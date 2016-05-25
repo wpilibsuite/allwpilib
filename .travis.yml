@@ -7,7 +7,7 @@ before_install:
   - wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
   - sudo add-apt-repository ppa:wpilib/toolchain -y
   - sudo apt-get update -q || true
-  - sudo apt-get install frc-toolchain libgazebo6-dev protobuf-compiler libprotobuf-dev -y
+  - sudo apt-get install frc-toolchain libgazebo7-dev protobuf-compiler libprotobuf-dev -y
 
 
 before_cache:

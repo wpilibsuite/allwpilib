@@ -17,8 +17,6 @@
 #include <gazebo/sensors/sensors.hh>
 #include <gazebo/transport/transport.hh>
 
-#include <boost/pointer_cast.hpp>
-
 GZ_REGISTER_MODEL_PLUGIN(Rangefinder)
 
 Rangefinder::Rangefinder() {}
@@ -29,7 +27,7 @@ void Rangefinder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 
   // Parse SDF properties
-  sensor = boost::dynamic_pointer_cast<sensors::SonarSensor>(
+  sensor = std::dynamic_pointer_cast<sensors::SonarSensor>(
       sensors::get_sensor(sdf->Get<std::string>("sensor")));
   if (sdf->HasElement("topic")) {
     topic = sdf->Get<std::string>("topic");
@@ -37,8 +35,8 @@ void Rangefinder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
     topic = "~/" + sdf->GetAttribute("name")->GetAsString();
   }
 
-  gzmsg << "Initializing rangefinder: " << topic
-        << " sensor=" << sensor->GetName() << std::endl;
+  gzmsg << "Initializing rangefinder: " << topic << " sensor=" << sensor->Name()
+        << std::endl;
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
@@ -56,6 +54,6 @@ void Rangefinder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
 
 void Rangefinder::Update(const common::UpdateInfo& info) {
   msgs::Float64 msg;
-  msg.set_data(sensor->GetRange());
+  msg.set_data(sensor->Range());
   pub->Publish(msg);
 }

@@ -29,7 +29,7 @@ using namespace gazebo;
  * To add a pneumatic piston to your robot, add the following XML to
  * your robot model:
  *
- *     <plugin name="my_piston" filename="libgz_pneumatic_piston.so">
+ *     <plugin name="my_piston" filename="libpneumatic_piston.so">
  *       <joint>Joint Name</joint>
  *       <topic>~/my/topic</topic>
  *       <direction>{forward, reversed}</direction>

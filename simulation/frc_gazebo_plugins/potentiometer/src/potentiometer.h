@@ -22,7 +22,7 @@ using namespace gazebo;
  * To add a potentiometer to your robot, add the following XML to your
  * robot model:
  *
- *     <plugin name="my_pot" filename="libgz_potentiometer.so">
+ *     <plugin name="my_pot" filename="libpotentiometer.so">
  *       <joint>Joint Name</joint>
  *       <topic>~/my/topic</topic>
  *       <units>{degrees, radians}</units>

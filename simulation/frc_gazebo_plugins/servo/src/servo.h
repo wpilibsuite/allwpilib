@@ -23,9 +23,10 @@ using namespace gazebo;
  * To add a servo to your robot, add the following XML to your robot
  * model:
  *
- *     <plugin name="my_servo" filename="libgz_servo.so">
+ *     <plugin name="my_servo" filename="libservo.so">
  *       <joint>Joint Name</joint>
  *       <topic>/gzebo/frc/simulator/pwm/1</topic>
+ *       <zero_position>0</zero_position>
  *     </plugin>
  *
  * - `link`: Name of the link the servo is attached to.
