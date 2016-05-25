@@ -24,7 +24,7 @@ regexExclude = re.compile(folderExclude +
 
 # Handle running in either the root or styleguide directories
 configPath = ""
-if os.getcwd().rpartition("/")[2] == "styleguide":
+if os.getcwd().rpartition(os.sep)[2] == "styleguide":
     configPath = ".."
 else:
     configPath = "."
