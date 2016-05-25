@@ -8,9 +8,9 @@
 #include "ControllerPower.h"
 
 #include <stdint.h>
-#include <HAL/HAL.h>
-#include <HAL/Power.h>
 #include "ErrorBase.h"
+#include "HAL/HAL.h"
+#include "HAL/Power.h"
 
 /**
  * Get the input voltage to the robot controller.
