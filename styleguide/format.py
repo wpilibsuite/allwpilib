@@ -42,6 +42,10 @@ clangExec = "clang-format"
 if sys.platform.startswith("win32"):
     clangExec += ".exe"
 
+if not files:
+    print("Error: no files found to format", file=sys.stderr)
+    sys.exit(1)
+
 for name in files:
     # List names of files as they are processed if verbose flag was given
     if len(sys.argv) > 1 and sys.argv[1] == "-v":
