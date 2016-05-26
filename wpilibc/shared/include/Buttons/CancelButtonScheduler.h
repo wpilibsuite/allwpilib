@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __CANCEL_BUTTON_SCHEDULER_H__
-#define __CANCEL_BUTTON_SCHEDULER_H__
+#pragma once
 
 #include "Buttons/ButtonScheduler.h"
 
@@ -22,5 +21,3 @@ class CancelButtonScheduler : public ButtonScheduler {
  private:
   bool pressedLast;
 };
-
-#endif

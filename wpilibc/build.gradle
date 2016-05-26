@@ -26,4 +26,3 @@ apply from: 'athena.gradle'
 if (hasProperty('makeSim')){
     apply from: 'simulation.gradle'
 }
-

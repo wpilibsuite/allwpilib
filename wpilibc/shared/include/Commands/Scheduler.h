@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __SCHEDULER_H__
-#define __SCHEDULER_H__
+#pragma once
 
 #include <list>
 #include <map>
@@ -67,4 +66,3 @@ class Scheduler : public ErrorBase, public NamedSendable {
   std::shared_ptr<ITable> m_table;
   bool m_runningCommandsChanged = false;
 };
-#endif

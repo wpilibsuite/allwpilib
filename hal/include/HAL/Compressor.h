@@ -7,8 +7,7 @@
 
 #include <stdint.h>
 
-#ifndef __HAL_COMPRESSOR_H__
-#define __HAL_COMPRESSOR_H__
+#pragma once
 
 extern "C" {
 void* initializeCompressor(uint8_t module);
@@ -30,5 +29,3 @@ bool getCompressorNotConnectedStickyFault(void* pcm_pointer, int32_t* status);
 bool getCompressorNotConnectedFault(void* pcm_pointer, int32_t* status);
 void clearAllPCMStickyFaults(void* pcm_pointer, int32_t* status);
 }
-
-#endif

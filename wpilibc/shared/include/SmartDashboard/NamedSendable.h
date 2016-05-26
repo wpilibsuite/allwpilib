@@ -1,12 +1,11 @@
-/*
- * NamedSendable.h
- *
- *  Created on: Oct 19, 2012
- *      Author: Mitchell Wills
- */
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2012-2016. All Rights Reserved.                        */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
-#ifndef NAMEDSENDABLE_H_
-#define NAMEDSENDABLE_H_
+#pragma once
 
 #include <string>
 #include "SmartDashboard/Sendable.h"
@@ -24,5 +23,3 @@ class NamedSendable : public Sendable {
    */
   virtual std::string GetName() const = 0;
 };
-
-#endif /* NAMEDSENDABLE_H_ */

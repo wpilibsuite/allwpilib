@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef Compressor_H_
-#define Compressor_H_
+#pragma once
 
 #include <memory>
 
@@ -61,5 +60,3 @@ class Compressor : public SensorBase,
 
   std::shared_ptr<ITable> m_table;
 };
-
-#endif /* Compressor_H_ */

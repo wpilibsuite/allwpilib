@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __BUTTON_SCHEDULER_H__
-#define __BUTTON_SCHEDULER_H__
+#pragma once
 
 class Trigger;
 class Command;
@@ -23,5 +22,3 @@ class ButtonScheduler {
   Trigger* m_button;
   Command* m_command;
 };
-
-#endif

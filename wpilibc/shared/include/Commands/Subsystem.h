@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __SUBSYSTEM_H__
-#define __SUBSYSTEM_H__
+#pragma once
 
 #include <memory>
 #include <string>
@@ -46,5 +45,3 @@ class Subsystem : public ErrorBase, public NamedSendable {
  protected:
   std::shared_ptr<ITable> m_table;
 };
-
-#endif

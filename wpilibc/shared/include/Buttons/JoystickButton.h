@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __JOYSTICK_BUTTON_H__
-#define __JOYSTICK_BUTTON_H__
+#pragma once
 
 #include "Buttons/Button.h"
 #include "GenericHID.h"
@@ -22,5 +21,3 @@ class JoystickButton : public Button {
   GenericHID* m_joystick;
   int m_buttonNumber;
 };
-
-#endif

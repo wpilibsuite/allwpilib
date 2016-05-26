@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __TOGGLE_BUTTON_SCHEDULER_H__
-#define __TOGGLE_BUTTON_SCHEDULER_H__
+#pragma once
 
 #include "Buttons/ButtonScheduler.h"
 
@@ -22,5 +21,3 @@ class ToggleButtonScheduler : public ButtonScheduler {
  private:
   bool pressedLast;
 };
-
-#endif

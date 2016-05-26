@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef JOYSTICK_H_
-#define JOYSTICK_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -115,5 +114,3 @@ class Joystick : public GenericHID, public ErrorBase {
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;
 };
-
-#endif

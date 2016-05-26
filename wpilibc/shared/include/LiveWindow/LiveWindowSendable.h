@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef LIVEWINDOWSENDABLE_H_
-#define LIVEWINDOWSENDABLE_H_
+#pragma once
 
 #include "SmartDashboard/Sendable.h"
 
@@ -35,5 +34,3 @@ class LiveWindowSendable : public Sendable {
    */
   virtual void StopLiveWindowMode() = 0;
 };
-
-#endif /* LIVEWINDOWSENDABLE_H_ */

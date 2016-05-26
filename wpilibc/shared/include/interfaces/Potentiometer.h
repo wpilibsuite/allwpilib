@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef INTERFACES_POTENTIOMETER_H
-#define INTERFACES_POTENTIOMETER_H
+#pragma once
 
 #include "PIDSource.h"
 
@@ -26,5 +25,3 @@ class Potentiometer : public PIDSource {
 
   virtual void SetPIDSourceType(PIDSourceType pidSource) override;
 };
-
-#endif

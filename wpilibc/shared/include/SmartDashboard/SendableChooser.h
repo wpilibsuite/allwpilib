@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __SENDABLE_CHOOSER_H__
-#define __SENDABLE_CHOOSER_H__
+#pragma once
 
 #include <map>
 #include <memory>
@@ -44,5 +43,3 @@ class SendableChooser : public Sendable {
   std::map<std::string, void*> m_choices;
   std::shared_ptr<ITable> m_table;
 };
-
-#endif

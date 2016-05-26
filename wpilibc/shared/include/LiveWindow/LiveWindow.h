@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _LIVE_WINDOW_H
-#define _LIVE_WINDOW_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -82,5 +81,3 @@ class LiveWindow {
   bool m_enabled = false;
   bool m_firstTime = true;
 };
-
-#endif

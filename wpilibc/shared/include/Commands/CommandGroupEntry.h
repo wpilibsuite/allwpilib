@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef __COMMAND_GROUP_ENTRY_H__
-#define __COMMAND_GROUP_ENTRY_H__
+#pragma once
 
 class Command;
 
@@ -26,5 +25,3 @@ class CommandGroupEntry {
   Command* m_command = nullptr;
   Sequence m_state = kSequence_InSequence;
 };
-
-#endif

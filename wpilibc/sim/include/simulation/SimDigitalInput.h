@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _SIM_DIGITAL_INPUT_H
-#define _SIM_DIGITAL_INPUT_H
+#pragma once
 
 #include <gazebo/transport/transport.hh>
 #include "simulation/gz_msgs/msgs.h"
@@ -27,5 +26,3 @@ class SimDigitalInput {
   transport::SubscriberPtr sub;
   void callback(const msgs::ConstBoolPtr& msg);
 };
-
-#endif

@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef _SIM_FLOAT_INPUT_H
-#define _SIM_FLOAT_INPUT_H
+#pragma once
 
 #include <gazebo/transport/transport.hh>
 #include "simulation/gz_msgs/msgs.h"
@@ -27,5 +26,3 @@ class SimFloatInput {
   transport::SubscriberPtr sub;
   void callback(const msgs::ConstFloat64Ptr& msg);
 };
-
-#endif

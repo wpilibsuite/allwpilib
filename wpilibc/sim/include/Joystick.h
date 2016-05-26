@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef JOYSTICK_H_
-#define JOYSTICK_H_
+#pragma once
 
 #include <memory>
 #include "ErrorBase.h"
@@ -77,5 +76,3 @@ class Joystick : public GenericHID, public ErrorBase {
   std::unique_ptr<uint32_t[]> m_axes;
   std::unique_ptr<uint32_t[]> m_buttons;
 };
-
-#endif
