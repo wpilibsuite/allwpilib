@@ -7,6 +7,7 @@
 from datetime import date
 import os
 import re
+import sys
 
 sep = os.sep
 # If directory separator is backslash, escape it for regexes
