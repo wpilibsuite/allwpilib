@@ -7,6 +7,8 @@
 
 #include "encoder.h"
 
+#include <boost/algorithm/string/replace.hpp>
+
 GZ_REGISTER_MODEL_PLUGIN(Encoder)
 
 void Encoder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {

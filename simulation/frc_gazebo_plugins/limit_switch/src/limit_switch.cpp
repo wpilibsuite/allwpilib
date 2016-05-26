@@ -7,6 +7,8 @@
 
 #include "limit_switch.h"
 
+#include <boost/algorithm/string/replace.hpp>
+
 GZ_REGISTER_MODEL_PLUGIN(LimitSwitch)
 
 void LimitSwitch::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
