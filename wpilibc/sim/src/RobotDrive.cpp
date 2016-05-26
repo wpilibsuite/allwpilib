@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "RobotDrive.h"
-//#include "CANJaguar.h"
 #include <math.h>
 #include "GenericHID.h"
 #include "Joystick.h"
