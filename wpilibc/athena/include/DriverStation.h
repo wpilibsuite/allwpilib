@@ -61,7 +61,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   bool IsNewControlData() const;
   bool IsFMSAttached() const;
   bool IsSysActive() const;
-  bool IsSysBrownedOut() const;
+  bool IsBrownedOut() const;
 
   Alliance GetAlliance() const;
   uint32_t GetLocation() const;
