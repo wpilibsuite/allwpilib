@@ -11,8 +11,6 @@
 
 #include "HAL/HAL.h"
 #include "edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary.h"
-//#include "NetworkCommunication/FRCComm.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "HALUtil.h"
 
 // set the logging level

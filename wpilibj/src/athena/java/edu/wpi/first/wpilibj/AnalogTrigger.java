@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
-// import com.sun.jna.Pointer;
-
 /**
  * Class for creating and configuring Analog Triggers.
  *

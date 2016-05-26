@@ -7,9 +7,8 @@
 
 #include "Relay.h"
 
-#include "MotorSafetyHelper.h"
-//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
+#include "MotorSafetyHelper.h"
 #include "WPIErrors.h"
 
 /**

@@ -7,7 +7,6 @@
 
 #include "Talon.h"
 
-//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**

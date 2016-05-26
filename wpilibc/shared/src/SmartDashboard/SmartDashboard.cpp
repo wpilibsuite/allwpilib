@@ -7,7 +7,6 @@
 
 #include "SmartDashboard/SmartDashboard.h"
 
-//#include "NetworkCommunication/UsageReporting.h"
 #include "HLUsageReporting.h"
 #include "SmartDashboard/NamedSendable.h"
 #include "WPIErrors.h"

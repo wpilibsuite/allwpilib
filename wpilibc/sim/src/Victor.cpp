@@ -7,7 +7,6 @@
 
 #include "Victor.h"
 
-//#include "NetworkCommunication/UsageReporting.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**

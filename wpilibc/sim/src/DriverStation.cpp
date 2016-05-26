@@ -6,14 +6,16 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DriverStation.h"
-#include "Timer.h"
-#include "simulation/MainNode.h"
-//#include "MotorSafetyHelper.h"
+
 #include <string.h>
+
+#include <boost/mem_fn.hpp>
+
 #include "Log.h"
+#include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "boost/mem_fn.hpp"
+#include "simulation/MainNode.h"
 
 const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
