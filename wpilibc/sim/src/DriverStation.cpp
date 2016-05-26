@@ -15,15 +15,6 @@
 #include "WPIErrors.h"
 #include "boost/mem_fn.hpp"
 
-// set the logging level
-TLogLevel dsLogLevel = logDEBUG;
-
-#define DS_LOG(level)     \
-  if (level > dsLogLevel) \
-    ;                     \
-  else                    \
-  Log().Get(level)
-
 const uint32_t DriverStation::kBatteryChannel;
 const uint32_t DriverStation::kJoystickPorts;
 const uint32_t DriverStation::kJoystickAxes;

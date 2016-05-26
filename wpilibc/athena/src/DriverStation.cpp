@@ -15,15 +15,7 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-// set the logging level
-TLogLevel dsLogLevel = logDEBUG;
 const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-
-#define DS_LOG(level)     \
-  if (level > dsLogLevel) \
-    ;                     \
-  else                    \
-  Log().Get(level)
 
 const uint32_t DriverStation::kJoystickPorts;
 
