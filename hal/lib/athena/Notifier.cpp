@@ -94,7 +94,7 @@ void* initializeNotifier(void (*process)(uint64_t, void*), void* param,
     if (!notifierManager) {
       notifierManager =
           new tInterruptManager(1 << kTimerInterruptNumber, false, status);
-      notifierManager->registerHandler(alarmCallback, NULL, status);
+      notifierManager->registerHandler(alarmCallback, nullptr, status);
       notifierManager->enable(status);
     }
     if (!notifierAlarm) notifierAlarm = tAlarm::create(status);

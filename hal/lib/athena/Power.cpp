@@ -9,10 +9,10 @@
 
 #include "ChipObject.h"
 
-static tPower* power = NULL;
+static tPower* power = nullptr;
 
 static void initializePower(int32_t* status) {
-  if (power == NULL) {
+  if (power == nullptr) {
     power = tPower::create(status);
   }
 }
