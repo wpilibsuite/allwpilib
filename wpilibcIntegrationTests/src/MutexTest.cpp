@@ -6,12 +6,14 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/cpp/priority_mutex.h"
-#include "TestBench.h"
 
 #include <atomic>
 #include <condition_variable>
 #include <thread>
+
 #include "gtest/gtest.h"
+
+#include "TestBench.h"
 
 namespace wpilib {
 namespace testing {

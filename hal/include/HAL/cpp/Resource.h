@@ -8,10 +8,11 @@
 #pragma once
 
 #include <stdint.h>
-#include "../Errors.h"
-#include "HAL/cpp/priority_mutex.h"
 
 #include <vector>
+
+#include "../Errors.h"
+#include "HAL/cpp/priority_mutex.h"
 
 // TODO: Replace this with something appropriate to avoid conflicts with
 // wpilibC++ Resource class (which performs an essentially identical function).

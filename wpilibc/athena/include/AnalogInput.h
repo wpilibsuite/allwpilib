@@ -7,12 +7,11 @@
 
 #pragma once
 
-#include "HAL/HAL.h"
+#include <memory>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
-
-#include <memory>
 
 /**
  * Analog input class.

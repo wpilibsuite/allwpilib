@@ -6,15 +6,17 @@
 /*----------------------------------------------------------------------------*/
 
 #include "CameraServer.h"
-#include "Utility.h"
-#include "WPIErrors.h"
 
 #include <netdb.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
 #include <chrono>
-#include <cstring>
 #include <iostream>
+
+#include "Utility.h"
+#include "WPIErrors.h"
 
 constexpr uint8_t CameraServer::kMagicNumber[];
 

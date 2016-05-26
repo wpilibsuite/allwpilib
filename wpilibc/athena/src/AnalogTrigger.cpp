@@ -8,6 +8,7 @@
 #include "AnalogTrigger.h"
 
 #include "AnalogInput.h"
+#include "HAL/HAL.h"
 #include "HAL/Port.h"
 #include "Resource.h"
 #include "WPIErrors.h"

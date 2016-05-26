@@ -5,11 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Preferences.h>
-#include <Timer.h>
-#include <cstdio>
+#include "Preferences.h"
+
+#include <stdio.h>
 #include <fstream>
+
 #include "gtest/gtest.h"
+
+#include "Timer.h"
 
 static const char* kFileName = "networktables.ini";
 static const double kSaveTime = 1.2;

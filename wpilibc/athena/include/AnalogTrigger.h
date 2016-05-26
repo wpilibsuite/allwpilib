@@ -8,7 +8,6 @@
 #pragma once
 
 #include "AnalogTriggerOutput.h"
-#include "HAL/HAL.h"
 #include "SensorBase.h"
 
 class AnalogInput;

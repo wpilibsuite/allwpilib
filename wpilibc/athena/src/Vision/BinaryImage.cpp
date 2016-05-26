@@ -6,7 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Vision/BinaryImage.h"
-#include <cstring>
+
+#include <string.h>
+
 #include "WPIErrors.h"
 
 using namespace std;

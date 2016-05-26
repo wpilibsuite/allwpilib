@@ -5,11 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Counter.h>
-#include <DigitalGlitchFilter.h>
-#include <DigitalInput.h>
-#include <Encoder.h>
+#include "DigitalGlitchFilter.h"
+
 #include "gtest/gtest.h"
+
+#include "Counter.h"
+#include "DigitalInput.h"
+#include "Encoder.h"
 
 /**
  * Tests that configuring inputs to be filtered succeeds.

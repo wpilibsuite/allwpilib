@@ -6,7 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/cpp/Resource.h"
-#include <cstddef>
+
+#include <stddef.h>
+
 #include "HAL/Errors.h"
 #include "HAL/cpp/priority_mutex.h"
 

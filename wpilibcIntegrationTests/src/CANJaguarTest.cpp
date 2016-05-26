@@ -5,14 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <AnalogOutput.h>
-#include <CANJaguar.h>
-#include <DigitalOutput.h>
-#include <Relay.h>
-#include <Timer.h>
-#include <WPIErrors.h>
-#include "TestBench.h"
+#include "CANJaguar.h"
+
 #include "gtest/gtest.h"
+
+#include "AnalogOutput.h"
+#include "DigitalOutput.h"
+#include "Relay.h"
+#include "TestBench.h"
+#include "Timer.h"
+#include "WPIErrors.h"
 
 static constexpr double kSpikeTime = 0.5;
 

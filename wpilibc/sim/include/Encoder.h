@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
+
 #include <memory>
 
 #include "CounterBase.h"

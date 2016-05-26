@@ -7,9 +7,10 @@
 
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
+
 #include <memory>
-#include "HAL/HAL.h"
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 

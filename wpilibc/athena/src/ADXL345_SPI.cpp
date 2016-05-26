@@ -8,6 +8,7 @@
 #include "ADXL345_SPI.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
 const uint8_t ADXL345_SPI::kPowerCtlRegister;

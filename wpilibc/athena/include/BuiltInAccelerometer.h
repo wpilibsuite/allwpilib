@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "interfaces/Accelerometer.h"
-
-#include <memory>
 
 /**
  * Built-in accelerometer.

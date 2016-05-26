@@ -7,6 +7,8 @@
 
 #include "SolenoidBase.h"
 
+#include "HAL/HAL.h"
+
 void* SolenoidBase::m_ports[m_maxModules][m_maxPorts];
 std::unique_ptr<Resource> SolenoidBase::m_allocated;
 

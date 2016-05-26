@@ -9,7 +9,7 @@
 #include "RobotState.h"
 #include "Utility.h"
 
-#include <cstring>
+#include <string.h>
 
 RobotBase* RobotBase::m_instance = nullptr;
 

@@ -6,16 +6,18 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HALUtil.h"
+
 #include <assert.h>
+#include <errno.h>
 #include <jni.h>
-#include <string.h>
+
 #include <cstring>
 #include <string>
+
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"
 #include "Log.h"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
-#include "errno.h"
 
 // set the logging level
 TLogLevel halUtilLogLevel = logWARNING;

@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <memory>
+
 #include "AnalogInput.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "interfaces/Potentiometer.h"
-
-#include <memory>
 
 /**
  * Class for reading analog potentiometers. Analog potentiometers read

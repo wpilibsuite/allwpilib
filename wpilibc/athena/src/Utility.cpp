@@ -7,14 +7,15 @@
 
 #include "Utility.h"
 
-//#include "NetworkCommunication/FRCComm.h"
 #include <cxxabi.h>
 #include <execinfo.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <iostream>
 #include <sstream>
+
 #include "HAL/HAL.h"
 #include "Task.h"
 #include "nivision.h"

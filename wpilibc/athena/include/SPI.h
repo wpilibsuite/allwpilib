@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "HAL/HAL.h"
 #include "SensorBase.h"
 
 class DigitalOutput;

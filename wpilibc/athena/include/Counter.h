@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include "AnalogTriggerOutput.h"
+#include <memory>
+
+#include "AnalogTrigger.h"
 #include "CounterBase.h"
-#include "HAL/HAL.h"
+#include "HAL/Counter.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
-
-#include <memory>
 
 class DigitalGlitchFilter;
 

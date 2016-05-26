@@ -7,8 +7,8 @@
 
 #pragma once
 
+#include <math.h>
 #include <stdint.h>
-#include <cmath>
 
 #include "Accelerometer.h"
 #include "AnalogAccumulator.h"
@@ -29,10 +29,9 @@
 #include "Relay.h"
 #include "SPI.h"
 #include "SPIAccumulator.h"
+#include "Semaphore.h"
 #include "SerialPort.h"
 #include "Solenoid.h"
-
-#include "Semaphore.h"
 #include "Task.h"
 #include "Utilities.h"
 

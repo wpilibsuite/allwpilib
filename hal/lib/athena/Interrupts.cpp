@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/Interrupts.h"
+
 #include "ChipObject.h"
 
 extern void remapDigitalSource(bool analogTrigger, uint32_t& pin,

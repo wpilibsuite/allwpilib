@@ -7,8 +7,9 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <condition_variable>
-#include <cstdint>
 
 #include "HAL/cpp/priority_mutex.h"
 

@@ -8,19 +8,18 @@
 #include "Utility.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include "Timer.h"
-#include "simulation/simTime.h"
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <iostream>
 #include <sstream>
 #if not defined(_WIN32)
 #include <cxxabi.h>
 #include <execinfo.h>
 #endif
+
+#include "Timer.h"
+#include "simulation/simTime.h"
 
 static bool stackTraceEnabled = false;
 static bool suspendOnAssertEnabled = false;

@@ -7,11 +7,11 @@
 
 #pragma once
 
-#include "HAL/HAL.h"
+#include <memory>
+
+#include "HAL/Interrupts.h"
 #include "Resource.h"
 #include "SensorBase.h"
-
-#include <memory>
 
 class InterruptableSensorBase : public SensorBase {
  public:

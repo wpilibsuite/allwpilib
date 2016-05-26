@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
+#include "HAL/HAL.h"
 #include "HAL/Port.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Resource.h"

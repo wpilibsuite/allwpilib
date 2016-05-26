@@ -7,11 +7,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SolenoidBase.h"
 #include "tables/ITableListener.h"
-
-#include <memory>
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output

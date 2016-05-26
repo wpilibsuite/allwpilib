@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 
 class TestBench {
  public:

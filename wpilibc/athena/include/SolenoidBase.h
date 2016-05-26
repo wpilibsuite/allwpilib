@@ -7,12 +7,10 @@
 
 #pragma once
 
-#include "HAL/HAL.h"
-#include "HAL/Port.h"
+#include <memory>
+
 #include "Resource.h"
 #include "SensorBase.h"
-
-#include <memory>
 
 /**
  * SolenoidBase class is the common base class for the Solenoid and

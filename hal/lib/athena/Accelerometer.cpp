@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <stdio.h>
+
 #include "ChipObject.h"
 
 // The 7-bit I2C address with a 0 "send" bit

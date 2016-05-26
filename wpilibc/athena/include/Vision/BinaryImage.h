@@ -7,15 +7,15 @@
 
 #pragma once
 
+#include <algorithm>
+#include <vector>
+
 #include "MonoImage.h"
 /**
  * Included for ParticleAnalysisReport definition
  * TODO: Eliminate this dependency!
  */
 #include "Vision/VisionAPI.h"
-
-#include <algorithm>
-#include <vector>
 
 class BinaryImage : public MonoImage {
  public:

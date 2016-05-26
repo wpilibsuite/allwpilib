@@ -8,7 +8,6 @@
 #pragma once
 
 #include "CounterBase.h"
-#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 

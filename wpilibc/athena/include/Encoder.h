@@ -7,14 +7,13 @@
 
 #pragma once
 
+#include <memory>
+
 #include "Counter.h"
 #include "CounterBase.h"
-#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
-
-#include <memory>
 
 class DigitalSource;
 class DigitalGlitchFilter;

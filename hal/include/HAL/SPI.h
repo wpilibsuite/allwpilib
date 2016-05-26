@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #pragma once
+
 #include <stdint.h>
 
 #include "HAL/cpp/priority_mutex.h"

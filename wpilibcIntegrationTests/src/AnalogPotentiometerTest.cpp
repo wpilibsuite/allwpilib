@@ -5,12 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <AnalogOutput.h>
-#include <AnalogPotentiometer.h>
-#include <ControllerPower.h>
-#include <Timer.h>
-#include "TestBench.h"
+#include "AnalogPotentiometer.h"
+
 #include "gtest/gtest.h"
+
+#include "AnalogOutput.h"
+#include "ControllerPower.h"
+#include "TestBench.h"
+#include "Timer.h"
 
 static const double kScale = 270.0;
 static const double kAngle = 180.0;

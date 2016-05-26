@@ -5,10 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <Notifier.h>
-#include <Timer.h>
-#include "TestBench.h"
+#include "Notifier.h"
+
 #include "gtest/gtest.h"
+
+#include "TestBench.h"
+#include "Timer.h"
 
 unsigned notifierCounter;
 

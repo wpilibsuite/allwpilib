@@ -7,12 +7,12 @@
 
 #pragma once
 
+#include <memory>
+
 #include "GyroBase.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "Notifier.h"
 #include "SPI.h"
-
-#include <memory>
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.

@@ -7,11 +7,12 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <memory>
+
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
-
-#include <cstdint>
-#include <memory>
 
 class DigitalGlitchFilter;
 

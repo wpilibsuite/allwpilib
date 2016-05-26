@@ -9,6 +9,7 @@
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
 #include "DriverStation.h"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
 static uint8_t kRegWrite = 0x0A;

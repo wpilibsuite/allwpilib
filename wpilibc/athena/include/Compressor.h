@@ -8,12 +8,11 @@
 #ifndef Compressor_H_
 #define Compressor_H_
 
-#include "HAL/HAL.h"
+#include <memory>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
-
-#include <memory>
 
 /**
  * PCM compressor

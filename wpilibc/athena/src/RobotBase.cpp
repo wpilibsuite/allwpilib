@@ -7,8 +7,9 @@
 
 #include "RobotBase.h"
 
-#include <cstdio>
-#include <cstring>
+#include <stdio.h>
+#include <string.h>
+
 #include "DriverStation.h"
 #include "HAL/HAL.h"
 #include "HLUsageReporting.h"

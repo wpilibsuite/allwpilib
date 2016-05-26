@@ -7,12 +7,12 @@
 
 #pragma once
 
+#include <string>
+
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "NIIMAQdx.h"
 #include "nivision.h"
-
-#include <string>
 
 typedef enum whiteBalance_enum {
   kFixedIndoor = 3000,

@@ -9,9 +9,6 @@
 
 #define REAL
 
-#include <iostream>
-#include "string.h"
-
 #include "ADXL345_I2C.h"
 #include "ADXL345_SPI.h"
 #include "ADXL362.h"

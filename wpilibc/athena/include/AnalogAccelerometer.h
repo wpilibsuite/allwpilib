@@ -7,12 +7,12 @@
 
 #pragma once
 
+#include <memory>
+
 #include "AnalogInput.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
-
-#include <memory>
 
 /**
  * Handle operation of an analog accelerometer.

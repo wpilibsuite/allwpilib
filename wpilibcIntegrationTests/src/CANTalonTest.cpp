@@ -5,10 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <CANTalon.h>
-#include <Timer.h>
-#include "TestBench.h"
+#include "CANTalon.h"
+
 #include "gtest/gtest.h"
+
+#include "TestBench.h"
+#include "Timer.h"
 
 const int deviceId = 0;
 

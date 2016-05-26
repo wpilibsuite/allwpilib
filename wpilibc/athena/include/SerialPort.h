@@ -8,7 +8,6 @@
 #pragma once
 
 #include "ErrorBase.h"
-#include "HAL/HAL.h"
 
 /**
  * Driver for the RS-232 serial port on the RoboRIO.
