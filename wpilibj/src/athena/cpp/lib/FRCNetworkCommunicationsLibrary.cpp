@@ -35,7 +35,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationUsageReportingReport(
     JNIEnv *paramEnv, jclass, jbyte paramResource, jbyte paramInstanceNumber,
     jbyte paramContext, jstring paramFeature) {
-  const char *featureStr = paramEnv->GetStringUTFChars(paramFeature, NULL);
+  const char *featureStr = paramEnv->GetStringUTFChars(paramFeature, nullptr);
   NETCOMM_LOG(logDEBUG) << "Calling FRCNetworkCommunicationsLibrary report "
                         << "res:" << (unsigned int)paramResource
                         << " instance:" << (unsigned int)paramInstanceNumber
@@ -333,7 +333,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetB
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetErrorData(
     JNIEnv *env, jclass, jstring error) {
-  const char *errorStr = env->GetStringUTFChars(error, NULL);
+  const char *errorStr = env->GetStringUTFChars(error, nullptr);
   jsize length = env->GetStringUTFLength(error);
 
   NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr;
@@ -352,9 +352,9 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSendError(
     JNIEnv *env, jclass, jboolean isError, jint errorCode, jboolean isLVCode,
     jstring details, jstring location, jstring callStack, jboolean printMsg) {
-  const char *detailsStr = env->GetStringUTFChars(details, NULL);
-  const char *locationStr = env->GetStringUTFChars(location, NULL);
-  const char *callStackStr = env->GetStringUTFChars(callStack, NULL);
+  const char *detailsStr = env->GetStringUTFChars(details, nullptr);
+  const char *locationStr = env->GetStringUTFChars(location, nullptr);
+  const char *callStackStr = env->GetStringUTFChars(callStack, nullptr);
 
   NETCOMM_LOG(logDEBUG) << "Send Error: " << detailsStr;
   NETCOMM_LOG(logDEBUG) << "Location: " << locationStr;

@@ -35,8 +35,8 @@ struct AnalogPort {
 
 static bool analogSampleRateSet = false;
 static priority_recursive_mutex analogRegisterWindowMutex;
-static tAI* analogInputSystem = NULL;
-static tAO* analogOutputSystem = NULL;
+static tAI* analogInputSystem = nullptr;
+static tAO* analogOutputSystem = nullptr;
 static uint32_t analogNumChannelsToActivate = 0;
 
 extern "C" {
@@ -74,7 +74,7 @@ void* initializeAnalogInputPort(void* port_pointer, int32_t* status) {
   if (isAccumulatorChannel(analog_port, status)) {
     analog_port->accumulator = tAccumulator::create(port->pin, status);
   } else
-    analog_port->accumulator = NULL;
+    analog_port->accumulator = nullptr;
 
   // Set default configuration
   analogInputSystem->writeScanList(port->pin, port->pin, status);
@@ -100,7 +100,7 @@ void* initializeAnalogOutputPort(void* port_pointer, int32_t* status) {
   // Initialize port structure
   AnalogPort* analog_port = new AnalogPort();
   analog_port->port = *port;
-  analog_port->accumulator = NULL;
+  analog_port->accumulator = nullptr;
   return analog_port;
 }
 
@@ -517,7 +517,7 @@ void initAccumulator(void* analog_port_pointer, int32_t* status) {
  */
 void resetAccumulator(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  if (port->accumulator == NULL) {
+  if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return;
   }
@@ -539,7 +539,7 @@ void resetAccumulator(void* analog_port_pointer, int32_t* status) {
 void setAccumulatorCenter(void* analog_port_pointer, int32_t center,
                           int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  if (port->accumulator == NULL) {
+  if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return;
   }
@@ -552,7 +552,7 @@ void setAccumulatorCenter(void* analog_port_pointer, int32_t center,
 void setAccumulatorDeadband(void* analog_port_pointer, int32_t deadband,
                             int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  if (port->accumulator == NULL) {
+  if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return;
   }
@@ -569,7 +569,7 @@ void setAccumulatorDeadband(void* analog_port_pointer, int32_t deadband,
  */
 int64_t getAccumulatorValue(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  if (port->accumulator == NULL) {
+  if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return 0;
   }
@@ -587,7 +587,7 @@ int64_t getAccumulatorValue(void* analog_port_pointer, int32_t* status) {
  */
 uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  if (port->accumulator == NULL) {
+  if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return 0;
   }
@@ -606,11 +606,11 @@ uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t* status) {
 void getAccumulatorOutput(void* analog_port_pointer, int64_t* value,
                           uint32_t* count, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  if (port->accumulator == NULL) {
+  if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return;
   }
-  if (value == NULL || count == NULL) {
+  if (value == nullptr || count == nullptr) {
     *status = NULL_PARAMETER;
     return;
   }
@@ -628,7 +628,7 @@ struct trigger_t {
 };
 typedef struct trigger_t AnalogTrigger;
 
-static hal::Resource* triggers = NULL;
+static hal::Resource* triggers = nullptr;
 
 void* initializeAnalogTrigger(void* port_pointer, uint32_t* index,
                               int32_t* status) {

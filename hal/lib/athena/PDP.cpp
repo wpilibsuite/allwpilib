@@ -11,7 +11,7 @@
 
 static const int NUM_MODULE_NUMBERS = 63;
 
-static PDP* pdp[NUM_MODULE_NUMBERS] = {NULL};
+static PDP* pdp[NUM_MODULE_NUMBERS] = {nullptr};
 
 extern "C" {
 

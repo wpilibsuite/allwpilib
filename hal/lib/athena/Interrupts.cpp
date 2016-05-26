@@ -35,8 +35,8 @@ void cleanInterrupts(void* interrupt_pointer, int32_t* status) {
   Interrupt* anInterrupt = (Interrupt*)interrupt_pointer;
   delete anInterrupt->anInterrupt;
   delete anInterrupt->manager;
-  anInterrupt->anInterrupt = NULL;
-  anInterrupt->manager = NULL;
+  anInterrupt->anInterrupt = nullptr;
+  anInterrupt->manager = nullptr;
 }
 
 /**

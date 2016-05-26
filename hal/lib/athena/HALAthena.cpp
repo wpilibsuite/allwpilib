@@ -372,7 +372,7 @@ int HALInitialize(int mode) {
 
 uint32_t HALReport(uint8_t resource, uint8_t instanceNumber, uint8_t context,
                    const char* feature) {
-  if (feature == NULL) {
+  if (feature == nullptr) {
     feature = "";
   }
 

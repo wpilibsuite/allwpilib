@@ -15,7 +15,7 @@
 
 static const int NUM_MODULE_NUMBERS = 63;
 
-PCM* PCM_modules[NUM_MODULE_NUMBERS] = {NULL};
+PCM* PCM_modules[NUM_MODULE_NUMBERS] = {nullptr};
 
 struct solenoid_port_t {
   PCM* module;

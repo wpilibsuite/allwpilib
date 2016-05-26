@@ -240,7 +240,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialGetBytesRecieved(
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialRead(
     JNIEnv* env, jclass, jbyte port, jobject dataReceived, jint size) {
   SERIALJNI_LOG(logDEBUG) << "Serial Read";
-  jbyte* dataReceivedPtr = NULL;
+  jbyte* dataReceivedPtr = nullptr;
   dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
   int32_t status = 0;
   jint retVal = serialRead(port, (char*)dataReceivedPtr, size, &status);
@@ -258,7 +258,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialRead(
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialWrite(
     JNIEnv* env, jclass, jbyte port, jobject dataToSend, jint size) {
   SERIALJNI_LOG(logDEBUG) << "Serial Write";
-  jbyte* dataToSendPtr = NULL;
+  jbyte* dataToSendPtr = nullptr;
   if (dataToSend != 0) {
     dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
   }

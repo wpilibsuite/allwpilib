@@ -261,7 +261,7 @@ void HALNetworkCommunicationObserveUserProgramTeleop();
 void HALNetworkCommunicationObserveUserProgramTest();
 
 uint32_t HALReport(uint8_t resource, uint8_t instanceNumber,
-                   uint8_t context = 0, const char* feature = NULL);
+                   uint8_t context = 0, const char* feature = nullptr);
 }
 
 // TODO: HACKS for now...
