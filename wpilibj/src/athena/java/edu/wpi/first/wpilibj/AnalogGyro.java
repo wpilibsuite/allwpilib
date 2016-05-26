@@ -28,14 +28,14 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   private static final float kDefaultVoltsPerDegreePerSecond = 0.007f;
   protected AnalogInput m_analog;
   private boolean m_channelAllocated = false;
-  
+
   private int m_gyroHandle = 0;
 
   /**
    * Initialize the gyro. Calibration is handled by calibrate().
    */
   public void initGyro() {
-    
+
     if (m_gyroHandle == 0) {
       m_gyroHandle = AnalogGyroJNI.initializeAnalogGyro(m_analog.m_port);
     }
@@ -107,7 +107,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
       throw new NullPointerException("AnalogInput supplied to Gyro constructor is null");
     }
     initGyro();
-    AnalogGyroJNI.setAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond, 
+    AnalogGyroJNI.setAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
                                           (float)offset, center);
     reset();
   }
@@ -173,7 +173,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
    * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second.
    */
   public void setSensitivity(double voltsPerDegreePerSecond) {
-    AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle, 
+    AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle,
                                                       (float)voltsPerDegreePerSecond);
   }
 

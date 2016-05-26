@@ -36,7 +36,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   public DigitalOutput(int channel) {
     checkDigitalChannel(channel);
     m_channel = channel;
-    
+
     m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte)channel), false);
 
     UsageReporting.report(tResourceType.kResourceType_DigitalOutput, channel);
@@ -67,7 +67,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   /**
    * @return The GPIO channel number that this object represents.
    */
-  @Override 
+  @Override
   public int getChannel() {
     return m_channel;
   }
@@ -181,7 +181,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   public int getAnalogTriggerTypeForRouting() {
     return 0;
   }
-  
+
   /**
    * Is this an analog trigger.
    *
@@ -191,7 +191,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   public boolean isAnalogTrigger() {
     return false;
   }
-  
+
   /**
    * Get the HAL Port Handle.
    *

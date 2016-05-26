@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
 public class DigitalInput extends DigitalSource implements LiveWindowSendable {
   private int m_channel = 0;
   private int m_handle = 0;
-  
+
   /**
    * Create an instance of a Digital Input class. Creates a digital input given a channel.
    *
@@ -32,13 +32,13 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
   public DigitalInput(int channel) {
     checkDigitalChannel(channel);
     m_channel = channel;
-    
+
     m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte)channel), true);
 
     LiveWindow.addSensor("DigitalInput", channel, this);
     UsageReporting.report(tResourceType.kResourceType_DigitalInput, channel);
   }
-  
+
   /**
    * Frees the resources for this output.
    */
@@ -46,7 +46,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
     if (m_interrupt != 0) {
       cancelInterrupts();
     }
-    
+
     DIOJNI.freeDIOPort(m_handle);
   }
 
@@ -79,7 +79,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
   public int getAnalogTriggerTypeForRouting() {
     return 0;
   }
-  
+
   /**
    * Is this an analog trigger.
    *
@@ -89,7 +89,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
   public boolean isAnalogTrigger() {
     return false;
   }
-  
+
   /**
    * Get the HAL Port Handle.
    *

@@ -15,7 +15,7 @@ public class FakeJoystick implements ISimJoystick {
 	public String getName() {
 		return "Empty Joystick";
 	}
-	
+
 	public String toString() {
 		return getName();
 	}

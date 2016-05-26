@@ -15,6 +15,6 @@ package edu.wpi.first.wpilibj;
  */
 public abstract class DigitalSource extends InterruptableSensorBase {
   public abstract boolean isAnalogTrigger();
-  
+
   public abstract int getChannel();
 }

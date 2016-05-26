@@ -81,7 +81,7 @@ public class DriverStation implements RobotState.Interface {
   private HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
   private HALJoystickButtons[] m_joystickButtonsCache = new HALJoystickButtons[kJoystickPorts];
   // preallocated byte buffer for button count
-  private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1); 
+  private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
 
   private int[] m_joystickIsXbox = new int[kJoystickPorts];
   private int[] m_joystickType = new int[kJoystickPorts];
@@ -94,7 +94,7 @@ public class DriverStation implements RobotState.Interface {
   private final Object m_newControlDataMutex;
   private final Object m_joystickMutex;
   private volatile boolean m_threadKeepAlive = true;
-  
+
   private boolean m_userInDisabled = false;
   private boolean m_userInAutonomous = false;
   private boolean m_userInTeleop = false;
@@ -129,9 +129,9 @@ public class DriverStation implements RobotState.Interface {
       m_joystickPOVs[i] = new HALJoystickPOVs(FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs);
 
       m_joystickButtonsCache[i] = new HALJoystickButtons();
-      m_joystickAxesCache[i] = 
+      m_joystickAxesCache[i] =
           new HALJoystickAxes(FRCNetworkCommunicationsLibrary.kMaxJoystickAxes);
-      m_joystickPOVsCache[i] = 
+      m_joystickPOVsCache[i] =
           new HALJoystickPOVs(FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs);
     }
 
@@ -216,11 +216,11 @@ public class DriverStation implements RobotState.Interface {
   protected void getData() {
     // Get the status of all of the joysticks
     for (byte stick = 0; stick < kJoystickPorts; stick++) {
-      m_joystickAxesCache[stick].m_count = 
-          FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick, 
+      m_joystickAxesCache[stick].m_count =
+          FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick,
                                                              m_joystickAxesCache[stick].m_axes);
-      m_joystickPOVsCache[stick].m_count = 
-          FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick, 
+      m_joystickPOVsCache[stick].m_count =
+          FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick,
                                                              m_joystickPOVsCache[stick].m_povs);
       m_joystickButtonsCache[stick].m_buttons =
           FRCNetworkCommunicationsLibrary.HALGetJoystickButtons(stick, m_buttonCountBuffer);
@@ -295,7 +295,7 @@ public class DriverStation implements RobotState.Interface {
     if (axis < 0 || axis >= FRCNetworkCommunicationsLibrary.kMaxJoystickAxes) {
       throw new RuntimeException("Joystick axis is out of range");
     }
-    
+
     boolean error = false;
     double retVal = 0.0;
     synchronized (m_joystickMutex) {
@@ -306,7 +306,7 @@ public class DriverStation implements RobotState.Interface {
       } else {
         retVal =  m_joystickAxes[stick].m_axes[axis];
       }
-    } 
+    }
     if (error) {
       reportJoystickUnpluggedWarning("Joystick axis " + axis + " on port " + stick
           + " not available, check if controller is plugged in");
@@ -504,7 +504,7 @@ public class DriverStation implements RobotState.Interface {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
     boolean error = false;
-    String retVal = "";  
+    String retVal = "";
     synchronized (m_joystickMutex) {
       // TODO: Remove this when calling for descriptor on empty stick no longer
       // crashes
@@ -514,7 +514,7 @@ public class DriverStation implements RobotState.Interface {
       } else {
         retVal = FRCNetworkCommunicationsLibrary.HALGetJoystickName((byte) stick);
       }
-    } 
+    }
     if (error) {
       reportJoystickUnpluggedWarning("Joystick on port " + stick
           + " not available, check if controller is plugged in");

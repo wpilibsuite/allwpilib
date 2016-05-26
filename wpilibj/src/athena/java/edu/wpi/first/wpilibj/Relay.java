@@ -110,7 +110,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
   }
 
   private final int m_channel;
-  
+
   private int m_forwardHandle = 0;
   private int m_reverseHandle = 0;
   private long m_port;
@@ -176,10 +176,10 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
     } catch (RuntimeException ex) {
       // do nothing. Ignore
     }
-    
+
     RelayJNI.freeRelayPort(m_forwardHandle);
     RelayJNI.freeRelayPort(m_reverseHandle);
-    
+
     m_forwardHandle = 0;
     m_reverseHandle = 0;
   }

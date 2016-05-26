@@ -116,7 +116,7 @@ public class JoystickList extends JList<ISimJoystick> {
 			int index = Integer.parseInt(indexString);
 			JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
 			int dropTargetIndex = dl.getIndex();
-			
+
 			list.moveElement(index, dropTargetIndex);
 
 			return true;

@@ -35,7 +35,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testDigitalChannels() {
     assertEquals(26, SensorBase.kDigitalChannels);
   }
-  
+
   /**
    * kAnalogInputChannels.
    */
@@ -43,7 +43,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testAnalogInputChannels() {
     assertEquals(8, SensorBase.kAnalogInputChannels);
   }
-  
+
   /**
    * kAnalogOutputChannels.
    */
@@ -51,7 +51,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testAnalogOutputChannels() {
     assertEquals(2, SensorBase.kAnalogOutputChannels);
   }
-  
+
   /**
    * kSolenoidChannels.
    */
@@ -59,7 +59,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testSolenoidChannels() {
     assertEquals(8, SensorBase.kSolenoidChannels);
   }
-  
+
   /**
    * kPwmChannels.
    */
@@ -67,7 +67,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testPwmChannels() {
     assertEquals(20, SensorBase.kPwmChannels);
   }
-  
+
   /**
    * kRelayChannels.
    */
@@ -75,7 +75,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testRelayChannels() {
     assertEquals(8, SensorBase.kRelayChannels);
   }
-  
+
   /**
    * kPDPChannels.
    */
@@ -83,7 +83,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testPDPChannels() {
     assertEquals(16, SensorBase.kPDPChannels);
   }
-  
+
   /**
    * kPDPModules.
    */
@@ -91,7 +91,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
   public void testPDPModules() {
     assertEquals(63, SensorBase.kPDPModules);
   }
-  
+
   /**
    * kPCMModules.
    */

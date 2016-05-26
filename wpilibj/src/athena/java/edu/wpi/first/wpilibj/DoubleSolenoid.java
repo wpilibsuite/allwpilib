@@ -70,7 +70,7 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
 
     int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_forwardChannel);
     m_forwardHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
-    
+
     try {
       portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_reverseChannel);
       m_reverseHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
@@ -107,7 +107,7 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   public void set(final Value value) {
     boolean forward = false;
     boolean reverse = false;
-    
+
     switch (value) {
       case kOff:
         forward = false;
@@ -138,7 +138,7 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   public Value get() {
     boolean valueForward = SolenoidJNI.getSolenoid(m_forwardHandle);
     boolean valueReverse = SolenoidJNI.getSolenoid(m_reverseHandle);
-    
+
     if (valueForward) {
       return Value.kForward;
     }

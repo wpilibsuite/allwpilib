@@ -16,7 +16,7 @@ public class CounterJNI extends JNIWrapper {
 
   public static native void setCounterAverageSize(int counterHandle, int size);
 
-  public static native void setCounterUpSource(int counterHandle, int digitalSourceHandle, 
+  public static native void setCounterUpSource(int counterHandle, int digitalSourceHandle,
                                                int analogTriggerType);
 
   public static native void setCounterUpSourceEdge(int counterHandle, boolean risingEdge,
@@ -24,7 +24,7 @@ public class CounterJNI extends JNIWrapper {
 
   public static native void clearCounterUpSource(int counterHandle);
 
-  public static native void setCounterDownSource(int counterHandle, int digitalSourceHandle, 
+  public static native void setCounterDownSource(int counterHandle, int digitalSourceHandle,
                                                  int analogTriggerType);
 
   public static native void setCounterDownSourceEdge(int counterHandle, boolean risingEdge,

@@ -17,7 +17,7 @@ import org.gazebosim.transport.SubscriberCallback;
 public class Main {
 	private static double simTime = 0;
 	private static Subscriber<Float64> sub;
-	
+
 	public static void main(String args[]) {
 		Node node = new Node("frc");
 		try {

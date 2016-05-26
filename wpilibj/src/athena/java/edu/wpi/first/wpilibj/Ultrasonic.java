@@ -289,7 +289,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
     // single sensor
     m_counter.reset(); // reset the counter to zero (invalid data now)
     // do the ping to start getting a single range
-    m_pingChannel.pulse(m_pingChannel.getChannel(), (float) kPingTime); 
+    m_pingChannel.pulse(m_pingChannel.getChannel(), (float) kPingTime);
   }
 
   /**

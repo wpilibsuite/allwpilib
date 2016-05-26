@@ -21,9 +21,9 @@ public class Publisher<T extends Message> implements PublisherRecord {
 	private List<Connection> listeners;
 	private boolean latching = false;
 	private T lastMsg = null;
-	
+
 	private static final Logger LOG = Logger.getLogger("Gazebo Transport");
-	
+
 	public Publisher(String topic, String msgType, String localHost, int localPort) {
 		this.topic = topic;
 		this.msgType = msgType;
