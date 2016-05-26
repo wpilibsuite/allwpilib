@@ -24,8 +24,6 @@ InternalLimitSwitch::InternalLimitSwitch(physics::ModelPtr model,
         << "] radians=" << radians << std::endl;
 }
 
-InternalLimitSwitch::~InternalLimitSwitch() {}
-
 bool InternalLimitSwitch::Get() {
   double value;
   joint->GetAngle(0).Normalize();

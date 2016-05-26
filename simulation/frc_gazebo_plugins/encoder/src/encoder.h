@@ -45,9 +45,6 @@ using namespace gazebo;
  */
 class Encoder : public ModelPlugin {
  public:
-  Encoder();
-  ~Encoder();
-
   /// \brief Load the encoder and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 

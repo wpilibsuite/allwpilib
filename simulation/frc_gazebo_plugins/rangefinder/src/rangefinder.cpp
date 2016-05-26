@@ -19,10 +19,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Rangefinder)
 
-Rangefinder::Rangefinder() {}
-
-Rangefinder::~Rangefinder() {}
-
 void Rangefinder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 

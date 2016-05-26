@@ -9,10 +9,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Encoder)
 
-Encoder::Encoder() {}
-
-Encoder::~Encoder() {}
-
 void Encoder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 

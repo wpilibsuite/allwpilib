@@ -9,10 +9,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Gyro)
 
-Gyro::Gyro() {}
-
-Gyro::~Gyro() {}
-
 void Gyro::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 

@@ -18,10 +18,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Servo)
 
-Servo::Servo() {}
-
-Servo::~Servo() {}
-
 void Servo::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
   signal = 0;

@@ -9,10 +9,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Clock)
 
-Clock::Clock() {}
-
-Clock::~Clock() {}
-
 void Clock::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 

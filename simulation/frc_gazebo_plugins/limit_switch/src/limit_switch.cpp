@@ -9,10 +9,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(LimitSwitch)
 
-LimitSwitch::LimitSwitch() {}
-
-LimitSwitch::~LimitSwitch() {}
-
 void LimitSwitch::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 

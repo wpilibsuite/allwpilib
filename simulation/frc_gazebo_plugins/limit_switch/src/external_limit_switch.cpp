@@ -15,8 +15,6 @@ ExternalLimitSwitch::ExternalLimitSwitch(sdf::ElementPtr sdf) {
         << " sensor=" << sensor->Name() << std::endl;
 }
 
-ExternalLimitSwitch::~ExternalLimitSwitch() {}
-
 bool ExternalLimitSwitch::Get() {
   return sensor->Contacts().contact().size() > 0;
 }

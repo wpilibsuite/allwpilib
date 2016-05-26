@@ -34,9 +34,6 @@ using namespace gazebo;
  */
 class Clock : public ModelPlugin {
  public:
-  Clock();
-  ~Clock();
-
   /// \brief Load the clock and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 

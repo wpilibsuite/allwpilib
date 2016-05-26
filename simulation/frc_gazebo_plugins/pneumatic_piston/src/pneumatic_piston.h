@@ -49,9 +49,6 @@ using namespace gazebo;
  */
 class PneumaticPiston : public ModelPlugin {
  public:
-  PneumaticPiston();
-  ~PneumaticPiston();
-
   /// \brief Load the pneumatic piston and configures it according to the sdf.
   void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
 

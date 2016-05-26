@@ -19,10 +19,6 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Potentiometer)
 
-Potentiometer::Potentiometer() {}
-
-Potentiometer::~Potentiometer() {}
-
 void Potentiometer::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 
