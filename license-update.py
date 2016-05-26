@@ -8,23 +8,12 @@ from datetime import date
 import os
 import re
 import sys
+import wpi
 
-sep = os.sep
-# If directory separator is backslash, escape it for regexes
-if sep == "\\":
-    sep += "\\"
-
-# Files and directories which should be included in or excluded from the update
-regexInclude = re.compile("\.cpp$|\.h$|\.hpp$|\.inc$|\.java$")
-folderExclude = "build" + sep + "|\.git" + sep + "|gradle" + sep + \
-                "|\.gradle" + sep + "|ni-libraries" + sep + "|ctre" + sep + \
-                "|frccansae" + sep + "|FRC_FPGA_ChipObject" + sep + \
-                "|gtest" + sep + "|msgs" + sep + "|i2clib" + sep + \
-                "|NetworkCommunication" + sep + "|ni" + sep + \
-                "|spilib" + sep + "|visa" + sep
-regexExclude = re.compile(folderExclude +
-                          "|NIIMAQdx\.h$|nivision\.h$|NIVisionJNI\.cpp$|"
-                          "can_proto\.h$|jni\.h$|jni_md\.h$")
+# Files and directories which should be included in or excluded from processing
+regexInclude = re.compile("|".join(["\." + ext + "$" for ext in
+                                    ["cpp", "h", "hpp", "inc", "java"]]))
+regexExclude = re.compile(wpi.regexExclude())
 
 currentYear = str(date.today().year)
 
@@ -44,7 +33,7 @@ for name in files:
     # List names of files as they are processed if verbose flag was given
     if len(sys.argv) > 1 and sys.argv[1] == "-v":
         print("Processing", name,)
-    with open(name, "r", encoding = "ISO-8859-1") as file:
+    with open(name, "r") as file:
         modifyCopyright = False
         year = ""
 
@@ -87,7 +76,7 @@ for name in files:
                     line = file.readline()
                     pos = 0
 
-        with open(name + ".tmp", "w", encoding = "ISO-8859-1") as temp:
+        with open(name + ".tmp", "w") as temp:
             # Write first line of comment
             temp.write("/*")
             for i in range(0, 76):
@@ -129,4 +118,3 @@ for name in files:
     # Replace old file
     os.remove(name)
     os.rename(name + ".tmp", name)
-
