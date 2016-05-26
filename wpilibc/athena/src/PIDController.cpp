@@ -338,11 +338,9 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput) {
  * @param maximumOutput the maximum value to write to the output
  */
 void PIDController::SetOutputRange(float minimumOutput, float maximumOutput) {
-  {
-    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
-    m_minimumOutput = minimumOutput;
-    m_maximumOutput = maximumOutput;
-  }
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+  m_minimumOutput = minimumOutput;
+  m_maximumOutput = maximumOutput;
 }
 
 /**
@@ -451,11 +449,9 @@ float PIDController::GetAvgError() const {
  * @param percentage error which is tolerable
  */
 void PIDController::SetTolerance(float percent) {
-  {
-    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
-    m_toleranceType = kPercentTolerance;
-    m_tolerance = percent;
-  }
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+  m_toleranceType = kPercentTolerance;
+  m_tolerance = percent;
 }
 
 /*
@@ -465,11 +461,9 @@ void PIDController::SetTolerance(float percent) {
  * @param percentage error which is tolerable
  */
 void PIDController::SetPercentTolerance(float percent) {
-  {
-    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
-    m_toleranceType = kPercentTolerance;
-    m_tolerance = percent;
-  }
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+  m_toleranceType = kPercentTolerance;
+  m_tolerance = percent;
 }
 
 /*
@@ -479,11 +473,9 @@ void PIDController::SetPercentTolerance(float percent) {
  * @param percentage error which is tolerable
  */
 void PIDController::SetAbsoluteTolerance(float absTolerance) {
-  {
-    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
-    m_toleranceType = kAbsoluteTolerance;
-    m_tolerance = absTolerance;
-  }
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+  m_toleranceType = kAbsoluteTolerance;
+  m_tolerance = absTolerance;
 }
 
 /*
