@@ -9,8 +9,9 @@
 
 #include "ChipObject.h"
 
-extern void remapDigitalSource(bool analogTrigger, uint32_t& pin,
-                               uint8_t& module);
+#include "DigitalInternal.h"
+
+using namespace hal;
 
 struct Interrupt  // FIXME: why is this internal?
 {

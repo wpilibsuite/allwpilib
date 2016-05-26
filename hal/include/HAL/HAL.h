@@ -28,7 +28,6 @@
 #include "Power.h"
 #include "Relay.h"
 #include "SPI.h"
-#include "SPIAccumulator.h"
 #include "Semaphore.h"
 #include "SerialPort.h"
 #include "Solenoid.h"
