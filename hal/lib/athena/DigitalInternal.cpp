@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 #include <mutex>
+#include <thread>
 
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
@@ -61,7 +62,7 @@ void initializeDigital(int32_t* status) {
 
   // Make sure that the 9403 IONode has had a chance to initialize before
   // continuing.
-  while (pwmSystem->readLoopTiming(status) == 0) delayTicks(1);
+  while (pwmSystem->readLoopTiming(status) == 0) std::this_thread::yield();
 
   if (pwmSystem->readLoopTiming(status) != kExpectedLoopTiming) {
     // TODO: char err[128];

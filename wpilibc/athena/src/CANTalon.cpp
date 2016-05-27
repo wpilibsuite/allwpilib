@@ -7,9 +7,9 @@
 
 #include "CANTalon.h"
 
-#include <unistd.h>  // usleep
-
+#include <chrono>
 #include <sstream>
+#include <thread>
 
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
@@ -30,6 +30,8 @@ const double kNativePwdUnitsPerRotation = 4096.0;
  * measured by Talon's 100ms timebase to rotations per minute.
  */
 const double kMinutesPer100msUnit = 1.0 / 600.0;
+
+constexpr unsigned int CANTalon::kDelayForSolicitedSignalsUs;
 
 /**
  * Constructor for the CANTalon device.
@@ -386,7 +388,9 @@ double CANTalon::GetP() const {
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-  usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
+  // small yield for getting response
+  std::this_thread::sleep_for(
+      std::chrono::microseconds(kDelayForSolicitedSignalsUs));
   double p;
   status = m_impl->GetPgain(m_profile, p);
   if (status != CTR_OKAY) {
@@ -407,7 +411,9 @@ double CANTalon::GetI() const {
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-  usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
+  // small yield for getting response
+  std::this_thread::sleep_for(
+      std::chrono::microseconds(kDelayForSolicitedSignalsUs));
 
   double i;
   status = m_impl->GetIgain(m_profile, i);
@@ -429,8 +435,9 @@ double CANTalon::GetD() const {
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-  usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
-
+  // small yield for getting response
+  std::this_thread::sleep_for(
+      std::chrono::microseconds(kDelayForSolicitedSignalsUs));
   double d;
   status = m_impl->GetDgain(m_profile, d);
   if (status != CTR_OKAY) {
@@ -452,7 +459,9 @@ double CANTalon::GetF() const {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
 
-  usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
+  // small yield for getting response
+  std::this_thread::sleep_for(
+      std::chrono::microseconds(kDelayForSolicitedSignalsUs));
   double f;
   status = m_impl->GetFgain(m_profile, f);
   if (status != CTR_OKAY) {
@@ -473,7 +482,8 @@ int CANTalon::GetIzone() const {
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-  usleep(kDelayForSolicitedSignalsUs);
+  std::this_thread::sleep_for(
+      std::chrono::microseconds(kDelayForSolicitedSignalsUs));
 
   int iz;
   status = m_impl->GetIzone(m_profile, iz);
@@ -1117,7 +1127,8 @@ uint32_t CANTalon::GetFirmwareVersion() const {
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-  usleep(kDelayForSolicitedSignalsUs);
+  std::this_thread::sleep_for(
+      std::chrono::microseconds(kDelayForSolicitedSignalsUs));
   status =
       m_impl->GetParamResponseInt32(CanTalonSRX::eFirmVers, firmwareVersion);
   if (status != CTR_OKAY) {
@@ -1141,7 +1152,9 @@ int CANTalon::GetIaccum() const {
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
-  usleep(kDelayForSolicitedSignalsUs); /* small yield for getting response */
+  // small yield for getting response
+  std::this_thread::sleep_for(
+      std::chrono::microseconds(kDelayForSolicitedSignalsUs));
   int iaccum;
   status = m_impl->GetParamResponseInt32(CanTalonSRX::ePidIaccum, iaccum);
   if (status != CTR_OKAY) {
@@ -1519,7 +1532,8 @@ bool CANTalon::GetParameter(uint32_t paramEnum, double& dvalue) const {
     retval = false;
   }
   /* small yield for getting response */
-  usleep(kDelayForSolicitedSignalsUs);
+  std::this_thread::sleep_for(
+      std::chrono::microseconds(kDelayForSolicitedSignalsUs));
   /* get the last received update */
   status = m_impl->GetParamResponse((CanTalonSRX::param_t)paramEnum, dvalue);
   if (status != CTR_OKAY) {

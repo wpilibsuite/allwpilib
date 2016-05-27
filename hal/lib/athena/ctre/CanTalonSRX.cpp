@@ -107,7 +107,6 @@
 #include "HAL/CanTalonSRX.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"  //CAN Comm
 #include <string.h>                                  // memset
-#include <unistd.h>                                  // usleep
 
 #define STATUS_1 0x02041400
 #define STATUS_2 0x02041440

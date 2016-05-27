@@ -3,7 +3,6 @@
 #include "ctre/CtreCanNode.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
-#include <unistd.h> // usleep
 
 static const UINT32 kFullMessageIDMask = 0x1fffffff;
 
