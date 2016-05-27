@@ -21,9 +21,7 @@
  * This class assumes the default (not alternate) sensor address of 0x1D (7-bit
  * address).
  */
-class ADXL345_I2C : public Accelerometer,
-                    public I2C,
-                    public LiveWindowSendable {
+class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
  protected:
   static const uint8_t kAddress = 0x1D;
   static const uint8_t kPowerCtlRegister = 0x2D;
@@ -53,7 +51,7 @@ class ADXL345_I2C : public Accelerometer,
   };
 
  public:
-  explicit ADXL345_I2C(Port port, Range range = kRange_2G,
+  explicit ADXL345_I2C(I2C::Port port, Range range = kRange_2G,
                        int deviceAddress = kAddress);
   virtual ~ADXL345_I2C() = default;
 
@@ -75,6 +73,9 @@ class ADXL345_I2C : public Accelerometer,
   virtual std::shared_ptr<ITable> GetTable() const override;
   virtual void StartLiveWindowMode() override {}
   virtual void StopLiveWindowMode() override {}
+
+ protected:
+  I2C m_i2c;
 
  private:
   std::shared_ptr<ITable> m_table;
