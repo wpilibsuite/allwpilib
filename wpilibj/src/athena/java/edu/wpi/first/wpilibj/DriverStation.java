@@ -99,6 +99,7 @@ public class DriverStation implements RobotState.Interface {
   private boolean m_userInAutonomous = false;
   private boolean m_userInTeleop = false;
   private boolean m_userInTest = false;
+  private boolean m_updatedControlLoopData;
   private boolean m_newControlData;
   private final long m_packetDataAvailableMutex;
   private final long m_packetDataAvailableSem;
@@ -160,6 +161,7 @@ public class DriverStation implements RobotState.Interface {
       HALUtil.takeMultiWait(m_packetDataAvailableSem, m_packetDataAvailableMutex);
       getData();
       synchronized (m_dataSem) {
+        m_updatedControlLoopData = true;
         m_dataSem.notifyAll();
       }
       if (++safetyCounter >= 4) {
@@ -197,7 +199,10 @@ public class DriverStation implements RobotState.Interface {
   public void waitForData(long timeout) {
     synchronized (m_dataSem) {
       try {
-        m_dataSem.wait(timeout);
+        while (!m_updatedControlLoopData) {
+          m_dataSem.wait(timeout);
+        }
+        m_updatedControlLoopData = false;
       } catch (InterruptedException ex) {
         Thread.currentThread().interrupt();
       }

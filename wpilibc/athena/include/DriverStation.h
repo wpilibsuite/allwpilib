@@ -116,6 +116,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   mutable Semaphore m_newControlData{Semaphore::kEmpty};
   mutable priority_condition_variable m_packetDataAvailableCond;
   priority_mutex m_packetDataAvailableMutex;
+  bool m_updatedControlLoopData = false;
   std::condition_variable_any m_waitForDataCond;
   priority_mutex m_waitForDataMutex;
   mutable priority_mutex m_joystickDataMutex;

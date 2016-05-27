@@ -80,6 +80,10 @@ void DriverStation::Run() {
       m_packetDataAvailableCond.wait(lock);
     }
     GetData();
+    {
+      std::lock_guard<priority_mutex> lock(m_waitForDataMutex);
+      m_updatedControlLoopData = true;
+    }
     m_waitForDataCond.notify_all();
 
     if (++period >= 4) {
@@ -554,7 +558,10 @@ uint32_t DriverStation::GetLocation() const {
  */
 void DriverStation::WaitForData() {
   std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
-  m_waitForDataCond.wait(lock);
+  while (!m_updatedControlLoopData) {
+    m_waitForDataCond.wait(lock);
+  }
+  m_updatedControlLoopData = false;
 }
 
 /**
