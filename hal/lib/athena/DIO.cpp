@@ -118,6 +118,9 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t* status) {
 void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t* status) {
   uint32_t id = (uint32_t)pwmGenerator;
   if (id > 5) return;
+  if(pin>=kNumHeaders){//if it is on the MXP
+     pin += kMXPDigitalPWMOffset;//then to write as a digital PWM pin requires an offset to write on the correct pin
+   }
   digitalSystem->writePWMOutputSelect(id, pin, status);
 }
 

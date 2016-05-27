@@ -17,7 +17,7 @@ namespace hal {
 constexpr uint32_t kNumHeaders = 10;  // Number of non-MXP pins
 constexpr uint32_t kDigitalPins = 26;
 constexpr uint32_t kPwmPins = 20;
-
+constexpr uint32_t kMXPDigitalPWMOffset = 6;//MXP pins when used as digital output pwm are offset by 6 from actual value
 constexpr uint32_t kExpectedLoopTiming = 40;
 
 /**
