@@ -8,23 +8,11 @@ from datetime import date
 import os
 import re
 import sys
+import wpi
 
-sep = os.sep
-# If directory separator is backslash, escape it for regexes
-if sep == "\\":
-    sep += "\\"
-
-# Files and directories which should be included in or excluded from the update
+# Files and directories which should be included in or excluded from processing
 regexInclude = re.compile("\.cpp$|\.h$|\.hpp$|\.inc$|\.java$")
-folderExclude = "build" + sep + "|\.git" + sep + "|gradle" + sep + \
-                "|\.gradle" + sep + "|ni-libraries" + sep + "|ctre" + sep + \
-                "|frccansae" + sep + "|FRC_FPGA_ChipObject" + sep + \
-                "|gtest" + sep + "|msgs" + sep + "|i2clib" + sep + \
-                "|NetworkCommunication" + sep + "|ni" + sep + \
-                "|spilib" + sep + "|visa" + sep
-regexExclude = re.compile(folderExclude +
-                          "|NIIMAQdx\.h$|nivision\.h$|NIVisionJNI\.cpp$|"
-                          "can_proto\.h$|jni\.h$|jni_md\.h$")
+regexExclude = re.compile(wpi.regexExclude())
 
 currentYear = str(date.today().year)
 
@@ -129,4 +117,3 @@ for name in files:
     # Replace old file
     os.remove(name)
     os.rename(name + ".tmp", name)
-

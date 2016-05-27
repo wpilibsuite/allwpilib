@@ -5,22 +5,12 @@ import os
 import re
 import sys
 
-sep = os.sep
-# If directory separator is backslash, escape it for regexes
-if sep == "\\":
-    sep += "\\"
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import wpi
 
-# Files and directories which should be included in or excluded from the update
+# Files and directories which should be included in or excluded from processing
 regexInclude = re.compile("\.cpp$|\.h$|\.hpp$|\.inc$")
-folderExclude = "build" + sep + "|\.git" + sep + "|gradle" + sep + \
-                "|\.gradle" + sep + "|ni-libraries" + sep + "|ctre" + sep + \
-                "|frccansae" + sep + "|FRC_FPGA_ChipObject" + sep + \
-                "|gtest" + sep + "|i2clib" + sep + \
-                "|NetworkCommunication" + sep + "|spilib" + sep + \
-                "|visa" + sep + "|wpilibj" + sep
-regexExclude = re.compile(folderExclude +
-                          "|NIIMAQdx\.h$|nivision\.h$|can_proto\.h$|"
-                          "CanTalonSRX\.h$")
+regexExclude = re.compile(wpi.regexExclude())
 
 # Handle running in either the root or styleguide directories
 configPath = ""
