@@ -24,15 +24,17 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
   private long m_pcm;
 
   /**
-   * Create an instance of the Compressor.
+   * Constructor.
    *
    * <p>Most robots that use PCM will have a single module. Use this for supporting a second module
    * other than the default.
    *
-   * @param pcmId The PCM CAN device ID.
+   * @param module The PCM CAN device ID.
    */
-  public Compressor(int pcmId) {
-    initCompressor(pcmId);
+  public Compressor(int module) {
+    m_table = null;
+
+    m_pcm = CompressorJNI.initializeCompressor((byte) module);
   }
 
   /**
@@ -41,13 +43,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * ID.
    */
   public Compressor() {
-    initCompressor(getDefaultSolenoidModule());
-  }
-
-  private void initCompressor(int module) {
-    m_table = null;
-
-    m_pcm = CompressorJNI.initializeCompressor((byte) module);
+    this(getDefaultSolenoidModule());
   }
 
   /**

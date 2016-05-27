@@ -31,17 +31,6 @@ public class Servo implements SpeedController, LiveWindowSendable {
   private int channel;
 
   /**
-   * Common initialization code called by all constructors.
-   *
-   * InitServo() assigns defaults for the period multiplier for the servo PWM control signal, as
-   * well as the minimum and maximum PWM values supported by the servo.
-   */
-  private void initServo() {
-    LiveWindow.addActuator("Servo", channel, this);
-    impl = new SimSpeedController("simulator/pwm/" + channel);
-  }
-
-  /**
    * Write out the PID value as seen in the PIDOutput base object.
    *
    * @param output Write out the PWM value as was found in the PIDController
@@ -61,7 +50,8 @@ public class Servo implements SpeedController, LiveWindowSendable {
    */
   public Servo(final int channel) {
     this.channel = channel;
-    initServo();
+    LiveWindow.addActuator("Servo", channel, this);
+    impl = new SimSpeedController("simulator/pwm/" + channel);
   }
 
   private double getServoAngleRange() {

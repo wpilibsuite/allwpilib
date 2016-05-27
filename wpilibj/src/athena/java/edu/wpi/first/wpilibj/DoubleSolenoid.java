@@ -39,9 +39,28 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   private byte m_reverseMask; // /< The mask for the reverse channel.
 
   /**
-   * Common function to implement constructor behavior.
+   * Constructor. Uses the default PCM ID of 0.
+   *
+   * @param forwardChannel The forward channel number on the PCM (0..7).
+   * @param reverseChannel The reverse channel number on the PCM (0..7).
    */
-  private synchronized void initSolenoid() {
+  public DoubleSolenoid(final int forwardChannel, final int reverseChannel) {
+    this(getDefaultSolenoidModule(), forwardChannel, reverseChannel);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param moduleNumber   The module number of the solenoid module to use.
+   * @param forwardChannel The forward channel on the module to control (0..7).
+   * @param reverseChannel The reverse channel on the module to control (0..7).
+   */
+  public DoubleSolenoid(final int moduleNumber, final int forwardChannel,
+                        final int reverseChannel) {
+    super(moduleNumber);
+    m_forwardChannel = forwardChannel;
+    m_reverseChannel = reverseChannel;
+
     checkSolenoidModule(m_moduleNumber);
     checkSolenoidChannel(m_forwardChannel);
     checkSolenoidChannel(m_reverseChannel);
@@ -64,34 +83,6 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
     UsageReporting.report(tResourceType.kResourceType_Solenoid, m_forwardChannel, m_moduleNumber);
     UsageReporting.report(tResourceType.kResourceType_Solenoid, m_reverseChannel, m_moduleNumber);
     LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
-  }
-
-  /**
-   * Constructor. Uses the default PCM ID of 0.
-   *
-   * @param forwardChannel The forward channel number on the PCM (0..7).
-   * @param reverseChannel The reverse channel number on the PCM (0..7).
-   */
-  public DoubleSolenoid(final int forwardChannel, final int reverseChannel) {
-    super(getDefaultSolenoidModule());
-    m_forwardChannel = forwardChannel;
-    m_reverseChannel = reverseChannel;
-    initSolenoid();
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param moduleNumber   The module number of the solenoid module to use.
-   * @param forwardChannel The forward channel on the module to control (0..7).
-   * @param reverseChannel The reverse channel on the module to control (0..7).
-   */
-  public DoubleSolenoid(final int moduleNumber, final int forwardChannel,
-                        final int reverseChannel) {
-    super(moduleNumber);
-    m_forwardChannel = forwardChannel;
-    m_reverseChannel = reverseChannel;
-    initSolenoid();
   }
 
   /**

@@ -19,9 +19,14 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 public class Jaguar extends PWMSpeedController {
 
   /**
-   * Common initialization code called by all constructors.
+   * Constructor.
+   *
+   * @param channel The PWM channel that the Jaguar is attached to. 0-9 are on-board, 10-19 are on
+   *                the MXP port
    */
-  private void initJaguar() {
+  public Jaguar(final int channel) {
+    super(channel);
+
     /*
      * Input profile defined by Luminary Micro.
      *
@@ -37,16 +42,5 @@ public class Jaguar extends PWMSpeedController {
 
     UsageReporting.report(tResourceType.kResourceType_Jaguar, getChannel());
     LiveWindow.addActuator("Jaguar", getChannel(), this);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param channel The PWM channel that the Jaguar is attached to. 0-9 are on-board, 10-19 are on
-   *                the MXP port
-   */
-  public Jaguar(final int channel) {
-    super(channel);
-    initJaguar();
   }
 }

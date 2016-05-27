@@ -21,7 +21,7 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
   private SimSpeedController m_impl;
 
   /**
-   * Common initialization code called by all constructors.
+   * Constructor.
    *
    * <p>Note that the Victor uses the following bounds for PWM values.  These values were determined
    * empirically and optimized for the Victor 888. These values should work reasonably well for
@@ -33,8 +33,10 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
    * <p>- 2.027ms = full "forward" - 1.525ms = the "high end" of the deadband range - 1.507ms = center
    * of the deadband range (off) - 1.49ms = the "low end" of the deadband range - 1.026ms = full
    * "reverse"
+   *
+   * @param channel The PWM channel that the Victor is attached to.
    */
-  private void initVictor(final int channel) {
+  public Victor(final int channel) {
     this.m_channel = channel;
     m_impl = new SimSpeedController("simulator/pwm/" + channel);
 
@@ -44,15 +46,6 @@ public class Victor implements SpeedController, PIDOutput, MotorSafety, LiveWind
 
     LiveWindow.addActuator("Victor", channel, this);
     // UsageReporting.report(tResourceType.kResourceType_Talon, getChannel(), getModuleNumber()-1);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param channel The PWM channel that the Victor is attached to.
-   */
-  public Victor(final int channel) {
-    initVictor(channel);
   }
 
   /**

@@ -46,32 +46,13 @@ public class DoubleSolenoid implements LiveWindowSendable {
   private Value m_value;
 
   /**
-   * Common function to implement constructor behavior.
-   */
-  private synchronized void initSolenoid(int moduleNumber, int forwardChannel, int reverseChannel) {
-    m_forwardChannel = forwardChannel;
-    m_reverseChannel = reverseChannel;
-    m_moduleNumber = moduleNumber;
-//      LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
-
-    if (reverseChannel < forwardChannel) { // Swap ports
-      int channel = forwardChannel;
-      forwardChannel = reverseChannel;
-      reverseChannel = channel;
-      m_reverseDirection = true;
-    }
-    m_impl = new SimSpeedController("simulator/pneumatic/" + moduleNumber + "/" + forwardChannel
-        + "/" + moduleNumber + "/" + reverseChannel);
-  }
-
-  /**
    * Constructor.
    *
    * @param forwardChannel The forward channel on the module to control.
    * @param reverseChannel The reverse channel on the module to control.
    */
   public DoubleSolenoid(final int forwardChannel, final int reverseChannel) {
-    initSolenoid(1, forwardChannel, reverseChannel);
+    this(1, forwardChannel, reverseChannel);
   }
 
   /**
@@ -83,7 +64,17 @@ public class DoubleSolenoid implements LiveWindowSendable {
    */
   public DoubleSolenoid(final int moduleNumber, final int forwardChannel, final int
       reverseChannel) {
-    initSolenoid(moduleNumber, forwardChannel, reverseChannel);
+    m_moduleNumber = moduleNumber;
+//      LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
+
+    if (reverseChannel < forwardChannel) { // Swap ports
+      int channel = forwardChannel;
+      m_forwardChannel = reverseChannel;
+      m_reverseChannel = channel;
+      m_reverseDirection = true;
+    }
+    m_impl = new SimSpeedController("simulator/pneumatic/" + moduleNumber + "/" + forwardChannel
+        + "/" + moduleNumber + "/" + reverseChannel);
   }
 
   /**

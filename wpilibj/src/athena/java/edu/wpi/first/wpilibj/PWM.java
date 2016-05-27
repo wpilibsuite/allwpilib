@@ -98,15 +98,11 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   private int m_minPwm;
 
   /**
-   * Initialize PWMs given a channel.
-   *
-   * <p>This method is private and is the common path for all the constructors for creating PWM
-   * instances. Checks channel value ranges and allocates the appropriate channel. The allocation is
-   * only done to help users ensure that they don't double assign channels.
+   * Allocate a PWM given a channel.
    *
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
-  private void initPWM(final int channel) {
+  public PWM(final int channel) {
     checkPWMChannel(channel);
     m_channel = channel;
 
@@ -121,15 +117,6 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     m_eliminateDeadband = false;
 
     UsageReporting.report(tResourceType.kResourceType_PWM, channel);
-  }
-
-  /**
-   * Allocate a PWM given a channel.
-   *
-   * @param channel The PWM channel.
-   */
-  public PWM(final int channel) {
-    initPWM(channel);
   }
 
   /**

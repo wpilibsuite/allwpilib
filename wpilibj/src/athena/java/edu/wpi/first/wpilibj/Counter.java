@@ -70,7 +70,10 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   private PIDSourceType m_pidSource;
   private double m_distancePerPulse; // distance of travel for each tick
 
-  private void initCounter(final Mode mode) {
+  /**
+   * Create an instance of a counter with the given mode.
+   */
+  public Counter(final Mode mode) {
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     // set the byte order
     index.order(ByteOrder.LITTLE_ENDIAN);
@@ -94,7 +97,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * <p>The counter will start counting immediately.
    */
   public Counter() {
-    initCounter(Mode.kTwoPulse);
+    this(Mode.kTwoPulse);
   }
 
   /**
@@ -107,10 +110,10 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param source the digital source to count
    */
   public Counter(DigitalSource source) {
+    this();
     if (source == null) {
       throw new NullPointerException("Digital Source given was null");
     }
-    initCounter(Mode.kTwoPulse);
     setUpSource(source);
   }
 
@@ -122,7 +125,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param channel the DIO channel to use as the up source. 0-9 are on-board, 10-25 are on the MXP
    */
   public Counter(int channel) {
-    initCounter(Mode.kTwoPulse);
+    this();
     setUpSource(channel);
   }
 
@@ -139,11 +142,10 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   public Counter(EncodingType encodingType, DigitalSource upSource, DigitalSource downSource,
                  boolean inverted) {
-    initCounter(Mode.kExternalDirection);
+    this(Mode.kExternalDirection);
     if (encodingType == null) {
       throw new NullPointerException("Encoding type given was null");
     }
-
     if (encodingType != EncodingType.k1X && encodingType != EncodingType.k2X) {
       throw new RuntimeException("Counters only support 1X and 2X quadreature decoding!");
     }
@@ -176,10 +178,10 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param trigger the analog trigger to count
    */
   public Counter(AnalogTrigger trigger) {
+    this();
     if (trigger == null) {
       throw new NullPointerException("The Analog Trigger given was null");
     }
-    initCounter(Mode.kTwoPulse);
     setUpSource(trigger.createOutput(AnalogTriggerType.kState));
   }
 

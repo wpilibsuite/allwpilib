@@ -21,9 +21,11 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
   private SimSpeedController impl;
 
   /**
-   * Common initialization code called by all constructors.
+   * Constructor.
+   *
+   * @param channel The PWM channel that the Jaguar is attached to.
    */
-  private void initJaguar(final int channel) {
+  public Jaguar(final int channel) {
     this.channel = channel;
     impl = new SimSpeedController("simulator/pwm/" + channel);
 
@@ -32,15 +34,6 @@ public class Jaguar implements SpeedController, PIDOutput, MotorSafety, LiveWind
     m_safetyHelper.setSafetyEnabled(false);
 
     LiveWindow.addActuator("Jaguar", channel, this);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param channel The PWM channel that the Jaguar is attached to.
-   */
-  public Jaguar(final int channel) {
-    initJaguar(channel);
   }
 
   /**
