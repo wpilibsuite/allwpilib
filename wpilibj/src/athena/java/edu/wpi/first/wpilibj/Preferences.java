@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
 
 /**
- * The preferences class provides a relatively simple way to save important values to the RoboRIO to
- * access the next time the RoboRIO is booted.
+ * The preferences class provides a relatively simple way to save important values to the roboRIO to
+ * access the next time the roboRIO is booted.
  *
- * <p> This class loads and saves from a file inside the RoboRIO. The user can not access the file
+ * <p> This class loads and saves from a file inside the roboRIO. The user can not access the file
  * directly, but may modify values at specific fields which will then be automatically saved to the
  * file by the NetworkTables server. </p>
  *

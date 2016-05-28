@@ -10,7 +10,7 @@
 #include "ErrorBase.h"
 
 /**
- * Driver for the RS-232 serial port on the RoboRIO.
+ * Driver for the RS-232 serial port on the roboRIO.
  *
  * The current implementation uses the VISA formatted I/O mode.  This means that
  * all traffic goes through the fomatted buffers.  This allows the intermingled

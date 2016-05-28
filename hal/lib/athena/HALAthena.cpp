@@ -215,7 +215,7 @@ uint64_t getFPGATime(int32_t* status) {
 }
 
 /**
- * Get the state of the "USER" button on the RoboRIO
+ * Get the state of the "USER" button on the roboRIO
  * @return true if the button is currently pressed down
  */
 bool getFPGAButton(int32_t* status) {

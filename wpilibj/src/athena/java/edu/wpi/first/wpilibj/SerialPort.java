@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.SerialPortJNI;
 
 /**
- * Driver for the RS-232 serial port on the RoboRIO.
+ * Driver for the RS-232 serial port on the roboRIO.
  *
  * <p>The current implementation uses the VISA formatted I/O mode. This means that all traffic goes
  * through the formatted buffers. This allows the intermingled use of print(), readString(), and the

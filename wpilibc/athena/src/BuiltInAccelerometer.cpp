@@ -35,17 +35,17 @@ void BuiltInAccelerometer::SetRange(Range range) {
 }
 
 /**
- * @return The acceleration of the RoboRIO along the X axis in g-forces
+ * @return The acceleration of the roboRIO along the X axis in g-forces
  */
 double BuiltInAccelerometer::GetX() { return getAccelerometerX(); }
 
 /**
- * @return The acceleration of the RoboRIO along the Y axis in g-forces
+ * @return The acceleration of the roboRIO along the Y axis in g-forces
  */
 double BuiltInAccelerometer::GetY() { return getAccelerometerY(); }
 
 /**
- * @return The acceleration of the RoboRIO along the Z axis in g-forces
+ * @return The acceleration of the roboRIO along the Z axis in g-forces
  */
 double BuiltInAccelerometer::GetZ() { return getAccelerometerZ(); }
 
