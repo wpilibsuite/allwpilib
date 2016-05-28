@@ -193,13 +193,10 @@ int frcWriteImage(const Image* image, const char* fileName) {
  * Parameter Discussion:
  *    Relevant parameters of the HistogramReport include:
  *      min, max, mean and stdDev
- *    min/max —Setting both min and max to 0 causes the function to
- *           set min to 0 and the max to 255 for 8-bit images and to the actual
- *           minimum value and maximum value of the image for all other image
- *           types.
- *    max—Setting both min and max to 0 causes the function to set max
- *          to 255 for 8-bit images and to the actual maximum value of the
- *          image for all other image types.
+ *
+ * min/max: Setting both min and max to 0 causes the function to set min to 0
+ * and the max to 255 for 8-bit images and to the actual minimum value and
+ * maximum value of the image for all other image types.
  *
  * @param image      Image whose histogram the function calculates.
  * @param numClasses The number of classes into which the function separates the
