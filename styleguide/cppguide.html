@@ -467,6 +467,10 @@ as follows:</p>
   files.</li>
 </ol>
 
+<p>C and C++ standard library includes are considered system files in their
+respective group. Includes within one group should not have an empty line
+separating them, while there should be an empty line between groups.</p>
+
 <p>With the preferred ordering, if
 <code><var>dir2/foo2</var>.h</code> omits any necessary
 includes, the build of <code><var>dir/foo</var>.cc</code>
@@ -508,6 +512,7 @@ might look like this:</p>
 
 #include &lt;sys/types.h&gt;
 #include &lt;unistd.h&gt;
+
 #include &lt;hash_map&gt;
 #include &lt;vector&gt;
 
