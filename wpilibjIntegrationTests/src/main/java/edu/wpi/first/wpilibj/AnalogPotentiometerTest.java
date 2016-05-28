@@ -22,8 +22,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the {@link AnalogPotentiometer}.
- *
- * @author jonathanleitschuh
  */
 public class AnalogPotentiometerTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(AnalogPotentiometerTest.class.getName());

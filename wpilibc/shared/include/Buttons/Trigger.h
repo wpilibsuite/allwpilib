@@ -26,8 +26,6 @@ class Command;
  * only have to write the {@link Trigger#Get()} method to get the full
  * functionality
  * of the Trigger class.
- *
- * @author Brad Miller, Joe Grinstead
  */
 class Trigger : public Sendable {
  public:

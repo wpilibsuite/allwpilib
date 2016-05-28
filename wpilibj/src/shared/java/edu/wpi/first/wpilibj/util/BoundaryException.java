@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj.util;
 
 /**
  * This exception represents an error in which a lower limit was set as higher than an upper limit.
- *
- * @author dtjones
  */
 public class BoundaryException extends RuntimeException {
 

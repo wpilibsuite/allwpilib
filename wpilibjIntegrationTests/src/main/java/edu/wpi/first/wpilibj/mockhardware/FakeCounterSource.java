@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Simulates an encoder for testing purposes.
- *
- * @author Ryan O'Meara
  */
 public class FakeCounterSource {
 

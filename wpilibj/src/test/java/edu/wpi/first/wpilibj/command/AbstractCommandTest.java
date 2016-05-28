@@ -16,8 +16,6 @@ import static org.junit.Assert.fail;
 
 /**
  * The basic test for all {@link Command} tests.
- *
- * @author jonathanleitschuh
  */
 public abstract class AbstractCommandTest {
 

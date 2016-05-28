@@ -18,8 +18,6 @@ import edu.wpi.first.wpilibj.command.Command;
  * <p>This class represents a subclass of Trigger that is specifically aimed at buttons on an
  * operator interface as a common use case of the more generalized Trigger objects. This is a simple
  * wrapper around Trigger with the method names renamed to fit the Button object use.
- *
- * @author brad
  */
 public abstract class Button extends Trigger {
 

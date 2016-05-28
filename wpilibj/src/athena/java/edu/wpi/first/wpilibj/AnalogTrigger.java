@@ -20,8 +20,6 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Class for creating and configuring Analog Triggers.
- *
- * @author dtjones
  */
 public class AnalogTrigger {
 

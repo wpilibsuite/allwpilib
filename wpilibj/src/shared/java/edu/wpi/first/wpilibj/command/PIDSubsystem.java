@@ -22,8 +22,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * <p>It provides some convenience methods to run an internal {@link PIDController} . It also
  * allows access to the internal {@link PIDController} in order to give total control to the
  * programmer.
- *
- * @author Joe Grinstead
  */
 public abstract class PIDSubsystem extends Subsystem implements Sendable {
 

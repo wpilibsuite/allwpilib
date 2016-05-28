@@ -27,8 +27,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * Yes, this is the test system testing itself. Functionally, this is making sure that all tests get
  * run correctly when you use parametrized arguments.
- *
- * @author jonathanleitschuh
  */
 public class AbstractTestSuiteTest {
 

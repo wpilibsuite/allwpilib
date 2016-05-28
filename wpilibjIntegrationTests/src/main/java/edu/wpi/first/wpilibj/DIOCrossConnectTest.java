@@ -25,8 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Tests to see if the Digital ports are working properly.
- *
- * @author jonathanleitschuh
  */
 @RunWith(Parameterized.class)
 public class DIOCrossConnectTest extends AbstractInterruptTest {

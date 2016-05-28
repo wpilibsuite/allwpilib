@@ -112,8 +112,6 @@ public class AnalogTriggerOutput extends DigitalSource {
 
   /**
    * Defines the state in which the AnalogTrigger triggers.
-   *
-   * @author jonathanleitschuh
    */
   public enum AnalogTriggerType {
     kInWindow(AnalogJNI.AnalogTriggerType.kInWindow), kState(AnalogJNI.AnalogTriggerType.kState),

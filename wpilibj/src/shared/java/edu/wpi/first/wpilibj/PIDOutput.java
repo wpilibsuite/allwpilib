@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj;
 
 /**
  * This interface allows PIDController to write it's results to its output.
- *
- * @author dtjones
  */
 @FunctionalInterface
 public interface PIDOutput {

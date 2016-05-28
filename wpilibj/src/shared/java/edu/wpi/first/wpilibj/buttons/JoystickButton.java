@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 
 /**
  * A {@link Button} that gets its state from a {@link GenericHID}.
- *
- * @author bradmiller
  */
 public class JoystickButton extends Button {
 

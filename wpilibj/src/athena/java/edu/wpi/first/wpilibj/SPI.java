@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.hal.SPIJNI;
 
 /**
  * Represents a SPI bus port.
- *
- * @author koconnor
  */
 public class SPI extends SensorBase {
 

@@ -26,8 +26,6 @@ import static org.junit.Assert.assertThat;
 /**
  * This class should not be run as a test explicitly. Instead it should be extended by tests that
  * use the InterruptableSensorBase.
- *
- * @author jonathanleitschuh
  */
 public abstract class AbstractInterruptTest extends AbstractComsSetup {
   private InterruptableSensorBase m_interruptable = null;

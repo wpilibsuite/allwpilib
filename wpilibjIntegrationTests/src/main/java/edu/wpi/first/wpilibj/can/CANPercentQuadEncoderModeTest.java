@@ -31,8 +31,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the CAN motor in PercentQuadEncoderMode.
- *
- * @author jonathanleitschuh
  */
 @SuppressWarnings("AbbreviationAsWordInName")
 public class CANPercentQuadEncoderModeTest extends AbstractCANTest {

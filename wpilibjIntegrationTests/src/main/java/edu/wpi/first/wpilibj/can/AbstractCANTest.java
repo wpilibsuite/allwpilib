@@ -20,8 +20,6 @@ import edu.wpi.first.wpilibj.test.TestBench;
 /**
  * Provides a base implementation for CAN Tests that forces a test of a particular mode to provide
  * tests of a certain type. This also allows for a standardized base setup for each test.
- *
- * @author jonathanleitschuh
  */
 public abstract class AbstractCANTest extends AbstractComsSetup {
   public static final double kMotorStopTime = 2;
@@ -47,8 +45,6 @@ public abstract class AbstractCANTest extends AbstractComsSetup {
   /**
    * Extends the default test watcher in order to provide more information about a tests failure at
    * runtime.
-   *
-   * @author jonathanleitschuh
    */
   public class CANTestWatcher extends DefaultTestWatcher {
     @Override

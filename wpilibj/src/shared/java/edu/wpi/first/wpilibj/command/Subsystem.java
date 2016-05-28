@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * command which requires a subsystem can run at a time. Also, subsystems can have default commands
  * which are started if there is no command running which requires this subsystem. </p>
  *
- * @author Joe Grinstead
  * @see Command
  */
 public abstract class Subsystem implements NamedSendable {

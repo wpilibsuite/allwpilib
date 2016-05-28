@@ -25,8 +25,6 @@ import java.util.Vector;
  * <p> CommandGroups can also execute commands in parallel, simply by adding them using {@link
  * CommandGroup#addParallel(Command) addParallel(...)}. </p>
  *
- * @author Brad Miller
- * @author Joe Grinstead
  * @see Command
  * @see Subsystem
  * @see IllegalUseOfCommandException

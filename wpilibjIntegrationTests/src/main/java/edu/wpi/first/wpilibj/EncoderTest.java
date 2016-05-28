@@ -27,8 +27,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Test to see if the FPGA properly recognizes a mock Encoder input.
- *
- * @author Jonathan Leitschuh
  */
 @RunWith(Parameterized.class)
 public class EncoderTest extends AbstractComsSetup {

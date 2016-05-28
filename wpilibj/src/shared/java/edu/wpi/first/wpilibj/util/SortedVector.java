@@ -11,8 +11,6 @@ import java.util.Vector;
 
 /**
  * A vector that is sorted.
- *
- * @author dtjones
  */
 public class SortedVector extends Vector {
 

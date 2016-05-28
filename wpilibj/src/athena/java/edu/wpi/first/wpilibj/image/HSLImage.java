@@ -11,8 +11,6 @@ import com.ni.vision.NIVision;
 
 /**
  * A color image represented in HSL color space at 3 bytes per pixel.
- *
- * @author dtjones
  */
 public class HSLImage extends ColorImage {
 

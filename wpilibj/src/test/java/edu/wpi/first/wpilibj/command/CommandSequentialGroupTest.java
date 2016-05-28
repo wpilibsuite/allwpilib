@@ -13,9 +13,6 @@ import java.util.logging.Logger;
 
 /**
  * Ported from the old CrioTest Classes.
- *
- * @author Mitchell
- * @author Jonathan Leitschuh
  */
 public class CommandSequentialGroupTest extends AbstractCommandTest {
   private static Logger logger = Logger.getLogger(CommandSequentialGroupTest.class.getName());

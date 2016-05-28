@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * Class for reading analog potentiometers. Analog potentiometers read in an analog voltage that
  * corresponds to a position. Usually the position is either degrees or meters. However, if no
  * conversion is given it remains volts.
- *
- * @author Alex Henning
  */
 public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
   private double m_scale, m_offset;

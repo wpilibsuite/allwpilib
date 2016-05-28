@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
 
 /**
  * A fixture that wraps a {@link CANJaguar}.
- *
- * @author jonathanleitschuh
  */
 public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJaguar> implements
     ITestFixture {

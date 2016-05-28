@@ -28,8 +28,6 @@ import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
  *
  * <p> This will also interact with {@link NetworkTable} by creating a table called "Preferences"
  * with all the key-value pairs. </p>
- *
- * @author Joe Grinstead
  */
 public class Preferences {
 

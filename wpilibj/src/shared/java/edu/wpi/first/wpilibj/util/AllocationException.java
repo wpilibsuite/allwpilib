@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj.util;
 
 /**
  * Exception indicating that the resource is already allocated.
- *
- * @author dtjones
  */
 public class AllocationException extends RuntimeException {
 

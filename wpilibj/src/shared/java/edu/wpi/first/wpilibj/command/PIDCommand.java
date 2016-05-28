@@ -20,8 +20,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * <p> It provides some convenience methods to run an internal {@link PIDController} . It will also
  * start and stop said {@link PIDController} when the {@link PIDCommand} is first initialized and
  * ended/interrupted. </p>
- *
- * @author Joe Grinstead
  */
 public abstract class PIDCommand extends Command implements Sendable {
 

@@ -19,8 +19,6 @@ import java.io.File;
 /**
  * Provides an entry point for tests to run with ANT. This allows ant to output JUnit XML test
  * results for Jenkins.
- *
- * @author jonathanleitschuh
  */
 public class AntJunitLanucher {
 

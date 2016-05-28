@@ -27,8 +27,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link RelayCrossConnectFixture}.
- *
- * @author jonathanleitschuh
  */
 public class RelayCrossConnectTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(RelayCrossConnectTest.class.getName());

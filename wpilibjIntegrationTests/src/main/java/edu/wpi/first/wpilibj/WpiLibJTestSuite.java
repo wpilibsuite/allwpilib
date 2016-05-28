@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 /**
  * Holds all of the tests in the root wpilibj directory. Please list alphabetically so that it is
  * easy to determine if a test is missing from the list.
- *
- * @author Jonathan Leitschuh
  */
 @RunWith(Suite.class)
 @SuiteClasses({AnalogCrossConnectTest.class, AnalogPotentiometerTest.class,

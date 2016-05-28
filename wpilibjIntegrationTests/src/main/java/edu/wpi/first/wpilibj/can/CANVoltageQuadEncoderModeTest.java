@@ -27,8 +27,6 @@ import static org.junit.Assert.assertThat;
 
 /**
  * Tests the CAN motor controllers in voltage mode work correctly.
- *
- * @author Jonathan Leitschuh
  */
 public class CANVoltageQuadEncoderModeTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANVoltageQuadEncoderModeTest.class

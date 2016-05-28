@@ -11,8 +11,6 @@ package edu.wpi.first.wpilibj.command;
  * A {@link PrintCommand} is a command which prints out a string when it is initialized, and then
  * immediately finishes. It is useful if you want a {@link CommandGroup} to print out a string when
  * it reaches a certain point.
- *
- * @author Joe Grinstead
  */
 public class PrintCommand extends Command {
 

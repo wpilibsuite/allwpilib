@@ -23,8 +23,6 @@ import java.lang.annotation.Target;
  * <p>This code was originally found here:
  * <a href="http://www.codeaffine.com/2013/04/10/running-junit-tests-repeatedly-without-loops/">
  * Running JUnit Tests Repeatedly Without Loops</a>
- *
- * @author Frank Appel
  */
 public class RepeatRule implements TestRule {
   @Retention(RetentionPolicy.RUNTIME)

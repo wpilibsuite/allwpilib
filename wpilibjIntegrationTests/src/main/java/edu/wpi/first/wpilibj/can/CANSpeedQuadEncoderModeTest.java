@@ -23,8 +23,6 @@ import static org.junit.Assert.assertThat;
 
 /**
  * Tests the CAN Speed controllers in quad mode.
- *
- * @author jonathanleitschuh
  */
 public class CANSpeedQuadEncoderModeTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANPercentQuadEncoderModeTest.class

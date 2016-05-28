@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj.mockhardware.FakeCounterSource;
 
 /**
  * A fixture that can test the {@link Counter} using a {@link DIOCrossConnectFixture}.
- *
- * @author jonathanleitschuh
  */
 public class FakeCounterFixture implements ITestFixture {
   private static final Logger logger = Logger.getLogger(FakeEncoderFixture.class.getName());

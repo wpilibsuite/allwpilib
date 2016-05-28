@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj.util.SortedVector;
 
 /**
  * An image where each pixel is treated as either on or off.
- *
- * @author dtjones
  */
 public class BinaryImage extends MonoImage {
   private int m_numParticles = -1;

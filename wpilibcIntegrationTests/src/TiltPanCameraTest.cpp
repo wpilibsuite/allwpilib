@@ -26,7 +26,6 @@ static constexpr double kSensitivity = 0.013;
 
 /**
  * A fixture for the camera with two servos and a gyro
- * @author Thomas Clark
  */
 class TiltPanCameraTest : public testing::Test {
  protected:

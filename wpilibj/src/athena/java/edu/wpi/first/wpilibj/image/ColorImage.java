@@ -11,8 +11,6 @@ import com.ni.vision.NIVision;
 
 /**
  * A class representing a color image.
- *
- * @author dtjones
  */
 public abstract class ColorImage extends ImageBase {
 

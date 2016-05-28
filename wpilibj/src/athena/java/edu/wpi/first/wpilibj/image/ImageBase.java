@@ -12,8 +12,6 @@ import com.ni.vision.NIVision.Image;
 
 /**
  * Class representing a generic image.
- *
- * @author dtjones
  */
 public abstract class ImageBase {
 

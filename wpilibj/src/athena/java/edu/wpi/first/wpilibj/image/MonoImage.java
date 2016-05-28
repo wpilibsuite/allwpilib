@@ -16,8 +16,6 @@ import com.ni.vision.NIVision.ShapeDetectionOptions;
 
 /**
  * A grey scale image represented at a byte per pixel.
- *
- * @author dtjones
  */
 public class MonoImage extends ImageBase {
 

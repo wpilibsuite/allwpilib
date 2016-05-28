@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * Scheduler#run() run()} often to have {@link Command Commands} function correctly. However, this
  * is already done for you if you use the CommandBased Robot template.</p>
  *
- * @author Joe Grinstead
  * @see Command
  */
 public class Scheduler implements NamedSendable {

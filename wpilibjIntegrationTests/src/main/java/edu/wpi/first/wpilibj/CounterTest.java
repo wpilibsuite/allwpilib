@@ -27,8 +27,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Tests to see if the Counter is working properly.
- *
- * @author Jonathan Leitschuh
  */
 @RunWith(Parameterized.class)
 public class CounterTest extends AbstractComsSetup {

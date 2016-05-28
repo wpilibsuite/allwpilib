@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.Sendable;
 
 /**
  * Live Window Sendable is a special type of object sendable to the live window.
- *
- * @author Alex Henning
  */
 public interface LiveWindowSendable extends Sendable {
   /**
