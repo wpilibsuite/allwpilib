@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
 /**
  * Built-in accelerometer.
  *
- * <p>This class allows access to the RoboRIO's internal accelerometer.
+ * <p>This class allows access to the roboRIO's internal accelerometer.
  */
 public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable {
   /**
@@ -66,7 +66,7 @@ public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable {
   /**
    * The acceleration in the X axis.
    *
-   * @return The acceleration of the RoboRIO along the X axis in g-forces
+   * @return The acceleration of the roboRIO along the X axis in g-forces
    */
   @Override
   public double getX() {
@@ -76,7 +76,7 @@ public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable {
   /**
    * The acceleration in the Y axis.
    *
-   * @return The acceleration of the RoboRIO along the Y axis in g-forces
+   * @return The acceleration of the roboRIO along the Y axis in g-forces
    */
   @Override
   public double getY() {
@@ -86,7 +86,7 @@ public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable {
   /**
    * The acceleration in the Z axis.
    *
-   * @return The acceleration of the RoboRIO along the Z axis in g-forces
+   * @return The acceleration of the roboRIO along the Z axis in g-forces
    */
   @Override
   public double getZ() {

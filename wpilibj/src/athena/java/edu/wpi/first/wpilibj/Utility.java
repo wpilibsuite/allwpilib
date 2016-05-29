@@ -49,7 +49,7 @@ public final class Utility {
   }
 
   /**
-   * Get the state of the "USER" button on the RoboRIO.
+   * Get the state of the "USER" button on the roboRIO.
    *
    * @return true if the button is currently pressed down
    */

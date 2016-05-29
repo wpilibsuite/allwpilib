@@ -19,9 +19,9 @@
 
 /**
  * The preferences class provides a relatively simple way to save important
- * values to the RoboRIO to access the next time the RoboRIO is booted.
+ * values to the roboRIO to access the next time the roboRIO is booted.
  *
- * <p>This class loads and saves from a file inside the RoboRIO.  The user can
+ * <p>This class loads and saves from a file inside the roboRIO.  The user can
  * not access the file directly, but may modify values at specific fields which
  * will then be automatically periodically saved to the file by the NetworkTable
  * server.</p>

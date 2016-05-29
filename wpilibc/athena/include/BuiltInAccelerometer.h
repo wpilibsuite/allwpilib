@@ -16,7 +16,7 @@
 /**
  * Built-in accelerometer.
  *
- * This class allows access to the RoboRIO's internal accelerometer.
+ * This class allows access to the roboRIO's internal accelerometer.
  */
 class BuiltInAccelerometer : public Accelerometer,
                              public SensorBase,
