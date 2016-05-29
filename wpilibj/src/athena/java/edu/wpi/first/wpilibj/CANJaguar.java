@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
  * Texas Instruments Jaguar Speed Controller as a CAN device.
- *
- * @author Thomas Clark
  */
 public class CANJaguar implements MotorSafety, PIDOutput, CANSpeedController {
 

@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.AnalogOutput;
 
 /**
  * A fake source to provide output to a {@link edu.wpi.first.wpilibj.interfaces.Potentiometer}.
- *
- * @author jonathanleitschuh
  */
 public class FakePotentiometerSource {
   private AnalogOutput m_output;

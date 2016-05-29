@@ -34,8 +34,6 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  * with all the key-value pairs. To save using {@link NetworkTable}, simply set the boolean at
  * position ~S A V E~ to true. Also, if the value of any variable is " in the {@link NetworkTable},
  * then that represents non-existence in the {@link Preferences} table</p>
- *
- * @author Joe Grinstead
  */
 public class Preferences {
 

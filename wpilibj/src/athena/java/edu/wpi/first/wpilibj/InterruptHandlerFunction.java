@@ -16,15 +16,12 @@ import edu.wpi.first.wpilibj.hal.InterruptJNI.InterruptJNIHandlerFunction;
  *
  * @param <T> The type of the parameter that should be returned to the the method {@link
  *            #interruptFired(int, Object)}
- * @author Jonathan Leitschuh
  */
 public abstract class InterruptHandlerFunction<T> {
   /**
    * The entry point for the interrupt. When the interrupt fires the {@link #apply(int, Object)}
    * method is called. The outer class is provided as an interface to allow the implementer to pass
    * a generic object to the interrupt fired method.
-   *
-   * @author Jonathan Leitschuh
    */
   private class Function implements InterruptJNIHandlerFunction {
     @SuppressWarnings("unchecked")

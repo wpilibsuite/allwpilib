@@ -11,8 +11,6 @@ package edu.wpi.first.wpilibj.livewindow;
  * A LiveWindow component is a device (sensor or actuator) that should be added to the
  * SmartDashboard in test mode. The components are cached until the first time the robot enters Test
  * mode. This allows the components to be inserted, then renamed.
- *
- * @author brad
  */
 /*
  * This class is intentionally package private.

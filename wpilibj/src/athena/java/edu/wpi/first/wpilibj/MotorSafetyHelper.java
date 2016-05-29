@@ -12,8 +12,6 @@ package edu.wpi.first.wpilibj;
  * Safety protocol. The helper object has the code to actually do the timing and call the motors
  * Stop() method when the timeout expires. The motor object is expected to call the Feed() method
  * whenever the motors value is updated.
- *
- * @author brad
  */
 public final class MotorSafetyHelper {
 

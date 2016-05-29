@@ -25,8 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Tests the {@link Preferences}.
- *
- * @author jonathanleitschuh
  */
 public class PreferencesTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PreferencesTest.class.getName());

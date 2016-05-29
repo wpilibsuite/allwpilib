@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj.image;
 
 /**
  * Exception class which looks up nivision error codes.
- *
- * @author dtjones
  */
 @SuppressWarnings("all")
 public class NIVisionException extends Exception {

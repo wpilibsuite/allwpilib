@@ -11,9 +11,6 @@ import org.junit.Test;
 
 /**
  * Ported from the old CrioTest Classes.
- *
- * @author Mitchell
- * @author Jonathan Leitschuh
  */
 public class CommandParallelGroupTest extends AbstractCommandTest {
 

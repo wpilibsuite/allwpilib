@@ -18,8 +18,6 @@
  * in an analog voltage that corresponds to a position. Usually the
  * position is either degrees or meters. However, if no conversion is
  * given it remains volts.
- *
- * @author Alex Henning
  */
 class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
  public:

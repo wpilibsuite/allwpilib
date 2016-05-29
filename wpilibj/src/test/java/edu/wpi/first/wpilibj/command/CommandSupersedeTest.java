@@ -13,9 +13,6 @@ import java.util.logging.Logger;
 
 /**
  * Ported from the old CrioTest Classes.
- *
- * @author Mitchell
- * @author Jonathan Leitschuh
  */
 public class CommandSupersedeTest extends AbstractCommandTest {
   private static final Logger logger = Logger.getLogger(CommandSupersedeTest.class.getName());

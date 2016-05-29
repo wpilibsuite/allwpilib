@@ -31,8 +31,6 @@ struct LiveWindowComponent {
  * The LiveWindow class is the public interface for putting sensors and
  * actuators
  * on the LiveWindow.
- *
- * @author Brad Miller
  */
 class LiveWindow {
  public:

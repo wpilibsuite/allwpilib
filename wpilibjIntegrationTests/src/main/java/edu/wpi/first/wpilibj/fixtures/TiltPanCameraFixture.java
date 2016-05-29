@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.Timer;
 /**
  * A class to represent the a physical Camera with two servos (tilt and pan) designed to test to see
  * if the gyroscope is operating normally.
- *
- * @author Jonathan Leitschuh
  */
 public abstract class TiltPanCameraFixture implements ITestFixture {
   public static final Logger logger = Logger.getLogger(TiltPanCameraFixture.class.getName());

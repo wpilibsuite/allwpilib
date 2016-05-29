@@ -24,8 +24,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Test that covers the {@link AnalogCrossConnectFixture}.
- *
- * @author jonathanleitschuh
  */
 public class AnalogCrossConnectTest extends AbstractInterruptTest {
   private static final Logger logger = Logger.getLogger(AnalogCrossConnectTest.class.getName());

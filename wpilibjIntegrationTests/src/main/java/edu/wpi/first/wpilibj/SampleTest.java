@@ -24,8 +24,6 @@ import static org.junit.Assert.assertTrue;
  * test and use testing fixtures and categories. All tests must extend from {@link
  * AbstractComsSetup} in order to ensure that Network Communications are set up before the tests are
  * run.
- *
- * @author Fredric Silberberg
  */
 public class SampleTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(SampleTest.class.getName());

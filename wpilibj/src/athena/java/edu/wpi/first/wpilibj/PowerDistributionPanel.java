@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the CAN PDP.
- *
- * @author Thomas Clark
  */
 public class PowerDistributionPanel extends SensorBase implements LiveWindowSendable {
 

@@ -11,8 +11,6 @@ import com.ni.vision.NIVision;
 
 /**
  * Class to store commonly used information about a particle.
- *
- * @author dtjones
  */
 public class ParticleAnalysisReport {
 

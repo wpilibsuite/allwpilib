@@ -22,8 +22,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * SendableChooser} and then put it into the {@link SmartDashboard} to have a list of options appear
  * on the laptop. Once autonomous starts, simply ask the {@link SendableChooser} what the selected
  * value is.
- *
- * @author Joe Grinstead
  */
 public class SendableChooser implements Sendable {
 

@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj;
 
 /**
  * Shuts off motors when their outputs aren't updated often enough.
- *
- * @author brad
  */
 public interface MotorSafety {
   double DEFAULT_SAFETY_EXPIRATION = 0.1;

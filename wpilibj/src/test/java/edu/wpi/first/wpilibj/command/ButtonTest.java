@@ -16,9 +16,6 @@ import edu.wpi.first.wpilibj.buttons.InternalButton;
 /**
  * Test that covers the {@link edu.wpi.first.wpilibj.buttons.Button} with the {@link Command}
  * library.
- *
- * @author Mitchell
- * @author jonathanleitschuh
  */
 public class ButtonTest extends AbstractCommandTest {
   private InternalButton m_button1;

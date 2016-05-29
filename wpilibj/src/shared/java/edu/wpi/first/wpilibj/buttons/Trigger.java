@@ -22,8 +22,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * (for instance, if they want to react to the user holding a button while the robot is reading a
  * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
  * the full functionality of the Trigger class.
- *
- * @author Joe Grinstead
  */
 public abstract class Trigger implements Sendable {
 

@@ -15,7 +15,6 @@
 /**
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
- * @author Thomas Clark
  */
 class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
  public:

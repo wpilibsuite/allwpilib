@@ -20,8 +20,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * ADXL345 I2C Accelerometer.
- *
- * @author dtjones
  */
 @SuppressWarnings("TypeName")
 public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindowSendable {

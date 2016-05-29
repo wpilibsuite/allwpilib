@@ -20,9 +20,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * ADXL345 SPI Accelerometer.
- *
- * @author dtjones
- * @author mwills
  */
 @SuppressWarnings({"TypeName"})
 public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindowSendable {

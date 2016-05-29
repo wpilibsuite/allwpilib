@@ -28,8 +28,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * The default test set to run against the CAN Motor Controllers.
- *
- * @author jonathanleitschuh
  */
 public class CANDefaultTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANDefaultTest.class.getName());

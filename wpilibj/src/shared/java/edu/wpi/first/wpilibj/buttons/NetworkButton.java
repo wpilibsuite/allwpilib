@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 /**
  * A {@link Button} that uses a {@link NetworkTable} boolean field.
- * @author Joe
  */
 public class NetworkButton extends Button {
 

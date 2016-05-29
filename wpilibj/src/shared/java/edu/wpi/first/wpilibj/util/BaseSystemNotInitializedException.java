@@ -11,8 +11,6 @@ package edu.wpi.first.wpilibj.util;
 /**
  * Thrown if there is an error caused by a basic system or setting not being properly initialized
  * before being used.
- *
- * @author Jonathan Leitschuh
  */
 public class BaseSystemNotInitializedException extends RuntimeException {
   /**

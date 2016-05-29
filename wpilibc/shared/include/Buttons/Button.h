@@ -21,8 +21,6 @@
  * Trigger objects. This is a simple wrapper around Trigger with the method
  * names
  * renamed to fit the Button object use.
- *
- * @author brad
  */
 class Button : public Trigger {
  public:

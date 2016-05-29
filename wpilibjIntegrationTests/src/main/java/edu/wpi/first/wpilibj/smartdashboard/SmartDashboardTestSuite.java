@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 
 /**
  * All tests pertaining to {@link SmartDashboard}.
- *
- * @author jonathanleitschuh
  */
 @RunWith(Suite.class)
 @SuiteClasses({SmartDashboardTest.class})

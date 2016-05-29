@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj;
 
 /**
  * Manages a PWM object.
- *
- * @author brad
  */
 public class SafePWM extends PWM implements MotorSafety {
 

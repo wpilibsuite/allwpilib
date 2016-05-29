@@ -40,10 +40,6 @@ import edu.wpi.first.wpilibj.mockhardware.FakePotentiometerSource;
  * This class provides access to all of the elements on the test bench, for use in fixtures. This
  * class is a singleton, you should use {@link #getInstance()} to obtain a reference to the {@code
  * TestBench}.
- *
- * <p>TODO: This needs to be updated to the most recent test bench setup.
- *
- * @author Fredric Silberberg
  */
 public final class TestBench {
 

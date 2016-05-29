@@ -28,8 +28,6 @@ import static org.junit.Assert.assertThat;
 
 /**
  * Tests the CAN Motor controller in Potentiometer Mode.
- *
- * @author jonathanleitschuh
  */
 public class CANPositionPotentiometerModeTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANPositionPotentiometerModeTest.class

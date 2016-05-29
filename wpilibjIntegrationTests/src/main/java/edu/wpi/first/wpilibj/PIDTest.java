@@ -36,9 +36,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Test that covers the {@link PIDController}.
- *
- * @author Kacper Puczydlowski
- * @author Jonathan Leitschuh
  */
 
 @RunWith(Parameterized.class)

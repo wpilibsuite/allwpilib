@@ -11,9 +11,6 @@ import org.junit.Test;
 
 /**
  * Test a {@link Command} that times out.
- *
- * @author jonathanleitschuh
- *
  */
 public class CommandTimeoutTest extends AbstractCommandTest {
 

@@ -20,8 +20,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the CAN Motor Controller in Current Quad Encoder mode.
- *
- * @author jonathanleitschuh
  */
 public class CANCurrentQuadEncoderModeTest extends AbstractCANTest {
   private static Logger logger = Logger.getLogger(CANCurrentQuadEncoderModeTest.class.getName());

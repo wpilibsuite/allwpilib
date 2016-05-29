@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.AnalogOutput;
 
 /**
  * A fixture that connects an {@link AnalogInput} and an {@link AnalogOutput}.
- *
- * @author jonathanleitschuh
  */
 public abstract class AnalogCrossConnectFixture implements ITestFixture {
   private boolean m_initialized = false;

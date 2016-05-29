@@ -24,8 +24,6 @@ import edu.wpi.first.wpilibj.test.TestBench;
  * reuse. This class should be explicitly instantiated in the TestBed class to allow any test to
  * access this fixture. This allows tests to be mailable so that you can easily reconfigure the
  * physical testbed without breaking the tests.
- *
- * @author Jonathan Leitschuh
  */
 public abstract class MotorEncoderFixture<T extends SpeedController> implements ITestFixture {
   private static final Logger logger = Logger.getLogger(MotorEncoderFixture.class.getName());

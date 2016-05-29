@@ -22,8 +22,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Test that covers the {@link Compressor}.
- *
- * @author Kacper Puczydlowski
  */
 
 public class PCMTest extends AbstractComsSetup {

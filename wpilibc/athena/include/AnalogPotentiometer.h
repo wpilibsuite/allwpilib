@@ -16,9 +16,6 @@
  * in an analog voltage that corresponds to a position. The position is
  * in whichever units you choose, by way of the scaling and offset
  * constants passed to the constructor.
- *
- * @author Alex Henning
- * @author Colby Skeggs (rail voltage)
  */
 class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
  public:

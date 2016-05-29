@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
 
 /**
  * Support for high level usage reporting.
- *
- * @author alex
  */
 @SuppressWarnings("JavadocMethod")
 public class HLUsageReporting {

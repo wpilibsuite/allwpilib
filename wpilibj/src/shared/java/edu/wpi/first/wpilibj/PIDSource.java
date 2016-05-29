@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj;
 
 /**
  * This interface allows for PIDController to automatically read from this object.
- *
- * @author dtjones
  */
 public interface PIDSource {
   /**

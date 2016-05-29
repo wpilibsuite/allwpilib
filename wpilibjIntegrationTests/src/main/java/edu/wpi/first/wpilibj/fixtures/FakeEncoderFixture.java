@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj.mockhardware.FakeEncoderSource;
 /**
  * An encoder that uses two {@link DIOCrossConnectFixture DIOCrossConnectFixtures} to test the
  * {@link Encoder}.
- *
- * @author jonathanleitschuh
  */
 public class FakeEncoderFixture implements ITestFixture {
   private static final Logger logger = Logger.getLogger(FakeEncoderFixture.class.getName());

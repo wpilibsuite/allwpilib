@@ -17,8 +17,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Test for the DigitalGlitchFilter class.
- *
- * @author Austin Schuh and Jerry Morrison
  */
 public class DigitalGlitchFilterTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(

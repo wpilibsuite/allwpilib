@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.test.TestBench;
  * obtain references to hardware from the {@link TestBench} class, which is a singleton. Testing
  * Fixtures are responsible for ensuring that the hardware is in an appropriate state for the start
  * of a test, and ensuring that future tests will not be affected by the results of a test.
- *
- * @author Fredric Silberberg
  */
 public interface ITestFixture {
 

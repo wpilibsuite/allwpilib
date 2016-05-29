@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj.command;
 
 /**
  * An element that is in a LinkedList.
- *
- * @author Greg
  */
 class LinkedListElement {
   private LinkedListElement m_next;

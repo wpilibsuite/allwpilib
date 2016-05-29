@@ -38,8 +38,6 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  * active command is not interruptible, the other one will not even be started, and the active one
  * will continue functioning.
  *
- * @author Brad Miller
- * @author Joe Grinstead
  * @see Subsystem
  * @see CommandGroup
  * @see IllegalUseOfCommandException

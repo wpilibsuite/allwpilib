@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
 /**
  * The LiveWindow class is the public interface for putting sensors and actuators on the
  * LiveWindow.
- *
- * @author Alex Henning
  */
 public class LiveWindow {
 

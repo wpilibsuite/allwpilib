@@ -15,9 +15,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * Class for reading analog potentiometers. Analog potentiometers read in an analog voltage that
  * corresponds to a position. The position is in whichever units you choose, by way of the scaling
  * and offset constants passed to the constructor.
- *
- * @author Alex Henning
- * @author Colby Skeggs (rail voltage)
  */
 public class AnalogPotentiometer implements Potentiometer, LiveWindowSendable {
   private AnalogInput m_analogInput;

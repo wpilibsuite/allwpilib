@@ -12,8 +12,6 @@ import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Emulates a quadrature encoder.
- *
- * @author Ryan O'Meara
  */
 public class FakeEncoderSource {
 

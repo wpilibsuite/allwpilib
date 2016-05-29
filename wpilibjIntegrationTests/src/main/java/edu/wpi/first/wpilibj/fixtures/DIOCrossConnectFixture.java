@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj.DigitalOutput;
 
 /**
  * Connects a digital input to a digital output.
- *
- * @author Jonathan Leitschuh
  */
 public class DIOCrossConnectFixture implements ITestFixture {
 

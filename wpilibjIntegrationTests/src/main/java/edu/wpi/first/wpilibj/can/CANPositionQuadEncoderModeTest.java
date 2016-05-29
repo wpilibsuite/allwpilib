@@ -21,8 +21,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the CAN Motor Encoders in QuadEncoder mode.
- *
- * @author jonathanleitschuh
  */
 public class CANPositionQuadEncoderModeTest extends AbstractCANTest {
   private static final Logger logger = Logger.getLogger(CANPositionQuadEncoderModeTest.class

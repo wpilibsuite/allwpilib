@@ -11,8 +11,6 @@ import org.junit.Test;
 
 /**
  * Tests the {@link Command} library.
- *
- * @author jonathanleitschuh
  */
 public class DefaultCommandTest extends AbstractCommandTest {
 

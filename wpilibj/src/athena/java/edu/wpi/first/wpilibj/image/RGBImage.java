@@ -11,8 +11,6 @@ import com.ni.vision.NIVision;
 
 /**
  * A color image represented in RGB color space at 3 bytes per pixel.
- *
- * @author dtjones
  */
 public class RGBImage extends ColorImage {
 

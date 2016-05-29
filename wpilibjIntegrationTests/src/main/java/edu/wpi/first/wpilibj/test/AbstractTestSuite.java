@@ -22,8 +22,6 @@ import java.util.regex.Pattern;
 /**
  * Allows tests suites and tests to be run selectively from the command line using a regex text
  * pattern.
- *
- * @author jonathanleitschuh
  */
 public abstract class AbstractTestSuite {
   private static final Logger logger = Logger.getLogger(AbstractTestSuite.class.getName());
@@ -63,8 +61,6 @@ public abstract class AbstractTestSuite {
   /**
    * Stores a method name and method class pair. Used when searching for methods matching a given
    * regex text.
-   *
-   * @author jonathanleitschuh
    */
   protected class ClassMethodPair {
     public final Class<?> m_methodClass;

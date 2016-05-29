@@ -24,8 +24,6 @@ import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
  *
  * <p>When a value is put into the SmartDashboard here, it pops up on the SmartDashboard on the
  * laptop. Users can put values into and get values from the SmartDashboard.
- *
- * @author Joe Grinstead
  */
 public class SmartDashboard {
   /**

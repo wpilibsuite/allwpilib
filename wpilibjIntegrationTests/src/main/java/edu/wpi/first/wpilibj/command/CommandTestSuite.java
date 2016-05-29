@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 
 /**
  * Contains a listing of all of the {@link Command} tests.
- * @author jonathanleitschuh
  */
 @RunWith(Suite.class)
 @SuiteClasses({ButtonTest.class, CommandParallelGroupTest.class, CommandScheduleTest.class,

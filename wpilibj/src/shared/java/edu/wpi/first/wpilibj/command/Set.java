@@ -12,8 +12,7 @@ import java.util.Vector;
 
 @SuppressWarnings("all")
 /**
- *
- * @author Greg
+ * A set.
  */
 class Set {
   private Vector m_set = new Vector();

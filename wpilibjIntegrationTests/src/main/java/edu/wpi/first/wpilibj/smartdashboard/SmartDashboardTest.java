@@ -20,8 +20,6 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * Test that covers {@link SmartDashboard}.
- *
- * @author jonathanleitschuh
  */
 public class SmartDashboardTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(SmartDashboardTest.class.getName());
