@@ -21,8 +21,9 @@ extern "C" {
  * Signature: (BB)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_JNIWrapper_getPortWithModule(
-    JNIEnv* env, jclass, jbyte module, jbyte pin) {
+Java_edu_wpi_first_wpilibj_hal_JNIWrapper_getPortWithModule(JNIEnv* env, jclass,
+                                                            jbyte module,
+                                                            jbyte pin) {
   // FILE_LOG(logDEBUG) << "Calling JNIWrapper getPortWithModlue";
   // FILE_LOG(logDEBUG) << "Module = " << (jint)module;
   // FILE_LOG(logDEBUG) << "Pin = " << (jint)pin;

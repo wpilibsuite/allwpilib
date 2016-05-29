@@ -35,7 +35,7 @@ TLogLevel halUtilLogLevel = logWARNING;
 #define kRIOStatusFeatureNotSupported (kRioStatusOffset - 193)
 #define kRIOStatusResourceNotInitialized -52010
 
-JavaVM *jvm = nullptr;
+JavaVM* jvm = nullptr;
 static jclass throwableCls = nullptr;
 static jclass stackTraceElementCls = nullptr;
 static jclass runtimeExCls = nullptr;
@@ -47,7 +47,7 @@ static jclass canMessageNotAllowedExCls = nullptr;
 static jclass canNotInitializedExCls = nullptr;
 static jclass uncleanStatusExCls = nullptr;
 
-static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
+static void GetStackTrace(JNIEnv* env, std::string& res, std::string& func) {
   // create a throwable
   static jmethodID constructorId = nullptr;
   if (!constructorId)
@@ -94,7 +94,7 @@ static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
 
     // add a line to res
     // res += " at ";
-    const char *tmp = env->GetStringUTFChars(stackElementString, nullptr);
+    const char* tmp = env->GetStringUTFChars(stackElementString, nullptr);
     res += tmp;
     res += '\n';
 
@@ -117,11 +117,11 @@ static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
   env->DeleteLocalRef(stackTrace);
 }
 
-void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
+void ReportError(JNIEnv* env, int32_t status, bool do_throw) {
   if (status == 0) return;
-  const char *message = getHALErrorMessage(status);
+  const char* message = getHALErrorMessage(status);
   if (do_throw && status < 0) {
-    char *buf = new char[strlen(message) + 30];
+    char* buf = new char[strlen(message) + 30];
     sprintf(buf, " Code: %d. %s", status, message);
     env->ThrowNew(runtimeExCls, buf);
     delete[] buf;
@@ -133,7 +133,7 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   }
 }
 
-void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
+void ReportCANError(JNIEnv* env, int32_t status, int message_id) {
   if (status >= 0) return;
   switch (status) {
     case kRioStatusSuccess:
@@ -188,11 +188,11 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
   }
 }
 
-void ThrowIllegalArgumentException(JNIEnv *env, const char *msg) {
+void ThrowIllegalArgumentException(JNIEnv* env, const char* msg) {
   env->ThrowNew(illegalArgExCls, msg);
 }
 
-void ThrowBoundaryException(JNIEnv *env, double value, double lower,
+void ThrowBoundaryException(JNIEnv* env, double value, double lower,
                             double upper) {
   static jmethodID getMessage = nullptr;
   if (!getMessage)
@@ -216,14 +216,14 @@ extern "C" {
 //
 // indicate JNI version support desired and load classes
 //
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
   jvm = vm;
 
   // set our logging level
   Log::ReportingLevel() = logDEBUG;
 
-  JNIEnv *env;
-  if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
+  JNIEnv* env;
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return JNI_ERR;
 
   // Cache references to classes
@@ -295,9 +295,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   return JNI_VERSION_1_6;
 }
 
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
-  JNIEnv *env;
-  if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
+  JNIEnv* env;
+  if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
   // Delete global references
   if (throwableCls) env->DeleteGlobalRef(throwableCls);
@@ -320,8 +320,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
  * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutexNormal(
-    JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutexNormal(JNIEnv* env,
+                                                             jclass) {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMutex";
   MUTEX_ID mutex = initializeMutexNormal();
   HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << mutex;
@@ -334,7 +334,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMutexNormal(
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMutex(
-    JNIEnv *env, jclass, jlong id) {
+    JNIEnv* env, jclass, jlong id) {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil deleteMutex";
   HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << (MUTEX_ID)id;
   deleteMutex((MUTEX_ID)id);
@@ -346,7 +346,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMutex(
  * Signature: (JI)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMutex(
-    JNIEnv *env, jclass, jlong id) {
+    JNIEnv* env, jclass, jlong id) {
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil takeMutex";
   // HALUTIL_LOG(logDEBUG) << "Mutex Ptr = " << (MUTEX_ID)id;
   takeMutex((MUTEX_ID)id);
@@ -358,8 +358,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMutex(
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMultiWait(
-    JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMultiWait(JNIEnv* env,
+                                                           jclass) {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil initializeMultiWait";
   MULTIWAIT_ID multiWait = initializeMultiWait();
   HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << multiWait;
@@ -372,7 +372,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_initializeMultiWait(
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMultiWait(
-    JNIEnv *env, jclass, jlong id) {
+    JNIEnv* env, jclass, jlong id) {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil deleteMultiWait";
   HALUTIL_LOG(logDEBUG) << "MultiWait Ptr = " << (MULTIWAIT_ID)id;
   deleteMultiWait((MULTIWAIT_ID)id);
@@ -384,7 +384,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_deleteMultiWait(
  * Signature: (JJ)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMultiWait(
-    JNIEnv *env, jclass, jlong multiWaitId, jlong mutexId) {
+    JNIEnv* env, jclass, jlong multiWaitId, jlong mutexId) {
   takeMultiWait((MULTIWAIT_ID)multiWaitId, (MUTEX_ID)mutexId);
 }
 
@@ -394,7 +394,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_takeMultiWait(
  * Signature: ()S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion(JNIEnv* env, jclass) {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGAVersion";
   int32_t status = 0;
   jshort returnValue = getFPGAVersion(&status);
@@ -410,7 +410,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion(JNIEnv *env, jclass) {
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision(JNIEnv* env, jclass) {
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGARevision";
   int32_t status = 0;
   jint returnValue = getFPGARevision(&status);
@@ -426,7 +426,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision(JNIEnv *env, jclass) {
  * Signature: ()J
  */
 JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime(JNIEnv* env, jclass) {
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   int32_t status = 0;
   jlong returnValue = getFPGATime(&status);
@@ -442,7 +442,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime(JNIEnv *env, jclass) {
  * Signature: ()I
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton(JNIEnv *env, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton(JNIEnv* env, jclass) {
   // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getFPGATime";
   int32_t status = 0;
   jboolean returnValue = getFPGAButton(&status);
@@ -458,9 +458,10 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton(JNIEnv *env, jclass) {
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(
-    JNIEnv *paramEnv, jclass, jint paramId) {
-  const char *msg = getHALErrorMessage(paramId);
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(JNIEnv* paramEnv,
+                                                          jclass,
+                                                          jint paramId) {
+  const char* msg = getHALErrorMessage(paramId);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALErrorMessage id=" << paramId
                         << " msg=" << msg;
   return paramEnv->NewStringUTF(msg);
@@ -472,7 +473,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno(JNIEnv *, jclass) {
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno(JNIEnv*, jclass) {
   return errno;
 }
 
@@ -482,8 +483,8 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno(JNIEnv *, jclass) {
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror(
-    JNIEnv *env, jclass, jint errorCode) {
-  const char *msg = strerror(errno);
+    JNIEnv* env, jclass, jint errorCode) {
+  const char* msg = strerror(errno);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode="
                         << errorCode << " msg=" << msg;
   return env->NewStringUTF(msg);

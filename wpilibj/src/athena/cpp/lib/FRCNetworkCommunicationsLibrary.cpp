@@ -10,8 +10,8 @@
 #include "Log.h"
 
 #include "HAL/HAL.h"
-#include "edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary.h"
 #include "HALUtil.h"
+#include "edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary.h"
 
 // set the logging level
 TLogLevel netCommLogLevel = logWARNING;
@@ -31,9 +31,9 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationUsageReportingReport(
-    JNIEnv *paramEnv, jclass, jbyte paramResource, jbyte paramInstanceNumber,
+    JNIEnv* paramEnv, jclass, jbyte paramResource, jbyte paramInstanceNumber,
     jbyte paramContext, jstring paramFeature) {
-  const char *featureStr = paramEnv->GetStringUTFChars(paramFeature, nullptr);
+  const char* featureStr = paramEnv->GetStringUTFChars(paramFeature, nullptr);
   NETCOMM_LOG(logDEBUG) << "Calling FRCNetworkCommunicationsLibrary report "
                         << "res:" << (unsigned int)paramResource
                         << " instance:" << (unsigned int)paramInstanceNumber
@@ -51,7 +51,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetw
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationObserveUserProgramStarting(
-    JNIEnv *, jclass) {
+    JNIEnv*, jclass) {
   HALNetworkCommunicationObserveUserProgramStarting();
 }
 /*
@@ -61,7 +61,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetw
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationObserveUserProgramDisabled(
-    JNIEnv *, jclass) {
+    JNIEnv*, jclass) {
   HALNetworkCommunicationObserveUserProgramDisabled();
 }
 /*
@@ -71,7 +71,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetw
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationObserveUserProgramAutonomous(
-    JNIEnv *, jclass) {
+    JNIEnv*, jclass) {
   HALNetworkCommunicationObserveUserProgramAutonomous();
 }
 
@@ -82,7 +82,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetw
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationObserveUserProgramTeleop(
-    JNIEnv *, jclass) {
+    JNIEnv*, jclass) {
   HALNetworkCommunicationObserveUserProgramTeleop();
 }
 
@@ -93,7 +93,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetw
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationObserveUserProgramTest(
-    JNIEnv *, jclass) {
+    JNIEnv*, jclass) {
   HALNetworkCommunicationObserveUserProgramTest();
 }
 
@@ -104,7 +104,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetw
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationReserve(
-    JNIEnv *, jclass) {
+    JNIEnv*, jclass) {
   int rv = HALInitialize(0);
   assert(1 == rv);
 }
@@ -116,10 +116,10 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetw
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeHALGetControlWord(
-    JNIEnv *, jclass) {
+    JNIEnv*, jclass) {
   NETCOMM_LOG(logDEBUG) << "Calling HAL Control Word";
   jint controlWord;
-  HALGetControlWord((HALControlWord *)&controlWord);
+  HALGetControlWord((HALControlWord*)&controlWord);
   return controlWord;
 }
 
@@ -130,10 +130,10 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeH
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeHALGetAllianceStation(
-    JNIEnv *, jclass) {
+    JNIEnv*, jclass) {
   NETCOMM_LOG(logDEBUG) << "Calling HAL Alliance Station";
   jint allianceStation;
-  HALGetAllianceStation((HALAllianceStationID *)&allianceStation);
+  HALGetAllianceStation((HALAllianceStationID*)&allianceStation);
   return allianceStation;
 }
 
@@ -144,15 +144,15 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeH
  */
 JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxes(
-    JNIEnv * env, jclass, jbyte joystickNum, jfloatArray axesArray) {
+    JNIEnv* env, jclass, jbyte joystickNum, jfloatArray axesArray) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickAxes";
   HALJoystickAxes axes;
   HALGetJoystickAxes(joystickNum, &axes);
 
   jsize javaSize = env->GetArrayLength(axesArray);
-  if (axes.count > javaSize)
-  {
-    ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
+  if (axes.count > javaSize) {
+    ThrowIllegalArgumentException(
+        env, "Native array size larger then passed in java array size");
   }
 
   env->SetFloatArrayRegion(axesArray, 0, axes.count, axes.axes);
@@ -167,15 +167,15 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
  */
 JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickPOVs(
-    JNIEnv * env, jclass, jbyte joystickNum, jshortArray povsArray) {
+    JNIEnv* env, jclass, jbyte joystickNum, jshortArray povsArray) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickPOVs";
   HALJoystickPOVs povs;
   HALGetJoystickPOVs(joystickNum, &povs);
 
   jsize javaSize = env->GetArrayLength(povsArray);
-  if (povs.count > javaSize)
-  {
-    ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
+  if (povs.count > javaSize) {
+    ThrowIllegalArgumentException(
+        env, "Native array size larger then passed in java array size");
   }
 
   env->SetShortArrayRegion(povsArray, 0, povs.count, povs.povs);
@@ -190,11 +190,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickButtons(
-    JNIEnv *env, jclass, jbyte joystickNum, jobject count) {
+    JNIEnv* env, jclass, jbyte joystickNum, jobject count) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickButtons";
   HALJoystickButtons joystickButtons;
   HALGetJoystickButtons(joystickNum, &joystickButtons);
-  jbyte *countPtr = (jbyte *)env->GetDirectBufferAddress(count);
+  jbyte* countPtr = (jbyte*)env->GetDirectBufferAddress(count);
   NETCOMM_LOG(logDEBUG) << "Buttons = " << joystickButtons.buttons;
   NETCOMM_LOG(logDEBUG) << "Count = " << (jint)joystickButtons.count;
   *countPtr = joystickButtons.count;
@@ -209,7 +209,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetJoystickOutputs(
-    JNIEnv *, jclass, jbyte port, jint outputs, jshort leftRumble,
+    JNIEnv*, jclass, jbyte port, jint outputs, jshort leftRumble,
     jshort rightRumble) {
   NETCOMM_LOG(logDEBUG) << "Calling HALSetJoystickOutputs on port " << port;
   NETCOMM_LOG(logDEBUG) << "Outputs: " << outputs;
@@ -225,7 +225,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetJ
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickIsXbox(
-    JNIEnv *, jclass, jbyte port) {
+    JNIEnv*, jclass, jbyte port) {
   NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickIsXbox";
   return HALGetJoystickIsXbox(port);
 }
@@ -237,7 +237,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickType(
-    JNIEnv *, jclass, jbyte port) {
+    JNIEnv*, jclass, jbyte port) {
   NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickType";
   return HALGetJoystickType(port);
 }
@@ -249,9 +249,9 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
  */
 JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickName(
-    JNIEnv *env, jclass, jbyte port) {
+    JNIEnv* env, jclass, jbyte port) {
   NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickName";
-  char *joystickName = HALGetJoystickName(port);
+  char* joystickName = HALGetJoystickName(port);
   jstring str = env->NewStringUTF(joystickName);
   std::free(joystickName);
   return str;
@@ -264,7 +264,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxisType(
-    JNIEnv *, jclass, jbyte joystickNum, jbyte axis) {
+    JNIEnv*, jclass, jbyte joystickNum, jbyte axis) {
   NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickAxisType";
   return HALGetJoystickAxisType(joystickNum, axis);
 }
@@ -276,8 +276,8 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setNewDataSem(
-    JNIEnv *env, jclass, jlong id) {
-  NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << (void *)id;
+    JNIEnv* env, jclass, jlong id) {
+  NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << (void*)id;
   HALSetNewDataSem((MULTIWAIT_ID)id);
 }
 
@@ -289,9 +289,9 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_setNewD
  */
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetMatchTime(
-    JNIEnv *env, jclass) {
+    JNIEnv* env, jclass) {
   jfloat matchTime;
-  HALGetMatchTime((float *)&matchTime);
+  HALGetMatchTime((float*)&matchTime);
   return matchTime;
 }
 
@@ -302,7 +302,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetM
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetSystemActive(
-    JNIEnv *env, jclass) {
+    JNIEnv* env, jclass) {
   int32_t status = 0;
   bool val = HALGetSystemActive(&status);
   CheckStatus(env, status);
@@ -316,7 +316,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetS
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetBrownedOut(
-    JNIEnv *env, jclass) {
+    JNIEnv* env, jclass) {
   int32_t status = 0;
   bool val = HALGetBrownedOut(&status);
   CheckStatus(env, status);
@@ -330,8 +330,8 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetB
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetErrorData(
-    JNIEnv *env, jclass, jstring error) {
-  const char *errorStr = env->GetStringUTFChars(error, nullptr);
+    JNIEnv* env, jclass, jstring error) {
+  const char* errorStr = env->GetStringUTFChars(error, nullptr);
   jsize length = env->GetStringUTFLength(error);
 
   NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr;
@@ -348,11 +348,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetE
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSendError(
-    JNIEnv *env, jclass, jboolean isError, jint errorCode, jboolean isLVCode,
+    JNIEnv* env, jclass, jboolean isError, jint errorCode, jboolean isLVCode,
     jstring details, jstring location, jstring callStack, jboolean printMsg) {
-  const char *detailsStr = env->GetStringUTFChars(details, nullptr);
-  const char *locationStr = env->GetStringUTFChars(location, nullptr);
-  const char *callStackStr = env->GetStringUTFChars(callStack, nullptr);
+  const char* detailsStr = env->GetStringUTFChars(details, nullptr);
+  const char* locationStr = env->GetStringUTFChars(location, nullptr);
+  const char* callStackStr = env->GetStringUTFChars(callStack, nullptr);
 
   NETCOMM_LOG(logDEBUG) << "Send Error: " << detailsStr;
   NETCOMM_LOG(logDEBUG) << "Location: " << locationStr;
