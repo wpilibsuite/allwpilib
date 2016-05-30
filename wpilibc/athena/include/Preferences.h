@@ -37,13 +37,13 @@ class Preferences : public ErrorBase {
 
   std::vector<std::string> GetKeys();
   std::string GetString(llvm::StringRef key, llvm::StringRef defaultValue = "");
-  int GetInt(llvm::StringRef key, int defaultValue = 0);
+  int32_t GetInt(llvm::StringRef key, int32_t defaultValue = 0);
   double GetDouble(llvm::StringRef key, double defaultValue = 0.0);
   float GetFloat(llvm::StringRef key, float defaultValue = 0.0);
   bool GetBoolean(llvm::StringRef key, bool defaultValue = false);
   int64_t GetLong(llvm::StringRef key, int64_t defaultValue = 0);
   void PutString(llvm::StringRef key, llvm::StringRef value);
-  void PutInt(llvm::StringRef key, int value);
+  void PutInt(llvm::StringRef key, int32_t value);
   void PutDouble(llvm::StringRef key, double value);
   void PutFloat(llvm::StringRef key, float value);
   void PutBoolean(llvm::StringRef key, bool value);
@@ -66,7 +66,7 @@ class Preferences : public ErrorBase {
                       std::shared_ptr<nt::Value> value, bool isNew) override;
     void ValueChangedEx(ITable* source, llvm::StringRef key,
                         std::shared_ptr<nt::Value> value,
-                        unsigned int flags) override;
+                        uint32_t flags) override;
   };
   Listener m_listener;
 };

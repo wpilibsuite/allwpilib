@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DigitalInput.h"
+
+#include <cstdio>
+
 #include "WPIErrors.h"
 
 /**
@@ -17,7 +20,7 @@
 DigitalInput::DigitalInput(uint32_t channel) {
   char buf[64];
   m_channel = channel;
-  int n = sprintf(buf, "dio/%d", channel);
+  int32_t n = std::sprintf(buf, "dio/%d", channel);
   m_impl = new SimDigitalInput(buf);
 }
 

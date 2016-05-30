@@ -7,8 +7,7 @@
 
 #include "CANJaguar.h"
 
-#include <assert.h>
-#include <stdio.h>
+#include <cassert>
 
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"
@@ -87,7 +86,7 @@ void CANJaguar::InitCANJaguar() {
   requestMessage(LM_API_HWVER);
 
   // Wait until we've gotten all of the status data at least once.
-  for (int i = 0; i < kReceiveStatusAttempts; i++) {
+  for (int32_t i = 0; i < kReceiveStatusAttempts; i++) {
     Wait(0.001);
 
     setupPeriodicStatus();

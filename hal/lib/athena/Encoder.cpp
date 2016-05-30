@@ -197,8 +197,8 @@ void setEncoderIndexSource(void* encoder_pointer, uint32_t pin,
                            bool analogTrigger, bool activeHigh,
                            bool edgeSensitive, int32_t* status) {
   Encoder* encoder = (Encoder*)encoder_pointer;
-  encoder->encoder->writeConfig_IndexSource_Channel((unsigned char)pin, status);
-  encoder->encoder->writeConfig_IndexSource_Module((unsigned char)0, status);
+  encoder->encoder->writeConfig_IndexSource_Channel((uint8_t)pin, status);
+  encoder->encoder->writeConfig_IndexSource_Module((uint8_t)0, status);
   encoder->encoder->writeConfig_IndexSource_AnalogTrigger(analogTrigger,
                                                           status);
   encoder->encoder->writeConfig_IndexActiveHigh(activeHigh, status);

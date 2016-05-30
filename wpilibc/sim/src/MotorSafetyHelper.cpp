@@ -12,7 +12,6 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
-#include <stdio.h>
 #include <sstream>
 
 std::set<MotorSafetyHelper*> MotorSafetyHelper::m_helperList;

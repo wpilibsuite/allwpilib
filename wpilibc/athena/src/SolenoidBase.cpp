@@ -35,9 +35,9 @@ SolenoidBase::SolenoidBase(uint8_t moduleNumber)
  * @param value The value you want to set on the module.
  * @param mask  The channels you want to be affected.
  */
-void SolenoidBase::Set(uint8_t value, uint8_t mask, int module) {
+void SolenoidBase::Set(uint8_t value, uint8_t mask, int32_t module) {
   int32_t status = 0;
-  for (int i = 0; i < m_maxPorts; i++) {
+  for (int32_t i = 0; i < m_maxPorts; i++) {
     uint8_t local_mask = 1 << i;
     if (mask & local_mask)
       setSolenoid(m_ports[module][i], value & local_mask, &status);
@@ -50,7 +50,7 @@ void SolenoidBase::Set(uint8_t value, uint8_t mask, int module) {
  *
  * @return The current value of all 8 solenoids on the module.
  */
-uint8_t SolenoidBase::GetAll(int module) const {
+uint8_t SolenoidBase::GetAll(int32_t module) const {
   uint8_t value = 0;
   int32_t status = 0;
   value = getAllSolenoids(m_ports[module][0], &status);
@@ -67,7 +67,7 @@ uint8_t SolenoidBase::GetAll(int module) const {
  *
  * @return The solenoid blacklist of all 8 solenoids on the module.
  */
-uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module) const {
+uint8_t SolenoidBase::GetPCMSolenoidBlackList(int32_t module) const {
   int32_t status = 0;
   return getPCMSolenoidBlackList(m_ports[module][0], &status);
 }
@@ -76,7 +76,7 @@ uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module) const {
  * @return true if PCM sticky fault is set : The common highside solenoid
  *         voltage rail is too low, most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) const {
+bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int32_t module) const {
   int32_t status = 0;
   return getPCMSolenoidVoltageStickyFault(m_ports[module][0], &status);
 }
@@ -85,7 +85,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) const {
  * @return true if PCM is in fault state : The common highside solenoid voltage
  *         rail is too low, most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) const {
+bool SolenoidBase::GetPCMSolenoidVoltageFault(int32_t module) const {
   int32_t status = 0;
   return getPCMSolenoidVoltageFault(m_ports[module][0], &status);
 }
@@ -100,7 +100,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) const {
  *
  * If no sticky faults are set then this call will have no effect.
  */
-void SolenoidBase::ClearAllPCMStickyFaults(int module) {
+void SolenoidBase::ClearAllPCMStickyFaults(int32_t module) {
   int32_t status = 0;
   return clearAllPCMStickyFaults_sol(m_ports[module][0], &status);
 }

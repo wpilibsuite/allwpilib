@@ -7,9 +7,9 @@
 
 #include "Vision/Threshold.h"
 
-Threshold::Threshold(int new_plane1Low, int new_plane1High, int new_plane2Low,
-                     int new_plane2High, int new_plane3Low,
-                     int new_plane3High) {
+Threshold::Threshold(int32_t new_plane1Low, int32_t new_plane1High,
+                     int32_t new_plane2Low, int32_t new_plane2High,
+                     int32_t new_plane3Low, int32_t new_plane3High) {
   plane1Low = new_plane1Low;
   plane1High = new_plane1High;
   plane2Low = new_plane2Low;

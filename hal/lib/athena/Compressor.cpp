@@ -7,13 +7,11 @@
 
 #include "HAL/Compressor.h"
 
-#include <iostream>
-
 #include "ctre/PCM.h"
 
-static const int NUM_MODULE_NUMBERS = 63;
+static const int32_t NUM_MODULE_NUMBERS = 63;
 extern PCM* PCM_modules[NUM_MODULE_NUMBERS];
-extern void initializePCM(int module);
+extern void initializePCM(int32_t module);
 
 extern "C" {
 

@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <stdlib.h>
-
 #include <memory>
 #include <sstream>
 
@@ -114,7 +112,7 @@ class RobotDrive : public MotorSafety, public ErrorBase {
 
  private:
   int32_t GetNumMotors() {
-    int motors = 0;
+    int32_t motors = 0;
     if (m_frontLeftMotor) motors++;
     if (m_frontRightMotor) motors++;
     if (m_rearLeftMotor) motors++;

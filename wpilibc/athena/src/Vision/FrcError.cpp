@@ -12,12 +12,7 @@
  * Get the error code returned from the NI Vision library
  * @return The last error code.
  */
-int GetLastVisionError() {
-  // int errorCode = imaqGetLastVisionError();     // error code: 0 = no error
-  // char* errorText = GetVisionErrorText(errorCode);
-  // dprintf (LOG_DEBUG, "Error = %i  %s ", errorCode, errorText);
-  return imaqGetLastError();
-}
+int32_t GetLastVisionError() { return imaqGetLastError(); }
 
 /**
  * Get the error text for an NI Vision error code.
@@ -29,7 +24,7 @@ int GetLastVisionError() {
  * @param errorCode The error code to find the text for.
  * @return The error text
  */
-const char* GetVisionErrorText(int errorCode) {
+const char* GetVisionErrorText(int32_t errorCode) {
   const char* errorText;
 
   switch (errorCode) {

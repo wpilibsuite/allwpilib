@@ -232,7 +232,7 @@ void Scheduler::UpdateTable() {
     if (!toCancel.empty()) {
       for (commandIter = m_commands.begin(); commandIter != m_commands.end();
            ++commandIter) {
-        for (unsigned i = 0; i < toCancel.size(); i++) {
+        for (uint32_t i = 0; i < toCancel.size(); i++) {
           Command* c = *commandIter;
           if (c->GetID() == toCancel[i]) {
             c->Cancel();

@@ -22,7 +22,7 @@
 // To call it, just give the name of the function and the arguments
 #define SAFE_IMAQ_CALL(funName, ...)                \
   {                                                 \
-    unsigned int error = funName(__VA_ARGS__);      \
+    uint32_t error = funName(__VA_ARGS__);          \
     if (error != IMAQdxErrorSuccess)                \
       wpi_setImaqErrorWithContext(error, #funName); \
   }
@@ -33,15 +33,15 @@
  * http://stackoverflow.com/a/1602428. Be sure to also read the comments for
  * the SOS flag explanation.
  */
-unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
+uint32_t USBCamera::GetJpegSize(void* buffer, uint32_t buffSize) {
   uint8_t* data = (uint8_t*)buffer;
   if (!wpi_assert(data[0] == 0xff && data[1] == 0xd8)) return 0;
-  unsigned int pos = 2;
+  uint32_t pos = 2;
   while (pos < buffSize) {
     // All control markers start with 0xff, so if this isn't present,
     // the JPEG is not valid
     if (!wpi_assert(data[pos] == 0xff)) return 0;
-    unsigned char t = data[pos + 1];
+    uint8_t t = data[pos + 1];
     // These are RST markers. We just skip them and move onto the next marker
     if (t == 0x01 || (t >= 0xd0 && t <= 0xd7)) {
       pos += 2;
@@ -54,8 +54,8 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
     } else if (t == 0xda) {
       // SOS marker. The next two bytes are a 16-bit big-endian int that is
       // the length of the SOS header, skip that
-      unsigned int len = (((unsigned int)(data[pos + 2] & 0xff)) << 8 |
-                          ((unsigned int)data[pos + 3] & 0xff));
+      uint32_t len = (((uint32_t)(data[pos + 2] & 0xff)) << 8 |
+                      ((uint32_t)data[pos + 3] & 0xff));
       pos += len + 2;
       // The next marker is the first marker that is 0xff followed by a non-RST
       // element. 0xff followed by 0x00 is an escaped 0xff. 0xd0-0xd7 are RST
@@ -70,8 +70,8 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
       // 16-bit
       // big-endian int with the length of the marker header, skip that then
       // continue searching
-      unsigned int len = (((unsigned int)(data[pos + 2] & 0xff)) << 8 |
-                          ((unsigned int)data[pos + 3] & 0xff));
+      uint32_t len = (((uint32_t)(data[pos + 2] & 0xff)) << 8 |
+                      ((uint32_t)data[pos + 3] & 0xff));
       pos += len + 2;
     }
   }
@@ -84,7 +84,7 @@ USBCamera::USBCamera(std::string name, bool useJpeg)
 
 void USBCamera::OpenCamera() {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
-  for (unsigned int i = 0; i < 3; i++) {
+  for (uint32_t i = 0; i < 3; i++) {
     uInt32 id = 0;
     // Can't use SAFE_IMAQ_CALL here because we only error on the third time
     IMAQdxError error = IMAQdxOpenCamera(
@@ -153,11 +153,11 @@ void USBCamera::UpdateSettings() {
   double foundFps = 1000.0;
 
   // Loop through the modes, and find the match with the lowest fps
-  for (unsigned int i = 0; i < count; i++) {
+  for (uint32_t i = 0; i < count; i++) {
     std::cmatch m;
     if (!std::regex_match(modes[i].Name, m, reMode)) continue;
-    unsigned int width = (unsigned int)std::stoul(m[1].str());
-    unsigned int height = (unsigned int)std::stoul(m[2].str());
+    uint32_t width = (uint32_t)std::stoul(m[1].str());
+    uint32_t height = (uint32_t)std::stoul(m[2].str());
     if (width != m_width) continue;
     if (height != m_height) continue;
     double fps = atof(m[4].str().c_str());
@@ -230,7 +230,7 @@ void USBCamera::SetFPS(double fps) {
   }
 }
 
-void USBCamera::SetSize(unsigned int width, unsigned int height) {
+void USBCamera::SetSize(uint32_t width, uint32_t height) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (m_width != width || m_height != height) {
     m_needSettingsUpdate = true;
@@ -239,7 +239,7 @@ void USBCamera::SetSize(unsigned int width, unsigned int height) {
   }
 }
 
-void USBCamera::SetBrightness(unsigned int brightness) {
+void USBCamera::SetBrightness(uint32_t brightness) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (m_brightness != brightness) {
     m_needSettingsUpdate = true;
@@ -247,7 +247,7 @@ void USBCamera::SetBrightness(unsigned int brightness) {
   }
 }
 
-unsigned int USBCamera::GetBrightness() {
+uint32_t USBCamera::GetBrightness() {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   return m_brightness;
 }
@@ -268,7 +268,7 @@ void USBCamera::SetWhiteBalanceHoldCurrent() {
   m_needSettingsUpdate = true;
 }
 
-void USBCamera::SetWhiteBalanceManual(unsigned int whiteBalance) {
+void USBCamera::SetWhiteBalanceManual(uint32_t whiteBalance) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_whiteBalance = MANUAL;
   m_whiteBalanceValue = whiteBalance;
@@ -292,7 +292,7 @@ void USBCamera::SetExposureHoldCurrent() {
   m_needSettingsUpdate = true;
 }
 
-void USBCamera::SetExposureManual(unsigned int level) {
+void USBCamera::SetExposureManual(uint32_t level) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_exposure = MANUAL;
   if (level > 100)
@@ -316,7 +316,7 @@ void USBCamera::GetImage(Image* image) {
   SAFE_IMAQ_CALL(IMAQdxGrab, m_id, image, 1, &bufNum);
 }
 
-unsigned int USBCamera::GetImageData(void* buffer, unsigned int bufferSize) {
+uint32_t USBCamera::GetImageData(void* buffer, uint32_t bufferSize) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   if (m_needSettingsUpdate || !m_useJpeg) {
     m_needSettingsUpdate = false;

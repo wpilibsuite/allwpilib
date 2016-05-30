@@ -76,7 +76,7 @@ class ErrorBase {
   virtual void SetErrnoError(llvm::StringRef contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
                              uint32_t lineNumber) const;
-  virtual void SetImaqError(int success, llvm::StringRef contextMessage,
+  virtual void SetImaqError(int32_t success, llvm::StringRef contextMessage,
                             llvm::StringRef filename, llvm::StringRef function,
                             uint32_t lineNumber) const;
   virtual void SetError(Error::Code code, llvm::StringRef contextMessage,

@@ -17,7 +17,7 @@ void AnalogPotentiometer::initPot(AnalogInput* input, double scale,
   m_analog_input = input;
 }
 
-AnalogPotentiometer::AnalogPotentiometer(int channel, double scale,
+AnalogPotentiometer::AnalogPotentiometer(int32_t channel, double scale,
                                          double offset) {
   m_init_analog_input = true;
   initPot(new AnalogInput(channel), scale, offset);

@@ -7,7 +7,8 @@
 
 #include "SampleRobot.h"
 
-#include <stdio.h>
+#include <cstdio>
+
 #include "LiveWindow/LiveWindow.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "Timer.h"
@@ -17,7 +18,7 @@
 #include <unistd.h>
 #elif defined(_WIN32)
 #include <windows.h>
-void sleep(unsigned milliseconds) { Sleep(milliseconds); }
+void sleep(uint32_t milliseconds) { Sleep(milliseconds); }
 #endif
 
 SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
@@ -29,7 +30,7 @@ SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
  * which will be called each time the robot enters the disabled state.
  */
 void SampleRobot::RobotInit() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**
@@ -39,7 +40,7 @@ void SampleRobot::RobotInit() {
  * field is disabled.
  */
 void SampleRobot::Disabled() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**
@@ -50,7 +51,7 @@ void SampleRobot::Disabled() {
  * robot enters the autonomous state.
  */
 void SampleRobot::Autonomous() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**
@@ -61,7 +62,7 @@ void SampleRobot::Autonomous() {
  * each time the robot enters the teleop state.
  */
 void SampleRobot::OperatorControl() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**
@@ -72,7 +73,7 @@ void SampleRobot::OperatorControl() {
  * test mode.
  */
 void SampleRobot::Test() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**

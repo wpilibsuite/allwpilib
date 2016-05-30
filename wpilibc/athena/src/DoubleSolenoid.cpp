@@ -140,7 +140,7 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
  * @return If solenoid is disabled due to short.
  */
 bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
-  int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
+  int32_t blackList = GetPCMSolenoidBlackList(m_moduleNumber);
   return (blackList & m_forwardMask) ? 1 : 0;
 }
 /**
@@ -153,7 +153,7 @@ bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
  * @return If solenoid is disabled due to short.
  */
 bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
-  int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
+  int32_t blackList = GetPCMSolenoidBlackList(m_moduleNumber);
   return (blackList & m_reverseMask) ? 1 : 0;
 }
 

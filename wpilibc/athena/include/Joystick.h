@@ -84,7 +84,7 @@ class Joystick : public GenericHID, public ErrorBase {
   virtual bool GetTop(JoystickHand hand = kRightHand) const override;
   virtual bool GetBumper(JoystickHand hand = kRightHand) const override;
   virtual bool GetRawButton(uint32_t button) const override;
-  virtual int GetPOV(uint32_t pov = 0) const override;
+  virtual int32_t GetPOV(uint32_t pov = 0) const override;
   bool GetButton(ButtonType button) const;
   static Joystick* GetStickForPort(uint32_t port);
 
@@ -95,11 +95,11 @@ class Joystick : public GenericHID, public ErrorBase {
   bool GetIsXbox() const;
   Joystick::HIDType GetType() const;
   std::string GetName() const;
-  int GetAxisType(uint8_t axis) const;
+  int32_t GetAxisType(uint8_t axis) const;
 
-  int GetAxisCount() const;
-  int GetButtonCount() const;
-  int GetPOVCount() const;
+  int32_t GetAxisCount() const;
+  int32_t GetButtonCount() const;
+  int32_t GetPOVCount() const;
 
   void SetRumble(RumbleType type, float value);
   void SetOutput(uint8_t outputNumber, bool value);

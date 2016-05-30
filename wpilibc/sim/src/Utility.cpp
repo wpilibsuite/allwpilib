@@ -7,10 +7,7 @@
 
 #include "Utility.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #if not defined(_WIN32)
@@ -43,10 +40,10 @@ void wpi_suspendOnAssertEnabled(bool enabled) {
 static void wpi_handleTracing() {
   // if (stackTraceEnabled)
   // {
-  // 	printf("\n-----------<Stack Trace>----------------\n");
+  // 	std::printf("\n-----------<Stack Trace>----------------\n");
   // 	printCurrentStackTrace();
   // }
-  printf("\n");
+  std::printf("\n");
 }
 
 /**
@@ -84,7 +81,7 @@ bool wpi_assert_impl(bool conditionValue, const char* conditionText,
  * This should not be called directly; it should only be used by
  * wpi_assertEqual_impl and wpi_assertNotEqual_impl.
  */
-void wpi_assertEqual_common_impl(int valueA, int valueB,
+void wpi_assertEqual_common_impl(int32_t valueA, int32_t valueB,
                                  const std::string& equalityType,
                                  const std::string& message,
                                  const std::string& fileName,
@@ -118,7 +115,8 @@ void wpi_assertEqual_common_impl(int valueA, int valueB,
  * The users don't call this, but instead use the wpi_assertEqual macros in
  * Utility.h.
  */
-bool wpi_assertEqual_impl(int valueA, int valueB, const std::string& message,
+bool wpi_assertEqual_impl(int32_t valueA, int32_t valueB,
+                          const std::string& message,
                           const std::string& fileName, uint32_t lineNumber,
                           const std::string& funcName) {
   if (!(valueA == valueB)) {
@@ -135,7 +133,8 @@ bool wpi_assertEqual_impl(int valueA, int valueB, const std::string& message,
  * The users don't call this, but instead use the wpi_assertNotEqual macros in
  * Utility.h.
  */
-bool wpi_assertNotEqual_impl(int valueA, int valueB, const std::string& message,
+bool wpi_assertNotEqual_impl(int32_t valueA, int32_t valueB,
+                             const std::string& message,
                              const std::string& fileName, uint32_t lineNumber,
                              const std::string& funcName) {
   if (!(valueA != valueB)) {
@@ -162,7 +161,7 @@ uint64_t GetFPGATime() { return wpilib::internal::simTime * 1e6; }
 static std::string demangle(char const* mangledSymbol) {
   char buffer[256];
   size_t length;
-  int status;
+  int32_t status;
 
   if (sscanf(mangledSymbol, "%*[^(]%*[^_]%255[^)+]", buffer)) {
     char* symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
@@ -185,11 +184,11 @@ static std::string demangle(char const* mangledSymbol) {
  */
 std::string GetStackTrace(uint32_t offset) {
   void* stackTrace[128];
-  int stackSize = backtrace(stackTrace, 128);
+  int32_t stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
   std::stringstream trace;
 
-  for (int i = offset; i < stackSize; i++) {
+  for (int32_t i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
     if (i == 0 || stackTrace[i] != stackTrace[i - 1]) {
       trace << "\tat " << demangle(mangledSymbols[i]) << std::endl;

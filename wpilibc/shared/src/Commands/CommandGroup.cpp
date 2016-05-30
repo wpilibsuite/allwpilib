@@ -315,4 +315,4 @@ void CommandGroup::CancelConflicts(Command* command) {
   }
 }
 
-int CommandGroup::GetSize() const { return m_children.size(); }
+int32_t CommandGroup::GetSize() const { return m_children.size(); }

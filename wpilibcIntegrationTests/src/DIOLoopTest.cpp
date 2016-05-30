@@ -129,7 +129,7 @@ TEST_F(DIOLoopTest, FakeCounter) {
   EXPECT_EQ(0, counter.Get()) << "Counter did not initialize to 0.";
 
   /* Count 100 ticks.  The counter value should be 100 after this loop. */
-  for (int i = 0; i < 100; i++) {
+  for (int32_t i = 0; i < 100; i++) {
     m_output->Set(true);
     Wait(kCounterTime);
     m_output->Set(false);
@@ -140,13 +140,13 @@ TEST_F(DIOLoopTest, FakeCounter) {
 }
 
 static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
-  *(int*)param = 12345;
+  *(int32_t*)param = 12345;
 }
 
 TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
-  int param = 0;
+  int32_t param = 0;
 
-  // Given an interrupt handler that sets an int to 12345
+  // Given an interrupt handler that sets an int32_t to 12345
   m_input->RequestInterrupts(InterruptHandler, &param);
   m_input->EnableInterrupts();
 
@@ -155,7 +155,7 @@ TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
   m_output->Set(true);
   m_input->CancelInterrupts();
 
-  // Then the int should be 12345
+  // Then the int32_t should be 12345
   Wait(kDelayTime);
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }

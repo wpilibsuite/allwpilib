@@ -60,8 +60,8 @@ class Encoder : public SensorBase,
   void SetMinRate(double minRate);
   void SetDistancePerPulse(double distancePerPulse);
   void SetReverseDirection(bool reverseDirection);
-  void SetSamplesToAverage(int samplesToAverage);
-  int GetSamplesToAverage() const;
+  void SetSamplesToAverage(int32_t samplesToAverage);
+  int32_t GetSamplesToAverage() const;
   void SetPIDSourceType(PIDSourceType pidSource);
   double PIDGet() override;
 
@@ -75,7 +75,7 @@ class Encoder : public SensorBase,
   int32_t FPGAEncoderIndex() const { return 0; }
 
  private:
-  void InitEncoder(int channelA, int channelB, bool _reverseDirection,
+  void InitEncoder(int32_t channelA, int32_t channelB, bool _reverseDirection,
                    EncodingType encodingType);
   double DecodingScaleFactor() const;
 
@@ -87,7 +87,7 @@ class Encoder : public SensorBase,
   // TODO: [Not Supported] bool m_allocatedASource;
   // was the B source allocated locally?
   // TODO: [Not Supported] bool m_allocatedBSource;
-  int channelA, channelB;
+  int32_t channelA, channelB;
   double m_distancePerPulse;    // distance of travel for each encoder tick
   EncodingType m_encodingType;  // Encoding type
   int32_t m_encodingScale;      // 1x, 2x, or 4x, per the encodingType

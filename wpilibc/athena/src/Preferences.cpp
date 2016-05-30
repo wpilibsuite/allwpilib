@@ -7,11 +7,10 @@
 
 #include "Preferences.h"
 
+#include <algorithm>
+
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
-
-#include <stdio.h>
-#include <algorithm>
 
 /** The Preferences table name */
 static const char* kTableName = "Preferences";
@@ -21,7 +20,7 @@ void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
                                          bool isNew) {}
 void Preferences::Listener::ValueChangedEx(ITable* source, llvm::StringRef key,
                                            std::shared_ptr<nt::Value> value,
-                                           unsigned int flags) {
+                                           uint32_t flags) {
   source->SetPersistent(key);
 }
 
@@ -61,15 +60,15 @@ std::string Preferences::GetString(llvm::StringRef key,
 }
 
 /**
- * Returns the int at the given key.  If this table does not have a value
- * for that position, then the given defaultValue value will be returned.
+ * Returns the int at the given key.  If this table does not have a value for
+ * that position, then the given defaultValue value will be returned.
  *
  * @param key          the key
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-int Preferences::GetInt(llvm::StringRef key, int defaultValue) {
-  return static_cast<int>(m_table->GetNumber(key, defaultValue));
+int32_t Preferences::GetInt(llvm::StringRef key, int32_t defaultValue) {
+  return static_cast<int32_t>(m_table->GetNumber(key, defaultValue));
 }
 
 /**
@@ -135,14 +134,14 @@ void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
 }
 
 /**
- * Puts the given int into the preferences table.
+ * Puts the given int32_t into the preferences table.
  *
  * <p>The key may not have any whitespace nor an equals sign</p>
  *
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutInt(llvm::StringRef key, int value) {
+void Preferences::PutInt(llvm::StringRef key, int32_t value) {
   m_table->PutNumber(key, value);
   m_table->SetPersistent(key);
 }

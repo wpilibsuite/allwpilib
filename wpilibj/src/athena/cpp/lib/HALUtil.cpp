@@ -133,7 +133,7 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   }
 }
 
-void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
+void ReportCANError(JNIEnv *env, int32_t status, int32_t message_id) {
   if (status >= 0) return;
   switch (status) {
     case kRioStatusSuccess:

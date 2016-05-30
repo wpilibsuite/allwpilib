@@ -73,8 +73,8 @@ class Counter : public SensorBase,
   bool GetStopped() const override;
   bool GetDirection() const override;
 
-  void SetSamplesToAverage(int samplesToAverage);
-  int GetSamplesToAverage() const;
+  void SetSamplesToAverage(int32_t samplesToAverage);
+  int32_t GetSamplesToAverage() const;
   uint32_t GetFPGAIndex() const { return m_index; }
 
   void UpdateTable() override;

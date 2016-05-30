@@ -49,7 +49,7 @@ void DigitalGlitchFilter::Add(DigitalSource* input) {
   DoAdd(input, m_channelIndex + 1);
 }
 
-void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requested_index) {
+void DigitalGlitchFilter::DoAdd(DigitalSource* input, int32_t requested_index) {
   // Some sources from Counters and Encoders are null.  By pushing the check
   // here, we catch the issue more generally.
   if (input) {
@@ -59,7 +59,7 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requested_index) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
     // Validate that we set it correctly.
-    int actual_index = getFilterSelect(
+    int32_t actual_index = getFilterSelect(
         m_digital_ports[input->GetChannelForRouting()], &status);
     wpi_assertEqual(actual_index, requested_index);
 

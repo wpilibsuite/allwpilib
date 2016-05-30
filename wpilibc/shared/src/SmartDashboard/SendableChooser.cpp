@@ -7,8 +7,6 @@
 
 #include "SmartDashboard/SendableChooser.h"
 
-#include <stdio.h>
-
 static const std::string kDefault = "default";
 static const std::string kOptions = "options";
 static const std::string kSelected = "selected";

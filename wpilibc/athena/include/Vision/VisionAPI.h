@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "nivision.h"
 
 /* Constants */
@@ -22,20 +24,20 @@ typedef struct CircularEdgeReport_struct CircularEdgeReport;
 
 /** frcParticleAnalysis returns this structure */
 typedef struct ParticleAnalysisReport_struct {
-  int imageHeight;
-  int imageWidth;
+  int32_t imageHeight;
+  int32_t imageWidth;
   double imageTimestamp;
-  int particleIndex;  // the particle index analyzed
+  int32_t particleIndex;  // the particle index analyzed
   /* X-coordinate of the point representing the average position of the
    * total particle mass, assuming every point in the particle has a constant
    * density
    */
-  int center_mass_x;  // MeasurementType: IMAQ_MT_CENTER_OF_MASS_X
+  int32_t center_mass_x;  // MeasurementType: IMAQ_MT_CENTER_OF_MASS_X
   /* Y-coordinate of the point representing the average position of the
    * total particle mass, assuming every point in the particle has a constant
    * density
    */
-  int center_mass_y;                // MeasurementType: IMAQ_MT_CENTER_OF_MASS_Y
+  int32_t center_mass_y;            // MeasurementType: IMAQ_MT_CENTER_OF_MASS_Y
   double center_mass_x_normalized;  // Center of mass x value normalized to -1.0
                                     // to +1.0 range
   double center_mass_y_normalized;  // Center of mass y value normalized to -1.0
@@ -54,8 +56,8 @@ typedef struct ParticleAnalysisReport_struct {
 
 /** Tracking functions return this structure */
 typedef struct ColorReport_struct {
-  int numberParticlesFound;   // Number of particles found for this color
-  int largestParticleNumber;  // The particle index of the largest particle
+  int32_t numberParticlesFound;   // Number of particles found for this color
+  int32_t largestParticleNumber;  // The particle index of the largest particle
   /* Color information */
   float particleHueMax;   // HistogramReport: hue max
   float particleHueMin;   // HistogramReport: hue max
@@ -74,102 +76,108 @@ typedef struct ColorReport_struct {
 Image* frcCreateImage(ImageType type);
 
 /* Dispose: calls imaqDispose */
-int frcDispose(void* object);
-int frcDispose(const char* filename, ...);
+int32_t frcDispose(void* object);
+int32_t frcDispose(const char* filename, ...);
 
 /* Copy: calls imaqDuplicateImage */
-int frcCopyImage(Image* dest, const Image* source);
+int32_t frcCopyImage(Image* dest, const Image* source);
 
 /* Image Extraction: Crop: calls imaqScale */
-int frcCrop(Image* dest, const Image* source, Rect rect);
+int32_t frcCrop(Image* dest, const Image* source, Rect rect);
 
 /* Image Extraction: Scale: calls imaqScale.  Scales entire image */
-int frcScale(Image* dest, const Image* source, int xScale, int yScale,
-             ScalingMode scaleMode);
+int32_t frcScale(Image* dest, const Image* source, int32_t xScale,
+                 int32_t yScale, ScalingMode scaleMode);
 
 /* Read Image : calls imaqReadFile */
-int frcReadImage(Image* image, const char* fileName);
+int32_t frcReadImage(Image* image, const char* fileName);
 /* Write Image : calls imaqWriteFile */
-int frcWriteImage(const Image* image, const char* fileName);
+int32_t frcWriteImage(const Image* image, const char* fileName);
 
 /* Measure Intensity functions */
 
 /* Histogram: calls imaqHistogram */
-HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
+HistogramReport* frcHistogram(const Image* image, int32_t numClasses, float min,
                               float max, Rect rect);
 /* Color Histogram: calls imaqColorHistogram2 */
-ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
+ColorHistogramReport* frcColorHistogram(const Image* image, int32_t numClasses,
                                         ColorMode mode, Image* mask);
 
 /* Get Pixel Value: calls imaqGetPixel */
-int frcGetPixelValue(const Image* image, Point pixel, PixelValue* value);
+int32_t frcGetPixelValue(const Image* image, Point pixel, PixelValue* value);
 
 /* Particle Analysis functions */
 
 /* Particle Filter: calls imaqParticleFilter3 */
-int frcParticleFilter(Image* dest, Image* source,
-                      const ParticleFilterCriteria2* criteria,
-                      int criteriaCount, const ParticleFilterOptions* options,
-                      Rect rect, int* numParticles);
-int frcParticleFilter(Image* dest, Image* source,
-                      const ParticleFilterCriteria2* criteria,
-                      int criteriaCount, const ParticleFilterOptions* options,
-                      int* numParticles);
+int32_t frcParticleFilter(Image* dest, Image* source,
+                          const ParticleFilterCriteria2* criteria,
+                          int32_t criteriaCount,
+                          const ParticleFilterOptions* options, Rect rect,
+                          int32_t* numParticles);
+int32_t frcParticleFilter(Image* dest, Image* source,
+                          const ParticleFilterCriteria2* criteria,
+                          int32_t criteriaCount,
+                          const ParticleFilterOptions* options,
+                          int32_t* numParticles);
 /* Morphology: calls imaqMorphology */
-int frcMorphology(Image* dest, Image* source, MorphologyMethod method);
-int frcMorphology(Image* dest, Image* source, MorphologyMethod method,
-                  const StructuringElement* structuringElement);
+int32_t frcMorphology(Image* dest, Image* source, MorphologyMethod method);
+int32_t frcMorphology(Image* dest, Image* source, MorphologyMethod method,
+                      const StructuringElement* structuringElement);
 /* Reject Border: calls imaqRejectBorder */
-int frcRejectBorder(Image* dest, Image* source);
-int frcRejectBorder(Image* dest, Image* source, int connectivity8);
+int32_t frcRejectBorder(Image* dest, Image* source);
+int32_t frcRejectBorder(Image* dest, Image* source, int32_t connectivity8);
 /* Count Particles: calls imaqCountParticles */
-int frcCountParticles(Image* image, int* numParticles);
+int32_t frcCountParticles(Image* image, int32_t* numParticles);
 /* Particle Analysis Report: calls imaqMeasureParticle */
-int frcParticleAnalysis(Image* image, int particleNumber,
-                        ParticleAnalysisReport* par);
+int32_t frcParticleAnalysis(Image* image, int32_t particleNumber,
+                            ParticleAnalysisReport* par);
 
 /* Image Enhancement functions */
 
 /* Equalize: calls imaqEqualize */
-int frcEqualize(Image* dest, const Image* source, float min, float max);
-int frcEqualize(Image* dest, const Image* source, float min, float max,
-                const Image* mask);
+int32_t frcEqualize(Image* dest, const Image* source, float min, float max);
+int32_t frcEqualize(Image* dest, const Image* source, float min, float max,
+                    const Image* mask);
 
 /* Color Equalize: calls imaqColorEqualize */
-int frcColorEqualize(Image* dest, const Image* source);
-int frcColorEqualize(Image* dest, const Image* source, int colorEqualization);
+int32_t frcColorEqualize(Image* dest, const Image* source);
+int32_t frcColorEqualize(Image* dest, const Image* source,
+                         int32_t colorEqualization);
 
 /* Image Thresholding & Conversion functions */
 
 /* Smart Threshold: calls imaqLocalThreshold */
-int frcSmartThreshold(Image* dest, const Image* source,
-                      unsigned int windowWidth, unsigned int windowHeight,
-                      LocalThresholdMethod method, double deviationWeight,
-                      ObjectType type);
-int frcSmartThreshold(Image* dest, const Image* source,
-                      unsigned int windowWidth, unsigned int windowHeight,
-                      LocalThresholdMethod method, double deviationWeight,
-                      ObjectType type, float replaceValue);
+int32_t frcSmartThreshold(Image* dest, const Image* source,
+                          uint32_t windowWidth, uint32_t windowHeight,
+                          LocalThresholdMethod method, double deviationWeight,
+                          ObjectType type);
+int32_t frcSmartThreshold(Image* dest, const Image* source,
+                          uint32_t windowWidth, uint32_t windowHeight,
+                          LocalThresholdMethod method, double deviationWeight,
+                          ObjectType type, float replaceValue);
 
 /* Simple Threshold: calls imaqThreshold */
-int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
-                       float rangeMax, float newValue);
-int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
-                       float rangeMax);
+int32_t frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
+                           float rangeMax, float newValue);
+int32_t frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
+                           float rangeMax);
 
 /* Color/Hue Threshold: calls imaqColorThreshold */
-int frcColorThreshold(Image* dest, const Image* source, ColorMode mode,
-                      const Range* plane1Range, const Range* plane2Range,
-                      const Range* plane3Range);
-int frcColorThreshold(Image* dest, const Image* source, int replaceValue,
-                      ColorMode mode, const Range* plane1Range,
-                      const Range* plane2Range, const Range* plane3Range);
-int frcHueThreshold(Image* dest, const Image* source, const Range* hueRange);
-int frcHueThreshold(Image* dest, const Image* source, const Range* hueRange,
-                    int minSaturation);
+int32_t frcColorThreshold(Image* dest, const Image* source, ColorMode mode,
+                          const Range* plane1Range, const Range* plane2Range,
+                          const Range* plane3Range);
+int32_t frcColorThreshold(Image* dest, const Image* source,
+                          int32_t replaceValue, ColorMode mode,
+                          const Range* plane1Range, const Range* plane2Range,
+                          const Range* plane3Range);
+int32_t frcHueThreshold(Image* dest, const Image* source,
+                        const Range* hueRange);
+int32_t frcHueThreshold(Image* dest, const Image* source, const Range* hueRange,
+                        int32_t minSaturation);
 
 /* Extract ColorHue Plane: calls imaqExtractColorPlanes */
-int frcExtractColorPlanes(const Image* image, ColorMode mode, Image* plane1,
-                          Image* plane2, Image* plane3);
-int frcExtractHuePlane(const Image* image, Image* huePlane);
-int frcExtractHuePlane(const Image* image, Image* huePlane, int minSaturation);
+int32_t frcExtractColorPlanes(const Image* image, ColorMode mode, Image* plane1,
+                              Image* plane2, Image* plane3);
+int32_t frcExtractHuePlane(const Image* image, Image* huePlane);
+int32_t frcExtractHuePlane(const Image* image, Image* huePlane,
+                           int32_t minSaturation);

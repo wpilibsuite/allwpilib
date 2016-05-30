@@ -192,8 +192,8 @@ void spiSetSpeed(uint8_t port, uint32_t speed) {
  * @param clk_idle_high True to set the clock to active low, False to set the
  * clock active high
  */
-void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing,
-                int clk_idle_high) {
+void spiSetOpts(uint8_t port, int32_t msb_first, int32_t sample_on_trailing,
+                int32_t clk_idle_high) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   spilib_setopts(spiGetHandle(port), msb_first, sample_on_trailing,
                  clk_idle_high);
@@ -308,12 +308,12 @@ static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
   // convert from bytes
   uint32_t resp = 0;
   if (accum->big_endian) {
-    for (int i = 0; i < accum->xfer_size; ++i) {
+    for (int32_t i = 0; i < accum->xfer_size; ++i) {
       resp <<= 8;
       resp |= resp_b[i] & 0xff;
     }
   } else {
-    for (int i = accum->xfer_size - 1; i >= 0; --i) {
+    for (int32_t i = accum->xfer_size - 1; i >= 0; --i) {
       resp <<= 8;
       resp |= resp_b[i] & 0xff;
     }
@@ -373,7 +373,7 @@ void spiInitAccumulator(uint8_t port, uint32_t period, uint32_t cmd,
   if (!spiAccumulators[port]) spiAccumulators[port] = new SPIAccumulator();
   SPIAccumulator* accum = spiAccumulators[port];
   if (big_endian) {
-    for (int i = xfer_size - 1; i >= 0; --i) {
+    for (int32_t i = xfer_size - 1; i >= 0; --i) {
       accum->cmd[i] = cmd & 0xff;
       cmd >>= 8;
     }

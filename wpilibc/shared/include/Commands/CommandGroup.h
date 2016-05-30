@@ -43,7 +43,7 @@ class CommandGroup : public Command {
   void AddParallel(Command* command);
   void AddParallel(Command* command, double timeout);
   bool IsInterruptible() const;
-  int GetSize() const;
+  int32_t GetSize() const;
 
  protected:
   virtual void Initialize();
@@ -66,5 +66,5 @@ class CommandGroup : public Command {
   std::list<CommandGroupEntry> m_children;
 
   /** The current command, -1 signifies that none have been run */
-  int m_currentCommandIndex = -1;
+  int32_t m_currentCommandIndex = -1;
 };

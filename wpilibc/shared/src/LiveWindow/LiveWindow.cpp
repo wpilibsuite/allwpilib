@@ -148,7 +148,7 @@ void LiveWindow::AddActuator(const std::string& subsystem,
 /**
  * Meant for internal use in other WPILib classes.
  */
-void LiveWindow::AddSensor(std::string type, int channel,
+void LiveWindow::AddSensor(std::string type, int32_t channel,
                            LiveWindowSendable* component) {
   std::ostringstream oss;
   oss << type << "[" << channel << "]";
@@ -163,7 +163,7 @@ void LiveWindow::AddSensor(std::string type, int channel,
 /**
  * Meant for internal use in other WPILib classes.
  */
-void LiveWindow::AddActuator(std::string type, int channel,
+void LiveWindow::AddActuator(std::string type, int32_t channel,
                              LiveWindowSendable* component) {
   std::ostringstream oss;
   oss << type << "[" << channel << "]";
@@ -175,7 +175,7 @@ void LiveWindow::AddActuator(std::string type, int channel,
 /**
  * Meant for internal use in other WPILib classes.
  */
-void LiveWindow::AddActuator(std::string type, int module, int channel,
+void LiveWindow::AddActuator(std::string type, int32_t module, int32_t channel,
                              LiveWindowSendable* component) {
   std::ostringstream oss;
   oss << type << "[" << module << "," << channel << "]";

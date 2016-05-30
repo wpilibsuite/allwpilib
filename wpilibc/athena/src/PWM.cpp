@@ -160,18 +160,13 @@ void PWM::SetPosition(float pos) {
 
   // note, need to perform the multiplication below as floating point before
   // converting to int
-  unsigned short rawValue =
+  uint16_t rawValue =
       (int32_t)((pos * (float)GetFullRangeScaleFactor()) + GetMinNegativePwm());
-  //  printf("MinNegPWM: %d FullRangeScaleFactor: %d Raw value: %5d   Input "
-  // "value: %4.4f\n", GetMinNegativePwm(), GetFullRangeScaleFactor(), rawValue,
-  // pos);
 
-  // wpi_assert((rawValue >= GetMinNegativePwm()) && (rawValue <=
-  // GetMaxPositivePwm()));
   wpi_assert(rawValue != kPwmDisabled);
 
   // send the computed pwm value to the FPGA
-  SetRaw((unsigned short)rawValue);
+  SetRaw((uint16_t)rawValue);
 }
 
 /**
@@ -279,7 +274,7 @@ float PWM::GetSpeed() const {
  *
  * @param value Raw PWM value.
  */
-void PWM::SetRaw(unsigned short value) {
+void PWM::SetRaw(uint16_t value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -294,11 +289,11 @@ void PWM::SetRaw(unsigned short value) {
  *
  * @return Raw PWM control value.
  */
-unsigned short PWM::GetRaw() const {
+uint16_t PWM::GetRaw() const {
   if (StatusIsFatal()) return 0;
 
   int32_t status = 0;
-  unsigned short value = getPWM(m_pwm_ports[m_channel], &status);
+  uint16_t value = getPWM(m_pwm_ports[m_channel], &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   return value;

@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <stdio.h>
+#include <stdint.h>
+
 #include "Base.h"
 #include "ErrorBase.h"
 

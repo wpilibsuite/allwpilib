@@ -37,7 +37,7 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    * @param offset The offset to add to the scaled value for controlling the
    * zero value
    */
-  explicit AnalogPotentiometer(int channel, double fullRange = 1.0,
+  explicit AnalogPotentiometer(int32_t channel, double fullRange = 1.0,
                                double offset = 0.0);
 
   explicit AnalogPotentiometer(AnalogInput* input, double fullRange = 1.0,

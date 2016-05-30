@@ -70,8 +70,8 @@ class Encoder : public SensorBase,
   void SetMinRate(double minRate);
   void SetDistancePerPulse(double distancePerPulse);
   void SetReverseDirection(bool reverseDirection);
-  void SetSamplesToAverage(int samplesToAverage);
-  int GetSamplesToAverage() const;
+  void SetSamplesToAverage(int32_t samplesToAverage);
+  int32_t GetSamplesToAverage() const;
   double PIDGet() override;
 
   void SetIndexSource(uint32_t channel, IndexingType type = kResetOnRisingEdge);

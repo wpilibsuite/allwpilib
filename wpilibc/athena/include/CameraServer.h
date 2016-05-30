@@ -38,17 +38,16 @@ class CameraServer : public ErrorBase {
   priority_recursive_mutex m_imageMutex;
   std::condition_variable_any m_newImageVariable;
   std::vector<uint8_t*> m_dataPool;
-  unsigned int m_quality;
+  uint32_t m_quality;
   bool m_autoCaptureStarted;
   bool m_hwClient;
-  std::tuple<uint8_t*, unsigned int, unsigned int, bool> m_imageData;
+  std::tuple<uint8_t*, uint32_t, uint32_t, bool> m_imageData;
 
   void Serve();
   void AutoCapture();
-  void SetImageData(uint8_t* data, unsigned int size, unsigned int start = 0,
+  void SetImageData(uint8_t* data, uint32_t size, uint32_t start = 0,
                     bool imaqData = false);
-  void FreeImageData(
-      std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData);
+  void FreeImageData(std::tuple<uint8_t*, uint32_t, uint32_t, bool> imageData);
 
   struct Request {
     uint32_t fps;
@@ -76,8 +75,8 @@ class CameraServer : public ErrorBase {
 
   bool IsAutoCaptureStarted();
 
-  void SetQuality(unsigned int quality);
-  unsigned int GetQuality();
+  void SetQuality(uint32_t quality);
+  uint32_t GetQuality();
 
-  void SetSize(unsigned int size);
+  void SetSize(uint32_t size);
 };

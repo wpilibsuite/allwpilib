@@ -224,7 +224,7 @@ bool Joystick::GetRawButton(uint32_t button) const {
  * @param pov The index of the POV to read (starting at 0)
  * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
  */
-int Joystick::GetPOV(uint32_t pov) const {
+int32_t Joystick::GetPOV(uint32_t pov) const {
   return m_ds.GetStickPOV(m_port, pov);
 }
 
@@ -252,7 +252,9 @@ bool Joystick::GetButton(ButtonType button) const {
  *
  * @return the number of axis for the current joystick
  */
-int Joystick::GetAxisCount() const { return m_ds.GetStickAxisCount(m_port); }
+int32_t Joystick::GetAxisCount() const {
+  return m_ds.GetStickAxisCount(m_port);
+}
 
 /**
  * Get the value of isXbox for the joystick.
@@ -277,17 +279,16 @@ Joystick::HIDType Joystick::GetType() const {
  */
 std::string Joystick::GetName() const { return m_ds.GetJoystickName(m_port); }
 
-// int Joystick::GetAxisType(uint8_t axis) const
-//{
-//  return m_ds.GetJoystickAxisType(m_port, axis);
-//}
+int32_t Joystick::GetAxisType(uint8_t axis) const {
+  return m_ds.GetJoystickAxisType(m_port, axis);
+}
 
 /**
  * Get the number of axis for a joystick.
  *
  * @return the number of buttons on the current joystick
  */
-int Joystick::GetButtonCount() const {
+int32_t Joystick::GetButtonCount() const {
   return m_ds.GetStickButtonCount(m_port);
 }
 
@@ -296,7 +297,7 @@ int Joystick::GetButtonCount() const {
  *
  * @return the number of POVs for the current joystick
  */
-int Joystick::GetPOVCount() const { return m_ds.GetStickPOVCount(m_port); }
+int32_t Joystick::GetPOVCount() const { return m_ds.GetStickPOVCount(m_port); }
 
 /**
  * Get the channel currently associated with the specified axis.

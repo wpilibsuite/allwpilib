@@ -7,9 +7,6 @@
 
 #include "DigitalInternal.h"
 
-#include <math.h>
-#include <stdio.h>
-
 #include <mutex>
 #include <thread>
 
@@ -65,10 +62,6 @@ void initializeDigital(int32_t* status) {
   while (pwmSystem->readLoopTiming(status) == 0) std::this_thread::yield();
 
   if (pwmSystem->readLoopTiming(status) != kExpectedLoopTiming) {
-    // TODO: char err[128];
-    // TODO: sprintf(err, "DIO LoopTiming: %d, expecting: %lu\n",
-    // digitalModules[port->module-1]->readLoopTiming(status),
-    // kExpectedLoopTiming);
     *status = LOOP_TIMING_ERROR;  // NOTE: Doesn't display the error
   }
 
@@ -81,7 +74,6 @@ void initializeDigital(int32_t* status) {
   uint16_t minHigh = (uint16_t)(
       (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + .5);
   pwmSystem->writeConfig_MinHigh(minHigh, status);
-  //  printf("MinHigh: %d\n", minHigh);
   // Ensure that PWM output values are set to OFF
   for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
     // Initialize port structure

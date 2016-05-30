@@ -7,10 +7,7 @@
 
 #include "ErrorBase.h"
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-
+#include <cerrno>
 #include <sstream>
 
 #define WPI_ERRORS_DEFINE_STRINGS
@@ -46,7 +43,7 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
                               llvm::StringRef function,
                               uint32_t lineNumber) const {
   std::string err;
-  int errNo = errno;
+  int32_t errNo = errno;
   if (errNo == 0) {
     err = "OK: ";
     err += contextMessage;
@@ -77,7 +74,7 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
+void ErrorBase::SetImaqError(int32_t success, llvm::StringRef contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
                              uint32_t lineNumber) const {
   // If there was an error

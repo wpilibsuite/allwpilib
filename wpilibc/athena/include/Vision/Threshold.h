@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 /**
  * Color threshold values.
  * This object represnts the threshold values for any type of color object
@@ -15,12 +17,12 @@
  */
 class Threshold {
  public:
-  int plane1Low;
-  int plane1High;
-  int plane2Low;
-  int plane2High;
-  int plane3Low;
-  int plane3High;
-  Threshold(int plane1Low, int plane1High, int plane2Low, int plane2High,
-            int plane3Low, int plane3High);
+  int32_t plane1Low;
+  int32_t plane1High;
+  int32_t plane2Low;
+  int32_t plane2High;
+  int32_t plane3Low;
+  int32_t plane3High;
+  Threshold(int32_t plane1Low, int32_t plane1High, int32_t plane2Low,
+            int32_t plane2High, int32_t plane3Low, int32_t plane3High);
 };

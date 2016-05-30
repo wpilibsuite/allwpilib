@@ -13,7 +13,7 @@
 #include "HAL/Port.h"
 #include "ctre/PCM.h"
 
-static const int NUM_MODULE_NUMBERS = 63;
+static const int32_t NUM_MODULE_NUMBERS = 63;
 
 PCM* PCM_modules[NUM_MODULE_NUMBERS] = {nullptr};
 
@@ -22,7 +22,7 @@ struct solenoid_port_t {
   uint32_t pin;
 };
 
-void initializePCM(int module) {
+void initializePCM(int32_t module) {
   if (!PCM_modules[module]) {
     PCM_modules[module] = new PCM(module);
   }
@@ -72,7 +72,7 @@ void setSolenoid(void* solenoid_port_pointer, bool value, int32_t* status) {
   *status = port->module->SetSolenoid(port->pin, value);
 }
 
-int getPCMSolenoidBlackList(void* solenoid_port_pointer, int32_t* status) {
+int32_t getPCMSolenoidBlackList(void* solenoid_port_pointer, int32_t* status) {
   solenoid_port_t* port = (solenoid_port_t*)solenoid_port_pointer;
   UINT8 value;
 

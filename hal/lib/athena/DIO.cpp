@@ -7,7 +7,7 @@
 
 #include "HAL/DIO.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "DigitalInternal.h"
 
@@ -100,7 +100,7 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t* status) {
     if (pwmPeriodPower < 4) {
       // The resolution of the duty cycle drops close to the highest
       // frequencies.
-      rawDutyCycle = rawDutyCycle / pow(2.0, 4 - pwmPeriodPower);
+      rawDutyCycle = rawDutyCycle / std::pow(2.0, 4 - pwmPeriodPower);
     }
     if (id < 4)
       digitalSystem->writePWMDutyCycleA(id, (uint8_t)rawDutyCycle, status);
@@ -157,7 +157,7 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t* status) {
       uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
 
       // Disable special functions on this pin
-      short specialFunctions =
+      uint16_t specialFunctions =
           digitalSystem->readEnableMXPSpecialFunction(status);
       digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
                                                    status);
@@ -195,7 +195,7 @@ void freeDIO(void* digital_port_pointer, int32_t* status) {
  * @param value The state to set the digital channel (if it is configured as an
  * output)
  */
-void setDIO(void* digital_port_pointer, short value, int32_t* status) {
+void setDIO(void* digital_port_pointer, uint16_t value, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
   if (value != 0 && value != 1) {
     if (value != 0) value = 1;
@@ -220,7 +220,7 @@ void setDIO(void* digital_port_pointer, short value, int32_t* status) {
       }
 
       uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
-      short specialFunctions =
+      uint16_t specialFunctions =
           digitalSystem->readEnableMXPSpecialFunction(status);
       digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
                                                    status);
@@ -249,7 +249,7 @@ bool getDIO(void* digital_port_pointer, int32_t* status) {
   } else {
     // Disable special functions
     uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
-    short specialFunctions =
+    uint16_t specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
                                                  status);
@@ -340,7 +340,7 @@ bool isAnyPulsing(int32_t* status) {
  * @param filter_index The filter index.  Must be in the range 0 - 3,
  * where 0 means "none" and 1 - 3 means filter # filter_index - 1.
  */
-void setFilterSelect(void* digital_port_pointer, int filter_index,
+void setFilterSelect(void* digital_port_pointer, int32_t filter_index,
                      int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
 
@@ -361,7 +361,7 @@ void setFilterSelect(void* digital_port_pointer, int filter_index,
  * @return filter_index The filter index.  Must be in the range 0 - 3,
  * where 0 means "none" and 1 - 3 means filter # filter_index - 1.
  */
-int getFilterSelect(void* digital_port_pointer, int32_t* status) {
+int32_t getFilterSelect(void* digital_port_pointer, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
 
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
@@ -384,7 +384,7 @@ int getFilterSelect(void* digital_port_pointer, int32_t* status) {
  * @param value The number of cycles that the signal must not transition to be
  * counted as a transition.
  */
-void setFilterPeriod(int filter_index, uint32_t value, int32_t* status) {
+void setFilterPeriod(int32_t filter_index, uint32_t value, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
   digitalSystem->writeFilterPeriodHdr(filter_index, value, status);
   if (*status == 0) {
@@ -404,7 +404,7 @@ void setFilterPeriod(int filter_index, uint32_t value, int32_t* status) {
  * @param value The number of cycles that the signal must not transition to be
  * counted as a transition.
  */
-uint32_t getFilterPeriod(int filter_index, int32_t* status) {
+uint32_t getFilterPeriod(int32_t filter_index, int32_t* status) {
   uint32_t hdr_period = 0;
   uint32_t mxp_period = 0;
   {

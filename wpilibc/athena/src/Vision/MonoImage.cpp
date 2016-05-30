@@ -8,8 +8,6 @@
 #include "Vision/MonoImage.h"
 #include "nivision.h"
 
-using namespace std;
-
 MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
 
 /**
@@ -23,27 +21,27 @@ MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
  * @param roi                   Region of Interest
  * @returns a vector of EllipseMatch structures (0 length vector on no match)
  */
-vector<EllipseMatch>* MonoImage::DetectEllipses(
+std::vector<EllipseMatch>* MonoImage::DetectEllipses(
     EllipseDescriptor* ellipseDescriptor, CurveOptions* curveOptions,
     ShapeDetectionOptions* shapeDetectionOptions, ROI* roi) {
-  int numberOfMatches;
+  int32_t numberOfMatches;
   EllipseMatch* e =
       imaqDetectEllipses(m_imaqImage, ellipseDescriptor, curveOptions,
                          shapeDetectionOptions, roi, &numberOfMatches);
-  auto ellipses = new vector<EllipseMatch>;
+  auto ellipses = new std::vector<EllipseMatch>;
   if (e == nullptr) {
     return ellipses;
   }
-  for (int i = 0; i < numberOfMatches; i++) {
+  for (int32_t i = 0; i < numberOfMatches; i++) {
     ellipses->push_back(e[i]);
   }
   imaqDispose(e);
   return ellipses;
 }
 
-vector<EllipseMatch>* MonoImage::DetectEllipses(
+std::vector<EllipseMatch>* MonoImage::DetectEllipses(
     EllipseDescriptor* ellipseDescriptor) {
-  vector<EllipseMatch>* ellipses =
+  std::vector<EllipseMatch>* ellipses =
       DetectEllipses(ellipseDescriptor, nullptr, nullptr, nullptr);
   return ellipses;
 }

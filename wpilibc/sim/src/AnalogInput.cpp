@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
+
+#include <cstdio>
+
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 
@@ -17,7 +20,7 @@
 AnalogInput::AnalogInput(uint32_t channel) {
   m_channel = channel;
   char buffer[50];
-  int n = sprintf(buffer, "analog/%d", channel);
+  int32_t n = std::sprintf(buffer, "analog/%d", channel);
   m_impl = new SimFloatInput(buffer);
 
   LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
