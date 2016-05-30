@@ -43,7 +43,7 @@ class PWM : public SensorBase,
 
   explicit PWM(uint32_t channel);
   virtual ~PWM();
-  virtual void SetRaw(unsigned short value);
+  virtual void SetRaw(uint16_t value);
   void SetPeriodMultiplier(PeriodMultiplier mult);
   void EnableDeadbandElimination(bool eliminateDeadband);
   void SetBounds(int32_t max, int32_t deadbandMax, int32_t center,

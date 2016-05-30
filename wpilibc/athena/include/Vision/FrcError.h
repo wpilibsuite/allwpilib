@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 /* Error Codes */
 #define ERR_VISION_GENERAL_ERROR 166000  //
 #define ERR_COLOR_NOT_FOUND 166100       // TrackAPI.cpp
@@ -26,5 +28,5 @@
 #define ERR_CAMERA_COMMAND_FAILURE 166211          // AxisCamera.cpp
 
 /* error handling functions */
-int GetLastVisionError();
-const char* GetVisionErrorText(int errorCode);
+int32_t GetLastVisionError();
+const char* GetVisionErrorText(int32_t errorCode);

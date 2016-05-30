@@ -21,7 +21,7 @@ void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
                                          bool isNew) {}
 void Preferences::Listener::ValueChangedEx(ITable* source, llvm::StringRef key,
                                            std::shared_ptr<nt::Value> value,
-                                           unsigned int flags) {
+                                           uint32_t flags) {
   source->SetPersistent(key);
 }
 
@@ -68,8 +68,8 @@ std::string Preferences::GetString(llvm::StringRef key,
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-int Preferences::GetInt(llvm::StringRef key, int defaultValue) {
-  return static_cast<int>(m_table->GetNumber(key, defaultValue));
+int32_t Preferences::GetInt(llvm::StringRef key, int32_t defaultValue) {
+  return static_cast<int32_t>(m_table->GetNumber(key, defaultValue));
 }
 
 /**
@@ -135,14 +135,14 @@ void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
 }
 
 /**
- * Puts the given int into the preferences table.
+ * Puts the given int32_t into the preferences table.
  *
  * <p>The key may not have any whitespace nor an equals sign</p>
  *
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutInt(llvm::StringRef key, int value) {
+void Preferences::PutInt(llvm::StringRef key, int32_t value) {
   m_table->PutNumber(key, value);
   m_table->SetPersistent(key);
 }

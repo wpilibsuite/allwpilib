@@ -50,19 +50,19 @@ class USBCamera : public ErrorBase {
 
   priority_recursive_mutex m_mutex;
 
-  unsigned int m_width = 320;
-  unsigned int m_height = 240;
+  uint32_t m_width = 320;
+  uint32_t m_height = 240;
   double m_fps = 30;
   std::string m_whiteBalance = AUTO;
-  unsigned int m_whiteBalanceValue = 0;
+  uint32_t m_whiteBalanceValue = 0;
   bool m_whiteBalanceValuePresent = false;
   std::string m_exposure = MANUAL;
-  unsigned int m_exposureValue = 50;
+  uint32_t m_exposureValue = 50;
   bool m_exposureValuePresent = false;
-  unsigned int m_brightness = 80;
+  uint32_t m_brightness = 80;
   bool m_needSettingsUpdate = true;
 
-  unsigned int GetJpegSize(void* buffer, unsigned int buffSize);
+  uint32_t GetJpegSize(void* buffer, uint32_t buffSize);
 
  public:
   static constexpr char const* kDefaultCameraName = "cam0";
@@ -74,18 +74,18 @@ class USBCamera : public ErrorBase {
   void StartCapture();
   void StopCapture();
   void SetFPS(double fps);
-  void SetSize(unsigned int width, unsigned int height);
+  void SetSize(uint32_t width, uint32_t height);
 
   void UpdateSettings();
   /**
    * Set the brightness, as a percentage (0-100).
    */
-  void SetBrightness(unsigned int brightness);
+  void SetBrightness(uint32_t brightness);
 
   /**
    * Get the brightness, as a percentage (0-100).
    */
-  unsigned int GetBrightness();
+  uint32_t GetBrightness();
 
   /**
    * Set the white balance to auto
@@ -100,7 +100,7 @@ class USBCamera : public ErrorBase {
   /**
    * Set the white balance to manual, with specified color temperature
    */
-  void SetWhiteBalanceManual(unsigned int wbValue);
+  void SetWhiteBalanceManual(uint32_t wbValue);
 
   /**
    * Set the exposure to auto exposure
@@ -115,8 +115,8 @@ class USBCamera : public ErrorBase {
   /**
    * Set the exposure to manual, with a given percentage (0-100)
    */
-  void SetExposureManual(unsigned int expValue);
+  void SetExposureManual(uint32_t expValue);
 
   void GetImage(Image* image);
-  unsigned int GetImageData(void* buffer, unsigned int bufferSize);
+  uint32_t GetImageData(void* buffer, uint32_t bufferSize);
 };

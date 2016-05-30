@@ -489,7 +489,7 @@ void PIDController::SetAbsoluteTolerance(float absTolerance) {
  * not register as on target for at least the specified bufLength cycles.
  * @param bufLength Number of previous cycles to average. Defaults to 1.
  */
-void PIDController::SetToleranceBuffer(unsigned bufLength) {
+void PIDController::SetToleranceBuffer(uint32_t bufLength) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_bufLength = bufLength;
 

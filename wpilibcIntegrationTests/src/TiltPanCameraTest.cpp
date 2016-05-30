@@ -87,7 +87,7 @@ void TiltPanCameraTest::GyroAngle() {
   Wait(0.5);
   m_gyro->Reset();
 
-  for (int i = 0; i < 600; i++) {
+  for (int32_t i = 0; i < 600; i++) {
     m_pan->Set(i / 1000.0);
     Wait(0.001);
   }
@@ -123,7 +123,7 @@ void TiltPanCameraTest::GyroCalibratedParameters() {
   Wait(0.5);
   m_gyro->Reset();
 
-  for (int i = 0; i < 600; i++) {
+  for (int32_t i = 0; i < 600; i++) {
     m_pan->Set(i / 1000.0);
     Wait(0.001);
   }

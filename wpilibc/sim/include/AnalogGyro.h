@@ -43,7 +43,7 @@ class AnalogGyro : public GyroBase {
   void Reset();
 
  private:
-  void InitAnalogGyro(int channel);
+  void InitAnalogGyro(int32_t channel);
 
   SimGyro* impl;
 

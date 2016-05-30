@@ -42,8 +42,8 @@ class PWM : public SensorBase,
 
   explicit PWM(uint32_t channel);
   virtual ~PWM();
-  virtual void SetRaw(unsigned short value);
-  virtual unsigned short GetRaw() const;
+  virtual void SetRaw(uint16_t value);
+  virtual uint16_t GetRaw() const;
   void SetPeriodMultiplier(PeriodMultiplier mult);
   void SetZeroLatch();
   void EnableDeadbandElimination(bool eliminateDeadband);

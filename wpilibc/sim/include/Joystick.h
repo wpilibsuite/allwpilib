@@ -62,7 +62,7 @@ class Joystick : public GenericHID, public ErrorBase {
   virtual bool GetTop(JoystickHand hand = kRightHand) const override;
   virtual bool GetBumper(JoystickHand hand = kRightHand) const override;
   virtual bool GetRawButton(uint32_t button) const override;
-  virtual int GetPOV(uint32_t pov = 1) const override;
+  virtual int32_t GetPOV(uint32_t pov = 1) const override;
   bool GetButton(ButtonType button) const;
   static Joystick* GetStickForPort(uint32_t port);
 

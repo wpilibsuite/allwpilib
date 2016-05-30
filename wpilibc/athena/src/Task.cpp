@@ -62,7 +62,7 @@ bool Task::Verify() {
  * @return task priority or 0 if an error occured
  */
 int32_t Task::GetPriority() {
-  int priority;
+  int32_t priority;
   auto id = m_thread.native_handle();
   if (HandleError(getTaskPriority(&id, &priority)))
     return priority;

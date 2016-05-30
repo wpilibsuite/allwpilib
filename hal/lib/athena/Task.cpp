@@ -26,8 +26,8 @@ STATUS verifyTaskID(TASK task) {
   }
 }
 
-STATUS setTaskPriority(TASK task, int priority) {
-  int policy = 0;
+STATUS setTaskPriority(TASK task, int32_t priority) {
+  int32_t policy = 0;
   struct sched_param param;
 
   if (verifyTaskID(task) == OK &&
@@ -44,7 +44,7 @@ STATUS setTaskPriority(TASK task, int priority) {
 }
 
 STATUS getTaskPriority(TASK task, int* priority) {
-  int policy = 0;
+  int32_t policy = 0;
   struct sched_param param;
 
   if (verifyTaskID(task) == OK &&

@@ -26,7 +26,7 @@ MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
 vector<EllipseMatch>* MonoImage::DetectEllipses(
     EllipseDescriptor* ellipseDescriptor, CurveOptions* curveOptions,
     ShapeDetectionOptions* shapeDetectionOptions, ROI* roi) {
-  int numberOfMatches;
+  int32_t numberOfMatches;
   EllipseMatch* e =
       imaqDetectEllipses(m_imaqImage, ellipseDescriptor, curveOptions,
                          shapeDetectionOptions, roi, &numberOfMatches);
@@ -34,7 +34,7 @@ vector<EllipseMatch>* MonoImage::DetectEllipses(
   if (e == nullptr) {
     return ellipses;
   }
-  for (int i = 0; i < numberOfMatches; i++) {
+  for (int32_t i = 0; i < numberOfMatches; i++) {
     ellipses->push_back(e[i]);
   }
   imaqDispose(e);

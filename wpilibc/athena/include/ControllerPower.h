@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 class ControllerPower {
  public:
   static double GetInputVoltage();
@@ -14,13 +16,13 @@ class ControllerPower {
   static double GetVoltage3V3();
   static double GetCurrent3V3();
   static bool GetEnabled3V3();
-  static int GetFaultCount3V3();
+  static int32_t GetFaultCount3V3();
   static double GetVoltage5V();
   static double GetCurrent5V();
   static bool GetEnabled5V();
-  static int GetFaultCount5V();
+  static int32_t GetFaultCount5V();
   static double GetVoltage6V();
   static double GetCurrent6V();
   static bool GetEnabled6V();
-  static int GetFaultCount6V();
+  static int32_t GetFaultCount6V();
 };

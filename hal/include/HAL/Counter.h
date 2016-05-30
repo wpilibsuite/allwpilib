@@ -38,7 +38,7 @@ void setCounterSemiPeriodMode(void* counter_pointer, bool highSemiPeriod,
 void setCounterPulseLengthMode(void* counter_pointer, double threshold,
                                int32_t* status);
 int32_t getCounterSamplesToAverage(void* counter_pointer, int32_t* status);
-void setCounterSamplesToAverage(void* counter_pointer, int samplesToAverage,
+void setCounterSamplesToAverage(void* counter_pointer, int32_t samplesToAverage,
                                 int32_t* status);
 void resetCounter(void* counter_pointer, int32_t* status);
 int32_t getCounter(void* counter_pointer, int32_t* status);

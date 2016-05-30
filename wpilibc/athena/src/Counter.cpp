@@ -457,7 +457,7 @@ void Counter::SetPulseLengthMode(float threshold) {
  *
  * @return The number of samples being averaged (from 1 to 127)
  */
-int Counter::GetSamplesToAverage() const {
+int32_t Counter::GetSamplesToAverage() const {
   int32_t status = 0;
   int32_t samples = getCounterSamplesToAverage(m_counter, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -471,7 +471,7 @@ int Counter::GetSamplesToAverage() const {
  *
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
-void Counter::SetSamplesToAverage(int samplesToAverage) {
+void Counter::SetSamplesToAverage(int32_t samplesToAverage) {
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     wpi_setWPIErrorWithContext(
         ParameterOutOfRange,

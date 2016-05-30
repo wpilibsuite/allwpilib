@@ -227,31 +227,33 @@ uint64_t getFPGATime(int32_t* status);
 
 bool getFPGAButton(int32_t* status);
 
-int HALSetErrorData(const char* errors, int errorsLength, int wait_ms);
-int HALSendError(int isError, int32_t errorCode, int isLVCode,
-                 const char* details, const char* location,
-                 const char* callStack, int printMsg);
+int32_t HALSetErrorData(const char* errors, int32_t errorsLength,
+                        int32_t wait_ms);
+int32_t HALSendError(int32_t isError, int32_t errorCode, int32_t isLVCode,
+                     const char* details, const char* location,
+                     const char* callStack, int32_t printMsg);
 
-int HALGetControlWord(HALControlWord* data);
-int HALGetAllianceStation(enum HALAllianceStationID* allianceStation);
-int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes* axes);
-int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs* povs);
-int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons* buttons);
-int HALGetJoystickDescriptor(uint8_t joystickNum, HALJoystickDescriptor* desc);
-int HALGetJoystickIsXbox(uint8_t joystickNum);
-int HALGetJoystickType(uint8_t joystickNum);
+int32_t HALGetControlWord(HALControlWord* data);
+int32_t HALGetAllianceStation(enum HALAllianceStationID* allianceStation);
+int32_t HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes* axes);
+int32_t HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs* povs);
+int32_t HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons* buttons);
+int32_t HALGetJoystickDescriptor(uint8_t joystickNum,
+                                 HALJoystickDescriptor* desc);
+int32_t HALGetJoystickIsXbox(uint8_t joystickNum);
+int32_t HALGetJoystickType(uint8_t joystickNum);
 char* HALGetJoystickName(uint8_t joystickNum);
-int HALGetJoystickAxisType(uint8_t joystickNum, uint8_t axis);
-int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs,
-                          uint16_t leftRumble, uint16_t rightRumble);
-int HALGetMatchTime(float* matchTime);
+int32_t HALGetJoystickAxisType(uint8_t joystickNum, uint8_t axis);
+int32_t HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs,
+                              uint16_t leftRumble, uint16_t rightRumble);
+int32_t HALGetMatchTime(float* matchTime);
 
 void HALSetNewDataSem(MULTIWAIT_ID sem);
 
 bool HALGetSystemActive(int32_t* status);
 bool HALGetBrownedOut(int32_t* status);
 
-int HALInitialize(int mode = 0);
+int32_t HALInitialize(int32_t mode = 0);
 void HALNetworkCommunicationObserveUserProgramStarting();
 void HALNetworkCommunicationObserveUserProgramDisabled();
 void HALNetworkCommunicationObserveUserProgramAutonomous();

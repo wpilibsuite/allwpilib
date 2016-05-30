@@ -80,9 +80,9 @@ bool ControllerPower::GetEnabled6V() {
  *
  * @return The number of faults.
  */
-int ControllerPower::GetFaultCount6V() {
+int32_t ControllerPower::GetFaultCount6V() {
   int32_t status = 0;
-  int retVal = getUserCurrentFaults6V(&status);
+  int32_t retVal = getUserCurrentFaults6V(&status);
   wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
   return retVal;
 }
@@ -130,9 +130,9 @@ bool ControllerPower::GetEnabled5V() {
  *
  * @return The number of faults
  */
-int ControllerPower::GetFaultCount5V() {
+int32_t ControllerPower::GetFaultCount5V() {
   int32_t status = 0;
-  int retVal = getUserCurrentFaults5V(&status);
+  int32_t retVal = getUserCurrentFaults5V(&status);
   wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
   return retVal;
 }
@@ -180,9 +180,9 @@ bool ControllerPower::GetEnabled3V3() {
  *
  * @return The number of faults
  */
-int ControllerPower::GetFaultCount3V3() {
+int32_t ControllerPower::GetFaultCount3V3() {
   int32_t status = 0;
-  int retVal = getUserCurrentFaults3V3(&status);
+  int32_t retVal = getUserCurrentFaults3V3(&status);
   wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
   return retVal;
 }

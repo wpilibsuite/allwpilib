@@ -44,9 +44,9 @@ class DigitalGlitchFilter : public SensorBase {
   // Sets the filter for the input to be the requested index.  A value of 0
   // disables the filter, and the filter value must be between 1 and 3,
   // inclusive.
-  void DoAdd(DigitalSource* input, int requested_index);
+  void DoAdd(DigitalSource* input, int32_t requested_index);
 
-  int m_channelIndex = -1;
+  int32_t m_channelIndex = -1;
   static priority_mutex m_mutex;
   static ::std::array<bool, 3> m_filterAllocated;
 };

@@ -20,24 +20,24 @@
 class BinaryImage : public MonoImage {
  public:
   virtual ~BinaryImage() = default;
-  int GetNumberParticles();
-  ParticleAnalysisReport GetParticleAnalysisReport(int particleNumber);
-  void GetParticleAnalysisReport(int particleNumber,
+  int32_t GetNumberParticles();
+  ParticleAnalysisReport GetParticleAnalysisReport(int32_t particleNumber);
+  void GetParticleAnalysisReport(int32_t particleNumber,
                                  ParticleAnalysisReport* par);
   std::vector<ParticleAnalysisReport>* GetOrderedParticleAnalysisReports();
-  BinaryImage* RemoveSmallObjects(bool connectivity8, int erosions);
-  BinaryImage* RemoveLargeObjects(bool connectivity8, int erosions);
+  BinaryImage* RemoveSmallObjects(bool connectivity8, int32_t erosions);
+  BinaryImage* RemoveLargeObjects(bool connectivity8, int32_t erosions);
   BinaryImage* ConvexHull(bool connectivity8);
   BinaryImage* ParticleFilter(ParticleFilterCriteria2* criteria,
-                              int criteriaCount);
+                              int32_t criteriaCount);
   virtual void Write(const char* fileName);
 
  private:
-  bool ParticleMeasurement(int particleNumber, MeasurementType whatToMeasure,
-                           int* result);
-  bool ParticleMeasurement(int particleNumber, MeasurementType whatToMeasure,
-                           double* result);
-  static double NormalizeFromRange(double position, int range);
+  bool ParticleMeasurement(int32_t particleNumber,
+                           MeasurementType whatToMeasure, int32_t* result);
+  bool ParticleMeasurement(int32_t particleNumber,
+                           MeasurementType whatToMeasure, double* result);
+  static double NormalizeFromRange(double position, int32_t range);
   static bool CompareParticleSizes(ParticleAnalysisReport particle1,
                                    ParticleAnalysisReport particle2);
 };

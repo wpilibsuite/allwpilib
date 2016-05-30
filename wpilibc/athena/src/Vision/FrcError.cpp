@@ -29,7 +29,7 @@ int GetLastVisionError() {
  * @param errorCode The error code to find the text for.
  * @return The error text
  */
-const char* GetVisionErrorText(int errorCode) {
+const char* GetVisionErrorText(int32_t errorCode) {
   const char* errorText;
 
   switch (errorCode) {

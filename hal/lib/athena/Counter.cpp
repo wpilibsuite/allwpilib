@@ -105,7 +105,7 @@ void clearCounterUpSource(void* counter_pointer, int32_t* status) {
 void setCounterDownSource(void* counter_pointer, uint32_t pin,
                           bool analogTrigger, int32_t* status) {
   Counter* counter = (Counter*)counter_pointer;
-  unsigned char mode = counter->counter->readConfig_Mode(status);
+  uint8_t mode = counter->counter->readConfig_Mode(status);
   if (mode != kTwoPulse && mode != kExternalDirection) {
     // TODO: wpi_setWPIErrorWithContext(ParameterOutOfRange, "Counter only
     // supports DownSource in TwoPulse and ExternalDirection modes.");
@@ -212,7 +212,7 @@ int32_t getCounterSamplesToAverage(void* counter_pointer, int32_t* status) {
  * mechanical imperfections or as oversampling to increase resolution.
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
-void setCounterSamplesToAverage(void* counter_pointer, int samplesToAverage,
+void setCounterSamplesToAverage(void* counter_pointer, int32_t samplesToAverage,
                                 int32_t* status) {
   Counter* counter = (Counter*)counter_pointer;
   if (samplesToAverage < 1 || samplesToAverage > 127) {

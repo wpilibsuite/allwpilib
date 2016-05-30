@@ -13,16 +13,16 @@
 #ifndef _FUNCPTR_DEFINED
 #define _FUNCPTR_DEFINED
 #ifdef __cplusplus
-typedef int (*FUNCPTR)(...);
-/* ptr to function returning int */
+typedef int32_t (*FUNCPTR)(...);
+/* ptr to function returning int32_t */
 #else
-typedef int (*FUNCPTR)(); /* ptr to function returning int */
+typedef int32_t (*FUNCPTR)(); /* ptr to function returning int32_t */
 #endif /* __cplusplus */
 #endif /* _FUNCPTR_DEFINED */
 
 #ifndef _STATUS_DEFINED
 #define _STATUS_DEFINED
-typedef int STATUS;
+typedef int32_t STATUS;
 #endif /* _STATUS_DEFINED */
 
 #ifndef OK
@@ -42,6 +42,6 @@ extern "C" {
 const int32_t HAL_taskLib_ILLEGAL_PRIORITY = 22;  // 22 is EINVAL
 
 STATUS verifyTaskID(TASK task);
-STATUS setTaskPriority(TASK task, int priority);  // valid priority [1..99]
-STATUS getTaskPriority(TASK task, int* priority);
+STATUS setTaskPriority(TASK task, int32_t priority);  // valid priority [1..99]
+STATUS getTaskPriority(TASK task, int32_t* priority);
 }

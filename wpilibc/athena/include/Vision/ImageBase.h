@@ -19,8 +19,8 @@ class ImageBase : public ErrorBase {
   ImageBase(ImageType type);
   virtual ~ImageBase();
   virtual void Write(const char* fileName);
-  int GetHeight();
-  int GetWidth();
+  int32_t GetHeight();
+  int32_t GetWidth();
   Image* GetImaqImage();
 
  protected:

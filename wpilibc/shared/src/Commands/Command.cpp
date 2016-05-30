@@ -17,7 +17,7 @@ static const std::string kName = "name";
 static const std::string kRunning = "running";
 static const std::string kIsParented = "isParented";
 
-int Command::m_commandCounter = 0;
+int32_t Command::m_commandCounter = 0;
 
 /**
  * Creates a new command.
@@ -73,7 +73,7 @@ Command::~Command() {
  *
  * @return the ID of this command
  */
-int Command::GetID() const { return m_commandID; }
+int32_t Command::GetID() const { return m_commandID; }
 
 /**
  * Sets the timeout of this command.

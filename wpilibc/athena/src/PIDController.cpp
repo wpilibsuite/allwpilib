@@ -488,7 +488,7 @@ void PIDController::SetAbsoluteTolerance(float absTolerance) {
  *
  * @param bufLength Number of previous cycles to average. Defaults to 1.
  */
-void PIDController::SetToleranceBuffer(unsigned bufLength) {
+void PIDController::SetToleranceBuffer(uint32_t bufLength) {
   std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   m_bufLength = bufLength;
 

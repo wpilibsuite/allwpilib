@@ -23,17 +23,17 @@ void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t* status);
 
 bool allocateDIO(void* digital_port_pointer, bool input, int32_t* status);
 void freeDIO(void* digital_port_pointer, int32_t* status);
-void setDIO(void* digital_port_pointer, short value, int32_t* status);
+void setDIO(void* digital_port_pointer, uint16_t value, int32_t* status);
 bool getDIO(void* digital_port_pointer, int32_t* status);
 bool getDIODirection(void* digital_port_pointer, int32_t* status);
 void pulse(void* digital_port_pointer, double pulseLength, int32_t* status);
 bool isPulsing(void* digital_port_pointer, int32_t* status);
 bool isAnyPulsing(int32_t* status);
 
-void setFilterSelect(void* digital_port_pointer, int filter_index,
+void setFilterSelect(void* digital_port_pointer, int32_t filter_index,
                      int32_t* status);
-int getFilterSelect(void* digital_port_pointer, int32_t* status);
+int32_t getFilterSelect(void* digital_port_pointer, int32_t* status);
 
-void setFilterPeriod(int filter_index, uint32_t value, int32_t* status);
-uint32_t getFilterPeriod(int filter_index, int32_t* status);
+void setFilterPeriod(int32_t filter_index, uint32_t value, int32_t* status);
+uint32_t getFilterPeriod(int32_t filter_index, int32_t* status);
 }

@@ -22,7 +22,7 @@ class MainNode {
 
   template <typename M>
   static transport::PublisherPtr Advertise(const std::string& topic,
-                                           unsigned int _queueLimit = 10,
+                                           uint32_t _queueLimit = 10,
                                            bool _latch = false) {
     return GetInstance()->main->Advertise<M>(topic, _queueLimit, _latch);
   }

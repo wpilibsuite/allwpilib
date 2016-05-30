@@ -57,35 +57,35 @@ class AxisCamera : public ErrorBase {
 
   bool IsFreshImage() const;
 
-  int GetImage(Image* image);
-  int GetImage(ColorImage* image);
+  int32_t GetImage(Image* image);
+  int32_t GetImage(ColorImage* image);
   HSLImage* GetImage();
-  int CopyJPEG(char** destImage, unsigned int& destImageSize,
-               unsigned int& destImageBufferSize);
+  int32_t CopyJPEG(char** destImage, uint32_t& destImageSize,
+                   uint32_t& destImageBufferSize);
 
-  void WriteBrightness(int brightness);
-  int GetBrightness();
+  void WriteBrightness(int32_t brightness);
+  int32_t GetBrightness();
 
   void WriteWhiteBalance(WhiteBalance whiteBalance);
   WhiteBalance GetWhiteBalance();
 
-  void WriteColorLevel(int colorLevel);
-  int GetColorLevel();
+  void WriteColorLevel(int32_t colorLevel);
+  int32_t GetColorLevel();
 
   void WriteExposureControl(ExposureControl exposureControl);
   ExposureControl GetExposureControl();
 
-  void WriteExposurePriority(int exposurePriority);
-  int GetExposurePriority();
+  void WriteExposurePriority(int32_t exposurePriority);
+  int32_t GetExposurePriority();
 
-  void WriteMaxFPS(int maxFPS);
-  int GetMaxFPS();
+  void WriteMaxFPS(int32_t maxFPS);
+  int32_t GetMaxFPS();
 
   void WriteResolution(Resolution resolution);
   Resolution GetResolution();
 
-  void WriteCompression(int compression);
-  int GetCompression();
+  void WriteCompression(int32_t compression);
+  int32_t GetCompression();
 
   void WriteRotation(Rotation rotation);
   Rotation GetRotation();
@@ -93,21 +93,21 @@ class AxisCamera : public ErrorBase {
  private:
   std::thread m_captureThread;
   std::string m_cameraHost;
-  int m_cameraSocket = -1;
+  int32_t m_cameraSocket = -1;
   priority_mutex m_captureMutex;
 
   priority_mutex m_imageDataMutex;
   std::vector<uint8_t> m_imageData;
   bool m_freshImage = false;
 
-  int m_brightness = 50;
+  int32_t m_brightness = 50;
   WhiteBalance m_whiteBalance = kWhiteBalance_Automatic;
-  int m_colorLevel = 50;
+  int32_t m_colorLevel = 50;
   ExposureControl m_exposureControl = kExposureControl_Automatic;
-  int m_exposurePriority = 50;
-  int m_maxFPS = 0;
+  int32_t m_exposurePriority = 50;
+  int32_t m_maxFPS = 0;
   Resolution m_resolution = kResolution_640x480;
-  int m_compression = 50;
+  int32_t m_compression = 50;
   Rotation m_rotation = kRotation_0;
   bool m_parametersDirty = true;
   bool m_streamDirty = true;
@@ -119,5 +119,5 @@ class AxisCamera : public ErrorBase {
   void ReadImagesFromCamera();
   bool WriteParameters();
 
-  int CreateCameraSocket(std::string const& requestString, bool setError);
+  int32_t CreateCameraSocket(std::string const& requestString, bool setError);
 };

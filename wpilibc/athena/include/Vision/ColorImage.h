@@ -15,16 +15,18 @@ class ColorImage : public ImageBase {
  public:
   ColorImage(ImageType type);
   virtual ~ColorImage() = default;
-  BinaryImage* ThresholdRGB(int redLow, int redHigh, int greenLow,
-                            int greenHigh, int blueLow, int blueHigh);
-  BinaryImage* ThresholdHSL(int hueLow, int hueHigh, int saturationLow,
-                            int saturationHigh, int luminenceLow,
-                            int luminenceHigh);
-  BinaryImage* ThresholdHSV(int hueLow, int hueHigh, int saturationLow,
-                            int saturationHigh, int valueHigh, int valueLow);
-  BinaryImage* ThresholdHSI(int hueLow, int hueHigh, int saturationLow,
-                            int saturationHigh, int intensityLow,
-                            int intensityHigh);
+  BinaryImage* ThresholdRGB(int32_t redLow, int32_t redHigh, int32_t greenLow,
+                            int32_t greenHigh, int32_t blueLow,
+                            int32_t blueHigh);
+  BinaryImage* ThresholdHSL(int32_t hueLow, int32_t hueHigh,
+                            int32_t saturationLow, int32_t saturationHigh,
+                            int32_t luminenceLow, int32_t luminenceHigh);
+  BinaryImage* ThresholdHSV(int32_t hueLow, int32_t hueHigh,
+                            int32_t saturationLow, int32_t saturationHigh,
+                            int32_t valueHigh, int32_t valueLow);
+  BinaryImage* ThresholdHSI(int32_t hueLow, int32_t hueHigh,
+                            int32_t saturationLow, int32_t saturationHigh,
+                            int32_t intensityLow, int32_t intensityHigh);
   BinaryImage* ThresholdRGB(Threshold& threshold);
   BinaryImage* ThresholdHSL(Threshold& threshold);
   BinaryImage* ThresholdHSV(Threshold& threshold);
@@ -57,14 +59,15 @@ class ColorImage : public ImageBase {
   void LuminanceEqualize();
 
  private:
-  BinaryImage* ComputeThreshold(ColorMode colorMode, int low1, int high1,
-                                int low2, int high2, int low3, int high3);
+  BinaryImage* ComputeThreshold(ColorMode colorMode, int32_t low1,
+                                int32_t high1, int32_t low2, int32_t high2,
+                                int32_t low3, int32_t high3);
   void Equalize(bool allPlanes);
-  MonoImage* ExtractColorPlane(ColorMode mode, int planeNumber);
+  MonoImage* ExtractColorPlane(ColorMode mode, int32_t planeNumber);
   MonoImage* ExtractFirstColorPlane(ColorMode mode);
   MonoImage* ExtractSecondColorPlane(ColorMode mode);
   MonoImage* ExtractThirdColorPlane(ColorMode mode);
-  void ReplacePlane(ColorMode mode, MonoImage* plane, int planeNumber);
+  void ReplacePlane(ColorMode mode, MonoImage* plane, int32_t planeNumber);
   void ReplaceFirstColorPlane(ColorMode mode, MonoImage* plane);
   void ReplaceSecondColorPlane(ColorMode mode, MonoImage* plane);
   void ReplaceThirdColorPlane(ColorMode mode, MonoImage* plane);

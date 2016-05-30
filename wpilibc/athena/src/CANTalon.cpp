@@ -31,14 +31,14 @@ const double kNativePwdUnitsPerRotation = 4096.0;
  */
 const double kMinutesPer100msUnit = 1.0 / 600.0;
 
-constexpr unsigned int CANTalon::kDelayForSolicitedSignalsUs;
+constexpr uint32_t CANTalon::kDelayForSolicitedSignalsUs;
 
 /**
  * Constructor for the CANTalon device.
  *
  * @param deviceNumber The CAN ID of the Talon SRX
  */
-CANTalon::CANTalon(int deviceNumber)
+CANTalon::CANTalon(int32_t deviceNumber)
     : m_deviceNumber(deviceNumber),
       m_impl(new CanTalonSRX(deviceNumber)),
       m_safetyHelper(new MotorSafetyHelper(this)) {
@@ -53,7 +53,7 @@ CANTalon::CANTalon(int deviceNumber)
  * @param controlPeriodMs The period in ms to send the CAN control frame.
  *                        Period is bounded to [1ms,95ms].
  */
-CANTalon::CANTalon(int deviceNumber, int controlPeriodMs)
+CANTalon::CANTalon(int32_t deviceNumber, int32_t controlPeriodMs)
     : m_deviceNumber(deviceNumber),
       m_impl(new CanTalonSRX(deviceNumber, controlPeriodMs)),
       m_safetyHelper(new MotorSafetyHelper(this)) {
@@ -103,7 +103,7 @@ double CANTalon::PIDGet() { return Get(); }
  * @return The current sensor value of the Talon.
  */
 float CANTalon::Get() const {
-  int value;
+  int32_t value;
   switch (m_controlMode) {
     case kVoltage:
       return GetOutputVoltage();
@@ -160,7 +160,7 @@ void CANTalon::Set(float value) {
       } break;
       case CANSpeedController::kVoltage: {
         // Voltage is an 8.8 fixed point number.
-        int volts = int((m_isInverted ? -value : value) * 256);
+        int32_t volts = int32_t((m_isInverted ? -value : value) * 256);
         status = m_impl->SetDemand(volts);
       } break;
       case CANSpeedController::kSpeed:
@@ -299,7 +299,7 @@ void CANTalon::SetF(double f) {
  *
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-void CANTalon::SetIzone(unsigned iz) {
+void CANTalon::SetIzone(uint32_t iz) {
   CTR_Code status = m_impl->SetIzone(m_profile, iz);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -310,7 +310,7 @@ void CANTalon::SetIzone(unsigned iz) {
  * SRX has two available slots for PID.
  * @param slotIdx one or zero depending on which slot caller wants.
  */
-void CANTalon::SelectProfileSlot(int slotIdx) {
+void CANTalon::SelectProfileSlot(int32_t slotIdx) {
   m_profile = (slotIdx == 0) ? 0 : 1; /* only get two slots for now */
   CTR_Code status = m_impl->SetProfileSlotSelect(m_profile);
   if (status != CTR_OKAY) {
@@ -367,8 +367,9 @@ void CANTalon::SetFeedbackDevice(FeedbackDevice feedbackDevice) {
 /**
  * Select the feedback device to use in closed-loop
  */
-void CANTalon::SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs) {
-  CTR_Code status = m_impl->SetStatusFrameRate((int)stateFrame, periodMs);
+void CANTalon::SetStatusFrameRateMs(StatusFrameRate stateFrame,
+                                    int32_t periodMs) {
+  CTR_Code status = m_impl->SetStatusFrameRate((int32_t)stateFrame, periodMs);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
@@ -473,7 +474,7 @@ double CANTalon::GetF() const {
 /**
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-int CANTalon::GetIzone() const {
+int32_t CANTalon::GetIzone() const {
   CanTalonSRX::param_t param = m_profile
                                    ? CanTalonSRX::eProfileParamSlot1_IZone
                                    : CanTalonSRX::eProfileParamSlot0_IZone;
@@ -485,7 +486,7 @@ int CANTalon::GetIzone() const {
   std::this_thread::sleep_for(
       std::chrono::microseconds(kDelayForSolicitedSignalsUs));
 
-  int iz;
+  int32_t iz;
   status = m_impl->GetIzone(m_profile, iz);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -516,7 +517,7 @@ float CANTalon::GetBusVoltage() const {
  * @return The voltage being output by the Talon, in Volts.
  */
 float CANTalon::GetOutputVoltage() const {
-  int throttle11;
+  int32_t throttle11;
   CTR_Code status = m_impl->GetAppliedThrottle(throttle11);
   float voltage = GetBusVoltage() * (float(throttle11) / 1023.0);
   if (status != CTR_OKAY) {
@@ -621,8 +622,8 @@ void CANTalon::SetClosedLoopOutputDirection(bool reverseOutput) {
  *
  * @return the difference between the setpoint and the sensor value.
  */
-int CANTalon::GetClosedLoopError() const {
-  int error;
+int32_t CANTalon::GetClosedLoopError() const {
+  int32_t error;
   /* retrieve the closed loop error in native units */
   CTR_Code status = m_impl->GetCloseLoopErr(error);
   if (status != CTR_OKAY) {
@@ -683,8 +684,8 @@ double CANTalon::GetSpeed() const {
  *          on the analog pin of the Talon. The upper 14 bits tracks the
  *          overflows and underflows (continuous sensor).
  */
-int CANTalon::GetAnalogIn() const {
-  int position;
+int32_t CANTalon::GetAnalogIn() const {
+  int32_t position;
   CTR_Code status = m_impl->GetAnalogInWithOv(position);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -692,7 +693,7 @@ int CANTalon::GetAnalogIn() const {
   return position;
 }
 
-void CANTalon::SetAnalogPosition(int newPosition) {
+void CANTalon::SetAnalogPosition(int32_t newPosition) {
   CTR_Code status = m_impl->SetParam(CanTalonSRX::eAinPosition, newPosition);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -705,7 +706,7 @@ void CANTalon::SetAnalogPosition(int newPosition) {
  *
  * @returns The ADC (0 - 1023) on analog pin of the Talon.
  */
-int CANTalon::GetAnalogInRaw() const { return GetAnalogIn() & 0x3FF; }
+int32_t CANTalon::GetAnalogInRaw() const { return GetAnalogIn() & 0x3FF; }
 
 /**
  * Get the position of whatever is in the analog pin of the Talon, regardless of
@@ -713,8 +714,8 @@ int CANTalon::GetAnalogInRaw() const { return GetAnalogIn() & 0x3FF; }
  *
  * @returns The value (0 - 1023) on the analog pin of the Talon.
  */
-int CANTalon::GetAnalogInVel() const {
-  int vel;
+int32_t CANTalon::GetAnalogInVel() const {
+  int32_t vel;
   CTR_Code status = m_impl->GetAnalogInVel(vel);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -728,15 +729,15 @@ int CANTalon::GetAnalogInVel() const {
  *
  * @returns The value (0 - 1023) on the analog pin of the Talon.
  */
-int CANTalon::GetEncPosition() const {
-  int position;
+int32_t CANTalon::GetEncPosition() const {
+  int32_t position;
   CTR_Code status = m_impl->GetEncPosition(position);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
   return position;
 }
-void CANTalon::SetEncPosition(int newPosition) {
+void CANTalon::SetEncPosition(int32_t newPosition) {
   CTR_Code status = m_impl->SetParam(CanTalonSRX::eEncPosition, newPosition);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -749,43 +750,43 @@ void CANTalon::SetEncPosition(int newPosition) {
  *
  * @returns The value (0 - 1023) on the analog pin of the Talon.
  */
-int CANTalon::GetEncVel() const {
-  int vel;
+int32_t CANTalon::GetEncVel() const {
+  int32_t vel;
   CTR_Code status = m_impl->GetEncVel(vel);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
   return vel;
 }
-int CANTalon::GetPulseWidthPosition() const {
-  int param;
+int32_t CANTalon::GetPulseWidthPosition() const {
+  int32_t param;
   CTR_Code status = m_impl->GetPulseWidthPosition(param);
   if (status != CTR_OKAY)
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   return param;
 }
-void CANTalon::SetPulseWidthPosition(int newPosition) {
+void CANTalon::SetPulseWidthPosition(int32_t newPosition) {
   CTR_Code status = m_impl->SetParam(CanTalonSRX::ePwdPosition, newPosition);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
 }
-int CANTalon::GetPulseWidthVelocity() const {
-  int param;
+int32_t CANTalon::GetPulseWidthVelocity() const {
+  int32_t param;
   CTR_Code status = m_impl->GetPulseWidthVelocity(param);
   if (status != CTR_OKAY)
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   return param;
 }
-int CANTalon::GetPulseWidthRiseToFallUs() const {
-  int param;
+int32_t CANTalon::GetPulseWidthRiseToFallUs() const {
+  int32_t param;
   CTR_Code status = m_impl->GetPulseWidthRiseToFallUs(param);
   if (status != CTR_OKAY)
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   return param;
 }
-int CANTalon::GetPulseWidthRiseToRiseUs() const {
-  int param;
+int32_t CANTalon::GetPulseWidthRiseToRiseUs() const {
+  int32_t param;
   CTR_Code status = m_impl->GetPulseWidthRiseToRiseUs(param);
   if (status != CTR_OKAY)
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -799,7 +800,7 @@ int CANTalon::GetPulseWidthRiseToRiseUs() const {
 CANTalon::FeedbackDeviceStatus CANTalon::IsSensorPresent(
     FeedbackDevice feedbackDevice) const {
   FeedbackDeviceStatus retval = FeedbackStatusUnknown;
-  int param;
+  int32_t param;
   /* detecting sensor health depends on which sensor caller cares about */
   switch (feedbackDevice) {
     case QuadEncoder:
@@ -836,8 +837,8 @@ CANTalon::FeedbackDeviceStatus CANTalon::IsSensorPresent(
 /**
  * @return IO level of QUADA pin.
  */
-int CANTalon::GetPinStateQuadA() const {
-  int retval;
+int32_t CANTalon::GetPinStateQuadA() const {
+  int32_t retval;
   CTR_Code status = m_impl->GetQuadApin(retval);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -848,8 +849,8 @@ int CANTalon::GetPinStateQuadA() const {
 /**
  * @return IO level of QUADB pin.
  */
-int CANTalon::GetPinStateQuadB() const {
-  int retval;
+int32_t CANTalon::GetPinStateQuadB() const {
+  int32_t retval;
   CTR_Code status = m_impl->GetQuadBpin(retval);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -860,8 +861,8 @@ int CANTalon::GetPinStateQuadB() const {
 /**
  * @return IO level of QUAD Index pin.
  */
-int CANTalon::GetPinStateQuadIdx() const {
-  int retval;
+int32_t CANTalon::GetPinStateQuadIdx() const {
+  int32_t retval;
   CTR_Code status = m_impl->GetQuadIdxpin(retval);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -873,8 +874,8 @@ int CANTalon::GetPinStateQuadIdx() const {
  * @return '1' iff forward limit switch is closed, 0 iff switch is open.
  * This function works regardless if limit switch feature is enabled.
  */
-int CANTalon::IsFwdLimitSwitchClosed() const {
-  int retval;
+int32_t CANTalon::IsFwdLimitSwitchClosed() const {
+  int32_t retval;
   CTR_Code status = m_impl->GetLimitSwitchClosedFor(
       retval); /* rename this func, '1' => open, '0' => closed */
   if (status != CTR_OKAY) {
@@ -887,8 +888,8 @@ int CANTalon::IsFwdLimitSwitchClosed() const {
  * @return '1' iff reverse limit switch is closed, 0 iff switch is open.
  * This function works regardless if limit switch feature is enabled.
  */
-int CANTalon::IsRevLimitSwitchClosed() const {
-  int retval;
+int32_t CANTalon::IsRevLimitSwitchClosed() const {
+  int32_t retval;
   CTR_Code status = m_impl->GetLimitSwitchClosedRev(
       retval); /* rename this func, '1' => open, '0' => closed */
   if (status != CTR_OKAY) {
@@ -901,8 +902,8 @@ int CANTalon::IsRevLimitSwitchClosed() const {
  * Simple accessor for tracked rise eventso index pin.
  * @return number of rising edges on idx pin.
  */
-int CANTalon::GetNumberOfQuadIdxRises() const {
-  int rises;
+int32_t CANTalon::GetNumberOfQuadIdxRises() const {
+  int32_t rises;
   CTR_Code status = m_impl->GetEncIndexRiseEvents(
       rises); /* rename this func, '1' => open, '0' => closed */
   if (status != CTR_OKAY) {
@@ -915,7 +916,7 @@ int CANTalon::GetNumberOfQuadIdxRises() const {
  * @param rises integral value to set into index-rises register.  Great way to
  *              zero the index count.
  */
-void CANTalon::SetNumberOfQuadIdxRises(int rises) {
+void CANTalon::SetNumberOfQuadIdxRises(int32_t rises) {
   CTR_Code status = m_impl->SetParam(
       CanTalonSRX::eEncIndexRiseEvents,
       rises); /* rename this func, '1' => open, '0' => closed */
@@ -928,8 +929,8 @@ void CANTalon::SetNumberOfQuadIdxRises(int rises) {
  * TODO documentation (see CANJaguar.cpp)
  */
 bool CANTalon::GetForwardLimitOK() const {
-  int limSwit = 0;
-  int softLim = 0;
+  int32_t limSwit = 0;
+  int32_t softLim = 0;
   CTR_Code status = CTR_OKAY;
   status = m_impl->GetFault_ForSoftLim(softLim);
   if (status != CTR_OKAY) {
@@ -947,8 +948,8 @@ bool CANTalon::GetForwardLimitOK() const {
  * TODO documentation (see CANJaguar.cpp)
  */
 bool CANTalon::GetReverseLimitOK() const {
-  int limSwit = 0;
-  int softLim = 0;
+  int32_t limSwit = 0;
+  int32_t softLim = 0;
   CTR_Code status = CTR_OKAY;
   status = m_impl->GetFault_RevSoftLim(softLim);
   if (status != CTR_OKAY) {
@@ -967,7 +968,7 @@ bool CANTalon::GetReverseLimitOK() const {
  */
 uint16_t CANTalon::GetFaults() const {
   uint16_t retval = 0;
-  int val;
+  int32_t val;
   CTR_Code status = CTR_OKAY;
 
   /* temperature */
@@ -1017,7 +1018,7 @@ uint16_t CANTalon::GetFaults() const {
 
 uint16_t CANTalon::GetStickyFaults() const {
   uint16_t retval = 0;
-  int val;
+  int32_t val;
   CTR_Code status = CTR_OKAY;
 
   /* temperature */
@@ -1122,7 +1123,7 @@ void CANTalon::SetCloseLoopRampRate(double rampRate) {
  * @return The version of the firmware running on the Talon
  */
 uint32_t CANTalon::GetFirmwareVersion() const {
-  int firmwareVersion;
+  int32_t firmwareVersion;
   CTR_Code status = m_impl->RequestParam(CanTalonSRX::eFirmVers);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -1147,7 +1148,7 @@ uint32_t CANTalon::GetFirmwareVersion() const {
 /**
  * @return The accumulator for I gain.
  */
-int CANTalon::GetIaccum() const {
+int32_t CANTalon::GetIaccum() const {
   CTR_Code status = m_impl->RequestParam(CanTalonSRX::ePidIaccum);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -1155,7 +1156,7 @@ int CANTalon::GetIaccum() const {
   // small yield for getting response
   std::this_thread::sleep_for(
       std::chrono::microseconds(kDelayForSolicitedSignalsUs));
-  int iaccum;
+  int32_t iaccum;
   status = m_impl->GetParamResponseInt32(CanTalonSRX::ePidIaccum, iaccum);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -1203,8 +1204,8 @@ void CANTalon::ConfigNeutralMode(NeutralMode mode) {
  * @return nonzero if brake is enabled during neutral.  Zero if coast is enabled
  * during neutral.
  */
-int CANTalon::GetBrakeEnableDuringNeutral() const {
-  int brakeEn = 0;
+int32_t CANTalon::GetBrakeEnableDuringNeutral() const {
+  int32_t brakeEn = 0;
   CTR_Code status = m_impl->GetBrakeIsEnabled(brakeEn);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -1275,7 +1276,7 @@ void CANTalon::DisableSoftPositionLimits() {
 void CANTalon::ConfigLimitSwitchOverrides(bool bForwardLimitSwitchEn,
                                           bool bReverseLimitSwitchEn) {
   CTR_Code status = CTR_OKAY;
-  int fwdRevEnable;
+  int32_t fwdRevEnable;
   /* chose correct signal value based on caller's requests enables */
   if (!bForwardLimitSwitchEn) {
     /* caller wants Forward Limit Switch OFF */
@@ -1847,7 +1848,7 @@ void CANTalon::EnableZeroSensorPositionOnIndex(bool enable, bool risingEdge) {
  * Ideally the period should be no more than half the period of a trajectory
  * point.
  */
-void CANTalon::ChangeMotionControlFramePeriod(int periodMs) {
+void CANTalon::ChangeMotionControlFramePeriod(int32_t periodMs) {
   m_impl->ChangeMotionControlFramePeriod(periodMs);
 }
 
@@ -1871,7 +1872,7 @@ void CANTalon::ClearMotionProfileTrajectories() {
  *
  * @return number of trajectory points in the top buffer.
  */
-int CANTalon::GetMotionProfileTopLevelBufferCount() {
+int32_t CANTalon::GetMotionProfileTopLevelBufferCount() {
   return m_impl->GetMotionProfileTopLevelBufferCount();
 }
 

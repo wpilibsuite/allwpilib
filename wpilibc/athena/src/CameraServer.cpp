@@ -36,11 +36,12 @@ CameraServer::CameraServer()
       m_autoCaptureStarted(false),
       m_hwClient(true),
       m_imageData(nullptr, 0, 0, false) {
-  for (int i = 0; i < 3; i++) m_dataPool.push_back(new uint8_t[kMaxImageSize]);
+  for (int32_t i = 0; i < 3; i++)
+    m_dataPool.push_back(new uint8_t[kMaxImageSize]);
 }
 
 void CameraServer::FreeImageData(
-    std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData) {
+    std::tuple<uint8_t*, uint32_t, uint32_t, bool> imageData) {
   if (std::get<3>(imageData))
     imaqDispose(std::get<0>(imageData));
   else if (std::get<0>(imageData) != nullptr) {
@@ -49,8 +50,8 @@ void CameraServer::FreeImageData(
   }
 }
 
-void CameraServer::SetImageData(uint8_t* data, unsigned int size,
-                                unsigned int start, bool imaqData) {
+void CameraServer::SetImageData(uint8_t* data, uint32_t size, uint32_t start,
+                                bool imaqData) {
   std::lock_guard<priority_recursive_mutex> lock(m_imageMutex);
   FreeImageData(m_imageData);
   m_imageData = std::make_tuple(data, size, start, imaqData);
@@ -58,7 +59,7 @@ void CameraServer::SetImageData(uint8_t* data, unsigned int size,
 }
 
 void CameraServer::SetImage(Image const* image) {
-  unsigned int dataSize = 0;
+  uint32_t dataSize = 0;
   uint8_t* data =
       (uint8_t*)imaqFlatten(image, IMAQ_FLATTEN_IMAGE, IMAQ_COMPRESSION_JPEG,
                             10 * m_quality, &dataSize);
@@ -70,7 +71,7 @@ void CameraServer::SetImage(Image const* image) {
     std::lock_guard<priority_recursive_mutex> lock(m_imageMutex);
     hwClient = m_hwClient;
   }
-  unsigned int start = 0;
+  uint32_t start = 0;
   if (hwClient) {
     while (start < dataSize - 1) {
       if (data[start] == 0xFF && data[start + 1] == 0xD8)
@@ -101,7 +102,7 @@ void CameraServer::AutoCapture() {
     }
 
     if (hwClient) {
-      unsigned int size = m_camera->GetImageData(data, kMaxImageSize);
+      uint32_t size = m_camera->GetImageData(data, kMaxImageSize);
       SetImageData(data, size);
     } else {
       m_camera->GetImage(frame);
@@ -134,7 +135,7 @@ bool CameraServer::IsAutoCaptureStarted() {
   return m_autoCaptureStarted;
 }
 
-void CameraServer::SetSize(unsigned int size) {
+void CameraServer::SetSize(uint32_t size) {
   std::lock_guard<priority_recursive_mutex> lock(m_imageMutex);
   if (!m_camera) return;
   if (size == kSize160x120)
@@ -145,25 +146,25 @@ void CameraServer::SetSize(unsigned int size) {
     m_camera->SetSize(640, 480);
 }
 
-void CameraServer::SetQuality(unsigned int quality) {
+void CameraServer::SetQuality(uint32_t quality) {
   std::lock_guard<priority_recursive_mutex> lock(m_imageMutex);
   m_quality = quality > 100 ? 100 : quality;
 }
 
-unsigned int CameraServer::GetQuality() {
+uint32_t CameraServer::GetQuality() {
   std::lock_guard<priority_recursive_mutex> lock(m_imageMutex);
   return m_quality;
 }
 
 void CameraServer::Serve() {
-  int sock = socket(AF_INET, SOCK_STREAM, 0);
+  int32_t sock = socket(AF_INET, SOCK_STREAM, 0);
 
   if (sock == -1) {
     wpi_setErrnoError();
     return;
   }
 
-  int reuseAddr = 1;
+  int32_t reuseAddr = 1;
   if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuseAddr,
                  sizeof(reuseAddr)) == -1)
     wpi_setErrnoError();
@@ -183,7 +184,7 @@ void CameraServer::Serve() {
   while (true) {
     socklen_t clientAddressLen = sizeof(clientAddress);
 
-    int conn =
+    int32_t conn =
         accept(sock, (struct sockaddr*)&clientAddress, &clientAddressLen);
     if (conn == -1) {
       wpi_setErrnoError();
@@ -238,7 +239,7 @@ void CameraServer::Serve() {
     auto period = std::chrono::microseconds(1000000) / req.fps;
     while (true) {
       auto startTime = std::chrono::steady_clock::now();
-      std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData;
+      std::tuple<uint8_t*, uint32_t, uint32_t, bool> imageData;
       {
         std::unique_lock<priority_recursive_mutex> lock(m_imageMutex);
         m_newImageVariable.wait(lock);
@@ -246,9 +247,9 @@ void CameraServer::Serve() {
         m_imageData = std::make_tuple<uint8_t*>(nullptr, 0, 0, false);
       }
 
-      unsigned int size = std::get<1>(imageData);
-      unsigned int netSize = htonl(size);
-      unsigned int start = std::get<2>(imageData);
+      uint32_t size = std::get<1>(imageData);
+      uint32_t netSize = htonl(size);
+      uint32_t start = std::get<2>(imageData);
       uint8_t* data = std::get<0>(imageData);
 
       if (data == nullptr) continue;

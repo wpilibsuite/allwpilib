@@ -46,7 +46,7 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort(
   SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Pointer = "
                             << solenoid_port_pointer;
 
-  int *asints = (int *)solenoid_port_pointer;
+  int32_t *asints = (int32_t *)solenoid_port_pointer;
   SOLENOIDJNI_LOG(logDEBUG) << '\t' << asints[0] << '\t' << asints[1]
                             << std::endl;
 

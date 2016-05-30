@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 /*  Constants */
 #define LOG_DEBUG __FILE__, __FUNCTION__, __LINE__, DEBUG_TYPE
 #define LOG_INFO __FILE__, __FUNCTION__, __LINE__, INFO_TYPE
@@ -44,7 +46,7 @@ void SetDebugFlag(DebugOutputType flag);
 void dprintf(const char* tempString, ...); /* Variable argument list */
 
 /* set FRC ranges for drive */
-double RangeToNormalized(double pixel, int range);
+double RangeToNormalized(double pixel, int32_t range);
 /* change normalized value to any range - used for servo */
 float NormalizeToRange(float normalizedValue, float minRange, float maxRange);
 float NormalizeToRange(float normalizedValue);
@@ -62,6 +64,6 @@ void panForTarget(Servo* panServo);
 void panForTarget(Servo* panServo, double sinStart);
 
 /* config file read utilities */
-int processFile(char* inputFile, char* outputString, int lineNumber);
-int emptyString(char* string);
+int32_t processFile(char* inputFile, char* outputString, int32_t lineNumber);
+int32_t emptyString(char* string);
 void stripString(char* string);

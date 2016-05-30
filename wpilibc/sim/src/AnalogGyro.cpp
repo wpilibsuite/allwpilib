@@ -26,11 +26,11 @@ const float AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
  * this is typically done when the robot is first turned on while it's sitting
  * at rest before the competition starts.
  */
-void AnalogGyro::InitAnalogGyro(int channel) {
+void AnalogGyro::InitAnalogGyro(int32_t channel) {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
   char buffer[50];
-  int n = sprintf(buffer, "analog/%d", channel);
+  int32_t n = sprintf(buffer, "analog/%d", channel);
   impl = new SimGyro(buffer);
 
   LiveWindow::GetInstance()->AddSensor("AnalogGyro", channel, this);

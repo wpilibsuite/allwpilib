@@ -46,21 +46,20 @@ void SetDebugFlag(DebugOutputType flag) { dprintfFlag = flag; }
  *
  * @param tempString The format string.
  */
-void dprintf(const char* tempString, ...) /* Variable argument list */
-{
-  va_list args;    /* Input argument list */
-  int line_number; /* Line number passed in argument */
-  int type;
+void dprintf(const char* tempString, ...) {
+  va_list args;        /* Input argument list */
+  int32_t line_number; /* Line number passed in argument */
+  int32_t type;
   const char* functionName; /* Format passed in argument */
   const char* fmt;          /* Format passed in argument */
   char text[512];           /* Text string */
   char outtext[512];        /* Text string */
   FILE* outfile_fd;         /* Output file pointer */
   char filepath[128];       /* Text string */
-  int fatalFlag = 0;
+  int32_t fatalFlag = 0;
   const char* filename;
-  int index;
-  int tempStringLen;
+  int32_t index;
+  int32_t tempStringLen;
 
   if (dprintfFlag == DEBUG_OFF) {
     return;
@@ -84,10 +83,10 @@ void dprintf(const char* tempString, ...) /* Variable argument list */
   functionName = va_arg(args, const char*);
 
   /* Extract line number from argument list */
-  line_number = va_arg(args, int);
+  line_number = va_arg(args, int32_t);
 
   /* Extract information type from argument list */
-  type = va_arg(args, int);
+  type = va_arg(args, int32_t);
 
   /* Extract format from argument list */
   fmt = va_arg(args, const char*);
@@ -165,7 +164,7 @@ void dprintf(const char* tempString, ...) /* Variable argument list */
  * @param range    The size of the range that position is in
  * @return The normalized position from -1 to +1
  */
-double RangeToNormalized(double position, int range) {
+double RangeToNormalized(double position, int32_t range) {
   return (((position * 2.0) / (double)range) - 1.0);
 }
 
@@ -193,7 +192,7 @@ float NormalizeToRange(float normalizedValue) {
 */
 void ShowActivity(char* fmt, ...) {
   static char activity_indication_string[] = "|/-\\";
-  static int ai = 3;
+  static int32_t ai = 3;
   va_list args;
   char text[1024];
 
@@ -291,14 +290,14 @@ void panForTarget(Servo* panServo, double sinStart) {
  * @param outputString one string
  * @param lineNumber   if 0, return number of lines; else return that line
  *                     number
- * @return int number of lines or -1 if error
+ * @return int32_t number of lines or -1 if error
  **/
-int processFile(char* inputFile, char* outputString, int lineNumber) {
+int32_t processFile(char* inputFile, char* outputString, int32_t lineNumber) {
   FILE* infile;
-  const int stringSize = 80;  // max size of one line in file
+  const int32_t stringSize = 80;  // max size of one line in file
   char inputStr[stringSize];
   inputStr[0] = '\0';
-  int lineCount = 0;
+  int32_t lineCount = 0;
 
   if (lineNumber < 0) return (-1);
 
@@ -339,8 +338,8 @@ int processFile(char* inputFile, char* outputString, int lineNumber) {
  * Ignore empty string.
  * @param string to check if empty
  **/
-int emptyString(char* string) {
-  int i, len;
+int32_t emptyString(char* string) {
+  int32_t i, len;
 
   if (string == nullptr) return (1);
 
@@ -360,7 +359,7 @@ int emptyString(char* string) {
  * @param string to process
  **/
 void stripString(char* string) {
-  int i, j, len;
+  int32_t i, j, len;
 
   if (string == nullptr) return;
 

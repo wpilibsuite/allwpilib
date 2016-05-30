@@ -439,7 +439,7 @@ void Encoder::SetReverseDirection(bool reverseDirection) {
  *
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
-void Encoder::SetSamplesToAverage(int samplesToAverage) {
+void Encoder::SetSamplesToAverage(int32_t samplesToAverage) {
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     wpi_setWPIErrorWithContext(
         ParameterOutOfRange,
@@ -467,8 +467,8 @@ void Encoder::SetSamplesToAverage(int samplesToAverage) {
  *
  * @return The number of samples being averaged (from 1 to 127)
  */
-int Encoder::GetSamplesToAverage() const {
-  int result = 1;
+int32_t Encoder::GetSamplesToAverage() const {
+  int32_t result = 1;
   int32_t status = 0;
   switch (m_encodingType) {
     case k4X:

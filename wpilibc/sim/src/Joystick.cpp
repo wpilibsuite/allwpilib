@@ -55,7 +55,7 @@ Joystick::Joystick(uint32_t port, uint32_t numAxisTypes,
                    uint32_t numButtonTypes)
     : m_port(port), m_ds(DriverStation::GetInstance()) {
   if (!joySticksInitialized) {
-    for (unsigned i = 0; i < DriverStation::kJoystickPorts; i++)
+    for (uint32_t i = 0; i < DriverStation::kJoystickPorts; i++)
       joysticks[i] = nullptr;
     joySticksInitialized = true;
   }
@@ -208,7 +208,7 @@ bool Joystick::GetRawButton(uint32_t button) const {
  *
  * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
  */
-int Joystick::GetPOV(uint32_t pov) const {
+int32_t Joystick::GetPOV(uint32_t pov) const {
   return 0;  // TODO
 }
 

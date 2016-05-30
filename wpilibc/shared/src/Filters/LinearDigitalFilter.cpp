@@ -119,7 +119,7 @@ LinearDigitalFilter LinearDigitalFilter::HighPass(
  *               slower
  */
 LinearDigitalFilter LinearDigitalFilter::MovingAverage(
-    std::shared_ptr<PIDSource> source, unsigned int taps) {
+    std::shared_ptr<PIDSource> source, uint32_t taps) {
   assert(taps > 0);
 
   std::vector<double> gains(taps, 1.0 / taps);
@@ -130,10 +130,10 @@ double LinearDigitalFilter::Get() const {
   double retVal = 0.0;
 
   // Calculate the new value
-  for (unsigned int i = 0; i < m_inputGains.size(); i++) {
+  for (size_t i = 0; i < m_inputGains.size(); i++) {
     retVal += m_inputs[i] * m_inputGains[i];
   }
-  for (unsigned int i = 0; i < m_outputGains.size(); i++) {
+  for (size_t i = 0; i < m_outputGains.size(); i++) {
     retVal -= m_outputs[i] * m_outputGains[i];
   }
 
@@ -157,10 +157,10 @@ double LinearDigitalFilter::PIDGet() {
   m_inputs.PushFront(PIDGetSource());
 
   // Calculate the new value
-  for (unsigned int i = 0; i < m_inputGains.size(); i++) {
+  for (size_t i = 0; i < m_inputGains.size(); i++) {
     retVal += m_inputs[i] * m_inputGains[i];
   }
-  for (unsigned int i = 0; i < m_outputGains.size(); i++) {
+  for (size_t i = 0; i < m_outputGains.size(); i++) {
     retVal -= m_outputs[i] * m_outputGains[i];
   }
 
