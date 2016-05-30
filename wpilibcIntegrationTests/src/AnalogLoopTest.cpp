@@ -41,7 +41,7 @@ class AnalogLoopTest : public testing::Test {
  */
 TEST_F(AnalogLoopTest, AnalogInputWorks) {
   // Set the output voltage and check if the input measures the same voltage
-  for (int i = 0; i < 50; i++) {
+  for (int32_t i = 0; i < 50; i++) {
     m_output->SetVoltage(i / 10.0f);
 
     Wait(kDelayTime);
@@ -91,7 +91,7 @@ TEST_F(AnalogLoopTest, AnalogTriggerCounterWorks) {
   Counter counter(trigger);
 
   // Turn the analog output low and high 50 times
-  for (int i = 0; i < 50; i++) {
+  for (int32_t i = 0; i < 50; i++) {
     m_output->SetVoltage(1.0);
     Wait(kDelayTime);
     m_output->SetVoltage(4.0);
@@ -104,15 +104,15 @@ TEST_F(AnalogLoopTest, AnalogTriggerCounterWorks) {
 }
 
 static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
-  *(int*)param = 12345;
+  *(int32_t*)param = 12345;
 }
 
 TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
-  int param = 0;
+  int32_t param = 0;
   AnalogTrigger trigger(m_input);
   trigger.SetLimitsVoltage(2.0f, 3.0f);
 
-  // Given an interrupt handler that sets an int to 12345
+  // Given an interrupt handler that sets an int32_t to 12345
   std::shared_ptr<AnalogTriggerOutput> triggerOutput =
       trigger.CreateOutput(kState);
   triggerOutput->RequestInterrupts(InterruptHandler, &param);
@@ -124,7 +124,7 @@ TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
   m_output->SetVoltage(5.0);
   triggerOutput->CancelInterrupts();
 
-  // Then the int should be 12345
+  // Then the int32_t should be 12345
   Wait(kDelayTime);
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }

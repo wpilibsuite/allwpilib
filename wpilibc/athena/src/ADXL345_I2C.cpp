@@ -23,7 +23,7 @@ constexpr double ADXL345_I2C::kGsPerLSB;
  * @param range         The range (+ or -) that the accelerometer will measure
  * @param deviceAddress The I2C address of the accelerometer (0x1D or 0x53)
  */
-ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
+ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, uint32_t deviceAddress)
     : m_i2c(port, deviceAddress) {
   // Turn on the measurements
   m_i2c.Write(kPowerCtlRegister, kPowerCtl_Measure);

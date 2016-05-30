@@ -33,8 +33,9 @@ class CommandTest : public testing::Test {
    */
   void TeardownScheduler() { Scheduler::GetInstance()->ResetAll(); }
 
-  void AssertCommandState(MockCommand& command, int initialize, int execute,
-                          int isFinished, int end, int interrupted) {
+  void AssertCommandState(MockCommand& command, int32_t initialize,
+                          int32_t execute, int32_t isFinished, int32_t end,
+                          int32_t interrupted) {
     EXPECT_EQ(initialize, command.GetInitializeCount());
     EXPECT_EQ(execute, command.GetExecuteCount());
     EXPECT_EQ(isFinished, command.GetIsFinishedCount());

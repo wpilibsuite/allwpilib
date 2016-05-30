@@ -30,5 +30,5 @@ class GenericHID {
   virtual bool GetBumper(JoystickHand hand = kRightHand) const = 0;
   virtual bool GetRawButton(uint32_t button) const = 0;
 
-  virtual int GetPOV(uint32_t pov = 0) const = 0;
+  virtual int32_t GetPOV(uint32_t pov = 0) const = 0;
 };

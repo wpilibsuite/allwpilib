@@ -71,7 +71,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   CommandGroup* GetGroup() const;
   void SetRunWhenDisabled(bool run);
   bool WillRunWhenDisabled() const;
-  int GetID() const;
+  int32_t GetID() const;
 
  protected:
   void SetTimeout(double timeout);
@@ -163,8 +163,8 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   /** The {@link CommandGroup} this is in */
   CommandGroup* m_parent = nullptr;
 
-  int m_commandID = m_commandCounter++;
-  static int m_commandCounter;
+  int32_t m_commandID = m_commandCounter++;
+  static int32_t m_commandCounter;
 
  public:
   virtual std::string GetName() const;

@@ -47,7 +47,7 @@ static bool verifyPWMChannel(DigitalPort* port, int32_t* status) {
  * @param channel The PWM channel to set.
  * @param value The PWM value to set.
  */
-void setPWM(void* digital_port_pointer, unsigned short value, int32_t* status) {
+void setPWM(void* digital_port_pointer, uint16_t value, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
   if (!verifyPWMChannel(port, status)) {
     return;
@@ -66,7 +66,7 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t* status) {
  * @param channel The PWM channel to read from.
  * @return The raw PWM value.
  */
-unsigned short getPWM(void* digital_port_pointer, int32_t* status) {
+uint16_t getPWM(void* digital_port_pointer, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
   if (!verifyPWMChannel(port, status)) {
     return 0;
@@ -130,7 +130,7 @@ bool allocatePWMChannel(void* digital_port_pointer, int32_t* status) {
         ~0ul)
       return false;
     uint32_t bitToSet = 1 << remapMXPPWMChannel(port->port.pin);
-    short specialFunctions =
+    uint16_t specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
                                                  status);
@@ -149,7 +149,7 @@ void freePWMChannel(void* digital_port_pointer, int32_t* status) {
   if (port->port.pin > tPWM::kNumHdrRegisters - 1) {
     DIOChannels->Free(remapMXPPWMChannel(port->port.pin) + 10);
     uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->port.pin);
-    short specialFunctions =
+    uint16_t specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,
                                                  status);

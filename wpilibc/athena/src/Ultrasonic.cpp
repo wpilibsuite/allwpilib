@@ -71,7 +71,7 @@ void Ultrasonic::Initialize() {
   m_enabled = true;  // make it available for round robin scheduling
   SetAutomaticMode(originalMode);
 
-  static int instances = 0;
+  static int32_t instances = 0;
   instances++;
   HALReport(HALUsageReporting::kResourceType_Ultrasonic, instances);
   LiveWindow::GetInstance()->AddSensor("Ultrasonic",

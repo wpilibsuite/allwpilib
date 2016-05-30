@@ -9,7 +9,7 @@
 
 #include "ctre/PDP.h"
 
-static const int NUM_MODULE_NUMBERS = 63;
+static const int32_t NUM_MODULE_NUMBERS = 63;
 
 static PDP* pdp[NUM_MODULE_NUMBERS] = {nullptr};
 

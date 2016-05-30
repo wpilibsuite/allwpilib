@@ -84,7 +84,7 @@ class LinearDigitalFilter : public Filter {
   static LinearDigitalFilter HighPass(std::shared_ptr<PIDSource> source,
                                       double timeConstant, double period);
   static LinearDigitalFilter MovingAverage(std::shared_ptr<PIDSource> source,
-                                           unsigned int taps);
+                                           uint32_t taps);
 
   // Filter interface
   double Get() const override;

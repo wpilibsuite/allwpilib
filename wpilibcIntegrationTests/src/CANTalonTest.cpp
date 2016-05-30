@@ -12,7 +12,7 @@
 #include "TestBench.h"
 #include "Timer.h"
 
-const int deviceId = 0;
+const int32_t deviceId = 0;
 
 TEST(CANTalonTest, QuickTest) {
   double throttle = 0.1;

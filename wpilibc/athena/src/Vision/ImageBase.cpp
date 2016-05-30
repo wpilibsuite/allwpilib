@@ -35,7 +35,7 @@ ImageBase::~ImageBase() {
  * @param fileName The name of the file to write
  */
 void ImageBase::Write(const char* fileName) {
-  int success = imaqWriteFile(m_imaqImage, fileName, nullptr);
+  int32_t success = imaqWriteFile(m_imaqImage, fileName, nullptr);
   wpi_setImaqErrorWithContext(success, "Imaq Image writeFile error");
 }
 
@@ -44,8 +44,8 @@ void ImageBase::Write(const char* fileName) {
  *
  * @return The height of the image in pixels.
  */
-int ImageBase::GetHeight() {
-  int height;
+int32_t ImageBase::GetHeight() {
+  int32_t height;
   imaqGetImageSize(m_imaqImage, nullptr, &height);
   return height;
 }
@@ -55,8 +55,8 @@ int ImageBase::GetHeight() {
  *
  * @return The width of the image in pixels.
  */
-int ImageBase::GetWidth() {
-  int width;
+int32_t ImageBase::GetWidth() {
+  int32_t width;
   imaqGetImageSize(m_imaqImage, &width, nullptr);
   return width;
 }

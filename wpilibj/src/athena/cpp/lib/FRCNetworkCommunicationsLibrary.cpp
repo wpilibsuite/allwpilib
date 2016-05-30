@@ -105,7 +105,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetw
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_FRCNetworkCommunicationReserve(
     JNIEnv *, jclass) {
-  int rv = HALInitialize(0);
+  int32_t rv = HALInitialize(0);
   assert(1 == rv);
 }
 

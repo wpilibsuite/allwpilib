@@ -18,7 +18,7 @@
  * @param offset    The angular value (in desired units) representing the
  *                  angular output at 0V.
  */
-AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
+AnalogPotentiometer::AnalogPotentiometer(int32_t channel, double fullRange,
                                          double offset)
     : m_analog_input(std::make_unique<AnalogInput>(channel)),
       m_fullRange(fullRange),

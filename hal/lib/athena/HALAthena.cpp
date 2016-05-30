@@ -226,27 +226,28 @@ bool getFPGAButton(int32_t* status) {
   return global->readUserButton(status);
 }
 
-int HALSetErrorData(const char* errors, int errorsLength, int wait_ms) {
+int32_t HALSetErrorData(const char* errors, int32_t errorsLength,
+                        int32_t wait_ms) {
   return setErrorData(errors, errorsLength, wait_ms);
 }
 
-int HALSendError(int isError, int32_t errorCode, int isLVCode,
-                 const char* details, const char* location,
-                 const char* callStack, int printMsg) {
+int32_t HALSendError(int32_t isError, int32_t errorCode, int32_t isLVCode,
+                     const char* details, const char* location,
+                     const char* callStack, int32_t printMsg) {
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
-  static constexpr int KEEP_MSGS = 5;
+  static constexpr int32_t KEEP_MSGS = 5;
   std::lock_guard<priority_mutex> lock(msgMutex);
   static std::string prev_msg[KEEP_MSGS];
   static uint64_t prev_msg_time[KEEP_MSGS] = {0, 0, 0};
 
   int32_t status = 0;
   uint64_t curTime = getFPGATime(&status);
-  int i;
+  int32_t i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prev_msg[i] == details) break;
   }
-  int retval = 0;
+  int32_t retval = 0;
   if (i == KEEP_MSGS || (curTime - prev_msg_time[i]) >= 1000000) {
     retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
                                                 details, location, callStack);
@@ -263,7 +264,7 @@ int HALSendError(int isError, int32_t errorCode, int isLVCode,
       // replace the oldest one
       i = 0;
       uint64_t first = prev_msg_time[0];
-      for (int j = 1; j < KEEP_MSGS; ++j) {
+      for (int32_t j = 1; j < KEEP_MSGS; ++j) {
         if (prev_msg_time[j] < first) {
           first = prev_msg_time[j];
           i = j;
@@ -306,7 +307,7 @@ static void timerRollover(uint64_t currentTime, void*) {
 /**
  * Call this to start up HAL. This is required for robot programs.
  */
-int HALInitialize(int mode) {
+int32_t HALInitialize(int32_t mode) {
   setlinebuf(stdin);
   setlinebuf(stdout);
 

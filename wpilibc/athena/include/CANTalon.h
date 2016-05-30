@@ -118,7 +118,7 @@ class CANTalon : public MotorSafety,
      * Value should be between 1ms and 255ms.  If value is zero
      * then Talon will default to 1ms.  If value exceeds 255ms API will cap it.
      */
-    unsigned int timeDurMs;
+    uint32_t timeDurMs;
     /**
      * Which slot to get PIDF gains.
      * PID is used for position servo.
@@ -126,7 +126,7 @@ class CANTalon : public MotorSafety,
      * Typically this is hardcoded to the a particular slot, but you are free
      * gain schedule if need be.
      */
-    unsigned int profileSlotSelect;
+    uint32_t profileSlotSelect;
     /**
      * Set to true to only perform the velocity feed-forward and not perform
      * position servo.  This is useful when learning how the position servo
@@ -180,15 +180,15 @@ class CANTalon : public MotorSafety,
      * them into the Talon's low-level buffer, allowing the Talon to act on
      * them.
      */
-    unsigned int topBufferRem;
+    uint32_t topBufferRem;
     /**
      * The number of points in the top trajectory buffer.
      */
-    unsigned int topBufferCnt;
+    uint32_t topBufferCnt;
     /**
      * The number of points in the low level Talon buffer.
      */
-    unsigned int btmBufferCnt;
+    uint32_t btmBufferCnt;
     /**
      * Set if isUnderrun ever gets set.
      * Only is cleared by clearMotionProfileHasUnderrun() to ensure
@@ -220,8 +220,8 @@ class CANTalon : public MotorSafety,
      */
     SetValueMotionProfile outputEnable;
   };
-  explicit CANTalon(int deviceNumber);
-  explicit CANTalon(int deviceNumber, int controlPeriodMs);
+  explicit CANTalon(int32_t deviceNumber);
+  explicit CANTalon(int32_t deviceNumber, int32_t controlPeriodMs);
   DEFAULT_MOVE_CONSTRUCTOR(CANTalon);
   virtual ~CANTalon();
 
@@ -252,7 +252,7 @@ class CANTalon : public MotorSafety,
   virtual void SetI(double i) override;
   virtual void SetD(double d) override;
   void SetF(double f);
-  void SetIzone(unsigned iz);
+  void SetIzone(uint32_t iz);
   virtual void SetPID(double p, double i, double d) override;
   virtual void SetPID(double p, double i, double d, double f);
   virtual double GetP() const override;
@@ -267,27 +267,27 @@ class CANTalon : public MotorSafety,
   void SetPosition(double pos);
   virtual double GetPosition() const override;
   virtual double GetSpeed() const override;
-  virtual int GetClosedLoopError() const;
+  virtual int32_t GetClosedLoopError() const;
   virtual void SetAllowableClosedLoopErr(uint32_t allowableCloseLoopError);
-  virtual int GetAnalogIn() const;
-  virtual void SetAnalogPosition(int newPosition);
-  virtual int GetAnalogInRaw() const;
-  virtual int GetAnalogInVel() const;
-  virtual int GetEncPosition() const;
+  virtual int32_t GetAnalogIn() const;
+  virtual void SetAnalogPosition(int32_t newPosition);
+  virtual int32_t GetAnalogInRaw() const;
+  virtual int32_t GetAnalogInVel() const;
+  virtual int32_t GetEncPosition() const;
   virtual void SetEncPosition(int);
-  virtual int GetEncVel() const;
-  int GetPinStateQuadA() const;
-  int GetPinStateQuadB() const;
-  int GetPinStateQuadIdx() const;
-  int IsFwdLimitSwitchClosed() const;
-  int IsRevLimitSwitchClosed() const;
-  int GetNumberOfQuadIdxRises() const;
-  void SetNumberOfQuadIdxRises(int rises);
-  virtual int GetPulseWidthPosition() const;
-  virtual void SetPulseWidthPosition(int newpos);
-  virtual int GetPulseWidthVelocity() const;
-  virtual int GetPulseWidthRiseToFallUs() const;
-  virtual int GetPulseWidthRiseToRiseUs() const;
+  virtual int32_t GetEncVel() const;
+  int32_t GetPinStateQuadA() const;
+  int32_t GetPinStateQuadB() const;
+  int32_t GetPinStateQuadIdx() const;
+  int32_t IsFwdLimitSwitchClosed() const;
+  int32_t IsRevLimitSwitchClosed() const;
+  int32_t GetNumberOfQuadIdxRises() const;
+  void SetNumberOfQuadIdxRises(int32_t rises);
+  virtual int32_t GetPulseWidthPosition() const;
+  virtual void SetPulseWidthPosition(int32_t newpos);
+  virtual int32_t GetPulseWidthVelocity() const;
+  virtual int32_t GetPulseWidthRiseToFallUs() const;
+  virtual int32_t GetPulseWidthRiseToRiseUs() const;
   virtual FeedbackDeviceStatus IsSensorPresent(
       FeedbackDevice feedbackDevice) const;
   virtual bool GetForwardLimitOK() const override;
@@ -352,16 +352,16 @@ class CANTalon : public MotorSafety,
   virtual void ConfigFaultTime(float faultTime) override;
   virtual void SetControlMode(ControlMode mode);
   void SetFeedbackDevice(FeedbackDevice device);
-  void SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs);
+  void SetStatusFrameRateMs(StatusFrameRate stateFrame, int32_t periodMs);
   virtual ControlMode GetControlMode() const;
   void SetSensorDirection(bool reverseSensor);
   void SetClosedLoopOutputDirection(bool reverseOutput);
   void SetCloseLoopRampRate(double rampRate);
-  void SelectProfileSlot(int slotIdx);
-  int GetIzone() const;
-  int GetIaccum() const;
+  void SelectProfileSlot(int32_t slotIdx);
+  int32_t GetIzone() const;
+  int32_t GetIaccum() const;
   void ClearIaccum();
-  int GetBrakeEnableDuringNeutral() const;
+  int32_t GetBrakeEnableDuringNeutral() const;
 
   bool IsControlEnabled() const;
   bool IsEnabled() const override;
@@ -373,7 +373,7 @@ class CANTalon : public MotorSafety,
    * Profile.  Ideally the period should be no more than half the period of a
    * trajectory point.
    */
-  void ChangeMotionControlFramePeriod(int periodMs);
+  void ChangeMotionControlFramePeriod(int32_t periodMs);
 
   /**
    * Clear the buffered motion profile in both Talon RAM (bottom), and in the
@@ -389,7 +389,7 @@ class CANTalon : public MotorSafety,
    * being emptied into Talon's RAM. Otherwise just use GetMotionProfileStatus.
    * @return number of trajectory points in the top buffer.
    */
-  int GetMotionProfileTopLevelBufferCount();
+  int32_t GetMotionProfileTopLevelBufferCount();
 
   /**
    * Push another trajectory point into the top level buffer (which is emptied
@@ -465,11 +465,11 @@ class CANTalon : public MotorSafety,
     kDisabled = 15
   };
 
-  int m_deviceNumber;
+  int32_t m_deviceNumber;
   std::unique_ptr<CanTalonSRX> m_impl;
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
-  int m_profile = 0;  // Profile from CANTalon to use. Set to zero until we can
-                      // actually test this.
+  int32_t m_profile = 0;  // Profile from CANTalon to use. Set to zero until we
+                          // can actually test this.
 
   bool m_controlEnabled = true;
   bool m_stopped = false;
@@ -500,7 +500,7 @@ class CANTalon : public MotorSafety,
    */
   FeedbackDevice m_feedbackDevice = QuadEncoder;
 
-  static constexpr unsigned int kDelayForSolicitedSignalsUs = 4000;
+  static constexpr uint32_t kDelayForSolicitedSignalsUs = 4000;
   /**
    * @param devToLookup FeedbackDevice to lookup the scalar for.  Because Talon
    *                    allows multiple sensors to be attached simultaneously,

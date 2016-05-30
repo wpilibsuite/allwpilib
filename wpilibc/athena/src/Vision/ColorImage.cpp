@@ -20,14 +20,15 @@ ColorImage::ColorImage(ImageType type) : ImageBase(type) {}
  * @param colorMode The type of colorspace this operation should be performed in
  * @return a pointer to a binary image
  */
-BinaryImage* ColorImage::ComputeThreshold(ColorMode colorMode, int low1,
-                                          int high1, int low2, int high2,
-                                          int low3, int high3) {
+BinaryImage* ColorImage::ComputeThreshold(ColorMode colorMode, int32_t low1,
+                                          int32_t high1, int32_t low2,
+                                          int32_t high2, int32_t low3,
+                                          int32_t high3) {
   auto result = new BinaryImage();
   Range range1 = {low1, high1}, range2 = {low2, high2}, range3 = {low3, high3};
 
-  int success = imaqColorThreshold(result->GetImaqImage(), m_imaqImage, 1,
-                                   colorMode, &range1, &range2, &range3);
+  int32_t success = imaqColorThreshold(result->GetImaqImage(), m_imaqImage, 1,
+                                       colorMode, &range1, &range2, &range3);
   wpi_setImaqErrorWithContext(success, "ImaqThreshold error");
   return result;
 }
@@ -44,9 +45,9 @@ BinaryImage* ColorImage::ComputeThreshold(ColorMode colorMode, int low1,
  * @return A pointer to a BinaryImage that represents the result of the
  *         threshold operation.
  */
-BinaryImage* ColorImage::ThresholdRGB(int redLow, int redHigh, int greenLow,
-                                      int greenHigh, int blueLow,
-                                      int blueHigh) {
+BinaryImage* ColorImage::ThresholdRGB(int32_t redLow, int32_t redHigh,
+                                      int32_t greenLow, int32_t greenHigh,
+                                      int32_t blueLow, int32_t blueHigh) {
   return ComputeThreshold(IMAQ_RGB, redLow, redHigh, greenLow, greenHigh,
                           blueLow, blueHigh);
 }
@@ -75,9 +76,11 @@ BinaryImage* ColorImage::ThresholdRGB(Threshold& t) {
  * @return a pointer to a BinaryImage that represents the result of the
  *         threshold operation.
  */
-BinaryImage* ColorImage::ThresholdHSL(int hueLow, int hueHigh,
-                                      int saturationLow, int saturationHigh,
-                                      int luminenceLow, int luminenceHigh) {
+BinaryImage* ColorImage::ThresholdHSL(int32_t hueLow, int32_t hueHigh,
+                                      int32_t saturationLow,
+                                      int32_t saturationHigh,
+                                      int32_t luminenceLow,
+                                      int32_t luminenceHigh) {
   return ComputeThreshold(IMAQ_HSL, hueLow, hueHigh, saturationLow,
                           saturationHigh, luminenceLow, luminenceHigh);
 }
@@ -106,9 +109,10 @@ BinaryImage* ColorImage::ThresholdHSL(Threshold& t) {
  * @return a pointer to a BinaryImage that represents the result of the
  *         threshold operation.
  */
-BinaryImage* ColorImage::ThresholdHSV(int hueLow, int hueHigh,
-                                      int saturationLow, int saturationHigh,
-                                      int valueLow, int valueHigh) {
+BinaryImage* ColorImage::ThresholdHSV(int32_t hueLow, int32_t hueHigh,
+                                      int32_t saturationLow,
+                                      int32_t saturationHigh, int32_t valueLow,
+                                      int32_t valueHigh) {
   return ComputeThreshold(IMAQ_HSV, hueLow, hueHigh, saturationLow,
                           saturationHigh, valueLow, valueHigh);
 }
@@ -137,9 +141,11 @@ BinaryImage* ColorImage::ThresholdHSV(Threshold& t) {
  * @return a pointer to a BinaryImage that represents the result of the
  *         threshold operation.
  */
-BinaryImage* ColorImage::ThresholdHSI(int hueLow, int hueHigh,
-                                      int saturationLow, int saturationHigh,
-                                      int intensityLow, int intensityHigh) {
+BinaryImage* ColorImage::ThresholdHSI(int32_t hueLow, int32_t hueHigh,
+                                      int32_t saturationLow,
+                                      int32_t saturationHigh,
+                                      int32_t intensityLow,
+                                      int32_t intensityHigh) {
   return ComputeThreshold(IMAQ_HSI, hueLow, hueHigh, saturationLow,
                           saturationHigh, intensityLow, intensityHigh);
 }
@@ -163,10 +169,10 @@ BinaryImage* ColorImage::ThresholdHSI(Threshold& t) {
  * @param planeNumber Which plane is to be extracted
  * @return A pointer to a MonoImage that represents the extracted plane.
  */
-MonoImage* ColorImage::ExtractColorPlane(ColorMode mode, int planeNumber) {
+MonoImage* ColorImage::ExtractColorPlane(ColorMode mode, int32_t planeNumber) {
   auto result = new MonoImage();
   if (m_imaqImage == nullptr) wpi_setWPIError(NullParameter);
-  int success = imaqExtractColorPlanes(
+  int32_t success = imaqExtractColorPlanes(
       m_imaqImage, mode, (planeNumber == 1) ? result->GetImaqImage() : nullptr,
       (planeNumber == 2) ? result->GetImaqImage() : nullptr,
       (planeNumber == 3) ? result->GetImaqImage() : nullptr);
@@ -295,8 +301,8 @@ MonoImage* ColorImage::GetIntensityPlane() {
  * @param planeNumber The plane number (1, 2, 3) to replace
  */
 void ColorImage::ReplacePlane(ColorMode mode, MonoImage* plane,
-                              int planeNumber) {
-  int success = imaqReplaceColorPlanes(
+                              int32_t planeNumber) {
+  int32_t success = imaqReplaceColorPlanes(
       m_imaqImage, (const Image*)m_imaqImage, mode,
       (planeNumber == 1) ? plane->GetImaqImage() : nullptr,
       (planeNumber == 2) ? plane->GetImaqImage() : nullptr,
@@ -475,8 +481,8 @@ void ColorImage::ReplaceIntensityPlane(MonoImage* plane) {
 // to imaqColorEqualize.
 void ColorImage::Equalize(bool allPlanes) {
   // Note that this call uses NI-defined TRUE and FALSE
-  int success = imaqColorEqualize(m_imaqImage, (const Image*)m_imaqImage,
-                                  (allPlanes) ? TRUE : FALSE);
+  int32_t success = imaqColorEqualize(m_imaqImage, (const Image*)m_imaqImage,
+                                      (allPlanes) ? TRUE : FALSE);
   wpi_setImaqErrorWithContext(success, "Imaq ColorEqualize error");
 }
 

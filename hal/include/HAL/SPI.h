@@ -21,8 +21,8 @@ int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize);
 int32_t spiRead(uint8_t port, uint8_t* buffer, uint8_t count);
 void spiClose(uint8_t port);
 void spiSetSpeed(uint8_t port, uint32_t speed);
-void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing,
-                int clk_idle_high);
+void spiSetOpts(uint8_t port, int32_t msb_first, int32_t sample_on_trailing,
+                int32_t clk_idle_high);
 void spiSetChipSelectActiveHigh(uint8_t port, int32_t* status);
 void spiSetChipSelectActiveLow(uint8_t port, int32_t* status);
 int32_t spiGetHandle(uint8_t port);

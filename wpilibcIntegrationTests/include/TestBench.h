@@ -71,6 +71,6 @@ class TestBench {
   static constexpr double kSinglePoleIIRExpectedOutput = -3.2172003;
   static constexpr double kHighPassTimeConstant = 0.006631;
   static constexpr double kHighPassExpectedOutput = 10.074717;
-  static constexpr int kMovAvgTaps = 6;
+  static constexpr int32_t kMovAvgTaps = 6;
   static constexpr double kMovAvgExpectedOutput = -10.191644;
 };

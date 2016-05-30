@@ -12,7 +12,7 @@
 #include "Vision/FrcError.h"
 #include "Vision/VisionAPI.h"
 
-int VisionAPI_debugFlag = 1;
+int32_t VisionAPI_debugFlag = 1;
 #define DPRINTF \
   if (VisionAPI_debugFlag) dprintf
 
@@ -45,7 +45,7 @@ Image* frcCreateImage(ImageType type) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcDispose(void* object) { return imaqDispose(object); }
+int32_t frcDispose(void* object) { return imaqDispose(object); }
 
 /**
  * @brief Dispose of a list of objects. Supports any object created on the heap.
@@ -58,11 +58,10 @@ int frcDispose(void* object) { return imaqDispose(object); }
  * @return On success: 1. On failure: 0. To get extended error information, call
  * GetLastError().
  */
-int frcDispose(const char* functionName, ...) /* Variable argument list */
-{
+int32_t frcDispose(const char* functionName, ...) {
   va_list disposalPtrList; /* Input argument list */
   void* disposalPtr;       /* For iteration */
-  int success, returnValue = 1;
+  int32_t success, returnValue = 1;
 
   va_start(disposalPtrList, functionName); /* start of variable list */
   disposalPtr = va_arg(disposalPtrList, void*);
@@ -90,7 +89,7 @@ int frcDispose(const char* functionName, ...) /* Variable argument list */
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcCopyImage(Image* dest, const Image* source) {
+int32_t frcCopyImage(Image* dest, const Image* source) {
   return imaqDuplicate(dest, source);
 }
 
@@ -106,7 +105,7 @@ int frcCopyImage(Image* dest, const Image* source) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcCrop(Image* dest, const Image* source, Rect rect) {
+int32_t frcCrop(Image* dest, const Image* source, Rect rect) {
   return imaqScale(dest, source, 1, 1, IMAQ_SCALE_LARGER, rect);
 }
 
@@ -124,8 +123,8 @@ int frcCrop(Image* dest, const Image* source, Rect rect) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcScale(Image* dest, const Image* source, int xScale, int yScale,
-             ScalingMode scaleMode) {
+int32_t frcScale(Image* dest, const Image* source, int32_t xScale,
+                 int32_t yScale, ScalingMode scaleMode) {
   Rect rect = IMAQ_NO_RECT;
   return imaqScale(dest, source, xScale, yScale, scaleMode, rect);
 }
@@ -143,7 +142,7 @@ int frcScale(Image* dest, const Image* source, int xScale, int yScale,
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcReadImage(Image* image, const char* fileName) {
+int32_t frcReadImage(Image* image, const char* fileName) {
   return imaqReadFile(image, fileName, nullptr, nullptr);
 }
 
@@ -177,7 +176,7 @@ int frcReadImage(Image* image, const char* fileName) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcWriteImage(const Image* image, const char* fileName) {
+int32_t frcWriteImage(const Image* image, const char* fileName) {
   RGBValue* colorTable = nullptr;
   return imaqWriteFile(image, fileName, colorTable);
 }
@@ -214,16 +213,16 @@ int frcWriteImage(const Image* image, const char* fileName) {
  *         by calling frcDispose(). On failure, this function returns nullptr.
  *         To get extended error information, call GetLastError().
  */
-HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
+HistogramReport* frcHistogram(const Image* image, int32_t numClasses, float min,
                               float max) {
   Rect rect = IMAQ_NO_RECT;
   return frcHistogram(image, numClasses, min, max, rect);
 }
 
-HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
+HistogramReport* frcHistogram(const Image* image, int32_t numClasses, float min,
                               float max, Rect rect) {
-  int success;
-  int fillValue = 1;
+  int32_t success;
+  int32_t fillValue = 1;
 
   /* create the region of interest */
   ROI* pRoi = imaqCreateROI();
@@ -275,12 +274,12 @@ HistogramReport* frcHistogram(const Image* image, int numClasses, float min,
  *         On failure, this function returns nullptr. To get extended error
  *         information, call imaqGetLastError().
  */
-ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
+ColorHistogramReport* frcColorHistogram(const Image* image, int32_t numClasses,
                                         ColorMode mode) {
   return frcColorHistogram(image, numClasses, mode, nullptr);
 }
 
-ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
+ColorHistogramReport* frcColorHistogram(const Image* image, int32_t numClasses,
                                         ColorMode mode, Image* mask) {
   return imaqColorHistogram2((Image*)image, numClasses, mode, nullptr, mask);
 }
@@ -301,7 +300,7 @@ ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcGetPixelValue(const Image* image, Point pixel, PixelValue* value) {
+int32_t frcGetPixelValue(const Image* image, Point pixel, PixelValue* value) {
   return imaqGetPixel(image, pixel, value);
 }
 
@@ -327,19 +326,21 @@ int frcGetPixelValue(const Image* image, Point pixel, PixelValue* value) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcParticleFilter(Image* dest, Image* source,
-                      const ParticleFilterCriteria2* criteria,
-                      int criteriaCount, const ParticleFilterOptions* options,
-                      int* numParticles) {
+int32_t frcParticleFilter(Image* dest, Image* source,
+                          const ParticleFilterCriteria2* criteria,
+                          int32_t criteriaCount,
+                          const ParticleFilterOptions* options,
+                          int32_t* numParticles) {
   Rect rect = IMAQ_NO_RECT;
   return frcParticleFilter(dest, source, criteria, criteriaCount, options, rect,
                            numParticles);
 }
 
-int frcParticleFilter(Image* dest, Image* source,
-                      const ParticleFilterCriteria2* criteria,
-                      int criteriaCount, const ParticleFilterOptions* options,
-                      Rect rect, int* numParticles) {
+int32_t frcParticleFilter(Image* dest, Image* source,
+                          const ParticleFilterCriteria2* criteria,
+                          int32_t criteriaCount,
+                          const ParticleFilterOptions* options, Rect rect,
+                          int32_t* numParticles) {
   ROI* roi = imaqCreateROI();
   imaqAddRectContour(roi, rect);
   return imaqParticleFilter3(dest, source, criteria, criteriaCount, options,
@@ -370,12 +371,12 @@ int frcParticleFilter(Image* dest, Image* source,
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcMorphology(Image* dest, Image* source, MorphologyMethod method) {
+int32_t frcMorphology(Image* dest, Image* source, MorphologyMethod method) {
   return imaqMorphology(dest, source, method, nullptr);
 }
 
-int frcMorphology(Image* dest, Image* source, MorphologyMethod method,
-                  const StructuringElement* structuringElement) {
+int32_t frcMorphology(Image* dest, Image* source, MorphologyMethod method,
+                      const StructuringElement* structuringElement) {
   return imaqMorphology(dest, source, method, structuringElement);
 }
 
@@ -397,11 +398,11 @@ int frcMorphology(Image* dest, Image* source, MorphologyMethod method,
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcRejectBorder(Image* dest, Image* source) {
+int32_t frcRejectBorder(Image* dest, Image* source) {
   return imaqRejectBorder(dest, source, TRUE);
 }
 
-int frcRejectBorder(Image* dest, Image* source, int connectivity8) {
+int32_t frcRejectBorder(Image* dest, Image* source, int32_t connectivity8) {
   return imaqRejectBorder(dest, source, connectivity8);
 }
 
@@ -413,7 +414,7 @@ int frcRejectBorder(Image* dest, Image* source, int connectivity8) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcCountParticles(Image* image, int* numParticles) {
+int32_t frcCountParticles(Image* image, int32_t* numParticles) {
   return imaqCountParticles(image, 1, numParticles);
 }
 
@@ -432,12 +433,12 @@ int frcCountParticles(Image* image, int* numParticles) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcParticleAnalysis(Image* image, int particleNumber,
-                        ParticleAnalysisReport* par) {
-  int success = 0;
+int32_t frcParticleAnalysis(Image* image, int32_t particleNumber,
+                            ParticleAnalysisReport* par) {
+  int32_t success = 0;
 
   /* image information */
-  int height, width;
+  int32_t height, width;
   if (!imaqGetImageSize(image, &width, &height)) {
     return success;
   }
@@ -550,12 +551,12 @@ int frcParticleAnalysis(Image* image, int particleNumber,
  *       searchRect = IMAQ_NO_RECT
  *    minMatchScore = DEFAULT_MINMAX_SCORE (800)
  */
-int frcEqualize(Image* dest, const Image* source, float min, float max) {
+int32_t frcEqualize(Image* dest, const Image* source, float min, float max) {
   return frcEqualize(dest, source, min, max, nullptr);
 }
 
-int frcEqualize(Image* dest, const Image* source, float min, float max,
-                const Image* mask) {
+int32_t frcEqualize(Image* dest, const Image* source, float min, float max,
+                    const Image* mask) {
   return imaqEqualize(dest, source, min, max, mask);
 }
 
@@ -573,11 +574,12 @@ int frcEqualize(Image* dest, const Image* source, float min, float max,
  * planes of the image (the default). Set this parameter to FALSE to equalize
  * only the luminance plane.
  */
-int frcColorEqualize(Image* dest, const Image* source) {
+int32_t frcColorEqualize(Image* dest, const Image* source) {
   return imaqColorEqualize(dest, source, TRUE);
 }
 
-int frcColorEqualize(Image* dest, const Image* source, int colorEqualization) {
+int32_t frcColorEqualize(Image* dest, const Image* source,
+                         int32_t colorEqualization) {
   return imaqColorEqualize(dest, source, TRUE);
 }
 
@@ -622,19 +624,19 @@ int frcColorEqualize(Image* dest, const Image* source, int colorEqualization) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcSmartThreshold(Image* dest, const Image* source,
-                      unsigned int windowWidth, unsigned int windowHeight,
-                      LocalThresholdMethod method, double deviationWeight,
-                      ObjectType type) {
+int32_t frcSmartThreshold(Image* dest, const Image* source,
+                          uint32_t windowWidth, uint32_t windowHeight,
+                          LocalThresholdMethod method, double deviationWeight,
+                          ObjectType type) {
   float replaceValue = 1.0;
   return imaqLocalThreshold(dest, source, windowWidth, windowHeight, method,
                             deviationWeight, type, replaceValue);
 }
 
-int frcSmartThreshold(Image* dest, const Image* source,
-                      unsigned int windowWidth, unsigned int windowHeight,
-                      LocalThresholdMethod method, double deviationWeight,
-                      ObjectType type, float replaceValue) {
+int32_t frcSmartThreshold(Image* dest, const Image* source,
+                          uint32_t windowWidth, uint32_t windowHeight,
+                          LocalThresholdMethod method, double deviationWeight,
+                          ObjectType type, float replaceValue) {
   return imaqLocalThreshold(dest, source, windowWidth, windowHeight, method,
                             deviationWeight, type, replaceValue);
 }
@@ -655,9 +657,9 @@ int frcSmartThreshold(Image* dest, const Image* source,
  * @return int - error code: 0 = error. To get extended error information, call
  *         GetLastError().
  */
-int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
-                       float rangeMax) {
-  int newValue = 255;
+int32_t frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
+                           float rangeMax) {
+  int32_t newValue = 255;
   return frcSimpleThreshold(dest, source, rangeMin, rangeMax, newValue);
 }
 
@@ -678,9 +680,9 @@ int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
  * @return int - error code: 0 = error. To get extended error information, call
  *         GetLastError().
  */
-int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
-                       float rangeMax, float newValue) {
-  int useNewValue = TRUE;
+int32_t frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
+                           float rangeMax, float newValue) {
+  int32_t useNewValue = TRUE;
   return imaqThreshold(dest, source, rangeMin, rangeMax, useNewValue, newValue);
 }
 
@@ -707,10 +709,10 @@ int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcColorThreshold(Image* dest, const Image* source, ColorMode mode,
-                      const Range* plane1Range, const Range* plane2Range,
-                      const Range* plane3Range) {
-  int replaceValue = 1;
+int32_t frcColorThreshold(Image* dest, const Image* source, ColorMode mode,
+                          const Range* plane1Range, const Range* plane2Range,
+                          const Range* plane3Range) {
+  int32_t replaceValue = 1;
   return imaqColorThreshold(dest, source, replaceValue, mode, plane1Range,
                             plane2Range, plane3Range);
 }
@@ -741,9 +743,10 @@ int frcColorThreshold(Image* dest, const Image* source, ColorMode mode,
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcColorThreshold(Image* dest, const Image* source, int replaceValue,
-                      ColorMode mode, const Range* plane1Range,
-                      const Range* plane2Range, const Range* plane3Range) {
+int32_t frcColorThreshold(Image* dest, const Image* source,
+                          int32_t replaceValue, ColorMode mode,
+                          const Range* plane1Range, const Range* plane2Range,
+                          const Range* plane3Range) {
   return imaqColorThreshold(dest, source, replaceValue, mode, plane1Range,
                             plane2Range, plane3Range);
 }
@@ -760,12 +763,13 @@ int frcColorThreshold(Image* dest, const Image* source, int replaceValue,
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcHueThreshold(Image* dest, const Image* source, const Range* hueRange) {
+int32_t frcHueThreshold(Image* dest, const Image* source,
+                        const Range* hueRange) {
   return frcHueThreshold(dest, source, hueRange, DEFAULT_SATURATION_THRESHOLD);
 }
 
-int frcHueThreshold(Image* dest, const Image* source, const Range* hueRange,
-                    int minSaturation) {
+int32_t frcHueThreshold(Image* dest, const Image* source, const Range* hueRange,
+                        int32_t minSaturation) {
   // assume HSL mode
   ColorMode mode = IMAQ_HSL;
   // Set saturation 100 - 255
@@ -777,7 +781,7 @@ int frcHueThreshold(Image* dest, const Image* source, const Range* hueRange,
   lumRange.minValue = 100;
   lumRange.maxValue = 255;
   // Replace pixels with 1 if pass threshold filter
-  int replaceValue = 1;
+  int32_t replaceValue = 1;
   return imaqColorThreshold(dest, source, replaceValue, mode, hueRange,
                             &satRange, &lumRange);
 }
@@ -803,8 +807,8 @@ int frcHueThreshold(Image* dest, const Image* source, const Range* hueRange,
  * @return error code: 0 = error. To get extended error information, call
  *         GetLastError().
  */
-int frcExtractColorPlanes(const Image* image, ColorMode mode, Image* plane1,
-                          Image* plane2, Image* plane3) {
+int32_t frcExtractColorPlanes(const Image* image, ColorMode mode, Image* plane1,
+                              Image* plane2, Image* plane3) {
   return imaqExtractColorPlanes(image, mode, plane1, plane2, plane3);
 }
 
@@ -820,10 +824,11 @@ int frcExtractColorPlanes(const Image* image, ColorMode mode, Image* plane1,
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcExtractHuePlane(const Image* image, Image* huePlane) {
+int32_t frcExtractHuePlane(const Image* image, Image* huePlane) {
   return frcExtractHuePlane(image, huePlane, DEFAULT_SATURATION_THRESHOLD);
 }
 
-int frcExtractHuePlane(const Image* image, Image* huePlane, int minSaturation) {
+int32_t frcExtractHuePlane(const Image* image, Image* huePlane,
+                           int32_t minSaturation) {
   return frcExtractColorPlanes(image, IMAQ_HSL, huePlane, nullptr, nullptr);
 }

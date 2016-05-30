@@ -62,9 +62,9 @@ bool getUserActive6V(int32_t* status) {
 /**
  * Get the fault count for the 6V rail
  */
-int getUserCurrentFaults6V(int32_t* status) {
+int32_t getUserCurrentFaults6V(int32_t* status) {
   initializePower(status);
-  return (int)power->readFaultCounts_OverCurrentFaultCount6V(status);
+  return (int32_t)power->readFaultCounts_OverCurrentFaultCount6V(status);
 }
 
 /**
@@ -94,12 +94,12 @@ bool getUserActive5V(int32_t* status) {
 /**
  * Get the fault count for the 5V rail
  */
-int getUserCurrentFaults5V(int32_t* status) {
+int32_t getUserCurrentFaults5V(int32_t* status) {
   initializePower(status);
-  return (int)power->readFaultCounts_OverCurrentFaultCount5V(status);
+  return (int32_t)power->readFaultCounts_OverCurrentFaultCount5V(status);
 }
 
-unsigned char getUserStatus5V(int32_t* status) {
+uint8_t getUserStatus5V(int32_t* status) {
   initializePower(status);
   return power->readStatus_User5V(status);
 }
@@ -131,9 +131,9 @@ bool getUserActive3V3(int32_t* status) {
 /**
  * Get the fault count for the 3.3V rail
  */
-int getUserCurrentFaults3V3(int32_t* status) {
+int32_t getUserCurrentFaults3V3(int32_t* status) {
   initializePower(status);
-  return (int)power->readFaultCounts_OverCurrentFaultCount3V3(status);
+  return (int32_t)power->readFaultCounts_OverCurrentFaultCount3V3(status);
 }
 
 }  // extern "C"

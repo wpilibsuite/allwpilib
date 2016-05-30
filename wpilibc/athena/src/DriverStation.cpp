@@ -39,7 +39,7 @@ DriverStation::DriverStation() {
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to speed controllers.
-  for (unsigned int i = 0; i < kJoystickPorts; i++) {
+  for (uint32_t i = 0; i < kJoystickPorts; i++) {
     m_joystickAxes[i].count = 0;
     m_joystickPOVs[i].count = 0;
     m_joystickButtons[i].count = 0;
@@ -73,7 +73,7 @@ DriverStation::~DriverStation() {
 
 void DriverStation::Run() {
   m_isRunning = true;
-  int period = 0;
+  int32_t period = 0;
   while (m_isRunning) {
     {
       std::unique_lock<priority_mutex> lock(m_packetDataAvailableMutex);

@@ -94,10 +94,10 @@ void wpi_assertEqual_common_impl(const char* valueA, const char* valueB,
  * The users don't call this, but instead use the wpi_assertEqual macros in
  * Utility.h.
  */
-bool wpi_assertEqual_impl(int valueA, int valueB, const char* valueAString,
-                          const char* valueBString, const char* message,
-                          const char* fileName, uint32_t lineNumber,
-                          const char* funcName) {
+bool wpi_assertEqual_impl(int32_t valueA, int32_t valueB,
+                          const char* valueAString, const char* valueBString,
+                          const char* message, const char* fileName,
+                          uint32_t lineNumber, const char* funcName) {
   if (!(valueA == valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "==", message,
                                 fileName, lineNumber, funcName);
@@ -112,10 +112,10 @@ bool wpi_assertEqual_impl(int valueA, int valueB, const char* valueAString,
  * The users don't call this, but instead use the wpi_assertNotEqual macros in
  * Utility.h.
  */
-bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
-                             const char* valueBString, const char* message,
-                             const char* fileName, uint32_t lineNumber,
-                             const char* funcName) {
+bool wpi_assertNotEqual_impl(int32_t valueA, int32_t valueB,
+                             const char* valueAString, const char* valueBString,
+                             const char* message, const char* fileName,
+                             uint32_t lineNumber, const char* funcName) {
   if (!(valueA != valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "!=", message,
                                 fileName, lineNumber, funcName);
@@ -184,7 +184,7 @@ bool GetUserButton() {
 static std::string demangle(char const* mangledSymbol) {
   char buffer[256];
   size_t length;
-  int status;
+  int32_t status;
 
   if (sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer)) {
     char* symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
@@ -207,11 +207,11 @@ static std::string demangle(char const* mangledSymbol) {
  */
 std::string GetStackTrace(uint32_t offset) {
   void* stackTrace[128];
-  int stackSize = backtrace(stackTrace, 128);
+  int32_t stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
   std::stringstream trace;
 
-  for (int i = offset; i < stackSize; i++) {
+  for (int32_t i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
     if (i == 0 || stackTrace[i] != stackTrace[i - 1]) {
       trace << "\tat " << demangle(mangledSymbols[i]) << std::endl;

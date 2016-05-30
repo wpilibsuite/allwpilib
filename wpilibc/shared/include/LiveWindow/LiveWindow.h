@@ -49,10 +49,11 @@ class LiveWindow {
   void AddActuator(const std::string& subsystem, const std::string& name,
                    std::shared_ptr<LiveWindowSendable> component);
 
-  void AddSensor(std::string type, int channel, LiveWindowSendable* component);
-  void AddActuator(std::string type, int channel,
+  void AddSensor(std::string type, int32_t channel,
+                 LiveWindowSendable* component);
+  void AddActuator(std::string type, int32_t channel,
                    LiveWindowSendable* component);
-  void AddActuator(std::string type, int module, int channel,
+  void AddActuator(std::string type, int32_t module, int32_t channel,
                    LiveWindowSendable* component);
 
   bool IsEnabled() const { return m_enabled; }

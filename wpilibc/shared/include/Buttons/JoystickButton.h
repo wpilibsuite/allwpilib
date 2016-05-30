@@ -12,12 +12,12 @@
 
 class JoystickButton : public Button {
  public:
-  JoystickButton(GenericHID* joystick, int buttonNumber);
+  JoystickButton(GenericHID* joystick, int32_t buttonNumber);
   virtual ~JoystickButton() = default;
 
   virtual bool Get();
 
  private:
   GenericHID* m_joystick;
-  int m_buttonNumber;
+  int32_t m_buttonNumber;
 };

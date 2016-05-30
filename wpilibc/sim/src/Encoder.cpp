@@ -41,7 +41,7 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection,
   LiveWindow::GetInstance()->AddSensor("Encoder", channelA, this);
 
   if (channelB < channelA) {  // Swap ports
-    int channel = channelB;
+    int32_t channel = channelB;
     channelB = channelA;
     channelA = channel;
     m_reverseDirection = !reverseDirection;
@@ -49,7 +49,7 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection,
     m_reverseDirection = reverseDirection;
   }
   char buffer[50];
-  int n = sprintf(buffer, "dio/%d/%d", channelA, channelB);
+  int n = std::sprintf(buffer, "dio/%d/%d", channelA, channelB);
   impl = new SimEncoder(buffer);
   impl->Start();
 }

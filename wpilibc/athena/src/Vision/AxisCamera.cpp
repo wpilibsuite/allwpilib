@@ -20,8 +20,8 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
-static const unsigned int kMaxPacketSize = 1536;
-static const unsigned int kImageBufferAllocationIncrement = 1000;
+static const uint32_t kMaxPacketSize = 1536;
+static const uint32_t kImageBufferAllocationIncrement = 1000;
 
 static const std::string kWhiteBalanceStrings[] = {
     "auto",         "hold",         "fixed_outdoor1", "fixed_outdoor2",
@@ -70,7 +70,7 @@ bool AxisCamera::IsFreshImage() const { return m_freshImage; }
  *        RGB image.
  * @return 1 upon success, zero on a failure
  */
-int AxisCamera::GetImage(Image* image) {
+int32_t AxisCamera::GetImage(Image* image) {
   if (m_imageData.size() == 0) {
     return 0;
   }
@@ -91,7 +91,7 @@ int AxisCamera::GetImage(Image* image) {
  *        image
  * @return 1 upon success, zero on a failure
  */
-int AxisCamera::GetImage(ColorImage* image) {
+int32_t AxisCamera::GetImage(ColorImage* image) {
   return GetImage(image->GetImaqImage());
 }
 
@@ -123,8 +123,8 @@ HSLImage* AxisCamera::GetImage() {
  * @param numBytes  The size of the destination image.
  * @return 0 if failed (no source image or no memory), 1 if success.
  */
-int AxisCamera::CopyJPEG(char** destImage, unsigned int& destImageSize,
-                         unsigned int& destImageBufferSize) {
+int32_t AxisCamera::CopyJPEG(char** destImage, uint32_t& destImageSize,
+                             uint32_t& destImageBufferSize) {
   std::lock_guard<priority_mutex> lock(m_imageDataMutex);
   if (destImage == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "destImage must not be nullptr");
@@ -157,7 +157,7 @@ int AxisCamera::CopyJPEG(char** destImage, unsigned int& destImageSize,
  *
  * @param brightness valid values 0 .. 100
  */
-void AxisCamera::WriteBrightness(int brightness) {
+void AxisCamera::WriteBrightness(int32_t brightness) {
   if (brightness < 0 || brightness > 100) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                "Brightness must be from 0 to 100");
@@ -175,7 +175,7 @@ void AxisCamera::WriteBrightness(int brightness) {
 /**
  * @return The configured brightness of the camera images
  */
-int AxisCamera::GetBrightness() {
+int32_t AxisCamera::GetBrightness() {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_brightness;
 }
@@ -207,7 +207,7 @@ AxisCamera::WhiteBalance AxisCamera::GetWhiteBalance() {
  *
  * @param colorLevel valid values are 0 .. 100
  */
-void AxisCamera::WriteColorLevel(int colorLevel) {
+void AxisCamera::WriteColorLevel(int32_t colorLevel) {
   if (colorLevel < 0 || colorLevel > 100) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                "Color level must be from 0 to 100");
@@ -225,7 +225,7 @@ void AxisCamera::WriteColorLevel(int colorLevel) {
 /**
  * @return The configured color level of the camera images
  */
-int AxisCamera::GetColorLevel() {
+int32_t AxisCamera::GetColorLevel() {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_colorLevel;
 }
@@ -261,7 +261,7 @@ AxisCamera::ExposureControl AxisCamera::GetExposureControl() {
  *                         50 = None
  *                         100 = Prioritize frame rate
  */
-void AxisCamera::WriteExposurePriority(int exposurePriority) {
+void AxisCamera::WriteExposurePriority(int32_t exposurePriority) {
   if (exposurePriority != 0 && exposurePriority != 50 &&
       exposurePriority != 100) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
@@ -280,7 +280,7 @@ void AxisCamera::WriteExposurePriority(int exposurePriority) {
 /**
  * @return The configured exposure priority of the camera
  */
-int AxisCamera::GetExposurePriority() {
+int32_t AxisCamera::GetExposurePriority() {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_exposurePriority;
 }
@@ -292,7 +292,7 @@ int AxisCamera::GetExposurePriority() {
  * @param maxFPS The number of frames the camera should send in a second,
  *               exposure permitting.
  */
-void AxisCamera::WriteMaxFPS(int maxFPS) {
+void AxisCamera::WriteMaxFPS(int32_t maxFPS) {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
 
   if (m_maxFPS != maxFPS) {
@@ -305,7 +305,7 @@ void AxisCamera::WriteMaxFPS(int maxFPS) {
 /**
  * @return The configured maximum FPS of the camera
  */
-int AxisCamera::GetMaxFPS() {
+int32_t AxisCamera::GetMaxFPS() {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_maxFPS;
 }
@@ -366,7 +366,7 @@ AxisCamera::Rotation AxisCamera::GetRotation() {
  *
  * @param compression Values between 0 and 100.
  */
-void AxisCamera::WriteCompression(int compression) {
+void AxisCamera::WriteCompression(int32_t compression) {
   if (compression < 0 || compression > 100) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                "Compression must be from 0 to 100");
@@ -385,7 +385,7 @@ void AxisCamera::WriteCompression(int compression) {
 /**
  * @return The configured compression level of the camera
  */
-int AxisCamera::GetCompression() {
+int32_t AxisCamera::GetCompression() {
   std::lock_guard<priority_mutex> lock(m_parametersMutex);
   return m_compression;
 }
@@ -394,7 +394,7 @@ int AxisCamera::GetCompression() {
  * Method called in the capture thread to receive images from the camera
  */
 void AxisCamera::Capture() {
-  int consecutiveErrors = 0;
+  int32_t consecutiveErrors = 0;
 
   // Loop on trying to setup the camera connection. This happens in a background
   // thread so it shouldn't effect the operation of user programs.
@@ -423,18 +423,18 @@ void AxisCamera::Capture() {
  */
 void AxisCamera::ReadImagesFromCamera() {
   char* imgBuffer = nullptr;
-  int imgBufferLength = 0;
+  int32_t imgBufferLength = 0;
 
   // TODO: these recv calls must be non-blocking. Otherwise if the camera
   // fails during a read, the code hangs and never retries when the camera comes
   // back up.
 
-  int counter = 2;
+  int32_t counter = 2;
   while (!m_done) {
     char initialReadBuffer[kMaxPacketSize] = "";
     char intermediateBuffer[1];
     char* trailingPtr = initialReadBuffer;
-    int trailingCounter = 0;
+    int32_t trailingCounter = 0;
     while (counter) {
       // TODO: fix me... this cannot be the most efficient way to approach this,
       // reading one byte at a time.
@@ -464,8 +464,8 @@ void AxisCamera::ReadImagesFromCamera() {
       if (imgBuffer) delete[] imgBuffer;
       return;
     }
-    contentLength = contentLength + 16;    // skip past "content length"
-    int readLength = atol(contentLength);  // get the image byte count
+    contentLength = contentLength + 16;        // skip past "content length"
+    int32_t readLength = atol(contentLength);  // get the image byte count
 
     // Make sure buffer is large enough
     if (imgBufferLength < readLength) {
@@ -479,10 +479,10 @@ void AxisCamera::ReadImagesFromCamera() {
     }
 
     // Read the image data for "Content-Length" bytes
-    int bytesRead = 0;
-    int remaining = readLength;
+    int32_t bytesRead = 0;
+    int32_t remaining = readLength;
     while (bytesRead < readLength) {
-      int bytesThisRecv =
+      int32_t bytesThisRecv =
           recv(m_cameraSocket, &imgBuffer[bytesRead], remaining, 0);
       bytesRead += bytesThisRecv;
       remaining -= bytesThisRecv;
@@ -575,10 +575,10 @@ bool AxisCamera::WriteParameters() {
  *                      recovers.
  * @return -1 if failed, socket handle if successful.
  */
-int AxisCamera::CreateCameraSocket(std::string const& requestString,
-                                   bool setError) {
+int32_t AxisCamera::CreateCameraSocket(std::string const& requestString,
+                                       bool setError) {
   struct addrinfo* address = nullptr;
-  int camSocket;
+  int32_t camSocket;
 
   /* create socket */
   if ((camSocket = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -606,7 +606,8 @@ int AxisCamera::CreateCameraSocket(std::string const& requestString,
 
   freeaddrinfo(address);
 
-  int sent = send(camSocket, requestString.c_str(), requestString.size(), 0);
+  int32_t sent =
+      send(camSocket, requestString.c_str(), requestString.size(), 0);
   if (sent == -1) {
     if (setError)
       wpi_setErrnoErrorWithContext("Failed to send a request to the camera");

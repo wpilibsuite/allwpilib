@@ -162,7 +162,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrupts(
  * Method:    waitForInterrupt
  * Signature: (JD)V
  */
-JNIEXPORT int JNICALL
+JNIEXPORT int32_t JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt(
     JNIEnv* env, jclass, jlong interrupt_pointer, jdouble timeout,
     jboolean ignorePrevious) {
@@ -170,8 +170,8 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt(
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Ptr = " << (void*)interrupt_pointer;
 
   int32_t status = 0;
-  int result = waitForInterrupt((void*)interrupt_pointer, timeout,
-                                ignorePrevious, &status);
+  int32_t result = waitForInterrupt((void*)interrupt_pointer, timeout,
+                                    ignorePrevious, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 

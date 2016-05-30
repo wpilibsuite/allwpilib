@@ -99,7 +99,7 @@ bool Solenoid::Get() const {
  * @return If solenoid is disabled due to short.
  */
 bool Solenoid::IsBlackListed() const {
-  int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
+  int32_t value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
   return (value != 0);
 }
 
