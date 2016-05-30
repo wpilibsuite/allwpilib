@@ -10,7 +10,6 @@
 #include <sstream>
 
 #include "LiveWindow/LiveWindow.h"
-#include "Resource.h"
 #include "WPIErrors.h"
 
 /**
@@ -30,15 +29,15 @@
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-void Encoder::InitEncoder(int32_t channelA, int32_t channelB,
-                          bool reverseDirection, EncodingType encodingType) {
+void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection,
+                          EncodingType encodingType) {
   m_table = nullptr;
   this->channelA = channelA;
   this->channelB = channelB;
   m_encodingType = encodingType;
   m_encodingScale = encodingType == k4X ? 4 : encodingType == k2X ? 2 : 1;
 
-  int32_t index = 0;
+  int index = 0;
   m_distancePerPulse = 1.0;
 
   LiveWindow::GetInstance()->AddSensor("Encoder", channelA, this);
@@ -77,7 +76,7 @@ void Encoder::InitEncoder(int32_t channelA, int32_t channelB,
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
+Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
                  EncodingType encodingType) {
   InitEncoder(aChannel, bChannel, reverseDirection, encodingType);
 }
@@ -204,7 +203,7 @@ double Encoder::DecodingScaleFactor() const {
  *
  * Used to divide raw edge counts down to spec'd counts.
  */
-int32_t Encoder::GetEncodingScale() const { return m_encodingScale; }
+int Encoder::GetEncodingScale() const { return m_encodingScale; }
 
 /**
  * Gets the raw value from the encoder.
@@ -214,7 +213,7 @@ int32_t Encoder::GetEncodingScale() const { return m_encodingScale; }
  *
  * @return Current raw count from the encoder
  */
-int32_t Encoder::GetRaw() const {
+int Encoder::GetRaw() const {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -227,7 +226,7 @@ int32_t Encoder::GetRaw() const {
  * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale
  *         factor.
  */
-int32_t Encoder::Get() const {
+int Encoder::Get() const {
   throw "Simulation doesn't currently support this method.";
 }
 

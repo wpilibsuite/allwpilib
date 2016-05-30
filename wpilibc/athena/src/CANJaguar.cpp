@@ -12,6 +12,7 @@
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
+#include "Resource.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 
@@ -27,20 +28,20 @@
 #define FXP16_EQ(a, b) \
   (static_cast<int32_t>((a)*65536.0) == static_cast<int32_t>((b)*65536.0))
 
-const int32_t CANJaguar::kControllerRate;
+const int CANJaguar::kControllerRate;
 constexpr double CANJaguar::kApproxBusVoltage;
 
-static const int32_t kSendMessagePeriod = 20;
-static const uint32_t kFullMessageIDMask =
+static const int kSendMessagePeriod = 20;
+static const int kFullMessageIDMask =
     (CAN_MSGID_API_M | CAN_MSGID_MFR_M | CAN_MSGID_DTYPE_M);
 
-static const int32_t kReceiveStatusAttempts = 50;
+static const int kReceiveStatusAttempts = 50;
 
 static std::unique_ptr<Resource> allocated;
 
-static int32_t sendMessageHelper(uint32_t messageID, const uint8_t* data,
-                                 uint8_t dataSize, int32_t period) {
-  static const uint32_t kTrustedMessages[] = {
+static int sendMessageHelper(int messageID, const uint8_t* data,
+                             uint8_t dataSize, int period) {
+  static const int kTrustedMessages[] = {
       LM_API_VOLT_T_EN,  LM_API_VOLT_T_SET,  LM_API_SPD_T_EN, LM_API_SPD_T_SET,
       LM_API_VCOMP_T_EN, LM_API_VCOMP_T_SET, LM_API_POS_T_EN, LM_API_POS_T_SET,
       LM_API_ICTRL_T_EN, LM_API_ICTRL_T_SET};
@@ -56,7 +57,7 @@ static int32_t sendMessageHelper(uint32_t messageID, const uint8_t* data,
       // Make sure the data will still fit after adjusting for the token.
       assert(dataSize <= 6);
 
-      for (uint8_t j = 0; j < dataSize; j++) {
+      for (int j = 0; j < dataSize; j++) {
         dataBuffer[j + 2] = data[j];
       }
 
@@ -97,7 +98,7 @@ void CANJaguar::InitCANJaguar() {
     if (!receivedFirmwareVersion &&
         getMessage(CAN_MSGID_API_FIRMVER, CAN_MSGID_FULL_M, dataBuffer,
                    &dataSize)) {
-      m_firmwareVersion = unpackint32_t(dataBuffer);
+      m_firmwareVersion = unpackInt32(dataBuffer);
       receivedFirmwareVersion = true;
     }
 
@@ -180,7 +181,7 @@ void CANJaguar::InitCANJaguar() {
  * @see CANJaguar#SetVoltageMode(EncoderTag, int)
  * @see CANJaguar#SetVoltageMode(QuadEncoderTag, int)
  */
-CANJaguar::CANJaguar(uint8_t deviceNumber) : m_deviceNumber(deviceNumber) {
+CANJaguar::CANJaguar(int deviceNumber) : m_deviceNumber(deviceNumber) {
   std::stringstream buf;
   buf << "CANJaguar device number " << m_deviceNumber;
   Resource::CreateResourceObject(allocated, 63);
@@ -229,7 +230,7 @@ CANJaguar::~CANJaguar() {
 /**
  * @return The CAN ID passed in the constructor
  */
-uint8_t CANJaguar::getDeviceNumber() const { return m_deviceNumber; }
+int CANJaguar::getDeviceNumber() const { return m_deviceNumber; }
 
 /**
  * Sets the output set-point value.
@@ -246,8 +247,8 @@ uint8_t CANJaguar::getDeviceNumber() const { return m_deviceNumber; }
  * @param syncGroup   The update group to add this Set() to, pending
  *                    UpdateSyncGroup().  If 0, update immediately.
  */
-void CANJaguar::Set(float outputValue, uint8_t syncGroup) {
-  uint32_t messageID;
+void CANJaguar::Set(float outputValue, int syncGroup) {
+  int messageID;
   uint8_t dataBuffer[8];
   uint8_t dataSize;
 
@@ -344,30 +345,30 @@ void CANJaguar::PIDWrite(float output) {
   }
 }
 
-uint8_t CANJaguar::packPercentage(uint8_t* buffer, double value) {
+int CANJaguar::packPercentage(uint8_t* buffer, double value) {
   int16_t intValue = static_cast<int16_t>(value * 32767.0);
   *reinterpret_cast<int16_t*>(buffer) = swap16(intValue);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packFXP8_8(uint8_t* buffer, double value) {
+int CANJaguar::packFXP8_8(uint8_t* buffer, double value) {
   int16_t intValue = static_cast<int16_t>(value * 256.0);
   *reinterpret_cast<int16_t*>(buffer) = swap16(intValue);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packFXP16_16(uint8_t* buffer, double value) {
-  int32_t intValue = static_cast<int32_t>(value * 65536.0);
+int CANJaguar::packFXP16_16(uint8_t* buffer, double value) {
+  int intValue = static_cast<int>(value * 65536.0);
   *reinterpret_cast<int32_t*>(buffer) = swap32(intValue);
   return sizeof(int32_t);
 }
 
-uint8_t CANJaguar::packint16_t(uint8_t* buffer, int16_t value) {
+int CANJaguar::packInt16(uint8_t* buffer, int16_t value) {
   *reinterpret_cast<int16_t*>(buffer) = swap16(value);
   return sizeof(int16_t);
 }
 
-uint8_t CANJaguar::packint32_t(uint8_t* buffer, int32_t value) {
+int CANJaguar::packInt32(uint8_t* buffer, int32_t value) {
   *reinterpret_cast<int32_t*>(buffer) = swap32(value);
   return sizeof(int32_t);
 }
@@ -385,17 +386,17 @@ double CANJaguar::unpackFXP8_8(uint8_t* buffer) const {
 }
 
 double CANJaguar::unpackFXP16_16(uint8_t* buffer) const {
-  int32_t value = *reinterpret_cast<int32_t*>(buffer);
+  int value = *reinterpret_cast<int*>(buffer);
   value = swap32(value);
   return value / 65536.0;
 }
 
-int16_t CANJaguar::unpackint16_t(uint8_t* buffer) const {
+int16_t CANJaguar::unpackInt16(uint8_t* buffer) const {
   int16_t value = *reinterpret_cast<int16_t*>(buffer);
   return swap16(value);
 }
 
-int32_t CANJaguar::unpackint32_t(uint8_t* buffer) const {
+int32_t CANJaguar::unpackInt32(uint8_t* buffer) const {
   int32_t value = *reinterpret_cast<int32_t*>(buffer);
   return swap32(value);
 }
@@ -410,9 +411,9 @@ int32_t CANJaguar::unpackint32_t(uint8_t* buffer) const {
  * @param periodic  If positive, tell Network Communications to send the
  *                  message every "period" milliseconds.
  */
-void CANJaguar::sendMessage(uint32_t messageID, const uint8_t* data,
-                            uint8_t dataSize, int32_t period) {
-  int32_t localStatus =
+void CANJaguar::sendMessage(int messageID, const uint8_t* data,
+                            uint8_t dataSize, int period) {
+  int localStatus =
       sendMessageHelper(messageID | m_deviceNumber, data, dataSize, period);
 
   if (localStatus < 0) {
@@ -427,7 +428,7 @@ void CANJaguar::sendMessage(uint32_t messageID, const uint8_t* data,
  * @param periodic  If positive, tell Network Communications to send the
  *                  message every "period" milliseconds.
  */
-void CANJaguar::requestMessage(uint32_t messageID, int32_t period) {
+void CANJaguar::requestMessage(int messageID, int period) {
   sendMessageHelper(messageID | m_deviceNumber, nullptr, 0, period);
 }
 
@@ -444,8 +445,8 @@ void CANJaguar::requestMessage(uint32_t messageID, int32_t period) {
  * @return true if the message was found.  Otherwise, no new message is
  *         available.
  */
-bool CANJaguar::getMessage(uint32_t messageID, uint32_t messageMask,
-                           uint8_t* data, uint8_t* dataSize) const {
+bool CANJaguar::getMessage(int messageID, uint32_t messageMask, uint8_t* data,
+                           uint8_t* dataSize) const {
   uint32_t targetedMessageID = messageID | m_deviceNumber;
   int32_t status = 0;
   uint32_t timeStamp;
@@ -490,7 +491,7 @@ void CANJaguar::setupPeriodicStatus() {
   static const uint8_t kMessage2Data[] = {LM_PSTAT_LIMIT_CLR, LM_PSTAT_FAULT,
                                           LM_PSTAT_END};
 
-  dataSize = packint16_t(data, kSendMessagePeriod);
+  dataSize = packInt16(data, kSendMessagePeriod);
   sendMessage(LM_API_PSTAT_PER_EN_S0, data, dataSize);
   sendMessage(LM_API_PSTAT_PER_EN_S1, data, dataSize);
   sendMessage(LM_API_PSTAT_PER_EN_S2, data, dataSize);
@@ -638,7 +639,7 @@ void CANJaguar::verify() {
 
   if (!m_speedRefVerified) {
     if (getMessage(LM_API_SPD_REF, CAN_MSGID_FULL_M, dataBuffer, &dataSize)) {
-      uint8_t speedRef = dataBuffer[0];
+      int speedRef = dataBuffer[0];
 
       if (m_speedReference == speedRef)
         m_speedRefVerified = true;
@@ -653,7 +654,7 @@ void CANJaguar::verify() {
 
   if (!m_posRefVerified) {
     if (getMessage(LM_API_POS_REF, CAN_MSGID_FULL_M, dataBuffer, &dataSize)) {
-      uint8_t posRef = dataBuffer[0];
+      int posRef = dataBuffer[0];
 
       if (m_positionReference == posRef)
         m_posRefVerified = true;
@@ -667,7 +668,7 @@ void CANJaguar::verify() {
   }
 
   if (!m_pVerified) {
-    uint32_t message = 0;
+    int message = 0;
 
     if (m_controlMode == kSpeed) {
       message = LM_API_SPD_PC;
@@ -697,7 +698,7 @@ void CANJaguar::verify() {
   }
 
   if (!m_iVerified) {
-    uint32_t message = 0;
+    int message = 0;
 
     if (m_controlMode == kSpeed) {
       message = LM_API_SPD_IC;
@@ -727,7 +728,7 @@ void CANJaguar::verify() {
   }
 
   if (!m_dVerified) {
-    uint32_t message = 0;
+    int message = 0;
 
     if (m_controlMode == kSpeed) {
       message = LM_API_SPD_DC;
@@ -775,7 +776,7 @@ void CANJaguar::verify() {
   if (!m_encoderCodesPerRevVerified) {
     if (getMessage(LM_API_CFG_ENC_LINES, CAN_MSGID_FULL_M, dataBuffer,
                    &dataSize)) {
-      uint16_t codes = unpackint16_t(dataBuffer);
+      uint16_t codes = unpackInt16(dataBuffer);
 
       if (codes == m_encoderCodesPerRev)
         m_encoderCodesPerRevVerified = true;
@@ -791,7 +792,7 @@ void CANJaguar::verify() {
   if (!m_potentiometerTurnsVerified) {
     if (getMessage(LM_API_CFG_POT_TURNS, CAN_MSGID_FULL_M, dataBuffer,
                    &dataSize)) {
-      uint16_t turns = unpackint16_t(dataBuffer);
+      uint16_t turns = unpackInt16(dataBuffer);
 
       if (turns == m_potentiometerTurns)
         m_potentiometerTurnsVerified = true;
@@ -912,7 +913,7 @@ void CANJaguar::verify() {
   if (!m_faultTimeVerified) {
     if (getMessage(LM_API_CFG_FAULT_TIME, CAN_MSGID_FULL_M, dataBuffer,
                    &dataSize)) {
-      uint16_t faultTime = unpackint16_t(dataBuffer);
+      uint16_t faultTime = unpackInt16(dataBuffer);
 
       if (static_cast<uint16_t>(m_faultTime * 1000.0) == faultTime) {
         m_faultTimeVerified = true;
@@ -945,7 +946,7 @@ void CANJaguar::verify() {
  *
  * @param reference Specify a speed reference.
  */
-void CANJaguar::SetSpeedReference(uint8_t reference) {
+void CANJaguar::SetSpeedReference(int reference) {
   uint8_t dataBuffer[8];
 
   // Send the speed reference parameter
@@ -962,7 +963,7 @@ void CANJaguar::SetSpeedReference(uint8_t reference) {
  * @return A speed reference indicating the currently selected reference device
  *         for speed controller mode.
  */
-uint8_t CANJaguar::GetSpeedReference() const { return m_speedReference; }
+int CANJaguar::GetSpeedReference() const { return m_speedReference; }
 
 /**
  * Set the reference source device for position controller mode.
@@ -972,7 +973,7 @@ uint8_t CANJaguar::GetSpeedReference() const { return m_speedReference; }
  *
  * @param reference Specify a PositionReference.
  */
-void CANJaguar::SetPositionReference(uint8_t reference) {
+void CANJaguar::SetPositionReference(int reference) {
   uint8_t dataBuffer[8];
 
   // Send the position reference parameter
@@ -989,7 +990,7 @@ void CANJaguar::SetPositionReference(uint8_t reference) {
  * @return A PositionReference indicating the currently selected reference
  * device for position controller mode.
  */
-uint8_t CANJaguar::GetPositionReference() const { return m_positionReference; }
+int CANJaguar::GetPositionReference() const { return m_positionReference; }
 
 /**
  * Set the P, I, and D constants for the closed loop modes.
@@ -1711,7 +1712,7 @@ uint16_t CANJaguar::GetFaults() const {
 void CANJaguar::SetVoltageRampRate(double rampRate) {
   uint8_t dataBuffer[8];
   uint8_t dataSize;
-  uint32_t message;
+  int message;
 
   switch (m_controlMode) {
     case kPercentVbus:
@@ -1741,14 +1742,14 @@ void CANJaguar::SetVoltageRampRate(double rampRate) {
  *
  * @return The firmware version.  0 if the device did not respond.
  */
-uint32_t CANJaguar::GetFirmwareVersion() const { return m_firmwareVersion; }
+int CANJaguar::GetFirmwareVersion() const { return m_firmwareVersion; }
 
 /**
  * Get the version of the Jaguar hardware.
  *
  * @return The hardware version. 1: Jaguar,  2: Black Jaguar
  */
-uint8_t CANJaguar::GetHardwareVersion() const { return m_hardwareVersion; }
+int CANJaguar::GetHardwareVersion() const { return m_hardwareVersion; }
 
 /**
  * Configure what the controller does to the H-Bridge when neutral (not driving
@@ -1778,7 +1779,7 @@ void CANJaguar::ConfigEncoderCodesPerRev(uint16_t codesPerRev) {
   uint8_t dataBuffer[8];
 
   // Set the codes per revolution mode
-  packint16_t(dataBuffer, codesPerRev);
+  packInt16(dataBuffer, codesPerRev);
   sendMessage(LM_API_CFG_ENC_LINES, dataBuffer, sizeof(uint16_t));
 
   m_encoderCodesPerRev = codesPerRev;
@@ -1798,7 +1799,7 @@ void CANJaguar::ConfigPotentiometerTurns(uint16_t turns) {
   uint8_t dataSize;
 
   // Set the pot turns
-  dataSize = packint16_t(dataBuffer, turns);
+  dataSize = packInt16(dataBuffer, turns);
   sendMessage(LM_API_CFG_POT_TURNS, dataBuffer, dataSize);
 
   m_potentiometerTurns = turns;
@@ -1921,7 +1922,7 @@ void CANJaguar::ConfigFaultTime(float faultTime) {
     faultTime = 3.0;
 
   // Message takes ms
-  dataSize = packint16_t(dataBuffer, static_cast<int16_t>(faultTime * 1000.0));
+  dataSize = packInt16(dataBuffer, static_cast<int16_t>(faultTime * 1000.0));
   sendMessage(LM_API_CFG_FAULT_TIME, dataBuffer, dataSize);
 
   m_faultTime = faultTime;
@@ -1965,7 +1966,7 @@ void CANJaguar::GetDescription(std::ostringstream& desc) const {
   desc << "CANJaguar ID " << m_deviceNumber;
 }
 
-uint8_t CANJaguar::GetDeviceID() const { return m_deviceNumber; }
+int CANJaguar::GetDeviceID() const { return m_deviceNumber; }
 
 /**
  * Common interface for stopping the motor until the next Set() command

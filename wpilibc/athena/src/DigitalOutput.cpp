@@ -21,14 +21,14 @@
  * @param channel The digital channel 0-9 are on-board, 10-25 are on the MXP
  *                port
  */
-DigitalOutput::DigitalOutput(uint32_t channel) {
+DigitalOutput::DigitalOutput(int channel) {
   std::stringstream buf;
 
   m_pwmGenerator = HAL_kInvalidHandle;
   if (!CheckDigitalChannel(channel)) {
     buf << "Digital Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
-    m_channel = std::numeric_limits<uint32_t>::max();
+    m_channel = std::numeric_limits<int>::max();
     return;
   }
   m_channel = channel;
@@ -38,7 +38,7 @@ DigitalOutput::DigitalOutput(uint32_t channel) {
   if (status != 0) {
     wpi_setErrorWithContextRange(status, 0, HAL_GetNumDigitalChannels(),
                                  channel, HAL_GetErrorMessage(status));
-    m_channel = std::numeric_limits<uint32_t>::max();
+    m_channel = std::numeric_limits<int>::max();
     m_handle = HAL_kInvalidHandle;
     return;
   }
@@ -78,7 +78,7 @@ void DigitalOutput::Set(bool value) {
    *
    * @return the state of the digital output.
    */
-bool DigitalOutput::Get() {
+bool DigitalOutput::Get() const {
   if (StatusIsFatal()) return false;
 
   int32_t status = 0;
@@ -90,7 +90,7 @@ bool DigitalOutput::Get() {
 /**
  * @return The GPIO channel number that this object represents.
  */
-uint32_t DigitalOutput::GetChannel() const { return m_channel; }
+int DigitalOutput::GetChannel() const { return m_channel; }
 
 /**
  * Output a single pulse on the digital output line.

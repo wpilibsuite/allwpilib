@@ -25,11 +25,11 @@ class DigitalOutput : public DigitalSource,
                       public ITableListener,
                       public LiveWindowSendable {
  public:
-  explicit DigitalOutput(uint32_t channel);
+  explicit DigitalOutput(int channel);
   virtual ~DigitalOutput();
   void Set(bool value);
-  bool Get();
-  uint32_t GetChannel() const override;
+  bool Get() const;
+  int GetChannel() const override;
   void Pulse(float length);
   bool IsPulsing() const;
   void SetPWMRate(float rate);
@@ -52,7 +52,7 @@ class DigitalOutput : public DigitalSource,
   std::shared_ptr<ITable> GetTable() const;
 
  private:
-  uint32_t m_channel;
+  int m_channel;
   HAL_DigitalHandle m_handle;
   HAL_DigitalPWMHandle m_pwmGenerator;
 

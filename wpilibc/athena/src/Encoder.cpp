@@ -68,7 +68,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-Encoder::Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection,
+Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
                  EncodingType encodingType) {
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
@@ -164,9 +164,9 @@ Encoder::~Encoder() {
  *
  * Used to divide raw edge counts down to spec'd counts.
  */
-int32_t Encoder::GetEncodingScale() const {
+int Encoder::GetEncodingScale() const {
   int32_t status = 0;
-  int32_t val = HAL_GetEncoderEncodingScale(m_encoder, &status);
+  int val = HAL_GetEncoderEncodingScale(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
 }
@@ -179,10 +179,10 @@ int32_t Encoder::GetEncodingScale() const {
  *
  * @return Current raw count from the encoder
  */
-int32_t Encoder::GetRaw() const {
+int Encoder::GetRaw() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t value = HAL_GetEncoderRaw(m_encoder, &status);
+  int value = HAL_GetEncoderRaw(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -196,10 +196,10 @@ int32_t Encoder::GetRaw() const {
  * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale
  *         factor.
  */
-int32_t Encoder::Get() const {
+int Encoder::Get() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t value = HAL_GetEncoder(m_encoder, &status);
+  int value = HAL_GetEncoder(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -445,7 +445,7 @@ double Encoder::PIDGet() {
  * @param channel A DIO channel to set as the encoder index
  * @param type    The state that will cause the encoder to reset
  */
-void Encoder::SetIndexSource(uint32_t channel, Encoder::IndexingType type) {
+void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_unique<DigitalInput>(channel);
   SetIndexSource(m_indexSource.get(), type);
@@ -483,9 +483,9 @@ void Encoder::SetIndexSource(const DigitalSource& source,
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-int32_t Encoder::GetFPGAIndex() const {
+int Encoder::GetFPGAIndex() const {
   int32_t status = 0;
-  int32_t val = HAL_GetEncoderFPGAIndex(m_encoder, &status);
+  int val = HAL_GetEncoderFPGAIndex(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
 }

@@ -25,7 +25,7 @@ class AnalogAccelerometer : public SensorBase,
                             public PIDSource,
                             public LiveWindowSendable {
  public:
-  explicit AnalogAccelerometer(int32_t channel);
+  explicit AnalogAccelerometer(int channel);
   explicit AnalogAccelerometer(AnalogInput* channel);
   explicit AnalogAccelerometer(std::shared_ptr<AnalogInput> channel);
   virtual ~AnalogAccelerometer() = default;

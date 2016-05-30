@@ -23,7 +23,7 @@ class Compressor : public SensorBase,
                    public ITableListener {
  public:
   // Default PCM ID is 0
-  explicit Compressor(uint8_t pcmID = GetDefaultSolenoidModule());
+  explicit Compressor(int pcmID = GetDefaultSolenoidModule());
   virtual ~Compressor() = default;
 
   void Start();
@@ -59,7 +59,7 @@ class Compressor : public SensorBase,
 
  private:
   void SetCompressor(bool on);
-  uint8_t m_module;
+  int m_module;
 
   std::shared_ptr<ITable> m_table;
 };

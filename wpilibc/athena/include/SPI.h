@@ -42,27 +42,25 @@ class SPI : public SensorBase {
   void SetChipSelectActiveHigh();
   void SetChipSelectActiveLow();
 
-  virtual int32_t Write(uint8_t* data, uint8_t size);
-  virtual int32_t Read(bool initiate, uint8_t* dataReceived, uint8_t size);
-  virtual int32_t Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
-                              uint8_t size);
+  virtual int Write(uint8_t* data, int size);
+  virtual int Read(bool initiate, uint8_t* dataReceived, int size);
+  virtual int Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size);
 
-  void InitAccumulator(double period, uint32_t cmd, uint8_t xfer_size,
-                       uint32_t valid_mask, uint32_t valid_value,
-                       uint8_t data_shift, uint8_t data_size, bool is_signed,
-                       bool big_endian);
+  void InitAccumulator(double period, int cmd, int xfer_size, int valid_mask,
+                       int valid_value, int data_shift, int data_size,
+                       bool is_signed, bool big_endian);
   void FreeAccumulator();
   void ResetAccumulator();
-  void SetAccumulatorCenter(int32_t center);
-  void SetAccumulatorDeadband(int32_t deadband);
-  int32_t GetAccumulatorLastValue() const;
+  void SetAccumulatorCenter(int center);
+  void SetAccumulatorDeadband(int deadband);
+  int GetAccumulatorLastValue() const;
   int64_t GetAccumulatorValue() const;
   int64_t GetAccumulatorCount() const;
   double GetAccumulatorAverage() const;
   void GetAccumulatorOutput(int64_t& value, int64_t& count) const;
 
  protected:
-  uint8_t m_port;
+  int m_port;
   bool m_msbFirst = false;          // default little-endian
   bool m_sampleOnTrailing = false;  // default data updated on falling edge
   bool m_clk_idle_high = false;     // default clock active high

@@ -20,11 +20,11 @@
 class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
  public:
   PowerDistributionPanel();
-  explicit PowerDistributionPanel(uint8_t module);
+  explicit PowerDistributionPanel(int module);
 
   float GetVoltage() const;
   float GetTemperature() const;
-  float GetCurrent(uint8_t channel) const;
+  float GetCurrent(int channel) const;
   float GetTotalCurrent() const;
   float GetTotalPower() const;
   float GetTotalEnergy() const;
@@ -40,5 +40,5 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
 
  private:
   std::shared_ptr<ITable> m_table;
-  uint8_t m_module;
+  int m_module;
 };

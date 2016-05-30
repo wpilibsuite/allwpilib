@@ -14,6 +14,6 @@
  */
 class Talon : public PWMSpeedController {
  public:
-  explicit Talon(uint32_t channel);
+  explicit Talon(int channel);
   virtual ~Talon() = default;
 };

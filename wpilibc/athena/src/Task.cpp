@@ -18,7 +18,7 @@
 #define ERROR (-1)
 #endif /* ERROR */
 
-const uint32_t Task::kDefaultPriority;
+const int Task::kDefaultPriority;
 
 Task& Task::operator=(Task&& task) {
   m_thread.swap(task.m_thread);
@@ -60,7 +60,7 @@ bool Task::Verify() {
  *
  * @return task priority or 0 if an error occured
  */
-int32_t Task::GetPriority() {
+int Task::GetPriority() {
   int priority;
   auto id = m_thread.native_handle();
   if (HandleError(HAL_GetTaskPriority(&id, &priority)))
@@ -77,7 +77,7 @@ int32_t Task::GetPriority() {
  * @param priority The priority at which the internal thread should run.
  * @return true on success.
  */
-bool Task::SetPriority(int32_t priority) {
+bool Task::SetPriority(int priority) {
   auto id = m_thread.native_handle();
   return HandleError(HAL_SetTaskPriority(&id, priority));
 }

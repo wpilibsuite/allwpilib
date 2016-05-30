@@ -23,12 +23,12 @@ class GenericHID {
   virtual float GetZ() const = 0;
   virtual float GetTwist() const = 0;
   virtual float GetThrottle() const = 0;
-  virtual float GetRawAxis(uint32_t axis) const = 0;
+  virtual float GetRawAxis(int axis) const = 0;
 
   virtual bool GetTrigger(JoystickHand hand = kRightHand) const = 0;
   virtual bool GetTop(JoystickHand hand = kRightHand) const = 0;
   virtual bool GetBumper(JoystickHand hand = kRightHand) const = 0;
-  virtual bool GetRawButton(uint32_t button) const = 0;
+  virtual bool GetRawButton(int button) const = 0;
 
-  virtual int GetPOV(uint32_t pov = 0) const = 0;
+  virtual int GetPOV(int pov = 0) const = 0;
 };

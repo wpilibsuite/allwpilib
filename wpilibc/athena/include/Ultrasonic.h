@@ -47,8 +47,7 @@ class Ultrasonic : public SensorBase,
   Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
              std::shared_ptr<DigitalInput> echoChannel,
              DistanceUnit units = kInches);
-  Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
-             DistanceUnit units = kInches);
+  Ultrasonic(int pingChannel, int echoChannel, DistanceUnit units = kInches);
   virtual ~Ultrasonic();
 
   void Ping();
@@ -79,7 +78,7 @@ class Ultrasonic : public SensorBase,
   // Time (sec) for the ping trigger pulse.
   static constexpr double kPingTime = 10 * 1e-6;
   // Priority that the ultrasonic round robin task runs.
-  static const uint32_t kPriority = 64;
+  static const int kPriority = 64;
   // Max time (ms) between readings.
   static constexpr double kMaxUltrasonicTime = 0.1;
   static constexpr double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;

@@ -17,11 +17,11 @@
 #include "WPIErrors.h"
 #include "simulation/MainNode.h"
 
-const uint32_t DriverStation::kBatteryChannel;
-const uint32_t DriverStation::kJoystickPorts;
-const uint32_t DriverStation::kJoystickAxes;
+const int DriverStation::kBatteryChannel;
+const int DriverStation::kJoystickPorts;
+const int DriverStation::kJoystickAxes;
 const float DriverStation::kUpdatePeriod = 0.02;
-uint8_t DriverStation::m_updateNumber = 0;
+int DriverStation::m_updateNumber = 0;
 
 /**
  * DriverStation contructor.
@@ -78,7 +78,7 @@ float DriverStation::GetBatteryVoltage() const {
  * @param axis  The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
  */
-float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
+float DriverStation::GetStickAxis(int stick, int axis) {
   if (axis < 0 || axis > (kJoystickAxes - 1)) {
     wpi_setWPIError(BadJoystickAxis);
     return 0.0;
@@ -105,7 +105,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
  * @param button The button number to check.
  * @return If the button is pressed.
  */
-bool DriverStation::GetStickButton(uint32_t stick, uint32_t button) {
+bool DriverStation::GetStickButton(int stick, int button) {
   if (stick < 0 || stick >= 6) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                "stick must be between 0 and 5");
@@ -128,7 +128,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint32_t button) {
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
-int16_t DriverStation::GetStickButtons(uint32_t stick) {
+int16_t DriverStation::GetStickButtons(int stick) {
   if (stick < 0 || stick >= 6) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                "stick must be between 0 and 5");
@@ -161,7 +161,7 @@ int16_t DriverStation::GetStickButtons(uint32_t stick) {
  *                Valid range is 1 - 4.
  * @return The analog voltage on the input.
  */
-float DriverStation::GetAnalogIn(uint32_t channel) {
+float DriverStation::GetAnalogIn(int channel) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetAnalogIn");
   return 0.0;
 }
@@ -174,7 +174,7 @@ float DriverStation::GetAnalogIn(uint32_t channel) {
  *
  * @param channel The digital input to get. Valid range is 1 - 8.
  */
-bool DriverStation::GetDigitalIn(uint32_t channel) {
+bool DriverStation::GetDigitalIn(int channel) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalIn");
   return false;
 }
@@ -188,7 +188,7 @@ bool DriverStation::GetDigitalIn(uint32_t channel) {
  * @param channel The digital output to set. Valid range is 1 - 8.
  * @param value   The state to set the digital output.
  */
-void DriverStation::SetDigitalOut(uint32_t channel, bool value) {
+void DriverStation::SetDigitalOut(int channel, bool value) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "SetDigitalOut");
 }
 
@@ -198,7 +198,7 @@ void DriverStation::SetDigitalOut(uint32_t channel, bool value) {
  * @param channel The digital ouput to monitor. Valid range is 1 through 8.
  * @return A digital value being output on the Drivers Station.
  */
-bool DriverStation::GetDigitalOut(uint32_t channel) {
+bool DriverStation::GetDigitalOut(int channel) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalOut");
   return false;
 }
@@ -253,7 +253,7 @@ DriverStation::Alliance DriverStation::GetAlliance() const {
  * This could return 1, 2, or 3.
  * @return The location of the driver station
  */
-uint32_t DriverStation::GetLocation() const {
+int DriverStation::GetLocation() const {
   return -1;  // TODO: Support locations
 }
 
@@ -304,7 +304,7 @@ void DriverStation::ReportWarning(std::string error) {
  * Report an error to the DriverStation messages window.
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(bool is_error, int32_t code,
+void DriverStation::ReportError(bool is_error, int code,
                                 const std::string& error,
                                 const std::string& location,
                                 const std::string& stack) {

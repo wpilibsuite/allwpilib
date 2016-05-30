@@ -21,7 +21,7 @@
  * @param forwardChannel The forward channel number on the PCM (0..7).
  * @param reverseChannel The reverse channel number on the PCM (0..7).
  */
-DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
+DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
     : DoubleSolenoid(GetDefaultSolenoidModule(), forwardChannel,
                      reverseChannel) {}
 
@@ -32,8 +32,8 @@ DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
  * @param forwardChannel The forward channel on the PCM to control (0..7).
  * @param reverseChannel The reverse channel on the PCM to control (0..7).
  */
-DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
-                               uint32_t reverseChannel)
+DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
+                               int reverseChannel)
     : SolenoidBase(moduleNumber),
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
@@ -120,9 +120,9 @@ void DoubleSolenoid::Set(Value value) {
       reverse = true;
       break;
   }
-  int32_t fstatus = 0;
+  int fstatus = 0;
   HAL_SetSolenoid(m_forwardHandle, forward, &fstatus);
-  int32_t rstatus = 0;
+  int rstatus = 0;
   HAL_SetSolenoid(m_reverseHandle, reverse, &rstatus);
 
   wpi_setErrorWithContext(fstatus, HAL_GetErrorMessage(fstatus));
@@ -136,8 +136,8 @@ void DoubleSolenoid::Set(Value value) {
  */
 DoubleSolenoid::Value DoubleSolenoid::Get() const {
   if (StatusIsFatal()) return kOff;
-  int32_t fstatus = 0;
-  int32_t rstatus = 0;
+  int fstatus = 0;
+  int rstatus = 0;
   bool valueForward = HAL_GetSolenoid(m_forwardHandle, &fstatus);
   bool valueReverse = HAL_GetSolenoid(m_reverseHandle, &rstatus);
 

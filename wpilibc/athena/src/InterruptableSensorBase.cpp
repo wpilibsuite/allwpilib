@@ -101,7 +101,7 @@ InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
   if (StatusIsFatal()) return InterruptableSensorBase::kTimeout;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
-  uint32_t result;
+  int result;
 
   result = HAL_WaitForInterrupt(m_interrupt, timeout, ignorePrevious, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

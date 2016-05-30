@@ -23,7 +23,7 @@
  * @param stopBits The number of stop bits to use as defined by the enum
  *                 StopBits.
  */
-SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
+SerialPort::SerialPort(int baudRate, Port port, int dataBits,
                        SerialPort::Parity parity,
                        SerialPort::StopBits stopBits) {
   int32_t status = 0;
@@ -105,9 +105,9 @@ void SerialPort::DisableTermination() {
  *
  * @return The number of bytes available to read
  */
-int32_t SerialPort::GetBytesReceived() {
+int SerialPort::GetBytesReceived() {
   int32_t status = 0;
-  int32_t retVal = HAL_GetSerialBytesReceived(m_port, &status);
+  int retVal = HAL_GetSerialBytesReceived(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -119,9 +119,9 @@ int32_t SerialPort::GetBytesReceived() {
  * @param count  The maximum number of bytes to read.
  * @return The number of bytes actually read into the buffer.
  */
-uint32_t SerialPort::Read(char* buffer, int32_t count) {
+int SerialPort::Read(char* buffer, int count) {
   int32_t status = 0;
-  int32_t retVal = HAL_ReadSerial(m_port, buffer, count, &status);
+  int retVal = HAL_ReadSerial(m_port, buffer, count, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -133,9 +133,9 @@ uint32_t SerialPort::Read(char* buffer, int32_t count) {
  * @param count  The maximum number of bytes to write.
  * @return The number of bytes actually written into the port.
  */
-uint32_t SerialPort::Write(const std::string& buffer, int32_t count) {
+int SerialPort::Write(const std::string& buffer, int count) {
   int32_t status = 0;
-  int32_t retVal = HAL_WriteSerial(m_port, buffer.c_str(), count, &status);
+  int retVal = HAL_WriteSerial(m_port, buffer.c_str(), count, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -166,7 +166,7 @@ void SerialPort::SetTimeout(float timeout) {
  *
  * @param size The read buffer size.
  */
-void SerialPort::SetReadBufferSize(uint32_t size) {
+void SerialPort::SetReadBufferSize(int size) {
   int32_t status = 0;
   HAL_SetSerialReadBufferSize(m_port, size, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -180,7 +180,7 @@ void SerialPort::SetReadBufferSize(uint32_t size) {
  *
  * @param size The write buffer size.
  */
-void SerialPort::SetWriteBufferSize(uint32_t size) {
+void SerialPort::SetWriteBufferSize(int size) {
   int32_t status = 0;
   HAL_SetSerialWriteBufferSize(m_port, size, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

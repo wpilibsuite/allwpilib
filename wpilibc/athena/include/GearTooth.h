@@ -22,7 +22,7 @@ class GearTooth : public Counter {
  public:
   /// 55 uSec for threshold
   static constexpr double kGearToothThreshold = 55e-6;
-  explicit GearTooth(uint32_t channel, bool directionSensitive = false);
+  explicit GearTooth(int channel, bool directionSensitive = false);
   explicit GearTooth(DigitalSource* source, bool directionSensitive = false);
   explicit GearTooth(std::shared_ptr<DigitalSource> source,
                      bool directionSensitive = false);

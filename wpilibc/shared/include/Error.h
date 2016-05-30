@@ -28,7 +28,7 @@ class ErrorBase;
  */
 class Error {
  public:
-  typedef int32_t Code;
+  typedef int Code;
 
   Error() = default;
 
@@ -40,12 +40,12 @@ class Error {
   std::string GetMessage() const;
   std::string GetFilename() const;
   std::string GetFunction() const;
-  uint32_t GetLineNumber() const;
+  int GetLineNumber() const;
   const ErrorBase* GetOriginatingObject() const;
   double GetTimestamp() const;
   void Clear();
   void Set(Code code, llvm::StringRef contextMessage, llvm::StringRef filename,
-           llvm::StringRef function, uint32_t lineNumber,
+           llvm::StringRef function, int lineNumber,
            const ErrorBase* originatingObject);
 
  private:
@@ -55,7 +55,7 @@ class Error {
   std::string m_message;
   std::string m_filename;
   std::string m_function;
-  uint32_t m_lineNumber = 0;
+  int m_lineNumber = 0;
   const ErrorBase* m_originatingObject = nullptr;
   double m_timestamp = 0.0;
 };

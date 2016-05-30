@@ -17,7 +17,7 @@
 
 const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
 
-const uint32_t DriverStation::kJoystickPorts;
+const int DriverStation::kJoystickPorts;
 
 DriverStation::~DriverStation() {
   m_isRunning = false;
@@ -74,7 +74,7 @@ void DriverStation::ReportError(bool is_error, int32_t code,
  * @param axis  The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
  */
-float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
+float DriverStation::GetStickAxis(int stick, int axis) {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
@@ -100,7 +100,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
  *
  * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
  */
-int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
+int DriverStation::GetStickPOV(int stick, int pov) {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
@@ -126,7 +126,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
-uint32_t DriverStation::GetStickButtons(uint32_t stick) const {
+int DriverStation::GetStickButtons(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
@@ -142,7 +142,7 @@ uint32_t DriverStation::GetStickButtons(uint32_t stick) const {
  * @param button The button index, beginning at 1.
  * @return The state of the joystick button.
  */
-bool DriverStation::GetStickButton(uint32_t stick, uint8_t button) {
+bool DriverStation::GetStickButton(int stick, int button) {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
@@ -171,7 +171,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button) {
  * @param stick The joystick port number
  * @return The number of axes on the indicated joystick
  */
-int DriverStation::GetStickAxisCount(uint32_t stick) const {
+int DriverStation::GetStickAxisCount(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
@@ -186,7 +186,7 @@ int DriverStation::GetStickAxisCount(uint32_t stick) const {
  * @param stick The joystick port number
  * @return The number of POVs on the indicated joystick
  */
-int DriverStation::GetStickPOVCount(uint32_t stick) const {
+int DriverStation::GetStickPOVCount(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
@@ -201,7 +201,7 @@ int DriverStation::GetStickPOVCount(uint32_t stick) const {
  * @param stick The joystick port number
  * @return The number of buttons on the indicated joystick
  */
-int DriverStation::GetStickButtonCount(uint32_t stick) const {
+int DriverStation::GetStickButtonCount(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
@@ -216,7 +216,7 @@ int DriverStation::GetStickButtonCount(uint32_t stick) const {
  * @param stick The joystick port number
  * @return A boolean that is true if the controller is an xbox controller.
  */
-bool DriverStation::GetJoystickIsXbox(uint32_t stick) const {
+bool DriverStation::GetJoystickIsXbox(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return false;
@@ -231,7 +231,7 @@ bool DriverStation::GetJoystickIsXbox(uint32_t stick) const {
  * @param stick The joystick port number
  * @return The HID type of joystick at the given port
  */
-int DriverStation::GetJoystickType(uint32_t stick) const {
+int DriverStation::GetJoystickType(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
@@ -246,7 +246,7 @@ int DriverStation::GetJoystickType(uint32_t stick) const {
  * @param stick The joystick port number
  * @return The name of the joystick at the given port
  */
-std::string DriverStation::GetJoystickName(uint32_t stick) const {
+std::string DriverStation::GetJoystickName(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
   }
@@ -261,7 +261,7 @@ std::string DriverStation::GetJoystickName(uint32_t stick) const {
  * @param stick The joystick port number and the target axis
  * @return What type of axis the axis is reporting to be
  */
-int DriverStation::GetJoystickAxisType(uint32_t stick, uint8_t axis) const {
+int DriverStation::GetJoystickAxisType(int stick, int axis) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
@@ -419,7 +419,7 @@ DriverStation::Alliance DriverStation::GetAlliance() const {
  *
  * @return The location of the driver station (1-3, 0 for invalid)
  */
-uint32_t DriverStation::GetLocation() const {
+int DriverStation::GetLocation() const {
   int32_t status = 0;
   auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {

@@ -10,10 +10,10 @@
 #include "I2C.h"
 #include "LiveWindow/LiveWindow.h"
 
-const uint8_t ADXL345_I2C::kAddress;
-const uint8_t ADXL345_I2C::kPowerCtlRegister;
-const uint8_t ADXL345_I2C::kDataFormatRegister;
-const uint8_t ADXL345_I2C::kDataRegister;
+const int ADXL345_I2C::kAddress;
+const int ADXL345_I2C::kPowerCtlRegister;
+const int ADXL345_I2C::kDataFormatRegister;
+const int ADXL345_I2C::kDataRegister;
 constexpr double ADXL345_I2C::kGsPerLSB;
 
 /**
@@ -54,7 +54,7 @@ double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
  */
 double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
   int16_t rawAccel = 0;
-  m_i2c.Read(kDataRegister + static_cast<uint8_t>(axis), sizeof(rawAccel),
+  m_i2c.Read(kDataRegister + static_cast<int>(axis), sizeof(rawAccel),
              reinterpret_cast<uint8_t*>(&rawAccel));
   return rawAccel * kGsPerLSB;
 }

@@ -21,7 +21,7 @@
  */
 class AnalogOutput : public SensorBase, public LiveWindowSendable {
  public:
-  explicit AnalogOutput(uint32_t channel);
+  explicit AnalogOutput(int channel);
   virtual ~AnalogOutput();
 
   void SetVoltage(float voltage);
@@ -35,7 +35,7 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
   std::shared_ptr<ITable> GetTable() const override;
 
  protected:
-  uint32_t m_channel;
+  int m_channel;
   HAL_AnalogOutputHandle m_port;
 
   std::shared_ptr<ITable> m_table;

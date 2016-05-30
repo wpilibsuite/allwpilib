@@ -18,18 +18,18 @@
 class SolenoidBase : public SensorBase {
  public:
   virtual ~SolenoidBase() = default;
-  uint8_t GetAll(int module = 0) const;
+  int GetAll(int module = 0) const;
 
-  uint8_t GetPCMSolenoidBlackList(int module) const;
+  int GetPCMSolenoidBlackList(int module) const;
   bool GetPCMSolenoidVoltageStickyFault(int module) const;
   bool GetPCMSolenoidVoltageFault(int module) const;
   void ClearAllPCMStickyFaults(int module);
 
  protected:
-  explicit SolenoidBase(uint8_t pcmID);
+  explicit SolenoidBase(int pcmID);
   static const int m_maxModules = 63;
   static const int m_maxPorts = 8;
   // static void* m_ports[m_maxModules][m_maxPorts];
-  uint8_t m_moduleNumber;  ///< Slot number where the module is plugged into
-                           /// the chassis.
+  int m_moduleNumber;  ///< Slot number where the module is plugged into
+                       /// the chassis.
 };

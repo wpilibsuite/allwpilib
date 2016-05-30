@@ -27,10 +27,10 @@ class DigitalGlitchFilter;
  */
 class DigitalInput : public DigitalSource, public LiveWindowSendable {
  public:
-  explicit DigitalInput(uint32_t channel);
+  explicit DigitalInput(int channel);
   virtual ~DigitalInput();
   bool Get() const;
-  uint32_t GetChannel() const override;
+  int GetChannel() const override;
 
   // Digital Source Interface
   HAL_Handle GetPortHandleForRouting() const override;
@@ -45,7 +45,7 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   std::shared_ptr<ITable> GetTable() const;
 
  private:
-  uint32_t m_channel;
+  int m_channel;
   HAL_DigitalHandle m_handle;
 
   std::shared_ptr<ITable> m_table;

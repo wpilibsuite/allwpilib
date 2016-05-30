@@ -46,7 +46,7 @@ class Encoder : public SensorBase,
     kResetOnRisingEdge
   };
 
-  Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection = false,
+  Encoder(int aChannel, int bChannel, bool reverseDirection = false,
           EncodingType encodingType = k4X);
   Encoder(std::shared_ptr<DigitalSource> aSource,
           std::shared_ptr<DigitalSource> bSource, bool reverseDirection = false,
@@ -58,9 +58,9 @@ class Encoder : public SensorBase,
   virtual ~Encoder();
 
   // CounterBase interface
-  int32_t Get() const override;
-  int32_t GetRaw() const;
-  int32_t GetEncodingScale() const;
+  int Get() const override;
+  int GetRaw() const;
+  int GetEncodingScale() const;
   void Reset() override;
   double GetPeriod() const override;
   void SetMaxPeriod(double maxPeriod) override;
@@ -76,7 +76,7 @@ class Encoder : public SensorBase,
   int GetSamplesToAverage() const;
   double PIDGet() override;
 
-  void SetIndexSource(uint32_t channel, IndexingType type = kResetOnRisingEdge);
+  void SetIndexSource(int channel, IndexingType type = kResetOnRisingEdge);
   DEPRECATED("Use pass-by-reference instead.")
   void SetIndexSource(DigitalSource* source,
                       IndexingType type = kResetOnRisingEdge);
@@ -90,7 +90,7 @@ class Encoder : public SensorBase,
   void InitTable(std::shared_ptr<ITable> subTable) override;
   std::shared_ptr<ITable> GetTable() const override;
 
-  int32_t GetFPGAIndex() const;
+  int GetFPGAIndex() const;
 
  private:
   void InitEncoder(bool reverseDirection, EncodingType encodingType);

@@ -38,7 +38,7 @@ class Encoder : public SensorBase,
                 public PIDSource,
                 public LiveWindowSendable {
  public:
-  Encoder(uint32_t aChannel, uint32_t bChannel, bool reverseDirection = false,
+  Encoder(int aChannel, int bChannel, bool reverseDirection = false,
           EncodingType encodingType = k4X);
   // TODO: [Not Supported] Encoder(DigitalSource *aSource, DigitalSource
   // *bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
@@ -47,9 +47,9 @@ class Encoder : public SensorBase,
   virtual ~Encoder() = default;
 
   // CounterBase interface
-  int32_t Get() const override;
-  int32_t GetRaw() const;
-  int32_t GetEncodingScale() const;
+  int Get() const override;
+  int GetRaw() const;
+  int GetEncodingScale() const;
   void Reset() override;
   double GetPeriod() const override;
   void SetMaxPeriod(double maxPeriod) override;
@@ -73,7 +73,7 @@ class Encoder : public SensorBase,
   void InitTable(std::shared_ptr<ITable> subTable) override;
   std::shared_ptr<ITable> GetTable() const override;
 
-  int32_t FPGAEncoderIndex() const { return 0; }
+  int FPGAEncoderIndex() const { return 0; }
 
  private:
   void InitEncoder(int channelA, int channelB, bool _reverseDirection,
@@ -91,7 +91,7 @@ class Encoder : public SensorBase,
   int channelA, channelB;
   double m_distancePerPulse;    // distance of travel for each encoder tick
   EncodingType m_encodingType;  // Encoding type
-  int32_t m_encodingScale;      // 1x, 2x, or 4x, per the encodingType
+  int m_encodingScale;          // 1x, 2x, or 4x, per the encodingType
   bool m_reverseDirection;
   SimEncoder* impl;
 

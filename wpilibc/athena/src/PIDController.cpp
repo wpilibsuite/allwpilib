@@ -67,7 +67,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
   m_controlLoop->StartPeriodic(m_period);
   m_setpointTimer.Start();
 
-  static int32_t instances = 0;
+  static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
 }
@@ -473,12 +473,12 @@ void PIDController::SetPercentTolerance(float percent) {
  *
  * @param bufLength Number of previous cycles to average. Defaults to 1.
  */
-void PIDController::SetToleranceBuffer(unsigned bufLength) {
+void PIDController::SetToleranceBuffer(int bufLength) {
   std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   m_bufLength = bufLength;
 
   // Cut the buffer down to size if needed.
-  while (m_buf.size() > bufLength) {
+  while (m_buf.size() > static_cast<uint32_t>(bufLength)) {
     m_bufTotal -= m_buf.front();
     m_buf.pop();
   }

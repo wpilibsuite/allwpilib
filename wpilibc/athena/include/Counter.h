@@ -39,7 +39,7 @@ class Counter : public SensorBase,
     kExternalDirection = 3
   };
   explicit Counter(Mode mode = kTwoPulse);
-  explicit Counter(int32_t channel);
+  explicit Counter(int channel);
   explicit Counter(DigitalSource* source);
   explicit Counter(std::shared_ptr<DigitalSource> source);
   DEPRECATED("Use pass-by-reference instead.")
@@ -51,7 +51,7 @@ class Counter : public SensorBase,
           std::shared_ptr<DigitalSource> downSource, bool inverted);
   virtual ~Counter();
 
-  void SetUpSource(int32_t channel);
+  void SetUpSource(int channel);
   void SetUpSource(AnalogTrigger* analogTrigger, AnalogTriggerType triggerType);
   void SetUpSource(std::shared_ptr<AnalogTrigger> analogTrigger,
                    AnalogTriggerType triggerType);
@@ -61,7 +61,7 @@ class Counter : public SensorBase,
   void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
   void ClearUpSource();
 
-  void SetDownSource(int32_t channel);
+  void SetDownSource(int channel);
   void SetDownSource(AnalogTrigger* analogTrigger,
                      AnalogTriggerType triggerType);
   void SetDownSource(std::shared_ptr<AnalogTrigger> analogTrigger,
@@ -80,7 +80,7 @@ class Counter : public SensorBase,
   void SetReverseDirection(bool reverseDirection);
 
   // CounterBase interface
-  int32_t Get() const override;
+  int Get() const override;
   void Reset() override;
   double GetPeriod() const override;
   void SetMaxPeriod(double maxPeriod) override;
@@ -90,7 +90,7 @@ class Counter : public SensorBase,
 
   void SetSamplesToAverage(int samplesToAverage);
   int GetSamplesToAverage() const;
-  int32_t GetFPGAIndex() const { return m_index; }
+  int GetFPGAIndex() const { return m_index; }
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;
@@ -108,7 +108,7 @@ class Counter : public SensorBase,
   HAL_CounterHandle m_counter = HAL_kInvalidHandle;
 
  private:
-  int32_t m_index = 0;  ///< The index of this counter.
+  int m_index = 0;  ///< The index of this counter.
 
   std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;

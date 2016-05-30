@@ -22,8 +22,8 @@
  */
 class Solenoid : public LiveWindowSendable, public ITableListener {
  public:
-  explicit Solenoid(uint32_t channel);
-  Solenoid(uint8_t moduleNumber, uint32_t channel);
+  explicit Solenoid(int channel);
+  Solenoid(int moduleNumber, int channel);
   virtual ~Solenoid();
   virtual void Set(bool on);
   virtual bool Get() const;

@@ -14,6 +14,6 @@
  */
 class Spark : public PWMSpeedController {
  public:
-  explicit Spark(uint32_t channel);
+  explicit Spark(int channel);
   virtual ~Spark() = default;
 };

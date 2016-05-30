@@ -27,9 +27,9 @@ class DigitalOutput;
  */
 class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
  protected:
-  static const uint8_t kPowerCtlRegister = 0x2D;
-  static const uint8_t kDataFormatRegister = 0x31;
-  static const uint8_t kDataRegister = 0x32;
+  static const int kPowerCtlRegister = 0x2D;
+  static const int kDataFormatRegister = 0x31;
+  static const int kDataRegister = 0x32;
   static constexpr double kGsPerLSB = 0.00390625;
   enum SPIAddressFields { kAddress_Read = 0x80, kAddress_MultiByte = 0x40 };
   enum PowerCtlFields {

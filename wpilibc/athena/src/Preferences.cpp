@@ -20,7 +20,7 @@ void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
                                          bool isNew) {}
 void Preferences::Listener::ValueChangedEx(ITable* source, llvm::StringRef key,
                                            std::shared_ptr<nt::Value> value,
-                                           unsigned int flags) {
+                                           uint32_t flags) {
   source->SetPersistent(key);
 }
 

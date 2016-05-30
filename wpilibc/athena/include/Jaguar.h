@@ -14,6 +14,6 @@
  */
 class Jaguar : public PWMSpeedController {
  public:
-  explicit Jaguar(uint32_t channel);
+  explicit Jaguar(int channel);
   virtual ~Jaguar() = default;
 };

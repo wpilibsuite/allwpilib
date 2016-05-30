@@ -61,8 +61,7 @@ class AxisCamera : public ErrorBase {
   int GetImage(Image* image);
   int GetImage(ColorImage* image);
   HSLImage* GetImage();
-  int CopyJPEG(char** destImage, unsigned int& destImageSize,
-               unsigned int& destImageBufferSize);
+  int CopyJPEG(char** destImage, int& destImageSize, int& destImageBufferSize);
 
   void WriteBrightness(int brightness);
   int GetBrightness();

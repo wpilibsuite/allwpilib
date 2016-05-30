@@ -16,7 +16,7 @@
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
  */
-DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
+DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
     : DoubleSolenoid(1, forwardChannel, reverseChannel) {}
 
 /**
@@ -26,8 +26,8 @@ DoubleSolenoid::DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel)
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
  */
-DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
-                               uint32_t reverseChannel) {
+DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
+                               int reverseChannel) {
   m_reversed = false;
   if (reverseChannel < forwardChannel) {  // Swap ports to get the right address
     int channel = reverseChannel;

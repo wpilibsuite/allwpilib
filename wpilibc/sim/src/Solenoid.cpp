@@ -18,7 +18,7 @@
  *
  * @param channel The channel on the solenoid module to control (1..8).
  */
-Solenoid::Solenoid(uint32_t channel) : Solenoid(1, channel) {}
+Solenoid::Solenoid(int channel) : Solenoid(1, channel) {}
 
 /**
  * Constructor.
@@ -26,7 +26,7 @@ Solenoid::Solenoid(uint32_t channel) : Solenoid(1, channel) {}
  * @param moduleNumber The solenoid module (1 or 2).
  * @param channel      The channel on the solenoid module to control (1..8).
  */
-Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel) {
+Solenoid::Solenoid(int moduleNumber, int channel) {
   std::stringstream ss;
   ss << "pneumatic/" << moduleNumber << "/" << channel;
   m_impl = new SimContinuousOutput(ss.str());

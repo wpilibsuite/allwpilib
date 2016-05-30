@@ -40,22 +40,22 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   static DriverStation& GetInstance();
   static void ReportError(std::string error);
   static void ReportWarning(std::string error);
-  static void ReportError(bool is_error, int32_t code, const std::string& error,
+  static void ReportError(bool is_error, int code, const std::string& error,
                           const std::string& location,
                           const std::string& stack);
 
-  static const uint32_t kBatteryChannel = 7;
-  static const uint32_t kJoystickPorts = 4;
-  static const uint32_t kJoystickAxes = 6;
+  static const int kBatteryChannel = 7;
+  static const int kJoystickPorts = 4;
+  static const int kJoystickAxes = 6;
 
-  float GetStickAxis(uint32_t stick, uint32_t axis);
-  bool GetStickButton(uint32_t stick, uint32_t button);
-  int16_t GetStickButtons(uint32_t stick);
+  float GetStickAxis(int stick, int axis);
+  bool GetStickButton(int stick, int button);
+  int16_t GetStickButtons(int stick);
 
-  float GetAnalogIn(uint32_t channel);
-  bool GetDigitalIn(uint32_t channel);
-  void SetDigitalOut(uint32_t channel, bool value);
-  bool GetDigitalOut(uint32_t channel);
+  float GetAnalogIn(int channel);
+  bool GetDigitalIn(int channel);
+  void SetDigitalOut(int channel, bool value);
+  bool GetDigitalOut(int channel);
 
   bool IsEnabled() const;
   bool IsDisabled() const;
@@ -64,9 +64,9 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   bool IsTest() const;
   bool IsFMSAttached() const;
 
-  uint32_t GetPacketNumber() const;
+  int GetPacketNumber() const;
   Alliance GetAlliance() const;
-  uint32_t GetLocation() const;
+  int GetLocation() const;
   void WaitForData();
   double GetMatchTime() const;
   float GetBatteryVoltage() const;
@@ -112,7 +112,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
  private:
   static void InitTask(DriverStation* ds);
   static DriverStation* m_instance;
-  static uint8_t m_updateNumber;
+  static int m_updateNumber;
   ///< TODO: Get rid of this and use the semaphore signaling
   static const float kUpdatePeriod;
 
@@ -125,7 +125,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void joystickCallback4(const msgs::ConstFRCJoystickPtr& msg);
   void joystickCallback5(const msgs::ConstFRCJoystickPtr& msg);
 
-  uint8_t m_digitalOut = 0;
+  int m_digitalOut = 0;
   std::condition_variable m_waitForDataCond;
   std::mutex m_waitForDataMutex;
   mutable std::recursive_mutex m_stateMutex;

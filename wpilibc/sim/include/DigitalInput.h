@@ -24,10 +24,10 @@
  */
 class DigitalInput : public LiveWindowSendable {
  public:
-  explicit DigitalInput(uint32_t channel);
+  explicit DigitalInput(int channel);
   virtual ~DigitalInput() = default;
-  uint32_t Get() const;
-  uint32_t GetChannel() const;
+  int Get() const;
+  int GetChannel() const;
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;
@@ -37,7 +37,7 @@ class DigitalInput : public LiveWindowSendable {
   std::shared_ptr<ITable> GetTable() const override;
 
  private:
-  uint32_t m_channel;
+  int m_channel;
   bool m_lastValue;
   SimDigitalInput* m_impl;
 

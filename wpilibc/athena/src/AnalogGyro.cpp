@@ -15,8 +15,8 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
-const uint32_t AnalogGyro::kOversampleBits;
-const uint32_t AnalogGyro::kAverageBits;
+const int AnalogGyro::kOversampleBits;
+const int AnalogGyro::kAverageBits;
 constexpr float AnalogGyro::kSamplesPerSecond;
 constexpr float AnalogGyro::kCalibrationSampleTime;
 constexpr float AnalogGyro::kDefaultVoltsPerDegreePerSecond;
@@ -27,7 +27,7 @@ constexpr float AnalogGyro::kDefaultVoltsPerDegreePerSecond;
  * @param channel The analog channel the gyro is connected to. Gyros can only
  *                be used on on-board Analog Inputs 0-1.
  */
-AnalogGyro::AnalogGyro(int32_t channel)
+AnalogGyro::AnalogGyro(int channel)
     : AnalogGyro(std::make_shared<AnalogInput>(channel)) {}
 
 /**
@@ -76,7 +76,7 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
  *                value.
  * @param offset  Preset uncalibrated value to use as the gyro offset.
  */
-AnalogGyro::AnalogGyro(int32_t channel, uint32_t center, float offset) {
+AnalogGyro::AnalogGyro(int channel, int center, float offset) {
   m_analog = std::make_shared<AnalogInput>(channel);
   InitGyro();
   int32_t status = 0;
@@ -101,7 +101,7 @@ AnalogGyro::AnalogGyro(int32_t channel, uint32_t center, float offset) {
  * @param channel A pointer to the AnalogInput object that the gyro is
  *                connected to.
  */
-AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center,
+AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
                        float offset)
     : m_analog(channel) {
   if (channel == nullptr) {
@@ -239,10 +239,10 @@ float AnalogGyro::GetOffset() const {
  *
  * @return the current center value
  */
-uint32_t AnalogGyro::GetCenter() const {
+int AnalogGyro::GetCenter() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  uint32_t value = HAL_GetAnalogGyroCenter(m_gyroHandle, &status);
+  int value = HAL_GetAnalogGyroCenter(m_gyroHandle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }

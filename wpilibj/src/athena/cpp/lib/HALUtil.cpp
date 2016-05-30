@@ -166,7 +166,7 @@ void ReportError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange
   }
 }
 
-void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
+void ReportCANError(JNIEnv *env, int32_t status, int32_t message_id) {
   if (status >= 0) return;
   switch (status) {
     case kRioStatusSuccess:

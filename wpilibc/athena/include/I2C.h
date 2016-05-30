@@ -20,24 +20,23 @@ class I2C : SensorBase {
  public:
   enum Port { kOnboard, kMXP };
 
-  I2C(Port port, uint8_t deviceAddress);
+  I2C(Port port, int deviceAddress);
   virtual ~I2C();
 
   I2C(const I2C&) = delete;
   I2C& operator=(const I2C&) = delete;
 
-  bool Transaction(uint8_t* dataToSend, uint8_t sendSize, uint8_t* dataReceived,
-                   uint8_t receiveSize);
+  bool Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
+                   int receiveSize);
   bool AddressOnly();
-  bool Write(uint8_t registerAddress, uint8_t data);
-  bool WriteBulk(uint8_t* data, uint8_t count);
-  bool Read(uint8_t registerAddress, uint8_t count, uint8_t* data);
-  bool ReadOnly(uint8_t count, uint8_t* buffer);
-  void Broadcast(uint8_t registerAddress, uint8_t data);
-  bool VerifySensor(uint8_t registerAddress, uint8_t count,
-                    const uint8_t* expected);
+  bool Write(int registerAddress, uint8_t data);
+  bool WriteBulk(uint8_t* data, int count);
+  bool Read(int registerAddress, int count, uint8_t* data);
+  bool ReadOnly(int count, uint8_t* buffer);
+  void Broadcast(int registerAddress, uint8_t data);
+  bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
   Port m_port;
-  uint8_t m_deviceAddress;
+  int m_deviceAddress;
 };

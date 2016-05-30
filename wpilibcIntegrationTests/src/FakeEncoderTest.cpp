@@ -54,7 +54,7 @@ class FakeEncoderTest : public testing::Test {
    * ticks
    */
   void Simulate100QuadratureTicks() {
-    for (int i = 0; i < 100; i++) {
+    for (int32_t i = 0; i < 100; i++) {
       m_outputA->Set(true);
       Wait(kDelayTime);
       m_outputB->Set(true);

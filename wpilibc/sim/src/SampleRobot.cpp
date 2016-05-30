@@ -18,7 +18,7 @@
 #include <unistd.h>
 #elif defined(_WIN32)
 #include <windows.h>
-void sleep(unsigned milliseconds) { Sleep(milliseconds); }
+void sleep(unsigned int milliseconds) { Sleep(milliseconds); }
 #endif
 
 SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}

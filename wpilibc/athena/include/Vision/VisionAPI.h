@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "nivision.h"
 
 /* Constants */
@@ -142,14 +144,13 @@ int frcColorEqualize(Image* dest, const Image* source, int colorEqualization);
 /* Image Thresholding & Conversion functions */
 
 /* Smart Threshold: calls imaqLocalThreshold */
-int frcSmartThreshold(Image* dest, const Image* source,
-                      unsigned int windowWidth, unsigned int windowHeight,
-                      LocalThresholdMethod method, double deviationWeight,
-                      ObjectType type);
-int frcSmartThreshold(Image* dest, const Image* source,
-                      unsigned int windowWidth, unsigned int windowHeight,
-                      LocalThresholdMethod method, double deviationWeight,
-                      ObjectType type, float replaceValue);
+int frcSmartThreshold(Image* dest, const Image* source, int windowWidth,
+                      int windowHeight, LocalThresholdMethod method,
+                      double deviationWeight, ObjectType type);
+int frcSmartThreshold(Image* dest, const Image* source, int windowWidth,
+                      int windowHeight, LocalThresholdMethod method,
+                      double deviationWeight, ObjectType type,
+                      float replaceValue);
 
 /* Simple Threshold: calls imaqThreshold */
 int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,

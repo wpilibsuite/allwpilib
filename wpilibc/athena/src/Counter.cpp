@@ -80,7 +80,7 @@ Counter::Counter(std::shared_ptr<DigitalSource> source) : Counter(kTwoPulse) {
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
  *                10-25 are on the MXP
  */
-Counter::Counter(int32_t channel) : Counter(kTwoPulse) {
+Counter::Counter(int channel) : Counter(kTwoPulse) {
   SetUpSource(channel);
   ClearDownSource();
 }
@@ -190,7 +190,7 @@ Counter::~Counter() {
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
  *                10-25 are on the MXP
  */
-void Counter::SetUpSource(int32_t channel) {
+void Counter::SetUpSource(int channel) {
   if (StatusIsFatal()) return;
   SetUpSource(std::make_shared<DigitalInput>(channel));
 }
@@ -296,7 +296,7 @@ void Counter::ClearUpSource() {
  * @param channel The DIO channel to use as the up source. 0-9 are on-board,
  *                10-25 are on the MXP
  */
-void Counter::SetDownSource(int32_t channel) {
+void Counter::SetDownSource(int channel) {
   if (StatusIsFatal()) return;
   SetDownSource(std::make_shared<DigitalInput>(channel));
 }
@@ -462,7 +462,7 @@ void Counter::SetPulseLengthMode(float threshold) {
  */
 int Counter::GetSamplesToAverage() const {
   int32_t status = 0;
-  int32_t samples = HAL_GetCounterSamplesToAverage(m_counter, &status);
+  int samples = HAL_GetCounterSamplesToAverage(m_counter, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return samples;
 }
@@ -491,10 +491,10 @@ void Counter::SetSamplesToAverage(int samplesToAverage) {
  * Read the value at this instant. It may still be running, so it reflects the
  * current value. Next time it is read, it might have a different value.
  */
-int32_t Counter::Get() const {
+int Counter::Get() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t value = HAL_GetCounter(m_counter, &status);
+  int value = HAL_GetCounter(m_counter, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }

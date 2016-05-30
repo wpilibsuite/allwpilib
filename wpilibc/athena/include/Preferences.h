@@ -66,7 +66,7 @@ class Preferences : public ErrorBase {
                       std::shared_ptr<nt::Value> value, bool isNew) override;
     void ValueChangedEx(ITable* source, llvm::StringRef key,
                         std::shared_ptr<nt::Value> value,
-                        unsigned int flags) override;
+                        uint32_t flags) override;
   };
   Listener m_listener;
 };

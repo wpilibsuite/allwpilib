@@ -622,19 +622,18 @@ int frcColorEqualize(Image* dest, const Image* source, int colorEqualization) {
  * @return On success: 1. On failure: 0. To get extended error information, call
  *         GetLastError().
  */
-int frcSmartThreshold(Image* dest, const Image* source,
-                      unsigned int windowWidth, unsigned int windowHeight,
-                      LocalThresholdMethod method, double deviationWeight,
-                      ObjectType type) {
+int frcSmartThreshold(Image* dest, const Image* source, int windowWidth,
+                      int windowHeight, LocalThresholdMethod method,
+                      double deviationWeight, ObjectType type) {
   float replaceValue = 1.0;
   return imaqLocalThreshold(dest, source, windowWidth, windowHeight, method,
                             deviationWeight, type, replaceValue);
 }
 
-int frcSmartThreshold(Image* dest, const Image* source,
-                      unsigned int windowWidth, unsigned int windowHeight,
-                      LocalThresholdMethod method, double deviationWeight,
-                      ObjectType type, float replaceValue) {
+int frcSmartThreshold(Image* dest, const Image* source, int windowWidth,
+                      int windowHeight, LocalThresholdMethod method,
+                      double deviationWeight, ObjectType type,
+                      float replaceValue) {
   return imaqLocalThreshold(dest, source, windowWidth, windowHeight, method,
                             deviationWeight, type, replaceValue);
 }

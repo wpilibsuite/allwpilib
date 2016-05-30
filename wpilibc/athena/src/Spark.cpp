@@ -31,7 +31,7 @@
  * @param channel The PWM channel that the Spark is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-Spark::Spark(uint32_t channel) : PWMSpeedController(channel) {
+Spark::Spark(int channel) : PWMSpeedController(channel) {
   SetBounds(2.003, 1.55, 1.50, 1.46, .999);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);

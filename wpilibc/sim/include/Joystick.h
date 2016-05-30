@@ -23,11 +23,11 @@ class DriverStation;
  */
 class Joystick : public GenericHID, public ErrorBase {
  public:
-  static const uint32_t kDefaultXAxis = 1;
-  static const uint32_t kDefaultYAxis = 2;
-  static const uint32_t kDefaultZAxis = 3;
-  static const uint32_t kDefaultTwistAxis = 4;
-  static const uint32_t kDefaultThrottleAxis = 3;
+  static const int kDefaultXAxis = 1;
+  static const int kDefaultYAxis = 2;
+  static const int kDefaultZAxis = 3;
+  static const int kDefaultTwistAxis = 4;
+  static const int kDefaultThrottleAxis = 3;
   typedef enum {
     kXAxis,
     kYAxis,
@@ -36,19 +36,19 @@ class Joystick : public GenericHID, public ErrorBase {
     kThrottleAxis,
     kNumAxisTypes
   } AxisType;
-  static const uint32_t kDefaultTriggerButton = 1;
-  static const uint32_t kDefaultTopButton = 2;
+  static const int kDefaultTriggerButton = 1;
+  static const int kDefaultTopButton = 2;
   typedef enum { kTriggerButton, kTopButton, kNumButtonTypes } ButtonType;
 
-  explicit Joystick(uint32_t port);
-  Joystick(uint32_t port, uint32_t numAxisTypes, uint32_t numButtonTypes);
+  explicit Joystick(int port);
+  Joystick(int port, int numAxisTypes, int numButtonTypes);
   virtual ~Joystick() = default;
 
   Joystick(const Joystick&) = delete;
   Joystick& operator=(const Joystick&) = delete;
 
-  uint32_t GetAxisChannel(AxisType axis);
-  void SetAxisChannel(AxisType axis, uint32_t channel);
+  int GetAxisChannel(AxisType axis);
+  void SetAxisChannel(AxisType axis, int channel);
 
   float GetX(JoystickHand hand = kRightHand) const override;
   float GetY(JoystickHand hand = kRightHand) const override;
@@ -56,15 +56,15 @@ class Joystick : public GenericHID, public ErrorBase {
   float GetTwist() const override;
   float GetThrottle() const override;
   virtual float GetAxis(AxisType axis) const;
-  float GetRawAxis(uint32_t axis) const override;
+  float GetRawAxis(int axis) const override;
 
   bool GetTrigger(JoystickHand hand = kRightHand) const override;
   bool GetTop(JoystickHand hand = kRightHand) const override;
   bool GetBumper(JoystickHand hand = kRightHand) const override;
-  bool GetRawButton(uint32_t button) const override;
-  int GetPOV(uint32_t pov = 1) const override;
+  bool GetRawButton(int button) const override;
+  int GetPOV(int pov = 1) const override;
   bool GetButton(ButtonType button) const;
-  static Joystick* GetStickForPort(uint32_t port);
+  static Joystick* GetStickForPort(int port);
 
   virtual float GetMagnitude() const;
   virtual float GetDirectionRadians() const;
@@ -72,7 +72,7 @@ class Joystick : public GenericHID, public ErrorBase {
 
  private:
   DriverStation& m_ds;
-  uint32_t m_port;
-  std::unique_ptr<uint32_t[]> m_axes;
-  std::unique_ptr<uint32_t[]> m_buttons;
+  int m_port;
+  std::unique_ptr<int[]> m_axes;
+  std::unique_ptr<int[]> m_buttons;
 };

@@ -16,7 +16,7 @@
  * @param channel The PWM channel number that the Talon is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-Talon::Talon(uint32_t channel) : PWMSpeedController(channel) {
+Talon::Talon(int channel) : PWMSpeedController(channel) {
   /* Note that the Talon uses the following bounds for PWM values. These values
    * should work reasonably well for most controllers, but if users experience
    * issues such as asymmetric behavior around the deadband or inability to

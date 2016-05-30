@@ -79,7 +79,7 @@ class CANJaguarTest : public testing::Test {
    * called in each iteration of the main loop.
    */
   void SetJaguar(float totalTime, float value = 0.0f) {
-    for (int i = 0; i < 50; i++) {
+    for (int32_t i = 0; i < 50; i++) {
       m_jaguar->Set(value);
       Wait(totalTime / 50.0);
     }
@@ -87,7 +87,7 @@ class CANJaguarTest : public testing::Test {
   /**
   * returns the sign of the given number
   */
-  int SignNum(double value) { return -(value < 0) + (value > 0); }
+  int32_t SignNum(double value) { return -(value < 0) + (value > 0); }
   void InversionTest(float motorValue, float delayTime = kMotorTime) {
     m_jaguar->EnableControl();
     m_jaguar->SetInverted(false);
@@ -218,7 +218,7 @@ TEST_F(CANJaguarTest, BrownOut) {
 
   /* The jaguar should automatically get set to quad encoder position mode,
           so it should be able to reach a setpoint in a couple seconds. */
-  for (int i = 0; i < 10; i++) {
+  for (int32_t i = 0; i < 10; i++) {
     SetJaguar(1.0f, setpoint);
 
     if (std::abs(m_jaguar->GetPosition() - setpoint) <=
@@ -333,7 +333,7 @@ TEST_F(CANJaguarTest, PositionModeWorks) {
   m_jaguar->EnableControl();
 
   /* It should get to the setpoint within 10 seconds */
-  for (int i = 0; i < 10; i++) {
+  for (int32_t i = 0; i < 10; i++) {
     SetJaguar(1.0f, setpoint);
 
     if (std::abs(m_jaguar->GetPosition() - setpoint) <=
@@ -361,7 +361,7 @@ TEST_F(CANJaguarTest, DISABLED_CurrentModeWorks) {
     float expectedCurrent = std::abs(setpoints_i);
 
     /* It should get to each setpoint within 10 seconds */
-    for (int j = 0; j < 10; j++) {
+    for (int32_t j = 0; j < 10; j++) {
       SetJaguar(1.0, setpoint);
 
       if (std::abs(m_jaguar->GetOutputCurrent() - expectedCurrent) <=
@@ -385,7 +385,7 @@ TEST_F(CANJaguarTest, FakePotentiometerPosition) {
 
   // Set the analog output to 4 different voltages and check if the Jaguar
   // returns corresponding positions.
-  for (int i = 0; i <= 3; i++) {
+  for (int32_t i = 0; i <= 3; i++) {
     m_fakePotentiometer->SetVoltage(static_cast<float>(i));
 
     SetJaguar(kPotentiometerSettlingTime);

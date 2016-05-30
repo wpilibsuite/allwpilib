@@ -40,12 +40,12 @@ class Relay : public MotorSafety,
   enum Value { kOff, kOn, kForward, kReverse };
   enum Direction { kBothDirections, kForwardOnly, kReverseOnly };
 
-  explicit Relay(uint32_t channel, Direction direction = kBothDirections);
+  explicit Relay(int channel, Direction direction = kBothDirections);
   virtual ~Relay();
 
   void Set(Value value);
   Value Get() const;
-  uint32_t GetChannel() const;
+  int GetChannel() const;
 
   void SetExpiration(float timeout) override;
   float GetExpiration() const override;
@@ -67,7 +67,7 @@ class Relay : public MotorSafety,
   std::shared_ptr<ITable> m_table;
 
  private:
-  uint32_t m_channel;
+  int m_channel;
   Direction m_direction;
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
   SimContinuousOutput* impl;

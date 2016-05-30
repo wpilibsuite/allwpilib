@@ -42,7 +42,7 @@ class PWM : public SensorBase,
     kPeriodMultiplier_4X = 4
   };
 
-  explicit PWM(uint32_t channel);
+  explicit PWM(int channel);
   virtual ~PWM();
   virtual void SetRaw(uint16_t value);
   virtual uint16_t GetRaw() const;
@@ -56,11 +56,11 @@ class PWM : public SensorBase,
   void EnableDeadbandElimination(bool eliminateDeadband);
   void SetBounds(float max, float deadbandMax, float center, float deadbandMin,
                  float min);
-  void SetRawBounds(int32_t max, int32_t deadbandMax, int32_t center,
-                    int32_t deadbandMin, int32_t min);
+  void SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
+                    int min);
   void GetRawBounds(int32_t* max, int32_t* deadbandMax, int32_t* center,
                     int32_t* deadbandMin, int32_t* min);
-  uint32_t GetChannel() const { return m_channel; }
+  int GetChannel() const { return m_channel; }
 
  protected:
   void ValueChanged(ITable* source, llvm::StringRef key,
@@ -75,6 +75,6 @@ class PWM : public SensorBase,
   std::shared_ptr<ITable> m_table;
 
  private:
-  uint32_t m_channel;
+  int m_channel;
   HAL_DigitalHandle m_handle;
 };

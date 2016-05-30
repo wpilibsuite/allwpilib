@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 /* Error Codes */
 #define ERR_VISION_GENERAL_ERROR 166000  //
 #define ERR_COLOR_NOT_FOUND 166100       // TrackAPI.cpp

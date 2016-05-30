@@ -18,7 +18,7 @@
  *
  * @param channel The channel on the PCM to control (0..7).
  */
-Solenoid::Solenoid(uint32_t channel)
+Solenoid::Solenoid(int channel)
     : Solenoid(GetDefaultSolenoidModule(), channel) {}
 
 /**
@@ -27,7 +27,7 @@ Solenoid::Solenoid(uint32_t channel)
  * @param moduleNumber The CAN ID of the PCM the solenoid is attached to
  * @param channel      The channel on the PCM to control (0..7).
  */
-Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
+Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
   std::stringstream buf;
   if (!CheckSolenoidModule(m_moduleNumber)) {

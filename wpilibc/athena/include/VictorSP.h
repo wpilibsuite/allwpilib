@@ -14,6 +14,6 @@
  */
 class VictorSP : public PWMSpeedController {
  public:
-  explicit VictorSP(uint32_t channel);
+  explicit VictorSP(int channel);
   virtual ~VictorSP() = default;
 };

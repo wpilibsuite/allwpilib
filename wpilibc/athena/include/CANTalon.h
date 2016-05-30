@@ -119,7 +119,7 @@ class CANTalon : public MotorSafety,
      * Value should be between 1ms and 255ms.  If value is zero
      * then Talon will default to 1ms.  If value exceeds 255ms API will cap it.
      */
-    unsigned int timeDurMs;
+    int timeDurMs;
     /**
      * Which slot to get PIDF gains.
      * PID is used for position servo.
@@ -127,7 +127,7 @@ class CANTalon : public MotorSafety,
      * Typically this is hardcoded to the a particular slot, but you are free
      * gain schedule if need be.
      */
-    unsigned int profileSlotSelect;
+    int profileSlotSelect;
     /**
      * Set to true to only perform the velocity feed-forward and not perform
      * position servo.  This is useful when learning how the position servo
@@ -181,15 +181,15 @@ class CANTalon : public MotorSafety,
      * them into the Talon's low-level buffer, allowing the Talon to act on
      * them.
      */
-    unsigned int topBufferRem;
+    int topBufferRem;
     /**
      * The number of points in the top trajectory buffer.
      */
-    unsigned int topBufferCnt;
+    int topBufferCnt;
     /**
      * The number of points in the low level Talon buffer.
      */
-    unsigned int btmBufferCnt;
+    int btmBufferCnt;
     /**
      * Set if isUnderrun ever gets set.
      * Only is cleared by clearMotionProfileHasUnderrun() to ensure
@@ -253,7 +253,7 @@ class CANTalon : public MotorSafety,
   void SetI(double i) override;
   void SetD(double d) override;
   void SetF(double f);
-  void SetIzone(unsigned iz);
+  void SetIzone(int iz);
   void SetPID(double p, double i, double d) override;
   virtual void SetPID(double p, double i, double d, double f);
   double GetP() const override;
@@ -269,7 +269,7 @@ class CANTalon : public MotorSafety,
   double GetPosition() const override;
   double GetSpeed() const override;
   virtual int GetClosedLoopError() const;
-  virtual void SetAllowableClosedLoopErr(uint32_t allowableCloseLoopError);
+  virtual void SetAllowableClosedLoopErr(int allowableCloseLoopError);
   virtual int GetAnalogIn() const;
   virtual void SetAnalogPosition(int newPosition);
   virtual int GetAnalogInRaw() const;
@@ -298,7 +298,7 @@ class CANTalon : public MotorSafety,
   void ClearStickyFaults();
   void SetVoltageRampRate(double rampRate) override;
   virtual void SetVoltageCompensationRampRate(double rampRate);
-  uint32_t GetFirmwareVersion() const override;
+  int GetFirmwareVersion() const override;
   void ConfigNeutralMode(NeutralMode mode) override;
   void ConfigEncoderCodesPerRev(uint16_t codesPerRev) override;
   void ConfigPotentiometerTurns(uint16_t turns) override;
@@ -347,8 +347,8 @@ class CANTalon : public MotorSafety,
    *                    edge, pass false to clear the position on falling edge.
    */
   void EnableZeroSensorPositionOnIndex(bool enable, bool risingEdge);
-  void ConfigSetParameter(uint32_t paramEnum, double value);
-  bool GetParameter(uint32_t paramEnum, double& dvalue) const;
+  void ConfigSetParameter(int paramEnum, double value);
+  bool GetParameter(int paramEnum, double& dvalue) const;
 
   void ConfigFaultTime(float faultTime) override;
   virtual void SetControlMode(ControlMode mode);
@@ -469,8 +469,8 @@ class CANTalon : public MotorSafety,
   int m_deviceNumber;
   std::unique_ptr<CanTalonSRX> m_impl;
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
-  int m_profile = 0;  // Profile from CANTalon to use. Set to zero until we can
-                      // actually test this.
+  int m_profile = 0;  // Profile from CANTalon to use. Set to zero until we
+                      // can actually test this.
 
   bool m_controlEnabled = true;
   bool m_stopped = false;
@@ -485,7 +485,7 @@ class CANTalon : public MotorSafety,
    * count (4X). Caller can use ConfigEncoderCodesPerRev to set the quadrature
    * encoder CPR.
    */
-  uint32_t m_codesPerRev = 0;
+  int m_codesPerRev = 0;
   /**
    * Number of turns per rotation.  For example, a 10-turn pot spins ten full
    * rotations from a wiper voltage of zero to 3.3 volts.  Therefore knowing
@@ -494,14 +494,14 @@ class CANTalon : public MotorSafety,
    * behaves as it did during the 2015 season, there are 1024 position units
    * from zero to 3.3V.
    */
-  uint32_t m_numPotTurns = 0;
+  int m_numPotTurns = 0;
   /**
    * Although the Talon handles feedback selection, caching the feedback
    * selection is helpful at the API level for scaling into rotations and RPM.
    */
   FeedbackDevice m_feedbackDevice = QuadEncoder;
 
-  static constexpr unsigned int kDelayForSolicitedSignalsUs = 4000;
+  static constexpr int kDelayForSolicitedSignalsUs = 4000;
   /**
    * @param devToLookup FeedbackDevice to lookup the scalar for.  Because Talon
    *                    allows multiple sensors to be attached simultaneously,
@@ -531,8 +531,8 @@ class CANTalon : public MotorSafety,
    * @return fullRotations in native engineering units of the Talon SRX
    *         firmware.
    */
-  int32_t ScaleRotationsToNativeUnits(FeedbackDevice devToLookup,
-                                      double fullRotations) const;
+  int ScaleRotationsToNativeUnits(FeedbackDevice devToLookup,
+                                  double fullRotations) const;
   /**
    * @param rpm double precision value representing number of rotations per
    *            minute of selected feedback sensor. If user has never called
@@ -544,8 +544,7 @@ class CANTalon : public MotorSafety,
    * @return sensor velocity in native engineering units of the Talon SRX
    *         firmware.
    */
-  int32_t ScaleVelocityToNativeUnits(FeedbackDevice devToLookup,
-                                     double rpm) const;
+  int ScaleVelocityToNativeUnits(FeedbackDevice devToLookup, double rpm) const;
   /**
    * @param nativePos integral position of the feedback sensor in native
    *                  Talon SRX units. If user has never called the config
@@ -558,7 +557,7 @@ class CANTalon : public MotorSafety,
    *         performed.
    */
   double ScaleNativeUnitsToRotations(FeedbackDevice devToLookup,
-                                     int32_t nativePos) const;
+                                     int nativePos) const;
   /**
    * @param nativeVel integral velocity of the feedback sensor in native
    *                  Talon SRX units. If user has never called the config
@@ -570,8 +569,7 @@ class CANTalon : public MotorSafety,
    * @return double precision of sensor velocity in RPM, unless config was never
    *         performed.
    */
-  double ScaleNativeUnitsToRpm(FeedbackDevice devToLookup,
-                               int32_t nativeVel) const;
+  double ScaleNativeUnitsToRpm(FeedbackDevice devToLookup, int nativeVel) const;
 
   // LiveWindow stuff.
   std::shared_ptr<ITable> m_table;

@@ -34,25 +34,25 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   static DriverStation& GetInstance();
   static void ReportError(std::string error);
   static void ReportWarning(std::string error);
-  static void ReportError(bool is_error, int32_t code, const std::string& error,
+  static void ReportError(bool is_error, int code, const std::string& error,
                           const std::string& location,
                           const std::string& stack);
 
-  static const uint32_t kJoystickPorts = 6;
+  static const int kJoystickPorts = 6;
 
-  float GetStickAxis(uint32_t stick, uint32_t axis);
-  int GetStickPOV(uint32_t stick, uint32_t pov);
-  uint32_t GetStickButtons(uint32_t stick) const;
-  bool GetStickButton(uint32_t stick, uint8_t button);
+  float GetStickAxis(int stick, int axis);
+  int GetStickPOV(int stick, int pov);
+  int GetStickButtons(int stick) const;
+  bool GetStickButton(int stick, int button);
 
-  int GetStickAxisCount(uint32_t stick) const;
-  int GetStickPOVCount(uint32_t stick) const;
-  int GetStickButtonCount(uint32_t stick) const;
+  int GetStickAxisCount(int stick) const;
+  int GetStickPOVCount(int stick) const;
+  int GetStickButtonCount(int stick) const;
 
-  bool GetJoystickIsXbox(uint32_t stick) const;
-  int GetJoystickType(uint32_t stick) const;
-  std::string GetJoystickName(uint32_t stick) const;
-  int GetJoystickAxisType(uint32_t stick, uint8_t axis) const;
+  bool GetJoystickIsXbox(int stick) const;
+  int GetJoystickType(int stick) const;
+  std::string GetJoystickName(int stick) const;
+  int GetJoystickAxisType(int stick, int axis) const;
 
   bool IsEnabled() const override;
   bool IsDisabled() const override;
@@ -66,7 +66,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   bool IsBrownedOut() const;
 
   Alliance GetAlliance() const;
-  uint32_t GetLocation() const;
+  int GetLocation() const;
   void WaitForData();
   double GetMatchTime() const;
   float GetBatteryVoltage() const;

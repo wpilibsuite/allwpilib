@@ -46,7 +46,7 @@ class SerialPort : public ErrorBase {
   enum WriteBufferMode { kFlushOnAccess = 1, kFlushWhenFull = 2 };
   enum Port { kOnboard = 0, kMXP = 1, kUSB = 2 };
 
-  SerialPort(uint32_t baudRate, Port port = kOnboard, uint8_t dataBits = 8,
+  SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
              Parity parity = kParity_None, StopBits stopBits = kStopBits_One);
   ~SerialPort();
 
@@ -56,19 +56,19 @@ class SerialPort : public ErrorBase {
   void SetFlowControl(FlowControl flowControl);
   void EnableTermination(char terminator = '\n');
   void DisableTermination();
-  int32_t GetBytesReceived();
-  uint32_t Read(char* buffer, int32_t count);
-  uint32_t Write(const std::string& buffer, int32_t count);
+  int GetBytesReceived();
+  int Read(char* buffer, int count);
+  int Write(const std::string& buffer, int count);
   void SetTimeout(float timeout);
-  void SetReadBufferSize(uint32_t size);
-  void SetWriteBufferSize(uint32_t size);
+  void SetReadBufferSize(int size);
+  void SetWriteBufferSize(int size);
   void SetWriteBufferMode(WriteBufferMode mode);
   void Flush();
   void Reset();
 
  private:
-  uint32_t m_resourceManagerHandle = 0;
-  uint32_t m_portHandle = 0;
+  int m_resourceManagerHandle = 0;
+  int m_portHandle = 0;
   bool m_consoleModeEnabled = false;
-  uint8_t m_port;
+  int m_port;
 };

@@ -11,7 +11,7 @@
 /**
  * @param channel The PWM channel that the Jaguar is attached to.
  */
-Jaguar::Jaguar(uint32_t channel) : SafePWM(channel) {
+Jaguar::Jaguar(int channel) : SafePWM(channel) {
   /*
    * Input profile defined by Luminary Micro.
    *

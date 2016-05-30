@@ -21,13 +21,13 @@
  *
  * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
  */
-DigitalInput::DigitalInput(uint32_t channel) {
+DigitalInput::DigitalInput(int channel) {
   std::stringstream buf;
 
   if (!CheckDigitalChannel(channel)) {
     buf << "Digital Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
-    m_channel = std::numeric_limits<uint32_t>::max();
+    m_channel = std::numeric_limits<int>::max();
     return;
   }
   m_channel = channel;
@@ -38,7 +38,7 @@ DigitalInput::DigitalInput(uint32_t channel) {
     wpi_setErrorWithContextRange(status, 0, HAL_GetNumDigitalChannels(),
                                  channel, HAL_GetErrorMessage(status));
     m_handle = HAL_kInvalidHandle;
-    m_channel = std::numeric_limits<uint32_t>::max();
+    m_channel = std::numeric_limits<int>::max();
     return;
   }
 
@@ -77,7 +77,7 @@ bool DigitalInput::Get() const {
 /**
  * @return The GPIO channel number that this object represents.
  */
-uint32_t DigitalInput::GetChannel() const { return m_channel; }
+int DigitalInput::GetChannel() const { return m_channel; }
 
 /**
  * @return The HAL Handle to the specified source.

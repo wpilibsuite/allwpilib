@@ -81,7 +81,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
   m_controlLoop->StartPeriodic(m_period);
 
-  static int32_t instances = 0;
+  static int instances = 0;
   instances++;
 
   m_toleranceType = kNoTolerance;
@@ -483,7 +483,7 @@ void PIDController::SetPercentTolerance(float percent) {
  * not register as on target for at least the specified bufLength cycles.
  * @param bufLength Number of previous cycles to average. Defaults to 1.
  */
-void PIDController::SetToleranceBuffer(unsigned bufLength) {
+void PIDController::SetToleranceBuffer(int bufLength) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_bufLength = bufLength;
 

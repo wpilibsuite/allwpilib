@@ -15,6 +15,6 @@
  */
 class TalonSRX : public PWMSpeedController {
  public:
-  explicit TalonSRX(uint32_t channel);
+  explicit TalonSRX(int channel);
   virtual ~TalonSRX() = default;
 };

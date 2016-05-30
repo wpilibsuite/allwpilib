@@ -81,32 +81,32 @@ class ErrorBase {
   virtual const Error& GetError() const;
   virtual void SetErrnoError(llvm::StringRef contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
-                             uint32_t lineNumber) const;
+                             int lineNumber) const;
   virtual void SetImaqError(int success, llvm::StringRef contextMessage,
                             llvm::StringRef filename, llvm::StringRef function,
-                            uint32_t lineNumber) const;
+                            int lineNumber) const;
   virtual void SetError(Error::Code code, llvm::StringRef contextMessage,
                         llvm::StringRef filename, llvm::StringRef function,
-                        uint32_t lineNumber) const;
+                        int lineNumber) const;
   virtual void SetErrorRange(Error::Code code, int32_t minRange,
                              int32_t maxRange, int32_t requestedValue,
                              llvm::StringRef contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
-                             uint32_t lineNumber) const;
+                             int lineNumber) const;
   virtual void SetWPIError(llvm::StringRef errorMessage, Error::Code code,
                            llvm::StringRef contextMessage,
                            llvm::StringRef filename, llvm::StringRef function,
-                           uint32_t lineNumber) const;
+                           int lineNumber) const;
   virtual void CloneError(const ErrorBase& rhs) const;
   virtual void ClearError() const;
   virtual bool StatusIsFatal() const;
   static void SetGlobalError(Error::Code code, llvm::StringRef contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
-                             uint32_t lineNumber);
+                             int lineNumber);
   static void SetGlobalWPIError(llvm::StringRef errorMessage,
                                 llvm::StringRef contextMessage,
                                 llvm::StringRef filename,
-                                llvm::StringRef function, uint32_t lineNumber);
+                                llvm::StringRef function, int lineNumber);
   static Error& GetGlobalError();
 
  protected:

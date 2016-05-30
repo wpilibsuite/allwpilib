@@ -21,13 +21,13 @@
  *
  * @param channel The channel number on the roboRIO to represent.
  */
-AnalogOutput::AnalogOutput(uint32_t channel) {
+AnalogOutput::AnalogOutput(int channel) {
   std::stringstream buf;
   buf << "analog input " << channel;
 
   if (!SensorBase::CheckAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
-    m_channel = std::numeric_limits<uint32_t>::max();
+    m_channel = std::numeric_limits<int>::max();
     m_port = HAL_kInvalidHandle;
     return;
   }
@@ -40,7 +40,7 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
   if (status != 0) {
     wpi_setErrorWithContextRange(status, 0, HAL_GetNumAnalogOutputs(), channel,
                                  HAL_GetErrorMessage(status));
-    m_channel = std::numeric_limits<uint32_t>::max();
+    m_channel = std::numeric_limits<int>::max();
     m_port = HAL_kInvalidHandle;
     return;
   }

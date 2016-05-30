@@ -22,7 +22,6 @@
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
 #include "PIDOutput.h"
-#include "Resource.h"
 #include "tables/ITableListener.h"
 
 /**
@@ -35,7 +34,7 @@ class CANJaguar : public MotorSafety,
                   public ITableListener {
  public:
   // The internal PID control loop in the Jaguar runs at 1kHz.
-  static const int32_t kControllerRate = 1000;
+  static const int kControllerRate = 1000;
   static constexpr double kApproxBusVoltage = 12.0;
 
   // Control mode tags
@@ -52,11 +51,11 @@ class CANJaguar : public MotorSafety,
   static const struct PotentiometerStruct {
   } Potentiometer;
 
-  explicit CANJaguar(uint8_t deviceNumber);
+  explicit CANJaguar(int deviceNumber);
   virtual ~CANJaguar();
 
-  uint8_t getDeviceNumber() const;
-  uint8_t GetHardwareVersion() const;
+  int getDeviceNumber() const;
+  int GetHardwareVersion() const;
 
   // PIDOutput interface
   void PIDWrite(float output) override;
@@ -91,7 +90,7 @@ class CANJaguar : public MotorSafety,
   void SetVoltageMode(QuadEncoderStruct, uint16_t codesPerRev);
   void SetVoltageMode(PotentiometerStruct);
 
-  void Set(float value, uint8_t syncGroup);
+  void Set(float value, int syncGroup);
 
   // CANSpeedController interface
   float Get() const override;
@@ -115,7 +114,7 @@ class CANJaguar : public MotorSafety,
   bool GetReverseLimitOK() const override;
   uint16_t GetFaults() const override;
   void SetVoltageRampRate(double rampRate) override;
-  uint32_t GetFirmwareVersion() const override;
+  int GetFirmwareVersion() const override;
   void ConfigNeutralMode(NeutralMode mode) override;
   void ConfigEncoderCodesPerRev(uint16_t codesPerRev) override;
   void ConfigPotentiometerTurns(uint16_t turns) override;
@@ -139,7 +138,7 @@ class CANJaguar : public MotorSafety,
   bool IsSafetyEnabled() const override;
   void SetSafetyEnabled(bool enabled) override;
   void GetDescription(std::ostringstream& desc) const override;
-  uint8_t GetDeviceID() const;
+  int GetDeviceID() const;
 
   // SpeedController overrides
   void SetInverted(bool isInverted) override;
@@ -147,28 +146,27 @@ class CANJaguar : public MotorSafety,
 
  protected:
   // Control mode helpers
-  void SetSpeedReference(uint8_t reference);
-  uint8_t GetSpeedReference() const;
+  void SetSpeedReference(int reference);
+  int GetSpeedReference() const;
 
-  void SetPositionReference(uint8_t reference);
-  uint8_t GetPositionReference() const;
+  void SetPositionReference(int reference);
+  int GetPositionReference() const;
 
-  uint8_t packPercentage(uint8_t* buffer, double value);
-  uint8_t packFXP8_8(uint8_t* buffer, double value);
-  uint8_t packFXP16_16(uint8_t* buffer, double value);
-  uint8_t packint16_t(uint8_t* buffer, int16_t value);
-  uint8_t packint32_t(uint8_t* buffer, int32_t value);
+  int packPercentage(uint8_t* buffer, double value);
+  int packFXP8_8(uint8_t* buffer, double value);
+  int packFXP16_16(uint8_t* buffer, double value);
+  int packInt16(uint8_t* buffer, int16_t value);
+  int packInt32(uint8_t* buffer, int32_t value);
   double unpackPercentage(uint8_t* buffer) const;
   double unpackFXP8_8(uint8_t* buffer) const;
   double unpackFXP16_16(uint8_t* buffer) const;
-  int16_t unpackint16_t(uint8_t* buffer) const;
-  int32_t unpackint32_t(uint8_t* buffer) const;
+  int16_t unpackInt16(uint8_t* buffer) const;
+  int32_t unpackInt32(uint8_t* buffer) const;
 
-  void sendMessage(uint32_t messageID, const uint8_t* data, uint8_t dataSize,
-                   int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
-  void requestMessage(uint32_t messageID,
-                      int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
-  bool getMessage(uint32_t messageID, uint32_t mask, uint8_t* data,
+  void sendMessage(int messageID, const uint8_t* data, uint8_t dataSize,
+                   int period = CAN_SEND_PERIOD_NO_REPEAT);
+  void requestMessage(int messageID, int period = CAN_SEND_PERIOD_NO_REPEAT);
+  bool getMessage(int messageID, uint32_t mask, uint8_t* data,
                   uint8_t* dataSize) const;
 
   void setupPeriodicStatus();
@@ -176,13 +174,13 @@ class CANJaguar : public MotorSafety,
 
   mutable priority_recursive_mutex m_mutex;
 
-  uint8_t m_deviceNumber;
+  int m_deviceNumber;
   float m_value = 0.0f;
 
   // Parameters/configuration
   ControlMode m_controlMode = kPercentVbus;
-  uint8_t m_speedReference = LM_REF_NONE;
-  uint8_t m_positionReference = LM_REF_NONE;
+  int m_speedReference = LM_REF_NONE;
+  int m_positionReference = LM_REF_NONE;
   double m_p = 0.0;
   double m_i = 0.0;
   double m_d = 0.0;
@@ -221,10 +219,10 @@ class CANJaguar : public MotorSafety,
   mutable float m_temperature = 0.0f;
   mutable double m_position = 0.0;
   mutable double m_speed = 0.0;
-  mutable uint8_t m_limits = 0x00;
+  mutable int m_limits = 0x00;
   mutable uint16_t m_faults = 0x0000;
-  uint32_t m_firmwareVersion = 0;
-  uint8_t m_hardwareVersion = 0;
+  int m_firmwareVersion = 0;
+  int m_hardwareVersion = 0;
 
   // Which periodic status messages have we received at least once?
   mutable std::atomic<bool> m_receivedStatusMessage0{false};

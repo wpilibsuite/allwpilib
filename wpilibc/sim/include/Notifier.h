@@ -43,7 +43,7 @@ class Notifier : public ErrorBase {
   static std::atomic<int> refcount;
 
   // Process the timer queue on a timer event
-  static void ProcessQueue(uint32_t mask, void* params);
+  static void ProcessQueue(int mask, void* params);
 
   // Update the FPGA alarm since the queue has changed
   static void UpdateAlarm();

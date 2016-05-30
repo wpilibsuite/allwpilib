@@ -30,9 +30,9 @@ inline bool CheckStatusRange(JNIEnv *env, int32_t status, int32_t minRange,
   return status == 0;
 }
 
-void ReportCANError(JNIEnv *env, int32_t status, int message_id);
+void ReportCANError(JNIEnv *env, int32_t status, int32_t message_id);
 
-inline bool CheckCANStatus(JNIEnv *env, int32_t status, int message_id) {
+inline bool CheckCANStatus(JNIEnv *env, int32_t status, int32_t message_id) {
   if (status != 0) ReportCANError(env, status, message_id);
   return status == 0;
 }
