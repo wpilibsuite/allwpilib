@@ -2,7 +2,6 @@ approve_by_comment: true
 approve_regex: ^(Approved|LGTM)
 reject_regex: ^Rejected
 reset_on_push: true
-author_approval: required
 reset_on_reopened: true
 
 reviewers:
