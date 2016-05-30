@@ -375,7 +375,7 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
-  uint32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
+  int32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
       0, port->channel, status);  // XXX: aiSystemIndex == 0?
   return lsbWeight;
 }

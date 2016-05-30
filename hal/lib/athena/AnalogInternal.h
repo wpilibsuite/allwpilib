@@ -37,9 +37,9 @@ extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
                              kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
     analogInputHandles;
 
-uint32_t getAnalogNumActiveChannels(int32_t* status);
-uint32_t getAnalogNumChannelsToActivate(int32_t* status);
-void setAnalogNumChannelsToActivate(uint32_t channels);
+int32_t getAnalogNumActiveChannels(int32_t* status);
+int32_t getAnalogNumChannelsToActivate(int32_t* status);
+void setAnalogNumChannelsToActivate(int32_t channels);
 void initializeAnalog(int32_t* status);
 
 extern bool analogSystemInitialized;

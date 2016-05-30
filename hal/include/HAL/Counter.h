@@ -54,7 +54,7 @@ void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counterHandle,
 int32_t HAL_GetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
                                        int32_t* status);
 void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counterHandle,
-                                    int samplesToAverage, int32_t* status);
+                                    int32_t samplesToAverage, int32_t* status);
 void HAL_ResetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 int32_t HAL_GetCounter(HAL_CounterHandle counterHandle, int32_t* status);
 double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status);

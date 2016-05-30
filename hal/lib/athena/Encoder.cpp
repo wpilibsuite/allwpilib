@@ -172,7 +172,7 @@ void Encoder::SetReverseDirection(bool reverseDirection, int32_t* status) {
   }
 }
 
-void Encoder::SetSamplesToAverage(int samplesToAverage, int32_t* status) {
+void Encoder::SetSamplesToAverage(int32_t samplesToAverage, int32_t* status) {
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;

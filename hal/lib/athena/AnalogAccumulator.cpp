@@ -26,7 +26,7 @@ HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analogPortHandle,
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  for (uint32_t i = 0; i < kNumAccumulators; i++) {
+  for (int32_t i = 0; i < kNumAccumulators; i++) {
     if (port->channel == kAccumulatorChannels[i]) return true;
   }
   return false;

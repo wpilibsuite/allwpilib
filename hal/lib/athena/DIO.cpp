@@ -383,7 +383,7 @@ HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
  * @param filterIndex The filter index.  Must be in the range 0 - 3, where 0
  *                    means "none" and 1 - 3 means filter # filterIndex - 1.
  */
-void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int filterIndex,
+void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
                          int32_t* status) {
   auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
@@ -408,7 +408,7 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int filterIndex,
  * @return filterIndex The filter index.  Must be in the range 0 - 3,
  * where 0 means "none" and 1 - 3 means filter # filterIndex - 1.
  */
-int HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
+int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
   auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;

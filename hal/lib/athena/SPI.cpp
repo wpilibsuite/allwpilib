@@ -342,12 +342,12 @@ static void spiAccumulatorProcess(uint64_t currentTime,
   // convert from bytes
   uint32_t resp = 0;
   if (accum->bigEndian) {
-    for (int i = 0; i < accum->xferSize; ++i) {
+    for (int32_t i = 0; i < accum->xferSize; ++i) {
       resp <<= 8;
       resp |= resp_b[i] & 0xff;
     }
   } else {
-    for (int i = accum->xferSize - 1; i >= 0; --i) {
+    for (int32_t i = accum->xferSize - 1; i >= 0; --i) {
       resp <<= 8;
       resp |= resp_b[i] & 0xff;
     }
@@ -408,7 +408,7 @@ void HAL_InitSPIAccumulator(int32_t port, int32_t period, int32_t cmd,
     spiAccumulators[port] = std::make_unique<SPIAccumulator>();
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (bigEndian) {
-    for (int i = xferSize - 1; i >= 0; --i) {
+    for (int32_t i = xferSize - 1; i >= 0; --i) {
       accum->cmd[i] = cmd & 0xff;
       cmd >>= 8;
     }

@@ -118,7 +118,7 @@ void HAL_SetSolenoid(HAL_SolenoidHandle solenoidPortHandle, HAL_Bool value,
 
 int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status) {
   if (!checkPCMInit(module, status)) return 0;
-  UINT8 value;
+  uint8_t value;
 
   *status = PCM_modules[module]->GetSolenoidBlackList(value);
 
