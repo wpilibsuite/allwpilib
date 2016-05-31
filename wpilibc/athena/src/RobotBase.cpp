@@ -7,8 +7,7 @@
 
 #include "RobotBase.h"
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
 
 #include "DriverStation.h"
 #include "HAL/HAL.h"
@@ -28,7 +27,7 @@ void RobotBase::setInstance(RobotBase* robot) {
 RobotBase& RobotBase::getInstance() { return *m_instance; }
 
 void RobotBase::robotSetup(RobotBase* robot) {
-  printf("\n********** Robot program starting **********\n");
+  std::printf("\n********** Robot program starting **********\n");
   robot->StartCompetition();
 }
 

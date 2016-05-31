@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Solenoid.h"
+
+#include <cstdio>
+
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 #include "simulation/simTime.h"

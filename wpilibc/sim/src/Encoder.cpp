@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Encoder.h"
+
+#include <cstdio>
+
 #include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "WPIErrors.h"
@@ -27,8 +30,8 @@
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection,
-                          EncodingType encodingType) {
+void Encoder::InitEncoder(int32_t channelA, int32_t channelB,
+                          bool reverseDirection, EncodingType encodingType) {
   m_table = nullptr;
   this->channelA = channelA;
   this->channelB = channelB;

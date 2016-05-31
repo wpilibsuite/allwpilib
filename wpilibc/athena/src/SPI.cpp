@@ -7,7 +7,7 @@
 
 #include "SPI.h"
 
-#include <string.h>
+#include <cstring>
 
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
@@ -151,7 +151,7 @@ int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size) {
   int32_t retVal = 0;
   if (initiate) {
     auto dataToSend = new uint8_t[size];
-    memset(dataToSend, 0, size);
+    std::memset(dataToSend, 0, size);
     retVal = spiTransaction(m_port, dataToSend, dataReceived, size);
   } else
     retVal = spiRead(m_port, dataReceived, size);

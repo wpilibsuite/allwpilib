@@ -8,11 +8,11 @@
 #include "CameraServer.h"
 
 #include <netdb.h>
-#include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
 #include <chrono>
+#include <cstring>
 #include <iostream>
 
 #include "Utility.h"
@@ -170,7 +170,7 @@ void CameraServer::Serve() {
 
   sockaddr_in address, clientAddress;
 
-  memset(&address, 0, sizeof(address));
+  std::memset(&address, 0, sizeof(address));
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = htonl(INADDR_ANY);
   address.sin_port = htons(kPort);

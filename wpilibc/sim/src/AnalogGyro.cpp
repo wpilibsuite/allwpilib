@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogGyro.h"
+
+#include <cstdio>
+
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"

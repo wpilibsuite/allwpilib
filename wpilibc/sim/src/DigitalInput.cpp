@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DigitalInput.h"
+
+#include <cstdio>
+
 #include "WPIErrors.h"
 
 /**

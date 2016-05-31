@@ -5,8 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <stdarg.h>
-#include <stdlib.h>
+#include <cstdarg>
 
 #include "Vision/BaeUtilities.h"
 #include "Vision/FrcError.h"
@@ -652,7 +651,7 @@ int frcSmartThreshold(Image* dest, const Image* source,
  * @param rangeMin The lower boundary of the range of pixel values to keep
  * @param rangeMax The upper boundary of the range of pixel values to keep.
  *
- * @return int - error code: 0 = error. To get extended error information, call
+ * @return error code: 0 = error. To get extended error information, call
  *         GetLastError().
  */
 int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
@@ -675,7 +674,7 @@ int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,
  * @param newValue The replacement value for pixels within the range. Use the
  *                 simplified call to leave the pixel values unchanged
  *
- * @return int - error code: 0 = error. To get extended error information, call
+ * @return error code: 0 = error. To get extended error information, call
  *         GetLastError().
  */
 int frcSimpleThreshold(Image* dest, const Image* source, float rangeMin,

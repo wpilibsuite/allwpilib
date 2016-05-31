@@ -7,10 +7,7 @@
 
 #include "Utility.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include <cstdio>
 #include <iostream>
 #include <sstream>
 #if not defined(_WIN32)
@@ -43,10 +40,10 @@ void wpi_suspendOnAssertEnabled(bool enabled) {
 static void wpi_handleTracing() {
   // if (stackTraceEnabled)
   // {
-  // 	printf("\n-----------<Stack Trace>----------------\n");
+  // 	std::printf("\n-----------<Stack Trace>----------------\n");
   // 	printCurrentStackTrace();
   // }
-  printf("\n");
+  std::printf("\n");
 }
 
 /**

@@ -7,9 +7,8 @@
 
 #include "Task.h"
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include <cerrno>
+
 #include "WPIErrors.h"
 
 #ifndef OK

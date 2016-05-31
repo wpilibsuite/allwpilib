@@ -7,7 +7,7 @@
 
 #include "HAL/DIO.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "DigitalInternal.h"
 
@@ -100,7 +100,7 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t* status) {
     if (pwmPeriodPower < 4) {
       // The resolution of the duty cycle drops close to the highest
       // frequencies.
-      rawDutyCycle = rawDutyCycle / pow(2.0, 4 - pwmPeriodPower);
+      rawDutyCycle = rawDutyCycle / std::pow(2.0, 4 - pwmPeriodPower);
     }
     if (id < 4)
       digitalSystem->writePWMDutyCycleA(id, (uint8_t)rawDutyCycle, status);
