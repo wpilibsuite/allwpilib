@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <math.h>
 #include <stdint.h>
 
 #include "Accelerometer.h"
@@ -205,10 +204,6 @@ struct HALJoystickDescriptor {
   uint8_t buttonCount;
   uint8_t povCount;
 };
-
-inline float intToFloat(int value) { return (float)value; }
-
-inline int floatToInt(float value) { return round(value); }
 
 extern "C" {
 extern const uint32_t dio_kNumSystems;

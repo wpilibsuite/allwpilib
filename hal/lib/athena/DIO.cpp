@@ -7,7 +7,7 @@
 
 #include "HAL/DIO.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "DigitalInternal.h"
 

@@ -11,6 +11,7 @@
 
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 
+extern "C" {
 void canTxSend(uint32_t arbID, uint8_t length,
                int32_t period = CAN_SEND_PERIOD_NO_REPEAT);
 
@@ -33,3 +34,4 @@ uint16_t canRxUnpackInt16(uint32_t arbID, uint8_t offset);
 uint32_t canRxUnpackInt32(uint32_t arbID, uint8_t offset);
 double canRxUnpackFXP16(uint32_t arbID, uint8_t offset);
 double canRxUnpackFXP32(uint32_t arbID, uint8_t offset);
+}

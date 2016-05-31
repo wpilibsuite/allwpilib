@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogGyro.h"
+
+#include <cstdio>
+
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
@@ -30,7 +33,7 @@ void AnalogGyro::InitAnalogGyro(int32_t channel) {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
   char buffer[50];
-  int32_t n = sprintf(buffer, "analog/%d", channel);
+  int32_t n = std::sprintf(buffer, "analog/%d", channel);
   impl = new SimGyro(buffer);
 
   LiveWindow::GetInstance()->AddSensor("AnalogGyro", channel, this);

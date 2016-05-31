@@ -7,9 +7,8 @@
 
 #include "Task.h"
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include <cerrno>
+
 #include "WPIErrors.h"
 
 #ifndef OK
@@ -95,7 +94,7 @@ std::string Task::GetName() const { return m_taskName; }
  */
 bool Task::HandleError(STATUS results) {
   if (results != ERROR) return true;
-  int errsv = errno;
+  int32_t errsv = errno;
   if (errsv == HAL_taskLib_ILLEGAL_PRIORITY) {
     wpi_setWPIErrorWithContext(TaskPriorityError, m_taskName.c_str());
   } else {

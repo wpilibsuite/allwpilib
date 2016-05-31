@@ -7,11 +7,9 @@
 
 #include "Vision/BinaryImage.h"
 
-#include <string.h>
+#include <cstring>
 
 #include "WPIErrors.h"
-
-using namespace std;
 
 /**
  * Get then number of particles for the image.
@@ -109,7 +107,7 @@ void BinaryImage::GetParticleAnalysisReport(int32_t particleNumber,
  * @return a pointer to the vector of particle analysis reports. The caller
  *         must delete the vector when finished using it.
  */
-vector<ParticleAnalysisReport>*
+std::vector<ParticleAnalysisReport>*
 BinaryImage::GetOrderedParticleAnalysisReports() {
   auto particles = new std::vector<ParticleAnalysisReport>;
   int32_t particleCount = GetNumberParticles();
@@ -134,7 +132,7 @@ BinaryImage::GetOrderedParticleAnalysisReports() {
  */
 void BinaryImage::Write(const char* fileName) {
   RGBValue colorTable[256];
-  memset(colorTable, 0, sizeof(colorTable));
+  std::memset(colorTable, 0, sizeof(colorTable));
   colorTable[0].R = 0;
   colorTable[1].R = 255;
   colorTable[0].G = colorTable[1].G = 0;

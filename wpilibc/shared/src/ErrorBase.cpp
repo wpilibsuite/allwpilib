@@ -7,10 +7,7 @@
 
 #include "ErrorBase.h"
 
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-
+#include <cerrno>
 #include <sstream>
 
 #define WPI_ERRORS_DEFINE_STRINGS

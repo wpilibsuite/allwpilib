@@ -7,8 +7,7 @@
 
 #include "CANJaguar.h"
 
-#include <assert.h>
-#include <stdio.h>
+#include <cassert>
 
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"

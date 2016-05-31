@@ -279,10 +279,9 @@ Joystick::HIDType Joystick::GetType() const {
  */
 std::string Joystick::GetName() const { return m_ds.GetJoystickName(m_port); }
 
-// int Joystick::GetAxisType(uint8_t axis) const
-//{
-//  return m_ds.GetJoystickAxisType(m_port, axis);
-//}
+int32_t Joystick::GetAxisType(uint8_t axis) const {
+  return m_ds.GetJoystickAxisType(m_port, axis);
+}
 
 /**
  * Get the number of axis for a joystick.

@@ -86,7 +86,7 @@ Timer::Timer() : m_startTime(0.0), m_accumulatedTime(0.0), m_running(false) {
  * start time stored in the timer class. If the clock is not running, then
  * return the time when it was last stopped.
  *
- * @return unsigned Current time value for this timer in seconds
+ * @return Current time value for this timer in seconds
  */
 double Timer::Get() const {
   double result;

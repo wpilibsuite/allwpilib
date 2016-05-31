@@ -162,12 +162,7 @@ void PWM::SetPosition(float pos) {
   // converting to int
   uint16_t rawValue =
       (int32_t)((pos * (float)GetFullRangeScaleFactor()) + GetMinNegativePwm());
-  //  printf("MinNegPWM: %d FullRangeScaleFactor: %d Raw value: %5d   Input "
-  // "value: %4.4f\n", GetMinNegativePwm(), GetFullRangeScaleFactor(), rawValue,
-  // pos);
 
-  // wpi_assert((rawValue >= GetMinNegativePwm()) && (rawValue <=
-  // GetMaxPositivePwm()));
   wpi_assert(rawValue != kPwmDisabled);
 
   // send the computed pwm value to the FPGA

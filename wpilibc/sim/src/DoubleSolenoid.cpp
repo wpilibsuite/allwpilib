@@ -36,8 +36,8 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
     m_reversed = true;
   }
   char buffer[50];
-  int32_t n = sprintf(buffer, "pneumatic/%d/%d/%d/%d", moduleNumber,
-                      forwardChannel, moduleNumber, reverseChannel);
+  int32_t n = std::sprintf(buffer, "pneumatic/%d/%d/%d/%d", moduleNumber,
+                           forwardChannel, moduleNumber, reverseChannel);
   m_impl = new SimContinuousOutput(buffer);
 
   LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", moduleNumber,

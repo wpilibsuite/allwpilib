@@ -5,11 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <math.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdarg>
+#include <cstdio>
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -198,12 +197,12 @@ void ShowActivity(char* fmt, ...) {
 
   va_start(args, fmt);
 
-  vsprintf(text, fmt, args);
+  std::vsprintf(text, fmt, args);
 
   ai = ai == 3 ? 0 : ai + 1;
 
-  printf("%c %s \r", activity_indication_string[ai], text);
-  fflush(stdout);
+  std::printf("%c %s \r", activity_indication_string[ai], text);
+  std::fflush(stdout);
 
   va_end(args);
 }
@@ -237,7 +236,7 @@ double SinPosition(double* period, double sinStart) {
   // Adding sinStart to the part multiplied by PI, but not by 2, allows it to
   // work as described in the comments.
   sinArg = PI * ((2.0 * (GetTime() - timestamp)) + sinStart) / sinePeriod;
-  rtnVal = sin(sinArg);
+  rtnVal = std::sin(sinArg);
   return (rtnVal);
 }
 
