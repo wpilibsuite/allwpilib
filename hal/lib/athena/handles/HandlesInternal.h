@@ -31,7 +31,7 @@ static inline HalHandleEnum getHandleType(HalHandle handle) {
   return (HalHandleEnum)((handle >> 24) & 0xff);
 }
 static inline bool isHandleType(HalHandle handle, HalHandleEnum handleType) {
-  return handleType == getHandleType(handleType);
+  return handleType == getHandleType(handle);
 }
 static inline int16_t getHandleTypedIndex(HalHandle handle,
                                           HalHandleEnum enumType) {
