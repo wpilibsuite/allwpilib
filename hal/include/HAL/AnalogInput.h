@@ -9,9 +9,11 @@
 
 #include <stdint.h>
 
+#include "Handles.h"
+
 extern "C" {
 // Analog input functions
-void* initializeAnalogInputPort(void* port_pointer, int32_t* status);
+void* initializeAnalogInputPort(HalPortHandle port_handle, int32_t* status);
 void freeAnalogInputPort(void* analog_port_pointer);
 bool checkAnalogModule(uint8_t module);
 bool checkAnalogInputChannel(uint32_t pin);

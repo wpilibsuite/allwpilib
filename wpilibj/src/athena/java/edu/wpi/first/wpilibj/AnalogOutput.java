@@ -42,8 +42,8 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
       throw new AllocationException("Analog output channel " + m_channel + " is already allocated");
     }
 
-    final long portPointer = AnalogJNI.getPort((byte) channel);
-    m_port = AnalogJNI.initializeAnalogOutputPort(portPointer);
+    final int portHandle = AnalogJNI.getPort((byte) channel);
+    m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);
 
     LiveWindow.addSensor("AnalogOutput", channel, this);
     UsageReporting.report(tResourceType.kResourceType_AnalogOutput, channel);

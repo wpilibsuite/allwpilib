@@ -57,8 +57,8 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
         + m_moduleNumber + " is already allocated");
     }
 
-    long port = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
-    m_solenoidPort = SolenoidJNI.initializeSolenoidPort(port);
+    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
+    m_solenoidPort = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
     UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);

@@ -42,5 +42,30 @@ static inline int16_t getHandleTypedIndex(HalHandle handle,
   return getHandleIndex(handle);
 }
 
+/* specialized functions for Port handle
+ * Port Handle Data Layout
+ * Bits 0-7:   Pin Number
+ * Bits 8-15:  Module Number
+ * Bits 16-23: Unused
+ * Bits 24-30: Handle Type
+ * Bit 31:     1 if handle error, 0 if no error
+ */
+
+// using a 16 bit value so we can store 0-255 and still report error
+static inline int16_t getPortHandlePin(HalPortHandle handle) {
+  if (!isHandleType(handle, HalHandleEnum::Port))
+    return HAL_HANDLE_INVALID_TYPE;
+  return (uint8_t)(handle & 0xff);
+}
+
+// using a 16 bit value so we can store 0-255 and still report error
+static inline int16_t getPortHandleModule(HalPortHandle handle) {
+  if (!isHandleType(handle, HalHandleEnum::Port))
+    return HAL_HANDLE_INVALID_TYPE;
+  return (uint8_t)((handle >> 8) & 0xff);
+}
+
+HalPortHandle createPortHandle(uint8_t pin, uint8_t module);
+
 HalHandle createHandle(int16_t index, HalHandleEnum handleType);
 }

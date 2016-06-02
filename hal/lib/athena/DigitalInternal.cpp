@@ -13,7 +13,6 @@
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/HAL.h"
-#include "HAL/Port.h"
 #include "HAL/cpp/Resource.h"
 #include "HAL/cpp/priority_mutex.h"
 
@@ -78,7 +77,7 @@ void initializeDigital(int32_t* status) {
   for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
     // Initialize port structure
     DigitalPort digital_port;
-    digital_port.port.pin = pwm_index;
+    digital_port.pin = pwm_index;
 
     setPWM(&digital_port, kPwmDisabled, status);
     setPWMPeriodScale(&digital_port, 3, status);  // Set all to 4x by default.

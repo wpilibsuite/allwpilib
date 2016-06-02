@@ -29,15 +29,15 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    initializeDigitalPort
- * Signature: (J)J;
+ * Signature: (I)J;
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDigitalPort(
-    JNIEnv *env, jclass, jlong id) {
+    JNIEnv *env, jclass, jint id) {
   DIOJNI_LOG(logDEBUG) << "Calling DIOJNI initializeDigitalPort";
-  DIOJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
+  DIOJNI_LOG(logDEBUG) << "Port Handle = " << (HalPortHandle)id;
   int32_t status = 0;
-  void *dio = initializeDigitalPort((void *)id, &status);
+  void *dio = initializeDigitalPort((HalPortHandle)id, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "DIO Ptr = " << dio;
   CheckStatus(env, status);

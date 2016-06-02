@@ -9,8 +9,10 @@
 
 #include <stdint.h>
 
+#include "Handles.h"
+
 extern "C" {
-void* initializeAnalogOutputPort(void* port_pointer, int32_t* status);
+void* initializeAnalogOutputPort(HalPortHandle port_handle, int32_t* status);
 void freeAnalogOutputPort(void* analog_port_pointer);
 void setAnalogOutput(void* analog_port_pointer, double voltage,
                      int32_t* status);

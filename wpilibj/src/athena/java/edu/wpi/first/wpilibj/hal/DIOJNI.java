@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.hal;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class DIOJNI extends JNIWrapper {
-  public static native long initializeDigitalPort(long portPointer);
+  public static native long initializeDigitalPort(int halPortHandle);
 
   public static native void freeDigitalPort(long portPointer);
 

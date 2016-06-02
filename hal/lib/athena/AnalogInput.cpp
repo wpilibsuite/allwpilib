@@ -14,6 +14,7 @@
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "handles/HandlesInternal.h"
 
 using namespace hal;
 
@@ -23,20 +24,27 @@ extern "C" {
 /**
  * Initialize the analog input port using the given port object.
  */
-void* initializeAnalogInputPort(void* port_pointer, int32_t* status) {
+void* initializeAnalogInputPort(HalPortHandle port_handle, int32_t* status) {
   initializeAnalog(status);
-  Port* port = (Port*)port_pointer;
+
+  if (*status != 0) return nullptr;
+
+  int16_t pin = getPortHandlePin(port_handle);
+  if (pin == HAL_HANDLE_INVALID_TYPE) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return nullptr;
+  }
 
   // Initialize port structure
   AnalogPort* analog_port = new AnalogPort();
-  analog_port->port = *port;
+  analog_port->pin = (uint8_t)pin;
   if (isAccumulatorChannel(analog_port, status)) {
-    analog_port->accumulator = tAccumulator::create(port->pin, status);
+    analog_port->accumulator = tAccumulator::create(pin, status);
   } else
     analog_port->accumulator = nullptr;
 
   // Set default configuration
-  analogInputSystem->writeScanList(port->pin, port->pin, status);
+  analogInputSystem->writeScanList(pin, pin, status);
   setAnalogAverageBits(analog_port, kDefaultAverageBits, status);
   setAnalogOversampleBits(analog_port, kDefaultOversampleBits, status);
   return analog_port;
@@ -130,7 +138,7 @@ float getAnalogSampleRate(int32_t* status) {
 void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits,
                           int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  analogInputSystem->writeAverageBits(port->port.pin, bits, status);
+  analogInputSystem->writeAverageBits(port->pin, bits, status);
 }
 
 /**
@@ -144,7 +152,7 @@ void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits,
  */
 uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  uint32_t result = analogInputSystem->readAverageBits(port->port.pin, status);
+  uint32_t result = analogInputSystem->readAverageBits(port->pin, status);
   return result;
 }
 
@@ -162,7 +170,7 @@ uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t* status) {
 void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits,
                              int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  analogInputSystem->writeOversampleBits(port->port.pin, bits, status);
+  analogInputSystem->writeOversampleBits(port->pin, bits, status);
 }
 
 /**
@@ -177,8 +185,7 @@ void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits,
  */
 uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  uint32_t result =
-      analogInputSystem->readOversampleBits(port->port.pin, status);
+  uint32_t result = analogInputSystem->readOversampleBits(port->pin, status);
   return result;
 }
 
@@ -195,12 +202,12 @@ uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t* status) {
 int16_t getAnalogValue(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
   int16_t value;
-  if (!checkAnalogInputChannel(port->port.pin)) {
+  if (!checkAnalogInputChannel(port->pin)) {
     return 0;
   }
 
   tAI::tReadSelect readSelect;
-  readSelect.Channel = port->port.pin;
+  readSelect.Channel = port->pin;
   readSelect.Averaged = false;
 
   {
@@ -230,12 +237,12 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t* status) {
 int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
   int32_t value;
-  if (!checkAnalogInputChannel(port->port.pin)) {
+  if (!checkAnalogInputChannel(port->pin)) {
     return 0;
   }
 
   tAI::tReadSelect readSelect;
-  readSelect.Channel = port->port.pin;
+  readSelect.Channel = port->pin;
   readSelect.Averaged = true;
 
   {
@@ -331,7 +338,7 @@ int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage,
 uint32_t getAnalogLSBWeight(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
   uint32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
-      0, port->port.pin, status);  // XXX: aiSystemIndex == 0?
+      0, port->pin, status);  // XXX: aiSystemIndex == 0?
   return lsbWeight;
 }
 
@@ -348,7 +355,7 @@ uint32_t getAnalogLSBWeight(void* analog_port_pointer, int32_t* status) {
 int32_t getAnalogOffset(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
   int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
-      0, port->port.pin, status);  // XXX: aiSystemIndex == 0?
+      0, port->pin, status);  // XXX: aiSystemIndex == 0?
   return offset;
 }
 }

@@ -10,8 +10,8 @@
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/Errors.h"
-#include "HAL/Port.h"
 #include "ctre/PCM.h"
+#include "handles/HandlesInternal.h"
 
 static const int NUM_MODULE_NUMBERS = 63;
 
@@ -28,15 +28,23 @@ void initializePCM(int module) {
   }
 }
 
+using namespace hal;
+
 extern "C" {
 
-void* initializeSolenoidPort(void* port_pointer, int32_t* status) {
-  Port* port = (Port*)port_pointer;
-  initializePCM(port->module);
+void* initializeSolenoidPort(HalPortHandle port_handle, int32_t* status) {
+  int16_t pin = getPortHandlePin(port_handle);
+  int16_t module = getPortHandleModule(port_handle);
+  if (pin == HAL_HANDLE_INVALID_TYPE) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return nullptr;
+  }
+
+  initializePCM(module);
 
   solenoid_port_t* solenoid_port = new solenoid_port_t;
-  solenoid_port->module = PCM_modules[port->module];
-  solenoid_port->pin = port->pin;
+  solenoid_port->module = PCM_modules[module];
+  solenoid_port->pin = pin;
 
   return solenoid_port;
 }

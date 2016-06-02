@@ -9,8 +9,10 @@
 
 #include <stdint.h>
 
+#include "Handles.h"
+
 extern "C" {
-void* initializeSolenoidPort(void* port_pointer, int32_t* status);
+void* initializeSolenoidPort(HalPortHandle port_handle, int32_t* status);
 void freeSolenoidPort(void* solenoid_port_pointer);
 bool checkSolenoidModule(uint8_t module);
 

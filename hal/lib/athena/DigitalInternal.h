@@ -10,7 +10,6 @@
 #include <stdint.h>
 
 #include "ChipObject.h"
-#include "HAL/Port.h"
 #include "HAL/cpp/Resource.h"
 
 namespace hal {
@@ -62,7 +61,7 @@ extern hal::Resource* PWMChannels;
 extern bool digitalSystemsInitialized;
 
 struct DigitalPort {
-  Port port;
+  uint8_t pin;
   uint32_t PWMGeneratorID;
 };
 

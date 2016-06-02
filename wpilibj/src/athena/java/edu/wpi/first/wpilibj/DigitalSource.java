@@ -35,8 +35,8 @@ public abstract class DigitalSource extends InterruptableSensorBase {
       throw new AllocationException("Digital input " + m_channel + " is already allocated");
     }
 
-    long portPointer = DIOJNI.getPort((byte) channel);
-    m_port = DIOJNI.initializeDigitalPort(portPointer);
+    int portHandle = DIOJNI.getPort((byte) channel);
+    m_port = DIOJNI.initializeDigitalPort(portHandle);
     DIOJNI.allocateDIO(m_port, input);
   }
 
