@@ -8,6 +8,7 @@
 #include "HAL/SPI.h"
 
 #include "DigitalInternal.h"
+#include "HAL/DIO.h"
 #include "HAL/HAL.h"
 #include "spilib/spi-lib.h"
 
@@ -76,19 +77,24 @@ void spiInitialize(uint8_t port, int32_t* status) {
       break;
     case 4:
       initializeDigital(status);
-      if (!allocateDIO(getPort(14), false, status)) {
+      if (*status != 0) return;
+      if (!allocateDIO(initializeDigitalPort(getPort(14), status), false,
+                       status)) {
         printf("Failed to allocate DIO 14\n");
         return;
       }
-      if (!allocateDIO(getPort(15), false, status)) {
+      if (!allocateDIO(initializeDigitalPort(getPort(15), status), false,
+                       status)) {
         printf("Failed to allocate DIO 15\n");
         return;
       }
-      if (!allocateDIO(getPort(16), true, status)) {
+      if (!allocateDIO(initializeDigitalPort(getPort(16), status), true,
+                       status)) {
         printf("Failed to allocate DIO 16\n");
         return;
       }
-      if (!allocateDIO(getPort(17), false, status)) {
+      if (!allocateDIO(initializeDigitalPort(getPort(17), status), false,
+                       status)) {
         printf("Failed to allocate DIO 17\n");
         return;
       }

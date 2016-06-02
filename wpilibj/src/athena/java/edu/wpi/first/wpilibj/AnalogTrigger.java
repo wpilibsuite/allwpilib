@@ -51,12 +51,12 @@ public class AnalogTrigger {
    * @param channel the port to use for the analog trigger
    */
   public AnalogTrigger(final int channel) {
-    final long portPointer = AnalogJNI.getPort((byte) channel);
+    final int portHandle = AnalogJNI.getPort((byte) channel);
     ByteBuffer index = ByteBuffer.allocateDirect(4);
     index.order(ByteOrder.LITTLE_ENDIAN);
 
     m_port =
-        AnalogJNI.initializeAnalogTrigger(portPointer, index.asIntBuffer());
+        AnalogJNI.initializeAnalogTrigger(portHandle, index.asIntBuffer());
     m_index = index.asIntBuffer().get(0);
 
     UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel);

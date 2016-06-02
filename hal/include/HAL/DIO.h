@@ -9,10 +9,12 @@
 
 #include <stdint.h>
 
+#include "Handles.h"
+
 extern "C" {
 // the following 2 functions are here as they will be changed with
 // the handle changes to be DIO exclusive.
-void* initializeDigitalPort(void* port_pointer, int32_t* status);
+void* initializeDigitalPort(HalPortHandle port_handle, int32_t* status);
 void freeDigitalPort(void* digital_port_pointer);
 
 void* allocatePWM(int32_t* status);

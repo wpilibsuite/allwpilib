@@ -10,7 +10,6 @@
 #include <stdint.h>
 
 #include "ChipObject.h"
-#include "HAL/Port.h"
 #include "HAL/cpp/priority_mutex.h"
 
 namespace hal {
@@ -28,7 +27,7 @@ extern tAO* analogOutputSystem;
 extern priority_recursive_mutex analogRegisterWindowMutex;
 
 struct AnalogPort {
-  Port port;
+  uint8_t pin;
   tAccumulator* accumulator;
 };
 

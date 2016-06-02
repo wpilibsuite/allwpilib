@@ -24,8 +24,8 @@
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "FRC_NetworkCommunication/UsageReporting.h"
 #include "HAL/Errors.h"
-#include "HAL/Port.h"
 #include "ctre/ctre.h"
+#include "handles/HandlesInternal.h"
 #include "visa/visa.h"
 
 const uint32_t solenoid_kNumDO7_0Elements = 8;
@@ -42,28 +42,21 @@ static uint32_t timeEpoch = 0;
 static uint32_t prevFPGATime = 0;
 static void* rolloverNotifier = nullptr;
 
+using namespace hal;
+
 extern "C" {
 
-void* getPort(uint8_t pin) {
-  Port* port = new Port();
-  port->pin = pin;
-  port->module = 1;
-  return port;
-}
+HalPortHandle getPort(uint8_t pin) { return createPortHandle(pin, 1); }
 
 /**
  * @deprecated Uses module numbers
  */
-void* getPortWithModule(uint8_t module, uint8_t pin) {
-  Port* port = new Port();
-  port->pin = pin;
-  port->module = module;
-  return port;
+HalPortHandle getPortWithModule(uint8_t module, uint8_t pin) {
+  return createPortHandle(pin, module);
 }
 
-void freePort(void* port_pointer) {
-  Port* port = (Port*)port_pointer;
-  delete port;
+void freePort(HalPortHandle port_handle) {
+  // noop
 }
 
 const char* getHALErrorMessage(int32_t code) {

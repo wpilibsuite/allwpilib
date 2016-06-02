@@ -33,11 +33,11 @@ public class AnalogJNI extends JNIWrapper {
     int kFallingPulse = 3;
   }
 
-  public static native long initializeAnalogInputPort(long portPointer);
+  public static native long initializeAnalogInputPort(int halPortHandle);
 
   public static native void freeAnalogInputPort(long portPointer);
 
-  public static native long initializeAnalogOutputPort(long portPointer);
+  public static native long initializeAnalogOutputPort(int halPortHandle);
 
   public static native void freeAnalogOutputPort(long portPointer);
 
@@ -94,7 +94,7 @@ public class AnalogJNI extends JNIWrapper {
   public static native void getAccumulatorOutput(long analogPortPointer, LongBuffer value,
                                                  IntBuffer count);
 
-  public static native long initializeAnalogTrigger(long portPointer, IntBuffer index);
+  public static native long initializeAnalogTrigger(int halPortHandle, IntBuffer index);
 
   public static native void cleanAnalogTrigger(long analogTriggerPointer);
 

@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#include "Handles.h"
+
 enum AnalogTriggerType {
   kInWindow = 0,
   kState = 1,
@@ -17,7 +19,7 @@ enum AnalogTriggerType {
 };
 
 extern "C" {
-void* initializeAnalogTrigger(void* port_pointer, uint32_t* index,
+void* initializeAnalogTrigger(HalPortHandle port_handle, uint32_t* index,
                               int32_t* status);
 void cleanAnalogTrigger(void* analog_trigger_pointer, int32_t* status);
 void setAnalogTriggerLimitsRaw(void* analog_trigger_pointer, int32_t lower,

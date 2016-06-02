@@ -20,6 +20,7 @@
 #include "DIO.h"
 #include "Encoder.h"
 #include "Errors.h"
+#include "Handles.h"
 #include "I2C.h"
 #include "Interrupts.h"
 #include "Notifier.h"
@@ -216,9 +217,9 @@ extern const uint32_t solenoid_kNumDO7_0Elements;
 extern const uint32_t interrupt_kNumSystems;
 extern const uint32_t kSystemClockTicksPerMicrosecond;
 
-void* getPort(uint8_t pin);
-void* getPortWithModule(uint8_t module, uint8_t pin);
-void freePort(void* port);
+HalPortHandle getPort(uint8_t pin);
+HalPortHandle getPortWithModule(uint8_t module, uint8_t pin);
+void freePort(HalPortHandle port);
 const char* getHALErrorMessage(int32_t code);
 
 uint16_t getFPGAVersion(int32_t* status);

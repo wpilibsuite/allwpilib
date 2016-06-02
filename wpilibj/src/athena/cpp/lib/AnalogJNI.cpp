@@ -31,14 +31,14 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
  * Method:    initializeAnalogInputPort
- * Signature: (J)J
+ * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort(
-    JNIEnv *env, jclass, jlong id) {
-  ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
+    JNIEnv *env, jclass, jint id) {
+  ANALOGJNI_LOG(logDEBUG) << "Port Handle = " << (HalPortHandle)id;
   int32_t status = 0;
-  void *analog = initializeAnalogInputPort((void *)id, &status);
+  void *analog = initializeAnalogInputPort((HalPortHandle)id, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << analog;
   CheckStatus(env, status);
@@ -60,14 +60,14 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_freeAnalogInputPort(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
  * Method:    initializeAnalogOutputPort
- * Signature: (J)J
+ * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort(
-    JNIEnv *env, jclass, jlong id) {
-  ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
+    JNIEnv *env, jclass, jint id) {
+  ANALOGJNI_LOG(logDEBUG) << "Port Handle = " << (HalPortHandle)id;
   int32_t status = 0;
-  void *analog = initializeAnalogOutputPort((void *)id, &status);
+  void *analog = initializeAnalogOutputPort((HalPortHandle)id, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Ptr = " << analog;
   CheckStatus(env, status);
@@ -521,19 +521,19 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
  * Method:    initializeAnalogTrigger
- * Signature: (JLjava/nio/IntBuffer;)J
+ * Signature: (ILjava/nio/IntBuffer;)J
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogTrigger(
-    JNIEnv *env, jclass, jlong id, jobject index) {
-  ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
+    JNIEnv *env, jclass, jint id, jobject index) {
+  ANALOGJNI_LOG(logDEBUG) << "Port Ptr = " << (HalPortHandle)id;
 
   jint *indexPtr = (jint *)env->GetDirectBufferAddress(index);
   ANALOGJNI_LOG(logDEBUG) << "Index Ptr = " << indexPtr;
 
   int32_t status = 0;
   void *analogTrigger =
-      initializeAnalogTrigger((void *)id, (uint32_t *)indexPtr, &status);
+      initializeAnalogTrigger((HalPortHandle)id, (uint32_t *)indexPtr, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "AnalogTrigger Ptr = " << analogTrigger;
   CheckStatus(env, status);

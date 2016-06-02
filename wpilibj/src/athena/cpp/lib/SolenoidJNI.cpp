@@ -26,21 +26,21 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    initializeSolenoidPort
- * Signature: (J)J
+ * Signature: (I)J
  */
 JNIEXPORT jlong JNICALL
 Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort(
-    JNIEnv *env, jclass, jlong port_pointer) {
+    JNIEnv *env, jclass, jint port_handle) {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI initializeSolenoidPort";
 
-  SOLENOIDJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)port_pointer;
-  char *aschars = (char *)port_pointer;
+  SOLENOIDJNI_LOG(logDEBUG) << "Port Handle = " << (HalPortHandle)port_handle;
+  char *aschars = (char *)port_handle;
   SOLENOIDJNI_LOG(logDEBUG) << '\t' << (int)aschars[0] << '\t'
                             << (int)aschars[1] << std::endl;
 
   int32_t status = 0;
   void *solenoid_port_pointer =
-      initializeSolenoidPort((void *)port_pointer, &status);
+      initializeSolenoidPort((HalPortHandle)port_handle, &status);
 
   SOLENOIDJNI_LOG(logDEBUG) << "Status = " << status;
   SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Pointer = "
@@ -66,19 +66,6 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_freeSolenoidPort(
 
   SOLENOIDJNI_LOG(logDEBUG) << "Port Ptr = " << (void *)id;
   freeSolenoidPort((void *)id);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
- * Method:    getPortWithModule
- * Signature: (BB)J
- */
-JNIEXPORT jlong JNICALL
-Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPortWithModule(
-    JNIEnv *env, jclass, jbyte module, jbyte channel) {
-  void *port_pointer = getPortWithModule(module, channel);
-
-  return (jlong)port_pointer;
 }
 
 /*

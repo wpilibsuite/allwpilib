@@ -17,7 +17,7 @@ using namespace hal;
 extern "C" {
 bool checkPWMChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  return port->port.pin < kPwmPins;
+  return port->pin < kPwmPins;
 }
 
 /**
@@ -53,10 +53,10 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t* status) {
     return;
   }
 
-  if (port->port.pin < tPWM::kNumHdrRegisters) {
-    pwmSystem->writeHdr(port->port.pin, value, status);
+  if (port->pin < tPWM::kNumHdrRegisters) {
+    pwmSystem->writeHdr(port->pin, value, status);
   } else {
-    pwmSystem->writeMXP(port->port.pin - tPWM::kNumHdrRegisters, value, status);
+    pwmSystem->writeMXP(port->pin - tPWM::kNumHdrRegisters, value, status);
   }
 }
 
@@ -72,10 +72,10 @@ unsigned short getPWM(void* digital_port_pointer, int32_t* status) {
     return 0;
   }
 
-  if (port->port.pin < tPWM::kNumHdrRegisters) {
-    return pwmSystem->readHdr(port->port.pin, status);
+  if (port->pin < tPWM::kNumHdrRegisters) {
+    return pwmSystem->readHdr(port->pin, status);
   } else {
-    return pwmSystem->readMXP(port->port.pin - tPWM::kNumHdrRegisters, status);
+    return pwmSystem->readMXP(port->pin - tPWM::kNumHdrRegisters, status);
   }
 }
 
@@ -85,8 +85,8 @@ void latchPWMZero(void* digital_port_pointer, int32_t* status) {
     return;
   }
 
-  pwmSystem->writeZeroLatch(port->port.pin, true, status);
-  pwmSystem->writeZeroLatch(port->port.pin, false, status);
+  pwmSystem->writeZeroLatch(port->pin, true, status);
+  pwmSystem->writeZeroLatch(port->pin, false, status);
 }
 
 /**
@@ -102,11 +102,11 @@ void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask,
     return;
   }
 
-  if (port->port.pin < tPWM::kNumPeriodScaleHdrElements) {
-    pwmSystem->writePeriodScaleHdr(port->port.pin, squelchMask, status);
+  if (port->pin < tPWM::kNumPeriodScaleHdrElements) {
+    pwmSystem->writePeriodScaleHdr(port->pin, squelchMask, status);
   } else {
-    pwmSystem->writePeriodScaleMXP(
-        port->port.pin - tPWM::kNumPeriodScaleHdrElements, squelchMask, status);
+    pwmSystem->writePeriodScaleMXP(port->pin - tPWM::kNumPeriodScaleHdrElements,
+                                   squelchMask, status);
   }
 }
 
@@ -117,19 +117,18 @@ bool allocatePWMChannel(void* digital_port_pointer, int32_t* status) {
   }
 
   char buf[64];
-  snprintf(buf, 64, "PWM %d", port->port.pin);
-  if (PWMChannels->Allocate(port->port.pin, buf) == ~0ul) {
+  snprintf(buf, 64, "PWM %d", port->pin);
+  if (PWMChannels->Allocate(port->pin, buf) == ~0ul) {
     *status = RESOURCE_IS_ALLOCATED;
     return false;
   }
 
-  if (port->port.pin > tPWM::kNumHdrRegisters - 1) {
-    snprintf(buf, 64, "PWM %d and DIO %d", port->port.pin,
-             remapMXPPWMChannel(port->port.pin) + 10);
-    if (DIOChannels->Allocate(remapMXPPWMChannel(port->port.pin) + 10, buf) ==
-        ~0ul)
+  if (port->pin > tPWM::kNumHdrRegisters - 1) {
+    snprintf(buf, 64, "PWM %d and DIO %d", port->pin,
+             remapMXPPWMChannel(port->pin) + 10);
+    if (DIOChannels->Allocate(remapMXPPWMChannel(port->pin) + 10, buf) == ~0ul)
       return false;
-    uint32_t bitToSet = 1 << remapMXPPWMChannel(port->port.pin);
+    uint32_t bitToSet = 1 << remapMXPPWMChannel(port->pin);
     short specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
@@ -145,10 +144,10 @@ void freePWMChannel(void* digital_port_pointer, int32_t* status) {
     return;
   }
 
-  PWMChannels->Free(port->port.pin);
-  if (port->port.pin > tPWM::kNumHdrRegisters - 1) {
-    DIOChannels->Free(remapMXPPWMChannel(port->port.pin) + 10);
-    uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->port.pin);
+  PWMChannels->Free(port->pin);
+  if (port->pin > tPWM::kNumHdrRegisters - 1) {
+    DIOChannels->Free(remapMXPPWMChannel(port->pin) + 10);
+    uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->pin);
     short specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,

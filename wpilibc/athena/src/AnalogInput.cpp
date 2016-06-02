@@ -7,7 +7,6 @@
 
 #include "AnalogInput.h"
 #include "HAL/HAL.h"
-#include "HAL/Port.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "Timer.h"
@@ -45,7 +44,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
 
   m_channel = channel;
 
-  void* port = getPort(channel);
+  HalPortHandle port = getPort(channel);
   int32_t status = 0;
   m_port = initializeAnalogInputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));

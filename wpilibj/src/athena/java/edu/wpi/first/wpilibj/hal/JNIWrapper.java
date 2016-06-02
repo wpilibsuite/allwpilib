@@ -59,9 +59,9 @@ public class JNIWrapper {
     }
   }
 
-  public static native long getPortWithModule(byte module, byte pin);
+  public static native int getPortWithModule(byte module, byte pin);
 
-  public static native long getPort(byte pin);
+  public static native int getPort(byte pin);
 
-  public static native void freePort(long portPointer);
+  public static native void freePort(int halPortHandle);
 }

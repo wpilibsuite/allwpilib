@@ -21,7 +21,7 @@ extern "C" {
 bool isAccumulatorChannel(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
   for (uint32_t i = 0; i < kAccumulatorNumChannels; i++) {
-    if (port->port.pin == kAccumulatorChannels[i]) return true;
+    if (port->pin == kAccumulatorChannels[i]) return true;
   }
   return false;
 }

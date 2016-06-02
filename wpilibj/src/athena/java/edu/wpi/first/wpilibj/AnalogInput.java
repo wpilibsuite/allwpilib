@@ -59,8 +59,8 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
       throw new AllocationException("Analog input channel " + m_channel + " is already allocated");
     }
 
-    final long portPointer = AnalogJNI.getPort((byte) channel);
-    m_port = AnalogJNI.initializeAnalogInputPort(portPointer);
+    final int portHandle = AnalogJNI.getPort((byte) channel);
+    m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
     LiveWindow.addSensor("AnalogInput", channel, this);
     UsageReporting.report(tResourceType.kResourceType_AnalogChannel, channel);

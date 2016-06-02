@@ -10,6 +10,7 @@
 #include <math.h>
 
 #include "DigitalInternal.h"
+#include "handles/HandlesInternal.h"
 
 static_assert(sizeof(uint32_t) <= sizeof(void*),
               "This file shoves uint32_ts into pointers.");
@@ -24,13 +25,20 @@ extern "C" {
 /**
  * Create a new instance of a digital port.
  */
-void* initializeDigitalPort(void* port_pointer, int32_t* status) {
+void* initializeDigitalPort(HalPortHandle port_handle, int32_t* status) {
   initializeDigital(status);
-  Port* port = (Port*)port_pointer;
+  
+  if (*status != 0) return nullptr;
+
+  int16_t pin = getPortHandlePin(port_handle);
+  if (pin == HAL_HANDLE_INVALID_TYPE) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return nullptr;
+  }
 
   // Initialize port structure
   DigitalPort* digital_port = new DigitalPort();
-  digital_port->port = *port;
+  digital_port->pin = (uint8_t)pin;
 
   return digital_port;
 }
@@ -132,9 +140,13 @@ void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t* status) {
  */
 bool allocateDIO(void* digital_port_pointer, bool input, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
+  if (port == nullptr) {
+    *status = NULL_PARAMETER;
+    return false;
+  }
   char buf[64];
-  snprintf(buf, 64, "DIO %d", port->port.pin);
-  if (DIOChannels->Allocate(port->port.pin, buf) == ~0ul) {
+  snprintf(buf, 64, "DIO %d", port->pin);
+  if (DIOChannels->Allocate(port->pin, buf) == ~0ul) {
     *status = RESOURCE_IS_ALLOCATED;
     return false;
   }
@@ -144,8 +156,8 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t* status) {
 
     tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
 
-    if (port->port.pin < kNumHeaders) {
-      uint32_t bitToSet = 1 << port->port.pin;
+    if (port->pin < kNumHeaders) {
+      uint32_t bitToSet = 1 << port->pin;
       if (input) {
         outputEnable.Headers =
             outputEnable.Headers & (~bitToSet);  // clear the bit for read
@@ -154,7 +166,7 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t* status) {
             outputEnable.Headers | bitToSet;  // set the bit for write
       }
     } else {
-      uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+      uint32_t bitToSet = 1 << remapMXPChannel(port->pin);
 
       // Disable special functions on this pin
       short specialFunctions =
@@ -184,7 +196,7 @@ bool allocateDIO(void* digital_port_pointer, bool input, int32_t* status) {
 void freeDIO(void* digital_port_pointer, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
   if (!port) return;
-  DIOChannels->Free(port->port.pin);
+  DIOChannels->Free(port->pin);
 }
 
 /**
@@ -204,22 +216,20 @@ void setDIO(void* digital_port_pointer, short value, int32_t* status) {
     std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
 
-    if (port->port.pin < kNumHeaders) {
+    if (port->pin < kNumHeaders) {
       if (value == 0) {
-        currentDIO.Headers = currentDIO.Headers & ~(1 << port->port.pin);
+        currentDIO.Headers = currentDIO.Headers & ~(1 << port->pin);
       } else if (value == 1) {
-        currentDIO.Headers = currentDIO.Headers | (1 << port->port.pin);
+        currentDIO.Headers = currentDIO.Headers | (1 << port->pin);
       }
     } else {
       if (value == 0) {
-        currentDIO.MXP =
-            currentDIO.MXP & ~(1 << remapMXPChannel(port->port.pin));
+        currentDIO.MXP = currentDIO.MXP & ~(1 << remapMXPChannel(port->pin));
       } else if (value == 1) {
-        currentDIO.MXP =
-            currentDIO.MXP | (1 << remapMXPChannel(port->port.pin));
+        currentDIO.MXP = currentDIO.MXP | (1 << remapMXPChannel(port->pin));
       }
 
-      uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+      uint32_t bitToSet = 1 << remapMXPChannel(port->pin);
       short specialFunctions =
           digitalSystem->readEnableMXPSpecialFunction(status);
       digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
@@ -244,17 +254,17 @@ bool getDIO(void* digital_port_pointer, int32_t* status) {
   // if it == 0, then return false
   // else return true
 
-  if (port->port.pin < kNumHeaders) {
-    return ((currentDIO.Headers >> port->port.pin) & 1) != 0;
+  if (port->pin < kNumHeaders) {
+    return ((currentDIO.Headers >> port->pin) & 1) != 0;
   } else {
     // Disable special functions
-    uint32_t bitToSet = 1 << remapMXPChannel(port->port.pin);
+    uint32_t bitToSet = 1 << remapMXPChannel(port->pin);
     short specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
                                                  status);
 
-    return ((currentDIO.MXP >> remapMXPChannel(port->port.pin)) & 1) != 0;
+    return ((currentDIO.MXP >> remapMXPChannel(port->pin)) & 1) != 0;
   }
 }
 
@@ -269,16 +279,15 @@ bool getDIODirection(void* digital_port_pointer, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
   tDIO::tOutputEnable currentOutputEnable =
       digitalSystem->readOutputEnable(status);
-  // Shift 00000001 over port->port.pin-1 places.
+  // Shift 00000001 over port->pin-1 places.
   // AND it against the currentOutputEnable
   // if it == 0, then return false
   // else return true
 
-  if (port->port.pin < kNumHeaders) {
-    return ((currentOutputEnable.Headers >> port->port.pin) & 1) != 0;
+  if (port->pin < kNumHeaders) {
+    return ((currentOutputEnable.Headers >> port->pin) & 1) != 0;
   } else {
-    return ((currentOutputEnable.MXP >> remapMXPChannel(port->port.pin)) & 1) !=
-           0;
+    return ((currentOutputEnable.MXP >> remapMXPChannel(port->pin)) & 1) != 0;
   }
 }
 
@@ -294,10 +303,10 @@ void pulse(void* digital_port_pointer, double pulseLength, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
   tDIO::tPulse pulse;
 
-  if (port->port.pin < kNumHeaders) {
-    pulse.Headers = 1 << port->port.pin;
+  if (port->pin < kNumHeaders) {
+    pulse.Headers = 1 << port->pin;
   } else {
-    pulse.MXP = 1 << remapMXPChannel(port->port.pin);
+    pulse.MXP = 1 << remapMXPChannel(port->pin);
   }
 
   digitalSystem->writePulseLength(
@@ -315,10 +324,10 @@ bool isPulsing(void* digital_port_pointer, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
 
-  if (port->port.pin < kNumHeaders) {
-    return (pulseRegister.Headers & (1 << port->port.pin)) != 0;
+  if (port->pin < kNumHeaders) {
+    return (pulseRegister.Headers & (1 << port->pin)) != 0;
   } else {
-    return (pulseRegister.MXP & (1 << remapMXPChannel(port->port.pin))) != 0;
+    return (pulseRegister.MXP & (1 << remapMXPChannel(port->pin))) != 0;
   }
 }
 
@@ -345,10 +354,10 @@ void setFilterSelect(void* digital_port_pointer, int filter_index,
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
 
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-  if (port->port.pin < kNumHeaders) {
-    digitalSystem->writeFilterSelectHdr(port->port.pin, filter_index, status);
+  if (port->pin < kNumHeaders) {
+    digitalSystem->writeFilterSelectHdr(port->pin, filter_index, status);
   } else {
-    digitalSystem->writeFilterSelectMXP(remapMXPChannel(port->port.pin),
+    digitalSystem->writeFilterSelectMXP(remapMXPChannel(port->pin),
                                         filter_index, status);
   }
 }
@@ -365,10 +374,10 @@ int getFilterSelect(void* digital_port_pointer, int32_t* status) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
 
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-  if (port->port.pin < kNumHeaders) {
-    return digitalSystem->readFilterSelectHdr(port->port.pin, status);
+  if (port->pin < kNumHeaders) {
+    return digitalSystem->readFilterSelectHdr(port->pin, status);
   } else {
-    return digitalSystem->readFilterSelectMXP(remapMXPChannel(port->port.pin),
+    return digitalSystem->readFilterSelectMXP(remapMXPChannel(port->pin),
                                               status);
   }
 }

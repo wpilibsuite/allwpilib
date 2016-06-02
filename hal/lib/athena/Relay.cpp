@@ -22,7 +22,7 @@ constexpr uint32_t kRelayPins = 8;
 extern "C" {
 bool checkRelayChannel(void* digital_port_pointer) {
   DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  return port->port.pin < kRelayPins;
+  return port->pin < kRelayPins;
 }
 
 /**
@@ -60,9 +60,9 @@ void setRelayForward(void* digital_port_pointer, bool on, int32_t* status) {
     std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
     uint8_t forwardRelays = relaySystem->readValue_Forward(status);
     if (on)
-      forwardRelays |= 1 << port->port.pin;
+      forwardRelays |= 1 << port->pin;
     else
-      forwardRelays &= ~(1 << port->port.pin);
+      forwardRelays &= ~(1 << port->pin);
     relaySystem->writeValue_Forward(forwardRelays, status);
   }
 }
@@ -83,9 +83,9 @@ void setRelayReverse(void* digital_port_pointer, bool on, int32_t* status) {
     std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
     uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
     if (on)
-      reverseRelays |= 1 << port->port.pin;
+      reverseRelays |= 1 << port->pin;
     else
-      reverseRelays &= ~(1 << port->port.pin);
+      reverseRelays &= ~(1 << port->pin);
     relaySystem->writeValue_Reverse(reverseRelays, status);
   }
 }
@@ -100,7 +100,7 @@ bool getRelayForward(void* digital_port_pointer, int32_t* status) {
   }
 
   uint8_t forwardRelays = relaySystem->readValue_Forward(status);
-  return (forwardRelays & (1 << port->port.pin)) != 0;
+  return (forwardRelays & (1 << port->pin)) != 0;
 }
 
 /**
@@ -113,6 +113,6 @@ bool getRelayReverse(void* digital_port_pointer, int32_t* status) {
   }
 
   uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
-  return (reverseRelays & (1 << port->port.pin)) != 0;
+  return (reverseRelays & (1 << port->pin)) != 0;
 }
 }

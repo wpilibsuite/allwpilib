@@ -18,4 +18,6 @@
 
 typedef int32_t HalHandle;
 
-enum HalHandleEnum { Undefined = 0, DIO = 1 };
+typedef HalHandle HalPortHandle;
+
+enum HalHandleEnum { Undefined = 0, DIO = 1, Port = 2 };
