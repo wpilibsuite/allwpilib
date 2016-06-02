@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "HAL/Handles.h"
+#include "handles/HandlesInternal.h"
 #include "HAL/cpp/priority_mutex.h"
 
 namespace hal {
@@ -33,6 +34,7 @@ namespace hal {
  */
 template <typename THandle, typename TStruct, HalHandleEnum enumValue>
 class UnlimitedHandleResource {
+  friend class UnlimitedHandleResourceTest;
  public:
   UnlimitedHandleResource(const UnlimitedHandleResource&) = delete;
   UnlimitedHandleResource operator=(const UnlimitedHandleResource&) = delete;
@@ -66,7 +68,7 @@ THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
 template <typename THandle, typename TStruct, HalHandleEnum enumValue>
 std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
-  int16_t index = getHandleTypedIndex(handle);
+  int16_t index = getHandleTypedIndex(handle, enumValue);
   std::lock_guard<priority_recursive_mutex> sync(m_handleMutex);
   if (index < 0 || index > m_structures.size()) return nullptr;
   return m_structures[index];
@@ -75,9 +77,9 @@ UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
 template <typename THandle, typename TStruct, HalHandleEnum enumValue>
 void UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(
     THandle handle) {
-  int16_t index = getHandleTypedIndex(handle);
+  int16_t index = getHandleTypedIndex(handle, enumValue);
   std::lock_guard<priority_recursive_mutex> sync(m_handleMutex);
-  if (index < 0 || index > m_structures.size()) return nullptr;
+  if (index < 0 || index > m_structures.size()) return;
   m_structures[index].reset();
 }
 }

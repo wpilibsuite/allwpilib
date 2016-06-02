@@ -16,6 +16,9 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "HandlesInternal.h"
 
+#define LIMITED_RESOURCE_INDEX_OUT_OF_RANGE -1
+#define LIMITED_RESOURCE_NOT_ALLOCATED -2
+
 namespace hal {
 
 /**
@@ -31,12 +34,13 @@ namespace hal {
 template <typename THandle, typename TStruct, int16_t size,
           HalHandleEnum enumValue>
 class LimitedHandleResource {
+ friend class LimitedHandleResourceTest;
  public:
   LimitedHandleResource(const LimitedHandleResource&) = delete;
   LimitedHandleResource operator=(const LimitedHandleResource&) = delete;
   LimitedHandleResource();
   THandle Allocate(const TStruct& toSet);
-  TStruct Get(THandle handle);
+  TStruct Get(THandle handle, int32_t *status);
   void Free(THandle handle);
 
  private:
@@ -79,13 +83,20 @@ THandle LimitedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
 template <typename THandle, typename TStruct, int16_t size,
           HalHandleEnum enumValue>
 TStruct LimitedHandleResource<THandle, TStruct, size, enumValue>::Get(
-    THandle handle) {
+    THandle handle, int32_t *status) {
+  *status = 0;
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue);
-  if (index < 0 || index > size) return nullptr;
+  if (index < 0 || index >= size) {
+    *status = LIMITED_RESOURCE_INDEX_OUT_OF_RANGE;
+    return TStruct();
+  }
   std::lock_guard<priority_recursive_mutex> sync(m_handleMutexes[index]);
   // check for already deallocated handle, then return structure
-  if (!m_allocated[index]) return nullptr;
+  if (!m_allocated[index]) {
+    *status = LIMITED_RESOURCE_NOT_ALLOCATED;
+    return TStruct();
+  }
   return m_structures[index];
 }
 
@@ -95,7 +106,7 @@ void LimitedHandleResource<THandle, TStruct, size, enumValue>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue);
-  if (index < 0 || index > size) return nullptr;
+  if (index < 0 || index >= size) return;
   // lock and deallocated handle
   std::lock_guard<priority_recursive_mutex> sync(m_allocateMutex);
   std::lock_guard<priority_recursive_mutex> lock(m_handleMutexes[index]);
