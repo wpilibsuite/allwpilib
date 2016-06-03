@@ -53,7 +53,7 @@ template <typename THandle, typename TStruct, HalHandleEnum enumValue>
 THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
     std::shared_ptr<TStruct> structure) {
   std::lock_guard<priority_mutex> sync(m_handleMutex);
-  int16_t i;
+  size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
       m_structures[i] = structure;
@@ -63,7 +63,7 @@ THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
   if (i >= INT16_MAX) return HAL_HANDLE_OUT_OF_HANDLES;
 
   m_structures.push_back(structure);
-  return (THandle)createHandle(i, enumValue);
+  return (THandle)createHandle(static_cast<int16_t>(i), enumValue);
 }
 
 template <typename THandle, typename TStruct, HalHandleEnum enumValue>
@@ -71,7 +71,8 @@ std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue);
   std::lock_guard<priority_mutex> sync(m_handleMutex);
-  if (index < 0 || index >= m_structures.size()) return nullptr;
+  if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
+    return nullptr;
   return m_structures[index];
 }
 
@@ -80,7 +81,7 @@ void UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(
     THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue);
   std::lock_guard<priority_mutex> sync(m_handleMutex);
-  if (index < 0 || index >= m_structures.size()) return;
+  if (index < 0 || index >= static_cast<int16_t>(m_structures.size())) return;
   m_structures[index].reset();
 }
 }

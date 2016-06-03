@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.wpilibj.hal.NotifierJNI;
@@ -18,7 +19,7 @@ public class Notifier {
     private final ReentrantLock m_processLock = new ReentrantLock();
     // The C pointer to the notifier object. We don't use it directly, it is
     // just passed to the JNI bindings.
-    private long m_notifier;
+    AtomicInteger m_notifier = new AtomicInteger();
     // The time, in microseconds, at which the corresponding handler should be
     // called. Has the same zero as Utility.getFPGATime().
     private double m_expirationTime = 0;
@@ -38,13 +39,14 @@ public class Notifier {
 
     public Process(Runnable run) {
       m_handler = run;
-      m_notifier = NotifierJNI.initializeNotifier(this);
+      m_notifier.set(NotifierJNI.initializeNotifier(this));
     }
 
     @Override
     @SuppressWarnings("NoFinalizer")
     protected void finalize() {
-      NotifierJNI.cleanNotifier(m_notifier);
+      int handle = m_notifier.getAndSet(0);
+      NotifierJNI.cleanNotifier(handle);
       m_handlerLock.lock();
     }
 
@@ -52,7 +54,7 @@ public class Notifier {
      * Update the alarm hardware to reflect the next alarm.
      */
     private void updateAlarm() {
-      NotifierJNI.updateNotifierAlarm(m_notifier, (long) (m_expirationTime * 1e6));
+      NotifierJNI.updateNotifierAlarm(m_notifier.get(), (long) (m_expirationTime * 1e6));
     }
 
     /**
@@ -84,7 +86,7 @@ public class Notifier {
     }
 
     public void stop() {
-      NotifierJNI.stopNotifierAlarm(m_notifier);
+      NotifierJNI.stopNotifierAlarm(m_notifier.get());
 
       // Wait for a currently executing handler to complete before returning
       // from stop()
