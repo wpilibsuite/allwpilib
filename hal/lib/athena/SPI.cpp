@@ -7,6 +7,8 @@
 
 #include "HAL/SPI.h"
 
+#include <atomic>
+
 #include "DigitalInternal.h"
 #include "HAL/HAL.h"
 #include "spilib/spi-lib.h"
@@ -28,7 +30,7 @@ static tSPI* spiSystem;
 extern "C" {
 
 struct SPIAccumulator {
-  void* notifier = nullptr;
+  std::atomic<HalNotifierHandle> notifier{0};
   uint64_t triggerTime;
   uint32_t period;
 
@@ -413,7 +415,9 @@ void spiFreeAccumulator(uint8_t port, int32_t* status) {
     *status = NULL_PARAMETER;
     return;
   }
-  cleanNotifier(accum->notifier, status);
+  HalNotifierHandle handle = accum->notifier;
+  accum->notifier = 0;
+  cleanNotifier(handle, status);
   delete accum;
   spiAccumulators[port] = nullptr;
 }

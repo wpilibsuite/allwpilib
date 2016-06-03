@@ -22,6 +22,9 @@
  */
 
 namespace hal {
+
+enum class HalHandleEnum { Undefined = 0, DIO = 1, Port = 2, Notifier = 3 };
+
 static inline int16_t getHandleIndex(HalHandle handle) {
   // mask and return last 16 bits
   return (int16_t)(handle & 0xffff);

@@ -40,7 +40,7 @@ static priority_mutex timeMutex;
 static priority_mutex msgMutex;
 static uint32_t timeEpoch = 0;
 static uint32_t prevFPGATime = 0;
-static void* rolloverNotifier = nullptr;
+static HalNotifierHandle rolloverNotifier = 0;
 
 extern "C" {
 
