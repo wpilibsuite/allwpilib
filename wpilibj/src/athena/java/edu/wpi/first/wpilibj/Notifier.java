@@ -18,7 +18,7 @@ public class Notifier {
     private final ReentrantLock m_processLock = new ReentrantLock();
     // The C pointer to the notifier object. We don't use it directly, it is
     // just passed to the JNI bindings.
-    private long m_notifier;
+    private volatile int m_notifier;
     // The time, in microseconds, at which the corresponding handler should be
     // called. Has the same zero as Utility.getFPGATime().
     private double m_expirationTime = 0;
@@ -44,7 +44,9 @@ public class Notifier {
     @Override
     @SuppressWarnings("NoFinalizer")
     protected void finalize() {
-      NotifierJNI.cleanNotifier(m_notifier);
+      int handle = m_notifier;
+      m_notifier = 0;
+      NotifierJNI.cleanNotifier(handle);
       m_handlerLock.lock();
     }
 

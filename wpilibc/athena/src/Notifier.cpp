@@ -31,7 +31,10 @@ Notifier::Notifier(TimerEventHandler handler) {
  */
 Notifier::~Notifier() {
   int32_t status = 0;
-  cleanNotifier(m_notifier, &status);
+  // atomically set handle to 0, then clean
+  HalNotifierHandle handle = m_notifier;
+  m_notifier = 0;
+  cleanNotifier(handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   /* Acquire the mutex; this makes certain that the handler is not being

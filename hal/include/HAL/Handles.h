@@ -17,5 +17,3 @@
 #define HAL_HANDLE_NEGATIVE_INDEX -5
 
 typedef int32_t HalHandle;
-
-enum HalHandleEnum { Undefined = 0, DIO = 1 };

@@ -115,9 +115,9 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
  * Method:    initializeNotifier
- * Signature: (Ljava/lang/Runnable;)J
+ * Signature: (Ljava/lang/Runnable;)I
  */
-JNIEXPORT jlong JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
     JNIEnv *env, jclass, jobject func) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI initializeNotifier";
@@ -141,34 +141,34 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
   notify->Start();
   notify->SetFunc(env, func, mid);
   int32_t status = 0;
-  void *notifierPtr = initializeNotifier(notifierHandler, notify, &status);
+  HalNotifierHandle notifierHandle = initializeNotifier(notifierHandler, notify, &status);
 
-  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << notifierPtr;
+  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
 
-  if (!notifierPtr || !CheckStatus(env, status)) {
+  if (!notifierHandle || !CheckStatus(env, status)) {
     // something went wrong in HAL, clean up
     delete notify;
   }
 
-  return (jlong)notifierPtr;
+  return (jint)notifierHandle;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
  * Method:    cleanNotifier
- * Signature: (J)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier(
-    JNIEnv *env, jclass, jlong notifierPtr) {
+    JNIEnv *env, jclass, jint notifierHandle) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI cleanNotifier";
 
-  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
+  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
 
   int32_t status = 0;
   NotifierJNI *notify =
-      (NotifierJNI *)getNotifierParam((void *)notifierPtr, &status);
-  cleanNotifier((void *)notifierPtr, &status);
+      (NotifierJNI *)getNotifierParam((HalNotifierHandle)notifierHandle, &status);
+  cleanNotifier((HalNotifierHandle)notifierHandle, &status);
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
   delete notify;
@@ -177,19 +177,19 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_NotifierJNI_cleanNotifier(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
  * Method:    updateNotifierAlarm
- * Signature: (JJ)V
+ * Signature: (IJ)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm(
-    JNIEnv *env, jclass cls, jlong notifierPtr, jlong triggerTime) {
+    JNIEnv *env, jclass cls, jint notifierHandle, jlong triggerTime) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI updateNotifierAlarm";
 
-  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
+  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
 
   NOTIFIERJNI_LOG(logDEBUG) << "triggerTime = " << triggerTime;
 
   int32_t status = 0;
-  updateNotifierAlarm((void *)notifierPtr, (uint64_t)triggerTime, &status);
+  updateNotifierAlarm((HalNotifierHandle)notifierHandle, (uint64_t)triggerTime, &status);
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -197,17 +197,17 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_updateNotifierAlarm(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_NotifierJNI
  * Method:    stopNotifierAlarm
- * Signature: (J)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_NotifierJNI_stopNotifierAlarm(
-    JNIEnv *env, jclass cls, jlong notifierPtr) {
+    JNIEnv *env, jclass cls, jint notifierHandle) {
   NOTIFIERJNI_LOG(logDEBUG) << "Calling NOTIFIERJNI stopNotifierAlarm";
 
-  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Ptr = " << (void *)notifierPtr;
+  NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
 
   int32_t status = 0;
-  stopNotifierAlarm((void *)notifierPtr, &status);
+  stopNotifierAlarm((HalNotifierHandle)notifierHandle, &status);
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
