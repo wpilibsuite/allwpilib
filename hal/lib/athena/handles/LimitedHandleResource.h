@@ -18,6 +18,9 @@
 
 namespace hal {
 
+constexpr int32_t LimitedResourceIndexOutOfRange = -1;
+constexpr int32_t LimitedResourceNotAllocated = -2;
+
 /**
  * The LimitedHandleResource class is a way to track handles. This version
  * allows a limited number of handles that are allocated sequentially.
@@ -31,19 +34,21 @@ namespace hal {
 template <typename THandle, typename TStruct, int16_t size,
           HalHandleEnum enumValue>
 class LimitedHandleResource {
+  friend class LimitedHandleResourceTest;
+
  public:
   LimitedHandleResource(const LimitedHandleResource&) = delete;
   LimitedHandleResource operator=(const LimitedHandleResource&) = delete;
   LimitedHandleResource();
   THandle Allocate(const TStruct& toSet);
-  TStruct Get(THandle handle);
+  TStruct Get(THandle handle, int32_t* status);
   void Free(THandle handle);
 
  private:
   TStruct m_structures[size];
   bool m_allocated[size];
-  priority_recursive_mutex m_handleMutexes[size];
-  priority_recursive_mutex m_allocateMutex;
+  priority_mutex m_handleMutexes[size];
+  priority_mutex m_allocateMutex;
 };
 
 template <typename THandle, typename TStruct, int16_t size,
@@ -61,13 +66,13 @@ template <typename THandle, typename TStruct, int16_t size,
 THandle LimitedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     const TStruct& toSet) {
   // globally lock to loop through indices
-  std::lock_guard<priority_recursive_mutex> sync(m_allocateMutex);
+  std::lock_guard<priority_mutex> sync(m_allocateMutex);
   int16_t i;
   for (i = 0; i < size; i++) {
     if (m_allocated[i] == false) {
       // if a false index is found, grab its specific mutex
       // and allocate it.
-      std::lock_guard<priority_recursive_mutex> sync(m_handleMutexes[i]);
+      std::lock_guard<priority_mutex> sync(m_handleMutexes[i]);
       m_allocated[i] = true;
       m_structures[i] = toSet;
       return (THandle)createHandle(i, enumValue);
@@ -79,13 +84,20 @@ THandle LimitedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
 template <typename THandle, typename TStruct, int16_t size,
           HalHandleEnum enumValue>
 TStruct LimitedHandleResource<THandle, TStruct, size, enumValue>::Get(
-    THandle handle) {
+    THandle handle, int32_t* status) {
+  *status = 0;
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue);
-  if (index < 0 || index > size) return nullptr;
-  std::lock_guard<priority_recursive_mutex> sync(m_handleMutexes[index]);
+  if (index < 0 || index >= size) {
+    *status = LimitedResourceIndexOutOfRange;
+    return TStruct();
+  }
+  std::lock_guard<priority_mutex> sync(m_handleMutexes[index]);
   // check for already deallocated handle, then return structure
-  if (!m_allocated[index]) return nullptr;
+  if (!m_allocated[index]) {
+    *status = LimitedResourceNotAllocated;
+    return TStruct();
+  }
   return m_structures[index];
 }
 
@@ -95,10 +107,10 @@ void LimitedHandleResource<THandle, TStruct, size, enumValue>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue);
-  if (index < 0 || index > size) return nullptr;
+  if (index < 0 || index >= size) return;
   // lock and deallocated handle
-  std::lock_guard<priority_recursive_mutex> sync(m_allocateMutex);
-  std::lock_guard<priority_recursive_mutex> lock(m_handleMutexes[index]);
+  std::lock_guard<priority_mutex> sync(m_allocateMutex);
+  std::lock_guard<priority_mutex> lock(m_handleMutexes[index]);
   m_allocated[index] = false;
 }
 }
