@@ -24,20 +24,20 @@ public class NotifierJNI extends JNIWrapper {
   /**
    * Initializes the notifier.
    */
-  public static native long initializeNotifier(NotifierJNIHandlerFunction func);
+  public static native int initializeNotifier(NotifierJNIHandlerFunction func);
 
   /**
    * Deletes the notifier object when we are done with it.
    */
-  public static native void cleanNotifier(long notifierPtr);
+  public static native void cleanNotifier(int notifierHandle);
 
   /**
    * Sets the notifier to call the callback in another triggerTime microseconds.
    */
-  public static native void updateNotifierAlarm(long notifierPtr, long triggerTime);
+  public static native void updateNotifierAlarm(int notifierHandle, long triggerTime);
 
   /**
    * Tells the notifier to stop calling the callback.
    */
-  public static native void stopNotifierAlarm(long notifierPtr);
+  public static native void stopNotifierAlarm(int notifierHandle);
 }

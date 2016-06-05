@@ -9,12 +9,16 @@
 
 #include <stdint.h>
 
+#include "Handles.h"
+
+typedef HalHandle HalNotifierHandle;
+
 extern "C" {
-void* initializeNotifier(void (*process)(uint64_t, void*), void* param,
-                         int32_t* status);
-void cleanNotifier(void* notifier_pointer, int32_t* status);
-void* getNotifierParam(void* notifier_pointer, int32_t* status);
-void updateNotifierAlarm(void* notifier_pointer, uint64_t triggerTime,
-                         int32_t* status);
-void stopNotifierAlarm(void* notifier_pointer, int32_t* status);
+HalNotifierHandle initializeNotifier(void (*process)(uint64_t, void*),
+                                     void* param, int32_t* status);
+void cleanNotifier(HalNotifierHandle notifier_handle, int32_t* status);
+void* getNotifierParam(HalNotifierHandle notifier_handle, int32_t* status);
+void updateNotifierAlarm(HalNotifierHandle notifier_handle,
+                         uint64_t triggerTime, int32_t* status);
+void stopNotifierAlarm(HalNotifierHandle notifier_handle, int32_t* status);
 }
