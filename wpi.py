@@ -22,6 +22,7 @@ def folderExclude():
             "msgs",
             "ni-libraries",
             "ni" + sep + "vision",
+            "__pycache__",
             "spilib",
             "visa"]]
 

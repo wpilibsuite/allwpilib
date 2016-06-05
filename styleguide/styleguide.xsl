@@ -50,7 +50,7 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
                   var bodyElements = GetElementsByName(bodyName);
                   var linkElement = GetElementsByName('link-' + buttonName)[0];
                   if (bodyElements.length != 1) {
-                    throw Error('ShowHideByName() got the wrong number of bodyElements:  ' + 
+                    throw Error('ShowHideByName() got the wrong number of bodyElements:  ' +
                         bodyElements.length);
                   } else {
                     var bodyElement = bodyElements[0];
@@ -138,10 +138,10 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
                   var showHideAllValue = showHideAllRegex.exec(window.location.href);
                   if (showHideAllValue != null) {
                     if (showHideAllValue[2] == "y") {
-                      SetHiddenState(document.getElementsByTagName("body")[0].childNodes, 
+                      SetHiddenState(document.getElementsByTagName("body")[0].childNodes,
                           "inline", '<xsl:value-of select="$hide_button_text"/>');
                     } else {
-                      SetHiddenState(document.getElementsByTagName("body")[0].childNodes, 
+                      SetHiddenState(document.getElementsByTagName("body")[0].childNodes,
                           "none", '<xsl:value-of select="$show_button_text"/>');
                     }
                   }
@@ -551,8 +551,8 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
   </xsl:template>
 
   <!-- Given text, determine the starting position of code.
-       This similar to num_leading_spaces_one_line but treats "Yes:" and "No:" 
-       as spaces. Also, if there is no code on the first line, it searches 
+       This similar to num_leading_spaces_one_line but treats "Yes:" and "No:"
+       as spaces. Also, if there is no code on the first line, it searches
        subsequent lines until a non-empty line is found.
        Used to find the start of code in snippets like:
        Yes: if(foo):
@@ -583,7 +583,7 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
           <xsl:with-param name="current_count" select="$current_count + 3"/>
         </xsl:call-template>
       </xsl:when>
-      <!-- This is only reached if the first line is entirely whitespace or 
+      <!-- This is only reached if the first line is entirely whitespace or
            contains nothing but "Yes:" or "No:"-->
       <xsl:when test="starts-with($text, '&#xA;')">
         <xsl:call-template name="code_start_index">
@@ -716,7 +716,7 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
        5) Print line[a:c] (Note that we ignore line[0:a])
        6) Print line[b:c] in an external span (in order to double the block
           indent in external code).
-       7) Print line[c:<end>] with function names processed to produce both 
+       7) Print line[c:<end>] with function names processed to produce both
           internal and external names.
        8) If there are more lines, recurse.
   -->
@@ -820,7 +820,7 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
       <xsl:with-param name="b" select="$b"/>
       <xsl:with-param name="previous_indent" select="$b"/>
       <xsl:with-param name="previous_ends_with_colon" select="0"/>
-      <xsl:with-param name="is_first_line" select="1"/> 
+      <xsl:with-param name="is_first_line" select="1"/>
     </xsl:call-template>
   </xsl:template>
 
@@ -895,7 +895,7 @@ xmlns:fn="http://www.w3.org/2005/xpath-functions">
   <!-- Given a single word of text convert it from CamelCase to
        lower_with_under.
        This means replacing each uppercase character with _ followed by the
-       lowercase version except for the first character which is replaced 
+       lowercase version except for the first character which is replaced
        without adding the _.-->
   <xsl:template name="convert_camel_case_to_lowercase_with_under">
     <xsl:param name="text"/>

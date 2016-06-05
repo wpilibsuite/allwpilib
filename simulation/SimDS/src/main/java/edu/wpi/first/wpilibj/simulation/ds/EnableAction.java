@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 
 public class EnableAction implements ActionListener {
 	private DS ds;
-	
+
 	public EnableAction(DS ds) {
 		this.ds = ds;
 	}

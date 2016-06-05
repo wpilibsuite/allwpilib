@@ -32,13 +32,13 @@ import gazebo.msgs.GzDriverStation.DriverStation;
 public class DS {
 	private JoystickProvider joystickProvider;
 	private JoystickList joysticks;
-	
+
 	private JFrame mainframe;
 	private JPanel modePanel;
 	private ActionListener modeListener;
 	private ButtonGroup modes;
 	private JButton enable, refresh;
-	
+
 	public enum State {
 		Disabled, Teleop, Autonomous, Test;
 	}
@@ -46,14 +46,14 @@ public class DS {
 	private State state = State.Teleop;
 	private DriverStation.State protoState = DriverStation.State.TELEOP;
 	private Publisher<DriverStation> pub;
-	
+
 	public DS(JoystickProvider joystickProvider) {
 		this.joystickProvider = joystickProvider;
 		mainframe = new JFrame();
 		mainframe.setTitle("FRC Simulation DriverStation");
 		mainframe.setLayout(new GridBagLayout());
 		GridBagConstraints constraints = new GridBagConstraints();
-		
+
 		makeModeButtons(constraints);
         mainframe.pack();
 		constraints.gridy = 1;
@@ -65,15 +65,15 @@ public class DS {
         mainframe.pack();
 		constraints.gridy = 1;
 		makeRefreshButton(constraints);
-        
+
         mainframe.pack();
         mainframe.setVisible(true);
 	}
-	
+
 	private void makeModeButtons(GridBagConstraints constraints) {
 		modePanel = new JPanel();
 		modePanel.setLayout(new BoxLayout(modePanel, BoxLayout.PAGE_AXIS));
-		
+
 		modeListener = new ModeAction(this);
 		JRadioButton teleop = new JRadioButton("Teleop");
 		teleop.setActionCommand(State.Teleop.toString());
@@ -85,7 +85,7 @@ public class DS {
 		test.setActionCommand(State.Test.toString());
 		test.addActionListener(modeListener);
 		teleop.setSelected(true);
-		
+
 		modes = new ButtonGroup();
 		modes.add(teleop);
 		modes.add(auto);
@@ -95,14 +95,14 @@ public class DS {
 		modePanel.add(test);
 		mainframe.add(modePanel, constraints);
 	}
-		
+
 	private void makeEnableButton(GridBagConstraints constraints) {
 		enable = new JButton("Enable");
 		enable.addActionListener(new EnableAction(this));
 		enable.setPreferredSize(new Dimension(modePanel.getSize().width, 50));
 		mainframe.add(enable, constraints);
 	}
-	
+
 	private void makeJoystickUI(GridBagConstraints constraints) {
 		joysticks = new JoystickList(joystickProvider);
 		mainframe.add(joysticks, constraints);
@@ -117,19 +117,19 @@ public class DS {
 		}
 		joysticks.setListData(sticks);
 	}
-	
+
 	private void makeRefreshButton(GridBagConstraints constraints) {
 		refresh = new JButton("Refresh Joysticks");
 		refresh.addActionListener(new RefreshAction(this));
 		refresh.setPreferredSize(new Dimension(joysticks.getSize().width, 50));
 		mainframe.add(refresh, constraints);
 	}
-	
+
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 		enable.setText(enabled ? "Disable" : "Enable");
 	}
-	
+
 	public State getState() {
 		return enabled ? state : State.Disabled;
 	}

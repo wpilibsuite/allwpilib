@@ -34,15 +34,15 @@ import com.google.protobuf.Message;
  */
 public class Connection {
 	private static int HEADER_SIZE = 8;
-	
+
 	public String host;
 	public int port;
-	
+
 	private Socket socket;
 	private ServerSocket ssocket;
 	private InputStream is;
 	private OutputStream os;
-	
+
 	private static final Logger LOG = Logger.getLogger("Gazebo Transport");
 
 	public void connect(String host, int port) throws UnknownHostException, IOException {
@@ -114,7 +114,7 @@ public class Connection {
 			ssocket = null;
 		}
 	}
-	
+
 	public byte[] rawRead() throws IOException {
 		synchronized (is) {
 			// Figure out the message size
@@ -125,18 +125,18 @@ public class Connection {
 				return null;
 			}
 			int size = Integer.parseInt(new String(buff), 16);
-		
+
 			// Read in the actual message
 			buff = new byte[size];
 			n = is.read(buff);
 			if (n != size) {
 				throw new IOException("Failed to read whole message");
 			}
-			
+
 			return buff;
 		}
 	}
-	
+
 	public Packet read() throws IOException {
 		byte[] buff = rawRead();
 		if (buff == null) {

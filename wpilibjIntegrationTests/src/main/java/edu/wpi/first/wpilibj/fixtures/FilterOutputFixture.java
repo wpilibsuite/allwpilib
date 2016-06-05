@@ -129,18 +129,18 @@ public abstract class FilterOutputFixture<T extends PIDSource> implements ITestF
     @SuppressWarnings("ParameterName")
     public abstract double getData(double t);
 
-    
+
     @Override
     public void setPIDSourceType(PIDSourceType pidSource) {
     }
 
-    
+
     @Override
     public PIDSourceType getPIDSourceType() {
       return PIDSourceType.kDisplacement;
     }
 
-    
+
     @Override
     public double pidGet() {
       m_count += TestBench.kFilterStep;

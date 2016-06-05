@@ -42,7 +42,7 @@ public class SimJoystick implements ISimJoystick {
 		return controller.getName();
 	}
 
-	@Override	
+	@Override
 	public String toString() {
 		return getName();
 	}
@@ -60,7 +60,7 @@ public class SimJoystick implements ISimJoystick {
 		prevNode = node;
 		prevI = i;
 	}
-	
+
 	@Override
 	public void publish() {
 		controller.poll();
