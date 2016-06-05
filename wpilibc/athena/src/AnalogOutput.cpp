@@ -7,7 +7,6 @@
 
 #include "AnalogOutput.h"
 #include "HAL/HAL.h"
-#include "HAL/Port.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
 #include "WPIErrors.h"
@@ -47,7 +46,7 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
 
   m_channel = channel;
 
-  void* port = getPort(m_channel);
+  HalPortHandle port = getPort(m_channel);
   int32_t status = 0;
   m_port = initializeAnalogOutputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));

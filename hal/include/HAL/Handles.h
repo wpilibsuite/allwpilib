@@ -17,3 +17,5 @@
 #define HAL_HANDLE_NEGATIVE_INDEX -5
 
 typedef int32_t HalHandle;
+
+typedef HalHandle HalPortHandle;

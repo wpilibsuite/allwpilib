@@ -20,7 +20,7 @@ std::unique_ptr<Resource> SolenoidBase::m_allocated;
 SolenoidBase::SolenoidBase(uint8_t moduleNumber)
     : m_moduleNumber(moduleNumber) {
   for (uint32_t i = 0; i < kSolenoidChannels; i++) {
-    void* port = getPortWithModule(moduleNumber, i);
+    HalPortHandle port = getPortWithModule(moduleNumber, i);
     int32_t status = 0;
     SolenoidBase::m_ports[moduleNumber][i] =
         initializeSolenoidPort(port, &status);

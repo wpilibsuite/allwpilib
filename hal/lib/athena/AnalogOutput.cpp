@@ -8,6 +8,8 @@
 #include "HAL/AnalogOutput.h"
 
 #include "AnalogInternal.h"
+#include "HAL/Errors.h"
+#include "handles/HandlesInternal.h"
 
 using namespace hal;
 
@@ -16,13 +18,20 @@ extern "C" {
 /**
  * Initialize the analog output port using the given port object.
  */
-void* initializeAnalogOutputPort(void* port_pointer, int32_t* status) {
+void* initializeAnalogOutputPort(HalPortHandle port_handle, int32_t* status) {
   initializeAnalog(status);
-  Port* port = (Port*)port_pointer;
+
+  if (*status != 0) return nullptr;
+
+  int16_t pin = getPortHandlePin(port_handle);
+  if (pin == HAL_HANDLE_INVALID_TYPE) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return nullptr;
+  }
 
   // Initialize port structure
   AnalogPort* analog_port = new AnalogPort();
-  analog_port->port = *port;
+  analog_port->pin = (uint8_t)pin;
   analog_port->accumulator = nullptr;
   return analog_port;
 }
@@ -57,13 +66,13 @@ void setAnalogOutput(void* analog_port_pointer, double voltage,
   else if (voltage > 5.0)
     rawValue = 0x1000;
 
-  analogOutputSystem->writeMXP(port->port.pin, rawValue, status);
+  analogOutputSystem->writeMXP(port->pin, rawValue, status);
 }
 
 double getAnalogOutput(void* analog_port_pointer, int32_t* status) {
   AnalogPort* port = (AnalogPort*)analog_port_pointer;
 
-  uint16_t rawValue = analogOutputSystem->readMXP(port->port.pin, status);
+  uint16_t rawValue = analogOutputSystem->readMXP(port->pin, status);
 
   return rawValue * 5.0 / 0x1000;
 }

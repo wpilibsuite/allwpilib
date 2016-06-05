@@ -8,6 +8,7 @@
 #include "HAL/I2C.h"
 
 #include "DigitalInternal.h"
+#include "HAL/DIO.h"
 #include "HAL/HAL.h"
 #include "i2clib/i2c-lib.h"
 
@@ -32,6 +33,7 @@ extern "C" {
  */
 void i2CInitialize(uint8_t port, int32_t* status) {
   initializeDigital(status);
+  if (*status != 0) return;
 
   if (port > 1) {
     // Set port out of range error here
@@ -49,8 +51,12 @@ void i2CInitialize(uint8_t port, int32_t* status) {
     } else if (port == 1) {
       i2CMXPObjCount++;
       if (i2CMXPHandle > 0) return;
-      if (!allocateDIO(getPort(24), false, status)) return;
-      if (!allocateDIO(getPort(25), false, status)) return;
+      if (!allocateDIO(initializeDigitalPort(getPort(24), status), false,
+                       status))
+        return;
+      if (!allocateDIO(initializeDigitalPort(getPort(25), status), false,
+                       status))
+        return;
       digitalSystem->writeEnableMXPSpecialFunction(
           digitalSystem->readEnableMXPSpecialFunction(status) | 0xC000, status);
       i2CMXPHandle = i2clib_open("/dev/i2c-1");

@@ -9,7 +9,9 @@
 
 #include "AnalogInternal.h"
 #include "HAL/AnalogInput.h"
+#include "HAL/Errors.h"
 #include "HAL/cpp/Resource.h"
+#include "handles/HandlesInternal.h"
 
 using namespace hal;
 
@@ -23,20 +25,21 @@ typedef struct trigger_t AnalogTrigger;
 
 static hal::Resource* triggers = nullptr;
 
-void* initializeAnalogTrigger(void* port_pointer, uint32_t* index,
+void* initializeAnalogTrigger(HalPortHandle port_handle, uint32_t* index,
                               int32_t* status) {
-  Port* port = (Port*)port_pointer;
   hal::Resource::CreateResourceObject(&triggers, tAnalogTrigger::kNumSystems);
 
   AnalogTrigger* trigger = new AnalogTrigger();
-  trigger->port = (AnalogPort*)initializeAnalogInputPort(port, status);
+  trigger->port = (AnalogPort*)initializeAnalogInputPort(port_handle, status);
+  if (*status != 0) {
+    return nullptr;
+  }
   trigger->index = triggers->Allocate("Analog Trigger");
   *index = trigger->index;
   // TODO: if (index == ~0ul) { CloneError(triggers); return; }
 
   trigger->trigger = tAnalogTrigger::create(trigger->index, status);
-  trigger->trigger->writeSourceSelect_Channel(port->pin, status);
-
+  trigger->trigger->writeSourceSelect_Channel(trigger->port->pin, status);
   return trigger;
 }
 

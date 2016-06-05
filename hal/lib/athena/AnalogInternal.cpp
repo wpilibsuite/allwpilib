@@ -9,7 +9,6 @@
 
 #include "ChipObject.h"
 #include "HAL/AnalogInput.h"
-#include "HAL/Port.h"
 #include "HAL/cpp/priority_mutex.h"
 
 namespace hal {

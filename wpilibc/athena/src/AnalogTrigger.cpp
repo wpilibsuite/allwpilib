@@ -9,7 +9,6 @@
 
 #include "AnalogInput.h"
 #include "HAL/HAL.h"
-#include "HAL/Port.h"
 #include "Resource.h"
 #include "WPIErrors.h"
 
@@ -22,7 +21,7 @@
  *                on-board 4-7 are on the MXP port.
  */
 AnalogTrigger::AnalogTrigger(int32_t channel) {
-  void* port = getPort(channel);
+  HalPortHandle port = getPort(channel);
   int32_t status = 0;
   uint32_t index = 0;
   m_trigger = initializeAnalogTrigger(port, &index, &status);

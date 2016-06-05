@@ -9,7 +9,6 @@
 
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/HAL.h"
-#include "HAL/Port.h"
 #include "WPIErrors.h"
 
 const uint32_t SensorBase::kDigitalChannels;
@@ -33,7 +32,7 @@ void* SensorBase::m_pwm_ports[kPwmChannels];
 SensorBase::SensorBase() {
   if (!portsInitialized) {
     for (uint32_t i = 0; i < kDigitalChannels; i++) {
-      void* port = getPort(i);
+      HalPortHandle port = getPort(i);
       int32_t status = 0;
       m_digital_ports[i] = initializeDigitalPort(port, &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -41,7 +40,7 @@ SensorBase::SensorBase() {
     }
 
     for (uint32_t i = 0; i < kRelayChannels; i++) {
-      void* port = getPort(i);
+      HalPortHandle port = getPort(i);
       int32_t status = 0;
       m_relay_ports[i] = initializeDigitalPort(port, &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -49,7 +48,7 @@ SensorBase::SensorBase() {
     }
 
     for (uint32_t i = 0; i < kPwmChannels; i++) {
-      void* port = getPort(i);
+      HalPortHandle port = getPort(i);
       int32_t status = 0;
       m_pwm_ports[i] = initializeDigitalPort(port, &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));

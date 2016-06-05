@@ -28,8 +28,8 @@ public abstract class SolenoidBase extends SensorBase {
     m_moduleNumber = moduleNumber;
     m_ports = new long[SensorBase.kSolenoidChannels];
     for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-      long port = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) i);
-      m_ports[i] = SolenoidJNI.initializeSolenoidPort(port);
+      int portHandle = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) i);
+      m_ports[i] = SolenoidJNI.initializeSolenoidPort(portHandle);
     }
   }
 
