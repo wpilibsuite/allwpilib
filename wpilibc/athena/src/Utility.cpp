@@ -9,11 +9,7 @@
 
 #include <cxxabi.h>
 #include <execinfo.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-#include <iostream>
 #include <sstream>
 
 #include "HAL/HAL.h"

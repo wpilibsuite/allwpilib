@@ -383,7 +383,7 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button) {
  */
 bool DriverStation::IsEnabled() const {
   HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
+  std::memset(&controlWord, 0, sizeof(controlWord));
   HALGetControlWord(&controlWord);
   return controlWord.enabled && controlWord.dsAttached;
 }
@@ -395,7 +395,7 @@ bool DriverStation::IsEnabled() const {
  */
 bool DriverStation::IsDisabled() const {
   HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
+  std::memset(&controlWord, 0, sizeof(controlWord));
   HALGetControlWord(&controlWord);
   return !(controlWord.enabled && controlWord.dsAttached);
 }
@@ -407,7 +407,7 @@ bool DriverStation::IsDisabled() const {
  */
 bool DriverStation::IsAutonomous() const {
   HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
+  std::memset(&controlWord, 0, sizeof(controlWord));
   HALGetControlWord(&controlWord);
   return controlWord.autonomous;
 }
@@ -419,7 +419,7 @@ bool DriverStation::IsAutonomous() const {
  */
 bool DriverStation::IsOperatorControl() const {
   HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
+  std::memset(&controlWord, 0, sizeof(controlWord));
   HALGetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
 }
@@ -442,7 +442,7 @@ bool DriverStation::IsTest() const {
  */
 bool DriverStation::IsDSAttached() const {
   HALControlWord controlWord;
-  memset(&controlWord, 0, sizeof(controlWord));
+  std::memset(&controlWord, 0, sizeof(controlWord));
   HALGetControlWord(&controlWord);
   return controlWord.dsAttached;
 }

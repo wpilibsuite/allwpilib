@@ -7,7 +7,8 @@
 
 #include "HAL/Notifier.h"
 
-#include <stdlib.h>
+// For std::atexit()
+#include <cstdlib>
 
 #include <atomic>
 #include <memory>

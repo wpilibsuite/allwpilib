@@ -7,7 +7,6 @@
 
 #include "SerialPort.h"
 
-#include <stdarg.h>
 #include "HAL/HAL.h"
 
 // static ViStatus _VI_FUNCH ioCompleteHandler (ViSession vi, ViEventType

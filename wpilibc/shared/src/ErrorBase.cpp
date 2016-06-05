@@ -7,8 +7,7 @@
 
 #include "ErrorBase.h"
 
-#include <errno.h>
-
+#include <cerrno>
 #include <iomanip>
 #include <sstream>
 

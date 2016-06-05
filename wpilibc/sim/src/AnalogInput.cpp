@@ -6,6 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
+
+#include <cstdio>
+
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

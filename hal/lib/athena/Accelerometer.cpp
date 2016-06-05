@@ -7,9 +7,10 @@
 
 #include "HAL/Accelerometer.h"
 
-#include <assert.h>
+#include <cassert>
+#include <cstdio>
+
 #include <stdint.h>
-#include <stdio.h>
 
 #include "ChipObject.h"
 
@@ -125,7 +126,7 @@ static void writeRegister(Register reg, uint8_t data) {
     if (getFPGATime(&status) > initialTime + 1000) break;
   }
 
-  fflush(stdout);
+  std::fflush(stdout);
 }
 
 static uint8_t readRegister(Register reg) {
@@ -155,7 +156,7 @@ static uint8_t readRegister(Register reg) {
     if (getFPGATime(&status) > initialTime + 1000) break;
   }
 
-  fflush(stdout);
+  std::fflush(stdout);
 
   return accel->readDATI(&status);
 }

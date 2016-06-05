@@ -7,13 +7,12 @@
 
 #include "MotorSafetyHelper.h"
 
+#include <sstream>
+
 #include "DriverStation.h"
 #include "MotorSafety.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-
-#include <stdio.h>
-#include <sstream>
 
 std::set<MotorSafetyHelper*> MotorSafetyHelper::m_helperList;
 priority_recursive_mutex MotorSafetyHelper::m_listMutex;
