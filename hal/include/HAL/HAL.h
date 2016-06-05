@@ -234,15 +234,15 @@ int HALSendError(int isError, int32_t errorCode, int isLVCode,
 
 int HALGetControlWord(HALControlWord* data);
 int HALGetAllianceStation(enum HALAllianceStationID* allianceStation);
-int HALGetJoystickAxes(uint8_t joystickNum, HALJoystickAxes* axes);
-int HALGetJoystickPOVs(uint8_t joystickNum, HALJoystickPOVs* povs);
-int HALGetJoystickButtons(uint8_t joystickNum, HALJoystickButtons* buttons);
-int HALGetJoystickDescriptor(uint8_t joystickNum, HALJoystickDescriptor* desc);
-int HALGetJoystickIsXbox(uint8_t joystickNum);
-int HALGetJoystickType(uint8_t joystickNum);
-char* HALGetJoystickName(uint8_t joystickNum);
-int HALGetJoystickAxisType(uint8_t joystickNum, uint8_t axis);
-int HALSetJoystickOutputs(uint8_t joystickNum, uint32_t outputs,
+int HALGetJoystickAxes(uint32_t joystickNum, HALJoystickAxes* axes);
+int HALGetJoystickPOVs(uint32_t joystickNum, HALJoystickPOVs* povs);
+int HALGetJoystickButtons(uint32_t joystickNum, HALJoystickButtons* buttons);
+int HALGetJoystickDescriptor(uint32_t joystickNum, HALJoystickDescriptor* desc);
+int HALGetJoystickIsXbox(uint32_t joystickNum);
+int HALGetJoystickType(uint32_t joystickNum);
+char* HALGetJoystickName(uint32_t joystickNum);
+int HALGetJoystickAxisType(uint32_t joystickNum, uint32_t axis);
+int HALSetJoystickOutputs(uint32_t joystickNum, uint32_t outputs,
                           uint16_t leftRumble, uint16_t rightRumble);
 int HALGetMatchTime(float* matchTime);
 

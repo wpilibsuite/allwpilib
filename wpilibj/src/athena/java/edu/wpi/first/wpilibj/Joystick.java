@@ -447,6 +447,15 @@ public class Joystick extends GenericHID {
   }
 
   /**
+   * Get the axis type of a joystick axis.
+   *
+   * @return the axis type of a joystick axis.
+   */
+  public int getAxisType(int axis) {
+    return m_ds.getJoystickAxisType(m_port, axis);
+  }
+
+  /**
    * Set the rumble output for the joystick. The DS currently supports 2 rumble values, left rumble
    * and right rumble.
    *

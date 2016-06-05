@@ -225,22 +225,22 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
   public static int kMaxJoystickAxes = 12;
   public static int kMaxJoystickPOVs = 12;
 
-  public static native byte HALGetJoystickAxes(byte joystickNum, float[] axesArray);
+  public static native byte HALGetJoystickAxes(int joystickNum, float[] axesArray);
 
-  public static native byte HALGetJoystickPOVs(byte joystickNum, short[] povsArray);
+  public static native byte HALGetJoystickPOVs(int joystickNum, short[] povsArray);
 
-  public static native int HALGetJoystickButtons(byte joystickNum, ByteBuffer count);
+  public static native int HALGetJoystickButtons(int joystickNum, ByteBuffer count);
 
-  public static native int HALSetJoystickOutputs(byte joystickNum, int outputs, short leftRumble,
+  public static native int HALSetJoystickOutputs(int joystickNum, int outputs, short leftRumble,
                                                  short rightRumble);
 
-  public static native int HALGetJoystickIsXbox(byte joystickNum);
+  public static native int HALGetJoystickIsXbox(int joystickNum);
 
-  public static native int HALGetJoystickType(byte joystickNum);
+  public static native int HALGetJoystickType(int joystickNum);
 
-  public static native String HALGetJoystickName(byte joystickNum);
+  public static native String HALGetJoystickName(int joystickNum);
 
-  public static native int HALGetJoystickAxisType(byte joystickNum, byte axis);
+  public static native int HALGetJoystickAxisType(int joystickNum, int axis);
 
   public static native float HALGetMatchTime();
 

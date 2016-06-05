@@ -50,7 +50,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   bool GetJoystickIsXbox(uint32_t stick) const;
   int GetJoystickType(uint32_t stick) const;
   std::string GetJoystickName(uint32_t stick) const;
-  int GetJoystickAxisType(uint32_t stick, uint8_t axis) const;
+  int GetJoystickAxisType(uint32_t stick, uint32_t axis) const;
 
   bool IsEnabled() const override;
   bool IsDisabled() const override;

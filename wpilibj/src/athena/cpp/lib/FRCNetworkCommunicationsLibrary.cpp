@@ -140,11 +140,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeH
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickAxes
- * Signature: (B[S)B
+ * Signature: (I[S)B
  */
 JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxes(
-    JNIEnv * env, jclass, jbyte joystickNum, jfloatArray axesArray) {
+    JNIEnv * env, jclass, jint joystickNum, jfloatArray axesArray) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickAxes";
   HALJoystickAxes axes;
   HALGetJoystickAxes(joystickNum, &axes);
@@ -163,11 +163,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickPOVs
- * Signature: (B[S)B
+ * Signature: (I[S)B
  */
 JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickPOVs(
-    JNIEnv * env, jclass, jbyte joystickNum, jshortArray povsArray) {
+    JNIEnv * env, jclass, jint joystickNum, jshortArray povsArray) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickPOVs";
   HALJoystickPOVs povs;
   HALGetJoystickPOVs(joystickNum, &povs);
@@ -186,11 +186,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickButtons
- * Signature: (B)S
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickButtons(
-    JNIEnv *env, jclass, jbyte joystickNum, jobject count) {
+    JNIEnv *env, jclass, jint joystickNum, jobject count) {
   NETCOMM_LOG(logDEBUG) << "Calling HALJoystickButtons";
   HALJoystickButtons joystickButtons;
   HALGetJoystickButtons(joystickNum, &joystickButtons);
@@ -205,11 +205,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALSetJoystickOutputs
- * Signature: (BISS)I
+ * Signature: (IISS)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetJoystickOutputs(
-    JNIEnv *, jclass, jbyte port, jint outputs, jshort leftRumble,
+    JNIEnv *, jclass, jint port, jint outputs, jshort leftRumble,
     jshort rightRumble) {
   NETCOMM_LOG(logDEBUG) << "Calling HALSetJoystickOutputs on port " << port;
   NETCOMM_LOG(logDEBUG) << "Outputs: " << outputs;
@@ -221,11 +221,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALSetJ
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickIsXbox
- * Signature: (B)I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickIsXbox(
-    JNIEnv *, jclass, jbyte port) {
+    JNIEnv *, jclass, jint port) {
   NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickIsXbox";
   return HALGetJoystickIsXbox(port);
 }
@@ -233,11 +233,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickType
- * Signature: (B)I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickType(
-    JNIEnv *, jclass, jbyte port) {
+    JNIEnv *, jclass, jint port) {
   NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickType";
   return HALGetJoystickType(port);
 }
@@ -245,11 +245,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickName
- * Signature: (B)Ljava/lang/String;
+ * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickName(
-    JNIEnv *env, jclass, jbyte port) {
+    JNIEnv *env, jclass, jint port) {
   NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickName";
   char *joystickName = HALGetJoystickName(port);
   jstring str = env->NewStringUTF(joystickName);
@@ -260,11 +260,11 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickAxisType
- * Signature: (BB)I
+ * Signature: (II)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxisType(
-    JNIEnv *, jclass, jbyte joystickNum, jbyte axis) {
+    JNIEnv *, jclass, jint joystickNum, jint axis) {
   NETCOMM_LOG(logDEBUG) << "Calling HALGetJoystickAxisType";
   return HALGetJoystickAxisType(joystickNum, axis);
 }
