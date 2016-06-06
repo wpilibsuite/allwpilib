@@ -36,9 +36,9 @@ class RobotDrive : public MotorSafety, public ErrorBase {
     kRearRightMotor = 3
   };
 
-  RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel);
-  RobotDrive(uint32_t frontLeftMotorChannel, uint32_t rearLeftMotorChannel,
-             uint32_t frontRightMotorChannel, uint32_t rearRightMotorChannel);
+  RobotDrive(uint8_t leftMotorChannel, uint8_t rightMotorChannel);
+  RobotDrive(uint8_t frontLeftMotorChannel, uint8_t rearLeftMotorChannel,
+             uint8_t frontRightMotorChannel, uint8_t rearRightMotorChannel);
   RobotDrive(SpeedController* leftMotor, SpeedController* rightMotor);
   RobotDrive(SpeedController& leftMotor, SpeedController& rightMotor);
   RobotDrive(std::shared_ptr<SpeedController> leftMotor,
@@ -61,20 +61,20 @@ class RobotDrive : public MotorSafety, public ErrorBase {
                  bool squaredInputs = true);
   void TankDrive(GenericHID& leftStick, GenericHID& rightStick,
                  bool squaredInputs = true);
-  void TankDrive(GenericHID* leftStick, uint32_t leftAxis,
-                 GenericHID* rightStick, uint32_t rightAxis,
+  void TankDrive(GenericHID* leftStick, uint8_t leftAxis,
+                 GenericHID* rightStick, uint8_t rightAxis,
                  bool squaredInputs = true);
-  void TankDrive(GenericHID& leftStick, uint32_t leftAxis,
-                 GenericHID& rightStick, uint32_t rightAxis,
+  void TankDrive(GenericHID& leftStick, uint8_t leftAxis,
+                 GenericHID& rightStick, uint8_t rightAxis,
                  bool squaredInputs = true);
   void TankDrive(float leftValue, float rightValue, bool squaredInputs = true);
   void ArcadeDrive(GenericHID* stick, bool squaredInputs = true);
   void ArcadeDrive(GenericHID& stick, bool squaredInputs = true);
-  void ArcadeDrive(GenericHID* moveStick, uint32_t moveChannel,
-                   GenericHID* rotateStick, uint32_t rotateChannel,
+  void ArcadeDrive(GenericHID* moveStick, uint8_t moveChannel,
+                   GenericHID* rotateStick, uint8_t rotateChannel,
                    bool squaredInputs = true);
-  void ArcadeDrive(GenericHID& moveStick, uint32_t moveChannel,
-                   GenericHID& rotateStick, uint32_t rotateChannel,
+  void ArcadeDrive(GenericHID& moveStick, uint8_t moveChannel,
+                   GenericHID& rotateStick, uint8_t rotateChannel,
                    bool squaredInputs = true);
   void ArcadeDrive(float moveValue, float rotateValue,
                    bool squaredInputs = true);

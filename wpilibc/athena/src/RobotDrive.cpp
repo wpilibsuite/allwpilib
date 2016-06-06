@@ -56,7 +56,7 @@ void RobotDrive::InitRobotDrive() {
  * @param rightMotorChannel The PWM channel number that drives the right motor.
  *                          0-9 are on-board, 10-19 are on the MXP port
  */
-RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
+RobotDrive::RobotDrive(uint8_t leftMotorChannel, uint8_t rightMotorChannel) {
   InitRobotDrive();
   m_rearLeftMotor = std::make_shared<Talon>(leftMotorChannel);
   m_rearRightMotor = std::make_shared<Talon>(rightMotorChannel);
@@ -79,8 +79,8 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
  * @param rearRightMotor  Rear Right motor channel number. 0-9 are on-board,
  *                        10-19 are on the MXP port
  */
-RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
-                       uint32_t frontRightMotor, uint32_t rearRightMotor) {
+RobotDrive::RobotDrive(uint8_t frontLeftMotor, uint8_t rearLeftMotor,
+                       uint8_t frontRightMotor, uint8_t rearRightMotor) {
   InitRobotDrive();
   m_rearLeftMotor = std::make_shared<Talon>(rearLeftMotor);
   m_rearRightMotor = std::make_shared<Talon>(rearRightMotor);
@@ -276,8 +276,8 @@ void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
  *                   robot.
  * @param rightAxis  The axis to select on the right side Joystick object.
  */
-void RobotDrive::TankDrive(GenericHID* leftStick, uint32_t leftAxis,
-                           GenericHID* rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID* leftStick, uint8_t leftAxis,
+                           GenericHID* rightStick, uint8_t rightAxis,
                            bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -287,8 +287,8 @@ void RobotDrive::TankDrive(GenericHID* leftStick, uint32_t leftAxis,
             squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID& leftStick, uint32_t leftAxis,
-                           GenericHID& rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID& leftStick, uint8_t leftAxis,
+                           GenericHID& rightStick, uint8_t rightAxis,
                            bool squaredInputs) {
   TankDrive(leftStick.GetRawAxis(leftAxis), rightStick.GetRawAxis(rightAxis),
             squaredInputs);
@@ -383,8 +383,8 @@ void RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {
  * @param squaredInputs Setting this parameter to true increases the
  *                      sensitivity at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint32_t moveAxis,
-                             GenericHID* rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint8_t moveAxis,
+                             GenericHID* rotateStick, uint8_t rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick->GetRawAxis(moveAxis);
   float rotateValue = rotateStick->GetRawAxis(rotateAxis);
@@ -408,8 +408,8 @@ void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint32_t moveAxis,
  * @param squaredInputs Setting this parameter to true increases the
  *                      sensitivity at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID& moveStick, uint32_t moveAxis,
-                             GenericHID& rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID& moveStick, uint8_t moveAxis,
+                             GenericHID& rotateStick, uint8_t rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick.GetRawAxis(moveAxis);
   float rotateValue = rotateStick.GetRawAxis(rotateAxis);

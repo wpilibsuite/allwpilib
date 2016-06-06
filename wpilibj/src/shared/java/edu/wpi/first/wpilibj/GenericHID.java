@@ -11,7 +11,6 @@ package edu.wpi.first.wpilibj;
  * GenericHID Interface.
  */
 public abstract class GenericHID {
-
   /**
    * Which hand the Human Interface Device is associated with.
    */
@@ -97,7 +96,7 @@ public abstract class GenericHID {
    * @param which index of the axis
    * @return the raw value of the selected axis
    */
-  public abstract double getRawAxis(int which);
+  public abstract double getRawAxis(byte which);
 
   /**
    * Is the trigger pressed.
@@ -156,7 +155,7 @@ public abstract class GenericHID {
    * @param button which button number
    * @return true if the button is pressed
    */
-  public abstract boolean getRawButton(int button);
+  public abstract boolean getRawButton(byte button);
 
   public abstract int getPOV(int pov);
 

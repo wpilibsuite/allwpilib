@@ -20,12 +20,16 @@ import edu.wpi.first.wpilibj.hal.SPIJNI;
 public class SPI extends SensorBase {
 
   public enum Port {
-    kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
+    kOnboardCS0((byte) 0),
+    kOnboardCS1((byte) 1),
+    kOnboardCS2((byte) 2),
+    kOnboardCS3((byte) 3),
+    kMXP((byte) 4);
 
     @SuppressWarnings("MemberName")
-    public int value;
+    public byte value;
 
-    private Port(int value) {
+    private Port(byte value) {
       this.value = value;
     }
   }
@@ -43,7 +47,7 @@ public class SPI extends SensorBase {
    * @param port the physical SPI port
    */
   public SPI(Port port) {
-    m_port = (byte) port.value;
+    m_port = port.value;
     devices++;
 
     SPIJNI.spiInitialize(m_port);
@@ -140,10 +144,10 @@ public class SPI extends SensorBase {
    * <p>If not running in output only mode, also saves the data received on the MISO input during
    * the transfer into the receive FIFO.
    */
-  public int write(byte[] dataToSend, int size) {
+  public int write(byte[] dataToSend, byte size) {
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
     dataToSendBuffer.put(dataToSend);
-    return SPIJNI.spiWrite(m_port, dataToSendBuffer, (byte) size);
+    return SPIJNI.spiWrite(m_port, dataToSendBuffer, size);
   }
 
   /**
@@ -155,14 +159,14 @@ public class SPI extends SensorBase {
    * @param dataToSend The buffer containing the data to send. Must be created using
    *                   ByteBuffer.allocateDirect().
    */
-  public int write(ByteBuffer dataToSend, int size) {
+  public int write(ByteBuffer dataToSend, byte size) {
     if (!dataToSend.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
     if (dataToSend.capacity() < size) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
     }
-    return SPIJNI.spiWrite(m_port, dataToSend, (byte) size);
+    return SPIJNI.spiWrite(m_port, dataToSend, size);
   }
 
   /**
@@ -176,14 +180,14 @@ public class SPI extends SensorBase {
    *                 transfer. If false, this function assumes that data is already in the receive
    *                 FIFO from a previous write.
    */
-  public int read(boolean initiate, byte[] dataReceived, int size) {
+  public int read(boolean initiate, byte[] dataReceived, byte size) {
     final int retVal;
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(size);
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
     if (initiate) {
-      retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
+      retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, size);
     } else {
-      retVal = SPIJNI.spiRead(m_port, dataReceivedBuffer, (byte) size);
+      retVal = SPIJNI.spiRead(m_port, dataReceivedBuffer, size);
     }
     dataReceivedBuffer.get(dataReceived);
     return retVal;
@@ -203,7 +207,7 @@ public class SPI extends SensorBase {
    *                     ByteBuffer.allocateDirect().
    * @param size         The length of the transaction, in bytes
    */
-  public int read(boolean initiate, ByteBuffer dataReceived, int size) {
+  public int read(boolean initiate, ByteBuffer dataReceived, byte size) {
     if (!dataReceived.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
@@ -212,9 +216,9 @@ public class SPI extends SensorBase {
     }
     if (initiate) {
       ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
-      return SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceived, (byte) size);
+      return SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceived, size);
     }
-    return SPIJNI.spiRead(m_port, dataReceived, (byte) size);
+    return SPIJNI.spiRead(m_port, dataReceived, size);
   }
 
   /**
@@ -224,11 +228,11 @@ public class SPI extends SensorBase {
    * @param dataReceived Buffer to receive data from the device
    * @param size         The length of the transaction, in bytes
    */
-  public int transaction(byte[] dataToSend, byte[] dataReceived, int size) {
+  public int transaction(byte[] dataToSend, byte[] dataReceived, byte size) {
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
     dataToSendBuffer.put(dataToSend);
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(size);
-    int retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
+    int retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, size);
     dataReceivedBuffer.get(dataReceived);
     return retVal;
   }
@@ -242,7 +246,7 @@ public class SPI extends SensorBase {
    *                     ByteBuffer.allocateDirect().
    * @param size         The length of the transaction, in bytes
    */
-  public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
+  public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, byte size) {
     if (!dataToSend.isDirect()) {
       throw new IllegalArgumentException("dataToSend must be a direct buffer");
     }
@@ -255,7 +259,7 @@ public class SPI extends SensorBase {
     if (dataReceived.capacity() < size) {
       throw new IllegalArgumentException("dataReceived is too small, must be at least " + size);
     }
-    return SPIJNI.spiTransaction(m_port, dataToSend, dataReceived, (byte) size);
+    return SPIJNI.spiTransaction(m_port, dataToSend, dataReceived, size);
   }
 
   /**
@@ -271,13 +275,13 @@ public class SPI extends SensorBase {
    * @param isSigned   Is data field signed?
    * @param bigEndian  Is device big endian?
    */
-  public void initAccumulator(double period, int cmd, int xferSize,
+  public void initAccumulator(double period, int cmd, byte xferSize,
                               int validMask, int validValue,
-                              int dataShift, int dataSize,
+                              byte dataShift, byte dataSize,
                               boolean isSigned, boolean bigEndian) {
     SPIJNI.spiInitAccumulator(m_port, (int) (period * 1.0e6), cmd,
-        (byte) xferSize, validMask, validValue, (byte) dataShift,
-        (byte) dataSize, isSigned, bigEndian);
+        xferSize, validMask, validValue, dataShift,
+        dataSize, isSigned, bigEndian);
   }
 
   /**

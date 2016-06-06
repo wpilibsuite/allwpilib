@@ -7,12 +7,14 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "Buttons/Button.h"
 #include "GenericHID.h"
 
 class JoystickButton : public Button {
  public:
-  JoystickButton(GenericHID* joystick, int buttonNumber);
+  JoystickButton(GenericHID* joystick, uint8_t buttonNumber);
   virtual ~JoystickButton() = default;
 
   virtual bool Get();

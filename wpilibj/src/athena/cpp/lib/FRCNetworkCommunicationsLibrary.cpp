@@ -140,7 +140,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_NativeH
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickAxes
- * Signature: (B[S)B
+ * Signature: (B[F)B
  */
 JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickAxes(
@@ -186,7 +186,7 @@ Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJ
 /*
  * Class: edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary
  * Method:    HALGetJoystickButtons
- * Signature: (B)S
+ * Signature: (BL)S
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_communication_FRCNetworkCommunicationsLibrary_HALGetJoystickButtons(

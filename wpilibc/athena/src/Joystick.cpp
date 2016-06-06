@@ -11,13 +11,13 @@
 #include "DriverStation.h"
 #include "WPIErrors.h"
 
-const uint32_t Joystick::kDefaultXAxis;
-const uint32_t Joystick::kDefaultYAxis;
-const uint32_t Joystick::kDefaultZAxis;
-const uint32_t Joystick::kDefaultTwistAxis;
-const uint32_t Joystick::kDefaultThrottleAxis;
-const uint32_t Joystick::kDefaultTriggerButton;
-const uint32_t Joystick::kDefaultTopButton;
+const uint8_t Joystick::kDefaultXAxis;
+const uint8_t Joystick::kDefaultYAxis;
+const uint8_t Joystick::kDefaultZAxis;
+const uint8_t Joystick::kDefaultTwistAxis;
+const uint8_t Joystick::kDefaultThrottleAxis;
+const uint8_t Joystick::kDefaultTriggerButton;
+const uint8_t Joystick::kDefaultTopButton;
 static Joystick* joysticks[DriverStation::kJoystickPorts];
 static bool joySticksInitialized = false;
 
@@ -29,7 +29,7 @@ static bool joySticksInitialized = false;
  * @param port The port on the driver station that the joystick is plugged into
  *             (0-5).
  */
-Joystick::Joystick(uint32_t port)
+Joystick::Joystick(uint8_t port)
     : Joystick(port, kNumAxisTypes, kNumButtonTypes) {
   m_axes[kXAxis] = kDefaultXAxis;
   m_axes[kYAxis] = kDefaultYAxis;
@@ -54,7 +54,7 @@ Joystick::Joystick(uint32_t port)
  * @param numAxisTypes   The number of axis types in the enum.
  * @param numButtonTypes The number of button types in the enum.
  */
-Joystick::Joystick(uint32_t port, uint32_t numAxisTypes,
+Joystick::Joystick(uint8_t port, uint32_t numAxisTypes,
                    uint32_t numButtonTypes)
     : m_ds(DriverStation::GetInstance()),
       m_port(port),
@@ -71,7 +71,7 @@ Joystick::Joystick(uint32_t port, uint32_t numAxisTypes,
   }
 }
 
-Joystick* Joystick::GetStickForPort(uint32_t port) {
+Joystick* Joystick::GetStickForPort(uint8_t port) {
   Joystick* stick = joysticks[port];
   if (stick == nullptr) {
     stick = new Joystick(port);
@@ -133,7 +133,7 @@ float Joystick::GetThrottle() const {
  * @param axis The axis to read, starting at 0.
  * @return The value of the axis.
  */
-float Joystick::GetRawAxis(uint32_t axis) const {
+float Joystick::GetRawAxis(uint8_t axis) const {
   return m_ds.GetStickAxis(m_port, axis);
 }
 
@@ -211,7 +211,7 @@ bool Joystick::GetBumper(JoystickHand hand) const {
  * @param button The button number to be read (starting at 1)
  * @return The state of the button.
  **/
-bool Joystick::GetRawButton(uint32_t button) const {
+bool Joystick::GetRawButton(uint8_t button) const {
   return m_ds.GetStickButton(m_port, button);
 }
 
@@ -316,7 +316,7 @@ uint32_t Joystick::GetAxisChannel(AxisType axis) const { return m_axes[axis]; }
  * @param axis    The axis to set the channel for.
  * @param channel The channel to set the axis to.
  */
-void Joystick::SetAxisChannel(AxisType axis, uint32_t channel) {
+void Joystick::SetAxisChannel(AxisType axis, uint8_t channel) {
   m_axes[axis] = channel;
 }
 

@@ -265,8 +265,8 @@ public class RobotDrive implements MotorSafety {
    * @param rightStick The Joystick object to use for the right side of the robot.
    * @param rightAxis  The axis to select on the right side Joystick object.
    */
-  public void tankDrive(GenericHID leftStick, final int leftAxis,
-                        GenericHID rightStick, final int rightAxis) {
+  public void tankDrive(GenericHID leftStick, final byte leftAxis,
+                        GenericHID rightStick, final byte rightAxis) {
     if (leftStick == null || rightStick == null) {
       throw new NullPointerException("Null HID provided");
     }
@@ -283,8 +283,8 @@ public class RobotDrive implements MotorSafety {
    * @param rightAxis     The axis to select on the right side Joystick object.
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
-  public void tankDrive(GenericHID leftStick, final int leftAxis,
-                        GenericHID rightStick, final int rightAxis, boolean squaredInputs) {
+  public void tankDrive(GenericHID leftStick, final byte leftAxis,
+                        GenericHID rightStick, final byte rightAxis, boolean squaredInputs) {
     if (leftStick == null || rightStick == null) {
       throw new NullPointerException("Null HID provided");
     }
@@ -374,8 +374,8 @@ public class RobotDrive implements MotorSafety {
    *                      (typically X_AXIS)
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
-  public void arcadeDrive(GenericHID moveStick, final int moveAxis,
-                          GenericHID rotateStick, final int rotateAxis,
+  public void arcadeDrive(GenericHID moveStick, final byte moveAxis,
+                          GenericHID rotateStick, final byte rotateAxis,
                           boolean squaredInputs) {
     double moveValue = moveStick.getRawAxis(moveAxis);
     double rotateValue = rotateStick.getRawAxis(rotateAxis);
@@ -394,8 +394,8 @@ public class RobotDrive implements MotorSafety {
    * @param rotateAxis  The axis on the rotation object to use for the rotate right/left (typically
    *                    X_AXIS)
    */
-  public void arcadeDrive(GenericHID moveStick, final int moveAxis,
-                          GenericHID rotateStick, final int rotateAxis) {
+  public void arcadeDrive(GenericHID moveStick, final byte moveAxis,
+                          GenericHID rotateStick, final byte rotateAxis) {
     this.arcadeDrive(moveStick, moveAxis, rotateStick, rotateAxis, true);
   }
 

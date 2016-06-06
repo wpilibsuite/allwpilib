@@ -72,8 +72,8 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
       return;
     }
 
-    m_spi.initAccumulator(kSamplePeriod, 0x20000000, 4, 0x0c00000e, 0x04000000,
-        10, 16, true, true);
+    m_spi.initAccumulator(kSamplePeriod, 0x20000000, (byte) 4, 0x0c00000e, 0x04000000,
+        (byte) 10, (byte) 16, true, true);
 
     calibrate();
 
@@ -118,8 +118,8 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     buf.put(2, (byte) 0);
     buf.put(3, (byte) (parity ? 0 : 1));
 
-    m_spi.write(buf, 4);
-    m_spi.read(false, buf, 4);
+    m_spi.write(buf, (byte) 4);
+    m_spi.read(false, buf, (byte) 4);
 
     if ((buf.get(0) & 0xe0) == 0) {
       return 0;  // error, return 0

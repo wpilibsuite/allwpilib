@@ -38,19 +38,19 @@ class DriverStation : public SensorBase, public RobotStateInterface {
 
   static const uint32_t kJoystickPorts = 6;
 
-  float GetStickAxis(uint32_t stick, uint32_t axis);
-  int GetStickPOV(uint32_t stick, uint32_t pov);
-  uint32_t GetStickButtons(uint32_t stick) const;
-  bool GetStickButton(uint32_t stick, uint8_t button);
+  float GetStickAxis(uint8_t stick, uint8_t axis);
+  int GetStickPOV(uint8_t stick, uint32_t pov);
+  uint32_t GetStickButtons(uint8_t stick) const;
+  bool GetStickButton(uint8_t stick, uint8_t button);
 
-  int GetStickAxisCount(uint32_t stick) const;
-  int GetStickPOVCount(uint32_t stick) const;
-  int GetStickButtonCount(uint32_t stick) const;
+  int GetStickAxisCount(uint8_t stick) const;
+  int GetStickPOVCount(uint8_t stick) const;
+  int GetStickButtonCount(uint8_t stick) const;
 
-  bool GetJoystickIsXbox(uint32_t stick) const;
-  int GetJoystickType(uint32_t stick) const;
-  std::string GetJoystickName(uint32_t stick) const;
-  int GetJoystickAxisType(uint32_t stick, uint8_t axis) const;
+  bool GetJoystickIsXbox(uint8_t stick) const;
+  int GetJoystickType(uint8_t stick) const;
+  std::string GetJoystickName(uint8_t stick) const;
+  int GetJoystickAxisType(uint8_t stick, uint8_t axis) const;
 
   bool IsEnabled() const override;
   bool IsDisabled() const override;

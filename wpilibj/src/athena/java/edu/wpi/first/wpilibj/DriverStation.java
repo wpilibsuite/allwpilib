@@ -172,7 +172,7 @@ public class DriverStation implements RobotState.Interface {
    * @param axis  The analog axis value to read from the joystick.
    * @return The value of the axis on the joystick.
    */
-  public double getStickAxis(int stick, int axis) {
+  public double getStickAxis(byte stick, byte axis) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
@@ -203,7 +203,7 @@ public class DriverStation implements RobotState.Interface {
    *
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
-  public int getStickPOV(int stick, int pov) {
+  public int getStickPOV(byte stick, int pov) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
@@ -233,7 +233,7 @@ public class DriverStation implements RobotState.Interface {
    * @param stick The joystick to read.
    * @return The state of the buttons on the joystick.
    */
-  public int getStickButtons(final int stick) {
+  public int getStickButtons(final byte stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-3");
     }
@@ -249,7 +249,7 @@ public class DriverStation implements RobotState.Interface {
    * @param button The button index, beginning at 1.
    * @return The state of the joystick button.
    */
-  public boolean getStickButton(final int stick, byte button) {
+  public boolean getStickButton(final byte stick, byte button) {
     if (button <= 0) {
       reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
       return false;
@@ -280,7 +280,7 @@ public class DriverStation implements RobotState.Interface {
    * @param stick The joystick port number
    * @return The number of axes on the indicated joystick
    */
-  public int getStickAxisCount(int stick) {
+  public int getStickAxisCount(byte stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
@@ -295,7 +295,7 @@ public class DriverStation implements RobotState.Interface {
    * @param stick The joystick port number
    * @return The number of POVs on the indicated joystick
    */
-  public int getStickPOVCount(int stick) {
+  public int getStickPOVCount(byte stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
@@ -310,7 +310,7 @@ public class DriverStation implements RobotState.Interface {
    * @param stick The joystick port number
    * @return The number of buttons on the indicated joystick
    */
-  public int getStickButtonCount(int stick) {
+  public int getStickButtonCount(byte stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
@@ -325,7 +325,7 @@ public class DriverStation implements RobotState.Interface {
    * @param stick The joystick port number
    * @return A boolean that returns the value of isXbox
    */
-  public boolean getJoystickIsXbox(int stick) {
+  public boolean getJoystickIsXbox(byte stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
@@ -337,7 +337,7 @@ public class DriverStation implements RobotState.Interface {
       if (1 > m_joystickButtons[stick].m_count && 1 > m_joystickAxes[stick].m_count) {
         error = true;
         retVal = false;
-      } else if (FRCNetworkCommunicationsLibrary.HALGetJoystickIsXbox((byte) stick) == 1) {
+      } else if (FRCNetworkCommunicationsLibrary.HALGetJoystickIsXbox(stick) == 1) {
         retVal = true;
       }
     }
@@ -354,7 +354,7 @@ public class DriverStation implements RobotState.Interface {
    * @param stick The joystick port number
    * @return The value of type
    */
-  public int getJoystickType(int stick) {
+  public int getJoystickType(byte stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
@@ -367,7 +367,7 @@ public class DriverStation implements RobotState.Interface {
         error = true;
         retVal = -1;
       } else {
-        retVal = FRCNetworkCommunicationsLibrary.HALGetJoystickType((byte) stick);
+        retVal = FRCNetworkCommunicationsLibrary.HALGetJoystickType(stick);
       }
     }
     if (error) {
@@ -383,7 +383,7 @@ public class DriverStation implements RobotState.Interface {
    * @param stick The joystick port number
    * @return The value of name
    */
-  public String getJoystickName(int stick) {
+  public String getJoystickName(byte stick) {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
@@ -396,7 +396,7 @@ public class DriverStation implements RobotState.Interface {
         error = true;
         retVal = "";
       } else {
-        retVal = FRCNetworkCommunicationsLibrary.HALGetJoystickName((byte) stick);
+        retVal = FRCNetworkCommunicationsLibrary.HALGetJoystickName(stick);
       }
     } 
     if (error) {

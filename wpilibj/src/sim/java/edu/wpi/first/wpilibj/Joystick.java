@@ -21,8 +21,8 @@ public class Joystick extends GenericHID {
   static final byte kDefaultZAxis = 3;
   static final byte kDefaultTwistAxis = 3;
   static final byte kDefaultThrottleAxis = 4;
-  static final int kDefaultTriggerButton = 1;
-  static final int kDefaultTopButton = 2;
+  static final byte kDefaultTriggerButton = 1;
+  static final byte kDefaultTopButton = 2;
 
   /**
    * Represents an analog axis on a joystick.
@@ -200,7 +200,7 @@ public class Joystick extends GenericHID {
    * @param axis The axis to read [1-6].
    * @return The value of the axis.
    */
-  public double getRawAxis(final int axis) {
+  public double getRawAxis(final byte axis) {
     return m_ds.getStickAxis(m_port, axis);
   }
 
@@ -277,7 +277,7 @@ public class Joystick extends GenericHID {
    * @param button The button number to be read.
    * @return The state of the button.
    */
-  public boolean getRawButton(final int button) {
+  public boolean getRawButton(final byte button) {
     return m_ds.getStickButton(m_port, button);
   }
 

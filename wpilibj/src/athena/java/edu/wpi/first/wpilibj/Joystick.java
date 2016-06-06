@@ -24,8 +24,8 @@ public class Joystick extends GenericHID {
   static final byte kDefaultZAxis = 2;
   static final byte kDefaultTwistAxis = 2;
   static final byte kDefaultThrottleAxis = 3;
-  static final int kDefaultTriggerButton = 1;
-  static final int kDefaultTopButton = 2;
+  static final byte kDefaultTriggerButton = 1;
+  static final byte kDefaultTopButton = 2;
 
   /**
    * Represents an analog axis on a joystick.
@@ -77,7 +77,7 @@ public class Joystick extends GenericHID {
    *
    * @param port The port on the driver station that the joystick is plugged into.
    */
-  public Joystick(final int port) {
+  public Joystick(final byte port) {
     this(port, AxisType.kNumAxis.value, ButtonType.kNumButton.value);
 
     m_axes[AxisType.kX.value] = kDefaultXAxis;
@@ -102,11 +102,11 @@ public class Joystick extends GenericHID {
    * @param numAxisTypes   The number of axis types in the enum.
    * @param numButtonTypes The number of button types in the enum.
    */
-  protected Joystick(int port, int numAxisTypes, int numButtonTypes) {
+  protected Joystick(byte port, int numAxisTypes, int numButtonTypes) {
     m_ds = DriverStation.getInstance();
     m_axes = new byte[numAxisTypes];
     m_buttons = new byte[numButtonTypes];
-    m_port = (byte) port;
+    m_port = port;
   }
 
   /**
@@ -168,7 +168,7 @@ public class Joystick extends GenericHID {
    * @param axis The axis to read, starting at 0.
    * @return The value of the axis.
    */
-  public double getRawAxis(final int axis) {
+  public double getRawAxis(final byte axis) {
     return m_ds.getStickAxis(m_port, axis);
   }
 
@@ -251,8 +251,8 @@ public class Joystick extends GenericHID {
    * @param button The button number to be read (starting at 1).
    * @return The state of the button.
    */
-  public boolean getRawButton(final int button) {
-    return m_ds.getStickButton(m_port, (byte) button);
+  public boolean getRawButton(final byte button) {
+    return m_ds.getStickButton(m_port, button);
   }
 
   /**
@@ -347,8 +347,8 @@ public class Joystick extends GenericHID {
    * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
    */
-  public void setAxisChannel(AxisType axis, int channel) {
-    m_axes[axis.value] = (byte) channel;
+  public void setAxisChannel(AxisType axis, byte channel) {
+    m_axes[axis.value] = channel;
   }
 
   /**
@@ -405,7 +405,7 @@ public class Joystick extends GenericHID {
     } else {
       m_rightRumble = (short) (value * 65535);
     }
-    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte) m_port, m_outputs, m_leftRumble,
+    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs(m_port, m_outputs, m_leftRumble,
         m_rightRumble);
   }
 
@@ -418,7 +418,7 @@ public class Joystick extends GenericHID {
 
   public void setOutput(int outputNumber, boolean value) {
     m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
-    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte) m_port, m_outputs, m_leftRumble,
+    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs(m_port, m_outputs, m_leftRumble,
         m_rightRumble);
   }
 
@@ -429,7 +429,7 @@ public class Joystick extends GenericHID {
    */
   public void setOutputs(int value) {
     m_outputs = value;
-    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte) m_port, m_outputs, m_leftRumble,
+    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs(m_port, m_outputs, m_leftRumble,
         m_rightRumble);
   }
 }

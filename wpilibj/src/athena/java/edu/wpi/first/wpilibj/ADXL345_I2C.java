@@ -83,7 +83,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
    * @param range         The range (+ or -) that the accelerometer will measure.
    * @param deviceAddress I2C address of the accelerometer (0x1D or 0x53)
    */
-  public ADXL345_I2C(I2C.Port port, Range range, int deviceAddress) {
+  public ADXL345_I2C(I2C.Port port, Range range, byte deviceAddress) {
     m_i2c = new I2C(port, deviceAddress);
 
     // Turn on the measurements
@@ -118,7 +118,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     }
 
     // Specify the data format to read
-    m_i2c.write(kDataFormatRegister, kDataFormat_FullRes | value);
+    m_i2c.write(kDataFormatRegister, (byte) (kDataFormat_FullRes | value));
   }
 
   @Override
@@ -144,7 +144,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
    */
   public double getAcceleration(Axes axis) {
     ByteBuffer rawAccel = ByteBuffer.allocateDirect(2);
-    m_i2c.read(kDataRegister + axis.value, 2, rawAccel);
+    m_i2c.read((byte) (kDataRegister + axis.value), (byte) 2, rawAccel);
 
     // Sensor is little endian... swap bytes
     rawAccel.order(ByteOrder.LITTLE_ENDIAN);
@@ -159,7 +159,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
   public AllAxes getAccelerations() {
     AllAxes data = new AllAxes();
     ByteBuffer rawData = ByteBuffer.allocateDirect(6);
-    m_i2c.read(kDataRegister, 6, rawData);
+    m_i2c.read(kDataRegister, (byte) 6, rawData);
 
     // Sensor is little endian... swap bytes
     rawData.order(ByteOrder.LITTLE_ENDIAN);

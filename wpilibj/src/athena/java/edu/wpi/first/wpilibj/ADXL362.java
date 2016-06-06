@@ -90,7 +90,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     ByteBuffer transferBuffer = ByteBuffer.allocateDirect(3);
     transferBuffer.put(0, kRegRead);
     transferBuffer.put(1, kPartIdRegister);
-    m_spi.transaction(transferBuffer, transferBuffer, 3);
+    m_spi.transaction(transferBuffer, transferBuffer, (byte) 3);
     if (transferBuffer.get(2) != (byte) 0xF2) {
       m_spi.free();
       m_spi = null;
@@ -104,7 +104,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     transferBuffer.put(0, kRegWrite);
     transferBuffer.put(1, kPowerCtlRegister);
     transferBuffer.put(2, (byte) (kPowerCtl_Measure | kPowerCtl_UltraLowNoise));
-    m_spi.write(transferBuffer, 3);
+    m_spi.write(transferBuffer, (byte) 3);
 
     UsageReporting.report(tResourceType.kResourceType_ADXL362, port.value);
     LiveWindow.addSensor("ADXL362", port.value, this);
@@ -140,7 +140,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     // Specify the data format to read
     byte[] commands = new byte[]{kRegWrite, kFilterCtlRegister, (byte) (kFilterCtl_ODR_100Hz
         | value)};
-    m_spi.write(commands, commands.length);
+    m_spi.write(commands, (byte) commands.length);
   }
 
 
@@ -172,7 +172,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     ByteBuffer transferBuffer = ByteBuffer.allocateDirect(4);
     transferBuffer.put(0, kRegRead);
     transferBuffer.put(1, (byte) (kDataRegister + axis.value));
-    m_spi.transaction(transferBuffer, transferBuffer, 4);
+    m_spi.transaction(transferBuffer, transferBuffer, (byte) 4);
     // Sensor is little endian
     transferBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -191,7 +191,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
       // Select the data address.
       dataBuffer.put(0, kRegRead);
       dataBuffer.put(1, kDataRegister);
-      m_spi.transaction(dataBuffer, dataBuffer, 8);
+      m_spi.transaction(dataBuffer, dataBuffer, (byte) 8);
       // Sensor is little endian... swap bytes
       dataBuffer.order(ByteOrder.LITTLE_ENDIAN);
 

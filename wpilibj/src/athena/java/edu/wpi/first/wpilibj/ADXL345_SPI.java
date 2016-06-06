@@ -100,7 +100,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     byte[] commands = new byte[2];
     commands[0] = kPowerCtlRegister;
     commands[1] = kPowerCtl_Measure;
-    m_spi.write(commands, 2);
+    m_spi.write(commands, (byte) 2);
 
     setRange(range);
 
@@ -130,7 +130,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
 
     // Specify the data format to read
     byte[] commands = new byte[]{kDataFormatRegister, (byte) (kDataFormat_FullRes | value)};
-    m_spi.write(commands, commands.length);
+    m_spi.write(commands, (byte) commands.length);
   }
 
   @Override
@@ -158,7 +158,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     ByteBuffer transferBuffer = ByteBuffer.allocateDirect(3);
     transferBuffer.put(0,
         (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
-    m_spi.transaction(transferBuffer, transferBuffer, 3);
+    m_spi.transaction(transferBuffer, transferBuffer, (byte) 3);
     // Sensor is little endian
     transferBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -176,7 +176,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
       ByteBuffer dataBuffer = ByteBuffer.allocateDirect(7);
       // Select the data address.
       dataBuffer.put(0, (byte) (kAddress_Read | kAddress_MultiByte | kDataRegister));
-      m_spi.transaction(dataBuffer, dataBuffer, 7);
+      m_spi.transaction(dataBuffer, dataBuffer, (byte) 7);
       // Sensor is little endian... swap bytes
       dataBuffer.order(ByteOrder.LITTLE_ENDIAN);
 

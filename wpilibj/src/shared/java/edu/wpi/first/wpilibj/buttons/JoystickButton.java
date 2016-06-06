@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 public class JoystickButton extends Button {
 
   private final GenericHID m_joystick;
-  private final int m_buttonNumber;
+  private final byte m_buttonNumber;
 
   /**
    * Create a joystick button for triggering commands.
@@ -24,7 +24,7 @@ public class JoystickButton extends Button {
    *                     etc)
    * @param buttonNumber The button number (see {@link GenericHID#getRawButton(int) }
    */
-  public JoystickButton(GenericHID joystick, int buttonNumber) {
+  public JoystickButton(GenericHID joystick, byte buttonNumber) {
     m_joystick = joystick;
     m_buttonNumber = buttonNumber;
   }

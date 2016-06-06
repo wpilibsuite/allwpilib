@@ -30,12 +30,12 @@ public class SerialPort {
   private byte m_port;
 
   public enum Port {
-    kOnboard(0), kMXP(1), kUSB(2);
+    kOnboard((byte) 0), kMXP((byte) 1), kUSB((byte) 2);
 
     @SuppressWarnings("MemberName")
-    public int value;
+    public byte value;
 
-    private Port(int value) {
+    private Port(byte value) {
       this.value = value;
     }
   }
@@ -44,12 +44,16 @@ public class SerialPort {
    * Represents the parity to use for serial communications.
    */
   public enum Parity {
-    kNone(0), kOdd(1), kEven(2), kMark(3), kSpace(4);
+    kNone((byte) 0),
+    kOdd((byte) 1),
+    kEven((byte) 2),
+    kMark((byte) 3),
+    kSpace((byte) 4);
 
     @SuppressWarnings("MemberName")
-    public final int value;
+    public final byte value;
 
-    private Parity(int value) {
+    private Parity(byte value) {
       this.value = value;
     }
   }
@@ -58,12 +62,12 @@ public class SerialPort {
    * Represents the number of stop bits to use for Serial Communication.
    */
   public enum StopBits {
-    kOne(0), kOnePointFive(1), kTwo(2);
+    kOne((byte) 0), kOnePointFive((byte) 1), kTwo((byte) 2);
 
     @SuppressWarnings("MemberName")
-    public final int value;
+    public final byte value;
 
-    private StopBits(int value) {
+    private StopBits(byte value) {
       this.value = value;
     }
   }
@@ -72,12 +76,12 @@ public class SerialPort {
    * Represents what type of flow control to use for serial communication.
    */
   public enum FlowControl {
-    kNone(0), kXonXoff(1), kRtsCts(2), kDtsDsr(3);
+    kNone((byte) 0), kXonXoff((byte) 1), kRtsCts((byte) 2), kDtsDsr((byte) 3);
 
     @SuppressWarnings("MemberName")
-    public final int value;
+    public final byte value;
 
-    private FlowControl(int value) {
+    private FlowControl(byte value) {
       this.value = value;
     }
   }
@@ -86,12 +90,12 @@ public class SerialPort {
    * Represents which type of buffer mode to use when writing to a serial m_port.
    */
   public enum WriteBufferMode {
-    kFlushOnAccess(0), kFlushWhenFull(1);
+    kFlushOnAccess((byte) 0), kFlushWhenFull((byte) 1);
 
     @SuppressWarnings("MemberName")
-    public final int value;
+    public final byte value;
 
-    private WriteBufferMode(int value) {
+    private WriteBufferMode(byte value) {
       this.value = value;
     }
   }
@@ -105,15 +109,15 @@ public class SerialPort {
    * @param parity   Select the type of parity checking to use.
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.
    */
-  public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity,
+  public SerialPort(final byte baudRate, Port port, final byte dataBits, Parity parity,
                     StopBits stopBits) {
-    m_port = (byte) port.value;
+    m_port = port.value;
 
     SerialPortJNI.serialInitializePort(m_port);
     SerialPortJNI.serialSetBaudRate(m_port, baudRate);
-    SerialPortJNI.serialSetDataBits(m_port, (byte) dataBits);
-    SerialPortJNI.serialSetParity(m_port, (byte) parity.value);
-    SerialPortJNI.serialSetStopBits(m_port, (byte) stopBits.value);
+    SerialPortJNI.serialSetDataBits(m_port, dataBits);
+    SerialPortJNI.serialSetParity(m_port, parity.value);
+    SerialPortJNI.serialSetStopBits(m_port, stopBits.value);
 
     // Set the default read buffer size to 1 to return bytes immediately
     setReadBufferSize(1);
@@ -136,7 +140,7 @@ public class SerialPort {
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    * @param parity   Select the type of parity checking to use.
    */
-  public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity) {
+  public SerialPort(final byte baudRate, Port port, final byte dataBits, Parity parity) {
     this(baudRate, port, dataBits, parity, StopBits.kOne);
   }
 
@@ -146,7 +150,7 @@ public class SerialPort {
    * @param baudRate The baud rate to configure the serial port.
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    */
-  public SerialPort(final int baudRate, Port port, final int dataBits) {
+  public SerialPort(final byte baudRate, Port port, final byte dataBits) {
     this(baudRate, port, dataBits, Parity.kNone, StopBits.kOne);
   }
 
@@ -156,8 +160,8 @@ public class SerialPort {
    *
    * @param baudRate The baud rate to configure the serial port.
    */
-  public SerialPort(final int baudRate, Port port) {
-    this(baudRate, port, 8, Parity.kNone, StopBits.kOne);
+  public SerialPort(final byte baudRate, Port port) {
+    this(baudRate, port, (byte) 8, Parity.kNone, StopBits.kOne);
   }
 
   /**
@@ -175,7 +179,7 @@ public class SerialPort {
    * @param flowControl the FlowControl m_value to use
    */
   public void setFlowControl(FlowControl flowControl) {
-    SerialPortJNI.serialSetFlowControl(m_port, (byte) flowControl.value);
+    SerialPortJNI.serialSetFlowControl(m_port, flowControl.value);
   }
 
   /**
@@ -332,7 +336,7 @@ public class SerialPort {
    * @param mode The write buffer mode.
    */
   public void setWriteBufferMode(WriteBufferMode mode) {
-    SerialPortJNI.serialSetWriteMode(m_port, (byte) mode.value);
+    SerialPortJNI.serialSetWriteMode(m_port, mode.value);
   }
 
   /**
