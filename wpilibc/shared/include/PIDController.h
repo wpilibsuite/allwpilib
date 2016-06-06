@@ -125,7 +125,7 @@ class PIDController : public LiveWindowSendable,
   std::shared_ptr<PIDSource> m_origSource;
   LinearDigitalFilter m_filter{nullptr, {}, {}};
 
-  mutable priority_recursive_mutex m_mutex;
+  mutable priority_mutex m_mutex;
 
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;
