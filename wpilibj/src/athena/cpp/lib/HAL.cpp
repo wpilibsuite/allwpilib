@@ -138,7 +138,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_nativeGetAllianceStation(JNIEnv*, jclass) {
 /*
  * Class: edu_wpi_first_wpilibj_hal_HAL
  * Method:    HAL_GetJoystickAxes
- * Signature: (B[S)S
+ * Signature: (B[F)S
  */
 JNIEXPORT jshort JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickAxes(JNIEnv* env, jclass,
@@ -186,7 +186,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickPOVs(JNIEnv* env, jclass,
 /*
  * Class: edu_wpi_first_wpilibj_hal_HAL
  * Method:    HAL_GetJoystickButtons
- * Signature: (B)B
+ * Signature: (BL)B
  */
 JNIEXPORT jbyte JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickButtons(JNIEnv* env, jclass,

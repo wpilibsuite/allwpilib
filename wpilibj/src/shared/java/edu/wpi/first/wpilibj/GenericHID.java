@@ -11,7 +11,6 @@ package edu.wpi.first.wpilibj;
  * GenericHID Interface.
  */
 public abstract class GenericHID {
-
   /**
    * Which hand the Human Interface Device is associated with.
    */
