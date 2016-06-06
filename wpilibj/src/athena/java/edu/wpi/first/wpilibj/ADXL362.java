@@ -45,20 +45,16 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     kY((byte) 0x02),
     kZ((byte) 0x04);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final byte value;
 
-    Axes(byte value) {
+    private Axes(byte value) {
       this.value = value;
     }
   }
 
   @SuppressWarnings("MemberName")
   public static class AllAxes {
-
     public double XAxis;
     public double YAxis;
     public double ZAxis;
@@ -98,7 +94,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     if (transferBuffer.get(2) != (byte) 0xF2) {
       m_spi.free();
       m_spi = null;
-      DriverStation.reportError("could not find ADXL362 on SPI port " + port.getValue(), false);
+      DriverStation.reportError("could not find ADXL362 on SPI port " + port.value, false);
       return;
     }
 
@@ -110,8 +106,8 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     transferBuffer.put(2, (byte) (kPowerCtl_Measure | kPowerCtl_UltraLowNoise));
     m_spi.write(transferBuffer, 3);
 
-    HAL.report(tResourceType.kResourceType_ADXL362, port.getValue());
-    LiveWindow.addSensor("ADXL362", port.getValue(), this);
+    HAL.report(tResourceType.kResourceType_ADXL362, port.value);
+    LiveWindow.addSensor("ADXL362", port.value, this);
   }
 
   public void free() {

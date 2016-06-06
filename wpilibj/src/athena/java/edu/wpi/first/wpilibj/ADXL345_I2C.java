@@ -51,7 +51,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     @SuppressWarnings("MemberName")
     public final byte value;
 
-    Axes(byte value) {
+    private Axes(byte value) {
       this.value = value;
     }
   }
@@ -92,7 +92,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     setRange(range);
 
     HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
-    LiveWindow.addSensor("ADXL345_I2C", port.getValue(), this);
+    LiveWindow.addSensor("ADXL345_I2C", port.value, this);
   }
 
 

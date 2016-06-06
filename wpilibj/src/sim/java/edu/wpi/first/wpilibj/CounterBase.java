@@ -34,9 +34,6 @@ public interface CounterBase {
      */
     k4X(2);
 
-    /**
-     * The integer value representing this enumeration
-     */
     public final int value;
 
     private EncodingType(int value) {

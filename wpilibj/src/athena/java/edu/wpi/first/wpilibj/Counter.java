@@ -50,13 +50,10 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
      */
     kExternalDirection(3);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
 
-    Mode(int value) {
+    private Mode(int value) {
       this.value = value;
     }
   }

@@ -32,32 +32,19 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */
-  public static class PeriodMultiplier {
-
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
-    public final int value;
-    static final int k1X_val = 1;
-    static final int k2X_val = 2;
-    static final int k4X_val = 4;
+  public enum PeriodMultiplier {
     /**
      * Period Multiplier: don't skip pulses.
      */
-    public static final PeriodMultiplier k1X = new PeriodMultiplier(k1X_val);
+    k1X,
     /**
      * Period Multiplier: skip every other pulse.
      */
-    public static final PeriodMultiplier k2X = new PeriodMultiplier(k2X_val);
+    k2X,
     /**
      * Period Multiplier: skip three out of four pulses.
      */
-    public static final PeriodMultiplier k4X = new PeriodMultiplier(k4X_val);
-
-    private PeriodMultiplier(int value) {
-      this.value = value;
-    }
+    k4X
   }
 
   private int m_channel;
@@ -252,16 +239,16 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @param mult The period multiplier to apply to this channel
    */
   public void setPeriodMultiplier(PeriodMultiplier mult) {
-    switch (mult.value) {
-      case PeriodMultiplier.k4X_val:
+    switch (mult) {
+      case k4X:
         // Squelch 3 out of 4 outputs
         PWMJNI.setPWMPeriodScale(m_handle, 3);
         break;
-      case PeriodMultiplier.k2X_val:
+      case k2X:
         // Squelch 1 out of 2 outputs
         PWMJNI.setPWMPeriodScale(m_handle, 1);
         break;
-      case PeriodMultiplier.k1X_val:
+      case k1X:
         // Don't squelch any outputs
         PWMJNI.setPWMPeriodScale(m_handle, 0);
         break;
