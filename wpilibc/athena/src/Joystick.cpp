@@ -284,10 +284,14 @@ std::string Joystick::GetName() const { return m_ds.GetJoystickName(m_port); }
  */
 int Joystick::GetPort() const { return m_port; }
 
-// int Joystick::GetAxisType(uint8_t axis) const
-//{
-//  return m_ds.GetJoystickAxisType(m_port, axis);
-//}
+/**
+ * Get the axis type of a joystick axis.
+ *
+ * @return the axis type of a joystick axis.
+ */
+int Joystick::GetAxisType(int axis) const {
+  return m_ds.GetJoystickAxisType(m_port, axis);
+}
 
 /**
  * Get the number of axis for a joystick.
