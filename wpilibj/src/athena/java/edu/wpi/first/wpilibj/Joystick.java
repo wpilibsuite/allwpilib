@@ -132,7 +132,7 @@ public class Joystick extends GenericHID {
   }
 
   private final DriverStation m_ds;
-  private final int m_port;
+  private final byte m_port;
   private final byte[] m_axes;
   private final byte[] m_buttons;
   private int m_outputs;
@@ -174,7 +174,7 @@ public class Joystick extends GenericHID {
     m_ds = DriverStation.getInstance();
     m_axes = new byte[numAxisTypes];
     m_buttons = new byte[numButtonTypes];
-    m_port = port;
+    m_port = (byte) port;
   }
 
   /**
@@ -444,6 +444,15 @@ public class Joystick extends GenericHID {
    */
   public String getName() {
     return m_ds.getJoystickName(m_port);
+  }
+
+  /**
+   * Get the axis type of a joystick axis.
+   *
+   * @return the axis type of a joystick axis.
+   */
+  public int getAxisType(byte axis) {
+    return m_ds.getJoystickAxisType(m_port, axis);
   }
 
   /**
