@@ -53,7 +53,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     @SuppressWarnings("MemberName")
     public final byte value;
 
-    Axes(byte value) {
+    private Axes(byte value) {
       this.value = value;
     }
   }
@@ -77,7 +77,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   public ADXL345_SPI(SPI.Port port, Range range) {
     m_spi = new SPI(port);
     init(range);
-    LiveWindow.addSensor("ADXL345_SPI", port.getValue(), this);
+    LiveWindow.addSensor("ADXL345_SPI", port.value, this);
   }
 
   public void free() {

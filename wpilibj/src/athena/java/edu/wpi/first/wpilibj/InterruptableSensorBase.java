@@ -23,18 +23,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    @SuppressWarnings("JavadocMethod")
-    public static WaitResult valueOf(int value) {
-      for (WaitResult mode : values()) {
-        if (mode.value == value) {
-          return mode;
-        }
-      }
-      return null;
-    }
-
-
-    WaitResult(int value) {
+    private WaitResult(int value) {
       this.value = value;
     }
   }
@@ -176,7 +165,12 @@ public abstract class InterruptableSensorBase extends SensorBase {
     }
     int result = InterruptJNI.waitForInterrupt(m_interrupt, timeout, ignorePrevious);
 
-    return WaitResult.valueOf(result);
+    for (WaitResult mode : WaitResult.values()) {
+      if (mode.value == result) {
+        return mode;
+      }
+    }
+    return null;
   }
 
   /**

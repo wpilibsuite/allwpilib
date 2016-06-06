@@ -32,52 +32,22 @@ public class SerialPort {
   public enum Port {
     kOnboard(0), kMXP(1), kUSB(2);
 
-    private int m_value;
+    @SuppressWarnings("MemberName")
+    public int value;
 
-    Port(int value) {
-      m_value = value;
-    }
-
-    public int getValue() {
-      return m_value;
+    private Port(int value) {
+      this.value = value;
     }
   }
 
   /**
    * Represents the parity to use for serial communications.
    */
-  public static class Parity {
+  public enum Parity {
+    kNone(0), kOdd(1), kEven(2), kMark(3), kSpace(4);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
-    static final int kNone_val = 0;
-    static final int kOdd_val = 1;
-    static final int kEven_val = 2;
-    static final int kMark_val = 3;
-    static final int kSpace_val = 4;
-    /**
-     * parity: Use no parity.
-     */
-    public static final Parity kNone = new Parity(kNone_val);
-    /**
-     * parity: Use odd parity.
-     */
-    public static final Parity kOdd = new Parity(kOdd_val);
-    /**
-     * parity: Use even parity.
-     */
-    public static final Parity kEven = new Parity(kEven_val);
-    /**
-     * parity: Use mark parity.
-     */
-    public static final Parity kMark = new Parity(kMark_val);
-    /**
-     * parity: Use space parity.
-     */
-    public static final Parity kSpace = new Parity((kSpace_val));
 
     private Parity(int value) {
       this.value = value;
@@ -87,28 +57,11 @@ public class SerialPort {
   /**
    * Represents the number of stop bits to use for Serial Communication.
    */
-  public static class StopBits {
+  public enum StopBits {
+    kOne(0), kOnePointFive(1), kTwo(2);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
-    static final int kOne_val = 10;
-    static final int kOnePointFive_val = 15;
-    static final int kTwo_val = 20;
-    /**
-     * stopBits: use 1.
-     */
-    public static final StopBits kOne = new StopBits(kOne_val);
-    /**
-     * stopBits: use 1.5.
-     */
-    public static final StopBits kOnePointFive = new StopBits(kOnePointFive_val);
-    /**
-     * stopBits: use 2.
-     */
-    public static final StopBits kTwo = new StopBits(kTwo_val);
 
     private StopBits(int value) {
       this.value = value;
@@ -118,33 +71,11 @@ public class SerialPort {
   /**
    * Represents what type of flow control to use for serial communication.
    */
-  public static class FlowControl {
+  public enum FlowControl {
+    kNone(0), kXonXoff(1), kRtsCts(2), kDtsDsr(3);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
-    static final int kNone_val = 0;
-    static final int kXonXoff_val = 1;
-    static final int kRtsCts_val = 2;
-    static final int kDtrDsr_val = 4;
-    /**
-     * flowControl: use none.
-     */
-    public static final FlowControl kNone = new FlowControl(kNone_val);
-    /**
-     * flowcontrol: use on/off.
-     */
-    public static final FlowControl kXonXoff = new FlowControl(kXonXoff_val);
-    /**
-     * flowcontrol: use rts cts.
-     */
-    public static final FlowControl kRtsCts = new FlowControl(kRtsCts_val);
-    /**
-     * flowcontrol: use dts dsr.
-     */
-    public static final FlowControl kDtrDsr = new FlowControl(kDtrDsr_val);
 
     private FlowControl(int value) {
       this.value = value;
@@ -154,23 +85,11 @@ public class SerialPort {
   /**
    * Represents which type of buffer mode to use when writing to a serial m_port.
    */
-  public static class WriteBufferMode {
+  public enum WriteBufferMode {
+    kFlushOnAccess(0), kFlushWhenFull(1);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
-    static final int kFlushOnAccess_val = 1;
-    static final int kFlushWhenFull_val = 2;
-    /**
-     * Flush on access.
-     */
-    public static final WriteBufferMode kFlushOnAccess = new WriteBufferMode(kFlushOnAccess_val);
-    /**
-     * Flush when full.
-     */
-    public static final WriteBufferMode kFlushWhenFull = new WriteBufferMode(kFlushWhenFull_val);
 
     private WriteBufferMode(int value) {
       this.value = value;
@@ -188,7 +107,7 @@ public class SerialPort {
    */
   public SerialPort(final int baudRate, Port port, final int dataBits, Parity parity,
                     StopBits stopBits) {
-    m_port = (byte) port.getValue();
+    m_port = (byte) port.value;
 
     SerialPortJNI.serialInitializePort(m_port);
     SerialPortJNI.serialSetBaudRate(m_port, baudRate);

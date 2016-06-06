@@ -78,7 +78,7 @@ public class AnalogTriggerOutput extends DigitalSource {
     m_outputType = outputType;
 
     UsageReporting.report(tResourceType.kResourceType_AnalogTriggerOutput, trigger.getIndex(),
-        outputType.m_value);
+        outputType.value);
   }
 
   @Override
@@ -92,12 +92,12 @@ public class AnalogTriggerOutput extends DigitalSource {
    * @return The state of the analog trigger output.
    */
   public boolean get() {
-    return AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port, m_outputType.m_value);
+    return AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port, m_outputType.value);
   }
 
   @Override
   public int getChannelForRouting() {
-    return (m_trigger.m_index << 2) + m_outputType.m_value;
+    return (m_trigger.m_index << 2) + m_outputType.value;
   }
 
   @Override
@@ -118,10 +118,11 @@ public class AnalogTriggerOutput extends DigitalSource {
     kRisingPulse(AnalogJNI.AnalogTriggerType.kRisingPulse),
     kFallingPulse(AnalogJNI.AnalogTriggerType.kFallingPulse);
 
-    private final int m_value;
+    @SuppressWarnings("MemberName")
+    private final int value;
 
-    AnalogTriggerType(int value) {
-      m_value = value;
+    private AnalogTriggerType(int value) {
+      this.value = value;
     }
   }
 }

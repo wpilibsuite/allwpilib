@@ -28,33 +28,11 @@ public class RobotDrive implements MotorSafety {
   /**
    * The location of a motor on the robot for the purpose of driving.
    */
-  public static class MotorType {
+  public enum MotorType {
+    kFrontLeft(0), kFrontRight(1), kRearLeft(2), kRearRight(3);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
-    static final int kFrontLeft_val = 0;
-    static final int kFrontRight_val = 1;
-    static final int kRearLeft_val = 2;
-    static final int kRearRight_val = 3;
-    /**
-     * motortype: front left.
-     */
-    public static final MotorType kFrontLeft = new MotorType(kFrontLeft_val);
-    /**
-     * motortype: front right.
-     */
-    public static final MotorType kFrontRight = new MotorType(kFrontRight_val);
-    /**
-     * motortype: rear left.
-     */
-    public static final MotorType kRearLeft = new MotorType(kRearLeft_val);
-    /**
-     * motortype: rear right.
-     */
-    public static final MotorType kRearRight = new MotorType(kRearRight_val);
 
     private MotorType(int value) {
       this.value = value;
@@ -496,16 +474,16 @@ public class RobotDrive implements MotorSafety {
     yIn = rotated[1];
 
     double[] wheelSpeeds = new double[kMaxNumberOfMotors];
-    wheelSpeeds[MotorType.kFrontLeft_val] = xIn + yIn + rotation;
-    wheelSpeeds[MotorType.kFrontRight_val] = -xIn + yIn - rotation;
-    wheelSpeeds[MotorType.kRearLeft_val] = -xIn + yIn + rotation;
-    wheelSpeeds[MotorType.kRearRight_val] = xIn + yIn - rotation;
+    wheelSpeeds[MotorType.kFrontLeft.value] = xIn + yIn + rotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = -xIn + yIn - rotation;
+    wheelSpeeds[MotorType.kRearLeft.value] = -xIn + yIn + rotation;
+    wheelSpeeds[MotorType.kRearRight.value] = xIn + yIn - rotation;
 
     normalize(wheelSpeeds);
-    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_maxOutput);
-    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_maxOutput);
-    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput);
-    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput);
+    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft.value] * m_maxOutput);
+    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput);
+    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
+    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput);
 
     if (m_safetyHelper != null) {
       m_safetyHelper.feed();
@@ -539,17 +517,17 @@ public class RobotDrive implements MotorSafety {
     double sinD = Math.sin(dirInRad);
 
     double[] wheelSpeeds = new double[kMaxNumberOfMotors];
-    wheelSpeeds[MotorType.kFrontLeft_val] = (sinD * magnitude + rotation);
-    wheelSpeeds[MotorType.kFrontRight_val] = (cosD * magnitude - rotation);
-    wheelSpeeds[MotorType.kRearLeft_val] = (cosD * magnitude + rotation);
-    wheelSpeeds[MotorType.kRearRight_val] = (sinD * magnitude - rotation);
+    wheelSpeeds[MotorType.kFrontLeft.value] = (sinD * magnitude + rotation);
+    wheelSpeeds[MotorType.kFrontRight.value] = (cosD * magnitude - rotation);
+    wheelSpeeds[MotorType.kRearLeft.value] = (cosD * magnitude + rotation);
+    wheelSpeeds[MotorType.kRearRight.value] = (sinD * magnitude - rotation);
 
     normalize(wheelSpeeds);
 
-    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft_val] * m_maxOutput);
-    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight_val] * m_maxOutput);
-    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft_val] * m_maxOutput);
-    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight_val] * m_maxOutput);
+    m_frontLeftMotor.set(wheelSpeeds[MotorType.kFrontLeft.value] * m_maxOutput);
+    m_frontRightMotor.set(wheelSpeeds[MotorType.kFrontRight.value] * m_maxOutput);
+    m_rearLeftMotor.set(wheelSpeeds[MotorType.kRearLeft.value] * m_maxOutput);
+    m_rearRightMotor.set(wheelSpeeds[MotorType.kRearRight.value] * m_maxOutput);
 
     if (m_safetyHelper != null) {
       m_safetyHelper.feed();
@@ -652,17 +630,17 @@ public class RobotDrive implements MotorSafety {
    * @param isInverted True if the motor should be inverted when operated.
    */
   public void setInvertedMotor(MotorType motor, boolean isInverted) {
-    switch (motor.value) {
-      case MotorType.kFrontLeft_val:
+    switch (motor) {
+      case kFrontLeft:
         m_frontLeftMotor.setInverted(isInverted);
         break;
-      case MotorType.kFrontRight_val:
+      case kFrontRight:
         m_frontRightMotor.setInverted(isInverted);
         break;
-      case MotorType.kRearLeft_val:
+      case kRearLeft:
         m_rearLeftMotor.setInverted(isInverted);
         break;
-      case MotorType.kRearRight_val:
+      case kRearRight:
         m_rearRightMotor.setInverted(isInverted);
         break;
       default:

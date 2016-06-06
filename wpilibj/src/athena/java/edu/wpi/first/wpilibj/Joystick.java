@@ -30,43 +30,11 @@ public class Joystick extends GenericHID {
   /**
    * Represents an analog axis on a joystick.
    */
-  public static final class AxisType {
+  public enum AxisType {
+    kX(0), kY(1), kZ(2), kTwist(3), kThrottle(4), kNumAxis(5);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
-    static final int kX_val = 0;
-    static final int kY_val = 1;
-    static final int kZ_val = 2;
-    static final int kTwist_val = 3;
-    static final int kThrottle_val = 4;
-    static final int kNumAxis_val = 5;
-    /**
-     * axis: x-axis.
-     */
-    public static final AxisType kX = new AxisType(kX_val);
-    /**
-     * axis: y-axis.
-     */
-    public static final AxisType kY = new AxisType(kY_val);
-    /**
-     * axis: z-axis.
-     */
-    public static final AxisType kZ = new AxisType(kZ_val);
-    /**
-     * axis: twist.
-     */
-    public static final AxisType kTwist = new AxisType(kTwist_val);
-    /**
-     * axis: throttle.
-     */
-    public static final AxisType kThrottle = new AxisType(kThrottle_val);
-    /**
-     * axis: number of axis.
-     */
-    public static final AxisType kNumAxis = new AxisType(kNumAxis_val);
 
     private AxisType(int value) {
       this.value = value;
@@ -76,28 +44,11 @@ public class Joystick extends GenericHID {
   /**
    * Represents a digital button on the JoyStick.
    */
-  public static final class ButtonType {
+  public enum ButtonType {
+    kTrigger(0), kTop(1), kNumButton(2);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
-    static final int kTrigger_val = 0;
-    static final int kTop_val = 1;
-    static final int kNumButton_val = 2;
-    /**
-     * button: trigger.
-     */
-    public static final ButtonType kTrigger = new ButtonType((kTrigger_val));
-    /**
-     * button: top button.
-     */
-    public static final ButtonType kTop = new ButtonType(kTop_val);
-    /**
-     * button: num button types.
-     */
-    public static final ButtonType kNumButton = new ButtonType((kNumButton_val));
 
     private ButtonType(int value) {
       this.value = value;
@@ -108,27 +59,8 @@ public class Joystick extends GenericHID {
   /**
    * Represents a rumble output on the JoyStick.
    */
-  public static final class RumbleType {
-
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
-    public final int value;
-    static final int kLeftRumble_val = 0;
-    static final int kRightRumble_val = 1;
-    /**
-     * Left Rumble.
-     */
-    public static final RumbleType kLeftRumble = new RumbleType((kLeftRumble_val));
-    /**
-     * Right Rumble.
-     */
-    public static final RumbleType kRightRumble = new RumbleType(kRightRumble_val);
-
-    private RumbleType(int value) {
-      this.value = value;
-    }
+  public enum RumbleType {
+    kLeftRumble, kRightRumble
   }
 
   private final DriverStation m_ds;
@@ -250,16 +182,16 @@ public class Joystick extends GenericHID {
    * @return The value of the axis.
    */
   public double getAxis(final AxisType axis) {
-    switch (axis.value) {
-      case AxisType.kX_val:
+    switch (axis) {
+      case kX:
         return getX();
-      case AxisType.kY_val:
+      case kY:
         return getY();
-      case AxisType.kZ_val:
+      case kZ:
         return getZ();
-      case AxisType.kTwist_val:
+      case kTwist:
         return getTwist();
-      case AxisType.kThrottle_val:
+      case kThrottle:
         return getThrottle();
       default:
         return 0.0;
@@ -359,10 +291,10 @@ public class Joystick extends GenericHID {
    * @return The state of the button.
    */
   public boolean getButton(ButtonType button) {
-    switch (button.value) {
-      case ButtonType.kTrigger_val:
+    switch (button) {
+      case kTrigger:
         return getTrigger();
-      case ButtonType.kTop_val:
+      case kTop:
         return getTop();
       default:
         return false;
@@ -468,7 +400,7 @@ public class Joystick extends GenericHID {
     } else if (value > 1) {
       value = 1;
     }
-    if (type.value == RumbleType.kLeftRumble_val) {
+    if (type == RumbleType.kLeftRumble) {
       m_leftRumble = (short) (value * 65535);
     } else {
       m_rightRumble = (short) (value * 65535);
