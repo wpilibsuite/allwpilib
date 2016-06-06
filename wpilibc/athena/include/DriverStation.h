@@ -90,12 +90,10 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void InTest(bool entering) { m_userInTest = entering; }
 
  protected:
-  DriverStation();
-
   void GetData();
 
  private:
-  static DriverStation* m_instance;
+  DriverStation();
   void ReportJoystickUnpluggedError(std::string message);
   void ReportJoystickUnpluggedWarning(std::string message);
   void Run();
