@@ -46,9 +46,9 @@ class InterruptableSensorBase : public SensorBase {
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  void* m_interrupt = nullptr;
+  HalInterruptHandle m_interrupt = HAL_INVALID_HANDLE;
   uint32_t m_interruptIndex = std::numeric_limits<uint32_t>::max();
   void AllocateInterrupts(bool watcher);
 
-  static std::unique_ptr<Resource> m_interrupts;
+  // static std::unique_ptr<Resource> m_interrupts;
 };

@@ -25,7 +25,13 @@ namespace hal {
 
 constexpr int16_t InvalidHandleIndex = -1;
 
-enum class HalHandleEnum { Undefined = 0, DIO = 1, Port = 2, Notifier = 3 };
+enum class HalHandleEnum {
+  Undefined = 0,
+  DIO = 1,
+  Port = 2,
+  Notifier = 3,
+  Interrupt = 4
+};
 
 static inline int16_t getHandleIndex(HalHandle handle) {
   // mask and return last 16 bits
