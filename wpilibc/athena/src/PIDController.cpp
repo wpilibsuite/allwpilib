@@ -455,18 +455,6 @@ void PIDController::SetTolerance(float percent) {
 }
 
 /*
- * Set the percentage error which is considered tolerable for use with
- * OnTarget.
- *
- * @param percentage error which is tolerable
- */
-void PIDController::SetPercentTolerance(float percent) {
-  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
-  m_toleranceType = kPercentTolerance;
-  m_tolerance = percent;
-}
-
-/*
  * Set the absolute error which is considered tolerable for use with
  * OnTarget.
  *
@@ -476,6 +464,18 @@ void PIDController::SetAbsoluteTolerance(float absTolerance) {
   std::lock_guard<priority_recursive_mutex> sync(m_mutex);
   m_toleranceType = kAbsoluteTolerance;
   m_tolerance = absTolerance;
+}
+
+/*
+ * Set the percentage error which is considered tolerable for use with
+ * OnTarget.
+ *
+ * @param percentage error which is tolerable
+ */
+void PIDController::SetPercentTolerance(float percent) {
+  std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+  m_toleranceType = kPercentTolerance;
+  m_tolerance = percent;
 }
 
 /*
