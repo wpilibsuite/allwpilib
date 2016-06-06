@@ -7,9 +7,12 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 import edu.wpi.first.wpilibj.hal.InterruptJNI;
 import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
+
 
 /**
  * Base for sensors to be used with interrupts.
@@ -42,7 +45,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
   /**
    * The interrupt resource.
    */
-  protected long m_interrupt = 0;
+  protected int m_interrupt = InterruptJNI.HalInvalidHandle;
 
   /**
    * Flags if the interrupt being allocated is synchronous.
@@ -53,10 +56,6 @@ public abstract class InterruptableSensorBase extends SensorBase {
    * The index of the interrupt.
    */
   protected int m_interruptIndex;
-  /**
-   * Resource manager.
-   */
-  protected static Resource m_interrupts = new Resource(8);
 
   /**
    * Create a new InterrupatableSensorBase.
@@ -138,15 +137,15 @@ public abstract class InterruptableSensorBase extends SensorBase {
    *                have to explicitly wait for the interrupt to occur.
    */
   protected void allocateInterrupts(boolean watcher) {
-    try {
-      m_interruptIndex = m_interrupts.allocate();
-    } catch (CheckedAllocationException ex) {
-      throw new AllocationException("No interrupts are left to be allocated");
-    }
     m_isSynchronousInterrupt = watcher;
 
+    ByteBuffer index = ByteBuffer.allocateDirect(4);
+    // set the byte order
+    index.order(ByteOrder.LITTLE_ENDIAN);
+    
     m_interrupt =
-        InterruptJNI.initializeInterrupts(m_interruptIndex, watcher);
+        InterruptJNI.initializeInterrupts(watcher, index.asIntBuffer());
+    m_interruptIndex = index.asIntBuffer().get(0);
   }
 
   /**
@@ -159,7 +158,6 @@ public abstract class InterruptableSensorBase extends SensorBase {
     }
     InterruptJNI.cleanInterrupts(m_interrupt);
     m_interrupt = 0;
-    m_interrupts.free(m_interruptIndex);
   }
 
   /**

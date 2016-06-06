@@ -11,8 +11,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-std::unique_ptr<Resource> InterruptableSensorBase::m_interrupts =
-    std::make_unique<Resource>(interrupt_kNumSystems);
+// std::unique_ptr<Resource> InterruptableSensorBase::m_interrupts =
+//  std::make_unique<Resource>(interrupt_kNumSystems);
 
 InterruptableSensorBase::InterruptableSensorBase() {}
 
@@ -27,15 +27,10 @@ InterruptableSensorBase::InterruptableSensorBase() {}
 void InterruptableSensorBase::RequestInterrupts(
     InterruptHandlerFunction handler, void* param) {
   if (StatusIsFatal()) return;
-  uint32_t index = m_interrupts->Allocate("Async Interrupt");
-  if (index == std::numeric_limits<uint32_t>::max()) {
-    CloneError(*m_interrupts);
-    return;
-  }
-  m_interruptIndex = index;
 
-  // Creates a manager too
+  wpi_assert(m_interrupt == HAL_INVALID_HANDLE);
   AllocateInterrupts(false);
+  if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
 
   int32_t status = 0;
   requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
@@ -54,14 +49,10 @@ void InterruptableSensorBase::RequestInterrupts(
  */
 void InterruptableSensorBase::RequestInterrupts() {
   if (StatusIsFatal()) return;
-  uint32_t index = m_interrupts->Allocate("Sync Interrupt");
-  if (index == std::numeric_limits<uint32_t>::max()) {
-    CloneError(*m_interrupts);
-    return;
-  }
-  m_interruptIndex = index;
 
+  wpi_assert(m_interrupt == HAL_INVALID_HANDLE);
   AllocateInterrupts(true);
+  if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
 
   int32_t status = 0;
   requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
@@ -71,10 +62,10 @@ void InterruptableSensorBase::RequestInterrupts() {
 }
 
 void InterruptableSensorBase::AllocateInterrupts(bool watcher) {
-  wpi_assert(m_interrupt == nullptr);
+  wpi_assert(m_interrupt == HAL_INVALID_HANDLE);
   // Expects the calling leaf class to allocate an interrupt index.
   int32_t status = 0;
-  m_interrupt = initializeInterrupts(m_interruptIndex, watcher, &status);
+  m_interrupt = initializeInterrupts(watcher, &m_interruptIndex, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -85,12 +76,11 @@ void InterruptableSensorBase::AllocateInterrupts(bool watcher) {
  */
 void InterruptableSensorBase::CancelInterrupts() {
   if (StatusIsFatal()) return;
-  wpi_assert(m_interrupt != nullptr);
+  wpi_assert(m_interrupt != HAL_INVALID_HANDLE);
   int32_t status = 0;
   cleanInterrupts(m_interrupt, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  m_interrupt = nullptr;
-  m_interrupts->Free(m_interruptIndex);
+  m_interrupt = HAL_INVALID_HANDLE;
 }
 
 /**
@@ -108,7 +98,7 @@ void InterruptableSensorBase::CancelInterrupts() {
 InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
     float timeout, bool ignorePrevious) {
   if (StatusIsFatal()) return InterruptableSensorBase::kTimeout;
-  wpi_assert(m_interrupt != nullptr);
+  wpi_assert(m_interrupt != HAL_INVALID_HANDLE);
   int32_t status = 0;
   uint32_t result;
 
@@ -127,7 +117,7 @@ InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
  */
 void InterruptableSensorBase::EnableInterrupts() {
   if (StatusIsFatal()) return;
-  wpi_assert(m_interrupt != nullptr);
+  wpi_assert(m_interrupt != HAL_INVALID_HANDLE);
   int32_t status = 0;
   enableInterrupts(m_interrupt, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -138,7 +128,7 @@ void InterruptableSensorBase::EnableInterrupts() {
  */
 void InterruptableSensorBase::DisableInterrupts() {
   if (StatusIsFatal()) return;
-  wpi_assert(m_interrupt != nullptr);
+  wpi_assert(m_interrupt != HAL_INVALID_HANDLE);
   int32_t status = 0;
   disableInterrupts(m_interrupt, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -155,7 +145,7 @@ void InterruptableSensorBase::DisableInterrupts() {
  */
 double InterruptableSensorBase::ReadRisingTimestamp() {
   if (StatusIsFatal()) return 0.0;
-  wpi_assert(m_interrupt != nullptr);
+  wpi_assert(m_interrupt != HAL_INVALID_HANDLE);
   int32_t status = 0;
   double timestamp = readRisingTimestamp(m_interrupt, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -173,7 +163,7 @@ double InterruptableSensorBase::ReadRisingTimestamp() {
 */
 double InterruptableSensorBase::ReadFallingTimestamp() {
   if (StatusIsFatal()) return 0.0;
-  wpi_assert(m_interrupt != nullptr);
+  wpi_assert(m_interrupt != HAL_INVALID_HANDLE);
   int32_t status = 0;
   double timestamp = readFallingTimestamp(m_interrupt, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -189,13 +179,13 @@ double InterruptableSensorBase::ReadFallingTimestamp() {
 void InterruptableSensorBase::SetUpSourceEdge(bool risingEdge,
                                               bool fallingEdge) {
   if (StatusIsFatal()) return;
-  if (m_interrupt == nullptr) {
+  if (m_interrupt == HAL_INVALID_HANDLE) {
     wpi_setWPIErrorWithContext(
         NullParameter,
         "You must call RequestInterrupts before SetUpSourceEdge");
     return;
   }
-  if (m_interrupt != nullptr) {
+  if (m_interrupt != HAL_INVALID_HANDLE) {
     int32_t status = 0;
     setInterruptUpSourceEdge(m_interrupt, risingEdge, fallingEdge, &status);
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
