@@ -16,7 +16,6 @@
 #include "CANSpeedController.h"
 #include "ErrorBase.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
-#include "HAL/cpp/Semaphore.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
