@@ -27,6 +27,7 @@
 
 .vs/
 *.def
+!ntcore.def
 *.opensdf
 *.vcxproj
 *.vcxproj.user
@@ -40,6 +41,7 @@
 # Build directories
 /.gradle
 /build*
+!build.gradle
 /native
 /arm
 /gmock/build
