@@ -1,0 +1,42 @@
+apply plugin: 'cpp'
+
+defineNetworkTablesProperties()
+defineWpiUtilProperties()
+
+ext.shared = "${project(':wpilibc').projectDir.getAbsolutePath()}/shared"
+ext.athena = "${project(':wpilibc').projectDir.getAbsolutePath()}/athena"
+ext.hal = project(':hal').projectDir.getAbsolutePath()
+
+model {
+    components {
+        myRobotcpp(NativeExecutableSpec) {
+            targetPlatform 'arm'
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    addNiLibraryLinks(linker, targetPlatform)
+                    addNetworkTablesLibraryLinks(it, linker, targetPlatform)
+                }
+
+                cppCompiler.args '-pthread', '-Wno-unused-variable'
+                linker.args '-pthread', '-Wno-unused-variable', '-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a'
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDir 'src'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs = ['include',
+                                   "${project.athena}/include", "${project.shared}/include",
+                                   "${project.hal}/include/HAL", netTablesInclude]
+                        include '**/*.h'
+                    }
+
+                    lib project: ':wpilibc', library: 'wpilib_nonshared', linkage: 'static'
+                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                }
+            }
+        }
+    }
+}
