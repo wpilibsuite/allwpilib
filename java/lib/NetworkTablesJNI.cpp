@@ -11,6 +11,9 @@
 #include "ntcore.h"
 #include "atomic_static.h"
 #include "SafeThread.h"
+#include "llvm/ConvertUTF.h"
+#include "llvm/SmallString.h"
+#include "llvm/SmallVector.h"
 
 //
 // Globals and load/unload
@@ -221,20 +224,19 @@ class JavaWeakGlobal {
 
 class JavaStringRef {
  public:
-  JavaStringRef(JNIEnv *env, jstring str)
-      : m_env(env),
-        m_jstr(str),
-        m_str(env->GetStringUTFChars(str, nullptr)) {}
-  ~JavaStringRef() { m_env->ReleaseStringUTFChars(m_jstr, m_str); }
+  JavaStringRef(JNIEnv *env, jstring str) {
+    jsize size = env->GetStringLength(str);
+    const jchar *chars = env->GetStringChars(str, nullptr);
+    llvm::convertUTF16ToUTF8String(llvm::makeArrayRef(chars, size), m_str);
+    env->ReleaseStringChars(str, chars);
+  }
 
-  operator nt::StringRef() const { return nt::StringRef(m_str); }
-  nt::StringRef str() const { return nt::StringRef(m_str); }
-  const char *c_str() const { return m_str; }
+  operator nt::StringRef() const { return m_str; }
+  nt::StringRef str() const { return m_str; }
+  const char* c_str() const { return m_str.data(); }
 
  private:
-  JNIEnv *m_env;
-  jstring m_jstr;
-  const char *m_str;
+  llvm::SmallString<128> m_str;
 };
 
 class JavaByteRef {
@@ -344,11 +346,9 @@ std::shared_ptr<nt::Value> FromJavaStringArray(JNIEnv *env, jobjectArray jarr) {
 //
 
 static inline jstring ToJavaString(JNIEnv *env, nt::StringRef str) {
-  // fastpath if string already null terminated; if not, need to make a copy
-  if (str.data()[str.size()] == '\0')
-    return env->NewStringUTF(str.data());
-  else
-    return env->NewStringUTF(str.str().c_str());
+  llvm::SmallVector<UTF16, 128> chars;
+  llvm::convertUTF8ToUTF16String(str, chars);
+  return env->NewString(chars.begin(), chars.size());
 }
 
 static jbyteArray ToJavaByteArray(JNIEnv *env, nt::StringRef str) {
