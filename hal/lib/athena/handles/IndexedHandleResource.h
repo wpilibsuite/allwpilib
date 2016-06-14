@@ -67,10 +67,10 @@ template <typename THandle, typename TStruct, int16_t size,
 THandle IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     int16_t index, const TStruct& toSet) {
   // don't aquire the lock if we can fail early.
-  if (index < 0 || index >= size) return HAL_HANDLE_INDEX_OUT_OF_RANGE;
+  if (index < 0 || index >= size) return HAL_INVALID_HANDLE;
   std::lock_guard<priority_mutex> sync(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
-  if (m_allocated[index]) return HAL_HANDLE_ALREADY_ALLOCATED;
+  if (m_allocated[index]) return HAL_INVALID_HANDLE;
   m_allocated[index] = true;
   m_structures[index] = toSet;
   return (THandle)hal::createHandle(index, enumValue);

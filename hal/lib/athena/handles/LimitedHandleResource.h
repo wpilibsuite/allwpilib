@@ -78,7 +78,7 @@ THandle LimitedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
       return (THandle)createHandle(i, enumValue);
     }
   }
-  return HAL_HANDLE_OUT_OF_HANDLES;
+  return HAL_INVALID_HANDLE;
 }
 
 template <typename THandle, typename TStruct, int16_t size,
