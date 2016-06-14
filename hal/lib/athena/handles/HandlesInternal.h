@@ -23,6 +23,8 @@
 
 namespace hal {
 
+constexpr int16_t InvalidGetHandle = -1;
+
 enum class HalHandleEnum { Undefined = 0, DIO = 1, Port = 2, Notifier = 3 };
 
 static inline int16_t getHandleIndex(HalHandle handle) {
@@ -38,7 +40,7 @@ static inline bool isHandleType(HalHandle handle, HalHandleEnum handleType) {
 }
 static inline int16_t getHandleTypedIndex(HalHandle handle,
                                           HalHandleEnum enumType) {
-  if (!isHandleType(handle, enumType)) return HAL_HANDLE_INVALID_TYPE;
+  if (!isHandleType(handle, enumType)) return InvalidGetHandle;
   return getHandleIndex(handle);
 }
 
@@ -53,15 +55,13 @@ static inline int16_t getHandleTypedIndex(HalHandle handle,
 
 // using a 16 bit value so we can store 0-255 and still report error
 static inline int16_t getPortHandlePin(HalPortHandle handle) {
-  if (!isHandleType(handle, HalHandleEnum::Port))
-    return HAL_HANDLE_INVALID_TYPE;
+  if (!isHandleType(handle, HalHandleEnum::Port)) return InvalidGetHandle;
   return (uint8_t)(handle & 0xff);
 }
 
 // using a 16 bit value so we can store 0-255 and still report error
 static inline int16_t getPortHandleModule(HalPortHandle handle) {
-  if (!isHandleType(handle, HalHandleEnum::Port))
-    return HAL_HANDLE_INVALID_TYPE;
+  if (!isHandleType(handle, HalHandleEnum::Port)) return InvalidGetHandle;
   return (uint8_t)((handle >> 8) & 0xff);
 }
 

@@ -31,7 +31,7 @@ void* initializeDigitalPort(HalPortHandle port_handle, int32_t* status) {
   if (*status != 0) return nullptr;
 
   int16_t pin = getPortHandlePin(port_handle);
-  if (pin == HAL_HANDLE_INVALID_TYPE) {
+  if (pin == InvalidGetHandle) {
     *status = PARAMETER_OUT_OF_RANGE;
     return nullptr;
   }

@@ -10,11 +10,6 @@
 #include <stdint.h>
 
 #define HAL_INVALID_HANDLE 0
-#define HAL_HANDLE_INDEX_OUT_OF_RANGE -1
-#define HAL_HANDLE_ALREADY_ALLOCATED -2
-#define HAL_HANDLE_INVALID_TYPE -3
-#define HAL_HANDLE_OUT_OF_HANDLES -4
-#define HAL_HANDLE_NEGATIVE_INDEX -5
 
 typedef int32_t HalHandle;
 
