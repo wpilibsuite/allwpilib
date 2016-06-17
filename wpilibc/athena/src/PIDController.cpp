@@ -6,8 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PIDController.h"
-#include <math.h>
+
+#include <cmath>
 #include <vector>
+
 #include "HAL/HAL.h"
 #include "Notifier.h"
 #include "PIDOutput.h"
@@ -110,7 +112,7 @@ void PIDController::Calculate() {
 
     m_error = m_setpoint - input;
     if (m_continuous) {
-      if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
+      if (std::fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
         if (m_error > 0) {
           m_error = m_error - m_maximumInput + m_minimumInput;
         } else {
@@ -516,11 +518,11 @@ bool PIDController::OnTarget() const {
   double error = GetAvgError();
   switch (m_toleranceType) {
     case kPercentTolerance:
-      return fabs(error) <
+      return std::fabs(error) <
              m_tolerance / 100 * (m_maximumInput - m_minimumInput);
       break;
     case kAbsoluteTolerance:
-      return fabs(error) < m_tolerance;
+      return std::fabs(error) < m_tolerance;
       break;
     case kNoTolerance:
       // TODO: this case needs an error
