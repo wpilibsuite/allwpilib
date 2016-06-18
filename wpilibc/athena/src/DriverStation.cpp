@@ -462,7 +462,7 @@ bool DriverStation::IsBrownedOut() const {
  * this function was called?
  *
  * Warning: If you call this function from more than one place at the same time,
- * you will not get the get the intended behaviour.
+ * you will not get the intended behavior.
  *
  * @return True if the control data has been updated since the last call.
  */
