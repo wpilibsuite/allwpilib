@@ -35,7 +35,7 @@ extern "C" {
 void* initializeSolenoidPort(HalPortHandle port_handle, int32_t* status) {
   int16_t pin = getPortHandlePin(port_handle);
   int16_t module = getPortHandleModule(port_handle);
-  if (pin == HAL_HANDLE_INVALID_TYPE) {
+  if (pin == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
     return nullptr;
   }
