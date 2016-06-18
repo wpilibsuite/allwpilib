@@ -39,7 +39,7 @@ Notifier::~Notifier() {
   /* Acquire the mutex; this makes certain that the handler is not being
    * executed by the interrupt manager.
    */
-  std::lock_guard<priority_mutex> lock(m_handlerMutex);
+  std::lock_guard<priority_mutex> lock(m_notifyMutex);
 }
 
 /**
@@ -66,11 +66,11 @@ void Notifier::Notify(uint64_t currentTimeInt, void* param) {
 
   auto handler = notifier->m_handler;
 
-  notifier->m_handlerMutex.lock();
+  notifier->m_notifyMutex.lock();
   notifier->m_processMutex.unlock();
 
   if (handler) handler();
-  notifier->m_handlerMutex.unlock();
+  notifier->m_notifyMutex.unlock();
 }
 
 /**
@@ -122,5 +122,5 @@ void Notifier::Stop() {
 
   // Wait for a currently executing handler to complete before returning from
   // Stop()
-  std::lock_guard<priority_mutex> sync(m_handlerMutex);
+  std::lock_guard<priority_mutex> sync(m_notifyMutex);
 }

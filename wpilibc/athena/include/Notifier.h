@@ -53,6 +53,6 @@ class Notifier : public ErrorBase {
   // true if this is a periodic event
   bool m_periodic = false;
 
-  // held by interrupt manager task while handler call is in progress
-  priority_mutex m_handlerMutex;
+  // held HAL notifier while Notifier::Notify() call is in progress
+  priority_mutex m_notifyMutex;
 };
