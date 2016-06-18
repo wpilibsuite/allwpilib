@@ -12,6 +12,7 @@
 
 #include "gtest/gtest.h"
 
+#include "ntcore.h"
 #include "Timer.h"
 
 static const char* kFileName = "networktables.ini";
@@ -58,6 +59,12 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
  */
 TEST(PreferencesTest, WritePreferencesToFile) {
   NetworkTable::Shutdown();
+  NetworkTable::GlobalDeleteAll();
+  // persistent keys don't get deleted normally, so make remaining keys
+  // non-persistent and delete them too
+  for (const auto& info : nt::GetEntryInfo("", 0)) {
+    nt::SetEntryFlags(info.name, 0);
+  }
   NetworkTable::GlobalDeleteAll();
   std::remove(kFileName);
   NetworkTable::Initialize();
