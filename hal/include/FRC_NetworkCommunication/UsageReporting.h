@@ -91,7 +91,7 @@ namespace nUsageReporting
         kCANPlugin_2CAN = 2,
 
         kFramework_Iterative = 1,
-        kFramework_Simple = 2,
+        kFramework_Sample = 2,
         kFramework_CommandControl = 3,
 
         kRobotDrive_ArcadeStandard = 1,
