@@ -164,6 +164,7 @@ class Storage {
       bool periodic,
       std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
       const;
+  void DeleteAllEntriesImpl();
 
   ATOMIC_STATIC_DECL(Storage)
 };

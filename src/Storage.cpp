@@ -319,17 +319,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
     }
     case Message::kClearEntries: {
       // update local
-      EntriesMap map;
-      m_entries.swap(map);
-      m_idmap.resize(0);
-
-      // set persistent dirty flag
-      m_persistent_dirty = true;
-
-      // notify
-      for (auto& entry : map)
-        m_notifier.NotifyEntry(entry.getKey(), entry.getValue()->value,
-                               NT_NOTIFY_DELETE);
+      DeleteAllEntriesImpl();
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
@@ -638,22 +628,35 @@ void Storage::DeleteEntry(StringRef name) {
   }
 }
 
+void Storage::DeleteAllEntriesImpl() {
+  if (m_entries.empty()) return;
+
+  // only delete non-persistent values
+  // can't erase without invalidating iterators, so build a new map
+  EntriesMap entries;
+  for (auto& i : m_entries) {
+    Entry* entry = i.getValue().get();
+    if (!entry->IsPersistent()) {
+      // notify it's being deleted
+      if (m_notifier.local_notifiers()) {
+        m_notifier.NotifyEntry(i.getKey(), i.getValue()->value,
+                               NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL);
+      }
+      // remove it from idmap
+      if (entry->id != 0xffff) m_idmap[entry->id] = nullptr;
+    } else {
+      // add it to new entries
+      entries.insert(std::make_pair(i.getKey(), std::move(i.getValue())));
+    }
+  }
+  m_entries.swap(entries);
+}
+
 void Storage::DeleteAllEntries() {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_entries.empty()) return;
-  EntriesMap map;
-  m_entries.swap(map);
-  m_idmap.resize(0);
 
-  // set persistent dirty flag
-  m_persistent_dirty = true;
-
-  // notify
-  if (m_notifier.local_notifiers()) {
-    for (auto& entry : map)
-      m_notifier.NotifyEntry(entry.getKey(), entry.getValue()->value,
-                             NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL);
-  }
+  DeleteAllEntriesImpl();
 
   // generate message
   if (!m_queue_outgoing) return;

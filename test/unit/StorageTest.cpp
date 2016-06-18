@@ -387,6 +387,19 @@ TEST_P(StorageTestPopulated, DeleteAllEntries) {
   EXPECT_EQ(Message::kClearEntries, msg->type());
 }
 
+TEST_P(StorageTestPopulated, DeleteAllEntriesPersistent) {
+  GetEntry("foo2")->flags = NT_PERSISTENT;
+  storage.DeleteAllEntries();
+  ASSERT_EQ(1u, entries().size());
+  EXPECT_EQ(1u, entries().count("foo2"));
+
+  ASSERT_EQ(1u, outgoing.size());
+  EXPECT_FALSE(outgoing[0].only);
+  EXPECT_FALSE(outgoing[0].except);
+  auto msg = outgoing[0].msg;
+  EXPECT_EQ(Message::kClearEntries, msg->type());
+}
+
 TEST_P(StorageTestPopulated, GetEntryInfoAll) {
   auto info = storage.GetEntryInfo("", 0u);
   ASSERT_EQ(4u, info.size());
