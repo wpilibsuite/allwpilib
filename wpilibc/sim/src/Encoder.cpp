@@ -52,7 +52,7 @@ void Encoder::InitEncoder(int32_t channelA, int32_t channelB,
     m_reverseDirection = reverseDirection;
   }
   char buffer[50];
-  int n = sprintf(buffer, "dio/%d/%d", channelA, channelB);
+  int n = std::sprintf(buffer, "dio/%d/%d", channelA, channelB);
   impl = new SimEncoder(buffer);
   impl->Start();
 }

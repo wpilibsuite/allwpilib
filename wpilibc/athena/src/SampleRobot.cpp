@@ -28,7 +28,7 @@ SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
  * ready, causing the robot to be bypassed in a match.
  */
 void SampleRobot::RobotInit() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**
@@ -38,7 +38,7 @@ void SampleRobot::RobotInit() {
  * field is disabled.
  */
 void SampleRobot::Disabled() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**
@@ -49,7 +49,7 @@ void SampleRobot::Disabled() {
  * robot enters the autonomous state.
  */
 void SampleRobot::Autonomous() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**
@@ -60,7 +60,7 @@ void SampleRobot::Autonomous() {
  * each time the robot enters the teleop state.
  */
 void SampleRobot::OperatorControl() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**
@@ -71,7 +71,7 @@ void SampleRobot::OperatorControl() {
  * test mode
  */
 void SampleRobot::Test() {
-  printf("Default %s() method... Override me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
 }
 
 /**

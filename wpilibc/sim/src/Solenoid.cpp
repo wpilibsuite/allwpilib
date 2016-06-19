@@ -28,7 +28,7 @@ Solenoid::Solenoid(uint32_t channel) : Solenoid(1, channel) {}
  */
 Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel) {
   char buffer[50];
-  int n = sprintf(buffer, "pneumatic/%d/%d", moduleNumber, channel);
+  int n = std::sprintf(buffer, "pneumatic/%d/%d", moduleNumber, channel);
   m_impl = new SimContinuousOutput(buffer);
 
   LiveWindow::GetInstance()->AddActuator("Solenoid", moduleNumber, channel,
