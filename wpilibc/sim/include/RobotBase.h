@@ -7,15 +7,18 @@
 
 #pragma once
 
+#include <cstdio>
+
 #include "Base.h"
 #include "DriverStation.h"
 #include "simulation/MainNode.h"
 #include "simulation/simTime.h"
 
-#define START_ROBOT_CLASS(_ClassName_)       \
-  int main() {                               \
-    (new _ClassName_())->StartCompetition(); \
-    return 0;                                \
+#define START_ROBOT_CLASS(_ClassName_)                               \
+  int main() {                                                       \
+    static _ClassName_ robot;                                        \
+    std::printf("\n********** Robot program starting **********\n"); \
+    robot.StartCompetition();                                        \
   }
 
 /**
@@ -29,12 +32,7 @@
  * then killed at the end of the Autonomous period.
  */
 class RobotBase {
-  friend class RobotDeleter;
-
  public:
-  static RobotBase& getInstance();
-  static void setInstance(RobotBase* robot);
-
   bool IsEnabled() const;
   bool IsDisabled() const;
   bool IsAutonomous() const;
@@ -51,7 +49,4 @@ class RobotBase {
 
   DriverStation& m_ds;
   transport::SubscriberPtr time_sub;
-
- private:
-  static RobotBase* m_instance;
 };

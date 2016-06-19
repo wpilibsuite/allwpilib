@@ -11,15 +11,6 @@
 
 #include <string.h>
 
-RobotBase* RobotBase::m_instance = nullptr;
-
-void RobotBase::setInstance(RobotBase* robot) {
-  wpi_assert(m_instance == nullptr);
-  m_instance = robot;
-}
-
-RobotBase& RobotBase::getInstance() { return *m_instance; }
-
 /**
  * Constructor for a generic robot program.
  *
@@ -73,17 +64,3 @@ bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
  *         field controls.
  */
 bool RobotBase::IsTest() const { return m_ds.IsTest(); }
-
-/**
- * This class exists for the sole purpose of getting its destructor called when
- * the module unloads.
- *
- * Before the module is done unloading, we need to delete the RobotBase derived
- * singleton.  This should delete the other remaining singletons that were
- * registered.  This should also stop all tasks that are using the Task class.
- */
-class RobotDeleter {
- public:
-  ~RobotDeleter() { delete &RobotBase::getInstance(); }
-};
-static RobotDeleter g_robotDeleter;
