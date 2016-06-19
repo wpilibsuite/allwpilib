@@ -19,7 +19,11 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  * Class implements a PID Control Loop.
  *
  * <p>Creates a separate thread which reads the given PIDSource and takes care of the integral
- * calculations, as well as writing the given PIDOutput
+ * calculations, as well as writing the given PIDOutput.
+ *
+ * <p>This feedback controller runs in discrete time, so time deltas are not used in the integral
+ * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
+ * given set of PID constants.
  */
 public class PIDController implements PIDInterface, LiveWindowSendable, Controller {
 

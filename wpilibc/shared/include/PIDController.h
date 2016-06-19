@@ -28,6 +28,10 @@ class PIDOutput;
  *
  * Creates a separate thread which reads the given PIDSource and takes
  * care of the integral calculations, as well as writing the given PIDOutput.
+ *
+ * This feedback controller runs in discrete time, so time deltas are not used
+ * in the integral and derivative calculations. Therefore, the sample rate
+ * affects the controller's behavior for a given set of PID constants.
  */
 class PIDController : public LiveWindowSendable,
                       public PIDInterface,
