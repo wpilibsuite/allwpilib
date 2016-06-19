@@ -116,7 +116,7 @@ void IterativeRobot::StartCompetition() {
  * ready, causing the robot to be bypassed in a match.
  */
 void IterativeRobot::RobotInit() {
-  printf("Default %s() method... Overload me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -127,7 +127,7 @@ void IterativeRobot::RobotInit() {
  * the robot enters disabled mode.
  */
 void IterativeRobot::DisabledInit() {
-  printf("Default %s() method... Overload me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -137,7 +137,7 @@ void IterativeRobot::DisabledInit() {
  * called each time the robot enters autonomous mode.
  */
 void IterativeRobot::AutonomousInit() {
-  printf("Default %s() method... Overload me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -147,7 +147,7 @@ void IterativeRobot::AutonomousInit() {
  * called each time the robot enters teleop mode.
  */
 void IterativeRobot::TeleopInit() {
-  printf("Default %s() method... Overload me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -157,7 +157,7 @@ void IterativeRobot::TeleopInit() {
  * called each time the robot enters test mode.
  */
 void IterativeRobot::TestInit() {
-  printf("Default %s() method... Overload me!\n", __FUNCTION__);
+  std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -169,7 +169,7 @@ void IterativeRobot::TestInit() {
 void IterativeRobot::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    printf("Default %s() method... Overload me!\n", __FUNCTION__);
+    std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -183,7 +183,7 @@ void IterativeRobot::DisabledPeriodic() {
 void IterativeRobot::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    printf("Default %s() method... Overload me!\n", __FUNCTION__);
+    std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -197,7 +197,7 @@ void IterativeRobot::AutonomousPeriodic() {
 void IterativeRobot::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    printf("Default %s() method... Overload me!\n", __FUNCTION__);
+    std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
     firstRun = false;
   }
 }
@@ -211,7 +211,7 @@ void IterativeRobot::TeleopPeriodic() {
 void IterativeRobot::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
-    printf("Default %s() method... Overload me!\n", __FUNCTION__);
+    std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
     firstRun = false;
   }
 }

@@ -26,7 +26,7 @@ Servo::Servo(uint32_t channel) : SafePWM(channel) {
   // Assign defaults for period multiplier for the servo PWM control signal
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
-  //  printf("Done initializing servo %d\n", channel);
+  //  std::printf("Done initializing servo %d\n", channel);
 }
 
 Servo::~Servo() {

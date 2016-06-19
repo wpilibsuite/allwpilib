@@ -36,11 +36,11 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   NetworkTable::SetPersistentFilename("/home/lvuser/networktables.ini");
 
   FILE* file = nullptr;
-  file = fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
+  file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
   if (file != nullptr) {
-    fputs("2016 C++ Release 5", file);
-    fclose(file);
+    std::fputs("2016 C++ Release 5", file);
+    std::fclose(file);
   }
 }
 

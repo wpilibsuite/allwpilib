@@ -24,7 +24,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
   char buf[64];
   if (!SensorBase::CheckRelayChannel(m_channel)) {
-    snprintf(buf, 64, "Relay Channel %d", m_channel);
+    std::snprintf(buf, 64, "Relay Channel %d", m_channel);
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
     return;
   }
@@ -32,7 +32,7 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
   m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
   m_safetyHelper->SetSafetyEnabled(false);
 
-  sprintf(buf, "relay/%d", m_channel);
+  std::sprintf(buf, "relay/%d", m_channel);
   impl = new SimContinuousOutput(buf);  // TODO: Allow two different relays
                                         // (targetting the different halves of a
                                         // relay) to be combined to control one

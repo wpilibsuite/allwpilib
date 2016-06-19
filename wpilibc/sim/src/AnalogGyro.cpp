@@ -33,7 +33,7 @@ void AnalogGyro::InitAnalogGyro(int channel) {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
   char buffer[50];
-  int n = sprintf(buffer, "analog/%d", channel);
+  int n = std::sprintf(buffer, "analog/%d", channel);
   impl = new SimGyro(buffer);
 
   LiveWindow::GetInstance()->AddSensor("AnalogGyro", channel, this);

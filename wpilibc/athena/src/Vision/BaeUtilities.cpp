@@ -71,7 +71,8 @@ void dprintf(const char* tempString, ...) /* Variable argument list */
   filename = tempString;
   for (index = 0; index < tempStringLen; index++) {
     if (tempString[index] == ' ') {
-      printf("ERROR in dprintf: malformed calling sequence (%s)\n", tempString);
+      std::printf("ERROR in dprintf: malformed calling sequence (%s)\n",
+                  tempString);
       va_end(args);
       return;
     }
@@ -91,40 +92,40 @@ void dprintf(const char* tempString, ...) /* Variable argument list */
   /* Extract format from argument list */
   fmt = va_arg(args, const char*);
 
-  vsprintf(text, fmt, args);
+  std::vsprintf(text, fmt, args);
 
   va_end(args);
 
   /* Format output statement */
   switch (type) {
     case DEBUG_TYPE:
-      sprintf(outtext, "[%s:%s@%04d] DEBUG %s\n", filename, functionName,
-              line_number, text);
+      std::sprintf(outtext, "[%s:%s@%04d] DEBUG %s\n", filename, functionName,
+                   line_number, text);
       break;
     case INFO_TYPE:
-      sprintf(outtext, "[%s:%s@%04d] INFO %s\n", filename, functionName,
-              line_number, text);
+      std::sprintf(outtext, "[%s:%s@%04d] INFO %s\n", filename, functionName,
+                   line_number, text);
       break;
     case ERROR_TYPE:
-      sprintf(outtext, "[%s:%s@%04d] ERROR %s\n", filename, functionName,
-              line_number, text);
+      std::sprintf(outtext, "[%s:%s@%04d] ERROR %s\n", filename, functionName,
+                   line_number, text);
       break;
     case CRITICAL_TYPE:
-      sprintf(outtext, "[%s:%s@%04d] CRITICAL %s\n", filename, functionName,
-              line_number, text);
+      std::sprintf(outtext, "[%s:%s@%04d] CRITICAL %s\n", filename,
+                   functionName, line_number, text);
       break;
     case FATAL_TYPE:
       fatalFlag = 1;
-      sprintf(outtext, "[%s:%s@%04d] FATAL %s\n", filename, functionName,
-              line_number, text);
+      std::sprintf(outtext, "[%s:%s@%04d] FATAL %s\n", filename, functionName,
+                   line_number, text);
       break;
     default:
-      printf("ERROR in dprintf: malformed calling sequence\n");
+      std::printf("ERROR in dprintf: malformed calling sequence\n");
       return;
       break;
   }
 
-  sprintf(filepath, "%s.debug", filename);
+  std::sprintf(filepath, "%s.debug", filename);
 
   /* Write output statement */
   switch (dprintfFlag) {
@@ -133,26 +134,26 @@ void dprintf(const char* tempString, ...) /* Variable argument list */
       break;
     case DEBUG_MOSTLY_OFF:
       if (fatalFlag) {
-        if ((outfile_fd = fopen(filepath, "a+")) != nullptr) {
-          fwrite(outtext, sizeof(char), strlen(outtext), outfile_fd);
-          fclose(outfile_fd);
+        if ((outfile_fd = std::fopen(filepath, "a+")) != nullptr) {
+          std::fwrite(outtext, sizeof(char), std::strlen(outtext), outfile_fd);
+          std::fclose(outfile_fd);
         }
       }
       break;
     case DEBUG_SCREEN_ONLY:
-      printf("%s", outtext);
+      std::printf("%s", outtext);
       break;
     case DEBUG_FILE_ONLY:
-      if ((outfile_fd = fopen(filepath, "a+")) != nullptr) {
+      if ((outfile_fd = std::fopen(filepath, "a+")) != nullptr) {
         fwrite(outtext, sizeof(char), strlen(outtext), outfile_fd);
-        fclose(outfile_fd);
+        std::fclose(outfile_fd);
       }
       break;
     case DEBUG_SCREEN_AND_FILE:  // BOTH
-      printf("%s", outtext);
-      if ((outfile_fd = fopen(filepath, "a+")) != nullptr) {
+      std::printf("%s", outtext);
+      if ((outfile_fd = std::fopen(filepath, "a+")) != nullptr) {
         fwrite(outtext, sizeof(char), strlen(outtext), outfile_fd);
-        fclose(outfile_fd);
+        std::fclose(outfile_fd);
       }
       break;
   }
@@ -187,7 +188,7 @@ float NormalizeToRange(float normalizedValue) {
 
 /**
  * @brief Displays an activity indicator to console.
- * Call this function like you would call printf.
+ * Call this function like you would call std::printf.
  * @param fmt The format string
 */
 void ShowActivity(char* fmt, ...) {
@@ -301,13 +302,13 @@ int processFile(char* inputFile, char* outputString, int lineNumber) {
 
   if (lineNumber < 0) return (-1);
 
-  if ((infile = fopen(inputFile, "r")) == nullptr) {
-    printf("Fatal error opening file %s\n", inputFile);
+  if ((infile = std::fopen(inputFile, "r")) == nullptr) {
+    std::printf("Fatal error opening file %s\n", inputFile);
     return (0);
   }
 
-  while (!feof(infile)) {
-    if (fgets(inputStr, stringSize, infile) != nullptr) {
+  while (!std::feof(infile)) {
+    if (std::fgets(inputStr, stringSize, infile) != nullptr) {
       // Skip empty lines
       if (emptyString(inputStr)) continue;
       // Skip comment lines
@@ -323,14 +324,14 @@ int processFile(char* inputFile, char* outputString, int lineNumber) {
   }
 
   // close file
-  fclose(infile);
+  std::fclose(infile);
   // if number lines requested return the count
   if (lineNumber == 0) return (lineCount);
   // check for input out of range
   if (lineNumber > lineCount) return (-1);
   // return the line selected; lineCount guaranteed to be greater than zero
   stripString(inputStr);
-  strcpy(outputString, inputStr);
+  std::strcpy(outputString, inputStr);
   return (lineCount);
 }
 
