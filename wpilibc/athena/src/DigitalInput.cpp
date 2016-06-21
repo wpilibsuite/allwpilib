@@ -46,12 +46,11 @@ DigitalInput::DigitalInput(uint32_t channel) {
  */
 DigitalInput::~DigitalInput() {
   if (StatusIsFatal()) return;
-  if (m_interrupt != nullptr) {
+  if (m_interrupt != HAL_INVALID_HANDLE) {
     int32_t status = 0;
     cleanInterrupts(m_interrupt, &status);
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
-    m_interrupt = nullptr;
-    m_interrupts->Free(m_interruptIndex);
+    // ignore status, as an invalid handle just needs to be ignored.
+    m_interrupt = HAL_INVALID_HANDLE;
   }
 
   int32_t status = 0;
