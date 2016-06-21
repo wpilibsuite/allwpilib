@@ -9,9 +9,9 @@ package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.HALAllianceStationID;
-import edu.wpi.first.wpilibj.communication.HALControlWord;
+import edu.wpi.first.wpilibj.hal.AllianceStationID;
+import edu.wpi.first.wpilibj.hal.ControlWord;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.PowerJNI;
 
@@ -32,7 +32,7 @@ public class DriverStation implements RobotState.Interface {
 
   private class HALJoystickAxes {
     public float[] m_axes;
-    public byte m_count;
+    public short m_count;
 
     public HALJoystickAxes(int count) {
       m_axes = new float[count];
@@ -41,7 +41,7 @@ public class DriverStation implements RobotState.Interface {
 
   private class HALJoystickPOVs {
     public short[] m_povs;
-    public byte m_count;
+    public short m_count;
 
     public HALJoystickPOVs(int count) {
       m_povs = new short[count];
@@ -86,8 +86,7 @@ public class DriverStation implements RobotState.Interface {
   private int[] m_joystickIsXbox = new int[kJoystickPorts];
   private int[] m_joystickType = new int[kJoystickPorts];
   private String[] m_joystickName = new String[kJoystickPorts];
-  private int[][] m_joystickAxisType =
-      new int[kJoystickPorts][FRCNetworkCommunicationsLibrary.kMaxJoystickAxes];
+  private int[][] m_joystickAxisType = new int[kJoystickPorts][HAL.kMaxJoystickAxes];
 
   private Thread m_thread;
   private final Object m_dataSem;
@@ -125,19 +124,17 @@ public class DriverStation implements RobotState.Interface {
     m_newControlDataMutex = new Object();
     for (int i = 0; i < kJoystickPorts; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();
-      m_joystickAxes[i] = new HALJoystickAxes(FRCNetworkCommunicationsLibrary.kMaxJoystickAxes);
-      m_joystickPOVs[i] = new HALJoystickPOVs(FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs);
+      m_joystickAxes[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
+      m_joystickPOVs[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
 
       m_joystickButtonsCache[i] = new HALJoystickButtons();
-      m_joystickAxesCache[i] =
-          new HALJoystickAxes(FRCNetworkCommunicationsLibrary.kMaxJoystickAxes);
-      m_joystickPOVsCache[i] =
-          new HALJoystickPOVs(FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs);
+      m_joystickAxesCache[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
+      m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
     }
 
     m_packetDataAvailableMutex = HALUtil.initializeMutexNormal();
     m_packetDataAvailableSem = HALUtil.initializeMultiWait();
-    FRCNetworkCommunicationsLibrary.setNewDataSem(m_packetDataAvailableSem);
+    HAL.setNewDataSem(m_packetDataAvailableSem);
 
     m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");
     m_thread.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY) / 2);
@@ -169,16 +166,16 @@ public class DriverStation implements RobotState.Interface {
         safetyCounter = 0;
       }
       if (m_userInDisabled) {
-        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramDisabled();
+        HAL.observeUserProgramDisabled();
       }
       if (m_userInAutonomous) {
-        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
+        HAL.observeUserProgramAutonomous();
       }
       if (m_userInTeleop) {
-        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTeleop();
+        HAL.observeUserProgramTeleop();
       }
       if (m_userInTest) {
-        FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTest();
+        HAL.observeUserProgramTest();
       }
     }
   }
@@ -217,13 +214,10 @@ public class DriverStation implements RobotState.Interface {
     // Get the status of all of the joysticks
     for (byte stick = 0; stick < kJoystickPorts; stick++) {
       m_joystickAxesCache[stick].m_count =
-          FRCNetworkCommunicationsLibrary.HALGetJoystickAxes(stick,
-                                                             m_joystickAxesCache[stick].m_axes);
+          HAL.getJoystickAxes(stick, m_joystickAxesCache[stick].m_axes);
       m_joystickPOVsCache[stick].m_count =
-          FRCNetworkCommunicationsLibrary.HALGetJoystickPOVs(stick,
-                                                             m_joystickPOVsCache[stick].m_povs);
-      m_joystickButtonsCache[stick].m_buttons =
-          FRCNetworkCommunicationsLibrary.HALGetJoystickButtons(stick, m_buttonCountBuffer);
+          HAL.getJoystickPOVs(stick, m_joystickPOVsCache[stick].m_povs);
+      m_joystickButtonsCache[stick].m_buttons = HAL.getJoystickButtons(stick, m_buttonCountBuffer);
       m_joystickButtonsCache[stick].m_count = m_buttonCountBuffer.get(0);
     }
     // lock joystick mutex to swap cache data
@@ -292,7 +286,7 @@ public class DriverStation implements RobotState.Interface {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
-    if (axis < 0 || axis >= FRCNetworkCommunicationsLibrary.kMaxJoystickAxes) {
+    if (axis < 0 || axis >= HAL.kMaxJoystickAxes) {
       throw new RuntimeException("Joystick axis is out of range");
     }
 
@@ -338,7 +332,7 @@ public class DriverStation implements RobotState.Interface {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-5");
     }
-    if (pov < 0 || pov >= FRCNetworkCommunicationsLibrary.kMaxJoystickPOVs) {
+    if (pov < 0 || pov >= HAL.kMaxJoystickPOVs) {
       throw new RuntimeException("Joystick POV is out of range");
     }
     boolean error = false;
@@ -453,7 +447,7 @@ public class DriverStation implements RobotState.Interface {
       if (1 > m_joystickButtons[stick].m_count && 1 > m_joystickAxes[stick].m_count) {
         error = true;
         retVal = false;
-      } else if (FRCNetworkCommunicationsLibrary.HALGetJoystickIsXbox((byte) stick) == 1) {
+      } else if (HAL.getJoystickIsXbox((byte) stick) == 1) {
         retVal = true;
       }
     }
@@ -483,7 +477,7 @@ public class DriverStation implements RobotState.Interface {
         error = true;
         retVal = -1;
       } else {
-        retVal = FRCNetworkCommunicationsLibrary.HALGetJoystickType((byte) stick);
+        retVal = HAL.getJoystickType((byte) stick);
       }
     }
     if (error) {
@@ -512,7 +506,7 @@ public class DriverStation implements RobotState.Interface {
         error = true;
         retVal = "";
       } else {
-        retVal = FRCNetworkCommunicationsLibrary.HALGetJoystickName((byte) stick);
+        retVal = HAL.getJoystickName((byte) stick);
       }
     }
     if (error) {
@@ -528,7 +522,7 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the robot is enabled, false otherwise.
    */
   public boolean isEnabled() {
-    HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+    ControlWord controlWord = HAL.getControlWord();
     return controlWord.getEnabled() && controlWord.getDSAttached();
   }
 
@@ -548,7 +542,7 @@ public class DriverStation implements RobotState.Interface {
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public boolean isAutonomous() {
-    HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+    ControlWord controlWord = HAL.getControlWord();
     return controlWord.getAutonomous();
   }
 
@@ -559,7 +553,7 @@ public class DriverStation implements RobotState.Interface {
    * @return True if test mode should be enabled, false otherwise.
    */
   public boolean isTest() {
-    HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+    ControlWord controlWord = HAL.getControlWord();
     return controlWord.getTest();
   }
 
@@ -580,7 +574,7 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the FPGA outputs are enabled.
    */
   public boolean isSysActive() {
-    return FRCNetworkCommunicationsLibrary.HALGetSystemActive();
+    return HAL.getSystemActive();
   }
 
   /**
@@ -589,7 +583,7 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the system is browned out
    */
   public boolean isBrownedOut() {
-    return FRCNetworkCommunicationsLibrary.HALGetBrownedOut();
+    return HAL.getBrownedOut();
   }
 
   /**
@@ -612,8 +606,7 @@ public class DriverStation implements RobotState.Interface {
    * @return the current alliance
    */
   public Alliance getAlliance() {
-    HALAllianceStationID allianceStationID =
-        FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
+    AllianceStationID allianceStationID = HAL.getAllianceStation();
     if (allianceStationID == null) {
       return Alliance.Invalid;
     }
@@ -640,8 +633,7 @@ public class DriverStation implements RobotState.Interface {
    * @return the location of the team's driver station controls: 1, 2, or 3
    */
   public int getLocation() {
-    HALAllianceStationID allianceStationID =
-        FRCNetworkCommunicationsLibrary.HALGetAllianceStation();
+    AllianceStationID allianceStationID = HAL.getAllianceStation();
     if (allianceStationID == null) {
       return 0;
     }
@@ -670,12 +662,12 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the robot is competing on a field being controlled by a Field Management System
    */
   public boolean isFMSAttached() {
-    HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+    ControlWord controlWord = HAL.getControlWord();
     return controlWord.getFMSAttached();
   }
 
   public boolean isDSAttached() {
-    HALControlWord controlWord = FRCNetworkCommunicationsLibrary.HALGetControlWord();
+    ControlWord controlWord = HAL.getControlWord();
     return controlWord.getDSAttached();
   }
 
@@ -689,7 +681,7 @@ public class DriverStation implements RobotState.Interface {
    * @return Time remaining in current match period (auto or teleop) in seconds
    */
   public double getMatchTime() {
-    return FRCNetworkCommunicationsLibrary.HALGetMatchTime();
+    return HAL.getMatchTime();
   }
 
   /**
@@ -732,8 +724,7 @@ public class DriverStation implements RobotState.Interface {
         haveLoc = true;
       }
     }
-    FRCNetworkCommunicationsLibrary.HALSendError(isError, code, false, error, locString,
-        printTrace ? traceString : "", true);
+    HAL.sendError(isError, code, false, error, locString, printTrace ? traceString : "", true);
   }
 
   /**

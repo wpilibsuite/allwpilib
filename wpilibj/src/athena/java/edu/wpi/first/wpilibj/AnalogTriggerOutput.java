@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * Class to represent a specific output from an analog trigger. This class is used to get the
@@ -77,8 +77,8 @@ public class AnalogTriggerOutput extends DigitalSource {
     m_trigger = trigger;
     m_outputType = outputType;
 
-    UsageReporting.report(tResourceType.kResourceType_AnalogTriggerOutput, trigger.getIndex(),
-        outputType.m_value);
+    HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
+                                   trigger.getIndex(), outputType.m_value);
   }
 
   /**

@@ -11,9 +11,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.CounterJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.BoundaryException;
@@ -87,7 +87,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
 
     setMaxPeriod(.5);
 
-    UsageReporting.report(tResourceType.kResourceType_Counter, m_index, mode.value);
+    HAL.report(tResourceType.kResourceType_Counter, m_index, mode.value);
   }
 
   /**

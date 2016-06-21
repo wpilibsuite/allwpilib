@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 
 import static java.util.Objects.requireNonNull;
 
@@ -191,7 +191,7 @@ public class RobotDrive implements MotorSafety {
     final double rightOutput;
 
     if (!kArcadeRatioCurve_Reported) {
-      UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
+      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
           tInstances.kRobotDrive_ArcadeRatioCurve);
       kArcadeRatioCurve_Reported = true;
     }
@@ -293,7 +293,7 @@ public class RobotDrive implements MotorSafety {
   public void tankDrive(double leftValue, double rightValue, boolean squaredInputs) {
 
     if (!kTank_Reported) {
-      UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
+      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
           tInstances.kRobotDrive_Tank);
       kTank_Reported = true;
     }
@@ -402,7 +402,7 @@ public class RobotDrive implements MotorSafety {
   public void arcadeDrive(double moveValue, double rotateValue, boolean squaredInputs) {
     // local variables to hold the computed PWM values for the motors
     if (!kArcadeStandard_Reported) {
-      UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
+      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
           tInstances.kRobotDrive_ArcadeStandard);
       kArcadeStandard_Reported = true;
     }
@@ -480,7 +480,7 @@ public class RobotDrive implements MotorSafety {
   @SuppressWarnings("ParameterName")
   public void mecanumDrive_Cartesian(double x, double y, double rotation, double gyroAngle) {
     if (!kMecanumCartesian_Reported) {
-      UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
+      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
           tInstances.kRobotDrive_MecanumCartesian);
       kMecanumCartesian_Reported = true;
     }
@@ -527,7 +527,7 @@ public class RobotDrive implements MotorSafety {
    */
   public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
     if (!kMecanumPolar_Reported) {
-      UsageReporting.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
+      HAL.report(tResourceType.kResourceType_RobotDrive, getNumMotors(),
           tInstances.kRobotDrive_MecanumPolar);
       kMecanumPolar_Reported = true;
     }

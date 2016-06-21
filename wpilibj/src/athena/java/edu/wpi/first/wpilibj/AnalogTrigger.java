@@ -11,9 +11,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 import static java.util.Objects.requireNonNull;
@@ -72,7 +72,7 @@ public class AnalogTrigger {
         AnalogJNI.initializeAnalogTrigger(channel.m_port, index.asIntBuffer());
     m_index = index.asIntBuffer().get(0);
 
-    UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());
+    HAL.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());
   }
 
   /**

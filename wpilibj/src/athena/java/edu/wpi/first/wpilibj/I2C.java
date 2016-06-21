@@ -9,8 +9,8 @@ package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.I2CJNI;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
@@ -50,7 +50,7 @@ public class I2C extends SensorBase {
 
     I2CJNI.i2CInitialize((byte) port.getValue());
 
-    UsageReporting.report(tResourceType.kResourceType_I2C, deviceAddress);
+    HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
   }
 
   /**

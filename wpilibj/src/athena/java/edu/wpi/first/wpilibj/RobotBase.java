@@ -15,10 +15,9 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
@@ -161,7 +160,8 @@ public abstract class RobotBase {
    * Common initialization for all robot programs.
    */
   public static void initializeHardwareConfiguration() {
-    FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationReserve();
+    int rv = HAL.initialize(0);
+    assert rv == 1;
 
     // Set some implementations so that the static methods work properly
     Timer.SetImplementation(new HardwareTimer());
@@ -175,7 +175,7 @@ public abstract class RobotBase {
   public static void main(String... args) {
     initializeHardwareConfiguration();
 
-    UsageReporting.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
+    HAL.report(tResourceType.kResourceType_Language, tInstances.kLanguage_Java);
 
     String robotName = "";
     Enumeration<URL> resources = null;

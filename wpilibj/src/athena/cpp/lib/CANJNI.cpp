@@ -29,14 +29,14 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_can_CANJNI
- * Method:    FRCNetworkCommunicationCANSessionMuxSendMessage
+ * Method:    FRCNetCommCANSessionMuxSendMessage
  * Signature: (ILjava/nio/ByteBuffer;I)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommunicationCANSessionMuxSendMessage(
+Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
     JNIEnv *env, jclass, jint messageID, jobject data, jint periodMs) {
   CANJNI_LOG(logDEBUG)
-      << "Calling CANJNI FRCNetworkCommunicationCANSessionMuxSendMessage";
+      << "Calling CANJNI FRCNetCommCANSessionMuxSendMessage";
 
   uint8_t *dataBuffer =
       (uint8_t *)(data ? env->GetDirectBufferAddress(data) : 0);
@@ -72,15 +72,15 @@ static uint8_t buffer[8];
 
 /*
  * Class:     edu_wpi_first_wpilibj_can_CANJNI
- * Method:    FRCNetworkCommunicationCANSessionMuxReceiveMessage
+ * Method:    FRCNetCommCANSessionMuxReceiveMessage
  * Signature: (Ljava/nio/IntBuffer;ILjava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;
  */
 JNIEXPORT jobject JNICALL
-Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetworkCommunicationCANSessionMuxReceiveMessage(
+Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
     JNIEnv *env, jclass, jobject messageID, jint messageIDMask,
     jobject timeStamp) {
   CANJNI_LOG(logDEBUG)
-      << "Calling CANJNI FRCNetworkCommunicationCANSessionMuxReceiveMessage";
+      << "Calling CANJNI FRCNetCommCANSessionMuxReceiveMessage";
 
   uint32_t *messageIDPtr = (uint32_t *)env->GetDirectBufferAddress(messageID);
   uint32_t *timeStampPtr = (uint32_t *)env->GetDirectBufferAddress(timeStamp);

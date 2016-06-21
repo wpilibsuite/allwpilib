@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -40,7 +40,7 @@ public class Jaguar extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    UsageReporting.report(tResourceType.kResourceType_Jaguar, getChannel());
+    HAL.report(tResourceType.kResourceType_Jaguar, getChannel());
     LiveWindow.addActuator("Jaguar", getChannel(), this);
   }
 }

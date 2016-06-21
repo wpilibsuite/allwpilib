@@ -34,7 +34,7 @@ void IterativeRobot::StartCompetition() {
   RobotInit();
 
   // Tell the DS that the robot is ready to be enabled
-  HAL_NetworkCommunicationObserveUserProgramStarting();
+  HAL_ObserveUserProgramStarting();
 
   // loop forever, calling the appropriate mode-dependent function
   lw->SetEnabled(false);
@@ -52,7 +52,7 @@ void IterativeRobot::StartCompetition() {
         m_teleopInitialized = false;
         m_testInitialized = false;
       }
-      HAL_NetworkCommunicationObserveUserProgramDisabled();
+      HAL_ObserveUserProgramDisabled();
       DisabledPeriodic();
     } else if (IsAutonomous()) {
       // call AutonomousInit() if we are now just entering autonomous mode from
@@ -66,7 +66,7 @@ void IterativeRobot::StartCompetition() {
         m_teleopInitialized = false;
         m_testInitialized = false;
       }
-      HAL_NetworkCommunicationObserveUserProgramAutonomous();
+      HAL_ObserveUserProgramAutonomous();
       AutonomousPeriodic();
     } else if (IsTest()) {
       // call TestInit() if we are now just entering test mode from
@@ -80,7 +80,7 @@ void IterativeRobot::StartCompetition() {
         m_autonomousInitialized = false;
         m_teleopInitialized = false;
       }
-      HAL_NetworkCommunicationObserveUserProgramTest();
+      HAL_ObserveUserProgramTest();
       TestPeriodic();
     } else {
       // call TeleopInit() if we are now just entering teleop mode from
@@ -95,7 +95,7 @@ void IterativeRobot::StartCompetition() {
         m_testInitialized = false;
         Scheduler::GetInstance()->SetEnabled(true);
       }
-      HAL_NetworkCommunicationObserveUserProgramTeleop();
+      HAL_ObserveUserProgramTeleop();
       TeleopPeriodic();
     }
     // wait for driver station data so the loop doesn't hog the CPU

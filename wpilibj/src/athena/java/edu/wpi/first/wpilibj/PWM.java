@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -78,7 +78,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
 
     PWMJNI.setPWMEliminateDeadband(m_handle, false);
 
-    UsageReporting.report(tResourceType.kResourceType_PWM, channel);
+    HAL.report(tResourceType.kResourceType_PWM, channel);
   }
 
   /**

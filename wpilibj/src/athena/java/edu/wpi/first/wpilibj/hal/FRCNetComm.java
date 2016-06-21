@@ -5,17 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.communication;
-
-import java.nio.ByteBuffer;
+package edu.wpi.first.wpilibj.hal;
 
 import edu.wpi.first.wpilibj.hal.JNIWrapper;
 
 /**
- * JNI Wrapper for library <b>FRC_NetworkCommunications</b><br>.
+ * JNI wrapper for library <b>FRC_NetworkCommunication</b><br>.
  */
 @SuppressWarnings("MethodName")
-public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
+public class FRCNetComm extends JNIWrapper {
   /**
    * Module type from LoadOut.h
    */
@@ -35,18 +33,17 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
     int kTargetClass_Unknown = 0x00;
     int kTargetClass_FRC1 = 0x10;
     int kTargetClass_FRC2 = 0x20;
-    int kTargetClass_FRC2_Analog =
-        kTargetClass_FRC2 | FRCNetworkCommunicationsLibrary.tModuleType.kModuleType_Analog;
-    int kTargetClass_FRC2_Digital =
-        kTargetClass_FRC2 | FRCNetworkCommunicationsLibrary.tModuleType.kModuleType_Digital;
-    int kTargetClass_FRC2_Solenoid =
-        kTargetClass_FRC2 | FRCNetworkCommunicationsLibrary.tModuleType.kModuleType_Solenoid;
+    int kTargetClass_FRC3 = 0x30;
+    int kTargetClass_RoboRIO = 0x40;
+    int kTargetClass_FRC2_Analog = kTargetClass_FRC2 | tModuleType.kModuleType_Analog;
+    int kTargetClass_FRC2_Digital = kTargetClass_FRC2 | tModuleType.kModuleType_Digital;
+    int kTargetClass_FRC2_Solenoid = kTargetClass_FRC2 | tModuleType.kModuleType_Solenoid;
     int kTargetClass_FamilyMask = 0xF0;
     int kTargetClass_ModuleMask = 0x0F;
   }
 
   /**
-   * Resource types from UsageReporting.h
+   * Resource type from UsageReporting.h
    */
   @SuppressWarnings("TypeName")
   public interface tResourceType {
@@ -124,7 +121,7 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
     int kCANPlugin_2CAN = 2;
 
     int kFramework_Iterative = 1;
-    int kFramework_Sample = 2;
+    int kFramework_Simple = 2;
     int kFramework_CommandControl = 3;
 
     int kRobotDrive_ArcadeStandard = 1;
@@ -157,100 +154,4 @@ public class FRCNetworkCommunicationsLibrary extends JNIWrapper {
 
     int kSmartDashboard_Instance = 1;
   }
-
-  /**
-   * Report the usage of a resource of interest. <br>
-   *
-   * <p>Original signature: <code>uint32_t report(tResourceType, uint8_t, uint8_t, const
-   * char*)</code>
-   *
-   * @param resource       one of the values in the tResourceType above (max value 51). <br>
-   * @param instanceNumber an index that identifies the resource instance. <br>
-   * @param context        an optional additional context number for some cases (such as module
-   *                       number). Set to 0 to omit. <br>
-   * @param feature        a string to be included describing features in use on a specific
-   *                       resource. Setting the same resource more than once allows you to change
-   *                       the feature string.
-   */
-  public static native int FRCNetworkCommunicationUsageReportingReport(byte resource,
-                                                                       byte instanceNumber,
-                                                                       byte context,
-                                                                       String feature);
-
-  public static native void setNewDataSem(long mutexId);
-
-  public static native void FRCNetworkCommunicationObserveUserProgramStarting();
-
-  public static native void FRCNetworkCommunicationObserveUserProgramDisabled();
-
-  public static native void FRCNetworkCommunicationObserveUserProgramAutonomous();
-
-  public static native void FRCNetworkCommunicationObserveUserProgramTeleop();
-
-  public static native void FRCNetworkCommunicationObserveUserProgramTest();
-
-  public static native void FRCNetworkCommunicationReserve();
-
-  private static native int NativeHALGetControlWord();
-
-  @SuppressWarnings("JavadocMethod")
-  public static HALControlWord HALGetControlWord() {
-    int word = NativeHALGetControlWord();
-    return new HALControlWord((word & 1) != 0, ((word >> 1) & 1) != 0, ((word >> 2) & 1) != 0,
-        ((word >> 3) & 1) != 0, ((word >> 4) & 1) != 0, ((word >> 5) & 1) != 0);
-  }
-
-  private static native int NativeHALGetAllianceStation();
-
-  @SuppressWarnings("JavadocMethod")
-  public static HALAllianceStationID HALGetAllianceStation() {
-    switch (NativeHALGetAllianceStation()) {
-      case 0:
-        return HALAllianceStationID.Red1;
-      case 1:
-        return HALAllianceStationID.Red2;
-      case 2:
-        return HALAllianceStationID.Red3;
-      case 3:
-        return HALAllianceStationID.Blue1;
-      case 4:
-        return HALAllianceStationID.Blue2;
-      case 5:
-        return HALAllianceStationID.Blue3;
-      default:
-        return null;
-    }
-  }
-
-  public static int kMaxJoystickAxes = 12;
-  public static int kMaxJoystickPOVs = 12;
-
-  public static native byte HALGetJoystickAxes(byte joystickNum, float[] axesArray);
-
-  public static native byte HALGetJoystickPOVs(byte joystickNum, short[] povsArray);
-
-  public static native int HALGetJoystickButtons(byte joystickNum, ByteBuffer count);
-
-  public static native int HALSetJoystickOutputs(byte joystickNum, int outputs, short leftRumble,
-                                                 short rightRumble);
-
-  public static native int HALGetJoystickIsXbox(byte joystickNum);
-
-  public static native int HALGetJoystickType(byte joystickNum);
-
-  public static native String HALGetJoystickName(byte joystickNum);
-
-  public static native int HALGetJoystickAxisType(byte joystickNum, byte axis);
-
-  public static native float HALGetMatchTime();
-
-  public static native boolean HALGetSystemActive();
-
-  public static native boolean HALGetBrownedOut();
-
-  public static native int HALSetErrorData(String error);
-
-  public static native int HALSendError(boolean isError, int errorCode, boolean isLVCode,
-                                        String details, String location, String callStack,
-                                        boolean printMsg);
 }

@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.communication;
+package edu.wpi.first.wpilibj.hal;
 
-public enum HALAllianceStationID {
+public enum AllianceStationID {
   Red1, Red2, Red3, Blue1, Blue2, Blue3
 }

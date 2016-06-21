@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -44,7 +44,7 @@ public abstract class AbstractComsSetup {
     if (!initialized) {
       // Set some implementations so that the static methods work properly
       RobotBase.initializeHardwareConfiguration();
-      FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+      HAL.observeUserProgramStarting();
 
       LiveWindow.setEnabled(false);
       TestBench.out().println("Started coms");

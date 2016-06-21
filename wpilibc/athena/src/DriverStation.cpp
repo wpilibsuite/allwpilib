@@ -88,11 +88,10 @@ void DriverStation::Run() {
       MotorSafetyHelper::CheckMotors();
       period = 0;
     }
-    if (m_userInDisabled) HAL_NetworkCommunicationObserveUserProgramDisabled();
-    if (m_userInAutonomous)
-      HAL_NetworkCommunicationObserveUserProgramAutonomous();
-    if (m_userInTeleop) HAL_NetworkCommunicationObserveUserProgramTeleop();
-    if (m_userInTest) HAL_NetworkCommunicationObserveUserProgramTest();
+    if (m_userInDisabled) HAL_ObserveUserProgramDisabled();
+    if (m_userInAutonomous) HAL_ObserveUserProgramAutonomous();
+    if (m_userInTeleop) HAL_ObserveUserProgramTeleop();
+    if (m_userInTest) HAL_ObserveUserProgramTest();
   }
 }
 
@@ -381,7 +380,6 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button) {
  */
 bool DriverStation::IsEnabled() const {
   HAL_ControlWord controlWord;
-  std::memset(&controlWord, 0, sizeof(controlWord));
   HAL_GetControlWord(&controlWord);
   return controlWord.enabled && controlWord.dsAttached;
 }
@@ -393,7 +391,6 @@ bool DriverStation::IsEnabled() const {
  */
 bool DriverStation::IsDisabled() const {
   HAL_ControlWord controlWord;
-  std::memset(&controlWord, 0, sizeof(controlWord));
   HAL_GetControlWord(&controlWord);
   return !(controlWord.enabled && controlWord.dsAttached);
 }
@@ -405,7 +402,6 @@ bool DriverStation::IsDisabled() const {
  */
 bool DriverStation::IsAutonomous() const {
   HAL_ControlWord controlWord;
-  std::memset(&controlWord, 0, sizeof(controlWord));
   HAL_GetControlWord(&controlWord);
   return controlWord.autonomous;
 }
@@ -417,7 +413,6 @@ bool DriverStation::IsAutonomous() const {
  */
 bool DriverStation::IsOperatorControl() const {
   HAL_ControlWord controlWord;
-  std::memset(&controlWord, 0, sizeof(controlWord));
   HAL_GetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
 }
@@ -440,7 +435,6 @@ bool DriverStation::IsTest() const {
  */
 bool DriverStation::IsDSAttached() const {
   HAL_ControlWord controlWord;
-  std::memset(&controlWord, 0, sizeof(controlWord));
   HAL_GetControlWord(&controlWord);
   return controlWord.dsAttached;
 }
@@ -505,8 +499,8 @@ bool DriverStation::IsFMSAttached() const {
  * @return The Alliance enum (kRed, kBlue or kInvalid)
  */
 DriverStation::Alliance DriverStation::GetAlliance() const {
-  HAL_AllianceStationID allianceStationID;
-  HAL_GetAllianceStation(&allianceStationID);
+  int32_t status = 0;
+  auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
     case HAL_AllianceStationID_kRed1:
     case HAL_AllianceStationID_kRed2:
@@ -529,8 +523,8 @@ DriverStation::Alliance DriverStation::GetAlliance() const {
  * @return The location of the driver station (1-3, 0 for invalid)
  */
 uint32_t DriverStation::GetLocation() const {
-  HAL_AllianceStationID allianceStationID;
-  HAL_GetAllianceStation(&allianceStationID);
+  int32_t status = 0;
+  auto allianceStationID = HAL_GetAllianceStation(&status);
   switch (allianceStationID) {
     case HAL_AllianceStationID_kRed1:
     case HAL_AllianceStationID_kBlue1:
@@ -578,9 +572,8 @@ void DriverStation::WaitForData() {
  * @return Time remaining in current match period (auto or teleop)
  */
 double DriverStation::GetMatchTime() const {
-  float matchTime;
-  HAL_GetMatchTime(&matchTime);
-  return (double)matchTime;
+  int32_t status;
+  return HAL_GetMatchTime(&status);
 }
 
 /**

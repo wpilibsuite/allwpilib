@@ -7,10 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -111,12 +110,13 @@ public class SampleRobot extends RobotBase {
    * for the robot to be enabled again.
    */
   public void startCompetition() {
-    UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Sample);
+    HAL.report(tResourceType.kResourceType_Framework,
+                                   tInstances.kFramework_Simple);
 
     robotInit();
 
     // Tell the DS that the robot is ready to be enabled
-    FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+    HAL.observeUserProgramStarting();
 
     robotMain();
     if (!m_robotMainOverridden) {

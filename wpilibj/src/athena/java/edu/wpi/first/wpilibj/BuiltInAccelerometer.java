@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AccelerometerJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -28,8 +28,7 @@ public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable {
    */
   public BuiltInAccelerometer(Range range) {
     setRange(range);
-    UsageReporting
-        .report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
+    HAL.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
     LiveWindow.addSensor("BuiltInAccel", 0, this);
   }
 

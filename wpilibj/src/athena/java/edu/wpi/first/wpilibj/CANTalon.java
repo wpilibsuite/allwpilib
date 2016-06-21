@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.CanTalonJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -872,7 +872,7 @@ public class CANTalon implements MotorSafety, PIDOutput, PIDSource, CANSpeedCont
     // Disable until set() is called.
     CanTalonJNI.SetModeSelect(m_handle, TalonControlMode.Disabled.value);
 
-    UsageReporting.report(tResourceType.kResourceType_CANTalonSRX, m_deviceNumber + 1,
+    HAL.report(tResourceType.kResourceType_CANTalonSRX, m_deviceNumber + 1,
         controlMode.value);
   }
 

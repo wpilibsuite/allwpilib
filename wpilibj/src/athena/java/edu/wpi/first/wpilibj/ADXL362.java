@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -110,7 +110,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     transferBuffer.put(2, (byte) (kPowerCtl_Measure | kPowerCtl_UltraLowNoise));
     m_spi.write(transferBuffer, 3);
 
-    UsageReporting.report(tResourceType.kResourceType_ADXL362, port.getValue());
+    HAL.report(tResourceType.kResourceType_ADXL362, port.getValue());
     LiveWindow.addSensor("ADXL362", port.getValue(), this);
   }
 

@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.communication;
+package edu.wpi.first.wpilibj.hal;
 
 /**
  * A wrapper for the HALControlWord bitfield.
  */
-public class HALControlWord {
+public class ControlWord {
   private final boolean m_enabled;
   private final boolean m_autonomous;
   private final boolean m_test;
@@ -18,8 +18,8 @@ public class HALControlWord {
   private final boolean m_fmsAttached;
   private final boolean m_dsAttached;
 
-  protected HALControlWord(boolean enabled, boolean autonomous, boolean test, boolean emergencyStop,
-                           boolean fmsAttached, boolean dsAttached) {
+  protected ControlWord(boolean enabled, boolean autonomous, boolean test, boolean emergencyStop,
+                        boolean fmsAttached, boolean dsAttached) {
     m_enabled = enabled;
     m_autonomous = autonomous;
     m_test = test;
@@ -51,6 +51,4 @@ public class HALControlWord {
   public boolean getDSAttached() {
     return m_dsAttached;
   }
-
-
 }
