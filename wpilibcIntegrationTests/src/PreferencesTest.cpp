@@ -12,8 +12,8 @@
 
 #include "gtest/gtest.h"
 
-#include "ntcore.h"
 #include "Timer.h"
+#include "ntcore.h"
 
 static const char* kFileName = "networktables.ini";
 static const double kSaveTime = 1.2;
