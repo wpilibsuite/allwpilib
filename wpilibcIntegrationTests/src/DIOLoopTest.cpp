@@ -50,7 +50,10 @@ class DIOLoopTest : public testing::Test {
  */
 TEST_F(DIOLoopTest, Loop) {
   Reset();
-
+  
+  // test code to see what a failure actually does.
+  int *foo = (int*)-1; // make a bad pointer
+  printf("%d\n", *foo);       // causes segfault
   m_output->Set(false);
   Wait(kDelayTime);
   EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "

@@ -31,7 +31,25 @@
 
 #include "gtest/gtest.h"
 
+#include <execinfo.h>
+
+// stack trace code found on StackOverflow at the following link
+// http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
+
 GTEST_API_ int main(int argc, char **argv) {
+  signal(SIGSEGV, handler);
   printf("Running main() from gtest_main.cc\n");
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

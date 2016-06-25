@@ -16,7 +16,7 @@ model {
                     dependsOn addNetworkTablesLibraryLinks
                 }
 
-                cppCompiler.args '-pthread', '-Wno-unused-variable'
+                cppCompiler.args '-pthread', '-Wno-unused-variable', '-rdynamic', '-g'
                 linker.args '-pthread', '-Wno-unused-variable', '-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a'
             }
             sources {
