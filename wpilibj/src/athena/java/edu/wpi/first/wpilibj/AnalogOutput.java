@@ -14,14 +14,12 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
  * Analog output class.
  */
 public class AnalogOutput extends SensorBase implements LiveWindowSendable {
-  private static Resource channels = new Resource(kAnalogOutputChannels);
-  private long m_port;
+  private int m_port;
   private int m_channel;
 
   /**
@@ -36,14 +34,10 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
       throw new AllocationException("Analog output channel " + m_channel
           + " cannot be allocated. Channel is not present.");
     }
-    try {
-      channels.allocate(channel);
-    } catch (CheckedAllocationException ex) {
-      throw new AllocationException("Analog output channel " + m_channel + " is already allocated");
-    }
 
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);
+    AnalogJNI.freePort(portHandle);
 
     LiveWindow.addSensor("AnalogOutput", channel, this);
     UsageReporting.report(tResourceType.kResourceType_AnalogOutput, channel);
@@ -55,7 +49,6 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
   public void free() {
     AnalogJNI.freeAnalogOutputPort(m_port);
     m_port = 0;
-    channels.free(m_channel);
     m_channel = 0;
   }
 
