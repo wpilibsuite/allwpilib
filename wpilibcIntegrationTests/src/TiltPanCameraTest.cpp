@@ -59,6 +59,9 @@ class TiltPanCameraTest : public testing::Test {
   void DefaultGyroAngle();
   void GyroAngle();
   void GyroCalibratedParameters();
+  void DeviationOverTime();
+  
+  bool WaitForStableGyro(double timeout);
 
   void TearDown() override {
     delete m_tilt;
@@ -69,10 +72,36 @@ class TiltPanCameraTest : public testing::Test {
 
 AnalogGyro* TiltPanCameraTest::m_gyro = nullptr;
 
+bool TiltPanCameraTest::WaitForStableGyro(double timeout) {
+  int count = 0;
+  
+  // Allow 2 degrees per second of tolerance
+  static constexpr double tolerance = 2.0;
+  // Require 5 samples to be within tolerance
+  static constexpr int toleranceCount = 5;
+  
+  // 50 samples per second (0.02 seconds);
+  int numberOfLoops = static_cast<int>(timeout * 50);
+  for (int i = 0; i < numberOfLoops; i++) {
+    double rate = m_gyro->GetRate();
+    if (rate <= tolerance && rate >= -tolerance)
+      count++;
+    else 
+      count = 0;
+    if (count > toleranceCount)
+      // Gyro stopped moving
+      return true;
+  }
+  // Gyro still moving
+  return false;
+}
+
 /**
  * Test if the gyro angle defaults to 0 immediately after being reset.
  */
 void TiltPanCameraTest::DefaultGyroAngle() {
+  EXPECT_TRUE(WaitForStableGyro(2.0));
+  m_gyro->Reset();
   EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
 }
 
@@ -85,7 +114,7 @@ void TiltPanCameraTest::DefaultGyroAngle() {
 void TiltPanCameraTest::GyroAngle() {
   // Make sure that the gyro doesn't get jerked when the servo goes to zero.
   m_pan->SetAngle(0.0);
-  Wait(0.5);
+  EXPECT_TRUE(WaitForStableGyro(2.0));
   m_gyro->Reset();
 
   for (int32_t i = 0; i < 600; i++) {
@@ -93,6 +122,7 @@ void TiltPanCameraTest::GyroAngle() {
     Wait(0.001);
   }
 
+  EXPECT_TRUE(WaitForStableGyro(5.0));
   double gyroAngle = m_gyro->GetAngle();
 
   EXPECT_NEAR(gyroAngle, kTestAngle, 10.0)
@@ -114,6 +144,7 @@ void TiltPanCameraTest::GyroCalibratedParameters() {
 
   // Default gyro angle test
   // Accumulator needs a small amount of time to reset before being tested
+  EXPECT_TRUE(WaitForStableGyro(5.0));
   m_gyro->Reset();
   Wait(.001);
   EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
@@ -129,11 +160,40 @@ void TiltPanCameraTest::GyroCalibratedParameters() {
     Wait(0.001);
   }
 
+  EXPECT_TRUE(WaitForStableGyro(5.0));
   double gyroAngle = m_gyro->GetAngle();
 
   EXPECT_NEAR(gyroAngle, kTestAngle, 10.0)
       << "Gyro measured " << gyroAngle << " degrees, servo should have turned "
       << kTestAngle << " degrees";
+
+  // DeviationOverTime
+  // Make sure that the test isn't influenced by any previous motions
+  EXPECT_TRUE(WaitForStableGyro(5.0));
+  m_gyro->Reset();
+  Wait(0.15);
+  EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
+  Wait(5.0);
+  gyroAngle = m_gyro->GetAngle();
+
+  EXPECT_NEAR(gyroAngle, 0.0, 2.0) << "Gyro measured " << gyroAngle
+                                   << " degrees, but should be 0";
+}
+
+/**
+ * Tests to see if the deviation over time is within parameters.
+ */
+void TiltPanCameraTest::DeviationOverTime() {
+  // Make sure that the test isn't influenced by any previous motions
+  EXPECT_TRUE(WaitForStableGyro(5.0));
+  m_gyro->Reset();
+  Wait(0.15);
+  EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
+  Wait(5.0);
+  double gyroAngle = m_gyro->GetAngle();
+
+  EXPECT_NEAR(gyroAngle, 0.0, 2.0) << "Gyro measured " << gyroAngle
+                                   << " degrees, but should be 0";
 }
 
 /**
@@ -142,6 +202,7 @@ void TiltPanCameraTest::GyroCalibratedParameters() {
 TEST_F(TiltPanCameraTest, TestAllGyroTests) {
   DefaultGyroAngle();
   GyroAngle();
+  DeviationOverTime();
   GyroCalibratedParameters();
 }
 

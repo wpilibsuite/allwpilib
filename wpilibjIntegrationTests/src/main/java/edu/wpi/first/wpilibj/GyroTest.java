@@ -55,9 +55,13 @@ public class GyroTest extends AbstractComsSetup {
     testGyroAngleCalibratedParameters();
   }
 
+  /**
+   * Tests to see that the gyro is properly reset to 0.
+   */
   public void testInitial(AnalogGyro gyro) {
+    gyro.reset();
     double angle = gyro.getAngle();
-    assertEquals(errorMessage(angle, 0), 0, angle, .5);
+    assertEquals(errorMessage(angle, 0), 0, angle, 1.0);
   }
 
   /**
@@ -98,9 +102,9 @@ public class GyroTest extends AbstractComsSetup {
     // Make sure that the test isn't influenced by any previous motions.
     Timer.delay(0.5);
     gyro.reset();
-    Timer.delay(0.25);
+    Timer.delay(0.15);
     double angle = gyro.getAngle();
-    assertEquals(errorMessage(angle, 0), 0, angle, .5);
+    assertEquals(errorMessage(angle, 0), 0, angle, 1.0);
     Timer.delay(5);
     angle = gyro.getAngle();
     assertEquals("After 5 seconds " + errorMessage(angle, 0), 0, angle, 2.0);
