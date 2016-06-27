@@ -11,8 +11,6 @@
 
 #include "Handles.h"
 
-typedef HalHandle HalAnalogOutputHandle;
-
 extern "C" {
 HalAnalogOutputHandle initializeAnalogOutputPort(HalPortHandle port_handle,
                                                  int32_t* status);

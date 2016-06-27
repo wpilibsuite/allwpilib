@@ -14,3 +14,9 @@
 typedef int32_t HalHandle;
 
 typedef HalHandle HalPortHandle;
+
+typedef HalHandle HalInterruptHandle;
+
+typedef HalHandle HalNotifierHandle;
+
+typedef HalHandle HalAnalogOutputHandle;

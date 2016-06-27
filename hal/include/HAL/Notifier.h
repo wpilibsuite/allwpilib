@@ -11,8 +11,6 @@
 
 #include "Handles.h"
 
-typedef HalHandle HalNotifierHandle;
-
 extern "C" {
 HalNotifierHandle initializeNotifier(void (*process)(uint64_t, void*),
                                      void* param, int32_t* status);
