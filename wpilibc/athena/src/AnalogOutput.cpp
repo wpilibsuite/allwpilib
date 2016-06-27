@@ -8,13 +8,10 @@
 #include "AnalogOutput.h"
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
-#include "Resource.h"
 #include "WPIErrors.h"
 
 #include <limits>
 #include <sstream>
-
-static std::unique_ptr<Resource> outputs;
 
 /**
  * Construct an analog output on the given channel.
@@ -24,23 +21,13 @@ static std::unique_ptr<Resource> outputs;
  * @param channel The channel number on the roboRIO to represent.
  */
 AnalogOutput::AnalogOutput(uint32_t channel) {
-  Resource::CreateResourceObject(outputs, kAnalogOutputs);
-
   std::stringstream buf;
   buf << "analog input " << channel;
 
   if (!checkAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     m_channel = std::numeric_limits<uint32_t>::max();
-    m_port = nullptr;
-    return;
-  }
-
-  if (outputs->Allocate(channel, buf.str()) ==
-      std::numeric_limits<uint32_t>::max()) {
-    CloneError(*outputs);
-    m_channel = std::numeric_limits<uint32_t>::max();
-    m_port = nullptr;
+    m_port = HAL_INVALID_HANDLE;
     return;
   }
 
@@ -49,8 +36,13 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
   HalPortHandle port = getPort(m_channel);
   int32_t status = 0;
   m_port = initializeAnalogOutputPort(port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
   freePort(port);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    m_channel = std::numeric_limits<uint32_t>::max();
+    m_port = HAL_INVALID_HANDLE;
+    return;
+  }
 
   LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
@@ -61,10 +53,7 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
  *
  * Frees analog output resource.
  */
-AnalogOutput::~AnalogOutput() {
-  freeAnalogOutputPort(m_port);
-  outputs->Free(m_channel);
-}
+AnalogOutput::~AnalogOutput() { freeAnalogOutputPort(m_port); }
 
 /**
  * Set the value of the analog output.

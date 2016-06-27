@@ -11,11 +11,15 @@
 
 #include "Handles.h"
 
+typedef HalHandle HalAnalogOutputHandle;
+
 extern "C" {
-void* initializeAnalogOutputPort(HalPortHandle port_handle, int32_t* status);
-void freeAnalogOutputPort(void* analog_port_pointer);
-void setAnalogOutput(void* analog_port_pointer, double voltage,
+HalAnalogOutputHandle initializeAnalogOutputPort(HalPortHandle port_handle,
+                                                 int32_t* status);
+void freeAnalogOutputPort(HalAnalogOutputHandle analog_output_handle);
+void setAnalogOutput(HalAnalogOutputHandle analog_output_handle, double voltage,
                      int32_t* status);
-double getAnalogOutput(void* analog_port_pointer, int32_t* status);
+double getAnalogOutput(HalAnalogOutputHandle analog_output_handle,
+                       int32_t* status);
 bool checkAnalogOutputChannel(uint32_t pin);
 }

@@ -37,9 +37,9 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native void freeAnalogInputPort(long portPointer);
 
-  public static native long initializeAnalogOutputPort(int halPortHandle);
+  public static native int initializeAnalogOutputPort(int halPortHandle);
 
-  public static native void freeAnalogOutputPort(long portPointer);
+  public static native void freeAnalogOutputPort(int portHandle);
 
   public static native boolean checkAnalogModule(byte module);
 
@@ -47,9 +47,9 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native boolean checkAnalogOutputChannel(int pin);
 
-  public static native void setAnalogOutput(long portPointer, double voltage);
+  public static native void setAnalogOutput(int portHandle, double voltage);
 
-  public static native double getAnalogOutput(long portPointer);
+  public static native double getAnalogOutput(int portHandle);
 
   public static native void setAnalogSampleRate(double samplesPerSecond);
 

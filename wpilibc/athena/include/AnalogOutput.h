@@ -11,6 +11,7 @@
 
 #include <memory>
 
+#include "HAL/AnalogOutput.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 
@@ -34,7 +35,7 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
 
  protected:
   uint32_t m_channel;
-  void* m_port;
+  HalAnalogOutputHandle m_port;
 
   std::shared_ptr<ITable> m_table;
 };

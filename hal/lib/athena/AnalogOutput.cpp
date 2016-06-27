@@ -10,37 +10,55 @@
 #include "AnalogInternal.h"
 #include "HAL/Errors.h"
 #include "handles/HandlesInternal.h"
+#include "handles/IndexedHandleResource.h"
 
 using namespace hal;
+
+namespace {
+struct AnalogOutput {
+  uint8_t pin;
+};
+}
+
+static IndexedHandleResource<HalAnalogOutputHandle, AnalogOutput,
+                             kAnalogOutputPins, HalHandleEnum::AnalogOutput>
+    analogOutputHandles;
 
 extern "C" {
 
 /**
  * Initialize the analog output port using the given port object.
  */
-void* initializeAnalogOutputPort(HalPortHandle port_handle, int32_t* status) {
+HalAnalogOutputHandle initializeAnalogOutputPort(HalPortHandle port_handle,
+                                                 int32_t* status) {
   initializeAnalog(status);
 
-  if (*status != 0) return nullptr;
+  if (*status != 0) return HAL_INVALID_HANDLE;
 
   int16_t pin = getPortHandlePin(port_handle);
   if (pin == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return nullptr;
+    return HAL_INVALID_HANDLE;
   }
 
-  // Initialize port structure
-  AnalogPort* analog_port = new AnalogPort();
-  analog_port->pin = (uint8_t)pin;
-  analog_port->accumulator = nullptr;
-  return analog_port;
+  HalAnalogOutputHandle handle = analogOutputHandles.Allocate(pin, status);
+
+  if (*status != 0)
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
+
+  auto port = analogOutputHandles.Get(handle);
+  if (port == nullptr) {  // would only error on thread issue
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+
+  port->pin = static_cast<uint8_t>(pin);
+  return handle;
 }
 
-void freeAnalogOutputPort(void* analog_port_pointer) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
-  if (!port) return;
-  delete port->accumulator;
-  delete port;
+void freeAnalogOutputPort(HalAnalogOutputHandle analog_output_handle) {
+  // no status, so no need to check for a proper free.
+  analogOutputHandles.Free(analog_output_handle);
 }
 
 /**
@@ -55,9 +73,13 @@ bool checkAnalogOutputChannel(uint32_t pin) {
   return false;
 }
 
-void setAnalogOutput(void* analog_port_pointer, double voltage,
+void setAnalogOutput(HalAnalogOutputHandle analog_output_handle, double voltage,
                      int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+  auto port = analogOutputHandles.Get(analog_output_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
 
   uint16_t rawValue = (uint16_t)(voltage / 5.0 * 0x1000);
 
@@ -69,8 +91,13 @@ void setAnalogOutput(void* analog_port_pointer, double voltage,
   analogOutputSystem->writeMXP(port->pin, rawValue, status);
 }
 
-double getAnalogOutput(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+double getAnalogOutput(HalAnalogOutputHandle analog_output_handle,
+                       int32_t* status) {
+  auto port = analogOutputHandles.Get(analog_output_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
 
   uint16_t rawValue = analogOutputSystem->readMXP(port->pin, status);
 
