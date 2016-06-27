@@ -26,7 +26,6 @@ AnalogTrigger::AnalogTrigger(int32_t channel) {
   uint32_t index = 0;
   m_trigger = initializeAnalogTrigger(port, &index, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  freePort(port);
   m_index = index;
 
   HALReport(HALUsageReporting::kResourceType_AnalogTrigger, channel);

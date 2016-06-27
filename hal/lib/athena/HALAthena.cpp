@@ -54,10 +54,6 @@ HalPortHandle getPortWithModule(uint8_t module, uint8_t pin) {
   return createPortHandle(pin, module);
 }
 
-void freePort(HalPortHandle port_handle) {
-  // noop
-}
-
 const char* getHALErrorMessage(int32_t code) {
   switch (code) {
     case 0:

@@ -45,19 +45,4 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_JNIWrapper_getPort(
   // FILE_LOG(logDEBUG) << "Port Handle = " << port;
   return (jint)port;
 }
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_JNIWrapper
- * Method:    freePort
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_JNIWrapper_freePort(
-    JNIEnv* env, jclass, jint id) {
-  // FILE_LOG(logDEBUG) << "Calling JNIWrapper getPortWithModlue";
-  // FILE_LOG(logDEBUG) << "Module = " << (jint)module;
-  // FILE_LOG(logDEBUG) << "Pin = " << (jint)pin;
-  freePort((HalPortHandle)id);
-  // FILE_LOG(logDEBUG) << "Port Handle = " << port;
-}
-
 }  // extern "C"

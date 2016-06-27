@@ -25,7 +25,6 @@ SolenoidBase::SolenoidBase(uint8_t moduleNumber)
     SolenoidBase::m_ports[moduleNumber][i] =
         initializeSolenoidPort(port, &status);
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
-    freePort(port);
   }
 }
 

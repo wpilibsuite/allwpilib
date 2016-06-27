@@ -35,7 +35,6 @@ SensorBase::SensorBase() {
       int32_t status = 0;
       m_digital_ports[i] = initializeDigitalPort(port, &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
-      freePort(port);
     }
 
     for (uint32_t i = 0; i < kRelayChannels; i++) {
@@ -43,7 +42,6 @@ SensorBase::SensorBase() {
       int32_t status = 0;
       m_relay_ports[i] = initializeDigitalPort(port, &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
-      freePort(port);
     }
 
     for (uint32_t i = 0; i < kPwmChannels; i++) {
@@ -51,7 +49,6 @@ SensorBase::SensorBase() {
       int32_t status = 0;
       m_pwm_ports[i] = initializeDigitalPort(port, &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
-      freePort(port);
     }
   }
 }

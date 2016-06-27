@@ -110,7 +110,6 @@ extern const uint32_t kSystemClockTicksPerMicrosecond;
 
 HalPortHandle getPort(uint8_t pin);
 HalPortHandle getPortWithModule(uint8_t module, uint8_t pin);
-void freePort(HalPortHandle port);
 const char* getHALErrorMessage(int32_t code);
 
 uint16_t getFPGAVersion(int32_t* status);
