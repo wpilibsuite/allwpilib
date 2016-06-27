@@ -14,8 +14,6 @@
 
 #include <sstream>
 
-static std::unique_ptr<Resource> inputs;
-
 const uint8_t AnalogInput::kAccumulatorModuleNumber;
 const uint32_t AnalogInput::kAccumulatorNumChannels;
 const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
@@ -29,16 +27,9 @@ const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
 AnalogInput::AnalogInput(uint32_t channel) {
   std::stringstream buf;
   buf << "Analog Input " << channel;
-  Resource::CreateResourceObject(inputs, kAnalogInputs);
 
   if (!checkAnalogInputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
-    return;
-  }
-
-  if (inputs->Allocate(channel, buf.str()) ==
-      std::numeric_limits<uint32_t>::max()) {
-    CloneError(*inputs);
     return;
   }
 
@@ -47,7 +38,12 @@ AnalogInput::AnalogInput(uint32_t channel) {
   HalPortHandle port = getPort(channel);
   int32_t status = 0;
   m_port = initializeAnalogInputPort(port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    m_channel = std::numeric_limits<uint32_t>::max();
+    m_port = HAL_INVALID_HANDLE;
+    return;
+  }
 
   LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
@@ -58,7 +54,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
  */
 AnalogInput::~AnalogInput() {
   freeAnalogInputPort(m_port);
-  inputs->Free(m_channel);
+  m_port = HAL_INVALID_HANDLE;
 }
 
 /**

@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
  * Analog channel class.
@@ -34,8 +33,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSendable {
 
   private static final int kAccumulatorSlot = 1;
-  private static Resource channels = new Resource(kAnalogInputChannels);
-  private long m_port;
+  int m_port; // explicit no modifier, private and package accessable.
   private int m_channel;
   private static final int[] kAccumulatorChannels = {0, 1};
   private long m_accumulatorOffset;
@@ -53,11 +51,6 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
       throw new AllocationException("Analog input channel " + m_channel
           + " cannot be allocated. Channel is not present.");
     }
-    try {
-      channels.allocate(channel);
-    } catch (CheckedAllocationException ex) {
-      throw new AllocationException("Analog input channel " + m_channel + " is already allocated");
-    }
 
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
@@ -72,7 +65,6 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
   public void free() {
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
-    channels.free(m_channel);
     m_channel = 0;
     m_accumulatorOffset = 0;
   }

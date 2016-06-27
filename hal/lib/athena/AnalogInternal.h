@@ -11,6 +11,7 @@
 
 #include "ChipObject.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "handles/IndexedHandleResource.h"
 
 namespace hal {
 constexpr long kTimebase = 40000000;  ///< 40 MHz clock
@@ -30,6 +31,10 @@ struct AnalogPort {
   uint8_t pin;
   tAccumulator* accumulator;
 };
+
+extern IndexedHandleResource<HalAnalogInputHandle, hal::AnalogPort,
+                             kAnalogInputPins, HalHandleEnum::AnalogInput>
+    analogInputHandles;
 
 uint32_t getAnalogNumActiveChannels(int32_t* status);
 uint32_t getAnalogNumChannelsToActivate(int32_t* status);

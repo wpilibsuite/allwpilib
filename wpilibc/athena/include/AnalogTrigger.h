@@ -8,6 +8,7 @@
 #pragma once
 
 #include "AnalogTriggerOutput.h"
+#include "HAL/Handles.h"
 #include "SensorBase.h"
 
 class AnalogInput;
@@ -32,5 +33,7 @@ class AnalogTrigger : public SensorBase {
 
  private:
   uint8_t m_index;
-  void* m_trigger;
+  HalAnalogTriggerHandle m_trigger;
+  AnalogInput* m_analogInput = nullptr;
+  bool m_ownsAnalog = false;
 };

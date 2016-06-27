@@ -18,8 +18,13 @@ extern "C" {
 *
 *@return The analog channel is attached to an accumulator.
 */
-bool isAccumulatorChannel(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+bool isAccumulatorChannel(HalAnalogInputHandle analog_port_handle,
+                          int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
   for (uint32_t i = 0; i < kAccumulatorNumChannels; i++) {
     if (port->pin == kAccumulatorChannels[i]) return true;
   }
@@ -29,16 +34,21 @@ bool isAccumulatorChannel(void* analog_port_pointer, int32_t* status) {
 /**
  * Initialize the accumulator.
  */
-void initAccumulator(void* analog_port_pointer, int32_t* status) {
-  setAccumulatorCenter(analog_port_pointer, 0, status);
-  resetAccumulator(analog_port_pointer, status);
+void initAccumulator(HalAnalogInputHandle analog_port_handle, int32_t* status) {
+  setAccumulatorCenter(analog_port_handle, 0, status);
+  resetAccumulator(analog_port_handle, status);
 }
 
 /**
  * Resets the accumulator to the initial value.
  */
-void resetAccumulator(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+void resetAccumulator(HalAnalogInputHandle analog_port_handle,
+                      int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return;
@@ -58,9 +68,13 @@ void resetAccumulator(void* analog_port_pointer, int32_t* status) {
  * source from channel 1. Because of this, any non-zero oversample bits will
  * affect the size of the value for this field.
  */
-void setAccumulatorCenter(void* analog_port_pointer, int32_t center,
-                          int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+void setAccumulatorCenter(HalAnalogInputHandle analog_port_handle,
+                          int32_t center, int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return;
@@ -71,9 +85,13 @@ void setAccumulatorCenter(void* analog_port_pointer, int32_t center,
 /**
  * Set the accumulator's deadband.
  */
-void setAccumulatorDeadband(void* analog_port_pointer, int32_t deadband,
-                            int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+void setAccumulatorDeadband(HalAnalogInputHandle analog_port_handle,
+                            int32_t deadband, int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return;
@@ -89,8 +107,13 @@ void setAccumulatorDeadband(void* analog_port_pointer, int32_t deadband,
  *
  * @return The 64-bit value accumulated since the last Reset().
  */
-int64_t getAccumulatorValue(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+int64_t getAccumulatorValue(HalAnalogInputHandle analog_port_handle,
+                            int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0;
+  }
   if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return 0;
@@ -107,8 +130,13 @@ int64_t getAccumulatorValue(void* analog_port_pointer, int32_t* status) {
  *
  * @return The number of times samples from the channel were accumulated.
  */
-uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+uint32_t getAccumulatorCount(HalAnalogInputHandle analog_port_handle,
+                             int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0;
+  }
   if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return 0;
@@ -125,9 +153,13 @@ uint32_t getAccumulatorCount(void* analog_port_pointer, int32_t* status) {
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
-void getAccumulatorOutput(void* analog_port_pointer, int64_t* value,
-                          uint32_t* count, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+void getAccumulatorOutput(HalAnalogInputHandle analog_port_handle,
+                          int64_t* value, uint32_t* count, int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   if (port->accumulator == nullptr) {
     *status = NULL_PARAMETER;
     return;
