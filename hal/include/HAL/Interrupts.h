@@ -11,8 +11,6 @@
 
 #include "Handles.h"
 
-typedef HalHandle HalInterruptHandle;
-
 extern "C" {
 typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask,
                                          void* param);
