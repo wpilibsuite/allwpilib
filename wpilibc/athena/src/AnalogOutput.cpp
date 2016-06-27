@@ -36,7 +36,6 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
   HalPortHandle port = getPort(m_channel);
   int32_t status = 0;
   m_port = initializeAnalogOutputPort(port, &status);
-  freePort(port);
   if (status != 0) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
     m_channel = std::numeric_limits<uint32_t>::max();

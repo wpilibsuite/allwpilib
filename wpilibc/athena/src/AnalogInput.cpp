@@ -48,7 +48,6 @@ AnalogInput::AnalogInput(uint32_t channel) {
   int32_t status = 0;
   m_port = initializeAnalogInputPort(port, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  freePort(port);
 
   LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);

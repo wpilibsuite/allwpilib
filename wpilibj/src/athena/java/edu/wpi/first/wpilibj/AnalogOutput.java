@@ -37,7 +37,6 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
 
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);
-    AnalogJNI.freePort(portHandle);
 
     LiveWindow.addSensor("AnalogOutput", channel, this);
     UsageReporting.report(tResourceType.kResourceType_AnalogOutput, channel);
