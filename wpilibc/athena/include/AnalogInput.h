@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "HAL/Handles.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
@@ -28,6 +29,8 @@
 class AnalogInput : public SensorBase,
                     public PIDSource,
                     public LiveWindowSendable {
+  friend class AnalogTrigger;
+
  public:
   static const uint8_t kAccumulatorModuleNumber = 1;
   static const uint32_t kAccumulatorNumChannels = 2;
@@ -77,7 +80,7 @@ class AnalogInput : public SensorBase,
  private:
   uint32_t m_channel;
   // TODO: Adjust HAL to avoid use of raw pointers.
-  void* m_port;
+  HalAnalogInputHandle m_port;
   int64_t m_accumulatorOffset;
 
   std::shared_ptr<ITable> m_table;

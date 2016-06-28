@@ -24,37 +24,48 @@ extern "C" {
 /**
  * Initialize the analog input port using the given port object.
  */
-void* initializeAnalogInputPort(HalPortHandle port_handle, int32_t* status) {
+HalAnalogInputHandle initializeAnalogInputPort(HalPortHandle port_handle,
+                                               int32_t* status) {
   initializeAnalog(status);
 
-  if (*status != 0) return nullptr;
+  if (*status != 0) return HAL_INVALID_HANDLE;
 
   int16_t pin = getPortHandlePin(port_handle);
   if (pin == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return nullptr;
+    return HAL_INVALID_HANDLE;
   }
 
+  HalAnalogInputHandle handle = analogInputHandles.Allocate(pin, status);
+
+  if (*status != 0)
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
+
   // Initialize port structure
-  AnalogPort* analog_port = new AnalogPort();
-  analog_port->pin = (uint8_t)pin;
-  if (isAccumulatorChannel(analog_port, status)) {
+  auto analog_port = analogInputHandles.Get(handle);
+  if (analog_port == nullptr) {  // would only error on thread issue
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+  analog_port->pin = static_cast<uint8_t>(pin);
+  if (isAccumulatorChannel(handle, status)) {
     analog_port->accumulator = tAccumulator::create(pin, status);
   } else
     analog_port->accumulator = nullptr;
 
   // Set default configuration
   analogInputSystem->writeScanList(pin, pin, status);
-  setAnalogAverageBits(analog_port, kDefaultAverageBits, status);
-  setAnalogOversampleBits(analog_port, kDefaultOversampleBits, status);
-  return analog_port;
+  setAnalogAverageBits(handle, kDefaultAverageBits, status);
+  setAnalogOversampleBits(handle, kDefaultOversampleBits, status);
+  return handle;
 }
 
-void freeAnalogInputPort(void* analog_port_pointer) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+void freeAnalogInputPort(HalAnalogInputHandle analog_port_handle) {
+  auto port = analogInputHandles.Get(analog_port_handle);
   if (!port) return;
+  // no status, so no need to check for a proper free.
+  analogInputHandles.Free(analog_port_handle);
   delete port->accumulator;
-  delete port;
 }
 
 /**
@@ -135,9 +146,13 @@ float getAnalogSampleRate(int32_t* status) {
  * @param analog_port_pointer Pointer to the analog port to configure.
  * @param bits Number of bits to average.
  */
-void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits,
-                          int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+void setAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
+                          uint32_t bits, int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   analogInputSystem->writeAverageBits(port->pin, bits, status);
 }
 
@@ -150,8 +165,13 @@ void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Bits to average.
  */
-uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+uint32_t getAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
+                              int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return kDefaultAverageBits;
+  }
   uint32_t result = analogInputSystem->readAverageBits(port->pin, status);
   return result;
 }
@@ -167,9 +187,13 @@ uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t* status) {
  * @param analog_port_pointer Pointer to the analog port to use.
  * @param bits Number of bits to oversample.
  */
-void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits,
-                             int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+void setAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
+                             uint32_t bits, int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   analogInputSystem->writeOversampleBits(port->pin, bits, status);
 }
 
@@ -183,8 +207,13 @@ void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Bits to oversample.
  */
-uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+uint32_t getAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
+                                 int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return kDefaultOversampleBits;
+  }
   uint32_t result = analogInputSystem->readOversampleBits(port->pin, status);
   return result;
 }
@@ -199,8 +228,13 @@ uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t* status) {
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A sample straight from the channel on this module.
  */
-int16_t getAnalogValue(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+int16_t getAnalogValue(HalAnalogInputHandle analog_port_handle,
+                       int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0;
+  }
   int16_t value;
   if (!checkAnalogInputChannel(port->pin)) {
     return 0;
@@ -234,8 +268,13 @@ int16_t getAnalogValue(void* analog_port_pointer, int32_t* status) {
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A sample from the oversample and average engine for the channel.
  */
-int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+int32_t getAnalogAverageValue(HalAnalogInputHandle analog_port_handle,
+                              int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0;
+  }
   int32_t value;
   if (!checkAnalogInputChannel(port->pin)) {
     return 0;
@@ -264,10 +303,11 @@ int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t* status) {
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A scaled sample straight from the channel on this module.
  */
-float getAnalogVoltage(void* analog_port_pointer, int32_t* status) {
-  int16_t value = getAnalogValue(analog_port_pointer, status);
-  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_pointer, status);
-  int32_t offset = getAnalogOffset(analog_port_pointer, status);
+float getAnalogVoltage(HalAnalogInputHandle analog_port_handle,
+                       int32_t* status) {
+  int16_t value = getAnalogValue(analog_port_handle, status);
+  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_handle, status);
+  int32_t offset = getAnalogOffset(analog_port_handle, status);
   float voltage = LSBWeight * 1.0e-9 * value - offset * 1.0e-9;
   return voltage;
 }
@@ -285,12 +325,12 @@ float getAnalogVoltage(void* analog_port_pointer, int32_t* status) {
  * @return A scaled sample from the output of the oversample and average engine
  * for the channel.
  */
-float getAnalogAverageVoltage(void* analog_port_pointer, int32_t* status) {
-  int32_t value = getAnalogAverageValue(analog_port_pointer, status);
-  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_pointer, status);
-  int32_t offset = getAnalogOffset(analog_port_pointer, status);
-  uint32_t oversampleBits =
-      getAnalogOversampleBits(analog_port_pointer, status);
+float getAnalogAverageVoltage(HalAnalogInputHandle analog_port_handle,
+                              int32_t* status) {
+  int32_t value = getAnalogAverageValue(analog_port_handle, status);
+  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_handle, status);
+  int32_t offset = getAnalogOffset(analog_port_handle, status);
+  uint32_t oversampleBits = getAnalogOversampleBits(analog_port_handle, status);
   float voltage =
       ((LSBWeight * 1.0e-9 * value) / (float)(1 << oversampleBits)) -
       offset * 1.0e-9;
@@ -309,8 +349,8 @@ float getAnalogAverageVoltage(void* analog_port_pointer, int32_t* status) {
  * @param voltage The voltage to convert.
  * @return The raw value for the channel.
  */
-int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage,
-                              int32_t* status) {
+int32_t getAnalogVoltsToValue(HalAnalogInputHandle analog_port_handle,
+                              double voltage, int32_t* status) {
   if (voltage > 5.0) {
     voltage = 5.0;
     *status = VOLTAGE_OUT_OF_RANGE;
@@ -319,8 +359,8 @@ int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage,
     voltage = 0.0;
     *status = VOLTAGE_OUT_OF_RANGE;
   }
-  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_pointer, status);
-  int32_t offset = getAnalogOffset(analog_port_pointer, status);
+  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_handle, status);
+  int32_t offset = getAnalogOffset(analog_port_handle, status);
   int32_t value = (int32_t)((voltage + offset * 1.0e-9) / (LSBWeight * 1.0e-9));
   return value;
 }
@@ -335,8 +375,13 @@ int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Least significant bit weight.
  */
-uint32_t getAnalogLSBWeight(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+uint32_t getAnalogLSBWeight(HalAnalogInputHandle analog_port_handle,
+                            int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0;
+  }
   uint32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
       0, port->pin, status);  // XXX: aiSystemIndex == 0?
   return lsbWeight;
@@ -352,8 +397,13 @@ uint32_t getAnalogLSBWeight(void* analog_port_pointer, int32_t* status) {
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Offset constant.
  */
-int32_t getAnalogOffset(void* analog_port_pointer, int32_t* status) {
-  AnalogPort* port = (AnalogPort*)analog_port_pointer;
+int32_t getAnalogOffset(HalAnalogInputHandle analog_port_handle,
+                        int32_t* status) {
+  auto port = analogInputHandles.Get(analog_port_handle);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0;
+  }
   int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
       0, port->pin, status);  // XXX: aiSystemIndex == 0?
   return offset;

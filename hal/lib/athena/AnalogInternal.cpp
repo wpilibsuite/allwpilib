@@ -15,6 +15,11 @@ namespace hal {
 priority_recursive_mutex analogRegisterWindowMutex;
 tAI* analogInputSystem = nullptr;
 tAO* analogOutputSystem = nullptr;
+
+IndexedHandleResource<HalAnalogInputHandle, hal::AnalogPort, kAnalogInputPins,
+                      HalHandleEnum::AnalogInput>
+    analogInputHandles;
+
 static uint32_t analogNumChannelsToActivate = 0;
 
 bool analogSystemInitialized = false;

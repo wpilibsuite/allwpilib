@@ -19,20 +19,23 @@ enum AnalogTriggerType {
 };
 
 extern "C" {
-void* initializeAnalogTrigger(HalPortHandle port_handle, uint32_t* index,
-                              int32_t* status);
-void cleanAnalogTrigger(void* analog_trigger_pointer, int32_t* status);
-void setAnalogTriggerLimitsRaw(void* analog_trigger_pointer, int32_t lower,
-                               int32_t upper, int32_t* status);
-void setAnalogTriggerLimitsVoltage(void* analog_trigger_pointer, double lower,
-                                   double upper, int32_t* status);
-void setAnalogTriggerAveraged(void* analog_trigger_pointer,
+HalAnalogTriggerHandle initializeAnalogTrigger(HalAnalogInputHandle port_handle,
+                                               uint32_t* index,
+                                               int32_t* status);
+void cleanAnalogTrigger(HalAnalogTriggerHandle analog_trigger_handle,
+                        int32_t* status);
+void setAnalogTriggerLimitsRaw(HalAnalogTriggerHandle analog_trigger_handle,
+                               int32_t lower, int32_t upper, int32_t* status);
+void setAnalogTriggerLimitsVoltage(HalAnalogTriggerHandle analog_trigger_handle,
+                                   double lower, double upper, int32_t* status);
+void setAnalogTriggerAveraged(HalAnalogTriggerHandle analog_trigger_handle,
                               bool useAveragedValue, int32_t* status);
-void setAnalogTriggerFiltered(void* analog_trigger_pointer,
+void setAnalogTriggerFiltered(HalAnalogTriggerHandle analog_trigger_handle,
                               bool useFilteredValue, int32_t* status);
-bool getAnalogTriggerInWindow(void* analog_trigger_pointer, int32_t* status);
-bool getAnalogTriggerTriggerState(void* analog_trigger_pointer,
+bool getAnalogTriggerInWindow(HalAnalogTriggerHandle analog_trigger_handle,
+                              int32_t* status);
+bool getAnalogTriggerTriggerState(HalAnalogTriggerHandle analog_trigger_handle,
                                   int32_t* status);
-bool getAnalogTriggerOutput(void* analog_trigger_pointer,
+bool getAnalogTriggerOutput(HalAnalogTriggerHandle analog_trigger_handle,
                             AnalogTriggerType type, int32_t* status);
 }

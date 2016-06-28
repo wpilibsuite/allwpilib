@@ -20,15 +20,9 @@
  * @param channel The channel number on the roboRIO to represent. 0-3 are
  *                on-board 4-7 are on the MXP port.
  */
-AnalogTrigger::AnalogTrigger(int32_t channel) {
-  HalPortHandle port = getPort(channel);
-  int32_t status = 0;
-  uint32_t index = 0;
-  m_trigger = initializeAnalogTrigger(port, &index, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  m_index = index;
-
-  HALReport(HALUsageReporting::kResourceType_AnalogTrigger, channel);
+AnalogTrigger::AnalogTrigger(int32_t channel)
+    : AnalogTrigger(new AnalogInput(channel)) {
+  m_ownsAnalog = true;
 }
 
 /**
@@ -39,13 +33,29 @@ AnalogTrigger::AnalogTrigger(int32_t channel) {
  *
  * @param channel The pointer to the existing AnalogInput object
  */
-AnalogTrigger::AnalogTrigger(AnalogInput* input)
-    : AnalogTrigger(input->GetChannel()) {}
+AnalogTrigger::AnalogTrigger(AnalogInput* input) {
+  m_analogInput = input;
+  int32_t status = 0;
+  uint32_t index = 0;
+  m_trigger = initializeAnalogTrigger(input->m_port, &index, &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    m_index = std::numeric_limits<uint8_t>::max();
+    m_trigger = HAL_INVALID_HANDLE;
+    return;
+  }
+  m_index = index;
+
+  HALReport(HALUsageReporting::kResourceType_AnalogTrigger, input->m_channel);
+}
 
 AnalogTrigger::~AnalogTrigger() {
   int32_t status = 0;
   cleanAnalogTrigger(m_trigger, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+
+  if (m_ownsAnalog && m_analogInput != nullptr) {
+    delete m_analogInput;
+  }
 }
 
 /**

@@ -31,7 +31,9 @@ enum class HalHandleEnum {
   Port = 2,
   Notifier = 3,
   Interrupt = 4,
-  AnalogOutput = 5
+  AnalogOutput = 5,
+  AnalogInput = 6,
+  AnalogTrigger = 7
 };
 
 static inline int16_t getHandleIndex(HalHandle handle) {

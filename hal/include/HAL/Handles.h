@@ -20,3 +20,7 @@ typedef HalHandle HalInterruptHandle;
 typedef HalHandle HalNotifierHandle;
 
 typedef HalHandle HalAnalogOutputHandle;
+
+typedef HalHandle HalAnalogInputHandle;
+
+typedef HalHandle HalAnalogTriggerHandle;

@@ -13,25 +13,34 @@
 
 extern "C" {
 // Analog input functions
-void* initializeAnalogInputPort(HalPortHandle port_handle, int32_t* status);
-void freeAnalogInputPort(void* analog_port_pointer);
+HalAnalogInputHandle initializeAnalogInputPort(HalPortHandle port_handle,
+                                               int32_t* status);
+void freeAnalogInputPort(HalAnalogInputHandle analog_port_handle);
 bool checkAnalogModule(uint8_t module);
 bool checkAnalogInputChannel(uint32_t pin);
 
 void setAnalogSampleRate(double samplesPerSecond, int32_t* status);
 float getAnalogSampleRate(int32_t* status);
-void setAnalogAverageBits(void* analog_port_pointer, uint32_t bits,
-                          int32_t* status);
-uint32_t getAnalogAverageBits(void* analog_port_pointer, int32_t* status);
-void setAnalogOversampleBits(void* analog_port_pointer, uint32_t bits,
-                             int32_t* status);
-uint32_t getAnalogOversampleBits(void* analog_port_pointer, int32_t* status);
-int16_t getAnalogValue(void* analog_port_pointer, int32_t* status);
-int32_t getAnalogAverageValue(void* analog_port_pointer, int32_t* status);
-int32_t getAnalogVoltsToValue(void* analog_port_pointer, double voltage,
+void setAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
+                          uint32_t bits, int32_t* status);
+uint32_t getAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
                               int32_t* status);
-float getAnalogVoltage(void* analog_port_pointer, int32_t* status);
-float getAnalogAverageVoltage(void* analog_port_pointer, int32_t* status);
-uint32_t getAnalogLSBWeight(void* analog_port_pointer, int32_t* status);
-int32_t getAnalogOffset(void* analog_port_pointer, int32_t* status);
+void setAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
+                             uint32_t bits, int32_t* status);
+uint32_t getAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
+                                 int32_t* status);
+int16_t getAnalogValue(HalAnalogInputHandle analog_port_handle,
+                       int32_t* status);
+int32_t getAnalogAverageValue(HalAnalogInputHandle analog_port_handle,
+                              int32_t* status);
+int32_t getAnalogVoltsToValue(HalAnalogInputHandle analog_port_handle,
+                              double voltage, int32_t* status);
+float getAnalogVoltage(HalAnalogInputHandle analog_port_handle,
+                       int32_t* status);
+float getAnalogAverageVoltage(HalAnalogInputHandle analog_port_handle,
+                              int32_t* status);
+uint32_t getAnalogLSBWeight(HalAnalogInputHandle analog_port_handle,
+                            int32_t* status);
+int32_t getAnalogOffset(HalAnalogInputHandle analog_port_handle,
+                        int32_t* status);
 }

@@ -42,8 +42,10 @@ public class AnalogTrigger {
   /**
    * Where the analog trigger is attached.
    */
-  protected long m_port;
+  protected int m_port;
   protected int m_index;
+  protected AnalogInput m_analogInput = null;
+  protected boolean m_ownsAnalog = false;
 
   /**
    * Constructor for an analog trigger given a channel number.
@@ -51,15 +53,8 @@ public class AnalogTrigger {
    * @param channel the port to use for the analog trigger
    */
   public AnalogTrigger(final int channel) {
-    final int portHandle = AnalogJNI.getPort((byte) channel);
-    ByteBuffer index = ByteBuffer.allocateDirect(4);
-    index.order(ByteOrder.LITTLE_ENDIAN);
-
-    m_port =
-        AnalogJNI.initializeAnalogTrigger(portHandle, index.asIntBuffer());
-    m_index = index.asIntBuffer().get(0);
-
-    UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel);
+    this(new AnalogInput(channel));
+    m_ownsAnalog = true;
   }
 
   /**
@@ -69,7 +64,15 @@ public class AnalogTrigger {
    * @param channel the AnalogInput to use for the analog trigger
    */
   public AnalogTrigger(AnalogInput channel) {
-    this(requireNonNull(channel, "The Analog Input given was null").getChannel());
+    m_analogInput = channel;
+    ByteBuffer index = ByteBuffer.allocateDirect(4);
+    index.order(ByteOrder.LITTLE_ENDIAN);
+
+    m_port =
+        AnalogJNI.initializeAnalogTrigger(channel.m_port, index.asIntBuffer());
+    m_index = index.asIntBuffer().get(0);
+
+    UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());  
   }
 
   /**
@@ -78,6 +81,9 @@ public class AnalogTrigger {
   public void free() {
     AnalogJNI.cleanAnalogTrigger(m_port);
     m_port = 0;
+    if (m_ownsAnalog && m_analogInput != null) {
+      m_analogInput.free();
+    }
   }
 
   /**

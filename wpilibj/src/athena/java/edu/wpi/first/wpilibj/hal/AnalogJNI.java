@@ -33,9 +33,9 @@ public class AnalogJNI extends JNIWrapper {
     int kFallingPulse = 3;
   }
 
-  public static native long initializeAnalogInputPort(int halPortHandle);
+  public static native int initializeAnalogInputPort(int halPortHandle);
 
-  public static native void freeAnalogInputPort(long portPointer);
+  public static native void freeAnalogInputPort(int portHandle);
 
   public static native int initializeAnalogOutputPort(int halPortHandle);
 
@@ -55,64 +55,64 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native double getAnalogSampleRate();
 
-  public static native void setAnalogAverageBits(long analogPortPointer, int bits);
+  public static native void setAnalogAverageBits(int analogPortHandle, int bits);
 
-  public static native int getAnalogAverageBits(long analogPortPointer);
+  public static native int getAnalogAverageBits(int analogPortHandle);
 
-  public static native void setAnalogOversampleBits(long analogPortPointer, int bits);
+  public static native void setAnalogOversampleBits(int analogPortHandle, int bits);
 
-  public static native int getAnalogOversampleBits(long analogPortPointer);
+  public static native int getAnalogOversampleBits(int analogPortHandle);
 
-  public static native short getAnalogValue(long analogPortPointer);
+  public static native short getAnalogValue(int analogPortHandle);
 
-  public static native int getAnalogAverageValue(long analogPortPointer);
+  public static native int getAnalogAverageValue(int analogPortHandle);
 
-  public static native int getAnalogVoltsToValue(long analogPortPointer, double voltage);
+  public static native int getAnalogVoltsToValue(int analogPortHandle, double voltage);
 
-  public static native double getAnalogVoltage(long analogPortPointer);
+  public static native double getAnalogVoltage(int analogPortHandle);
 
-  public static native double getAnalogAverageVoltage(long analogPortPointer);
+  public static native double getAnalogAverageVoltage(int analogPortHandle);
 
-  public static native int getAnalogLSBWeight(long analogPortPointer);
+  public static native int getAnalogLSBWeight(int analogPortHandle);
 
-  public static native int getAnalogOffset(long analogPortPointer);
+  public static native int getAnalogOffset(int analogPortHandle);
 
-  public static native boolean isAccumulatorChannel(long analogPortPointer);
+  public static native boolean isAccumulatorChannel(int analogPortHandle);
 
-  public static native void initAccumulator(long analogPortPointer);
+  public static native void initAccumulator(int analogPortHandle);
 
-  public static native void resetAccumulator(long analogPortPointer);
+  public static native void resetAccumulator(int analogPortHandle);
 
-  public static native void setAccumulatorCenter(long analogPortPointer, int center);
+  public static native void setAccumulatorCenter(int analogPortHandle, int center);
 
-  public static native void setAccumulatorDeadband(long analogPortPointer, int deadband);
+  public static native void setAccumulatorDeadband(int analogPortHandle, int deadband);
 
-  public static native long getAccumulatorValue(long analogPortPointer);
+  public static native long getAccumulatorValue(int analogPortHandle);
 
-  public static native int getAccumulatorCount(long analogPortPointer);
+  public static native int getAccumulatorCount(int analogPortHandle);
 
-  public static native void getAccumulatorOutput(long analogPortPointer, LongBuffer value,
+  public static native void getAccumulatorOutput(int analogPortHandle, LongBuffer value,
                                                  IntBuffer count);
 
-  public static native long initializeAnalogTrigger(int halPortHandle, IntBuffer index);
+  public static native int initializeAnalogTrigger(int analogInputHandle, IntBuffer index);
 
-  public static native void cleanAnalogTrigger(long analogTriggerPointer);
+  public static native void cleanAnalogTrigger(int analogTriggerHandle);
 
-  public static native void setAnalogTriggerLimitsRaw(long analogTriggerPointer, int lower,
+  public static native void setAnalogTriggerLimitsRaw(int analogTriggerHandle, int lower,
                                                       int upper);
 
-  public static native void setAnalogTriggerLimitsVoltage(long analogTriggerPointer,
+  public static native void setAnalogTriggerLimitsVoltage(int analogTriggerHandle,
                                                           double lower, double upper);
 
-  public static native void setAnalogTriggerAveraged(long analogTriggerPointer,
+  public static native void setAnalogTriggerAveraged(int analogTriggerHandle,
                                                      boolean useAveragedValue);
 
-  public static native void setAnalogTriggerFiltered(long analogTriggerPointer,
+  public static native void setAnalogTriggerFiltered(int analogTriggerHandle,
                                                      boolean useFilteredValue);
 
-  public static native boolean getAnalogTriggerInWindow(long analogTriggerPointer);
+  public static native boolean getAnalogTriggerInWindow(int analogTriggerHandle);
 
-  public static native boolean getAnalogTriggerTriggerState(long analogTriggerPointer);
+  public static native boolean getAnalogTriggerTriggerState(int analogTriggerHandle);
 
-  public static native boolean getAnalogTriggerOutput(long analogTriggerPointer, int type);
+  public static native boolean getAnalogTriggerOutput(int analogTriggerHandle, int type);
 }
