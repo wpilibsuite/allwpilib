@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -111,10 +110,12 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
   }
 
   private final int m_channel;
+  
+  private int m_forwardHandle = 0;
+  private int m_reverseHandle = 0;
   private long m_port;
 
   private Direction m_direction;
-  private static Resource relayChannels = new Resource(kRelayChannels * 2);
 
   /**
    * Common relay initialization method. This code is common to all Relay constructors and
@@ -122,21 +123,18 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * set to both lines at 0v.
    */
   private void initRelay() {
-    SensorBase.checkRelayChannel(m_channel);
-    try {
-      if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-        relayChannels.allocate(m_channel * 2);
-        UsageReporting.report(tResourceType.kResourceType_Relay, m_channel);
-      }
-      if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-        relayChannels.allocate(m_channel * 2 + 1);
-        UsageReporting.report(tResourceType.kResourceType_Relay, m_channel + 128);
-      }
-    } catch (CheckedAllocationException ex) {
-      throw new AllocationException("Relay channel " + m_channel + " is already allocated");
+    if (!RelayJNI.checkRelayChannel(m_channel)) {
+      throw new IndexOutOfBoundsException("Requested relay channel number is out of range.");
     }
-
-    m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) m_channel));
+    int portHandle = RelayJNI.getPort((byte)m_channel);
+    if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
+      m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);
+      UsageReporting.report(tResourceType.kResourceType_Relay, m_channel);
+    }
+    if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
+      m_reverseHandle = RelayJNI.initializeRelayPort(portHandle, false);
+      UsageReporting.report(tResourceType.kResourceType_Relay, m_channel + 128);
+    }
 
     m_safetyHelper = new MotorSafetyHelper(this);
     m_safetyHelper.setSafetyEnabled(false);
@@ -168,19 +166,22 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
 
   @Override
   public void free() {
-    if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-      relayChannels.free(m_channel * 2);
+    try {
+      RelayJNI.setRelay(m_forwardHandle, false);
+    } catch (RuntimeException ex) {
+      // do nothing. Ignore
     }
-    if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-      relayChannels.free(m_channel * 2 + 1);
+    try {
+      RelayJNI.setRelay(m_reverseHandle, false);
+    } catch (RuntimeException ex) {
+      // do nothing. Ignore
     }
-
-    RelayJNI.setRelayForward(m_port, false);
-    RelayJNI.setRelayReverse(m_port, false);
-
-    DIOJNI.freeDIO(m_port);
-    DIOJNI.freeDigitalPort(m_port);
-    m_port = 0;
+    
+    RelayJNI.freeRelayPort(m_forwardHandle);
+    RelayJNI.freeRelayPort(m_reverseHandle);
+    
+    m_forwardHandle = 0;
+    m_reverseHandle = 0;
   }
 
   /**
@@ -200,18 +201,18 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
     switch (value) {
       case kOff:
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-          RelayJNI.setRelayForward(m_port, false);
+          RelayJNI.setRelay(m_forwardHandle, false);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-          RelayJNI.setRelayReverse(m_port, false);
+          RelayJNI.setRelay(m_reverseHandle, false);
         }
         break;
       case kOn:
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-          RelayJNI.setRelayForward(m_port, true);
+          RelayJNI.setRelay(m_forwardHandle, true);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-          RelayJNI.setRelayReverse(m_port, true);
+          RelayJNI.setRelay(m_reverseHandle, true);
         }
         break;
       case kForward:
@@ -220,10 +221,10 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
               + "forward");
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
-          RelayJNI.setRelayForward(m_port, true);
+          RelayJNI.setRelay(m_forwardHandle, true);
         }
         if (m_direction == Direction.kBoth) {
-          RelayJNI.setRelayReverse(m_port, false);
+          RelayJNI.setRelay(m_reverseHandle, false);
         }
         break;
       case kReverse:
@@ -232,10 +233,10 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
               + "reverse");
         }
         if (m_direction == Direction.kBoth) {
-          RelayJNI.setRelayForward(m_port, false);
+          RelayJNI.setRelay(m_forwardHandle, false);
         }
         if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
-          RelayJNI.setRelayReverse(m_port, true);
+          RelayJNI.setRelay(m_reverseHandle, true);
         }
         break;
       default:
@@ -254,8 +255,8 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * @return The current state of the relay as a Relay::Value
    */
   public Value get() {
-    if (RelayJNI.getRelayForward(m_port)) {
-      if (RelayJNI.getRelayReverse(m_port)) {
+    if (RelayJNI.getRelay(m_forwardHandle)) {
+      if (RelayJNI.getRelay(m_reverseHandle)) {
         return Value.kOn;
       } else {
         if (m_direction == Direction.kForward) {
@@ -265,7 +266,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
         }
       }
     } else {
-      if (RelayJNI.getRelayReverse(m_port)) {
+      if (RelayJNI.getRelay(m_reverseHandle)) {
         if (m_direction == Direction.kReverse) {
           return Value.kOn;
         } else {
