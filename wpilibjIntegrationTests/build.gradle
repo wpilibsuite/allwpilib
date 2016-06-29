@@ -14,7 +14,7 @@ mainClassName = 'edu.wpi.first.wpilibj.test.AntJunitLanucher'
 buildscript {
     repositories { jcenter() }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
 }
 
@@ -37,9 +37,13 @@ compileJava.dependsOn tasks.getByPath(':wpilibj:testClasses')
 build.dependsOn shadowJar
 
 jar {
-    wpilibj.binaries.withType(SharedLibraryBinarySpec) {
-        from(file(it.sharedLibraryFile)) {
-            into 'linux-arm'
+    wpilibj.model{
+        binaries{
+            withType(SharedLibraryBinarySpec) {
+                from(file(it.sharedLibraryFile)) {
+                    into 'linux-arm'
+                }
+            }
         }
     }
 
@@ -47,9 +51,13 @@ jar {
 }
 
 shadowJar {
-    wpilibj.binaries.withType(SharedLibraryBinarySpec) {
-        from(file(it.sharedLibraryFile)) {
-            into 'linux-arm'
+    wpilibj.model{
+        binaries{
+            withType(SharedLibraryBinarySpec) {
+                from(file(it.sharedLibraryFile)) {
+                    into 'linux-arm'
+                }
+            }
         }
     }
 }
