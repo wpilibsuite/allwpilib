@@ -19,7 +19,7 @@
  */
 class SensorBase : public ErrorBase {
  public:
-  SensorBase();
+  SensorBase() = default;
   virtual ~SensorBase() = default;
 
   SensorBase(const SensorBase&) = delete;
@@ -45,9 +45,4 @@ class SensorBase : public ErrorBase {
   static const uint32_t kRelayChannels = 8;
   static const uint32_t kPDPChannels = 16;
   static const uint32_t kChassisSlots = 8;
-
- protected:
-  static void* m_digital_ports[kDigitalChannels];
-  static void* m_relay_ports[kRelayChannels];
-  static void* m_pwm_ports[kPwmChannels];
 };

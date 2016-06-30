@@ -35,8 +35,13 @@ DigitalOutput::DigitalOutput(uint32_t channel) {
   m_channel = channel;
 
   int32_t status = 0;
-  allocateDIO(m_digital_ports[channel], false, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  m_handle = initializeDIOPort(getPort(channel), false, &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    m_channel = std::numeric_limits<uint32_t>::max();
+    m_handle = HAL_INVALID_HANDLE;
+    return;
+  }
 
   HALReport(HALUsageReporting::kResourceType_DigitalOutput, channel);
 }
@@ -50,9 +55,7 @@ DigitalOutput::~DigitalOutput() {
   // Disable the PWM in case it was running.
   DisablePWM();
 
-  int32_t status = 0;
-  freeDIO(m_digital_ports[m_channel], &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  freeDIOPort(m_handle);
 }
 
 /**
@@ -66,7 +69,7 @@ void DigitalOutput::Set(uint32_t value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
-  setDIO(m_digital_ports[m_channel], value, &status);
+  setDIO(m_handle, value, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -87,7 +90,7 @@ void DigitalOutput::Pulse(float length) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
-  pulse(m_digital_ports[m_channel], length, &status);
+  pulse(m_handle, length, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -100,7 +103,7 @@ bool DigitalOutput::IsPulsing() const {
   if (StatusIsFatal()) return false;
 
   int32_t status = 0;
-  bool value = isPulsing(m_digital_ports[m_channel], &status);
+  bool value = isPulsing(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
   return value;
 }
@@ -205,6 +208,11 @@ uint32_t DigitalOutput::GetModuleForRouting() const { return 0; }
  * @return The value to be written to the analog trigger field of a routing mux.
  */
 bool DigitalOutput::GetAnalogTriggerForRouting() const { return false; }
+
+/**
+ * @return The HAL Handle to the specified source.
+ */
+HalHandle DigitalOutput::GetPortHandle() const { return m_handle; }
 
 void DigitalOutput::ValueChanged(ITable* source, llvm::StringRef key,
                                  std::shared_ptr<nt::Value> value, bool isNew) {

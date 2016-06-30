@@ -17,11 +17,10 @@
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect(
-    JNIEnv* env, jclass, jlong port_pointer, jint filter_index) {
+    JNIEnv* env, jclass, jint id, jint filter_index) {
   int32_t status = 0;
-  void* digital_port_pointer = reinterpret_cast<void*>(port_pointer);
 
-  setFilterSelect(digital_port_pointer, filter_index, &status);
+  setFilterSelect((HalDigitalHandle)id, filter_index, &status);
   CheckStatus(env, status);
 }
 
@@ -31,11 +30,10 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect(
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect(
-    JNIEnv* env, jclass, jlong port_pointer) {
+    JNIEnv* env, jclass, jint id) {
   int32_t status = 0;
-  void* digital_port_pointer = reinterpret_cast<void*>(port_pointer);
 
-  jint result = getFilterSelect(digital_port_pointer, &status);
+  jint result = getFilterSelect((HalDigitalHandle)id, &status);
   CheckStatus(env, status);
   return result;
 }

@@ -20,31 +20,6 @@ const uint32_t SensorBase::kRelayChannels;
 const uint32_t SensorBase::kPDPChannels;
 const uint32_t SensorBase::kChassisSlots;
 
-static bool portsInitialized = false;
-void* SensorBase::m_digital_ports[kDigitalChannels];
-void* SensorBase::m_pwm_ports[kPwmChannels];
-
-/**
- * Creates an instance of the sensor base and gets an FPGA handle
- */
-SensorBase::SensorBase() {
-  if (!portsInitialized) {
-    for (uint32_t i = 0; i < kDigitalChannels; i++) {
-      HalPortHandle port = getPort(i);
-      int32_t status = 0;
-      m_digital_ports[i] = initializeDigitalPort(port, &status);
-      wpi_setErrorWithContext(status, getHALErrorMessage(status));
-    }
-
-    for (uint32_t i = 0; i < kPwmChannels; i++) {
-      HalPortHandle port = getPort(i);
-      int32_t status = 0;
-      m_pwm_ports[i] = initializeDigitalPort(port, &status);
-      wpi_setErrorWithContext(status, getHALErrorMessage(status));
-    }
-  }
-}
-
 /**
  * Check that the solenoid module number is valid.
  *

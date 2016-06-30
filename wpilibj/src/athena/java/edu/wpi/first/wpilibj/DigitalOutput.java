@@ -24,6 +24,9 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   private static final long invalidPwmGenerator = 0xffffffff;
 
   private long m_pwmGenerator = invalidPwmGenerator;
+  
+  private int m_channel = 0;
+  private int m_handle = 0;
 
   /**
    * Create an instance of a digital output. Create an instance of a digital output given a
@@ -33,7 +36,10 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    *                the MXP
    */
   public DigitalOutput(int channel) {
-    initDigitalPort(channel, false);
+    checkDigitalChannel(channel);
+    m_channel = channel;
+    
+    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte)channel), false);
 
     UsageReporting.report(tResourceType.kResourceType_DigitalOutput, channel);
   }
@@ -47,7 +53,8 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();
     }
-    super.free();
+    DIOJNI.freeDIOPort(m_handle);
+    m_handle = 0;
   }
 
   /**
@@ -56,14 +63,14 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param value true is on, off is false
    */
   public void set(boolean value) {
-    DIOJNI.setDIO(super.m_port, (short) (value ? 1 : 0));
+    DIOJNI.setDIO(m_handle, (short) (value ? 1 : 0));
   }
 
   /**
    * @return The GPIO channel number that this object represents.
    */
   public int getChannel() {
-    return super.m_channel;
+    return m_channel;
   }
 
   /**
@@ -74,7 +81,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param pulseLength The length of the pulse.
    */
   public void pulse(final int channel, final float pulseLength) {
-    DIOJNI.pulse(super.m_port, pulseLength);
+    DIOJNI.pulse(m_handle, pulseLength);
   }
 
   /**
@@ -89,7 +96,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
         (float) (pulseLength / 1.0e9 * (DIOJNI.getLoopTiming() * 25));
     System.err
         .println("You should use the float version of pulse for portability.  This is deprecated");
-    DIOJNI.pulse(super.m_port, convertedPulse);
+    DIOJNI.pulse(m_handle, convertedPulse);
   }
 
   /**
@@ -98,7 +105,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @return true if pulsing
    */
   public boolean isPulsing() {
-    return DIOJNI.isPulsing(super.m_port);
+    return DIOJNI.isPulsing(m_handle);
   }
 
   /**
@@ -164,6 +171,46 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
       return;
     }
     PWMJNI.setPWMDutyCycle(m_pwmGenerator, dutyCycle);
+  }
+  
+  /**
+   * Get the channel routing number.
+   *
+   * @return channel routing number
+   */
+  @Override
+  public int getChannelForRouting() {
+    return m_channel;
+  }
+
+  /**
+   * Get the module routing number.
+   *
+   * @return 0
+   */
+  @Override
+  public byte getModuleForRouting() {
+    return 0;
+  }
+
+  /**
+   * Is this an analog trigger.
+   *
+   * @return true if this is an analog trigger
+   */
+  @Override
+  public boolean getAnalogTriggerForRouting() {
+    return false;
+  }
+  
+  /**
+   * Get the HAL Port Handle.
+   *
+   * @return The HAL Handle to the specified source.
+   */
+  @Override
+  public int getPortHandle() {
+    return m_handle;
   }
 
   /*

@@ -34,8 +34,13 @@ DigitalInput::DigitalInput(uint32_t channel) {
   m_channel = channel;
 
   int32_t status = 0;
-  allocateDIO(m_digital_ports[channel], true, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  m_handle = initializeDIOPort(getPort(channel), true, &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    m_handle = HAL_INVALID_HANDLE;
+    m_channel = std::numeric_limits<uint32_t>::max();
+    return;
+  }
 
   LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
@@ -53,9 +58,7 @@ DigitalInput::~DigitalInput() {
     m_interrupt = HAL_INVALID_HANDLE;
   }
 
-  int32_t status = 0;
-  freeDIO(m_digital_ports[m_channel], &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  freeDIOPort(m_handle);
 }
 
 /**
@@ -66,7 +69,7 @@ DigitalInput::~DigitalInput() {
 bool DigitalInput::Get() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
-  bool value = getDIO(m_digital_ports[m_channel], &status);
+  bool value = getDIO(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
   return value;
 }
@@ -90,6 +93,11 @@ uint32_t DigitalInput::GetModuleForRouting() const { return 0; }
  * @return The value to be written to the analog trigger field of a routing mux.
  */
 bool DigitalInput::GetAnalogTriggerForRouting() const { return false; }
+
+/**
+ * @return The HAL Handle to the specified source.
+ */
+HalHandle DigitalInput::GetPortHandle() const { return m_handle; }
 
 void DigitalInput::UpdateTable() {
   if (m_table != nullptr) {

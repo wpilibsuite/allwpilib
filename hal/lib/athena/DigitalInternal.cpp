@@ -31,6 +31,9 @@ hal::Resource* PWMChannels = nullptr;
 
 bool digitalSystemsInitialized = false;
 
+DigitalHandleResource<HalDigitalHandle, DigitalPort, kDigitalPins + kNumHeaders>
+    digitalPinHandles;
+
 /**
  * Initialize the digital system.
  */
@@ -75,12 +78,21 @@ void initializeDigital(int32_t* status) {
   pwmSystem->writeConfig_MinHigh(minHigh, status);
   // Ensure that PWM output values are set to OFF
   for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
-    // Initialize port structure
-    DigitalPort digital_port;
-    digital_port.pin = pwm_index;
+    // Copy of SetPWM
+    if (pwm_index < tPWM::kNumHdrRegisters) {
+      pwmSystem->writeHdr(pwm_index, kPwmDisabled, status);
+    } else {
+      pwmSystem->writeMXP(pwm_index - tPWM::kNumHdrRegisters, kPwmDisabled,
+                          status);
+    }
 
-    setPWM(&digital_port, kPwmDisabled, status);
-    setPWMPeriodScale(&digital_port, 3, status);  // Set all to 4x by default.
+    // Copy of SetPWMPeriodScale, set to 4x by default.
+    if (pwm_index < tPWM::kNumPeriodScaleHdrElements) {
+      pwmSystem->writePeriodScaleHdr(pwm_index, 3, status);
+    } else {
+      pwmSystem->writePeriodScaleMXP(
+          pwm_index - tPWM::kNumPeriodScaleHdrElements, 3, status);
+    }
   }
 
   digitalSystemsInitialized = true;

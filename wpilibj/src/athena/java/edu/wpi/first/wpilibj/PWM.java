@@ -61,7 +61,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   }
 
   private int m_channel;
-  private long m_port;
+  private int m_handle;
 
   /**
    * kDefaultPwmPeriod is in ms.
@@ -106,13 +106,9 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     checkPWMChannel(channel);
     m_channel = channel;
 
-    m_port = DIOJNI.initializeDigitalPort(DIOJNI.getPort((byte) channel));
+    m_handle = PWMJNI.initializePWMPort(DIOJNI.getPort((byte) channel));
 
-    if (!PWMJNI.allocatePWMChannel(m_port)) {
-      throw new AllocationException("PWM channel " + channel + " is already allocated");
-    }
-
-    PWMJNI.setPWM(m_port, (short) 0);
+    PWMJNI.setPWM(m_handle, (short) 0);
 
     m_eliminateDeadband = false;
 
@@ -125,14 +121,12 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * <p>Free the resource associated with the PWM channel and set the value to 0.
    */
   public void free() {
-    if (m_port == 0) {
+    if (m_handle == 0) {
       return;
     }
-    PWMJNI.setPWM(m_port, (short) 0);
-    PWMJNI.freePWMChannel(m_port);
-    PWMJNI.freeDIO(m_port);
-    DIOJNI.freeDigitalPort(m_port);
-    m_port = 0;
+    PWMJNI.setPWM(m_handle, (short) 0);
+    PWMJNI.freePWMPort(m_handle);
+    m_handle = 0;
   }
 
   /**
@@ -320,7 +314,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @param value Raw PWM value. Range 0 - 255.
    */
   public void setRaw(int value) {
-    PWMJNI.setPWM(m_port, (short) value);
+    PWMJNI.setPWM(m_handle, (short) value);
   }
 
   /**
@@ -331,7 +325,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @return Raw PWM control value. Range: 0 - 255.
    */
   public int getRaw() {
-    return PWMJNI.getPWM(m_port);
+    return PWMJNI.getPWM(m_handle);
   }
 
   /**
@@ -343,15 +337,15 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     switch (mult.value) {
       case PeriodMultiplier.k4X_val:
         // Squelch 3 out of 4 outputs
-        PWMJNI.setPWMPeriodScale(m_port, 3);
+        PWMJNI.setPWMPeriodScale(m_handle, 3);
         break;
       case PeriodMultiplier.k2X_val:
         // Squelch 1 out of 2 outputs
-        PWMJNI.setPWMPeriodScale(m_port, 1);
+        PWMJNI.setPWMPeriodScale(m_handle, 1);
         break;
       case PeriodMultiplier.k1X_val:
         // Don't squelch any outputs
-        PWMJNI.setPWMPeriodScale(m_port, 0);
+        PWMJNI.setPWMPeriodScale(m_handle, 0);
         break;
       default:
         // Cannot hit this, limited by PeriodMultiplier enum
@@ -359,7 +353,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   }
 
   protected void setZeroLatch() {
-    PWMJNI.latchPWMZero(m_port);
+    PWMJNI.latchPWMZero(m_handle);
   }
 
   private int getMaxPositivePwm() {

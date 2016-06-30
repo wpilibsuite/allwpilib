@@ -9,15 +9,19 @@
 
 #include <stdint.h>
 
-extern "C" {
-bool checkPWMChannel(void* digital_port_pointer);
+#include "HAL/Handles.h"
 
-void setPWM(void* digital_port_pointer, unsigned short value, int32_t* status);
-bool allocatePWMChannel(void* digital_port_pointer, int32_t* status);
-void freePWMChannel(void* digital_port_pointer, int32_t* status);
-unsigned short getPWM(void* digital_port_pointer, int32_t* status);
-void latchPWMZero(void* digital_port_pointer, int32_t* status);
-void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask,
+extern "C" {
+HalDigitalHandle initializePWMPort(HalPortHandle port_handle, int32_t* status);
+void freePWMPort(HalDigitalHandle pwm_port_handle, int32_t* status);
+
+bool checkPWMChannel(uint8_t pin);
+
+void setPWM(HalDigitalHandle pwm_port_handle, unsigned short value,
+            int32_t* status);
+unsigned short getPWM(HalDigitalHandle pwm_port_handle, int32_t* status);
+void latchPWMZero(HalDigitalHandle pwm_port_handle, int32_t* status);
+void setPWMPeriodScale(HalDigitalHandle pwm_port_handle, uint32_t squelchMask,
                        int32_t* status);
 uint16_t getLoopTiming(int32_t* status);
 }

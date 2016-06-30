@@ -10,7 +10,10 @@
 #include <stdint.h>
 
 #include "ChipObject.h"
+#include "HAL/Handles.h"
 #include "HAL/cpp/Resource.h"
+#include "handles/DigitalHandleResource.h"
+#include "handles/HandlesInternal.h"
 
 namespace hal {
 constexpr uint32_t kNumHeaders = 10;  // Number of non-MXP pins
@@ -64,8 +67,11 @@ extern bool digitalSystemsInitialized;
 
 struct DigitalPort {
   uint8_t pin;
-  uint32_t PWMGeneratorID;
 };
+
+extern DigitalHandleResource<HalDigitalHandle, DigitalPort,
+                             kDigitalPins + kNumHeaders>
+    digitalPinHandles;
 
 void initializeDigital(int32_t* status);
 void remapDigitalSource(bool analogTrigger, uint32_t& pin, uint8_t& module);

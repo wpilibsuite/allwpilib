@@ -19,11 +19,6 @@ const uint32_t SensorBase::kPDPChannels;
 const uint32_t SensorBase::kChassisSlots;
 
 /**
- * Creates an instance of the sensor base and gets an FPGA handle
- */
-SensorBase::SensorBase() {}
-
-/**
  * Check that the solenoid module number is valid.
  *
  * @return Solenoid module is valid and present

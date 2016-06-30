@@ -80,10 +80,15 @@ public class AnalogTriggerOutput extends DigitalSource {
     UsageReporting.report(tResourceType.kResourceType_AnalogTriggerOutput, trigger.getIndex(),
         outputType.m_value);
   }
-
-  @Override
+  
+  /**
+   * Frees the resources for this output.
+   */
   public void free() {
-
+    if (m_interrupt != 0) {
+      cancelInterrupts();
+    }
+    
   }
 
   /**
@@ -108,6 +113,11 @@ public class AnalogTriggerOutput extends DigitalSource {
   @Override
   public boolean getAnalogTriggerForRouting() {
     return true;
+  }
+  
+  @Override
+  public int getPortHandle() {
+    return m_trigger.m_port;
   }
 
   /**

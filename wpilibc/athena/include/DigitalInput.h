@@ -35,6 +35,7 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   virtual uint32_t GetChannelForRouting() const;
   virtual uint32_t GetModuleForRouting() const;
   virtual bool GetAnalogTriggerForRouting() const;
+  virtual HalHandle GetPortHandle() const;
 
   void UpdateTable();
   void StartLiveWindowMode();
@@ -45,6 +46,7 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
 
  private:
   uint32_t m_channel;
+  HalDigitalHandle m_handle;
 
   std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;

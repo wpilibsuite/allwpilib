@@ -39,12 +39,16 @@ PWM::PWM(uint32_t channel) {
   }
 
   int32_t status = 0;
-  allocatePWMChannel(m_pwm_ports[channel], &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  m_handle = initializePWMPort(getPort(channel), &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    m_channel = std::numeric_limits<uint32_t>::max();
+    m_handle = HAL_INVALID_HANDLE;
+  }
 
   m_channel = channel;
 
-  setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
+  setPWM(m_handle, kPwmDisabled, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   m_eliminateDeadband = false;
@@ -60,10 +64,10 @@ PWM::PWM(uint32_t channel) {
 PWM::~PWM() {
   int32_t status = 0;
 
-  setPWM(m_pwm_ports[m_channel], kPwmDisabled, &status);
+  setPWM(m_handle, kPwmDisabled, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  freePWMChannel(m_pwm_ports[m_channel], &status);
+  freePWMPort(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   if (m_table != nullptr) m_table->RemoveTableListener(this);
@@ -278,7 +282,7 @@ void PWM::SetRaw(unsigned short value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
-  setPWM(m_pwm_ports[m_channel], value, &status);
+  setPWM(m_handle, value, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -293,7 +297,7 @@ unsigned short PWM::GetRaw() const {
   if (StatusIsFatal()) return 0;
 
   int32_t status = 0;
-  unsigned short value = getPWM(m_pwm_ports[m_channel], &status);
+  unsigned short value = getPWM(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   return value;
@@ -311,16 +315,13 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
 
   switch (mult) {
     case kPeriodMultiplier_4X:
-      setPWMPeriodScale(m_pwm_ports[m_channel], 3,
-                        &status);  // Squelch 3 out of 4 outputs
+      setPWMPeriodScale(m_handle, 3, &status);  // Squelch 3 out of 4 outputs
       break;
     case kPeriodMultiplier_2X:
-      setPWMPeriodScale(m_pwm_ports[m_channel], 1,
-                        &status);  // Squelch 1 out of 2 outputs
+      setPWMPeriodScale(m_handle, 1, &status);  // Squelch 1 out of 2 outputs
       break;
     case kPeriodMultiplier_1X:
-      setPWMPeriodScale(m_pwm_ports[m_channel], 0,
-                        &status);  // Don't squelch any outputs
+      setPWMPeriodScale(m_handle, 0, &status);  // Don't squelch any outputs
       break;
     default:
       wpi_assert(false);
@@ -334,7 +335,7 @@ void PWM::SetZeroLatch() {
 
   int32_t status = 0;
 
-  latchPWMZero(m_pwm_ports[m_channel], &status);
+  latchPWMZero(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 

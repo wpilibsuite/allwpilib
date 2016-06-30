@@ -25,6 +25,9 @@ static uint8_t i2CMXPObjCount = 0;
 static uint8_t i2COnBoardHandle = 0;
 static uint8_t i2CMXPHandle = 0;
 
+static HalDigitalHandle i2CMXPDigitalHandle1 = HAL_INVALID_HANDLE;
+static HalDigitalHandle i2CMXPDigitalHandle2 = HAL_INVALID_HANDLE;
+
 extern "C" {
 /*
  * Initialize the I2C port. Opens the port if necessary and saves the handle.
@@ -51,12 +54,15 @@ void i2CInitialize(uint8_t port, int32_t* status) {
     } else if (port == 1) {
       i2CMXPObjCount++;
       if (i2CMXPHandle > 0) return;
-      if (!allocateDIO(initializeDigitalPort(getPort(24), status), false,
-                       status))
+      if ((i2CMXPDigitalHandle1 = initializeDIOPort(
+               getPort(24), false, status)) == HAL_INVALID_HANDLE) {
         return;
-      if (!allocateDIO(initializeDigitalPort(getPort(25), status), false,
-                       status))
+      }
+      if ((i2CMXPDigitalHandle2 = initializeDIOPort(
+               getPort(25), false, status)) == HAL_INVALID_HANDLE) {
+        freeDIOPort(i2CMXPDigitalHandle1);  // free the first port allocated
         return;
+      }
       digitalSystem->writeEnableMXPSpecialFunction(
           digitalSystem->readEnableMXPSpecialFunction(status) | 0xC000, status);
       i2CMXPHandle = i2clib_open("/dev/i2c-1");
@@ -167,6 +173,11 @@ void i2CClose(uint8_t port) {
       int32_t handle = port == 0 ? i2COnBoardHandle : i2CMXPHandle;
       i2clib_close(handle);
     }
+  }
+
+  if (port == 1) {
+    freeDIOPort(i2CMXPDigitalHandle1);
+    freeDIOPort(i2CMXPDigitalHandle2);
   }
   return;
 }

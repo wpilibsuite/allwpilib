@@ -28,48 +28,47 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
- * Method:    allocatePWMChannel
- * Signature: (J)Z
+ * Method:    initializePWMPort
+ * Signature: (I)I;
  */
-JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_allocatePWMChannel(
-    JNIEnv* env, jclass, jlong id) {
-  PWMJNI_LOG(logDEBUG) << "Calling DIOJNI allocatePWMChannel";
-  PWMJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_wpilibj_hal_PWMJNI_initializePWMPort(
+    JNIEnv *env, jclass, jint id) {
+  PWMJNI_LOG(logDEBUG) << "Calling PWMJNI initializePWMPort";
+  PWMJNI_LOG(logDEBUG) << "Port Handle = " << (HalPortHandle)id;
   int32_t status = 0;
-  jboolean returnValue = allocatePWMChannel((void*)id, &status);
+  auto pwm = initializePWMPort((HalPortHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  PWMJNI_LOG(logDEBUG) << "allocatePWMChannelResult = " << (jint)returnValue;
+  PWMJNI_LOG(logDEBUG) << "PWM Handle = " << pwm;
   CheckStatus(env, status);
-  return returnValue;
+  return (jint)pwm;
 }
 
 /*
- * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
- * Method:    freePWMChannel
- * Signature: (J)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMChannel(
-    JNIEnv* env, jclass, jlong id) {
-  PWMJNI_LOG(logDEBUG) << "Calling DIOJNI freePWMChannel";
-  PWMJNI_LOG(logDEBUG) << "Port Ptr = " << (void*)id;
+* Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+* Method:    freeDIOPort
+* Signature: (I)V;
+*/
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMPort(
+    JNIEnv *env, jclass, jint id) {
+  PWMJNI_LOG(logDEBUG) << "Calling PWMJNI freePWMPort";
+  PWMJNI_LOG(logDEBUG) << "Port Handle = " << (HalDigitalHandle)id;
   int32_t status = 0;
-  freePWMChannel((void*)id, &status);
-  PWMJNI_LOG(logDEBUG) << "Status = " << status;
+  freePWMPort((HalDigitalHandle)id, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    setPWM
- * Signature: (JS)V
+ * Signature: (IS)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWM(
-    JNIEnv* env, jclass, jlong id, jshort value) {
-  PWMJNI_LOG(logDEBUG) << "DigitalPort Ptr = " << (void*)id;
+    JNIEnv* env, jclass, jint id, jshort value) {
+  PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HalDigitalHandle)id;
   PWMJNI_LOG(logDEBUG) << "PWM Value = " << value;
   int32_t status = 0;
-  setPWM((void*)id, value, &status);
+  setPWM((HalDigitalHandle)id, value, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -77,13 +76,13 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWM(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    getPWM
- * Signature: (J)S
+ * Signature: (I)S
  */
 JNIEXPORT jshort JNICALL
-Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWM(JNIEnv* env, jclass, jlong id) {
-  PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << (void*)id;
+Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWM(JNIEnv* env, jclass, jint id) {
+  PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HalDigitalHandle)id;
   int32_t status = 0;
-  jshort returnValue = getPWM((void*)id, &status);
+  jshort returnValue = getPWM((HalDigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "Value = " << returnValue;
   CheckStatus(env, status);
@@ -93,13 +92,13 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWM(JNIEnv* env, jclass, jlong id) {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    latchPWMZero
- * Signature: (J)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_latchPWMZero(
-    JNIEnv* env, jclass, jlong id) {
-  PWMJNI_LOG(logDEBUG) << "PWM Ptr = " << (void*)id;
+    JNIEnv* env, jclass, jint id) {
+  PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HalDigitalHandle)id;
   int32_t status = 0;
-  latchPWMZero((void*)id, &status);
+  latchPWMZero((HalDigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -107,14 +106,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_latchPWMZero(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    setPWMPeriodScale
- * Signature: (JI)V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMPeriodScale(
-    JNIEnv* env, jclass, jlong id, jint value) {
-  PWMJNI_LOG(logDEBUG) << "DigitalPort Ptr = " << (void*)id;
+    JNIEnv* env, jclass, jint id, jint value) {
+  PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HalDigitalHandle)id;
   PWMJNI_LOG(logDEBUG) << "PeriodScale Value = " << value;
   int32_t status = 0;
-  setPWMPeriodScale((void*)id, value, &status);
+  setPWMPeriodScale((HalDigitalHandle)id, value, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
