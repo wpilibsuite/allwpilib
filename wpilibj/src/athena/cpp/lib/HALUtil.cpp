@@ -41,6 +41,7 @@ static jclass stackTraceElementCls = nullptr;
 static jclass runtimeExCls = nullptr;
 static jclass illegalArgExCls = nullptr;
 static jclass boundaryExCls = nullptr;
+static jclass allocationExCls = nullptr;
 static jclass canInvalidBufferExCls = nullptr;
 static jclass canMessageNotFoundExCls = nullptr;
 static jclass canMessageNotAllowedExCls = nullptr;
@@ -117,8 +118,20 @@ static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
   env->DeleteLocalRef(stackTrace);
 }
 
+void ThrowAllocationException(JNIEnv *env, int32_t status) {
+  const char *message = getHALErrorMessage(status);
+  char *buf = new char[strlen(message) + 30];
+  sprintf(buf, " Code: $%d. %s", status, message);
+  env->ThrowNew(allocationExCls, buf);
+  delete[] buf;
+}
+
 void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   if (status == 0) return;
+  if (status == NO_AVAILABLE_RESOURCES || 
+      status == RESOURCE_IS_ALLOCATED) {
+    ThrowAllocationException(env, status);
+  }
   const char *message = getHALErrorMessage(status);
   if (do_throw && status < 0) {
     char *buf = new char[strlen(message) + 30];
@@ -257,6 +270,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (!local) return JNI_ERR;
   boundaryExCls = static_cast<jclass>(env->NewGlobalRef(local));
   if (!boundaryExCls) return JNI_ERR;
+  env->DeleteLocalRef(local);
+  
+  local = env->FindClass("edu/wpi/first/wpilibj/util/AllocationException");
+  if (!local) return JNI_ERR;
+  allocationExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  if (!allocationExCls) return JNI_ERR;
   env->DeleteLocalRef(local);
 
   local = env->FindClass("edu/wpi/first/wpilibj/can/CANInvalidBufferException");
