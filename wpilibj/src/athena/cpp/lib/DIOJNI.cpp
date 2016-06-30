@@ -173,4 +173,84 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTiming(JNIEnv *env, jclass) {
   return returnValue;
 }
 
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+ * Method:    allocateDigitalPWM
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_wpilibj_hal_DIOJNI_allocateDigitalPWM(JNIEnv* env, jclass) {
+  DIOJNI_LOG(logDEBUG) << "Calling DIOJNI allocateDigitalPWM";
+  int32_t status = 0;
+  auto pwm = allocateDigitalPWM(&status);
+  DIOJNI_LOG(logDEBUG) << "Status = " << status;
+  DIOJNI_LOG(logDEBUG) << "PWM Handle = " << pwm;
+  CheckStatus(env, status);
+  return (jint)pwm;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+ * Method:    freeDigitalPWM
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_DIOJNI_freeDigitalPWM(JNIEnv* env, jclass, jint id) {
+  DIOJNI_LOG(logDEBUG) << "Calling DIOJNI freeDigitalPWM";
+  DIOJNI_LOG(logDEBUG) << "PWM Handle = " << (HalDigitalPWMHandle)id;
+  int32_t status = 0;
+  freeDigitalPWM((HalDigitalPWMHandle)id, &status);
+  DIOJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+ * Method:    setDigitalPWMRate
+ * Signature: (D)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDigitalPWMRate(
+    JNIEnv* env, jclass, jdouble value) {
+  DIOJNI_LOG(logDEBUG) << "Calling DIOJNI setDigitalPWMRate";
+  DIOJNI_LOG(logDEBUG) << "Rate= " << value;
+  int32_t status = 0;
+  setDigitalPWMRate(value, &status);
+  DIOJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+ * Method:    setDigitalPWMDutyCycle
+ * Signature: (ID)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDigitalPWMDutyCycle(
+    JNIEnv* env, jclass, jint id, jdouble value) {
+  DIOJNI_LOG(logDEBUG) << "Calling DIOJNI setDigitalPWMDutyCycle";
+  DIOJNI_LOG(logDEBUG) << "PWM Handle = " << (HalDigitalPWMHandle)id;
+  DIOJNI_LOG(logDEBUG) << "DutyCycle= " << value;
+  int32_t status = 0;
+  setDigitalPWMDutyCycle((HalDigitalPWMHandle)id, value, &status);
+  DIOJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+ * Method:    setDigitalPWMOutputChannel
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDigitalPWMOutputChannel(
+    JNIEnv* env, jclass, jint id, jint value) {
+  DIOJNI_LOG(logDEBUG) << "Calling DIOJNI setDigitalPWMOutputChannel";
+  DIOJNI_LOG(logDEBUG) << "PWM Handle = " << (HalDigitalPWMHandle)id;
+  DIOJNI_LOG(logDEBUG) << "Pin= " << value;
+  int32_t status = 0;
+  setDigitalPWMOutputChannel((HalDigitalPWMHandle)id, (uint32_t)value, &status);
+  DIOJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatus(env, status);
+}
+
 }  // extern "C"

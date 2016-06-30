@@ -25,7 +25,7 @@
 DigitalOutput::DigitalOutput(uint32_t channel) {
   std::stringstream buf;
 
-  m_pwmGenerator = (void*)std::numeric_limits<uint32_t>::max();
+  m_pwmGenerator = HAL_INVALID_HANDLE;
   if (!CheckDigitalChannel(channel)) {
     buf << "Digital Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
@@ -122,7 +122,7 @@ void DigitalOutput::SetPWMRate(float rate) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
-  setPWMRate(rate, &status);
+  setDigitalPWMRate(rate, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -140,20 +140,20 @@ void DigitalOutput::SetPWMRate(float rate) {
  * @param initialDutyCycle The duty-cycle to start generating. [0..1]
  */
 void DigitalOutput::EnablePWM(float initialDutyCycle) {
-  if (m_pwmGenerator != (void*)std::numeric_limits<uint32_t>::max()) return;
+  if (m_pwmGenerator != HAL_INVALID_HANDLE) return;
 
   int32_t status = 0;
 
   if (StatusIsFatal()) return;
-  m_pwmGenerator = allocatePWM(&status);
+  m_pwmGenerator = allocateDigitalPWM(&status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   if (StatusIsFatal()) return;
-  setPWMDutyCycle(m_pwmGenerator, initialDutyCycle, &status);
+  setDigitalPWMDutyCycle(m_pwmGenerator, initialDutyCycle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   if (StatusIsFatal()) return;
-  setPWMOutputChannel(m_pwmGenerator, m_channel, &status);
+  setDigitalPWMOutputChannel(m_pwmGenerator, m_channel, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -164,18 +164,18 @@ void DigitalOutput::EnablePWM(float initialDutyCycle) {
  */
 void DigitalOutput::DisablePWM() {
   if (StatusIsFatal()) return;
-  if (m_pwmGenerator == (void*)std::numeric_limits<uint32_t>::max()) return;
+  if (m_pwmGenerator == HAL_INVALID_HANDLE) return;
 
   int32_t status = 0;
 
   // Disable the output by routing to a dead bit.
-  setPWMOutputChannel(m_pwmGenerator, kDigitalChannels, &status);
+  setDigitalPWMOutputChannel(m_pwmGenerator, kDigitalChannels, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  freePWM(m_pwmGenerator, &status);
+  freeDigitalPWM(m_pwmGenerator, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
-  m_pwmGenerator = (void*)std::numeric_limits<uint32_t>::max();
+  m_pwmGenerator = HAL_INVALID_HANDLE;
 }
 
 /**
@@ -190,7 +190,7 @@ void DigitalOutput::UpdateDutyCycle(float dutyCycle) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
-  setPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);
+  setDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 

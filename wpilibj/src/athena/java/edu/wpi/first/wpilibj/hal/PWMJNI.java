@@ -20,14 +20,4 @@ public class PWMJNI extends DIOJNI {
   public static native void latchPWMZero(int pwmPortHandle);
 
   public static native void setPWMPeriodScale(int pwmPortHandle, int squelchMask);
-
-  public static native long allocatePWM();
-
-  public static native void freePWM(long pwmGenerator);
-
-  public static native void setPWMRate(double rate);
-
-  public static native void setPWMDutyCycle(long pwmGenerator, double dutyCycle);
-
-  public static native void setPWMOutputChannel(long pwmGenerator, int pin);
 }
