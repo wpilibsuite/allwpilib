@@ -24,3 +24,5 @@ typedef HalHandle HalAnalogOutputHandle;
 typedef HalHandle HalAnalogInputHandle;
 
 typedef HalHandle HalAnalogTriggerHandle;
+
+typedef HalHandle HalRelayHandle;

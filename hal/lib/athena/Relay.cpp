@@ -8,111 +8,125 @@
 #include "HAL/Relay.h"
 
 #include "DigitalInternal.h"
-
-static_assert(sizeof(uint32_t) <= sizeof(void*),
-              "This file shoves uint32_ts into pointers.");
+#include "handles/IndexedHandleResource.h"
 
 using namespace hal;
+
+namespace {
+struct Relay {
+  uint8_t pin;
+  bool fwd;
+};
+}
+
+constexpr uint32_t kRelayPins = 8;
+constexpr uint32_t kRelayHeaders = kRelayPins / 2;  // Number of FPGA ID's
+
+static IndexedHandleResource<HalRelayHandle, Relay, kRelayPins,
+                             HalHandleEnum::Relay>
+    relayHandles;
 
 // Create a mutex to protect changes to the relay values
 static priority_recursive_mutex digitalRelayMutex;
 
-constexpr uint32_t kRelayPins = 8;
-
 extern "C" {
-bool checkRelayChannel(void* digital_port_pointer) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  return port->pin < kRelayPins;
+HalRelayHandle initializeRelayPort(HalPortHandle port_handle, uint8_t fwd,
+                                   int32_t* status) {
+  initializeDigital(status);
+
+  if (*status != 0) return HAL_INVALID_HANDLE;
+
+  int16_t pin = getPortHandlePin(port_handle);
+  if (pin == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+
+  if (!fwd) pin += kRelayHeaders;  // add 4 to reverse pins
+
+  auto handle = relayHandles.Allocate(pin, status);
+
+  if (*status != 0)
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
+
+  auto port = relayHandles.Get(handle);
+  if (port == nullptr) {  // would only occur on thread issue.
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+
+  if (!fwd) {
+    pin -= kRelayHeaders;  // subtract number of headers to put pin in range.
+    port->fwd = false;     // set to reverse
+  } else {
+    port->fwd = true;  // set to forward
+  }
+
+  port->pin = static_cast<uint8_t>(pin);
+  return handle;
+}
+
+void freeRelayPort(HalRelayHandle relay_port_handle) {
+  // no status, so no need to check for a proper free.
+  relayHandles.Free(relay_port_handle);
+}
+
+bool checkRelayChannel(uint8_t pin) {
+  return pin < kRelayHeaders;  // roboRIO only has 4 headers, and the FPGA has
+                               // seperate functions for forward and reverse,
+                               // instead of seperate pin IDs
 }
 
 /**
- * Check a port to make sure that it is not nullptr and is a valid Relay port.
- *
- * Sets the status to contain the appropriate error.
- *
- * @return true if the port passed validation.
+ * Set the state of a relay.
+ * Set the state of a relay output.
  */
-static bool verifyRelayChannel(DigitalPort* port, int32_t* status) {
+void setRelay(HalRelayHandle relay_port_handle, bool on, int32_t* status) {
+  auto port = relayHandles.Get(relay_port_handle);
   if (port == nullptr) {
-    *status = NULL_PARAMETER;
-    return false;
-  } else if (!checkRelayChannel(port)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+  std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
+  uint8_t relays = 0;
+  if (port->fwd) {
+    relays = relaySystem->readValue_Forward(status);
+  } else {
+    relays = relaySystem->readValue_Reverse(status);
+  }
+
+  if (*status != 0) return;  // bad status read
+
+  if (on) {
+    relays |= 1 << port->pin;
+  } else {
+    relays &= ~(1 << port->pin);
+  }
+
+  if (port->fwd) {
+    relaySystem->writeValue_Forward(relays, status);
+  } else {
+    relaySystem->writeValue_Reverse(relays, status);
+  }
+}
+
+/**
+ * Get the current state of the relay channel
+ */
+bool getRelay(HalRelayHandle relay_port_handle, int32_t* status) {
+  auto port = relayHandles.Get(relay_port_handle);
+  if (port == nullptr) {
     *status = PARAMETER_OUT_OF_RANGE;
     return false;
+  }
+
+  uint8_t relays = 0;
+  if (port->fwd) {
+    relays = relaySystem->readValue_Forward(status);
   } else {
-    return true;
-  }
-}
-
-/**
- * Set the state of a relay.
- * Set the state of a relay output to be forward. Relays have two outputs and
- * each is
- * independently set to 0v or 12v.
- */
-void setRelayForward(void* digital_port_pointer, bool on, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyRelayChannel(port, status)) {
-    return;
+    relays = relaySystem->readValue_Reverse(status);
   }
 
-  {
-    std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
-    uint8_t forwardRelays = relaySystem->readValue_Forward(status);
-    if (on)
-      forwardRelays |= 1 << port->pin;
-    else
-      forwardRelays &= ~(1 << port->pin);
-    relaySystem->writeValue_Forward(forwardRelays, status);
-  }
-}
-
-/**
- * Set the state of a relay.
- * Set the state of a relay output to be reverse. Relays have two outputs and
- * each is
- * independently set to 0v or 12v.
- */
-void setRelayReverse(void* digital_port_pointer, bool on, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyRelayChannel(port, status)) {
-    return;
-  }
-
-  {
-    std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
-    uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
-    if (on)
-      reverseRelays |= 1 << port->pin;
-    else
-      reverseRelays &= ~(1 << port->pin);
-    relaySystem->writeValue_Reverse(reverseRelays, status);
-  }
-}
-
-/**
- * Get the current state of the forward relay channel
- */
-bool getRelayForward(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyRelayChannel(port, status)) {
-    return false;
-  }
-
-  uint8_t forwardRelays = relaySystem->readValue_Forward(status);
-  return (forwardRelays & (1 << port->pin)) != 0;
-}
-
-/**
- * Get the current state of the reverse relay channel
- */
-bool getRelayReverse(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyRelayChannel(port, status)) {
-    return false;
-  }
-
-  uint8_t reverseRelays = relaySystem->readValue_Reverse(status);
-  return (reverseRelays & (1 << port->pin)) != 0;
+  return (relays & (1 << port->pin)) != 0;
 }
 }

@@ -9,11 +9,15 @@
 
 #include <stdint.h>
 
-extern "C" {
-bool checkRelayChannel(void* digital_port_pointer);
+#include "Handles.h"
 
-void setRelayForward(void* digital_port_pointer, bool on, int32_t* status);
-void setRelayReverse(void* digital_port_pointer, bool on, int32_t* status);
-bool getRelayForward(void* digital_port_pointer, int32_t* status);
-bool getRelayReverse(void* digital_port_pointer, int32_t* status);
+extern "C" {
+HalRelayHandle initializeRelayPort(HalPortHandle port_handle, uint8_t fwd,
+                                   int32_t* status);
+void freeRelayPort(HalRelayHandle relay_port_handle);
+
+bool checkRelayChannel(uint8_t pin);
+
+void setRelay(HalRelayHandle relay_port_handle, bool on, int32_t* status);
+bool getRelay(HalRelayHandle relay_port_handle, int32_t* status);
 }

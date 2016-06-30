@@ -22,7 +22,6 @@ const uint32_t SensorBase::kChassisSlots;
 
 static bool portsInitialized = false;
 void* SensorBase::m_digital_ports[kDigitalChannels];
-void* SensorBase::m_relay_ports[kRelayChannels];
 void* SensorBase::m_pwm_ports[kPwmChannels];
 
 /**
@@ -34,13 +33,6 @@ SensorBase::SensorBase() {
       HalPortHandle port = getPort(i);
       int32_t status = 0;
       m_digital_ports[i] = initializeDigitalPort(port, &status);
-      wpi_setErrorWithContext(status, getHALErrorMessage(status));
-    }
-
-    for (uint32_t i = 0; i < kRelayChannels; i++) {
-      HalPortHandle port = getPort(i);
-      int32_t status = 0;
-      m_relay_ports[i] = initializeDigitalPort(port, &status);
       wpi_setErrorWithContext(status, getHALErrorMessage(status));
     }
 
@@ -77,16 +69,15 @@ bool SensorBase::CheckDigitalChannel(uint32_t channel) {
 }
 
 /**
- * Check that the digital channel number is valid.
+ * Check that the relay channel number is valid.
  *
  * Verify that the channel number is one of the legal channel numbers. Channel
- * numbers are 1-based.
+ * numbers are 0-based.
  *
  * @return Relay channel is valid
  */
 bool SensorBase::CheckRelayChannel(uint32_t channel) {
-  if (channel < kRelayChannels) return true;
-  return false;
+  return checkRelayChannel((uint8_t)channel);
 }
 
 /**

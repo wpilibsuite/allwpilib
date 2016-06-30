@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "HAL/Handles.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "SensorBase.h"
@@ -65,6 +66,9 @@ class Relay : public MotorSafety,
  private:
   uint32_t m_channel;
   Direction m_direction;
+
+  HalRelayHandle m_forwardHandle = HAL_INVALID_HANDLE;
+  HalRelayHandle m_reverseHandle = HAL_INVALID_HANDLE;
 
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 };
