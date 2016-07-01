@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#include "HAL/Handles.h"
+
 enum Mode {
   kTwoPulse = 0,
   kSemiperiod = 1,
@@ -17,38 +19,40 @@ enum Mode {
 };
 
 extern "C" {
-void* initializeCounter(Mode mode, uint32_t* index, int32_t* status);
-void freeCounter(void* counter_pointer, int32_t* status);
-void setCounterAverageSize(void* counter_pointer, int32_t size,
+HalCounterHandle initializeCounter(Mode mode, uint32_t* index, int32_t* status);
+void freeCounter(HalCounterHandle counter_handle, int32_t* status);
+void setCounterAverageSize(HalCounterHandle counter_handle, int32_t size,
                            int32_t* status);
-void setCounterUpSource(void* counter_pointer, uint32_t pin, bool analogTrigger,
-                        int32_t* status);
-void setCounterUpSourceEdge(void* counter_pointer, bool risingEdge,
+void setCounterUpSource(HalCounterHandle counter_handle, uint32_t pin,
+                        bool analogTrigger, int32_t* status);
+void setCounterUpSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
                             bool fallingEdge, int32_t* status);
-void clearCounterUpSource(void* counter_pointer, int32_t* status);
-void setCounterDownSource(void* counter_pointer, uint32_t pin,
+void clearCounterUpSource(HalCounterHandle counter_handle, int32_t* status);
+void setCounterDownSource(HalCounterHandle counter_handle, uint32_t pin,
                           bool analogTrigger, int32_t* status);
-void setCounterDownSourceEdge(void* counter_pointer, bool risingEdge,
+void setCounterDownSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
                               bool fallingEdge, int32_t* status);
-void clearCounterDownSource(void* counter_pointer, int32_t* status);
-void setCounterUpDownMode(void* counter_pointer, int32_t* status);
-void setCounterExternalDirectionMode(void* counter_pointer, int32_t* status);
-void setCounterSemiPeriodMode(void* counter_pointer, bool highSemiPeriod,
-                              int32_t* status);
-void setCounterPulseLengthMode(void* counter_pointer, double threshold,
-                               int32_t* status);
-int32_t getCounterSamplesToAverage(void* counter_pointer, int32_t* status);
-void setCounterSamplesToAverage(void* counter_pointer, int samplesToAverage,
-                                int32_t* status);
-void resetCounter(void* counter_pointer, int32_t* status);
-int32_t getCounter(void* counter_pointer, int32_t* status);
-double getCounterPeriod(void* counter_pointer, int32_t* status);
-void setCounterMaxPeriod(void* counter_pointer, double maxPeriod,
+void clearCounterDownSource(HalCounterHandle counter_handle, int32_t* status);
+void setCounterUpDownMode(HalCounterHandle counter_handle, int32_t* status);
+void setCounterExternalDirectionMode(HalCounterHandle counter_handle,
+                                     int32_t* status);
+void setCounterSemiPeriodMode(HalCounterHandle counter_handle,
+                              bool highSemiPeriod, int32_t* status);
+void setCounterPulseLengthMode(HalCounterHandle counter_handle,
+                               double threshold, int32_t* status);
+int32_t getCounterSamplesToAverage(HalCounterHandle counter_handle,
+                                   int32_t* status);
+void setCounterSamplesToAverage(HalCounterHandle counter_handle,
+                                int samplesToAverage, int32_t* status);
+void resetCounter(HalCounterHandle counter_handle, int32_t* status);
+int32_t getCounter(HalCounterHandle counter_handle, int32_t* status);
+double getCounterPeriod(HalCounterHandle counter_handle, int32_t* status);
+void setCounterMaxPeriod(HalCounterHandle counter_handle, double maxPeriod,
                          int32_t* status);
-void setCounterUpdateWhenEmpty(void* counter_pointer, bool enabled,
+void setCounterUpdateWhenEmpty(HalCounterHandle counter_handle, bool enabled,
                                int32_t* status);
-bool getCounterStopped(void* counter_pointer, int32_t* status);
-bool getCounterDirection(void* counter_pointer, int32_t* status);
-void setCounterReverseDirection(void* counter_pointer, bool reverseDirection,
-                                int32_t* status);
+bool getCounterStopped(HalCounterHandle counter_handle, int32_t* status);
+bool getCounterDirection(HalCounterHandle counter_handle, int32_t* status);
+void setCounterReverseDirection(HalCounterHandle counter_handle,
+                                bool reverseDirection, int32_t* status);
 }

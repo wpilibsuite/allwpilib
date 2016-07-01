@@ -182,7 +182,7 @@ Counter::~Counter() {
   int32_t status = 0;
   freeCounter(m_counter, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  m_counter = nullptr;
+  m_counter = HAL_INVALID_HANDLE;
 }
 
 /**
