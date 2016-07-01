@@ -10,56 +10,56 @@ package edu.wpi.first.wpilibj.hal;
 import java.nio.IntBuffer;
 
 public class CounterJNI extends JNIWrapper {
-  public static native long initializeCounter(int mode, IntBuffer index);
+  public static native int initializeCounter(int mode, IntBuffer index);
 
-  public static native void freeCounter(long counterPointer);
+  public static native void freeCounter(int counterHandle);
 
-  public static native void setCounterAverageSize(long counterPointer, int size);
+  public static native void setCounterAverageSize(int counterHandle, int size);
 
-  public static native void setCounterUpSource(long counterPointer, int pin,
+  public static native void setCounterUpSource(int counterHandle, int pin,
                                                boolean analogTrigger);
 
-  public static native void setCounterUpSourceEdge(long counterPointer, boolean risingEdge,
+  public static native void setCounterUpSourceEdge(int counterHandle, boolean risingEdge,
                                                    boolean fallingEdge);
 
-  public static native void clearCounterUpSource(long counterPointer);
+  public static native void clearCounterUpSource(int counterHandle);
 
-  public static native void setCounterDownSource(long counterPointer, int pin,
+  public static native void setCounterDownSource(int counterHandle, int pin,
                                                  boolean analogTrigger);
 
-  public static native void setCounterDownSourceEdge(long counterPointer, boolean risingEdge,
+  public static native void setCounterDownSourceEdge(int counterHandle, boolean risingEdge,
                                                      boolean fallingEdge);
 
-  public static native void clearCounterDownSource(long counterPointer);
+  public static native void clearCounterDownSource(int counterHandle);
 
-  public static native void setCounterUpDownMode(long counterPointer);
+  public static native void setCounterUpDownMode(int counterHandle);
 
-  public static native void setCounterExternalDirectionMode(long counterPointer);
+  public static native void setCounterExternalDirectionMode(int counterHandle);
 
-  public static native void setCounterSemiPeriodMode(long counterPointer,
+  public static native void setCounterSemiPeriodMode(int counterHandle,
                                                      boolean highSemiPeriod);
 
-  public static native void setCounterPulseLengthMode(long counterPointer, double threshold);
+  public static native void setCounterPulseLengthMode(int counterHandle, double threshold);
 
-  public static native int getCounterSamplesToAverage(long counterPointer);
+  public static native int getCounterSamplesToAverage(int counterHandle);
 
-  public static native void setCounterSamplesToAverage(long counterPointer,
+  public static native void setCounterSamplesToAverage(int counterHandle,
                                                        int samplesToAverage);
 
-  public static native void resetCounter(long counterPointer);
+  public static native void resetCounter(int counterHandle);
 
-  public static native int getCounter(long counterPointer);
+  public static native int getCounter(int counterHandle);
 
-  public static native double getCounterPeriod(long counterPointer);
+  public static native double getCounterPeriod(int counterHandle);
 
-  public static native void setCounterMaxPeriod(long counterPointer, double maxPeriod);
+  public static native void setCounterMaxPeriod(int counterHandle, double maxPeriod);
 
-  public static native void setCounterUpdateWhenEmpty(long counterPointer, boolean enabled);
+  public static native void setCounterUpdateWhenEmpty(int counterHandle, boolean enabled);
 
-  public static native boolean getCounterStopped(long counterPointer);
+  public static native boolean getCounterStopped(int counterHandle);
 
-  public static native boolean getCounterDirection(long counterPointer);
+  public static native boolean getCounterDirection(int counterHandle);
 
-  public static native void setCounterReverseDirection(long counterPointer,
+  public static native void setCounterReverseDirection(int counterHandle,
                                                        boolean reverseDirection);
 }

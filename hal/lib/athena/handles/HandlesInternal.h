@@ -36,7 +36,8 @@ enum class HalHandleEnum {
   AnalogTrigger = 7,
   Relay = 8,
   PWM = 9,
-  DigitalPWM = 10
+  DigitalPWM = 10,
+  Counter = 11
 };
 
 static inline int16_t getHandleIndex(HalHandle handle) {

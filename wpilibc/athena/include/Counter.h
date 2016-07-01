@@ -12,6 +12,7 @@
 #include "AnalogTrigger.h"
 #include "CounterBase.h"
 #include "HAL/Counter.h"
+#include "HAL/Handles.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 
@@ -97,9 +98,10 @@ class Counter : public SensorBase,
   // Makes the counter count down.
   std::shared_ptr<DigitalSource> m_downSource;
   // The FPGA counter object
-  void* m_counter = nullptr;  ///< The FPGA counter object.
+  HalCounterHandle m_counter = HAL_INVALID_HANDLE;
+
  private:
-  uint32_t m_index = 0;  ///< The index of this counter.
+  uint32_t m_index = 0;  // The index of this counter.
 
   std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;
