@@ -25,27 +25,69 @@ extern "C" {
 /**
  * Create a new instance of a digital port.
  */
-void* initializeDigitalPort(HalPortHandle port_handle, int32_t* status) {
+HalDigitalHandle initializeDIOPort(HalPortHandle port_handle, uint8_t input,
+                                   int32_t* status) {
   initializeDigital(status);
 
-  if (*status != 0) return nullptr;
+  if (*status != 0) return HAL_INVALID_HANDLE;
 
   int16_t pin = getPortHandlePin(port_handle);
   if (pin == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return nullptr;
+    return HAL_INVALID_HANDLE;
   }
 
-  // Initialize port structure
-  DigitalPort* digital_port = new DigitalPort();
-  digital_port->pin = (uint8_t)pin;
+  auto handle = digitalPinHandles.Allocate(pin, HalHandleEnum::DIO, status);
 
-  return digital_port;
+  if (*status != 0)
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
+
+  auto port = digitalPinHandles.Get(handle, HalHandleEnum::DIO);
+  if (port == nullptr) {  // would only occur on thread issue.
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+
+  port->pin = static_cast<uint8_t>(pin);
+
+  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
+
+  tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
+
+  if (port->pin < kNumHeaders) {
+    uint32_t bitToSet = 1 << port->pin;
+    if (input) {
+      outputEnable.Headers =
+          outputEnable.Headers & (~bitToSet);  // clear the bit for read
+    } else {
+      outputEnable.Headers =
+          outputEnable.Headers | bitToSet;  // set the bit for write
+    }
+  } else {
+    uint32_t bitToSet = 1 << remapMXPChannel(port->pin);
+
+    // Disable special functions on this pin
+    short specialFunctions =
+        digitalSystem->readEnableMXPSpecialFunction(status);
+    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
+                                                 status);
+
+    if (input) {
+      outputEnable.MXP =
+          outputEnable.MXP & (~bitToSet);  // clear the bit for read
+    } else {
+      outputEnable.MXP = outputEnable.MXP | bitToSet;  // set the bit for write
+    }
+  }
+
+  digitalSystem->writeOutputEnable(outputEnable, status);
+
+  return handle;
 }
 
-void freeDigitalPort(void* digital_port_pointer) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  delete port;
+void freeDIOPort(HalDigitalHandle dio_port_handle) {
+  // no status, so no need to check for a proper free.
+  digitalPinHandles.Free(dio_port_handle, HalHandleEnum::DIO);
 }
 
 /**
@@ -134,76 +176,6 @@ void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t* status) {
 }
 
 /**
- * Allocate Digital I/O channels.
- * Allocate channels so that they are not accidently reused. Also the direction
- * is set at the time of the allocation.
- *
- * @param channel The Digital I/O channel
- * @param input If true open as input; if false open as output
- * @return Was successfully allocated
- */
-bool allocateDIO(void* digital_port_pointer, bool input, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (port == nullptr) {
-    *status = NULL_PARAMETER;
-    return false;
-  }
-  char buf[64];
-  snprintf(buf, 64, "DIO %d", port->pin);
-  if (DIOChannels->Allocate(port->pin, buf) == ~0ul) {
-    *status = RESOURCE_IS_ALLOCATED;
-    return false;
-  }
-
-  {
-    std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-
-    tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
-
-    if (port->pin < kNumHeaders) {
-      uint32_t bitToSet = 1 << port->pin;
-      if (input) {
-        outputEnable.Headers =
-            outputEnable.Headers & (~bitToSet);  // clear the bit for read
-      } else {
-        outputEnable.Headers =
-            outputEnable.Headers | bitToSet;  // set the bit for write
-      }
-    } else {
-      uint32_t bitToSet = 1 << remapMXPChannel(port->pin);
-
-      // Disable special functions on this pin
-      short specialFunctions =
-          digitalSystem->readEnableMXPSpecialFunction(status);
-      digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
-                                                   status);
-
-      if (input) {
-        outputEnable.MXP =
-            outputEnable.MXP & (~bitToSet);  // clear the bit for read
-      } else {
-        outputEnable.MXP =
-            outputEnable.MXP | bitToSet;  // set the bit for write
-      }
-    }
-
-    digitalSystem->writeOutputEnable(outputEnable, status);
-  }
-  return true;
-}
-
-/**
- * Free the resource associated with a digital I/O channel.
- *
- * @param channel The Digital I/O channel to free
- */
-void freeDIO(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!port) return;
-  DIOChannels->Free(port->pin);
-}
-
-/**
  * Write a digital I/O bit to the FPGA.
  * Set a single value on a digital I/O channel.
  *
@@ -211,8 +183,12 @@ void freeDIO(void* digital_port_pointer, int32_t* status) {
  * @param value The state to set the digital channel (if it is configured as an
  * output)
  */
-void setDIO(void* digital_port_pointer, short value, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+void setDIO(HalDigitalHandle dio_port_handle, short value, int32_t* status) {
+  auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   if (value != 0 && value != 1) {
     if (value != 0) value = 1;
   }
@@ -250,8 +226,12 @@ void setDIO(void* digital_port_pointer, short value, int32_t* status) {
  * @param channel The digital I/O channel
  * @return The state of the specified channel
  */
-bool getDIO(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+bool getDIO(HalDigitalHandle dio_port_handle, int32_t* status) {
+  auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
   tDIO::tDI currentDIO = digitalSystem->readDI(status);
   // Shift 00000001 over channel-1 places.
   // AND it against the currentDIO
@@ -279,8 +259,12 @@ bool getDIO(void* digital_port_pointer, int32_t* status) {
  * @param channel The digital I/O channel
  * @return The direction of the specified channel
  */
-bool getDIODirection(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+bool getDIODirection(HalDigitalHandle dio_port_handle, int32_t* status) {
+  auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
   tDIO::tOutputEnable currentOutputEnable =
       digitalSystem->readOutputEnable(status);
   // Shift 00000001 over port->pin-1 places.
@@ -303,8 +287,13 @@ bool getDIODirection(void* digital_port_pointer, int32_t* status) {
  * @param channel The Digital Output channel that the pulse should be output on
  * @param pulseLength The active length of the pulse (in seconds)
  */
-void pulse(void* digital_port_pointer, double pulseLength, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+void pulse(HalDigitalHandle dio_port_handle, double pulseLength,
+           int32_t* status) {
+  auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   tDIO::tPulse pulse;
 
   if (port->pin < kNumHeaders) {
@@ -324,8 +313,12 @@ void pulse(void* digital_port_pointer, double pulseLength, int32_t* status) {
  *
  * @return A pulse is in progress
  */
-bool isPulsing(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+bool isPulsing(HalDigitalHandle dio_port_handle, int32_t* status) {
+  auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
 
   if (port->pin < kNumHeaders) {
@@ -353,9 +346,13 @@ bool isAnyPulsing(int32_t* status) {
  * @param filter_index The filter index.  Must be in the range 0 - 3,
  * where 0 means "none" and 1 - 3 means filter # filter_index - 1.
  */
-void setFilterSelect(void* digital_port_pointer, int filter_index,
+void setFilterSelect(HalDigitalHandle dio_port_handle, int filter_index,
                      int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+  auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
 
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
   if (port->pin < kNumHeaders) {
@@ -374,8 +371,12 @@ void setFilterSelect(void* digital_port_pointer, int filter_index,
  * @return filter_index The filter index.  Must be in the range 0 - 3,
  * where 0 means "none" and 1 - 3 means filter # filter_index - 1.
  */
-int getFilterSelect(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
+int getFilterSelect(HalDigitalHandle dio_port_handle, int32_t* status) {
+  auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0;
+  }
 
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
   if (port->pin < kNumHeaders) {

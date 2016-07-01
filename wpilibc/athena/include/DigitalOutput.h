@@ -38,6 +38,7 @@ class DigitalOutput : public DigitalSource,
   virtual uint32_t GetChannelForRouting() const;
   virtual uint32_t GetModuleForRouting() const;
   virtual bool GetAnalogTriggerForRouting() const;
+  virtual HalHandle GetPortHandle() const;
 
   virtual void ValueChanged(ITable* source, llvm::StringRef key,
                             std::shared_ptr<nt::Value> value, bool isNew);
@@ -50,6 +51,7 @@ class DigitalOutput : public DigitalSource,
 
  private:
   uint32_t m_channel;
+  HalDigitalHandle m_handle;
   void* m_pwmGenerator;
 
   std::shared_ptr<ITable> m_table;

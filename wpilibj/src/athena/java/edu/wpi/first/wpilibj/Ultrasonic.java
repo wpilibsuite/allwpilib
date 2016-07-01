@@ -83,7 +83,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
           return;
         }
         if (ultrasonic.isEnabled()) {
-          ultrasonic.m_pingChannel.pulse(m_pingChannel.m_channel, (float) kPingTime); // do
+          ultrasonic.m_pingChannel.pulse(m_pingChannel.getChannel(), (float) kPingTime); // do
           // the
           // ping
         }
@@ -288,15 +288,8 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
     setAutomaticMode(false); // turn off automatic round robin if pinging
     // single sensor
     m_counter.reset(); // reset the counter to zero (invalid data now)
-    m_pingChannel.pulse(m_pingChannel.m_channel, (float) kPingTime); // do
-    // the
-    // ping
-    // to
-    // start
-    // getting
-    // a
-    // single
-    // range
+    // do the ping to start getting a single range
+    m_pingChannel.pulse(m_pingChannel.getChannel(), (float) kPingTime); 
   }
 
   /**

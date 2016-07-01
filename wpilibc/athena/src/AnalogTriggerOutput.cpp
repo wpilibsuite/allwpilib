@@ -66,3 +66,10 @@ uint32_t AnalogTriggerOutput::GetModuleForRouting() const { return 0; }
  * @return The value to be written to the module field of a routing mux.
  */
 bool AnalogTriggerOutput::GetAnalogTriggerForRouting() const { return true; }
+
+/**
+ * @return The HAL Handle to the specified source.
+ */
+HalHandle AnalogTriggerOutput::GetPortHandle() const {
+  return m_trigger.m_trigger;
+}

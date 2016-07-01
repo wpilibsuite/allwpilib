@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "HAL/Handles.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
@@ -108,6 +109,7 @@ class PWM : public SensorBase,
 
  private:
   uint32_t m_channel;
+  HalDigitalHandle m_handle;
   int32_t GetMaxPositivePwm() const { return m_maxPwm; }
   int32_t GetMinPositivePwm() const {
     return m_eliminateDeadband ? m_deadbandMaxPwm : m_centerPwm + 1;

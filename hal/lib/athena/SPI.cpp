@@ -28,6 +28,11 @@ static priority_recursive_mutex spiOnboardSemaphore;
 static priority_recursive_mutex spiMXPSemaphore;
 static tSPI* spiSystem;
 
+static HalDigitalHandle spiMXPDigitalHandle1 = HAL_INVALID_HANDLE;
+static HalDigitalHandle spiMXPDigitalHandle2 = HAL_INVALID_HANDLE;
+static HalDigitalHandle spiMXPDigitalHandle3 = HAL_INVALID_HANDLE;
+static HalDigitalHandle spiMXPDigitalHandle4 = HAL_INVALID_HANDLE;
+
 extern "C" {
 
 struct SPIAccumulator {
@@ -80,24 +85,30 @@ void spiInitialize(uint8_t port, int32_t* status) {
     case 4:
       initializeDigital(status);
       if (*status != 0) return;
-      if (!allocateDIO(initializeDigitalPort(getPort(14), status), false,
-                       status)) {
+      if ((spiMXPDigitalHandle1 = initializeDIOPort(
+               getPort(14), false, status)) == HAL_INVALID_HANDLE) {
         printf("Failed to allocate DIO 14\n");
         return;
       }
-      if (!allocateDIO(initializeDigitalPort(getPort(15), status), false,
-                       status)) {
+      if ((spiMXPDigitalHandle2 = initializeDIOPort(
+               getPort(15), false, status)) == HAL_INVALID_HANDLE) {
         printf("Failed to allocate DIO 15\n");
+        freeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
         return;
       }
-      if (!allocateDIO(initializeDigitalPort(getPort(16), status), true,
-                       status)) {
+      if ((spiMXPDigitalHandle3 = initializeDIOPort(
+               getPort(16), false, status)) == HAL_INVALID_HANDLE) {
         printf("Failed to allocate DIO 16\n");
+        freeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
+        freeDIOPort(spiMXPDigitalHandle2);  // free the second port allocated
         return;
       }
-      if (!allocateDIO(initializeDigitalPort(getPort(17), status), false,
-                       status)) {
+      if ((spiMXPDigitalHandle4 = initializeDIOPort(
+               getPort(17), false, status)) == HAL_INVALID_HANDLE) {
         printf("Failed to allocate DIO 17\n");
+        freeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
+        freeDIOPort(spiMXPDigitalHandle2);  // free the second port allocated
+        freeDIOPort(spiMXPDigitalHandle3);  // free the third port allocated
         return;
       }
       digitalSystem->writeEnableMXPSpecialFunction(
@@ -176,6 +187,12 @@ void spiClose(uint8_t port) {
   }
   spilib_close(spiGetHandle(port));
   spiSetHandle(port, 0);
+  if (port == 4) {
+    freeDIOPort(spiMXPDigitalHandle1);
+    freeDIOPort(spiMXPDigitalHandle2);
+    freeDIOPort(spiMXPDigitalHandle3);
+    freeDIOPort(spiMXPDigitalHandle4);
+  }
   return;
 }
 

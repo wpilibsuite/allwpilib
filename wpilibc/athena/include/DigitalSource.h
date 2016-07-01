@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "HAL/Handles.h"
 #include "InterruptableSensorBase.h"
 
 /**
@@ -25,4 +26,5 @@ class DigitalSource : public InterruptableSensorBase {
   virtual uint32_t GetChannelForRouting() const = 0;
   virtual uint32_t GetModuleForRouting() const = 0;
   virtual bool GetAnalogTriggerForRouting() const = 0;
+  virtual HalHandle GetPortHandle() const = 0;
 };

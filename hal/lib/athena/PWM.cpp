@@ -8,6 +8,7 @@
 #include "HAL/PWM.h"
 
 #include "DigitalInternal.h"
+#include "handles/HandlesInternal.h"
 
 static_assert(sizeof(uint32_t) <= sizeof(void*),
               "This file shoves uint32_ts into pointers.");
@@ -15,29 +16,65 @@ static_assert(sizeof(uint32_t) <= sizeof(void*),
 using namespace hal;
 
 extern "C" {
-bool checkPWMChannel(void* digital_port_pointer) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  return port->pin < kPwmPins;
+
+HalDigitalHandle initializePWMPort(HalPortHandle port_handle, int32_t* status) {
+  initializeDigital(status);
+
+  if (*status != 0) return HAL_INVALID_HANDLE;
+
+  int16_t pin = getPortHandlePin(port_handle);
+  if (pin == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+
+  uint8_t origPin = static_cast<uint8_t>(pin);
+
+  if (origPin < kNumHeaders) {
+    pin += kDigitalPins;  // remap Headers to end of allocations
+  } else {
+    pin = remapMXPPWMChannel(pin) + 10;  // remap MXP to proper channel
+  }
+
+  auto handle = digitalPinHandles.Allocate(pin, HalHandleEnum::PWM, status);
+
+  if (*status != 0)
+    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
+
+  auto port = digitalPinHandles.Get(handle, HalHandleEnum::PWM);
+  if (port == nullptr) {  // would only occur on thread issue.
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+
+  port->pin = origPin;
+
+  uint32_t bitToSet = 1 << remapMXPPWMChannel(port->pin);
+  short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+  digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
+                                               status);
+
+  return handle;
+}
+void freePWMPort(HalDigitalHandle pwm_port_handle, int32_t* status) {
+  auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
+  if (port->pin > tPWM::kNumHdrRegisters - 1) {
+    uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->pin);
+    short specialFunctions =
+        digitalSystem->readEnableMXPSpecialFunction(status);
+    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,
+                                                 status);
+  }
+
+  digitalPinHandles.Free(pwm_port_handle, HalHandleEnum::PWM);
 }
 
-/**
- * Check a port to make sure that it is not nullptr and is a valid PWM port.
- *
- * Sets the status to contain the appropriate error.
- *
- * @return true if the port passed validation.
- */
-static bool verifyPWMChannel(DigitalPort* port, int32_t* status) {
-  if (port == nullptr) {
-    *status = NULL_PARAMETER;
-    return false;
-  } else if (!checkPWMChannel(port)) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return false;
-  } else {
-    return true;
-  }
-}
+bool checkPWMChannel(uint8_t pin) { return pin < kPwmPins; }
 
 /**
  * Set a PWM channel to the desired value. The values range from 0 to 255 and
@@ -47,9 +84,11 @@ static bool verifyPWMChannel(DigitalPort* port, int32_t* status) {
  * @param channel The PWM channel to set.
  * @param value The PWM value to set.
  */
-void setPWM(void* digital_port_pointer, unsigned short value, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyPWMChannel(port, status)) {
+void setPWM(HalDigitalHandle pwm_port_handle, unsigned short value,
+            int32_t* status) {
+  auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
@@ -66,9 +105,10 @@ void setPWM(void* digital_port_pointer, unsigned short value, int32_t* status) {
  * @param channel The PWM channel to read from.
  * @return The raw PWM value.
  */
-unsigned short getPWM(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyPWMChannel(port, status)) {
+unsigned short getPWM(HalDigitalHandle pwm_port_handle, int32_t* status) {
+  auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
     return 0;
   }
 
@@ -79,9 +119,10 @@ unsigned short getPWM(void* digital_port_pointer, int32_t* status) {
   }
 }
 
-void latchPWMZero(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyPWMChannel(port, status)) {
+void latchPWMZero(HalDigitalHandle pwm_port_handle, int32_t* status) {
+  auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
@@ -95,10 +136,11 @@ void latchPWMZero(void* digital_port_pointer, int32_t* status) {
  * @param channel The PWM channel to configure.
  * @param squelchMask The 2-bit mask of outputs to squelch.
  */
-void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask,
+void setPWMPeriodScale(HalDigitalHandle pwm_port_handle, uint32_t squelchMask,
                        int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyPWMChannel(port, status)) {
+  auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
@@ -107,51 +149,6 @@ void setPWMPeriodScale(void* digital_port_pointer, uint32_t squelchMask,
   } else {
     pwmSystem->writePeriodScaleMXP(port->pin - tPWM::kNumPeriodScaleHdrElements,
                                    squelchMask, status);
-  }
-}
-
-bool allocatePWMChannel(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!verifyPWMChannel(port, status)) {
-    return false;
-  }
-
-  char buf[64];
-  snprintf(buf, 64, "PWM %d", port->pin);
-  if (PWMChannels->Allocate(port->pin, buf) == ~0ul) {
-    *status = RESOURCE_IS_ALLOCATED;
-    return false;
-  }
-
-  if (port->pin > tPWM::kNumHdrRegisters - 1) {
-    snprintf(buf, 64, "PWM %d and DIO %d", port->pin,
-             remapMXPPWMChannel(port->pin) + 10);
-    if (DIOChannels->Allocate(remapMXPPWMChannel(port->pin) + 10, buf) == ~0ul)
-      return false;
-    uint32_t bitToSet = 1 << remapMXPPWMChannel(port->pin);
-    short specialFunctions =
-        digitalSystem->readEnableMXPSpecialFunction(status);
-    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
-                                                 status);
-  }
-  return true;
-}
-
-void freePWMChannel(void* digital_port_pointer, int32_t* status) {
-  DigitalPort* port = (DigitalPort*)digital_port_pointer;
-  if (!port) return;
-  if (!verifyPWMChannel(port, status)) {
-    return;
-  }
-
-  PWMChannels->Free(port->pin);
-  if (port->pin > tPWM::kNumHdrRegisters - 1) {
-    DIOChannels->Free(remapMXPPWMChannel(port->pin) + 10);
-    uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->pin);
-    short specialFunctions =
-        digitalSystem->readEnableMXPSpecialFunction(status);
-    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,
-                                                 status);
   }
 }
 
