@@ -19,7 +19,7 @@ enum Mode {
 };
 
 extern "C" {
-HalCounterHandle initializeCounter(Mode mode, uint32_t* index, int32_t* status);
+HalCounterHandle initializeCounter(Mode mode, int32_t* index, int32_t* status);
 void freeCounter(HalCounterHandle counter_handle, int32_t* status);
 void setCounterAverageSize(HalCounterHandle counter_handle, int32_t size,
                            int32_t* status);

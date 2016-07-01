@@ -26,8 +26,7 @@ static LimitedHandleResource<HalCounterHandle, Counter, kNumCounters,
     counterHandles;
 
 extern "C" {
-HalCounterHandle initializeCounter(Mode mode, uint32_t* index,
-                                   int32_t* status) {
+HalCounterHandle initializeCounter(Mode mode, int32_t* index, int32_t* status) {
   auto handle = counterHandles.Allocate();
   if (handle == HAL_INVALID_HANDLE) {  // out of resources
     *status = NO_AVAILABLE_RESOURCES;

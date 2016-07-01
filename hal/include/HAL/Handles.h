@@ -36,3 +36,7 @@ typedef HalHandle HalCounterHandle;
 typedef HalHandle HalCompressorHandle;
 
 typedef HalHandle HalSolenoidHandle;
+
+typedef HalHandle HalFPGAEncoderHandle;
+
+typedef HalHandle HalEncoderHandle;

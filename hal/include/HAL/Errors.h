@@ -67,6 +67,9 @@
 #define PARAMETER_OUT_OF_RANGE_MESSAGE "HAL: A parameter is out of range."
 #define RESOURCE_IS_ALLOCATED -1029
 #define RESOURCE_IS_ALLOCATED_MESSAGE "HAL: Resource already allocated"
+#define HAL_COUNTER_NOT_SUPPORTED -1058
+#define HAL_COUNTER_NOT_SUPPORTED_MESSAGE \
+  "HAL: Counter mode not supported for encoder method"
 
 #define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"

@@ -38,6 +38,8 @@ enum class HalHandleEnum {
   PWM = 9,
   DigitalPWM = 10,
   Counter = 11,
+  FPGAEncoder = 12,
+  Encoder = 13,
   Compressor = 14,
   Solenoid = 15
 };

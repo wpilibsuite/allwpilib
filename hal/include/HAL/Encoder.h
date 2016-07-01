@@ -9,26 +9,57 @@
 
 #include <stdint.h>
 
+#include "HAL/Handles.h"
+
 extern "C" {
-void* initializeEncoder(uint8_t port_a_module, uint32_t port_a_pin,
-                        bool port_a_analog_trigger, uint8_t port_b_module,
-                        uint32_t port_b_pin, bool port_b_analog_trigger,
-                        bool reverseDirection, int32_t* index,
-                        int32_t* status);  // TODO: fix routing
-void freeEncoder(void* encoder_pointer, int32_t* status);
-void resetEncoder(void* encoder_pointer, int32_t* status);
-int32_t getEncoder(void* encoder_pointer, int32_t* status);  // Raw value
-double getEncoderPeriod(void* encoder_pointer, int32_t* status);
-void setEncoderMaxPeriod(void* encoder_pointer, double maxPeriod,
-                         int32_t* status);
-bool getEncoderStopped(void* encoder_pointer, int32_t* status);
-bool getEncoderDirection(void* encoder_pointer, int32_t* status);
-void setEncoderReverseDirection(void* encoder_pointer, bool reverseDirection,
+enum EncoderIndexingType {
+  HAL_kResetWhileHigh,
+  HAL_kResetWhileLow,
+  HAL_kResetOnFallingEdge,
+  HAL_kResetOnRisingEdge
+};
+enum EncoderEncodingType { HAL_Encoder_k1X, HAL_Encoder_k2X, HAL_Encoder_k4X };
+
+HalEncoderHandle initializeEncoder(
+    uint8_t port_a_module, uint32_t port_a_pin, bool port_a_analog_trigger,
+    uint8_t port_b_module, uint32_t port_b_pin, bool port_b_analog_trigger,
+    bool reverseDirection, EncoderEncodingType encodingType, int32_t* status);
+void freeEncoder(HalEncoderHandle encoder_handle, int32_t* status);
+int32_t getEncoder(HalEncoderHandle encoder_handle, int32_t* status);
+int32_t getEncoderRaw(HalEncoderHandle encoder_handle, int32_t* status);
+int32_t getEncoderEncodingScale(HalEncoderHandle encoder_handle,
                                 int32_t* status);
-void setEncoderSamplesToAverage(void* encoder_pointer,
-                                uint32_t samplesToAverage, int32_t* status);
-uint32_t getEncoderSamplesToAverage(void* encoder_pointer, int32_t* status);
-void setEncoderIndexSource(void* encoder_pointer, uint32_t pin,
-                           bool analogTrigger, bool activeHigh,
-                           bool edgeSensitive, int32_t* status);
+void resetEncoder(HalEncoderHandle encoder_handle, int32_t* status);
+int32_t getEncoderPeriod(HalEncoderHandle encoder_handle, int32_t* status);
+void setEncoderMaxPeriod(HalEncoderHandle encoder_handle, double maxPeriod,
+                         int32_t* status);
+uint8_t getEncoderStopped(HalEncoderHandle encoder_handle, int32_t* status);
+uint8_t getEncoderDirection(HalEncoderHandle encoder_handle, int32_t* status);
+double getEncoderDistance(HalEncoderHandle encoder_handle, int32_t* status);
+double getEncoderRate(HalEncoderHandle encoder_handle, int32_t* status);
+void setEncoderMinRate(HalEncoderHandle encoder_handle, double minRate,
+                       int32_t* status);
+void setEncoderDistancePerPulse(HalEncoderHandle encoder_handle,
+                                double distancePerPulse, int32_t* status);
+void setEncoderReverseDirection(HalEncoderHandle encoder_handle,
+                                uint8_t reverseDirection, int32_t* status);
+void setEncoderSamplesToAverage(HalEncoderHandle encoder_handle,
+                                int32_t samplesToAverage, int32_t* status);
+int32_t getEncoderSamplesToAverage(HalEncoderHandle encoder_handle,
+                                   int32_t* status);
+
+void setEncoderIndexSource(HalEncoderHandle encoder_handle, uint32_t pin,
+                           uint8_t analogTrigger, EncoderIndexingType type,
+                           int32_t* status);
+
+int32_t getEncoderFPGAIndex(HalEncoderHandle encoder_handle, int32_t* status);
+
+double getEncoderDecodingScaleFactor(HalEncoderHandle encoder_handle,
+                                     int32_t* status);
+
+double getEncoderDistancePerPulse(HalEncoderHandle encoder_handle,
+                                  int32_t* status);
+
+EncoderEncodingType getEncoderEncodingType(HalEncoderHandle encoder_handle,
+                                           int32_t* status);
 }

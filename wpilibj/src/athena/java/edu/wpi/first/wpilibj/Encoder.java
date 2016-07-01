@@ -31,7 +31,14 @@ import edu.wpi.first.wpilibj.tables.ITable;
  */
 public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
   public enum IndexingType {
-    kResetWhileHigh, kResetWhileLow, kResetOnFallingEdge, kResetOnRisingEdge
+    kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
+    
+    @SuppressWarnings("MemberName")
+    public final int value;
+    
+    IndexingType(int value) {
+      this.value = value;
+    }
   }
 
   /**
@@ -48,24 +55,13 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * The index source.
    */
   protected DigitalSource m_indexSource = null; // Index on some encoders
-  private long m_encoder;
-  private int m_index;
-  private double m_distancePerPulse; // distance of travel for each encoder
-  // tick
-  private Counter m_counter; // Counter object for 1x and 2x encoding
-  /**
-   * Either k1X, k2X, or k4X to indicate 1X, 2X or 4X decoding. If 4X is selected, then an encoder
-   * FPGA object is used and the returned counts will be 4x the encoder spec'd value since all
-   * rising and falling edges are counted. If 1X or 2X are selected then a counter object will be
-   * used and the returned value will either exactly match the spec'd count or be double (2x) the
-   * spec'd count.
-   */
-  private EncodingType m_encodingType = EncodingType.k4X;
-  private int m_encodingScale; // 1x, 2x, or 4x, per the m_encodingType
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
   private PIDSourceType m_pidSource;
+  
+  private int m_encoder; // the HAL encoder object
+ 
 
   /**
    * Common initialization code for Encoders. This code allocates resources for Encoders and is
@@ -75,36 +71,15 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *
    * @param reverseDirection If true, counts down instead of up (this is all relative)
    */
-  private void initEncoder(boolean reverseDirection) {
-    switch (m_encodingType) {
-      case k4X:
-        m_encodingScale = 4;
-        ByteBuffer index = ByteBuffer.allocateDirect(4);
-        // set the byte order
-        index.order(ByteOrder.LITTLE_ENDIAN);
-        m_encoder =
-            EncoderJNI.initializeEncoder(m_aSource.getModuleForRouting(), m_aSource
-                    .getChannelForRouting(), m_aSource.getAnalogTriggerForRouting(),
-                m_bSource.getModuleForRouting(), m_bSource.getChannelForRouting(),
-                m_bSource.getAnalogTriggerForRouting(),
-                reverseDirection, index.asIntBuffer());
-        m_index = index.asIntBuffer().get(0);
-        m_counter = null;
-        setMaxPeriod(.5);
-        break;
-      case k2X:
-      case k1X:
-        m_encodingScale = m_encodingType == EncodingType.k1X ? 1 : 2;
-        m_counter = new Counter(m_encodingType, m_aSource, m_bSource, reverseDirection);
-        m_index = m_counter.getFPGAIndex();
-        break;
-      default:
-        throw new AssertionError("Illegal encoding type: " + m_encodingType);
-    }
-    m_distancePerPulse = 1.0;
+  private void initEncoder(boolean reverseDirection, final EncodingType type) {
+    m_encoder = EncoderJNI.initializeEncoder(m_aSource.getModuleForRouting(), 
+      (byte)m_aSource.getChannelForRouting(), m_aSource.getAnalogTriggerForRouting(), 
+      m_bSource.getModuleForRouting(), (byte)m_bSource.getChannelForRouting(), 
+      m_bSource.getAnalogTriggerForRouting(), reverseDirection, type.value);
+      
     m_pidSource = PIDSourceType.kDisplacement;
 
-    UsageReporting.report(tResourceType.kResourceType_Encoder, m_index, m_encodingType.value);
+    UsageReporting.report(tResourceType.kResourceType_Encoder, getFPGAIndex(), type.value);
     LiveWindow.addSensor("Encoder", m_aSource.getChannelForRouting(), this);
   }
 
@@ -124,7 +99,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     m_allocatedI = false;
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
-    initEncoder(reverseDirection);
+    initEncoder(reverseDirection, EncodingType.k4X);
   }
 
   /**
@@ -163,10 +138,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (encodingType == null) {
       throw new NullPointerException("Given encoding type was null");
     }
-    m_encodingType = encodingType;
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
-    initEncoder(reverseDirection);
+    initEncoder(reverseDirection, encodingType);
   }
 
   /**
@@ -189,7 +163,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
     m_indexSource = new DigitalInput(indexChannel);
-    initEncoder(reverseDirection);
+    initEncoder(reverseDirection, EncodingType.k4X);
     setIndexSource(indexChannel);
   }
 
@@ -231,7 +205,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
       throw new NullPointerException("Digital Source B was null");
     }
     m_bSource = sourceB;
-    initEncoder(reverseDirection);
+    initEncoder(reverseDirection, EncodingType.k4X);
   }
 
   /**
@@ -274,7 +248,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (encodingType == null) {
       throw new NullPointerException("Given encoding type was null");
     }
-    m_encodingType = encodingType;
     if (sourceA == null) {
       throw new NullPointerException("Digital Source A was null");
     }
@@ -284,7 +257,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     }
     m_aSource = sourceA;
     m_bSource = sourceB;
-    initEncoder(reverseDirection);
+    initEncoder(reverseDirection, encodingType);
   }
 
   /**
@@ -315,7 +288,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     m_aSource = sourceA;
     m_bSource = sourceB;
     m_indexSource = indexSource;
-    initEncoder(reverseDirection);
+    initEncoder(reverseDirection, EncodingType.k4X);
     setIndexSource(indexSource);
   }
 
@@ -339,7 +312,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   @SuppressWarnings("AbbreviationAsWordInName")
   public int getFPGAIndex() {
-    return m_index;
+    return EncoderJNI.getEncoderFPGAIndex(m_encoder);
   }
 
   /**
@@ -348,7 +321,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return The encoding scale factor 1x, 2x, or 4x, per the requested encoding type.
    */
   public int getEncodingScale() {
-    return m_encodingScale;
+    return EncoderJNI.getEncoderEncodingScale(m_encoder);
   }
 
   /**
@@ -371,12 +344,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     m_aSource = null;
     m_bSource = null;
     m_indexSource = null;
-    if (m_counter != null) {
-      m_counter.free();
-      m_counter = null;
-    } else {
-      EncoderJNI.freeEncoder(m_encoder);
-    }
+    EncoderJNI.freeEncoder(m_encoder);
+    m_encoder = 0;
   }
 
   /**
@@ -386,13 +355,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return Current raw count from the encoder
    */
   public int getRaw() {
-    int value;
-    if (m_counter != null) {
-      value = m_counter.get();
-    } else {
-      value = EncoderJNI.getEncoder(m_encoder);
-    }
-    return value;
+    return EncoderJNI.getEncoderRaw(m_encoder);
   }
 
   /**
@@ -402,18 +365,14 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale factor.
    */
   public int get() {
-    return (int) (getRaw() * decodingScaleFactor());
+    return EncoderJNI.getEncoder(m_encoder);
   }
 
   /**
    * Reset the Encoder distance to zero. Resets the current count to zero on the encoder.
    */
   public void reset() {
-    if (m_counter != null) {
-      m_counter.reset();
-    } else {
-      EncoderJNI.resetEncoder(m_encoder);
-    }
+    EncoderJNI.resetEncoder(m_encoder);
   }
 
   /**
@@ -428,13 +387,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   @Deprecated
   public double getPeriod() {
-    double measuredPeriod;
-    if (m_counter != null) {
-      measuredPeriod = m_counter.getPeriod() / decodingScaleFactor();
-    } else {
-      measuredPeriod = EncoderJNI.getEncoderPeriod(m_encoder);
-    }
-    return measuredPeriod;
+    return EncoderJNI.getEncoderPeriod(m_encoder);
   }
 
   /**
@@ -447,11 +400,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *                  the device stopped. This is expressed in seconds.
    */
   public void setMaxPeriod(double maxPeriod) {
-    if (m_counter != null) {
-      m_counter.setMaxPeriod(maxPeriod * decodingScaleFactor());
-    } else {
-      EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
-    }
+    EncoderJNI.setEncoderMaxPeriod(m_encoder, maxPeriod);
   }
 
   /**
@@ -462,11 +411,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return True if the encoder is considered stopped.
    */
   public boolean getStopped() {
-    if (m_counter != null) {
-      return m_counter.getStopped();
-    } else {
-      return EncoderJNI.getEncoderStopped(m_encoder);
-    }
+    return EncoderJNI.getEncoderStopped(m_encoder);
   }
 
   /**
@@ -475,28 +420,14 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return The last direction the encoder value changed.
    */
   public boolean getDirection() {
-    if (m_counter != null) {
-      return m_counter.getDirection();
-    } else {
-      return EncoderJNI.getEncoderDirection(m_encoder);
-    }
+    return EncoderJNI.getEncoderDirection(m_encoder);
   }
 
   /**
    * The scale needed to convert a raw counter value into a number of encoder pulses.
    */
   private double decodingScaleFactor() {
-    switch (m_encodingType) {
-      case k1X:
-        return 1.0;
-      case k2X:
-        return 0.5;
-      case k4X:
-        return 0.25;
-      default:
-        // This is never reached, EncodingType enum limits values
-        return 0.0;
-    }
+    return EncoderJNI.getEncoderDecodingScaleFactor(m_encoder);
   }
 
   /**
@@ -506,7 +437,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return The distance driven since the last reset
    */
   public double getDistance() {
-    return getRaw() * decodingScaleFactor() * m_distancePerPulse;
+    return EncoderJNI.getEncoderDistance(m_encoder);
   }
 
   /**
@@ -516,7 +447,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return The current rate of the encoder.
    */
   public double getRate() {
-    return m_distancePerPulse / getPeriod();
+    return EncoderJNI.getEncoderRate(m_encoder);
   }
 
   /**
@@ -526,7 +457,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *                from setDistancePerPulse().
    */
   public void setMinRate(double minRate) {
-    setMaxPeriod(m_distancePerPulse / minRate);
+    EncoderJNI.setEncoderMinRate(m_encoder, minRate);
   }
 
   /**
@@ -539,7 +470,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param distancePerPulse The scale factor that will be used to convert pulses to useful units.
    */
   public void setDistancePerPulse(double distancePerPulse) {
-    m_distancePerPulse = distancePerPulse;
+    EncoderJNI.setEncoderDistancePerPulse(m_encoder, distancePerPulse);
   }
 
   /**
@@ -549,9 +480,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param reverseDirection true if the encoder direction should be reversed
    */
   public void setReverseDirection(boolean reverseDirection) {
-    if (m_counter != null) {
-      m_counter.setReverseDirection(reverseDirection);
-    }
+    EncoderJNI.setEncoderReverseDirection(m_encoder, reverseDirection);
   }
 
   /**
@@ -562,17 +491,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param samplesToAverage The number of samples to average from 1 to 127.
    */
   public void setSamplesToAverage(int samplesToAverage) {
-    switch (m_encodingType) {
-      case k4X:
-        EncoderJNI.setEncoderSamplesToAverage(m_encoder, samplesToAverage);
-        break;
-      case k1X:
-      case k2X:
-        m_counter.setSamplesToAverage(samplesToAverage);
-        break;
-      default:
-        throw new AssertionError("Illegal encoding type: " + m_encodingType);
-    }
+    EncoderJNI.setEncoderSamplesToAverage(m_encoder, samplesToAverage);
   }
 
   /**
@@ -583,15 +502,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
    */
   public int getSamplesToAverage() {
-    switch (m_encodingType) {
-      case k4X:
-        return EncoderJNI.getEncoderSamplesToAverage(m_encoder);
-      case k1X:
-      case k2X:
-        return m_counter.getSamplesToAverage();
-      default:
-        return 1;
-    }
+    return EncoderJNI.getEncoderSamplesToAverage(m_encoder);
   }
 
   /**
@@ -653,12 +564,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param type    The state that will cause the encoder to reset
    */
   public void setIndexSource(int channel, IndexingType type) {
-    boolean activeHigh =
-        (type == IndexingType.kResetWhileHigh) || (type == IndexingType.kResetOnRisingEdge);
-    boolean edgeSensitive =
-        (type == IndexingType.kResetOnFallingEdge) || (type == IndexingType.kResetOnRisingEdge);
-
-    EncoderJNI.setEncoderIndexSource(m_encoder, channel, false, activeHigh, edgeSensitive);
+    EncoderJNI.setEncoderIndexSource(m_encoder, channel, false, type.value);
   }
 
   /**
@@ -669,21 +575,16 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param type   The state that will cause the encoder to reset
    */
   public void setIndexSource(DigitalSource source, IndexingType type) {
-    boolean activeHigh =
-        (type == IndexingType.kResetWhileHigh) || (type == IndexingType.kResetOnRisingEdge);
-    boolean edgeSensitive =
-        (type == IndexingType.kResetOnFallingEdge) || (type == IndexingType.kResetOnRisingEdge);
-
-    EncoderJNI.setEncoderIndexSource(m_encoder, source.getChannelForRouting(),
-        source.getAnalogTriggerForRouting(), activeHigh, edgeSensitive);
+    EncoderJNI.setEncoderIndexSource(m_encoder, source.getChannelForRouting(), 
+                                     source.getAnalogTriggerForRouting(), type.value);
   }
 
   /**
    * Live Window code, only does anything if live window is activated.
    */
   public String getSmartDashboardType() {
-    switch (m_encodingType) {
-      case k4X:
+    switch (EncoderJNI.getEncoderEncodingType(m_encoder)) {
+      case 2: // value of k4X
         return "Quadrature Encoder";
       default:
         return "Encoder";
@@ -708,7 +609,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     if (m_table != null) {
       m_table.putNumber("Speed", getRate());
       m_table.putNumber("Distance", getDistance());
-      m_table.putNumber("Distance per Tick", m_distancePerPulse);
+      m_table.putNumber("Distance per Tick", EncoderJNI.getEncoderDistancePerPulse(m_encoder));
     }
   }
 
