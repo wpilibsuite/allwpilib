@@ -2,7 +2,7 @@ def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPre
 model {
     toolChains {
         gcc(Gcc) {
-            target("arm"){
+            target("arm") {
                 // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
                 // If this ever changes, the prefix will need to be changed here
                 cppCompiler.executable = compilerPrefix + cppCompiler.executable
@@ -66,29 +66,33 @@ ext.setupDebugDefines = { cppCompiler, linker ->
 }
 
 ext.releaseSetup = { releaseTasks ->
-    binaries.withType(SharedLibraryBinarySpec) { binary ->
-        if (!project.hasProperty('debug')) {
-            def library = binary.sharedLibraryFile.absolutePath
-            def debugLibrary = binary.sharedLibraryFile.absolutePath + ".debug"
-            if (project.tasks.findByName("firstObjcopy${binary.name}") == null) {
-                def firstObjcopy = project.tasks.create("firstObjcopy${binary.name}", Exec) { task ->
-                    task.commandLine "${compilerPrefix}objcopy", '--only-keep-debug', library, debugLibrary
-                }
-                def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
-                    task.commandLine "${compilerPrefix}strip", '-g', library
-                }
-                def secondObjcopy = project.tasks.create("secondObjcopy${binary.name}", Exec) { task ->
-                    task.commandLine "${compilerPrefix}objcopy", "--add-gnu-debuglink=$debugLibrary", library
-                }
-                secondObjcopy.dependsOn strip
-                strip.dependsOn firstObjcopy
-                binary.tasks.whenObjectAdded { task ->
-                    if (task.name.contains('link')) {
-                        firstObjcopy.dependsOn task
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { binary ->
+                if (!project.hasProperty('debug')) {
+                    def library = binary.sharedLibraryFile.absolutePath
+                    def debugLibrary = binary.sharedLibraryFile.absolutePath + ".debug"
+                    if (project.tasks.findByName("firstObjcopy${binary.name}") == null) {
+                        def firstObjcopy = project.tasks.create("firstObjcopy${binary.name}", Exec) { task ->
+                            task.commandLine "${compilerPrefix}objcopy", '--only-keep-debug', library, debugLibrary
+                        }
+                        def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
+                            task.commandLine "${compilerPrefix}strip", '-g', library
+                        }
+                        def secondObjcopy = project.tasks.create("secondObjcopy${binary.name}", Exec) { task ->
+                            task.commandLine "${compilerPrefix}objcopy", "--add-gnu-debuglink=$debugLibrary", library
+                        }
+                        secondObjcopy.dependsOn strip
+                        strip.dependsOn firstObjcopy
+                        binary.tasks.whenObjectAdded { task ->
+                            if (task.name.contains('link')) {
+                                firstObjcopy.dependsOn task
+                            }
+                        }
                     }
+                    releaseTasks.each { it.dependsOn project.tasks.getByName("secondObjcopy${binary.name}") }
                 }
             }
-            releaseTasks.each { it.dependsOn project.tasks.getByName("secondObjcopy${binary.name}") }
         }
     }
 }

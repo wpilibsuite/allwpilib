@@ -31,24 +31,28 @@ ext.setupDebugDefines = { cppCompiler, linker ->
 }
 
 ext.releaseSetup = { releaseTasks ->
-    binaries.withType(SharedLibraryBinarySpec) { binary ->
-        if (!project.hasProperty('debug')) {
-            def library = binary.sharedLibraryFile.absolutePath
-            if (project.tasks.findByName("strip${binary.name}") == null) {
-                def dsymutil = project.tasks.create("dsymutil${binary.name}", Exec) { task ->
-                    task.commandLine 'dsymutil', library
-                }
-                def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
-                    task.commandLine 'strip', '-S', library
-                }
-                strip.dependsOn dsymutil
-                binary.tasks.whenObjectAdded { task ->
-                    if (task.name.contains('link')) {
-                        dsymutil.dependsOn task
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { binary ->
+                if (!project.hasProperty('debug')) {
+                    def library = binary.sharedLibraryFile.absolutePath
+                    if (project.tasks.findByName("strip${binary.name}") == null) {
+                        def dsymutil = project.tasks.create("dsymutil${binary.name}", Exec) { task ->
+                            task.commandLine 'dsymutil', library
+                        }
+                        def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
+                            task.commandLine 'strip', '-S', library
+                        }
+                        strip.dependsOn dsymutil
+                        binary.tasks.whenObjectAdded { task ->
+                            if (task.name.contains('link')) {
+                                dsymutil.dependsOn task
+                            }
+                        }
                     }
+                    releaseTasks.each { it.dependsOn project.tasks.getByName("strip${binary.name}") }
                 }
             }
-            releaseTasks.each { it.dependsOn project.tasks.getByName("strip${binary.name}") }
         }
     }
 }

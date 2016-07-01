@@ -27,18 +27,22 @@ jar {
     classifier = "$buildPlatform"
 
     dependsOn { classes }
-    binaries.withType(SharedLibraryBinary) { binary ->
-        from(file(binary.sharedLibraryFile)) {
-            into getPlatformPath(binary)
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { binary ->
+                from(file(binary.sharedLibraryFile)) {
+                    into getPlatformPath(binary)
+                }
+            }
         }
     }
 }
 
-project.tasks.whenTaskAdded { task-> 
+project.tasks.whenTaskAdded { task ->
     if (isArm) {
         if (task.name == 'ntcoreSharedLibrary') jar.dependsOn task
     } else {
-        if (task.name == 'x64NtcoreSharedLibrary' || task.name == 'x86NtcoreSharedLibrary') 
+        if (task.name == 'ntcoreX64SharedLibrary' || task.name == 'ntcoreX86SharedLibrary')
             jar.dependsOn task
     }
 }

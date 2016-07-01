@@ -142,15 +142,18 @@ def ntcoreZipTask = { project ->
             }
         }
 
-        project.binaries.withType(StaticLibraryBinarySpec) { binary ->
-            from(binary.staticLibraryFile) {
-                into getPlatformPath(binary)
-            }
-        }
-
-        project.binaries.withType(SharedLibraryBinarySpec) { binary ->
-            from(binary.sharedLibraryFile) {
-                into getPlatformPath(binary)
+        project.model {
+            binaries {
+                withType(StaticLibraryBinarySpec) { binary ->
+                    from(binary.staticLibraryFile) {
+                        into getPlatformPath(binary)
+                    }
+                }
+                withType(SharedLibraryBinarySpec) { binary ->
+                    from(binary.sharedLibraryFile) {
+                        into getPlatformPath(binary)
+                    }
+                }
             }
         }
     }
@@ -167,8 +170,7 @@ def ntcoreZipTask = { project ->
 
     project.tasks.whenTaskAdded { task ->
         def name = task.name.toLowerCase()
-        if (name.contains("ntcoresharedlibrary") || name.contains("ntcorestaticlibrary") ||
-            name.contains("ntcoretest")) {
+        if (name.contains("ntcoresharedlibrary") || name.contains("ntcorestaticlibrary") || name.contains("ntcoretest")) {
             project.ntcoreZip.dependsOn task
         }
     }
@@ -227,7 +229,7 @@ task ntcoreSourceZip(type: Zip) {
     baseName = 'ntcore'
     classifier = "sources"
 
-    from ('src') {
+    from('src') {
         into 'src'
     }
 
@@ -254,3 +256,7 @@ task build
 build.dependsOn ntcoreSourceZip
 
 apply from: 'publish.gradle'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14'
+}
