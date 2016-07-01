@@ -16,11 +16,13 @@ HalDigitalHandle initializeDIOPort(HalPortHandle port_handle, uint8_t input,
                                    int32_t* status);
 void freeDIOPort(HalDigitalHandle dio_port_handle);
 
-void* allocatePWM(int32_t* status);
-void freePWM(void* pwmGenerator, int32_t* status);
-void setPWMRate(double rate, int32_t* status);
-void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t* status);
-void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t* status);
+HalDigitalPWMHandle allocateDigitalPWM(int32_t* status);
+void freeDigitalPWM(HalDigitalPWMHandle pwmGenerator, int32_t* status);
+void setDigitalPWMRate(double rate, int32_t* status);
+void setDigitalPWMDutyCycle(HalDigitalPWMHandle pwmGenerator, double dutyCycle,
+                            int32_t* status);
+void setDigitalPWMOutputChannel(HalDigitalPWMHandle pwmGenerator, uint32_t pin,
+                                int32_t* status);
 
 void setDIO(HalDigitalHandle dio_port_handle, short value, int32_t* status);
 bool getDIO(HalDigitalHandle dio_port_handle, int32_t* status);

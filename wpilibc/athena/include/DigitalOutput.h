@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "DigitalSource.h"
+#include "HAL/Handles.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
 
@@ -52,7 +53,7 @@ class DigitalOutput : public DigitalSource,
  private:
   uint32_t m_channel;
   HalDigitalHandle m_handle;
-  void* m_pwmGenerator;
+  HalDigitalPWMHandle m_pwmGenerator;
 
   std::shared_ptr<ITable> m_table;
 };

@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
-import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -21,10 +20,9 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
  */
 public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 
-  private static final long invalidPwmGenerator = 0xffffffff;
+  private static final int invalidPwmGenerator = 0;
+  private int m_pwmGenerator = invalidPwmGenerator;
 
-  private long m_pwmGenerator = invalidPwmGenerator;
-  
   private int m_channel = 0;
   private int m_handle = 0;
 
@@ -118,7 +116,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param rate The frequency to output all digital output PWM signals.
    */
   public void setPWMRate(double rate) {
-    PWMJNI.setPWMRate(rate);
+    DIOJNI.setDigitalPWMRate(rate);
   }
 
   /**
@@ -137,9 +135,9 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
     if (m_pwmGenerator != invalidPwmGenerator) {
       return;
     }
-    m_pwmGenerator = PWMJNI.allocatePWM();
-    PWMJNI.setPWMDutyCycle(m_pwmGenerator, initialDutyCycle);
-    PWMJNI.setPWMOutputChannel(m_pwmGenerator, m_channel);
+    m_pwmGenerator = DIOJNI.allocateDigitalPWM();
+    DIOJNI.setDigitalPWMDutyCycle(m_pwmGenerator, initialDutyCycle);
+    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, m_channel);
   }
 
   /**
@@ -152,9 +150,9 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
       return;
     }
     // Disable the output by routing to a dead bit.
-    PWMJNI.setPWMOutputChannel(m_pwmGenerator, kDigitalChannels);
-    PWMJNI.freePWM(m_pwmGenerator);
-    m_pwmGenerator = 0;
+    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, kDigitalChannels);
+    DIOJNI.freeDigitalPWM(m_pwmGenerator);
+    m_pwmGenerator = invalidPwmGenerator;
   }
 
   /**
@@ -170,7 +168,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
     if (m_pwmGenerator == invalidPwmGenerator) {
       return;
     }
-    PWMJNI.setPWMDutyCycle(m_pwmGenerator, dutyCycle);
+    DIOJNI.setDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle);
   }
   
   /**

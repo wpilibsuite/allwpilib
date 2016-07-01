@@ -28,3 +28,5 @@ typedef HalHandle HalAnalogTriggerHandle;
 typedef HalHandle HalRelayHandle;
 
 typedef HalHandle HalDigitalHandle;
+
+typedef HalHandle HalDigitalPWMHandle;

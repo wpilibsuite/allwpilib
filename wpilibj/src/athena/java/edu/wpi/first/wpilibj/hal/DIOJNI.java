@@ -26,4 +26,14 @@ public class DIOJNI extends JNIWrapper {
   public static native boolean isAnyPulsing();
 
   public static native short getLoopTiming();
+  
+  public static native int allocateDigitalPWM();
+
+  public static native void freeDigitalPWM(int pwmGenerator);
+
+  public static native void setDigitalPWMRate(double rate);
+
+  public static native void setDigitalPWMDutyCycle(int pwmGenerator, double dutyCycle);
+
+  public static native void setDigitalPWMOutputChannel(int pwmGenerator, int pin);
 }

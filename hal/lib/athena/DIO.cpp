@@ -11,6 +11,7 @@
 
 #include "DigitalInternal.h"
 #include "handles/HandlesInternal.h"
+#include "handles/LimitedHandleResource.h"
 
 static_assert(sizeof(uint32_t) <= sizeof(void*),
               "This file shoves uint32_ts into pointers.");
@@ -19,6 +20,12 @@ using namespace hal;
 
 // Create a mutex to protect changes to the digital output values
 static priority_recursive_mutex digitalDIOMutex;
+
+static LimitedHandleResource<HalDigitalPWMHandle, uint8_t,
+                             tDIO::kNumPWMDutyCycleAElements +
+                                 tDIO::kNumPWMDutyCycleBElements,
+                             HalHandleEnum::DigitalPWM>
+    digitalPWMHandles;
 
 extern "C" {
 
@@ -94,22 +101,33 @@ void freeDIOPort(HalDigitalHandle dio_port_handle) {
  * Allocate a DO PWM Generator.
  * Allocate PWM generators so that they are not accidentally reused.
  *
- * @return PWM Generator refnum
+ * @return PWM Generator handle
  */
-void* allocatePWM(int32_t* status) {
-  return (void*)DO_PWMGenerators->Allocate("DO_PWM");
+HalDigitalPWMHandle allocateDigitalPWM(int32_t* status) {
+  auto handle = digitalPWMHandles.Allocate();
+  if (handle == HAL_INVALID_HANDLE) {
+    *status = NO_AVAILABLE_RESOURCES;
+    return HAL_INVALID_HANDLE;
+  }
+
+  auto id = digitalPWMHandles.Get(handle);
+  if (id == nullptr) {  // would only occur on thread issue.
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+  *id = static_cast<uint8_t>(getHandleIndex(handle));
+
+  return handle;
 }
 
 /**
  * Free the resource associated with a DO PWM generator.
  *
  * @param pwmGenerator The pwmGen to free that was allocated with
- * AllocateDO_PWM()
+ * allocateDigitalPWM()
  */
-void freePWM(void* pwmGenerator, int32_t* status) {
-  uint32_t id = (uint32_t)pwmGenerator;
-  if (id == ~0ul) return;
-  DO_PWMGenerators->Free(id);
+void freeDigitalPWM(HalDigitalPWMHandle pwmGenerator, int32_t* status) {
+  digitalPWMHandles.Free(pwmGenerator);
 }
 
 /**
@@ -120,7 +138,7 @@ void freePWM(void* pwmGenerator, int32_t* status) {
  *
  * @param rate The frequency to output all digital output PWM signals.
  */
-void setPWMRate(double rate, int32_t* status) {
+void setDigitalPWMRate(double rate, int32_t* status) {
   // Currently rounding in the log rate domain... heavy weight toward picking a
   // higher freq.
   // TODO: Round in the linear rate domain.
@@ -134,12 +152,17 @@ void setPWMRate(double rate, int32_t* status) {
 /**
  * Configure the duty-cycle of the PWM generator
  *
- * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
+ * @param pwmGenerator The generator index reserved by allocateDigitalPWM()
  * @param dutyCycle The percent duty cycle to output [0..1].
  */
-void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t* status) {
-  uint32_t id = (uint32_t)pwmGenerator;
-  if (id == ~0ul) return;
+void setDigitalPWMDutyCycle(HalDigitalPWMHandle pwmGenerator, double dutyCycle,
+                            int32_t* status) {
+  auto port = digitalPWMHandles.Get(pwmGenerator);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+  uint32_t id = *port;
   if (dutyCycle > 1.0) dutyCycle = 1.0;
   if (dutyCycle < 0.0) dutyCycle = 0.0;
   float rawDutyCycle = 256.0 * dutyCycle;
@@ -162,12 +185,17 @@ void setPWMDutyCycle(void* pwmGenerator, double dutyCycle, int32_t* status) {
 /**
  * Configure which DO channel the PWM signal is output on
  *
- * @param pwmGenerator The generator index reserved by AllocateDO_PWM()
+ * @param pwmGenerator The generator index reserved by allocateDigitalPWM()
  * @param channel The Digital Output channel to output on
  */
-void setPWMOutputChannel(void* pwmGenerator, uint32_t pin, int32_t* status) {
-  uint32_t id = (uint32_t)pwmGenerator;
-  if (id > 5) return;
+void setDigitalPWMOutputChannel(HalDigitalPWMHandle pwmGenerator, uint32_t pin,
+                                int32_t* status) {
+  auto port = digitalPWMHandles.Get(pwmGenerator);
+  if (port == nullptr) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+  uint32_t id = *port;
   if (pin >= kNumHeaders) {       // if it is on the MXP
     pin += kMXPDigitalPWMOffset;  // then to write as a digital PWM pin requires
                                   // an offset to write on the correct pin
