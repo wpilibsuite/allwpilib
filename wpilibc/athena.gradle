@@ -8,8 +8,8 @@ model {
             targetPlatform 'arm'
             binaries.all {
                 tasks.withType(CppCompile) {
-                    dependsOn addNiLibraryLinks
-                    dependsOn addNetworkTablesLibraryLinks
+                    addNiLibraryLinks(linker, targetPlatform)
+                    addNetworkTablesLibraryLinks(it, linker, targetPlatform)
                 }
             }
             sources {
@@ -36,34 +36,42 @@ task wpilibcZip(type: Zip) {
     destinationDir = project.buildDir
 
     // Include the static library file and header files from this project
-    binaries.withType(StaticLibraryBinarySpec) { spec ->
-        spec.headerDirs.each {
-            from(it) {
-                into 'include'
+    model {
+        binaries {
+            withType(StaticLibraryBinarySpec) { spec ->
+                spec.headerDirs.each {
+                    from(it) {
+                        into 'include'
+                    }
+                }
+                from(spec.staticLibraryFile) {
+                    into 'lib'
+                }
             }
-        }
-        from(spec.staticLibraryFile) {
-            into 'lib'
         }
     }
 
     // Include the static library file and shared library object from hal project
     def hal = project(':hal')
-    hal.binaries.withType(StaticLibraryBinarySpec) { spec ->
-        spec.headerDirs.each {
-            from(it) {
-                into 'include'
-                // We don't want to include any of the .cpp files that are in some of the header directories
-                exclude '**/*.cpp'
+    hal.model{
+        binaries{
+            withType(StaticLibraryBinarySpec) { spec ->
+                spec.headerDirs.each {
+                    from(it) {
+                        into 'include'
+                        // We don't want to include any of the .cpp files that are in some of the header directories
+                        exclude '**/*.cpp'
+                    }
+                }
+                from(spec.staticLibraryFile) {
+                    into 'lib'
+                }
             }
-        }
-        from(spec.staticLibraryFile) {
-            into 'lib'
-        }
-    }
-    hal.binaries.withType(SharedLibraryBinarySpec) { spec ->
-        from(spec.sharedLibraryFile) {
-            into 'lib'
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into 'lib'
+                }
+            }
         }
     }
 
@@ -119,15 +127,15 @@ if (checkDoxygen()) {
 
     doxygen {
         def halLocation = '../hal'
-        source file("${project.shared}/src")
-        source file("${project.shared}/include")
-        source file("${project.athena}/src")
-        source file("${project.athena}/include")
-        source file("$ntSourceDir/src")
-        source file("$ntSourceDir/include")
-        source file("$halLocation/shared")
-        source file("$halLocation/athena")
-        source file("$halLocation/include")
+        source new File("${project.shared}/src")
+        source new File("${project.shared}/include")
+        source new File("${project.athena}/src")
+        source new File("${project.athena}/include")
+        source new File("$ntSourceDir/src")
+        source new File("$ntSourceDir/include")
+        source new File("$halLocation/shared")
+        source new File("$halLocation/athena")
+        source new File("$halLocation/include")
         // template file('cpp.doxy')
         exclude 'nivision.h'
         extension_mapping 'inc=C++'
@@ -144,7 +152,7 @@ if (checkDoxygen()) {
         generate_latex false
         html_timestamp true
         generate_treeview true
-        outputDir file("$buildDir/docs")
+        outputDir new File("$buildDir/docs")
     }
 
     doxygen.dependsOn unzipCppNtSources

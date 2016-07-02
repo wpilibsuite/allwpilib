@@ -60,27 +60,17 @@ subprojects {
             ext.netTables = netTablesUnzipLocation
             ext.netTablesInclude = "$netTablesUnzipLocation/include"
             ext.netLibArmLocation = "$netTablesUnzipLocation/Linux/arm"
-            if (project.hasProperty('makeSim')){
-              ext.netLibDesktopLocation = "$netTablesUnzipLocation/Linux/amd64"
+            if (project.hasProperty('makeSim')) {
+                ext.netLibDesktopLocation = "$netTablesUnzipLocation/Linux/amd64"
             }
             ext.netSharedLib = "$netLibArmLocation/libntcore.so"
             ext.netStaticLib = "$netLibArmLocation/libntcore.a"
 
-            task addNetworkTablesLibraryLinks() {
-                description = 'Adds the linker flags for the networktables libraries retreived from maven'
-                group = 'WPILib'
-                dependsOn project(':').unzipNetworkTables
-                doLast {
-                    binaries.all {
-                        tasks.withType(CppCompile) {
-                            // desktop version doesn't use all the NI libraries
-                            // so only do this for arm libraries
-                            String architecture = targetPlatform.architecture
-                            if (architecture.contains('arm')){
-                                linker.args netStaticLib
-                            }
-                        }
-                    }
+            ext.addNetworkTablesLibraryLinks = { compileTask, linker, targetPlatform ->
+                compileTask.dependsOn project(':').unzipNetworkTables
+                String architecture = targetPlatform.architecture
+                if (architecture.contains('arm')) {
+                    linker.args netStaticLib
                 }
             }
         }
@@ -158,36 +148,11 @@ subprojects {
         }
 
         // This task adds the appropriate linker flags for the NI libraries
-        task addNiLibraryLinks() {
-            description = 'Adds the linker flags for the NI libraries in the ni-library folders'
-            group = 'WPILib'
-            doLast {
-                binaries.all {
-                    tasks.withType(CppCompile) {
-                        // desktop version doesn't use all the NI libraries
-                        // so only do this for arm libraries
-                        String architecture = targetPlatform.architecture
-                        if (architecture.contains('arm')){
-                            linker.args << '-L' + niLibraryPath
-                            linker.args.addAll(niLibraryArgs)
-                        }
-                    }
-                }
-                model {
-                    repositories {
-                        libs(PrebuiltLibraries) { libs ->
-                            // Loops through all .so files (except files matching *libwpi*.so) in ../ni-libraries
-                            // and includes them for linking
-                            niLibraryTree.each { niLib ->
-                                libs.create(niLib) {
-                                    binaries.withType(SharedLibraryBinary) {
-                                        sharedLibraryFile = file(niLib.path)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        ext.addNiLibraryLinks = { linker, targetPlatform ->
+            String architecture = targetPlatform.architecture
+            if (architecture.contains('arm')){
+                linker.args << '-L' + niLibraryPath
+                linker.args.addAll(niLibraryArgs)
             }
         }
     }

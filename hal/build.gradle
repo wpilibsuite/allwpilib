@@ -8,8 +8,10 @@ model {
     components {
         HALAthena(NativeLibrarySpec) {
             targetPlatform 'arm'
-            tasks.withType(CppCompile) {
-                dependsOn addNiLibraryLinks
+            binaries.all {
+                tasks.withType(CppCompile) {
+                    addNiLibraryLinks(linker, targetPlatform)
+                }
             }
             sources {
                 cpp {
