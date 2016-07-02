@@ -7,26 +7,45 @@
 
 #include "HAL/Compressor.h"
 
+#include "HAL/Errors.h"
 #include "ctre/PCM.h"
+#include "handles/HandlesInternal.h"
 
 static const int NUM_MODULE_NUMBERS = 63;
 extern PCM* PCM_modules[NUM_MODULE_NUMBERS];
 extern void initializePCM(int module);
 
+using namespace hal;
+
 extern "C" {
 
-void* initializeCompressor(uint8_t module) {
+HalCompressorHandle initializeCompressor(uint8_t module, int32_t* status) {
+  // fail on invalid index;
+  if (!checkCompressorModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return HAL_INVALID_HANDLE;
+  }
+
   initializePCM(module);
 
-  return PCM_modules[module];
+  // As compressors can have unlimited objects, just create a
+  // handle with the module number as the index.
+
+  return (HalCompressorHandle)createHandle(module, HalHandleEnum::Compressor);
 }
 
 bool checkCompressorModule(uint8_t module) {
   return module < NUM_MODULE_NUMBERS;
 }
 
-bool getCompressor(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getCompressor(HalCompressorHandle compressor_handle, int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetCompressor(value);
@@ -34,14 +53,28 @@ bool getCompressor(void* pcm_pointer, int32_t* status) {
   return value;
 }
 
-void setClosedLoopControl(void* pcm_pointer, bool value, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+void setClosedLoopControl(HalCompressorHandle compressor_handle, bool value,
+                          int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+  PCM* module = PCM_modules[index];
 
   *status = module->SetClosedLoopControl(value);
 }
 
-bool getClosedLoopControl(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getClosedLoopControl(HalCompressorHandle compressor_handle,
+                          int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetClosedLoopControl(value);
@@ -49,8 +82,14 @@ bool getClosedLoopControl(void* pcm_pointer, int32_t* status) {
   return value;
 }
 
-bool getPressureSwitch(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getPressureSwitch(HalCompressorHandle compressor_handle, int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetPressure(value);
@@ -58,65 +97,120 @@ bool getPressureSwitch(void* pcm_pointer, int32_t* status) {
   return value;
 }
 
-float getCompressorCurrent(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+float getCompressorCurrent(HalCompressorHandle compressor_handle,
+                           int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0;
+  }
+  PCM* module = PCM_modules[index];
   float value;
 
   *status = module->GetCompressorCurrent(value);
 
   return value;
 }
-bool getCompressorCurrentTooHighFault(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getCompressorCurrentTooHighFault(HalCompressorHandle compressor_handle,
+                                      int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetCompressorCurrentTooHighFault(value);
 
   return value;
 }
-bool getCompressorCurrentTooHighStickyFault(void* pcm_pointer,
-                                            int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getCompressorCurrentTooHighStickyFault(
+    HalCompressorHandle compressor_handle, int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetCompressorCurrentTooHighStickyFault(value);
 
   return value;
 }
-bool getCompressorShortedStickyFault(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getCompressorShortedStickyFault(HalCompressorHandle compressor_handle,
+                                     int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetCompressorShortedStickyFault(value);
 
   return value;
 }
-bool getCompressorShortedFault(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getCompressorShortedFault(HalCompressorHandle compressor_handle,
+                               int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetCompressorShortedFault(value);
 
   return value;
 }
-bool getCompressorNotConnectedStickyFault(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getCompressorNotConnectedStickyFault(HalCompressorHandle compressor_handle,
+                                          int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetCompressorNotConnectedStickyFault(value);
 
   return value;
 }
-bool getCompressorNotConnectedFault(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+bool getCompressorNotConnectedFault(HalCompressorHandle compressor_handle,
+                                    int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return false;
+  }
+  PCM* module = PCM_modules[index];
   bool value;
 
   *status = module->GetCompressorNotConnectedFault(value);
 
   return value;
 }
-void clearAllPCMStickyFaults(void* pcm_pointer, int32_t* status) {
-  PCM* module = (PCM*)pcm_pointer;
+void clearAllPCMStickyFaults(HalCompressorHandle compressor_handle,
+                             int32_t* status) {
+  int16_t index =
+      getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
+  if (index == InvalidHandleIndex) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+  PCM* module = PCM_modules[index];
 
   *status = module->ClearStickyFaults();
 }

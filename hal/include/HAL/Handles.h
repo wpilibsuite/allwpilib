@@ -32,3 +32,5 @@ typedef HalHandle HalDigitalHandle;
 typedef HalHandle HalDigitalPWMHandle;
 
 typedef HalHandle HalCounterHandle;
+
+typedef HalHandle HalCompressorHandle;

@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "HAL/Handles.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
@@ -53,7 +54,7 @@ class Compressor : public SensorBase,
                     std::shared_ptr<nt::Value> value, bool isNew) override;
 
  protected:
-  void* m_pcm_pointer;
+  HalCompressorHandle m_compressorHandle;
 
  private:
   void SetCompressor(bool on);

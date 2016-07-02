@@ -15,13 +15,19 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
  * Method:    initializeCompressor
- * Signature: (B)J
+ * Signature: (B)I
  */
-JNIEXPORT jlong JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_initializeCompressor(
     JNIEnv *env, jclass, jbyte module) {
-  void *pcm = initializeCompressor(module);
-  return (jlong)pcm;
+  int32_t status = 0;
+  auto handle = initializeCompressor(module, &status);
+  if (status == PARAMETER_OUT_OF_RANGE) {
+    //TODO: Move 63 to a constant (Thad will do)
+    ThrowBoundaryException(env, module, 0, 63);
+  }
+  
+  return (jint)handle;
 }
 
 /*
@@ -42,9 +48,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_checkCompressorModule(
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressor(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = getCompressor((void *)pcm_pointer, &status);
+  bool val = getCompressor((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -56,9 +62,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressor(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_setClosedLoopControl(
-    JNIEnv *env, jclass, jlong pcm_pointer, jboolean value) {
+    JNIEnv *env, jclass, jint compressor_handle, jboolean value) {
   int32_t status = 0;
-  setClosedLoopControl((void *)pcm_pointer, value, &status);
+  setClosedLoopControl((HalCompressorHandle)compressor_handle, value, &status);
   CheckStatus(env, status);
 }
 
@@ -69,9 +75,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_setClosedLoopControl(
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getClosedLoopControl(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = getClosedLoopControl((void *)pcm_pointer, &status);
+  bool val = getClosedLoopControl((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -83,9 +89,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getClosedLoopControl(
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getPressureSwitch(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = getPressureSwitch((void *)pcm_pointer, &status);
+  bool val = getPressureSwitch((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -97,9 +103,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getPressureSwitch(
  */
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrent(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  float val = getCompressorCurrent((void *)pcm_pointer, &status);
+  float val = getCompressorCurrent((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -111,9 +117,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrent(
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrentTooHighFault(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = getCompressorCurrentTooHighFault((void *)pcm_pointer, &status);
+  bool val = getCompressorCurrentTooHighFault((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -125,10 +131,10 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrentTooHighFault(
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrentTooHighStickyFault(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
   bool val =
-      getCompressorCurrentTooHighStickyFault((void *)pcm_pointer, &status);
+      getCompressorCurrentTooHighStickyFault((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -140,9 +146,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrentTooHighStickyFa
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorShortedStickyFault(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = getCompressorShortedStickyFault((void *)pcm_pointer, &status);
+  bool val = getCompressorShortedStickyFault((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -154,9 +160,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorShortedStickyFault(
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorShortedFault(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = getCompressorShortedFault((void *)pcm_pointer, &status);
+  bool val = getCompressorShortedFault((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -168,9 +174,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorShortedFault(
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorNotConnectedStickyFault(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = getCompressorNotConnectedStickyFault((void *)pcm_pointer, &status);
+  bool val = getCompressorNotConnectedStickyFault((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -182,9 +188,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorNotConnectedStickyFaul
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorNotConnectedFault(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = getCompressorNotConnectedFault((void *)pcm_pointer, &status);
+  bool val = getCompressorNotConnectedFault((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -195,9 +201,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorNotConnectedFault(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_clearAllPCMStickyFaults(
-    JNIEnv *env, jclass, jlong pcm_pointer) {
+    JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  clearAllPCMStickyFaults((void *)pcm_pointer, &status);
+  clearAllPCMStickyFaults((HalCompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
 }
 

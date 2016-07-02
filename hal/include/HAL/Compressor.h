@@ -5,27 +5,39 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <stdint.h>
-
 #pragma once
 
+#include <stdint.h>
+
+#include "HAL/Handles.h"
+
 extern "C" {
-void* initializeCompressor(uint8_t module);
+HalCompressorHandle initializeCompressor(uint8_t module, int32_t* status);
 bool checkCompressorModule(uint8_t module);
 
-bool getCompressor(void* pcm_pointer, int32_t* status);
+bool getCompressor(HalCompressorHandle compressor_handle, int32_t* status);
 
-void setClosedLoopControl(void* pcm_pointer, bool value, int32_t* status);
-bool getClosedLoopControl(void* pcm_pointer, int32_t* status);
+void setClosedLoopControl(HalCompressorHandle compressor_handle, bool value,
+                          int32_t* status);
+bool getClosedLoopControl(HalCompressorHandle compressor_handle,
+                          int32_t* status);
 
-bool getPressureSwitch(void* pcm_pointer, int32_t* status);
-float getCompressorCurrent(void* pcm_pointer, int32_t* status);
+bool getPressureSwitch(HalCompressorHandle compressor_handle, int32_t* status);
+float getCompressorCurrent(HalCompressorHandle compressor_handle,
+                           int32_t* status);
 
-bool getCompressorCurrentTooHighFault(void* pcm_pointer, int32_t* status);
-bool getCompressorCurrentTooHighStickyFault(void* pcm_pointer, int32_t* status);
-bool getCompressorShortedStickyFault(void* pcm_pointer, int32_t* status);
-bool getCompressorShortedFault(void* pcm_pointer, int32_t* status);
-bool getCompressorNotConnectedStickyFault(void* pcm_pointer, int32_t* status);
-bool getCompressorNotConnectedFault(void* pcm_pointer, int32_t* status);
-void clearAllPCMStickyFaults(void* pcm_pointer, int32_t* status);
+bool getCompressorCurrentTooHighFault(HalCompressorHandle compressor_handle,
+                                      int32_t* status);
+bool getCompressorCurrentTooHighStickyFault(
+    HalCompressorHandle compressor_handle, int32_t* status);
+bool getCompressorShortedStickyFault(HalCompressorHandle compressor_handle,
+                                     int32_t* status);
+bool getCompressorShortedFault(HalCompressorHandle compressor_handle,
+                               int32_t* status);
+bool getCompressorNotConnectedStickyFault(HalCompressorHandle compressor_handle,
+                                          int32_t* status);
+bool getCompressorNotConnectedFault(HalCompressorHandle compressor_handle,
+                                    int32_t* status);
+void clearAllPCMStickyFaults(HalCompressorHandle compressor_handle,
+                             int32_t* status);
 }
