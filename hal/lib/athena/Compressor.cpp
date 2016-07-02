@@ -38,7 +38,7 @@ bool getCompressor(HalCompressorHandle compressor_handle, int32_t* status) {
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -54,7 +54,7 @@ void setClosedLoopControl(HalCompressorHandle compressor_handle, bool value,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   PCM* module = PCM_modules[index];
@@ -67,7 +67,7 @@ bool getClosedLoopControl(HalCompressorHandle compressor_handle,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -82,7 +82,7 @@ bool getPressureSwitch(HalCompressorHandle compressor_handle, int32_t* status) {
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -98,7 +98,7 @@ float getCompressorCurrent(HalCompressorHandle compressor_handle,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   PCM* module = PCM_modules[index];
@@ -113,7 +113,7 @@ bool getCompressorCurrentTooHighFault(HalCompressorHandle compressor_handle,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -128,7 +128,7 @@ bool getCompressorCurrentTooHighStickyFault(
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -143,7 +143,7 @@ bool getCompressorShortedStickyFault(HalCompressorHandle compressor_handle,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -158,7 +158,7 @@ bool getCompressorShortedFault(HalCompressorHandle compressor_handle,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -173,7 +173,7 @@ bool getCompressorNotConnectedStickyFault(HalCompressorHandle compressor_handle,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -188,7 +188,7 @@ bool getCompressorNotConnectedFault(HalCompressorHandle compressor_handle,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   PCM* module = PCM_modules[index];
@@ -203,7 +203,7 @@ void clearAllPCMStickyFaults(HalCompressorHandle compressor_handle,
   int16_t index =
       getHandleTypedIndex(compressor_handle, HalHandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   PCM* module = PCM_modules[index];

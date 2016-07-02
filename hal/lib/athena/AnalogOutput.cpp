@@ -49,7 +49,7 @@ HalAnalogOutputHandle initializeAnalogOutputPort(HalPortHandle port_handle,
 
   auto port = analogOutputHandles.Get(handle);
   if (port == nullptr) {  // would only error on thread issue
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return HAL_INVALID_HANDLE;
   }
 
@@ -78,7 +78,7 @@ void setAnalogOutput(HalAnalogOutputHandle analog_output_handle, double voltage,
                      int32_t* status) {
   auto port = analogOutputHandles.Get(analog_output_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
 
@@ -96,7 +96,7 @@ double getAnalogOutput(HalAnalogOutputHandle analog_output_handle,
                        int32_t* status) {
   auto port = analogOutputHandles.Get(analog_output_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0.0;
   }
 

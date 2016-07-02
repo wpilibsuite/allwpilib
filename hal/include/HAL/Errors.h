@@ -70,6 +70,9 @@
 #define HAL_COUNTER_NOT_SUPPORTED -1058
 #define HAL_COUNTER_NOT_SUPPORTED_MESSAGE \
   "HAL: Counter mode not supported for encoder method"
+#define HAL_HANDLE_ERROR -1098
+#define HAL_HANDLE_ERROR_MESSAGE \
+  "HAL: A handle parameter was passed incorrectly"
 
 #define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"

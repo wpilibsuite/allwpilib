@@ -41,7 +41,7 @@ HalDigitalHandle initializePWMPort(HalPortHandle port_handle, int32_t* status) {
 
   auto port = digitalPinHandles.Get(handle, HalHandleEnum::PWM);
   if (port == nullptr) {  // would only occur on thread issue.
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return HAL_INVALID_HANDLE;
   }
 
@@ -57,7 +57,7 @@ HalDigitalHandle initializePWMPort(HalPortHandle port_handle, int32_t* status) {
 void freePWMPort(HalDigitalHandle pwm_port_handle, int32_t* status) {
   auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
 
@@ -86,7 +86,7 @@ void setPWM(HalDigitalHandle pwm_port_handle, unsigned short value,
             int32_t* status) {
   auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
 
@@ -106,7 +106,7 @@ void setPWM(HalDigitalHandle pwm_port_handle, unsigned short value,
 unsigned short getPWM(HalDigitalHandle pwm_port_handle, int32_t* status) {
   auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
 
@@ -120,7 +120,7 @@ unsigned short getPWM(HalDigitalHandle pwm_port_handle, int32_t* status) {
 void latchPWMZero(HalDigitalHandle pwm_port_handle, int32_t* status) {
   auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
 
@@ -138,7 +138,7 @@ void setPWMPeriodScale(HalDigitalHandle pwm_port_handle, uint32_t squelchMask,
                        int32_t* status) {
   auto port = digitalPinHandles.Get(pwm_port_handle, HalHandleEnum::PWM);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
 

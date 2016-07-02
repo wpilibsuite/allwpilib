@@ -49,7 +49,7 @@ HalRelayHandle initializeRelayPort(HalPortHandle port_handle, uint8_t fwd,
 
   auto port = relayHandles.Get(handle);
   if (port == nullptr) {  // would only occur on thread issue.
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return HAL_INVALID_HANDLE;
   }
 
@@ -83,7 +83,7 @@ bool checkRelayChannel(uint8_t pin) {
 void setRelay(HalRelayHandle relay_port_handle, bool on, int32_t* status) {
   auto port = relayHandles.Get(relay_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
@@ -115,7 +115,7 @@ void setRelay(HalRelayHandle relay_port_handle, bool on, int32_t* status) {
 bool getRelay(HalRelayHandle relay_port_handle, int32_t* status) {
   auto port = relayHandles.Get(relay_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
 

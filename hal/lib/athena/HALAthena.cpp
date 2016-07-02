@@ -103,6 +103,8 @@ const char* getHALErrorMessage(int32_t code) {
       return NO_AVAILABLE_RESOURCES_MESSAGE;
     case RESOURCE_IS_ALLOCATED:
       return RESOURCE_IS_ALLOCATED_MESSAGE;
+    case HAL_HANDLE_ERROR:
+      return HAL_HANDLE_ERROR_MESSAGE;
     case NULL_PARAMETER:
       return NULL_PARAMETER_MESSAGE;
     case ANALOG_TRIGGER_LIMIT_ORDER_ERROR:

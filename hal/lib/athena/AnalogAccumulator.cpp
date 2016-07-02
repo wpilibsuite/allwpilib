@@ -22,7 +22,7 @@ bool isAccumulatorChannel(HalAnalogInputHandle analog_port_handle,
                           int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   for (uint32_t i = 0; i < kNumAccumulators; i++) {
@@ -46,7 +46,7 @@ void resetAccumulator(HalAnalogInputHandle analog_port_handle,
                       int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   if (port->accumulator == nullptr) {
@@ -72,7 +72,7 @@ void setAccumulatorCenter(HalAnalogInputHandle analog_port_handle,
                           int32_t center, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   if (port->accumulator == nullptr) {
@@ -89,7 +89,7 @@ void setAccumulatorDeadband(HalAnalogInputHandle analog_port_handle,
                             int32_t deadband, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   if (port->accumulator == nullptr) {
@@ -111,7 +111,7 @@ int64_t getAccumulatorValue(HalAnalogInputHandle analog_port_handle,
                             int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   if (port->accumulator == nullptr) {
@@ -134,7 +134,7 @@ uint32_t getAccumulatorCount(HalAnalogInputHandle analog_port_handle,
                              int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   if (port->accumulator == nullptr) {
@@ -157,7 +157,7 @@ void getAccumulatorOutput(HalAnalogInputHandle analog_port_handle,
                           int64_t* value, uint32_t* count, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   if (port->accumulator == nullptr) {
