@@ -13,7 +13,12 @@
  * @param module The PCM ID to use (0-62)
  */
 Compressor::Compressor(uint8_t pcmID) {
-  m_pcm_pointer = initializeCompressor(pcmID);
+  int32_t status = 0;
+  m_compressorHandle = initializeCompressor(pcmID, &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    return;
+  }
   SetClosedLoopControl(true);
 }
 
@@ -21,13 +26,19 @@ Compressor::Compressor(uint8_t pcmID) {
  * Starts closed-loop control. Note that closed loop control is enabled by
  * default.
  */
-void Compressor::Start() { SetClosedLoopControl(true); }
+void Compressor::Start() {
+  if (StatusIsFatal()) return;
+  SetClosedLoopControl(true);
+}
 
 /**
  * Stops closed-loop control. Note that closed loop control is enabled by
  * default.
  */
-void Compressor::Stop() { SetClosedLoopControl(false); }
+void Compressor::Stop() {
+  if (StatusIsFatal()) return;
+  SetClosedLoopControl(false);
+}
 
 /**
  * Check if compressor output is active.
@@ -35,10 +46,11 @@ void Compressor::Stop() { SetClosedLoopControl(false); }
  * @return true if the compressor is on
  */
 bool Compressor::Enabled() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getCompressor(m_pcm_pointer, &status);
+  value = getCompressor(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -53,10 +65,11 @@ bool Compressor::Enabled() const {
  * @return true if pressure is low
  */
 bool Compressor::GetPressureSwitchValue() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getPressureSwitch(m_pcm_pointer, &status);
+  value = getPressureSwitch(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -71,10 +84,11 @@ bool Compressor::GetPressureSwitchValue() const {
  * @return The current through the compressor, in amps
  */
 float Compressor::GetCompressorCurrent() const {
+  if (StatusIsFatal()) return 0;
   int32_t status = 0;
   float value;
 
-  value = getCompressorCurrent(m_pcm_pointer, &status);
+  value = getCompressorCurrent(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -91,9 +105,10 @@ float Compressor::GetCompressorCurrent() const {
  *           to disable.
  */
 void Compressor::SetClosedLoopControl(bool on) {
+  if (StatusIsFatal()) return;
   int32_t status = 0;
 
-  setClosedLoopControl(m_pcm_pointer, on, &status);
+  setClosedLoopControl(m_compressorHandle, on, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -108,10 +123,11 @@ void Compressor::SetClosedLoopControl(bool on) {
  *         disabled.
  */
 bool Compressor::GetClosedLoopControl() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getClosedLoopControl(m_pcm_pointer, &status);
+  value = getClosedLoopControl(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -127,10 +143,11 @@ bool Compressor::GetClosedLoopControl() const {
  *         disabled due to compressor current being too high.
  */
 bool Compressor::GetCompressorCurrentTooHighFault() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getCompressorCurrentTooHighFault(m_pcm_pointer, &status);
+  value = getCompressorCurrentTooHighFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -150,10 +167,11 @@ bool Compressor::GetCompressorCurrentTooHighFault() const {
  *         disabled due to compressor current being too high.
  */
 bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getCompressorCurrentTooHighStickyFault(m_pcm_pointer, &status);
+  value = getCompressorCurrentTooHighStickyFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -173,10 +191,11 @@ bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
  *         appears to be shorted.
  */
 bool Compressor::GetCompressorShortedStickyFault() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getCompressorShortedStickyFault(m_pcm_pointer, &status);
+  value = getCompressorShortedStickyFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -192,10 +211,11 @@ bool Compressor::GetCompressorShortedStickyFault() const {
  *         appears to be shorted.
  */
 bool Compressor::GetCompressorShortedFault() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getCompressorShortedFault(m_pcm_pointer, &status);
+  value = getCompressorShortedFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -214,10 +234,11 @@ bool Compressor::GetCompressorShortedFault() const {
  *         appear to be wired, i.e. compressor is not drawing enough current.
  */
 bool Compressor::GetCompressorNotConnectedStickyFault() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getCompressorNotConnectedStickyFault(m_pcm_pointer, &status);
+  value = getCompressorNotConnectedStickyFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -233,10 +254,11 @@ bool Compressor::GetCompressorNotConnectedStickyFault() const {
  *         appear to be wired, i.e. compressor is not drawing enough current.
  */
 bool Compressor::GetCompressorNotConnectedFault() const {
+  if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
 
-  value = getCompressorNotConnectedFault(m_pcm_pointer, &status);
+  value = getCompressorNotConnectedFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -256,9 +278,10 @@ bool Compressor::GetCompressorNotConnectedFault() const {
  * If no sticky faults are set then this call will have no effect.
  */
 void Compressor::ClearAllPCMStickyFaults() {
+  if (StatusIsFatal()) return;
   int32_t status = 0;
 
-  clearAllPCMStickyFaults(m_pcm_pointer, &status);
+  clearAllPCMStickyFaults(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);

@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * thereby stopping the compressor from operating.
  */
 public class Compressor extends SensorBase implements LiveWindowSendable {
-  private long m_pcm;
+  private int m_compressorHandle;
 
   /**
    * Constructor.
@@ -34,7 +34,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
   public Compressor(int module) {
     m_table = null;
 
-    m_pcm = CompressorJNI.initializeCompressor((byte) module);
+    m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
   }
 
   /**
@@ -70,7 +70,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if the compressor is on
    */
   public boolean enabled() {
-    return CompressorJNI.getCompressor(m_pcm);
+    return CompressorJNI.getCompressor(m_compressorHandle);
   }
 
   /**
@@ -79,7 +79,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if the pressure is low by reading the pressure switch that is plugged into the PCM
    */
   public boolean getPressureSwitchValue() {
-    return CompressorJNI.getPressureSwitch(m_pcm);
+    return CompressorJNI.getPressureSwitch(m_compressorHandle);
   }
 
   /**
@@ -88,7 +88,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return current consumed in amps for the compressor motor
    */
   public float getCompressorCurrent() {
-    return CompressorJNI.getCompressorCurrent(m_pcm);
+    return CompressorJNI.getCompressorCurrent(m_compressorHandle);
   }
 
   /**
@@ -98,7 +98,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *           operation of the compressor is disabled.
    */
   public void setClosedLoopControl(boolean on) {
-    CompressorJNI.setClosedLoopControl(m_pcm, on);
+    CompressorJNI.setClosedLoopControl(m_compressorHandle, on);
   }
 
   /**
@@ -107,7 +107,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if compressor is operating on closed-loop mode, otherwise return false.
    */
   public boolean getClosedLoopControl() {
-    return CompressorJNI.getClosedLoopControl(m_pcm);
+    return CompressorJNI.getClosedLoopControl(m_compressorHandle);
   }
 
   /**
@@ -117,7 +117,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if PCM is in fault state.
    */
   public boolean getCompressorCurrentTooHighFault() {
-    return CompressorJNI.getCompressorCurrentTooHighFault(m_pcm);
+    return CompressorJNI.getCompressorCurrentTooHighFault(m_compressorHandle);
   }
 
   /**
@@ -127,21 +127,21 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if PCM sticky fault is set.
    */
   public boolean getCompressorCurrentTooHighStickyFault() {
-    return CompressorJNI.getCompressorCurrentTooHighStickyFault(m_pcm);
+    return CompressorJNI.getCompressorCurrentTooHighStickyFault(m_compressorHandle);
   }
 
   /**
    * @return true if PCM sticky fault is set : Compressor output appears to be shorted.
    */
   public boolean getCompressorShortedStickyFault() {
-    return CompressorJNI.getCompressorShortedStickyFault(m_pcm);
+    return CompressorJNI.getCompressorShortedStickyFault(m_compressorHandle);
   }
 
   /**
    * @return true if PCM is in fault state : Compressor output appears to be shorted.
    */
   public boolean getCompressorShortedFault() {
-    return CompressorJNI.getCompressorShortedFault(m_pcm);
+    return CompressorJNI.getCompressorShortedFault(m_compressorHandle);
   }
 
   /**
@@ -151,7 +151,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if PCM sticky fault is set.
    */
   public boolean getCompressorNotConnectedStickyFault() {
-    return CompressorJNI.getCompressorNotConnectedStickyFault(m_pcm);
+    return CompressorJNI.getCompressorNotConnectedStickyFault(m_compressorHandle);
   }
 
   /**
@@ -161,7 +161,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if PCM is in fault state.
    */
   public boolean getCompressorNotConnectedFault() {
-    return CompressorJNI.getCompressorNotConnectedFault(m_pcm);
+    return CompressorJNI.getCompressorNotConnectedFault(m_compressorHandle);
   }
 
   /**
@@ -174,7 +174,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * <p>If no sticky faults are set then this call will have no effect.
    */
   public void clearAllPCMStickyFaults() {
-    CompressorJNI.clearAllPCMStickyFaults(m_pcm);
+    CompressorJNI.clearAllPCMStickyFaults(m_compressorHandle);
   }
 
   @Override

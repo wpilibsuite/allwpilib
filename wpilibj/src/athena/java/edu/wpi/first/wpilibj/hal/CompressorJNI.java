@@ -8,31 +8,31 @@
 package edu.wpi.first.wpilibj.hal;
 
 public class CompressorJNI extends JNIWrapper {
-  public static native long initializeCompressor(byte module);
+  public static native int initializeCompressor(byte module);
 
   public static native boolean checkCompressorModule(byte module);
 
-  public static native boolean getCompressor(long pcmPointer);
+  public static native boolean getCompressor(int compressorHandle);
 
-  public static native void setClosedLoopControl(long pcmPointer, boolean value);
+  public static native void setClosedLoopControl(int compressorHandle, boolean value);
 
-  public static native boolean getClosedLoopControl(long pcmPointer);
+  public static native boolean getClosedLoopControl(int compressorHandle);
 
-  public static native boolean getPressureSwitch(long pcmPointer);
+  public static native boolean getPressureSwitch(int compressorHandle);
 
-  public static native float getCompressorCurrent(long pcmPointer);
+  public static native float getCompressorCurrent(int compressorHandle);
 
-  public static native boolean getCompressorCurrentTooHighFault(long pcmPointer);
+  public static native boolean getCompressorCurrentTooHighFault(int compressorHandle);
 
-  public static native boolean getCompressorCurrentTooHighStickyFault(long pcmPointer);
+  public static native boolean getCompressorCurrentTooHighStickyFault(int compressorHandle);
 
-  public static native boolean getCompressorShortedStickyFault(long pcmPointer);
+  public static native boolean getCompressorShortedStickyFault(int compressorHandle);
 
-  public static native boolean getCompressorShortedFault(long pcmPointer);
+  public static native boolean getCompressorShortedFault(int compressorHandle);
 
-  public static native boolean getCompressorNotConnectedStickyFault(long pcmPointer);
+  public static native boolean getCompressorNotConnectedStickyFault(int compressorHandle);
 
-  public static native boolean getCompressorNotConnectedFault(long pcmPointer);
+  public static native boolean getCompressorNotConnectedFault(int compressorHandle);
 
-  public static native void clearAllPCMStickyFaults(long pcmPointer);
+  public static native void clearAllPCMStickyFaults(int compressorHandle);
 }
