@@ -8,21 +8,21 @@
 package edu.wpi.first.wpilibj.hal;
 
 public class SolenoidJNI extends JNIWrapper {
-  public static native long initializeSolenoidPort(int halPortHandle);
+  public static native int initializeSolenoidPort(int halPortHandle);
 
-  public static native void freeSolenoidPort(long portPointer);
+  public static native void freeSolenoidPort(int portHandle);
 
-  public static native void setSolenoid(long port, boolean on);
+  public static native void setSolenoid(int portHandle, boolean on);
 
-  public static native boolean getSolenoid(long port);
+  public static native boolean getSolenoid(int portHandle);
 
-  public static native byte getAllSolenoids(long port);
+  public static native byte getAllSolenoids(byte module);
 
-  public static native int getPCMSolenoidBlackList(long pcmPointer);
+  public static native int getPCMSolenoidBlackList(byte module);
 
-  public static native boolean getPCMSolenoidVoltageStickyFault(long pcmPointer);
+  public static native boolean getPCMSolenoidVoltageStickyFault(byte module);
 
-  public static native boolean getPCMSolenoidVoltageFault(long pcmPointer);
+  public static native boolean getPCMSolenoidVoltageFault(byte module);
 
-  public static native void clearAllPCMStickyFaults(long pcmPointer);
+  public static native void clearAllPCMStickyFaults(byte module);
 }

@@ -38,7 +38,8 @@ enum class HalHandleEnum {
   PWM = 9,
   DigitalPWM = 10,
   Counter = 11,
-  Compressor = 14
+  Compressor = 14,
+  Solenoid = 15
 };
 
 static inline int16_t getHandleIndex(HalHandle handle) {

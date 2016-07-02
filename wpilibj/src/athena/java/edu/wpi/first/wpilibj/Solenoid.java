@@ -26,7 +26,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 public class Solenoid extends SolenoidBase implements LiveWindowSendable {
 
   private final int m_channel; // /< The channel to control.
-  private long m_solenoidPort;
+  private int m_solenoidHandle;
 
   /**
    * Constructor using the default PCM ID (0)
@@ -50,15 +50,8 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     checkSolenoidModule(m_moduleNumber);
     checkSolenoidChannel(m_channel);
 
-    try {
-      allocated.allocate(m_moduleNumber * kSolenoidChannels + m_channel);
-    } catch (CheckedAllocationException ex) {
-      throw new AllocationException("Solenoid channel " + m_channel + " on module "
-        + m_moduleNumber + " is already allocated");
-    }
-
     int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
-    m_solenoidPort = SolenoidJNI.initializeSolenoidPort(portHandle);
+    m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
     UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
@@ -68,9 +61,11 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * Destructor.
    */
   public synchronized void free() {
-    allocated.free(m_moduleNumber * kSolenoidChannels + m_channel);
-    SolenoidJNI.freeSolenoidPort(m_solenoidPort);
-    m_solenoidPort = 0;
+    SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
+    m_solenoidHandle = 0;
+    if (m_table != null) {
+      m_table.removeTableListener(m_tableListener);
+    }
     super.free();
   }
 
@@ -80,10 +75,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * @param on Turn the solenoid output off or on.
    */
   public void set(boolean on) {
-    byte value = (byte) (on ? 0xFF : 0x00);
-    byte mask = (byte) (1 << m_channel);
-
-    set(value, mask);
+    SolenoidJNI.setSolenoid(m_solenoidHandle, on);
   }
 
   /**
@@ -92,8 +84,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * @return The current value of the solenoid.
    */
   public boolean get() {
-    int value = getAll() & (1 << m_channel);
-    return (value != 0);
+    return SolenoidJNI.getSolenoid(m_solenoidHandle);
   }
 
   /**

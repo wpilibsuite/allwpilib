@@ -13,11 +13,8 @@ import edu.wpi.first.wpilibj.hal.SolenoidJNI;
  * SolenoidBase class is the common base class for the Solenoid and DoubleSolenoid classes.
  */
 public abstract class SolenoidBase extends SensorBase {
-
-  private final long[] m_ports;
-  protected final int m_moduleNumber; // /< The number of the solenoid module being
+  protected final byte m_moduleNumber; // /< The number of the solenoid module being
   // used.
-  protected static final Resource allocated = new Resource(63 * SensorBase.kSolenoidChannels);
 
   /**
    * Constructor.
@@ -25,38 +22,7 @@ public abstract class SolenoidBase extends SensorBase {
    * @param moduleNumber The PCM CAN ID
    */
   public SolenoidBase(final int moduleNumber) {
-    m_moduleNumber = moduleNumber;
-    m_ports = new long[SensorBase.kSolenoidChannels];
-    for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-      int portHandle = SolenoidJNI.getPortWithModule((byte) moduleNumber, (byte) i);
-      m_ports[i] = SolenoidJNI.initializeSolenoidPort(portHandle);
-    }
-  }
-
-  /**
-   * Free the resources associated with by the solenoid base.
-   */
-  @Override
-  public void free() {
-    for (int i = 0; i < m_ports.length; i++) {
-      SolenoidJNI.freeSolenoidPort(m_ports[i]);
-      m_ports[i] = 0;
-    }
-  }
-
-  /**
-   * Set the value of a solenoid.
-   *
-   * @param value The value you want to set on the module.
-   * @param mask  The channels you want to be affected.
-   */
-  protected synchronized void set(int value, int mask) {
-    for (int i = 0; i < SensorBase.kSolenoidChannels; i++) {
-      int localMask = 1 << i;
-      if ((mask & localMask) != 0) {
-        SolenoidJNI.setSolenoid(m_ports[i], (value & localMask) != 0);
-      }
-    }
+    m_moduleNumber = (byte)moduleNumber;
   }
 
   /**
@@ -65,7 +31,7 @@ public abstract class SolenoidBase extends SensorBase {
    * @return The current value of all 8 solenoids on this module.
    */
   public byte getAll() {
-    return SolenoidJNI.getAllSolenoids(m_ports[0]);
+    return SolenoidJNI.getAllSolenoids(m_moduleNumber);
   }
 
   /**
@@ -77,7 +43,7 @@ public abstract class SolenoidBase extends SensorBase {
    * @see #clearAllPCMStickyFaults()
    */
   public byte getPCMSolenoidBlackList() {
-    return (byte) SolenoidJNI.getPCMSolenoidBlackList(m_ports[0]);
+    return (byte) SolenoidJNI.getPCMSolenoidBlackList(m_moduleNumber);
   }
 
   /**
@@ -87,7 +53,7 @@ public abstract class SolenoidBase extends SensorBase {
    * @return true if PCM sticky fault is set
    */
   public boolean getPCMSolenoidVoltageStickyFault() {
-    return SolenoidJNI.getPCMSolenoidVoltageStickyFault(m_ports[0]);
+    return SolenoidJNI.getPCMSolenoidVoltageStickyFault(m_moduleNumber);
   }
 
   /**
@@ -97,7 +63,7 @@ public abstract class SolenoidBase extends SensorBase {
    * @return true if PCM is in fault state.
    */
   public boolean getPCMSolenoidVoltageFault() {
-    return SolenoidJNI.getPCMSolenoidVoltageFault(m_ports[0]);
+    return SolenoidJNI.getPCMSolenoidVoltageFault(m_moduleNumber);
   }
 
   /**
@@ -110,6 +76,6 @@ public abstract class SolenoidBase extends SensorBase {
    * <p>If no sticky faults are set then this call will have no effect.
    */
   public void clearAllPCMStickyFaults() {
-    SolenoidJNI.clearAllPCMStickyFaults(m_ports[0]);
+    SolenoidJNI.clearAllPCMStickyFaults(m_moduleNumber);
   }
 }
