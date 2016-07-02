@@ -25,9 +25,6 @@ priority_recursive_mutex digitalPwmMutex;
 tDIO* digitalSystem = nullptr;
 tRelay* relaySystem = nullptr;
 tPWM* pwmSystem = nullptr;
-hal::Resource* DIOChannels = nullptr;
-hal::Resource* DO_PWMGenerators = nullptr;
-hal::Resource* PWMChannels = nullptr;
 
 bool digitalSystemsInitialized = false;
 
@@ -40,13 +37,6 @@ DigitalHandleResource<HalDigitalHandle, DigitalPort, kDigitalPins + kNumHeaders>
 void initializeDigital(int32_t* status) {
   if (digitalSystemsInitialized) return;
 
-  hal::Resource::CreateResourceObject(&DIOChannels,
-                                      tDIO::kNumSystems * kDigitalPins);
-  hal::Resource::CreateResourceObject(
-      &DO_PWMGenerators,
-      tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements);
-  hal::Resource::CreateResourceObject(&PWMChannels,
-                                      tPWM::kNumSystems * kPwmPins);
   digitalSystem = tDIO::create(status);
 
   // Relay Setup
