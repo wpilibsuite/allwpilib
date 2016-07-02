@@ -59,8 +59,6 @@ extern priority_recursive_mutex digitalPwmMutex;
 extern tDIO* digitalSystem;
 extern tRelay* relaySystem;
 extern tPWM* pwmSystem;
-extern hal::Resource* DIOChannels;
-extern hal::Resource* PWMChannels;
 
 extern bool digitalSystemsInitialized;
 
