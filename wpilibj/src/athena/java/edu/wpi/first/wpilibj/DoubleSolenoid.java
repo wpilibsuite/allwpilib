@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
 import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -37,6 +38,8 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   private int m_reverseChannel; // /< The reverse channel on the module to control.
   private byte m_forwardMask; // /< The mask for the forward channel.
   private byte m_reverseMask; // /< The mask for the reverse channel.
+  private int m_forwardHandle = 0;
+  private int m_reverseHandle = 0;
 
   /**
    * Constructor. Uses the default PCM ID of 0.
@@ -65,18 +68,20 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
     checkSolenoidChannel(m_forwardChannel);
     checkSolenoidChannel(m_reverseChannel);
 
+    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_forwardChannel);
+    m_forwardHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
+    
     try {
-      allocated.allocate(m_moduleNumber * kSolenoidChannels + m_forwardChannel);
-    } catch (CheckedAllocationException exception) {
-      throw new AllocationException("Solenoid channel " + m_forwardChannel + " on module "
-          + m_moduleNumber + " is already allocated");
+      portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_reverseChannel);
+      m_reverseHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
+    } catch (RuntimeException ex) {
+      // free the forward handle on exception, then rethrow
+      SolenoidJNI.freeSolenoidPort(m_forwardHandle);
+      m_forwardHandle = 0;
+      m_reverseHandle = 0;
+      throw ex;
     }
-    try {
-      allocated.allocate(m_moduleNumber * kSolenoidChannels + m_reverseChannel);
-    } catch (CheckedAllocationException exception) {
-      throw new AllocationException("Solenoid channel " + m_reverseChannel + " on module "
-          + m_moduleNumber + " is already allocated");
-    }
+
     m_forwardMask = (byte) (1 << m_forwardChannel);
     m_reverseMask = (byte) (1 << m_reverseChannel);
 
@@ -89,8 +94,8 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
    * Destructor.
    */
   public synchronized void free() {
-    allocated.free(m_moduleNumber * kSolenoidChannels + m_forwardChannel);
-    allocated.free(m_moduleNumber * kSolenoidChannels + m_reverseChannel);
+    SolenoidJNI.freeSolenoidPort(m_forwardHandle);
+    SolenoidJNI.freeSolenoidPort(m_reverseChannel);
     super.free();
   }
 
@@ -100,24 +105,29 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
    * @param value The value to set (Off, Forward, Reverse)
    */
   public void set(final Value value) {
-    final byte rawValue;
-
+    boolean forward = false;
+    boolean reverse = false;
+    
     switch (value) {
       case kOff:
-        rawValue = 0x00;
+        forward = false;
+        reverse = false;
         break;
       case kForward:
-        rawValue = m_forwardMask;
+        forward = true;
+        reverse = false;
         break;
       case kReverse:
-        rawValue = m_reverseMask;
+        forward = false;
+        reverse = true;
         break;
       default:
         throw new AssertionError("Illegal value: " + value);
 
     }
 
-    set(rawValue, m_forwardMask | m_reverseMask);
+    SolenoidJNI.setSolenoid(m_forwardHandle, forward);
+    SolenoidJNI.setSolenoid(m_reverseHandle, reverse);
   }
 
   /**
@@ -126,12 +136,13 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
    * @return The current value of the solenoid.
    */
   public Value get() {
-    byte value = getAll();
-
-    if ((value & m_forwardMask) != 0) {
+    boolean valueForward = SolenoidJNI.getSolenoid(m_forwardHandle);
+    boolean valueReverse = SolenoidJNI.getSolenoid(m_reverseHandle);
+    
+    if (valueForward) {
       return Value.kForward;
     }
-    if ((value & m_reverseMask) != 0) {
+    if (valueReverse) {
       return Value.kReverse;
     }
     return Value.kOff;

@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "HAL/Handles.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SolenoidBase.h"
 #include "tables/ITableListener.h"
@@ -40,6 +41,7 @@ class Solenoid : public SolenoidBase,
   std::shared_ptr<ITable> GetTable() const;
 
  private:
+  HalSolenoidHandle m_solenoidHandle = HAL_INVALID_HANDLE;
   uint32_t m_channel;  ///< The channel on the module to control.
   std::shared_ptr<ITable> m_table;
 };

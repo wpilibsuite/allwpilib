@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "HAL/Handles.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SolenoidBase.h"
 #include "tables/ITableListener.h"
@@ -49,6 +50,8 @@ class DoubleSolenoid : public SolenoidBase,
   uint32_t m_reverseChannel;  ///< The reverse channel on the module to control.
   uint8_t m_forwardMask;      ///< The mask for the forward channel.
   uint8_t m_reverseMask;      ///< The mask for the reverse channel.
+  HalSolenoidHandle m_forwardHandle = HAL_INVALID_HANDLE;
+  HalSolenoidHandle m_reverseHandle = HAL_INVALID_HANDLE;
 
   std::shared_ptr<ITable> m_table;
 };
