@@ -9,6 +9,7 @@
 
 #include "HAL/Errors.h"
 #include "PCMInternal.h"
+#include "PortsInternal.h"
 #include "ctre/PCM.h"
 #include "handles/HandlesInternal.h"
 
@@ -31,9 +32,7 @@ HalCompressorHandle initializeCompressor(uint8_t module, int32_t* status) {
   return (HalCompressorHandle)createHandle(module, HalHandleEnum::Compressor);
 }
 
-bool checkCompressorModule(uint8_t module) {
-  return module < NUM_MODULE_NUMBERS;
-}
+bool checkCompressorModule(uint8_t module) { return module < kNumPCMModules; }
 
 bool getCompressor(HalCompressorHandle compressor_handle, int32_t* status) {
   int16_t index =

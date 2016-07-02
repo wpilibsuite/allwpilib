@@ -9,10 +9,8 @@
 
 #include "DigitalInternal.h"
 #include "HAL/HAL.h"
+#include "PortsInternal.h"
 #include "handles/LimitedHandleResource.h"
-
-static_assert(sizeof(uint32_t) <= sizeof(void*),
-              "This file shoves uint32_ts into pointers.");
 
 using namespace hal;
 
@@ -23,7 +21,7 @@ struct Counter {
 };
 }
 
-static LimitedHandleResource<HalCounterHandle, Counter, tCounter::kNumSystems,
+static LimitedHandleResource<HalCounterHandle, Counter, kNumCounters,
                              HalHandleEnum::Counter>
     counterHandles;
 

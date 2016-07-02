@@ -11,6 +11,7 @@
 #include "HAL/AnalogInput.h"
 #include "HAL/Errors.h"
 #include "HAL/cpp/Resource.h"
+#include "PortsInternal.h"
 #include "handles/HandlesInternal.h"
 #include "handles/LimitedHandleResource.h"
 
@@ -25,8 +26,7 @@ struct AnalogTrigger {
 }
 
 static LimitedHandleResource<HalAnalogTriggerHandle, AnalogTrigger,
-                             tAnalogTrigger::kNumSystems,
-                             HalHandleEnum::AnalogTrigger>
+                             kNumAnalogTriggers, HalHandleEnum::AnalogTrigger>
     analogTriggerHandles;
 
 extern "C" {

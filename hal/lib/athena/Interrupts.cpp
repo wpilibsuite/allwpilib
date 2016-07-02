@@ -13,6 +13,7 @@
 
 #include "DigitalInternal.h"
 #include "HAL/Errors.h"
+#include "PortsInternal.h"
 #include "handles/LimitedHandleResource.h"
 
 using namespace hal;
@@ -25,8 +26,8 @@ struct Interrupt  // FIXME: why is this internal?
 };
 }
 
-static LimitedHandleResource<HalInterruptHandle, Interrupt,
-                             tInterrupt::kNumSystems, HalHandleEnum::Interrupt>
+static LimitedHandleResource<HalInterruptHandle, Interrupt, kNumInterrupts,
+                             HalHandleEnum::Interrupt>
     interruptHandles;
 
 extern "C" {

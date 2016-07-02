@@ -25,7 +25,7 @@ bool isAccumulatorChannel(HalAnalogInputHandle analog_port_handle,
     *status = PARAMETER_OUT_OF_RANGE;
     return false;
   }
-  for (uint32_t i = 0; i < kAccumulatorNumChannels; i++) {
+  for (uint32_t i = 0; i < kNumAccumulators; i++) {
     if (port->pin == kAccumulatorChannels[i]) return true;
   }
   return false;

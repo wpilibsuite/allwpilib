@@ -8,10 +8,8 @@
 #include "HAL/PWM.h"
 
 #include "DigitalInternal.h"
+#include "PortsInternal.h"
 #include "handles/HandlesInternal.h"
-
-static_assert(sizeof(uint32_t) <= sizeof(void*),
-              "This file shoves uint32_ts into pointers.");
 
 using namespace hal;
 
@@ -30,8 +28,8 @@ HalDigitalHandle initializePWMPort(HalPortHandle port_handle, int32_t* status) {
 
   uint8_t origPin = static_cast<uint8_t>(pin);
 
-  if (origPin < kNumHeaders) {
-    pin += kDigitalPins;  // remap Headers to end of allocations
+  if (origPin < kNumPWMHeaders) {
+    pin += kNumDigitalPins;  // remap Headers to end of allocations
   } else {
     pin = remapMXPPWMChannel(pin) + 10;  // remap MXP to proper channel
   }
@@ -74,7 +72,7 @@ void freePWMPort(HalDigitalHandle pwm_port_handle, int32_t* status) {
   digitalPinHandles.Free(pwm_port_handle, HalHandleEnum::PWM);
 }
 
-bool checkPWMChannel(uint8_t pin) { return pin < kPwmPins; }
+bool checkPWMChannel(uint8_t pin) { return pin < kNumPWMPins; }
 
 /**
  * Set a PWM channel to the desired value. The values range from 0 to 255 and

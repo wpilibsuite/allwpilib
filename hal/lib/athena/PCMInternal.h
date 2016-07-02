@@ -9,13 +9,12 @@
 
 #include <stdint.h>
 
+#include "HAL/Ports.h"
+#include "PortsInternal.h"
 #include "ctre/PCM.h"
 
 namespace hal {
-constexpr int NUM_MODULE_NUMBERS = 63;
-constexpr int NUM_SOLENOID_PINS = 8;
-
-extern PCM* PCM_modules[NUM_MODULE_NUMBERS];
+extern PCM* PCM_modules[kNumPCMModules];
 
 void initializePCM(int module);
 }
