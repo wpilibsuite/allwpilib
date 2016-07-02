@@ -8,12 +8,9 @@
 #include "HAL/Compressor.h"
 
 #include "HAL/Errors.h"
+#include "PCMInternal.h"
 #include "ctre/PCM.h"
 #include "handles/HandlesInternal.h"
-
-static const int NUM_MODULE_NUMBERS = 63;
-extern PCM* PCM_modules[NUM_MODULE_NUMBERS];
-extern void initializePCM(int module);
 
 using namespace hal;
 

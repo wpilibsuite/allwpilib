@@ -10,14 +10,10 @@
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/Errors.h"
+#include "PCMInternal.h"
 #include "ctre/PCM.h"
 #include "handles/HandlesInternal.h"
 #include "handles/IndexedHandleResource.h"
-
-static constexpr int NUM_MODULE_NUMBERS = 63;
-static constexpr int NUM_SOLENOID_PINS = 8;
-
-PCM* PCM_modules[NUM_MODULE_NUMBERS] = {nullptr};
 
 namespace {
 struct Solenoid {
@@ -26,16 +22,11 @@ struct Solenoid {
 };
 }
 
-void initializePCM(int module) {
-  if (!PCM_modules[module]) {
-    PCM_modules[module] = new PCM(module);
-  }
-}
-
 using namespace hal;
 
 static IndexedHandleResource<HalSolenoidHandle, Solenoid,
-                             NUM_MODULE_NUMBERS * 8, HalHandleEnum::Solenoid>
+                             NUM_MODULE_NUMBERS * NUM_SOLENOID_PINS,
+                             HalHandleEnum::Solenoid>
     solenoidHandles;
 
 extern "C" {
