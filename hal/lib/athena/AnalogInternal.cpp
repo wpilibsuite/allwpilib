@@ -10,13 +10,14 @@
 #include "ChipObject.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "PortsInternal.h"
 
 namespace hal {
 priority_recursive_mutex analogRegisterWindowMutex;
 tAI* analogInputSystem = nullptr;
 tAO* analogOutputSystem = nullptr;
 
-IndexedHandleResource<HalAnalogInputHandle, hal::AnalogPort, kAnalogInputPins,
+IndexedHandleResource<HalAnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
                       HalHandleEnum::AnalogInput>
     analogInputHandles;
 
@@ -32,7 +33,7 @@ void initializeAnalog(int32_t* status) {
   if (analogSystemInitialized) return;
   analogInputSystem = tAI::create(status);
   analogOutputSystem = tAO::create(status);
-  setAnalogNumChannelsToActivate(kAnalogInputPins);
+  setAnalogNumChannelsToActivate(kNumAnalogInputs);
   setAnalogSampleRate(kDefaultSampleRate, status);
   analogSystemInitialized = true;
 }

@@ -9,6 +9,7 @@
 
 #include "AnalogInternal.h"
 #include "HAL/Errors.h"
+#include "PortsInternal.h"
 #include "handles/HandlesInternal.h"
 #include "handles/IndexedHandleResource.h"
 
@@ -21,7 +22,7 @@ struct AnalogOutput {
 }
 
 static IndexedHandleResource<HalAnalogOutputHandle, AnalogOutput,
-                             kAnalogOutputPins, HalHandleEnum::AnalogOutput>
+                             kNumAnalogOutputs, HalHandleEnum::AnalogOutput>
     analogOutputHandles;
 
 extern "C" {
@@ -69,7 +70,7 @@ void freeAnalogOutputPort(HalAnalogOutputHandle analog_output_handle) {
  * @return Analog channel is valid
  */
 bool checkAnalogOutputChannel(uint32_t pin) {
-  if (pin < kAnalogOutputPins) return true;
+  if (pin < kNumAnalogOutputs) return true;
   return false;
 }
 

@@ -8,6 +8,7 @@
 #include "HAL/Relay.h"
 
 #include "DigitalInternal.h"
+#include "PortsInternal.h"
 #include "handles/IndexedHandleResource.h"
 
 using namespace hal;
@@ -19,10 +20,7 @@ struct Relay {
 };
 }
 
-constexpr uint32_t kRelayPins = 8;
-constexpr uint32_t kRelayHeaders = kRelayPins / 2;  // Number of FPGA ID's
-
-static IndexedHandleResource<HalRelayHandle, Relay, kRelayPins,
+static IndexedHandleResource<HalRelayHandle, Relay, kNumRelayPins,
                              HalHandleEnum::Relay>
     relayHandles;
 
@@ -42,7 +40,7 @@ HalRelayHandle initializeRelayPort(HalPortHandle port_handle, uint8_t fwd,
     return HAL_INVALID_HANDLE;
   }
 
-  if (!fwd) pin += kRelayHeaders;  // add 4 to reverse pins
+  if (!fwd) pin += kNumRelayHeaders;  // add 4 to reverse pins
 
   auto handle = relayHandles.Allocate(pin, status);
 
@@ -56,8 +54,8 @@ HalRelayHandle initializeRelayPort(HalPortHandle port_handle, uint8_t fwd,
   }
 
   if (!fwd) {
-    pin -= kRelayHeaders;  // subtract number of headers to put pin in range.
-    port->fwd = false;     // set to reverse
+    pin -= kNumRelayHeaders;  // subtract number of headers to put pin in range.
+    port->fwd = false;        // set to reverse
   } else {
     port->fwd = true;  // set to forward
   }
@@ -72,9 +70,10 @@ void freeRelayPort(HalRelayHandle relay_port_handle) {
 }
 
 bool checkRelayChannel(uint8_t pin) {
-  return pin < kRelayHeaders;  // roboRIO only has 4 headers, and the FPGA has
-                               // seperate functions for forward and reverse,
-                               // instead of seperate pin IDs
+  // roboRIO only has 4 headers, and the FPGA has
+  // seperate functions for forward and reverse,
+  // instead of seperate pin IDs
+  return pin < kNumRelayHeaders;
 }
 
 /**

@@ -10,11 +10,9 @@
 #include <cmath>
 
 #include "DigitalInternal.h"
+#include "PortsInternal.h"
 #include "handles/HandlesInternal.h"
 #include "handles/LimitedHandleResource.h"
-
-static_assert(sizeof(uint32_t) <= sizeof(void*),
-              "This file shoves uint32_ts into pointers.");
 
 using namespace hal;
 
@@ -22,9 +20,7 @@ using namespace hal;
 static priority_recursive_mutex digitalDIOMutex;
 
 static LimitedHandleResource<HalDigitalPWMHandle, uint8_t,
-                             tDIO::kNumPWMDutyCycleAElements +
-                                 tDIO::kNumPWMDutyCycleBElements,
-                             HalHandleEnum::DigitalPWM>
+                             kNumDigitalPWMOutputs, HalHandleEnum::DigitalPWM>
     digitalPWMHandles;
 
 extern "C" {
@@ -61,7 +57,7 @@ HalDigitalHandle initializeDIOPort(HalPortHandle port_handle, uint8_t input,
 
   tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
 
-  if (port->pin < kNumHeaders) {
+  if (port->pin < kNumDigitalHeaders) {
     uint32_t bitToSet = 1 << port->pin;
     if (input) {
       outputEnable.Headers =
@@ -196,7 +192,7 @@ void setDigitalPWMOutputChannel(HalDigitalPWMHandle pwmGenerator, uint32_t pin,
     return;
   }
   uint32_t id = *port;
-  if (pin >= kNumHeaders) {       // if it is on the MXP
+  if (pin >= kNumDigitalHeaders) {  // if it is on the MXP
     pin += kMXPDigitalPWMOffset;  // then to write as a digital PWM pin requires
                                   // an offset to write on the correct pin
   }
@@ -224,7 +220,7 @@ void setDIO(HalDigitalHandle dio_port_handle, short value, int32_t* status) {
     std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
     tDIO::tDO currentDIO = digitalSystem->readDO(status);
 
-    if (port->pin < kNumHeaders) {
+    if (port->pin < kNumDigitalHeaders) {
       if (value == 0) {
         currentDIO.Headers = currentDIO.Headers & ~(1 << port->pin);
       } else if (value == 1) {
@@ -266,7 +262,7 @@ bool getDIO(HalDigitalHandle dio_port_handle, int32_t* status) {
   // if it == 0, then return false
   // else return true
 
-  if (port->pin < kNumHeaders) {
+  if (port->pin < kNumDigitalHeaders) {
     return ((currentDIO.Headers >> port->pin) & 1) != 0;
   } else {
     // Disable special functions
@@ -300,7 +296,7 @@ bool getDIODirection(HalDigitalHandle dio_port_handle, int32_t* status) {
   // if it == 0, then return false
   // else return true
 
-  if (port->pin < kNumHeaders) {
+  if (port->pin < kNumDigitalHeaders) {
     return ((currentOutputEnable.Headers >> port->pin) & 1) != 0;
   } else {
     return ((currentOutputEnable.MXP >> remapMXPChannel(port->pin)) & 1) != 0;
@@ -324,7 +320,7 @@ void pulse(HalDigitalHandle dio_port_handle, double pulseLength,
   }
   tDIO::tPulse pulse;
 
-  if (port->pin < kNumHeaders) {
+  if (port->pin < kNumDigitalHeaders) {
     pulse.Headers = 1 << port->pin;
   } else {
     pulse.MXP = 1 << remapMXPChannel(port->pin);
@@ -349,7 +345,7 @@ bool isPulsing(HalDigitalHandle dio_port_handle, int32_t* status) {
   }
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
 
-  if (port->pin < kNumHeaders) {
+  if (port->pin < kNumDigitalHeaders) {
     return (pulseRegister.Headers & (1 << port->pin)) != 0;
   } else {
     return (pulseRegister.MXP & (1 << remapMXPChannel(port->pin))) != 0;
@@ -383,7 +379,7 @@ void setFilterSelect(HalDigitalHandle dio_port_handle, int filter_index,
   }
 
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-  if (port->pin < kNumHeaders) {
+  if (port->pin < kNumDigitalHeaders) {
     digitalSystem->writeFilterSelectHdr(port->pin, filter_index, status);
   } else {
     digitalSystem->writeFilterSelectMXP(remapMXPChannel(port->pin),
@@ -407,7 +403,7 @@ int getFilterSelect(HalDigitalHandle dio_port_handle, int32_t* status) {
   }
 
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-  if (port->pin < kNumHeaders) {
+  if (port->pin < kNumDigitalHeaders) {
     return digitalSystem->readFilterSelectHdr(port->pin, status);
   } else {
     return digitalSystem->readFilterSelectMXP(remapMXPChannel(port->pin),

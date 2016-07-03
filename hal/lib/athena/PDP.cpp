@@ -7,11 +7,13 @@
 
 #include "HAL/PDP.h"
 
+#include "HAL/Ports.h"
+#include "PortsInternal.h"
 #include "ctre/PDP.h"
 
-static const int NUM_MODULE_NUMBERS = 63;
+using namespace hal;
 
-static PDP* pdp[NUM_MODULE_NUMBERS] = {nullptr};
+static PDP* pdp[kNumPDPModules] = {nullptr};
 
 extern "C" {
 

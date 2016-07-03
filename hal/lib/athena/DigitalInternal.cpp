@@ -13,11 +13,10 @@
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/HAL.h"
-#include "HAL/cpp/Resource.h"
+#include "HAL/Ports.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "PortsInternal.h"
 
-static_assert(sizeof(uint32_t) <= sizeof(void*),
-              "This file shoves uint32_ts into pointers.");
 namespace hal {
 // Create a mutex to protect changes to the DO PWM config
 priority_recursive_mutex digitalPwmMutex;
@@ -28,7 +27,8 @@ tPWM* pwmSystem = nullptr;
 
 bool digitalSystemsInitialized = false;
 
-DigitalHandleResource<HalDigitalHandle, DigitalPort, kDigitalPins + kNumHeaders>
+DigitalHandleResource<HalDigitalHandle, DigitalPort,
+                      kNumDigitalPins + kNumPWMHeaders>
     digitalPinHandles;
 
 /**
@@ -67,7 +67,7 @@ void initializeDigital(int32_t* status) {
       (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + .5);
   pwmSystem->writeConfig_MinHigh(minHigh, status);
   // Ensure that PWM output values are set to OFF
-  for (uint32_t pwm_index = 0; pwm_index < kPwmPins; pwm_index++) {
+  for (uint32_t pwm_index = 0; pwm_index < kNumPWMPins; pwm_index++) {
     // Copy of SetPWM
     if (pwm_index < tPWM::kNumHdrRegisters) {
       pwmSystem->writeHdr(pwm_index, kPwmDisabled, status);
@@ -112,7 +112,7 @@ extern "C++" void remapDigitalSource(bool analogTrigger, uint32_t& pin,
   if (analogTrigger) {
     module = pin >> 4;
   } else {
-    if (pin >= kNumHeaders) {
+    if (pin >= kNumDigitalHeaders) {
       pin = remapMXPChannel(pin);
       module = 1;
     } else {

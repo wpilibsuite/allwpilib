@@ -10,7 +10,9 @@
 #include <stdint.h>
 
 #include "ChipObject.h"
+#include "HAL/Ports.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "PortsInternal.h"
 #include "handles/IndexedHandleResource.h"
 
 namespace hal {
@@ -18,9 +20,6 @@ constexpr long kTimebase = 40000000;  ///< 40 MHz clock
 constexpr long kDefaultOversampleBits = 0;
 constexpr long kDefaultAverageBits = 7;
 constexpr float kDefaultSampleRate = 50000.0;
-constexpr uint32_t kAnalogInputPins = 8;
-constexpr uint32_t kAnalogOutputPins = 2;
-constexpr uint32_t kAccumulatorNumChannels = 2;
 static const uint32_t kAccumulatorChannels[] = {0, 1};
 
 extern tAI* analogInputSystem;
@@ -33,7 +32,7 @@ struct AnalogPort {
 };
 
 extern IndexedHandleResource<HalAnalogInputHandle, hal::AnalogPort,
-                             kAnalogInputPins, HalHandleEnum::AnalogInput>
+                             kNumAnalogInputs, HalHandleEnum::AnalogInput>
     analogInputHandles;
 
 uint32_t getAnalogNumActiveChannels(int32_t* status);

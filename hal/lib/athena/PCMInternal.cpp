@@ -7,8 +7,10 @@
 
 #include "PCMInternal.h"
 
+#include "PortsInternal.h"
+
 namespace hal {
-PCM* PCM_modules[NUM_MODULE_NUMBERS] = {nullptr};
+PCM* PCM_modules[kNumPCMModules] = {nullptr};
 
 void initializePCM(int module) {
   if (!PCM_modules[module]) {

@@ -12,9 +12,6 @@
 #include "HAL/HAL.h"
 #include "i2clib/i2c-lib.h"
 
-static_assert(sizeof(uint32_t) <= sizeof(void*),
-              "This file shoves uint32_ts into pointers.");
-
 using namespace hal;
 
 static priority_recursive_mutex digitalI2COnBoardMutex;

@@ -27,9 +27,6 @@
 #include "handles/HandlesInternal.h"
 #include "visa/visa.h"
 
-const uint32_t solenoid_kNumDO7_0Elements = 8;
-const uint32_t dio_kNumSystems = tDIO::kNumSystems;
-const uint32_t interrupt_kNumSystems = tInterrupt::kNumSystems;
 const uint32_t kSystemClockTicksPerMicrosecond = 40;
 
 static tGlobal* global = nullptr;
@@ -375,8 +372,5 @@ void NumericArrayResize() {}
 void RTSetCleanupProc() {}
 void EDVR_CreateReference() {}
 void Occur() {}
-
-void imaqGetErrorText() {}
-void imaqGetLastError() {}
 
 }  // extern "C"

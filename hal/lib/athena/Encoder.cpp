@@ -8,6 +8,7 @@
 #include "HAL/Encoder.h"
 
 #include "DigitalInternal.h"
+#include "HAL/cpp/Resource.h"
 
 static_assert(sizeof(uint32_t) <= sizeof(void*),
               "This file shoves uint32_ts into pointers.");

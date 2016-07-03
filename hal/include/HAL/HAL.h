@@ -26,6 +26,7 @@
 #include "Notifier.h"
 #include "PDP.h"
 #include "PWM.h"
+#include "Ports.h"
 #include "Power.h"
 #include "Relay.h"
 #include "SPI.h"
@@ -103,9 +104,6 @@ struct HALJoystickDescriptor {
 };
 
 extern "C" {
-extern const uint32_t dio_kNumSystems;
-extern const uint32_t solenoid_kNumDO7_0Elements;
-extern const uint32_t interrupt_kNumSystems;
 extern const uint32_t kSystemClockTicksPerMicrosecond;
 
 HalPortHandle getPort(uint8_t pin);

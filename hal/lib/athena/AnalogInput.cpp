@@ -14,6 +14,7 @@
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "PortsInternal.h"
 #include "handles/HandlesInternal.h"
 
 using namespace hal;
@@ -83,7 +84,7 @@ bool checkAnalogModule(uint8_t module) { return module == 1; }
  * @return Analog channel is valid
  */
 bool checkAnalogInputChannel(uint32_t pin) {
-  if (pin < kAnalogInputPins) return true;
+  if (pin < kNumAnalogInputs) return true;
   return false;
 }
 
