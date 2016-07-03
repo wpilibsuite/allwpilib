@@ -111,6 +111,8 @@ const char* getHALErrorMessage(int32_t code) {
       return ANALOG_TRIGGER_PULSE_OUTPUT_ERROR_MESSAGE;
     case PARAMETER_OUT_OF_RANGE:
       return PARAMETER_OUT_OF_RANGE_MESSAGE;
+    case HAL_COUNTER_NOT_SUPPORTED:
+      return HAL_COUNTER_NOT_SUPPORTED_MESSAGE;
     case ERR_CANSessionMux_InvalidBuffer:
       return ERR_CANSessionMux_InvalidBuffer_MESSAGE;
     case ERR_CANSessionMux_MessageNotFound:

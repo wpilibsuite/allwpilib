@@ -17,7 +17,6 @@
 #include "Compressor.h"
 #include "Counter.h"
 #include "DIO.h"
-#include "Encoder.h"
 #include "Errors.h"
 #include "FRC_NetworkCommunication/UsageReporting.h"
 #include "Handles.h"

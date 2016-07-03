@@ -37,9 +37,9 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_initializeCounter(
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI initializeCounter";
   COUNTERJNI_LOG(logDEBUG) << "Mode = " << mode;
   jint* indexPtr = (jint*)env->GetDirectBufferAddress(index);
-  COUNTERJNI_LOG(logDEBUG) << "Index Ptr = " << (uint32_t*)indexPtr;
+  COUNTERJNI_LOG(logDEBUG) << "Index Ptr = " << (int32_t*)indexPtr;
   int32_t status = 0;
-  auto counter = initializeCounter((Mode)mode, (uint32_t*)indexPtr, &status);
+  auto counter = initializeCounter((Mode)mode, (int32_t*)indexPtr, &status);
   COUNTERJNI_LOG(logDEBUG) << "Index = " << *indexPtr;
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   COUNTERJNI_LOG(logDEBUG) << "COUNTER Handle = " << counter;

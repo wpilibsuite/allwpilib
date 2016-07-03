@@ -83,7 +83,7 @@ class Counter : public SensorBase,
 
   void SetSamplesToAverage(int samplesToAverage);
   int GetSamplesToAverage() const;
-  uint32_t GetFPGAIndex() const { return m_index; }
+  int32_t GetFPGAIndex() const { return m_index; }
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;
@@ -101,7 +101,7 @@ class Counter : public SensorBase,
   HalCounterHandle m_counter = HAL_INVALID_HANDLE;
 
  private:
-  uint32_t m_index = 0;  // The index of this counter.
+  int32_t m_index = 0;  ///< The index of this counter.
 
   std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;
