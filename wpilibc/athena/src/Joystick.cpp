@@ -84,8 +84,8 @@ Joystick* Joystick::GetStickForPort(int port) {
  *
  * This depends on the mapping of the joystick connected to the current port.
  *
- * @param hand This parameter is ignored for the Joystick class and is only
- *             here to complete the GenericHID interface.
+ * @param hand This parameter is ignored for the Joystick class and is only here
+ *             to complete the GenericHID interface.
  */
 float Joystick::GetX(JoystickHand hand) const {
   return GetRawAxis(m_axes[kXAxis]);
@@ -96,8 +96,8 @@ float Joystick::GetX(JoystickHand hand) const {
  *
  * This depends on the mapping of the joystick connected to the current port.
  *
- * @param hand This parameter is ignored for the Joystick class and is only
- *             here to complete the GenericHID interface.
+ * @param hand This parameter is ignored for the Joystick class and is only here
+ *             to complete the GenericHID interface.
  */
 float Joystick::GetY(JoystickHand hand) const {
   return GetRawAxis(m_axes[kYAxis]);
@@ -169,8 +169,8 @@ float Joystick::GetAxis(AxisType axis) const {
  *
  * Look up which button has been assigned to the trigger and read its state.
  *
- * @param hand This parameter is ignored for the Joystick class and is only
- *             here to complete the GenericHID interface.
+ * @param hand This parameter is ignored for the Joystick class and is only here
+ *             to complete the GenericHID interface.
  * @return The state of the trigger.
  */
 bool Joystick::GetTrigger(JoystickHand hand) const {
@@ -182,8 +182,8 @@ bool Joystick::GetTrigger(JoystickHand hand) const {
  *
  * Look up which button has been assigned to the top and read its state.
  *
- * @param hand This parameter is ignored for the Joystick class and is only
- *             here to complete the GenericHID interface.
+ * @param hand This parameter is ignored for the Joystick class and is only here
+ *             to complete the GenericHID interface.
  * @return The state of the top button.
  */
 bool Joystick::GetTop(JoystickHand hand) const {
@@ -209,7 +209,7 @@ bool Joystick::GetBumper(JoystickHand hand) const {
  *
  * @param button The button number to be read (starting at 1)
  * @return The state of the button.
- **/
+ */
 bool Joystick::GetRawButton(int button) const {
   return m_ds.GetStickButton(m_port, button);
 }

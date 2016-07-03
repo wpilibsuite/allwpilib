@@ -7,12 +7,16 @@
 
 #include "Talon.h"
 
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * @param channel The PWM channel that the Talon is attached to.
+ * Constructor for a Talon (original or Talon SR).
+ *
+ * @param channel The PWM channel number that the Talon is attached to. 0-9 are
+ *                on-board, 10-19 are on the MXP port
  */
-Talon::Talon(int channel) : SafePWM(channel) {
+Talon::Talon(int channel) : PWMSpeedController(channel) {
   /* Note that the Talon uses the following bounds for PWM values. These values
    * should work reasonably well for most controllers, but if users experience
    * issues such as asymmetric behavior around the deadband or inability to
@@ -20,44 +24,16 @@ Talon::Talon(int channel) : SafePWM(channel) {
    * The calibration procedure can be found in the Talon User Manual available
    * from CTRE.
    *
-   *   - 211 = full "forward"
-   *   - 133 = the "high end" of the deadband range
-   *   - 129 = center of the deadband range (off)
-   *   - 125 = the "low end" of the deadband range
-   *   - 49 = full "reverse"
+   *   2.037ms = full "forward"
+   *   1.539ms = the "high end" of the deadband range
+   *   1.513ms = center of the deadband range (off)
+   *   1.487ms = the "low end" of the deadband range
+   *   0.989ms = full "reverse"
    */
   SetBounds(2.037, 1.539, 1.513, 1.487, .989);
-  SetPeriodMultiplier(kPeriodMultiplier_2X);
+  SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetRaw(m_centerPwm);
+  SetZeroLatch();
 
   LiveWindow::GetInstance()->AddActuator("Talon", GetChannel(), this);
 }
-
-/**
- * Set the PWM value.
- *
- * The PWM value is set using a range of -1.0 to 1.0, appropriately
- * scaling the value for the FPGA.
- *
- * @param speed The speed value between -1.0 and 1.0 to set.
- */
-void Talon::Set(float speed) { SetSpeed(speed); }
-
-/**
- * Get the recently set value of the PWM.
- *
- * @return The most recently set value for the PWM between -1.0 and 1.0.
- */
-float Talon::Get() const { return GetSpeed(); }
-
-/**
- * Common interface for disabling a motor.
- */
-void Talon::Disable() { SetRaw(kPwmDisabled); }
-
-/**
- * Write out the PID value as seen in the PIDOutput base object.
- *
- * @param output Write out the PWM value as was found in the PIDController
- */
-void Talon::PIDWrite(float output) { Set(output); }

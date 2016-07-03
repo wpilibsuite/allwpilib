@@ -205,6 +205,18 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
   // Do nothing in simulation.
 }
 
+/**
+ * Temporarily disables the PWM output. The next set call will reenable
+ * the output.
+ */
+void PWM::SetDisabled() {
+  SetRaw(0);
+}
+
+void PWM::SetZeroLatch() {
+  // Do nothing in simulation.
+}
+
 void PWM::ValueChanged(ITable* source, llvm::StringRef key,
                        std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsDouble()) return;

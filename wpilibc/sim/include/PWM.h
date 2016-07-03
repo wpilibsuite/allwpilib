@@ -46,6 +46,7 @@ class PWM : public SensorBase,
   virtual ~PWM();
   virtual void SetRaw(uint16_t value);
   void SetPeriodMultiplier(PeriodMultiplier mult);
+  void SetZeroLatch();
   void EnableDeadbandElimination(bool eliminateDeadband);
   void SetBounds(int max, int deadbandMax, int center, int deadbandMin,
                  int min);
@@ -87,6 +88,7 @@ class PWM : public SensorBase,
   virtual float GetPosition() const;
   virtual void SetSpeed(float speed);
   virtual float GetSpeed() const;
+  virtual void SetDisabled();
 
   bool m_eliminateDeadband;
   int m_centerPwm;

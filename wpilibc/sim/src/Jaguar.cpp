@@ -7,13 +7,17 @@
 
 #include "Jaguar.h"
 
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
 /**
- * @param channel The PWM channel that the Jaguar is attached to.
+ * Constructor for a Jaguar connected via PWM.
+ *
+ * @param channel The PWM channel that the Jaguar is attached to. 0-9 are
+ *                on-board, 10-19 are on the MXP port
  */
-Jaguar::Jaguar(int channel) : SafePWM(channel) {
-  /*
+Jaguar::Jaguar(int channel) : PWMSpeedController(channel) {
+  /**
    * Input profile defined by Luminary Micro.
    *
    * Full reverse ranges from 0.671325ms to 0.6972211ms
@@ -25,35 +29,7 @@ Jaguar::Jaguar(int channel) : SafePWM(channel) {
   SetBounds(2.31, 1.55, 1.507, 1.454, .697);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetRaw(m_centerPwm);
+  SetZeroLatch();
 
   LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
 }
-
-/**
- * Set the PWM value.
- *
- * The PWM value is set using a range of -1.0 to 1.0, appropriately
- * scaling the value for the FPGA.
- *
- * @param speed The speed value between -1.0 and 1.0 to set.
- */
-void Jaguar::Set(float speed) { SetSpeed(speed); }
-
-/**
- * Get the recently set value of the PWM.
- *
- * @return The most recently set value for the PWM between -1.0 and 1.0.
- */
-float Jaguar::Get() const { return GetSpeed(); }
-
-/**
- * Common interface for disabling a motor.
- */
-void Jaguar::Disable() { SetRaw(kPwmDisabled); }
-
-/**
- * Write out the PID value as seen in the PIDOutput base object.
- *
- * @param output Write out the PWM value as was found in the PIDController
- */
-void Jaguar::PIDWrite(float output) { Set(output); }
