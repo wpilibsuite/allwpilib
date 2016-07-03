@@ -48,7 +48,7 @@ class Task : public ErrorBase {
  private:
   std::thread m_thread;
   std::string m_taskName;
-  bool HandleError(STATUS results);
+  bool HandleError(int32_t results);
 };
 
 #include "Task.inc"

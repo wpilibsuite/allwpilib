@@ -7,8 +7,13 @@
 
 #include "RobotBase.h"
 
+#include <cstdio>
+
+#include "DriverStation.h"
+#include "HLUsageReporting.h"
 #include "RobotState.h"
 #include "Utility.h"
+#include "networktables/NetworkTable.h"
 
 /**
  * Constructor for a generic robot program.

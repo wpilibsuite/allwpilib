@@ -11,6 +11,7 @@
 #include <string>
 
 #include "CounterBase.h"
+#include "HAL/Counter.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 

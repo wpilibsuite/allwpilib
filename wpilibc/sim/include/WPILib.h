@@ -27,6 +27,7 @@
 #include "Commands/WaitCommand.h"
 #include "Commands/WaitForChildren.h"
 #include "Commands/WaitUntilCommand.h"
+#include "ControllerPower.h"
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DoubleSolenoid.h"
