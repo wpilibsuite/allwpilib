@@ -40,3 +40,5 @@ typedef HalHandle HalSolenoidHandle;
 typedef HalHandle HalFPGAEncoderHandle;
 
 typedef HalHandle HalEncoderHandle;
+
+typedef HalHandle HalGyroHandle;

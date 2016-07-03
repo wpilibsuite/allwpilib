@@ -41,7 +41,8 @@ enum class HalHandleEnum {
   FPGAEncoder = 12,
   Encoder = 13,
   Compressor = 14,
-  Solenoid = 15
+  Solenoid = 15,
+  AnalogGyro = 16
 };
 
 static inline int16_t getHandleIndex(HalHandle handle) {

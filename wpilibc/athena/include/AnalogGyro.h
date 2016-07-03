@@ -9,6 +9,8 @@
 
 #include "GyroBase.h"
 
+#include "HAL/Handles.h"
+
 class AnalogInput;
 
 /**
@@ -38,7 +40,7 @@ class AnalogGyro : public GyroBase {
   AnalogGyro(int32_t channel, uint32_t center, float offset);
   AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center,
              float offset);
-  virtual ~AnalogGyro() = default;
+  virtual ~AnalogGyro();
 
   float GetAngle() const override;
   double GetRate() const override;
@@ -54,7 +56,5 @@ class AnalogGyro : public GyroBase {
   std::shared_ptr<AnalogInput> m_analog;
 
  private:
-  float m_voltsPerDegreePerSecond;
-  float m_offset;
-  uint32_t m_center;
+  HalGyroHandle m_gyroHandle = HAL_INVALID_HANDLE;
 };
