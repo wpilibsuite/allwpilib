@@ -311,8 +311,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         result = m_result;
 
         // Update the buffer.
-        m_buf.add(m_error);
-        m_bufTotal += m_error;
+        m_buf.add(input);
+        m_bufTotal += input;
         // Remove old elements when the buffer is full.
         if (m_buf.size() > m_bufLength) {
           m_bufTotal -= m_buf.remove();
@@ -488,7 +488,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Set the setpoint for the PIDController Clears the queue for GetAvgError().
+   * Set the setpoint for the PIDController.
    *
    * @param setpoint the desired setpoint
    */
@@ -504,9 +504,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     } else {
       m_setpoint = setpoint;
     }
-
-    m_buf.clear();
-    m_bufTotal = 0;
 
     if (m_table != null) {
       m_table.putNumber("setpoint", m_setpoint);
@@ -569,7 +566,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     double avgError = 0;
     // Don't divide by zero.
     if (m_buf.size() != 0) {
-      avgError = m_bufTotal / m_buf.size();
+      avgError = m_setpoint - m_bufTotal / m_buf.size();
     }
     return avgError;
   }
@@ -675,6 +672,10 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   public synchronized void disable() {
     m_pidOutput.pidWrite(0);
     m_enabled = false;
+
+    // Clear buffer
+    m_buf.clear();
+    m_bufTotal = 0;
 
     if (m_table != null) {
       m_table.putBoolean("enabled", false);
