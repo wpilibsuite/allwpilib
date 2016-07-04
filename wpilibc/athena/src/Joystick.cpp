@@ -277,6 +277,13 @@ Joystick::HIDType Joystick::GetType() const {
  */
 std::string Joystick::GetName() const { return m_ds.GetJoystickName(m_port); }
 
+/**
+ * Get the port number of the joystick.
+ *
+ * @return The port number of the joystick.
+ */
+int Joystick::GetPort() const { return m_port; }
+
 // int Joystick::GetAxisType(uint8_t axis) const
 //{
 //  return m_ds.GetJoystickAxisType(m_port, axis);

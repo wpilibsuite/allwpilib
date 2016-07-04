@@ -95,6 +95,7 @@ class Joystick : public GenericHID, public ErrorBase {
   bool GetIsXbox() const;
   Joystick::HIDType GetType() const;
   std::string GetName() const;
+  int GetPort() const;
   int GetAxisType(uint8_t axis) const;
 
   int GetAxisCount() const;
