@@ -10,7 +10,6 @@
 #include "AnalogInternal.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/Errors.h"
-#include "HAL/cpp/Resource.h"
 #include "PortsInternal.h"
 #include "handles/HandlesInternal.h"
 #include "handles/LimitedHandleResource.h"

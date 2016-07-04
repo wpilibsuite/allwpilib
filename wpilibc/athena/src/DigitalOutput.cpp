@@ -8,7 +8,6 @@
 #include "DigitalOutput.h"
 
 #include "HAL/HAL.h"
-#include "Resource.h"
 #include "WPIErrors.h"
 
 #include <limits>

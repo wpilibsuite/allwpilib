@@ -9,7 +9,6 @@
 
 #include "AnalogInput.h"
 #include "HAL/HAL.h"
-#include "Resource.h"
 #include "WPIErrors.h"
 
 #include <memory>

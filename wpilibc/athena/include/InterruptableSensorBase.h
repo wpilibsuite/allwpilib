@@ -10,7 +10,6 @@
 #include <memory>
 
 #include "HAL/Interrupts.h"
-#include "Resource.h"
 #include "SensorBase.h"
 
 class InterruptableSensorBase : public SensorBase {

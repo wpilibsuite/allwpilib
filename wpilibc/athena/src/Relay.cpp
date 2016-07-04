@@ -10,13 +10,9 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
-#include "Resource.h"
 #include "WPIErrors.h"
 
 #include <sstream>
-
-// Allocate each direction separately.
-static std::unique_ptr<Resource> relayChannels;
 
 /**
  * Relay constructor given a channel.

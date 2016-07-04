@@ -9,7 +9,6 @@
 
 #include <memory>
 
-#include "Resource.h"
 #include "SensorBase.h"
 
 /**

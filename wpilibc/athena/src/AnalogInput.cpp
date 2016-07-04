@@ -8,7 +8,6 @@
 #include "AnalogInput.h"
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
-#include "Resource.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 
