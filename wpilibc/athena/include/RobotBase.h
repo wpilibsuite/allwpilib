@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "Base.h"
+#include "HAL/HAL.h"
 
 class DriverStation;
 
