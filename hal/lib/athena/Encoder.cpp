@@ -12,6 +12,7 @@
 #include "FPGAEncoder.h"
 #include "HAL/Counter.h"
 #include "HAL/Errors.h"
+#include "PortsInternal.h"
 #include "handles/LimitedClassedHandleResource.h"
 
 using namespace hal;
@@ -213,9 +214,9 @@ double Encoder::DecodingScaleFactor() const {
   }
 }
 
-static LimitedClassedHandleResource<
-    HalEncoderHandle, Encoder, tEncoder::kNumSystems + tCounter::kNumSystems,
-    HalHandleEnum::Encoder>
+static LimitedClassedHandleResource<HalEncoderHandle, Encoder,
+                                    kNumEncoders + kNumCounters,
+                                    HalHandleEnum::Encoder>
     encoderHandles;
 
 extern "C" {

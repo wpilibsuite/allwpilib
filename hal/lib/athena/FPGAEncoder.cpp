@@ -8,10 +8,8 @@
 #include "FPGAEncoder.h"
 
 #include "DigitalInternal.h"
+#include "PortsInternal.h"
 #include "handles/LimitedHandleResource.h"
-
-static_assert(sizeof(uint32_t) <= sizeof(void*),
-              "This file shoves uint32_ts into pointers.");
 
 using namespace hal;
 
@@ -24,8 +22,8 @@ struct Encoder {
 
 static const double DECODING_SCALING_FACTOR = 0.25;
 
-static LimitedHandleResource<HalFPGAEncoderHandle, Encoder,
-                             tEncoder::kNumSystems, HalHandleEnum::FPGAEncoder>
+static LimitedHandleResource<HalFPGAEncoderHandle, Encoder, kNumEncoders,
+                             HalHandleEnum::FPGAEncoder>
     fpgaEncoderHandles;
 
 extern "C" {
