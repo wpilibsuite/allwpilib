@@ -7,15 +7,11 @@
 
 #pragma once
 
-#include <stdio.h>
+#include <chrono>
 #include <iomanip>
+#include <iostream>
 #include <sstream>
 #include <string>
-#ifdef _WIN32
-#include <Windows.h>
-#else
-#include <sys/time.h>
-#endif
 
 inline std::string NowTime();
 
@@ -61,8 +57,7 @@ inline std::ostringstream& Log::Get(TLogLevel level) {
 
 inline Log::~Log() {
   os << std::endl;
-  fprintf(stderr, "%s", os.str().c_str());
-  fflush(stderr);
+  std::cerr << os.str();
 }
 
 inline TLogLevel& Log::ReportingLevel() {
@@ -100,26 +95,17 @@ typedef Log FILELog;
   else                                   \
   Log().Get(level)
 
-#ifdef _WIN32
 inline std::string NowTime() {
-  SYSTEMTIME st;
-  GetLocalTime(&st);
-  char result[100] = {0};
-  sprintf(result, "%d:%d:%d.%d", st.wHour, st.wMinute, st.wSecond,
-          st.wMilliseconds);
-  return result;
+  std::stringstream ss;
+  ss << std::setfill('0') << std::setw(2);
+
+  using namespace std::chrono;
+  auto now = system_clock::now().time_since_epoch();
+
+  ss << duration_cast<hours>(now).count() % 24 << ":"
+     << duration_cast<minutes>(now).count() % 60 << ":"
+     << duration_cast<seconds>(now).count() % 60 << "."
+     << duration_cast<milliseconds>(now).count() % 1000;
+
+  return ss.str();
 }
-#else
-inline std::string NowTime() {
-  char buffer[11];
-  time_t t;
-  time(&t);
-  tm* r = gmtime(&t);
-  strftime(buffer, sizeof(buffer), "%H:%M:%S", r);
-  struct timeval tv;
-  gettimeofday(&tv, 0);
-  char result[100] = {0};
-  sprintf(result, "%s.%03ld", buffer, (long)tv.tv_usec / 1000);
-  return result;
-}
-#endif
