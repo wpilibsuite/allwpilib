@@ -57,7 +57,7 @@ HalSolenoidHandle initializeSolenoidPort(HalPortHandle port_handle,
   }
   auto solenoid_port = solenoidHandles.Get(handle);
   if (solenoid_port == nullptr) {  // would only occur on thread issues
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return HAL_INVALID_HANDLE;
   }
   solenoid_port->module = static_cast<uint8_t>(module);
@@ -75,7 +75,7 @@ bool checkSolenoidModule(uint8_t module) { return module < kNumPCMModules; }
 bool getSolenoid(HalSolenoidHandle solenoid_port_handle, int32_t* status) {
   auto port = solenoidHandles.Get(solenoid_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   bool value;
@@ -101,7 +101,7 @@ void setSolenoid(HalSolenoidHandle solenoid_port_handle, bool value,
                  int32_t* status) {
   auto port = solenoidHandles.Get(solenoid_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
 

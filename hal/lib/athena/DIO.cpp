@@ -47,7 +47,7 @@ HalDigitalHandle initializeDIOPort(HalPortHandle port_handle, uint8_t input,
 
   auto port = digitalPinHandles.Get(handle, HalHandleEnum::DIO);
   if (port == nullptr) {  // would only occur on thread issue.
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return HAL_INVALID_HANDLE;
   }
 
@@ -108,7 +108,7 @@ HalDigitalPWMHandle allocateDigitalPWM(int32_t* status) {
 
   auto id = digitalPWMHandles.Get(handle);
   if (id == nullptr) {  // would only occur on thread issue.
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return HAL_INVALID_HANDLE;
   }
   *id = static_cast<uint8_t>(getHandleIndex(handle));
@@ -155,7 +155,7 @@ void setDigitalPWMDutyCycle(HalDigitalPWMHandle pwmGenerator, double dutyCycle,
                             int32_t* status) {
   auto port = digitalPWMHandles.Get(pwmGenerator);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   uint32_t id = *port;
@@ -188,7 +188,7 @@ void setDigitalPWMOutputChannel(HalDigitalPWMHandle pwmGenerator, uint32_t pin,
                                 int32_t* status) {
   auto port = digitalPWMHandles.Get(pwmGenerator);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   uint32_t id = *port;
@@ -210,7 +210,7 @@ void setDigitalPWMOutputChannel(HalDigitalPWMHandle pwmGenerator, uint32_t pin,
 void setDIO(HalDigitalHandle dio_port_handle, short value, int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   if (value != 0 && value != 1) {
@@ -253,7 +253,7 @@ void setDIO(HalDigitalHandle dio_port_handle, short value, int32_t* status) {
 bool getDIO(HalDigitalHandle dio_port_handle, int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   tDIO::tDI currentDIO = digitalSystem->readDI(status);
@@ -286,7 +286,7 @@ bool getDIO(HalDigitalHandle dio_port_handle, int32_t* status) {
 bool getDIODirection(HalDigitalHandle dio_port_handle, int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   tDIO::tOutputEnable currentOutputEnable =
@@ -315,7 +315,7 @@ void pulse(HalDigitalHandle dio_port_handle, double pulseLength,
            int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   tDIO::tPulse pulse;
@@ -340,7 +340,7 @@ void pulse(HalDigitalHandle dio_port_handle, double pulseLength,
 bool isPulsing(HalDigitalHandle dio_port_handle, int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
@@ -374,7 +374,7 @@ void setFilterSelect(HalDigitalHandle dio_port_handle, int filter_index,
                      int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
 
@@ -398,7 +398,7 @@ void setFilterSelect(HalDigitalHandle dio_port_handle, int filter_index,
 int getFilterSelect(HalDigitalHandle dio_port_handle, int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HalHandleEnum::DIO);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
 

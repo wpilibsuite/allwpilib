@@ -34,7 +34,7 @@ HalCounterHandle initializeCounter(Mode mode, int32_t* index, int32_t* status) {
   }
   auto counter = counterHandles.Get(handle);
   if (counter == nullptr) {  // would only occur on thread issues
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return HAL_INVALID_HANDLE;
   }
   *index = static_cast<uint32_t>(getHandleIndex(handle));
@@ -59,7 +59,7 @@ void setCounterAverageSize(HalCounterHandle counter_handle, int32_t size,
                            int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeTimerConfig_AverageSize(size, status);
@@ -73,7 +73,7 @@ void setCounterUpSource(HalCounterHandle counter_handle, uint32_t pin,
                         bool analogTrigger, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
 
@@ -100,7 +100,7 @@ void setCounterUpSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
                             bool fallingEdge, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeConfig_UpRisingEdge(risingEdge, status);
@@ -113,7 +113,7 @@ void setCounterUpSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
 void clearCounterUpSource(HalCounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeConfig_UpFallingEdge(false, status);
@@ -131,7 +131,7 @@ void setCounterDownSource(HalCounterHandle counter_handle, uint32_t pin,
                           bool analogTrigger, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   unsigned char mode = counter->counter->readConfig_Mode(status);
@@ -162,7 +162,7 @@ void setCounterDownSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
                               bool fallingEdge, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeConfig_DownRisingEdge(risingEdge, status);
@@ -175,7 +175,7 @@ void setCounterDownSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
 void clearCounterDownSource(HalCounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeConfig_DownFallingEdge(false, status);
@@ -192,7 +192,7 @@ void clearCounterDownSource(HalCounterHandle counter_handle, int32_t* status) {
 void setCounterUpDownMode(HalCounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeConfig_Mode(kTwoPulse, status);
@@ -207,7 +207,7 @@ void setCounterExternalDirectionMode(HalCounterHandle counter_handle,
                                      int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeConfig_Mode(kExternalDirection, status);
@@ -221,7 +221,7 @@ void setCounterSemiPeriodMode(HalCounterHandle counter_handle,
                               bool highSemiPeriod, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeConfig_Mode(kSemiperiod, status);
@@ -240,7 +240,7 @@ void setCounterPulseLengthMode(HalCounterHandle counter_handle,
                                double threshold, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeConfig_Mode(kPulseLength, status);
@@ -259,7 +259,7 @@ int32_t getCounterSamplesToAverage(HalCounterHandle counter_handle,
                                    int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   return counter->counter->readTimerConfig_AverageSize(status);
@@ -275,7 +275,7 @@ void setCounterSamplesToAverage(HalCounterHandle counter_handle,
                                 int samplesToAverage, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   if (samplesToAverage < 1 || samplesToAverage > 127) {
@@ -292,7 +292,7 @@ void setCounterSamplesToAverage(HalCounterHandle counter_handle,
 void resetCounter(HalCounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->strobeReset(status);
@@ -306,7 +306,7 @@ void resetCounter(HalCounterHandle counter_handle, int32_t* status) {
 int32_t getCounter(HalCounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   int32_t value = counter->counter->readOutput_Value(status);
@@ -322,7 +322,7 @@ int32_t getCounter(HalCounterHandle counter_handle, int32_t* status) {
 double getCounterPeriod(HalCounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0.0;
   }
   tCounter::tTimerOutput output = counter->counter->readTimerOutput(status);
@@ -351,7 +351,7 @@ void setCounterMaxPeriod(HalCounterHandle counter_handle, double maxPeriod,
                          int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeTimerConfig_StallPeriod((uint32_t)(maxPeriod * 4.0e8),
@@ -375,7 +375,7 @@ void setCounterUpdateWhenEmpty(HalCounterHandle counter_handle, bool enabled,
                                int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   counter->counter->writeTimerConfig_UpdateWhenEmpty(enabled, status);
@@ -392,7 +392,7 @@ void setCounterUpdateWhenEmpty(HalCounterHandle counter_handle, bool enabled,
 bool getCounterStopped(HalCounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   return counter->counter->readTimerOutput_Stalled(status);
@@ -405,7 +405,7 @@ bool getCounterStopped(HalCounterHandle counter_handle, int32_t* status) {
 bool getCounterDirection(HalCounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return false;
   }
   bool value = counter->counter->readOutput_Direction(status);
@@ -422,7 +422,7 @@ void setCounterReverseDirection(HalCounterHandle counter_handle,
                                 bool reverseDirection, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   if (counter->counter->readConfig_Mode(status) == kExternalDirection) {

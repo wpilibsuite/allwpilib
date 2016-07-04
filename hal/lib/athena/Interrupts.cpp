@@ -51,7 +51,7 @@ HalInterruptHandle initializeInterrupts(bool watcher, int32_t* status) {
 void cleanInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   interruptHandles.Free(interrupt_handle);
@@ -71,7 +71,7 @@ uint32_t waitForInterrupt(HalInterruptHandle interrupt_handle, double timeout,
   uint32_t result;
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
 
@@ -96,7 +96,7 @@ uint32_t waitForInterrupt(HalInterruptHandle interrupt_handle, double timeout,
 void enableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   anInterrupt->manager->enable(status);
@@ -108,7 +108,7 @@ void enableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
 void disableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   anInterrupt->manager->disable(status);
@@ -123,7 +123,7 @@ double readRisingTimestamp(HalInterruptHandle interrupt_handle,
                            int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   uint32_t timestamp = anInterrupt->anInterrupt->readRisingTimeStamp(status);
@@ -139,7 +139,7 @@ double readFallingTimestamp(HalInterruptHandle interrupt_handle,
                             int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   uint32_t timestamp = anInterrupt->anInterrupt->readFallingTimeStamp(status);
@@ -151,7 +151,7 @@ void requestInterrupts(HalInterruptHandle interrupt_handle,
                        bool routing_analog_trigger, int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
@@ -167,7 +167,7 @@ void attachInterruptHandler(HalInterruptHandle interrupt_handle,
                             int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   anInterrupt->manager->registerHandler(handler, param, status);
@@ -178,7 +178,7 @@ void setInterruptUpSourceEdge(HalInterruptHandle interrupt_handle,
                               int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   anInterrupt->anInterrupt->writeConfig_RisingEdge(risingEdge, status);

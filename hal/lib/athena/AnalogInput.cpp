@@ -45,7 +45,7 @@ HalAnalogInputHandle initializeAnalogInputPort(HalPortHandle port_handle,
   // Initialize port structure
   auto analog_port = analogInputHandles.Get(handle);
   if (analog_port == nullptr) {  // would only error on thread issue
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return HAL_INVALID_HANDLE;
   }
   analog_port->pin = static_cast<uint8_t>(pin);
@@ -151,7 +151,7 @@ void setAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
                           uint32_t bits, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   analogInputSystem->writeAverageBits(port->pin, bits, status);
@@ -170,7 +170,7 @@ uint32_t getAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
                               int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return kDefaultAverageBits;
   }
   uint32_t result = analogInputSystem->readAverageBits(port->pin, status);
@@ -192,7 +192,7 @@ void setAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
                              uint32_t bits, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return;
   }
   analogInputSystem->writeOversampleBits(port->pin, bits, status);
@@ -212,7 +212,7 @@ uint32_t getAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
                                  int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return kDefaultOversampleBits;
   }
   uint32_t result = analogInputSystem->readOversampleBits(port->pin, status);
@@ -233,7 +233,7 @@ int16_t getAnalogValue(HalAnalogInputHandle analog_port_handle,
                        int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   int16_t value;
@@ -273,7 +273,7 @@ int32_t getAnalogAverageValue(HalAnalogInputHandle analog_port_handle,
                               int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   int32_t value;
@@ -380,7 +380,7 @@ uint32_t getAnalogLSBWeight(HalAnalogInputHandle analog_port_handle,
                             int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   uint32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
@@ -402,7 +402,7 @@ int32_t getAnalogOffset(HalAnalogInputHandle analog_port_handle,
                         int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = HAL_HANDLE_ERROR;
     return 0;
   }
   int32_t offset = FRC_NetworkCommunication_nAICalibration_getOffset(
