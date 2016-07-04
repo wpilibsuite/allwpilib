@@ -74,8 +74,8 @@ void Ultrasonic::Initialize() {
   static int instances = 0;
   instances++;
   HALReport(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  LiveWindow::GetInstance()->AddSensor("Ultrasonic",
-                                       m_echoChannel->GetChannel(), this);
+  LiveWindow::GetInstance().AddSensor("Ultrasonic", m_echoChannel->GetChannel(),
+                                      this);
 }
 
 /**

@@ -16,8 +16,8 @@
 void AnalogAccelerometer::InitAccelerometer() {
   HALReport(HALUsageReporting::kResourceType_Accelerometer,
             m_analogInput->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("Accelerometer",
-                                       m_analogInput->GetChannel(), this);
+  LiveWindow::GetInstance().AddSensor("Accelerometer",
+                                      m_analogInput->GetChannel(), this);
 }
 
 /**

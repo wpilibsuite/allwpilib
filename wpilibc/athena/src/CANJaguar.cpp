@@ -150,7 +150,7 @@ void CANJaguar::InitCANJaguar() {
   }
   HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber,
             m_controlMode);
-  LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, this);
+  LiveWindow::GetInstance().AddActuator("CANJaguar", m_deviceNumber, this);
 }
 
 /**

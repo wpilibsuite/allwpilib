@@ -41,7 +41,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
   HALReport(HALUsageReporting::kResourceType_ADXL345,
             HALUsageReporting::kADXL345_SPI);
 
-  LiveWindow::GetInstance()->AddSensor("ADXL345_SPI", port, this);
+  LiveWindow::GetInstance().AddSensor("ADXL345_SPI", port, this);
 }
 
 void ADXL345_SPI::SetRange(Range range) {

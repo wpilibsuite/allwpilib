@@ -34,7 +34,7 @@ struct LiveWindowComponent {
  */
 class LiveWindow {
  public:
-  static LiveWindow* GetInstance();
+  static LiveWindow& GetInstance();
   void Run();
   void AddSensor(const std::string& subsystem, const std::string& name,
                  LiveWindowSendable* component);
@@ -74,7 +74,7 @@ class LiveWindow {
   std::shared_ptr<ITable> m_liveWindowTable;
   std::shared_ptr<ITable> m_statusTable;
 
-  Scheduler* m_scheduler;
+  Scheduler& m_scheduler;
 
   bool m_enabled = false;
   bool m_firstTime = true;

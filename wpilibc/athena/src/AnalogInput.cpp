@@ -44,7 +44,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
     return;
   }
 
-  LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
+  LiveWindow::GetInstance().AddSensor("AnalogInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
 }
 

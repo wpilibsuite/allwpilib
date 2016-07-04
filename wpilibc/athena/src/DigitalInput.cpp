@@ -41,7 +41,7 @@ DigitalInput::DigitalInput(uint32_t channel) {
     return;
   }
 
-  LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
+  LiveWindow::GetInstance().AddSensor("DigitalInput", channel, this);
   HALReport(HALUsageReporting::kResourceType_DigitalInput, channel);
 }
 

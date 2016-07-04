@@ -30,7 +30,7 @@ void GearTooth::EnableDirectionSensing(bool directionSensitive) {
 GearTooth::GearTooth(uint32_t channel, bool directionSensitive)
     : Counter(channel) {
   EnableDirectionSensing(directionSensitive);
-  LiveWindow::GetInstance()->AddSensor("GearTooth", channel, this);
+  LiveWindow::GetInstance().AddSensor("GearTooth", channel, this);
 }
 
 /**

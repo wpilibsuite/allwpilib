@@ -44,7 +44,7 @@ CANTalon::CANTalon(int deviceNumber)
       m_safetyHelper(new MotorSafetyHelper(this)) {
   ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
-  LiveWindow::GetInstance()->AddActuator("CANTalon", m_deviceNumber, this);
+  LiveWindow::GetInstance().AddActuator("CANTalon", m_deviceNumber, this);
 }
 /**
  * Constructor for the CANTalon device.
@@ -59,7 +59,7 @@ CANTalon::CANTalon(int deviceNumber, int controlPeriodMs)
       m_safetyHelper(new MotorSafetyHelper(this)) {
   ApplyControlMode(m_controlMode);
   m_impl->SetProfileSlotSelect(m_profile);
-  LiveWindow::GetInstance()->AddActuator("CANTalon", m_deviceNumber, this);
+  LiveWindow::GetInstance().AddActuator("CANTalon", m_deviceNumber, this);
 }
 
 CANTalon::~CANTalon() {

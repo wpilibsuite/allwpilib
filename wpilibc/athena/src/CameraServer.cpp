@@ -20,9 +20,9 @@
 
 constexpr uint8_t CameraServer::kMagicNumber[];
 
-CameraServer* CameraServer::GetInstance() {
+CameraServer& CameraServer::GetInstance() {
   static CameraServer instance;
-  return &instance;
+  return instance;
 }
 
 CameraServer::CameraServer()
