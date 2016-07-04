@@ -447,6 +447,15 @@ public class Joystick extends GenericHID {
   }
 
   /**
+   * Get the port number of the joystick.
+   *
+   * @return The port number of the joystick.
+   */
+  public int getPort() {
+    return m_port;
+  }
+
+  /**
    * Set the rumble output for the joystick. The DS currently supports 2 rumble values, left rumble
    * and right rumble.
    *
