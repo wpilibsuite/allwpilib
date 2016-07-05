@@ -24,109 +24,90 @@ public class Joystick extends GenericHID {
   static final byte kDefaultZAxis = 2;
   static final byte kDefaultTwistAxis = 2;
   static final byte kDefaultThrottleAxis = 3;
+
   static final int kDefaultTriggerButton = 1;
   static final int kDefaultTopButton = 2;
 
   /**
    * Represents an analog axis on a joystick.
    */
-  public static final class AxisType {
-
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
-    public final int value;
-    static final int kX_val = 0;
-    static final int kY_val = 1;
-    static final int kZ_val = 2;
-    static final int kTwist_val = 3;
-    static final int kThrottle_val = 4;
-    static final int kNumAxis_val = 5;
+  public enum AxisType {
     /**
      * axis: x-axis.
      */
-    public static final AxisType kX = new AxisType(kX_val);
+    kX(0),
     /**
      * axis: y-axis.
      */
-    public static final AxisType kY = new AxisType(kY_val);
+    kY(1),
     /**
      * axis: z-axis.
      */
-    public static final AxisType kZ = new AxisType(kZ_val);
+    kZ(2),
     /**
      * axis: twist.
      */
-    public static final AxisType kTwist = new AxisType(kTwist_val);
+    kTwist(3),
     /**
      * axis: throttle.
      */
-    public static final AxisType kThrottle = new AxisType(kThrottle_val);
+    kThrottle(4),
     /**
      * axis: number of axis.
      */
-    public static final AxisType kNumAxis = new AxisType(kNumAxis_val);
+    kNumber(5);
 
-    private AxisType(int value) {
+    @SuppressWarnings("MemberName")
+    public final int value;
+
+    AxisType(int value) {
       this.value = value;
     }
   }
 
   /**
-   * Represents a digital button on the JoyStick.
+   * Represents a digital button on a joystick.
    */
-  public static final class ButtonType {
-
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
-    public final int value;
-    static final int kTrigger_val = 0;
-    static final int kTop_val = 1;
-    static final int kNumButton_val = 2;
+  public enum ButtonType {
     /**
      * button: trigger.
      */
-    public static final ButtonType kTrigger = new ButtonType((kTrigger_val));
+    kTrigger(0),
     /**
      * button: top button.
      */
-    public static final ButtonType kTop = new ButtonType(kTop_val);
+    kTop(1),
     /**
-     * button: num button types.
+     * button: number button types.
      */
-    public static final ButtonType kNumButton = new ButtonType((kNumButton_val));
+    kNumber(2);
 
-    private ButtonType(int value) {
+    @SuppressWarnings("MemberName")
+    public final int value;
+
+    ButtonType(int value) {
       this.value = value;
     }
   }
 
 
   /**
-   * Represents a rumble output on the JoyStick.
+   * Represents a rumble output on a joystick.
    */
-  public static final class RumbleType {
-
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
-    public final int value;
-    static final int kLeftRumble_val = 0;
-    static final int kRightRumble_val = 1;
+  public enum RumbleType {
     /**
      * Left Rumble.
      */
-    public static final RumbleType kLeftRumble = new RumbleType((kLeftRumble_val));
+    kLeft(0),
     /**
      * Right Rumble.
      */
-    public static final RumbleType kRightRumble = new RumbleType(kRightRumble_val);
+    kRight(1);
 
-    private RumbleType(int value) {
+    @SuppressWarnings("MemberName")
+    public final int value;
+
+    RumbleType(int value) {
       this.value = value;
     }
   }
@@ -146,7 +127,7 @@ public class Joystick extends GenericHID {
    * @param port The port on the driver station that the joystick is plugged into.
    */
   public Joystick(final int port) {
-    this(port, AxisType.kNumAxis.value, ButtonType.kNumButton.value);
+    this(port, AxisType.kNumber.value, ButtonType.kNumber.value);
 
     m_axes[AxisType.kX.value] = kDefaultXAxis;
     m_axes[AxisType.kY.value] = kDefaultYAxis;
@@ -250,16 +231,16 @@ public class Joystick extends GenericHID {
    * @return The value of the axis.
    */
   public double getAxis(final AxisType axis) {
-    switch (axis.value) {
-      case AxisType.kX_val:
+    switch (axis) {
+      case kX:
         return getX();
-      case AxisType.kY_val:
+      case kY:
         return getY();
-      case AxisType.kZ_val:
+      case kZ:
         return getZ();
-      case AxisType.kTwist_val:
+      case kTwist:
         return getTwist();
-      case AxisType.kThrottle_val:
+      case kThrottle:
         return getThrottle();
       default:
         return 0.0;
@@ -359,10 +340,10 @@ public class Joystick extends GenericHID {
    * @return The state of the button.
    */
   public boolean getButton(ButtonType button) {
-    switch (button.value) {
-      case ButtonType.kTrigger_val:
+    switch (button) {
+      case kTrigger:
         return getTrigger();
-      case ButtonType.kTop_val:
+      case kTop:
         return getTop();
       default:
         return false;
@@ -468,10 +449,15 @@ public class Joystick extends GenericHID {
     } else if (value > 1) {
       value = 1;
     }
-    if (type.value == RumbleType.kLeftRumble_val) {
-      m_leftRumble = (short) (value * 65535);
-    } else {
-      m_rightRumble = (short) (value * 65535);
+    switch (type) {
+      case kLeft:
+        m_leftRumble = (short) (value * 65535);
+        break;
+      case kRight:
+        m_rightRumble = (short) (value * 65535);
+        break;
+      default:
+        break;
     }
     FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte) m_port, m_outputs, m_leftRumble,
         m_rightRumble);
