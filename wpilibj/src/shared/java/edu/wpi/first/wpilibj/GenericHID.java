@@ -12,6 +12,40 @@ package edu.wpi.first.wpilibj;
  */
 public abstract class GenericHID {
   /**
+   * Represents a rumble output on the JoyStick.
+   */
+  public enum RumbleType {
+    kLeftRumble, kRightRumble
+  }
+
+  public enum HIDType {
+    kUnknown(-1),
+    kXInputUnknown(0),
+    kXInputGamepad(1),
+    kXInputWheel(2),
+    kXInputArcadeStick(3),
+    kXInputFlightStick(4),
+    kXInputDancePad(5),
+    kXInputGuitar(6),
+    kXInputGuitar2(7),
+    kXInputDrumKit(8),
+    kXInputGuitar3(11),
+    kXInputArcadePad(19),
+    kHIDJoystick(20),
+    kHIDGamepad(21),
+    kHIDDriving(22),
+    kHIDFlight(23),
+    kHID1stPerson(24);
+
+    @SuppressWarnings("MemberName")
+    public final int value;
+
+    private HIDType(int value) {
+      this.value = value;
+    }
+  }
+
+  /**
    * Which hand the Human Interface Device is associated with.
    */
   public enum Hand {
@@ -23,6 +57,12 @@ public abstract class GenericHID {
     private Hand(int value) {
       this.value = value;
     }
+  }
+
+  private final int m_port;
+
+  public GenericHID(int port) {
+    m_port = port;
   }
 
   /**
@@ -60,94 +100,12 @@ public abstract class GenericHID {
   public abstract double getY(Hand hand);
 
   /**
-   * Get the z position of the HID.
-   *
-   * @return the z position
-   */
-  public final double getZ() {
-    return getZ(Hand.kRight);
-  }
-
-  /**
-   * Get the z position of the HID.
-   *
-   * @param hand which hand, left or right
-   * @return the z position
-   */
-  public abstract double getZ(Hand hand);
-
-  /**
-   * Get the twist value.
-   *
-   * @return the twist value
-   */
-  public abstract double getTwist();
-
-  /**
-   * Get the throttle.
-   *
-   * @return the throttle value
-   */
-  public abstract double getThrottle();
-
-  /**
    * Get the raw axis.
    *
    * @param which index of the axis
    * @return the raw value of the selected axis
    */
   public abstract double getRawAxis(int which);
-
-  /**
-   * Is the trigger pressed.
-   *
-   * @return true if pressed
-   */
-  public final boolean getTrigger() {
-    return getTrigger(Hand.kRight);
-  }
-
-  /**
-   * Is the trigger pressed.
-   *
-   * @param hand which hand
-   * @return true if the trigger for the given hand is pressed
-   */
-  public abstract boolean getTrigger(Hand hand);
-
-  /**
-   * Is the top button pressed.
-   *
-   * @return true if the top button is pressed
-   */
-  public final boolean getTop() {
-    return getTop(Hand.kRight);
-  }
-
-  /**
-   * Is the top button pressed.
-   *
-   * @param hand which hand
-   * @return true if hte top button for the given hand is pressed
-   */
-  public abstract boolean getTop(Hand hand);
-
-  /**
-   * Is the bumper pressed.
-   *
-   * @return true if the bumper is pressed
-   */
-  public final boolean getBumper() {
-    return getBumper(Hand.kRight);
-  }
-
-  /**
-   * Is the bumper pressed.
-   *
-   * @param hand which hand
-   * @return true if hte bumper is pressed
-   */
-  public abstract boolean getBumper(Hand hand);
 
   /**
    * Is the given button pressed.
@@ -157,9 +115,70 @@ public abstract class GenericHID {
    */
   public abstract boolean getRawButton(int button);
 
+  /**
+   * Get the angle in degrees of a POV on the HID.
+   *
+   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
+   * upper-left is 315).
+   *
+   * @param pov The index of the POV to read (starting at 0)
+   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
+   */
   public abstract int getPOV(int pov);
 
   public int getPOV() {
     return getPOV(0);
   }
+
+  /**
+   * For the current HID, return the number of POVs.
+   */
+  public abstract int getPOVCount();
+
+  /**
+   * Get the port number of the HID.
+   *
+   * @return The port number of the HID.
+   */
+  public int getPort() {
+    return m_port;
+  }
+
+  /**
+   * Get the type of the HID.
+   *
+   * @return the type of the HID.
+   */
+  public abstract HIDType getType();
+
+  /**
+   * Get the name of the HID.
+   *
+   * @return the name of the HID.
+   */
+  public abstract String getName();
+
+  /**
+   * Set a single HID output value for the HID.
+   *
+   * @param outputNumber The index of the output to set (1-32)
+   * @param value        The value to set the output to
+   */
+  public abstract void setOutput(int outputNumber, boolean value);
+
+  /**
+   * Set all HID output values for the HID.
+   *
+   * @param value The 32 bit output value (1 bit for each output)
+   */
+  public abstract void setOutputs(int value);
+
+  /**
+   * Set the rumble output for the HID. The DS currently supports 2 rumble values, left rumble and
+   * right rumble.
+   *
+   * @param type  Which rumble value to set
+   * @param value The normalized value (0 to 1) to set the rumble to
+   */
+  public abstract void setRumble(RumbleType type, double value);
 }

@@ -28,9 +28,9 @@ static bool joySticksInitialized = false;
 /**
  * Construct an instance of a joystick.
  *
- * The joystick index is the usb port on the drivers station.
+ * The joystick index is the USB port on the Driver Station.
  *
- * @param port The port on the driver station that the joystick is plugged into
+ * @param port The port on the Driver Station that the joystick is plugged into
  *             (0-5).
  */
 Joystick::Joystick(int port) : Joystick(port, kNumAxisTypes, kNumButtonTypes) {
@@ -52,24 +52,24 @@ Joystick::Joystick(int port) : Joystick(port, kNumAxisTypes, kNumButtonTypes) {
  * This constructor allows the subclass to configure the number of constants
  * for axes and buttons.
  *
- * @param port           The port on the driver station that the joystick is
+ * @param port           The port on the Driver Station that the joystick is
  *                       plugged into.
  * @param numAxisTypes   The number of axis types in the enum.
  * @param numButtonTypes The number of button types in the enum.
  */
 Joystick::Joystick(int port, int numAxisTypes, int numButtonTypes)
-    : m_ds(DriverStation::GetInstance()),
-      m_port(port),
+    : JoystickBase(port),
+      m_ds(DriverStation::GetInstance()),
       m_axes(numAxisTypes),
       m_buttons(numButtonTypes) {
   if (!joySticksInitialized) {
     for (auto& joystick : joysticks) joystick = nullptr;
     joySticksInitialized = true;
   }
-  if (m_port >= DriverStation::kJoystickPorts) {
+  if (GetPort() >= DriverStation::kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
   } else {
-    joysticks[m_port] = this;
+    joysticks[GetPort()] = this;
   }
 }
 
@@ -111,7 +111,9 @@ float Joystick::GetY(JoystickHand hand) const {
  *
  * This depends on the mapping of the joystick connected to the current port.
  */
-float Joystick::GetZ() const { return GetRawAxis(m_axes[kZAxis]); }
+float Joystick::GetZ(JoystickHand hand) const {
+  return GetRawAxis(m_axes[kZAxis]);
+}
 
 /**
  * Get the twist value of the current joystick.
@@ -127,16 +129,6 @@ float Joystick::GetTwist() const { return GetRawAxis(m_axes[kTwistAxis]); }
  */
 float Joystick::GetThrottle() const {
   return GetRawAxis(m_axes[kThrottleAxis]);
-}
-
-/**
- * Get the value of the axis.
- *
- * @param axis The axis to read, starting at 0.
- * @return The value of the axis.
- */
-float Joystick::GetRawAxis(int axis) const {
-  return m_ds.GetStickAxis(m_port, axis);
 }
 
 /**
@@ -194,41 +186,6 @@ bool Joystick::GetTop(JoystickHand hand) const {
 }
 
 /**
- * This is not supported for the Joystick.
- *
- * This method is only here to complete the GenericHID interface.
- */
-bool Joystick::GetBumper(JoystickHand hand) const {
-  // Joysticks don't have bumpers.
-  return false;
-}
-
-/**
- * Get the button value (starting at button 1)
- *
- * The buttons are returned in a single 16 bit value with one bit representing
- * the state of each button. The appropriate button is returned as a boolean
- * value.
- *
- * @param button The button number to be read (starting at 1)
- * @return The state of the button.
- **/
-bool Joystick::GetRawButton(int button) const {
-  return m_ds.GetStickButton(m_port, button);
-}
-
-/**
- * Get the angle in degrees of a POV on the joystick.
- *
- * The POV angles start at 0 in the up direction, and increase clockwise
- * (e.g. right is 90, upper-left is 315).
- *
- * @param pov The index of the POV to read (starting at 0)
- * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
- */
-int Joystick::GetPOV(int pov) const { return m_ds.GetStickPOV(m_port, pov); }
-
-/**
  * Get buttons based on an enumerated type.
  *
  * The button type will be looked up in the list of buttons and then read.
@@ -252,37 +209,7 @@ bool Joystick::GetButton(ButtonType button) const {
  *
  * @return the number of axis for the current joystick
  */
-int Joystick::GetAxisCount() const { return m_ds.GetStickAxisCount(m_port); }
-
-/**
- * Get the value of isXbox for the joystick.
- *
- * @return A boolean that is true if the joystick is an xbox controller.
- */
-bool Joystick::GetIsXbox() const { return m_ds.GetJoystickIsXbox(m_port); }
-
-/**
- * Get the HID type of the controller.
- *
- * @return the HID type of the controller.
- */
-Joystick::HIDType Joystick::GetType() const {
-  return static_cast<HIDType>(m_ds.GetJoystickType(m_port));
-}
-
-/**
- * Get the name of the joystick.
- *
- * @return the name of the controller.
- */
-std::string Joystick::GetName() const { return m_ds.GetJoystickName(m_port); }
-
-/**
- * Get the port number of the joystick.
- *
- * @return The port number of the joystick.
- */
-int Joystick::GetPort() const { return m_port; }
+int Joystick::GetAxisCount() const { return m_ds.GetStickAxisCount(GetPort()); }
 
 /**
  * Get the axis type of a joystick axis.
@@ -290,24 +217,17 @@ int Joystick::GetPort() const { return m_port; }
  * @return the axis type of a joystick axis.
  */
 int Joystick::GetAxisType(int axis) const {
-  return m_ds.GetJoystickAxisType(m_port, axis);
+  return m_ds.GetJoystickAxisType(GetPort(), axis);
 }
 
 /**
- * Get the number of axis for a joystick.
+ * Get the number of buttons for a joystick.
  *
  * @return the number of buttons on the current joystick
  */
 int Joystick::GetButtonCount() const {
-  return m_ds.GetStickButtonCount(m_port);
+  return m_ds.GetStickButtonCount(GetPort());
 }
-
-/**
- * Get the number of axis for a joystick.
- *
- * @return the number of POVs for the current joystick
- */
-int Joystick::GetPOVCount() const { return m_ds.GetStickPOVCount(m_port); }
 
 /**
  * Get the channel currently associated with the specified axis.
@@ -358,48 +278,4 @@ float Joystick::GetDirectionRadians() const {
  */
 float Joystick::GetDirectionDegrees() const {
   return (180 / std::acos(-1)) * GetDirectionRadians();
-}
-
-/**
- * Set the rumble output for the joystick.
- *
- * The DS currently supports 2 rumble values, left rumble and right rumble.
- *
- * @param type  Which rumble value to set
- * @param value The normalized value (0 to 1) to set the rumble to
- */
-void Joystick::SetRumble(RumbleType type, float value) {
-  if (value < 0)
-    value = 0;
-  else if (value > 1)
-    value = 1;
-  if (type == kLeftRumble)
-    m_leftRumble = value * 65535;
-  else
-    m_rightRumble = value * 65535;
-  HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
-}
-
-/**
- * Set a single HID output value for the joystick.
- *
- * @param outputNumber The index of the output to set (1-32)
- * @param value        The value to set the output to
- */
-
-void Joystick::SetOutput(int outputNumber, bool value) {
-  m_outputs =
-      (m_outputs & ~(1 << (outputNumber - 1))) | (value << (outputNumber - 1));
-
-  HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
-}
-
-/**
- * Set all HID output values for the joystick.
- *
- * @param value The 32 bit output value (1 bit for each output)
- */
-void Joystick::SetOutputs(int value) {
-  m_outputs = value;
-  HAL_SetJoystickOutputs(m_port, m_outputs, m_leftRumble, m_rightRumble);
 }

@@ -50,4 +50,5 @@
 #include "SpeedController.h"
 #include "Talon.h"
 #include "Victor.h"
+#include "XboxController.h"
 #include "interfaces/Potentiometer.h"

@@ -90,6 +90,7 @@
 #include "Vision/RGBImage.h"
 #include "Vision/Threshold.h"
 #include "WPIErrors.h"
+#include "XboxController.h"
 #include "interfaces/Accelerometer.h"
 #include "interfaces/Gyro.h"
 #include "interfaces/Potentiometer.h"
