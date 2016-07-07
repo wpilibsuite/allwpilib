@@ -88,6 +88,7 @@ class PIDController : public LiveWindowSendable,
   std::shared_ptr<ITable> m_table;
   virtual void Calculate();
   virtual double CalculateFeedForward();
+  double GetContinuousError(double error) const;
 
  private:
   // factor for "proportional" control

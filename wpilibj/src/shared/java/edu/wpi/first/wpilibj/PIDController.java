@@ -265,16 +265,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         input = pidInput.pidGet();
       }
       synchronized (this) {
-        m_error = m_setpoint - input;
-        if (m_continuous) {
-          if (Math.abs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
-            if (m_error > 0) {
-              m_error = m_error - m_maximumInput + m_minimumInput;
-            } else {
-              m_error = m_error + m_maximumInput - m_minimumInput;
-            }
-          }
-        }
+        m_error = getContinuousError(m_setpoint - input);
 
         if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {
           if (m_P != 0) {
@@ -546,8 +537,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @return the current error
    */
   public synchronized double getError() {
-    // return m_error;
-    return getSetpoint() - m_pidInput.pidGet();
+    return getContinuousError(getSetpoint() - m_pidInput.pidGet());
   }
 
   /**
@@ -765,6 +755,26 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     }
   }
 
+  /**
+   * Wraps error around for continuous inputs. The original error is returned if continuous mode is
+   * disabled. This is an unsynchronized function.
+   *
+   * @param error The current error of the PID controller.
+   * @return Error for continuous inputs.
+   */
+  protected double getContinuousError(double error) {
+    if (m_continuous) {
+      if (Math.abs(error) > (m_maximumInput - m_minimumInput) / 2) {
+        if (error > 0) {
+          return error - (m_maximumInput - m_minimumInput);
+        } else {
+          return error + (m_maximumInput - m_minimumInput);
+        }
+      }
+    }
+
+    return error;
+  }
 
   @Override
   public ITable getTable() {
