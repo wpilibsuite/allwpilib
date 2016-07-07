@@ -48,7 +48,7 @@ class CommandGroup : public Command {
  protected:
   virtual void Initialize();
   virtual void Execute();
-  virtual bool IsFinished();
+  virtual bool IsFinished() const;
   virtual void End();
   virtual void Interrupted();
   virtual void _Initialize();
