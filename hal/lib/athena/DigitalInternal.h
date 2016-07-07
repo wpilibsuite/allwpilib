@@ -63,6 +63,13 @@ extern bool digitalSystemsInitialized;
 
 struct DigitalPort {
   uint8_t pin;
+  bool configSet = false;
+  bool eliminateDeadband = false;
+  int32_t maxPwm = 0;
+  int32_t deadbandMaxPwm = 0;
+  int32_t centerPwm = 0;
+  int32_t deadbandMinPwm = 0;
+  int32_t minPwm = 0;
 };
 
 extern DigitalHandleResource<HalDigitalHandle, DigitalPort,

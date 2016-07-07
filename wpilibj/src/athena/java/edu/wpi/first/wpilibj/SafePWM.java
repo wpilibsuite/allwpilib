@@ -90,6 +90,6 @@ public class SafePWM extends PWM implements MotorSafety {
   }
 
   public void disable() {
-    setRaw(kPwmDisabled);
+    setDisabled();
   }
 }

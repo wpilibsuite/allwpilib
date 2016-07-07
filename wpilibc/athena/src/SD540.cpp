@@ -34,7 +34,7 @@
 SD540::SD540(uint32_t channel) : PWMSpeedController(channel) {
   SetBounds(2.05, 1.55, 1.50, 1.44, .94);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetRaw(m_centerPwm);
+  SetSpeed(0.0);
   SetZeroLatch();
 
   HALReport(HALUsageReporting::kResourceType_MindsensorsSD540, GetChannel());

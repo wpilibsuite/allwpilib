@@ -31,7 +31,7 @@ TalonSRX::TalonSRX(uint32_t channel) : PWMSpeedController(channel) {
    */
   SetBounds(2.004, 1.52, 1.50, 1.48, .997);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetRaw(m_centerPwm);
+  SetSpeed(0.0);
   SetZeroLatch();
 
   HALReport(HALUsageReporting::kResourceType_TalonSRX, GetChannel());

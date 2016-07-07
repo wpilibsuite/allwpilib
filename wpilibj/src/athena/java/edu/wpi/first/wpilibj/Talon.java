@@ -37,7 +37,7 @@ public class Talon extends PWMSpeedController {
 
     setBounds(2.037, 1.539, 1.513, 1.487, .989);
     setPeriodMultiplier(PeriodMultiplier.k1X);
-    setRaw(m_centerPwm);
+    setSpeed(0.0);
     setZeroLatch();
 
     LiveWindow.addActuator("Talon", getChannel(), this);

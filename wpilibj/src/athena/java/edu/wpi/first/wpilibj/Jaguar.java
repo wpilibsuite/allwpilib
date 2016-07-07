@@ -37,7 +37,7 @@ public class Jaguar extends PWMSpeedController {
      */
     setBounds(2.31, 1.55, 1.507, 1.454, .697);
     setPeriodMultiplier(PeriodMultiplier.k1X);
-    setRaw(m_centerPwm);
+    setSpeed(0.0);
     setZeroLatch();
 
     UsageReporting.report(tResourceType.kResourceType_Jaguar, getChannel());

@@ -48,7 +48,7 @@ bool SafePWM::IsAlive() const { return m_safetyHelper->IsAlive(); }
  * This is called by the MotorSafetyHelper object when it has a timeout for this
  * PWM and needs to stop it from running.
  */
-void SafePWM::StopMotor() { SetRaw(kPwmDisabled); }
+void SafePWM::StopMotor() { SetDisabled(); }
 
 /**
  * Enable/disable motor safety for this device.

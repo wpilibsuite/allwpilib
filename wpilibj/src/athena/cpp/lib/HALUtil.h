@@ -31,5 +31,9 @@ inline bool CheckCANStatus(JNIEnv *env, int32_t status, int message_id) {
 void ThrowIllegalArgumentException(JNIEnv *env, const char *msg);
 void ThrowBoundaryException(JNIEnv *env, double value, double lower,
                             double upper);
+                            
+jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
+                  int32_t deadbandMaxPwm, int32_t centerPwm,
+                  int32_t deadbandMinPwm, int32_t minPwm);
 
 #endif  // HALUTIL_H

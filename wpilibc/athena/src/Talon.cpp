@@ -32,7 +32,7 @@ Talon::Talon(uint32_t channel) : PWMSpeedController(channel) {
    */
   SetBounds(2.037, 1.539, 1.513, 1.487, .989);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetRaw(m_centerPwm);
+  SetSpeed(0.0);
   SetZeroLatch();
 
   HALReport(HALUsageReporting::kResourceType_Talon, GetChannel());

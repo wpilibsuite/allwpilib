@@ -33,7 +33,7 @@ Victor::Victor(uint32_t channel) : PWMSpeedController(channel) {
    */
   SetBounds(2.027, 1.525, 1.507, 1.49, 1.026);
   SetPeriodMultiplier(kPeriodMultiplier_2X);
-  SetRaw(m_centerPwm);
+  SetSpeed(0.0);
   SetZeroLatch();
 
   LiveWindow::GetInstance()->AddActuator("Victor", GetChannel(), this);

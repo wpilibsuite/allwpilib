@@ -48,6 +48,7 @@ static jclass canMessageNotFoundExCls = nullptr;
 static jclass canMessageNotAllowedExCls = nullptr;
 static jclass canNotInitializedExCls = nullptr;
 static jclass uncleanStatusExCls = nullptr;
+static jclass pwmConfigDataResultCls = nullptr;
 
 static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
   // create a throwable
@@ -236,6 +237,17 @@ void ThrowBoundaryException(JNIEnv *env, double value, double lower,
   env->Throw(static_cast<jthrowable>(ex));
 }
 
+jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
+                  int32_t deadbandMaxPwm, int32_t centerPwm,
+                  int32_t deadbandMinPwm, int32_t minPwm) {
+  static jmethodID constructor =
+      env->GetMethodID(pwmConfigDataResultCls, "<init>",
+                       "(IIIII)V");
+  return env->NewObject(pwmConfigDataResultCls, constructor, maxPwm,
+                        deadbandMaxPwm, centerPwm, deadbandMinPwm,
+                        minPwm);
+}
+
 extern "C" {
 
 //
@@ -328,6 +340,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   uncleanStatusExCls = static_cast<jclass>(env->NewGlobalRef(local));
   if (!uncleanStatusExCls) return JNI_ERR;
   env->DeleteLocalRef(local);
+  
+  local = env->FindClass("edu/wpi/first/wpilibj/PWMConfigDataResult");
+  if (!local) return JNI_ERR;
+  pwmConfigDataResultCls = static_cast<jclass>(env->NewGlobalRef(local));
+  if (!pwmConfigDataResultCls) return JNI_ERR;
+  env->DeleteLocalRef(local);
 
   return JNI_VERSION_1_6;
 }
@@ -342,12 +360,15 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (runtimeExCls) env->DeleteGlobalRef(runtimeExCls);
   if (illegalArgExCls) env->DeleteGlobalRef(illegalArgExCls);
   if (boundaryExCls) env->DeleteGlobalRef(boundaryExCls);
+  if (allocationExCls) env->DeleteGlobalRef(allocationExCls);
+  if (halHandleExCls) env->DeleteGlobalRef(halHandleExCls);
   if (canInvalidBufferExCls) env->DeleteGlobalRef(canInvalidBufferExCls);
   if (canMessageNotFoundExCls) env->DeleteGlobalRef(canMessageNotFoundExCls);
   if (canMessageNotAllowedExCls)
     env->DeleteGlobalRef(canMessageNotAllowedExCls);
   if (canNotInitializedExCls) env->DeleteGlobalRef(canNotInitializedExCls);
   if (uncleanStatusExCls) env->DeleteGlobalRef(uncleanStatusExCls);
+  if (pwmConfigDataResultCls) env->DeleteGlobalRef(pwmConfigDataResultCls);
   jvm = nullptr;
 }
 

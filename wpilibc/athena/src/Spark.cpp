@@ -34,7 +34,7 @@
 Spark::Spark(uint32_t channel) : PWMSpeedController(channel) {
   SetBounds(2.003, 1.55, 1.50, 1.46, .999);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
-  SetRaw(m_centerPwm);
+  SetSpeed(0.0);
   SetZeroLatch();
 
   HALReport(HALUsageReporting::kResourceType_RevSPARK, GetChannel());
