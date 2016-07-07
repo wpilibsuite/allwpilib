@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 
+#include "HAL/AnalogTrigger.h"
 #include "HAL/Handles.h"
 
 extern "C" {
@@ -21,8 +22,8 @@ enum EncoderIndexingType {
 enum EncoderEncodingType { HAL_Encoder_k1X, HAL_Encoder_k2X, HAL_Encoder_k4X };
 
 HalEncoderHandle initializeEncoder(
-    uint8_t port_a_module, uint32_t port_a_pin, bool port_a_analog_trigger,
-    uint8_t port_b_module, uint32_t port_b_pin, bool port_b_analog_trigger,
+    HalHandle digitalSourceHandleA, AnalogTriggerType analogTriggerTypeA,
+    HalHandle digitalSourceHandleB, AnalogTriggerType analogTriggerTypeB,
     bool reverseDirection, EncoderEncodingType encodingType, int32_t* status);
 void freeEncoder(HalEncoderHandle encoder_handle, int32_t* status);
 int32_t getEncoder(HalEncoderHandle encoder_handle, int32_t* status);
@@ -48,9 +49,10 @@ void setEncoderSamplesToAverage(HalEncoderHandle encoder_handle,
 int32_t getEncoderSamplesToAverage(HalEncoderHandle encoder_handle,
                                    int32_t* status);
 
-void setEncoderIndexSource(HalEncoderHandle encoder_handle, uint32_t pin,
-                           uint8_t analogTrigger, EncoderIndexingType type,
-                           int32_t* status);
+void setEncoderIndexSource(HalEncoderHandle encoder_handle,
+                           HalHandle digitalSourceHandle,
+                           AnalogTriggerType analogTriggerType,
+                           EncoderIndexingType type, int32_t* status);
 
 int32_t getEncoderFPGAIndex(HalEncoderHandle encoder_handle, int32_t* status);
 

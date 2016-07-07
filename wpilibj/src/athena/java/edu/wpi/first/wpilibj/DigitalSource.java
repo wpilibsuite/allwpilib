@@ -14,5 +14,7 @@ package edu.wpi.first.wpilibj;
  * source. The source can either be a digital input or analog trigger but not both.
  */
 public abstract class DigitalSource extends InterruptableSensorBase {
-  public abstract int getPortHandle();
+  public abstract boolean isAnalogTrigger();
+  
+  public abstract int getChannel();
 }

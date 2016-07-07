@@ -98,6 +98,7 @@ class Encoder : public SensorBase,
 
   std::shared_ptr<DigitalSource> m_aSource;  // the A phase of the quad encoder
   std::shared_ptr<DigitalSource> m_bSource;  // the B phase of the quad encoder
+  std::unique_ptr<DigitalSource> m_indexSource = nullptr;
   HalEncoderHandle m_encoder = HAL_INVALID_HANDLE;
 
   std::shared_ptr<ITable> m_table;

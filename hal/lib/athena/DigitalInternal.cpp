@@ -12,6 +12,7 @@
 
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
+#include "HAL/AnalogTrigger.h"
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "HAL/cpp/priority_mutex.h"
@@ -107,17 +108,30 @@ uint32_t remapMXPPWMChannel(uint32_t pin) {
  * If it's an analog trigger, determine the module from the high order routing
  * channel else do normal digital input remapping based on pin number (MXP)
  */
-extern "C++" void remapDigitalSource(bool analogTrigger, uint32_t& pin,
-                                     uint8_t& module) {
-  if (analogTrigger) {
+extern "C++" bool remapDigitalSource(HalHandle digitalSourceHandle,
+                                     AnalogTriggerType analogTriggerType,
+                                     uint32_t& pin, uint8_t& module,
+                                     bool& analogTrigger) {
+  if (isHandleType(digitalSourceHandle, HalHandleEnum::AnalogTrigger)) {
+    // If handle passed, index is not negative
+    uint32_t index = getHandleIndex(digitalSourceHandle);
+    pin = (index << 2) + analogTriggerType;
     module = pin >> 4;
-  } else {
-    if (pin >= kNumDigitalHeaders) {
-      pin = remapMXPChannel(pin);
+    analogTrigger = true;
+    return true;
+  } else if (isHandleType(digitalSourceHandle, HalHandleEnum::DIO)) {
+    uint32_t index = getHandleIndex(digitalSourceHandle);
+    if (index >= kNumDigitalHeaders) {
+      pin = remapMXPChannel(index);
       module = 1;
     } else {
+      pin = index;
       module = 0;
     }
+    analogTrigger = false;
+    return true;
+  } else {
+    return false;
   }
 }
 }

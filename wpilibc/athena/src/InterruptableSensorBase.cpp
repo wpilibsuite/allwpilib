@@ -30,8 +30,8 @@ void InterruptableSensorBase::RequestInterrupts(
   if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
 
   int32_t status = 0;
-  requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
-                    GetAnalogTriggerForRouting(), &status);
+  requestInterrupts(m_interrupt, GetPortHandleForRouting(),
+                    GetAnalogTriggerTypeForRouting(), &status);
   SetUpSourceEdge(true, false);
   attachInterruptHandler(m_interrupt, handler, param, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
@@ -52,8 +52,8 @@ void InterruptableSensorBase::RequestInterrupts() {
   if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
 
   int32_t status = 0;
-  requestInterrupts(m_interrupt, GetModuleForRouting(), GetChannelForRouting(),
-                    GetAnalogTriggerForRouting(), &status);
+  requestInterrupts(m_interrupt, GetPortHandleForRouting(),
+                    GetAnalogTriggerTypeForRouting(), &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
   SetUpSourceEdge(true, false);
 }

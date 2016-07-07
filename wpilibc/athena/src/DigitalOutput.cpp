@@ -194,24 +194,21 @@ void DigitalOutput::UpdateDutyCycle(float dutyCycle) {
 }
 
 /**
- * @return The value to be written to the channel field of a routing mux.
- */
-uint32_t DigitalOutput::GetChannelForRouting() const { return GetChannel(); }
-
-/**
- * @return The value to be written to the module field of a routing mux.
- */
-uint32_t DigitalOutput::GetModuleForRouting() const { return 0; }
-
-/**
- * @return The value to be written to the analog trigger field of a routing mux.
- */
-bool DigitalOutput::GetAnalogTriggerForRouting() const { return false; }
-
-/**
  * @return The HAL Handle to the specified source.
  */
-HalHandle DigitalOutput::GetPortHandle() const { return m_handle; }
+HalHandle DigitalOutput::GetPortHandleForRouting() const { return m_handle; }
+
+/**
+ * Is source an AnalogTrigger
+ */
+bool DigitalOutput::IsAnalogTrigger() const { return false; }
+
+/**
+ * @return The type of analog trigger output to be used. 0 for Digitals
+ */
+AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
+  return (AnalogTriggerType)0;
+}
 
 void DigitalOutput::ValueChanged(ITable* source, llvm::StringRef key,
                                  std::shared_ptr<nt::Value> value, bool isNew) {

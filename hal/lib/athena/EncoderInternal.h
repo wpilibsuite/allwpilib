@@ -14,9 +14,8 @@
 namespace hal {
 class Encoder {
  public:
-  Encoder(uint8_t port_a_module, uint32_t port_a_pin,
-          bool port_a_analog_trigger, uint8_t port_b_module,
-          uint32_t port_b_pin, bool port_b_analog_trigger,
+  Encoder(HalHandle digitalSourceHandleA, AnalogTriggerType analogTriggerTypeA,
+          HalHandle digitalSourceHandleB, AnalogTriggerType analogTriggerTypeB,
           bool reverseDirection, EncoderEncodingType encodingType,
           int32_t* status);
   ~Encoder();
@@ -39,7 +38,8 @@ class Encoder {
   void SetSamplesToAverage(int samplesToAverage, int32_t* status);
   int32_t GetSamplesToAverage(int32_t* status) const;
 
-  void SetIndexSource(uint32_t pin, bool analogTrigger,
+  void SetIndexSource(HalHandle digitalSourceHandle,
+                      AnalogTriggerType analogTriggerType,
                       EncoderIndexingType type, int32_t* status);
 
   int32_t GetFPGAIndex() const { return m_index; }
@@ -53,11 +53,11 @@ class Encoder {
   EncoderEncodingType GetEncodingType() const { return m_encodingType; }
 
  private:
-  void SetupCounter(uint8_t port_a_module, uint32_t port_a_pin,
-                    bool port_a_analog_trigger, uint8_t port_b_module,
-                    uint32_t port_b_pin, bool port_b_analog_trigger,
-                    bool reverseDirection, EncoderEncodingType encodingType,
-                    int32_t* status);
+  void SetupCounter(HalHandle digitalSourceHandleA,
+                    AnalogTriggerType analogTriggerTypeA,
+                    HalHandle digitalSourceHandleB,
+                    AnalogTriggerType analogTriggerTypeB, bool reverseDirection,
+                    EncoderEncodingType encodingType, int32_t* status);
 
   HalFPGAEncoderHandle m_encoder = HAL_INVALID_HANDLE;
 

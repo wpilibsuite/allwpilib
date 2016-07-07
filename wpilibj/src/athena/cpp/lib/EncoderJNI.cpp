@@ -29,29 +29,27 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    initializeEncoder
- * Signature: (BIZBIZZI)I
+ * Signature: (IIIIZI)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEncoder(
-    JNIEnv* env, jclass, jbyte port_a_module, jint port_a_pin,
-    jboolean port_a_analog_trigger, jbyte port_b_module, jint port_b_pin,
-    jboolean port_b_analog_trigger, jboolean reverseDirection, jint encodingType) {
+    JNIEnv* env, jclass, jint digitalSourceHandleA, jint analogTriggerTypeA,
+    jint digitalSourceHandleB, jint analogTriggerTypeB, jboolean reverseDirection, 
+    jint encodingType) {
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI initializeEncoder";
-  ENCODERJNI_LOG(logDEBUG) << "Module A = " << (jint)port_a_module;
-  ENCODERJNI_LOG(logDEBUG) << "Pin A = " << port_a_pin;
-  ENCODERJNI_LOG(logDEBUG) << "Analog Trigger A = "
-                           << (jint)port_a_analog_trigger;
-  ENCODERJNI_LOG(logDEBUG) << "Module B = " << (jint)port_b_module;
-  ENCODERJNI_LOG(logDEBUG) << "Pin B = " << port_b_pin;
-  ENCODERJNI_LOG(logDEBUG) << "Analog Trigger B = "
-                           << (jint)port_b_analog_trigger;
+  ENCODERJNI_LOG(logDEBUG) << "Source Handle A = " << digitalSourceHandleA;
+  ENCODERJNI_LOG(logDEBUG) << "Analog Trigger Type A = "
+                           << analogTriggerTypeA;
+  ENCODERJNI_LOG(logDEBUG) << "Source Handle B = " << digitalSourceHandleB;
+  ENCODERJNI_LOG(logDEBUG) << "Analog Trigger Type B = "
+                           << analogTriggerTypeB;
   ENCODERJNI_LOG(logDEBUG) << "Reverse direction = " << (jint)reverseDirection;
   ENCODERJNI_LOG(logDEBUG) << "EncodingType = " << encodingType;
   int32_t status = 0;
   auto encoder = initializeEncoder(
-      port_a_module, port_a_pin, port_a_analog_trigger, port_b_module,
-      port_b_pin, port_b_analog_trigger, reverseDirection,
-      (EncoderEncodingType)encodingType, &status);
+      (HalHandle)digitalSourceHandleA, (AnalogTriggerType)analogTriggerTypeA, 
+      (HalHandle)digitalSourceHandleB, (AnalogTriggerType)analogTriggerTypeB,
+      reverseDirection, (EncoderEncodingType)encodingType, &status);
       
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "ENCODER Handle = " << encoder;
@@ -336,20 +334,21 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderSamplesToAverage(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_EncoderJNI
  * Method:    setEncoderIndexSource
- * Signature: (IIZI)V
+ * Signature: (IIII)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderIndexSource(
-    JNIEnv* env, jclass, jint id, jint pin, jboolean analogTrigger,
-    jint type) {
+    JNIEnv* env, jclass, jint id, jint digitalSourceHandle, 
+    jint analogTriggerType, jint type) {
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI setEncoderIndexSource";
   ENCODERJNI_LOG(logDEBUG) << "Encoder Handle = " << (HalEncoderHandle)id;
-  ENCODERJNI_LOG(logDEBUG) << "Pin = " << pin;
-  ENCODERJNI_LOG(logDEBUG) << "Analog Trigger = "
-                           << (analogTrigger ? "true" : "false");
+  ENCODERJNI_LOG(logDEBUG) << "Source Handle = " << digitalSourceHandle;
+  ENCODERJNI_LOG(logDEBUG) << "Analog Trigger Type = "
+                           << analogTriggerType;
   ENCODERJNI_LOG(logDEBUG) << "IndexingType = " << type;
   int32_t status = 0;
-  setEncoderIndexSource((HalEncoderHandle)id, pin, analogTrigger, 
+  setEncoderIndexSource((HalEncoderHandle)id, (HalHandle)digitalSourceHandle, 
+                        (AnalogTriggerType)analogTriggerType, 
                         (EncoderIndexingType)type, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);

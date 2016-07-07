@@ -234,8 +234,8 @@ void Counter::SetUpSource(std::shared_ptr<DigitalSource> source) {
     CloneError(*m_upSource);
   } else {
     int32_t status = 0;
-    setCounterUpSource(m_counter, source->GetChannelForRouting(),
-                       source->GetAnalogTriggerForRouting(), &status);
+    setCounterUpSource(m_counter, source->GetPortHandleForRouting(),
+                       source->GetAnalogTriggerTypeForRouting(), &status);
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
 }
@@ -340,8 +340,8 @@ void Counter::SetDownSource(std::shared_ptr<DigitalSource> source) {
     CloneError(*m_downSource);
   } else {
     int32_t status = 0;
-    setCounterDownSource(m_counter, source->GetChannelForRouting(),
-                         source->GetAnalogTriggerForRouting(), &status);
+    setCounterDownSource(m_counter, source->GetPortHandleForRouting(),
+                         source->GetAnalogTriggerTypeForRouting(), &status);
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
   }
 }

@@ -27,7 +27,7 @@ class DigitalOutput : public DigitalSource,
   explicit DigitalOutput(uint32_t channel);
   virtual ~DigitalOutput();
   void Set(uint32_t value);
-  uint32_t GetChannel() const;
+  uint32_t GetChannel() const override;
   void Pulse(float length);
   bool IsPulsing() const;
   void SetPWMRate(float rate);
@@ -36,10 +36,9 @@ class DigitalOutput : public DigitalSource,
   void UpdateDutyCycle(float dutyCycle);
 
   // Digital Source Interface
-  virtual uint32_t GetChannelForRouting() const;
-  virtual uint32_t GetModuleForRouting() const;
-  virtual bool GetAnalogTriggerForRouting() const;
-  virtual HalHandle GetPortHandle() const;
+  virtual HalHandle GetPortHandleForRouting() const override;
+  virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
+  virtual bool IsAnalogTrigger() const override;
 
   virtual void ValueChanged(ITable* source, llvm::StringRef key,
                             std::shared_ptr<nt::Value> value, bool isNew);

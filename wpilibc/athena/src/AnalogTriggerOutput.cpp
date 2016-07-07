@@ -51,25 +51,25 @@ bool AnalogTriggerOutput::Get() const {
 }
 
 /**
- * @return The value to be written to the channel field of a routing mux.
- */
-uint32_t AnalogTriggerOutput::GetChannelForRouting() const {
-  return (m_trigger.m_index << 2) + m_outputType;
-}
-
-/**
- * @return The value to be written to the module field of a routing mux.
- */
-uint32_t AnalogTriggerOutput::GetModuleForRouting() const { return 0; }
-
-/**
- * @return The value to be written to the module field of a routing mux.
- */
-bool AnalogTriggerOutput::GetAnalogTriggerForRouting() const { return true; }
-
-/**
  * @return The HAL Handle to the specified source.
  */
-HalHandle AnalogTriggerOutput::GetPortHandle() const {
+HalHandle AnalogTriggerOutput::GetPortHandleForRouting() const {
   return m_trigger.m_trigger;
 }
+
+/**
+ * Is source an AnalogTrigger
+ */
+bool AnalogTriggerOutput::IsAnalogTrigger() const { return true; }
+
+/**
+ * @return The type of analog trigger output to be used.
+ */
+AnalogTriggerType AnalogTriggerOutput::GetAnalogTriggerTypeForRouting() const {
+  return m_outputType;
+}
+
+/**
+ * @return The channel of the source.
+ */
+uint32_t AnalogTriggerOutput::GetChannel() const { return m_trigger.m_index; }
