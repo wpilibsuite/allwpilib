@@ -30,6 +30,7 @@ class AnalogInput : public SensorBase,
                     public PIDSource,
                     public LiveWindowSendable {
   friend class AnalogTrigger;
+  friend class AnalogGyro;
 
  public:
   static const uint8_t kAccumulatorModuleNumber = 1;

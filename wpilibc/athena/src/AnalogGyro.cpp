@@ -79,10 +79,15 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
 AnalogGyro::AnalogGyro(int32_t channel, uint32_t center, float offset) {
   m_analog = std::make_shared<AnalogInput>(channel);
   InitGyro();
-  m_center = center;
-  m_offset = offset;
-  m_analog->SetAccumulatorCenter(m_center);
-  m_analog->ResetAccumulator();
+  int32_t status = 0;
+  setAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond, offset,
+                          center, &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    m_gyroHandle = HAL_INVALID_HANDLE;
+    return;
+  }
+  Reset();
 }
 
 /**
@@ -103,12 +108,23 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center,
     wpi_setWPIError(NullParameter);
   } else {
     InitGyro();
-    m_center = center;
-    m_offset = offset;
-    m_analog->SetAccumulatorCenter(m_center);
-    m_analog->ResetAccumulator();
+    int32_t status = 0;
+    setAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
+                            offset, center, &status);
+    if (status != 0) {
+      wpi_setErrorWithContext(status, getHALErrorMessage(status));
+      m_gyroHandle = HAL_INVALID_HANDLE;
+      return;
+    }
+    Reset();
   }
 }
+
+/**
+ * AnalogGyro Destructor
+ *
+ */
+AnalogGyro::~AnalogGyro() { freeAnalogGyro(m_gyroHandle); }
 
 /**
  * Reset the gyro.
@@ -119,7 +135,9 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center,
  */
 void AnalogGyro::Reset() {
   if (StatusIsFatal()) return;
-  m_analog->ResetAccumulator();
+  int32_t status = 0;
+  resetAnalogGyro(m_gyroHandle, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -127,25 +145,32 @@ void AnalogGyro::Reset() {
  */
 void AnalogGyro::InitGyro() {
   if (StatusIsFatal()) return;
-
-  if (!m_analog->IsAccumulatorChannel()) {
-    wpi_setWPIErrorWithContext(ParameterOutOfRange,
-                               " channel (must be accumulator channel)");
-    m_analog = nullptr;
-    return;
+  if (m_gyroHandle == HAL_INVALID_HANDLE) {
+    int32_t status = 0;
+    m_gyroHandle = initializeAnalogGyro(m_analog->m_port, &status);
+    if (status == PARAMETER_OUT_OF_RANGE) {
+      wpi_setWPIErrorWithContext(ParameterOutOfRange,
+                                 " channel (must be accumulator channel)");
+      m_analog = nullptr;
+      m_gyroHandle = HAL_INVALID_HANDLE;
+      return;
+    }
+    if (status != 0) {
+      wpi_setErrorWithContext(status, getHALErrorMessage(status));
+      m_analog = nullptr;
+      m_gyroHandle = HAL_INVALID_HANDLE;
+      return;
+    }
   }
 
-  m_voltsPerDegreePerSecond = kDefaultVoltsPerDegreePerSecond;
-  m_analog->SetAverageBits(kAverageBits);
-  m_analog->SetOversampleBits(kOversampleBits);
-  float sampleRate =
-      kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
-  m_analog->SetSampleRate(sampleRate);
-  Wait(0.1);
-
-  SetDeadband(0.0f);
-
-  SetPIDSourceType(PIDSourceType::kDisplacement);
+  int32_t status = 0;
+  setupAnalogGyro(m_gyroHandle, &status);
+  if (status != 0) {
+    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    m_analog = nullptr;
+    m_gyroHandle = HAL_INVALID_HANDLE;
+    return;
+  }
 
   HALReport(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
   LiveWindow::GetInstance()->AddSensor("AnalogGyro", m_analog->GetChannel(),
@@ -154,20 +179,9 @@ void AnalogGyro::InitGyro() {
 
 void AnalogGyro::Calibrate() {
   if (StatusIsFatal()) return;
-
-  m_analog->InitAccumulator();
-
-  Wait(kCalibrationSampleTime);
-
-  int64_t value;
-  uint32_t count;
-  m_analog->GetAccumulatorOutput(value, count);
-
-  m_center = (uint32_t)((float)value / (float)count + .5);
-
-  m_offset = ((float)value / (float)count) - (float)m_center;
-  m_analog->SetAccumulatorCenter(m_center);
-  m_analog->ResetAccumulator();
+  int32_t status = 0;
+  calibrateAnalogGyro(m_gyroHandle, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -184,18 +198,10 @@ void AnalogGyro::Calibrate() {
  */
 float AnalogGyro::GetAngle() const {
   if (StatusIsFatal()) return 0.f;
-
-  int64_t rawValue;
-  uint32_t count;
-  m_analog->GetAccumulatorOutput(rawValue, count);
-
-  int64_t value = rawValue - (int64_t)((float)count * m_offset);
-
-  double scaledValue = value * 1e-9 * (double)m_analog->GetLSBWeight() *
-                       (double)(1 << m_analog->GetAverageBits()) /
-                       (m_analog->GetSampleRate() * m_voltsPerDegreePerSecond);
-
-  return (float)scaledValue;
+  int32_t status = 0;
+  float value = getAnalogGyroAngle(m_gyroHandle, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  return value;
 }
 
 /**
@@ -207,10 +213,10 @@ float AnalogGyro::GetAngle() const {
  */
 double AnalogGyro::GetRate() const {
   if (StatusIsFatal()) return 0.0;
-
-  return (m_analog->GetAverageValue() - ((double)m_center + m_offset)) * 1e-9 *
-         m_analog->GetLSBWeight() /
-         ((1 << m_analog->GetOversampleBits()) * m_voltsPerDegreePerSecond);
+  int32_t status = 0;
+  double value = getAnalogGyroRate(m_gyroHandle, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  return value;
 }
 
 /**
@@ -219,7 +225,13 @@ double AnalogGyro::GetRate() const {
  *
  * @return the current offset value
  */
-float AnalogGyro::GetOffset() const { return m_offset; }
+float AnalogGyro::GetOffset() const {
+  if (StatusIsFatal()) return 0.0;
+  int32_t status = 0;
+  float value = getAnalogGyroOffset(m_gyroHandle, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  return value;
+}
 
 /**
  * Return the gyro center value. If run after calibration,
@@ -227,7 +239,13 @@ float AnalogGyro::GetOffset() const { return m_offset; }
  *
  * @return the current center value
  */
-uint32_t AnalogGyro::GetCenter() const { return m_center; }
+uint32_t AnalogGyro::GetCenter() const {
+  if (StatusIsFatal()) return 0;
+  int32_t status = 0;
+  uint32_t value = getAnalogGyroCenter(m_gyroHandle, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  return value;
+}
 
 /**
  * Set the gyro sensitivity.
@@ -239,7 +257,10 @@ uint32_t AnalogGyro::GetCenter() const { return m_center; }
  * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second
  */
 void AnalogGyro::SetSensitivity(float voltsPerDegreePerSecond) {
-  m_voltsPerDegreePerSecond = voltsPerDegreePerSecond;
+  int32_t status = 0;
+  setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle, voltsPerDegreePerSecond,
+                                       &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -253,8 +274,7 @@ void AnalogGyro::SetSensitivity(float voltsPerDegreePerSecond) {
  */
 void AnalogGyro::SetDeadband(float volts) {
   if (StatusIsFatal()) return;
-
-  int32_t deadband = volts * 1e9 / m_analog->GetLSBWeight() *
-                     (1 << m_analog->GetOversampleBits());
-  m_analog->SetAccumulatorDeadband(deadband);
+  int32_t status = 0;
+  setAnalogGyroDeadband(m_gyroHandle, volts, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
