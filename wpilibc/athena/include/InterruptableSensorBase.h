@@ -9,6 +9,7 @@
 
 #include <memory>
 
+#include "HAL/AnalogTrigger.h"
 #include "HAL/Interrupts.h"
 #include "SensorBase.h"
 
@@ -23,9 +24,8 @@ class InterruptableSensorBase : public SensorBase {
 
   InterruptableSensorBase();
   virtual ~InterruptableSensorBase() = default;
-  virtual uint32_t GetChannelForRouting() const = 0;
-  virtual uint32_t GetModuleForRouting() const = 0;
-  virtual bool GetAnalogTriggerForRouting() const = 0;
+  virtual HalHandle GetPortHandleForRouting() const = 0;
+  virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
   virtual void RequestInterrupts(
       InterruptHandlerFunction handler,
       void* param);                  ///< Asynchronus handler version.

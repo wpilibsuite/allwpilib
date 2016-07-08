@@ -29,8 +29,8 @@ public class InterruptJNI extends JNIWrapper {
 
   public static native double readFallingTimestamp(int interruptHandle);
 
-  public static native void requestInterrupts(int interruptHandle, byte routingModule,
-                                              int routingPin, boolean routingAnalogTrigger);
+  public static native void requestInterrupts(int interruptHandle, int digitalSourceHandle, 
+                                              int analogTriggerType);
 
   public static native void attachInterruptHandler(int interruptHandle,
                                                    InterruptJNIHandlerFunction handler,

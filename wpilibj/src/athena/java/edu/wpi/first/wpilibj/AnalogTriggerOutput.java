@@ -101,23 +101,23 @@ public class AnalogTriggerOutput extends DigitalSource {
   }
 
   @Override
-  public int getChannelForRouting() {
-    return (m_trigger.m_index << 2) + m_outputType.m_value;
+  public int getPortHandleForRouting() {
+    return m_trigger.m_port;
   }
 
   @Override
-  public byte getModuleForRouting() {
-    return (byte) (m_trigger.m_index >> 2);
-  }
-
-  @Override
-  public boolean getAnalogTriggerForRouting() {
-    return true;
+  public int getAnalogTriggerTypeForRouting() {
+    return m_outputType.m_value;
   }
   
   @Override
-  public int getPortHandle() {
-    return m_trigger.m_port;
+  public int getChannel() {
+    return m_trigger.m_index;
+  }
+  
+  @Override
+  public boolean isAnalogTrigger() {
+    return true;
   }
 
   /**

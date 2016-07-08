@@ -29,13 +29,12 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   explicit DigitalInput(uint32_t channel);
   virtual ~DigitalInput();
   bool Get() const;
-  uint32_t GetChannel() const;
+  uint32_t GetChannel() const override;
 
   // Digital Source Interface
-  virtual uint32_t GetChannelForRouting() const;
-  virtual uint32_t GetModuleForRouting() const;
-  virtual bool GetAnalogTriggerForRouting() const;
-  virtual HalHandle GetPortHandle() const;
+  virtual HalHandle GetPortHandleForRouting() const override;
+  virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
+  virtual bool IsAnalogTrigger() const override;
 
   void UpdateTable();
   void StartLiveWindowMode();

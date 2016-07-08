@@ -79,24 +79,21 @@ bool DigitalInput::Get() const {
 uint32_t DigitalInput::GetChannel() const { return m_channel; }
 
 /**
- * @return The value to be written to the channel field of a routing mux.
- */
-uint32_t DigitalInput::GetChannelForRouting() const { return GetChannel(); }
-
-/**
- * @return The value to be written to the module field of a routing mux.
- */
-uint32_t DigitalInput::GetModuleForRouting() const { return 0; }
-
-/**
- * @return The value to be written to the analog trigger field of a routing mux.
- */
-bool DigitalInput::GetAnalogTriggerForRouting() const { return false; }
-
-/**
  * @return The HAL Handle to the specified source.
  */
-HalHandle DigitalInput::GetPortHandle() const { return m_handle; }
+HalHandle DigitalInput::GetPortHandleForRouting() const { return m_handle; }
+
+/**
+ * Is source an AnalogTrigger
+ */
+bool DigitalInput::IsAnalogTrigger() const { return false; }
+
+/**
+ * @return The type of analog trigger output to be used. 0 for Digitals
+ */
+AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
+  return (AnalogTriggerType)0;
+}
 
 void DigitalInput::UpdateTable() {
   if (m_table != nullptr) {

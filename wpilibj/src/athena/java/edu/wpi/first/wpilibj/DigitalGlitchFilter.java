@@ -54,12 +54,12 @@ public class DigitalGlitchFilter extends SensorBase {
   private static void setFilter(DigitalSource input, int channelIndex) {
     if (input != null) { // Counter might have just one input
       // analog triggers are not supported for DigitalGlitchFilters
-      if (input.getAnalogTriggerForRouting()) {
+      if (input.isAnalogTrigger()) {
         throw new IllegalStateException("Analog Triggers not supported for DigitalGlitchFilters");
       }
-      DigitalGlitchFilterJNI.setFilterSelect(input.getPortHandle(), channelIndex);
+      DigitalGlitchFilterJNI.setFilterSelect(input.getPortHandleForRouting(), channelIndex);
 
-      int selected = DigitalGlitchFilterJNI.getFilterSelect(input.getPortHandle());
+      int selected = DigitalGlitchFilterJNI.getFilterSelect(input.getPortHandleForRouting());
       if (selected != channelIndex) {
         throw new IllegalStateException("DigitalGlitchFilterJNI.setFilterSelect("
             + channelIndex + ") failed -> " + selected);

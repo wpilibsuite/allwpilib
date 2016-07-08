@@ -53,21 +53,22 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requested_index) {
   // here, we catch the issue more generally.
   if (input) {
     // we don't support GlitchFilters on AnalogTriggers.
-    if (input->GetAnalogTriggerForRouting()) {
+    if (input->IsAnalogTrigger()) {
       wpi_setErrorWithContext(
           -1, "Analog Triggers not supported for DigitalGlitchFilters");
       return;
     }
     int32_t status = 0;
-    setFilterSelect(input->GetPortHandle(), requested_index, &status);
+    setFilterSelect(input->GetPortHandleForRouting(), requested_index, &status);
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
     // Validate that we set it correctly.
-    int actual_index = getFilterSelect(input->GetPortHandle(), &status);
+    int actual_index =
+        getFilterSelect(input->GetPortHandleForRouting(), &status);
     wpi_assertEqual(actual_index, requested_index);
 
     HALReport(HALUsageReporting::kResourceType_DigitalInput,
-              input->GetChannelForRouting());
+              input->GetChannel());
   }
 }
 

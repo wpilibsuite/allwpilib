@@ -11,10 +11,9 @@ import java.nio.IntBuffer;
 
 public class EncoderJNI extends JNIWrapper {
   
-  public static native int initializeEncoder(byte portAModule, int portAPin,
-                                              boolean portAAnalogTrigger, byte portBModule,
-                                              int portBPin, boolean portBAnalogTrigger,
-                                              boolean reverseDirection, int encodingType);
+  public static native int initializeEncoder(int digitalSourceHandleA, int analogTriggerTypeA, 
+                                             int digitalSourceHandleB, int analogTriggerTypeB,
+                                             boolean reverseDirection, int encodingType);
 
   public static native void freeEncoder(int encoderHandle);
 
@@ -50,8 +49,8 @@ public class EncoderJNI extends JNIWrapper {
 
   public static native int getEncoderSamplesToAverage(int encoderHandle);
 
-  public static native void setEncoderIndexSource(int encoderHandle, int pin,
-                                                  boolean analogTrigger, int indexingType);
+  public static native void setEncoderIndexSource(int encoderHandle, int digitalSourceHandle, 
+                                                  int analogTriggerType, int indexingType);
   
   @SuppressWarnings("AbbreviationAsWordInName")
   public static native int getEncoderFPGAIndex(int encoderHandle);

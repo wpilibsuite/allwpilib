@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 
+#include "HAL/AnalogTrigger.h"
 #include "HAL/Handles.h"
 
 enum Mode {
@@ -23,13 +24,15 @@ HalCounterHandle initializeCounter(Mode mode, int32_t* index, int32_t* status);
 void freeCounter(HalCounterHandle counter_handle, int32_t* status);
 void setCounterAverageSize(HalCounterHandle counter_handle, int32_t size,
                            int32_t* status);
-void setCounterUpSource(HalCounterHandle counter_handle, uint32_t pin,
-                        bool analogTrigger, int32_t* status);
+void setCounterUpSource(HalCounterHandle counter_handle,
+                        HalHandle digitalSourceHandle,
+                        AnalogTriggerType analogTriggerType, int32_t* status);
 void setCounterUpSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
                             bool fallingEdge, int32_t* status);
 void clearCounterUpSource(HalCounterHandle counter_handle, int32_t* status);
-void setCounterDownSource(HalCounterHandle counter_handle, uint32_t pin,
-                          bool analogTrigger, int32_t* status);
+void setCounterDownSource(HalCounterHandle counter_handle,
+                          HalHandle digitalSourceHandle,
+                          AnalogTriggerType analogTriggerType, int32_t* status);
 void setCounterDownSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
                               bool fallingEdge, int32_t* status);
 void clearCounterDownSource(HalCounterHandle counter_handle, int32_t* status);

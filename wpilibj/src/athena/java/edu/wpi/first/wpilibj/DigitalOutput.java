@@ -67,6 +67,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   /**
    * @return The GPIO channel number that this object represents.
    */
+  @Override 
   public int getChannel() {
     return m_channel;
   }
@@ -170,34 +171,24 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
     }
     DIOJNI.setDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle);
   }
-  
-  /**
-   * Get the channel routing number.
-   *
-   * @return channel routing number
-   */
-  @Override
-  public int getChannelForRouting() {
-    return m_channel;
-  }
 
   /**
-   * Get the module routing number.
+   * Get the analog trigger type.
    *
-   * @return 0
+   * @return false
    */
   @Override
-  public byte getModuleForRouting() {
+  public int getAnalogTriggerTypeForRouting() {
     return 0;
   }
-
+  
   /**
    * Is this an analog trigger.
    *
    * @return true if this is an analog trigger
    */
   @Override
-  public boolean getAnalogTriggerForRouting() {
+  public boolean isAnalogTrigger() {
     return false;
   }
   
@@ -207,7 +198,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @return The HAL Handle to the specified source.
    */
   @Override
-  public int getPortHandle() {
+  public int getPortHandleForRouting() {
     return m_handle;
   }
 

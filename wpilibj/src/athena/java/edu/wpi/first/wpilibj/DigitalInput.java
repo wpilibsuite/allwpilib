@@ -65,37 +65,28 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
    *
    * @return The GPIO channel number that this object represents.
    */
+  @Override
   public int getChannel() {
     return m_channel;
   }
 
   /**
-   * Get the channel routing number.
+   * Get the analog trigger type.
    *
-   * @return channel routing number
+   * @return false
    */
   @Override
-  public int getChannelForRouting() {
-    return m_channel;
-  }
-
-  /**
-   * Get the module routing number.
-   *
-   * @return 0
-   */
-  @Override
-  public byte getModuleForRouting() {
+  public int getAnalogTriggerTypeForRouting() {
     return 0;
   }
-
+  
   /**
    * Is this an analog trigger.
    *
    * @return true if this is an analog trigger
    */
   @Override
-  public boolean getAnalogTriggerForRouting() {
+  public boolean isAnalogTrigger() {
     return false;
   }
   
@@ -105,10 +96,9 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
    * @return The HAL Handle to the specified source.
    */
   @Override
-  public int getPortHandle() {
+  public int getPortHandleForRouting() {
     return m_handle;
   }
-
 
   @Override
   public String getSmartDashboardType() {
