@@ -14,7 +14,7 @@
 
 #include "HAL/Handles.h"
 #include "HAL/cpp/priority_mutex.h"
-#include "handles/HandlesInternal.h"
+#include "HandlesInternal.h"
 
 namespace hal {
 

@@ -17,10 +17,10 @@ model {
                 cpp {
                     source {
                         srcDirs = ["lib/athena", "lib/athena/FRC_FPGA_ChipObject", "lib/shared"]
-                        includes = ["**/*.cpp"]
+                        includes = ["**/*.cpp", "lib/athena", "lib/athena/FRC_FPGA_ChipObject", "lib/shared"]
                     }
                     exportedHeaders {
-                        srcDirs = ["include", "lib/athena", "lib/athena/FRC_FPGA_ChipObject", "lib/shared"]
+                        srcDirs = ["include"]
                     }
                 }
             }

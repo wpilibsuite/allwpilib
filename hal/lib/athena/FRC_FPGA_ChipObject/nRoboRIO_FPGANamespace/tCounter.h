@@ -4,7 +4,7 @@
 #ifndef __nFRC_2016_16_1_0_Counter_h__
 #define __nFRC_2016_16_1_0_Counter_h__
 
-#include "tSystemInterface.h"
+#include "../tSystemInterface.h"
 
 namespace nFPGA
 {
