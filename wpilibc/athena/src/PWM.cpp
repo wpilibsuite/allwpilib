@@ -126,7 +126,7 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
   // calculate the loop time in milliseconds
   int32_t status = 0;
   double loopTime =
-      getLoopTiming(&status) / (kSystemClockTicksPerMicrosecond * 1e3);
+      getLoopTiming(&status) / (HAL_getSystemClockTicksPerMicrosecond() * 1e3);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   if (StatusIsFatal()) return;

@@ -30,5 +30,6 @@ constexpr int32_t kNumRelayHeaders = kNumRelayPins / 2;
 constexpr int32_t kNumPCMModules = 63;
 constexpr int32_t kNumSolenoidPins = 8;
 constexpr int32_t kNumPDPModules = 63;
+constexpr int32_t kNumPDPChannels = 16;
 constexpr int32_t kNumCanTalons = 63;
 }

@@ -27,5 +27,6 @@ int32_t HAL_getNumRelayHeaders(void);
 int32_t HAL_getNumPCMModules(void);
 int32_t HAL_getNumSolenoidPins(void);
 int32_t HAL_getNumPDPModules(void);
+int32_t HAL_getNumPDPChannels(void);
 int32_t HAL_getNumCanTalons(void);
 }
