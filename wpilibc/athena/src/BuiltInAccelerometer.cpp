@@ -18,8 +18,8 @@
 BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
   SetRange(range);
 
-  HALReport(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
-            "Built-in accelerometer");
+  HAL_Report(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
+             "Built-in accelerometer");
   LiveWindow::GetInstance()->AddSensor((std::string) "BuiltInAccel", 0, this);
 }
 
@@ -29,25 +29,25 @@ void BuiltInAccelerometer::SetRange(Range range) {
         ParameterOutOfRange, "16G range not supported (use k2G, k4G, or k8G)");
   }
 
-  setAccelerometerActive(false);
-  setAccelerometerRange((AccelerometerRange)range);
-  setAccelerometerActive(true);
+  HAL_SetAccelerometerActive(false);
+  HAL_SetAccelerometerRange((HAL_AccelerometerRange)range);
+  HAL_SetAccelerometerActive(true);
 }
 
 /**
  * @return The acceleration of the roboRIO along the X axis in g-forces
  */
-double BuiltInAccelerometer::GetX() { return getAccelerometerX(); }
+double BuiltInAccelerometer::GetX() { return HAL_GetAccelerometerX(); }
 
 /**
  * @return The acceleration of the roboRIO along the Y axis in g-forces
  */
-double BuiltInAccelerometer::GetY() { return getAccelerometerY(); }
+double BuiltInAccelerometer::GetY() { return HAL_GetAccelerometerY(); }
 
 /**
  * @return The acceleration of the roboRIO along the Z axis in g-forces
  */
-double BuiltInAccelerometer::GetZ() { return getAccelerometerZ(); }
+double BuiltInAccelerometer::GetZ() { return HAL_GetAccelerometerZ(); }
 
 std::string BuiltInAccelerometer::GetSmartDashboardType() const {
   return "3AxisAccelerometer";

@@ -25,43 +25,43 @@ extern "C" {
 /**
  * Initialize the analog input port using the given port object.
  */
-HalAnalogInputHandle initializeAnalogInputPort(HalPortHandle port_handle,
-                                               int32_t* status) {
+HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle port_handle,
+                                                    int32_t* status) {
   initializeAnalog(status);
 
-  if (*status != 0) return HAL_INVALID_HANDLE;
+  if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t pin = getPortHandlePin(port_handle);
   if (pin == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
 
-  HalAnalogInputHandle handle = analogInputHandles.Allocate(pin, status);
+  HAL_AnalogInputHandle handle = analogInputHandles.Allocate(pin, status);
 
   if (*status != 0)
-    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
+    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
   // Initialize port structure
   auto analog_port = analogInputHandles.Get(handle);
   if (analog_port == nullptr) {  // would only error on thread issue
     *status = HAL_HANDLE_ERROR;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   analog_port->pin = static_cast<uint8_t>(pin);
-  if (isAccumulatorChannel(handle, status)) {
+  if (HAL_IsAccumulatorChannel(handle, status)) {
     analog_port->accumulator = tAccumulator::create(pin, status);
   } else
     analog_port->accumulator = nullptr;
 
   // Set default configuration
   analogInputSystem->writeScanList(pin, pin, status);
-  setAnalogAverageBits(handle, kDefaultAverageBits, status);
-  setAnalogOversampleBits(handle, kDefaultOversampleBits, status);
+  HAL_SetAnalogAverageBits(handle, kDefaultAverageBits, status);
+  HAL_SetAnalogOversampleBits(handle, kDefaultOversampleBits, status);
   return handle;
 }
 
-void freeAnalogInputPort(HalAnalogInputHandle analog_port_handle) {
+void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analog_port_handle) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (!port) return;
   // no status, so no need to check for a proper free.
@@ -74,7 +74,7 @@ void freeAnalogInputPort(HalAnalogInputHandle analog_port_handle) {
  *
  * @return Analog module is valid and present
  */
-bool checkAnalogModule(uint8_t module) { return module == 1; }
+bool HAL_CheckAnalogModule(uint8_t module) { return module == 1; }
 
 /**
  * Check that the analog output channel number is value.
@@ -83,7 +83,7 @@ bool checkAnalogModule(uint8_t module) { return module == 1; }
  *
  * @return Analog channel is valid
  */
-bool checkAnalogInputChannel(uint32_t pin) {
+bool HAL_CheckAnalogInputChannel(uint32_t pin) {
   if (pin < kNumAnalogInputs) return true;
   return false;
 }
@@ -95,7 +95,7 @@ bool checkAnalogInputChannel(uint32_t pin) {
  *
  * @param samplesPerSecond The number of samples per channel per second.
  */
-void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
+void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need float comparison with epsilon.
   // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
@@ -130,7 +130,7 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
  *
  * @return Sample rate.
  */
-float getAnalogSampleRate(int32_t* status) {
+float HAL_GetAnalogSampleRate(int32_t* status) {
   uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
   uint32_t ticksPerSample =
       ticksPerConversion * getAnalogNumActiveChannels(status);
@@ -147,8 +147,8 @@ float getAnalogSampleRate(int32_t* status) {
  * @param analog_port_pointer Pointer to the analog port to configure.
  * @param bits Number of bits to average.
  */
-void setAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
-                          uint32_t bits, int32_t* status) {
+void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analog_port_handle,
+                              uint32_t bits, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -166,8 +166,8 @@ void setAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Bits to average.
  */
-uint32_t getAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
-                              int32_t* status) {
+uint32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analog_port_handle,
+                                  int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -188,8 +188,8 @@ uint32_t getAnalogAverageBits(HalAnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @param bits Number of bits to oversample.
  */
-void setAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
-                             uint32_t bits, int32_t* status) {
+void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analog_port_handle,
+                                 uint32_t bits, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -208,8 +208,8 @@ void setAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Bits to oversample.
  */
-uint32_t getAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
-                                 int32_t* status) {
+uint32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analog_port_handle,
+                                     int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -229,15 +229,15 @@ uint32_t getAnalogOversampleBits(HalAnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A sample straight from the channel on this module.
  */
-int16_t getAnalogValue(HalAnalogInputHandle analog_port_handle,
-                       int32_t* status) {
+int16_t HAL_GetAnalogValue(HAL_AnalogInputHandle analog_port_handle,
+                           int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
   int16_t value;
-  if (!checkAnalogInputChannel(port->pin)) {
+  if (!HAL_CheckAnalogInputChannel(port->pin)) {
     return 0;
   }
 
@@ -269,15 +269,15 @@ int16_t getAnalogValue(HalAnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A sample from the oversample and average engine for the channel.
  */
-int32_t getAnalogAverageValue(HalAnalogInputHandle analog_port_handle,
-                              int32_t* status) {
+int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analog_port_handle,
+                                  int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
   int32_t value;
-  if (!checkAnalogInputChannel(port->pin)) {
+  if (!HAL_CheckAnalogInputChannel(port->pin)) {
     return 0;
   }
 
@@ -304,11 +304,11 @@ int32_t getAnalogAverageValue(HalAnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A scaled sample straight from the channel on this module.
  */
-float getAnalogVoltage(HalAnalogInputHandle analog_port_handle,
-                       int32_t* status) {
-  int16_t value = getAnalogValue(analog_port_handle, status);
-  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_handle, status);
-  int32_t offset = getAnalogOffset(analog_port_handle, status);
+float HAL_GetAnalogVoltage(HAL_AnalogInputHandle analog_port_handle,
+                           int32_t* status) {
+  int16_t value = HAL_GetAnalogValue(analog_port_handle, status);
+  uint32_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
+  int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
   float voltage = LSBWeight * 1.0e-9 * value - offset * 1.0e-9;
   return voltage;
 }
@@ -326,12 +326,13 @@ float getAnalogVoltage(HalAnalogInputHandle analog_port_handle,
  * @return A scaled sample from the output of the oversample and average engine
  * for the channel.
  */
-float getAnalogAverageVoltage(HalAnalogInputHandle analog_port_handle,
-                              int32_t* status) {
-  int32_t value = getAnalogAverageValue(analog_port_handle, status);
-  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_handle, status);
-  int32_t offset = getAnalogOffset(analog_port_handle, status);
-  uint32_t oversampleBits = getAnalogOversampleBits(analog_port_handle, status);
+float HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analog_port_handle,
+                                  int32_t* status) {
+  int32_t value = HAL_GetAnalogAverageValue(analog_port_handle, status);
+  uint32_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
+  int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
+  uint32_t oversampleBits =
+      HAL_GetAnalogOversampleBits(analog_port_handle, status);
   float voltage =
       ((LSBWeight * 1.0e-9 * value) / (float)(1 << oversampleBits)) -
       offset * 1.0e-9;
@@ -350,8 +351,8 @@ float getAnalogAverageVoltage(HalAnalogInputHandle analog_port_handle,
  * @param voltage The voltage to convert.
  * @return The raw value for the channel.
  */
-int32_t getAnalogVoltsToValue(HalAnalogInputHandle analog_port_handle,
-                              double voltage, int32_t* status) {
+int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analog_port_handle,
+                                  double voltage, int32_t* status) {
   if (voltage > 5.0) {
     voltage = 5.0;
     *status = VOLTAGE_OUT_OF_RANGE;
@@ -360,8 +361,8 @@ int32_t getAnalogVoltsToValue(HalAnalogInputHandle analog_port_handle,
     voltage = 0.0;
     *status = VOLTAGE_OUT_OF_RANGE;
   }
-  uint32_t LSBWeight = getAnalogLSBWeight(analog_port_handle, status);
-  int32_t offset = getAnalogOffset(analog_port_handle, status);
+  uint32_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
+  int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
   int32_t value = (int32_t)((voltage + offset * 1.0e-9) / (LSBWeight * 1.0e-9));
   return value;
 }
@@ -376,8 +377,8 @@ int32_t getAnalogVoltsToValue(HalAnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Least significant bit weight.
  */
-uint32_t getAnalogLSBWeight(HalAnalogInputHandle analog_port_handle,
-                            int32_t* status) {
+uint32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analog_port_handle,
+                                int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -398,8 +399,8 @@ uint32_t getAnalogLSBWeight(HalAnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Offset constant.
  */
-int32_t getAnalogOffset(HalAnalogInputHandle analog_port_handle,
-                        int32_t* status) {
+int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analog_port_handle,
+                            int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;

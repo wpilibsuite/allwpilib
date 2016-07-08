@@ -25,8 +25,8 @@ SolenoidBase::SolenoidBase(uint8_t moduleNumber)
 uint8_t SolenoidBase::GetAll(int module) const {
   uint8_t value = 0;
   int32_t status = 0;
-  value = getAllSolenoids(static_cast<uint8_t>(module), &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  value = HAL_GetAllSolenoids(static_cast<uint8_t>(module), &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -41,7 +41,7 @@ uint8_t SolenoidBase::GetAll(int module) const {
  */
 uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module) const {
   int32_t status = 0;
-  return getPCMSolenoidBlackList(static_cast<uint8_t>(module), &status);
+  return HAL_GetPCMSolenoidBlackList(static_cast<uint8_t>(module), &status);
 }
 
 /**
@@ -50,8 +50,8 @@ uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module) const {
  */
 bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) const {
   int32_t status = 0;
-  return getPCMSolenoidVoltageStickyFault(static_cast<uint8_t>(module),
-                                          &status);
+  return HAL_GetPCMSolenoidVoltageStickyFault(static_cast<uint8_t>(module),
+                                              &status);
 }
 
 /**
@@ -60,7 +60,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) const {
  */
 bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) const {
   int32_t status = 0;
-  return getPCMSolenoidVoltageFault(static_cast<uint8_t>(module), &status);
+  return HAL_GetPCMSolenoidVoltageFault(static_cast<uint8_t>(module), &status);
 }
 
 /**
@@ -75,5 +75,5 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) const {
  */
 void SolenoidBase::ClearAllPCMStickyFaults(int module) {
   int32_t status = 0;
-  return clearAllPCMStickyFaults_sol(static_cast<uint8_t>(module), &status);
+  return HAL_ClearAllPCMStickyFaults_sol(static_cast<uint8_t>(module), &status);
 }

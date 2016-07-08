@@ -25,17 +25,17 @@ const uint32_t DriverStation::kJoystickPorts;
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation() {
-  m_joystickAxes = std::make_unique<HALJoystickAxes[]>(kJoystickPorts);
-  m_joystickPOVs = std::make_unique<HALJoystickPOVs[]>(kJoystickPorts);
-  m_joystickButtons = std::make_unique<HALJoystickButtons[]>(kJoystickPorts);
+  m_joystickAxes = std::make_unique<HAL_JoystickAxes[]>(kJoystickPorts);
+  m_joystickPOVs = std::make_unique<HAL_JoystickPOVs[]>(kJoystickPorts);
+  m_joystickButtons = std::make_unique<HAL_JoystickButtons[]>(kJoystickPorts);
   m_joystickDescriptor =
-      std::make_unique<HALJoystickDescriptor[]>(kJoystickPorts);
-  m_joystickAxesCache = std::make_unique<HALJoystickAxes[]>(kJoystickPorts);
-  m_joystickPOVsCache = std::make_unique<HALJoystickPOVs[]>(kJoystickPorts);
+      std::make_unique<HAL_JoystickDescriptor[]>(kJoystickPorts);
+  m_joystickAxesCache = std::make_unique<HAL_JoystickAxes[]>(kJoystickPorts);
+  m_joystickPOVsCache = std::make_unique<HAL_JoystickPOVs[]>(kJoystickPorts);
   m_joystickButtonsCache =
-      std::make_unique<HALJoystickButtons[]>(kJoystickPorts);
+      std::make_unique<HAL_JoystickButtons[]>(kJoystickPorts);
   m_joystickDescriptorCache =
-      std::make_unique<HALJoystickDescriptor[]>(kJoystickPorts);
+      std::make_unique<HAL_JoystickDescriptor[]>(kJoystickPorts);
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to speed controllers.
@@ -56,7 +56,7 @@ DriverStation::DriverStation() {
   }
   // Register that semaphore with the network communications task.
   // It will signal when new packet data is available.
-  HALSetNewDataSem(&m_packetDataAvailableCond);
+  HAL_SetNewDataSem(&m_packetDataAvailableCond);
 
   m_task = Task("DriverStation", &DriverStation::Run, this);
 }
@@ -66,7 +66,7 @@ DriverStation::~DriverStation() {
   m_task.join();
 
   // Unregister our semaphore.
-  HALSetNewDataSem(nullptr);
+  HAL_SetNewDataSem(nullptr);
 }
 
 void DriverStation::Run() {
@@ -88,11 +88,11 @@ void DriverStation::Run() {
       MotorSafetyHelper::CheckMotors();
       period = 0;
     }
-    if (m_userInDisabled) HALNetworkCommunicationObserveUserProgramDisabled();
+    if (m_userInDisabled) HAL_NetworkCommunicationObserveUserProgramDisabled();
     if (m_userInAutonomous)
-      HALNetworkCommunicationObserveUserProgramAutonomous();
-    if (m_userInTeleop) HALNetworkCommunicationObserveUserProgramTeleop();
-    if (m_userInTest) HALNetworkCommunicationObserveUserProgramTest();
+      HAL_NetworkCommunicationObserveUserProgramAutonomous();
+    if (m_userInTeleop) HAL_NetworkCommunicationObserveUserProgramTeleop();
+    if (m_userInTest) HAL_NetworkCommunicationObserveUserProgramTest();
   }
 }
 
@@ -115,10 +115,10 @@ DriverStation& DriverStation::GetInstance() {
 void DriverStation::GetData() {
   // Get the status of all of the joysticks, and save to the cache
   for (uint8_t stick = 0; stick < kJoystickPorts; stick++) {
-    HALGetJoystickAxes(stick, &m_joystickAxesCache[stick]);
-    HALGetJoystickPOVs(stick, &m_joystickPOVsCache[stick]);
-    HALGetJoystickButtons(stick, &m_joystickButtonsCache[stick]);
-    HALGetJoystickDescriptor(stick, &m_joystickDescriptorCache[stick]);
+    HAL_GetJoystickAxes(stick, &m_joystickAxesCache[stick]);
+    HAL_GetJoystickPOVs(stick, &m_joystickPOVsCache[stick]);
+    HAL_GetJoystickButtons(stick, &m_joystickButtonsCache[stick]);
+    HAL_GetJoystickDescriptor(stick, &m_joystickDescriptorCache[stick]);
   }
   // Obtain a write lock on the data, swap the cached data into the
   // main data arrays
@@ -138,7 +138,7 @@ void DriverStation::GetData() {
  */
 float DriverStation::GetBatteryVoltage() const {
   int32_t status = 0;
-  float voltage = getVinVoltage(&status);
+  float voltage = HAL_GetVinVoltage(&status);
   wpi_setErrorWithContext(status, "getVinVoltage");
 
   return voltage;
@@ -293,7 +293,7 @@ float DriverStation::GetStickAxis(uint32_t stick, uint32_t axis) {
     // Unlock early so error printing isn't locked.
     m_joystickDataMutex.unlock();
     lock.release();
-    if (axis >= kMaxJoystickAxes)
+    if (axis >= HAL_kMaxJoystickAxes)
       wpi_setWPIError(BadJoystickAxis);
     else
       ReportJoystickUnpluggedWarning(
@@ -318,7 +318,7 @@ int DriverStation::GetStickPOV(uint32_t stick, uint32_t pov) {
   if (pov >= m_joystickPOVs[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
-    if (pov >= kMaxJoystickPOVs)
+    if (pov >= HAL_kMaxJoystickPOVs)
       wpi_setWPIError(BadJoystickAxis);
     else
       ReportJoystickUnpluggedWarning(
@@ -380,9 +380,9 @@ bool DriverStation::GetStickButton(uint32_t stick, uint8_t button) {
  * @return True if the robot is enabled and the DS is connected
  */
 bool DriverStation::IsEnabled() const {
-  HALControlWord controlWord;
+  HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
+  HAL_GetControlWord(&controlWord);
   return controlWord.enabled && controlWord.dsAttached;
 }
 
@@ -392,9 +392,9 @@ bool DriverStation::IsEnabled() const {
  * @return True if the robot is explicitly disabled or the DS is not connected
  */
 bool DriverStation::IsDisabled() const {
-  HALControlWord controlWord;
+  HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
+  HAL_GetControlWord(&controlWord);
   return !(controlWord.enabled && controlWord.dsAttached);
 }
 
@@ -404,9 +404,9 @@ bool DriverStation::IsDisabled() const {
  * @return True if the robot is being commanded to be in autonomous mode
  */
 bool DriverStation::IsAutonomous() const {
-  HALControlWord controlWord;
+  HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
+  HAL_GetControlWord(&controlWord);
   return controlWord.autonomous;
 }
 
@@ -416,9 +416,9 @@ bool DriverStation::IsAutonomous() const {
  * @return True if the robot is being commanded to be in teleop mode
  */
 bool DriverStation::IsOperatorControl() const {
-  HALControlWord controlWord;
+  HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
+  HAL_GetControlWord(&controlWord);
   return !(controlWord.autonomous || controlWord.test);
 }
 
@@ -428,8 +428,8 @@ bool DriverStation::IsOperatorControl() const {
  * @return True if the robot is being commanded to be in test mode
  */
 bool DriverStation::IsTest() const {
-  HALControlWord controlWord;
-  HALGetControlWord(&controlWord);
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
   return controlWord.test;
 }
 
@@ -439,9 +439,9 @@ bool DriverStation::IsTest() const {
  * @return True if the DS is connected to the robot
  */
 bool DriverStation::IsDSAttached() const {
-  HALControlWord controlWord;
+  HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(controlWord));
-  HALGetControlWord(&controlWord);
+  HAL_GetControlWord(&controlWord);
   return controlWord.dsAttached;
 }
 
@@ -455,8 +455,8 @@ bool DriverStation::IsDSAttached() const {
  */
 bool DriverStation::IsSysActive() const {
   int32_t status = 0;
-  bool retVal = HALGetSystemActive(&status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  bool retVal = HAL_GetSystemActive(&status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
 
@@ -467,8 +467,8 @@ bool DriverStation::IsSysActive() const {
  */
 bool DriverStation::IsBrownedOut() const {
   int32_t status = 0;
-  bool retVal = HALGetBrownedOut(&status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  bool retVal = HAL_GetBrownedOut(&status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
 
@@ -492,8 +492,8 @@ bool DriverStation::IsNewControlData() const {
  *         Management System
  */
 bool DriverStation::IsFMSAttached() const {
-  HALControlWord controlWord;
-  HALGetControlWord(&controlWord);
+  HAL_ControlWord controlWord;
+  HAL_GetControlWord(&controlWord);
   return controlWord.fmsAttached;
 }
 
@@ -505,16 +505,16 @@ bool DriverStation::IsFMSAttached() const {
  * @return The Alliance enum (kRed, kBlue or kInvalid)
  */
 DriverStation::Alliance DriverStation::GetAlliance() const {
-  HALAllianceStationID allianceStationID;
-  HALGetAllianceStation(&allianceStationID);
+  HAL_AllianceStationID allianceStationID;
+  HAL_GetAllianceStation(&allianceStationID);
   switch (allianceStationID) {
-    case kHALAllianceStationID_red1:
-    case kHALAllianceStationID_red2:
-    case kHALAllianceStationID_red3:
+    case HAL_AllianceStationID_kRed1:
+    case HAL_AllianceStationID_kRed2:
+    case HAL_AllianceStationID_kRed3:
       return kRed;
-    case kHALAllianceStationID_blue1:
-    case kHALAllianceStationID_blue2:
-    case kHALAllianceStationID_blue3:
+    case HAL_AllianceStationID_kBlue1:
+    case HAL_AllianceStationID_kBlue2:
+    case HAL_AllianceStationID_kBlue3:
       return kBlue;
     default:
       return kInvalid;
@@ -529,17 +529,17 @@ DriverStation::Alliance DriverStation::GetAlliance() const {
  * @return The location of the driver station (1-3, 0 for invalid)
  */
 uint32_t DriverStation::GetLocation() const {
-  HALAllianceStationID allianceStationID;
-  HALGetAllianceStation(&allianceStationID);
+  HAL_AllianceStationID allianceStationID;
+  HAL_GetAllianceStation(&allianceStationID);
   switch (allianceStationID) {
-    case kHALAllianceStationID_red1:
-    case kHALAllianceStationID_blue1:
+    case HAL_AllianceStationID_kRed1:
+    case HAL_AllianceStationID_kBlue1:
       return 1;
-    case kHALAllianceStationID_red2:
-    case kHALAllianceStationID_blue2:
+    case HAL_AllianceStationID_kRed2:
+    case HAL_AllianceStationID_kBlue2:
       return 2;
-    case kHALAllianceStationID_red3:
-    case kHALAllianceStationID_blue3:
+    case HAL_AllianceStationID_kRed3:
+    case HAL_AllianceStationID_kBlue3:
       return 3;
     default:
       return 0;
@@ -579,7 +579,7 @@ void DriverStation::WaitForData() {
  */
 double DriverStation::GetMatchTime() const {
   float matchTime;
-  HALGetMatchTime(&matchTime);
+  HAL_GetMatchTime(&matchTime);
   return (double)matchTime;
 }
 
@@ -589,7 +589,7 @@ double DriverStation::GetMatchTime() const {
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(std::string error) {
-  HALSendError(1, 1, 0, error.c_str(), "", "", 1);
+  HAL_SendError(1, 1, 0, error.c_str(), "", "", 1);
 }
 
 /**
@@ -598,7 +598,7 @@ void DriverStation::ReportError(std::string error) {
  * The warning is also printed to the program console.
  */
 void DriverStation::ReportWarning(std::string error) {
-  HALSendError(0, 1, 0, error.c_str(), "", "", 1);
+  HAL_SendError(0, 1, 0, error.c_str(), "", "", 1);
 }
 
 /**
@@ -610,6 +610,6 @@ void DriverStation::ReportError(bool is_error, int32_t code,
                                 const std::string& error,
                                 const std::string& location,
                                 const std::string& stack) {
-  HALSendError(is_error, code, 0, error.c_str(), location.c_str(),
-               stack.c_str(), 1);
+  HAL_SendError(is_error, code, 0, error.c_str(), location.c_str(),
+                stack.c_str(), 1);
 }

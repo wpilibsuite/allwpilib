@@ -10,23 +10,23 @@
 #include <stdint.h>
 
 extern "C" {
-int32_t HAL_getNumAccumulators(void);
-int32_t HAL_getNumAnalogTriggers(void);
-int32_t HAL_getNumAnalogInputs(void);
-int32_t HAL_getNumAnalogOutputs(void);
-int32_t HAL_getNumCounters(void);
-int32_t HAL_getNumDigitalHeaders(void);
-int32_t HAL_getNumPWMHeaders(void);
-int32_t HAL_getNumDigitalPins(void);
-int32_t HAL_getNumPWMPins(void);
-int32_t HAL_getNumDigitalPWMOutputs(void);
-int32_t HAL_getNumEncoders(void);
-int32_t HAL_getNumInterrupts(void);
-int32_t HAL_getNumRelayPins(void);
-int32_t HAL_getNumRelayHeaders(void);
-int32_t HAL_getNumPCMModules(void);
-int32_t HAL_getNumSolenoidPins(void);
-int32_t HAL_getNumPDPModules(void);
-int32_t HAL_getNumPDPChannels(void);
-int32_t HAL_getNumCanTalons(void);
+int32_t HAL_GetNumAccumulators(void);
+int32_t HAL_GetNumAnalogTriggers(void);
+int32_t HAL_GetNumAnalogInputs(void);
+int32_t HAL_GetNumAnalogOutputs(void);
+int32_t HAL_GetNumCounters(void);
+int32_t HAL_GetNumDigitalHeaders(void);
+int32_t HAL_GetNumPWMHeaders(void);
+int32_t HAL_GetNumDigitalPins(void);
+int32_t HAL_GetNumPWMPins(void);
+int32_t HAL_GetNumDigitalPWMOutputs(void);
+int32_t HAL_GetNumEncoders(void);
+int32_t HAL_GetNumInterrupts(void);
+int32_t HAL_GetNumRelayPins(void);
+int32_t HAL_GetNumRelayHeaders(void);
+int32_t HAL_GetNumPCMModules(void);
+int32_t HAL_GetNumSolenoidPins(void);
+int32_t HAL_GetNumPDPModules(void);
+int32_t HAL_GetNumPDPChannels(void);
+int32_t HAL_GetNumCanTalons(void);
 }

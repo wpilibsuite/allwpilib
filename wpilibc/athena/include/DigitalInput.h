@@ -32,7 +32,7 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   uint32_t GetChannel() const override;
 
   // Digital Source Interface
-  virtual HalHandle GetPortHandleForRouting() const override;
+  virtual HAL_Handle GetPortHandleForRouting() const override;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
   virtual bool IsAnalogTrigger() const override;
 
@@ -45,7 +45,7 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
 
  private:
   uint32_t m_channel;
-  HalDigitalHandle m_handle;
+  HAL_DigitalHandle m_handle;
 
   std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;

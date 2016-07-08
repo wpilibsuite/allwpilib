@@ -31,16 +31,16 @@
  */
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
   int32_t status = 0;
-  m_encoder = initializeEncoder(m_aSource->GetPortHandleForRouting(),
-                                m_aSource->GetAnalogTriggerTypeForRouting(),
-                                m_bSource->GetPortHandleForRouting(),
-                                m_bSource->GetAnalogTriggerTypeForRouting(),
-                                reverseDirection,
-                                (EncoderEncodingType)encodingType, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  m_encoder = HAL_InitializeEncoder(
+      m_aSource->GetPortHandleForRouting(),
+      (HAL_AnalogTriggerType)m_aSource->GetAnalogTriggerTypeForRouting(),
+      m_bSource->GetPortHandleForRouting(),
+      (HAL_AnalogTriggerType)m_bSource->GetAnalogTriggerTypeForRouting(),
+      reverseDirection, (HAL_EncoderEncodingType)encodingType, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  HALReport(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
-            encodingType);
+  HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
+             encodingType);
   LiveWindow::GetInstance()->AddSensor("Encoder", m_aSource->GetChannel(),
                                        this);
 }
@@ -155,8 +155,8 @@ Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
  */
 Encoder::~Encoder() {
   int32_t status = 0;
-  freeEncoder(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_FreeEncoder(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -166,8 +166,8 @@ Encoder::~Encoder() {
  */
 int32_t Encoder::GetEncodingScale() const {
   int32_t status = 0;
-  int32_t val = getEncoderEncodingScale(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t val = HAL_GetEncoderEncodingScale(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
 }
 
@@ -182,8 +182,8 @@ int32_t Encoder::GetEncodingScale() const {
 int32_t Encoder::GetRaw() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t value = getEncoderRaw(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t value = HAL_GetEncoderRaw(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -199,8 +199,8 @@ int32_t Encoder::GetRaw() const {
 int32_t Encoder::Get() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t value = getEncoder(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t value = HAL_GetEncoder(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -212,8 +212,8 @@ int32_t Encoder::Get() const {
 void Encoder::Reset() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  resetEncoder(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_ResetEncoder(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   ;
 }
 
@@ -232,8 +232,8 @@ void Encoder::Reset() {
 double Encoder::GetPeriod() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  double value = getEncoderPeriod(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  double value = HAL_GetEncoderPeriod(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -256,8 +256,8 @@ double Encoder::GetPeriod() const {
 void Encoder::SetMaxPeriod(double maxPeriod) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setEncoderMaxPeriod(m_encoder, maxPeriod, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -272,8 +272,8 @@ void Encoder::SetMaxPeriod(double maxPeriod) {
 bool Encoder::GetStopped() const {
   if (StatusIsFatal()) return true;
   int32_t status = 0;
-  bool value = getEncoderStopped(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  bool value = HAL_GetEncoderStopped(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -285,8 +285,8 @@ bool Encoder::GetStopped() const {
 bool Encoder::GetDirection() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
-  bool value = getEncoderDirection(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  bool value = HAL_GetEncoderDirection(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -297,8 +297,8 @@ bool Encoder::GetDirection() const {
 double Encoder::DecodingScaleFactor() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  double val = getEncoderDecodingScaleFactor(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  double val = HAL_GetEncoderDecodingScaleFactor(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
 }
 
@@ -311,8 +311,8 @@ double Encoder::DecodingScaleFactor() const {
 double Encoder::GetDistance() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  double value = getEncoderDistance(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  double value = HAL_GetEncoderDistance(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -327,8 +327,8 @@ double Encoder::GetDistance() const {
 double Encoder::GetRate() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  double value = getEncoderRate(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  double value = HAL_GetEncoderRate(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -341,8 +341,8 @@ double Encoder::GetRate() const {
 void Encoder::SetMinRate(double minRate) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setEncoderMinRate(m_encoder, minRate, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetEncoderMinRate(m_encoder, minRate, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -365,8 +365,8 @@ void Encoder::SetMinRate(double minRate) {
 void Encoder::SetDistancePerPulse(double distancePerPulse) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -380,8 +380,8 @@ void Encoder::SetDistancePerPulse(double distancePerPulse) {
 void Encoder::SetReverseDirection(bool reverseDirection) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setEncoderReverseDirection(m_encoder, reverseDirection, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetEncoderReverseDirection(m_encoder, reverseDirection, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -401,8 +401,8 @@ void Encoder::SetSamplesToAverage(int samplesToAverage) {
     return;
   }
   int32_t status = 0;
-  setEncoderSamplesToAverage(m_encoder, samplesToAverage, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetEncoderSamplesToAverage(m_encoder, samplesToAverage, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -416,8 +416,8 @@ void Encoder::SetSamplesToAverage(int samplesToAverage) {
  */
 int Encoder::GetSamplesToAverage() const {
   int32_t status = 0;
-  int result = getEncoderSamplesToAverage(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int result = HAL_GetEncoderSamplesToAverage(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return result;
 }
 
@@ -477,16 +477,17 @@ void Encoder::SetIndexSource(DigitalSource* source,
 void Encoder::SetIndexSource(const DigitalSource& source,
                              Encoder::IndexingType type) {
   int32_t status = 0;
-  setEncoderIndexSource(m_encoder, source.GetPortHandleForRouting(),
-                        source.GetAnalogTriggerTypeForRouting(),
-                        (EncoderIndexingType)type, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetEncoderIndexSource(
+      m_encoder, source.GetPortHandleForRouting(),
+      (HAL_AnalogTriggerType)source.GetAnalogTriggerTypeForRouting(),
+      (HAL_EncoderIndexingType)type, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 int32_t Encoder::GetFPGAIndex() const {
   int32_t status = 0;
-  int32_t val = getEncoderFPGAIndex(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t val = HAL_GetEncoderFPGAIndex(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
 }
 
@@ -495,8 +496,9 @@ void Encoder::UpdateTable() {
     m_table->PutNumber("Speed", GetRate());
     m_table->PutNumber("Distance", GetDistance());
     int32_t status = 0;
-    double distancePerPulse = getEncoderDistancePerPulse(m_encoder, &status);
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    double distancePerPulse =
+        HAL_GetEncoderDistancePerPulse(m_encoder, &status);
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
     m_table->PutNumber("Distance per Tick", distancePerPulse);
   }
 }
@@ -507,9 +509,9 @@ void Encoder::StopLiveWindowMode() {}
 
 std::string Encoder::GetSmartDashboardType() const {
   int32_t status = 0;
-  EncoderEncodingType type = getEncoderEncodingType(m_encoder, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
-  if (type == EncoderEncodingType::HAL_Encoder_k4X)
+  HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X)
     return "Quadrature Encoder";
   else
     return "Encoder";

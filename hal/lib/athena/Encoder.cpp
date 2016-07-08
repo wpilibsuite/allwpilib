@@ -17,22 +17,23 @@
 
 using namespace hal;
 
-Encoder::Encoder(HalHandle digitalSourceHandleA,
-                 AnalogTriggerType analogTriggerTypeA,
-                 HalHandle digitalSourceHandleB,
-                 AnalogTriggerType analogTriggerTypeB, bool reverseDirection,
-                 EncoderEncodingType encodingType, int32_t* status) {
+Encoder::Encoder(HAL_Handle digitalSourceHandleA,
+                 HAL_AnalogTriggerType analogTriggerTypeA,
+                 HAL_Handle digitalSourceHandleB,
+                 HAL_AnalogTriggerType analogTriggerTypeB,
+                 bool reverseDirection, HAL_EncoderEncodingType encodingType,
+                 int32_t* status) {
   m_encodingType = encodingType;
   switch (encodingType) {
     case HAL_Encoder_k4X: {
       m_encodingScale = 4;
-      m_encoder = initializeFPGAEncoder(
+      m_encoder = HAL_InitializeFPGAEncoder(
           digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
           analogTriggerTypeB, reverseDirection, &m_index, status);
       if (*status != 0) {
         return;
       }
-      m_counter = HAL_INVALID_HANDLE;
+      m_counter = HAL_kInvalidHandle;
       SetMaxPeriod(.5, status);
       break;
     }
@@ -51,40 +52,42 @@ Encoder::Encoder(HalHandle digitalSourceHandleA,
   }
 }
 
-void Encoder::SetupCounter(HalHandle digitalSourceHandleA,
-                           AnalogTriggerType analogTriggerTypeA,
-                           HalHandle digitalSourceHandleB,
-                           AnalogTriggerType analogTriggerTypeB,
+void Encoder::SetupCounter(HAL_Handle digitalSourceHandleA,
+                           HAL_AnalogTriggerType analogTriggerTypeA,
+                           HAL_Handle digitalSourceHandleB,
+                           HAL_AnalogTriggerType analogTriggerTypeB,
                            bool reverseDirection,
-                           EncoderEncodingType encodingType, int32_t* status) {
+                           HAL_EncoderEncodingType encodingType,
+                           int32_t* status) {
   m_encodingScale = encodingType == HAL_Encoder_k1X ? 1 : 2;
-  m_counter = initializeCounter(kExternalDirection, &m_index, status);
+  m_counter =
+      HAL_InitializeCounter(HAL_Counter_kExternalDirection, &m_index, status);
   if (*status != 0) return;
-  setCounterMaxPeriod(m_counter, 0.5, status);
+  HAL_SetCounterMaxPeriod(m_counter, 0.5, status);
   if (*status != 0) return;
-  setCounterUpSource(m_counter, digitalSourceHandleA, analogTriggerTypeA,
-                     status);
+  HAL_SetCounterUpSource(m_counter, digitalSourceHandleA, analogTriggerTypeA,
+                         status);
   if (*status != 0) return;
-  setCounterDownSource(m_counter, digitalSourceHandleB, analogTriggerTypeB,
-                       status);
+  HAL_SetCounterDownSource(m_counter, digitalSourceHandleB, analogTriggerTypeB,
+                           status);
   if (*status != 0) return;
   if (encodingType == HAL_Encoder_k1X) {
-    setCounterUpSourceEdge(m_counter, true, false, status);
-    setCounterAverageSize(m_counter, 1, status);
+    HAL_SetCounterUpSourceEdge(m_counter, true, false, status);
+    HAL_SetCounterAverageSize(m_counter, 1, status);
   } else {
-    setCounterUpSourceEdge(m_counter, true, true, status);
-    setCounterAverageSize(m_counter, 2, status);
+    HAL_SetCounterUpSourceEdge(m_counter, true, true, status);
+    HAL_SetCounterAverageSize(m_counter, 2, status);
   }
-  setCounterDownSourceEdge(m_counter, reverseDirection, true, status);
+  HAL_SetCounterDownSourceEdge(m_counter, reverseDirection, true, status);
 }
 
 Encoder::~Encoder() {
-  if (m_counter != HAL_INVALID_HANDLE) {
+  if (m_counter != HAL_kInvalidHandle) {
     int32_t status = 0;
-    freeCounter(m_counter, &status);
+    HAL_FreeCounter(m_counter, &status);
   } else {
     int32_t status = 0;
-    freeFPGAEncoder(m_encoder, &status);
+    HAL_FreeFPGAEncoder(m_encoder, &status);
   }
 }
 
@@ -95,9 +98,9 @@ int32_t Encoder::Get(int32_t* status) const {
 
 int32_t Encoder::GetRaw(int32_t* status) const {
   if (m_counter) {
-    return getCounter(m_counter, status);
+    return HAL_GetCounter(m_counter, status);
   } else {
-    return getFPGAEncoder(m_encoder, status);
+    return HAL_GetFPGAEncoder(m_encoder, status);
   }
 }
 
@@ -107,41 +110,41 @@ int32_t Encoder::GetEncodingScale(int32_t* status) const {
 
 void Encoder::Reset(int32_t* status) {
   if (m_counter) {
-    resetCounter(m_counter, status);
+    HAL_ResetCounter(m_counter, status);
   } else {
-    resetFPGAEncoder(m_encoder, status);
+    HAL_ResetFPGAEncoder(m_encoder, status);
   }
 }
 
 double Encoder::GetPeriod(int32_t* status) const {
   if (m_counter) {
-    return getCounterPeriod(m_counter, status) / DecodingScaleFactor();
+    return HAL_GetCounterPeriod(m_counter, status) / DecodingScaleFactor();
   } else {
-    return getFPGAEncoderPeriod(m_encoder, status);
+    return HAL_GetFPGAEncoderPeriod(m_encoder, status);
   }
 }
 
 void Encoder::SetMaxPeriod(double maxPeriod, int32_t* status) {
   if (m_counter) {
-    setCounterMaxPeriod(m_counter, maxPeriod, status);
+    HAL_SetCounterMaxPeriod(m_counter, maxPeriod, status);
   } else {
-    setFPGAEncoderMaxPeriod(m_encoder, maxPeriod, status);
+    HAL_SetFPGAEncoderMaxPeriod(m_encoder, maxPeriod, status);
   }
 }
 
 bool Encoder::GetStopped(int32_t* status) const {
   if (m_counter) {
-    return getCounterStopped(m_counter, status);
+    return HAL_GetCounterStopped(m_counter, status);
   } else {
-    return getFPGAEncoderStopped(m_encoder, status);
+    return HAL_GetFPGAEncoderStopped(m_encoder, status);
   }
 }
 
 bool Encoder::GetDirection(int32_t* status) const {
   if (m_counter) {
-    return getCounterDirection(m_counter, status);
+    return HAL_GetCounterDirection(m_counter, status);
   } else {
-    return getFPGAEncoderDirection(m_encoder, status);
+    return HAL_GetFPGAEncoderDirection(m_encoder, status);
   }
 }
 
@@ -163,9 +166,9 @@ void Encoder::SetDistancePerPulse(double distancePerPulse, int32_t* status) {
 
 void Encoder::SetReverseDirection(bool reverseDirection, int32_t* status) {
   if (m_counter) {
-    setCounterReverseDirection(m_counter, reverseDirection, status);
+    HAL_SetCounterReverseDirection(m_counter, reverseDirection, status);
   } else {
-    setFPGAEncoderReverseDirection(m_encoder, reverseDirection, status);
+    HAL_SetFPGAEncoderReverseDirection(m_encoder, reverseDirection, status);
   }
 }
 
@@ -175,23 +178,23 @@ void Encoder::SetSamplesToAverage(int samplesToAverage, int32_t* status) {
     return;
   }
   if (m_counter) {
-    setCounterSamplesToAverage(m_counter, samplesToAverage, status);
+    HAL_SetCounterSamplesToAverage(m_counter, samplesToAverage, status);
   } else {
-    setFPGAEncoderSamplesToAverage(m_encoder, samplesToAverage, status);
+    HAL_SetFPGAEncoderSamplesToAverage(m_encoder, samplesToAverage, status);
   }
 }
 
 int32_t Encoder::GetSamplesToAverage(int32_t* status) const {
   if (m_counter) {
-    return getCounterSamplesToAverage(m_counter, status);
+    return HAL_GetCounterSamplesToAverage(m_counter, status);
   } else {
-    return getFPGAEncoderSamplesToAverage(m_encoder, status);
+    return HAL_GetFPGAEncoderSamplesToAverage(m_encoder, status);
   }
 }
 
-void Encoder::SetIndexSource(HalHandle digitalSourceHandle,
-                             AnalogTriggerType analogTriggerType,
-                             EncoderIndexingType type, int32_t* status) {
+void Encoder::SetIndexSource(HAL_Handle digitalSourceHandle,
+                             HAL_AnalogTriggerType analogTriggerType,
+                             HAL_EncoderIndexingType type, int32_t* status) {
   if (m_counter) {
     *status = HAL_COUNTER_NOT_SUPPORTED;
     return;
@@ -200,8 +203,9 @@ void Encoder::SetIndexSource(HalHandle digitalSourceHandle,
       (type == HAL_kResetWhileHigh) || (type == HAL_kResetOnRisingEdge);
   bool edgeSensitive =
       (type == HAL_kResetOnFallingEdge) || (type == HAL_kResetOnRisingEdge);
-  setFPGAEncoderIndexSource(m_encoder, digitalSourceHandle, analogTriggerType,
-                            activeHigh, edgeSensitive, status);
+  HAL_SetFPGAEncoderIndexSource(m_encoder, digitalSourceHandle,
+                                analogTriggerType, activeHigh, edgeSensitive,
+                                status);
 }
 
 double Encoder::DecodingScaleFactor() const {
@@ -217,33 +221,34 @@ double Encoder::DecodingScaleFactor() const {
   }
 }
 
-static LimitedClassedHandleResource<HalEncoderHandle, Encoder,
+static LimitedClassedHandleResource<HAL_EncoderHandle, Encoder,
                                     kNumEncoders + kNumCounters,
-                                    HalHandleEnum::Encoder>
+                                    HAL_HandleEnum::Encoder>
     encoderHandles;
 
 extern "C" {
-HalEncoderHandle initializeEncoder(
-    HalHandle digitalSourceHandleA, AnalogTriggerType analogTriggerTypeA,
-    HalHandle digitalSourceHandleB, AnalogTriggerType analogTriggerTypeB,
-    bool reverseDirection, EncoderEncodingType encodingType, int32_t* status) {
+HAL_EncoderHandle HAL_InitializeEncoder(
+    HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
+    HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
+    bool reverseDirection, HAL_EncoderEncodingType encodingType,
+    int32_t* status) {
   auto encoder = std::make_shared<Encoder>(
       digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
       analogTriggerTypeB, reverseDirection, encodingType, status);
-  if (*status != 0) return HAL_INVALID_HANDLE;  // return in creation error
+  if (*status != 0) return HAL_kInvalidHandle;  // return in creation error
   auto handle = encoderHandles.Allocate(encoder);
-  if (handle == HAL_INVALID_HANDLE) {
+  if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   return handle;
 }
 
-void freeEncoder(HalEncoderHandle encoder_handle, int32_t* status) {
+void HAL_FreeEncoder(HAL_EncoderHandle encoder_handle, int32_t* status) {
   encoderHandles.Free(encoder_handle);
 }
 
-int32_t getEncoder(HalEncoderHandle encoder_handle, int32_t* status) {
+int32_t HAL_GetEncoder(HAL_EncoderHandle encoder_handle, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -252,7 +257,7 @@ int32_t getEncoder(HalEncoderHandle encoder_handle, int32_t* status) {
   return encoder->Get(status);
 }
 
-int32_t getEncoderRaw(HalEncoderHandle encoder_handle, int32_t* status) {
+int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoder_handle, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -261,8 +266,8 @@ int32_t getEncoderRaw(HalEncoderHandle encoder_handle, int32_t* status) {
   return encoder->GetRaw(status);
 }
 
-int32_t getEncoderEncodingScale(HalEncoderHandle encoder_handle,
-                                int32_t* status) {
+int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoder_handle,
+                                    int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -271,7 +276,7 @@ int32_t getEncoderEncodingScale(HalEncoderHandle encoder_handle,
   return encoder->GetEncodingScale(status);
 }
 
-void resetEncoder(HalEncoderHandle encoder_handle, int32_t* status) {
+void HAL_ResetEncoder(HAL_EncoderHandle encoder_handle, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -280,7 +285,8 @@ void resetEncoder(HalEncoderHandle encoder_handle, int32_t* status) {
   encoder->Reset(status);
 }
 
-int32_t getEncoderPeriod(HalEncoderHandle encoder_handle, int32_t* status) {
+int32_t HAL_GetEncoderPeriod(HAL_EncoderHandle encoder_handle,
+                             int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -289,8 +295,8 @@ int32_t getEncoderPeriod(HalEncoderHandle encoder_handle, int32_t* status) {
   return encoder->GetPeriod(status);
 }
 
-void setEncoderMaxPeriod(HalEncoderHandle encoder_handle, double maxPeriod,
-                         int32_t* status) {
+void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoder_handle, double maxPeriod,
+                             int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -299,7 +305,8 @@ void setEncoderMaxPeriod(HalEncoderHandle encoder_handle, double maxPeriod,
   encoder->SetMaxPeriod(maxPeriod, status);
 }
 
-uint8_t getEncoderStopped(HalEncoderHandle encoder_handle, int32_t* status) {
+uint8_t HAL_GetEncoderStopped(HAL_EncoderHandle encoder_handle,
+                              int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -308,7 +315,8 @@ uint8_t getEncoderStopped(HalEncoderHandle encoder_handle, int32_t* status) {
   return encoder->GetStopped(status);
 }
 
-uint8_t getEncoderDirection(HalEncoderHandle encoder_handle, int32_t* status) {
+uint8_t HAL_GetEncoderDirection(HAL_EncoderHandle encoder_handle,
+                                int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -317,7 +325,8 @@ uint8_t getEncoderDirection(HalEncoderHandle encoder_handle, int32_t* status) {
   return encoder->GetDirection(status);
 }
 
-double getEncoderDistance(HalEncoderHandle encoder_handle, int32_t* status) {
+double HAL_GetEncoderDistance(HAL_EncoderHandle encoder_handle,
+                              int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -326,7 +335,7 @@ double getEncoderDistance(HalEncoderHandle encoder_handle, int32_t* status) {
   return encoder->GetDistance(status);
 }
 
-double getEncoderRate(HalEncoderHandle encoder_handle, int32_t* status) {
+double HAL_GetEncoderRate(HAL_EncoderHandle encoder_handle, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -335,8 +344,8 @@ double getEncoderRate(HalEncoderHandle encoder_handle, int32_t* status) {
   return encoder->GetRate(status);
 }
 
-void setEncoderMinRate(HalEncoderHandle encoder_handle, double minRate,
-                       int32_t* status) {
+void HAL_SetEncoderMinRate(HAL_EncoderHandle encoder_handle, double minRate,
+                           int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -345,8 +354,8 @@ void setEncoderMinRate(HalEncoderHandle encoder_handle, double minRate,
   encoder->SetMinRate(minRate, status);
 }
 
-void setEncoderDistancePerPulse(HalEncoderHandle encoder_handle,
-                                double distancePerPulse, int32_t* status) {
+void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoder_handle,
+                                    double distancePerPulse, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -355,8 +364,8 @@ void setEncoderDistancePerPulse(HalEncoderHandle encoder_handle,
   encoder->SetDistancePerPulse(distancePerPulse, status);
 }
 
-void setEncoderReverseDirection(HalEncoderHandle encoder_handle,
-                                uint8_t reverseDirection, int32_t* status) {
+void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoder_handle,
+                                    uint8_t reverseDirection, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -365,8 +374,8 @@ void setEncoderReverseDirection(HalEncoderHandle encoder_handle,
   encoder->SetReverseDirection(reverseDirection, status);
 }
 
-void setEncoderSamplesToAverage(HalEncoderHandle encoder_handle,
-                                int32_t samplesToAverage, int32_t* status) {
+void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoder_handle,
+                                    int32_t samplesToAverage, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -375,8 +384,8 @@ void setEncoderSamplesToAverage(HalEncoderHandle encoder_handle,
   encoder->SetSamplesToAverage(samplesToAverage, status);
 }
 
-int32_t getEncoderSamplesToAverage(HalEncoderHandle encoder_handle,
-                                   int32_t* status) {
+int32_t HAL_GetEncoderSamplesToAverage(HAL_EncoderHandle encoder_handle,
+                                       int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -385,8 +394,8 @@ int32_t getEncoderSamplesToAverage(HalEncoderHandle encoder_handle,
   return encoder->GetSamplesToAverage(status);
 }
 
-double getEncoderDecodingScaleFactor(HalEncoderHandle encoder_handle,
-                                     int32_t* status) {
+double HAL_GetEncoderDecodingScaleFactor(HAL_EncoderHandle encoder_handle,
+                                         int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -395,8 +404,8 @@ double getEncoderDecodingScaleFactor(HalEncoderHandle encoder_handle,
   return encoder->DecodingScaleFactor();
 }
 
-double getEncoderDistancePerPulse(HalEncoderHandle encoder_handle,
-                                  int32_t* status) {
+double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoder_handle,
+                                      int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -405,8 +414,8 @@ double getEncoderDistancePerPulse(HalEncoderHandle encoder_handle,
   return encoder->GetDistancePerPulse();
 }
 
-EncoderEncodingType getEncoderEncodingType(HalEncoderHandle encoder_handle,
-                                           int32_t* status) {
+HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
+    HAL_EncoderHandle encoder_handle, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -415,10 +424,10 @@ EncoderEncodingType getEncoderEncodingType(HalEncoderHandle encoder_handle,
   return encoder->GetEncodingType();
 }
 
-void setEncoderIndexSource(HalEncoderHandle encoder_handle,
-                           HalHandle digitalSourceHandle,
-                           AnalogTriggerType analogTriggerType,
-                           EncoderIndexingType type, int32_t* status) {
+void HAL_SetEncoderIndexSource(HAL_EncoderHandle encoder_handle,
+                               HAL_Handle digitalSourceHandle,
+                               HAL_AnalogTriggerType analogTriggerType,
+                               HAL_EncoderIndexingType type, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -427,7 +436,8 @@ void setEncoderIndexSource(HalEncoderHandle encoder_handle,
   encoder->SetIndexSource(digitalSourceHandle, analogTriggerType, type, status);
 }
 
-int32_t getEncoderFPGAIndex(HalEncoderHandle encoder_handle, int32_t* status) {
+int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoder_handle,
+                                int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;

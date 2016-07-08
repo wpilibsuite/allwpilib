@@ -22,8 +22,8 @@ static uint8_t i2CMXPObjCount = 0;
 static uint8_t i2COnBoardHandle = 0;
 static uint8_t i2CMXPHandle = 0;
 
-static HalDigitalHandle i2CMXPDigitalHandle1 = HAL_INVALID_HANDLE;
-static HalDigitalHandle i2CMXPDigitalHandle2 = HAL_INVALID_HANDLE;
+static HAL_DigitalHandle i2CMXPDigitalHandle1 = HAL_kInvalidHandle;
+static HAL_DigitalHandle i2CMXPDigitalHandle2 = HAL_kInvalidHandle;
 
 extern "C" {
 /*
@@ -31,7 +31,7 @@ extern "C" {
  * If opening the MXP port, also sets up the pin functions appropriately
  * @param port The port to open, 0 for the on-board, 1 for the MXP.
  */
-void i2CInitialize(uint8_t port, int32_t* status) {
+void HAL_I2CInitialize(uint8_t port, int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return;
 
@@ -51,13 +51,13 @@ void i2CInitialize(uint8_t port, int32_t* status) {
     } else if (port == 1) {
       i2CMXPObjCount++;
       if (i2CMXPHandle > 0) return;
-      if ((i2CMXPDigitalHandle1 = initializeDIOPort(
-               getPort(24), false, status)) == HAL_INVALID_HANDLE) {
+      if ((i2CMXPDigitalHandle1 = HAL_InitializeDIOPort(
+               HAL_GetPort(24), false, status)) == HAL_kInvalidHandle) {
         return;
       }
-      if ((i2CMXPDigitalHandle2 = initializeDIOPort(
-               getPort(25), false, status)) == HAL_INVALID_HANDLE) {
-        freeDIOPort(i2CMXPDigitalHandle1);  // free the first port allocated
+      if ((i2CMXPDigitalHandle2 = HAL_InitializeDIOPort(
+               HAL_GetPort(25), false, status)) == HAL_kInvalidHandle) {
+        HAL_FreeDIOPort(i2CMXPDigitalHandle1);  // free the first port allocated
         return;
       }
       digitalSystem->writeEnableMXPSpecialFunction(
@@ -80,9 +80,9 @@ void i2CInitialize(uint8_t port, int32_t* status) {
  * @param receiveSize Number of bytes to read from the device.
  * @return The number of bytes read (>= 0) or -1 on transfer abort.
  */
-int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend,
-                       uint8_t sendSize, uint8_t* dataReceived,
-                       uint8_t receiveSize) {
+int32_t HAL_I2CTransaction(uint8_t port, uint8_t deviceAddress,
+                           uint8_t* dataToSend, uint8_t sendSize,
+                           uint8_t* dataReceived, uint8_t receiveSize) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
@@ -111,8 +111,8 @@ int32_t i2CTransaction(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend,
  * @param data The byte to write to the register on the device.
  * @return The number of bytes written (>= 0) or -1 on transfer abort.
  */
-int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend,
-                 uint8_t sendSize) {
+int32_t HAL_I2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend,
+                     uint8_t sendSize) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
@@ -141,8 +141,8 @@ int32_t i2CWrite(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend,
  * device.
  * @return The number of bytes read (>= 0) or -1 on transfer abort.
  */
-int32_t i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t* buffer,
-                uint8_t count) {
+int32_t HAL_I2CRead(uint8_t port, uint8_t deviceAddress, uint8_t* buffer,
+                    uint8_t count) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
@@ -157,7 +157,7 @@ int32_t i2CRead(uint8_t port, uint8_t deviceAddress, uint8_t* buffer,
   }
 }
 
-void i2CClose(uint8_t port) {
+void HAL_I2CClose(uint8_t port) {
   if (port > 1) {
     // Set port out of range error here
     return;
@@ -173,8 +173,8 @@ void i2CClose(uint8_t port) {
   }
 
   if (port == 1) {
-    freeDIOPort(i2CMXPDigitalHandle1);
-    freeDIOPort(i2CMXPDigitalHandle2);
+    HAL_FreeDIOPort(i2CMXPDigitalHandle1);
+    HAL_FreeDIOPort(i2CMXPDigitalHandle2);
   }
   return;
 }

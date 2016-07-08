@@ -101,8 +101,8 @@ void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
 void SampleRobot::StartCompetition() {
   LiveWindow* lw = LiveWindow::GetInstance();
 
-  HALReport(HALUsageReporting::kResourceType_Framework,
-            HALUsageReporting::kFramework_Simple);
+  HAL_Report(HALUsageReporting::kResourceType_Framework,
+             HALUsageReporting::kFramework_Simple);
 
   SmartDashboard::init();
   NetworkTable::GetTable("LiveWindow")
@@ -112,7 +112,7 @@ void SampleRobot::StartCompetition() {
   RobotInit();
 
   // Tell the DS that the robot is ready to be enabled
-  HALNetworkCommunicationObserveUserProgramStarting();
+  HAL_NetworkCommunicationObserveUserProgramStarting();
 
   RobotMain();
 

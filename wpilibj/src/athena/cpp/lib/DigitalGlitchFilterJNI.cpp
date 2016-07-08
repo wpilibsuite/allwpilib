@@ -20,7 +20,7 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect(
     JNIEnv* env, jclass, jint id, jint filter_index) {
   int32_t status = 0;
 
-  setFilterSelect((HalDigitalHandle)id, filter_index, &status);
+  HAL_SetFilterSelect((HAL_DigitalHandle)id, filter_index, &status);
   CheckStatus(env, status);
 }
 
@@ -33,7 +33,7 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect(
     JNIEnv* env, jclass, jint id) {
   int32_t status = 0;
 
-  jint result = getFilterSelect((HalDigitalHandle)id, &status);
+  jint result = HAL_GetFilterSelect((HAL_DigitalHandle)id, &status);
   CheckStatus(env, status);
   return result;
 }
@@ -47,7 +47,7 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterPeriod(
     JNIEnv* env, jclass, jint filter_index, jint fpga_cycles) {
   int32_t status = 0;
 
-  setFilterPeriod(filter_index, fpga_cycles, &status);
+  HAL_SetFilterPeriod(filter_index, fpga_cycles, &status);
   CheckStatus(env, status);
 }
 
@@ -60,7 +60,7 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterPeriod(
     JNIEnv* env, jclass, jint filter_index) {
   int32_t status = 0;
 
-  jint result = getFilterPeriod(filter_index, &status);
+  jint result = HAL_GetFilterPeriod(filter_index, &status);
   CheckStatus(env, status);
   return result;
 }

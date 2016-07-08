@@ -30,6 +30,6 @@ Jaguar::Jaguar(uint32_t channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HALReport(HALUsageReporting::kResourceType_Jaguar, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_Jaguar, GetChannel());
   LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
 }

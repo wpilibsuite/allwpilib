@@ -35,7 +35,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiInitialize";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  spiInitialize(port, &status);
+  HAL_SpiInitialize(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -59,7 +59,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransaction(
   SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
   SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << dataToSendPtr;
   SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << dataReceivedPtr;
-  jint retVal = spiTransaction(port, dataToSendPtr, dataReceivedPtr, size);
+  jint retVal = HAL_SpiTransaction(port, dataToSendPtr, dataReceivedPtr, size);
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
   return retVal;
 }
@@ -79,7 +79,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWrite(
   }
   SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
   SPIJNI_LOG(logDEBUG) << "DataToSendPtr = " << dataToSendPtr;
-  jint retVal = spiWrite(port, dataToSendPtr, size);
+  jint retVal = HAL_SpiWrite(port, dataToSendPtr, size);
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
   return retVal;
 }
@@ -97,7 +97,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiRead(
       (uint8_t *)env->GetDirectBufferAddress(dataReceived);
   SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
   SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << dataReceivedPtr;
-  jint retVal = spiRead(port, (uint8_t *)dataReceivedPtr, size);
+  jint retVal = HAL_SpiRead(port, (uint8_t *)dataReceivedPtr, size);
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
   return retVal;
 }
@@ -111,7 +111,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiClose(JNIEnv *, jclass, jbyte port) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiClose";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
-  spiClose(port);
+  HAL_SpiClose(port);
 }
 
 /*
@@ -124,7 +124,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetSpeed(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetSpeed";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   SPIJNI_LOG(logDEBUG) << "Speed = " << (jint)speed;
-  spiSetSpeed(port, speed);
+  HAL_SpiSetSpeed(port, speed);
 }
 
 /*
@@ -140,7 +140,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetOpts(
   SPIJNI_LOG(logDEBUG) << "msb_first = " << msb_first;
   SPIJNI_LOG(logDEBUG) << "sample_on_trailing = " << sample_on_trailing;
   SPIJNI_LOG(logDEBUG) << "clk_idle_high = " << clk_idle_high;
-  spiSetOpts(port, msb_first, sample_on_trailing, clk_idle_high);
+  HAL_SpiSetOpts(port, msb_first, sample_on_trailing, clk_idle_high);
 }
 
 /*
@@ -154,7 +154,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveHigh";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  spiSetChipSelectActiveHigh(port, &status);
+  HAL_SpiSetChipSelectActiveHigh(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -170,7 +170,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiSetCSActiveLow";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  spiSetChipSelectActiveLow(port, &status);
+  HAL_SpiSetChipSelectActiveLow(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -196,7 +196,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitAccumulator(
   SPIJNI_LOG(logDEBUG) << "IsSigned = " << (jint)isSigned;
   SPIJNI_LOG(logDEBUG) << "BigEndian = " << (jint)bigEndian;
   int32_t status = 0;
-  spiInitAccumulator(port, period, cmd, xferSize, validMask, validValue,
+  HAL_SpiInitAccumulator(port, period, cmd, xferSize, validMask, validValue,
                      dataShift, dataSize, isSigned, bigEndian, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -212,7 +212,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiFreeAccumulator(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiFreeAccumulator";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  spiFreeAccumulator(port, &status);
+  HAL_SpiFreeAccumulator(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -228,7 +228,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiResetAccumulator(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiResetAccumulator";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  spiResetAccumulator(port, &status);
+  HAL_SpiResetAccumulator(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -245,7 +245,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorCenter(
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   SPIJNI_LOG(logDEBUG) << "Center = " << center;
   int32_t status = 0;
-  spiSetAccumulatorCenter(port, center, &status);
+  HAL_SpiSetAccumulatorCenter(port, center, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -262,7 +262,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorDeadband(
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   SPIJNI_LOG(logDEBUG) << "Deadband = " << deadband;
   int32_t status = 0;
-  spiSetAccumulatorDeadband(port, deadband, &status);
+  HAL_SpiSetAccumulatorDeadband(port, deadband, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -278,7 +278,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorLastValue(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorLastValue";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  jint retVal = spiGetAccumulatorLastValue(port, &status);
+  jint retVal = HAL_SpiGetAccumulatorLastValue(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   CheckStatus(env, status);
@@ -296,7 +296,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorValue(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorValue";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  jlong retVal = spiGetAccumulatorValue(port, &status);
+  jlong retVal = HAL_SpiGetAccumulatorValue(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   CheckStatus(env, status);
@@ -314,7 +314,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorCount(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorCount";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  jint retVal = spiGetAccumulatorCount(port, &status);
+  jint retVal = HAL_SpiGetAccumulatorCount(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   CheckStatus(env, status);
@@ -332,7 +332,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorAverage(
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorAverage";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  jdouble retVal = spiGetAccumulatorAverage(port, &status);
+  jdouble retVal = HAL_SpiGetAccumulatorAverage(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   CheckStatus(env, status);
@@ -354,7 +354,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorOutput(
   jlong *valuePtr = (jlong *)env->GetDirectBufferAddress(value);
   uint32_t *countPtr = (uint32_t *)env->GetDirectBufferAddress(count);
 
-  spiGetAccumulatorOutput(port, valuePtr, countPtr, &status);
+  HAL_SpiGetAccumulatorOutput(port, valuePtr, countPtr, &status);
 
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "Value = " << *valuePtr;

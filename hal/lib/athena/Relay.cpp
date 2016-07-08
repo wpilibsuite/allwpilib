@@ -20,24 +20,24 @@ struct Relay {
 };
 }
 
-static IndexedHandleResource<HalRelayHandle, Relay, kNumRelayPins,
-                             HalHandleEnum::Relay>
+static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayPins,
+                             HAL_HandleEnum::Relay>
     relayHandles;
 
 // Create a mutex to protect changes to the relay values
 static priority_recursive_mutex digitalRelayMutex;
 
 extern "C" {
-HalRelayHandle initializeRelayPort(HalPortHandle port_handle, uint8_t fwd,
-                                   int32_t* status) {
+HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle port_handle, uint8_t fwd,
+                                        int32_t* status) {
   initializeDigital(status);
 
-  if (*status != 0) return HAL_INVALID_HANDLE;
+  if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t pin = getPortHandlePin(port_handle);
   if (pin == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
 
   if (!fwd) pin += kNumRelayHeaders;  // add 4 to reverse pins
@@ -45,12 +45,12 @@ HalRelayHandle initializeRelayPort(HalPortHandle port_handle, uint8_t fwd,
   auto handle = relayHandles.Allocate(pin, status);
 
   if (*status != 0)
-    return HAL_INVALID_HANDLE;  // failed to allocate. Pass error back.
+    return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
   auto port = relayHandles.Get(handle);
   if (port == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
 
   if (!fwd) {
@@ -64,12 +64,12 @@ HalRelayHandle initializeRelayPort(HalPortHandle port_handle, uint8_t fwd,
   return handle;
 }
 
-void freeRelayPort(HalRelayHandle relay_port_handle) {
+void HAL_FreeRelayPort(HAL_RelayHandle relay_port_handle) {
   // no status, so no need to check for a proper free.
   relayHandles.Free(relay_port_handle);
 }
 
-bool checkRelayChannel(uint8_t pin) {
+bool HAL_CheckRelayChannel(uint8_t pin) {
   // roboRIO only has 4 headers, and the FPGA has
   // seperate functions for forward and reverse,
   // instead of seperate pin IDs
@@ -80,7 +80,7 @@ bool checkRelayChannel(uint8_t pin) {
  * Set the state of a relay.
  * Set the state of a relay output.
  */
-void setRelay(HalRelayHandle relay_port_handle, bool on, int32_t* status) {
+void HAL_SetRelay(HAL_RelayHandle relay_port_handle, bool on, int32_t* status) {
   auto port = relayHandles.Get(relay_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -112,7 +112,7 @@ void setRelay(HalRelayHandle relay_port_handle, bool on, int32_t* status) {
 /**
  * Get the current state of the relay channel
  */
-bool getRelay(HalRelayHandle relay_port_handle, int32_t* status) {
+bool HAL_GetRelay(HAL_RelayHandle relay_port_handle, int32_t* status) {
   auto port = relayHandles.Get(relay_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;

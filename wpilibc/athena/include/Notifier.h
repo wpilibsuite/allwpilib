@@ -43,7 +43,7 @@ class Notifier : public ErrorBase {
   // held while updating process information
   priority_mutex m_processMutex;
   // HAL handle, atomic for proper destruction
-  std::atomic<HalNotifierHandle> m_notifier{0};
+  std::atomic<HAL_NotifierHandle> m_notifier{0};
   // address of the handler
   TimerEventHandler m_handler;
   // the absolute expiration time

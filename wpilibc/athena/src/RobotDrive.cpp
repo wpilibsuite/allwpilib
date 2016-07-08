@@ -217,8 +217,8 @@ void RobotDrive::Drive(float outputMagnitude, float curve) {
   float leftOutput, rightOutput;
   static bool reported = false;
   if (!reported) {
-    HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-              HALUsageReporting::kRobotDrive_ArcadeRatioCurve);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
+               HALUsageReporting::kRobotDrive_ArcadeRatioCurve);
     reported = true;
   }
 
@@ -306,8 +306,8 @@ void RobotDrive::TankDrive(float leftValue, float rightValue,
                            bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
-    HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-              HALUsageReporting::kRobotDrive_Tank);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
+               HALUsageReporting::kRobotDrive_Tank);
     reported = true;
   }
 
@@ -430,8 +430,8 @@ void RobotDrive::ArcadeDrive(float moveValue, float rotateValue,
                              bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
-    HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-              HALUsageReporting::kRobotDrive_ArcadeStandard);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
+               HALUsageReporting::kRobotDrive_ArcadeStandard);
     reported = true;
   }
 
@@ -502,8 +502,8 @@ void RobotDrive::MecanumDrive_Cartesian(float x, float y, float rotation,
                                         float gyroAngle) {
   static bool reported = false;
   if (!reported) {
-    HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-              HALUsageReporting::kRobotDrive_MecanumCartesian);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
+               HALUsageReporting::kRobotDrive_MecanumCartesian);
     reported = true;
   }
 
@@ -551,8 +551,8 @@ void RobotDrive::MecanumDrive_Polar(float magnitude, float direction,
                                     float rotation) {
   static bool reported = false;
   if (!reported) {
-    HALReport(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
-              HALUsageReporting::kRobotDrive_MecanumPolar);
+    HAL_Report(HALUsageReporting::kResourceType_RobotDrive, GetNumMotors(),
+               HALUsageReporting::kRobotDrive_MecanumPolar);
     reported = true;
   }
 

@@ -18,7 +18,7 @@
 
 extern "C" {
 
-STATUS verifyTaskID(TASK task) {
+STATUS HAL_VerifyTaskID(TASK task) {
   if (task != nullptr && pthread_kill(*task, 0) == 0) {
     return OK;
   } else {
@@ -26,11 +26,11 @@ STATUS verifyTaskID(TASK task) {
   }
 }
 
-STATUS setTaskPriority(TASK task, int priority) {
+STATUS HAL_SetTaskPriority(TASK task, int priority) {
   int policy = 0;
   struct sched_param param;
 
-  if (verifyTaskID(task) == OK &&
+  if (HAL_VerifyTaskID(task) == OK &&
       pthread_getschedparam(*task, &policy, &param) == 0) {
     param.sched_priority = priority;
     if (pthread_setschedparam(*task, SCHED_FIFO, &param) == 0) {
@@ -43,11 +43,11 @@ STATUS setTaskPriority(TASK task, int priority) {
   }
 }
 
-STATUS getTaskPriority(TASK task, int* priority) {
+STATUS HAL_GetTaskPriority(TASK task, int* priority) {
   int policy = 0;
   struct sched_param param;
 
-  if (verifyTaskID(task) == OK &&
+  if (HAL_VerifyTaskID(task) == OK &&
       pthread_getschedparam(*task, &policy, &param) == 0) {
     *priority = param.sched_priority;
     return OK;

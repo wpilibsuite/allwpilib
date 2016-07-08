@@ -9,36 +9,36 @@
 
 #include <stdint.h>
 
-#define HAL_INVALID_HANDLE 0
+#define HAL_kInvalidHandle 0
 
-typedef int32_t HalHandle;
+typedef int32_t HAL_Handle;
 
-typedef HalHandle HalPortHandle;
+typedef HAL_Handle HAL_PortHandle;
 
-typedef HalHandle HalInterruptHandle;
+typedef HAL_Handle HAL_InterruptHandle;
 
-typedef HalHandle HalNotifierHandle;
+typedef HAL_Handle HAL_NotifierHandle;
 
-typedef HalHandle HalAnalogOutputHandle;
+typedef HAL_Handle HAL_AnalogOutputHandle;
 
-typedef HalHandle HalAnalogInputHandle;
+typedef HAL_Handle HAL_AnalogInputHandle;
 
-typedef HalHandle HalAnalogTriggerHandle;
+typedef HAL_Handle HAL_AnalogTriggerHandle;
 
-typedef HalHandle HalRelayHandle;
+typedef HAL_Handle HAL_RelayHandle;
 
-typedef HalHandle HalDigitalHandle;
+typedef HAL_Handle HAL_DigitalHandle;
 
-typedef HalHandle HalDigitalPWMHandle;
+typedef HAL_Handle HAL_DigitalPWMHandle;
 
-typedef HalHandle HalCounterHandle;
+typedef HAL_Handle HAL_CounterHandle;
 
-typedef HalHandle HalCompressorHandle;
+typedef HAL_Handle HAL_CompressorHandle;
 
-typedef HalHandle HalSolenoidHandle;
+typedef HAL_Handle HAL_SolenoidHandle;
 
-typedef HalHandle HalFPGAEncoderHandle;
+typedef HAL_Handle HAL_FPGAEncoderHandle;
 
-typedef HalHandle HalEncoderHandle;
+typedef HAL_Handle HAL_EncoderHandle;
 
-typedef HalHandle HalGyroHandle;
+typedef HAL_Handle HAL_GyroHandle;

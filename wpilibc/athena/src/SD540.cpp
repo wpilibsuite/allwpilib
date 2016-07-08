@@ -37,6 +37,6 @@ SD540::SD540(uint32_t channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HALReport(HALUsageReporting::kResourceType_MindsensorsSD540, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_MindsensorsSD540, GetChannel());
   LiveWindow::GetInstance()->AddActuator("SD540", GetChannel(), this);
 }

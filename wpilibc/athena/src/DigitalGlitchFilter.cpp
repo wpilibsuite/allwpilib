@@ -29,7 +29,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
   m_channelIndex = std::distance(m_filterAllocated.begin(), index);
   *index = true;
 
-  HALReport(HALUsageReporting::kResourceType_DigitalFilter, m_channelIndex);
+  HAL_Report(HALUsageReporting::kResourceType_DigitalFilter, m_channelIndex);
 }
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
@@ -59,16 +59,17 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requested_index) {
       return;
     }
     int32_t status = 0;
-    setFilterSelect(input->GetPortHandleForRouting(), requested_index, &status);
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    HAL_SetFilterSelect(input->GetPortHandleForRouting(), requested_index,
+                        &status);
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
     // Validate that we set it correctly.
     int actual_index =
-        getFilterSelect(input->GetPortHandleForRouting(), &status);
+        HAL_GetFilterSelect(input->GetPortHandleForRouting(), &status);
     wpi_assertEqual(actual_index, requested_index);
 
-    HALReport(HALUsageReporting::kResourceType_DigitalInput,
-              input->GetChannel());
+    HAL_Report(HALUsageReporting::kResourceType_DigitalInput,
+               input->GetChannel());
   }
 }
 
@@ -147,8 +148,8 @@ void DigitalGlitchFilter::Remove(Counter* input) {
  */
 void DigitalGlitchFilter::SetPeriodCycles(uint32_t fpga_cycles) {
   int32_t status = 0;
-  setFilterPeriod(m_channelIndex, fpga_cycles, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetFilterPeriod(m_channelIndex, fpga_cycles, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -159,10 +160,10 @@ void DigitalGlitchFilter::SetPeriodCycles(uint32_t fpga_cycles) {
 void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
   int32_t status = 0;
   uint32_t fpga_cycles =
-      nanoseconds * HAL_getSystemClockTicksPerMicrosecond() / 4 / 1000;
-  setFilterPeriod(m_channelIndex, fpga_cycles, &status);
+      nanoseconds * HAL_GetSystemClockTicksPerMicrosecond() / 4 / 1000;
+  HAL_SetFilterPeriod(m_channelIndex, fpga_cycles, &status);
 
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -172,9 +173,9 @@ void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
  */
 uint32_t DigitalGlitchFilter::GetPeriodCycles() {
   int32_t status = 0;
-  uint32_t fpga_cycles = getFilterPeriod(m_channelIndex, &status);
+  uint32_t fpga_cycles = HAL_GetFilterPeriod(m_channelIndex, &status);
 
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   return fpga_cycles;
 }
@@ -186,10 +187,10 @@ uint32_t DigitalGlitchFilter::GetPeriodCycles() {
  */
 uint64_t DigitalGlitchFilter::GetPeriodNanoSeconds() {
   int32_t status = 0;
-  uint32_t fpga_cycles = getFilterPeriod(m_channelIndex, &status);
+  uint32_t fpga_cycles = HAL_GetFilterPeriod(m_channelIndex, &status);
 
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   return static_cast<uint64_t>(fpga_cycles) * 1000L /
-         static_cast<uint64_t>(HAL_getSystemClockTicksPerMicrosecond() / 4);
+         static_cast<uint64_t>(HAL_GetSystemClockTicksPerMicrosecond() / 4);
 }

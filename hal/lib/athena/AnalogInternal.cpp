@@ -17,8 +17,8 @@ priority_recursive_mutex analogRegisterWindowMutex;
 tAI* analogInputSystem = nullptr;
 tAO* analogOutputSystem = nullptr;
 
-IndexedHandleResource<HalAnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
-                      HalHandleEnum::AnalogInput>
+IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
+                      HAL_HandleEnum::AnalogInput>
     analogInputHandles;
 
 static uint32_t analogNumChannelsToActivate = 0;
@@ -34,7 +34,7 @@ void initializeAnalog(int32_t* status) {
   analogInputSystem = tAI::create(status);
   analogOutputSystem = tAO::create(status);
   setAnalogNumChannelsToActivate(kNumAnalogInputs);
-  setAnalogSampleRate(kDefaultSampleRate, status);
+  HAL_SetAnalogSampleRate(kDefaultSampleRate, status);
   analogSystemInitialized = true;
 }
 

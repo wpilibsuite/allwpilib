@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "HAL/AnalogTrigger.h"
+#include "AnalogTriggerType.h"
 #include "HAL/Interrupts.h"
 #include "SensorBase.h"
 
@@ -24,7 +24,7 @@ class InterruptableSensorBase : public SensorBase {
 
   InterruptableSensorBase();
   virtual ~InterruptableSensorBase() = default;
-  virtual HalHandle GetPortHandleForRouting() const = 0;
+  virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
   virtual void RequestInterrupts(
       InterruptHandlerFunction handler,
@@ -45,6 +45,6 @@ class InterruptableSensorBase : public SensorBase {
   virtual void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
 
  protected:
-  HalInterruptHandle m_interrupt = HAL_INVALID_HANDLE;
+  HAL_InterruptHandle m_interrupt = HAL_kInvalidHandle;
   void AllocateInterrupts(bool watcher);
 };

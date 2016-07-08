@@ -67,8 +67,8 @@ class Relay : public MotorSafety,
   uint32_t m_channel;
   Direction m_direction;
 
-  HalRelayHandle m_forwardHandle = HAL_INVALID_HANDLE;
-  HalRelayHandle m_reverseHandle = HAL_INVALID_HANDLE;
+  HAL_RelayHandle m_forwardHandle = HAL_kInvalidHandle;
+  HAL_RelayHandle m_reverseHandle = HAL_kInvalidHandle;
 
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 };

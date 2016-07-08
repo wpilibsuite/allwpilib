@@ -81,7 +81,7 @@ class AnalogInput : public SensorBase,
  private:
   uint32_t m_channel;
   // TODO: Adjust HAL to avoid use of raw pointers.
-  HalAnalogInputHandle m_port;
+  HAL_AnalogInputHandle m_port;
   int64_t m_accumulatorOffset;
 
   std::shared_ptr<ITable> m_table;

@@ -27,12 +27,12 @@ namespace hal {
  * the future.
  * Because we have to loop through the allocator, we must use a global mutex.
 
- * @tparam THandle The Handle Type (Must be typedefed from HalHandle)
+ * @tparam THandle The Handle Type (Must be typedefed from HAL_Handle)
  * @tparam TStruct The struct type held by this resource
  * @tparam enumValue The type value stored in the handle
  *
  */
-template <typename THandle, typename TStruct, HalHandleEnum enumValue>
+template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 class UnlimitedHandleResource {
   friend class UnlimitedHandleResourceTest;
 
@@ -49,7 +49,7 @@ class UnlimitedHandleResource {
   priority_mutex m_handleMutex;
 };
 
-template <typename THandle, typename TStruct, HalHandleEnum enumValue>
+template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
     std::shared_ptr<TStruct> structure) {
   std::lock_guard<priority_mutex> sync(m_handleMutex);
@@ -60,13 +60,13 @@ THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
       return (THandle)createHandle(i, enumValue);
     }
   }
-  if (i >= INT16_MAX) return HAL_INVALID_HANDLE;
+  if (i >= INT16_MAX) return HAL_kInvalidHandle;
 
   m_structures.push_back(structure);
   return (THandle)createHandle(static_cast<int16_t>(i), enumValue);
 }
 
-template <typename THandle, typename TStruct, HalHandleEnum enumValue>
+template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue);
@@ -76,7 +76,7 @@ UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
   return m_structures[index];
 }
 
-template <typename THandle, typename TStruct, HalHandleEnum enumValue>
+template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 void UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(
     THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue);

@@ -56,5 +56,5 @@ class AnalogGyro : public GyroBase {
   std::shared_ptr<AnalogInput> m_analog;
 
  private:
-  HalGyroHandle m_gyroHandle = HAL_INVALID_HANDLE;
+  HAL_GyroHandle m_gyroHandle = HAL_kInvalidHandle;
 };

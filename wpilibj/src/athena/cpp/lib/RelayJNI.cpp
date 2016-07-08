@@ -33,10 +33,10 @@ extern "C" {
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_initializeRelayPort(
     JNIEnv* env, jclass, jint id, jboolean fwd) {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI initializeRelayPort";
-  RELAYJNI_LOG(logDEBUG) << "Port Handle = " << (HalPortHandle)id;
+  RELAYJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_PortHandle)id;
   RELAYJNI_LOG(logDEBUG) << "Forward = " << (jint)fwd;
   int32_t status = 0;
-  HalRelayHandle handle = initializeRelayPort((HalPortHandle)id, (uint8_t) fwd, &status);
+  HAL_RelayHandle handle = HAL_InitializeRelayPort((HAL_PortHandle)id, (uint8_t) fwd, &status);
   RELAYJNI_LOG(logDEBUG) << "Status = " << status;
   RELAYJNI_LOG(logDEBUG) << "Relay Handle = " << handle;
   return (jint) handle;
@@ -50,8 +50,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_initializeRelayPo
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_freeRelayPort(
     JNIEnv *env, jclass, jint id) {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI freeRelayPort";
-  RELAYJNI_LOG(logDEBUG) << "Port Handle = " << (HalRelayHandle)id;
-  freeRelayPort((HalRelayHandle)id);
+  RELAYJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_RelayHandle)id;
+  HAL_FreeRelayPort((HAL_RelayHandle)id);
 }
 
 /*
@@ -63,7 +63,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_checkRelayCha
     JNIEnv *env, jclass, jint channel) {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI checkRelayChannel";
   RELAYJNI_LOG(logDEBUG) << "Channel = " << channel;
-  return (jboolean)checkRelayChannel((uint8_t) channel);
+  return (jboolean)HAL_CheckRelayChannel((uint8_t) channel);
 }
 
 /*
@@ -74,10 +74,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_checkRelayCha
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_setRelay(
     JNIEnv* env, jclass, jint id, jboolean value) {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI setRelay";
-  RELAYJNI_LOG(logDEBUG) << "Port Handle = " << (HalRelayHandle)id;
+  RELAYJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_RelayHandle)id;
   RELAYJNI_LOG(logDEBUG) << "Flag = " << (jint)value;
   int32_t status = 0;
-  setRelay((HalRelayHandle)id, value, &status);
+  HAL_SetRelay((HAL_RelayHandle)id, value, &status);
   RELAYJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -91,9 +91,9 @@ JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelay(
     JNIEnv* env, jclass, jint id) {
   RELAYJNI_LOG(logDEBUG) << "Calling RELAYJNI getRelay";
-  RELAYJNI_LOG(logDEBUG) << "Port Handle = " << (HalRelayHandle)id;
+  RELAYJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_RelayHandle)id;
   int32_t status = 0;
-  jboolean returnValue = getRelay((HalRelayHandle)id, &status);
+  jboolean returnValue = HAL_GetRelay((HAL_RelayHandle)id, &status);
   RELAYJNI_LOG(logDEBUG) << "Status = " << status;
   RELAYJNI_LOG(logDEBUG) << "getRelayResult = " << (jint)returnValue;
   CheckStatus(env, status);

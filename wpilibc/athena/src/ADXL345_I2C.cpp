@@ -30,8 +30,8 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
   // Specify the data format to read
   SetRange(range);
 
-  HALReport(HALUsageReporting::kResourceType_ADXL345,
-            HALUsageReporting::kADXL345_I2C, 0);
+  HAL_Report(HALUsageReporting::kResourceType_ADXL345,
+             HALUsageReporting::kADXL345_I2C, 0);
   LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
 }
 

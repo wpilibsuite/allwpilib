@@ -33,23 +33,23 @@ PWM::PWM(uint32_t channel) {
   }
 
   int32_t status = 0;
-  m_handle = initializePWMPort(getPort(channel), &status);
+  m_handle = HAL_InitializePWMPort(HAL_GetPort(channel), &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
     m_channel = std::numeric_limits<uint32_t>::max();
-    m_handle = HAL_INVALID_HANDLE;
+    m_handle = HAL_kInvalidHandle;
     return;
   }
 
   m_channel = channel;
 
-  setPWMDisabled(m_handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMDisabled(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   status = 0;
-  setPWMEliminateDeadband(m_handle, false, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMEliminateDeadband(m_handle, false, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  HALReport(HALUsageReporting::kResourceType_PWM, channel);
+  HAL_Report(HALUsageReporting::kResourceType_PWM, channel);
 }
 
 /**
@@ -60,11 +60,11 @@ PWM::PWM(uint32_t channel) {
 PWM::~PWM() {
   int32_t status = 0;
 
-  setPWMDisabled(m_handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMDisabled(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  freePWMPort(m_handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_FreePWMPort(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
@@ -80,8 +80,8 @@ PWM::~PWM() {
 void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setPWMEliminateDeadband(m_handle, eliminateDeadband, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMEliminateDeadband(m_handle, eliminateDeadband, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -101,8 +101,9 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
                     double deadbandMin, double min) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min,
+                   &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -122,9 +123,9 @@ void PWM::SetRawBounds(int32_t max, int32_t deadbandMax, int32_t center,
                        int32_t deadbandMin, int32_t min) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
-                  &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
+                      &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -143,9 +144,9 @@ void PWM::SetRawBounds(int32_t max, int32_t deadbandMax, int32_t center,
 void PWM::GetRawBounds(int32_t* max, int32_t* deadbandMax, int32_t* center,
                        int32_t* deadbandMin, int32_t* min) {
   int32_t status = 0;
-  getPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
-                  &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_GetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
+                      &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -161,8 +162,8 @@ void PWM::GetRawBounds(int32_t* max, int32_t* deadbandMax, int32_t* center,
 void PWM::SetPosition(float pos) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setPWMPosition(m_handle, pos, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMPosition(m_handle, pos, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -178,8 +179,8 @@ void PWM::SetPosition(float pos) {
 float PWM::GetPosition() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  float position = getPWMPosition(m_handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  float position = HAL_GetPWMPosition(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return position;
 }
 
@@ -199,8 +200,8 @@ float PWM::GetPosition() const {
 void PWM::SetSpeed(float speed) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setPWMSpeed(m_handle, speed, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMSpeed(m_handle, speed, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -218,8 +219,8 @@ void PWM::SetSpeed(float speed) {
 float PWM::GetSpeed() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  float speed = getPWMSpeed(m_handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  float speed = HAL_GetPWMSpeed(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return speed;
 }
 
@@ -234,8 +235,8 @@ void PWM::SetRaw(unsigned short value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
-  setPWMRaw(m_handle, value, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMRaw(m_handle, value, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -249,8 +250,8 @@ unsigned short PWM::GetRaw() const {
   if (StatusIsFatal()) return 0;
 
   int32_t status = 0;
-  unsigned short value = getPWMRaw(m_handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  unsigned short value = HAL_GetPWMRaw(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   return value;
 }
@@ -267,19 +268,21 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
 
   switch (mult) {
     case kPeriodMultiplier_4X:
-      setPWMPeriodScale(m_handle, 3, &status);  // Squelch 3 out of 4 outputs
+      HAL_SetPWMPeriodScale(m_handle, 3,
+                            &status);  // Squelch 3 out of 4 outputs
       break;
     case kPeriodMultiplier_2X:
-      setPWMPeriodScale(m_handle, 1, &status);  // Squelch 1 out of 2 outputs
+      HAL_SetPWMPeriodScale(m_handle, 1,
+                            &status);  // Squelch 1 out of 2 outputs
       break;
     case kPeriodMultiplier_1X:
-      setPWMPeriodScale(m_handle, 0, &status);  // Don't squelch any outputs
+      HAL_SetPWMPeriodScale(m_handle, 0, &status);  // Don't squelch any outputs
       break;
     default:
       wpi_assert(false);
   }
 
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -291,8 +294,8 @@ void PWM::SetDisabled() {
 
   int32_t status = 0;
 
-  setPWMDisabled(m_handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetPWMDisabled(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 void PWM::SetZeroLatch() {
@@ -300,8 +303,8 @@ void PWM::SetZeroLatch() {
 
   int32_t status = 0;
 
-  latchPWMZero(m_handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_LatchPWMZero(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 void PWM::ValueChanged(ITable* source, llvm::StringRef key,

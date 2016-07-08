@@ -26,39 +26,39 @@ struct Solenoid {
 
 using namespace hal;
 
-static IndexedHandleResource<HalSolenoidHandle, Solenoid,
+static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
                              kNumPCMModules * kNumSolenoidPins,
-                             HalHandleEnum::Solenoid>
+                             HAL_HandleEnum::Solenoid>
     solenoidHandles;
 
 extern "C" {
 
-HalSolenoidHandle initializeSolenoidPort(HalPortHandle port_handle,
-                                         int32_t* status) {
+HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
+                                              int32_t* status) {
   int16_t pin = getPortHandlePin(port_handle);
   int16_t module = getPortHandleModule(port_handle);
   if (pin == InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;  // Change to Handle Error
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
 
   if (module >= kNumPCMModules || pin >= kNumSolenoidPins) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
 
   initializePCM(module);
 
   auto handle =
       solenoidHandles.Allocate(module * kNumSolenoidPins + pin, status);
-  if (handle == HAL_INVALID_HANDLE) {  // out of resources
+  if (handle == HAL_kInvalidHandle) {  // out of resources
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   auto solenoid_port = solenoidHandles.Get(handle);
   if (solenoid_port == nullptr) {  // would only occur on thread issues
     *status = HAL_HANDLE_ERROR;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   solenoid_port->module = static_cast<uint8_t>(module);
   solenoid_port->pin = static_cast<uint8_t>(pin);
@@ -66,13 +66,13 @@ HalSolenoidHandle initializeSolenoidPort(HalPortHandle port_handle,
   return handle;
 }
 
-void freeSolenoidPort(HalSolenoidHandle solenoid_port_handle) {
+void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoid_port_handle) {
   solenoidHandles.Free(solenoid_port_handle);
 }
 
-bool checkSolenoidModule(uint8_t module) { return module < kNumPCMModules; }
+bool HAL_CheckSolenoidModule(uint8_t module) { return module < kNumPCMModules; }
 
-bool getSolenoid(HalSolenoidHandle solenoid_port_handle, int32_t* status) {
+bool HAL_GetSolenoid(HAL_SolenoidHandle solenoid_port_handle, int32_t* status) {
   auto port = solenoidHandles.Get(solenoid_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -85,7 +85,7 @@ bool getSolenoid(HalSolenoidHandle solenoid_port_handle, int32_t* status) {
   return value;
 }
 
-uint8_t getAllSolenoids(uint8_t module, int32_t* status) {
+uint8_t HAL_GetAllSolenoids(uint8_t module, int32_t* status) {
   if (module >= kNumPCMModules) {
     *status = PARAMETER_OUT_OF_RANGE;
     return 0;
@@ -97,8 +97,8 @@ uint8_t getAllSolenoids(uint8_t module, int32_t* status) {
   return value;
 }
 
-void setSolenoid(HalSolenoidHandle solenoid_port_handle, bool value,
-                 int32_t* status) {
+void HAL_SetSolenoid(HAL_SolenoidHandle solenoid_port_handle, bool value,
+                     int32_t* status) {
   auto port = solenoidHandles.Get(solenoid_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -108,7 +108,7 @@ void setSolenoid(HalSolenoidHandle solenoid_port_handle, bool value,
   *status = PCM_modules[port->module]->SetSolenoid(port->pin, value);
 }
 
-int getPCMSolenoidBlackList(uint8_t module, int32_t* status) {
+int HAL_GetPCMSolenoidBlackList(uint8_t module, int32_t* status) {
   if (module >= kNumPCMModules) {
     *status = PARAMETER_OUT_OF_RANGE;
     return 0;
@@ -119,7 +119,7 @@ int getPCMSolenoidBlackList(uint8_t module, int32_t* status) {
 
   return value;
 }
-bool getPCMSolenoidVoltageStickyFault(uint8_t module, int32_t* status) {
+bool HAL_GetPCMSolenoidVoltageStickyFault(uint8_t module, int32_t* status) {
   if (module >= kNumPCMModules) {
     *status = PARAMETER_OUT_OF_RANGE;
     return false;
@@ -130,7 +130,7 @@ bool getPCMSolenoidVoltageStickyFault(uint8_t module, int32_t* status) {
 
   return value;
 }
-bool getPCMSolenoidVoltageFault(uint8_t module, int32_t* status) {
+bool HAL_GetPCMSolenoidVoltageFault(uint8_t module, int32_t* status) {
   if (module >= kNumPCMModules) {
     *status = PARAMETER_OUT_OF_RANGE;
     return false;
@@ -141,7 +141,7 @@ bool getPCMSolenoidVoltageFault(uint8_t module, int32_t* status) {
 
   return value;
 }
-void clearAllPCMStickyFaults_sol(uint8_t module, int32_t* status) {
+void HAL_ClearAllPCMStickyFaults_sol(uint8_t module, int32_t* status) {
   if (module >= kNumPCMModules) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;

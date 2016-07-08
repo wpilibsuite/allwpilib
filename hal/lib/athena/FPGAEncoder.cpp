@@ -22,17 +22,15 @@ struct Encoder {
 
 static const double DECODING_SCALING_FACTOR = 0.25;
 
-static LimitedHandleResource<HalFPGAEncoderHandle, Encoder, kNumEncoders,
-                             HalHandleEnum::FPGAEncoder>
+static LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder, kNumEncoders,
+                             HAL_HandleEnum::FPGAEncoder>
     fpgaEncoderHandles;
 
 extern "C" {
-HalFPGAEncoderHandle initializeFPGAEncoder(HalHandle digitalSourceHandleA,
-                                           AnalogTriggerType analogTriggerTypeA,
-                                           HalHandle digitalSourceHandleB,
-                                           AnalogTriggerType analogTriggerTypeB,
-                                           bool reverseDirection,
-                                           int32_t* index, int32_t* status) {
+HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
+    HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
+    HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
+    bool reverseDirection, int32_t* index, int32_t* status) {
   bool routingAnalogTriggerA = false;
   uint32_t routingPinA = 0;
   uint8_t routingModuleA = 0;
@@ -48,19 +46,19 @@ HalFPGAEncoderHandle initializeFPGAEncoder(HalHandle digitalSourceHandleA,
 
   if (!successA || !successB) {
     *status = HAL_HANDLE_ERROR;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
 
   auto handle = fpgaEncoderHandles.Allocate();
-  if (handle == HAL_INVALID_HANDLE) {  // out of resources
+  if (handle == HAL_kInvalidHandle) {  // out of resources
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
 
   auto encoder = fpgaEncoderHandles.Get(handle);
   if (encoder == nullptr) {  // will only error on thread issue
     *status = HAL_HANDLE_ERROR;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
 
   encoder->index = static_cast<uint32_t>(getHandleIndex(handle));
@@ -83,8 +81,8 @@ HalFPGAEncoderHandle initializeFPGAEncoder(HalHandle digitalSourceHandleA,
   return handle;
 }
 
-void freeFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
-                     int32_t* status) {
+void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                         int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   fpgaEncoderHandles.Free(fpga_encoder_handle);
   if (encoder == nullptr) {
@@ -98,8 +96,8 @@ void freeFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
  * Reset the Encoder distance to zero.
  * Resets the current count to zero on the encoder.
  */
-void resetFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
-                      int32_t* status) {
+void HAL_ResetFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                          int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -114,8 +112,8 @@ void resetFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
  * factor.
  * @return Current fpga count from the encoder
  */
-int32_t getFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
-                       int32_t* status) {
+int32_t HAL_GetFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                           int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -134,8 +132,8 @@ int32_t getFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
  *
  * @return Period in seconds of the most recent pulse.
  */
-double getFPGAEncoderPeriod(HalFPGAEncoderHandle fpga_encoder_handle,
-                            int32_t* status) {
+double HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -170,8 +168,8 @@ double getFPGAEncoderPeriod(HalFPGAEncoderHandle fpga_encoder_handle,
  * FPGA will
  * report the device stopped. This is expressed in seconds.
  */
-void setFPGAEncoderMaxPeriod(HalFPGAEncoderHandle fpga_encoder_handle,
-                             double maxPeriod, int32_t* status) {
+void HAL_SetFPGAEncoderMaxPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                 double maxPeriod, int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -188,8 +186,8 @@ void setFPGAEncoderMaxPeriod(HalFPGAEncoderHandle fpga_encoder_handle,
  * one where the most recent pulse width exceeds the MaxPeriod.
  * @return True if the encoder is considered stopped.
  */
-bool getFPGAEncoderStopped(HalFPGAEncoderHandle fpga_encoder_handle,
-                           int32_t* status) {
+bool HAL_GetFPGAEncoderStopped(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                               int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -202,8 +200,8 @@ bool getFPGAEncoderStopped(HalFPGAEncoderHandle fpga_encoder_handle,
  * The last direction the encoder value changed.
  * @return The last direction the encoder value changed.
  */
-bool getFPGAEncoderDirection(HalFPGAEncoderHandle fpga_encoder_handle,
-                             int32_t* status) {
+bool HAL_GetFPGAEncoderDirection(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                 int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -218,8 +216,9 @@ bool getFPGAEncoderDirection(HalFPGAEncoderHandle fpga_encoder_handle,
  * correct software direction regardless of the mounting.
  * @param reverseDirection true if the encoder direction should be reversed
  */
-void setFPGAEncoderReverseDirection(HalFPGAEncoderHandle fpga_encoder_handle,
-                                    bool reverseDirection, int32_t* status) {
+void HAL_SetFPGAEncoderReverseDirection(
+    HAL_FPGAEncoderHandle fpga_encoder_handle, bool reverseDirection,
+    int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -234,9 +233,9 @@ void setFPGAEncoderReverseDirection(HalFPGAEncoderHandle fpga_encoder_handle,
  * mechanical imperfections or as oversampling to increase resolution.
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
-void setFPGAEncoderSamplesToAverage(HalFPGAEncoderHandle fpga_encoder_handle,
-                                    uint32_t samplesToAverage,
-                                    int32_t* status) {
+void HAL_SetFPGAEncoderSamplesToAverage(
+    HAL_FPGAEncoderHandle fpga_encoder_handle, uint32_t samplesToAverage,
+    int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -254,8 +253,8 @@ void setFPGAEncoderSamplesToAverage(HalFPGAEncoderHandle fpga_encoder_handle,
  * mechanical imperfections or as oversampling to increase resolution.
  * @return SamplesToAverage The number of samples being averaged (from 1 to 127)
  */
-uint32_t getFPGAEncoderSamplesToAverage(
-    HalFPGAEncoderHandle fpga_encoder_handle, int32_t* status) {
+uint32_t HAL_GetFPGAEncoderSamplesToAverage(
+    HAL_FPGAEncoderHandle fpga_encoder_handle, int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -268,11 +267,11 @@ uint32_t getFPGAEncoderSamplesToAverage(
  * Set an index source for an encoder, which is an input that resets the
  * encoder's count.
  */
-void setFPGAEncoderIndexSource(HalFPGAEncoderHandle fpga_encoder_handle,
-                               HalHandle digitalSourceHandle,
-                               AnalogTriggerType analogTriggerType,
-                               bool activeHigh, bool edgeSensitive,
-                               int32_t* status) {
+void HAL_SetFPGAEncoderIndexSource(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                   HAL_Handle digitalSourceHandle,
+                                   HAL_AnalogTriggerType analogTriggerType,
+                                   bool activeHigh, bool edgeSensitive,
+                                   int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;

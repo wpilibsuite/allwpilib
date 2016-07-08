@@ -27,8 +27,6 @@
 #include "handles/HandlesInternal.h"
 #include "visa/visa.h"
 
-const uint32_t kSystemClockTicksPerMicrosecond = 40;
-
 static tGlobal* global = nullptr;
 static tSysWatchdog* watchdog = nullptr;
 
@@ -36,22 +34,22 @@ static priority_mutex timeMutex;
 static priority_mutex msgMutex;
 static uint32_t timeEpoch = 0;
 static uint32_t prevFPGATime = 0;
-static HalNotifierHandle rolloverNotifier = 0;
+static HAL_NotifierHandle rolloverNotifier = 0;
 
 using namespace hal;
 
 extern "C" {
 
-HalPortHandle getPort(uint8_t pin) { return createPortHandle(pin, 1); }
+HAL_PortHandle HAL_GetPort(uint8_t pin) { return createPortHandle(pin, 1); }
 
 /**
  * @deprecated Uses module numbers
  */
-HalPortHandle getPortWithModule(uint8_t module, uint8_t pin) {
+HAL_PortHandle HAL_GetPortWithModule(uint8_t module, uint8_t pin) {
   return createPortHandle(pin, module);
 }
 
-const char* getHALErrorMessage(int32_t code) {
+const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
     case 0:
       return "";
@@ -161,7 +159,7 @@ const char* getHALErrorMessage(int32_t code) {
  * For now, expect this to be competition year.
  * @return FPGA Version number.
  */
-uint16_t getFPGAVersion(int32_t* status) {
+uint16_t HAL_GetFPGAVersion(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -177,7 +175,7 @@ uint16_t getFPGAVersion(int32_t* status) {
  * The 12 least significant bits are the Build Number.
  * @return FPGA Revision number.
  */
-uint32_t getFPGARevision(int32_t* status) {
+uint32_t HAL_GetFPGARevision(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -191,7 +189,7 @@ uint32_t getFPGARevision(int32_t* status) {
  * @return The current time in microseconds according to the FPGA (since FPGA
  * reset).
  */
-uint64_t getFPGATime(int32_t* status) {
+uint64_t HAL_GetFPGATime(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -209,7 +207,7 @@ uint64_t getFPGATime(int32_t* status) {
  * Get the state of the "USER" button on the roboRIO
  * @return true if the button is currently pressed down
  */
-bool getFPGAButton(int32_t* status) {
+bool HAL_GetFPGAButton(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -217,13 +215,13 @@ bool getFPGAButton(int32_t* status) {
   return global->readUserButton(status);
 }
 
-int HALSetErrorData(const char* errors, int errorsLength, int wait_ms) {
+int HAL_SetErrorData(const char* errors, int errorsLength, int wait_ms) {
   return setErrorData(errors, errorsLength, wait_ms);
 }
 
-int HALSendError(int isError, int32_t errorCode, int isLVCode,
-                 const char* details, const char* location,
-                 const char* callStack, int printMsg) {
+int HAL_SendError(int isError, int32_t errorCode, int isLVCode,
+                  const char* details, const char* location,
+                  const char* callStack, int printMsg) {
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
@@ -232,7 +230,7 @@ int HALSendError(int isError, int32_t errorCode, int isLVCode,
   static uint64_t prev_msg_time[KEEP_MSGS] = {0, 0, 0};
 
   int32_t status = 0;
-  uint64_t curTime = getFPGATime(&status);
+  uint64_t curTime = HAL_GetFPGATime(&status);
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prev_msg[i] == details) break;
@@ -267,7 +265,7 @@ int HALSendError(int isError, int32_t errorCode, int isLVCode,
   return retval;
 }
 
-bool HALGetSystemActive(int32_t* status) {
+bool HAL_GetSystemActive(int32_t* status) {
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -275,7 +273,7 @@ bool HALGetSystemActive(int32_t* status) {
   return watchdog->readStatus_SystemActive(status);
 }
 
-bool HALGetBrownedOut(int32_t* status) {
+bool HAL_GetBrownedOut(int32_t* status) {
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -291,13 +289,14 @@ static void HALCleanupAtExit() {
 static void timerRollover(uint64_t currentTime, void*) {
   // reschedule timer for next rollover
   int32_t status = 0;
-  updateNotifierAlarm(rolloverNotifier, currentTime + 0x80000000ULL, &status);
+  HAL_UpdateNotifierAlarm(rolloverNotifier, currentTime + 0x80000000ULL,
+                          &status);
 }
 
 /**
  * Call this to start up HAL. This is required for robot programs.
  */
-int HALInitialize(int mode) {
+int HAL_Initialize(int mode) {
   setlinebuf(stdin);
   setlinebuf(stdout);
 
@@ -315,11 +314,12 @@ int HALInitialize(int mode) {
   std::atexit(HALCleanupAtExit);
 
   if (!rolloverNotifier)
-    rolloverNotifier = initializeNotifier(timerRollover, nullptr, &status);
+    rolloverNotifier = HAL_InitializeNotifier(timerRollover, nullptr, &status);
   if (status == 0) {
-    uint64_t curTime = getFPGATime(&status);
+    uint64_t curTime = HAL_GetFPGATime(&status);
     if (status == 0)
-      updateNotifierAlarm(rolloverNotifier, curTime + 0x80000000ULL, &status);
+      HAL_UpdateNotifierAlarm(rolloverNotifier, curTime + 0x80000000ULL,
+                              &status);
   }
 
   // Kill any previous robot programs
@@ -363,8 +363,8 @@ int HALInitialize(int mode) {
   return 1;
 }
 
-uint32_t HALReport(uint8_t resource, uint8_t instanceNumber, uint8_t context,
-                   const char* feature) {
+uint32_t HAL_Report(uint8_t resource, uint8_t instanceNumber, uint8_t context,
+                    const char* feature) {
   if (feature == nullptr) {
     feature = "";
   }

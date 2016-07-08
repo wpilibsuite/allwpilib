@@ -33,7 +33,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_ConstantsJNI_getSystemClockTicksPerMicrosecond(
     JNIEnv *env, jclass) {
   CONSTANTSJNI_LOG(logDEBUG) << "Calling ConstantsJNI getSystemClockTicksPerMicrosecond";
-  jint value = HAL_getSystemClockTicksPerMicrosecond();
+  jint value = HAL_GetSystemClockTicksPerMicrosecond();
   CONSTANTSJNI_LOG(logDEBUG) << "Value = " << value;
   return value;
 }

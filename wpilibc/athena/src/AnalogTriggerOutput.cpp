@@ -24,16 +24,16 @@
 AnalogTriggerOutput::AnalogTriggerOutput(const AnalogTrigger& trigger,
                                          AnalogTriggerType outputType)
     : m_trigger(trigger), m_outputType(outputType) {
-  HALReport(HALUsageReporting::kResourceType_AnalogTriggerOutput,
-            trigger.GetIndex(), outputType);
+  HAL_Report(HALUsageReporting::kResourceType_AnalogTriggerOutput,
+             trigger.GetIndex(), (uint8_t)outputType);
 }
 
 AnalogTriggerOutput::~AnalogTriggerOutput() {
-  if (m_interrupt != HAL_INVALID_HANDLE) {
+  if (m_interrupt != HAL_kInvalidHandle) {
     int32_t status = 0;
-    cleanInterrupts(m_interrupt, &status);
+    HAL_CleanInterrupts(m_interrupt, &status);
     // ignore status, as an invalid handle just needs to be ignored.
-    m_interrupt = HAL_INVALID_HANDLE;
+    m_interrupt = HAL_kInvalidHandle;
   }
 }
 
@@ -44,16 +44,16 @@ AnalogTriggerOutput::~AnalogTriggerOutput() {
  */
 bool AnalogTriggerOutput::Get() const {
   int32_t status = 0;
-  bool result =
-      getAnalogTriggerOutput(m_trigger.m_trigger, m_outputType, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  bool result = HAL_GetAnalogTriggerOutput(
+      m_trigger.m_trigger, (HAL_AnalogTriggerType)m_outputType, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return result;
 }
 
 /**
  * @return The HAL Handle to the specified source.
  */
-HalHandle AnalogTriggerOutput::GetPortHandleForRouting() const {
+HAL_Handle AnalogTriggerOutput::GetPortHandleForRouting() const {
   return m_trigger.m_trigger;
 }
 

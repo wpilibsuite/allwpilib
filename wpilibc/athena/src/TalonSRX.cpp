@@ -34,6 +34,6 @@ TalonSRX::TalonSRX(uint32_t channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HALReport(HALUsageReporting::kResourceType_TalonSRX, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_TalonSRX, GetChannel());
   LiveWindow::GetInstance()->AddActuator("TalonSRX", GetChannel(), this);
 }

@@ -25,14 +25,14 @@ namespace hal {
  * Because they are allocated by index, each individual index holds its own
  * mutex, which reduces contention heavily.]
  *
- * @tparam THandle The Handle Type (Must be typedefed from HalHandle)
+ * @tparam THandle The Handle Type (Must be typedefed from HAL_Handle)
  * @tparam TStruct The struct type held by this resource
  * @tparam size The number of resources allowed to be allocated
  * @tparam enumValue The type value stored in the handle
  *
  */
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 class IndexedHandleResource {
   friend class IndexedHandleResourceTest;
 
@@ -52,7 +52,7 @@ class IndexedHandleResource {
 };
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 IndexedHandleResource<THandle, TStruct, size,
                       enumValue>::IndexedHandleResource() {
   m_structures = new std::shared_ptr<TStruct>[size];
@@ -60,7 +60,7 @@ IndexedHandleResource<THandle, TStruct, size,
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 IndexedHandleResource<THandle, TStruct, size,
                       enumValue>::~IndexedHandleResource() {
   delete[] m_structures;
@@ -68,26 +68,26 @@ IndexedHandleResource<THandle, TStruct, size,
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 THandle IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     int16_t index, int32_t* status) {
   // don't aquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   std::lock_guard<priority_mutex> sync(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     *status = RESOURCE_IS_ALLOCATED;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   m_structures[index] = std::make_shared<TStruct>();
   return (THandle)hal::createHandle(index, enumValue);
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 std::shared_ptr<TStruct>
 IndexedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
@@ -102,7 +102,7 @@ IndexedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 void IndexedHandleResource<THandle, TStruct, size, enumValue>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
