@@ -69,21 +69,30 @@ void setCounterAverageSize(HalCounterHandle counter_handle, int32_t size,
  * Set the source object that causes the counter to count up.
  * Set the up counting DigitalSource.
  */
-void setCounterUpSource(HalCounterHandle counter_handle, uint32_t pin,
-                        bool analogTrigger, int32_t* status) {
+void setCounterUpSource(HalCounterHandle counter_handle,
+                        HalHandle digitalSourceHandle,
+                        AnalogTriggerType analogTriggerType, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
-  uint8_t module;
+  bool routingAnalogTrigger = false;
+  uint32_t routingPin = 0;
+  uint8_t routingModule = 0;
+  bool success =
+      remapDigitalSource(digitalSourceHandle, analogTriggerType, routingPin,
+                         routingModule, routingAnalogTrigger);
+  if (!success) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
 
-  remapDigitalSource(analogTrigger, pin, module);
-
-  counter->counter->writeConfig_UpSource_Module(module, status);
-  counter->counter->writeConfig_UpSource_Channel(pin, status);
-  counter->counter->writeConfig_UpSource_AnalogTrigger(analogTrigger, status);
+  counter->counter->writeConfig_UpSource_Module(routingModule, status);
+  counter->counter->writeConfig_UpSource_Channel(routingPin, status);
+  counter->counter->writeConfig_UpSource_AnalogTrigger(routingAnalogTrigger,
+                                                       status);
 
   if (counter->counter->readConfig_Mode(status) == kTwoPulse ||
       counter->counter->readConfig_Mode(status) == kExternalDirection) {
@@ -127,8 +136,10 @@ void clearCounterUpSource(HalCounterHandle counter_handle, int32_t* status) {
  * Set the source object that causes the counter to count down.
  * Set the down counting DigitalSource.
  */
-void setCounterDownSource(HalCounterHandle counter_handle, uint32_t pin,
-                          bool analogTrigger, int32_t* status) {
+void setCounterDownSource(HalCounterHandle counter_handle,
+                          HalHandle digitalSourceHandle,
+                          AnalogTriggerType analogTriggerType,
+                          int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -142,13 +153,21 @@ void setCounterDownSource(HalCounterHandle counter_handle, uint32_t pin,
     return;
   }
 
-  uint8_t module;
+  bool routingAnalogTrigger = false;
+  uint32_t routingPin = 0;
+  uint8_t routingModule = 0;
+  bool success =
+      remapDigitalSource(digitalSourceHandle, analogTriggerType, routingPin,
+                         routingModule, routingAnalogTrigger);
+  if (!success) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
 
-  remapDigitalSource(analogTrigger, pin, module);
-
-  counter->counter->writeConfig_DownSource_Module(module, status);
-  counter->counter->writeConfig_DownSource_Channel(pin, status);
-  counter->counter->writeConfig_DownSource_AnalogTrigger(analogTrigger, status);
+  counter->counter->writeConfig_DownSource_Module(routingModule, status);
+  counter->counter->writeConfig_DownSource_Channel(routingPin, status);
+  counter->counter->writeConfig_DownSource_AnalogTrigger(routingAnalogTrigger,
+                                                         status);
 
   setCounterDownSourceEdge(counter_handle, true, false, status);
   counter->counter->strobeReset(status);

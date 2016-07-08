@@ -230,8 +230,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
       m_allocatedUpSource = false;
     }
     m_upSource = source;
-    CounterJNI.setCounterUpSource(m_counter, source.getChannelForRouting(),
-        source.getAnalogTriggerForRouting());
+    CounterJNI.setCounterUpSource(m_counter, source.getPortHandleForRouting(),
+        source.getAnalogTriggerTypeForRouting());
   }
 
   /**
@@ -303,8 +303,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
       m_downSource.free();
       m_allocatedDownSource = false;
     }
-    CounterJNI.setCounterDownSource(m_counter, source.getChannelForRouting(),
-        source.getAnalogTriggerForRouting());
+    CounterJNI.setCounterDownSource(m_counter, source.getPortHandleForRouting(),
+        source.getAnalogTriggerTypeForRouting());
     m_downSource = source;
   }
 

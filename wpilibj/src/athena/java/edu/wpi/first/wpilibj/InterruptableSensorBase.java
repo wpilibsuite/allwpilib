@@ -61,21 +61,14 @@ public abstract class InterruptableSensorBase extends SensorBase {
    *
    * @return true if this is an analog trigger.
    */
-  abstract boolean getAnalogTriggerForRouting();
+  public abstract int getAnalogTriggerTypeForRouting();
 
   /**
    * The channel routing number.
    *
    * @return channel routing number
    */
-  abstract int getChannelForRouting();
-
-  /**
-   * The modules routing number.
-   *
-   * @return module routing number
-   */
-  abstract byte getModuleForRouting();
+  public abstract int getPortHandleForRouting();
 
   /**
    * Request one of the 8 interrupts asynchronously on this digital input.
@@ -95,8 +88,8 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
     assert (m_interrupt != 0);
 
-    InterruptJNI.requestInterrupts(m_interrupt, getModuleForRouting(), getChannelForRouting(),
-        getAnalogTriggerForRouting());
+    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(), 
+                                   getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
     InterruptJNI.attachInterruptHandler(m_interrupt, handler.m_function,
         handler.overridableParameter());
@@ -116,8 +109,8 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
     assert (m_interrupt != 0);
 
-    InterruptJNI.requestInterrupts(m_interrupt, getModuleForRouting(), getChannelForRouting(),
-        getAnalogTriggerForRouting());
+    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(), 
+                                   getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
 
   }

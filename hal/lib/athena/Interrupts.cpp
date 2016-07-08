@@ -14,6 +14,7 @@
 #include "DigitalInternal.h"
 #include "HAL/Errors.h"
 #include "PortsInternal.h"
+#include "handles/HandlesInternal.h"
 #include "handles/LimitedHandleResource.h"
 
 using namespace hal;
@@ -147,19 +148,28 @@ double readFallingTimestamp(HalInterruptHandle interrupt_handle,
 }
 
 void requestInterrupts(HalInterruptHandle interrupt_handle,
-                       uint8_t routing_module, uint32_t routing_pin,
-                       bool routing_analog_trigger, int32_t* status) {
+                       HalHandle digitalSourceHandle,
+                       AnalogTriggerType analogTriggerType, int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
   anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
-  remapDigitalSource(routing_analog_trigger, routing_pin, routing_module);
+  bool routingAnalogTrigger = false;
+  uint32_t routingPin = 0;
+  uint8_t routingModule = 0;
+  bool success =
+      remapDigitalSource(digitalSourceHandle, analogTriggerType, routingPin,
+                         routingModule, routingAnalogTrigger);
+  if (!success) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
   anInterrupt->anInterrupt->writeConfig_Source_AnalogTrigger(
-      routing_analog_trigger, status);
-  anInterrupt->anInterrupt->writeConfig_Source_Channel(routing_pin, status);
-  anInterrupt->anInterrupt->writeConfig_Source_Module(routing_module, status);
+      routingAnalogTrigger, status);
+  anInterrupt->anInterrupt->writeConfig_Source_Channel(routingPin, status);
+  anInterrupt->anInterrupt->writeConfig_Source_Module(routingModule, status);
 }
 
 void attachInterruptHandler(HalInterruptHandle interrupt_handle,

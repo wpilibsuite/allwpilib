@@ -82,17 +82,19 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterAverageSize(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CounterJNI
  * Method:    setCounterUpSource
- * Signature: (IIZ)V
+ * Signature: (III)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSource(
-    JNIEnv* env, jclass, jint id, jint pin, jboolean analogTrigger) {
+    JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
+    jint analogTriggerType) {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterUpSource";
   COUNTERJNI_LOG(logDEBUG) << "Counter Handle = " << (HalCounterHandle)id;
-  COUNTERJNI_LOG(logDEBUG) << "Pin = " << pin;
-  COUNTERJNI_LOG(logDEBUG) << "AnalogTrigger = " << (jint)analogTrigger;
+  COUNTERJNI_LOG(logDEBUG) << "digitalSourceHandle = " << digitalSourceHandle;
+  COUNTERJNI_LOG(logDEBUG) << "analogTriggerType = " << analogTriggerType;
   int32_t status = 0;
-  setCounterUpSource((HalCounterHandle)id, pin, analogTrigger, &status);
+  setCounterUpSource((HalCounterHandle)id, (HalHandle)digitalSourceHandle, 
+                     (AnalogTriggerType)analogTriggerType, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -138,13 +140,15 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterUpSource(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSource(
-    JNIEnv* env, jclass, jint id, jint pin, jboolean analogTrigger) {
+    JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
+    jint analogTriggerType) {
   COUNTERJNI_LOG(logDEBUG) << "Calling COUNTERJNI setCounterDownSource";
   COUNTERJNI_LOG(logDEBUG) << "Counter Handle = " << (HalCounterHandle)id;
-  COUNTERJNI_LOG(logDEBUG) << "Pin = " << pin;
-  COUNTERJNI_LOG(logDEBUG) << "AnalogTrigger = " << (jint)analogTrigger;
+  COUNTERJNI_LOG(logDEBUG) << "digitalSourceHandle = " << digitalSourceHandle;
+  COUNTERJNI_LOG(logDEBUG) << "analogTriggerType = " << analogTriggerType;
   int32_t status = 0;
-  setCounterDownSource((HalCounterHandle)id, pin, analogTrigger, &status);
+  setCounterDownSource((HalCounterHandle)id, (HalHandle)digitalSourceHandle, 
+                       (AnalogTriggerType)analogTriggerType, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   if (status == PARAMETER_OUT_OF_RANGE) {
     ThrowIllegalArgumentException(env,

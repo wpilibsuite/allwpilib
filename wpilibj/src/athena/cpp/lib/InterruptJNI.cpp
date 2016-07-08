@@ -257,22 +257,20 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readFallingTimestamp(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
  * Method:    requestInterrupts
- * Signature: (JBIZ)V
+ * Signature: (III)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterrupts(
-    JNIEnv* env, jclass, jint interrupt_handle, jbyte routing_module,
-    jint routing_pin, jboolean routing_analog_trigger) {
+    JNIEnv* env, jclass, jint interrupt_handle, jint digitalSourceHandle,
+    jint analogTriggerType) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI requestInterrupts";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HalInterruptHandle)interrupt_handle;
-  INTERRUPTJNI_LOG(logDEBUG) << "routing module = " << (jint)routing_module;
-  INTERRUPTJNI_LOG(logDEBUG) << "routing pin = " << routing_pin;
-  INTERRUPTJNI_LOG(logDEBUG) << "routing analog trigger = "
-                             << (jint)routing_analog_trigger;
+  INTERRUPTJNI_LOG(logDEBUG) << "digitalSourceHandle = " << digitalSourceHandle;
+  INTERRUPTJNI_LOG(logDEBUG) << "analogTriggerType = " << analogTriggerType;
 
   int32_t status = 0;
-  requestInterrupts((HalInterruptHandle)interrupt_handle, (uint8_t)routing_module,
-                    (uint32_t)routing_pin, routing_analog_trigger, &status);
+  requestInterrupts((HalInterruptHandle)interrupt_handle, (HalHandle)digitalSourceHandle, 
+                    (AnalogTriggerType)analogTriggerType, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);

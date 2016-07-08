@@ -17,19 +17,18 @@
 
 using namespace hal;
 
-Encoder::Encoder(uint8_t port_a_module, uint32_t port_a_pin,
-                 bool port_a_analog_trigger, uint8_t port_b_module,
-                 uint32_t port_b_pin, bool port_b_analog_trigger,
-                 bool reverseDirection, EncoderEncodingType encodingType,
-                 int32_t* status) {
+Encoder::Encoder(HalHandle digitalSourceHandleA,
+                 AnalogTriggerType analogTriggerTypeA,
+                 HalHandle digitalSourceHandleB,
+                 AnalogTriggerType analogTriggerTypeB, bool reverseDirection,
+                 EncoderEncodingType encodingType, int32_t* status) {
   m_encodingType = encodingType;
   switch (encodingType) {
     case HAL_Encoder_k4X: {
       m_encodingScale = 4;
-      m_encoder = initializeFPGAEncoder(port_a_module, port_a_pin,
-                                        port_a_analog_trigger, port_b_module,
-                                        port_b_pin, port_b_analog_trigger,
-                                        reverseDirection, &m_index, status);
+      m_encoder = initializeFPGAEncoder(
+          digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
+          analogTriggerTypeB, reverseDirection, &m_index, status);
       if (*status != 0) {
         return;
       }
@@ -39,9 +38,9 @@ Encoder::Encoder(uint8_t port_a_module, uint32_t port_a_pin,
     }
     case HAL_Encoder_k1X:
     case HAL_Encoder_k2X: {
-      SetupCounter(port_a_module, port_a_pin, port_a_analog_trigger,
-                   port_b_module, port_b_pin, port_b_analog_trigger,
-                   reverseDirection, encodingType, status);
+      SetupCounter(digitalSourceHandleA, analogTriggerTypeA,
+                   digitalSourceHandleB, analogTriggerTypeB, reverseDirection,
+                   encodingType, status);
 
       m_encodingScale = encodingType == HAL_Encoder_k1X ? 1 : 2;
       break;
@@ -52,9 +51,10 @@ Encoder::Encoder(uint8_t port_a_module, uint32_t port_a_pin,
   }
 }
 
-void Encoder::SetupCounter(uint8_t port_a_module, uint32_t port_a_pin,
-                           bool port_a_analog_trigger, uint8_t port_b_module,
-                           uint32_t port_b_pin, bool port_b_analog_trigger,
+void Encoder::SetupCounter(HalHandle digitalSourceHandleA,
+                           AnalogTriggerType analogTriggerTypeA,
+                           HalHandle digitalSourceHandleB,
+                           AnalogTriggerType analogTriggerTypeB,
                            bool reverseDirection,
                            EncoderEncodingType encodingType, int32_t* status) {
   m_encodingScale = encodingType == HAL_Encoder_k1X ? 1 : 2;
@@ -62,9 +62,11 @@ void Encoder::SetupCounter(uint8_t port_a_module, uint32_t port_a_pin,
   if (*status != 0) return;
   setCounterMaxPeriod(m_counter, 0.5, status);
   if (*status != 0) return;
-  setCounterUpSource(m_counter, port_a_pin, port_a_analog_trigger, status);
+  setCounterUpSource(m_counter, digitalSourceHandleA, analogTriggerTypeA,
+                     status);
   if (*status != 0) return;
-  setCounterDownSource(m_counter, port_b_pin, port_b_analog_trigger, status);
+  setCounterDownSource(m_counter, digitalSourceHandleB, analogTriggerTypeB,
+                       status);
   if (*status != 0) return;
   if (encodingType == HAL_Encoder_k1X) {
     setCounterUpSourceEdge(m_counter, true, false, status);
@@ -187,7 +189,8 @@ int32_t Encoder::GetSamplesToAverage(int32_t* status) const {
   }
 }
 
-void Encoder::SetIndexSource(uint32_t pin, bool analogTrigger,
+void Encoder::SetIndexSource(HalHandle digitalSourceHandle,
+                             AnalogTriggerType analogTriggerType,
                              EncoderIndexingType type, int32_t* status) {
   if (m_counter) {
     *status = HAL_COUNTER_NOT_SUPPORTED;
@@ -197,8 +200,8 @@ void Encoder::SetIndexSource(uint32_t pin, bool analogTrigger,
       (type == HAL_kResetWhileHigh) || (type == HAL_kResetOnRisingEdge);
   bool edgeSensitive =
       (type == HAL_kResetOnFallingEdge) || (type == HAL_kResetOnRisingEdge);
-  setFPGAEncoderIndexSource(m_encoder, pin, analogTrigger, activeHigh,
-                            edgeSensitive, status);
+  setFPGAEncoderIndexSource(m_encoder, digitalSourceHandle, analogTriggerType,
+                            activeHigh, edgeSensitive, status);
 }
 
 double Encoder::DecodingScaleFactor() const {
@@ -221,13 +224,12 @@ static LimitedClassedHandleResource<HalEncoderHandle, Encoder,
 
 extern "C" {
 HalEncoderHandle initializeEncoder(
-    uint8_t port_a_module, uint32_t port_a_pin, bool port_a_analog_trigger,
-    uint8_t port_b_module, uint32_t port_b_pin, bool port_b_analog_trigger,
+    HalHandle digitalSourceHandleA, AnalogTriggerType analogTriggerTypeA,
+    HalHandle digitalSourceHandleB, AnalogTriggerType analogTriggerTypeB,
     bool reverseDirection, EncoderEncodingType encodingType, int32_t* status) {
   auto encoder = std::make_shared<Encoder>(
-      port_a_module, port_a_pin, port_a_analog_trigger, port_b_module,
-      port_b_pin, port_b_analog_trigger, reverseDirection, encodingType,
-      status);
+      digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
+      analogTriggerTypeB, reverseDirection, encodingType, status);
   if (*status != 0) return HAL_INVALID_HANDLE;  // return in creation error
   auto handle = encoderHandles.Allocate(encoder);
   if (handle == HAL_INVALID_HANDLE) {
@@ -413,15 +415,16 @@ EncoderEncodingType getEncoderEncodingType(HalEncoderHandle encoder_handle,
   return encoder->GetEncodingType();
 }
 
-void setEncoderIndexSource(HalEncoderHandle encoder_handle, uint32_t pin,
-                           uint8_t analogTrigger, EncoderIndexingType type,
-                           int32_t* status) {
+void setEncoderIndexSource(HalEncoderHandle encoder_handle,
+                           HalHandle digitalSourceHandle,
+                           AnalogTriggerType analogTriggerType,
+                           EncoderIndexingType type, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  encoder->SetIndexSource(pin, analogTrigger, type, status);
+  encoder->SetIndexSource(digitalSourceHandle, analogTriggerType, type, status);
 }
 
 int32_t getEncoderFPGAIndex(HalEncoderHandle encoder_handle, int32_t* status) {

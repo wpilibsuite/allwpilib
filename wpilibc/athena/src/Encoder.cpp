@@ -31,18 +31,18 @@
  */
 void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
   int32_t status = 0;
-  m_encoder = initializeEncoder(
-      m_aSource->GetModuleForRouting(), m_aSource->GetChannelForRouting(),
-      m_aSource->GetAnalogTriggerForRouting(), m_bSource->GetModuleForRouting(),
-      m_bSource->GetChannelForRouting(),
-      m_bSource->GetAnalogTriggerForRouting(), reverseDirection,
-      (EncoderEncodingType)encodingType, &status);
+  m_encoder = initializeEncoder(m_aSource->GetPortHandleForRouting(),
+                                m_aSource->GetAnalogTriggerTypeForRouting(),
+                                m_bSource->GetPortHandleForRouting(),
+                                m_bSource->GetAnalogTriggerTypeForRouting(),
+                                reverseDirection,
+                                (EncoderEncodingType)encodingType, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   HALReport(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
             encodingType);
-  LiveWindow::GetInstance()->AddSensor("Encoder",
-                                       m_aSource->GetChannelForRouting(), this);
+  LiveWindow::GetInstance()->AddSensor("Encoder", m_aSource->GetChannel(),
+                                       this);
 }
 
 /**
@@ -447,10 +447,9 @@ double Encoder::PIDGet() {
  * @param type    The state that will cause the encoder to reset
  */
 void Encoder::SetIndexSource(uint32_t channel, Encoder::IndexingType type) {
-  int32_t status = 0;
-  setEncoderIndexSource(m_encoder, channel, false, (EncoderIndexingType)type,
-                        &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  // Force digital input if just given an index
+  m_indexSource = std::make_unique<DigitalInput>(channel);
+  SetIndexSource(m_indexSource.get(), type);
 }
 
 /**
@@ -478,8 +477,8 @@ void Encoder::SetIndexSource(DigitalSource* source,
 void Encoder::SetIndexSource(const DigitalSource& source,
                              Encoder::IndexingType type) {
   int32_t status = 0;
-  setEncoderIndexSource(m_encoder, source.GetChannelForRouting(),
-                        source.GetAnalogTriggerForRouting(),
+  setEncoderIndexSource(m_encoder, source.GetPortHandleForRouting(),
+                        source.GetAnalogTriggerTypeForRouting(),
                         (EncoderIndexingType)type, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }

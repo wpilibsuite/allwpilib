@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.hal.EncoderJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.wpilibj.util.AllocationException;
 
 /**
  * Class to read quad encoders. Quadrature encoders are devices that count shaft rotation and can
@@ -72,15 +73,14 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param reverseDirection If true, counts down instead of up (this is all relative)
    */
   private void initEncoder(boolean reverseDirection, final EncodingType type) {
-    m_encoder = EncoderJNI.initializeEncoder(m_aSource.getModuleForRouting(), 
-      (byte)m_aSource.getChannelForRouting(), m_aSource.getAnalogTriggerForRouting(), 
-      m_bSource.getModuleForRouting(), (byte)m_bSource.getChannelForRouting(), 
-      m_bSource.getAnalogTriggerForRouting(), reverseDirection, type.value);
+    m_encoder = EncoderJNI.initializeEncoder(m_aSource.getPortHandleForRouting(), 
+      m_aSource.getAnalogTriggerTypeForRouting(), m_bSource.getPortHandleForRouting(), 
+      m_bSource.getAnalogTriggerTypeForRouting(), reverseDirection, type.value);
       
     m_pidSource = PIDSourceType.kDisplacement;
 
     UsageReporting.report(tResourceType.kResourceType_Encoder, getFPGAIndex(), type.value);
-    LiveWindow.addSensor("Encoder", m_aSource.getChannelForRouting(), this);
+    LiveWindow.addSensor("Encoder", m_aSource.getChannel(), this);
   }
 
   /**
@@ -164,7 +164,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     m_bSource = new DigitalInput(channelB);
     m_indexSource = new DigitalInput(indexChannel);
     initEncoder(reverseDirection, EncodingType.k4X);
-    setIndexSource(indexChannel);
+    setIndexSource(m_indexSource);
   }
 
   /**
@@ -564,7 +564,12 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param type    The state that will cause the encoder to reset
    */
   public void setIndexSource(int channel, IndexingType type) {
-    EncoderJNI.setEncoderIndexSource(m_encoder, channel, false, type.value);
+    if (m_allocatedI) {
+      throw new AllocationException("Digital Input for Indexing already allocated");
+    }
+    m_indexSource = new DigitalInput(channel);
+    m_allocatedI = true;
+    setIndexSource(m_indexSource, type);
   }
 
   /**
@@ -575,8 +580,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param type   The state that will cause the encoder to reset
    */
   public void setIndexSource(DigitalSource source, IndexingType type) {
-    EncoderJNI.setEncoderIndexSource(m_encoder, source.getChannelForRouting(), 
-                                     source.getAnalogTriggerForRouting(), type.value);
+    EncoderJNI.setEncoderIndexSource(m_encoder, source.getPortHandleForRouting(), 
+                                     source.getAnalogTriggerTypeForRouting(), type.value);
   }
 
   /**

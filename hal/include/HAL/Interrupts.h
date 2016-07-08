@@ -9,7 +9,8 @@
 
 #include <stdint.h>
 
-#include "Handles.h"
+#include "HAL/AnalogTrigger.h"
+#include "HAL/Handles.h"
 
 extern "C" {
 typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask,
@@ -27,8 +28,8 @@ double readRisingTimestamp(HalInterruptHandle interrupt_handle,
 double readFallingTimestamp(HalInterruptHandle interrupt_handle,
                             int32_t* status);
 void requestInterrupts(HalInterruptHandle interrupt_handle,
-                       uint8_t routing_module, uint32_t routing_pin,
-                       bool routing_analog_trigger, int32_t* status);
+                       HalHandle digitalSourceHandle,
+                       AnalogTriggerType analogTriggerType, int32_t* status);
 void attachInterruptHandler(HalInterruptHandle interrupt_handle,
                             InterruptHandlerFunction handler, void* param,
                             int32_t* status);

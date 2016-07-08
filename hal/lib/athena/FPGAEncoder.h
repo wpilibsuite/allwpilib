@@ -9,14 +9,16 @@
 
 #include <stdint.h>
 
+#include "HAL/AnalogTrigger.h"
 #include "HAL/Handles.h"
 
 extern "C" {
-HalFPGAEncoderHandle initializeFPGAEncoder(
-    uint8_t port_a_module, uint32_t port_a_pin, bool port_a_analog_trigger,
-    uint8_t port_b_module, uint32_t port_b_pin, bool port_b_analog_trigger,
-    bool reverseDirection, int32_t* index,
-    int32_t* status);  // TODO: fix routing
+HalFPGAEncoderHandle initializeFPGAEncoder(HalHandle digitalSourceHandleA,
+                                           AnalogTriggerType analogTriggerTypeA,
+                                           HalHandle digitalSourceHandleB,
+                                           AnalogTriggerType analogTriggerTypeB,
+                                           bool reverseDirection,
+                                           int32_t* index, int32_t* status);
 void freeFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle, int32_t* status);
 void resetFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
                       int32_t* status);
@@ -37,7 +39,8 @@ void setFPGAEncoderSamplesToAverage(HalFPGAEncoderHandle fpga_encoder_handle,
 uint32_t getFPGAEncoderSamplesToAverage(
     HalFPGAEncoderHandle fpga_encoder_handle, int32_t* status);
 void setFPGAEncoderIndexSource(HalFPGAEncoderHandle fpga_encoder_handle,
-                               uint32_t pin, bool analogTrigger,
+                               HalHandle digitalSourceHandle,
+                               AnalogTriggerType analogTriggerType,
                                bool activeHigh, bool edgeSensitive,
                                int32_t* status);
 }
