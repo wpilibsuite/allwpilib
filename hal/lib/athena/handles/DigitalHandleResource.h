@@ -38,15 +38,29 @@ class DigitalHandleResource {
  public:
   DigitalHandleResource(const DigitalHandleResource&) = delete;
   DigitalHandleResource operator=(const DigitalHandleResource&) = delete;
-  DigitalHandleResource() = default;
+  DigitalHandleResource();
+  ~DigitalHandleResource();
   THandle Allocate(int16_t index, HalHandleEnum enumValue, int32_t* status);
   std::shared_ptr<TStruct> Get(THandle handle, HalHandleEnum enumValue);
   void Free(THandle handle, HalHandleEnum enumValue);
 
  private:
-  std::shared_ptr<TStruct> m_structures[size];
-  priority_mutex m_handleMutexes[size];
+  // Dynamic array to shrink HAL file size.
+  std::shared_ptr<TStruct>* m_structures;
+  priority_mutex* m_handleMutexes;
 };
+
+template <typename THandle, typename TStruct, int16_t size>
+DigitalHandleResource<THandle, TStruct, size>::DigitalHandleResource() {
+  m_structures = new std::shared_ptr<TStruct>[size];
+  m_handleMutexes = new priority_mutex[size];
+}
+
+template <typename THandle, typename TStruct, int16_t size>
+DigitalHandleResource<THandle, TStruct, size>::~DigitalHandleResource() {
+  delete[] m_structures;
+  delete[] m_handleMutexes;
+}
 
 template <typename THandle, typename TStruct, int16_t size>
 THandle DigitalHandleResource<THandle, TStruct, size>::Allocate(
