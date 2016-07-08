@@ -12,7 +12,6 @@
 
 #include "ChipObject.h"
 #include "ConstantsInternal.h"
-#include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/AnalogTrigger.h"
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"

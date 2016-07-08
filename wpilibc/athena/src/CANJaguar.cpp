@@ -9,7 +9,6 @@
 
 #include <cassert>
 
-#include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
