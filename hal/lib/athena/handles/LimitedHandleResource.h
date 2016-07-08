@@ -36,16 +36,34 @@ class LimitedHandleResource {
  public:
   LimitedHandleResource(const LimitedHandleResource&) = delete;
   LimitedHandleResource operator=(const LimitedHandleResource&) = delete;
-  LimitedHandleResource() = default;
+  LimitedHandleResource();
+  ~LimitedHandleResource();
   THandle Allocate();
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);
 
  private:
-  std::shared_ptr<TStruct> m_structures[size];
-  priority_mutex m_handleMutexes[size];
+  // Dynamic array to shrink HAL file size.
+  std::shared_ptr<TStruct>* m_structures;
+  priority_mutex* m_handleMutexes;
   priority_mutex m_allocateMutex;
 };
+
+template <typename THandle, typename TStruct, int16_t size,
+          HalHandleEnum enumValue>
+LimitedHandleResource<THandle, TStruct, size,
+                      enumValue>::LimitedHandleResource() {
+  m_structures = new std::shared_ptr<TStruct>[size];
+  m_handleMutexes = new priority_mutex[size];
+}
+
+template <typename THandle, typename TStruct, int16_t size,
+          HalHandleEnum enumValue>
+LimitedHandleResource<THandle, TStruct, size,
+                      enumValue>::~LimitedHandleResource() {
+  delete[] m_structures;
+  delete[] m_handleMutexes;
+}
 
 template <typename THandle, typename TStruct, int16_t size,
           HalHandleEnum enumValue>
