@@ -7,6 +7,7 @@
 
 #include "HAL/Counter.h"
 
+#include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HAL/HAL.h"
 #include "PortsInternal.h"

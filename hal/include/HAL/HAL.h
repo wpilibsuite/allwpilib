@@ -15,6 +15,7 @@
 #include "AnalogOutput.h"
 #include "AnalogTrigger.h"
 #include "Compressor.h"
+#include "Constants.h"
 #include "Counter.h"
 #include "DIO.h"
 #include "Errors.h"
@@ -103,8 +104,6 @@ struct HALJoystickDescriptor {
 };
 
 extern "C" {
-extern const uint32_t kSystemClockTicksPerMicrosecond;
-
 HalPortHandle getPort(uint8_t pin);
 HalPortHandle getPortWithModule(uint8_t module, uint8_t pin);
 const char* getHALErrorMessage(int32_t code);

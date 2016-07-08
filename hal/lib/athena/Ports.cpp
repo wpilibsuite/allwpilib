@@ -29,5 +29,6 @@ int32_t HAL_getNumRelayHeaders(void) { return kNumRelayHeaders; }
 int32_t HAL_getNumPCMModules(void) { return kNumPCMModules; }
 int32_t HAL_getNumSolenoidPins(void) { return kNumSolenoidPins; }
 int32_t HAL_getNumPDPModules(void) { return kNumPDPModules; }
+int32_t HAL_getNumPDPChannels(void) { return kNumPDPChannels; }
 int32_t HAL_getNumCanTalons(void) { return kNumCanTalons; }
 }
