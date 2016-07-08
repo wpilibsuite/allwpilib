@@ -2,8 +2,7 @@
 #ifndef __LoadOut_h__
 #define __LoadOut_h__
 
-#ifdef WIN32
-#include <vxWorks_compat.h>
+#ifdef _WIN32
 #define EXPORT_FUNC __declspec(dllexport) __cdecl
 #elif defined (__vxworks)
 #include <vxWorks.h>
@@ -46,7 +45,7 @@ namespace nLoadOut
 extern "C" {
 #endif
 
-#if defined(__vxworks) || defined(SIMULATION)
+#if defined(__vxworks) || defined(SIMULATION) || defined(_WIN32)
     uint32_t EXPORT_FUNC FRC_NetworkCommunication_nLoadOut_getModulePresence(uint32_t moduleType, uint8_t moduleNumber);
 #endif
     uint32_t EXPORT_FUNC FRC_NetworkCommunication_nLoadOut_getTargetClass();
