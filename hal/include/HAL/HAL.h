@@ -11,6 +11,7 @@
 
 #include "Accelerometer.h"
 #include "AnalogAccumulator.h"
+#include "AnalogGyro.h"
 #include "AnalogInput.h"
 #include "AnalogOutput.h"
 #include "AnalogTrigger.h"
