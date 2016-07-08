@@ -27,8 +27,6 @@
 #include "handles/HandlesInternal.h"
 #include "visa/visa.h"
 
-const uint32_t kSystemClockTicksPerMicrosecond = 40;
-
 static tGlobal* global = nullptr;
 static tSysWatchdog* watchdog = nullptr;
 

@@ -7,7 +7,6 @@
 
 #include "SensorBase.h"
 
-#include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
