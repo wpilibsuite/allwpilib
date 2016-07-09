@@ -64,7 +64,8 @@ bool HAL_GetUserActive6V(int32_t* status) {
  */
 int HAL_GetUserCurrentFaults6V(int32_t* status) {
   initializePower(status);
-  return (int)power->readFaultCounts_OverCurrentFaultCount6V(status);
+  return static_cast<int>(
+      power->readFaultCounts_OverCurrentFaultCount6V(status));
 }
 
 /**
@@ -96,7 +97,8 @@ bool HAL_GetUserActive5V(int32_t* status) {
  */
 int HAL_GetUserCurrentFaults5V(int32_t* status) {
   initializePower(status);
-  return (int)power->readFaultCounts_OverCurrentFaultCount5V(status);
+  return static_cast<int>(
+      power->readFaultCounts_OverCurrentFaultCount5V(status));
 }
 
 unsigned char HAL_GetUserStatus5V(int32_t* status) {
@@ -133,7 +135,8 @@ bool HAL_GetUserActive3V3(int32_t* status) {
  */
 int HAL_GetUserCurrentFaults3V3(int32_t* status) {
   initializePower(status);
-  return (int)power->readFaultCounts_OverCurrentFaultCount3V3(status);
+  return static_cast<int>(
+      power->readFaultCounts_OverCurrentFaultCount3V3(status));
 }
 
 }  // extern "C"

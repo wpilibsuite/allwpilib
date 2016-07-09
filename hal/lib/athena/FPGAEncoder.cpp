@@ -148,7 +148,8 @@ double HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
   } else {
     // output.Period is a fixed point number that counts by 2 (24 bits, 25
     // integer bits)
-    value = (double)(output.Period << 1) / (double)output.Count;
+    value = static_cast<double>(output.Period << 1) /
+            static_cast<double>(output.Count);
   }
   double measuredPeriod = value * 2.5e-8;
   return measuredPeriod / DECODING_SCALING_FACTOR;

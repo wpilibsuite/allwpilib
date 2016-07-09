@@ -119,7 +119,7 @@ float CANTalon::Get() const {
     case kFollower:
     default:
       m_impl->GetAppliedThrottle(value);
-      return (float)value / 1023.0;
+      return static_cast<float>(value) / 1023.0;
   }
 }
 
@@ -156,11 +156,11 @@ void CANTalon::Set(float value) {
         status = CTR_OKAY;
       } break;
       case CANSpeedController::kFollower: {
-        status = m_impl->SetDemand((int)value);
+        status = m_impl->SetDemand(static_cast<int>(value));
       } break;
       case CANSpeedController::kVoltage: {
         // Voltage is an 8.8 fixed point number.
-        int volts = int((m_isInverted ? -value : value) * 256);
+        int volts = static_cast<int>((m_isInverted ? -value : value) * 256);
         status = m_impl->SetDemand(volts);
       } break;
       case CANSpeedController::kSpeed:
@@ -177,7 +177,7 @@ void CANTalon::Set(float value) {
         status = m_impl->SetDemand(milliamperes);
       } break;
       case CANSpeedController::kMotionProfile: {
-        status = m_impl->SetDemand((int)value);
+        status = m_impl->SetDemand(static_cast<int>(value));
       } break;
       default:
         wpi_setWPIErrorWithContext(
@@ -216,7 +216,7 @@ void CANTalon::Reset() {
  * for more information).
  */
 void CANTalon::Disable() {
-  m_impl->SetModeSelect((int)CANTalon::kDisabled);
+  m_impl->SetModeSelect(static_cast<int>(CANTalon::kDisabled));
   m_controlEnabled = false;
 }
 
@@ -358,7 +358,8 @@ void CANTalon::SetFeedbackDevice(FeedbackDevice feedbackDevice) {
    */
   m_feedbackDevice = feedbackDevice;
   /* pass feedback to actual CAN frame */
-  CTR_Code status = m_impl->SetFeedbackDeviceSelect((int)feedbackDevice);
+  CTR_Code status =
+      m_impl->SetFeedbackDeviceSelect(static_cast<int>(feedbackDevice));
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   }
@@ -368,7 +369,8 @@ void CANTalon::SetFeedbackDevice(FeedbackDevice feedbackDevice) {
  * Select the feedback device to use in closed-loop
  */
 void CANTalon::SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs) {
-  CTR_Code status = m_impl->SetStatusFrameRate((int)stateFrame, periodMs);
+  CTR_Code status =
+      m_impl->SetStatusFrameRate(static_cast<int>(stateFrame), periodMs);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   }
@@ -518,7 +520,7 @@ float CANTalon::GetBusVoltage() const {
 float CANTalon::GetOutputVoltage() const {
   int throttle11;
   CTR_Code status = m_impl->GetAppliedThrottle(throttle11);
-  float voltage = GetBusVoltage() * (float(throttle11) / 1023.0);
+  float voltage = GetBusVoltage() * (static_cast<float>(throttle11) / 1023.0);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   }
@@ -1086,7 +1088,8 @@ void CANTalon::SetVoltageRampRate(double rampRate) {
           Talon's throttle ramp is in dThrot/d10ms.  1023 is full fwd, -1023 is
      full rev. */
   double rampRatedThrotPer10ms = (rampRate * 1023.0 / 12.0) / 100;
-  CTR_Code status = m_impl->SetRampThrottle((int)rampRatedThrotPer10ms);
+  CTR_Code status =
+      m_impl->SetRampThrottle(static_cast<int>(rampRatedThrotPer10ms));
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   }
@@ -1586,7 +1589,7 @@ void CANTalon::ApplyControlMode(CANSpeedController::ControlMode mode) {
       break;
   }
   // Keep the talon disabled until Set() is called.
-  CTR_Code status = m_impl->SetModeSelect((int)kDisabled);
+  CTR_Code status = m_impl->SetModeSelect(static_cast<int>(kDisabled));
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   }
@@ -1710,7 +1713,8 @@ double CANTalon::GetNativeUnitsPerRotationScalar(
          * bottom of this func.
          */
       } else {
-        retval = (double)kNativeAdcUnitsPerRotation / m_numPotTurns;
+        retval =
+            static_cast<double>(kNativeAdcUnitsPerRotation) / m_numPotTurns;
         scalingAvail = true;
       }
       break;
@@ -1746,11 +1750,11 @@ double CANTalon::GetNativeUnitsPerRotationScalar(
 int32_t CANTalon::ScaleRotationsToNativeUnits(FeedbackDevice devToLookup,
                                               double fullRotations) const {
   /* first assume we don't have config info, prep the default return */
-  int32_t retval = (int32_t)fullRotations;
+  int32_t retval = static_cast<int32_t>(fullRotations);
   /* retrieve scaling info */
   double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
   /* apply scalar if its available */
-  if (scalar > 0) retval = (int32_t)(fullRotations * scalar);
+  if (scalar > 0) retval = static_cast<int32_t>(fullRotations * scalar);
   return retval;
 }
 
@@ -1768,11 +1772,13 @@ int32_t CANTalon::ScaleRotationsToNativeUnits(FeedbackDevice devToLookup,
 int32_t CANTalon::ScaleVelocityToNativeUnits(FeedbackDevice devToLookup,
                                              double rpm) const {
   /* first assume we don't have config info, prep the default return */
-  int32_t retval = (int32_t)rpm;
+  int32_t retval = static_cast<int32_t>(rpm);
   /* retrieve scaling info */
   double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
   /* apply scalar if its available */
-  if (scalar > 0) retval = (int32_t)(rpm * kMinutesPer100msUnit * scalar);
+  if (scalar > 0) {
+    retval = static_cast<int32_t>(rpm * kMinutesPer100msUnit * scalar);
+  }
   return retval;
 }
 
@@ -1789,11 +1795,11 @@ int32_t CANTalon::ScaleVelocityToNativeUnits(FeedbackDevice devToLookup,
 double CANTalon::ScaleNativeUnitsToRotations(FeedbackDevice devToLookup,
                                              int32_t nativePos) const {
   /* first assume we don't have config info, prep the default return */
-  double retval = (double)nativePos;
+  double retval = static_cast<double>(nativePos);
   /* retrieve scaling info */
   double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
   /* apply scalar if its available */
-  if (scalar > 0) retval = ((double)nativePos) / scalar;
+  if (scalar > 0) retval = static_cast<double>(nativePos) / scalar;
   return retval;
 }
 
@@ -1810,12 +1816,12 @@ double CANTalon::ScaleNativeUnitsToRotations(FeedbackDevice devToLookup,
 double CANTalon::ScaleNativeUnitsToRpm(FeedbackDevice devToLookup,
                                        int32_t nativeVel) const {
   /* first assume we don't have config info, prep the default return */
-  double retval = (double)nativeVel;
+  double retval = static_cast<double>(nativeVel);
   /* retrieve scaling info */
   double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
   /* apply scalar if its available */
   if (scalar > 0)
-    retval = (double)(nativeVel) / (scalar * kMinutesPer100msUnit);
+    retval = static_cast<double>(nativeVel) / (scalar * kMinutesPer100msUnit);
   return retval;
 }
 

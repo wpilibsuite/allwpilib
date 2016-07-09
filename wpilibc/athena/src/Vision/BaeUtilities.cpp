@@ -166,7 +166,7 @@ void dprintf(const char* tempString, ...) /* Variable argument list */
  * @return The normalized position from -1 to +1
  */
 double RangeToNormalized(double position, int range) {
-  return (((position * 2.0) / (double)range) - 1.0);
+  return position * 2.0 / static_cast<double>(range) - 1.0;
 }
 
 /**
@@ -179,11 +179,11 @@ double RangeToNormalized(double position, int range) {
  */
 float NormalizeToRange(float normalizedValue, float minRange, float maxRange) {
   float range = maxRange - minRange;
-  float temp = (float)((normalizedValue / 2.0) + 0.5) * range;
+  float temp = static_cast<float>(normalizedValue / 2.0 + 0.5) * range;
   return (temp + minRange);
 }
 float NormalizeToRange(float normalizedValue) {
-  return (float)((normalizedValue / 2.0) + 0.5);
+  return static_cast<float>(normalizedValue / 2.0 + 0.5);
 }
 
 /**
@@ -274,7 +274,8 @@ void panInit(double period) {
 void panForTarget(Servo* panServo) { panForTarget(panServo, 0.0); }
 
 void panForTarget(Servo* panServo, double sinStart) {
-  float normalizedSinPosition = (float)SinPosition(nullptr, sinStart);
+  float normalizedSinPosition =
+      static_cast<float>(SinPosition(nullptr, sinStart));
   float newServoPosition = NormalizeToRange(normalizedSinPosition);
   panServo->Set(newServoPosition);
   // ShowActivity ("pan x: normalized %f newServoPosition = %f" ,

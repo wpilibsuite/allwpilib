@@ -94,9 +94,10 @@ int32_t HAL_TransactionI2C(uint8_t port, uint8_t deviceAddress,
 
   {
     std::lock_guard<priority_recursive_mutex> sync(lock);
-    return i2clib_writeread(handle, deviceAddress, (const char*)dataToSend,
-                            (int32_t)sendSize, (char*)dataReceived,
-                            (int32_t)receiveSize);
+    return i2clib_writeread(
+        handle, deviceAddress, reinterpret_cast<const char*>(dataToSend),
+        static_cast<int32_t>(sendSize), reinterpret_cast<char*>(dataReceived),
+        static_cast<int32_t>(receiveSize));
   }
 }
 
@@ -153,7 +154,8 @@ int32_t HAL_ReadI2C(uint8_t port, uint8_t deviceAddress, uint8_t* buffer,
       port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
   {
     std::lock_guard<priority_recursive_mutex> sync(lock);
-    return i2clib_read(handle, deviceAddress, (char*)buffer, (int32_t)count);
+    return i2clib_read(handle, deviceAddress, reinterpret_cast<char*>(buffer),
+                       static_cast<int32_t>(count));
   }
 }
 

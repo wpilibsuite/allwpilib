@@ -59,9 +59,9 @@ void CameraServer::SetImageData(uint8_t* data, unsigned int size,
 
 void CameraServer::SetImage(Image const* image) {
   unsigned int dataSize = 0;
-  uint8_t* data =
-      (uint8_t*)imaqFlatten(image, IMAQ_FLATTEN_IMAGE, IMAQ_COMPRESSION_JPEG,
-                            10 * m_quality, &dataSize);
+  uint8_t* data = reinterpret_cast<uint8_t*>(
+      imaqFlatten(image, IMAQ_FLATTEN_IMAGE, IMAQ_COMPRESSION_JPEG,
+                  10 * m_quality, &dataSize));
 
   // If we're using a HW camera, then find the start of the data
   bool hwClient;

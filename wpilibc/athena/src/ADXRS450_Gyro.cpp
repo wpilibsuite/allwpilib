@@ -133,8 +133,8 @@ void ADXRS450_Gyro::Reset() { m_spi.ResetAccumulator(); }
  *         integration of the returned rate from the gyro.
  */
 float ADXRS450_Gyro::GetAngle() const {
-  return (float)(m_spi.GetAccumulatorValue() * kDegreePerSecondPerLSB *
-                 kSamplePeriod);
+  return static_cast<float>(m_spi.GetAccumulatorValue() *
+                            kDegreePerSecondPerLSB * kSamplePeriod);
 }
 
 /**
@@ -145,5 +145,6 @@ float ADXRS450_Gyro::GetAngle() const {
  * @return the current rate in degrees per second
  */
 double ADXRS450_Gyro::GetRate() const {
-  return (double)m_spi.GetAccumulatorLastValue() * kDegreePerSecondPerLSB;
+  return static_cast<double>(m_spi.GetAccumulatorLastValue()) *
+         kDegreePerSecondPerLSB;
 }

@@ -245,11 +245,13 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwm_port_handle, float speed,
   if (speed == 0.0) {
     rawValue = GetCenterPwm(dPort);
   } else if (speed > 0.0) {
-    rawValue = (int32_t)(speed * ((float)GetPositiveScaleFactor(dPort)) +
-                         ((float)GetMinPositivePwm(dPort)) + 0.5);
+    rawValue = static_cast<int32_t>(
+        speed * static_cast<float>(GetPositiveScaleFactor(dPort)) +
+        static_cast<float>(GetMinPositivePwm(dPort)) + 0.5);
   } else {
-    rawValue = (int32_t)(speed * ((float)GetNegativeScaleFactor(dPort)) +
-                         ((float)GetMaxNegativePwm(dPort)) + 0.5);
+    rawValue = static_cast<int32_t>(
+        speed * static_cast<float>(GetNegativeScaleFactor(dPort)) +
+        static_cast<float>(GetMaxNegativePwm(dPort)) + 0.5);
   }
 
   if (!((rawValue >= GetMinNegativePwm(dPort)) &&
@@ -292,8 +294,9 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwm_port_handle, float pos,
 
   // note, need to perform the multiplication below as floating point before
   // converting to int
-  uint16_t rawValue = (int32_t)((pos * (float)GetFullRangeScaleFactor(dPort)) +
-                                GetMinNegativePwm(dPort));
+  uint16_t rawValue = static_cast<int32_t>(
+      (pos * static_cast<float>(GetFullRangeScaleFactor(dPort))) +
+      GetMinNegativePwm(dPort));
 
   if (rawValue == kPwmDisabled) {
     *status = HAL_PWM_SCALE_ERROR;
@@ -355,11 +358,11 @@ float HAL_GetPWMSpeed(HAL_DigitalHandle pwm_port_handle, int32_t* status) {
   } else if (value < GetMinNegativePwm(dPort)) {
     return -1.0;
   } else if (value > GetMinPositivePwm(dPort)) {
-    return (float)(value - GetMinPositivePwm(dPort)) /
-           (float)GetPositiveScaleFactor(dPort);
+    return static_cast<float>(value - GetMinPositivePwm(dPort)) /
+           static_cast<float>(GetPositiveScaleFactor(dPort));
   } else if (value < GetMaxNegativePwm(dPort)) {
-    return (float)(value - GetMaxNegativePwm(dPort)) /
-           (float)GetNegativeScaleFactor(dPort);
+    return static_cast<float>(value - GetMaxNegativePwm(dPort)) /
+           static_cast<float>(GetNegativeScaleFactor(dPort));
   } else {
     return 0.0;
   }
@@ -391,8 +394,8 @@ float HAL_GetPWMPosition(HAL_DigitalHandle pwm_port_handle, int32_t* status) {
   } else if (value > GetMaxPositivePwm(dPort)) {
     return 1.0;
   } else {
-    return (float)(value - GetMinNegativePwm(dPort)) /
-           (float)GetFullRangeScaleFactor(dPort);
+    return static_cast<float>(value - GetMinNegativePwm(dPort)) /
+           static_cast<float>(GetFullRangeScaleFactor(dPort));
   }
 }
 

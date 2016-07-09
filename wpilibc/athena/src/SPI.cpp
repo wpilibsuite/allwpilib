@@ -49,8 +49,9 @@ void SPI::SetClockRate(double hz) { HAL_SetSPISpeed(m_port, hz); }
  */
 void SPI::SetMSBFirst() {
   m_msbFirst = true;
-  HAL_SetSPIOpts(m_port, (int)m_msbFirst, (int)m_sampleOnTrailing,
-                 (int)m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, static_cast<int>(m_msbFirst),
+                 static_cast<int>(m_sampleOnTrailing),
+                 static_cast<int>(m_clk_idle_high));
 }
 
 /**
@@ -59,8 +60,9 @@ void SPI::SetMSBFirst() {
  */
 void SPI::SetLSBFirst() {
   m_msbFirst = false;
-  HAL_SetSPIOpts(m_port, (int)m_msbFirst, (int)m_sampleOnTrailing,
-                 (int)m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, static_cast<int>(m_msbFirst),
+                 static_cast<int>(m_sampleOnTrailing),
+                 static_cast<int>(m_clk_idle_high));
 }
 
 /**
@@ -69,8 +71,9 @@ void SPI::SetLSBFirst() {
  */
 void SPI::SetSampleDataOnFalling() {
   m_sampleOnTrailing = true;
-  HAL_SetSPIOpts(m_port, (int)m_msbFirst, (int)m_sampleOnTrailing,
-                 (int)m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, static_cast<int>(m_msbFirst),
+                 static_cast<int>(m_sampleOnTrailing),
+                 static_cast<int>(m_clk_idle_high));
 }
 
 /**
@@ -79,8 +82,9 @@ void SPI::SetSampleDataOnFalling() {
  */
 void SPI::SetSampleDataOnRising() {
   m_sampleOnTrailing = false;
-  HAL_SetSPIOpts(m_port, (int)m_msbFirst, (int)m_sampleOnTrailing,
-                 (int)m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, static_cast<int>(m_msbFirst),
+                 static_cast<int>(m_sampleOnTrailing),
+                 static_cast<int>(m_clk_idle_high));
 }
 
 /**
@@ -89,8 +93,9 @@ void SPI::SetSampleDataOnRising() {
  */
 void SPI::SetClockActiveLow() {
   m_clk_idle_high = true;
-  HAL_SetSPIOpts(m_port, (int)m_msbFirst, (int)m_sampleOnTrailing,
-                 (int)m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, static_cast<int>(m_msbFirst),
+                 static_cast<int>(m_sampleOnTrailing),
+                 static_cast<int>(m_clk_idle_high));
 }
 
 /**
@@ -99,8 +104,9 @@ void SPI::SetClockActiveLow() {
  */
 void SPI::SetClockActiveHigh() {
   m_clk_idle_high = false;
-  HAL_SetSPIOpts(m_port, (int)m_msbFirst, (int)m_sampleOnTrailing,
-                 (int)m_clk_idle_high);
+  HAL_SetSPIOpts(m_port, static_cast<int>(m_msbFirst),
+                 static_cast<int>(m_sampleOnTrailing),
+                 static_cast<int>(m_clk_idle_high));
 }
 
 /**
@@ -192,9 +198,9 @@ void SPI::InitAccumulator(double period, uint32_t cmd, uint8_t xfer_size,
                           uint8_t data_shift, uint8_t data_size, bool is_signed,
                           bool big_endian) {
   int32_t status = 0;
-  HAL_InitSPIAccumulator(m_port, (uint32_t)(period * 1e6), cmd, xfer_size,
-                         valid_mask, valid_value, data_shift, data_size,
-                         is_signed, big_endian, &status);
+  HAL_InitSPIAccumulator(m_port, static_cast<uint32_t>(period * 1e6), cmd,
+                         xfer_size, valid_mask, valid_value, data_shift,
+                         data_size, is_signed, big_endian, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 

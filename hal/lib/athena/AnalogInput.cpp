@@ -102,7 +102,8 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   analogSampleRateSet = true;
 
   // Compute the convert rate
-  uint32_t ticksPerSample = (uint32_t)((float)kTimebase / samplesPerSecond);
+  uint32_t ticksPerSample =
+      static_cast<uint32_t>(static_cast<float>(kTimebase) / samplesPerSecond);
   uint32_t ticksPerConversion =
       ticksPerSample / getAnalogNumChannelsToActivate(status);
   // ticksPerConversion must be at least 80
@@ -134,7 +135,7 @@ float HAL_GetAnalogSampleRate(int32_t* status) {
   uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
   uint32_t ticksPerSample =
       ticksPerConversion * getAnalogNumActiveChannels(status);
-  return (float)kTimebase / (float)ticksPerSample;
+  return static_cast<float>(kTimebase) / static_cast<float>(ticksPerSample);
 }
 
 /**
@@ -317,7 +318,7 @@ float HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analog_port_handle,
   uint32_t oversampleBits =
       HAL_GetAnalogOversampleBits(analog_port_handle, status);
   float voltage =
-      ((LSBWeight * 1.0e-9 * value) / (float)(1 << oversampleBits)) -
+      LSBWeight * 1.0e-9 * value / static_cast<float>(1 << oversampleBits) -
       offset * 1.0e-9;
   return voltage;
 }

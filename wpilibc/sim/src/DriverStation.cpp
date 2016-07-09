@@ -147,7 +147,7 @@ int16_t DriverStation::GetStickButtons(uint32_t stick) {
 }
 
 // 5V divided by 10 bits
-#define kDSAnalogInScaling ((float)(5.0 / 1023.0))
+#define kDSAnalogInScaling (static_cast<float>(5.0 / 1023.0))
 
 /**
  * Get an analog voltage from the Driver Station.

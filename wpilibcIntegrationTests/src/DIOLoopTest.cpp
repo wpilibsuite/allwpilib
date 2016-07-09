@@ -140,7 +140,7 @@ TEST_F(DIOLoopTest, FakeCounter) {
 }
 
 static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
-  *(int*)param = 12345;
+  *reinterpret_cast<int*>(param) = 12345;
 }
 
 TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {

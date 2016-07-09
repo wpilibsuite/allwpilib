@@ -162,9 +162,11 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   HAL_GetAccumulatorOutput(gyro->handle, &value, &count, status);
   if (*status != 0) return;
 
-  gyro->center = (uint32_t)((float)value / (float)count + .5);
+  gyro->center = static_cast<uint32_t>(
+      static_cast<float>(value) / static_cast<float>(count) + .5);
 
-  gyro->offset = ((float)value / (float)count) - (float)gyro->center;
+  gyro->offset = static_cast<float>(value) / static_cast<float>(count) -
+                 static_cast<float>(gyro->center);
   HAL_SetAccumulatorCenter(gyro->handle, gyro->center, status);
   if (*status != 0) return;
   HAL_ResetAnalogGyro(handle, status);
@@ -194,14 +196,16 @@ float HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
   uint32_t count = 0;
   HAL_GetAccumulatorOutput(gyro->handle, &rawValue, &count, status);
 
-  int64_t value = rawValue - (int64_t)((float)count * gyro->offset);
+  int64_t value =
+      rawValue - static_cast<int64_t>(static_cast<float>(count) * gyro->offset);
 
   double scaledValue =
-      value * 1e-9 * (double)HAL_GetAnalogLSBWeight(gyro->handle, status) *
-      (double)(1 << HAL_GetAnalogAverageBits(gyro->handle, status)) /
+      value * 1e-9 *
+      static_cast<double>(HAL_GetAnalogLSBWeight(gyro->handle, status)) *
+      static_cast<double>(1 << HAL_GetAnalogAverageBits(gyro->handle, status)) /
       (HAL_GetAnalogSampleRate(status) * gyro->voltsPerDegreePerSecond);
 
-  return (float)scaledValue;
+  return static_cast<float>(scaledValue);
 }
 
 double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
@@ -212,7 +216,7 @@ double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
   }
 
   return (HAL_GetAnalogAverageValue(gyro->handle, status) -
-          ((double)gyro->center + gyro->offset)) *
+          (static_cast<double>(gyro->center) + gyro->offset)) *
          1e-9 * HAL_GetAnalogLSBWeight(gyro->handle, status) /
          ((1 << HAL_GetAnalogOversampleBits(gyro->handle, status)) *
           gyro->voltsPerDegreePerSecond);

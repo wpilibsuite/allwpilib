@@ -34,7 +34,7 @@
  * the SOS flag explanation.
  */
 unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
-  uint8_t* data = (uint8_t*)buffer;
+  uint8_t* data = static_cast<uint8_t*>(buffer);
   if (!wpi_assert(data[0] == 0xff && data[1] == 0xd8)) return 0;
   unsigned int pos = 2;
   while (pos < buffSize) {
@@ -201,7 +201,8 @@ void USBCamera::UpdateSettings() {
                      IMAQdxValueTypeF64, &minv);
       SAFE_IMAQ_CALL(IMAQdxGetAttributeMaximum, m_id, ATTR_EX_VALUE,
                      IMAQdxValueTypeF64, &maxv);
-      double val = minv + ((maxv - minv) * ((double)m_exposureValue / 100.0));
+      double val =
+          minv + (maxv - minv) * (static_cast<double>(m_exposureValue) / 100.0);
       SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_EX_VALUE,
                      IMAQdxValueTypeF64, val);
     }
@@ -215,7 +216,8 @@ void USBCamera::UpdateSettings() {
                  IMAQdxValueTypeF64, &minv);
   SAFE_IMAQ_CALL(IMAQdxGetAttributeMaximum, m_id, ATTR_BR_VALUE,
                  IMAQdxValueTypeF64, &maxv);
-  double val = minv + ((maxv - minv) * ((double)m_brightness / 100.0));
+  double val =
+      minv + (maxv - minv) * (static_cast<double>(m_brightness) / 100.0);
   SAFE_IMAQ_CALL(IMAQdxSetAttribute, m_id, ATTR_BR_VALUE, IMAQdxValueTypeF64,
                  val);
 

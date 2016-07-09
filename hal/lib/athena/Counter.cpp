@@ -362,7 +362,8 @@ double HAL_GetCounterPeriod(HAL_CounterHandle counter_handle, int32_t* status) {
   } else {
     // output.Period is a fixed point number that counts by 2 (24 bits, 25
     // integer bits)
-    period = (double)(output.Period << 1) / (double)output.Count;
+    period = static_cast<double>(output.Period << 1) /
+             static_cast<double>(output.Count);
   }
   return period * 2.5e-8;  // result * timebase (currently 40ns)
 }

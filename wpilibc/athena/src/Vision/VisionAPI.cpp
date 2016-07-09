@@ -281,7 +281,9 @@ ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
 
 ColorHistogramReport* frcColorHistogram(const Image* image, int numClasses,
                                         ColorMode mode, Image* mask) {
-  return imaqColorHistogram2((Image*)image, numClasses, mode, nullptr, mask);
+  return imaqColorHistogram2(
+      const_cast<Image*>(reinterpret_cast<const Image*>(image)), numClasses,
+      mode, nullptr, mask);
 }
 
 /**
@@ -451,14 +453,14 @@ int frcParticleAnalysis(Image* image, int particleNumber,
   if (!success) {
     return success;
   }
-  par->center_mass_x = (int)returnDouble;  // pixel
+  par->center_mass_x = static_cast<int>(returnDouble);  // pixel
 
   success = imaqMeasureParticle(image, particleNumber, 0,
                                 IMAQ_MT_CENTER_OF_MASS_Y, &returnDouble);
   if (!success) {
     return success;
   }
-  par->center_mass_y = (int)returnDouble;  // pixel
+  par->center_mass_y = static_cast<int>(returnDouble);  // pixel
 
   /* particle size statistics */
   success = imaqMeasureParticle(image, particleNumber, 0, IMAQ_MT_AREA,
@@ -473,28 +475,28 @@ int frcParticleAnalysis(Image* image, int particleNumber,
   if (!success) {
     return success;
   }
-  par->boundingRect.top = (int)returnDouble;
+  par->boundingRect.top = static_cast<int>(returnDouble);
 
   success = imaqMeasureParticle(image, particleNumber, 0,
                                 IMAQ_MT_BOUNDING_RECT_LEFT, &returnDouble);
   if (!success) {
     return success;
   }
-  par->boundingRect.left = (int)returnDouble;
+  par->boundingRect.left = static_cast<int>(returnDouble);
 
   success = imaqMeasureParticle(image, particleNumber, 0,
                                 IMAQ_MT_BOUNDING_RECT_HEIGHT, &returnDouble);
   if (!success) {
     return success;
   }
-  par->boundingRect.height = (int)returnDouble;
+  par->boundingRect.height = static_cast<int>(returnDouble);
 
   success = imaqMeasureParticle(image, particleNumber, 0,
                                 IMAQ_MT_BOUNDING_RECT_WIDTH, &returnDouble);
   if (!success) {
     return success;
   }
-  par->boundingRect.width = (int)returnDouble;
+  par->boundingRect.width = static_cast<int>(returnDouble);
 
   /* particle quality statistics */
   success = imaqMeasureParticle(image, particleNumber, 0,

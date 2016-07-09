@@ -343,58 +343,58 @@ void CANJaguar::PIDWrite(float output) {
 }
 
 uint8_t CANJaguar::packPercentage(uint8_t* buffer, double value) {
-  int16_t intValue = (int16_t)(value * 32767.0);
-  *((int16_t*)buffer) = swap16(intValue);
+  int16_t intValue = static_cast<int16_t>(value * 32767.0);
+  *reinterpret_cast<int16_t*>(buffer) = swap16(intValue);
   return sizeof(int16_t);
 }
 
 uint8_t CANJaguar::packFXP8_8(uint8_t* buffer, double value) {
-  int16_t intValue = (int16_t)(value * 256.0);
-  *((int16_t*)buffer) = swap16(intValue);
+  int16_t intValue = static_cast<int16_t>(value * 256.0);
+  *reinterpret_cast<int16_t*>(buffer) = swap16(intValue);
   return sizeof(int16_t);
 }
 
 uint8_t CANJaguar::packFXP16_16(uint8_t* buffer, double value) {
-  int32_t intValue = (int32_t)(value * 65536.0);
-  *((int32_t*)buffer) = swap32(intValue);
+  int32_t intValue = static_cast<int32_t>(value * 65536.0);
+  *reinterpret_cast<int32_t*>(buffer) = swap32(intValue);
   return sizeof(int32_t);
 }
 
 uint8_t CANJaguar::packint16_t(uint8_t* buffer, int16_t value) {
-  *((int16_t*)buffer) = swap16(value);
+  *reinterpret_cast<int16_t*>(buffer) = swap16(value);
   return sizeof(int16_t);
 }
 
 uint8_t CANJaguar::packint32_t(uint8_t* buffer, int32_t value) {
-  *((int32_t*)buffer) = swap32(value);
+  *reinterpret_cast<int32_t*>(buffer) = swap32(value);
   return sizeof(int32_t);
 }
 
 double CANJaguar::unpackPercentage(uint8_t* buffer) const {
-  int16_t value = *((int16_t*)buffer);
+  int16_t value = *reinterpret_cast<int16_t*>(buffer);
   value = swap16(value);
   return value / 32767.0;
 }
 
 double CANJaguar::unpackFXP8_8(uint8_t* buffer) const {
-  int16_t value = *((int16_t*)buffer);
+  int16_t value = *reinterpret_cast<int16_t*>(buffer);
   value = swap16(value);
   return value / 256.0;
 }
 
 double CANJaguar::unpackFXP16_16(uint8_t* buffer) const {
-  int32_t value = *((int32_t*)buffer);
+  int32_t value = *reinterpret_cast<int32_t*>(buffer);
   value = swap32(value);
   return value / 65536.0;
 }
 
 int16_t CANJaguar::unpackint16_t(uint8_t* buffer) const {
-  int16_t value = *((int16_t*)buffer);
+  int16_t value = *reinterpret_cast<int16_t*>(buffer);
   return swap16(value);
 }
 
 int32_t CANJaguar::unpackint32_t(uint8_t* buffer) const {
-  int32_t value = *((int32_t*)buffer);
+  int32_t value = *reinterpret_cast<int32_t*>(buffer);
   return swap32(value);
 }
 
@@ -552,7 +552,7 @@ void CANJaguar::verify() {
   // If the Jaguar lost power, everything should be considered unverified.
   if (getMessage(LM_API_STATUS_POWER, CAN_MSGID_FULL_M, dataBuffer,
                  &dataSize)) {
-    bool powerCycled = (bool)dataBuffer[0];
+    bool powerCycled = static_cast<bool>(dataBuffer[0]);
 
     if (powerCycled) {
       // Clear the power cycled bit
