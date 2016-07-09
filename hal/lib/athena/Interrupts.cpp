@@ -27,17 +27,17 @@ struct Interrupt  // FIXME: why is this internal?
 };
 }
 
-static LimitedHandleResource<HalInterruptHandle, Interrupt, kNumInterrupts,
-                             HalHandleEnum::Interrupt>
+static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
+                             HAL_HandleEnum::Interrupt>
     interruptHandles;
 
 extern "C" {
 
-HalInterruptHandle initializeInterrupts(bool watcher, int32_t* status) {
-  HalInterruptHandle handle = interruptHandles.Allocate();
-  if (handle == HAL_INVALID_HANDLE) {
+HAL_InterruptHandle HAL_InitializeInterrupts(bool watcher, int32_t* status) {
+  HAL_InterruptHandle handle = interruptHandles.Allocate();
+  if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   auto anInterrupt = interruptHandles.Get(handle);
   uint32_t interruptIndex = static_cast<uint32_t>(getHandleIndex(handle));
@@ -49,7 +49,8 @@ HalInterruptHandle initializeInterrupts(bool watcher, int32_t* status) {
   return handle;
 }
 
-void cleanInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
+void HAL_CleanInterrupts(HAL_InterruptHandle interrupt_handle,
+                         int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -67,8 +68,9 @@ void cleanInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
  * waitForInterrupt was called.
  * @return The mask of interrupts that fired.
  */
-uint32_t waitForInterrupt(HalInterruptHandle interrupt_handle, double timeout,
-                          bool ignorePrevious, int32_t* status) {
+uint32_t HAL_WaitForInterrupt(HAL_InterruptHandle interrupt_handle,
+                              double timeout, bool ignorePrevious,
+                              int32_t* status) {
   uint32_t result;
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
@@ -94,7 +96,8 @@ uint32_t waitForInterrupt(HalInterruptHandle interrupt_handle, double timeout,
  * time to do the setup of the other options before starting to field
  * interrupts.
  */
-void enableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
+void HAL_EnableInterrupts(HAL_InterruptHandle interrupt_handle,
+                          int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -106,7 +109,8 @@ void enableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
 /**
  * Disable Interrupts without without deallocating structures.
  */
-void disableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
+void HAL_DisableInterrupts(HAL_InterruptHandle interrupt_handle,
+                           int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -120,8 +124,8 @@ void disableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status) {
  * This is in the same time domain as GetClock().
  * @return Timestamp in seconds since boot.
  */
-double readRisingTimestamp(HalInterruptHandle interrupt_handle,
-                           int32_t* status) {
+double HAL_ReadRisingTimestamp(HAL_InterruptHandle interrupt_handle,
+                               int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -136,8 +140,8 @@ double readRisingTimestamp(HalInterruptHandle interrupt_handle,
 * This is in the same time domain as GetClock().
 * @return Timestamp in seconds since boot.
 */
-double readFallingTimestamp(HalInterruptHandle interrupt_handle,
-                            int32_t* status) {
+double HAL_ReadFallingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -147,9 +151,10 @@ double readFallingTimestamp(HalInterruptHandle interrupt_handle,
   return timestamp * 1e-6;
 }
 
-void requestInterrupts(HalInterruptHandle interrupt_handle,
-                       HalHandle digitalSourceHandle,
-                       AnalogTriggerType analogTriggerType, int32_t* status) {
+void HAL_RequestInterrupts(HAL_InterruptHandle interrupt_handle,
+                           HAL_Handle digitalSourceHandle,
+                           HAL_AnalogTriggerType analogTriggerType,
+                           int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -172,9 +177,9 @@ void requestInterrupts(HalInterruptHandle interrupt_handle,
   anInterrupt->anInterrupt->writeConfig_Source_Module(routingModule, status);
 }
 
-void attachInterruptHandler(HalInterruptHandle interrupt_handle,
-                            InterruptHandlerFunction handler, void* param,
-                            int32_t* status) {
+void HAL_AttachInterruptHandler(HAL_InterruptHandle interrupt_handle,
+                                InterruptHandlerFunction handler, void* param,
+                                int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -183,9 +188,9 @@ void attachInterruptHandler(HalInterruptHandle interrupt_handle,
   anInterrupt->manager->registerHandler(handler, param, status);
 }
 
-void setInterruptUpSourceEdge(HalInterruptHandle interrupt_handle,
-                              bool risingEdge, bool fallingEdge,
-                              int32_t* status) {
+void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interrupt_handle,
+                                  bool risingEdge, bool fallingEdge,
+                                  int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;

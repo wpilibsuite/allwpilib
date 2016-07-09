@@ -41,25 +41,25 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
   }
 
   int32_t status = 0;
-  m_solenoidHandle =
-      initializeSolenoidPort(getPortWithModule(moduleNumber, channel), &status);
+  m_solenoidHandle = HAL_InitializeSolenoidPort(
+      HAL_GetPortWithModule(moduleNumber, channel), &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
-    m_solenoidHandle = HAL_INVALID_HANDLE;
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    m_solenoidHandle = HAL_kInvalidHandle;
     return;
   }
 
   LiveWindow::GetInstance()->AddActuator("Solenoid", m_moduleNumber, m_channel,
                                          this);
-  HALReport(HALUsageReporting::kResourceType_Solenoid, m_channel,
-            m_moduleNumber);
+  HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel,
+             m_moduleNumber);
 }
 
 /**
  * Destructor.
  */
 Solenoid::~Solenoid() {
-  freeSolenoidPort(m_solenoidHandle);
+  HAL_FreeSolenoidPort(m_solenoidHandle);
   if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
@@ -71,8 +71,8 @@ Solenoid::~Solenoid() {
 void Solenoid::Set(bool on) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setSolenoid(m_solenoidHandle, on, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetSolenoid(m_solenoidHandle, on, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -83,8 +83,8 @@ void Solenoid::Set(bool on) {
 bool Solenoid::Get() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
-  bool value = getSolenoid(m_solenoidHandle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 

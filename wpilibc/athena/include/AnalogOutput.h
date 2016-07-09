@@ -35,7 +35,7 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
 
  protected:
   uint32_t m_channel;
-  HalAnalogOutputHandle m_port;
+  HAL_AnalogOutputHandle m_port;
 
   std::shared_ptr<ITable> m_table;
 };

@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #include "ChipObject.h"
+#include "HAL/HAL.h"
 
 // The 7-bit I2C address with a 0 "send" bit
 static const uint8_t kSendAddress = (0x1c << 1) | 0;
@@ -25,7 +26,7 @@ static const uint8_t kControlStart = 2;
 static const uint8_t kControlStop = 4;
 
 static tAccel* accel = 0;
-static AccelerometerRange accelerometerRange;
+static HAL_AccelerometerRange accelerometerRange;
 
 // Register addresses
 enum Register {
@@ -73,8 +74,6 @@ enum Register {
   kReg_OffZ = 0x31
 };
 
-extern "C" uint32_t getFPGATime(int32_t* status);
-
 static void writeRegister(Register reg, uint8_t data);
 static uint8_t readRegister(Register reg);
 
@@ -110,9 +109,9 @@ static void writeRegister(Register reg, uint8_t data) {
   accel->strobeGO(&status);
 
   // Execute and wait until it's done (up to a millisecond)
-  initialTime = getFPGATime(&status);
+  initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (getFPGATime(&status) > initialTime + 1000) break;
+    if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
   }
 
   // Send a stop transmit/receive message with the data
@@ -121,9 +120,9 @@ static void writeRegister(Register reg, uint8_t data) {
   accel->strobeGO(&status);
 
   // Execute and wait until it's done (up to a millisecond)
-  initialTime = getFPGATime(&status);
+  initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (getFPGATime(&status) > initialTime + 1000) break;
+    if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
   }
 
   std::fflush(stdout);
@@ -140,9 +139,9 @@ static uint8_t readRegister(Register reg) {
   accel->strobeGO(&status);
 
   // Execute and wait until it's done (up to a millisecond)
-  initialTime = getFPGATime(&status);
+  initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (getFPGATime(&status) > initialTime + 1000) break;
+    if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
   }
 
   // Receive a message with the data and stop
@@ -151,9 +150,9 @@ static uint8_t readRegister(Register reg) {
   accel->strobeGO(&status);
 
   // Execute and wait until it's done (up to a millisecond)
-  initialTime = getFPGATime(&status);
+  initialTime = HAL_GetFPGATime(&status);
   while (accel->readSTAT(&status) & 1) {
-    if (getFPGATime(&status) > initialTime + 1000) break;
+    if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
   }
 
   std::fflush(stdout);
@@ -173,11 +172,11 @@ static double unpackAxis(int16_t raw) {
   raw >>= 4;
 
   switch (accelerometerRange) {
-    case kRange_2G:
+    case HAL_AccelerometerRange_k2G:
       return raw / 1024.0;
-    case kRange_4G:
+    case HAL_AccelerometerRange_k4G:
       return raw / 512.0;
-    case kRange_8G:
+    case HAL_AccelerometerRange_k8G:
       return raw / 256.0;
     default:
       return 0.0;
@@ -190,7 +189,7 @@ extern "C" {
  * Set the accelerometer to active or standby mode.  It must be in standby
  * mode to change any configuration.
  */
-void setAccelerometerActive(bool active) {
+void HAL_SetAccelerometerActive(bool active) {
   initializeAccelerometer();
 
   uint8_t ctrlReg1 = readRegister(kReg_CtrlReg1);
@@ -202,7 +201,7 @@ void setAccelerometerActive(bool active) {
  * Set the range of values that can be measured (either 2, 4, or 8 g-forces).
  * The accelerometer should be in standby mode when this is called.
  */
-void setAccelerometerRange(AccelerometerRange range) {
+void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
   initializeAccelerometer();
 
   accelerometerRange = range;
@@ -217,7 +216,7 @@ void setAccelerometerRange(AccelerometerRange range) {
  *
  * This is a floating point value in units of 1 g-force
  */
-double getAccelerometerX() {
+double HAL_GetAccelerometerX() {
   initializeAccelerometer();
 
   int raw =
@@ -230,7 +229,7 @@ double getAccelerometerX() {
  *
  * This is a floating point value in units of 1 g-force
  */
-double getAccelerometerY() {
+double HAL_GetAccelerometerY() {
   initializeAccelerometer();
 
   int raw =
@@ -243,7 +242,7 @@ double getAccelerometerY() {
  *
  * This is a floating point value in units of 1 g-force
  */
-double getAccelerometerZ() {
+double HAL_GetAccelerometerZ() {
   initializeAccelerometer();
 
   int raw =

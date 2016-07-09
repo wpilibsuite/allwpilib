@@ -50,8 +50,8 @@ class DoubleSolenoid : public SolenoidBase,
   uint32_t m_reverseChannel;  ///< The reverse channel on the module to control.
   uint8_t m_forwardMask;      ///< The mask for the forward channel.
   uint8_t m_reverseMask;      ///< The mask for the reverse channel.
-  HalSolenoidHandle m_forwardHandle = HAL_INVALID_HANDLE;
-  HalSolenoidHandle m_reverseHandle = HAL_INVALID_HANDLE;
+  HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
+  HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
 
   std::shared_ptr<ITable> m_table;
 };

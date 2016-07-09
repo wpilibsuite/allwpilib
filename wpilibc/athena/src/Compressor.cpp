@@ -14,9 +14,9 @@
  */
 Compressor::Compressor(uint8_t pcmID) {
   int32_t status = 0;
-  m_compressorHandle = initializeCompressor(pcmID, &status);
+  m_compressorHandle = HAL_InitializeCompressor(pcmID, &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
     return;
   }
   SetClosedLoopControl(true);
@@ -50,7 +50,7 @@ bool Compressor::Enabled() const {
   int32_t status = 0;
   bool value;
 
-  value = getCompressor(m_compressorHandle, &status);
+  value = HAL_GetCompressor(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -69,7 +69,7 @@ bool Compressor::GetPressureSwitchValue() const {
   int32_t status = 0;
   bool value;
 
-  value = getPressureSwitch(m_compressorHandle, &status);
+  value = HAL_GetPressureSwitch(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -88,7 +88,7 @@ float Compressor::GetCompressorCurrent() const {
   int32_t status = 0;
   float value;
 
-  value = getCompressorCurrent(m_compressorHandle, &status);
+  value = HAL_GetCompressorCurrent(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -108,7 +108,7 @@ void Compressor::SetClosedLoopControl(bool on) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
 
-  setClosedLoopControl(m_compressorHandle, on, &status);
+  HAL_SetClosedLoopControl(m_compressorHandle, on, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -127,7 +127,7 @@ bool Compressor::GetClosedLoopControl() const {
   int32_t status = 0;
   bool value;
 
-  value = getClosedLoopControl(m_compressorHandle, &status);
+  value = HAL_GetClosedLoopControl(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -147,7 +147,7 @@ bool Compressor::GetCompressorCurrentTooHighFault() const {
   int32_t status = 0;
   bool value;
 
-  value = getCompressorCurrentTooHighFault(m_compressorHandle, &status);
+  value = HAL_GetCompressorCurrentTooHighFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -171,7 +171,8 @@ bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
   int32_t status = 0;
   bool value;
 
-  value = getCompressorCurrentTooHighStickyFault(m_compressorHandle, &status);
+  value =
+      HAL_GetCompressorCurrentTooHighStickyFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -195,7 +196,7 @@ bool Compressor::GetCompressorShortedStickyFault() const {
   int32_t status = 0;
   bool value;
 
-  value = getCompressorShortedStickyFault(m_compressorHandle, &status);
+  value = HAL_GetCompressorShortedStickyFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -215,7 +216,7 @@ bool Compressor::GetCompressorShortedFault() const {
   int32_t status = 0;
   bool value;
 
-  value = getCompressorShortedFault(m_compressorHandle, &status);
+  value = HAL_GetCompressorShortedFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -238,7 +239,7 @@ bool Compressor::GetCompressorNotConnectedStickyFault() const {
   int32_t status = 0;
   bool value;
 
-  value = getCompressorNotConnectedStickyFault(m_compressorHandle, &status);
+  value = HAL_GetCompressorNotConnectedStickyFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -258,7 +259,7 @@ bool Compressor::GetCompressorNotConnectedFault() const {
   int32_t status = 0;
   bool value;
 
-  value = getCompressorNotConnectedFault(m_compressorHandle, &status);
+  value = HAL_GetCompressorNotConnectedFault(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -281,7 +282,7 @@ void Compressor::ClearAllPCMStickyFaults() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
 
-  clearAllPCMStickyFaults(m_compressorHandle, &status);
+  HAL_ClearAllPCMStickyFaults(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);

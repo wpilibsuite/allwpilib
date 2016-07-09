@@ -52,7 +52,7 @@ bool SensorBase::CheckDigitalChannel(uint32_t channel) {
  * @return Relay channel is valid
  */
 bool SensorBase::CheckRelayChannel(uint32_t channel) {
-  return checkRelayChannel((uint8_t)channel);
+  return HAL_CheckRelayChannel((uint8_t)channel);
 }
 
 /**

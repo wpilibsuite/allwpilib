@@ -148,8 +148,8 @@ void CANJaguar::InitCANJaguar() {
     default:
       break;
   }
-  HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber,
-            m_controlMode);
+  HAL_Report(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber,
+             m_controlMode);
   LiveWindow::GetInstance()->AddActuator("CANJaguar", m_deviceNumber, this);
 }
 
@@ -1566,8 +1566,8 @@ void CANJaguar::SetControlMode(ControlMode controlMode) {
   m_controlMode = controlMode;
   m_controlModeVerified = false;
 
-  HALReport(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber,
-            m_controlMode);
+  HAL_Report(HALUsageReporting::kResourceType_CANJaguar, m_deviceNumber,
+             m_controlMode);
 }
 
 /**

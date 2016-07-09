@@ -10,5 +10,5 @@
 #include <stdint.h>
 
 extern "C" {
-int32_t HAL_getSystemClockTicksPerMicrosecond(void);
+int32_t HAL_GetSystemClockTicksPerMicrosecond(void);
 }

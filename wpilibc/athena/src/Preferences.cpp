@@ -26,7 +26,7 @@ void Preferences::Listener::ValueChangedEx(ITable* source, llvm::StringRef key,
 
 Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
   m_table->AddTableListenerEx(&m_listener, NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
-  HALReport(HALUsageReporting::kResourceType_Preferences, 0);
+  HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
 }
 
 /**

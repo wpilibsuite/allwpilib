@@ -9,10 +9,10 @@
 #include "HAL/HAL.h"
 
 void HardwareHLReporting::ReportScheduler() {
-  HALReport(HALUsageReporting::kResourceType_Command,
-            HALUsageReporting::kCommand_Scheduler);
+  HAL_Report(HALUsageReporting::kResourceType_Command,
+             HALUsageReporting::kCommand_Scheduler);
 }
 
 void HardwareHLReporting::ReportSmartDashboard() {
-  HALReport(HALUsageReporting::kResourceType_SmartDashboard, 0);
+  HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
 }

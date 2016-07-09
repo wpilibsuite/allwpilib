@@ -27,33 +27,33 @@ AnalogInput::AnalogInput(uint32_t channel) {
   std::stringstream buf;
   buf << "Analog Input " << channel;
 
-  if (!checkAnalogInputChannel(channel)) {
+  if (!HAL_CheckAnalogInputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
 
   m_channel = channel;
 
-  HalPortHandle port = getPort(channel);
+  HAL_PortHandle port = HAL_GetPort(channel);
   int32_t status = 0;
-  m_port = initializeAnalogInputPort(port, &status);
+  m_port = HAL_InitializeAnalogInputPort(port, &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, getHALErrorMessage(status));
+    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
     m_channel = std::numeric_limits<uint32_t>::max();
-    m_port = HAL_INVALID_HANDLE;
+    m_port = HAL_kInvalidHandle;
     return;
   }
 
   LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
-  HALReport(HALUsageReporting::kResourceType_AnalogChannel, channel);
+  HAL_Report(HALUsageReporting::kResourceType_AnalogChannel, channel);
 }
 
 /**
  * Channel destructor.
  */
 AnalogInput::~AnalogInput() {
-  freeAnalogInputPort(m_port);
-  m_port = HAL_INVALID_HANDLE;
+  HAL_FreeAnalogInputPort(m_port);
+  m_port = HAL_kInvalidHandle;
 }
 
 /**
@@ -68,8 +68,8 @@ AnalogInput::~AnalogInput() {
 int16_t AnalogInput::GetValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int16_t value = getAnalogValue(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int16_t value = HAL_GetAnalogValue(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -90,8 +90,8 @@ int16_t AnalogInput::GetValue() const {
 int32_t AnalogInput::GetAverageValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t value = getAnalogAverageValue(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t value = HAL_GetAnalogAverageValue(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
 
@@ -106,8 +106,8 @@ int32_t AnalogInput::GetAverageValue() const {
 float AnalogInput::GetVoltage() const {
   if (StatusIsFatal()) return 0.0f;
   int32_t status = 0;
-  float voltage = getAnalogVoltage(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  float voltage = HAL_GetAnalogVoltage(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return voltage;
 }
 
@@ -128,8 +128,8 @@ float AnalogInput::GetVoltage() const {
 float AnalogInput::GetAverageVoltage() const {
   if (StatusIsFatal()) return 0.0f;
   int32_t status = 0;
-  float voltage = getAnalogAverageVoltage(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  float voltage = HAL_GetAnalogAverageVoltage(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return voltage;
 }
 
@@ -143,8 +143,8 @@ float AnalogInput::GetAverageVoltage() const {
 uint32_t AnalogInput::GetLSBWeight() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t lsbWeight = getAnalogLSBWeight(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return lsbWeight;
 }
 
@@ -158,8 +158,8 @@ uint32_t AnalogInput::GetLSBWeight() const {
 int32_t AnalogInput::GetOffset() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t offset = getAnalogOffset(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t offset = HAL_GetAnalogOffset(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return offset;
 }
 
@@ -187,8 +187,8 @@ uint32_t AnalogInput::GetChannel() const {
 void AnalogInput::SetAverageBits(uint32_t bits) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setAnalogAverageBits(m_port, bits, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetAnalogAverageBits(m_port, bits, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -201,8 +201,8 @@ void AnalogInput::SetAverageBits(uint32_t bits) {
  */
 uint32_t AnalogInput::GetAverageBits() const {
   int32_t status = 0;
-  int32_t averageBits = getAnalogAverageBits(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t averageBits = HAL_GetAnalogAverageBits(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return averageBits;
 }
 
@@ -219,8 +219,8 @@ uint32_t AnalogInput::GetAverageBits() const {
 void AnalogInput::SetOversampleBits(uint32_t bits) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setAnalogOversampleBits(m_port, bits, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetAnalogOversampleBits(m_port, bits, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -235,8 +235,8 @@ void AnalogInput::SetOversampleBits(uint32_t bits) {
 uint32_t AnalogInput::GetOversampleBits() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t oversampleBits = getAnalogOversampleBits(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int32_t oversampleBits = HAL_GetAnalogOversampleBits(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return oversampleBits;
 }
 
@@ -248,8 +248,8 @@ uint32_t AnalogInput::GetOversampleBits() const {
 bool AnalogInput::IsAccumulatorChannel() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
-  bool isAccum = isAccumulatorChannel(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  bool isAccum = HAL_IsAccumulatorChannel(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return isAccum;
 }
 
@@ -260,8 +260,8 @@ void AnalogInput::InitAccumulator() {
   if (StatusIsFatal()) return;
   m_accumulatorOffset = 0;
   int32_t status = 0;
-  initAccumulator(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_InitAccumulator(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -283,8 +283,8 @@ void AnalogInput::SetAccumulatorInitialValue(int64_t initialValue) {
 void AnalogInput::ResetAccumulator() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  resetAccumulator(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_ResetAccumulator(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   if (!StatusIsFatal()) {
     // Wait until the next sample, so the next call to GetAccumulator*()
@@ -310,8 +310,8 @@ void AnalogInput::ResetAccumulator() {
 void AnalogInput::SetAccumulatorCenter(int32_t center) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setAccumulatorCenter(m_port, center, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetAccumulatorCenter(m_port, center, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -320,8 +320,8 @@ void AnalogInput::SetAccumulatorCenter(int32_t center) {
 void AnalogInput::SetAccumulatorDeadband(int32_t deadband) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  setAccumulatorDeadband(m_port, deadband, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetAccumulatorDeadband(m_port, deadband, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -335,8 +335,8 @@ void AnalogInput::SetAccumulatorDeadband(int32_t deadband) {
 int64_t AnalogInput::GetAccumulatorValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int64_t value = getAccumulatorValue(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  int64_t value = HAL_GetAccumulatorValue(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value + m_accumulatorOffset;
 }
 
@@ -351,8 +351,8 @@ int64_t AnalogInput::GetAccumulatorValue() const {
 uint32_t AnalogInput::GetAccumulatorCount() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  uint32_t count = getAccumulatorCount(m_port, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  uint32_t count = HAL_GetAccumulatorCount(m_port, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return count;
 }
 
@@ -368,8 +368,8 @@ uint32_t AnalogInput::GetAccumulatorCount() const {
 void AnalogInput::GetAccumulatorOutput(int64_t& value, uint32_t& count) const {
   if (StatusIsFatal()) return;
   int32_t status = 0;
-  getAccumulatorOutput(m_port, &value, &count, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_GetAccumulatorOutput(m_port, &value, &count, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   value += m_accumulatorOffset;
 }
 
@@ -383,8 +383,8 @@ void AnalogInput::GetAccumulatorOutput(int64_t& value, uint32_t& count) const {
  */
 void AnalogInput::SetSampleRate(float samplesPerSecond) {
   int32_t status = 0;
-  setAnalogSampleRate(samplesPerSecond, &status);
-  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+  HAL_SetAnalogSampleRate(samplesPerSecond, &status);
+  wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -394,8 +394,8 @@ void AnalogInput::SetSampleRate(float samplesPerSecond) {
  */
 float AnalogInput::GetSampleRate() {
   int32_t status = 0;
-  float sampleRate = getAnalogSampleRate(&status);
-  wpi_setGlobalErrorWithContext(status, getHALErrorMessage(status));
+  float sampleRate = HAL_GetAnalogSampleRate(&status);
+  wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return sampleRate;
 }
 

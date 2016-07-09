@@ -31,8 +31,8 @@ struct AnalogPort {
   tAccumulator* accumulator;
 };
 
-extern IndexedHandleResource<HalAnalogInputHandle, hal::AnalogPort,
-                             kNumAnalogInputs, HalHandleEnum::AnalogInput>
+extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
+                             kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
     analogInputHandles;
 
 uint32_t getAnalogNumActiveChannels(int32_t* status);

@@ -75,7 +75,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
 
   Calibrate();
 
-  HALReport(HALUsageReporting::kResourceType_ADXRS450, port);
+  HAL_Report(HALUsageReporting::kResourceType_ADXRS450, port);
   LiveWindow::GetInstance()->AddSensor("ADXRS450_Gyro", port, this);
 }
 

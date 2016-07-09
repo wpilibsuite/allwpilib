@@ -72,13 +72,13 @@ struct DigitalPort {
   int32_t minPwm = 0;
 };
 
-extern DigitalHandleResource<HalDigitalHandle, DigitalPort,
+extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                              kNumDigitalPins + kNumPWMHeaders>
     digitalPinHandles;
 
 void initializeDigital(int32_t* status);
-bool remapDigitalSource(HalHandle digitalSourceHandle,
-                        AnalogTriggerType analogTriggerType, uint32_t& pin,
+bool remapDigitalSource(HAL_Handle digitalSourceHandle,
+                        HAL_AnalogTriggerType analogTriggerType, uint32_t& pin,
                         uint8_t& module, bool& analogTrigger);
 uint32_t remapMXPPWMChannel(uint32_t pin);
 uint32_t remapMXPChannel(uint32_t pin);

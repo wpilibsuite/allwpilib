@@ -28,15 +28,15 @@ static priority_recursive_mutex spiOnboardSemaphore;
 static priority_recursive_mutex spiMXPSemaphore;
 static tSPI* spiSystem;
 
-static HalDigitalHandle spiMXPDigitalHandle1 = HAL_INVALID_HANDLE;
-static HalDigitalHandle spiMXPDigitalHandle2 = HAL_INVALID_HANDLE;
-static HalDigitalHandle spiMXPDigitalHandle3 = HAL_INVALID_HANDLE;
-static HalDigitalHandle spiMXPDigitalHandle4 = HAL_INVALID_HANDLE;
+static HAL_DigitalHandle spiMXPDigitalHandle1 = HAL_kInvalidHandle;
+static HAL_DigitalHandle spiMXPDigitalHandle2 = HAL_kInvalidHandle;
+static HAL_DigitalHandle spiMXPDigitalHandle3 = HAL_kInvalidHandle;
+static HAL_DigitalHandle spiMXPDigitalHandle4 = HAL_kInvalidHandle;
 
 extern "C" {
 
 struct SPIAccumulator {
-  std::atomic<HalNotifierHandle> notifier{0};
+  std::atomic<HAL_NotifierHandle> notifier{0};
   uint64_t triggerTime;
   uint32_t period;
 
@@ -66,54 +66,56 @@ SPIAccumulator* spiAccumulators[5] = {nullptr, nullptr, nullptr, nullptr,
  * If opening the MXP port, also sets up the pin functions appropriately
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
-void spiInitialize(uint8_t port, int32_t* status) {
+void HAL_SpiInitialize(uint8_t port, int32_t* status) {
   if (spiSystem == nullptr) spiSystem = tSPI::create(status);
-  if (spiGetHandle(port) != 0) return;
+  if (HAL_SpiGetHandle(port) != 0) return;
   switch (port) {
     case 0:
-      spiSetHandle(0, spilib_open("/dev/spidev0.0"));
+      HAL_SpiSetHandle(0, spilib_open("/dev/spidev0.0"));
       break;
     case 1:
-      spiSetHandle(1, spilib_open("/dev/spidev0.1"));
+      HAL_SpiSetHandle(1, spilib_open("/dev/spidev0.1"));
       break;
     case 2:
-      spiSetHandle(2, spilib_open("/dev/spidev0.2"));
+      HAL_SpiSetHandle(2, spilib_open("/dev/spidev0.2"));
       break;
     case 3:
-      spiSetHandle(3, spilib_open("/dev/spidev0.3"));
+      HAL_SpiSetHandle(3, spilib_open("/dev/spidev0.3"));
       break;
     case 4:
       initializeDigital(status);
       if (*status != 0) return;
-      if ((spiMXPDigitalHandle1 = initializeDIOPort(
-               getPort(14), false, status)) == HAL_INVALID_HANDLE) {
+      if ((spiMXPDigitalHandle1 = HAL_InitializeDIOPort(
+               HAL_GetPort(14), false, status)) == HAL_kInvalidHandle) {
         printf("Failed to allocate DIO 14\n");
         return;
       }
-      if ((spiMXPDigitalHandle2 = initializeDIOPort(
-               getPort(15), false, status)) == HAL_INVALID_HANDLE) {
+      if ((spiMXPDigitalHandle2 = HAL_InitializeDIOPort(
+               HAL_GetPort(15), false, status)) == HAL_kInvalidHandle) {
         printf("Failed to allocate DIO 15\n");
-        freeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
+        HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
         return;
       }
-      if ((spiMXPDigitalHandle3 = initializeDIOPort(
-               getPort(16), false, status)) == HAL_INVALID_HANDLE) {
+      if ((spiMXPDigitalHandle3 = HAL_InitializeDIOPort(
+               HAL_GetPort(16), false, status)) == HAL_kInvalidHandle) {
         printf("Failed to allocate DIO 16\n");
-        freeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
-        freeDIOPort(spiMXPDigitalHandle2);  // free the second port allocated
+        HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
+        HAL_FreeDIOPort(
+            spiMXPDigitalHandle2);  // free the second port allocated
         return;
       }
-      if ((spiMXPDigitalHandle4 = initializeDIOPort(
-               getPort(17), false, status)) == HAL_INVALID_HANDLE) {
+      if ((spiMXPDigitalHandle4 = HAL_InitializeDIOPort(
+               HAL_GetPort(17), false, status)) == HAL_kInvalidHandle) {
         printf("Failed to allocate DIO 17\n");
-        freeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
-        freeDIOPort(spiMXPDigitalHandle2);  // free the second port allocated
-        freeDIOPort(spiMXPDigitalHandle3);  // free the third port allocated
+        HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
+        HAL_FreeDIOPort(
+            spiMXPDigitalHandle2);  // free the second port allocated
+        HAL_FreeDIOPort(spiMXPDigitalHandle3);  // free the third port allocated
         return;
       }
       digitalSystem->writeEnableMXPSpecialFunction(
           digitalSystem->readEnableMXPSpecialFunction(status) | 0x00F0, status);
-      spiSetHandle(4, spilib_open("/dev/spidev1.0"));
+      HAL_SpiSetHandle(4, spilib_open("/dev/spidev1.0"));
       break;
     default:
       break;
@@ -133,10 +135,10 @@ void spiInitialize(uint8_t port, int32_t* status) {
  * @param size Number of bytes to transfer. [0..7]
  * @return Number of bytes transferred, -1 for error
  */
-int32_t spiTransaction(uint8_t port, uint8_t* dataToSend, uint8_t* dataReceived,
-                       uint8_t size) {
+int32_t HAL_SpiTransaction(uint8_t port, uint8_t* dataToSend,
+                           uint8_t* dataReceived, uint8_t size) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
-  return spilib_writeread(spiGetHandle(port), (const char*)dataToSend,
+  return spilib_writeread(HAL_SpiGetHandle(port), (const char*)dataToSend,
                           (char*)dataReceived, (int32_t)size);
 }
 
@@ -150,9 +152,9 @@ int32_t spiTransaction(uint8_t port, uint8_t* dataToSend, uint8_t* dataReceived,
  * @param sendSize The number of bytes to be written
  * @return The number of bytes written. -1 for an error
  */
-int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize) {
+int32_t HAL_SpiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
-  return spilib_write(spiGetHandle(port), (const char*)dataToSend,
+  return spilib_write(HAL_SpiGetHandle(port), (const char*)dataToSend,
                       (int32_t)sendSize);
 }
 
@@ -169,9 +171,9 @@ int32_t spiWrite(uint8_t port, uint8_t* dataToSend, uint8_t sendSize) {
  * @param count The number of bytes to read in the transaction. [1..7]
  * @return Number of bytes read. -1 for error.
  */
-int32_t spiRead(uint8_t port, uint8_t* buffer, uint8_t count) {
+int32_t HAL_SpiRead(uint8_t port, uint8_t* buffer, uint8_t count) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
-  return spilib_read(spiGetHandle(port), (char*)buffer, (int32_t)count);
+  return spilib_read(HAL_SpiGetHandle(port), (char*)buffer, (int32_t)count);
 }
 
 /**
@@ -179,19 +181,19 @@ int32_t spiRead(uint8_t port, uint8_t* buffer, uint8_t count) {
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
-void spiClose(uint8_t port) {
+void HAL_SpiClose(uint8_t port) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   if (spiAccumulators[port]) {
     int32_t status = 0;
-    spiFreeAccumulator(port, &status);
+    HAL_SpiFreeAccumulator(port, &status);
   }
-  spilib_close(spiGetHandle(port));
-  spiSetHandle(port, 0);
+  spilib_close(HAL_SpiGetHandle(port));
+  HAL_SpiSetHandle(port, 0);
   if (port == 4) {
-    freeDIOPort(spiMXPDigitalHandle1);
-    freeDIOPort(spiMXPDigitalHandle2);
-    freeDIOPort(spiMXPDigitalHandle3);
-    freeDIOPort(spiMXPDigitalHandle4);
+    HAL_FreeDIOPort(spiMXPDigitalHandle1);
+    HAL_FreeDIOPort(spiMXPDigitalHandle2);
+    HAL_FreeDIOPort(spiMXPDigitalHandle3);
+    HAL_FreeDIOPort(spiMXPDigitalHandle4);
   }
   return;
 }
@@ -202,9 +204,9 @@ void spiClose(uint8_t port) {
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  * @param speed The speed in Hz (0-1MHz)
  */
-void spiSetSpeed(uint8_t port, uint32_t speed) {
+void HAL_SpiSetSpeed(uint8_t port, uint32_t speed) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
-  spilib_setspeed(spiGetHandle(port), speed);
+  spilib_setspeed(HAL_SpiGetHandle(port), speed);
 }
 
 /**
@@ -217,10 +219,10 @@ void spiSetSpeed(uint8_t port, uint32_t speed) {
  * @param clk_idle_high True to set the clock to active low, False to set the
  * clock active high
  */
-void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing,
-                int clk_idle_high) {
+void HAL_SpiSetOpts(uint8_t port, int msb_first, int sample_on_trailing,
+                    int clk_idle_high) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
-  spilib_setopts(spiGetHandle(port), msb_first, sample_on_trailing,
+  spilib_setopts(HAL_SpiGetHandle(port), msb_first, sample_on_trailing,
                  clk_idle_high);
 }
 
@@ -229,7 +231,7 @@ void spiSetOpts(uint8_t port, int msb_first, int sample_on_trailing,
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
-void spiSetChipSelectActiveHigh(uint8_t port, int32_t* status) {
+void HAL_SpiSetChipSelectActiveHigh(uint8_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   if (port < 4) {
     spiSystem->writeChipSelectActiveHigh_Hdr(
@@ -244,7 +246,7 @@ void spiSetChipSelectActiveHigh(uint8_t port, int32_t* status) {
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
-void spiSetChipSelectActiveLow(uint8_t port, int32_t* status) {
+void HAL_SpiSetChipSelectActiveLow(uint8_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   if (port < 4) {
     spiSystem->writeChipSelectActiveHigh_Hdr(
@@ -260,7 +262,7 @@ void spiSetChipSelectActiveLow(uint8_t port, int32_t* status) {
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  * @return The stored handle for the SPI port. 0 represents no stored handle.
  */
-int32_t spiGetHandle(uint8_t port) {
+int32_t HAL_SpiGetHandle(uint8_t port) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   switch (port) {
     case 0:
@@ -285,7 +287,7 @@ int32_t spiGetHandle(uint8_t port) {
  * MXP.
  * @param handle The value of the handle for the port.
  */
-void spiSetHandle(uint8_t port, int32_t handle) {
+void HAL_SpiSetHandle(uint8_t port, int32_t handle) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   switch (port) {
     case 0:
@@ -327,7 +329,7 @@ static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
   // perform SPI transaction
   uint8_t resp_b[4];
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(accum->port));
-  spilib_writeread(spiGetHandle(accum->port), (const char*)accum->cmd,
+  spilib_writeread(HAL_SpiGetHandle(accum->port), (const char*)accum->cmd,
                    (char*)resp_b, (int32_t)accum->xfer_size);
 
   // convert from bytes
@@ -369,7 +371,7 @@ static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
   if (accum->triggerTime < currentTime)
     accum->triggerTime = currentTime + accum->period;
   int32_t status = 0;
-  updateNotifierAlarm(accum->notifier, accum->triggerTime, &status);
+  HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, &status);
 }
 
 /**
@@ -388,11 +390,11 @@ static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
  * @param is_signed Is data field signed?
  * @param big_endian Is device big endian?
  */
-void spiInitAccumulator(uint8_t port, uint32_t period, uint32_t cmd,
-                        uint8_t xfer_size, uint32_t valid_mask,
-                        uint32_t valid_value, uint8_t data_shift,
-                        uint8_t data_size, bool is_signed, bool big_endian,
-                        int32_t* status) {
+void HAL_SpiInitAccumulator(uint8_t port, uint32_t period, uint32_t cmd,
+                            uint8_t xfer_size, uint32_t valid_mask,
+                            uint32_t valid_value, uint8_t data_shift,
+                            uint8_t data_size, bool is_signed, bool big_endian,
+                            int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   if (port > 4) return;
   if (!spiAccumulators[port]) spiAccumulators[port] = new SPIAccumulator();
@@ -421,25 +423,26 @@ void spiInitAccumulator(uint8_t port, uint32_t period, uint32_t cmd,
   accum->is_signed = is_signed;
   accum->big_endian = big_endian;
   if (!accum->notifier) {
-    accum->notifier = initializeNotifier(spiAccumulatorProcess, accum, status);
-    accum->triggerTime = getFPGATime(status) + period;
+    accum->notifier =
+        HAL_InitializeNotifier(spiAccumulatorProcess, accum, status);
+    accum->triggerTime = HAL_GetFPGATime(status) + period;
     if (*status != 0) return;
-    updateNotifierAlarm(accum->notifier, accum->triggerTime, status);
+    HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, status);
   }
 }
 
 /**
  * Frees a SPI accumulator.
  */
-void spiFreeAccumulator(uint8_t port, int32_t* status) {
+void HAL_SpiFreeAccumulator(uint8_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   SPIAccumulator* accum = spiAccumulators[port];
   if (!accum) {
     *status = NULL_PARAMETER;
     return;
   }
-  HalNotifierHandle handle = accum->notifier.exchange(0);
-  cleanNotifier(handle, status);
+  HAL_NotifierHandle handle = accum->notifier.exchange(0);
+  HAL_CleanNotifier(handle, status);
   delete accum;
   spiAccumulators[port] = nullptr;
 }
@@ -447,7 +450,7 @@ void spiFreeAccumulator(uint8_t port, int32_t* status) {
 /**
  * Resets the accumulator to zero.
  */
-void spiResetAccumulator(uint8_t port, int32_t* status) {
+void HAL_SpiResetAccumulator(uint8_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   SPIAccumulator* accum = spiAccumulators[port];
   if (!accum) {
@@ -468,7 +471,8 @@ void spiResetAccumulator(uint8_t port, int32_t* status) {
  * integration work
  * and to take the device offset into account when integrating.
  */
-void spiSetAccumulatorCenter(uint8_t port, int32_t center, int32_t* status) {
+void HAL_SpiSetAccumulatorCenter(uint8_t port, int32_t center,
+                                 int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   SPIAccumulator* accum = spiAccumulators[port];
   if (!accum) {
@@ -481,8 +485,8 @@ void spiSetAccumulatorCenter(uint8_t port, int32_t center, int32_t* status) {
 /**
  * Set the accumulator's deadband.
  */
-void spiSetAccumulatorDeadband(uint8_t port, int32_t deadband,
-                               int32_t* status) {
+void HAL_SpiSetAccumulatorDeadband(uint8_t port, int32_t deadband,
+                                   int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   SPIAccumulator* accum = spiAccumulators[port];
   if (!accum) {
@@ -495,7 +499,7 @@ void spiSetAccumulatorDeadband(uint8_t port, int32_t deadband,
 /**
  * Read the last value read by the accumulator engine.
  */
-int32_t spiGetAccumulatorLastValue(uint8_t port, int32_t* status) {
+int32_t HAL_SpiGetAccumulatorLastValue(uint8_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   SPIAccumulator* accum = spiAccumulators[port];
   if (!accum) {
@@ -510,7 +514,7 @@ int32_t spiGetAccumulatorLastValue(uint8_t port, int32_t* status) {
  *
  * @return The 64-bit value accumulated since the last Reset().
  */
-int64_t spiGetAccumulatorValue(uint8_t port, int32_t* status) {
+int64_t HAL_SpiGetAccumulatorValue(uint8_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   SPIAccumulator* accum = spiAccumulators[port];
   if (!accum) {
@@ -528,7 +532,7 @@ int64_t spiGetAccumulatorValue(uint8_t port, int32_t* status) {
  *
  * @return The number of times samples from the channel were accumulated.
  */
-uint32_t spiGetAccumulatorCount(uint8_t port, int32_t* status) {
+uint32_t HAL_SpiGetAccumulatorCount(uint8_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   SPIAccumulator* accum = spiAccumulators[port];
   if (!accum) {
@@ -543,10 +547,10 @@ uint32_t spiGetAccumulatorCount(uint8_t port, int32_t* status) {
  *
  * @return The accumulated average value (value / count).
  */
-double spiGetAccumulatorAverage(uint8_t port, int32_t* status) {
+double HAL_SpiGetAccumulatorAverage(uint8_t port, int32_t* status) {
   int64_t value;
   uint32_t count;
-  spiGetAccumulatorOutput(port, &value, &count, status);
+  HAL_SpiGetAccumulatorOutput(port, &value, &count, status);
   if (count == 0) return 0.0;
   return ((double)value) / count;
 }
@@ -560,8 +564,8 @@ double spiGetAccumulatorAverage(uint8_t port, int32_t* status) {
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
-void spiGetAccumulatorOutput(uint8_t port, int64_t* value, uint32_t* count,
-                             int32_t* status) {
+void HAL_SpiGetAccumulatorOutput(uint8_t port, int64_t* value, uint32_t* count,
+                                 int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
   SPIAccumulator* accum = spiAccumulators[port];
   if (!accum) {

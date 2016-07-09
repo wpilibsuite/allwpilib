@@ -26,7 +26,7 @@ Java_edu_wpi_first_wpilibj_hal_JNIWrapper_getPortWithModule(
   // FILE_LOG(logDEBUG) << "Calling JNIWrapper getPortWithModlue";
   // FILE_LOG(logDEBUG) << "Module = " << (jint)module;
   // FILE_LOG(logDEBUG) << "Pin = " << (jint)pin;
-  HalPortHandle port = getPortWithModule(module, pin);
+  HAL_PortHandle port = HAL_GetPortWithModule(module, pin);
   // FILE_LOG(logDEBUG) << "Port Handle = " << port;
   return (jint)port;
 }
@@ -41,7 +41,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_JNIWrapper_getPort(
   // FILE_LOG(logDEBUG) << "Calling JNIWrapper getPortWithModlue";
   // FILE_LOG(logDEBUG) << "Module = " << (jint)module;
   // FILE_LOG(logDEBUG) << "Pin = " << (jint)pin;
-  HalPortHandle port = getPort(pin);
+  HAL_PortHandle port = HAL_GetPort(pin);
   // FILE_LOG(logDEBUG) << "Port Handle = " << port;
   return (jint)port;
 }

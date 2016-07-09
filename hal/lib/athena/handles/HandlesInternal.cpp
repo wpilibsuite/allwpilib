@@ -11,9 +11,9 @@
 #include "UnlimitedHandleResource.h"
 
 namespace hal {
-HalPortHandle createPortHandle(uint8_t pin, uint8_t module) {
+HAL_PortHandle createPortHandle(uint8_t pin, uint8_t module) {
   // set last 8 bits, then shift to first 8 bits
-  HalPortHandle handle = static_cast<HalPortHandle>(HalHandleEnum::Port);
+  HAL_PortHandle handle = static_cast<HAL_PortHandle>(HAL_HandleEnum::Port);
   handle = handle << 24;
   // shift module and add to 3rd set of 8 bits
   int32_t temp = module;
@@ -24,12 +24,12 @@ HalPortHandle createPortHandle(uint8_t pin, uint8_t module) {
   return handle;
 }
 
-HalHandle createHandle(int16_t index, HalHandleEnum handleType) {
-  if (index < 0) return HAL_INVALID_HANDLE;
+HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType) {
+  if (index < 0) return HAL_kInvalidHandle;
   uint8_t hType = static_cast<uint8_t>(handleType);
-  if (hType == 0 || hType > 127) return HAL_INVALID_HANDLE;
+  if (hType == 0 || hType > 127) return HAL_kInvalidHandle;
   // set last 8 bits, then shift to first 8 bits
-  HalHandle handle = hType;
+  HAL_Handle handle = hType;
   handle = handle << 24;
   // add index to set last 16 bits
   handle += index;

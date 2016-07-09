@@ -12,50 +12,58 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Handles.h"
 
-enum Mode {
-  kTwoPulse = 0,
-  kSemiperiod = 1,
-  kPulseLength = 2,
-  kExternalDirection = 3
+enum HAL_Counter_Mode {
+  HAL_Counter_kTwoPulse = 0,
+  HAL_Counter_kSemiperiod = 1,
+  HAL_Counter_kPulseLength = 2,
+  HAL_Counter_kExternalDirection = 3
 };
 
 extern "C" {
-HalCounterHandle initializeCounter(Mode mode, int32_t* index, int32_t* status);
-void freeCounter(HalCounterHandle counter_handle, int32_t* status);
-void setCounterAverageSize(HalCounterHandle counter_handle, int32_t size,
-                           int32_t* status);
-void setCounterUpSource(HalCounterHandle counter_handle,
-                        HalHandle digitalSourceHandle,
-                        AnalogTriggerType analogTriggerType, int32_t* status);
-void setCounterUpSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
-                            bool fallingEdge, int32_t* status);
-void clearCounterUpSource(HalCounterHandle counter_handle, int32_t* status);
-void setCounterDownSource(HalCounterHandle counter_handle,
-                          HalHandle digitalSourceHandle,
-                          AnalogTriggerType analogTriggerType, int32_t* status);
-void setCounterDownSourceEdge(HalCounterHandle counter_handle, bool risingEdge,
-                              bool fallingEdge, int32_t* status);
-void clearCounterDownSource(HalCounterHandle counter_handle, int32_t* status);
-void setCounterUpDownMode(HalCounterHandle counter_handle, int32_t* status);
-void setCounterExternalDirectionMode(HalCounterHandle counter_handle,
-                                     int32_t* status);
-void setCounterSemiPeriodMode(HalCounterHandle counter_handle,
-                              bool highSemiPeriod, int32_t* status);
-void setCounterPulseLengthMode(HalCounterHandle counter_handle,
-                               double threshold, int32_t* status);
-int32_t getCounterSamplesToAverage(HalCounterHandle counter_handle,
-                                   int32_t* status);
-void setCounterSamplesToAverage(HalCounterHandle counter_handle,
-                                int samplesToAverage, int32_t* status);
-void resetCounter(HalCounterHandle counter_handle, int32_t* status);
-int32_t getCounter(HalCounterHandle counter_handle, int32_t* status);
-double getCounterPeriod(HalCounterHandle counter_handle, int32_t* status);
-void setCounterMaxPeriod(HalCounterHandle counter_handle, double maxPeriod,
-                         int32_t* status);
-void setCounterUpdateWhenEmpty(HalCounterHandle counter_handle, bool enabled,
+HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
+                                        int32_t* status);
+void HAL_FreeCounter(HAL_CounterHandle counter_handle, int32_t* status);
+void HAL_SetCounterAverageSize(HAL_CounterHandle counter_handle, int32_t size,
                                int32_t* status);
-bool getCounterStopped(HalCounterHandle counter_handle, int32_t* status);
-bool getCounterDirection(HalCounterHandle counter_handle, int32_t* status);
-void setCounterReverseDirection(HalCounterHandle counter_handle,
-                                bool reverseDirection, int32_t* status);
+void HAL_SetCounterUpSource(HAL_CounterHandle counter_handle,
+                            HAL_Handle digitalSourceHandle,
+                            HAL_AnalogTriggerType analogTriggerType,
+                            int32_t* status);
+void HAL_SetCounterUpSourceEdge(HAL_CounterHandle counter_handle,
+                                bool risingEdge, bool fallingEdge,
+                                int32_t* status);
+void HAL_ClearCounterUpSource(HAL_CounterHandle counter_handle,
+                              int32_t* status);
+void HAL_SetCounterDownSource(HAL_CounterHandle counter_handle,
+                              HAL_Handle digitalSourceHandle,
+                              HAL_AnalogTriggerType analogTriggerType,
+                              int32_t* status);
+void HAL_SetCounterDownSourceEdge(HAL_CounterHandle counter_handle,
+                                  bool risingEdge, bool fallingEdge,
+                                  int32_t* status);
+void HAL_ClearCounterDownSource(HAL_CounterHandle counter_handle,
+                                int32_t* status);
+void HAL_SetCounterUpDownMode(HAL_CounterHandle counter_handle,
+                              int32_t* status);
+void HAL_SetCounterExternalDirectionMode(HAL_CounterHandle counter_handle,
+                                         int32_t* status);
+void HAL_SetCounterSemiPeriodMode(HAL_CounterHandle counter_handle,
+                                  bool highSemiPeriod, int32_t* status);
+void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counter_handle,
+                                   double threshold, int32_t* status);
+int32_t HAL_GetCounterSamplesToAverage(HAL_CounterHandle counter_handle,
+                                       int32_t* status);
+void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counter_handle,
+                                    int samplesToAverage, int32_t* status);
+void HAL_ResetCounter(HAL_CounterHandle counter_handle, int32_t* status);
+int32_t HAL_GetCounter(HAL_CounterHandle counter_handle, int32_t* status);
+double HAL_GetCounterPeriod(HAL_CounterHandle counter_handle, int32_t* status);
+void HAL_SetCounterMaxPeriod(HAL_CounterHandle counter_handle, double maxPeriod,
+                             int32_t* status);
+void HAL_SetCounterUpdateWhenEmpty(HAL_CounterHandle counter_handle,
+                                   bool enabled, int32_t* status);
+bool HAL_GetCounterStopped(HAL_CounterHandle counter_handle, int32_t* status);
+bool HAL_GetCounterDirection(HAL_CounterHandle counter_handle, int32_t* status);
+void HAL_SetCounterReverseDirection(HAL_CounterHandle counter_handle,
+                                    bool reverseDirection, int32_t* status);
 }

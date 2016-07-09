@@ -20,7 +20,7 @@ extern "C" {
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getVinVoltage(JNIEnv* env, jclass) {
   int32_t status = 0;
-  float val = getVinVoltage(&status);
+  float val = HAL_GetVinVoltage(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -33,7 +33,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getVinVoltage(JNIEnv* env, jclass) {
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getVinCurrent(JNIEnv* env, jclass) {
   int32_t status = 0;
-  float val = getVinCurrent(&status);
+  float val = HAL_GetVinCurrent(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -46,7 +46,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getVinCurrent(JNIEnv* env, jclass) {
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage6V(JNIEnv* env, jclass) {
   int32_t status = 0;
-  float val = getUserVoltage6V(&status);
+  float val = HAL_GetUserVoltage6V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -59,7 +59,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage6V(JNIEnv* env, jclass) {
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent6V(JNIEnv* env, jclass) {
   int32_t status = 0;
-  float val = getUserCurrent6V(&status);
+  float val = HAL_GetUserCurrent6V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -72,7 +72,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent6V(JNIEnv* env, jclass) {
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive6V(JNIEnv* env, jclass) {
   int32_t status = 0;
-  bool val = getUserActive6V(&status);
+  bool val = HAL_GetUserActive6V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -86,7 +86,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults6V(
     JNIEnv* env, jclass) {
   int32_t status = 0;
-  int val = getUserCurrentFaults6V(&status);
+  int val = HAL_GetUserCurrentFaults6V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -99,7 +99,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults6V(
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage5V(JNIEnv* env, jclass) {
   int32_t status = 0;
-  float val = getUserVoltage5V(&status);
+  float val = HAL_GetUserVoltage5V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -112,7 +112,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage5V(JNIEnv* env, jclass) {
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent5V(JNIEnv* env, jclass) {
   int32_t status = 0;
-  float val = getUserCurrent5V(&status);
+  float val = HAL_GetUserCurrent5V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -125,7 +125,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent5V(JNIEnv* env, jclass) {
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive5V(JNIEnv* env, jclass) {
   int32_t status = 0;
-  bool val = getUserActive5V(&status);
+  bool val = HAL_GetUserActive5V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -139,7 +139,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults5V(
     JNIEnv* env, jclass) {
   int32_t status = 0;
-  int val = getUserCurrentFaults5V(&status);
+  int val = HAL_GetUserCurrentFaults5V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -152,7 +152,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults5V(
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage3V3(JNIEnv* env, jclass) {
   int32_t status = 0;
-  float val = getUserVoltage3V3(&status);
+  float val = HAL_GetUserVoltage3V3(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -165,7 +165,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserVoltage3V3(JNIEnv* env, jclass) {
 JNIEXPORT jfloat JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent3V3(JNIEnv* env, jclass) {
   int32_t status = 0;
-  float val = getUserCurrent3V3(&status);
+  float val = HAL_GetUserCurrent3V3(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -178,7 +178,7 @@ Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrent3V3(JNIEnv* env, jclass) {
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserActive3V3(JNIEnv* env, jclass) {
   int32_t status = 0;
-  bool val = getUserActive3V3(&status);
+  bool val = HAL_GetUserActive3V3(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -192,7 +192,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults3V3(
     JNIEnv* env, jclass) {
   int32_t status = 0;
-  int val = getUserCurrentFaults3V3(&status);
+  int val = HAL_GetUserCurrentFaults3V3(&status);
   CheckStatus(env, status);
   return val;
 }

@@ -26,7 +26,7 @@ namespace hal {
  * Because they are allocated by index, each individual index holds its own
  * mutex, which reduces contention heavily.]
  *
- * @tparam THandle The Handle Type (Must be typedefed from HalHandle)
+ * @tparam THandle The Handle Type (Must be typedefed from HAL_Handle)
  * @tparam TStruct The struct type held by this resource
  * @tparam size The number of resources allowed to be allocated
  *
@@ -40,9 +40,9 @@ class DigitalHandleResource {
   DigitalHandleResource operator=(const DigitalHandleResource&) = delete;
   DigitalHandleResource();
   ~DigitalHandleResource();
-  THandle Allocate(int16_t index, HalHandleEnum enumValue, int32_t* status);
-  std::shared_ptr<TStruct> Get(THandle handle, HalHandleEnum enumValue);
-  void Free(THandle handle, HalHandleEnum enumValue);
+  THandle Allocate(int16_t index, HAL_HandleEnum enumValue, int32_t* status);
+  std::shared_ptr<TStruct> Get(THandle handle, HAL_HandleEnum enumValue);
+  void Free(THandle handle, HAL_HandleEnum enumValue);
 
  private:
   // Dynamic array to shrink HAL file size.
@@ -64,17 +64,17 @@ DigitalHandleResource<THandle, TStruct, size>::~DigitalHandleResource() {
 
 template <typename THandle, typename TStruct, int16_t size>
 THandle DigitalHandleResource<THandle, TStruct, size>::Allocate(
-    int16_t index, HalHandleEnum enumValue, int32_t* status) {
+    int16_t index, HAL_HandleEnum enumValue, int32_t* status) {
   // don't aquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   std::lock_guard<priority_mutex> sync(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     *status = RESOURCE_IS_ALLOCATED;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   m_structures[index] = std::make_shared<TStruct>();
   return (THandle)hal::createHandle(index, enumValue);
@@ -82,7 +82,7 @@ THandle DigitalHandleResource<THandle, TStruct, size>::Allocate(
 
 template <typename THandle, typename TStruct, int16_t size>
 std::shared_ptr<TStruct> DigitalHandleResource<THandle, TStruct, size>::Get(
-    THandle handle, HalHandleEnum enumValue) {
+    THandle handle, HAL_HandleEnum enumValue) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue);
   if (index < 0 || index >= size) {
@@ -96,7 +96,7 @@ std::shared_ptr<TStruct> DigitalHandleResource<THandle, TStruct, size>::Get(
 
 template <typename THandle, typename TStruct, int16_t size>
 void DigitalHandleResource<THandle, TStruct, size>::Free(
-    THandle handle, HalHandleEnum enumValue) {
+    THandle handle, HAL_HandleEnum enumValue) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue);
   if (index < 0 || index >= size) return;

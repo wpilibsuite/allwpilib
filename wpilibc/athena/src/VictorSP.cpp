@@ -36,6 +36,6 @@ VictorSP::VictorSP(uint32_t channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HALReport(HALUsageReporting::kResourceType_VictorSP, GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_VictorSP, GetChannel());
   LiveWindow::GetInstance()->AddActuator("VictorSP", GetChannel(), this);
 }

@@ -16,24 +16,28 @@ extern "C" {
 typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask,
                                          void* param);
 
-HalInterruptHandle initializeInterrupts(bool watcher, int32_t* status);
-void cleanInterrupts(HalInterruptHandle interrupt_handle, int32_t* status);
+HAL_InterruptHandle HAL_InitializeInterrupts(bool watcher, int32_t* status);
+void HAL_CleanInterrupts(HAL_InterruptHandle interrupt_handle, int32_t* status);
 
-uint32_t waitForInterrupt(HalInterruptHandle interrupt_handle, double timeout,
-                          bool ignorePrevious, int32_t* status);
-void enableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status);
-void disableInterrupts(HalInterruptHandle interrupt_handle, int32_t* status);
-double readRisingTimestamp(HalInterruptHandle interrupt_handle,
-                           int32_t* status);
-double readFallingTimestamp(HalInterruptHandle interrupt_handle,
-                            int32_t* status);
-void requestInterrupts(HalInterruptHandle interrupt_handle,
-                       HalHandle digitalSourceHandle,
-                       AnalogTriggerType analogTriggerType, int32_t* status);
-void attachInterruptHandler(HalInterruptHandle interrupt_handle,
-                            InterruptHandlerFunction handler, void* param,
-                            int32_t* status);
-void setInterruptUpSourceEdge(HalInterruptHandle interrupt_handle,
-                              bool risingEdge, bool fallingEdge,
+uint32_t HAL_WaitForInterrupt(HAL_InterruptHandle interrupt_handle,
+                              double timeout, bool ignorePrevious,
                               int32_t* status);
+void HAL_EnableInterrupts(HAL_InterruptHandle interrupt_handle,
+                          int32_t* status);
+void HAL_DisableInterrupts(HAL_InterruptHandle interrupt_handle,
+                           int32_t* status);
+double HAL_ReadRisingTimestamp(HAL_InterruptHandle interrupt_handle,
+                               int32_t* status);
+double HAL_ReadFallingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                int32_t* status);
+void HAL_RequestInterrupts(HAL_InterruptHandle interrupt_handle,
+                           HAL_Handle digitalSourceHandle,
+                           HAL_AnalogTriggerType analogTriggerType,
+                           int32_t* status);
+void HAL_AttachInterruptHandler(HAL_InterruptHandle interrupt_handle,
+                                InterruptHandlerFunction handler, void* param,
+                                int32_t* status);
+void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interrupt_handle,
+                                  bool risingEdge, bool fallingEdge,
+                                  int32_t* status);
 }

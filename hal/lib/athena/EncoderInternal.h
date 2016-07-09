@@ -14,10 +14,11 @@
 namespace hal {
 class Encoder {
  public:
-  Encoder(HalHandle digitalSourceHandleA, AnalogTriggerType analogTriggerTypeA,
-          HalHandle digitalSourceHandleB, AnalogTriggerType analogTriggerTypeB,
-          bool reverseDirection, EncoderEncodingType encodingType,
-          int32_t* status);
+  Encoder(HAL_Handle digitalSourceHandleA,
+          HAL_AnalogTriggerType analogTriggerTypeA,
+          HAL_Handle digitalSourceHandleB,
+          HAL_AnalogTriggerType analogTriggerTypeB, bool reverseDirection,
+          HAL_EncoderEncodingType encodingType, int32_t* status);
   ~Encoder();
 
   // CounterBase interface
@@ -38,9 +39,9 @@ class Encoder {
   void SetSamplesToAverage(int samplesToAverage, int32_t* status);
   int32_t GetSamplesToAverage(int32_t* status) const;
 
-  void SetIndexSource(HalHandle digitalSourceHandle,
-                      AnalogTriggerType analogTriggerType,
-                      EncoderIndexingType type, int32_t* status);
+  void SetIndexSource(HAL_Handle digitalSourceHandle,
+                      HAL_AnalogTriggerType analogTriggerType,
+                      HAL_EncoderIndexingType type, int32_t* status);
 
   int32_t GetFPGAIndex() const { return m_index; }
 
@@ -50,24 +51,25 @@ class Encoder {
 
   double GetDistancePerPulse() const { return m_distancePerPulse; }
 
-  EncoderEncodingType GetEncodingType() const { return m_encodingType; }
+  HAL_EncoderEncodingType GetEncodingType() const { return m_encodingType; }
 
  private:
-  void SetupCounter(HalHandle digitalSourceHandleA,
-                    AnalogTriggerType analogTriggerTypeA,
-                    HalHandle digitalSourceHandleB,
-                    AnalogTriggerType analogTriggerTypeB, bool reverseDirection,
-                    EncoderEncodingType encodingType, int32_t* status);
+  void SetupCounter(HAL_Handle digitalSourceHandleA,
+                    HAL_AnalogTriggerType analogTriggerTypeA,
+                    HAL_Handle digitalSourceHandleB,
+                    HAL_AnalogTriggerType analogTriggerTypeB,
+                    bool reverseDirection, HAL_EncoderEncodingType encodingType,
+                    int32_t* status);
 
-  HalFPGAEncoderHandle m_encoder = HAL_INVALID_HANDLE;
+  HAL_FPGAEncoderHandle m_encoder = HAL_kInvalidHandle;
 
-  HalCounterHandle m_counter = HAL_INVALID_HANDLE;
+  HAL_CounterHandle m_counter = HAL_kInvalidHandle;
 
   int32_t m_index = 0;
 
   double m_distancePerPulse = 1.0;
 
-  EncoderEncodingType m_encodingType;
+  HAL_EncoderEncodingType m_encodingType;
 
   int32_t m_encodingScale;
 };

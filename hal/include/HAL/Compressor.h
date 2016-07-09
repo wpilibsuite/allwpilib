@@ -12,32 +12,33 @@
 #include "HAL/Handles.h"
 
 extern "C" {
-HalCompressorHandle initializeCompressor(uint8_t module, int32_t* status);
-bool checkCompressorModule(uint8_t module);
+HAL_CompressorHandle HAL_InitializeCompressor(uint8_t module, int32_t* status);
+bool HAL_CheckCompressorModule(uint8_t module);
 
-bool getCompressor(HalCompressorHandle compressor_handle, int32_t* status);
+bool HAL_GetCompressor(HAL_CompressorHandle compressor_handle, int32_t* status);
 
-void setClosedLoopControl(HalCompressorHandle compressor_handle, bool value,
-                          int32_t* status);
-bool getClosedLoopControl(HalCompressorHandle compressor_handle,
-                          int32_t* status);
+void HAL_SetClosedLoopControl(HAL_CompressorHandle compressor_handle,
+                              bool value, int32_t* status);
+bool HAL_GetClosedLoopControl(HAL_CompressorHandle compressor_handle,
+                              int32_t* status);
 
-bool getPressureSwitch(HalCompressorHandle compressor_handle, int32_t* status);
-float getCompressorCurrent(HalCompressorHandle compressor_handle,
+bool HAL_GetPressureSwitch(HAL_CompressorHandle compressor_handle,
                            int32_t* status);
-
-bool getCompressorCurrentTooHighFault(HalCompressorHandle compressor_handle,
-                                      int32_t* status);
-bool getCompressorCurrentTooHighStickyFault(
-    HalCompressorHandle compressor_handle, int32_t* status);
-bool getCompressorShortedStickyFault(HalCompressorHandle compressor_handle,
-                                     int32_t* status);
-bool getCompressorShortedFault(HalCompressorHandle compressor_handle,
+float HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
                                int32_t* status);
-bool getCompressorNotConnectedStickyFault(HalCompressorHandle compressor_handle,
-                                          int32_t* status);
-bool getCompressorNotConnectedFault(HalCompressorHandle compressor_handle,
-                                    int32_t* status);
-void clearAllPCMStickyFaults(HalCompressorHandle compressor_handle,
-                             int32_t* status);
+
+bool HAL_GetCompressorCurrentTooHighFault(
+    HAL_CompressorHandle compressor_handle, int32_t* status);
+bool HAL_GetCompressorCurrentTooHighStickyFault(
+    HAL_CompressorHandle compressor_handle, int32_t* status);
+bool HAL_GetCompressorShortedStickyFault(HAL_CompressorHandle compressor_handle,
+                                         int32_t* status);
+bool HAL_GetCompressorShortedFault(HAL_CompressorHandle compressor_handle,
+                                   int32_t* status);
+bool HAL_GetCompressorNotConnectedStickyFault(
+    HAL_CompressorHandle compressor_handle, int32_t* status);
+bool HAL_GetCompressorNotConnectedFault(HAL_CompressorHandle compressor_handle,
+                                        int32_t* status);
+void HAL_ClearAllPCMStickyFaults(HAL_CompressorHandle compressor_handle,
+                                 int32_t* status);
 }

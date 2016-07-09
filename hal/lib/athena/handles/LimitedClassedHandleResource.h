@@ -23,14 +23,14 @@ namespace hal {
  * version
  * allows a limited number of handles that are allocated sequentially.
  *
- * @tparam THandle The Handle Type (Must be typedefed from HalHandle)
+ * @tparam THandle The Handle Type (Must be typedefed from HAL_Handle)
  * @tparam TStruct The struct type held by this resource
  * @tparam size The number of resources allowed to be allocated
  * @tparam enumValue The type value stored in the handle
  *
  */
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 class LimitedClassedHandleResource {
   friend class LimitedClassedHandleResourceTest;
 
@@ -52,7 +52,7 @@ class LimitedClassedHandleResource {
 };
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 LimitedClassedHandleResource<THandle, TStruct, size,
                              enumValue>::LimitedClassedHandleResource() {
   m_structures = new std::shared_ptr<TStruct>[size];
@@ -60,7 +60,7 @@ LimitedClassedHandleResource<THandle, TStruct, size,
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 LimitedClassedHandleResource<THandle, TStruct, size,
                              enumValue>::~LimitedClassedHandleResource() {
   delete[] m_structures;
@@ -68,7 +68,7 @@ LimitedClassedHandleResource<THandle, TStruct, size,
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 THandle
 LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     std::shared_ptr<TStruct> toSet) {
@@ -84,11 +84,11 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
       return (THandle)createHandle(i, enumValue);
     }
   }
-  return HAL_INVALID_HANDLE;
+  return HAL_kInvalidHandle;
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 std::shared_ptr<TStruct> LimitedClassedHandleResource<
     THandle, TStruct, size, enumValue>::Get(THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
@@ -103,7 +103,7 @@ std::shared_ptr<TStruct> LimitedClassedHandleResource<
 }
 
 template <typename THandle, typename TStruct, int16_t size,
-          HalHandleEnum enumValue>
+          HAL_HandleEnum enumValue>
 void LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle

@@ -18,8 +18,8 @@ extern "C" {
 *
 *@return The analog channel is attached to an accumulator.
 */
-bool isAccumulatorChannel(HalAnalogInputHandle analog_port_handle,
-                          int32_t* status) {
+bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analog_port_handle,
+                              int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -34,16 +34,17 @@ bool isAccumulatorChannel(HalAnalogInputHandle analog_port_handle,
 /**
  * Initialize the accumulator.
  */
-void initAccumulator(HalAnalogInputHandle analog_port_handle, int32_t* status) {
-  setAccumulatorCenter(analog_port_handle, 0, status);
-  resetAccumulator(analog_port_handle, status);
+void HAL_InitAccumulator(HAL_AnalogInputHandle analog_port_handle,
+                         int32_t* status) {
+  HAL_SetAccumulatorCenter(analog_port_handle, 0, status);
+  HAL_ResetAccumulator(analog_port_handle, status);
 }
 
 /**
  * Resets the accumulator to the initial value.
  */
-void resetAccumulator(HalAnalogInputHandle analog_port_handle,
-                      int32_t* status) {
+void HAL_ResetAccumulator(HAL_AnalogInputHandle analog_port_handle,
+                          int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -68,8 +69,8 @@ void resetAccumulator(HalAnalogInputHandle analog_port_handle,
  * source from channel 1. Because of this, any non-zero oversample bits will
  * affect the size of the value for this field.
  */
-void setAccumulatorCenter(HalAnalogInputHandle analog_port_handle,
-                          int32_t center, int32_t* status) {
+void HAL_SetAccumulatorCenter(HAL_AnalogInputHandle analog_port_handle,
+                              int32_t center, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -85,8 +86,8 @@ void setAccumulatorCenter(HalAnalogInputHandle analog_port_handle,
 /**
  * Set the accumulator's deadband.
  */
-void setAccumulatorDeadband(HalAnalogInputHandle analog_port_handle,
-                            int32_t deadband, int32_t* status) {
+void HAL_SetAccumulatorDeadband(HAL_AnalogInputHandle analog_port_handle,
+                                int32_t deadband, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -107,8 +108,8 @@ void setAccumulatorDeadband(HalAnalogInputHandle analog_port_handle,
  *
  * @return The 64-bit value accumulated since the last Reset().
  */
-int64_t getAccumulatorValue(HalAnalogInputHandle analog_port_handle,
-                            int32_t* status) {
+int64_t HAL_GetAccumulatorValue(HAL_AnalogInputHandle analog_port_handle,
+                                int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -130,8 +131,8 @@ int64_t getAccumulatorValue(HalAnalogInputHandle analog_port_handle,
  *
  * @return The number of times samples from the channel were accumulated.
  */
-uint32_t getAccumulatorCount(HalAnalogInputHandle analog_port_handle,
-                             int32_t* status) {
+uint32_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analog_port_handle,
+                                 int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -153,8 +154,9 @@ uint32_t getAccumulatorCount(HalAnalogInputHandle analog_port_handle,
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
-void getAccumulatorOutput(HalAnalogInputHandle analog_port_handle,
-                          int64_t* value, uint32_t* count, int32_t* status) {
+void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analog_port_handle,
+                              int64_t* value, uint32_t* count,
+                              int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;

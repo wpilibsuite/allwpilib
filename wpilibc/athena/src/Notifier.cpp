@@ -22,8 +22,8 @@ Notifier::Notifier(TimerEventHandler handler) {
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
   int32_t status = 0;
-  m_notifier = initializeNotifier(&Notifier::Notify, this, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  m_notifier = HAL_InitializeNotifier(&Notifier::Notify, this, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -32,9 +32,9 @@ Notifier::Notifier(TimerEventHandler handler) {
 Notifier::~Notifier() {
   int32_t status = 0;
   // atomically set handle to 0, then clean
-  HalNotifierHandle handle = m_notifier.exchange(0);
-  cleanNotifier(handle, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_NotifierHandle handle = m_notifier.exchange(0);
+  HAL_CleanNotifier(handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   /* Acquire the mutex; this makes certain that the handler is not being
    * executed by the interrupt manager.
@@ -47,8 +47,9 @@ Notifier::~Notifier() {
  */
 void Notifier::UpdateAlarm() {
   int32_t status = 0;
-  updateNotifierAlarm(m_notifier, (uint64_t)(m_expirationTime * 1e6), &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_UpdateNotifierAlarm(m_notifier, (uint64_t)(m_expirationTime * 1e6),
+                          &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
@@ -117,8 +118,8 @@ void Notifier::StartPeriodic(double period) {
  */
 void Notifier::Stop() {
   int32_t status = 0;
-  stopNotifierAlarm(m_notifier, &status);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  HAL_StopNotifierAlarm(m_notifier, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   // Wait for a currently executing handler to complete before returning from
   // Stop()

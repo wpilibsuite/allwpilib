@@ -10,18 +10,18 @@
 #include <stdint.h>
 
 extern "C" {
-float getVinVoltage(int32_t* status);
-float getVinCurrent(int32_t* status);
-float getUserVoltage6V(int32_t* status);
-float getUserCurrent6V(int32_t* status);
-bool getUserActive6V(int32_t* status);
-int getUserCurrentFaults6V(int32_t* status);
-float getUserVoltage5V(int32_t* status);
-float getUserCurrent5V(int32_t* status);
-bool getUserActive5V(int32_t* status);
-int getUserCurrentFaults5V(int32_t* status);
-float getUserVoltage3V3(int32_t* status);
-float getUserCurrent3V3(int32_t* status);
-bool getUserActive3V3(int32_t* status);
-int getUserCurrentFaults3V3(int32_t* status);
+float HAL_GetVinVoltage(int32_t* status);
+float HAL_GetVinCurrent(int32_t* status);
+float HAL_GetUserVoltage6V(int32_t* status);
+float HAL_GetUserCurrent6V(int32_t* status);
+bool HAL_GetUserActive6V(int32_t* status);
+int HAL_GetUserCurrentFaults6V(int32_t* status);
+float HAL_GetUserVoltage5V(int32_t* status);
+float HAL_GetUserCurrent5V(int32_t* status);
+bool HAL_GetUserActive5V(int32_t* status);
+int HAL_GetUserCurrentFaults5V(int32_t* status);
+float HAL_GetUserVoltage3V3(int32_t* status);
+float HAL_GetUserCurrent3V3(int32_t* status);
+bool HAL_GetUserActive3V3(int32_t* status);
+int HAL_GetUserCurrentFaults3V3(int32_t* status);
 }

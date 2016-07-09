@@ -19,28 +19,27 @@ using namespace hal;
 namespace {
 struct AnalogTrigger {
   tAnalogTrigger* trigger;
-  HalAnalogInputHandle analogHandle;
+  HAL_AnalogInputHandle analogHandle;
   uint32_t index;
 };
 }
 
-static LimitedHandleResource<HalAnalogTriggerHandle, AnalogTrigger,
-                             kNumAnalogTriggers, HalHandleEnum::AnalogTrigger>
+static LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
+                             kNumAnalogTriggers, HAL_HandleEnum::AnalogTrigger>
     analogTriggerHandles;
 
 extern "C" {
 
-HalAnalogTriggerHandle initializeAnalogTrigger(HalAnalogInputHandle port_handle,
-                                               uint32_t* index,
-                                               int32_t* status) {
-  if (port_handle == HAL_INVALID_HANDLE) {
+HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
+    HAL_AnalogInputHandle port_handle, uint32_t* index, int32_t* status) {
+  if (port_handle == HAL_kInvalidHandle) {
     *status = PARAMETER_OUT_OF_RANGE;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
-  HalAnalogInputHandle handle = analogTriggerHandles.Allocate();
-  if (handle == HAL_INVALID_HANDLE) {
+  HAL_AnalogInputHandle handle = analogTriggerHandles.Allocate();
+  if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   auto trigger = analogTriggerHandles.Get(handle);
   trigger->analogHandle = port_handle;
@@ -48,7 +47,7 @@ HalAnalogTriggerHandle initializeAnalogTrigger(HalAnalogInputHandle port_handle,
   auto analog_port = analogInputHandles.Get(trigger->analogHandle);
   if (analog_port == nullptr) {  // would only error on thread issue
     *status = HAL_HANDLE_ERROR;
-    return HAL_INVALID_HANDLE;
+    return HAL_kInvalidHandle;
   }
   *index = static_cast<uint32_t>(getHandleIndex(handle));
   trigger->index = *index;
@@ -59,8 +58,8 @@ HalAnalogTriggerHandle initializeAnalogTrigger(HalAnalogInputHandle port_handle,
   return handle;
 }
 
-void cleanAnalogTrigger(HalAnalogTriggerHandle analog_trigger_handle,
-                        int32_t* status) {
+void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analog_trigger_handle,
+                            int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {  // ignore status error
     return;
@@ -70,8 +69,9 @@ void cleanAnalogTrigger(HalAnalogTriggerHandle analog_trigger_handle,
   delete trigger->trigger;
 }
 
-void setAnalogTriggerLimitsRaw(HalAnalogTriggerHandle analog_trigger_handle,
-                               int32_t lower, int32_t upper, int32_t* status) {
+void HAL_SetAnalogTriggerLimitsRaw(
+    HAL_AnalogTriggerHandle analog_trigger_handle, int32_t lower, int32_t upper,
+    int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -88,9 +88,9 @@ void setAnalogTriggerLimitsRaw(HalAnalogTriggerHandle analog_trigger_handle,
  * Set the upper and lower limits of the analog trigger.
  * The limits are given as floating point voltage values.
  */
-void setAnalogTriggerLimitsVoltage(HalAnalogTriggerHandle analog_trigger_handle,
-                                   double lower, double upper,
-                                   int32_t* status) {
+void HAL_SetAnalogTriggerLimitsVoltage(
+    HAL_AnalogTriggerHandle analog_trigger_handle, double lower, double upper,
+    int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -103,9 +103,9 @@ void setAnalogTriggerLimitsVoltage(HalAnalogTriggerHandle analog_trigger_handle,
   // TODO: This depends on the averaged setting.  Only raw values will work as
   // is.
   trigger->trigger->writeLowerLimit(
-      getAnalogVoltsToValue(trigger->analogHandle, lower, status), status);
+      HAL_GetAnalogVoltsToValue(trigger->analogHandle, lower, status), status);
   trigger->trigger->writeUpperLimit(
-      getAnalogVoltsToValue(trigger->analogHandle, upper, status), status);
+      HAL_GetAnalogVoltsToValue(trigger->analogHandle, upper, status), status);
 }
 
 /**
@@ -113,8 +113,8 @@ void setAnalogTriggerLimitsVoltage(HalAnalogTriggerHandle analog_trigger_handle,
  * If the value is true, then the averaged value is selected for the analog
  * trigger, otherwise the immediate value is used.
  */
-void setAnalogTriggerAveraged(HalAnalogTriggerHandle analog_trigger_handle,
-                              bool useAveragedValue, int32_t* status) {
+void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analog_trigger_handle,
+                                  bool useAveragedValue, int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -134,8 +134,8 @@ void setAnalogTriggerAveraged(HalAnalogTriggerHandle analog_trigger_handle,
  * is designed to help with 360 degree pot applications for the period where the
  * pot crosses through zero.
  */
-void setAnalogTriggerFiltered(HalAnalogTriggerHandle analog_trigger_handle,
-                              bool useFilteredValue, int32_t* status) {
+void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analog_trigger_handle,
+                                  bool useFilteredValue, int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -154,8 +154,8 @@ void setAnalogTriggerFiltered(HalAnalogTriggerHandle analog_trigger_handle,
  * True if the analog input is between the upper and lower limits.
  * @return The InWindow output of the analog trigger.
  */
-bool getAnalogTriggerInWindow(HalAnalogTriggerHandle analog_trigger_handle,
-                              int32_t* status) {
+bool HAL_GetAnalogTriggerInWindow(HAL_AnalogTriggerHandle analog_trigger_handle,
+                                  int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -171,8 +171,8 @@ bool getAnalogTriggerInWindow(HalAnalogTriggerHandle analog_trigger_handle,
  * If in Hysteresis, maintain previous state.
  * @return The TriggerState output of the analog trigger.
  */
-bool getAnalogTriggerTriggerState(HalAnalogTriggerHandle analog_trigger_handle,
-                                  int32_t* status) {
+bool HAL_GetAnalogTriggerTriggerState(
+    HAL_AnalogTriggerHandle analog_trigger_handle, int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -185,8 +185,8 @@ bool getAnalogTriggerTriggerState(HalAnalogTriggerHandle analog_trigger_handle,
  * Get the state of the analog trigger output.
  * @return The state of the analog trigger output.
  */
-bool getAnalogTriggerOutput(HalAnalogTriggerHandle analog_trigger_handle,
-                            AnalogTriggerType type, int32_t* status) {
+bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analog_trigger_handle,
+                                HAL_AnalogTriggerType type, int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -194,15 +194,15 @@ bool getAnalogTriggerOutput(HalAnalogTriggerHandle analog_trigger_handle,
   }
   bool result = false;
   switch (type) {
-    case kInWindow:
+    case HAL_Trigger_kInWindow:
       result =
           trigger->trigger->readOutput_InHysteresis(trigger->index, status);
       break;  // XXX: Backport
-    case kState:
+    case HAL_Trigger_kState:
       result = trigger->trigger->readOutput_OverLimit(trigger->index, status);
       break;  // XXX: Backport
-    case kRisingPulse:
-    case kFallingPulse:
+    case HAL_Trigger_kRisingPulse:
+    case HAL_Trigger_kFallingPulse:
       *status = ANALOG_TRIGGER_PULSE_OUTPUT_ERROR;
       return false;
   }

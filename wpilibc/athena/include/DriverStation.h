@@ -100,16 +100,16 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void ReportJoystickUnpluggedWarning(std::string message);
   void Run();
 
-  std::unique_ptr<HALJoystickAxes[]> m_joystickAxes;
-  std::unique_ptr<HALJoystickPOVs[]> m_joystickPOVs;
-  std::unique_ptr<HALJoystickButtons[]> m_joystickButtons;
-  std::unique_ptr<HALJoystickDescriptor[]> m_joystickDescriptor;
+  std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxes;
+  std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVs;
+  std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtons;
+  std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptor;
 
   // Cached Data
-  std::unique_ptr<HALJoystickAxes[]> m_joystickAxesCache;
-  std::unique_ptr<HALJoystickPOVs[]> m_joystickPOVsCache;
-  std::unique_ptr<HALJoystickButtons[]> m_joystickButtonsCache;
-  std::unique_ptr<HALJoystickDescriptor[]> m_joystickDescriptorCache;
+  std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxesCache;
+  std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVsCache;
+  std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtonsCache;
+  std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptorCache;
 
   Task m_task;
   std::atomic<bool> m_isRunning{false};

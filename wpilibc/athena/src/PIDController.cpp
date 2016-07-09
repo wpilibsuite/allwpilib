@@ -74,7 +74,7 @@ void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
 
   static int32_t instances = 0;
   instances++;
-  HALReport(HALUsageReporting::kResourceType_PIDController, instances);
+  HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
 }
 
 PIDController::~PIDController() {

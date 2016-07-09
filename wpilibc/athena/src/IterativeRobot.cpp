@@ -22,8 +22,8 @@ constexpr double IterativeRobot::kDefaultPeriod;
  * the DS packets
  */
 void IterativeRobot::StartCompetition() {
-  HALReport(HALUsageReporting::kResourceType_Framework,
-            HALUsageReporting::kFramework_Iterative);
+  HAL_Report(HALUsageReporting::kResourceType_Framework,
+             HALUsageReporting::kFramework_Iterative);
 
   LiveWindow* lw = LiveWindow::GetInstance();
   // first and one-time initialization
@@ -34,7 +34,7 @@ void IterativeRobot::StartCompetition() {
   RobotInit();
 
   // Tell the DS that the robot is ready to be enabled
-  HALNetworkCommunicationObserveUserProgramStarting();
+  HAL_NetworkCommunicationObserveUserProgramStarting();
 
   // loop forever, calling the appropriate mode-dependent function
   lw->SetEnabled(false);
@@ -52,7 +52,7 @@ void IterativeRobot::StartCompetition() {
         m_teleopInitialized = false;
         m_testInitialized = false;
       }
-      HALNetworkCommunicationObserveUserProgramDisabled();
+      HAL_NetworkCommunicationObserveUserProgramDisabled();
       DisabledPeriodic();
     } else if (IsAutonomous()) {
       // call AutonomousInit() if we are now just entering autonomous mode from
@@ -66,7 +66,7 @@ void IterativeRobot::StartCompetition() {
         m_teleopInitialized = false;
         m_testInitialized = false;
       }
-      HALNetworkCommunicationObserveUserProgramAutonomous();
+      HAL_NetworkCommunicationObserveUserProgramAutonomous();
       AutonomousPeriodic();
     } else if (IsTest()) {
       // call TestInit() if we are now just entering test mode from
@@ -80,7 +80,7 @@ void IterativeRobot::StartCompetition() {
         m_autonomousInitialized = false;
         m_teleopInitialized = false;
       }
-      HALNetworkCommunicationObserveUserProgramTest();
+      HAL_NetworkCommunicationObserveUserProgramTest();
       TestPeriodic();
     } else {
       // call TeleopInit() if we are now just entering teleop mode from
@@ -95,7 +95,7 @@ void IterativeRobot::StartCompetition() {
         m_testInitialized = false;
         Scheduler::GetInstance()->SetEnabled(true);
       }
-      HALNetworkCommunicationObserveUserProgramTeleop();
+      HAL_NetworkCommunicationObserveUserProgramTeleop();
       TeleopPeriodic();
     }
     // wait for driver station data so the loop doesn't hog the CPU

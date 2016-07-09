@@ -54,7 +54,7 @@ class Compressor : public SensorBase,
                     std::shared_ptr<nt::Value> value, bool isNew) override;
 
  protected:
-  HalCompressorHandle m_compressorHandle;
+  HAL_CompressorHandle m_compressorHandle;
 
  private:
   void SetCompressor(bool on);

@@ -29,7 +29,7 @@ tPWM* pwmSystem = nullptr;
 
 bool digitalSystemsInitialized = false;
 
-DigitalHandleResource<HalDigitalHandle, DigitalPort,
+DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalPins + kNumPWMHeaders>
     digitalPinHandles;
 
@@ -109,18 +109,18 @@ uint32_t remapMXPPWMChannel(uint32_t pin) {
  * If it's an analog trigger, determine the module from the high order routing
  * channel else do normal digital input remapping based on pin number (MXP)
  */
-extern "C++" bool remapDigitalSource(HalHandle digitalSourceHandle,
-                                     AnalogTriggerType analogTriggerType,
+extern "C++" bool remapDigitalSource(HAL_Handle digitalSourceHandle,
+                                     HAL_AnalogTriggerType analogTriggerType,
                                      uint32_t& pin, uint8_t& module,
                                      bool& analogTrigger) {
-  if (isHandleType(digitalSourceHandle, HalHandleEnum::AnalogTrigger)) {
+  if (isHandleType(digitalSourceHandle, HAL_HandleEnum::AnalogTrigger)) {
     // If handle passed, index is not negative
     uint32_t index = getHandleIndex(digitalSourceHandle);
     pin = (index << 2) + analogTriggerType;
     module = pin >> 4;
     analogTrigger = true;
     return true;
-  } else if (isHandleType(digitalSourceHandle, HalHandleEnum::DIO)) {
+  } else if (isHandleType(digitalSourceHandle, HAL_HandleEnum::DIO)) {
     uint32_t index = getHandleIndex(digitalSourceHandle);
     if (index >= kNumDigitalHeaders) {
       pin = remapMXPChannel(index);

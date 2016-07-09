@@ -12,23 +12,23 @@
 using namespace hal;
 
 extern "C" {
-int32_t HAL_getNumAccumulators(void) { return kNumAccumulators; }
-int32_t HAL_getNumAnalogTriggers(void) { return kNumAnalogTriggers; }
-int32_t HAL_getNumAnalogInputs(void) { return kNumAnalogInputs; }
-int32_t HAL_getNumAnalogOutputs(void) { return kNumAnalogOutputs; }
-int32_t HAL_getNumCounters(void) { return kNumCounters; }
-int32_t HAL_getNumDigitalHeaders(void) { return kNumDigitalHeaders; }
-int32_t HAL_getNumPWMHeaders(void) { return kNumPWMHeaders; }
-int32_t HAL_getNumDigitalPins(void) { return kNumDigitalPins; }
-int32_t HAL_getNumPWMPins(void) { return kNumPWMPins; }
-int32_t HAL_getNumDigitalPWMOutputs(void) { return kNumDigitalPWMOutputs; }
-int32_t HAL_getNumEncoders(void) { return kNumEncoders; }
-int32_t HAL_getNumInterrupts(void) { return kNumInterrupts; }
-int32_t HAL_getNumRelayPins(void) { return kNumRelayPins; }
-int32_t HAL_getNumRelayHeaders(void) { return kNumRelayHeaders; }
-int32_t HAL_getNumPCMModules(void) { return kNumPCMModules; }
-int32_t HAL_getNumSolenoidPins(void) { return kNumSolenoidPins; }
-int32_t HAL_getNumPDPModules(void) { return kNumPDPModules; }
-int32_t HAL_getNumPDPChannels(void) { return kNumPDPChannels; }
-int32_t HAL_getNumCanTalons(void) { return kNumCanTalons; }
+int32_t HAL_GetNumAccumulators(void) { return kNumAccumulators; }
+int32_t HAL_GetNumAnalogTriggers(void) { return kNumAnalogTriggers; }
+int32_t HAL_GetNumAnalogInputs(void) { return kNumAnalogInputs; }
+int32_t HAL_GetNumAnalogOutputs(void) { return kNumAnalogOutputs; }
+int32_t HAL_GetNumCounters(void) { return kNumCounters; }
+int32_t HAL_GetNumDigitalHeaders(void) { return kNumDigitalHeaders; }
+int32_t HAL_GetNumPWMHeaders(void) { return kNumPWMHeaders; }
+int32_t HAL_GetNumDigitalPins(void) { return kNumDigitalPins; }
+int32_t HAL_GetNumPWMPins(void) { return kNumPWMPins; }
+int32_t HAL_GetNumDigitalPWMOutputs(void) { return kNumDigitalPWMOutputs; }
+int32_t HAL_GetNumEncoders(void) { return kNumEncoders; }
+int32_t HAL_GetNumInterrupts(void) { return kNumInterrupts; }
+int32_t HAL_GetNumRelayPins(void) { return kNumRelayPins; }
+int32_t HAL_GetNumRelayHeaders(void) { return kNumRelayHeaders; }
+int32_t HAL_GetNumPCMModules(void) { return kNumPCMModules; }
+int32_t HAL_GetNumSolenoidPins(void) { return kNumSolenoidPins; }
+int32_t HAL_GetNumPDPModules(void) { return kNumPDPModules; }
+int32_t HAL_GetNumPDPChannels(void) { return kNumPDPChannels; }
+int32_t HAL_GetNumCanTalons(void) { return kNumCanTalons; }
 }

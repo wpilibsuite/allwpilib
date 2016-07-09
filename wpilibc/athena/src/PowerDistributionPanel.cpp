@@ -19,7 +19,7 @@ PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
  */
 PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
     : m_module(module) {
-  initializePDP(m_module);
+  HAL_InitializePDP(m_module);
 }
 
 /**
@@ -30,7 +30,7 @@ PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
 double PowerDistributionPanel::GetVoltage() const {
   int32_t status = 0;
 
-  double voltage = getPDPVoltage(m_module, &status);
+  double voltage = HAL_GetPDPVoltage(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -47,7 +47,7 @@ double PowerDistributionPanel::GetVoltage() const {
 double PowerDistributionPanel::GetTemperature() const {
   int32_t status = 0;
 
-  double temperature = getPDPTemperature(m_module, &status);
+  double temperature = HAL_GetPDPTemperature(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -70,7 +70,7 @@ double PowerDistributionPanel::GetCurrent(uint8_t channel) const {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
   }
 
-  double current = getPDPChannelCurrent(m_module, channel, &status);
+  double current = HAL_GetPDPChannelCurrent(m_module, channel, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -87,7 +87,7 @@ double PowerDistributionPanel::GetCurrent(uint8_t channel) const {
 double PowerDistributionPanel::GetTotalCurrent() const {
   int32_t status = 0;
 
-  double current = getPDPTotalCurrent(m_module, &status);
+  double current = HAL_GetPDPTotalCurrent(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -104,7 +104,7 @@ double PowerDistributionPanel::GetTotalCurrent() const {
 double PowerDistributionPanel::GetTotalPower() const {
   int32_t status = 0;
 
-  double power = getPDPTotalPower(m_module, &status);
+  double power = HAL_GetPDPTotalPower(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -121,7 +121,7 @@ double PowerDistributionPanel::GetTotalPower() const {
 double PowerDistributionPanel::GetTotalEnergy() const {
   int32_t status = 0;
 
-  double energy = getPDPTotalEnergy(m_module, &status);
+  double energy = HAL_GetPDPTotalEnergy(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -138,7 +138,7 @@ double PowerDistributionPanel::GetTotalEnergy() const {
 void PowerDistributionPanel::ResetTotalEnergy() {
   int32_t status = 0;
 
-  resetPDPTotalEnergy(m_module, &status);
+  HAL_ResetPDPTotalEnergy(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -151,7 +151,7 @@ void PowerDistributionPanel::ResetTotalEnergy() {
 void PowerDistributionPanel::ClearStickyFaults() {
   int32_t status = 0;
 
-  clearPDPStickyFaults(m_module, &status);
+  HAL_ClearPDPStickyFaults(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");

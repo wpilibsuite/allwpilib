@@ -31,6 +31,12 @@ class Counter : public SensorBase,
                 public CounterBase,
                 public LiveWindowSendable {
  public:
+  enum Mode {
+    kTwoPulse = 0,
+    kSemiperiod = 1,
+    kPulseLength = 2,
+    kExternalDirection = 3
+  };
   explicit Counter(Mode mode = kTwoPulse);
   explicit Counter(int32_t channel);
   explicit Counter(DigitalSource* source);
@@ -98,7 +104,7 @@ class Counter : public SensorBase,
   // Makes the counter count down.
   std::shared_ptr<DigitalSource> m_downSource;
   // The FPGA counter object
-  HalCounterHandle m_counter = HAL_INVALID_HANDLE;
+  HAL_CounterHandle m_counter = HAL_kInvalidHandle;
 
  private:
   int32_t m_index = 0;  ///< The index of this counter.

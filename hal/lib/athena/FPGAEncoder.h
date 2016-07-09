@@ -13,34 +13,35 @@
 #include "HAL/Handles.h"
 
 extern "C" {
-HalFPGAEncoderHandle initializeFPGAEncoder(HalHandle digitalSourceHandleA,
-                                           AnalogTriggerType analogTriggerTypeA,
-                                           HalHandle digitalSourceHandleB,
-                                           AnalogTriggerType analogTriggerTypeB,
-                                           bool reverseDirection,
-                                           int32_t* index, int32_t* status);
-void freeFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle, int32_t* status);
-void resetFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
-                      int32_t* status);
-int32_t getFPGAEncoder(HalFPGAEncoderHandle fpga_encoder_handle,
-                       int32_t* status);  // Raw value
-double getFPGAEncoderPeriod(HalFPGAEncoderHandle fpga_encoder_handle,
-                            int32_t* status);
-void setFPGAEncoderMaxPeriod(HalFPGAEncoderHandle fpga_encoder_handle,
-                             double maxPeriod, int32_t* status);
-bool getFPGAEncoderStopped(HalFPGAEncoderHandle fpga_encoder_handle,
-                           int32_t* status);
-bool getFPGAEncoderDirection(HalFPGAEncoderHandle fpga_encoder_handle,
-                             int32_t* status);
-void setFPGAEncoderReverseDirection(HalFPGAEncoderHandle fpga_encoder_handle,
-                                    bool reverseDirection, int32_t* status);
-void setFPGAEncoderSamplesToAverage(HalFPGAEncoderHandle fpga_encoder_handle,
-                                    uint32_t samplesToAverage, int32_t* status);
-uint32_t getFPGAEncoderSamplesToAverage(
-    HalFPGAEncoderHandle fpga_encoder_handle, int32_t* status);
-void setFPGAEncoderIndexSource(HalFPGAEncoderHandle fpga_encoder_handle,
-                               HalHandle digitalSourceHandle,
-                               AnalogTriggerType analogTriggerType,
-                               bool activeHigh, bool edgeSensitive,
+HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
+    HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
+    HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
+    bool reverseDirection, int32_t* index, int32_t* status);
+void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                         int32_t* status);
+void HAL_ResetFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                          int32_t* status);
+int32_t HAL_GetFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                           int32_t* status);  // Raw value
+double HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                int32_t* status);
+void HAL_SetFPGAEncoderMaxPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                 double maxPeriod, int32_t* status);
+bool HAL_GetFPGAEncoderStopped(HAL_FPGAEncoderHandle fpga_encoder_handle,
                                int32_t* status);
+bool HAL_GetFPGAEncoderDirection(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                 int32_t* status);
+void HAL_SetFPGAEncoderReverseDirection(
+    HAL_FPGAEncoderHandle fpga_encoder_handle, bool reverseDirection,
+    int32_t* status);
+void HAL_SetFPGAEncoderSamplesToAverage(
+    HAL_FPGAEncoderHandle fpga_encoder_handle, uint32_t samplesToAverage,
+    int32_t* status);
+uint32_t HAL_GetFPGAEncoderSamplesToAverage(
+    HAL_FPGAEncoderHandle fpga_encoder_handle, int32_t* status);
+void HAL_SetFPGAEncoderIndexSource(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                   HAL_Handle digitalSourceHandle,
+                                   HAL_AnalogTriggerType analogTriggerType,
+                                   bool activeHigh, bool edgeSensitive,
+                                   int32_t* status);
 }

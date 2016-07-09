@@ -21,7 +21,7 @@ class TestEnvironment : public testing::Environment {
     if (m_alreadySetUp) return;
     m_alreadySetUp = true;
 
-    if (!HALInitialize()) {
+    if (!HAL_Initialize()) {
       std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl;
       exit(-1);
     }
@@ -30,7 +30,7 @@ class TestEnvironment : public testing::Environment {
             station. After starting network coms, it will loop until the driver
             station returns that the robot is enabled, to ensure that tests
             will be able to run on the hardware. */
-    HALNetworkCommunicationObserveUserProgramStarting();
+    HAL_NetworkCommunicationObserveUserProgramStarting();
     LiveWindow::GetInstance()->SetEnabled(false);
 
     std::cout << "Waiting for enable" << std::endl;

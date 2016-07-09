@@ -14,8 +14,8 @@
  * Common function for initializing the accelerometer.
  */
 void AnalogAccelerometer::InitAccelerometer() {
-  HALReport(HALUsageReporting::kResourceType_Accelerometer,
-            m_analogInput->GetChannel());
+  HAL_Report(HALUsageReporting::kResourceType_Accelerometer,
+             m_analogInput->GetChannel());
   LiveWindow::GetInstance()->AddSensor("Accelerometer",
                                        m_analogInput->GetChannel(), this);
 }

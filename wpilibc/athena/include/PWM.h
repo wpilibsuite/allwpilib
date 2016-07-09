@@ -75,5 +75,5 @@ class PWM : public SensorBase,
 
  private:
   uint32_t m_channel;
-  HalDigitalHandle m_handle;
+  HAL_DigitalHandle m_handle;
 };

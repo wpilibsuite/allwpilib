@@ -36,7 +36,7 @@ class DigitalOutput : public DigitalSource,
   void UpdateDutyCycle(float dutyCycle);
 
   // Digital Source Interface
-  virtual HalHandle GetPortHandleForRouting() const override;
+  virtual HAL_Handle GetPortHandleForRouting() const override;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
   virtual bool IsAnalogTrigger() const override;
 
@@ -51,8 +51,8 @@ class DigitalOutput : public DigitalSource,
 
  private:
   uint32_t m_channel;
-  HalDigitalHandle m_handle;
-  HalDigitalPWMHandle m_pwmGenerator;
+  HAL_DigitalHandle m_handle;
+  HAL_DigitalPWMHandle m_pwmGenerator;
 
   std::shared_ptr<ITable> m_table;
 };
