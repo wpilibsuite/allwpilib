@@ -189,7 +189,7 @@ float PWM::GetSpeed() const {
  *
  * @param value Raw PWM value.
  */
-void PWM::SetRaw(unsigned short value) {
+void PWM::SetRaw(uint16_t value) {
   wpi_assert(value == kPwmDisabled);
   impl->Set(0);
 }

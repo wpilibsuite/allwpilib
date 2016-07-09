@@ -128,13 +128,13 @@ bool DriverStation::GetStickButton(uint32_t stick, uint32_t button) {
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
-short DriverStation::GetStickButtons(uint32_t stick) {
+int16_t DriverStation::GetStickButtons(uint32_t stick) {
   if (stick < 0 || stick >= 6) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                "stick must be between 0 and 5");
     return false;
   }
-  short btns = 0, btnid;
+  int16_t btns = 0, btnid;
 
   std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
   msgs::FRCJoystickPtr joy = joysticks[stick];

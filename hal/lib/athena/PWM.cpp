@@ -75,7 +75,8 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle port_handle,
   port->pin = origPin;
 
   uint32_t bitToSet = 1 << remapMXPPWMChannel(port->pin);
-  short specialFunctions = digitalSystem->readEnableMXPSpecialFunction(status);
+  int16_t specialFunctions =
+      digitalSystem->readEnableMXPSpecialFunction(status);
   digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToSet,
                                                status);
 
@@ -90,7 +91,7 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwm_port_handle, int32_t* status) {
 
   if (port->pin > tPWM::kNumHdrRegisters - 1) {
     uint32_t bitToUnset = 1 << remapMXPPWMChannel(port->pin);
-    short specialFunctions =
+    int16_t specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToUnset,
                                                  status);
