@@ -17,13 +17,13 @@ bool HAL_CheckCompressorModule(uint8_t module);
 
 bool HAL_GetCompressor(HAL_CompressorHandle compressor_handle, int32_t* status);
 
-void HAL_SetClosedLoopControl(HAL_CompressorHandle compressor_handle,
-                              bool value, int32_t* status);
-bool HAL_GetClosedLoopControl(HAL_CompressorHandle compressor_handle,
-                              int32_t* status);
+void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressor_handle,
+                                        bool value, int32_t* status);
+bool HAL_GetCompressorClosedLoopControl(HAL_CompressorHandle compressor_handle,
+                                        int32_t* status);
 
-bool HAL_GetPressureSwitch(HAL_CompressorHandle compressor_handle,
-                           int32_t* status);
+bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressor_handle,
+                                     int32_t* status);
 float HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
                                int32_t* status);
 
@@ -39,6 +39,4 @@ bool HAL_GetCompressorNotConnectedStickyFault(
     HAL_CompressorHandle compressor_handle, int32_t* status);
 bool HAL_GetCompressorNotConnectedFault(HAL_CompressorHandle compressor_handle,
                                         int32_t* status);
-void HAL_ClearAllPCMStickyFaults(HAL_CompressorHandle compressor_handle,
-                                 int32_t* status);
 }

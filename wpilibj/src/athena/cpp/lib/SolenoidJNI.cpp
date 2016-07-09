@@ -153,7 +153,7 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_clearAllPCMStickyFaults(
     JNIEnv *env, jclass, jbyte module) {
   int32_t status = 0;
-  HAL_ClearAllPCMStickyFaults_sol(module, &status);
+  HAL_ClearAllPCMStickyFaults(module, &status);
   CheckStatus(env, status);
 }
 

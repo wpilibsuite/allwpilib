@@ -146,7 +146,7 @@ double InterruptableSensorBase::ReadRisingTimestamp() {
   if (StatusIsFatal()) return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
-  double timestamp = HAL_ReadRisingTimestamp(m_interrupt, &status);
+  double timestamp = HAL_ReadInterruptRisingTimestamp(m_interrupt, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return timestamp;
 }
@@ -164,7 +164,7 @@ double InterruptableSensorBase::ReadFallingTimestamp() {
   if (StatusIsFatal()) return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
-  double timestamp = HAL_ReadFallingTimestamp(m_interrupt, &status);
+  double timestamp = HAL_ReadInterruptFallingTimestamp(m_interrupt, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return timestamp;
 }

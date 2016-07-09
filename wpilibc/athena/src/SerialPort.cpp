@@ -30,15 +30,15 @@ SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
 
   m_port = port;
 
-  HAL_SerialInitializePort(port, &status);
+  HAL_InitializeSerialPort(port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  HAL_SerialSetBaudRate(port, baudRate, &status);
+  HAL_SetSerialBaudRate(port, baudRate, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  HAL_SerialSetDataBits(port, dataBits, &status);
+  HAL_SetSerialDataBits(port, dataBits, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  HAL_SerialSetParity(port, parity, &status);
+  HAL_SetSerialParity(port, parity, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  HAL_SerialSetStopBits(port, stopBits, &status);
+  HAL_SetSerialStopBits(port, stopBits, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   // Set the default timeout to 5 seconds.
@@ -61,7 +61,7 @@ SerialPort::SerialPort(uint32_t baudRate, Port port, uint8_t dataBits,
  */
 SerialPort::~SerialPort() {
   int32_t status = 0;
-  HAL_SerialClose(m_port, &status);
+  HAL_CloseSerial(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -72,7 +72,7 @@ SerialPort::~SerialPort() {
  */
 void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
   int32_t status = 0;
-  HAL_SerialSetFlowControl(m_port, flowControl, &status);
+  HAL_SetSerialFlowControl(m_port, flowControl, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -87,7 +87,7 @@ void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
  */
 void SerialPort::EnableTermination(char terminator) {
   int32_t status = 0;
-  HAL_SerialEnableTermination(m_port, terminator, &status);
+  HAL_EnableSerialTermination(m_port, terminator, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -96,7 +96,7 @@ void SerialPort::EnableTermination(char terminator) {
  */
 void SerialPort::DisableTermination() {
   int32_t status = 0;
-  HAL_SerialDisableTermination(m_port, &status);
+  HAL_DisableSerialTermination(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -107,7 +107,7 @@ void SerialPort::DisableTermination() {
  */
 int32_t SerialPort::GetBytesReceived() {
   int32_t status = 0;
-  int32_t retVal = HAL_SerialGetBytesReceived(m_port, &status);
+  int32_t retVal = HAL_GetSerialBytesReceived(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -121,7 +121,7 @@ int32_t SerialPort::GetBytesReceived() {
  */
 uint32_t SerialPort::Read(char* buffer, int32_t count) {
   int32_t status = 0;
-  int32_t retVal = HAL_SerialRead(m_port, buffer, count, &status);
+  int32_t retVal = HAL_ReadSerial(m_port, buffer, count, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -135,7 +135,7 @@ uint32_t SerialPort::Read(char* buffer, int32_t count) {
  */
 uint32_t SerialPort::Write(const std::string& buffer, int32_t count) {
   int32_t status = 0;
-  int32_t retVal = HAL_SerialWrite(m_port, buffer.c_str(), count, &status);
+  int32_t retVal = HAL_WriteSerial(m_port, buffer.c_str(), count, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -150,7 +150,7 @@ uint32_t SerialPort::Write(const std::string& buffer, int32_t count) {
  */
 void SerialPort::SetTimeout(float timeout) {
   int32_t status = 0;
-  HAL_SerialSetTimeout(m_port, timeout, &status);
+  HAL_SetSerialTimeout(m_port, timeout, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -168,7 +168,7 @@ void SerialPort::SetTimeout(float timeout) {
  */
 void SerialPort::SetReadBufferSize(uint32_t size) {
   int32_t status = 0;
-  HAL_SerialSetReadBufferSize(m_port, size, &status);
+  HAL_SetSerialReadBufferSize(m_port, size, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -182,7 +182,7 @@ void SerialPort::SetReadBufferSize(uint32_t size) {
  */
 void SerialPort::SetWriteBufferSize(uint32_t size) {
   int32_t status = 0;
-  HAL_SerialSetWriteBufferSize(m_port, size, &status);
+  HAL_SetSerialWriteBufferSize(m_port, size, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -199,7 +199,7 @@ void SerialPort::SetWriteBufferSize(uint32_t size) {
  */
 void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
   int32_t status = 0;
-  HAL_SerialSetWriteMode(m_port, mode, &status);
+  HAL_SetSerialWriteMode(m_port, mode, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -211,7 +211,7 @@ void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
  */
 void SerialPort::Flush() {
   int32_t status = 0;
-  HAL_SerialFlush(m_port, &status);
+  HAL_FlushSerial(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
@@ -222,6 +222,6 @@ void SerialPort::Flush() {
  */
 void SerialPort::Reset() {
   int32_t status = 0;
-  HAL_SerialClear(m_port, &status);
+  HAL_ClearSerial(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }

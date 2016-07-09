@@ -205,7 +205,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     if (m_interrupt == 0) {
       throw new IllegalStateException("The interrupt is not allocated.");
     }
-    return InterruptJNI.readRisingTimestamp(m_interrupt);
+    return InterruptJNI.readInterruptRisingTimestamp(m_interrupt);
   }
 
   /**
@@ -219,7 +219,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     if (m_interrupt == 0) {
       throw new IllegalStateException("The interrupt is not allocated.");
     }
-    return InterruptJNI.readFallingTimestamp(m_interrupt);
+    return InterruptJNI.readInterruptFallingTimestamp(m_interrupt);
   }
 
   /**

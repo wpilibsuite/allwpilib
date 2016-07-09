@@ -57,41 +57,41 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressor(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
- * Method:    setClosedLoopControl
+ * Method:    setCompressorClosedLoopControl
  * Signature: (JZ)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_CompressorJNI_setClosedLoopControl(
+Java_edu_wpi_first_wpilibj_hal_CompressorJNI_setCompressorClosedLoopControl(
     JNIEnv *env, jclass, jint compressor_handle, jboolean value) {
   int32_t status = 0;
-  HAL_SetClosedLoopControl((HAL_CompressorHandle)compressor_handle, value, &status);
+  HAL_SetCompressorClosedLoopControl((HAL_CompressorHandle)compressor_handle, value, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
- * Method:    getClosedLoopControl
+ * Method:    getCompressorClosedLoopControl
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getClosedLoopControl(
+Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorClosedLoopControl(
     JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = HAL_GetClosedLoopControl((HAL_CompressorHandle)compressor_handle, &status);
+  bool val = HAL_GetCompressorClosedLoopControl((HAL_CompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
- * Method:    getPressureSwitch
+ * Method:    getCompressorPressureSwitch
  * Signature: (J)Z
  */
 JNIEXPORT jboolean JNICALL
-Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getPressureSwitch(
+Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorPressureSwitch(
     JNIEnv *env, jclass, jint compressor_handle) {
   int32_t status = 0;
-  bool val = HAL_GetPressureSwitch((HAL_CompressorHandle)compressor_handle, &status);
+  bool val = HAL_GetCompressorPressureSwitch((HAL_CompressorHandle)compressor_handle, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -201,9 +201,9 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorNotConnectedFault(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_clearAllPCMStickyFaults(
-    JNIEnv *env, jclass, jint compressor_handle) {
+    JNIEnv *env, jclass, jbyte module) {
   int32_t status = 0;
-  HAL_ClearAllPCMStickyFaults((HAL_CompressorHandle)compressor_handle, &status);
+  HAL_ClearAllPCMStickyFaults((uint8_t)module, &status);
   CheckStatus(env, status);
 }
 

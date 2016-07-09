@@ -75,5 +75,5 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) const {
  */
 void SolenoidBase::ClearAllPCMStickyFaults(int module) {
   int32_t status = 0;
-  return HAL_ClearAllPCMStickyFaults_sol(static_cast<uint8_t>(module), &status);
+  return HAL_ClearAllPCMStickyFaults(static_cast<uint8_t>(module), &status);
 }

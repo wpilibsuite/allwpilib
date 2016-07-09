@@ -14,11 +14,11 @@ public class CompressorJNI extends JNIWrapper {
 
   public static native boolean getCompressor(int compressorHandle);
 
-  public static native void setClosedLoopControl(int compressorHandle, boolean value);
+  public static native void setCompressorClosedLoopControl(int compressorHandle, boolean value);
 
-  public static native boolean getClosedLoopControl(int compressorHandle);
+  public static native boolean getCompressorClosedLoopControl(int compressorHandle);
 
-  public static native boolean getPressureSwitch(int compressorHandle);
+  public static native boolean getCompressorPressureSwitch(int compressorHandle);
 
   public static native float getCompressorCurrent(int compressorHandle);
 
@@ -34,5 +34,5 @@ public class CompressorJNI extends JNIWrapper {
 
   public static native boolean getCompressorNotConnectedFault(int compressorHandle);
 
-  public static native void clearAllPCMStickyFaults(int compressorHandle);
+  public static native void clearAllPCMStickyFaults(byte compressorModule);
 }

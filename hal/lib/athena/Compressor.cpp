@@ -52,8 +52,8 @@ bool HAL_GetCompressor(HAL_CompressorHandle compressor_handle,
   return value;
 }
 
-void HAL_SetClosedLoopControl(HAL_CompressorHandle compressor_handle,
-                              bool value, int32_t* status) {
+void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressor_handle,
+                                        bool value, int32_t* status) {
   int16_t index =
       getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
@@ -65,8 +65,8 @@ void HAL_SetClosedLoopControl(HAL_CompressorHandle compressor_handle,
   *status = module->SetClosedLoopControl(value);
 }
 
-bool HAL_GetClosedLoopControl(HAL_CompressorHandle compressor_handle,
-                              int32_t* status) {
+bool HAL_GetCompressorClosedLoopControl(HAL_CompressorHandle compressor_handle,
+                                        int32_t* status) {
   int16_t index =
       getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
@@ -81,8 +81,8 @@ bool HAL_GetClosedLoopControl(HAL_CompressorHandle compressor_handle,
   return value;
 }
 
-bool HAL_GetPressureSwitch(HAL_CompressorHandle compressor_handle,
-                           int32_t* status) {
+bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressor_handle,
+                                     int32_t* status) {
   int16_t index =
       getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
@@ -202,17 +202,4 @@ bool HAL_GetCompressorNotConnectedFault(HAL_CompressorHandle compressor_handle,
 
   return value;
 }
-void HAL_ClearAllPCMStickyFaults(HAL_CompressorHandle compressor_handle,
-                                 int32_t* status) {
-  int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
-  if (index == InvalidHandleIndex) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
-  PCM* module = PCM_modules[index];
-
-  *status = module->ClearStickyFaults();
-}
-
 }  // extern "C"

@@ -141,7 +141,7 @@ bool HAL_GetPCMSolenoidVoltageFault(uint8_t module, int32_t* status) {
 
   return value;
 }
-void HAL_ClearAllPCMStickyFaults_sol(uint8_t module, int32_t* status) {
+void HAL_ClearAllPCMStickyFaults(uint8_t module, int32_t* status) {
   if (module >= kNumPCMModules) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;

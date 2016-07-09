@@ -25,5 +25,5 @@ void HAL_SetSolenoid(HAL_SolenoidHandle solenoid_port_handle, bool value,
 int HAL_GetPCMSolenoidBlackList(uint8_t module, int32_t* status);
 bool HAL_GetPCMSolenoidVoltageStickyFault(uint8_t module, int32_t* status);
 bool HAL_GetPCMSolenoidVoltageFault(uint8_t module, int32_t* status);
-void HAL_ClearAllPCMStickyFaults_sol(uint8_t module, int32_t* status);
+void HAL_ClearAllPCMStickyFaults(uint8_t module, int32_t* status);
 }

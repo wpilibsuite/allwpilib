@@ -12,9 +12,9 @@
  *
  * @param module The PCM ID to use (0-62)
  */
-Compressor::Compressor(uint8_t pcmID) {
+Compressor::Compressor(uint8_t pcmID) : m_module(pcmID) {
   int32_t status = 0;
-  m_compressorHandle = HAL_InitializeCompressor(pcmID, &status);
+  m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
   if (status != 0) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
     return;
@@ -69,7 +69,7 @@ bool Compressor::GetPressureSwitchValue() const {
   int32_t status = 0;
   bool value;
 
-  value = HAL_GetPressureSwitch(m_compressorHandle, &status);
+  value = HAL_GetCompressorPressureSwitch(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -108,7 +108,7 @@ void Compressor::SetClosedLoopControl(bool on) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
 
-  HAL_SetClosedLoopControl(m_compressorHandle, on, &status);
+  HAL_SetCompressorClosedLoopControl(m_compressorHandle, on, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -127,7 +127,7 @@ bool Compressor::GetClosedLoopControl() const {
   int32_t status = 0;
   bool value;
 
-  value = HAL_GetClosedLoopControl(m_compressorHandle, &status);
+  value = HAL_GetCompressorClosedLoopControl(m_compressorHandle, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
@@ -282,7 +282,7 @@ void Compressor::ClearAllPCMStickyFaults() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
 
-  HAL_ClearAllPCMStickyFaults(m_compressorHandle, &status);
+  HAL_ClearAllPCMStickyFaults(m_module, &status);
 
   if (status) {
     wpi_setWPIError(Timeout);
