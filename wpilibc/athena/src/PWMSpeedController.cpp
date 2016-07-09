@@ -37,7 +37,7 @@ float PWMSpeedController::Get() const { return GetSpeed(); }
 /**
  * Common interface for disabling a motor.
  */
-void PWMSpeedController::Disable() { SetRaw(kPwmDisabled); }
+void PWMSpeedController::Disable() { SetDisabled(); }
 
 /**
  * Common interface for inverting direction of a speed controller.

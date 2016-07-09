@@ -7,15 +7,41 @@
 
 package edu.wpi.first.wpilibj.hal;
 
+import edu.wpi.first.wpilibj.PWMConfigDataResult;
+
 @SuppressWarnings("AbbreviationAsWordInName")
 public class PWMJNI extends DIOJNI {
   public static native int initializePWMPort(int halPortHandle);
 
   public static native void freePWMPort(int pwmPortHandle);
+  
+  public static native void setPWMConfigRaw(int pwmPortHandle, int maxPwm, 
+                                            int deadbandMaxPwm, int centerPwm, 
+                                            int deadbandMinPwm, int minPwm);
+                                         
+  public static native void setPWMConfig(int pwmPortHandle, double maxPwm, 
+                                         double deadbandMaxPwm, double centerPwm, 
+                                         double deadbandMinPwm, double minPwm);
 
-  public static native void setPWM(int pwmPortHandle, short value);
+  public static native PWMConfigDataResult getPWMConfigRaw(int pwmPortHandle);
 
-  public static native short getPWM(int pwmPortHandle);
+  public static native void setPWMEliminateDeadband(int pwmPortHandle, boolean eliminateDeadband);
+
+  public static native boolean getPWMEliminateDeadband(int pwmPortHandle);
+
+  public static native void setPWMRaw(int pwmPortHandle, short value);
+  
+  public static native void setPWMSpeed(int pwmPortHandle, float speed);
+  
+  public static native void setPWMPosition(int pwmPortHandle, float position);
+
+  public static native short getPWMRaw(int pwmPortHandle);
+  
+  public static native float getPWMSpeed(int pwmPortHandle);
+  
+  public static native float getPWMPosition(int pwmPortHandle);
+  
+  public static native  void setPWMDisabled(int pwmPortHandle);
 
   public static native void latchPWMZero(int pwmPortHandle);
 

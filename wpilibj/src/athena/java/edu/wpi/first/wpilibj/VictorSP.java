@@ -37,7 +37,7 @@ public class VictorSP extends PWMSpeedController {
 
     setBounds(2.004, 1.52, 1.50, 1.48, .997);
     setPeriodMultiplier(PeriodMultiplier.k1X);
-    setRaw(m_centerPwm);
+    setSpeed(0.0);
     setZeroLatch();
 
     LiveWindow.addActuator("VictorSP", getChannel(), this);

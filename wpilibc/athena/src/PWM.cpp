@@ -13,11 +13,6 @@
 
 #include <sstream>
 
-constexpr float PWM::kDefaultPwmPeriod;
-constexpr float PWM::kDefaultPwmCenter;
-const int32_t PWM::kDefaultPwmStepsDown;
-const int32_t PWM::kPwmDisabled;
-
 /**
  * Allocate a PWM given a channel number.
  *
@@ -43,14 +38,16 @@ PWM::PWM(uint32_t channel) {
     wpi_setErrorWithContext(status, getHALErrorMessage(status));
     m_channel = std::numeric_limits<uint32_t>::max();
     m_handle = HAL_INVALID_HANDLE;
+    return;
   }
 
   m_channel = channel;
 
-  setPWM(m_handle, kPwmDisabled, &status);
+  setPWMDisabled(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
-
-  m_eliminateDeadband = false;
+  status = 0;
+  setPWMEliminateDeadband(m_handle, false, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   HALReport(HALUsageReporting::kResourceType_PWM, channel);
 }
@@ -63,7 +60,7 @@ PWM::PWM(uint32_t channel) {
 PWM::~PWM() {
   int32_t status = 0;
 
-  setPWM(m_handle, kPwmDisabled, &status);
+  setPWMDisabled(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   freePWMPort(m_handle, &status);
@@ -82,30 +79,9 @@ PWM::~PWM() {
  */
 void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   if (StatusIsFatal()) return;
-  m_eliminateDeadband = eliminateDeadband;
-}
-
-/**
- * Set the bounds on the PWM values.
- *
- * This sets the bounds on the PWM values for a particular each type of
- * controller. The values determine the upper and lower speeds as well as the
- * deadband bracket.
- *
- * @param max         The Minimum pwm value
- * @param deadbandMax The high end of the deadband range
- * @param center      The center speed (off)
- * @param deadbandMin The low end of the deadband range
- * @param min         The minimum pwm value
- */
-void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
-                    int32_t deadbandMin, int32_t min) {
-  if (StatusIsFatal()) return;
-  m_maxPwm = max;
-  m_deadbandMaxPwm = deadbandMax;
-  m_centerPwm = center;
-  m_deadbandMinPwm = deadbandMin;
-  m_minPwm = min;
+  int32_t status = 0;
+  setPWMEliminateDeadband(m_handle, eliminateDeadband, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -123,24 +99,53 @@ void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
  */
 void PWM::SetBounds(double max, double deadbandMax, double center,
                     double deadbandMin, double min) {
-  // calculate the loop time in milliseconds
-  int32_t status = 0;
-  double loopTime =
-      getLoopTiming(&status) / (HAL_getSystemClockTicksPerMicrosecond() * 1e3);
-  wpi_setErrorWithContext(status, getHALErrorMessage(status));
-
   if (StatusIsFatal()) return;
+  int32_t status = 0;
+  setPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+}
 
-  m_maxPwm = (int32_t)((max - kDefaultPwmCenter) / loopTime +
-                       kDefaultPwmStepsDown - 1);
-  m_deadbandMaxPwm = (int32_t)((deadbandMax - kDefaultPwmCenter) / loopTime +
-                               kDefaultPwmStepsDown - 1);
-  m_centerPwm = (int32_t)((center - kDefaultPwmCenter) / loopTime +
-                          kDefaultPwmStepsDown - 1);
-  m_deadbandMinPwm = (int32_t)((deadbandMin - kDefaultPwmCenter) / loopTime +
-                               kDefaultPwmStepsDown - 1);
-  m_minPwm = (int32_t)((min - kDefaultPwmCenter) / loopTime +
-                       kDefaultPwmStepsDown - 1);
+/**
+ * Set the bounds on the PWM values.
+ *
+ * This sets the bounds on the PWM values for a particular each type of
+ * controller. The values determine the upper and lower speeds as well as the
+ * deadband bracket.
+ *
+ * @param max         The Minimum pwm value
+ * @param deadbandMax The high end of the deadband range
+ * @param center      The center speed (off)
+ * @param deadbandMin The low end of the deadband range
+ * @param min         The minimum pwm value
+ */
+void PWM::SetRawBounds(int32_t max, int32_t deadbandMax, int32_t center,
+                       int32_t deadbandMin, int32_t min) {
+  if (StatusIsFatal()) return;
+  int32_t status = 0;
+  setPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
+                  &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+}
+
+/**
+ * Get the bounds on the PWM values.
+ *
+ * This Gets the bounds on the PWM values for a particular each type of
+ * controller. The values determine the upper and lower speeds as well as the
+ * deadband bracket.
+ *
+ * @param max         The Minimum pwm value
+ * @param deadbandMax The high end of the deadband range
+ * @param center      The center speed (off)
+ * @param deadbandMin The low end of the deadband range
+ * @param min         The minimum pwm value
+ */
+void PWM::GetRawBounds(int32_t* max, int32_t* deadbandMax, int32_t* center,
+                       int32_t* deadbandMin, int32_t* min) {
+  int32_t status = 0;
+  getPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
+                  &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -155,21 +160,9 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
  */
 void PWM::SetPosition(float pos) {
   if (StatusIsFatal()) return;
-  if (pos < 0.0) {
-    pos = 0.0;
-  } else if (pos > 1.0) {
-    pos = 1.0;
-  }
-
-  // note, need to perform the multiplication below as floating point before
-  // converting to int
-  unsigned short rawValue =
-      (int32_t)((pos * (float)GetFullRangeScaleFactor()) + GetMinNegativePwm());
-
-  wpi_assert(rawValue != kPwmDisabled);
-
-  // send the computed pwm value to the FPGA
-  SetRaw((unsigned short)rawValue);
+  int32_t status = 0;
+  setPWMPosition(m_handle, pos, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -184,15 +177,10 @@ void PWM::SetPosition(float pos) {
  */
 float PWM::GetPosition() const {
   if (StatusIsFatal()) return 0.0;
-  int32_t value = GetRaw();
-  if (value < GetMinNegativePwm()) {
-    return 0.0;
-  } else if (value > GetMaxPositivePwm()) {
-    return 1.0;
-  } else {
-    return (float)(value - GetMinNegativePwm()) /
-           (float)GetFullRangeScaleFactor();
-  }
+  int32_t status = 0;
+  float position = getPWMPosition(m_handle, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  return position;
 }
 
 /**
@@ -210,32 +198,9 @@ float PWM::GetPosition() const {
  */
 void PWM::SetSpeed(float speed) {
   if (StatusIsFatal()) return;
-  // clamp speed to be in the range 1.0 >= speed >= -1.0
-  if (speed < -1.0) {
-    speed = -1.0;
-  } else if (speed > 1.0) {
-    speed = 1.0;
-  }
-
-  // calculate the desired output pwm value by scaling the speed appropriately
-  int32_t rawValue;
-  if (speed == 0.0) {
-    rawValue = GetCenterPwm();
-  } else if (speed > 0.0) {
-    rawValue = (int32_t)(speed * ((float)GetPositiveScaleFactor()) +
-                         ((float)GetMinPositivePwm()) + 0.5);
-  } else {
-    rawValue = (int32_t)(speed * ((float)GetNegativeScaleFactor()) +
-                         ((float)GetMaxNegativePwm()) + 0.5);
-  }
-
-  // the above should result in a pwm_value in the valid range
-  wpi_assert((rawValue >= GetMinNegativePwm()) &&
-             (rawValue <= GetMaxPositivePwm()));
-  wpi_assert(rawValue != kPwmDisabled);
-
-  // send the computed pwm value to the FPGA
-  SetRaw(rawValue);
+  int32_t status = 0;
+  setPWMSpeed(m_handle, speed, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
 /**
@@ -252,22 +217,10 @@ void PWM::SetSpeed(float speed) {
  */
 float PWM::GetSpeed() const {
   if (StatusIsFatal()) return 0.0;
-  int32_t value = GetRaw();
-  if (value == PWM::kPwmDisabled) {
-    return 0.0;
-  } else if (value > GetMaxPositivePwm()) {
-    return 1.0;
-  } else if (value < GetMinNegativePwm()) {
-    return -1.0;
-  } else if (value > GetMinPositivePwm()) {
-    return (float)(value - GetMinPositivePwm()) /
-           (float)GetPositiveScaleFactor();
-  } else if (value < GetMaxNegativePwm()) {
-    return (float)(value - GetMaxNegativePwm()) /
-           (float)GetNegativeScaleFactor();
-  } else {
-    return 0.0;
-  }
+  int32_t status = 0;
+  float speed = getPWMSpeed(m_handle, &status);
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+  return speed;
 }
 
 /**
@@ -281,7 +234,7 @@ void PWM::SetRaw(unsigned short value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
-  setPWM(m_handle, value, &status);
+  setPWMRaw(m_handle, value, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 
@@ -296,7 +249,7 @@ unsigned short PWM::GetRaw() const {
   if (StatusIsFatal()) return 0;
 
   int32_t status = 0;
-  unsigned short value = getPWM(m_handle, &status);
+  unsigned short value = getPWMRaw(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 
   return value;
@@ -326,6 +279,19 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
       wpi_assert(false);
   }
 
+  wpi_setErrorWithContext(status, getHALErrorMessage(status));
+}
+
+/**
+ * Temporarily disables the PWM output. The next set call will reenable
+ * the output.
+ */
+void PWM::SetDisabled() {
+  if (StatusIsFatal()) return;
+
+  int32_t status = 0;
+
+  setPWMDisabled(m_handle, &status);
   wpi_setErrorWithContext(status, getHALErrorMessage(status));
 }
 

@@ -149,6 +149,8 @@ const char* getHALErrorMessage(int32_t code) {
       return VI_ERROR_RSRC_BUSY_MESSAGE;
     case VI_ERROR_INV_PARAMETER:
       return VI_ERROR_INV_PARAMETER_MESSAGE;
+    case HAL_PWM_SCALE_ERROR:
+      return HAL_PWM_SCALE_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }

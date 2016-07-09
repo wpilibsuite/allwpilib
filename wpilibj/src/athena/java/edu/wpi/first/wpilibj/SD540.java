@@ -32,7 +32,7 @@ public class SD540 extends PWMSpeedController {
   protected void initSD540() {
     setBounds(2.05, 1.55, 1.50, 1.44, .94);
     setPeriodMultiplier(PeriodMultiplier.k1X);
-    setRaw(m_centerPwm);
+    setSpeed(0.0);
     setZeroLatch();
 
     LiveWindow.addActuator("SD540", getChannel(), this);

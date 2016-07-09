@@ -32,7 +32,7 @@ public class Spark extends PWMSpeedController {
   protected void initSpark() {
     setBounds(2.003, 1.55, 1.50, 1.46, .999);
     setPeriodMultiplier(PeriodMultiplier.k1X);
-    setRaw(m_centerPwm);
+    setSpeed(0.0);
     setZeroLatch();
 
     LiveWindow.addActuator("Spark", getChannel(), this);
