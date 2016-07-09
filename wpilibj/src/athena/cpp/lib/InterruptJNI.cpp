@@ -218,17 +218,17 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterrupts(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
- * Method:    readRisingTimestamp
+ * Method:    readInterruptRisingTimestamp
  * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readRisingTimestamp(
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readInterruptRisingTimestamp(
     JNIEnv* env, jclass, jint interrupt_handle) {
-  INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readRisingTimestamp";
+  INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readInterruptRisingTimestamp";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
 
   int32_t status = 0;
-  jdouble timeStamp = HAL_ReadRisingTimestamp((HAL_InterruptHandle)interrupt_handle, &status);
+  jdouble timeStamp = HAL_ReadInterruptRisingTimestamp((HAL_InterruptHandle)interrupt_handle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -237,17 +237,17 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readRisingTimestamp(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_InterruptJNI
- * Method:    readFallingTimestamp
+ * Method:    readInterruptFallingTimestamp
  * Signature: (J)D
  */
 JNIEXPORT jdouble JNICALL
-Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readFallingTimestamp(
+Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readInterruptFallingTimestamp(
     JNIEnv* env, jclass, jint interrupt_handle) {
-  INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readFallingTimestamp";
+  INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readInterruptFallingTimestamp";
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
 
   int32_t status = 0;
-  jdouble timeStamp = HAL_ReadFallingTimestamp((HAL_InterruptHandle)interrupt_handle, &status);
+  jdouble timeStamp = HAL_ReadInterruptFallingTimestamp((HAL_InterruptHandle)interrupt_handle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);

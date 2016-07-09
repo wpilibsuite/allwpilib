@@ -124,8 +124,8 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interrupt_handle,
  * This is in the same time domain as GetClock().
  * @return Timestamp in seconds since boot.
  */
-double HAL_ReadRisingTimestamp(HAL_InterruptHandle interrupt_handle,
-                               int32_t* status) {
+double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                        int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -140,8 +140,8 @@ double HAL_ReadRisingTimestamp(HAL_InterruptHandle interrupt_handle,
 * This is in the same time domain as GetClock().
 * @return Timestamp in seconds since boot.
 */
-double HAL_ReadFallingTimestamp(HAL_InterruptHandle interrupt_handle,
-                                int32_t* status) {
+double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                         int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;

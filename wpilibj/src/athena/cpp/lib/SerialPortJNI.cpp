@@ -36,7 +36,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialInitializePort(
   SERIALJNI_LOG(logDEBUG) << "Calling Serial Initialize";
   SERIALJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
-  HAL_SerialInitializePort(port, &status);
+  HAL_InitializeSerialPort(port, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -52,7 +52,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetBaudRate(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Baud Rate";
   SERIALJNI_LOG(logDEBUG) << "Baud: " << rate;
   int32_t status = 0;
-  HAL_SerialSetBaudRate(port, rate, &status);
+  HAL_SetSerialBaudRate(port, rate, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -68,7 +68,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetDataBits(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Data Bits";
   SERIALJNI_LOG(logDEBUG) << "Data Bits: " << bits;
   int32_t status = 0;
-  HAL_SerialSetDataBits(port, bits, &status);
+  HAL_SetSerialDataBits(port, bits, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -84,7 +84,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetParity(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Parity";
   SERIALJNI_LOG(logDEBUG) << "Parity: " << parity;
   int32_t status = 0;
-  HAL_SerialSetParity(port, parity, &status);
+  HAL_SetSerialParity(port, parity, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -100,7 +100,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetStopBits(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Stop Bits";
   SERIALJNI_LOG(logDEBUG) << "Stop Bits: " << bits;
   int32_t status = 0;
-  HAL_SerialSetStopBits(port, bits, &status);
+  HAL_SetSerialStopBits(port, bits, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -116,7 +116,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetWriteMode(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Write Mode";
   SERIALJNI_LOG(logDEBUG) << "Write mode: " << mode;
   int32_t status = 0;
-  HAL_SerialSetWriteMode(port, mode, &status);
+  HAL_SetSerialWriteMode(port, mode, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -132,7 +132,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetFlowControl(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Flow Control";
   SERIALJNI_LOG(logDEBUG) << "Flow Control: " << flow;
   int32_t status = 0;
-  HAL_SerialSetFlowControl(port, flow, &status);
+  HAL_SetSerialFlowControl(port, flow, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -148,7 +148,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetTimeout(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Timeout";
   SERIALJNI_LOG(logDEBUG) << "Timeout: " << timeout;
   int32_t status = 0;
-  HAL_SerialSetTimeout(port, timeout, &status);
+  HAL_SetSerialTimeout(port, timeout, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -164,7 +164,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialEnableTermination(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Enable Termination";
   SERIALJNI_LOG(logDEBUG) << "Terminator: " << terminator;
   int32_t status = 0;
-  HAL_SerialEnableTermination(port, terminator, &status);
+  HAL_EnableSerialTermination(port, terminator, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -179,7 +179,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialDisableTermination(
     JNIEnv* env, jclass, jbyte port) {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Disable termination";
   int32_t status = 0;
-  HAL_SerialDisableTermination(port, &status);
+  HAL_DisableSerialTermination(port, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -195,7 +195,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetReadBufferSize(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Read Buffer Size";
   SERIALJNI_LOG(logDEBUG) << "Size: " << size;
   int32_t status = 0;
-  HAL_SerialSetReadBufferSize(port, size, &status);
+  HAL_SetSerialReadBufferSize(port, size, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -211,7 +211,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetWriteBufferSize(
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Write Buffer Size";
   SERIALJNI_LOG(logDEBUG) << "Size: " << size;
   int32_t status = 0;
-  HAL_SerialSetWriteBufferSize(port, size, &status);
+  HAL_SetSerialWriteBufferSize(port, size, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -226,7 +226,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialGetBytesRecieved(
     JNIEnv* env, jclass, jbyte port) {
   SERIALJNI_LOG(logDEBUG) << "Serial Get Bytes Received";
   int32_t status = 0;
-  jint retVal = HAL_SerialGetBytesReceived(port, &status);
+  jint retVal = HAL_GetSerialBytesReceived(port, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
   return retVal;
@@ -243,7 +243,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialRead(
   jbyte* dataReceivedPtr = nullptr;
   dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
   int32_t status = 0;
-  jint retVal = HAL_SerialRead(port, (char*)dataReceivedPtr, size, &status);
+  jint retVal = HAL_ReadSerial(port, (char*)dataReceivedPtr, size, &status);
   SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -263,7 +263,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialWrite(
     dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
   }
   int32_t status = 0;
-  jint retVal = HAL_SerialWrite(port, (const char*)dataToSendPtr, size, &status);
+  jint retVal = HAL_WriteSerial(port, (const char*)dataToSendPtr, size, &status);
   SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -279,7 +279,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialFlush(
     JNIEnv* env, jclass, jbyte port) {
   SERIALJNI_LOG(logDEBUG) << "Serial Flush";
   int32_t status = 0;
-  HAL_SerialFlush(port, &status);
+  HAL_FlushSerial(port, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -293,7 +293,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialClear(
     JNIEnv* env, jclass, jbyte port) {
   SERIALJNI_LOG(logDEBUG) << "Serial Clear";
   int32_t status = 0;
-  HAL_SerialClear(port, &status);
+  HAL_ClearSerial(port, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -307,7 +307,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialClose(
     JNIEnv* env, jclass, jbyte port) {
   SERIALJNI_LOG(logDEBUG) << "Serial Close";
   int32_t status = 0;
-  HAL_SerialClose(port, &status);
+  HAL_CloseSerial(port, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }

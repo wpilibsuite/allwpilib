@@ -35,7 +35,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CInitialize(
   I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CInititalize";
   I2CJNI_LOG(logDEBUG) << "Port: " << (jint)value;
   int32_t status = 0;
-  HAL_I2CInitialize(value, &status);
+  HAL_InitializeI2C(value, &status);
   I2CJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
@@ -61,7 +61,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CTransaction(
       (uint8_t*)env->GetDirectBufferAddress(dataReceived);
   I2CJNI_LOG(logDEBUG) << "DataReceivedPtr = " << (jint*)dataReceivedPtr;
   I2CJNI_LOG(logDEBUG) << "ReceiveSize = " << (jint)receiveSize;
-  jint returnValue = HAL_I2CTransaction(port, address, dataToSendPtr, sendSize,
+  jint returnValue = HAL_TransactionI2C(port, address, dataToSendPtr, sendSize,
                                     dataReceivedPtr, receiveSize);
   I2CJNI_LOG(logDEBUG) << "ReturnValue = " << returnValue;
   return returnValue;
@@ -85,7 +85,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CWrite(
   }
   I2CJNI_LOG(logDEBUG) << "DataToSendPtr = " << dataToSendPtr;
   I2CJNI_LOG(logDEBUG) << "SendSize = " << (jint)dataToSend;
-  jint returnValue = HAL_I2CWrite(port, address, dataToSendPtr, sendSize);
+  jint returnValue = HAL_WriteI2C(port, address, dataToSendPtr, sendSize);
   I2CJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)returnValue;
   return returnValue;
 }
@@ -105,7 +105,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CRead(
       (uint8_t*)env->GetDirectBufferAddress(dataReceived);
   I2CJNI_LOG(logDEBUG) << "DataReceivedPtr = " << dataReceivedPtr;
   I2CJNI_LOG(logDEBUG) << "ReceiveSize = " << receiveSize;
-  jint returnValue = HAL_I2CRead(port, address, dataReceivedPtr, receiveSize);
+  jint returnValue = HAL_ReadI2C(port, address, dataReceivedPtr, receiveSize);
   I2CJNI_LOG(logDEBUG) << "ReturnValue = " << returnValue;
   return returnValue;
 }
@@ -118,7 +118,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CRead(
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CClose(JNIEnv*, jclass, jbyte value) {
   I2CJNI_LOG(logDEBUG) << "Calling I2CJNI i2CClose";
-  HAL_I2CClose(value);
+  HAL_CloseI2C(value);
 }
 
 }  // extern "C"

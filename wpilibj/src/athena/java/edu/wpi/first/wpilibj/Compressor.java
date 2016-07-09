@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  */
 public class Compressor extends SensorBase implements LiveWindowSendable {
   private int m_compressorHandle;
+  private byte m_module;
 
   /**
    * Constructor.
@@ -33,6 +34,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    */
   public Compressor(int module) {
     m_table = null;
+    m_module = (byte)module;
 
     m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
   }
@@ -79,7 +81,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if the pressure is low by reading the pressure switch that is plugged into the PCM
    */
   public boolean getPressureSwitchValue() {
-    return CompressorJNI.getPressureSwitch(m_compressorHandle);
+    return CompressorJNI.getCompressorPressureSwitch(m_compressorHandle);
   }
 
   /**
@@ -98,7 +100,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *           operation of the compressor is disabled.
    */
   public void setClosedLoopControl(boolean on) {
-    CompressorJNI.setClosedLoopControl(m_compressorHandle, on);
+    CompressorJNI.setCompressorClosedLoopControl(m_compressorHandle, on);
   }
 
   /**
@@ -107,7 +109,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @return true if compressor is operating on closed-loop mode, otherwise return false.
    */
   public boolean getClosedLoopControl() {
-    return CompressorJNI.getClosedLoopControl(m_compressorHandle);
+    return CompressorJNI.getCompressorClosedLoopControl(m_compressorHandle);
   }
 
   /**
@@ -174,7 +176,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * <p>If no sticky faults are set then this call will have no effect.
    */
   public void clearAllPCMStickyFaults() {
-    CompressorJNI.clearAllPCMStickyFaults(m_compressorHandle);
+    CompressorJNI.clearAllPCMStickyFaults(m_module);
   }
 
   @Override

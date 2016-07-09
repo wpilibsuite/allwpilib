@@ -58,6 +58,7 @@ class Compressor : public SensorBase,
 
  private:
   void SetCompressor(bool on);
+  uint8_t m_module;
 
   std::shared_ptr<ITable> m_table;
 };

@@ -18,7 +18,7 @@
 I2C::I2C(Port port, uint8_t deviceAddress)
     : m_port(port), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
-  HAL_I2CInitialize(m_port, &status);
+  HAL_InitializeI2C(m_port, &status);
   // wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   HAL_Report(HALUsageReporting::kResourceType_I2C, deviceAddress);
@@ -27,7 +27,7 @@ I2C::I2C(Port port, uint8_t deviceAddress)
 /**
  * Destructor.
  */
-I2C::~I2C() { HAL_I2CClose(m_port); }
+I2C::~I2C() { HAL_CloseI2C(m_port); }
 
 /**
  * Generic transaction.
@@ -44,7 +44,7 @@ I2C::~I2C() { HAL_I2CClose(m_port); }
 bool I2C::Transaction(uint8_t* dataToSend, uint8_t sendSize,
                       uint8_t* dataReceived, uint8_t receiveSize) {
   int32_t status = 0;
-  status = HAL_I2CTransaction(m_port, m_deviceAddress, dataToSend, sendSize,
+  status = HAL_TransactionI2C(m_port, m_deviceAddress, dataToSend, sendSize,
                               dataReceived, receiveSize);
   // wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return status < receiveSize;
@@ -76,7 +76,7 @@ bool I2C::Write(uint8_t registerAddress, uint8_t data) {
   buffer[0] = registerAddress;
   buffer[1] = data;
   int32_t status = 0;
-  status = HAL_I2CWrite(m_port, m_deviceAddress, buffer, sizeof(buffer));
+  status = HAL_WriteI2C(m_port, m_deviceAddress, buffer, sizeof(buffer));
   return status < static_cast<int32_t>(sizeof(buffer));
 }
 
@@ -92,7 +92,7 @@ bool I2C::Write(uint8_t registerAddress, uint8_t data) {
  */
 bool I2C::WriteBulk(uint8_t* data, uint8_t count) {
   int32_t status = 0;
-  status = HAL_I2CWrite(m_port, m_deviceAddress, data, count);
+  status = HAL_WriteI2C(m_port, m_deviceAddress, data, count);
   return status < count;
 }
 
@@ -142,7 +142,7 @@ bool I2C::ReadOnly(uint8_t count, uint8_t* buffer) {
     return true;
   }
   int32_t status = 0;
-  status = HAL_I2CRead(m_port, m_deviceAddress, buffer, count);
+  status = HAL_ReadI2C(m_port, m_deviceAddress, buffer, count);
   return status < count;
 }
 

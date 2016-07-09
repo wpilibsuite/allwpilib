@@ -128,7 +128,7 @@ void ThrowAllocationException(JNIEnv *env, int32_t status) {
   delete[] buf;
 }
 
-void ThrowHAL_HandleException(JNIEnv *env, int32_t status) {
+void ThrowHalHandleException(JNIEnv *env, int32_t status) {
   const char *message = HAL_GetErrorMessage(status);
   char *buf = new char[strlen(message) + 30];
   sprintf(buf, " Code: $%d. %s", status, message);
@@ -143,7 +143,7 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
     ThrowAllocationException(env, status);
   }
   if (status == HAL_HANDLE_ERROR) {
-    ThrowHAL_HandleException(env, status);
+    ThrowHalHandleException(env, status);
   }
   const char *message = HAL_GetErrorMessage(status);
   if (do_throw && status < 0) {
@@ -302,7 +302,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (!allocationExCls) return JNI_ERR;
   env->DeleteLocalRef(local);
   
-  local = env->FindClass("edu/wpi/first/wpilibj/util/HAL_HandleException");
+  local = env->FindClass("edu/wpi/first/wpilibj/util/HalHandleException");
   if (!local) return JNI_ERR;
   halHandleExCls = static_cast<jclass>(env->NewGlobalRef(local));
   if (!halHandleExCls) return JNI_ERR;
