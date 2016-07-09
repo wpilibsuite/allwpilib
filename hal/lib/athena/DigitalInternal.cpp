@@ -109,10 +109,9 @@ uint32_t remapMXPPWMChannel(uint32_t pin) {
  * If it's an analog trigger, determine the module from the high order routing
  * channel else do normal digital input remapping based on pin number (MXP)
  */
-extern "C++" bool remapDigitalSource(HAL_Handle digitalSourceHandle,
-                                     HAL_AnalogTriggerType analogTriggerType,
-                                     uint32_t& pin, uint8_t& module,
-                                     bool& analogTrigger) {
+bool remapDigitalSource(HAL_Handle digitalSourceHandle,
+                        HAL_AnalogTriggerType analogTriggerType, uint32_t& pin,
+                        uint8_t& module, bool& analogTrigger) {
   if (isHandleType(digitalSourceHandle, HAL_HandleEnum::AnalogTrigger)) {
     // If handle passed, index is not negative
     uint32_t index = getHandleIndex(digitalSourceHandle);

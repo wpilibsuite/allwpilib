@@ -23,8 +23,7 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_initializeCompressor(
   int32_t status = 0;
   auto handle = HAL_InitializeCompressor(module, &status);
   if (status == PARAMETER_OUT_OF_RANGE) {
-    //TODO: Move 63 to a constant (Thad will do)
-    ThrowBoundaryException(env, module, 0, 63);
+    ThrowBoundaryException(env, module, 0, HAL_GetNumPCMModules());
   }
   
   return (jint)handle;

@@ -150,12 +150,3 @@ void HAL_NetworkCommunicationObserveUserProgramTest();
 uint32_t HAL_Report(uint8_t resource, uint8_t instanceNumber,
                     uint8_t context = 0, const char* feature = nullptr);
 }
-
-// TODO: HACKS for now...
-extern "C" {
-
-void NumericArrayResize();
-void RTSetCleanupProc();
-void EDVR_CreateReference();
-void Occur();
-}
