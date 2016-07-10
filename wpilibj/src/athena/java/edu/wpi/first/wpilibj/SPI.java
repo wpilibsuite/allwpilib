@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SPIJNI;
 
 /**
@@ -51,7 +51,7 @@ public class SPI extends SensorBase {
 
     SPIJNI.spiInitialize(m_port);
 
-    UsageReporting.report(tResourceType.kResourceType_SPI, devices);
+    HAL.report(tResourceType.kResourceType_SPI, devices);
   }
 
   /**

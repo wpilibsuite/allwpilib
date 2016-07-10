@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -42,7 +42,7 @@ public class Servo extends PWM {
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
     LiveWindow.addActuator("Servo", getChannel(), this);
-    UsageReporting.report(tResourceType.kResourceType_Servo, getChannel());
+    HAL.report(tResourceType.kResourceType_Servo, getChannel());
   }
 
 

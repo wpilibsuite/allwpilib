@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -36,7 +36,7 @@ public class SD540 extends PWMSpeedController {
     setZeroLatch();
 
     LiveWindow.addActuator("SD540", getChannel(), this);
-    UsageReporting.report(tResourceType.kResourceType_MindsensorsSD540, getChannel());
+    HAL.report(tResourceType.kResourceType_MindsensorsSD540, getChannel());
   }
 
   /**

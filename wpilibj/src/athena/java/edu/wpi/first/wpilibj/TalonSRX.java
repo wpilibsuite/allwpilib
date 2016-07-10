@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -44,6 +44,6 @@ public class TalonSRX extends PWMSpeedController {
     setZeroLatch();
 
     LiveWindow.addActuator("TalonSRX", getChannel(), this);
-    UsageReporting.report(tResourceType.kResourceType_TalonSRX, getChannel());
+    HAL.report(tResourceType.kResourceType_TalonSRX, getChannel());
   }
 }

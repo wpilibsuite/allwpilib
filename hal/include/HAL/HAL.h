@@ -120,8 +120,8 @@ int HAL_SendError(int isError, int32_t errorCode, int isLVCode,
                   const char* details, const char* location,
                   const char* callStack, int printMsg);
 
-int HAL_GetControlWord(HAL_ControlWord* data);
-int HAL_GetAllianceStation(enum HAL_AllianceStationID* allianceStation);
+int HAL_GetControlWord(HAL_ControlWord* controlWord);
+HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status);
 int HAL_GetJoystickAxes(uint8_t joystickNum, HAL_JoystickAxes* axes);
 int HAL_GetJoystickPOVs(uint8_t joystickNum, HAL_JoystickPOVs* povs);
 int HAL_GetJoystickButtons(uint8_t joystickNum, HAL_JoystickButtons* buttons);
@@ -133,7 +133,7 @@ char* HAL_GetJoystickName(uint8_t joystickNum);
 int HAL_GetJoystickAxisType(uint8_t joystickNum, uint8_t axis);
 int HAL_SetJoystickOutputs(uint8_t joystickNum, uint32_t outputs,
                            uint16_t leftRumble, uint16_t rightRumble);
-int HAL_GetMatchTime(float* matchTime);
+float HAL_GetMatchTime(int32_t* status);
 
 void HAL_SetNewDataSem(MULTIWAIT_ID sem);
 
@@ -141,11 +141,11 @@ bool HAL_GetSystemActive(int32_t* status);
 bool HAL_GetBrownedOut(int32_t* status);
 
 int HAL_Initialize(int mode = 0);
-void HAL_NetworkCommunicationObserveUserProgramStarting();
-void HAL_NetworkCommunicationObserveUserProgramDisabled();
-void HAL_NetworkCommunicationObserveUserProgramAutonomous();
-void HAL_NetworkCommunicationObserveUserProgramTeleop();
-void HAL_NetworkCommunicationObserveUserProgramTest();
+void HAL_ObserveUserProgramStarting();
+void HAL_ObserveUserProgramDisabled();
+void HAL_ObserveUserProgramAutonomous();
+void HAL_ObserveUserProgramTeleop();
+void HAL_ObserveUserProgramTest();
 
 uint32_t HAL_Report(uint8_t resource, uint8_t instanceNumber,
                     uint8_t context = 0, const char* feature = nullptr);

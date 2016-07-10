@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -31,7 +31,8 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    * Common initialization.
    */
   private void initAccelerometer() {
-    UsageReporting.report(tResourceType.kResourceType_Accelerometer, m_analogChannel.getChannel());
+    HAL.report(tResourceType.kResourceType_Accelerometer,
+                                   m_analogChannel.getChannel());
     LiveWindow.addSensor("Accelerometer", m_analogChannel.getChannel(), this);
   }
 

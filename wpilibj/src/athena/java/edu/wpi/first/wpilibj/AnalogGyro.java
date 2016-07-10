@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogGyroJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -42,7 +42,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
 
     AnalogGyroJNI.setupAnalogGyro(m_gyroHandle);
 
-    UsageReporting.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
+    HAL.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
     LiveWindow.addSensor("AnalogGyro", m_analog.getChannel(), this);
   }
 

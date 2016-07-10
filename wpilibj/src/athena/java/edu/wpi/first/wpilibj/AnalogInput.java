@@ -10,9 +10,9 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -56,7 +56,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
     LiveWindow.addSensor("AnalogInput", channel, this);
-    UsageReporting.report(tResourceType.kResourceType_AnalogChannel, channel);
+    HAL.report(tResourceType.kResourceType_AnalogChannel, channel);
   }
 
   /**

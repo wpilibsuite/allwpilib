@@ -153,7 +153,8 @@ task jniHeaders {
             args '-d', outputFolder
             args '-classpath', sourceSets.athena.output.classesDir
             args 'edu.wpi.first.wpilibj.can.CANJNI'
-            args 'edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary'
+            args 'edu.wpi.first.wpilibj.hal.FRCNetComm'
+            args 'edu.wpi.first.wpilibj.hal.HAL'
             args 'edu.wpi.first.wpilibj.hal.HALUtil'
             args 'edu.wpi.first.wpilibj.hal.JNIWrapper'
             args 'edu.wpi.first.wpilibj.hal.AccelerometerJNI'

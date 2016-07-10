@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SerialPortJNI;
 
 /**
@@ -207,7 +207,7 @@ public class SerialPort {
 
     disableTermination();
 
-    UsageReporting.report(tResourceType.kResourceType_SerialPort, 0);
+    HAL.report(tResourceType.kResourceType_SerialPort, 0);
   }
 
   /**

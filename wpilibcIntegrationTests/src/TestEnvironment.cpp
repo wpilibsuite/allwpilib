@@ -30,7 +30,7 @@ class TestEnvironment : public testing::Environment {
             station. After starting network coms, it will loop until the driver
             station returns that the robot is enabled, to ensure that tests
             will be able to run on the hardware. */
-    HAL_NetworkCommunicationObserveUserProgramStarting();
+    HAL_ObserveUserProgramStarting();
     LiveWindow::GetInstance()->SetEnabled(false);
 
     std::cout << "Waiting for enable" << std::endl;

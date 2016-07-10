@@ -7,10 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -59,12 +58,13 @@ public class IterativeRobot extends RobotBase {
    * Provide an alternate "main loop" via startCompetition().
    */
   public void startCompetition() {
-    UsageReporting.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Iterative);
+    HAL.report(tResourceType.kResourceType_Framework,
+                                   tInstances.kFramework_Iterative);
 
     robotInit();
 
     // Tell the DS that the robot is ready to be enabled
-    FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramStarting();
+    HAL.observeUserProgramStarting();
 
     // loop forever, calling the appropriate mode-dependent function
     LiveWindow.setEnabled(false);
@@ -83,7 +83,7 @@ public class IterativeRobot extends RobotBase {
           m_testInitialized = false;
         }
         if (nextPeriodReady()) {
-          FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramDisabled();
+          HAL.observeUserProgramDisabled();
           disabledPeriodic();
         }
       } else if (isTest()) {
@@ -98,7 +98,7 @@ public class IterativeRobot extends RobotBase {
           m_disabledInitialized = false;
         }
         if (nextPeriodReady()) {
-          FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTest();
+          HAL.observeUserProgramTest();
           testPeriodic();
         }
       } else if (isAutonomous()) {
@@ -116,7 +116,7 @@ public class IterativeRobot extends RobotBase {
           m_disabledInitialized = false;
         }
         if (nextPeriodReady()) {
-          FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramAutonomous();
+          HAL.observeUserProgramAutonomous();
           autonomousPeriodic();
         }
       } else {
@@ -131,7 +131,7 @@ public class IterativeRobot extends RobotBase {
           m_disabledInitialized = false;
         }
         if (nextPeriodReady()) {
-          FRCNetworkCommunicationsLibrary.FRCNetworkCommunicationObserveUserProgramTeleop();
+          HAL.observeUserProgramTeleop();
           teleopPeriodic();
         }
       }

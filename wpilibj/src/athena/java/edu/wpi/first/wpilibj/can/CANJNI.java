@@ -927,11 +927,11 @@ public class CANJNI extends JNIWrapper {
   public static final int CAN_IS_FRAME_11BIT = 0x40000000;
 
   @SuppressWarnings("MethodName")
-  public static native void FRCNetworkCommunicationCANSessionMuxSendMessage(int messageID,
+  public static native void FRCNetCommCANSessionMuxSendMessage(int messageID,
                                                                             ByteBuffer data,
                                                                             int periodMs);
 
   @SuppressWarnings("MethodName")
-  public static native ByteBuffer FRCNetworkCommunicationCANSessionMuxReceiveMessage(
+  public static native ByteBuffer FRCNetCommCANSessionMuxReceiveMessage(
       IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp);
 }

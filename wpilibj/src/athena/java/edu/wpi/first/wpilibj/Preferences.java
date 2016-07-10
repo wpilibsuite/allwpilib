@@ -9,8 +9,8 @@ package edu.wpi.first.wpilibj;
 
 import java.util.Vector;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
@@ -77,7 +77,7 @@ public class Preferences {
   private Preferences() {
     m_table = NetworkTable.getTable(TABLE_NAME);
     m_table.addTableListenerEx(m_listener, ITable.NOTIFY_NEW | ITable.NOTIFY_IMMEDIATE);
-    UsageReporting.report(tResourceType.kResourceType_Preferences, 0);
+    HAL.report(tResourceType.kResourceType_Preferences, 0);
   }
 
   /**

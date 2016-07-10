@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -52,9 +52,9 @@ public class GearTooth extends Counter {
     super(channel);
     enableDirectionSensing(directionSensitive);
     if (directionSensitive) {
-      UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, 0, "D");
+      HAL.report(tResourceType.kResourceType_GearTooth, channel, 0, "D");
     } else {
-      UsageReporting.report(tResourceType.kResourceType_GearTooth, channel, 0);
+      HAL.report(tResourceType.kResourceType_GearTooth, channel, 0);
     }
     LiveWindow.addSensor("GearTooth", channel, this);
   }

@@ -18,17 +18,21 @@ struct HAL_JoystickAxesInt {
 
 extern "C" {
 
-int HAL_GetControlWord(HAL_ControlWord* data) {
-  return FRC_NetworkCommunication_getControlWord((ControlWord_t*)data);
+int HAL_GetControlWord(HAL_ControlWord* controlWord) {
+  std::memset(controlWord, 0, sizeof(HAL_ControlWord));
+  return FRC_NetworkCommunication_getControlWord(
+      reinterpret_cast<ControlWord_t*>(controlWord));
 }
 
 void HAL_SetNewDataSem(MULTIWAIT_ID sem) {
   setNewDataSem(sem->native_handle());
 }
 
-int HAL_GetAllianceStation(enum HAL_AllianceStationID* allianceStation) {
-  return FRC_NetworkCommunication_getAllianceStation(
-      (AllianceStationID_t*)allianceStation);
+HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
+  HAL_AllianceStationID allianceStation;
+  *status = FRC_NetworkCommunication_getAllianceStation(
+      reinterpret_cast<AllianceStationID_t*>(&allianceStation));
+  return allianceStation;
 }
 
 int HAL_GetJoystickAxes(uint8_t joystickNum, HAL_JoystickAxes* axes) {
@@ -142,27 +146,29 @@ int HAL_SetJoystickOutputs(uint8_t joystickNum, uint32_t outputs,
                                                      leftRumble, rightRumble);
 }
 
-int HAL_GetMatchTime(float* matchTime) {
-  return FRC_NetworkCommunication_getMatchTime(matchTime);
+float HAL_GetMatchTime(int32_t* status) {
+  float matchTime;
+  *status = FRC_NetworkCommunication_getMatchTime(&matchTime);
+  return matchTime;
 }
 
-void HAL_NetworkCommunicationObserveUserProgramStarting(void) {
+void HAL_ObserveUserProgramStarting(void) {
   FRC_NetworkCommunication_observeUserProgramStarting();
 }
 
-void HAL_NetworkCommunicationObserveUserProgramDisabled(void) {
+void HAL_ObserveUserProgramDisabled(void) {
   FRC_NetworkCommunication_observeUserProgramDisabled();
 }
 
-void HAL_NetworkCommunicationObserveUserProgramAutonomous(void) {
+void HAL_ObserveUserProgramAutonomous(void) {
   FRC_NetworkCommunication_observeUserProgramAutonomous();
 }
 
-void HAL_NetworkCommunicationObserveUserProgramTeleop(void) {
+void HAL_ObserveUserProgramTeleop(void) {
   FRC_NetworkCommunication_observeUserProgramTeleop();
 }
 
-void HAL_NetworkCommunicationObserveUserProgramTest(void) {
+void HAL_ObserveUserProgramTest(void) {
   FRC_NetworkCommunication_observeUserProgramTest();
 }
 

@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -39,7 +39,7 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
     m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);
 
     LiveWindow.addSensor("AnalogOutput", channel, this);
-    UsageReporting.report(tResourceType.kResourceType_AnalogOutput, channel);
+    HAL.report(tResourceType.kResourceType_AnalogOutput, channel);
   }
 
   /**

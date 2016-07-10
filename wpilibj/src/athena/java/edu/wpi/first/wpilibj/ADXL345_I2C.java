@@ -10,9 +10,9 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tInstances;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -91,7 +91,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
 
     setRange(range);
 
-    UsageReporting.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
+    HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
     LiveWindow.addSensor("ADXL345_I2C", port.getValue(), this);
   }
 

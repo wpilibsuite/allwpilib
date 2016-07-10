@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -129,11 +129,11 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
     int portHandle = RelayJNI.getPort((byte)m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
       m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);
-      UsageReporting.report(tResourceType.kResourceType_Relay, m_channel);
+      HAL.report(tResourceType.kResourceType_Relay, m_channel);
     }
     if (m_direction == Direction.kBoth || m_direction == Direction.kReverse) {
       m_reverseHandle = RelayJNI.initializeRelayPort(portHandle, false);
-      UsageReporting.report(tResourceType.kResourceType_Relay, m_channel + 128);
+      HAL.report(tResourceType.kResourceType_Relay, m_channel + 128);
     }
 
     m_safetyHelper = new MotorSafetyHelper(this);

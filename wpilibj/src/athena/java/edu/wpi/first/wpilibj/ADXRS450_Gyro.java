@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -77,7 +77,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
 
     calibrate();
 
-    UsageReporting.report(tResourceType.kResourceType_ADXRS450, port.getValue());
+    HAL.report(tResourceType.kResourceType_ADXRS450, port.getValue());
     LiveWindow.addSensor("ADXRS450_Gyro", port.getValue(), this);
   }
 

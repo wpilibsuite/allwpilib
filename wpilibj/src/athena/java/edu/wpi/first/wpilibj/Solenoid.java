@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -54,7 +54,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
-    UsageReporting.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
+    HAL.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
   }
 
   /**

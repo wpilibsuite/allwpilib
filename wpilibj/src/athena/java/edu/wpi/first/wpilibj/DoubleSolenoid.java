@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -85,8 +85,10 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
     m_forwardMask = (byte) (1 << m_forwardChannel);
     m_reverseMask = (byte) (1 << m_reverseChannel);
 
-    UsageReporting.report(tResourceType.kResourceType_Solenoid, m_forwardChannel, m_moduleNumber);
-    UsageReporting.report(tResourceType.kResourceType_Solenoid, m_reverseChannel, m_moduleNumber);
+    HAL.report(tResourceType.kResourceType_Solenoid, m_forwardChannel,
+                                   m_moduleNumber);
+    HAL.report(tResourceType.kResourceType_Solenoid, m_reverseChannel,
+                                   m_moduleNumber);
     LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
   }
 

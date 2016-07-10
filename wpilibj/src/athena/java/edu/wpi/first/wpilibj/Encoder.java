@@ -10,9 +10,9 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.EncoderJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -79,7 +79,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 
     m_pidSource = PIDSourceType.kDisplacement;
 
-    UsageReporting.report(tResourceType.kResourceType_Encoder, getFPGAIndex(), type.value);
+    HAL.report(tResourceType.kResourceType_Encoder, getFPGAIndex(), type.value);
     LiveWindow.addSensor("Encoder", m_aSource.getChannel(), this);
   }
 

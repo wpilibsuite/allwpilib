@@ -112,7 +112,7 @@ void SampleRobot::StartCompetition() {
   RobotInit();
 
   // Tell the DS that the robot is ready to be enabled
-  HAL_NetworkCommunicationObserveUserProgramStarting();
+  HAL_ObserveUserProgramStarting();
 
   RobotMain();
 

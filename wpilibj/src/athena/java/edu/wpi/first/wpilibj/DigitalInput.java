@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
@@ -36,7 +36,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
     m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte)channel), true);
 
     LiveWindow.addSensor("DigitalInput", channel, this);
-    UsageReporting.report(tResourceType.kResourceType_DigitalInput, channel);
+    HAL.report(tResourceType.kResourceType_DigitalInput, channel);
   }
 
   /**

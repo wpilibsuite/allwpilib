@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary;
-import edu.wpi.first.wpilibj.communication.FRCNetworkCommunicationsLibrary.tResourceType;
-import edu.wpi.first.wpilibj.communication.UsageReporting;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * Handle input from standard Joysticks connected to the Driver Station. This class handles standard
@@ -157,7 +157,7 @@ public class Joystick extends GenericHID {
     m_buttons[ButtonType.kTrigger.value] = kDefaultTriggerButton;
     m_buttons[ButtonType.kTop.value] = kDefaultTopButton;
 
-    UsageReporting.report(tResourceType.kResourceType_Joystick, port);
+    HAL.report(tResourceType.kResourceType_Joystick, port);
   }
 
   /**
@@ -473,8 +473,7 @@ public class Joystick extends GenericHID {
     } else {
       m_rightRumble = (short) (value * 65535);
     }
-    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte) m_port, m_outputs, m_leftRumble,
-        m_rightRumble);
+    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 
   /**
@@ -486,8 +485,7 @@ public class Joystick extends GenericHID {
 
   public void setOutput(int outputNumber, boolean value) {
     m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
-    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte) m_port, m_outputs, m_leftRumble,
-        m_rightRumble);
+    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 
   /**
@@ -497,7 +495,6 @@ public class Joystick extends GenericHID {
    */
   public void setOutputs(int value) {
     m_outputs = value;
-    FRCNetworkCommunicationsLibrary.HALSetJoystickOutputs((byte) m_port, m_outputs, m_leftRumble,
-        m_rightRumble);
+    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
   }
 }
