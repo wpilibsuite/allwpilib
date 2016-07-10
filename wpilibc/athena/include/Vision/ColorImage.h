@@ -13,7 +13,7 @@
 
 class ColorImage : public ImageBase {
  public:
-  ColorImage(ImageType type);
+  explicit ColorImage(ImageType type);
   virtual ~ColorImage() = default;
   BinaryImage* ThresholdRGB(int redLow, int redHigh, int greenLow,
                             int greenHigh, int blueLow, int blueHigh);

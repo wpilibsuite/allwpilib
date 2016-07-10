@@ -14,7 +14,7 @@ using namespace gazebo;
 
 class SimGyro {
  public:
-  SimGyro(std::string topic);
+  explicit SimGyro(std::string topic);
 
   void Reset();
   double GetAngle();

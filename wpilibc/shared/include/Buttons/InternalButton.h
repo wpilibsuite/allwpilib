@@ -12,7 +12,7 @@
 class InternalButton : public Button {
  public:
   InternalButton() = default;
-  InternalButton(bool inverted);
+  explicit InternalButton(bool inverted);
   virtual ~InternalButton() = default;
 
   void SetInverted(bool inverted);

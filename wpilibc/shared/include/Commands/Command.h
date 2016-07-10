@@ -52,8 +52,8 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
 
  public:
   Command();
-  Command(const std::string& name);
-  Command(double timeout);
+  explicit Command(const std::string& name);
+  explicit Command(double timeout);
   Command(const std::string& name, double timeout);
   virtual ~Command();
   double TimeSinceInitialized() const;

@@ -11,7 +11,7 @@
 
 class WaitForChildren : public Command {
  public:
-  WaitForChildren(double timeout);
+  explicit WaitForChildren(double timeout);
   WaitForChildren(const std::string& name, double timeout);
   virtual ~WaitForChildren() = default;
 

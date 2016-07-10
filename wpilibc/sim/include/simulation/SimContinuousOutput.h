@@ -24,7 +24,7 @@ class SimContinuousOutput {
   float speed;
 
  public:
-  SimContinuousOutput(std::string topic);
+  explicit SimContinuousOutput(std::string topic);
 
   /**
    * Set the output value.

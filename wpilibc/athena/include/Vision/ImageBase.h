@@ -14,7 +14,7 @@
 
 class ImageBase : public ErrorBase {
  public:
-  ImageBase(ImageType type);
+  explicit ImageBase(ImageType type);
   virtual ~ImageBase();
   virtual void Write(const char* fileName);
   int GetHeight();

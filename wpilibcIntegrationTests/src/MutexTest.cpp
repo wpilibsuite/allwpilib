@@ -69,7 +69,7 @@ void SetThreadRealtimePriorityOrDie(int priority) {
 template <typename MutexType>
 class LowPriorityThread {
  public:
-  LowPriorityThread(MutexType* mutex)
+  explicit LowPriorityThread(MutexType* mutex)
       : m_mutex(mutex), m_hold_mutex(1), m_success(0) {}
 
   void operator()() {
@@ -137,7 +137,7 @@ class BusyWaitingThread {
 template <typename MutexType>
 class HighPriorityThread {
  public:
-  HighPriorityThread(MutexType* mutex) : m_mutex(mutex), m_success(0) {}
+  explicit HighPriorityThread(MutexType* mutex) : m_mutex(mutex) {}
 
   void operator()() {
     SetProcessorAffinity(0);
@@ -153,7 +153,7 @@ class HighPriorityThread {
  private:
   Notification m_started;
   MutexType* m_mutex;
-  std::atomic<int> m_success;
+  std::atomic<int> m_success{0};
 };
 
 // Class to test a MutexType to see if it solves the priority inheritance

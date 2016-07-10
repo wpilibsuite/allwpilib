@@ -32,8 +32,8 @@ class ADXL362 : public Accelerometer, public LiveWindowSendable {
   };
 
  public:
-  ADXL362(Range range = kRange_2G);
-  ADXL362(SPI::Port port, Range range = kRange_2G);
+  explicit ADXL362(Range range = kRange_2G);
+  explicit ADXL362(SPI::Port port, Range range = kRange_2G);
   virtual ~ADXL362() = default;
 
   ADXL362(const ADXL362&) = delete;

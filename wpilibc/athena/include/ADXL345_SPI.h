@@ -54,7 +54,7 @@ class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
   };
 
  public:
-  ADXL345_SPI(SPI::Port port, Range range = kRange_2G);
+  explicit ADXL345_SPI(SPI::Port port, Range range = kRange_2G);
   virtual ~ADXL345_SPI() = default;
 
   ADXL345_SPI(const ADXL345_SPI&) = delete;

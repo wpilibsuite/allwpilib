@@ -39,7 +39,7 @@ class Relay : public MotorSafety,
   enum Value { kOff, kOn, kForward, kReverse };
   enum Direction { kBothDirections, kForwardOnly, kReverseOnly };
 
-  Relay(uint32_t channel, Direction direction = kBothDirections);
+  explicit Relay(uint32_t channel, Direction direction = kBothDirections);
   virtual ~Relay();
 
   void Set(Value value);

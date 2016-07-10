@@ -14,7 +14,7 @@ using namespace gazebo;
 
 class SimFloatInput {
  public:
-  SimFloatInput(std::string topic);
+  explicit SimFloatInput(std::string topic);
 
   /**
    * @return The value of the potentiometer.

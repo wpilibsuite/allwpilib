@@ -11,7 +11,7 @@
 
 class StartCommand : public Command {
  public:
-  StartCommand(Command* commandToStart);
+  explicit StartCommand(Command* commandToStart);
   virtual ~StartCommand() = default;
 
  protected:

@@ -15,7 +15,7 @@
  */
 class Filter : public PIDSource {
  public:
-  Filter(std::shared_ptr<PIDSource> source);
+  explicit Filter(std::shared_ptr<PIDSource> source);
   virtual ~Filter() = default;
 
   // PIDSource interface

@@ -16,7 +16,7 @@ class MotorSafety;
 
 class MotorSafetyHelper : public ErrorBase {
  public:
-  MotorSafetyHelper(MotorSafety* safeObject);
+  explicit MotorSafetyHelper(MotorSafety* safeObject);
   ~MotorSafetyHelper();
   void Feed();
   void SetExpiration(float expirationTime);

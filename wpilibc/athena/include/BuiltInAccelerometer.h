@@ -22,7 +22,7 @@ class BuiltInAccelerometer : public Accelerometer,
                              public SensorBase,
                              public LiveWindowSendable {
  public:
-  BuiltInAccelerometer(Range range = kRange_8G);
+  explicit BuiltInAccelerometer(Range range = kRange_8G);
   virtual ~BuiltInAccelerometer() = default;
 
   // Accelerometer interface

@@ -15,7 +15,7 @@ using namespace gazebo;
 
 class SimEncoder {
  public:
-  SimEncoder(std::string topic);
+  explicit SimEncoder(std::string topic);
 
   void Reset();
   void Start();

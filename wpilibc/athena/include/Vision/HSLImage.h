@@ -15,6 +15,6 @@
 class HSLImage : public ColorImage {
  public:
   HSLImage();
-  HSLImage(const char* fileName);
+  explicit HSLImage(const char* fileName);
   virtual ~HSLImage() = default;
 };

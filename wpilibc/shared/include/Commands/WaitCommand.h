@@ -11,7 +11,7 @@
 
 class WaitCommand : public Command {
  public:
-  WaitCommand(double timeout);
+  explicit WaitCommand(double timeout);
   WaitCommand(const std::string& name, double timeout);
   virtual ~WaitCommand() = default;
 

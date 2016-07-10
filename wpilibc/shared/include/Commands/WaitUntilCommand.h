@@ -11,7 +11,7 @@
 
 class WaitUntilCommand : public Command {
  public:
-  WaitUntilCommand(double time);
+  explicit WaitUntilCommand(double time);
   WaitUntilCommand(const std::string& name, double time);
   virtual ~WaitUntilCommand() = default;
 
