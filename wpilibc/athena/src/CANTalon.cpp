@@ -1183,8 +1183,8 @@ void CANTalon::ConfigNeutralMode(NeutralMode mode) {
   CTR_Code status = CTR_OKAY;
   switch (mode) {
     default:
-    case kNeutralMode_Jumper: /* use default setting in flash based on
-                                 webdash/BrakeCal button selection */
+    case kNeutralMode_Jumper:
+      // use default setting in flash based on webdash/BrakeCal button selection
       status = m_impl->SetOverrideBrakeType(
           CanTalonSRX::kBrakeOverride_UseDefaultsFromFlash);
       break;
@@ -1350,8 +1350,9 @@ void CANTalon::ConfigLimitMode(LimitMode mode) {
       }
       break;
 
-    case kLimitMode_SrxDisableSwitchInputs: /** disable both limit switches and
-                                               soft limits */
+    case kLimitMode_SrxDisableSwitchInputs:
+      // disable both limit switches and soft limits
+
       /* turn on both limits. SRX has individual enables and polarity for each
        * limit switch.*/
       status = m_impl->SetForwardSoftEnable(false);
@@ -1650,14 +1651,13 @@ double CANTalon::GetNativeUnitsPerRotationScalar(
   CTR_Code status = CTR_OKAY;
   double retval = 0;
   switch (devToLookup) {
-    case QuadEncoder: { /* When caller wants to lookup Quadrature, the QEI may
-                         * be in 1x if the selected feedback is edge counter.
-                         * Additionally if the quadrature source is the CTRE Mag
-                         * encoder, then the CPR is known.
-                         * This is nice in that the calling app does not require
-                         * knowing the CPR at all.
-                         * So do both checks here.
-                         */
+    case QuadEncoder: {
+      /* When caller wants to lookup Quadrature, the QEI may be in 1x if the
+       * selected feedback is edge counter. Additionally if the quadrature
+       * source is the CTRE Mag encoder, then the CPR is known. This is nice in
+       * that the calling app does not require knowing the CPR at all. So do
+       * both checks here.
+       */
       int32_t qeiPulsePerCount = 4; /* default to 4x */
       switch (m_feedbackDevice) {
         case CtreMagEncoder_Relative:
@@ -1672,8 +1672,8 @@ double CANTalon::GetNativeUnitsPerRotationScalar(
           qeiPulsePerCount = 1;
           break;
         case QuadEncoder: /* Talon's QEI is 4x */
-        default: /* pulse width and everything else, assume its regular quad
-                    use. */
+        default:
+          // pulse width and everything else, assume its regular quad use.
           break;
       }
       if (scalingAvail) {
