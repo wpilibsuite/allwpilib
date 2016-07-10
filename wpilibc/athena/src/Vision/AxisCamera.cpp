@@ -147,7 +147,7 @@ int AxisCamera::CopyJPEG(char** destImage, unsigned int& destImageSize,
 
   std::copy(m_imageData.begin(), m_imageData.end(), *destImage);
   destImageSize = m_imageData.size();
-  ;
+
   return 1;
 }
 

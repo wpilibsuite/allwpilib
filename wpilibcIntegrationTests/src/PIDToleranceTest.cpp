@@ -23,10 +23,7 @@ class PIDToleranceTest : public testing::Test {
     double val = 0;
     void SetPIDSourceType(PIDSourceType pidSource) {}
     PIDSourceType GetPIDSourceType() { return PIDSourceType::kDisplacement; }
-    double PIDGet() {
-      ;
-      return val;
-    }
+    double PIDGet() { return val; }
   };
   class fakeOutput : public PIDOutput {
     void PIDWrite(float output) {}
