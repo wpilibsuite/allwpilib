@@ -20,8 +20,8 @@
 using namespace hal;
 
 namespace {
-struct Interrupt  // FIXME: why is this internal?
-{
+// FIXME: why is this internal?
+struct Interrupt {
   tInterrupt* anInterrupt;
   tInterruptManager* manager;
 };

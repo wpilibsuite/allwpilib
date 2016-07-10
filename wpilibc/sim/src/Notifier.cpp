@@ -82,8 +82,9 @@ void Notifier::UpdateAlarm() {}
  */
 void Notifier::ProcessQueue(uint32_t mask, void* params) {
   Notifier* current;
-  while (true)  // keep processing past events until no more
-  {
+
+  // keep processing events until no more
+  while (true) {
     {
       std::lock_guard<priority_recursive_mutex> sync(queueMutex);
       double currentTime = GetClock();

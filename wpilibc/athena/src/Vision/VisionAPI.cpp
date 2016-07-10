@@ -57,8 +57,7 @@ int frcDispose(void* object) { return imaqDispose(object); }
  * @return On success: 1. On failure: 0. To get extended error information, call
  * GetLastError().
  */
-int frcDispose(const char* functionName, ...) /* Variable argument list */
-{
+int frcDispose(const char* functionName, ...) {
   va_list disposalPtrList; /* Input argument list */
   void* disposalPtr;       /* For iteration */
   int success, returnValue = 1;

@@ -133,9 +133,8 @@ int AxisCamera::CopyJPEG(char** destImage, unsigned int& destImageSize,
 
   if (m_imageData.size() == 0) return 0;  // if no source image
 
-  if (destImageBufferSize <
-      m_imageData.size())  // if current destination buffer too small
-  {
+  // if current destination buffer too small
+  if (destImageBufferSize < m_imageData.size()) {
     if (*destImage != nullptr) delete[] * destImage;
     destImageBufferSize = m_imageData.size() + kImageBufferAllocationIncrement;
     *destImage = new char[destImageBufferSize];

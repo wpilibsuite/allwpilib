@@ -45,8 +45,7 @@ void SetDebugFlag(DebugOutputType flag) { dprintfFlag = flag; }
  *
  * @param tempString The format string.
  */
-void dprintf(const char* tempString, ...) /* Variable argument list */
-{
+void dprintf(const char* tempString, ...) {
   va_list args;    /* Input argument list */
   int line_number; /* Line number passed in argument */
   int type;
