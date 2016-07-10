@@ -40,8 +40,8 @@ void wpi_suspendOnAssertEnabled(bool enabled) {
 static void wpi_handleTracing() {
   // if (stackTraceEnabled)
   // {
-  // 	std::printf("\n-----------<Stack Trace>----------------\n");
-  // 	printCurrentStackTrace();
+  //   std::printf("\n-----------<Stack Trace>----------------\n");
+  //   printCurrentStackTrace();
   // }
   std::printf("\n");
 }
