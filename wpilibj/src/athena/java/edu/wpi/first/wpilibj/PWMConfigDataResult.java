@@ -19,31 +19,31 @@ public class PWMConfigDataResult {
     this.deadbandMin = deadbandMin;
     this.min = min;
   }
-  
+
   /**
    * The maximum PWM value.
    */
   @SuppressWarnings("MemberName")
   public int max;
-  
+
   /**
    * The deadband maximum PWM value.
    */
   @SuppressWarnings("MemberName")
   public int deadbandMax;
-  
+
   /**
    * The center PWM value.
    */
   @SuppressWarnings("MemberName")
   public int center;
-  
+
   /**
    * The deadband minimum PWM value.
    */
   @SuppressWarnings("MemberName")
   public int deadbandMin;
-  
+
   /**
    * The minimum PWM value.
    */
