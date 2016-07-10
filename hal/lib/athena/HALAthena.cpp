@@ -374,6 +374,7 @@ uint32_t HAL_Report(uint8_t resource, uint8_t instanceNumber, uint8_t context,
 }
 
 // TODO: HACKS
+// No need for header definitions, as we should not run from user code.
 void NumericArrayResize() {}
 void RTSetCleanupProc() {}
 void EDVR_CreateReference() {}

@@ -236,23 +236,15 @@ int16_t HAL_GetAnalogValue(HAL_AnalogInputHandle analog_port_handle,
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
-  int16_t value;
-  if (!HAL_CheckAnalogInputChannel(port->pin)) {
-    return 0;
-  }
 
   tAI::tReadSelect readSelect;
   readSelect.Channel = port->pin;
   readSelect.Averaged = false;
 
-  {
-    std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
-    analogInputSystem->writeReadSelect(readSelect, status);
-    analogInputSystem->strobeLatchOutput(status);
-    value = (int16_t)analogInputSystem->readOutput(status);
-  }
-
-  return value;
+  std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
+  analogInputSystem->writeReadSelect(readSelect, status);
+  analogInputSystem->strobeLatchOutput(status);
+  return static_cast<int16_t>(analogInputSystem->readOutput(status));
 }
 
 /**
@@ -276,23 +268,14 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analog_port_handle,
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
-  int32_t value;
-  if (!HAL_CheckAnalogInputChannel(port->pin)) {
-    return 0;
-  }
-
   tAI::tReadSelect readSelect;
   readSelect.Channel = port->pin;
   readSelect.Averaged = true;
 
-  {
-    std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
-    analogInputSystem->writeReadSelect(readSelect, status);
-    analogInputSystem->strobeLatchOutput(status);
-    value = (int32_t)analogInputSystem->readOutput(status);
-  }
-
-  return value;
+  std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
+  analogInputSystem->writeReadSelect(readSelect, status);
+  analogInputSystem->strobeLatchOutput(status);
+  return static_cast<int32_t>(analogInputSystem->readOutput(status));
 }
 
 /**
