@@ -50,19 +50,19 @@ class Joystick : public GenericHID, public ErrorBase {
   uint32_t GetAxisChannel(AxisType axis);
   void SetAxisChannel(AxisType axis, uint32_t channel);
 
-  virtual float GetX(JoystickHand hand = kRightHand) const override;
-  virtual float GetY(JoystickHand hand = kRightHand) const override;
-  virtual float GetZ() const override;
-  virtual float GetTwist() const override;
-  virtual float GetThrottle() const override;
+  float GetX(JoystickHand hand = kRightHand) const override;
+  float GetY(JoystickHand hand = kRightHand) const override;
+  float GetZ() const override;
+  float GetTwist() const override;
+  float GetThrottle() const override;
   virtual float GetAxis(AxisType axis) const;
   float GetRawAxis(uint32_t axis) const override;
 
-  virtual bool GetTrigger(JoystickHand hand = kRightHand) const override;
-  virtual bool GetTop(JoystickHand hand = kRightHand) const override;
-  virtual bool GetBumper(JoystickHand hand = kRightHand) const override;
-  virtual bool GetRawButton(uint32_t button) const override;
-  virtual int GetPOV(uint32_t pov = 1) const override;
+  bool GetTrigger(JoystickHand hand = kRightHand) const override;
+  bool GetTop(JoystickHand hand = kRightHand) const override;
+  bool GetBumper(JoystickHand hand = kRightHand) const override;
+  bool GetRawButton(uint32_t button) const override;
+  int GetPOV(uint32_t pov = 1) const override;
   bool GetButton(ButtonType button) const;
   static Joystick* GetStickForPort(uint32_t port);
 

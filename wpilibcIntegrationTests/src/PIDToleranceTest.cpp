@@ -34,16 +34,16 @@ class PIDToleranceTest : public testing::Test {
   fakeInput inp;
   fakeOutput out;
   PIDController* pid;
-  virtual void SetUp() override {
+  void SetUp() override {
     pid = new PIDController(0.5, 0.0, 0.0, &inp, &out);
     pid->SetInputRange(-range / 2, range / 2);
   }
-  virtual void TearDown() override { delete pid; }
-  virtual void reset() { inp.val = 0; }
+  void TearDown() override { delete pid; }
+  void Reset() { inp.val = 0; }
 };
 
 TEST_F(PIDToleranceTest, Absolute) {
-  reset();
+  Reset();
   pid->SetAbsoluteTolerance(tolerance);
   pid->SetSetpoint(setpoint);
   pid->Enable();
@@ -63,7 +63,7 @@ TEST_F(PIDToleranceTest, Absolute) {
 }
 
 TEST_F(PIDToleranceTest, Percent) {
-  reset();
+  Reset();
   pid->SetPercentTolerance(tolerance);
   pid->SetSetpoint(setpoint);
   pid->Enable();

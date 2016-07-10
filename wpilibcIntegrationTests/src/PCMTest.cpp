@@ -37,7 +37,7 @@ class PCMTest : public testing::Test {
   DoubleSolenoid* m_doubleSolenoid;
   DigitalInput *m_fakeSolenoid1, *m_fakeSolenoid2;
 
-  virtual void SetUp() override {
+  void SetUp() override {
     m_compressor = new Compressor();
 
     m_fakePressureSwitch =
@@ -47,7 +47,7 @@ class PCMTest : public testing::Test {
     m_fakeSolenoid2 = new DigitalInput(TestBench::kFakeSolenoid2Channel);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete m_compressor;
     delete m_fakePressureSwitch;
     delete m_fakeCompressor;

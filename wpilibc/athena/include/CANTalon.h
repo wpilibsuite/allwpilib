@@ -226,47 +226,47 @@ class CANTalon : public MotorSafety,
   virtual ~CANTalon();
 
   // PIDOutput interface
-  virtual void PIDWrite(float output) override;
+  void PIDWrite(float output) override;
 
   // PIDSource interface
-  virtual double PIDGet() override;
+  double PIDGet() override;
 
   // MotorSafety interface
-  virtual void SetExpiration(float timeout) override;
-  virtual float GetExpiration() const override;
-  virtual bool IsAlive() const override;
-  virtual void StopMotor() override;
-  virtual void SetSafetyEnabled(bool enabled) override;
-  virtual bool IsSafetyEnabled() const override;
-  virtual void GetDescription(std::ostringstream& desc) const override;
+  void SetExpiration(float timeout) override;
+  float GetExpiration() const override;
+  bool IsAlive() const override;
+  void StopMotor() override;
+  void SetSafetyEnabled(bool enabled) override;
+  bool IsSafetyEnabled() const override;
+  void GetDescription(std::ostringstream& desc) const override;
 
   // CANSpeedController interface
-  virtual float Get() const override;
-  virtual void Set(float value) override;
-  virtual void Reset() override;
-  virtual void SetSetpoint(float value) override;
-  virtual void Disable() override;
+  float Get() const override;
+  void Set(float value) override;
+  void Reset() override;
+  void SetSetpoint(float value) override;
+  void Disable() override;
   virtual void EnableControl();
-  virtual void Enable() override;
-  virtual void SetP(double p) override;
-  virtual void SetI(double i) override;
-  virtual void SetD(double d) override;
+  void Enable() override;
+  void SetP(double p) override;
+  void SetI(double i) override;
+  void SetD(double d) override;
   void SetF(double f);
   void SetIzone(unsigned iz);
-  virtual void SetPID(double p, double i, double d) override;
+  void SetPID(double p, double i, double d) override;
   virtual void SetPID(double p, double i, double d, double f);
-  virtual double GetP() const override;
-  virtual double GetI() const override;
-  virtual double GetD() const override;
+  double GetP() const override;
+  double GetI() const override;
+  double GetD() const override;
   virtual double GetF() const;
-  virtual bool IsModePID(CANSpeedController::ControlMode mode) const override;
-  virtual float GetBusVoltage() const override;
-  virtual float GetOutputVoltage() const override;
-  virtual float GetOutputCurrent() const override;
-  virtual float GetTemperature() const override;
+  bool IsModePID(CANSpeedController::ControlMode mode) const override;
+  float GetBusVoltage() const override;
+  float GetOutputVoltage() const override;
+  float GetOutputCurrent() const override;
+  float GetTemperature() const override;
   void SetPosition(double pos);
-  virtual double GetPosition() const override;
-  virtual double GetSpeed() const override;
+  double GetPosition() const override;
+  double GetSpeed() const override;
   virtual int GetClosedLoopError() const;
   virtual void SetAllowableClosedLoopErr(uint32_t allowableCloseLoopError);
   virtual int GetAnalogIn() const;
@@ -290,23 +290,23 @@ class CANTalon : public MotorSafety,
   virtual int GetPulseWidthRiseToRiseUs() const;
   virtual FeedbackDeviceStatus IsSensorPresent(
       FeedbackDevice feedbackDevice) const;
-  virtual bool GetForwardLimitOK() const override;
-  virtual bool GetReverseLimitOK() const override;
-  virtual uint16_t GetFaults() const override;
+  bool GetForwardLimitOK() const override;
+  bool GetReverseLimitOK() const override;
+  uint16_t GetFaults() const override;
   uint16_t GetStickyFaults() const;
   void ClearStickyFaults();
-  virtual void SetVoltageRampRate(double rampRate) override;
+  void SetVoltageRampRate(double rampRate) override;
   virtual void SetVoltageCompensationRampRate(double rampRate);
-  virtual uint32_t GetFirmwareVersion() const override;
-  virtual void ConfigNeutralMode(NeutralMode mode) override;
-  virtual void ConfigEncoderCodesPerRev(uint16_t codesPerRev) override;
-  virtual void ConfigPotentiometerTurns(uint16_t turns) override;
-  virtual void ConfigSoftPositionLimits(double forwardLimitPosition,
-                                        double reverseLimitPosition) override;
-  virtual void DisableSoftPositionLimits() override;
-  virtual void ConfigLimitMode(LimitMode mode) override;
-  virtual void ConfigForwardLimit(double forwardLimitPosition) override;
-  virtual void ConfigReverseLimit(double reverseLimitPosition) override;
+  uint32_t GetFirmwareVersion() const override;
+  void ConfigNeutralMode(NeutralMode mode) override;
+  void ConfigEncoderCodesPerRev(uint16_t codesPerRev) override;
+  void ConfigPotentiometerTurns(uint16_t turns) override;
+  void ConfigSoftPositionLimits(double forwardLimitPosition,
+                                double reverseLimitPosition) override;
+  void DisableSoftPositionLimits() override;
+  void ConfigLimitMode(LimitMode mode) override;
+  void ConfigForwardLimit(double forwardLimitPosition) override;
+  void ConfigReverseLimit(double reverseLimitPosition) override;
   void ConfigLimitSwitchOverrides(bool bForwardLimitSwitchEn,
                                   bool bReverseLimitSwitchEn);
   void ConfigForwardSoftLimitEnable(bool bForwardSoftLimitEn);
@@ -333,7 +333,7 @@ class CANTalon : public MotorSafety,
    * @param normallyOpen true for normally open.  false for normally closed.
    */
   void ConfigRevLimitSwitchNormallyOpen(bool normallyOpen);
-  virtual void ConfigMaxOutputVoltage(double voltage) override;
+  void ConfigMaxOutputVoltage(double voltage) override;
   void ConfigPeakOutputVoltage(double forwardVoltage, double reverseVoltage);
   void ConfigNominalOutputVoltage(double forwardVoltage, double reverseVoltage);
   /**
@@ -349,7 +349,7 @@ class CANTalon : public MotorSafety,
   void ConfigSetParameter(uint32_t paramEnum, double value);
   bool GetParameter(uint32_t paramEnum, double& dvalue) const;
 
-  virtual void ConfigFaultTime(float faultTime) override;
+  void ConfigFaultTime(float faultTime) override;
   virtual void SetControlMode(ControlMode mode);
   void SetFeedbackDevice(FeedbackDevice device);
   void SetStatusFrameRateMs(StatusFrameRate stateFrame, int periodMs);
@@ -449,8 +449,8 @@ class CANTalon : public MotorSafety,
   std::shared_ptr<ITable> GetTable() const override;
 
   // SpeedController overrides
-  virtual void SetInverted(bool isInverted) override;
-  virtual bool GetInverted() const override;
+  void SetInverted(bool isInverted) override;
+  bool GetInverted() const override;
 
  private:
   // Values for various modes as is sent in the CAN packets for the Talon.

@@ -17,7 +17,7 @@
 
 class CommandTest : public testing::Test {
  protected:
-  virtual void SetUp() override {
+  void SetUp() override {
     RobotState::SetImplementation(DriverStation::GetInstance());
     Scheduler::GetInstance()->SetEnabled(true);
   }
@@ -50,7 +50,7 @@ class ASubsystem : public Subsystem {
  public:
   explicit ASubsystem(const std::string& name) : Subsystem(name) {}
 
-  virtual void InitDefaultCommand() override {
+  void InitDefaultCommand() override {
     if (m_command != nullptr) {
       SetDefaultCommand(m_command);
     }

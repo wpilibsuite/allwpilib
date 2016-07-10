@@ -19,9 +19,9 @@ class Filter : public PIDSource {
   virtual ~Filter() = default;
 
   // PIDSource interface
-  virtual void SetPIDSourceType(PIDSourceType pidSource) override;
+  void SetPIDSourceType(PIDSourceType pidSource) override;
   PIDSourceType GetPIDSourceType() const;
-  virtual double PIDGet() override = 0;
+  double PIDGet() override = 0;
 
   /**
    * Returns the current filter estimate without also inserting new data as

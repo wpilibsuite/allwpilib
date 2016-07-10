@@ -15,7 +15,7 @@ class TestEnvironment : public testing::Environment {
   bool m_alreadySetUp = false;
 
  public:
-  virtual void SetUp() override {
+  void SetUp() override {
     /* Only set up once.  This allows gtest_repeat to be used to
             automatically repeat tests. */
     if (m_alreadySetUp) return;
@@ -40,7 +40,7 @@ class TestEnvironment : public testing::Environment {
     }
   }
 
-  virtual void TearDown() override {}
+  void TearDown() override {}
 };
 
 testing::Environment* const environment =

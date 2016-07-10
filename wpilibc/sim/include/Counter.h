@@ -80,7 +80,7 @@ class Counter : public SensorBase,
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
-  virtual std::string GetSmartDashboardType() const override;
+  std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<ITable> subTable) override;
   std::shared_ptr<ITable> GetTable() const override;
 

@@ -61,20 +61,20 @@ class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
   ADXL345_SPI& operator=(const ADXL345_SPI&) = delete;
 
   // Accelerometer interface
-  virtual void SetRange(Range range) override;
-  virtual double GetX() override;
-  virtual double GetY() override;
-  virtual double GetZ() override;
+  void SetRange(Range range) override;
+  double GetX() override;
+  double GetY() override;
+  double GetZ() override;
 
   virtual double GetAcceleration(Axes axis);
   virtual AllAxes GetAccelerations();
 
-  virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(std::shared_ptr<ITable> subtable) override;
-  virtual void UpdateTable() override;
-  virtual std::shared_ptr<ITable> GetTable() const override;
-  virtual void StartLiveWindowMode() override {}
-  virtual void StopLiveWindowMode() override {}
+  std::string GetSmartDashboardType() const override;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void UpdateTable() override;
+  std::shared_ptr<ITable> GetTable() const override;
+  void StartLiveWindowMode() override {}
+  void StopLiveWindowMode() override {}
 
  protected:
   SPI m_spi;

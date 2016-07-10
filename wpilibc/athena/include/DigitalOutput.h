@@ -36,12 +36,12 @@ class DigitalOutput : public DigitalSource,
   void UpdateDutyCycle(float dutyCycle);
 
   // Digital Source Interface
-  virtual HAL_Handle GetPortHandleForRouting() const override;
-  virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
-  virtual bool IsAnalogTrigger() const override;
+  HAL_Handle GetPortHandleForRouting() const override;
+  AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
+  bool IsAnalogTrigger() const override;
 
-  virtual void ValueChanged(ITable* source, llvm::StringRef key,
-                            std::shared_ptr<nt::Value> value, bool isNew);
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable();
   void StartLiveWindowMode();
   void StopLiveWindowMode();

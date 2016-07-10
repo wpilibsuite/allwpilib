@@ -51,6 +51,6 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   std::shared_ptr<PIDController> m_controller;
 
  public:
-  virtual void InitTable(std::shared_ptr<ITable> table);
-  virtual std::string GetSmartDashboardType() const;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  std::string GetSmartDashboardType() const override;
 };

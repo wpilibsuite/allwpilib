@@ -42,7 +42,7 @@ class TiltPanCameraTest : public testing::Test {
 
   static void TearDownTestCase() { delete m_gyro; }
 
-  virtual void SetUp() override {
+  void SetUp() override {
     m_tilt = new Servo(TestBench::kCameraTiltChannel);
     m_pan = new Servo(TestBench::kCameraPanChannel);
     m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS0);
@@ -59,7 +59,7 @@ class TiltPanCameraTest : public testing::Test {
   void GyroAngle();
   void GyroCalibratedParameters();
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete m_tilt;
     delete m_pan;
     delete m_spiAccel;

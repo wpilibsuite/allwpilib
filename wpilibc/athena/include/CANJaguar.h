@@ -59,7 +59,7 @@ class CANJaguar : public MotorSafety,
   uint8_t GetHardwareVersion() const;
 
   // PIDOutput interface
-  virtual void PIDWrite(float output) override;
+  void PIDWrite(float output) override;
 
   // Control mode methods
   void EnableControl(double encoderInitialPosition = 0.0);
@@ -94,39 +94,39 @@ class CANJaguar : public MotorSafety,
   void Set(float value, uint8_t syncGroup);
 
   // CANSpeedController interface
-  virtual float Get() const override;
-  virtual void Set(float value) override;
-  virtual void Disable() override;
-  virtual void SetP(double p) override;
-  virtual void SetI(double i) override;
-  virtual void SetD(double d) override;
-  virtual void SetPID(double p, double i, double d) override;
-  virtual double GetP() const override;
-  virtual double GetI() const override;
-  virtual double GetD() const override;
-  virtual bool IsModePID(CANSpeedController::ControlMode mode) const override;
-  virtual float GetBusVoltage() const override;
-  virtual float GetOutputVoltage() const override;
-  virtual float GetOutputCurrent() const override;
-  virtual float GetTemperature() const override;
-  virtual double GetPosition() const override;
-  virtual double GetSpeed() const override;
-  virtual bool GetForwardLimitOK() const override;
-  virtual bool GetReverseLimitOK() const override;
-  virtual uint16_t GetFaults() const override;
-  virtual void SetVoltageRampRate(double rampRate) override;
-  virtual uint32_t GetFirmwareVersion() const override;
-  virtual void ConfigNeutralMode(NeutralMode mode) override;
-  virtual void ConfigEncoderCodesPerRev(uint16_t codesPerRev) override;
-  virtual void ConfigPotentiometerTurns(uint16_t turns) override;
-  virtual void ConfigSoftPositionLimits(double forwardLimitPosition,
-                                        double reverseLimitPosition) override;
-  virtual void DisableSoftPositionLimits() override;
-  virtual void ConfigLimitMode(LimitMode mode) override;
-  virtual void ConfigForwardLimit(double forwardLimitPosition) override;
-  virtual void ConfigReverseLimit(double reverseLimitPosition) override;
-  virtual void ConfigMaxOutputVoltage(double voltage) override;
-  virtual void ConfigFaultTime(float faultTime) override;
+  float Get() const override;
+  void Set(float value) override;
+  void Disable() override;
+  void SetP(double p) override;
+  void SetI(double i) override;
+  void SetD(double d) override;
+  void SetPID(double p, double i, double d) override;
+  double GetP() const override;
+  double GetI() const override;
+  double GetD() const override;
+  bool IsModePID(CANSpeedController::ControlMode mode) const override;
+  float GetBusVoltage() const override;
+  float GetOutputVoltage() const override;
+  float GetOutputCurrent() const override;
+  float GetTemperature() const override;
+  double GetPosition() const override;
+  double GetSpeed() const override;
+  bool GetForwardLimitOK() const override;
+  bool GetReverseLimitOK() const override;
+  uint16_t GetFaults() const override;
+  void SetVoltageRampRate(double rampRate) override;
+  uint32_t GetFirmwareVersion() const override;
+  void ConfigNeutralMode(NeutralMode mode) override;
+  void ConfigEncoderCodesPerRev(uint16_t codesPerRev) override;
+  void ConfigPotentiometerTurns(uint16_t turns) override;
+  void ConfigSoftPositionLimits(double forwardLimitPosition,
+                                double reverseLimitPosition) override;
+  void DisableSoftPositionLimits() override;
+  void ConfigLimitMode(LimitMode mode) override;
+  void ConfigForwardLimit(double forwardLimitPosition) override;
+  void ConfigReverseLimit(double reverseLimitPosition) override;
+  void ConfigMaxOutputVoltage(double voltage) override;
+  void ConfigFaultTime(float faultTime) override;
   virtual void SetControlMode(ControlMode mode);
   virtual ControlMode GetControlMode() const;
 
@@ -142,8 +142,8 @@ class CANJaguar : public MotorSafety,
   uint8_t GetDeviceID() const;
 
   // SpeedController overrides
-  virtual void SetInverted(bool isInverted) override;
-  virtual bool GetInverted() const override;
+  void SetInverted(bool isInverted) override;
+  bool GetInverted() const override;
 
  protected:
   // Control mode helpers

@@ -50,15 +50,15 @@ class PIDController : public LiveWindowSendable,
   virtual void SetContinuous(bool continuous = true);
   virtual void SetInputRange(float minimumInput, float maximumInput);
   virtual void SetOutputRange(float minimumOutput, float maximumOutput);
-  virtual void SetPID(double p, double i, double d) override;
+  void SetPID(double p, double i, double d) override;
   virtual void SetPID(double p, double i, double d, double f);
-  virtual double GetP() const override;
-  virtual double GetI() const override;
-  virtual double GetD() const override;
+  double GetP() const override;
+  double GetI() const override;
+  double GetD() const override;
   virtual double GetF() const;
 
-  virtual void SetSetpoint(float setpoint) override;
-  virtual double GetSetpoint() const override;
+  void SetSetpoint(float setpoint) override;
+  double GetSetpoint() const override;
   double GetDeltaSetpoint() const;
 
   virtual float GetError() const;
@@ -73,13 +73,13 @@ class PIDController : public LiveWindowSendable,
   virtual void SetToleranceBuffer(unsigned buf = 1);
   virtual bool OnTarget() const;
 
-  virtual void Enable() override;
-  virtual void Disable() override;
-  virtual bool IsEnabled() const override;
+  void Enable() override;
+  void Disable() override;
+  bool IsEnabled() const override;
 
-  virtual void Reset() override;
+  void Reset() override;
 
-  virtual void InitTable(std::shared_ptr<ITable> table) override;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
 
  protected:
   PIDSource* m_pidInput;
@@ -141,12 +141,11 @@ class PIDController : public LiveWindowSendable,
   void Initialize(float p, float i, float d, float f, PIDSource* source,
                   PIDOutput* output, float period = 0.05);
 
-  virtual std::shared_ptr<ITable> GetTable() const override;
-  virtual std::string GetSmartDashboardType() const override;
-  virtual void ValueChanged(ITable* source, llvm::StringRef key,
-                            std::shared_ptr<nt::Value> value,
-                            bool isNew) override;
-  virtual void UpdateTable() override;
-  virtual void StartLiveWindowMode() override;
-  virtual void StopLiveWindowMode() override;
+  std::shared_ptr<ITable> GetTable() const override;
+  std::string GetSmartDashboardType() const override;
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
+  void UpdateTable() override;
+  void StartLiveWindowMode() override;
+  void StopLiveWindowMode() override;
 };

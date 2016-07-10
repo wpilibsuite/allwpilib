@@ -27,7 +27,7 @@ class FakeEncoderTest : public testing::Test {
   AnalogTrigger* m_indexAnalogTrigger;
   std::shared_ptr<AnalogTriggerOutput> m_indexAnalogTriggerOutput;
 
-  virtual void SetUp() override {
+  void SetUp() override {
     m_outputA = new DigitalOutput(TestBench::kLoop2OutputChannel);
     m_outputB = new DigitalOutput(TestBench::kLoop1OutputChannel);
     m_indexOutput = new AnalogOutput(TestBench::kAnalogOutputChannel);
@@ -42,7 +42,7 @@ class FakeEncoderTest : public testing::Test {
         m_indexAnalogTrigger->CreateOutput(AnalogTriggerType::kState);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete m_outputA;
     delete m_outputB;
     delete m_indexOutput;
