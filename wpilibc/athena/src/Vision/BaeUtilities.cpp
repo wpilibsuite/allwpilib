@@ -295,8 +295,8 @@ void panForTarget(Servo* panServo, double sinStart) {
  **/
 int processFile(char* inputFile, char* outputString, int lineNumber) {
   FILE* infile;
-  const int stringSize = 80;  // max size of one line in file
-  char inputStr[stringSize];
+  const int kStringSize = 80;  // max size of one line in file
+  char inputStr[kStringSize];
   inputStr[0] = '\0';
   int lineCount = 0;
 
@@ -308,7 +308,7 @@ int processFile(char* inputFile, char* outputString, int lineNumber) {
   }
 
   while (!std::feof(infile)) {
-    if (std::fgets(inputStr, stringSize, infile) != nullptr) {
+    if (std::fgets(inputStr, kStringSize, infile) != nullptr) {
       // Skip empty lines
       if (emptyString(inputStr)) continue;
       // Skip comment lines
