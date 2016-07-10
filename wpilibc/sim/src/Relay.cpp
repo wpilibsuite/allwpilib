@@ -7,6 +7,8 @@
 
 #include "Relay.h"
 
+#include <sstream>
+
 #include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "WPIErrors.h"
@@ -22,21 +24,21 @@
  */
 Relay::Relay(uint32_t channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
-  char buf[64];
+  std::stringstream ss;
   if (!SensorBase::CheckRelayChannel(m_channel)) {
-    std::snprintf(buf, 64, "Relay Channel %d", m_channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    ss << "Relay Channel " << m_channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, ss.str());
     return;
   }
 
   m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
   m_safetyHelper->SetSafetyEnabled(false);
 
-  std::sprintf(buf, "relay/%d", m_channel);
-  impl = new SimContinuousOutput(buf);  // TODO: Allow two different relays
-                                        // (targetting the different halves of a
-                                        // relay) to be combined to control one
-                                        // motor.
+  ss << "relay/" << m_channel;
+  impl = new SimContinuousOutput(ss.str());  // TODO: Allow two different relays
+                                             // (targetting the different halves
+                                             // of a relay) to be combined to
+                                             // control one motor.
   LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
   go_pos = go_neg = false;
 }

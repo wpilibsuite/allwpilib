@@ -7,7 +7,7 @@
 
 #include "DigitalInput.h"
 
-#include <cstdio>
+#include <sstream>
 
 #include "WPIErrors.h"
 
@@ -17,11 +17,10 @@
  *
  * @param channel The digital channel (1..14).
  */
-DigitalInput::DigitalInput(uint32_t channel) {
-  char buf[64];
-  m_channel = channel;
-  int n = std::sprintf(buf, "dio/%d", channel);
-  m_impl = new SimDigitalInput(buf);
+DigitalInput::DigitalInput(uint32_t channel) : m_channel(channel) {
+  std::stringstream ss;
+  ss << "dio/" << channel;
+  m_impl = new SimDigitalInput(ss.str());
 }
 
 /**

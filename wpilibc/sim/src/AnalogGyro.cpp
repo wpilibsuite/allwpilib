@@ -7,7 +7,7 @@
 
 #include "AnalogGyro.h"
 
-#include <cstdio>
+#include <sstream>
 
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
@@ -32,9 +32,9 @@ const float AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
 void AnalogGyro::InitAnalogGyro(int channel) {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
-  char buffer[50];
-  int n = std::sprintf(buffer, "analog/%d", channel);
-  impl = new SimGyro(buffer);
+  std::stringstream ss;
+  ss << "analog/" << channel;
+  impl = new SimGyro(ss.str());
 
   LiveWindow::GetInstance()->AddSensor("AnalogGyro", channel, this);
 }
