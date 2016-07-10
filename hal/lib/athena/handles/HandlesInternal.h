@@ -86,4 +86,4 @@ static inline int16_t getPortHandleModule(HAL_PortHandle handle) {
 HAL_PortHandle createPortHandle(uint8_t pin, uint8_t module);
 
 HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType);
-}
+}  // namespace hal

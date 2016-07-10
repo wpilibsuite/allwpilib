@@ -114,4 +114,4 @@ void LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Free(
   std::lock_guard<priority_mutex> lock(m_handleMutexes[index]);
   m_structures[index].reset();
 }
-}
+}  // namespace hal

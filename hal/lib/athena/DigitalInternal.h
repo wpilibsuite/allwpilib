@@ -82,4 +82,4 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         uint8_t& module, bool& analogTrigger);
 uint32_t remapMXPPWMChannel(uint32_t pin);
 uint32_t remapMXPChannel(uint32_t pin);
-}
+}  // namespace hal

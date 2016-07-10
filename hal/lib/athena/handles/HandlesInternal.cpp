@@ -35,4 +35,4 @@ HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType) {
   handle += index;
   return handle;
 }
-}
+}  // namespace hal

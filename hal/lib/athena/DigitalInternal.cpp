@@ -134,4 +134,4 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     return false;
   }
 }
-}
+}  // namespace hal

@@ -73,4 +73,4 @@ class Encoder {
 
   int32_t m_encodingScale;
 };
-}
+}  // namespace hal

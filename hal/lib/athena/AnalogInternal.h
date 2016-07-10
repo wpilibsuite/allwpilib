@@ -41,4 +41,4 @@ void setAnalogNumChannelsToActivate(uint32_t channels);
 void initializeAnalog(int32_t* status);
 
 extern bool analogSystemInitialized;
-}
+}  // namespace hal

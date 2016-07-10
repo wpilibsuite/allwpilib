@@ -24,7 +24,7 @@ void time_callback(const msgs::ConstFloat64Ptr& msg) {
   time_wait.notify_all();
 }
 }
-}
+}  // namespace wpilib
 
 /**
  * Pause the task for a specified time.
