@@ -35,9 +35,9 @@ public class RemotePublisherRecord implements PublisherRecord {
 	public String getMsgType() {
 		return pub.getMsgType();
 	}
-	
+
 	public String toString() {
-		return String.format("%s (%s) %s:%s", getTopic(), getMsgType(), getHost(), getPort()); 
+		return String.format("%s (%s) %s:%s", getTopic(), getMsgType(), getHost(), getPort());
 	}
 
 	@Override

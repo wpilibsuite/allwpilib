@@ -12,11 +12,11 @@ import java.awt.event.ActionListener;
 
 public class ModeAction implements ActionListener {
 	private DS ds;
-	
+
 	public ModeAction(DS ds) {
 		this.ds = ds;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		ds.setState(DS.State.valueOf(e.getActionCommand()));

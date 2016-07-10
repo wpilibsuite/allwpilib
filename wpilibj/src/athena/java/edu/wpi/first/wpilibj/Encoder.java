@@ -33,10 +33,10 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
-    
+
     @SuppressWarnings("MemberName")
     public final int value;
-    
+
     IndexingType(int value) {
       this.value = value;
     }
@@ -60,9 +60,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
   private boolean m_allocatedB;
   private boolean m_allocatedI;
   private PIDSourceType m_pidSource;
-  
+
   private int m_encoder; // the HAL encoder object
- 
+
 
   /**
    * Common initialization code for Encoders. This code allocates resources for Encoders and is
@@ -73,10 +73,10 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param reverseDirection If true, counts down instead of up (this is all relative)
    */
   private void initEncoder(boolean reverseDirection, final EncodingType type) {
-    m_encoder = EncoderJNI.initializeEncoder(m_aSource.getPortHandleForRouting(), 
-      m_aSource.getAnalogTriggerTypeForRouting(), m_bSource.getPortHandleForRouting(), 
+    m_encoder = EncoderJNI.initializeEncoder(m_aSource.getPortHandleForRouting(),
+      m_aSource.getAnalogTriggerTypeForRouting(), m_bSource.getPortHandleForRouting(),
       m_bSource.getAnalogTriggerTypeForRouting(), reverseDirection, type.value);
-      
+
     m_pidSource = PIDSourceType.kDisplacement;
 
     UsageReporting.report(tResourceType.kResourceType_Encoder, getFPGAIndex(), type.value);
@@ -580,7 +580,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * @param type   The state that will cause the encoder to reset
    */
   public void setIndexSource(DigitalSource source, IndexingType type) {
-    EncoderJNI.setEncoderIndexSource(m_encoder, source.getPortHandleForRouting(), 
+    EncoderJNI.setEncoderIndexSource(m_encoder, source.getPortHandleForRouting(),
                                      source.getAnalogTriggerTypeForRouting(), type.value);
   }
 

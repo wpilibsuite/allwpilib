@@ -88,7 +88,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
     assert (m_interrupt != 0);
 
-    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(), 
+    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
                                    getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
     InterruptJNI.attachInterruptHandler(m_interrupt, handler.m_function,
@@ -109,7 +109,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
     assert (m_interrupt != 0);
 
-    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(), 
+    InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
                                    getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
 
@@ -123,7 +123,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
    */
   protected void allocateInterrupts(boolean watcher) {
     m_isSynchronousInterrupt = watcher;
-    
+
     m_interrupt = InterruptJNI.initializeInterrupts(watcher);
   }
 

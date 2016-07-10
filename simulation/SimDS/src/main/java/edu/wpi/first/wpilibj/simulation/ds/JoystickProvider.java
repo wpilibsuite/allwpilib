@@ -18,11 +18,11 @@ import net.java.games.input.ControllerEnvironment;
 
 public class JoystickProvider {
 	List<ISimJoystick> joysticks;
-	
+
 	public JoystickProvider() {
 		scanForJoysticks();
 	}
-	
+
 	public List<ISimJoystick> scanForJoysticks() {
 		List<ISimJoystick> foundControllers = new ArrayList<>();
 		Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();
@@ -30,21 +30,21 @@ public class JoystickProvider {
         for(int i = 0; i < controllers.length; i++){
             Controller controller = controllers[i];
             if (controller.getType() == Controller.Type.STICK
-            		|| controller.getType() == Controller.Type.GAMEPAD 
+            		|| controller.getType() == Controller.Type.GAMEPAD
                     || controller.getType() == Controller.Type.WHEEL
                     || controller.getType() == Controller.Type.FINGERSTICK) {
                 foundControllers.add(new SimJoystick(controller));
             }
         }
-        
+
         joysticks = foundControllers;
         return foundControllers;
 	}
-	
+
 	public List<ISimJoystick> getJoysticks() {
         return joysticks;
 	}
-	
+
 	public void setJoysticks(List<ISimJoystick> joysticks) {
 		this.joysticks = joysticks;
 	}

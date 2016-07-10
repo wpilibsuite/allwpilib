@@ -72,7 +72,7 @@ public class AnalogTrigger {
         AnalogJNI.initializeAnalogTrigger(channel.m_port, index.asIntBuffer());
     m_index = index.asIntBuffer().get(0);
 
-    UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());  
+    UsageReporting.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());
   }
 
   /**

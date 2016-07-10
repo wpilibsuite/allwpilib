@@ -9,11 +9,11 @@ package edu.wpi.first.wpilibj.hal;
 
 public class RelayJNI extends DIOJNI {
   public static native int initializeRelayPort(int halPortHandle, boolean forward);
-  
+
   public static native void freeRelayPort(int relayPortHandle);
-  
+
   public static native boolean checkRelayChannel(int pin);
-  
+
   public static native void setRelay(int relayPortHandle, boolean on);
 
   public static native boolean getRelay(int relayPortHandle);

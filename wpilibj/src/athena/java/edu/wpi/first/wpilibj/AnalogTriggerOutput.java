@@ -80,7 +80,7 @@ public class AnalogTriggerOutput extends DigitalSource {
     UsageReporting.report(tResourceType.kResourceType_AnalogTriggerOutput, trigger.getIndex(),
         outputType.m_value);
   }
-  
+
   /**
    * Frees the resources for this output.
    */
@@ -88,7 +88,7 @@ public class AnalogTriggerOutput extends DigitalSource {
     if (m_interrupt != 0) {
       cancelInterrupts();
     }
-    
+
   }
 
   /**
@@ -109,12 +109,12 @@ public class AnalogTriggerOutput extends DigitalSource {
   public int getAnalogTriggerTypeForRouting() {
     return m_outputType.m_value;
   }
-  
+
   @Override
   public int getChannel() {
     return m_trigger.m_index;
   }
-  
+
   @Override
   public boolean isAnalogTrigger() {
     return true;

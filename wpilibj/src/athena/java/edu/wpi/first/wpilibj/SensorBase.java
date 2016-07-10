@@ -18,7 +18,7 @@ public abstract class SensorBase { // TODO: Refactor
   /**
    * Ticks per microsecond.
    */
-  public static final int kSystemClockTicksPerMicrosecond = 
+  public static final int kSystemClockTicksPerMicrosecond =
       ConstantsJNI.getSystemClockTicksPerMicrosecond();
   /**
    * Number of digital channels per roboRIO.

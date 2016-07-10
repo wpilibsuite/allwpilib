@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj.hal;
 
 public class InterruptJNI extends JNIWrapper {
   public static final int HalInvalidHandle = 0;
-  
+
   public interface InterruptJNIHandlerFunction {
     void apply(int interruptAssertedMask, Object param);
   }
@@ -29,7 +29,7 @@ public class InterruptJNI extends JNIWrapper {
 
   public static native double readInterruptFallingTimestamp(int interruptHandle);
 
-  public static native void requestInterrupts(int interruptHandle, int digitalSourceHandle, 
+  public static native void requestInterrupts(int interruptHandle, int digitalSourceHandle,
                                               int analogTriggerType);
 
   public static native void attachInterruptHandler(int interruptHandle,

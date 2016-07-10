@@ -1,53 +1,66 @@
 #!/usr/bin/env python3
 
-from subprocess import call
+# This script runs all formatting tasks on the code base.
+#
+# Passing "-v" as an argument enables verbosity. Otherwise, this script takes no
+# arguments. This should be invoked from either the styleguide directory or the
+# root directory of the project.
+
 import os
-import re
+import subprocess
 import sys
 
-sep = os.sep
-# If directory separator is backslash, escape it for regexes
-if sep == "\\":
-    sep += "\\"
+from clangformat import ClangFormat
+from licenseupdate import LicenseUpdate
+from newline import Newline
+from whitespace import Whitespace
+from task import Task
 
-# Files and directories which should be included in or excluded from the update
-regexInclude = re.compile("\.cpp$|\.h$|\.hpp$|\.inc$")
-folderExclude = "build" + sep + "|\.git" + sep + "|gradle" + sep + \
-                "|\.gradle" + sep + "|ni-libraries" + sep + "|ctre" + sep + \
-                "|frccansae" + sep + "|FRC_FPGA_ChipObject" + sep + \
-                "|gtest" + sep + "|i2clib" + sep + \
-                "|NetworkCommunication" + sep + "|spilib" + sep + \
-                "|visa" + sep + "|wpilibj" + sep
-regexExclude = re.compile(folderExclude +
-                          "|NIIMAQdx\.h$|nivision\.h$|can_proto\.h$|"
-                          "CanTalonSRX\.h$")
+# Check that the current directory is part of a Git repository
+def inGitRepo(directory):
+    ret = subprocess.run(["git", "rev-parse"], stderr = subprocess.DEVNULL)
+    return ret.returncode == 0
 
-# Handle running in either the root or styleguide directories
-configPath = ""
-if os.getcwd().rpartition(os.sep)[2] == "styleguide":
-    configPath = ".."
-else:
-    configPath = "."
+def main():
+    if not inGitRepo("."):
+        print("Error: not invoked within a Git repository", file = sys.stderr)
+        sys.exit(1)
 
-# Recursively create list of files in given directory
-files = [os.path.join(dp, f) for dp, dn, fn in
-         os.walk(os.path.expanduser(configPath)) for f in fn]
+    # Handle running in either the root or styleguide directories
+    configPath = ""
+    if os.getcwd().rpartition(os.sep)[2] == "styleguide":
+        configPath = ".."
+    else:
+        configPath = "."
 
-# Apply regex filters to list
-files = [f for f in files if regexInclude.search(f)]
-files = [f for f in files if not regexExclude.search(f)]
+    # Recursively create list of files in given directory
+    files = [os.path.join(dp, f) for dp, dn, fn in
+             os.walk(os.path.expanduser(configPath)) for f in fn]
 
-# Set clang-format name for platform
-clangExec = "clang-format"
-if sys.platform.startswith("win32"):
-    clangExec += ".exe"
+    if not files:
+        print("Error: no files found to format", file = sys.stderr)
+        sys.exit(1)
 
-if not files:
-    print("Error: no files found to format", file=sys.stderr)
-    sys.exit(1)
+    # Don't format generated files
+    files = [name for name in files if Task.notGeneratedFile(name)]
 
-for name in files:
-    # List names of files as they are processed if verbose flag was given
-    if len(sys.argv) > 1 and sys.argv[1] == "-v":
-        print("Processing", name,)
-    call([clangExec, "-i", "-style=file", name])
+    clangFormat = ClangFormat()
+    licenseUpdate = LicenseUpdate()
+    newline = Newline()
+    whitespace = Whitespace()
+
+    # Check for verbose flag
+    isVerbose = len(sys.argv) > 1 and sys.argv[1] == "-v"
+
+    for name in files:
+        if isVerbose:
+            print("Processing", name,)
+
+        for task in [clangFormat, licenseUpdate, newline, whitespace]:
+            if task.fileMatchesExtension(name):
+                if isVerbose:
+                    print("  with " + type(task).__name__)
+                task.run(name)
+
+if __name__ == "__main__":
+    main()
