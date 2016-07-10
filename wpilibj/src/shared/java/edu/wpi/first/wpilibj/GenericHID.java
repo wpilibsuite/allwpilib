@@ -15,25 +15,20 @@ public abstract class GenericHID {
   /**
    * Which hand the Human Interface Device is associated with.
    */
-  public static class Hand {
-
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
-    public final int value;
-    static final int kLeft_val = 0;
-    static final int kRight_val = 1;
+  public enum Hand {
     /**
      * hand: left.
      */
-    public static final Hand kLeft = new Hand(kLeft_val);
+    kLeft(0),
     /**
      * hand: right.
      */
-    public static final Hand kRight = new Hand(kRight_val);
+    kRight(1);
 
-    private Hand(int value) {
+    @SuppressWarnings("MemberName")
+    public final int value;
+
+    Hand(int value) {
       this.value = value;
     }
   }
