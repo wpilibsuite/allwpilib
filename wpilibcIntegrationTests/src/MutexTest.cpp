@@ -53,15 +53,15 @@ void SetProcessorAffinity(int core_id) {
   CPU_SET(core_id, &cpuset);
 
   pthread_t current_thread = pthread_self();
-  ASSERT_TRUE(
-      pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset) == 0);
+  ASSERT_EQ(pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset),
+            0);
 }
 
 void SetThreadRealtimePriorityOrDie(int priority) {
   struct sched_param param;
   // Set realtime priority for this thread
   param.sched_priority = priority + sched_get_priority_min(SCHED_RR);
-  ASSERT_TRUE(pthread_setschedparam(pthread_self(), SCHED_RR, &param) == 0)
+  ASSERT_EQ(pthread_setschedparam(pthread_self(), SCHED_RR, &param), 0)
       << ": Failed to set scheduler priority.";
 }
 
