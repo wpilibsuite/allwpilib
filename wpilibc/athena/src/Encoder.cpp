@@ -293,10 +293,10 @@ bool Encoder::GetDirection() const {
  * The scale needed to convert a raw counter value into a number of encoder
  * pulses.
  */
-double Encoder::DecodingScaleFactor() const {
+float Encoder::DecodingScaleFactor() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  double val = HAL_GetEncoderDecodingScaleFactor(m_encoder, &status);
+  float val = HAL_GetEncoderDecodingScaleFactor(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
 }
@@ -307,10 +307,10 @@ double Encoder::DecodingScaleFactor() const {
  * @return The distance driven since the last reset as scaled by the value from
  *         SetDistancePerPulse().
  */
-double Encoder::GetDistance() const {
+float Encoder::GetDistance() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  double value = HAL_GetEncoderDistance(m_encoder, &status);
+  float value = HAL_GetEncoderDistance(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -323,10 +323,10 @@ double Encoder::GetDistance() const {
  *
  * @return The current rate of the encoder.
  */
-double Encoder::GetRate() const {
+float Encoder::GetRate() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  double value = HAL_GetEncoderRate(m_encoder, &status);
+  float value = HAL_GetEncoderRate(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -337,7 +337,7 @@ double Encoder::GetRate() const {
  * @param minRate The minimum rate.  The units are in distance per second as
  *                scaled by the value from SetDistancePerPulse().
  */
-void Encoder::SetMinRate(double minRate) {
+void Encoder::SetMinRate(float minRate) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderMinRate(m_encoder, minRate, &status);
@@ -361,7 +361,7 @@ void Encoder::SetMinRate(double minRate) {
  * @param distancePerPulse The scale factor that will be used to convert pulses
  *                         to useful units.
  */
-void Encoder::SetDistancePerPulse(double distancePerPulse) {
+void Encoder::SetDistancePerPulse(float distancePerPulse) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);

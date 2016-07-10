@@ -10,13 +10,13 @@
 #include <stdint.h>
 
 extern "C" {
-void HAL_InitializeI2C(uint8_t port, int32_t* status);
-int32_t HAL_TransactionI2C(uint8_t port, uint8_t deviceAddress,
-                           uint8_t* dataToSend, uint8_t sendSize,
-                           uint8_t* dataReceived, uint8_t receiveSize);
-int32_t HAL_WriteI2C(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend,
-                     uint8_t sendSize);
-int32_t HAL_ReadI2C(uint8_t port, uint8_t deviceAddress, uint8_t* buffer,
-                    uint8_t count);
-void HAL_CloseI2C(uint8_t port);
+void HAL_InitializeI2C(int32_t port, int32_t* status);
+int32_t HAL_TransactionI2C(int32_t port, int32_t deviceAddress,
+                           uint8_t* dataToSend, int32_t sendSize,
+                           uint8_t* dataReceived, int32_t receiveSize);
+int32_t HAL_WriteI2C(int32_t port, int32_t deviceAddress, uint8_t* dataToSend,
+                     int32_t sendSize);
+int32_t HAL_ReadI2C(int32_t port, int32_t deviceAddress, uint8_t* buffer,
+                    int32_t count);
+void HAL_CloseI2C(int32_t port);
 }

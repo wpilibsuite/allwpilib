@@ -99,7 +99,7 @@ static void initializeAccelerometer() {
 
 static void writeRegister(Register reg, uint8_t data) {
   int32_t status = 0;
-  uint32_t initialTime;
+  uint64_t initialTime;
 
   accel->writeADDR(kSendAddress, &status);
 
@@ -130,7 +130,7 @@ static void writeRegister(Register reg, uint8_t data) {
 
 static uint8_t readRegister(Register reg) {
   int32_t status = 0;
-  uint32_t initialTime;
+  uint64_t initialTime;
 
   // Send a start transmit/receive message with the register address
   accel->writeADDR(kSendAddress, &status);
@@ -164,7 +164,7 @@ static uint8_t readRegister(Register reg) {
  * Convert a 12-bit raw acceleration value into a scaled double in units of
  * 1 g-force, taking into account the accelerometer range.
  */
-static double unpackAxis(int16_t raw) {
+static float unpackAxis(int16_t raw) {
   // The raw value is actually 12 bits, not 16, so we need to propogate the
   // 2's complement sign bit to the unused 4 bits for this to work with
   // negative numbers.
@@ -173,13 +173,13 @@ static double unpackAxis(int16_t raw) {
 
   switch (accelerometerRange) {
     case HAL_AccelerometerRange_k2G:
-      return raw / 1024.0;
+      return raw / 1024.0f;
     case HAL_AccelerometerRange_k4G:
-      return raw / 512.0;
+      return raw / 512.0f;
     case HAL_AccelerometerRange_k8G:
-      return raw / 256.0;
+      return raw / 256.0f;
     default:
-      return 0.0;
+      return 0.0f;
   }
 }
 
@@ -189,7 +189,7 @@ extern "C" {
  * Set the accelerometer to active or standby mode.  It must be in standby
  * mode to change any configuration.
  */
-void HAL_SetAccelerometerActive(bool active) {
+void HAL_SetAccelerometerActive(HAL_Bool active) {
   initializeAccelerometer();
 
   uint8_t ctrlReg1 = readRegister(kReg_CtrlReg1);
@@ -216,7 +216,7 @@ void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
  *
  * This is a floating point value in units of 1 g-force
  */
-double HAL_GetAccelerometerX() {
+float HAL_GetAccelerometerX() {
   initializeAccelerometer();
 
   int raw =
@@ -229,7 +229,7 @@ double HAL_GetAccelerometerX() {
  *
  * This is a floating point value in units of 1 g-force
  */
-double HAL_GetAccelerometerY() {
+float HAL_GetAccelerometerY() {
   initializeAccelerometer();
 
   int raw =
@@ -242,7 +242,7 @@ double HAL_GetAccelerometerY() {
  *
  * This is a floating point value in units of 1 g-force
  */
-double HAL_GetAccelerometerZ() {
+float HAL_GetAccelerometerZ() {
   initializeAccelerometer();
 
   int raw =

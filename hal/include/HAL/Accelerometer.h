@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "Types.h"
+
 enum HAL_AccelerometerRange {
   HAL_AccelerometerRange_k2G = 0,
   HAL_AccelerometerRange_k4G = 1,
@@ -14,9 +16,9 @@ enum HAL_AccelerometerRange {
 };
 
 extern "C" {
-void HAL_SetAccelerometerActive(bool);
+void HAL_SetAccelerometerActive(HAL_Bool);
 void HAL_SetAccelerometerRange(HAL_AccelerometerRange);
-double HAL_GetAccelerometerX();
-double HAL_GetAccelerometerY();
-double HAL_GetAccelerometerZ();
+float HAL_GetAccelerometerX();
+float HAL_GetAccelerometerY();
+float HAL_GetAccelerometerZ();
 }

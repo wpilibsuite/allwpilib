@@ -9,19 +9,21 @@
 
 #include <stdint.h>
 
+#include "Types.h"
+
 extern "C" {
 float HAL_GetVinVoltage(int32_t* status);
 float HAL_GetVinCurrent(int32_t* status);
 float HAL_GetUserVoltage6V(int32_t* status);
 float HAL_GetUserCurrent6V(int32_t* status);
-bool HAL_GetUserActive6V(int32_t* status);
-int HAL_GetUserCurrentFaults6V(int32_t* status);
+HAL_Bool HAL_GetUserActive6V(int32_t* status);
+int32_t HAL_GetUserCurrentFaults6V(int32_t* status);
 float HAL_GetUserVoltage5V(int32_t* status);
 float HAL_GetUserCurrent5V(int32_t* status);
-bool HAL_GetUserActive5V(int32_t* status);
-int HAL_GetUserCurrentFaults5V(int32_t* status);
+HAL_Bool HAL_GetUserActive5V(int32_t* status);
+int32_t HAL_GetUserCurrentFaults5V(int32_t* status);
 float HAL_GetUserVoltage3V3(int32_t* status);
 float HAL_GetUserCurrent3V3(int32_t* status);
-bool HAL_GetUserActive3V3(int32_t* status);
-int HAL_GetUserCurrentFaults3V3(int32_t* status);
+HAL_Bool HAL_GetUserActive3V3(int32_t* status);
+int32_t HAL_GetUserCurrentFaults3V3(int32_t* status);
 }

@@ -33,7 +33,8 @@ static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
 
 extern "C" {
 
-HAL_InterruptHandle HAL_InitializeInterrupts(bool watcher, int32_t* status) {
+HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
+                                             int32_t* status) {
   HAL_InterruptHandle handle = interruptHandles.Allocate();
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
@@ -45,7 +46,7 @@ HAL_InterruptHandle HAL_InitializeInterrupts(bool watcher, int32_t* status) {
   anInterrupt->anInterrupt = tInterrupt::create(interruptIndex, status);
   anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
   anInterrupt->manager = new tInterruptManager(
-      (1 << interruptIndex) | (1 << (interruptIndex + 8)), watcher, status);
+      (1u << interruptIndex) | (1u << (interruptIndex + 8u)), watcher, status);
   return handle;
 }
 
@@ -68,9 +69,9 @@ void HAL_CleanInterrupts(HAL_InterruptHandle interrupt_handle,
  * waitForInterrupt was called.
  * @return The mask of interrupts that fired.
  */
-uint32_t HAL_WaitForInterrupt(HAL_InterruptHandle interrupt_handle,
-                              double timeout, bool ignorePrevious,
-                              int32_t* status) {
+int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interrupt_handle,
+                             float timeout, HAL_Bool ignorePrevious,
+                             int32_t* status) {
   uint32_t result;
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
@@ -124,15 +125,15 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interrupt_handle,
  * This is in the same time domain as GetClock().
  * @return Timestamp in seconds since boot.
  */
-double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
-                                        int32_t* status) {
+float HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                       int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
   uint32_t timestamp = anInterrupt->anInterrupt->readRisingTimeStamp(status);
-  return timestamp * 1e-6;
+  return timestamp * 1e-6f;
 }
 
 /**
@@ -140,15 +141,15 @@ double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
 * This is in the same time domain as GetClock().
 * @return Timestamp in seconds since boot.
 */
-double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interrupt_handle,
-                                         int32_t* status) {
+float HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                        int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
   uint32_t timestamp = anInterrupt->anInterrupt->readFallingTimeStamp(status);
-  return timestamp * 1e-6;
+  return timestamp * 1e-6f;
 }
 
 void HAL_RequestInterrupts(HAL_InterruptHandle interrupt_handle,
@@ -162,7 +163,7 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interrupt_handle,
   }
   anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
   bool routingAnalogTrigger = false;
-  uint32_t routingPin = 0;
+  uint8_t routingPin = 0;
   uint8_t routingModule = 0;
   bool success =
       remapDigitalSource(digitalSourceHandle, analogTriggerType, routingPin,
@@ -189,7 +190,7 @@ void HAL_AttachInterruptHandler(HAL_InterruptHandle interrupt_handle,
 }
 
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interrupt_handle,
-                                  bool risingEdge, bool fallingEdge,
+                                  HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {

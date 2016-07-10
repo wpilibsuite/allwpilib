@@ -20,15 +20,15 @@ struct AnalogGyro {
   HAL_AnalogInputHandle handle;
   float voltsPerDegreePerSecond;
   float offset;
-  uint32_t center;
+  int32_t center;
 };
 }
 
 static constexpr uint32_t kOversampleBits = 10;
 static constexpr uint32_t kAverageBits = 0;
-static constexpr float kSamplesPerSecond = 50.0;
-static constexpr float kCalibrationSampleTime = 5.0;
-static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
+static constexpr float kSamplesPerSecond = 50.0f;
+static constexpr float kCalibrationSampleTime = 5.0f;
+static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007f;
 
 using namespace hal;
 
@@ -103,7 +103,7 @@ void HAL_FreeAnalogGyro(HAL_GyroHandle handle) {
 
 void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle,
                                  float voltsPerDegreePerSecond, float offset,
-                                 uint32_t center, int32_t* status) {
+                                 int32_t center, int32_t* status) {
   auto gyro = analogGyroHandles.Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -158,11 +158,11 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   Wait(kCalibrationSampleTime);
 
   int64_t value;
-  uint32_t count;
+  int64_t count;
   HAL_GetAccumulatorOutput(gyro->handle, &value, &count, status);
   if (*status != 0) return;
 
-  gyro->center = static_cast<uint32_t>(
+  gyro->center = static_cast<int32_t>(
       static_cast<float>(value) / static_cast<float>(count) + .5);
 
   gyro->offset = static_cast<float>(value) / static_cast<float>(count) -
@@ -179,9 +179,9 @@ void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, float volts,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  int32_t deadband = volts * 1e9 /
-                     HAL_GetAnalogLSBWeight(gyro->handle, status) *
-                     (1 << HAL_GetAnalogOversampleBits(gyro->handle, status));
+  int32_t deadband = static_cast<int32_t>(
+      volts * 1e9 / HAL_GetAnalogLSBWeight(gyro->handle, status) *
+      (1 << HAL_GetAnalogOversampleBits(gyro->handle, status)));
   if (*status != 0) return;
   HAL_SetAccumulatorDeadband(gyro->handle, deadband, status);
 }
@@ -193,7 +193,7 @@ float HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
     return 0;
   }
   int64_t rawValue = 0;
-  uint32_t count = 0;
+  int64_t count = 0;
   HAL_GetAccumulatorOutput(gyro->handle, &rawValue, &count, status);
 
   int64_t value =
@@ -208,7 +208,7 @@ float HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
   return static_cast<float>(scaledValue);
 }
 
-double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
+float HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
   auto gyro = analogGyroHandles.Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -231,7 +231,7 @@ float HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status) {
   return gyro->offset;
 }
 
-uint32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status) {
+int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status) {
   auto gyro = analogGyroHandles.Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;

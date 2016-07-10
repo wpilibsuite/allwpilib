@@ -66,10 +66,10 @@ class Encoder : public SensorBase,
   bool GetStopped() const override;
   bool GetDirection() const override;
 
-  double GetDistance() const;
-  double GetRate() const;
-  void SetMinRate(double minRate);
-  void SetDistancePerPulse(double distancePerPulse);
+  float GetDistance() const;
+  float GetRate() const;
+  void SetMinRate(float minRate);
+  void SetDistancePerPulse(float distancePerPulse);
   void SetReverseDirection(bool reverseDirection);
   void SetSamplesToAverage(int samplesToAverage);
   int GetSamplesToAverage() const;
@@ -94,7 +94,7 @@ class Encoder : public SensorBase,
  private:
   void InitEncoder(bool reverseDirection, EncodingType encodingType);
 
-  double DecodingScaleFactor() const;
+  float DecodingScaleFactor() const;
 
   std::shared_ptr<DigitalSource> m_aSource;  // the A phase of the quad encoder
   std::shared_ptr<DigitalSource> m_bSource;  // the B phase of the quad encoder

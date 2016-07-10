@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 #include "InterruptableSensorBase.h"
 
 /**

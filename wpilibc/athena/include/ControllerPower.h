@@ -9,18 +9,18 @@
 
 class ControllerPower {
  public:
-  static double GetInputVoltage();
-  static double GetInputCurrent();
-  static double GetVoltage3V3();
-  static double GetCurrent3V3();
+  static float GetInputVoltage();
+  static float GetInputCurrent();
+  static float GetVoltage3V3();
+  static float GetCurrent3V3();
   static bool GetEnabled3V3();
   static int GetFaultCount3V3();
-  static double GetVoltage5V();
-  static double GetCurrent5V();
+  static float GetVoltage5V();
+  static float GetCurrent5V();
   static bool GetEnabled5V();
   static int GetFaultCount5V();
-  static double GetVoltage6V();
-  static double GetCurrent6V();
+  static float GetVoltage6V();
+  static float GetCurrent6V();
   static bool GetEnabled6V();
   static int GetFaultCount6V();
 };

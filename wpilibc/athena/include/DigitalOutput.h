@@ -10,7 +10,7 @@
 #include <memory>
 
 #include "DigitalSource.h"
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
 
@@ -26,7 +26,7 @@ class DigitalOutput : public DigitalSource,
  public:
   explicit DigitalOutput(uint32_t channel);
   virtual ~DigitalOutput();
-  void Set(uint32_t value);
+  void Set(bool value);
   uint32_t GetChannel() const override;
   void Pulse(float length);
   bool IsPulsing() const;

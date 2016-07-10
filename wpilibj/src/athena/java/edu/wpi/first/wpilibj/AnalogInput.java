@@ -295,12 +295,12 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
     ByteBuffer value = ByteBuffer.allocateDirect(8);
     // set the byte order
     value.order(ByteOrder.LITTLE_ENDIAN);
-    ByteBuffer count = ByteBuffer.allocateDirect(4);
+    ByteBuffer count = ByteBuffer.allocateDirect(8);
     // set the byte order
     count.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.getAccumulatorOutput(m_port, value.asLongBuffer(), count.asIntBuffer());
+    AnalogJNI.getAccumulatorOutput(m_port, value.asLongBuffer(), count.asLongBuffer());
     result.value = value.asLongBuffer().get(0) + m_accumulatorOffset;
-    result.count = count.asIntBuffer().get(0);
+    result.count = count.asLongBuffer().get(0);
   }
 
   /**

@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "Handles.h"
+#include "Types.h"
 
 extern "C" {
 HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, void*),

@@ -17,66 +17,66 @@ static PDP* pdp[kNumPDPModules] = {nullptr};
 
 extern "C" {
 
-void HAL_InitializePDP(uint8_t module) {
+void HAL_InitializePDP(int32_t module) {
   if (!pdp[module]) {
     pdp[module] = new PDP(module);
   }
 }
 
-double HAL_GetPDPTemperature(uint8_t module, int32_t* status) {
+float HAL_GetPDPTemperature(int32_t module, int32_t* status) {
   double temperature;
 
   *status = pdp[module]->GetTemperature(temperature);
 
-  return temperature;
+  return static_cast<float>(temperature);
 }
 
-double HAL_GetPDPVoltage(uint8_t module, int32_t* status) {
+float HAL_GetPDPVoltage(int32_t module, int32_t* status) {
   double voltage;
 
   *status = pdp[module]->GetVoltage(voltage);
 
-  return voltage;
+  return static_cast<float>(voltage);
 }
 
-double HAL_GetPDPChannelCurrent(uint8_t module, uint8_t channel,
-                                int32_t* status) {
+float HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
+                               int32_t* status) {
   double current;
 
   *status = pdp[module]->GetChannelCurrent(channel, current);
 
-  return current;
+  return static_cast<float>(current);
 }
 
-double HAL_GetPDPTotalCurrent(uint8_t module, int32_t* status) {
+float HAL_GetPDPTotalCurrent(int32_t module, int32_t* status) {
   double current;
 
   *status = pdp[module]->GetTotalCurrent(current);
 
-  return current;
+  return static_cast<float>(current);
 }
 
-double HAL_GetPDPTotalPower(uint8_t module, int32_t* status) {
+float HAL_GetPDPTotalPower(int32_t module, int32_t* status) {
   double power;
 
   *status = pdp[module]->GetTotalPower(power);
 
-  return power;
+  return static_cast<float>(power);
 }
 
-double HAL_GetPDPTotalEnergy(uint8_t module, int32_t* status) {
+float HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) {
   double energy;
 
   *status = pdp[module]->GetTotalEnergy(energy);
 
-  return energy;
+  return static_cast<float>(energy);
 }
 
-void HAL_ResetPDPTotalEnergy(uint8_t module, int32_t* status) {
+void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status) {
   *status = pdp[module]->ResetEnergy();
 }
 
-void HAL_ClearPDPStickyFaults(uint8_t module, int32_t* status) {
+void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status) {
   *status = pdp[module]->ClearStickyFaults();
 }
 

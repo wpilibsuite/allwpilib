@@ -54,5 +54,5 @@ public class SPIJNI extends JNIWrapper {
   public static native double spiGetAccumulatorAverage(byte port);
 
   public static native void spiGetAccumulatorOutput(byte port, LongBuffer value,
-                                                    IntBuffer count);
+                                                    LongBuffer count);
 }

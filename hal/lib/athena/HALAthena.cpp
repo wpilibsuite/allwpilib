@@ -45,12 +45,12 @@ using namespace hal;
 
 extern "C" {
 
-HAL_PortHandle HAL_GetPort(uint8_t pin) { return createPortHandle(pin, 1); }
+HAL_PortHandle HAL_GetPort(int32_t pin) { return createPortHandle(pin, 1); }
 
 /**
  * @deprecated Uses module numbers
  */
-HAL_PortHandle HAL_GetPortWithModule(uint8_t module, uint8_t pin) {
+HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t pin) {
   return createPortHandle(pin, module);
 }
 
@@ -164,7 +164,7 @@ const char* HAL_GetErrorMessage(int32_t code) {
  * For now, expect this to be competition year.
  * @return FPGA Version number.
  */
-uint16_t HAL_GetFPGAVersion(int32_t* status) {
+int32_t HAL_GetFPGAVersion(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -180,7 +180,7 @@ uint16_t HAL_GetFPGAVersion(int32_t* status) {
  * The 12 least significant bits are the Build Number.
  * @return FPGA Revision number.
  */
-uint32_t HAL_GetFPGARevision(int32_t* status) {
+int64_t HAL_GetFPGARevision(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
@@ -212,7 +212,7 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
  * Get the state of the "USER" button on the roboRIO
  * @return true if the button is currently pressed down
  */
-bool HAL_GetFPGAButton(int32_t* status) {
+HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   if (!global) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -220,13 +220,14 @@ bool HAL_GetFPGAButton(int32_t* status) {
   return global->readUserButton(status);
 }
 
-int HAL_SetErrorData(const char* errors, int errorsLength, int wait_ms) {
+int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
+                         int32_t wait_ms) {
   return setErrorData(errors, errorsLength, wait_ms);
 }
 
-int HAL_SendError(int isError, int32_t errorCode, int isLVCode,
-                  const char* details, const char* location,
-                  const char* callStack, int printMsg) {
+int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
+                      const char* details, const char* location,
+                      const char* callStack, HAL_Bool printMsg) {
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
@@ -270,7 +271,7 @@ int HAL_SendError(int isError, int32_t errorCode, int isLVCode,
   return retval;
 }
 
-bool HAL_GetSystemActive(int32_t* status) {
+HAL_Bool HAL_GetSystemActive(int32_t* status) {
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -278,7 +279,7 @@ bool HAL_GetSystemActive(int32_t* status) {
   return watchdog->readStatus_SystemActive(status);
 }
 
-bool HAL_GetBrownedOut(int32_t* status) {
+HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return false;
@@ -312,7 +313,7 @@ void HAL_WaitForDSData() {
 /**
  * Call this to start up HAL. This is required for robot programs.
  */
-int HAL_Initialize(int mode) {
+int32_t HAL_Initialize(int32_t mode) {
   setlinebuf(stdin);
   setlinebuf(stdout);
 
@@ -382,8 +383,8 @@ int HAL_Initialize(int mode) {
   return 1;
 }
 
-uint32_t HAL_Report(uint8_t resource, uint8_t instanceNumber, uint8_t context,
-                    const char* feature) {
+int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
+                   const char* feature) {
   if (feature == nullptr) {
     feature = "";
   }

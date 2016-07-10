@@ -26,15 +26,15 @@ class Encoder {
   int32_t GetRaw(int32_t* status) const;
   int32_t GetEncodingScale(int32_t* status) const;
   void Reset(int32_t* status);
-  double GetPeriod(int32_t* status) const;
-  void SetMaxPeriod(double maxPeriod, int32_t* status);
+  float GetPeriod(int32_t* status) const;
+  void SetMaxPeriod(float maxPeriod, int32_t* status);
   bool GetStopped(int32_t* status) const;
   bool GetDirection(int32_t* status) const;
 
-  double GetDistance(int32_t* status) const;
-  double GetRate(int32_t* status) const;
-  void SetMinRate(double minRate, int32_t* status);
-  void SetDistancePerPulse(double distancePerPulse, int32_t* status);
+  float GetDistance(int32_t* status) const;
+  float GetRate(int32_t* status) const;
+  void SetMinRate(float minRate, int32_t* status);
+  void SetDistancePerPulse(float distancePerPulse, int32_t* status);
   void SetReverseDirection(bool reverseDirection, int32_t* status);
   void SetSamplesToAverage(int samplesToAverage, int32_t* status);
   int32_t GetSamplesToAverage(int32_t* status) const;
@@ -47,9 +47,9 @@ class Encoder {
 
   int32_t GetEncodingScale() const { return m_encodingScale; }
 
-  double DecodingScaleFactor() const;
+  float DecodingScaleFactor() const;
 
-  double GetDistancePerPulse() const { return m_distancePerPulse; }
+  float GetDistancePerPulse() const { return m_distancePerPulse; }
 
   HAL_EncoderEncodingType GetEncodingType() const { return m_encodingType; }
 
@@ -67,7 +67,7 @@ class Encoder {
 
   int32_t m_index = 0;
 
-  double m_distancePerPulse = 1.0;
+  float m_distancePerPulse = 1.0;
 
   HAL_EncoderEncodingType m_encodingType;
 

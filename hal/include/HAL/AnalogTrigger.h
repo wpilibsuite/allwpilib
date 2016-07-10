@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "Handles.h"
+#include "Types.h"
 
 enum HAL_AnalogTriggerType {
   HAL_Trigger_kInWindow = 0,
@@ -20,23 +20,24 @@ enum HAL_AnalogTriggerType {
 
 extern "C" {
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
-    HAL_AnalogInputHandle port_handle, uint32_t* index, int32_t* status);
+    HAL_AnalogInputHandle port_handle, int32_t* index, int32_t* status);
 void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analog_trigger_handle,
                             int32_t* status);
 void HAL_SetAnalogTriggerLimitsRaw(
     HAL_AnalogTriggerHandle analog_trigger_handle, int32_t lower, int32_t upper,
     int32_t* status);
 void HAL_SetAnalogTriggerLimitsVoltage(
-    HAL_AnalogTriggerHandle analog_trigger_handle, double lower, double upper,
+    HAL_AnalogTriggerHandle analog_trigger_handle, float lower, float upper,
     int32_t* status);
 void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analog_trigger_handle,
-                                  bool useAveragedValue, int32_t* status);
+                                  HAL_Bool useAveragedValue, int32_t* status);
 void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analog_trigger_handle,
-                                  bool useFilteredValue, int32_t* status);
-bool HAL_GetAnalogTriggerInWindow(HAL_AnalogTriggerHandle analog_trigger_handle,
-                                  int32_t* status);
-bool HAL_GetAnalogTriggerTriggerState(
+                                  HAL_Bool useFilteredValue, int32_t* status);
+HAL_Bool HAL_GetAnalogTriggerInWindow(
     HAL_AnalogTriggerHandle analog_trigger_handle, int32_t* status);
-bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analog_trigger_handle,
-                                HAL_AnalogTriggerType type, int32_t* status);
+HAL_Bool HAL_GetAnalogTriggerTriggerState(
+    HAL_AnalogTriggerHandle analog_trigger_handle, int32_t* status);
+HAL_Bool HAL_GetAnalogTriggerOutput(
+    HAL_AnalogTriggerHandle analog_trigger_handle, HAL_AnalogTriggerType type,
+    int32_t* status);
 }

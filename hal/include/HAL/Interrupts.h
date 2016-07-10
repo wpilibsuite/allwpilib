@@ -9,27 +9,27 @@
 
 #include <stdint.h>
 
-#include "HAL/AnalogTrigger.h"
-#include "HAL/Handles.h"
+#include "AnalogTrigger.h"
+#include "Types.h"
 
 extern "C" {
 typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask,
                                          void* param);
 
-HAL_InterruptHandle HAL_InitializeInterrupts(bool watcher, int32_t* status);
+HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher, int32_t* status);
 void HAL_CleanInterrupts(HAL_InterruptHandle interrupt_handle, int32_t* status);
 
-uint32_t HAL_WaitForInterrupt(HAL_InterruptHandle interrupt_handle,
-                              double timeout, bool ignorePrevious,
-                              int32_t* status);
+int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interrupt_handle,
+                             float timeout, HAL_Bool ignorePrevious,
+                             int32_t* status);
 void HAL_EnableInterrupts(HAL_InterruptHandle interrupt_handle,
                           int32_t* status);
 void HAL_DisableInterrupts(HAL_InterruptHandle interrupt_handle,
                            int32_t* status);
-double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
+float HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                       int32_t* status);
+float HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interrupt_handle,
                                         int32_t* status);
-double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interrupt_handle,
-                                         int32_t* status);
 void HAL_RequestInterrupts(HAL_InterruptHandle interrupt_handle,
                            HAL_Handle digitalSourceHandle,
                            HAL_AnalogTriggerType analogTriggerType,
@@ -38,6 +38,6 @@ void HAL_AttachInterruptHandler(HAL_InterruptHandle interrupt_handle,
                                 InterruptHandlerFunction handler, void* param,
                                 int32_t* status);
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interrupt_handle,
-                                  bool risingEdge, bool fallingEdge,
+                                  HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status);
 }

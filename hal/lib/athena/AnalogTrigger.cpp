@@ -20,7 +20,7 @@ namespace {
 struct AnalogTrigger {
   tAnalogTrigger* trigger;
   HAL_AnalogInputHandle analogHandle;
-  uint32_t index;
+  uint8_t index;
 };
 }
 
@@ -31,7 +31,7 @@ static LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
 extern "C" {
 
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
-    HAL_AnalogInputHandle port_handle, uint32_t* index, int32_t* status) {
+    HAL_AnalogInputHandle port_handle, int32_t* index, int32_t* status) {
   if (port_handle == HAL_kInvalidHandle) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
@@ -49,8 +49,8 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
-  *index = static_cast<uint32_t>(getHandleIndex(handle));
-  trigger->index = *index;
+  trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
+  *index = trigger->index;
   // TODO: if (index == ~0ul) { CloneError(triggers); return; }
 
   trigger->trigger = tAnalogTrigger::create(trigger->index, status);
@@ -89,7 +89,7 @@ void HAL_SetAnalogTriggerLimitsRaw(
  * The limits are given as floating point voltage values.
  */
 void HAL_SetAnalogTriggerLimitsVoltage(
-    HAL_AnalogTriggerHandle analog_trigger_handle, double lower, double upper,
+    HAL_AnalogTriggerHandle analog_trigger_handle, float lower, float upper,
     int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
@@ -114,7 +114,7 @@ void HAL_SetAnalogTriggerLimitsVoltage(
  * trigger, otherwise the immediate value is used.
  */
 void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analog_trigger_handle,
-                                  bool useAveragedValue, int32_t* status) {
+                                  HAL_Bool useAveragedValue, int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -135,7 +135,7 @@ void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analog_trigger_handle,
  * pot crosses through zero.
  */
 void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analog_trigger_handle,
-                                  bool useFilteredValue, int32_t* status) {
+                                  HAL_Bool useFilteredValue, int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -154,8 +154,8 @@ void HAL_SetAnalogTriggerFiltered(HAL_AnalogTriggerHandle analog_trigger_handle,
  * True if the analog input is between the upper and lower limits.
  * @return The InWindow output of the analog trigger.
  */
-bool HAL_GetAnalogTriggerInWindow(HAL_AnalogTriggerHandle analog_trigger_handle,
-                                  int32_t* status) {
+HAL_Bool HAL_GetAnalogTriggerInWindow(
+    HAL_AnalogTriggerHandle analog_trigger_handle, int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -171,7 +171,7 @@ bool HAL_GetAnalogTriggerInWindow(HAL_AnalogTriggerHandle analog_trigger_handle,
  * If in Hysteresis, maintain previous state.
  * @return The TriggerState output of the analog trigger.
  */
-bool HAL_GetAnalogTriggerTriggerState(
+HAL_Bool HAL_GetAnalogTriggerTriggerState(
     HAL_AnalogTriggerHandle analog_trigger_handle, int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
@@ -185,8 +185,9 @@ bool HAL_GetAnalogTriggerTriggerState(
  * Get the state of the analog trigger output.
  * @return The state of the analog trigger output.
  */
-bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analog_trigger_handle,
-                                HAL_AnalogTriggerType type, int32_t* status) {
+HAL_Bool HAL_GetAnalogTriggerOutput(
+    HAL_AnalogTriggerHandle analog_trigger_handle, HAL_AnalogTriggerType type,
+    int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {
     *status = HAL_HANDLE_ERROR;

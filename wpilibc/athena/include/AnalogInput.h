@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
@@ -40,7 +40,7 @@ class AnalogInput : public SensorBase,
   explicit AnalogInput(uint32_t channel);
   virtual ~AnalogInput();
 
-  int16_t GetValue() const;
+  int32_t GetValue() const;
   int32_t GetAverageValue() const;
 
   float GetVoltage() const;
@@ -48,12 +48,12 @@ class AnalogInput : public SensorBase,
 
   uint32_t GetChannel() const;
 
-  void SetAverageBits(uint32_t bits);
-  uint32_t GetAverageBits() const;
-  void SetOversampleBits(uint32_t bits);
-  uint32_t GetOversampleBits() const;
+  void SetAverageBits(int32_t bits);
+  int32_t GetAverageBits() const;
+  void SetOversampleBits(int32_t bits);
+  int32_t GetOversampleBits() const;
 
-  uint32_t GetLSBWeight() const;
+  int64_t GetLSBWeight() const;
   int32_t GetOffset() const;
 
   bool IsAccumulatorChannel() const;
@@ -63,8 +63,8 @@ class AnalogInput : public SensorBase,
   void SetAccumulatorCenter(int32_t center);
   void SetAccumulatorDeadband(int32_t deadband);
   int64_t GetAccumulatorValue() const;
-  uint32_t GetAccumulatorCount() const;
-  void GetAccumulatorOutput(int64_t& value, uint32_t& count) const;
+  int64_t GetAccumulatorCount() const;
+  void GetAccumulatorOutput(int64_t& value, int64_t& count) const;
 
   static void SetSampleRate(float samplesPerSecond);
   static float GetSampleRate();

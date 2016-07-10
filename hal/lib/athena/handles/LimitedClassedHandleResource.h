@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HandlesInternal.h"
 

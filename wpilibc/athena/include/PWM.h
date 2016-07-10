@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
@@ -53,8 +53,8 @@ class PWM : public SensorBase,
   void SetPeriodMultiplier(PeriodMultiplier mult);
   void SetZeroLatch();
   void EnableDeadbandElimination(bool eliminateDeadband);
-  void SetBounds(double max, double deadbandMax, double center,
-                 double deadbandMin, double min);
+  void SetBounds(float max, float deadbandMax, float center, float deadbandMin,
+                 float min);
   void SetRawBounds(int32_t max, int32_t deadbandMax, int32_t center,
                     int32_t deadbandMin, int32_t min);
   void GetRawBounds(int32_t* max, int32_t* deadbandMax, int32_t* center,

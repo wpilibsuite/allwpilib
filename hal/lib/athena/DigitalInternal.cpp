@@ -69,7 +69,7 @@ void initializeDigital(int32_t* status) {
       (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + .5);
   pwmSystem->writeConfig_MinHigh(minHigh, status);
   // Ensure that PWM output values are set to OFF
-  for (uint32_t pwm_index = 0; pwm_index < kNumPWMPins; pwm_index++) {
+  for (uint8_t pwm_index = 0; pwm_index < kNumPWMPins; pwm_index++) {
     // Copy of SetPWM
     if (pwm_index < tPWM::kNumHdrRegisters) {
       pwmSystem->writeHdr(pwm_index, kPwmDisabled, status);
@@ -94,9 +94,9 @@ void initializeDigital(int32_t* status) {
  * Map DIO pin numbers from their physical number (10 to 26) to their position
  * in the bit field.
  */
-uint32_t remapMXPChannel(uint32_t pin) { return pin - 10; }
+int32_t remapMXPChannel(int32_t pin) { return pin - 10; }
 
-uint32_t remapMXPPWMChannel(uint32_t pin) {
+int32_t remapMXPPWMChannel(int32_t pin) {
   if (pin < 14) {
     return pin - 10;  // first block of 4 pwms (MXP 0-3)
   } else {
@@ -110,17 +110,17 @@ uint32_t remapMXPPWMChannel(uint32_t pin) {
  * channel else do normal digital input remapping based on pin number (MXP)
  */
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
-                        HAL_AnalogTriggerType analogTriggerType, uint32_t& pin,
+                        HAL_AnalogTriggerType analogTriggerType, uint8_t& pin,
                         uint8_t& module, bool& analogTrigger) {
   if (isHandleType(digitalSourceHandle, HAL_HandleEnum::AnalogTrigger)) {
     // If handle passed, index is not negative
-    uint32_t index = getHandleIndex(digitalSourceHandle);
+    int32_t index = getHandleIndex(digitalSourceHandle);
     pin = (index << 2) + analogTriggerType;
     module = pin >> 4;
     analogTrigger = true;
     return true;
   } else if (isHandleType(digitalSourceHandle, HAL_HandleEnum::DIO)) {
-    uint32_t index = getHandleIndex(digitalSourceHandle);
+    int32_t index = getHandleIndex(digitalSourceHandle);
     if (index >= kNumDigitalHeaders) {
       pin = remapMXPChannel(index);
       module = 1;

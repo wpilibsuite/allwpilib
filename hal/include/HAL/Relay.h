@@ -9,15 +9,16 @@
 
 #include <stdint.h>
 
-#include "Handles.h"
+#include "Types.h"
 
 extern "C" {
-HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle port_handle, uint8_t fwd,
-                                        int32_t* status);
+HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle port_handle,
+                                        HAL_Bool fwd, int32_t* status);
 void HAL_FreeRelayPort(HAL_RelayHandle relay_port_handle);
 
-bool HAL_CheckRelayChannel(uint8_t pin);
+HAL_Bool HAL_CheckRelayChannel(int32_t pin);
 
-void HAL_SetRelay(HAL_RelayHandle relay_port_handle, bool on, int32_t* status);
-bool HAL_GetRelay(HAL_RelayHandle relay_port_handle, int32_t* status);
+void HAL_SetRelay(HAL_RelayHandle relay_port_handle, HAL_Bool on,
+                  int32_t* status);
+HAL_Bool HAL_GetRelay(HAL_RelayHandle relay_port_handle, int32_t* status);
 }

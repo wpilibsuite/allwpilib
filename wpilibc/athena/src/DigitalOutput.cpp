@@ -64,7 +64,7 @@ DigitalOutput::~DigitalOutput() {
  *
  * @param value 1 (true) for high, 0 (false) for disabled
  */
-void DigitalOutput::Set(uint32_t value) {
+void DigitalOutput::Set(bool value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;

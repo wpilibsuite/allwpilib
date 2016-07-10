@@ -12,7 +12,7 @@
 #include "AnalogTrigger.h"
 #include "CounterBase.h"
 #include "HAL/Counter.h"
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 

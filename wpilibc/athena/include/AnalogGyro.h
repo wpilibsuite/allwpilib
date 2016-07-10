@@ -9,7 +9,7 @@
 
 #include "GyroBase.h"
 
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 
 class AnalogInput;
 

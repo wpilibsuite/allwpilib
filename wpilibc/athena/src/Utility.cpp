@@ -125,9 +125,9 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
  * For now, expect this to be competition year.
  * @return FPGA Version number.
  */
-uint16_t GetFPGAVersion() {
+int32_t GetFPGAVersion() {
   int32_t status = 0;
-  uint16_t version = HAL_GetFPGAVersion(&status);
+  int32_t version = HAL_GetFPGAVersion(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return version;
 }
@@ -140,9 +140,9 @@ uint16_t GetFPGAVersion() {
  * The 12 least significant bits are the Build Number.
  * @return FPGA Revision number.
  */
-uint32_t GetFPGARevision() {
+int64_t GetFPGARevision() {
   int32_t status = 0;
-  uint32_t revision = HAL_GetFPGARevision(&status);
+  int64_t revision = HAL_GetFPGARevision(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return revision;
 }

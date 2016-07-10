@@ -35,7 +35,7 @@ AnalogTrigger::AnalogTrigger(int32_t channel)
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_analogInput = input;
   int32_t status = 0;
-  uint32_t index = 0;
+  int32_t index = 0;
   m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &index, &status);
   if (status != 0) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -128,8 +128,8 @@ void AnalogTrigger::SetFiltered(bool useFilteredValue) {
  *
  * @return The index of the analog trigger.
  */
-uint32_t AnalogTrigger::GetIndex() const {
-  if (StatusIsFatal()) return std::numeric_limits<uint32_t>::max();
+int32_t AnalogTrigger::GetIndex() const {
+  if (StatusIsFatal()) return -1;
   return m_index;
 }
 

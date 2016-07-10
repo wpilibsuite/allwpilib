@@ -11,8 +11,8 @@
 
 #include "ChipObject.h"
 #include "HAL/AnalogTrigger.h"
-#include "HAL/Handles.h"
 #include "HAL/Ports.h"
+#include "HAL/Types.h"
 #include "PortsInternal.h"
 #include "handles/DigitalHandleResource.h"
 #include "handles/HandlesInternal.h"
@@ -41,11 +41,11 @@ constexpr uint32_t kExpectedLoopTiming = 40;
  * scaling is implemented as an output squelch to get longer periods for old
  * devices.
  */
-constexpr float kDefaultPwmPeriod = 5.05;
+constexpr float kDefaultPwmPeriod = 5.05f;
 /**
  * kDefaultPwmCenter is the PWM range center in ms
  */
-constexpr float kDefaultPwmCenter = 1.5;
+constexpr float kDefaultPwmCenter = 1.5f;
 /**
  * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
  */
@@ -78,8 +78,8 @@ extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
 
 void initializeDigital(int32_t* status);
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
-                        HAL_AnalogTriggerType analogTriggerType, uint32_t& pin,
+                        HAL_AnalogTriggerType analogTriggerType, uint8_t& pin,
                         uint8_t& module, bool& analogTrigger);
-uint32_t remapMXPPWMChannel(uint32_t pin);
-uint32_t remapMXPChannel(uint32_t pin);
+int32_t remapMXPPWMChannel(int32_t pin);
+int32_t remapMXPChannel(int32_t pin);
 }  // namespace hal

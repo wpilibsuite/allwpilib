@@ -31,7 +31,7 @@ extern "C" {
  * If opening the MXP port, also sets up the pin functions appropriately
  * @param port The port to open, 0 for the on-board, 1 for the MXP.
  */
-void HAL_InitializeI2C(uint8_t port, int32_t* status) {
+void HAL_InitializeI2C(int32_t port, int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return;
 
@@ -80,9 +80,9 @@ void HAL_InitializeI2C(uint8_t port, int32_t* status) {
  * @param receiveSize Number of bytes to read from the device.
  * @return The number of bytes read (>= 0) or -1 on transfer abort.
  */
-int32_t HAL_TransactionI2C(uint8_t port, uint8_t deviceAddress,
-                           uint8_t* dataToSend, uint8_t sendSize,
-                           uint8_t* dataReceived, uint8_t receiveSize) {
+int32_t HAL_TransactionI2C(int32_t port, int32_t deviceAddress,
+                           uint8_t* dataToSend, int32_t sendSize,
+                           uint8_t* dataReceived, int32_t receiveSize) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
@@ -112,8 +112,8 @@ int32_t HAL_TransactionI2C(uint8_t port, uint8_t deviceAddress,
  * @param data The byte to write to the register on the device.
  * @return The number of bytes written (>= 0) or -1 on transfer abort.
  */
-int32_t HAL_WriteI2C(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend,
-                     uint8_t sendSize) {
+int32_t HAL_WriteI2C(int32_t port, int32_t deviceAddress, uint8_t* dataToSend,
+                     int32_t sendSize) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
@@ -142,8 +142,8 @@ int32_t HAL_WriteI2C(uint8_t port, uint8_t deviceAddress, uint8_t* dataToSend,
  * device.
  * @return The number of bytes read (>= 0) or -1 on transfer abort.
  */
-int32_t HAL_ReadI2C(uint8_t port, uint8_t deviceAddress, uint8_t* buffer,
-                    uint8_t count) {
+int32_t HAL_ReadI2C(int32_t port, int32_t deviceAddress, uint8_t* buffer,
+                    int32_t count) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
@@ -159,7 +159,7 @@ int32_t HAL_ReadI2C(uint8_t port, uint8_t deviceAddress, uint8_t* buffer,
   }
 }
 
-void HAL_CloseI2C(uint8_t port) {
+void HAL_CloseI2C(int32_t port) {
   if (port > 1) {
     // Set port out of range error here
     return;

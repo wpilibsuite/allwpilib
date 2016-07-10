@@ -65,10 +65,10 @@ AnalogInput::~AnalogInput() {
  *
  * @return A sample straight from this channel.
  */
-int16_t AnalogInput::GetValue() const {
+int32_t AnalogInput::GetValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int16_t value = HAL_GetAnalogValue(m_port, &status);
+  int32_t value = HAL_GetAnalogValue(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -140,10 +140,10 @@ float AnalogInput::GetAverageVoltage() const {
  *
  * @return Least significant bit weight.
  */
-uint32_t AnalogInput::GetLSBWeight() const {
+int64_t AnalogInput::GetLSBWeight() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
+  int64_t lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return lsbWeight;
 }
@@ -184,7 +184,7 @@ uint32_t AnalogInput::GetChannel() const {
  *
  * @param bits Number of bits of averaging.
  */
-void AnalogInput::SetAverageBits(uint32_t bits) {
+void AnalogInput::SetAverageBits(int32_t bits) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogAverageBits(m_port, bits, &status);
@@ -199,7 +199,7 @@ void AnalogInput::SetAverageBits(uint32_t bits) {
  *
  * @return Number of bits of averaging previously configured.
  */
-uint32_t AnalogInput::GetAverageBits() const {
+int32_t AnalogInput::GetAverageBits() const {
   int32_t status = 0;
   int32_t averageBits = HAL_GetAnalogAverageBits(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -216,7 +216,7 @@ uint32_t AnalogInput::GetAverageBits() const {
  *
  * @param bits Number of bits of oversampling.
  */
-void AnalogInput::SetOversampleBits(uint32_t bits) {
+void AnalogInput::SetOversampleBits(int32_t bits) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogOversampleBits(m_port, bits, &status);
@@ -232,7 +232,7 @@ void AnalogInput::SetOversampleBits(uint32_t bits) {
  *
  * @return Number of bits of oversampling previously configured.
  */
-uint32_t AnalogInput::GetOversampleBits() const {
+int32_t AnalogInput::GetOversampleBits() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int32_t oversampleBits = HAL_GetAnalogOversampleBits(m_port, &status);
@@ -348,10 +348,10 @@ int64_t AnalogInput::GetAccumulatorValue() const {
  *
  * @return The number of times samples from the channel were accumulated.
  */
-uint32_t AnalogInput::GetAccumulatorCount() const {
+int64_t AnalogInput::GetAccumulatorCount() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  uint32_t count = HAL_GetAccumulatorCount(m_port, &status);
+  int64_t count = HAL_GetAccumulatorCount(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return count;
 }
@@ -365,7 +365,7 @@ uint32_t AnalogInput::GetAccumulatorCount() const {
  * @param value Reference to the 64-bit accumulated output.
  * @param count Reference to the number of accumulation cycles.
  */
-void AnalogInput::GetAccumulatorOutput(int64_t& value, uint32_t& count) const {
+void AnalogInput::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_GetAccumulatorOutput(m_port, &value, &count, &status);

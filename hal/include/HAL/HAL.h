@@ -21,7 +21,6 @@
 #include "DIO.h"
 #include "Errors.h"
 #include "FRC_NetworkCommunication/UsageReporting.h"
-#include "Handles.h"
 #include "I2C.h"
 #include "Interrupts.h"
 #include "Notifier.h"
@@ -34,6 +33,7 @@
 #include "SerialPort.h"
 #include "Solenoid.h"
 #include "Task.h"
+#include "Types.h"
 
 namespace HALUsageReporting = nUsageReporting;
 
@@ -104,48 +104,50 @@ struct HAL_JoystickDescriptor {
 };
 
 extern "C" {
-HAL_PortHandle HAL_GetPort(uint8_t pin);
-HAL_PortHandle HAL_GetPortWithModule(uint8_t module, uint8_t pin);
+HAL_PortHandle HAL_GetPort(int32_t pin);
+HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t pin);
 const char* HAL_GetErrorMessage(int32_t code);
 
-uint16_t HAL_GetFPGAVersion(int32_t* status);
-uint32_t HAL_GetFPGARevision(int32_t* status);
+int32_t HAL_GetFPGAVersion(int32_t* status);
+int64_t HAL_GetFPGARevision(int32_t* status);
 uint64_t HAL_GetFPGATime(int32_t* status);
 
-bool HAL_GetFPGAButton(int32_t* status);
+HAL_Bool HAL_GetFPGAButton(int32_t* status);
 
-int HAL_SetErrorData(const char* errors, int errorsLength, int wait_ms);
-int HAL_SendError(int isError, int32_t errorCode, int isLVCode,
-                  const char* details, const char* location,
-                  const char* callStack, int printMsg);
+int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
+                         int32_t wait_ms);
+int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
+                      const char* details, const char* location,
+                      const char* callStack, HAL_Bool printMsg);
 
-int HAL_GetControlWord(HAL_ControlWord* controlWord);
+int32_t HAL_GetControlWord(HAL_ControlWord* controlWord);
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status);
-int HAL_GetJoystickAxes(uint8_t joystickNum, HAL_JoystickAxes* axes);
-int HAL_GetJoystickPOVs(uint8_t joystickNum, HAL_JoystickPOVs* povs);
-int HAL_GetJoystickButtons(uint8_t joystickNum, HAL_JoystickButtons* buttons);
-int HAL_GetJoystickDescriptor(uint8_t joystickNum,
-                              HAL_JoystickDescriptor* desc);
-int HAL_GetJoystickIsXbox(uint8_t joystickNum);
-int HAL_GetJoystickType(uint8_t joystickNum);
-char* HAL_GetJoystickName(uint8_t joystickNum);
-int HAL_GetJoystickAxisType(uint8_t joystickNum, uint8_t axis);
-int HAL_SetJoystickOutputs(uint8_t joystickNum, uint32_t outputs,
-                           uint16_t leftRumble, uint16_t rightRumble);
+int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes);
+int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
+int32_t HAL_GetJoystickButtons(int32_t joystickNum,
+                               HAL_JoystickButtons* buttons);
+int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
+                                  HAL_JoystickDescriptor* desc);
+HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum);
+int32_t HAL_GetJoystickType(int32_t joystickNum);
+char* HAL_GetJoystickName(int32_t joystickNum);
+int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis);
+int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
+                               int32_t leftRumble, int32_t rightRumble);
 float HAL_GetMatchTime(int32_t* status);
 
 void HAL_WaitForDSData();
 
-bool HAL_GetSystemActive(int32_t* status);
-bool HAL_GetBrownedOut(int32_t* status);
+HAL_Bool HAL_GetSystemActive(int32_t* status);
+HAL_Bool HAL_GetBrownedOut(int32_t* status);
 
-int HAL_Initialize(int mode = 0);
+int32_t HAL_Initialize(int32_t mode = 0);
 void HAL_ObserveUserProgramStarting();
 void HAL_ObserveUserProgramDisabled();
 void HAL_ObserveUserProgramAutonomous();
 void HAL_ObserveUserProgramTeleop();
 void HAL_ObserveUserProgramTest();
 
-uint32_t HAL_Report(uint8_t resource, uint8_t instanceNumber,
-                    uint8_t context = 0, const char* feature = nullptr);
+int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
+                   int32_t context = 0, const char* feature = nullptr);
 }
