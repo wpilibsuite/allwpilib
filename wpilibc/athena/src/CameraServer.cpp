@@ -41,9 +41,9 @@ CameraServer::CameraServer()
 
 void CameraServer::FreeImageData(
     std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData) {
-  if (std::get<3>(imageData))
+  if (std::get<3>(imageData)) {
     imaqDispose(std::get<0>(imageData));
-  else if (std::get<0>(imageData) != nullptr) {
+  } else if (std::get<0>(imageData) != nullptr) {
     std::lock_guard<priority_recursive_mutex> lock(m_imageMutex);
     m_dataPool.push_back(std::get<0>(imageData));
   }

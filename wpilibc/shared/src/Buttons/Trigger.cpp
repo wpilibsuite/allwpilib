@@ -14,15 +14,13 @@
 #include "Buttons/ToggleButtonScheduler.h"
 
 bool Trigger::Grab() {
-  if (Get())
+  if (Get()) {
     return true;
-  else if (m_table != nullptr) {
-    // if (m_table->isConnected())//TODO is connected on button?
+  } else if (m_table != nullptr) {
     return m_table->GetBoolean("pressed", false);
-    /*else
-            return false;*/
-  } else
+  } else {
     return false;
+  }
 }
 
 void Trigger::WhenActive(Command* command) {

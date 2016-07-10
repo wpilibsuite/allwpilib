@@ -342,10 +342,10 @@ int HAL_Initialize(int mode) {
         if (mode == 0) {
           std::cout << "FRC pid " << pid
                     << " did not die within 110ms. Aborting" << std::endl;
-          return 0;            // just fail
-        } else if (mode == 1)  // kill -9 it
+          return 0;              // just fail
+        } else if (mode == 1) {  // kill -9 it
           kill(pid, SIGKILL);
-        else {
+        } else {
           std::cout << "WARNING: FRC pid " << pid
                     << " did not die within 110ms." << std::endl;
         }

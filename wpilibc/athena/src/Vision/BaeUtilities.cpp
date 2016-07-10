@@ -316,9 +316,9 @@ int processFile(char* inputFile, char* outputString, int lineNumber) {
       if (inputStr[0] == '#' || inputStr[0] == '!') continue;
 
       lineCount++;
-      if (lineNumber == 0)
+      if (lineNumber == 0) {
         continue;
-      else {
+      } else {
         if (lineCount == lineNumber) break;
       }
     }

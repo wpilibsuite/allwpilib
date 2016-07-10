@@ -51,8 +51,9 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle port_handle,
   analog_port->pin = static_cast<uint8_t>(pin);
   if (HAL_IsAccumulatorChannel(handle, status)) {
     analog_port->accumulator = tAccumulator::create(pin, status);
-  } else
+  } else {
     analog_port->accumulator = nullptr;
+  }
 
   // Set default configuration
   analogInputSystem->writeScanList(pin, pin, status);

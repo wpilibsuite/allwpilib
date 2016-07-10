@@ -159,8 +159,9 @@ int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size) {
     auto dataToSend = new uint8_t[size];
     std::memset(dataToSend, 0, size);
     retVal = HAL_TransactionSPI(m_port, dataToSend, dataReceived, size);
-  } else
+  } else {
     retVal = HAL_ReadSPI(m_port, dataReceived, size);
+  }
   return retVal;
 }
 

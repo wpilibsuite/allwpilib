@@ -667,13 +667,13 @@ void CANJaguar::verify() {
   if (!m_pVerified) {
     uint32_t message = 0;
 
-    if (m_controlMode == kSpeed)
+    if (m_controlMode == kSpeed) {
       message = LM_API_SPD_PC;
-    else if (m_controlMode == kPosition)
+    } else if (m_controlMode == kPosition) {
       message = LM_API_POS_PC;
-    else if (m_controlMode == kCurrent)
+    } else if (m_controlMode == kCurrent) {
       message = LM_API_ICTRL_PC;
-    else {
+    } else {
       wpi_setWPIErrorWithContext(
           IncompatibleMode,
           "PID constants only apply in Speed, Position, and Current mode");
@@ -697,13 +697,13 @@ void CANJaguar::verify() {
   if (!m_iVerified) {
     uint32_t message = 0;
 
-    if (m_controlMode == kSpeed)
+    if (m_controlMode == kSpeed) {
       message = LM_API_SPD_IC;
-    else if (m_controlMode == kPosition)
+    } else if (m_controlMode == kPosition) {
       message = LM_API_POS_IC;
-    else if (m_controlMode == kCurrent)
+    } else if (m_controlMode == kCurrent) {
       message = LM_API_ICTRL_IC;
-    else {
+    } else {
       wpi_setWPIErrorWithContext(
           IncompatibleMode,
           "PID constants only apply in Speed, Position, and Current mode");
@@ -727,13 +727,13 @@ void CANJaguar::verify() {
   if (!m_dVerified) {
     uint32_t message = 0;
 
-    if (m_controlMode == kSpeed)
+    if (m_controlMode == kSpeed) {
       message = LM_API_SPD_DC;
-    else if (m_controlMode == kPosition)
+    } else if (m_controlMode == kPosition) {
       message = LM_API_POS_DC;
-    else if (m_controlMode == kCurrent)
+    } else if (m_controlMode == kCurrent) {
       message = LM_API_ICTRL_DC;
-    else {
+    } else {
       wpi_setWPIErrorWithContext(
           IncompatibleMode,
           "PID constants only apply in Speed, Position, and Current mode");
@@ -807,9 +807,9 @@ void CANJaguar::verify() {
                    &dataSize)) {
       LimitMode mode = (LimitMode)dataBuffer[0];
 
-      if (mode == m_limitMode)
+      if (mode == m_limitMode) {
         m_limitModeVerified = true;
-      else {
+      } else {
         // It's wrong - set it again
         ConfigLimitMode(m_limitMode);
       }
@@ -824,9 +824,9 @@ void CANJaguar::verify() {
                    &dataSize)) {
       double limit = unpackFXP16_16(dataBuffer);
 
-      if (FXP16_EQ(limit, m_forwardLimit))
+      if (FXP16_EQ(limit, m_forwardLimit)) {
         m_forwardLimitVerified = true;
-      else {
+      } else {
         // It's wrong - set it again
         ConfigForwardLimit(m_forwardLimit);
       }
@@ -841,9 +841,9 @@ void CANJaguar::verify() {
                    &dataSize)) {
       double limit = unpackFXP16_16(dataBuffer);
 
-      if (FXP16_EQ(limit, m_reverseLimit))
+      if (FXP16_EQ(limit, m_reverseLimit)) {
         m_reverseLimitVerified = true;
-      else {
+      } else {
         // It's wrong - set it again
         ConfigReverseLimit(m_reverseLimit);
       }
@@ -861,9 +861,9 @@ void CANJaguar::verify() {
       // The returned max output voltage is sometimes slightly higher or
       // lower than what was sent.  This should not trigger resending
       // the message.
-      if (std::abs(voltage - m_maxOutputVoltage) < 0.1)
+      if (std::abs(voltage - m_maxOutputVoltage) < 0.1) {
         m_maxOutputVoltageVerified = true;
-      else {
+      } else {
         // It's wrong - set it again
         ConfigMaxOutputVoltage(m_maxOutputVoltage);
       }
@@ -879,9 +879,9 @@ void CANJaguar::verify() {
                      &dataSize)) {
         double rate = unpackPercentage(dataBuffer);
 
-        if (FXP16_EQ(rate, m_voltageRampRate))
+        if (FXP16_EQ(rate, m_voltageRampRate)) {
           m_voltageRampRateVerified = true;
-        else {
+        } else {
           // It's wrong - set it again
           SetVoltageRampRate(m_voltageRampRate);
         }
@@ -894,9 +894,9 @@ void CANJaguar::verify() {
                      &dataSize)) {
         double rate = unpackFXP8_8(dataBuffer);
 
-        if (FXP8_EQ(rate, m_voltageRampRate))
+        if (FXP8_EQ(rate, m_voltageRampRate)) {
           m_voltageRampRateVerified = true;
-        else {
+        } else {
           // It's wrong - set it again
           SetVoltageRampRate(m_voltageRampRate);
         }
@@ -912,9 +912,9 @@ void CANJaguar::verify() {
                    &dataSize)) {
       uint16_t faultTime = unpackint16_t(dataBuffer);
 
-      if ((uint16_t)(m_faultTime * 1000.0) == faultTime)
+      if ((uint16_t)(m_faultTime * 1000.0) == faultTime) {
         m_faultTimeVerified = true;
-      else {
+      } else {
         // It's wrong - set it again
         ConfigFaultTime(m_faultTime);
       }
