@@ -100,8 +100,6 @@ public class DriverStation implements RobotState.Interface {
   private boolean m_userInTest = false;
   private boolean m_updatedControlLoopData;
   private boolean m_newControlData;
-  private final long m_packetDataAvailableMutex;
-  private final long m_packetDataAvailableSem;
 
   /**
    * Gets an instance of the DriverStation
@@ -132,10 +130,6 @@ public class DriverStation implements RobotState.Interface {
       m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
     }
 
-    m_packetDataAvailableMutex = HALUtil.initializeMutexNormal();
-    m_packetDataAvailableSem = HALUtil.initializeMultiWait();
-    HAL.setNewDataSem(m_packetDataAvailableSem);
-
     m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");
     m_thread.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY) / 2);
 
@@ -155,7 +149,7 @@ public class DriverStation implements RobotState.Interface {
   private void task() {
     int safetyCounter = 0;
     while (m_threadKeepAlive) {
-      HALUtil.takeMultiWait(m_packetDataAvailableSem, m_packetDataAvailableMutex);
+      HAL.waitForDSData();
       getData();
       synchronized (m_dataSem) {
         m_updatedControlLoopData = true;

@@ -54,9 +54,6 @@ DriverStation::DriverStation() {
     m_joystickDescriptorCache[i].type = -1;
     m_joystickDescriptorCache[i].name[0] = '\0';
   }
-  // Register that semaphore with the network communications task.
-  // It will signal when new packet data is available.
-  HAL_SetNewDataSem(&m_packetDataAvailableCond);
 
   m_task = Task("DriverStation", &DriverStation::Run, this);
 }
@@ -64,19 +61,13 @@ DriverStation::DriverStation() {
 DriverStation::~DriverStation() {
   m_isRunning = false;
   m_task.join();
-
-  // Unregister our semaphore.
-  HAL_SetNewDataSem(nullptr);
 }
 
 void DriverStation::Run() {
   m_isRunning = true;
   int period = 0;
   while (m_isRunning) {
-    {
-      std::unique_lock<priority_mutex> lock(m_packetDataAvailableMutex);
-      m_packetDataAvailableCond.wait(lock);
-    }
+    HAL_WaitForDSData();
     GetData();
     {
       std::lock_guard<priority_mutex> lock(m_waitForDataMutex);

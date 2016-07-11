@@ -274,14 +274,12 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickAxisType(JNIEnv*, jclass,
 
 /*
  * Class: edu_wpi_first_wpilibj_hal_HAL
- * Method:    HALSetNewDataSem
- * Signature: (J)V
+ * Method:    HAL_waitForDSData
+ * Signature: ()V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_HAL_setNewDataSem(JNIEnv* env, jclass,
-                                                 jlong id) {
-  NETCOMM_LOG(logDEBUG) << "Mutex Ptr = " << (void *)id;
-  HAL_SetNewDataSem((MULTIWAIT_ID)id);
+Java_edu_wpi_first_wpilibj_hal_HAL_waitForDSData(JNIEnv* env, jclass) {
+  HAL_WaitForDSData();
 }
 
 /*

@@ -7,6 +7,7 @@
 
 #include "HAL/HAL.h"
 
+#include <cstdlib>
 #include <cstring>
 
 #include "FRC_NetworkCommunication/FRCComm.h"
@@ -22,10 +23,6 @@ int HAL_GetControlWord(HAL_ControlWord* controlWord) {
   std::memset(controlWord, 0, sizeof(HAL_ControlWord));
   return FRC_NetworkCommunication_getControlWord(
       reinterpret_cast<ControlWord_t*>(controlWord));
-}
-
-void HAL_SetNewDataSem(MULTIWAIT_ID sem) {
-  setNewDataSem(sem->native_handle());
 }
 
 HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
