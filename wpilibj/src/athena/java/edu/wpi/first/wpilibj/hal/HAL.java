@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.hal.JNIWrapper;
  */
 @SuppressWarnings({"AbbreviationAsWordInName", "MethodName"})
 public class HAL extends JNIWrapper {
-  public static native void setNewDataSem(long mutexId);
+  public static native void waitForDSData();
 
   public static native int initialize(int mode);
 

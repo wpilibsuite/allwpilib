@@ -31,7 +31,6 @@
 #include "Power.h"
 #include "Relay.h"
 #include "SPI.h"
-#include "Semaphore.h"
 #include "SerialPort.h"
 #include "Solenoid.h"
 #include "Task.h"
@@ -135,7 +134,7 @@ int HAL_SetJoystickOutputs(uint8_t joystickNum, uint32_t outputs,
                            uint16_t leftRumble, uint16_t rightRumble);
 float HAL_GetMatchTime(int32_t* status);
 
-void HAL_SetNewDataSem(MULTIWAIT_ID sem);
+void HAL_WaitForDSData();
 
 bool HAL_GetSystemActive(int32_t* status);
 bool HAL_GetBrownedOut(int32_t* status);

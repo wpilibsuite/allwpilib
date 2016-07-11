@@ -23,6 +23,8 @@
 #include "FRC_NetworkCommunication/FRCComm.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/Errors.h"
+#include "HAL/cpp/priority_condition_variable.h"
+#include "HAL/cpp/priority_mutex.h"
 #include "ctre/ctre.h"
 #include "handles/HandlesInternal.h"
 #include "visa/visa.h"
@@ -35,6 +37,9 @@ static priority_mutex msgMutex;
 static uint32_t timeEpoch = 0;
 static uint32_t prevFPGATime = 0;
 static HAL_NotifierHandle rolloverNotifier = 0;
+
+static priority_condition_variable newDSDataAvailableCond;
+static priority_mutex newDSDataAvailableMutex;
 
 using namespace hal;
 
@@ -284,6 +289,9 @@ bool HAL_GetBrownedOut(int32_t* status) {
 static void HALCleanupAtExit() {
   global = nullptr;
   watchdog = nullptr;
+
+  // Unregister our new data condition variable.
+  setNewDataSem(nullptr);
 }
 
 static void timerRollover(uint64_t currentTime, void*) {
@@ -291,6 +299,14 @@ static void timerRollover(uint64_t currentTime, void*) {
   int32_t status = 0;
   HAL_UpdateNotifierAlarm(rolloverNotifier, currentTime + 0x80000000ULL,
                           &status);
+}
+
+/**
+ * Waits for the newest DS packet to arrive. Note that this is a blocking call.
+ */
+void HAL_WaitForDSData() {
+  std::unique_lock<priority_mutex> lock(newDSDataAvailableMutex);
+  newDSDataAvailableCond.wait(lock);
 }
 
 /**
@@ -359,6 +375,9 @@ int HAL_Initialize(int mode) {
   pid = getpid();
   fs << pid << std::endl;
   fs.close();
+
+  //  Set our DS new data condition variable.
+  setNewDataSem(newDSDataAvailableCond.native_handle());
 
   return 1;
 }
