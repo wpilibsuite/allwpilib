@@ -1,25 +1,47 @@
 #!/usr/bin/env python3
 
-# This script runs all formatting tasks on the code base.
-#
-# Passing "-v" as an argument enables verbosity. Otherwise, this script takes no
-# arguments. This should be invoked from either the styleguide directory or the
-# root directory of the project.
-
+import argparse
+import multiprocessing
 import os
+import queue
 import subprocess
 import sys
+from threading import Lock
+from threading import Thread
 
 from clangformat import ClangFormat
 from licenseupdate import LicenseUpdate
 from newline import Newline
 from whitespace import Whitespace
+from lint import Lint
 from task import Task
 
 # Check that the current directory is part of a Git repository
 def inGitRepo(directory):
     ret = subprocess.run(["git", "rev-parse"], stderr = subprocess.DEVNULL)
     return ret.returncode == 0
+
+def threadFunc(workQueue, isVerbose, printLock):
+    # Lint is run last since previous tasks can affect its output
+    tasks = [ClangFormat(), LicenseUpdate(), Newline(), Whitespace(), Lint()]
+
+    try:
+        while True:
+            name = workQueue.get_nowait()
+
+            if isVerbose:
+                printLock.acquire()
+                print("Processing", name,)
+                for task in tasks:
+                    if task.fileMatchesExtension(name):
+                        print("  with " + type(task).__name__)
+                printLock.release()
+
+            for task in tasks:
+                if task.fileMatchesExtension(name):
+                    task.run(name)
+    except queue.Empty:
+        pass
 
 def main():
     if not inGitRepo("."):
@@ -33,6 +55,13 @@ def main():
     else:
         configPath = "."
 
+    # Delete temporary files from previous incomplete run
+    files = [os.path.join(dp, f) for dp, dn, fn in
+             os.walk(os.path.expanduser(configPath)) for f in fn]
+    for f in files:
+        if f.endswith(".tmp"):
+            os.remove(f)
+
     # Recursively create list of files in given directory
     files = [os.path.join(dp, f) for dp, dn, fn in
              os.walk(os.path.expanduser(configPath)) for f in fn]
@@ -44,23 +73,35 @@ def main():
     # Don't format generated files
     files = [name for name in files if Task.notGeneratedFile(name)]
 
-    clangFormat = ClangFormat()
-    licenseUpdate = LicenseUpdate()
-    newline = Newline()
-    whitespace = Whitespace()
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description = "Runs all formatting tasks on the code base. This should be invoked from either the styleguide directory or the root directory of the project.")
+    parser.add_argument("-v", dest = "verbose", action = "store_true",
+                        help = "enable output verbosity")
+    parser.add_argument("-j", dest = "jobs", type = int,
+                        default = multiprocessing.cpu_count(),
+                        help = "number of jobs to run (default is number of cores)")
+    args = parser.parse_args()
+    jobs = args.jobs
+    isVerbose = args.verbose
 
-    # Check for verbose flag
-    isVerbose = len(sys.argv) > 1 and sys.argv[1] == "-v"
+    # Add files to work queue
+    workQueue = queue.Queue()
+    for file in files:
+        workQueue.put(file)
 
-    for name in files:
-        if isVerbose:
-            print("Processing", name,)
+    threads = []
+    printLock = Lock()
 
-        for task in [clangFormat, licenseUpdate, newline, whitespace]:
-            if task.fileMatchesExtension(name):
-                if isVerbose:
-                    print("  with " + type(task).__name__)
-                task.run(name)
+    # Start worker threads
+    for i in range(0, jobs):
+        thread = Thread(target = threadFunc,
+                        args = (workQueue, isVerbose, printLock))
+        thread.start()
+        threads.append(thread)
+
+    # Wait for worker threads to finish
+    for i in range(0, jobs):
+        threads[i].join()
 
 if __name__ == "__main__":
     main()
