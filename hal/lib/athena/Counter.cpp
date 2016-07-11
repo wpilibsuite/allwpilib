@@ -265,7 +265,7 @@ void HAL_SetCounterSemiPeriodMode(HAL_CounterHandle counter_handle,
  * opposite direction.  Units are seconds.
  */
 void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counter_handle,
-                                   float threshold, int32_t* status) {
+                                   double threshold, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -347,7 +347,7 @@ int32_t HAL_GetCounter(HAL_CounterHandle counter_handle, int32_t* status) {
  * velocity calculations to determine shaft speed.
  * @returns The period of the last two pulses in units of seconds.
  */
-float HAL_GetCounterPeriod(HAL_CounterHandle counter_handle, int32_t* status) {
+double HAL_GetCounterPeriod(HAL_CounterHandle counter_handle, int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -365,8 +365,8 @@ float HAL_GetCounterPeriod(HAL_CounterHandle counter_handle, int32_t* status) {
     period = static_cast<double>(output.Period << 1) /
              static_cast<double>(output.Count);
   }
-  return static_cast<float>(period *
-                            2.5e-8);  // result * timebase (currently 25ns)
+  return static_cast<double>(period *
+                             2.5e-8);  // result * timebase (currently 25ns)
 }
 
 /**
@@ -377,7 +377,7 @@ float HAL_GetCounterPeriod(HAL_CounterHandle counter_handle, int32_t* status) {
  * @param maxPeriod The maximum period where the counted device is considered
  * moving in seconds.
  */
-void HAL_SetCounterMaxPeriod(HAL_CounterHandle counter_handle, float maxPeriod,
+void HAL_SetCounterMaxPeriod(HAL_CounterHandle counter_handle, double maxPeriod,
                              int32_t* status) {
   auto counter = counterHandles.Get(counter_handle);
   if (counter == nullptr) {

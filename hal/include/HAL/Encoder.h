@@ -36,19 +36,20 @@ int32_t HAL_GetEncoderRaw(HAL_EncoderHandle encoder_handle, int32_t* status);
 int32_t HAL_GetEncoderEncodingScale(HAL_EncoderHandle encoder_handle,
                                     int32_t* status);
 void HAL_ResetEncoder(HAL_EncoderHandle encoder_handle, int32_t* status);
-float HAL_GetEncoderPeriod(HAL_EncoderHandle encoder_handle, int32_t* status);
-void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoder_handle, float maxPeriod,
+double HAL_GetEncoderPeriod(HAL_EncoderHandle encoder_handle, int32_t* status);
+void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoder_handle, double maxPeriod,
                              int32_t* status);
 HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoder_handle,
                                int32_t* status);
 HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoder_handle,
                                  int32_t* status);
-float HAL_GetEncoderDistance(HAL_EncoderHandle encoder_handle, int32_t* status);
-float HAL_GetEncoderRate(HAL_EncoderHandle encoder_handle, int32_t* status);
-void HAL_SetEncoderMinRate(HAL_EncoderHandle encoder_handle, float minRate,
+double HAL_GetEncoderDistance(HAL_EncoderHandle encoder_handle,
+                              int32_t* status);
+double HAL_GetEncoderRate(HAL_EncoderHandle encoder_handle, int32_t* status);
+void HAL_SetEncoderMinRate(HAL_EncoderHandle encoder_handle, double minRate,
                            int32_t* status);
 void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoder_handle,
-                                    float distancePerPulse, int32_t* status);
+                                    double distancePerPulse, int32_t* status);
 void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoder_handle,
                                     HAL_Bool reverseDirection, int32_t* status);
 void HAL_SetEncoderSamplesToAverage(HAL_EncoderHandle encoder_handle,
@@ -64,11 +65,11 @@ void HAL_SetEncoderIndexSource(HAL_EncoderHandle encoder_handle,
 int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoder_handle,
                                 int32_t* status);
 
-float HAL_GetEncoderDecodingScaleFactor(HAL_EncoderHandle encoder_handle,
-                                        int32_t* status);
+double HAL_GetEncoderDecodingScaleFactor(HAL_EncoderHandle encoder_handle,
+                                         int32_t* status);
 
-float HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoder_handle,
-                                     int32_t* status);
+double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoder_handle,
+                                      int32_t* status);
 
 HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
     HAL_EncoderHandle encoder_handle, int32_t* status);

@@ -23,53 +23,53 @@ void HAL_InitializePDP(int32_t module) {
   }
 }
 
-float HAL_GetPDPTemperature(int32_t module, int32_t* status) {
+double HAL_GetPDPTemperature(int32_t module, int32_t* status) {
   double temperature;
 
   *status = pdp[module]->GetTemperature(temperature);
 
-  return static_cast<float>(temperature);
+  return temperature;
 }
 
-float HAL_GetPDPVoltage(int32_t module, int32_t* status) {
+double HAL_GetPDPVoltage(int32_t module, int32_t* status) {
   double voltage;
 
   *status = pdp[module]->GetVoltage(voltage);
 
-  return static_cast<float>(voltage);
+  return voltage;
 }
 
-float HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
-                               int32_t* status) {
+double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
+                                int32_t* status) {
   double current;
 
   *status = pdp[module]->GetChannelCurrent(channel, current);
 
-  return static_cast<float>(current);
+  return current;
 }
 
-float HAL_GetPDPTotalCurrent(int32_t module, int32_t* status) {
+double HAL_GetPDPTotalCurrent(int32_t module, int32_t* status) {
   double current;
 
   *status = pdp[module]->GetTotalCurrent(current);
 
-  return static_cast<float>(current);
+  return current;
 }
 
-float HAL_GetPDPTotalPower(int32_t module, int32_t* status) {
+double HAL_GetPDPTotalPower(int32_t module, int32_t* status) {
   double power;
 
   *status = pdp[module]->GetTotalPower(power);
 
-  return static_cast<float>(power);
+  return power;
 }
 
-float HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) {
+double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) {
   double energy;
 
   *status = pdp[module]->GetTotalEnergy(energy);
 
-  return static_cast<float>(energy);
+  return energy;
 }
 
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status) {

@@ -23,10 +23,10 @@ void HAL_ResetFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
                           int32_t* status);
 int32_t HAL_GetFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
                            int32_t* status);  // Raw value
-float HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
-                               int32_t* status);
+double HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                int32_t* status);
 void HAL_SetFPGAEncoderMaxPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
-                                 float maxPeriod, int32_t* status);
+                                 double maxPeriod, int32_t* status);
 HAL_Bool HAL_GetFPGAEncoderStopped(HAL_FPGAEncoderHandle fpga_encoder_handle,
                                    int32_t* status);
 HAL_Bool HAL_GetFPGAEncoderDirection(HAL_FPGAEncoderHandle fpga_encoder_handle,

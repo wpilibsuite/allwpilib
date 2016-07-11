@@ -64,7 +64,7 @@ void HAL_SetSerialFlowControl(int32_t port, int32_t flow, int32_t* status) {
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialTimeout(int32_t port, float timeout, int32_t* status) {
+void HAL_SetSerialTimeout(int32_t port, double timeout, int32_t* status) {
   *status = viSetAttribute(m_portHandle[port], VI_ATTR_TMO_VALUE,
                            (uint32_t)(timeout * 1e3));
   if (*status > 0) *status = 0;

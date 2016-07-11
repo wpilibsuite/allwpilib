@@ -11,13 +11,13 @@
 
 extern "C" {
 void HAL_InitializePDP(int32_t module);
-float HAL_GetPDPTemperature(int32_t module, int32_t* status);
-float HAL_GetPDPVoltage(int32_t module, int32_t* status);
-float HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
-                               int32_t* status);
-float HAL_GetPDPTotalCurrent(int32_t module, int32_t* status);
-float HAL_GetPDPTotalPower(int32_t module, int32_t* status);
-float HAL_GetPDPTotalEnergy(int32_t module, int32_t* status);
+double HAL_GetPDPTemperature(int32_t module, int32_t* status);
+double HAL_GetPDPVoltage(int32_t module, int32_t* status);
+double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
+                                int32_t* status);
+double HAL_GetPDPTotalCurrent(int32_t module, int32_t* status);
+double HAL_GetPDPTotalPower(int32_t module, int32_t* status);
+double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status);
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status);
 void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status);
 }

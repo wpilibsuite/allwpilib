@@ -9,6 +9,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 
 #include "FRC_NetworkCommunication/FRCComm.h"
 

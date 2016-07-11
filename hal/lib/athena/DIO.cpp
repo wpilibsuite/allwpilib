@@ -133,7 +133,7 @@ void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status) {
  *
  * @param rate The frequency to output all digital output PWM signals.
  */
-void HAL_SetDigitalPWMRate(float rate, int32_t* status) {
+void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   // Currently rounding in the log rate domain... heavy weight toward picking a
   // higher freq.
   // TODO: Round in the linear rate domain.
@@ -151,7 +151,7 @@ void HAL_SetDigitalPWMRate(float rate, int32_t* status) {
  * @param dutyCycle The percent duty cycle to output [0..1].
  */
 void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
-                                float dutyCycle, int32_t* status) {
+                                double dutyCycle, int32_t* status) {
   auto port = digitalPWMHandles.Get(pwmGenerator);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -160,7 +160,7 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
   int32_t id = *port;
   if (dutyCycle > 1.0) dutyCycle = 1.0;
   if (dutyCycle < 0.0) dutyCycle = 0.0;
-  float rawDutyCycle = 256.0f * dutyCycle;
+  double rawDutyCycle = 256.0 * dutyCycle;
   if (rawDutyCycle > 255.5) rawDutyCycle = 255.5;
   {
     std::lock_guard<priority_recursive_mutex> sync(digitalPwmMutex);
@@ -168,8 +168,7 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
     if (pwmPeriodPower < 4) {
       // The resolution of the duty cycle drops close to the highest
       // frequencies.
-      rawDutyCycle =
-          rawDutyCycle / std::pow(2.0f, static_cast<float>(4 - pwmPeriodPower));
+      rawDutyCycle = rawDutyCycle / std::pow(2.0, 4 - pwmPeriodPower);
     }
     if (id < 4)
       digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
@@ -315,7 +314,7 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dio_port_handle,
  * @param channel The Digital Output channel that the pulse should be output on
  * @param pulseLength The active length of the pulse (in seconds)
  */
-void HAL_Pulse(HAL_DigitalHandle dio_port_handle, float pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dio_port_handle, double pulseLength,
                int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HAL_HandleEnum::DIO);
   if (port == nullptr) {

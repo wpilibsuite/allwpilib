@@ -164,7 +164,7 @@ static uint8_t readRegister(Register reg) {
  * Convert a 12-bit raw acceleration value into a scaled double in units of
  * 1 g-force, taking into account the accelerometer range.
  */
-static float unpackAxis(int16_t raw) {
+static double unpackAxis(int16_t raw) {
   // The raw value is actually 12 bits, not 16, so we need to propogate the
   // 2's complement sign bit to the unused 4 bits for this to work with
   // negative numbers.
@@ -173,13 +173,13 @@ static float unpackAxis(int16_t raw) {
 
   switch (accelerometerRange) {
     case HAL_AccelerometerRange_k2G:
-      return raw / 1024.0f;
+      return raw / 1024.0;
     case HAL_AccelerometerRange_k4G:
-      return raw / 512.0f;
+      return raw / 512.0;
     case HAL_AccelerometerRange_k8G:
-      return raw / 256.0f;
+      return raw / 256.0;
     default:
-      return 0.0f;
+      return 0.0;
   }
 }
 
@@ -216,7 +216,7 @@ void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
  *
  * This is a floating point value in units of 1 g-force
  */
-float HAL_GetAccelerometerX() {
+double HAL_GetAccelerometerX() {
   initializeAccelerometer();
 
   int raw =
@@ -229,7 +229,7 @@ float HAL_GetAccelerometerX() {
  *
  * This is a floating point value in units of 1 g-force
  */
-float HAL_GetAccelerometerY() {
+double HAL_GetAccelerometerY() {
   initializeAccelerometer();
 
   int raw =
@@ -242,7 +242,7 @@ float HAL_GetAccelerometerY() {
  *
  * This is a floating point value in units of 1 g-force
  */
-float HAL_GetAccelerometerZ() {
+double HAL_GetAccelerometerZ() {
   initializeAccelerometer();
 
   int raw =

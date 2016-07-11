@@ -27,7 +27,7 @@ void HAL_SetAnalogTriggerLimitsRaw(
     HAL_AnalogTriggerHandle analog_trigger_handle, int32_t lower, int32_t upper,
     int32_t* status);
 void HAL_SetAnalogTriggerLimitsVoltage(
-    HAL_AnalogTriggerHandle analog_trigger_handle, float lower, float upper,
+    HAL_AnalogTriggerHandle analog_trigger_handle, double lower, double upper,
     int32_t* status);
 void HAL_SetAnalogTriggerAveraged(HAL_AnalogTriggerHandle analog_trigger_handle,
                                   HAL_Bool useAveragedValue, int32_t* status);

@@ -96,7 +96,7 @@ HAL_Bool HAL_CheckAnalogInputChannel(int32_t pin) {
  *
  * @param samplesPerSecond The number of samples per channel per second.
  */
-void HAL_SetAnalogSampleRate(float samplesPerSecond, int32_t* status) {
+void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need float comparison with epsilon.
   // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
@@ -104,7 +104,7 @@ void HAL_SetAnalogSampleRate(float samplesPerSecond, int32_t* status) {
 
   // Compute the convert rate
   uint32_t ticksPerSample =
-      static_cast<uint32_t>(static_cast<float>(kTimebase) / samplesPerSecond);
+      static_cast<uint32_t>(static_cast<double>(kTimebase) / samplesPerSecond);
   uint32_t ticksPerConversion =
       ticksPerSample / getAnalogNumChannelsToActivate(status);
   // ticksPerConversion must be at least 80
@@ -132,11 +132,11 @@ void HAL_SetAnalogSampleRate(float samplesPerSecond, int32_t* status) {
  *
  * @return Sample rate.
  */
-float HAL_GetAnalogSampleRate(int32_t* status) {
+double HAL_GetAnalogSampleRate(int32_t* status) {
   uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
   uint32_t ticksPerSample =
       ticksPerConversion * getAnalogNumActiveChannels(status);
-  return static_cast<float>(kTimebase) / static_cast<float>(ticksPerSample);
+  return static_cast<double>(kTimebase) / static_cast<double>(ticksPerSample);
 }
 
 /**
@@ -291,12 +291,12 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return A scaled sample straight from the channel on this module.
  */
-float HAL_GetAnalogVoltage(HAL_AnalogInputHandle analog_port_handle,
-                           int32_t* status) {
+double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analog_port_handle,
+                            int32_t* status) {
   int32_t value = HAL_GetAnalogValue(analog_port_handle, status);
   int64_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
   int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
-  float voltage = LSBWeight * 1.0e-9f * value - offset * 1.0e-9f;
+  double voltage = LSBWeight * 1.0e-9 * value - offset * 1.0e-9;
   return voltage;
 }
 
@@ -313,15 +313,15 @@ float HAL_GetAnalogVoltage(HAL_AnalogInputHandle analog_port_handle,
  * @return A scaled sample from the output of the oversample and average engine
  * for the channel.
  */
-float HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analog_port_handle,
-                                  int32_t* status) {
+double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analog_port_handle,
+                                   int32_t* status) {
   int32_t value = HAL_GetAnalogAverageValue(analog_port_handle, status);
   int64_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
   int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
   int32_t oversampleBits =
       HAL_GetAnalogOversampleBits(analog_port_handle, status);
-  float voltage =
-      LSBWeight * 1.0e-9 * value / static_cast<float>(1 << oversampleBits) -
+  double voltage =
+      LSBWeight * 1.0e-9 * value / static_cast<double>(1 << oversampleBits) -
       offset * 1.0e-9;
   return voltage;
 }
@@ -339,7 +339,7 @@ float HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analog_port_handle,
  * @return The raw value for the channel.
  */
 int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analog_port_handle,
-                                  float voltage, int32_t* status) {
+                                  double voltage, int32_t* status) {
   if (voltage > 5.0) {
     voltage = 5.0;
     *status = VOLTAGE_OUT_OF_RANGE;
@@ -350,8 +350,8 @@ int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analog_port_handle,
   }
   int64_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
   int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
-  int32_t value = static_cast<int32_t>((voltage + offset * 1.0e-9f) /
-                                       (LSBWeight * 1.0e-9f));
+  int32_t value =
+      static_cast<int32_t>((voltage + offset * 1.0e-9) / (LSBWeight * 1.0e-9));
   return value;
 }
 

@@ -98,8 +98,8 @@ HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressor_handle,
   return value;
 }
 
-float HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
-                               int32_t* status) {
+double HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
+                                int32_t* status) {
   int16_t index =
       getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {

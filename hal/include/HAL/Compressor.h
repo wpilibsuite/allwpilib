@@ -25,8 +25,8 @@ HAL_Bool HAL_GetCompressorClosedLoopControl(
 
 HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressor_handle,
                                          int32_t* status);
-float HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
-                               int32_t* status);
+double HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
+                                int32_t* status);
 
 HAL_Bool HAL_GetCompressorCurrentTooHighFault(
     HAL_CompressorHandle compressor_handle, int32_t* status);

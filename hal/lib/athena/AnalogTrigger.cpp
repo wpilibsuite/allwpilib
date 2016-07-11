@@ -89,7 +89,7 @@ void HAL_SetAnalogTriggerLimitsRaw(
  * The limits are given as floating point voltage values.
  */
 void HAL_SetAnalogTriggerLimitsVoltage(
-    HAL_AnalogTriggerHandle analog_trigger_handle, float lower, float upper,
+    HAL_AnalogTriggerHandle analog_trigger_handle, double lower, double upper,
     int32_t* status) {
   auto trigger = analogTriggerHandles.Get(analog_trigger_handle);
   if (trigger == nullptr) {

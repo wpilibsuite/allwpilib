@@ -70,7 +70,7 @@ void HAL_CleanInterrupts(HAL_InterruptHandle interrupt_handle,
  * @return The mask of interrupts that fired.
  */
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interrupt_handle,
-                             float timeout, HAL_Bool ignorePrevious,
+                             double timeout, HAL_Bool ignorePrevious,
                              int32_t* status) {
   uint32_t result;
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
@@ -125,15 +125,15 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interrupt_handle,
  * This is in the same time domain as GetClock().
  * @return Timestamp in seconds since boot.
  */
-float HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
-                                       int32_t* status) {
+double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                        int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
   uint32_t timestamp = anInterrupt->anInterrupt->readRisingTimeStamp(status);
-  return timestamp * 1e-6f;
+  return timestamp * 1e-6;
 }
 
 /**
@@ -141,15 +141,15 @@ float HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interrupt_handle,
 * This is in the same time domain as GetClock().
 * @return Timestamp in seconds since boot.
 */
-float HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interrupt_handle,
-                                        int32_t* status) {
+double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interrupt_handle,
+                                         int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interrupt_handle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
   uint32_t timestamp = anInterrupt->anInterrupt->readFallingTimeStamp(status);
-  return timestamp * 1e-6f;
+  return timestamp * 1e-6;
 }
 
 void HAL_RequestInterrupts(HAL_InterruptHandle interrupt_handle,

@@ -50,15 +50,15 @@ void HAL_SetCounterExternalDirectionMode(HAL_CounterHandle counter_handle,
 void HAL_SetCounterSemiPeriodMode(HAL_CounterHandle counter_handle,
                                   HAL_Bool highSemiPeriod, int32_t* status);
 void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counter_handle,
-                                   float threshold, int32_t* status);
+                                   double threshold, int32_t* status);
 int32_t HAL_GetCounterSamplesToAverage(HAL_CounterHandle counter_handle,
                                        int32_t* status);
 void HAL_SetCounterSamplesToAverage(HAL_CounterHandle counter_handle,
                                     int samplesToAverage, int32_t* status);
 void HAL_ResetCounter(HAL_CounterHandle counter_handle, int32_t* status);
 int32_t HAL_GetCounter(HAL_CounterHandle counter_handle, int32_t* status);
-float HAL_GetCounterPeriod(HAL_CounterHandle counter_handle, int32_t* status);
-void HAL_SetCounterMaxPeriod(HAL_CounterHandle counter_handle, float maxPeriod,
+double HAL_GetCounterPeriod(HAL_CounterHandle counter_handle, int32_t* status);
+void HAL_SetCounterMaxPeriod(HAL_CounterHandle counter_handle, double maxPeriod,
                              int32_t* status);
 void HAL_SetCounterUpdateWhenEmpty(HAL_CounterHandle counter_handle,
                                    HAL_Bool enabled, int32_t* status);

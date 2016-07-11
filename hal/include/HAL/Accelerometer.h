@@ -18,7 +18,7 @@ enum HAL_AccelerometerRange {
 extern "C" {
 void HAL_SetAccelerometerActive(HAL_Bool);
 void HAL_SetAccelerometerRange(HAL_AccelerometerRange);
-float HAL_GetAccelerometerX();
-float HAL_GetAccelerometerY();
-float HAL_GetAccelerometerZ();
+double HAL_GetAccelerometerX();
+double HAL_GetAccelerometerY();
+double HAL_GetAccelerometerZ();
 }

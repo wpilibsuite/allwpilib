@@ -131,8 +131,8 @@ int32_t HAL_GetFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
  *
  * @return Period in seconds of the most recent pulse.
  */
-float HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
-                               int32_t* status) {
+double HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
+                                int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -151,7 +151,7 @@ float HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
             static_cast<double>(output.Count);
   }
   double measuredPeriod = value * 2.5e-8;
-  return static_cast<float>(measuredPeriod / DECODING_SCALING_FACTOR);
+  return static_cast<double>(measuredPeriod / DECODING_SCALING_FACTOR);
 }
 
 /**
@@ -169,7 +169,7 @@ float HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
  * report the device stopped. This is expressed in seconds.
  */
 void HAL_SetFPGAEncoderMaxPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
-                                 float maxPeriod, int32_t* status) {
+                                 double maxPeriod, int32_t* status) {
   auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;

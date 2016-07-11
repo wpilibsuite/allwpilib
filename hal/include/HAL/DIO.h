@@ -18,9 +18,9 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dio_port_handle);
 
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status);
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
-void HAL_SetDigitalPWMRate(float rate, int32_t* status);
+void HAL_SetDigitalPWMRate(double rate, int32_t* status);
 void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
-                                float dutyCycle, int32_t* status);
+                                double dutyCycle, int32_t* status);
 void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
                                     int32_t pin, int32_t* status);
 void HAL_SetDIO(HAL_DigitalHandle dio_port_handle, HAL_Bool value,
@@ -28,7 +28,7 @@ void HAL_SetDIO(HAL_DigitalHandle dio_port_handle, HAL_Bool value,
 HAL_Bool HAL_GetDIO(HAL_DigitalHandle dio_port_handle, int32_t* status);
 HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dio_port_handle,
                              int32_t* status);
-void HAL_Pulse(HAL_DigitalHandle dio_port_handle, float pulseLength,
+void HAL_Pulse(HAL_DigitalHandle dio_port_handle, double pulseLength,
                int32_t* status);
 HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dio_port_handle, int32_t* status);
 HAL_Bool HAL_IsAnyPulsing(int32_t* status);

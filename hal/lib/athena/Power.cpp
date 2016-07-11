@@ -22,33 +22,33 @@ extern "C" {
 /**
  * Get the roboRIO input voltage
  */
-float HAL_GetVinVoltage(int32_t* status) {
+double HAL_GetVinVoltage(int32_t* status) {
   initializePower(status);
-  return power->readVinVoltage(status) / 4.096f * 0.025733f - 0.029f;
+  return power->readVinVoltage(status) / 4.096 * 0.025733 - 0.029;
 }
 
 /**
  * Get the roboRIO input current
  */
-float HAL_GetVinCurrent(int32_t* status) {
+double HAL_GetVinCurrent(int32_t* status) {
   initializePower(status);
-  return power->readVinCurrent(status) / 4.096f * 0.017042f - 0.071f;
+  return power->readVinCurrent(status) / 4.096 * 0.017042 - 0.071;
 }
 
 /**
  * Get the 6V rail voltage
  */
-float HAL_GetUserVoltage6V(int32_t* status) {
+double HAL_GetUserVoltage6V(int32_t* status) {
   initializePower(status);
-  return power->readUserVoltage6V(status) / 4.096f * 0.007019f - 0.014f;
+  return power->readUserVoltage6V(status) / 4.096 * 0.007019 - 0.014;
 }
 
 /**
  * Get the 6V rail current
  */
-float HAL_GetUserCurrent6V(int32_t* status) {
+double HAL_GetUserCurrent6V(int32_t* status) {
   initializePower(status);
-  return power->readUserCurrent6V(status) / 4.096f * 0.005566f - 0.009f;
+  return power->readUserCurrent6V(status) / 4.096 * 0.005566 - 0.009;
 }
 
 /**
@@ -71,17 +71,17 @@ int32_t HAL_GetUserCurrentFaults6V(int32_t* status) {
 /**
  * Get the 5V rail voltage
  */
-float HAL_GetUserVoltage5V(int32_t* status) {
+double HAL_GetUserVoltage5V(int32_t* status) {
   initializePower(status);
-  return power->readUserVoltage5V(status) / 4.096f * 0.005962f - 0.013f;
+  return power->readUserVoltage5V(status) / 4.096 * 0.005962 - 0.013;
 }
 
 /**
  * Get the 5V rail current
  */
-float HAL_GetUserCurrent5V(int32_t* status) {
+double HAL_GetUserCurrent5V(int32_t* status) {
   initializePower(status);
-  return power->readUserCurrent5V(status) / 4.096f * 0.001996f - 0.002f;
+  return power->readUserCurrent5V(status) / 4.096 * 0.001996 - 0.002f;
 }
 
 /**
@@ -109,17 +109,17 @@ uint8_t HAL_GetUserStatus5V(int32_t* status) {
 /**
  * Get the 3.3V rail voltage
  */
-float HAL_GetUserVoltage3V3(int32_t* status) {
+double HAL_GetUserVoltage3V3(int32_t* status) {
   initializePower(status);
-  return power->readUserVoltage3V3(status) / 4.096f * 0.004902f - 0.01f;
+  return power->readUserVoltage3V3(status) / 4.096 * 0.004902 - 0.01;
 }
 
 /**
  * Get the 3.3V rail current
  */
-float HAL_GetUserCurrent3V3(int32_t* status) {
+double HAL_GetUserCurrent3V3(int32_t* status) {
   initializePower(status);
-  return power->readUserCurrent3V3(status) / 4.096f * 0.002486f - 0.003f;
+  return power->readUserCurrent3V3(status) / 4.096 * 0.002486 - 0.003;
 }
 
 /**

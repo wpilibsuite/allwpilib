@@ -17,7 +17,7 @@ void HAL_SetSerialParity(int32_t port, int32_t parity, int32_t* status);
 void HAL_SetSerialStopBits(int32_t port, int32_t stopBits, int32_t* status);
 void HAL_SetSerialWriteMode(int32_t port, int32_t mode, int32_t* status);
 void HAL_SetSerialFlowControl(int32_t port, int32_t flow, int32_t* status);
-void HAL_SetSerialTimeout(int32_t port, float timeout, int32_t* status);
+void HAL_SetSerialTimeout(int32_t port, double timeout, int32_t* status);
 void HAL_EnableSerialTermination(int32_t port, char terminator,
                                  int32_t* status);
 void HAL_DisableSerialTermination(int32_t port, int32_t* status);
