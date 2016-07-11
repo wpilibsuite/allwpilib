@@ -11,15 +11,15 @@ package edu.wpi.first.wpilibj.hal;
  * A wrapper for the HALControlWord bitfield.
  */
 public class ControlWord {
-  private final boolean m_enabled;
-  private final boolean m_autonomous;
-  private final boolean m_test;
-  private final boolean m_emergencyStop;
-  private final boolean m_fmsAttached;
-  private final boolean m_dsAttached;
+  private boolean m_enabled;
+  private boolean m_autonomous;
+  private boolean m_test;
+  private boolean m_emergencyStop;
+  private boolean m_fmsAttached;
+  private boolean m_dsAttached;
 
-  protected ControlWord(boolean enabled, boolean autonomous, boolean test, boolean emergencyStop,
-                        boolean fmsAttached, boolean dsAttached) {
+  void update(boolean enabled, boolean autonomous, boolean test, boolean emergencyStop,
+              boolean fmsAttached, boolean dsAttached) {
     m_enabled = enabled;
     m_autonomous = autonomous;
     m_test = test;

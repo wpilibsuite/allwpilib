@@ -277,7 +277,7 @@ int DriverStation::GetJoystickAxisType(uint32_t stick, uint8_t axis) const {
  */
 bool DriverStation::IsEnabled() const {
   HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  UpdateControlWord(false, controlWord);
   return controlWord.enabled && controlWord.dsAttached;
 }
 
@@ -288,7 +288,7 @@ bool DriverStation::IsEnabled() const {
  */
 bool DriverStation::IsDisabled() const {
   HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  UpdateControlWord(false, controlWord);
   return !(controlWord.enabled && controlWord.dsAttached);
 }
 
@@ -299,7 +299,7 @@ bool DriverStation::IsDisabled() const {
  */
 bool DriverStation::IsAutonomous() const {
   HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  UpdateControlWord(false, controlWord);
   return controlWord.autonomous;
 }
 
@@ -310,7 +310,7 @@ bool DriverStation::IsAutonomous() const {
  */
 bool DriverStation::IsOperatorControl() const {
   HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  UpdateControlWord(false, controlWord);
   return !(controlWord.autonomous || controlWord.test);
 }
 
@@ -321,7 +321,7 @@ bool DriverStation::IsOperatorControl() const {
  */
 bool DriverStation::IsTest() const {
   HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  UpdateControlWord(false, controlWord);
   return controlWord.test;
 }
 
@@ -332,7 +332,7 @@ bool DriverStation::IsTest() const {
  */
 bool DriverStation::IsDSAttached() const {
   HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  UpdateControlWord(false, controlWord);
   return controlWord.dsAttached;
 }
 
@@ -357,7 +357,7 @@ bool DriverStation::IsNewControlData() const {
  */
 bool DriverStation::IsFMSAttached() const {
   HAL_ControlWord controlWord;
-  HAL_GetControlWord(&controlWord);
+  UpdateControlWord(false, controlWord);
   return controlWord.fmsAttached;
 }
 
@@ -500,6 +500,9 @@ void DriverStation::GetData() {
     HAL_GetJoystickButtons(stick, &m_joystickButtonsCache[stick]);
     HAL_GetJoystickDescriptor(stick, &m_joystickDescriptorCache[stick]);
   }
+  // Force a control word update, to make sure the data is the newest.
+  HAL_ControlWord controlWord;
+  UpdateControlWord(true, controlWord);
   // Obtain a write lock on the data, swap the cached data into the
   // main data arrays
   std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
@@ -596,4 +599,26 @@ void DriverStation::Run() {
     if (m_userInTeleop) HAL_ObserveUserProgramTeleop();
     if (m_userInTest) HAL_ObserveUserProgramTest();
   }
+}
+
+/**
+ * Gets ControlWord data from the cache. If 50ms has passed, or the force
+ * parameter is set, the cached data is updated. Otherwise the data is just
+ * copied from the cache.
+ *
+ * @param force True to force an update to the cache, otherwise update if 50ms
+ * have passed.
+ * @param controlWord Structure to put the return control word data into.
+ */
+void DriverStation::UpdateControlWord(bool force,
+                                      HAL_ControlWord& controlWord) const {
+  auto now = std::chrono::steady_clock::now();
+  std::lock_guard<priority_mutex> lock(m_controlWordMutex);
+  // Update every 50 ms or on force.
+  if ((now - m_lastControlWordUpdate > std::chrono::milliseconds(50)) ||
+      force) {
+    HAL_GetControlWord(&m_controlWordCache);
+    m_lastControlWordUpdate = now;
+  }
+  controlWord = m_controlWordCache;
 }

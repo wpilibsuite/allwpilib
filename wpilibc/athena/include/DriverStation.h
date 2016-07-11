@@ -97,6 +97,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void ReportJoystickUnpluggedError(std::string message);
   void ReportJoystickUnpluggedWarning(std::string message);
   void Run();
+  void UpdateControlWord(bool force, HAL_ControlWord& controlWord) const;
 
   std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxes;
   std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVs;
@@ -120,5 +121,8 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   bool m_userInAutonomous = false;
   bool m_userInTeleop = false;
   bool m_userInTest = false;
+  mutable HAL_ControlWord m_controlWordCache;
+  mutable std::chrono::steady_clock::time_point m_lastControlWordUpdate;
+  mutable priority_mutex m_controlWordMutex;
   double m_nextMessageTime = 0;
 };

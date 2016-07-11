@@ -94,6 +94,10 @@ public class DriverStation implements RobotState.Interface {
   private final Object m_joystickMutex;
   private volatile boolean m_threadKeepAlive = true;
 
+  private final Object m_controlWordMutex;
+  private ControlWord m_controlWordCache;
+  private long m_lastControlWordUpdate;
+
   private boolean m_userInDisabled = false;
   private boolean m_userInAutonomous = false;
   private boolean m_userInTeleop = false;
@@ -129,6 +133,10 @@ public class DriverStation implements RobotState.Interface {
       m_joystickAxesCache[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
       m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
     }
+
+    m_controlWordMutex = new Object();
+    m_controlWordCache = new ControlWord();
+    m_lastControlWordUpdate = 0;
 
     m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");
     m_thread.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY) / 2);
@@ -434,8 +442,10 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the robot is enabled, false otherwise.
    */
   public boolean isEnabled() {
-    ControlWord controlWord = HAL.getControlWord();
-    return controlWord.getEnabled() && controlWord.getDSAttached();
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getEnabled() && m_controlWordCache.getDSAttached();
+    }
   }
 
   /**
@@ -454,8 +464,10 @@ public class DriverStation implements RobotState.Interface {
    * @return True if autonomous mode should be enabled, false otherwise.
    */
   public boolean isAutonomous() {
-    ControlWord controlWord = HAL.getControlWord();
-    return controlWord.getAutonomous();
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getAutonomous();
+    }
   }
 
   /**
@@ -475,8 +487,10 @@ public class DriverStation implements RobotState.Interface {
    * @return True if test mode should be enabled, false otherwise.
    */
   public boolean isTest() {
-    ControlWord controlWord = HAL.getControlWord();
-    return controlWord.getTest();
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getTest();
+    }
   }
 
   /**
@@ -485,8 +499,10 @@ public class DriverStation implements RobotState.Interface {
    * @return True if Driver Station is attached, false otherwise.
    */
   public boolean isDSAttached() {
-    ControlWord controlWord = HAL.getControlWord();
-    return controlWord.getDSAttached();
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getDSAttached();
+    }
   }
 
   /**
@@ -510,8 +526,10 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the robot is competing on a field being controlled by a Field Management System
    */
   public boolean isFMSAttached() {
-    ControlWord controlWord = HAL.getControlWord();
-    return controlWord.getFMSAttached();
+    synchronized (m_controlWordMutex) {
+      updateControlWord(false);
+      return m_controlWordCache.getFMSAttached();
+    }
   }
 
   /**
@@ -694,6 +712,9 @@ public class DriverStation implements RobotState.Interface {
       m_joystickButtonsCache[stick].m_buttons = HAL.getJoystickButtons(stick, m_buttonCountBuffer);
       m_joystickButtonsCache[stick].m_count = m_buttonCountBuffer.get(0);
     }
+    // Force a control word update, to make sure the data is the newest.
+    updateControlWord(true);
+
     // lock joystick mutex to swap cache data
     synchronized (m_joystickMutex) {
       // move cache to actual data
@@ -766,6 +787,22 @@ public class DriverStation implements RobotState.Interface {
       }
       if (m_userInTest) {
         HAL.observeUserProgramTest();
+      }
+    }
+  }
+
+  /**
+   * Updates the data in the control word cache. Updates if the force parameter is set, or if
+   * 50ms have passed since the last update.
+   *
+   * @param force True to force an update to the cache, otherwise update if 50ms have passed.
+   */
+  private void updateControlWord(boolean force) {
+    long now = System.currentTimeMillis();
+    synchronized (m_controlWordMutex) {
+      if ((now - m_lastControlWordUpdate > 50) || force) {
+        HAL.getControlWord(m_controlWordCache);
+        now = m_lastControlWordUpdate;
       }
     }
   }

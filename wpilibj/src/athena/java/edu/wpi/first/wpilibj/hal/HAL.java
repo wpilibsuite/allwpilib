@@ -57,9 +57,9 @@ public class HAL extends JNIWrapper {
   private static native int nativeGetControlWord();
 
   @SuppressWarnings("JavadocMethod")
-  public static ControlWord getControlWord() {
+  public static void getControlWord(ControlWord controlWord) {
     int word = nativeGetControlWord();
-    return new ControlWord((word & 1) != 0, ((word >> 1) & 1) != 0, ((word >> 2) & 1) != 0,
+    controlWord.update((word & 1) != 0, ((word >> 1) & 1) != 0, ((word >> 2) & 1) != 0,
         ((word >> 3) & 1) != 0, ((word >> 4) & 1) != 0, ((word >> 5) & 1) != 0);
   }
 
