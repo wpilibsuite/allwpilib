@@ -52,8 +52,8 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
 
  public:
   Command();
-  Command(const std::string& name);
-  Command(double timeout);
+  explicit Command(const std::string& name);
+  explicit Command(double timeout);
   Command(const std::string& name, double timeout);
   virtual ~Command();
   double TimeSinceInitialized() const;
@@ -167,12 +167,12 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   static int m_commandCounter;
 
  public:
-  virtual std::string GetName() const;
-  virtual void InitTable(std::shared_ptr<ITable> table);
-  virtual std::shared_ptr<ITable> GetTable() const;
-  virtual std::string GetSmartDashboardType() const;
-  virtual void ValueChanged(ITable* source, llvm::StringRef key,
-                            std::shared_ptr<nt::Value> value, bool isNew);
+  std::string GetName() const override;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  std::shared_ptr<ITable> GetTable() const override;
+  std::string GetSmartDashboardType() const override;
+  void ValueChanged(ITable* source, llvm::StringRef key,
+                    std::shared_ptr<nt::Value> value, bool isNew) override;
 
  protected:
   std::shared_ptr<ITable> m_table;

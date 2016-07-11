@@ -18,7 +18,7 @@ class Subsystem : public ErrorBase, public NamedSendable {
   friend class Scheduler;
 
  public:
-  Subsystem(const std::string& name);
+  explicit Subsystem(const std::string& name);
   virtual ~Subsystem() = default;
 
   void SetDefaultCommand(Command* command);
@@ -37,10 +37,10 @@ class Subsystem : public ErrorBase, public NamedSendable {
   bool m_initializedDefaultCommand = false;
 
  public:
-  virtual std::string GetName() const;
-  virtual void InitTable(std::shared_ptr<ITable> table);
-  virtual std::shared_ptr<ITable> GetTable() const;
-  virtual std::string GetSmartDashboardType() const;
+  std::string GetName() const override;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  std::shared_ptr<ITable> GetTable() const override;
+  std::string GetSmartDashboardType() const override;
 
  protected:
   std::shared_ptr<ITable> m_table;

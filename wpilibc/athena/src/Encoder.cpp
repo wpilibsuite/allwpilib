@@ -214,7 +214,6 @@ void Encoder::Reset() {
   int32_t status = 0;
   HAL_ResetEncoder(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  ;
 }
 
 /**

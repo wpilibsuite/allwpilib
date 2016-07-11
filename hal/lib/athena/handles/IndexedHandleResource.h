@@ -112,4 +112,4 @@ void IndexedHandleResource<THandle, TStruct, size, enumValue>::Free(
   std::lock_guard<priority_mutex> sync(m_handleMutexes[index]);
   m_structures[index].reset();
 }
-}
+}  // namespace hal

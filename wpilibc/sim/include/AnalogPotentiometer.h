@@ -36,7 +36,8 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    * @param offset  The offset to add to the scaled value for controlling the
    *                zero value
    */
-  AnalogPotentiometer(int channel, double scale = 1.0, double offset = 0.0);
+  explicit AnalogPotentiometer(int channel, double scale = 1.0,
+                               double offset = 0.0);
 
   AnalogPotentiometer(AnalogInput* input, double scale = 1.0,
                       double offset = 0.0);
@@ -58,27 +59,27 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    *
    * @return The current reading.
    */
-  virtual double PIDGet() override;
+  double PIDGet() override;
 
   /*
    * Live Window code, only does anything if live window is activated.
    */
-  virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(std::shared_ptr<ITable> subtable) override;
-  virtual void UpdateTable() override;
-  virtual std::shared_ptr<ITable> GetTable() const override;
+  std::string GetSmartDashboardType() const override;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void UpdateTable() override;
+  std::shared_ptr<ITable> GetTable() const override;
 
   /**
    * AnalogPotentiometers don't have to do anything special when entering the
    * LiveWindow.
    */
-  virtual void StartLiveWindowMode() override {}
+  void StartLiveWindowMode() override {}
 
   /**
    * AnalogPotentiometers don't have to do anything special when exiting the
    * LiveWindow.
    */
-  virtual void StopLiveWindowMode() override {}
+  void StopLiveWindowMode() override {}
 
  private:
   double m_scale, m_offset;

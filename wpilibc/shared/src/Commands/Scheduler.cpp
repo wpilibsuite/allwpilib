@@ -225,7 +225,7 @@ void Scheduler::UpdateTable() {
       toCancel = new_toCancel->GetDoubleArray();
     else
       toCancel.resize(0);
-    //		m_table->RetrieveValue("Ids", *ids);
+    // m_table->RetrieveValue("Ids", *ids);
 
     // cancel commands that have had the cancel buttons pressed
     // on the SmartDashboad

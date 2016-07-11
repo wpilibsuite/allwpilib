@@ -83,7 +83,8 @@ void Servo::SetAngle(float degrees) {
     degrees = kMaxServoAngle;
   }
 
-  SetPosition(((float)(degrees - kMinServoAngle)) / GetServoAngleRange());
+  SetPosition(static_cast<float>(degrees - kMinServoAngle) /
+              GetServoAngleRange());
 }
 
 /**
@@ -95,7 +96,8 @@ void Servo::SetAngle(float degrees) {
  * @return The angle in degrees to which the servo is set.
  */
 float Servo::GetAngle() const {
-  return (float)GetPosition() * GetServoAngleRange() + kMinServoAngle;
+  return static_cast<float>(GetPosition()) * GetServoAngleRange() +
+         kMinServoAngle;
 }
 
 void Servo::ValueChanged(ITable* source, llvm::StringRef key,

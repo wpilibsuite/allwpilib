@@ -582,9 +582,9 @@ std::string PIDController::GetSmartDashboardType() const {
   return "PIDController";
 }
 
-void PIDController::InitTable(std::shared_ptr<ITable> table) {
+void PIDController::InitTable(std::shared_ptr<ITable> subtable) {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
-  m_table = table;
+  m_table = subtable;
   if (m_table != nullptr) {
     m_table->PutNumber(kP, GetP());
     m_table->PutNumber(kI, GetI());

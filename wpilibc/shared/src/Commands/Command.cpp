@@ -392,9 +392,9 @@ std::string Command::GetName() const { return m_name; }
 
 std::string Command::GetSmartDashboardType() const { return "Command"; }
 
-void Command::InitTable(std::shared_ptr<ITable> table) {
+void Command::InitTable(std::shared_ptr<ITable> subtable) {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
-  m_table = table;
+  m_table = subtable;
   if (m_table != nullptr) {
     m_table->PutString(kName, GetName());
     m_table->PutBoolean(kRunning, IsRunning());

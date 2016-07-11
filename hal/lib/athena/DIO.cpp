@@ -70,7 +70,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle port_handle,
     uint32_t bitToSet = 1 << remapMXPChannel(port->pin);
 
     // Disable special functions on this pin
-    short specialFunctions =
+    int16_t specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
                                                  status);
@@ -207,7 +207,7 @@ void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
  * @param value The state to set the digital channel (if it is configured as an
  * output)
  */
-void HAL_SetDIO(HAL_DigitalHandle dio_port_handle, short value,
+void HAL_SetDIO(HAL_DigitalHandle dio_port_handle, int16_t value,
                 int32_t* status) {
   auto port = digitalPinHandles.Get(dio_port_handle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
@@ -235,7 +235,7 @@ void HAL_SetDIO(HAL_DigitalHandle dio_port_handle, short value,
       }
 
       uint32_t bitToSet = 1 << remapMXPChannel(port->pin);
-      short specialFunctions =
+      int16_t specialFunctions =
           digitalSystem->readEnableMXPSpecialFunction(status);
       digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
                                                    status);
@@ -268,7 +268,7 @@ bool HAL_GetDIO(HAL_DigitalHandle dio_port_handle, int32_t* status) {
   } else {
     // Disable special functions
     uint32_t bitToSet = 1 << remapMXPChannel(port->pin);
-    short specialFunctions =
+    int16_t specialFunctions =
         digitalSystem->readEnableMXPSpecialFunction(status);
     digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
                                                  status);

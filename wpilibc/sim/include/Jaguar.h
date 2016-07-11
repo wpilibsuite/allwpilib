@@ -22,5 +22,5 @@ class Jaguar : public SafePWM, public SpeedController {
   virtual float Get() const;
   virtual void Disable();
 
-  virtual void PIDWrite(float output) override;
+  void PIDWrite(float output) override;
 };

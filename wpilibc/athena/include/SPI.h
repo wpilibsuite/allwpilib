@@ -22,7 +22,7 @@ class DigitalInput;
 class SPI : public SensorBase {
  public:
   enum Port { kOnboardCS0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
-  SPI(Port SPIport);
+  explicit SPI(Port SPIport);
   virtual ~SPI();
 
   SPI(const SPI&) = delete;

@@ -140,7 +140,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
                            double min) {
     PWMJNI.setPWMConfig(m_handle, max, deadbandMax, center, deadbandMax, min);
   }
-  
+
   /**
    * Gets the bounds on the PWM pulse widths. This Gets the bounds on the PWM values for a
    * particular type of controller. The values determine the upper and lower speeds as well
@@ -237,7 +237,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   public int getRaw() {
     return PWMJNI.getPWMRaw(m_handle);
   }
-  
+
   /**
    * Temporarily disables the PWM output. The next set call will reenable
    * the output.

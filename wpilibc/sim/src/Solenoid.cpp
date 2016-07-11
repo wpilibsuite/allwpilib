@@ -7,7 +7,7 @@
 
 #include "Solenoid.h"
 
-#include <cstdio>
+#include <sstream>
 
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
@@ -27,9 +27,9 @@ Solenoid::Solenoid(uint32_t channel) : Solenoid(1, channel) {}
  * @param channel      The channel on the solenoid module to control (1..8).
  */
 Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel) {
-  char buffer[50];
-  int n = std::sprintf(buffer, "pneumatic/%d/%d", moduleNumber, channel);
-  m_impl = new SimContinuousOutput(buffer);
+  std::stringstream ss;
+  ss << "pneumatic/" << moduleNumber << "/" << channel;
+  m_impl = new SimContinuousOutput(ss.str());
 
   LiveWindow::GetInstance()->AddActuator("Solenoid", moduleNumber, channel,
                                          this);

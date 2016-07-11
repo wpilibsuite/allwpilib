@@ -41,7 +41,7 @@ class ConditionVariableTest : public ::testing::Test {
   // Information for when running with predicates.
   std::atomic<bool> m_pred_var{false};
 
-  void ShortSleep(unsigned long time = 10) {
+  void ShortSleep(uint32_t time = 10) {
     std::this_thread::sleep_for(std::chrono::milliseconds(time));
   }
 

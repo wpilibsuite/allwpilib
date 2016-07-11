@@ -45,8 +45,7 @@ void SetDebugFlag(DebugOutputType flag) { dprintfFlag = flag; }
  *
  * @param tempString The format string.
  */
-void dprintf(const char* tempString, ...) /* Variable argument list */
-{
+void dprintf(const char* tempString, ...) {
   va_list args;    /* Input argument list */
   int line_number; /* Line number passed in argument */
   int type;
@@ -166,7 +165,7 @@ void dprintf(const char* tempString, ...) /* Variable argument list */
  * @return The normalized position from -1 to +1
  */
 double RangeToNormalized(double position, int range) {
-  return (((position * 2.0) / (double)range) - 1.0);
+  return position * 2.0 / static_cast<double>(range) - 1.0;
 }
 
 /**
@@ -179,11 +178,11 @@ double RangeToNormalized(double position, int range) {
  */
 float NormalizeToRange(float normalizedValue, float minRange, float maxRange) {
   float range = maxRange - minRange;
-  float temp = (float)((normalizedValue / 2.0) + 0.5) * range;
+  float temp = static_cast<float>(normalizedValue / 2.0 + 0.5) * range;
   return (temp + minRange);
 }
 float NormalizeToRange(float normalizedValue) {
-  return (float)((normalizedValue / 2.0) + 0.5);
+  return static_cast<float>(normalizedValue / 2.0 + 0.5);
 }
 
 /**
@@ -274,7 +273,8 @@ void panInit(double period) {
 void panForTarget(Servo* panServo) { panForTarget(panServo, 0.0); }
 
 void panForTarget(Servo* panServo, double sinStart) {
-  float normalizedSinPosition = (float)SinPosition(nullptr, sinStart);
+  float normalizedSinPosition =
+      static_cast<float>(SinPosition(nullptr, sinStart));
   float newServoPosition = NormalizeToRange(normalizedSinPosition);
   panServo->Set(newServoPosition);
   // ShowActivity ("pan x: normalized %f newServoPosition = %f" ,
@@ -295,8 +295,8 @@ void panForTarget(Servo* panServo, double sinStart) {
  **/
 int processFile(char* inputFile, char* outputString, int lineNumber) {
   FILE* infile;
-  const int stringSize = 80;  // max size of one line in file
-  char inputStr[stringSize];
+  const int kStringSize = 80;  // max size of one line in file
+  char inputStr[kStringSize];
   inputStr[0] = '\0';
   int lineCount = 0;
 
@@ -308,16 +308,16 @@ int processFile(char* inputFile, char* outputString, int lineNumber) {
   }
 
   while (!std::feof(infile)) {
-    if (std::fgets(inputStr, stringSize, infile) != nullptr) {
+    if (std::fgets(inputStr, kStringSize, infile) != nullptr) {
       // Skip empty lines
       if (emptyString(inputStr)) continue;
       // Skip comment lines
       if (inputStr[0] == '#' || inputStr[0] == '!') continue;
 
       lineCount++;
-      if (lineNumber == 0)
+      if (lineNumber == 0) {
         continue;
-      else {
+      } else {
         if (lineCount == lineNumber) break;
       }
     }

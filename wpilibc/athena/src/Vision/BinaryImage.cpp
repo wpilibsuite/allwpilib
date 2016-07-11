@@ -157,7 +157,7 @@ bool BinaryImage::ParticleMeasurement(int particleNumber,
   double resultDouble;
   bool success =
       ParticleMeasurement(particleNumber, whatToMeasure, &resultDouble);
-  *result = (int)resultDouble;
+  *result = static_cast<int>(resultDouble);
   return success;
 }
 
@@ -184,7 +184,7 @@ bool BinaryImage::ParticleMeasurement(int particleNumber,
 
 // Normalizes to [-1,1]
 double BinaryImage::NormalizeFromRange(double position, int range) {
-  return (position * 2.0 / (double)range) - 1.0;
+  return position * 2.0 / static_cast<double>(range) - 1.0;
 }
 
 /**

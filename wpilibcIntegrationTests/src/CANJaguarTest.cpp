@@ -46,7 +46,7 @@ class CANJaguarTest : public testing::Test {
   AnalogOutput* m_fakePotentiometer;
   Relay* m_spike;
 
-  virtual void SetUp() override {
+  void SetUp() override {
     m_spike = new Relay(TestBench::kCANJaguarRelayChannel, Relay::kForwardOnly);
     m_spike->Set(Relay::kOn);
     Wait(kSpikeTime);
@@ -66,7 +66,7 @@ class CANJaguarTest : public testing::Test {
     Wait(kEncoderSettlingTime);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete m_jaguar;
     delete m_fakeForwardLimit;
     delete m_fakeReverseLimit;

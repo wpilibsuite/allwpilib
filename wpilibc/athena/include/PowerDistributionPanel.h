@@ -19,7 +19,7 @@
 class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
  public:
   PowerDistributionPanel();
-  PowerDistributionPanel(uint8_t module);
+  explicit PowerDistributionPanel(uint8_t module);
 
   double GetVoltage() const;
   double GetTemperature() const;

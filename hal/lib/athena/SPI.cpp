@@ -152,8 +152,9 @@ void HAL_InitializeSPI(uint8_t port, int32_t* status) {
 int32_t HAL_TransactionSPI(uint8_t port, uint8_t* dataToSend,
                            uint8_t* dataReceived, uint8_t size) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
-  return spilib_writeread(HAL_GetSPIHandle(port), (const char*)dataToSend,
-                          (char*)dataReceived, (int32_t)size);
+  return spilib_writeread(
+      HAL_GetSPIHandle(port), reinterpret_cast<const char*>(dataToSend),
+      reinterpret_cast<char*>(dataReceived), static_cast<int32_t>(size));
 }
 
 /**
@@ -168,8 +169,9 @@ int32_t HAL_TransactionSPI(uint8_t port, uint8_t* dataToSend,
  */
 int32_t HAL_WriteSPI(uint8_t port, uint8_t* dataToSend, uint8_t sendSize) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
-  return spilib_write(HAL_GetSPIHandle(port), (const char*)dataToSend,
-                      (int32_t)sendSize);
+  return spilib_write(HAL_GetSPIHandle(port),
+                      reinterpret_cast<const char*>(dataToSend),
+                      static_cast<int32_t>(sendSize));
 }
 
 /**
@@ -187,7 +189,8 @@ int32_t HAL_WriteSPI(uint8_t port, uint8_t* dataToSend, uint8_t sendSize) {
  */
 int32_t HAL_ReadSPI(uint8_t port, uint8_t* buffer, uint8_t count) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(port));
-  return spilib_read(HAL_GetSPIHandle(port), (char*)buffer, (int32_t)count);
+  return spilib_read(HAL_GetSPIHandle(port), reinterpret_cast<char*>(buffer),
+                     static_cast<int32_t>(count));
 }
 
 /**
@@ -325,13 +328,14 @@ void HAL_SetSPIHandle(uint8_t port, int32_t handle) {
 }
 
 static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
-  SPIAccumulator* accum = (SPIAccumulator*)param;
+  SPIAccumulator* accum = static_cast<SPIAccumulator*>(param);
 
   // perform SPI transaction
   uint8_t resp_b[4];
   std::lock_guard<priority_recursive_mutex> sync(spiGetSemaphore(accum->port));
-  spilib_writeread(HAL_GetSPIHandle(accum->port), (const char*)accum->cmd,
-                   (char*)resp_b, (int32_t)accum->xfer_size);
+  spilib_writeread(
+      HAL_GetSPIHandle(accum->port), reinterpret_cast<const char*>(accum->cmd),
+      reinterpret_cast<char*>(resp_b), static_cast<int32_t>(accum->xfer_size));
 
   // convert from bytes
   uint32_t resp = 0;
@@ -350,7 +354,7 @@ static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
   // process response
   if ((resp & accum->valid_mask) == accum->valid_value) {
     // valid sensor data; extract data field
-    int32_t data = (int32_t)(resp >> accum->data_shift);
+    int32_t data = static_cast<int32_t>(resp >> accum->data_shift);
     data &= accum->data_max - 1;
     // 2s complement conversion if signed MSB is set
     if (accum->is_signed && (data & accum->data_msb_mask) != 0)
@@ -553,7 +557,7 @@ double HAL_GetSPIAccumulatorAverage(uint8_t port, int32_t* status) {
   uint32_t count;
   HAL_GetAccumulatorOutput(port, &value, &count, status);
   if (count == 0) return 0.0;
-  return ((double)value) / count;
+  return static_cast<double>(value) / count;
 }
 
 /**

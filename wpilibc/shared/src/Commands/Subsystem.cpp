@@ -129,8 +129,8 @@ std::string Subsystem::GetName() const { return m_name; }
 
 std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
 
-void Subsystem::InitTable(std::shared_ptr<ITable> table) {
-  m_table = table;
+void Subsystem::InitTable(std::shared_ptr<ITable> subtable) {
+  m_table = subtable;
   if (m_table != nullptr) {
     if (m_defaultCommand != nullptr) {
       m_table->PutBoolean("hasDefault", true);

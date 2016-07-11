@@ -21,12 +21,12 @@ class GearTooth : public Counter {
  public:
   /// 55 uSec for threshold
   static constexpr double kGearToothThreshold = 55e-6;
-  GearTooth(uint32_t channel, bool directionSensitive = false);
-  GearTooth(DigitalSource* source, bool directionSensitive = false);
-  GearTooth(std::shared_ptr<DigitalSource> source,
-            bool directionSensitive = false);
+  explicit GearTooth(uint32_t channel, bool directionSensitive = false);
+  explicit GearTooth(DigitalSource* source, bool directionSensitive = false);
+  explicit GearTooth(std::shared_ptr<DigitalSource> source,
+                     bool directionSensitive = false);
   virtual ~GearTooth() = default;
   void EnableDirectionSensing(bool directionSensitive);
 
-  virtual std::string GetSmartDashboardType() const override;
+  std::string GetSmartDashboardType() const override;
 };

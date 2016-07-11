@@ -21,7 +21,7 @@ using namespace gazebo;
 
 class ExternalLimitSwitch : public Switch {
  public:
-  ExternalLimitSwitch(sdf::ElementPtr sdf);
+  explicit ExternalLimitSwitch(sdf::ElementPtr sdf);
 
   /// \brief Returns true when the switch is triggered.
   virtual bool Get();

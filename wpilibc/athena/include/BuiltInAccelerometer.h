@@ -22,21 +22,21 @@ class BuiltInAccelerometer : public Accelerometer,
                              public SensorBase,
                              public LiveWindowSendable {
  public:
-  BuiltInAccelerometer(Range range = kRange_8G);
+  explicit BuiltInAccelerometer(Range range = kRange_8G);
   virtual ~BuiltInAccelerometer() = default;
 
   // Accelerometer interface
-  virtual void SetRange(Range range) override;
-  virtual double GetX() override;
-  virtual double GetY() override;
-  virtual double GetZ() override;
+  void SetRange(Range range) override;
+  double GetX() override;
+  double GetY() override;
+  double GetZ() override;
 
-  virtual std::string GetSmartDashboardType() const override;
-  virtual void InitTable(std::shared_ptr<ITable> subtable) override;
-  virtual void UpdateTable() override;
-  virtual std::shared_ptr<ITable> GetTable() const override;
-  virtual void StartLiveWindowMode() override {}
-  virtual void StopLiveWindowMode() override {}
+  std::string GetSmartDashboardType() const override;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void UpdateTable() override;
+  std::shared_ptr<ITable> GetTable() const override;
+  void StartLiveWindowMode() override {}
+  void StopLiveWindowMode() override {}
 
  private:
   std::shared_ptr<ITable> m_table;

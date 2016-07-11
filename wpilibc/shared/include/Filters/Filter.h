@@ -15,13 +15,13 @@
  */
 class Filter : public PIDSource {
  public:
-  Filter(std::shared_ptr<PIDSource> source);
+  explicit Filter(std::shared_ptr<PIDSource> source);
   virtual ~Filter() = default;
 
   // PIDSource interface
-  virtual void SetPIDSourceType(PIDSourceType pidSource) override;
+  void SetPIDSourceType(PIDSourceType pidSource) override;
   PIDSourceType GetPIDSourceType() const;
-  virtual double PIDGet() override = 0;
+  double PIDGet() override = 0;
 
   /**
    * Returns the current filter estimate without also inserting new data as

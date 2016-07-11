@@ -231,7 +231,7 @@ float PWM::GetSpeed() const {
  *
  * @param value Raw PWM value.
  */
-void PWM::SetRaw(unsigned short value) {
+void PWM::SetRaw(uint16_t value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -246,11 +246,11 @@ void PWM::SetRaw(unsigned short value) {
  *
  * @return Raw PWM control value.
  */
-unsigned short PWM::GetRaw() const {
+uint16_t PWM::GetRaw() const {
   if (StatusIsFatal()) return 0;
 
   int32_t status = 0;
-  unsigned short value = HAL_GetPWMRaw(m_handle, &status);
+  uint16_t value = HAL_GetPWMRaw(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   return value;

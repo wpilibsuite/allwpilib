@@ -14,15 +14,13 @@
 #include "Buttons/ToggleButtonScheduler.h"
 
 bool Trigger::Grab() {
-  if (Get())
+  if (Get()) {
     return true;
-  else if (m_table != nullptr) {
-    // if (m_table->isConnected())//TODO is connected on button?
+  } else if (m_table != nullptr) {
     return m_table->GetBoolean("pressed", false);
-    /*else
-            return false;*/
-  } else
+  } else {
     return false;
+  }
 }
 
 void Trigger::WhenActive(Command* command) {
@@ -52,8 +50,8 @@ void Trigger::ToggleWhenActive(Command* command) {
 
 std::string Trigger::GetSmartDashboardType() const { return "Button"; }
 
-void Trigger::InitTable(std::shared_ptr<ITable> table) {
-  m_table = table;
+void Trigger::InitTable(std::shared_ptr<ITable> subtable) {
+  m_table = subtable;
   if (m_table != nullptr) {
     m_table->PutBoolean("pressed", Get());
   }

@@ -16,9 +16,9 @@
 #include "handles/IndexedHandleResource.h"
 
 namespace hal {
-constexpr long kTimebase = 40000000;  ///< 40 MHz clock
-constexpr long kDefaultOversampleBits = 0;
-constexpr long kDefaultAverageBits = 7;
+constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock
+constexpr int32_t kDefaultOversampleBits = 0;
+constexpr int32_t kDefaultAverageBits = 7;
 constexpr float kDefaultSampleRate = 50000.0;
 static const uint32_t kAccumulatorChannels[] = {0, 1};
 
@@ -41,4 +41,4 @@ void setAnalogNumChannelsToActivate(uint32_t channels);
 void initializeAnalog(int32_t* status);
 
 extern bool analogSystemInitialized;
-}
+}  // namespace hal

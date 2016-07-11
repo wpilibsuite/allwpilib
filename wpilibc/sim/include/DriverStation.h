@@ -48,7 +48,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
 
   float GetStickAxis(uint32_t stick, uint32_t axis);
   bool GetStickButton(uint32_t stick, uint32_t button);
-  short GetStickButtons(uint32_t stick);
+  int16_t GetStickButtons(uint32_t stick);
 
   float GetAnalogIn(uint32_t channel);
   bool GetDigitalIn(uint32_t channel);

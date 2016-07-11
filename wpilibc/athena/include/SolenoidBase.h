@@ -27,8 +27,8 @@ class SolenoidBase : public SensorBase {
 
  protected:
   explicit SolenoidBase(uint8_t pcmID);
-  const static int m_maxModules = 63;
-  const static int m_maxPorts = 8;
+  static const int m_maxModules = 63;
+  static const int m_maxPorts = 8;
   // static void* m_ports[m_maxModules][m_maxPorts];
   uint8_t m_moduleNumber;  ///< Slot number where the module is plugged into
                            /// the chassis.

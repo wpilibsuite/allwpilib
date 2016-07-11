@@ -43,8 +43,8 @@ class PWM : public SensorBase,
 
   explicit PWM(uint32_t channel);
   virtual ~PWM();
-  virtual void SetRaw(unsigned short value);
-  virtual unsigned short GetRaw() const;
+  virtual void SetRaw(uint16_t value);
+  virtual uint16_t GetRaw() const;
   virtual void SetPosition(float pos);
   virtual float GetPosition() const;
   virtual void SetSpeed(float speed);

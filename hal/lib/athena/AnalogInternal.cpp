@@ -78,4 +78,4 @@ uint32_t getAnalogNumChannelsToActivate(int32_t* status) {
 void setAnalogNumChannelsToActivate(uint32_t channels) {
   analogNumChannelsToActivate = channels;
 }
-}
+}  // namespace hal

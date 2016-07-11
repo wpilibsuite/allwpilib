@@ -18,7 +18,7 @@
 template <class T>
 class CircularBuffer {
  public:
-  CircularBuffer(size_t size);
+  explicit CircularBuffer(size_t size);
 
   void PushFront(T value);
   void PushBack(T value);

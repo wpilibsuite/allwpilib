@@ -23,5 +23,5 @@ class Potentiometer : public PIDSource {
    */
   virtual double Get() const = 0;
 
-  virtual void SetPIDSourceType(PIDSourceType pidSource) override;
+  void SetPIDSourceType(PIDSourceType pidSource) override;
 };

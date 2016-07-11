@@ -84,4 +84,4 @@ void UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(
   if (index < 0 || index >= static_cast<int16_t>(m_structures.size())) return;
   m_structures[index].reset();
 }
-}
+}  // namespace hal

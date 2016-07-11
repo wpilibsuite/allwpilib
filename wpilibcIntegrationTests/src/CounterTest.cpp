@@ -28,7 +28,7 @@ class CounterTest : public testing::Test {
   Victor* m_victor;
   Jaguar* m_jaguar;
 
-  virtual void SetUp() override {
+  void SetUp() override {
     m_talonCounter = new Counter(TestBench::kTalonEncoderChannelA);
     m_victorCounter = new Counter(TestBench::kVictorEncoderChannelA);
     m_jaguarCounter = new Counter(TestBench::kJaguarEncoderChannelA);
@@ -37,7 +37,7 @@ class CounterTest : public testing::Test {
     m_jaguar = new Jaguar(TestBench::kJaguarChannel);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete m_talonCounter;
     delete m_victorCounter;
     delete m_jaguarCounter;

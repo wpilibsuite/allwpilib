@@ -38,7 +38,7 @@ std::ostream& operator<<(std::ostream& os, const FilterOutputTestType& type) {
 
 class DataWrapper : public PIDSource {
  public:
-  DataWrapper(double (*dataFunc)(double)) { m_dataFunc = dataFunc; }
+  explicit DataWrapper(double (*dataFunc)(double)) { m_dataFunc = dataFunc; }
 
   virtual void SetPIDSourceType(PIDSourceType pidSource) {}
 

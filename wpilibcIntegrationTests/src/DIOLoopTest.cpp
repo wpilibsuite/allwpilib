@@ -31,12 +31,12 @@ class DIOLoopTest : public testing::Test {
   DigitalInput* m_input;
   DigitalOutput* m_output;
 
-  virtual void SetUp() override {
+  void SetUp() override {
     m_input = new DigitalInput(TestBench::kLoop1InputChannel);
     m_output = new DigitalOutput(TestBench::kLoop1OutputChannel);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete m_input;
     delete m_output;
   }
@@ -140,7 +140,7 @@ TEST_F(DIOLoopTest, FakeCounter) {
 }
 
 static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
-  *(int*)param = 12345;
+  *reinterpret_cast<int*>(param) = 12345;
 }
 
 TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {

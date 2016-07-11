@@ -12,7 +12,7 @@
 
 class PrintCommand : public Command {
  public:
-  PrintCommand(const std::string& message);
+  explicit PrintCommand(const std::string& message);
   virtual ~PrintCommand() = default;
 
  protected:

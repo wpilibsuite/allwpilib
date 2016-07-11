@@ -39,7 +39,8 @@ int HAL_GetJoystickAxes(uint8_t joystickNum, HAL_JoystickAxes* axes) {
   HAL_JoystickAxesInt axesInt;
 
   int retVal = FRC_NetworkCommunication_getJoystickAxes(
-      joystickNum, (JoystickAxes_t*)&axesInt, HAL_kMaxJoystickAxes);
+      joystickNum, reinterpret_cast<JoystickAxes_t*>(&axesInt),
+      HAL_kMaxJoystickAxes);
 
   // copy int values to float values
   axes->count = axesInt.count;
@@ -59,7 +60,8 @@ int HAL_GetJoystickAxes(uint8_t joystickNum, HAL_JoystickAxes* axes) {
 
 int HAL_GetJoystickPOVs(uint8_t joystickNum, HAL_JoystickPOVs* povs) {
   return FRC_NetworkCommunication_getJoystickPOVs(
-      joystickNum, (JoystickPOV_t*)povs, HAL_kMaxJoystickPOVs);
+      joystickNum, reinterpret_cast<JoystickPOV_t*>(povs),
+      HAL_kMaxJoystickPOVs);
 }
 
 int HAL_GetJoystickButtons(uint8_t joystickNum, HAL_JoystickButtons* buttons) {
@@ -87,8 +89,9 @@ int HAL_GetJoystickDescriptor(uint8_t joystickNum,
   desc->buttonCount = 0;
   desc->povCount = 0;
   int retval = FRC_NetworkCommunication_getJoystickDesc(
-      joystickNum, &desc->isXbox, &desc->type, (char*)(&desc->name),
-      &desc->axisCount, (uint8_t*)&desc->axisTypes, &desc->buttonCount,
+      joystickNum, &desc->isXbox, &desc->type,
+      reinterpret_cast<char*>(&desc->name), &desc->axisCount,
+      reinterpret_cast<uint8_t*>(&desc->axisTypes), &desc->buttonCount,
       &desc->povCount);
   /* check the return, if there is an error and the RIOimage predates FRC2017,
    * then axisCount needs to be cleared */
@@ -120,13 +123,14 @@ int HAL_GetJoystickType(uint8_t joystickNum) {
 char* HAL_GetJoystickName(uint8_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
-    char* name = (char*)std::malloc(1);
+    char* name = static_cast<char*>(std::malloc(1));
     name[0] = '\0';
     return name;
   } else {
     size_t len = std::strlen(joystickDesc.name);
-    char* name = (char*)std::malloc(len + 1);
-    std::strcpy(name, joystickDesc.name);
+    char* name = static_cast<char*>(std::malloc(len + 1));
+    std::strncpy(name, joystickDesc.name, len);
+    name[len] = '\0';
     return name;
   }
 }

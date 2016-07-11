@@ -21,19 +21,19 @@ class RelayTest : public testing::Test {
   DigitalInput* m_forward;
   DigitalInput* m_reverse;
 
-  virtual void SetUp() override {
+  void SetUp() override {
     m_relay = new Relay(TestBench::kRelayChannel);
     m_forward = new DigitalInput(TestBench::kFakeRelayForward);
     m_reverse = new DigitalInput(TestBench::kFakeRelayReverse);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete m_relay;
     delete m_forward;
     delete m_reverse;
   }
 
-  virtual void Reset() { m_relay->Set(Relay::kOff); }
+  void Reset() { m_relay->Set(Relay::kOff); }
 };
 /**
  * Test the relay by setting it forward, reverse, off, and on.

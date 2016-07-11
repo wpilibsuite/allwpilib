@@ -7,6 +7,8 @@
 
 #include "PWM.h"
 
+#include <sstream>
+
 #include "Utility.h"
 #include "WPIErrors.h"
 
@@ -26,16 +28,16 @@ const int32_t PWM::kPwmDisabled = 0;
  *                port
  */
 PWM::PWM(uint32_t channel) {
-  char buf[64];
+  std::stringstream ss;
 
   if (!CheckPWMChannel(channel)) {
-    std::snprintf(buf, 64, "PWM Channel %d", channel);
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf);
+    ss << "PWM Channel " << channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, ss.str());
     return;
   }
 
-  std::sprintf(buf, "pwm/%d", channel);
-  impl = new SimContinuousOutput(buf);
+  ss << "pwm/" << channel;
+  impl = new SimContinuousOutput(ss.str());
   m_channel = channel;
   m_eliminateDeadband = false;
 
@@ -189,7 +191,7 @@ float PWM::GetSpeed() const {
  *
  * @param value Raw PWM value.
  */
-void PWM::SetRaw(unsigned short value) {
+void PWM::SetRaw(uint16_t value) {
   wpi_assert(value == kPwmDisabled);
   impl->Set(0);
 }

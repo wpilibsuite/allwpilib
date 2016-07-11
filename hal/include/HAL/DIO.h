@@ -24,7 +24,7 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
 void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
                                     uint32_t pin, int32_t* status);
 
-void HAL_SetDIO(HAL_DigitalHandle dio_port_handle, short value,
+void HAL_SetDIO(HAL_DigitalHandle dio_port_handle, int16_t value,
                 int32_t* status);
 bool HAL_GetDIO(HAL_DigitalHandle dio_port_handle, int32_t* status);
 bool HAL_GetDIODirection(HAL_DigitalHandle dio_port_handle, int32_t* status);

@@ -15,6 +15,6 @@
 class RGBImage : public ColorImage {
  public:
   RGBImage();
-  RGBImage(const char* fileName);
+  explicit RGBImage(const char* fileName);
   virtual ~RGBImage() = default;
 };

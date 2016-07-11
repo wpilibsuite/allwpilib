@@ -39,9 +39,9 @@ class Trigger : public Sendable {
   void CancelWhenActive(Command* command);
   void ToggleWhenActive(Command* command);
 
-  virtual void InitTable(std::shared_ptr<ITable> table);
-  virtual std::shared_ptr<ITable> GetTable() const;
-  virtual std::string GetSmartDashboardType() const;
+  void InitTable(std::shared_ptr<ITable> subtable) override;
+  std::shared_ptr<ITable> GetTable() const override;
+  std::string GetSmartDashboardType() const override;
 
  protected:
   std::shared_ptr<ITable> m_table;

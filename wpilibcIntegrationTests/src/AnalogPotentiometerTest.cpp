@@ -22,13 +22,13 @@ class AnalogPotentiometerTest : public testing::Test {
   AnalogOutput* m_fakePot;
   AnalogPotentiometer* m_pot;
 
-  virtual void SetUp() override {
+  void SetUp() override {
     m_fakePot = new AnalogOutput(TestBench::kAnalogOutputChannel);
     m_pot =
         new AnalogPotentiometer(TestBench::kFakeAnalogOutputChannel, kScale);
   }
 
-  virtual void TearDown() override {
+  void TearDown() override {
     delete m_fakePot;
     delete m_pot;
   }

@@ -210,7 +210,7 @@ int DriverStation::GetJoystickType(uint32_t stick) const {
     return -1;
   }
   std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
-  return (int)m_joystickDescriptor[stick].type;
+  return static_cast<int>(m_joystickDescriptor[stick].type);
 }
 
 /**
@@ -225,7 +225,7 @@ bool DriverStation::GetJoystickIsXbox(uint32_t stick) const {
     return false;
   }
   std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
-  return (bool)m_joystickDescriptor[stick].isXbox;
+  return static_cast<bool>(m_joystickDescriptor[stick].isXbox);
 }
 
 /**

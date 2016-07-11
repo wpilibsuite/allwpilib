@@ -14,7 +14,7 @@ using namespace gazebo;
 
 class SimDigitalInput {
  public:
-  SimDigitalInput(std::string topic);
+  explicit SimDigitalInput(std::string topic);
 
   /**
    * @return The value of the potentiometer.

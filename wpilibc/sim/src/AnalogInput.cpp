@@ -7,7 +7,7 @@
 
 #include "AnalogInput.h"
 
-#include <cstdio>
+#include <sstream>
 
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
@@ -17,11 +17,10 @@
  *
  * @param channel The channel number to represent.
  */
-AnalogInput::AnalogInput(uint32_t channel) {
-  m_channel = channel;
-  char buffer[50];
-  int n = std::sprintf(buffer, "analog/%d", channel);
-  m_impl = new SimFloatInput(buffer);
+AnalogInput::AnalogInput(uint32_t channel) : m_channel(channel) {
+  std::stringstream ss;
+  ss << "analog/" << channel;
+  m_impl = new SimFloatInput(ss.str());
 
   LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
 }

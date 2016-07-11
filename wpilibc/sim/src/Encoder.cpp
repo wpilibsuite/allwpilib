@@ -7,7 +7,7 @@
 
 #include "Encoder.h"
 
-#include <cstdio>
+#include <sstream>
 
 #include "LiveWindow/LiveWindow.h"
 #include "Resource.h"
@@ -51,9 +51,9 @@ void Encoder::InitEncoder(int32_t channelA, int32_t channelB,
   } else {
     m_reverseDirection = reverseDirection;
   }
-  char buffer[50];
-  int n = std::sprintf(buffer, "dio/%d/%d", channelA, channelB);
-  impl = new SimEncoder(buffer);
+  std::stringstream ss;
+  ss << "dio/" << channelA << "/" << channelB;
+  impl = new SimEncoder(ss.str());
   impl->Start();
 }
 

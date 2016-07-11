@@ -18,7 +18,7 @@ void HAL_InitializeSerialPort(uint8_t port, int32_t* status) {
   char const* portName;
 
   if (m_resourceManagerHandle == 0)
-    viOpenDefaultRM((ViSession*)&m_resourceManagerHandle);
+    viOpenDefaultRM(reinterpret_cast<ViSession*>(&m_resourceManagerHandle));
 
   if (port == 0)
     portName = "ASRL1::INSTR";
@@ -27,8 +27,9 @@ void HAL_InitializeSerialPort(uint8_t port, int32_t* status) {
   else
     portName = "ASRL3::INSTR";
 
-  *status = viOpen(m_resourceManagerHandle, const_cast<char*>(portName),
-                   VI_NULL, VI_NULL, (ViSession*)&m_portHandle[port]);
+  *status =
+      viOpen(m_resourceManagerHandle, const_cast<char*>(portName), VI_NULL,
+             VI_NULL, reinterpret_cast<ViSession*>(&m_portHandle[port]));
   if (*status > 0) *status = 0;
 }
 
