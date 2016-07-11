@@ -53,7 +53,7 @@ class AnalogInput : public SensorBase,
   void SetOversampleBits(int32_t bits);
   int32_t GetOversampleBits() const;
 
-  int64_t GetLSBWeight() const;
+  int32_t GetLSBWeight() const;
   int32_t GetOffset() const;
 
   bool IsAccumulatorChannel() const;

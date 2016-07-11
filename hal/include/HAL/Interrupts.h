@@ -9,8 +9,8 @@
 
 #include <stdint.h>
 
-#include "AnalogTrigger.h"
-#include "Types.h"
+#include "HAL/AnalogTrigger.h"
+#include "HAL/Types.h"
 
 extern "C" {
 typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask,

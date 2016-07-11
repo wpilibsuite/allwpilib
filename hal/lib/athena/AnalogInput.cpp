@@ -85,8 +85,7 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module) { return module == 1; }
  * @return Analog channel is valid
  */
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t pin) {
-  if (pin < kNumAnalogInputs) return true;
-  return false;
+  return (pin < kNumAnalogInputs) && (pin >= 0);
 }
 
 /**
@@ -294,7 +293,7 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analog_port_handle,
 double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analog_port_handle,
                             int32_t* status) {
   int32_t value = HAL_GetAnalogValue(analog_port_handle, status);
-  int64_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
+  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
   int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
   double voltage = LSBWeight * 1.0e-9 * value - offset * 1.0e-9;
   return voltage;
@@ -316,7 +315,7 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analog_port_handle,
 double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analog_port_handle,
                                    int32_t* status) {
   int32_t value = HAL_GetAnalogAverageValue(analog_port_handle, status);
-  int64_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
+  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
   int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
   int32_t oversampleBits =
       HAL_GetAnalogOversampleBits(analog_port_handle, status);
@@ -348,7 +347,7 @@ int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analog_port_handle,
     voltage = 0.0;
     *status = VOLTAGE_OUT_OF_RANGE;
   }
-  int64_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
+  int32_t LSBWeight = HAL_GetAnalogLSBWeight(analog_port_handle, status);
   int32_t offset = HAL_GetAnalogOffset(analog_port_handle, status);
   int32_t value =
       static_cast<int32_t>((voltage + offset * 1.0e-9) / (LSBWeight * 1.0e-9));
@@ -365,7 +364,7 @@ int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analog_port_handle,
  * @param analog_port_pointer Pointer to the analog port to use.
  * @return Least significant bit weight.
  */
-int64_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analog_port_handle,
+int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analog_port_handle,
                                int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {

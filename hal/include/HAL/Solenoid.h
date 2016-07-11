@@ -9,14 +9,14 @@
 
 #include <stdint.h>
 
-#include "Types.h"
+#include "HAL/Types.h"
 
 extern "C" {
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
                                               int32_t* status);
 void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoid_port_handle);
 HAL_Bool HAL_CheckSolenoidModule(int32_t module);
-
+HAL_Bool HAL_CheckSolenoidPin(int32_t pin);
 HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoid_port_handle,
                          int32_t* status);
 int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status);

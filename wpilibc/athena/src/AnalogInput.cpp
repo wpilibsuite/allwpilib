@@ -140,10 +140,10 @@ float AnalogInput::GetAverageVoltage() const {
  *
  * @return Least significant bit weight.
  */
-int64_t AnalogInput::GetLSBWeight() const {
+int32_t AnalogInput::GetLSBWeight() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int64_t lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
+  int32_t lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return lsbWeight;
 }

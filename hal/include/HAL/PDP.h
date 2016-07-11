@@ -9,8 +9,11 @@
 
 #include <stdint.h>
 
+#include "HAL/Types.h"
+
 extern "C" {
-void HAL_InitializePDP(int32_t module);
+void HAL_InitializePDP(int32_t module, int32_t* status);
+HAL_Bool HAL_CheckPDPModule(int32_t module);
 double HAL_GetPDPTemperature(int32_t module, int32_t* status);
 double HAL_GetPDPVoltage(int32_t module, int32_t* status);
 double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,

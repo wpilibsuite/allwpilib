@@ -132,6 +132,7 @@ void HAL_InitializeSPI(int32_t port, int32_t* status) {
       HAL_SetSPIHandle(4, spilib_open("/dev/spidev1.0"));
       break;
     default:
+      *status = PARAMETER_OUT_OF_RANGE;
       break;
   }
   return;

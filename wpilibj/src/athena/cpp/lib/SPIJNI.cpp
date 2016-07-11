@@ -342,7 +342,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorAverage(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
  * Method:    spiGetAccumulatorOutput
- * Signature: (BLjava/nio/LongBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (BLjava/nio/LongBuffer;Ljava/nio/LongBuffer;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorOutput(

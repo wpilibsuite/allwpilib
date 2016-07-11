@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "Types.h"
+#include "HAL/Types.h"
 
 extern "C" {
 void HAL_InitializeSPI(int32_t port, int32_t* status);

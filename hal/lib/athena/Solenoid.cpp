@@ -38,16 +38,20 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
   int16_t pin = getPortHandlePin(port_handle);
   int16_t module = getPortHandleModule(port_handle);
   if (pin == InvalidHandleIndex) {
-    *status = PARAMETER_OUT_OF_RANGE;  // Change to Handle Error
+    *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
 
-  if (module >= kNumPCMModules || pin >= kNumSolenoidPins) {
+  // initializePCM will check the module
+  if (!HAL_CheckSolenoidPin(pin)) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
 
-  initializePCM(module);
+  initializePCM(module, status);
+  if (*status != 0) {
+    return HAL_kInvalidHandle;
+  }
 
   auto handle =
       solenoidHandles.Allocate(module * kNumSolenoidPins + pin, status);
@@ -71,7 +75,11 @@ void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoid_port_handle) {
 }
 
 HAL_Bool HAL_CheckSolenoidModule(int32_t module) {
-  return module < kNumPCMModules;
+  return (module < kNumPCMModules) && (module >= 0);
+}
+
+HAL_Bool HAL_CheckSolenoidPin(int32_t pin) {
+  return (pin < kNumSolenoidPins) && (pin >= 0);
 }
 
 HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoid_port_handle,

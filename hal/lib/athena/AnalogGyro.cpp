@@ -26,9 +26,9 @@ struct AnalogGyro {
 
 static constexpr uint32_t kOversampleBits = 10;
 static constexpr uint32_t kAverageBits = 0;
-static constexpr double kSamplesPerSecond = 50.0f;
-static constexpr double kCalibrationSampleTime = 5.0f;
-static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007f;
+static constexpr double kSamplesPerSecond = 50.0;
+static constexpr double kCalibrationSampleTime = 5.0;
+static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
 
 using namespace hal;
 
@@ -137,7 +137,7 @@ void HAL_ResetAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   HAL_ResetAccumulator(gyro->handle, status);
   if (*status != 0) return;
 
-  const double sampleTime = 1.0f / HAL_GetAnalogSampleRate(status);
+  const double sampleTime = 1.0 / HAL_GetAnalogSampleRate(status);
   const double overSamples =
       1 << HAL_GetAnalogOversampleBits(gyro->handle, status);
   const double averageSamples =

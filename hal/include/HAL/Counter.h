@@ -9,8 +9,8 @@
 
 #include <stdint.h>
 
-#include "AnalogTrigger.h"
-#include "Types.h"
+#include "HAL/AnalogTrigger.h"
+#include "HAL/Types.h"
 
 enum HAL_Counter_Mode {
   HAL_Counter_kTwoPulse = 0,

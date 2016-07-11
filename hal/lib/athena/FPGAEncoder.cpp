@@ -20,7 +20,7 @@ struct Encoder {
 };
 }
 
-static const float DECODING_SCALING_FACTOR = 0.25f;
+static const double DECODING_SCALING_FACTOR = 0.25;
 
 static LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder, kNumEncoders,
                              HAL_HandleEnum::FPGAEncoder>
@@ -151,7 +151,7 @@ double HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
             static_cast<double>(output.Count);
   }
   double measuredPeriod = value * 2.5e-8;
-  return static_cast<double>(measuredPeriod / DECODING_SCALING_FACTOR);
+  return measuredPeriod / DECODING_SCALING_FACTOR;
 }
 
 /**

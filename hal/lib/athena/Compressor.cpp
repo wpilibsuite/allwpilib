@@ -18,13 +18,11 @@ using namespace hal;
 extern "C" {
 
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status) {
-  // fail on invalid index;
-  if (!HAL_CheckCompressorModule(module)) {
-    *status = PARAMETER_OUT_OF_RANGE;
+  // Use status to check for invalid index
+  initializePCM(module, status);
+  if (*status != 0) {
     return HAL_kInvalidHandle;
   }
-
-  initializePCM(module);
 
   // As compressors can have unlimited objects, just create a
   // handle with the module number as the index.
@@ -34,7 +32,7 @@ HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status) {
 }
 
 HAL_Bool HAL_CheckCompressorModule(int32_t module) {
-  return module < kNumPCMModules;
+  return (module < kNumPCMModules) && (module >= 0);
 }
 
 HAL_Bool HAL_GetCompressor(HAL_CompressorHandle compressor_handle,

@@ -9,14 +9,14 @@
 
 #include <stdint.h>
 
-#include "Types.h"
+#include "HAL/Types.h"
 
 extern "C" {
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle port_handle,
                                         int32_t* status);
 void HAL_FreePWMPort(HAL_DigitalHandle pwm_port_handle, int32_t* status);
 
-bool HAL_CheckPWMChannel(int32_t pin);
+HAL_Bool HAL_CheckPWMChannel(int32_t pin);
 
 void HAL_SetPWMConfig(HAL_DigitalHandle pwm_port_handle, double maxPwm,
                       double deadbandMaxPwm, double centerPwm,

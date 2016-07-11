@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "Types.h"
+#include "HAL/Types.h"
 
 extern "C" {
 HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(

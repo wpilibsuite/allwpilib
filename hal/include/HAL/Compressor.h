@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "Types.h"
+#include "HAL/Types.h"
 
 extern "C" {
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status);

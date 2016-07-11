@@ -16,5 +16,5 @@
 namespace hal {
 extern PCM* PCM_modules[kNumPCMModules];
 
-void initializePCM(int module);
+void initializePCM(int32_t module, int32_t* status);
 }

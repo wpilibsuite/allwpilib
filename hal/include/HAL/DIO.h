@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "Types.h"
+#include "HAL/Types.h"
 
 extern "C" {
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle port_handle,

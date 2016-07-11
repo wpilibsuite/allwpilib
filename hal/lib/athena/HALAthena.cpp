@@ -45,12 +45,19 @@ using namespace hal;
 
 extern "C" {
 
-HAL_PortHandle HAL_GetPort(int32_t pin) { return createPortHandle(pin, 1); }
+HAL_PortHandle HAL_GetPort(int32_t pin) {
+  // Dont allow a number that wouldn't fit in a uint8_t
+  if (pin < 0 || pin >= 255) return HAL_kInvalidHandle;
+  return createPortHandle(pin, 1);
+}
 
 /**
  * @deprecated Uses module numbers
  */
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t pin) {
+  // Dont allow a number that wouldn't fit in a uint8_t
+  if (pin < 0 || pin >= 255) return HAL_kInvalidHandle;
+  if (module < 0 || module >= 255) return HAL_kInvalidHandle;
   return createPortHandle(pin, module);
 }
 

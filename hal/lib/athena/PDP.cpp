@@ -7,6 +7,7 @@
 
 #include "HAL/PDP.h"
 
+#include "HAL/Errors.h"
 #include "HAL/Ports.h"
 #include "PortsInternal.h"
 #include "ctre/PDP.h"
@@ -17,10 +18,18 @@ static PDP* pdp[kNumPDPModules] = {nullptr};
 
 extern "C" {
 
-void HAL_InitializePDP(int32_t module) {
+void HAL_InitializePDP(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   if (!pdp[module]) {
     pdp[module] = new PDP(module);
   }
+}
+
+HAL_Bool HAL_CheckPDPModule(int32_t module) {
+  return (module < kNumPDPModules) && (module >= 0);
 }
 
 double HAL_GetPDPTemperature(int32_t module, int32_t* status) {

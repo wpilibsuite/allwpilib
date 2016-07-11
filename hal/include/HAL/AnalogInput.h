@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "Types.h"
+#include "HAL/Types.h"
 
 extern "C" {
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle port_handle,
@@ -38,7 +38,7 @@ double HAL_GetAnalogVoltage(HAL_AnalogInputHandle analog_port_handle,
                             int32_t* status);
 double HAL_GetAnalogAverageVoltage(HAL_AnalogInputHandle analog_port_handle,
                                    int32_t* status);
-int64_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analog_port_handle,
+int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analog_port_handle,
                                int32_t* status);
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analog_port_handle,
                             int32_t* status);

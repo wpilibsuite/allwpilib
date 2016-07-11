@@ -41,11 +41,11 @@ constexpr uint32_t kExpectedLoopTiming = 40;
  * scaling is implemented as an output squelch to get longer periods for old
  * devices.
  */
-constexpr float kDefaultPwmPeriod = 5.05f;
+constexpr float kDefaultPwmPeriod = 5.05;
 /**
  * kDefaultPwmCenter is the PWM range center in ms
  */
-constexpr float kDefaultPwmCenter = 1.5f;
+constexpr float kDefaultPwmCenter = 1.5;
 /**
  * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
  */

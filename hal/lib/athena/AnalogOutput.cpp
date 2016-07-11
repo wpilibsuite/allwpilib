@@ -70,8 +70,7 @@ void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analog_output_handle) {
  * @return Analog channel is valid
  */
 HAL_Bool HAL_CheckAnalogOutputChannel(int32_t pin) {
-  if (pin < kNumAnalogOutputs) return true;
-  return false;
+  return (pin < kNumAnalogOutputs) && (pin >= 0);
 }
 
 void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analog_output_handle,

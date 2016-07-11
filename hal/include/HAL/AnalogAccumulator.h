@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "Types.h"
+#include "HAL/Types.h"
 
 extern "C" {
 HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analog_port_handle,
