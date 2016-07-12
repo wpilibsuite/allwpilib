@@ -2398,4 +2398,4 @@ const char* GetVisionErrorText(int errorCode) {
   }
 
   return errorText;
-}
+}  // NOLINT
