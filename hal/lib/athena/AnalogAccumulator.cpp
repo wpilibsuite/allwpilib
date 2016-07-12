@@ -18,8 +18,8 @@ extern "C" {
 *
 *@return The analog channel is attached to an accumulator.
 */
-bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analog_port_handle,
-                              int32_t* status) {
+HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analog_port_handle,
+                                  int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -131,8 +131,8 @@ int64_t HAL_GetAccumulatorValue(HAL_AnalogInputHandle analog_port_handle,
  *
  * @return The number of times samples from the channel were accumulated.
  */
-uint32_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analog_port_handle,
-                                 int32_t* status) {
+int64_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analog_port_handle,
+                                int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -155,8 +155,7 @@ uint32_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analog_port_handle,
  * @param count Pointer to the number of accumulation cycles.
  */
 void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analog_port_handle,
-                              int64_t* value, uint32_t* count,
-                              int32_t* status) {
+                              int64_t* value, int64_t* count, int32_t* status) {
   auto port = analogInputHandles.Get(analog_port_handle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;

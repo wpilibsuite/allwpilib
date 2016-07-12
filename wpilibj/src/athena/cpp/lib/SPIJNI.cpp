@@ -342,7 +342,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorAverage(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
  * Method:    spiGetAccumulatorOutput
- * Signature: (BLjava/nio/LongBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (BLjava/nio/LongBuffer;Ljava/nio/LongBuffer;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorOutput(
@@ -352,7 +352,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorOutput(
   int32_t status = 0;
 
   jlong *valuePtr = (jlong *)env->GetDirectBufferAddress(value);
-  uint32_t *countPtr = (uint32_t *)env->GetDirectBufferAddress(count);
+  jlong *countPtr = (jlong *)env->GetDirectBufferAddress(count);
 
   HAL_GetSPIAccumulatorOutput(port, valuePtr, countPtr, &status);
 

@@ -11,8 +11,8 @@
 
 #include "ChipObject.h"
 #include "HAL/AnalogTrigger.h"
-#include "HAL/Handles.h"
 #include "HAL/Ports.h"
+#include "HAL/Types.h"
 #include "PortsInternal.h"
 #include "handles/DigitalHandleResource.h"
 #include "handles/HandlesInternal.h"
@@ -78,8 +78,8 @@ extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
 
 void initializeDigital(int32_t* status);
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
-                        HAL_AnalogTriggerType analogTriggerType, uint32_t& pin,
+                        HAL_AnalogTriggerType analogTriggerType, uint8_t& pin,
                         uint8_t& module, bool& analogTrigger);
-uint32_t remapMXPPWMChannel(uint32_t pin);
-uint32_t remapMXPChannel(uint32_t pin);
+int32_t remapMXPPWMChannel(int32_t pin);
+int32_t remapMXPChannel(int32_t pin);
 }  // namespace hal

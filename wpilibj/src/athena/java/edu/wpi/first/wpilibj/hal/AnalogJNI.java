@@ -92,7 +92,7 @@ public class AnalogJNI extends JNIWrapper {
   public static native int getAccumulatorCount(int analogPortHandle);
 
   public static native void getAccumulatorOutput(int analogPortHandle, LongBuffer value,
-                                                 IntBuffer count);
+                                                 LongBuffer count);
 
   public static native int initializeAnalogTrigger(int analogInputHandle, IntBuffer index);
 

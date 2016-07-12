@@ -494,7 +494,7 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorCount(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
  * Method:    getAccumulatorOutput
- * Signature: (ILjava/nio/LongBuffer;Ljava/nio/IntBuffer;)V
+ * Signature: (ILjava/nio/LongBuffer;Ljava/nio/LongBuffer;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput(
@@ -502,7 +502,7 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput(
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
   int32_t status = 0;
   jlong *valuePtr = (jlong *)env->GetDirectBufferAddress(value);
-  uint32_t *countPtr = (uint32_t *)env->GetDirectBufferAddress(count);
+  jlong *countPtr = (jlong *)env->GetDirectBufferAddress(count);
   HAL_GetAccumulatorOutput((HAL_AnalogInputHandle)id, valuePtr, countPtr, &status);
   ANALOGJNI_LOG(logDEBUG) << "Value = " << *valuePtr;
   ANALOGJNI_LOG(logDEBUG) << "Count = " << *countPtr;
@@ -523,7 +523,7 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogTrigger(
   ANALOGJNI_LOG(logDEBUG) << "Index Ptr = " << indexHandle;
   int32_t status = 0;
   HAL_AnalogTriggerHandle analogTrigger =
-      HAL_InitializeAnalogTrigger((HAL_AnalogInputHandle)id, (uint32_t *)indexHandle, &status);
+      HAL_InitializeAnalogTrigger((HAL_AnalogInputHandle)id, (int32_t *)indexHandle, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "AnalogTrigger Handle = " << analogTrigger;
   CheckStatus(env, status);

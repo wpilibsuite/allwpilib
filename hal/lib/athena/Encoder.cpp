@@ -230,7 +230,7 @@ extern "C" {
 HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
-    bool reverseDirection, HAL_EncoderEncodingType encodingType,
+    HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
     int32_t* status) {
   auto encoder = std::make_shared<Encoder>(
       digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
@@ -285,8 +285,7 @@ void HAL_ResetEncoder(HAL_EncoderHandle encoder_handle, int32_t* status) {
   encoder->Reset(status);
 }
 
-int32_t HAL_GetEncoderPeriod(HAL_EncoderHandle encoder_handle,
-                             int32_t* status) {
+double HAL_GetEncoderPeriod(HAL_EncoderHandle encoder_handle, int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -305,8 +304,8 @@ void HAL_SetEncoderMaxPeriod(HAL_EncoderHandle encoder_handle, double maxPeriod,
   encoder->SetMaxPeriod(maxPeriod, status);
 }
 
-uint8_t HAL_GetEncoderStopped(HAL_EncoderHandle encoder_handle,
-                              int32_t* status) {
+HAL_Bool HAL_GetEncoderStopped(HAL_EncoderHandle encoder_handle,
+                               int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -315,8 +314,8 @@ uint8_t HAL_GetEncoderStopped(HAL_EncoderHandle encoder_handle,
   return encoder->GetStopped(status);
 }
 
-uint8_t HAL_GetEncoderDirection(HAL_EncoderHandle encoder_handle,
-                                int32_t* status) {
+HAL_Bool HAL_GetEncoderDirection(HAL_EncoderHandle encoder_handle,
+                                 int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;
@@ -365,7 +364,8 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoder_handle,
 }
 
 void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoder_handle,
-                                    uint8_t reverseDirection, int32_t* status) {
+                                    HAL_Bool reverseDirection,
+                                    int32_t* status) {
   auto encoder = encoderHandles.Get(encoder_handle);
   if (encoder == nullptr) {
     *status = HAL_HANDLE_ERROR;

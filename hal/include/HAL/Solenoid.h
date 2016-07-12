@@ -9,21 +9,21 @@
 
 #include <stdint.h>
 
-#include "Handles.h"
+#include "HAL/Types.h"
 
 extern "C" {
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
                                               int32_t* status);
 void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoid_port_handle);
-bool HAL_CheckSolenoidModule(uint8_t module);
-
-bool HAL_GetSolenoid(HAL_SolenoidHandle solenoid_port_handle, int32_t* status);
-uint8_t HAL_GetAllSolenoids(uint8_t module, int32_t* status);
-void HAL_SetSolenoid(HAL_SolenoidHandle solenoid_port_handle, bool value,
+HAL_Bool HAL_CheckSolenoidModule(int32_t module);
+HAL_Bool HAL_CheckSolenoidPin(int32_t pin);
+HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoid_port_handle,
+                         int32_t* status);
+int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status);
+void HAL_SetSolenoid(HAL_SolenoidHandle solenoid_port_handle, HAL_Bool value,
                      int32_t* status);
-
-int HAL_GetPCMSolenoidBlackList(uint8_t module, int32_t* status);
-bool HAL_GetPCMSolenoidVoltageStickyFault(uint8_t module, int32_t* status);
-bool HAL_GetPCMSolenoidVoltageFault(uint8_t module, int32_t* status);
-void HAL_ClearAllPCMStickyFaults(uint8_t module, int32_t* status);
+int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status);
+HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status);
+HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status);
+void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status);
 }

@@ -97,8 +97,8 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
  * @param deadbandMin The low end of the deadband pulse width in ms
  * @param min         The minimum pulse width in ms
  */
-void PWM::SetBounds(double max, double deadbandMax, double center,
-                    double deadbandMin, double min) {
+void PWM::SetBounds(float max, float deadbandMax, float center,
+                    float deadbandMin, float min) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min,

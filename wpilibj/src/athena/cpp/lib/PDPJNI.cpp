@@ -17,8 +17,10 @@ extern "C" {
  * Signature: (I)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP(
-    JNIEnv *, jclass, jint module) {
-  HAL_InitializePDP(module);
+    JNIEnv *env, jclass, jint module) {
+  int32_t status = 0;
+  HAL_InitializePDP(module, &status);
+  CheckStatus(env, status);
 }
 
 /*

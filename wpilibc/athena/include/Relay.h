@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "SensorBase.h"

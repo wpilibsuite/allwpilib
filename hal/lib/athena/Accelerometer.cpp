@@ -99,7 +99,7 @@ static void initializeAccelerometer() {
 
 static void writeRegister(Register reg, uint8_t data) {
   int32_t status = 0;
-  uint32_t initialTime;
+  uint64_t initialTime;
 
   accel->writeADDR(kSendAddress, &status);
 
@@ -130,7 +130,7 @@ static void writeRegister(Register reg, uint8_t data) {
 
 static uint8_t readRegister(Register reg) {
   int32_t status = 0;
-  uint32_t initialTime;
+  uint64_t initialTime;
 
   // Send a start transmit/receive message with the register address
   accel->writeADDR(kSendAddress, &status);
@@ -189,7 +189,7 @@ extern "C" {
  * Set the accelerometer to active or standby mode.  It must be in standby
  * mode to change any configuration.
  */
-void HAL_SetAccelerometerActive(bool active) {
+void HAL_SetAccelerometerActive(HAL_Bool active) {
   initializeAccelerometer();
 
   uint8_t ctrlReg1 = readRegister(kReg_CtrlReg1);

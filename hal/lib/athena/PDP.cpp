@@ -7,6 +7,7 @@
 
 #include "HAL/PDP.h"
 
+#include "HAL/Errors.h"
 #include "HAL/Ports.h"
 #include "PortsInternal.h"
 #include "ctre/PDP.h"
@@ -17,13 +18,26 @@ static PDP* pdp[kNumPDPModules] = {nullptr};
 
 extern "C" {
 
-void HAL_InitializePDP(uint8_t module) {
+void HAL_InitializePDP(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
   if (!pdp[module]) {
     pdp[module] = new PDP(module);
   }
 }
 
-double HAL_GetPDPTemperature(uint8_t module, int32_t* status) {
+HAL_Bool HAL_CheckPDPModule(int32_t module) {
+  return (module < kNumPDPModules) && (module >= 0);
+}
+
+double HAL_GetPDPTemperature(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double temperature;
 
   *status = pdp[module]->GetTemperature(temperature);
@@ -31,7 +45,12 @@ double HAL_GetPDPTemperature(uint8_t module, int32_t* status) {
   return temperature;
 }
 
-double HAL_GetPDPVoltage(uint8_t module, int32_t* status) {
+double HAL_GetPDPVoltage(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double voltage;
 
   *status = pdp[module]->GetVoltage(voltage);
@@ -39,8 +58,13 @@ double HAL_GetPDPVoltage(uint8_t module, int32_t* status) {
   return voltage;
 }
 
-double HAL_GetPDPChannelCurrent(uint8_t module, uint8_t channel,
+double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
                                 int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double current;
 
   *status = pdp[module]->GetChannelCurrent(channel, current);
@@ -48,7 +72,12 @@ double HAL_GetPDPChannelCurrent(uint8_t module, uint8_t channel,
   return current;
 }
 
-double HAL_GetPDPTotalCurrent(uint8_t module, int32_t* status) {
+double HAL_GetPDPTotalCurrent(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double current;
 
   *status = pdp[module]->GetTotalCurrent(current);
@@ -56,7 +85,12 @@ double HAL_GetPDPTotalCurrent(uint8_t module, int32_t* status) {
   return current;
 }
 
-double HAL_GetPDPTotalPower(uint8_t module, int32_t* status) {
+double HAL_GetPDPTotalPower(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double power;
 
   *status = pdp[module]->GetTotalPower(power);
@@ -64,7 +98,12 @@ double HAL_GetPDPTotalPower(uint8_t module, int32_t* status) {
   return power;
 }
 
-double HAL_GetPDPTotalEnergy(uint8_t module, int32_t* status) {
+double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double energy;
 
   *status = pdp[module]->GetTotalEnergy(energy);
@@ -72,11 +111,21 @@ double HAL_GetPDPTotalEnergy(uint8_t module, int32_t* status) {
   return energy;
 }
 
-void HAL_ResetPDPTotalEnergy(uint8_t module, int32_t* status) {
+void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
   *status = pdp[module]->ResetEnergy();
 }
 
-void HAL_ClearPDPStickyFaults(uint8_t module, int32_t* status) {
+void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
   *status = pdp[module]->ClearStickyFaults();
 }
 

@@ -42,3 +42,5 @@ typedef HAL_Handle HAL_FPGAEncoderHandle;
 typedef HAL_Handle HAL_EncoderHandle;
 
 typedef HAL_Handle HAL_GyroHandle;
+
+typedef int32_t HAL_Bool;

@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "HAL/Handles.h"
+#include "HAL/Types.h"
 
 /* General Handle Data Layout
  * Bits 0-15:  Handle Index

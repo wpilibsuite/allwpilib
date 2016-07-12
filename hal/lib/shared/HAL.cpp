@@ -9,6 +9,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <limits>
 
 #include "FRC_NetworkCommunication/FRCComm.h"
 
@@ -19,7 +20,7 @@ struct HAL_JoystickAxesInt {
 
 extern "C" {
 
-int HAL_GetControlWord(HAL_ControlWord* controlWord) {
+int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   std::memset(controlWord, 0, sizeof(HAL_ControlWord));
   return FRC_NetworkCommunication_getControlWord(
       reinterpret_cast<ControlWord_t*>(controlWord));
@@ -32,7 +33,7 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
   return allianceStation;
 }
 
-int HAL_GetJoystickAxes(uint8_t joystickNum, HAL_JoystickAxes* axes) {
+int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
   HAL_JoystickAxesInt axesInt;
 
   int retVal = FRC_NetworkCommunication_getJoystickAxes(
@@ -55,13 +56,14 @@ int HAL_GetJoystickAxes(uint8_t joystickNum, HAL_JoystickAxes* axes) {
   return retVal;
 }
 
-int HAL_GetJoystickPOVs(uint8_t joystickNum, HAL_JoystickPOVs* povs) {
+int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
   return FRC_NetworkCommunication_getJoystickPOVs(
       joystickNum, reinterpret_cast<JoystickPOV_t*>(povs),
       HAL_kMaxJoystickPOVs);
 }
 
-int HAL_GetJoystickButtons(uint8_t joystickNum, HAL_JoystickButtons* buttons) {
+int32_t HAL_GetJoystickButtons(int32_t joystickNum,
+                               HAL_JoystickButtons* buttons) {
   return FRC_NetworkCommunication_getJoystickButtons(
       joystickNum, &buttons->buttons, &buttons->count);
 }
@@ -76,10 +78,10 @@ int HAL_GetJoystickButtons(uint8_t joystickNum, HAL_JoystickButtons* buttons) {
  * @return error code reported from Network Comm back-end.  Zero is good,
  * nonzero is bad.
  */
-int HAL_GetJoystickDescriptor(uint8_t joystickNum,
-                              HAL_JoystickDescriptor* desc) {
+int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
+                                  HAL_JoystickDescriptor* desc) {
   desc->isXbox = 0;
-  desc->type = -1;
+  desc->type = std::numeric_limits<uint8_t>::max();
   desc->name[0] = '\0';
   desc->axisCount =
       HAL_kMaxJoystickAxes; /* set to the desc->axisTypes's capacity */
@@ -99,7 +101,7 @@ int HAL_GetJoystickDescriptor(uint8_t joystickNum,
   return retval;
 }
 
-int HAL_GetJoystickIsXbox(uint8_t joystickNum) {
+HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return 0;
@@ -108,7 +110,7 @@ int HAL_GetJoystickIsXbox(uint8_t joystickNum) {
   }
 }
 
-int HAL_GetJoystickType(uint8_t joystickNum) {
+int32_t HAL_GetJoystickType(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
@@ -117,7 +119,7 @@ int HAL_GetJoystickType(uint8_t joystickNum) {
   }
 }
 
-char* HAL_GetJoystickName(uint8_t joystickNum) {
+char* HAL_GetJoystickName(int32_t joystickNum) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     char* name = static_cast<char*>(std::malloc(1));
@@ -132,7 +134,7 @@ char* HAL_GetJoystickName(uint8_t joystickNum) {
   }
 }
 
-int HAL_GetJoystickAxisType(uint8_t joystickNum, uint8_t axis) {
+int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {
     return -1;
@@ -141,8 +143,8 @@ int HAL_GetJoystickAxisType(uint8_t joystickNum, uint8_t axis) {
   }
 }
 
-int HAL_SetJoystickOutputs(uint8_t joystickNum, uint32_t outputs,
-                           uint16_t leftRumble, uint16_t rightRumble) {
+int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
+                               int32_t leftRumble, int32_t rightRumble) {
   return FRC_NetworkCommunication_setJoystickOutputs(joystickNum, outputs,
                                                      leftRumble, rightRumble);
 }
