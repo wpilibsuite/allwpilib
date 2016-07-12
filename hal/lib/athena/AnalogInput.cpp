@@ -17,8 +17,6 @@
 #include "PortsInternal.h"
 #include "handles/HandlesInternal.h"
 
-#include <iostream>
-
 using namespace hal;
 
 static bool analogSampleRateSet = false;
@@ -375,7 +373,6 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analog_port_handle,
   }
   uint32_t lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(
       0, port->pin, status);  // XXX: aiSystemIndex == 0?
-  std::cout << lsbWeight << " = LSBWeight" << std::endl;
   return lsbWeight;
 }
 
