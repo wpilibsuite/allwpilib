@@ -161,12 +161,12 @@ public abstract class CANMotorEncoderFixture extends MotorEncoderFixture<CANJagu
       status.append("\t" + "CANJaguar Motor = null" + "\n");
     }
     if (m_forwardLimit != null) {
-      status.append("\tForward Limit Output = " + m_forwardLimit + "\n");
+      status.append("\tForward Limit Output = " + m_forwardLimit.get() + "\n");
     } else {
       status.append("\tForward Limit Output = null" + "\n");
     }
     if (m_reverseLimit != null) {
-      status.append("\tReverse Limit Output = " + m_reverseLimit + "\n");
+      status.append("\tReverse Limit Output = " + m_reverseLimit.get() + "\n");
     } else {
       status.append("\tReverse Limit Output = null" + "\n");
     }
