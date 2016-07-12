@@ -81,7 +81,7 @@ double HAL_GetUserVoltage5V(int32_t* status) {
  */
 double HAL_GetUserCurrent5V(int32_t* status) {
   initializePower(status);
-  return power->readUserCurrent5V(status) / 4.096 * 0.001996 - 0.002f;
+  return power->readUserCurrent5V(status) / 4.096 * 0.001996 - 0.002;
 }
 
 /**

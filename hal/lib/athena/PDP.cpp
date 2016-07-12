@@ -33,6 +33,11 @@ HAL_Bool HAL_CheckPDPModule(int32_t module) {
 }
 
 double HAL_GetPDPTemperature(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double temperature;
 
   *status = pdp[module]->GetTemperature(temperature);
@@ -41,6 +46,11 @@ double HAL_GetPDPTemperature(int32_t module, int32_t* status) {
 }
 
 double HAL_GetPDPVoltage(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double voltage;
 
   *status = pdp[module]->GetVoltage(voltage);
@@ -50,6 +60,11 @@ double HAL_GetPDPVoltage(int32_t module, int32_t* status) {
 
 double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
                                 int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double current;
 
   *status = pdp[module]->GetChannelCurrent(channel, current);
@@ -58,6 +73,11 @@ double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
 }
 
 double HAL_GetPDPTotalCurrent(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double current;
 
   *status = pdp[module]->GetTotalCurrent(current);
@@ -66,6 +86,11 @@ double HAL_GetPDPTotalCurrent(int32_t module, int32_t* status) {
 }
 
 double HAL_GetPDPTotalPower(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double power;
 
   *status = pdp[module]->GetTotalPower(power);
@@ -74,6 +99,11 @@ double HAL_GetPDPTotalPower(int32_t module, int32_t* status) {
 }
 
 double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return 0.0;
+  }
+
   double energy;
 
   *status = pdp[module]->GetTotalEnergy(energy);
@@ -82,10 +112,20 @@ double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) {
 }
 
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
   *status = pdp[module]->ResetEnergy();
 }
 
 void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status) {
+  if (!HAL_CheckPDPModule(module)) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
+
   *status = pdp[module]->ClearStickyFaults();
 }
 
