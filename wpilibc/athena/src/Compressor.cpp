@@ -19,7 +19,8 @@ Compressor::Compressor(uint8_t pcmID) : m_module(pcmID) {
   int32_t status = 0;
   m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setErrorWithContextRange(status, 0, HAL_GetNumPCMModules(), pcmID,
+                                 HAL_GetErrorMessage(status));
     return;
   }
   SetClosedLoopControl(true);

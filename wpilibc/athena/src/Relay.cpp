@@ -38,7 +38,8 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
     int32_t status = 0;
     m_forwardHandle = HAL_InitializeRelayPort(portHandle, true, &status);
     if (status != 0) {
-      wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+      wpi_setErrorWithContextRange(status, 0, HAL_GetNumRelayPins(), channel,
+                                   HAL_GetErrorMessage(status));
       m_forwardHandle = HAL_kInvalidHandle;
       m_reverseHandle = HAL_kInvalidHandle;
       return;
@@ -49,7 +50,8 @@ Relay::Relay(uint32_t channel, Relay::Direction direction)
     int32_t status = 0;
     m_reverseHandle = HAL_InitializeRelayPort(portHandle, false, &status);
     if (status != 0) {
-      wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+      wpi_setErrorWithContextRange(status, 0, HAL_GetNumRelayPins(), channel,
+                                   HAL_GetErrorMessage(status));
       m_forwardHandle = HAL_kInvalidHandle;
       m_reverseHandle = HAL_kInvalidHandle;
       return;
