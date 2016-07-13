@@ -20,7 +20,7 @@ extern "C" {
 
 void HAL_InitializePDP(int32_t module, int32_t* status) {
   if (!HAL_CheckPDPModule(module)) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
     return;
   }
   if (!pdp[module]) {

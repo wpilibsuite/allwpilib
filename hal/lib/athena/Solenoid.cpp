@@ -44,7 +44,7 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
 
   // initializePCM will check the module
   if (!HAL_CheckSolenoidPin(pin)) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
 

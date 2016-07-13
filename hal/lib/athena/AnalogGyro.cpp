@@ -46,7 +46,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analog_handle,
                                         int32_t* status) {
   if (!HAL_IsAccumulatorChannel(analog_handle, status)) {
     if (*status == 0) {
-      *status = PARAMETER_OUT_OF_RANGE;
+      *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
     }
     return HAL_kInvalidHandle;
   }

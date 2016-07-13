@@ -14,10 +14,19 @@
 
 extern JavaVM *jvm;
 
-void ReportError(JNIEnv *env, int32_t status, bool do_throw = true);
+void ReportError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange, 
+                 int32_t requestedValue, bool do_throw = true);
 
 inline bool CheckStatus(JNIEnv *env, int32_t status, bool do_throw = true) {
-  if (status != 0) ReportError(env, status, do_throw);
+  if (status != 0) ReportError(env, status, 0, 0, 0, do_throw);
+  return status == 0;
+}
+
+inline bool CheckStatusRange(JNIEnv *env, int32_t status, int32_t minRange, 
+                             int32_t maxRange, int32_t requestedValue, 
+                             bool do_throw = true) {
+  if (status != 0) ReportError(env, status, minRange, maxRange, requestedValue, 
+                               do_throw);
   return status == 0;
 }
 
