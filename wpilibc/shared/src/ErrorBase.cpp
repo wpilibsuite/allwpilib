@@ -140,10 +140,11 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
                               uint32_t lineNumber) const {
   //  If there was an error
   if (code != 0) {
-    char* buf = new char[contextMessage.size() + 100];
-    sprintf(buf,
-            "%s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d",
-            contextMessage.data(), minRange, maxRange, requestedValue);
+    size_t size = contextMessage.size() + 100;
+    char* buf = new char[size];
+    snprintf(buf, size,
+             "%s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d",
+             contextMessage.data(), minRange, maxRange, requestedValue);
     //  Set the current error information for this object.
     m_error.Set(code, buf, filename, function, lineNumber, this);
     delete[] buf;

@@ -25,8 +25,8 @@
 #include "HAL/Errors.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "ctre/ctre.h"
-#include "handles/HandlesInternal.h"
 #include "visa/visa.h"
 
 static tGlobal* global = nullptr;

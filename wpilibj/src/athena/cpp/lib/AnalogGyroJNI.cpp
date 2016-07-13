@@ -13,7 +13,7 @@
 
 #include "HAL/AnalogGyro.h"
 #include "HALUtil.h"
-#include "handles/HandlesInternal.h"
+#include "HAL/handles/HandlesInternal.h"
 
 // set the logging level
 TLogLevel analogGyroJNILogLevel = logWARNING;

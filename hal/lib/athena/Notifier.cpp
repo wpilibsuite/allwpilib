@@ -17,7 +17,7 @@
 #include "ChipObject.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/priority_mutex.h"
-#include "handles/UnlimitedHandleResource.h"
+#include "HAL/handles/UnlimitedHandleResource.h"
 
 static const uint32_t kTimerInterruptNumber = 28;
 

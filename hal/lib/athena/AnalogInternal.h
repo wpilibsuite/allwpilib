@@ -12,8 +12,8 @@
 #include "ChipObject.h"
 #include "HAL/Ports.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "HAL/handles/IndexedHandleResource.h"
 #include "PortsInternal.h"
-#include "handles/IndexedHandleResource.h"
 
 namespace hal {
 constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock

@@ -11,11 +11,11 @@
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/Errors.h"
 #include "HAL/Ports.h"
+#include "HAL/handles/HandlesInternal.h"
+#include "HAL/handles/IndexedHandleResource.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
-#include "handles/HandlesInternal.h"
-#include "handles/IndexedHandleResource.h"
 
 namespace {
 struct Solenoid {

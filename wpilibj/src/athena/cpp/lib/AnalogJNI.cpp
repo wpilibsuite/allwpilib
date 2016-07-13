@@ -17,7 +17,7 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Ports.h"
 #include "HALUtil.h"
-#include "handles/HandlesInternal.h"
+#include "HAL/handles/HandlesInternal.h"
 
 // set the logging level
 TLogLevel analogJNILogLevel = logWARNING;

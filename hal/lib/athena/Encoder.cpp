@@ -12,8 +12,8 @@
 #include "FPGAEncoder.h"
 #include "HAL/Counter.h"
 #include "HAL/Errors.h"
+#include "HAL/handles/LimitedClassedHandleResource.h"
 #include "PortsInternal.h"
-#include "handles/LimitedClassedHandleResource.h"
 
 using namespace hal;
 

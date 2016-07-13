@@ -15,7 +15,7 @@
 #include "HAL/PWM.h"
 #include "HALUtil.h"
 #include "HAL/Ports.h"
-#include "handles/HandlesInternal.h"
+#include "HAL/handles/HandlesInternal.h"
 
 // set the logging level
 TLogLevel dioJNILogLevel = logWARNING;

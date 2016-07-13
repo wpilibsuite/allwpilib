@@ -13,7 +13,7 @@
 #include "AnalogInternal.h"
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/AnalogInput.h"
-#include "handles/IndexedHandleResource.h"
+#include "HAL/handles/IndexedHandleResource.h"
 
 namespace {
 struct AnalogGyro {

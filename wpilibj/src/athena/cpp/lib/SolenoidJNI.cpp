@@ -7,7 +7,7 @@
 
 #include <jni.h>
 #include "HAL/HAL.h"
-#include "handles/HandlesInternal.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "Log.h"
 
 #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"

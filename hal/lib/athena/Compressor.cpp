@@ -8,10 +8,10 @@
 #include "HAL/Compressor.h"
 
 #include "HAL/Errors.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
-#include "handles/HandlesInternal.h"
 
 using namespace hal;
 
