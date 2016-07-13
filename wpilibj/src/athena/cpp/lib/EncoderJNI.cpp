@@ -7,7 +7,7 @@
 
 #include <assert.h>
 #include <jni.h>
-#include "Log.h"
+#include "HAL/cpp/Log.h"
 
 #include "edu_wpi_first_wpilibj_hal_EncoderJNI.h"
 

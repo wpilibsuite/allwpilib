@@ -9,7 +9,7 @@
 #include <string.h>
 #include "AnalogInput.h"
 #include "FRC_NetworkCommunication/FRCComm.h"
-#include "Log.h"
+#include "HAL/cpp/Log.h"
 #include "MotorSafetyHelper.h"
 #include "Timer.h"
 #include "Utility.h"

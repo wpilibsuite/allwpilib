@@ -11,7 +11,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
-#include "Log.h"
+#include "HAL/cpp/Log.h"
 
 #include "HAL/Interrupts.h"
 #include "HALUtil.h"

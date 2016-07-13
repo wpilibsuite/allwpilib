@@ -7,7 +7,7 @@
 
 #include "HAL/HAL.h"
 #include "HALUtil.h"
-#include "Log.h"
+#include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_CompressorJNI.h"
 
 extern "C" {

@@ -11,7 +11,7 @@
 
 #include <boost/mem_fn.hpp>
 
-#include "Log.h"
+#include "HAL/cpp/Log.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
