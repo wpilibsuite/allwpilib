@@ -23,4 +23,4 @@ void initializePCM(int32_t module, int32_t* status) {
     PCM_modules[module] = new PCM(module);
   }
 }
-}
+}  // namespace hal
