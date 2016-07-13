@@ -14,6 +14,8 @@
 #include "HAL/DIO.h"
 #include "HAL/PWM.h"
 #include "HALUtil.h"
+#include "HAL/Ports.h"
+#include "handles/HandlesInternal.h"
 
 // set the logging level
 TLogLevel dioJNILogLevel = logWARNING;
@@ -41,7 +43,8 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDIOPort(
   auto dio = HAL_InitializeDIOPort((HAL_PortHandle)id, (uint8_t)input, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "DIO Handle = " << dio;
-  CheckStatus(env, status);
+  CheckStatusRange(env, 0, HAL_GetNumDigitalPins(), 
+                   hal::getPortHandlePin((HAL_PortHandle)id), status);
   return (jint)dio;
 }
 

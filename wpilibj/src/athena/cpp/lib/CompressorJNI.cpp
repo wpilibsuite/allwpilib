@@ -22,9 +22,7 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_initializeCompressor(
     JNIEnv *env, jclass, jbyte module) {
   int32_t status = 0;
   auto handle = HAL_InitializeCompressor(module, &status);
-  if (status == PARAMETER_OUT_OF_RANGE) {
-    ThrowBoundaryException(env, module, 0, HAL_GetNumPCMModules());
-  }
+  CheckStatusRange(env, 0, HAL_GetNumPCMModules(), module, status);
   
   return (jint)handle;
 }

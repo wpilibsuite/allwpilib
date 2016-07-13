@@ -68,9 +68,11 @@
 #define RESOURCE_IS_ALLOCATED -1029
 #define RESOURCE_IS_ALLOCATED_MESSAGE "HAL: Resource already allocated"
 #define RESOURCE_OUT_OF_RANGE -1030
-#define RESOURCE_OUT_OF_RANGE_MESSAGE "HAL: The requested resource is out of range."
+#define RESOURCE_OUT_OF_RANGE_MESSAGE \
+  "HAL: The requested resource is out of range."
 #define HAL_INVALID_ACCUMULATOR_CHANNEL -1035
-#define HAL_INVALID_ACCUMULATOR_CHANNEL_MESSAGE "HAL: The requested input is not an accumulator channel"
+#define HAL_INVALID_ACCUMULATOR_CHANNEL_MESSAGE \
+  "HAL: The requested input is not an accumulator channel"
 #define HAL_COUNTER_NOT_SUPPORTED -1058
 #define HAL_COUNTER_NOT_SUPPORTED_MESSAGE \
   "HAL: Counter mode not supported for encoder method"
