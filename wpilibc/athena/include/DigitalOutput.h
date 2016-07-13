@@ -27,6 +27,7 @@ class DigitalOutput : public DigitalSource,
   explicit DigitalOutput(uint32_t channel);
   virtual ~DigitalOutput();
   void Set(bool value);
+  bool Get();
   uint32_t GetChannel() const override;
   void Pulse(float length);
   bool IsPulsing() const;

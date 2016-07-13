@@ -73,6 +73,20 @@ void DigitalOutput::Set(bool value) {
 }
 
 /**
+   * Gets the value being output from the Digital Output.
+   *
+   * @return the state of the digital output.
+   */
+bool DigitalOutput::Get() {
+  if (StatusIsFatal()) return false;
+
+  int32_t status = 0;
+  bool val = HAL_GetDIO(m_handle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return val;
+}
+
+/**
  * @return The GPIO channel number that this object represents.
  */
 uint32_t DigitalOutput::GetChannel() const { return m_channel; }

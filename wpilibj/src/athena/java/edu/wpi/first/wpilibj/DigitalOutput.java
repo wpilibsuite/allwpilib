@@ -65,6 +65,15 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   }
 
   /**
+   * Gets the value being output from the Digital Output.
+   *
+   * @return the state of the digital output.
+   */
+  public boolean get() {
+    return DIOJNI.getDIO(m_handle);
+  }
+
+  /**
    * @return The GPIO channel number that this object represents.
    */
   @Override
