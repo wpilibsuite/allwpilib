@@ -15,6 +15,51 @@ using namespace nt;
 ATOMIC_STATIC_INIT(Notifier)
 bool Notifier::s_destroyed = false;
 
+namespace {
+// Vector which provides an integrated freelist for removal and reuse of
+// individual elements.
+template <typename T>
+class UidVector {
+ public:
+  typedef typename std::vector<T>::size_type size_type;
+
+  size_type size() const { return m_vector.size(); }
+  T& operator[](size_type i) { return m_vector[i]; }
+  const T& operator[](size_type i) const { return m_vector[i]; }
+
+  // Add a new T to the vector.  If there are elements on the freelist,
+  // reuses the last one; otherwise adds to the end of the vector.
+  // Returns the resulting element index (+1).
+  template <class... Args>
+  unsigned int emplace_back(Args&&... args) {
+    unsigned int uid;
+    if (m_free.empty()) {
+      uid = m_vector.size();
+      m_vector.emplace_back(std::forward<Args>(args)...);
+    } else {
+      uid = m_free.back();
+      m_free.pop_back();
+      m_vector[uid] = T(std::forward<Args>(args)...);
+    }
+    return uid + 1;
+  }
+
+  // Removes the identified element by replacing it with a default-constructed
+  // one.  The element is added to the freelist for later reuse.
+  void erase(unsigned int uid) {
+    --uid;
+    if (uid >= m_vector.size() || !m_vector[uid]) return;
+    m_free.push_back(uid);
+    m_vector[uid] = T();
+  }
+
+ private:
+  std::vector<T> m_vector;
+  std::vector<unsigned int> m_free;
+};
+
+}  // anonymous namespace
+
 class Notifier::Thread : public SafeThread {
  public:
   Thread(std::function<void()> on_start, std::function<void()> on_exit)
@@ -23,16 +68,19 @@ class Notifier::Thread : public SafeThread {
   void Main();
 
   struct EntryListener {
+    EntryListener() = default;
     EntryListener(StringRef prefix_, EntryListenerCallback callback_,
                   unsigned int flags_)
         : prefix(prefix_), callback(callback_), flags(flags_) {}
+
+    explicit operator bool() const { return bool(callback); }
 
     std::string prefix;
     EntryListenerCallback callback;
     unsigned int flags;
   };
-  std::vector<EntryListener> m_entry_listeners;
-  std::vector<ConnectionListenerCallback> m_conn_listeners;
+  UidVector<EntryListener> m_entry_listeners;
+  UidVector<ConnectionListenerCallback> m_conn_listeners;
 
   struct EntryNotification {
     EntryNotification(StringRef name_, std::shared_ptr<Value> value_,
@@ -107,7 +155,7 @@ void Notifier::Thread::Main() {
 
       // Use index because iterator might get invalidated.
       for (std::size_t i=0; i<m_entry_listeners.size(); ++i) {
-        if (!m_entry_listeners[i].callback) continue;  // removed
+        if (!m_entry_listeners[i]) continue;  // removed
 
         // Flags must be within requested flag set for this listener.
         // Because assign messages can result in both a value and flags update,
@@ -170,18 +218,14 @@ unsigned int Notifier::AddEntryListener(StringRef prefix,
                                         unsigned int flags) {
   Start();
   auto thr = m_owner.GetThread();
-  unsigned int uid = thr->m_entry_listeners.size();
-  thr->m_entry_listeners.emplace_back(prefix, callback, flags);
   if ((flags & NT_NOTIFY_LOCAL) != 0) m_local_notifiers = true;
-  return uid + 1;
+  return thr->m_entry_listeners.emplace_back(prefix, callback, flags);
 }
 
 void Notifier::RemoveEntryListener(unsigned int entry_listener_uid) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  --entry_listener_uid;
-  if (entry_listener_uid < thr->m_entry_listeners.size())
-    thr->m_entry_listeners[entry_listener_uid].callback = nullptr;
+  thr->m_entry_listeners.erase(entry_listener_uid);
 }
 
 void Notifier::NotifyEntry(StringRef name, std::shared_ptr<Value> value,
@@ -199,17 +243,13 @@ unsigned int Notifier::AddConnectionListener(
     ConnectionListenerCallback callback) {
   Start();
   auto thr = m_owner.GetThread();
-  unsigned int uid = thr->m_conn_listeners.size();
-  thr->m_conn_listeners.emplace_back(callback);
-  return uid + 1;
+  return thr->m_conn_listeners.emplace_back(callback);
 }
 
 void Notifier::RemoveConnectionListener(unsigned int conn_listener_uid) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  --conn_listener_uid;
-  if (conn_listener_uid < thr->m_conn_listeners.size())
-    thr->m_conn_listeners[conn_listener_uid] = nullptr;
+  thr->m_conn_listeners.erase(conn_listener_uid);
 }
 
 void Notifier::NotifyConnection(bool connected,
