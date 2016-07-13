@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 void HAL_InitializePDP(int32_t module, int32_t* status);
 HAL_Bool HAL_CheckPDPModule(int32_t module);
 double HAL_GetPDPTemperature(int32_t module, int32_t* status);
@@ -23,4 +25,6 @@ double HAL_GetPDPTotalPower(int32_t module, int32_t* status);
 double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status);
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status);
 void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

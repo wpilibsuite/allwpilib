@@ -12,7 +12,9 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask,
                                          void* param);
 
@@ -40,4 +42,6 @@ void HAL_AttachInterruptHandler(HAL_InterruptHandle interrupt_handle,
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interrupt_handle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status);
+#ifdef __cplusplus
 }
+#endif

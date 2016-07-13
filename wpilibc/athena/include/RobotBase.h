@@ -17,7 +17,7 @@ class DriverStation;
 
 #define START_ROBOT_CLASS(_ClassName_)                                       \
   int main() {                                                               \
-    if (!HAL_Initialize()) {                                                 \
+    if (!HAL_Initialize(0)) {                                                \
       std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl; \
       return -1;                                                             \
     }                                                                        \

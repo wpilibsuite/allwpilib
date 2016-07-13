@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle port_handle,
                                         HAL_Bool fwd, int32_t* status);
 void HAL_FreeRelayPort(HAL_RelayHandle relay_port_handle);
@@ -21,4 +23,6 @@ HAL_Bool HAL_CheckRelayChannel(int32_t pin);
 void HAL_SetRelay(HAL_RelayHandle relay_port_handle, HAL_Bool on,
                   int32_t* status);
 HAL_Bool HAL_GetRelay(HAL_RelayHandle relay_port_handle, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

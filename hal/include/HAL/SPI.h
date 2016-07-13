@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 void HAL_InitializeSPI(int32_t port, int32_t* status);
 int32_t HAL_TransactionSPI(int32_t port, uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size);
@@ -42,4 +44,6 @@ int64_t HAL_GetSPIAccumulatorCount(int32_t port, int32_t* status);
 double HAL_GetSPIAccumulatorAverage(int32_t port, int32_t* status);
 void HAL_GetSPIAccumulatorOutput(int32_t port, int64_t* value, int64_t* count,
                                  int32_t* status);
+#ifdef __cplusplus
 }
+#endif

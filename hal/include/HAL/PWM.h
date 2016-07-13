@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle port_handle,
                                         int32_t* status);
 void HAL_FreePWMPort(HAL_DigitalHandle pwm_port_handle, int32_t* status);
@@ -47,4 +49,6 @@ void HAL_LatchPWMZero(HAL_DigitalHandle pwm_port_handle, int32_t* status);
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwm_port_handle,
                            int32_t squelchMask, int32_t* status);
 int32_t HAL_GetLoopTiming(int32_t* status);
+#ifdef __cplusplus
 }
+#endif

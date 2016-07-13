@@ -15,10 +15,14 @@ enum HAL_AccelerometerRange {
   HAL_AccelerometerRange_k8G = 2,
 };
 
+#ifdef __cplusplus
 extern "C" {
-void HAL_SetAccelerometerActive(HAL_Bool);
-void HAL_SetAccelerometerRange(HAL_AccelerometerRange);
-double HAL_GetAccelerometerX();
-double HAL_GetAccelerometerY();
-double HAL_GetAccelerometerZ();
+#endif
+void HAL_SetAccelerometerActive(HAL_Bool active);
+void HAL_SetAccelerometerRange(HAL_AccelerometerRange range);
+double HAL_GetAccelerometerX(void);
+double HAL_GetAccelerometerY(void);
+double HAL_GetAccelerometerZ(void);
+#ifdef __cplusplus
 }
+#endif

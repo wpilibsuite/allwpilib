@@ -12,7 +12,6 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
-extern "C" {
 enum HAL_EncoderIndexingType {
   HAL_kResetWhileHigh,
   HAL_kResetWhileLow,
@@ -25,6 +24,9 @@ enum HAL_EncoderEncodingType {
   HAL_Encoder_k4X
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
@@ -73,4 +75,6 @@ double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoder_handle,
 
 HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
     HAL_EncoderHandle encoder_handle, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

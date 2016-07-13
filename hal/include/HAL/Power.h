@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 double HAL_GetVinVoltage(int32_t* status);
 double HAL_GetVinCurrent(int32_t* status);
 double HAL_GetUserVoltage6V(int32_t* status);
@@ -26,4 +28,6 @@ double HAL_GetUserVoltage3V3(int32_t* status);
 double HAL_GetUserCurrent3V3(int32_t* status);
 HAL_Bool HAL_GetUserActive3V3(int32_t* status);
 int32_t HAL_GetUserCurrentFaults3V3(int32_t* status);
+#ifdef __cplusplus
 }
+#endif

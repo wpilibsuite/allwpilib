@@ -9,7 +9,9 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 void HAL_InitializeSerialPort(int32_t port, int32_t* status);
 void HAL_SetSerialBaudRate(int32_t port, int32_t baud, int32_t* status);
 void HAL_SetSerialDataBits(int32_t port, int32_t bits, int32_t* status);
@@ -31,4 +33,6 @@ int32_t HAL_WriteSerial(int32_t port, const char* buffer, int32_t count,
 void HAL_FlushSerial(int32_t port, int32_t* status);
 void HAL_ClearSerial(int32_t port, int32_t* status);
 void HAL_CloseSerial(int32_t port, int32_t* status);
+#ifdef __cplusplus
 }
+#endif
