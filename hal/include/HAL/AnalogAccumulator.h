@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analog_port_handle,
                                   int32_t* status);
 void HAL_InitAccumulator(HAL_AnalogInputHandle analog_port_handle,
@@ -28,4 +30,6 @@ int64_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analog_port_handle,
                                 int32_t* status);
 void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analog_port_handle,
                               int64_t* value, int64_t* count, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

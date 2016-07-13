@@ -24,7 +24,9 @@ typedef int STATUS;
 
 typedef pthread_t* TASK;
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 // Note: These constants used to be declared extern and were defined in
 // Task.cpp. This caused issues with the JNI bindings for java, and so the
 // instantiations were moved here.
@@ -33,4 +35,6 @@ const int32_t HAL_TaskLib_ILLEGAL_PRIORITY = 22;  // 22 is EINVAL
 STATUS HAL_VerifyTaskID(TASK task);
 STATUS HAL_SetTaskPriority(TASK task, int priority);  // valid priority [1..99]
 STATUS HAL_GetTaskPriority(TASK task, int* priority);
+#ifdef __cplusplus
 }
+#endif

@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
                                               int32_t* status);
 void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoid_port_handle);
@@ -26,4 +28,6 @@ int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status);
 HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status);
 HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status);
 void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

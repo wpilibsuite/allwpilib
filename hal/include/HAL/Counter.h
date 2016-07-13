@@ -19,7 +19,9 @@ enum HAL_Counter_Mode {
   HAL_Counter_kExternalDirection = 3
 };
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
                                         int32_t* status);
 void HAL_FreeCounter(HAL_CounterHandle counter_handle, int32_t* status);
@@ -68,4 +70,6 @@ HAL_Bool HAL_GetCounterDirection(HAL_CounterHandle counter_handle,
                                  int32_t* status);
 void HAL_SetCounterReverseDirection(HAL_CounterHandle counter_handle,
                                     HAL_Bool reverseDirection, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

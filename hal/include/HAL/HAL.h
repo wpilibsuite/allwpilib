@@ -103,7 +103,9 @@ struct HAL_JoystickDescriptor {
   uint8_t povCount;
 };
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_PortHandle HAL_GetPort(int32_t pin);
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t pin);
 const char* HAL_GetErrorMessage(int32_t code);
@@ -136,18 +138,26 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble);
 float HAL_GetMatchTime(int32_t* status);
 
-void HAL_WaitForDSData();
+void HAL_WaitForDSData(void);
 
 HAL_Bool HAL_GetSystemActive(int32_t* status);
 HAL_Bool HAL_GetBrownedOut(int32_t* status);
 
-int32_t HAL_Initialize(int32_t mode = 0);
-void HAL_ObserveUserProgramStarting();
-void HAL_ObserveUserProgramDisabled();
-void HAL_ObserveUserProgramAutonomous();
-void HAL_ObserveUserProgramTeleop();
-void HAL_ObserveUserProgramTest();
+int32_t HAL_Initialize(int32_t mode);
+void HAL_ObserveUserProgramStarting(void);
+void HAL_ObserveUserProgramDisabled(void);
+void HAL_ObserveUserProgramAutonomous(void);
+void HAL_ObserveUserProgramTeleop(void);
+void HAL_ObserveUserProgramTest(void);
 
+// ifdef's definition is to allow for default parameters in C++.
+#ifdef __cplusplus
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
                    int32_t context = 0, const char* feature = nullptr);
+#else
+int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
+                   const char* feature);
+#endif
+#ifdef __cplusplus
 }
+#endif

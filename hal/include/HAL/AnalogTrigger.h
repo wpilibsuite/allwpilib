@@ -18,7 +18,9 @@ enum HAL_AnalogTriggerType {
   HAL_Trigger_kFallingPulse = 3
 };
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     HAL_AnalogInputHandle port_handle, int32_t* index, int32_t* status);
 void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analog_trigger_handle,
@@ -40,4 +42,6 @@ HAL_Bool HAL_GetAnalogTriggerTriggerState(
 HAL_Bool HAL_GetAnalogTriggerOutput(
     HAL_AnalogTriggerHandle analog_trigger_handle, HAL_AnalogTriggerType type,
     int32_t* status);
+#ifdef __cplusplus
 }
+#endif

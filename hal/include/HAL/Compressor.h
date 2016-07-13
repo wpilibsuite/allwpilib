@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status);
 HAL_Bool HAL_CheckCompressorModule(int32_t module);
 
@@ -40,4 +42,6 @@ HAL_Bool HAL_GetCompressorNotConnectedStickyFault(
     HAL_CompressorHandle compressor_handle, int32_t* status);
 HAL_Bool HAL_GetCompressorNotConnectedFault(
     HAL_CompressorHandle compressor_handle, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

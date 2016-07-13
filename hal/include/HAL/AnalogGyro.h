@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
                                         int32_t* status);
 void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status);
@@ -30,4 +32,6 @@ double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status);
 double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status);
 double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status);
 int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

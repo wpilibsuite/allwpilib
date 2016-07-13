@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle port_handle,
                                                     int32_t* status);
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analog_port_handle);
@@ -42,4 +44,6 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analog_port_handle,
                                int32_t* status);
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analog_port_handle,
                             int32_t* status);
+#ifdef __cplusplus
 }
+#endif

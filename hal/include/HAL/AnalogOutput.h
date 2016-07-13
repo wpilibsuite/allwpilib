@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(
     HAL_PortHandle port_handle, int32_t* status);
 void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analog_output_handle);
@@ -20,4 +22,6 @@ void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analog_output_handle,
 double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analog_output_handle,
                            int32_t* status);
 HAL_Bool HAL_CheckAnalogOutputChannel(int32_t pin);
+#ifdef __cplusplus
 }
+#endif

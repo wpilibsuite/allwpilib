@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle port_handle,
                                         int32_t input, int32_t* status);
 void HAL_FreeDIOPort(HAL_DigitalHandle dio_port_handle);
@@ -38,4 +40,6 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dio_port_handle,
 int32_t HAL_GetFilterSelect(HAL_DigitalHandle dio_port_handle, int32_t* status);
 void HAL_SetFilterPeriod(int32_t filter_index, int64_t value, int32_t* status);
 int64_t HAL_GetFilterPeriod(int32_t filter_index, int32_t* status);
+#ifdef __cplusplus
 }
+#endif

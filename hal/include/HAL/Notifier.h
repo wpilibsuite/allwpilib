@@ -11,7 +11,9 @@
 
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, void*),
                                           void* param, int32_t* status);
 void HAL_CleanNotifier(HAL_NotifierHandle notifier_handle, int32_t* status);
@@ -19,4 +21,6 @@ void* HAL_GetNotifierParam(HAL_NotifierHandle notifier_handle, int32_t* status);
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifier_handle,
                              uint64_t triggerTime, int32_t* status);
 void HAL_StopNotifierAlarm(HAL_NotifierHandle notifier_handle, int32_t* status);
+#ifdef __cplusplus
 }
+#endif
