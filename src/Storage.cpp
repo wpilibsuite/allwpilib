@@ -464,6 +464,48 @@ std::shared_ptr<Value> Storage::GetEntryValue(StringRef name) const {
   return i == m_entries.end() ? nullptr : i->getValue()->value;
 }
 
+bool Storage::SetDefaultEntryValue(StringRef name, 
+                                   std::shared_ptr<Value> value) {
+  if (!value) return false; // can't compare to a null value
+  if (name.empty()) return false; // can't compare empty name
+  std::unique_lock<std::mutex> lock(m_mutex);
+  auto& new_entry = m_entries[name];
+  if (new_entry) { // entry already exists
+      auto old_value = new_entry->value;
+      // if types match return true
+      if (old_value && old_value->type() == value->type()) return true;
+      else return false; // entry exists but doesn't match type
+  }
+  
+  // if we've gotten here, entry does not exist, and we can write it.
+  new_entry.reset(new Entry(name));
+  Entry* entry = new_entry.get();
+  // don't need to compare old value as we know it will assign
+  entry->value = value;
+
+  // if we're the server, assign an id if it doesn't have one
+  if (m_server && entry->id == 0xffff) {
+    unsigned int id = m_idmap.size();
+    entry->id = id;
+    m_idmap.push_back(entry);
+  }
+
+  // notify (for local listeners)
+  if (m_notifier.local_notifiers()) {
+    // always a new entry if we got this far
+    m_notifier.NotifyEntry(name, value, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
+  }
+
+  // generate message
+  if (!m_queue_outgoing) return true;
+  auto queue_outgoing = m_queue_outgoing;
+  auto msg = Message::EntryAssign(name, entry->id, entry->seq_num.value(),
+                                  value, entry->flags);
+  lock.unlock();
+  queue_outgoing(msg, nullptr, nullptr);
+  return true;
+}
+
 bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   if (name.empty()) return true;
   if (!value) return true;

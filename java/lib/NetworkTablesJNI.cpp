@@ -917,6 +917,90 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 
 /*
  * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setDefaultBoolean
+ * Signature: (Ljava/lang/String;Z)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultBoolean
+  (JNIEnv *env, jclass, jstring key, jboolean defaultValue)
+{
+  return nt::SetDefaultEntryValue(JavaStringRef(env, key), 
+                                  nt::Value::MakeBoolean(defaultValue != JNI_FALSE));
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setDefaultDouble
+ * Signature: (Ljava/lang/String;D)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultDouble
+  (JNIEnv *env, jclass, jstring key, jdouble defaultValue)
+{
+  return nt::SetDefaultEntryValue(JavaStringRef(env, key),
+                                  nt::Value::MakeDouble(defaultValue));
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setDefaultString
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultString
+  (JNIEnv *env, jclass, jstring key, jstring defaultValue)
+{
+  return nt::SetDefaultEntryValue(JavaStringRef(env, key), 
+                                  nt::Value::MakeString(JavaStringRef(env, defaultValue)));
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setDefaultRaw
+ * Signature: (Ljava/lang/String;[B)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultRaw
+  (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
+{
+  auto v = FromJavaRaw(env, defaultValue);
+  return nt::SetDefaultEntryValue(JavaStringRef(env, key), v);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setDefaultBooleanArray
+ * Signature: (Ljava/lang/String;[Z)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultBooleanArray
+  (JNIEnv *env, jclass, jstring key, jbooleanArray defaultValue)
+{
+  auto v = FromJavaBooleanArray(env, defaultValue);
+  return nt::SetDefaultEntryValue(JavaStringRef(env, key), v);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setDefaultDoubleArray
+ * Signature: (Ljava/lang/String;[D)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultDoubleArray
+  (JNIEnv *env, jclass, jstring key, jdoubleArray defaultValue)
+{
+  auto v = FromJavaDoubleArray(env, defaultValue);
+  return nt::SetDefaultEntryValue(JavaStringRef(env, key), v);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setDefaultStringArray
+ * Signature: (Ljava/lang/String;[Ljava/lang/String;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultStringArray
+  (JNIEnv *env, jclass, jstring key, jobjectArray defaultValue)
+{
+  auto v = FromJavaStringArray(env, defaultValue);
+  return nt::SetDefaultEntryValue(JavaStringRef(env, key), v);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Method:    setEntryFlags
  * Signature: (Ljava/lang/String;I)V
  */

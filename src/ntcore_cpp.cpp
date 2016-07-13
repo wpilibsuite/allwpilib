@@ -29,6 +29,10 @@ std::shared_ptr<Value> GetEntryValue(StringRef name) {
   return Storage::GetInstance().GetEntryValue(name);
 }
 
+bool SetDefaultEntryValue(StringRef name, std::shared_ptr<Value> value) {
+  return Storage::GetInstance().SetDefaultEntryValue(name, value);
+}
+
 bool SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   return Storage::GetInstance().SetEntryValue(name, value);
 }

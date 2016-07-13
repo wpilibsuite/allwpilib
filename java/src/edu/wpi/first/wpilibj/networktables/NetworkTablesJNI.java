@@ -106,6 +106,14 @@ public class NetworkTablesJNI {
   public static native double[] getDoubleArray(String key, double[] defaultValue);
   public static native String[] getStringArray(String key, String[] defaultValue);
 
+  public static native boolean setDefaultBoolean(String key, boolean defaultValue);
+  public static native boolean setDefaultDouble(String key, double defaultValue);
+  public static native boolean setDefaultString(String key, String defaultValue);
+  public static native boolean setDefaultRaw(String key, byte[] defaultValue);
+  public static native boolean setDefaultBooleanArray(String key, boolean[] defaultValue);
+  public static native boolean setDefaultDoubleArray(String key, double[] defaultValue);
+  public static native boolean setDefaultStringArray(String key, String[] defaultValue);
+
   public static native void setEntryFlags(String key, int flags);
   public static native int getEntryFlags(String key);
 

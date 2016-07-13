@@ -174,6 +174,19 @@ struct NT_RpcCallInfo {
  */
 void NT_GetEntryValue(const char *name, size_t name_len,
                       struct NT_Value *value);
+                      
+/** Set Default Entry Value.
+ * Returns copy of current entry value if it exists.
+ * Otherwise, sets passed in value, and returns set value.
+ * Note that one of the type options is "unassigned".
+ *
+ * @param name      entry name (UTF-8 string)
+ * @param name_len  length of name in bytes
+ * @param default_value     value to be set if name does not exist
+ * @return 0 on error (value not set), 1 on success
+ */
+int NT_SetDefaultEntryValue(const char* name, size_t name_len,
+                            const struct NT_Value *default_value);
 
 /** Set Entry Value.
  * Sets new entry value.  If type of new value differs from the type of the
@@ -801,6 +814,107 @@ double *NT_GetEntryDoubleArray(const char *name, size_t name_len,
 NT_String *NT_GetEntryStringArray(const char *name, size_t name_len,
                                   unsigned long long *last_change,
                                   size_t *arr_size);
+
+/* Set Default Values */
+
+/** Set Default Entry Boolean.
+ * Sets the default for the specified key to be a boolean.
+ * If key exists with same type, does not set value. Otherwise
+ * sets value to the default.
+ *
+ * @param name      entry name (UTF-8 string)
+ * @param name_len  length of name in bytes
+ * @param default_boolean     value to be set if name does not exist
+ * @return 0 on error (value not set), 1 on success
+ */
+int NT_SetDefaultEntryBoolean(const char *name, size_t name_len,
+                              int default_boolean);
+
+/** Set Default Entry Double.
+ * Sets the default for the specified key.
+ * If key exists with same type, does not set value. Otherwise
+ * sets value to the default.
+ *
+ * @param name      entry name (UTF-8 string)
+ * @param name_len  length of name in bytes
+ * @param default_double     value to be set if name does not exist
+ * @return 0 on error (value not set), 1 on success
+ */
+int NT_SetDefaultEntryDouble(const char *name, size_t name_len,
+                             double default_double);
+
+/** Set Default Entry String.
+ * Sets the default for the specified key.
+ * If key exists with same type, does not set value. Otherwise
+ * sets value to the default.
+ *
+ * @param name      entry name (UTF-8 string)
+ * @param name_len  length of name in bytes
+ * @param default_value     value to be set if name does not exist
+ * @param default_len       length of value
+ * @return 0 on error (value not set), 1 on success
+ */
+int NT_SetDefaultEntryString(const char *name, size_t name_len,
+                             const char *default_value, size_t default_len);
+
+/** Set Default Entry Raw.
+ * Sets the default for the specified key.
+ * If key exists with same type, does not set value. Otherwise
+ * sets value to the default.
+ *
+ * @param name      entry name (UTF-8 string)
+ * @param name_len  length of name in bytes
+ * @param default_value     value to be set if name does not exist
+ * @param default_len       length of value array
+ * @return 0 on error (value not set), 1 on success
+ */
+int NT_SetDefaultEntryRaw(const char *name, size_t name_len,
+                          const char *default_value, size_t default_len);
+
+/** Set Default Entry Boolean Array.
+ * Sets the default for the specified key.
+ * If key exists with same type, does not set value. Otherwise
+ * sets value to the default.
+ *
+ * @param name      entry name (UTF-8 string)
+ * @param name_len  length of name in bytes
+ * @param default_value     value to be set if name does not exist
+ * @param default_size      size of value array
+ * @return 0 on error (value not set), 1 on success
+ */
+int NT_SetDefaultEntryBooleanArray(const char *name, size_t name_len,
+                                   const int *default_value, 
+                                   size_t default_size);
+
+/** Set Default Entry Double Array.
+ * Sets the default for the specified key.
+ * If key exists with same type, does not set value. Otherwise
+ * sets value to the default.
+ *
+ * @param name      entry name (UTF-8 string)
+ * @param name_len  length of name in bytes
+ * @param default_value     value to be set if name does not exist
+ * @param default_size      size of value array
+ * @return 0 on error (value not set), 1 on success
+ */
+int NT_SetDefaultEntryDoubleArray(const char *name, size_t name_len,
+                                  const double *default_value, 
+                                  size_t default_size);
+
+/** Set Default Entry String Array.
+ * Sets the default for the specified key.
+ * If key exists with same type, does not set value. Otherwise
+ * sets value to the default.
+ *
+ * @param name      entry name (UTF-8 string)
+ * @param name_len  length of name in bytes
+ * @param default_value     value to be set if name does not exist
+ * @param default_size      size of value array
+ * @return 0 on error (value not set), 1 on success
+ */
+int NT_SetDefaultEntryStringArray(const char *name, size_t name_len,
+                                  const struct NT_String* default_value,
+                                  size_t default_size);
 
 /* Entry Value Setters */
 

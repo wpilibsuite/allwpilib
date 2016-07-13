@@ -502,6 +502,14 @@ public class NetworkTable implements ITable, IRemote {
   public boolean putNumber(String key, double value) {
     return NetworkTablesJNI.putDouble(path + PATH_SEPARATOR + key, value);
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultNumber(String key, double defaultValue) {
+    return NetworkTablesJNI.setDefaultDouble(path + PATH_SEPARATOR + key,
+                                             defaultValue);
+  }
 
   /**
    * {@inheritDoc}
@@ -529,6 +537,14 @@ public class NetworkTable implements ITable, IRemote {
   public boolean putString(String key, String value) {
     return NetworkTablesJNI.putString(path + PATH_SEPARATOR + key, value);
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultString(String key, String defaultValue) {
+    return NetworkTablesJNI.setDefaultString(path + PATH_SEPARATOR + key,
+                                             defaultValue);
+  }
 
   /**
    * {@inheritDoc}
@@ -555,6 +571,14 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   public boolean putBoolean(String key, boolean value) {
     return NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, value);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultBoolean(String key, boolean defaultValue) {
+    return NetworkTablesJNI.setDefaultBoolean(path + PATH_SEPARATOR + key,
+                                              defaultValue);
   }
 
   /**
@@ -590,6 +614,22 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   public boolean putBooleanArray(String key, Boolean[] value) {
     return putBooleanArray(key, toNative(value));
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultBooleanArray(String key, boolean[] defaultValue) {
+    return NetworkTablesJNI.setDefaultBooleanArray(path + PATH_SEPARATOR + key,
+                                                   defaultValue);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
+    return NetworkTablesJNI.setDefaultBooleanArray(path + PATH_SEPARATOR + key,
+                                                   toNative(defaultValue));
   }
 
   /**
@@ -638,6 +678,22 @@ public class NetworkTable implements ITable, IRemote {
   public boolean putNumberArray(String key, Double[] value) {
     return putNumberArray(key, toNative(value));
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultNumberArray(String key, double[] defaultValue) {
+    return NetworkTablesJNI.setDefaultDoubleArray(path + PATH_SEPARATOR + key,
+                                                  defaultValue);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultNumberArray(String key, Double[] defaultValue) {
+    return NetworkTablesJNI.setDefaultDoubleArray(path + PATH_SEPARATOR + key,
+                                                  toNative(defaultValue));
+  }
 
   /**
    * {@inheritDoc}
@@ -677,7 +733,15 @@ public class NetworkTable implements ITable, IRemote {
   public boolean putStringArray(String key, String[] value) {
     return NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, value);
   }
-
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultStringArray(String key, String[] defaultValue) {
+    return NetworkTablesJNI.setDefaultStringArray(path + PATH_SEPARATOR + key,
+                                                  defaultValue);
+  }
+  
   /**
    * {@inheritDoc}
    * @deprecated This exception-raising method has been replaced by the
@@ -703,6 +767,14 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   public boolean putRaw(String key, byte[] value) {
     return NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, value);
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public boolean setDefaultRaw(String key, byte[] defaultValue) {
+    return NetworkTablesJNI.setDefaultRaw(path + PATH_SEPARATOR + key,
+                                          defaultValue);
   }
 
   /**

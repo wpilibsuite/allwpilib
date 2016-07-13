@@ -96,6 +96,17 @@ struct RpcCallInfo {
  */
 std::shared_ptr<Value> GetEntryValue(StringRef name);
 
+/** Set Default Entry Value
+ * Returns copy of current entry value if it exists.
+ * Otherwise, sets passed in value, and returns set value.
+ * Note that one of the type options is "unassigned".
+ * 
+ * @param name      entry name (UTF-8 string)
+ * @param value     value to be set if name does not exist
+ * @return False on error (value not set), True on success
+ */
+bool SetDefaultEntryValue(StringRef name, std::shared_ptr<Value> value);
+
 /** Set Entry Value.
  * Sets new entry value.  If type of new value differs from the type of the
  * currently stored entry, returns error and does not update value.

@@ -82,6 +82,15 @@ NT_SetRpcServerOnStart @84
 NT_SetRpcServerOnExit @85
 NT_StartClientMulti @86
 
+NT_SetDefaultEntryValue @87
+NT_SetDefaultEntryBoolean @88
+NT_SetDefaultEntryDouble @89
+NT_SetDefaultEntryString @90
+NT_SetDefaultEntryRaw @91
+NT_SetDefaultEntryBooleanArray @92
+NT_SetDefaultEntryDoubleArray @93
+NT_SetDefaultEntryStringArray @94
+
 ; JNI functions
 JNI_OnLoad
 JNI_OnUnload

@@ -67,6 +67,7 @@ class Storage {
   // User functions.  These are the actual implementations of the corresponding
   // user API functions in ntcore_cpp.
   std::shared_ptr<Value> GetEntryValue(StringRef name) const;
+  bool SetDefaultEntryValue(StringRef name, std::shared_ptr<Value> value);
   bool SetEntryValue(StringRef name, std::shared_ptr<Value> value);
   void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value);
   void SetEntryFlags(StringRef name, unsigned int flags);

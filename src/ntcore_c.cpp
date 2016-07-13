@@ -124,6 +124,12 @@ void NT_GetEntryValue(const char *name, size_t name_len,
   ConvertToC(*v, value);
 }
 
+int NT_SetDefaultEntryValue(const char* name, size_t name_len,
+                            const struct NT_Value *set_value) {
+    return nt::SetDefaultEntryValue(StringRef(name, name_len),
+                                    ConvertFromC(*set_value));
+}
+
 int NT_SetEntryValue(const char *name, size_t name_len,
                      const struct NT_Value *value) {
   return nt::SetEntryValue(StringRef(name, name_len), ConvertFromC(*value));
@@ -699,6 +705,57 @@ NT_String *NT_GetValueStringArray(const struct NT_Value *value,
     std::memcpy(arr[i].str, value->data.arr_string.arr[i].str, len + 1);
   }
   return arr;
+}
+
+int NT_SetDefaultEntryBoolean(const char *name, size_t name_len,
+                              int default_boolean) {
+  return nt::SetDefaultEntryValue(StringRef(name, name_len),
+                                  Value::MakeBoolean(default_boolean != 0));
+}
+
+int NT_SetDefaultEntryDouble(const char *name, size_t name_len,
+                             double default_double) {
+  return nt::SetDefaultEntryValue(StringRef(name, name_len),
+                                  Value::MakeDouble(default_double));
+}
+
+int NT_SetDefaultEntryString(const char *name, size_t name_len,
+                             const char *default_value, size_t default_len) {
+  return nt::SetDefaultEntryValue(StringRef(name, name_len),
+                                  Value::MakeString(StringRef(default_value,
+                                                    default_len)));
+}
+
+int NT_SetDefaultEntryRaw(const char *name, size_t name_len,
+                          const char *default_value, size_t default_len) {
+  return nt::SetDefaultEntryValue(StringRef(name, name_len),
+                                  Value::MakeString(StringRef(default_value,
+                                                    default_len)));
+}
+
+int NT_SetDefaultEntryBooleanArray(const char *name, size_t name_len,
+                                   const int *default_value, 
+                                   size_t default_size) {
+  return nt::SetDefaultEntryValue(StringRef(name, name_len),
+                                  Value::MakeBooleanArray(llvm::makeArrayRef(default_value, default_size)));
+}
+
+int NT_SetDefaultEntryDoubleArray(const char *name, size_t name_len, const double *default_value,
+                                  size_t default_size) {
+  return nt::SetDefaultEntryValue(StringRef(name, name_len),
+                                  Value::MakeDoubleArray(llvm::makeArrayRef(default_value, default_size)));
+}
+
+int NT_SetDefaultEntryStringArray(const char *name, size_t name_len,
+                                  const struct NT_String* default_value,
+                                  size_t default_size) {
+  std::vector<std::string> vec;
+  vec.reserve(default_size);
+  for (size_t i = 0; i < default_size; ++i) 
+    vec.push_back(ConvertFromC(default_value[i]));
+  
+  return nt::SetDefaultEntryValue(StringRef(name, name_len), 
+                                  Value::MakeStringArray(std::move(vec)));
 }
 
 int NT_GetEntryBoolean(const char *name, size_t name_len,
