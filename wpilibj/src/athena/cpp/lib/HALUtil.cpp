@@ -120,10 +120,13 @@ static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
   env->DeleteLocalRef(stackTrace);
 }
 
-void ThrowAllocationException(JNIEnv *env, int32_t status) {
+void ThrowAllocationException(JNIEnv *env, int32_t minRange, int32_t maxRange, 
+    int32_t requestedValue, int32_t status) {
   const char *message = HAL_GetErrorMessage(status);
-  char *buf = new char[strlen(message) + 30];
-  sprintf(buf, " Code: $%d. %s", status, message);
+  char *buf = new char[strlen(message) + 100];
+  sprintf(buf, 
+      " Code: $%d. %s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d", 
+      status, message, minRange, maxRange, requestedValue);
   env->ThrowNew(allocationExCls, buf);
   delete[] buf;
 }
@@ -136,11 +139,13 @@ void ThrowHalHandleException(JNIEnv *env, int32_t status) {
   delete[] buf;
 }
 
-void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
+void ReportError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange, 
+    int32_t requestedValue, bool do_throw) {
   if (status == 0) return;
   if (status == NO_AVAILABLE_RESOURCES || 
-      status == RESOURCE_IS_ALLOCATED) {
-    ThrowAllocationException(env, status);
+      status == RESOURCE_IS_ALLOCATED || 
+      status == RESOURCE_OUT_OF_RANGE) {
+    ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
   }
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);

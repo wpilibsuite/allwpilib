@@ -13,6 +13,7 @@
 
 #include "HAL/AnalogGyro.h"
 #include "HALUtil.h"
+#include "HAL/handles/HandlesInternal.h"
 
 // set the logging level
 TLogLevel analogGyroJNILogLevel = logWARNING;
@@ -37,6 +38,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_initializeAn
   HAL_GyroHandle handle = HAL_InitializeAnalogGyro((HAL_AnalogInputHandle)id, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << handle;
+  // Analog input does range checking, so we don't need to do so.
+  CheckStatus(env, status);
   return (jint) handle;
 }
 

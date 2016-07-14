@@ -17,7 +17,7 @@
 extern "C" {
 
 inline bool CheckCTRStatus(JNIEnv *env, CTR_Code status) {
-  if (status != CTR_OKAY) ReportError(env, (int32_t)status, false);
+  if (status != CTR_OKAY) ReportError(env, (int32_t)status, 0, 0, 0, false);
   return status == CTR_OKAY;
 }
 

@@ -16,7 +16,7 @@ PCM* PCM_modules[kNumPCMModules] = {nullptr};
 
 void initializePCM(int32_t module, int32_t* status) {
   if (!HAL_CheckSolenoidModule(module)) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
     return;
   }
   if (!PCM_modules[module]) {

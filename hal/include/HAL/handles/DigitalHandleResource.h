@@ -15,7 +15,7 @@
 #include "HAL/Errors.h"
 #include "HAL/Types.h"
 #include "HAL/cpp/priority_mutex.h"
-#include "HandlesInternal.h"
+#include "HAL/handles/HandlesInternal.h"
 
 namespace hal {
 
@@ -67,7 +67,7 @@ THandle DigitalHandleResource<THandle, TStruct, size>::Allocate(
     int16_t index, HAL_HandleEnum enumValue, int32_t* status) {
   // don't aquire the lock if we can fail early.
   if (index < 0 || index >= size) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
   std::lock_guard<priority_mutex> sync(m_handleMutexes[index]);

@@ -25,8 +25,8 @@
 #include "HAL/Errors.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "ctre/ctre.h"
-#include "handles/HandlesInternal.h"
 #include "visa/visa.h"
 
 static tGlobal* global = nullptr;
@@ -113,6 +113,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return NO_AVAILABLE_RESOURCES_MESSAGE;
     case RESOURCE_IS_ALLOCATED:
       return RESOURCE_IS_ALLOCATED_MESSAGE;
+    case RESOURCE_OUT_OF_RANGE:
+      return RESOURCE_OUT_OF_RANGE_MESSAGE;
+    case HAL_INVALID_ACCUMULATOR_CHANNEL:
+      return HAL_INVALID_ACCUMULATOR_CHANNEL_MESSAGE;
     case HAL_HANDLE_ERROR:
       return HAL_HANDLE_ERROR_MESSAGE;
     case NULL_PARAMETER:

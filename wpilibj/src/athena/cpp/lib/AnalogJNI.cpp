@@ -15,7 +15,9 @@
 #include "HAL/AnalogOutput.h"
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/AnalogTrigger.h"
+#include "HAL/Ports.h"
 #include "HALUtil.h"
+#include "HAL/handles/HandlesInternal.h"
 
 // set the logging level
 TLogLevel analogJNILogLevel = logWARNING;
@@ -41,7 +43,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort(
   auto analog = HAL_InitializeAnalogInputPort((HAL_PortHandle)id, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << analog;
-  CheckStatus(env, status);
+  CheckStatusRange(env, 0, HAL_GetNumAnalogInputs(), 
+                   hal::getPortHandlePin((HAL_PortHandle)id), status);
   return (jint)analog;
 }
 
@@ -70,7 +73,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort(
   HAL_AnalogOutputHandle analog = HAL_InitializeAnalogOutputPort((HAL_PortHandle)id, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << analog;
-  CheckStatus(env, status);
+  CheckStatusRange(env, 0, HAL_GetNumAnalogOutputs(), 
+                   hal::getPortHandlePin((HAL_PortHandle)id), status);
   return (jlong)analog;
 }
 

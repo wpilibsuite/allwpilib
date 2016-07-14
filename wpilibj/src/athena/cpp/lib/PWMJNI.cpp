@@ -13,7 +13,9 @@
 
 #include "HAL/DIO.h"
 #include "HAL/PWM.h"
+#include "HAL/Ports.h"
 #include "HALUtil.h"
+#include "HAL/handles/HandlesInternal.h"
 
 // set the logging level
 TLogLevel pwmJNILogLevel = logWARNING;
@@ -40,7 +42,8 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_initializePWMPort(
   auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << pwm;
-  CheckStatus(env, status);
+  CheckStatusRange(env, 0, HAL_GetNumPWMPins(), 
+                   hal::getPortHandlePin((HAL_PortHandle)id), status);
   return (jint)pwm;
 }
 

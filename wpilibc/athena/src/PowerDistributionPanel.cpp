@@ -22,7 +22,8 @@ PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
   int32_t status = 0;
   HAL_InitializePDP(m_module, &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setErrorWithContextRange(status, 0, HAL_GetNumPDPModules(), module,
+                                 HAL_GetErrorMessage(status));
     m_module = -1;
     return;
   }

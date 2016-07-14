@@ -5,10 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HandlesInternal.h"
-#include "IndexedHandleResource.h"
-#include "LimitedHandleResource.h"
-#include "UnlimitedHandleResource.h"
+#include "HAL/handles/HandlesInternal.h"
 
 namespace hal {
 HAL_PortHandle createPortHandle(uint8_t pin, uint8_t module) {

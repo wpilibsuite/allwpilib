@@ -8,8 +8,8 @@
 #include "HAL/Relay.h"
 
 #include "DigitalInternal.h"
+#include "HAL/handles/IndexedHandleResource.h"
 #include "PortsInternal.h"
-#include "handles/IndexedHandleResource.h"
 
 using namespace hal;
 

@@ -9,9 +9,9 @@
 
 #include "AnalogInternal.h"
 #include "HAL/Errors.h"
+#include "HAL/handles/HandlesInternal.h"
+#include "HAL/handles/IndexedHandleResource.h"
 #include "PortsInternal.h"
-#include "handles/HandlesInternal.h"
-#include "handles/IndexedHandleResource.h"
 
 using namespace hal;
 

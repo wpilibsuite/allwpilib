@@ -7,6 +7,7 @@
 
 #include <jni.h>
 #include "HAL/HAL.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "Log.h"
 
 #include "edu_wpi_first_wpilibj_hal_SolenoidJNI.h"
@@ -30,19 +31,21 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort(
-    JNIEnv *env, jclass, jint port_handle) {
+    JNIEnv *env, jclass, jint id) {
   SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI initializeSolenoidPort";
 
-  SOLENOIDJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_PortHandle)port_handle;
+  SOLENOIDJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_PortHandle)id;
 
   int32_t status = 0;
   HAL_SolenoidHandle handle =
-      HAL_InitializeSolenoidPort((HAL_PortHandle)port_handle, &status);
+      HAL_InitializeSolenoidPort((HAL_PortHandle)id, &status);
 
   SOLENOIDJNI_LOG(logDEBUG) << "Status = " << status;
   SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Handle = " << handle;
 
-  CheckStatus(env, status);
+  // Use solenoid pins, as we have to pick one.
+  CheckStatusRange(env, 0, HAL_GetNumSolenoidPins(), 
+                   hal::getPortHandlePin((HAL_PortHandle)id), status);;
   return (jint)handle;
 }
 

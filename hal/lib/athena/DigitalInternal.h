@@ -13,9 +13,9 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Ports.h"
 #include "HAL/Types.h"
+#include "HAL/handles/DigitalHandleResource.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "PortsInternal.h"
-#include "handles/DigitalHandleResource.h"
-#include "handles/HandlesInternal.h"
 
 namespace hal {
 constexpr uint32_t kMXPDigitalPWMOffset = 6;  // MXP pins when used as digital

@@ -121,6 +121,44 @@ void ErrorBase::SetError(Error::Code code, llvm::StringRef contextMessage,
 
 /**
  * @brief Set the current error information associated with this sensor.
+ * Range versions use for initialization code.
+ *
+ * @param code           The error code
+ * @param minRange       The minimum allowed allocation range
+ * @param maxRange       The maximum allowed allocation range
+ * @param requestedValue The requested value to allocate
+ * @param contextMessage A custom message from the code that set the error.
+ * @param filename       Filename of the error source
+ * @param function       Function of the error source
+ * @param lineNumber     Line number of the error source
+ */
+void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
+                              int32_t maxRange, int32_t requestedValue,
+                              llvm::StringRef contextMessage,
+                              llvm::StringRef filename,
+                              llvm::StringRef function,
+                              uint32_t lineNumber) const {
+  //  If there was an error
+  if (code != 0) {
+    size_t size = contextMessage.size() + 100;
+    char* buf = new char[size];
+    snprintf(buf, size,
+             "%s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d",
+             contextMessage.data(), minRange, maxRange, requestedValue);
+    //  Set the current error information for this object.
+    m_error.Set(code, buf, filename, function, lineNumber, this);
+    delete[] buf;
+
+    // Update the global error if there is not one already set.
+    std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+    if (_globalError.GetCode() == 0) {
+      _globalError.Clone(m_error);
+    }
+  }
+}
+
+/**
+ * @brief Set the current error information associated with this sensor.
  *
  * @param errorMessage   The error message from WPIErrors.h
  * @param contextMessage A custom message from the code that set the error.

@@ -36,6 +36,10 @@ HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analog_port_handle,
  */
 void HAL_InitAccumulator(HAL_AnalogInputHandle analog_port_handle,
                          int32_t* status) {
+  if (!HAL_IsAccumulatorChannel(analog_port_handle, status)) {
+    *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
+    return;
+  }
   HAL_SetAccumulatorCenter(analog_port_handle, 0, status);
   HAL_ResetAccumulator(analog_port_handle, status);
 }

@@ -14,8 +14,8 @@
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "PortsInternal.h"
-#include "handles/HandlesInternal.h"
 
 using namespace hal;
 

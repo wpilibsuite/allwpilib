@@ -11,11 +11,11 @@
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/Errors.h"
 #include "HAL/Ports.h"
+#include "HAL/handles/HandlesInternal.h"
+#include "HAL/handles/IndexedHandleResource.h"
 #include "PCMInternal.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
-#include "handles/HandlesInternal.h"
-#include "handles/IndexedHandleResource.h"
 
 namespace {
 struct Solenoid {
@@ -44,7 +44,7 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
 
   // initializePCM will check the module
   if (!HAL_CheckSolenoidPin(pin)) {
-    *status = PARAMETER_OUT_OF_RANGE;
+    *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
 

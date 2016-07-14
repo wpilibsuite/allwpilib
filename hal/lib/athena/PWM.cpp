@@ -9,8 +9,8 @@
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "PortsInternal.h"
-#include "handles/HandlesInternal.h"
 
 using namespace hal;
 

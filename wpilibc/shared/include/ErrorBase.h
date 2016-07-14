@@ -26,6 +26,12 @@
     if ((code) != 0)                                                       \
       this->SetError((code), (context), __FILE__, __FUNCTION__, __LINE__); \
   } while (0)
+#define wpi_setErrorWithContextRange(code, min, max, req, context)          \
+  do {                                                                      \
+    if ((code) != 0)                                                        \
+      this->SetErrorRange((code), (min), (max), (req), (context), __FILE__, \
+                          __FUNCTION__, __LINE__);                          \
+  } while (0)
 #define wpi_setError(code) wpi_setErrorWithContext(code, "")
 #define wpi_setStaticErrorWithContext(object, code, context)                 \
   do {                                                                       \
@@ -82,6 +88,11 @@ class ErrorBase {
   virtual void SetError(Error::Code code, llvm::StringRef contextMessage,
                         llvm::StringRef filename, llvm::StringRef function,
                         uint32_t lineNumber) const;
+  virtual void SetErrorRange(Error::Code code, int32_t minRange,
+                             int32_t maxRange, int32_t requestedValue,
+                             llvm::StringRef contextMessage,
+                             llvm::StringRef filename, llvm::StringRef function,
+                             uint32_t lineNumber) const;
   virtual void SetWPIError(llvm::StringRef errorMessage, Error::Code code,
                            llvm::StringRef contextMessage,
                            llvm::StringRef filename, llvm::StringRef function,

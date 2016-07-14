@@ -35,7 +35,8 @@ DigitalInput::DigitalInput(uint32_t channel) {
   int32_t status = 0;
   m_handle = HAL_InitializeDIOPort(HAL_GetPort(channel), true, &status);
   if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+    wpi_setErrorWithContextRange(status, 0, HAL_GetNumDigitalPins(), channel,
+                                 HAL_GetErrorMessage(status));
     m_handle = HAL_kInvalidHandle;
     m_channel = std::numeric_limits<uint32_t>::max();
     return;
