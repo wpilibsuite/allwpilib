@@ -16,7 +16,7 @@
 
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"
-#include "Log.h"
+#include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
 
 // set the logging level

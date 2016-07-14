@@ -15,7 +15,7 @@
 #include <mutex>
 #include <thread>
 #include "HALUtil.h"
-#include "Log.h"
+#include "HAL/cpp/Log.h"
 #include "SafeThread.h"
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
 
