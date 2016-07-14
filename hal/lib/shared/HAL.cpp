@@ -149,7 +149,7 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                                      leftRumble, rightRumble);
 }
 
-float HAL_GetMatchTime(int32_t* status) {
+double HAL_GetMatchTime(int32_t* status) {
   float matchTime;
   *status = FRC_NetworkCommunication_getMatchTime(&matchTime);
   return matchTime;
