@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2016. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2015-2016. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -93,5 +93,127 @@ public class CircularBufferTest {
 
     // Leaving only one element with value == 4
     assertEquals(4.0, queue.get(0), 0.00005);
+  }
+
+  @Test
+  public void resetTest() {
+    CircularBuffer queue = new CircularBuffer(5);
+
+    for (int i = 0; i < 6; i++) {
+      queue.pushBack(i);
+    }
+
+    queue.reset();
+
+    for (int i = 0; i < 5; i++) {
+      assertEquals(0.0, queue.get(i), 0.00005);
+    }
+  }
+
+  @Test
+  public void resizeTest() {
+    CircularBuffer queue = new CircularBuffer(5);
+
+    /* Buffer contains {1, 2, 3, _, _}
+     *                  ^ front
+     */
+    queue.pushBack(1.0);
+    queue.pushBack(2.0);
+    queue.pushBack(3.0);
+
+    queue.resize(2);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.resize(5);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.reset();
+
+    /* Buffer contains {_, 1, 2, 3, _}
+     *                     ^ front
+     */
+    queue.pushBack(0.0);
+    queue.pushBack(1.0);
+    queue.pushBack(2.0);
+    queue.pushBack(3.0);
+    queue.popFront();
+
+    queue.resize(2);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.resize(5);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.reset();
+
+    /* Buffer contains {_, _, 1, 2, 3}
+     *                        ^ front
+     */
+    queue.pushBack(0.0);
+    queue.pushBack(0.0);
+    queue.pushBack(1.0);
+    queue.pushBack(2.0);
+    queue.pushBack(3.0);
+    queue.popFront();
+    queue.popFront();
+
+    queue.resize(2);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.resize(5);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.reset();
+
+    /* Buffer contains {3, _, _, 1, 2}
+     *                           ^ front
+     */
+    queue.pushBack(3.0);
+    queue.pushFront(2.0);
+    queue.pushFront(1.0);
+
+    queue.resize(2);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.resize(5);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.reset();
+
+    /* Buffer contains {2, 3, _, _, 1}
+     *                              ^ front
+     */
+    queue.pushBack(2.0);
+    queue.pushBack(3.0);
+    queue.pushFront(1.0);
+
+    queue.resize(2);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    queue.resize(5);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+
+    // Test pushBack() after resize
+    queue.pushBack(3.0);
+    assertEquals(1.0, queue.get(0), 0.00005);
+    assertEquals(2.0, queue.get(1), 0.00005);
+    assertEquals(3.0, queue.get(2), 0.00005);
+
+    // Test pushFront() after resize
+    queue.pushFront(4.0);
+    assertEquals(4.0, queue.get(0), 0.00005);
+    assertEquals(1.0, queue.get(1), 0.00005);
+    assertEquals(2.0, queue.get(2), 0.00005);
+    assertEquals(3.0, queue.get(3), 0.00005);
   }
 }

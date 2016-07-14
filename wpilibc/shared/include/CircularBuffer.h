@@ -24,6 +24,7 @@ class CircularBuffer {
   void PushBack(T value);
   T PopFront();
   T PopBack();
+  void Resize(size_t size);
   void Reset();
 
   T& operator[](size_t index);

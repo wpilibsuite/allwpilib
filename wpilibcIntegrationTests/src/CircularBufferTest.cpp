@@ -87,3 +87,123 @@ TEST(CircularBufferTest, PushPopTest) {
   // Leaving only one element with value == 4
   EXPECT_EQ(4.0, queue[0]);
 }
+
+TEST(CircularBufferTest, ResetTest) {
+  CircularBuffer<double> queue(5);
+
+  for (size_t i = 1; i < 6; i++) {
+    queue.PushBack(i);
+  }
+
+  queue.Reset();
+
+  for (size_t i = 0; i < 5; i++) {
+    EXPECT_EQ(0.0, queue[i]);
+  }
+}
+
+TEST(CircularBufferTest, ResizeTest) {
+  CircularBuffer<double> queue(5);
+
+  /* Buffer contains {1, 2, 3, _, _}
+   *                  ^ front
+   */
+  queue.PushBack(1.0);
+  queue.PushBack(2.0);
+  queue.PushBack(3.0);
+
+  queue.Resize(2);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Resize(5);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Reset();
+
+  /* Buffer contains {_, 1, 2, 3, _}
+   *                     ^ front
+   */
+  queue.PushBack(0.0);
+  queue.PushBack(1.0);
+  queue.PushBack(2.0);
+  queue.PushBack(3.0);
+  queue.PopFront();
+
+  queue.Resize(2);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Resize(5);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Reset();
+
+  /* Buffer contains {_, _, 1, 2, 3}
+   *                        ^ front
+   */
+  queue.PushBack(0.0);
+  queue.PushBack(0.0);
+  queue.PushBack(1.0);
+  queue.PushBack(2.0);
+  queue.PushBack(3.0);
+  queue.PopFront();
+  queue.PopFront();
+
+  queue.Resize(2);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Resize(5);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Reset();
+
+  /* Buffer contains {3, _, _, 1, 2}
+   *                           ^ front
+   */
+  queue.PushBack(3.0);
+  queue.PushFront(2.0);
+  queue.PushFront(1.0);
+
+  queue.Resize(2);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Resize(5);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Reset();
+
+  /* Buffer contains {2, 3, _, _, 1}
+   *                              ^ front
+   */
+  queue.PushBack(2.0);
+  queue.PushBack(3.0);
+  queue.PushFront(1.0);
+
+  queue.Resize(2);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  queue.Resize(5);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+
+  // Test PushBack() after resize
+  queue.PushBack(3.0);
+  EXPECT_EQ(1.0, queue[0]);
+  EXPECT_EQ(2.0, queue[1]);
+  EXPECT_EQ(3.0, queue[2]);
+
+  // Test PushFront() after resize
+  queue.PushFront(4.0);
+  EXPECT_EQ(4.0, queue[0]);
+  EXPECT_EQ(1.0, queue[1]);
+  EXPECT_EQ(2.0, queue[2]);
+  EXPECT_EQ(3.0, queue[3]);
+}
