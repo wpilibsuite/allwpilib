@@ -240,8 +240,8 @@ void HAL_SetSPISpeed(int32_t port, int32_t speed) {
 void HAL_SetSPIOpts(int32_t port, HAL_Bool msb_first,
                     HAL_Bool sample_on_trailing, HAL_Bool clk_idle_high) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  spilib_setopts(HAL_GetSPIHandle(port), (int)msb_first,
-                 (int)sample_on_trailing, (int)clk_idle_high);
+  spilib_setopts(HAL_GetSPIHandle(port), msb_first, sample_on_trailing,
+                 clk_idle_high);
 }
 
 /**
