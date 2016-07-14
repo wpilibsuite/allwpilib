@@ -6,7 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PIDController.h"
-#include <math.h>
+
+#include <cmath>
+
 #include "Notifier.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
@@ -122,7 +124,7 @@ void PIDController::Calculate() {
       std::lock_guard<priority_recursive_mutex> sync(m_mutex);
       m_error = m_setpoint - input;
       if (m_continuous) {
-        if (fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
+        if (std::fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
           if (m_error > 0) {
             m_error = m_error - m_maximumInput + m_minimumInput;
           } else {
@@ -456,18 +458,6 @@ void PIDController::SetTolerance(float percent) {
 }
 
 /**
- * Set the percentage error which is considered tolerable for use with
- * OnTarget.
- *
- * @param percent percentage error which is tolerable
- */
-void PIDController::SetPercentTolerance(float percent) {
-  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
-  m_toleranceType = kPercentTolerance;
-  m_tolerance = percent;
-}
-
-/**
  * Set the absolute error which is considered tolerable for use with
  * OnTarget.
  *
@@ -477,6 +467,18 @@ void PIDController::SetAbsoluteTolerance(float absTolerance) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_toleranceType = kAbsoluteTolerance;
   m_tolerance = absTolerance;
+}
+
+/**
+ * Set the percentage error which is considered tolerable for use with
+ * OnTarget.
+ *
+ * @param percent percentage error which is tolerable
+ */
+void PIDController::SetPercentTolerance(float percent) {
+  std::lock_guard<priority_recursive_mutex> lock(m_mutex);
+  m_toleranceType = kPercentTolerance;
+  m_tolerance = percent;
 }
 
 /**
@@ -515,11 +517,11 @@ bool PIDController::OnTarget() const {
   double error = GetError();
   switch (m_toleranceType) {
     case kPercentTolerance:
-      return fabs(error) <
+      return std::fabs(error) <
              m_tolerance / 100 * (m_maximumInput - m_minimumInput);
       break;
     case kAbsoluteTolerance:
-      return fabs(error) < m_tolerance;
+      return std::fabs(error) < m_tolerance;
       break;
     case kNoTolerance:  // TODO: this case needs an error
       return false;
