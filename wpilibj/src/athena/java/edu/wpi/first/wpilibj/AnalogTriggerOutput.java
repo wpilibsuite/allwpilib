@@ -43,7 +43,6 @@ public class AnalogTriggerOutput extends DigitalSource {
    * Exceptions dealing with improper operation of the Analog trigger output.
    */
   public class AnalogTriggerOutputException extends RuntimeException {
-
     /**
      * Create a new exception with the given message.
      *
@@ -52,7 +51,6 @@ public class AnalogTriggerOutput extends DigitalSource {
     public AnalogTriggerOutputException(String message) {
       super(message);
     }
-
   }
 
   private final AnalogTrigger m_trigger;
@@ -78,7 +76,7 @@ public class AnalogTriggerOutput extends DigitalSource {
     m_outputType = outputType;
 
     HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
-                                   trigger.getIndex(), outputType.m_value);
+        trigger.getIndex(), outputType.value);
   }
 
   /**
@@ -97,7 +95,7 @@ public class AnalogTriggerOutput extends DigitalSource {
    * @return The state of the analog trigger output.
    */
   public boolean get() {
-    return AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port, m_outputType.m_value);
+    return AnalogJNI.getAnalogTriggerOutput(m_trigger.m_port, m_outputType.value);
   }
 
   @Override
@@ -107,7 +105,7 @@ public class AnalogTriggerOutput extends DigitalSource {
 
   @Override
   public int getAnalogTriggerTypeForRouting() {
-    return m_outputType.m_value;
+    return m_outputType.value;
   }
 
   @Override
@@ -128,10 +126,11 @@ public class AnalogTriggerOutput extends DigitalSource {
     kRisingPulse(AnalogJNI.AnalogTriggerType.kRisingPulse),
     kFallingPulse(AnalogJNI.AnalogTriggerType.kFallingPulse);
 
-    private final int m_value;
+    @SuppressWarnings("MemberName")
+    private final int value;
 
-    AnalogTriggerType(int value) {
-      m_value = value;
+    private AnalogTriggerType(int value) {
+      this.value = value;
     }
   }
 }

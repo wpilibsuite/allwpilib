@@ -23,17 +23,14 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
 public class I2C extends SensorBase {
   public enum Port {
     kOnboard(0), kMXP(1);
-    private int m_value;
 
-    Port(int value) {
-      m_value = value;
-    }
+    @SuppressWarnings("MemberName")
+    public final int value;
 
-    public int getValue() {
-      return m_value;
+    private Port(int value) {
+      this.value = value;
     }
   }
-
 
   private final Port m_port;
   private final int m_deviceAddress;
@@ -48,7 +45,7 @@ public class I2C extends SensorBase {
     m_port = port;
     m_deviceAddress = deviceAddress;
 
-    I2CJNI.i2CInitialize((byte) port.getValue());
+    I2CJNI.i2CInitialize((byte) port.value);
 
     HAL.report(tResourceType.kResourceType_I2C, deviceAddress);
   }
@@ -81,10 +78,8 @@ public class I2C extends SensorBase {
     }
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(receiveSize);
 
-    status = I2CJNI
-        .i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress,
-            dataToSendBuffer, (byte) sendSize, dataReceivedBuffer,
-            (byte) receiveSize);
+    status = I2CJNI.i2CTransaction((byte) m_port.value, (byte) m_deviceAddress, dataToSendBuffer,
+                                   (byte) sendSize, dataReceivedBuffer, (byte) receiveSize);
     if (receiveSize > 0 && dataReceived != null) {
       dataReceivedBuffer.get(dataReceived);
     }
@@ -121,10 +116,8 @@ public class I2C extends SensorBase {
           "dataReceived is too small, must be at least " + receiveSize);
     }
 
-    return I2CJNI
-        .i2CTransaction((byte) m_port.getValue(), (byte) m_deviceAddress,
-            dataToSend, (byte) sendSize, dataReceived, (byte) receiveSize)
-        < receiveSize;
+    return I2CJNI.i2CTransaction((byte) m_port.value, (byte) m_deviceAddress, dataToSend,
+                                 (byte) sendSize, dataReceived, (byte) receiveSize) < receiveSize;
   }
 
   /**
@@ -155,8 +148,8 @@ public class I2C extends SensorBase {
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(2);
     dataToSendBuffer.put(buffer);
 
-    return I2CJNI.i2CWrite((byte) m_port.getValue(), (byte) m_deviceAddress,
-        dataToSendBuffer, (byte) buffer.length) < buffer.length;
+    return I2CJNI.i2CWrite((byte) m_port.value, (byte) m_deviceAddress, dataToSendBuffer,
+                           (byte) buffer.length) < buffer.length;
   }
 
   /**
@@ -170,8 +163,8 @@ public class I2C extends SensorBase {
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(data.length);
     dataToSendBuffer.put(data);
 
-    return I2CJNI.i2CWrite((byte) m_port.getValue(), (byte) m_deviceAddress,
-        dataToSendBuffer, (byte) data.length) < data.length;
+    return I2CJNI.i2CWrite((byte) m_port.value, (byte) m_deviceAddress, dataToSendBuffer,
+                           (byte) data.length) < data.length;
   }
 
   /**
@@ -190,8 +183,7 @@ public class I2C extends SensorBase {
           "buffer is too small, must be at least " + size);
     }
 
-    return I2CJNI.i2CWrite((byte) m_port.getValue(), (byte) m_deviceAddress,
-        data, (byte) size) < size;
+    return I2CJNI.i2CWrite((byte) m_port.value, (byte) m_deviceAddress, data, (byte) size) < size;
   }
 
   /**
@@ -269,9 +261,8 @@ public class I2C extends SensorBase {
 
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
 
-    int retVal = I2CJNI
-        .i2CRead((byte) m_port.getValue(), (byte) m_deviceAddress, dataReceivedBuffer,
-            (byte) count);
+    int retVal = I2CJNI.i2CRead((byte) m_port.value, (byte) m_deviceAddress, dataReceivedBuffer,
+                                (byte) count);
     dataReceivedBuffer.get(buffer);
     return retVal < count;
   }
@@ -299,8 +290,8 @@ public class I2C extends SensorBase {
       throw new IllegalArgumentException("buffer is too small, must be at least " + count);
     }
 
-    return I2CJNI
-        .i2CRead((byte) m_port.getValue(), (byte) m_deviceAddress, buffer, (byte) count) < count;
+    return I2CJNI.i2CRead((byte) m_port.value, (byte) m_deviceAddress, buffer, (byte) count)
+        < count;
   }
 
   /**

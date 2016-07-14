@@ -51,32 +51,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * The state to drive a Relay to.
    */
   public enum Value {
-    /**
-     * value: off.
-     */
-    kOff(0),
-    /**
-     * value: on for relays with defined direction.
-     */
-    kOn(1),
-    /**
-     * value: forward.
-     */
-    kForward(2),
-    /**
-     * value: reverse.
-     */
-    kReverse(3);
-
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
-    public final int value;
-
-    Value(int value) {
-      this.value = value;
-    }
+    kOff, kOn, kForward, kReverse
   }
 
   /**
@@ -87,26 +62,15 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
      * direction: both directions are valid.
      */
 
-    kBoth(0),
+    kBoth,
     /**
      * direction: Only forward is valid.
      */
-    kForward(1),
+    kForward,
     /**
      * direction: only reverse is valid.
      */
-    kReverse(2);
-
-    /**
-     * The integer value representing this enumeration.
-     */
-    @SuppressWarnings("MemberName")
-    public final int value;
-
-    Direction(int value) {
-      this.value = value;
-    }
-
+    kReverse
   }
 
   private final int m_channel;

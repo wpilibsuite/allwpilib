@@ -11,27 +11,14 @@ package edu.wpi.first.wpilibj;
  * GenericHID Interface.
  */
 public abstract class GenericHID {
-
   /**
    * Which hand the Human Interface Device is associated with.
    */
-  public static class Hand {
+  public enum Hand {
+    kLeft(0), kRight(1);
 
-    /**
-     * The integer value representing this enumeration.
-     */
     @SuppressWarnings("MemberName")
     public final int value;
-    static final int kLeft_val = 0;
-    static final int kRight_val = 1;
-    /**
-     * hand: left.
-     */
-    public static final Hand kLeft = new Hand(kLeft_val);
-    /**
-     * hand: right.
-     */
-    public static final Hand kRight = new Hand(kRight_val);
 
     private Hand(int value) {
       this.value = value;

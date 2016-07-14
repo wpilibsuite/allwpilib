@@ -22,14 +22,11 @@ public class SPI extends SensorBase {
   public enum Port {
     kOnboardCS0(0), kOnboardCS1(1), kOnboardCS2(2), kOnboardCS3(3), kMXP(4);
 
-    private int m_value;
+    @SuppressWarnings("MemberName")
+    public int value;
 
-    Port(int value) {
-      m_value = value;
-    }
-
-    public int getValue() {
-      return m_value;
+    private Port(int value) {
+      this.value = value;
     }
   }
 
@@ -46,7 +43,7 @@ public class SPI extends SensorBase {
    * @param port the physical SPI port
    */
   public SPI(Port port) {
-    m_port = (byte) port.getValue();
+    m_port = (byte) port.value;
     devices++;
 
     SPIJNI.spiInitialize(m_port);
