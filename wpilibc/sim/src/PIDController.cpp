@@ -126,9 +126,9 @@ void PIDController::Calculate() {
       if (m_continuous) {
         if (std::fabs(m_error) > (m_maximumInput - m_minimumInput) / 2) {
           if (m_error > 0) {
-            m_error = m_error - m_maximumInput + m_minimumInput;
+            m_error = m_error - (m_maximumInput - m_minimumInput);
           } else {
-            m_error = m_error + m_maximumInput - m_minimumInput;
+            m_error = m_error + (m_maximumInput - m_minimumInput);
           }
         }
       }
@@ -403,12 +403,11 @@ double PIDController::GetDeltaSetpoint() const {
  * @return the current error
  */
 float PIDController::GetError() const {
-  double pidInput;
+  double setpoint = GetSetpoint();
   {
-    std::lock_guard<priority_recursive_mutex> lock(m_mutex);
-    pidInput = m_pidInput->PIDGet();
+    std::lock_guard<priority_recursive_mutex> sync(m_mutex);
+    return GetContinuousError(setpoint - m_pidInput->PIDGet());
   }
-  return GetSetpoint() - pidInput;
 }
 
 /**
@@ -594,6 +593,27 @@ void PIDController::InitTable(std::shared_ptr<ITable> table) {
     m_table->PutBoolean(kEnabled, IsEnabled());
     m_table->AddTableListener(this, false);
   }
+}
+
+/**
+ * Wraps error around for continuous inputs. The original error is returned if
+ * continuous mode is disabled. This is an unsynchronized function.
+ *
+ * @param error The current error of the PID controller.
+ * @return Error for continuous inputs.
+ */
+double PIDController::GetContinuousError(double error) const {
+  if (m_continuous) {
+    if (std::fabs(error) > (m_maximumInput - m_minimumInput) / 2) {
+      if (error > 0) {
+        return error - (m_maximumInput - m_minimumInput);
+      } else {
+        return error + (m_maximumInput - m_minimumInput);
+      }
+    }
+  }
+
+  return error;
 }
 
 std::shared_ptr<ITable> PIDController::GetTable() const { return m_table; }
