@@ -205,7 +205,7 @@ double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
       static_cast<double>(1 << HAL_GetAnalogAverageBits(gyro->handle, status)) /
       (HAL_GetAnalogSampleRate(status) * gyro->voltsPerDegreePerSecond);
 
-  return static_cast<float>(scaledValue);
+  return scaledValue;
 }
 
 double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
