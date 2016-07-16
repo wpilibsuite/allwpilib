@@ -33,9 +33,8 @@ static const std::string kEnabled = "enabled";
  *               default is 50ms.
  */
 PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource* source,
-                             PIDOutput* output, float period) {
-  Initialize(Kp, Ki, Kd, 0.0f, source, output, period);
-}
+                             PIDOutput* output, float period)
+    : PIDController(Kp, Ki, Kd, 0.0f, source, output, period) {}
 
 /**
  * Allocate a PID object with the given constants for P, I, D.
@@ -52,12 +51,6 @@ PIDController::PIDController(float Kp, float Ki, float Kd, PIDSource* source,
 PIDController::PIDController(float Kp, float Ki, float Kd, float Kf,
                              PIDSource* source, PIDOutput* output,
                              float period) {
-  Initialize(Kp, Ki, Kd, Kf, source, output, period);
-}
-
-void PIDController::Initialize(float Kp, float Ki, float Kd, float Kf,
-                               PIDSource* source, PIDOutput* output,
-                               float period) {
   m_table = nullptr;
 
   m_P = Kp;
