@@ -14,7 +14,8 @@
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-
+#include <climits>
+#include <iostream>
 const uint32_t AnalogGyro::kOversampleBits;
 const uint32_t AnalogGyro::kAverageBits;
 constexpr float AnalogGyro::kSamplesPerSecond;
@@ -81,6 +82,8 @@ AnalogGyro::AnalogGyro(int32_t channel, uint32_t center, float offset) {
   InitGyro();
   m_center = center;
   m_offset = offset;
+  std::cout << "Set Center: " << m_center << std::endl;
+  std::cout << "Set Offset: " << m_offset << std::endl;
   m_analog->SetAccumulatorCenter(m_center);
   m_analog->ResetAccumulator();
 }
@@ -105,6 +108,8 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, uint32_t center,
     InitGyro();
     m_center = center;
     m_offset = offset;
+    std::cout << "Set Center: " << m_center << std::endl;
+    std::cout << "Set Offset: " << m_offset << std::endl;
     m_analog->SetAccumulatorCenter(m_center);
     m_analog->ResetAccumulator();
   }
@@ -168,6 +173,9 @@ void AnalogGyro::Calibrate() {
   m_offset = ((float)value / (float)count) - (float)m_center;
   m_analog->SetAccumulatorCenter(m_center);
   m_analog->ResetAccumulator();
+  
+  std::cout << "Calibrate Center: " << m_center << std::endl;
+    std::cout << "Calibrate Offset: " << m_offset << std::endl;
 }
 
 /**
@@ -194,7 +202,15 @@ float AnalogGyro::GetAngle() const {
   double scaledValue = value * 1e-9 * (double)m_analog->GetLSBWeight() *
                        (double)(1 << m_analog->GetAverageBits()) /
                        (m_analog->GetSampleRate() * m_voltsPerDegreePerSecond);
+                       
+  std::cout << "Raw = " << rawValue << std::endl;
+  std::cout << "Count = " << count << std::endl;
 
+  std::cout << "Value = " << value << std::endl;
+  std::cout << "Offset = " << m_offset << std::endl;
+  
+  std::cout << "vPDPS = " << m_voltsPerDegreePerSecond << std::endl;
+  std::cout << "Scaled Value = " << scaledValue << std::endl;
   return (float)scaledValue;
 }
 
@@ -257,4 +273,5 @@ void AnalogGyro::SetDeadband(float volts) {
   int32_t deadband = volts * 1e9 / m_analog->GetLSBWeight() *
                      (1 << m_analog->GetOversampleBits());
   m_analog->SetAccumulatorDeadband(deadband);
+  std::cout << "Deadband set to: " << deadband << std::endl;
 }
