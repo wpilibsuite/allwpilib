@@ -79,6 +79,9 @@ T CircularBuffer<T>::PopBack() {
   return m_data[(m_front + m_length) % m_data.size()];
 }
 
+/**
+ * Sets internal buffer contents to zero.
+ */
 template <class T>
 void CircularBuffer<T>::Reset() {
   std::fill(m_data.begin(), m_data.end(), 0);
@@ -87,7 +90,7 @@ void CircularBuffer<T>::Reset() {
 }
 
 /**
- * Returns element at index starting from front of buffer.
+ * @return Element at index starting from front of buffer.
  */
 template <class T>
 T& CircularBuffer<T>::operator[](size_t index) {
@@ -95,7 +98,7 @@ T& CircularBuffer<T>::operator[](size_t index) {
 }
 
 /**
- * Returns element at index starting from front of buffer.
+ * @return Element at index starting from front of buffer.
  */
 template <class T>
 const T& CircularBuffer<T>::operator[](size_t index) const {
@@ -103,7 +106,9 @@ const T& CircularBuffer<T>::operator[](size_t index) const {
 }
 
 /**
- * Increment an index modulo the length of the m_data buffer
+ * Increment an index modulo the length of the buffer.
+ *
+ * @return The result of the modulo operation.
  */
 template <class T>
 size_t CircularBuffer<T>::ModuloInc(size_t index) {
@@ -111,7 +116,9 @@ size_t CircularBuffer<T>::ModuloInc(size_t index) {
 }
 
 /**
- * Decrement an index modulo the length of the m_data buffer
+ * Decrement an index modulo the length of the buffer.
+ *
+ * @return The result of the modulo operation.
  */
 template <class T>
 size_t CircularBuffer<T>::ModuloDec(size_t index) {
