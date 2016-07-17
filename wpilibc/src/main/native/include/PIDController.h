@@ -9,13 +9,13 @@
 
 #include <atomic>
 #include <memory>
-#include <queue>
 #include <string>
 
 #include <support/mutex.h>
 
 #include "Base.h"
 #include "Controller.h"
+#include "Filters/LinearDigitalFilter.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Notifier.h"
 #include "PIDInterface.h"
@@ -64,7 +64,6 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   double GetDeltaSetpoint() const;
 
   virtual double GetError() const;
-  virtual double GetAvgError() const;
 
   virtual void SetPIDSourceType(PIDSourceType pidSource);
   virtual PIDSourceType GetPIDSourceType() const;
@@ -156,11 +155,8 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   double m_result = 0;
   double m_period;
 
-  // Length of buffer for averaging for tolerances.
-  std::atomic<unsigned> m_bufLength{1};
-
-  std::queue<double> m_buf;
-  double m_bufTotal = 0;
+  std::shared_ptr<PIDSource> m_origSource;
+  LinearDigitalFilter m_filter{nullptr, {}, {}};
 
   mutable wpi::mutex m_mutex;
 
