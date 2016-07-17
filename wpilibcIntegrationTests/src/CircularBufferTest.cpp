@@ -28,7 +28,7 @@ TEST(CircularBufferTest, PushFrontTest) {
     queue.PushFront(value);
   }
 
-  for (unsigned int i = 0; i < pushFrontOut.size(); i++) {
+  for (size_t i = 0; i < pushFrontOut.size(); i++) {
     EXPECT_EQ(pushFrontOut[i], queue[i]);
   }
 }
@@ -40,7 +40,7 @@ TEST(CircularBufferTest, PushBackTest) {
     queue.PushBack(value);
   }
 
-  for (unsigned int i = 0; i < pushBackOut.size(); i++) {
+  for (size_t i = 0; i < pushBackOut.size(); i++) {
     EXPECT_EQ(pushBackOut[i], queue[i]);
   }
 }
