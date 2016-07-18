@@ -29,7 +29,7 @@ extern "C" {
  * Create a new instance of a digital port.
  */
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle port_handle,
-                                        int32_t input, int32_t* status) {
+                                        HAL_Bool input, int32_t* status) {
   initializeDigital(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
