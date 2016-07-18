@@ -12,13 +12,69 @@
 #include <limits>
 
 #include "FRC_NetworkCommunication/FRCComm.h"
+#include "HAL/cpp/priority_condition_variable.h"
+#include "HAL/cpp/priority_mutex.h"
 
 struct HAL_JoystickAxesInt {
   uint16_t count;
   int16_t axes[HAL_kMaxJoystickAxes];
 };
 
+static priority_mutex msgMutex;
+static priority_condition_variable newDSDataAvailableCond;
+static priority_mutex newDSDataAvailableMutex;
+
 extern "C" {
+int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
+                         int32_t wait_ms) {
+  return setErrorData(errors, errorsLength, wait_ms);
+}
+
+int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
+                      const char* details, const char* location,
+                      const char* callStack, HAL_Bool printMsg) {
+  // Avoid flooding console by keeping track of previous 5 error
+  // messages and only printing again if they're longer than 1 second old.
+  static constexpr int KEEP_MSGS = 5;
+  std::lock_guard<priority_mutex> lock(msgMutex);
+  static std::string prev_msg[KEEP_MSGS];
+  static uint64_t prev_msg_time[KEEP_MSGS] = {0, 0, 0};
+
+  int32_t status = 0;
+  uint64_t curTime = HAL_GetFPGATime(&status);
+  int i;
+  for (i = 0; i < KEEP_MSGS; ++i) {
+    if (prev_msg[i] == details) break;
+  }
+  int retval = 0;
+  if (i == KEEP_MSGS || (curTime - prev_msg_time[i]) >= 1000000) {
+    retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
+                                                details, location, callStack);
+    if (printMsg) {
+      if (location && location[0] != '\0') {
+        fprintf(stderr, "%s at %s: ", isError ? "Error" : "Warning", location);
+      }
+      fprintf(stderr, "%s\n", details);
+      if (callStack && callStack[0] != '\0') {
+        fprintf(stderr, "%s\n", callStack);
+      }
+    }
+    if (i == KEEP_MSGS) {
+      // replace the oldest one
+      i = 0;
+      uint64_t first = prev_msg_time[0];
+      for (int j = 1; j < KEEP_MSGS; ++j) {
+        if (prev_msg_time[j] < first) {
+          first = prev_msg_time[j];
+          i = j;
+        }
+      }
+      prev_msg[i] = details;
+    }
+    prev_msg_time[i] = curTime;
+  }
+  return retval;
+}
 
 int32_t HAL_GetControlWord(HAL_ControlWord* controlWord) {
   std::memset(controlWord, 0, sizeof(HAL_ControlWord));
@@ -173,6 +229,19 @@ void HAL_ObserveUserProgramTeleop(void) {
 
 void HAL_ObserveUserProgramTest(void) {
   FRC_NetworkCommunication_observeUserProgramTest();
+}
+
+/**
+ * Waits for the newest DS packet to arrive. Note that this is a blocking call.
+ */
+void HAL_WaitForDSData(void) {
+  std::unique_lock<priority_mutex> lock(newDSDataAvailableMutex);
+  newDSDataAvailableCond.wait(lock);
+}
+
+void HAL_InitializeDriverStation(void) {
+  //  Set our DS new data condition variable.
+  setNewDataSem(newDSDataAvailableCond.native_handle());
 }
 
 }  // extern "C"

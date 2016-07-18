@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/HAL.h"
-#include "HAL/cpp/priority_mutex.h"
 
 #include <signal.h>  // linux for kill
 #include <stdlib.h>
@@ -23,7 +22,6 @@
 #include "FRC_NetworkCommunication/FRCComm.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/Errors.h"
-#include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "ctre/ctre.h"
@@ -33,13 +31,9 @@ static tGlobal* global = nullptr;
 static tSysWatchdog* watchdog = nullptr;
 
 static priority_mutex timeMutex;
-static priority_mutex msgMutex;
 static uint32_t timeEpoch = 0;
 static uint32_t prevFPGATime = 0;
 static HAL_NotifierHandle rolloverNotifier = 0;
-
-static priority_condition_variable newDSDataAvailableCond;
-static priority_mutex newDSDataAvailableMutex;
 
 using namespace hal;
 
@@ -231,57 +225,6 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   return global->readUserButton(status);
 }
 
-int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
-                         int32_t wait_ms) {
-  return setErrorData(errors, errorsLength, wait_ms);
-}
-
-int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
-                      const char* details, const char* location,
-                      const char* callStack, HAL_Bool printMsg) {
-  // Avoid flooding console by keeping track of previous 5 error
-  // messages and only printing again if they're longer than 1 second old.
-  static constexpr int KEEP_MSGS = 5;
-  std::lock_guard<priority_mutex> lock(msgMutex);
-  static std::string prev_msg[KEEP_MSGS];
-  static uint64_t prev_msg_time[KEEP_MSGS] = {0, 0, 0};
-
-  int32_t status = 0;
-  uint64_t curTime = HAL_GetFPGATime(&status);
-  int i;
-  for (i = 0; i < KEEP_MSGS; ++i) {
-    if (prev_msg[i] == details) break;
-  }
-  int retval = 0;
-  if (i == KEEP_MSGS || (curTime - prev_msg_time[i]) >= 1000000) {
-    retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
-                                                details, location, callStack);
-    if (printMsg) {
-      if (location && location[0] != '\0') {
-        fprintf(stderr, "%s at %s: ", isError ? "Error" : "Warning", location);
-      }
-      fprintf(stderr, "%s\n", details);
-      if (callStack && callStack[0] != '\0') {
-        fprintf(stderr, "%s\n", callStack);
-      }
-    }
-    if (i == KEEP_MSGS) {
-      // replace the oldest one
-      i = 0;
-      uint64_t first = prev_msg_time[0];
-      for (int j = 1; j < KEEP_MSGS; ++j) {
-        if (prev_msg_time[j] < first) {
-          first = prev_msg_time[j];
-          i = j;
-        }
-      }
-      prev_msg[i] = details;
-    }
-    prev_msg_time[i] = curTime;
-  }
-  return retval;
-}
-
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
   if (!watchdog) {
     *status = NiFpga_Status_ResourceNotInitialized;
@@ -311,14 +254,6 @@ static void timerRollover(uint64_t currentTime, void*) {
   int32_t status = 0;
   HAL_UpdateNotifierAlarm(rolloverNotifier, currentTime + 0x80000000ULL,
                           &status);
-}
-
-/**
- * Waits for the newest DS packet to arrive. Note that this is a blocking call.
- */
-void HAL_WaitForDSData() {
-  std::unique_lock<priority_mutex> lock(newDSDataAvailableMutex);
-  newDSDataAvailableCond.wait(lock);
 }
 
 /**
@@ -388,8 +323,7 @@ int32_t HAL_Initialize(int32_t mode) {
   fs << pid << std::endl;
   fs.close();
 
-  //  Set our DS new data condition variable.
-  setNewDataSem(newDSDataAvailableCond.native_handle());
+  HAL_InitializeDriverStation();
 
   return 1;
 }
