@@ -12,6 +12,7 @@
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
+#include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "spilib/spi-lib.h"
 
@@ -72,8 +73,7 @@ struct SPIAccumulator {
   bool is_signed;   // is data field signed?
   bool big_endian;  // is response big endian?
 };
-SPIAccumulator* spiAccumulators[5] = {nullptr, nullptr, nullptr, nullptr,
-                                      nullptr};
+std::unique_ptr<SPIAccumulator> spiAccumulators[5];
 
 /*
  * Initialize the spi port. Opens the port if necessary and saves the handle.
@@ -403,8 +403,9 @@ void HAL_InitSPIAccumulator(int32_t port, int32_t period, int32_t cmd,
                             HAL_Bool big_endian, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
   if (port > 4) return;
-  if (!spiAccumulators[port]) spiAccumulators[port] = new SPIAccumulator();
-  SPIAccumulator* accum = spiAccumulators[port];
+  if (!spiAccumulators[port])
+    spiAccumulators[port] = std::make_unique<SPIAccumulator>();
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (big_endian) {
     for (int i = xfer_size - 1; i >= 0; --i) {
       accum->cmd[i] = cmd & 0xff;
@@ -442,14 +443,13 @@ void HAL_InitSPIAccumulator(int32_t port, int32_t period, int32_t cmd,
  */
 void HAL_FreeSPIAccumulator(int32_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  SPIAccumulator* accum = spiAccumulators[port];
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
     return;
   }
   HAL_NotifierHandle handle = accum->notifier.exchange(0);
   HAL_CleanNotifier(handle, status);
-  delete accum;
   spiAccumulators[port] = nullptr;
 }
 
@@ -458,7 +458,7 @@ void HAL_FreeSPIAccumulator(int32_t port, int32_t* status) {
  */
 void HAL_ResetSPIAccumulator(int32_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  SPIAccumulator* accum = spiAccumulators[port];
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
     return;
@@ -480,7 +480,7 @@ void HAL_ResetSPIAccumulator(int32_t port, int32_t* status) {
 void HAL_SetSPIAccumulatorCenter(int32_t port, int32_t center,
                                  int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  SPIAccumulator* accum = spiAccumulators[port];
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
     return;
@@ -494,7 +494,7 @@ void HAL_SetSPIAccumulatorCenter(int32_t port, int32_t center,
 void HAL_SetSPIAccumulatorDeadband(int32_t port, int32_t deadband,
                                    int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  SPIAccumulator* accum = spiAccumulators[port];
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
     return;
@@ -507,7 +507,7 @@ void HAL_SetSPIAccumulatorDeadband(int32_t port, int32_t deadband,
  */
 int32_t HAL_GetSPIAccumulatorLastValue(int32_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  SPIAccumulator* accum = spiAccumulators[port];
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
     return 0;
@@ -522,7 +522,7 @@ int32_t HAL_GetSPIAccumulatorLastValue(int32_t port, int32_t* status) {
  */
 int64_t HAL_GetSPIAccumulatorValue(int32_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  SPIAccumulator* accum = spiAccumulators[port];
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
     return 0;
@@ -540,7 +540,7 @@ int64_t HAL_GetSPIAccumulatorValue(int32_t port, int32_t* status) {
  */
 int64_t HAL_GetSPIAccumulatorCount(int32_t port, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  SPIAccumulator* accum = spiAccumulators[port];
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
     return 0;
@@ -573,7 +573,7 @@ double HAL_GetSPIAccumulatorAverage(int32_t port, int32_t* status) {
 void HAL_GetSPIAccumulatorOutput(int32_t port, int64_t* value, int64_t* count,
                                  int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  SPIAccumulator* accum = spiAccumulators[port];
+  SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
     *value = 0;

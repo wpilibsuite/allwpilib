@@ -23,9 +23,9 @@ namespace hal {
 // Create a mutex to protect changes to the DO PWM config
 priority_recursive_mutex digitalPwmMutex;
 
-tDIO* digitalSystem = nullptr;
-tRelay* relaySystem = nullptr;
-tPWM* pwmSystem = nullptr;
+std::unique_ptr<tDIO> digitalSystem;
+std::unique_ptr<tRelay> relaySystem;
+std::unique_ptr<tPWM> pwmSystem;
 
 bool digitalSystemsInitialized = false;
 
@@ -39,17 +39,17 @@ DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
 void initializeDigital(int32_t* status) {
   if (digitalSystemsInitialized) return;
 
-  digitalSystem = tDIO::create(status);
+  digitalSystem.reset(tDIO::create(status));
 
   // Relay Setup
-  relaySystem = tRelay::create(status);
+  relaySystem.reset(tRelay::create(status));
 
   // Turn off all relay outputs.
   relaySystem->writeValue_Forward(0, status);
   relaySystem->writeValue_Reverse(0, status);
 
   // PWM Setup
-  pwmSystem = tPWM::create(status);
+  pwmSystem.reset(tPWM::create(status));
 
   // Make sure that the 9403 IONode has had a chance to initialize before
   // continuing.

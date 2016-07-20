@@ -16,6 +16,7 @@
 
 #include "ChipObject.h"
 #include "HAL/HAL.h"
+#include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
 
@@ -23,8 +24,8 @@ static const uint32_t kTimerInterruptNumber = 28;
 
 static priority_mutex notifierInterruptMutex;
 static priority_recursive_mutex notifierMutex;
-static tAlarm* notifierAlarm = nullptr;
-static tInterruptManager* notifierManager = nullptr;
+static std::unique_ptr<tAlarm> notifierAlarm;
+static std::unique_ptr<tInterruptManager> notifierManager;
 static uint64_t closestTrigger = UINT64_MAX;
 
 namespace {
@@ -35,7 +36,7 @@ struct Notifier {
   uint64_t triggerTime = UINT64_MAX;
 };
 }
-static std::shared_ptr<Notifier> notifiers = nullptr;
+static std::shared_ptr<Notifier> notifiers;
 static std::atomic_flag notifierAtexitRegistered = ATOMIC_FLAG_INIT;
 static std::atomic_int notifierRefCount{0};
 
@@ -120,12 +121,12 @@ HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, void*),
     std::lock_guard<priority_mutex> sync(notifierInterruptMutex);
     // create manager and alarm if not already created
     if (!notifierManager) {
-      notifierManager =
-          new tInterruptManager(1 << kTimerInterruptNumber, false, status);
+      notifierManager = std::make_unique<tInterruptManager>(
+          1 << kTimerInterruptNumber, false, status);
       notifierManager->registerHandler(alarmCallback, nullptr, status);
       notifierManager->enable(status);
     }
-    if (!notifierAlarm) notifierAlarm = tAlarm::create(status);
+    if (!notifierAlarm) notifierAlarm.reset(tAlarm::create(status));
   }
 
   std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
@@ -157,12 +158,10 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifier_handle, int32_t* status) {
     // if this was the last notifier, clean up alarm and manager
     if (notifierAlarm) {
       notifierAlarm->writeEnable(false, status);
-      delete notifierAlarm;
       notifierAlarm = nullptr;
     }
     if (notifierManager) {
       notifierManager->disable(status);
-      delete notifierManager;
       notifierManager = nullptr;
     }
     closestTrigger = UINT64_MAX;

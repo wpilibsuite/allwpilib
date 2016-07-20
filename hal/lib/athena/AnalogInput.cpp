@@ -50,7 +50,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle port_handle,
   }
   analog_port->pin = static_cast<uint8_t>(pin);
   if (HAL_IsAccumulatorChannel(handle, status)) {
-    analog_port->accumulator = tAccumulator::create(pin, status);
+    analog_port->accumulator.reset(tAccumulator::create(pin, status));
   } else {
     analog_port->accumulator = nullptr;
   }
@@ -67,7 +67,6 @@ void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analog_port_handle) {
   if (!port) return;
   // no status, so no need to check for a proper free.
   analogInputHandles.Free(analog_port_handle);
-  delete port->accumulator;
 }
 
 /**

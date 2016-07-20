@@ -7,6 +7,8 @@
 
 #include "FPGAEncoder.h"
 
+#include <memory>
+
 #include "DigitalInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
@@ -15,7 +17,7 @@ using namespace hal;
 
 namespace {
 struct Encoder {
-  tEncoder* encoder;
+  std::unique_ptr<tEncoder> encoder;
   uint8_t index;
 };
 }
@@ -64,7 +66,7 @@ HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
   encoder->index = static_cast<uint8_t>(getHandleIndex(handle));
   *index = encoder->index;
   // TODO: if (index == ~0ul) { CloneError(quadEncoders); return; }
-  encoder->encoder = tEncoder::create(encoder->index, status);
+  encoder->encoder.reset(tEncoder::create(encoder->index, status));
   encoder->encoder->writeConfig_ASource_Module(routingModuleA, status);
   encoder->encoder->writeConfig_ASource_Channel(routingPinA, status);
   encoder->encoder->writeConfig_ASource_AnalogTrigger(routingAnalogTriggerA,
@@ -88,7 +90,6 @@ void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  delete encoder->encoder;
 }
 
 /**
