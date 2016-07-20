@@ -43,7 +43,7 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
   }
 
   // initializePCM will check the module
-  if (!HAL_CheckSolenoidPin(pin)) {
+  if (!HAL_CheckSolenoidChannel(pin)) {
     *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
@@ -75,11 +75,11 @@ void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoid_port_handle) {
 }
 
 HAL_Bool HAL_CheckSolenoidModule(int32_t module) {
-  return (module < kNumPCMModules) && (module >= 0);
+  return module < kNumPCMModules && module >= 0;
 }
 
-HAL_Bool HAL_CheckSolenoidPin(int32_t pin) {
-  return (pin < kNumSolenoidPins) && (pin >= 0);
+HAL_Bool HAL_CheckSolenoidChannel(int32_t pin) {
+  return pin < kNumSolenoidPins && pin >= 0;
 }
 
 HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoid_port_handle,

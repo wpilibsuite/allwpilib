@@ -101,7 +101,7 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwm_port_handle, int32_t* status) {
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t pin) {
-  return (pin < kNumPWMPins) && (pin >= 0);
+  return pin < kNumPWMPins && pin >= 0;
 }
 
 void HAL_SetPWMConfig(HAL_DigitalHandle pwm_port_handle, double max,

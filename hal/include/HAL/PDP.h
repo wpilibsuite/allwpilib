@@ -15,6 +15,7 @@
 extern "C" {
 #endif
 void HAL_InitializePDP(int32_t module, int32_t* status);
+HAL_Bool HAL_CheckPDPChannel(int32_t channel);
 HAL_Bool HAL_CheckPDPModule(int32_t module);
 double HAL_GetPDPTemperature(int32_t module, int32_t* status);
 double HAL_GetPDPVoltage(int32_t module, int32_t* status);

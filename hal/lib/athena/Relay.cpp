@@ -73,7 +73,7 @@ HAL_Bool HAL_CheckRelayChannel(int32_t pin) {
   // roboRIO only has 4 headers, and the FPGA has
   // seperate functions for forward and reverse,
   // instead of seperate pin IDs
-  return (pin < kNumRelayHeaders) && (pin >= 0);
+  return pin < kNumRelayHeaders && pin >= 0;
 }
 
 /**

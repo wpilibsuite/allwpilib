@@ -26,6 +26,26 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
+ * Method:    checkPDPChannel
+ * Signature: (I)Z;
+*/
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_checkPDPChannel(
+    JNIEnv *env, jclass, jint channel) {
+  return HAL_CheckPDPChannel(channel);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
+ * Method:    checkPDPModule
+ * Signature: (I)Z;
+*/
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_checkPDPModule(
+    JNIEnv *env, jclass, jint module) {
+  return HAL_CheckPDPModule(module);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
  * Method:    getPDPTemperature
  * Signature: (I)D
  */

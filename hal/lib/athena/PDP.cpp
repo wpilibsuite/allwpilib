@@ -29,7 +29,11 @@ void HAL_InitializePDP(int32_t module, int32_t* status) {
 }
 
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
-  return (module < kNumPDPModules) && (module >= 0);
+  return module < kNumPDPModules && module >= 0;
+}
+
+HAL_Bool HAL_CheckPDPChannel(int32_t channel) {
+  return channel < kNumPDPChannels && channel >= 0;
 }
 
 double HAL_GetPDPTemperature(int32_t module, int32_t* status) {
