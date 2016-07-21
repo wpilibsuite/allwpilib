@@ -87,9 +87,8 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * set to both lines at 0v.
    */
   private void initRelay() {
-    if (!RelayJNI.checkRelayChannel(m_channel)) {
-      throw new IndexOutOfBoundsException("Requested relay channel number is out of range.");
-    }
+    SensorBase.checkRelayChannel(m_channel);
+
     int portHandle = RelayJNI.getPort((byte)m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
       m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);

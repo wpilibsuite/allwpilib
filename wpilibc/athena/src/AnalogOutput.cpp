@@ -24,7 +24,7 @@ AnalogOutput::AnalogOutput(uint32_t channel) {
   std::stringstream buf;
   buf << "analog input " << channel;
 
-  if (!HAL_CheckAnalogOutputChannel(channel)) {
+  if (!SensorBase::CheckAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     m_channel = std::numeric_limits<uint32_t>::max();
     m_port = HAL_kInvalidHandle;

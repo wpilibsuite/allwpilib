@@ -31,8 +31,8 @@ class SensorBase : public ErrorBase {
   static bool CheckDigitalChannel(int channel);
   static bool CheckRelayChannel(int channel);
   static bool CheckPWMChannel(int channel);
-  static bool CheckAnalogInput(int channel);
-  static bool CheckAnalogOutput(int channel);
+  static bool CheckAnalogInputChannel(int channel);
+  static bool CheckAnalogOutputChannel(int channel);
   static bool CheckSolenoidChannel(int channel);
   static bool CheckPDPChannel(int channel);
 

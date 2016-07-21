@@ -72,7 +72,7 @@ bool SensorBase::CheckPWMChannel(int channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogInput(int channel) {
+bool SensorBase::CheckAnalogInputChannel(int channel) {
   return HAL_CheckAnalogInputChannel(channel);
 }
 
@@ -84,7 +84,7 @@ bool SensorBase::CheckAnalogInput(int channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogOutput(int channel) {
+bool SensorBase::CheckAnalogOutputChannel(int channel) {
   return HAL_CheckAnalogOutputChannel(channel);
 }
 

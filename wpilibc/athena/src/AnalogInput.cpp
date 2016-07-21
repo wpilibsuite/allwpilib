@@ -27,7 +27,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
   std::stringstream buf;
   buf << "Analog Input " << channel;
 
-  if (!HAL_CheckAnalogInputChannel(channel)) {
+  if (!SensorBase::CheckAnalogInputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
