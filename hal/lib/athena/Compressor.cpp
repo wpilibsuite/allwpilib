@@ -43,10 +43,9 @@ HAL_Bool HAL_GetCompressor(HAL_CompressorHandle compressor_handle,
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetCompressor(value);
+  *status = PCM_modules[index]->GetCompressor(value);
 
   return value;
 }
@@ -59,9 +58,8 @@ void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressor_handle,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  PCM* module = PCM_modules[index];
 
-  *status = module->SetClosedLoopControl(value);
+  *status = PCM_modules[index]->SetClosedLoopControl(value);
 }
 
 HAL_Bool HAL_GetCompressorClosedLoopControl(
@@ -72,10 +70,9 @@ HAL_Bool HAL_GetCompressorClosedLoopControl(
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetClosedLoopControl(value);
+  *status = PCM_modules[index]->GetClosedLoopControl(value);
 
   return value;
 }
@@ -88,10 +85,9 @@ HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressor_handle,
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetPressure(value);
+  *status = PCM_modules[index]->GetPressure(value);
 
   return value;
 }
@@ -104,10 +100,9 @@ double HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
-  PCM* module = PCM_modules[index];
   float value;
 
-  *status = module->GetCompressorCurrent(value);
+  *status = PCM_modules[index]->GetCompressorCurrent(value);
 
   return value;
 }
@@ -119,10 +114,9 @@ HAL_Bool HAL_GetCompressorCurrentTooHighFault(
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetCompressorCurrentTooHighFault(value);
+  *status = PCM_modules[index]->GetCompressorCurrentTooHighFault(value);
 
   return value;
 }
@@ -134,10 +128,9 @@ HAL_Bool HAL_GetCompressorCurrentTooHighStickyFault(
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetCompressorCurrentTooHighStickyFault(value);
+  *status = PCM_modules[index]->GetCompressorCurrentTooHighStickyFault(value);
 
   return value;
 }
@@ -149,10 +142,9 @@ HAL_Bool HAL_GetCompressorShortedStickyFault(
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetCompressorShortedStickyFault(value);
+  *status = PCM_modules[index]->GetCompressorShortedStickyFault(value);
 
   return value;
 }
@@ -164,10 +156,9 @@ HAL_Bool HAL_GetCompressorShortedFault(HAL_CompressorHandle compressor_handle,
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetCompressorShortedFault(value);
+  *status = PCM_modules[index]->GetCompressorShortedFault(value);
 
   return value;
 }
@@ -179,10 +170,9 @@ HAL_Bool HAL_GetCompressorNotConnectedStickyFault(
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetCompressorNotConnectedStickyFault(value);
+  *status = PCM_modules[index]->GetCompressorNotConnectedStickyFault(value);
 
   return value;
 }
@@ -194,10 +184,9 @@ HAL_Bool HAL_GetCompressorNotConnectedFault(
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  PCM* module = PCM_modules[index];
   bool value;
 
-  *status = module->GetCompressorNotConnectedFault(value);
+  *status = PCM_modules[index]->GetCompressorNotConnectedFault(value);
 
   return value;
 }

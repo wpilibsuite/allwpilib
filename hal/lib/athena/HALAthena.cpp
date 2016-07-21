@@ -27,8 +27,8 @@
 #include "ctre/ctre.h"
 #include "visa/visa.h"
 
-static tGlobal* global = nullptr;
-static tSysWatchdog* watchdog = nullptr;
+static std::unique_ptr<tGlobal> global;
+static std::unique_ptr<tSysWatchdog> watchdog;
 
 static priority_mutex timeMutex;
 static uint32_t timeEpoch = 0;
@@ -271,8 +271,8 @@ int32_t HAL_Initialize(int32_t mode) {
       nLoadOut::kTargetClass_RoboRIO;
 
   int32_t status = 0;
-  global = tGlobal::create(&status);
-  watchdog = tSysWatchdog::create(&status);
+  global.reset(tGlobal::create(&status));
+  watchdog.reset(tSysWatchdog::create(&status));
 
   std::atexit(HALCleanupAtExit);
 

@@ -22,13 +22,13 @@ constexpr int32_t kDefaultAverageBits = 7;
 constexpr double kDefaultSampleRate = 50000.0;
 static const uint32_t kAccumulatorChannels[] = {0, 1};
 
-extern tAI* analogInputSystem;
-extern tAO* analogOutputSystem;
+extern std::unique_ptr<tAI> analogInputSystem;
+extern std::unique_ptr<tAO> analogOutputSystem;
 extern priority_recursive_mutex analogRegisterWindowMutex;
 
 struct AnalogPort {
   uint8_t pin;
-  tAccumulator* accumulator;
+  std::unique_ptr<tAccumulator> accumulator;
 };
 
 extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,

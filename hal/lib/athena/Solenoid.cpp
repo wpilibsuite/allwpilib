@@ -97,10 +97,7 @@ HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoid_port_handle,
 }
 
 int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status) {
-  if (module >= kNumPCMModules) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return 0;
-  }
+  if (!checkPCMInit(module, status)) return 0;
   uint8_t value;
 
   *status = PCM_modules[module]->GetAllSolenoids(value);
@@ -120,10 +117,7 @@ void HAL_SetSolenoid(HAL_SolenoidHandle solenoid_port_handle, HAL_Bool value,
 }
 
 int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status) {
-  if (module >= kNumPCMModules) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return 0;
-  }
+  if (!checkPCMInit(module, status)) return 0;
   UINT8 value;
 
   *status = PCM_modules[module]->GetSolenoidBlackList(value);
@@ -131,10 +125,7 @@ int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status) {
   return value;
 }
 HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status) {
-  if (module >= kNumPCMModules) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return false;
-  }
+  if (!checkPCMInit(module, status)) return 0;
   bool value;
 
   *status = PCM_modules[module]->GetSolenoidStickyFault(value);
@@ -142,10 +133,7 @@ HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status) {
   return value;
 }
 HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status) {
-  if (module >= kNumPCMModules) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return false;
-  }
+  if (!checkPCMInit(module, status)) return false;
   bool value;
 
   *status = PCM_modules[module]->GetSolenoidFault(value);
@@ -153,10 +141,7 @@ HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status) {
   return value;
 }
 void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status) {
-  if (module >= kNumPCMModules) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return;
-  }
+  if (!checkPCMInit(module, status)) return;
 
   *status = PCM_modules[module]->ClearStickyFaults();
 }

@@ -9,10 +9,11 @@
 
 #include "HAL/Errors.h"
 #include "HAL/Solenoid.h"
+#include "HAL/cpp/make_unique.h"
 #include "PortsInternal.h"
 
 namespace hal {
-PCM* PCM_modules[kNumPCMModules] = {nullptr};
+std::unique_ptr<PCM> PCM_modules[kNumPCMModules];
 
 void initializePCM(int32_t module, int32_t* status) {
   if (!HAL_CheckSolenoidModule(module)) {
@@ -20,7 +21,7 @@ void initializePCM(int32_t module, int32_t* status) {
     return;
   }
   if (!PCM_modules[module]) {
-    PCM_modules[module] = new PCM(module);
+    PCM_modules[module] = std::make_unique<PCM>(module);
   }
 }
 }  // namespace hal

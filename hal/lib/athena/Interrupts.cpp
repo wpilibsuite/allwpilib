@@ -13,6 +13,7 @@
 
 #include "DigitalInternal.h"
 #include "HAL/Errors.h"
+#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
@@ -20,10 +21,9 @@
 using namespace hal;
 
 namespace {
-// FIXME: why is this internal?
 struct Interrupt {
-  tInterrupt* anInterrupt;
-  tInterruptManager* manager;
+  std::unique_ptr<tInterrupt> anInterrupt;
+  std::unique_ptr<tInterruptManager> manager;
 };
 }
 
@@ -43,9 +43,9 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
   auto anInterrupt = interruptHandles.Get(handle);
   uint32_t interruptIndex = static_cast<uint32_t>(getHandleIndex(handle));
   // Expects the calling leaf class to allocate an interrupt index.
-  anInterrupt->anInterrupt = tInterrupt::create(interruptIndex, status);
+  anInterrupt->anInterrupt.reset(tInterrupt::create(interruptIndex, status));
   anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
-  anInterrupt->manager = new tInterruptManager(
+  anInterrupt->manager = std::make_unique<tInterruptManager>(
       (1u << interruptIndex) | (1u << (interruptIndex + 8u)), watcher, status);
   return handle;
 }
@@ -58,8 +58,6 @@ void HAL_CleanInterrupts(HAL_InterruptHandle interrupt_handle,
     return;
   }
   interruptHandles.Free(interrupt_handle);
-  delete anInterrupt->anInterrupt;
-  delete anInterrupt->manager;
 }
 
 /**

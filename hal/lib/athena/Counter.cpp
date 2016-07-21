@@ -17,7 +17,7 @@ using namespace hal;
 
 namespace {
 struct Counter {
-  tCounter* counter;
+  std::unique_ptr<tCounter> counter;
   uint8_t index;
 };
 }
@@ -42,7 +42,7 @@ HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
   counter->index = static_cast<uint8_t>(getHandleIndex(handle));
   *index = counter->index;
 
-  counter->counter = tCounter::create(counter->index, status);
+  counter->counter.reset(tCounter::create(counter->index, status));
   counter->counter->writeConfig_Mode(mode, status);
   counter->counter->writeTimerConfig_AverageSize(1, status);
   return handle;
@@ -53,7 +53,6 @@ void HAL_FreeCounter(HAL_CounterHandle counter_handle, int32_t* status) {
   if (counter == nullptr) {  // don't throw status as unneccesary
     return;
   }
-  delete counter->counter;
   counterHandles.Free(counter_handle);
 }
 

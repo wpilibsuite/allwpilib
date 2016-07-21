@@ -7,13 +7,15 @@
 
 #include "HAL/Power.h"
 
+#include <memory>
+
 #include "ChipObject.h"
 
-static tPower* power = nullptr;
+static std::unique_ptr<tPower> power;
 
 static void initializePower(int32_t* status) {
   if (power == nullptr) {
-    power = tPower::create(status);
+    power.reset(tPower::create(status));
   }
 }
 

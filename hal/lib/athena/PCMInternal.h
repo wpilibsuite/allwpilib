@@ -8,13 +8,28 @@
 #pragma once
 
 #include <stdint.h>
+#include <memory>
 
+#include "HAL/Errors.h"
 #include "HAL/Ports.h"
+#include "HAL/Solenoid.h"
 #include "PortsInternal.h"
 #include "ctre/PCM.h"
 
 namespace hal {
-extern PCM* PCM_modules[kNumPCMModules];
+extern std::unique_ptr<PCM> PCM_modules[kNumPCMModules];
+
+static inline bool checkPCMInit(int32_t module, int32_t* status) {
+  if (!HAL_CheckSolenoidModule(module)) {
+    *status = RESOURCE_OUT_OF_RANGE;
+    return false;
+  }
+  if (!PCM_modules[module]) {
+    *status = INCOMPATIBLE_STATE;
+    return false;
+  }
+  return true;
+}
 
 void initializePCM(int32_t module, int32_t* status);
-}
+}  // namespace hal

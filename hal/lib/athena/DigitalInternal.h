@@ -55,9 +55,9 @@ constexpr int32_t kPwmDisabled = 0;
 // Create a mutex to protect changes to the DO PWM config
 extern priority_recursive_mutex digitalPwmMutex;
 
-extern tDIO* digitalSystem;
-extern tRelay* relaySystem;
-extern tPWM* pwmSystem;
+extern std::unique_ptr<tDIO> digitalSystem;
+extern std::unique_ptr<tRelay> relaySystem;
+extern std::unique_ptr<tPWM> pwmSystem;
 
 extern bool digitalSystemsInitialized;
 

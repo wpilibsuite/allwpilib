@@ -18,7 +18,7 @@ using namespace hal;
 
 namespace {
 struct AnalogTrigger {
-  tAnalogTrigger* trigger;
+  std::unique_ptr<tAnalogTrigger> trigger;
   HAL_AnalogInputHandle analogHandle;
   uint8_t index;
 };
@@ -53,7 +53,7 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
   *index = trigger->index;
   // TODO: if (index == ~0ul) { CloneError(triggers); return; }
 
-  trigger->trigger = tAnalogTrigger::create(trigger->index, status);
+  trigger->trigger.reset(tAnalogTrigger::create(trigger->index, status));
   trigger->trigger->writeSourceSelect_Channel(analog_port->pin, status);
   return handle;
 }
@@ -66,7 +66,6 @@ void HAL_CleanAnalogTrigger(HAL_AnalogTriggerHandle analog_trigger_handle,
   }
   analogTriggerHandles.Free(analog_trigger_handle);
   // caller owns the analog input handle.
-  delete trigger->trigger;
 }
 
 void HAL_SetAnalogTriggerLimitsRaw(

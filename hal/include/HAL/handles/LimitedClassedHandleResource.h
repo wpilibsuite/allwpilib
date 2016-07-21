@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "HAL/Types.h"
+#include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 
@@ -39,15 +40,14 @@ class LimitedClassedHandleResource {
   LimitedClassedHandleResource operator=(const LimitedClassedHandleResource&) =
       delete;
   LimitedClassedHandleResource();
-  ~LimitedClassedHandleResource();
   THandle Allocate(std::shared_ptr<TStruct> toSet);
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);
 
  private:
   // Dynamic array to shrink HAL file size.
-  std::shared_ptr<TStruct>* m_structures;
-  priority_mutex* m_handleMutexes;
+  std::unique_ptr<std::shared_ptr<TStruct>[]> m_structures;
+  std::unique_ptr<priority_mutex[]> m_handleMutexes;
   priority_mutex m_allocateMutex;
 };
 
@@ -55,16 +55,8 @@ template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
 LimitedClassedHandleResource<THandle, TStruct, size,
                              enumValue>::LimitedClassedHandleResource() {
-  m_structures = new std::shared_ptr<TStruct>[size];
-  m_handleMutexes = new priority_mutex[size];
-}
-
-template <typename THandle, typename TStruct, int16_t size,
-          HAL_HandleEnum enumValue>
-LimitedClassedHandleResource<THandle, TStruct, size,
-                             enumValue>::~LimitedClassedHandleResource() {
-  delete[] m_structures;
-  delete[] m_handleMutexes;
+  m_structures = std::make_unique<std::shared_ptr<TStruct>[]>(size);
+  m_handleMutexes = std::make_unique<priority_mutex[]>(size);
 }
 
 template <typename THandle, typename TStruct, int16_t size,
