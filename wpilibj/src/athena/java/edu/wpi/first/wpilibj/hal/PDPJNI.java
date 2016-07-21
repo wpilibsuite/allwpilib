@@ -11,6 +11,10 @@ package edu.wpi.first.wpilibj.hal;
 public class PDPJNI extends JNIWrapper {
   public static native void initializePDP(int module);
 
+  public static native boolean checkPDPModule(int module);
+
+  public static native boolean checkPDPChannel(int channel);
+
   public static native double getPDPTemperature(int module);
 
   public static native double getPDPVoltage(int module);

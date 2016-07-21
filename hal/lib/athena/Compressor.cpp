@@ -32,7 +32,7 @@ HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status) {
 }
 
 HAL_Bool HAL_CheckCompressorModule(int32_t module) {
-  return (module < kNumPCMModules) && (module >= 0);
+  return module < kNumPCMModules && module >= 0;
 }
 
 HAL_Bool HAL_GetCompressor(HAL_CompressorHandle compressor_handle,

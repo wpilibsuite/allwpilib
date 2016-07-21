@@ -10,6 +10,10 @@ package edu.wpi.first.wpilibj.hal;
 public class SolenoidJNI extends JNIWrapper {
   public static native int initializeSolenoidPort(int halPortHandle);
 
+  public static native boolean checkSolenoidModule(int module);
+
+  public static native boolean checkSolenoidChannel(int channel);
+
   public static native void freeSolenoidPort(int portHandle);
 
   public static native void setSolenoid(int portHandle, boolean on);

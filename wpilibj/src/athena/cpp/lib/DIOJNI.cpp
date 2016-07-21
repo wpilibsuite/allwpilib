@@ -49,9 +49,21 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDIOPort(
 }
 
 /*
-* Class:     edu_wpi_first_wpilibj_hal_DIOJNI
-* Method:    freeDIOPort
-* Signature: (I)V;
+ * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+ * Method:    checkDIOChannel
+ * Signature: (I)Z;
+*/
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_checkDIOChannel(
+    JNIEnv *env, jclass, jint channel) {
+  DIOJNI_LOG(logDEBUG) << "Calling DIOJNI checkDIOChannel";
+  DIOJNI_LOG(logDEBUG) << "Channel = " << channel;
+  return HAL_CheckDIOChannel(channel);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+ * Method:    freeDIOPort
+ * Signature: (I)V;
 */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_freeDIOPort(
     JNIEnv *env, jclass, jint id) {

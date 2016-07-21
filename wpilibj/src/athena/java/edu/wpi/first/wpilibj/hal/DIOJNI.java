@@ -11,6 +11,8 @@ package edu.wpi.first.wpilibj.hal;
 public class DIOJNI extends JNIWrapper {
   public static native int initializeDIOPort(int halPortHandle, boolean input);
 
+  public static native boolean checkDIOChannel(int channel);
+
   public static native void freeDIOPort(int dioPortHandle);
 
   public static native void setDIO(int dioPortHandle, short value);

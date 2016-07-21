@@ -16,8 +16,8 @@ extern "C" {
 #endif
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle port_handle,
                                         HAL_Bool input, int32_t* status);
+HAL_Bool HAL_CheckDIOChannel(int32_t channel);
 void HAL_FreeDIOPort(HAL_DigitalHandle dio_port_handle);
-
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status);
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status);
 void HAL_SetDigitalPWMRate(double rate, int32_t* status);

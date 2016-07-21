@@ -7,8 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.ConstantsJNI;
+import edu.wpi.first.wpilibj.hal.DIOJNI;
+import edu.wpi.first.wpilibj.hal.PDPJNI;
+import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.hal.PortsJNI;
+import edu.wpi.first.wpilibj.hal.RelayJNI;
+import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 
 /**
  * Base class for all sensors. Stores most recent status information as well as containing utility
@@ -43,7 +49,7 @@ public abstract class SensorBase { // TODO: Refactor
   /**
    * Number of relay channels per roboRIO.
    */
-  public static final int kRelayChannels = PortsJNI.getNumRelayPins();
+  public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
   /**
    * Number of power distribution channels.
    */
@@ -81,6 +87,9 @@ public abstract class SensorBase { // TODO: Refactor
    * @param moduleNumber The solenoid module module number to check.
    */
   protected static void checkSolenoidModule(final int moduleNumber) {
+    if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
+      throw new IndexOutOfBoundsException("Requested solenoid module number is out of range");
+    }
   }
 
   /**
@@ -90,7 +99,7 @@ public abstract class SensorBase { // TODO: Refactor
    * @param channel The channel number to check.
    */
   protected static void checkDigitalChannel(final int channel) {
-    if (channel < 0 || channel >= kDigitalChannels) {
+    if (!DIOJNI.checkDIOChannel(channel)) {
       throw new IndexOutOfBoundsException("Requested digital channel number is out of range.");
     }
   }
@@ -102,7 +111,7 @@ public abstract class SensorBase { // TODO: Refactor
    * @param channel The channel number to check.
    */
   protected static void checkRelayChannel(final int channel) {
-    if (channel < 0 || channel >= kRelayChannels) {
+    if (!RelayJNI.checkRelayChannel(channel)) {
       throw new IndexOutOfBoundsException("Requested relay channel number is out of range.");
     }
   }
@@ -114,7 +123,7 @@ public abstract class SensorBase { // TODO: Refactor
    * @param channel The channel number to check.
    */
   protected static void checkPWMChannel(final int channel) {
-    if (channel < 0 || channel >= kPwmChannels) {
+    if (!PWMJNI.checkPWMChannel(channel)) {
       throw new IndexOutOfBoundsException("Requested PWM channel number is out of range.");
     }
   }
@@ -126,7 +135,7 @@ public abstract class SensorBase { // TODO: Refactor
    * @param channel The channel number to check.
    */
   protected static void checkAnalogInputChannel(final int channel) {
-    if (channel < 0 || channel >= kAnalogInputChannels) {
+    if (!AnalogJNI.checkAnalogInputChannel(channel)) {
       throw new IndexOutOfBoundsException("Requested analog input channel number is out of range.");
     }
   }
@@ -138,7 +147,7 @@ public abstract class SensorBase { // TODO: Refactor
    * @param channel The channel number to check.
    */
   protected static void checkAnalogOutputChannel(final int channel) {
-    if (channel < 0 || channel >= kAnalogOutputChannels) {
+    if (!AnalogJNI.checkAnalogOutputChannel(channel)) {
       throw new IndexOutOfBoundsException(
           "Requested analog output channel number is out of range.");
     }
@@ -150,7 +159,7 @@ public abstract class SensorBase { // TODO: Refactor
    * @param channel The channel number to check.
    */
   protected static void checkSolenoidChannel(final int channel) {
-    if (channel < 0 || channel >= kSolenoidChannels) {
+    if (!SolenoidJNI.checkSolenoidChannel(channel)) {
       throw new IndexOutOfBoundsException("Requested solenoid channel number is out of range.");
     }
   }
@@ -162,7 +171,7 @@ public abstract class SensorBase { // TODO: Refactor
    * @param channel The channel number to check.
    */
   protected static void checkPDPChannel(final int channel) {
-    if (channel < 0 || channel >= kPDPChannels) {
+    if (!PDPJNI.checkPDPChannel(channel)) {
       throw new IndexOutOfBoundsException("Requested PDP channel number is out of range.");
     }
   }
@@ -173,7 +182,7 @@ public abstract class SensorBase { // TODO: Refactor
    * @param module The module number to check.
    */
   protected static void checkPDPModule(final int module) {
-    if (module < 0 || module > kPDPModules) {
+    if (!PDPJNI.checkPDPModule(module)) {
       throw new IndexOutOfBoundsException("Requested PDP module number is out of range.");
     }
   }

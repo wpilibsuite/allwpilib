@@ -25,24 +25,23 @@ class SensorBase : public ErrorBase {
   SensorBase(const SensorBase&) = delete;
   SensorBase& operator=(const SensorBase&) = delete;
 
-  static uint32_t GetDefaultSolenoidModule() { return 0; }
+  static int GetDefaultSolenoidModule() { return 0; }
 
-  static bool CheckSolenoidModule(uint8_t moduleNumber);
-  static bool CheckDigitalChannel(uint32_t channel);
-  static bool CheckRelayChannel(uint32_t channel);
-  static bool CheckPWMChannel(uint32_t channel);
-  static bool CheckAnalogInput(uint32_t channel);
-  static bool CheckAnalogOutput(uint32_t channel);
-  static bool CheckSolenoidChannel(uint32_t channel);
-  static bool CheckPDPChannel(uint32_t channel);
+  static bool CheckSolenoidModule(int moduleNumber);
+  static bool CheckDigitalChannel(int channel);
+  static bool CheckRelayChannel(int channel);
+  static bool CheckPWMChannel(int channel);
+  static bool CheckAnalogInput(int channel);
+  static bool CheckAnalogOutput(int channel);
+  static bool CheckSolenoidChannel(int channel);
+  static bool CheckPDPChannel(int channel);
 
-  static const uint32_t kDigitalChannels = 26;
-  static const uint32_t kAnalogInputs = 8;
-  static const uint32_t kAnalogOutputs = 2;
-  static const uint32_t kSolenoidChannels = 8;
-  static const uint32_t kSolenoidModules = 2;
-  static const uint32_t kPwmChannels = 20;
-  static const uint32_t kRelayChannels = 8;
-  static const uint32_t kPDPChannels = 16;
-  static const uint32_t kChassisSlots = 8;
+  static const int kDigitalChannels = 26;
+  static const int kAnalogInputs = 8;
+  static const int kAnalogOutputs = 2;
+  static const int kSolenoidChannels = 8;
+  static const int kSolenoidModules = 63;
+  static const int kPwmChannels = 20;
+  static const int kRelayChannels = 8;
+  static const int kPDPChannels = 16;
 };

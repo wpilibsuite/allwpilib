@@ -11,23 +11,21 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
-const uint32_t SensorBase::kDigitalChannels;
-const uint32_t SensorBase::kAnalogInputs;
-const uint32_t SensorBase::kSolenoidChannels;
-const uint32_t SensorBase::kSolenoidModules;
-const uint32_t SensorBase::kPwmChannels;
-const uint32_t SensorBase::kRelayChannels;
-const uint32_t SensorBase::kPDPChannels;
-const uint32_t SensorBase::kChassisSlots;
+const int SensorBase::kDigitalChannels = HAL_GetNumDigitalPins();
+const int SensorBase::kAnalogInputs = HAL_GetNumAnalogInputs();
+const int SensorBase::kSolenoidChannels = HAL_GetNumSolenoidPins();
+const int SensorBase::kSolenoidModules = HAL_GetNumPCMModules();
+const int SensorBase::kPwmChannels = HAL_GetNumPWMPins();
+const int SensorBase::kRelayChannels = HAL_GetNumRelayHeaders();
+const int SensorBase::kPDPChannels = HAL_GetNumPDPChannels();
 
 /**
  * Check that the solenoid module number is valid.
  *
  * @return Solenoid module is valid and present
  */
-bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber) {
-  if (moduleNumber < 64) return true;
-  return false;
+bool SensorBase::CheckSolenoidModule(int moduleNumber) {
+  return HAL_CheckSolenoidModule(moduleNumber);
 }
 
 /**
@@ -38,9 +36,8 @@ bool SensorBase::CheckSolenoidModule(uint8_t moduleNumber) {
  *
  * @return Digital channel is valid
  */
-bool SensorBase::CheckDigitalChannel(uint32_t channel) {
-  if (channel < kDigitalChannels) return true;
-  return false;
+bool SensorBase::CheckDigitalChannel(int channel) {
+  return HAL_CheckDIOChannel(channel);
 }
 
 /**
@@ -51,8 +48,8 @@ bool SensorBase::CheckDigitalChannel(uint32_t channel) {
  *
  * @return Relay channel is valid
  */
-bool SensorBase::CheckRelayChannel(uint32_t channel) {
-  return HAL_CheckRelayChannel((uint8_t)channel);
+bool SensorBase::CheckRelayChannel(int channel) {
+  return HAL_CheckRelayChannel(channel);
 }
 
 /**
@@ -63,9 +60,8 @@ bool SensorBase::CheckRelayChannel(uint32_t channel) {
  *
  * @return PWM channel is valid
  */
-bool SensorBase::CheckPWMChannel(uint32_t channel) {
-  if (channel < kPwmChannels) return true;
-  return false;
+bool SensorBase::CheckPWMChannel(int channel) {
+  return HAL_CheckPWMChannel(channel);
 }
 
 /**
@@ -76,9 +72,8 @@ bool SensorBase::CheckPWMChannel(uint32_t channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogInput(uint32_t channel) {
-  if (channel < kAnalogInputs) return true;
-  return false;
+bool SensorBase::CheckAnalogInput(int channel) {
+  return HAL_CheckAnalogInputChannel(channel);
 }
 
 /**
@@ -89,9 +84,8 @@ bool SensorBase::CheckAnalogInput(uint32_t channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogOutput(uint32_t channel) {
-  if (channel < kAnalogOutputs) return true;
-  return false;
+bool SensorBase::CheckAnalogOutput(int channel) {
+  return HAL_CheckAnalogOutputChannel(channel);
 }
 
 /**
@@ -99,9 +93,8 @@ bool SensorBase::CheckAnalogOutput(uint32_t channel) {
  *
  * @return Solenoid channel is valid
  */
-bool SensorBase::CheckSolenoidChannel(uint32_t channel) {
-  if (channel < kSolenoidChannels) return true;
-  return false;
+bool SensorBase::CheckSolenoidChannel(int channel) {
+  return HAL_CheckSolenoidChannel(channel);
 }
 
 /**
@@ -109,7 +102,6 @@ bool SensorBase::CheckSolenoidChannel(uint32_t channel) {
  *
  * @return PDP channel is valid
  */
-bool SensorBase::CheckPDPChannel(uint32_t channel) {
-  if (channel < kPDPChannels) return true;
-  return false;
+bool SensorBase::CheckPDPChannel(int channel) {
+  return HAL_CheckPDPModule(channel);
 }

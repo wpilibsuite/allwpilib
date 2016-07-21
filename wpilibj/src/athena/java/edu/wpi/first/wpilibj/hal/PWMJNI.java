@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.PWMConfigDataResult;
 public class PWMJNI extends DIOJNI {
   public static native int initializePWMPort(int halPortHandle);
 
+  public static native boolean checkPWMChannel(int channel);
+
   public static native void freePWMPort(int pwmPortHandle);
 
   public static native void setPWMConfigRaw(int pwmPortHandle, int maxPwm,

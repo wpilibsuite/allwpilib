@@ -87,6 +87,10 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle port_handle,
   return handle;
 }
 
+HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
+  return channel < kNumDigitalPins && channel >= 0;
+}
+
 void HAL_FreeDIOPort(HAL_DigitalHandle dio_port_handle) {
   // no status, so no need to check for a proper free.
   digitalPinHandles.Free(dio_port_handle, HAL_HandleEnum::DIO);

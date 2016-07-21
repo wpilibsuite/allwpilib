@@ -48,6 +48,18 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_initializePWMPort(
 }
 
 /*
+ * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Method:    checkPWMChannel
+ * Signature: (I)Z;
+*/
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_checkPWMChannel(
+    JNIEnv *env, jclass, jint channel) {
+  PWMJNI_LOG(logDEBUG) << "Calling PWMJNI checkPWMChannel";
+  PWMJNI_LOG(logDEBUG) << "Channel = " << channel;
+  return HAL_CheckPWMChannel(channel);
+}
+
+/*
 * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
 * Method:    freeDIOPort
 * Signature: (I)V;

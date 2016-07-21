@@ -51,6 +51,30 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    checkSolenoidChannel
+ * Signature: (I)Z;
+*/
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_checkSolenoidChannel(
+    JNIEnv *env, jclass, jint channel) {
+  SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI checkSolenoidChannel";
+  SOLENOIDJNI_LOG(logDEBUG) << "Channel = " << channel;
+  return HAL_CheckSolenoidChannel(channel);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
+ * Method:    checkSolenoidModule
+ * Signature: (I)Z;
+*/
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_checkSolenoidModule(
+    JNIEnv *env, jclass, jint module) {
+  SOLENOIDJNI_LOG(logDEBUG) << "Calling SolenoidJNI checkSolenoidModule";
+  SOLENOIDJNI_LOG(logDEBUG) << "Module = " << module;
+  return HAL_CheckSolenoidModule(module);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    freeSolenoidPort
  * Signature: (I)V
  */
