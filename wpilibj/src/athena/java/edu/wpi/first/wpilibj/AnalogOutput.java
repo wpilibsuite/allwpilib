@@ -30,10 +30,7 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
   public AnalogOutput(final int channel) {
     m_channel = channel;
 
-    if (!AnalogJNI.checkAnalogOutputChannel(channel)) {
-      throw new AllocationException("Analog output channel " + m_channel
-          + " cannot be allocated. Channel is not present.");
-    }
+    SensorBase.checkAnalogOutputChannel(channel);
 
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);

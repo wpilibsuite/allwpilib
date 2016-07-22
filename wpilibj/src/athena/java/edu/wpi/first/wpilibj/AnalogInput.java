@@ -47,10 +47,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
   public AnalogInput(final int channel) {
     m_channel = channel;
 
-    if (!AnalogJNI.checkAnalogInputChannel(channel)) {
-      throw new AllocationException("Analog input channel " + m_channel
-          + " cannot be allocated. Channel is not present.");
-    }
+    SensorBase.checkAnalogInputChannel(channel);
 
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);

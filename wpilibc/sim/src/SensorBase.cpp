@@ -73,7 +73,7 @@ bool SensorBase::CheckPWMChannel(int channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogInput(int channel) {
+bool SensorBase::CheckAnalogInputChannel(int channel) {
   if (channel >= 0 && channel < kAnalogInputs) return true;
   return false;
 }
@@ -86,7 +86,7 @@ bool SensorBase::CheckAnalogInput(int channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogOutput(int channel) {
+bool SensorBase::CheckAnalogOutputChannel(int channel) {
   if (channel >= 0 && channel < kAnalogOutputs) return true;
   return false;
 }
