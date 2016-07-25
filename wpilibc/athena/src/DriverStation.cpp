@@ -348,7 +348,7 @@ bool DriverStation::IsDSAttached() const {
  * @return True if the control data has been updated since the last call.
  */
 bool DriverStation::IsNewControlData() const {
-  return m_newControlData.tryTake() == false;
+  return m_newControlData.exchange(false);
 }
 
 /**
@@ -476,7 +476,7 @@ bool DriverStation::WaitForData(double timeout) {
 #endif
 
   std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
-  while (!m_updatedControlLoopData) {
+  while (!m_waitForDataPredicate) {
     if (timeout > 0) {
       auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
       if (timedOut == std::cv_status::timeout) {
@@ -486,7 +486,7 @@ bool DriverStation::WaitForData(double timeout) {
       m_waitForDataCond.wait(lock);
     }
   }
-  m_updatedControlLoopData = false;
+  m_waitForDataPredicate = false;
   return true;
 }
 
@@ -547,8 +547,6 @@ void DriverStation::GetData() {
   m_joystickPOVs.swap(m_joystickPOVsCache);
   m_joystickButtons.swap(m_joystickButtonsCache);
   m_joystickDescriptor.swap(m_joystickDescriptorCache);
-
-  m_newControlData.give();
 }
 
 /**
@@ -621,9 +619,13 @@ void DriverStation::Run() {
   while (m_isRunning) {
     HAL_WaitForDSData();
     GetData();
+    // notify IsNewControlData variables
+    m_newControlData = true;
+
+    // notify WaitForData block
     {
       std::lock_guard<priority_mutex> lock(m_waitForDataMutex);
-      m_updatedControlLoopData = true;
+      m_waitForDataPredicate = true;
     }
     m_waitForDataCond.notify_all();
 

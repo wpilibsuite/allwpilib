@@ -8,10 +8,12 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wpi.first.wpilibj.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.hal.ControlWord;
@@ -77,39 +79,43 @@ public class DriverStation implements RobotState.Interface {
 
   private static DriverStation instance = new DriverStation();
 
+  // Joystick User Data
   private HALJoystickAxes[] m_joystickAxes = new HALJoystickAxes[kJoystickPorts];
   private HALJoystickPOVs[] m_joystickPOVs = new HALJoystickPOVs[kJoystickPorts];
   private HALJoystickButtons[] m_joystickButtons = new HALJoystickButtons[kJoystickPorts];
 
+  // Joystick Cached Data
   private HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[kJoystickPorts];
   private HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
   private HALJoystickButtons[] m_joystickButtonsCache = new HALJoystickButtons[kJoystickPorts];
   // preallocated byte buffer for button count
   private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
 
-  private int[] m_joystickIsXbox = new int[kJoystickPorts];
-  private int[] m_joystickType = new int[kJoystickPorts];
-  private String[] m_joystickName = new String[kJoystickPorts];
-  private int[][] m_joystickAxisType = new int[kJoystickPorts][HAL.kMaxJoystickAxes];
-
+  // Internal Driver Station thread
   private Thread m_thread;
+
   private final Lock m_dataMutex;
   private final Condition m_dataCond;
 
-  private final Object m_newControlDataMutex;
-  private final Object m_joystickMutex;
   private volatile boolean m_threadKeepAlive = true;
 
-  private final Object m_controlWordMutex;
-  private ControlWord m_controlWordCache;
-  private long m_lastControlWordUpdate;
+  // WPILib WaitForData control variables
+  private boolean m_waitForDataPredicate;
 
+  private AtomicBoolean m_newControlData;
+
+  private final Object m_joystickMutex;
+
+  // Robot state status variables
   private boolean m_userInDisabled = false;
   private boolean m_userInAutonomous = false;
   private boolean m_userInTeleop = false;
   private boolean m_userInTest = false;
-  private boolean m_updatedControlLoopData;
-  private boolean m_newControlData;
+
+  // Control word variables
+  private final Object m_controlWordMutex;
+  private ControlWord m_controlWordCache;
+  private long m_lastControlWordUpdate;
 
   /**
    * Gets an instance of the DriverStation
@@ -130,7 +136,7 @@ public class DriverStation implements RobotState.Interface {
     m_dataMutex = new ReentrantLock();
     m_dataCond = m_dataMutex.newCondition();
     m_joystickMutex = new Object();
-    m_newControlDataMutex = new Object();
+    m_newControlData = new AtomicBoolean(false);
     for (int i = 0; i < kJoystickPorts; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();
       m_joystickAxes[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
@@ -538,11 +544,7 @@ public class DriverStation implements RobotState.Interface {
    * @return True if the control data has been updated since the last call.
    */
   public boolean isNewControlData() {
-    synchronized (m_newControlDataMutex) {
-      boolean result = m_newControlData;
-      m_newControlData = false;
-      return result;
-    }
+    return m_newControlData.getAndSet(false);
   }
 
   /**
@@ -652,7 +654,7 @@ public class DriverStation implements RobotState.Interface {
     m_dataMutex.lock();
     try {
       try {
-        while (!m_updatedControlLoopData) {
+        while (!m_waitForDataPredicate) {
           if (timeout > 0) {
             long now = Utility.getFPGATime();
             if (now < startTime + timeoutMicros) {
@@ -671,7 +673,7 @@ public class DriverStation implements RobotState.Interface {
             m_dataCond.await();
           }
         }
-        m_updatedControlLoopData = false;
+        m_waitForDataPredicate = false;
         // Return true if we have received a proper signal
         return true;
       } catch (InterruptedException ex) {
@@ -781,10 +783,6 @@ public class DriverStation implements RobotState.Interface {
       m_joystickPOVs = m_joystickPOVsCache;
       m_joystickPOVsCache = currentPOVs;
     }
-    //Lock new control data mutex and set new control data.
-    synchronized (m_newControlDataMutex) {
-      m_newControlData = true;
-    }
   }
 
   /**
@@ -821,11 +819,14 @@ public class DriverStation implements RobotState.Interface {
       getData();
       m_dataMutex.lock();
       try {
-        m_updatedControlLoopData = true;
+        m_waitForDataPredicate = true;
         m_dataCond.signalAll();
       } finally {
         m_dataMutex.unlock();
       }
+      // notify isNewControlData variable
+      m_newControlData.set(true);
+
       if (++safetyCounter >= 4) {
         MotorSafetyHelper.checkMotors();
         safetyCounter = 0;
