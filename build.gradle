@@ -258,5 +258,5 @@ build.dependsOn ntcoreSourceZip
 apply from: 'publish.gradle'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14'
+    gradleVersion = '2.14.1'
 }
