@@ -49,10 +49,6 @@ HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
 }
 
 void HAL_FreeCounter(HAL_CounterHandle counter_handle, int32_t* status) {
-  auto counter = counterHandles.Get(counter_handle);
-  if (counter == nullptr) {  // don't throw status as unneccesary
-    return;
-  }
   counterHandles.Free(counter_handle);
 }
 
