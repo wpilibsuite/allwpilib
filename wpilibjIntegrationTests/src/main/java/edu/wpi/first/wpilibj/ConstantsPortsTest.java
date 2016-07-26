@@ -73,7 +73,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testRelayChannels() {
-    assertEquals(8, SensorBase.kRelayChannels);
+    assertEquals(4, SensorBase.kRelayChannels);
   }
 
   /**
