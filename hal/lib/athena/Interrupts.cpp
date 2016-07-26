@@ -52,11 +52,6 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
 
 void HAL_CleanInterrupts(HAL_InterruptHandle interrupt_handle,
                          int32_t* status) {
-  auto anInterrupt = interruptHandles.Get(interrupt_handle);
-  if (anInterrupt == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
   interruptHandles.Free(interrupt_handle);
 }
 

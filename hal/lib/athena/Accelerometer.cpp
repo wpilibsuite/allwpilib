@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <memory>
 
 #include <stdint.h>
 
@@ -25,7 +26,7 @@ static const uint8_t kControlTxRx = 1;
 static const uint8_t kControlStart = 2;
 static const uint8_t kControlStop = 4;
 
-static tAccel* accel = 0;
+static std::unique_ptr<tAccel> accel;
 static HAL_AccelerometerRange accelerometerRange;
 
 // Register addresses
@@ -84,7 +85,7 @@ static void initializeAccelerometer() {
   int32_t status;
 
   if (!accel) {
-    accel = tAccel::create(&status);
+    accel.reset(tAccel::create(&status));
 
     // Enable I2C
     accel->writeCNFG(1, &status);
@@ -124,8 +125,6 @@ static void writeRegister(Register reg, uint8_t data) {
   while (accel->readSTAT(&status) & 1) {
     if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
   }
-
-  std::fflush(stdout);
 }
 
 static uint8_t readRegister(Register reg) {
@@ -154,8 +153,6 @@ static uint8_t readRegister(Register reg) {
   while (accel->readSTAT(&status) & 1) {
     if (HAL_GetFPGATime(&status) > initialTime + 1000) break;
   }
-
-  std::fflush(stdout);
 
   return accel->readDATI(&status);
 }

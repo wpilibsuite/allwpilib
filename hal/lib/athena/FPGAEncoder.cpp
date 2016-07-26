@@ -84,12 +84,7 @@ HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
 
 void HAL_FreeFPGAEncoder(HAL_FPGAEncoderHandle fpga_encoder_handle,
                          int32_t* status) {
-  auto encoder = fpgaEncoderHandles.Get(fpga_encoder_handle);
   fpgaEncoderHandles.Free(fpga_encoder_handle);
-  if (encoder == nullptr) {
-    *status = HAL_HANDLE_ERROR;
-    return;
-  }
 }
 
 /**

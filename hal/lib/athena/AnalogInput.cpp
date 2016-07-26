@@ -63,8 +63,6 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle port_handle,
 }
 
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analog_port_handle) {
-  auto port = analogInputHandles.Get(analog_port_handle);
-  if (!port) return;
   // no status, so no need to check for a proper free.
   analogInputHandles.Free(analog_port_handle);
 }
