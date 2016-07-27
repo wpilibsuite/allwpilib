@@ -9,8 +9,8 @@
 
 #include "edu_wpi_first_wpilibj_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
-#include "atomic_static.h"
-#include "SafeThread.h"
+#include "support/atomic_static.h"
+#include "support/SafeThread.h"
 #include "llvm/ConvertUTF.h"
 #include "llvm/SmallString.h"
 #include "llvm/SmallVector.h"
@@ -1427,7 +1427,7 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJN
 // Instead, this class attaches just once.  When a hardware notification
 // occurs, a condition variable wakes up this thread and this thread actually
 // makes the call into Java.
-class LoggerThreadJNI : public nt::SafeThread {
+class LoggerThreadJNI : public wpi::SafeThread {
  public:
   void Main();
 
@@ -1445,7 +1445,7 @@ class LoggerThreadJNI : public nt::SafeThread {
   jmethodID m_mid;
 };
 
-class LoggerJNI : public nt::SafeThreadOwner<LoggerThreadJNI> {
+class LoggerJNI : public wpi::SafeThreadOwner<LoggerThreadJNI> {
  public:
   static LoggerJNI& GetInstance() {
     ATOMIC_STATIC(LoggerJNI, instance);

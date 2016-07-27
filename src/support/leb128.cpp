@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "leb128.h"
+#include "support/leb128.h"
 
-#include "raw_istream.h"
+#include "support/raw_istream.h"
 
-namespace nt {
+namespace wpi {
 
 /**
  * Get size of unsigned LEB128 data
@@ -116,4 +116,4 @@ bool ReadUleb128(raw_istream& is, unsigned long* ret) {
   return true;
 }
 
-}  // namespace nt
+}  // namespace wpi

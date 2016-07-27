@@ -10,6 +10,7 @@
 #include <cassert>
 #include <cstdlib>
 
+#include "support/timestamp.h"
 #include "Value_internal.h"
 
 using namespace nt;
@@ -404,6 +405,10 @@ const char *NT_LoadPersistent(const char *filename,
 /*
  * Utility Functions
  */
+
+unsigned long long NT_Now() {
+  return wpi::Now();
+}
 
 void NT_SetLogger(NT_LogFunc func, unsigned int min_level) {
   nt::SetLogger(func, min_level);

@@ -11,8 +11,9 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "Dispatcher.h"
+#include "support/timestamp.h"
 #include "Log.h"
+#include "Dispatcher.h"
 #include "Notifier.h"
 #include "RpcServer.h"
 #include "Storage.h"
@@ -168,7 +169,7 @@ std::string PackRpcDefinition(const RpcDefinition& def) {
 }
 
 bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def) {
-  raw_mem_istream is(packed.data(), packed.size());
+  wpi::raw_mem_istream is(packed.data(), packed.size());
   WireDecoder dec(is, 0x0300);
   if (!dec.Read8(&def->version)) return false;
   if (!dec.ReadString(&def->name)) return false;
@@ -211,7 +212,7 @@ std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values) {
 
 std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
                                                     ArrayRef<NT_Type> types) {
-  raw_mem_istream is(packed.data(), packed.size());
+  wpi::raw_mem_istream is(packed.data(), packed.size());
   WireDecoder dec(is, 0x0300);
   std::vector<std::shared_ptr<Value>> vec;
   for (auto type : types) {
@@ -279,6 +280,10 @@ const char* LoadPersistent(
     StringRef filename,
     std::function<void(size_t line, const char* msg)> warn) {
   return Storage::GetInstance().LoadPersistent(filename, warn);
+}
+
+unsigned long long Now() {
+  return wpi::Now();
 }
 
 void SetLogger(LogFunc func, unsigned int min_level) {

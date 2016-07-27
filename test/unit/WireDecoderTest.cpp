@@ -63,21 +63,21 @@ class WireDecoderTest : public ::testing::Test {
 };
 
 TEST_F(WireDecoderTest, Construct) {
-  raw_mem_istream is("", 0);
+  wpi::raw_mem_istream is("", 0);
   WireDecoder d(is, 0x0300u);
   EXPECT_EQ(nullptr, d.error());
   EXPECT_EQ(0x0300u, d.proto_rev());
 }
 
 TEST_F(WireDecoderTest, SetProtoRev) {
-  raw_mem_istream is("", 0);
+  wpi::raw_mem_istream is("", 0);
   WireDecoder d(is, 0x0300u);
   d.set_proto_rev(0x0200u);
   EXPECT_EQ(0x0200u, d.proto_rev());
 }
 
 TEST_F(WireDecoderTest, Read8) {
-  raw_mem_istream is("\x05\x01\x00", 3);
+  wpi::raw_mem_istream is("\x05\x01\x00", 3);
   WireDecoder d(is, 0x0300u);
   unsigned int val;
   ASSERT_TRUE(d.Read8(&val));
@@ -91,7 +91,7 @@ TEST_F(WireDecoderTest, Read8) {
 }
 
 TEST_F(WireDecoderTest, Read16) {
-  raw_mem_istream is("\x00\x05\x00\x01\x45\x67\x00\x00", 8);
+  wpi::raw_mem_istream is("\x00\x05\x00\x01\x45\x67\x00\x00", 8);
   WireDecoder d(is, 0x0300u);
   unsigned int val;
   ASSERT_TRUE(d.Read16(&val));
@@ -107,7 +107,7 @@ TEST_F(WireDecoderTest, Read16) {
 }
 
 TEST_F(WireDecoderTest, Read32) {
-  raw_mem_istream is(
+  wpi::raw_mem_istream is(
       "\x00\x00\x00\x05\x00\x00\x00\x01\x00\x00\xab\xcd"
       "\x12\x34\x56\x78\x00\x00\x00\x00",
       20);
@@ -130,7 +130,7 @@ TEST_F(WireDecoderTest, Read32) {
 TEST_F(WireDecoderTest, ReadDouble) {
   // values except min and max from
   // http://www.binaryconvert.com/result_double.html
-  raw_mem_istream is(
+  wpi::raw_mem_istream is(
       "\x00\x00\x00\x00\x00\x00\x00\x00"
       "\x41\x0c\x13\x80\x00\x00\x00\x00"
       "\x7f\xf0\x00\x00\x00\x00\x00\x00"
@@ -154,7 +154,7 @@ TEST_F(WireDecoderTest, ReadDouble) {
 }
 
 TEST_F(WireDecoderTest, ReadUleb128) {
-  raw_mem_istream is("\x00\x7f\x80\x01\x80", 5);
+  wpi::raw_mem_istream is("\x00\x7f\x80\x01\x80", 5);
   WireDecoder d(is, 0x0300u);
   unsigned long val;
   ASSERT_TRUE(d.ReadUleb128(&val));
@@ -168,7 +168,7 @@ TEST_F(WireDecoderTest, ReadUleb128) {
 }
 
 TEST_F(WireDecoderTest, ReadType) {
-  raw_mem_istream is("\x00\x01\x02\x03\x10\x11\x12\x20", 8);
+  wpi::raw_mem_istream is("\x00\x01\x02\x03\x10\x11\x12\x20", 8);
   WireDecoder d(is, 0x0300u);
   NT_Type val;
   ASSERT_TRUE(d.ReadType(&val));
@@ -192,7 +192,7 @@ TEST_F(WireDecoderTest, ReadType) {
 }
 
 TEST_F(WireDecoderTest, ReadTypeError) {
-  raw_mem_istream is("\x30", 1);
+  wpi::raw_mem_istream is("\x30", 1);
   WireDecoder d(is, 0x0200u);
   NT_Type val;
   ASSERT_FALSE(d.ReadType(&val));
@@ -201,7 +201,7 @@ TEST_F(WireDecoderTest, ReadTypeError) {
 }
 
 TEST_F(WireDecoderTest, Reset) {
-  raw_mem_istream is("\x30", 1);
+  wpi::raw_mem_istream is("\x30", 1);
   WireDecoder d(is, 0x0200u);
   NT_Type val;
   ASSERT_FALSE(d.ReadType(&val));
@@ -212,7 +212,7 @@ TEST_F(WireDecoderTest, Reset) {
 }
 
 TEST_F(WireDecoderTest, ReadBooleanValue2) {
-  raw_mem_istream is("\x01\x00", 2);
+  wpi::raw_mem_istream is("\x01\x00", 2);
   WireDecoder d(is, 0x0200u);
   auto val = d.ReadValue(NT_BOOLEAN);
   ASSERT_TRUE(bool(val));
@@ -228,7 +228,7 @@ TEST_F(WireDecoderTest, ReadBooleanValue2) {
 }
 
 TEST_F(WireDecoderTest, ReadDoubleValue2) {
-  raw_mem_istream is(
+  wpi::raw_mem_istream is(
       "\x3f\xf0\x00\x00\x00\x00\x00\x00"
       "\x3f\xf0\x00\x00\x00\x00\x00\x00",
       16);
@@ -246,7 +246,7 @@ TEST_F(WireDecoderTest, ReadDoubleValue2) {
 }
 
 TEST_F(WireDecoderTest, ReadStringValue2) {
-  raw_mem_istream is("\x00\x05hello\x00\x03" "bye\x55", 13);
+  wpi::raw_mem_istream is("\x00\x05hello\x00\x03" "bye\x55", 13);
   WireDecoder d(is, 0x0200u);
   auto val = d.ReadValue(NT_STRING);
   ASSERT_TRUE(bool(val));
@@ -266,7 +266,7 @@ TEST_F(WireDecoderTest, ReadStringValue2) {
 }
 
 TEST_F(WireDecoderTest, ReadBooleanArrayValue2) {
-  raw_mem_istream is("\x03\x00\x01\x00\x02\x01\x00\xff", 8);
+  wpi::raw_mem_istream is("\x03\x00\x01\x00\x02\x01\x00\xff", 8);
   WireDecoder d(is, 0x0200u);
   auto val = d.ReadValue(NT_BOOLEAN_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -285,7 +285,7 @@ TEST_F(WireDecoderTest, ReadBooleanArrayBigValue2) {
   std::string s;
   s.push_back('\xff');
   s.append(255, '\x00');
-  raw_mem_istream is(s.data(), s.size());
+  wpi::raw_mem_istream is(s.data(), s.size());
   WireDecoder d(is, 0x0200u);
   auto val = d.ReadValue(NT_BOOLEAN_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -296,7 +296,7 @@ TEST_F(WireDecoderTest, ReadBooleanArrayBigValue2) {
 }
 
 TEST_F(WireDecoderTest, ReadDoubleArrayValue2) {
-  raw_mem_istream is(
+  wpi::raw_mem_istream is(
       "\x02\x3f\xe0\x00\x00\x00\x00\x00\x00"
       "\x3f\xd0\x00\x00\x00\x00\x00\x00\x55",
       18);
@@ -317,7 +317,7 @@ TEST_F(WireDecoderTest, ReadDoubleArrayBigValue2) {
   std::string s;
   s.push_back('\xff');
   s.append(255*8, '\x00');
-  raw_mem_istream is(s.data(), s.size());
+  wpi::raw_mem_istream is(s.data(), s.size());
   WireDecoder d(is, 0x0200u);
   auto val = d.ReadValue(NT_DOUBLE_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -328,7 +328,7 @@ TEST_F(WireDecoderTest, ReadDoubleArrayBigValue2) {
 }
 
 TEST_F(WireDecoderTest, ReadStringArrayValue2) {
-  raw_mem_istream is("\x02\x00\x05hello\x00\x07goodbye\x55", 18);
+  wpi::raw_mem_istream is("\x02\x00\x05hello\x00\x07goodbye\x55", 18);
   WireDecoder d(is, 0x0200u);
   auto val = d.ReadValue(NT_STRING_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -347,7 +347,7 @@ TEST_F(WireDecoderTest, ReadStringArrayBigValue2) {
   s.push_back('\xff');
   for (int i=0; i<255; ++i)
     s.append("\x00\x01h", 3);
-  raw_mem_istream is(s.data(), s.size());
+  wpi::raw_mem_istream is(s.data(), s.size());
   WireDecoder d(is, 0x0200u);
   auto val = d.ReadValue(NT_STRING_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -358,7 +358,7 @@ TEST_F(WireDecoderTest, ReadStringArrayBigValue2) {
 }
 
 TEST_F(WireDecoderTest, ReadValueError2) {
-  raw_mem_istream is("", 0);
+  wpi::raw_mem_istream is("", 0);
   WireDecoder d(is, 0x0200u);
   ASSERT_FALSE(d.ReadValue(NT_UNASSIGNED));  // unassigned
   ASSERT_NE(nullptr, d.error());
@@ -373,7 +373,7 @@ TEST_F(WireDecoderTest, ReadValueError2) {
 }
 
 TEST_F(WireDecoderTest, ReadBooleanValue3) {
-  raw_mem_istream is("\x01\x00", 2);
+  wpi::raw_mem_istream is("\x01\x00", 2);
   WireDecoder d(is, 0x0300u);
   auto val = d.ReadValue(NT_BOOLEAN);
   ASSERT_TRUE(bool(val));
@@ -389,7 +389,7 @@ TEST_F(WireDecoderTest, ReadBooleanValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadDoubleValue3) {
-  raw_mem_istream is(
+  wpi::raw_mem_istream is(
       "\x3f\xf0\x00\x00\x00\x00\x00\x00"
       "\x3f\xf0\x00\x00\x00\x00\x00\x00",
       16);
@@ -407,7 +407,7 @@ TEST_F(WireDecoderTest, ReadDoubleValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadStringValue3) {
-  raw_mem_istream is("\x05hello\x03" "bye\x55", 11);
+  wpi::raw_mem_istream is("\x05hello\x03" "bye\x55", 11);
   WireDecoder d(is, 0x0300u);
   auto val = d.ReadValue(NT_STRING);
   ASSERT_TRUE(bool(val));
@@ -427,7 +427,7 @@ TEST_F(WireDecoderTest, ReadStringValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadRawValue3) {
-  raw_mem_istream is("\x05hello\x03" "bye\x55", 11);
+  wpi::raw_mem_istream is("\x05hello\x03" "bye\x55", 11);
   WireDecoder d(is, 0x0300u);
   auto val = d.ReadValue(NT_RAW);
   ASSERT_TRUE(bool(val));
@@ -447,7 +447,7 @@ TEST_F(WireDecoderTest, ReadRawValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadBooleanArrayValue3) {
-  raw_mem_istream is("\x03\x00\x01\x00\x02\x01\x00\xff", 8);
+  wpi::raw_mem_istream is("\x03\x00\x01\x00\x02\x01\x00\xff", 8);
   WireDecoder d(is, 0x0300u);
   auto val = d.ReadValue(NT_BOOLEAN_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -466,7 +466,7 @@ TEST_F(WireDecoderTest, ReadBooleanArrayBigValue3) {
   std::string s;
   s.push_back('\xff');
   s.append(255, '\x00');
-  raw_mem_istream is(s.data(), s.size());
+  wpi::raw_mem_istream is(s.data(), s.size());
   WireDecoder d(is, 0x0300u);
   auto val = d.ReadValue(NT_BOOLEAN_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -477,7 +477,7 @@ TEST_F(WireDecoderTest, ReadBooleanArrayBigValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadDoubleArrayValue3) {
-  raw_mem_istream is(
+  wpi::raw_mem_istream is(
       "\x02\x3f\xe0\x00\x00\x00\x00\x00\x00"
       "\x3f\xd0\x00\x00\x00\x00\x00\x00\x55",
       18);
@@ -498,7 +498,7 @@ TEST_F(WireDecoderTest, ReadDoubleArrayBigValue3) {
   std::string s;
   s.push_back('\xff');
   s.append(255*8, '\x00');
-  raw_mem_istream is(s.data(), s.size());
+  wpi::raw_mem_istream is(s.data(), s.size());
   WireDecoder d(is, 0x0300u);
   auto val = d.ReadValue(NT_DOUBLE_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -509,7 +509,7 @@ TEST_F(WireDecoderTest, ReadDoubleArrayBigValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadStringArrayValue3) {
-  raw_mem_istream is("\x02\x05hello\x07goodbye\x55", 16);
+  wpi::raw_mem_istream is("\x02\x05hello\x07goodbye\x55", 16);
   WireDecoder d(is, 0x0300u);
   auto val = d.ReadValue(NT_STRING_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -528,7 +528,7 @@ TEST_F(WireDecoderTest, ReadStringArrayBigValue3) {
   s.push_back('\xff');
   for (int i=0; i<255; ++i)
     s.append("\x01h", 2);
-  raw_mem_istream is(s.data(), s.size());
+  wpi::raw_mem_istream is(s.data(), s.size());
   WireDecoder d(is, 0x0300u);
   auto val = d.ReadValue(NT_STRING_ARRAY);
   ASSERT_TRUE(bool(val));
@@ -539,7 +539,7 @@ TEST_F(WireDecoderTest, ReadStringArrayBigValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadValueError3) {
-  raw_mem_istream is("", 0);
+  wpi::raw_mem_istream is("", 0);
   WireDecoder d(is, 0x0200u);
   ASSERT_FALSE(d.ReadValue(NT_UNASSIGNED));  // unassigned
   ASSERT_NE(nullptr, d.error());
@@ -554,7 +554,7 @@ TEST_F(WireDecoderTest, ReadString2) {
   s.append("\xff\xff", 2);
   s += s_big2;
   s.push_back('\x55');
-  raw_mem_istream is(s.data(), s.size());
+  wpi::raw_mem_istream is(s.data(), s.size());
   WireDecoder d(is, 0x0200u);
   std::string outs;
   ASSERT_TRUE(d.ReadString(&outs));
@@ -581,7 +581,7 @@ TEST_F(WireDecoderTest, ReadString3) {
   s.append("\x81\x80\x04", 3);
   s += s_big3;
   s.push_back('\x55');
-  raw_mem_istream is(s.data(), s.size());
+  wpi::raw_mem_istream is(s.data(), s.size());
   WireDecoder d(is, 0x0300u);
   std::string outs;
   ASSERT_TRUE(d.ReadString(&outs));

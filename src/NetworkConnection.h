@@ -17,7 +17,9 @@
 #include "Message.h"
 #include "ntcore_cpp.h"
 
+namespace wpi {
 class NetworkStream;
+}
 
 namespace nt {
 
@@ -35,9 +37,9 @@ class NetworkConnection {
   typedef std::function<void(std::shared_ptr<Message> msg,
                              NetworkConnection* conn)> ProcessIncomingFunc;
   typedef std::vector<std::shared_ptr<Message>> Outgoing;
-  typedef ConcurrentQueue<Outgoing> OutgoingQueue;
+  typedef wpi::ConcurrentQueue<Outgoing> OutgoingQueue;
 
-  NetworkConnection(std::unique_ptr<NetworkStream> stream,
+  NetworkConnection(std::unique_ptr<wpi::NetworkStream> stream,
                     Notifier& notifier,
                     HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type);
@@ -54,7 +56,7 @@ class NetworkConnection {
   ConnectionInfo info() const;
 
   bool active() const { return m_active; }
-  NetworkStream& stream() { return *m_stream; }
+  wpi::NetworkStream& stream() { return *m_stream; }
 
   void QueueOutgoing(std::shared_ptr<Message> msg);
   void PostOutgoing(bool keep_alive);
@@ -82,7 +84,7 @@ class NetworkConnection {
   static std::atomic_uint s_uid;
 
   unsigned int m_uid;
-  std::unique_ptr<NetworkStream> m_stream;
+  std::unique_ptr<wpi::NetworkStream> m_stream;
   Notifier& m_notifier;
   OutgoingQueue m_outgoing;
   HandshakeFunc m_handshake;

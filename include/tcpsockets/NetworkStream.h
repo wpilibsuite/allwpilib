@@ -5,12 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef TCPSOCKETS_NETWORKSTREAM_H_
-#define TCPSOCKETS_NETWORKSTREAM_H_
+#ifndef WPIUTIL_TCPSOCKETS_NETWORKSTREAM_H_
+#define WPIUTIL_TCPSOCKETS_NETWORKSTREAM_H_
 
 #include <cstddef>
 
 #include "llvm/StringRef.h"
+
+namespace wpi {
 
 class NetworkStream {
  public:
@@ -36,4 +38,6 @@ class NetworkStream {
   NetworkStream& operator=(const NetworkStream&) = delete;
 };
 
-#endif  // TCPSOCKETS_NETWORKSTREAM_H_
+}  // namespace wpi
+
+#endif  // WPIUTIL_TCPSOCKETS_NETWORKSTREAM_H_

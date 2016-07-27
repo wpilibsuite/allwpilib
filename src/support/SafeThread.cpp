@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SafeThread.h"
+#include "support/SafeThread.h"
 
-using namespace nt;
+using namespace wpi;
 
 void detail::SafeThreadOwnerBase::Start(SafeThread* thr) {
   SafeThread* curthr = nullptr;

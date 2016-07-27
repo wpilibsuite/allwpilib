@@ -5,22 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef TCPSOCKETS_NETWORKACCEPTOR_H_
-#define TCPSOCKETS_NETWORKACCEPTOR_H_
+#ifndef WPIUTIL_SUPPORT_BASE64_H_
+#define WPIUTIL_SUPPORT_BASE64_H_
 
-#include "NetworkStream.h"
+#include <cstddef>
+#include <string>
 
-class NetworkAcceptor {
- public:
-  NetworkAcceptor() = default;
-  virtual ~NetworkAcceptor() = default;
+#include "llvm/StringRef.h"
 
-  virtual int start() = 0;
-  virtual void shutdown() = 0;
-  virtual std::unique_ptr<NetworkStream> accept() = 0;
+namespace wpi {
 
-  NetworkAcceptor(const NetworkAcceptor&) = delete;
-  NetworkAcceptor& operator=(const NetworkAcceptor&) = delete;
-};
+std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain);
+void Base64Encode(llvm::StringRef plain, std::string* encoded);
 
-#endif  // TCPSOCKETS_NETWORKACCEPTOR_H_
+}  // namespace wpi
+
+#endif  // WPIUTIL_SUPPORT_BASE64_H_

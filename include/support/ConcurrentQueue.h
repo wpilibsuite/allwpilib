@@ -4,13 +4,15 @@
 // - see < http://opensource.org/licenses/BSD-2-Clause>
 //
 
-#ifndef NT_SUPPORT_CONCURRENT_QUEUE_H_
-#define NT_SUPPORT_CONCURRENT_QUEUE_H_
+#ifndef WPIUTIL_SUPPORT_CONCURRENT_QUEUE_H_
+#define WPIUTIL_SUPPORT_CONCURRENT_QUEUE_H_
 
 #include <queue>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+
+namespace wpi {
 
 template <typename T>
 class ConcurrentQueue {
@@ -76,4 +78,6 @@ class ConcurrentQueue {
   std::condition_variable cond_;
 };
 
-#endif  // NT_SUPPORT_CONCURRENT_QUEUE_H_
+}  // namespace wpi
+
+#endif  // WPIUTIL_SUPPORT_CONCURRENT_QUEUE_H_

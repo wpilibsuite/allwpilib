@@ -14,7 +14,7 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "leb128.h"
+#include "support/leb128.h"
 
 #include "gtest/gtest.h"
 
@@ -24,9 +24,9 @@
 #include "llvm/SmallString.h"
 #include "llvm/StringRef.h"
 
-#include "raw_istream.h"
+#include "support/raw_istream.h"
 
-namespace nt {
+namespace wpi {
 
 TEST(LEB128Test, WriteUleb128) {
 #define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD) \
@@ -111,4 +111,4 @@ TEST(LEB128Test, SizeUleb128) {
   EXPECT_EQ(5u, SizeUleb128(UINT32_MAX));
 }
 
-}  // namespace nt
+}  // namespace wpi

@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_RAW_ISTREAM_H_
-#define NT_RAW_ISTREAM_H_
+#ifndef WPIUTIL_SUPPORT_RAW_ISTREAM_H_
+#define WPIUTIL_SUPPORT_RAW_ISTREAM_H_
 
 #include <cstddef>
 
-namespace nt {
+namespace wpi {
 
 class raw_istream {
  public:
@@ -35,6 +35,6 @@ class raw_mem_istream : public raw_istream {
   std::size_t m_left;
 };
 
-}  // namespace nt
+}  // namespace wpi
 
-#endif  // NT_RAW_ISTREAM_H_
+#endif  // WPIUTIL_SUPPORT_RAW_ISTREAM_H_

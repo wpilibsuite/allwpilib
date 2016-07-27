@@ -62,9 +62,9 @@
  *
  */
 
-#include "Base64.h"
+#include "support/Base64.h"
 
-namespace nt {
+namespace wpi {
 
 // aaaack but it's fast and const should make it shared text page.
 static const unsigned char pr2six[256] =
@@ -149,4 +149,4 @@ void Base64Encode(llvm::StringRef plain, std::string* encoded) {
   }
 }
 
-}  // namespace nt
+}  // namespace wpi

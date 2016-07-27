@@ -5,27 +5,26 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "tcpsockets/SocketError.h"
+#ifndef WPIUTIL_TCPSOCKETS_NETWORKACCEPTOR_H_
+#define WPIUTIL_TCPSOCKETS_NETWORKACCEPTOR_H_
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <string.h>
-#endif
+#include "tcpsockets/NetworkStream.h"
 
 namespace wpi {
 
-std::string SocketStrerror(int code) {
-#ifdef _WIN32
-  LPSTR errstr = nullptr;
-  FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-                0, code, 0, (LPSTR)&errstr, 0, 0);
-  std::string rv(errstr);
-  LocalFree(errstr);
-  return rv;
-#else
-  return strerror(code);
-#endif
-}
+class NetworkAcceptor {
+ public:
+  NetworkAcceptor() = default;
+  virtual ~NetworkAcceptor() = default;
+
+  virtual int start() = 0;
+  virtual void shutdown() = 0;
+  virtual std::unique_ptr<NetworkStream> accept() = 0;
+
+  NetworkAcceptor(const NetworkAcceptor&) = delete;
+  NetworkAcceptor& operator=(const NetworkAcceptor&) = delete;
+};
 
 }  // namespace wpi
+
+#endif  // WPIUTIL_TCPSOCKETS_NETWORKACCEPTOR_H_

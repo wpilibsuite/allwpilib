@@ -5,14 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_RAW_SOCKET_ISTREAM_H_
-#define NT_RAW_SOCKET_ISTREAM_H_
+#ifndef WPIUTIL_SUPPORT_RAW_SOCKET_ISTREAM_H_
+#define WPIUTIL_SUPPORT_RAW_SOCKET_ISTREAM_H_
 
-#include "raw_istream.h"
-
+#include "support/raw_istream.h"
 #include "tcpsockets/NetworkStream.h"
 
-namespace nt {
+namespace wpi {
 
 class raw_socket_istream : public raw_istream {
  public:
@@ -27,6 +26,6 @@ class raw_socket_istream : public raw_istream {
   int m_timeout;
 };
 
-}  // namespace nt
+}  // namespace wpi
 
-#endif  // NT_RAW_SOCKET_ISTREAM_H_
+#endif  // WPIUTIL_SUPPORT_RAW_SOCKET_ISTREAM_H_

@@ -7,11 +7,11 @@
 
 #include "NetworkConnection.h"
 
+#include "support/raw_socket_istream.h"
 #include "support/timestamp.h"
 #include "tcpsockets/NetworkStream.h"
 #include "Log.h"
 #include "Notifier.h"
-#include "raw_socket_istream.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
 
@@ -19,7 +19,7 @@ using namespace nt;
 
 std::atomic_uint NetworkConnection::s_uid;
 
-NetworkConnection::NetworkConnection(std::unique_ptr<NetworkStream> stream,
+NetworkConnection::NetworkConnection(std::unique_ptr<wpi::NetworkStream> stream,
                                      Notifier& notifier,
                                      HandshakeFunc handshake,
                                      Message::GetEntryTypeFunc get_entry_type)
@@ -106,7 +106,7 @@ void NetworkConnection::set_remote_id(StringRef remote_id) {
 }
 
 void NetworkConnection::ReadThreadMain() {
-  raw_socket_istream is(*m_stream);
+  wpi::raw_socket_istream is(*m_stream);
   WireDecoder decoder(is, m_proto_rev);
 
   m_state = static_cast<int>(kHandshake);
@@ -179,7 +179,7 @@ void NetworkConnection::WriteThreadMain() {
         msg->Write(encoder);
       }
     }
-    NetworkStream::Error err;
+    wpi::NetworkStream::Error err;
     if (!m_stream) break;
     if (encoder.size() == 0) continue;
     if (m_stream->send(encoder.data(), encoder.size(), &err) == 0) break;

@@ -19,7 +19,7 @@
 
 #include "llvm/DenseMap.h"
 #include "llvm/StringMap.h"
-#include "atomic_static.h"
+#include "support/atomic_static.h"
 #include "Message.h"
 #include "Notifier.h"
 #include "ntcore_cpp.h"

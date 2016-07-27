@@ -13,7 +13,7 @@
 #include <cstring>
 
 #include "llvm/MathExtras.h"
-#include "leb128.h"
+#include "support/leb128.h"
 
 using namespace nt;
 
@@ -45,7 +45,8 @@ static double ReadDouble(const char*& buf) {
   return llvm::BitsToDouble(val);
 }
 
-WireDecoder::WireDecoder(raw_istream& is, unsigned int proto_rev) : m_is(is) {
+WireDecoder::WireDecoder(wpi::raw_istream& is, unsigned int proto_rev)
+    : m_is(is) {
   // Start with a 1K temporary buffer.  Use malloc instead of new so we can
   // realloc.
   m_allocated = 1024;

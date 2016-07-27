@@ -21,7 +21,7 @@
    limitations under the License
 */
 
-#include "TCPConnector.h"
+#include "tcpsockets/TCPConnector.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -38,13 +38,13 @@
 #include <unistd.h>
 #endif
 
-#include "TCPStream.h"
+#include "tcpsockets/TCPStream.h"
 
 #include "llvm/SmallString.h"
-#include "../Log.h"
-#include "SocketError.h"
+#include "support/Logger.h"
+#include "tcpsockets/SocketError.h"
 
-using namespace tcpsockets;
+using namespace wpi;
 
 static int ResolveHostName(const char* hostname, struct in_addr* addr) {
   struct addrinfo hints;
@@ -68,7 +68,8 @@ static int ResolveHostName(const char* hostname, struct in_addr* addr) {
 }
 
 std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
-                                                     int port, int timeout) {
+                                                     int port, Logger& logger,
+                                                     int timeout) {
 #ifdef _WIN32
   struct WSAHelper {
     WSAHelper() {
@@ -90,7 +91,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
     addr_copy.push_back('\0');
     int size = sizeof(address);
     if (WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size) != 0) {
-      ERROR("could not resolve " << server << " address");
+      WPI_ERROR(logger, "could not resolve " << server << " address");
       return nullptr;
     }
 #else
@@ -102,11 +103,11 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   if (timeout == 0) {
     int sd = socket(AF_INET, SOCK_STREAM, 0);
     if (sd < 0) {
-      ERROR("could not create socket");
+      WPI_ERROR(logger, "could not create socket");
       return nullptr;
     }
     if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
-      ERROR("connect() to " << server << " port " << port << " failed: " << SocketStrerror());
+      WPI_ERROR(logger, "connect() to " << server << " port " << port << " failed: " << SocketStrerror());
 #ifdef _WIN32
       closesocket(sd);
 #else
@@ -122,7 +123,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   socklen_t len;
   int result = -1, valopt, sd = socket(AF_INET, SOCK_STREAM, 0);
   if (sd < 0) {
-    ERROR("could not create socket");
+    WPI_ERROR(logger, "could not create socket");
     return nullptr;
   }
 
@@ -154,15 +155,15 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
         len = sizeof(int);
         getsockopt(sd, SOL_SOCKET, SO_ERROR, (char*)(&valopt), &len);
         if (valopt) {
-          ERROR("select() to " << server << " port " << port << " error " << valopt << " - " << SocketStrerror(valopt));
+          WPI_ERROR(logger, "select() to " << server << " port " << port << " error " << valopt << " - " << SocketStrerror(valopt));
         }
         // connection established
         else
           result = 0;
       } else
-        INFO("connect() to " << server << " port " << port << " timed out");
+        WPI_INFO(logger, "connect() to " << server << " port " << port << " timed out");
     } else
-      ERROR("connect() to " << server << " port " << port << " error " << SocketErrno() << " - " << SocketStrerror());
+      WPI_ERROR(logger, "connect() to " << server << " port " << port << " error " << SocketErrno() << " - " << SocketStrerror());
   }
 
   // Return socket to blocking mode

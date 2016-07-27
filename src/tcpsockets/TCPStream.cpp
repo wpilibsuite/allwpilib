@@ -21,7 +21,7 @@
    limitations under the License.
 */
 
-#include "TCPStream.h"
+#include "tcpsockets/TCPStream.h"
 
 #ifdef _WIN32
 #include <WinSock2.h>
@@ -31,13 +31,15 @@
 #include <unistd.h>
 #endif
 
-TCPStream::TCPStream(int sd, struct sockaddr_in* address) : m_sd(sd) {
+using namespace wpi;
+
+TCPStream::TCPStream(int sd, sockaddr_in* address) : m_sd(sd) {
   char ip[50];
 #ifdef _WIN32
   unsigned long size = sizeof(ip) - 1;
-  WSAAddressToString((struct sockaddr*)address, sizeof sockaddr_in, nullptr, ip, &size);
+  WSAAddressToString((sockaddr*)address, sizeof sockaddr_in, nullptr, ip, &size);
 #else
-  inet_ntop(PF_INET, (struct in_addr*)&(address->sin_addr.s_addr), ip,
+  inet_ntop(PF_INET, (in_addr*)&(address->sin_addr.s_addr), ip,
             sizeof(ip) - 1);
 #endif
   m_peerIP = ip;

@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef TCPSOCKETS_SOCKETERROR_H_
-#define TCPSOCKETS_SOCKETERROR_H_
+#ifndef WPIUTIL_TCPSOCKETS_SOCKETERROR_H_
+#define WPIUTIL_TCPSOCKETS_SOCKETERROR_H_
 
 #include <string>
 
@@ -16,7 +16,7 @@
 #include <errno.h>
 #endif
 
-namespace tcpsockets {
+namespace wpi {
 
 static inline int SocketErrno() {
 #ifdef _WIN32
@@ -32,6 +32,6 @@ static inline std::string SocketStrerror() {
   return SocketStrerror(SocketErrno());
 }
 
-}  // namespace tcpsockets
+}  // namespace wpi
 
-#endif  // TCPSOCKETS_SOCKETERROR_H_
+#endif  // WPIUTIL_TCPSOCKETS_SOCKETERROR_H_

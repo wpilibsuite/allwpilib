@@ -21,7 +21,7 @@
    limitations under the License.
 */
 
-#include "TCPAcceptor.h"
+#include "tcpsockets/TCPAcceptor.h"
 
 #include <cstdio>
 #include <cstring>
@@ -36,16 +36,17 @@
 #endif
 
 #include "llvm/SmallString.h"
-#include "../Log.h"
-#include "SocketError.h"
+#include "support/Logger.h"
+#include "tcpsockets/SocketError.h"
 
-using namespace tcpsockets;
+using namespace wpi;
 
-TCPAcceptor::TCPAcceptor(int port, const char* address)
+TCPAcceptor::TCPAcceptor(int port, const char* address, Logger& logger)
     : m_lsd(0),
       m_port(port),
       m_address(address),
-      m_listening(false) {
+      m_listening(false),
+      m_logger(logger) {
   m_shutdown = false;
 #ifdef _WIN32
   WSAData wsaData;
@@ -73,7 +74,7 @@ int TCPAcceptor::start() {
 
   m_lsd = socket(PF_INET, SOCK_STREAM, 0);
   if (m_lsd < 0) {
-    ERROR("could not create socket");
+    WPI_ERROR(m_logger, "could not create socket");
     return -1;
   }
   struct sockaddr_in address;
@@ -99,13 +100,13 @@ int TCPAcceptor::start() {
 
   int result = bind(m_lsd, (struct sockaddr*)&address, sizeof(address));
   if (result != 0) {
-    ERROR("bind() failed: " << SocketStrerror());
+    WPI_ERROR(m_logger, "bind() failed: " << SocketStrerror());
     return result;
   }
 
   result = listen(m_lsd, 5);
   if (result != 0) {
-    ERROR("listen() failed: " << SocketStrerror());
+    WPI_ERROR(m_logger, "listen() failed: " << SocketStrerror());
     return result;
   }
   m_listening = true;
@@ -172,7 +173,8 @@ std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   std::memset(&address, 0, sizeof(address));
   int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
   if (sd < 0) {
-    if (!m_shutdown) ERROR("accept() failed: " << SocketStrerror());
+    if (!m_shutdown)
+      WPI_ERROR(m_logger, "accept() failed: " << SocketStrerror());
     return nullptr;
   }
   if (m_shutdown) {

@@ -1,8 +1,8 @@
 /*
-   TCPAcceptor.h
+   TCPConnector.h
 
-   TCPAcceptor class interface. TCPAcceptor provides methods to passively
-   establish TCP/IP connections with clients.
+   TCPConnector class interface. TCPConnector provides methods to actively
+   establish TCP/IP connections with a server.
 
    ------------------------------------------
 
@@ -18,33 +18,27 @@
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
-   limitations under the License.
+   limitations under the License
 */
 
-#ifndef TCPSOCKETS_TCPACCEPTOR_H_
-#define TCPSOCKETS_TCPACCEPTOR_H_
+#ifndef WPIUTIL_TCPSOCKETS_TCPCONNECTOR_H_
+#define WPIUTIL_TCPSOCKETS_TCPCONNECTOR_H_
 
-#include <atomic>
 #include <memory>
-#include <string>
 
-#include "NetworkAcceptor.h"
-#include "TCPStream.h"
+#include "tcpsockets/NetworkStream.h"
 
-class TCPAcceptor : public NetworkAcceptor {
-  int m_lsd;
-  int m_port;
-  std::string m_address;
-  bool m_listening;
-  std::atomic_bool m_shutdown;
+namespace wpi {
 
+class Logger;
+
+class TCPConnector {
  public:
-  TCPAcceptor(int port, const char* address);
-  ~TCPAcceptor();
-
-  int start() override;
-  void shutdown() override;
-  std::unique_ptr<NetworkStream> accept() override;
+  static std::unique_ptr<NetworkStream> connect(const char* server, int port,
+                                                Logger& logger,
+                                                int timeout = 0);
 };
 
-#endif
+}  // namespace wpi
+
+#endif  // WPIUTIL_TCPSOCKETS_TCPCONNECTOR_H_

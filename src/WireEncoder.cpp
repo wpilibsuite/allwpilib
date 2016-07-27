@@ -13,7 +13,7 @@
 #include <cstring>
 
 #include "llvm/MathExtras.h"
-#include "leb128.h"
+#include "support/leb128.h"
 
 using namespace nt;
 
@@ -38,7 +38,7 @@ void WireEncoder::WriteDouble(double val) {
 }
 
 void WireEncoder::WriteUleb128(unsigned long val) {
-  nt::WriteUleb128(m_data, val);
+  wpi::WriteUleb128(m_data, val);
 }
 
 void WireEncoder::WriteType(NT_Type type) {
@@ -191,7 +191,7 @@ std::size_t WireEncoder::GetStringSize(llvm::StringRef str) const {
     if (len > 0xffff) len = 0xffff; // Limited to 64K length; truncate
     return 2 + len;
   }
-  return SizeUleb128(str.size()) + str.size();
+  return wpi::SizeUleb128(str.size()) + str.size();
 }
 
 void WireEncoder::WriteString(llvm::StringRef str) {

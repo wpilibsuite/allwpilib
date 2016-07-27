@@ -21,8 +21,8 @@
    limitations under the License.
 */
 
-#ifndef TCPSOCKETS_TCPSTREAM_H_
-#define TCPSOCKETS_TCPSTREAM_H_
+#ifndef WPIUTIL_TCPSOCKETS_TCPSTREAM_H_
+#define WPIUTIL_TCPSOCKETS_TCPSTREAM_H_
 
 #include <cstddef>
 #include <string>
@@ -33,7 +33,11 @@
 #include <sys/socket.h>
 #endif
 
-#include "NetworkStream.h"
+#include "tcpsockets/NetworkStream.h"
+
+struct sockaddr_in;
+
+namespace wpi {
 
 class TCPStream : public NetworkStream {
   int m_sd;
@@ -60,8 +64,10 @@ class TCPStream : public NetworkStream {
  private:
   bool WaitForReadEvent(int timeout);
 
-  TCPStream(int sd, struct sockaddr_in* address);
+  TCPStream(int sd, sockaddr_in* address);
   TCPStream() = delete;
 };
+
+}  // namespace wpi
 
 #endif

@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_SAFETHREAD_H_
-#define NT_SAFETHREAD_H_
+#ifndef WPIUTIL_SUPPORT_SAFETHREAD_H_
+#define WPIUTIL_SUPPORT_SAFETHREAD_H_
 
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
 
-namespace nt {
+namespace wpi {
 
 // Base class for SafeThreadOwner threads.
 class SafeThread {
@@ -88,6 +88,6 @@ class SafeThreadOwner : public detail::SafeThreadOwnerBase {
   Proxy GetThread() { return Proxy(detail::SafeThreadOwnerBase::GetThread()); }
 };
 
-}  // namespace nt
+}  // namespace wpi
 
-#endif  // NT_SAFETHREAD_H_
+#endif  // WPIUTIL_SUPPORT_SAFETHREAD_H_

@@ -60,7 +60,7 @@ class UidVector {
 
 }  // anonymous namespace
 
-class Notifier::Thread : public SafeThread {
+class Notifier::Thread : public wpi::SafeThread {
  public:
   Thread(std::function<void()> on_start, std::function<void()> on_exit)
       : m_on_start(on_start), m_on_exit(on_exit) {}
@@ -83,7 +83,7 @@ class Notifier::Thread : public SafeThread {
   UidVector<ConnectionListenerCallback> m_conn_listeners;
 
   struct EntryNotification {
-    EntryNotification(StringRef name_, std::shared_ptr<Value> value_,
+    EntryNotification(llvm::StringRef name_, std::shared_ptr<Value> value_,
                       unsigned int flags_, EntryListenerCallback only_)
         : name(name_),
           value(value_),

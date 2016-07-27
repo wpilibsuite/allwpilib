@@ -4,7 +4,7 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-#include "timestamp.h"
+#include "support/timestamp.h"
 
 #ifdef _WIN32
 #include <cassert>
@@ -70,7 +70,7 @@ static const unsigned long long offset_val = timestamp();
 static const unsigned long long frequency_val = update_frequency();
 #endif
 
-unsigned long long nt::Now() {
+unsigned long long wpi::Now() {
 #ifdef _WIN32
   assert(offset_val > 0u);
   assert(frequency_val > 0u);
@@ -84,6 +84,6 @@ unsigned long long nt::Now() {
 #endif
 }
 
-unsigned long long NT_Now() {
-  return nt::Now();
+unsigned long long WPI_Now() {
+  return wpi::Now();
 }

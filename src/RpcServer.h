@@ -15,10 +15,10 @@
 #include <utility>
 
 #include "llvm/DenseMap.h"
-#include "atomic_static.h"
+#include "support/atomic_static.h"
+#include "support/SafeThread.h"
 #include "Message.h"
 #include "ntcore_cpp.h"
-#include "SafeThread.h"
 
 namespace nt {
 
@@ -51,7 +51,7 @@ class RpcServer {
   RpcServer();
 
   class Thread;
-  SafeThreadOwner<Thread> m_owner;
+  wpi::SafeThreadOwner<Thread> m_owner;
 
   struct RpcCall {
     RpcCall(StringRef name_, std::shared_ptr<Message> msg_, RpcCallback func_,

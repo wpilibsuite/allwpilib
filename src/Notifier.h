@@ -10,9 +10,9 @@
 
 #include <functional>
 
-#include "atomic_static.h"
+#include "support/atomic_static.h"
+#include "support/SafeThread.h"
 #include "ntcore_cpp.h"
-#include "SafeThread.h"
 
 namespace nt {
 
@@ -34,7 +34,7 @@ class Notifier {
   void SetOnStart(std::function<void()> on_start) { m_on_start = on_start; }
   void SetOnExit(std::function<void()> on_exit) { m_on_exit = on_exit; }
 
-  unsigned int AddEntryListener(StringRef prefix,
+  unsigned int AddEntryListener(llvm::StringRef prefix,
                                 EntryListenerCallback callback,
                                 unsigned int flags);
   void RemoveEntryListener(unsigned int entry_listener_uid);
@@ -52,7 +52,7 @@ class Notifier {
   Notifier();
 
   class Thread;
-  SafeThreadOwner<Thread> m_owner;
+  wpi::SafeThreadOwner<Thread> m_owner;
 
   std::atomic_bool m_local_notifiers;
 

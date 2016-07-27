@@ -4,23 +4,25 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
+#ifndef WPIUTIL_SUPPORT_TIMESTAMP_H_
+#define WPIUTIL_SUPPORT_TIMESTAMP_H_
 
-#ifndef NT_LEB128_H_
-#define NT_LEB128_H_
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include <cstddef>
+unsigned long long WPI_Now(void);
 
-#include "llvm/SmallVector.h"
+#ifdef __cplusplus
+}
+#endif
 
-namespace nt {
+#ifdef __cplusplus
+namespace wpi {
 
-class raw_istream;
+unsigned long long Now();
 
-std::size_t SizeUleb128(unsigned long val);
-std::size_t WriteUleb128(llvm::SmallVectorImpl<char>& dest, unsigned long val);
-std::size_t ReadUleb128(const char* addr, unsigned long* ret);
-bool ReadUleb128(raw_istream& is, unsigned long* ret);
+}  // namespace wpi
+#endif
 
-}  // namespace nt
-
-#endif  // NT_LEB128_H_
+#endif  // WPIUTIL_SUPPORT_TIMESTAMP_H_

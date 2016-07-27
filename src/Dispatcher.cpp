@@ -10,26 +10,28 @@
 #include <algorithm>
 #include <iterator>
 
+#include "Log.h"
 #include "tcpsockets/TCPAcceptor.h"
 #include "tcpsockets/TCPConnector.h"
-#include "Log.h"
 
 using namespace nt;
 
 ATOMIC_STATIC_INIT(Dispatcher)
 
-void Dispatcher::StartServer(StringRef persist_filename,
+void Dispatcher::StartServer(llvm::StringRef persist_filename,
                              const char* listen_address, unsigned int port) {
-  DispatcherBase::StartServer(persist_filename,
-                              std::unique_ptr<NetworkAcceptor>(new TCPAcceptor(
-                                  static_cast<int>(port), listen_address)));
+  DispatcherBase::StartServer(
+      persist_filename,
+      std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
+          static_cast<int>(port), listen_address, Logger::GetInstance())));
 }
 
 void Dispatcher::StartClient(const char* server_name, unsigned int port) {
   std::string server_name_copy(server_name);
-  DispatcherBase::StartClient([=]() -> std::unique_ptr<NetworkStream> {
-    return TCPConnector::connect(server_name_copy.c_str(),
-                                 static_cast<int>(port), 1);
+  DispatcherBase::StartClient([=]() -> std::unique_ptr<wpi::NetworkStream> {
+    return wpi::TCPConnector::connect(server_name_copy.c_str(),
+                                      static_cast<int>(port),
+                                      Logger::GetInstance(), 1);
   });
 }
 
@@ -39,9 +41,10 @@ void Dispatcher::StartClient(
   for (const auto& server : servers) {
     std::string server_name(server.first);
     unsigned int port = server.second;
-    connectors.emplace_back([=]() -> std::unique_ptr<NetworkStream> {
-      return TCPConnector::connect(server_name.c_str(),
-                                   static_cast<int>(port), 1);
+    connectors.emplace_back([=]() -> std::unique_ptr<wpi::NetworkStream> {
+      return wpi::TCPConnector::connect(server_name.c_str(),
+                                        static_cast<int>(port),
+                                        Logger::GetInstance(), 1);
     });
   }
   DispatcherBase::StartClient(std::move(connectors));
@@ -61,8 +64,9 @@ DispatcherBase::~DispatcherBase() {
   Stop();
 }
 
-void DispatcherBase::StartServer(StringRef persist_filename,
-                                 std::unique_ptr<NetworkAcceptor> acceptor) {
+void DispatcherBase::StartServer(
+    StringRef persist_filename,
+    std::unique_ptr<wpi::NetworkAcceptor> acceptor) {
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
     if (m_active) return;

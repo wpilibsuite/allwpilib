@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_ATOMIC_STATIC_H_
-#define NT_ATOMIC_STATIC_H_
+#ifndef WPIUTIL_SUPPORT_ATOMIC_STATIC_H_
+#define WPIUTIL_SUPPORT_ATOMIC_STATIC_H_
 
 #if !defined(_MSC_VER) || (_MSC_VER >= 1900)
 
@@ -46,4 +46,4 @@
 
 #endif
 
-#endif  // NT_ATOMIC_STATIC_H_
+#endif  // WPIUTIL_SUPPORT_ATOMIC_STATIC_H_

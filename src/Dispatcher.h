@@ -19,25 +19,27 @@
 
 #include "llvm/StringRef.h"
 
-#include "atomic_static.h"
+#include "support/atomic_static.h"
 #include "NetworkConnection.h"
 #include "Notifier.h"
 #include "Storage.h"
 
+namespace wpi {
 class NetworkAcceptor;
 class NetworkStream;
+}
 
 namespace nt {
 
 class DispatcherBase {
   friend class DispatcherTest;
  public:
-  typedef std::function<std::unique_ptr<NetworkStream>()> Connector;
+  typedef std::function<std::unique_ptr<wpi::NetworkStream>()> Connector;
 
   virtual ~DispatcherBase();
 
-  void StartServer(StringRef persist_filename,
-                   std::unique_ptr<NetworkAcceptor> acceptor);
+  void StartServer(llvm::StringRef persist_filename,
+                   std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   void StartClient(Connector connector);
   void StartClient(std::vector<Connector>&& connectors);
   void Stop();
@@ -81,7 +83,7 @@ class DispatcherBase {
   std::thread m_dispatch_thread;
   std::thread m_clientserver_thread;
 
-  std::unique_ptr<NetworkAcceptor> m_server_acceptor;
+  std::unique_ptr<wpi::NetworkAcceptor> m_server_acceptor;
   std::vector<Connector> m_client_connectors;
 
   // Mutex for user-accessible items

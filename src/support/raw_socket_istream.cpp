@@ -5,19 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_BASE64_H_
-#define NT_BASE64_H_
+#include "support/raw_socket_istream.h"
 
-#include <cstddef>
-#include <string>
+using namespace wpi;
 
-#include "llvm/StringRef.h"
+bool raw_socket_istream::read(void* data, std::size_t len) {
+  char* cdata = static_cast<char*>(data);
+  std::size_t pos = 0;
 
-namespace nt {
+  while (pos < len) {
+    NetworkStream::Error err;
+    std::size_t count =
+        m_stream.receive(&cdata[pos], len - pos, &err, m_timeout);
+    if (count == 0) return false;
+    pos += count;
+  }
+  return true;
+}
 
-std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain);
-void Base64Encode(llvm::StringRef plain, std::string* encoded);
-
-}  // namespace nt
-
-#endif  // NT_BASE64_H_
+void raw_socket_istream::close() { m_stream.close(); }

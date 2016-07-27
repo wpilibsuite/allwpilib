@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Base64.h"
+#include "support/Base64.h"
 
 #include "gtest/gtest.h"
 
-namespace nt {
+namespace wpi {
 
 struct Base64TestParam {
   int plain_len;
@@ -73,4 +73,4 @@ static Base64TestParam standard[] = {
 INSTANTIATE_TEST_CASE_P(Base64Standard, Base64Test,
                         ::testing::ValuesIn(standard));
 
-}  // namespace nt
+}  // namespace wpi

@@ -12,12 +12,12 @@
 #include <sstream>
 #include <string>
 
-#include "atomic_static.h"
-#include "ntcore_c.h"
+#include "support/atomic_static.h"
+#include "support/Logger.h"
 
 namespace nt {
 
-class Logger {
+class Logger : public wpi::Logger {
  public:
   static Logger& GetInstance() {
     ATOMIC_STATIC(Logger, instance);
@@ -25,59 +25,24 @@ class Logger {
   }
   ~Logger();
 
-  typedef std::function<void(unsigned int level, const char* file,
-                             unsigned int line, const char* msg)> LogFunc;
-
-  void SetLogger(LogFunc func) { m_func = func; }
-
-  void set_min_level(unsigned int level) { m_min_level = level; }
-  unsigned int min_level() const { return m_min_level; }
-
-  void Log(unsigned int level, const char* file, unsigned int line,
-           const char* msg) {
-    if (!m_func || level < m_min_level) return;
-    m_func(level, file, line, msg);
-  }
-
-  bool HasLogger() const { return m_func != nullptr; }
-
  private:
   Logger();
-
-  LogFunc m_func;
-  unsigned int m_min_level = 20;
 
   ATOMIC_STATIC_DECL(Logger)
 };
 
-#define LOG(level, x)                                           \
-  do {                                                          \
-    nt::Logger& logger = nt::Logger::GetInstance();             \
-    if (logger.min_level() <= level && logger.HasLogger()) {    \
-      std::ostringstream oss;                                   \
-      oss << x;                                                 \
-      logger.Log(level, __FILE__, __LINE__, oss.str().c_str()); \
-    }                                                           \
-  } while (0)
+#define LOG(level, x) WPI_LOG(nt::Logger::GetInstance(), level, x)
 
 #undef ERROR
-#define ERROR(x) LOG(NT_LOG_ERROR, x)
-#define WARNING(x) LOG(NT_LOG_WARNING, x)
-#define INFO(x) LOG(NT_LOG_INFO, x)
+#define ERROR(x) WPI_ERROR(nt::Logger::GetInstance(), x)
+#define WARNING(x) WPI_WARNING(nt::Logger::GetInstance(), x)
+#define INFO(x) WPI_INFO(nt::Logger::GetInstance(), x)
 
-#ifdef NDEBUG
-#define DEBUG(x) do {} while (0)
-#define DEBUG1(x) do {} while (0)
-#define DEBUG2(x) do {} while (0)
-#define DEBUG3(x) do {} while (0)
-#define DEBUG4(x) do {} while (0)
-#else
-#define DEBUG(x) LOG(NT_LOG_DEBUG, x)
-#define DEBUG1(x) LOG(NT_LOG_DEBUG1, x)
-#define DEBUG2(x) LOG(NT_LOG_DEBUG2, x)
-#define DEBUG3(x) LOG(NT_LOG_DEBUG3, x)
-#define DEBUG4(x) LOG(NT_LOG_DEBUG4, x)
-#endif
+#define DEBUG(x) WPI_DEBUG(nt::Logger::GetInstance(), x)
+#define DEBUG1(x) WPI_DEBUG1(nt::Logger::GetInstance(), x)
+#define DEBUG2(x) WPI_DEBUG2(nt::Logger::GetInstance(), x)
+#define DEBUG3(x) WPI_DEBUG3(nt::Logger::GetInstance(), x)
+#define DEBUG4(x) WPI_DEBUG4(nt::Logger::GetInstance(), x)
 
 } // namespace nt
 

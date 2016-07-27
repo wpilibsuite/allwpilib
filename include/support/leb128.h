@@ -5,22 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "raw_socket_istream.h"
+#ifndef WPIUTIL_SUPPORT_LEB128_H_
+#define WPIUTIL_SUPPORT_LEB128_H_
 
-using namespace nt;
+#include <cstddef>
 
-bool raw_socket_istream::read(void* data, std::size_t len) {
-  char* cdata = static_cast<char*>(data);
-  std::size_t pos = 0;
+#include "llvm/SmallVector.h"
 
-  while (pos < len) {
-    NetworkStream::Error err;
-    std::size_t count =
-        m_stream.receive(&cdata[pos], len - pos, &err, m_timeout);
-    if (count == 0) return false;
-    pos += count;
-  }
-  return true;
-}
+namespace wpi {
 
-void raw_socket_istream::close() { m_stream.close(); }
+class raw_istream;
+
+std::size_t SizeUleb128(unsigned long val);
+std::size_t WriteUleb128(llvm::SmallVectorImpl<char>& dest, unsigned long val);
+std::size_t ReadUleb128(const char* addr, unsigned long* ret);
+bool ReadUleb128(raw_istream& is, unsigned long* ret);
+
+}  // namespace wpi
+
+#endif  // WPIUTIL_SUPPORT_LEB128_H_

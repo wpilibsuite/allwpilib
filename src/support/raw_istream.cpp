@@ -4,25 +4,17 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-#ifndef NT_SUPPORT_TIMESTAMP_H_
-#define NT_SUPPORT_TIMESTAMP_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "support/raw_istream.h"
 
-unsigned long long NT_Now(void);
+#include <cstring>
 
-#ifdef __cplusplus
+using namespace wpi;
+
+bool raw_mem_istream::read(void* data, std::size_t len) {
+  if (len > m_left) return false;
+  std::memcpy(data, m_cur, len);
+  m_cur += len;
+  m_left -= len;
+  return true;
 }
-#endif
-
-#ifdef __cplusplus
-namespace nt {
-
-unsigned long long Now();
-
-}  // namespace nt
-#endif
-
-#endif  // NT_SUPPORT_TIMESTAMP_H_

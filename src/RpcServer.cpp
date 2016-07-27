@@ -15,7 +15,7 @@ using namespace nt;
 
 ATOMIC_STATIC_INIT(RpcServer)
 
-class RpcServer::Thread : public SafeThread {
+class RpcServer::Thread : public wpi::SafeThread {
  public:
   Thread(std::function<void()> on_start, std::function<void()> on_exit)
       : m_on_start(on_start), m_on_exit(on_exit) {}

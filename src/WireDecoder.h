@@ -11,9 +11,9 @@
 #include <cstddef>
 
 #include "nt_Value.h"
-#include "leb128.h"
+#include "support/leb128.h"
+#include "support/raw_istream.h"
 //#include "Log.h"
-#include "raw_istream.h"
 
 namespace nt {
 
@@ -26,7 +26,7 @@ namespace nt {
  */
 class WireDecoder {
  public:
-  explicit WireDecoder(raw_istream& is, unsigned int proto_rev);
+  explicit WireDecoder(wpi::raw_istream& is, unsigned int proto_rev);
   ~WireDecoder();
 
   void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
@@ -113,7 +113,7 @@ class WireDecoder {
 
   /* Reads an ULEB128-encoded unsigned integer. */
   bool ReadUleb128(unsigned long* val) {
-    return nt::ReadUleb128(m_is, val);
+    return wpi::ReadUleb128(m_is, val);
   }
 
   bool ReadType(NT_Type* type);
@@ -135,7 +135,7 @@ class WireDecoder {
   void Realloc(std::size_t len);
 
   /* input stream */
-  raw_istream& m_is;
+  wpi::raw_istream& m_is;
 
   /* temporary buffer */
   char* m_buf;

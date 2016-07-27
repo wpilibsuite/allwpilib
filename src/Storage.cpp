@@ -12,7 +12,7 @@
 #include <tuple>
 
 #include "llvm/StringExtras.h"
-#include "Base64.h"
+#include "support/Base64.h"
 #include "Log.h"
 #include "NetworkConnection.h"
 
@@ -853,7 +853,7 @@ static void SavePersistentImpl(
         WriteString(os, v->GetString());
         break;
       case NT_RAW:
-        Base64Encode(v->GetRaw(), &base64_encoded);
+        wpi::Base64Encode(v->GetRaw(), &base64_encoded);
         os << base64_encoded;
         break;
       case NT_BOOLEAN_ARRAY: {
@@ -1139,7 +1139,7 @@ bool Storage::LoadPersistent(
         break;
       }
       case NT_RAW:
-        Base64Decode(line, &str);
+        wpi::Base64Decode(line, &str);
         value = Value::MakeRaw(std::move(str));
         break;
       case NT_BOOLEAN_ARRAY: {
