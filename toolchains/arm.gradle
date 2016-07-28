@@ -1,5 +1,14 @@
+ext.isArm = true
+ext.buildPlatform = 'arm'
+
 def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPrefix : 'arm-frc-linux-gnueabi-'
 model {
+    platforms {
+	arm {
+	    architecture 'arm'
+	    operatingSystem 'linux'
+	}
+    }
     toolChains {
         gcc(Gcc) {
             target("arm") {
@@ -64,6 +73,9 @@ ext.setupReleaseDefines = { cppCompiler, linker ->
 ext.setupDebugDefines = { cppCompiler, linker ->
     cppCompiler.args '-g', '-O0'
 }
+
+// Used only on Windows.
+ext.setupDef = { linker, deffile -> }
 
 ext.releaseSetup = { releaseTasks ->
     model {

@@ -28,6 +28,7 @@
 .vs/
 *.def
 !ntcore.def
+!ntcore-jni.def
 *.opensdf
 *.vcxproj
 *.vcxproj.user

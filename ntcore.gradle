@@ -1,0 +1,166 @@
+def ntcoreSetupModel = { project ->
+    project.model {
+        components {
+            ntcore(NativeLibrarySpec) {
+                if (project.isArm) {
+                    targetPlatform 'arm'
+                } else {
+                    targetPlatform 'x86'
+                    targetPlatform 'x64'
+                }
+                setupDefines(project, binaries)
+
+                if (includeJava) {
+                    project.setupJniIncludes(binaries)
+                    binaries.all {
+                        project.setupDef(linker, "${rootDir}/ntcore-jni.def")
+                    }
+                } else {
+                    binaries.all {
+                        project.setupDef(linker, "${rootDir}/ntcore.def")
+                    }
+                }
+
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ["${rootDir}/src"]
+                            if (includeJava) {
+                                srcDirs "${rootDir}/java/lib"
+                            }
+                            includes = ['**/*.cpp']
+                        }
+                        exportedHeaders {
+                            srcDirs = ["${rootDir}/include"]
+                            if (includeJava) {
+                                project.jniHeadersNetworkTables.outputs.files.each { file ->
+                                    srcDirs file.getPath()
+                                }
+                            }
+                            includes = ['**/*.h']
+                        }
+                        if (project.isArm) {
+                            lib project: ':arm:wpiutil', library: 'wpiutil', linkage: 'static'
+                        } else {
+                            lib project: ':native:wpiutil', library: 'wpiutil', linkage: 'static'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+def ntcoreZipTask = { project ->
+    project.ext.ntcoreZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}NtcoreZip", Zip) {
+        description = 'Creates platform-specific zip of the desktop ntcore libraries.'
+        group = 'WPILib'
+        destinationDir = project.buildDir
+        baseName = 'ntcore'
+        classifier = "${project.buildPlatform}"
+
+        from(file('include')) {
+            into 'include'
+        }
+
+        if (!project.hasProperty('skipJava')) {
+            project.jniHeadersNetworkTables.outputs.each {
+                from(it) {
+                    into 'include'
+                }
+            }
+        }
+
+        project.model {
+            binaries {
+                withType(StaticLibraryBinarySpec) { binary ->
+                    from(binary.staticLibraryFile) {
+                        into getPlatformPath(binary)
+                    }
+                }
+                withType(SharedLibraryBinarySpec) { binary ->
+                    from(binary.sharedLibraryFile) {
+                        into getPlatformPath(binary)
+                    }
+                }
+            }
+        }
+    }
+
+    project.build.dependsOn project.ntcoreZip
+
+    def releaseTasks = [project.ntcoreZip]
+
+    if (includeJava) {
+        releaseTasks.add(project.jar)
+    }
+
+    project.releaseSetup(releaseTasks)
+
+    project.tasks.whenTaskAdded { task ->
+        def name = task.name.toLowerCase()
+        if (name.contains("ntcoresharedlibrary") || name.contains("ntcorestaticlibrary") || name.contains("ntcoretest")) {
+            project.ntcoreZip.dependsOn task
+        }
+    }
+}
+
+if (buildArm) {
+    project(':arm:ntcore') {
+        apply plugin: 'cpp'
+
+        apply from: "${rootDir}/toolchains/arm.gradle"
+        if (includeJava) {
+            apply from: "${rootDir}/java/java.gradle"
+        }
+
+        ntcoreSetupModel(project)
+        ntcoreZipTask(project)
+    }
+}
+
+project(':native:ntcore') {
+    apply plugin: 'cpp'
+    task check
+
+    apply from: "${rootDir}/toolchains/native.gradle"
+
+    if (!project.hasProperty("withoutTests")) {
+        apply from: "${rootDir}/test/tests.gradle"
+    }
+
+    if (includeJava) {
+        apply from: "${rootDir}/java/java.gradle"
+    }
+
+    ntcoreSetupModel(project)
+    ntcoreZipTask(project)
+}
+
+task ntcoreSourceZip(type: Zip) {
+    description = 'Creates a sources-zip of the ntcore source files'
+    group = 'WPILib'
+    destinationDir = project.buildDir
+    baseName = 'ntcore'
+    classifier = "sources"
+
+    from('src') {
+        into 'src'
+    }
+
+    from('include') {
+        into 'include'
+    }
+
+    if (includeJava) {
+        from('java/lib') {
+            into 'src'
+        }
+
+        project(':native:ntcore').jniHeadersNetworkTables.outputs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+    }
+}

@@ -19,6 +19,7 @@ if (!hasProperty('repo')) {
 }
 
 ext.buildArm = !project.hasProperty('skipArm')
+ext.includeJava = !project.hasProperty('skipJava')
 
 if (hasProperty('makeDesktop')) {
     println 'Making desktop classifier jar. NOTE: This desktop version should only be used for local testing.' +
@@ -52,211 +53,28 @@ ext.getPlatformPath = { binary ->
     }
 }
 
-def includeJava = !hasProperty('skipJava')
-
-// This is a closure to set up the model for compiling a c++ build. In order to run the tests only on the
-// native build, we have two pseudoprojects, native and arm. Native compiles for x86/x64, and arm compiles
-// for arm. This closure takes two parameters:
-//  project - the project to configure
-//  isArm - whether the project should use arm include files or not.
-def setupModel = { project, isArm ->
-    project.model {
-        platforms {
-            if (isArm) {
-                arm {
-                    architecture 'arm'
-                    operatingSystem 'linux'
-                }
-            } else {
-                x86 {
-                    architecture 'x86'
-                }
-                x64 {
-                    architecture 'x86_64'
-                }
-            }
-        }
-
-        components {
-            ntcore(NativeLibrarySpec) {
-                if (isArm) {
-                    targetPlatform 'arm'
-                } else {
-                    targetPlatform 'x86'
-                    targetPlatform 'x64'
-                }
-                binaries.all {
-                    if (project.hasProperty('debug')) {
-                        project.setupDebugDefines(cppCompiler, linker)
-                    } else {
-                        project.setupReleaseDefines(cppCompiler, linker)
-                    }
-                }
-
-                if (includeJava) {
-                    project.setupJniIncludes(binaries)
-                }
-
-                sources {
-                    cpp {
-                        source {
-                            srcDirs = ['../src']
-                            if (includeJava) {
-                                srcDirs "../java/lib"
-                            }
-                            includes = ['**/*.cpp']
-                        }
-                        exportedHeaders {
-                            srcDirs = ['../include', '../src']
-                            if (includeJava) {
-                                project.jniHeadersNetworkTables.outputs.files.each { file ->
-                                    srcDirs file.getPath()
-                                }
-                            }
-                            includes = ['**/*.h']
-                        }
-                    }
-                }
-            }
-        }
+ext.setupDefines = { project, binaries ->
+    binaries.all {
+	if (project.hasProperty('debug')) {
+	    project.setupDebugDefines(cppCompiler, linker)
+	} else {
+	    project.setupReleaseDefines(cppCompiler, linker)
+	}
     }
 }
 
-def ntcoreZipTask = { project ->
-    project.ext.ntcoreZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}NtcoreZip", Zip) {
-        description = 'Creates platform-specific zip of the desktop ntcore libraries.'
-        group = 'WPILib'
-        destinationDir = project.buildDir
-        baseName = 'ntcore'
-        classifier = "${project.buildPlatform}"
+apply from: "ntcore.gradle"
+apply from: "wpiutil.gradle"
 
-        from(file('include')) {
-            into 'include'
-        }
-
-        if (!hasProperty('skipJava')) {
-            project.jniHeadersNetworkTables.outputs.each {
-                from(it) {
-                    into 'include'
-                }
-            }
-        }
-
-        project.model {
-            binaries {
-                withType(StaticLibraryBinarySpec) { binary ->
-                    from(binary.staticLibraryFile) {
-                        into getPlatformPath(binary)
-                    }
-                }
-                withType(SharedLibraryBinarySpec) { binary ->
-                    from(binary.sharedLibraryFile) {
-                        into getPlatformPath(binary)
-                    }
-                }
-            }
-        }
-    }
-
-    project.build.dependsOn project.ntcoreZip
-
-    def releaseTasks = [project.ntcoreZip]
-
-    if (includeJava) {
-        releaseTasks.add(project.jar)
-    }
-
-    project.releaseSetup(releaseTasks)
-
-    project.tasks.whenTaskAdded { task ->
-        def name = task.name.toLowerCase()
-        if (name.contains("ntcoresharedlibrary") || name.contains("ntcorestaticlibrary") || name.contains("ntcoretest")) {
-            project.ntcoreZip.dependsOn task
-        }
-    }
-}
-
-if (buildArm) {
-    project(':arm') {
-        apply plugin: 'cpp'
-
-        ext.buildPlatform = 'arm'
-        ext.isArm = true
-
-        apply from: '../toolchains/arm.gradle'
-        if (includeJava) {
-            apply from: '../java/java.gradle'
-        }
-
-        setupModel(project, true)
-        ntcoreZipTask(project)
-    }
-}
-
-project(':native') {
-    apply plugin: 'cpp'
-    task check
-
-    ext.buildPlatform = OperatingSystem.current().getFamilyName()
-    ext.isArm = false
-
-    if (OperatingSystem.current().isLinux()) {
-        apply from: '../toolchains/linux.gradle'
-    } else if (OperatingSystem.current().isMacOsX()) {
-        apply from: '../toolchains/mac.gradle'
-    } else if (OperatingSystem.current().isWindows()) {
-        apply from: '../toolchains/windows.gradle'
-    } else {
-        throw new GradleException("ntcore does not support building on ${OperatingSystem.current().getFamilyName()}.")
-    }
-
-    if (!project.hasProperty("withoutTests")) {
-        apply from: '../test/tests.gradle'
-    }
-
-    if (includeJava) {
-        apply from: '../java/java.gradle'
-    }
-
-    setupModel(project, false)
-    ntcoreZipTask(project)
-}
-
-task ntcoreSourceZip(type: Zip) {
-    description = 'Creates a sources-zip of the ntcore source files'
-    group = 'WPILib'
-    destinationDir = project.buildDir
-    baseName = 'ntcore'
-    classifier = "sources"
-
-    from('src') {
-        into 'src'
-    }
-
-    from('include') {
-        into 'include'
-    }
-
-    if (includeJava) {
-        from('java/lib') {
-            into 'src'
-        }
-
-        project(':native').jniHeadersNetworkTables.outputs.each {
-            from(it) {
-                into 'include'
-            }
-        }
-    }
-}
-
-// Empty task for build so that ntcoreSourceZip will be build when running ./gradlew build
+// Empty task for build so that ntcoreSourceZip and wpiutilSourceZip will be
+// built when running ./gradlew build
 task build
 
 build.dependsOn ntcoreSourceZip
+build.dependsOn wpiutilSourceZip
 
 apply from: 'publish.gradle'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
+    gradleVersion = '2.14'
 }

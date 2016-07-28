@@ -11,12 +11,12 @@ configurations.errorprone {
     resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
 }
 
-def generatedJNIHeaderLoc = '../build/include'
+def generatedJNIHeaderLoc = "${buildDir}/include"
 
 sourceSets {
     main {
         java {
-            srcDirs = ['../java/src']
+            srcDirs = ["${rootDir}/java/src"]
         }
     }
 }
@@ -111,8 +111,8 @@ ext.setupJniIncludes = { binaries ->
     binaries.all {
         tasks.withType(CppCompile) {
             if (buildPlatform == 'arm') {
-                cppCompiler.args '-I', file('../java/arm-linux').absolutePath
-                cppCompiler.args '-I', file('../java/arm-linux/linux').absolutePath
+                cppCompiler.args '-I', file("${rootDir}/java/arm-linux").absolutePath
+                cppCompiler.args '-I', file("${rootDir}/java/arm-linux/linux").absolutePath
             } else {
                 def jdkLocation = org.gradle.internal.jvm.Jvm.current().javaHome
                 platformSpecificIncludeFlag("${jdkLocation}/include", cppCompiler)

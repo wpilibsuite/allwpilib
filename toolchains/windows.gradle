@@ -36,14 +36,17 @@ model {
 
 ext.setupReleaseDefines = { cppCompiler, linker ->
     cppCompiler.args '/O2', '/Zi', '/FS'
-    linker.args '/DEF:../ntcore.def'
 }
 
 ext.setupDebugDefines = { cppCompiler, linker ->
     cppCompiler.args '/Zi', '/FS'
-    linker.args '/DEBUG', '/DEF:../ntcore.def'
+    linker.args '/DEBUG'
+}
+
+ext.setupDef = { linker, deffile ->
+    linker.args "/DEF:${deffile}"
 }
 
 // This is a noop on Windows. On gcc platforms, we strip the release binary and create a separate
 // debug library, but Windows already separates debug symbols into a .pdb file.
-ext.releaseSetup = {}
+ext.releaseSetup = { releaseTasks -> }

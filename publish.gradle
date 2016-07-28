@@ -6,14 +6,14 @@ apply plugin: 'maven-publish'
 // release. This is set up in the main gradle file.
 publishing {
     publications {
-        def nat = project('native')
+        def nat = project('native:ntcore')
         if (!project.hasProperty('skipJava')) {
             java(MavenPublication) {
                 artifact nat.jar
                 artifact nat.networktablesJavaSource
                 artifact nat.networktablesJavadoc
                 if (project.buildArm) {
-                    artifact project('arm').jar
+                    artifact project('arm:ntcore').jar
                 }
 
                 if (project.hasProperty('makeDesktop')) {
@@ -31,7 +31,7 @@ publishing {
             artifact nat.ntcoreZip
             artifact ntcoreSourceZip
             if (project.buildArm) {
-                artifact project(':arm').ntcoreZip
+                artifact project(':arm:ntcore').ntcoreZip
             }
 
             if (project.hasProperty('makeDesktop')) {
@@ -43,6 +43,23 @@ publishing {
             groupId 'edu.wpi.first.wpilib.networktables.cpp'
             artifactId 'NetworkTables'
             version '3.0.0-SNAPSHOT'
+        }
+        wpiutil(MavenPublication) {
+            artifact project(':native:wpiutil').wpiutilZip
+            artifact wpiutilSourceZip
+            if (project.buildArm) {
+                artifact project(':arm:wpiutil').wpiutilZip
+            }
+
+            if (project.hasProperty('makeDesktop')) {
+                artifact project(':native:wpiutil').wpiutilZip, {
+                    classifier = 'desktop'
+                }
+            }
+
+            groupId 'edu.wpi.first.wpilib'
+            artifactId 'wpiutil'
+            version '1.0.0-SNAPSHOT'
         }
     }
 
