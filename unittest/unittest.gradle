@@ -1,0 +1,39 @@
+apply plugin: 'google-test'
+
+model {
+    testSuites {
+        wpiutilTest {
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ["${rootDir}/wpiutil/unittest"]
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ["${rootDir}/wpiutil/include", "${rootDir}/gmock/include", "${rootDir}/gmock/gtest/include"]
+                        includes = ['**/*.h']
+                    }
+                }
+            }
+            binaries.all {
+                lib project: ':gmock', library: 'gmock', linkage: 'static'
+                lib library: 'wpiutil', linkage: 'static'
+            }
+        }
+    }
+}
+
+model {
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            lib project: ':gmock', library: "gmock", linkage: "static"
+            lib library: 'wpiutil', linkage: 'static'
+            if (targetPlatform.operatingSystem.windows) {
+                cppCompiler.args '/EHsc', '/DNOMINMAX', '/D_SCL_SECURE_NO_WARNINGS', '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
+            } else {
+                cppCompiler.args '-pthread', '-std=c++1y'
+                linker.args '-pthread'
+            }
+        }
+    }
+}
