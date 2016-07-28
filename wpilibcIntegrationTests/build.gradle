@@ -1,6 +1,7 @@
 apply plugin: 'cpp'
 
 defineNetworkTablesProperties()
+defineWpiUtilProperties()
 
 ext.shared = "${project(':wpilibc').projectDir.getAbsolutePath()}/shared"
 ext.athena = "${project(':wpilibc').projectDir.getAbsolutePath()}/athena"

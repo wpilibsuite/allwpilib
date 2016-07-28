@@ -26,7 +26,7 @@ armConfig.setTransitive(false)
 def armNetTables = armConfig.files[0].canonicalFile
 
 def desktopNetTables
-if (project.hasProperty('makeSim')){
+if (project.hasProperty('makeSim')) {
     def desktopNtDependency =
         project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:desktop@zip")
     def desktopConfig = project.configurations.detachedConfiguration(desktopNtDependency)
@@ -40,11 +40,39 @@ def netTablesUnzipLocation = "$buildDir/networktables"
 task unzipNetworkTables(type: Copy) {
     description = 'Unzips the networktables maven dependency so that the include files and libraries can be used'
     group = 'WPILib'
-    if (project.hasProperty('makeSim')){
+    if (project.hasProperty('makeSim')) {
         from zipTree(desktopNetTables)
     }
     from zipTree(armNetTables)
     into netTablesUnzipLocation
+}
+
+def armWpiUtilDependency =
+    project.dependencies.create("edu.wpi.first.wpilib:wpiutil:1.0.0-SNAPSHOT:arm@zip")
+def armWpiUtilConfig = project.configurations.detachedConfiguration(armWpiUtilDependency)
+armWpiUtilConfig.setTransitive(false)
+def armWpiUtil = armWpiUtilConfig.files[0].canonicalFile
+
+def desktopWpiUtil
+if (project.hasProperty('makeSim')) {
+    def desktopWpiUtilDependency =
+        project.dependencies.create("edu.wpi.first.wpilib:wpiutil:1.0.0-SNAPSHOT:desktop@zip")
+    def desktopWpiUtilConfig = project.configurations.detachedConfiguration(desktopWpiUtilDependency)
+    desktopWpiUtilConfig.setTransitive(false)
+    desktopWpiUtil = desktopWpiUtilConfig.files[0].canonicalFile
+}
+
+def wpiUtilUnzipLocation = "$buildDir/wpiutil"
+
+// Create a task that will unzip the wpiutil files into a temporary build directory
+task unzipWpiUtil(type: Copy) {
+    description = 'Unzips the wpiutil maven dependency so that the include files and libraries can be used'
+    group = 'WPILib'
+    if (project.hasProperty('makeSim')) {
+        from zipTree(desktopWpiUtil)
+    }
+    from zipTree(armWpiUtil)
+    into wpiUtilUnzipLocation
 }
 
 task clean(type: Delete) {
@@ -55,6 +83,24 @@ task clean(type: Delete) {
 
 subprojects {
     plugins.withType(CppPlugin).whenPluginAdded {
+        ext.defineWpiUtilProperties = {
+            ext.wpiUtil = wpiUtilUnzipLocation
+            ext.wpiUtilInclude = "$wpiUtilUnzipLocation/include"
+            ext.wpiUtilLibArmLocation = "$wpiUtilUnzipLocation/Linux/arm"
+            if (project.hasProperty('makeSim')) {
+                ext.wpiUtilLibDesktopLocation = "$wpiUtilUnzipLocation/Linux/amd64"
+            }
+            ext.wpiUtilStaticLib = "$wpiUtilLibArmLocation/libwpiutil.a"
+
+            ext.addWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
+                compileTask.dependsOn project(':').unzipWpiUtil
+                String architecture = targetPlatform.architecture
+                if (architecture.contains('arm')) {
+                    linker.args wpiUtilStaticLib
+                }
+            }
+        }
+
         // This defines a project property that projects depending on network tables can use to setup that dependency.
         ext.defineNetworkTablesProperties = {
             ext.netTables = netTablesUnzipLocation
@@ -72,6 +118,7 @@ subprojects {
                 if (architecture.contains('arm')) {
                     linker.args netStaticLib
                 }
+                addWpiUtilLibraryLinks(compileTask, linker, targetPlatform)
             }
         }
 
