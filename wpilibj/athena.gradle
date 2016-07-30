@@ -105,6 +105,8 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
     description = 'Creates the sources jar for the maven publishing routine'
     group = 'WPILib'
     classifier = 'sources'
+    duplicatesStrategy = 'exclude'
+
     from sourceSets.athena.allJava
     from sourceSets.shared.allJava
 }
@@ -136,6 +138,8 @@ task wpilibjJavadoc(type: Jar, dependsOn: javadoc) {
     description = 'Creates the javadoc jar for the maven publishing routine'
     group = 'WPILib'
     classifier = 'javadoc'
+    duplicatesStrategy = 'exclude'
+
     from javadoc.destinationDir
 }
 

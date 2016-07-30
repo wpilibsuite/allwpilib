@@ -34,6 +34,7 @@ task wpilibcZip(type: Zip) {
     group = 'WPILib'
     baseName = 'wpilibc'
     destinationDir = project.buildDir
+    duplicatesStrategy = 'exclude'
 
     // Include the static library file and header files from this project
     model {
@@ -161,6 +162,8 @@ if (checkDoxygen()) {
         description = 'Generates doxygen zip file for publishing'
         group = 'WPILib'
         dependsOn doxygen
+        duplicatesStrategy = 'exclude'
+
         from doxygen.outputDir
     }
 }

@@ -43,6 +43,8 @@ task simDsSources(type: Jar, dependsOn: classes) {
     description = 'Creates the sources jar for the SimDS'
     group = 'WPILib'
     classifier = 'sources'
+    duplicatesStrategy = 'exclude'
+
     from sourceSets.main.allJava
 }
 
@@ -50,6 +52,8 @@ task simDsJavadoc(type: Jar, dependsOn: javadoc) {
     description = 'Creates the javadoc jar for the SimDS'
     group = 'WPILib'
     classifier = 'javadoc'
+    duplicatesStrategy = 'exclude'
+
     from javadoc.destinationDir
 }
 
