@@ -25,6 +25,7 @@ jar {
     description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
     baseName = 'ntcore'
     classifier = "$buildPlatform"
+    duplicatesStrategy = 'exclude'
 
     dependsOn { classes }
     model {
@@ -52,6 +53,8 @@ task networktablesJavaSource(type: Jar, dependsOn: classes) {
     group = 'WPILib'
     baseName = 'ntcore'
     classifier = "sources"
+    duplicatesStrategy = 'exclude'
+
     from sourceSets.main.allJava
 }
 
@@ -60,6 +63,8 @@ task networktablesJavadoc(type: Jar, dependsOn: javadoc) {
     group = 'WPILib'
     baseName = 'ntcore'
     classifier = "javadoc"
+    duplicatesStrategy = 'exclude'
+
     from javadoc.destinationDir
 }
 

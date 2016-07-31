@@ -58,6 +58,7 @@ def ntcoreZipTask = { project ->
         destinationDir = project.buildDir
         baseName = 'ntcore'
         classifier = "${project.buildPlatform}"
+        duplicatesStrategy = 'exclude'
 
         from(file('include')) {
             into 'include'
@@ -143,6 +144,7 @@ task ntcoreSourceZip(type: Zip) {
     destinationDir = project.buildDir
     baseName = 'ntcore'
     classifier = "sources"
+    duplicatesStrategy = 'exclude'
 
     from('src') {
         into 'src'
