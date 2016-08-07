@@ -268,7 +268,9 @@ void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counter_handle,
   }
   counter->counter->writeConfig_Mode(HAL_Counter_kPulseLength, status);
   counter->counter->writeConfig_PulseLengthThreshold(
-      (uint32_t)(threshold * 1.0e6) * kSystemClockTicksPerMicrosecond, status);
+      static_cast<uint32_t>(threshold * 1.0e6) *
+          kSystemClockTicksPerMicrosecond,
+      status);
 }
 
 /**
@@ -379,8 +381,8 @@ void HAL_SetCounterMaxPeriod(HAL_CounterHandle counter_handle, double maxPeriod,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  counter->counter->writeTimerConfig_StallPeriod((uint32_t)(maxPeriod * 4.0e8),
-                                                 status);
+  counter->counter->writeTimerConfig_StallPeriod(
+      static_cast<uint32_t>(maxPeriod * 4.0e8), status);
 }
 
 /**

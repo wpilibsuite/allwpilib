@@ -36,7 +36,8 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
 }
 
 void ADXL345_I2C::SetRange(Range range) {
-  m_i2c.Write(kDataFormatRegister, kDataFormat_FullRes | (uint8_t)range);
+  m_i2c.Write(kDataFormatRegister,
+              kDataFormat_FullRes | static_cast<uint8_t>(range));
 }
 
 double ADXL345_I2C::GetX() { return GetAcceleration(kAxis_X); }

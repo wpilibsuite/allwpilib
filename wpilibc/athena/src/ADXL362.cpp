@@ -95,7 +95,8 @@ void ADXL362::SetRange(Range range) {
   // Specify the data format to read
   commands[0] = kRegWrite;
   commands[1] = kFilterCtlRegister;
-  commands[2] = kFilterCtl_ODR_100Hz | (uint8_t)((range & 0x03) << 6);
+  commands[2] =
+      kFilterCtl_ODR_100Hz | static_cast<uint8_t>((range & 0x03) << 6);
   m_spi.Write(commands, 3);
 }
 
@@ -117,7 +118,7 @@ double ADXL362::GetAcceleration(ADXL362::Axes axis) {
   uint8_t buffer[4];
   uint8_t command[4] = {0, 0, 0, 0};
   command[0] = kRegRead;
-  command[1] = kDataRegister + (uint8_t)axis;
+  command[1] = kDataRegister + static_cast<uint8_t>(axis);
   m_spi.Transaction(command, buffer, 4);
 
   // Sensor is little endian... swap bytes

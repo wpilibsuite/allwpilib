@@ -72,8 +72,8 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interrupt_handle,
     return 0;
   }
 
-  result = anInterrupt->manager->watch((int32_t)(timeout * 1e3), ignorePrevious,
-                                       status);
+  result = anInterrupt->manager->watch(static_cast<int32_t>(timeout * 1e3),
+                                       ignorePrevious, status);
 
   // Don't report a timeout as an error - the return code is enough to tell
   // that a timeout happened.

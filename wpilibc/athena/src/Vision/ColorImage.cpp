@@ -297,7 +297,7 @@ MonoImage* ColorImage::GetIntensityPlane() {
 void ColorImage::ReplacePlane(ColorMode mode, MonoImage* plane,
                               int planeNumber) {
   int success = imaqReplaceColorPlanes(
-      m_imaqImage, (const Image*)m_imaqImage, mode,
+      m_imaqImage, reinterpret_cast<const Image*>(m_imaqImage), mode,
       (planeNumber == 1) ? plane->GetImaqImage() : nullptr,
       (planeNumber == 2) ? plane->GetImaqImage() : nullptr,
       (planeNumber == 3) ? plane->GetImaqImage() : nullptr);
@@ -475,7 +475,8 @@ void ColorImage::ReplaceIntensityPlane(MonoImage* plane) {
 // to imaqColorEqualize.
 void ColorImage::Equalize(bool allPlanes) {
   // Note that this call uses NI-defined TRUE and FALSE
-  int success = imaqColorEqualize(m_imaqImage, (const Image*)m_imaqImage,
+  int success = imaqColorEqualize(m_imaqImage,
+                                  reinterpret_cast<const Image*>(m_imaqImage),
                                   (allPlanes) ? TRUE : FALSE);
   wpi_setImaqErrorWithContext(success, "Imaq ColorEqualize error");
 }

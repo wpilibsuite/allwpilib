@@ -63,9 +63,9 @@ void initializeDigital(int32_t* status) {
   double loopTime = pwmSystem->readLoopTiming(status) /
                     (kSystemClockTicksPerMicrosecond * 1e3);
 
-  pwmSystem->writeConfig_Period((uint16_t)(kDefaultPwmPeriod / loopTime + .5),
-                                status);
-  uint16_t minHigh = (uint16_t)(
+  pwmSystem->writeConfig_Period(
+      static_cast<uint16_t>(kDefaultPwmPeriod / loopTime + .5), status);
+  uint16_t minHigh = static_cast<uint16_t>(
       (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + .5);
   pwmSystem->writeConfig_MinHigh(minHigh, status);
   // Ensure that PWM output values are set to OFF

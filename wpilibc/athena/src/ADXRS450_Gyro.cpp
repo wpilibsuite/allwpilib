@@ -43,7 +43,8 @@ void ADXRS450_Gyro::Calibrate() {
 
   Wait(kCalibrationSampleTime);
 
-  m_spi.SetAccumulatorCenter((int32_t)m_spi.GetAccumulatorAverage());
+  m_spi.SetAccumulatorCenter(
+      static_cast<int32_t>(m_spi.GetAccumulatorAverage()));
   m_spi.ResetAccumulator();
 }
 
@@ -89,26 +90,27 @@ static bool CalcParity(uint32_t v) {
 }
 
 static inline uint32_t BytesToIntBE(uint8_t* buf) {
-  uint32_t result = ((uint32_t)buf[0]) << 24;
-  result |= ((uint32_t)buf[1]) << 16;
-  result |= ((uint32_t)buf[2]) << 8;
-  result |= (uint32_t)buf[3];
+  uint32_t result = static_cast<uint32_t>(buf[0]) << 24;
+  result |= static_cast<uint32_t>(buf[1]) << 16;
+  result |= static_cast<uint32_t>(buf[2]) << 8;
+  result |= static_cast<uint32_t>(buf[3]);
   return result;
 }
 
 uint16_t ADXRS450_Gyro::ReadRegister(uint8_t reg) {
-  uint32_t cmd = 0x80000000 | (((uint32_t)reg) << 17);
+  uint32_t cmd = 0x80000000 | static_cast<uint32_t>(reg) << 17;
   if (!CalcParity(cmd)) cmd |= 1u;
 
   // big endian
-  uint8_t buf[4] = {(uint8_t)((cmd >> 24) & 0xff),
-                    (uint8_t)((cmd >> 16) & 0xff), (uint8_t)((cmd >> 8) & 0xff),
-                    (uint8_t)(cmd & 0xff)};
+  uint8_t buf[4] = {static_cast<uint8_t>((cmd >> 24) & 0xff),
+                    static_cast<uint8_t>((cmd >> 16) & 0xff),
+                    static_cast<uint8_t>((cmd >> 8) & 0xff),
+                    static_cast<uint8_t>(cmd & 0xff)};
 
   m_spi.Write(buf, 4);
   m_spi.Read(false, buf, 4);
   if ((buf[0] & 0xe0) == 0) return 0;  // error, return 0
-  return (uint16_t)((BytesToIntBE(buf) >> 5) & 0xffff);
+  return static_cast<uint16_t>((BytesToIntBE(buf) >> 5) & 0xffff);
 }
 
 /**

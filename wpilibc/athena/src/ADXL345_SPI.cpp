@@ -49,7 +49,7 @@ void ADXL345_SPI::SetRange(Range range) {
 
   // Specify the data format to read
   commands[0] = kDataFormatRegister;
-  commands[1] = kDataFormat_FullRes | (uint8_t)(range & 0x03);
+  commands[1] = kDataFormat_FullRes | static_cast<uint8_t>(range & 0x03);
   m_spi.Transaction(commands, commands, 2);
 }
 
@@ -68,8 +68,8 @@ double ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
 double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
   uint8_t buffer[3];
   uint8_t command[3] = {0, 0, 0};
-  command[0] =
-      (kAddress_Read | kAddress_MultiByte | kDataRegister) + (uint8_t)axis;
+  command[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister) +
+               static_cast<uint8_t>(axis);
   m_spi.Transaction(command, buffer, 3);
 
   // Sensor is little endian... swap bytes

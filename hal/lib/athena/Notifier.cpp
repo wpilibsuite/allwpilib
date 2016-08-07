@@ -65,7 +65,7 @@ void updateNotifierAlarmInternal(std::shared_ptr<Notifier> notifier_pointer,
   if (triggerTime < closestTrigger) {
     closestTrigger = triggerTime;
     // Simply truncate the hardware trigger time to 32-bit.
-    notifierAlarm->writeTriggerTime((uint32_t)triggerTime, status);
+    notifierAlarm->writeTriggerTime(static_cast<uint32_t>(triggerTime), status);
   }
   // Enable the alarm.  The hardware disables itself after each alarm.
   if (!wasActive) notifierAlarm->writeEnable(true, status);
