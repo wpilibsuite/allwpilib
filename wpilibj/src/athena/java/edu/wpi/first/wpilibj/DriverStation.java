@@ -437,6 +437,25 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
+   * Returns the types of Axes on a given joystick port.
+   *
+   * @param stick The joystick port number
+   * @param axis The target axis
+   * @return What type of axis the axis is reporting to be
+   */
+  public int getJoystickAxisType(int stick, int axis) {
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new RuntimeException("Joystick index is out of range, should be 0-5");
+    }
+
+    int retVal = -1;
+    synchronized (m_joystickMutex) {
+      retVal = HAL.getJoystickAxisType((byte) stick, (byte) axis);
+    }
+    return retVal;
+  }
+
+  /**
    * Gets a value indicating whether the Driver Station requires the robot to be enabled.
    *
    * @return True if the robot is enabled, false otherwise.
