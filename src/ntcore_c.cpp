@@ -32,7 +32,7 @@ static void ConvertToC(const EntryInfo& in, NT_EntryInfo* out) {
 
 static void ConvertToC(const ConnectionInfo& in, NT_ConnectionInfo* out) {
   ConvertToC(in.remote_id, &out->remote_id);
-  ConvertToC(in.remote_name, &out->remote_name);
+  ConvertToC(in.remote_ip, &out->remote_ip);
   out->remote_port = in.remote_port;
   out->last_update = in.last_update;
   out->protocol_version = in.protocol_version;
@@ -74,7 +74,7 @@ static void ConvertToC(const RpcCallInfo& in, NT_RpcCallInfo* out) {
 
 static void DisposeConnectionInfo(NT_ConnectionInfo *info) {
   std::free(info->remote_id.str);
-  std::free(info->remote_name);
+  std::free(info->remote_ip.str);
 }
 
 static void DisposeEntryInfo(NT_EntryInfo *info) {

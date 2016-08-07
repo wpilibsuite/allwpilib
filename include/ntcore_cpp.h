@@ -42,7 +42,7 @@ struct EntryInfo {
 /** NetworkTables Connection Information */
 struct ConnectionInfo {
   std::string remote_id;
-  std::string remote_name;
+  std::string remote_ip;
   unsigned int remote_port;
   unsigned long long last_update;
   unsigned int protocol_version;

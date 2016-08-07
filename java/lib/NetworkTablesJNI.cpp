@@ -428,9 +428,9 @@ static jobject ToJavaObject(JNIEnv *env, const nt::ConnectionInfo &info) {
       env->GetMethodID(connectionInfoCls, "<init>",
                        "(Ljava/lang/String;Ljava/lang/String;IJI)V");
   JavaLocal<jstring> remote_id(env, ToJavaString(env, info.remote_id));
-  JavaLocal<jstring> remote_name(env, ToJavaString(env, info.remote_name));
+  JavaLocal<jstring> remote_ip(env, ToJavaString(env, info.remote_ip));
   return env->NewObject(connectionInfoCls, constructor, remote_id.obj(),
-                        remote_name.obj(), (jint)info.remote_port,
+                        remote_ip.obj(), (jint)info.remote_port,
                         (jlong)info.last_update, (jint)info.protocol_version);
 }
 

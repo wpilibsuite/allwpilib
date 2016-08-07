@@ -120,7 +120,7 @@ struct NT_EntryInfo {
 /** NetworkTables Connection Information */
 struct NT_ConnectionInfo {
   struct NT_String remote_id;
-  char *remote_name;
+  struct NT_String remote_ip;
   unsigned int remote_port;
   unsigned long long last_update;
   unsigned int protocol_version;
@@ -185,7 +185,7 @@ void NT_GetEntryValue(const char *name, size_t name_len,
  * @param default_value     value to be set if name does not exist
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryValue(const char* name, size_t name_len,
+int NT_SetDefaultEntryValue(const char *name, size_t name_len,
                             const struct NT_Value *default_value);
 
 /** Set Entry Value.
