@@ -9,15 +9,20 @@ sep = os.sep
 if sep == "\\":
     sep += "\\"
 
-# List of folder regexes which should be excluded from modification
-folderExclude = \
+# There are two groups of regexes which prevent tasks from running on matching
+# files:
+#   1) generated files (shouldn't be modified)
+#   2) modifiable files
+#
+# format.py excludes matches for the "modifiable" regex before checking for
+# modifications to generated files because some of the regexes from each group
+# overlap.
+
+# List of regexes for folders which contain generated files
+genFolderExclude = \
     [name + sep for name in [
-     "\.git",
-     "\.gradle",
      "FRC_FPGA_ChipObject",
      "NetworkCommunication",
-     "__pycache__",
-     "build",
      "ctre",
      "frccansae",
      "gtest",
@@ -26,25 +31,40 @@ folderExclude = \
      "ni-libraries",
      "ni" + sep + "vision",
      "spilib",
-     "wpilibj" + sep + "src" + sep + "athena" + sep + "cpp" + sep + "include",
-     "wpilibj" + sep + "src" + sep + "athena" + sep + "cpp" + sep + "lib",
      "wpilibj" + sep + "src" + sep + "athena" + sep + "cpp" + sep + "nivision",
      "visa"]]
 
-# List of file regexes which should be excluded from modification
-fileExclude = [name + "$" for name in [
-               "CanTalonSRX\.h",
-               "NIIMAQdx\.h",
-               "can_proto\.h",
-               "nivision\.h",
-               "\.jar",
-               "\.patch",
-               "\.png",
-               "\.py",
-               "\.so"]]
+# List of regexes for generated files
+genFileExclude = [name + "$" for name in [
+                  "CanTalonSRX\.h",
+                  "NIIMAQdx\.h",
+                  "can_proto\.h",
+                  "nivision\.h"]]
 
-# Regex of exclusions
-regexExclude = re.compile("|".join(folderExclude + fileExclude))
+# Regex for generated file exclusions
+genRegexExclude = re.compile("|".join(genFolderExclude + genFileExclude))
+
+# Regex for folders which contain modifiable files
+modifiableFolderExclude = \
+    [name + sep for name in [
+     "\.git",
+     "\.gradle",
+     "__pycache__",
+     "build",
+     "wpilibj" + sep + "src" + sep + "athena" + sep + "cpp" + sep + "include",
+     "wpilibj" + sep + "src" + sep + "athena" + sep + "cpp" + sep + "lib"]]
+
+# List of regexes for modifiable files
+modifiableFileExclude = [name + "$" for name in [
+                         "\.jar",
+                         "\.patch",
+                         "\.png",
+                         "\.py",
+                         "\.so"]]
+
+# Regex for modifiable file exclusions
+modifiableRegexExclude = \
+    re.compile("|".join(modifiableFolderExclude + modifiableFileExclude))
 
 class Task(object):
     __metaclass__ = ABCMeta
@@ -62,10 +82,15 @@ class Task(object):
     def run(self, name):
         return
 
+    # Returns True if file is modifiable but should not have tasks run on it
+    @staticmethod
+    def isModifiableFile(name):
+        return modifiableRegexExclude.search(name)
+
     # Returns True if file isn't generated (generated files are skipped)
     @staticmethod
-    def notGeneratedFile(name):
-        return not regexExclude.search(name)
+    def isGeneratedFile(name):
+        return genRegexExclude.search(name)
 
     # Returns True if file has an extension this task can process
     def fileMatchesExtension(self, name):
