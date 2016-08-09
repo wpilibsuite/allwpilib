@@ -27,7 +27,7 @@ extern std::unique_ptr<tAO> analogOutputSystem;
 extern priority_recursive_mutex analogRegisterWindowMutex;
 
 struct AnalogPort {
-  uint8_t pin;
+  uint8_t channel;
   std::unique_ptr<tAccumulator> accumulator;
 };
 

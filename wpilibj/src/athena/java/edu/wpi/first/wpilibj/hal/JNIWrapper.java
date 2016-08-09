@@ -59,7 +59,7 @@ public class JNIWrapper {
     }
   }
 
-  public static native int getPortWithModule(byte module, byte pin);
+  public static native int getPortWithModule(byte module, byte channel);
 
-  public static native int getPort(byte pin);
+  public static native int getPort(byte channel);
 }

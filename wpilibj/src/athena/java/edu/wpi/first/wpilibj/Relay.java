@@ -21,12 +21,12 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Class for VEX Robotics Spike style relay outputs. Relays are intended to be connected to Spikes
- * or similar relays. The relay channels controls a pair of pins that are either both off, one on,
- * the other on, or both on. This translates into two Spike outputs at 0v, one at 12v and one at 0v,
- * one at 0v and the other at 12v, or two Spike outputs at 12V. This allows off, full forward, or
- * full reverse control of motors without variable speed. It also allows the two channels (forward
- * and reverse) to be used independently for something that does not care about voltage polarity
- * (like a solenoid).
+ * or similar relays. The relay channels controls a pair of channels that are either both off, one
+ * on, the other on, or both on. This translates into two Spike outputs at 0v, one at 12v and one
+ * at 0v, one at 0v and the other at 12v, or two Spike outputs at 12V. This allows off, full
+ * forward, or full reverse control of motors without variable speed. It also allows the two
+ * channels (forward and reverse) to be used independently for something that does not care about
+ * voltage polarity (like a solenoid).
  */
 public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable {
   private MotorSafetyHelper m_safetyHelper;

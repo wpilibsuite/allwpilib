@@ -16,11 +16,11 @@ extern "C" {
 #endif
 HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, void*),
                                           void* param, int32_t* status);
-void HAL_CleanNotifier(HAL_NotifierHandle notifier_handle, int32_t* status);
-void* HAL_GetNotifierParam(HAL_NotifierHandle notifier_handle, int32_t* status);
-void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifier_handle,
+void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
+void* HAL_GetNotifierParam(HAL_NotifierHandle notifierHandle, int32_t* status);
+void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status);
-void HAL_StopNotifierAlarm(HAL_NotifierHandle notifier_handle, int32_t* status);
+void HAL_StopNotifierAlarm(HAL_NotifierHandle notifierHandle, int32_t* status);
 #ifdef __cplusplus
 }
 #endif

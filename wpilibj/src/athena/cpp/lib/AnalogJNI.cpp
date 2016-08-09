@@ -44,7 +44,7 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort(
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << analog;
   CheckStatusRange(env, 0, HAL_GetNumAnalogInputs(), 
-                   hal::getPortHandlePin((HAL_PortHandle)id), status);
+                   hal::getPortHandleChannel((HAL_PortHandle)id), status);
   return (jint)analog;
 }
 
@@ -74,7 +74,7 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort(
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << analog;
   CheckStatusRange(env, 0, HAL_GetNumAnalogOutputs(), 
-                   hal::getPortHandlePin((HAL_PortHandle)id), status);
+                   hal::getPortHandleChannel((HAL_PortHandle)id), status);
   return (jlong)analog;
 }
 

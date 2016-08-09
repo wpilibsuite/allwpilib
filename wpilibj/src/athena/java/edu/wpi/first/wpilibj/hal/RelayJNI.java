@@ -12,7 +12,7 @@ public class RelayJNI extends DIOJNI {
 
   public static native void freeRelayPort(int relayPortHandle);
 
-  public static native boolean checkRelayChannel(int pin);
+  public static native boolean checkRelayChannel(int channel);
 
   public static native void setRelay(int relayPortHandle, boolean on);
 

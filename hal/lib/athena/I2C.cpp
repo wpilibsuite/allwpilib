@@ -28,7 +28,7 @@ static HAL_DigitalHandle i2CMXPDigitalHandle2 = HAL_kInvalidHandle;
 extern "C" {
 /*
  * Initialize the I2C port. Opens the port if necessary and saves the handle.
- * If opening the MXP port, also sets up the pin functions appropriately
+ * If opening the MXP port, also sets up the channel functions appropriately
  * @param port The port to open, 0 for the on-board, 1 for the MXP.
  */
 void HAL_InitializeI2C(int32_t port, int32_t* status) {

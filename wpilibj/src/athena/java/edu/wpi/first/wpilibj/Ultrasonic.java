@@ -83,9 +83,8 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
           return;
         }
         if (ultrasonic.isEnabled()) {
-          ultrasonic.m_pingChannel.pulse(m_pingChannel.getChannel(), (float) kPingTime); // do
-          // the
-          // ping
+          // Do the ping
+          ultrasonic.m_pingChannel.pulse(m_pingChannel.getChannel(), (float) kPingTime);
         }
         ultrasonic = ultrasonic.m_nextSensor;
         Timer.delay(.1); // wait for ping to return

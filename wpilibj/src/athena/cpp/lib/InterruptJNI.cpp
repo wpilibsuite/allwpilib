@@ -144,12 +144,12 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInterrupts(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrupts(
-    JNIEnv* env, jclass, jint interrupt_handle) {
+    JNIEnv* env, jclass, jint interruptHandle) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI cleanInterrupts";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  HAL_CleanInterrupts((HAL_InterruptHandle)interrupt_handle, &status);
+  HAL_CleanInterrupts((HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
@@ -163,13 +163,13 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrupts(
  */
 JNIEXPORT int JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt(
-    JNIEnv* env, jclass, jint interrupt_handle, jdouble timeout,
+    JNIEnv* env, jclass, jint interruptHandle, jdouble timeout,
     jboolean ignorePrevious) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI waitForInterrupt";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  int result = HAL_WaitForInterrupt((HAL_InterruptHandle)interrupt_handle, timeout,
+  int result = HAL_WaitForInterrupt((HAL_InterruptHandle)interruptHandle, timeout,
                                 ignorePrevious, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
@@ -185,12 +185,12 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_enableInterrupts(
-    JNIEnv* env, jclass, jint interrupt_handle) {
+    JNIEnv* env, jclass, jint interruptHandle) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI enableInterrupts";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  HAL_EnableInterrupts((HAL_InterruptHandle)interrupt_handle, &status);
+  HAL_EnableInterrupts((HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
@@ -204,12 +204,12 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_enableInterrupts(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterrupts(
-    JNIEnv* env, jclass, jint interrupt_handle) {
+    JNIEnv* env, jclass, jint interruptHandle) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI disableInterrupts";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  HAL_DisableInterrupts((HAL_InterruptHandle)interrupt_handle, &status);
+  HAL_DisableInterrupts((HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
@@ -223,12 +223,12 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterrupts(
  */
 JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readInterruptRisingTimestamp(
-    JNIEnv* env, jclass, jint interrupt_handle) {
+    JNIEnv* env, jclass, jint interruptHandle) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readInterruptRisingTimestamp";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  jdouble timeStamp = HAL_ReadInterruptRisingTimestamp((HAL_InterruptHandle)interrupt_handle, &status);
+  jdouble timeStamp = HAL_ReadInterruptRisingTimestamp((HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -242,12 +242,12 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readInterruptRisingTimestamp(
  */
 JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readInterruptFallingTimestamp(
-    JNIEnv* env, jclass, jint interrupt_handle) {
+    JNIEnv* env, jclass, jint interruptHandle) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI readInterruptFallingTimestamp";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   int32_t status = 0;
-  jdouble timeStamp = HAL_ReadInterruptFallingTimestamp((HAL_InterruptHandle)interrupt_handle, &status);
+  jdouble timeStamp = HAL_ReadInterruptFallingTimestamp((HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -261,15 +261,15 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readInterruptFallingTimestamp(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterrupts(
-    JNIEnv* env, jclass, jint interrupt_handle, jint digitalSourceHandle,
+    JNIEnv* env, jclass, jint interruptHandle, jint digitalSourceHandle,
     jint analogTriggerType) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI requestInterrupts";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
   INTERRUPTJNI_LOG(logDEBUG) << "digitalSourceHandle = " << digitalSourceHandle;
   INTERRUPTJNI_LOG(logDEBUG) << "analogTriggerType = " << analogTriggerType;
 
   int32_t status = 0;
-  HAL_RequestInterrupts((HAL_InterruptHandle)interrupt_handle, (HAL_Handle)digitalSourceHandle, 
+  HAL_RequestInterrupts((HAL_InterruptHandle)interruptHandle, (HAL_Handle)digitalSourceHandle,
                     (HAL_AnalogTriggerType)analogTriggerType, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
@@ -284,10 +284,10 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterrupts(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterruptHandler(
-    JNIEnv* env, jclass, jint interrupt_handle, jobject handler,
+    JNIEnv* env, jclass, jint interruptHandle, jobject handler,
     jobject param) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI attachInterruptHandler";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
 
   jclass cls = env->GetObjectClass(handler);
   INTERRUPTJNI_LOG(logDEBUG) << "class = " << cls;
@@ -311,7 +311,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterruptHandler(
   INTERRUPTJNI_LOG(logDEBUG) << "InterruptThreadJNI Ptr = " << intr;
 
   int32_t status = 0;
-  HAL_AttachInterruptHandler((HAL_InterruptHandle)interrupt_handle, interruptHandler, intr,
+  HAL_AttachInterruptHandler((HAL_InterruptHandle)interruptHandle, interruptHandler, intr,
                          &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
@@ -325,15 +325,15 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterruptHandler(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_setInterruptUpSourceEdge(
-    JNIEnv* env, jclass, jint interrupt_handle, jboolean risingEdge,
+    JNIEnv* env, jclass, jint interruptHandle, jboolean risingEdge,
     jboolean fallingEdge) {
   INTERRUPTJNI_LOG(logDEBUG) << "Calling INTERRUPTJNI setInterruptUpSourceEdge";
-  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interrupt_handle;
+  INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << (HAL_InterruptHandle)interruptHandle;
   INTERRUPTJNI_LOG(logDEBUG) << "Rising Edge = " << (bool)risingEdge;
   INTERRUPTJNI_LOG(logDEBUG) << "Falling Edge = " << (bool)fallingEdge;
 
   int32_t status = 0;
-  HAL_SetInterruptUpSourceEdge((HAL_InterruptHandle)interrupt_handle, risingEdge, fallingEdge,
+  HAL_SetInterruptUpSourceEdge((HAL_InterruptHandle)interruptHandle, risingEdge, fallingEdge,
                            &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;

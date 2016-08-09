@@ -43,9 +43,9 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort(
   SOLENOIDJNI_LOG(logDEBUG) << "Status = " << status;
   SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Handle = " << handle;
 
-  // Use solenoid pins, as we have to pick one.
-  CheckStatusRange(env, 0, HAL_GetNumSolenoidPins(), 
-                   hal::getPortHandlePin((HAL_PortHandle)id), status);;
+  // Use solenoid channels, as we have to pick one.
+  CheckStatusRange(env, 0, HAL_GetNumSolenoidChannels(),
+                   hal::getPortHandleChannel((HAL_PortHandle)id), status);;
   return (jint)handle;
 }
 

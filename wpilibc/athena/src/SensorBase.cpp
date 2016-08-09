@@ -11,11 +11,11 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
-const int SensorBase::kDigitalChannels = HAL_GetNumDigitalPins();
+const int SensorBase::kDigitalChannels = HAL_GetNumDigitalChannels();
 const int SensorBase::kAnalogInputs = HAL_GetNumAnalogInputs();
-const int SensorBase::kSolenoidChannels = HAL_GetNumSolenoidPins();
+const int SensorBase::kSolenoidChannels = HAL_GetNumSolenoidChannels();
 const int SensorBase::kSolenoidModules = HAL_GetNumPCMModules();
-const int SensorBase::kPwmChannels = HAL_GetNumPWMPins();
+const int SensorBase::kPwmChannels = HAL_GetNumPWMChannels();
 const int SensorBase::kRelayChannels = HAL_GetNumRelayHeaders();
 const int SensorBase::kPDPChannels = HAL_GetNumPDPChannels();
 

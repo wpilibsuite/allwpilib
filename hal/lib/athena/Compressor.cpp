@@ -35,10 +35,10 @@ HAL_Bool HAL_CheckCompressorModule(int32_t module) {
   return module < kNumPCMModules && module >= 0;
 }
 
-HAL_Bool HAL_GetCompressor(HAL_CompressorHandle compressor_handle,
+HAL_Bool HAL_GetCompressor(HAL_CompressorHandle compressorHandle,
                            int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -50,10 +50,10 @@ HAL_Bool HAL_GetCompressor(HAL_CompressorHandle compressor_handle,
   return value;
 }
 
-void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressor_handle,
+void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressorHandle,
                                         HAL_Bool value, int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -63,9 +63,9 @@ void HAL_SetCompressorClosedLoopControl(HAL_CompressorHandle compressor_handle,
 }
 
 HAL_Bool HAL_GetCompressorClosedLoopControl(
-    HAL_CompressorHandle compressor_handle, int32_t* status) {
+    HAL_CompressorHandle compressorHandle, int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -77,10 +77,10 @@ HAL_Bool HAL_GetCompressorClosedLoopControl(
   return value;
 }
 
-HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressor_handle,
+HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressorHandle,
                                          int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -92,10 +92,10 @@ HAL_Bool HAL_GetCompressorPressureSwitch(HAL_CompressorHandle compressor_handle,
   return value;
 }
 
-double HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
+double HAL_GetCompressorCurrent(HAL_CompressorHandle compressorHandle,
                                 int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -107,9 +107,9 @@ double HAL_GetCompressorCurrent(HAL_CompressorHandle compressor_handle,
   return value;
 }
 HAL_Bool HAL_GetCompressorCurrentTooHighFault(
-    HAL_CompressorHandle compressor_handle, int32_t* status) {
+    HAL_CompressorHandle compressorHandle, int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -121,9 +121,9 @@ HAL_Bool HAL_GetCompressorCurrentTooHighFault(
   return value;
 }
 HAL_Bool HAL_GetCompressorCurrentTooHighStickyFault(
-    HAL_CompressorHandle compressor_handle, int32_t* status) {
+    HAL_CompressorHandle compressorHandle, int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -135,9 +135,9 @@ HAL_Bool HAL_GetCompressorCurrentTooHighStickyFault(
   return value;
 }
 HAL_Bool HAL_GetCompressorShortedStickyFault(
-    HAL_CompressorHandle compressor_handle, int32_t* status) {
+    HAL_CompressorHandle compressorHandle, int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -148,10 +148,10 @@ HAL_Bool HAL_GetCompressorShortedStickyFault(
 
   return value;
 }
-HAL_Bool HAL_GetCompressorShortedFault(HAL_CompressorHandle compressor_handle,
+HAL_Bool HAL_GetCompressorShortedFault(HAL_CompressorHandle compressorHandle,
                                        int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -163,9 +163,9 @@ HAL_Bool HAL_GetCompressorShortedFault(HAL_CompressorHandle compressor_handle,
   return value;
 }
 HAL_Bool HAL_GetCompressorNotConnectedStickyFault(
-    HAL_CompressorHandle compressor_handle, int32_t* status) {
+    HAL_CompressorHandle compressorHandle, int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -177,9 +177,9 @@ HAL_Bool HAL_GetCompressorNotConnectedStickyFault(
   return value;
 }
 HAL_Bool HAL_GetCompressorNotConnectedFault(
-    HAL_CompressorHandle compressor_handle, int32_t* status) {
+    HAL_CompressorHandle compressorHandle, int32_t* status) {
   int16_t index =
-      getHandleTypedIndex(compressor_handle, HAL_HandleEnum::Compressor);
+      getHandleTypedIndex(compressorHandle, HAL_HandleEnum::Compressor);
   if (index == InvalidHandleIndex) {
     *status = HAL_HANDLE_ERROR;
     return false;

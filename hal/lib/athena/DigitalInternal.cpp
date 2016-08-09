@@ -30,8 +30,8 @@ std::unique_ptr<tPWM> pwmSystem;
 bool digitalSystemsInitialized = false;
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                      kNumDigitalPins + kNumPWMHeaders>
-    digitalPinHandles;
+                      kNumDigitalChannels + kNumPWMHeaders>
+    digitalChannelHandles;
 
 /**
  * Initialize the digital system.
@@ -69,21 +69,21 @@ void initializeDigital(int32_t* status) {
       (kDefaultPwmCenter - kDefaultPwmStepsDown * loopTime) / loopTime + .5);
   pwmSystem->writeConfig_MinHigh(minHigh, status);
   // Ensure that PWM output values are set to OFF
-  for (uint8_t pwm_index = 0; pwm_index < kNumPWMPins; pwm_index++) {
+  for (uint8_t pwmIndex = 0; pwmIndex < kNumPWMChannels; pwmIndex++) {
     // Copy of SetPWM
-    if (pwm_index < tPWM::kNumHdrRegisters) {
-      pwmSystem->writeHdr(pwm_index, kPwmDisabled, status);
+    if (pwmIndex < tPWM::kNumHdrRegisters) {
+      pwmSystem->writeHdr(pwmIndex, kPwmDisabled, status);
     } else {
-      pwmSystem->writeMXP(pwm_index - tPWM::kNumHdrRegisters, kPwmDisabled,
+      pwmSystem->writeMXP(pwmIndex - tPWM::kNumHdrRegisters, kPwmDisabled,
                           status);
     }
 
     // Copy of SetPWMPeriodScale, set to 4x by default.
-    if (pwm_index < tPWM::kNumPeriodScaleHdrElements) {
-      pwmSystem->writePeriodScaleHdr(pwm_index, 3, status);
+    if (pwmIndex < tPWM::kNumPeriodScaleHdrElements) {
+      pwmSystem->writePeriodScaleHdr(pwmIndex, 3, status);
     } else {
       pwmSystem->writePeriodScaleMXP(
-          pwm_index - tPWM::kNumPeriodScaleHdrElements, 3, status);
+          pwmIndex - tPWM::kNumPeriodScaleHdrElements, 3, status);
     }
   }
 
@@ -91,41 +91,43 @@ void initializeDigital(int32_t* status) {
 }
 
 /**
- * Map DIO pin numbers from their physical number (10 to 26) to their position
- * in the bit field.
+ * Map DIO channel numbers from their physical number (10 to 26) to their
+ * position in the bit field.
  */
-int32_t remapMXPChannel(int32_t pin) { return pin - 10; }
+int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
 
-int32_t remapMXPPWMChannel(int32_t pin) {
-  if (pin < 14) {
-    return pin - 10;  // first block of 4 pwms (MXP 0-3)
+int32_t remapMXPPWMChannel(int32_t channel) {
+  if (channel < 14) {
+    return channel - 10;  // first block of 4 pwms (MXP 0-3)
   } else {
-    return pin - 6;  // block of PWMs after SPI
+    return channel - 6;  // block of PWMs after SPI
   }
 }
 
 /**
- * remap the digital source pin and set the module.
+ * remap the digital source channel and set the module.
  * If it's an analog trigger, determine the module from the high order routing
- * channel else do normal digital input remapping based on pin number (MXP)
+ * channel else do normal digital input remapping based on channel number
+ * (MXP)
  */
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
-                        HAL_AnalogTriggerType analogTriggerType, uint8_t& pin,
-                        uint8_t& module, bool& analogTrigger) {
+                        HAL_AnalogTriggerType analogTriggerType,
+                        uint8_t& channel, uint8_t& module,
+                        bool& analogTrigger) {
   if (isHandleType(digitalSourceHandle, HAL_HandleEnum::AnalogTrigger)) {
     // If handle passed, index is not negative
     int32_t index = getHandleIndex(digitalSourceHandle);
-    pin = (index << 2) + analogTriggerType;
-    module = pin >> 4;
+    channel = (index << 2) + analogTriggerType;
+    module = channel >> 4;
     analogTrigger = true;
     return true;
   } else if (isHandleType(digitalSourceHandle, HAL_HandleEnum::DIO)) {
     int32_t index = getHandleIndex(digitalSourceHandle);
     if (index >= kNumDigitalHeaders) {
-      pin = remapMXPChannel(index);
+      channel = remapMXPChannel(index);
       module = 1;
     } else {
-      pin = index;
+      channel = index;
       module = 0;
     }
     analogTrigger = false;

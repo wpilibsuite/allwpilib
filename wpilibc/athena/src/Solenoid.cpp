@@ -44,8 +44,8 @@ Solenoid::Solenoid(uint8_t moduleNumber, uint32_t channel)
   m_solenoidHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, channel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidPins(), channel,
-                                 HAL_GetErrorMessage(status));
+    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
+                                 channel, HAL_GetErrorMessage(status));
     m_solenoidHandle = HAL_kInvalidHandle;
     return;
   }

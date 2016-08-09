@@ -22,11 +22,11 @@ extern "C" {
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_JNIWrapper_getPortWithModule(
-    JNIEnv* env, jclass, jbyte module, jbyte pin) {
+    JNIEnv* env, jclass, jbyte module, jbyte channel) {
   // FILE_LOG(logDEBUG) << "Calling JNIWrapper getPortWithModlue";
   // FILE_LOG(logDEBUG) << "Module = " << (jint)module;
-  // FILE_LOG(logDEBUG) << "Pin = " << (jint)pin;
-  HAL_PortHandle port = HAL_GetPortWithModule(module, pin);
+  // FILE_LOG(logDEBUG) << "Channel = " << (jint)channel;
+  HAL_PortHandle port = HAL_GetPortWithModule(module, channel);
   // FILE_LOG(logDEBUG) << "Port Handle = " << port;
   return (jint)port;
 }
@@ -37,11 +37,11 @@ Java_edu_wpi_first_wpilibj_hal_JNIWrapper_getPortWithModule(
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_JNIWrapper_getPort(
-    JNIEnv* env, jclass, jbyte pin) {
+    JNIEnv* env, jclass, jbyte channel) {
   // FILE_LOG(logDEBUG) << "Calling JNIWrapper getPortWithModlue";
   // FILE_LOG(logDEBUG) << "Module = " << (jint)module;
-  // FILE_LOG(logDEBUG) << "Pin = " << (jint)pin;
-  HAL_PortHandle port = HAL_GetPort(pin);
+  // FILE_LOG(logDEBUG) << "Channel = " << (jint)channel;
+  HAL_PortHandle port = HAL_GetPort(channel);
   // FILE_LOG(logDEBUG) << "Port Handle = " << port;
   return (jint)port;
 }

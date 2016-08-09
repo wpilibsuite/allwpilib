@@ -57,27 +57,27 @@ struct SPIAccumulator {
 
   int64_t value = 0;
   uint32_t count = 0;
-  int32_t last_value = 0;
+  int32_t lastValue = 0;
 
   int32_t center = 0;
   int32_t deadband = 0;
 
   uint8_t cmd[4];  // command to send (up to 4 bytes)
-  int32_t valid_mask;
-  int32_t valid_value;
-  int32_t data_max;       // one more than max data value
-  int32_t data_msb_mask;  // data field MSB mask (for signed)
-  uint8_t data_shift;     // data field shift right amount, in bits
-  uint8_t xfer_size;      // SPI transfer size, in bytes (up to 4)
+  int32_t validMask;
+  int32_t validValue;
+  int32_t dataMax;      // one more than max data value
+  int32_t dataMsbMask;  // data field MSB mask (for signed)
+  uint8_t dataShift;    // data field shift right amount, in bits
+  uint8_t xferSize;     // SPI transfer size, in bytes (up to 4)
   uint8_t port;
-  bool is_signed;   // is data field signed?
-  bool big_endian;  // is response big endian?
+  bool isSigned;   // is data field signed?
+  bool bigEndian;  // is response big endian?
 };
 std::unique_ptr<SPIAccumulator> spiAccumulators[5];
 
 /*
  * Initialize the spi port. Opens the port if necessary and saves the handle.
- * If opening the MXP port, also sets up the pin functions appropriately
+ * If opening the MXP port, also sets up the channel functions appropriately
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
 void HAL_InitializeSPI(int32_t port, int32_t* status) {
@@ -336,39 +336,39 @@ static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(accum->port));
   spilib_writeread(
       HAL_GetSPIHandle(accum->port), reinterpret_cast<const char*>(accum->cmd),
-      reinterpret_cast<char*>(resp_b), static_cast<int32_t>(accum->xfer_size));
+      reinterpret_cast<char*>(resp_b), static_cast<int32_t>(accum->xferSize));
 
   // convert from bytes
   uint32_t resp = 0;
-  if (accum->big_endian) {
-    for (int i = 0; i < accum->xfer_size; ++i) {
+  if (accum->bigEndian) {
+    for (int i = 0; i < accum->xferSize; ++i) {
       resp <<= 8;
       resp |= resp_b[i] & 0xff;
     }
   } else {
-    for (int i = accum->xfer_size - 1; i >= 0; --i) {
+    for (int i = accum->xferSize - 1; i >= 0; --i) {
       resp <<= 8;
       resp |= resp_b[i] & 0xff;
     }
   }
 
   // process response
-  if ((resp & accum->valid_mask) == static_cast<uint32_t>(accum->valid_value)) {
+  if ((resp & accum->validMask) == static_cast<uint32_t>(accum->validValue)) {
     // valid sensor data; extract data field
-    int32_t data = static_cast<int32_t>(resp >> accum->data_shift);
-    data &= accum->data_max - 1;
+    int32_t data = static_cast<int32_t>(resp >> accum->dataShift);
+    data &= accum->dataMax - 1;
     // 2s complement conversion if signed MSB is set
-    if (accum->is_signed && (data & accum->data_msb_mask) != 0)
-      data -= accum->data_max;
+    if (accum->isSigned && (data & accum->dataMsbMask) != 0)
+      data -= accum->dataMax;
     // center offset
     data -= accum->center;
     // only accumulate if outside deadband
     if (data < -accum->deadband || data > accum->deadband) accum->value += data;
     ++accum->count;
-    accum->last_value = data;
+    accum->lastValue = data;
   } else {
     // no data from the sensor; just clear the last value
-    accum->last_value = 0;
+    accum->lastValue = 0;
   }
 
   // reschedule timer
@@ -386,28 +386,28 @@ static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
  * @param port SPI port
  * @param period Time between reads, in us
  * @param cmd SPI command to send to request data
- * @param xfer_size SPI transfer size, in bytes
- * @param valid_mask Mask to apply to received data for validity checking
- * @param valid_data After valid_mask is applied, required matching value for
+ * @param xferSize SPI transfer size, in bytes
+ * @param validMask Mask to apply to received data for validity checking
+ * @param valid_data After validMask is applied, required matching value for
  *                   validity checking
- * @param data_shift Bit shift to apply to received data to get actual data
+ * @param dataShift Bit shift to apply to received data to get actual data
  *                   value
- * @param data_size Size (in bits) of data field
- * @param is_signed Is data field signed?
- * @param big_endian Is device big endian?
+ * @param dataSize Size (in bits) of data field
+ * @param isSigned Is data field signed?
+ * @param bigEndian Is device big endian?
  */
 void HAL_InitSPIAccumulator(int32_t port, int32_t period, int32_t cmd,
-                            int32_t xfer_size, int32_t valid_mask,
-                            int32_t valid_value, int32_t data_shift,
-                            int32_t data_size, HAL_Bool is_signed,
-                            HAL_Bool big_endian, int32_t* status) {
+                            int32_t xferSize, int32_t validMask,
+                            int32_t validValue, int32_t dataShift,
+                            int32_t dataSize, HAL_Bool isSigned,
+                            HAL_Bool bigEndian, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
   if (port > 4) return;
   if (!spiAccumulators[port])
     spiAccumulators[port] = std::make_unique<SPIAccumulator>();
   SPIAccumulator* accum = spiAccumulators[port].get();
-  if (big_endian) {
-    for (int i = xfer_size - 1; i >= 0; --i) {
+  if (bigEndian) {
+    for (int i = xferSize - 1; i >= 0; --i) {
       accum->cmd[i] = cmd & 0xff;
       cmd >>= 8;
     }
@@ -421,14 +421,14 @@ void HAL_InitSPIAccumulator(int32_t port, int32_t period, int32_t cmd,
     accum->cmd[3] = cmd & 0xff;
   }
   accum->period = period;
-  accum->xfer_size = xfer_size;
-  accum->valid_mask = valid_mask;
-  accum->valid_value = valid_value;
-  accum->data_shift = data_shift;
-  accum->data_max = (1 << data_size);
-  accum->data_msb_mask = (1 << (data_size - 1));
-  accum->is_signed = is_signed;
-  accum->big_endian = big_endian;
+  accum->xferSize = xferSize;
+  accum->validMask = validMask;
+  accum->validValue = validValue;
+  accum->dataShift = dataShift;
+  accum->dataMax = (1 << dataSize);
+  accum->dataMsbMask = (1 << (dataSize - 1));
+  accum->isSigned = isSigned;
+  accum->bigEndian = bigEndian;
   if (!accum->notifier) {
     accum->notifier =
         HAL_InitializeNotifier(spiAccumulatorProcess, accum, status);
@@ -465,7 +465,7 @@ void HAL_ResetSPIAccumulator(int32_t port, int32_t* status) {
   }
   accum->value = 0;
   accum->count = 0;
-  accum->last_value = 0;
+  accum->lastValue = 0;
 }
 
 /**
@@ -512,7 +512,7 @@ int32_t HAL_GetSPIAccumulatorLastValue(int32_t port, int32_t* status) {
     *status = NULL_PARAMETER;
     return 0;
   }
-  return accum->last_value;
+  return accum->lastValue;
 }
 
 /**

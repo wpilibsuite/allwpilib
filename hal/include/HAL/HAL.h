@@ -41,8 +41,8 @@ namespace HALUsageReporting = nUsageReporting;
 #ifdef __cplusplus
 extern "C" {
 #endif
-HAL_PortHandle HAL_GetPort(int32_t pin);
-HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t pin);
+HAL_PortHandle HAL_GetPort(int32_t channel);
+HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 const char* HAL_GetErrorMessage(int32_t code);
 
 int32_t HAL_GetFPGAVersion(int32_t* status);
