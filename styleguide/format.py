@@ -70,8 +70,24 @@ def main():
         print("Error: no files found to format", file = sys.stderr)
         sys.exit(1)
 
+    # Don't check for changes in or run tasks on modifiable files
+    files = [name for name in files if not Task.isModifiableFile(name)]
+
+    # Create list of all changed files
+    changedFileList = []
+    proc = subprocess.Popen(["git", "diff", "--name-only", "master"],
+                            bufsize = 1, stdout = subprocess.PIPE)
+    for line in proc.stdout:
+        changedFileList.append(configPath + os.sep +
+                               line.strip().decode("ascii"))
+
+    # Emit warning if a generated file was editted
+    for name in files:
+        if Task.isGeneratedFile(name) and name in changedFileList:
+            print("Warning: generated file '" + name + "' modified")
+
     # Don't format generated files
-    files = [name for name in files if Task.notGeneratedFile(name)]
+    files = [name for name in files if not Task.isGeneratedFile(name)]
 
     # Parse command-line arguments
     parser = argparse.ArgumentParser(description = "Runs all formatting tasks on the code base. This should be invoked from either the styleguide directory or the root directory of the project.")
