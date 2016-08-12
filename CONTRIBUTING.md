@@ -37,7 +37,7 @@ So you want to contribute your changes back to WPILib. Great! We have a few cont
 
 ## Coding Guidelines
 
-WPILib uses Google style guides for both C++ and Java. Autoformatters are available for many popular editors at [https://github.com/google/styleguide]. An online version of the styleguide for [C++](https://google.github.io/styleguide/cppguide.html) and [Java](https://google.github.io/styleguide/javaguide.html) are also available.  Additionally, offline copies of the style guide can be found in the style guide directory of the repository.
+WPILib uses modified Google style guides for both C++ and Java, which can be found in the style guide directory of the repository. Autoformatters are available for many popular editors at https://github.com/google/styleguide. Another option for C++ is running format.py in the style guide directory.
 
 While the library should be fully formatted according to the styles, additional elements of the style guide were not followed when the library was initially created. All new code should follow the guidelines. If you are looking for some easy ramp-up tasks, finding areas that don't follow the style guide and fixing them is very welcome.
 

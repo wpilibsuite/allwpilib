@@ -198,7 +198,7 @@ are meant for textual inclusion, but are not headers, should end in
 <p>All header files should be self-contained. In other
 words, users and refactoring tools should not have to adhere to special
 conditions in order to include the header. Specifically, a
-header should have <a href="#The__define_Guard">header guards</a>,
+header should have <a href="#_pragma_once">#pragma once</a>,
 should include all other headers it needs, and should not require any
 particular symbols to be defined.</p>
 
@@ -222,36 +222,11 @@ instantiates the template.</p>
 
 </div>
 
-<h3 id="The__define_Guard">The #define Guard</h3>
+<h3 id="_pragma_once">#pragma once</h3>
 
 <div class="summary">
-<p>All header files should have <code>#define</code> guards to
-prevent multiple inclusion. The format of the symbol name
-should be
-<code><i>&lt;PROJECT&gt;</i>_<i>&lt;PATH&gt;</i>_<i>&lt;FILE&gt;</i>_H_</code>.</p>
-</div>
-
-<div class="stylebody">
-
-
-
-<p>To guarantee uniqueness, they should
-be based on the full path in a project's source tree. For
-example, the file <code>foo/src/bar/baz.h</code> in
-project <code>foo</code> should have the following
-guard:</p>
-
-<pre>#ifndef FOO_BAR_BAZ_H_
-#define FOO_BAR_BAZ_H_
-
-...
-
-#endif  // FOO_BAR_BAZ_H_
-</pre>
-
-
-
-
+<p>All header files should have <code>#pragma once</code> at the top to
+prevent multiple inclusion.
 </div>
 
 <h3 id="Forward_Declarations">Forward Declarations</h3>
@@ -818,18 +793,13 @@ discussion of namespaces and how to name them.</p>
 <h3 id="Enumerator_Names">Enumerator Names</h3>
 
 <div class="summary">
-<p>Enumerators should be named <i>either</i> like
-<a href="#Constant_Names">constants</a> or like
-<a href="#Macro_Names">macros</a>: either <code>kEnumName</code> or
-<code>ENUM_NAME</code>.</p>
+<p>Enumerators should be named like
+<a href="#Constant_Names">constants</a>: <code>kEnumName</code>.</p>
 </div>
 
 <div class="stylebody">
 
-<p>Preferably, the individual enumerators should be named
-like <a href="#Constant_Names">constants</a>. However, it
-is also acceptable to name them like
-<a href="Macro_Names">macros</a>.  The enumeration name,
+<p>The enumeration name,
 <code>UrlTableErrors</code> (and
 <code>AlternateUrlTableErrors</code>), is a type, and
 therefore mixed case.</p>
@@ -839,23 +809,7 @@ therefore mixed case.</p>
   kErrorOutOfMemory,
   kErrorMalformedInput,
 };
-enum AlternateUrlTableErrors {
-  OK = 0,
-  OUT_OF_MEMORY = 1,
-  MALFORMED_INPUT = 2,
-};
 </pre>
-
-<p>Until January 2009, the style was to name enum values
-like <a href="#Macro_Names">macros</a>. This caused
-problems with name collisions between enum values and
-macros. Hence, the change to prefer constant-style naming
-was put in place. New code should prefer constant-style
-naming if possible. However, there is no reason to change
-old code to use constant-style names, unless the old
-names are actually causing a compile-time problem.</p>
-
-
 
 </div>
 
@@ -1390,10 +1344,9 @@ everyone's code easily.</p>
 
 
 
-<p>To help you format code correctly, we've
-created a
-<a href="http://google-styleguide.googlecode.com/svn/trunk/google-c-style.el">
-settings file for emacs</a>.</p>
+<p>To help your code conform to our format, we've
+created a <a href="format.py">python script</a> that runs clang-format on it
+and performs various other checks.</p>
 
 <h3 id="Line_Length">Line Length</h3>
 
@@ -1443,10 +1396,6 @@ should appear near top of a file.</p>
 
 <p class="exception">An <code>#include</code> statement with a
 long path may exceed 80 columns.</p>
-
-<p class="exception">You needn't be concerned about
-<a href="#The__define_Guard">header guards</a> that exceed
-the maximum length. </p>
 </div>
 
 </div>
