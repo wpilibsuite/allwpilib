@@ -124,8 +124,8 @@ int32_t HAL_WriteI2C(int32_t port, int32_t deviceAddress, uint8_t* dataToSend,
       port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
   {
     std::lock_guard<priority_recursive_mutex> sync(lock);
-    return i2clib_write(handle, deviceAddress, (const char*)dataToSend,
-                        (int32_t)sendSize);
+    return i2clib_write(handle, deviceAddress,
+                        reinterpret_cast<const char*>(dataToSend), sendSize);
   }
 }
 

@@ -172,7 +172,8 @@ void HAL_SetFPGAEncoderMaxPeriod(HAL_FPGAEncoderHandle fpga_encoder_handle,
     return;
   }
   encoder->encoder->writeTimerConfig_StallPeriod(
-      (uint32_t)(maxPeriod * 4.0e8 * DECODING_SCALING_FACTOR), status);
+      static_cast<uint32_t>(maxPeriod * 4.0e8 * DECODING_SCALING_FACTOR),
+      status);
 }
 
 /**

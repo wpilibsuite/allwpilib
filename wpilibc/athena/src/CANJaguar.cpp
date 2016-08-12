@@ -22,8 +22,10 @@
 #define swap32(x) (x)
 
 /* Compare floats for equality as fixed point numbers */
-#define FXP8_EQ(a, b) ((int16_t)((a)*256.0) == (int16_t)((b)*256.0))
-#define FXP16_EQ(a, b) ((int32_t)((a)*65536.0) == (int32_t)((b)*65536.0))
+#define FXP8_EQ(a, b) \
+  (static_cast<int16_t>((a)*256.0) == static_cast<int16_t>((b)*256.0))
+#define FXP16_EQ(a, b) \
+  (static_cast<int32_t>((a)*65536.0) == static_cast<int32_t>((b)*65536.0))
 
 const int32_t CANJaguar::kControllerRate;
 constexpr double CANJaguar::kApproxBusVoltage;
@@ -912,7 +914,7 @@ void CANJaguar::verify() {
                    &dataSize)) {
       uint16_t faultTime = unpackint16_t(dataBuffer);
 
-      if ((uint16_t)(m_faultTime * 1000.0) == faultTime) {
+      if (static_cast<uint16_t>(m_faultTime * 1000.0) == faultTime) {
         m_faultTimeVerified = true;
       } else {
         // It's wrong - set it again
@@ -1919,7 +1921,7 @@ void CANJaguar::ConfigFaultTime(float faultTime) {
     faultTime = 3.0;
 
   // Message takes ms
-  dataSize = packint16_t(dataBuffer, (int16_t)(faultTime * 1000.0));
+  dataSize = packint16_t(dataBuffer, static_cast<int16_t>(faultTime * 1000.0));
   sendMessage(LM_API_CFG_FAULT_TIME, dataBuffer, dataSize);
 
   m_faultTime = faultTime;

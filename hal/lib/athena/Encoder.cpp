@@ -93,7 +93,7 @@ Encoder::~Encoder() {
 
 // CounterBase interface
 int32_t Encoder::Get(int32_t* status) const {
-  return (int32_t)(GetRaw(status) * DecodingScaleFactor());
+  return static_cast<int32_t>(GetRaw(status) * DecodingScaleFactor());
 }
 
 int32_t Encoder::GetRaw(int32_t* status) const {

@@ -118,16 +118,16 @@ void HAL_SetPWMConfig(HAL_DigitalHandle pwm_port_handle, double max,
       HAL_GetLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
   if (*status != 0) return;
 
-  int32_t maxPwm = (int32_t)((max - kDefaultPwmCenter) / loopTime +
-                             kDefaultPwmStepsDown - 1);
-  int32_t deadbandMaxPwm = (int32_t)(
+  int32_t maxPwm = static_cast<int32_t>((max - kDefaultPwmCenter) / loopTime +
+                                        kDefaultPwmStepsDown - 1);
+  int32_t deadbandMaxPwm = static_cast<int32_t>(
       (deadbandMax - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
-  int32_t centerPwm = (int32_t)((center - kDefaultPwmCenter) / loopTime +
-                                kDefaultPwmStepsDown - 1);
-  int32_t deadbandMinPwm = (int32_t)(
+  int32_t centerPwm = static_cast<int32_t>(
+      (center - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
+  int32_t deadbandMinPwm = static_cast<int32_t>(
       (deadbandMin - kDefaultPwmCenter) / loopTime + kDefaultPwmStepsDown - 1);
-  int32_t minPwm = (int32_t)((min - kDefaultPwmCenter) / loopTime +
-                             kDefaultPwmStepsDown - 1);
+  int32_t minPwm = static_cast<int32_t>((min - kDefaultPwmCenter) / loopTime +
+                                        kDefaultPwmStepsDown - 1);
 
   port->maxPwm = maxPwm;
   port->deadbandMaxPwm = deadbandMaxPwm;

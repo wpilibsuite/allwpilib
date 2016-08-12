@@ -54,8 +54,9 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
     } else if (t == 0xda) {
       // SOS marker. The next two bytes are a 16-bit big-endian int that is
       // the length of the SOS header, skip that
-      unsigned int len = (((unsigned int)(data[pos + 2] & 0xff)) << 8 |
-                          ((unsigned int)data[pos + 3] & 0xff));
+      unsigned int len = (static_cast<unsigned int>(data[pos + 2]) & 0xff)
+                             << 8 |
+                         (static_cast<unsigned int>(data[pos + 3]) & 0xff);
       pos += len + 2;
       // The next marker is the first marker that is 0xff followed by a non-RST
       // element. 0xff followed by 0x00 is an escaped 0xff. 0xd0-0xd7 are RST
@@ -70,8 +71,9 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
       // 16-bit
       // big-endian int with the length of the marker header, skip that then
       // continue searching
-      unsigned int len = (((unsigned int)(data[pos + 2] & 0xff)) << 8 |
-                          ((unsigned int)data[pos + 3] & 0xff));
+      unsigned int len = (static_cast<unsigned int>(data[pos + 2]) & 0xff)
+                             << 8 |
+                         (static_cast<unsigned int>(data[pos + 3]) & 0xff);
       pos += len + 2;
     }
   }
@@ -156,8 +158,8 @@ void USBCamera::UpdateSettings() {
   for (unsigned int i = 0; i < count; i++) {
     std::cmatch m;
     if (!std::regex_match(modes[i].Name, m, reMode)) continue;
-    unsigned int width = (unsigned int)std::stoul(m[1].str());
-    unsigned int height = (unsigned int)std::stoul(m[2].str());
+    unsigned int width = static_cast<unsigned int>(std::stoul(m[1].str()));
+    unsigned int height = static_cast<unsigned int>(std::stoul(m[2].str()));
     if (width != m_width) continue;
     if (height != m_height) continue;
     double fps = atof(m[4].str().c_str());

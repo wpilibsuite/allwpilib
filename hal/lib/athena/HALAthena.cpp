@@ -210,7 +210,8 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
   // check for rollover
   if (fpgaTime < prevFPGATime) ++timeEpoch;
   prevFPGATime = fpgaTime;
-  return (((uint64_t)timeEpoch) << 32) | ((uint64_t)fpgaTime);
+  return static_cast<uint64_t>(timeEpoch) << 32 |
+         static_cast<uint64_t>(fpgaTime);
 }
 
 /**

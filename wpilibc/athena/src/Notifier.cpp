@@ -47,8 +47,8 @@ Notifier::~Notifier() {
  */
 void Notifier::UpdateAlarm() {
   int32_t status = 0;
-  HAL_UpdateNotifierAlarm(m_notifier, (uint64_t)(m_expirationTime * 1e6),
-                          &status);
+  HAL_UpdateNotifierAlarm(
+      m_notifier, static_cast<uint64_t>(m_expirationTime * 1e6), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 

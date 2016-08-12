@@ -81,7 +81,7 @@ void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analog_output_handle,
     return;
   }
 
-  uint16_t rawValue = (uint16_t)(voltage / 5.0 * 0x1000);
+  uint16_t rawValue = static_cast<uint16_t>(voltage / 5.0 * 0x1000);
 
   if (voltage < 0.0)
     rawValue = 0;

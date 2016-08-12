@@ -9,7 +9,26 @@ and a patch was applied:
 diff --git a/styleguide/cpplint.py b/styleguide/cpplint.py
 --- a/styleguide/cpplint.py
 +++ b/styleguide/cpplint.py
-@@ -6094,13 +6094,6 @@ def ParseArguments(args):
+@@ -5108,7 +5108,8 @@ def CheckCasts(filename, clean_lines, linenum, error):
+ 
+   if not expecting_function:
+     CheckCStyleCast(filename, clean_lines, linenum, 'static_cast',
+-                    r'\((int|float|double|bool|char|u?int(16|32|64))\)', error)
++                    r'\(((unsigned )?(char|(short |long )?int|long)|float|'
++                    'double|bool|u?int(8_t|16_t|32_t|64_t))\)', error)
+ 
+   # This doesn't catch all cases. Consider (const char * const)"hello".
+   #
+@@ -5120,7 +5121,7 @@ def CheckCasts(filename, clean_lines, linenum, error):
+   else:
+     # Check pointer casts for other than string constants
+     CheckCStyleCast(filename, clean_lines, linenum, 'reinterpret_cast',
+-                    r'\((\w+\s?\*+\s?)\)', error)
++                    r'\(((const )?\w+\s?\*+\s?)\)', error)
+ 
+   # In addition, we look for people taking the address of a cast.  This
+   # is dangerous -- casts can assign to temporaries, so the pointer doesn't
+@@ -6102,13 +6103,6 @@ def ParseArguments(args):
  def main():
    filenames = ParseArguments(sys.argv[1:])
  
