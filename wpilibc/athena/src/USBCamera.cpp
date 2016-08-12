@@ -54,9 +54,7 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
     } else if (t == 0xda) {
       // SOS marker. The next two bytes are a 16-bit big-endian int that is
       // the length of the SOS header, skip that
-      unsigned int len = (static_cast<unsigned int>(data[pos + 2]) & 0xff)
-                             << 8 |
-                         (static_cast<unsigned int>(data[pos + 3]) & 0xff);
+      unsigned int len = (data[pos + 2] & 0xffu) << 8 | (data[pos + 3] & 0xffu);
       pos += len + 2;
       // The next marker is the first marker that is 0xff followed by a non-RST
       // element. 0xff followed by 0x00 is an escaped 0xff. 0xd0-0xd7 are RST
@@ -71,9 +69,7 @@ unsigned int USBCamera::GetJpegSize(void* buffer, unsigned int buffSize) {
       // 16-bit
       // big-endian int with the length of the marker header, skip that then
       // continue searching
-      unsigned int len = (static_cast<unsigned int>(data[pos + 2]) & 0xff)
-                             << 8 |
-                         (static_cast<unsigned int>(data[pos + 3]) & 0xff);
+      unsigned int len = (data[pos + 2] & 0xffu) << 8 | (data[pos + 3] & 0xffu);
       pos += len + 2;
     }
   }
