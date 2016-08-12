@@ -75,11 +75,11 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
       m_outputGains(fbGains) {}
 
 /**
- * Creates a one-pole IIR low-pass filter of the form:
- *   y[n] = (1-gain)*x[n] + gain*y[n-1]
- * where gain = e^(-dt / T), T is the time constant in seconds
+ * Creates a one-pole IIR low-pass filter of the form:<br>
+ *   y[n] = (1 - gain) * x[n] + gain * y[n-1]<br>
+ * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
  *
- * This filter is stable for time constants greater than zero
+ * This filter is stable for time constants greater than zero.
  *
  * @param source       The PIDSource object that is used to get values
  * @param timeConstant The discrete-time time constant in seconds
@@ -92,11 +92,11 @@ LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(
 }
 
 /**
- * Creates a first-order high-pass filter of the form:
- *   y[n] = gain*x[n] + (-gain)*x[n-1] + gain*y[n-1]
- * where gain = e^(-dt / T), T is the time constant in seconds
+ * Creates a first-order high-pass filter of the form:<br>
+ *   y[n] = gain * x[n] + (-gain) * x[n-1] + gain * y[n-1]<br>
+ * where gain = e<sup>-dt / T</sup>, T is the time constant in seconds
  *
- * This filter is stable for time constants greater than zero
+ * This filter is stable for time constants greater than zero.
  *
  * @param source       The PIDSource object that is used to get values
  * @param timeConstant The discrete-time time constant in seconds
@@ -109,8 +109,8 @@ LinearDigitalFilter LinearDigitalFilter::HighPass(
 }
 
 /**
- * Creates a K-tap FIR moving average filter of the form:
- *   y[n] = 1/k * (x[k] + x[k-1] + ... + x[0])
+ * Creates a K-tap FIR moving average filter of the form:<br>
+ *   y[n] = 1/k * (x[k] + x[k-1] + … + x[0])
  *
  * This filter is always stable.
  *
