@@ -12,6 +12,8 @@ dependencies {
 task wpilibjSimJar(type: Jar, dependsOn: simClasses) {
     description = 'Creates the WPILibJSimulation Jar'
     group = 'WPILib Simulation'
+    duplicatesStrategy = 'exclude'
+
     def addClasspath = { classpath ->
         classpath.files.findAll { it.exists() }.each {
             if (file(it).directory) {
@@ -34,6 +36,8 @@ task wpilibjSimSources(type: Jar, dependsOn: simClasses) {
     description = 'Creates the wpilibjSimulation sources jar for the maven publishing routine'
     group = 'WPILib'
     classifier = 'sources'
+    duplicatesStrategy = 'exclude'
+
     from sourceSets.sim.allJava
     from sourceSets.shared.allJava
 }
@@ -50,6 +54,8 @@ task wpilibjSimJavadocJar(type: Jar, dependsOn: wpilibjSimJavadoc) {
     description = 'Creates the wpilibjSimulation javadoc jar for the maven publishing routine'
     group = 'WPILib'
     classifier = 'javadoc'
+    duplicatesStrategy = 'exclude'
+
     from wpilibjSimJavadoc.destinationDir
 }
 

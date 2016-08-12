@@ -31,5 +31,7 @@ task zip(type: Zip, dependsOn: [copy_resources,
     description = 'zip of all the resources for simulation'
     group = 'WPILib Simulation'
     baseName = 'simulation-trusty'
+    duplicatesStrategy = 'exclude'
+
     from "$simulationInstallDir"
 }
