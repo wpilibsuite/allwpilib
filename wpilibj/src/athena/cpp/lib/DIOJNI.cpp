@@ -43,8 +43,8 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDIOPort(
   auto dio = HAL_InitializeDIOPort((HAL_PortHandle)id, (uint8_t)input, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "DIO Handle = " << dio;
-  CheckStatusRange(env, 0, HAL_GetNumDigitalPins(), 
-                   hal::getPortHandlePin((HAL_PortHandle)id), status);
+  CheckStatusRange(env, 0, HAL_GetNumDigitalChannels(),
+                   hal::getPortHandleChannel((HAL_PortHandle)id), status);
   return (jint)dio;
 }
 
@@ -261,7 +261,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDigitalPWMOutputChannel(
     JNIEnv* env, jclass, jint id, jint value) {
   DIOJNI_LOG(logDEBUG) << "Calling DIOJNI setDigitalPWMOutputChannel";
   DIOJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalPWMHandle)id;
-  DIOJNI_LOG(logDEBUG) << "Pin= " << value;
+  DIOJNI_LOG(logDEBUG) << "Channel= " << value;
   int32_t status = 0;
   HAL_SetDigitalPWMOutputChannel((HAL_DigitalPWMHandle)id, (uint32_t)value, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;

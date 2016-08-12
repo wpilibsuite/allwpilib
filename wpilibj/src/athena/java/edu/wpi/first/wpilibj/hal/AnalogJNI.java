@@ -43,9 +43,9 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native boolean checkAnalogModule(byte module);
 
-  public static native boolean checkAnalogInputChannel(int pin);
+  public static native boolean checkAnalogInputChannel(int channel);
 
-  public static native boolean checkAnalogOutputChannel(int pin);
+  public static native boolean checkAnalogOutputChannel(int channel);
 
   public static native void setAnalogOutput(int portHandle, double voltage);
 

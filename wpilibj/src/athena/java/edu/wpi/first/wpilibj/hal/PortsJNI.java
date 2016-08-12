@@ -22,9 +22,9 @@ public class PortsJNI extends JNIWrapper {
 
   public static native int getNumPWMHeaders();
 
-  public static native int getNumDigitalPins();
+  public static native int getNumDigitalChannels();
 
-  public static native int getNumPWMPins();
+  public static native int getNumPWMChannels();
 
   public static native int getNumDigitalPWMOutputs();
 
@@ -32,13 +32,13 @@ public class PortsJNI extends JNIWrapper {
 
   public static native int getNumInterrupts();
 
-  public static native int getNumRelayPins();
+  public static native int getNumRelayChannels();
 
   public static native int getNumRelayHeaders();
 
   public static native int getNumPCMModules();
 
-  public static native int getNumSolenoidPins();
+  public static native int getNumSolenoidChannels();
 
   public static native int getNumPDPModules();
 

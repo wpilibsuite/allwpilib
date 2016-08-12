@@ -8,7 +8,7 @@
 #include "HAL/handles/HandlesInternal.h"
 
 namespace hal {
-HAL_PortHandle createPortHandle(uint8_t pin, uint8_t module) {
+HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module) {
   // set last 8 bits, then shift to first 8 bits
   HAL_PortHandle handle = static_cast<HAL_PortHandle>(HAL_HandleEnum::Port);
   handle = handle << 24;
@@ -16,8 +16,8 @@ HAL_PortHandle createPortHandle(uint8_t pin, uint8_t module) {
   int32_t temp = module;
   temp = (temp << 8) & 0xff00;
   handle += temp;
-  // add pin to last 8 bits
-  handle += pin;
+  // add channel to last 8 bits
+  handle += channel;
   return handle;
 }
 

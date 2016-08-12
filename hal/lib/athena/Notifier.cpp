@@ -48,11 +48,11 @@ static UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
 
 // internal version of updateAlarm used during the alarmCallback when we know
 // that the pointer is a valid pointer.
-void updateNotifierAlarmInternal(std::shared_ptr<Notifier> notifier_pointer,
+void updateNotifierAlarmInternal(std::shared_ptr<Notifier> notifierPointer,
                                  uint64_t triggerTime, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
 
-  auto notifier = notifier_pointer;
+  auto notifier = notifierPointer;
   // no need for a null check, as this must always be a valid pointer.
   notifier->triggerTime = triggerTime;
   bool wasActive = (closestTrigger != UINT64_MAX);
@@ -140,17 +140,17 @@ HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, void*),
   return notifierHandles.Allocate(notifier);
 }
 
-void HAL_CleanNotifier(HAL_NotifierHandle notifier_handle, int32_t* status) {
+void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   {
     std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
-    auto notifier = notifierHandles.Get(notifier_handle);
+    auto notifier = notifierHandles.Get(notifierHandle);
     if (!notifier) return;
 
     // remove from list
     if (notifier->prev) notifier->prev->next = notifier->next;
     if (notifier->next) notifier->next->prev = notifier->prev;
     if (notifiers == notifier) notifiers = notifier->next;
-    notifierHandles.Free(notifier_handle);
+    notifierHandles.Free(notifierHandle);
   }
 
   if (notifierRefCount.fetch_sub(1) == 1) {
@@ -168,26 +168,24 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifier_handle, int32_t* status) {
   }
 }
 
-void* HAL_GetNotifierParam(HAL_NotifierHandle notifier_handle,
-                           int32_t* status) {
-  auto notifier = notifierHandles.Get(notifier_handle);
+void* HAL_GetNotifierParam(HAL_NotifierHandle notifierHandle, int32_t* status) {
+  auto notifier = notifierHandles.Get(notifierHandle);
   if (!notifier) return nullptr;
   return notifier->param;
 }
 
-void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifier_handle,
+void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
 
-  auto notifier = notifierHandles.Get(notifier_handle);
+  auto notifier = notifierHandles.Get(notifierHandle);
   if (!notifier) return;
   updateNotifierAlarmInternal(notifier, triggerTime, status);
 }
 
-void HAL_StopNotifierAlarm(HAL_NotifierHandle notifier_handle,
-                           int32_t* status) {
+void HAL_StopNotifierAlarm(HAL_NotifierHandle notifierHandle, int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
-  auto notifier = notifierHandles.Get(notifier_handle);
+  auto notifier = notifierHandles.Get(notifierHandle);
   if (!notifier) return;
   notifier->triggerTime = UINT64_MAX;
 }

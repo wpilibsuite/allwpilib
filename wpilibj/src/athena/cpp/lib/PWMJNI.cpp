@@ -42,8 +42,8 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_initializePWMPort(
   auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << pwm;
-  CheckStatusRange(env, 0, HAL_GetNumPWMPins(), 
-                   hal::getPortHandlePin((HAL_PortHandle)id), status);
+  CheckStatusRange(env, 0, HAL_GetNumPWMChannels(),
+                   hal::getPortHandleChannel((HAL_PortHandle)id), status);
   return (jint)pwm;
 }
 

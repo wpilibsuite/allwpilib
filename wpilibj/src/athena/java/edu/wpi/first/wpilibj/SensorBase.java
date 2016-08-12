@@ -29,7 +29,7 @@ public abstract class SensorBase { // TODO: Refactor
   /**
    * Number of digital channels per roboRIO.
    */
-  public static final int kDigitalChannels = PortsJNI.getNumDigitalPins();
+  public static final int kDigitalChannels = PortsJNI.getNumDigitalChannels();
   /**
    * Number of analog input channels.
    */
@@ -41,11 +41,11 @@ public abstract class SensorBase { // TODO: Refactor
   /**
    * Number of solenoid channels per module.
    */
-  public static final int kSolenoidChannels = PortsJNI.getNumSolenoidPins();
+  public static final int kSolenoidChannels = PortsJNI.getNumSolenoidChannels();
   /**
    * Number of PWM channels per roboRIO.
    */
-  public static final int kPwmChannels = PortsJNI.getNumPWMPins();
+  public static final int kPwmChannels = PortsJNI.getNumPWMChannels();
   /**
    * Number of relay channels per roboRIO.
    */

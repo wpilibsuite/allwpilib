@@ -41,8 +41,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_initializeRelayPo
   HAL_RelayHandle handle = HAL_InitializeRelayPort((HAL_PortHandle)id, (uint8_t) fwd, &status);
   RELAYJNI_LOG(logDEBUG) << "Status = " << status;
   RELAYJNI_LOG(logDEBUG) << "Relay Handle = " << handle;
-  CheckStatusRange(env, 0, HAL_GetNumRelayPins(), 
-                   hal::getPortHandlePin((HAL_PortHandle)id), status);
+  CheckStatusRange(env, 0, HAL_GetNumRelayChannels(),
+                   hal::getPortHandleChannel((HAL_PortHandle)id), status);
   return (jint) handle;
 }
 

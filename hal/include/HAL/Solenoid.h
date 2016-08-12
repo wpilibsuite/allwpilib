@@ -14,15 +14,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle port_handle,
+HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
                                               int32_t* status);
-void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoid_port_handle);
+void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle);
 HAL_Bool HAL_CheckSolenoidModule(int32_t module);
-HAL_Bool HAL_CheckSolenoidChannel(int32_t pin);
-HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoid_port_handle,
+HAL_Bool HAL_CheckSolenoidChannel(int32_t channel);
+HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoidPortHandle,
                          int32_t* status);
 int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status);
-void HAL_SetSolenoid(HAL_SolenoidHandle solenoid_port_handle, HAL_Bool value,
+void HAL_SetSolenoid(HAL_SolenoidHandle solenoidPortHandle, HAL_Bool value,
                      int32_t* status);
 int32_t HAL_GetPCMSolenoidBlackList(int32_t module, int32_t* status);
 HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status);

@@ -35,7 +35,7 @@ PWM::PWM(uint32_t channel) {
   int32_t status = 0;
   m_handle = HAL_InitializePWMPort(HAL_GetPort(channel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumPWMPins(), channel,
+    wpi_setErrorWithContextRange(status, 0, HAL_GetNumPWMChannels(), channel,
                                  HAL_GetErrorMessage(status));
     m_channel = std::numeric_limits<uint32_t>::max();
     m_handle = HAL_kInvalidHandle;

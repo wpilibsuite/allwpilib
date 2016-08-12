@@ -42,9 +42,9 @@ static void Wait(double seconds) {
 }
 
 extern "C" {
-HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analog_handle,
+HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
                                         int32_t* status) {
-  if (!HAL_IsAccumulatorChannel(analog_handle, status)) {
+  if (!HAL_IsAccumulatorChannel(analogHandle, status)) {
     if (*status == 0) {
       *status = HAL_INVALID_ACCUMULATOR_CHANNEL;
     }
@@ -52,7 +52,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analog_handle,
   }
 
   // handle known to be correct, so no need to type check
-  int16_t channel = getHandleIndex(analog_handle);
+  int16_t channel = getHandleIndex(analogHandle);
 
   auto handle = analogGyroHandles.Allocate(channel, status);
 
@@ -66,7 +66,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analog_handle,
     return HAL_kInvalidHandle;
   }
 
-  gyro->handle = analog_handle;
+  gyro->handle = analogHandle;
   gyro->voltsPerDegreePerSecond = 0;
   gyro->offset = 0;
   gyro->center = 0;

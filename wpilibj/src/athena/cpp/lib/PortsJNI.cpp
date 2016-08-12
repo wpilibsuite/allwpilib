@@ -131,14 +131,14 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPWMHeaders(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
- * Method:    getNumDigitalPins
+ * Method:    getNumDigitalChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalPins(
+Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalChannels(
     JNIEnv *env, jclass) {
-  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumDigitalPins";
-  jint value = HAL_GetNumDigitalPins();
+  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumDigitalChannels";
+  jint value = HAL_GetNumDigitalChannels();
   PORTSJNI_LOG(logDEBUG) << "Value = " << value;
   return value;
 }
@@ -146,14 +146,14 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumDigitalPins(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
- * Method:    getNumPWMPins
+ * Method:    getNumPWMChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPWMPins(
+Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPWMChannels(
     JNIEnv *env, jclass) {
-  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumPWMPins";
-  jint value = HAL_GetNumPWMPins();
+  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumPWMChannels";
+  jint value = HAL_GetNumPWMChannels();
   PORTSJNI_LOG(logDEBUG) << "Value = " << value;
   return value;
 }
@@ -206,14 +206,14 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumInterrupts(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
- * Method:    getNumRelayPins
+ * Method:    getNumRelayChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumRelayPins(
+Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumRelayChannels(
     JNIEnv *env, jclass) {
-  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumRelayPins";
-  jint value = HAL_GetNumRelayPins();
+  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumRelayChannels";
+  jint value = HAL_GetNumRelayChannels();
   PORTSJNI_LOG(logDEBUG) << "Value = " << value;
   return value;
 }
@@ -251,14 +251,14 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPCMModules(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
- * Method:    getNumSolenoidPins
+ * Method:    getNumSolenoidChannels
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumSolenoidPins(
+Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumSolenoidChannels(
     JNIEnv *env, jclass) {
-  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumSolenoidPins";
-  jint value = HAL_GetNumSolenoidPins();
+  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumSolenoidChannels";
+  jint value = HAL_GetNumSolenoidChannels();
   PORTSJNI_LOG(logDEBUG) << "Value = " << value;
   return value;
 }

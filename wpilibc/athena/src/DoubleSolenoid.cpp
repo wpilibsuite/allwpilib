@@ -56,7 +56,7 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
   m_forwardHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_forwardChannel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidPins(),
+    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
                                  forwardChannel, HAL_GetErrorMessage(status));
     m_forwardHandle = HAL_kInvalidHandle;
     m_reverseHandle = HAL_kInvalidHandle;
@@ -66,7 +66,7 @@ DoubleSolenoid::DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
   m_reverseHandle = HAL_InitializeSolenoidPort(
       HAL_GetPortWithModule(moduleNumber, m_reverseChannel), &status);
   if (status != 0) {
-    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidPins(),
+    wpi_setErrorWithContextRange(status, 0, HAL_GetNumSolenoidChannels(),
                                  reverseChannel, HAL_GetErrorMessage(status));
     // free forward solenoid
     HAL_FreeSolenoidPort(m_forwardHandle);
