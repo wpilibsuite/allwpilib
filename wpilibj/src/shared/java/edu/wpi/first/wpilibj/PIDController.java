@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.TimerTask;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
@@ -52,7 +50,9 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   // the tolerance object used to check if on target
   private Tolerance m_tolerance;
   private int m_bufLength = 1;
-  private Queue<Double> m_buf;
+  private double[] m_buf;
+  private int m_bufSize = 0;
+  private int m_bufPos = 0;
   private double m_bufTotal = 0.0;
   private double m_setpoint = 0.0;
   private double m_prevSetpoint = 0.0;
@@ -172,7 +172,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     HLUsageReporting.reportPIDController(instances);
     m_tolerance = new NullTolerance();
 
-    m_buf = new ArrayDeque<Double>(m_bufLength + 1);
+    m_buf = new double[m_bufLength];
   }
 
   /**
@@ -311,12 +311,18 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         result = m_result;
 
         // Update the buffer.
-        m_buf.add(input);
-        m_bufTotal += input;
-        // Remove old elements when the buffer is full.
-        if (m_buf.size() > m_bufLength) {
-          m_bufTotal -= m_buf.remove();
+        if (m_bufSize < m_bufLength) {
+          m_buf[m_bufSize] = input;
+          m_bufSize++;
+        } else {
+          if (m_bufPos >= m_bufLength) {
+            m_bufPos = 0;
+          }
+          m_bufTotal -= m_buf[m_bufPos];
+          m_buf[m_bufPos] = input;
+          m_bufPos++;
         }
+        m_bufTotal += input;
       }
 
       pidOutput.pidWrite(result);
@@ -565,8 +571,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   public synchronized double getAvgError() {
     double avgError = 0;
     // Don't divide by zero.
-    if (m_buf.size() != 0) {
-      avgError = m_setpoint - m_bufTotal / m_buf.size();
+    if (m_bufSize != 0) {
+      avgError = m_setpoint - m_bufTotal / m_bufSize;
     }
     return avgError;
   }
@@ -578,7 +584,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @return True if {@link #getAvgError()} is currently valid.
    */
   private synchronized boolean isAvgErrorValid() {
-    return m_buf.size() != 0;
+    return m_bufSize != 0;
   }
 
   /**
@@ -635,11 +641,16 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @param bufLength Number of previous cycles to average.
    */
   public synchronized void setToleranceBuffer(int bufLength) {
+    if (bufLength > m_bufLength) {
+      m_buf = java.util.Arrays.copyOf(m_buf, bufLength);
+    }
     m_bufLength = bufLength;
 
-    // Cut the existing buffer down to size if needed.
-    while (m_buf.size() > bufLength) {
-      m_bufTotal -= m_buf.remove();
+    // Cut the existing buffer down to size if needed.  Note: this does not
+    // necessarily throw away the least recent samples.
+    while (m_bufSize > bufLength) {
+      m_bufSize--;
+      m_bufTotal -= m_buf[m_bufSize];
     }
   }
 
@@ -674,7 +685,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     m_enabled = false;
 
     // Clear buffer
-    m_buf.clear();
+    m_bufSize = 0;
     m_bufTotal = 0;
 
     if (m_table != null) {

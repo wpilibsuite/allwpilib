@@ -131,7 +131,8 @@ class PIDController : public LiveWindowSendable,
 
   // Length of buffer for averaging for tolerances.
   std::atomic<unsigned> m_bufLength{1};
-  std::queue<double> m_buf;
+  std::vector<double> m_buf;
+  unsigned m_bufPos = 0;
   double m_bufTotal = 0;
 
   mutable priority_recursive_mutex m_mutex;
