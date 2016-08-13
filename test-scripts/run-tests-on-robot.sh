@@ -180,4 +180,17 @@ elif [[ ${LANGUAGE} = cpp ]]; then
 fi
 
 printf "Running: %s\n\n" "${RUN_COMMAND}"
+COREDUMP_DIR=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/coredump
+mkdir -p ${COREDUMP_DIR}
+CORE_LOCATION=${COREDUMP_DIR}/core
+echo ${CORE_LOCATION} > /proc/sys/kernel/core_pattern
+ulimit -c unlimited
 eval ${RUN_COMMAND}
+if [[ $? -gt 127 && -e ${CORE_LOCATION} ]]; then
+	mv ${CORE_LOCATION} ${COREDUMP_DIR}/core.${LANGUAGE}
+	if [[ ${LANGUAGE} = java ]]; then
+		cp -p ${DEFAULT_JAVA_TEST_NAME} ${COREDUMP_DIR}/
+	elif [[ ${LANGUAGE} = cpp ]]; then
+		cp -p ${DEFAULT_CPP_TEST_NAME} ${COREDUMP_DIR}/
+	fi
+fi
