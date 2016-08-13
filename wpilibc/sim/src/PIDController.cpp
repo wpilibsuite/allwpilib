@@ -170,6 +170,17 @@ void PIDController::Calculate() {
     }
 
     pidOutput->PIDWrite(result);
+
+    // Update the buffer.
+    if (m_buf.size() < m_bufLength) {
+      m_buf.push_back(input);
+    } else {
+      if (m_bufPos >= m_bufLength) m_bufPos = 0;
+      m_bufTotal -= m_buf[m_bufPos];
+      m_buf[m_bufPos] = input;
+      ++m_bufPos;
+    }
+    m_bufTotal += input;
   }
 }
 
@@ -487,10 +498,11 @@ void PIDController::SetToleranceBuffer(unsigned bufLength) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_bufLength = bufLength;
 
-  // Cut the buffer down to size if needed.
+  // Cut the buffer down to size if needed.  Note: this does not necessarily
+  // throw away the least recent samples.
   while (m_buf.size() > bufLength) {
-    m_bufTotal -= m_buf.front();
-    m_buf.pop();
+    m_bufTotal -= m_buf.back();
+    m_buf.pop_back();
   }
 }
 
