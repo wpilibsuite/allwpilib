@@ -181,3 +181,6 @@ NO
 
 # Simulation folder stuff
 !simulation/install_resources/*
+
+# VSCode
+.vscode/
