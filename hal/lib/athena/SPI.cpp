@@ -328,7 +328,10 @@ void HAL_SetSPIHandle(int32_t port, int32_t handle) {
   }
 }
 
-static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
+static void spiAccumulatorProcess(uint64_t currentTime, HAL_NotifierHandle handle) {
+  int32_t status = 0;
+  auto param = HAL_GetNotifierParam(handle, &status);
+  if (param == nullptr) return;
   SPIAccumulator* accum = static_cast<SPIAccumulator*>(param);
 
   // perform SPI transaction
@@ -376,7 +379,7 @@ static void spiAccumulatorProcess(uint64_t currentTime, void* param) {
   // handle timer slip
   if (accum->triggerTime < currentTime)
     accum->triggerTime = currentTime + accum->period;
-  int32_t status = 0;
+  status = 0;
   HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, &status);
 }
 

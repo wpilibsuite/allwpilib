@@ -32,8 +32,9 @@ namespace {
 struct Notifier {
   std::shared_ptr<Notifier> prev, next;
   void* param;
-  void (*process)(uint64_t, void*);
+  void (*process)(uint64_t, HAL_NotifierHandle);
   uint64_t triggerTime = UINT64_MAX;
+  HAL_NotifierHandle handle;
 };
 }
 static std::shared_ptr<Notifier> notifiers;
@@ -90,9 +91,9 @@ static void alarmCallback(uint32_t, void*) {
       if (notifier->triggerTime < currentTime) {
         notifier->triggerTime = UINT64_MAX;
         auto process = notifier->process;
-        auto param = notifier->param;
+        auto handle = notifier->handle;
         sync.unlock();
-        process(currentTime, param);
+        process(currentTime, handle);
         sync.lock();
       } else if (notifier->triggerTime < closestTrigger) {
         updateNotifierAlarmInternal(notifier, notifier->triggerTime, &status);
@@ -109,7 +110,7 @@ static void cleanupNotifierAtExit() {
 
 extern "C" {
 
-HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, void*),
+HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, HAL_NotifierHandle),
                                           void* param, int32_t* status) {
   if (!process) {
     *status = NULL_PARAMETER;
@@ -130,14 +131,20 @@ HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, void*),
   }
 
   std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
-  // create notifier structure and add to list
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
+  HAL_NotifierHandle handle = notifierHandles.Allocate(notifier);
+  if (handle == HAL_kInvalidHandle) {
+	  *status = HAL_HANDLE_ERROR;
+	  return HAL_kInvalidHandle;
+  }
+  // create notifier structure and add to list
   notifier->next = notifiers;
   if (notifier->next) notifier->next->prev = notifier;
   notifier->param = param;
   notifier->process = process;
+  notifier->handle = handle;
   notifiers = notifier;
-  return notifierHandles.Allocate(notifier);
+  return handle;
 }
 
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
