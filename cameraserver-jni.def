@@ -1,0 +1,4 @@
+LIBRARY CAMERASERVER
+EXPORTS
+
+; JNI functions

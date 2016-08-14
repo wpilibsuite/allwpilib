@@ -1,0 +1,139 @@
+import org.gradle.internal.os.OperatingSystem
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.8'
+    }
+}
+
+// Determine what repo to publish to. Default is development. Valid options are development, beta, stable, and release
+if (!hasProperty('repo')) {
+    allprojects {
+        ext.repo = 'development'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven {
+            url "${System.getProperty('user.home')}/releases/maven/${repo}"
+        }
+        maven {
+            url "http://first.wpi.edu/FRC/roborio/maven/${repo}"
+        }
+    }
+}
+
+ext.buildArm = !project.hasProperty('skipArm')
+ext.includeJava = !project.hasProperty('skipJava')
+
+if (hasProperty('makeDesktop')) {
+    println 'Making desktop classifier jar. NOTE: This desktop version should only be used for local testing.' +
+            'It will only support the current platform, and will override fetching the latest development version from' +
+            ' the maven repo until you manually delete it!'
+}
+
+ext.getPlatformPath2 = { targetPlatform ->
+    if (targetPlatform.architecture.arm) {
+        return 'Linux/arm'
+    } else if (targetPlatform.operatingSystem.linux) {
+        if (targetPlatform.architecture.amd64) {
+            return 'Linux/amd64'
+        } else {
+            return 'Linux/' + targetPlatform.architecture.name
+        }
+    } else if (targetPlatform.operatingSystem.windows) {
+        if (targetPlatform.architecture.amd64) {
+            return 'Windows/amd64'
+        } else {
+            return 'Windows/' + targetPlatform.architecture.name
+        }
+    } else if (targetPlatform.operatingSystem.macOsX) {
+        if (targetPlatform.architecture.amd64) {
+            return 'Mac OS X/x86_64'
+        } else {
+            return 'Mac OS X/' + targetPlatform.architecture.name
+        }
+    } else {
+        return targetPlatform.operatingSystem.name + '/' + targetPlatform.architecture.name
+    }
+}
+
+ext.getPlatformPath = { binary ->
+    return getPlatformPath2(binary.targetPlatform)
+}
+
+ext.useWpiUtil = { project ->
+    def wpiUtilDependency =
+        project.dependencies.create("edu.wpi.first.wpilib:wpiutil:1.0.0-SNAPSHOT:${project.isArm ? 'arm' : 'desktop'}@zip")
+    def wpiUtilConfig = project.configurations.detachedConfiguration(wpiUtilDependency)
+    wpiUtilConfig.setTransitive(false)
+    def wpiUtil = wpiUtilConfig.files[0].canonicalFile
+    def wpiUtilUnzipLocation = "${project.buildDir}/wpiutil"
+
+    // Create a task that will unzip the wpiutil files into a temporary build directory
+    project.tasks.create(name: "unzipWpiUtil", type: Copy) {
+	description = 'Unzips the wpiutil maven dependency so that the include files and libraries can be used'
+	group = 'WPILib'
+	from zipTree(wpiUtil)
+	into wpiUtilUnzipLocation
+    }
+
+    project.ext.wpiUtil = wpiUtilUnzipLocation
+    project.ext.wpiUtilInclude = "$wpiUtilUnzipLocation/include"
+
+    project.ext.addWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
+        compileTask.dependsOn "unzipWpiUtil"
+        String path = project.getPlatformPath2(targetPlatform)
+        if (targetPlatform.operatingSystem.windows) {
+            linker.args "${project.wpiUtil}/${path}/wpiutil.lib"
+        } else {
+            linker.args "${project.wpiUtil}/${path}/libwpiutil.a"
+        }
+    }
+//    project.model {
+//        repositories {
+//            libwpiutil(PrebuiltLibraries) {
+//                wpiutil {
+//                    headers.srcDir "${project.wpiUtilUnzipLocation}/include"
+//                    binaries.withType(StaticLibraryBinary) {
+//                        staticLibraryFile = file("${project.wpiUtil}/libwpiutil.a")
+//                    }
+//                }
+//            }
+//        }
+//    }
+}
+
+ext.setupDefines = { project, binaries ->
+    binaries.all {
+	if (project.hasProperty('debug')) {
+	    project.setupDebugDefines(cppCompiler, linker)
+	} else {
+	    project.setupReleaseDefines(cppCompiler, linker)
+	}
+        tasks.withType(CppCompile) {
+            project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
+        }
+    }
+}
+
+apply from: "cameraserver.gradle"
+
+// Empty task for build so that cameraserverSourceZip will be
+// built when running ./gradlew build
+task build
+
+build.dependsOn cameraserverSourceZip
+
+apply from: 'publish.gradle'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14'
+}

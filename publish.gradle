@@ -1,0 +1,54 @@
+import org.gradle.internal.os.OperatingSystem
+
+apply plugin: 'maven-publish'
+
+// We change what repo we publish to depending on whether this is a development, beta, stable, or full
+// release. This is set up in the main gradle file.
+publishing {
+    publications {
+        def nat = project('native')
+        if (!project.hasProperty('skipJava')) {
+            java(MavenPublication) {
+                artifact nat.jar
+                artifact nat.cameraserverJavaSource
+                artifact nat.cameraserverJavadoc
+                if (project.buildArm) {
+                    artifact project('arm').jar
+                }
+
+                if (project.hasProperty('makeDesktop')) {
+                    artifact nat.jar, {
+                        classifier = 'desktop'
+                    }
+                }
+
+                groupId 'edu.wpi.cameraserver.java'
+                artifactId 'CameraServer'
+                version '1.0.0-SNAPSHOT'
+            }
+        }
+        cpp(MavenPublication) {
+            artifact nat.cameraserverZip
+            artifact cameraserverSourceZip
+            if (project.buildArm) {
+                artifact project(':arm').cameraserverZip
+            }
+
+            if (project.hasProperty('makeDesktop')) {
+                artifact nat.cameraserverZip, {
+                    classifier = 'desktop'
+                }
+            }
+
+            groupId 'edu.wpi.cameraserver.cpp'
+            artifactId 'CameraServer'
+            version '1.0.0-SNAPSHOT'
+        }
+    }
+
+    repositories {
+        maven {
+            url "${System.getProperty('user.home')}/releases/maven/${project.repo}"
+        }
+    }
+}

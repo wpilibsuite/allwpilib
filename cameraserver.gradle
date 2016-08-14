@@ -1,0 +1,166 @@
+def cameraserverSetupModel = { project ->
+    project.model {
+        components {
+            cameraserver(NativeLibrarySpec) {
+                if (project.isArm) {
+                    targetPlatform 'arm'
+                } else {
+                    targetPlatform 'x86'
+                    targetPlatform 'x64'
+                }
+                setupDefines(project, binaries)
+
+                if (includeJava) {
+                    project.setupJniIncludes(binaries)
+                    binaries.all {
+                        project.setupDef(linker, "${rootDir}/cameraserver-jni.def")
+                    }
+                } else {
+                    binaries.all {
+                        project.setupDef(linker, "${rootDir}/cameraserver.def")
+                    }
+                }
+
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ["${rootDir}/src"]
+                            if (includeJava) {
+                                srcDirs "${rootDir}/java/lib"
+                            }
+                            includes = ['**/*.cpp']
+                        }
+                        exportedHeaders {
+                            srcDirs = ["${rootDir}/include", project.wpiUtilInclude]
+                            if (includeJava) {
+                                project.jniHeadersCameraServer.outputs.files.each { file ->
+                                    srcDirs file.getPath()
+                                }
+                            }
+                            includes = ['**/*.h']
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+def cameraserverZipTask = { project ->
+    project.ext.cameraserverZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}CameraserverZip", Zip) {
+        description = 'Creates platform-specific zip of the desktop cameraserver libraries.'
+        group = 'WPILib'
+        destinationDir = project.buildDir
+        baseName = 'cameraserver'
+        classifier = "${project.buildPlatform}"
+        duplicatesStrategy = 'exclude'
+
+        from(file('include')) {
+            into 'include'
+        }
+
+        if (!project.hasProperty('skipJava')) {
+            project.jniHeadersCameraServer.outputs.each {
+                from(it) {
+                    into 'include'
+                }
+            }
+        }
+
+        project.model {
+            binaries {
+                withType(StaticLibraryBinarySpec) { binary ->
+                    from(binary.staticLibraryFile) {
+                        into getPlatformPath(binary)
+                    }
+                }
+                withType(SharedLibraryBinarySpec) { binary ->
+                    from(binary.sharedLibraryFile) {
+                        into getPlatformPath(binary)
+                    }
+                }
+            }
+        }
+    }
+
+    project.build.dependsOn project.cameraserverZip
+
+    def releaseTasks = [project.cameraserverZip]
+
+    if (includeJava) {
+        releaseTasks.add(project.jar)
+    }
+
+    project.releaseSetup(releaseTasks)
+
+    project.tasks.whenTaskAdded { task ->
+        def name = task.name.toLowerCase()
+        if (name.contains("cameraserversharedlibrary") || name.contains("cameraserverstaticlibrary") || name.contains("cameraservertest")) {
+            project.cameraserverZip.dependsOn task
+        }
+    }
+}
+
+if (buildArm) {
+    project(':arm') {
+        apply plugin: 'cpp'
+
+        apply from: "${rootDir}/toolchains/arm.gradle"
+        if (includeJava) {
+            apply from: "${rootDir}/java/java.gradle"
+        }
+
+        cameraserverSetupModel(project)
+        cameraserverZipTask(project)
+        useWpiUtil(project)
+    }
+}
+
+project(':native') {
+    apply plugin: 'cpp'
+    task check
+
+    apply from: "${rootDir}/toolchains/native.gradle"
+
+    // TODO
+    //if (!project.hasProperty("withoutTests")) {
+    //    apply from: "${rootDir}/test/tests.gradle"
+    //}
+
+    if (includeJava) {
+        apply from: "${rootDir}/java/java.gradle"
+    }
+
+    cameraserverSetupModel(project)
+    cameraserverZipTask(project)
+    useWpiUtil(project)
+}
+
+task cameraserverSourceZip(type: Zip) {
+    description = 'Creates a sources-zip of the cameraserver source files'
+    group = 'WPILib'
+    destinationDir = project.buildDir
+    baseName = 'cameraserver'
+    classifier = "sources"
+    duplicatesStrategy = 'exclude'
+
+    from('src') {
+        into 'src'
+    }
+
+    from('include') {
+        into 'include'
+    }
+
+    if (includeJava) {
+        from('java/lib') {
+            into 'src'
+        }
+
+        project(':native').jniHeadersCameraServer.outputs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+    }
+}

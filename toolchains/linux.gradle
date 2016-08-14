@@ -1,0 +1,77 @@
+model {
+    toolChains {
+        gcc(Gcc) {
+            target('x86') {
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-rdynamic'
+                    //TODO: When the compiler allows us to actually call deprecated functions from within
+                    // deprecated function, remove this line (this will cause calling deprecated functions
+                    // to be treated as a warning rather than an error).
+                    args << '-Wno-error=deprecated-declarations' << '-pthread'
+                    args << '-m32'
+                }
+                linker.withArguments { args ->
+                    args << '-rdynamic' << '-pthread'
+                    args << '-m32'
+                }
+            }
+            target('x64') {
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++11' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-rdynamic'
+                    //TODO: When the compiler allows us to actually call deprecated functions from within
+                    // deprecated function, remove this line (this will cause calling deprecated functions
+                    // to be treated as a warning rather than an error).
+                    args << '-Wno-error=deprecated-declarations' << '-pthread'
+                }
+                linker.withArguments { args ->
+                    args << '-rdynamic' << '-pthread'
+                }
+            }
+        }
+    }
+}
+
+ext.setupReleaseDefines = { cppCompiler, linker ->
+    cppCompiler.args '-O2', '-g'
+}
+
+ext.setupDebugDefines = { cppCompiler, linker ->
+    cppCompiler.args '-g', '-O0'
+}
+
+// Used only on Windows.
+ext.setupDef = { linker, deffile -> }
+
+ext.releaseSetup = { releaseTasks ->
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { binary ->
+                if (!project.hasProperty('debug')) {
+                    def library = binary.sharedLibraryFile.absolutePath
+                    def debugLibrary = binary.sharedLibraryFile.absolutePath + ".debug"
+                    if (project.tasks.findByName("firstObjcopy${binary.name}") == null) {
+                        def firstObjcopy = project.tasks.create("firstObjcopy${binary.name}", Exec) { task ->
+                            task.commandLine 'objcopy', '--only-keep-debug', library, debugLibrary
+                        }
+                        def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
+                            task.commandLine 'strip', '-g', library
+                        }
+                        def secondObjcopy = project.tasks.create("secondObjcopy${binary.name}", Exec) { task ->
+                            task.commandLine 'objcopy', "--add-gnu-debuglink=$debugLibrary", library
+                        }
+                        secondObjcopy.dependsOn strip
+                        strip.dependsOn firstObjcopy
+                        binary.tasks.whenObjectAdded { task ->
+                            if (task.name.contains('link')) {
+                                firstObjcopy.dependsOn task
+                            }
+                        }
+                    }
+                    releaseTasks.each { it.dependsOn project.tasks.getByName("secondObjcopy${binary.name}") }
+                }
+            }
+        }
+    }
+}

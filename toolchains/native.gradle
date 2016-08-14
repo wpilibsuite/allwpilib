@@ -1,0 +1,25 @@
+import org.gradle.internal.os.OperatingSystem
+
+ext.isArm = false
+ext.buildPlatform = OperatingSystem.current().getFamilyName()
+
+if (OperatingSystem.current().isLinux()) {
+    apply from: "${rootDir}/toolchains/linux.gradle"
+} else if (OperatingSystem.current().isMacOsX()) {
+    apply from: "${rootDir}/toolchains/mac.gradle"
+} else if (OperatingSystem.current().isWindows()) {
+    apply from: "${rootDir}/toolchains/windows.gradle"
+} else {
+    throw new GradleException("${name} does not support building on ${ext.buildPlatform}.")
+}
+
+model {
+    platforms {
+	x86 {
+	    architecture 'x86'
+	}
+	x64 {
+	    architecture 'x86_64'
+	}
+    }
+}

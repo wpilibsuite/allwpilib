@@ -1,0 +1,52 @@
+model {
+    toolChains {
+        visualCpp(VisualCpp) {
+            // Workaround for VS2015 adapted from https://github.com/couchbase/couchbase-lite-java-native/issues/23
+            def VS_2015_INCLUDE_DIR = "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10240.0/ucrt"
+            def VS_2015_LIB_DIR = "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.10240.0/ucrt"
+            def VS_2015_INSTALL_DIR = 'C:/Program Files (x86)/Microsoft Visual Studio 14.0'
+            def vsInstallDir = file(VS_2015_INSTALL_DIR)
+
+            // If you ever happen to install and uninstall any other version of VS, Gradle will misdetect the compiler
+            // and linker to run. This fixes that by manually setting the install dir
+            if (vsInstallDir.exists()) {
+                installDir = vsInstallDir
+            }
+
+            eachPlatform {
+                cppCompiler.withArguments { args ->
+                    args << '/EHsc' << '/DNOMINMAX' << '/D_SCL_SECURE_NO_WARNINGS' << '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
+                    if (file(VS_2015_INCLUDE_DIR).exists()) {
+                        args << "/I$VS_2015_INCLUDE_DIR"
+                    }
+                }
+                linker.withArguments { args ->
+                    if (file(VS_2015_LIB_DIR).exists()) {
+                        if (platform.architecture.name == 'x86') {
+                            args << "/LIBPATH:$VS_2015_LIB_DIR/x86"
+                        } else {
+                            args << "/LIBPATH:$VS_2015_LIB_DIR/x64"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+ext.setupReleaseDefines = { cppCompiler, linker ->
+    cppCompiler.args '/O2', '/Zi', '/FS'
+}
+
+ext.setupDebugDefines = { cppCompiler, linker ->
+    cppCompiler.args '/Zi', '/FS'
+    linker.args '/DEBUG'
+}
+
+ext.setupDef = { linker, deffile ->
+    linker.args "/DEF:${deffile}"
+}
+
+// This is a noop on Windows. On gcc platforms, we strip the release binary and create a separate
+// debug library, but Windows already separates debug symbols into a .pdb file.
+ext.releaseSetup = { releaseTasks -> }

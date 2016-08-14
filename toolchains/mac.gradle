@@ -1,0 +1,61 @@
+model {
+    toolChains {
+        clang(Clang) {
+            target('x86') {
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++11' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic-errors'
+                    args << '-fPIC' << '-m32'
+                    args << '-Wno-unused-parameter' << '-Wno-missing-field-initializers' << '-Wno-unused-private-field'
+                }
+                linker.withArguments { args ->
+                    args << '-m32'
+                }
+            }
+            target('x64') {
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++11' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic-errors'
+                    args << '-fPIC'
+                    args << '-Wno-missing-field-initializers' << '-Wno-unused-private-field' << '-Wno-unused-parameter'
+                }
+            }
+        }
+    }
+}
+
+ext.setupReleaseDefines = { cppCompiler, linker ->
+    cppCompiler.args '-O2'
+}
+
+ext.setupDebugDefines = { cppCompiler, linker ->
+    cppCompiler.args '-g', '-O0'
+}
+
+// Used only on Windows.
+ext.setupDef = { linker, deffile -> }
+
+ext.releaseSetup = { releaseTasks ->
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { binary ->
+                if (!project.hasProperty('debug')) {
+                    def library = binary.sharedLibraryFile.absolutePath
+                    if (project.tasks.findByName("strip${binary.name}") == null) {
+                        def dsymutil = project.tasks.create("dsymutil${binary.name}", Exec) { task ->
+                            task.commandLine 'dsymutil', library
+                        }
+                        def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
+                            task.commandLine 'strip', '-S', library
+                        }
+                        strip.dependsOn dsymutil
+                        binary.tasks.whenObjectAdded { task ->
+                            if (task.name.contains('link')) {
+                                dsymutil.dependsOn task
+                            }
+                        }
+                    }
+                    releaseTasks.each { it.dependsOn project.tasks.getByName("strip${binary.name}") }
+                }
+            }
+        }
+    }
+}

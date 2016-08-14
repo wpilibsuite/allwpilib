@@ -1,0 +1,110 @@
+ext.isArm = true
+ext.buildPlatform = 'arm'
+
+def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPrefix : 'arm-frc-linux-gnueabi-'
+model {
+    platforms {
+	arm {
+	    architecture 'arm'
+	    operatingSystem 'linux'
+	}
+    }
+    toolChains {
+        gcc(Gcc) {
+            target("arm") {
+                // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
+                // If this ever changes, the prefix will need to be changed here
+                cppCompiler.executable = compilerPrefix + cppCompiler.executable
+                linker.executable = compilerPrefix + linker.executable
+                assembler.executable = compilerPrefix + assembler.executable
+                // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
+                // arm, and doesn't understand this flag, so it is removed from both
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-rdynamic'
+                    //TODO: When the compiler allows us to actually call deprecated functions from within
+                    // deprecated function, remove this line (this will cause calling deprecated functions
+                    // to be treated as a warning rather than an error).
+                    args << '-Wno-error=deprecated-declarations' << '-pthread'
+                    args.remove('-m32')
+                }
+                linker.withArguments { args ->
+                    args << '-rdynamic' << '-pthread'
+                    args.remove('-m32')
+                }
+                staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
+            }
+        }
+        // Workaround for OS X. Macs for some reason want to use Xcode's gcc
+        // (which just wraps Clang), so we have to explicitly make it so
+        // that trying to compile with Clang will call gcc instead
+        macGcc(Clang) {
+            target('arm') {
+                // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
+                // If this ever changes, the prefix will need to be changed here
+                cppCompiler.executable = compilerPrefix + 'g++'
+                linker.executable = compilerPrefix + 'g++'
+                assembler.executable = compilerPrefix + 'gcc'
+                // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
+                // arm, and doesn't understand this flag, so it is removed from both
+                cppCompiler.withArguments { args ->
+                    args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
+                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
+                    //TODO: When the compiler allows us to actually call deprecated functions from within
+                    // deprecated function, remove this line (this will cause calling deprecated functions
+                    // to be treated as a warning rather than an error).
+                    args << '-Wno-error=deprecated-declarations' << '-pthread'
+                    args.remove('-m32')
+                }
+                linker.withArguments { args ->
+                    args << '-rdynamic' << '-pthread'
+                    args.remove('-m32')
+                }
+                staticLibArchiver.executable = compilerPrefix + 'ar'
+            }
+        }
+    }
+}
+
+ext.setupReleaseDefines = { cppCompiler, linker ->
+    cppCompiler.args '-O2', '-g'
+}
+
+ext.setupDebugDefines = { cppCompiler, linker ->
+    cppCompiler.args '-g', '-O0'
+}
+
+// Used only on Windows.
+ext.setupDef = { linker, deffile -> }
+
+ext.releaseSetup = { releaseTasks ->
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { binary ->
+                if (!project.hasProperty('debug')) {
+                    def library = binary.sharedLibraryFile.absolutePath
+                    def debugLibrary = binary.sharedLibraryFile.absolutePath + ".debug"
+                    if (project.tasks.findByName("firstObjcopy${binary.name}") == null) {
+                        def firstObjcopy = project.tasks.create("firstObjcopy${binary.name}", Exec) { task ->
+                            task.commandLine "${compilerPrefix}objcopy", '--only-keep-debug', library, debugLibrary
+                        }
+                        def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
+                            task.commandLine "${compilerPrefix}strip", '-g', library
+                        }
+                        def secondObjcopy = project.tasks.create("secondObjcopy${binary.name}", Exec) { task ->
+                            task.commandLine "${compilerPrefix}objcopy", "--add-gnu-debuglink=$debugLibrary", library
+                        }
+                        secondObjcopy.dependsOn strip
+                        strip.dependsOn firstObjcopy
+                        binary.tasks.whenObjectAdded { task ->
+                            if (task.name.contains('link')) {
+                                firstObjcopy.dependsOn task
+                            }
+                        }
+                    }
+                    releaseTasks.each { it.dependsOn project.tasks.getByName("secondObjcopy${binary.name}") }
+                }
+            }
+        }
+    }
+}
