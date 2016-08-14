@@ -148,8 +148,8 @@ void PIDController::Calculate() {
     pidOutput->PIDWrite(result);
 
     // Update the buffer.
-    m_buf.push(input);
-    m_bufTotal += input;
+    m_buf.push(m_error);
+    m_bufTotal += m_error;
     // Remove old elements when buffer is full.
     if (m_buf.size() > m_bufLength) {
       m_bufTotal -= m_buf.front();
@@ -332,6 +332,8 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput) {
 /**
  * Set the setpoint for the PIDController.
  *
+ * Clears the queue for GetAvgError().
+ *
  * @param setpoint the desired setpoint
  */
 void PIDController::SetSetpoint(float setpoint) {
@@ -348,6 +350,10 @@ void PIDController::SetSetpoint(float setpoint) {
     } else {
       m_setpoint = setpoint;
     }
+
+    // Clear m_buf.
+    m_buf = std::queue<double>();
+    m_bufTotal = 0;
   }
 
   if (m_table != nullptr) {
@@ -416,7 +422,7 @@ float PIDController::GetAvgError() const {
   {
     std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     // Don't divide by zero.
-    if (m_buf.size()) avgError = m_setpoint - m_bufTotal / m_buf.size();
+    if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
   }
   return avgError;
 }
@@ -530,10 +536,6 @@ void PIDController::Disable() {
     std::lock_guard<priority_recursive_mutex> sync(m_mutex);
     m_pidOutput->PIDWrite(0);
     m_enabled = false;
-
-    // Clear buffer
-    m_buf = std::queue<double>();
-    m_bufTotal = 0;
   }
 
   if (m_table != nullptr) {
