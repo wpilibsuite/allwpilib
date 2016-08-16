@@ -151,9 +151,9 @@ void DispatcherBase::Stop() {
 }
 
 void DispatcherBase::SetUpdateRate(double interval) {
-  // don't allow update rates faster than 100 ms or slower than 1 second
-  if (interval < 0.1)
-    interval = 0.1;
+  // don't allow update rates faster than 10 ms or slower than 1 second
+  if (interval < 0.01)
+    interval = 0.01;
   else if (interval > 1.0)
     interval = 1.0;
   m_update_rate = static_cast<unsigned int>(interval * 1000);
@@ -168,8 +168,8 @@ void DispatcherBase::Flush() {
   auto now = std::chrono::steady_clock::now();
   {
     std::lock_guard<std::mutex> lock(m_flush_mutex);
-    // don't allow flushes more often than every 100 ms
-    if ((now - m_last_flush) < std::chrono::milliseconds(100))
+    // don't allow flushes more often than every 10 ms
+    if ((now - m_last_flush) < std::chrono::milliseconds(10))
       return;
     m_last_flush = now;
     m_do_flush = true;
