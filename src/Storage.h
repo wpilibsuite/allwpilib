@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "llvm/DenseMap.h"
+#include "llvm/SmallSet.h"
 #include "llvm/StringMap.h"
 #include "support/atomic_static.h"
 #include "Message.h"
@@ -143,11 +144,13 @@ class Storage {
   typedef std::vector<Entry*> IdMap;
   typedef llvm::DenseMap<std::pair<unsigned int, unsigned int>, std::string>
       RpcResultMap;
+  typedef llvm::SmallSet<unsigned int, 12> RpcBlockingCallSet;
 
   mutable std::mutex m_mutex;
   EntriesMap m_entries;
   IdMap m_idmap;
   RpcResultMap m_rpc_results;
+  RpcBlockingCallSet m_rpc_blocking_calls;
   // If any persistent values have changed
   mutable bool m_persistent_dirty = false;
 

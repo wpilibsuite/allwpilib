@@ -1420,6 +1420,8 @@ bool Storage::GetRpcResult(bool blocking, unsigned int call_uid, double time_out
         m_rpc_results.find(std::make_pair(call_uid >> 16, call_uid & 0xffff));
     if (i == m_rpc_results.end()) {
       if (!blocking || m_terminating) return false;
+      // only allow one blocking call per rpc call uid
+      if (!m_rpc_blocking_calls.insert(call_uid).second) return false;
       if (time_out < 0) {
         m_rpc_results_cond.wait(lock);
       } else {
@@ -1428,14 +1430,20 @@ bool Storage::GetRpcResult(bool blocking, unsigned int call_uid, double time_out
         while (!m_terminating) {
           auto timed_out = m_rpc_results_cond.wait_until(lock, timeout_time);
           if (timed_out == std::cv_status::timeout) {
+            m_rpc_blocking_calls.erase(call_uid);
             return false;
           }
         }
       }
-      if (m_terminating) return false;
+      if (m_terminating) {
+        m_rpc_blocking_calls.erase(call_uid);
+        return false;
+      }
       continue;
     }
     result->swap(i->getSecond());
+    // safe to erase even if id does not exist
+    m_rpc_blocking_calls.erase(call_uid);
     m_rpc_results.erase(i);
     return true;
   }
