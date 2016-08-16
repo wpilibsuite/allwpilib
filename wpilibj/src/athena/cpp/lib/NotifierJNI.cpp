@@ -106,8 +106,11 @@ void NotifierThreadJNI::Main() {
   jvm->DetachCurrentThread();
 }
 
-void notifierHandler(uint64_t currentTimeInt, void *param) {
-  ((NotifierJNI *)param)->Notify(currentTimeInt);
+void notifierHandler(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
+  int32_t status = 0;
+  auto param = HAL_GetNotifierParam(handle, &status);
+  if (param == nullptr) return;
+  (static_cast<NotifierJNI*>(param))->Notify(currentTimeInt);
 }
 
 extern "C" {

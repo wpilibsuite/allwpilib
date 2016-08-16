@@ -14,7 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, void*),
+HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, HAL_NotifierHandle),
                                           void* param, int32_t* status);
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
 void* HAL_GetNotifierParam(HAL_NotifierHandle notifierHandle, int32_t* status);

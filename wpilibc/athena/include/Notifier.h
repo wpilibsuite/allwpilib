@@ -38,8 +38,10 @@ class Notifier : public ErrorBase {
   // update the HAL alarm
   void UpdateAlarm();
   // HAL callback
-  static void Notify(uint64_t currentTimeInt, void* param);
+  static void Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle);
 
+  // used to constrain execution between destructors and callback
+  static priority_mutex m_destructorMutex;
   // held while updating process information
   priority_mutex m_processMutex;
   // HAL handle, atomic for proper destruction
@@ -52,7 +54,4 @@ class Notifier : public ErrorBase {
   double m_period = 0;
   // true if this is a periodic event
   bool m_periodic = false;
-
-  // held HAL notifier while Notifier::Notify() call is in progress
-  priority_mutex m_notifyMutex;
 };

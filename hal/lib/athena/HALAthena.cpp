@@ -250,10 +250,10 @@ static void HALCleanupAtExit() {
   setNewDataSem(nullptr);
 }
 
-static void timerRollover(uint64_t currentTime, void*) {
+static void timerRollover(uint64_t currentTime, HAL_NotifierHandle handle) {
   // reschedule timer for next rollover
   int32_t status = 0;
-  HAL_UpdateNotifierAlarm(rolloverNotifier, currentTime + 0x80000000ULL,
+  HAL_UpdateNotifierAlarm(handle, currentTime + 0x80000000ULL,
                           &status);
 }
 
