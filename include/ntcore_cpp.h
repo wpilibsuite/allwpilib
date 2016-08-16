@@ -214,6 +214,8 @@ bool NotifierDestroyed();
 /*
  * Remote Procedure Call Functions
  */
+ 
+constexpr double kTimeout_Indefinite = -1;
 
 void SetRpcServerOnStart(std::function<void()> on_start);
 void SetRpcServerOnExit(std::function<void()> on_exit);
@@ -225,11 +227,14 @@ void CreateRpc(StringRef name, StringRef def, RpcCallback callback);
 void CreatePolledRpc(StringRef name, StringRef def);
 
 bool PollRpc(bool blocking, RpcCallInfo* call_info);
+bool PollRpc(bool blocking, double time_out, RpcCallInfo* call_info);
 void PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
                      StringRef result);
 
 unsigned int CallRpc(StringRef name, StringRef params);
 bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result);
+bool GetRpcResult(bool blocking, unsigned int call_uid, double time_out, 
+                  std::string* result);
 
 std::string PackRpcDefinition(const RpcDefinition& def);
 bool UnpackRpcDefinition(StringRef packed, RpcDefinition *def);

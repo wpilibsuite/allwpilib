@@ -61,10 +61,26 @@ void RpcServer::ProcessRpc(StringRef name, std::shared_ptr<Message> msg,
 }
 
 bool RpcServer::PollRpc(bool blocking, RpcCallInfo* call_info) {
+  return PollRpc(blocking, kTimeout_Indefinite, call_info);
+}
+
+bool RpcServer::PollRpc(bool blocking, double time_out, RpcCallInfo* call_info) {
   std::unique_lock<std::mutex> lock(m_mutex);
   while (m_poll_queue.empty()) {
     if (!blocking || m_terminating) return false;
-    m_poll_cond.wait(lock);
+    if (time_out < 0) {
+      m_poll_cond.wait(lock);
+    } else {
+      auto timeout_time = std::chrono::steady_clock::now() + 
+          std::chrono::duration<double>(time_out);
+      while (!m_terminating) {
+        auto timed_out = m_poll_cond.wait_until(lock, timeout_time);
+        if (timed_out == std::cv_status::timeout) {
+          return false;
+        }
+      }
+    }
+    if (m_terminating) return false;
   }
 
   auto& item = m_poll_queue.front();

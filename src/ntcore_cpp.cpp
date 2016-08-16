@@ -128,6 +128,10 @@ bool PollRpc(bool blocking, RpcCallInfo* call_info) {
   return RpcServer::GetInstance().PollRpc(blocking, call_info);
 }
 
+bool PollRpc(bool blocking, double time_out, RpcCallInfo* call_info) {
+  return RpcServer::GetInstance().PollRpc(blocking, time_out, call_info);
+}
+
 void PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
                      StringRef result) {
   RpcServer::GetInstance().PostRpcResponse(rpc_id, call_uid, result);
@@ -139,6 +143,12 @@ unsigned int CallRpc(StringRef name, StringRef params) {
 
 bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result) {
   return Storage::GetInstance().GetRpcResult(blocking, call_uid, result);
+}
+
+bool GetRpcResult(bool blocking, unsigned int call_uid, 
+                  double time_out, std::string* result) {
+  return Storage::GetInstance().GetRpcResult(blocking, call_uid, time_out, 
+                                             result);
 }
 
 std::string PackRpcDefinition(const RpcDefinition& def) {

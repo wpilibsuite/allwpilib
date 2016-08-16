@@ -257,6 +257,15 @@ int NT_PollRpc(int blocking, NT_RpcCallInfo* call_info) {
   return 1;
 }
 
+int NT_PollRpcTimeout(int blocking, double time_out, 
+                      NT_RpcCallInfo* call_info) {
+  RpcCallInfo call_info_cpp;
+  if (!nt::PollRpc(blocking != 0, time_out, &call_info_cpp))
+    return 0;
+  ConvertToC(call_info_cpp, call_info);
+  return 1;
+}
+
 void NT_PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
                         const char *result, size_t result_len) {
   nt::PostRpcResponse(rpc_id, call_uid, StringRef(result, result_len));
@@ -270,6 +279,19 @@ unsigned int NT_CallRpc(const char *name, size_t name_len,
 char *NT_GetRpcResult(int blocking, unsigned int call_uid, size_t *result_len) {
   std::string result;
   if (!nt::GetRpcResult(blocking != 0, call_uid, &result)) return nullptr;
+
+  // convert result
+  *result_len = result.size();
+  char *result_cstr;
+  ConvertToC(result, &result_cstr);
+  return result_cstr;
+}
+
+char *NT_GetRpcResultTimeout(int blocking, unsigned int call_uid, 
+                             double time_out, size_t *result_len) {
+  std::string result;
+  if (!nt::GetRpcResult(blocking != 0, call_uid, time_out, &result)) 
+    return nullptr;
 
   // convert result
   *result_len = result.size();

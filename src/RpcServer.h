@@ -44,6 +44,7 @@ class RpcServer {
                   SendMsgFunc send_response);
 
   bool PollRpc(bool blocking, RpcCallInfo* call_info);
+  bool PollRpc(bool blocking, double time_out, RpcCallInfo* call_info);
   void PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
                        llvm::StringRef result);
 

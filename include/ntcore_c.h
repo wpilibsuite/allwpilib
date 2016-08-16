@@ -319,12 +319,16 @@ void NT_CreatePolledRpc(const char *name, size_t name_len, const char *def,
                         size_t def_len);
 
 int NT_PollRpc(int blocking, struct NT_RpcCallInfo* call_info);
+int NT_PollRpcTimeout(int blocking, double time_out, 
+                      struct NT_RpcCallInfo* call_info);
 void NT_PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
                         const char *result, size_t result_len);
 
 unsigned int NT_CallRpc(const char *name, size_t name_len, const char *params,
                         size_t params_len);
 char *NT_GetRpcResult(int blocking, unsigned int call_uid, size_t *result_len);
+char *NT_GetRpcResultTimeout(int blocking, unsigned int call_uid, 
+                             double time_out, size_t *result_len);
 
 char *NT_PackRpcDefinition(const struct NT_RpcDefinition *def,
                            size_t *packed_len);
