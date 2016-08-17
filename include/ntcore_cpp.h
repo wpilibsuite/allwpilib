@@ -235,6 +235,7 @@ unsigned int CallRpc(StringRef name, StringRef params);
 bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result);
 bool GetRpcResult(bool blocking, unsigned int call_uid, double time_out, 
                   std::string* result);
+void CancelBlockingRpcResult(unsigned int call_uid);
 
 std::string PackRpcDefinition(const RpcDefinition& def);
 bool UnpackRpcDefinition(StringRef packed, RpcDefinition *def);

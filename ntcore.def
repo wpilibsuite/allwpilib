@@ -92,3 +92,4 @@ NT_SetDefaultEntryDoubleArray @93
 NT_SetDefaultEntryStringArray @94
 NT_PollRpcTimeout @95
 NT_GetRpcResultTimeout @96
+NT_CancelBlockingRpcResult @97

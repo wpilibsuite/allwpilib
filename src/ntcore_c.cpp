@@ -300,6 +300,10 @@ char *NT_GetRpcResultTimeout(int blocking, unsigned int call_uid,
   return result_cstr;
 }
 
+void NT_CancelBlockingRpcResult(unsigned int call_uid) {
+  nt::CancelBlockingRpcResult(call_uid);
+}
+
 char *NT_PackRpcDefinition(const NT_RpcDefinition *def, size_t *packed_len) {
   auto packed = nt::PackRpcDefinition(ConvertFromC(*def));
 

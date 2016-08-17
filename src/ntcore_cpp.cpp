@@ -151,6 +151,10 @@ bool GetRpcResult(bool blocking, unsigned int call_uid,
                                              result);
 }
 
+void CancelBlockingRpcResult(unsigned int call_uid) {
+  Storage::GetInstance().CancelBlockingRpcResult(call_uid);
+}
+
 std::string PackRpcDefinition(const RpcDefinition& def) {
   WireEncoder enc(0x0300);
   enc.Write8(def.version);

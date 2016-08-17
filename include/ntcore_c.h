@@ -329,6 +329,7 @@ unsigned int NT_CallRpc(const char *name, size_t name_len, const char *params,
 char *NT_GetRpcResult(int blocking, unsigned int call_uid, size_t *result_len);
 char *NT_GetRpcResultTimeout(int blocking, unsigned int call_uid, 
                              double time_out, size_t *result_len);
+void NT_CancelBlockingRpcResult(unsigned int call_uid);
 
 char *NT_PackRpcDefinition(const struct NT_RpcDefinition *def,
                            size_t *packed_len);

@@ -1446,3 +1446,10 @@ bool Storage::GetRpcResult(bool blocking, unsigned int call_uid, double time_out
     return true;
   }
 }
+
+void Storage::CancelBlockingRpcResult(unsigned int call_uid) {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  // safe to erase even if id does not exist
+  m_rpc_blocking_calls.erase(call_uid);
+  m_rpc_results_cond.notify_all();
+}

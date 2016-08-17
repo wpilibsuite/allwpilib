@@ -102,6 +102,7 @@ class Storage {
   bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result);
   bool GetRpcResult(bool blocking, unsigned int call_uid, double time_out, 
                     std::string* result);
+  void CancelBlockingRpcResult(unsigned int call_uid);
 
  private:
   Storage();
