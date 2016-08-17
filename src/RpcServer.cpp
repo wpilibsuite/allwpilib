@@ -72,12 +72,10 @@ bool RpcServer::PollRpc(bool blocking, double time_out, RpcCallInfo* call_info) 
       m_poll_cond.wait(lock);
     } else {
       auto timeout_time = std::chrono::steady_clock::now() + 
-          std::chrono::duration<double>(time_out);
-      while (!m_terminating) {
-        auto timed_out = m_poll_cond.wait_until(lock, timeout_time);
-        if (timed_out == std::cv_status::timeout) {
-          return false;
-        }
+        std::chrono::duration<double>(time_out);
+      auto timed_out = m_poll_cond.wait_until(lock, timeout_time);
+      if (timed_out == std::cv_status::timeout) {
+        return false;
       }
     }
     if (m_terminating) return false;
