@@ -82,7 +82,12 @@ bool RpcServer::PollRpc(bool blocking, double time_out, RpcCallInfo* call_info) 
   }
 
   auto& item = m_poll_queue.front();
-  unsigned int call_uid = (item.conn_id << 16) | item.msg->seq_num_uid();
+  unsigned int call_uid;
+  // do not include conn id if the result came from the server
+  if (item.conn_id != 0xffff)
+    call_uid = (item.conn_id << 16) | item.msg->seq_num_uid();
+  else
+    call_uid = item.msg->seq_num_uid();  
   call_info->rpc_id = item.msg->id();
   call_info->call_uid = call_uid;
   call_info->name = std::move(item.name);
