@@ -1432,6 +1432,9 @@ bool Storage::GetRpcResult(bool blocking, unsigned int call_uid, double time_out
           m_rpc_blocking_calls.erase(call_uid);
           return false;
         }
+        // if element does not exist, we have been canceled
+        if (m_rpc_blocking_calls.count(call_uid) == 0)
+          return false;
       }
       if (m_terminating) {
         m_rpc_blocking_calls.erase(call_uid);
