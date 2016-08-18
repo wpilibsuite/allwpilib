@@ -46,10 +46,10 @@ void NetworkTable::SetServerMode() { s_client = false; }
 void NetworkTable::SetTeam(int team) {
   char tmp[30];
 #ifdef _MSC_VER
-  sprintf_s(tmp, "roboRIO-%d-FRC.local\n", team);
+  sprintf_s(tmp, "roboRIO-%d-FRC.local", team);
 #else
   using namespace std;
-  snprintf(tmp, 30, "roboRIO-%d-FRC.local\n",team);
+  snprintf(tmp, 30, "roboRIO-%d-FRC.local",team);
 #endif
   SetIPAddress(tmp);
 }
