@@ -1,0 +1,38 @@
+genFolderExclude {
+  FRC_FPGA_ChipObject
+  NetworkCommunication
+  ctre
+  frccansae
+  gtest
+  i2clib
+  msgs
+  ni-libraries
+  ni/vision
+  spilib
+  wpilibj/src/athena/cpp/nivision
+  visa
+}
+
+genFileExclude {
+  CanTalonSRX\.h$
+  NIIMAQdx\.h$
+  can_proto\.h$
+  nivision\.h$
+}
+
+modifiableFolderExclude {
+  \.git
+  \.gradle
+  __pycache__
+  build
+  wpilibj/src/athena/cpp/include
+  wpilibj/src/athena/cpp/lib
+}
+
+modifiableFileExclude {
+  \.jar$
+  \.patch$
+  \.png$
+  \.py$
+  \.so$
+}
