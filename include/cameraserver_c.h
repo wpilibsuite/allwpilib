@@ -14,6 +14,14 @@
 extern "C" {
 #endif
 
+enum CS_PropertyType {
+  CS_PROP_NONE = 0,
+  CS_PROP_BOOLEAN,
+  CS_PROP_DOUBLE,
+  CS_PROP_STRING,
+  CS_PROP_ENUM
+};
+
 #ifdef __cplusplus
 }
 #endif

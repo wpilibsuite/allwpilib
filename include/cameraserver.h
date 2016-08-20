@@ -13,8 +13,7 @@
 
 #ifdef __cplusplus
 /* C++ API */
-#include "CameraSource.h"
-#include "CameraSink.h"
+#include "cameraserver_cpp.h"
 #endif  /* __cplusplus */
 
 #endif  /* CAMERASERVER_H_ */
