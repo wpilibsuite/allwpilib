@@ -1421,7 +1421,10 @@ bool Storage::GetRpcResult(bool blocking, unsigned int call_uid, double time_out
     auto i =
         m_rpc_results.find(std::make_pair(call_uid >> 16, call_uid & 0xffff));
     if (i == m_rpc_results.end()) {
-      if (!blocking || m_terminating) return false;
+      if (!blocking || m_terminating) {
+        m_rpc_blocking_calls.erase(call_uid);
+        return false;
+      }
       if (time_out < 0) {
         m_rpc_results_cond.wait(lock);
       } else {
