@@ -118,7 +118,6 @@ if (buildArm) {
 
 project(':native') {
     apply plugin: 'cpp'
-    task check
 
     apply from: "${rootDir}/toolchains/native.gradle"
 
