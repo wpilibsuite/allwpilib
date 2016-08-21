@@ -134,7 +134,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInterrupts(
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << interrupt;
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
-  CheckStatus(env, status);
+  CheckStatusForceThrow(env, status);
   return (jint)interrupt;
 }
 

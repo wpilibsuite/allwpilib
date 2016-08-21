@@ -38,7 +38,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialInitializePort(
   int32_t status = 0;
   HAL_InitializeSerialPort(port, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  CheckStatusForceThrow(env, status);
 }
 
 /*

@@ -150,7 +150,7 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;
 
-  if (notifierHandle <= 0 || !CheckStatus(env, status)) {
+  if (notifierHandle <= 0 || !CheckStatusForceThrow(env, status)) {
     // something went wrong in HAL, clean up
     delete notify;
   }

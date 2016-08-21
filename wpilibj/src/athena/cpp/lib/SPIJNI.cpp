@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize(
   int32_t status = 0;
   HAL_InitializeSPI(port, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  CheckStatusForceThrow(env, status);
 }
 
 /*

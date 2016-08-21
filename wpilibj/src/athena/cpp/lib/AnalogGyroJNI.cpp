@@ -39,7 +39,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_initializeAn
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << handle;
   // Analog input does range checking, so we don't need to do so.
-  CheckStatus(env, status);
+  CheckStatusForceThrow(env, status);
   return (jint) handle;
 }
 
