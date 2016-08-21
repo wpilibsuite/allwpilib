@@ -84,7 +84,6 @@ if (buildArm) {
 
 project(':native:wpiutil') {
     apply plugin: 'cpp'
-    task check
 
     apply from: "${rootDir}/toolchains/native.gradle"
 
