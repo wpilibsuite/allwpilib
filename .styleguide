@@ -1,4 +1,5 @@
 genFolderExclude {
+  \.vscode
   FRC_FPGA_ChipObject
   NetworkCommunication
   ctre
