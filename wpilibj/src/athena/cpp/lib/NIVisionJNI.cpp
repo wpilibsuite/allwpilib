@@ -17,7 +17,7 @@ static void throwJavaException(JNIEnv *env) {
     jclass je = env->FindClass("com/ni/vision/VisionException");
     int err = imaqGetLastError();
     const char* err_text = getErrorText(err);
-    char* full_err_msg = (char*)malloc(30+strlen(err_text));
+    char* full_err_msg = static_cast<char*>(malloc(30+strlen(err_text)));
     sprintf(full_err_msg, "imaqError: %d: %s", err, err_text);
     env->ThrowNew(je, full_err_msg);
     free(full_err_msg);
@@ -27,7 +27,7 @@ static void throwJavaException(JNIEnv *env) {
 static void dxthrowJavaException(JNIEnv *env, IMAQdxError err) {
     jclass je = env->FindClass("com/ni/vision/VisionException");
     const char* err_text = getErrorText(err);
-    char* full_err_msg = (char*)malloc(30+strlen(err_text));
+    char* full_err_msg = static_cast<char*>(malloc(30+strlen(err_text)));
     sprintf(full_err_msg, "IMAQdxError: %d: %s", err, err_text);
     env->ThrowNew(je, full_err_msg);
     free(full_err_msg);

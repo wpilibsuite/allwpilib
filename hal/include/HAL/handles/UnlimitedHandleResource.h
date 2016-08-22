@@ -57,13 +57,13 @@ THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
       m_structures[i] = structure;
-      return (THandle)createHandle(i, enumValue);
+      return static_cast<THandle>(createHandle(i, enumValue));
     }
   }
   if (i >= INT16_MAX) return HAL_kInvalidHandle;
 
   m_structures.push_back(structure);
-  return (THandle)createHandle(static_cast<int16_t>(i), enumValue);
+  return static_cast<THandle>(createHandle(static_cast<int16_t>(i), enumValue));
 }
 
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>

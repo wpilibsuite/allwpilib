@@ -79,7 +79,8 @@ void NotifierThreadJNI::Main() {
   args.version = JNI_VERSION_1_2;
   args.name = const_cast<char *>("Notifier");
   args.group = nullptr;
-  jint rs = jvm->AttachCurrentThreadAsDaemon((void **)&env, &args);
+  jint rs =
+      jvm->AttachCurrentThreadAsDaemon(reinterpret_cast<void **>(&env), &args);
   if (rs != JNI_OK) return;
 
   std::unique_lock<std::mutex> lock(m_mutex);
@@ -92,7 +93,7 @@ void NotifierThreadJNI::Main() {
     jmethodID mid = m_mid;
     uint64_t currentTime = m_currentTime;
     lock.unlock();  // don't hold mutex during callback execution
-    env->CallVoidMethod(func, mid, (jlong)currentTime);
+    env->CallVoidMethod(func, mid, static_cast<jlong>(currentTime));
     if (env->ExceptionCheck()) {
       env->ExceptionDescribe();
       env->ExceptionClear();

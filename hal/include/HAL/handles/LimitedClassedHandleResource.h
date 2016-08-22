@@ -73,7 +73,7 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
       // and allocate it.
       std::lock_guard<priority_mutex> sync(m_handleMutexes[i]);
       m_structures[i] = toSet;
-      return (THandle)createHandle(i, enumValue);
+      return static_cast<THandle>(createHandle(i, enumValue));
     }
   }
   return HAL_kInvalidHandle;

@@ -67,7 +67,8 @@ static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
 
   // call getStackTrace
   jobjectArray stackTrace =
-      (jobjectArray)env->CallObjectMethod(throwable, getStackTraceId);
+      static_cast<jobjectArray>(env->CallObjectMethod(throwable,
+                                                      getStackTraceId));
 
   if (!stackTrace) return;
 
@@ -87,7 +88,8 @@ static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
 
     // call to string on the object
     jstring stackElementString =
-        (jstring)env->CallObjectMethod(curStackTraceElement, toStringId);
+        static_cast<jstring>(env->CallObjectMethod(curStackTraceElement,
+                                                   toStringId));
 
     if (!stackElementString) {
       env->DeleteLocalRef(stackTrace);
@@ -236,8 +238,10 @@ void ThrowBoundaryException(JNIEnv *env, double value, double lower,
         env->GetMethodID(boundaryExCls, "<init>", "(Ljava/lang/String;)V");
 
   jobject msg =
-      env->CallStaticObjectMethod(boundaryExCls, getMessage, (jdouble)value,
-                                  (jdouble)lower, (jdouble)upper);
+      env->CallStaticObjectMethod(boundaryExCls, getMessage,
+                                  static_cast<jdouble>(value),
+                                  static_cast<jdouble>(lower),
+                                  static_cast<jdouble>(upper));
   jobject ex = env->NewObject(boundaryExCls, constructor, msg);
   env->Throw(static_cast<jthrowable>(ex));
 }

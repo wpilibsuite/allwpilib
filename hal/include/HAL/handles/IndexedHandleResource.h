@@ -75,7 +75,7 @@ THandle IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     return HAL_kInvalidHandle;
   }
   m_structures[index] = std::make_shared<TStruct>();
-  return (THandle)hal::createHandle(index, enumValue);
+  return static_cast<THandle>(hal::createHandle(index, enumValue));
 }
 
 template <typename THandle, typename TStruct, int16_t size,

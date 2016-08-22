@@ -81,7 +81,8 @@ void InterruptThreadJNI::Main() {
   args.version = JNI_VERSION_1_2;
   args.name = const_cast<char*>("Interrupt");
   args.group = nullptr;
-  jint rs = jvm->AttachCurrentThreadAsDaemon((void**)&env, &args);
+  jint rs = jvm->AttachCurrentThreadAsDaemon(reinterpret_cast<void**>(&env),
+                                             &args);
   if (rs != JNI_OK) return;
 
   std::unique_lock<std::mutex> lock(m_mutex);
@@ -95,7 +96,7 @@ void InterruptThreadJNI::Main() {
     uint32_t mask = m_mask;
     jobject param = m_param;
     lock.unlock();  // don't hold mutex during callback execution
-    env->CallVoidMethod(func, mid, (jint)mask, param);
+    env->CallVoidMethod(func, mid, static_cast<jint>(mask), param);
     if (env->ExceptionCheck()) {
       env->ExceptionDescribe();
       env->ExceptionClear();
@@ -111,7 +112,7 @@ void InterruptThreadJNI::Main() {
 }
 
 void interruptHandler(uint32_t mask, void* param) {
-  ((InterruptJNI*)param)->Notify(mask);
+  static_cast<InterruptJNI*>(param)->Notify(mask);
 }
 
 extern "C" {
