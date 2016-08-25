@@ -51,8 +51,8 @@ std::thread::native_handle_type Task::native_handle() {
  * @return true on success.
  */
 bool Task::Verify() {
-  TASK id = (TASK)m_thread.native_handle();
-  return HAL_VerifyTaskID(id) == OK;
+  auto id = m_thread.native_handle();
+  return HAL_VerifyTaskID(&id) == OK;
 }
 
 /**

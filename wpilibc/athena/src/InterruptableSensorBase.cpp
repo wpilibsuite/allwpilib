@@ -30,9 +30,10 @@ void InterruptableSensorBase::RequestInterrupts(
   if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
 
   int32_t status = 0;
-  HAL_RequestInterrupts(m_interrupt, GetPortHandleForRouting(),
-                        (HAL_AnalogTriggerType)GetAnalogTriggerTypeForRouting(),
-                        &status);
+  HAL_RequestInterrupts(
+      m_interrupt, GetPortHandleForRouting(),
+      static_cast<HAL_AnalogTriggerType>(GetAnalogTriggerTypeForRouting()),
+      &status);
   SetUpSourceEdge(true, false);
   HAL_AttachInterruptHandler(m_interrupt, handler, param, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -53,9 +54,10 @@ void InterruptableSensorBase::RequestInterrupts() {
   if (StatusIsFatal()) return;  // if allocate failed, out of interrupts
 
   int32_t status = 0;
-  HAL_RequestInterrupts(m_interrupt, GetPortHandleForRouting(),
-                        (HAL_AnalogTriggerType)GetAnalogTriggerTypeForRouting(),
-                        &status);
+  HAL_RequestInterrupts(
+      m_interrupt, GetPortHandleForRouting(),
+      static_cast<HAL_AnalogTriggerType>(GetAnalogTriggerTypeForRouting()),
+      &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   SetUpSourceEdge(true, false);
 }

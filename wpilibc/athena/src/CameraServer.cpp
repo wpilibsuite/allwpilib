@@ -175,7 +175,7 @@ void CameraServer::Serve() {
   address.sin_addr.s_addr = htonl(INADDR_ANY);
   address.sin_port = htons(kPort);
 
-  if (bind(sock, (struct sockaddr*)&address, sizeof(address)) == -1)
+  if (bind(sock, reinterpret_cast<sockaddr*>(&address), sizeof(address)) == -1)
     wpi_setErrnoError();
 
   if (listen(sock, 10) == -1) wpi_setErrnoError();
@@ -183,8 +183,8 @@ void CameraServer::Serve() {
   while (true) {
     socklen_t clientAddressLen = sizeof(clientAddress);
 
-    int conn =
-        accept(sock, (struct sockaddr*)&clientAddress, &clientAddressLen);
+    int conn = accept(sock, reinterpret_cast<sockaddr*>(&clientAddress),
+                      &clientAddressLen);
     if (conn == -1) {
       wpi_setErrnoError();
       continue;

@@ -51,7 +51,7 @@ static inline int16_t getHandleIndex(HAL_Handle handle) {
 }
 static inline HAL_HandleEnum getHandleType(HAL_Handle handle) {
   // mask first 8 bits and cast to enum
-  return (HAL_HandleEnum)((handle >> 24) & 0xff);
+  return static_cast<HAL_HandleEnum>((handle >> 24) & 0xff);
 }
 static inline bool isHandleType(HAL_Handle handle, HAL_HandleEnum handleType) {
   return handleType == getHandleType(handle);

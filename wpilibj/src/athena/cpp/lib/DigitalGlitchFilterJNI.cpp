@@ -20,7 +20,8 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect(
     JNIEnv* env, jclass, jint id, jint filter_index) {
   int32_t status = 0;
 
-  HAL_SetFilterSelect((HAL_DigitalHandle)id, filter_index, &status);
+  HAL_SetFilterSelect(static_cast<HAL_DigitalHandle>(id), filter_index,
+                      &status);
   CheckStatus(env, status);
 }
 
@@ -33,7 +34,8 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect(
     JNIEnv* env, jclass, jint id) {
   int32_t status = 0;
 
-  jint result = HAL_GetFilterSelect((HAL_DigitalHandle)id, &status);
+  jint result =
+      HAL_GetFilterSelect(static_cast<HAL_DigitalHandle>(id), &status);
   CheckStatus(env, status);
   return result;
 }
