@@ -291,7 +291,8 @@ class VideoSource {
       : m_handle(source.m_handle == 0 ? 0 : CopySource(source.m_handle,
                                                        &m_status)) {}
 
-  VideoSource(VideoSource&& source) noexcept : m_handle(source.m_handle) {
+  VideoSource(VideoSource&& source) noexcept : m_status(source.m_status),
+                                               m_handle(source.m_handle) {
     source.m_handle = 0;
   }
 
@@ -504,7 +505,8 @@ class VideoSink {
   VideoSink(const VideoSink& sink)
       : m_handle(sink.m_handle == 0 ? 0 : CopySink(sink.m_handle, &m_status)) {}
 
-  VideoSink(VideoSink&& sink) noexcept : m_handle(sink.m_handle) {
+  VideoSink(VideoSink&& sink) noexcept : m_status(sink.m_status),
+                                         m_handle(sink.m_handle) {
     sink.m_handle = 0;
   }
 
