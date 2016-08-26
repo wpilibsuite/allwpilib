@@ -144,8 +144,8 @@ CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status) {
   return cs::IsSourceConnected(source, status);
 }
 
-CS_Property* EnumerateSourceProperties(CS_Source source, int* count,
-                                       CS_Status* status) {
+CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
+                                          CS_Status* status) {
   llvm::SmallVector<CS_Property, 32> vec;
   cs::EnumerateSourceProperties(source, vec, status);
   CS_Property* out =

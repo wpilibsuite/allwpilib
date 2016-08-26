@@ -94,8 +94,8 @@ char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 int CS_GetSourceNumChannels(CS_Source source, CS_Status* status);
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status);
-CS_Property* EnumerateSourceProperties(CS_Source source, int* count,
-                                       CS_Status* status);
+CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
+                                          CS_Status* status);
 CS_Source CS_CopySource(CS_Source source, CS_Status* status);
 void CS_ReleaseSource(CS_Source source, CS_Status* status);
 
