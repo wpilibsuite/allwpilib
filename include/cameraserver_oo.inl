@@ -139,6 +139,11 @@ inline USBCamera::USBCamera(llvm::StringRef name, llvm::StringRef path) {
   m_handle = CreateUSBSourcePath(name, path, &m_status);
 }
 
+inline std::vector<USBCameraInfo> USBCamera::EnumerateUSBCameras() {
+  CS_Status status = 0;
+  return ::cs::EnumerateUSBCameras(&status);
+}
+
 inline HTTPCamera::HTTPCamera(llvm::StringRef name, llvm::StringRef url) {
   m_handle = CreateHTTPSource(name, url, &m_status);
 }

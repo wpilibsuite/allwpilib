@@ -13,7 +13,7 @@ std::vector<VideoSource> VideoSource::EnumerateSources() {
   std::vector<VideoSource> sources;
   llvm::SmallVector<int, 16> handles;
   CS_Status status = 0;
-  EnumerateSourceHandles(handles, &status);
+  ::cs::EnumerateSources(handles, &status);
   sources.reserve(handles.size());
   for (int handle : handles)
     sources.emplace_back(VideoSource{handle});
@@ -24,7 +24,7 @@ std::vector<VideoSink> VideoSink::EnumerateSinks() {
   std::vector<VideoSink> sinks;
   llvm::SmallVector<int, 16> handles;
   CS_Status status = 0;
-  EnumerateSinkHandles(handles, &status);
+  ::cs::EnumerateSinks(handles, &status);
   sinks.reserve(handles.size());
   for (int handle : handles)
     sinks.emplace_back(VideoSink{handle});

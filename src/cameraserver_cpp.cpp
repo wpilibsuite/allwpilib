@@ -274,7 +274,7 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   return "";  // TODO
 }
 
-void GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char> msg,
+void GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& msg,
                   CS_Status* status) {
   // TODO
 }
@@ -311,6 +311,10 @@ void RemoveSinkListener(CS_Listener handle, CS_Status* status) {
 //
 // Utility Functions
 //
+
+std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {
+  return std::vector<USBCameraInfo>{};  // TODO
+}
 
 void EnumerateSourceHandles(llvm::SmallVectorImpl<CS_Source>& handles,
                             CS_Status* status) {

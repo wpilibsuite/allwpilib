@@ -31,6 +31,19 @@ namespace cs {
 // in applications such as JNI which require handle-based access.
 //
 
+/// USB camera information
+struct USBCameraInfo {
+  /// Device number (e.g. N in '/dev/videoN' on Linux)
+  int dev;
+  /// Path to device if available (e.g. '/dev/video0' on Linux)
+  std::string path;
+  /// Vendor/model name of the camera as provided by the USB driver
+  std::string name;
+  /// Number of channels the camera provides (usually 1, but some cameras such
+  /// as stereo or depth cameras may provide multiple channels).
+  int channels;
+};
+
 //
 // Property Functions
 //
@@ -139,7 +152,7 @@ uint64_t SinkWaitForFrame(CS_Sink sink, CS_Status* status);
 bool GetSinkImage(CS_Sink sink, int channel, cv::Mat* image, CS_Status* status);
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat* image, CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
-void GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char> msg,
+void GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& msg,
                   CS_Status* status);
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status);
 
@@ -162,10 +175,11 @@ void RemoveSinkListener(CS_Listener handle, CS_Status* status);
 //
 // Utility Functions
 //
-void EnumerateSourceHandles(llvm::SmallVectorImpl<CS_Source>& handles,
-                            CS_Status* status);
-void EnumerateSinkHandles(llvm::SmallVectorImpl<CS_Sink>& handles,
-                          CS_Status* status);
+std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status);
+
+void EnumerateSources(llvm::SmallVectorImpl<CS_Source>& handles,
+                      CS_Status* status);
+void EnumerateSinks(llvm::SmallVectorImpl<CS_Sink>& handles, CS_Status* status);
 
 }  // namespace cs
 

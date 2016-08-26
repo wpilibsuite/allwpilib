@@ -130,19 +130,6 @@ class VideoSource {
   CS_Source m_handle;
 };
 
-/// USB camera information
-struct USBCameraInfo {
-  /// Device number (e.g. N in '/dev/videoN' on Linux)
-  int dev;
-  /// Path to device if available (e.g. '/dev/video0' on Linux)
-  std::string path;
-  /// Vendor/model name of the camera as provided by the USB driver
-  std::string name;
-  /// Number of channels the camera provides (usually 1, but some cameras such
-  /// as stereo or depth cameras may provide multiple channels).
-  int channels;
-};
-
 /// A source that represents a USB camera.
 class USBCamera : public VideoSource {
  public:

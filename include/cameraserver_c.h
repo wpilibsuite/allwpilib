@@ -194,16 +194,16 @@ typedef struct CS_USBCameraInfo {
 } CS_USBCameraInfo;
 
 CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status);
-void CS_FreeEnumeratedUSBCameras(CS_USBCameraInfo* cameras);
+void CS_FreeEnumeratedUSBCameras(CS_USBCameraInfo* cameras, int count);
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status);
-void CS_FreeEnumeratedSources(CS_Source* sources);
+void CS_ReleaseEnumeratedSources(CS_Source* sources, int count);
 
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status);
-void CS_FreeEnumeratedSinks(CS_Sink* sinks);
+void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count);
 
 void CS_FreeString(char* str);
-void CS_FreeEnumPropertyChoices(char** choices);
+void CS_FreeEnumPropertyChoices(char** choices, int count);
 
 #ifdef __cplusplus
 }
