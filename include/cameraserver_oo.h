@@ -50,72 +50,29 @@ class VideoProperty {
   bool IsEnum() const { return m_type == kEnum; }
 
   // Boolean-specific functions
-  bool GetBoolean() const {
-    m_status = 0;
-    return GetBooleanProperty(m_handle, &m_status);
-  }
-  void SetBoolean(bool value) {
-    m_status = 0;
-    SetBooleanProperty(m_handle, value, &m_status);
-  }
+  bool GetBoolean() const;
+  void SetBoolean(bool value);
 
   // Double-specific functions
-  double GetDouble() const {
-    m_status = 0;
-    return GetDoubleProperty(m_handle, &m_status);
-  }
-  void SetDouble(double value) {
-    m_status = 0;
-    SetDoubleProperty(m_handle, value, &m_status);
-  }
-  double GetMin() const {
-    m_status = 0;
-    return GetDoublePropertyMin(m_handle, &m_status);
-  }
-  double GetMax() const {
-    m_status = 0;
-    return GetDoublePropertyMax(m_handle, &m_status);
-  }
+  double GetDouble() const;
+  void SetDouble(double value);
+  double GetMin() const;
+  double GetMax() const;
 
   // String-specific functions
-  std::string GetString() const {
-    m_status = 0;
-    return GetStringProperty(m_handle, &m_status);
-  }
-  void GetString(llvm::SmallVectorImpl<char>& value) const {
-    m_status = 0;
-    GetStringProperty(m_handle, value, &m_status);
-  }
-  void SetString(llvm::StringRef value) {
-    m_status = 0;
-    SetStringProperty(m_handle, value, &m_status);
-  }
+  std::string GetString() const;
+  void GetString(llvm::SmallVectorImpl<char>& value) const;
+  void SetString(llvm::StringRef value);
 
   // Enum-specific functions
-  int GetEnum() const {
-    m_status = 0;
-    return GetEnumProperty(m_handle, &m_status);
-  }
-  void SetEnum(int value) {
-    m_status = 0;
-    SetEnumProperty(m_handle, value, &m_status);
-  }
-  std::vector<std::string> GetChoices() const {
-    m_status = 0;
-    return GetEnumPropertyChoices(m_handle, &m_status);
-  }
+  int GetEnum() const;
+  void SetEnum(int value);
+  std::vector<std::string> GetChoices() const;
 
   CS_Status GetLastStatus() const { return m_status; }
 
  private:
-  explicit VideoProperty(CS_Property handle) : m_handle(handle) {
-    m_status = 0;
-    if (handle == 0)
-      m_type = kNone;
-    else
-      m_type = static_cast<Type>(
-          static_cast<int>(GetPropertyType(handle, &m_status)));
-  }
+  explicit VideoProperty(CS_Property handle);
 
   mutable CS_Status m_status;
   CS_Property m_handle;
@@ -131,69 +88,34 @@ class VideoSource {
 
  public:
   VideoSource() : m_handle(0) {}
-
-  VideoSource(const VideoSource& source)
-      : m_handle(source.m_handle == 0 ? 0 : CopySource(source.m_handle,
-                                                       &m_status)) {}
-
-  VideoSource(VideoSource&& source) noexcept : m_status(source.m_status),
-                                               m_handle(source.m_handle) {
-    source.m_handle = 0;
-  }
-
-  VideoSource& operator=(const VideoSource& rhs) {
-    m_status = 0;
-    if (m_handle != 0) ReleaseSource(m_handle, &m_status);
-    m_handle = rhs.m_handle == 0 ? 0 : CopySource(rhs.m_handle, &m_status);
-    return *this;
-  }
-
-  ~VideoSource() {
-    m_status = 0;
-    if (m_handle != 0) ReleaseSource(m_handle, &m_status);
-  }
+  VideoSource(const VideoSource& source);
+  VideoSource(VideoSource&& source) noexcept;
+  VideoSource& operator=(const VideoSource& rhs);
+  ~VideoSource();
 
   explicit operator bool() const { return m_handle != 0; }
 
   /// Get the name of the source.  The name is an arbitrary identifier
   /// provided when the source is created, and should be unique.
-  llvm::StringRef GetName() const {
-    m_status = 0;
-    return GetSourceName(m_handle, &m_status);
-  }
+  std::string GetName() const;
 
   /// Get the source description.  This is source-type specific.
-  std::string GetDescription() const {
-    m_status = 0;
-    return GetSourceDescription(m_handle, &m_status);
-  }
+  std::string GetDescription() const;
 
   /// Get the last time a frame was captured.
-  uint64_t GetLastFrameTime() const {
-    m_status = 0;
-    return GetSourceLastFrameTime(m_handle, &m_status);
-  }
+  uint64_t GetLastFrameTime() const;
 
   /// Get the number of channels this source provides.
-  int GetNumChannels() const {
-    m_status = 0;
-    return GetSourceNumChannels(m_handle, &m_status);
-  }
+  int GetNumChannels() const;
 
   /// Is the source currently connected to whatever is providing the images?
-  bool IsConnected() const {
-    m_status = 0;
-    return IsSourceConnected(m_handle, &m_status);
-  }
+  bool IsConnected() const;
 
   /// Get a property.
   /// @param name Property name
   /// @return Property contents (of type Property::kNone if no property with
   ///         the given name exists)
-  VideoProperty GetProperty(llvm::StringRef name) {
-    m_status = 0;
-    return VideoProperty{GetSourceProperty(m_handle, name, &m_status)};
-  }
+  VideoProperty GetProperty(llvm::StringRef name);
 
   CS_Status GetLastStatus() const { return m_status; }
 
@@ -227,16 +149,12 @@ class USBCamera : public VideoSource {
   /// Create a source for a USB camera based on device number.
   /// @param name Source name (arbitrary unique identifier)
   /// @param dev Device number (e.g. 0 for /dev/video0)
-  USBCamera(llvm::StringRef name, int dev) {
-    m_handle = CreateUSBSourceDev(name, dev, &m_status);
-  }
+  USBCamera(llvm::StringRef name, int dev);
 
   /// Create a source for a USB camera based on device path.
   /// @param name Source name (arbitrary unique identifier)
   /// @param path Path to device (e.g. "/dev/video0" on Linux)
-  USBCamera(llvm::StringRef name, llvm::StringRef path) {
-    m_handle = CreateUSBSourcePath(name, path, &m_status);
-  }
+  USBCamera(llvm::StringRef name, llvm::StringRef path);
 
   /// Enumerate USB cameras on the local system.
   /// @return Vector of USB camera information (one for each camera)
@@ -248,9 +166,7 @@ class HTTPCamera : public VideoSource {
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-  HTTPCamera(llvm::StringRef name, llvm::StringRef url) {
-    m_handle = CreateHTTPSource(name, url, &m_status);
-  }
+  HTTPCamera(llvm::StringRef name, llvm::StringRef url);
 };
 
 /// A source for user code to provide OpenCV images as video frames.
@@ -259,58 +175,36 @@ class CvSource : public VideoSource {
   /// Create an OpenCV source.
   /// @param name Source name (arbitrary unique identifier)
   /// @param numChannels Number of channels
-  CvSource(llvm::StringRef name, int numChannels = 1) {
-    m_handle = CreateCvSource(name, numChannels, &m_status);
-  }
+  CvSource(llvm::StringRef name, int numChannels = 1);
 
   /// Put an OpenCV image onto the specified channel.
   /// @param channel Channel number (range 0 to numChannels-1)
   /// @param image OpenCV image
-  void PutImage(int channel, cv::Mat* image) {
-    m_status = 0;
-    PutSourceImage(m_handle, channel, image, &m_status);
-  }
+  void PutImage(int channel, cv::Mat* image);
 
   /// Signal sinks connected to this source that all new channel images have
   /// been put to the stream and are ready to be read.
-  void NotifyFrame() {
-    m_status = 0;
-    NotifySourceFrame(m_handle, &m_status);
-  }
+  void NotifyFrame();
 
   /// Put an OpenCV image onto channel 0 and notify sinks.
   /// This is identical in behavior to calling PutImage(0, image) followed by
   /// NotifyFrame().
   /// @param image OpenCV image
-  void PutFrame(cv::Mat* image) {
-    m_status = 0;
-    PutSourceFrame(m_handle, image, &m_status);
-  }
+  void PutFrame(cv::Mat* image);
 
   /// Signal sinks that an error has occurred.  This should be called instead
   /// of NotifyFrame when an error occurs.
-  void NotifyError(llvm::StringRef msg) {
-    m_status = 0;
-    NotifySourceError(m_handle, msg, &m_status);
-  }
+  void NotifyError(llvm::StringRef msg);
 
   /// Set source connection status.  Defaults to true.
   /// @param connected True for connected, false for disconnected
-  void SetConnected(bool connected) {
-    m_status = 0;
-    SetSourceConnected(m_handle, connected, &m_status);
-  }
+  void SetConnected(bool connected);
 
   /// Create a property.
   /// @param name Property name
   /// @param type Property type
   /// @return Property
-  VideoProperty CreateProperty(llvm::StringRef name, VideoProperty::Type type) {
-    m_status = 0;
-    return VideoProperty{CreateSourceProperty(
-        m_handle, name, static_cast<CS_PropertyType>(static_cast<int>(type)),
-        &m_status)};
-  }
+  VideoProperty CreateProperty(llvm::StringRef name, VideoProperty::Type type);
 
   /// Create a property with a change callback.
   /// @param name Property name
@@ -320,22 +214,11 @@ class CvSource : public VideoSource {
   VideoProperty CreateProperty(
       llvm::StringRef name, VideoProperty::Type type,
       std::function<void(llvm::StringRef name, VideoProperty property)>
-          onChange) {
-    m_status = 0;
-    return VideoProperty{CreateSourcePropertyCallback(
-        m_handle, name, static_cast<CS_PropertyType>(static_cast<int>(type)),
-        [=](llvm::StringRef name, CS_Property property) {
-          onChange(name, VideoProperty{property});
-        },
-        &m_status)};
-  }
+          onChange);
 
   /// Remove a property.
   /// @param name Property name
-  void RemoveProperty(llvm::StringRef name) {
-    m_status = 0;
-    RemoveSourceProperty(m_handle, name, &m_status);
-  }
+  void RemoveProperty(llvm::StringRef name);
 };
 
 /// A sink for video that accepts a sequence of frames.  Each frame may
@@ -346,69 +229,35 @@ class VideoSink {
 
  public:
   VideoSink() : m_handle(0) {}
-
-  VideoSink(const VideoSink& sink)
-      : m_handle(sink.m_handle == 0 ? 0 : CopySink(sink.m_handle, &m_status)) {}
-
-  VideoSink(VideoSink&& sink) noexcept : m_status(sink.m_status),
-                                         m_handle(sink.m_handle) {
-    sink.m_handle = 0;
-  }
-
-  VideoSink& operator=(const VideoSink& rhs) {
-    m_status = 0;
-    if (m_handle != 0) ReleaseSink(m_handle, &m_status);
-    m_handle = rhs.m_handle == 0 ? 0 : CopySink(rhs.m_handle, &m_status);
-    return *this;
-  }
-
-  ~VideoSink() {
-    m_status = 0;
-    if (m_handle != 0) ReleaseSink(m_handle, &m_status);
-  }
+  VideoSink(const VideoSink& sink);
+  VideoSink(VideoSink&& sink) noexcept;
+  VideoSink& operator=(const VideoSink& rhs);
+  ~VideoSink();
 
   explicit operator bool() const { return m_handle != 0; }
 
   /// Get the name of the sink.  The name is an arbitrary identifier
   /// provided when the sink is created, and should be unique.
-  llvm::StringRef GetName() const {
-    m_status = 0;
-    return GetSinkName(m_handle, &m_status);
-  }
+  std::string GetName() const;
 
   /// Get the sink description.  This is sink-type specific.
-  std::string GetDescription() const {
-    m_status = 0;
-    return GetSinkDescription(m_handle, &m_status);
-  }
+  std::string GetDescription() const;
 
   /// Configure which source should provide frames to this sink.  Each sink
   /// can accept frames from only a single source, but a single source can
   /// provide frames to multiple clients.
   /// @param source Source
-  void SetSource(VideoSource source) {
-    m_status = 0;
-    if (!source)
-      SetSinkSource(m_handle, 0, &m_status);
-    else
-      SetSinkSource(m_handle, source.m_handle, &m_status);
-  }
+  void SetSource(VideoSource source);
 
   /// Get the connected source.
   /// @return Connected source (empty if none connected).
-  VideoSource GetSource() const {
-    m_status = 0;
-    return VideoSource{GetSinkSource(m_handle, &m_status)};
-  }
+  VideoSource GetSource() const;
 
   /// Get a property of the associated source.
   /// @param name Property name
   /// @return Property (type Property::kNone if no property with
   ///         the given name exists or no source connected)
-  VideoProperty GetSourceProperty(llvm::StringRef name) {
-    m_status = 0;
-    return VideoProperty{::cs::GetSourceProperty(m_handle, name, &m_status)};
-  }
+  VideoProperty GetSourceProperty(llvm::StringRef name);
 
   CS_Status GetLastStatus() const { return m_status; }
 
@@ -430,9 +279,7 @@ class HTTPSink : public VideoSink {
   /// @param name Sink name (arbitrary unique identifier)
   /// @param listenAddress TCP listen address (empty string for all addresses)
   /// @param port TCP port number
-  HTTPSink(llvm::StringRef name, llvm::StringRef listenAddress, int port) {
-    m_handle = CreateHTTPSink(name, listenAddress, port, &m_status);
-  }
+  HTTPSink(llvm::StringRef name, llvm::StringRef listenAddress, int port);
 
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
@@ -443,10 +290,7 @@ class HTTPSink : public VideoSink {
   /// MJPEG-HTTP can only serve a single channel of video.
   /// By default, channel 0 is served.
   /// @param channel video channel to serve to clients
-  void SetSourceChannel(int channel) {
-    m_status = 0;
-    SetSinkSourceChannel(m_handle, channel, &m_status);
-  }
+  void SetSourceChannel(int channel);
 };
 
 /// A sink for user code to accept video frames as OpenCV images.
@@ -456,7 +300,7 @@ class CvSink : public VideoSink {
   /// WaitForFrame() must be called on the created sink to get each new
   /// image.
   /// @param name Source name (arbitrary unique identifier)
-  CvSink(llvm::StringRef name) { m_handle = CreateCvSink(name, &m_status); }
+  CvSink(llvm::StringRef name);
 
   /// Create a sink for accepting OpenCV images in a separate thread.
   /// A thread will be created that calls WaitForFrame() and calls the
@@ -466,51 +310,33 @@ class CvSink : public VideoSink {
   ///        time=0 if an error occurred.  processFrame should call GetImage()
   ///        or GetError() as needed, but should not call (except in very
   ///        unusual circumstances) WaitForImage().
-  CvSink(llvm::StringRef name,
-         std::function<void(uint64_t time)> processFrame) {
-    m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
-  }
+  CvSink(llvm::StringRef name, std::function<void(uint64_t time)> processFrame);
 
   /// Wait for the next frame.  This is a blocking call.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message).
-  uint64_t WaitForFrame() const {
-    m_status = 0;
-    return SinkWaitForFrame(m_handle, &m_status);
-  }
+  uint64_t WaitForFrame() const;
 
   /// Get an OpenCV image from the specified channel.
   /// @return False if image could not be obtained for some reason (e.g.
   ///         channel out of range)
-  bool GetImage(int channel, cv::Mat* image) const {
-    m_status = 0;
-    return GetSinkImage(m_handle, channel, image, &m_status);
-  }
+  bool GetImage(int channel, cv::Mat* image) const;
 
   /// Wait for the next frame and get the image from channel 0.  Equivalent
   /// to calling WaitForFrame() followed by GetImage(0, image).
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
-  uint64_t FrameGrab(cv::Mat* image) const {
-    m_status = 0;
-    return GrabSinkFrame(m_handle, image, &m_status);
-  }
+  uint64_t FrameGrab(cv::Mat* image) const;
 
   /// Get error string.  Call this if WaitForFrame() returns 0 to determine
   /// what the error is.
-  std::string GetError() const {
-    m_status = 0;
-    return GetSinkError(m_handle, &m_status);
-  }
+  std::string GetError() const;
 
   /// Enable or disable getting new frames.
   /// Disabling will cause processFrame (for callback-based CvSinks) to not
   /// be called and WaitForFrame() to not return.  This can be used to save
   /// processor resources when frames are not needed.
-  void SetEnabled(bool enabled) {
-    m_status = 0;
-    SetSinkEnabled(m_handle, enabled, &m_status);
-  }
+  void SetEnabled(bool enabled);
 };
 
 class SourceListener {
@@ -525,26 +351,12 @@ class SourceListener {
   SourceListener(
       std::function<void(llvm::StringRef name, VideoSource source, int event)>
           callback,
-      int eventMask) {
-    CS_Status status = 0;
-    m_handle = AddSourceListener(
-        [=](llvm::StringRef name, CS_Source sourceHandle, int event) {
-          callback(name, VideoSource{sourceHandle}, event);
-        },
-        eventMask, &status);
-  }
+      int eventMask);
 
   SourceListener(const SourceListener&) = delete;
   SourceListener& operator=(const SourceListener&) = delete;
-
-  SourceListener(SourceListener&& rhs) noexcept : m_handle(rhs.m_handle) {
-    rhs.m_handle = 0;
-  }
-
-  ~SourceListener() {
-    CS_Status status = 0;
-    if (m_handle != 0) RemoveSourceListener(m_handle, &status);
-  }
+  SourceListener(SourceListener&& rhs) noexcept;
+  ~SourceListener();
 
  private:
   CS_Listener m_handle;
@@ -562,31 +374,19 @@ class SinkListener {
   SinkListener(
       std::function<void(llvm::StringRef name, VideoSink sink, int event)>
           callback,
-      int eventMask) {
-    CS_Status status = 0;
-    m_handle = AddSinkListener(
-        [=](llvm::StringRef name, CS_Sink sinkHandle, int event) {
-          callback(name, VideoSink{sinkHandle}, event);
-        },
-        eventMask, &status);
-  }
+      int eventMask);
 
   SinkListener(const SinkListener&) = delete;
   SinkListener& operator=(const SinkListener&) = delete;
-
-  SinkListener(SinkListener&& rhs) noexcept : m_handle(rhs.m_handle) {
-    rhs.m_handle = 0;
-  }
-
-  ~SinkListener() {
-    CS_Status status = 0;
-    if (m_handle != 0) RemoveSinkListener(m_handle, &status);
-  }
+  SinkListener(SinkListener&& rhs) noexcept;
+  ~SinkListener();
 
  private:
   CS_Listener m_handle;
 };
 
 }  // namespace cs
+
+#include "cameraserver_oo.inl"
 
 #endif  /* CAMERASERVER_OO_H_ */
