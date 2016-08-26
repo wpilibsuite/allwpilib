@@ -326,7 +326,7 @@ class CvSink : public VideoSink {
   /// to calling WaitForFrame() followed by GetImage(0, image).
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
-  uint64_t FrameGrab(cv::Mat* image) const;
+  uint64_t GrabFrame(cv::Mat* image) const;
 
   /// Get error string.  Call this if WaitForFrame() returns 0 to determine
   /// what the error is.

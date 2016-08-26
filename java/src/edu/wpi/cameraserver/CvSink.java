@@ -41,7 +41,7 @@ public class CvSink extends VideoSink {
   /// to calling WaitForFrame() followed by GetImage(0, image).
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
-  //public long frameGrab(CvMat image) {
+  //public long grabFrame(CvMat image) {
   //  return CameraServerJNI.grabSinkFrame(m_handle, image);
   //}
 

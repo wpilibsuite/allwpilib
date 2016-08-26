@@ -276,7 +276,7 @@ inline bool CvSink::GetImage(int channel, cv::Mat* image) const {
   return GetSinkImage(m_handle, channel, image, &m_status);
 }
 
-inline uint64_t CvSink::FrameGrab(cv::Mat* image) const {
+inline uint64_t CvSink::GrabFrame(cv::Mat* image) const {
   m_status = 0;
   return GrabSinkFrame(m_handle, image, &m_status);
 }
