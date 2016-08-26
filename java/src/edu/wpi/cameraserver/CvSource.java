@@ -48,7 +48,10 @@ public class CvSource extends VideoSource {
   /// @param name Property name
   /// @param type Property type
   /// @return Property
-  //public VideoProperty createProperty(String name, VideoProperty.Type type);
+  public VideoProperty createProperty(String name, VideoProperty.Type type) {
+    return new VideoProperty(
+        CameraServerJNI.createSourceProperty(m_handle, name, type.getValue()));
+  }
 
   /// Create a property with a change callback.
   /// @param name Property name
@@ -62,9 +65,9 @@ public class CvSource extends VideoSource {
 
   /// Remove a property.
   /// @param name Property name
-  //public void removeProperty(VdeoProperty property) {
-  //  CameraServerJNI.removeSourceProperty(m_handle, property.m_handle);
-  //}
+  public void removeProperty(VideoProperty property) {
+    CameraServerJNI.removeSourceProperty(m_handle, property.m_handle);
+  }
 
   /// Remove a property.
   /// @param name Property name

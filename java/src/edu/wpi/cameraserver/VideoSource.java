@@ -49,10 +49,19 @@ public class VideoSource {
   /// @param name Property name
   /// @return Property contents (of type Property::kNone if no property with
   ///         the given name exists)
-  //public VideoProperty getProperty(String name);
+  public VideoProperty getProperty(String name) {
+    return new VideoProperty(CameraServerJNI.getSourceProperty(m_handle, name));
+  }
 
   /// Enumerate all properties of this source.
-  //public VideoProperty[] enumerateProperties();
+  public VideoProperty[] enumerateProperties() {
+    int[] handles = CameraServerJNI.enumerateSourceProperties(m_handle);
+    VideoProperty[] rv = new VideoProperty[handles.length];
+    for (int i=0; i<handles.length; i++) {
+      rv[i] = new VideoProperty(handles[i]);
+    }
+    return rv;
+  }
 
   /// Enumerate all existing sources.
   /// @return Vector of sources.
