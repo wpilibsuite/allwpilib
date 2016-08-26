@@ -49,6 +49,9 @@ struct USBCameraInfo {
 //
 
 CS_PropertyType GetPropertyType(CS_Property property, CS_Status* status);
+std::string GetPropertyName(CS_Property property, CS_Status* status);
+void GetPropertyName(CS_Property property, llvm::SmallVectorImpl<char>& name,
+                     CS_Status* status);
 bool GetBooleanProperty(CS_Property property, CS_Status* status);
 void SetBooleanProperty(CS_Property property, bool value, CS_Status* status);
 double GetDoubleProperty(CS_Property property, CS_Status* status);
@@ -94,6 +97,9 @@ void GetSourceDescription(CS_Source source, llvm::SmallVectorImpl<char>& desc,
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 int GetSourceNumChannels(CS_Source source, CS_Status* status);
 bool IsSourceConnected(CS_Source source, CS_Status* status);
+void EnumerateSourceProperties(CS_Source source,
+                               llvm::SmallVectorImpl<CS_Property>& properties,
+                               CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 
@@ -111,8 +117,9 @@ CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
                                  CS_PropertyType type, CS_Status* status);
 CS_Property CreateSourcePropertyCallback(
     CS_Source source, llvm::StringRef name, CS_PropertyType type,
-    std::function<void(llvm::StringRef name, CS_Property property)> onChange,
-    CS_Status* status);
+    std::function<void(CS_Property property)> onChange, CS_Status* status);
+void RemoveSourceProperty(CS_Source source, CS_Property property,
+                          CS_Status* status);
 void RemoveSourceProperty(CS_Source source, llvm::StringRef name,
                           CS_Status* status);
 

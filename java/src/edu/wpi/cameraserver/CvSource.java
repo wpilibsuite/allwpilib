@@ -62,7 +62,13 @@ public class CvSource extends VideoSource {
 
   /// Remove a property.
   /// @param name Property name
+  //public void removeProperty(VdeoProperty property) {
+  //  CameraServerJNI.removeSourceProperty(m_handle, property.m_handle);
+  //}
+
+  /// Remove a property.
+  /// @param name Property name
   public void removeProperty(String name) {
-    CameraServerJNI.removeSourceProperty(m_handle, name);
+    CameraServerJNI.removeSourcePropertyByName(m_handle, name);
   }
 }

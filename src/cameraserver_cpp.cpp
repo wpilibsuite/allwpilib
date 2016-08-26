@@ -21,6 +21,15 @@ CS_PropertyType GetPropertyType(CS_Property property, CS_Status* status) {
   return CS_PROP_NONE;  // TODO
 }
 
+std::string GetPropertyName(CS_Property property, CS_Status* status) {
+  return "";  // TODO
+}
+
+void GetPropertyName(CS_Property property, llvm::SmallVectorImpl<char>& name,
+                     CS_Status* status) {
+  // TODO
+}
+
 bool GetBooleanProperty(CS_Property property, CS_Status* status) {
   return false;  // TODO
 }
@@ -138,6 +147,12 @@ bool IsSourceConnected(CS_Source source, CS_Status* status) {
   return false;  // TODO
 }
 
+void EnumerateSourceProperties(CS_Source source,
+                               llvm::SmallVectorImpl<CS_Property>& properties,
+                               CS_Status* status) {
+  // TODO
+}
+
 CS_Source CopySource(CS_Source source, CS_Status* status) {
   return source;  // TODO
 }
@@ -179,9 +194,13 @@ CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
 
 CS_Property CreateSourcePropertyCallback(
     CS_Source source, llvm::StringRef name, CS_PropertyType type,
-    std::function<void(llvm::StringRef name, CS_Property property)> onChange,
-    CS_Status* status) {
+    std::function<void(CS_Property property)> onChange, CS_Status* status) {
   return 0;  // TODO
+}
+
+void RemoveSourceProperty(CS_Source source, CS_Property property,
+                          CS_Status* status) {
+  // TODO
 }
 
 void RemoveSourceProperty(CS_Source source, llvm::StringRef name,

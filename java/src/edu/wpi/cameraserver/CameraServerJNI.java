@@ -69,6 +69,7 @@ public class CameraServerJNI {
   // Property Functions
   //
   public static native int getPropertyType(int property);
+  public static native String getPropertyName(int property);
   public static native boolean getBooleanProperty(int property);
   public static native void setBooleanProperty(int property, boolean value);
   public static native double getDoubleProperty(int property);
@@ -102,6 +103,7 @@ public class CameraServerJNI {
   public static native long getSourceLastFrameTime(int source);
   public static native int getSourceNumChannels(int source);
   public static native boolean isSourceConnected(int source);
+  public static native int[] enumerateSourceProperties(int source);
   public static native int copySource(int source);
   public static native void releaseSource(int source);
 
@@ -118,7 +120,8 @@ public class CameraServerJNI {
   //                                    int type,
   //                                    void (*onChange)(String name,
   //                                                     int property));
-  public static native void removeSourceProperty(int source, String name);
+  public static native void removeSourceProperty(int source, int property);
+  public static native void removeSourcePropertyByName(int source, String name);
 
   //
   // Sink Creation Functions

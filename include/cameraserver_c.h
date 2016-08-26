@@ -52,6 +52,7 @@ enum CS_PropertyType {
 
 enum CS_PropertyType CS_GetPropertyType(CS_Property property,
                                         CS_Status* status);
+char* CS_GetPropertyName(CS_Property property, CS_Status* status);
 CS_Bool CS_GetBooleanProperty(CS_Property property, CS_Status* status);
 void CS_SetBooleanProperty(CS_Property property, CS_Bool value,
                            CS_Status* status);
@@ -93,6 +94,8 @@ char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 int CS_GetSourceNumChannels(CS_Source source, CS_Status* status);
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status);
+CS_Property* EnumerateSourceProperties(CS_Source source, int* count,
+                                       CS_Status* status);
 CS_Source CS_CopySource(CS_Source source, CS_Status* status);
 void CS_ReleaseSource(CS_Source source, CS_Status* status);
 
@@ -112,10 +115,11 @@ CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
                                     CS_Status* status);
 CS_Property CS_CreateSourcePropertyCallback(
     CS_Source source, const char* name, enum CS_PropertyType type, void* data,
-    void (*onChange)(void* data, const char* name, CS_Property property),
-    CS_Status* status);
-void CS_RemoveSourceProperty(CS_Source source, const char* name,
+    void (*onChange)(void* data, CS_Property property), CS_Status* status);
+void CS_RemoveSourceProperty(CS_Source source, CS_Property property,
                              CS_Status* status);
+void CS_RemoveSourcePropertyByName(CS_Source source, const char* name,
+                                   CS_Status* status);
 
 //
 // Sink Creation Functions
@@ -204,6 +208,8 @@ void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count);
 
 void CS_FreeString(char* str);
 void CS_FreeEnumPropertyChoices(char** choices, int count);
+
+void CS_FreeEnumeratedProperties(CS_Property* properties, int count);
 
 #ifdef __cplusplus
 }

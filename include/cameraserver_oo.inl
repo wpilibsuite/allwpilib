@@ -10,6 +10,11 @@
 
 namespace cs {
 
+inline std::string VideoProperty::GetName() const {
+  m_status = 0;
+  return GetPropertyName(m_handle, &m_status);
+}
+
 inline bool VideoProperty::GetBoolean() const {
   m_status = 0;
   return GetBooleanProperty(m_handle, &m_status);
@@ -187,15 +192,17 @@ inline VideoProperty CvSource::CreateProperty(llvm::StringRef name,
 
 inline VideoProperty CvSource::CreateProperty(
     llvm::StringRef name, VideoProperty::Type type,
-    std::function<void(llvm::StringRef name, VideoProperty property)>
-        onChange) {
+    std::function<void(VideoProperty property)> onChange) {
   m_status = 0;
   return VideoProperty{CreateSourcePropertyCallback(
       m_handle, name, static_cast<CS_PropertyType>(static_cast<int>(type)),
-      [=](llvm::StringRef name, CS_Property property) {
-        onChange(name, VideoProperty{property});
-      },
+      [=](CS_Property property) { onChange(VideoProperty{property}); },
       &m_status)};
+}
+
+inline void CvSource::RemoveProperty(VideoProperty property) {
+  m_status = 0;
+  RemoveSourceProperty(m_handle, property.m_handle, &m_status);
 }
 
 inline void CvSource::RemoveProperty(llvm::StringRef name) {

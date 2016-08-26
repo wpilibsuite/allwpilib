@@ -31,6 +31,13 @@ CS_PropertyType CS_GetPropertyType(CS_Property property, CS_Status* status) {
   return cs::GetPropertyType(property, status);
 }
 
+char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
+  llvm::SmallString<128> str;
+  cs::GetPropertyName(property, str, status);
+  if (*status != 0) return nullptr;
+  return ConvertToC(str);
+}
+
 CS_Bool CS_GetBooleanProperty(CS_Property property, CS_Status* status) {
   return cs::GetBooleanProperty(property, status);
 }
@@ -137,6 +144,17 @@ CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status) {
   return cs::IsSourceConnected(source, status);
 }
 
+CS_Property* EnumerateSourceProperties(CS_Source source, int* count,
+                                       CS_Status* status) {
+  llvm::SmallVector<CS_Property, 32> vec;
+  cs::EnumerateSourceProperties(source, vec, status);
+  CS_Property* out =
+      static_cast<CS_Property*>(std::malloc(vec.size() * sizeof(CS_Property)));
+  *count = vec.size();
+  std::copy(vec.begin(), vec.end(), out);
+  return out;
+}
+
 CS_Source CS_CopySource(CS_Source source, CS_Status* status) {
   return cs::CopySource(source, status);
 }
@@ -177,24 +195,20 @@ CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
 
 CS_Property CS_CreateSourcePropertyCallback(
     CS_Source source, const char* name, enum CS_PropertyType type, void* data,
-    void (*onChange)(void* data, const char* name, CS_Property property),
+    void (*onChange)(void* data, CS_Property property),
     CS_Status* status) {
   return cs::CreateSourcePropertyCallback(
       source, name, type,
-      [=](llvm::StringRef name, CS_Property property) {
-        // avoid the copy if possible
-        if (name[name.size()] == '\0') {
-          onChange(data, name.data(), property);
-        } else {
-          llvm::SmallString<128> copy{name};
-          onChange(data, copy.c_str(), property);
-        }
-      },
-      status);
+      [=](CS_Property property) { onChange(data, property); }, status);
 }
 
-void CS_RemoveSourceProperty(CS_Source source, const char* name,
+void CS_RemoveSourceProperty(CS_Source source, CS_Property property,
                              CS_Status* status) {
+  return cs::RemoveSourceProperty(source, property, status);
+}
+
+void CS_RemoveSourcePropertyByName(CS_Source source, const char* name,
+                                   CS_Status* status) {
   return cs::RemoveSourceProperty(source, name, status);
 }
 
@@ -384,6 +398,10 @@ void CS_FreeEnumPropertyChoices(char** choices, int count) {
   if (!choices) return;
   for (int i = 0; i < count; ++i) std::free(choices[i]);
   std::free(choices);
+}
+
+void CS_FreeEnumeratedProperties(CS_Property* properties, int count) {
+  std::free(properties);
 }
 
 }  // extern "C"

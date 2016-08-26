@@ -39,6 +39,8 @@ class VideoProperty {
 
   VideoProperty() : m_handle(0), m_type(kNone) {}
 
+  std::string GetName() const;
+
   Type type() const { return m_type; }
 
   explicit operator bool() const { return m_type != kNone; }
@@ -116,6 +118,9 @@ class VideoSource {
   /// @return Property contents (of type Property::kNone if no property with
   ///         the given name exists)
   VideoProperty GetProperty(llvm::StringRef name);
+
+  /// Enumerate all properties of this source.
+  std::vector<VideoProperty> EnumerateProperties() const;
 
   CS_Status GetLastStatus() const { return m_status; }
 
@@ -200,8 +205,11 @@ class CvSource : public VideoSource {
   /// @return Property
   VideoProperty CreateProperty(
       llvm::StringRef name, VideoProperty::Type type,
-      std::function<void(llvm::StringRef name, VideoProperty property)>
-          onChange);
+      std::function<void(VideoProperty property)> onChange);
+
+  /// Remove a property.
+  /// @param property Property
+  void RemoveProperty(VideoProperty property);
 
   /// Remove a property.
   /// @param name Property name

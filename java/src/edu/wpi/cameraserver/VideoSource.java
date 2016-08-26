@@ -51,6 +51,9 @@ public class VideoSource {
   ///         the given name exists)
   //public VideoProperty getProperty(String name);
 
+  /// Enumerate all properties of this source.
+  //public VideoProperty[] enumerateProperties();
+
   /// Enumerate all existing sources.
   /// @return Vector of sources.
   public static VideoSource[] enumerateSources() {
