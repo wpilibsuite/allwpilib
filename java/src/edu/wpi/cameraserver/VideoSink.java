@@ -58,7 +58,9 @@ public class VideoSink {
   /// @return Property (type Property::kNone if no property with
   ///         the given name exists or no source connected)
   public VideoProperty getSourceProperty(String name) {
-    return new VideoProperty(CameraServerJNI.getSourceProperty(m_handle, name));  }
+    return new VideoProperty(
+        CameraServerJNI.getSinkSourceProperty(m_handle, name));
+  }
 
   /// Enumerate all existing sinks.
   /// @return Vector of sinks.

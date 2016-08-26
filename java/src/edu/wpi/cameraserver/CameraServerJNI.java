@@ -90,11 +90,6 @@ public class CameraServerJNI {
   public static native String[] getEnumPropertyChoices(int property);
 
   //
-  // Source/Sink Functions
-  //
-  public static native int getSourceProperty(int handle, String name);
-
-  //
   // Source Creation Functions
   //
   public static native int createUSBSourceDev(String name, int dev);
@@ -110,6 +105,7 @@ public class CameraServerJNI {
   public static native long getSourceLastFrameTime(int source);
   public static native int getSourceNumChannels(int source);
   public static native boolean isSourceConnected(int source);
+  public static native int getSourceProperty(int source, String name);
   public static native int[] enumerateSourceProperties(int source);
   public static native int copySource(int source);
   public static native void releaseSource(int source);
@@ -144,6 +140,7 @@ public class CameraServerJNI {
   public static native String getSinkName(int sink);
   public static native String getSinkDescription(int sink);
   public static native void setSinkSource(int sink, int source);
+  public static native int getSinkSourceProperty(int sink, String name);
   public static native int getSinkSource(int sink);
   public static native int copySink(int sink);
   public static native void releaseSink(int sink);

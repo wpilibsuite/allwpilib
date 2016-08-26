@@ -82,15 +82,6 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
 }
 
 //
-// Source/Sink Functions
-//
-
-CS_Property GetSourceProperty(CS_Source handle, llvm::StringRef name,
-                              CS_Status* status) {
-  return 0;  // TODO
-}
-
-//
 // Source Creation Functions
 //
 
@@ -145,6 +136,11 @@ int GetSourceNumChannels(CS_Source source, CS_Status* status) {
 
 bool IsSourceConnected(CS_Source source, CS_Status* status) {
   return false;  // TODO
+}
+
+CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
+                              CS_Status* status) {
+  return 0;  // TODO
 }
 
 void EnumerateSourceProperties(CS_Source source,
@@ -253,6 +249,11 @@ void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
 }
 
 CS_Source GetSinkSource(CS_Sink sink, CS_Status* status) {
+  return 0;  // TODO
+}
+
+CS_Property GetSinkSourceProperty(CS_Sink sink, llvm::StringRef name,
+                                  CS_Status* status) {
   return 0;  // TODO
 }
 

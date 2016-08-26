@@ -69,12 +69,6 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
                                                 CS_Status* status);
 
 //
-// Source/Sink Functions
-//
-CS_Property GetSourceProperty(CS_Source handle, llvm::StringRef name,
-                              CS_Status* status);
-
-//
 // Source Creation Functions
 //
 CS_Source CreateUSBSourceDev(llvm::StringRef name, int dev, CS_Status* status);
@@ -97,6 +91,8 @@ void GetSourceDescription(CS_Source source, llvm::SmallVectorImpl<char>& desc,
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 int GetSourceNumChannels(CS_Source source, CS_Status* status);
 bool IsSourceConnected(CS_Source source, CS_Status* status);
+CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
+                              CS_Status* status);
 void EnumerateSourceProperties(CS_Source source,
                                llvm::SmallVectorImpl<CS_Property>& properties,
                                CS_Status* status);
@@ -143,6 +139,8 @@ std::string GetSinkDescription(CS_Sink sink, CS_Status* status);
 void GetSinkDescription(CS_Sink sink, llvm::SmallVectorImpl<char>& desc,
                         CS_Status* status);
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
+CS_Property GetSinkSourceProperty(CS_Sink sink, llvm::StringRef name,
+                                  CS_Status* status);
 CS_Source GetSinkSource(CS_Sink sink, CS_Status* status);
 CS_Sink CopySink(CS_Sink sink, CS_Status* status);
 void ReleaseSink(CS_Sink sink, CS_Status* status);

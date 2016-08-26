@@ -94,11 +94,6 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
   return out;
 }
 
-CS_Property CS_GetSourceProperty(CS_Source handle, const char* name,
-                                 CS_Status* status) {
-  return cs::GetSourceProperty(handle, name, status);
-}
-
 CS_Source CS_CreateUSBSourceDev(const char* name, int dev, CS_Status* status) {
   return cs::CreateUSBSourceDev(name, dev, status);
 }
@@ -142,6 +137,11 @@ int CS_GetSourceNumChannels(CS_Source source, CS_Status* status) {
 
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status) {
   return cs::IsSourceConnected(source, status);
+}
+
+CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
+                                 CS_Status* status) {
+  return cs::GetSourceProperty(source, name, status);
 }
 
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
@@ -248,6 +248,11 @@ void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
 
 CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status) {
   return cs::GetSinkSource(sink, status);
+}
+
+CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const char* name,
+                                     CS_Status* status) {
+  return cs::GetSinkSourceProperty(sink, name, status);
 }
 
 CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status) {

@@ -256,7 +256,7 @@ inline VideoSource VideoSink::GetSource() const {
 
 inline VideoProperty VideoSink::GetSourceProperty(llvm::StringRef name) {
   m_status = 0;
-  return VideoProperty{::cs::GetSourceProperty(m_handle, name, &m_status)};
+  return VideoProperty{GetSinkSourceProperty(m_handle, name, &m_status)};
 }
 
 inline HTTPSink::HTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,

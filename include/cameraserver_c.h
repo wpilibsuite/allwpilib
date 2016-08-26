@@ -70,12 +70,6 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
                                  CS_Status* status);
 
 //
-// Source/Sink Functions
-//
-CS_Property CS_GetSourceProperty(CS_Source handle, const char* name,
-                                 CS_Status* status);
-
-//
 // Source Creation Functions
 //
 CS_Source CS_CreateUSBSourceDev(const char* name, int dev, CS_Status* status);
@@ -94,6 +88,8 @@ char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 int CS_GetSourceNumChannels(CS_Source source, CS_Status* status);
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status);
+CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
+                                 CS_Status* status);
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
                                           CS_Status* status);
 CS_Source CS_CopySource(CS_Source source, CS_Status* status);
@@ -137,6 +133,8 @@ CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status);
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
+CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const char* name,
+                                     CS_Status* status);
 CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status);
 CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status);
 void CS_ReleaseSink(CS_Sink sink, CS_Status* status);
