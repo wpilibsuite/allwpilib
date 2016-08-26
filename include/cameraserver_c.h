@@ -18,6 +18,17 @@ extern "C" {
 struct CvMat;
 
 //
+// The C API is handle-based.  Sources and sinks are reference counted
+// internally to the library.  Any time a source or sink handle is returned
+// or provided to a callback, the reference count is incremented.
+// Calling CS_ReleaseSource() or CS_ReleaseSink() decrements the reference
+// count, and when the reference count reaches zero, the object is destroyed.
+// Connecting a source to a sink increments the reference count of the source,
+// and when the sink is destroyed (its reference count reaches zero), the
+// source reference count is decremented.
+//
+
+//
 // Typedefs
 //
 typedef int CS_Bool;
