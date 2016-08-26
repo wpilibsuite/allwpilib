@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 /* C++ API */
 #include "cameraserver_cpp.h"
+#include "cameraserver_oo.h"
 #endif  /* __cplusplus */
 
 #endif  /* CAMERASERVER_H_ */
