@@ -8,11 +8,11 @@
 #ifndef CAMERASERVER_CPP_H_
 #define CAMERASERVER_CPP_H_
 
+#include <stdint.h>
+
 #include <functional>
 #include <string>
 #include <vector>
-
-#include <stdint.h>
 
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
