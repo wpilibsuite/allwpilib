@@ -385,7 +385,7 @@ static jobjectArray ToJavaStringArray(JNIEnv *env,
   jobjectArray jarr = env->NewObjectArray(arr.size(), stringCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
-    JavaLocal<jstring> elem(env, env->NewStringUTF(arr[i].c_str()));
+    JavaLocal<jstring> elem(env, ToJavaString(env, arr[i]));
     env->SetObjectArrayElement(jarr, i, elem.obj());
   }
   return jarr;
