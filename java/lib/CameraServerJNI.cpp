@@ -7,11 +7,12 @@
 
 #include "edu_wpi_cameraserver_CameraServerJNI.h"
 
-#include "llvm/ArrayRef.h"
-#include "llvm/ConvertUTF.h"
 #include "llvm/SmallString.h"
+#include "support/jni_util.h"
 
 #include "cameraserver_cpp.h"
+
+using namespace wpi::java;
 
 //
 // Globals and load/unload
@@ -19,7 +20,6 @@
 
 // Used for callback.
 static JavaVM *jvm = nullptr;
-static jclass stringCls = nullptr;
 static jclass usbCameraInfoCls = nullptr;
 
 extern "C" {
@@ -33,12 +33,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
   // Cache references to classes
   jclass local;
-
-  local = env->FindClass("java/lang/String");
-  if (!local) return JNI_ERR;
-  stringCls = static_cast<jclass>(env->NewGlobalRef(local));
-  if (!stringCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
   local = env->FindClass("edu/wpi/cameraserver/USBCameraInfo");
   if (!local) return JNI_ERR;
@@ -54,7 +48,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
   // Delete global references
-  if (stringCls) env->DeleteGlobalRef(stringCls);
   if (usbCameraInfoCls) env->DeleteGlobalRef(usbCameraInfoCls);
   jvm = nullptr;
 }
@@ -71,83 +64,11 @@ static inline bool CheckStatus(JNIEnv *env, CS_Status status,
   return status == 0;
 }
 
-//
-// Helper class to automatically clean up a local reference
-//
-template <typename T>
-class JavaLocal {
- public:
-  JavaLocal(JNIEnv *env, T obj) : m_env(env), m_obj(obj) {}
-  ~JavaLocal() {
-    if (m_obj) m_env->DeleteLocalRef(m_obj);
-  }
-  operator T() { return m_obj; }
-  T obj() { return m_obj; }
-
- private:
-  JNIEnv *m_env;
-  T m_obj;
-};
-
-//
-// Conversions from Java objects to C++
-//
-
-namespace {
-
-class JavaStringRef {
- public:
-  JavaStringRef(JNIEnv *env, jstring str) {
-    jsize size = env->GetStringLength(str);
-    const jchar *chars = env->GetStringChars(str, nullptr);
-    llvm::convertUTF16ToUTF8String(llvm::makeArrayRef(chars, size), m_str);
-    env->ReleaseStringChars(str, chars);
-  }
-
-  operator llvm::StringRef() const { return m_str; }
-  llvm::StringRef str() const { return m_str; }
-  const char* c_str() const { return m_str.data(); }
-
- private:
-  llvm::SmallString<128> m_str;
-};
-
-}  // anonymous namespace
-
-//
-// Conversions from C++ to Java objects
-//
-
-static inline jstring ToJavaString(JNIEnv *env, llvm::StringRef str) {
-  llvm::SmallVector<UTF16, 128> chars;
-  llvm::convertUTF8ToUTF16String(str, chars);
-  return env->NewString(chars.begin(), chars.size());
-}
-
-static jintArray ToJavaIntArray(JNIEnv *env, llvm::ArrayRef<int> arr)
-{
-  jintArray jarr = env->NewIntArray(arr.size());
-  if (!jarr) return nullptr;
-  env->SetIntArrayRegion(jarr, 0, arr.size(), arr.data());
-  return jarr;
-}
-
-static jobjectArray ToJavaStringArray(JNIEnv *env,
-                                      llvm::ArrayRef<std::string> arr) {
-  jobjectArray jarr = env->NewObjectArray(arr.size(), stringCls, nullptr);
-  if (!jarr) return nullptr;
-  for (std::size_t i = 0; i < arr.size(); ++i) {
-    JavaLocal<jstring> elem{env, ToJavaString(env, arr[i])};
-    env->SetObjectArrayElement(jarr, i, elem.obj());
-  }
-  return jarr;
-}
-
-static jobject ToJavaObject(JNIEnv *env, const cs::USBCameraInfo &info) {
+static jobject MakeJObject(JNIEnv *env, const cs::USBCameraInfo &info) {
   static jmethodID constructor = env->GetMethodID(
       usbCameraInfoCls, "<init>", "(ILjava/lang/String;Ljava/lang/String;I)V");
-  JavaLocal<jstring> path(env, ToJavaString(env, info.path));
-  JavaLocal<jstring> name(env, ToJavaString(env, info.name));
+  JLocal<jstring> path(env, MakeJString(env, info.path));
+  JLocal<jstring> name(env, MakeJString(env, info.name));
   return env->NewObject(usbCameraInfoCls, constructor,
                         static_cast<jint>(info.dev), path.obj(), name.obj(),
                         static_cast<jint>(info.channels));
@@ -181,7 +102,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyN
   llvm::SmallString<128> str;
   cs::GetPropertyName(property, str, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaString(env, str);
+  return MakeJString(env, str);
 }
 
 /*
@@ -278,7 +199,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getStringPro
   llvm::SmallString<128> str;
   cs::GetStringProperty(property, str, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaString(env, str);
+  return MakeJString(env, str);
 }
 
 /*
@@ -290,7 +211,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setStringProper
   (JNIEnv *env, jclass, jint property, jstring value)
 {
   CS_Status status;
-  cs::SetStringProperty(property, JavaStringRef{env, value}, &status);
+  cs::SetStringProperty(property, JStringRef{env, value}, &status);
   CheckStatus(env, status);
 }
 
@@ -332,7 +253,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getEnum
   CS_Status status;
   auto arr = cs::GetEnumPropertyChoices(property, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaStringArray(env, arr);
+  return MakeJStringArray(env, arr);
 }
 
 /*
@@ -344,7 +265,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createUSBSource
   (JNIEnv *env, jclass, jstring name, jint dev)
 {
   CS_Status status;
-  auto val = cs::CreateUSBSourceDev(JavaStringRef{env, name}, dev, &status);
+  auto val = cs::CreateUSBSourceDev(JStringRef{env, name}, dev, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -358,8 +279,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createUSBSource
   (JNIEnv *env, jclass, jstring name, jstring path)
 {
   CS_Status status;
-  auto val = cs::CreateUSBSourcePath(JavaStringRef{env, name},
-                                     JavaStringRef{env, path}, &status);
+  auto val = cs::CreateUSBSourcePath(JStringRef{env, name},
+                                     JStringRef{env, path}, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -373,8 +294,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createHTTPSourc
   (JNIEnv *env, jclass, jstring name, jstring url)
 {
   CS_Status status;
-  auto val = cs::CreateHTTPSource(JavaStringRef{env, name},
-                                  JavaStringRef{env, url}, &status);
+  auto val = cs::CreateHTTPSource(JStringRef{env, name},
+                                  JStringRef{env, url}, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -388,7 +309,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createCvSource
   (JNIEnv *env, jclass, jstring name, jint numChannels)
 {
   CS_Status status;
-  auto val = cs::CreateCvSource(JavaStringRef{env, name}, numChannels, &status);
+  auto val = cs::CreateCvSource(JStringRef{env, name}, numChannels, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -405,7 +326,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSourceNam
   llvm::SmallString<128> str;
   cs::GetSourceName(source, str, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaString(env, str);
+  return MakeJString(env, str);
 }
 
 /*
@@ -420,7 +341,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSourceDes
   llvm::SmallString<128> str;
   cs::GetSourceDescription(source, str, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaString(env, str);
+  return MakeJString(env, str);
 }
 
 /*
@@ -474,7 +395,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSourceProper
   (JNIEnv *env, jclass, jint source, jstring name)
 {
   CS_Status status;
-  auto val = cs::GetSourceProperty(source, JavaStringRef{env, name}, &status);
+  auto val = cs::GetSourceProperty(source, JStringRef{env, name}, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -491,7 +412,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
   llvm::SmallVector<CS_Property, 32> arr;
   cs::EnumerateSourceProperties(source, arr, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaIntArray(env, arr);
+  return MakeJIntArray(env, arr);
 }
 
 /*
@@ -543,7 +464,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_notifySourceErr
   (JNIEnv *env, jclass, jint source, jstring msg)
 {
   CS_Status status;
-  cs::NotifySourceError(source, JavaStringRef{env, msg}, &status);
+  cs::NotifySourceError(source, JStringRef{env, msg}, &status);
   CheckStatus(env, status);
 }
 
@@ -570,7 +491,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createSourcePro
 {
   CS_Status status;
   auto val =
-      cs::CreateSourceProperty(source, JavaStringRef{env, name},
+      cs::CreateSourceProperty(source, JStringRef{env, name},
                                static_cast<CS_PropertyType>(type), &status);
   CheckStatus(env, status);
   return val;
@@ -598,7 +519,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_removeSourcePro
   (JNIEnv *env, jclass, jint source, jstring name)
 {
   CS_Status status;
-  cs::RemoveSourceProperty(source, JavaStringRef{env, name}, &status);
+  cs::RemoveSourceProperty(source, JStringRef{env, name}, &status);
   CheckStatus(env, status);
 }
 
@@ -612,8 +533,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createHTTPSink
 {
   CS_Status status;
   auto val =
-      cs::CreateHTTPSink(JavaStringRef{env, name},
-                         JavaStringRef{env, listenAddress}, port, &status);
+      cs::CreateHTTPSink(JStringRef{env, name},
+                         JStringRef{env, listenAddress}, port, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -627,7 +548,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createCvSink
   (JNIEnv *env, jclass, jstring name)
 {
   CS_Status status;
-  auto val = cs::CreateCvSink(JavaStringRef{env, name}, &status);
+  auto val = cs::CreateCvSink(JStringRef{env, name}, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -644,7 +565,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSinkName
   llvm::SmallString<128> str;
   cs::GetSinkName(sink, str, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaString(env, str);
+  return MakeJString(env, str);
 }
 
 /*
@@ -659,7 +580,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSinkDescr
   llvm::SmallString<128> str;
   cs::GetSinkDescription(sink, str, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaString(env, str);
+  return MakeJString(env, str);
 }
 
 /*
@@ -684,7 +605,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSinkSourcePr
   (JNIEnv *env, jclass, jint sink, jstring name)
 {
   CS_Status status;
-  auto val = cs::GetSinkSourceProperty(sink, JavaStringRef{env, name}, &status);
+  auto val = cs::GetSinkSourceProperty(sink, JStringRef{env, name}, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -769,7 +690,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSinkError
   llvm::SmallString<128> str;
   cs::GetSinkError(sink, str, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaString(env, str);
+  return MakeJString(env, str);
 }
 
 /*
@@ -826,7 +747,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumera
       env->NewObjectArray(arr.size(), usbCameraInfoCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
-    JavaLocal<jobject> jelem{env, ToJavaObject(env, arr[i])};
+    JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
   }
   return jarr;
@@ -844,7 +765,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
   llvm::SmallVector<CS_Source, 16> arr;
   cs::EnumerateSources(arr, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaIntArray(env, arr);
+  return MakeJIntArray(env, arr);
 }
 
 /*
@@ -859,7 +780,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
   llvm::SmallVector<CS_Sink, 16> arr;
   cs::EnumerateSinks(arr, &status);
   if (!CheckStatus(env, status)) return nullptr;
-  return ToJavaIntArray(env, arr);
+  return MakeJIntArray(env, arr);
 }
 
 }  // extern "C"
