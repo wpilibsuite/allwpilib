@@ -215,7 +215,11 @@ bool NotifierDestroyed();
  * Remote Procedure Call Functions
  */
  
+#if defined(_MSC_VER) && _MSC_VER < 1900
+const double kTimeout_Indefinite = -1;
+#else
 constexpr double kTimeout_Indefinite = -1;
+#endif
 
 void SetRpcServerOnStart(std::function<void()> on_start);
 void SetRpcServerOnExit(std::function<void()> on_exit);
