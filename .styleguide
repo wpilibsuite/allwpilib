@@ -1,3 +1,16 @@
+cExtensions {
+}
+
+cppExtensions {
+  cpp
+  h
+  inc
+}
+
+otherExtensions {
+  java
+}
+
 genFolderExclude {
   \.vscode
   FRC_FPGA_ChipObject
