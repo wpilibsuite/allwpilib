@@ -17,6 +17,21 @@ class raw_istream {
   raw_istream() = default;
   virtual ~raw_istream() = default;
 
+  raw_istream& read(char& c) {
+    read_impl(&c, 1);
+    return *this;
+  }
+
+  raw_istream& read(unsigned char& c) {
+    read_impl(&c, 1);
+    return *this;
+  }
+
+  raw_istream& read(signed char& c) {
+    read_impl(&c, 1);
+    return *this;
+  }
+
   raw_istream& read(void* data, std::size_t len) {
     read_impl(data, len);
     return *this;
