@@ -6,10 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "support/raw_socket_istream.h"
+#include "tcpsockets/NetworkStream.h"
 
 using namespace wpi;
 
-bool raw_socket_istream::read(void* data, std::size_t len) {
+void raw_socket_istream::read_impl(void* data, std::size_t len) {
   char* cdata = static_cast<char*>(data);
   std::size_t pos = 0;
 
@@ -17,10 +18,12 @@ bool raw_socket_istream::read(void* data, std::size_t len) {
     NetworkStream::Error err;
     std::size_t count =
         m_stream.receive(&cdata[pos], len - pos, &err, m_timeout);
-    if (count == 0) return false;
+    if (count == 0) {
+      error_detected();
+      return;
+    }
     pos += count;
   }
-  return true;
 }
 
 void raw_socket_istream::close() { m_stream.close(); }
