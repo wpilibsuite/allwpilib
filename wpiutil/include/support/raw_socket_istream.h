@@ -9,19 +9,21 @@
 #define WPIUTIL_SUPPORT_RAW_SOCKET_ISTREAM_H_
 
 #include "support/raw_istream.h"
-#include "tcpsockets/NetworkStream.h"
 
 namespace wpi {
+
+class NetworkStream;
 
 class raw_socket_istream : public raw_istream {
  public:
   raw_socket_istream(NetworkStream& stream, int timeout = 0)
       : m_stream(stream), m_timeout(timeout) {}
-  virtual ~raw_socket_istream() = default;
-  virtual bool read(void* data, std::size_t len);
-  virtual void close();
+
+  void close() override;
 
  private:
+  void read_impl(void* data, std::size_t len) override;
+
   NetworkStream& m_stream;
   int m_timeout;
 };

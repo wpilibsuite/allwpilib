@@ -103,7 +103,8 @@ bool ReadUleb128(raw_istream& is, unsigned long* ret) {
 
   while (1) {
     unsigned char byte;
-    if (!is.read((char*)&byte, 1)) return false;
+    is.read((char*)&byte, 1);
+    if (is.has_error()) return false;
 
     result |= (byte & 0x7f) << shift;
     shift += 7;

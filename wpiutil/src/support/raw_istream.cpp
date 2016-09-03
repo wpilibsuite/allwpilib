@@ -11,10 +11,14 @@
 
 using namespace wpi;
 
-bool raw_mem_istream::read(void* data, std::size_t len) {
-  if (len > m_left) return false;
+void raw_mem_istream::close() {}
+
+void raw_mem_istream::read_impl(void* data, std::size_t len) {
+  if (len > m_left) {
+    error_detected();
+    return;
+  }
   std::memcpy(data, m_cur, len);
   m_cur += len;
   m_left -= len;
-  return true;
 }

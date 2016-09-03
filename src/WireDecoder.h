@@ -52,7 +52,7 @@ class WireDecoder {
   bool Read(const char** buf, std::size_t len) {
     if (len > m_allocated) Realloc(len);
     *buf = m_buf;
-    bool rv = m_is.read(m_buf, len);
+    m_is.read(m_buf, len);
 #if 0
     nt::Logger& logger = nt::Logger::GetInstance();
     if (logger.min_level() <= NT_LOG_DEBUG4 && logger.HasLogger()) {
@@ -67,7 +67,7 @@ class WireDecoder {
       logger.Log(NT_LOG_DEBUG4, __FILE__, __LINE__, oss.str().c_str());
     }
 #endif
-    return rv;
+    return !m_is.has_error();
   }
 
   /* Reads a single byte. */
