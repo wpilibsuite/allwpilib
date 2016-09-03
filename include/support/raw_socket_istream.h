@@ -16,7 +16,7 @@ class NetworkStream;
 
 class raw_socket_istream : public raw_istream {
  public:
-  raw_socket_istream(NetworkStream& stream, int timeout = 0)
+  explicit raw_socket_istream(NetworkStream& stream, int timeout = 0)
       : m_stream(stream), m_timeout(timeout) {}
 
   void close() override;
