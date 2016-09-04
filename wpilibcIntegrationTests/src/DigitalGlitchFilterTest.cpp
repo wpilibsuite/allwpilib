@@ -7,11 +7,10 @@
 
 #include "DigitalGlitchFilter.h"
 
-#include "gtest/gtest.h"
-
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "Encoder.h"
+#include "gtest/gtest.h"
 
 /**
  * Tests that configuring inputs to be filtered succeeds.

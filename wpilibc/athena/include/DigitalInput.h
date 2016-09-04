@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <memory>
+#include <string>
 
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"

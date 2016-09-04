@@ -5,14 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "gtest/gtest.h"
-
 #include "Encoder.h"
 #include "Jaguar.h"
 #include "Talon.h"
 #include "TestBench.h"
 #include "Timer.h"
 #include "Victor.h"
+#include "gtest/gtest.h"
 
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 static const double motorSpeed = 0.15;

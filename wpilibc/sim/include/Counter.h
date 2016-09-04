@@ -7,11 +7,12 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "CounterBase.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
-
-#include <memory>
 
 /**
  * Class for counting the number of ticks on a digital input channel.

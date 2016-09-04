@@ -7,11 +7,11 @@
 
 #include "HAL/Accelerometer.h"
 
+#include <stdint.h>
+
 #include <cassert>
 #include <cstdio>
 #include <memory>
-
-#include <stdint.h>
 
 #include "ChipObject.h"
 #include "HAL/HAL.h"

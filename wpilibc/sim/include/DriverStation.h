@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "simulation/gz_msgs/msgs.h"
-
 #ifdef _WIN32
 // Ensure that Winsock2.h is included before Windows.h, which can get
 // pulled in by anybody (e.g., Boost).
@@ -16,10 +14,14 @@
 #endif
 
 #include <condition_variable>
-#include <gazebo/transport/transport.hh>
 #include <mutex>
+#include <string>
+
+#include <gazebo/transport/transport.hh>
+
 #include "RobotState.h"
 #include "SensorBase.h"
+#include "simulation/gz_msgs/msgs.h"
 
 struct HALCommonControlData;
 class AnalogInput;

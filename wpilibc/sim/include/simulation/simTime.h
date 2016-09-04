@@ -13,10 +13,10 @@
 #include <Winsock2.h>
 #endif
 
-#include "simulation/SimFloatInput.h"
-
 #include <condition_variable>
 #include <mutex>
+
+#include "simulation/SimFloatInput.h"
 
 namespace wpilib {
 namespace internal {

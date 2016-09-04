@@ -7,7 +7,6 @@
 
 #include "Commands/PIDSubsystem.h"
 #include "PIDController.h"
-#include "float.h"
 
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d

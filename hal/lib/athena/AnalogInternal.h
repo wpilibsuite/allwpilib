@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#include <memory>
+
 #include "ChipObject.h"
 #include "HAL/Ports.h"
 #include "HAL/cpp/priority_mutex.h"

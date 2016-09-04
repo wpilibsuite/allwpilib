@@ -7,11 +7,11 @@
 
 #include "AnalogTrigger.h"
 
+#include <memory>
+
 #include "AnalogInput.h"
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
-
-#include <memory>
 
 /**
  * Constructor for an analog trigger given a channel number.

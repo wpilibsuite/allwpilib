@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <memory>
+#include <string>
 
 #include "HAL/AnalogOutput.h"
 #include "LiveWindow/LiveWindowSendable.h"

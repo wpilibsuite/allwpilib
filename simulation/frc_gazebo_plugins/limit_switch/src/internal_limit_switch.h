@@ -7,13 +7,14 @@
 
 #pragma once
 
-#include "switch.h"
-
 #ifdef _WIN32
 #include <Winsock2.h>
 #endif
+
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
+
+#include "switch.h"
 
 using namespace gazebo;
 

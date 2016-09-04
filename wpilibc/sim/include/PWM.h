@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "simulation/SimContinuousOutput.h"
 #include "tables/ITableListener.h"
-
-#include <memory>
 
 /**
  * Class implements the PWM generation in the FPGA.

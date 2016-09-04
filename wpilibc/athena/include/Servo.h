@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "SafePWM.h"
 #include "SpeedController.h"

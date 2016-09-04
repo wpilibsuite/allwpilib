@@ -6,12 +6,13 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
+
+#include <sstream>
+
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-
-#include <sstream>
 
 const uint8_t AnalogInput::kAccumulatorModuleNumber;
 const uint32_t AnalogInput::kAccumulatorNumChannels;

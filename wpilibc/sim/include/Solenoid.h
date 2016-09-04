@@ -7,11 +7,12 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "simulation/SimContinuousOutput.h"
 #include "tables/ITableListener.h"
-
-#include <memory>
 
 /**
  * Solenoid class for running high voltage Digital Output (PCM).

@@ -5,18 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Filters/LinearDigitalFilter.h"
+#include "Filters/LinearDigitalFilter.h"  // NOLINT(build/include_order)
 
 #include <math.h>
+
 #include <functional>
 #include <memory>
 #include <random>
 #include <thread>
 
-#include "gtest/gtest.h"
-
 #include "Base.h"
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 enum FilterNoiseTestType { TEST_SINGLE_POLE_IIR, TEST_MOVAVG };
 

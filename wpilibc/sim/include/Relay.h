@@ -7,14 +7,15 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "SensorBase.h"
 #include "simulation/SimContinuousOutput.h"
 #include "tables/ITable.h"
 #include "tables/ITableListener.h"
-
-#include <memory>
 
 class MotorSafetyHelper;
 class DigitalModule;

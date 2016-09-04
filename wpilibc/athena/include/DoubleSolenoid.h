@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "HAL/Types.h"
 #include "LiveWindow/LiveWindowSendable.h"

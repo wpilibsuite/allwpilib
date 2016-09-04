@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "CANSpeedController.h"
 #include "HAL/CanTalonSRX.h"

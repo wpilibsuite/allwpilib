@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "Commands/Command.h"
 
 class WaitCommand : public Command {

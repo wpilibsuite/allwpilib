@@ -5,13 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
-
 #include <cstdlib>
 #include <cstring>
 #include <limits>
 
 #include "FRC_NetworkCommunication/FRCComm.h"
+#include "HAL/HAL.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 

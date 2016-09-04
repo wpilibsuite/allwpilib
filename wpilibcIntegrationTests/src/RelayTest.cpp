@@ -7,11 +7,10 @@
 
 #include "Relay.h"
 
-#include "gtest/gtest.h"
-
 #include "DigitalInput.h"
 #include "TestBench.h"
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 static const double kDelayTime = 0.01;
 

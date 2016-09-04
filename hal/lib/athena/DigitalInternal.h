@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#include <memory>
+
 #include "ChipObject.h"
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Ports.h"

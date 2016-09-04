@@ -7,13 +7,12 @@
 
 #include "PowerDistributionPanel.h"
 
-#include "gtest/gtest.h"
-
 #include "Jaguar.h"
 #include "Talon.h"
 #include "TestBench.h"
 #include "Timer.h"
 #include "Victor.h"
+#include "gtest/gtest.h"
 
 static const double kMotorTime = 0.25;
 

@@ -8,7 +8,9 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
+
 #include "SensorBase.h"
 #include "SmartDashboard/NamedSendable.h"
 #include "SmartDashboard/Sendable.h"

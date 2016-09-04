@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
 #include "simulation/SimFloatInput.h"
-
-#include <memory>
 
 /**
  * Analog input class.

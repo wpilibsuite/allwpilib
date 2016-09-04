@@ -7,10 +7,10 @@
 
 #pragma once
 
+#include <memory>
+
 #include "GyroBase.h"
 #include "simulation/SimGyro.h"
-
-#include <memory>
 
 class AnalogInput;
 class AnalogModule;

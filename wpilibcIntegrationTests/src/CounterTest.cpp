@@ -7,13 +7,12 @@
 
 #include "Counter.h"
 
-#include "gtest/gtest.h"
-
 #include "Jaguar.h"
 #include "Talon.h"
 #include "TestBench.h"
 #include "Timer.h"
 #include "Victor.h"
+#include "gtest/gtest.h"
 
 static const double kMotorDelay = 2.5;
 

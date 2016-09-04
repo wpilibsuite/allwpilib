@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SPI.h"

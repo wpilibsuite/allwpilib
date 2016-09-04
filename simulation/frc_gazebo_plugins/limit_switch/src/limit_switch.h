@@ -7,16 +7,16 @@
 
 #pragma once
 
-#include "simulation/gz_msgs/msgs.h"
-
-#include "switch.h"
-
-#include "external_limit_switch.h"
-#include "internal_limit_switch.h"
+#include <string>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/transport/transport.hh>
+
+#include "external_limit_switch.h"
+#include "internal_limit_switch.h"
+#include "simulation/gz_msgs/msgs.h"
+#include "switch.h"
 
 using namespace gazebo;
 

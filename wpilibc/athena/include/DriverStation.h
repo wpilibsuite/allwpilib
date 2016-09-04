@@ -9,6 +9,8 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <memory>
+#include <string>
 
 #include "HAL/cpp/Semaphore.h"
 #include "HAL/cpp/priority_condition_variable.h"

@@ -9,7 +9,9 @@
 
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
+
 #include "Commands/Scheduler.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"

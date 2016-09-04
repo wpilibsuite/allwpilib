@@ -7,10 +7,11 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "simulation/SimDigitalInput.h"
-
-#include <memory>
 
 /**
  * Class to read a digital input.

@@ -9,6 +9,7 @@
 
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"

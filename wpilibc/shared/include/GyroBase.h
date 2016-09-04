@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
 #include "interfaces/Gyro.h"
-
-#include <memory>
 
 /**
  * GyroBase is the common base class for Gyro implementations such as

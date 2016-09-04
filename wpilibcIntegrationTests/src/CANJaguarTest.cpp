@@ -7,14 +7,13 @@
 
 #include "CANJaguar.h"
 
-#include "gtest/gtest.h"
-
 #include "AnalogOutput.h"
 #include "DigitalOutput.h"
 #include "Relay.h"
 #include "TestBench.h"
 #include "Timer.h"
 #include "WPIErrors.h"
+#include "gtest/gtest.h"
 
 static constexpr double kSpikeTime = 0.5;
 

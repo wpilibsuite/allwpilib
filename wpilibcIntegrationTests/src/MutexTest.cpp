@@ -5,15 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/cpp/priority_mutex.h"
+#include "HAL/cpp/priority_mutex.h"  // NOLINT(build/include_order)
 
 #include <atomic>
 #include <condition_variable>
 #include <thread>
 
-#include "gtest/gtest.h"
-
 #include "TestBench.h"
+#include "gtest/gtest.h"
 
 namespace wpilib {
 namespace testing {
