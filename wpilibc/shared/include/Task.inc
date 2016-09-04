@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#pragma once
+
 #include <atomic>
 #include "HAL/HAL.h"
 

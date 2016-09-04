@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#pragma once
+
 #include <memory>
 
 #include "AnalogInput.h"
