@@ -32,11 +32,22 @@ struct CvMat;
 // Typedefs
 //
 typedef int CS_Bool;
-typedef int CS_Property;
-typedef int CS_Listener;
-typedef int CS_Sink;
-typedef int CS_Source;
 typedef int CS_Status;
+
+typedef int CS_Handle;
+typedef CS_Handle CS_Property;
+typedef CS_Handle CS_Listener;
+typedef CS_Handle CS_Sink;
+typedef CS_Handle CS_Source;
+
+//
+// Status values
+//
+enum CS_StatusValue {
+  CS_OK = 0,
+  CS_INVALID_HANDLE = -2000,    // handle was invalid (does not exist)
+  CS_WRONG_HANDLE_SUBTYPE = -2001
+};
 
 //
 // Property Functions
