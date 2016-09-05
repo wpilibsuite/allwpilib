@@ -32,7 +32,7 @@ namespace {
 struct Notifier {
   std::shared_ptr<Notifier> prev, next;
   void* param;
-  void (*process)(uint64_t, HAL_NotifierHandle);
+  HAL_NotifierProcessFunction process;
   uint64_t triggerTime = UINT64_MAX;
   HAL_NotifierHandle handle;
 };
@@ -110,7 +110,7 @@ static void cleanupNotifierAtExit() {
 
 extern "C" {
 
-HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, HAL_NotifierHandle),
+HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
                                           void* param, int32_t* status) {
   if (!process) {
     *status = NULL_PARAMETER;
@@ -134,8 +134,8 @@ HAL_NotifierHandle HAL_InitializeNotifier(void (*process)(uint64_t, HAL_Notifier
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle = notifierHandles.Allocate(notifier);
   if (handle == HAL_kInvalidHandle) {
-	  *status = HAL_HANDLE_ERROR;
-	  return HAL_kInvalidHandle;
+    *status = HAL_HANDLE_ERROR;
+    return HAL_kInvalidHandle;
   }
   // create notifier structure and add to list
   notifier->next = notifiers;

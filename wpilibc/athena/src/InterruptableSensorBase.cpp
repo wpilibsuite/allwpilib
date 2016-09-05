@@ -22,7 +22,7 @@ InterruptableSensorBase::InterruptableSensorBase() {}
  * thread. The default is interrupt on rising edges only.
  */
 void InterruptableSensorBase::RequestInterrupts(
-    InterruptHandlerFunction handler, void* param) {
+    HAL_InterruptHandlerFunction handler, void* param) {
   if (StatusIsFatal()) return;
 
   wpi_assert(m_interrupt == HAL_kInvalidHandle);
