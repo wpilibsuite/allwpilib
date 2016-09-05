@@ -328,7 +328,8 @@ void HAL_SetSPIHandle(int32_t port, int32_t handle) {
   }
 }
 
-static void spiAccumulatorProcess(uint64_t currentTime, HAL_NotifierHandle handle) {
+static void spiAccumulatorProcess(uint64_t currentTime,
+                                  HAL_NotifierHandle handle) {
   int32_t status = 0;
   auto param = HAL_GetNotifierParam(handle, &status);
   if (param == nullptr) return;
