@@ -7,9 +7,31 @@
 
 #include "cameraserver_cpp.h"
 
-#include <limits>
+#include "llvm/SmallString.h"
+
+#include "SinkImpl.h"
+#include "SourceImpl.h"
+#include "Handle.h"
 
 using namespace cs;
+
+static std::shared_ptr<SourceImpl> GetPropertySource(CS_Property propertyHandle,
+                                                     int* propertyIndex,
+                                                     CS_Status* status) {
+  Handle handle{propertyHandle};
+  int i = handle.GetTypedIndex(Handle::kProperty);
+  if (i < 0) {
+    *status = CS_INVALID_HANDLE;
+    return nullptr;
+  }
+  auto data = Sources::GetInstance().Get(Handle{i, Handle::kSource});
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return nullptr;
+  }
+  *propertyIndex = handle.GetSubIndex();
+  return data->source;
+}
 
 namespace cs {
 
@@ -18,67 +40,116 @@ namespace cs {
 //
 
 CS_PropertyType GetPropertyType(CS_Property property, CS_Status* status) {
-  return CS_PROP_NONE;  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return CS_PROP_NONE;
+  return source->GetPropertyType(propertyIndex);
 }
 
 std::string GetPropertyName(CS_Property property, CS_Status* status) {
-  return "";  // TODO
+  llvm::SmallString<128> name;
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return std::string{};
+  source->GetPropertyName(propertyIndex, name);
+  return name.str();
 }
 
 void GetPropertyName(CS_Property property, llvm::SmallVectorImpl<char>& name,
                      CS_Status* status) {
-  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return;
+  source->GetPropertyName(propertyIndex, name);
 }
 
 bool GetBooleanProperty(CS_Property property, CS_Status* status) {
-  return false;  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return false;
+  return source->GetBooleanProperty(propertyIndex);
 }
 
 void SetBooleanProperty(CS_Property property, bool value, CS_Status* status) {
-  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return;
+  source->SetBooleanProperty(propertyIndex, value);
 }
 
 double GetDoubleProperty(CS_Property property, CS_Status* status) {
-  return 0.0;  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return false;
+  return source->GetDoubleProperty(propertyIndex);
 }
 
 void SetDoubleProperty(CS_Property property, double value, CS_Status* status) {
-  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return;
+  source->SetDoubleProperty(propertyIndex, value);
 }
 
 double GetDoublePropertyMin(CS_Property property, CS_Status* status) {
-  return 0.0;  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return 0.0;
+  return source->GetPropertyMin(propertyIndex);
 }
 
 double GetDoublePropertyMax(CS_Property property, CS_Status* status) {
-  return 0.0;  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return 0.0;
+  return source->GetPropertyMax(propertyIndex);
 }
 
 std::string GetStringProperty(CS_Property property, CS_Status* status) {
-  return "";  // TODO
+  llvm::SmallString<128> value;
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return std::string{};
+  source->GetStringProperty(propertyIndex, value);
+  return value.str();
 }
 
 void GetStringProperty(CS_Property property, llvm::SmallVectorImpl<char>& value,
                        CS_Status* status) {
-  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return;
+  source->GetStringProperty(propertyIndex, value);
 }
 
 void SetStringProperty(CS_Property property, llvm::StringRef value,
                        CS_Status* status) {
-  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return;
+  source->SetStringProperty(propertyIndex, value);
 }
 
 int GetEnumProperty(CS_Property property, CS_Status* status) {
-  return 0;  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return 0;
+  return source->GetEnumProperty(propertyIndex);
 }
 
 void SetEnumProperty(CS_Property property, int value, CS_Status* status) {
-  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return;
+  source->SetEnumProperty(propertyIndex, value);
 }
 
 std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
                                                 CS_Status* status) {
-  return std::vector<std::string>{};  // TODO
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return std::vector<std::string>{};
+  return source->GetEnumPropertyChoices(propertyIndex);
 }
 
 //
@@ -109,21 +180,44 @@ CS_Source CreateCvSource(llvm::StringRef name, int numChannels,
 //
 
 std::string GetSourceName(CS_Source source, CS_Status* status) {
-  return "";  // TODO
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return data->source->GetName();
 }
 
-void GetSourceName(CS_Source sink, llvm::SmallVectorImpl<char>& name,
+void GetSourceName(CS_Source source, llvm::SmallVectorImpl<char>& name,
                    CS_Status* status) {
-  // TODO
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  auto str = data->source->GetName();
+  name.append(str.begin(), str.end());
 }
 
 std::string GetSourceDescription(CS_Source source, CS_Status* status) {
-  return "";  // TODO
+  llvm::SmallString<128> desc;
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  data->source->GetDescription(desc);
+  return desc.str();
 }
 
 void GetSourceDescription(CS_Source source, llvm::SmallVectorImpl<char>& desc,
                           CS_Status* status) {
-  // TODO
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->GetDescription(desc);
 }
 
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
@@ -131,16 +225,36 @@ uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
 }
 
 int GetSourceNumChannels(CS_Source source, CS_Status* status) {
-  return 0;  // TODO
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  return data->source->GetNumChannels();
 }
 
 bool IsSourceConnected(CS_Source source, CS_Status* status) {
-  return false;  // TODO
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->IsConnected();
 }
 
 CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
                               CS_Status* status) {
-  return 0;  // TODO
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  int property = data->source->GetProperty(name);
+  if (property < 0) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  return Handle{source, property, Handle::kProperty};
 }
 
 void EnumerateSourceProperties(CS_Source source,
@@ -150,11 +264,25 @@ void EnumerateSourceProperties(CS_Source source,
 }
 
 CS_Source CopySource(CS_Source source, CS_Status* status) {
-  return source;  // TODO
+  if (source == 0) return 0;
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  data->refCount++;
+  return source;
 }
 
 void ReleaseSource(CS_Source source, CS_Status* status) {
-  // TODO
+  if (source == 0) return;
+  auto& inst = Sources::GetInstance();
+  auto data = inst.Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  if (--(data->refCount) == 0) inst.Free(source);
 }
 
 //
@@ -227,42 +355,100 @@ CS_Sink CreateCvSinkCallback(llvm::StringRef name,
 // Sink Functions
 //
 std::string GetSinkName(CS_Sink sink, CS_Status* status) {
-  return "";  // TODO
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return data->sink->GetName();
 }
 
 void GetSinkName(CS_Sink sink, llvm::SmallVectorImpl<char>& name,
                  CS_Status* status) {
-  // TODO
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  auto str = data->sink->GetName();
+  name.append(str.begin(), str.end());
 }
 
 std::string GetSinkDescription(CS_Sink sink, CS_Status* status) {
-  return "";  // TODO
+  llvm::SmallString<128> desc;
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  data->sink->GetDescription(desc);
+  return desc.str();
 }
 
 void GetSinkDescription(CS_Sink sink, llvm::SmallVectorImpl<char>& desc,
                         CS_Status* status) {
-  // TODO
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->sink->GetDescription(desc);
 }
 
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
-  // TODO
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  auto sourceData = Sources::GetInstance().Get(source);
+  if (!sourceData) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->sink->SetSource(sourceData->source);
+  data->sourceHandle.store(source);
 }
 
 CS_Source GetSinkSource(CS_Sink sink, CS_Status* status) {
-  return 0;  // TODO
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  return data->sourceHandle.load();
 }
 
 CS_Property GetSinkSourceProperty(CS_Sink sink, llvm::StringRef name,
                                   CS_Status* status) {
-  return 0;  // TODO
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  return GetSourceProperty(data->sourceHandle.load(), name, status);
 }
 
 CS_Sink CopySink(CS_Sink sink, CS_Status* status) {
-  return sink;  // TODO
+  if (sink == 0) return 0;
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  data->refCount++;
+  return sink;
 }
 
 void ReleaseSink(CS_Sink sink, CS_Status* status) {
-  // TODO
+  if (sink == 0) return;
+  auto& inst = Sinks::GetInstance();
+  auto data = inst.Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  if (--(data->refCount) == 0) inst.Free(sink);
 }
 
 //
@@ -338,12 +524,12 @@ std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {
 
 void EnumerateSourceHandles(llvm::SmallVectorImpl<CS_Source>& handles,
                             CS_Status* status) {
-  // TODO
+  Sources::GetInstance().GetAll(handles);
 }
 
 void EnumerateSinkHandles(llvm::SmallVectorImpl<CS_Sink>& handles,
                           CS_Status* status) {
-  // TODO
+  Sinks::GetInstance().GetAll(handles);
 }
 
 }  // namespace cs
