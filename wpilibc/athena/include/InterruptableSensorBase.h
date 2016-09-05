@@ -27,7 +27,7 @@ class InterruptableSensorBase : public SensorBase {
   virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
   virtual void RequestInterrupts(
-      InterruptHandlerFunction handler,
+      HAL_InterruptHandlerFunction handler,
       void* param);                  ///< Asynchronus handler version.
   virtual void RequestInterrupts();  ///< Synchronus Wait version.
   virtual void

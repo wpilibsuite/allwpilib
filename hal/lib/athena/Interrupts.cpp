@@ -171,8 +171,8 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
 }
 
 void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
-                                InterruptHandlerFunction handler, void* param,
-                                int32_t* status) {
+                                HAL_InterruptHandlerFunction handler,
+                                void* param, int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;

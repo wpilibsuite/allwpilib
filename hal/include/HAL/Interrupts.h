@@ -15,8 +15,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-typedef void (*InterruptHandlerFunction)(uint32_t interruptAssertedMask,
-                                         void* param);
+typedef void (*HAL_InterruptHandlerFunction)(uint32_t interruptAssertedMask,
+                                             void* param);
 
 HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher, int32_t* status);
 void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status);
@@ -36,8 +36,8 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
                            HAL_AnalogTriggerType analogTriggerType,
                            int32_t* status);
 void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
-                                InterruptHandlerFunction handler, void* param,
-                                int32_t* status);
+                                HAL_InterruptHandlerFunction handler,
+                                void* param, int32_t* status);
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status);
