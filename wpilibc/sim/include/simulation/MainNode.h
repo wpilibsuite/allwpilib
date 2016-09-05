@@ -7,8 +7,11 @@
 
 #pragma once
 
+#include <string>
+
 #include <gazebo/gazebo_client.hh>
 #include <gazebo/transport/transport.hh>
+
 #include "simulation/gz_msgs/msgs.h"
 
 using namespace gazebo;

@@ -7,9 +7,8 @@
 
 #include "BuiltInAccelerometer.h"
 
-#include "gtest/gtest.h"
-
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 static constexpr double kAccelerationTolerance = 0.1;
 /**

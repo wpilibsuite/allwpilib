@@ -8,7 +8,9 @@
 #pragma once
 
 #include <list>
+#include <string>
 #include <vector>
+
 #include "Commands/Command.h"
 #include "Commands/CommandGroupEntry.h"
 

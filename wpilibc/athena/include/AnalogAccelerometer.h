@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "AnalogInput.h"
 #include "LiveWindow/LiveWindowSendable.h"

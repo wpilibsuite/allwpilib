@@ -7,10 +7,9 @@
 
 #include "Notifier.h"
 
-#include "gtest/gtest.h"
-
 #include "TestBench.h"
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 unsigned notifierCounter;
 

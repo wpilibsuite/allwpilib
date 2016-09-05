@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <string>
+
 /*  Constants */
 #define LOG_DEBUG __FILE__, __FUNCTION__, __LINE__, DEBUG_TYPE
 #define LOG_INFO __FILE__, __FUNCTION__, __LINE__, INFO_TYPE

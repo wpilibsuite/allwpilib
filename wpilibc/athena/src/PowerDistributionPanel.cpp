@@ -6,11 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "PowerDistributionPanel.h"
+
+#include <sstream>
+
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
-
-#include <sstream>
 
 PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 

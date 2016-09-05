@@ -11,6 +11,7 @@
 #include <functional>
 #include <list>
 #include <thread>
+#include <utility>
 
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"

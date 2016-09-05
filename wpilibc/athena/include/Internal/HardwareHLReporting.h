@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#pragma once
+
 #include "HLUsageReporting.h"
 
 class HardwareHLReporting : public HLUsageReportingInterface {

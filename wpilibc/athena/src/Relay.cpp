@@ -7,12 +7,12 @@
 
 #include "Relay.h"
 
+#include <sstream>
+
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "WPIErrors.h"
-
-#include <sstream>
 
 /**
  * Relay constructor given a channel.

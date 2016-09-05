@@ -7,9 +7,9 @@
 
 #include "CircularBuffer.h"
 
-#include "gtest/gtest.h"
-
 #include <array>
+
+#include "gtest/gtest.h"
 
 static const std::array<double, 10> values = {
     751.848, 766.366, 342.657, 234.252, 716.126,

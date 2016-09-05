@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "AnalogTriggerOutput.h"
 #include "HAL/Types.h"
 #include "SensorBase.h"

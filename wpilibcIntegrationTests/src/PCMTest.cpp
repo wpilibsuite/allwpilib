@@ -5,8 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "gtest/gtest.h"
-
 #include "AnalogInput.h"
 #include "Compressor.h"
 #include "DigitalInput.h"
@@ -15,6 +13,7 @@
 #include "Solenoid.h"
 #include "TestBench.h"
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 /* The PCM switches the compressor up to a couple seconds after the pressure
         switch changes. */

@@ -181,7 +181,7 @@ void CommandGroup::_Execute() {
     m_currentCommandIndex = 0;
   }
 
-  while ((unsigned)m_currentCommandIndex < m_commands.size()) {
+  while (static_cast<size_t>(m_currentCommandIndex) < m_commands.size()) {
     if (cmd != nullptr) {
       if (entry.IsTimedOut()) cmd->_Cancel();
 
@@ -243,7 +243,7 @@ void CommandGroup::_End() {
   // Theoretically, we don't have to check this, but we do if teams override the
   // IsFinished method
   if (m_currentCommandIndex != -1 &&
-      (unsigned)m_currentCommandIndex < m_commands.size()) {
+      static_cast<size_t>(m_currentCommandIndex) < m_commands.size()) {
     Command* cmd = m_commands[m_currentCommandIndex].m_command;
     cmd->_Cancel();
     cmd->Removed();
@@ -273,7 +273,7 @@ void CommandGroup::End() {}
 void CommandGroup::Interrupted() {}
 
 bool CommandGroup::IsFinished() {
-  return (unsigned)m_currentCommandIndex >= m_commands.size() &&
+  return static_cast<size_t>(m_currentCommandIndex) >= m_commands.size() &&
          m_children.empty();
 }
 
@@ -281,7 +281,7 @@ bool CommandGroup::IsInterruptible() const {
   if (!Command::IsInterruptible()) return false;
 
   if (m_currentCommandIndex != -1 &&
-      (unsigned)m_currentCommandIndex < m_commands.size()) {
+      static_cast<size_t>(m_currentCommandIndex) < m_commands.size()) {
     Command* cmd = m_commands[m_currentCommandIndex].m_command;
     if (!cmd->IsInterruptible()) return false;
   }

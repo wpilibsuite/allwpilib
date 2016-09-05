@@ -5,19 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "Vision/BaeUtilities.h"
+
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
 #include <iomanip>
 #include <iostream>
 
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 #include "Servo.h"
 #include "Timer.h"
-#include "Vision/BaeUtilities.h"
 
 /** @file
  *   Utility functions

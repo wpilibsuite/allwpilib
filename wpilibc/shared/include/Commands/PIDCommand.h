@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "Commands/Command.h"
 #include "PIDController.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
-
-#include <memory>
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:

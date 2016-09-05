@@ -8,6 +8,8 @@
 #pragma once
 
 #include <memory>
+#include <string>
+
 #include "SmartDashboard/Sendable.h"
 
 class Command;

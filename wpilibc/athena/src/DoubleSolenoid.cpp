@@ -6,11 +6,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DoubleSolenoid.h"
+
+#include <sstream>
+
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
-
-#include <sstream>
 
 /**
  * Constructor.

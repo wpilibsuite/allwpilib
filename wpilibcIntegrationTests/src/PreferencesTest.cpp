@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Preferences.h"
+#include "Preferences.h"  // NOLINT(build/include_order)
 
 #include <stdio.h>
+
 #include <fstream>
 
-#include "gtest/gtest.h"
-
 #include "Timer.h"
+#include "gtest/gtest.h"
 #include "ntcore.h"
 
 static const char* kFileName = "networktables.ini";

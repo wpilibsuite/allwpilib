@@ -7,12 +7,13 @@
 
 #pragma once
 
+#include <memory>
+#include <string>
+
 #include "Commands/Subsystem.h"
 #include "PIDController.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
-
-#include <memory>
 
 /**
  * This class is designed to handle the case where there is a {@link Subsystem}

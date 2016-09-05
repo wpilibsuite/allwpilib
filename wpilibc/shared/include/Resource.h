@@ -8,10 +8,12 @@
 #pragma once
 
 #include <stdint.h>
-#include <memory>
-#include <vector>
-#include "ErrorBase.h"
 
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"
 
 /**

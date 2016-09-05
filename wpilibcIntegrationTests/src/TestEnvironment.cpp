@@ -5,11 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "gtest/gtest.h"
-
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 class TestEnvironment : public testing::Environment {
   bool m_alreadySetUp = false;

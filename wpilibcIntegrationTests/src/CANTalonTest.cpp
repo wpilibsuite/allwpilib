@@ -7,10 +7,9 @@
 
 #include "CANTalon.h"
 
-#include "gtest/gtest.h"
-
 #include "TestBench.h"
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 const int deviceId = 0;
 

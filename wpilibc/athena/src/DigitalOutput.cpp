@@ -7,11 +7,11 @@
 
 #include "DigitalOutput.h"
 
-#include "HAL/HAL.h"
-#include "WPIErrors.h"
-
 #include <limits>
 #include <sstream>
+
+#include "HAL/HAL.h"
+#include "WPIErrors.h"
 
 /**
  * Create an instance of a digital output.

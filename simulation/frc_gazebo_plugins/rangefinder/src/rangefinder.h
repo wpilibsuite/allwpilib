@@ -7,9 +7,11 @@
 
 #pragma once
 
-#include <simulation/gz_msgs/msgs.h>
+#include <string>
 
 #include <gazebo/gazebo.hh>
+
+#include "simulation/gz_msgs/msgs.h"
 
 using namespace gazebo;
 

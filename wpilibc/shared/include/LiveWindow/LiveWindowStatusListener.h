@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include "tables/ITable.h"
 #include "tables/ITableListener.h"
 

@@ -5,7 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#pragma once
+
 #include <atomic>
+#include <string>
+#include <utility>
+
 #include "HAL/HAL.h"
 
 /**

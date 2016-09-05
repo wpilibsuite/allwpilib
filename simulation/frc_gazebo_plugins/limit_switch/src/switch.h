@@ -9,7 +9,7 @@
 
 class Switch {
  public:
-  virtual ~Switch() {}
+  virtual ~Switch() = default;
 
   /// \brief Returns true when the switch is triggered.
   virtual bool Get() = 0;

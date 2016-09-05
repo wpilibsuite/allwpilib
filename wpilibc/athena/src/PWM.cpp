@@ -7,11 +7,11 @@
 
 #include "PWM.h"
 
+#include <sstream>
+
 #include "HAL/HAL.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-
-#include <sstream>
 
 /**
  * Allocate a PWM given a channel number.

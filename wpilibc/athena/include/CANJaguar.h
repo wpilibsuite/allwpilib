@@ -10,6 +10,7 @@
 #include <atomic>
 #include <memory>
 #include <sstream>
+#include <string>
 #include <utility>
 
 #include "CAN/can_proto.h"

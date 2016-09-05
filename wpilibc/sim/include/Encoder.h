@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <memory>
+#include <string>
 
 #include "CounterBase.h"
 #include "LiveWindow/LiveWindowSendable.h"

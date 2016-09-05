@@ -7,6 +7,8 @@
 
 #include "external_limit_switch.h"
 
+#include <string>
+
 ExternalLimitSwitch::ExternalLimitSwitch(sdf::ElementPtr sdf) {
   sensor = std::dynamic_pointer_cast<sensors::ContactSensor>(
       sensors::get_sensor(sdf->Get<std::string>("sensor")));

@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include "GyroBase.h"
+#include <memory>
 
+#include "GyroBase.h"
 #include "HAL/Types.h"
 
 class AnalogInput;

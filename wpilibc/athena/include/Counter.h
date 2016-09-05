@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "AnalogTrigger.h"
 #include "CounterBase.h"

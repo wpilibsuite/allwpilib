@@ -7,6 +7,8 @@
 
 #include "internal_limit_switch.h"
 
+#include <string>
+
 InternalLimitSwitch::InternalLimitSwitch(physics::ModelPtr model,
                                          sdf::ElementPtr sdf) {
   joint = model->GetJoint(sdf->Get<std::string>("joint"));

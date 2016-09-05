@@ -13,7 +13,10 @@
 #include <Winsock2.h>
 #endif
 
+#include <string>
+
 #include <gazebo/transport/transport.hh>
+
 #include "SpeedController.h"
 
 using namespace gazebo;

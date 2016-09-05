@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "DigitalSource.h"
 #include "HAL/Types.h"

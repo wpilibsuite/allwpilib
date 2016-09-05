@@ -10,6 +10,7 @@
 #include <atomic>
 #include <memory>
 #include <set>
+#include <string>
 
 #include "Counter.h"
 #include "LiveWindow/LiveWindowSendable.h"

@@ -7,12 +7,11 @@
 
 #include "AnalogPotentiometer.h"
 
-#include "gtest/gtest.h"
-
 #include "AnalogOutput.h"
 #include "ControllerPower.h"
 #include "TestBench.h"
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 static const double kScale = 270.0;
 static const double kAngle = 180.0;

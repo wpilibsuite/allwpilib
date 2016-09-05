@@ -5,13 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "gtest/gtest.h"
-
 #include "ADXL345_SPI.h"
 #include "AnalogGyro.h"
 #include "Servo.h"
 #include "TestBench.h"
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 static constexpr double kServoResetTime = 2.0;
 

@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include <functional>
+#include <utility>
 
 #include "ErrorBase.h"
 #include "HAL/Notifier.h"

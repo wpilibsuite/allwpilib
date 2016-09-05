@@ -5,14 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "gtest/gtest.h"
-
 #include "AnalogInput.h"
 #include "AnalogOutput.h"
 #include "AnalogTrigger.h"
 #include "Counter.h"
 #include "TestBench.h"
 #include "Timer.h"
+#include "gtest/gtest.h"
 
 static const double kDelayTime = 0.01;
 

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "I2C.h"
 #include "LiveWindow/LiveWindowSendable.h"

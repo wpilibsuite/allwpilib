@@ -7,6 +7,11 @@
 
 #pragma once
 
+#include <atomic>
+#include <memory>
+#include <queue>
+#include <string>
+
 #include "Base.h"
 #include "Controller.h"
 #include "HAL/cpp/priority_mutex.h"
@@ -15,11 +20,6 @@
 #include "PIDInterface.h"
 #include "PIDSource.h"
 #include "Timer.h"
-
-#include <memory>
-
-#include <atomic>
-#include <queue>
 
 class PIDOutput;
 
