@@ -19,13 +19,11 @@
 #include <Winsock2.h>
 #endif
 
-using namespace gazebo;
-
 namespace frc {
 
 class SimContinuousOutput {
  private:
-  transport::PublisherPtr pub;
+  gazebo::transport::PublisherPtr pub;
   float speed;
 
  public:

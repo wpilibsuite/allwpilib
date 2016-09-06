@@ -29,26 +29,26 @@ int DriverStation::m_updateNumber = 0;
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation() {
-  state = msgs::DriverStationPtr(new msgs::DriverStation());
+  state = gazebo::msgs::DriverStationPtr(new gazebo::msgs::DriverStation());
   stateSub =
       MainNode::Subscribe("~/ds/state", &DriverStation::stateCallback, this);
   // TODO: for loop + boost bind
-  joysticks[0] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+  joysticks[0] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[0] = MainNode::Subscribe(
       "~/ds/joysticks/0", &DriverStation::joystickCallback0, this);
-  joysticks[1] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+  joysticks[1] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[1] = MainNode::Subscribe(
       "~/ds/joysticks/1", &DriverStation::joystickCallback1, this);
-  joysticks[2] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+  joysticks[2] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[2] = MainNode::Subscribe(
       "~/ds/joysticks/2", &DriverStation::joystickCallback2, this);
-  joysticks[3] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+  joysticks[3] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[3] = MainNode::Subscribe(
       "~/ds/joysticks/5", &DriverStation::joystickCallback3, this);
-  joysticks[4] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+  joysticks[4] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[4] = MainNode::Subscribe(
       "~/ds/joysticks/4", &DriverStation::joystickCallback4, this);
-  joysticks[5] = msgs::FRCJoystickPtr(new msgs::FRCJoystick());
+  joysticks[5] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[5] = MainNode::Subscribe(
       "~/ds/joysticks/5", &DriverStation::joystickCallback5, this);
 }
@@ -137,7 +137,7 @@ int16_t DriverStation::GetStickButtons(int stick) {
   int16_t btns = 0, btnid;
 
   std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
-  msgs::FRCJoystickPtr joy = joysticks[stick];
+  gazebo::msgs::FRCJoystickPtr joy = joysticks[stick];
   for (btnid = 0; btnid < joy->buttons().size() && btnid < 12; btnid++) {
     if (joysticks[stick]->buttons(btnid)) {
       btns |= (1 << btnid);
@@ -212,8 +212,9 @@ bool DriverStation::IsDisabled() const { return !IsEnabled(); }
 
 bool DriverStation::IsAutonomous() const {
   std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
-  return state != nullptr ? state->state() == msgs::DriverStation_State_AUTO
-                          : false;
+  return state != nullptr
+             ? state->state() == gazebo::msgs::DriverStation_State_AUTO
+             : false;
 }
 
 bool DriverStation::IsOperatorControl() const {
@@ -222,8 +223,9 @@ bool DriverStation::IsOperatorControl() const {
 
 bool DriverStation::IsTest() const {
   std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
-  return state != nullptr ? state->state() == msgs::DriverStation_State_TEST
-                          : false;
+  return state != nullptr
+             ? state->state() == gazebo::msgs::DriverStation_State_TEST
+             : false;
 }
 
 /**
@@ -360,7 +362,8 @@ void DriverStation::ReportError(bool is_error, int code,
  */
 uint16_t DriverStation::GetTeamNumber() const { return 348; }
 
-void DriverStation::stateCallback(const msgs::ConstDriverStationPtr& msg) {
+void DriverStation::stateCallback(
+    const gazebo::msgs::ConstDriverStationPtr& msg) {
   {
     std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
     *state = *msg;
@@ -372,32 +375,38 @@ void DriverStation::stateCallback(const msgs::ConstDriverStationPtr& msg) {
   m_waitForDataCond.notify_all();
 }
 
-void DriverStation::joystickCallback(const msgs::ConstFRCJoystickPtr& msg,
-                                     int i) {
+void DriverStation::joystickCallback(
+    const gazebo::msgs::ConstFRCJoystickPtr& msg, int i) {
   std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
   *(joysticks[i]) = *msg;
 }
 
-void DriverStation::joystickCallback0(const msgs::ConstFRCJoystickPtr& msg) {
+void DriverStation::joystickCallback0(
+    const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 0);
 }
 
-void DriverStation::joystickCallback1(const msgs::ConstFRCJoystickPtr& msg) {
+void DriverStation::joystickCallback1(
+    const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 1);
 }
 
-void DriverStation::joystickCallback2(const msgs::ConstFRCJoystickPtr& msg) {
+void DriverStation::joystickCallback2(
+    const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 2);
 }
 
-void DriverStation::joystickCallback3(const msgs::ConstFRCJoystickPtr& msg) {
+void DriverStation::joystickCallback3(
+    const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 3);
 }
 
-void DriverStation::joystickCallback4(const msgs::ConstFRCJoystickPtr& msg) {
+void DriverStation::joystickCallback4(
+    const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 4);
 }
 
-void DriverStation::joystickCallback5(const msgs::ConstFRCJoystickPtr& msg) {
+void DriverStation::joystickCallback5(
+    const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 5);
 }

@@ -13,8 +13,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 /**
  * \brief Plugin for controlling a joint with a pneumatic piston.
  *
@@ -49,13 +47,13 @@ using namespace gazebo;
  *
  * \todo Signal should probably be made a tri-state message.
  */
-class PneumaticPiston : public ModelPlugin {
+class PneumaticPiston : public gazebo::ModelPlugin {
  public:
   /// \brief Load the pneumatic piston and configures it according to the sdf.
-  void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Updat the force the piston applies on the joint.
-  void Update(const common::UpdateInfo& info);
+  void Update(const gazebo::common::UpdateInfo& info);
 
  private:
   /// \brief Topic to read control signal from.
@@ -68,14 +66,20 @@ class PneumaticPiston : public ModelPlugin {
   double forward_force, reverse_force;
 
   /// \brief The joint that this pneumatic piston actuates.
-  physics::JointPtr joint;
+  gazebo::physics::JointPtr joint;
 
   /// \brief Callback for receiving msgs and updating the torque.
-  void Callback(const msgs::ConstFloat64Ptr& msg);
+  void Callback(const gazebo::msgs::ConstFloat64Ptr& msg);
 
-  physics::ModelPtr model;  ///< \brief The model that this is attached to.
-  event::ConnectionPtr
-      updateConn;           ///< \brief Pointer to the world update function.
-  transport::NodePtr node;  ///< \brief The node we're advertising on.
-  transport::SubscriberPtr sub;  ///< \brief Subscriber handle.
+  /// \brief The model to which this is attached.
+  gazebo::physics::ModelPtr model;
+
+  /// \brief Pointer to the world update function.
+  gazebo::event::ConnectionPtr updateConn;
+
+  /// \brief The node on which we're advertising.
+  gazebo::transport::NodePtr node;
+
+  /// \brief Subscriber handle.
+  gazebo::transport::SubscriberPtr sub;
 };

@@ -15,8 +15,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 /// \brief The axis about which to measure rotation.
 typedef enum { Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/ } ROTATION;
 
@@ -44,13 +42,13 @@ typedef enum { Roll /*X*/, Pitch /*Y*/, Yaw /*Z*/ } ROTATION;
  * (gazebo.msgs.String)
  * - `units`; Optional, defaults to radians.
  */
-class Gyro : public ModelPlugin {
+class Gyro : public gazebo::ModelPlugin {
  public:
   /// \brief Load the gyro and configures it according to the sdf.
-  void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Sends out the gyro reading each timestep.
-  void Update(const common::UpdateInfo& info);
+  void Update(const gazebo::common::UpdateInfo& info);
 
  private:
   /// \brief Publish the angle on this topic.
@@ -66,10 +64,10 @@ class Gyro : public ModelPlugin {
   double zero;
 
   /// \brief The link that this gyro measures
-  physics::LinkPtr link;
+  gazebo::physics::LinkPtr link;
 
   /// \brief Callback for handling control data
-  void Callback(const msgs::ConstStringPtr& msg);
+  void Callback(const gazebo::msgs::ConstStringPtr& msg);
 
   /// \brief Gets the current angle, taking into account whether to
   ///        return radians or degrees.
@@ -83,10 +81,18 @@ class Gyro : public ModelPlugin {
   ///       depending on whether or radians or degrees are being used.
   double Limit(double value);
 
-  physics::ModelPtr model;  ///< \brief The model that this is attached to.
-  event::ConnectionPtr
-      updateConn;           ///< \brief Pointer to the world update function.
-  transport::NodePtr node;  ///< \brief The node we're advertising on.
-  transport::SubscriberPtr command_sub;      ///< \brief Subscriber handle.
-  transport::PublisherPtr pos_pub, vel_pub;  ///< \brief Publisher handles.
+  /// \brief The model to which this is attached.
+  gazebo::physics::ModelPtr model;
+
+  /// \brief Pointer to the world update function.
+  gazebo::event::ConnectionPtr updateConn;
+
+  /// \brief The node on which we're advertising.
+  gazebo::transport::NodePtr node;
+
+  /// \brief Subscriber handle.
+  gazebo::transport::SubscriberPtr command_sub;
+
+  /// \brief Publisher handles.
+  gazebo::transport::PublisherPtr pos_pub, vel_pub;
 };

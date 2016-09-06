@@ -19,6 +19,6 @@ SimFloatInput::SimFloatInput(std::string topic) {
 
 double SimFloatInput::Get() { return value; }
 
-void SimFloatInput::callback(const msgs::ConstFloat64Ptr& msg) {
+void SimFloatInput::callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   value = msg->data();
 }

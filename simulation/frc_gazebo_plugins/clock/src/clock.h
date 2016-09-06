@@ -15,8 +15,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 /**
  * \brief Plugin for publishing the simulation time.
  *
@@ -34,19 +32,27 @@ using namespace gazebo;
  *
  * \todo Make WorldPlugin?
  */
-class Clock : public ModelPlugin {
+class Clock : public gazebo::ModelPlugin {
  public:
   /// \brief Load the clock and configures it according to the sdf.
-  void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Sends out time each timestep.
-  void Update(const common::UpdateInfo& info);
+  void Update(const gazebo::common::UpdateInfo& info);
 
  private:
-  std::string topic;        ///< \brief Publish the time on this topic.
-  physics::ModelPtr model;  ///< \brief The model that this is attached to.
-  event::ConnectionPtr
-      updateConn;           ///< \brief Pointer to the world update function.
-  transport::NodePtr node;  ///< \brief The node we're advertising on.
-  transport::PublisherPtr pub;  ///< \brief Publisher handle.
+  /// \brief Publish the time on this topic.
+  std::string topic;
+
+  /// \brief The model to which this is attached.
+  gazebo::physics::ModelPtr model;
+
+  /// \brief Pointer to the world update function.
+  gazebo::event::ConnectionPtr updateConn;
+
+  /// \brief The node on which we're advertising.
+  gazebo::transport::NodePtr node;
+
+  /// \brief Publisher handle.
+  gazebo::transport::PublisherPtr pub;
 };

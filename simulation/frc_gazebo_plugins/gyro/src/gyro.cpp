@@ -11,7 +11,7 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Gyro)
 
-void Gyro::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void Gyro::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 
   // Parse SDF properties
@@ -41,27 +41,27 @@ void Gyro::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   std::string scoped_name =
       model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
-  node = transport::NodePtr(new transport::Node());
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
   command_sub = node->Subscribe(topic + "/control", &Gyro::Callback, this);
-  pos_pub = node->Advertise<msgs::Float64>(topic + "/position");
-  vel_pub = node->Advertise<msgs::Float64>(topic + "/velocity");
+  pos_pub = node->Advertise<gazebo::msgs::Float64>(topic + "/position");
+  vel_pub = node->Advertise<gazebo::msgs::Float64>(topic + "/velocity");
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
+  updateConn = gazebo::event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Gyro::Update, this, _1));
 }
 
-void Gyro::Update(const common::UpdateInfo& info) {
-  msgs::Float64 pos_msg, vel_msg;
+void Gyro::Update(const gazebo::common::UpdateInfo& info) {
+  gazebo::msgs::Float64 pos_msg, vel_msg;
   pos_msg.set_data(Limit(GetAngle() - zero));
   pos_pub->Publish(pos_msg);
   vel_msg.set_data(GetVelocity());
   vel_pub->Publish(vel_msg);
 }
 
-void Gyro::Callback(const msgs::ConstStringPtr& msg) {
+void Gyro::Callback(const gazebo::msgs::ConstStringPtr& msg) {
   std::string command = msg->data();
   if (command == "reset") {
     zero = GetAngle();

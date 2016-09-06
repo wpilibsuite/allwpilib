@@ -11,7 +11,7 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Clock)
 
-void Clock::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void Clock::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 
   // Parse SDF properties
@@ -27,18 +27,18 @@ void Clock::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   std::string scoped_name =
       model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
-  node = transport::NodePtr(new transport::Node());
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
-  pub = node->Advertise<msgs::Float64>(topic);
+  pub = node->Advertise<gazebo::msgs::Float64>(topic);
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
+  updateConn = gazebo::event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Clock::Update, this, _1));
 }
 
-void Clock::Update(const common::UpdateInfo& info) {
-  msgs::Float64 msg;
+void Clock::Update(const gazebo::common::UpdateInfo& info) {
+  gazebo::msgs::Float64 msg;
   msg.set_data(info.simTime.Double());
   pub->Publish(msg);
 }

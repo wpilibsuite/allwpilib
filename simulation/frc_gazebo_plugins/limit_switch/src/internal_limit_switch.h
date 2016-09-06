@@ -16,17 +16,15 @@
 #include <Winsock2.h>
 #endif
 
-using namespace gazebo;
-
 class InternalLimitSwitch : public Switch {
  public:
-  InternalLimitSwitch(physics::ModelPtr model, sdf::ElementPtr sdf);
+  InternalLimitSwitch(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Returns true when the switch is triggered.
   virtual bool Get();
 
  private:
-  physics::JointPtr joint;
+  gazebo::physics::JointPtr joint;
   double min, max;
   bool radians;
 };

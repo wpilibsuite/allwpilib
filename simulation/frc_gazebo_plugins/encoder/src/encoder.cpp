@@ -11,7 +11,7 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Encoder)
 
-void Encoder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void Encoder::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 
   // Parse SDF properties
@@ -38,20 +38,20 @@ void Encoder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   std::string scoped_name =
       model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
-  node = transport::NodePtr(new transport::Node());
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
   command_sub = node->Subscribe(topic + "/control", &Encoder::Callback, this);
-  pos_pub = node->Advertise<msgs::Float64>(topic + "/position");
-  vel_pub = node->Advertise<msgs::Float64>(topic + "/velocity");
+  pos_pub = node->Advertise<gazebo::msgs::Float64>(topic + "/position");
+  vel_pub = node->Advertise<gazebo::msgs::Float64>(topic + "/velocity");
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
+  updateConn = gazebo::event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Encoder::Update, this, _1));
 }
 
-void Encoder::Update(const common::UpdateInfo& info) {
-  msgs::Float64 pos_msg, vel_msg;
+void Encoder::Update(const gazebo::common::UpdateInfo& info) {
+  gazebo::msgs::Float64 pos_msg, vel_msg;
   if (stopped) {
     pos_msg.set_data(stop_value);
     pos_pub->Publish(pos_msg);
@@ -65,7 +65,7 @@ void Encoder::Update(const common::UpdateInfo& info) {
   }
 }
 
-void Encoder::Callback(const msgs::ConstStringPtr& msg) {
+void Encoder::Callback(const gazebo::msgs::ConstStringPtr& msg) {
   std::string command = msg->data();
   if (command == "reset") {
     zero = GetAngle();

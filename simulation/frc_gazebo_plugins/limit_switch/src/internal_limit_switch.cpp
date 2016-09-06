@@ -9,7 +9,7 @@
 
 #include <string>
 
-InternalLimitSwitch::InternalLimitSwitch(physics::ModelPtr model,
+InternalLimitSwitch::InternalLimitSwitch(gazebo::physics::ModelPtr model,
                                          sdf::ElementPtr sdf) {
   joint = model->GetJoint(sdf->Get<std::string>("joint"));
   min = sdf->Get<double>("min");

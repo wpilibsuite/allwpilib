@@ -12,12 +12,12 @@
 using namespace frc;
 
 SimContinuousOutput::SimContinuousOutput(std::string topic) {
-  pub = MainNode::Advertise<msgs::Float64>("~/simulator/" + topic);
+  pub = MainNode::Advertise<gazebo::msgs::Float64>("~/simulator/" + topic);
   std::cout << "Initialized ~/simulator/" + topic << std::endl;
 }
 
 void SimContinuousOutput::Set(float speed) {
-  msgs::Float64 msg;
+  gazebo::msgs::Float64 msg;
   msg.set_data(speed);
   pub->Publish(msg);
 }

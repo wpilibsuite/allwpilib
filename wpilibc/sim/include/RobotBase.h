@@ -50,7 +50,7 @@ class RobotBase {
   RobotBase& operator=(const RobotBase&) = delete;
 
   DriverStation& m_ds;
-  transport::SubscriberPtr time_sub;
+  gazebo::transport::SubscriberPtr time_sub;
 };
 
 }  // namespace frc

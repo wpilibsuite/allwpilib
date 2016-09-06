@@ -11,7 +11,7 @@
 
 GZ_REGISTER_MODEL_PLUGIN(DCMotor)
 
-void DCMotor::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void DCMotor::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
   signal = 0;
 
@@ -36,21 +36,21 @@ void DCMotor::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   std::string scoped_name =
       model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
-  node = transport::NodePtr(new transport::Node());
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
   sub = node->Subscribe(topic, &DCMotor::Callback, this);
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
+  updateConn = gazebo::event::Events::ConnectWorldUpdateBegin(
       boost::bind(&DCMotor::Update, this, _1));
 }
 
-void DCMotor::Update(const common::UpdateInfo& info) {
+void DCMotor::Update(const gazebo::common::UpdateInfo& info) {
   joint->SetForce(0, signal * multiplier);
 }
 
-void DCMotor::Callback(const msgs::ConstFloat64Ptr& msg) {
+void DCMotor::Callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   signal = msg->data();
   if (signal < -1) {
     signal = -1;

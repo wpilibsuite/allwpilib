@@ -19,7 +19,7 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Potentiometer)
 
-void Potentiometer::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void Potentiometer::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 
   // Parse SDF properties
@@ -43,19 +43,19 @@ void Potentiometer::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   std::string scoped_name =
       model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
-  node = transport::NodePtr(new transport::Node());
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
-  pub = node->Advertise<msgs::Float64>(topic);
+  pub = node->Advertise<gazebo::msgs::Float64>(topic);
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
+  updateConn = gazebo::event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Potentiometer::Update, this, _1));
 }
 
-void Potentiometer::Update(const common::UpdateInfo& info) {
+void Potentiometer::Update(const gazebo::common::UpdateInfo& info) {
   joint->GetAngle(0).Normalize();
-  msgs::Float64 msg;
+  gazebo::msgs::Float64 msg;
   if (radians) {
     msg.set_data(joint->GetAngle(0).Radian());
   } else {

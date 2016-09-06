@@ -20,12 +20,12 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Rangefinder)
 
-void Rangefinder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void Rangefinder::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
 
   // Parse SDF properties
-  sensor = std::dynamic_pointer_cast<sensors::SonarSensor>(
-      sensors::get_sensor(sdf->Get<std::string>("sensor")));
+  sensor = std::dynamic_pointer_cast<gazebo::sensors::SonarSensor>(
+      gazebo::sensors::get_sensor(sdf->Get<std::string>("sensor")));
   if (sdf->HasElement("topic")) {
     topic = sdf->Get<std::string>("topic");
   } else {
@@ -39,18 +39,18 @@ void Rangefinder::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   std::string scoped_name =
       model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
-  node = transport::NodePtr(new transport::Node());
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
-  pub = node->Advertise<msgs::Float64>(topic);
+  pub = node->Advertise<gazebo::msgs::Float64>(topic);
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
+  updateConn = gazebo::event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Rangefinder::Update, this, _1));
 }
 
-void Rangefinder::Update(const common::UpdateInfo& info) {
-  msgs::Float64 msg;
+void Rangefinder::Update(const gazebo::common::UpdateInfo& info) {
+  gazebo::msgs::Float64 msg;
   msg.set_data(sensor->Range());
   pub->Publish(msg);
 }

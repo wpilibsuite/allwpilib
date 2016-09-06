@@ -21,6 +21,6 @@
 namespace wpilib {
 namespace internal {
 extern double simTime;
-extern void time_callback(const msgs::ConstFloat64Ptr& msg);
+extern void time_callback(const gazebo::msgs::ConstFloat64Ptr& msg);
 }
 }
