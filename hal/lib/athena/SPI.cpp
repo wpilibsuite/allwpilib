@@ -16,9 +16,6 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "spilib/spi-lib.h"
 
-static_assert(sizeof(uint32_t) <= sizeof(void*),
-              "This file shoves uint32_ts into pointers.");
-
 using namespace hal;
 
 static int32_t m_spiCS0Handle = 0;
