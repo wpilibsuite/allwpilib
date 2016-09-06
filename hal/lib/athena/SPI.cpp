@@ -228,17 +228,17 @@ void HAL_SetSPISpeed(int32_t port, int32_t speed) {
  * Set the SPI options
  *
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
- * @param msb_first True to write the MSB first, False for LSB first
- * @param sample_on_trailing True to sample on the trailing edge, False to
- * sample on the leading edge
- * @param clk_idle_high True to set the clock to active low, False to set the
+ * @param msbFirst True to write the MSB first, False for LSB first
+ * @param sampleOnTrailing True to sample on the trailing edge, False to sample
+ * on the leading edge
+ * @param clkIdleHigh True to set the clock to active low, False to set the
  * clock active high
  */
-void HAL_SetSPIOpts(int32_t port, HAL_Bool msb_first,
-                    HAL_Bool sample_on_trailing, HAL_Bool clk_idle_high) {
+void HAL_SetSPIOpts(int32_t port, HAL_Bool msbFirst, HAL_Bool sampleOnTrailing,
+                    HAL_Bool clkIdleHigh) {
   std::lock_guard<priority_recursive_mutex> sync(spiGetMutex(port));
-  spilib_setopts(HAL_GetSPIHandle(port), msb_first, sample_on_trailing,
-                 clk_idle_high);
+  spilib_setopts(HAL_GetSPIHandle(port), msbFirst, sampleOnTrailing,
+                 clkIdleHigh);
 }
 
 /**
