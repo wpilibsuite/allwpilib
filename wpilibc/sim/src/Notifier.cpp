@@ -80,7 +80,7 @@ void Notifier::UpdateAlarm() {}
  * long as its scheduled time is after the current time. Then the item is
  * removed or rescheduled (repetitive events) in the queue.
  */
-void Notifier::ProcessQueue(uint32_t mask, void* params) {
+void Notifier::ProcessQueue(int mask, void* params) {
   Notifier* current;
 
   // keep processing events until no more

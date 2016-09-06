@@ -70,7 +70,7 @@ class PIDController : public LiveWindowSendable,
   virtual void SetTolerance(float percent);
   virtual void SetAbsoluteTolerance(float absValue);
   virtual void SetPercentTolerance(float percentValue);
-  virtual void SetToleranceBuffer(unsigned buf = 1);
+  virtual void SetToleranceBuffer(int buf = 1);
   virtual bool OnTarget() const;
 
   void Enable() override;

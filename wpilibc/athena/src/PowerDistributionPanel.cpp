@@ -18,8 +18,7 @@ PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 /**
  * Initialize the PDP.
  */
-PowerDistributionPanel::PowerDistributionPanel(uint8_t module)
-    : m_module(module) {
+PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
   int32_t status = 0;
   HAL_InitializePDP(m_module, &status);
   if (status != 0) {
@@ -71,7 +70,7 @@ float PowerDistributionPanel::GetTemperature() const {
  *
  * @return The current of one of the PDP channels (channels 0-15) in Amperes
  */
-float PowerDistributionPanel::GetCurrent(uint8_t channel) const {
+float PowerDistributionPanel::GetCurrent(int channel) const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
 

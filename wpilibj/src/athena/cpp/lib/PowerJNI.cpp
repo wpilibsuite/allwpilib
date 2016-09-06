@@ -86,7 +86,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults6V(
     JNIEnv* env, jclass) {
   int32_t status = 0;
-  int val = HAL_GetUserCurrentFaults6V(&status);
+  int32_t val = HAL_GetUserCurrentFaults6V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -139,7 +139,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults5V(
     JNIEnv* env, jclass) {
   int32_t status = 0;
-  int val = HAL_GetUserCurrentFaults5V(&status);
+  int32_t val = HAL_GetUserCurrentFaults5V(&status);
   CheckStatus(env, status);
   return val;
 }
@@ -192,7 +192,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_PowerJNI_getUserCurrentFaults3V3(
     JNIEnv* env, jclass) {
   int32_t status = 0;
-  int val = HAL_GetUserCurrentFaults3V3(&status);
+  int32_t val = HAL_GetUserCurrentFaults3V3(&status);
   CheckStatus(env, status);
   return val;
 }

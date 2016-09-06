@@ -29,13 +29,13 @@ class AnalogModule;
  */
 class AnalogGyro : public GyroBase {
  public:
-  static const uint32_t kOversampleBits;
-  static const uint32_t kAverageBits;
+  static const int kOversampleBits;
+  static const int kAverageBits;
   static const float kSamplesPerSecond;
   static const float kCalibrationSampleTime;
   static const float kDefaultVoltsPerDegreePerSecond;
 
-  explicit AnalogGyro(uint32_t channel);
+  explicit AnalogGyro(int channel);
   virtual ~AnalogGyro() = default;
   float GetAngle() const;
   void Calibrate() override;

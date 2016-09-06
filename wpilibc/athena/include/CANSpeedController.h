@@ -84,7 +84,7 @@ class CANSpeedController : public SpeedController {
   virtual bool GetReverseLimitOK() const = 0;
   virtual uint16_t GetFaults() const = 0;
   virtual void SetVoltageRampRate(double rampRate) = 0;
-  virtual uint32_t GetFirmwareVersion() const = 0;
+  virtual int GetFirmwareVersion() const = 0;
   virtual void ConfigNeutralMode(NeutralMode mode) = 0;
   virtual void ConfigEncoderCodesPerRev(uint16_t codesPerRev) = 0;
   virtual void ConfigPotentiometerTurns(uint16_t turns) = 0;

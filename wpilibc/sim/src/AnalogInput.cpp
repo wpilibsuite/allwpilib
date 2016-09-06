@@ -17,7 +17,7 @@
  *
  * @param channel The channel number to represent.
  */
-AnalogInput::AnalogInput(uint32_t channel) : m_channel(channel) {
+AnalogInput::AnalogInput(int channel) : m_channel(channel) {
   std::stringstream ss;
   ss << "analog/" << channel;
   m_impl = new SimFloatInput(ss.str());
@@ -54,7 +54,7 @@ float AnalogInput::GetAverageVoltage() const { return m_impl->Get(); }
  *
  * @return The channel number.
  */
-uint32_t AnalogInput::GetChannel() const { return m_channel; }
+int AnalogInput::GetChannel() const { return m_channel; }
 
 /**
  * Get the Average value for the PID Source base object.

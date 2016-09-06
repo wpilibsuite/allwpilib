@@ -28,7 +28,7 @@ void AnalogAccelerometer::InitAccelerometer() {
  * @param channel The channel number for the analog input the accelerometer is
  *                connected to
  */
-AnalogAccelerometer::AnalogAccelerometer(int32_t channel) {
+AnalogAccelerometer::AnalogAccelerometer(int channel) {
   m_analogInput = std::make_shared<AnalogInput>(channel);
   InitAccelerometer();
 }

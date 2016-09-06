@@ -39,5 +39,5 @@ class ADXRS450_Gyro : public GyroBase {
  private:
   SPI m_spi;
 
-  uint16_t ReadRegister(uint8_t reg);
+  uint16_t ReadRegister(int reg);
 };

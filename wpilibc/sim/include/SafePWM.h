@@ -22,7 +22,7 @@
  */
 class SafePWM : public PWM, public MotorSafety {
  public:
-  explicit SafePWM(uint32_t channel);
+  explicit SafePWM(int channel);
   virtual ~SafePWM() = default;
 
   void SetExpiration(float timeout);

@@ -14,15 +14,15 @@ static constexpr double kSamplePeriod = 0.001;
 static constexpr double kCalibrationSampleTime = 5.0;
 static constexpr double kDegreePerSecondPerLSB = 0.0125;
 
-static constexpr uint8_t kRateRegister = 0x00;
-static constexpr uint8_t kTemRegister = 0x02;
-static constexpr uint8_t kLoCSTRegister = 0x04;
-static constexpr uint8_t kHiCSTRegister = 0x06;
-static constexpr uint8_t kQuadRegister = 0x08;
-static constexpr uint8_t kFaultRegister = 0x0A;
-static constexpr uint8_t kPIDRegister = 0x0C;
-static constexpr uint8_t kSNHighRegister = 0x0E;
-static constexpr uint8_t kSNLowRegister = 0x10;
+static constexpr int kRateRegister = 0x00;
+static constexpr int kTemRegister = 0x02;
+static constexpr int kLoCSTRegister = 0x04;
+static constexpr int kHiCSTRegister = 0x06;
+static constexpr int kQuadRegister = 0x08;
+static constexpr int kFaultRegister = 0x0A;
+static constexpr int kPIDRegister = 0x0C;
+static constexpr int kSNHighRegister = 0x0E;
+static constexpr int kSNLowRegister = 0x10;
 
 /**
  * Initialize the gyro.
@@ -43,8 +43,7 @@ void ADXRS450_Gyro::Calibrate() {
 
   Wait(kCalibrationSampleTime);
 
-  m_spi.SetAccumulatorCenter(
-      static_cast<int32_t>(m_spi.GetAccumulatorAverage()));
+  m_spi.SetAccumulatorCenter(static_cast<int>(m_spi.GetAccumulatorAverage()));
   m_spi.ResetAccumulator();
 }
 
@@ -80,7 +79,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
   LiveWindow::GetInstance()->AddSensor("ADXRS450_Gyro", port, this);
 }
 
-static bool CalcParity(uint32_t v) {
+static bool CalcParity(int v) {
   bool parity = false;
   while (v != 0) {
     parity = !parity;
@@ -89,16 +88,16 @@ static bool CalcParity(uint32_t v) {
   return parity;
 }
 
-static inline uint32_t BytesToIntBE(uint8_t* buf) {
-  uint32_t result = static_cast<uint32_t>(buf[0]) << 24;
-  result |= static_cast<uint32_t>(buf[1]) << 16;
-  result |= static_cast<uint32_t>(buf[2]) << 8;
-  result |= static_cast<uint32_t>(buf[3]);
+static inline int BytesToIntBE(uint8_t* buf) {
+  int result = static_cast<int>(buf[0]) << 24;
+  result |= static_cast<int>(buf[1]) << 16;
+  result |= static_cast<int>(buf[2]) << 8;
+  result |= static_cast<int>(buf[3]);
   return result;
 }
 
-uint16_t ADXRS450_Gyro::ReadRegister(uint8_t reg) {
-  uint32_t cmd = 0x80000000 | static_cast<uint32_t>(reg) << 17;
+uint16_t ADXRS450_Gyro::ReadRegister(int reg) {
+  int cmd = 0x80000000 | static_cast<int>(reg) << 17;
   if (!CalcParity(cmd)) cmd |= 1u;
 
   // big endian

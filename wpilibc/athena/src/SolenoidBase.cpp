@@ -14,18 +14,17 @@
  *
  * @param moduleNumber The CAN PCM ID.
  */
-SolenoidBase::SolenoidBase(uint8_t moduleNumber)
-    : m_moduleNumber(moduleNumber) {}
+SolenoidBase::SolenoidBase(int moduleNumber) : m_moduleNumber(moduleNumber) {}
 
 /**
  * Read all 8 solenoids as a single byte
  *
  * @return The current value of all 8 solenoids on the module.
  */
-uint8_t SolenoidBase::GetAll(int module) const {
-  uint8_t value = 0;
+int SolenoidBase::GetAll(int module) const {
+  int value = 0;
   int32_t status = 0;
-  value = HAL_GetAllSolenoids(static_cast<uint8_t>(module), &status);
+  value = HAL_GetAllSolenoids(static_cast<int>(module), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -39,9 +38,9 @@ uint8_t SolenoidBase::GetAll(int module) const {
  *
  * @return The solenoid blacklist of all 8 solenoids on the module.
  */
-uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module) const {
+int SolenoidBase::GetPCMSolenoidBlackList(int module) const {
   int32_t status = 0;
-  return HAL_GetPCMSolenoidBlackList(static_cast<uint8_t>(module), &status);
+  return HAL_GetPCMSolenoidBlackList(static_cast<int>(module), &status);
 }
 
 /**
@@ -50,7 +49,7 @@ uint8_t SolenoidBase::GetPCMSolenoidBlackList(int module) const {
  */
 bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) const {
   int32_t status = 0;
-  return HAL_GetPCMSolenoidVoltageStickyFault(static_cast<uint8_t>(module),
+  return HAL_GetPCMSolenoidVoltageStickyFault(static_cast<int>(module),
                                               &status);
 }
 
@@ -60,7 +59,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) const {
  */
 bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) const {
   int32_t status = 0;
-  return HAL_GetPCMSolenoidVoltageFault(static_cast<uint8_t>(module), &status);
+  return HAL_GetPCMSolenoidVoltageFault(static_cast<int>(module), &status);
 }
 
 /**
@@ -75,5 +74,5 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) const {
  */
 void SolenoidBase::ClearAllPCMStickyFaults(int module) {
   int32_t status = 0;
-  return HAL_ClearAllPCMStickyFaults(static_cast<uint8_t>(module), &status);
+  return HAL_ClearAllPCMStickyFaults(static_cast<int>(module), &status);
 }

@@ -27,8 +27,7 @@ void GearTooth::EnableDirectionSensing(bool directionSensitive) {
  * @param directionSensitive True to enable the pulse length decoding in
  *                           hardware to specify count direction.
  */
-GearTooth::GearTooth(uint32_t channel, bool directionSensitive)
-    : Counter(channel) {
+GearTooth::GearTooth(int channel, bool directionSensitive) : Counter(channel) {
   EnableDirectionSensing(directionSensitive);
   LiveWindow::GetInstance()->AddSensor("GearTooth", channel, this);
 }

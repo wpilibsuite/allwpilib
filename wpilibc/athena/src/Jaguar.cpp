@@ -15,7 +15,7 @@
  * @param channel The PWM channel that the Jaguar is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-Jaguar::Jaguar(uint32_t channel) : PWMSpeedController(channel) {
+Jaguar::Jaguar(int channel) : PWMSpeedController(channel) {
   /**
    * Input profile defined by Luminary Micro.
    *

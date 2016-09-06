@@ -14,8 +14,8 @@
 
 const float PWM::kDefaultPwmPeriod = 5.05;
 const float PWM::kDefaultPwmCenter = 1.5;
-const int32_t PWM::kDefaultPwmStepsDown = 1000;
-const int32_t PWM::kPwmDisabled = 0;
+const int PWM::kDefaultPwmStepsDown = 1000;
+const int PWM::kPwmDisabled = 0;
 
 /**
  * Allocate a PWM given a channel number.
@@ -27,7 +27,7 @@ const int32_t PWM::kPwmDisabled = 0;
  * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP
  *                port
  */
-PWM::PWM(uint32_t channel) {
+PWM::PWM(int channel) {
   std::stringstream ss;
 
   if (!CheckPWMChannel(channel)) {
@@ -73,8 +73,8 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
  * @param deadbandMin The low end of the deadband range
  * @param min         The minimum pwm value
  */
-void PWM::SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
-                    int32_t deadbandMin, int32_t min) {
+void PWM::SetBounds(int max, int deadbandMax, int center, int deadbandMin,
+                    int min) {
   // Nothing to do in simulation.
 }
 

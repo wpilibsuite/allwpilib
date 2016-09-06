@@ -31,7 +31,7 @@ std::string Error::GetFilename() const { return m_filename; }
 
 std::string Error::GetFunction() const { return m_function; }
 
-uint32_t Error::GetLineNumber() const { return m_lineNumber; }
+int Error::GetLineNumber() const { return m_lineNumber; }
 
 const ErrorBase* Error::GetOriginatingObject() const {
   return m_originatingObject;
@@ -41,7 +41,7 @@ double Error::GetTimestamp() const { return m_timestamp; }
 
 void Error::Set(Code code, llvm::StringRef contextMessage,
                 llvm::StringRef filename, llvm::StringRef function,
-                uint32_t lineNumber, const ErrorBase* originatingObject) {
+                int lineNumber, const ErrorBase* originatingObject) {
   bool report = true;
 
   if (code == m_code && GetTime() - m_timestamp < 1) {

@@ -14,9 +14,9 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
-const uint8_t AnalogInput::kAccumulatorModuleNumber;
-const uint32_t AnalogInput::kAccumulatorNumChannels;
-const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
+const int AnalogInput::kAccumulatorModuleNumber;
+const int AnalogInput::kAccumulatorNumChannels;
+const int AnalogInput::kAccumulatorChannels[] = {0, 1};
 
 /**
  * Construct an analog input.
@@ -24,7 +24,7 @@ const uint32_t AnalogInput::kAccumulatorChannels[] = {0, 1};
  * @param channel The channel number on the roboRIO to represent. 0-3 are
  *                on-board 4-7 are on the MXP port.
  */
-AnalogInput::AnalogInput(uint32_t channel) {
+AnalogInput::AnalogInput(int channel) {
   std::stringstream buf;
   buf << "Analog Input " << channel;
 
@@ -41,7 +41,7 @@ AnalogInput::AnalogInput(uint32_t channel) {
   if (status != 0) {
     wpi_setErrorWithContextRange(status, 0, HAL_GetNumAnalogInputs(), channel,
                                  HAL_GetErrorMessage(status));
-    m_channel = std::numeric_limits<uint32_t>::max();
+    m_channel = std::numeric_limits<int>::max();
     m_port = HAL_kInvalidHandle;
     return;
   }
@@ -67,10 +67,10 @@ AnalogInput::~AnalogInput() {
  *
  * @return A sample straight from this channel.
  */
-int32_t AnalogInput::GetValue() const {
+int AnalogInput::GetValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t value = HAL_GetAnalogValue(m_port, &status);
+  int value = HAL_GetAnalogValue(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -89,10 +89,10 @@ int32_t AnalogInput::GetValue() const {
  *
  * @return A sample from the oversample and average engine for this channel.
  */
-int32_t AnalogInput::GetAverageValue() const {
+int AnalogInput::GetAverageValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t value = HAL_GetAnalogAverageValue(m_port, &status);
+  int value = HAL_GetAnalogAverageValue(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -142,10 +142,10 @@ float AnalogInput::GetAverageVoltage() const {
  *
  * @return Least significant bit weight.
  */
-int32_t AnalogInput::GetLSBWeight() const {
+int AnalogInput::GetLSBWeight() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
+  int lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return lsbWeight;
 }
@@ -157,10 +157,10 @@ int32_t AnalogInput::GetLSBWeight() const {
  *
  * @return Offset constant.
  */
-int32_t AnalogInput::GetOffset() const {
+int AnalogInput::GetOffset() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t offset = HAL_GetAnalogOffset(m_port, &status);
+  int offset = HAL_GetAnalogOffset(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return offset;
 }
@@ -170,7 +170,7 @@ int32_t AnalogInput::GetOffset() const {
  *
  * @return The channel number.
  */
-uint32_t AnalogInput::GetChannel() const {
+int AnalogInput::GetChannel() const {
   if (StatusIsFatal()) return 0;
   return m_channel;
 }
@@ -186,7 +186,7 @@ uint32_t AnalogInput::GetChannel() const {
  *
  * @param bits Number of bits of averaging.
  */
-void AnalogInput::SetAverageBits(int32_t bits) {
+void AnalogInput::SetAverageBits(int bits) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogAverageBits(m_port, bits, &status);
@@ -201,9 +201,9 @@ void AnalogInput::SetAverageBits(int32_t bits) {
  *
  * @return Number of bits of averaging previously configured.
  */
-int32_t AnalogInput::GetAverageBits() const {
+int AnalogInput::GetAverageBits() const {
   int32_t status = 0;
-  int32_t averageBits = HAL_GetAnalogAverageBits(m_port, &status);
+  int averageBits = HAL_GetAnalogAverageBits(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return averageBits;
 }
@@ -218,7 +218,7 @@ int32_t AnalogInput::GetAverageBits() const {
  *
  * @param bits Number of bits of oversampling.
  */
-void AnalogInput::SetOversampleBits(int32_t bits) {
+void AnalogInput::SetOversampleBits(int bits) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogOversampleBits(m_port, bits, &status);
@@ -234,10 +234,10 @@ void AnalogInput::SetOversampleBits(int32_t bits) {
  *
  * @return Number of bits of oversampling previously configured.
  */
-int32_t AnalogInput::GetOversampleBits() const {
+int AnalogInput::GetOversampleBits() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  int32_t oversampleBits = HAL_GetAnalogOversampleBits(m_port, &status);
+  int oversampleBits = HAL_GetAnalogOversampleBits(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return oversampleBits;
 }
@@ -309,7 +309,7 @@ void AnalogInput::ResetAccumulator() {
  * source from the accumulator channel. Because of this, any non-zero
  * oversample bits will affect the size of the value for this field.
  */
-void AnalogInput::SetAccumulatorCenter(int32_t center) {
+void AnalogInput::SetAccumulatorCenter(int center) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAccumulatorCenter(m_port, center, &status);
@@ -319,7 +319,7 @@ void AnalogInput::SetAccumulatorCenter(int32_t center) {
 /**
  * Set the accumulator's deadband.
  */
-void AnalogInput::SetAccumulatorDeadband(int32_t deadband) {
+void AnalogInput::SetAccumulatorDeadband(int deadband) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAccumulatorDeadband(m_port, deadband, &status);

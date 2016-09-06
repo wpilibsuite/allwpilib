@@ -54,7 +54,7 @@ class AnalogTriggerOutput : public DigitalSource {
   HAL_Handle GetPortHandleForRouting() const override;
   AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
   bool IsAnalogTrigger() const override;
-  uint32_t GetChannel() const override;
+  int GetChannel() const override;
 
  protected:
   AnalogTriggerOutput(const AnalogTrigger& trigger,

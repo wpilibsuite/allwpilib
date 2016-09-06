@@ -19,7 +19,7 @@
  * @param channel The channel number on the roboRIO to represent. 0-3 are
  *                on-board 4-7 are on the MXP port.
  */
-AnalogTrigger::AnalogTrigger(int32_t channel)
+AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
 }
@@ -35,11 +35,11 @@ AnalogTrigger::AnalogTrigger(int32_t channel)
 AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_analogInput = input;
   int32_t status = 0;
-  int32_t index = 0;
+  int index = 0;
   m_trigger = HAL_InitializeAnalogTrigger(input->m_port, &index, &status);
   if (status != 0) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    m_index = std::numeric_limits<uint8_t>::max();
+    m_index = std::numeric_limits<int>::max();
     m_trigger = HAL_kInvalidHandle;
     return;
   }
@@ -66,7 +66,7 @@ AnalogTrigger::~AnalogTrigger() {
  * @param lower The lower limit of the trigger in ADC codes (12-bit values).
  * @param upper The upper limit of the trigger in ADC codes (12-bit values).
  */
-void AnalogTrigger::SetLimitsRaw(int32_t lower, int32_t upper) {
+void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsRaw(m_trigger, lower, upper, &status);
@@ -128,7 +128,7 @@ void AnalogTrigger::SetFiltered(bool useFilteredValue) {
  *
  * @return The index of the analog trigger.
  */
-int32_t AnalogTrigger::GetIndex() const {
+int AnalogTrigger::GetIndex() const {
   if (StatusIsFatal()) return -1;
   return m_index;
 }

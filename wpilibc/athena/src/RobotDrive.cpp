@@ -17,7 +17,7 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-const int32_t RobotDrive::kMaxNumberOfMotors;
+const int RobotDrive::kMaxNumberOfMotors;
 
 static auto make_shared_nodelete(SpeedController* ptr) {
   return std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
@@ -55,7 +55,7 @@ void RobotDrive::InitRobotDrive() {
  * @param rightMotorChannel The PWM channel number that drives the right motor.
  *                          0-9 are on-board, 10-19 are on the MXP port
  */
-RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
+RobotDrive::RobotDrive(int leftMotorChannel, int rightMotorChannel) {
   InitRobotDrive();
   m_rearLeftMotor = std::make_shared<Talon>(leftMotorChannel);
   m_rearRightMotor = std::make_shared<Talon>(rightMotorChannel);
@@ -78,8 +78,8 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
  * @param rearRightMotor  Rear Right motor channel number. 0-9 are on-board,
  *                        10-19 are on the MXP port
  */
-RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
-                       uint32_t frontRightMotor, uint32_t rearRightMotor) {
+RobotDrive::RobotDrive(int frontLeftMotor, int rearLeftMotor,
+                       int frontRightMotor, int rearRightMotor) {
   InitRobotDrive();
   m_rearLeftMotor = std::make_shared<Talon>(rearLeftMotor);
   m_rearRightMotor = std::make_shared<Talon>(rearRightMotor);
@@ -275,8 +275,8 @@ void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
  *                   robot.
  * @param rightAxis  The axis to select on the right side Joystick object.
  */
-void RobotDrive::TankDrive(GenericHID* leftStick, uint32_t leftAxis,
-                           GenericHID* rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID* leftStick, int leftAxis,
+                           GenericHID* rightStick, int rightAxis,
                            bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -286,8 +286,8 @@ void RobotDrive::TankDrive(GenericHID* leftStick, uint32_t leftAxis,
             squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID& leftStick, uint32_t leftAxis,
-                           GenericHID& rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID& leftStick, int leftAxis,
+                           GenericHID& rightStick, int rightAxis,
                            bool squaredInputs) {
   TankDrive(leftStick.GetRawAxis(leftAxis), rightStick.GetRawAxis(rightAxis),
             squaredInputs);
@@ -382,8 +382,8 @@ void RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {
  * @param squaredInputs Setting this parameter to true increases the
  *                      sensitivity at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint32_t moveAxis,
-                             GenericHID* rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID* moveStick, int moveAxis,
+                             GenericHID* rotateStick, int rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick->GetRawAxis(moveAxis);
   float rotateValue = rotateStick->GetRawAxis(rotateAxis);
@@ -407,8 +407,8 @@ void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint32_t moveAxis,
  * @param squaredInputs Setting this parameter to true increases the
  *                      sensitivity at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID& moveStick, uint32_t moveAxis,
-                             GenericHID& rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID& moveStick, int moveAxis,
+                             GenericHID& rotateStick, int rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick.GetRawAxis(moveAxis);
   float rotateValue = rotateStick.GetRawAxis(rotateAxis);
@@ -637,7 +637,7 @@ float RobotDrive::Limit(float num) {
  */
 void RobotDrive::Normalize(double* wheelSpeeds) {
   double maxMagnitude = std::fabs(wheelSpeeds[0]);
-  int32_t i;
+  int i;
   for (i = 1; i < kMaxNumberOfMotors; i++) {
     double temp = std::fabs(wheelSpeeds[i]);
     if (maxMagnitude < temp) maxMagnitude = temp;

@@ -28,9 +28,8 @@ class DoubleSolenoid : public SolenoidBase,
  public:
   enum Value { kOff, kForward, kReverse };
 
-  explicit DoubleSolenoid(uint32_t forwardChannel, uint32_t reverseChannel);
-  DoubleSolenoid(uint8_t moduleNumber, uint32_t forwardChannel,
-                 uint32_t reverseChannel);
+  explicit DoubleSolenoid(int forwardChannel, int reverseChannel);
+  DoubleSolenoid(int moduleNumber, int forwardChannel, int reverseChannel);
   virtual ~DoubleSolenoid();
   virtual void Set(Value value);
   virtual Value Get() const;
@@ -47,10 +46,10 @@ class DoubleSolenoid : public SolenoidBase,
   std::shared_ptr<ITable> GetTable() const;
 
  private:
-  uint32_t m_forwardChannel;  ///< The forward channel on the module to control.
-  uint32_t m_reverseChannel;  ///< The reverse channel on the module to control.
-  uint8_t m_forwardMask;      ///< The mask for the forward channel.
-  uint8_t m_reverseMask;      ///< The mask for the reverse channel.
+  int m_forwardChannel;  ///< The forward channel on the module to control.
+  int m_reverseChannel;  ///< The reverse channel on the module to control.
+  int m_forwardMask;     ///< The mask for the forward channel.
+  int m_reverseMask;     ///< The mask for the reverse channel.
   HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
   HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
 

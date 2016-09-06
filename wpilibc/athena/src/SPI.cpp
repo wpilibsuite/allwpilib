@@ -23,7 +23,7 @@ SPI::SPI(Port SPIport) {
   HAL_InitializeSPI(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  static int32_t instances = 0;
+  static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_SPI, instances);
 }
@@ -122,8 +122,8 @@ void SPI::SetChipSelectActiveLow() {
  * If not running in output only mode, also saves the data received
  * on the MISO input during the transfer into the receive FIFO.
  */
-int32_t SPI::Write(uint8_t* data, uint8_t size) {
-  int32_t retVal = 0;
+int SPI::Write(uint8_t* data, int size) {
+  int retVal = 0;
   retVal = HAL_WriteSPI(m_port, data, size);
   return retVal;
 }
@@ -141,8 +141,8 @@ int32_t SPI::Write(uint8_t* data, uint8_t size) {
  *                 that data is already in the receive FIFO from a previous
  *                 write.
  */
-int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size) {
-  int32_t retVal = 0;
+int SPI::Read(bool initiate, uint8_t* dataReceived, int size) {
+  int retVal = 0;
   if (initiate) {
     auto dataToSend = new uint8_t[size];
     std::memset(dataToSend, 0, size);
@@ -160,9 +160,8 @@ int32_t SPI::Read(bool initiate, uint8_t* dataReceived, uint8_t size) {
  * @param dataReceived Buffer to receive data from the device
  * @param size         The length of the transaction, in bytes
  */
-int32_t SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
-                         uint8_t size) {
-  int32_t retVal = 0;
+int SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size) {
+  int retVal = 0;
   retVal = HAL_TransactionSPI(m_port, dataToSend, dataReceived, size);
   return retVal;
 }
@@ -182,12 +181,11 @@ int32_t SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
  * @param is_signed  Is data field signed?
  * @param big_endian Is device big endian?
  */
-void SPI::InitAccumulator(double period, uint32_t cmd, uint8_t xfer_size,
-                          uint32_t valid_mask, uint32_t valid_value,
-                          uint8_t data_shift, uint8_t data_size, bool is_signed,
-                          bool big_endian) {
+void SPI::InitAccumulator(double period, int cmd, int xfer_size, int valid_mask,
+                          int valid_value, int data_shift, int data_size,
+                          bool is_signed, bool big_endian) {
   int32_t status = 0;
-  HAL_InitSPIAccumulator(m_port, static_cast<uint32_t>(period * 1e6), cmd,
+  HAL_InitSPIAccumulator(m_port, static_cast<int32_t>(period * 1e6), cmd,
                          xfer_size, valid_mask, valid_value, data_shift,
                          data_size, is_signed, big_endian, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -219,7 +217,7 @@ void SPI::ResetAccumulator() {
  * accelerometers to make integration work and to take the device offset into
  * account when integrating.
  */
-void SPI::SetAccumulatorCenter(int32_t center) {
+void SPI::SetAccumulatorCenter(int center) {
   int32_t status = 0;
   HAL_SetSPIAccumulatorCenter(m_port, center, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -228,7 +226,7 @@ void SPI::SetAccumulatorCenter(int32_t center) {
 /**
  * Set the accumulator's deadband.
  */
-void SPI::SetAccumulatorDeadband(int32_t deadband) {
+void SPI::SetAccumulatorDeadband(int deadband) {
   int32_t status = 0;
   HAL_SetSPIAccumulatorDeadband(m_port, deadband, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -237,9 +235,9 @@ void SPI::SetAccumulatorDeadband(int32_t deadband) {
 /**
  * Read the last value read by the accumulator engine.
  */
-int32_t SPI::GetAccumulatorLastValue() const {
+int SPI::GetAccumulatorLastValue() const {
   int32_t status = 0;
-  int32_t retVal = HAL_GetSPIAccumulatorLastValue(m_port, &status);
+  int retVal = HAL_GetSPIAccumulatorLastValue(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }

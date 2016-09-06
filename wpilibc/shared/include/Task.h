@@ -18,7 +18,7 @@
  */
 class Task : public ErrorBase {
  public:
-  static const uint32_t kDefaultPriority = 60;
+  static const int kDefaultPriority = 60;
 
   Task() = default;
   Task(const Task&) = delete;
@@ -38,9 +38,9 @@ class Task : public ErrorBase {
 
   bool Verify();
 
-  int32_t GetPriority();
+  int GetPriority();
 
-  bool SetPriority(int32_t priority);
+  bool SetPriority(int priority);
 
   std::string GetName() const;
 

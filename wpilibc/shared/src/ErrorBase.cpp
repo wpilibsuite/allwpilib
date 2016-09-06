@@ -41,8 +41,7 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
  */
 void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
                               llvm::StringRef filename,
-                              llvm::StringRef function,
-                              uint32_t lineNumber) const {
+                              llvm::StringRef function, int lineNumber) const {
   std::string err;
   int errNo = errno;
   if (errNo == 0) {
@@ -77,7 +76,7 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
  */
 void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
-                             uint32_t lineNumber) const {
+                             int lineNumber) const {
   // If there was an error
   if (success <= 0) {
     std::stringstream err;
@@ -105,7 +104,7 @@ void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
  */
 void ErrorBase::SetError(Error::Code code, llvm::StringRef contextMessage,
                          llvm::StringRef filename, llvm::StringRef function,
-                         uint32_t lineNumber) const {
+                         int lineNumber) const {
   //  If there was an error
   if (code != 0) {
     //  Set the current error information for this object.
@@ -136,8 +135,7 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
                               int32_t maxRange, int32_t requestedValue,
                               llvm::StringRef contextMessage,
                               llvm::StringRef filename,
-                              llvm::StringRef function,
-                              uint32_t lineNumber) const {
+                              llvm::StringRef function, int lineNumber) const {
   //  If there was an error
   if (code != 0) {
     size_t size = contextMessage.size() + 100;
@@ -169,7 +167,7 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
 void ErrorBase::SetWPIError(llvm::StringRef errorMessage, Error::Code code,
                             llvm::StringRef contextMessage,
                             llvm::StringRef filename, llvm::StringRef function,
-                            uint32_t lineNumber) const {
+                            int lineNumber) const {
   std::string err = errorMessage.str() + ": " + contextMessage.str();
 
   //  Set the current error information for this object.
@@ -195,7 +193,7 @@ bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
 
 void ErrorBase::SetGlobalError(Error::Code code, llvm::StringRef contextMessage,
                                llvm::StringRef filename,
-                               llvm::StringRef function, uint32_t lineNumber) {
+                               llvm::StringRef function, int lineNumber) {
   // If there was an error
   if (code != 0) {
     std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
@@ -209,8 +207,7 @@ void ErrorBase::SetGlobalError(Error::Code code, llvm::StringRef contextMessage,
 void ErrorBase::SetGlobalWPIError(llvm::StringRef errorMessage,
                                   llvm::StringRef contextMessage,
                                   llvm::StringRef filename,
-                                  llvm::StringRef function,
-                                  uint32_t lineNumber) {
+                                  llvm::StringRef function, int lineNumber) {
   std::string err = errorMessage.str() + ": " + contextMessage.str();
 
   std::lock_guard<priority_mutex> mutex(_globalErrorMutex);

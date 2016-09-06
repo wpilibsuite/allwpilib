@@ -15,7 +15,7 @@
  *
  * @param module The PCM ID to use (0-62)
  */
-Compressor::Compressor(uint8_t pcmID) : m_module(pcmID) {
+Compressor::Compressor(int pcmID) : m_module(pcmID) {
   int32_t status = 0;
   m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
   if (status != 0) {

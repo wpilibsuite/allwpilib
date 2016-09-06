@@ -18,7 +18,7 @@
 // Time (sec) for the ping trigger pulse.
 constexpr double Ultrasonic::kPingTime;
 // Priority that the ultrasonic round robin task runs.
-const uint32_t Ultrasonic::kPriority;
+const int Ultrasonic::kPriority;
 // Max time (ms) between readings.
 constexpr double Ultrasonic::kMaxUltrasonicTime;
 constexpr double Ultrasonic::kSpeedOfSoundInchesPerSec;
@@ -91,8 +91,7 @@ void Ultrasonic::Initialize() {
  *                    round trip time of the ping, and the distance.
  * @param units       The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(uint32_t pingChannel, uint32_t echoChannel,
-                       DistanceUnit units)
+Ultrasonic::Ultrasonic(int pingChannel, int echoChannel, DistanceUnit units)
     : m_pingChannel(std::make_shared<DigitalOutput>(pingChannel)),
       m_echoChannel(std::make_shared<DigitalInput>(echoChannel)),
       m_counter(m_echoChannel) {

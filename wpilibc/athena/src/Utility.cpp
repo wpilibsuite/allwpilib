@@ -23,8 +23,8 @@
  * Utility.h.
  */
 bool wpi_assert_impl(bool conditionValue, const char* conditionText,
-                     const char* message, const char* fileName,
-                     uint32_t lineNumber, const char* funcName) {
+                     const char* message, const char* fileName, int lineNumber,
+                     const char* funcName) {
   if (!conditionValue) {
     std::stringstream locStream;
     locStream << funcName << " [";
@@ -58,7 +58,7 @@ bool wpi_assert_impl(bool conditionValue, const char* conditionText,
  */
 void wpi_assertEqual_common_impl(const char* valueA, const char* valueB,
                                  const char* equalityType, const char* message,
-                                 const char* fileName, uint32_t lineNumber,
+                                 const char* fileName, int lineNumber,
                                  const char* funcName) {
   std::stringstream locStream;
   locStream << funcName << " [";
@@ -92,7 +92,7 @@ void wpi_assertEqual_common_impl(const char* valueA, const char* valueB,
  */
 bool wpi_assertEqual_impl(int valueA, int valueB, const char* valueAString,
                           const char* valueBString, const char* message,
-                          const char* fileName, uint32_t lineNumber,
+                          const char* fileName, int lineNumber,
                           const char* funcName) {
   if (!(valueA == valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "==", message,
@@ -110,7 +110,7 @@ bool wpi_assertEqual_impl(int valueA, int valueB, const char* valueAString,
  */
 bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
                              const char* valueBString, const char* message,
-                             const char* fileName, uint32_t lineNumber,
+                             const char* fileName, int lineNumber,
                              const char* funcName) {
   if (!(valueA != valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "!=", message,
@@ -125,9 +125,9 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
  * For now, expect this to be competition year.
  * @return FPGA Version number.
  */
-int32_t GetFPGAVersion() {
+int GetFPGAVersion() {
   int32_t status = 0;
-  int32_t version = HAL_GetFPGAVersion(&status);
+  int version = HAL_GetFPGAVersion(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return version;
 }
@@ -180,7 +180,7 @@ bool GetUserButton() {
 static std::string demangle(char const* mangledSymbol) {
   char buffer[256];
   size_t length;
-  int status;
+  int32_t status;
 
   if (sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer)) {
     char* symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
@@ -201,7 +201,7 @@ static std::string demangle(char const* mangledSymbol) {
  * Get a stack trace, ignoring the first "offset" symbols.
  * @param offset The number of symbols at the top of the stack to ignore
  */
-std::string GetStackTrace(uint32_t offset) {
+std::string GetStackTrace(int offset) {
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);

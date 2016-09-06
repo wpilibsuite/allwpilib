@@ -13,7 +13,7 @@
  * @param channel The PWM channel that the controller is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-PWMSpeedController::PWMSpeedController(uint32_t channel) : SafePWM(channel) {}
+PWMSpeedController::PWMSpeedController(int channel) : SafePWM(channel) {}
 
 /**
  * Set the PWM value.

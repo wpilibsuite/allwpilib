@@ -19,22 +19,22 @@ class AnalogTrigger : public SensorBase {
   friend class AnalogTriggerOutput;
 
  public:
-  explicit AnalogTrigger(int32_t channel);
+  explicit AnalogTrigger(int channel);
   explicit AnalogTrigger(AnalogInput* channel);
   virtual ~AnalogTrigger();
 
   void SetLimitsVoltage(float lower, float upper);
-  void SetLimitsRaw(int32_t lower, int32_t upper);
+  void SetLimitsRaw(int lower, int upper);
   void SetAveraged(bool useAveragedValue);
   void SetFiltered(bool useFilteredValue);
-  int32_t GetIndex() const;
+  int GetIndex() const;
   bool GetInWindow();
   bool GetTriggerState();
   std::shared_ptr<AnalogTriggerOutput> CreateOutput(
       AnalogTriggerType type) const;
 
  private:
-  uint8_t m_index;
+  int m_index;
   HAL_AnalogTriggerHandle m_trigger;
   AnalogInput* m_analogInput = nullptr;
   bool m_ownsAnalog = false;

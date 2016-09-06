@@ -34,35 +34,35 @@ class AnalogInput : public SensorBase,
   friend class AnalogGyro;
 
  public:
-  static const uint8_t kAccumulatorModuleNumber = 1;
-  static const uint32_t kAccumulatorNumChannels = 2;
-  static const uint32_t kAccumulatorChannels[kAccumulatorNumChannels];
+  static const int kAccumulatorModuleNumber = 1;
+  static const int kAccumulatorNumChannels = 2;
+  static const int kAccumulatorChannels[kAccumulatorNumChannels];
 
-  explicit AnalogInput(uint32_t channel);
+  explicit AnalogInput(int channel);
   virtual ~AnalogInput();
 
-  int32_t GetValue() const;
-  int32_t GetAverageValue() const;
+  int GetValue() const;
+  int GetAverageValue() const;
 
   float GetVoltage() const;
   float GetAverageVoltage() const;
 
-  uint32_t GetChannel() const;
+  int GetChannel() const;
 
-  void SetAverageBits(int32_t bits);
-  int32_t GetAverageBits() const;
-  void SetOversampleBits(int32_t bits);
-  int32_t GetOversampleBits() const;
+  void SetAverageBits(int bits);
+  int GetAverageBits() const;
+  void SetOversampleBits(int bits);
+  int GetOversampleBits() const;
 
-  int32_t GetLSBWeight() const;
-  int32_t GetOffset() const;
+  int GetLSBWeight() const;
+  int GetOffset() const;
 
   bool IsAccumulatorChannel() const;
   void InitAccumulator();
   void SetAccumulatorInitialValue(int64_t value);
   void ResetAccumulator();
-  void SetAccumulatorCenter(int32_t center);
-  void SetAccumulatorDeadband(int32_t deadband);
+  void SetAccumulatorCenter(int center);
+  void SetAccumulatorDeadband(int deadband);
   int64_t GetAccumulatorValue() const;
   int64_t GetAccumulatorCount() const;
   void GetAccumulatorOutput(int64_t& value, int64_t& count) const;
@@ -80,7 +80,7 @@ class AnalogInput : public SensorBase,
   std::shared_ptr<ITable> GetTable() const override;
 
  private:
-  uint32_t m_channel;
+  int m_channel;
   // TODO: Adjust HAL to avoid use of raw pointers.
   HAL_AnalogInputHandle m_port;
   int64_t m_accumulatorOffset;

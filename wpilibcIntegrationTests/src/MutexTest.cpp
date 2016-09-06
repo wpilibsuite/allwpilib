@@ -46,7 +46,7 @@ class Notification {
   bool m_set = false;
 };
 
-void SetProcessorAffinity(int core_id) {
+void SetProcessorAffinity(int32_t core_id) {
   cpu_set_t cpuset;
   CPU_ZERO(&cpuset);
   CPU_SET(core_id, &cpuset);
@@ -56,7 +56,7 @@ void SetProcessorAffinity(int core_id) {
             0);
 }
 
-void SetThreadRealtimePriorityOrDie(int priority) {
+void SetThreadRealtimePriorityOrDie(int32_t priority) {
   struct sched_param param;
   // Set realtime priority for this thread
   param.sched_priority = priority + sched_get_priority_min(SCHED_RR);

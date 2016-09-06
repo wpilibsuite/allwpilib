@@ -23,11 +23,11 @@ class CameraServer : public ErrorBase {
  private:
   static constexpr uint16_t kPort = 1180;
   static constexpr uint8_t kMagicNumber[] = {0x01, 0x00, 0x00, 0x00};
-  static constexpr uint32_t kSize640x480 = 0;
-  static constexpr uint32_t kSize320x240 = 1;
-  static constexpr uint32_t kSize160x120 = 2;
-  static constexpr int32_t kHardwareCompression = -1;
-  static constexpr uint32_t kMaxImageSize = 200000;
+  static constexpr int kSize640x480 = 0;
+  static constexpr int kSize320x240 = 1;
+  static constexpr int kSize160x120 = 2;
+  static constexpr int kHardwareCompression = -1;
+  static constexpr int kMaxImageSize = 200000;
 
  protected:
   CameraServer();
@@ -38,22 +38,21 @@ class CameraServer : public ErrorBase {
   priority_recursive_mutex m_imageMutex;
   std::condition_variable_any m_newImageVariable;
   std::vector<uint8_t*> m_dataPool;
-  unsigned int m_quality;
+  int m_quality;
   bool m_autoCaptureStarted;
   bool m_hwClient;
-  std::tuple<uint8_t*, unsigned int, unsigned int, bool> m_imageData;
+  std::tuple<uint8_t*, int, int, bool> m_imageData;
 
   void Serve();
   void AutoCapture();
-  void SetImageData(uint8_t* data, unsigned int size, unsigned int start = 0,
+  void SetImageData(uint8_t* data, int size, int start = 0,
                     bool imaqData = false);
-  void FreeImageData(
-      std::tuple<uint8_t*, unsigned int, unsigned int, bool> imageData);
+  void FreeImageData(std::tuple<uint8_t*, int, int, bool> imageData);
 
   struct Request {
-    uint32_t fps;
-    int32_t compression;
-    uint32_t size;
+    int fps;
+    int compression;
+    int size;
   };
 
  public:
@@ -76,8 +75,8 @@ class CameraServer : public ErrorBase {
 
   bool IsAutoCaptureStarted();
 
-  void SetQuality(unsigned int quality);
-  unsigned int GetQuality();
+  void SetQuality(int quality);
+  int GetQuality();
 
-  void SetSize(unsigned int size);
+  void SetSize(int size);
 };

@@ -23,7 +23,7 @@
  * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
  *                MXP port
  */
-PWM::PWM(uint32_t channel) {
+PWM::PWM(int channel) {
   std::stringstream buf;
 
   if (!CheckPWMChannel(channel)) {
@@ -37,7 +37,7 @@ PWM::PWM(uint32_t channel) {
   if (status != 0) {
     wpi_setErrorWithContextRange(status, 0, HAL_GetNumPWMChannels(), channel,
                                  HAL_GetErrorMessage(status));
-    m_channel = std::numeric_limits<uint32_t>::max();
+    m_channel = std::numeric_limits<int>::max();
     m_handle = HAL_kInvalidHandle;
     return;
   }
@@ -120,8 +120,8 @@ void PWM::SetBounds(float max, float deadbandMax, float center,
  * @param deadbandMin The low end of the deadband range
  * @param min         The minimum pwm value
  */
-void PWM::SetRawBounds(int32_t max, int32_t deadbandMax, int32_t center,
-                       int32_t deadbandMin, int32_t min) {
+void PWM::SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
+                       int min) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
@@ -142,8 +142,8 @@ void PWM::SetRawBounds(int32_t max, int32_t deadbandMax, int32_t center,
  * @param deadbandMin The low end of the deadband range
  * @param min         The minimum pwm value
  */
-void PWM::GetRawBounds(int32_t* max, int32_t* deadbandMax, int32_t* center,
-                       int32_t* deadbandMin, int32_t* min) {
+void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
+                       int* deadbandMin, int* min) {
   int32_t status = 0;
   HAL_GetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
                       &status);

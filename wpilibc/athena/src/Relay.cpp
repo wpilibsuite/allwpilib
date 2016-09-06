@@ -23,7 +23,7 @@
  * @param channel   The channel number (0-3).
  * @param direction The direction that the Relay object will control.
  */
-Relay::Relay(uint32_t channel, Relay::Direction direction)
+Relay::Relay(int channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
   std::stringstream buf;
   if (!SensorBase::CheckRelayChannel(m_channel)) {
@@ -206,7 +206,7 @@ Relay::Value Relay::Get() const {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-uint32_t Relay::GetChannel() const { return m_channel; }
+int Relay::GetChannel() const { return m_channel; }
 
 /**
  * Set the expiration time for the Relay object

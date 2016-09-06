@@ -53,8 +53,8 @@ static void wpi_handleTracing() {
  * Utility.h.
  */
 bool wpi_assert_impl(bool conditionValue, const char* conditionText,
-                     const char* message, const char* fileName,
-                     uint32_t lineNumber, const char* funcName) {
+                     const char* message, const char* fileName, int lineNumber,
+                     const char* funcName) {
   if (!conditionValue) {
     std::stringstream errorStream;
 
@@ -84,8 +84,7 @@ bool wpi_assert_impl(bool conditionValue, const char* conditionText,
 void wpi_assertEqual_common_impl(int valueA, int valueB,
                                  const std::string& equalityType,
                                  const std::string& message,
-                                 const std::string& fileName,
-                                 uint32_t lineNumber,
+                                 const std::string& fileName, int lineNumber,
                                  const std::string& funcName) {
   // Error string buffer
   std::stringstream error;
@@ -116,7 +115,7 @@ void wpi_assertEqual_common_impl(int valueA, int valueB,
  * Utility.h.
  */
 bool wpi_assertEqual_impl(int valueA, int valueB, const std::string& message,
-                          const std::string& fileName, uint32_t lineNumber,
+                          const std::string& fileName, int lineNumber,
                           const std::string& funcName) {
   if (!(valueA == valueB)) {
     wpi_assertEqual_common_impl(valueA, valueB, "!=", message, fileName,
@@ -133,7 +132,7 @@ bool wpi_assertEqual_impl(int valueA, int valueB, const std::string& message,
  * Utility.h.
  */
 bool wpi_assertNotEqual_impl(int valueA, int valueB, const std::string& message,
-                             const std::string& fileName, uint32_t lineNumber,
+                             const std::string& fileName, int lineNumber,
                              const std::string& funcName) {
   if (!(valueA != valueB)) {
     wpi_assertEqual_common_impl(valueA, valueB, "==", message, fileName,
@@ -159,7 +158,7 @@ uint64_t GetFPGATime() { return wpilib::internal::simTime * 1e6; }
 static std::string demangle(char const* mangledSymbol) {
   char buffer[256];
   size_t length;
-  int status;
+  int32_t status;
 
   if (sscanf(mangledSymbol, "%*[^(]%*[^_]%255[^)+]", buffer)) {
     char* symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
@@ -180,7 +179,7 @@ static std::string demangle(char const* mangledSymbol) {
 /**
  * Get a stack trace, ignoring the first "offset" symbols.
  */
-std::string GetStackTrace(uint32_t offset) {
+std::string GetStackTrace(int offset) {
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
@@ -202,7 +201,5 @@ std::string GetStackTrace(uint32_t offset) {
 static std::string demangle(char const* mangledSymbol) {
   return "no demangling on windows";
 }
-std::string GetStackTrace(uint32_t offset) {
-  return "no stack trace on windows";
-}
+std::string GetStackTrace(int offset) { return "no stack trace on windows"; }
 #endif

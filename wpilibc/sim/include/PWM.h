@@ -42,16 +42,16 @@ class PWM : public SensorBase,
     kPeriodMultiplier_4X = 4
   };
 
-  explicit PWM(uint32_t channel);
+  explicit PWM(int channel);
   virtual ~PWM();
   virtual void SetRaw(uint16_t value);
   void SetPeriodMultiplier(PeriodMultiplier mult);
   void EnableDeadbandElimination(bool eliminateDeadband);
-  void SetBounds(int32_t max, int32_t deadbandMax, int32_t center,
-                 int32_t deadbandMin, int32_t min);
+  void SetBounds(int max, int deadbandMax, int center, int deadbandMin,
+                 int min);
   void SetBounds(double max, double deadbandMax, double center,
                  double deadbandMin, double min);
-  uint32_t GetChannel() const { return m_channel; }
+  int GetChannel() const { return m_channel; }
 
  protected:
   /**
@@ -80,8 +80,8 @@ class PWM : public SensorBase,
   /**
    * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
    */
-  static const int32_t kDefaultPwmStepsDown;
-  static const int32_t kPwmDisabled;
+  static const int kDefaultPwmStepsDown;
+  static const int kPwmDisabled;
 
   virtual void SetPosition(float pos);
   virtual float GetPosition() const;
@@ -89,7 +89,7 @@ class PWM : public SensorBase,
   virtual float GetSpeed() const;
 
   bool m_eliminateDeadband;
-  int32_t m_centerPwm;
+  int m_centerPwm;
 
   void ValueChanged(ITable* source, llvm::StringRef key,
                     std::shared_ptr<nt::Value> value, bool isNew) override;
@@ -103,6 +103,6 @@ class PWM : public SensorBase,
   std::shared_ptr<ITable> m_table;
 
  private:
-  uint32_t m_channel;
+  int m_channel;
   SimContinuousOutput* impl;
 };

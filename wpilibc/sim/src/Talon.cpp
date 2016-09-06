@@ -12,7 +12,7 @@
 /**
  * @param channel The PWM channel that the Talon is attached to.
  */
-Talon::Talon(uint32_t channel) : SafePWM(channel) {
+Talon::Talon(int channel) : SafePWM(channel) {
   /* Note that the Talon uses the following bounds for PWM values. These values
    * should work reasonably well for most controllers, but if users experience
    * issues such as asymmetric behavior around the deadband or inability to

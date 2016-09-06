@@ -20,8 +20,8 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
-static const unsigned int kMaxPacketSize = 1536;
-static const unsigned int kImageBufferAllocationIncrement = 1000;
+static const int kMaxPacketSize = 1536;
+static const int kImageBufferAllocationIncrement = 1000;
 
 static const std::string kWhiteBalanceStrings[] = {
     "auto",         "hold",         "fixed_outdoor1", "fixed_outdoor2",
@@ -123,8 +123,8 @@ HSLImage* AxisCamera::GetImage() {
  * @param numBytes  The size of the destination image.
  * @return 0 if failed (no source image or no memory), 1 if success.
  */
-int AxisCamera::CopyJPEG(char** destImage, unsigned int& destImageSize,
-                         unsigned int& destImageBufferSize) {
+int AxisCamera::CopyJPEG(char** destImage, int& destImageSize,
+                         int& destImageBufferSize) {
   std::lock_guard<priority_mutex> lock(m_imageDataMutex);
   if (destImage == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "destImage must not be nullptr");
@@ -134,7 +134,7 @@ int AxisCamera::CopyJPEG(char** destImage, unsigned int& destImageSize,
   if (m_imageData.size() == 0) return 0;  // if no source image
 
   // if current destination buffer too small
-  if (destImageBufferSize < m_imageData.size()) {
+  if (static_cast<uint32_t>(destImageBufferSize) < m_imageData.size()) {
     if (*destImage != nullptr) delete[] * destImage;
     destImageBufferSize = m_imageData.size() + kImageBufferAllocationIncrement;
     *destImage = new char[destImageBufferSize];

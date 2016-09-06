@@ -26,5 +26,5 @@ class DigitalSource : public InterruptableSensorBase {
   virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
   virtual bool IsAnalogTrigger() const = 0;
-  virtual uint32_t GetChannel() const = 0;
+  virtual int GetChannel() const = 0;
 };

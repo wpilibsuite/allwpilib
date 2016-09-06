@@ -31,7 +31,7 @@ const double kNativePwdUnitsPerRotation = 4096.0;
  */
 const double kMinutesPer100msUnit = 1.0 / 600.0;
 
-constexpr unsigned int CANTalon::kDelayForSolicitedSignalsUs;
+constexpr int CANTalon::kDelayForSolicitedSignalsUs;
 
 /**
  * Constructor for the CANTalon device.
@@ -299,7 +299,7 @@ void CANTalon::SetF(double f) {
  *
  * @see SelectProfileSlot to choose between the two sets of gains.
  */
-void CANTalon::SetIzone(unsigned iz) {
+void CANTalon::SetIzone(int iz) {
   CTR_Code status = m_impl->SetIzone(m_profile, iz);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -562,7 +562,7 @@ float CANTalon::GetTemperature() const {
  * portion of the postion based on overflows).
  */
 void CANTalon::SetPosition(double pos) {
-  int32_t nativePos = ScaleRotationsToNativeUnits(m_feedbackDevice, pos);
+  int nativePos = ScaleRotationsToNativeUnits(m_feedbackDevice, pos);
   CTR_Code status = m_impl->SetSensorPosition(nativePos);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -580,7 +580,7 @@ void CANTalon::SetPosition(double pos) {
  *         When using quadrature, each unit is a quadrature edge (4X) mode.
  */
 double CANTalon::GetPosition() const {
-  int32_t position;
+  int position;
   CTR_Code status = m_impl->GetSensorPosition(position);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -642,7 +642,7 @@ int CANTalon::GetClosedLoopError() const {
  * Units: mA for Curent closed loop.
  *        Talon Native Units for position and velocity.
  */
-void CANTalon::SetAllowableClosedLoopErr(uint32_t allowableCloseLoopError) {
+void CANTalon::SetAllowableClosedLoopErr(int allowableCloseLoopError) {
   /* grab param enum */
   CanTalonSRX::param_t param;
   if (m_profile == 1) {
@@ -669,7 +669,7 @@ void CANTalon::SetAllowableClosedLoopErr(uint32_t allowableCloseLoopError) {
  * would then equate to 20% of a rotation per 100ms, or 10 rotations per second.
  */
 double CANTalon::GetSpeed() const {
-  int32_t speed;
+  int speed;
   CTR_Code status = m_impl->GetSensorVelocity(speed);
   if (status != CTR_OKAY) {
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -1124,7 +1124,7 @@ void CANTalon::SetCloseLoopRampRate(double rampRate) {
 /**
  * @return The version of the firmware running on the Talon
  */
-uint32_t CANTalon::GetFirmwareVersion() const {
+int CANTalon::GetFirmwareVersion() const {
   int firmwareVersion;
   CTR_Code status = m_impl->RequestParam(CanTalonSRX::eFirmVers);
   if (status != CTR_OKAY) {
@@ -1378,7 +1378,7 @@ void CANTalon::ConfigLimitMode(LimitMode mode) {
  */
 void CANTalon::ConfigForwardLimit(double forwardLimitPosition) {
   CTR_Code status = CTR_OKAY;
-  int32_t nativeLimitPos =
+  int nativeLimitPos =
       ScaleRotationsToNativeUnits(m_feedbackDevice, forwardLimitPosition);
   status = m_impl->SetForwardSoftLimit(nativeLimitPos);
   if (status != CTR_OKAY) {
@@ -1459,7 +1459,7 @@ void CANTalon::ConfigRevLimitSwitchNormallyOpen(bool normallyOpen) {
  */
 void CANTalon::ConfigReverseLimit(double reverseLimitPosition) {
   CTR_Code status = CTR_OKAY;
-  int32_t nativeLimitPos =
+  int nativeLimitPos =
       ScaleRotationsToNativeUnits(m_feedbackDevice, reverseLimitPosition);
   status = m_impl->SetReverseSoftLimit(nativeLimitPos);
   if (status != CTR_OKAY) {
@@ -1514,7 +1514,7 @@ void CANTalon::ConfigNominalOutputVoltage(double forwardVoltage,
  * General set frame.  Since the parameter is a general integral type, this can
  * be used for testing future features.
  */
-void CANTalon::ConfigSetParameter(uint32_t paramEnum, double value) {
+void CANTalon::ConfigSetParameter(int paramEnum, double value) {
   CTR_Code status;
   /* config peak throttle when in closed-loop mode in the positive direction. */
   status = m_impl->SetParam((CanTalonSRX::param_t)paramEnum, value);
@@ -1527,7 +1527,7 @@ void CANTalon::ConfigSetParameter(uint32_t paramEnum, double value) {
  * General get frame.  Since the parameter is a general integral type, this can
  * be used for testing future features.
  */
-bool CANTalon::GetParameter(uint32_t paramEnum, double& dvalue) const {
+bool CANTalon::GetParameter(int paramEnum, double& dvalue) const {
   bool retval = true;
   /* send the request frame */
   CTR_Code status = m_impl->RequestParam((CanTalonSRX::param_t)paramEnum);
@@ -1658,7 +1658,7 @@ double CANTalon::GetNativeUnitsPerRotationScalar(
        * that the calling app does not require knowing the CPR at all. So do
        * both checks here.
        */
-      int32_t qeiPulsePerCount = 4; /* default to 4x */
+      int qeiPulsePerCount = 4; /* default to 4x */
       switch (m_feedbackDevice) {
         case CtreMagEncoder_Relative:
         case CtreMagEncoder_Absolute:
@@ -1747,14 +1747,14 @@ double CANTalon::GetNativeUnitsPerRotationScalar(
  * @see ConfigEncoderCodesPerRev
  * @return fullRotations in native engineering units of the Talon SRX firmware.
  */
-int32_t CANTalon::ScaleRotationsToNativeUnits(FeedbackDevice devToLookup,
-                                              double fullRotations) const {
+int CANTalon::ScaleRotationsToNativeUnits(FeedbackDevice devToLookup,
+                                          double fullRotations) const {
   /* first assume we don't have config info, prep the default return */
-  int32_t retval = static_cast<int32_t>(fullRotations);
+  int retval = static_cast<int>(fullRotations);
   /* retrieve scaling info */
   double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
   /* apply scalar if its available */
-  if (scalar > 0) retval = static_cast<int32_t>(fullRotations * scalar);
+  if (scalar > 0) retval = static_cast<int>(fullRotations * scalar);
   return retval;
 }
 
@@ -1769,15 +1769,15 @@ int32_t CANTalon::ScaleRotationsToNativeUnits(FeedbackDevice devToLookup,
  * @return sensor velocity in native engineering units of the Talon SRX
  *         firmware.
  */
-int32_t CANTalon::ScaleVelocityToNativeUnits(FeedbackDevice devToLookup,
-                                             double rpm) const {
+int CANTalon::ScaleVelocityToNativeUnits(FeedbackDevice devToLookup,
+                                         double rpm) const {
   /* first assume we don't have config info, prep the default return */
-  int32_t retval = static_cast<int32_t>(rpm);
+  int retval = static_cast<int>(rpm);
   /* retrieve scaling info */
   double scalar = GetNativeUnitsPerRotationScalar(devToLookup);
   /* apply scalar if its available */
   if (scalar > 0) {
-    retval = static_cast<int32_t>(rpm * kMinutesPer100msUnit * scalar);
+    retval = static_cast<int>(rpm * kMinutesPer100msUnit * scalar);
   }
   return retval;
 }
@@ -1793,7 +1793,7 @@ int32_t CANTalon::ScaleVelocityToNativeUnits(FeedbackDevice devToLookup,
  *         performed.
  */
 double CANTalon::ScaleNativeUnitsToRotations(FeedbackDevice devToLookup,
-                                             int32_t nativePos) const {
+                                             int nativePos) const {
   /* first assume we don't have config info, prep the default return */
   double retval = static_cast<double>(nativePos);
   /* retrieve scaling info */
@@ -1814,7 +1814,7 @@ double CANTalon::ScaleNativeUnitsToRotations(FeedbackDevice devToLookup,
  *         performed.
  */
 double CANTalon::ScaleNativeUnitsToRpm(FeedbackDevice devToLookup,
-                                       int32_t nativeVel) const {
+                                       int nativeVel) const {
   /* first assume we don't have config info, prep the default return */
   double retval = static_cast<double>(nativeVel);
   /* retrieve scaling info */
@@ -1891,15 +1891,13 @@ int CANTalon::GetMotionProfileTopLevelBufferCount() {
  */
 bool CANTalon::PushMotionProfileTrajectory(const TrajectoryPoint& trajPt) {
   /* convert positiona and velocity to native units */
-  int32_t targPos =
-      ScaleRotationsToNativeUnits(m_feedbackDevice, trajPt.position);
-  int32_t targVel =
-      ScaleVelocityToNativeUnits(m_feedbackDevice, trajPt.velocity);
+  int targPos = ScaleRotationsToNativeUnits(m_feedbackDevice, trajPt.position);
+  int targVel = ScaleVelocityToNativeUnits(m_feedbackDevice, trajPt.velocity);
   /* bounds check signals that require it */
-  uint32_t profileSlotSelect = (trajPt.profileSlotSelect) ? 1 : 0;
-  uint8_t timeDurMs = (trajPt.timeDurMs >= 255)
-                          ? 255
-                          : trajPt.timeDurMs; /* cap time to 255ms */
+  int profileSlotSelect = (trajPt.profileSlotSelect) ? 1 : 0;
+  int timeDurMs = (trajPt.timeDurMs >= 255)
+                      ? 255
+                      : trajPt.timeDurMs; /* cap time to 255ms */
   /* send it to the top level buffer */
   CTR_Code status = m_impl->PushMotionProfileTrajectory(
       targPos, targVel, profileSlotSelect, timeDurMs, trajPt.velocityOnly,
@@ -1939,7 +1937,7 @@ void CANTalon::GetMotionProfileStatus(
     MotionProfileStatus& motionProfileStatus) {
   uint32_t flags;
   uint32_t profileSlotSelect;
-  int32_t targPos, targVel;
+  int targPos, targVel;
   uint32_t topBufferRem, topBufferCnt, btmBufferCnt;
   uint32_t outputEnable;
   /* retrieve all motion profile signals from status frame */

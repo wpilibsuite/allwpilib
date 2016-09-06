@@ -25,8 +25,8 @@ class Solenoid : public SolenoidBase,
                  public LiveWindowSendable,
                  public ITableListener {
  public:
-  explicit Solenoid(uint32_t channel);
-  Solenoid(uint8_t moduleNumber, uint32_t channel);
+  explicit Solenoid(int channel);
+  Solenoid(int moduleNumber, int channel);
   virtual ~Solenoid();
   virtual void Set(bool on);
   virtual bool Get() const;
@@ -43,6 +43,6 @@ class Solenoid : public SolenoidBase,
 
  private:
   HAL_SolenoidHandle m_solenoidHandle = HAL_kInvalidHandle;
-  uint32_t m_channel;  ///< The channel on the module to control.
+  int m_channel;  ///< The channel on the module to control.
   std::shared_ptr<ITable> m_table;
 };

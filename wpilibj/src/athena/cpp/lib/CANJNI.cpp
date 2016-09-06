@@ -48,7 +48,7 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
     if (dataBuffer) {
       std::ostringstream str;
       str << std::setfill('0') << std::hex;
-      for (int i = 0; i < dataSize; i++) {
+      for (int32_t i = 0; i < dataSize; i++) {
         str << std::setw(2) << (int)dataBuffer[i] << ' ';
       }
 
@@ -96,7 +96,7 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   if (logDEBUG <= canJNILogLevel) {
     std::ostringstream str;
     str << std::setfill('0') << std::hex;
-    for (int i = 0; i < dataSize; i++) {
+    for (int32_t i = 0; i < dataSize; i++) {
       str << std::setw(2) << (int)buffer[i] << ' ';
     }
 

@@ -12,7 +12,7 @@
 /**
  * @param channel The PWM channel that the Victor is attached to.
  */
-Victor::Victor(uint32_t channel) : SafePWM(channel) {
+Victor::Victor(int channel) : SafePWM(channel) {
   /* Note that the Victor uses the following bounds for PWM values. These values
    * were determined empirically and optimized for the Victor 888. These values
    * should work reasonably well for Victor 884 controllers as well but if users

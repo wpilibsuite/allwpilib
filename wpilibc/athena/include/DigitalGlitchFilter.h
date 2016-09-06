@@ -34,10 +34,10 @@ class DigitalGlitchFilter : public SensorBase {
   void Remove(Encoder* input);
   void Remove(Counter* input);
 
-  void SetPeriodCycles(uint32_t fpga_cycles);
+  void SetPeriodCycles(int fpga_cycles);
   void SetPeriodNanoSeconds(uint64_t nanoseconds);
 
-  uint32_t GetPeriodCycles();
+  int GetPeriodCycles();
   uint64_t GetPeriodNanoSeconds();
 
  private:

@@ -19,7 +19,7 @@ constexpr float Servo::kDefaultMinServoPWM;
  * @param channel The PWM channel to which the servo is attached. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-Servo::Servo(uint32_t channel) : SafePWM(channel) {
+Servo::Servo(int channel) : SafePWM(channel) {
   // Set minimum and maximum PWM values supported by the servo
   SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
 

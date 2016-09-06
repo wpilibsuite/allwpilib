@@ -13,7 +13,7 @@
  * @param channel The PWM channel number 0-9 are on-board, 10-19 are on the MXP
  *                port
  */
-SafePWM::SafePWM(uint32_t channel) : PWM(channel) {
+SafePWM::SafePWM(int channel) : PWM(channel) {
   m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
   m_safetyHelper->SetSafetyEnabled(false);
 }

@@ -38,9 +38,9 @@ class RobotDrive : public MotorSafety, public ErrorBase {
     kRearRightMotor = 3
   };
 
-  RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel);
-  RobotDrive(uint32_t frontLeftMotorChannel, uint32_t rearLeftMotorChannel,
-             uint32_t frontRightMotorChannel, uint32_t rearRightMotorChannel);
+  RobotDrive(int leftMotorChannel, int rightMotorChannel);
+  RobotDrive(int frontLeftMotorChannel, int rearLeftMotorChannel,
+             int frontRightMotorChannel, int rearRightMotorChannel);
   RobotDrive(SpeedController* leftMotor, SpeedController* rightMotor);
   RobotDrive(SpeedController& leftMotor, SpeedController& rightMotor);
   RobotDrive(std::shared_ptr<SpeedController> leftMotor,
@@ -63,20 +63,18 @@ class RobotDrive : public MotorSafety, public ErrorBase {
                  bool squaredInputs = true);
   void TankDrive(GenericHID& leftStick, GenericHID& rightStick,
                  bool squaredInputs = true);
-  void TankDrive(GenericHID* leftStick, uint32_t leftAxis,
-                 GenericHID* rightStick, uint32_t rightAxis,
-                 bool squaredInputs = true);
-  void TankDrive(GenericHID& leftStick, uint32_t leftAxis,
-                 GenericHID& rightStick, uint32_t rightAxis,
-                 bool squaredInputs = true);
+  void TankDrive(GenericHID* leftStick, int leftAxis, GenericHID* rightStick,
+                 int rightAxis, bool squaredInputs = true);
+  void TankDrive(GenericHID& leftStick, int leftAxis, GenericHID& rightStick,
+                 int rightAxis, bool squaredInputs = true);
   void TankDrive(float leftValue, float rightValue, bool squaredInputs = true);
   void ArcadeDrive(GenericHID* stick, bool squaredInputs = true);
   void ArcadeDrive(GenericHID& stick, bool squaredInputs = true);
-  void ArcadeDrive(GenericHID* moveStick, uint32_t moveChannel,
-                   GenericHID* rotateStick, uint32_t rotateChannel,
+  void ArcadeDrive(GenericHID* moveStick, int moveChannel,
+                   GenericHID* rotateStick, int rotateChannel,
                    bool squaredInputs = true);
-  void ArcadeDrive(GenericHID& moveStick, uint32_t moveChannel,
-                   GenericHID& rotateStick, uint32_t rotateChannel,
+  void ArcadeDrive(GenericHID& moveStick, int moveChannel,
+                   GenericHID& rotateStick, int rotateChannel,
                    bool squaredInputs = true);
   void ArcadeDrive(float moveValue, float rotateValue,
                    bool squaredInputs = true);
@@ -103,9 +101,9 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   void Normalize(double* wheelSpeeds);
   void RotateVector(double& x, double& y, double angle);
 
-  static const int32_t kMaxNumberOfMotors = 4;
+  static const int kMaxNumberOfMotors = 4;
 
-  int32_t m_invertedMotors[kMaxNumberOfMotors] = {1, 1, 1, 1};
+  int m_invertedMotors[kMaxNumberOfMotors] = {1, 1, 1, 1};
   float m_sensitivity = 0.5;
   double m_maxOutput = 1.0;
   bool m_deleteSpeedControllers;
@@ -116,7 +114,7 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   // FIXME: MotorSafetyHelper *m_safetyHelper;
 
  private:
-  int32_t GetNumMotors() {
+  int GetNumMotors() {
     int motors = 0;
     if (m_frontLeftMotor) motors++;
     if (m_frontRightMotor) motors++;

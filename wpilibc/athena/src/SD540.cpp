@@ -31,7 +31,7 @@
  * @param channel The PWM channel that the SD540 is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-SD540::SD540(uint32_t channel) : PWMSpeedController(channel) {
+SD540::SD540(int channel) : PWMSpeedController(channel) {
   SetBounds(2.05, 1.55, 1.50, 1.44, .94);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);

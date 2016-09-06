@@ -16,7 +16,7 @@
 #undef max
 #include <algorithm>
 
-const int32_t RobotDrive::kMaxNumberOfMotors;
+const int RobotDrive::kMaxNumberOfMotors;
 
 static auto make_shared_nodelete(SpeedController* ptr) {
   return std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
@@ -52,7 +52,7 @@ void RobotDrive::InitRobotDrive() {
  * @param leftMotorChannel  The PWM channel number that drives the left motor.
  * @param rightMotorChannel The PWM channel number that drives the right motor.
  */
-RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
+RobotDrive::RobotDrive(int leftMotorChannel, int rightMotorChannel) {
   InitRobotDrive();
   m_rearLeftMotor = std::make_shared<Talon>(leftMotorChannel);
   m_rearRightMotor = std::make_shared<Talon>(rightMotorChannel);
@@ -72,8 +72,8 @@ RobotDrive::RobotDrive(uint32_t leftMotorChannel, uint32_t rightMotorChannel) {
  * @param frontRightMotor Front right motor channel number
  * @param rearRightMotor  Rear Right motor channel number
  */
-RobotDrive::RobotDrive(uint32_t frontLeftMotor, uint32_t rearLeftMotor,
-                       uint32_t frontRightMotor, uint32_t rearRightMotor) {
+RobotDrive::RobotDrive(int frontLeftMotor, int rearLeftMotor,
+                       int frontRightMotor, int rearRightMotor) {
   InitRobotDrive();
   m_rearLeftMotor = std::make_shared<Talon>(rearLeftMotor);
   m_rearRightMotor = std::make_shared<Talon>(rearRightMotor);
@@ -266,8 +266,8 @@ void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
  * @param rightStick The Joystick object to use for the right side of the robot.
  * @param rightAxis  The axis to select on the right side Joystick object.
  */
-void RobotDrive::TankDrive(GenericHID* leftStick, uint32_t leftAxis,
-                           GenericHID* rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID* leftStick, int leftAxis,
+                           GenericHID* rightStick, int rightAxis,
                            bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -277,8 +277,8 @@ void RobotDrive::TankDrive(GenericHID* leftStick, uint32_t leftAxis,
             squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID& leftStick, uint32_t leftAxis,
-                           GenericHID& rightStick, uint32_t rightAxis,
+void RobotDrive::TankDrive(GenericHID& leftStick, int leftAxis,
+                           GenericHID& rightStick, int rightAxis,
                            bool squaredInputs) {
   TankDrive(leftStick.GetRawAxis(leftAxis), rightStick.GetRawAxis(rightAxis),
             squaredInputs);
@@ -371,8 +371,8 @@ void RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {
  * @param squaredInputs Setting this parameter to true increases the sensitivity
  *                      at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint32_t moveAxis,
-                             GenericHID* rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID* moveStick, int moveAxis,
+                             GenericHID* rotateStick, int rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick->GetRawAxis(moveAxis);
   float rotateValue = rotateStick->GetRawAxis(rotateAxis);
@@ -396,8 +396,8 @@ void RobotDrive::ArcadeDrive(GenericHID* moveStick, uint32_t moveAxis,
  * @param squaredInputs Setting this parameter to true increases the sensitivity
  *                      at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID& moveStick, uint32_t moveAxis,
-                             GenericHID& rotateStick, uint32_t rotateAxis,
+void RobotDrive::ArcadeDrive(GenericHID& moveStick, int moveAxis,
+                             GenericHID& rotateStick, int rotateAxis,
                              bool squaredInputs) {
   float moveValue = moveStick.GetRawAxis(moveAxis);
   float rotateValue = rotateStick.GetRawAxis(rotateAxis);
@@ -630,7 +630,7 @@ float RobotDrive::Limit(float num) {
  */
 void RobotDrive::Normalize(double* wheelSpeeds) {
   double maxMagnitude = fabs(wheelSpeeds[0]);
-  int32_t i;
+  int i;
   for (i = 1; i < kMaxNumberOfMotors; i++) {
     double temp = fabs(wheelSpeeds[i]);
     if (maxMagnitude < temp) maxMagnitude = temp;

@@ -65,7 +65,6 @@
 #include "PowerDistributionPanel.h"
 #include "Preferences.h"
 #include "Relay.h"
-#include "Resource.h"
 #include "RobotBase.h"
 #include "RobotDrive.h"
 #include "SD540.h"

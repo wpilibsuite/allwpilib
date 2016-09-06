@@ -27,7 +27,7 @@ class PWMSpeedController : public SafePWM, public SpeedController {
   bool GetInverted() const override;
 
  protected:
-  explicit PWMSpeedController(uint32_t channel);
+  explicit PWMSpeedController(int channel);
 
  private:
   bool m_isInverted = false;

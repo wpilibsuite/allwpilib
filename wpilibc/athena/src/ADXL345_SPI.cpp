@@ -11,9 +11,9 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
-const uint8_t ADXL345_SPI::kPowerCtlRegister;
-const uint8_t ADXL345_SPI::kDataFormatRegister;
-const uint8_t ADXL345_SPI::kDataRegister;
+const int ADXL345_SPI::kPowerCtlRegister;
+const int ADXL345_SPI::kDataFormatRegister;
+const int ADXL345_SPI::kDataRegister;
 constexpr double ADXL345_SPI::kGsPerLSB;
 
 /**
@@ -92,7 +92,7 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
   dataBuffer[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister);
   m_spi.Transaction(dataBuffer, dataBuffer, 7);
 
-  for (int32_t i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++) {
     // Sensor is little endian... swap bytes
     rawData[i] = dataBuffer[i * 2 + 2] << 8 | dataBuffer[i * 2 + 1];
   }

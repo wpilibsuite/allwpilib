@@ -32,21 +32,21 @@
                           __FUNCTION__)
 
 bool wpi_assert_impl(bool conditionValue, const char* conditionText,
-                     const char* message, const char* fileName,
-                     uint32_t lineNumber, const char* funcName);
+                     const char* message, const char* fileName, int lineNumber,
+                     const char* funcName);
 bool wpi_assertEqual_impl(int valueA, int valueB, const char* valueAString,
                           const char* valueBString, const char* message,
-                          const char* fileName, uint32_t lineNumber,
+                          const char* fileName, int lineNumber,
                           const char* funcName);
 bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
                              const char* valueBString, const char* message,
-                             const char* fileName, uint32_t lineNumber,
+                             const char* fileName, int lineNumber,
                              const char* funcName);
 
 void wpi_suspendOnAssertEnabled(bool enabled);
 
-int32_t GetFPGAVersion();
+int GetFPGAVersion();
 int64_t GetFPGARevision();
 uint64_t GetFPGATime();
 bool GetUserButton();
-std::string GetStackTrace(uint32_t offset);
+std::string GetStackTrace(int offset);

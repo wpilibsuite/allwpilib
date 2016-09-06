@@ -13,8 +13,8 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
-const uint32_t AnalogGyro::kOversampleBits = 10;
-const uint32_t AnalogGyro::kAverageBits = 0;
+const int AnalogGyro::kOversampleBits = 10;
+const int AnalogGyro::kAverageBits = 0;
 const float AnalogGyro::kSamplesPerSecond = 50.0;
 const float AnalogGyro::kCalibrationSampleTime = 5.0;
 const float AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
@@ -44,7 +44,7 @@ void AnalogGyro::InitAnalogGyro(int channel) {
  *
  * @param channel The analog channel the gyro is connected to.
  */
-AnalogGyro::AnalogGyro(uint32_t channel) { InitAnalogGyro(channel); }
+AnalogGyro::AnalogGyro(int channel) { InitAnalogGyro(channel); }
 
 /**
  * Reset the gyro.

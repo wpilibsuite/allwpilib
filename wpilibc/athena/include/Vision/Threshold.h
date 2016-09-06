@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 /**
  * Color threshold values.
  * This object represnts the threshold values for any type of color object

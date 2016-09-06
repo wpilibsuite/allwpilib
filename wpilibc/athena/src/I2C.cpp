@@ -15,7 +15,7 @@
  * @param port          The I2C port to which the device is connected.
  * @param deviceAddress The address of the device on the I2C bus.
  */
-I2C::I2C(Port port, uint8_t deviceAddress)
+I2C::I2C(Port port, int deviceAddress)
     : m_port(port), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
   HAL_InitializeI2C(m_port, &status);
@@ -41,8 +41,8 @@ I2C::~I2C() { HAL_CloseI2C(m_port); }
  * @param receiveSize  Number of bytes to read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::Transaction(uint8_t* dataToSend, uint8_t sendSize,
-                      uint8_t* dataReceived, uint8_t receiveSize) {
+bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
+                      int receiveSize) {
   int32_t status = 0;
   status = HAL_TransactionI2C(m_port, m_deviceAddress, dataToSend, sendSize,
                               dataReceived, receiveSize);
@@ -71,13 +71,13 @@ bool I2C::AddressOnly() { return Transaction(nullptr, 0, nullptr, 0); }
  * @param data            The byte to write to the register on the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::Write(uint8_t registerAddress, uint8_t data) {
+bool I2C::Write(int registerAddress, uint8_t data) {
   uint8_t buffer[2];
   buffer[0] = registerAddress;
   buffer[1] = data;
   int32_t status = 0;
   status = HAL_WriteI2C(m_port, m_deviceAddress, buffer, sizeof(buffer));
-  return status < static_cast<int32_t>(sizeof(buffer));
+  return status < static_cast<int>(sizeof(buffer));
 }
 
 /**
@@ -90,7 +90,7 @@ bool I2C::Write(uint8_t registerAddress, uint8_t data) {
  * @param count The number of bytes to be written.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::WriteBulk(uint8_t* data, uint8_t count) {
+bool I2C::WriteBulk(uint8_t* data, int count) {
   int32_t status = 0;
   status = HAL_WriteI2C(m_port, m_deviceAddress, data, count);
   return status < count;
@@ -109,7 +109,7 @@ bool I2C::WriteBulk(uint8_t* data, uint8_t count) {
  *                        read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t* buffer) {
+bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
   if (count < 1) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
@@ -118,7 +118,8 @@ bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t* buffer) {
     wpi_setWPIErrorWithContext(NullParameter, "buffer");
     return true;
   }
-  return Transaction(&registerAddress, sizeof(registerAddress), buffer, count);
+  return Transaction(reinterpret_cast<uint8_t*>(&registerAddress),
+                     sizeof(registerAddress), buffer, count);
 }
 
 /**
@@ -132,7 +133,7 @@ bool I2C::Read(uint8_t registerAddress, uint8_t count, uint8_t* buffer) {
  * @param count  The number of bytes to read in the transaction.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::ReadOnly(uint8_t count, uint8_t* buffer) {
+bool I2C::ReadOnly(int count, uint8_t* buffer) {
   if (count < 1) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
@@ -155,7 +156,7 @@ bool I2C::ReadOnly(uint8_t count, uint8_t* buffer) {
  * @param data            The value to write to the devices.
  */
 [[gnu::warning("I2C::Broadcast() is not implemented.")]] void I2C::Broadcast(
-    uint8_t registerAddress, uint8_t data) {}
+    int registerAddress, uint8_t data) {}
 
 /**
  * Verify that a device's registers contain expected values.
@@ -172,17 +173,17 @@ bool I2C::ReadOnly(uint8_t count, uint8_t* buffer) {
  * @param expected        A buffer containing the values expected from the
  *                        device.
  */
-bool I2C::VerifySensor(uint8_t registerAddress, uint8_t count,
+bool I2C::VerifySensor(int registerAddress, int count,
                        const uint8_t* expected) {
   // TODO: Make use of all 7 read bytes
   uint8_t deviceData[4];
-  for (uint8_t i = 0, curRegisterAddress = registerAddress; i < count;
+  for (int i = 0, curRegisterAddress = registerAddress; i < count;
        i += 4, curRegisterAddress += 4) {
-    uint8_t toRead = count - i < 4 ? count - i : 4;
+    int toRead = count - i < 4 ? count - i : 4;
     // Read the chunk of data.  Return false if the sensor does not respond.
     if (Read(curRegisterAddress, toRead, deviceData)) return false;
 
-    for (uint8_t j = 0; j < toRead; j++) {
+    for (int j = 0; j < toRead; j++) {
       if (deviceData[j] != expected[i + j]) return false;
     }
   }

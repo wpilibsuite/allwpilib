@@ -22,7 +22,7 @@
  */
 class Servo : public SafePWM {
  public:
-  explicit Servo(uint32_t channel);
+  explicit Servo(int channel);
   virtual ~Servo();
   void Set(float value);
   void SetOffline();

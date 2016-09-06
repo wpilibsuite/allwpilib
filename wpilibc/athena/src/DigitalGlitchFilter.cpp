@@ -146,7 +146,7 @@ void DigitalGlitchFilter::Remove(Counter* input) {
  *
  * @param fpga_cycles The number of FPGA cycles.
  */
-void DigitalGlitchFilter::SetPeriodCycles(uint32_t fpga_cycles) {
+void DigitalGlitchFilter::SetPeriodCycles(int fpga_cycles) {
   int32_t status = 0;
   HAL_SetFilterPeriod(m_channelIndex, fpga_cycles, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -159,7 +159,7 @@ void DigitalGlitchFilter::SetPeriodCycles(uint32_t fpga_cycles) {
  */
 void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
   int32_t status = 0;
-  uint32_t fpga_cycles =
+  int fpga_cycles =
       nanoseconds * HAL_GetSystemClockTicksPerMicrosecond() / 4 / 1000;
   HAL_SetFilterPeriod(m_channelIndex, fpga_cycles, &status);
 
@@ -171,9 +171,9 @@ void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
  *
  * @return The number of cycles.
  */
-uint32_t DigitalGlitchFilter::GetPeriodCycles() {
+int DigitalGlitchFilter::GetPeriodCycles() {
   int32_t status = 0;
-  uint32_t fpga_cycles = HAL_GetFilterPeriod(m_channelIndex, &status);
+  int fpga_cycles = HAL_GetFilterPeriod(m_channelIndex, &status);
 
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
@@ -187,7 +187,7 @@ uint32_t DigitalGlitchFilter::GetPeriodCycles() {
  */
 uint64_t DigitalGlitchFilter::GetPeriodNanoSeconds() {
   int32_t status = 0;
-  uint32_t fpga_cycles = HAL_GetFilterPeriod(m_channelIndex, &status);
+  int fpga_cycles = HAL_GetFilterPeriod(m_channelIndex, &status);
 
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 

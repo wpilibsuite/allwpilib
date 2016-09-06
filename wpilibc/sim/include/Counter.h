@@ -29,7 +29,7 @@ class Counter : public SensorBase,
                 public LiveWindowSendable {
  public:
   explicit Counter(Mode mode = kTwoPulse);
-  explicit Counter(uint32_t channel);
+  explicit Counter(int channel);
   // TODO: [Not Supported] explicit Counter(DigitalSource *source);
   // TODO: [Not Supported] explicit Counter(DigitalSource &source);
   // TODO: [Not Supported] explicit Counter(AnalogTrigger *source);
@@ -38,7 +38,7 @@ class Counter : public SensorBase,
   // *upSource, DigitalSource *downSource, bool inverted);
   virtual ~Counter();
 
-  void SetUpSource(uint32_t channel);
+  void SetUpSource(int channel);
   // TODO: [Not Supported] void SetUpSource(AnalogTrigger *analogTrigger,
   // AnalogTriggerType triggerType);
   // TODO: [Not Supported] void SetUpSource(AnalogTrigger &analogTrigger,
@@ -48,7 +48,7 @@ class Counter : public SensorBase,
   void SetUpSourceEdge(bool risingEdge, bool fallingEdge);
   void ClearUpSource();
 
-  void SetDownSource(uint32_t channel);
+  void SetDownSource(int channel);
   // TODO: [Not Supported] void SetDownSource(AnalogTrigger *analogTrigger,
   // AnalogTriggerType triggerType);
   // TODO: [Not Supported] void SetDownSource(AnalogTrigger &analogTrigger,
@@ -66,7 +66,7 @@ class Counter : public SensorBase,
   void SetReverseDirection(bool reverseDirection);
 
   // CounterBase interface
-  int32_t Get() const override;
+  int Get() const override;
   void Reset() override;
   double GetPeriod() const override;
   void SetMaxPeriod(double maxPeriod) override;
@@ -76,7 +76,7 @@ class Counter : public SensorBase,
 
   void SetSamplesToAverage(int samplesToAverage);
   int GetSamplesToAverage() const;
-  uint32_t GetFPGAIndex() const { return m_index; }
+  int GetFPGAIndex() const { return m_index; }
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;
@@ -94,7 +94,7 @@ class Counter : public SensorBase,
  private:
   bool m_allocatedUpSource;    ///< Was the upSource allocated locally?
   bool m_allocatedDownSource;  ///< Was the downSource allocated locally?
-  uint32_t m_index;            ///< The index of this counter.
+  int m_index;                 ///< The index of this counter.
 
   std::shared_ptr<ITable> m_table;
 };
