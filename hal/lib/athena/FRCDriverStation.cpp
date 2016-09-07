@@ -14,8 +14,11 @@
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 
+static_assert(sizeof(int32_t) >= sizeof(int),
+              "FRC_NetworkComm status variable is larger than 32 bits");
+
 struct HAL_JoystickAxesInt {
-  uint16_t count;
+  int16_t count;
   int16_t axes[HAL_kMaxJoystickAxes];
 };
 
@@ -95,11 +98,11 @@ int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
       joystickNum, reinterpret_cast<JoystickAxes_t*>(&axesInt),
       HAL_kMaxJoystickAxes);
 
-  // copy int values to float values
+  // copy integer values to float values
   axes->count = axesInt.count;
   // current scaling is -128 to 127, can easily be patched in the future by
   // changing this function.
-  for (unsigned int i = 0; i < axesInt.count; i++) {
+  for (int32_t i = 0; i < axesInt.count; i++) {
     int8_t value = axesInt.axes[i];
     if (value < 0) {
       axes->axes[i] = value / 128.0f;

@@ -36,7 +36,7 @@ class Encoder {
   void SetMinRate(double minRate, int32_t* status);
   void SetDistancePerPulse(double distancePerPulse, int32_t* status);
   void SetReverseDirection(bool reverseDirection, int32_t* status);
-  void SetSamplesToAverage(int samplesToAverage, int32_t* status);
+  void SetSamplesToAverage(int32_t samplesToAverage, int32_t* status);
   int32_t GetSamplesToAverage(int32_t* status) const;
 
   void SetIndexSource(HAL_Handle digitalSourceHandle,

@@ -26,8 +26,8 @@ STATUS HAL_VerifyTaskID(TASK task) {
   }
 }
 
-STATUS HAL_SetTaskPriority(TASK task, int priority) {
-  int policy = 0;
+STATUS HAL_SetTaskPriority(TASK task, int32_t priority) {
+  int32_t policy = 0;
   struct sched_param param;
 
   if (HAL_VerifyTaskID(task) == OK &&
@@ -43,8 +43,8 @@ STATUS HAL_SetTaskPriority(TASK task, int priority) {
   }
 }
 
-STATUS HAL_GetTaskPriority(TASK task, int* priority) {
-  int policy = 0;
+STATUS HAL_GetTaskPriority(TASK task, int32_t* priority) {
+  int32_t policy = 0;
   struct sched_param param;
 
   if (HAL_VerifyTaskID(task) == OK &&

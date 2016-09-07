@@ -7,7 +7,7 @@
 
 #include "HAL/cpp/Semaphore.h"
 
-Semaphore::Semaphore(uint32_t count) { m_count = count; }
+Semaphore::Semaphore(int32_t count) { m_count = count; }
 
 void Semaphore::give() {
   std::lock_guard<priority_mutex> lock(m_mutex);

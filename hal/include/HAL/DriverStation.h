@@ -54,12 +54,12 @@ enum HAL_AllianceStationID {
 #define HAL_kMaxJoystickPOVs 12
 
 struct HAL_JoystickAxes {
-  uint16_t count;
+  int16_t count;
   float axes[HAL_kMaxJoystickAxes];
 };
 
 struct HAL_JoystickPOVs {
-  uint16_t count;
+  int16_t count;
   int16_t povs[HAL_kMaxJoystickPOVs];
 };
 

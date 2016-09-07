@@ -9,8 +9,8 @@
 
 #include "visa/visa.h"
 
-static uint32_t m_resourceManagerHandle;
-static uint32_t m_portHandle[2];
+static int32_t m_resourceManagerHandle;
+static int32_t m_portHandle[2];
 
 extern "C" {
 

@@ -21,7 +21,7 @@ IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
                       HAL_HandleEnum::AnalogInput>
     analogInputHandles;
 
-static uint32_t analogNumChannelsToActivate = 0;
+static int32_t analogNumChannelsToActivate = 0;
 
 bool analogSystemInitialized = false;
 
@@ -43,8 +43,8 @@ void initializeAnalog(int32_t* status) {
  *
  * @return Active channels.
  */
-uint32_t getAnalogNumActiveChannels(int32_t* status) {
-  uint32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
+int32_t getAnalogNumActiveChannels(int32_t* status) {
+  int32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
   if (scanSize == 0) return 8;
   return scanSize;
 }
@@ -60,7 +60,7 @@ uint32_t getAnalogNumActiveChannels(int32_t* status) {
  *
  * @return Value to write to the active channels field.
  */
-uint32_t getAnalogNumChannelsToActivate(int32_t* status) {
+int32_t getAnalogNumChannelsToActivate(int32_t* status) {
   if (analogNumChannelsToActivate == 0)
     return getAnalogNumActiveChannels(status);
   return analogNumChannelsToActivate;
@@ -75,7 +75,7 @@ uint32_t getAnalogNumChannelsToActivate(int32_t* status) {
  *
  * @param channels Number of active channels.
  */
-void setAnalogNumChannelsToActivate(uint32_t channels) {
+void setAnalogNumChannelsToActivate(int32_t channels) {
   analogNumChannelsToActivate = channels;
 }
 }  // namespace hal

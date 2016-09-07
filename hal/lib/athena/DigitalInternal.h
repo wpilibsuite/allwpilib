@@ -23,9 +23,9 @@ namespace hal {
 /**
  * MXP channels when used as digital output PWM are offset from actual value
  */
-constexpr uint32_t kMXPDigitalPWMOffset = 6;
+constexpr int32_t kMXPDigitalPWMOffset = 6;
 
-constexpr uint32_t kExpectedLoopTiming = 40;
+constexpr int32_t kExpectedLoopTiming = 40;
 
 /**
  * kDefaultPwmPeriod is in ms

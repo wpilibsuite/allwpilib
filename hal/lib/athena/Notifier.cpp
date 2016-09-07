@@ -20,7 +20,7 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
 
-static const uint32_t kTimerInterruptNumber = 28;
+static const int32_t kTimerInterruptNumber = 28;
 
 static priority_mutex notifierInterruptMutex;
 static priority_recursive_mutex notifierMutex;
