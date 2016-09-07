@@ -223,11 +223,11 @@ public class NetworkTable implements ITable, IRemote {
     return !client;
   }
 
-  private class ListenerBase {
+  private static class ListenerBase {
     public int uid;
   }
 
-  private class ConnectionListenerAdapter extends ListenerBase implements NetworkTablesJNI.ConnectionListenerFunction {
+  private static class ConnectionListenerAdapter extends ListenerBase implements NetworkTablesJNI.ConnectionListenerFunction {
     private final IRemote targetSource;
     private final IRemoteConnectionListener targetListener;
 
@@ -241,6 +241,41 @@ public class NetworkTable implements ITable, IRemote {
         targetListener.connectedEx(targetSource, conn);
       else
         targetListener.disconnectedEx(targetSource, conn);
+    }
+  }
+  
+  private static IRemote staticRemote = new IRemote() {
+    public void addConnectionListener(IRemoteConnectionListener listener, boolean immediateNotify) {
+      NetworkTable.addGlobalConnectionListener(listener, immediateNotify);
+    }
+    public void removeConnectionListener(IRemoteConnectionListener listener) {
+      NetworkTable.removeGlobalConnectionListener(listener);
+    }
+    public boolean isConnected() {
+      ConnectionInfo[] conns = NetworkTablesJNI.getConnections();
+      return conns.length > 0;
+    }
+    public boolean isServer() {
+      return !client;
+    }
+  };
+  
+  private static final Hashtable<IRemoteConnectionListener,ConnectionListenerAdapter> globalConnectionListenerMap = new Hashtable<IRemoteConnectionListener,ConnectionListenerAdapter>();
+  public static synchronized void addGlobalConnectionListener(IRemoteConnectionListener listener,
+                                                              boolean immediateNotify) {
+    ConnectionListenerAdapter adapter = globalConnectionListenerMap.get(listener);
+    if (adapter != null)
+      throw new IllegalStateException("Cannot add the same listener twice");
+    adapter = new ConnectionListenerAdapter(staticRemote, listener);
+    adapter.uid = NetworkTablesJNI.addConnectionListener(adapter, immediateNotify);
+    globalConnectionListenerMap.put(listener, adapter);
+  }
+
+  public static synchronized void removeGlobalConnectionListener(IRemoteConnectionListener listener) {
+    ConnectionListenerAdapter adapter = globalConnectionListenerMap.get(listener);
+    if (adapter != null) {
+      NetworkTablesJNI.removeConnectionListener(adapter.uid);
+      globalConnectionListenerMap.remove(listener);
     }
   }
 
