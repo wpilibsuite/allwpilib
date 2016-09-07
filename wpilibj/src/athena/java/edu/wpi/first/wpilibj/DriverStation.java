@@ -821,7 +821,7 @@ public class DriverStation implements RobotState.Interface {
     synchronized (m_controlWordMutex) {
       if ((now - m_lastControlWordUpdate > 50) || force) {
         HAL.getControlWord(m_controlWordCache);
-        now = m_lastControlWordUpdate;
+        m_lastControlWordUpdate = now;
       }
     }
   }
