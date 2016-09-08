@@ -336,11 +336,6 @@ void RemoveSourceProperty(CS_Source source, llvm::StringRef name,
 // Sink Creation Functions
 //
 
-CS_Sink CreateHTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,
-                       int port, CS_Status* status) {
-  return 0;  // TODO
-}
-
 CS_Sink CreateCvSink(llvm::StringRef name, CS_Status* status) {
   return 0;  // TODO
 }
@@ -449,14 +444,6 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
     return;
   }
   if (--(data->refCount) == 0) inst.Free(sink);
-}
-
-//
-// Server Sink (e.g. HTTP) Functions
-//
-
-void SetSinkSourceChannel(CS_Sink sink, int channel, CS_Status* status) {
-  // TODO
 }
 
 //

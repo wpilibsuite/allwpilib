@@ -212,11 +212,6 @@ void CS_RemoveSourcePropertyByName(CS_Source source, const char* name,
   return cs::RemoveSourceProperty(source, name, status);
 }
 
-CS_Sink CS_CreateHTTPSink(const char* name, const char* listenAddress, int port,
-                          CS_Status* status) {
-  return cs::CreateHTTPSink(name, listenAddress, port, status);
-}
-
 CS_Sink CS_CreateCvSink(const char* name, CS_Status* status) {
   return cs::CreateCvSink(name, status);
 }
@@ -261,10 +256,6 @@ CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status) {
 
 void CS_ReleaseSink(CS_Sink sink, CS_Status* status) {
   return cs::ReleaseSink(sink, status);
-}
-
-void CS_SetSinkSourceChannel(CS_Sink sink, int channel, CS_Status* status) {
-  return cs::SetSinkSourceChannel(sink, channel, status);
 }
 
 uint64_t CS_SinkWaitForFrame(CS_Sink sink, CS_Status* status) {
