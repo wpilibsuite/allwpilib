@@ -17,6 +17,7 @@ SourceImpl::SourceImpl(llvm::StringRef name)
 SourceImpl::~SourceImpl() {
   // Wake up anyone who is waiting.  This also clears the current frame,
   // which is good because its destructor will call back into the class.
+  EnableSink();
   Wakeup();
   // Everything else can clean up itself.
 }
@@ -24,7 +25,7 @@ SourceImpl::~SourceImpl() {
 Frame SourceImpl::GetNextFrame() {
   std::unique_lock<std::mutex> lock{m_frameMutex};
   // TODO: handle spurious wakeup by comparing frame timestamps
-  m_cv.wait(lock);
+  m_frameCv.wait(lock);
   return m_frame;
 }
 
@@ -33,7 +34,7 @@ void SourceImpl::Wakeup() {
     std::lock_guard<std::mutex> lock{m_frameMutex};
     m_frame = Frame{*this, nullptr};
   }
-  m_cv.notify_all();
+  m_frameCv.notify_all();
 }
 
 void SourceImpl::StartFrame() {
@@ -56,7 +57,7 @@ void SourceImpl::FinishFrame() {
     std::lock_guard<std::mutex> lock2{m_frameMutex};
     m_frame = Frame{*this, m_frameData.release()};
   }
-  m_cv.notify_all();
+  m_frameCv.notify_all();
 }
 
 void SourceImpl::ReleaseFrame(Frame::Data* data) {

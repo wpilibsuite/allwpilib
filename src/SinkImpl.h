@@ -14,25 +14,39 @@
 
 #include "llvm/StringRef.h"
 
+#include "SourceImpl.h"
+
 namespace cs {
 
 class Frame;
-class SourceImpl;
 
 class SinkImpl {
  public:
   SinkImpl(llvm::StringRef name);
-  virtual ~SinkImpl() = default;
+  virtual ~SinkImpl();
   SinkImpl(const SinkImpl& queue) = delete;
   SinkImpl& operator=(const SinkImpl& queue) = delete;
 
   llvm::StringRef GetName() const { return m_name; }
   virtual void GetDescription(llvm::SmallVectorImpl<char>& desc) const = 0;
 
-  void SetSource(std::shared_ptr<SourceImpl> source) {
+  void Enable() {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_source = source;
+    if (!m_enabled) {
+      m_enabled = true;
+      if (m_source) m_source->EnableSink();
+    }
   }
+
+  void Disable() {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_enabled) {
+      m_enabled = false;
+      if (m_source) m_source->DisableSink();
+    }
+  }
+
+  void SetSource(std::shared_ptr<SourceImpl> source);
 
   std::shared_ptr<SourceImpl> GetSource() const {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -43,6 +57,7 @@ class SinkImpl {
   std::string m_name;
   mutable std::mutex m_mutex;
   std::shared_ptr<SourceImpl> m_source;
+  bool m_enabled{false};
 };
 
 }  // namespace cs

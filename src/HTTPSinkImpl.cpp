@@ -290,6 +290,7 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
 
   DEBUG("Headers send, sending stream now");
 
+  Enable();
   while (m_active && !os.has_error()) {
     auto source = GetSource();
     if (!source) {
@@ -321,8 +322,8 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
     os << "\r\n--" BOUNDARY "\r\n";
     // os.flush();
   }
+  Disable();
 }
-
 
 // thread for clients that connected to this server
 void HTTPSinkImpl::ConnThreadMain(wpi::NetworkStream* stream) {

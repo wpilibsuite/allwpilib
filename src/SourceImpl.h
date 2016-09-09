@@ -35,6 +35,38 @@ class SourceImpl {
   int GetNumChannels() const { return m_numChannels; }
   bool IsConnected() const { return m_connected; }
 
+  // Functions to keep track of the overall number of sinks connected to this
+  // source.  Primarily used by sinks to determine if other sinks are using
+  // the same source.
+  int GetNumSinks() const { return m_numSinks; }
+  void AddSink() { ++m_numSinks; }
+  void RemoveSink() { --m_numSinks; }
+
+  // Functions to keep track of the number of sinks connected to this source
+  // that are "enabled", in other words, listening for new images.  Primarily
+  // used by sources to determine whether they should actually bother trying
+  // to get source frames.
+  int GetNumSinksEnabled() const {
+    std::lock_guard<std::mutex> lock{m_numSinksEnabledMutex};
+    return m_numSinksEnabled;
+  }
+
+  void EnableSink() {
+    std::lock_guard<std::mutex> lock{m_numSinksEnabledMutex};
+    ++m_numSinksEnabled;
+    m_numSinksEnabledCv.notify_all();
+  }
+
+  void DisableSink() {
+    std::lock_guard<std::mutex> lock{m_numSinksEnabledMutex};
+    --m_numSinksEnabled;
+  }
+
+  void WaitForEnabledSink() {
+    std::unique_lock<std::mutex> lock{m_numSinksEnabledMutex};
+    m_numSinksEnabledCv.wait(lock, [this] { return m_numSinksEnabled > 0; });
+  }
+
   // Gets the current frame (without waiting for a new one).
   Frame GetCurFrame();
 
@@ -72,6 +104,7 @@ class SourceImpl {
 
   std::atomic_int m_numChannels{0};
   std::atomic_bool m_connected{false};
+  std::atomic_int m_numSinks{0};
 
  private:
   void ReleaseFrame(Frame::Data* data);
@@ -79,8 +112,13 @@ class SourceImpl {
   std::string m_name;
 
   std::mutex m_mutex;
+
+  mutable std::mutex m_numSinksEnabledMutex;
+  std::condition_variable m_numSinksEnabledCv;
+  int m_numSinksEnabled;
+
   std::mutex m_frameMutex;
-  std::condition_variable m_cv;
+  std::condition_variable m_frameCv;
 
   // Most recent complete frame (returned to callers of GetNextFrame)
   // Access protected by m_frameMutex.

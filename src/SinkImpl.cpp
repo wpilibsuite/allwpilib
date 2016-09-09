@@ -12,3 +12,22 @@
 using namespace cs;
 
 SinkImpl::SinkImpl(llvm::StringRef name) : m_name{name} {}
+
+SinkImpl::~SinkImpl() {
+  if (m_source) {
+    if (m_enabled) m_source->DisableSink();
+    m_source->RemoveSink();
+  }
+}
+
+void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  bool was_enabled = m_enabled;
+  if (m_source) {
+    if (m_enabled) m_source->DisableSink();
+    m_source->RemoveSink();
+  }
+  m_source = source;
+  m_source->AddSink();
+  if (was_enabled) m_source->EnableSink();
+}
