@@ -295,12 +295,14 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
     if (!source) {
       // Source disconnected; sleep for one second
       std::this_thread::sleep_for(std::chrono::seconds(1));
+      continue;
     }
     Frame frame = source->GetNextFrame();  // blocks
     if (!m_active) break;
     if (!frame) {
       // Bad frame; sleep for 10 ms so we don't consume all processor time.
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      continue;
     }
 
     // print the individual mimetype and the length
