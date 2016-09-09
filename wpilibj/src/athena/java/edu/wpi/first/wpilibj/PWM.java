@@ -109,7 +109,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   @Deprecated
   public void setRawBounds(final int max, final int deadbandMax, final int center,
                         final int deadbandMin, final int min) {
-    PWMJNI.setPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMax, min);
+    PWMJNI.setPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min);
   }
 
   /**
@@ -125,7 +125,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    */
   public void setBounds(double max, double deadbandMax, double center, double deadbandMin,
                            double min) {
-    PWMJNI.setPWMConfig(m_handle, max, deadbandMax, center, deadbandMax, min);
+    PWMJNI.setPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min);
   }
 
   /**
