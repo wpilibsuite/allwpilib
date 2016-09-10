@@ -350,7 +350,7 @@ void CS_FreeEnumeratedUSBCameras(CS_USBCameraInfo* cameras, int count) {
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
   llvm::SmallVector<CS_Source, 32> handles;
-  cs::EnumerateSources(handles, status);
+  cs::EnumerateSourceHandles(handles, status);
   CS_Source* sources =
       static_cast<CS_Source*>(std::malloc(handles.size() * sizeof(CS_Source)));
   *count = handles.size();
@@ -369,7 +369,7 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
   llvm::SmallVector<CS_Sink, 32> handles;
-  cs::EnumerateSinks(handles, status);
+  cs::EnumerateSinkHandles(handles, status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(std::malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();

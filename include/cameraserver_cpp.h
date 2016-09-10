@@ -182,9 +182,10 @@ void RemoveSinkListener(CS_Listener handle, CS_Status* status);
 //
 std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status);
 
-void EnumerateSources(llvm::SmallVectorImpl<CS_Source>& handles,
-                      CS_Status* status);
-void EnumerateSinks(llvm::SmallVectorImpl<CS_Sink>& handles, CS_Status* status);
+void EnumerateSourceHandles(llvm::SmallVectorImpl<CS_Source>& handles,
+                            CS_Status* status);
+void EnumerateSinkHandles(llvm::SmallVectorImpl<CS_Sink>& handles,
+                          CS_Status* status);
 
 }  // namespace cs
 

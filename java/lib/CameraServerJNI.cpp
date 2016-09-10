@@ -763,7 +763,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
 {
   CS_Status status;
   llvm::SmallVector<CS_Source, 16> arr;
-  cs::EnumerateSources(arr, &status);
+  cs::EnumerateSourceHandles(arr, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
 }
@@ -778,7 +778,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
 {
   CS_Status status;
   llvm::SmallVector<CS_Sink, 16> arr;
-  cs::EnumerateSinks(arr, &status);
+  cs::EnumerateSinkHandles(arr, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
 }
