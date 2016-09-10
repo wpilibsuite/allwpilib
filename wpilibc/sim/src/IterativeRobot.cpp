@@ -221,6 +221,20 @@ void IterativeRobot::TestInit() {
 }
 
 /**
+ * Periodic code for all modes should go here.
+ *
+ * Users should override this method for code which will be called periodically
+ * at a regular rate while the robot is in any mode.
+ */
+void IterativeRobot::RobotPeriodic() {
+  static bool firstRun = true;
+  if (firstRun) {
+    std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
+    firstRun = false;
+  }
+}
+
+/**
  * Periodic code for disabled mode should go here.
  *
  * Users should override this method for code which will be called periodically

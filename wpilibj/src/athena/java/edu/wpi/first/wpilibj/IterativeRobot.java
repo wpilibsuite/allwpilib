@@ -135,6 +135,7 @@ public class IterativeRobot extends RobotBase {
           teleopPeriodic();
         }
       }
+      robotPeriodic();
       m_ds.waitForData();
     }
   }
@@ -204,6 +205,22 @@ public class IterativeRobot extends RobotBase {
   }
 
   /* ----------- Overridable periodic code ----------------- */
+  
+  private boolean m_rpFirstRun = true;
+
+  /**
+   * Periodic code for all robot modes should go here.
+   *
+   * <p>Users should override this method for code which will be called periodically at a regular
+   * rate while the robot is in any mode.
+   */
+  public void robotPeriodic() {
+    if (m_rpFirstRun) {
+      System.out.println("Default IterativeRobot.robotPeriodic() method... Overload me!");
+      m_rpFirstRun = false;
+    }
+    Timer.delay(0.001);
+  }
 
   private boolean m_dpFirstRun = true;
 

@@ -62,6 +62,7 @@ class IterativeRobot : public RobotBase {
   virtual void TeleopInit();
   virtual void TestInit();
 
+  virtual void RobotPeriodic();
   virtual void DisabledPeriodic();
   virtual void AutonomousPeriodic();
   virtual void TeleopPeriodic();
