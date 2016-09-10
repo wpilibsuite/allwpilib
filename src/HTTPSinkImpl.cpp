@@ -248,13 +248,20 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
   os.flush();
 }
 
-HTTPSinkImpl::HTTPSinkImpl(llvm::StringRef name,
+HTTPSinkImpl::HTTPSinkImpl(llvm::StringRef name, llvm::StringRef description,
                            std::unique_ptr<wpi::NetworkAcceptor> acceptor)
-    : SinkImpl{name}, m_acceptor{std::move(acceptor)} {
+    : SinkImpl{name},
+      m_description(description),
+      m_acceptor{std::move(acceptor)} {
   m_serverThread = std::thread(&HTTPSinkImpl::ServerThreadMain, this);
 }
 
 HTTPSinkImpl::~HTTPSinkImpl() { Stop(); }
+
+void HTTPSinkImpl::GetDescription(llvm::SmallVectorImpl<char>& desc) const {
+  llvm::raw_svector_ostream oss{desc};
+  oss << m_description;
+}
 
 void HTTPSinkImpl::Stop() {
   m_active = false;
@@ -436,10 +443,14 @@ namespace cs {
 
 CS_Sink CreateHTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,
                        int port, CS_Status* status) {
+  llvm::SmallString<128> descBuf;
+  llvm::raw_svector_ostream desc{descBuf};
+  desc << "HTTP Server on port " << port;
   llvm::SmallString<128> str{listenAddress};
   auto sink = std::make_shared<HTTPSinkImpl>(
-      name, std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
-                port, str.c_str(), Logger::GetInstance())));
+      name, desc.str(),
+      std::unique_ptr<wpi::NetworkAcceptor>(
+          new wpi::TCPAcceptor(port, str.c_str(), Logger::GetInstance())));
   return Sinks::GetInstance().Allocate(SinkData::kHTTP, sink);
 }
 

@@ -31,7 +31,7 @@ class SourceImpl;
 
 class HTTPSinkImpl : public SinkImpl {
  public:
-  HTTPSinkImpl(llvm::StringRef name,
+  HTTPSinkImpl(llvm::StringRef name, llvm::StringRef description,
                std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   ~HTTPSinkImpl() override;
 
@@ -59,6 +59,8 @@ class HTTPSinkImpl : public SinkImpl {
  private:
   void ServerThreadMain();
   void ConnThreadMain(wpi::NetworkStream* stream);
+
+  std::string m_description;
 
   std::unique_ptr<wpi::NetworkAcceptor> m_acceptor;
   std::atomic_int m_sourceChannel;
