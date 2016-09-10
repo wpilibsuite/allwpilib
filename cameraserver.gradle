@@ -9,6 +9,11 @@ def cameraserverSetupModel = { project ->
                     targetPlatform 'x64'
                 }
                 setupDefines(project, binaries)
+                binaries.all {
+                    tasks.withType(CppCompile) {
+                       project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
+                    }
+                }
 
                 if (includeJava) {
                     project.setupJniIncludes(binaries)

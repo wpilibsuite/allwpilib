@@ -21,6 +21,9 @@ model {
             binaries.all {
                 lib project: ':gmock', library: 'gmock', linkage: 'static'
                 lib library: 'cameraserver', linkage: 'static'
+                tasks.withType(CppCompile) {
+                   project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
+                }
             }
         }
     }
