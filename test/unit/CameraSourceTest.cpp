@@ -7,6 +7,8 @@
 
 #include "gtest/gtest.h"
 
+#include "cameraserver.h"
+
 namespace cs {
 
 class CameraSourceTest : public ::testing::Test {
@@ -15,8 +17,8 @@ class CameraSourceTest : public ::testing::Test {
   }
 };
 
-TEST_F(CameraSourceTest, CreateHTTP) {
-  auto source = CameraSource::CreateHTTP("http", "http://localhost:8000");
+TEST_F(CameraSourceTest, HTTPCamera) {
+  auto source = HTTPCamera("axis", "http://localhost:8000");
 }
 
 }  // namespace cs

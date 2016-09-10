@@ -126,10 +126,9 @@ project(':native') {
 
     apply from: "${rootDir}/toolchains/native.gradle"
 
-    // TODO
-    //if (!project.hasProperty("withoutTests")) {
-    //    apply from: "${rootDir}/test/tests.gradle"
-    //}
+    if (!project.hasProperty("withoutTests")) {
+        apply from: "${rootDir}/test/tests.gradle"
+    }
 
     if (includeJava) {
         apply from: "${rootDir}/java/java.gradle"
