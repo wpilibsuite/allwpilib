@@ -9,8 +9,9 @@
 #define WPIUTIL_SUPPORT_LOGGER_H_
 
 #include <functional>
-#include <sstream>
-#include <string>
+
+#include "llvm/raw_ostream.h"
+#include "llvm/SmallString.h"
 
 namespace wpi {
 
@@ -53,9 +54,10 @@ class Logger {
   do {                                                                 \
     ::wpi::Logger& WPI_logger_ = logger_inst;                          \
     if (WPI_logger_.min_level() <= level && WPI_logger_.HasLogger()) { \
-      std::ostringstream oss;                                          \
-      oss << x;                                                        \
-      WPI_logger_.Log(level, __FILE__, __LINE__, oss.str().c_str());   \
+      llvm::SmallString<128> log_buf_;                                 \
+      llvm::raw_svector_ostream log_os_{log_buf_};                     \
+      log_os_ << x;                                                    \
+      WPI_logger_.Log(level, __FILE__, __LINE__, log_buf_.c_str());    \
     }                                                                  \
   } while (0)
 
