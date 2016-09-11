@@ -8,10 +8,6 @@
 #ifndef NT_LOG_H_
 #define NT_LOG_H_
 
-#include <functional>
-#include <sstream>
-#include <string>
-
 #include "support/atomic_static.h"
 #include "support/Logger.h"
 
