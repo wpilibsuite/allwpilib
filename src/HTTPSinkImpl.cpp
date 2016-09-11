@@ -258,9 +258,9 @@ HTTPSinkImpl::HTTPSinkImpl(llvm::StringRef name, llvm::StringRef description,
 
 HTTPSinkImpl::~HTTPSinkImpl() { Stop(); }
 
-void HTTPSinkImpl::GetDescription(llvm::SmallVectorImpl<char>& desc) const {
-  llvm::raw_svector_ostream oss{desc};
-  oss << m_description;
+llvm::StringRef HTTPSinkImpl::GetDescription(
+    llvm::SmallVectorImpl<char>& buf) const {
+  return m_description;
 }
 
 void HTTPSinkImpl::Stop() {

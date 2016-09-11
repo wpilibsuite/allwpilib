@@ -28,7 +28,8 @@ class SinkImpl {
   SinkImpl& operator=(const SinkImpl& queue) = delete;
 
   llvm::StringRef GetName() const { return m_name; }
-  virtual void GetDescription(llvm::SmallVectorImpl<char>& desc) const = 0;
+  virtual llvm::StringRef GetDescription(
+      llvm::SmallVectorImpl<char>& buf) const = 0;
 
   void Enable() {
     std::lock_guard<std::mutex> lock(m_mutex);

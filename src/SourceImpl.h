@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+#include "llvm/ArrayRef.h"
 #include "llvm/StringRef.h"
 #include "cameraserver_c.h"
 #include "Frame.h"
@@ -31,7 +32,8 @@ class SourceImpl {
   SourceImpl& operator=(const SourceImpl& queue) = delete;
 
   llvm::StringRef GetName() const { return m_name; }
-  virtual void GetDescription(llvm::SmallVectorImpl<char>& desc) const = 0;
+  virtual llvm::StringRef GetDescription(
+      llvm::SmallVectorImpl<char>& buf) const = 0;
   int GetNumChannels() const { return m_numChannels; }
   bool IsConnected() const { return m_connected; }
 
@@ -78,19 +80,19 @@ class SourceImpl {
 
   // Property functions
   virtual int GetProperty(llvm::StringRef name) const = 0;
-  virtual void EnumerateProperties(
-      llvm::SmallVectorImpl<int>& properties) const = 0;
+  virtual llvm::ArrayRef<int> EnumerateProperties(
+      llvm::SmallVectorImpl<int>& vec) const = 0;
   virtual CS_PropertyType GetPropertyType(int property) const = 0;
-  virtual void GetPropertyName(int property,
-                               llvm::SmallVectorImpl<char>& name) const = 0;
+  virtual llvm::StringRef GetPropertyName(
+      int property, llvm::SmallVectorImpl<char>& buf) const = 0;
   virtual bool GetBooleanProperty(int property) const = 0;
   virtual void SetBooleanProperty(int property, bool value) = 0;
   virtual double GetDoubleProperty(int property) const = 0;
   virtual void SetDoubleProperty(int property, double value) = 0;
   virtual double GetPropertyMin(int property) const = 0;
   virtual double GetPropertyMax(int property) const = 0;
-  virtual void GetStringProperty(int property,
-                                 llvm::SmallVectorImpl<char>& value) const = 0;
+  virtual llvm::StringRef GetStringProperty(
+      int property, llvm::SmallVectorImpl<char>& buf) const = 0;
   virtual void SetStringProperty(int property, llvm::StringRef value) = 0;
   virtual int GetEnumProperty(int property) const = 0;
   virtual void SetEnumProperty(int property, int value) = 0;

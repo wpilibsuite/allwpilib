@@ -32,8 +32,8 @@ CS_PropertyType CS_GetPropertyType(CS_Property property, CS_Status* status) {
 }
 
 char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
-  llvm::SmallString<128> str;
-  cs::GetPropertyName(property, str, status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetPropertyName(property, buf, status);
   if (*status != 0) return nullptr;
   return ConvertToC(str);
 }
@@ -65,8 +65,8 @@ double CS_GetDoublePropertyMax(CS_Property property, CS_Status* status) {
 }
 
 char* CS_GetStringProperty(CS_Property property, CS_Status* status) {
-  llvm::SmallString<128> str;
-  cs::GetStringProperty(property, str, status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetStringProperty(property, buf, status);
   if (*status != 0) return nullptr;
   return ConvertToC(str);
 }
@@ -114,15 +114,15 @@ CS_Source CS_CreateCvSource(const char* name, int numChannels,
 }
 
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
-  llvm::SmallString<128> str;
-  cs::GetSourceName(source, str, status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSourceName(source, buf, status);
   if (*status != 0) return nullptr;
   return ConvertToC(str);
 }
 
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status) {
-  llvm::SmallString<128> str;
-  cs::GetSourceDescription(source, str, status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSourceDescription(source, buf, status);
   if (*status != 0) return nullptr;
   return ConvertToC(str);
 }
@@ -146,8 +146,8 @@ CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
 
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
                                           CS_Status* status) {
-  llvm::SmallVector<CS_Property, 32> vec;
-  cs::EnumerateSourceProperties(source, vec, status);
+  llvm::SmallVector<CS_Property, 32> buf;
+  auto vec = cs::EnumerateSourceProperties(source, buf, status);
   CS_Property* out =
       static_cast<CS_Property*>(std::malloc(vec.size() * sizeof(CS_Property)));
   *count = vec.size();
@@ -224,15 +224,15 @@ CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
 }
 
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
-  llvm::SmallString<128> str;
-  cs::GetSinkName(sink, str, status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSinkName(sink, buf, status);
   if (*status != 0) return nullptr;
   return ConvertToC(str);
 }
 
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status) {
-  llvm::SmallString<128> str;
-  cs::GetSinkDescription(sink, str, status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSinkDescription(sink, buf, status);
   if (*status != 0) return nullptr;
   return ConvertToC(str);
 }
@@ -273,8 +273,8 @@ uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
 }
 
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
-  llvm::SmallString<128> str;
-  cs::GetSinkError(sink, str, status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSinkError(sink, buf, status);
   if (*status != 0) return nullptr;
   return ConvertToC(str);
 }
@@ -349,8 +349,8 @@ void CS_FreeEnumeratedUSBCameras(CS_USBCameraInfo* cameras, int count) {
 }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
-  llvm::SmallVector<CS_Source, 32> handles;
-  cs::EnumerateSourceHandles(handles, status);
+  llvm::SmallVector<CS_Source, 32> buf;
+  auto handles = cs::EnumerateSourceHandles(buf, status);
   CS_Source* sources =
       static_cast<CS_Source*>(std::malloc(handles.size() * sizeof(CS_Source)));
   *count = handles.size();
@@ -368,8 +368,8 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 }
 
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
-  llvm::SmallVector<CS_Sink, 32> handles;
-  cs::EnumerateSinkHandles(handles, status);
+  llvm::SmallVector<CS_Sink, 32> buf;
+  auto handles = cs::EnumerateSinkHandles(buf, status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(std::malloc(handles.size() * sizeof(CS_Sink)));
   *count = handles.size();

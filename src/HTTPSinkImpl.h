@@ -35,7 +35,8 @@ class HTTPSinkImpl : public SinkImpl {
                std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   ~HTTPSinkImpl() override;
 
-  void GetDescription(llvm::SmallVectorImpl<char>& desc) const override;
+  llvm::StringRef GetDescription(
+      llvm::SmallVectorImpl<char>& buf) const override;
 
   void SetSourceChannel(int channel) { m_sourceChannel.store(channel); }
 

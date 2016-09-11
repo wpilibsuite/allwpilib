@@ -99,8 +99,8 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyN
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
-  llvm::SmallString<128> str;
-  cs::GetPropertyName(property, str, &status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetPropertyName(property, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
@@ -196,8 +196,8 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getStringPro
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
-  llvm::SmallString<128> str;
-  cs::GetStringProperty(property, str, &status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetStringProperty(property, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
@@ -323,8 +323,8 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSourceNam
   (JNIEnv *env, jclass, jint source)
 {
   CS_Status status;
-  llvm::SmallString<128> str;
-  cs::GetSourceName(source, str, &status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSourceName(source, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
@@ -338,8 +338,8 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSourceDes
   (JNIEnv *env, jclass, jint source)
 {
   CS_Status status;
-  llvm::SmallString<128> str;
-  cs::GetSourceDescription(source, str, &status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSourceDescription(source, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
@@ -409,8 +409,8 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
   (JNIEnv *env, jclass, jint source)
 {
   CS_Status status;
-  llvm::SmallVector<CS_Property, 32> arr;
-  cs::EnumerateSourceProperties(source, arr, &status);
+  llvm::SmallVector<CS_Property, 32> buf;
+  auto arr = cs::EnumerateSourceProperties(source, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
 }
@@ -562,8 +562,8 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSinkName
   (JNIEnv *env, jclass, jint sink)
 {
   CS_Status status;
-  llvm::SmallString<128> str;
-  cs::GetSinkName(sink, str, &status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSinkName(sink, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
@@ -577,8 +577,8 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSinkDescr
   (JNIEnv *env, jclass, jint sink)
 {
   CS_Status status;
-  llvm::SmallString<128> str;
-  cs::GetSinkDescription(sink, str, &status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSinkDescription(sink, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
@@ -687,8 +687,8 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSinkError
   (JNIEnv *env, jclass, jint sink)
 {
   CS_Status status;
-  llvm::SmallString<128> str;
-  cs::GetSinkError(sink, str, &status);
+  llvm::SmallString<128> buf;
+  auto str = cs::GetSinkError(sink, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
@@ -762,8 +762,8 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
   (JNIEnv *env, jclass)
 {
   CS_Status status;
-  llvm::SmallVector<CS_Source, 16> arr;
-  cs::EnumerateSourceHandles(arr, &status);
+  llvm::SmallVector<CS_Source, 16> buf;
+  auto arr = cs::EnumerateSourceHandles(buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
 }
@@ -777,8 +777,8 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
   (JNIEnv *env, jclass)
 {
   CS_Status status;
-  llvm::SmallVector<CS_Sink, 16> arr;
-  cs::EnumerateSinkHandles(arr, &status);
+  llvm::SmallVector<CS_Sink, 16> buf;
+  auto arr = cs::EnumerateSinkHandles(buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
 }

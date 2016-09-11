@@ -63,7 +63,7 @@ class VideoProperty {
 
   // String-specific functions
   std::string GetString() const;
-  void GetString(llvm::SmallVectorImpl<char>& value) const;
+  llvm::StringRef GetString(llvm::SmallVectorImpl<char>& buf) const;
   void SetString(llvm::StringRef value);
 
   // Enum-specific functions

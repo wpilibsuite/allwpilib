@@ -50,9 +50,10 @@ inline std::string VideoProperty::GetString() const {
   return GetStringProperty(m_handle, &m_status);
 }
 
-inline void VideoProperty::GetString(llvm::SmallVectorImpl<char>& value) const {
+inline llvm::StringRef VideoProperty::GetString(
+    llvm::SmallVectorImpl<char>& buf) const {
   m_status = 0;
-  GetStringProperty(m_handle, value, &m_status);
+  return GetStringProperty(m_handle, buf, &m_status);
 }
 
 inline void VideoProperty::SetString(llvm::StringRef value) {

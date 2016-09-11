@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 
+#include "llvm/ArrayRef.h"
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 
@@ -50,8 +51,9 @@ struct USBCameraInfo {
 
 CS_PropertyType GetPropertyType(CS_Property property, CS_Status* status);
 std::string GetPropertyName(CS_Property property, CS_Status* status);
-void GetPropertyName(CS_Property property, llvm::SmallVectorImpl<char>& name,
-                     CS_Status* status);
+llvm::StringRef GetPropertyName(CS_Property property,
+                                llvm::SmallVectorImpl<char>& buf,
+                                CS_Status* status);
 bool GetBooleanProperty(CS_Property property, CS_Status* status);
 void SetBooleanProperty(CS_Property property, bool value, CS_Status* status);
 double GetDoubleProperty(CS_Property property, CS_Status* status);
@@ -59,8 +61,9 @@ void SetDoubleProperty(CS_Property property, double value, CS_Status* status);
 double GetDoublePropertyMin(CS_Property property, CS_Status* status);
 double GetDoublePropertyMax(CS_Property property, CS_Status* status);
 std::string GetStringProperty(CS_Property property, CS_Status* status);
-void GetStringProperty(CS_Property property, llvm::SmallVectorImpl<char>& value,
-                       CS_Status* status);
+llvm::StringRef GetStringProperty(CS_Property property,
+                                  llvm::SmallVectorImpl<char>& buf,
+                                  CS_Status* status);
 void SetStringProperty(CS_Property property, llvm::StringRef value,
                        CS_Status* status);
 int GetEnumProperty(CS_Property property, CS_Status* status);
@@ -83,19 +86,21 @@ CS_Source CreateCvSource(llvm::StringRef name, int numChannels,
 // Source Functions
 //
 std::string GetSourceName(CS_Source source, CS_Status* status);
-void GetSourceName(CS_Source source, llvm::SmallVectorImpl<char>& name,
-                   CS_Status* status);
+llvm::StringRef GetSourceName(CS_Source source,
+                              llvm::SmallVectorImpl<char>& buf,
+                              CS_Status* status);
 std::string GetSourceDescription(CS_Source source, CS_Status* status);
-void GetSourceDescription(CS_Source source, llvm::SmallVectorImpl<char>& desc,
-                          CS_Status* status);
+llvm::StringRef GetSourceDescription(CS_Source source,
+                                     llvm::SmallVectorImpl<char>& buf,
+                                     CS_Status* status);
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status);
 int GetSourceNumChannels(CS_Source source, CS_Status* status);
 bool IsSourceConnected(CS_Source source, CS_Status* status);
 CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
                               CS_Status* status);
-void EnumerateSourceProperties(CS_Source source,
-                               llvm::SmallVectorImpl<CS_Property>& properties,
-                               CS_Status* status);
+llvm::ArrayRef<CS_Property> EnumerateSourceProperties(
+    CS_Source source, llvm::SmallVectorImpl<CS_Property>& vec,
+    CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 
@@ -133,11 +138,12 @@ CS_Sink CreateCvSinkCallback(llvm::StringRef name,
 // Sink Functions
 //
 std::string GetSinkName(CS_Sink sink, CS_Status* status);
-void GetSinkName(CS_Sink sink, llvm::SmallVectorImpl<char>& name,
-                 CS_Status* status);
+llvm::StringRef GetSinkName(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
+                            CS_Status* status);
 std::string GetSinkDescription(CS_Sink sink, CS_Status* status);
-void GetSinkDescription(CS_Sink sink, llvm::SmallVectorImpl<char>& desc,
-                        CS_Status* status);
+llvm::StringRef GetSinkDescription(CS_Sink sink,
+                                   llvm::SmallVectorImpl<char>& buf,
+                                   CS_Status* status);
 void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);
 CS_Property GetSinkSourceProperty(CS_Sink sink, llvm::StringRef name,
                                   CS_Status* status);
@@ -157,8 +163,8 @@ uint64_t SinkWaitForFrame(CS_Sink sink, CS_Status* status);
 bool GetSinkImage(CS_Sink sink, int channel, cv::Mat* image, CS_Status* status);
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat* image, CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
-void GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& msg,
-                  CS_Status* status);
+llvm::StringRef GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
+                             CS_Status* status);
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status);
 
 //
@@ -182,10 +188,10 @@ void RemoveSinkListener(CS_Listener handle, CS_Status* status);
 //
 std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status);
 
-void EnumerateSourceHandles(llvm::SmallVectorImpl<CS_Source>& handles,
-                            CS_Status* status);
-void EnumerateSinkHandles(llvm::SmallVectorImpl<CS_Sink>& handles,
-                          CS_Status* status);
+llvm::ArrayRef<CS_Source> EnumerateSourceHandles(
+    llvm::SmallVectorImpl<CS_Source>& vec, CS_Status* status);
+llvm::ArrayRef<CS_Sink> EnumerateSinkHandles(
+    llvm::SmallVectorImpl<CS_Sink>& vec, CS_Status* status);
 
 }  // namespace cs
 
