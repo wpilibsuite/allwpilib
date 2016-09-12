@@ -6,8 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Joystick.h"
-#include <math.h>
-#include <string.h>
+
+#include <cmath>
+
 #include "DriverStation.h"
 #include "WPIErrors.h"
 
@@ -330,7 +331,7 @@ void Joystick::SetAxisChannel(AxisType axis, int channel) {
  * @return The magnitude of the direction vector
  */
 float Joystick::GetMagnitude() const {
-  return sqrt(pow(GetX(), 2) + pow(GetY(), 2));
+  return std::sqrt(std::pow(GetX(), 2) + std::pow(GetY(), 2));
 }
 
 /**
@@ -339,19 +340,21 @@ float Joystick::GetMagnitude() const {
  *
  * @return The direction of the vector in radians
  */
-float Joystick::GetDirectionRadians() const { return atan2(GetX(), -GetY()); }
+float Joystick::GetDirectionRadians() const {
+  return std::atan2(GetX(), -GetY());
+}
 
 /**
  * Get the direction of the vector formed by the joystick and its origin
  * in degrees.
  *
- * uses acos(-1) to represent Pi due to absence of readily accessible Pi
+ * uses std::acos(-1) to represent Pi due to absence of readily accessible Pi
  * constant in C++
  *
  * @return The direction of the vector in degrees
  */
 float Joystick::GetDirectionDegrees() const {
-  return (180 / acos(-1)) * GetDirectionRadians();
+  return (180 / std::acos(-1)) * GetDirectionRadians();
 }
 
 /**

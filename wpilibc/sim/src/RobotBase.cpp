@@ -6,10 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "RobotBase.h"
+
 #include "RobotState.h"
 #include "Utility.h"
-
-#include <string.h>
 
 /**
  * Constructor for a generic robot program.

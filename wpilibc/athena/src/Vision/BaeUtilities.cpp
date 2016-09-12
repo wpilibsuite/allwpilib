@@ -146,14 +146,16 @@ void dprintf(const char* tempString, ...) {
       break;
     case DEBUG_FILE_ONLY:
       if ((outfile_fd = std::fopen(filepath, "a+")) != nullptr) {
-        fwrite(ss.str().c_str(), sizeof(char), ss.str().length(), outfile_fd);
+        std::fwrite(ss.str().c_str(), sizeof(char), ss.str().length(),
+                    outfile_fd);
         std::fclose(outfile_fd);
       }
       break;
     case DEBUG_SCREEN_AND_FILE:  // BOTH
       std::printf("%s", ss.str().c_str());
       if ((outfile_fd = std::fopen(filepath, "a+")) != nullptr) {
-        fwrite(ss.str().c_str(), sizeof(char), ss.str().length(), outfile_fd);
+        std::fwrite(ss.str().c_str(), sizeof(char), ss.str().length(),
+                    outfile_fd);
         std::fclose(outfile_fd);
       }
       break;

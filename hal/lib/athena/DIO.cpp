@@ -143,8 +143,8 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   // higher freq.
   // TODO: Round in the linear rate domain.
   uint8_t pwmPeriodPower = static_cast<uint8_t>(
-      log(1.0 / (pwmSystem->readLoopTiming(status) * 0.25E-6 * rate)) /
-          log(2.0) +
+      std::log(1.0 / (pwmSystem->readLoopTiming(status) * 0.25E-6 * rate)) /
+          std::log(2.0) +
       0.5);
   digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }

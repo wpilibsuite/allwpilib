@@ -8,10 +8,10 @@
 #include "HAL/HAL.h"
 
 #include <signal.h>  // linux for kill
-#include <stdlib.h>
 #include <sys/prctl.h>
 #include <unistd.h>
 
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <mutex>

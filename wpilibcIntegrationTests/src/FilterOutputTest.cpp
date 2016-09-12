@@ -7,8 +7,7 @@
 
 #include "Filters/LinearDigitalFilter.h"  // NOLINT(build/include_order)
 
-#include <math.h>
-
+#include <cmath>
 #include <functional>
 #include <memory>
 #include <random>

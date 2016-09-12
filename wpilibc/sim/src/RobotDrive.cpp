@@ -6,15 +6,15 @@
 /*----------------------------------------------------------------------------*/
 
 #include "RobotDrive.h"
-#include <math.h>
+
+#include <algorithm>
+#include <cmath>
+
 #include "GenericHID.h"
 #include "Joystick.h"
 #include "Talon.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-
-#undef max
-#include <algorithm>
 
 const int RobotDrive::kMaxNumberOfMotors;
 
@@ -214,13 +214,13 @@ void RobotDrive::Drive(float outputMagnitude, float curve) {
   }
 
   if (curve < 0) {
-    float value = log(-curve);
+    float value = std::log(-curve);
     float ratio = (value - m_sensitivity) / (value + m_sensitivity);
     if (ratio == 0) ratio = .0000000001;
     leftOutput = outputMagnitude / ratio;
     rightOutput = outputMagnitude;
   } else if (curve > 0) {
-    float value = log(curve);
+    float value = std::log(curve);
     float ratio = (value - m_sensitivity) / (value + m_sensitivity);
     if (ratio == 0) ratio = .0000000001;
     leftOutput = outputMagnitude;
@@ -541,11 +541,11 @@ void RobotDrive::MecanumDrive_Polar(float magnitude, float direction,
   }
 
   // Normalized for full power along the Cartesian axes.
-  magnitude = Limit(magnitude) * sqrt(2.0);
+  magnitude = Limit(magnitude) * std::sqrt(2.0);
   // The rollers are at 45 degree angles.
   double dirInRad = (direction + 45.0) * 3.14159 / 180.0;
-  double cosD = cos(dirInRad);
-  double sinD = sin(dirInRad);
+  double cosD = std::cos(dirInRad);
+  double sinD = std::sin(dirInRad);
 
   double wheelSpeeds[kMaxNumberOfMotors];
   wheelSpeeds[kFrontLeftMotor] = sinD * magnitude + rotation;
@@ -629,10 +629,10 @@ float RobotDrive::Limit(float num) {
  * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
  */
 void RobotDrive::Normalize(double* wheelSpeeds) {
-  double maxMagnitude = fabs(wheelSpeeds[0]);
+  double maxMagnitude = std::fabs(wheelSpeeds[0]);
   int i;
   for (i = 1; i < kMaxNumberOfMotors; i++) {
-    double temp = fabs(wheelSpeeds[i]);
+    double temp = std::fabs(wheelSpeeds[i]);
     if (maxMagnitude < temp) maxMagnitude = temp;
   }
   if (maxMagnitude > 1.0) {
@@ -646,8 +646,8 @@ void RobotDrive::Normalize(double* wheelSpeeds) {
  * Rotate a vector in Cartesian space.
  */
 void RobotDrive::RotateVector(double& x, double& y, double angle) {
-  double cosA = cos(angle * (3.14159 / 180.0));
-  double sinA = sin(angle * (3.14159 / 180.0));
+  double cosA = std::cos(angle * (3.14159 / 180.0));
+  double sinA = std::sin(angle * (3.14159 / 180.0));
   double xOut = x * cosA - y * sinA;
   double yOut = x * sinA + y * cosA;
   x = xOut;

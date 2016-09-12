@@ -7,8 +7,6 @@
 
 #include "DriverStation.h"
 
-#include <string.h>
-
 #include <boost/mem_fn.hpp>
 
 #include "HAL/cpp/Log.h"
