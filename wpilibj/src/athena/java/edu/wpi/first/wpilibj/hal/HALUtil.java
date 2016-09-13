@@ -23,6 +23,8 @@ public class HALUtil extends JNIWrapper {
   public static native int getFPGARevision();
 
   public static native long getFPGATime();
+  
+  public static native int getHALRuntimeType();
 
   public static native boolean getFPGAButton();
 
