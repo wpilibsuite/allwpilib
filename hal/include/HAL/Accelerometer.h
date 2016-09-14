@@ -9,7 +9,7 @@
 
 #include "HAL/Types.h"
 
-enum HAL_AccelerometerRange {
+enum HAL_AccelerometerRange : int32_t {
   HAL_AccelerometerRange_k2G = 0,
   HAL_AccelerometerRange_k4G = 1,
   HAL_AccelerometerRange_k8G = 2,
