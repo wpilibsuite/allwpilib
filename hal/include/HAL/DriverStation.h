@@ -37,7 +37,7 @@ struct HAL_ControlWord {
   uint32_t control_reserved : 26;
 };
 
-enum HAL_AllianceStationID {
+enum HAL_AllianceStationID : int32_t {
   HAL_AllianceStationID_kRed1,
   HAL_AllianceStationID_kRed2,
   HAL_AllianceStationID_kRed3,
