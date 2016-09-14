@@ -11,7 +11,7 @@
 
 #include "HAL/Types.h"
 
-enum HAL_AnalogTriggerType {
+enum HAL_AnalogTriggerType : int32_t {
   HAL_Trigger_kInWindow = 0,
   HAL_Trigger_kState = 1,
   HAL_Trigger_kRisingPulse = 2,

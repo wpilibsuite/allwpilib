@@ -12,7 +12,7 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
-enum HAL_Counter_Mode {
+enum HAL_Counter_Mode : int32_t {
   HAL_Counter_kTwoPulse = 0,
   HAL_Counter_kSemiperiod = 1,
   HAL_Counter_kPulseLength = 2,
