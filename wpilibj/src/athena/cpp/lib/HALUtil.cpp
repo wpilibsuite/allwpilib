@@ -431,6 +431,19 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime(JNIEnv *env, jclass) {
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_HALUtil
+ * Method:    getHALRuntimeType
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALRuntimeType(JNIEnv *env, jclass) {
+  // HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALRuntimeType";
+  jint returnValue = HAL_GetRuntimeType();
+  // HALUTIL_LOG(logDEBUG) << "RuntimeType = " << returnValue;
+  return returnValue;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HALUtil
  * Method:    getFPGAButton
  * Signature: ()I
  */
