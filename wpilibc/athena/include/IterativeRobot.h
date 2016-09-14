@@ -33,11 +33,9 @@
  *  - TestInit()       -- called each and every time test is entered from
  *                        another mode
  *
- * Periodic() functions -- each of these functions is called iteratively at the
- *                         appropriate periodic rate (aka the "slow loop").  The
- *                         default period of the iterative robot is synced to
- *                         the driver station control packets, giving a periodic
- *                         frequency of about 50Hz (50 times per second).
+ * Periodic() functions -- each of these functions is called each time a
+ *                         new packet is received from the driver station:
+ *   - RobotPeriodic()
  *   - DisabledPeriodic()
  *   - AutonomousPeriodic()
  *   - TeleopPeriodic()

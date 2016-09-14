@@ -164,8 +164,12 @@ void IterativeRobot::TestInit() {
 /**
  * Periodic code for all modes should go here.
  *
- * Users should override this method for code which will be called periodically
- * at a regular rate while the robot is in any mode.
+ * This function is called each time a new packet is received from the driver station.
+ *
+ * Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+ * network timing variability and the function may not be called at all if the Driver Station is
+ * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+ * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
  */
 void IterativeRobot::RobotPeriodic() {
   static bool firstRun = true;
@@ -178,8 +182,13 @@ void IterativeRobot::RobotPeriodic() {
 /**
  * Periodic code for disabled mode should go here.
  *
- * Users should override this method for code which will be called periodically
- * at a regular rate while the robot is in disabled mode.
+ * Users should override this method for code which will be called each time a new packet is
+ * received from the driver station and the robot is in disabled mode.
+ *
+ * Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+ * network timing variability and the function may not be called at all if the Driver Station is
+ * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+ * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
  */
 void IterativeRobot::DisabledPeriodic() {
   static bool firstRun = true;
@@ -192,8 +201,13 @@ void IterativeRobot::DisabledPeriodic() {
 /**
  * Periodic code for autonomous mode should go here.
  *
- * Users should override this method for code which will be called periodically
- * at a regular rate while the robot is in autonomous mode.
+ * Users should override this method for code which will be called each time a new packet is
+ * received from the driver station and the robot is in autonomous mode.
+ *
+ * Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+ * network timing variability and the function may not be called at all if the Driver Station is
+ * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+ * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
  */
 void IterativeRobot::AutonomousPeriodic() {
   static bool firstRun = true;
@@ -206,8 +220,13 @@ void IterativeRobot::AutonomousPeriodic() {
 /**
  * Periodic code for teleop mode should go here.
  *
- * Users should override this method for code which will be called periodically
- * at a regular rate while the robot is in teleop mode.
+ * Users should override this method for code which will be called each time a new packet is
+ * received from the driver station and the robot is in teleop mode.
+ *
+ * Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+ * network timing variability and the function may not be called at all if the Driver Station is
+ * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+ * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
  */
 void IterativeRobot::TeleopPeriodic() {
   static bool firstRun = true;
@@ -220,8 +239,13 @@ void IterativeRobot::TeleopPeriodic() {
 /**
  * Periodic code for test mode should go here.
  *
- * Users should override this method for code which will be called periodically
- * at a regular rate while the robot is in test mode.
+ * Users should override this method for code which will be called each time a new packet is
+ * received from the driver station and the robot is in test mode.
+ *
+ * Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+ * network timing variability and the function may not be called at all if the Driver Station is
+ * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+ * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
  */
 void IterativeRobot::TestPeriodic() {
   static bool firstRun = true;
