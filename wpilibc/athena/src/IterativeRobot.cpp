@@ -13,8 +13,6 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include "networktables/NetworkTable.h"
 
-constexpr double IterativeRobot::kDefaultPeriod;
-
 /**
  * Provide an alternate "main loop" via StartCompetition().
  *

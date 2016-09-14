@@ -17,8 +17,6 @@
 #include <unistd.h>
 #endif
 
-const double IterativeRobot::kDefaultPeriod = 0;
-
 /**
  * Set the period for the periodic functions.
  *

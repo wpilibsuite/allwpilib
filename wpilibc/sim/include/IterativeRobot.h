@@ -47,13 +47,6 @@
 
 class IterativeRobot : public RobotBase {
  public:
-  /*
-   * The default period for the periodic function calls (seconds).
-   * Setting the period to 0.0 will cause the periodic functions to follow
-   * the Driver Station packet rate of about 50Hz.
-   */
-  static const double kDefaultPeriod;
-
   virtual void StartCompetition();
 
   virtual void RobotInit();
@@ -83,6 +76,6 @@ class IterativeRobot : public RobotBase {
   bool m_autonomousInitialized = false;
   bool m_teleopInitialized = false;
   bool m_testInitialized = false;
-  double m_period = kDefaultPeriod;
+  double m_period = 0.0;
   Timer m_mainLoopTimer;
 };
