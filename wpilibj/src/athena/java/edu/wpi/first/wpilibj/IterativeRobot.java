@@ -211,8 +211,12 @@ public class IterativeRobot extends RobotBase {
   /**
    * Periodic code for all robot modes should go here.
    *
-   * <p>Users should override this method for code which will be called periodically at a regular
-   * rate while the robot is in any mode.
+   * <p>This function is called each time a new packet is received from the driver station.
+   *
+   * <p>Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+   * network timing variability and the function may not be called at all if the Driver Station is
+   * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+   * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
    */
   public void robotPeriodic() {
     if (m_rpFirstRun) {
@@ -227,8 +231,13 @@ public class IterativeRobot extends RobotBase {
   /**
    * Periodic code for disabled mode should go here.
    *
-   * <p>Users should override this method for code which will be called periodically at a regular
-   * rate while the robot is in disabled mode.
+   * <p>Users should override this method for code which will be called each time a new packet is
+   * received from the driver station and the robot is in disabled mode.
+   *
+   * <p>Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+   * network timing variability and the function may not be called at all if the Driver Station is
+   * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+   * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
    */
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
@@ -243,8 +252,13 @@ public class IterativeRobot extends RobotBase {
   /**
    * Periodic code for autonomous mode should go here.
    *
-   * <p>Users should override this method for code which will be called periodically at a regular
-   * rate while the robot is in autonomous mode.
+   * <p>Users should override this method for code which will be called each time a new packet is
+   * received from the driver station and the robot is in autonomous mode.
+   *
+   * <p>Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+   * network timing variability and the function may not be called at all if the Driver Station is
+   * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+   * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
    */
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
@@ -259,8 +273,13 @@ public class IterativeRobot extends RobotBase {
   /**
    * Periodic code for teleop mode should go here.
    *
-   * <p>Users should override this method for code which will be called periodically at a regular
-   * rate while the robot is in teleop mode.
+   * <p>Users should override this method for code which will be called each time a new packet is
+   * received from the driver station and the robot is in teleop mode.
+   *
+   * <p>Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+   * network timing variability and the function may not be called at all if the Driver Station is
+   * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+   * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
    */
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
@@ -275,8 +294,13 @@ public class IterativeRobot extends RobotBase {
   /**
    * Periodic code for test mode should go here.
    *
-   * <p>Users should override this method for code which will be called periodically at a regular
-   * rate while the robot is in test mode.
+   * <p>Users should override this method for code which will be called each time a new packet is
+   * received from the driver station and the robot is in test mode.
+   *
+   * <p>Packets are received approximately every 20ms.  Fixed loop timing is not guaranteed due to
+   * network timing variability and the function may not be called at all if the Driver Station is
+   * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
+   * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
    */
   public void testPeriodic() {
     if (m_tmpFirstRun) {
