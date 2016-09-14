@@ -38,6 +38,11 @@
 
 namespace HALUsageReporting = nUsageReporting;
 
+enum HAL_RuntimeType : int32_t {
+  HAL_Athena,
+  HAL_Mock
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,6 +54,7 @@ int32_t HAL_GetFPGAVersion(int32_t* status);
 int64_t HAL_GetFPGARevision(int32_t* status);
 uint64_t HAL_GetFPGATime(int32_t* status);
 
+HAL_RuntimeType HAL_GetRuntimeType();
 HAL_Bool HAL_GetFPGAButton(int32_t* status);
 
 HAL_Bool HAL_GetSystemActive(int32_t* status);
