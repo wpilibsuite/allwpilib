@@ -50,10 +50,8 @@ void IterativeRobot::StartCompetition() {
         m_teleopInitialized = false;
         m_testInitialized = false;
       }
-      if (NextPeriodReady()) {
-        // TODO: HALNetworkCommunicationObserveUserProgramDisabled();
-        DisabledPeriodic();
-      }
+      // TODO: HALNetworkCommunicationObserveUserProgramDisabled();
+      DisabledPeriodic();
     } else if (IsAutonomous()) {
       // call AutonomousInit() if we are now just entering autonomous mode from
       // either a different mode or from power-on
@@ -66,10 +64,8 @@ void IterativeRobot::StartCompetition() {
         m_teleopInitialized = false;
         m_testInitialized = false;
       }
-      if (NextPeriodReady()) {
-        // TODO: HALNetworkCommunicationObserveUserProgramAutonomous();
-        AutonomousPeriodic();
-      }
+      // TODO: HALNetworkCommunicationObserveUserProgramAutonomous();
+      AutonomousPeriodic();
     } else if (IsTest()) {
       // call TestInit() if we are now just entering test mode from
       // either a different mode or from power-on
@@ -82,10 +78,8 @@ void IterativeRobot::StartCompetition() {
         m_autonomousInitialized = false;
         m_teleopInitialized = false;
       }
-      if (NextPeriodReady()) {
-        // TODO: HALNetworkCommunicationObserveUserProgramTest();
-        TestPeriodic();
-      }
+      // TODO: HALNetworkCommunicationObserveUserProgramTest();
+      TestPeriodic();
     } else {
       // call TeleopInit() if we are now just entering teleop mode from
       // either a different mode or from power-on
@@ -99,21 +93,12 @@ void IterativeRobot::StartCompetition() {
         m_testInitialized = false;
         Scheduler::GetInstance()->SetEnabled(true);
       }
-      if (NextPeriodReady()) {
-        // TODO: HALNetworkCommunicationObserveUserProgramTeleop();
-        TeleopPeriodic();
-      }
+      // TODO: HALNetworkCommunicationObserveUserProgramTeleop();
+      TeleopPeriodic();
     }
     // wait for driver station data so the loop doesn't hog the CPU
     m_ds.WaitForData();
   }
-}
-
-/**
- * Determine if the periodic functions should be called.
- */
-bool IterativeRobot::NextPeriodReady() {
-  return true;
 }
 
 /**

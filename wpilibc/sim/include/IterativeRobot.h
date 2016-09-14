@@ -63,8 +63,6 @@ class IterativeRobot : public RobotBase {
   IterativeRobot() = default;
 
  private:
-  bool NextPeriodReady();
-
   bool m_disabledInitialized = false;
   bool m_autonomousInitialized = false;
   bool m_teleopInitialized = false;
