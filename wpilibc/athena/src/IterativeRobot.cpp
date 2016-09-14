@@ -98,6 +98,7 @@ void IterativeRobot::StartCompetition() {
       HAL_ObserveUserProgramTeleop();
       TeleopPeriodic();
     }
+    RobotPeriodic();
     // wait for driver station data so the loop doesn't hog the CPU
     m_ds.WaitForData();
   }
@@ -158,6 +159,20 @@ void IterativeRobot::TeleopInit() {
  */
 void IterativeRobot::TestInit() {
   std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
+}
+
+/**
+ * Periodic code for all modes should go here.
+ *
+ * Users should override this method for code which will be called periodically
+ * at a regular rate while the robot is in any mode.
+ */
+void IterativeRobot::RobotPeriodic() {
+  static bool firstRun = true;
+  if (firstRun) {
+    std::printf("Default %s() method... Overload me!\n", __FUNCTION__);
+    firstRun = false;
+  }
 }
 
 /**
