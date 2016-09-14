@@ -12,13 +12,13 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
-enum HAL_EncoderIndexingType {
+enum HAL_EncoderIndexingType : int32_t {
   HAL_kResetWhileHigh,
   HAL_kResetWhileLow,
   HAL_kResetOnFallingEdge,
   HAL_kResetOnRisingEdge
 };
-enum HAL_EncoderEncodingType {
+enum HAL_EncoderEncodingType : int32_t {
   HAL_Encoder_k1X,
   HAL_Encoder_k2X,
   HAL_Encoder_k4X
