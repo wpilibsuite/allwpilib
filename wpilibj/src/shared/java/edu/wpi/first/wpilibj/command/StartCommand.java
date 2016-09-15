@@ -11,7 +11,7 @@ package edu.wpi.first.wpilibj.command;
  * A {@link StartCommand} will call the {@link Command#start() start()} method of another command
  * when it is initialized and will finish immediately.
  */
-public class StartCommand extends Command {
+public class StartCommand extends InstantCommand {
 
   /**
    * The command to fork.
@@ -31,18 +31,5 @@ public class StartCommand extends Command {
 
   protected void initialize() {
     m_commandToFork.start();
-  }
-
-  protected void execute() {
-  }
-
-  protected boolean isFinished() {
-    return true;
-  }
-
-  protected void end() {
-  }
-
-  protected void interrupted() {
   }
 }

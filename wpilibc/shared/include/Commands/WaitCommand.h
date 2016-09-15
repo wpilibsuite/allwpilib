@@ -9,22 +9,15 @@
 
 #include <string>
 
-#include "Commands/Command.h"
+#include "Commands/TimedCommand.h"
 
 namespace frc {
 
-class WaitCommand : public Command {
+class WaitCommand : public TimedCommand {
  public:
   explicit WaitCommand(double timeout);
   WaitCommand(const std::string& name, double timeout);
   virtual ~WaitCommand() = default;
-
- protected:
-  virtual void Initialize();
-  virtual void Execute();
-  virtual bool IsFinished();
-  virtual void End();
-  virtual void Interrupted();
 };
 
 }  // namespace frc

@@ -22,22 +22,10 @@ public class WaitUntilCommand extends Command {
     m_time = time;
   }
 
-  public void initialize() {
-  }
-
-  public void execute() {
-  }
-
   /**
    * Check if we've reached the actual finish time.
    */
   public boolean isFinished() {
     return Timer.getMatchTime() >= m_time;
-  }
-
-  public void end() {
-  }
-
-  public void interrupted() {
   }
 }

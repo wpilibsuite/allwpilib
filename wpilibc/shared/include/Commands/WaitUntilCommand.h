@@ -20,11 +20,7 @@ class WaitUntilCommand : public Command {
   virtual ~WaitUntilCommand() = default;
 
  protected:
-  virtual void Initialize();
-  virtual void Execute();
   virtual bool IsFinished();
-  virtual void End();
-  virtual void Interrupted();
 
  private:
   double m_time;

@@ -17,18 +17,6 @@ package edu.wpi.first.wpilibj.command;
  */
 public class WaitForChildren extends Command {
 
-  protected void initialize() {
-  }
-
-  protected void execute() {
-  }
-
-  protected void end() {
-  }
-
-  protected void interrupted() {
-  }
-
   protected boolean isFinished() {
     return getGroup() == null || getGroup().m_children.isEmpty();
   }

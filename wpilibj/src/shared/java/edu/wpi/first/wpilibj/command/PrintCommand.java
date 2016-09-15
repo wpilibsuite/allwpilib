@@ -12,7 +12,7 @@ package edu.wpi.first.wpilibj.command;
  * immediately finishes. It is useful if you want a {@link CommandGroup} to print out a string when
  * it reaches a certain point.
  */
-public class PrintCommand extends Command {
+public class PrintCommand extends InstantCommand {
 
   /**
    * The message to print out.
@@ -31,18 +31,5 @@ public class PrintCommand extends Command {
 
   protected void initialize() {
     System.out.println(m_message);
-  }
-
-  protected void execute() {
-  }
-
-  protected boolean isFinished() {
-    return true;
-  }
-
-  protected void end() {
-  }
-
-  protected void interrupted() {
   }
 }

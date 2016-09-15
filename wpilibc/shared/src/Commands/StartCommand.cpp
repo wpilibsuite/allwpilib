@@ -9,16 +9,9 @@
 
 using namespace frc;
 
-StartCommand::StartCommand(Command* commandToStart) : Command("StartCommand") {
+StartCommand::StartCommand(Command* commandToStart)
+    : InstantCommand("StartCommand") {
   m_commandToFork = commandToStart;
 }
 
 void StartCommand::Initialize() { m_commandToFork->Start(); }
-
-void StartCommand::Execute() {}
-
-void StartCommand::End() {}
-
-void StartCommand::Interrupted() {}
-
-bool StartCommand::IsFinished() { return true; }
