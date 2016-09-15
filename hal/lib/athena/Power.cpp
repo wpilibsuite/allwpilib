@@ -103,11 +103,6 @@ int32_t HAL_GetUserCurrentFaults5V(int32_t* status) {
       power->readFaultCounts_OverCurrentFaultCount5V(status));
 }
 
-uint8_t HAL_GetUserStatus5V(int32_t* status) {
-  initializePower(status);
-  return power->readStatus_User5V(status);
-}
-
 /**
  * Get the 3.3V rail voltage
  */
