@@ -9,8 +9,7 @@
 
 // Define make_unique for C++11-only compilers
 #if __cplusplus == 201103L
-#include <stddef.h>
-
+#include <cstddef>
 #include <memory>
 #include <type_traits>
 #include <utility>

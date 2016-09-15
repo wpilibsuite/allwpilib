@@ -206,7 +206,7 @@ void CameraServer::Serve() {
       continue;
     }
 
-    memcpy(&req, reqBuf, sizeof(req));
+    std::memcpy(&req, reqBuf, sizeof(req));
     req.fps = ntohl(req.fps);
     req.compression = ntohl(req.compression);
     req.size = ntohl(req.size);

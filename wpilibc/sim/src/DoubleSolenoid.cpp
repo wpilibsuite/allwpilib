@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "DoubleSolenoid.h"
-#include <string.h>
+
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

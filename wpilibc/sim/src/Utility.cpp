@@ -160,7 +160,7 @@ static std::string demangle(char const* mangledSymbol) {
   size_t length;
   int32_t status;
 
-  if (sscanf(mangledSymbol, "%*[^(]%*[^_]%255[^)+]", buffer)) {
+  if (std::sscanf(mangledSymbol, "%*[^(]%*[^_]%255[^)+]", buffer)) {
     char* symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
 
     if (status == 0) {

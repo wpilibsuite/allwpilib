@@ -7,8 +7,7 @@
 
 #include "Preferences.h"  // NOLINT(build/include_order)
 
-#include <stdio.h>
-
+#include <cstdio>
 #include <fstream>
 
 #include "Timer.h"

@@ -7,8 +7,8 @@
 
 #include "Filters/LinearDigitalFilter.h"
 
-#include <assert.h>
-#include <math.h>
+#include <cassert>
+#include <cmath>
 
 /**
  * Create a linear FIR or IIR filter.

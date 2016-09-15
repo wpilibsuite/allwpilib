@@ -9,11 +9,11 @@
 
 #include <netdb.h>
 #include <netinet/in.h>
-#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <cstring>
 #include <iostream>
 #include <sstream>
 
@@ -442,12 +442,12 @@ void AxisCamera::ReadImagesFromCamera() {
         close(m_cameraSocket);
         return;
       }
-      strncat(initialReadBuffer, intermediateBuffer, 1);
+      std::strncat(initialReadBuffer, intermediateBuffer, 1);
       // trailingCounter ensures that we start looking for the 4 byte string
       // after
       // there is at least 4 bytes total. Kind of obscure.
       // look for 2 blank lines (\r\n)
-      if (nullptr != strstr(trailingPtr, "\r\n\r\n")) {
+      if (nullptr != std::strstr(trailingPtr, "\r\n\r\n")) {
         --counter;
       }
       if (++trailingCounter >= 4) {
@@ -455,7 +455,7 @@ void AxisCamera::ReadImagesFromCamera() {
       }
     }
     counter = 1;
-    char* contentLength = strstr(initialReadBuffer, "Content-Length: ");
+    char* contentLength = std::strstr(initialReadBuffer, "Content-Length: ");
     if (contentLength == nullptr) {
       wpi_setWPIErrorWithContext(IncompatibleMode,
                                  "No content-length token found in packet");
