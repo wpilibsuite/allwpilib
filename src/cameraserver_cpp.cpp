@@ -171,15 +171,6 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
 // Source Creation Functions
 //
 
-CS_Source CreateUSBSourceDev(llvm::StringRef name, int dev, CS_Status* status) {
-  return 0;  // TODO
-}
-
-CS_Source CreateUSBSourcePath(llvm::StringRef name, llvm::StringRef path,
-                              CS_Status* status) {
-  return 0;  // TODO
-}
-
 CS_Source CreateHTTPSource(llvm::StringRef name, llvm::StringRef url,
                            CS_Status* status) {
   return 0;  // TODO
@@ -498,10 +489,6 @@ void RemoveSinkListener(CS_Listener handle, CS_Status* status) {
 //
 // Utility Functions
 //
-
-std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {
-  return std::vector<USBCameraInfo>{};  // TODO
-}
 
 llvm::ArrayRef<CS_Source> EnumerateSourceHandles(
     llvm::SmallVectorImpl<CS_Source>& vec, CS_Status* status) {

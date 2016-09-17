@@ -13,17 +13,7 @@
 #include "llvm/SmallString.h"
 
 #include "cameraserver_cpp.h"
-
-//
-// Conversion helpers
-//
-
-static char* ConvertToC(llvm::StringRef in) {
-  char* out = static_cast<char*>(std::malloc(in.size() + 1));
-  std::memmove(out, in.data(), in.size());
-  out[in.size()] = '\0';
-  return out;
-}
+#include "c_util.h"
 
 extern "C" {
 
@@ -35,7 +25,7 @@ char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetPropertyName(property, buf, status);
   if (*status != 0) return nullptr;
-  return ConvertToC(str);
+  return cs::ConvertToC(str);
 }
 
 CS_Bool CS_GetBooleanProperty(CS_Property property, CS_Status* status) {
@@ -76,7 +66,7 @@ char* CS_GetStringProperty(CS_Property property, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetStringProperty(property, buf, status);
   if (*status != 0) return nullptr;
-  return ConvertToC(str);
+  return cs::ConvertToC(str);
 }
 
 void CS_SetStringProperty(CS_Property property, const char* value,
@@ -98,17 +88,8 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
   char** out = static_cast<char**>(std::malloc(choices.size() * sizeof(char*)));
   *count = choices.size();
   for (std::size_t i = 0; i < choices.size(); ++i)
-    out[i] = ConvertToC(choices[i]);
+    out[i] = cs::ConvertToC(choices[i]);
   return out;
-}
-
-CS_Source CS_CreateUSBSourceDev(const char* name, int dev, CS_Status* status) {
-  return cs::CreateUSBSourceDev(name, dev, status);
-}
-
-CS_Source CS_CreateUSBSourcePath(const char* name, const char* path,
-                                 CS_Status* status) {
-  return cs::CreateUSBSourcePath(name, path, status);
 }
 
 CS_Source CS_CreateHTTPSource(const char* name, const char* url,
@@ -124,14 +105,14 @@ char* CS_GetSourceName(CS_Source source, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, status);
   if (*status != 0) return nullptr;
-  return ConvertToC(str);
+  return cs::ConvertToC(str);
 }
 
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSourceDescription(source, buf, status);
   if (*status != 0) return nullptr;
-  return ConvertToC(str);
+  return cs::ConvertToC(str);
 }
 
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
@@ -221,14 +202,14 @@ char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, status);
   if (*status != 0) return nullptr;
-  return ConvertToC(str);
+  return cs::ConvertToC(str);
 }
 
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSinkDescription(sink, buf, status);
   if (*status != 0) return nullptr;
-  return ConvertToC(str);
+  return cs::ConvertToC(str);
 }
 
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
@@ -261,7 +242,7 @@ char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSinkError(sink, buf, status);
   if (*status != 0) return nullptr;
-  return ConvertToC(str);
+  return cs::ConvertToC(str);
 }
 
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {
@@ -308,28 +289,6 @@ CS_Listener CS_AddSinkListener(void* data,
 
 void CS_RemoveSinkListener(CS_Listener handle, CS_Status* status) {
   return cs::RemoveSinkListener(handle, status);
-}
-
-CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status) {
-  auto cameras = cs::EnumerateUSBCameras(status);
-  CS_USBCameraInfo* out = static_cast<CS_USBCameraInfo*>(
-      std::malloc(cameras.size() * sizeof(CS_USBCameraInfo)));
-  *count = cameras.size();
-  for (std::size_t i = 0; i < cameras.size(); ++i) {
-    out[i].dev = cameras[i].dev;
-    out[i].path = ConvertToC(cameras[i].path);
-    out[i].name = ConvertToC(cameras[i].name);
-  }
-  return out;
-}
-
-void CS_FreeEnumeratedUSBCameras(CS_USBCameraInfo* cameras, int count) {
-  if (!cameras) return;
-  for (int i = 0; i < count; ++i) {
-    std::free(cameras[i].path);
-    std::free(cameras[i].name);
-  }
-  std::free(cameras);
 }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
