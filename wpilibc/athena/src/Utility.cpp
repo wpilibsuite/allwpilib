@@ -10,6 +10,8 @@
 #include <cxxabi.h>
 #include <execinfo.h>
 
+#include <cstdio>
+#include <cstdlib>
 #include <sstream>
 
 #include "HAL/HAL.h"
@@ -182,7 +184,7 @@ static std::string demangle(char const* mangledSymbol) {
   size_t length;
   int32_t status;
 
-  if (sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer)) {
+  if (std::sscanf(mangledSymbol, "%*[^(]%*[(]%255[^)+]", buffer)) {
     char* symbol = abi::__cxa_demangle(buffer, nullptr, &length, &status);
     if (status == 0) {
       return symbol;
@@ -214,7 +216,7 @@ std::string GetStackTrace(int offset) {
     }
   }
 
-  free(mangledSymbols);
+  std::free(mangledSymbols);
 
   return trace.str();
 }

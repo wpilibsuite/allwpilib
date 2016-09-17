@@ -7,7 +7,7 @@
 
 #include "AnalogGyro.h"
 
-#include <limits.h>
+#include <climits>
 
 #include "AnalogInput.h"
 #include "HAL/HAL.h"

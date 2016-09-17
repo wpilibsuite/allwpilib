@@ -167,9 +167,7 @@ const char* HAL_GetErrorMessage(int32_t code) {
 /**
  * Returns the runtime type of this HAL
  */
-HAL_RuntimeType HAL_GetRuntimeType() {
-  return HAL_Athena;
-}
+HAL_RuntimeType HAL_GetRuntimeType() { return HAL_Athena; }
 
 /**
  * Return the FPGA Version number.

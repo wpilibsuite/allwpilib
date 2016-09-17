@@ -7,13 +7,15 @@
 
 #include "Utility.h"
 
-#include <cstdio>
-#include <iostream>
-#include <sstream>
-#if not defined(_WIN32)
+#ifndef _WIN32
 #include <cxxabi.h>
 #include <execinfo.h>
 #endif
+
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
 
 #include "Timer.h"
 #include "simulation/simTime.h"
@@ -192,7 +194,7 @@ std::string GetStackTrace(int offset) {
     }
   }
 
-  free(mangledSymbols);
+  std::free(mangledSymbols);
 
   return trace.str();
 }

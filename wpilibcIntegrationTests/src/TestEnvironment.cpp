@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cstdlib>
+
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
@@ -22,7 +24,7 @@ class TestEnvironment : public testing::Environment {
 
     if (!HAL_Initialize(0)) {
       std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl;
-      exit(-1);
+      std::exit(-1);
     }
 
     /* This sets up the network communications library to enable the driver

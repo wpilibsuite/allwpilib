@@ -8,6 +8,7 @@
 #include "Task.h"
 
 #include <cerrno>
+#include <cstdio>
 
 #include "WPIErrors.h"
 
@@ -98,7 +99,7 @@ bool Task::HandleError(STATUS results) {
   if (errsv == HAL_TaskLib_ILLEGAL_PRIORITY) {
     wpi_setWPIErrorWithContext(TaskPriorityError, m_taskName.c_str());
   } else {
-    printf("ERROR: errno=%i", errsv);
+    std::printf("ERROR: errno=%i", errsv);
     wpi_setWPIErrorWithContext(TaskError, m_taskName.c_str());
   }
   return false;

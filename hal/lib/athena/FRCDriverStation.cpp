@@ -5,6 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
@@ -54,11 +55,12 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                                                 details, location, callStack);
     if (printMsg) {
       if (location && location[0] != '\0') {
-        fprintf(stderr, "%s at %s: ", isError ? "Error" : "Warning", location);
+        std::fprintf(stderr, "%s at %s: ", isError ? "Error" : "Warning",
+                     location);
       }
-      fprintf(stderr, "%s\n", details);
+      std::fprintf(stderr, "%s\n", details);
       if (callStack && callStack[0] != '\0') {
-        fprintf(stderr, "%s\n", callStack);
+        std::fprintf(stderr, "%s\n", callStack);
       }
     }
     if (i == KEEP_MSGS) {

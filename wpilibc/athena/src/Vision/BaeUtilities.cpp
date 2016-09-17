@@ -14,6 +14,7 @@
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 
@@ -55,7 +56,7 @@ void dprintf(const char* tempString, ...) {
   const char* functionName; /* Format passed in argument */
   const char* fmt;          /* Format passed in argument */
   char text[512];           /* Text string */
-  FILE* outfile_fd;         /* Output file pointer */
+  std::FILE* outfile_fd;    /* Output file pointer */
   char filepath[128];       /* Text string */
   int fatalFlag = 0;
   const char* filename;
@@ -68,7 +69,7 @@ void dprintf(const char* tempString, ...) {
 
   va_start(args, tempString);
 
-  tempStringLen = strlen(tempString);
+  tempStringLen = std::strlen(tempString);
   filename = tempString;
   for (index = 0; index < tempStringLen; index++) {
     if (tempString[index] == ' ') {
@@ -298,7 +299,7 @@ void panForTarget(Servo* panServo, double sinStart) {
  * @return int number of lines or -1 if error
  **/
 int processFile(char* inputFile, char* outputString, int lineNumber) {
-  FILE* infile;
+  std::FILE* infile;
   const int kStringSize = 80;  // max size of one line in file
   char inputStr[kStringSize];
   inputStr[0] = '\0';
@@ -348,7 +349,7 @@ int emptyString(char* string) {
 
   if (string == nullptr) return (1);
 
-  len = strlen(string);
+  len = std::strlen(string);
   for (i = 0; i < len; i++) {
     // Ignore the following characters
     if (string[i] == '\n' || string[i] == '\r' || string[i] == '\t' ||
@@ -368,7 +369,7 @@ void stripString(char* string) {
 
   if (string == nullptr) return;
 
-  len = strlen(string);
+  len = std::strlen(string);
   for (i = 0, j = 0; i < len; i++) {
     // Remove the following characters from the string
     if (string[i] == '\n' || string[i] == '\r' || string[i] == '\"') continue;

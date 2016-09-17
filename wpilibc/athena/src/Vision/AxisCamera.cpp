@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <sstream>
@@ -463,8 +464,8 @@ void AxisCamera::ReadImagesFromCamera() {
       if (imgBuffer) delete[] imgBuffer;
       return;
     }
-    contentLength = contentLength + 16;    // skip past "content length"
-    int readLength = atol(contentLength);  // get the image byte count
+    contentLength = contentLength + 16;         // skip past "content length"
+    int readLength = std::atol(contentLength);  // get the image byte count
 
     // Make sure buffer is large enough
     if (imgBufferLength < readLength) {
