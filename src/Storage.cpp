@@ -348,7 +348,15 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       }
       ConnectionInfo conn_info;
       auto c = conn_weak.lock();
-      if (c) conn_info = c->info();
+      if (c) {
+        conn_info = c->info();
+      } else {
+        conn_info.remote_id = "Unknown";
+        conn_info.remote_ip = "Unknown";
+        conn_info.remote_port = 0;
+        conn_info.last_update = 0;
+        conn_info.protocol_version = 0;
+      }
       m_rpc_server.ProcessRpc(entry->name, msg, entry->rpc_callback,
                               conn->uid(), conn_info,
                               [=](std::shared_ptr<Message> msg) {
@@ -1399,6 +1407,9 @@ unsigned int Storage::CallRpc(StringRef name, StringRef params) {
     ConnectionInfo conn_info;
     conn_info.remote_id = "Server";
     conn_info.remote_ip = "localhost";
+    conn_info.remote_port = 0;
+    conn_info.last_update = 0;
+    conn_info.protocol_version = 0x3000;
     m_rpc_server.ProcessRpc(
         name, msg, rpc_callback, 0xffffU, conn_info,
         [this](std::shared_ptr<Message> msg) {
