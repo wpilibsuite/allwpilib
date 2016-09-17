@@ -69,10 +69,9 @@ class IterativeRobot : public RobotBase {
  protected:
   virtual ~IterativeRobot() = default;
   IterativeRobot() = default;
-
- private:
   bool m_disabledInitialized = false;
   bool m_autonomousInitialized = false;
   bool m_teleopInitialized = false;
   bool m_testInitialized = false;
+
 };
