@@ -41,7 +41,6 @@ class RpcServer {
 
   void ProcessRpc(StringRef name, std::shared_ptr<Message> msg,
                   RpcCallback func, unsigned int conn_id,
-                  const ConnectionInfo& conn_info,
                   SendMsgFunc send_response);
 
   bool PollRpc(bool blocking, RpcCallInfo* call_info);
@@ -57,20 +56,17 @@ class RpcServer {
 
   struct RpcCall {
     RpcCall(StringRef name_, std::shared_ptr<Message> msg_, RpcCallback func_,
-            unsigned int conn_id_, const ConnectionInfo& conn_info_, 
-            SendMsgFunc send_response_)
+            unsigned int conn_id_, SendMsgFunc send_response_)
         : name(name_),
           msg(msg_),
           func(func_),
           conn_id(conn_id_),
-          conn_info(conn_info_),
           send_response(send_response_) {}
 
     std::string name;
     std::shared_ptr<Message> msg;
     RpcCallback func;
     unsigned int conn_id;
-    ConnectionInfo conn_info;
     SendMsgFunc send_response;
   };
 

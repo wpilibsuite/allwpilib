@@ -79,7 +79,6 @@ struct RpcDefinition {
 struct RpcCallInfo {
   unsigned int rpc_id;
   unsigned int call_uid;
-  ConnectionInfo conn_info;
   std::string name;
   std::string params;
 };
@@ -225,8 +224,7 @@ constexpr double kTimeout_Indefinite = -1;
 void SetRpcServerOnStart(std::function<void()> on_start);
 void SetRpcServerOnExit(std::function<void()> on_exit);
 
-typedef std::function<std::string(StringRef name, StringRef params, 
-                                  const ConnectionInfo& conn_info)>
+typedef std::function<std::string(StringRef name, StringRef params)>
     RpcCallback;
 
 void CreateRpc(StringRef name, StringRef def, RpcCallback callback);
