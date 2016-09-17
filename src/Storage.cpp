@@ -346,8 +346,12 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         DEBUG("received RPC call to non-RPC entry");
         return;
       }
+      ConnectionInfo conn_info;
+      auto c = conn_weak.lock();
+      if (c) conn_info = c->info();
       m_rpc_server.ProcessRpc(entry->name, msg, entry->rpc_callback,
-                              conn->uid(), [=](std::shared_ptr<Message> msg) {
+                              conn->uid(), conn_info,
+                              [=](std::shared_ptr<Message> msg) {
                                 auto c = conn_weak.lock();
                                 if (c) c->QueueOutgoing(msg);
                               });
@@ -1392,8 +1396,12 @@ unsigned int Storage::CallRpc(StringRef name, StringRef params) {
     // gracefully anyway.
     auto rpc_callback = entry->rpc_callback;
     lock.unlock();
+    ConnectionInfo conn_info;
+    conn_info.remote_id = "Server";
+    conn_info.remote_ip = "localhost";
     m_rpc_server.ProcessRpc(
-        name, msg, rpc_callback, 0xffffU, [this](std::shared_ptr<Message> msg) {
+        name, msg, rpc_callback, 0xffffU, conn_info,
+        [this](std::shared_ptr<Message> msg) {
           std::lock_guard<std::mutex> lock(m_mutex);
           m_rpc_results.insert(std::make_pair(
               std::make_pair(msg->id(), msg->seq_num_uid()), msg->str()));

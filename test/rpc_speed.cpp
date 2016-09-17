@@ -5,7 +5,8 @@
 
 #include "ntcore.h"
 
-std::string callback1(nt::StringRef name, nt::StringRef params_str) {
+std::string callback1(nt::StringRef name, nt::StringRef params_str,
+                      const nt::ConnectionInfo& conn_info) {
   auto params = nt::UnpackRpcValues(params_str, NT_DOUBLE);
   if (params.empty()) {
     std::fputs("empty params?\n", stderr);

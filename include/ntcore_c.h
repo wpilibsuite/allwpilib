@@ -152,6 +152,7 @@ struct NT_RpcDefinition {
 struct NT_RpcCallInfo {
   unsigned int rpc_id;
   unsigned int call_uid;
+  struct NT_ConnectionInfo conn_info;
   struct NT_String name;
   struct NT_String params;
 };
@@ -310,7 +311,8 @@ void NT_SetRpcServerOnStart(void (*on_start)(void *data), void *data);
 void NT_SetRpcServerOnExit(void (*on_exit)(void *data), void *data);
 
 typedef char *(*NT_RpcCallback)(void *data, const char *name, size_t name_len,
-                                const char *params, size_t params_len,
+                                const char *params, size_t params_len, 
+                                const struct NT_ConnectionInfo* conn_info,
                                 size_t *results_len);
 
 void NT_CreateRpc(const char *name, size_t name_len, const char *def,

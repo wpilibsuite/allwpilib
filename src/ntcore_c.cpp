@@ -68,6 +68,7 @@ static void ConvertToC(const RpcDefinition& in, NT_RpcDefinition* out) {
 static void ConvertToC(const RpcCallInfo& in, NT_RpcCallInfo* out) {
   out->rpc_id = in.rpc_id;
   out->call_uid = in.call_uid;
+  ConvertToC(in.conn_info, &out->conn_info);
   ConvertToC(in.name, &out->name);
   ConvertToC(in.params, &out->params);
 }
@@ -234,12 +235,17 @@ void NT_CreateRpc(const char *name, size_t name_len, const char *def,
                   size_t def_len, void *data, NT_RpcCallback callback) {
   nt::CreateRpc(
       StringRef(name, name_len), StringRef(def, def_len),
-      [=](StringRef name, StringRef params) -> std::string {
+      [=](StringRef name, StringRef params, 
+          const ConnectionInfo& conn_info) -> std::string {
+        NT_ConnectionInfo conn_c;
+        ConvertToC(conn_info, &conn_c);
         size_t results_len;
         char* results_c = callback(data, name.data(), name.size(),
-                                   params.data(), params.size(), &results_len);
+                                   params.data(), params.size(), 
+                                   &conn_c, &results_len);
         std::string results(results_c, results_len);
         std::free(results_c);
+        DisposeConnectionInfo(&conn_c);
         return results;
       });
 }
@@ -521,6 +527,7 @@ void NT_DisposeRpcDefinition(NT_RpcDefinition *def) {
 }
 
 void NT_DisposeRpcCallInfo(NT_RpcCallInfo *call_info) {
+  DisposeConnectionInfo(&call_info->conn_info);
   NT_DisposeString(&call_info->name);
   NT_DisposeString(&call_info->params);
 }
