@@ -70,11 +70,19 @@ public class VideoProperty {
   }
 
   public double getMin() {
-    return CameraServerJNI.getDoublePropertyMin(m_handle);
+    return CameraServerJNI.getPropertyMin(m_handle);
   }
 
   public double getMax() {
-    return CameraServerJNI.getDoublePropertyMax(m_handle);
+    return CameraServerJNI.getPropertyMax(m_handle);
+  }
+
+  public double getStep() {
+    return CameraServerJNI.getPropertyStep(m_handle);
+  }
+
+  public double getDefault() {
+    return CameraServerJNI.getPropertyDefault(m_handle);
   }
 
   // String-specific functions

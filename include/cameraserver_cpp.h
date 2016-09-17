@@ -55,8 +55,10 @@ bool GetBooleanProperty(CS_Property property, CS_Status* status);
 void SetBooleanProperty(CS_Property property, bool value, CS_Status* status);
 double GetDoubleProperty(CS_Property property, CS_Status* status);
 void SetDoubleProperty(CS_Property property, double value, CS_Status* status);
-double GetDoublePropertyMin(CS_Property property, CS_Status* status);
-double GetDoublePropertyMax(CS_Property property, CS_Status* status);
+double GetPropertyMin(CS_Property property, CS_Status* status);
+double GetPropertyMax(CS_Property property, CS_Status* status);
+double GetPropertyStep(CS_Property property, CS_Status* status);
+double GetPropertyDefault(CS_Property property, CS_Status* status);
 std::string GetStringProperty(CS_Property property, CS_Status* status);
 llvm::StringRef GetStringProperty(CS_Property property,
                                   llvm::SmallVectorImpl<char>& buf,

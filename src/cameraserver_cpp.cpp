@@ -92,18 +92,32 @@ void SetDoubleProperty(CS_Property property, double value, CS_Status* status) {
   source->SetDoubleProperty(propertyIndex, value);
 }
 
-double GetDoublePropertyMin(CS_Property property, CS_Status* status) {
+double GetPropertyMin(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
   return source->GetPropertyMin(propertyIndex);
 }
 
-double GetDoublePropertyMax(CS_Property property, CS_Status* status) {
+double GetPropertyMax(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
   return source->GetPropertyMax(propertyIndex);
+}
+
+double GetPropertyStep(CS_Property property, CS_Status* status) {
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return 0.0;
+  return source->GetPropertyStep(propertyIndex);
+}
+
+double GetPropertyDefault(CS_Property property, CS_Status* status) {
+  int propertyIndex;
+  auto source = GetPropertySource(property, &propertyIndex, status);
+  if (!source) return 0.0;
+  return source->GetPropertyDefault(propertyIndex);
 }
 
 std::string GetStringProperty(CS_Property property, CS_Status* status) {

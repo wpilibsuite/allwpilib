@@ -70,8 +70,10 @@ void CS_SetBooleanProperty(CS_Property property, CS_Bool value,
 double CS_GetDoubleProperty(CS_Property property, CS_Status* status);
 void CS_SetDoubleProperty(CS_Property property, double value,
                           CS_Status* status);
-double CS_GetDoublePropertyMin(CS_Property property, CS_Status* status);
-double CS_GetDoublePropertyMax(CS_Property property, CS_Status* status);
+double CS_GetPropertyMin(CS_Property property, CS_Status* status);
+double CS_GetPropertyMax(CS_Property property, CS_Status* status);
+double CS_GetPropertyStep(CS_Property property, CS_Status* status);
+double CS_GetPropertyDefault(CS_Property property, CS_Status* status);
 char* CS_GetStringProperty(CS_Property property, CS_Status* status);
 void CS_SetStringProperty(CS_Property property, const char* value,
                           CS_Status* status);

@@ -37,12 +37,22 @@ inline void VideoProperty::SetDouble(double value) {
 
 inline double VideoProperty::GetMin() const {
   m_status = 0;
-  return GetDoublePropertyMin(m_handle, &m_status);
+  return GetPropertyMin(m_handle, &m_status);
 }
 
 inline double VideoProperty::GetMax() const {
   m_status = 0;
-  return GetDoublePropertyMax(m_handle, &m_status);
+  return GetPropertyMax(m_handle, &m_status);
+}
+
+inline double VideoProperty::GetStep() const {
+  m_status = 0;
+  return GetPropertyStep(m_handle, &m_status);
+}
+
+inline double VideoProperty::GetDefault() const {
+  m_status = 0;
+  return GetPropertyDefault(m_handle, &m_status);
 }
 
 inline std::string VideoProperty::GetString() const {

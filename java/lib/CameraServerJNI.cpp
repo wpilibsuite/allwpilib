@@ -160,28 +160,56 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setDoubleProper
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    getDoublePropertyMin
+ * Method:    getPropertyMin
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getDoublePropertyMin
+JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyMin
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
-  auto val = cs::GetDoublePropertyMin(property, &status);
+  auto val = cs::GetPropertyMin(property, &status);
   CheckStatus(env, status);
   return val;
 }
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    getDoublePropertyMax
+ * Method:    getPropertyMax
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getDoublePropertyMax
+JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyMax
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
-  auto val = cs::GetDoublePropertyMax(property, &status);
+  auto val = cs::GetPropertyMax(property, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    getPropertyStep
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyStep
+  (JNIEnv *env, jclass, jint property)
+{
+  CS_Status status;
+  auto val = cs::GetPropertyStep(property, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    getPropertyDefault
+ * Signature: (I)D
+ */
+JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyDefault
+  (JNIEnv *env, jclass, jint property)
+{
+  CS_Status status;
+  auto val = cs::GetPropertyDefault(property, &status);
   CheckStatus(env, status);
   return val;
 }

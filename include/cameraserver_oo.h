@@ -60,6 +60,8 @@ class VideoProperty {
   void SetDouble(double value);
   double GetMin() const;
   double GetMax() const;
+  double GetStep() const;
+  double GetDefault() const;
 
   // String-specific functions
   std::string GetString() const;

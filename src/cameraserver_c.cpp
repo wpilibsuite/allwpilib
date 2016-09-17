@@ -56,12 +56,20 @@ void CS_SetDoubleProperty(CS_Property property, double value,
   return cs::SetDoubleProperty(property, value, status);
 }
 
-double CS_GetDoublePropertyMin(CS_Property property, CS_Status* status) {
-  return cs::GetDoublePropertyMin(property, status);
+double CS_GetPropertyMin(CS_Property property, CS_Status* status) {
+  return cs::GetPropertyMin(property, status);
 }
 
-double CS_GetDoublePropertyMax(CS_Property property, CS_Status* status) {
-  return cs::GetDoublePropertyMax(property, status);
+double CS_GetPropertyMax(CS_Property property, CS_Status* status) {
+  return cs::GetPropertyMax(property, status);
+}
+
+double CS_GetPropertyStep(CS_Property property, CS_Status* status) {
+  return cs::GetPropertyStep(property, status);
+}
+
+double CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
+  return cs::GetPropertyDefault(property, status);
 }
 
 char* CS_GetStringProperty(CS_Property property, CS_Status* status) {

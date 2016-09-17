@@ -90,6 +90,8 @@ class SourceImpl {
   virtual void SetDoubleProperty(int property, double value) = 0;
   virtual double GetPropertyMin(int property) const = 0;
   virtual double GetPropertyMax(int property) const = 0;
+  virtual double GetPropertyStep(int property) const = 0;
+  virtual double GetPropertyDefault(int property) const = 0;
   virtual llvm::StringRef GetStringProperty(
       int property, llvm::SmallVectorImpl<char>& buf) const = 0;
   virtual void SetStringProperty(int property, llvm::StringRef value) = 0;
