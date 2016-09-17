@@ -89,10 +89,10 @@ class VideoSource {
   friend class VideoSink;
 
  public:
-  VideoSource() : m_handle(0) {}
+  VideoSource() noexcept : m_handle(0) {}
   VideoSource(const VideoSource& source);
-  VideoSource(VideoSource&& source) noexcept;
-  VideoSource& operator=(const VideoSource& rhs);
+  VideoSource(VideoSource&& other) noexcept;
+  VideoSource& operator=(VideoSource other) noexcept;
   ~VideoSource();
 
   explicit operator bool() const { return m_handle != 0; }
@@ -124,6 +124,12 @@ class VideoSource {
   /// Enumerate all existing sources.
   /// @return Vector of sources.
   static std::vector<VideoSource> EnumerateSources();
+
+  friend void swap(VideoSource& first, VideoSource& second) noexcept {
+    using std::swap;
+    swap(first.m_status, second.m_status);
+    swap(first.m_handle, second.m_handle);
+  }
 
  protected:
   explicit VideoSource(CS_Source handle) : m_handle(handle) {}
@@ -209,10 +215,10 @@ class VideoSink {
   friend class SinkListener;
 
  public:
-  VideoSink() : m_handle(0) {}
+  VideoSink() noexcept : m_handle(0) {}
   VideoSink(const VideoSink& sink);
   VideoSink(VideoSink&& sink) noexcept;
-  VideoSink& operator=(const VideoSink& rhs);
+  VideoSink& operator=(VideoSink other) noexcept;
   ~VideoSink();
 
   explicit operator bool() const { return m_handle != 0; }
@@ -245,6 +251,12 @@ class VideoSink {
   /// Enumerate all existing sinks.
   /// @return Vector of sinks.
   static std::vector<VideoSink> EnumerateSinks();
+
+  friend void swap(VideoSink& first, VideoSink& second) noexcept {
+    using std::swap;
+    swap(first.m_status, second.m_status);
+    swap(first.m_handle, second.m_handle);
+  }
 
  protected:
   explicit VideoSink(CS_Sink handle) : m_handle(handle) {}
@@ -312,6 +324,7 @@ class SourceListener {
     kDisconnected = CS_SOURCE_DISCONNECTED
   };
 
+  SourceListener() : m_handle(0) {}
   SourceListener(
       std::function<void(llvm::StringRef name, VideoSource source, int event)>
           callback,
@@ -319,8 +332,13 @@ class SourceListener {
 
   SourceListener(const SourceListener&) = delete;
   SourceListener& operator=(const SourceListener&) = delete;
-  SourceListener(SourceListener&& rhs) noexcept;
+  SourceListener(SourceListener&& other) noexcept;
   ~SourceListener();
+
+  friend void swap(SourceListener& first, SourceListener& second) noexcept {
+    using std::swap;
+    swap(first.m_handle, second.m_handle);
+  }
 
  private:
   CS_Listener m_handle;
@@ -335,6 +353,7 @@ class SinkListener {
     kDisabled = CS_SINK_DISABLED
   };
 
+  SinkListener() : m_handle(0) {}
   SinkListener(
       std::function<void(llvm::StringRef name, VideoSink sink, int event)>
           callback,
@@ -342,8 +361,13 @@ class SinkListener {
 
   SinkListener(const SinkListener&) = delete;
   SinkListener& operator=(const SinkListener&) = delete;
-  SinkListener(SinkListener&& rhs) noexcept;
+  SinkListener(SinkListener&& other) noexcept;
   ~SinkListener();
+
+  friend void swap(SinkListener& first, SinkListener& second) noexcept {
+    using std::swap;
+    swap(first.m_handle, second.m_handle);
+  }
 
  private:
   CS_Listener m_handle;

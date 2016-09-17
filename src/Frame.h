@@ -29,25 +29,24 @@ class Frame {
   };
 
  public:
-  Frame(SourceImpl& source, Data* data) : m_source(&source), m_data(data) {
+  Frame() noexcept : m_source{nullptr}, m_data{nullptr} {}
+
+  Frame(SourceImpl& source, Data* data) noexcept : m_source{&source},
+                                                   m_data{data} {
     if (m_data) ++(m_data->refcount);
   }
 
-  Frame(const Frame& frame) : m_source(frame.m_source), m_data(frame.m_data) {
+  Frame(const Frame& frame) noexcept : m_source{frame.m_source},
+                                       m_data{frame.m_data} {
     if (m_data) ++(m_data->refcount);
   }
 
-  Frame(Frame&& frame) : m_source(frame.m_source), m_data(frame.m_data) {
-    frame.m_data = nullptr;
-  }
+  Frame(Frame&& other) noexcept : Frame() { swap(*this, other); }
 
   ~Frame() { DecRef(); }
 
-  Frame& operator=(const Frame& frame) {
-    DecRef();
-    m_source = frame.m_source;
-    m_data = frame.m_data;
-    if (m_data) ++(m_data->refcount);
+  Frame& operator=(Frame other) noexcept {
+    swap(*this, other);
     return *this;
   }
 
@@ -66,6 +65,12 @@ class Frame {
   std::chrono::system_clock::time_point time() const {
     if (!m_data) return std::chrono::system_clock::time_point{};
     return m_data->timestamp;
+  }
+
+  friend void swap(Frame& first, Frame& second) noexcept {
+    using std::swap;
+    swap(first.m_source, second.m_source);
+    swap(first.m_data, second.m_data);
   }
 
  private:

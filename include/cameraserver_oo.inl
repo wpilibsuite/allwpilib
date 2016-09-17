@@ -99,16 +99,12 @@ inline VideoSource::VideoSource(const VideoSource& source)
     : m_handle(source.m_handle == 0 ? 0
                                     : CopySource(source.m_handle, &m_status)) {}
 
-inline VideoSource::VideoSource(VideoSource&& source) noexcept
-    : m_status(source.m_status),
-      m_handle(source.m_handle) {
-  source.m_handle = 0;
+inline VideoSource::VideoSource(VideoSource&& other) noexcept : VideoSource() {
+  swap(*this, other);
 }
 
-inline VideoSource& VideoSource::operator=(const VideoSource& rhs) {
-  m_status = 0;
-  if (m_handle != 0) ReleaseSource(m_handle, &m_status);
-  m_handle = rhs.m_handle == 0 ? 0 : CopySource(rhs.m_handle, &m_status);
+inline VideoSource& VideoSource::operator=(VideoSource other) noexcept {
+  swap(*this, other);
   return *this;
 }
 
@@ -209,16 +205,12 @@ inline void CvSource::RemoveProperty(llvm::StringRef name) {
 inline VideoSink::VideoSink(const VideoSink& sink)
     : m_handle(sink.m_handle == 0 ? 0 : CopySink(sink.m_handle, &m_status)) {}
 
-inline VideoSink::VideoSink(VideoSink&& sink) noexcept
-    : m_status(sink.m_status),
-      m_handle(sink.m_handle) {
-  sink.m_handle = 0;
+inline VideoSink::VideoSink(VideoSink&& other) noexcept : VideoSink() {
+  swap(*this, other);
 }
 
-inline VideoSink& VideoSink::operator=(const VideoSink& rhs) {
-  m_status = 0;
-  if (m_handle != 0) ReleaseSink(m_handle, &m_status);
-  m_handle = rhs.m_handle == 0 ? 0 : CopySink(rhs.m_handle, &m_status);
+inline VideoSink& VideoSink::operator=(VideoSink other) noexcept {
+  swap(*this, other);
   return *this;
 }
 
@@ -296,9 +288,9 @@ inline SourceListener::SourceListener(
       eventMask, &status);
 }
 
-inline SourceListener::SourceListener(SourceListener&& rhs) noexcept
-    : m_handle(rhs.m_handle) {
-  rhs.m_handle = 0;
+inline SourceListener::SourceListener(SourceListener&& other) noexcept
+    : SourceListener() {
+  swap(*this, other);
 }
 
 inline SourceListener::~SourceListener() {
@@ -318,9 +310,9 @@ inline SinkListener::SinkListener(
       eventMask, &status);
 }
 
-inline SinkListener::SinkListener(SinkListener&& rhs) noexcept
-    : m_handle(rhs.m_handle) {
-  rhs.m_handle = 0;
+inline SinkListener::SinkListener(SinkListener&& other) noexcept
+    : SinkListener() {
+  swap(*this, other);
 }
 
 inline SinkListener::~SinkListener() {
