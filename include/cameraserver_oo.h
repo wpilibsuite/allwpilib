@@ -81,9 +81,7 @@ class VideoProperty {
   Type m_type;
 };
 
-/// A source for video that provides a sequence of frames.  Each frame may
-/// consist of multiple images (e.g. from a stereo or depth camera); these
-/// are called channels.
+/// A source for video that provides a sequence of frames.
 class VideoSource {
   friend class SourceListener;
   friend class VideoSink;
@@ -106,9 +104,6 @@ class VideoSource {
 
   /// Get the last time a frame was captured.
   uint64_t GetLastFrameTime() const;
-
-  /// Get the number of channels this source provides.
-  int GetNumChannels() const;
 
   /// Is the source currently connected to whatever is providing the images?
   bool IsConnected() const;
@@ -167,19 +162,9 @@ class CvSource : public VideoSource {
  public:
   /// Create an OpenCV source.
   /// @param name Source name (arbitrary unique identifier)
-  /// @param numChannels Number of channels
-  CvSource(llvm::StringRef name, int numChannels = 1);
+  CvSource(llvm::StringRef name);
 
-  /// Put an OpenCV image onto the specified channel.
-  /// @param channel Channel number (range 0 to numChannels-1)
-  /// @param image OpenCV image
-  void PutImage(int channel, cv::Mat* image);
-
-  /// Signal sinks connected to this source that all new channel images have
-  /// been put to the stream and are ready to be read.
-  void NotifyFrame();
-
-  /// Put an OpenCV image onto channel 0 and notify sinks.
+  /// Put an OpenCV image and notify sinks.
   /// This is identical in behavior to calling PutImage(0, image) followed by
   /// NotifyFrame().
   /// @param image OpenCV image
@@ -217,9 +202,7 @@ class CvSource : public VideoSource {
   void RemoveProperty(llvm::StringRef name);
 };
 
-/// A sink for video that accepts a sequence of frames.  Each frame may
-/// consist of multiple images (e.g. from a stereo or depth camera); these are
-/// called channels.
+/// A sink for video that accepts a sequence of frames.
 class VideoSink {
   friend class SinkListener;
 
@@ -281,12 +264,6 @@ class HTTPSink : public VideoSink {
   /// @param name Sink name (arbitrary unique identifier)
   /// @param port TCP port number
   HTTPSink(llvm::StringRef name, int port) : HTTPSink(name, "", port) {}
-
-  /// Set what video channel should be served.
-  /// MJPEG-HTTP can only serve a single channel of video.
-  /// By default, channel 0 is served.
-  /// @param channel video channel to serve to clients
-  void SetSourceChannel(int channel);
 };
 
 /// A sink for user code to accept video frames as OpenCV images.
@@ -308,18 +285,7 @@ class CvSink : public VideoSink {
   ///        unusual circumstances) WaitForImage().
   CvSink(llvm::StringRef name, std::function<void(uint64_t time)> processFrame);
 
-  /// Wait for the next frame.  This is a blocking call.
-  /// @return Frame time, or 0 on error (call GetError() to obtain the error
-  ///         message).
-  uint64_t WaitForFrame() const;
-
-  /// Get an OpenCV image from the specified channel.
-  /// @return False if image could not be obtained for some reason (e.g.
-  ///         channel out of range)
-  bool GetImage(int channel, cv::Mat* image) const;
-
-  /// Wait for the next frame and get the image from channel 0.  Equivalent
-  /// to calling WaitForFrame() followed by GetImage(0, image).
+  /// Wait for the next frame and get the image.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
   uint64_t GrabFrame(cv::Mat* image) const;

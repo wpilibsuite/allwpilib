@@ -42,11 +42,6 @@ public class VideoSource {
     return CameraServerJNI.getSourceLastFrameTime(m_handle);
   }
 
-  /// Get the number of channels this source provides.
-  public int getNumChannels() {
-    return CameraServerJNI.getSourceNumChannels(m_handle);
-  }
-
   /// Is the source currently connected to whatever is providing the images?
   public boolean isConnected() {
     return CameraServerJNI.isSourceConnected(m_handle);

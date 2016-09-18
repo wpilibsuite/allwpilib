@@ -88,8 +88,7 @@ CS_Source CS_CreateUSBSourcePath(const char* name, const char* path,
                                  CS_Status* status);
 CS_Source CS_CreateHTTPSource(const char* name, const char* url,
                               CS_Status* status);
-CS_Source CS_CreateCvSource(const char* name, int numChannels,
-                            CS_Status* status);
+CS_Source CS_CreateCvSource(const char* name, CS_Status* status);
 
 //
 // Source Functions
@@ -97,7 +96,6 @@ CS_Source CS_CreateCvSource(const char* name, int numChannels,
 char* CS_GetSourceName(CS_Source source, CS_Status* status);
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
-int CS_GetSourceNumChannels(CS_Source source, CS_Status* status);
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status);
 CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
                                  CS_Status* status);
@@ -109,9 +107,6 @@ void CS_ReleaseSource(CS_Source source, CS_Status* status);
 //
 // OpenCV Source Functions
 //
-void CS_PutSourceImage(CS_Source source, int channel, struct CvMat* image,
-                       CS_Status* status);
-void CS_NotifySourceFrame(CS_Source source, CS_Status* status);
 void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
                        CS_Status* status);
 void CS_NotifySourceError(CS_Source source, const char* msg, CS_Status* status);
@@ -151,16 +146,8 @@ CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status);
 void CS_ReleaseSink(CS_Sink sink, CS_Status* status);
 
 //
-// Server Sink (e.g. HTTP) Functions
-//
-void CS_SetSinkSourceChannel(CS_Sink sink, int channel, CS_Status* status);
-
-//
 // OpenCV Sink Functions
 //
-uint64_t CS_SinkWaitForFrame(CS_Sink sink, CS_Status* status);
-CS_Bool CS_GetSinkImage(CS_Sink sink, int channel, struct CvMat* image,
-                        CS_Status* status);
 uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_Status* status);
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status);
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
@@ -203,7 +190,6 @@ typedef struct CS_USBCameraInfo {
   int dev;
   char* path;
   char* name;
-  int channels;
 } CS_USBCameraInfo;
 
 CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status);

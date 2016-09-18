@@ -23,12 +23,4 @@ public class HTTPSink extends VideoSink {
   public HTTPSink(String name, int port) {
     this(name, "", port);
   }
-
-  /// Set what video channel should be served.
-  /// MJPEG-HTTP can only serve a single channel of video.
-  /// By default, channel 0 is served.
-  /// @param channel video channel to serve to clients
-  public void setSourceChannel(int channel) {
-    CameraServerJNI.setSinkSourceChannel(m_handle, channel);
-  }
 }

@@ -34,7 +34,6 @@ class SourceImpl {
   llvm::StringRef GetName() const { return m_name; }
   virtual llvm::StringRef GetDescription(
       llvm::SmallVectorImpl<char>& buf) const = 0;
-  int GetNumChannels() const { return m_numChannels; }
   bool IsConnected() const { return m_connected; }
 
   // Functions to keep track of the overall number of sinks connected to this
@@ -101,10 +100,9 @@ class SourceImpl {
 
  protected:
   void StartFrame();
-  Image& AddImage(std::size_t channel, std::size_t size);
+  Image& AddImage(std::size_t size);
   void FinishFrame();
 
-  std::atomic_int m_numChannels{0};
   std::atomic_bool m_connected{false};
   std::atomic_int m_numSinks{0};
 

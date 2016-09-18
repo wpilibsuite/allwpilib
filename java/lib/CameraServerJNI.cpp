@@ -66,12 +66,11 @@ static inline bool CheckStatus(JNIEnv *env, CS_Status status,
 
 static jobject MakeJObject(JNIEnv *env, const cs::USBCameraInfo &info) {
   static jmethodID constructor = env->GetMethodID(
-      usbCameraInfoCls, "<init>", "(ILjava/lang/String;Ljava/lang/String;I)V");
+      usbCameraInfoCls, "<init>", "(ILjava/lang/String;Ljava/lang/String;)V");
   JLocal<jstring> path(env, MakeJString(env, info.path));
   JLocal<jstring> name(env, MakeJString(env, info.name));
   return env->NewObject(usbCameraInfoCls, constructor,
-                        static_cast<jint>(info.dev), path.obj(), name.obj(),
-                        static_cast<jint>(info.channels));
+                        static_cast<jint>(info.dev), path.obj(), name.obj());
 }
 
 extern "C" {
@@ -303,13 +302,13 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createHTTPSourc
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    createCvSource
- * Signature: (Ljava/lang/String;I)I
+ * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createCvSource
-  (JNIEnv *env, jclass, jstring name, jint numChannels)
+  (JNIEnv *env, jclass, jstring name)
 {
   CS_Status status;
-  auto val = cs::CreateCvSource(JStringRef{env, name}, numChannels, &status);
+  auto val = cs::CreateCvSource(JStringRef{env, name}, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -354,20 +353,6 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSourceLastF
 {
   CS_Status status;
   auto val = cs::GetSourceLastFrameTime(source, &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    getSourceNumChannels
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSourceNumChannels
-  (JNIEnv *env, jclass, jint source)
-{
-  CS_Status status;
-  auto val = cs::GetSourceNumChannels(source, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -439,19 +424,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_releaseSource
 {
   CS_Status status;
   cs::ReleaseSource(source, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    notifySourceFrame
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_notifySourceFrame
-  (JNIEnv *env, jclass, jint source)
-{
-  CS_Status status;
-  cs::NotifySourceFrame(source, &status);
   CheckStatus(env, status);
 }
 
@@ -649,33 +621,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_releaseSink
   CS_Status status;
   cs::ReleaseSink(sink, &status);
   CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    setSinkSourceChannel
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSinkSourceChannel
-  (JNIEnv *env, jclass, jint sink, jint channel)
-{
-  CS_Status status;
-  cs::SetSinkSourceChannel(sink, channel, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    sinkWaitForFrame
- * Signature: (I)J
- */
-JNIEXPORT jlong JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_sinkWaitForFrame
-  (JNIEnv *env, jclass, jint sink)
-{
-  CS_Status status;
-  auto val = cs::SinkWaitForFrame(sink, &status);
-  CheckStatus(env, status);
-  return val;
 }
 
 /*

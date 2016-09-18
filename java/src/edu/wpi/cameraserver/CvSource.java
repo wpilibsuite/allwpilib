@@ -9,33 +9,13 @@ package edu.wpi.cameraserver;
 
 /// A source that represents a video camera.
 public class CvSource extends VideoSource {
-  /// Create an OpenCV source with a single channel.
-  /// @param name Source name (arbitrary unique identifier)
-  public CvSource(String name) {
-    super(CameraServerJNI.createCvSource(name, 1));
-  }
-
   /// Create an OpenCV source.
   /// @param name Source name (arbitrary unique identifier)
-  /// @param numChannels Number of channels
-  public CvSource(String name, int numChannels) {
-    super(CameraServerJNI.createCvSource(name, numChannels));
+  public CvSource(String name) {
+    super(CameraServerJNI.createCvSource(name));
   }
 
-  /// Put an OpenCV image onto the specified channel.
-  /// @param channel Channel number (range 0 to nChannels-1)
-  /// @param image OpenCV image
-  //public void putImage(int channel, Mat image);
-
-  /// Signal sinks connected to this source that all new channel images have
-  /// been put to the stream and are ready to be read.
-  public void notifyFrame() {
-    CameraServerJNI.notifySourceFrame(m_handle);
-  }
-
-  /// Put an OpenCV image onto channel 0 and notify sinks.
-  /// This is identical in behavior to calling PutImage(0, image) followed by
-  /// NotifyFrame().
+  /// Put an OpenCV image and notify sinks.
   /// @param image OpenCV image
   //public void putFrame(Mat image);
 

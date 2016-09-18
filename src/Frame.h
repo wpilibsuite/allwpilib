@@ -25,7 +25,7 @@ class Frame {
   struct Data {
     std::atomic_int refcount{0};
     std::chrono::system_clock::time_point timestamp;
-    llvm::SmallVector<Image, 4> images;
+    Image image;
   };
 
  public:
@@ -53,14 +53,14 @@ class Frame {
 
   explicit operator bool() const { return m_data; }
 
-  std::size_t size(std::size_t channel) const {
-    if (!m_data || channel >= m_data->images.size()) return 0;
-    return m_data->images[channel].size();
+  std::size_t size() const {
+    if (!m_data) return 0;
+    return m_data->image.size();
   }
 
-  const char* data(std::size_t channel) const {
-    if (!m_data || channel >= m_data->images.size()) return nullptr;
-    return m_data->images[channel].data();
+  const char* data() const {
+    if (!m_data) return nullptr;
+    return m_data->image.data();
   }
 
   std::chrono::system_clock::time_point time() const {

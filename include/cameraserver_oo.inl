@@ -122,11 +122,6 @@ inline uint64_t VideoSource::GetLastFrameTime() const {
   return GetSourceLastFrameTime(m_handle, &m_status);
 }
 
-inline int VideoSource::GetNumChannels() const {
-  m_status = 0;
-  return GetSourceNumChannels(m_handle, &m_status);
-}
-
 inline bool VideoSource::IsConnected() const {
   m_status = 0;
   return IsSourceConnected(m_handle, &m_status);
@@ -154,18 +149,8 @@ inline HTTPCamera::HTTPCamera(llvm::StringRef name, llvm::StringRef url) {
   m_handle = CreateHTTPSource(name, url, &m_status);
 }
 
-inline CvSource::CvSource(llvm::StringRef name, int numChannels) {
-  m_handle = CreateCvSource(name, numChannels, &m_status);
-}
-
-inline void CvSource::PutImage(int channel, cv::Mat* image) {
-  m_status = 0;
-  PutSourceImage(m_handle, channel, image, &m_status);
-}
-
-inline void CvSource::NotifyFrame() {
-  m_status = 0;
-  NotifySourceFrame(m_handle, &m_status);
+inline CvSource::CvSource(llvm::StringRef name) {
+  m_handle = CreateCvSource(name, &m_status);
 }
 
 inline void CvSource::PutFrame(cv::Mat* image) {
@@ -265,11 +250,6 @@ inline HTTPSink::HTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,
   m_handle = CreateHTTPSink(name, listenAddress, port, &m_status);
 }
 
-inline void HTTPSink::SetSourceChannel(int channel) {
-  m_status = 0;
-  SetSinkSourceChannel(m_handle, channel, &m_status);
-}
-
 inline CvSink::CvSink(llvm::StringRef name) {
   m_handle = CreateCvSink(name, &m_status);
 }
@@ -277,16 +257,6 @@ inline CvSink::CvSink(llvm::StringRef name) {
 inline CvSink::CvSink(llvm::StringRef name,
                       std::function<void(uint64_t time)> processFrame) {
   m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
-}
-
-inline uint64_t CvSink::WaitForFrame() const {
-  m_status = 0;
-  return SinkWaitForFrame(m_handle, &m_status);
-}
-
-inline bool CvSink::GetImage(int channel, cv::Mat* image) const {
-  m_status = 0;
-  return GetSinkImage(m_handle, channel, image, &m_status);
 }
 
 inline uint64_t CvSink::GrabFrame(cv::Mat* image) const {

@@ -38,8 +38,6 @@ class HTTPSinkImpl : public SinkImpl {
   llvm::StringRef GetDescription(
       llvm::SmallVectorImpl<char>& buf) const override;
 
-  void SetSourceChannel(int channel) { m_sourceChannel.store(channel); }
-
   void Stop();
 
   static void SendHeader(llvm::raw_ostream& os, int code,
@@ -64,7 +62,6 @@ class HTTPSinkImpl : public SinkImpl {
   std::string m_description;
 
   std::unique_ptr<wpi::NetworkAcceptor> m_acceptor;
-  std::atomic_int m_sourceChannel;
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_serverThread;
 

@@ -172,8 +172,7 @@ CS_Source CreateHTTPSource(llvm::StringRef name, llvm::StringRef url,
   return 0;  // TODO
 }
 
-CS_Source CreateCvSource(llvm::StringRef name, int numChannels,
-                         CS_Status* status) {
+CS_Source CreateCvSource(llvm::StringRef name, CS_Status* status) {
   return 0;  // TODO
 }
 
@@ -224,15 +223,6 @@ llvm::StringRef GetSourceDescription(CS_Source source,
 
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
   return 0;  // TODO
-}
-
-int GetSourceNumChannels(CS_Source source, CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
-  if (!data) {
-    *status = CS_INVALID_HANDLE;
-    return 0;
-  }
-  return data->source->GetNumChannels();
 }
 
 bool IsSourceConnected(CS_Source source, CS_Status* status) {
@@ -291,15 +281,6 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
 //
 // OpenCV Source Functions
 //
-
-void PutSourceImage(CS_Source source, int channel, cv::Mat* image,
-                    CS_Status* status) {
-  // TODO
-}
-
-void NotifySourceFrame(CS_Source source, CS_Status* status) {
-  // TODO
-}
 
 void PutSourceFrame(CS_Source source, cv::Mat* image, CS_Status* status) {
   // TODO
@@ -451,15 +432,6 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
 //
 // OpenCV Sink Functions
 //
-
-uint64_t SinkWaitForFrame(CS_Sink sink, CS_Status* status) {
-  return 0;  // TODO
-}
-
-bool GetSinkImage(CS_Sink sink, int channel, cv::Mat* image,
-                  CS_Status* status) {
-  return false;  // TODO
-}
 
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat* image, CS_Status* status) {
   return 0;  // TODO

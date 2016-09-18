@@ -321,11 +321,11 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
                            .count();
     header.clear();
     oss << "Content-Type: image/jpeg\r\n"
-        << "Content-Length: " << frame.size(m_sourceChannel) << "\r\n"
+        << "Content-Length: " << frame.size() << "\r\n"
         << "X-Timestamp: " << timestamp << "\r\n"
         << "\r\n";
     os << oss.str();
-    os << frame.data(m_sourceChannel);
+    os << frame.data();
     os << "\r\n--" BOUNDARY "\r\n";
     // os.flush();
   }
@@ -454,19 +454,6 @@ CS_Sink CreateHTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,
   return Sinks::GetInstance().Allocate(SinkData::kHTTP, sink);
 }
 
-void SetSinkSourceChannel(CS_Sink sink, int channel, CS_Status* status) {
-  auto data = Sinks::GetInstance().Get(sink);
-  if (!data) {
-    *status = CS_INVALID_HANDLE;
-    return;
-  }
-  if (data->type != SinkData::kHTTP) {
-    *status = CS_WRONG_HANDLE_SUBTYPE;
-    return;
-  }
-  static_cast<HTTPSinkImpl*>(data->sink.get())->SetSourceChannel(channel);
-}
-
 }  // namespace cs
 
 extern "C" {
@@ -474,10 +461,6 @@ extern "C" {
 CS_Sink CS_CreateHTTPSink(const char* name, const char* listenAddress, int port,
                           CS_Status* status) {
   return cs::CreateHTTPSink(name, listenAddress, port, status);
-}
-
-void CS_SetSinkSourceChannel(CS_Sink sink, int channel, CS_Status* status) {
-  return cs::SetSinkSourceChannel(sink, channel, status);
 }
 
 }  // extern "C"

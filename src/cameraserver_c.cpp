@@ -108,9 +108,8 @@ CS_Source CS_CreateHTTPSource(const char* name, const char* url,
   return cs::CreateHTTPSource(name, url, status);
 }
 
-CS_Source CS_CreateCvSource(const char* name, int numChannels,
-                            CS_Status* status) {
-  return cs::CreateCvSource(name, numChannels, status);
+CS_Source CS_CreateCvSource(const char* name, CS_Status* status) {
+  return cs::CreateCvSource(name, status);
 }
 
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
@@ -129,10 +128,6 @@ char* CS_GetSourceDescription(CS_Source source, CS_Status* status) {
 
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
   return cs::GetSourceLastFrameTime(source, status);
-}
-
-int CS_GetSourceNumChannels(CS_Source source, CS_Status* status) {
-  return cs::GetSourceNumChannels(source, status);
 }
 
 CS_Bool CS_IsSourceConnected(CS_Source source, CS_Status* status) {
@@ -161,15 +156,6 @@ CS_Source CS_CopySource(CS_Source source, CS_Status* status) {
 
 void CS_ReleaseSource(CS_Source source, CS_Status* status) {
   return cs::ReleaseSource(source, status);
-}
-
-void CS_PutSourceImage(CS_Source source, int channel, struct CvMat* image,
-                       CS_Status* status) {
-  //TODO: return cs::PutSourceImage(source, channel, image, status);
-}
-
-void CS_NotifySourceFrame(CS_Source source, CS_Status* status) {
-  return cs::NotifySourceFrame(source, status);
 }
 
 void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
@@ -258,15 +244,6 @@ void CS_ReleaseSink(CS_Sink sink, CS_Status* status) {
   return cs::ReleaseSink(sink, status);
 }
 
-uint64_t CS_SinkWaitForFrame(CS_Sink sink, CS_Status* status) {
-  return cs::SinkWaitForFrame(sink, status);
-}
-
-CS_Bool CS_GetSinkImage(CS_Sink sink, int channel, struct CvMat* image,
-                        CS_Status* status) {
-  return 0;  //TODO: cs::GetSinkImage(sink, channel, image, status);
-}
-
 uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
                           CS_Status* status) {
   return 0;  // TODO: cs::GrabSinkFrame(sink, image, status);
@@ -334,7 +311,6 @@ CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status) {
     out[i].dev = cameras[i].dev;
     out[i].path = ConvertToC(cameras[i].path);
     out[i].name = ConvertToC(cameras[i].name);
-    out[i].channels = cameras[i].channels;
   }
   return out;
 }

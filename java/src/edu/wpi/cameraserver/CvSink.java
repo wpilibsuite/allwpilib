@@ -30,22 +30,7 @@ public class CvSink extends VideoSink {
   //  super(CameraServerJNI.createCvSinkCallback(name, processFrame));
   //}
 
-  /// Wait for the next frame.  This is a blocking call.
-  /// @return Frame time, or 0 on error (call GetError() to obtain the error
-  ///         message).
-  public long waitForFrame() {
-    return CameraServerJNI.sinkWaitForFrame(m_handle);
-  }
-
-  /// Get an OpenCV image from the specified channel.
-  /// @return False if image could not be obtained for some reason (e.g.
-  ///         channel out of range)
-  //public boolean getImage(int channel, CvMat image) {
-  //  return CameraServerJNI.getSinkImage(m_handle, channel, image);
-  //}
-
-  /// Wait for the next frame and get the image from channel 0.  Equivalent
-  /// to calling WaitForFrame() followed by GetImage(0, image).
+  /// Wait for the next frame and get the image.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
   //public long grabFrame(CvMat image) {

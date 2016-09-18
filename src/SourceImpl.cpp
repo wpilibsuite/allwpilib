@@ -49,7 +49,7 @@ void SourceImpl::StartFrame() {
   }
 }
 
-//TODO: Image& SourceImpl::AddImage(std::size_t channel, std::size_t size) {}
+//TODO: Image& SourceImpl::AddImage(std::size_t size) {}
 
 void SourceImpl::FinishFrame() {
   {
@@ -62,9 +62,8 @@ void SourceImpl::FinishFrame() {
 
 void SourceImpl::ReleaseFrame(Frame::Data* data) {
   std::lock_guard<std::mutex> lock{m_mutex};
-  // Return the images to the pool
-  for (auto&& image : data->images)
-    m_imagesAvail.emplace_back(std::move(image));
+  // Return the image to the pool
+  m_imagesAvail.emplace_back(std::move(data->image));
   // Return the frame to the pool
   m_framesAvail.emplace_back(data);
 }

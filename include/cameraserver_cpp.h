@@ -40,9 +40,6 @@ struct USBCameraInfo {
   std::string path;
   /// Vendor/model name of the camera as provided by the USB driver
   std::string name;
-  /// Number of channels the camera provides (usually 1, but some cameras such
-  /// as stereo or depth cameras may provide multiple channels).
-  int channels;
 };
 
 //
@@ -79,8 +76,7 @@ CS_Source CreateUSBSourcePath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status);
 CS_Source CreateHTTPSource(llvm::StringRef name, llvm::StringRef url,
                            CS_Status* status);
-CS_Source CreateCvSource(llvm::StringRef name, int numChannels,
-                         CS_Status* status);
+CS_Source CreateCvSource(llvm::StringRef name, CS_Status* status);
 
 //
 // Source Functions
@@ -94,7 +90,6 @@ llvm::StringRef GetSourceDescription(CS_Source source,
                                      llvm::SmallVectorImpl<char>& buf,
                                      CS_Status* status);
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status);
-int GetSourceNumChannels(CS_Source source, CS_Status* status);
 bool IsSourceConnected(CS_Source source, CS_Status* status);
 CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
                               CS_Status* status);
@@ -107,9 +102,6 @@ void ReleaseSource(CS_Source source, CS_Status* status);
 //
 // OpenCV Source Functions
 //
-void PutSourceImage(CS_Source source, int channel, cv::Mat* image,
-                    CS_Status* status);
-void NotifySourceFrame(CS_Source source, CS_Status* status);
 void PutSourceFrame(CS_Source source, cv::Mat* image, CS_Status* status);
 void NotifySourceError(CS_Source source, llvm::StringRef msg,
                        CS_Status* status);
@@ -152,15 +144,8 @@ CS_Sink CopySink(CS_Sink sink, CS_Status* status);
 void ReleaseSink(CS_Sink sink, CS_Status* status);
 
 //
-// Server Sink (e.g. HTTP) Functions
-//
-void SetSinkSourceChannel(CS_Sink sink, int channel, CS_Status* status);
-
-//
 // OpenCV Sink Functions
 //
-uint64_t SinkWaitForFrame(CS_Sink sink, CS_Status* status);
-bool GetSinkImage(CS_Sink sink, int channel, cv::Mat* image, CS_Status* status);
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat* image, CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
 llvm::StringRef GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,

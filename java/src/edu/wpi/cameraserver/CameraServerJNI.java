@@ -95,7 +95,7 @@ public class CameraServerJNI {
   public static native int createUSBSourceDev(String name, int dev);
   public static native int createUSBSourcePath(String name, String path);
   public static native int createHTTPSource(String name, String url);
-  public static native int createCvSource(String name, int numChannels);
+  public static native int createCvSource(String name);
 
   //
   // Source Functions
@@ -103,7 +103,6 @@ public class CameraServerJNI {
   public static native String getSourceName(int source);
   public static native String getSourceDescription(int source);
   public static native long getSourceLastFrameTime(int source);
-  public static native int getSourceNumChannels(int source);
   public static native boolean isSourceConnected(int source);
   public static native int getSourceProperty(int source, String name);
   public static native int[] enumerateSourceProperties(int source);
@@ -113,8 +112,6 @@ public class CameraServerJNI {
   //
   // OpenCV Source Functions
   //
-  //public static native void putSourceImage(int source, int channel, CvMat image);
-  public static native void notifySourceFrame(int source);
   //public static native void putSourceFrame(int source, CvMat image);
   public static native void notifySourceError(int source, String msg);
   public static native void setSourceConnected(int source, boolean connected);
@@ -146,15 +143,8 @@ public class CameraServerJNI {
   public static native void releaseSink(int sink);
 
   //
-  // Server Sink (e.g. HTTP) Functions
-  //
-  public static native void setSinkSourceChannel(int sink, int channel);
-
-  //
   // OpenCV Sink Functions
   //
-  public static native long sinkWaitForFrame(int sink);
-  //public static native int getSinkImage(int sink, CvMat image);
   //public static native int grabSinkFrame(int sink, CvMat image);
   public static native String getSinkError(int sink);
   public static native void setSinkEnabled(int sink, boolean enabled);
