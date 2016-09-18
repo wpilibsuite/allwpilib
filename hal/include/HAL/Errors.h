@@ -7,7 +7,7 @@
 
 #pragma once
 
-#define CTR_RxTimeout_MESSAGE "CTRE CAN Recieve Timeout"
+#define CTR_RxTimeout_MESSAGE "CTRE CAN Receive Timeout"
 #define CTR_TxTimeout_MESSAGE "CTRE CAN Transmit Timeout"
 #define CTR_InvalidParamValue_MESSAGE "CTRE CAN Invalid Parameter"
 #define CTR_UnexpectedArbId_MESSAGE \
@@ -19,7 +19,7 @@
 #define NiFpga_Status_TransferAborted_MESSAGE "NIFPGA: Transfer aborted error"
 #define NiFpga_Status_MemoryFull_MESSAGE \
   "NIFPGA: Memory Allocation failed, memory full"
-#define NiFpga_Status_SoftwareFault_MESSAGE "NIFPGA: Unexepected software error"
+#define NiFpga_Status_SoftwareFault_MESSAGE "NIFPGA: Unexpected software error"
 #define NiFpga_Status_InvalidParameter_MESSAGE "NIFPGA: Invalid Parameter"
 #define NiFpga_Status_ResourceNotFound_MESSAGE "NIFPGA: Resource not found"
 #define NiFpga_Status_ResourceNotInitialized_MESSAGE \
