@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "simulation/SimContinuousOutput.h"
+
 #include "simulation/MainNode.h"
 
 SimContinuousOutput::SimContinuousOutput(std::string topic) {

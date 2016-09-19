@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "simulation/SimDigitalInput.h"
+
 #include "simulation/MainNode.h"
 
 SimDigitalInput::SimDigitalInput(std::string topic) {

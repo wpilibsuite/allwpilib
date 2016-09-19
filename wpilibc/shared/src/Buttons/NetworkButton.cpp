@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Buttons/NetworkButton.h"
+
 #include "networktables/NetworkTable.h"
 
 NetworkButton::NetworkButton(const std::string& tableName,

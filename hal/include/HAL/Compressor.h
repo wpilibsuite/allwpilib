@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status);
 HAL_Bool HAL_CheckCompressorModule(int32_t module);
 

@@ -12,6 +12,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 int32_t HAL_GetNumAccumulators(void);
 int32_t HAL_GetNumAnalogTriggers(void);
 int32_t HAL_GetNumAnalogInputs(void);

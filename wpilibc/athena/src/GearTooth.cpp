@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "GearTooth.h"
+
 #include "LiveWindow/LiveWindow.h"
 
 constexpr double GearTooth::kGearToothThreshold;

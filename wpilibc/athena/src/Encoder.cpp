@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Encoder.h"
+
 #include "DigitalInput.h"
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"

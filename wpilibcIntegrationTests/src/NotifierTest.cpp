@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Notifier.h"
+#include "Notifier.h"  // NOLINT(build/include_order)
 
 #include "TestBench.h"
 #include "Timer.h"

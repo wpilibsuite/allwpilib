@@ -12,6 +12,7 @@
  */
 
 #include <stdint.h>
+
 #include <string>
 
 #define wpi_assert(condition) \

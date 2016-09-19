@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogPotentiometer.h"
+
 #include "ControllerPower.h"
 
 /**

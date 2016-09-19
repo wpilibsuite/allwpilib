@@ -6,8 +6,10 @@
 /*----------------------------------------------------------------------------*/
 
 #include "LiveWindow/LiveWindow.h"
+
 #include <algorithm>
 #include <sstream>
+
 #include "networktables/NetworkTable.h"
 
 /**

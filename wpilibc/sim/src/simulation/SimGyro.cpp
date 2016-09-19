@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "simulation/SimGyro.h"
+
 #include "simulation/MainNode.h"
 
 SimGyro::SimGyro(std::string topic) {

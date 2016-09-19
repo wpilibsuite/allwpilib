@@ -7,8 +7,6 @@
 
 #include "USBCamera.h"
 
-#include "Utility.h"
-
 #include <chrono>
 #include <cstdlib>
 #include <iomanip>
@@ -16,6 +14,8 @@
 #include <memory>
 #include <regex>
 #include <thread>
+
+#include "Utility.h"
 
 // This macro expands the given imaq function to ensure that it is called and
 // properly checked for an error, calling the wpi_setImaqErrorWithContext

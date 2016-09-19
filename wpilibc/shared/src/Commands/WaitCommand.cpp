@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Commands/WaitCommand.h"
+
 #include <sstream>
 
 WaitCommand::WaitCommand(double timeout)

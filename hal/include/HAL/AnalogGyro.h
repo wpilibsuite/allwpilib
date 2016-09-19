@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle handle,
                                         int32_t* status);
 void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status);

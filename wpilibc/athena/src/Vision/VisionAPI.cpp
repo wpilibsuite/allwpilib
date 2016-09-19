@@ -5,11 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "Vision/VisionAPI.h"
+
 #include <cstdarg>
 
 #include "Vision/BaeUtilities.h"
 #include "Vision/FrcError.h"
-#include "Vision/VisionAPI.h"
 
 int VisionAPI_debugFlag = 1;
 #define DPRINTF \

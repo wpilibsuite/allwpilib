@@ -53,3 +53,19 @@ modifiableFileExclude {
   \.py$
   \.so$
 }
+
+includeRelated {
+}
+
+includeCSys {
+}
+
+includeCppSys {
+}
+
+includeOtherLibs {
+}
+
+includeProject {
+  ^ctre/
+}

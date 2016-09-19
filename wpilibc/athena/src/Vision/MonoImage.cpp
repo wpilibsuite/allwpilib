@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Vision/MonoImage.h"
+
 #include "nivision.h"
 
 MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}

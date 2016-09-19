@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
 #include "PWM.h"

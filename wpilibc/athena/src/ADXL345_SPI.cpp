@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXL345_SPI.h"
+
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
 #include "HAL/HAL.h"

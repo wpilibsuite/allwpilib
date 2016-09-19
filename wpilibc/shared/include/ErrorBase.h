@@ -9,7 +9,6 @@
 
 #include "Base.h"
 #include "Error.h"
-
 #include "HAL/cpp/priority_mutex.h"
 #include "llvm/StringRef.h"
 

@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Resource.h"
+
 #include "ErrorBase.h"
 #include "WPIErrors.h"
 

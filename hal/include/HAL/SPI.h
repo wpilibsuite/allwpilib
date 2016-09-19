@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void HAL_InitializeSPI(int32_t port, int32_t* status);
 int32_t HAL_TransactionSPI(int32_t port, uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size);

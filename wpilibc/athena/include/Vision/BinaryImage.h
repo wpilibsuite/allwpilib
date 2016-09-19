@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "MonoImage.h"
+
 /**
  * Included for ParticleAnalysisReport definition
  * TODO: Eliminate this dependency!

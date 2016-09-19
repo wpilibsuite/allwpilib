@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DigitalGlitchFilter.h"
+#include "DigitalGlitchFilter.h"  // NOLINT(build/include_order)
 
 #include "Counter.h"
 #include "DigitalInput.h"

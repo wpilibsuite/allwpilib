@@ -7,7 +7,7 @@
 
 #include "Commands/PIDCommand.h"
 
-#include "float.h"
+#include <cfloat>
 
 PIDCommand::PIDCommand(const std::string& name, double p, double i, double d,
                        double f, double period)

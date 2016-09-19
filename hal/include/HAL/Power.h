@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 double HAL_GetVinVoltage(int32_t* status);
 double HAL_GetVinCurrent(int32_t* status);
 double HAL_GetUserVoltage6V(int32_t* status);

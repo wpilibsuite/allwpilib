@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Counter.h"
+#include "Counter.h"  // NOLINT(build/include_order)
 
 #include "Jaguar.h"
 #include "Talon.h"

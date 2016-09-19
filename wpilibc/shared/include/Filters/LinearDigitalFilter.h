@@ -10,6 +10,7 @@
 #include <initializer_list>
 #include <memory>
 #include <vector>
+
 #include "CircularBuffer.h"
 #include "Filter.h"
 

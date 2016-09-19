@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "BuiltInAccelerometer.h"
+
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"

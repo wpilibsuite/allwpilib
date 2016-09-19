@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXRS450_Gyro.h"
+
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"

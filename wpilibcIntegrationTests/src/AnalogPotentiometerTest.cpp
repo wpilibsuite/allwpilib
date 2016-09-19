@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "AnalogPotentiometer.h"
+#include "AnalogPotentiometer.h"  // NOLINT(build/include_order)
 
 #include "AnalogOutput.h"
 #include "ControllerPower.h"

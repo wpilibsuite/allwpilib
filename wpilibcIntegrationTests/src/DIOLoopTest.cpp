@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DigitalInput.h"
-#include "DigitalOutput.h"
+#include "DigitalInput.h"   // NOLINT(build/include_order)
+#include "DigitalOutput.h"  // NOLINT(build/include_order)
 
 #include "Counter.h"
 #include "InterruptableSensorBase.h"

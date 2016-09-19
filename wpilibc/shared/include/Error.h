@@ -7,7 +7,12 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <string>
+
 #include "Base.h"
+#include "llvm/StringRef.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -15,10 +20,6 @@
 // don't want it.
 #undef GetMessage
 #endif
-
-#include <stdint.h>
-#include <string>
-#include "llvm/StringRef.h"
 
 //  Forward declarations
 class ErrorBase;
