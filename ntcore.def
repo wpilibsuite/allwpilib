@@ -93,3 +93,22 @@ NT_SetDefaultEntryStringArray @94
 NT_PollRpcTimeout @95
 NT_GetRpcResultTimeout @96
 NT_CancelBlockingRpcResult @97
+
+NT_GetStringForTesting @98
+NT_GetEntryInfoForTesting @99
+NT_FreeEntryInfoForTesting @101
+NT_GetConnectionInfoForTesting @102
+NT_FreeConnectionInfoForTesting @103
+NT_GetValueBooleanForTesting @104
+NT_GetValueDoubleForTesting @105
+NT_GetValueStringForTesting @106
+NT_GetValueRawForTesting @107
+NT_GetValueBooleanArrayForTesting @108
+NT_GetValueDoubleArrayForTesting @109
+NT_GetValueStringArrayForTesting @110
+NT_GetRpcParamDefForTesting @111
+NT_FreeRpcParamDefForTesting @112
+NT_GetRpcResultsDefForTesting @113
+NT_FreeRpcResultsDefForTesting @114
+NT_GetRpcDefinitionForTesting @115
+NT_GetRpcCallInfoForTesting @116
