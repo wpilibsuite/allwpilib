@@ -25,24 +25,24 @@ class MainNode {
 
   template <typename M>
   static transport::PublisherPtr Advertise(const std::string& topic,
-                                           int _queueLimit = 10,
-                                           bool _latch = false) {
-    return GetInstance()->main->Advertise<M>(topic, _queueLimit, _latch);
+                                           int queueLimit = 10,
+                                           bool latch = false) {
+    return GetInstance()->main->Advertise<M>(topic, queueLimit, latch);
   }
 
   template <typename M, typename T>
   static transport::SubscriberPtr Subscribe(
       const std::string& topic,
       void (T::*fp)(const boost::shared_ptr<M const>&), T* obj,
-      bool _latching = false) {
-    return GetInstance()->main->Subscribe(topic, fp, obj, _latching);
+      bool latching = false) {
+    return GetInstance()->main->Subscribe(topic, fp, obj, latching);
   }
 
   template <typename M>
   static transport::SubscriberPtr Subscribe(
       const std::string& topic, void (*fp)(const boost::shared_ptr<M const>&),
-      bool _latching = false) {
-    return GetInstance()->main->Subscribe(topic, fp, _latching);
+      bool latching = false) {
+    return GetInstance()->main->Subscribe(topic, fp, latching);
   }
 
   transport::NodePtr main;
