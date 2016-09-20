@@ -223,7 +223,6 @@ public class IterativeRobot extends RobotBase {
       System.out.println("Default IterativeRobot.robotPeriodic() method... Overload me!");
       m_rpFirstRun = false;
     }
-    Timer.delay(0.001);
   }
 
   private boolean m_dpFirstRun = true;
@@ -244,7 +243,6 @@ public class IterativeRobot extends RobotBase {
       System.out.println("Default IterativeRobot.disabledPeriodic() method... Overload me!");
       m_dpFirstRun = false;
     }
-    Timer.delay(0.001);
   }
 
   private boolean m_apFirstRun = true;
@@ -265,7 +263,6 @@ public class IterativeRobot extends RobotBase {
       System.out.println("Default IterativeRobot.autonomousPeriodic() method... Overload me!");
       m_apFirstRun = false;
     }
-    Timer.delay(0.001);
   }
 
   private boolean m_tpFirstRun = true;
@@ -286,7 +283,6 @@ public class IterativeRobot extends RobotBase {
       System.out.println("Default IterativeRobot.teleopPeriodic() method... Overload me!");
       m_tpFirstRun = false;
     }
-    Timer.delay(0.001);
   }
 
   private boolean m_tmpFirstRun = true;
