@@ -334,19 +334,19 @@ llvm::ArrayRef<int> USBCameraImpl::EnumerateProperties(
 
 bool USBCameraImpl::GetPropertyTypeValueFd(int property,
                                            CS_PropertyType propType,
-                                           unsigned* id, int* type,
-                                           int* fd) const {
+                                           unsigned* id, int* type, int* fd,
+                                           CS_Status* status) const {
   // Get id and type from cached properties
   {
     if (!m_properties_cached) CacheProperties();
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_property_data.find(property);
     if (it == m_property_data.end()) {
-      //*status = ;
+      *status = CS_INVALID_PROPERTY;
       return false;
     }
     if (it->getSecond().propType != propType) {
-      //*status = ;
+      *status = CS_WRONG_PROPERTY_TYPE;
       return false;
     }
     *id = it->getSecond().id;
@@ -355,7 +355,7 @@ bool USBCameraImpl::GetPropertyTypeValueFd(int property,
 
   *fd = m_fd.load();
   if (*fd < 0) {
-    //*status = ;
+    *status = CS_SOURCE_IS_DISCONNECTED;
     return false;
   }
   return true;
@@ -365,129 +365,135 @@ CS_PropertyType USBCameraImpl::GetPropertyType(int property) const {
   if (!m_properties_cached) CacheProperties();
   std::lock_guard<std::mutex> lock(m_mutex);
   auto it = m_property_data.find(property);
-  if (it == m_property_data.end()) {
-    //*status = ;
-    return CS_PROP_NONE;
-  }
+  if (it == m_property_data.end()) return CS_PROP_NONE;
   return it->getSecond().propType;
 }
 
-llvm::StringRef USBCameraImpl::GetPropertyName(
-    int property, llvm::SmallVectorImpl<char>& buf) const {
+llvm::StringRef USBCameraImpl::GetPropertyName(int property,
+                                               llvm::SmallVectorImpl<char>& buf,
+                                               CS_Status* status) const {
   if (!m_properties_cached) CacheProperties();
   std::lock_guard<std::mutex> lock(m_mutex);
   auto it = m_property_data.find(property);
   if (it == m_property_data.end()) {
-    //*status = ;
+    *status = CS_INVALID_PROPERTY;
     return llvm::StringRef{};
   }
   return it->getSecond().name;  // safe because we never modify it after caching
 }
 
-bool USBCameraImpl::GetBooleanProperty(int property) const {
+bool USBCameraImpl::GetBooleanProperty(int property, CS_Status* status) const {
   unsigned id;
   int type;
   int fd;
-  if (!GetPropertyTypeValueFd(property, CS_PROP_BOOLEAN, &id, &type, &fd))
+  if (!GetPropertyTypeValueFd(property, CS_PROP_BOOLEAN, &id, &type, &fd,
+                              status))
     return false;
 
   int64_t value = 0;
   if (GetIntCtrlIoctl(fd, id, type, &value) < 0) {
-    //*status = ;
+    *status = CS_PROPERTY_READ_FAILED;
     return false;
   }
   return value != 0;
 }
 
-void USBCameraImpl::SetBooleanProperty(int property, bool value) {
+void USBCameraImpl::SetBooleanProperty(int property, bool value,
+                                       CS_Status* status) {
   unsigned id;
   int type;
   int fd;
-  if (!GetPropertyTypeValueFd(property, CS_PROP_BOOLEAN, &id, &type, &fd))
+  if (!GetPropertyTypeValueFd(property, CS_PROP_BOOLEAN, &id, &type, &fd,
+                              status))
     return;
 
   if (SetIntCtrlIoctl(fd, id, type, value ? 1 : 0) < 0) {
-    //*status = ;
+    *status = CS_PROPERTY_WRITE_FAILED;
   }
 }
 
-double USBCameraImpl::GetDoubleProperty(int property) const {
+double USBCameraImpl::GetDoubleProperty(int property, CS_Status* status) const {
   unsigned id;
   int type;
   int fd;
-  if (!GetPropertyTypeValueFd(property, CS_PROP_DOUBLE, &id, &type, &fd))
+  if (!GetPropertyTypeValueFd(property, CS_PROP_DOUBLE, &id, &type, &fd,
+                              status))
     return false;
 
   int64_t value = 0;
   if (GetIntCtrlIoctl(fd, id, type, &value) < 0) {
-    //*status = ;
+    *status = CS_PROPERTY_READ_FAILED;
     return false;
   }
   return value;
 }
 
-void USBCameraImpl::SetDoubleProperty(int property, double value) {
+void USBCameraImpl::SetDoubleProperty(int property, double value,
+                                      CS_Status* status) {
   unsigned id;
   int type;
   int fd;
-  if (!GetPropertyTypeValueFd(property, CS_PROP_DOUBLE, &id, &type, &fd))
+  if (!GetPropertyTypeValueFd(property, CS_PROP_DOUBLE, &id, &type, &fd,
+                              status))
     return;
 
   if (SetIntCtrlIoctl(fd, id, type, static_cast<int64_t>(value)) < 0) {
-    //*status = ;
+    *status = CS_PROPERTY_WRITE_FAILED;
   }
 }
 
-double USBCameraImpl::GetPropertyMin(int property) const {
+double USBCameraImpl::GetPropertyMin(int property, CS_Status* status) const {
   if (!m_properties_cached) CacheProperties();
   std::lock_guard<std::mutex> lock(m_mutex);
   auto it = m_property_data.find(property);
   if (it == m_property_data.end()) {
-    //*status = ;
+    *status = CS_INVALID_PROPERTY;
     return 0;
   }
   return it->getSecond().minimum;
 }
 
-double USBCameraImpl::GetPropertyMax(int property) const {
+double USBCameraImpl::GetPropertyMax(int property, CS_Status* status) const {
   if (!m_properties_cached) CacheProperties();
   std::lock_guard<std::mutex> lock(m_mutex);
   auto it = m_property_data.find(property);
   if (it == m_property_data.end()) {
-    //*status = ;
+    *status = CS_INVALID_PROPERTY;
     return 0;
   }
   return it->getSecond().maximum;
 }
 
-double USBCameraImpl::GetPropertyStep(int property) const {
+double USBCameraImpl::GetPropertyStep(int property, CS_Status* status) const {
   if (!m_properties_cached) CacheProperties();
   std::lock_guard<std::mutex> lock(m_mutex);
   auto it = m_property_data.find(property);
   if (it == m_property_data.end()) {
-    //*status = ;
+    *status = CS_INVALID_PROPERTY;
     return 0;
   }
   return it->getSecond().step;
 }
 
-double USBCameraImpl::GetPropertyDefault(int property) const {
+double USBCameraImpl::GetPropertyDefault(int property,
+                                         CS_Status* status) const {
   if (!m_properties_cached) CacheProperties();
   std::lock_guard<std::mutex> lock(m_mutex);
   auto it = m_property_data.find(property);
   if (it == m_property_data.end()) {
-    //*status = ;
+    *status = CS_INVALID_PROPERTY;
     return 0;
   }
   return it->getSecond().defaultValue;
 }
 
 llvm::StringRef USBCameraImpl::GetStringProperty(
-    int property, llvm::SmallVectorImpl<char>& buf) const {
+    int property, llvm::SmallVectorImpl<char>& buf, CS_Status* status) const {
   unsigned id;
   int type;
   int fd;
-  if (!GetPropertyTypeValueFd(property, CS_PROP_STRING, &id, &type, &fd))
+  if (!GetPropertyTypeValueFd(property, CS_PROP_STRING, &id, &type, &fd,
+                              status))
     return llvm::StringRef{};
 
   struct v4l2_ext_control ctrl;
@@ -499,14 +505,15 @@ llvm::StringRef USBCameraImpl::GetStringProperty(
   ctrls.controls = &ctrl;
   int rc = DoIoctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
   if (rc < 0) {
-    //*status = ;
+    *status = CS_PROPERTY_READ_FAILED;
     return llvm::StringRef{};
   }
   buf.append(ctrl.string, ctrl.string + std::strlen(ctrl.string));
   return llvm::StringRef(buf.data(), buf.size());
 }
 
-void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value) {
+void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value,
+                                      CS_Status* status) {
   unsigned id;
   std::size_t maximum;
   // Get id and maximum from cached properties
@@ -515,11 +522,11 @@ void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value) {
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_property_data.find(property);
     if (it == m_property_data.end()) {
-      //*status = ;
+      *status = CS_INVALID_PROPERTY;
       return;
     }
     if (it->getSecond().propType != CS_PROP_STRING) {
-      //*status = ;
+      *status = CS_WRONG_PROPERTY_TYPE;
       return;
     }
     id = it->getSecond().id;
@@ -528,7 +535,7 @@ void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value) {
 
   int fd = m_fd.load();
   if (fd < 0) {
-    //*status = ;
+    *status = CS_SOURCE_IS_DISCONNECTED;
     return;
   }
 
@@ -545,39 +552,41 @@ void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value) {
   ctrls.controls = &ctrl;
   int rc = DoIoctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls);
   if (rc < 0) {
-    //*status = ;
+    *status = CS_PROPERTY_WRITE_FAILED;
     return;
   }
 }
 
-int USBCameraImpl::GetEnumProperty(int property) const {
+int USBCameraImpl::GetEnumProperty(int property, CS_Status* status) const {
   unsigned id;
   int type;
   int fd;
-  if (!GetPropertyTypeValueFd(property, CS_PROP_ENUM, &id, &type, &fd))
+  if (!GetPropertyTypeValueFd(property, CS_PROP_ENUM, &id, &type, &fd, status))
     return false;
 
   int64_t value = 0;
   if (GetIntCtrlIoctl(fd, id, type, &value) < 0) {
-    //*status = ;
+    *status = CS_PROPERTY_READ_FAILED;
     return false;
   }
   return static_cast<int>(value);
 }
 
-void USBCameraImpl::SetEnumProperty(int property, int value) {
+void USBCameraImpl::SetEnumProperty(int property, int value,
+                                    CS_Status* status) {
   unsigned id;
   int type;
   int fd;
-  if (!GetPropertyTypeValueFd(property, CS_PROP_ENUM, &id, &type, &fd)) return;
+  if (!GetPropertyTypeValueFd(property, CS_PROP_ENUM, &id, &type, &fd, status))
+    return;
 
   if (SetIntCtrlIoctl(fd, id, type, value) < 0) {
-    //*status = ;
+    *status = CS_PROPERTY_WRITE_FAILED;
   }
 }
 
 std::vector<std::string> USBCameraImpl::GetEnumPropertyChoices(
-    int property) const {
+    int property, CS_Status* status) const {
   unsigned id;
   unsigned minimum;
   unsigned maximum;
@@ -587,11 +596,11 @@ std::vector<std::string> USBCameraImpl::GetEnumPropertyChoices(
     std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_property_data.find(property);
     if (it == m_property_data.end()) {
-      //*status = ;
+      *status = CS_INVALID_PROPERTY;
       return std::vector<std::string>{};
     }
     if (it->getSecond().propType != CS_PROP_ENUM) {
-      //*status = ;
+      *status = CS_WRONG_PROPERTY_TYPE;
       return std::vector<std::string>{};
     }
     id = it->getSecond().id;
@@ -601,7 +610,7 @@ std::vector<std::string> USBCameraImpl::GetEnumPropertyChoices(
 
   int fd = m_fd.load();
   if (fd < 0) {
-    //*status = ;
+    *status = CS_SOURCE_IS_DISCONNECTED;
     return std::vector<std::string>{};
   }
 

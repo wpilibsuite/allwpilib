@@ -51,7 +51,7 @@ std::string GetPropertyName(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return std::string{};
-  return source->GetPropertyName(propertyIndex, buf);
+  return source->GetPropertyName(propertyIndex, buf, status);
 }
 
 llvm::StringRef GetPropertyName(CS_Property property,
@@ -60,72 +60,71 @@ llvm::StringRef GetPropertyName(CS_Property property,
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return llvm::StringRef{};
-  return source->GetPropertyName(propertyIndex, buf);
+  return source->GetPropertyName(propertyIndex, buf, status);
 }
 
 bool GetBooleanProperty(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return false;
-  return source->GetBooleanProperty(propertyIndex);
+  return source->GetBooleanProperty(propertyIndex, status);
 }
 
 void SetBooleanProperty(CS_Property property, bool value, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return;
-  source->SetBooleanProperty(propertyIndex, value);
+  source->SetBooleanProperty(propertyIndex, value, status);
 }
 
 double GetDoubleProperty(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return false;
-  return source->GetDoubleProperty(propertyIndex);
+  return source->GetDoubleProperty(propertyIndex, status);
 }
 
 void SetDoubleProperty(CS_Property property, double value, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return;
-  source->SetDoubleProperty(propertyIndex, value);
+  source->SetDoubleProperty(propertyIndex, value, status);
 }
 
 double GetPropertyMin(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
-  return source->GetPropertyMin(propertyIndex);
+  return source->GetPropertyMin(propertyIndex, status);
 }
 
 double GetPropertyMax(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
-  return source->GetPropertyMax(propertyIndex);
+  return source->GetPropertyMax(propertyIndex, status);
 }
 
 double GetPropertyStep(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
-  return source->GetPropertyStep(propertyIndex);
+  return source->GetPropertyStep(propertyIndex, status);
 }
 
 double GetPropertyDefault(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
-  return source->GetPropertyDefault(propertyIndex);
+  return source->GetPropertyDefault(propertyIndex, status);
 }
 
 std::string GetStringProperty(CS_Property property, CS_Status* status) {
-  llvm::SmallString<128> value;
+  llvm::SmallString<128> buf;
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return std::string{};
-  source->GetStringProperty(propertyIndex, value);
-  return value.str();
+  return source->GetStringProperty(propertyIndex, buf, status);
 }
 
 llvm::StringRef GetStringProperty(CS_Property property,
@@ -134,7 +133,7 @@ llvm::StringRef GetStringProperty(CS_Property property,
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return llvm::StringRef{};
-  return source->GetStringProperty(propertyIndex, buf);
+  return source->GetStringProperty(propertyIndex, buf, status);
 }
 
 void SetStringProperty(CS_Property property, llvm::StringRef value,
@@ -142,21 +141,21 @@ void SetStringProperty(CS_Property property, llvm::StringRef value,
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return;
-  source->SetStringProperty(propertyIndex, value);
+  source->SetStringProperty(propertyIndex, value, status);
 }
 
 int GetEnumProperty(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0;
-  return source->GetEnumProperty(propertyIndex);
+  return source->GetEnumProperty(propertyIndex, status);
 }
 
 void SetEnumProperty(CS_Property property, int value, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return;
-  source->SetEnumProperty(propertyIndex, value);
+  source->SetEnumProperty(propertyIndex, value, status);
 }
 
 std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
@@ -164,7 +163,7 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return std::vector<std::string>{};
-  return source->GetEnumPropertyChoices(propertyIndex);
+  return source->GetEnumPropertyChoices(propertyIndex, status);
 }
 
 //

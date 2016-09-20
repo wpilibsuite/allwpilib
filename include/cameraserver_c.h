@@ -44,9 +44,14 @@ typedef CS_Handle CS_Source;
 // Status values
 //
 enum CS_StatusValue {
+  CS_PROPERTY_WRITE_FAILED = 2000,
   CS_OK = 0,
   CS_INVALID_HANDLE = -2000,    // handle was invalid (does not exist)
-  CS_WRONG_HANDLE_SUBTYPE = -2001
+  CS_WRONG_HANDLE_SUBTYPE = -2001,
+  CS_INVALID_PROPERTY = -2002,
+  CS_WRONG_PROPERTY_TYPE = -2003,
+  CS_PROPERTY_READ_FAILED = -2004,
+  CS_SOURCE_IS_DISCONNECTED = -2005
 };
 
 //

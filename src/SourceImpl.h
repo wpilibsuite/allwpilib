@@ -82,23 +82,28 @@ class SourceImpl {
   virtual llvm::ArrayRef<int> EnumerateProperties(
       llvm::SmallVectorImpl<int>& vec) const = 0;
   virtual CS_PropertyType GetPropertyType(int property) const = 0;
-  virtual llvm::StringRef GetPropertyName(
-      int property, llvm::SmallVectorImpl<char>& buf) const = 0;
-  virtual bool GetBooleanProperty(int property) const = 0;
-  virtual void SetBooleanProperty(int property, bool value) = 0;
-  virtual double GetDoubleProperty(int property) const = 0;
-  virtual void SetDoubleProperty(int property, double value) = 0;
-  virtual double GetPropertyMin(int property) const = 0;
-  virtual double GetPropertyMax(int property) const = 0;
-  virtual double GetPropertyStep(int property) const = 0;
-  virtual double GetPropertyDefault(int property) const = 0;
-  virtual llvm::StringRef GetStringProperty(
-      int property, llvm::SmallVectorImpl<char>& buf) const = 0;
-  virtual void SetStringProperty(int property, llvm::StringRef value) = 0;
-  virtual int GetEnumProperty(int property) const = 0;
-  virtual void SetEnumProperty(int property, int value) = 0;
+  virtual llvm::StringRef GetPropertyName(int property,
+                                          llvm::SmallVectorImpl<char>& buf,
+                                          CS_Status* status) const = 0;
+  virtual bool GetBooleanProperty(int property, CS_Status* status) const = 0;
+  virtual void SetBooleanProperty(int property, bool value,
+                                  CS_Status* status) = 0;
+  virtual double GetDoubleProperty(int property, CS_Status* status) const = 0;
+  virtual void SetDoubleProperty(int property, double value,
+                                 CS_Status* status) = 0;
+  virtual double GetPropertyMin(int property, CS_Status* status) const = 0;
+  virtual double GetPropertyMax(int property, CS_Status* status) const = 0;
+  virtual double GetPropertyStep(int property, CS_Status* status) const = 0;
+  virtual double GetPropertyDefault(int property, CS_Status* status) const = 0;
+  virtual llvm::StringRef GetStringProperty(int property,
+                                            llvm::SmallVectorImpl<char>& buf,
+                                            CS_Status* status) const = 0;
+  virtual void SetStringProperty(int property, llvm::StringRef value,
+                                 CS_Status* status) = 0;
+  virtual int GetEnumProperty(int property, CS_Status* status) const = 0;
+  virtual void SetEnumProperty(int property, int value, CS_Status* status) = 0;
   virtual std::vector<std::string> GetEnumPropertyChoices(
-      int property) const = 0;
+      int property, CS_Status* status) const = 0;
 
  protected:
   void StartFrame();

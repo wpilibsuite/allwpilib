@@ -192,32 +192,33 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
     else
       os << ",\n";
     os << "{";
+    CS_Status status = 0;
     llvm::SmallString<128> name;
-    source.GetPropertyName(prop, name);
+    source.GetPropertyName(prop, name, &status);
     auto type = source.GetPropertyType(prop);
     os << "\n\"name\": \"" << name << '"';
     os << ",\n\"id\": \"" << prop << '"';
     os << ",\n\"type\": \"" << type << '"';
-    os << ",\n\"min\": \"" << source.GetPropertyMin(prop) << '"';
-    os << ",\n\"max\": \"" << source.GetPropertyMax(prop) << '"';
+    os << ",\n\"min\": \"" << source.GetPropertyMin(prop, &status) << '"';
+    os << ",\n\"max\": \"" << source.GetPropertyMax(prop, &status) << '"';
     // os << ",\n\"step\": \"" << param->step << '"';
     // os << ",\n\"default\": \"" << param->default_value << '"';
     os << ",\n\"value\": \"";
     switch (type) {
       case CS_PROP_BOOLEAN:
-        os << (source.GetBooleanProperty(prop) ? "1" : "0");
+        os << (source.GetBooleanProperty(prop, &status) ? "1" : "0");
         break;
       case CS_PROP_DOUBLE:
-        os << source.GetDoubleProperty(prop);
+        os << source.GetDoubleProperty(prop, &status);
         break;
       case CS_PROP_STRING: {
         llvm::SmallString<128> strval;
-        source.GetStringProperty(prop, strval);
+        source.GetStringProperty(prop, strval, &status);
         os << strval.str();
         break;
       }
       case CS_PROP_ENUM:
-        os << source.GetEnumProperty(prop);
+        os << source.GetEnumProperty(prop, &status);
         break;
       default:
         break;
@@ -230,7 +231,7 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
     // append the menu object to the menu typecontrols
     if (source.GetPropertyType(prop) == CS_PROP_ENUM) {
       os << ",\n\"menu\": {";
-      auto choices = source.GetEnumPropertyChoices(prop);
+      auto choices = source.GetEnumPropertyChoices(prop, &status);
       int j = 0;
       for (auto choice = choices.begin(), end = choices.end(); choice != end;
            ++j, ++choice) {
