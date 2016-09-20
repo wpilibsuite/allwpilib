@@ -22,7 +22,7 @@ class SourceImpl;
 
 // Handle data layout:
 // Bits 0-15:  Handle index
-// Bits 16-23: Subindex (property only)
+// Bits 16-23: Parent index (property only)
 // Bits 24-30: Type
 
 class Handle {
@@ -52,7 +52,7 @@ class Handle {
       return;
     }
     m_handle = ((static_cast<int>(type) & 0x7f) << 24) |
-               ((property & 0xff) << 16) | (index & 0xffff);
+               ((index & 0xff) << 16) | (property & 0xffff);
   }
 
   int GetIndex() const { return static_cast<int>(m_handle) & 0xffff; }
@@ -61,7 +61,10 @@ class Handle {
   }
   bool IsType(Type type) const { return type == GetType(); }
   int GetTypedIndex(Type type) const { return IsType(type) ? GetIndex() : -1; }
-  int GetSubIndex() const { return (static_cast<int>(m_handle) >> 16) & 0xff; }
+  int GetParentIndex() const {
+    return IsType(Handle::kProperty) ? (static_cast<int>(m_handle) >> 16) & 0xff
+                                     : -1;
+  }
 
  private:
   CS_Handle m_handle;

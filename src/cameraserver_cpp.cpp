@@ -19,7 +19,7 @@ static std::shared_ptr<SourceImpl> GetPropertySource(CS_Property propertyHandle,
                                                      int* propertyIndex,
                                                      CS_Status* status) {
   Handle handle{propertyHandle};
-  int i = handle.GetTypedIndex(Handle::kProperty);
+  int i = handle.GetParentIndex();
   if (i < 0) {
     *status = CS_INVALID_HANDLE;
     return nullptr;
@@ -29,7 +29,7 @@ static std::shared_ptr<SourceImpl> GetPropertySource(CS_Property propertyHandle,
     *status = CS_INVALID_HANDLE;
     return nullptr;
   }
-  *propertyIndex = handle.GetSubIndex();
+  *propertyIndex = handle.GetIndex();
   return data->source;
 }
 
@@ -47,12 +47,11 @@ CS_PropertyType GetPropertyType(CS_Property property, CS_Status* status) {
 }
 
 std::string GetPropertyName(CS_Property property, CS_Status* status) {
-  llvm::SmallString<128> name;
+  llvm::SmallString<128> buf;
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return std::string{};
-  source->GetPropertyName(propertyIndex, name);
-  return name.str();
+  return source->GetPropertyName(propertyIndex, buf);
 }
 
 llvm::StringRef GetPropertyName(CS_Property property,
@@ -266,8 +265,15 @@ CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
 llvm::ArrayRef<CS_Property> EnumerateSourceProperties(
     CS_Source source, llvm::SmallVectorImpl<CS_Property>& vec,
     CS_Status* status) {
-  // TODO
-  return llvm::ArrayRef<CS_Property>{};
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  llvm::SmallVector<int, 32> properties_buf;
+  for (auto property : data->source->EnumerateProperties(properties_buf))
+    vec.push_back(Handle{source, property, Handle::kProperty});
+  return vec;
 }
 
 CS_Source CopySource(CS_Source source, CS_Status* status) {

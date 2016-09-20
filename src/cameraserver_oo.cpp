@@ -10,21 +10,23 @@
 using namespace cs;
 
 std::vector<VideoProperty> VideoSource::EnumerateProperties() const {
-  std::vector<VideoProperty> properties;
-  llvm::SmallVector<CS_Property, 32> handles;
+  llvm::SmallVector<CS_Property, 32> handles_buf;
   CS_Status status = 0;
-  EnumerateSourceProperties(m_handle, handles, &status);
+  auto handles = EnumerateSourceProperties(m_handle, handles_buf, &status);
+
+  std::vector<VideoProperty> properties;
   properties.reserve(handles.size());
-  for (int handle : handles)
+  for (CS_Property handle : handles)
     properties.emplace_back(VideoProperty{handle});
   return properties;
 }
 
 std::vector<VideoSource> VideoSource::EnumerateSources() {
-  std::vector<VideoSource> sources;
-  llvm::SmallVector<CS_Source, 16> handles;
+  llvm::SmallVector<CS_Source, 16> handles_buf;
   CS_Status status = 0;
-  ::cs::EnumerateSourceHandles(handles, &status);
+  auto handles = ::cs::EnumerateSourceHandles(handles_buf, &status);
+
+  std::vector<VideoSource> sources;
   sources.reserve(handles.size());
   for (int handle : handles)
     sources.emplace_back(VideoSource{handle});
@@ -32,10 +34,11 @@ std::vector<VideoSource> VideoSource::EnumerateSources() {
 }
 
 std::vector<VideoSink> VideoSink::EnumerateSinks() {
-  std::vector<VideoSink> sinks;
-  llvm::SmallVector<CS_Sink, 16> handles;
+  llvm::SmallVector<CS_Sink, 16> handles_buf;
   CS_Status status = 0;
-  ::cs::EnumerateSinkHandles(handles, &status);
+  auto handles = ::cs::EnumerateSinkHandles(handles_buf, &status);
+
+  std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());
   for (int handle : handles)
     sinks.emplace_back(VideoSink{handle});
