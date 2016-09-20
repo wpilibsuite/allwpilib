@@ -201,8 +201,9 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
     os << ",\n\"type\": \"" << type << '"';
     os << ",\n\"min\": \"" << source.GetPropertyMin(prop, &status) << '"';
     os << ",\n\"max\": \"" << source.GetPropertyMax(prop, &status) << '"';
-    // os << ",\n\"step\": \"" << param->step << '"';
-    // os << ",\n\"default\": \"" << param->default_value << '"';
+    os << ",\n\"step\": \"" << source.GetPropertyStep(prop, &status) << '"';
+    os << ",\n\"default\": \"" << source.GetPropertyDefault(prop, &status)
+       << '"';
     os << ",\n\"value\": \"";
     switch (type) {
       case CS_PROP_BOOLEAN:
