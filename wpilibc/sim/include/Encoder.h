@@ -76,7 +76,7 @@ class Encoder : public SensorBase,
   int FPGAEncoderIndex() const { return 0; }
 
  private:
-  void InitEncoder(int channelA, int channelB, bool _reverseDirection,
+  void InitEncoder(int channelA, int channelB, bool reverseDirection,
                    EncodingType encodingType);
   double DecodingScaleFactor() const;
 
