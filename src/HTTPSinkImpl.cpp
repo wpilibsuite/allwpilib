@@ -166,6 +166,33 @@ bool HTTPSinkImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
     }
 
     // try to assign parameter
+    auto prop = source.GetPropertyIndex(param);
+    if (!prop) {
+      WARNING("ignoring HTTP parameter \"" << param << "\"");
+      continue;
+    }
+
+    CS_Status status = 0;
+    auto type = source.GetPropertyType(prop);
+    switch (type) {
+      case CS_PROP_BOOLEAN:
+      case CS_PROP_INTEGER:
+      case CS_PROP_ENUM: {
+        int val;
+        if (value.str().getAsInteger(10, val)) {
+          WARNING("HTTP parameter \"" << param << "\" value \"" << value
+                                      << "\" is not an integer");
+        } else
+          source.SetProperty(prop, val, &status);
+        break;
+      }
+      case CS_PROP_STRING: {
+        source.SetStringProperty(prop, value, &status);
+        break;
+      }
+      default:
+        break;
+    }
   }
 
   if (respond) {
