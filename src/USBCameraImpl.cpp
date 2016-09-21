@@ -36,6 +36,22 @@ using namespace cs;
 
 #ifdef __linux__
 
+// Removes non-alphanumeric characters and replaces spaces with underscores.
+// e.g. "Zoom, Absolute" -> "zoom_absolute", "Pan (Absolute)" -> "pan_absolute"
+static llvm::StringRef NormalizeName(llvm::StringRef name,
+                                     llvm::SmallVectorImpl<char>& buf) {
+  bool newWord = false;
+  for (auto ch : name) {
+    if (std::isalnum(ch)) {
+      if (newWord) buf.push_back('_');
+      newWord = false;
+      buf.push_back(std::tolower(ch));
+    } else if (!buf.empty())
+      newWord = true;
+  }
+  return llvm::StringRef(buf.data(), buf.size());
+}
+
 static inline int ControlIdToProperty(__u32 control_id) {
   return (control_id & 0xffff) + 1;
 }
@@ -72,7 +88,8 @@ USBCameraImpl::PropertyData::PropertyData(
   // name
   std::size_t len = 0;
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
-  name.assign(ctrl.name, len);
+  llvm::SmallString<64> name_buf;
+  name = NormalizeName(llvm::StringRef(ctrl.name, len), name_buf);
 }
 #endif
 
@@ -106,7 +123,9 @@ USBCameraImpl::PropertyData::PropertyData(const struct v4l2_queryctrl& ctrl)
   // name
   std::size_t len = 0;
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
-  name.assign(reinterpret_cast<const char*>(ctrl.name), len);
+  llvm::SmallString<64> name_buf;
+  name = NormalizeName(
+      llvm::StringRef(reinterpret_cast<const char*>(ctrl.name), len), name_buf);
 }
 
 static inline int CheckedIoctl(int fd, unsigned long req, void* data,
