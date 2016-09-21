@@ -63,56 +63,42 @@ llvm::StringRef GetPropertyName(CS_Property property,
   return source->GetPropertyName(propertyIndex, buf, status);
 }
 
-bool GetBooleanProperty(CS_Property property, CS_Status* status) {
+int GetProperty(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return false;
-  return source->GetBooleanProperty(propertyIndex, status);
+  return source->GetProperty(propertyIndex, status);
 }
 
-void SetBooleanProperty(CS_Property property, bool value, CS_Status* status) {
+void SetProperty(CS_Property property, int value, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return;
-  source->SetBooleanProperty(propertyIndex, value, status);
+  source->SetProperty(propertyIndex, value, status);
 }
 
-double GetDoubleProperty(CS_Property property, CS_Status* status) {
-  int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return false;
-  return source->GetDoubleProperty(propertyIndex, status);
-}
-
-void SetDoubleProperty(CS_Property property, double value, CS_Status* status) {
-  int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return;
-  source->SetDoubleProperty(propertyIndex, value, status);
-}
-
-double GetPropertyMin(CS_Property property, CS_Status* status) {
+int GetPropertyMin(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
   return source->GetPropertyMin(propertyIndex, status);
 }
 
-double GetPropertyMax(CS_Property property, CS_Status* status) {
+int GetPropertyMax(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
   return source->GetPropertyMax(propertyIndex, status);
 }
 
-double GetPropertyStep(CS_Property property, CS_Status* status) {
+int GetPropertyStep(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
   return source->GetPropertyStep(propertyIndex, status);
 }
 
-double GetPropertyDefault(CS_Property property, CS_Status* status) {
+int GetPropertyDefault(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return 0.0;
@@ -142,20 +128,6 @@ void SetStringProperty(CS_Property property, llvm::StringRef value,
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return;
   source->SetStringProperty(propertyIndex, value, status);
-}
-
-int GetEnumProperty(CS_Property property, CS_Status* status) {
-  int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return 0;
-  return source->GetEnumProperty(propertyIndex, status);
-}
-
-void SetEnumProperty(CS_Property property, int value, CS_Status* status) {
-  int propertyIndex;
-  auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return;
-  source->SetEnumProperty(propertyIndex, value, status);
 }
 
 std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
@@ -244,7 +216,7 @@ CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  int property = data->source->GetProperty(name);
+  int property = data->source->GetPropertyIndex(name);
   if (property < 0) {
     *status = CS_INVALID_HANDLE;
     return 0;

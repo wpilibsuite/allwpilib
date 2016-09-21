@@ -77,18 +77,14 @@ public class CameraServerJNI {
   //
   public static native int getPropertyType(int property);
   public static native String getPropertyName(int property);
-  public static native boolean getBooleanProperty(int property);
-  public static native void setBooleanProperty(int property, boolean value);
-  public static native double getDoubleProperty(int property);
-  public static native void setDoubleProperty(int property, double value);
-  public static native double getPropertyMin(int property);
-  public static native double getPropertyMax(int property);
-  public static native double getPropertyStep(int property);
-  public static native double getPropertyDefault(int property);
+  public static native int getProperty(int property);
+  public static native void setProperty(int property, int value);
+  public static native int getPropertyMin(int property);
+  public static native int getPropertyMax(int property);
+  public static native int getPropertyStep(int property);
+  public static native int getPropertyDefault(int property);
   public static native String getStringProperty(int property);
   public static native void setStringProperty(int property, String value);
-  public static native int getEnumProperty(int property);
-  public static native void setEnumProperty(int property, int value);
   public static native String[] getEnumPropertyChoices(int property);
 
   //

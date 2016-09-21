@@ -34,29 +34,24 @@ class USBCameraImpl : public SourceImpl {
       llvm::SmallVectorImpl<char>& buf) const override;
 
   // Property functions
-  int GetProperty(llvm::StringRef name) const override;
+  int GetPropertyIndex(llvm::StringRef name) const override;
   llvm::ArrayRef<int> EnumerateProperties(
       llvm::SmallVectorImpl<int>& vec) const override;
   CS_PropertyType GetPropertyType(int property) const override;
   llvm::StringRef GetPropertyName(int property,
                                   llvm::SmallVectorImpl<char>& buf,
                                   CS_Status* status) const override;
-  bool GetBooleanProperty(int property, CS_Status* status) const override;
-  void SetBooleanProperty(int property, bool value, CS_Status* status) override;
-  double GetDoubleProperty(int property, CS_Status* status) const override;
-  void SetDoubleProperty(int property, double value,
-                         CS_Status* status) override;
-  double GetPropertyMin(int property, CS_Status* status) const override;
-  double GetPropertyMax(int property, CS_Status* status) const override;
-  double GetPropertyStep(int property, CS_Status* status) const override;
-  double GetPropertyDefault(int property, CS_Status* status) const override;
+  int GetProperty(int property, CS_Status* status) const override;
+  void SetProperty(int property, int value, CS_Status* status) override;
+  int GetPropertyMin(int property, CS_Status* status) const override;
+  int GetPropertyMax(int property, CS_Status* status) const override;
+  int GetPropertyStep(int property, CS_Status* status) const override;
+  int GetPropertyDefault(int property, CS_Status* status) const override;
   llvm::StringRef GetStringProperty(int property,
                                     llvm::SmallVectorImpl<char>& buf,
                                     CS_Status* status) const override;
   void SetStringProperty(int property, llvm::StringRef value,
                          CS_Status* status) override;
-  int GetEnumProperty(int property, CS_Status* status) const override;
-  void SetEnumProperty(int property, int value, CS_Status* status) override;
   std::vector<std::string> GetEnumPropertyChoices(
       int property, CS_Status* status) const override;
 
@@ -75,10 +70,10 @@ class USBCameraImpl : public SourceImpl {
     unsigned id;  // implementation-level id
     int type;  // implementation type, not CS_PropertyType!
     CS_PropertyType propType;
-    double minimum;
-    double maximum;
-    double step;
-    double defaultValue;
+    int minimum;
+    int maximum;
+    int step;
+    int defaultValue;
   };
 
  private:
@@ -88,9 +83,8 @@ class USBCameraImpl : public SourceImpl {
 
   void CacheProperty(PropertyData&& prop) const;
   void CacheProperties() const;
-  bool GetPropertyTypeValueFd(int property, CS_PropertyType propType,
-                              unsigned* id, int* type, int* fd,
-                              CS_Status* status) const;
+  bool GetPropertyTypeValueFd(int property, int propType, unsigned* id,
+                              int* type, int* fd, CS_Status* status) const;
 
   void CameraThreadMain();
 

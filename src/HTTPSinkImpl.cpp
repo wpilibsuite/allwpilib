@@ -206,19 +206,15 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
     os << ",\n\"value\": \"";
     switch (type) {
       case CS_PROP_BOOLEAN:
-        os << (source.GetBooleanProperty(prop, &status) ? "1" : "0");
-        break;
-      case CS_PROP_DOUBLE:
-        os << source.GetDoubleProperty(prop, &status);
+      case CS_PROP_INTEGER:
+      case CS_PROP_ENUM:
+        os << source.GetProperty(prop, &status);
         break;
       case CS_PROP_STRING: {
         llvm::SmallString<128> strval_buf;
         os << source.GetStringProperty(prop, strval_buf, &status);
         break;
       }
-      case CS_PROP_ENUM:
-        os << source.GetEnumProperty(prop, &status);
-        break;
       default:
         break;
     }

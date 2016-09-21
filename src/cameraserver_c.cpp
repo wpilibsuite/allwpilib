@@ -28,37 +28,27 @@ char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
   return cs::ConvertToC(str);
 }
 
-CS_Bool CS_GetBooleanProperty(CS_Property property, CS_Status* status) {
-  return cs::GetBooleanProperty(property, status);
+int CS_GetProperty(CS_Property property, CS_Status* status) {
+  return cs::GetProperty(property, status);
 }
 
-void CS_SetBooleanProperty(CS_Property property, CS_Bool value,
-                           CS_Status* status) {
-  return cs::SetBooleanProperty(property, value, status);
+void CS_SetProperty(CS_Property property, int value, CS_Status* status) {
+  return cs::SetProperty(property, value, status);
 }
 
-double CS_GetDoubleProperty(CS_Property property, CS_Status* status) {
-  return cs::GetDoubleProperty(property, status);
-}
-
-void CS_SetDoubleProperty(CS_Property property, double value,
-                          CS_Status* status) {
-  return cs::SetDoubleProperty(property, value, status);
-}
-
-double CS_GetPropertyMin(CS_Property property, CS_Status* status) {
+int CS_GetPropertyMin(CS_Property property, CS_Status* status) {
   return cs::GetPropertyMin(property, status);
 }
 
-double CS_GetPropertyMax(CS_Property property, CS_Status* status) {
+int CS_GetPropertyMax(CS_Property property, CS_Status* status) {
   return cs::GetPropertyMax(property, status);
 }
 
-double CS_GetPropertyStep(CS_Property property, CS_Status* status) {
+int CS_GetPropertyStep(CS_Property property, CS_Status* status) {
   return cs::GetPropertyStep(property, status);
 }
 
-double CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
+int CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
   return cs::GetPropertyDefault(property, status);
 }
 
@@ -72,14 +62,6 @@ char* CS_GetStringProperty(CS_Property property, CS_Status* status) {
 void CS_SetStringProperty(CS_Property property, const char* value,
                           CS_Status* status) {
   return cs::SetStringProperty(property, value, status);
-}
-
-int CS_GetEnumProperty(CS_Property property, CS_Status* status) {
-  return cs::GetEnumProperty(property, status);
-}
-
-void CS_SetEnumProperty(CS_Property property, int value, CS_Status* status) {
-  return cs::SetEnumProperty(property, value, status);
 }
 
 char** CS_GetEnumPropertyChoices(CS_Property property, int* count,

@@ -51,22 +51,18 @@ std::string GetPropertyName(CS_Property property, CS_Status* status);
 llvm::StringRef GetPropertyName(CS_Property property,
                                 llvm::SmallVectorImpl<char>& buf,
                                 CS_Status* status);
-bool GetBooleanProperty(CS_Property property, CS_Status* status);
-void SetBooleanProperty(CS_Property property, bool value, CS_Status* status);
-double GetDoubleProperty(CS_Property property, CS_Status* status);
-void SetDoubleProperty(CS_Property property, double value, CS_Status* status);
-double GetPropertyMin(CS_Property property, CS_Status* status);
-double GetPropertyMax(CS_Property property, CS_Status* status);
-double GetPropertyStep(CS_Property property, CS_Status* status);
-double GetPropertyDefault(CS_Property property, CS_Status* status);
+int GetProperty(CS_Property property, CS_Status* status);
+void SetProperty(CS_Property property, int value, CS_Status* status);
+int GetPropertyMin(CS_Property property, CS_Status* status);
+int GetPropertyMax(CS_Property property, CS_Status* status);
+int GetPropertyStep(CS_Property property, CS_Status* status);
+int GetPropertyDefault(CS_Property property, CS_Status* status);
 std::string GetStringProperty(CS_Property property, CS_Status* status);
 llvm::StringRef GetStringProperty(CS_Property property,
                                   llvm::SmallVectorImpl<char>& buf,
                                   CS_Status* status);
 void SetStringProperty(CS_Property property, llvm::StringRef value,
                        CS_Status* status);
-int GetEnumProperty(CS_Property property, CS_Status* status);
-void SetEnumProperty(CS_Property property, int value, CS_Status* status);
 std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
                                                 CS_Status* status);
 

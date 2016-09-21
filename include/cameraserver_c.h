@@ -60,30 +60,24 @@ enum CS_StatusValue {
 
 enum CS_PropertyType {
   CS_PROP_NONE = 0,
-  CS_PROP_BOOLEAN,
-  CS_PROP_DOUBLE,
-  CS_PROP_STRING,
-  CS_PROP_ENUM
+  CS_PROP_BOOLEAN = 1,
+  CS_PROP_INTEGER = 2,
+  CS_PROP_STRING = 4,
+  CS_PROP_ENUM = 8
 };
 
 enum CS_PropertyType CS_GetPropertyType(CS_Property property,
                                         CS_Status* status);
 char* CS_GetPropertyName(CS_Property property, CS_Status* status);
-CS_Bool CS_GetBooleanProperty(CS_Property property, CS_Status* status);
-void CS_SetBooleanProperty(CS_Property property, CS_Bool value,
-                           CS_Status* status);
-double CS_GetDoubleProperty(CS_Property property, CS_Status* status);
-void CS_SetDoubleProperty(CS_Property property, double value,
-                          CS_Status* status);
-double CS_GetPropertyMin(CS_Property property, CS_Status* status);
-double CS_GetPropertyMax(CS_Property property, CS_Status* status);
-double CS_GetPropertyStep(CS_Property property, CS_Status* status);
-double CS_GetPropertyDefault(CS_Property property, CS_Status* status);
+int CS_GetProperty(CS_Property property, CS_Status* status);
+void CS_SetProperty(CS_Property property, int value, CS_Status* status);
+int CS_GetPropertyMin(CS_Property property, CS_Status* status);
+int CS_GetPropertyMax(CS_Property property, CS_Status* status);
+int CS_GetPropertyStep(CS_Property property, CS_Status* status);
+int CS_GetPropertyDefault(CS_Property property, CS_Status* status);
 char* CS_GetStringProperty(CS_Property property, CS_Status* status);
 void CS_SetStringProperty(CS_Property property, const char* value,
                           CS_Status* status);
-int CS_GetEnumProperty(CS_Property property, CS_Status* status);
-void CS_SetEnumProperty(CS_Property property, int value, CS_Status* status);
 char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
                                  CS_Status* status);
 

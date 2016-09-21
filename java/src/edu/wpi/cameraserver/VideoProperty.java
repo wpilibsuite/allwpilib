@@ -9,7 +9,7 @@ package edu.wpi.cameraserver;
 
 public class VideoProperty {
   public enum Type {
-    kNone(0), kBoolean(1), kDouble(2), kString(3), kEnum(4);
+    kNone(0), kBoolean(1), kInteger(2), kString(4), kEnum(8);
     private int value;
 
     private Type(int value) {
@@ -39,8 +39,8 @@ public class VideoProperty {
     return m_type == Type.kBoolean;
   }
 
-  public boolean isDouble() {
-    return m_type == Type.kDouble;
+  public boolean isInteger() {
+    return m_type == Type.kInteger;
   }
 
   public boolean isString() {
@@ -51,37 +51,27 @@ public class VideoProperty {
     return m_type == Type.kEnum;
   }
 
-  // Boolean-specific functions
-  public boolean getBoolean() {
-    return CameraServerJNI.getBooleanProperty(m_handle);
+  public int get() {
+    return CameraServerJNI.getProperty(m_handle);
   }
 
-  public void setBoolean(boolean value) {
-    CameraServerJNI.setBooleanProperty(m_handle, value);
+  public void set(int value) {
+    CameraServerJNI.setProperty(m_handle, value);
   }
 
-  // Double-specific functions
-  public double getDouble() {
-    return CameraServerJNI.getDoubleProperty(m_handle);
-  }
-
-  public void setDouble(double value) {
-    CameraServerJNI.setDoubleProperty(m_handle, value);
-  }
-
-  public double getMin() {
+  public int getMin() {
     return CameraServerJNI.getPropertyMin(m_handle);
   }
 
-  public double getMax() {
+  public int getMax() {
     return CameraServerJNI.getPropertyMax(m_handle);
   }
 
-  public double getStep() {
+  public int getStep() {
     return CameraServerJNI.getPropertyStep(m_handle);
   }
 
-  public double getDefault() {
+  public int getDefault() {
     return CameraServerJNI.getPropertyDefault(m_handle);
   }
 
@@ -95,14 +85,6 @@ public class VideoProperty {
   }
 
   // Enum-specific functions
-  public int getEnum() {
-    return CameraServerJNI.getEnumProperty(m_handle);
-  }
-
-  public void setEnum(int value) {
-    CameraServerJNI.setEnumProperty(m_handle, value);
-  }
-
   public String[] getChoices() {
     return CameraServerJNI.getEnumPropertyChoices(m_handle);
   }

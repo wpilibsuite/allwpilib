@@ -106,64 +106,37 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyN
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    getBooleanProperty
- * Signature: (I)Z
+ * Method:    getProperty
+ * Signature: (I)I
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getBooleanProperty
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getProperty
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
-  auto val = cs::GetBooleanProperty(property, &status);
+  auto val = cs::GetProperty(property, &status);
   CheckStatus(env, status);
   return val;
 }
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    setBooleanProperty
- * Signature: (IZ)V
+ * Method:    setProperty
+ * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setBooleanProperty
-  (JNIEnv *env, jclass, jint property, jboolean value)
+JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setProperty
+  (JNIEnv *env, jclass, jint property, jint value)
 {
   CS_Status status;
-  cs::SetBooleanProperty(property, value, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    getDoubleProperty
- * Signature: (I)D
- */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getDoubleProperty
-  (JNIEnv *env, jclass, jint property)
-{
-  CS_Status status;
-  auto val = cs::GetDoubleProperty(property, &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    setDoubleProperty
- * Signature: (ID)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setDoubleProperty
-  (JNIEnv *env, jclass, jint property, jdouble value)
-{
-  CS_Status status;
-  cs::SetDoubleProperty(property, value, &status);
+  cs::SetProperty(property, value, &status);
   CheckStatus(env, status);
 }
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    getPropertyMin
- * Signature: (I)D
+ * Signature: (I)I
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyMin
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyMin
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
@@ -175,9 +148,9 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyM
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    getPropertyMax
- * Signature: (I)D
+ * Signature: (I)I
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyMax
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyMax
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
@@ -189,9 +162,9 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyM
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    getPropertyStep
- * Signature: (I)D
+ * Signature: (I)I
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyStep
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyStep
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
@@ -203,9 +176,9 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyS
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    getPropertyDefault
- * Signature: (I)D
+ * Signature: (I)I
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyDefault
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getPropertyDefault
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status;
@@ -239,33 +212,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setStringProper
 {
   CS_Status status;
   cs::SetStringProperty(property, JStringRef{env, value}, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    getEnumProperty
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getEnumProperty
-  (JNIEnv *env, jclass, jint property)
-{
-  CS_Status status;
-  auto val = cs::GetEnumProperty(property, &status);
-  CheckStatus(env, status);
-  return val;
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    setEnumProperty
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setEnumProperty
-  (JNIEnv *env, jclass, jint property, jint value)
-{
-  CS_Status status;
-  cs::SetEnumProperty(property, value, &status);
   CheckStatus(env, status);
 }
 

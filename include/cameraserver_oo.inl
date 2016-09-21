@@ -15,42 +15,32 @@ inline std::string VideoProperty::GetName() const {
   return GetPropertyName(m_handle, &m_status);
 }
 
-inline bool VideoProperty::GetBoolean() const {
+inline int VideoProperty::Get() const {
   m_status = 0;
-  return GetBooleanProperty(m_handle, &m_status);
+  return GetProperty(m_handle, &m_status);
 }
 
-inline void VideoProperty::SetBoolean(bool value) {
+inline void VideoProperty::Set(int value) {
   m_status = 0;
-  SetBooleanProperty(m_handle, value, &m_status);
+  SetProperty(m_handle, value, &m_status);
 }
 
-inline double VideoProperty::GetDouble() const {
-  m_status = 0;
-  return GetDoubleProperty(m_handle, &m_status);
-}
-
-inline void VideoProperty::SetDouble(double value) {
-  m_status = 0;
-  SetDoubleProperty(m_handle, value, &m_status);
-}
-
-inline double VideoProperty::GetMin() const {
+inline int VideoProperty::GetMin() const {
   m_status = 0;
   return GetPropertyMin(m_handle, &m_status);
 }
 
-inline double VideoProperty::GetMax() const {
+inline int VideoProperty::GetMax() const {
   m_status = 0;
   return GetPropertyMax(m_handle, &m_status);
 }
 
-inline double VideoProperty::GetStep() const {
+inline int VideoProperty::GetStep() const {
   m_status = 0;
   return GetPropertyStep(m_handle, &m_status);
 }
 
-inline double VideoProperty::GetDefault() const {
+inline int VideoProperty::GetDefault() const {
   m_status = 0;
   return GetPropertyDefault(m_handle, &m_status);
 }
@@ -69,16 +59,6 @@ inline llvm::StringRef VideoProperty::GetString(
 inline void VideoProperty::SetString(llvm::StringRef value) {
   m_status = 0;
   SetStringProperty(m_handle, value, &m_status);
-}
-
-inline int VideoProperty::GetEnum() const {
-  m_status = 0;
-  return GetEnumProperty(m_handle, &m_status);
-}
-
-inline void VideoProperty::SetEnum(int value) {
-  m_status = 0;
-  SetEnumProperty(m_handle, value, &m_status);
 }
 
 inline std::vector<std::string> VideoProperty::GetChoices() const {

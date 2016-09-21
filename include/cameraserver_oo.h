@@ -32,7 +32,7 @@ class VideoProperty {
   enum Type {
     kNone = CS_PROP_NONE,
     kBoolean = CS_PROP_BOOLEAN,
-    kDouble = CS_PROP_DOUBLE,
+    kInteger = CS_PROP_INTEGER,
     kString = CS_PROP_STRING,
     kEnum = CS_PROP_ENUM
   };
@@ -47,21 +47,16 @@ class VideoProperty {
 
   // Type checkers
   bool IsBoolean() const { return m_type == kBoolean; }
-  bool IsDouble() const { return m_type == kDouble; }
+  bool IsInteger() const { return m_type == kInteger; }
   bool IsString() const { return m_type == kString; }
   bool IsEnum() const { return m_type == kEnum; }
 
-  // Boolean-specific functions
-  bool GetBoolean() const;
-  void SetBoolean(bool value);
-
-  // Double-specific functions
-  double GetDouble() const;
-  void SetDouble(double value);
-  double GetMin() const;
-  double GetMax() const;
-  double GetStep() const;
-  double GetDefault() const;
+  int Get() const;
+  void Set(int value);
+  int GetMin() const;
+  int GetMax() const;
+  int GetStep() const;
+  int GetDefault() const;
 
   // String-specific functions
   std::string GetString() const;
@@ -69,8 +64,6 @@ class VideoProperty {
   void SetString(llvm::StringRef value);
 
   // Enum-specific functions
-  int GetEnum() const;
-  void SetEnum(int value);
   std::vector<std::string> GetChoices() const;
 
   CS_Status GetLastStatus() const { return m_status; }
