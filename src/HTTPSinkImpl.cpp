@@ -183,18 +183,17 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
   if (header) SendHeader(os, 200, "OK", "application/x-javascript");
 
   os << "{\n\"controls\": [\n";
-  llvm::SmallVector<int, 32> properties;
-  source.EnumerateProperties(properties);
+  llvm::SmallVector<int, 32> properties_vec;
   bool first = true;
-  for (auto prop : properties) {
+  for (auto prop : source.EnumerateProperties(properties_vec)) {
     if (first)
       first = false;
     else
       os << ",\n";
     os << "{";
     CS_Status status = 0;
-    llvm::SmallString<128> name;
-    source.GetPropertyName(prop, name, &status);
+    llvm::SmallString<128> name_buf;
+    auto name = source.GetPropertyName(prop, name_buf, &status);
     auto type = source.GetPropertyType(prop);
     os << "\n\"name\": \"" << name << '"';
     os << ",\n\"id\": \"" << prop << '"';
@@ -213,9 +212,8 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
         os << source.GetDoubleProperty(prop, &status);
         break;
       case CS_PROP_STRING: {
-        llvm::SmallString<128> strval;
-        source.GetStringProperty(prop, strval, &status);
-        os << strval.str();
+        llvm::SmallString<128> strval_buf;
+        os << source.GetStringProperty(prop, strval_buf, &status);
         break;
       }
       case CS_PROP_ENUM:
@@ -225,7 +223,7 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
         break;
     }
     os << '"';
-    os << ",\n\"dest\": \"0\",";
+    // os << ",\n\"dest\": \"0\"";
     // os << ",\n\"flags\": \"" << param->flags << '"';
     // os << ",\n\"group\": \"" << param->group << '"';
 
@@ -255,6 +253,7 @@ HTTPSinkImpl::HTTPSinkImpl(llvm::StringRef name, llvm::StringRef description,
     : SinkImpl{name},
       m_description(description),
       m_acceptor{std::move(acceptor)} {
+  m_active = true;
   m_serverThread = std::thread(&HTTPSinkImpl::ServerThreadMain, this);
 }
 
@@ -342,7 +341,7 @@ void HTTPSinkImpl::ConnThreadMain(wpi::NetworkStream* stream) {
   llvm::SmallString<128> buf;
   if (!ReadLine(is, buf, 4096)) return;
 
-  wpi::raw_socket_ostream os{*stream};
+  wpi::raw_socket_ostream os{*stream, true};
   enum { kCommand, kStream, kGetSettings } type;
   llvm::StringRef parameters;
   size_t pos;
