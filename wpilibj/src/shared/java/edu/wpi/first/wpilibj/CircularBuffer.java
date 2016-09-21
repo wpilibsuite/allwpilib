@@ -98,11 +98,26 @@ public class CircularBuffer {
   }
 
   /**
+   * Resizes internal buffer to given size.
+   *
+   * <p>A new buffer is allocated because arrays are not resizable.
+   */
+  void resize(int size) {
+    double[] newBuffer = new double[size];
+    m_length = Math.min(m_length, size);
+    for (int i = 0; i < m_length; i++) {
+      newBuffer[i] = m_data[(m_front + i) % m_data.length];
+    }
+    m_data = newBuffer;
+    m_front = 0;
+  }
+
+  /**
    * Sets internal buffer contents to zero.
    */
   public void reset() {
-    for (double i : m_data) {
-      i = 0.0;
+    for (int i = 0; i < m_data.length; i++) {
+      m_data[i] = 0.0;
     }
     m_front = 0;
     m_length = 0;
