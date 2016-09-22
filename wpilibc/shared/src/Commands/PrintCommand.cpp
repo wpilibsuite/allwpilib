@@ -6,8 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Commands/PrintCommand.h"
+
+#include <cstdio>
 #include <sstream>
-#include "stdio.h"
 
 PrintCommand::PrintCommand(const std::string& message)
     : Command(((std::stringstream&)(std::stringstream("Print \"") << message
@@ -17,7 +18,7 @@ PrintCommand::PrintCommand(const std::string& message)
   m_message = message;
 }
 
-void PrintCommand::Initialize() { printf("%s", m_message.c_str()); }
+void PrintCommand::Initialize() { std::printf("%s", m_message.c_str()); }
 
 void PrintCommand::Execute() {}
 

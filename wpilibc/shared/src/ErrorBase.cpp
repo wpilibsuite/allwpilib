@@ -8,6 +8,8 @@
 #include "ErrorBase.h"
 
 #include <cerrno>
+#include <cstdio>
+#include <cstring>
 #include <iomanip>
 #include <sstream>
 
@@ -49,7 +51,7 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
     err += contextMessage;
   } else {
     std::ostringstream oss;
-    oss << strerror(errNo) << " (0x" << std::setfill('0') << std::hex
+    oss << std::strerror(errNo) << " (0x" << std::setfill('0') << std::hex
         << std::uppercase << std::setw(8) << errNo << "): " << contextMessage;
     err = oss.str();
   }
@@ -140,9 +142,10 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
   if (code != 0) {
     size_t size = contextMessage.size() + 100;
     char* buf = new char[size];
-    snprintf(buf, size,
-             "%s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d",
-             contextMessage.data(), minRange, maxRange, requestedValue);
+    std::snprintf(
+        buf, size,
+        "%s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d",
+        contextMessage.data(), minRange, maxRange, requestedValue);
     //  Set the current error information for this object.
     m_error.Set(code, buf, filename, function, lineNumber, this);
     delete[] buf;

@@ -10,6 +10,7 @@
 #include "Utility.h"
 
 #include <chrono>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -160,7 +161,7 @@ void USBCamera::UpdateSettings() {
     int height = static_cast<int>(std::stoul(m[2].str()));
     if (width != m_width) continue;
     if (height != m_height) continue;
-    double fps = atof(m[4].str().c_str());
+    double fps = std::atof(m[4].str().c_str());
     if (fps < m_fps) continue;
     if (fps > foundFps) continue;
     bool isJpeg =

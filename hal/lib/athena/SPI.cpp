@@ -8,6 +8,7 @@
 #include "HAL/SPI.h"
 
 #include <atomic>
+#include <cstdio>
 
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
@@ -98,18 +99,18 @@ void HAL_InitializeSPI(int32_t port, int32_t* status) {
       if (*status != 0) return;
       if ((spiMXPDigitalHandle1 = HAL_InitializeDIOPort(
                HAL_GetPort(14), false, status)) == HAL_kInvalidHandle) {
-        printf("Failed to allocate DIO 14\n");
+        std::printf("Failed to allocate DIO 14\n");
         return;
       }
       if ((spiMXPDigitalHandle2 = HAL_InitializeDIOPort(
                HAL_GetPort(15), false, status)) == HAL_kInvalidHandle) {
-        printf("Failed to allocate DIO 15\n");
+        std::printf("Failed to allocate DIO 15\n");
         HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
         return;
       }
       if ((spiMXPDigitalHandle3 = HAL_InitializeDIOPort(
                HAL_GetPort(16), false, status)) == HAL_kInvalidHandle) {
-        printf("Failed to allocate DIO 16\n");
+        std::printf("Failed to allocate DIO 16\n");
         HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
         HAL_FreeDIOPort(
             spiMXPDigitalHandle2);  // free the second port allocated
@@ -117,7 +118,7 @@ void HAL_InitializeSPI(int32_t port, int32_t* status) {
       }
       if ((spiMXPDigitalHandle4 = HAL_InitializeDIOPort(
                HAL_GetPort(17), false, status)) == HAL_kInvalidHandle) {
-        printf("Failed to allocate DIO 17\n");
+        std::printf("Failed to allocate DIO 17\n");
         HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
         HAL_FreeDIOPort(
             spiMXPDigitalHandle2);  // free the second port allocated

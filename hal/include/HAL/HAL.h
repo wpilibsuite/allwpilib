@@ -38,10 +38,7 @@
 
 namespace HALUsageReporting = nUsageReporting;
 
-enum HAL_RuntimeType : int32_t {
-  HAL_Athena,
-  HAL_Mock
-};
+enum HAL_RuntimeType : int32_t { HAL_Athena, HAL_Mock };
 
 #ifdef __cplusplus
 extern "C" {
