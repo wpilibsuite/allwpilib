@@ -8,6 +8,7 @@
 #include "CANJaguar.h"
 
 #include <cassert>
+#include <cmath>
 
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"
@@ -864,7 +865,7 @@ void CANJaguar::verify() {
       // The returned max output voltage is sometimes slightly higher or
       // lower than what was sent.  This should not trigger resending
       // the message.
-      if (std::abs(voltage - m_maxOutputVoltage) < 0.1) {
+      if (std::fabs(voltage - m_maxOutputVoltage) < 0.1) {
         m_maxOutputVoltageVerified = true;
       } else {
         // It's wrong - set it again
