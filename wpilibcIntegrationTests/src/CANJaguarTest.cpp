@@ -7,6 +7,8 @@
 
 #include "CANJaguar.h"
 
+#include <cmath>
+
 #include "AnalogOutput.h"
 #include "DigitalOutput.h"
 #include "Relay.h"
@@ -221,7 +223,7 @@ TEST_F(CANJaguarTest, BrownOut) {
   for (int32_t i = 0; i < 10; i++) {
     SetJaguar(1.0f, setpoint);
 
-    if (std::abs(m_jaguar->GetPosition() - setpoint) <=
+    if (std::fabs(m_jaguar->GetPosition() - setpoint) <=
         kEncoderPositionTolerance) {
       return;
     }
@@ -336,7 +338,7 @@ TEST_F(CANJaguarTest, PositionModeWorks) {
   for (int32_t i = 0; i < 10; i++) {
     SetJaguar(1.0f, setpoint);
 
-    if (std::abs(m_jaguar->GetPosition() - setpoint) <=
+    if (std::fabs(m_jaguar->GetPosition() - setpoint) <=
         kEncoderPositionTolerance) {
       return;
     }
@@ -358,13 +360,13 @@ TEST_F(CANJaguarTest, DISABLED_CurrentModeWorks) {
 
   for (auto& setpoints_i : setpoints) {
     float setpoint = setpoints_i;
-    float expectedCurrent = std::abs(setpoints_i);
+    float expectedCurrent = std::fabs(setpoints_i);
 
     /* It should get to each setpoint within 10 seconds */
     for (int32_t j = 0; j < 10; j++) {
       SetJaguar(1.0, setpoint);
 
-      if (std::abs(m_jaguar->GetOutputCurrent() - expectedCurrent) <=
+      if (std::fabs(m_jaguar->GetOutputCurrent() - expectedCurrent) <=
           kCurrentTolerance) {
         break;
       }

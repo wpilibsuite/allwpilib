@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cmath>
+
 #include "ADXL345_SPI.h"
 #include "AnalogGyro.h"
 #include "Servo.h"
