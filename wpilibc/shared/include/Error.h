@@ -11,8 +11,7 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-// Windows.h defines #define GetMessage GetMessageW, which is stupid and we
-// don't want it.
+// Windows.h defines #define GetMessage GetMessageW, which we don't want.
 #undef GetMessage
 #endif
 
