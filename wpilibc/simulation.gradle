@@ -76,6 +76,10 @@ task wpilibcSimCopy(type: Copy, dependsOn: allcsim) {
         into "include"
     }
 
+    from ("$wpiUtilInclude"){
+        into "include"
+    }
+
     from ("../hal/include"){
         into "include"
     }

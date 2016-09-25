@@ -1,4 +1,5 @@
 defineNetworkTablesProperties()
+defineWpiUtilProperties()
 
 def ntSourceDir = "$buildDir/ntSources"
 
@@ -19,7 +20,7 @@ model {
                         includes = ['**/*.cpp']
                     }
                     exportedHeaders {
-                        srcDirs = ["${project.shared}/include", "${project.athena}/include", netTablesInclude]
+                        srcDirs = ["${project.shared}/include", "${project.athena}/include", netTablesInclude, wpiUtilInclude]
                         includes = ['**/*.h']
                     }
                     lib project: ':hal', library: 'HALAthena', linkage: 'static'
@@ -81,6 +82,9 @@ task wpilibcZip(type: Zip) {
         into 'lib'
     }
     from(netStaticLib) {
+        into 'lib'
+    }
+    from(wpiUtilStaticLib) {
         into 'lib'
     }
 
