@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
                                         int32_t* status);
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status);

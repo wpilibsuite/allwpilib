@@ -7,15 +7,15 @@
 
 #include "potentiometer.h"
 
+#include <boost/algorithm/string/replace.hpp>
+#include <gazebo/physics/physics.hh>
+#include <gazebo/transport/transport.hh>
+
 #ifdef _WIN32
 // Ensure that Winsock2.h is included before Windows.h, which can get
 // pulled in by anybody (e.g., Boost).
 #include <Winsock2.h>
 #endif
-
-#include <boost/algorithm/string/replace.hpp>
-#include <gazebo/physics/physics.hh>
-#include <gazebo/transport/transport.hh>
 
 GZ_REGISTER_MODEL_PLUGIN(Potentiometer)
 

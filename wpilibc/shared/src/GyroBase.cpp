@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "GyroBase.h"
+
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

@@ -12,6 +12,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 int32_t HAL_GetSystemClockTicksPerMicrosecond(void);
 #ifdef __cplusplus
 }

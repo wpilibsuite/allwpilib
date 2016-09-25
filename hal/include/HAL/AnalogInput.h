@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
                                                     int32_t* status);
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle);

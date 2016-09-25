@@ -5,8 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "interfaces/Potentiometer.h"
+
 #include <Utility.h>
-#include <interfaces/Potentiometer.h>
 
 void Potentiometer::SetPIDSourceType(PIDSourceType pidSource) {
   if (wpi_assert(pidSource == PIDSourceType::kDisplacement)) {

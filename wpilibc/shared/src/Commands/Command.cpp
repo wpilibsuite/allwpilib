@@ -6,7 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Commands/Command.h"
+
 #include <typeinfo>
+
 #include "Commands/CommandGroup.h"
 #include "Commands/Scheduler.h"
 #include "RobotState.h"

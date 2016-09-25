@@ -9,15 +9,17 @@
 
 #define SIMULATION "gazebo"
 
+#include <cstring>
 #include <iostream>
-#include "string.h"
 
+#include "AnalogGyro.h"
+#include "AnalogInput.h"
+#include "AnalogPotentiometer.h"
 #include "Buttons/Button.h"
 #include "Buttons/InternalButton.h"
 #include "Buttons/JoystickButton.h"
 #include "Buttons/NetworkButton.h"
 #include "Buttons/Trigger.h"
-
 #include "Commands/Command.h"
 #include "Commands/CommandGroup.h"
 #include "Commands/PIDCommand.h"
@@ -29,13 +31,6 @@
 #include "Commands/WaitCommand.h"
 #include "Commands/WaitForChildren.h"
 #include "Commands/WaitUntilCommand.h"
-
-#include "SmartDashboard/SendableChooser.h"
-#include "SmartDashboard/SmartDashboard.h"
-
-#include "AnalogGyro.h"
-#include "AnalogInput.h"
-#include "AnalogPotentiometer.h"
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DoubleSolenoid.h"
@@ -49,6 +44,8 @@
 #include "RobotBase.h"
 #include "RobotDrive.h"
 #include "SampleRobot.h"
+#include "SmartDashboard/SendableChooser.h"
+#include "SmartDashboard/SmartDashboard.h"
 #include "Solenoid.h"
 #include "SpeedController.h"
 #include "Talon.h"

@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <string>
+
 #include "SmartDashboard/Sendable.h"
 #include "tables/ITable.h"
 

@@ -10,7 +10,6 @@
 #include <memory>
 
 #include "ChipObject.h"
-
 #include "DigitalInternal.h"
 #include "HAL/Errors.h"
 #include "HAL/cpp/make_unique.h"

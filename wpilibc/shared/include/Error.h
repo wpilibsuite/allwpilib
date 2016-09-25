@@ -7,17 +7,18 @@
 
 #pragma once
 
+#include <stdint.h>
+
+#include <string>
+
 #include "Base.h"
+#include "llvm/StringRef.h"
 
 #ifdef _WIN32
 #include <Windows.h>
 // Windows.h defines #define GetMessage GetMessageW, which we don't want.
 #undef GetMessage
 #endif
-
-#include <stdint.h>
-#include <string>
-#include "llvm/StringRef.h"
 
 //  Forward declarations
 class ErrorBase;

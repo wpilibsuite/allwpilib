@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "simulation/SimFloatInput.h"
+
 #include "simulation/MainNode.h"
 
 SimFloatInput::SimFloatInput(std::string topic) {

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <memory>
+
 #include "ErrorBase.h"
 #include "GenericHID.h"
 

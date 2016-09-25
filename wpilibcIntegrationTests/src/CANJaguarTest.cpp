@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "CANJaguar.h"
+#include "CANJaguar.h"  // NOLINT(build/include_order)
 
 #include <cmath>
 

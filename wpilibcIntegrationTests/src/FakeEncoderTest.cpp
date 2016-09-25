@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Encoder.h"
+#include "Encoder.h"  // NOLINT(build/include_order)
 
 #include "AnalogOutput.h"
 #include "AnalogTrigger.h"

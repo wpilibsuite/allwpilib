@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Relay.h"
+#include "Relay.h"  // NOLINT(build/include_order)
 
 #include "DigitalInput.h"
 #include "TestBench.h"

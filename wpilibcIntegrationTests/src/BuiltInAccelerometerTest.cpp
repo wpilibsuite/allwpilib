@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "BuiltInAccelerometer.h"
+#include "BuiltInAccelerometer.h"  // NOLINT(build/include_order)
 
 #include "Timer.h"
 #include "gtest/gtest.h"

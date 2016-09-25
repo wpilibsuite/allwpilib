@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "simulation/SimEncoder.h"
+
 #include "simulation/MainNode.h"
 
 SimEncoder::SimEncoder(std::string topic) {

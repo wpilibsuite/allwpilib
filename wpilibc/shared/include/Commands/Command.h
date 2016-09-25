@@ -10,6 +10,7 @@
 #include <memory>
 #include <set>
 #include <string>
+
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
 #include "tables/ITableListener.h"

@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Internal/HardwareHLReporting.h"
+
 #include "HAL/HAL.h"
 
 void HardwareHLReporting::ReportScheduler() {

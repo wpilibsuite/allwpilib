@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "ADXL362.h"
+
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
 #include "DriverStation.h"

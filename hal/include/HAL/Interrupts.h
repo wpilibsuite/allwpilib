@@ -15,6 +15,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 typedef void (*HAL_InterruptHandlerFunction)(uint32_t interruptAssertedMask,
                                              void* param);
 

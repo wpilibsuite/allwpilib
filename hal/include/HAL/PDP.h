@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void HAL_InitializePDP(int32_t module, int32_t* status);
 HAL_Bool HAL_CheckPDPChannel(int32_t channel);
 HAL_Bool HAL_CheckPDPModule(int32_t module);

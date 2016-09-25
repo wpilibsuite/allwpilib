@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <memory>
+
 #include "ErrorBase.h"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"

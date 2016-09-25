@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PowerDistributionPanel.h"
+#include "PowerDistributionPanel.h"  // NOLINT(build/include_order)
 
 #include "Jaguar.h"
 #include "Talon.h"

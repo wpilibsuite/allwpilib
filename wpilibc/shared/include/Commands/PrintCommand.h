@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+
 #include "Commands/Command.h"
 
 class PrintCommand : public Command {

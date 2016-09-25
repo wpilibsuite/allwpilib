@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+
 #include "tables/ITable.h"
 
 class Sendable {

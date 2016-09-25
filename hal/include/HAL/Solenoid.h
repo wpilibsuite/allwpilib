@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
                                               int32_t* status);
 void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle);

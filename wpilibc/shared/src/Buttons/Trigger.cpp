@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Buttons/Button.h"
-
 #include "Buttons/CancelButtonScheduler.h"
 #include "Buttons/HeldButtonScheduler.h"
 #include "Buttons/PressedButtonScheduler.h"

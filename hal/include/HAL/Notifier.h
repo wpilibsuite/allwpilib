@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 typedef void (*HAL_NotifierProcessFunction)(uint64_t currentTime,
                                             HAL_NotifierHandle handle);
 

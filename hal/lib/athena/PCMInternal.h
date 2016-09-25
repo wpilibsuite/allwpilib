@@ -8,6 +8,7 @@
 #pragma once
 
 #include <stdint.h>
+
 #include <memory>
 
 #include "HAL/Errors.h"

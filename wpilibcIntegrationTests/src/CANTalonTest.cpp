@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "CANTalon.h"
+#include "CANTalon.h"  // NOLINT(build/include_order)
 
 #include "TestBench.h"
 #include "Timer.h"

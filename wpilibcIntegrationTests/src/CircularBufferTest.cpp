@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "CircularBuffer.h"
+#include "CircularBuffer.h"  // NOLINT(build/include_order)
 
 #include <array>
 

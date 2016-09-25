@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Commands/WaitForChildren.h"
+
 #include "Commands/CommandGroup.h"
 
 WaitForChildren::WaitForChildren(double timeout)

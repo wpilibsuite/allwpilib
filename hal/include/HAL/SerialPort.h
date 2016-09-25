@@ -12,6 +12,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 void HAL_InitializeSerialPort(int32_t port, int32_t* status);
 void HAL_SetSerialBaudRate(int32_t port, int32_t baud, int32_t* status);
 void HAL_SetSerialDataBits(int32_t port, int32_t bits, int32_t* status);

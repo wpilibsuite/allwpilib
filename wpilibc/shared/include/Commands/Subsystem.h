@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <string>
+
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
 

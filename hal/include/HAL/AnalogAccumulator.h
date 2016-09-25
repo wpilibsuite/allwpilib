@@ -14,6 +14,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 HAL_Bool HAL_IsAccumulatorChannel(HAL_AnalogInputHandle analogPortHandle,
                                   int32_t* status);
 void HAL_InitAccumulator(HAL_AnalogInputHandle analogPortHandle,

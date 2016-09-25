@@ -7,15 +7,15 @@
 
 #pragma once
 
-#ifdef _WIN32
-#include <Winsock2.h>
-#endif
-
 #include <boost/pointer_cast.hpp>
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/sensors.hh>
 
 #include "switch.h"
+
+#ifdef _WIN32
+#include <Winsock2.h>
+#endif
 
 using namespace gazebo;
 
