@@ -4,7 +4,7 @@ project(ntcore)
 if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX /D_SCL_SECURE_NO_WARNINGS /D_WINSOCK_DEPRECATED_NO_WARNINGS")
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wformat=2 -Wall -Wextra -Werror -pedantic -Wno-unused-parameter")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++1y -Wformat=2 -Wall -Wextra -Werror -pedantic -Wno-unused-parameter")
 endif()
 
 # This must be a macro(), as inside a function string() can only
@@ -33,7 +33,7 @@ endmacro()
 fix_default_compiler_settings_()
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
-include_directories(include src)
+include_directories(include src wpiutil/include)
 
 # Java bindings
 if (NOT WITHOUT_JAVA)
@@ -69,14 +69,19 @@ if (NOT WITHOUT_JAVA)
 endif()
 
 if (WIN32)
+    if (NOT WITHOUT_JAVA)
+	add_library(ntcore SHARED ${SRC_FILES} ntcore-jni.def)
+    else()
 	add_library(ntcore SHARED ${SRC_FILES} ntcore.def)
+    endif()
 else()
 	add_library(ntcore SHARED ${SRC_FILES})
 endif()
 set_target_properties(ntcore PROPERTIES VERSION 1.0.0 SOVERSION 1)
-#target_link_libraries(ntcore)
+target_link_libraries(ntcore wpiutil)
 if (WIN32)
 	add_library(ntcore_static STATIC ${SRC_FILES})
+	target_link_libraries(ntcore_static wpiutil)
 	target_link_libraries(ntcore ws2_32)
 	target_link_libraries(ntcore_static ws2_32)
 endif()
@@ -85,6 +90,14 @@ INSTALL(TARGETS ntcore
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib COMPONENT lib)
 INSTALL(DIRECTORY include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
+
+file(GLOB_RECURSE WPIUTIL_SRC_FILES wpiutil/src/*.cpp)
+add_library(wpiutil STATIC ${WPIUTIL_SRC_FILES})
+INSTALL(TARGETS wpiutil
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib COMPONENT lib)
+INSTALL(DIRECTORY wpiutil/include DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT headers)
 
 # We need thread support
 find_package(Threads REQUIRED)
