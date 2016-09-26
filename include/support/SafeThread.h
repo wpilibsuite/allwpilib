@@ -76,6 +76,27 @@ class SafeThreadOwnerBase {
   std::atomic<SafeThread*> m_thread;
 };
 
+inline void SafeThreadOwnerBase::Start(SafeThread* thr) {
+  SafeThread* curthr = nullptr;
+  SafeThread* newthr = thr;
+  if (!m_thread.compare_exchange_strong(curthr, newthr)) {
+    delete newthr;
+    return;
+  }
+  std::thread([=]() {
+    newthr->Main();
+    delete newthr;
+  }).detach();
+}
+
+inline void SafeThreadOwnerBase::Stop() {
+  SafeThread* thr = m_thread.exchange(nullptr);
+  if (!thr) return;
+  std::lock_guard<std::mutex> lock(thr->m_mutex);
+  thr->m_active = false;
+  thr->m_cond.notify_one();
+}
+
 }  // namespace detail
 
 template <typename T>
