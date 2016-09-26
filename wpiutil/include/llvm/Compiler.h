@@ -47,9 +47,33 @@
 # endif
 #endif
 
+#ifndef LLVM_CONSTEXPR
+# ifdef _MSC_VER
+#  if _MSC_VER >= 1900
+#   define LLVM_CONSTEXPR constexpr
+#  else
+#   define LLVM_CONSTEXPR
+#  endif
+# elif defined(__has_feature)
+#  if __has_feature(cxx_constexpr)
+#   define LLVM_CONSTEXPR constexpr
+#  else
+#   define LLVM_CONSTEXPR
+#  endif
+# elif defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  define LLVM_CONSTEXPR constexpr
+# elif defined(__has_constexpr)
+#  define LLVM_CONSTEXPR constexpr
+# else
+#  define LLVM_CONSTEXPR
+# endif
+#endif
+
 #ifndef LLVM_ATTRIBUTE_UNUSED_RESULT
 #if __has_attribute(warn_unused_result) || LLVM_GNUC_PREREQ(3, 4, 0)
 #define LLVM_ATTRIBUTE_UNUSED_RESULT __attribute__((__warn_unused_result__))
+#elif defined(_MSC_VER)
+#define LLVM_ATTRIBUTE_UNUSED_RESULT _Check_return_
 #else
 #define LLVM_ATTRIBUTE_UNUSED_RESULT
 #endif
