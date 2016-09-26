@@ -10,10 +10,13 @@
 #include "edu_wpi_first_wpilibj_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
 #include "support/atomic_static.h"
+#include "support/jni_util.h"
 #include "support/SafeThread.h"
 #include "llvm/ConvertUTF.h"
 #include "llvm/SmallString.h"
 #include "llvm/SmallVector.h"
+
+using namespace wpi::java;
 
 //
 // Globals and load/unload
@@ -23,7 +26,6 @@
 static JavaVM *jvm = nullptr;
 static jclass booleanCls = nullptr;
 static jclass doubleCls = nullptr;
-static jclass stringCls = nullptr;
 static jclass connectionInfoCls = nullptr;
 static jclass entryInfoCls = nullptr;
 static jclass keyNotDefinedEx = nullptr;
@@ -76,12 +78,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (!doubleCls) return JNI_ERR;
   env->DeleteLocalRef(local);
 
-  local = env->FindClass("java/lang/String");
-  if (!local) return JNI_ERR;
-  stringCls = static_cast<jclass>(env->NewGlobalRef(local));
-  if (!stringCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
-
   local = env->FindClass("edu/wpi/first/wpilibj/networktables/ConnectionInfo");
   if (!local) return JNI_ERR;
   connectionInfoCls = static_cast<jclass>(env->NewGlobalRef(local));
@@ -126,7 +122,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   // Delete global references
   if (booleanCls) env->DeleteGlobalRef(booleanCls);
   if (doubleCls) env->DeleteGlobalRef(doubleCls);
-  if (stringCls) env->DeleteGlobalRef(stringCls);
   if (connectionInfoCls) env->DeleteGlobalRef(connectionInfoCls);
   if (entryInfoCls) env->DeleteGlobalRef(entryInfoCls);
   if (keyNotDefinedEx) env->DeleteGlobalRef(keyNotDefinedEx);
@@ -138,32 +133,14 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
 }  // extern "C"
 
 //
-// Helper class to automatically clean up a local reference
-//
-template <typename T>
-class JavaLocal {
- public:
-  JavaLocal(JNIEnv *env, T obj) : m_env(env), m_obj(obj) {}
-  ~JavaLocal() {
-    if (m_obj) m_env->DeleteLocalRef(m_obj);
-  }
-  operator T() { return m_obj; }
-  T obj() { return m_obj; }
-
- private:
-  JNIEnv *m_env;
-  T m_obj;
-};
-
-//
 // Helper class to create and clean up a global reference
 //
 template <typename T>
-class JavaGlobal {
+class JGlobal {
  public:
-  JavaGlobal(JNIEnv *env, T obj)
+  JGlobal(JNIEnv *env, T obj)
       : m_obj(static_cast<T>(env->NewGlobalRef(obj))) {}
-  ~JavaGlobal() {
+  ~JGlobal() {
     if (!jvm || nt::NotifierDestroyed()) return;
     JNIEnv *env;
     bool attached = false;
@@ -190,11 +167,11 @@ class JavaGlobal {
 // Helper class to create and clean up a weak global reference
 //
 template <typename T>
-class JavaWeakGlobal {
+class JWeakGlobal {
  public:
-  JavaWeakGlobal(JNIEnv *env, T obj)
+  JWeakGlobal(JNIEnv *env, T obj)
       : m_obj(static_cast<T>(env->NewWeakGlobalRef(obj))) {}
-  ~JavaWeakGlobal() {
+  ~JWeakGlobal() {
     if (!jvm || nt::NotifierDestroyed()) return;
     JNIEnv *env;
     bool attached = false;
@@ -210,8 +187,8 @@ class JavaWeakGlobal {
     env->DeleteWeakGlobalRef(m_obj);
     if (attached) jvm->DetachCurrentThread();
   }
-  JavaLocal<T> obj(JNIEnv *env) {
-    return JavaLocal<T>(env, env->NewLocalRef(m_obj));
+  JLocal<T> obj(JNIEnv *env) {
+    return JLocal<T>{env, env->NewLocalRef(m_obj)};
   }
 
  private:
@@ -222,110 +199,41 @@ class JavaWeakGlobal {
 // Conversions from Java objects to C++
 //
 
-class JavaStringRef {
- public:
-  JavaStringRef(JNIEnv *env, jstring str) {
-    jsize size = env->GetStringLength(str);
-    const jchar *chars = env->GetStringChars(str, nullptr);
-    llvm::convertUTF16ToUTF8String(llvm::makeArrayRef(chars, size), m_str);
-    env->ReleaseStringChars(str, chars);
-  }
-
-  operator nt::StringRef() const { return m_str; }
-  nt::StringRef str() const { return m_str; }
-  const char* c_str() const { return m_str.data(); }
-
- private:
-  llvm::SmallString<128> m_str;
-};
-
-class JavaByteRef {
- public:
-  JavaByteRef(JNIEnv *env, jbyteArray jarr)
-      : m_env(env),
-        m_jarr(jarr),
-        m_elements(env->GetByteArrayElements(jarr, nullptr)),
-        m_size(env->GetArrayLength(jarr)) {}
-  ~JavaByteRef() {
-    m_env->ReleaseByteArrayElements(m_jarr, m_elements, JNI_ABORT);
-  }
-
-  operator nt::StringRef() const {
-    return nt::StringRef(reinterpret_cast<char *>(m_elements), m_size);
-  }
-
- private:
-  JNIEnv *m_env;
-  jbyteArray m_jarr;
-  jbyte *m_elements;
-  size_t m_size;
-};
-
-class JavaByteRefBB {
- public:
-  JavaByteRefBB(JNIEnv *env, jobject bb, int len)
-      : m_elements(env->GetDirectBufferAddress(bb)), m_size(len) {}
-
-  operator nt::StringRef() const {
-    return nt::StringRef(reinterpret_cast<char *>(m_elements), m_size);
-  }
-
- private:
-  void *m_elements;
-  size_t m_size;
-};
-
-std::shared_ptr<nt::Value> FromJavaRaw(JNIEnv *env, jbyteArray jarr) {
-  size_t len = env->GetArrayLength(jarr);
-  jbyte *elements =
-      static_cast<jbyte *>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-  if (!elements) return nullptr;
-  auto rv = nt::Value::MakeRaw(
-      nt::StringRef(reinterpret_cast<char *>(elements), len));
-  env->ReleasePrimitiveArrayCritical(jarr, elements, JNI_ABORT);
-  return rv;
+inline std::shared_ptr<nt::Value> FromJavaRaw(JNIEnv *env, jbyteArray jarr) {
+  CriticalJByteArrayRef ref{env, jarr};
+  if (!ref) return nullptr;
+  return nt::Value::MakeRaw(ref);
 }
 
-std::shared_ptr<nt::Value> FromJavaRawBB(JNIEnv *env, jobject jbb, int len) {
-  void* elements = env->GetDirectBufferAddress(jbb);
-  if (!elements) return nullptr;
-  auto rv = nt::Value::MakeRaw(
-      nt::StringRef(reinterpret_cast<char *>(elements), len));
-  return rv;
+inline std::shared_ptr<nt::Value> FromJavaRawBB(JNIEnv *env, jobject jbb,
+                                                int len) {
+  JByteArrayRef ref{env, jbb, len};
+  if (!ref) return nullptr;
+  return nt::Value::MakeRaw(ref.str());
 }
 
-std::shared_ptr<nt::Value> FromJavaRpc(JNIEnv *env, jbyteArray jarr) {
-  size_t len = env->GetArrayLength(jarr);
-  jbyte *elements =
-      static_cast<jbyte *>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-  if (!elements) return nullptr;
-  auto rv = nt::Value::MakeRpc(
-      nt::StringRef(reinterpret_cast<char *>(elements), len));
-  env->ReleasePrimitiveArrayCritical(jarr, elements, JNI_ABORT);
-  return rv;
+inline std::shared_ptr<nt::Value> FromJavaRpc(JNIEnv *env, jbyteArray jarr) {
+  CriticalJByteArrayRef ref{env, jarr};
+  if (!ref) return nullptr;
+  return nt::Value::MakeRpc(ref.str());
 }
 
 std::shared_ptr<nt::Value> FromJavaBooleanArray(JNIEnv *env,
                                                 jbooleanArray jarr) {
-  size_t len = env->GetArrayLength(jarr);
+  CriticalJBooleanArrayRef ref{env, jarr};
+  if (!ref) return nullptr;
+  llvm::ArrayRef<jboolean> elements{ref};
+  size_t len = elements.size();
   std::vector<int> arr;
   arr.reserve(len);
-  jboolean *elements =
-      static_cast<jboolean*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-  if (!elements) return nullptr;
   for (size_t i = 0; i < len; ++i) arr.push_back(elements[i]);
-  env->ReleasePrimitiveArrayCritical(jarr, elements, JNI_ABORT);
   return nt::Value::MakeBooleanArray(arr);
 }
 
 std::shared_ptr<nt::Value> FromJavaDoubleArray(JNIEnv *env, jdoubleArray jarr) {
-  size_t len = env->GetArrayLength(jarr);
-  jdouble *elements =
-      static_cast<jdouble *>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-  if (!elements) return nullptr;
-  auto rv = nt::Value::MakeDoubleArray(nt::ArrayRef<double>(elements, len));
-  env->ReleasePrimitiveArrayCritical(jarr, elements, JNI_ABORT);
-  return rv;
+  CriticalJDoubleArrayRef ref{env, jarr};
+  if (!ref) return nullptr;
+  return nt::Value::MakeDoubleArray(ref);
 }
 
 std::shared_ptr<nt::Value> FromJavaStringArray(JNIEnv *env, jobjectArray jarr) {
@@ -333,10 +241,10 @@ std::shared_ptr<nt::Value> FromJavaStringArray(JNIEnv *env, jobjectArray jarr) {
   std::vector<std::string> arr;
   arr.reserve(len);
   for (size_t i = 0; i < len; ++i) {
-    JavaLocal<jstring> elem(
-        env, static_cast<jstring>(env->GetObjectArrayElement(jarr, i)));
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(jarr, i))};
     if (!elem) return nullptr;
-    arr.push_back(JavaStringRef(env, elem).str());
+    arr.push_back(JStringRef{env, elem}.str());
   }
   return nt::Value::MakeStringArray(std::move(arr));
 }
@@ -345,53 +253,7 @@ std::shared_ptr<nt::Value> FromJavaStringArray(JNIEnv *env, jobjectArray jarr) {
 // Conversions from C++ to Java objects
 //
 
-static inline jstring ToJavaString(JNIEnv *env, nt::StringRef str) {
-  llvm::SmallVector<UTF16, 128> chars;
-  llvm::convertUTF8ToUTF16String(str, chars);
-  return env->NewString(chars.begin(), chars.size());
-}
-
-static jbyteArray ToJavaByteArray(JNIEnv *env, nt::StringRef str) {
-  jbyteArray jarr = env->NewByteArray(str.size());
-  if (!jarr) return nullptr;
-  env->SetByteArrayRegion(jarr, 0, str.size(),
-                          reinterpret_cast<const jbyte *>(str.data()));
-  return jarr;
-}
-
-static jbooleanArray ToJavaBooleanArray(JNIEnv *env, nt::ArrayRef<int> arr)
-{
-  jbooleanArray jarr = env->NewBooleanArray(arr.size());
-  if (!jarr) return nullptr;
-  jboolean *elements =
-      static_cast<jboolean*>(env->GetPrimitiveArrayCritical(jarr, nullptr));
-  if (!elements) return nullptr;
-  for (size_t i = 0; i < arr.size(); ++i)
-    elements[i] = arr[i];
-  env->ReleasePrimitiveArrayCritical(jarr, elements, 0);
-  return jarr;
-}
-
-static jdoubleArray ToJavaDoubleArray(JNIEnv *env, nt::ArrayRef<double> arr)
-{
-  jdoubleArray jarr = env->NewDoubleArray(arr.size());
-  if (!jarr) return nullptr;
-  env->SetDoubleArrayRegion(jarr, 0, arr.size(), arr.data());
-  return jarr;
-}
-
-static jobjectArray ToJavaStringArray(JNIEnv *env,
-                                      nt::ArrayRef<std::string> arr) {
-  jobjectArray jarr = env->NewObjectArray(arr.size(), stringCls, nullptr);
-  if (!jarr) return nullptr;
-  for (size_t i = 0; i < arr.size(); ++i) {
-    JavaLocal<jstring> elem(env, ToJavaString(env, arr[i]));
-    env->SetObjectArrayElement(jarr, i, elem.obj());
-  }
-  return jarr;
-}
-
-static jobject ToJavaObject(JNIEnv *env, const nt::Value& value) {
+static jobject MakeJObject(JNIEnv *env, const nt::Value& value) {
   static jmethodID booleanConstructor = nullptr;
   static jmethodID doubleConstructor = nullptr;
   if (!booleanConstructor)
@@ -407,37 +269,37 @@ static jobject ToJavaObject(JNIEnv *env, const nt::Value& value) {
       return env->NewObject(doubleCls, doubleConstructor,
                             (jdouble)value.GetDouble());
     case NT_STRING:
-      return ToJavaString(env, value.GetString());
+      return MakeJString(env, value.GetString());
     case NT_RAW:
-      return ToJavaByteArray(env, value.GetRaw());
+      return MakeJByteArray(env, value.GetRaw());
     case NT_BOOLEAN_ARRAY:
-      return ToJavaBooleanArray(env, value.GetBooleanArray());
+      return MakeJBooleanArray(env, value.GetBooleanArray());
     case NT_DOUBLE_ARRAY:
-      return ToJavaDoubleArray(env, value.GetDoubleArray());
+      return MakeJDoubleArray(env, value.GetDoubleArray());
     case NT_STRING_ARRAY:
-      return ToJavaStringArray(env, value.GetStringArray());
+      return MakeJStringArray(env, value.GetStringArray());
     case NT_RPC:
-      return ToJavaByteArray(env, value.GetRpc());
+      return MakeJByteArray(env, value.GetRpc());
     default:
       return nullptr;
   }
 }
 
-static jobject ToJavaObject(JNIEnv *env, const nt::ConnectionInfo &info) {
+static jobject MakeJObject(JNIEnv *env, const nt::ConnectionInfo &info) {
   static jmethodID constructor =
       env->GetMethodID(connectionInfoCls, "<init>",
                        "(Ljava/lang/String;Ljava/lang/String;IJI)V");
-  JavaLocal<jstring> remote_id(env, ToJavaString(env, info.remote_id));
-  JavaLocal<jstring> remote_ip(env, ToJavaString(env, info.remote_ip));
+  JLocal<jstring> remote_id{env, MakeJString(env, info.remote_id)};
+  JLocal<jstring> remote_ip{env, MakeJString(env, info.remote_ip)};
   return env->NewObject(connectionInfoCls, constructor, remote_id.obj(),
                         remote_ip.obj(), (jint)info.remote_port,
                         (jlong)info.last_update, (jint)info.protocol_version);
 }
 
-static jobject ToJavaObject(JNIEnv *env, const nt::EntryInfo &info) {
+static jobject MakeJObject(JNIEnv *env, const nt::EntryInfo &info) {
   static jmethodID constructor =
       env->GetMethodID(entryInfoCls, "<init>", "(Ljava/lang/String;IIJ)V");
-  JavaLocal<jstring> name(env, ToJavaString(env, info.name));
+  JLocal<jstring> name{env, MakeJString(env, info.name)};
   return env->NewObject(entryInfoCls, constructor, name.obj(), (jint)info.type,
                         (jint)info.flags, (jlong)info.last_change);
 }
@@ -465,7 +327,7 @@ extern "C" {
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_containsKey
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val) return false;
   return true;
 }
@@ -478,7 +340,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getType
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val) return NT_UNASSIGNED;
   return val->type();
 }
@@ -491,7 +353,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putBoolean
   (JNIEnv *env, jclass, jstring key, jboolean value)
 {
-  return nt::SetEntryValue(JavaStringRef(env, key),
+  return nt::SetEntryValue(JStringRef{env, key},
                            nt::Value::MakeBoolean(value != JNI_FALSE));
 }
 
@@ -503,7 +365,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putDouble
   (JNIEnv *env, jclass, jstring key, jdouble value)
 {
-  return nt::SetEntryValue(JavaStringRef(env, key),
+  return nt::SetEntryValue(JStringRef{env, key},
                            nt::Value::MakeDouble(value));
 }
 
@@ -515,8 +377,8 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putString
   (JNIEnv *env, jclass, jstring key, jstring value)
 {
-  return nt::SetEntryValue(JavaStringRef(env, key),
-                           nt::Value::MakeString(JavaStringRef(env, value)));
+  return nt::SetEntryValue(JStringRef{env, key},
+                           nt::Value::MakeString(JStringRef{env, value}));
 }
 
 /*
@@ -529,7 +391,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 {
   auto v = FromJavaRaw(env, value);
   if (!v) return false;
-  return nt::SetEntryValue(JavaStringRef(env, key), v);
+  return nt::SetEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -542,7 +404,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 {
   auto v = FromJavaRawBB(env, value, len);
   if (!v) return false;
-  return nt::SetEntryValue(JavaStringRef(env, key), v);
+  return nt::SetEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -555,7 +417,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 {
   auto v = FromJavaBooleanArray(env, value);
   if (!v) return false;
-  return nt::SetEntryValue(JavaStringRef(env, key), v);
+  return nt::SetEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -568,7 +430,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 {
   auto v = FromJavaDoubleArray(env, value);
   if (!v) return false;
-  return nt::SetEntryValue(JavaStringRef(env, key), v);
+  return nt::SetEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -581,7 +443,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 {
   auto v = FromJavaStringArray(env, value);
   if (!v) return false;
-  return nt::SetEntryValue(JavaStringRef(env, key), v);
+  return nt::SetEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -592,7 +454,8 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutBoolean
   (JNIEnv *env, jclass, jstring key, jboolean value)
 {
-  nt::SetEntryTypeValue(JavaStringRef(env, key), nt::Value::MakeBoolean(value != JNI_FALSE));
+  nt::SetEntryTypeValue(JStringRef{env, key},
+                        nt::Value::MakeBoolean(value != JNI_FALSE));
 }
 
 /*
@@ -603,7 +466,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutDouble
   (JNIEnv *env, jclass, jstring key, jdouble value)
 {
-  nt::SetEntryTypeValue(JavaStringRef(env, key), nt::Value::MakeDouble(value));
+  nt::SetEntryTypeValue(JStringRef{env, key}, nt::Value::MakeDouble(value));
 }
 
 /*
@@ -614,8 +477,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutString
   (JNIEnv *env, jclass, jstring key, jstring value)
 {
-  nt::SetEntryTypeValue(JavaStringRef(env, key),
-                        nt::Value::MakeString(JavaStringRef(env, value)));
+  nt::SetEntryTypeValue(JStringRef{env, key},
+                        nt::Value::MakeString(JStringRef{env, value}));
 }
 
 /*
@@ -628,7 +491,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 {
   auto v = FromJavaRaw(env, value);
   if (!v) return;
-  nt::SetEntryTypeValue(JavaStringRef(env, key), v);
+  nt::SetEntryTypeValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -641,7 +504,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 {
   auto v = FromJavaRawBB(env, value, len);
   if (!v) return;
-  nt::SetEntryTypeValue(JavaStringRef(env, key), v);
+  nt::SetEntryTypeValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -654,7 +517,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 {
   auto v = FromJavaBooleanArray(env, value);
   if (!v) return;
-  nt::SetEntryTypeValue(JavaStringRef(env, key), v);
+  nt::SetEntryTypeValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -667,7 +530,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 {
   auto v = FromJavaDoubleArray(env, value);
   if (!v) return;
-  nt::SetEntryTypeValue(JavaStringRef(env, key), v);
+  nt::SetEntryTypeValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -680,7 +543,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 {
   auto v = FromJavaStringArray(env, value);
   if (!v) return;
-  nt::SetEntryTypeValue(JavaStringRef(env, key), v);
+  nt::SetEntryTypeValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -691,12 +554,12 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val) {
     ThrowTableKeyNotDefined(env, key);
     return nullptr;
   }
-  return ToJavaObject(env, *val);
+  return MakeJObject(env, *val);
 }
 
 /*
@@ -707,7 +570,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBoolean__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsBoolean()) {
     ThrowTableKeyNotDefined(env, key);
     return false;
@@ -723,7 +586,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDouble__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsDouble()) {
     ThrowTableKeyNotDefined(env, key);
     return 0;
@@ -739,12 +602,12 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getString__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsString()) {
     ThrowTableKeyNotDefined(env, key);
     return nullptr;
   }
-  return ToJavaString(env, val->GetString());
+  return MakeJString(env, val->GetString());
 }
 
 /*
@@ -755,12 +618,12 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRaw__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsRaw()) {
     ThrowTableKeyNotDefined(env, key);
     return nullptr;
   }
-  return ToJavaByteArray(env, val->GetRaw());
+  return MakeJByteArray(env, val->GetRaw());
 }
 
 /*
@@ -771,12 +634,12 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
 JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBooleanArray__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsBooleanArray()) {
     ThrowTableKeyNotDefined(env, key);
     return nullptr;
   }
-  return ToJavaBooleanArray(env, val->GetBooleanArray());
+  return MakeJBooleanArray(env, val->GetBooleanArray());
 }
 
 /*
@@ -787,12 +650,12 @@ JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_Network
 JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDoubleArray__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsDoubleArray()) {
     ThrowTableKeyNotDefined(env, key);
     return nullptr;
   }
-  return ToJavaDoubleArray(env, val->GetDoubleArray());
+  return MakeJDoubleArray(env, val->GetDoubleArray());
 }
 
 /*
@@ -803,12 +666,12 @@ JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getStringArray__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsStringArray()) {
     ThrowTableKeyNotDefined(env, key);
     return nullptr;
   }
-  return ToJavaStringArray(env, val->GetStringArray());
+  return MakeJStringArray(env, val->GetStringArray());
 }
 
 /*
@@ -819,9 +682,9 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue__Ljava_lang_String_2Ljava_lang_Object_2
   (JNIEnv *env, jclass, jstring key, jobject defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val) return defaultValue;
-  return ToJavaObject(env, *val);
+  return MakeJObject(env, *val);
 }
 
 /*
@@ -832,7 +695,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBoolean__Ljava_lang_String_2Z
   (JNIEnv *env, jclass, jstring key, jboolean defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsBoolean()) return defaultValue;
   return val->GetBoolean();
 }
@@ -845,7 +708,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDouble__Ljava_lang_String_2D
   (JNIEnv *env, jclass, jstring key, jdouble defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsDouble()) return defaultValue;
   return val->GetDouble();
 }
@@ -858,9 +721,9 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getString__Ljava_lang_String_2Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key, jstring defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsString()) return defaultValue;
-  return ToJavaString(env, val->GetString());
+  return MakeJString(env, val->GetString());
 }
 
 /*
@@ -871,9 +734,9 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRaw__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsRaw()) return defaultValue;
-  return ToJavaByteArray(env, val->GetRaw());
+  return MakeJByteArray(env, val->GetRaw());
 }
 
 /*
@@ -884,9 +747,9 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
 JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBooleanArray__Ljava_lang_String_2_3Z
   (JNIEnv *env, jclass, jstring key, jbooleanArray defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsBooleanArray()) return defaultValue;
-  return ToJavaBooleanArray(env, val->GetBooleanArray());
+  return MakeJBooleanArray(env, val->GetBooleanArray());
 }
 
 /*
@@ -897,9 +760,9 @@ JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_Network
 JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDoubleArray__Ljava_lang_String_2_3D
   (JNIEnv *env, jclass, jstring key, jdoubleArray defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsDoubleArray()) return defaultValue;
-  return ToJavaDoubleArray(env, val->GetDoubleArray());
+  return MakeJDoubleArray(env, val->GetDoubleArray());
 }
 
 /*
@@ -910,9 +773,9 @@ JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getStringArray__Ljava_lang_String_2_3Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key, jobjectArray defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsStringArray()) return defaultValue;
-  return ToJavaStringArray(env, val->GetStringArray());
+  return MakeJStringArray(env, val->GetStringArray());
 }
 
 /*
@@ -923,7 +786,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultBoolean
   (JNIEnv *env, jclass, jstring key, jboolean defaultValue)
 {
-  return nt::SetDefaultEntryValue(JavaStringRef(env, key), 
+  return nt::SetDefaultEntryValue(JStringRef{env, key}, 
                                   nt::Value::MakeBoolean(defaultValue != JNI_FALSE));
 }
 
@@ -935,7 +798,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultDouble
   (JNIEnv *env, jclass, jstring key, jdouble defaultValue)
 {
-  return nt::SetDefaultEntryValue(JavaStringRef(env, key),
+  return nt::SetDefaultEntryValue(JStringRef{env, key},
                                   nt::Value::MakeDouble(defaultValue));
 }
 
@@ -947,8 +810,9 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultString
   (JNIEnv *env, jclass, jstring key, jstring defaultValue)
 {
-  return nt::SetDefaultEntryValue(JavaStringRef(env, key), 
-                                  nt::Value::MakeString(JavaStringRef(env, defaultValue)));
+  return nt::SetDefaultEntryValue(
+      JStringRef{env, key},
+      nt::Value::MakeString(JStringRef{env, defaultValue}));
 }
 
 /*
@@ -960,7 +824,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
   (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
 {
   auto v = FromJavaRaw(env, defaultValue);
-  return nt::SetDefaultEntryValue(JavaStringRef(env, key), v);
+  return nt::SetDefaultEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -972,7 +836,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
   (JNIEnv *env, jclass, jstring key, jbooleanArray defaultValue)
 {
   auto v = FromJavaBooleanArray(env, defaultValue);
-  return nt::SetDefaultEntryValue(JavaStringRef(env, key), v);
+  return nt::SetDefaultEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -984,7 +848,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
   (JNIEnv *env, jclass, jstring key, jdoubleArray defaultValue)
 {
   auto v = FromJavaDoubleArray(env, defaultValue);
-  return nt::SetDefaultEntryValue(JavaStringRef(env, key), v);
+  return nt::SetDefaultEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -996,7 +860,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
   (JNIEnv *env, jclass, jstring key, jobjectArray defaultValue)
 {
   auto v = FromJavaStringArray(env, defaultValue);
-  return nt::SetDefaultEntryValue(JavaStringRef(env, key), v);
+  return nt::SetDefaultEntryValue(JStringRef{env, key}, v);
 }
 
 /*
@@ -1007,7 +871,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setEntryFlags
   (JNIEnv *env, jclass, jstring key, jint flags)
 {
-  nt::SetEntryFlags(JavaStringRef(env, key), flags);
+  nt::SetEntryFlags(JStringRef{env, key}, flags);
 }
 
 /*
@@ -1018,7 +882,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getEntryFlags
   (JNIEnv *env, jclass, jstring key)
 {
-  return nt::GetEntryFlags(JavaStringRef(env, key));
+  return nt::GetEntryFlags(JStringRef{env, key});
 }
 
 /*
@@ -1029,7 +893,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_deleteEntry
   (JNIEnv *env, jclass, jstring key)
 {
-  nt::DeleteEntry(JavaStringRef(env, key));
+  nt::DeleteEntry(JStringRef{env, key});
 }
 
 /*
@@ -1051,11 +915,11 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getEntries
   (JNIEnv *env, jclass, jstring prefix, jint types)
 {
-  auto arr = nt::GetEntryInfo(JavaStringRef(env, prefix), types);
+  auto arr = nt::GetEntryInfo(JStringRef{env, prefix}, types);
   jobjectArray jarr = env->NewObjectArray(arr.size(), entryInfoCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
-    JavaLocal<jobject> jelem(env, ToJavaObject(env, arr[i]));
+    JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
   }
   return jarr;
@@ -1083,7 +947,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
   auto listener_global =
-      std::make_shared<JavaGlobal<jobject>>(envouter, listener);
+      std::make_shared<JGlobal<jobject>>(envouter, listener);
 
   // cls is a temporary here; cannot be used within callback functor
 	jclass cls = envouter->GetObjectClass(listener);
@@ -1095,7 +959,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   if (!mid) return 0;
 
   return nt::AddEntryListener(
-      JavaStringRef(envouter, prefix),
+      JStringRef{envouter, prefix},
       [=](unsigned int uid, nt::StringRef name,
           std::shared_ptr<nt::Value> value, unsigned int flags_) {
         JNIEnv *env = listenerEnv;
@@ -1105,7 +969,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
         auto handler = listener_global->obj();
 
         // convert the value into the appropriate Java type
-        JavaLocal<jobject> jobj(env, ToJavaObject(env, *value));
+        JLocal<jobject> jobj{env, MakeJObject(env, *value)};
         if (env->ExceptionCheck()) {
           env->ExceptionDescribe();
           env->ExceptionClear();
@@ -1113,7 +977,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
         }
         if (!jobj) return;
 
-        JavaLocal<jstring> jname(env, ToJavaString(env, name));
+        JLocal<jstring> jname{env, MakeJString(env, name)};
         env->CallVoidMethod(handler, mid, (jint)uid, jname.obj(), jobj.obj(),
                             (jint)(flags_));
         if (env->ExceptionCheck()) {
@@ -1146,7 +1010,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
   auto listener_global =
-      std::make_shared<JavaGlobal<jobject>>(envouter, listener);
+      std::make_shared<JGlobal<jobject>>(envouter, listener);
 
   // cls is a temporary here; cannot be used within callback functor
 	jclass cls = envouter->GetObjectClass(listener);
@@ -1167,7 +1031,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
         //if (!handler) goto done; // can happen due to weak reference
 
         // convert into the appropriate Java type
-        JavaLocal<jobject> jobj(env, ToJavaObject(env, conn));
+        JLocal<jobject> jobj{env, MakeJObject(env, conn)};
         if (env->ExceptionCheck()) {
           env->ExceptionDescribe();
           env->ExceptionClear();
@@ -1204,12 +1068,12 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRpc__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsRpc()) {
     ThrowTableKeyNotDefined(env, key);
     return nullptr;
   }
-  return ToJavaByteArray(env, val->GetRpc());
+  return MakeJByteArray(env, val->GetRpc());
 }
 
 /*
@@ -1220,9 +1084,9 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
 JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRpc__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
 {
-  auto val = nt::GetEntryValue(JavaStringRef(env, key));
+  auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsRpc()) return defaultValue;
-  return ToJavaByteArray(env, val->GetRpc());
+  return MakeJByteArray(env, val->GetRpc());
 }
 
 /*
@@ -1233,7 +1097,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_callRpc__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray params)
 {
-  return nt::CallRpc(JavaStringRef(env, key), JavaByteRef(env, params));
+  return nt::CallRpc(JStringRef{env, key}, JByteArrayRef{env, params});
 }
 
 /*
@@ -1244,8 +1108,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_callRpc__Ljava_lang_String_2Ljava_nio_ByteBuffer_2I
   (JNIEnv *env, jclass, jstring key, jobject params, jint params_len)
 {
-  return nt::CallRpc(JavaStringRef(env, key),
-                     JavaByteRefBB(env, params, params_len));
+  return nt::CallRpc(JStringRef{env, key},
+                     JByteArrayRef{env, params, params_len});
 }
 
 /*
@@ -1256,7 +1120,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setNetworkIdentity
   (JNIEnv *env, jclass, jstring name)
 {
-  nt::SetNetworkIdentity(JavaStringRef(env, name));
+  nt::SetNetworkIdentity(JStringRef{env, name});
 }
 
 /*
@@ -1268,8 +1132,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   (JNIEnv *env, jclass, jstring persistFilename, jstring listenAddress,
    jint port)
 {
-  nt::StartServer(JavaStringRef(env, persistFilename),
-                  JavaStringRef(env, listenAddress).c_str(), port);
+  nt::StartServer(JStringRef{env, persistFilename},
+                  JStringRef{env, listenAddress}.c_str(), port);
 }
 
 /*
@@ -1291,7 +1155,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startClient__Ljava_lang_String_2I
   (JNIEnv *env, jclass, jstring serverName, jint port)
 {
-  nt::StartClient(JavaStringRef(env, serverName).c_str(), port);
+  nt::StartClient(JStringRef{env, serverName}.c_str(), port);
 }
 
 /*
@@ -1316,13 +1180,13 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   names.reserve(len);
   servers.reserve(len);
   for (int i = 0; i < len; ++i) {
-    JavaLocal<jstring> elem(
-        env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i)));
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i))};
     if (!elem) {
       env->ThrowNew(illegalArgEx, "null string in serverNames");
       return;
     }
-    names.emplace_back(JavaStringRef(env, elem).str());
+    names.emplace_back(JStringRef{env, elem}.str());
     servers.emplace_back(std::make_pair(nt::StringRef(names.back()),
                                         portInts[i]));
   }
@@ -1365,7 +1229,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
       env->NewObjectArray(arr.size(), connectionInfoCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
-    JavaLocal<jobject> jelem(env, ToJavaObject(env, arr[i]));
+    JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
     env->SetObjectArrayElement(jarr, i, jelem);
   }
   return jarr;
@@ -1379,7 +1243,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_savePersistent
   (JNIEnv *env, jclass, jstring filename)
 {
-  const char *err = nt::SavePersistent(JavaStringRef(env, filename));
+  const char *err = nt::SavePersistent(JStringRef{env, filename});
   if (err) env->ThrowNew(persistentEx, err);
 }
 
@@ -1392,7 +1256,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
   (JNIEnv *env, jclass, jstring filename)
 {
   std::vector<std::string> warns;
-  const char *err = nt::LoadPersistent(JavaStringRef(env, filename),
+  const char *err = nt::LoadPersistent(JStringRef{env, filename},
                                        [&](size_t line, const char *msg) {
                                          std::ostringstream oss;
                                          oss << line << ": " << msg;
@@ -1402,7 +1266,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
     env->ThrowNew(persistentEx, err);
     return nullptr;
   }
-  return ToJavaStringArray(env, warns);
+  return MakeJStringArray(env, warns);
 }
 
 /*
@@ -1418,103 +1282,36 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJN
 
 }  // extern "C"
 
-// Thread where log callbacks are actually performed.
-//
-// JNI's AttachCurrentThread() creates a Java Thread object on every
-// invocation, which is both time inefficient and causes issues with Eclipse
-// (which tries to keep a thread list up-to-date and thus gets swamped).
-//
-// Instead, this class attaches just once.  When a hardware notification
-// occurs, a condition variable wakes up this thread and this thread actually
-// makes the call into Java.
-class LoggerThreadJNI : public wpi::SafeThread {
- public:
-  void Main();
+namespace {
 
-  struct LogMessage {
-    LogMessage(unsigned int level_, const char* file_, unsigned int line_,
-               const char* msg_)
-        : level(level_), file(file_), line(line_), msg(msg_) {}
-    unsigned int level;
-    const char* file;
-    unsigned int line;
-    std::string msg;
-  };
-  std::queue<LogMessage> m_queue;
-  jobject m_func = nullptr;
-  jmethodID m_mid;
-};
-
-class LoggerJNI : public wpi::SafeThreadOwner<LoggerThreadJNI> {
+struct LogMessage {
  public:
-  static LoggerJNI& GetInstance() {
-    ATOMIC_STATIC(LoggerJNI, instance);
-    return instance;
+  LogMessage(unsigned int level, const char *file, unsigned int line,
+             const char *msg)
+      : m_level(level), m_file(file), m_line(line), m_msg(msg) {}
+
+  void CallJava(JNIEnv* env, jobject func, jmethodID mid) {
+    JLocal<jstring> file{env, MakeJString(env, m_file)};
+    JLocal<jstring> msg{env, MakeJString(env, m_msg)};
+    env->CallVoidMethod(func, mid, (jint)m_level, file.obj(),
+                        (jint)m_line, msg.obj());
   }
-  void SetFunc(JNIEnv* env, jobject func, jmethodID mid);
-  void Log(unsigned int level, const char* file, unsigned int line,
-           const char* msg);
+
+  static const char* GetName() { return "NTLogger"; }
+  static JavaVM* GetJVM() { return jvm; }
 
  private:
-  ATOMIC_STATIC_DECL(LoggerJNI)
+  unsigned int m_level;
+  const char* m_file;
+  unsigned int m_line;
+  std::string m_msg;
 };
 
+typedef JSingletonCallbackManager<LogMessage> LoggerJNI;
+
+}  // anonymous namespace
+
 ATOMIC_STATIC_INIT(LoggerJNI)
-
-void LoggerJNI::SetFunc(JNIEnv* env, jobject func, jmethodID mid) {
-  auto thr = GetThread();
-  if (!thr) return;
-  // free global reference
-  if (thr->m_func) env->DeleteGlobalRef(thr->m_func);
-  // create global reference
-  thr->m_func = env->NewGlobalRef(func);
-  thr->m_mid = mid;
-}
-
-void LoggerJNI::Log(unsigned int level, const char *file, unsigned int line,
-                    const char *msg) {
-  auto thr = GetThread();
-  if (!thr) return;
-  thr->m_queue.emplace(level, file, line, msg);
-  thr->m_cond.notify_one();
-}
-
-void LoggerThreadJNI::Main() {
-  JNIEnv *env;
-  JavaVMAttachArgs args;
-  args.version = JNI_VERSION_1_2;
-  args.name = const_cast<char*>("NTLogger");
-  args.group = nullptr;
-  jint rs = jvm->AttachCurrentThreadAsDaemon((void**)&env, &args);
-  if (rs != JNI_OK) return;
-
-  std::unique_lock<std::mutex> lock(m_mutex);
-  while (m_active) {
-    m_cond.wait(lock, [&] { return !(m_active && m_queue.empty()); });
-    if (!m_active) break;
-    while (!m_queue.empty()) {
-      if (!m_active) break;
-      auto item = std::move(m_queue.front());
-      m_queue.pop();
-      auto func = m_func;
-      auto mid = m_mid;
-      lock.unlock();  // don't hold mutex during callback execution
-      {
-        JavaLocal<jstring> file(env, ToJavaString(env, item.file));
-        JavaLocal<jstring> msg(env, ToJavaString(env, item.msg));
-        env->CallVoidMethod(func, mid, (jint)item.level, file.obj(),
-                            (jint)item.line, msg.obj());
-        if (env->ExceptionCheck()) {
-          env->ExceptionDescribe();
-          env->ExceptionClear();
-        }
-      }
-      lock.lock();
-    }
-  }
-
-  if (jvm) jvm->DetachCurrentThread();
-}
 
 extern "C" {
 
@@ -1542,7 +1339,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   nt::SetLogger(
       [](unsigned int level, const char *file, unsigned int line,
          const char *msg) {
-        LoggerJNI::GetInstance().Log(level, file, line, msg);
+        LoggerJNI::GetInstance().Send(level, file, line, msg);
       },
       minLevel);
 }
