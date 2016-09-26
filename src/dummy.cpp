@@ -1,3 +1,0 @@
-namespace wpi {
-void DummyFunction() {}
-}
