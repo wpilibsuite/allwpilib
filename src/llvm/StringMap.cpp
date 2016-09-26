@@ -12,17 +12,32 @@
 //===----------------------------------------------------------------------===//
 
 #include "llvm/StringMap.h"
+#include "llvm/MathExtras.h"
 #include "llvm/StringExtras.h"
-//#include "llvm/Support/Compiler.h"
+#include "llvm/Compiler.h"
 #include <cassert>
 using namespace llvm;
+
+/// Returns the number of buckets to allocate to ensure that the DenseMap can
+/// accommodate \p NumEntries without need to grow().
+static unsigned getMinBucketToReserveForEntries(unsigned NumEntries) {
+  // Ensure that "NumEntries * 4 < NumBuckets * 3"
+  if (NumEntries == 0)
+    return 0;
+  // +1 is required because of the strict equality.
+  // For example if NumEntries is 48, we need to return 401.
+  return NextPowerOf2(NumEntries * 4 / 3 + 1);
+}
 
 StringMapImpl::StringMapImpl(unsigned InitSize, unsigned itemSize) {
   ItemSize = itemSize;
 
   // If a size is specified, initialize the table with that many buckets.
   if (InitSize) {
-    init(InitSize);
+    // The table will grow when the number of entries reach 3/4 of the number of
+    // buckets. To guarantee that "InitSize" number of entries can be inserted
+    // in the table without growing, we allocate just what is needed here.
+    init(getMinBucketToReserveForEntries(InitSize));
     return;
   }
 
@@ -70,7 +85,7 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
   while (1) {
     StringMapEntryBase *BucketItem = TheTable[BucketNo];
     // If we found an empty bucket, this key isn't in the table yet, return it.
-    if (!BucketItem) {
+    if (LLVM_LIKELY(!BucketItem)) {
       // If we found a tombstone, we want to reuse the tombstone instead of an
       // empty bucket.  This reduces probing.
       if (FirstTombstone != -1) {
@@ -85,7 +100,7 @@ unsigned StringMapImpl::LookupBucketFor(StringRef Name) {
     if (BucketItem == getTombstoneVal()) {
       // Skip over tombstones.  However, remember the first one we see.
       if (FirstTombstone == -1) FirstTombstone = BucketNo;
-    } else if (HashTable[BucketNo] == FullHashValue) {
+    } else if (LLVM_LIKELY(HashTable[BucketNo] == FullHashValue)) {
       // If the full hash value matches, check deeply for a match.  The common
       // case here is that we are only looking at the buckets (for item info
       // being non-null and for the full hash value) not at the items.  This
@@ -124,12 +139,12 @@ int StringMapImpl::FindKey(StringRef Key) const {
   while (1) {
     StringMapEntryBase *BucketItem = TheTable[BucketNo];
     // If we found an empty bucket, this key isn't in the table yet, return.
-    if (!BucketItem)
+    if (LLVM_LIKELY(!BucketItem))
       return -1;
 
     if (BucketItem == getTombstoneVal()) {
       // Ignore tombstones.
-    } else if (HashTable[BucketNo] == FullHashValue) {
+    } else if (LLVM_LIKELY(HashTable[BucketNo] == FullHashValue)) {
       // If the full hash value matches, check deeply for a match.  The common
       // case here is that we are only looking at the buckets (for item info
       // being non-null and for the full hash value) not at the items.  This
@@ -188,9 +203,10 @@ unsigned StringMapImpl::RehashTable(unsigned BucketNo) {
   // If the hash table is now more than 3/4 full, or if fewer than 1/8 of
   // the buckets are empty (meaning that many are filled with tombstones),
   // grow/rehash the table.
-  if (NumItems * 4 > NumBuckets * 3) {
+  if (LLVM_UNLIKELY(NumItems * 4 > NumBuckets * 3)) {
     NewSize = NumBuckets*2;
-  } else if (NumBuckets - (NumItems + NumTombstones) <= NumBuckets / 8) {
+  } else if (LLVM_UNLIKELY(NumBuckets - (NumItems + NumTombstones) <=
+                           NumBuckets / 8)) {
     NewSize = NumBuckets;
   } else {
     return BucketNo;

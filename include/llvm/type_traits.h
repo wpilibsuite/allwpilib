@@ -17,10 +17,7 @@
 #include <type_traits>
 #include <utility>
 
-#ifndef __has_feature
-#define LLVM_DEFINED_HAS_FEATURE
-#define __has_feature(x) 0
-#endif
+#include "llvm/Compiler.h"
 
 namespace llvm {
 
@@ -54,11 +51,12 @@ struct isPodLike<std::pair<T, U> > {
 };
 
 /// \brief Metafunction that determines whether the given type is either an
-/// integral type or an enumeration type.
+/// integral type or an enumeration type, including enum classes.
 ///
 /// Note that this accepts potentially more integral types than is_integral
-/// because it is based on merely being convertible implicitly to an integral
-/// type.
+/// because it is based on being implicitly convertible to an integral type.
+/// Also note that enum classes aren't implicitly convertible to integral types,
+/// the value may therefore need to be explicitly converted before being used.
 template <typename T> class is_integral_or_enum {
   typedef typename std::remove_reference<T>::type UnderlyingT;
 
@@ -67,7 +65,8 @@ public:
       !std::is_class<UnderlyingT>::value && // Filter conversion operators.
       !std::is_pointer<UnderlyingT>::value &&
       !std::is_floating_point<UnderlyingT>::value &&
-      std::is_convertible<UnderlyingT, unsigned long long>::value;
+      (std::is_enum<UnderlyingT>::value ||
+       std::is_convertible<UnderlyingT, unsigned long long>::value);
 };
 
 /// \brief If T is a pointer, just return it. If it is not, return T&.
@@ -92,9 +91,5 @@ struct add_const_past_pointer<
 };
 
 } // namespace llvm
-
-#ifdef LLVM_DEFINED_HAS_FEATURE
-#undef __has_feature
-#endif
 
 #endif
