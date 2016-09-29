@@ -53,10 +53,12 @@ static VideoMode::PixelFormat ToPixelFormat(__u32 pixelformat) {
   switch (pixelformat) {
     case V4L2_PIX_FMT_MJPEG:
       return VideoMode::kMJPEG;
+#if 0
     case V4L2_PIX_FMT_YUYV:
       return VideoMode::kYUYV;
     case V4L2_PIX_FMT_RGB565:
       return VideoMode::kRGB565;
+#endif
     default:
       return VideoMode::kUnknown;
   }
