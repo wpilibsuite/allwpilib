@@ -16,12 +16,16 @@ task cmake(type: Exec, dependsOn: setupCmake) {
         commandLine '../configure.bat',
             "-DNTCORE_INCLUDE_DIR=$netTablesInclude",
             "-DNTCORE_LIBDIR=$netLibDesktopLocation",
+            "-DWPIUTIL_INCLUDE_DIR=$wpiUtilInclude",
+            "-DWPIUTIL_LIBDIR=$wpiUtilLibDesktopLocation",
             "-DSIMULATION_INSTALL_DIR=$simulationInstallDir"
     }
     else {
         commandLine 'cmake', '..',
             "-DNTCORE_INCLUDE_DIR=$netTablesInclude",
             "-DNTCORE_LIBDIR=$netLibDesktopLocation",
+            "-DWPIUTIL_INCLUDE_DIR=$wpiUtilInclude",
+            "-DWPIUTIL_LIBDIR=$wpiUtilLibDesktopLocation",
             "-DSIMULATION_INSTALL_DIR=$simulationInstallDir"
     }
 }
@@ -50,7 +54,7 @@ task gz_msgs(type: Exec, dependsOn: cmake) {
       }
 }
 
-task wpilibcSim(type: Exec, dependsOn: ['cmake', ':unzipNetworkTables']) {
+task wpilibcSim(type: Exec, dependsOn: ['cmake', ':unzipNetworkTables', ':unzipWpiUtil']) {
     description = 'build WPILib C++ for simulation with cmake'
     group = 'WPILib Simulation'
     workingDir '../build'
@@ -93,6 +97,10 @@ task wpilibcSimCopy(type: Copy, dependsOn: allcsim) {
     }
 
     from ("$netLibDesktopLocation/libntcore.so") {
+        into "lib"
+    }
+
+    from ("$wpiUtilLibDesktopLocation/libwpiutil.so") {
         into "lib"
     }
 }
