@@ -21,6 +21,7 @@ using namespace wpi::java;
 // Used for callback.
 static JavaVM *jvm = nullptr;
 static jclass usbCameraInfoCls = nullptr;
+static jclass videoModeCls = nullptr;
 
 extern "C" {
 
@@ -40,6 +41,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (!usbCameraInfoCls) return JNI_ERR;
   env->DeleteLocalRef(local);
 
+  local = env->FindClass("edu/wpi/cameraserver/VideoMode");
+  if (!local) return JNI_ERR;
+  videoModeCls = static_cast<jclass>(env->NewGlobalRef(local));
+  if (!videoModeCls) return JNI_ERR;
+  env->DeleteLocalRef(local);
+
   return JNI_VERSION_1_6;
 }
 
@@ -49,6 +56,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     return;
   // Delete global references
   if (usbCameraInfoCls) env->DeleteGlobalRef(usbCameraInfoCls);
+  if (videoModeCls) env->DeleteGlobalRef(videoModeCls);
   jvm = nullptr;
 }
 
@@ -71,6 +79,15 @@ static jobject MakeJObject(JNIEnv *env, const cs::USBCameraInfo &info) {
   JLocal<jstring> name(env, MakeJString(env, info.name));
   return env->NewObject(usbCameraInfoCls, constructor,
                         static_cast<jint>(info.dev), path.obj(), name.obj());
+}
+
+static jobject MakeJObject(JNIEnv *env, const cs::VideoMode &videoMode) {
+  static jmethodID constructor =
+      env->GetMethodID(videoModeCls, "<init>", "(IIII)V");
+  return env->NewObject(
+      videoModeCls, constructor, static_cast<jint>(videoMode.pixelFormat),
+      static_cast<jint>(videoMode.width), static_cast<jint>(videoMode.height),
+      static_cast<jint>(videoMode.fps));
 }
 
 extern "C" {
@@ -276,13 +293,19 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createHTTPSourc
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    createCvSource
- * Signature: (Ljava/lang/String;)I
+ * Signature: (Ljava/lang/String;IIII)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createCvSource
-  (JNIEnv *env, jclass, jstring name)
+  (JNIEnv *env, jclass, jstring name, jint pixelFormat, jint width, jint height,
+   jint fps)
 {
   CS_Status status;
-  auto val = cs::CreateCvSource(JStringRef{env, name}, &status);
+  auto val = cs::CreateCvSource(
+      JStringRef{env, name},
+      cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(pixelFormat),
+                    static_cast<int>(width), static_cast<int>(height),
+                    static_cast<int>(fps)},
+      &status);
   CheckStatus(env, status);
   return val;
 }
@@ -372,6 +395,103 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateS
   auto arr = cs::EnumerateSourceProperties(source, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    getSourceVideoMode
+ * Signature: (I)Ledu/wpi/cameraserver/VideoMode;
+ */
+JNIEXPORT jobject JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getSourceVideoMode
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status;
+  auto val = cs::GetSourceVideoMode(source, &status);
+  if (!CheckStatus(env, status)) return nullptr;
+  return MakeJObject(env, val);
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    setSourceVideoMode
+ * Signature: (IIIII)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSourceVideoMode
+  (JNIEnv *env, jclass, jint source, jint pixelFormat, jint width, jint height,
+   jint fps)
+{
+  CS_Status status;
+  auto val = cs::SetSourceVideoMode(
+      source,
+      cs::VideoMode(static_cast<cs::VideoMode::PixelFormat>(pixelFormat), width,
+                    height, fps),
+      &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    setSourcePixelFormat
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSourcePixelFormat
+  (JNIEnv *env, jclass, jint source, jint pixelFormat)
+{
+  CS_Status status;
+  auto val = cs::SetSourcePixelFormat(
+      source, static_cast<cs::VideoMode::PixelFormat>(pixelFormat), &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    setSourceResolution
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSourceResolution
+  (JNIEnv *env, jclass, jint source, jint width, jint height)
+{
+  CS_Status status;
+  auto val = cs::SetSourceResolution(source, width, height, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    setSourceFPS
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSourceFPS
+  (JNIEnv *env, jclass, jint source, jint fps)
+{
+  CS_Status status;
+  auto val = cs::SetSourceFPS(source, fps, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    enumerateSourceVideoModes
+ * Signature: (I)[Ledu/wpi/cameraserver/VideoMode;
+ */
+JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_enumerateSourceVideoModes
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status;
+  auto arr = cs::EnumerateSourceVideoModes(source, &status);
+  if (!CheckStatus(env, status)) return nullptr;
+  jobjectArray jarr =
+      env->NewObjectArray(arr.size(), videoModeCls, nullptr);
+  if (!jarr) return nullptr;
+  for (size_t i = 0; i < arr.size(); ++i) {
+    JLocal<jobject> jelem{env, MakeJObject(env, arr[i])};
+    env->SetObjectArrayElement(jarr, i, jelem);
+  }
+  return jarr;
 }
 
 /*

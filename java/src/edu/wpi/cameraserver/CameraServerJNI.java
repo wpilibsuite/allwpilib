@@ -93,7 +93,7 @@ public class CameraServerJNI {
   public static native int createUSBSourceDev(String name, int dev);
   public static native int createUSBSourcePath(String name, String path);
   public static native int createHTTPSource(String name, String url);
-  public static native int createCvSource(String name);
+  public static native int createCvSource(String name, int pixelFormat, int width, int height, int fps);
 
   //
   // Source Functions
@@ -104,6 +104,12 @@ public class CameraServerJNI {
   public static native boolean isSourceConnected(int source);
   public static native int getSourceProperty(int source, String name);
   public static native int[] enumerateSourceProperties(int source);
+  public static native VideoMode getSourceVideoMode(int source);
+  public static native boolean setSourceVideoMode(int source, int pixelFormat, int width, int height, int fps);
+  public static native boolean setSourcePixelFormat(int source, int pixelFormat);
+  public static native boolean setSourceResolution(int source, int width, int height);
+  public static native boolean setSourceFPS(int source, int fps);
+  public static native VideoMode[] enumerateSourceVideoModes(int source);
   public static native int copySource(int source);
   public static native void releaseSource(int source);
 

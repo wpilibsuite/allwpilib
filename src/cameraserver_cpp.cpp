@@ -147,7 +147,8 @@ CS_Source CreateHTTPSource(llvm::StringRef name, llvm::StringRef url,
   return 0;  // TODO
 }
 
-CS_Source CreateCvSource(llvm::StringRef name, CS_Status* status) {
+CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
+                         CS_Status* status) {
   return 0;  // TODO
 }
 
@@ -236,6 +237,64 @@ llvm::ArrayRef<CS_Property> EnumerateSourceProperties(
   for (auto property : data->source->EnumerateProperties(properties_buf))
     vec.push_back(Handle{source, property, Handle::kProperty});
   return vec;
+}
+
+VideoMode GetSourceVideoMode(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return VideoMode{};
+  }
+  return data->source->GetVideoMode(status);
+}
+
+bool SetSourceVideoMode(CS_Source source, const VideoMode& mode,
+                        CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->SetVideoMode(mode, status);
+}
+
+bool SetSourcePixelFormat(CS_Source source, VideoMode::PixelFormat pixelFormat,
+                          CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->SetPixelFormat(pixelFormat, status);
+}
+
+bool SetSourceResolution(CS_Source source, int width, int height,
+                         CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->SetResolution(width, height, status);
+}
+
+bool SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return false;
+  }
+  return data->source->SetFPS(fps, status);
+}
+
+std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
+                                                 CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return std::vector<VideoMode>{};
+  }
+  return data->source->EnumerateVideoModes(status);
 }
 
 CS_Source CopySource(CS_Source source, CS_Status* status) {

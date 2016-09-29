@@ -42,6 +42,29 @@ struct USBCameraInfo {
   std::string name;
 };
 
+/// Video mode
+struct VideoMode : public CS_VideoMode {
+  enum PixelFormat {
+    kUnknown = CS_PIXFMT_UNKNOWN,
+    kMJPEG = CS_PIXFMT_MJPEG,
+    kYUYV = CS_PIXFMT_YUYV,
+    kRGB565 = CS_PIXFMT_RGB565
+  };
+  VideoMode() {
+    pixelFormat = 0;
+    width = 0;
+    height = 0;
+    fps = 0;
+  }
+  VideoMode(PixelFormat pixelFormat_, int width_, int height_, int fps_) {
+    pixelFormat = pixelFormat_;
+    width = width_;
+    height = height_;
+    fps = fps_;
+  }
+  explicit operator bool() const { return pixelFormat == kUnknown; }
+};
+
 //
 // Property Functions
 //
@@ -74,7 +97,8 @@ CS_Source CreateUSBSourcePath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status);
 CS_Source CreateHTTPSource(llvm::StringRef name, llvm::StringRef url,
                            CS_Status* status);
-CS_Source CreateCvSource(llvm::StringRef name, CS_Status* status);
+CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
+                         CS_Status* status);
 
 //
 // Source Functions
@@ -94,6 +118,16 @@ CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
 llvm::ArrayRef<CS_Property> EnumerateSourceProperties(
     CS_Source source, llvm::SmallVectorImpl<CS_Property>& vec,
     CS_Status* status);
+VideoMode GetSourceVideoMode(CS_Source source, CS_Status* status);
+bool SetSourceVideoMode(CS_Source source, const VideoMode& mode,
+                        CS_Status* status);
+bool SetSourcePixelFormat(CS_Source source, VideoMode::PixelFormat pixelFormat,
+                          CS_Status* status);
+bool SetSourceResolution(CS_Source source, int width, int height,
+                         CS_Status* status);
+bool SetSourceFPS(CS_Source source, int fps, CS_Status* status);
+std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
+                                                 CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 

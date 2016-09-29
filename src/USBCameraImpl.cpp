@@ -36,6 +36,32 @@ using namespace cs;
 
 #ifdef __linux__
 
+// Conversions v4l2_fract time per frame from/to frames per second (fps)
+static inline int FractToFPS(const struct v4l2_fract& timeperframe) {
+  return (1.0 * timeperframe.denominator) / timeperframe.numerator;
+}
+
+static inline struct v4l2_fract FPSToFract(int fps) {
+  struct v4l2_fract timeperframe;
+  timeperframe.numerator = 1;
+  timeperframe.denominator = fps;
+  return timeperframe;
+}
+
+// Conversion from v4l2_format pixelformat to VideoMode::PixelFormat
+static VideoMode::PixelFormat ToPixelFormat(__u32 pixelformat) {
+  switch (pixelformat) {
+    case V4L2_PIX_FMT_MJPEG:
+      return VideoMode::kMJPEG;
+    case V4L2_PIX_FMT_YUYV:
+      return VideoMode::kYUYV;
+    case V4L2_PIX_FMT_RGB565:
+      return VideoMode::kRGB565;
+    default:
+      return VideoMode::kUnknown;
+  }
+}
+
 // Removes non-alphanumeric characters and replaces spaces with underscores.
 // e.g. "Zoom, Absolute" -> "zoom_absolute", "Pan (Absolute)" -> "pan_absolute"
 static llvm::StringRef NormalizeName(llvm::StringRef name,
@@ -286,7 +312,17 @@ USBCameraImpl::USBCameraImpl(llvm::StringRef name, llvm::StringRef path)
       m_description{GetDescriptionImpl(m_path.c_str())},
       m_fd{open(m_path.c_str(), O_RDWR)},
       m_active{false} {
-  if (m_fd >= 0) m_connected = true;
+  if (m_fd >= 0) {
+    m_connected = true;
+    struct v4l2_capability vcap;
+    if (DoIoctl(m_fd, VIDIOC_QUERYCAP, &vcap) >= 0) {
+      m_capabilities = vcap.capabilities;
+      if (m_capabilities & V4L2_CAP_DEVICE_CAPS)
+        m_capabilities = vcap.device_caps;
+    }
+    CS_Status status = 0;
+    m_mode = GetVideoMode(&status);
+  }
 }
 
 USBCameraImpl::~USBCameraImpl() { Stop(); }
@@ -411,7 +447,7 @@ int USBCameraImpl::GetProperty(int property, CS_Status* status) const {
 
   int64_t value = 0;
   if (GetIntCtrlIoctl(fd, id, type, &value) < 0) {
-    *status = CS_PROPERTY_READ_FAILED;
+    *status = CS_READ_FAILED;
     return false;
   }
   return value;
@@ -493,7 +529,7 @@ llvm::StringRef USBCameraImpl::GetStringProperty(
   ctrls.controls = &ctrl;
   int rc = DoIoctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
   if (rc < 0) {
-    *status = CS_PROPERTY_READ_FAILED;
+    *status = CS_READ_FAILED;
     return llvm::StringRef{};
   }
   buf.append(ctrl.string, ctrl.string + std::strlen(ctrl.string));
@@ -585,6 +621,211 @@ std::vector<std::string> USBCameraImpl::GetEnumPropertyChoices(
   }
 
   return vec;
+}
+
+VideoMode USBCameraImpl::GetVideoMode(CS_Status* status) const {
+  int fd = m_fd.load();
+  if (fd < 0) {
+    *status = CS_SOURCE_IS_DISCONNECTED;
+    return VideoMode{};
+  }
+
+  // Get format
+  struct v4l2_format vfmt;
+  std::memset(&vfmt, 0, sizeof(vfmt));
+#ifdef V4L2_CAP_EXT_PIX_FORMAT
+  vfmt.fmt.pix.priv = (m_capabilities & V4L2_CAP_EXT_PIX_FORMAT) != 0
+                          ? V4L2_PIX_FMT_PRIV_MAGIC
+                          : 0;
+#endif
+  vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  if (DoIoctl(fd, VIDIOC_G_FMT, &vfmt) != 0) {
+    *status = CS_READ_FAILED;
+    return VideoMode{};
+  }
+  VideoMode::PixelFormat pixelFormat;
+  switch (vfmt.fmt.pix.pixelformat) {
+    case V4L2_PIX_FMT_MJPEG:
+      pixelFormat = VideoMode::kMJPEG;
+      break;
+    case V4L2_PIX_FMT_YUYV:
+      pixelFormat = VideoMode::kYUYV;
+      break;
+    case V4L2_PIX_FMT_RGB565:
+      pixelFormat = VideoMode::kRGB565;
+      break;
+    default:
+      pixelFormat = VideoMode::kUnknown;
+      break;
+  }
+
+  // Get FPS
+  int fps = 0;
+  struct v4l2_streamparm parm;
+  std::memset(&parm, 0, sizeof(parm));
+  parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  if (TryIoctl(fd, VIDIOC_G_PARM, &parm) == 0) {
+    if (parm.parm.capture.capability & V4L2_CAP_TIMEPERFRAME)
+      fps = FractToFPS(parm.parm.capture.timeperframe);
+  }
+
+  VideoMode mode(pixelFormat, vfmt.fmt.pix.width, vfmt.fmt.pix.height, fps);
+
+  // Re-cache
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_mode = mode;
+  return mode;
+}
+
+bool USBCameraImpl::SetVideoModePixRes(const VideoMode& mode,
+                                       CS_Status* status) {
+  int fd = m_fd.load();
+  if (fd < 0) {
+    *status = CS_SOURCE_IS_DISCONNECTED;
+    return false;
+  }
+
+  struct v4l2_format vfmt;
+  std::memset(&vfmt, 0, sizeof(vfmt));
+#ifdef V4L2_CAP_EXT_PIX_FORMAT
+  vfmt.fmt.pix.priv = (m_capabilities & V4L2_CAP_EXT_PIX_FORMAT) != 0
+                          ? V4L2_PIX_FMT_PRIV_MAGIC
+                          : 0;
+#endif
+  vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  switch (mode.pixelFormat) {
+    case VideoMode::kMJPEG:
+      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
+      break;
+    case VideoMode::kYUYV:
+      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+      break;
+    case VideoMode::kRGB565:
+      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB565;
+      break;
+    default:
+      return false;
+  }
+  vfmt.fmt.pix.width = mode.width;
+  vfmt.fmt.pix.height = mode.height;
+
+  if (DoIoctl(fd, VIDIOC_S_FMT, &vfmt) != 0) return false;
+  return true;
+}
+
+bool USBCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
+  if (!SetVideoModePixRes(mode, status)) return false;
+  if (!SetFPS(mode.fps, status)) return false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_mode = mode;
+  }
+  m_mode_changed.notify_one();
+  return true;
+}
+
+std::vector<VideoMode> USBCameraImpl::EnumerateVideoModes(
+    CS_Status* status) const {
+  std::vector<VideoMode> rv;
+  int fd = m_fd.load();
+  if (fd < 0) {
+    *status = CS_SOURCE_IS_DISCONNECTED;
+    return rv;
+  }
+
+  // Formats
+  struct v4l2_fmtdesc fmt;
+
+  fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  for (fmt.index = 0; TryIoctl(fd, VIDIOC_ENUM_FMT, &fmt) >= 0; ++fmt.index) {
+    VideoMode::PixelFormat pixelFormat = ToPixelFormat(fmt.pixelformat);
+    if (pixelFormat == VideoMode::kUnknown) continue;
+
+    struct v4l2_frmsizeenum frmsize;
+    frmsize.pixel_format = fmt.pixelformat;
+    for (frmsize.index = 0; TryIoctl(fd, VIDIOC_ENUM_FRAMESIZES, &frmsize) >= 0;
+         ++frmsize.index) {
+      if (frmsize.type != V4L2_FRMSIZE_TYPE_DISCRETE) continue;
+
+      struct v4l2_frmivalenum frmival;
+      frmival.pixel_format = fmt.pixelformat;
+      frmival.width = frmsize.discrete.width;
+      frmival.height = frmsize.discrete.height;
+      for (frmival.index = 0;
+           TryIoctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival) >= 0;
+           ++frmival.index) {
+        if (frmival.type != V4L2_FRMIVAL_TYPE_DISCRETE) continue;
+
+        rv.emplace_back(pixelFormat, static_cast<int>(frmsize.discrete.width),
+                        static_cast<int>(frmsize.discrete.height),
+                        FractToFPS(frmival.discrete));
+      }
+    }
+  }
+
+  return rv;
+}
+
+bool USBCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+                                   CS_Status* status) {
+  // Copy cached mode so we don't hold lock during ioctl
+  VideoMode mode;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    mode = m_mode;
+  }
+  mode.pixelFormat = pixelFormat;
+  if (!SetVideoModePixRes(mode, status)) return false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_mode.pixelFormat = pixelFormat;
+  }
+  m_mode_changed.notify_one();
+  return true;
+}
+
+bool USBCameraImpl::SetResolution(int width, int height, CS_Status* status) {
+  // Copy cached mode so we don't hold lock during ioctl
+  VideoMode mode;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    mode = m_mode;
+  }
+  mode.width = width;
+  mode.height = height;
+  if (!SetVideoModePixRes(mode, status)) return false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_mode.width = width;
+    m_mode.height = height;
+  }
+  m_mode_changed.notify_one();
+  return true;
+}
+
+bool USBCameraImpl::SetFPS(int fps, CS_Status* status) {
+  int fd = m_fd.load();
+  if (fd < 0) {
+    *status = CS_SOURCE_IS_DISCONNECTED;
+    return false;
+  }
+
+  struct v4l2_streamparm parm;
+  std::memset(&parm, 0, sizeof(parm));
+  parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  if (DoIoctl(fd, VIDIOC_G_PARM, &parm) != 0) return false;
+  if ((parm.parm.capture.capability & V4L2_CAP_TIMEPERFRAME) == 0) return false;
+  std::memset(&parm, 0, sizeof(parm));
+  parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  parm.parm.capture.timeperframe = FPSToFract(fps);
+  if (DoIoctl(fd, VIDIOC_S_PARM, &parm) != 0) return false;
+
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_mode.fps = fps;
+  }
+  m_mode_changed.notify_one();
+  return true;
 }
 
 void USBCameraImpl::Stop() {

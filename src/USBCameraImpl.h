@@ -55,6 +55,14 @@ class USBCameraImpl : public SourceImpl {
   std::vector<std::string> GetEnumPropertyChoices(
       int property, CS_Status* status) const override;
 
+  VideoMode GetVideoMode(CS_Status* status) const override;
+  bool SetVideoMode(const VideoMode& mode, CS_Status* status) override;
+  std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const override;
+  bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+                      CS_Status* status) override;
+  bool SetResolution(int width, int height, CS_Status* status) override;
+  bool SetFPS(int fps, CS_Status* status) override;
+
   void Stop();
 
   struct PropertyData {
@@ -85,6 +93,7 @@ class USBCameraImpl : public SourceImpl {
   void CacheProperties() const;
   bool GetPropertyTypeValueFd(int property, int propType, unsigned* id,
                               int* type, int* fd, CS_Status* status) const;
+  bool SetVideoModePixRes(const VideoMode& mode, CS_Status* status);
 
   void CameraThreadMain();
 
@@ -96,7 +105,13 @@ class USBCameraImpl : public SourceImpl {
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_cameraThread;
 
+  mutable VideoMode m_mode;
+#ifdef __linux__
+  unsigned m_capabilities = 0;
+#endif
+
   mutable std::mutex m_mutex;
+  mutable std::condition_variable m_mode_changed;
 };
 
 }  // namespace cs

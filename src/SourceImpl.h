@@ -17,7 +17,7 @@
 
 #include "llvm/ArrayRef.h"
 #include "llvm/StringRef.h"
-#include "cameraserver_c.h"
+#include "cameraserver_cpp.h"
 #include "Frame.h"
 
 namespace cs {
@@ -98,6 +98,19 @@ class SourceImpl {
                                  CS_Status* status) = 0;
   virtual std::vector<std::string> GetEnumPropertyChoices(
       int property, CS_Status* status) const = 0;
+
+  // Video mode functions
+  virtual VideoMode GetVideoMode(CS_Status* status) const = 0;
+  virtual bool SetVideoMode(const VideoMode& mode, CS_Status* status) = 0;
+  virtual std::vector<VideoMode> EnumerateVideoModes(
+      CS_Status* status) const = 0;
+
+  // These have default implementations but can be overridden for custom
+  // or optimized behavior.
+  virtual bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+                              CS_Status* status);
+  virtual bool SetResolution(int width, int height, CS_Status* status);
+  virtual bool SetFPS(int fps, CS_Status* status);
 
  protected:
   void StartFrame();

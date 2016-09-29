@@ -11,8 +11,19 @@ package edu.wpi.cameraserver;
 public class CvSource extends VideoSource {
   /// Create an OpenCV source.
   /// @param name Source name (arbitrary unique identifier)
-  public CvSource(String name) {
-    super(CameraServerJNI.createCvSource(name));
+  /// @param mode Video mode being generated
+  public CvSource(String name, VideoMode mode) {
+    super(CameraServerJNI.createCvSource(name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
+  }
+
+  /// Create an OpenCV source.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param pixelFormat Pixel format
+  /// @param width width
+  /// @param height height
+  /// @param fps fps
+  public CvSource(String name, VideoMode.PixelFormat pixelFormat, int width, int height, int fps) {
+    super(CameraServerJNI.createCvSource(name, pixelFormat.getValue(), width, height, fps));
   }
 
   /// Put an OpenCV image and notify sinks.

@@ -50,9 +50,29 @@ enum CS_StatusValue {
   CS_WRONG_HANDLE_SUBTYPE = -2001,
   CS_INVALID_PROPERTY = -2002,
   CS_WRONG_PROPERTY_TYPE = -2003,
-  CS_PROPERTY_READ_FAILED = -2004,
+  CS_READ_FAILED = -2004,
   CS_SOURCE_IS_DISCONNECTED = -2005
 };
+
+//
+// Pixel formats
+//
+enum CS_PixelFormat {
+  CS_PIXFMT_UNKNOWN = 0,
+  CS_PIXFMT_MJPEG,
+  CS_PIXFMT_YUYV,
+  CS_PIXFMT_RGB565
+};
+
+//
+// Frame formats
+//
+typedef struct CS_VideoMode {
+  int pixelFormat;
+  int width;
+  int height;
+  int fps;
+} CS_VideoMode;
 
 //
 // Property Functions
@@ -89,7 +109,8 @@ CS_Source CS_CreateUSBSourcePath(const char* name, const char* path,
                                  CS_Status* status);
 CS_Source CS_CreateHTTPSource(const char* name, const char* url,
                               CS_Status* status);
-CS_Source CS_CreateCvSource(const char* name, CS_Status* status);
+CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
+                            CS_Status* status);
 
 //
 // Source Functions
@@ -102,6 +123,22 @@ CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
                                  CS_Status* status);
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
                                           CS_Status* status);
+void CS_GetSourceVideoMode(CS_Source source, CS_VideoMode* mode,
+                           CS_Status* status);
+CS_Bool CS_SetSourceVideoMode(CS_Source source, const CS_VideoMode* mode,
+                              CS_Status* status);
+CS_Bool CS_SetSourceVideoModeDiscrete(CS_Source source,
+                                      enum CS_PixelFormat pixelFormat,
+                                      int width, int height, int fps,
+                                      CS_Status* status);
+CS_Bool CS_SetSourcePixelFormat(CS_Source source,
+                                enum CS_PixelFormat pixelFormat,
+                                CS_Status* status);
+CS_Bool CS_SetSourceResolution(CS_Source source, int width, int height,
+                               CS_Status* status);
+CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status);
+CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
+                                           CS_Status* status);
 CS_Source CS_CopySource(CS_Source source, CS_Status* status);
 void CS_ReleaseSource(CS_Source source, CS_Status* status);
 
@@ -206,6 +243,7 @@ void CS_FreeString(char* str);
 void CS_FreeEnumPropertyChoices(char** choices, int count);
 
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count);
+void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count);
 
 #ifdef __cplusplus
 }

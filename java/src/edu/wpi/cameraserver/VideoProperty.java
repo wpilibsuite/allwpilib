@@ -19,7 +19,7 @@ public class VideoProperty {
     public int getValue() {
       return value;
     }
-  };
+  }
   private static final Type[] m_typeValues = Type.values();
 
   public String getName() {

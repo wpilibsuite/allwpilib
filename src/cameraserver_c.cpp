@@ -79,8 +79,10 @@ CS_Source CS_CreateHTTPSource(const char* name, const char* url,
   return cs::CreateHTTPSource(name, url, status);
 }
 
-CS_Source CS_CreateCvSource(const char* name, CS_Status* status) {
-  return cs::CreateCvSource(name, status);
+CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
+                            CS_Status* status) {
+  return cs::CreateCvSource(name, static_cast<const cs::VideoMode&>(*mode),
+                            status);
 }
 
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
@@ -116,6 +118,56 @@ CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
   auto vec = cs::EnumerateSourceProperties(source, buf, status);
   CS_Property* out =
       static_cast<CS_Property*>(std::malloc(vec.size() * sizeof(CS_Property)));
+  *count = vec.size();
+  std::copy(vec.begin(), vec.end(), out);
+  return out;
+}
+
+void CS_GetSourceVideoMode(CS_Source source, CS_VideoMode* mode,
+                           CS_Status* status) {
+  *mode = cs::GetSourceVideoMode(source, status);
+}
+
+CS_Bool CS_SetSourceVideoMode(CS_Source source, const CS_VideoMode* mode,
+                           CS_Status* status) {
+  return cs::SetSourceVideoMode(
+      source, static_cast<const cs::VideoMode&>(*mode), status);
+}
+
+CS_Bool CS_SetSourceVideoModeDiscrete(CS_Source source,
+                                      enum CS_PixelFormat pixelFormat,
+                                      int width, int height, int fps,
+                                      CS_Status* status) {
+  return cs::SetSourceVideoMode(
+      source, cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(
+                                static_cast<int>(pixelFormat)),
+                            width, height, fps},
+      status);
+}
+
+CS_Bool CS_SetSourcePixelFormat(CS_Source source,
+                                enum CS_PixelFormat pixelFormat,
+                                CS_Status* status) {
+  return cs::SetSourcePixelFormat(
+      source,
+      static_cast<cs::VideoMode::PixelFormat>(static_cast<int>(pixelFormat)),
+      status);
+}
+
+CS_Bool CS_SetSourceResolution(CS_Source source, int width, int height,
+                               CS_Status* status) {
+  return cs::SetSourceResolution(source, width, height, status);
+}
+
+CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status) {
+  return cs::SetSourceFPS(source, fps, status);
+}
+
+CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
+                                           CS_Status* status) {
+  auto vec = cs::EnumerateSourceVideoModes(source, status);
+  CS_VideoMode* out = static_cast<CS_VideoMode*>(
+      std::malloc(vec.size() * sizeof(CS_VideoMode)));
   *count = vec.size();
   std::copy(vec.begin(), vec.end(), out);
   return out;
@@ -323,6 +375,10 @@ void CS_FreeEnumPropertyChoices(char** choices, int count) {
 
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count) {
   std::free(properties);
+}
+
+void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
+  std::free(modes);
 }
 
 }  // extern "C"

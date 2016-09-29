@@ -112,6 +112,41 @@ class VideoSource {
   /// Enumerate all properties of this source.
   std::vector<VideoProperty> EnumerateProperties() const;
 
+  /// Get the current video mode.
+  VideoMode GetVideoMode() const;
+
+  /// Set the video mode.
+  /// @param mode Video mode
+  bool SetVideoMode(const VideoMode& mode);
+
+  /// Set the video mode.
+  /// @param pixelFormat desired pixel format
+  /// @param width desired width
+  /// @param height desired height
+  /// @param fps desired FPS
+  /// @return True if set successfully
+  bool SetVideoMode(VideoMode::PixelFormat pixelFormat, int width, int height,
+                    int fps);
+
+  /// Set the pixel format.
+  /// @param pixelFormat desired pixel format
+  /// @return True if set successfully
+  bool SetPixelFormat(VideoMode::PixelFormat pixelFormat);
+
+  /// Set the resolution.
+  /// @param width desired width
+  /// @param height desired height
+  /// @return True if set successfully
+  bool SetResolution(int width, int height);
+
+  /// Set the frames per second (FPS).
+  /// @param fps desired FPS
+  /// @return True if set successfully
+  bool SetFPS(int fps);
+
+  /// Enumerate all known video modes for this source.
+  std::vector<VideoMode> EnumerateVideoModes() const;
+
   CS_Status GetLastStatus() const { return m_status; }
 
   /// Enumerate all existing sources.
@@ -163,7 +198,17 @@ class CvSource : public VideoSource {
  public:
   /// Create an OpenCV source.
   /// @param name Source name (arbitrary unique identifier)
-  CvSource(llvm::StringRef name);
+  /// @param mode Video mode being generated
+  CvSource(llvm::StringRef name, const VideoMode& mode);
+
+  /// Create an OpenCV source.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param pixelFormat Pixel format
+  /// @param width width
+  /// @param height height
+  /// @param fps fps
+  CvSource(llvm::StringRef name, VideoMode::PixelFormat pixelFormat, int width,
+           int height, int fps);
 
   /// Put an OpenCV image and notify sinks.
   /// This is identical in behavior to calling PutImage(0, image) followed by

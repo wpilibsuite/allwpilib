@@ -118,6 +118,43 @@ inline VideoProperty VideoSource::GetProperty(llvm::StringRef name) {
   return VideoProperty{GetSourceProperty(m_handle, name, &m_status)};
 }
 
+inline VideoMode VideoSource::GetVideoMode() const {
+  m_status = 0;
+  return GetSourceVideoMode(m_handle, &m_status);
+}
+
+inline bool VideoSource::SetVideoMode(const VideoMode& mode) {
+  m_status = 0;
+  return SetSourceVideoMode(m_handle, mode, &m_status);
+}
+
+inline bool VideoSource::SetVideoMode(VideoMode::PixelFormat pixelFormat,
+                                      int width, int height, int fps) {
+  m_status = 0;
+  return SetSourceVideoMode(
+      m_handle, VideoMode{pixelFormat, width, height, fps}, &m_status);
+}
+
+inline bool VideoSource::SetPixelFormat(VideoMode::PixelFormat pixelFormat) {
+  m_status = 0;
+  return SetSourcePixelFormat(m_handle, pixelFormat, &m_status);
+}
+
+inline bool VideoSource::SetResolution(int width, int height) {
+  m_status = 0;
+  return SetSourceResolution(m_handle, width, height, &m_status);
+}
+
+inline bool VideoSource::SetFPS(int fps) {
+  m_status = 0;
+  return SetSourceFPS(m_handle, fps, &m_status);
+}
+
+inline std::vector<VideoMode> VideoSource::EnumerateVideoModes() const {
+  CS_Status status = 0;
+  return EnumerateSourceVideoModes(m_handle, &status);
+}
+
 inline USBCamera::USBCamera(llvm::StringRef name, int dev) {
   m_handle = CreateUSBSourceDev(name, dev, &m_status);
 }
@@ -135,8 +172,14 @@ inline HTTPCamera::HTTPCamera(llvm::StringRef name, llvm::StringRef url) {
   m_handle = CreateHTTPSource(name, url, &m_status);
 }
 
-inline CvSource::CvSource(llvm::StringRef name) {
-  m_handle = CreateCvSource(name, &m_status);
+inline CvSource::CvSource(llvm::StringRef name, const VideoMode& mode) {
+  m_handle = CreateCvSource(name, mode, &m_status);
+}
+
+inline CvSource::CvSource(llvm::StringRef name, VideoMode::PixelFormat format,
+                          int width, int height, int fps) {
+  m_handle =
+      CreateCvSource(name, VideoMode{format, width, height, fps}, &m_status);
 }
 
 inline void CvSource::PutFrame(cv::Mat* image) {

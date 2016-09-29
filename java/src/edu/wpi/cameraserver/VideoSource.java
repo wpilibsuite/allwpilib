@@ -65,6 +65,54 @@ public class VideoSource {
     return rv;
   }
 
+  /// Get the current video mode.
+  public VideoMode getVideoMode() {
+    return CameraServerJNI.getSourceVideoMode(m_handle);
+  }
+
+  /// Set the video mode.
+  /// @param mode Video mode
+  public boolean setVideoMode(VideoMode mode) {
+    return CameraServerJNI.setSourceVideoMode(m_handle, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps);
+  }
+
+  /// Set the video mode.
+  /// @param pixelFormat desired pixel format
+  /// @param width desired width
+  /// @param height desired height
+  /// @param fps desired FPS
+  /// @return True if set successfully
+  public boolean setVideoMode(VideoMode.PixelFormat pixelFormat, int width, int height, int fps) {
+    return CameraServerJNI.setSourceVideoMode(m_handle, pixelFormat.getValue(), width, height, fps);
+  }
+
+  /// Set the pixel format.
+  /// @param pixelFormat desired pixel format
+  /// @return True if set successfully
+  public boolean setPixelFormat(VideoMode.PixelFormat pixelFormat) {
+    return CameraServerJNI.setSourcePixelFormat(m_handle, pixelFormat.getValue());
+  }
+
+  /// Set the resolution.
+  /// @param width desired width
+  /// @param height desired height
+  /// @return True if set successfully
+  public boolean setResolution(int width, int height) {
+    return CameraServerJNI.setSourceResolution(m_handle, width, height);
+  }
+
+  /// Set the frames per second (FPS).
+  /// @param fps desired FPS
+  /// @return True if set successfully
+  public boolean setFPS(int fps) {
+    return CameraServerJNI.setSourceFPS(m_handle, fps);
+  }
+
+  /// Enumerate all known video modes for this source.
+  public VideoMode[] enumerateVideoModes() {
+    return CameraServerJNI.enumerateSourceVideoModes(m_handle);
+  }
+
   /// Enumerate all existing sources.
   /// @return Vector of sources.
   public static VideoSource[] enumerateSources() {

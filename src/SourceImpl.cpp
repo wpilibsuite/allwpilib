@@ -37,6 +37,29 @@ void SourceImpl::Wakeup() {
   m_frameCv.notify_all();
 }
 
+bool SourceImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+                                CS_Status* status) {
+  auto mode = GetVideoMode(status);
+  if (!mode) return false;
+  mode.pixelFormat = pixelFormat;
+  return SetVideoMode(mode, status);
+}
+
+bool SourceImpl::SetResolution(int width, int height, CS_Status* status) {
+  auto mode = GetVideoMode(status);
+  if (!mode) return false;
+  mode.width = width;
+  mode.height = height;
+  return SetVideoMode(mode, status);
+}
+
+bool SourceImpl::SetFPS(int fps, CS_Status* status) {
+  auto mode = GetVideoMode(status);
+  if (!mode) return false;
+  mode.fps = fps;
+  return SetVideoMode(mode, status);
+}
+
 void SourceImpl::StartFrame() {
   std::lock_guard<std::mutex> lock{m_mutex};
   if (m_frameData) return;
