@@ -9,17 +9,18 @@ set (INCLUDE_FOLDERS include
   ../shared/include
   ../../hal/include
   ${NTCORE_INCLUDE_DIR}
+  ${WPIUTIL_INCLUDE_DIR}
   ${GZ_MSGS_INCLUDE_DIR}
   ${Boost_INCLUDE_DIR}
   ${GAZEBO_INCLUDE_DIRS})
 
 include_directories(${INCLUDE_FOLDERS})
 
-link_directories(${NTCORE_LIBDIR})
+link_directories(${NTCORE_LIBDIR} ${WPIUTIL_LIBDIR})
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${COM_SRC_FILES})
 
-target_link_libraries(${PROJECT_NAME} ntcore)
+target_link_libraries(${PROJECT_NAME} ntcore wpiutil)
 
 set_target_properties(${PROJECT_NAME}
   PROPERTIES
