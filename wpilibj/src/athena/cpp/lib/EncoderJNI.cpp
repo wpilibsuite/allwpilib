@@ -53,7 +53,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEncoder(
       
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "ENCODER Handle = " << encoder;
-  CheckStatus(env, status);
+  CheckStatusForceThrow(env, status);
   return (jint)encoder;
 }
 

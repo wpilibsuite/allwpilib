@@ -37,7 +37,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CInitialize(
   int32_t status = 0;
   HAL_InitializeI2C(value, &status);
   I2CJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  CheckStatusForceThrow(env, status);
 }
 
 /*

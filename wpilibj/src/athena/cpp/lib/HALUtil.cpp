@@ -141,14 +141,8 @@ void ThrowHalHandleException(JNIEnv *env, int32_t status) {
   delete[] buf;
 }
 
-void ReportError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange, 
-    int32_t requestedValue, bool do_throw) {
+void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   if (status == 0) return;
-  if (status == NO_AVAILABLE_RESOURCES || 
-      status == RESOURCE_IS_ALLOCATED || 
-      status == RESOURCE_OUT_OF_RANGE) {
-    ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
-  }
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
   }
@@ -166,7 +160,25 @@ void ReportError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange
   }
 }
 
-void ReportCANError(JNIEnv *env, int32_t status, int32_t message_id) {
+void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange, 
+                int32_t requestedValue) {
+  if (status == 0) return;
+  if (status == NO_AVAILABLE_RESOURCES || 
+      status == RESOURCE_IS_ALLOCATED || 
+      status == RESOURCE_OUT_OF_RANGE) {
+    ThrowAllocationException(env, minRange, maxRange, requestedValue, status);
+  }
+  if (status == HAL_HANDLE_ERROR) {
+    ThrowHalHandleException(env, status);
+  }
+  const char *message = HAL_GetErrorMessage(status);
+  char *buf = new char[strlen(message) + 30];
+  sprintf(buf, " Code: %d. %s", status, message);
+  env->ThrowNew(runtimeExCls, buf);
+  delete[] buf;
+}
+
+void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
   if (status >= 0) return;
   switch (status) {
     case kRioStatusSuccess:

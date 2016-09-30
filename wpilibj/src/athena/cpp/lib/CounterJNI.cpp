@@ -43,7 +43,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_initializeCounter(
   COUNTERJNI_LOG(logDEBUG) << "Index = " << *indexPtr;
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   COUNTERJNI_LOG(logDEBUG) << "COUNTER Handle = " << counter;
-  CheckStatus(env, status);
+  CheckStatusForceThrow(env, status);
   return (jint)counter;
 }
 
