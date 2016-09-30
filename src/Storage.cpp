@@ -755,7 +755,7 @@ static void WriteString(std::ostream& os, llvm::StringRef str) {
         os << "\\\"";
         break;
       default:
-        if (std::isprint(c)) {
+        if (std::isprint(c) && c != '=') {
           os << c;
           break;
         }

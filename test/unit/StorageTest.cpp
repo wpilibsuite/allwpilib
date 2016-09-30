@@ -79,6 +79,7 @@ class StorageTestPersistent : public StorageTestEmpty {
         Value::MakeStringArray(std::vector<std::string>{"hello", "world\n"}));
     storage.SetEntryTypeValue(StringRef("\0\3\5\n", 4),
                               Value::MakeBoolean(true));
+    storage.SetEntryTypeValue("=", Value::MakeBoolean(true));
     outgoing.clear();
   }
 };
@@ -560,6 +561,8 @@ TEST_P(StorageTestPersistent, SavePersistent) {
   std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("boolean \"\\x00\\x03\\x05\\n\"=true", line);
   std::tie(line, rem) = rem.split('\n');
+  ASSERT_EQ("boolean \"\\x3D\"=true", line);
+  std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("boolean \"boolean/false\"=false", line);
   std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("boolean \"boolean/true\"=true", line);
@@ -775,6 +778,7 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
 
   std::string in = "[NetworkTables Storage 3.0]\n";
   in += "boolean \"\\x00\\x03\\x05\\n\"=true\n";
+  in += "boolean \"\\x3D\"=true\n";
   in += "boolean \"boolean/false\"=false\n";
   in += "boolean \"boolean/true\"=true\n";
   in += "array boolean \"booleanarr/empty\"=\n";
@@ -798,8 +802,8 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
 
   std::istringstream iss(in);
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
-  ASSERT_EQ(21u, entries().size());
-  EXPECT_EQ(21u, outgoing.size());
+  ASSERT_EQ(22u, entries().size());
+  EXPECT_EQ(22u, outgoing.size());
 
   EXPECT_EQ(*Value::MakeBoolean(true), *storage.GetEntryValue("boolean/true"));
   EXPECT_EQ(*Value::MakeBoolean(false),
@@ -839,6 +843,7 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
       *storage.GetEntryValue("stringarr/two"));
   EXPECT_EQ(*Value::MakeBoolean(true),
             *storage.GetEntryValue(StringRef("\0\3\5\n", 4)));
+  EXPECT_EQ(*Value::MakeBoolean(true), *storage.GetEntryValue("="));
 }
 
 TEST_P(StorageTestEmpty, LoadPersistentWarn) {
