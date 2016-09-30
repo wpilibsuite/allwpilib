@@ -1417,6 +1417,14 @@ bool Storage::GetRpcResult(bool blocking, unsigned int call_uid, double time_out
   std::unique_lock<std::mutex> lock(m_mutex);
   // only allow one blocking call per rpc call uid
   if (!m_rpc_blocking_calls.insert(call_uid).second) return false;
+#if defined(_MSC_VER) && _MSC_VER < 1900
+  auto timeout_time = std::chrono::steady_clock::now() + 
+      std::chrono::duration<int64_t, std::nano>(static_cast<int64_t>
+      (time_out * 1e9));
+#else
+  auto timeout_time = std::chrono::steady_clock::now() + 
+      std::chrono::duration<double>(time_out);
+#endif
   for (;;) {
     auto i =
         m_rpc_results.find(std::make_pair(call_uid >> 16, call_uid & 0xffff));
@@ -1428,14 +1436,6 @@ bool Storage::GetRpcResult(bool blocking, unsigned int call_uid, double time_out
       if (time_out < 0) {
         m_rpc_results_cond.wait(lock);
       } else {
-#if defined(_MSC_VER) && _MSC_VER < 1900
-        auto timeout_time = std::chrono::steady_clock::now() + 
-            std::chrono::duration<int64_t, std::nano>(static_cast<int64_t>
-            (time_out * 1e9));
-#else
-        auto timeout_time = std::chrono::steady_clock::now() + 
-            std::chrono::duration<double>(time_out);
-#endif
         auto timed_out = m_rpc_results_cond.wait_until(lock, timeout_time);
         if (timed_out == std::cv_status::timeout) {
           m_rpc_blocking_calls.erase(call_uid);
