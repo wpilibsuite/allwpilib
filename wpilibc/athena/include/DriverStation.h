@@ -68,6 +68,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   Alliance GetAlliance() const;
   int GetLocation() const;
   void WaitForData();
+  bool WaitForData(double timeout);
   double GetMatchTime() const;
   float GetBatteryVoltage() const;
 

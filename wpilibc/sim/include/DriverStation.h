@@ -68,6 +68,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   Alliance GetAlliance() const;
   int GetLocation() const;
   void WaitForData();
+  bool WaitForData(double timeout);
   double GetMatchTime() const;
   float GetBatteryVoltage() const;
   uint16_t GetTeamNumber() const;
@@ -128,6 +129,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   int m_digitalOut = 0;
   std::condition_variable m_waitForDataCond;
   std::mutex m_waitForDataMutex;
+  bool m_updatedControlLoopData = false;
   mutable std::recursive_mutex m_stateMutex;
   std::recursive_mutex m_joystickMutex;
   double m_approxMatchTimeOffset = 0;

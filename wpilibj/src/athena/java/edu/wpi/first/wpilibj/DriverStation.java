@@ -8,6 +8,10 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.wpilibj.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.hal.ControlWord;
@@ -89,7 +93,9 @@ public class DriverStation implements RobotState.Interface {
   private int[][] m_joystickAxisType = new int[kJoystickPorts][HAL.kMaxJoystickAxes];
 
   private Thread m_thread;
-  private final Object m_dataSem;
+  private final Lock m_dataMutex;
+  private final Condition m_dataCond;
+
   private final Object m_newControlDataMutex;
   private final Object m_joystickMutex;
   private volatile boolean m_threadKeepAlive = true;
@@ -121,7 +127,8 @@ public class DriverStation implements RobotState.Interface {
    * variable.
    */
   private DriverStation() {
-    m_dataSem = new Object();
+    m_dataMutex = new ReentrantLock();
+    m_dataCond = m_dataMutex.newCondition();
     m_joystickMutex = new Object();
     m_newControlDataMutex = new Object();
     for (int i = 0; i < kJoystickPorts; i++) {
@@ -636,18 +643,43 @@ public class DriverStation implements RobotState.Interface {
    * Wait for new data or for timeout, which ever comes first. If timeout is 0, wait for new data
    * only.
    *
-   * @param timeout The maximum time in milliseconds to wait.
+   * @param timeout The maximum time in seconds to wait.
+   * @return true if there is new data, otherwise false
    */
-  public void waitForData(long timeout) {
-    synchronized (m_dataSem) {
+  public boolean waitForData(double timeout) {
+    long startTime = Utility.getFPGATime();
+    long timeoutMicros = (long)(timeout * 1000000);
+    m_dataMutex.lock();
+    try {
       try {
         while (!m_updatedControlLoopData) {
-          m_dataSem.wait(timeout);
+          if (timeout > 0) {
+            long now = Utility.getFPGATime();
+            if (now < startTime + timeoutMicros) {
+              // We still have time to wait
+              boolean signaled = m_dataCond.await(startTime + timeoutMicros - now,
+                                                  TimeUnit.MICROSECONDS);
+              if (!signaled) {
+                // Return false if a timeout happened
+                return false;
+              }
+            } else {
+              // Time has elapsed.
+              return false;
+            }
+          } else {
+            m_dataCond.await();
+          }
         }
         m_updatedControlLoopData = false;
+        // Return true if we have received a proper signal
+        return true;
       } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
+        // return false on a thread interrupt
+        return false;
       }
+    } finally {
+      m_dataMutex.unlock();
     }
   }
 
@@ -787,9 +819,12 @@ public class DriverStation implements RobotState.Interface {
     while (m_threadKeepAlive) {
       HAL.waitForDSData();
       getData();
-      synchronized (m_dataSem) {
+      m_dataMutex.lock();
+      try {
         m_updatedControlLoopData = true;
-        m_dataSem.notifyAll();
+        m_dataCond.signalAll();
+      } finally {
+        m_dataMutex.unlock();
       }
       if (++safetyCounter >= 4) {
         MotorSafetyHelper.checkMotors();
