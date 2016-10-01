@@ -39,6 +39,8 @@ void IterativeRobot::StartCompetition() {
   // loop forever, calling the appropriate mode-dependent function
   lw->SetEnabled(false);
   while (true) {
+    // wait for driver station data so the loop doesn't hog the CPU
+    m_ds.WaitForData();
     // Call the appropriate function depending upon the current robot mode
     if (IsDisabled()) {
       // call DisabledInit() if we are now just entering disabled mode from
@@ -99,8 +101,6 @@ void IterativeRobot::StartCompetition() {
       TeleopPeriodic();
     }
     RobotPeriodic();
-    // wait for driver station data so the loop doesn't hog the CPU
-    m_ds.WaitForData();
   }
 }
 
