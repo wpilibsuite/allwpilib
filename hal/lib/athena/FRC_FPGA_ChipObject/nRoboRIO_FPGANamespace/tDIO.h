@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2016_16_1_0_DIO_h__
-#define __nFRC_2016_16_1_0_DIO_h__
+#ifndef __nFRC_2017_17_0_1_DIO_h__
+#define __nFRC_2017_17_0_1_DIO_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2016_16_1_0
+namespace nFRC_2017_17_0_1
 {
 
 class tDIO
@@ -30,11 +30,13 @@ public:
       struct{
 #ifdef __vxworks
          unsigned Headers : 10;
-         unsigned Reserved : 6;
+         unsigned SPIPort : 5;
+         unsigned Reserved : 1;
          unsigned MXP : 16;
 #else
          unsigned MXP : 16;
-         unsigned Reserved : 6;
+         unsigned Reserved : 1;
+         unsigned SPIPort : 5;
          unsigned Headers : 10;
 #endif
       };
@@ -47,11 +49,13 @@ public:
       struct{
 #ifdef __vxworks
          unsigned Headers : 10;
-         unsigned Reserved : 6;
+         unsigned SPIPort : 5;
+         unsigned Reserved : 1;
          unsigned MXP : 16;
 #else
          unsigned MXP : 16;
-         unsigned Reserved : 6;
+         unsigned Reserved : 1;
+         unsigned SPIPort : 5;
          unsigned Headers : 10;
 #endif
       };
@@ -64,11 +68,13 @@ public:
       struct{
 #ifdef __vxworks
          unsigned Headers : 10;
-         unsigned Reserved : 6;
+         unsigned SPIPort : 5;
+         unsigned Reserved : 1;
          unsigned MXP : 16;
 #else
          unsigned MXP : 16;
-         unsigned Reserved : 6;
+         unsigned Reserved : 1;
+         unsigned SPIPort : 5;
          unsigned Headers : 10;
 #endif
       };
@@ -81,11 +87,13 @@ public:
       struct{
 #ifdef __vxworks
          unsigned Headers : 10;
-         unsigned Reserved : 6;
+         unsigned SPIPort : 5;
+         unsigned Reserved : 1;
          unsigned MXP : 16;
 #else
          unsigned MXP : 16;
-         unsigned Reserved : 6;
+         unsigned Reserved : 1;
+         unsigned SPIPort : 5;
          unsigned Headers : 10;
 #endif
       };
@@ -102,10 +110,12 @@ public:
 
    virtual void writeDO(tDO value, tRioStatusCode *status) = 0;
    virtual void writeDO_Headers(unsigned short value, tRioStatusCode *status) = 0;
+   virtual void writeDO_SPIPort(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writeDO_Reserved(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writeDO_MXP(unsigned short value, tRioStatusCode *status) = 0;
    virtual tDO readDO(tRioStatusCode *status) = 0;
    virtual unsigned short readDO_Headers(tRioStatusCode *status) = 0;
+   virtual unsigned char readDO_SPIPort(tRioStatusCode *status) = 0;
    virtual unsigned char readDO_Reserved(tRioStatusCode *status) = 0;
    virtual unsigned short readDO_MXP(tRioStatusCode *status) = 0;
 
@@ -143,10 +153,12 @@ public:
 
    virtual void writeOutputEnable(tOutputEnable value, tRioStatusCode *status) = 0;
    virtual void writeOutputEnable_Headers(unsigned short value, tRioStatusCode *status) = 0;
+   virtual void writeOutputEnable_SPIPort(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writeOutputEnable_Reserved(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writeOutputEnable_MXP(unsigned short value, tRioStatusCode *status) = 0;
    virtual tOutputEnable readOutputEnable(tRioStatusCode *status) = 0;
    virtual unsigned short readOutputEnable_Headers(tRioStatusCode *status) = 0;
+   virtual unsigned char readOutputEnable_SPIPort(tRioStatusCode *status) = 0;
    virtual unsigned char readOutputEnable_Reserved(tRioStatusCode *status) = 0;
    virtual unsigned short readOutputEnable_MXP(tRioStatusCode *status) = 0;
 
@@ -166,10 +178,12 @@ public:
 
    virtual void writePulse(tPulse value, tRioStatusCode *status) = 0;
    virtual void writePulse_Headers(unsigned short value, tRioStatusCode *status) = 0;
+   virtual void writePulse_SPIPort(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writePulse_Reserved(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writePulse_MXP(unsigned short value, tRioStatusCode *status) = 0;
    virtual tPulse readPulse(tRioStatusCode *status) = 0;
    virtual unsigned short readPulse_Headers(tRioStatusCode *status) = 0;
+   virtual unsigned char readPulse_SPIPort(tRioStatusCode *status) = 0;
    virtual unsigned char readPulse_Reserved(tRioStatusCode *status) = 0;
    virtual unsigned short readPulse_MXP(tRioStatusCode *status) = 0;
 
@@ -180,6 +194,7 @@ public:
 
    virtual tDI readDI(tRioStatusCode *status) = 0;
    virtual unsigned short readDI_Headers(tRioStatusCode *status) = 0;
+   virtual unsigned char readDI_SPIPort(tRioStatusCode *status) = 0;
    virtual unsigned char readDI_Reserved(tRioStatusCode *status) = 0;
    virtual unsigned short readDI_MXP(tRioStatusCode *status) = 0;
 
@@ -245,4 +260,4 @@ private:
 }
 }
 
-#endif // __nFRC_2016_16_1_0_DIO_h__
+#endif // __nFRC_2017_17_0_1_DIO_h__
