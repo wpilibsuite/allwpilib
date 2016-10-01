@@ -39,7 +39,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
   if (file != nullptr) {
-    std::fputs("2016 C++ Release 5", file);
+    std::fputs("v2017.1.0-beta-1", file);
     std::fclose(file);
   }
 }
