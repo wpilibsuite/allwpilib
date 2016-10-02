@@ -22,7 +22,7 @@ def main():
     args = ["python", path + "/format.py"]
     args.extend(sys.argv[1:])
     proc = subprocess.Popen(args)
-    proc.wait()
+    sys.exit(proc.wait())
 
 if __name__ == "__main__":
     main()
