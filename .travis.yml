@@ -19,9 +19,4 @@ cache:
 
 script:
  - ./gradlew build -PmakeSim
-
-notifications:
-  slack:
-    on_success: always
-    on_failure: change
-    secure: WOingZJ/nk8Mc5JXbHgE5Ux1YwpsrWryft5TH8kPBaIqTmX6qlcu3KSdLktwgiPgXJiOWpR6UitX9+xfalcApEfS77ZNQeUFafDYHv17nS6IAHe/A4vOAIElXfpS2KnY0aqxwWhgKCsehio49SPY7WHq9PtnvauEdkX8bca5FHk=
+ 
