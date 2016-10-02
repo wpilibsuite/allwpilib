@@ -69,6 +69,8 @@ public class IterativeRobot extends RobotBase {
     // loop forever, calling the appropriate mode-dependent function
     LiveWindow.setEnabled(false);
     while (true) {
+      // Wait for new data to arrive
+      m_ds.waitForData();
       // Call the appropriate function depending upon the current robot mode
       if (isDisabled()) {
         // call DisabledInit() if we are now just entering disabled mode from
@@ -82,10 +84,8 @@ public class IterativeRobot extends RobotBase {
           m_teleopInitialized = false;
           m_testInitialized = false;
         }
-        if (nextPeriodReady()) {
-          HAL.observeUserProgramDisabled();
-          disabledPeriodic();
-        }
+        HAL.observeUserProgramDisabled();
+        disabledPeriodic();
       } else if (isTest()) {
         // call TestInit() if we are now just entering test mode from either
         // a different mode or from power-on
@@ -97,10 +97,8 @@ public class IterativeRobot extends RobotBase {
           m_teleopInitialized = false;
           m_disabledInitialized = false;
         }
-        if (nextPeriodReady()) {
-          HAL.observeUserProgramTest();
-          testPeriodic();
-        }
+        HAL.observeUserProgramTest();
+        testPeriodic();
       } else if (isAutonomous()) {
         // call Autonomous_Init() if this is the first time
         // we've entered autonomous_mode
@@ -115,10 +113,8 @@ public class IterativeRobot extends RobotBase {
           m_teleopInitialized = false;
           m_disabledInitialized = false;
         }
-        if (nextPeriodReady()) {
-          HAL.observeUserProgramAutonomous();
-          autonomousPeriodic();
-        }
+        HAL.observeUserProgramAutonomous();
+        autonomousPeriodic();
       } else {
         // call Teleop_Init() if this is the first time
         // we've entered teleop_mode
@@ -130,22 +126,11 @@ public class IterativeRobot extends RobotBase {
           m_autonomousInitialized = false;
           m_disabledInitialized = false;
         }
-        if (nextPeriodReady()) {
-          HAL.observeUserProgramTeleop();
-          teleopPeriodic();
-        }
+        HAL.observeUserProgramTeleop();
+        teleopPeriodic();
       }
       robotPeriodic();
-      m_ds.waitForData();
     }
-  }
-
-  /**
-   * Determine if the appropriate next periodic function should be called. Call the periodic
-   * functions whenever a packet is received from the Driver Station, or about every 20ms.
-   */
-  private boolean nextPeriodReady() {
-    return m_ds.isNewControlData();
   }
 
   /* ----------- Overridable initialization code ----------------- */
