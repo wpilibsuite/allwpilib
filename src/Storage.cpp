@@ -13,6 +13,7 @@
 
 #include "llvm/StringExtras.h"
 #include "support/Base64.h"
+#include "support/timestamp.h"
 #include "Log.h"
 #include "NetworkConnection.h"
 
@@ -346,11 +347,22 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         DEBUG("received RPC call to non-RPC entry");
         return;
       }
+      ConnectionInfo conn_info; 
+      auto c = conn_weak.lock();
+      if (c) {
+        conn_info = c->info();
+      } else {
+        conn_info.remote_id = "";
+        conn_info.remote_ip = "";
+        conn_info.remote_port = 0;
+        conn_info.last_update = 0;
+        conn_info.protocol_version = 0;
+      } 
       m_rpc_server.ProcessRpc(entry->name, msg, entry->rpc_callback,
                               conn->uid(), [=](std::shared_ptr<Message> msg) {
                                 auto c = conn_weak.lock();
                                 if (c) c->QueueOutgoing(msg);
-                              });
+                              }, conn_info);
       break;
     }
     case Message::kRpcResponse: {
@@ -1392,13 +1404,19 @@ unsigned int Storage::CallRpc(StringRef name, StringRef params) {
     // gracefully anyway.
     auto rpc_callback = entry->rpc_callback;
     lock.unlock();
+    ConnectionInfo conn_info;
+    conn_info.remote_id = "Server";
+    conn_info.remote_ip = "localhost";
+    conn_info.remote_port = 0;
+    conn_info.last_update = wpi::Now();
+    conn_info.protocol_version = 0x0300;
     m_rpc_server.ProcessRpc(
         name, msg, rpc_callback, 0xffffU, [this](std::shared_ptr<Message> msg) {
           std::lock_guard<std::mutex> lock(m_mutex);
           m_rpc_results.insert(std::make_pair(
               std::make_pair(msg->id(), msg->seq_num_uid()), msg->str()));
           m_rpc_results_cond.notify_all();
-        });
+        }, conn_info);
   } else {
     auto queue_outgoing = m_queue_outgoing;
     lock.unlock();

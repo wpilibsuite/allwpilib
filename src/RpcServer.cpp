@@ -47,15 +47,17 @@ void RpcServer::Stop() { m_owner.Stop(); }
 
 void RpcServer::ProcessRpc(StringRef name, std::shared_ptr<Message> msg,
                            RpcCallback func, unsigned int conn_id,
-                           SendMsgFunc send_response) {
+                           SendMsgFunc send_response, 
+                           const ConnectionInfo& conn_info) {
   if (func) {
     auto thr = m_owner.GetThread();
     if (!thr) return;
-    thr->m_call_queue.emplace(name, msg, func, conn_id, send_response);
+    thr->m_call_queue.emplace(name, msg, func, conn_id, send_response, 
+                              conn_info);
     thr->m_cond.notify_one();
   } else {
     std::lock_guard<std::mutex> lock(m_mutex);
-    m_poll_queue.emplace(name, msg, func, conn_id, send_response);
+    m_poll_queue.emplace(name, msg, func, conn_id, send_response, conn_info);
     m_poll_cond.notify_one();
   }
 }
@@ -138,7 +140,7 @@ void RpcServer::Thread::Main() {
 
       // Don't hold mutex during callback execution!
       lock.unlock();
-      auto result = item.func(item.name, item.msg->str());
+      auto result = item.func(item.name, item.msg->str(), item.conn_info);
       item.send_response(Message::RpcResponse(item.msg->id(),
                                               item.msg->seq_num_uid(), result));
       lock.lock();

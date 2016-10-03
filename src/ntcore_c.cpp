@@ -234,12 +234,17 @@ void NT_CreateRpc(const char *name, size_t name_len, const char *def,
                   size_t def_len, void *data, NT_RpcCallback callback) {
   nt::CreateRpc(
       StringRef(name, name_len), StringRef(def, def_len),
-      [=](StringRef name, StringRef params) -> std::string {
+      [=](StringRef name, StringRef params, 
+          const ConnectionInfo& conn_info) -> std::string {
         size_t results_len;
+        NT_ConnectionInfo conn_c;
+        ConvertToC(conn_info, &conn_c);
         char* results_c = callback(data, name.data(), name.size(),
-                                   params.data(), params.size(), &results_len);
+                                   params.data(), params.size(), &results_len,
+                                   &conn_c);
         std::string results(results_c, results_len);
         std::free(results_c);
+        DisposeConnectionInfo(&conn_c);
         return results;
       });
 }

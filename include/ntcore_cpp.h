@@ -224,7 +224,8 @@ constexpr double kTimeout_Indefinite = -1;
 void SetRpcServerOnStart(std::function<void()> on_start);
 void SetRpcServerOnExit(std::function<void()> on_exit);
 
-typedef std::function<std::string(StringRef name, StringRef params)>
+typedef std::function<std::string(StringRef name, StringRef params, 
+                                  const ConnectionInfo& conn_info)>
     RpcCallback;
 
 void CreateRpc(StringRef name, StringRef def, RpcCallback callback);
