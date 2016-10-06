@@ -18,5 +18,4 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
- - ./gradlew build -PmakeSim
- 
+  - ./gradlew build -PmakeSim
