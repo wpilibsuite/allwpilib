@@ -103,14 +103,14 @@ task wpilibcZip(type: Zip) {
 // this cannot be done purely with dependsOn in the task, as the static library task doesn't exist yet. Same goes for
 // the networkTablesStaticLibrary task and the two HAL tasks below
 tasks.whenTaskAdded { task ->
-    if (task.name == 'wpilib_nonsharedStaticLibrary') {
+    if (task.name.toLowerCase() == 'wpilib_nonsharedstaticlibrary') {
         wpilibcZip.dependsOn task
     }
 }
 
 // Add the hal static and shared libraries as a dependency
 project(':hal').tasks.whenTaskAdded { task ->
-    if (task.name == 'hALAthenaStaticLibrary' || task.name == 'hALAthenaSharedLibrary') {
+    if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
         wpilibcZip.dependsOn task
     }
 }
