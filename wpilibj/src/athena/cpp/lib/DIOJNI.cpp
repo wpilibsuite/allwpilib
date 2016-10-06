@@ -43,8 +43,8 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDIOPort(
   auto dio = HAL_InitializeDIOPort((HAL_PortHandle)id, (uint8_t)input, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "DIO Handle = " << dio;
-  CheckStatusRange(env, 0, HAL_GetNumDigitalChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id), status);
+  CheckStatusRange(env, status, 0, HAL_GetNumDigitalChannels(),
+                   hal::getPortHandleChannel((HAL_PortHandle)id));
   return (jint)dio;
 }
 

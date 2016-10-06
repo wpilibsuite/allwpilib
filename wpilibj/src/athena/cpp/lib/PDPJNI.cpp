@@ -21,7 +21,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   HAL_InitializePDP(module, &status);
-  CheckStatusRange(env, 0, HAL_GetNumPDPModules(), module, status);
+  CheckStatusRange(env, status, 0, HAL_GetNumPDPModules(), module);
 }
 
 /*
