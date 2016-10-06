@@ -43,8 +43,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort(
   auto analog = HAL_InitializeAnalogInputPort((HAL_PortHandle)id, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << analog;
-  CheckStatusRange(env, 0, HAL_GetNumAnalogInputs(), 
-                   hal::getPortHandleChannel((HAL_PortHandle)id), status);
+  CheckStatusRange(env, status, 0, HAL_GetNumAnalogInputs(), 
+                   hal::getPortHandleChannel((HAL_PortHandle)id));
   return (jint)analog;
 }
 
@@ -73,8 +73,8 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort(
   HAL_AnalogOutputHandle analog = HAL_InitializeAnalogOutputPort((HAL_PortHandle)id, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << analog;
-  CheckStatusRange(env, 0, HAL_GetNumAnalogOutputs(), 
-                   hal::getPortHandleChannel((HAL_PortHandle)id), status);
+  CheckStatusRange(env, status, 0, HAL_GetNumAnalogOutputs(), 
+                   hal::getPortHandleChannel((HAL_PortHandle)id));
   return (jlong)analog;
 }
 
