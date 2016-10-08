@@ -41,6 +41,11 @@ TCPStream::TCPStream(int sd, sockaddr_in* address) : m_sd(sd) {
 #else
   inet_ntop(PF_INET, (in_addr*)&(address->sin_addr.s_addr), ip,
             sizeof(ip) - 1);
+#ifdef SO_NOSIGPIPE
+  // disable SIGPIPE on Mac OS X
+  int set = 1;
+  setsockopt(m_sd, SOL_SOCKET, SO_NOSIGPIPE, (char*)&set, sizeof set);
+#endif
 #endif
   m_peerIP = ip;
   m_peerPort = ntohs(address->sin_port);
@@ -78,7 +83,12 @@ std::size_t TCPStream::send(const char* buffer, std::size_t len, Error* err) {
     return 0;
   }
 #else
-  ssize_t rv = write(m_sd, buffer, len);
+#ifdef MSG_NOSIGNAL
+  // disable SIGPIPE on Linux
+  ssize_t rv = ::send(m_sd, buffer, len, MSG_NOSIGNAL);
+#else
+  ssize_t rv = ::send(m_sd, buffer, len, 0);
+#endif
   if (rv < 0) {
     *err = kConnectionReset;
     return 0;
