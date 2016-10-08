@@ -66,6 +66,23 @@ class raw_mem_istream : public raw_istream {
   std::size_t m_left;
 };
 
+class raw_fd_istream : public raw_istream {
+ public:
+  raw_fd_istream(int fd, bool shouldClose, std::size_t bufSize = 4096);
+  ~raw_fd_istream() override;
+  void close() override;
+
+ private:
+  void read_impl(void* data, std::size_t len) override;
+
+  char* m_buf;
+  char* m_cur;
+  char* m_end;
+  std::size_t m_bufSize;
+  int m_fd;
+  bool m_shouldClose;
+};
+
 }  // namespace wpi
 
 #endif  // WPIUTIL_SUPPORT_RAW_ISTREAM_H_
