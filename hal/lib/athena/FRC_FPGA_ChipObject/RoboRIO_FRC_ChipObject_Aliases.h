@@ -4,6 +4,6 @@
 #ifndef __RoboRIO_FRC_ChipObject_Aliases_h__
 #define __RoboRIO_FRC_ChipObject_Aliases_h__
 
-#define nRoboRIO_FPGANamespace nFRC_2016_16_1_0
+#define nRoboRIO_FPGANamespace nFRC_2017_17_0_1
 
 #endif // __RoboRIO_FRC_ChipObject_Aliases_h__
