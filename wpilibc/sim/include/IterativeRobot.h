@@ -8,7 +8,6 @@
 #pragma once
 
 #include "RobotBase.h"
-#include "Timer.h"
 
 /**
  * IterativeRobot implements a specific type of Robot Program framework,
@@ -33,11 +32,9 @@
  *  - TestInit()       -- called each and every time test is entered from
  *                        another mode
  *
- * Periodic() functions -- each of these functions is called iteratively at the
- *                         appropriate periodic rate (aka the "slow loop").  The
- *                         default period of the iterative robot is synced to
- *                         the driver station control packets, giving a periodic
- *                         frequency of about 50Hz (50 times per second).
+ * Periodic() functions -- each of these functions is called each time a
+ *                         new packet is received from the driver station:
+ *   - RobotPeriodic()
  *   - DisabledPeriodic()
  *   - AutonomousPeriodic()
  *   - TeleopPeriodic()
@@ -47,13 +44,6 @@
 
 class IterativeRobot : public RobotBase {
  public:
-  /*
-   * The default period for the periodic function calls (seconds).
-   * Setting the period to 0.0 will cause the periodic functions to follow
-   * the Driver Station packet rate of about 50Hz.
-   */
-  static const double kDefaultPeriod;
-
   virtual void StartCompetition();
 
   virtual void RobotInit();
@@ -68,21 +58,13 @@ class IterativeRobot : public RobotBase {
   virtual void TeleopPeriodic();
   virtual void TestPeriodic();
 
-  void SetPeriod(double period);
-  double GetPeriod();
-  double GetLoopsPerSec();
-
  protected:
   virtual ~IterativeRobot() = default;
   IterativeRobot() = default;
 
  private:
-  bool NextPeriodReady();
-
   bool m_disabledInitialized = false;
   bool m_autonomousInitialized = false;
   bool m_teleopInitialized = false;
   bool m_testInitialized = false;
-  double m_period = kDefaultPeriod;
-  Timer m_mainLoopTimer;
 };
