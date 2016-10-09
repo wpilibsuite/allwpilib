@@ -7,6 +7,8 @@
 
 #include "DriverStation.h"
 
+#include <chrono>
+
 #include "AnalogInput.h"
 #include "FRC_NetworkCommunication/FRCComm.h"
 #include "HAL/cpp/Log.h"
@@ -445,12 +447,47 @@ int DriverStation::GetLocation() const {
  * This is a good way to delay processing until there is new driver station data
  * to act on.
  */
-void DriverStation::WaitForData() {
+void DriverStation::WaitForData() { WaitForData(0); }
+
+/**
+ * Wait until a new packet comes from the driver station, or wait for a timeout.
+ *
+ * If the timeout is less then or equal to 0, wait indefinitely.
+ *
+ * Timeout is in milliseconds
+ *
+ * This blocks on a semaphore, so the waiting is efficient.
+ *
+ * This is a good way to delay processing until there is new driver station data
+ * to act on.
+ *
+ * @param timeout Timeout time in seconds
+ *
+ * @return true if new data, otherwise false
+ */
+bool DriverStation::WaitForData(double timeout) {
+#if defined(_MSC_VER) && _MSC_VER < 1900
+  auto timeoutTime = std::chrono::steady_clock::now() +
+                     std::chrono::duration<int64_t, std::nano>(
+                         static_cast<int64_t>(timeout * 1e9));
+#else
+  auto timeoutTime =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+#endif
+
   std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
   while (!m_updatedControlLoopData) {
-    m_waitForDataCond.wait(lock);
+    if (timeout > 0) {
+      auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
+      if (timedOut == std::cv_status::timeout) {
+        return false;
+      }
+    } else {
+      m_waitForDataCond.wait(lock);
+    }
   }
   m_updatedControlLoopData = false;
+  return true;
 }
 
 /**

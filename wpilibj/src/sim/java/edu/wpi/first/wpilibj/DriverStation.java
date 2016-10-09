@@ -9,6 +9,11 @@ package edu.wpi.first.wpilibj;
 
 import org.gazebosim.transport.SubscriberCallback;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import edu.wpi.first.wpilibj.simulation.MainNode;
 import gazebo.msgs.GzDriverStation;
 import gazebo.msgs.GzDriverStation.DriverStation.State;
@@ -76,7 +81,9 @@ public class DriverStation implements RobotState.Interface {
 
 
   private static DriverStation instance = new DriverStation();
-  private final Object m_dataSem;
+  private final Lock m_dataMutex;
+  private final Condition m_dataCond;
+  private boolean m_updatedControlLoopData;
   private boolean m_userInDisabled = false;
   private boolean m_userInAutonomous = false;
   private boolean m_userInTeleop = false;
@@ -101,7 +108,8 @@ public class DriverStation implements RobotState.Interface {
    * variable.
    */
   protected DriverStation() {
-    m_dataSem = new Object();
+    m_dataMutex = new ReentrantLock();
+    m_dataCond = m_dataMutex.newCondition();
 
     MainNode.subscribe("ds/state", GzDriverStation.DriverStation.getDefaultInstance(),
         new SubscriberCallback<GzDriverStation.DriverStation>() {
@@ -109,8 +117,12 @@ public class DriverStation implements RobotState.Interface {
           public void callback(GzDriverStation.DriverStation msg) {
             state = msg;
             m_newControlData = true;
-            synchronized (m_dataSem) {
-              m_dataSem.notifyAll();
+            m_dataMutex.lock();
+            try {
+              m_updatedControlLoopData = true;
+              m_dataCond.signalAll();
+            } finally {
+              m_dataMutex.unlock();
             }
           }
         }
@@ -122,8 +134,11 @@ public class DriverStation implements RobotState.Interface {
           new SubscriberCallback<Joystick>() {
             @Override
             public void callback(Joystick msg) {
-              synchronized (m_dataSem) {
+              m_dataMutex.lock();
+              try {
                 joysticks[j] = msg;
+              } finally {
+                m_dataMutex.unlock();
               }
             }
           }
@@ -139,18 +154,46 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
-   * Wait for new data or for timeout, which ever comes first.  If timeout is 0, wait for new data
+   * Wait for new data or for timeout, which ever comes first. If timeout is 0, wait for new data
    * only.
    *
-   * @param timeout The maximum time in milliseconds to wait.
+   * @param timeout The maximum time in seconds to wait.
+   * @return true if there is new data, otherwise false
    */
-  public void waitForData(long timeout) {
-    synchronized (m_dataSem) {
+  public boolean waitForData(double timeout) {
+    long startTime = (long)(Timer.getFPGATimestamp() * 1000000);
+    long timeoutMicros = (long)(timeout * 1000000);
+    m_dataMutex.lock();
+    try {
       try {
-        m_dataSem.wait(timeout);
+        while (!m_updatedControlLoopData) {
+          if (timeout > 0) {
+            long now = (long)(Timer.getFPGATimestamp() * 1000000);
+            if (now < startTime + timeoutMicros) {
+              // We still have time to wait
+              boolean signaled = m_dataCond.await(startTime + timeoutMicros - now,
+                                                  TimeUnit.MICROSECONDS);
+              if (!signaled) {
+                // Return false if a timeout happened
+                return false;
+              }
+            } else {
+              // Time has elapsed.
+              return false;
+            }
+          } else {
+            m_dataCond.await();
+          }
+        }
+        m_updatedControlLoopData = false;
+        // Return true if we have received a proper signal
+        return true;
       } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
+        // return false on a thread interrupt
+        return false;
       }
+    } finally {
+      m_dataMutex.unlock();
     }
   }
 
