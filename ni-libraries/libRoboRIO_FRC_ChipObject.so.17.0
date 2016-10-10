@@ -1,2 +1,0 @@
-OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( libRoboRIO_FRC_ChipObject.so.17.0.0 )
