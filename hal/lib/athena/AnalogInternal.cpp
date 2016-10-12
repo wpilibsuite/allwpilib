@@ -7,6 +7,8 @@
 
 #include "AnalogInternal.h"
 
+#include <iostream>
+
 #include "ChipObject.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/cpp/priority_mutex.h"
@@ -31,10 +33,18 @@ bool analogSystemInitialized = false;
 void initializeAnalog(int32_t* status) {
   std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
+  std::cout << "Creating Analog Input System" << std::endl;
   analogInputSystem.reset(tAI::create(status));
+  std::cout << "analog input " << *status << std::endl;
+  std::cout << "Creating Analog Output System" << std::endl;
   analogOutputSystem.reset(tAO::create(status));
+  std::cout << "analogoutput " << *status << std::endl;
+  std::cout << "Setting Active Channels" << std::endl;
   setAnalogNumChannelsToActivate(kNumAnalogInputs);
+  std::cout << "active channels  " << *status << std::endl;
+  std::cout << "Setting Sample Rate" << std::endl;
   HAL_SetAnalogSampleRate(kDefaultSampleRate, status);
+  std::cout << "Sample Rate " << *status << std::endl;
   analogSystemInitialized = true;
 }
 
