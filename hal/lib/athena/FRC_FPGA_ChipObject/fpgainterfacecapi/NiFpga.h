@@ -1,7 +1,7 @@
 /*
- * FPGA Interface C API 16.0 header file.
+ * FPGA Interface C API 15.0 header file.
  *
- * Copyright (c) 2016,
+ * Copyright (c) 2015,
  * National Instruments Corporation.
  * All rights reserved.
  */
@@ -138,7 +138,7 @@
  */
 #if NiFpga_Cpp || NiFpga_C99
    /* The inline keyword exists in C++ and C99. */
-   #define NiFpga_Inline inline
+#define NiFpga_Inline inline
 #elif NiFpga_Msvc
    /* Visual C++ (at least since 6.0) also supports an alternate keyword. */
    #define NiFpga_Inline __inline
@@ -274,6 +274,12 @@ static const NiFpga_Status NiFpga_Status_ResourceNotFound = -52006;
  * reserved.
  */
 static const NiFpga_Status NiFpga_Status_ResourceNotInitialized = -52010;
+
+/**
+ * A hardware failure has occurred. The operation could not be completed as
+ * specified.
+ */
+static const NiFpga_Status NiFpga_Status_HardwareFault = -52018;
 
 /**
  * The FPGA is already running.
@@ -433,14 +439,6 @@ static const NiFpga_Status NiFpga_Status_ElementsNotPermissibleToBeAcquired = -6
 static const NiFpga_Status NiFpga_Status_FpgaBusyConfiguration = -61252;
 
 /**
- * LabVIEW FPGA does not support Close and Reset if Last Reference for bitfiles
- * that do not support Reset. Pass the
- * NiFpga_CloseAttribute_NoResetIfLastSession attribute to NiFpga_Close instead
- * of 0.
- */
-static const NiFpga_Status NiFpga_Status_CloseAndResetCalledWithResetNotSupported = -61253;
-
-/**
  * An unexpected internal error occurred.
  */
 static const NiFpga_Status NiFpga_Status_InternalError = -61499;
@@ -531,12 +529,6 @@ static const NiFpga_Status NiFpga_Status_SignatureMismatch = -63106;
  * target and/or host.
  */
 static const NiFpga_Status NiFpga_Status_IncompatibleBitfile = -63107;
-
-/**
- * A hardware failure has occurred. The operation could not be completed as
- * specified.
- */
-static const NiFpga_Status NiFpga_Status_HardwareFault = -63150;
 
 /**
  * Either the supplied resource name is invalid as a RIO resource name, or the
@@ -872,32 +864,6 @@ NiFpga_Status NiFpga_ReadU64(NiFpga_Session session,
                              uint64_t*      value);
 
 /**
- * Reads a single-precision floating-point value from a given indicator or
- * control.
- *
- * @param session handle to a currently open session
- * @param indicator indicator or control from which to read
- * @param value outputs the value that was read
- * @return result of the call
- */
-NiFpga_Status NiFpga_ReadSgl(NiFpga_Session session,
-                             uint32_t       indicator,
-                             float*         value);
-
-/**
- * Reads a double-precision floating-point value from a given indicator or
- * control.
- *
- * @param session handle to a currently open session
- * @param indicator indicator or control from which to read
- * @param value outputs the value that was read
- * @return result of the call
- */
-NiFpga_Status NiFpga_ReadDbl(NiFpga_Session session,
-                             uint32_t       indicator,
-                             double*        value);
-
-/**
  * Writes a boolean value to a given control or indicator.
  *
  * @param session handle to a currently open session
@@ -1004,32 +970,6 @@ NiFpga_Status NiFpga_WriteI64(NiFpga_Session session,
 NiFpga_Status NiFpga_WriteU64(NiFpga_Session session,
                               uint32_t       control,
                               uint64_t       value);
-
-/**
- * Writes a single-precision floating-point value to a given control or
- * indicator.
- *
- * @param session handle to a currently open session
- * @param control control or indicator to which to write
- * @param value value to write
- * @return result of the call
- */
-NiFpga_Status NiFpga_WriteSgl(NiFpga_Session session,
-                              uint32_t       control,
-                              float          value);
-
-/**
- * Writes a double-precision floating-point value to a given control or
- * indicator.
- *
- * @param session handle to a currently open session
- * @param control control or indicator to which to write
- * @param value value to write
- * @return result of the call
- */
-NiFpga_Status NiFpga_WriteDbl(NiFpga_Session session,
-                              uint32_t       control,
-                              double         value);
 
 /**
  * Reads an entire array of boolean values from a given array indicator or
@@ -1194,42 +1134,6 @@ NiFpga_Status NiFpga_ReadArrayU64(NiFpga_Session session,
                                   size_t         size);
 
 /**
- * Reads an entire array of single-precision floating-point values from a
- * given array indicator or control.
- *
- * @warning The size passed must be the exact number of elements in the
- *          indicator or control.
- *
- * @param session handle to a currently open session
- * @param indicator indicator or control from which to read
- * @param array outputs the entire array that was read
- * @param size exact number of elements in the indicator or control
- * @return result of the call
- */
-NiFpga_Status NiFpga_ReadArraySgl(NiFpga_Session session,
-                                  uint32_t       indicator,
-                                  float*         array,
-                                  size_t         size);
-
-/**
- * Reads an entire array of double-precision floating-point values from a
- * given array indicator or control.
- *
- * @warning The size passed must be the exact number of elements in the
- *          indicator or control.
- *
- * @param session handle to a currently open session
- * @param indicator indicator or control from which to read
- * @param array outputs the entire array that was read
- * @param size exact number of elements in the indicator or control
- * @return result of the call
- */
-NiFpga_Status NiFpga_ReadArrayDbl(NiFpga_Session session,
-                                  uint32_t       indicator,
-                                  double*        array,
-                                  size_t         size);
-
-/**
  * Writes an entire array of boolean values to a given array control or
  * indicator.
  *
@@ -1390,42 +1294,6 @@ NiFpga_Status NiFpga_WriteArrayU64(NiFpga_Session  session,
                                    uint32_t        control,
                                    const uint64_t* array,
                                    size_t          size);
-
-/**
- * Writes an entire array of single-precision floating-point values to a given
- * array control or indicator.
- *
- * @warning The size passed must be the exact number of elements in the
- *          control or indicator.
- *
- * @param session handle to a currently open session
- * @param control control or indicator to which to write
- * @param array entire array to write
- * @param size exact number of elements in the control or indicator
- * @return result of the call
- */
-NiFpga_Status NiFpga_WriteArraySgl(NiFpga_Session session,
-                                   uint32_t       control,
-                                   const float*   array,
-                                   size_t         size);
-
-/**
- * Writes an entire array of double-precision floating-point values to a given
- * array control or indicator.
- *
- * @warning The size passed must be the exact number of elements in the
- *          control or indicator.
- *
- * @param session handle to a currently open session
- * @param control control or indicator to which to write
- * @param array entire array to write
- * @param size exact number of elements in the control or indicator
- * @return result of the call
- */
-NiFpga_Status NiFpga_WriteArrayDbl(NiFpga_Session session,
-                                   uint32_t       control,
-                                   const double*  array,
-                                   size_t         size);
 
 /**
  * Enumeration of all 32 possible IRQs. Multiple IRQs can be bitwise ORed
@@ -1766,44 +1634,6 @@ NiFpga_Status NiFpga_ReadFifoU64(NiFpga_Session session,
                                  size_t*        elementsRemaining);
 
 /**
- * Reads from a target-to-host FIFO of single-precision floating-point values.
- *
- * @param session handle to a currently open session
- * @param fifo target-to-host FIFO from which to read
- * @param data outputs the data that was read
- * @param numberOfElements number of elements to read
- * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
- * @param elementsRemaining if non-NULL, outputs the number of elements
- *                          remaining in the host memory part of the DMA FIFO
- * @return result of the call
- */
-NiFpga_Status NiFpga_ReadFifoSgl(NiFpga_Session session,
-                                 uint32_t       fifo,
-                                 float*         data,
-                                 size_t         numberOfElements,
-                                 uint32_t       timeout,
-                                 size_t*        elementsRemaining);
-
-/**
- * Reads from a target-to-host FIFO of double-precision floating-point values.
- *
- * @param session handle to a currently open session
- * @param fifo target-to-host FIFO from which to read
- * @param data outputs the data that was read
- * @param numberOfElements number of elements to read
- * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
- * @param elementsRemaining if non-NULL, outputs the number of elements
- *                          remaining in the host memory part of the DMA FIFO
- * @return result of the call
- */
-NiFpga_Status NiFpga_ReadFifoDbl(NiFpga_Session session,
-                                 uint32_t       fifo,
-                                 double*        data,
-                                 size_t         numberOfElements,
-                                 uint32_t       timeout,
-                                 size_t*        elementsRemaining);
-
-/**
  * Writes to a host-to-target FIFO of booleans.
  *
  * @param session handle to a currently open session
@@ -1982,46 +1812,6 @@ NiFpga_Status NiFpga_WriteFifoU64(NiFpga_Session  session,
                                   size_t          numberOfElements,
                                   uint32_t        timeout,
                                   size_t*         emptyElementsRemaining);
-
-/**
- * Writes to a host-to-target FIFO of single-precision floating-point values.
- *
- * @param session handle to a currently open session
- * @param fifo host-to-target FIFO to which to write
- * @param data data to write
- * @param numberOfElements number of elements to write
- * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
- * @param emptyElementsRemaining if non-NULL, outputs the number of empty
- *                               elements remaining in the host memory part of
- *                               the DMA FIFO
- * @return result of the call
- */
-NiFpga_Status NiFpga_WriteFifoSgl(NiFpga_Session session,
-                                  uint32_t       fifo,
-                                  const float*   data,
-                                  size_t         numberOfElements,
-                                  uint32_t       timeout,
-                                  size_t*        emptyElementsRemaining);
-
-/**
- * Writes to a host-to-target FIFO of double-precision floating-point values.
- *
- * @param session handle to a currently open session
- * @param fifo host-to-target FIFO to which to write
- * @param data data to write
- * @param numberOfElements number of elements to write
- * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
- * @param emptyElementsRemaining if non-NULL, outputs the number of empty
- *                               elements remaining in the host memory part of
- *                               the DMA FIFO
- * @return result of the call
- */
-NiFpga_Status NiFpga_WriteFifoDbl(NiFpga_Session session,
-                                  uint32_t       fifo,
-                                  const double*  data,
-                                  size_t         numberOfElements,
-                                  uint32_t       timeout,
-                                  size_t*        emptyElementsRemaining);
 
 /**
  * Acquires elements for reading from a target-to-host FIFO of booleans.
@@ -2329,74 +2119,6 @@ NiFpga_Status NiFpga_AcquireFifoReadElementsU64(
                                            size_t*          elementsRemaining);
 
 /**
- * Acquires elements for reading from a target-to-host FIFO of single-precision
- * floating-point values.
- *
- * Acquiring, reading, and releasing FIFO elements prevents the need to copy
- * the contents of elements from the host memory buffer to a separate
- * user-allocated buffer before reading. The FPGA target cannot write to
- * elements acquired by the host. Therefore, the host must release elements
- * after reading them. The number of elements acquired may differ from the
- * number of elements requested if, for example, the number of elements
- * requested reaches the end of the host memory buffer. Always release all
- * acquired elements before closing the session. Do not attempt to access FIFO
- * elements after the elements are released or the session is closed.
- *
- * @param session handle to a currently open session
- * @param fifo target-to-host FIFO from which to read
- * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested requested number of elements
- * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
- * @param elementsAcquired actual number of elements acquired, which may be
- *                         less than the requested number
- * @param elementsRemaining if non-NULL, outputs the number of elements
- *                          remaining in the host memory part of the DMA FIFO
- * @return result of the call
- */
-NiFpga_Status NiFpga_AcquireFifoReadElementsSgl(
-                                             NiFpga_Session session,
-                                             uint32_t       fifo,
-                                             float**        elements,
-                                             size_t         elementsRequested,
-                                             uint32_t       timeout,
-                                             size_t*        elementsAcquired,
-                                             size_t*        elementsRemaining);
-
-/**
- * Acquires elements for reading from a target-to-host FIFO of double-precision
- * floating-point values.
- *
- * Acquiring, reading, and releasing FIFO elements prevents the need to copy
- * the contents of elements from the host memory buffer to a separate
- * user-allocated buffer before reading. The FPGA target cannot write to
- * elements acquired by the host. Therefore, the host must release elements
- * after reading them. The number of elements acquired may differ from the
- * number of elements requested if, for example, the number of elements
- * requested reaches the end of the host memory buffer. Always release all
- * acquired elements before closing the session. Do not attempt to access FIFO
- * elements after the elements are released or the session is closed.
- *
- * @param session handle to a currently open session
- * @param fifo target-to-host FIFO from which to read
- * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested requested number of elements
- * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
- * @param elementsAcquired actual number of elements acquired, which may be
- *                         less than the requested number
- * @param elementsRemaining if non-NULL, outputs the number of elements
- *                          remaining in the host memory part of the DMA FIFO
- * @return result of the call
- */
-NiFpga_Status NiFpga_AcquireFifoReadElementsDbl(
-                                             NiFpga_Session session,
-                                             uint32_t       fifo,
-                                             double**       elements,
-                                             size_t         elementsRequested,
-                                             uint32_t       timeout,
-                                             size_t*        elementsAcquired,
-                                             size_t*        elementsRemaining);
-
-/**
  * Acquires elements for writing to a host-to-target FIFO of booleans.
  *
  * Acquiring, writing, and releasing FIFO elements prevents the need to write
@@ -2702,74 +2424,6 @@ NiFpga_Status NiFpga_AcquireFifoWriteElementsU64(
                                              size_t*        elementsRemaining);
 
 /**
- * Acquires elements for writing to a host-to-target FIFO of single-precision
- * floating-point values.
- *
- * Acquiring, writing, and releasing FIFO elements prevents the need to write
- * first into a separate user-allocated buffer and then copy the contents of
- * elements to the host memory buffer. The FPGA target cannot read elements
- * acquired by the host. Therefore, the host must release elements after
- * writing to them. The number of elements acquired may differ from the number
- * of elements requested if, for example, the number of elements requested
- * reaches the end of the host memory buffer. Always release all acquired
- * elements before closing the session. Do not attempt to access FIFO elements
- * after the elements are released or the session is closed.
- *
- * @param session handle to a currently open session
- * @param fifo host-to-target FIFO to which to write
- * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested requested number of elements
- * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
- * @param elementsAcquired actual number of elements acquired, which may be
- *                         less than the requested number
- * @param elementsRemaining if non-NULL, outputs the number of elements
- *                          remaining in the host memory part of the DMA FIFO
- * @return result of the call
- */
-NiFpga_Status NiFpga_AcquireFifoWriteElementsSgl(
-                                             NiFpga_Session session,
-                                             uint32_t       fifo,
-                                             float**        elements,
-                                             size_t         elementsRequested,
-                                             uint32_t       timeout,
-                                             size_t*        elementsAcquired,
-                                             size_t*        elementsRemaining);
-
-/**
- * Acquires elements for writing to a host-to-target FIFO of single-precision
- * floating-point values.
- *
- * Acquiring, writing, and releasing FIFO elements prevents the need to write
- * first into a separate user-allocated buffer and then copy the contents of
- * elements to the host memory buffer. The FPGA target cannot read elements
- * acquired by the host. Therefore, the host must release elements after
- * writing to them. The number of elements acquired may differ from the number
- * of elements requested if, for example, the number of elements requested
- * reaches the end of the host memory buffer. Always release all acquired
- * elements before closing the session. Do not attempt to access FIFO elements
- * after the elements are released or the session is closed.
- *
- * @param session handle to a currently open session
- * @param fifo host-to-target FIFO to which to write
- * @param elements outputs a pointer to the elements acquired
- * @param elementsRequested requested number of elements
- * @param timeout timeout in milliseconds, or NiFpga_InfiniteTimeout
- * @param elementsAcquired actual number of elements acquired, which may be
- *                         less than the requested number
- * @param elementsRemaining if non-NULL, outputs the number of elements
- *                          remaining in the host memory part of the DMA FIFO
- * @return result of the call
- */
-NiFpga_Status NiFpga_AcquireFifoWriteElementsDbl(
-                                             NiFpga_Session session,
-                                             uint32_t       fifo,
-                                             double**       elements,
-                                             size_t         elementsRequested,
-                                             uint32_t       timeout,
-                                             size_t*        elementsAcquired,
-                                             size_t*        elementsRemaining);
-
-/**
  * Releases previously acquired FIFO elements.
  *
  * The FPGA target cannot read elements acquired by the host. Therefore, the
@@ -2791,9 +2445,7 @@ NiFpga_Status NiFpga_ReleaseFifoElements(NiFpga_Session session,
  *
  * @param session handle to a currently open session
  * @param fifo peer-to-peer FIFO
- * @param endpoint Outputs the endpoint reference.
- *                 The actual type is a nip2p_tEndpointHandle usable by
- *                 the NI Peer-to-Peer Streaming C/C++ API.
+ * @param endpoint outputs the endpoint reference
  * @return result of the call
  */
 NiFpga_Status NiFpga_GetPeerToPeerFifoEndpoint(NiFpga_Session session,
