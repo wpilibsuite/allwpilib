@@ -74,10 +74,10 @@ By default, tests will be built for the x86 and x64 versions of CameraServer, an
 ## Publishing
 To use CameraServer in downstream projects as a Maven-style dependency, use the `publish` command. This will publish four artifacts, where platform_name is your current platform (windows, mac, linux):
 
-- edu.wpi.cameraserver.cpp:NetworkTables:1.0.0-SNAPSHOT:arm@zip
-- edu.wpi.cameraserver.cpp:NetworkTables:1.0.0-SNAPSHOT:platform_name@zip
-- edu.wpi.cameraserver.java:NetworkTables:1.0.0-SNAPSHOT:arm
-- edu.wpi.cameraserver.java:NetworkTables:1.0.0-SNAPSHOT:platform_name
+- edu.wpi.cameraserver.cpp:CameraServer:1.0.0-SNAPSHOT:arm@zip
+- edu.wpi.cameraserver.cpp:CameraServer:1.0.0-SNAPSHOT:platform_name@zip
+- edu.wpi.cameraserver.java:CameraServer:1.0.0-SNAPSHOT:arm
+- edu.wpi.cameraserver.java:CameraServer:1.0.0-SNAPSHOT:platform_name
 
 These are published to ~/releases/maven/development. To publish to a different repo, specify the `-Prepo=repo_name` flag. Valid repos are:
 
