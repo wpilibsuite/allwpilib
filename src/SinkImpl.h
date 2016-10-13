@@ -33,18 +33,14 @@ class SinkImpl {
 
   void Enable() {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (!m_enabled) {
-      m_enabled = true;
-      if (m_source) m_source->EnableSink();
-    }
+    if (m_enabledCount == 0 && m_source) m_source->EnableSink();
+    ++m_enabledCount;
   }
 
   void Disable() {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_enabled) {
-      m_enabled = false;
-      if (m_source) m_source->DisableSink();
-    }
+    --m_enabledCount;
+    if (m_enabledCount == 0 && m_source) m_source->DisableSink();
   }
 
   void SetSource(std::shared_ptr<SourceImpl> source);
@@ -58,7 +54,7 @@ class SinkImpl {
   std::string m_name;
   mutable std::mutex m_mutex;
   std::shared_ptr<SourceImpl> m_source;
-  bool m_enabled{false};
+  int m_enabledCount{0};
 };
 
 }  // namespace cs
