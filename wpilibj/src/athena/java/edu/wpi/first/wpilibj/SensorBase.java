@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.hal.SolenoidJNI;
  * Base class for all sensors. Stores most recent status information as well as containing utility
  * functions for checking channels and error processing.
  */
-public abstract class SensorBase { // TODO: Refactor
+public abstract class SensorBase {
   /**
    * Ticks per microsecond.
    */
@@ -31,11 +31,11 @@ public abstract class SensorBase { // TODO: Refactor
    */
   public static final int kDigitalChannels = PortsJNI.getNumDigitalChannels();
   /**
-   * Number of analog input channels.
+   * Number of analog input channels per roboRIO.
    */
   public static final int kAnalogInputChannels = PortsJNI.getNumAnalogInputs();
   /**
-   * Number of analog output channels.
+   * Number of analog output channels per roboRIO.
    */
   public static final int kAnalogOutputChannels = PortsJNI.getNumAnalogOutputs();
   /**
@@ -51,11 +51,11 @@ public abstract class SensorBase { // TODO: Refactor
    */
   public static final int kRelayChannels = PortsJNI.getNumRelayHeaders();
   /**
-   * Number of power distribution channels.
+   * Number of power distribution channels per PDP.
    */
   public static final int kPDPChannels = PortsJNI.getNumPDPChannels();
   /**
-   * Number of power distribution modules.
+   * Number of power distribution modules per PDP.
    */
   public static final int kPDPModules = PortsJNI.getNumPDPModules();
   /**
@@ -99,7 +99,7 @@ public abstract class SensorBase { // TODO: Refactor
 
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
-   * legal channel numbers. Channel numbers are 1-based.
+   * legal channel numbers. Channel numbers are 0-based.
    *
    * @param channel The channel number to check.
    */
@@ -116,7 +116,7 @@ public abstract class SensorBase { // TODO: Refactor
 
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
-   * legal channel numbers. Channel numbers are 1-based.
+   * legal channel numbers. Channel numbers are 0-based.
    *
    * @param channel The channel number to check.
    */
@@ -133,7 +133,7 @@ public abstract class SensorBase { // TODO: Refactor
 
   /**
    * Check that the digital channel number is valid. Verify that the channel number is one of the
-   * legal channel numbers. Channel numbers are 1-based.
+   * legal channel numbers. Channel numbers are 0-based.
    *
    * @param channel The channel number to check.
    */
@@ -183,7 +183,7 @@ public abstract class SensorBase { // TODO: Refactor
   }
 
   /**
-   * Verify that the solenoid channel number is within limits. Channel numbers are 1-based.
+   * Verify that the solenoid channel number is within limits. Channel numbers are 0-based.
    *
    * @param channel The channel number to check.
    */
@@ -200,7 +200,7 @@ public abstract class SensorBase { // TODO: Refactor
 
   /**
    * Verify that the power distribution channel number is within limits. Channel numbers are
-   * 1-based.
+   * 0-based.
    *
    * @param channel The channel number to check.
    */
