@@ -1,2 +1,0 @@
-OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( libnivision.so.16.0.0 )

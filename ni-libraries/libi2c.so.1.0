@@ -1,0 +1,2 @@
+OUTPUT_FORMAT(elf32-littlearm)
+GROUP ( libi2c.so.1.0.0 )

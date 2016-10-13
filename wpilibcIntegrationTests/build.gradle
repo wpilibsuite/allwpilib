@@ -18,7 +18,7 @@ model {
                 }
 
                 cppCompiler.args '-pthread', '-Wno-unused-variable'
-                linker.args '-pthread', '-Wno-unused-variable', '-Wl,-rpath,/opt/GenICam_v3_0_NI/bin/Linux32_ARM'
+                linker.args '-pthread', '-Wno-unused-variable', '-Wl,-rpath,/opt/GenICam_v2_3/bin/Linux_armv7-a'
             }
             sources {
                 cpp {
