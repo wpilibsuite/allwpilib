@@ -51,6 +51,68 @@ def cameraserverSetupModel = { project ->
     }
 }
 
+def cameraserverSetupExamplesModel = { project ->
+    project.model {
+        components {
+            enum_usb(NativeExecutableSpec) {
+                if (project.isArm) {
+                    targetPlatform 'arm'
+                } else {
+                    targetPlatform 'x86'
+                    targetPlatform 'x64'
+                }
+                setupDefines(project, binaries)
+                binaries.all {
+                    tasks.withType(CppCompile) {
+                       project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDir "${rootDir}/examples/enum_usb"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include"]
+                            include '**/*.h'
+                        }
+                        lib library: 'cameraserver', linkage: 'static'
+                    }
+                }
+            }
+
+            usbstream(NativeExecutableSpec) {
+                if (project.isArm) {
+                    targetPlatform 'arm'
+                } else {
+                    targetPlatform 'x86'
+                    targetPlatform 'x64'
+                }
+                setupDefines(project, binaries)
+                binaries.all {
+                    tasks.withType(CppCompile) {
+                       project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDir "${rootDir}/examples/usbstream"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include"]
+                            include '**/*.h'
+                        }
+                        lib library: 'cameraserver', linkage: 'static'
+                    }
+                }
+            }
+        }
+    }
+}
+
 def cameraserverZipTask = { project ->
     project.ext.cameraserverZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}CameraserverZip", Zip) {
         description = 'Creates platform-specific zip of the desktop cameraserver libraries.'
@@ -116,6 +178,7 @@ if (buildArm) {
         }
 
         cameraserverSetupModel(project)
+        cameraserverSetupExamplesModel(project)
         cameraserverZipTask(project)
         useWpiUtil(project)
     }
@@ -126,15 +189,16 @@ project(':native') {
 
     apply from: "${rootDir}/toolchains/native.gradle"
 
-    if (!project.hasProperty("withoutTests")) {
-        apply from: "${rootDir}/test/tests.gradle"
-    }
+    //if (!project.hasProperty("withoutTests")) {
+    //    apply from: "${rootDir}/test/tests.gradle"
+    //}
 
     if (includeJava) {
         apply from: "${rootDir}/java/java.gradle"
     }
 
     cameraserverSetupModel(project)
+    cameraserverSetupExamplesModel(project)
     cameraserverZipTask(project)
     useWpiUtil(project)
 }
