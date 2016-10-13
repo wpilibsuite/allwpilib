@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
  */
 @RunWith(Suite.class)
 @SuiteClasses({AnalogCrossConnectTest.class, AnalogPotentiometerTest.class,
-    BuiltInAccelerometerTest.class, CANTalonTest.class,
+    BuiltInAccelerometerTest.class,
     CircularBufferTest.class, ConstantsPortsTest.class, CounterTest.class,
     DigitalGlitchFilterTest.class, DIOCrossConnectTest.class, DriverStationTest.class,
     EncoderTest.class, FilterNoiseTest.class, FilterOutputTest.class, GyroTest.class,
