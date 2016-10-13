@@ -439,7 +439,6 @@ void USBCameraImpl::CameraThreadMain() {
   // Default to not streaming
   m_streaming = false;
 
-
   while (m_active) {
     // If not connected, try to reconnect
     if (m_fd < 0) DeviceConnect();
@@ -577,9 +576,8 @@ void USBCameraImpl::CameraThreadMain() {
     }
   }
 
-  DeviceStreamOff();
-
   // close camera connection
+  DeviceStreamOff();
   DeviceDisconnect();
 }
 
