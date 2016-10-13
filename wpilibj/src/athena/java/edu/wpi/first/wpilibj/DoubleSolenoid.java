@@ -14,11 +14,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
-import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
- * DoubleSolenoid class for running 2 channels of high voltage Digital Output.
+ * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
  *
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
@@ -34,15 +32,13 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
     kReverse
   }
 
-  private int m_forwardChannel; // /< The forward channel on the module to control.
-  private int m_reverseChannel; // /< The reverse channel on the module to control.
-  private byte m_forwardMask; // /< The mask for the forward channel.
-  private byte m_reverseMask; // /< The mask for the reverse channel.
+  private byte m_forwardMask; // The mask for the forward channel.
+  private byte m_reverseMask; // The mask for the reverse channel.
   private int m_forwardHandle = 0;
   private int m_reverseHandle = 0;
 
   /**
-   * Constructor. Uses the default PCM ID of 0.
+   * Constructor. Uses the default PCM ID (defaults to 0).
    *
    * @param forwardChannel The forward channel number on the PCM (0..7).
    * @param reverseChannel The reverse channel number on the PCM (0..7).
@@ -61,18 +57,16 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   public DoubleSolenoid(final int moduleNumber, final int forwardChannel,
                         final int reverseChannel) {
     super(moduleNumber);
-    m_forwardChannel = forwardChannel;
-    m_reverseChannel = reverseChannel;
 
     checkSolenoidModule(m_moduleNumber);
-    checkSolenoidChannel(m_forwardChannel);
-    checkSolenoidChannel(m_reverseChannel);
+    checkSolenoidChannel(forwardChannel);
+    checkSolenoidChannel(reverseChannel);
 
-    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_forwardChannel);
+    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
     m_forwardHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     try {
-      portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_reverseChannel);
+      portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
       m_reverseHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
     } catch (RuntimeException ex) {
       // free the forward handle on exception, then rethrow
@@ -82,14 +76,14 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
       throw ex;
     }
 
-    m_forwardMask = (byte) (1 << m_forwardChannel);
-    m_reverseMask = (byte) (1 << m_reverseChannel);
+    m_forwardMask = (byte) (1 << forwardChannel);
+    m_reverseMask = (byte) (1 << reverseChannel);
 
-    HAL.report(tResourceType.kResourceType_Solenoid, m_forwardChannel,
+    HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel,
                                    m_moduleNumber);
-    HAL.report(tResourceType.kResourceType_Solenoid, m_reverseChannel,
+    HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel,
                                    m_moduleNumber);
-    LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, m_forwardChannel, this);
+    LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, forwardChannel, this);
   }
 
   /**
@@ -198,25 +192,20 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
   @Override
   public void updateTable() {
     if (m_table != null) {
-      // TODO: this is bad
-      m_table.putString("Value", (get() == Value.kForward ? "Forward"
-          : (get() == Value.kReverse ? "Reverse" : "Off")));
+      m_table.putString("Value", get().name().substring(1));
     }
   }
 
   @Override
   public void startLiveWindowMode() {
     set(Value.kOff); // Stop for safety
-    m_tableListener = new ITableListener() {
-      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-        // TODO: this is bad also
-        if (value.toString().equals("Reverse")) {
-          set(Value.kReverse);
-        } else if (value.toString().equals("Forward")) {
-          set(Value.kForward);
-        } else {
-          set(Value.kOff);
-        }
+    m_tableListener = (source, key, value, isNew) -> {
+      if ("Reverse".equals(value.toString())) {
+        set(Value.kReverse);
+      } else if ("Forward".equals(value.toString())) {
+        set(Value.kForward);
+      } else {
+        set(Value.kOff);
       }
     };
     m_table.addTableListener("Value", m_tableListener, true);

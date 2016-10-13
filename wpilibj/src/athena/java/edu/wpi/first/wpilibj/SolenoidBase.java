@@ -10,11 +10,12 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 
 /**
- * SolenoidBase class is the common base class for the Solenoid and DoubleSolenoid classes.
+ * SolenoidBase class is the common base class for the {@link Solenoid} and {@link DoubleSolenoid}
+ * classes.
  */
 public abstract class SolenoidBase extends SensorBase {
-  protected final byte m_moduleNumber; // /< The number of the solenoid module being
-  // used.
+
+  protected final byte m_moduleNumber; // The number of the solenoid module being used.
 
   /**
    * Constructor.
@@ -22,7 +23,7 @@ public abstract class SolenoidBase extends SensorBase {
    * @param moduleNumber The PCM CAN ID
    */
   public SolenoidBase(final int moduleNumber) {
-    m_moduleNumber = (byte)moduleNumber;
+    m_moduleNumber = (byte) moduleNumber;
   }
 
   /**
