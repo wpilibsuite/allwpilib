@@ -34,38 +34,35 @@ class SourceImpl {
   llvm::StringRef GetName() const { return m_name; }
   virtual llvm::StringRef GetDescription(
       llvm::SmallVectorImpl<char>& buf) const = 0;
-  bool IsConnected() const { return m_connected; }
+  virtual bool IsConnected() const = 0;
 
   // Functions to keep track of the overall number of sinks connected to this
   // source.  Primarily used by sinks to determine if other sinks are using
   // the same source.
   int GetNumSinks() const { return m_numSinks; }
-  void AddSink() { ++m_numSinks; }
-  void RemoveSink() { --m_numSinks; }
+  void AddSink() {
+    ++m_numSinks;
+    NumSinksChanged();
+  }
+  void RemoveSink() {
+    --m_numSinks;
+    NumSinksChanged();
+  }
 
   // Functions to keep track of the number of sinks connected to this source
   // that are "enabled", in other words, listening for new images.  Primarily
   // used by sources to determine whether they should actually bother trying
   // to get source frames.
-  int GetNumSinksEnabled() const {
-    std::lock_guard<std::mutex> lock{m_numSinksEnabledMutex};
-    return m_numSinksEnabled;
-  }
+  int GetNumSinksEnabled() const { return m_numSinksEnabled; }
 
   void EnableSink() {
-    std::lock_guard<std::mutex> lock{m_numSinksEnabledMutex};
     ++m_numSinksEnabled;
-    m_numSinksEnabledCv.notify_all();
+    NumSinksEnabledChanged();
   }
 
   void DisableSink() {
-    std::lock_guard<std::mutex> lock{m_numSinksEnabledMutex};
     --m_numSinksEnabled;
-  }
-
-  void WaitForEnabledSink() {
-    std::unique_lock<std::mutex> lock{m_numSinksEnabledMutex};
-    m_numSinksEnabledCv.wait(lock, [this] { return m_numSinksEnabled > 0; });
+    NumSinksEnabledChanged();
   }
 
   // Gets the current frame (without waiting for a new one).
@@ -80,7 +77,7 @@ class SourceImpl {
   // Property functions
   virtual int GetPropertyIndex(llvm::StringRef name) const = 0;
   virtual llvm::ArrayRef<int> EnumerateProperties(
-      llvm::SmallVectorImpl<int>& vec) const = 0;
+      llvm::SmallVectorImpl<int>& vec, CS_Status* status) const = 0;
   virtual CS_PropertyType GetPropertyType(int property) const = 0;
   virtual llvm::StringRef GetPropertyName(int property,
                                           llvm::SmallVectorImpl<char>& buf,
@@ -102,8 +99,6 @@ class SourceImpl {
   // Video mode functions
   virtual VideoMode GetVideoMode(CS_Status* status) const = 0;
   virtual bool SetVideoMode(const VideoMode& mode, CS_Status* status) = 0;
-  virtual std::vector<VideoMode> EnumerateVideoModes(
-      CS_Status* status) const = 0;
 
   // These have default implementations but can be overridden for custom
   // or optimized behavior.
@@ -112,38 +107,38 @@ class SourceImpl {
   virtual bool SetResolution(int width, int height, CS_Status* status);
   virtual bool SetFPS(int fps, CS_Status* status);
 
- protected:
-  void StartFrame();
-  Image& AddImage(std::size_t size);
-  void FinishFrame();
+  virtual std::vector<VideoMode> EnumerateVideoModes(
+      CS_Status* status) const = 0;
 
-  std::atomic_bool m_connected{false};
+ protected:
+  void PutFrame(VideoMode::PixelFormat pixelFormat, llvm::StringRef data,
+                Frame::Time time);
+
+  // Notification functions for corresponding atomics
+  virtual void NumSinksChanged() = 0;
+  virtual void NumSinksEnabledChanged() = 0;
+
   std::atomic_int m_numSinks{0};
+  std::atomic_int m_numSinksEnabled{0};
 
  private:
-  void ReleaseFrame(Frame::Data* data);
+  void ReleaseFrame(std::unique_ptr<Frame::Data> data);
 
   std::string m_name;
 
   std::mutex m_mutex;
 
-  mutable std::mutex m_numSinksEnabledMutex;
-  std::condition_variable m_numSinksEnabledCv;
-  int m_numSinksEnabled;
-
   std::mutex m_frameMutex;
   std::condition_variable m_frameCv;
 
-  // Most recent complete frame (returned to callers of GetNextFrame)
+  // Most recent frame (returned to callers of GetNextFrame)
   // Access protected by m_frameMutex.
   Frame m_frame;
 
-  // In-progress frame.  Will be moved to m_frame when complete.
-  std::unique_ptr<Frame::Data> m_frameData;
+  bool m_destroyFrames{false};
 
-  // Pools of frames and images to reduce malloc traffic.
+  // Pool of frame data to reduce malloc traffic.
   std::vector<std::unique_ptr<Frame::Data>> m_framesAvail;
-  std::vector<Image> m_imagesAvail;
 };
 
 }  // namespace cs

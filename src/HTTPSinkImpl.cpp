@@ -134,6 +134,8 @@ bool HTTPSinkImpl::UnescapeURI(llvm::StringRef str,
 // Perform a command specified by HTTP GET parameters.
 bool HTTPSinkImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
                                   llvm::StringRef parameters, bool respond) {
+  llvm::SmallString<256> responseBuf;
+  llvm::raw_svector_ostream response{responseBuf};
   // command format: param1=value1&param2=value2...
   while (!parameters.empty()) {
     // split out next param and value
@@ -142,6 +144,8 @@ bool HTTPSinkImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
     if (rawParam.empty()) continue;  // ignore "&&"
     std::tie(rawParam, rawValue) = rawParam.split('=');
     if (rawParam.empty() || rawValue.empty()) continue;  // ignore "param="
+    DEBUG4("HTTP parameter \"" << rawParam << "\" value \"" << rawValue
+                               << "\"");
 
     // unescape param
     llvm::SmallString<64> param;
@@ -168,6 +172,7 @@ bool HTTPSinkImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
     // try to assign parameter
     auto prop = source.GetPropertyIndex(param);
     if (!prop) {
+      response << param << ": \"ignored\"\r\n";
       WARNING("ignoring HTTP parameter \"" << param << "\"");
       continue;
     }
@@ -180,13 +185,19 @@ bool HTTPSinkImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
       case CS_PROP_ENUM: {
         int val;
         if (value.str().getAsInteger(10, val)) {
+          response << param << ": \"invalid integer\"\r\n";
           WARNING("HTTP parameter \"" << param << "\" value \"" << value
                                       << "\" is not an integer");
-        } else
+        } else {
+          response << param << ": " << val << "\r\n";
+          DEBUG4("HTTP parameter \"" << param << "\" value " << value);
           source.SetProperty(prop, val, &status);
+        }
         break;
       }
       case CS_PROP_STRING: {
+        response << param << ": \"ok\"\r\n";
+        DEBUG4("HTTP parameter \"" << param << "\" value \"" << value << "\"");
         source.SetStringProperty(prop, value, &status);
         break;
       }
@@ -195,10 +206,10 @@ bool HTTPSinkImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
     }
   }
 
+  // Send HTTP response
   if (respond) {
-    // Send HTTP response
     SendHeader(os, 200, "OK", "text/plain");
-    //os << command << ": " << res;
+    os << response.str() << "\r\n";
   }
 
   return true;
@@ -212,13 +223,13 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
   os << "{\n\"controls\": [\n";
   llvm::SmallVector<int, 32> properties_vec;
   bool first = true;
-  for (auto prop : source.EnumerateProperties(properties_vec)) {
+  CS_Status status = 0;
+  for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
     if (first)
       first = false;
     else
       os << ",\n";
     os << "{";
-    CS_Status status = 0;
     llvm::SmallString<128> name_buf;
     auto name = source.GetPropertyName(prop, name_buf, &status);
     auto type = source.GetPropertyType(prop);
@@ -319,7 +330,7 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
   oss << "--" BOUNDARY "\r\n";
   os << oss.str();
 
-  DEBUG("Headers send, sending stream now");
+  DEBUG("HTTP: Headers send, sending stream now");
 
   Enable();
   while (m_active && !os.has_error()) {
@@ -329,6 +340,7 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
       std::this_thread::sleep_for(std::chrono::seconds(1));
       continue;
     }
+    DEBUG4("HTTP: waiting for frame");
     Frame frame = source->GetNextFrame();  // blocks
     if (!m_active) break;
     if (!frame) {
@@ -336,6 +348,7 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
       continue;
     }
+    DEBUG4("HTTP: sending frame size=" << frame.size());
 
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
@@ -349,7 +362,7 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
         << "X-Timestamp: " << timestamp << "\r\n"
         << "\r\n";
     os << oss.str();
-    os << frame.data();
+    os << llvm::StringRef(frame.data(), frame.size());
     os << "\r\n--" BOUNDARY "\r\n";
     // os.flush();
   }
@@ -359,12 +372,15 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
 // thread for clients that connected to this server
 void HTTPSinkImpl::ConnThreadMain(wpi::NetworkStream* stream) {
   wpi::raw_socket_istream is{*stream};
+  wpi::raw_socket_ostream os{*stream, true};
 
   // Read the request string from the stream
   llvm::SmallString<128> buf;
-  if (!ReadLine(is, buf, 4096)) return;
+  if (!ReadLine(is, buf, 4096)) {
+    DEBUG("HTTP error getting request string");
+    return;
+  }
 
-  wpi::raw_socket_ostream os{*stream, true};
   enum { kCommand, kStream, kGetSettings } type;
   llvm::StringRef parameters;
   size_t pos;
@@ -402,9 +418,10 @@ void HTTPSinkImpl::ConnThreadMain(wpi::NetworkStream* stream) {
 
   // Read the rest of the HTTP request.
   // The end of the request is marked by a single, empty line with "\r\n"
+  llvm::SmallString<128> buf2;
   do {
-    if (!ReadLine(is, buf, 4096)) return;
-  } while (!buf.startswith("\r\n"));
+    if (!ReadLine(is, buf2, 4096)) return;
+  } while (!buf2.startswith("\r\n"));
 
   // Send response
   switch (type) {
@@ -417,8 +434,7 @@ void HTTPSinkImpl::ConnThreadMain(wpi::NetworkStream* stream) {
       break;
     case kCommand:
       if (auto source = GetSource()) {
-        if (!ProcessCommand(os, *source, parameters, true)) return;
-        SendHeader(os, 200, "OK", "text/plain");
+        ProcessCommand(os, *source, parameters, true);
       } else {
         SendHeader(os, 200, "OK", "text/plain");
         os << "Ignored due to no connected source." << "\r\n";

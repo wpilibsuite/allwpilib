@@ -10,10 +10,11 @@
 
 #include <atomic>
 #include <chrono>
+#include <memory>
 
-#include "llvm/SmallVector.h"
+#include "llvm/StringRef.h"
 
-#include "Image.h"
+#include "cameraserver_cpp.h"
 
 namespace cs {
 
@@ -22,17 +23,29 @@ class SourceImpl;
 class Frame {
   friend class SourceImpl;
 
+ public:
+  typedef std::chrono::system_clock::time_point Time;
+
+ private:
   struct Data {
+    explicit Data(std::size_t capacity_)
+        : data(new char[capacity_]), size(0), capacity(capacity_) {}
+    ~Data() { delete[] data; }
+
     std::atomic_int refcount{0};
-    std::chrono::system_clock::time_point timestamp;
-    Image image;
+    Time time;
+    char* data;
+    std::size_t size;
+    std::size_t capacity;
+    VideoMode::PixelFormat pixelFormat;
   };
 
  public:
   Frame() noexcept : m_source{nullptr}, m_data{nullptr} {}
 
-  Frame(SourceImpl& source, Data* data) noexcept : m_source{&source},
-                                                   m_data{data} {
+  Frame(SourceImpl& source, std::unique_ptr<Data> data) noexcept
+      : m_source{&source},
+        m_data{data.release()} {
     if (m_data) ++(m_data->refcount);
   }
 
@@ -52,19 +65,29 @@ class Frame {
 
   explicit operator bool() const { return m_data; }
 
+  operator llvm::StringRef() const {
+    if (!m_data) return llvm::StringRef{};
+    return llvm::StringRef(m_data->data, m_data->size);
+  }
+
   std::size_t size() const {
     if (!m_data) return 0;
-    return m_data->image.size();
+    return m_data->size;
   }
 
   const char* data() const {
     if (!m_data) return nullptr;
-    return m_data->image.data();
+    return m_data->data;
   }
 
-  std::chrono::system_clock::time_point time() const {
-    if (!m_data) return std::chrono::system_clock::time_point{};
-    return m_data->timestamp;
+  VideoMode::PixelFormat GetPixelFormat() const {
+    if (!m_data) return VideoMode::kUnknown;
+    return m_data->pixelFormat;
+  }
+
+  Time time() const {
+    if (!m_data) return Time{};
+    return m_data->time;
   }
 
   friend void swap(Frame& first, Frame& second) noexcept {

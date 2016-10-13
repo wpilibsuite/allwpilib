@@ -234,7 +234,8 @@ llvm::ArrayRef<CS_Property> EnumerateSourceProperties(
     return 0;
   }
   llvm::SmallVector<int, 32> properties_buf;
-  for (auto property : data->source->EnumerateProperties(properties_buf))
+  for (auto property :
+       data->source->EnumerateProperties(properties_buf, status))
     vec.push_back(Handle{source, property, Handle::kProperty});
   return vec;
 }

@@ -11,4 +11,7 @@
 
 using namespace cs;
 
-void Frame::ReleaseFrame() { m_source->ReleaseFrame(m_data); }
+void Frame::ReleaseFrame() {
+  m_source->ReleaseFrame(std::unique_ptr<Data>(m_data));
+  m_data = nullptr;
+}
