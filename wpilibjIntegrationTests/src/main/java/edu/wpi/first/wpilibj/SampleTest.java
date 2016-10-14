@@ -58,10 +58,7 @@ public class SampleTest extends AbstractComsSetup {
    */
   @Test
   public void test() {
-    CANTalon cantalon = new CANTalon(0);
-    cantalon.set(0.5);
     Timer.delay(0.5);
-    cantalon.set(0.0);
     assertTrue(true);
   }
 

@@ -31,7 +31,6 @@ genFolderExclude {
 }
 
 genFileExclude {
-  CanTalonSRX\.h$
   NIIMAQdx\.h$
   can_proto\.h$
   nivision\.h$

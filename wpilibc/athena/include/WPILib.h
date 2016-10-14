@@ -25,7 +25,6 @@
 #include "Buttons/JoystickButton.h"
 #include "Buttons/NetworkButton.h"
 #include "CANJaguar.h"
-#include "CANTalon.h"
 #include "CameraServer.h"
 #include "Commands/Command.h"
 #include "Commands/CommandGroup.h"
