@@ -888,6 +888,9 @@ void USBCameraImpl::DeviceSetMode() {
     WARNING("USB " << m_path << ": could not set format "
                    << m_mode.pixelFormat << " res " << m_mode.width << "x"
                    << m_mode.height);
+  } else {
+    INFO("USB " << m_path << ": set format " << m_mode.pixelFormat << " res "
+                << m_mode.width << "x" << m_mode.height);
   }
 }
 
@@ -903,7 +906,10 @@ void USBCameraImpl::DeviceSetFPS() {
   std::memset(&parm, 0, sizeof(parm));
   parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   parm.parm.capture.timeperframe = FPSToFract(m_mode.fps);
-  if (DoIoctl(fd, VIDIOC_S_PARM, &parm) != 0) return;
+  if (DoIoctl(fd, VIDIOC_S_PARM, &parm) != 0)
+    WARNING("USB " << m_path << ": could not set FPS to " << m_mode.fps);
+  else
+    INFO("USB " << m_path << ": set FPS to " << m_mode.fps);
 }
 
 void USBCameraImpl::DeviceCacheMode() {
@@ -943,19 +949,6 @@ void USBCameraImpl::DeviceCacheMode() {
   int width = vfmt.fmt.pix.width;
   int height = vfmt.fmt.pix.height;
 
-  // Update format with user changes.
-  bool formatChanged = false;
-  if (m_modeSetPixelFormat && pixelFormat != m_mode.pixelFormat) {
-    formatChanged = true;
-    pixelFormat = static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat);
-  }
-  if (m_modeSetResolution &&
-      (width != m_mode.width || height != m_mode.height)) {
-    formatChanged = true;
-    width = m_mode.width;
-    height = m_mode.height;
-  }
-
   // Get FPS
   int fps = 0;
   struct v4l2_streamparm parm;
@@ -964,6 +957,45 @@ void USBCameraImpl::DeviceCacheMode() {
   if (TryIoctl(fd, VIDIOC_G_PARM, &parm) == 0) {
     if (parm.parm.capture.capability & V4L2_CAP_TIMEPERFRAME)
       fps = FractToFPS(parm.parm.capture.timeperframe);
+  }
+
+  // Update format with user changes.
+  bool formatChanged = false;
+
+  if (m_modeSetPixelFormat) {
+    // User set pixel format
+    if (pixelFormat != m_mode.pixelFormat) {
+      formatChanged = true;
+      pixelFormat = static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat);
+    }
+  } else {
+    // Default to MJPEG
+    if (pixelFormat != VideoMode::kMJPEG) {
+      formatChanged = true;
+      pixelFormat = VideoMode::kMJPEG;
+    }
+  }
+
+  if (m_modeSetResolution) {
+    // User set resolution
+    if (width != m_mode.width || height != m_mode.height) {
+      formatChanged = true;
+      width = m_mode.width;
+      height = m_mode.height;
+    }
+  } else {
+    // Default to lowest known resolution (based on number of total pixels)
+    int numPixels = width * height;
+    for (const auto& mode : m_videoModes) {
+      if (mode.pixelFormat != pixelFormat) continue;
+      int numPixelsHere = mode.width * mode.height;
+      if (numPixelsHere < numPixels) {
+        formatChanged = true;
+        numPixels = numPixelsHere;
+        width = mode.width;
+        height = mode.height;
+      }
+    }
   }
 
   // Update FPS with user changes
