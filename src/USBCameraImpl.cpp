@@ -1517,14 +1517,14 @@ void USBCameraImpl::NumSinksEnabledChanged() {
 
 namespace cs {
 
-CS_Source CreateUSBSourceDev(llvm::StringRef name, int dev, CS_Status* status) {
+CS_Source CreateUSBCameraDev(llvm::StringRef name, int dev, CS_Status* status) {
   llvm::SmallString<32> path;
   llvm::raw_svector_ostream oss{path};
   oss << "/dev/video" << dev;
-  return CreateUSBSourcePath(name, oss.str(), status);
+  return CreateUSBCameraPath(name, oss.str(), status);
 }
 
-CS_Source CreateUSBSourcePath(llvm::StringRef name, llvm::StringRef path,
+CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status) {
   auto source = std::make_shared<USBCameraImpl>(name, path);
   return Sources::GetInstance().Allocate(SourceData::kUSB, source);
@@ -1570,13 +1570,13 @@ std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {
 
 extern "C" {
 
-CS_Source CS_CreateUSBSourceDev(const char* name, int dev, CS_Status* status) {
-  return cs::CreateUSBSourceDev(name, dev, status);
+CS_Source CS_CreateUSBCameraDev(const char* name, int dev, CS_Status* status) {
+  return cs::CreateUSBCameraDev(name, dev, status);
 }
 
-CS_Source CS_CreateUSBSourcePath(const char* name, const char* path,
+CS_Source CS_CreateUSBCameraPath(const char* name, const char* path,
                                  CS_Status* status) {
-  return cs::CreateUSBSourcePath(name, path, status);
+  return cs::CreateUSBCameraPath(name, path, status);
 }
 
 CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status) {

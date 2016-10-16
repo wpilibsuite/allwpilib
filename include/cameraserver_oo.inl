@@ -156,11 +156,11 @@ inline std::vector<VideoMode> VideoSource::EnumerateVideoModes() const {
 }
 
 inline USBCamera::USBCamera(llvm::StringRef name, int dev) {
-  m_handle = CreateUSBSourceDev(name, dev, &m_status);
+  m_handle = CreateUSBCameraDev(name, dev, &m_status);
 }
 
 inline USBCamera::USBCamera(llvm::StringRef name, llvm::StringRef path) {
-  m_handle = CreateUSBSourcePath(name, path, &m_status);
+  m_handle = CreateUSBCameraPath(name, path, &m_status);
 }
 
 inline std::vector<USBCameraInfo> USBCamera::EnumerateUSBCameras() {
@@ -169,7 +169,7 @@ inline std::vector<USBCameraInfo> USBCamera::EnumerateUSBCameras() {
 }
 
 inline HTTPCamera::HTTPCamera(llvm::StringRef name, llvm::StringRef url) {
-  m_handle = CreateHTTPSource(name, url, &m_status);
+  m_handle = CreateHTTPCamera(name, url, &m_status);
 }
 
 inline CvSource::CvSource(llvm::StringRef name, const VideoMode& mode) {

@@ -248,28 +248,28 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_getEnum
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    createUSBSourceDev
+ * Method:    createUSBCameraDev
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createUSBSourceDev
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createUSBCameraDev
   (JNIEnv *env, jclass, jstring name, jint dev)
 {
   CS_Status status;
-  auto val = cs::CreateUSBSourceDev(JStringRef{env, name}, dev, &status);
+  auto val = cs::CreateUSBCameraDev(JStringRef{env, name}, dev, &status);
   CheckStatus(env, status);
   return val;
 }
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    createUSBSourcePath
+ * Method:    createUSBCameraPath
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createUSBSourcePath
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createUSBCameraPath
   (JNIEnv *env, jclass, jstring name, jstring path)
 {
   CS_Status status;
-  auto val = cs::CreateUSBSourcePath(JStringRef{env, name},
+  auto val = cs::CreateUSBCameraPath(JStringRef{env, name},
                                      JStringRef{env, path}, &status);
   CheckStatus(env, status);
   return val;
@@ -277,14 +277,14 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createUSBSource
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    createHTTPSource
+ * Method:    createHTTPCamera
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createHTTPSource
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createHTTPCamera
   (JNIEnv *env, jclass, jstring name, jstring url)
 {
   CS_Status status;
-  auto val = cs::CreateHTTPSource(JStringRef{env, name},
+  auto val = cs::CreateHTTPCamera(JStringRef{env, name},
                                   JStringRef{env, url}, &status);
   CheckStatus(env, status);
   return val;

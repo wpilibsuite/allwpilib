@@ -92,10 +92,10 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
 //
 // Source Creation Functions
 //
-CS_Source CreateUSBSourceDev(llvm::StringRef name, int dev, CS_Status* status);
-CS_Source CreateUSBSourcePath(llvm::StringRef name, llvm::StringRef path,
+CS_Source CreateUSBCameraDev(llvm::StringRef name, int dev, CS_Status* status);
+CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status);
-CS_Source CreateHTTPSource(llvm::StringRef name, llvm::StringRef url,
+CS_Source CreateHTTPCamera(llvm::StringRef name, llvm::StringRef url,
                            CS_Status* status);
 CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
                          CS_Status* status);

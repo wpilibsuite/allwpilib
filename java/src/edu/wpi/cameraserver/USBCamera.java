@@ -13,14 +13,14 @@ public class USBCamera extends VideoSource {
   /// @param name Source name (arbitrary unique identifier)
   /// @param dev Device number (e.g. 0 for /dev/video0)
   public USBCamera(String name, int dev) {
-    super(CameraServerJNI.createUSBSourceDev(name, dev));
+    super(CameraServerJNI.createUSBCameraDev(name, dev));
   }
 
   /// Create a source for a USB camera based on device path.
   /// @param name Source name (arbitrary unique identifier)
   /// @param path Path to device (e.g. "/dev/video0" on Linux)
   public USBCamera(String name, String path) {
-    super(CameraServerJNI.createUSBSourcePath(name, path));
+    super(CameraServerJNI.createUSBCameraPath(name, path));
   }
 
   /// Enumerate USB cameras on the local system.

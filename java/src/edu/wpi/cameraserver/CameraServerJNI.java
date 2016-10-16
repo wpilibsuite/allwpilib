@@ -90,9 +90,9 @@ public class CameraServerJNI {
   //
   // Source Creation Functions
   //
-  public static native int createUSBSourceDev(String name, int dev);
-  public static native int createUSBSourcePath(String name, String path);
-  public static native int createHTTPSource(String name, String url);
+  public static native int createUSBCameraDev(String name, int dev);
+  public static native int createUSBCameraPath(String name, String path);
+  public static native int createHTTPCamera(String name, String url);
   public static native int createCvSource(String name, int pixelFormat, int width, int height, int fps);
 
   //

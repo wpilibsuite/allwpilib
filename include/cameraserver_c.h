@@ -104,10 +104,10 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
 //
 // Source Creation Functions
 //
-CS_Source CS_CreateUSBSourceDev(const char* name, int dev, CS_Status* status);
-CS_Source CS_CreateUSBSourcePath(const char* name, const char* path,
+CS_Source CS_CreateUSBCameraDev(const char* name, int dev, CS_Status* status);
+CS_Source CS_CreateUSBCameraPath(const char* name, const char* path,
                                  CS_Status* status);
-CS_Source CS_CreateHTTPSource(const char* name, const char* url,
+CS_Source CS_CreateHTTPCamera(const char* name, const char* url,
                               CS_Status* status);
 CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
                             CS_Status* status);

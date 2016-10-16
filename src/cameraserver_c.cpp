@@ -74,9 +74,9 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
   return out;
 }
 
-CS_Source CS_CreateHTTPSource(const char* name, const char* url,
+CS_Source CS_CreateHTTPCamera(const char* name, const char* url,
                               CS_Status* status) {
-  return cs::CreateHTTPSource(name, url, status);
+  return cs::CreateHTTPCamera(name, url, status);
 }
 
 CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
