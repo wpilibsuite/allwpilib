@@ -7,10 +7,9 @@ publishing {
             artifact zip
             groupId 'edu.wpi.first.wpilib.simulation'
             artifactId 'simulation'
-            version '1.0.0'
+            version WPILibVersion.version
         }
     }
-
     setupWpilibRepo(it)
 }
 

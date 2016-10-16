@@ -54,7 +54,7 @@ task gz_msgs(type: Exec, dependsOn: cmake) {
       }
 }
 
-task wpilibcSim(type: Exec, dependsOn: ['cmake', ':unzipNetworkTables', ':unzipWpiUtil']) {
+task wpilibcSim(type: Exec, dependsOn: ['cmake', ':unzipNetworkTables', ':unzipWpiUtil', 'generateCppVersion']) {
     description = 'build WPILib C++ for simulation with cmake'
     group = 'WPILib Simulation'
     workingDir '../build'

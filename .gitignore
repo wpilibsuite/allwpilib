@@ -8,6 +8,8 @@ dependency-reduced-pom.xml
 /wpilibj/src/athena/cpp/nivision/*.java
 /wpilibj/src/athena/cpp/nivision/nivision_funcs.txt
 /wpilibj/src/athena/cpp/nivision/imaqdx_funcs.txt
+wpilibj/src/shared/java/edu/wpi/first/wpilibj/util/WPILibVersion.java
+wpilibc/shared/src/WPILibVersion.cpp
 doxygen.log
 
 # Created by the jenkins test script

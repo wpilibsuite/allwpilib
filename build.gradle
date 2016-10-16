@@ -1,13 +1,6 @@
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-
-    dependencies {
-        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.8'
-    }
+plugins {
+    id 'net.ltgt.errorprone' version '0.0.8'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.1'
 }
 
 def enableSimulation = hasProperty('enableSimulation')
@@ -15,9 +8,6 @@ def enableSimulation = hasProperty('enableSimulation')
 if (!hasProperty('repo')) {
     ext.repo = 'development'
 }
-
-def repoBaseUrl = "http://first.wpi.edu/FRC/roborio/maven/${repo}"
-def publishUrl = "${System.getProperty('user.home')}/releases/maven/${repo}"
 
 ext.simulationInstallDir = "$rootDir/build/install/simulation"
 
@@ -27,12 +17,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven {
-            url publishUrl
-        }
-        maven {
-            url repoBaseUrl
-        }
     }
 }
 
@@ -54,10 +38,9 @@ subprojects {
             options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
-
     ext.setupWpilibRepo = { publishing ->
         publishing.repositories.maven {
-            url = "${System.getProperty('user.home')}/releases/maven/${repo}"
+            url = WPILibVersion.mavenLocalUrl
         }
     }
 }

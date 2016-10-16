@@ -19,19 +19,53 @@ niLibraryTree.each { lib ->
     }
 }
 
-def armNtDependency =
-    project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:arm@zip")
-def armConfig = project.configurations.detachedConfiguration(armNtDependency)
-armConfig.setTransitive(false)
-def armNetTables = armConfig.files[0].canonicalFile
+task downloadArmNetworkTables() {
+    description = 'Downloads the C++ ARM NetworkTables maven dependency.'
+    group = 'WPILib'
+    def depFolder = "$buildDir/dependencies"
+    def ntZip = file("$depFolder/ntcore-arm.zip")
+    outputs.file(ntZip)
+    def armNetTables
 
-def desktopNetTables
+    doFirst {
+        def armNtDependency = project.dependencies.create('edu.wpi.first.wpilib.networktables.cpp:NetworkTables:+:arm@zip')
+        def armConfig = project.configurations.detachedConfiguration(armNtDependency)
+        armConfig.setTransitive(false)
+        armNetTables = armConfig.files[0].canonicalFile
+    }
+
+    doLast {
+        copy {
+            from armNetTables
+            rename 'NetworkTables(.+)', 'ntcore-arm.zip'
+            into depFolder
+        }
+    }
+}
+
 if (project.hasProperty('makeSim')) {
-    def desktopNtDependency =
-        project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:desktop@zip")
-    def desktopConfig = project.configurations.detachedConfiguration(desktopNtDependency)
-    desktopConfig.setTransitive(false)
-    desktopNetTables = desktopConfig.files[0].canonicalFile
+    task downloadDesktopNetworkTables() {
+        description = 'Downloads the C++ Desktop NetworkTables maven dependency.'
+        group = 'WPILib'
+        def depFolder = "$buildDir/dependencies"
+        def ntZip = file("$depFolder/ntcore-desk.zip")
+        outputs.file(ntZip)
+        def desktopNetTables
+        doFirst {
+            def desktopNtDependency = project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:+:desktop@zip")
+            def desktopConfig = project.configurations.detachedConfiguration(desktopNtDependency)
+            desktopConfig.setTransitive(false)
+            desktopNetTables = desktopConfig.files[0].canonicalFile
+        }
+
+        doLast {
+            copy {
+                from desktopNetTables
+                rename 'NetworkTables(.+)', 'ntcore-desk.zip'
+                into depFolder
+            }
+        }
+    }
 }
 
 def netTablesUnzipLocation = "$buildDir/networktables"
@@ -40,26 +74,64 @@ def netTablesUnzipLocation = "$buildDir/networktables"
 task unzipNetworkTables(type: Copy) {
     description = 'Unzips the networktables maven dependency so that the include files and libraries can be used'
     group = 'WPILib'
+    dependsOn downloadArmNetworkTables
+
     if (project.hasProperty('makeSim')) {
-        from zipTree(desktopNetTables)
+        dependsOn downloadDesktopNetworkTables
+        from zipTree(downloadDesktopNetworkTables.outputs.files.singleFile)
     }
-    from zipTree(armNetTables)
+    from zipTree(downloadArmNetworkTables.outputs.files.singleFile)
     into netTablesUnzipLocation
 }
 
-def armWpiUtilDependency =
-    project.dependencies.create("edu.wpi.first.wpilib:wpiutil:1.0.0-SNAPSHOT:arm@zip")
-def armWpiUtilConfig = project.configurations.detachedConfiguration(armWpiUtilDependency)
-armWpiUtilConfig.setTransitive(false)
-def armWpiUtil = armWpiUtilConfig.files[0].canonicalFile
+task downloadArmWpiUtil() {
+    description = 'Downloads the C++ ARM NetworkTables maven dependency.'
+    group = 'WPILib'
+    def depFolder = "$buildDir/dependencies"
+    def utilZip = file("$depFolder/wpiutil-arm.zip")
+    outputs.file(utilZip)
+    def armWpiUtil
 
-def desktopWpiUtil
+    doFirst {
+        def armWpiUtilDependency = project.dependencies.create("edu.wpi.first.wpilib:wpiutil:+:arm@zip")
+        def armWpiUtilConfig = project.configurations.detachedConfiguration(armWpiUtilDependency)
+        armWpiUtilConfig.setTransitive(false)
+        armWpiUtil = armWpiUtilConfig.files[0].canonicalFile
+    }
+
+    doLast {
+        copy {
+            from armWpiUtil
+            rename 'wpiutil(.+)', 'wpiutil-arm.zip'
+            into depFolder
+        }
+    }
+}
+
 if (project.hasProperty('makeSim')) {
-    def desktopWpiUtilDependency =
-        project.dependencies.create("edu.wpi.first.wpilib:wpiutil:1.0.0-SNAPSHOT:desktop@zip")
-    def desktopWpiUtilConfig = project.configurations.detachedConfiguration(desktopWpiUtilDependency)
-    desktopWpiUtilConfig.setTransitive(false)
-    desktopWpiUtil = desktopWpiUtilConfig.files[0].canonicalFile
+    task downloadDesktopWpiUtil() {
+        description = 'Downloads the C++ Desktop wpiutil maven dependency.'
+        group = 'WPILib'
+        def depFolder = "$buildDir/dependencies"
+        def wpiutilZip = file("$depFolder/wpiutil-desk.zip")
+        outputs.file(wpiutilZip)
+        def wpiUtil
+
+        doFirst {
+            def desktopWpiUtilDependency = project.dependencies.create("edu.wpi.first.wpilib:wpiutil:+:desktop@zip")
+            def desktopWpiUtilConfig = project.configurations.detachedConfiguration(desktopWpiUtilDependency)
+            desktopWpiUtilConfig.setTransitive(false)
+            wpiUtil = desktopWpiUtilConfig.files[0].canonicalFile
+        }
+
+        doLast {
+            copy {
+                from wpiUtil
+                rename 'wpiutil(.+)', 'wpiutil-desk.zip'
+                into depFolder
+            }
+        }
+    }
 }
 
 def wpiUtilUnzipLocation = "$buildDir/wpiutil"
@@ -68,10 +140,13 @@ def wpiUtilUnzipLocation = "$buildDir/wpiutil"
 task unzipWpiUtil(type: Copy) {
     description = 'Unzips the wpiutil maven dependency so that the include files and libraries can be used'
     group = 'WPILib'
+    dependsOn downloadArmWpiUtil
+
     if (project.hasProperty('makeSim')) {
-        from zipTree(desktopWpiUtil)
+        dependsOn downloadDesktopWpiUtil
+        from zipTree(downloadDesktopWpiUtil.outputs.files.singleFile)
     }
-    from zipTree(armWpiUtil)
+    from zipTree(downloadArmWpiUtil.outputs.files.singleFile)
     into wpiUtilUnzipLocation
 }
 

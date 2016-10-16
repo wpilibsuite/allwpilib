@@ -1,6 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
 apply plugin: 'net.ltgt.errorprone'
 
 configurations.errorprone {
@@ -11,19 +13,12 @@ evaluationDependsOn(':wpilibj')
 
 mainClassName = 'edu.wpi.first.wpilibj.test.AntJunitLanucher'
 
-buildscript {
-    repositories { jcenter() }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-    }
-}
-
 def wpilibj = project(':wpilibj')
 
 dependencies {
     compile wpilibj
     compile files(wpilibj.sourceSets.test.output.classesDir)
-    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
+    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
     compile 'junit:junit:4.11'
     compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
     compile 'org.apache.ant:ant:1.9.4'

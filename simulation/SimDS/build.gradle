@@ -1,14 +1,8 @@
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'maven-publish'
-
-// Adds the dependency for the shadow plugin, which creates an uberjar with all dependencies
-buildscript {
-    repositories { jcenter() }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-    }
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'maven-publish'
 }
 
 publishing {
@@ -26,7 +20,7 @@ publishing {
             }
             groupId 'edu.wpi.first.wpilibj.simulation'
             artifactId 'SimDS'
-            version '0.1.0-SNAPSHOT'
+            version WPILibVersion.version
         }
     }
     setupWpilibRepo(it)
