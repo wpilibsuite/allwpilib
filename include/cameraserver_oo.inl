@@ -270,9 +270,9 @@ inline VideoProperty VideoSink::GetSourceProperty(llvm::StringRef name) {
   return VideoProperty{GetSinkSourceProperty(m_handle, name, &m_status)};
 }
 
-inline HTTPSink::HTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,
-                          int port) {
-  m_handle = CreateHTTPSink(name, listenAddress, port, &m_status);
+inline MJPEGServer::MJPEGServer(llvm::StringRef name,
+                                llvm::StringRef listenAddress, int port) {
+  m_handle = CreateMJPEGServer(name, listenAddress, port, &m_status);
 }
 
 inline CvSink::CvSink(llvm::StringRef name) {

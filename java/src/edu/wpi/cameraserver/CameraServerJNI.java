@@ -130,7 +130,7 @@ public class CameraServerJNI {
   //
   // Sink Creation Functions
   //
-  public static native int createHTTPSink(String name, String listenAddress, int port);
+  public static native int createMJPEGServer(String name, String listenAddress, int port);
   public static native int createCvSink(String name);
   //public static native int createCvSinkCallback(String name,
   //                            void (*processFrame)(long time));

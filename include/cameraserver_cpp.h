@@ -151,8 +151,8 @@ void RemoveSourceProperty(CS_Source source, llvm::StringRef name,
 //
 // Sink Creation Functions
 //
-CS_Sink CreateHTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,
-                       int port, CS_Status* status);
+CS_Sink CreateMJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress,
+                          int port, CS_Status* status);
 CS_Sink CreateCvSink(llvm::StringRef name, CS_Status* status);
 CS_Sink CreateCvSinkCallback(llvm::StringRef name,
                              std::function<void(uint64_t time)> processFrame,

@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_HTTPSINKIMPL_H_
-#define CAMERASERVER_HTTPSINKIMPL_H_
+#ifndef CAMERASERVER_MJPEGSERVERIMPL_H_
+#define CAMERASERVER_MJPEGSERVERIMPL_H_
 
 #include <atomic>
 #include <condition_variable>
@@ -29,11 +29,11 @@ namespace cs {
 
 class SourceImpl;
 
-class HTTPSinkImpl : public SinkImpl {
+class MJPEGServerImpl : public SinkImpl {
  public:
-  HTTPSinkImpl(llvm::StringRef name, llvm::StringRef description,
-               std::unique_ptr<wpi::NetworkAcceptor> acceptor);
-  ~HTTPSinkImpl() override;
+  MJPEGServerImpl(llvm::StringRef name, llvm::StringRef description,
+                  std::unique_ptr<wpi::NetworkAcceptor> acceptor);
+  ~MJPEGServerImpl() override;
 
   llvm::StringRef GetDescription(
       llvm::SmallVectorImpl<char>& buf) const override;
@@ -72,4 +72,4 @@ class HTTPSinkImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_HTTPSINKIMPL_H_
+#endif  // CAMERASERVER_MJPEGSERVERIMPL_H_

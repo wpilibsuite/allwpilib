@@ -8,19 +8,19 @@
 package edu.wpi.cameraserver;
 
 /// A sink that acts as a MJPEG-over-HTTP network server.
-public class HTTPSink extends VideoSink {
+public class MJPEGServer extends VideoSink {
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
   /// @param listenAddress TCP listen address (empty string for all addresses)
   /// @param port TCP port number
-  public HTTPSink(String name, String listenAddress, int port) {
-    super(CameraServerJNI.createHTTPSink(name, listenAddress, port));
+  public MJPEGServer(String name, String listenAddress, int port) {
+    super(CameraServerJNI.createMJPEGServer(name, listenAddress, port));
   }
 
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
   /// @param port TCP port number
-  public HTTPSink(String name, int port) {
+  public MJPEGServer(String name, int port) {
     this(name, "", port);
   }
 }

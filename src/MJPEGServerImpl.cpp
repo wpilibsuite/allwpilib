@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HTTPSinkImpl.h"
+#include "MJPEGServerImpl.h"
 
 #include <chrono>
 
@@ -33,10 +33,10 @@ using namespace cs;
 // A browser should connect for each file and not serve files from its cache.
 // Using cached pictures would lead to showing old/outdated pictures.
 // Many browsers seem to ignore, or at least not always obey, those headers.
-void HTTPSinkImpl::SendHeader(llvm::raw_ostream& os, int code,
-                              llvm::StringRef codeText,
-                              llvm::StringRef contentType,
-                              llvm::StringRef extra) {
+void MJPEGServerImpl::SendHeader(llvm::raw_ostream& os, int code,
+                                 llvm::StringRef codeText,
+                                 llvm::StringRef contentType,
+                                 llvm::StringRef extra) {
   os << "HTTP/1.0 " << code << ' ' << codeText << "\r\n";
   os << "Connection: close\r\n"
         "Server: CameraServer/1.0\r\n"
@@ -52,8 +52,8 @@ void HTTPSinkImpl::SendHeader(llvm::raw_ostream& os, int code,
 // Send error header and message
 // @param code HTTP error code (e.g. 404)
 // @param message Additional message text
-void HTTPSinkImpl::SendError(llvm::raw_ostream& os, int code,
-                             llvm::StringRef message) {
+void MJPEGServerImpl::SendError(llvm::raw_ostream& os, int code,
+                                llvm::StringRef message) {
   llvm::StringRef codeText, extra, baseMessage;
   switch (code) {
     case 401:
@@ -90,8 +90,9 @@ void HTTPSinkImpl::SendError(llvm::raw_ostream& os, int code,
 // Read a line from an input stream (up to a maximum length).
 // The returned buffer will contain the trailing \n (unless the maximum length
 // was reached).
-bool HTTPSinkImpl::ReadLine(wpi::raw_istream& istream,
-                            llvm::SmallVectorImpl<char>& buffer, int maxLen) {
+bool MJPEGServerImpl::ReadLine(wpi::raw_istream& istream,
+                               llvm::SmallVectorImpl<char>& buffer,
+                               int maxLen) {
   buffer.clear();
   for (int i = 0; i < maxLen; ++i) {
     char c;
@@ -104,8 +105,8 @@ bool HTTPSinkImpl::ReadLine(wpi::raw_istream& istream,
 }
 
 // Unescape a %xx-encoded URI.  Returns false on error.
-bool HTTPSinkImpl::UnescapeURI(llvm::StringRef str,
-                               llvm::SmallVectorImpl<char>& out) {
+bool MJPEGServerImpl::UnescapeURI(llvm::StringRef str,
+                                  llvm::SmallVectorImpl<char>& out) {
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
     // pass non-escaped characters to output
     if (*i != '%') {
@@ -132,8 +133,8 @@ bool HTTPSinkImpl::UnescapeURI(llvm::StringRef str,
 }
 
 // Perform a command specified by HTTP GET parameters.
-bool HTTPSinkImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
-                                  llvm::StringRef parameters, bool respond) {
+bool MJPEGServerImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
+                                     llvm::StringRef parameters, bool respond) {
   llvm::SmallString<256> responseBuf;
   llvm::raw_svector_ostream response{responseBuf};
   // command format: param1=value1&param2=value2...
@@ -216,8 +217,8 @@ bool HTTPSinkImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
 }
 
 // Send a JSON file which is contains information about the source parameters.
-void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
-                            bool header) {
+void MJPEGServerImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
+                               bool header) {
   if (header) SendHeader(os, 200, "OK", "application/x-javascript");
 
   os << "{\n\"controls\": [\n";
@@ -282,23 +283,24 @@ void HTTPSinkImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
   os.flush();
 }
 
-HTTPSinkImpl::HTTPSinkImpl(llvm::StringRef name, llvm::StringRef description,
-                           std::unique_ptr<wpi::NetworkAcceptor> acceptor)
+MJPEGServerImpl::MJPEGServerImpl(llvm::StringRef name,
+                                 llvm::StringRef description,
+                                 std::unique_ptr<wpi::NetworkAcceptor> acceptor)
     : SinkImpl{name},
       m_description(description),
       m_acceptor{std::move(acceptor)} {
   m_active = true;
-  m_serverThread = std::thread(&HTTPSinkImpl::ServerThreadMain, this);
+  m_serverThread = std::thread(&MJPEGServerImpl::ServerThreadMain, this);
 }
 
-HTTPSinkImpl::~HTTPSinkImpl() { Stop(); }
+MJPEGServerImpl::~MJPEGServerImpl() { Stop(); }
 
-llvm::StringRef HTTPSinkImpl::GetDescription(
+llvm::StringRef MJPEGServerImpl::GetDescription(
     llvm::SmallVectorImpl<char>& buf) const {
   return m_description;
 }
 
-void HTTPSinkImpl::Stop() {
+void MJPEGServerImpl::Stop() {
   m_active = false;
 
   // wake up server thread by shutting down the socket
@@ -319,7 +321,7 @@ void HTTPSinkImpl::Stop() {
 }
 
 // Send HTTP response and a stream of JPG-frames
-void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
+void MJPEGServerImpl::SendStream(wpi::raw_socket_ostream& os) {
   os.SetUnbuffered();
 
   llvm::SmallString<256> header;
@@ -370,7 +372,7 @@ void HTTPSinkImpl::SendStream(wpi::raw_socket_ostream& os) {
 }
 
 // thread for clients that connected to this server
-void HTTPSinkImpl::ConnThreadMain(wpi::NetworkStream* stream) {
+void MJPEGServerImpl::ConnThreadMain(wpi::NetworkStream* stream) {
   wpi::raw_socket_istream is{*stream};
   wpi::raw_socket_ostream os{*stream, true};
 
@@ -454,7 +456,7 @@ void HTTPSinkImpl::ConnThreadMain(wpi::NetworkStream* stream) {
 }
 
 // Main server thread
-void HTTPSinkImpl::ServerThreadMain() {
+void MJPEGServerImpl::ServerThreadMain() {
   if (m_acceptor->start() != 0) {
     m_active = false;
     return;
@@ -471,7 +473,7 @@ void HTTPSinkImpl::ServerThreadMain() {
 
     DEBUG("server: client connection from " << stream->getPeerIP());
 
-    m_connThreads.emplace_back(&HTTPSinkImpl::ConnThreadMain, this,
+    m_connThreads.emplace_back(&MJPEGServerImpl::ConnThreadMain, this,
                                stream.get());
     m_connStreams.emplace_back(std::move(stream));
   }
@@ -481,13 +483,13 @@ void HTTPSinkImpl::ServerThreadMain() {
 
 namespace cs {
 
-CS_Sink CreateHTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,
-                       int port, CS_Status* status) {
+CS_Sink CreateMJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress,
+                          int port, CS_Status* status) {
   llvm::SmallString<128> descBuf;
   llvm::raw_svector_ostream desc{descBuf};
   desc << "HTTP Server on port " << port;
   llvm::SmallString<128> str{listenAddress};
-  auto sink = std::make_shared<HTTPSinkImpl>(
+  auto sink = std::make_shared<MJPEGServerImpl>(
       name, desc.str(),
       std::unique_ptr<wpi::NetworkAcceptor>(
           new wpi::TCPAcceptor(port, str.c_str(), Logger::GetInstance())));
@@ -498,9 +500,9 @@ CS_Sink CreateHTTPSink(llvm::StringRef name, llvm::StringRef listenAddress,
 
 extern "C" {
 
-CS_Sink CS_CreateHTTPSink(const char* name, const char* listenAddress, int port,
-                          CS_Status* status) {
-  return cs::CreateHTTPSink(name, listenAddress, port, status);
+CS_Sink CS_CreateMJPEGServer(const char* name, const char* listenAddress,
+                             int port, CS_Status* status) {
+  return cs::CreateMJPEGServer(name, listenAddress, port, status);
 }
 
 }  // extern "C"

@@ -591,16 +591,15 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_removeSourcePro
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    createHTTPSink
+ * Method:    createMJPEGServer
  * Signature: (Ljava/lang/String;Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createHTTPSink
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createMJPEGServer
   (JNIEnv *env, jclass, jstring name, jstring listenAddress, jint port)
 {
   CS_Status status;
-  auto val =
-      cs::CreateHTTPSink(JStringRef{env, name},
-                         JStringRef{env, listenAddress}, port, &status);
+  auto val = cs::CreateMJPEGServer(
+      JStringRef{env, name}, JStringRef{env, listenAddress}, port, &status);
   CheckStatus(env, status);
   return val;
 }

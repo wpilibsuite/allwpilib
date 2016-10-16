@@ -304,18 +304,18 @@ class VideoSink {
 };
 
 /// A sink that acts as a MJPEG-over-HTTP network server.
-class HTTPSink : public VideoSink {
+class MJPEGServer : public VideoSink {
  public:
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
   /// @param listenAddress TCP listen address (empty string for all addresses)
   /// @param port TCP port number
-  HTTPSink(llvm::StringRef name, llvm::StringRef listenAddress, int port);
+  MJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress, int port);
 
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
   /// @param port TCP port number
-  HTTPSink(llvm::StringRef name, int port) : HTTPSink(name, "", port) {}
+  MJPEGServer(llvm::StringRef name, int port) : MJPEGServer(name, "", port) {}
 };
 
 /// A sink for user code to accept video frames as OpenCV images.

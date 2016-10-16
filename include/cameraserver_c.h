@@ -164,8 +164,8 @@ void CS_RemoveSourcePropertyByName(CS_Source source, const char* name,
 //
 // Sink Creation Functions
 //
-CS_Sink CS_CreateHTTPSink(const char* name, const char* listenAddress, int port,
-                          CS_Status* status);
+CS_Sink CS_CreateMJPEGServer(const char* name, const char* listenAddress,
+                             int port, CS_Status* status);
 CS_Sink CS_CreateCvSink(const char* name, CS_Status* status);
 CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
                                 void (*processFrame)(void* data, uint64_t time),
