@@ -110,6 +110,8 @@ class USBCameraImpl : public SourceImpl {
       kError
     };
 
+    Message(Type type_) : type(type_) {}
+
     Type type;
     int data[4];
     std::string dataStr;
@@ -119,7 +121,7 @@ class USBCameraImpl : public SourceImpl {
   // Message pool access
   std::unique_ptr<Message> CreateMessage(Message::Type type) const {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_messagePool.empty()) return llvm::make_unique<Message>();
+    if (m_messagePool.empty()) return llvm::make_unique<Message>(type);
     auto rv = std::move(m_messagePool.back());
     m_messagePool.pop_back();
     rv->type = type;
@@ -149,6 +151,7 @@ class USBCameraImpl : public SourceImpl {
   bool DeviceStreamOn();
   bool DeviceStreamOff();
   void DeviceProcessCommands();
+  void DeviceSetMode();
   void DeviceSetFPS();
   void DeviceCacheMode();
   void DeviceCacheProperty(PropertyData&& prop);

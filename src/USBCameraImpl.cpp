@@ -617,44 +617,14 @@ void USBCameraImpl::DeviceConnect() {
   // Get or restore video mode
   if (!m_properties_cached) {
     DEBUG3("USB " << m_path << ": caching properties");
-    DeviceCacheMode();
     DeviceCacheProperties();
     DeviceCacheVideoModes();
+    DeviceCacheMode();
     m_properties_cached = true;
   } else {
     DEBUG3("USB " << m_path << ": restoring video mode");
-    struct v4l2_format vfmt;
-    std::memset(&vfmt, 0, sizeof(vfmt));
-#ifdef V4L2_CAP_EXT_PIX_FORMAT
-    vfmt.fmt.pix.priv = (m_capabilities & V4L2_CAP_EXT_PIX_FORMAT) != 0
-                            ? V4L2_PIX_FMT_PRIV_MAGIC
-                            : 0;
-#endif
-    vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    switch (m_mode.pixelFormat) {
-      case VideoMode::kMJPEG:
-        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
-        break;
-      case VideoMode::kYUYV:
-        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-        break;
-      case VideoMode::kRGB565:
-        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB565;
-        break;
-      default:
-        WARNING("USB " << m_path << ": could not set format "
-                       << m_mode.pixelFormat << ", defaulting to MJPEG");
-        vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
-        break;
-    }
-    vfmt.fmt.pix.width = m_mode.width;
-    vfmt.fmt.pix.height = m_mode.height;
-    vfmt.fmt.pix.field = V4L2_FIELD_ANY;
-    if (DoIoctl(fd, VIDIOC_S_FMT, &vfmt) != 0) {
-      WARNING("USB " << m_path << ": could not set format "
-                     << m_mode.pixelFormat << " res " << m_mode.width << "x"
-                     << m_mode.height);
-    }
+    DeviceSetMode();
+    DeviceSetFPS();
 
     // Restore settings
     DEBUG3("USB " << m_path << ": restoring settings");
@@ -786,22 +756,25 @@ void USBCameraImpl::DeviceProcessCommands() {
         m_modeSetFPS = true;
       }
 
-      // If the resolution changed, we need to disconnect and reconnect
-      if (newMode.width != m_mode.width || newMode.height != m_mode.height) {
+      // If the pixel format or resolution changed, we need to disconnect and
+      // reconnect
+      if (newMode.pixelFormat != m_mode.pixelFormat ||
+          newMode.width != m_mode.width || newMode.height != m_mode.height) {
+        m_mode = newMode;
         lock.unlock();
         bool wasStreaming = m_streaming;
         if (wasStreaming) DeviceStreamOff();
-        m_mode = newMode;
         if (m_fd >= 0) {
           DeviceDisconnect();
           DeviceConnect();
-          DeviceSetFPS();
         }
         if (wasStreaming) DeviceStreamOn();
         lock.lock();
-      } else {
-        // TODO
+      } else if (newMode.fps != m_mode.fps) {
         m_mode = newMode;
+        lock.unlock();
+        DeviceSetFPS();
+        lock.lock();
       }
     } else if (msg->type == Message::kCmdSetProperty ||
                msg->type == Message::kCmdSetPropertyStr) {
@@ -880,15 +853,48 @@ done:
   m_responseCv.notify_all();
 }
 
+void USBCameraImpl::DeviceSetMode() {
+  int fd = m_fd.load();
+  if (fd < 0) return;
+
+  struct v4l2_format vfmt;
+  std::memset(&vfmt, 0, sizeof(vfmt));
+#ifdef V4L2_CAP_EXT_PIX_FORMAT
+  vfmt.fmt.pix.priv = (m_capabilities & V4L2_CAP_EXT_PIX_FORMAT) != 0
+                          ? V4L2_PIX_FMT_PRIV_MAGIC
+                          : 0;
+#endif
+  vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  switch (m_mode.pixelFormat) {
+    case VideoMode::kMJPEG:
+      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
+      break;
+    case VideoMode::kYUYV:
+      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+      break;
+    case VideoMode::kRGB565:
+      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB565;
+      break;
+    default:
+      WARNING("USB " << m_path << ": could not set format "
+                     << m_mode.pixelFormat << ", defaulting to MJPEG");
+      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
+      break;
+  }
+  vfmt.fmt.pix.width = m_mode.width;
+  vfmt.fmt.pix.height = m_mode.height;
+  vfmt.fmt.pix.field = V4L2_FIELD_ANY;
+  if (DoIoctl(fd, VIDIOC_S_FMT, &vfmt) != 0) {
+    WARNING("USB " << m_path << ": could not set format "
+                   << m_mode.pixelFormat << " res " << m_mode.width << "x"
+                   << m_mode.height);
+  }
+}
+
 void USBCameraImpl::DeviceSetFPS() {
   int fd = m_fd.load();
   if (fd < 0) return;
 
-  int fps;
-  {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    fps = m_mode.fps;
-  }
   struct v4l2_streamparm parm;
   std::memset(&parm, 0, sizeof(parm));
   parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
@@ -896,7 +902,7 @@ void USBCameraImpl::DeviceSetFPS() {
   if ((parm.parm.capture.capability & V4L2_CAP_TIMEPERFRAME) == 0) return;
   std::memset(&parm, 0, sizeof(parm));
   parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  parm.parm.capture.timeperframe = FPSToFract(fps);
+  parm.parm.capture.timeperframe = FPSToFract(m_mode.fps);
   if (DoIoctl(fd, VIDIOC_S_PARM, &parm) != 0) return;
 }
 
@@ -934,6 +940,21 @@ void USBCameraImpl::DeviceCacheMode() {
       pixelFormat = VideoMode::kUnknown;
       break;
   }
+  int width = vfmt.fmt.pix.width;
+  int height = vfmt.fmt.pix.height;
+
+  // Update format with user changes.
+  bool formatChanged = false;
+  if (m_modeSetPixelFormat && pixelFormat != m_mode.pixelFormat) {
+    formatChanged = true;
+    pixelFormat = static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat);
+  }
+  if (m_modeSetResolution &&
+      (width != m_mode.width || height != m_mode.height)) {
+    formatChanged = true;
+    width = m_mode.width;
+    height = m_mode.height;
+  }
 
   // Get FPS
   int fps = 0;
@@ -945,12 +966,24 @@ void USBCameraImpl::DeviceCacheMode() {
       fps = FractToFPS(parm.parm.capture.timeperframe);
   }
 
-  // Save
-  std::lock_guard<std::mutex> lock(m_mutex);
-  m_mode.pixelFormat = pixelFormat;
-  m_mode.width = vfmt.fmt.pix.width;
-  m_mode.height = vfmt.fmt.pix.height;
-  m_mode.fps = fps;
+  // Update FPS with user changes
+  bool fpsChanged = false;
+  if (m_modeSetFPS && fps != m_mode.fps) {
+    fpsChanged = true;
+    fps = m_mode.fps;
+  }
+
+  // Save to global mode
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_mode.pixelFormat = pixelFormat;
+    m_mode.width = width;
+    m_mode.height = height;
+    m_mode.fps = fps;
+  }
+
+  if (formatChanged) DeviceSetMode();
+  if (fpsChanged) DeviceSetFPS();
 }
 
 void USBCameraImpl::DeviceCacheProperty(PropertyData&& prop) {
