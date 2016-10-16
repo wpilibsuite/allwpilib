@@ -85,7 +85,7 @@ task unzipNetworkTables(type: Copy) {
 }
 
 task downloadArmWpiUtil() {
-    description = 'Downloads the C++ ARM NetworkTables maven dependency.'
+    description = 'Downloads the C++ ARM wpiutil maven dependency.'
     group = 'WPILib'
     def depFolder = "$buildDir/dependencies"
     def utilZip = file("$depFolder/wpiutil-arm.zip")
