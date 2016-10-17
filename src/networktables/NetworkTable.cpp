@@ -274,7 +274,7 @@ void NetworkTable::SetFlags(StringRef key, unsigned int flags) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  nt::SetEntryFlags(path, nt::GetEntryFlags(key) | flags);
+  nt::SetEntryFlags(path, nt::GetEntryFlags(path) | flags);
 }
 
 void NetworkTable::ClearFlags(StringRef key, unsigned int flags) {
