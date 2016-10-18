@@ -170,6 +170,52 @@ bool MJPEGServerImpl::ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
       return false;
     }
 
+    // handle resolution and FPS; these are handled via separate interfaces
+    // rather than as properties
+    if (param == "resolution") {
+      llvm::StringRef widthStr, heightStr;
+      std::tie(widthStr, heightStr) = value.str().split('x');
+      int width, height;
+      if (widthStr.getAsInteger(10, width)) {
+        response << param << ": \"width is not integer\"\r\n";
+        WARNING("HTTP parameter \"" << param << "\" width \"" << widthStr
+                                    << "\" is not integer");
+        continue;
+      }
+      if (heightStr.getAsInteger(10, height)) {
+        response << param << ": \"height is not integer\"\r\n";
+        WARNING("HTTP parameter \"" << param << "\" height \"" << heightStr
+                                    << "\" is not integer");
+        continue;
+      }
+      CS_Status status = 0;
+      if (!source.SetResolution(width, height, &status)) {
+        response << param << ": \"error\"\r\n";
+        WARNING("Could not set resolution to " << width << "x" << height);
+      } else {
+        response << param << ": \"ok\"\r\n";
+      }
+      continue;
+    }
+
+    if (param == "fps") {
+      int fps;
+      if (value.str().getAsInteger(10, fps)) {
+        response << param << ": \"invalid integer\"\r\n";
+        WARNING("HTTP parameter \"" << param << "\" value \"" << value
+                                    << "\" is not an integer");
+        continue;
+      }
+      CS_Status status = 0;
+      if (!source.SetFPS(fps, &status)) {
+        response << param << ": \"error\"\r\n";
+        WARNING("Could not set FPS to " << fps);
+      } else {
+        response << param << ": \"ok\"\r\n";
+      }
+      continue;
+    }
+
     // try to assign parameter
     auto prop = source.GetPropertyIndex(param);
     if (!prop) {
