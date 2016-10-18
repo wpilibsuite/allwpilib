@@ -204,9 +204,11 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   private final String path;
+  private final String pathWithSep;
 
   NetworkTable(String path) {
     this.path = path;
+    this.pathWithSep = path + PATH_SEPARATOR;
   }
   public String toString() { return "NetworkTable: " + path; }
 
@@ -347,7 +349,7 @@ public class NetworkTable implements ITable, IRemote {
     }
     TableListenerAdapter adapter =
         new TableListenerAdapter(path.length() + 1, this, listener);
-    adapter.uid = NetworkTablesJNI.addEntryListener(path + PATH_SEPARATOR, adapter, flags);
+    adapter.uid = NetworkTablesJNI.addEntryListener(pathWithSep, adapter, flags);
     adapters.add(adapter);
   }
 
@@ -395,7 +397,7 @@ public class NetworkTable implements ITable, IRemote {
       adapters = new ArrayList<ListenerBase>();
       listenerMap.put(listener, adapters);
     }
-    String fullKey = path + PATH_SEPARATOR + key;
+    String fullKey = pathWithSep + key;
     KeyListenerAdapter adapter =
         new KeyListenerAdapter(key, fullKey, this, listener);
     adapter.uid = NetworkTablesJNI.addEntryListener(fullKey, adapter, flags);
@@ -451,7 +453,7 @@ public class NetworkTable implements ITable, IRemote {
     int flags = NOTIFY_NEW | NOTIFY_IMMEDIATE;
     if (localNotify)
       flags |= NOTIFY_LOCAL;
-    adapter.uid = NetworkTablesJNI.addEntryListener(path + PATH_SEPARATOR, adapter, flags);
+    adapter.uid = NetworkTablesJNI.addEntryListener(pathWithSep, adapter, flags);
     adapters.add(adapter);
   }
 
@@ -473,7 +475,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public ITable getSubTable(String key) {
-    return new NetworkTable(path + PATH_SEPARATOR + key);
+    return new NetworkTable(pathWithSep + key);
   }
 
   /**
@@ -481,11 +483,11 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean containsKey(String key) {
-    return NetworkTablesJNI.containsKey(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.containsKey(pathWithSep + key);
   }
 
   public boolean containsSubTable(String key) {
-    EntryInfo[] entries = NetworkTablesJNI.getEntries(path + PATH_SEPARATOR + key + PATH_SEPARATOR, 0);
+    EntryInfo[] entries = NetworkTablesJNI.getEntries(pathWithSep + key + PATH_SEPARATOR, 0);
     return entries.length != 0;
   }
 
@@ -496,7 +498,7 @@ public class NetworkTable implements ITable, IRemote {
   public Set<String> getKeys(int types) {
     Set<String> keys = new HashSet<String>();
     int prefixLen = path.length() + 1;
-    for (EntryInfo entry : NetworkTablesJNI.getEntries(path + PATH_SEPARATOR, types)) {
+    for (EntryInfo entry : NetworkTablesJNI.getEntries(pathWithSep, types)) {
       String relativeKey = entry.name.substring(prefixLen);
       if (relativeKey.indexOf(PATH_SEPARATOR) != -1)
         continue;
@@ -520,7 +522,7 @@ public class NetworkTable implements ITable, IRemote {
   public Set<String> getSubTables() {
     Set<String> keys = new HashSet<String>();
     int prefixLen = path.length() + 1;
-    for (EntryInfo entry : NetworkTablesJNI.getEntries(path + PATH_SEPARATOR, 0)) {
+    for (EntryInfo entry : NetworkTablesJNI.getEntries(pathWithSep, 0)) {
       String relativeKey = entry.name.substring(prefixLen);
       int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
       if (endSubTable == -1)
@@ -535,14 +537,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putNumber(String key, double value) {
-    return NetworkTablesJNI.putDouble(path + PATH_SEPARATOR + key, value);
+    return NetworkTablesJNI.putDouble(pathWithSep + key, value);
   }
   
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultNumber(String key, double defaultValue) {
-    return NetworkTablesJNI.setDefaultDouble(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultDouble(pathWithSep + key,
                                              defaultValue);
   }
 
@@ -554,7 +556,7 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   @Deprecated
   public double getNumber(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getDouble(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getDouble(pathWithSep + key);
   }
 
   /**
@@ -562,7 +564,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public double getNumber(String key, double defaultValue) {
-    return NetworkTablesJNI.getDouble(path + PATH_SEPARATOR + key, defaultValue);
+    return NetworkTablesJNI.getDouble(pathWithSep + key, defaultValue);
   }
 
   /**
@@ -570,14 +572,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putString(String key, String value) {
-    return NetworkTablesJNI.putString(path + PATH_SEPARATOR + key, value);
+    return NetworkTablesJNI.putString(pathWithSep + key, value);
   }
   
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultString(String key, String defaultValue) {
-    return NetworkTablesJNI.setDefaultString(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultString(pathWithSep + key,
                                              defaultValue);
   }
 
@@ -589,7 +591,7 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   @Deprecated
   public String getString(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getString(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getString(pathWithSep + key);
   }
 
   /**
@@ -597,7 +599,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public String getString(String key, String defaultValue) {
-    return NetworkTablesJNI.getString(path + PATH_SEPARATOR + key, defaultValue);
+    return NetworkTablesJNI.getString(pathWithSep + key, defaultValue);
   }
 
   /**
@@ -605,14 +607,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putBoolean(String key, boolean value) {
-    return NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, value);
+    return NetworkTablesJNI.putBoolean(pathWithSep + key, value);
   }
   
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultBoolean(String key, boolean defaultValue) {
-    return NetworkTablesJNI.setDefaultBoolean(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultBoolean(pathWithSep + key,
                                               defaultValue);
   }
 
@@ -624,7 +626,7 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   @Deprecated
   public boolean getBoolean(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getBoolean(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getBoolean(pathWithSep + key);
   }
 
   /**
@@ -632,7 +634,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean getBoolean(String key, boolean defaultValue) {
-    return NetworkTablesJNI.getBoolean(path + PATH_SEPARATOR + key, defaultValue);
+    return NetworkTablesJNI.getBoolean(pathWithSep + key, defaultValue);
   }
 
   /**
@@ -640,7 +642,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putBooleanArray(String key, boolean[] value) {
-    return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, value);
+    return NetworkTablesJNI.putBooleanArray(pathWithSep + key, value);
   }
 
   /**
@@ -655,7 +657,7 @@ public class NetworkTable implements ITable, IRemote {
    * {@inheritDoc}
    */
   public boolean setDefaultBooleanArray(String key, boolean[] defaultValue) {
-    return NetworkTablesJNI.setDefaultBooleanArray(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultBooleanArray(pathWithSep + key,
                                                    defaultValue);
   }
   
@@ -663,7 +665,7 @@ public class NetworkTable implements ITable, IRemote {
    * {@inheritDoc}
    */
   public boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
-    return NetworkTablesJNI.setDefaultBooleanArray(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultBooleanArray(pathWithSep + key,
                                                    toNative(defaultValue));
   }
 
@@ -675,7 +677,7 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   @Deprecated
   public boolean[] getBooleanArray(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getBooleanArray(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getBooleanArray(pathWithSep + key);
   }
 
   /**
@@ -683,7 +685,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean[] getBooleanArray(String key, boolean[] defaultValue) {
-    return NetworkTablesJNI.getBooleanArray(path + PATH_SEPARATOR + key, defaultValue);
+    return NetworkTablesJNI.getBooleanArray(pathWithSep + key, defaultValue);
   }
 
   /**
@@ -703,7 +705,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putNumberArray(String key, double[] value) {
-    return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, value);
+    return NetworkTablesJNI.putDoubleArray(pathWithSep + key, value);
   }
 
   /**
@@ -718,7 +720,7 @@ public class NetworkTable implements ITable, IRemote {
    * {@inheritDoc}
    */
   public boolean setDefaultNumberArray(String key, double[] defaultValue) {
-    return NetworkTablesJNI.setDefaultDoubleArray(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultDoubleArray(pathWithSep + key,
                                                   defaultValue);
   }
   
@@ -726,7 +728,7 @@ public class NetworkTable implements ITable, IRemote {
    * {@inheritDoc}
    */
   public boolean setDefaultNumberArray(String key, Double[] defaultValue) {
-    return NetworkTablesJNI.setDefaultDoubleArray(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultDoubleArray(pathWithSep + key,
                                                   toNative(defaultValue));
   }
 
@@ -738,7 +740,7 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   @Deprecated
   public double[] getNumberArray(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getDoubleArray(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getDoubleArray(pathWithSep + key);
   }
 
   /**
@@ -746,7 +748,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public double[] getNumberArray(String key, double[] defaultValue) {
-    return NetworkTablesJNI.getDoubleArray(path + PATH_SEPARATOR + key, defaultValue);
+    return NetworkTablesJNI.getDoubleArray(pathWithSep + key, defaultValue);
   }
 
   /**
@@ -766,14 +768,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putStringArray(String key, String[] value) {
-    return NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, value);
+    return NetworkTablesJNI.putStringArray(pathWithSep + key, value);
   }
   
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultStringArray(String key, String[] defaultValue) {
-    return NetworkTablesJNI.setDefaultStringArray(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultStringArray(pathWithSep + key,
                                                   defaultValue);
   }
   
@@ -785,7 +787,7 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   @Deprecated
   public String[] getStringArray(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getStringArray(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getStringArray(pathWithSep + key);
   }
 
   /**
@@ -793,7 +795,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public String[] getStringArray(String key, String[] defaultValue) {
-    return NetworkTablesJNI.getStringArray(path + PATH_SEPARATOR + key, defaultValue);
+    return NetworkTablesJNI.getStringArray(pathWithSep + key, defaultValue);
   }
 
   /**
@@ -801,14 +803,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putRaw(String key, byte[] value) {
-    return NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, value);
+    return NetworkTablesJNI.putRaw(pathWithSep + key, value);
   }
   
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultRaw(String key, byte[] defaultValue) {
-    return NetworkTablesJNI.setDefaultRaw(path + PATH_SEPARATOR + key,
+    return NetworkTablesJNI.setDefaultRaw(pathWithSep + key,
                                           defaultValue);
   }
 
@@ -821,7 +823,7 @@ public class NetworkTable implements ITable, IRemote {
       throw new IllegalArgumentException("must be a direct buffer");
     if (value.capacity() < len)
       throw new IllegalArgumentException("buffer is too small, must be at least " + len);
-    return NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, value, len);
+    return NetworkTablesJNI.putRaw(pathWithSep + key, value, len);
   }
 
   /**
@@ -832,7 +834,7 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   @Deprecated
   public byte[] getRaw(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getRaw(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getRaw(pathWithSep + key);
   }
 
   /**
@@ -840,7 +842,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public byte[] getRaw(String key, byte[] defaultValue) {
-    return NetworkTablesJNI.getRaw(path + PATH_SEPARATOR + key, defaultValue);
+    return NetworkTablesJNI.getRaw(pathWithSep + key, defaultValue);
   }
 
   /**
@@ -849,29 +851,29 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   public boolean putValue(String key, Object value) throws IllegalArgumentException {
     if (value instanceof Boolean)
-      return NetworkTablesJNI.putBoolean(path + PATH_SEPARATOR + key, ((Boolean)value).booleanValue());
+      return NetworkTablesJNI.putBoolean(pathWithSep + key, ((Boolean)value).booleanValue());
     else if (value instanceof Double)
-      return NetworkTablesJNI.putDouble(path + PATH_SEPARATOR + key, ((Double)value).doubleValue());
+      return NetworkTablesJNI.putDouble(pathWithSep + key, ((Double)value).doubleValue());
     else if (value instanceof String)
-      return NetworkTablesJNI.putString(path + PATH_SEPARATOR + key, (String)value);
+      return NetworkTablesJNI.putString(pathWithSep + key, (String)value);
     else if (value instanceof byte[])
-      return NetworkTablesJNI.putRaw(path + PATH_SEPARATOR + key, (byte[])value);
+      return NetworkTablesJNI.putRaw(pathWithSep + key, (byte[])value);
     else if (value instanceof boolean[])
-      return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, (boolean[])value);
+      return NetworkTablesJNI.putBooleanArray(pathWithSep + key, (boolean[])value);
     else if (value instanceof double[])
-      return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, (double[])value);
+      return NetworkTablesJNI.putDoubleArray(pathWithSep + key, (double[])value);
     else if (value instanceof Boolean[])
-      return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, toNative((Boolean[])value));
+      return NetworkTablesJNI.putBooleanArray(pathWithSep + key, toNative((Boolean[])value));
     else if (value instanceof Double[])
-      return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])value));
+      return NetworkTablesJNI.putDoubleArray(pathWithSep + key, toNative((Double[])value));
     else if (value instanceof String[])
-      return NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])value);
+      return NetworkTablesJNI.putStringArray(pathWithSep + key, (String[])value);
     else if (value instanceof BooleanArray)
-      return NetworkTablesJNI.putBooleanArray(path + PATH_SEPARATOR + key, toNative((Boolean[])((ArrayData)value).getDataArray()));
+      return NetworkTablesJNI.putBooleanArray(pathWithSep + key, toNative((Boolean[])((ArrayData)value).getDataArray()));
     else if (value instanceof NumberArray)
-      return NetworkTablesJNI.putDoubleArray(path + PATH_SEPARATOR + key, toNative((Double[])((ArrayData)value).getDataArray()));
+      return NetworkTablesJNI.putDoubleArray(pathWithSep + key, toNative((Double[])((ArrayData)value).getDataArray()));
     else if (value instanceof StringArray)
-      return NetworkTablesJNI.putStringArray(path + PATH_SEPARATOR + key, (String[])((ArrayData)value).getDataArray());
+      return NetworkTablesJNI.putStringArray(pathWithSep + key, (String[])((ArrayData)value).getDataArray());
     else
       throw new IllegalArgumentException(key);
   }
@@ -902,7 +904,7 @@ public class NetworkTable implements ITable, IRemote {
   @Override
   @Deprecated
   public Object getValue(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getValue(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getValue(pathWithSep + key);
   }
 
   /**
@@ -910,7 +912,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public Object getValue(String key, Object defaultValue) {
-    return NetworkTablesJNI.getValue(path + PATH_SEPARATOR + key, defaultValue);
+    return NetworkTablesJNI.getValue(pathWithSep + key, defaultValue);
   }
 
   /** The persistent flag value. */
@@ -945,7 +947,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public void setFlags(String key, int flags) {
-    NetworkTablesJNI.setEntryFlags(path + PATH_SEPARATOR + key, getFlags(key) | flags);
+    NetworkTablesJNI.setEntryFlags(pathWithSep + key, getFlags(key) | flags);
   }
 
   /**
@@ -953,7 +955,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public void clearFlags(String key, int flags) {
-    NetworkTablesJNI.setEntryFlags(path + PATH_SEPARATOR + key, getFlags(key) & ~flags);
+    NetworkTablesJNI.setEntryFlags(pathWithSep + key, getFlags(key) & ~flags);
   }
 
   /**
@@ -961,7 +963,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public int getFlags(String key) {
-    return NetworkTablesJNI.getEntryFlags(path + PATH_SEPARATOR + key);
+    return NetworkTablesJNI.getEntryFlags(pathWithSep + key);
   }
 
   /**
@@ -969,7 +971,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public void delete(String key) {
-    NetworkTablesJNI.deleteEntry(path + PATH_SEPARATOR + key);
+    NetworkTablesJNI.deleteEntry(pathWithSep + key);
   }
 
   /**
