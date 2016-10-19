@@ -1,14 +1,14 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2016_16_1_0_Global_h__
-#define __nFRC_2016_16_1_0_Global_h__
+#ifndef __nFRC_2017_17_0_2_Global_h__
+#define __nFRC_2017_17_0_2_Global_h__
 
 #include "tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2016_16_1_0
+namespace nFRC_2017_17_0_2
 {
 
 class tGlobal
@@ -29,7 +29,6 @@ public:
    union{
       struct{
 #ifdef __vxworks
-         unsigned Radio : 8;
          unsigned Comm : 8;
          unsigned Mode : 8;
          unsigned RSL : 1;
@@ -37,11 +36,10 @@ public:
          unsigned RSL : 1;
          unsigned Mode : 8;
          unsigned Comm : 8;
-         unsigned Radio : 8;
 #endif
       };
       struct{
-         unsigned value : 25;
+         unsigned value : 17;
       };
    } tLEDs;
 
@@ -52,12 +50,10 @@ public:
    } tLEDs_IfaceConstants;
 
    virtual void writeLEDs(tLEDs value, tRioStatusCode *status) = 0;
-   virtual void writeLEDs_Radio(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writeLEDs_Comm(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writeLEDs_Mode(unsigned char value, tRioStatusCode *status) = 0;
    virtual void writeLEDs_RSL(bool value, tRioStatusCode *status) = 0;
    virtual tLEDs readLEDs(tRioStatusCode *status) = 0;
-   virtual unsigned char readLEDs_Radio(tRioStatusCode *status) = 0;
    virtual unsigned char readLEDs_Comm(tRioStatusCode *status) = 0;
    virtual unsigned char readLEDs_Mode(tRioStatusCode *status) = 0;
    virtual bool readLEDs_RSL(tRioStatusCode *status) = 0;
@@ -101,4 +97,4 @@ private:
 }
 }
 
-#endif // __nFRC_2016_16_1_0_Global_h__
+#endif // __nFRC_2017_17_0_2_Global_h__
