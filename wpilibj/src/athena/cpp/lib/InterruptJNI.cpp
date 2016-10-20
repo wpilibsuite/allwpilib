@@ -15,8 +15,8 @@
 
 #include "HAL/Interrupts.h"
 #include "HALUtil.h"
-#include "SafeThread.h"
 #include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
+#include "support/SafeThread.h"
 
 TLogLevel interruptJNILogLevel = logERROR;
 
@@ -38,7 +38,7 @@ TLogLevel interruptJNILogLevel = logERROR;
 //
 // We don't want to use a FIFO here. If the user code takes too long to
 // process, we will just ignore the redundant wakeup.
-class InterruptThreadJNI : public SafeThread {
+class InterruptThreadJNI : public wpi::SafeThread {
  public:
   void Main();
 
@@ -49,7 +49,7 @@ class InterruptThreadJNI : public SafeThread {
   jobject m_param = nullptr;
 };
 
-class InterruptJNI : public SafeThreadOwner<InterruptThreadJNI> {
+class InterruptJNI : public wpi::SafeThreadOwner<InterruptThreadJNI> {
  public:
   void SetFunc(JNIEnv* env, jobject func, jmethodID mid, jobject param);
 

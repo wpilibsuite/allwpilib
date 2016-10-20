@@ -16,8 +16,8 @@
 #include <thread>
 #include "HALUtil.h"
 #include "HAL/cpp/Log.h"
-#include "SafeThread.h"
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
+#include "support/SafeThread.h"
 
 // set the logging level
 TLogLevel notifierJNILogLevel = logWARNING;
@@ -40,7 +40,7 @@ TLogLevel notifierJNILogLevel = logWARNING;
 //
 // We don't want to use a FIFO here. If the user code takes too long to
 // process, we will just ignore the redundant wakeup.
-class NotifierThreadJNI : public SafeThread {
+class NotifierThreadJNI : public wpi::SafeThread {
  public:
   void Main();
 
@@ -50,7 +50,7 @@ class NotifierThreadJNI : public SafeThread {
   uint64_t m_currentTime;
 };
 
-class NotifierJNI : public SafeThreadOwner<NotifierThreadJNI> {
+class NotifierJNI : public wpi::SafeThreadOwner<NotifierThreadJNI> {
  public:
   void SetFunc(JNIEnv *env, jobject func, jmethodID mid);
 
