@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.wpilibj.hal.EncoderJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -19,18 +16,19 @@ import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.AllocationException;
 
 /**
- * Class to read quad encoders. Quadrature encoders are devices that count shaft rotation and can
- * sense direction. The output of the QuadEncoder class is an integer that can count either up or
- * down, and can go negative for reverse direction counting. When creating QuadEncoders, a direction
- * is supplied that changes the sense of the output to make code more readable if the encoder is
+ * Class to read quadrature encoders. Quadrature encoders are devices that count shaft rotation and
+ * can sense direction. The output of the Encoder class is an integer that can count either up or
+ * down, and can go negative for reverse direction counting. When creating Encoders, a direction
+ * can be supplied that inverts the sense of the output to make code more readable if the encoder is
  * mounted such that forward movement generates negative values. Quadrature encoders have two
- * digital outputs, an A Channel and a B Channel that are out of phase with each other to allow the
- * FPGA to do direction sensing.
+ * digital outputs, an A Channel and a B Channel, that are out of phase with each other for
+ * direction sensing.
  *
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
 public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
+
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
 
@@ -74,8 +72,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   private void initEncoder(boolean reverseDirection, final EncodingType type) {
     m_encoder = EncoderJNI.initializeEncoder(m_aSource.getPortHandleForRouting(),
-      m_aSource.getAnalogTriggerTypeForRouting(), m_bSource.getPortHandleForRouting(),
-      m_bSource.getAnalogTriggerTypeForRouting(), reverseDirection, type.value);
+        m_aSource.getAnalogTriggerTypeForRouting(), m_bSource.getPortHandleForRouting(),
+        m_bSource.getAnalogTriggerTypeForRouting(), reverseDirection, type.value);
 
     m_pidSource = PIDSourceType.kDisplacement;
 
@@ -379,7 +377,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * Returns the period of the most recent pulse. Returns the period of the most recent Encoder
    * pulse in seconds. This method compensates for the decoding type.
    *
-   * <p></p><b>Warning:</b> This returns unscaled periods and getRate() scales using value from
+   * <p><b>Warning:</b> This returns unscaled periods and getRate() scales using value from
    * setDistancePerPulse().
    *
    * @return Period in seconds of the most recent pulse.
@@ -421,13 +419,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   public boolean getDirection() {
     return EncoderJNI.getEncoderDirection(m_encoder);
-  }
-
-  /**
-   * The scale needed to convert a raw counter value into a number of encoder pulses.
-   */
-  private double decodingScaleFactor() {
-    return EncoderJNI.getEncoderDecodingScaleFactor(m_encoder);
   }
 
   /**
@@ -581,19 +572,17 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   public void setIndexSource(DigitalSource source, IndexingType type) {
     EncoderJNI.setEncoderIndexSource(m_encoder, source.getPortHandleForRouting(),
-                                     source.getAnalogTriggerTypeForRouting(), type.value);
+        source.getAnalogTriggerTypeForRouting(), type.value);
   }
 
   /**
    * Live Window code, only does anything if live window is activated.
    */
   public String getSmartDashboardType() {
-    switch (EncoderJNI.getEncoderEncodingType(m_encoder)) {
-      case 2: // value of k4X
-        return "Quadrature Encoder";
-      default:
-        return "Encoder";
+    if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
+      return "Quadrature Encoder";
     }
+    return "Encoder";
   }
 
   private ITable m_table;
