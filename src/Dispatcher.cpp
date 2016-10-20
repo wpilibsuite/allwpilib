@@ -403,6 +403,11 @@ bool DispatcherBase::ClientHandshake(
     DEBUG4("received init str=" << msg->str() << " id=" << msg->id()
                                 << " seq_num=" << msg->seq_num_uid());
     if (msg->Is(Message::kServerHelloDone)) break;
+    // shouldn't receive a keep alive, but handle gracefully
+    if (msg->Is(Message::kKeepAlive)) {
+      msg = get_msg();
+      continue;
+    }
     if (!msg->Is(Message::kEntryAssign)) {
       // unexpected message
       DEBUG("client: received message (" << msg->type() << ") other than entry assignment during initial handshake");
@@ -491,6 +496,11 @@ bool DispatcherBase::ServerHandshake(
         return false;
       }
       if (msg->Is(Message::kClientHelloDone)) break;
+      // shouldn't receive a keep alive, but handle gracefully
+      if (msg->Is(Message::kKeepAlive)) {
+        msg = get_msg();
+        continue;
+      }
       if (!msg->Is(Message::kEntryAssign)) {
         // unexpected message
         DEBUG("server: received message ("
