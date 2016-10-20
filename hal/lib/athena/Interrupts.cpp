@@ -16,6 +16,7 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
+#include "support/SafeThread.h"
 
 using namespace hal;
 
@@ -24,6 +25,53 @@ struct Interrupt {
   std::unique_ptr<tInterrupt> anInterrupt;
   std::unique_ptr<tInterruptManager> manager;
 };
+
+// Safe thread to allow callbacks to run on their own thread
+class InterruptThread : public wpi::SafeThread {
+ public:
+  void Main() {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    while (m_active) {
+      m_cond.wait(lock, [&] { return !m_active || m_notify; });
+      if (!m_active) break;
+      m_notify = false;
+      HAL_InterruptHandlerFunction handler = m_handler;
+      uint32_t mask = m_mask;
+      void* param = m_param;
+      lock.unlock();  // don't hold mutex during callback execution
+      handler(mask, param);
+      lock.lock();
+    }
+  }
+
+  bool m_notify = false;
+  HAL_InterruptHandlerFunction m_handler;
+  void* m_param;
+  uint32_t m_mask;
+};
+
+class InterruptThreadOwner : public wpi::SafeThreadOwner<InterruptThread> {
+ public:
+  void SetFunc(HAL_InterruptHandlerFunction handler, void* param) {
+    auto thr = GetThread();
+    if (!thr) return;
+    thr->m_handler = handler;
+    thr->m_param = param;
+  }
+
+  void Notify(uint32_t mask) {
+    auto thr = GetThread();
+    if (!thr) return;
+    thr->m_mask = mask;
+    thr->m_notify = true;
+    thr->m_cond.notify_one();
+  }
+};
+
+}  // namespace
+
+static void threadedInterruptHandler(uint32_t mask, void* param) {
+  (static_cast<InterruptThreadOwner*>(param))->Notify(mask);
 }
 
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
@@ -178,6 +226,21 @@ void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
     return;
   }
   anInterrupt->manager->registerHandler(handler, param, status);
+}
+
+void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interrupt_handle,
+                                        HAL_InterruptHandlerFunction handler,
+                                        void* param, int32_t* status) {
+  InterruptThreadOwner* intr = new InterruptThreadOwner;
+  intr->Start();
+  intr->SetFunc(handler, param);
+
+  HAL_AttachInterruptHandler(interrupt_handle, threadedInterruptHandler, intr,
+                             status);
+
+  if (*status != 0) {
+    delete intr;
+  }
 }
 
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,

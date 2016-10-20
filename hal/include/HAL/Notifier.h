@@ -20,6 +20,8 @@ typedef void (*HAL_NotifierProcessFunction)(uint64_t currentTime,
 
 HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
                                           void* param, int32_t* status);
+HAL_NotifierHandle HAL_InitializeNotifierThreaded(
+    HAL_NotifierProcessFunction process, void* param, int32_t* status);
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status);
 void* HAL_GetNotifierParam(HAL_NotifierHandle notifierHandle, int32_t* status);
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
