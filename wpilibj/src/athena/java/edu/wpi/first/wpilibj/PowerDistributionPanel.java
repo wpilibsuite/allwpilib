@@ -12,24 +12,30 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
- * Class for getting voltage, current, temperature, power and energy from the CAN PDP.
+ * Class for getting voltage, current, temperature, power and energy from the Power Distribution
+ * Panel over CAN.
  */
 public class PowerDistributionPanel extends SensorBase implements LiveWindowSendable {
 
   private final int m_module;
 
-  @SuppressWarnings("JavadocMethod")
+  /**
+   * Constructor.
+   *
+   * @param module The CAN ID of the PDP
+   */
   public PowerDistributionPanel(int module) {
     m_module = module;
     checkPDPModule(module);
     PDPJNI.initializePDP(module);
   }
 
-  @SuppressWarnings("JavadocMethod")
+  /**
+   * Constructor.  Uses the default CAN ID (0).
+   */
   public PowerDistributionPanel() {
     this(0);
   }
-
 
   /**
    * Query the input voltage of the PDP.
