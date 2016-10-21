@@ -7,6 +7,8 @@
 
 #include "AnalogInternal.h"
 
+#include <atomic>
+
 #include "ChipObject.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/cpp/priority_mutex.h"
@@ -23,18 +25,21 @@ IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
 
 static int32_t analogNumChannelsToActivate = 0;
 
-bool analogSystemInitialized = false;
+static std::atomic<bool> analogSystemInitialized{false};
+
+bool analogSampleRateSet = false;
 
 /**
  * Initialize the analog System.
  */
 void initializeAnalog(int32_t* status) {
+  if (analogSystemInitialized) return;
   std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));
   setAnalogNumChannelsToActivate(kNumAnalogInputs);
-  HAL_SetAnalogSampleRate(kDefaultSampleRate, status);
+  setAnalogSampleRate(kDefaultSampleRate, status);
   analogSystemInitialized = true;
 }
 
@@ -64,6 +69,41 @@ int32_t getAnalogNumChannelsToActivate(int32_t* status) {
   if (analogNumChannelsToActivate == 0)
     return getAnalogNumActiveChannels(status);
   return analogNumChannelsToActivate;
+}
+
+/**
+ * Set the sample rate.
+ *
+ * This is a global setting for the Athena and effects all channels.
+ *
+ * @param samplesPerSecond The number of samples per channel per second.
+ */
+void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
+  // TODO: This will change when variable size scan lists are implemented.
+  // TODO: Need float comparison with epsilon.
+  // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
+  analogSampleRateSet = true;
+
+  // Compute the convert rate
+  uint32_t ticksPerSample =
+      static_cast<uint32_t>(static_cast<double>(kTimebase) / samplesPerSecond);
+  uint32_t ticksPerConversion =
+      ticksPerSample / getAnalogNumChannelsToActivate(status);
+  // ticksPerConversion must be at least 80
+  if (ticksPerConversion < 80) {
+    if ((*status) >= 0) *status = SAMPLE_RATE_TOO_HIGH;
+    ticksPerConversion = 80;
+  }
+
+  // Atomically set the scan size and the convert rate so that the sample rate
+  // is constant
+  tAI::tConfig config;
+  config.ScanSize = getAnalogNumChannelsToActivate(status);
+  config.ConvertRate = ticksPerConversion;
+  analogInputSystem->writeConfig(config, status);
+
+  // Indicate that the scan size has been commited to hardware.
+  setAnalogNumChannelsToActivate(0);
 }
 
 /**

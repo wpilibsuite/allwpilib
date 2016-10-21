@@ -142,6 +142,8 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   // Currently rounding in the log rate domain... heavy weight toward picking a
   // higher freq.
   // TODO: Round in the linear rate domain.
+  initializeDigital(status);
+  if (*status != 0) return;
   uint8_t pwmPeriodPower = static_cast<uint8_t>(
       std::log(1.0 / (pwmSystem->readLoopTiming(status) * 0.25E-6 * rate)) /
           std::log(2.0) +
@@ -371,6 +373,8 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
  * @return A pulse on some line is in progress
  */
 HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
+  initializeDigital(status);
+  if (*status != 0) return false;
   tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
   return pulseRegister.Headers != 0 && pulseRegister.MXP != 0;
 }
@@ -436,6 +440,8 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
  * counted as a transition.
  */
 void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
+  initializeDigital(status);
+  if (*status != 0) return;
   std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
   digitalSystem->writeFilterPeriodHdr(filterIndex, value, status);
   if (*status == 0) {
@@ -456,6 +462,8 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
  * counted as a transition.
  */
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
+  initializeDigital(status);
+  if (*status != 0) return 0;
   uint32_t hdrPeriod = 0;
   uint32_t mxpPeriod = 0;
   {

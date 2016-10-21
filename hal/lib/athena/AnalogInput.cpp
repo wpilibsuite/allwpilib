@@ -19,8 +19,6 @@
 
 using namespace hal;
 
-static bool analogSampleRateSet = false;
-
 extern "C" {
 /**
  * Initialize the analog input port using the given port object.
@@ -103,28 +101,9 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need float comparison with epsilon.
   // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
-  analogSampleRateSet = true;
-
-  // Compute the convert rate
-  uint32_t ticksPerSample =
-      static_cast<uint32_t>(static_cast<double>(kTimebase) / samplesPerSecond);
-  uint32_t ticksPerConversion =
-      ticksPerSample / getAnalogNumChannelsToActivate(status);
-  // ticksPerConversion must be at least 80
-  if (ticksPerConversion < 80) {
-    if ((*status) >= 0) *status = SAMPLE_RATE_TOO_HIGH;
-    ticksPerConversion = 80;
-  }
-
-  // Atomically set the scan size and the convert rate so that the sample rate
-  // is constant
-  tAI::tConfig config;
-  config.ScanSize = getAnalogNumChannelsToActivate(status);
-  config.ConvertRate = ticksPerConversion;
-  analogInputSystem->writeConfig(config, status);
-
-  // Indicate that the scan size has been commited to hardware.
-  setAnalogNumChannelsToActivate(0);
+  initializeAnalog(status);
+  if (*status != 0) return;
+  setAnalogSampleRate(samplesPerSecond, status);
 }
 
 /**
@@ -136,6 +115,8 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
  * @return Sample rate.
  */
 double HAL_GetAnalogSampleRate(int32_t* status) {
+  initializeAnalog(status);
+  if (*status != 0) return 0;
   uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
   uint32_t ticksPerSample =
       ticksPerConversion * getAnalogNumActiveChannels(status);

@@ -27,6 +27,7 @@ static const uint32_t kAccumulatorChannels[] = {0, 1};
 extern std::unique_ptr<tAI> analogInputSystem;
 extern std::unique_ptr<tAO> analogOutputSystem;
 extern priority_recursive_mutex analogRegisterWindowMutex;
+extern bool analogSampleRateSet;
 
 struct AnalogPort {
   uint8_t channel;
@@ -40,7 +41,6 @@ extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
 int32_t getAnalogNumActiveChannels(int32_t* status);
 int32_t getAnalogNumChannelsToActivate(int32_t* status);
 void setAnalogNumChannelsToActivate(int32_t channels);
+void setAnalogSampleRate(double samplesPerSecond, int32_t* status);
 void initializeAnalog(int32_t* status);
-
-extern bool analogSystemInitialized;
 }  // namespace hal
