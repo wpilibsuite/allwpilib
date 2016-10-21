@@ -8,13 +8,7 @@ buildscript {
     }
     dependencies {
         classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.8'
-    }
-}
-
-// Determine what repo to publish to. Default is development. Valid options are development, beta, stable, and release
-if (!hasProperty('repo')) {
-    allprojects {
-        ext.repo = 'development'
+        classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:1.1'
     }
 }
 

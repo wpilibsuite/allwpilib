@@ -1,6 +1,29 @@
 import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+def utilVersion = "1.0.0${-> WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))}"
+
+task outputVersions() {
+    description = 'Prints the versions of ntcore and wpiutil to a file for use by the downstream packaging project'
+    group = 'Build'
+    def utilFile = file("$buildDir/wpiutil.txt")
+    def ntcoreFile = file("$buildDir/ntcore.txt")
+    outputs.files(utilFile, ntcoreFile)
+
+    doLast {
+        utilFile.write utilVersion
+        ntcoreFile.write WPILibVersion.version
+    }
+}
+
+project(':native:wpiutil').build.dependsOn outputVersions
+project(':native:ntcore').build.dependsOn outputVersions
+if (project.buildArm) {
+    project(':arm:wpiutil').build.dependsOn outputVersions
+    project(':arm:ntcore').build.dependsOn outputVersions
+}
 
 // We change what repo we publish to depending on whether this is a development, beta, stable, or full
 // release. This is set up in the main gradle file.
@@ -24,7 +47,7 @@ publishing {
 
                 groupId 'edu.wpi.first.wpilib.networktables.java'
                 artifactId 'NetworkTables'
-                version '3.0.0-SNAPSHOT'
+                version WPILibVersion.version
             }
         }
         cpp(MavenPublication) {
@@ -42,7 +65,7 @@ publishing {
 
             groupId 'edu.wpi.first.wpilib.networktables.cpp'
             artifactId 'NetworkTables'
-            version '3.0.0-SNAPSHOT'
+            version WPILibVersion.version
         }
         wpiutil(MavenPublication) {
             artifact project(':native:wpiutil').wpiutilZip
@@ -59,13 +82,7 @@ publishing {
 
             groupId 'edu.wpi.first.wpilib'
             artifactId 'wpiutil'
-            version '1.0.0-SNAPSHOT'
-        }
-    }
-
-    repositories {
-        maven {
-            url "${System.getProperty('user.home')}/releases/maven/${project.repo}"
+            version utilVersion
         }
     }
 }
