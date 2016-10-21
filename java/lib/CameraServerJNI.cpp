@@ -523,6 +523,20 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_releaseSource
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    putSourceFrame
+ * Signature: (IJ)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_putSourceFrame
+  (JNIEnv *env, jclass, jint source, jlong imageNativeObj)
+{
+  cv::Mat& image = *((cv::Mat*)imageNativeObj);
+  CS_Status status;
+  cs::PutSourceFrame(source, image, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    notifySourceError
  * Signature: (ILjava/lang/String;)V
  */
@@ -714,6 +728,21 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_releaseSink
   CS_Status status;
   cs::ReleaseSink(sink, &status);
   CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    grabSinkFrame
+ * Signature: (IJ)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_grabSinkFrame
+  (JNIEnv *env, jclass, jint sink, jlong imageNativeObj)
+{
+  cv::Mat& image = *((cv::Mat*)imageNativeObj);
+  CS_Status status;
+  auto rv = cs::GrabSinkFrame(sink, image, &status);
+  CheckStatus(env, status);
+  return rv;
 }
 
 /*

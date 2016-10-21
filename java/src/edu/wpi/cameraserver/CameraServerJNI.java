@@ -116,7 +116,7 @@ public class CameraServerJNI {
   //
   // OpenCV Source Functions
   //
-  //public static native void putSourceFrame(int source, CvMat image);
+  public static native void putSourceFrame(int source, long imageNativeObj);
   public static native void notifySourceError(int source, String msg);
   public static native void setSourceConnected(int source, boolean connected);
   public static native int createSourceProperty(int source, String name, int type);
@@ -149,7 +149,7 @@ public class CameraServerJNI {
   //
   // OpenCV Sink Functions
   //
-  //public static native int grabSinkFrame(int sink, CvMat image);
+  public static native long grabSinkFrame(int sink, long imageNativeObj);
   public static native String getSinkError(int sink);
   public static native void setSinkEnabled(int sink, boolean enabled);
 

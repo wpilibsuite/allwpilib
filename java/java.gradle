@@ -21,6 +21,11 @@ sourceSets {
     }
 }
 
+dependencies {
+    compile 'org.opencv:opencv-java:3.1.0'
+    runtime 'org.opencv:opencv-java:3.1.0'
+}
+
 jar {
     description = 'Generates CameraServer jar, with the JNI shared libraries embedded'
     baseName = 'cameraserver'
@@ -85,7 +90,7 @@ task jniHeadersCameraServer {
         exec {
             executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
             args '-d', outputFolder
-            args '-classpath', sourceSets.main.output.classesDir
+            args '-classpath', sourceSets.main.runtimeClasspath.asPath
             args 'edu.wpi.cameraserver.CameraServerJNI'
         }
     }

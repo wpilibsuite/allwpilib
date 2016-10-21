@@ -7,6 +7,8 @@
 
 package edu.wpi.cameraserver;
 
+import org.opencv.core.Mat;
+
 /// A sink for user code to accept video frames as OpenCV images.
 public class CvSink extends VideoSink {
   /// Create a sink for accepting OpenCV images.
@@ -33,9 +35,9 @@ public class CvSink extends VideoSink {
   /// Wait for the next frame and get the image.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
-  //public long grabFrame(CvMat image) {
-  //  return CameraServerJNI.grabSinkFrame(m_handle, image);
-  //}
+  public long grabFrame(Mat image) {
+    return CameraServerJNI.grabSinkFrame(m_handle, image.nativeObj);
+  }
 
   /// Get error string.  Call this if WaitForFrame() returns 0 to determine
   /// what the error is.

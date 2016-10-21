@@ -7,6 +7,8 @@
 
 package edu.wpi.cameraserver;
 
+import org.opencv.core.Mat;
+
 /// A source that represents a video camera.
 public class CvSource extends VideoSource {
   /// Create an OpenCV source.
@@ -28,7 +30,9 @@ public class CvSource extends VideoSource {
 
   /// Put an OpenCV image and notify sinks.
   /// @param image OpenCV image
-  //public void putFrame(Mat image);
+  public void putFrame(Mat image) {
+    CameraServerJNI.putSourceFrame(m_handle, image.nativeObj);
+  }
 
   /// Signal sinks that an error has occurred.  This should be called instead
   /// of NotifyFrame when an error occurs.
