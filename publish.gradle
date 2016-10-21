@@ -4,19 +4,30 @@ apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
 def utilVersion = "1.0.0${-> WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))}"
+def utilFile = file("$buildDir/wpiutil.txt")
+def ntcoreFile = file("$buildDir/ntcore.txt")
 
 task outputVersions() {
     description = 'Prints the versions of ntcore and wpiutil to a file for use by the downstream packaging project'
     group = 'Build'
-    def utilFile = file("$buildDir/wpiutil.txt")
-    def ntcoreFile = file("$buildDir/ntcore.txt")
     outputs.files(utilFile, ntcoreFile)
+
+    doFirst {
+        buildDir.mkdir()
+    }
 
     doLast {
         utilFile.write utilVersion
         ntcoreFile.write WPILibVersion.version
     }
 }
+
+task clean(type: Delete) {
+    delete utilFile
+    delete ntcoreFile
+}
+
+outputVersions.mustRunAfter clean
 
 project(':native:wpiutil').build.dependsOn outputVersions
 project(':native:ntcore').build.dependsOn outputVersions
