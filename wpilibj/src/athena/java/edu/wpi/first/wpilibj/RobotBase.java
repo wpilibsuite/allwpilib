@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.util.WPILibVersion;
 
 /**
  * Implement a Robot Program framework. The RobotBase class is intended to be subclassed by a user
@@ -215,7 +216,7 @@ public abstract class RobotBase {
       file.createNewFile();
 
       try (FileOutputStream output = new FileOutputStream(file)) {
-        output.write("v2017.1.0-beta-1".getBytes());
+        output.write(WPILibVersion.Version.getBytes());
       }
 
     } catch (IOException ex) {

@@ -15,6 +15,7 @@
 #include "Internal/HardwareHLReporting.h"
 #include "RobotState.h"
 #include "Utility.h"
+#include "WPILibVersion.h"
 #include "networktables/NetworkTable.h"
 
 /**
@@ -39,7 +40,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
   if (file != nullptr) {
-    std::fputs("v2017.1.0-beta-1", file);
+    std::fputs(WPILibVersion, file);
     std::fclose(file);
   }
 }

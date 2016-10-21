@@ -115,9 +115,16 @@ project(':hal').tasks.whenTaskAdded { task ->
     }
 }
 
+// Add the generate version file task as a dependency
+tasks.whenTaskAdded { task ->
+    if (task.name.toLowerCase().startsWith('compilewpilib')) {
+        task.dependsOn generateCppVersion
+    }
+}
+
 if (checkDoxygen()) {
 
-    def ntSourcesDependency = project.dependencies.create('edu.wpi.first.wpilib.networktables.cpp:NetworkTables:3.0.0-SNAPSHOT:sources@zip')
+    def ntSourcesDependency = project.dependencies.create('edu.wpi.first.wpilib.networktables.cpp:NetworkTables:+:sources@zip')
     def ntSourcesConfig = project.configurations.detachedConfiguration(ntSourcesDependency)
     ntSourcesDependency.setTransitive(false)
     def ntSources = ntSourcesConfig.singleFile
@@ -185,7 +192,7 @@ publishing {
 
             groupId 'edu.wpi.first.wpilib.cmake'
             artifactId 'cpp-root'
-            version '1.0.0'
+            version WPILibVersion.version
         }
     }
 

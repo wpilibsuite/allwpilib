@@ -10,8 +10,8 @@ sourceSets {
 
 dependencies {
     athenaCompile sourceSets.shared.output
-    athenaCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
-    athenaRuntime 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
+    athenaCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
+    athenaRuntime 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
 }
 
 // Configuration for the HAL bindings
@@ -61,7 +61,7 @@ publishing {
 
             groupId 'edu.wpi.first.wpilibj'
             artifactId 'wpilibJavaFinal'
-            version '0.1.0-SNAPSHOT'
+            version WPILibVersion.version
         }
     }
 
@@ -111,18 +111,21 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
     from sourceSets.shared.allJava
 }
 
-def ntSourcesDependency =
-        project.dependencies.create('edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:sources@jar')
-def ntSourcesConfig = project.configurations.detachedConfiguration(ntSourcesDependency)
-ntSourcesDependency.setTransitive(false)
-def ntSources = ntSourcesConfig.singleFile
-
 task unzipJavaNtSources(type: Copy) {
     description = 'Unzips the java networktables sources for doc creation'
     group = 'WPILib'
-    from zipTree(ntSources)
-    exclude 'META-INF/*'
-    into ntSourceDir
+    doFirst {
+        def ntSourcesDependency =
+        project.dependencies.create('edu.wpi.first.wpilib.networktables.java:NetworkTables:+:sources@jar')
+        def ntSourcesConfig = project.configurations.detachedConfiguration(ntSourcesDependency)
+        ntSourcesDependency.setTransitive(false)
+        def ntSources = ntSourcesConfig.singleFile
+    }
+    doLast {
+        from zipTree(ntSources)
+        exclude 'META-INF/*'
+        into ntSourceDir
+    }
 }
 
 task javadoc(type: Javadoc, overwrite: true) {
