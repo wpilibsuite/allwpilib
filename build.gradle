@@ -1,32 +1,13 @@
 import org.gradle.internal.os.OperatingSystem
 
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.8'
-    }
-}
-
-// Determine what repo to publish to. Default is development. Valid options are development, beta, stable, and release
-if (!hasProperty('repo')) {
-    allprojects {
-        ext.repo = 'development'
-    }
+plugins {
+    id 'net.ltgt.errorprone' version '0.0.8'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.1'
 }
 
 allprojects {
     repositories {
         mavenCentral()
-        maven {
-            url "${System.getProperty('user.home')}/releases/maven/${repo}"
-        }
-        maven {
-            url "http://first.wpi.edu/FRC/roborio/maven/${repo}"
-        }
     }
 }
 
@@ -70,26 +51,46 @@ ext.getPlatformPath = { binary ->
 }
 
 ext.useWpiUtil = { project ->
-    def wpiUtilDependency =
-        project.dependencies.create("edu.wpi.first.wpilib:wpiutil:1.0.0-SNAPSHOT:${project.isArm ? 'arm' : 'desktop'}@zip")
-    def wpiUtilConfig = project.configurations.detachedConfiguration(wpiUtilDependency)
-    wpiUtilConfig.setTransitive(false)
-    def wpiUtil = wpiUtilConfig.files[0].canonicalFile
+    project.tasks.create(name: "downloadWpiUtil") {
+        description = 'Downloads the wpiutil maven dependency.'
+        group = 'WPILib'
+        def depFolder = "${project.buildDir}/dependencies"
+        def utilZip = file("${depFolder}/wpiutil.zip")
+        outputs.file(utilZip)
+        def wpiUtil
+
+        doFirst {
+            def wpiUtilDependency = project.dependencies.create("edu.wpi.first.wpilib:wpiutil:+:${project.isArm ? 'arm' : 'desktop'}@zip")
+            def wpiUtilConfig = project.configurations.detachedConfiguration(wpiUtilDependency)
+            wpiUtilConfig.setTransitive(false)
+            wpiUtil = wpiUtilConfig.files[0].canonicalFile
+        }
+
+        doLast {
+            copy {
+                from wpiUtil
+                rename 'wpiutil(.+)', 'wpiutil.zip'
+                into depFolder
+            }
+        }
+    }
+
     def wpiUtilUnzipLocation = "${project.buildDir}/wpiutil"
 
     // Create a task that will unzip the wpiutil files into a temporary build directory
     project.tasks.create(name: "unzipWpiUtil", type: Copy) {
-	description = 'Unzips the wpiutil maven dependency so that the include files and libraries can be used'
-	group = 'WPILib'
-	from zipTree(wpiUtil)
-	into wpiUtilUnzipLocation
+        description = 'Unzips the wpiutil maven dependency so that the include files and libraries can be used'
+        group = 'WPILib'
+        dependsOn project.tasks.downloadWpiUtil
+        from zipTree(project.tasks.downloadWpiUtil.outputs.files.singleFile)
+        into wpiUtilUnzipLocation
     }
 
     project.ext.wpiUtil = wpiUtilUnzipLocation
     project.ext.wpiUtilInclude = "$wpiUtilUnzipLocation/include"
 
     project.ext.addWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
-        compileTask.dependsOn "unzipWpiUtil"
+        compileTask.dependsOn project.tasks.unzipWpiUtil
         String path = project.getPlatformPath2(targetPlatform)
         if (targetPlatform.operatingSystem.windows) {
             linker.args "${project.wpiUtil}/${path}/wpiutil.lib"
@@ -97,18 +98,6 @@ ext.useWpiUtil = { project ->
             linker.args "${project.wpiUtil}/${path}/libwpiutil.a"
         }
     }
-//    project.model {
-//        repositories {
-//            libwpiutil(PrebuiltLibraries) {
-//                wpiutil {
-//                    headers.srcDir "${project.wpiUtilUnzipLocation}/include"
-//                    binaries.withType(StaticLibraryBinary) {
-//                        staticLibraryFile = file("${project.wpiUtil}/libwpiutil.a")
-//                    }
-//                }
-//            }
-//        }
-//    }
 }
 
 ext.getOpenCvPlatformPackage = { targetPlatform ->
@@ -137,40 +126,72 @@ ext.getOpenCvPlatformPackage = { targetPlatform ->
     }
 }
 
+task downloadOpenCvHeaders() {
+    description = 'Downloads the OpenCV Headers maven dependency.'
+    group = 'WPILib'
+    def depFolder = "${buildDir}/dependencies"
+    def openCvHeadersZip = file("${depFolder}/opencv-headers.zip")
+    outputs.file(openCvHeadersZip)
+    def openCvHeaders
+
+    doFirst {
+        def openCvHeadersDependency = project.dependencies.create("org.opencv:opencv-headers:3.1.0@jar")
+        def openCvHeadersConfig = project.configurations.detachedConfiguration(openCvHeadersDependency)
+        openCvHeadersConfig.setTransitive(false)
+        openCvHeaders = openCvHeadersConfig.files[0].canonicalFile
+    }
+
+    doLast {
+        copy {
+            from openCvHeaders
+            rename 'opencv-headers(.+)', 'opencv-headers.zip'
+            into depFolder
+        }
+    }
+}
+
+task downloadOpenCvJava() {
+    description = 'Downloads the OpenCV Java maven dependency.'
+    group = 'WPILib'
+    def depFolder = "${buildDir}/dependencies"
+    def openCvJavaZip = file("${depFolder}/opencv-java.zip")
+    outputs.file(openCvJavaZip)
+    def openCvJava
+
+    doFirst {
+        def openCvJavaDependency = project.dependencies.create("org.opencv:opencv-java:3.1.0@jar")
+        def openCvJavaConfig = project.configurations.detachedConfiguration(openCvJavaDependency)
+        openCvJavaConfig.setTransitive(false)
+        openCvJava = openCvJavaConfig.files[0].canonicalFile
+    }
+
+    doLast {
+        copy {
+            from openCvJava
+            rename 'opencv-java(.+)', 'opencv-java.zip'
+            into depFolder
+        }
+    }
+}
+
 ext.useOpenCv = { project ->
     def openCvUnzipLocation = "${project.buildDir}/opencv"
 
-    if (project.tasks.findByPath("unzipOpenCvHeaders") == null) {
-        // opencv-headers
-        def openCvHeadersDependency =
-            project.dependencies.create("org.opencv:opencv-headers:3.1.0@jar")
-        def openCvHeadersConfig = project.configurations.detachedConfiguration(openCvHeadersDependency)
-        openCvHeadersConfig.setTransitive(false)
-        def openCvHeaders = openCvHeadersConfig.files[0].canonicalFile
-
-        project.tasks.create(name: "unzipOpenCvHeaders", type: Copy) {
-            description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
-            group = 'OpenCv'
-            from zipTree(openCvHeaders)
-            into "${openCvUnzipLocation}/include"
-        }
+    project.tasks.create(name: "unzipOpenCvHeaders", type: Copy) {
+        description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
+        group = 'OpenCv'
+        dependsOn downloadOpenCvHeaders
+        from zipTree(downloadOpenCvHeaders.outputs.files.singleFile)
+        into "${openCvUnzipLocation}/include"
     }
 
     if (project.includeJava) {
-        if (project.tasks.findByPath("unzipOpenCvJava") == null) {
-            // opencv-java
-            def openCvJavaDependency =
-                project.dependencies.create("org.opencv:opencv-java:3.1.0@jar")
-            def openCvJavaConfig = project.configurations.detachedConfiguration(openCvJavaDependency)
-            openCvJavaConfig.setTransitive(false)
-            def openCvJava = openCvJavaConfig.files[0].canonicalFile
-
-            project.tasks.create(name: "unzipOpenCvJava", type: Copy) {
-                description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
-                group = 'OpenCv'
-                from zipTree(openCvJava)
-                into "${openCvUnzipLocation}/java"
-            }
+        project.tasks.create(name: "unzipOpenCvJava", type: Copy) {
+            description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
+            group = 'OpenCv'
+            dependsOn downloadOpenCvJava
+            from zipTree(downloadOpenCvJava.outputs.files.singleFile)
+            into "${openCvUnzipLocation}/java"
         }
     }
 
@@ -180,43 +201,77 @@ ext.useOpenCv = { project ->
     project.ext.addOpenCvLibraryLinks = { compileTask, linker, targetPlatform ->
         def openCvPlatform = project.getOpenCvPlatformPackage(targetPlatform)
 
-        if (project.tasks.findByPath("unzipOpenCvNatives${openCvPlatform}") == null) {
-            // opencv-natives
-            def openCvNativesDependency =
-                project.dependencies.create("org.opencv:opencv-natives:3.1.0:${openCvPlatform}@jar")
-            def openCvNativesConfig = project.configurations.detachedConfiguration(openCvNativesDependency)
-            openCvNativesConfig.setTransitive(false)
-            def openCvNatives = openCvNativesConfig.files[0].canonicalFile
+        if (project.tasks.findByPath("unzipOpenCvNatives_${openCvPlatform}") == null) {
+            project.tasks.create(name: "downloadOpenCvNatives_${openCvPlatform}") {
+                description = 'Downloads the OpenCV natives maven dependency.'
+                group = 'OpenCv'
+                def depFolder = "${project.buildDir}/dependencies"
+                def openCvNativesZip = file("${depFolder}/opencv-natives.zip")
+                outputs.file(openCvNativesZip)
+                def openCvNatives
 
-            project.tasks.create(name: "unzipOpenCvNatives${openCvPlatform}", type: Copy) {
+                doFirst {
+                    def openCvNativesDependency = project.dependencies.create("org.opencv:opencv-natives:3.1.0:${openCvPlatform}@jar")
+                    def openCvNativesConfig = project.configurations.detachedConfiguration(openCvNativesDependency)
+                    openCvNativesConfig.setTransitive(false)
+                    openCvNatives = openCvNativesConfig.files[0].canonicalFile
+                }
+
+                doLast {
+                    copy {
+                        from openCvNatives
+                        rename 'opencv-natives(.+)', 'opencv-natives.zip'
+                        into depFolder
+                    }
+                }
+            }
+
+            project.tasks.create(name: "unzipOpenCvNatives_${openCvPlatform}", type: Copy) {
                 description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
                 group = 'OpenCv'
-                from zipTree(openCvNatives)
+                dependsOn "downloadOpenCvNatives_${openCvPlatform}"
+                from zipTree(project.tasks["downloadOpenCvNatives_${openCvPlatform}"].outputs.files.singleFile)
                 into "${project.openCv}/${openCvPlatform}"
             }
         }
 
-        if (project.includeJava) {
-            if (project.tasks.findByPath("unzipOpenCvJni${openCvPlatform}") == null) {
-                // opencv-jni
-                def openCvJniDependency =
-                    project.dependencies.create("org.opencv:opencv-jni:3.1.0:${openCvPlatform}@jar")
-                def openCvJniConfig = project.configurations.detachedConfiguration(openCvJniDependency)
-                openCvJniConfig.setTransitive(false)
-                def openCvJni = openCvJniConfig.files[0].canonicalFile
+        if (project.includeJava && project.tasks.findByPath("unzipOpenCvJni_${openCvPlatform}") == null) {
+            project.tasks.create(name: "downloadOpenCvJni_${openCvPlatform}") {
+                description = 'Downloads the OpenCV JNI maven dependency.'
+                group = 'OpenCv'
+                def depFolder = "${project.buildDir}/dependencies"
+                def openCvJniZip = file("${depFolder}/opencv-jni.zip")
+                outputs.file(openCvJniZip)
+                def openCvJni
 
-                project.tasks.create(name: "unzipOpenCvJni${openCvPlatform}", type: Copy) {
-                    description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
-                    group = 'OpenCv'
-                    from zipTree(openCvJni)
-                    into "${project.openCv}/${openCvPlatform}"
+                doFirst {
+                    def openCvJniDependency = project.dependencies.create("org.opencv:opencv-jni:3.1.0:${openCvPlatform}@jar")
+                    def openCvJniConfig = project.configurations.detachedConfiguration(openCvJniDependency)
+                    openCvJniConfig.setTransitive(false)
+                    openCvJni = openCvJniConfig.files[0].canonicalFile
                 }
+
+                doLast {
+                    copy {
+                        from openCvJni
+                        rename 'opencv-jni(.+)', 'opencv-jni.zip'
+                        into depFolder
+                    }
+                }
+            }
+
+            project.tasks.create(name: "unzipOpenCvJni_${openCvPlatform}", type: Copy) {
+                description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
+                group = 'OpenCv'
+                dependsOn "downloadOpenCvJni_${openCvPlatform}"
+                from zipTree(project.tasks["downloadOpenCvJni_${openCvPlatform}"].outputs.files.singleFile)
+                into "${project.openCv}/${openCvPlatform}"
             }
         }
 
-        compileTask.dependsOn "unzipOpenCvHeaders", "unzipOpenCvNatives${openCvPlatform}"
+        compileTask.dependsOn "unzipOpenCvHeaders", "unzipOpenCvNatives_${openCvPlatform}"
         if (project.includeJava) {
-            compileTask.dependsOn "unzipOpenCvJava", "unzipOpenCvJni${openCvPlatform}"
+            compileTask.dependsOn "unzipOpenCvJava", "unzipOpenCvJni_${openCvPlatform}"
         }
         if (targetPlatform.architecture.arm) {
             linker.args "${project.openCv}/${openCvPlatform}/libopencv_calib3d.so"

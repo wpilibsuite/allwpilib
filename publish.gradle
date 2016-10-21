@@ -1,6 +1,34 @@
 import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+def csFile = file("$buildDir/cameraserver.txt")
+
+task outputVersions() {
+    description = 'Prints the version of CameraServer to a file for use by the downstream packaging project'
+    group = 'Build'
+    outputs.files(csFile)
+
+    doFirst {
+        buildDir.mkdir()
+    }
+
+    doLast {
+        csFile.write WPILibVersion.version
+    }
+}
+
+task clean(type: Delete) {
+    delete csFile
+}
+
+outputVersions.mustRunAfter clean
+
+project(':native').build.dependsOn outputVersions
+if (project.buildArm) {
+    project(':arm').build.dependsOn outputVersions
+}
 
 // We change what repo we publish to depending on whether this is a development, beta, stable, or full
 // release. This is set up in the main gradle file.
@@ -24,7 +52,7 @@ publishing {
 
                 groupId 'edu.wpi.cameraserver.java'
                 artifactId 'CameraServer'
-                version '1.0.0-SNAPSHOT'
+                version WPILibVersion.version
             }
         }
         cpp(MavenPublication) {
@@ -42,13 +70,7 @@ publishing {
 
             groupId 'edu.wpi.cameraserver.cpp'
             artifactId 'CameraServer'
-            version '1.0.0-SNAPSHOT'
-        }
-    }
-
-    repositories {
-        maven {
-            url "${System.getProperty('user.home')}/releases/maven/${project.repo}"
+            version WPILibVersion.version
         }
     }
 }
