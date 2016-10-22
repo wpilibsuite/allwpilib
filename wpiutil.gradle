@@ -29,7 +29,7 @@ def wpiutilSetupModel = { project ->
 
 
 def wpiutilZipTask = { project ->
-    project.ext.wpiutilZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}WpiutilZip", Zip) {
+    project.ext.wpiutilZip = project.tasks.create("wpiutilZip", Zip) {
         description = 'Creates platform-specific zip of the desktop wpiutil libraries.'
         group = 'WPILib'
         destinationDir = project.buildDir
@@ -51,6 +51,12 @@ def wpiutilZipTask = { project ->
                 withType(SharedLibraryBinarySpec) { binary ->
                     from(binary.sharedLibraryFile) {
                         into getPlatformPath(binary)
+                    }
+                    def debugFile = new File(binary.sharedLibraryFile.absolutePath + ".debug")
+                    if (debugFile.exists()) {
+                        from(debugFile) {
+                            into getPlatformPath(binary)
+                        }
                     }
                 }
             }

@@ -52,7 +52,7 @@ def ntcoreSetupModel = { project ->
 }
 
 def ntcoreZipTask = { project ->
-    project.ext.ntcoreZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}NtcoreZip", Zip) {
+    project.ext.ntcoreZip = project.tasks.create("ntcoreZip", Zip) {
         description = 'Creates platform-specific zip of the desktop ntcore libraries.'
         group = 'WPILib'
         destinationDir = project.buildDir
@@ -82,6 +82,12 @@ def ntcoreZipTask = { project ->
                 withType(SharedLibraryBinarySpec) { binary ->
                     from(binary.sharedLibraryFile) {
                         into getPlatformPath(binary)
+                    }
+                    def debugFile = new File(binary.sharedLibraryFile.absolutePath + ".debug")
+                    if (debugFile.exists()) {
+                        from(debugFile) {
+                            into getPlatformPath(binary)
+                        }
                     }
                 }
             }
