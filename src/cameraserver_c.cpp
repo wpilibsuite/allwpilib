@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdlib>
 
+#include "opencv2/core/core.hpp"
 #include "llvm/SmallString.h"
 
 #include "cameraserver_cpp.h"
@@ -183,7 +184,8 @@ void CS_ReleaseSource(CS_Source source, CS_Status* status) {
 
 void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
                        CS_Status* status) {
-  //TODO: return cs::PutSourceFrame(source, image, status);
+  auto mat = cv::cvarrToMat(image);
+  return cs::PutSourceFrame(source, mat, status);
 }
 
 void CS_NotifySourceError(CS_Source source, const char* msg,
@@ -269,7 +271,8 @@ void CS_ReleaseSink(CS_Sink sink, CS_Status* status) {
 
 uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
                           CS_Status* status) {
-  return 0;  // TODO: cs::GrabSinkFrame(sink, image, status);
+  auto mat = cv::cvarrToMat(image);
+  return cs::GrabSinkFrame(sink, mat, status);
 }
 
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {

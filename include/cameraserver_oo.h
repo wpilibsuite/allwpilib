@@ -214,7 +214,7 @@ class CvSource : public VideoSource {
   /// This is identical in behavior to calling PutImage(0, image) followed by
   /// NotifyFrame().
   /// @param image OpenCV image
-  void PutFrame(cv::Mat* image);
+  void PutFrame(cv::Mat& image);
 
   /// Signal sinks that an error has occurred.  This should be called instead
   /// of NotifyFrame when an error occurs.
@@ -340,7 +340,7 @@ class CvSink : public VideoSink {
   /// Wait for the next frame and get the image.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
-  uint64_t GrabFrame(cv::Mat* image) const;
+  uint64_t GrabFrame(cv::Mat& image) const;
 
   /// Get error string.  Call this if WaitForFrame() returns 0 to determine
   /// what the error is.

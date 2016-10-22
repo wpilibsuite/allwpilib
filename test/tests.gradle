@@ -13,7 +13,7 @@ model {
                         includes = ['**/*.cpp']
                     }
                     exportedHeaders {
-                        srcDirs = ["${rootDir}/include", "${rootDir}/src", "${rootDir}/wpiutil/include", "${rootDir}/gmock/include", "${rootDir}/gmock/gtest/include"]
+                        srcDirs = ["${rootDir}/include", "${rootDir}/src", "${rootDir}/gmock/include", "${rootDir}/gmock/gtest/include"]
                         includes = ['**/*.h']
                     }
                 }
@@ -23,6 +23,7 @@ model {
                 lib library: 'cameraserver', linkage: 'static'
                 tasks.withType(CppCompile) {
                    project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
+                   project.addOpenCvLibraryLinks(it, linker, targetPlatform)
                 }
             }
         }

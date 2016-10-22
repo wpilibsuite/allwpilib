@@ -36,7 +36,7 @@ def cameraserverSetupModel = { project ->
                             includes = ['**/*.cpp']
                         }
                         exportedHeaders {
-                            srcDirs = ["${rootDir}/include", project.wpiUtilInclude]
+                            srcDirs = ["${rootDir}/include", project.wpiUtilInclude, project.openCvInclude]
                             if (includeJava) {
                                 project.jniHeadersCameraServer.outputs.files.each { file ->
                                     srcDirs file.getPath()
@@ -181,6 +181,7 @@ if (buildArm) {
         cameraserverSetupExamplesModel(project)
         cameraserverZipTask(project)
         useWpiUtil(project)
+        useOpenCv(project)
     }
 }
 
@@ -201,6 +202,7 @@ project(':native') {
     cameraserverSetupExamplesModel(project)
     cameraserverZipTask(project)
     useWpiUtil(project)
+    useOpenCv(project)
 }
 
 task cameraserverSourceZip(type: Zip) {

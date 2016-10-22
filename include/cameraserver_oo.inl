@@ -182,7 +182,7 @@ inline CvSource::CvSource(llvm::StringRef name, VideoMode::PixelFormat format,
       CreateCvSource(name, VideoMode{format, width, height, fps}, &m_status);
 }
 
-inline void CvSource::PutFrame(cv::Mat* image) {
+inline void CvSource::PutFrame(cv::Mat& image) {
   m_status = 0;
   PutSourceFrame(m_handle, image, &m_status);
 }
@@ -284,7 +284,7 @@ inline CvSink::CvSink(llvm::StringRef name,
   m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
 }
 
-inline uint64_t CvSink::GrabFrame(cv::Mat* image) const {
+inline uint64_t CvSink::GrabFrame(cv::Mat& image) const {
   m_status = 0;
   return GrabSinkFrame(m_handle, image, &m_status);
 }

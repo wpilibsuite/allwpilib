@@ -324,7 +324,7 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
 // OpenCV Source Functions
 //
 
-void PutSourceFrame(CS_Source source, cv::Mat* image, CS_Status* status) {
+void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
   // TODO
 }
 
@@ -475,7 +475,7 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
 // OpenCV Sink Functions
 //
 
-uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat* image, CS_Status* status) {
+uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status) {
   return 0;  // TODO
 }
 

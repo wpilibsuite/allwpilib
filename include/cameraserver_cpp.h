@@ -134,7 +134,7 @@ void ReleaseSource(CS_Source source, CS_Status* status);
 //
 // OpenCV Source Functions
 //
-void PutSourceFrame(CS_Source source, cv::Mat* image, CS_Status* status);
+void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
 void NotifySourceError(CS_Source source, llvm::StringRef msg,
                        CS_Status* status);
 void SetSourceConnected(CS_Source source, bool connected, CS_Status* status);
@@ -178,7 +178,7 @@ void ReleaseSink(CS_Sink sink, CS_Status* status);
 //
 // OpenCV Sink Functions
 //
-uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat* image, CS_Status* status);
+uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
 llvm::StringRef GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
                              CS_Status* status);

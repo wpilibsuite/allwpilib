@@ -111,6 +111,157 @@ ext.useWpiUtil = { project ->
 //    }
 }
 
+ext.getOpenCvPlatformPackage = { targetPlatform ->
+    if (targetPlatform.architecture.arm) {
+        return 'linux-arm'
+    } else if (targetPlatform.operatingSystem.linux) {
+        if (targetPlatform.architecture.amd64) {
+            return 'linux-x86_64'
+        } else {
+            return 'linux-' + targetPlatform.architecture.name
+        }
+    } else if (targetPlatform.operatingSystem.windows) {
+        if (targetPlatform.architecture.amd64) {
+            return 'windows-x86_64'
+        } else {
+            return 'windows-' + targetPlatform.architecture.name
+        }
+    } else if (targetPlatform.operatingSystem.macOsX) {
+        if (targetPlatform.architecture.amd64) {
+            return 'osx-x86_64'
+        } else {
+            return 'osx-' + targetPlatform.architecture.name
+        }
+    } else {
+        return targetPlatform.operatingSystem.name + '-' + targetPlatform.architecture.name
+    }
+}
+
+ext.useOpenCv = { project ->
+    def openCvUnzipLocation = "${project.buildDir}/opencv"
+
+    if (project.tasks.findByPath("unzipOpenCvHeaders") == null) {
+        // opencv-headers
+        def openCvHeadersDependency =
+            project.dependencies.create("org.opencv:opencv-headers:3.1.0@jar")
+        def openCvHeadersConfig = project.configurations.detachedConfiguration(openCvHeadersDependency)
+        openCvHeadersConfig.setTransitive(false)
+        def openCvHeaders = openCvHeadersConfig.files[0].canonicalFile
+
+        project.tasks.create(name: "unzipOpenCvHeaders", type: Copy) {
+            description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
+            group = 'OpenCv'
+            from zipTree(openCvHeaders)
+            into "${openCvUnzipLocation}/include"
+        }
+    }
+
+    if (project.includeJava) {
+        if (project.tasks.findByPath("unzipOpenCvJava") == null) {
+            // opencv-java
+            def openCvJavaDependency =
+                project.dependencies.create("org.opencv:opencv-java:3.1.0@jar")
+            def openCvJavaConfig = project.configurations.detachedConfiguration(openCvJavaDependency)
+            openCvJavaConfig.setTransitive(false)
+            def openCvJava = openCvJavaConfig.files[0].canonicalFile
+
+            project.tasks.create(name: "unzipOpenCvJava", type: Copy) {
+                description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
+                group = 'OpenCv'
+                from zipTree(openCvJava)
+                into "${openCvUnzipLocation}/java"
+            }
+        }
+    }
+
+    project.ext.openCv = openCvUnzipLocation
+    project.ext.openCvInclude = "$openCvUnzipLocation/include"
+
+    project.ext.addOpenCvLibraryLinks = { compileTask, linker, targetPlatform ->
+        def openCvPlatform = project.getOpenCvPlatformPackage(targetPlatform)
+
+        if (project.tasks.findByPath("unzipOpenCvNatives${openCvPlatform}") == null) {
+            // opencv-natives
+            def openCvNativesDependency =
+                project.dependencies.create("org.opencv:opencv-natives:3.1.0:${openCvPlatform}@jar")
+            def openCvNativesConfig = project.configurations.detachedConfiguration(openCvNativesDependency)
+            openCvNativesConfig.setTransitive(false)
+            def openCvNatives = openCvNativesConfig.files[0].canonicalFile
+
+            project.tasks.create(name: "unzipOpenCvNatives${openCvPlatform}", type: Copy) {
+                description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
+                group = 'OpenCv'
+                from zipTree(openCvNatives)
+                into "${project.openCv}/${openCvPlatform}"
+            }
+        }
+
+        if (project.includeJava) {
+            if (project.tasks.findByPath("unzipOpenCvJni${openCvPlatform}") == null) {
+                // opencv-jni
+                def openCvJniDependency =
+                    project.dependencies.create("org.opencv:opencv-jni:3.1.0:${openCvPlatform}@jar")
+                def openCvJniConfig = project.configurations.detachedConfiguration(openCvJniDependency)
+                openCvJniConfig.setTransitive(false)
+                def openCvJni = openCvJniConfig.files[0].canonicalFile
+
+                project.tasks.create(name: "unzipOpenCvJni${openCvPlatform}", type: Copy) {
+                    description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
+                    group = 'OpenCv'
+                    from zipTree(openCvJni)
+                    into "${project.openCv}/${openCvPlatform}"
+                }
+            }
+        }
+
+        compileTask.dependsOn "unzipOpenCvHeaders", "unzipOpenCvNatives${openCvPlatform}"
+        if (project.includeJava) {
+            compileTask.dependsOn "unzipOpenCvJava", "unzipOpenCvJni${openCvPlatform}"
+        }
+        if (targetPlatform.architecture.arm) {
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_calib3d.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_core.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_features2d.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_flann.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_highgui.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_imgcodecs.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_imgproc.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_ml.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_objdetect.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_photo.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_shape.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_stitching.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_superres.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_video.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_videoio.so"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_videostab.so"
+            linker.args "-ldl"
+            linker.args "-lz"
+        } else if (targetPlatform.operatingSystem.windows) {
+            linker.args "${project.openCv}/${openCvPlatform}/opencv_core.lib"
+        } else {
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_calib3d.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_core.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_features2d.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_flann.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_highgui.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_imgcodecs.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_imgproc.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_ml.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_objdetect.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_photo.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_shape.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_stitching.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_superres.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_video.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_videoio.a"
+            linker.args "${project.openCv}/${openCvPlatform}/libopencv_videostab.a"
+            linker.args "-ldl"
+            linker.args "-lz"
+        }
+    }
+}
+
 ext.setupDefines = { project, binaries ->
     binaries.all {
 	if (project.hasProperty('debug')) {
@@ -120,6 +271,7 @@ ext.setupDefines = { project, binaries ->
 	}
         tasks.withType(CppCompile) {
             project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
+            project.addOpenCvLibraryLinks(it, linker, targetPlatform)
         }
     }
 }
