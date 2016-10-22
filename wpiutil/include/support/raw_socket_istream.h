@@ -20,6 +20,7 @@ class raw_socket_istream : public raw_istream {
       : m_stream(stream), m_timeout(timeout) {}
 
   void close() override;
+  std::size_t in_avail() const override;
 
  private:
   void read_impl(void* data, std::size_t len) override;
