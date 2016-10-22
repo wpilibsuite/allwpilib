@@ -1,23 +1,6 @@
-// This regex matches either a Windows or Unix style file separator, then the lib part of the library,
-// then the name of the library itself, and finally the .so extension at the end. The name of the library
-// is in the libName capture group, which is extracted and used for the linker flags
-def libPattern = /.*((\\/|\\).*)+lib(?<libName>.+).so$/
-def niLibraryArgs = []
+// These add the nilibraries shared library to the linker args
 def niLibraryPath = file('ni-libraries').path
-
-// The NI Library tree includes all non-wpi libraries, which is everything that doesn't have libwpi in the name
-def niLibraryTree = fileTree(niLibraryPath)
-niLibraryTree.include '*.so'
-niLibraryTree.exclude '*wpi*.so'
-
-// This adds all linker flags to the list of ni library linker flags
-niLibraryTree.each { lib ->
-    def nameMatcher = (lib.path =~ libPattern)
-    if (nameMatcher[0].size() > 1) {
-        def name = nameMatcher.group('libName')
-        niLibraryArgs << '-l' + name
-    }
-}
+def niLibrary = niLibraryPath + "/libnilibraries.so"
 
 task downloadArmNetworkTables() {
     description = 'Downloads the C++ ARM NetworkTables maven dependency.'
@@ -274,7 +257,7 @@ subprojects {
             String architecture = targetPlatform.architecture
             if (architecture.contains('arm')){
                 linker.args << '-L' + niLibraryPath
-                linker.args.addAll(niLibraryArgs)
+                linker.args niLibrary
             }
         }
     }
