@@ -20,6 +20,8 @@ using namespace wpi;
 
 void raw_mem_istream::close() {}
 
+std::size_t raw_mem_istream::in_avail() const { return m_left; }
+
 void raw_mem_istream::read_impl(void* data, std::size_t len) {
   if (len > m_left) {
     error_detected();
@@ -46,6 +48,8 @@ void raw_fd_istream::close() {
     m_fd = -1;
   }
 }
+
+std::size_t raw_fd_istream::in_avail() const { return m_end - m_cur; }
 
 void raw_fd_istream::read_impl(void* data, std::size_t len) {
   std::size_t left = m_end - m_cur;

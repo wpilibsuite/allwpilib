@@ -27,3 +27,5 @@ void raw_socket_istream::read_impl(void* data, std::size_t len) {
 }
 
 void raw_socket_istream::close() { m_stream.close(); }
+
+std::size_t raw_socket_istream::in_avail() const { return 0; }

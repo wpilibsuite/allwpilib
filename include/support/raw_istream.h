@@ -8,6 +8,7 @@
 #ifndef WPIUTIL_SUPPORT_RAW_ISTREAM_H_
 #define WPIUTIL_SUPPORT_RAW_ISTREAM_H_
 
+#include <algorithm>
 #include <cstddef>
 
 namespace wpi {
@@ -37,7 +38,15 @@ class raw_istream {
     return *this;
   }
 
+  std::size_t readsome(void* data, std::size_t len) {
+    std::size_t readlen = std::min(in_avail(), len);
+    if (readlen == 0) return 0;
+    read_impl(data, readlen);
+    return readlen;
+  };
+
   virtual void close() = 0;
+  virtual std::size_t in_avail() const = 0;
 
   bool has_error() const { return m_error; }
   void clear_error() { m_error = false; }
@@ -58,6 +67,7 @@ class raw_mem_istream : public raw_istream {
  public:
   raw_mem_istream(const char* mem, std::size_t len) : m_cur(mem), m_left(len) {}
   void close() override;
+  std::size_t in_avail() const override;
 
  private:
   void read_impl(void* data, std::size_t len) override;
@@ -71,6 +81,7 @@ class raw_fd_istream : public raw_istream {
   raw_fd_istream(int fd, bool shouldClose, std::size_t bufSize = 4096);
   ~raw_fd_istream() override;
   void close() override;
+  std::size_t in_avail() const override;
 
  private:
   void read_impl(void* data, std::size_t len) override;
