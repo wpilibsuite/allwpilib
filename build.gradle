@@ -199,6 +199,7 @@ ext.useOpenCv = { project ->
                 dependsOn "downloadOpenCvNatives_${openCvPlatform}"
                 from zipTree(project.tasks["downloadOpenCvNatives_${openCvPlatform}"].outputs.files.singleFile)
                 into openCvNativesFolder
+                exclude '**/MANIFEST.MF'
             }
         }
 
@@ -233,6 +234,7 @@ ext.useOpenCv = { project ->
                 dependsOn "downloadOpenCvJni_${openCvPlatform}"
                 from zipTree(project.tasks["downloadOpenCvJni_${openCvPlatform}"].outputs.files.singleFile)
                 into openCvNativesFolder
+                exclude '**/MANIFEST.MF'
             }
         }
 
