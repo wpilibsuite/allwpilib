@@ -152,13 +152,7 @@ def cameraserverZipTask = { project ->
 
     project.build.dependsOn project.cameraserverZip
 
-    def releaseTasks = [project.cameraserverZip]
-
-    if (includeJava) {
-        releaseTasks.add(project.jar)
-    }
-
-    project.releaseSetup(releaseTasks)
+    project.debugStripSetup()
 
     project.tasks.whenTaskAdded { task ->
         def name = task.name.toLowerCase()

@@ -33,27 +33,14 @@ ext.setupDebugDefines = { cppCompiler, linker ->
 // Used only on Windows.
 ext.setupDef = { linker, deffile -> }
 
-ext.releaseSetup = { releaseTasks ->
-    model {
-        binaries {
-            withType(SharedLibraryBinarySpec) { binary ->
-                if (!project.hasProperty('debug')) {
-                    def library = binary.sharedLibraryFile.absolutePath
-                    if (project.tasks.findByName("strip${binary.name}") == null) {
-                        def dsymutil = project.tasks.create("dsymutil${binary.name}", Exec) { task ->
-                            task.commandLine 'dsymutil', library
-                        }
-                        def strip = project.tasks.create("strip${binary.name}", Exec) { task ->
-                            task.commandLine 'strip', '-S', library
-                        }
-                        strip.dependsOn dsymutil
-                        binary.tasks.whenObjectAdded { task ->
-                            if (task.name.contains('link')) {
-                                dsymutil.dependsOn task
-                            }
-                        }
-                    }
-                    releaseTasks.each { it.dependsOn project.tasks.getByName("strip${binary.name}") }
+ext.debugStripSetup = {
+    if (!project.hasProperty('debug')) {
+        project.tasks.whenObjectAdded { task ->
+            if (task.name.contains('link') && task.name.contains('SharedLibrary')) {
+                def library = task.outputFile.absolutePath
+                task.doLast {
+                    exec { commandLine "dsymutil", library }
+                    exec { commandLine "strip", '-S', library }
                 }
             }
         }
