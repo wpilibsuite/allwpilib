@@ -60,14 +60,15 @@ class NetworkConnection {
 
   void QueueOutgoing(std::shared_ptr<Message> msg);
   void PostOutgoing(bool keep_alive);
+  void NotifyIfActive(ConnectionListenerCallback callback) const;
 
   unsigned int uid() const { return m_uid; }
 
   unsigned int proto_rev() const { return m_proto_rev; }
   void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
 
-  State state() const { return static_cast<State>(m_state.load()); }
-  void set_state(State state) { m_state = static_cast<int>(state); }
+  State state() const;
+  void set_state(State state);
 
   std::string remote_id() const;
   void set_remote_id(StringRef remote_id);
@@ -94,7 +95,8 @@ class NetworkConnection {
   std::thread m_write_thread;
   std::atomic_bool m_active;
   std::atomic_uint m_proto_rev;
-  std::atomic_int m_state;
+  mutable std::mutex m_state_mutex;
+  State m_state;
   mutable std::mutex m_remote_id_mutex;
   std::string m_remote_id;
   std::atomic_ullong m_last_update;
