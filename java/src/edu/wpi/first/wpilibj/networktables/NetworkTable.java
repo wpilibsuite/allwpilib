@@ -164,10 +164,10 @@ public class NetworkTable implements ITable, IRemote {
     return out;
   }
 
-  public static double[] toNative(Double[] arr) {
+  public static double[] toNative(Number[] arr) {
     double[] out = new double[arr.length];
     for (int i = 0; i < arr.length; i++)
-      out[i] = arr[i];
+      out[i] = arr[i].doubleValue();
     return out;
   }
 
@@ -852,8 +852,8 @@ public class NetworkTable implements ITable, IRemote {
   public boolean putValue(String key, Object value) throws IllegalArgumentException {
     if (value instanceof Boolean)
       return NetworkTablesJNI.putBoolean(pathWithSep + key, ((Boolean)value).booleanValue());
-    else if (value instanceof Double)
-      return NetworkTablesJNI.putDouble(pathWithSep + key, ((Double)value).doubleValue());
+    else if (value instanceof Number)
+      return NetworkTablesJNI.putDouble(pathWithSep + key, ((Number)value).doubleValue());
     else if (value instanceof String)
       return NetworkTablesJNI.putString(pathWithSep + key, (String)value);
     else if (value instanceof byte[])
@@ -864,8 +864,8 @@ public class NetworkTable implements ITable, IRemote {
       return NetworkTablesJNI.putDoubleArray(pathWithSep + key, (double[])value);
     else if (value instanceof Boolean[])
       return NetworkTablesJNI.putBooleanArray(pathWithSep + key, toNative((Boolean[])value));
-    else if (value instanceof Double[])
-      return NetworkTablesJNI.putDoubleArray(pathWithSep + key, toNative((Double[])value));
+    else if (value instanceof Number[])
+      return NetworkTablesJNI.putDoubleArray(pathWithSep + key, toNative((Number[])value));
     else if (value instanceof String[])
       return NetworkTablesJNI.putStringArray(pathWithSep + key, (String[])value);
     else if (value instanceof BooleanArray)
@@ -875,7 +875,7 @@ public class NetworkTable implements ITable, IRemote {
     else if (value instanceof StringArray)
       return NetworkTablesJNI.putStringArray(pathWithSep + key, (String[])((ArrayData)value).getDataArray());
     else
-      throw new IllegalArgumentException(key);
+      throw new IllegalArgumentException("Value of type " + value.getClass().getName() + " cannot be put into a table");
   }
 
   /**
