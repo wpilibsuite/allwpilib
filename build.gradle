@@ -150,30 +150,6 @@ task downloadOpenCvHeaders() {
     }
 }
 
-task downloadOpenCvJava() {
-    description = 'Downloads the OpenCV Java maven dependency.'
-    group = 'WPILib'
-    def depFolder = "${buildDir}/dependencies"
-    def openCvJavaZip = file("${depFolder}/opencv-java.zip")
-    outputs.file(openCvJavaZip)
-    def openCvJava
-
-    doFirst {
-        def openCvJavaDependency = project.dependencies.create("org.opencv:opencv-java:3.1.0@jar")
-        def openCvJavaConfig = project.configurations.detachedConfiguration(openCvJavaDependency)
-        openCvJavaConfig.setTransitive(false)
-        openCvJava = openCvJavaConfig.files[0].canonicalFile
-    }
-
-    doLast {
-        copy {
-            from openCvJava
-            rename 'opencv-java(.+)', 'opencv-java.zip'
-            into depFolder
-        }
-    }
-}
-
 ext.useOpenCv = { project ->
     def openCvUnzipLocation = "${project.buildDir}/opencv"
 
@@ -185,28 +161,19 @@ ext.useOpenCv = { project ->
         into "${openCvUnzipLocation}/include"
     }
 
-    if (project.includeJava) {
-        project.tasks.create(name: "unzipOpenCvJava", type: Copy) {
-            description = 'Unzips the OpenCV maven dependency so that the include files and libraries can be used'
-            group = 'OpenCv'
-            dependsOn downloadOpenCvJava
-            from zipTree(downloadOpenCvJava.outputs.files.singleFile)
-            into "${openCvUnzipLocation}/java"
-        }
-    }
-
     project.ext.openCv = openCvUnzipLocation
     project.ext.openCvInclude = "$openCvUnzipLocation/include"
 
     project.ext.addOpenCvLibraryLinks = { compileTask, linker, targetPlatform ->
         def openCvPlatform = project.getOpenCvPlatformPackage(targetPlatform)
+        def openCvNativesFolder = "${project.openCv}/${openCvPlatform}"
 
         if (project.tasks.findByPath("unzipOpenCvNatives_${openCvPlatform}") == null) {
             project.tasks.create(name: "downloadOpenCvNatives_${openCvPlatform}") {
                 description = 'Downloads the OpenCV natives maven dependency.'
                 group = 'OpenCv'
                 def depFolder = "${project.buildDir}/dependencies"
-                def openCvNativesZip = file("${depFolder}/opencv-natives.zip")
+                def openCvNativesZip = file("${depFolder}/opencv-natives-${openCvPlatform}.zip")
                 outputs.file(openCvNativesZip)
                 def openCvNatives
 
@@ -220,7 +187,7 @@ ext.useOpenCv = { project ->
                 doLast {
                     copy {
                         from openCvNatives
-                        rename 'opencv-natives(.+)', 'opencv-natives.zip'
+                        rename 'opencv-natives(.+)', "opencv-natives-${openCvPlatform}.zip"
                         into depFolder
                     }
                 }
@@ -231,7 +198,7 @@ ext.useOpenCv = { project ->
                 group = 'OpenCv'
                 dependsOn "downloadOpenCvNatives_${openCvPlatform}"
                 from zipTree(project.tasks["downloadOpenCvNatives_${openCvPlatform}"].outputs.files.singleFile)
-                into "${project.openCv}/${openCvPlatform}"
+                into openCvNativesFolder
             }
         }
 
@@ -240,7 +207,7 @@ ext.useOpenCv = { project ->
                 description = 'Downloads the OpenCV JNI maven dependency.'
                 group = 'OpenCv'
                 def depFolder = "${project.buildDir}/dependencies"
-                def openCvJniZip = file("${depFolder}/opencv-jni.zip")
+                def openCvJniZip = file("${depFolder}/opencv-jni-${openCvPlatform}.zip")
                 outputs.file(openCvJniZip)
                 def openCvJni
 
@@ -254,7 +221,7 @@ ext.useOpenCv = { project ->
                 doLast {
                     copy {
                         from openCvJni
-                        rename 'opencv-jni(.+)', 'opencv-jni.zip'
+                        rename 'opencv-jni(.+)', "opencv-jni-${openCvPlatform}.zip"
                         into depFolder
                     }
                 }
@@ -265,52 +232,52 @@ ext.useOpenCv = { project ->
                 group = 'OpenCv'
                 dependsOn "downloadOpenCvJni_${openCvPlatform}"
                 from zipTree(project.tasks["downloadOpenCvJni_${openCvPlatform}"].outputs.files.singleFile)
-                into "${project.openCv}/${openCvPlatform}"
+                into openCvNativesFolder
             }
         }
 
         compileTask.dependsOn "unzipOpenCvHeaders", "unzipOpenCvNatives_${openCvPlatform}"
         if (project.includeJava) {
-            compileTask.dependsOn "unzipOpenCvJava", "unzipOpenCvJni_${openCvPlatform}"
+            compileTask.dependsOn "unzipOpenCvJni_${openCvPlatform}"
         }
         if (targetPlatform.architecture.arm) {
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_calib3d.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_core.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_features2d.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_flann.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_highgui.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_imgcodecs.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_imgproc.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_ml.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_objdetect.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_photo.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_shape.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_stitching.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_superres.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_video.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_videoio.so"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_videostab.so"
+            linker.args "${openCvNativesFolder}/libopencv_calib3d.so"
+            linker.args "${openCvNativesFolder}/libopencv_core.so"
+            linker.args "${openCvNativesFolder}/libopencv_features2d.so"
+            linker.args "${openCvNativesFolder}/libopencv_flann.so"
+            linker.args "${openCvNativesFolder}/libopencv_highgui.so"
+            linker.args "${openCvNativesFolder}/libopencv_imgcodecs.so"
+            linker.args "${openCvNativesFolder}/libopencv_imgproc.so"
+            linker.args "${openCvNativesFolder}/libopencv_ml.so"
+            linker.args "${openCvNativesFolder}/libopencv_objdetect.so"
+            linker.args "${openCvNativesFolder}/libopencv_photo.so"
+            linker.args "${openCvNativesFolder}/libopencv_shape.so"
+            linker.args "${openCvNativesFolder}/libopencv_stitching.so"
+            linker.args "${openCvNativesFolder}/libopencv_superres.so"
+            linker.args "${openCvNativesFolder}/libopencv_video.so"
+            linker.args "${openCvNativesFolder}/libopencv_videoio.so"
+            linker.args "${openCvNativesFolder}/libopencv_videostab.so"
             linker.args "-ldl"
             linker.args "-lz"
         } else if (targetPlatform.operatingSystem.windows) {
-            linker.args "${project.openCv}/${openCvPlatform}/opencv_core.lib"
+            linker.args "${openCvNativesFolder}/opencv_core.lib"
         } else {
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_calib3d.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_core.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_features2d.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_flann.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_highgui.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_imgcodecs.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_imgproc.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_ml.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_objdetect.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_photo.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_shape.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_stitching.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_superres.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_video.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_videoio.a"
-            linker.args "${project.openCv}/${openCvPlatform}/libopencv_videostab.a"
+            linker.args "${openCvNativesFolder}/libopencv_calib3d.a"
+            linker.args "${openCvNativesFolder}/libopencv_core.a"
+            linker.args "${openCvNativesFolder}/libopencv_features2d.a"
+            linker.args "${openCvNativesFolder}/libopencv_flann.a"
+            linker.args "${openCvNativesFolder}/libopencv_highgui.a"
+            linker.args "${openCvNativesFolder}/libopencv_imgcodecs.a"
+            linker.args "${openCvNativesFolder}/libopencv_imgproc.a"
+            linker.args "${openCvNativesFolder}/libopencv_ml.a"
+            linker.args "${openCvNativesFolder}/libopencv_objdetect.a"
+            linker.args "${openCvNativesFolder}/libopencv_photo.a"
+            linker.args "${openCvNativesFolder}/libopencv_shape.a"
+            linker.args "${openCvNativesFolder}/libopencv_stitching.a"
+            linker.args "${openCvNativesFolder}/libopencv_superres.a"
+            linker.args "${openCvNativesFolder}/libopencv_video.a"
+            linker.args "${openCvNativesFolder}/libopencv_videoio.a"
+            linker.args "${openCvNativesFolder}/libopencv_videostab.a"
             linker.args "-ldl"
             linker.args "-lz"
         }
