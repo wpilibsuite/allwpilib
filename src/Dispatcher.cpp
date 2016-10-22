@@ -204,7 +204,6 @@ void DispatcherBase::DispatchThreadMain() {
 
   int count = 0;
 
-  std::unique_lock<std::mutex> flush_lock(m_flush_mutex);
   while (m_active) {
     // handle loop taking too long
     auto start = std::chrono::steady_clock::now();
@@ -213,9 +212,11 @@ void DispatcherBase::DispatchThreadMain() {
 
     // wait for periodic or when flushed
     timeout_time += std::chrono::milliseconds(m_update_rate);
+    std::unique_lock<std::mutex> flush_lock(m_flush_mutex);
     m_flush_cv.wait_until(flush_lock, timeout_time,
                           [&] { return !m_active || m_do_flush; });
     m_do_flush = false;
+    flush_lock.unlock();
     if (!m_active) break;  // in case we were woken up to terminate
 
     // perform periodic persistent save
