@@ -57,11 +57,7 @@ def wpiutilZipTask = { project ->
         }
     }
 
-    project.build.dependsOn project.wpiutilZip
-
-    def releaseTasks = [project.wpiutilZip]
-
-    project.releaseSetup(releaseTasks)
+    project.debugStripSetup()
 
     project.tasks.whenTaskAdded { task ->
         def name = task.name.toLowerCase()

@@ -49,4 +49,4 @@ ext.setupDef = { linker, deffile ->
 
 // This is a noop on Windows. On gcc platforms, we strip the release binary and create a separate
 // debug library, but Windows already separates debug symbols into a .pdb file.
-ext.releaseSetup = { releaseTasks -> }
+ext.debugStripSetup = { }
