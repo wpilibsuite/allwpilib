@@ -119,11 +119,12 @@ public class CameraServerJNI {
   public static native void putSourceFrame(int source, long imageNativeObj);
   public static native void notifySourceError(int source, String msg);
   public static native void setSourceConnected(int source, boolean connected);
-  public static native int createSourceProperty(int source, String name, int type);
+  public static native void setSourceDescription(int source, String description);
+  public static native int createSourceProperty(int source, String name, int type, int minimum, int maximum, int step, int defaultValue, int value);
   //public static native int createSourcePropertyCallback(int source, String name,
-  //                                    int type,
-  //                                    void (*onChange)(String name,
-  //                                                     int property));
+  //                                    int type, int minimum, int maximum, int step, int defaultValue, int value,
+  //                                    void (*onChange)(int property));
+  public static native void setSourceEnumPropertyChoices(int source, int property, String[] choices);
   public static native void removeSourceProperty(int source, int property);
   public static native void removeSourcePropertyByName(int source, String name);
 

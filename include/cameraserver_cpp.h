@@ -138,11 +138,19 @@ void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
 void NotifySourceError(CS_Source source, llvm::StringRef msg,
                        CS_Status* status);
 void SetSourceConnected(CS_Source source, bool connected, CS_Status* status);
+void SetSourceDescription(CS_Source source, llvm::StringRef description,
+                          CS_Status* status);
 CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
-                                 CS_PropertyType type, CS_Status* status);
+                                 CS_PropertyType type, int minimum, int maximum,
+                                 int step, int defaultValue, int value,
+                                 CS_Status* status);
 CS_Property CreateSourcePropertyCallback(
-    CS_Source source, llvm::StringRef name, CS_PropertyType type,
+    CS_Source source, llvm::StringRef name, CS_PropertyType type, int minimum,
+    int maximum, int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange, CS_Status* status);
+void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
+                                  llvm::ArrayRef<std::string> choices,
+                                  CS_Status* status);
 void RemoveSourceProperty(CS_Source source, CS_Property property,
                           CS_Status* status);
 void RemoveSourceProperty(CS_Source source, llvm::StringRef name,

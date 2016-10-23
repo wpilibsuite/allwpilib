@@ -150,12 +150,19 @@ void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
 void CS_NotifySourceError(CS_Source source, const char* msg, CS_Status* status);
 void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
                            CS_Status* status);
+void CS_SetSourceDescription(CS_Source source, const char* description,
+                             CS_Status* status);
 CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
-                                    enum CS_PropertyType type,
-                                    CS_Status* status);
+                                    enum CS_PropertyType type, int minimum,
+                                    int maximum, int step, int defaultValue,
+                                    int value, CS_Status* status);
 CS_Property CS_CreateSourcePropertyCallback(
-    CS_Source source, const char* name, enum CS_PropertyType type, void* data,
+    CS_Source source, const char* name, enum CS_PropertyType type, int minimum,
+    int maximum, int step, int defaultValue, int value, void* data,
     void (*onChange)(void* data, CS_Property property), CS_Status* status);
+void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
+                                     const char** choices, int count,
+                                     CS_Status* status);
 void CS_RemoveSourceProperty(CS_Source source, CS_Property property,
                              CS_Status* status);
 void CS_RemoveSourcePropertyByName(CS_Source source, const char* name,

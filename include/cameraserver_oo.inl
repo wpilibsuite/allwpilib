@@ -197,25 +197,41 @@ inline void CvSource::SetConnected(bool connected) {
   SetSourceConnected(m_handle, connected, &m_status);
 }
 
+inline void CvSource::SetDescription(llvm::StringRef description) {
+  m_status = 0;
+  SetSourceDescription(m_handle, description, &m_status);
+}
+
 inline VideoProperty CvSource::CreateProperty(llvm::StringRef name,
-                                              VideoProperty::Type type) {
+                                              VideoProperty::Type type,
+                                              int minimum, int maximum,
+                                              int step, int defaultValue,
+                                              int value) {
   m_status = 0;
   return VideoProperty{CreateSourceProperty(
       m_handle, name, static_cast<CS_PropertyType>(static_cast<int>(type)),
-      &m_status)};
+      minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
 inline VideoProperty CvSource::CreateProperty(
-    llvm::StringRef name, VideoProperty::Type type,
+    llvm::StringRef name, VideoProperty::Type type, int minimum, int maximum,
+    int step, int defaultValue, int value,
     std::function<void(VideoProperty property)> onChange) {
   m_status = 0;
   return VideoProperty{CreateSourcePropertyCallback(
       m_handle, name, static_cast<CS_PropertyType>(static_cast<int>(type)),
+      minimum, maximum, step, defaultValue, value,
       [=](CS_Property property) { onChange(VideoProperty{property}); },
       &m_status)};
 }
 
-inline void CvSource::RemoveProperty(VideoProperty property) {
+inline void CvSource::SetEnumPropertyChoices(
+    const VideoProperty& property, llvm::ArrayRef<std::string> choices) {
+  m_status = 0;
+  SetSourceEnumPropertyChoices(m_handle, property.m_handle, choices, &m_status);
+}
+
+inline void CvSource::RemoveProperty(const VideoProperty& property) {
   m_status = 0;
   RemoveSourceProperty(m_handle, property.m_handle, &m_status);
 }

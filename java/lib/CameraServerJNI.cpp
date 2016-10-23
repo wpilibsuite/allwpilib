@@ -563,18 +563,56 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSourceConnec
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    createSourceProperty
- * Signature: (ILjava/lang/String;I)I
+ * Method:    setSourceDescription
+ * Signature: (ILjava/lang/String;)V
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createSourceProperty
-  (JNIEnv *env, jclass, jint source, jstring name, jint type)
+JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSourceDescription
+  (JNIEnv *env, jclass, jint source, jstring description)
 {
   CS_Status status = 0;
-  auto val =
-      cs::CreateSourceProperty(source, JStringRef{env, name},
-                               static_cast<CS_PropertyType>(type), &status);
+  cs::SetSourceDescription(source, JStringRef{env, description}, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    createSourceProperty
+ * Signature: (ILjava/lang/String;IIIIII)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_createSourceProperty
+  (JNIEnv *env, jclass, jint source, jstring name, jint type, jint minimum, jint maximum, jint step, jint defaultValue, jint value)
+{
+  CS_Status status = 0;
+  auto val = cs::CreateSourceProperty(
+      source, JStringRef{env, name}, static_cast<CS_PropertyType>(type),
+      minimum, maximum, step, defaultValue, value, &status);
   CheckStatus(env, status);
   return val;
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    setSourceEnumPropertyChoices
+ * Signature: (II[Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSourceEnumPropertyChoices
+  (JNIEnv *env, jclass, jint source, jint property, jobjectArray choices)
+{
+  size_t len = env->GetArrayLength(choices);
+  llvm::SmallVector<std::string, 8> vec;
+  vec.reserve(len);
+  for (size_t i = 0; i < len; ++i) {
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(choices, i))};
+    if (!elem) {
+      // TODO
+      return;
+    }
+    vec.push_back(JStringRef{env, elem}.str());
+  }
+  CS_Status status = 0;
+  cs::SetSourceEnumPropertyChoices(source, property, vec, &status);
+  CheckStatus(env, status);
 }
 
 /*

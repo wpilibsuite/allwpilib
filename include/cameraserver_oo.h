@@ -224,24 +224,47 @@ class CvSource : public VideoSource {
   /// @param connected True for connected, false for disconnected
   void SetConnected(bool connected);
 
+  /// Set source description.
+  /// @param description Description
+  void SetDescription(llvm::StringRef description);
+
   /// Create a property.
   /// @param name Property name
   /// @param type Property type
+  /// @param minimum Minimum value
+  /// @param maximum Maximum value
+  /// @param step Step value
+  /// @param defaultValue Default value
+  /// @param value Current value
   /// @return Property
-  VideoProperty CreateProperty(llvm::StringRef name, VideoProperty::Type type);
+  VideoProperty CreateProperty(llvm::StringRef name, VideoProperty::Type type,
+                               int minimum, int maximum, int step,
+                               int defaultValue, int value);
 
   /// Create a property with a change callback.
   /// @param name Property name
   /// @param type Property type
+  /// @param minimum Minimum value
+  /// @param maximum Maximum value
+  /// @param step Step value
+  /// @param defaultValue Default value
+  /// @param value Current value
   /// @param onChange Callback to call when the property value changes
   /// @return Property
   VideoProperty CreateProperty(
-      llvm::StringRef name, VideoProperty::Type type,
+      llvm::StringRef name, VideoProperty::Type type, int minimum, int maximum,
+      int step, int defaultValue, int value,
       std::function<void(VideoProperty property)> onChange);
+
+  /// Configure enum property choices.
+  /// @param property Property
+  /// @param choices Choices
+  void SetEnumPropertyChoices(const VideoProperty& property,
+                              llvm::ArrayRef<std::string> choices);
 
   /// Remove a property.
   /// @param property Property
-  void RemoveProperty(VideoProperty property);
+  void RemoveProperty(const VideoProperty& property);
 
   /// Remove a property.
   /// @param name Property name

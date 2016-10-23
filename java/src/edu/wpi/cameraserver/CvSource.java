@@ -46,24 +46,47 @@ public class CvSource extends VideoSource {
     CameraServerJNI.setSourceConnected(m_handle, connected);
   }
 
+  /// Set source description.
+  /// @param description Description
+  public void setDescription(String description) {
+    CameraServerJNI.setSourceDescription(m_handle, description);
+  }
+
   /// Create a property.
   /// @param name Property name
   /// @param type Property type
+  /// @param minimum Minimum value
+  /// @param maximum Maximum value
+  /// @param step Step value
+  /// @param defaultValue Default value
+  /// @param value Current value
   /// @return Property
-  public VideoProperty createProperty(String name, VideoProperty.Type type) {
+  public VideoProperty createProperty(String name, VideoProperty.Type type, int minimum, int maximum, int step, int defaultValue, int value) {
     return new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle, name, type.getValue()));
+        CameraServerJNI.createSourceProperty(m_handle, name, type.getValue(), minimum, maximum, step, defaultValue, value));
   }
 
   /// Create a property with a change callback.
   /// @param name Property name
   /// @param type Property type
+  /// @param minimum Minimum value
+  /// @param maximum Maximum value
+  /// @param step Step value
+  /// @param defaultValue Default value
+  /// @param value Current value
   /// @param onChange Callback to call when the property value changes
   /// @return Property
   //public VideoProperty createProperty(
-  //    String name, VideoProperty.Type type,
-  //    std::function<void(String name, VideoProperty property)>
+  //    String name, VideoProperty.Type type, int minimum, int maximum, int step, int defaultValue, int value,
+  //    std::function<void(VideoProperty property)>
   //        onChange);
+
+  /// Configure enum property choices.
+  /// @param property Property
+  /// @param choices Choices
+  public void SetEnumPropertyChoices(VideoProperty property, String[] choices) {
+    CameraServerJNI.setSourceEnumPropertyChoices(m_handle, property.m_handle, choices);
+  }
 
   /// Remove a property.
   /// @param name Property name

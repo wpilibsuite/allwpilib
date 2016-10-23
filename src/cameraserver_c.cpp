@@ -198,19 +198,35 @@ void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
   return cs::SetSourceConnected(source, connected, status);
 }
 
+void CS_SetSourceDescription(CS_Source source, const char* description,
+                             CS_Status* status) {
+  return cs::SetSourceDescription(source, description, status);
+}
+
 CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
-                                    enum CS_PropertyType type,
-                                    CS_Status* status) {
-  return cs::CreateSourceProperty(source, name, type, status);
+                                    enum CS_PropertyType type, int minimum,
+                                    int maximum, int step, int defaultValue,
+                                    int value, CS_Status* status) {
+  return cs::CreateSourceProperty(source, name, type, minimum, maximum, step,
+                                  defaultValue, value, status);
 }
 
 CS_Property CS_CreateSourcePropertyCallback(
-    CS_Source source, const char* name, enum CS_PropertyType type, void* data,
-    void (*onChange)(void* data, CS_Property property),
-    CS_Status* status) {
+    CS_Source source, const char* name, enum CS_PropertyType type, int minimum,
+    int maximum, int step, int defaultValue, int value, void* data,
+    void (*onChange)(void* data, CS_Property property), CS_Status* status) {
   return cs::CreateSourcePropertyCallback(
-      source, name, type,
+      source, name, type, minimum, maximum, step, defaultValue, value,
       [=](CS_Property property) { onChange(data, property); }, status);
+}
+
+void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
+                                     const char** choices, int count,
+                                     CS_Status* status) {
+  llvm::SmallVector<std::string, 8> vec;
+  vec.reserve(count);
+  for (int i = 0; i < count; ++i) vec.push_back(choices[i]);
+  return cs::SetSourceEnumPropertyChoices(source, property, vec, status);
 }
 
 void CS_RemoveSourceProperty(CS_Source source, CS_Property property,
