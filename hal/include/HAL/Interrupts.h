@@ -39,6 +39,9 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
 void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
                                 HAL_InterruptHandlerFunction handler,
                                 void* param, int32_t* status);
+void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interruptHandle,
+                                        HAL_InterruptHandlerFunction handler,
+                                        void* param, int32_t* status);
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status);

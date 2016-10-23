@@ -19,6 +19,7 @@
 #include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
+#include "support/SafeThread.h"
 
 static const int32_t kTimerInterruptNumber = 28;
 
@@ -35,8 +36,55 @@ struct Notifier {
   HAL_NotifierProcessFunction process;
   uint64_t triggerTime = UINT64_MAX;
   HAL_NotifierHandle handle;
+  bool threaded;
 };
-}
+
+// Safe thread to allow callbacks to run on their own thread
+class NotifierThread : public wpi::SafeThread {
+ public:
+  void Main() {
+    std::unique_lock<std::mutex> lock(m_mutex);
+    while (m_active) {
+      m_cond.wait(lock, [&] { return !m_active || m_notify; });
+      if (!m_active) break;
+      m_notify = false;
+      uint64_t currentTime = m_currentTime;
+      HAL_NotifierHandle handle = m_handle;
+      HAL_NotifierProcessFunction process = m_process;
+      lock.unlock();  // don't hold mutex during callback execution
+      process(currentTime, handle);
+      lock.lock();
+    }
+  }
+
+  bool m_notify = false;
+  HAL_NotifierHandle m_handle = HAL_kInvalidHandle;
+  HAL_NotifierProcessFunction m_process;
+  uint64_t m_currentTime;
+};
+
+class NotifierThreadOwner : public wpi::SafeThreadOwner<NotifierThread> {
+ public:
+  void SetFunc(HAL_NotifierProcessFunction process, void* param) {
+    auto thr = GetThread();
+    if (!thr) return;
+    thr->m_process = process;
+    m_param = param;
+  }
+
+  void Notify(uint64_t currentTime, HAL_NotifierHandle handle) {
+    auto thr = GetThread();
+    if (!thr) return;
+    thr->m_currentTime = currentTime;
+    thr->m_handle = handle;
+    thr->m_notify = true;
+    thr->m_cond.notify_one();
+  }
+
+  void* m_param;
+};
+}  // namespace
+
 static std::shared_ptr<Notifier> notifiers;
 static std::atomic_flag notifierAtexitRegistered = ATOMIC_FLAG_INIT;
 static std::atomic_int notifierRefCount{0};
@@ -108,6 +156,18 @@ static void cleanupNotifierAtExit() {
   notifierManager = nullptr;
 }
 
+static void threadedNotifierHandler(uint64_t currentTimeInt,
+                                    HAL_NotifierHandle handle) {
+  // Grab notifier and get handler param
+  auto notifier = notifierHandles.Get(handle);
+  if (!notifier) return;
+  auto notifierPointer = notifier->param;
+  if (notifierPointer == nullptr) return;
+  NotifierThreadOwner* owner =
+      static_cast<NotifierThreadOwner*>(notifierPointer);
+  owner->Notify(currentTimeInt, handle);
+}
+
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
@@ -143,8 +203,32 @@ HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
   notifier->param = param;
   notifier->process = process;
   notifier->handle = handle;
+  notifier->threaded = false;
   notifiers = notifier;
   return handle;
+}
+
+HAL_NotifierHandle HAL_InitializeNotifierThreaded(
+    HAL_NotifierProcessFunction process, void* param, int32_t* status) {
+  NotifierThreadOwner* notify = new NotifierThreadOwner;
+  notify->Start();
+  notify->SetFunc(process, param);
+
+  auto notifierHandle =
+      HAL_InitializeNotifier(threadedNotifierHandler, notify, status);
+
+  if (notifierHandle == HAL_kInvalidHandle || *status != 0) {
+    delete notify;
+    return HAL_kInvalidHandle;
+  }
+
+  auto notifier = notifierHandles.Get(notifierHandle);
+  if (!notifier) {
+    return HAL_kInvalidHandle;
+  }
+  notifier->threaded = true;
+
+  return notifierHandle;
 }
 
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
@@ -158,6 +242,12 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
     if (notifier->next) notifier->next->prev = notifier->prev;
     if (notifiers == notifier) notifiers = notifier->next;
     notifierHandles.Free(notifierHandle);
+
+    if (notifier->threaded) {
+      NotifierThreadOwner* owner =
+          static_cast<NotifierThreadOwner*>(notifier->param);
+      delete owner;
+    }
   }
 
   if (notifierRefCount.fetch_sub(1) == 1) {
@@ -178,6 +268,12 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 void* HAL_GetNotifierParam(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles.Get(notifierHandle);
   if (!notifier) return nullptr;
+  if (notifier->threaded) {
+    // If threaded, return thread param rather then notifier param
+    NotifierThreadOwner* owner =
+        static_cast<NotifierThreadOwner*>(notifier->param);
+    return owner->m_param;
+  }
   return notifier->param;
 }
 
