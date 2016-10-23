@@ -441,6 +441,8 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
  * @return The loop time
  */
 int32_t HAL_GetLoopTiming(int32_t* status) {
+  initializeDigital(status);
+  if (*status != 0) return 0;
   return pwmSystem->readLoopTiming(status);
 }
 }

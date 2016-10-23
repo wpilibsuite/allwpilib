@@ -7,6 +7,7 @@
 
 #include "DigitalInternal.h"
 
+#include <atomic>
 #include <mutex>
 #include <thread>
 
@@ -27,7 +28,8 @@ std::unique_ptr<tDIO> digitalSystem;
 std::unique_ptr<tRelay> relaySystem;
 std::unique_ptr<tPWM> pwmSystem;
 
-bool digitalSystemsInitialized = false;
+static std::atomic<bool> digitalSystemsInitialized{false};
+static priority_mutex initializeMutex;
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalChannels + kNumPWMHeaders>
@@ -37,6 +39,11 @@ DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
  * Initialize the digital system.
  */
 void initializeDigital(int32_t* status) {
+  // Initial check, as if it's true initialization has finished
+  if (digitalSystemsInitialized) return;
+
+  std::lock_guard<priority_mutex> lock(initializeMutex);
+  // Second check in case another thread was waiting
   if (digitalSystemsInitialized) return;
 
   digitalSystem.reset(tDIO::create(status));

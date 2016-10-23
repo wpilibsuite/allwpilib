@@ -63,8 +63,6 @@ extern std::unique_ptr<tDIO> digitalSystem;
 extern std::unique_ptr<tRelay> relaySystem;
 extern std::unique_ptr<tPWM> pwmSystem;
 
-extern bool digitalSystemsInitialized;
-
 struct DigitalPort {
   uint8_t channel;
   bool configSet = false;
