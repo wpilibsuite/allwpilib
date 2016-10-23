@@ -14,22 +14,20 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
-import edu.wpi.first.wpilibj.util.AllocationException;
-import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
- * Solenoid class for running high voltage Digital Output.
+ * Solenoid class for running high voltage Digital Output on the PCM.
  *
- * <p>The Solenoid class is typically used for pneumatics solenoids, but could be used for any
+ * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any
  * device within the current spec of the PCM.
  */
 public class Solenoid extends SolenoidBase implements LiveWindowSendable {
 
-  private final int m_channel; // /< The channel to control.
+  private final int m_channel; // The channel to control.
   private int m_solenoidHandle;
 
   /**
-   * Constructor using the default PCM ID (0)
+   * Constructor using the default PCM ID (defaults to 0).
    *
    * @param channel The channel on the PCM to control (0..7).
    */
@@ -72,7 +70,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   /**
    * Set the value of a solenoid.
    *
-   * @param on Turn the solenoid output off or on.
+   * @param on True will turn the solenoid output on. False will turn the solenoid output off.
    */
   public void set(boolean on) {
     SolenoidJNI.setSolenoid(m_solenoidHandle, on);
@@ -81,7 +79,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   /**
    * Read the current value of the solenoid.
    *
-   * @return The current value of the solenoid.
+   * @return True if the solenoid output is on or false if the solenoid output is off.
    */
   public boolean get() {
     return SolenoidJNI.getSolenoid(m_solenoidHandle);
@@ -96,7 +94,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    */
   public boolean isBlackListed() {
     int value = getPCMSolenoidBlackList() & (1 << m_channel);
-    return (value != 0);
+    return value != 0;
   }
 
   /*
@@ -127,11 +125,10 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     }
   }
 
-
   @Override
   public void startLiveWindowMode() {
     set(false); // Stop for safety
-    m_tableListener = (itable, key, value, bln) -> set((Boolean) value);
+    m_tableListener = (source, key, value, isNew) -> set((Boolean) value);
     m_table.addTableListener("Value", m_tableListener, true);
   }
 
