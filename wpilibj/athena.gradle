@@ -14,6 +14,8 @@ dependencies {
     athenaRuntime 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
 }
 
+defineWpiUtilProperties()
+
 // Configuration for the HAL bindings
 model {
     components {
@@ -23,6 +25,7 @@ model {
                 tasks.withType(CppCompile) {
                     dependsOn jniHeaders
                     addNiLibraryLinks(linker, targetPlatform)
+                    addWpiUtilLibraryLinks(it, linker, targetPlatform)
                 }
             }
             sources {
@@ -35,7 +38,7 @@ model {
                         // JDK is included for jni.h. We also need the arm-linux specific headers. This does not need to change
                         // when compiling on Windows
                         // The JNI headers are put into the build/include directory by the jniHeaders task on wpilibJavaDevices
-                        srcDirs = ["$jniDir/include", "$jniDir/include/linux"]
+                        srcDirs = ["$jniDir/include", "$jniDir/include/linux", wpiUtilInclude]
                         jniHeaders.outputs.files.each { file ->
                             srcDirs file.getPath()
                         }
