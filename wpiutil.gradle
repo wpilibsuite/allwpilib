@@ -52,11 +52,8 @@ def wpiutilZipTask = { project ->
                     from(binary.sharedLibraryFile) {
                         into getPlatformPath(binary)
                     }
-                    def debugFile = new File(binary.sharedLibraryFile.absolutePath + ".debug")
-                    if (debugFile.exists()) {
-                        from(debugFile) {
-                            into getPlatformPath(binary)
-                        }
+                    from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                        into getPlatformPath(binary)
                     }
                 }
             }
