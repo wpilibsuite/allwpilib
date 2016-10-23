@@ -71,7 +71,7 @@ class InterruptThreadOwner : public wpi::SafeThreadOwner<InterruptThread> {
 }  // namespace
 
 static void threadedInterruptHandler(uint32_t mask, void* param) {
-  (static_cast<InterruptThreadOwner*>(param))->Notify(mask);
+  static_cast<InterruptThreadOwner*>(param)->Notify(mask);
 }
 
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
