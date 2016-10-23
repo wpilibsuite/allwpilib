@@ -32,6 +32,16 @@ SourceImpl::~SourceImpl() {
   // Everything else can clean up itself.
 }
 
+uint64_t SourceImpl::GetCurFrameTime() {
+  std::unique_lock<std::mutex> lock{m_frameMutex};
+  return m_frame.time();
+}
+
+Frame SourceImpl::GetCurFrame() {
+  std::unique_lock<std::mutex> lock{m_frameMutex};
+  return m_frame;
+}
+
 Frame SourceImpl::GetNextFrame() {
   std::unique_lock<std::mutex> lock{m_frameMutex};
   // TODO: handle spurious wakeup by comparing frame timestamps

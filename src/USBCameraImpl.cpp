@@ -31,6 +31,7 @@
 
 #include "llvm/raw_ostream.h"
 #include "llvm/SmallString.h"
+#include "support/timestamp.h"
 
 #include "cameraserver_cpp.h"
 #include "c_util.h"
@@ -561,7 +562,7 @@ void USBCameraImpl::CameraThreadMain() {
                  llvm::StringRef(
                      static_cast<const char*>(m_buffers[buf.index].m_data),
                      static_cast<std::size_t>(buf.bytesused)),
-                 Frame::Time{});  // TODO: time
+                 wpi::Now());  // TODO: time
       }
 
       // Requeue buffer

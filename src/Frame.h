@@ -9,7 +9,6 @@
 #define CAMERASERVER_FRAME_H_
 
 #include <atomic>
-#include <chrono>
 #include <memory>
 
 #include "llvm/StringRef.h"
@@ -24,7 +23,7 @@ class Frame {
   friend class SourceImpl;
 
  public:
-  typedef std::chrono::system_clock::time_point Time;
+  typedef uint64_t Time;
 
  private:
   struct Data {

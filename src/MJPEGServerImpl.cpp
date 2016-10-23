@@ -401,9 +401,7 @@ void MJPEGServerImpl::SendStream(wpi::raw_socket_ostream& os) {
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
     // with firefox
-    double timestamp = std::chrono::duration_cast<std::chrono::seconds>(
-                           frame.time().time_since_epoch())
-                           .count();
+    double timestamp = frame.time() / 10000000.0;
     header.clear();
     oss << "Content-Type: image/jpeg\r\n"
         << "Content-Length: " << frame.size() << "\r\n"

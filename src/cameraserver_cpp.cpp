@@ -198,7 +198,12 @@ llvm::StringRef GetSourceDescription(CS_Source source,
 }
 
 uint64_t GetSourceLastFrameTime(CS_Source source, CS_Status* status) {
-  return 0;  // TODO
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  return data->source->GetCurFrameTime();
 }
 
 bool IsSourceConnected(CS_Source source, CS_Status* status) {
