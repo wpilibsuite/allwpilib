@@ -6,6 +6,8 @@ apply plugin: 'cpp'
 
 defineWpiUtilProperties()
 
+debugStripSetup(project)
+
 model {
     components {
         HALAthena(NativeLibrarySpec) {

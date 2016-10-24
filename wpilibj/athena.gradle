@@ -4,6 +4,8 @@ def jniDir = 'src/athena/cpp'
 def generatedJNIHeaderLoc = "$buildDir/include"
 def ntSourceDir = "$buildDir/ntSources"
 
+debugStripSetup(project)
+
 sourceSets {
     athena
 }
@@ -115,8 +117,11 @@ task wpilibJNativeLibraries(type: Jar) {
     // Include the JNI library
     model {
         binaries {
-            withType(SharedLibraryBinarySpec) {
-                from(file(it.sharedLibraryFile)) {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into '/'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
                     into '/'
                 }
             }
@@ -129,6 +134,9 @@ task wpilibJNativeLibraries(type: Jar) {
         binaries{
             withType(SharedLibraryBinarySpec) { spec ->
                 from(spec.sharedLibraryFile) {
+                    into '/'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
                     into '/'
                 }
             }
