@@ -1,6 +1,8 @@
 defineNetworkTablesProperties()
 defineWpiUtilProperties()
 
+debugStripSetup(project)
+
 def ntSourceDir = "$buildDir/ntSources"
 
 model {
@@ -70,6 +72,9 @@ task wpilibcZip(type: Zip) {
                 from(spec.sharedLibraryFile) {
                     into 'lib'
                 }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
+                    into 'lib'
+                }
             }
         }
     }
@@ -78,6 +83,11 @@ task wpilibcZip(type: Zip) {
     from(netSharedLib) {
         into 'lib'
     }
+    
+    from(netSharedLibDebug) {
+        into 'lib'
+    }
+    
     from(wpiUtilStaticLib) {
         into 'lib'
     }
