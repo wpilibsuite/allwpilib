@@ -52,3 +52,53 @@ model {
 //        }
     }
 }
+
+task halZip(type: Zip) {
+    description = 'Zips the HAL'
+    group = 'WPILib'
+    baseName = 'hal'
+    destinationDir = project.buildDir
+    classifier = 'hal'
+    duplicatesStrategy = 'exclude'
+    
+    // Include the static library file and header files from this project
+    model {
+        binaries {
+            withType(StaticLibraryBinarySpec) { spec ->
+                spec.headerDirs.each {
+                    from(it) {
+                        into 'include'
+                        // We don't want to include any of the .cpp files that are in some of the header directories
+                        exclude '**/*.cpp'
+                    }
+                }
+            }
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into 'lib'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
+                    into 'lib'
+                }
+            }
+        }
+    }
+    
+    // Include the wpiutil static lib
+    from(wpiUtilStaticLib) {
+        into 'lib'
+    }
+    
+    // Finally, include all of the shared library objects from the ni directory
+    from(project.file('../ni-libraries')) {
+        into 'lib'
+        exclude 'genlinks'
+    }
+    
+    // Add the hal static and shared libraries as a dependency
+project(':hal').tasks.whenTaskAdded { task ->
+    if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
+        halZip.dependsOn task
+    }
+}
+}
