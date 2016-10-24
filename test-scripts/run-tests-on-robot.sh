@@ -177,7 +177,7 @@ export eval `/sbin/fw_printenv DeviceCode FPGADeviceCode DeviceDesc TargetClass`
 RUN_COMMAND=none
 if [[ ${LANGUAGE} = java ]]; then
 	chmod a+x ${DEFAULT_JAVA_TEST_NAME}
-	RUN_COMMAND="env LD_LIBRARY_PATH=/opt/GenICam_v3_0_NI/bin/Linux32_ARM/ ${DEFAULT_PATH_TO_JRE} -ea -jar ${DEFAULT_JAVA_TEST_NAME} ${TEST_RUN_ARGS}"
+	RUN_COMMAND="env LD_LIBRARY_PATH=/opt/GenICam_v3_0_NI/bin/Linux32_ARM/:/usr/local/frc/lib ${DEFAULT_PATH_TO_JRE} -ea -jar ${DEFAULT_JAVA_TEST_NAME} ${TEST_RUN_ARGS}"
 elif [[ ${LANGUAGE} = cpp ]]; then
 	chmod a+x ${DEFAULT_CPP_TEST_NAME}
 	RUN_COMMAND="./${DEFAULT_CPP_TEST_NAME} ${TEST_RUN_ARGS}"
