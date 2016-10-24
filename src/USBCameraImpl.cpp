@@ -89,12 +89,10 @@ static llvm::StringRef NormalizeName(llvm::StringRef name,
 #ifdef VIDIOC_QUERY_EXT_CTRL
 USBCameraImpl::PropertyData::PropertyData(
     const struct v4l2_query_ext_ctrl& ctrl)
-    : id(ctrl.id & V4L2_CTRL_ID_MASK),
-      type(ctrl.type),
-      minimum(ctrl.minimum),
-      maximum(ctrl.maximum),
-      step(ctrl.step),
-      defaultValue(ctrl.default_value) {
+    : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.minimum, ctrl.maximum,
+                   ctrl.step, ctrl.default_value, 0),
+      id(ctrl.id & V4L2_CTRL_ID_MASK),
+      type(ctrl.type) {
   // propType
   switch (ctrl.type) {
     case V4L2_CTRL_TYPE_INTEGER:
@@ -124,12 +122,10 @@ USBCameraImpl::PropertyData::PropertyData(
 #endif
 
 USBCameraImpl::PropertyData::PropertyData(const struct v4l2_queryctrl& ctrl)
-    : id(ctrl.id & V4L2_CTRL_ID_MASK),
-      type(ctrl.type),
-      minimum(ctrl.minimum),
-      maximum(ctrl.maximum),
-      step(ctrl.step),
-      defaultValue(ctrl.default_value) {
+    : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.minimum, ctrl.maximum,
+                   ctrl.step, ctrl.default_value, 0),
+      id(ctrl.id & V4L2_CTRL_ID_MASK),
+      type(ctrl.type) {
   // propType
   switch (ctrl.type) {
     case V4L2_CTRL_TYPE_INTEGER:
@@ -176,9 +172,10 @@ static inline int CheckedIoctl(int fd, unsigned long req, void* data,
 #define TryIoctl(fd, req, data) \
   CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, true)
 
-static int ExtCtrlIoctl(int fd, __u32* id, USBCameraImpl::PropertyData* prop) {
+static std::unique_ptr<USBCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
+                                                                 __u32* id) {
   int rc;
-  bool done = false;
+  std::unique_ptr<USBCameraImpl::PropertyData> prop;
 #ifdef VIDIOC_QUERY_EXT_CTRL
   v4l2_query_ext_ctrl qc_ext;
   std::memset(&qc_ext, 0, sizeof(qc_ext));
@@ -187,34 +184,35 @@ static int ExtCtrlIoctl(int fd, __u32* id, USBCameraImpl::PropertyData* prop) {
   if (rc == 0) {
     *id = qc_ext.id;  // copy back
     // We don't support array types
-    if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return 0;
-    *prop = qc_ext;
-    done = true;
+    if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return nullptr;
+    prop = llvm::make_unique<USBCameraImpl::PropertyData>(qc_ext);
   }
 #endif
-  if (!done) {
+  if (!prop) {
     // Fall back to normal QUERYCTRL
     struct v4l2_queryctrl qc;
     std::memset(&qc, 0, sizeof(qc));
     qc.id = *id;
     rc = TryIoctl(fd, VIDIOC_QUERYCTRL, &qc);
     *id = qc.id;  // copy back
-    if (rc != 0) return rc;
-    *prop = qc;
+    if (rc != 0) return nullptr;
+    prop = llvm::make_unique<USBCameraImpl::PropertyData>(qc);
   }
 
   // Cache enum property choices
-  if (prop->propType != CS_PROP_ENUM) return 0;
-  prop->enumChoices.resize(prop->maximum + 1);
-  v4l2_querymenu qmenu;
-  std::memset(&qmenu, 0, sizeof(qmenu));
-  qmenu.id = *id;
-  for (int i = prop->minimum; i <= prop->maximum; ++i) {
-    qmenu.index = static_cast<__u32>(i);
-    if (TryIoctl(fd, VIDIOC_QUERYMENU, &qmenu) != 0) continue;
-    prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
+  if (prop->propType == CS_PROP_ENUM) {
+    prop->enumChoices.resize(prop->maximum + 1);
+    v4l2_querymenu qmenu;
+    std::memset(&qmenu, 0, sizeof(qmenu));
+    qmenu.id = *id;
+    for (int i = prop->minimum; i <= prop->maximum; ++i) {
+      qmenu.index = static_cast<__u32>(i);
+      if (TryIoctl(fd, VIDIOC_QUERYMENU, &qmenu) != 0) continue;
+      prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
+    }
   }
-  return 0;
+
+  return prop;
 }
 
 static int GetIntCtrlIoctl(int fd, unsigned id, int type, int64_t* value) {
@@ -376,10 +374,10 @@ static std::string GetDescriptionImpl(const char* cpath) {
 USBCameraImpl::USBCameraImpl(llvm::StringRef name, llvm::StringRef path)
     : SourceImpl{name},
       m_path{path},
-      m_description{GetDescriptionImpl(m_path.c_str())},
       m_fd{-1},
       m_command_fd{eventfd(0, 0)},
       m_active{true} {
+  SetDescription(GetDescriptionImpl(m_path.c_str()));
   // Kick off the camera thread
   m_cameraThread = std::thread(&USBCameraImpl::CameraThreadMain, this);
 }
@@ -632,9 +630,9 @@ void USBCameraImpl::DeviceConnect() {
     std::unique_lock<std::mutex> lock2(m_mutex);
     for (std::size_t i = 0; i < m_propertyData.size(); ++i) {
       const auto& prop = m_propertyData[i];
-      if (!prop.valueSet) continue;
-      if (!DeviceSetProperty(lock2, prop))
-        WARNING("USB " << m_path << ": failed to set property " << prop.name);
+      if (!prop->valueSet) continue;
+      if (!DeviceSetProperty(lock2, static_cast<const PropertyData&>(*prop)))
+        WARNING("USB " << m_path << ": failed to set property " << prop->name);
     }
   }
 
@@ -782,7 +780,7 @@ void USBCameraImpl::DeviceProcessCommands() {
       int property = msg->data[0];
 
       // Look up
-      auto prop = GetProperty(property);
+      auto prop = static_cast<PropertyData*>(GetProperty(property));
       if (!prop) {
         msg->type = Message::kError;
         msg->data[0] = CS_INVALID_PROPERTY;
@@ -827,7 +825,7 @@ void USBCameraImpl::DeviceProcessCommands() {
 
       // Cache the set value.  We need to re-get the pointer due to
       // releasing the lock.
-      prop = GetProperty(property);
+      prop = static_cast<PropertyData*>(GetProperty(property));
       if (msg->type == Message::kCmdSetPropertyStr)
         prop->valueStr = msg->dataStr;
       else
@@ -1019,37 +1017,36 @@ void USBCameraImpl::DeviceCacheMode() {
   if (fpsChanged) DeviceSetFPS();
 }
 
-void USBCameraImpl::DeviceCacheProperty(PropertyData&& prop) {
+void USBCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
   std::unique_lock<std::mutex> lock(m_mutex);
-  int& ndx = m_properties[prop.name];
+  int& ndx = m_properties[prop->name];
   if (ndx == 0) {
     // get the value
     lock.unlock();
-    if (!DeviceGetProperty(&prop))
-      WARNING("USB " << m_path << ": failed to get property " << prop.name);
+    if (!DeviceGetProperty(prop.get()))
+      WARNING("USB " << m_path << ": failed to get property " << prop->name);
     lock.lock();
     // create a new index
     ndx = m_propertyData.size() + 1;
     m_propertyData.emplace_back(std::move(prop));
   } else {
     // merge with existing settings
-    auto* prop2 = GetProperty(ndx);
-    prop.valueSet = prop2->valueSet;
-    prop.value = prop2->value;
-    prop.valueStr = std::move(prop2->valueStr);
+    auto prop2 = static_cast<PropertyData*>(GetProperty(ndx));
+    prop->valueSet = prop2->valueSet;
+    prop->value = prop2->value;
+    prop->valueStr = std::move(prop2->valueStr);
     lock.unlock();
-    if (prop.valueSet) {
+    if (prop->valueSet) {
       // set the value if it was previously set
-      if (!DeviceSetProperty(lock, prop))
-        WARNING("USB " << m_path << ": failed to set property " << prop.name);
+      if (!DeviceSetProperty(lock, *prop))
+        WARNING("USB " << m_path << ": failed to set property " << prop->name);
     } else {
       // otherwise get the value
-      if (!DeviceGetProperty(&prop))
-        WARNING("USB " << m_path << ": failed to get property " << prop.name);
+      if (!DeviceGetProperty(prop.get()))
+        WARNING("USB " << m_path << ": failed to get property " << prop->name);
     }
     lock.lock();
-    // need to re-get as we unlocked
-    *GetProperty(ndx) = std::move(prop);
+    m_propertyData[ndx - 1] = std::move(prop);
   }
 }
 
@@ -1063,9 +1060,8 @@ void USBCameraImpl::DeviceCacheProperties() {
 #endif
       ;
   __u32 id = nextFlags;
-  PropertyData prop;
 
-  while (ExtCtrlIoctl(fd, &id, &prop) == 0) {
+  while (auto prop = ExtCtrlIoctl(fd, &id)) {
     DeviceCacheProperty(std::move(prop));
     id |= nextFlags;
   }
@@ -1073,11 +1069,12 @@ void USBCameraImpl::DeviceCacheProperties() {
   if (id == nextFlags) {
     // try just enumerating standard...
     for (id = V4L2_CID_BASE; id < V4L2_CID_LASTP1; ++id) {
-      if (ExtCtrlIoctl(fd, &id, &prop) == 0)
+      if (auto prop = ExtCtrlIoctl(fd, &id))
         DeviceCacheProperty(std::move(prop));
     }
     // ... and custom controls
-    for (id = V4L2_CID_PRIVATE_BASE; ExtCtrlIoctl(fd, &id, &prop) == 0; ++id)
+    std::unique_ptr<PropertyData> prop;
+    for (id = V4L2_CID_PRIVATE_BASE; (prop = ExtCtrlIoctl(fd, &id)); ++id)
       DeviceCacheProperty(std::move(prop));
   }
 }
@@ -1260,76 +1257,7 @@ bool USBCameraImpl::CacheProperties(CS_Status* status) const {
   return true;
 }
 
-llvm::StringRef USBCameraImpl::GetDescription(
-    llvm::SmallVectorImpl<char>& buf) const {
-  return m_description;
-}
-
 bool USBCameraImpl::IsConnected() const { return m_fd >= 0; }
-
-int USBCameraImpl::GetPropertyIndex(llvm::StringRef name) const {
-  // We can't fail, so instead we create a new index if caching fails.
-  CS_Status status = 0;
-  if (!m_properties_cached) CacheProperties(&status);
-  std::lock_guard<std::mutex> lock(m_mutex);
-  int& ndx = m_properties[name];
-  if (ndx == 0) {
-    // create a new index
-    ndx = m_propertyData.size() + 1;
-    m_propertyData.emplace_back();
-  }
-  return ndx;
-}
-
-llvm::ArrayRef<int> USBCameraImpl::EnumerateProperties(
-    llvm::SmallVectorImpl<int>& vec, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return llvm::ArrayRef<int>{};
-  std::lock_guard<std::mutex> lock(m_mutex);
-  for (int i = 0; i < static_cast<int>(m_propertyData.size()); ++i)
-    vec.push_back(i + 1);
-  return vec;
-}
-
-CS_PropertyType USBCameraImpl::GetPropertyType(int property) const {
-  CS_Status status = 0;
-  if (!m_properties_cached && !CacheProperties(&status)) return CS_PROP_NONE;
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) return CS_PROP_NONE;
-  return prop->propType;
-}
-
-llvm::StringRef USBCameraImpl::GetPropertyName(int property,
-                                               llvm::SmallVectorImpl<char>& buf,
-                                               CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return llvm::StringRef{};
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return llvm::StringRef{};
-  }
-  // safe to not copy because we never modify it after caching
-  return prop->name;
-}
-
-int USBCameraImpl::GetProperty(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  if ((prop->propType & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
-      0) {
-    *status = CS_WRONG_PROPERTY_TYPE;
-    return 0;
-  }
-  return prop->value;
-}
 
 void USBCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetProperty);
@@ -1341,69 +1269,6 @@ void USBCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   DestroyMessage(std::move(msg));
 }
 
-int USBCameraImpl::GetPropertyMin(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  return prop->minimum;
-}
-
-int USBCameraImpl::GetPropertyMax(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  return prop->maximum;
-}
-
-int USBCameraImpl::GetPropertyStep(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  return prop->step;
-}
-
-int USBCameraImpl::GetPropertyDefault(int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return 0;
-  }
-  return prop->defaultValue;
-}
-
-llvm::StringRef USBCameraImpl::GetStringProperty(
-    int property, llvm::SmallVectorImpl<char>& buf, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return llvm::StringRef{};
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return llvm::StringRef{};
-  }
-  if (prop->propType != CS_PROP_STRING) {
-    *status = CS_WRONG_PROPERTY_TYPE;
-    return llvm::StringRef{};
-  }
-  buf.clear();
-  buf.append(prop->valueStr.begin(), prop->valueStr.end());
-  return llvm::StringRef(buf.data(), buf.size());
-}
-
 void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value,
                                       CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetPropertyStr);
@@ -1413,30 +1278,6 @@ void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value,
   if (!msg) return;
   if (msg->type == Message::kError) *status = msg->data[0];
   DestroyMessage(std::move(msg));
-}
-
-std::vector<std::string> USBCameraImpl::GetEnumPropertyChoices(
-    int property, CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return std::vector<std::string>{};
-  std::lock_guard<std::mutex> lock(m_mutex);
-  auto prop = GetProperty(property);
-  if (!prop) {
-    *status = CS_INVALID_PROPERTY;
-    return std::vector<std::string>{};
-  }
-  if (prop->propType != CS_PROP_ENUM) {
-    *status = CS_WRONG_PROPERTY_TYPE;
-    return std::vector<std::string>{};
-  }
-  return prop->enumChoices;
-}
-
-VideoMode USBCameraImpl::GetVideoMode(CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return VideoMode{};
-  std::lock_guard<std::mutex> lock(m_mutex);
-  return m_mode;
 }
 
 bool USBCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
@@ -1498,14 +1339,6 @@ bool USBCameraImpl::SetFPS(int fps, CS_Status* status) {
   }
   DestroyMessage(std::move(msg));
   return rv;
-}
-
-std::vector<VideoMode> USBCameraImpl::EnumerateVideoModes(
-    CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return std::vector<VideoMode>{};
-  std::lock_guard<std::mutex> lock(m_mutex);
-  return m_videoModes;
 }
 
 void USBCameraImpl::NumSinksChanged() {

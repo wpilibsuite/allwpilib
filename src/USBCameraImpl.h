@@ -18,7 +18,6 @@
 
 #include "llvm/raw_ostream.h"
 #include "llvm/SmallVector.h"
-#include "llvm/StringMap.h"
 #include "llvm/STLExtras.h"
 #include "support/raw_istream.h"
 
@@ -32,45 +31,25 @@ class USBCameraImpl : public SourceImpl {
   USBCameraImpl(llvm::StringRef name, llvm::StringRef path);
   ~USBCameraImpl() override;
 
-  llvm::StringRef GetDescription(
-      llvm::SmallVectorImpl<char>& buf) const override;
   bool IsConnected() const override;
 
   // Property functions
-  int GetPropertyIndex(llvm::StringRef name) const override;
-  llvm::ArrayRef<int> EnumerateProperties(llvm::SmallVectorImpl<int>& vec,
-                                          CS_Status* status) const override;
-  CS_PropertyType GetPropertyType(int property) const override;
-  llvm::StringRef GetPropertyName(int property,
-                                  llvm::SmallVectorImpl<char>& buf,
-                                  CS_Status* status) const override;
-  int GetProperty(int property, CS_Status* status) const override;
   void SetProperty(int property, int value, CS_Status* status) override;
-  int GetPropertyMin(int property, CS_Status* status) const override;
-  int GetPropertyMax(int property, CS_Status* status) const override;
-  int GetPropertyStep(int property, CS_Status* status) const override;
-  int GetPropertyDefault(int property, CS_Status* status) const override;
-  llvm::StringRef GetStringProperty(int property,
-                                    llvm::SmallVectorImpl<char>& buf,
-                                    CS_Status* status) const override;
   void SetStringProperty(int property, llvm::StringRef value,
                          CS_Status* status) override;
-  std::vector<std::string> GetEnumPropertyChoices(
-      int property, CS_Status* status) const override;
 
-  VideoMode GetVideoMode(CS_Status* status) const override;
   bool SetVideoMode(const VideoMode& mode, CS_Status* status) override;
   bool SetPixelFormat(VideoMode::PixelFormat pixelFormat,
                       CS_Status* status) override;
   bool SetResolution(int width, int height, CS_Status* status) override;
   bool SetFPS(int fps, CS_Status* status) override;
-  std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const override;
 
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
   // Property data
-  struct PropertyData {
+  class PropertyData : public PropertyBase {
+   public:
     PropertyData() = default;
 #ifdef __linux__
 #ifdef VIDIOC_QUERY_EXT_CTRL
@@ -79,18 +58,8 @@ class USBCameraImpl : public SourceImpl {
     PropertyData(const struct v4l2_queryctrl& ctrl);
 #endif
 
-    std::string name;
     unsigned id;  // implementation-level id
     int type;  // implementation type, not CS_PropertyType!
-    CS_PropertyType propType{CS_PROP_NONE};
-    int minimum;
-    int maximum;
-    int step;
-    int defaultValue;
-    int value{0};
-    std::string valueStr;
-    std::vector<std::string> enumChoices;
-    bool valueSet{false};
   };
 
   // Messages passed to/from camera thread
@@ -117,6 +86,12 @@ class USBCameraImpl : public SourceImpl {
     std::string dataStr;
   };
 
+ protected:
+  // Cache properties.  Immediately successful if properties are already cached.
+  // If they are not, tries to connect to the camera to do so; returns false and
+  // sets status to CS_SOURCE_IS_DISCONNECTED if that too fails.
+  bool CacheProperties(CS_Status* status) const override;
+
  private:
   // Message pool access
   std::unique_ptr<Message> CreateMessage(Message::Type type) const {
@@ -137,11 +112,6 @@ class USBCameraImpl : public SourceImpl {
   // Send a message to the camera thread with no response
   void Send(std::unique_ptr<Message> msg) const;
 
-  // Cache properties.  Immediately successful if properties are already cached.
-  // If they are not, tries to connect to the camera to do so; returns false and
-  // sets status to CS_SOURCE_IS_DISCONNECTED if that too fails.
-  bool CacheProperties(CS_Status* status) const;
-
   // The camera processing thread
   void CameraThreadMain();
 
@@ -154,7 +124,7 @@ class USBCameraImpl : public SourceImpl {
   void DeviceSetMode();
   void DeviceSetFPS();
   void DeviceCacheMode();
-  void DeviceCacheProperty(PropertyData&& prop);
+  void DeviceCacheProperty(std::unique_ptr<PropertyData> prop);
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
   bool DeviceGetProperty(PropertyData* prop);
@@ -176,10 +146,9 @@ class USBCameraImpl : public SourceImpl {
   std::array<USBCameraBuffer, kNumBuffers> m_buffers;
 
   //
-  // Path and description: These never change, so not protected by mutex.
+  // Path never changes, so not protected by mutex.
   //
   std::string m_path;
-  std::string m_description;
 
 #ifdef __linux__
   std::atomic_int m_fd;
@@ -193,34 +162,11 @@ class USBCameraImpl : public SourceImpl {
   // Variables protected by m_mutex
   //
 
-  // Cached camera information (properties and video modes)
-  mutable std::vector<PropertyData> m_propertyData;
-  mutable llvm::StringMap<int> m_properties;
-  std::vector<VideoMode> m_videoModes;
-  std::atomic_bool m_properties_cached{false};
-
-  // Get a property; must be called with m_mutex held.
-  PropertyData* GetProperty(int property) {
-    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
-      return nullptr;
-    return &m_propertyData[property - 1];
-  }
-  const PropertyData* GetProperty(int property) const {
-    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
-      return nullptr;
-    return &m_propertyData[property - 1];
-  }
-
-  // Current video mode (updated by camera thread)
-  VideoMode m_mode;
-
   // Message pool and queues
   mutable std::vector<std::unique_ptr<Message>> m_messagePool;
   mutable std::vector<std::unique_ptr<Message>> m_commands;
   mutable std::vector<std::unique_ptr<Message>> m_responses;
   mutable std::condition_variable m_responseCv;
-
-  mutable std::mutex m_mutex;
 };
 
 }  // namespace cs

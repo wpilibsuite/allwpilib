@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "llvm/ArrayRef.h"
+#include "llvm/StringMap.h"
 #include "llvm/StringRef.h"
 #include "cameraserver_cpp.h"
 #include "Frame.h"
@@ -28,12 +29,14 @@ class SourceImpl {
  public:
   SourceImpl(llvm::StringRef name);
   virtual ~SourceImpl();
-  SourceImpl(const SourceImpl& queue) = delete;
-  SourceImpl& operator=(const SourceImpl& queue) = delete;
+  SourceImpl(const SourceImpl& oth) = delete;
+  SourceImpl& operator=(const SourceImpl& oth) = delete;
 
   llvm::StringRef GetName() const { return m_name; }
-  virtual llvm::StringRef GetDescription(
-      llvm::SmallVectorImpl<char>& buf) const = 0;
+
+  void SetDescription(llvm::StringRef description);
+  llvm::StringRef GetDescription(llvm::SmallVectorImpl<char>& buf) const;
+
   virtual bool IsConnected() const = 0;
 
   // Functions to keep track of the overall number of sinks connected to this
@@ -78,29 +81,29 @@ class SourceImpl {
   void Wakeup();
 
   // Property functions
-  virtual int GetPropertyIndex(llvm::StringRef name) const = 0;
-  virtual llvm::ArrayRef<int> EnumerateProperties(
-      llvm::SmallVectorImpl<int>& vec, CS_Status* status) const = 0;
-  virtual CS_PropertyType GetPropertyType(int property) const = 0;
-  virtual llvm::StringRef GetPropertyName(int property,
-                                          llvm::SmallVectorImpl<char>& buf,
-                                          CS_Status* status) const = 0;
-  virtual int GetProperty(int property, CS_Status* status) const = 0;
+  int GetPropertyIndex(llvm::StringRef name) const;
+  llvm::ArrayRef<int> EnumerateProperties(llvm::SmallVectorImpl<int>& vec,
+                                          CS_Status* status) const;
+  CS_PropertyType GetPropertyType(int property) const;
+  llvm::StringRef GetPropertyName(int property,
+                                  llvm::SmallVectorImpl<char>& buf,
+                                  CS_Status* status) const;
+  int GetProperty(int property, CS_Status* status) const;
   virtual void SetProperty(int property, int value, CS_Status* status) = 0;
-  virtual int GetPropertyMin(int property, CS_Status* status) const = 0;
-  virtual int GetPropertyMax(int property, CS_Status* status) const = 0;
-  virtual int GetPropertyStep(int property, CS_Status* status) const = 0;
-  virtual int GetPropertyDefault(int property, CS_Status* status) const = 0;
-  virtual llvm::StringRef GetStringProperty(int property,
-                                            llvm::SmallVectorImpl<char>& buf,
-                                            CS_Status* status) const = 0;
+  int GetPropertyMin(int property, CS_Status* status) const;
+  int GetPropertyMax(int property, CS_Status* status) const;
+  int GetPropertyStep(int property, CS_Status* status) const;
+  int GetPropertyDefault(int property, CS_Status* status) const;
+  llvm::StringRef GetStringProperty(int property,
+                                    llvm::SmallVectorImpl<char>& buf,
+                                    CS_Status* status) const;
   virtual void SetStringProperty(int property, llvm::StringRef value,
                                  CS_Status* status) = 0;
-  virtual std::vector<std::string> GetEnumPropertyChoices(
-      int property, CS_Status* status) const = 0;
+  std::vector<std::string> GetEnumPropertyChoices(int property,
+                                                  CS_Status* status) const;
 
   // Video mode functions
-  virtual VideoMode GetVideoMode(CS_Status* status) const = 0;
+  VideoMode GetVideoMode(CS_Status* status) const;
   virtual bool SetVideoMode(const VideoMode& mode, CS_Status* status) = 0;
 
   // These have default implementations but can be overridden for custom
@@ -110,8 +113,7 @@ class SourceImpl {
   virtual bool SetResolution(int width, int height, CS_Status* status);
   virtual bool SetFPS(int fps, CS_Status* status);
 
-  virtual std::vector<VideoMode> EnumerateVideoModes(
-      CS_Status* status) const = 0;
+  std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
  protected:
   void PutFrame(VideoMode::PixelFormat pixelFormat, llvm::StringRef data,
@@ -124,12 +126,69 @@ class SourceImpl {
   std::atomic_int m_numSinks{0};
   std::atomic_int m_numSinksEnabled{0};
 
+ protected:
+  // Property data
+  class PropertyBase {
+   public:
+    PropertyBase() = default;
+    PropertyBase(llvm::StringRef name_, CS_PropertyType type_, int minimum_,
+                 int maximum_, int step_, int defaultValue_, int value_)
+        : name{name_},
+          propType{type_},
+          minimum{minimum_},
+          maximum{maximum_},
+          step{step_},
+          defaultValue{defaultValue_},
+          value{value_} {}
+    virtual ~PropertyBase() = default;
+    PropertyBase(const PropertyBase& oth) = delete;
+    PropertyBase& operator=(const PropertyBase& oth) = delete;
+
+    std::string name;
+    CS_PropertyType propType{CS_PROP_NONE};
+    int minimum;
+    int maximum;
+    int step;
+    int defaultValue;
+    int value{0};
+    std::string valueStr;
+    std::vector<std::string> enumChoices;
+    bool valueSet{false};
+  };
+
+  // Get a property; must be called with m_mutex held.
+  PropertyBase* GetProperty(int property) {
+    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
+      return nullptr;
+    return m_propertyData[property - 1].get();
+  }
+  const PropertyBase* GetProperty(int property) const {
+    if (property <= 0 || static_cast<size_t>(property) > m_propertyData.size())
+      return nullptr;
+    return m_propertyData[property - 1].get();
+  }
+
+  // Cache properties.  Implementations must return false and set status to
+  // CS_SOURCE_IS_DISCONNECTED if not possible to cache.
+  virtual bool CacheProperties(CS_Status* status) const = 0;
+
+  // Cached properties and video modes (protected with m_mutex)
+  mutable std::vector<std::unique_ptr<PropertyBase>> m_propertyData;
+  mutable llvm::StringMap<int> m_properties;
+  mutable std::vector<VideoMode> m_videoModes;
+  // Current video mode
+  mutable VideoMode m_mode;
+  // Whether CacheProperties() has been successful at least once (and thus
+  // should not be called again)
+  mutable std::atomic_bool m_properties_cached{false};
+
+  mutable std::mutex m_mutex;
+
  private:
   void ReleaseFrame(std::unique_ptr<Frame::Data> data);
 
   std::string m_name;
-
-  std::mutex m_mutex;
+  std::string m_description;
 
   std::mutex m_frameMutex;
   std::condition_variable m_frameCv;
@@ -141,6 +200,7 @@ class SourceImpl {
   bool m_destroyFrames{false};
 
   // Pool of frame data to reduce malloc traffic.
+  std::mutex m_poolMutex;
   std::vector<std::unique_ptr<Frame::Data>> m_framesAvail;
 };
 
