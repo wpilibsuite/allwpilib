@@ -22,13 +22,19 @@ The WPILib Mission is to enable FIRST Robotics teams to focus on writing game-sp
 Using Gradle makes building WPILib very straightforward. It only has a few dependencies on outside tools, such as the ARM cross compiler for creating roboRIO binaries.
 
 ## Requirements
+
 - [ARM Compiler Toolchain](http://first.wpi.edu/FRC/roborio/toolchains/)
 - Doxygen (Only required if you want to build the C++ documentation)
+- [format.py](https://github.com/wpilibsuite/styleguide)
 
 ## Setup
-Clone the WPILib Repo. If the toolchains are not installed, install them, and make sure they are available on the system PATH.
+
+Clone the WPILib repository. If the toolchains are not installed, install them, and make sure they are available on the system PATH.
+
+See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/master/README.md) for format.py setup instructions.
 
 ## Building
+
 All build steps are executed using the Gradle wrapper, `gradlew`. Each target that Gradle can build is referred to as a task. The most common Gradle task to use is `build`. This will build all the outputs created by WPILib. To run, open a console and cd into the cloned WPILib directory. Then:
 
 ```bash
@@ -61,7 +67,10 @@ The gradlew wrapper only exists in the root of the main project, so be sure to r
 
 There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
 
+format.py can be executed in either the styleguide or root directories of the repository via `python3 format.py` or `./format.py`.
+
 ## Publishing
+
 If you are building to test with the Eclipse plugins or just want to export the build as a Maven-style dependency, simply run the `publish` task. This task will publish all available packages to ~/releases/maven/development. If you need to publish the project to a different repo, you can specify it with `-Prepo=repo_name`. Valid options are:
 
 - development - The default repo.
@@ -79,6 +88,7 @@ The following maven targets a published by this task:
 - org.gazebosim:JavaGazebo:0.1.0-SNAPSHOT - Gazebo protocol for Java.
 
 ## Structure and Organization
+
 The main WPILib code you're probably looking for is in WPILibJ and WPILibC. Those directories are split into shared, sim, and athena. Athena contains the WPILib code meant to run on your roboRIO. Sim is WPILib code meant to run on your computer with Gazebo, and shared is code shared between the two. Shared code must be platform-independent, since it will be compiled with both the ARM cross-compiler and whatever desktop compiler you are using (g++, msvc, etc...).
 
 The Simulation directory contains extra simulation tools and libraries, such as gz_msgs and JavaGazebo. See sub-directories for more information.
