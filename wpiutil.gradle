@@ -60,6 +60,8 @@ def wpiutilZipTask = { project ->
         }
     }
 
+    project.build.dependsOn project.wpiutilZip
+
     project.debugStripSetup()
 
     project.tasks.whenTaskAdded { task ->
