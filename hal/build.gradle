@@ -2,7 +2,10 @@
 // - desktop which is used by simulation (gcc/msvc)
 // - athena which is used by the roborio (arm)
 
-apply plugin: 'cpp'
+plugins {
+    id 'cpp'
+    id 'maven-publish'
+}
 
 defineWpiUtilProperties()
 
@@ -58,22 +61,23 @@ task halZip(type: Zip) {
     group = 'WPILib'
     baseName = 'hal'
     destinationDir = project.buildDir
-    classifier = 'hal'
     duplicatesStrategy = 'exclude'
 
-    // Include the static library file and header files from this project
+    // Include the shared library file and header files from this project
     model {
         binaries {
-            withType(StaticLibraryBinarySpec) { spec ->
+            withType(SharedLibraryBinarySpec) { spec ->
                 spec.headerDirs.each {
-                    from(it) {
-                        into 'include'
-                        // We don't want to include any of the .cpp files that are in some of the header directories
-                        exclude '**/*.cpp'
+                    def normalizedIt = it.toString().replace('/', '\\')
+                    def normalizedWPIUtil = wpiUtilInclude.toString().replace('/', '\\')
+                    if (normalizedIt != normalizedWPIUtil) {
+                        from(it) {
+                            into 'include'
+                            // We don't want to include any of the .cpp files that are in some of the header directories
+                            exclude '**/*.cpp'
+                        }
                     }
                 }
-            }
-            withType(SharedLibraryBinarySpec) { spec ->
                 from(spec.sharedLibraryFile) {
                     into 'lib'
                 }
@@ -84,15 +88,11 @@ task halZip(type: Zip) {
         }
     }
 
-    // Include the wpiutil static lib
-    from(wpiUtilSharedLib) {
-        into 'lib'
-    }
-
     // Finally, include all of the shared library objects from the ni directory
     from(project.file('../ni-libraries')) {
         into 'lib'
         exclude 'genlinks'
+        exclude 'libwpi.so'
     }
 
     // Add the hal static and shared libraries as a dependency
@@ -101,4 +101,84 @@ task halZip(type: Zip) {
             halZip.dependsOn task
         }
     }
+}
+
+task athenaRuntimeZip(type: Zip) {
+    description = 'Zips the Athena Runtime libraries'
+    group = 'WPILib'
+    baseName = 'athena-runtime'
+    destinationDir = project.buildDir
+    duplicatesStrategy = 'exclude'
+
+    // Include the static library file and header files from this project
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                spec.headerDirs.each {
+                    from(it) {
+                        into 'include'
+                        // We don't want to include any of the .cpp files that are in some of the header directories
+                        exclude '**/*.cpp'
+                    }
+                }
+                from(spec.sharedLibraryFile) {
+                    into 'lib'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
+                    into 'lib'
+                }
+            }
+        }
+    }
+
+    defineNetworkTablesProperties()
+
+    from(project.file(netTablesInclude)) {
+        into 'include'
+    }
+
+    from (file(netSharedLib)) {
+        into 'lib'
+    }
+
+    from (file(netSharedLibDebug)) {
+        into 'lib'
+    }
+
+    from (file(wpiUtilSharedLib)) {
+        into 'lib'
+    }
+
+    from (file(wpiUtilSharedLibDebug)) {
+        into 'lib'
+    }
+
+    // Add the hal static and shared libraries as a dependency
+    project(':hal').tasks.whenTaskAdded { task ->
+        if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
+            halZip.dependsOn task
+        }
+    }
+}
+
+
+publishing {
+    publications {
+        hal(MavenPublication) {
+            artifact halZip
+
+            groupId 'edu.wpi.first.wpilib'
+            artifactId 'hal'
+            version WPILibVersion.version
+        }
+        athenaruntime(MavenPublication) {
+            artifact athenaRuntimeZip
+
+            groupId 'edu.wpi.first.wpilib'
+            artifactId 'athena-runtime'
+            version WPILibVersion.version
+        }
+    }
+
+    setupWpilibRepo(it)
 }

@@ -148,12 +148,22 @@ subprojects {
             ext.wpiUtilLibDesktopLocation = "$wpiUtilUnzipLocation/Linux/amd64"
         }
         ext.wpiUtilSharedLib = "$wpiUtilLibArmLocation/libwpiutil.so"
+        ext.wpiUtilSharedLibDebug = "$wpiUtilLibArmLocation/libwpiutil.so.debug"
+        ext.wpiUtilStaticLib = "$wpiUtilLibArmLocation/libwpiutil.a"
 
         ext.addWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
             compileTask.dependsOn project(':').unzipWpiUtil
             String architecture = targetPlatform.architecture
             if (architecture.contains('arm')) {
                 linker.args wpiUtilSharedLib
+            }
+        }
+
+        ext.addStaticWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
+            compileTask.dependsOn project(':').unzipWpiUtil
+            String architecture = targetPlatform.architecture
+            if (architecture.contains('arm')) {
+                linker.args wpiUtilStaticLib
             }
         }
     }
@@ -185,7 +195,7 @@ subprojects {
             if (architecture.contains('arm')) {
                 linker.args netStaticLib
             }
-            addWpiUtilLibraryLinks(compileTask, linker, targetPlatform)
+            addStaticWpiUtilLibraryLinks(compileTask, linker, targetPlatform)
         }
     }
     plugins.withType(CppPlugin).whenPluginAdded {

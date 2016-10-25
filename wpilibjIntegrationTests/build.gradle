@@ -46,7 +46,20 @@ task moveNativeLibraries(type: Copy) {
     from zipTree(wpilibj.wpilibjNativeLibraries.archivePath)
     include '*.so'
 
+    project(':hal').model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile)
+            }
+        }
+    }
+
+    defineNetworkTablesProperties()
+    defineWpiUtilProperties()
+
     from file(netSharedLib)
+
+    from file(wpiUtilSharedLib)
 
     into nativeDirectory
 }

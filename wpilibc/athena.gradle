@@ -43,11 +43,6 @@ task wpilibcZip(type: Zip) {
     model {
         binaries {
             withType(StaticLibraryBinarySpec) { spec ->
-                spec.headerDirs.each {
-                    from(it) {
-                        into 'include'
-                    }
-                }
                 from(spec.staticLibraryFile) {
                     into 'lib'
                 }
@@ -55,12 +50,17 @@ task wpilibcZip(type: Zip) {
         }
     }
 
-    // Include the ntcore shared libraries
-    from(netSharedLib) {
-        into 'lib'
+    from (file("${project.shared}/include")) {
+      into 'include'
     }
 
-    from(netSharedLibDebug) {
+    from (file("${project.athena}/include")) {
+      into 'include'
+    }
+
+    // Finally, include all of the shared library objects from the ni directory
+    from(project.file('../ni-libraries')) {
+        include 'libwpi.so'
         into 'lib'
     }
 }
@@ -149,15 +149,14 @@ publishing {
     publications {
         wpilibc(MavenPublication) {
             artifact wpilibcZip
-            artifact project(':hal').halZip
             if (checkDoxygen()) {
                 artifact (doxygenZip) {
                     classifier = 'doxygen'
                 }
             }
 
-            groupId 'edu.wpi.first.wpilib.cmake'
-            artifactId 'cpp-root'
+            groupId 'edu.wpi.first.wpilibc'
+            artifactId 'athena'
             version WPILibVersion.version
         }
     }
