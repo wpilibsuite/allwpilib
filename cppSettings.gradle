@@ -147,7 +147,7 @@ subprojects {
         if (project.hasProperty('makeSim')) {
             ext.wpiUtilLibDesktopLocation = "$wpiUtilUnzipLocation/Linux/amd64"
         }
-        ext.wpiUtilSharedLib = "$wpiUtilLibArmLocation/libwpiutil.a"
+        ext.wpiUtilSharedLib = "$wpiUtilLibArmLocation/libwpiutil.so"
 
         ext.addWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
             compileTask.dependsOn project(':').unzipWpiUtil
