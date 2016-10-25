@@ -12,7 +12,6 @@
 #include <memory>
 #include <string>
 
-#include "HAL/cpp/Semaphore.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "RobotState.h"
@@ -102,30 +101,41 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void Run();
   void UpdateControlWord(bool force, HAL_ControlWord& controlWord) const;
 
+  // Joystick User Data
   std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxes;
   std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVs;
   std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtons;
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptor;
 
-  // Cached Data
+  // Joystick Cached Data
   std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxesCache;
   std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVsCache;
   std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtonsCache;
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptorCache;
 
+  // Internal Driver Station thread
   Task m_task;
   std::atomic<bool> m_isRunning{false};
-  mutable Semaphore m_newControlData{Semaphore::kEmpty};
-  bool m_updatedControlLoopData = false;
+
+  // WPILib WaitForData control variables
+  bool m_waitForDataPredicate = false;
   std::condition_variable_any m_waitForDataCond;
   priority_mutex m_waitForDataMutex;
+
+  mutable std::atomic<bool> m_newControlData{false};
+
   mutable priority_mutex m_joystickDataMutex;
+
+  // Robot state status variables
   bool m_userInDisabled = false;
   bool m_userInAutonomous = false;
   bool m_userInTeleop = false;
   bool m_userInTest = false;
+
+  // Control word variables
   mutable HAL_ControlWord m_controlWordCache;
   mutable std::chrono::steady_clock::time_point m_lastControlWordUpdate;
   mutable priority_mutex m_controlWordMutex;
+
   double m_nextMessageTime = 0;
 };
