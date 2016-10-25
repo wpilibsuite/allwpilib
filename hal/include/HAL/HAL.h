@@ -40,12 +40,16 @@ namespace HALUsageReporting = nUsageReporting;
 
 enum HAL_RuntimeType : int32_t { HAL_Athena, HAL_Mock };
 
+typedef const char* (*HAL_ErrorMessageHandler)(int32_t);
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 HAL_PortHandle HAL_GetPort(int32_t channel);
 HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 const char* HAL_GetErrorMessage(int32_t code);
+int32_t HAL_AddErrorMessageHandler(HAL_ErrorMessageHandler handler);
+void HAL_RemoveErrorMessageHandler(int32_t uid);
 
 int32_t HAL_GetFPGAVersion(int32_t* status);
 int64_t HAL_GetFPGARevision(int32_t* status);

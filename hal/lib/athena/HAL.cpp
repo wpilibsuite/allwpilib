@@ -17,6 +17,7 @@
 #include <mutex>
 #include <thread>
 
+#include "CallbackVector.h"
 #include "ChipObject.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "FRC_NetworkCommunication/FRCComm.h"
@@ -54,6 +55,10 @@ HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
   if (module < 0 || module >= 255) return HAL_kInvalidHandle;
   return createPortHandle(channel, module);
 }
+
+static std::shared_ptr<CallbackVector<HAL_ErrorMessageHandler>>
+    errorHandlerCallbacks;
+static priority_mutex errorHandlerRegisterMutex;
 
 const char* HAL_GetErrorMessage(int32_t code) {
   switch (code) {
@@ -160,8 +165,45 @@ const char* HAL_GetErrorMessage(int32_t code) {
     case HAL_PWM_SCALE_ERROR:
       return HAL_PWM_SCALE_ERROR_MESSAGE;
     default:
+      // Return if no callbacks are assigned
+      if (errorHandlerCallbacks == nullptr) return "Unknown error status";
+      // Get a copy of the shared_ptr, then iterate and callback listeners
+      auto newCallbacks = errorHandlerCallbacks;
+      for (size_t i = 0; i < newCallbacks->size(); ++i) {
+        if (!(*newCallbacks)[i]) continue;  // removed
+        auto listener = (*newCallbacks)[i];
+        if (listener) {
+          auto retVal = listener(code);
+          if (retVal) return retVal;
+        }
+      }
+      // Return unknown error status if nothing is found
       return "Unknown error status";
   }
+}
+
+/**
+ * Adds an error handler to be called during an error status check.
+ * If you receive an error status you don't handle, return a nullptr.
+ * @return uid of the handler, used for removing cases
+ */
+int32_t HAL_AddErrorMessageHandler(HAL_ErrorMessageHandler handler) {
+  std::lock_guard<priority_mutex> lock(errorHandlerRegisterMutex);
+  uint32_t newUid = 0;
+  if (errorHandlerCallbacks == nullptr) {
+    errorHandlerCallbacks =
+        std::make_shared<CallbackVector<HAL_ErrorMessageHandler>>(
+            handler, reinterpret_cast<unsigned int*>(newUid));
+  } else {
+    errorHandlerCallbacks = errorHandlerCallbacks->emplace_back(
+        handler, reinterpret_cast<unsigned int*>(newUid));
+  }
+  return newUid;
+}
+
+void HAL_RemoveErrorMessageHandler(int32_t uid) {
+  std::lock_guard<priority_mutex> lock(errorHandlerRegisterMutex);
+  errorHandlerCallbacks = errorHandlerCallbacks->erase(uid);
 }
 
 /**
