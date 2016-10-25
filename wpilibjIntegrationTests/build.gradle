@@ -33,25 +33,22 @@ def nativeDirectory = "$buildDir/nativelibraries"
 
 defineNetworkTablesProperties()
 
-task deleteNativeLibaries(type: Delete) {
-    description = "Deletes the native library directory"
-    group = "WPILib"
+clean {
     delete nativeDirectory
 }
 
 task moveNativeLibraries(type: Copy) {
-  description = 'Moves all native libraries to an easy to find folder'
-  group = 'WPILib'
-  dependsOn shadowJar
-  dependsOn deleteNativeLibaries
-  dependsOn wpilibj.wpilibJNativeLibraries
+    description = 'Moves all native libraries to an easy to find folder'
+    group = 'WPILib'
+    dependsOn shadowJar
+    dependsOn wpilibj.wpilibjNativeLibraries
 
-  from zipTree(wpilibj.wpilibJNativeLibraries.archivePath)
-  include '*.so'
+    from zipTree(wpilibj.wpilibjNativeLibraries.archivePath)
+    include '*.so'
 
-  from file(netSharedLib)
+    from file(netSharedLib)
 
-  into nativeDirectory
+    into nativeDirectory
 }
 
 build.dependsOn moveNativeLibraries

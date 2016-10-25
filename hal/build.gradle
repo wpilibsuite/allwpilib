@@ -85,7 +85,7 @@ task halZip(type: Zip) {
     }
 
     // Include the wpiutil static lib
-    from(wpiUtilStaticLib) {
+    from(wpiUtilSharedLib) {
         into 'lib'
     }
 
@@ -96,9 +96,9 @@ task halZip(type: Zip) {
     }
 
     // Add the hal static and shared libraries as a dependency
-project(':hal').tasks.whenTaskAdded { task ->
-    if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
-        halZip.dependsOn task
+    project(':hal').tasks.whenTaskAdded { task ->
+        if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
+            halZip.dependsOn task
+        }
     }
-}
 }

@@ -57,7 +57,7 @@ publishing {
     publications {
         wpilibj(MavenPublication) {
             artifact jar
-            artifact wpilibJNativeLibraries
+            artifact wpilibjNativeLibraries
             artifact(wpilibjSources) {
                 classifier "sources"
             }
@@ -94,7 +94,7 @@ jar {
 tasks.whenTaskAdded { task ->
     if (task.name == 'wpilibJavaJNISharedLibrary') {
         jar.dependsOn task
-        wpilibJNativeLibraries.dependsOn task
+        wpilibjNativeLibraries.dependsOn task
     }
 }
 
@@ -108,7 +108,7 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
     from sourceSets.shared.allJava
 }
 
-task wpilibJNativeLibraries(type: Jar) {
+task wpilibjNativeLibraries(type: Jar) {
     description = 'Creates the native library jar for the maven publishing routine'
     group = 'WPILib'
     classifier = 'nativelibraries'
@@ -144,7 +144,7 @@ task wpilibJNativeLibraries(type: Jar) {
     }
 }
 
-build.dependsOn wpilibJNativeLibraries
+build.dependsOn wpilibjNativeLibraries
 
 task unzipJavaNtSources(type: Copy) {
     description = 'Unzips the java networktables sources for doc creation'
