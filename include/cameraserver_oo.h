@@ -261,14 +261,6 @@ class CvSource : public VideoSource {
   /// @param choices Choices
   void SetEnumPropertyChoices(const VideoProperty& property,
                               llvm::ArrayRef<std::string> choices);
-
-  /// Remove a property.
-  /// @param property Property
-  void RemoveProperty(const VideoProperty& property);
-
-  /// Remove a property.
-  /// @param name Property name
-  void RemoveProperty(llvm::StringRef name);
 };
 
 /// A sink for video that accepts a sequence of frames.

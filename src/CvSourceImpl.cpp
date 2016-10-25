@@ -144,14 +144,6 @@ void CvSourceImpl::SetEnumPropertyChoices(CS_Property property,
   prop->enumChoices = choices;
 }
 
-void CvSourceImpl::RemoveProperty(CS_Property property) {
-  // TODO
-}
-
-void CvSourceImpl::RemoveProperty(llvm::StringRef name) {
-  // TODO
-}
-
 namespace cs {
 
 CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
@@ -237,26 +229,6 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
       .SetEnumPropertyChoices(property, choices, status);
 }
 
-void RemoveSourceProperty(CS_Source source, CS_Property property,
-                          CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
-    *status = CS_INVALID_HANDLE;
-    return;
-  }
-  static_cast<CvSourceImpl&>(*data->source).RemoveProperty(property);
-}
-
-void RemoveSourceProperty(CS_Source source, llvm::StringRef name,
-                          CS_Status* status) {
-  auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
-    *status = CS_INVALID_HANDLE;
-    return;
-  }
-  static_cast<CvSourceImpl&>(*data->source).RemoveProperty(name);
-}
-
 }  // namespace cs
 
 extern "C" {
@@ -312,16 +284,6 @@ void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
   vec.reserve(count);
   for (int i = 0; i < count; ++i) vec.push_back(choices[i]);
   return cs::SetSourceEnumPropertyChoices(source, property, vec, status);
-}
-
-void CS_RemoveSourceProperty(CS_Source source, CS_Property property,
-                             CS_Status* status) {
-  return cs::RemoveSourceProperty(source, property, status);
-}
-
-void CS_RemoveSourcePropertyByName(CS_Source source, const char* name,
-                                   CS_Status* status) {
-  return cs::RemoveSourceProperty(source, name, status);
 }
 
 }  // extern "C"

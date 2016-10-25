@@ -617,32 +617,6 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSourceEnumPr
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    removeSourceProperty
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_removeSourceProperty
-  (JNIEnv *env, jclass, jint source, jint property)
-{
-  CS_Status status = 0;
-  cs::RemoveSourceProperty(source, property, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    removeSourcePropertyByName
- * Signature: (ILjava/lang/String;)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_removeSourcePropertyByName
-  (JNIEnv *env, jclass, jint source, jstring name)
-{
-  CS_Status status = 0;
-  cs::RemoveSourceProperty(source, JStringRef{env, name}, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    createMJPEGServer
  * Signature: (Ljava/lang/String;Ljava/lang/String;I)I
  */

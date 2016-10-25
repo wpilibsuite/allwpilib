@@ -163,10 +163,6 @@ CS_Property CS_CreateSourcePropertyCallback(
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                      const char** choices, int count,
                                      CS_Status* status);
-void CS_RemoveSourceProperty(CS_Source source, CS_Property property,
-                             CS_Status* status);
-void CS_RemoveSourcePropertyByName(CS_Source source, const char* name,
-                                   CS_Status* status);
 
 //
 // Sink Creation Functions

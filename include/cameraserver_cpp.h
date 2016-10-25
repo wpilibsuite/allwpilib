@@ -151,10 +151,6 @@ CS_Property CreateSourcePropertyCallback(
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                   llvm::ArrayRef<std::string> choices,
                                   CS_Status* status);
-void RemoveSourceProperty(CS_Source source, CS_Property property,
-                          CS_Status* status);
-void RemoveSourceProperty(CS_Source source, llvm::StringRef name,
-                          CS_Status* status);
 
 //
 // Sink Creation Functions

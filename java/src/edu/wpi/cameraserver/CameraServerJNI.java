@@ -125,8 +125,6 @@ public class CameraServerJNI {
   //                                    int type, int minimum, int maximum, int step, int defaultValue, int value,
   //                                    void (*onChange)(int property));
   public static native void setSourceEnumPropertyChoices(int source, int property, String[] choices);
-  public static native void removeSourceProperty(int source, int property);
-  public static native void removeSourcePropertyByName(int source, String name);
 
   //
   // Sink Creation Functions

@@ -231,16 +231,6 @@ inline void CvSource::SetEnumPropertyChoices(
   SetSourceEnumPropertyChoices(m_handle, property.m_handle, choices, &m_status);
 }
 
-inline void CvSource::RemoveProperty(const VideoProperty& property) {
-  m_status = 0;
-  RemoveSourceProperty(m_handle, property.m_handle, &m_status);
-}
-
-inline void CvSource::RemoveProperty(llvm::StringRef name) {
-  m_status = 0;
-  RemoveSourceProperty(m_handle, name, &m_status);
-}
-
 inline VideoSink::VideoSink(const VideoSink& sink)
     : m_handle(sink.m_handle == 0 ? 0 : CopySink(sink.m_handle, &m_status)) {}
 

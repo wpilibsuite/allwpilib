@@ -87,16 +87,4 @@ public class CvSource extends VideoSource {
   public void SetEnumPropertyChoices(VideoProperty property, String[] choices) {
     CameraServerJNI.setSourceEnumPropertyChoices(m_handle, property.m_handle, choices);
   }
-
-  /// Remove a property.
-  /// @param name Property name
-  public void removeProperty(VideoProperty property) {
-    CameraServerJNI.removeSourceProperty(m_handle, property.m_handle);
-  }
-
-  /// Remove a property.
-  /// @param name Property name
-  public void removeProperty(String name) {
-    CameraServerJNI.removeSourcePropertyByName(m_handle, name);
-  }
 }
