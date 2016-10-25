@@ -178,7 +178,7 @@ subprojects {
               }
               addWpiUtilLibraryLinks(compileTask, linker, targetPlatform)
           }
-          
+
           ext.addStaticNetworkTablesLibraryLinks = { compileTask, linker, targetPlatform ->
               compileTask.dependsOn project(':').unzipNetworkTables
               String architecture = targetPlatform.architecture
@@ -266,7 +266,7 @@ subprojects {
                 linker.args niLibrary
             }
         }
-        
+
         // This task sets up the shared libraries to be stripped
         ext.debugStripSetup = { project->
             if (!project.hasProperty('debug')) {

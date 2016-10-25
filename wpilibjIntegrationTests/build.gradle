@@ -45,12 +45,12 @@ task moveNativeLibraries(type: Copy) {
   dependsOn shadowJar
   dependsOn deleteNativeLibaries
   dependsOn wpilibj.wpilibJNativeLibraries
-  
-  from zipTree(wpilibj.wpilibJNativeLibraries.archivePath) 
+
+  from zipTree(wpilibj.wpilibJNativeLibraries.archivePath)
   include '*.so'
- 
+
   from file(netSharedLib)
-    
+
   into nativeDirectory
 }
 

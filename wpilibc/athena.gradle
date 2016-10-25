@@ -59,7 +59,7 @@ task wpilibcZip(type: Zip) {
     from(netSharedLib) {
         into 'lib'
     }
-    
+
     from(netSharedLibDebug) {
         into 'lib'
     }
