@@ -80,12 +80,6 @@ CS_Source CS_CreateHTTPCamera(const char* name, const char* url,
   return cs::CreateHTTPCamera(name, url, status);
 }
 
-CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
-                            CS_Status* status) {
-  return cs::CreateCvSource(name, static_cast<const cs::VideoMode&>(*mode),
-                            status);
-}
-
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, status);
@@ -180,63 +174,6 @@ CS_Source CS_CopySource(CS_Source source, CS_Status* status) {
 
 void CS_ReleaseSource(CS_Source source, CS_Status* status) {
   return cs::ReleaseSource(source, status);
-}
-
-void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
-                       CS_Status* status) {
-  auto mat = cv::cvarrToMat(image);
-  return cs::PutSourceFrame(source, mat, status);
-}
-
-void CS_NotifySourceError(CS_Source source, const char* msg,
-                          CS_Status* status) {
-  return cs::NotifySourceError(source, msg, status);
-}
-
-void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
-                           CS_Status* status) {
-  return cs::SetSourceConnected(source, connected, status);
-}
-
-void CS_SetSourceDescription(CS_Source source, const char* description,
-                             CS_Status* status) {
-  return cs::SetSourceDescription(source, description, status);
-}
-
-CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
-                                    enum CS_PropertyType type, int minimum,
-                                    int maximum, int step, int defaultValue,
-                                    int value, CS_Status* status) {
-  return cs::CreateSourceProperty(source, name, type, minimum, maximum, step,
-                                  defaultValue, value, status);
-}
-
-CS_Property CS_CreateSourcePropertyCallback(
-    CS_Source source, const char* name, enum CS_PropertyType type, int minimum,
-    int maximum, int step, int defaultValue, int value, void* data,
-    void (*onChange)(void* data, CS_Property property), CS_Status* status) {
-  return cs::CreateSourcePropertyCallback(
-      source, name, type, minimum, maximum, step, defaultValue, value,
-      [=](CS_Property property) { onChange(data, property); }, status);
-}
-
-void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
-                                     const char** choices, int count,
-                                     CS_Status* status) {
-  llvm::SmallVector<std::string, 8> vec;
-  vec.reserve(count);
-  for (int i = 0; i < count; ++i) vec.push_back(choices[i]);
-  return cs::SetSourceEnumPropertyChoices(source, property, vec, status);
-}
-
-void CS_RemoveSourceProperty(CS_Source source, CS_Property property,
-                             CS_Status* status) {
-  return cs::RemoveSourceProperty(source, property, status);
-}
-
-void CS_RemoveSourcePropertyByName(CS_Source source, const char* name,
-                                   CS_Status* status) {
-  return cs::RemoveSourceProperty(source, name, status);
 }
 
 CS_Sink CS_CreateCvSink(const char* name, CS_Status* status) {
