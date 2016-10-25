@@ -113,7 +113,7 @@ task wpilibJNativeLibraries(type: Jar) {
     group = 'WPILib'
     classifier = 'nativelibraries'
     duplicatesStrategy = 'exclude'
-    
+
     // Include the JNI library
     model {
         binaries {
@@ -127,7 +127,7 @@ task wpilibJNativeLibraries(type: Jar) {
             }
         }
     }
-    
+
     // Include the shared library object from hal project
     def hal = project(':hal')
     hal.model{

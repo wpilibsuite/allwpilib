@@ -60,7 +60,7 @@ task halZip(type: Zip) {
     destinationDir = project.buildDir
     classifier = 'hal'
     duplicatesStrategy = 'exclude'
-    
+
     // Include the static library file and header files from this project
     model {
         binaries {
@@ -83,18 +83,18 @@ task halZip(type: Zip) {
             }
         }
     }
-    
+
     // Include the wpiutil static lib
     from(wpiUtilStaticLib) {
         into 'lib'
     }
-    
+
     // Finally, include all of the shared library objects from the ni directory
     from(project.file('../ni-libraries')) {
         into 'lib'
         exclude 'genlinks'
     }
-    
+
     // Add the hal static and shared libraries as a dependency
 project(':hal').tasks.whenTaskAdded { task ->
     if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
