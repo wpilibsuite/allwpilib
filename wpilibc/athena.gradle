@@ -7,7 +7,7 @@ def ntSourceDir = "$buildDir/ntSources"
 
 model {
     components {
-        wpilib_nonshared(NativeLibrarySpec) {
+        wpilibc(NativeLibrarySpec) {
             targetPlatform 'arm'
             binaries.all {
                 tasks.withType(CppCompile) {
@@ -39,11 +39,14 @@ task wpilibcZip(type: Zip) {
     destinationDir = project.buildDir
     duplicatesStrategy = 'exclude'
 
-    // Include the static library file and header files from this project
+    // Include the shared library file and header files from this project
     model {
         binaries {
-            withType(StaticLibraryBinarySpec) { spec ->
-                from(spec.staticLibraryFile) {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into 'lib'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
                     into 'lib'
                 }
             }
@@ -69,7 +72,7 @@ task wpilibcZip(type: Zip) {
 // this cannot be done purely with dependsOn in the task, as the static library task doesn't exist yet. Same goes for
 // the networkTablesStaticLibrary task and the two HAL tasks below
 tasks.whenTaskAdded { task ->
-    if (task.name.toLowerCase() == 'wpilib_nonsharedstaticlibrary') {
+    if (task.name.toLowerCase() == 'wpilibcsharedlibrary') {
         wpilibcZip.dependsOn task
     }
 }

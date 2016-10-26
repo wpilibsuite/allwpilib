@@ -38,7 +38,7 @@ model {
                         include '**/*.h'
                     }
 
-                    lib project: ':wpilibc', library: 'wpilib_nonshared', linkage: 'static'
+                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'static'
                     lib project: ':hal', library: 'HALAthena', linkage: 'static'
                 }
             }
