@@ -37,8 +37,8 @@ clean {
     delete nativeDirectory
 }
 
-task moveNativeLibraries(type: Copy) {
-    description = 'Moves all native libraries to an easy to find folder'
+task copyNativeLibraries(type: Copy) {
+    description = 'Copies all native libraries to an easy to find folder'
     group = 'WPILib'
     dependsOn shadowJar
     dependsOn wpilibj.wpilibjNativeLibraries
@@ -64,4 +64,4 @@ task moveNativeLibraries(type: Copy) {
     into nativeDirectory
 }
 
-build.dependsOn moveNativeLibraries
+build.dependsOn copyNativeLibraries
