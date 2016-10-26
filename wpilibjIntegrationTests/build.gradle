@@ -28,3 +28,30 @@ dependencies {
 compileJava.dependsOn tasks.getByPath(':wpilibj:testClasses')
 
 build.dependsOn shadowJar
+
+def nativeDirectory = "$buildDir/nativelibraries"
+
+defineNetworkTablesProperties()
+
+task deleteNativeLibaries(type: Delete) {
+    description = "Deletes the native library directory"
+    group = "WPILib"
+    delete nativeDirectory
+}
+
+task moveNativeLibraries(type: Copy) {
+  description = 'Moves all native libraries to an easy to find folder'
+  group = 'WPILib'
+  dependsOn shadowJar
+  dependsOn deleteNativeLibaries
+  dependsOn wpilibj.wpilibJNativeLibraries
+
+  from zipTree(wpilibj.wpilibJNativeLibraries.archivePath)
+  include '*.so'
+
+  from file(netSharedLib)
+
+  into nativeDirectory
+}
+
+build.dependsOn moveNativeLibraries

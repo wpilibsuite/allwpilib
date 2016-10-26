@@ -1,6 +1,8 @@
 defineNetworkTablesProperties()
 defineWpiUtilProperties()
 
+debugStripSetup(project)
+
 def ntSourceDir = "$buildDir/ntSources"
 
 model {
@@ -23,7 +25,7 @@ model {
                         srcDirs = ["${project.shared}/include", "${project.athena}/include", netTablesInclude, wpiUtilInclude]
                         includes = ['**/*.h']
                     }
-                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                    lib project: ':hal', library: 'HALAthena', linkage: 'shared'
                 }
             }
         }
@@ -53,49 +55,13 @@ task wpilibcZip(type: Zip) {
         }
     }
 
-    // Include the static library file and shared library object from hal project
-    def hal = project(':hal')
-    hal.model{
-        binaries{
-            withType(StaticLibraryBinarySpec) { spec ->
-                spec.headerDirs.each {
-                    from(it) {
-                        into 'include'
-                        // We don't want to include any of the .cpp files that are in some of the header directories
-                        exclude '**/*.cpp'
-                    }
-                }
-                from(spec.staticLibraryFile) {
-                    into 'lib'
-                }
-            }
-            withType(SharedLibraryBinarySpec) { spec ->
-                from(spec.sharedLibraryFile) {
-                    into 'lib'
-                }
-            }
-        }
-    }
-
-    // Include the ntcore static and shared libraries
+    // Include the ntcore shared libraries
     from(netSharedLib) {
         into 'lib'
     }
-    from(netStaticLib) {
-        into 'lib'
-    }
-    from(wpiUtilStaticLib) {
-        into 'lib'
-    }
 
-    // We rename the libHALAthena.so object to libHALAthena_shared.so, and the same for libntcore.so
-    rename('(libHALAthena)(.so)', '$1_shared$2')
-    rename('(libntcore)(.so)', '$1_shared$2')
-
-    // Finally, include all of the shared library objects from the ni directory
-    from(project.file('../ni-libraries')) {
+    from(netSharedLibDebug) {
         into 'lib'
-        exclude 'genlinks'
     }
 }
 
@@ -183,7 +149,7 @@ publishing {
     publications {
         wpilibc(MavenPublication) {
             artifact wpilibcZip
-
+            artifact project(':hal').halZip
             if (checkDoxygen()) {
                 artifact (doxygenZip) {
                     classifier = 'doxygen'

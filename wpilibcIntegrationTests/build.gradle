@@ -14,7 +14,7 @@ model {
             binaries.all {
                 tasks.withType(CppCompile) {
                     addNiLibraryLinks(linker, targetPlatform)
-                    addNetworkTablesLibraryLinks(it, linker, targetPlatform)
+                    addStaticNetworkTablesLibraryLinks(it, linker, targetPlatform)
                 }
 
                 cppCompiler.args '-pthread', '-Wno-unused-variable'
