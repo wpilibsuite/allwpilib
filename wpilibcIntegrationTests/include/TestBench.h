@@ -18,7 +18,6 @@ class TestBench {
 
   /* Analog output channels */
   static const uint32_t kAnalogOutputChannel = 0;
-  static const uint32_t kFakeJaguarPotentiometer = 1;
 
   /* DIO channels */
   static const uint32_t kTalonEncoderChannelA = 0;
@@ -45,15 +44,9 @@ class TestBench {
   static const uint32_t kFakeSolenoid2Channel = 13;
   static const uint32_t kFakeRelayForward = 18;
   static const uint32_t kFakeRelayReverse = 19;
-  static const uint32_t kFakeJaguarForwardLimit = 20;
-  static const uint32_t kFakeJaguarReverseLimit = 21;
 
   /* Relay channels */
   static const uint32_t kRelayChannel = 0;
-  static const uint32_t kCANJaguarRelayChannel = 1;
-
-  /* CAN IDs */
-  static const uint32_t kCANJaguarID = 2;
 
   /* PDP channels */
   static const uint32_t kJaguarPDPChannel = 6;

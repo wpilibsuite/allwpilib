@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
 public interface CANSpeedController extends SpeedController, PIDInterface, LiveWindowSendable {
   /**
    * Mode determines how the motor is controlled, used internally. This is meant to be subclassed by
-   * enums (see {@link CANTalon.TalonControlMode CANTalon.TalonControlMode}).
+   * enums
    *
    * <p>Note that the Jaguar does not support follower mode.
    */
@@ -146,11 +146,9 @@ public interface CANSpeedController extends SpeedController, PIDInterface, LiveW
     ITable table = getTable();
     if (table != null) {
       table.putString("~TYPE~", SMART_DASHBOARD_TYPE);
-      table.putString("Type", getClass().getSimpleName()); // "CANTalon", "CANJaguar"
+      table.putString("Type", getClass().getSimpleName());
       table.putNumber("Mode", getControlMode().getValue());
       if (getControlMode().isPID()) {
-        // CANJaguar throws an exception if you try to get its PID constants
-        // when it's not in a PID-compatible mode
         table.putNumber("p", getP());
         table.putNumber("i", getI());
         table.putNumber("d", getD());

@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * Texas Instruments / Vex Robotics Jaguar Speed Controller as a PWM device.
- *
- * @see CANJaguar CANJaguar for CAN control
  */
 public class Jaguar extends PWMSpeedController {
 

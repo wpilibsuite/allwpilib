@@ -16,7 +16,6 @@ import java.util.List;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
-import edu.wpi.first.wpilibj.CANJaguar;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Jaguar;
@@ -27,7 +26,6 @@ import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
-import edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.FilterNoiseFixture;
 import edu.wpi.first.wpilibj.fixtures.FilterOutputFixture;
@@ -63,14 +61,6 @@ public final class TestBench {
   public static final int kJaguarPDPChannel = 6;
   public static final int kVictorPDPChannel = 8;
   public static final int kTalonPDPChannel = 10;
-  public static final int kCANJaguarPDPChannel = 5;
-
-  /* CAN ASSOICATED CHANNELS */
-  public static final int kCANRelayPowerCycler = 1;
-  public static final int kFakeJaguarPotentiometer = 1;
-  public static final int kFakeJaguarForwardLimit = 20;
-  public static final int kFakeJaguarReverseLimit = 21;
-  public static final int kCANJaguarID = 2;
 
   // THESE MUST BE IN INCREMENTING ORDER
   public static final int DIOCrossConnectB2 = 9;
@@ -194,67 +184,6 @@ public final class TestBench {
       }
     };
     return jagPair;
-  }
-
-  public class BaseCANMotorEncoderFixture extends CANMotorEncoderFixture {
-    @Override
-    protected CANJaguar giveSpeedController() {
-      return new CANJaguar(kCANJaguarID);
-    }
-
-    @Override
-    protected DigitalInput giveDigitalInputA() {
-      return new DigitalInput(18);
-    }
-
-    @Override
-    protected DigitalInput giveDigitalInputB() {
-      return new DigitalInput(19);
-    }
-
-    @Override
-    protected FakePotentiometerSource giveFakePotentiometerSource() {
-      return new FakePotentiometerSource(kFakeJaguarPotentiometer, 360);
-    }
-
-    @Override
-    protected DigitalOutput giveFakeForwardLimit() {
-      return new DigitalOutput(kFakeJaguarForwardLimit);
-    }
-
-    @Override
-    protected DigitalOutput giveFakeReverseLimit() {
-      return new DigitalOutput(kFakeJaguarReverseLimit);
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * edu.wpi.first.wpilibj.fixtures.CANMotorEncoderFixture#givePowerCycleRelay
-     * ()
-     */
-    @Override
-    protected Relay givePowerCycleRelay() {
-      return new Relay(kCANRelayPowerCycler);
-    }
-
-    @Override
-    public int getPDPChannel() {
-      return kCANJaguarPDPChannel;
-    }
-  }
-
-  /**
-   * Constructs a new set of objects representing a connected set of CANJaguar controlled Motors and
-   * an encoder<br> Note: The CANJaguar is not freshly allocated because the CANJaguar lacks a
-   * free() method.
-   *
-   * @return an existing CANJaguar and a freshly allocated Encoder
-   */
-  public CANMotorEncoderFixture getCanJaguarPair() {
-    CANMotorEncoderFixture canPair = new BaseCANMotorEncoderFixture();
-    return canPair;
   }
 
   /**

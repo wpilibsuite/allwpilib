@@ -11,8 +11,6 @@
 
 /**
  * Interface for "smart" CAN-based speed controllers.
- * @see CANJaguar
- * @see CANTalon
  */
 class CANSpeedController : public SpeedController {
  public:
@@ -22,8 +20,8 @@ class CANSpeedController : public SpeedController {
     kSpeed = 2,
     kPosition = 3,
     kVoltage = 4,
-    kFollower = 5,       // Not supported in Jaguar.
-    kMotionProfile = 6,  // Not supported in Jaguar.
+    kFollower = 5,
+    kMotionProfile = 6,
   };
 
   // Helper function for the ControlMode enum

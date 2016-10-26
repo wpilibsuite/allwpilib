@@ -29,22 +29,6 @@ public class SimSpeedController {
   /**
    * Set the PWM value.
    *
-   * <p>he PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
-   * FPGA.
-   *
-   * @param speed     The speed to set.  Value should be between -1.0 and 1.0.
-   * @param syncGroup The update group to add this Set() to, pending UpdateSyncGroup().  If 0,
-   *                  update immediately.
-   * @deprecated For compatibility with CANJaguar
-   */
-  @Deprecated
-  public void set(double speed, byte syncGroup) {
-    set(speed);
-  }
-
-  /**
-   * Set the PWM value.
-   *
    * <p>The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the value for the
    * FPGA.
    *
