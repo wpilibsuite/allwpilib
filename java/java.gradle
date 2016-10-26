@@ -31,9 +31,11 @@ jar {
     model {
         binaries {
             withType(SharedLibraryBinarySpec) { binary ->
-                from(file(binary.sharedLibraryFile)) {
-                    into getPlatformPath(binary)
-                }
+                // Only include the native file if not cross compiling to the roboRIO
+                if (!project.isArm || project.hasProperty('compilerPrefix'))
+                    from(file(binary.sharedLibraryFile)) {
+                        into getPlatformPath(binary)
+                    }
             }
         }
     }

@@ -47,7 +47,12 @@ publishing {
                 artifact nat.networktablesJavaSource
                 artifact nat.networktablesJavadoc
                 if (project.buildArm) {
-                    artifact project('arm:ntcore').jar
+                    def natArm = project('arm:ntcore')
+                    artifact natArm.jar
+                    // If the library is not embedded include it in the repo
+                    if (!project.hasProperty('compilerPrefix')) {
+                        artifact natArm.ntcoreZip
+                    }                   
                 }
 
                 if (project.hasProperty('makeDesktop')) {
