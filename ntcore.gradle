@@ -39,8 +39,11 @@ def ntcoreSetupModel = { project ->
                             }
                             includes = ['**/*.h']
                         }
-                        if (project.isArm) {
+                        if (project.isArm && project.hasProperty('compilerPrefix')) {
                             lib project: ':arm:wpiutil', library: 'wpiutil', linkage: 'static'
+                        } else if (project.isArm) {
+                            // If roboRIO, link shared
+                            lib project: ':arm:wpiutil', library: 'wpiutil', linkage: 'shared'
                         } else {
                             lib project: ':native:wpiutil', library: 'wpiutil', linkage: 'static'
                         }
