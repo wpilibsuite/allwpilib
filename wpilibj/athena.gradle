@@ -4,6 +4,8 @@ def jniDir = 'src/athena/cpp'
 def generatedJNIHeaderLoc = "$buildDir/include"
 def ntSourceDir = "$buildDir/ntSources"
 
+debugStripSetup(project)
+
 sourceSets {
     athena
 }
@@ -43,7 +45,7 @@ model {
                             srcDirs file.getPath()
                         }
                     }
-                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                    lib project: ':hal', library: 'HALAthena', linkage: 'shared'
                 }
             }
         }
@@ -63,7 +65,14 @@ publishing {
             }
 
             groupId 'edu.wpi.first.wpilibj'
-            artifactId 'wpilibJavaFinal'
+            artifactId 'athena'
+            version WPILibVersion.version
+        }
+        wpilibjjni(MavenPublication) {
+            artifact wpilibjNativeLibraries
+
+            groupId 'edu.wpi.first.wpilibj'
+            artifactId 'athena-jni'
             version WPILibVersion.version
         }
     }
@@ -86,21 +95,12 @@ jar {
         }
         addClasspath sourceSets.athena.runtimeClasspath
     }
-
-    model {
-        binaries {
-            withType(SharedLibraryBinarySpec) {
-                from(file(it.sharedLibraryFile)) {
-                    into 'linux-arm'
-                }
-            }
-        }
-    }
 }
 
 tasks.whenTaskAdded { task ->
     if (task.name == 'wpilibJavaJNISharedLibrary') {
         jar.dependsOn task
+        wpilibjNativeLibraries.dependsOn task
     }
 }
 
@@ -189,6 +189,35 @@ task jniHeaders {
         }
     }
 }
+
+task wpilibjNativeLibraries(type: Jar) {
+    description = 'Creates the native library jar for the maven publishing routine'
+    baseName = 'nativelibraries'
+    group = 'WPILib'
+    duplicatesStrategy = 'exclude'
+    dependsOn project(':wpilibj').jniHeaders
+
+    // Include the JNI library
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into 'lib'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
+                    into 'lib'
+                }
+            }
+        }
+    }
+    project(':wpilibj').jniHeaders.outputs.each {
+            from(it) {
+                into 'include'
+            }
+        }
+}
+
+build.dependsOn wpilibjNativeLibraries
 
 clean {
     delete generatedJNIHeaderLoc
