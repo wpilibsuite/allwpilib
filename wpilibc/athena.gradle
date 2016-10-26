@@ -1,6 +1,8 @@
 defineNetworkTablesProperties()
 defineWpiUtilProperties()
 
+debugStripSetup(project)
+
 def ntSourceDir = "$buildDir/ntSources"
 
 model {
@@ -23,7 +25,7 @@ model {
                         srcDirs = ["${project.shared}/include", "${project.athena}/include", netTablesInclude, wpiUtilInclude]
                         includes = ['**/*.h']
                     }
-                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                    lib project: ':hal', library: 'HALAthena', linkage: 'shared'
                 }
             }
         }
@@ -65,32 +67,30 @@ task wpilibcZip(type: Zip) {
                         exclude '**/*.cpp'
                     }
                 }
-                from(spec.staticLibraryFile) {
-                    into 'lib'
-                }
             }
             withType(SharedLibraryBinarySpec) { spec ->
                 from(spec.sharedLibraryFile) {
+                    into 'lib'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
                     into 'lib'
                 }
             }
         }
     }
 
-    // Include the ntcore static and shared libraries
+    // Include the ntcore shared libraries
     from(netSharedLib) {
         into 'lib'
     }
-    from(netStaticLib) {
+    
+    from(netSharedLibDebug) {
         into 'lib'
     }
+    
     from(wpiUtilStaticLib) {
         into 'lib'
     }
-
-    // We rename the libHALAthena.so object to libHALAthena_shared.so, and the same for libntcore.so
-    rename('(libHALAthena)(.so)', '$1_shared$2')
-    rename('(libntcore)(.so)', '$1_shared$2')
 
     // Finally, include all of the shared library objects from the ni directory
     from(project.file('../ni-libraries')) {

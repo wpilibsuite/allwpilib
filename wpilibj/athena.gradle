@@ -4,6 +4,8 @@ def jniDir = 'src/athena/cpp'
 def generatedJNIHeaderLoc = "$buildDir/include"
 def ntSourceDir = "$buildDir/ntSources"
 
+debugStripSetup(project)
+
 sourceSets {
     athena
 }
@@ -43,7 +45,7 @@ model {
                             srcDirs file.getPath()
                         }
                     }
-                    lib project: ':hal', library: 'HALAthena', linkage: 'static'
+                    lib project: ':hal', library: 'HALAthena', linkage: 'shared'
                 }
             }
         }
@@ -55,6 +57,7 @@ publishing {
     publications {
         wpilibj(MavenPublication) {
             artifact jar
+            artifact wpilibJNativeLibraries
             artifact(wpilibjSources) {
                 classifier "sources"
             }
@@ -86,21 +89,12 @@ jar {
         }
         addClasspath sourceSets.athena.runtimeClasspath
     }
-
-    model {
-        binaries {
-            withType(SharedLibraryBinarySpec) {
-                from(file(it.sharedLibraryFile)) {
-                    into 'linux-arm'
-                }
-            }
-        }
-    }
 }
 
 tasks.whenTaskAdded { task ->
     if (task.name == 'wpilibJavaJNISharedLibrary') {
         jar.dependsOn task
+        wpilibJNativeLibraries.dependsOn task
     }
 }
 
@@ -113,6 +107,44 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
     from sourceSets.athena.allJava
     from sourceSets.shared.allJava
 }
+
+task wpilibJNativeLibraries(type: Jar) {
+    description = 'Creates the native library jar for the maven publishing routine'
+    group = 'WPILib'
+    classifier = 'nativelibraries'
+    duplicatesStrategy = 'exclude'
+    
+    // Include the JNI library
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into '/'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
+                    into '/'
+                }
+            }
+        }
+    }
+    
+    // Include the shared library object from hal project
+    def hal = project(':hal')
+    hal.model{
+        binaries{
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into '/'
+                }
+                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
+                    into '/'
+                }
+            }
+        }
+    }
+}
+
+build.dependsOn wpilibJNativeLibraries
 
 task unzipJavaNtSources(type: Copy) {
     description = 'Unzips the java networktables sources for doc creation'
