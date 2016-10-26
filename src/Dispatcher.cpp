@@ -346,6 +346,9 @@ void DispatcherBase::ClientThreadMain() {
     conn->set_proto_rev(m_reconnect_proto_rev);
     conn->Start();
 
+    // reconnect the next time starting with latest protocol revision
+    m_reconnect_proto_rev = 0x0300;
+
     // block until told to reconnect
     m_do_reconnect = false;
     m_reconnect_cv.wait(lock, [&] { return !m_active || m_do_reconnect; });
