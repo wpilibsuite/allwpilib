@@ -140,46 +140,54 @@ task clean(type: Delete) {
 }
 
 subprojects {
-    plugins.withType(CppPlugin).whenPluginAdded {
-        ext.defineWpiUtilProperties = {
-            ext.wpiUtil = wpiUtilUnzipLocation
-            ext.wpiUtilInclude = "$wpiUtilUnzipLocation/include"
-            ext.wpiUtilLibArmLocation = "$wpiUtilUnzipLocation/Linux/arm"
-            if (project.hasProperty('makeSim')) {
-                ext.wpiUtilLibDesktopLocation = "$wpiUtilUnzipLocation/Linux/amd64"
-            }
-            ext.wpiUtilStaticLib = "$wpiUtilLibArmLocation/libwpiutil.a"
+      ext.defineWpiUtilProperties = {
+          ext.wpiUtil = wpiUtilUnzipLocation
+          ext.wpiUtilInclude = "$wpiUtilUnzipLocation/include"
+          ext.wpiUtilLibArmLocation = "$wpiUtilUnzipLocation/Linux/arm"
+          if (project.hasProperty('makeSim')) {
+              ext.wpiUtilLibDesktopLocation = "$wpiUtilUnzipLocation/Linux/amd64"
+          }
+          ext.wpiUtilStaticLib = "$wpiUtilLibArmLocation/libwpiutil.a"
 
-            ext.addWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
-                compileTask.dependsOn project(':').unzipWpiUtil
-                String architecture = targetPlatform.architecture
-                if (architecture.contains('arm')) {
-                    linker.args wpiUtilStaticLib
-                }
-            }
-        }
+          ext.addWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
+              compileTask.dependsOn project(':').unzipWpiUtil
+              String architecture = targetPlatform.architecture
+              if (architecture.contains('arm')) {
+                  linker.args wpiUtilStaticLib
+              }
+          }
+      }
 
-        // This defines a project property that projects depending on network tables can use to setup that dependency.
-        ext.defineNetworkTablesProperties = {
-            ext.netTables = netTablesUnzipLocation
-            ext.netTablesInclude = "$netTablesUnzipLocation/include"
-            ext.netLibArmLocation = "$netTablesUnzipLocation/Linux/arm"
-            if (project.hasProperty('makeSim')) {
-                ext.netLibDesktopLocation = "$netTablesUnzipLocation/Linux/amd64"
-            }
-            ext.netSharedLib = "$netLibArmLocation/libntcore.so"
-            ext.netStaticLib = "$netLibArmLocation/libntcore.a"
+      // This defines a project property that projects depending on network tables can use to setup that dependency.
+      ext.defineNetworkTablesProperties = {
+          ext.netTables = netTablesUnzipLocation
+          ext.netTablesInclude = "$netTablesUnzipLocation/include"
+          ext.netLibArmLocation = "$netTablesUnzipLocation/Linux/arm"
+          if (project.hasProperty('makeSim')) {
+              ext.netLibDesktopLocation = "$netTablesUnzipLocation/Linux/amd64"
+          }
+          ext.netSharedLib = "$netLibArmLocation/libntcore.so"
+          ext.netStaticLib = "$netLibArmLocation/libntcore.a"
 
-            ext.addNetworkTablesLibraryLinks = { compileTask, linker, targetPlatform ->
-                compileTask.dependsOn project(':').unzipNetworkTables
-                String architecture = targetPlatform.architecture
-                if (architecture.contains('arm')) {
-                    linker.args netStaticLib
-                }
-                addWpiUtilLibraryLinks(compileTask, linker, targetPlatform)
-            }
-        }
-
+          ext.addNetworkTablesLibraryLinks = { compileTask, linker, targetPlatform ->
+              compileTask.dependsOn project(':').unzipNetworkTables
+              String architecture = targetPlatform.architecture
+              if (architecture.contains('arm')) {
+                  linker.args netSharedLib
+              }
+              addWpiUtilLibraryLinks(compileTask, linker, targetPlatform)
+          }
+          
+          ext.addStaticNetworkTablesLibraryLinks = { compileTask, linker, targetPlatform ->
+              compileTask.dependsOn project(':').unzipNetworkTables
+              String architecture = targetPlatform.architecture
+              if (architecture.contains('arm')) {
+                  linker.args netStaticLib
+              }
+              addWpiUtilLibraryLinks(compileTask, linker, targetPlatform)
+          }
+      }
+      plugins.withType(CppPlugin).whenPluginAdded {
         model {
             buildTypes {
                 debug

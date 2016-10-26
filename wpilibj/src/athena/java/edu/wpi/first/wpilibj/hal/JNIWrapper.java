@@ -22,34 +22,7 @@ public class JNIWrapper {
   static {
     try {
       if (!libraryLoaded) {
-        InputStream is = JNIWrapper.class.getResourceAsStream("/linux-arm/libwpilibJavaJNI.so");
-        if (is != null) {
-          // create temporary file
-          jniLibrary = File.createTempFile("libwpilibJavaJNI", ".so");
-          // flag for delete on exit
-          jniLibrary.deleteOnExit();
-
-          byte[] buffer = new byte[1024];
-
-          int readBytes;
-
-
-          OutputStream os = new FileOutputStream(jniLibrary);
-
-          try {
-            while ((readBytes = is.read(buffer)) != -1) {
-              os.write(buffer, 0, readBytes);
-            }
-
-          } finally {
-            os.close();
-            is.close();
-          }
-          System.load(jniLibrary.getAbsolutePath());
-        } else {
-          System.loadLibrary("wpilibJavaJNI");
-        }
-
+        System.loadLibrary("wpilibJavaJNI");
         libraryLoaded = true;
       }
 
