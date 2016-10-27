@@ -83,8 +83,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
         m_counters[0] = new Counter(m_alphaSource);
         m_counters[1] = new Counter(m_betaSource);
         logger.fine("Creating the speed controller!");
-        m_motor = giveSpeedController(); // CANJaguar throws an exception if it
-        // doesn't get the message
+        m_motor = giveSpeedController();
       }
     }
   }

@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import edu.wpi.first.wpilibj.WpiLibJTestSuite;
-import edu.wpi.first.wpilibj.can.CANTestSuite;
 import edu.wpi.first.wpilibj.command.CommandTestSuite;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
 
@@ -38,8 +37,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboardTestSuite;
  */
 @RunWith(Suite.class)
 // These are listed on separate lines to prevent merge conflicts
-@SuiteClasses({WpiLibJTestSuite.class, CANTestSuite.class, CommandTestSuite.class,
-    SmartDashboardTestSuite.class})
+@SuiteClasses({WpiLibJTestSuite.class, CommandTestSuite.class, SmartDashboardTestSuite.class})
 public class TestSuite extends AbstractTestSuite {
   static {
     // Sets up the logging output
