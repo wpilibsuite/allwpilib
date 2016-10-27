@@ -369,7 +369,6 @@ void MJPEGServerImpl::SendStream(wpi::raw_socket_ostream& os) {
 
   SendHeader(oss, 200, "OK", "multipart/x-mixed-replace;boundary=" BOUNDARY,
              "Access-Control-Allow-Origin: *");
-  oss << "--" BOUNDARY "\r\n";
   os << oss.str();
 
   DEBUG("HTTP: Headers send, sending stream now");
@@ -397,13 +396,13 @@ void MJPEGServerImpl::SendStream(wpi::raw_socket_ostream& os) {
     // with firefox
     double timestamp = frame.time() / 10000000.0;
     header.clear();
-    oss << "Content-Type: image/jpeg\r\n"
+    oss << "\r\n--" BOUNDARY "\r\n"
+        << "Content-Type: image/jpeg\r\n"
         << "Content-Length: " << frame.size() << "\r\n"
         << "X-Timestamp: " << timestamp << "\r\n"
         << "\r\n";
     os << oss.str();
     os << llvm::StringRef(frame.data(), frame.size());
-    os << "\r\n--" BOUNDARY "\r\n";
     // os.flush();
   }
   Disable();
