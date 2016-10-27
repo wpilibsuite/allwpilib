@@ -340,7 +340,7 @@ class CvSink : public VideoSink {
   /// WaitForFrame() must be called on the created sink to get each new
   /// image.
   /// @param name Source name (arbitrary unique identifier)
-  CvSink(llvm::StringRef name);
+  explicit CvSink(llvm::StringRef name);
 
   /// Create a sink for accepting OpenCV images in a separate thread.
   /// A thread will be created that calls WaitForFrame() and calls the
@@ -351,6 +351,10 @@ class CvSink : public VideoSink {
   ///        or GetError() as needed, but should not call (except in very
   ///        unusual circumstances) WaitForImage().
   CvSink(llvm::StringRef name, std::function<void(uint64_t time)> processFrame);
+
+  /// Set sink description.
+  /// @param description Description
+  void SetDescription(llvm::StringRef description);
 
   /// Wait for the next frame and get the image.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error

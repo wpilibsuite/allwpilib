@@ -176,17 +176,6 @@ void CS_ReleaseSource(CS_Source source, CS_Status* status) {
   return cs::ReleaseSource(source, status);
 }
 
-CS_Sink CS_CreateCvSink(const char* name, CS_Status* status) {
-  return cs::CreateCvSink(name, status);
-}
-
-CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
-                                void (*processFrame)(void* data, uint64_t time),
-                                CS_Status* status) {
-  return cs::CreateCvSinkCallback(
-      name, [=](uint64_t time) { processFrame(data, time); }, status);
-}
-
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, status);
@@ -220,23 +209,6 @@ CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status) {
 
 void CS_ReleaseSink(CS_Sink sink, CS_Status* status) {
   return cs::ReleaseSink(sink, status);
-}
-
-uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
-                          CS_Status* status) {
-  auto mat = cv::cvarrToMat(image);
-  return cs::GrabSinkFrame(sink, mat, status);
-}
-
-char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
-  llvm::SmallString<128> buf;
-  auto str = cs::GetSinkError(sink, buf, status);
-  if (*status != 0) return nullptr;
-  return cs::ConvertToC(str);
-}
-
-void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status) {
-  return cs::SetSinkEnabled(sink, enabled, status);
 }
 
 CS_Listener CS_AddSourceListener(void* data,

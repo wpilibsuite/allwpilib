@@ -744,6 +744,19 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_releaseSink
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    setSinkDescription
+ * Signature: (ILjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSinkDescription
+  (JNIEnv *env, jclass, jint sink, jstring description)
+{
+  CS_Status status = 0;
+  cs::SetSinkDescription(sink, JStringRef{env, description}, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
  * Method:    grabSinkFrame
  * Signature: (IJ)J
  */

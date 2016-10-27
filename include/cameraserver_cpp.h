@@ -182,6 +182,8 @@ void ReleaseSink(CS_Sink sink, CS_Status* status);
 //
 // OpenCV Sink Functions
 //
+void SetSinkDescription(CS_Sink sink, llvm::StringRef description,
+                        CS_Status* status);
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
 llvm::StringRef GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,

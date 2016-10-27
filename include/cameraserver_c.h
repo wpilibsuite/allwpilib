@@ -189,6 +189,8 @@ void CS_ReleaseSink(CS_Sink sink, CS_Status* status);
 //
 // OpenCV Sink Functions
 //
+void CS_SetSinkDescription(CS_Sink sink, const char* description,
+                           CS_Status* status);
 uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image, CS_Status* status);
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status);
 void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);

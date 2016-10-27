@@ -32,6 +32,12 @@ public class CvSink extends VideoSink {
   //  super(CameraServerJNI.createCvSinkCallback(name, processFrame));
   //}
 
+  /// Set sink description.
+  /// @param description Description
+  public void setDescription(String description) {
+    CameraServerJNI.setSinkDescription(m_handle, description);
+  }
+
   /// Wait for the next frame and get the image.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);

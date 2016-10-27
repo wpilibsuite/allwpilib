@@ -321,22 +321,9 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
 }
 
 //
-// Sink Creation Functions
-//
-
-CS_Sink CreateCvSink(llvm::StringRef name, CS_Status* status) {
-  return 0;  // TODO
-}
-
-CS_Sink CreateCvSinkCallback(llvm::StringRef name,
-                             std::function<void(uint64_t time)> processFrame,
-                             CS_Status* status) {
-  return 0;  // TODO
-}
-
-//
 // Sink Functions
 //
+
 std::string GetSinkName(CS_Sink sink, CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data) {
@@ -431,27 +418,6 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
     return;
   }
   if (data->refCount-- == 0) inst.Free(sink);
-}
-
-//
-// OpenCV Sink Functions
-//
-
-uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status) {
-  return 0;  // TODO
-}
-
-std::string GetSinkError(CS_Sink sink, CS_Status* status) {
-  return std::string{};  // TODO
-}
-
-llvm::StringRef GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
-                             CS_Status* status) {
-  return llvm::StringRef{};  // TODO
-}
-
-void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
-  // TODO
 }
 
 //

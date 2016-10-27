@@ -290,6 +290,11 @@ inline CvSink::CvSink(llvm::StringRef name,
   m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
 }
 
+inline void CvSink::SetDescription(llvm::StringRef description) {
+  m_status = 0;
+  SetSinkDescription(m_handle, description, &m_status);
+}
+
 inline uint64_t CvSink::GrabFrame(cv::Mat& image) const {
   m_status = 0;
   return GrabSinkFrame(m_handle, image, &m_status);
