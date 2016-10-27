@@ -12,8 +12,6 @@
 #include <functional>
 #include <vector>
 
-#include "llvm/StringMap.h"
-
 #include "SourceImpl.h"
 
 namespace cs {
