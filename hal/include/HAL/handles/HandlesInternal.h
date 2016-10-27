@@ -42,7 +42,8 @@ enum class HAL_HandleEnum {
   Encoder = 13,
   Compressor = 14,
   Solenoid = 15,
-  AnalogGyro = 16
+  AnalogGyro = 16,
+  Vendor = 17
 };
 
 static inline int16_t getHandleIndex(HAL_Handle handle) {
