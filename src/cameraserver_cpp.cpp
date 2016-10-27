@@ -317,7 +317,7 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
     *status = CS_INVALID_HANDLE;
     return;
   }
-  if (--(data->refCount) == 0) inst.Free(source);
+  if (data->refCount-- == 0) inst.Free(source);
 }
 
 //
@@ -430,7 +430,7 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
     *status = CS_INVALID_HANDLE;
     return;
   }
-  if (--(data->refCount) == 0) inst.Free(sink);
+  if (data->refCount-- == 0) inst.Free(sink);
 }
 
 //
