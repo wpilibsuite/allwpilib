@@ -56,8 +56,8 @@ Frame SourceImpl::GetCurFrame() {
 
 Frame SourceImpl::GetNextFrame() {
   std::unique_lock<std::mutex> lock{m_frameMutex};
-  // TODO: handle spurious wakeup by comparing frame timestamps
-  m_frameCv.wait(lock);
+  auto oldTime = m_frame.time();
+  m_frameCv.wait(lock, [=] { return m_frame.time() != oldTime; });
   return m_frame;
 }
 
