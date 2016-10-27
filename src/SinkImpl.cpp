@@ -20,6 +20,18 @@ SinkImpl::~SinkImpl() {
   }
 }
 
+void SinkImpl::SetDescription(llvm::StringRef description) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_description = description;
+}
+
+llvm::StringRef SinkImpl::GetDescription(
+    llvm::SmallVectorImpl<char>& buf) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  buf.append(m_description.begin(), m_description.end());
+  return llvm::StringRef{buf.data(), buf.size()};
+}
+
 void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_source) {
@@ -29,4 +41,21 @@ void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
   m_source = source;
   m_source->AddSink();
   if (m_enabledCount > 0) m_source->EnableSink();
+}
+
+std::string SinkImpl::GetError() const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (!m_source) return "no source connected";
+  auto frame = m_source->GetCurFrame();
+  if (frame) return std::string{};  // no error
+  return llvm::StringRef{frame};
+}
+
+llvm::StringRef SinkImpl::GetError(llvm::SmallVectorImpl<char>& buf) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (!m_source) return "no source connected";
+  auto frame = m_source->GetCurFrame();
+  if (frame) return llvm::StringRef{};  // no error
+  buf.append(frame.data(), frame.data() + frame.size());
+  return llvm::StringRef{buf.data(), buf.size()};
 }

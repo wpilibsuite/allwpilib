@@ -332,19 +332,13 @@ void MJPEGServerImpl::SendJSON(llvm::raw_ostream& os, SourceImpl& source,
 MJPEGServerImpl::MJPEGServerImpl(llvm::StringRef name,
                                  llvm::StringRef description,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
-    : SinkImpl{name},
-      m_description(description),
-      m_acceptor{std::move(acceptor)} {
+    : SinkImpl{name}, m_acceptor{std::move(acceptor)} {
   m_active = true;
+  SetDescription(description);
   m_serverThread = std::thread(&MJPEGServerImpl::ServerThreadMain, this);
 }
 
 MJPEGServerImpl::~MJPEGServerImpl() { Stop(); }
-
-llvm::StringRef MJPEGServerImpl::GetDescription(
-    llvm::SmallVectorImpl<char>& buf) const {
-  return m_description;
-}
 
 void MJPEGServerImpl::Stop() {
   m_active = false;

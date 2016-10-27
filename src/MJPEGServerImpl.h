@@ -9,9 +9,7 @@
 #define CAMERASERVER_MJPEGSERVERIMPL_H_
 
 #include <atomic>
-#include <condition_variable>
 #include <memory>
-#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -35,9 +33,6 @@ class MJPEGServerImpl : public SinkImpl {
                   std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   ~MJPEGServerImpl() override;
 
-  llvm::StringRef GetDescription(
-      llvm::SmallVectorImpl<char>& buf) const override;
-
   void Stop();
 
   static void SendHeader(llvm::raw_ostream& os, int code,
@@ -59,13 +54,10 @@ class MJPEGServerImpl : public SinkImpl {
   void ServerThreadMain();
   void ConnThreadMain(wpi::NetworkStream* stream);
 
-  std::string m_description;
-
   std::unique_ptr<wpi::NetworkAcceptor> m_acceptor;
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_serverThread;
 
-  std::mutex m_mutex;
   std::vector<std::thread> m_connThreads;
   std::vector<std::unique_ptr<wpi::NetworkStream>> m_connStreams;
 };

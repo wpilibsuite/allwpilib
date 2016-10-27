@@ -28,8 +28,9 @@ class SinkImpl {
   SinkImpl& operator=(const SinkImpl& queue) = delete;
 
   llvm::StringRef GetName() const { return m_name; }
-  virtual llvm::StringRef GetDescription(
-      llvm::SmallVectorImpl<char>& buf) const = 0;
+
+  void SetDescription(llvm::StringRef description);
+  llvm::StringRef GetDescription(llvm::SmallVectorImpl<char>& buf) const;
 
   void Enable() {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -43,6 +44,17 @@ class SinkImpl {
     if (m_enabledCount == 0 && m_source) m_source->DisableSink();
   }
 
+  void SetEnabled(bool enabled) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (enabled && m_enabledCount == 0) {
+      if (m_source) m_source->EnableSink();
+      m_enabledCount = 1;
+    } else if (!enabled && m_enabledCount > 0) {
+      if (m_source) m_source->DisableSink();
+      m_enabledCount = 0;
+    }
+  }
+
   void SetSource(std::shared_ptr<SourceImpl> source);
 
   std::shared_ptr<SourceImpl> GetSource() const {
@@ -50,9 +62,15 @@ class SinkImpl {
     return m_source;
   }
 
+  std::string GetError() const;
+  llvm::StringRef GetError(llvm::SmallVectorImpl<char>& buf) const;
+
+ protected:
+  mutable std::mutex m_mutex;
+
  private:
   std::string m_name;
-  mutable std::mutex m_mutex;
+  std::string m_description;
   std::shared_ptr<SourceImpl> m_source;
   int m_enabledCount{0};
 };
