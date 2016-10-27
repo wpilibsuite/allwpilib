@@ -118,6 +118,9 @@ class SourceImpl {
  protected:
   void PutFrame(VideoMode::PixelFormat pixelFormat, llvm::StringRef data,
                 Frame::Time time);
+  void PutError(llvm::StringRef msg, Frame::Time time) {
+    PutFrame(VideoMode::kUnknown, msg, time);
+  }
 
   // Notification functions for corresponding atomics
   virtual void NumSinksChanged() = 0;

@@ -62,7 +62,9 @@ class Frame {
     return *this;
   }
 
-  explicit operator bool() const { return m_data; }
+  explicit operator bool() const {
+    return m_data && m_data->pixelFormat != VideoMode::kUnknown;
+  }
 
   operator llvm::StringRef() const {
     if (!m_data) return llvm::StringRef{};
