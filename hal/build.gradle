@@ -156,7 +156,7 @@ task athenaRuntimeZip(type: Zip) {
     // Add the hal static and shared libraries as a dependency
     project(':hal').tasks.whenTaskAdded { task ->
         if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
-            halZip.dependsOn task
+            athenaRuntimeZip.dependsOn task
         }
     }
 }
@@ -182,3 +182,6 @@ publishing {
 
     setupWpilibRepo(it)
 }
+
+build.dependsOn halZip
+build.dependsOn athenaRuntimeZip
