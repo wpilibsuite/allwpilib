@@ -111,6 +111,35 @@ def cameraserverSetupExamplesModel = { project ->
                     }
                 }
             }
+
+            usbcvstream(NativeExecutableSpec) {
+                if (project.isArm) {
+                    targetPlatform 'arm'
+                } else {
+                    //targetPlatform 'x86'
+                    targetPlatform 'x64'
+                }
+                setupDefines(project, binaries)
+                binaries.all {
+                    tasks.withType(CppCompile) {
+                       project.addOpenCvLibraryLinks(it, linker, targetPlatform)
+                       project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDir "${rootDir}/examples/usbcvstream"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include", project.openCvInclude]
+                            include '**/*.h'
+                        }
+                        lib library: 'cameraserver', linkage: 'static'
+                    }
+                }
+            }
         }
     }
 }
