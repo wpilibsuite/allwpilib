@@ -244,7 +244,6 @@ ext.useOpenCv = { project ->
         }
         if (targetPlatform.architecture.arm) {
             linker.args "${openCvNativesFolder}/libopencv_calib3d.so"
-            linker.args "${openCvNativesFolder}/libopencv_core.so"
             linker.args "${openCvNativesFolder}/libopencv_features2d.so"
             linker.args "${openCvNativesFolder}/libopencv_flann.so"
             linker.args "${openCvNativesFolder}/libopencv_highgui.so"
@@ -259,13 +258,13 @@ ext.useOpenCv = { project ->
             linker.args "${openCvNativesFolder}/libopencv_video.so"
             linker.args "${openCvNativesFolder}/libopencv_videoio.so"
             linker.args "${openCvNativesFolder}/libopencv_videostab.so"
+            linker.args "${openCvNativesFolder}/libopencv_core.so"
             linker.args "-ldl"
             linker.args "-lz"
         } else if (targetPlatform.operatingSystem.windows) {
             linker.args "${openCvNativesFolder}/opencv_core.lib"
         } else {
             linker.args "${openCvNativesFolder}/libopencv_calib3d.a"
-            linker.args "${openCvNativesFolder}/libopencv_core.a"
             linker.args "${openCvNativesFolder}/libopencv_features2d.a"
             linker.args "${openCvNativesFolder}/libopencv_flann.a"
             linker.args "${openCvNativesFolder}/libopencv_highgui.a"
@@ -280,6 +279,9 @@ ext.useOpenCv = { project ->
             linker.args "${openCvNativesFolder}/libopencv_video.a"
             linker.args "${openCvNativesFolder}/libopencv_videoio.a"
             linker.args "${openCvNativesFolder}/libopencv_videostab.a"
+            linker.args "${openCvNativesFolder}/libopencv_core.a"
+            linker.args "${openCvNativesFolder}/liblibjpeg.a"
+            linker.args "${openCvNativesFolder}/liblibpng.a"
             linker.args "-ldl"
             linker.args "-lz"
         }
