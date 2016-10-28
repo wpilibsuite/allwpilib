@@ -100,7 +100,7 @@ void CvSourceImpl::PutFrame(cv::Mat& image) {
 }
 
 void CvSourceImpl::NotifyError(llvm::StringRef msg) {
-  // TODO
+  PutError(msg, wpi::Now());
 }
 
 void CvSourceImpl::SetConnected(bool connected) { m_connected = connected; }
