@@ -64,6 +64,7 @@ def cameraserverSetupExamplesModel = { project ->
                 setupDefines(project, binaries)
                 binaries.all {
                     tasks.withType(CppCompile) {
+                       project.addOpenCvLibraryLinks(it, linker, targetPlatform)
                        project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
                     }
                 }
@@ -92,6 +93,7 @@ def cameraserverSetupExamplesModel = { project ->
                 setupDefines(project, binaries)
                 binaries.all {
                     tasks.withType(CppCompile) {
+                       project.addOpenCvLibraryLinks(it, linker, targetPlatform)
                        project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
                     }
                 }
