@@ -3,7 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
-def utilVersion = "1.0.0${-> WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))}"
+def utilVersion = "1.0.1-beta-1${-> WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))}"
 def utilFile = file("$buildDir/wpiutil.txt")
 def ntcoreFile = file("$buildDir/ntcore.txt")
 
@@ -52,7 +52,7 @@ publishing {
                     // If the library is not embedded include it in the repo
                     if (!project.hasProperty('compilerPrefix')) {
                         artifact natArm.ntcoreZip
-                    }                   
+                    }
                 }
 
                 if (project.hasProperty('makeDesktop')) {
