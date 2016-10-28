@@ -5,7 +5,7 @@ def cameraserverSetupModel = { project ->
                 if (project.isArm) {
                     targetPlatform 'arm'
                 } else {
-                    targetPlatform 'x86'
+                    //targetPlatform 'x86'
                     targetPlatform 'x64'
                 }
                 setupDefines(project, binaries)
@@ -58,7 +58,7 @@ def cameraserverSetupExamplesModel = { project ->
                 if (project.isArm) {
                     targetPlatform 'arm'
                 } else {
-                    targetPlatform 'x86'
+                    //targetPlatform 'x86'
                     targetPlatform 'x64'
                 }
                 setupDefines(project, binaries)
@@ -86,7 +86,7 @@ def cameraserverSetupExamplesModel = { project ->
                 if (project.isArm) {
                     targetPlatform 'arm'
                 } else {
-                    targetPlatform 'x86'
+                    //targetPlatform 'x86'
                     targetPlatform 'x64'
                 }
                 setupDefines(project, binaries)
