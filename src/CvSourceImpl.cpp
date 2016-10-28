@@ -128,6 +128,14 @@ CS_Property CvSourceImpl::CreateProperty(llvm::StringRef name,
   return ndx;
 }
 
+CS_Property CvSourceImpl::CreateProperty(
+    llvm::StringRef name, CS_PropertyType type, int minimum, int maximum,
+    int step, int defaultValue, int value,
+    std::function<void(CS_Property property)> onChange) {
+  // TODO
+  return 0;
+}
+
 void CvSourceImpl::SetEnumPropertyChoices(CS_Property property,
                                           llvm::ArrayRef<std::string> choices,
                                           CS_Status* status) {
