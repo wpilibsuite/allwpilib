@@ -9,11 +9,6 @@ def cameraserverSetupModel = { project ->
                     targetPlatform 'x64'
                 }
                 setupDefines(project, binaries)
-                binaries.all {
-                    tasks.withType(CppCompile) {
-                       project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
-                    }
-                }
 
                 if (includeJava) {
                     project.setupJniIncludes(binaries)
@@ -62,12 +57,6 @@ def cameraserverSetupExamplesModel = { project ->
                     targetPlatform 'x64'
                 }
                 setupDefines(project, binaries)
-                binaries.all {
-                    tasks.withType(CppCompile) {
-                       project.addOpenCvLibraryLinks(it, linker, targetPlatform)
-                       project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
-                    }
-                }
                 sources {
                     cpp {
                         source {
@@ -91,12 +80,6 @@ def cameraserverSetupExamplesModel = { project ->
                     targetPlatform 'x64'
                 }
                 setupDefines(project, binaries)
-                binaries.all {
-                    tasks.withType(CppCompile) {
-                       project.addOpenCvLibraryLinks(it, linker, targetPlatform)
-                       project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
-                    }
-                }
                 sources {
                     cpp {
                         source {
@@ -120,12 +103,6 @@ def cameraserverSetupExamplesModel = { project ->
                     targetPlatform 'x64'
                 }
                 setupDefines(project, binaries)
-                binaries.all {
-                    tasks.withType(CppCompile) {
-                       project.addOpenCvLibraryLinks(it, linker, targetPlatform)
-                       project.addWpiUtilLibraryLinks(it, linker, targetPlatform)
-                    }
-                }
                 sources {
                     cpp {
                         source {
