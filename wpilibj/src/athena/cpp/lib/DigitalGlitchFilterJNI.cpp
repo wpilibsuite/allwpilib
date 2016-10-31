@@ -11,6 +11,8 @@
 
 #include "edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI.h"
 
+using namespace frc;
+
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    setFilterSelect

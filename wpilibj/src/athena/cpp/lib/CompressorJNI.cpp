@@ -10,6 +10,8 @@
 #include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_CompressorJNI.h"
 
+using namespace frc;
+
 extern "C" {
 
 /*

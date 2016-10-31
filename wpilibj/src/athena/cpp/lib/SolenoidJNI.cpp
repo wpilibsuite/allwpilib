@@ -14,6 +14,8 @@
 
 #include "HALUtil.h"
 
+using namespace frc;
+
 TLogLevel solenoidJNILogLevel = logERROR;
 
 #define SOLENOIDJNI_LOG(level)     \

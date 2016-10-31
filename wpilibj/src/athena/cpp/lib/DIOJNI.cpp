@@ -17,6 +17,8 @@
 #include "HAL/Ports.h"
 #include "HAL/handles/HandlesInternal.h"
 
+using namespace frc;
+
 // set the logging level
 TLogLevel dioJNILogLevel = logWARNING;
 

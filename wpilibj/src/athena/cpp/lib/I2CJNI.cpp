@@ -14,6 +14,8 @@
 #include "HAL/I2C.h"
 #include "HALUtil.h"
 
+using namespace frc;
+
 // set the logging level
 TLogLevel i2cJNILogLevel = logWARNING;
 

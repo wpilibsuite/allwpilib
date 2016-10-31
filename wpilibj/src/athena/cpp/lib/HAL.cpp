@@ -15,6 +15,8 @@
 #include "edu_wpi_first_wpilibj_hal_HAL.h"
 #include "HALUtil.h"
 
+using namespace frc;
+
 // set the logging level
 static TLogLevel netCommLogLevel = logWARNING;
 

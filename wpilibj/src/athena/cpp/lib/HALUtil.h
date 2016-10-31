@@ -14,6 +14,8 @@
 
 extern JavaVM *jvm;
 
+namespace frc {
+
 void ReportError(JNIEnv *env, int32_t status, bool do_throw = true);
                  
 void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange, 
@@ -49,5 +51,7 @@ void ThrowBoundaryException(JNIEnv *env, double value, double lower,
 jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
                   int32_t deadbandMaxPwm, int32_t centerPwm,
                   int32_t deadbandMinPwm, int32_t minPwm);
+                  
+}  // namespace frc
 
 #endif  // HALUTIL_H

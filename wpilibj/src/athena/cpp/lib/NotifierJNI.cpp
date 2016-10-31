@@ -19,6 +19,8 @@
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
 #include "support/SafeThread.h"
 
+using namespace frc;
+
 // set the logging level
 TLogLevel notifierJNILogLevel = logWARNING;
 
