@@ -25,26 +25,28 @@ dependencies {
     compile 'org.apache.ant:ant-junit:1.9.4'
 }
 
-compileJava.dependsOn tasks.getByPath(':wpilibj:testClasses')
-
 build.dependsOn shadowJar
 
 def nativeDirectory = "$buildDir/nativelibraries"
-
-defineNetworkTablesProperties()
 
 clean {
     delete nativeDirectory
 }
 
-task copyNativeLibraries(type: Copy) {
+task copyIntegrationLibraries(type: Copy) {
     description = 'Copies all native libraries to an easy to find folder'
     group = 'WPILib'
     dependsOn shadowJar
-    dependsOn wpilibj.wpilibjNativeLibraries
+    dependsOn ':hal:build'
+    dependsOn ':wpilibj:build'
 
-    from zipTree(wpilibj.wpilibjNativeLibraries.archivePath)
-    include '*.so'
+    project(':wpilibj').model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile)
+            }
+        }
+    }
 
     project(':hal').model {
         binaries {
@@ -64,4 +66,6 @@ task copyNativeLibraries(type: Copy) {
     into nativeDirectory
 }
 
-build.dependsOn copyNativeLibraries
+compileJava.dependsOn tasks.getByPath(':wpilibj:testClasses')
+
+build.dependsOn copyIntegrationLibraries
