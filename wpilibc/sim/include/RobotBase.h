@@ -8,22 +8,29 @@
 #pragma once
 
 #include <cstdio>
+#include <iostream>
 
 #include "Base.h"
-#include "DriverStation.h"
+#include "HAL/HAL.h"
 #include "simulation/MainNode.h"
 #include "simulation/simTime.h"
 
-#define START_ROBOT_CLASS(_ClassName_)                               \
-  int main() {                                                       \
-    static _ClassName_ robot;                                        \
-    std::printf("\n********** Robot program starting **********\n"); \
-    robot.StartCompetition();                                        \
+class DriverStation;
+
+#define START_ROBOT_CLASS(_ClassName_)                                       \
+  int main() {                                                               \
+    if (!HALInitialize()) {                                                  \
+      std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl; \
+    }                                                                        \
+    HALReport(HALUsageReporting::kResourceType_Language,                     \
+              HALUsageReporting::kLanguage_CPlusPlus);                       \
+    static _ClassName_ robot;                                                \
+    std::printf("\n********** Robot program starting **********\n");         \
+    robot.StartCompetition();                                                \
   }
 
 /**
  * Implement a Robot Program framework.
- *
  * The RobotBase class is intended to be subclassed by a user creating a robot
  * program. Overridden Autonomous() and OperatorControl() methods are called at
  * the appropriate time as the match proceeds. In the current implementation,

@@ -7,27 +7,25 @@
 
 #include "SampleRobot.h"
 
-#include <cstdio>
-
+#include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "Timer.h"
 #include "networktables/NetworkTable.h"
-
-#if defined(_UNIX)
-#include <unistd.h>
-#elif defined(_WIN32)
-#include <windows.h>
-void sleep(unsigned int milliseconds) { Sleep(milliseconds); }
-#endif
 
 SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
 
 /**
  * Robot-wide initialization code should go here.
  *
- * Programmers should override this method for default Robot-wide initialization
- * which will be called each time the robot enters the disabled state.
+ * Users should override this method for default Robot-wide initialization which
+ * will be called when the robot is first powered on. It will be called exactly
+ * one time.
+ *
+ * Warning: the Driver Station "Robot Code" light and FMS "Robot Ready"
+ * indicators will be off until RobotInit() exits. Code in RobotInit() that
+ * waits for enable will cause the robot to never indicate that the code is
+ * ready, causing the robot to be bypassed in a match.
  */
 void SampleRobot::RobotInit() {
   std::printf("Default %s() method... Override me!\n", __FUNCTION__);
@@ -70,7 +68,7 @@ void SampleRobot::OperatorControl() {
  *
  * Programmers should override this method to run code that executes while the
  * robot is in test mode. This will be called once whenever the robot enters
- * test mode.
+ * test mode
  */
 void SampleRobot::Test() {
   std::printf("Default %s() method... Override me!\n", __FUNCTION__);
@@ -108,37 +106,37 @@ void SampleRobot::StartCompetition() {
       ->GetSubTable("~STATUS~")
       ->PutBoolean("LW Enabled", false);
 
+  RobotInit();
+
   RobotMain();
 
   if (!m_robotMainOverridden) {
     // first and one-time initialization
     lw->SetEnabled(false);
-    RobotInit();
 
     while (true) {
       if (IsDisabled()) {
         m_ds.InDisabled(true);
         Disabled();
         m_ds.InDisabled(false);
-        while (IsDisabled()) sleep(1);  // m_ds.WaitForData();
+        while (IsDisabled()) m_ds.WaitForData();
       } else if (IsAutonomous()) {
         m_ds.InAutonomous(true);
         Autonomous();
         m_ds.InAutonomous(false);
-        while (IsAutonomous() && IsEnabled()) sleep(1);  // m_ds.WaitForData();
+        while (IsAutonomous() && IsEnabled()) m_ds.WaitForData();
       } else if (IsTest()) {
         lw->SetEnabled(true);
         m_ds.InTest(true);
         Test();
         m_ds.InTest(false);
-        while (IsTest() && IsEnabled()) sleep(1);  // m_ds.WaitForData();
+        while (IsTest() && IsEnabled()) m_ds.WaitForData();
         lw->SetEnabled(false);
       } else {
         m_ds.InOperatorControl(true);
         OperatorControl();
         m_ds.InOperatorControl(false);
-        while (IsOperatorControl() && IsEnabled())
-          sleep(1);  // m_ds.WaitForData();
+        while (IsOperatorControl() && IsEnabled()) m_ds.WaitForData();
       }
     }
   }

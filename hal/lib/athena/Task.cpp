@@ -9,50 +9,43 @@
 
 #include <signal.h>
 
-#ifndef OK
-#define OK 0
-#endif /* OK */
-#ifndef ERROR
-#define ERROR (-1)
-#endif /* ERROR */
-
 extern "C" {
 
-STATUS HAL_VerifyTaskID(TASK task) {
+int32_t HAL_VerifyTaskID(TASK task) {
   if (task != nullptr && pthread_kill(*task, 0) == 0) {
-    return OK;
+    return 0;
   } else {
-    return ERROR;
+    return -1;
   }
 }
 
-STATUS HAL_SetTaskPriority(TASK task, int32_t priority) {
+int32_t HAL_SetTaskPriority(TASK task, int32_t priority) {
   int32_t policy = 0;
   struct sched_param param;
 
-  if (HAL_VerifyTaskID(task) == OK &&
+  if (HAL_VerifyTaskID(task) == 0 &&
       pthread_getschedparam(*task, &policy, &param) == 0) {
     param.sched_priority = priority;
     if (pthread_setschedparam(*task, SCHED_FIFO, &param) == 0) {
-      return OK;
+      return 0;
     } else {
-      return ERROR;
+      return -1;
     }
   } else {
-    return ERROR;
+    return -1;
   }
 }
 
-STATUS HAL_GetTaskPriority(TASK task, int32_t* priority) {
+int32_t HAL_GetTaskPriority(TASK task, int32_t* priority) {
   int32_t policy = 0;
   struct sched_param param;
 
-  if (HAL_VerifyTaskID(task) == OK &&
+  if (HAL_VerifyTaskID(task) == 0 &&
       pthread_getschedparam(*task, &policy, &param) == 0) {
     *priority = param.sched_priority;
-    return OK;
+    return 0;
   } else {
-    return ERROR;
+    return -1;
   }
 }
 
