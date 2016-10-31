@@ -1,0 +1,70 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+evaluationDependsOn(':wpilibj')
+
+mainClassName = 'edu.wpi.first.wpilibj.RobotBase'
+
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
+def wpilibj = project(':wpilibj')
+
+dependencies {
+    compile wpilibj
+    compile files(wpilibj.sourceSets.test.output.classesDir)
+    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
+}
+
+def nativeDirectory = "$buildDir/output"
+
+clean {
+    delete nativeDirectory
+}
+
+task copyRobotLibraries(type: Copy) {
+    description = 'Copies all native libraries to an easy to find folder'
+    group = 'WPILib'
+    dependsOn shadowJar
+    dependsOn ':hal:build'
+    dependsOn ':wpilibj:build'
+
+    from (shadowJar)
+
+    project(':wpilibj').model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile)
+            }
+        }
+    }
+
+    project(':hal').model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile)
+            }
+        }
+    }
+
+    defineNetworkTablesProperties()
+    defineWpiUtilProperties()
+
+    from file(netSharedLib)
+
+    from file(wpiUtilSharedLib)
+
+    into nativeDirectory
+}
+
+
+build.dependsOn copyRobotLibraries
+
+jar {
+    manifest { attributes 'Robot-Class': 'MyRobot' }
+}

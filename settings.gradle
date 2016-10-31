@@ -2,7 +2,9 @@ include 'hal',
         'wpilibc',
         'wpilibcIntegrationTests',
         'wpilibj',
-        'wpilibjIntegrationTests'
+        'wpilibjIntegrationTests',
+        'myRobot',
+        'myRobotCpp'
 
 if (hasProperty("makeSim")){
 include 'simulation',
