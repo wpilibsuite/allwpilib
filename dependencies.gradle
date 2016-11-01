@@ -355,7 +355,6 @@ ext.useOpenCv = { project ->
             linker.args "-L${openCvNativesFolder}"
             linker.args "-lopencv"
             linker.args "-ldl"
-            linker.args "-lz"
         }
     }
 }
