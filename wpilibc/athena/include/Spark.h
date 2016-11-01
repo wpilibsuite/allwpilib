@@ -9,6 +9,8 @@
 
 #include "PWMSpeedController.h"
 
+namespace frc {
+
 /**
  * REV Robotics Speed Controller
  */
@@ -17,3 +19,5 @@ class Spark : public PWMSpeedController {
   explicit Spark(int channel);
   virtual ~Spark() = default;
 };
+
+}  // namespace frc

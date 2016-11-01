@@ -14,6 +14,8 @@
 #include "Commands/Command.h"
 #include "Commands/CommandGroupEntry.h"
 
+namespace frc {
+
 /**
  * A {@link CommandGroup} is a list of commands which are executed in sequence.
  *
@@ -70,3 +72,5 @@ class CommandGroup : public Command {
   /** The current command, -1 signifies that none have been run */
   int m_currentCommandIndex = -1;
 };
+
+}  // namespace frc

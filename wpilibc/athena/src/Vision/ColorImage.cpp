@@ -9,6 +9,8 @@
 
 #include "WPIErrors.h"
 
+using namespace frc;
+
 ColorImage::ColorImage(ImageType type) : ImageBase(type) {}
 
 /**

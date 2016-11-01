@@ -10,6 +10,8 @@
 #include "Buttons/Trigger.h"
 #include "Commands/Command.h"
 
+namespace frc {
+
 /**
  * This class provides an easy way to link commands to OI inputs.
  *
@@ -30,3 +32,5 @@ class Button : public Trigger {
   virtual void CancelWhenPressed(Command* command);
   virtual void ToggleWhenPressed(Command* command);
 };
+
+}  // namespace frc

@@ -20,6 +20,8 @@
 #undef GetMessage
 #endif
 
+namespace frc {
+
 //  Forward declarations
 class ErrorBase;
 
@@ -59,3 +61,5 @@ class Error {
   const ErrorBase* m_originatingObject = nullptr;
   double m_timestamp = 0.0;
 };
+
+}  // namespace frc

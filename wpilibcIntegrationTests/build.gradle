@@ -13,6 +13,7 @@ model {
             targetPlatform 'arm'
             binaries.all {
                 tasks.withType(CppCompile) {
+                    cppCompiler.args "-DNAMESPACED_WPILIB"
                     addNiLibraryLinks(linker, targetPlatform)
                     addStaticNetworkTablesLibraryLinks(it, linker, targetPlatform)
                 }

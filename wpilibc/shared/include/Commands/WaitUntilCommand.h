@@ -11,6 +11,8 @@
 
 #include "Commands/Command.h"
 
+namespace frc {
+
 class WaitUntilCommand : public Command {
  public:
   explicit WaitUntilCommand(double time);
@@ -27,3 +29,5 @@ class WaitUntilCommand : public Command {
  private:
   double m_time;
 };
+
+}  // namespace frc

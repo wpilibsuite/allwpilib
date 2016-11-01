@@ -7,6 +7,8 @@
 
 #include "Vision/HSLImage.h"
 
+using namespace frc;
+
 /**
  * Create a new image that uses the Hue, Saturation, and Luminance planes.
  */

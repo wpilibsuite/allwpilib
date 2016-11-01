@@ -16,6 +16,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 /**
  * MXP analog output class.
  */
@@ -40,3 +42,5 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

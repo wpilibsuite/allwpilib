@@ -13,6 +13,8 @@
 #include "SafePWM.h"
 #include "SpeedController.h"
 
+namespace frc {
+
 /**
  * Standard hobby style servo.
  *
@@ -52,3 +54,5 @@ class Servo : public SafePWM {
   static constexpr float kDefaultMaxServoPWM = 2.4;
   static constexpr float kDefaultMinServoPWM = .6;
 };
+
+}  // namespace frc

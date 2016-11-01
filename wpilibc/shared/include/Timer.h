@@ -10,6 +10,8 @@
 #include "Base.h"
 #include "HAL/cpp/priority_mutex.h"
 
+namespace frc {
+
 typedef void (*TimerInterruptHandler)(void* param);
 
 void Wait(double seconds);
@@ -51,3 +53,5 @@ class Timer {
   bool m_running = false;
   mutable priority_mutex m_mutex;
 };
+
+}  // namespace frc

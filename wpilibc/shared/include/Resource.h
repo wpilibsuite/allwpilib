@@ -16,6 +16,8 @@
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"
 
+namespace frc {
+
 /**
  * The Resource class is a convenient way to track allocated resources.
  * It tracks them as indicies in the range [0 .. elements - 1].
@@ -45,3 +47,5 @@ class Resource : public ErrorBase {
 
   static priority_recursive_mutex m_createLock;
 };
+
+}  // namespace frc

@@ -15,6 +15,8 @@
 #include "HAL/Notifier.h"
 #include "HAL/cpp/priority_mutex.h"
 
+namespace frc {
+
 typedef std::function<void()> TimerEventHandler;
 
 class Notifier : public ErrorBase {
@@ -56,3 +58,5 @@ class Notifier : public ErrorBase {
   // true if this is a periodic event
   bool m_periodic = false;
 };
+
+}  // namespace frc

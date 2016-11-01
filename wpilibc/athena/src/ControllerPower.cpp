@@ -13,6 +13,8 @@
 #include "HAL/HAL.h"
 #include "HAL/Power.h"
 
+using namespace frc;
+
 /**
  * Get the input voltage to the robot controller.
  *

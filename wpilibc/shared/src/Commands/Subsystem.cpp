@@ -11,6 +11,8 @@
 #include "Commands/Scheduler.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Creates a subsystem with the given name.
  *

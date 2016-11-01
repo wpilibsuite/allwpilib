@@ -15,6 +15,8 @@
 #include "WPIErrors.h"
 #include "simulation/MainNode.h"
 
+using namespace frc;
+
 const int DriverStation::kBatteryChannel;
 const int DriverStation::kJoystickPorts;
 const int DriverStation::kJoystickAxes;

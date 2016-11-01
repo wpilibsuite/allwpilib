@@ -16,6 +16,8 @@
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"
 
+namespace frc {
+
 typedef std::function<void()> TimerEventHandler;
 
 class Notifier : public ErrorBase {
@@ -70,3 +72,5 @@ class Notifier : public ErrorBase {
   static std::atomic<bool> m_stopped;
   static void Run();
 };
+
+}  // namespace frc

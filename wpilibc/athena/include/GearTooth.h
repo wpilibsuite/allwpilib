@@ -12,6 +12,8 @@
 
 #include "Counter.h"
 
+namespace frc {
+
 /**
  * Alias for counter class.
  * Implement the gear tooth sensor supplied by FIRST. Currently there is no
@@ -31,3 +33,5 @@ class GearTooth : public Counter {
 
   std::string GetSmartDashboardType() const override;
 };
+
+}  // namespace frc

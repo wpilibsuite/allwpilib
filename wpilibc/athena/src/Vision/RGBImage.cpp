@@ -7,6 +7,8 @@
 
 #include "Vision/RGBImage.h"
 
+using namespace frc;
+
 /**
  * Create a new image that uses Red, Green, and Blue planes.
  */

@@ -7,6 +7,8 @@
 
 #include "SmartDashboard/SendableChooser.h"
 
+using namespace frc;
+
 static const std::string kDefault = "default";
 static const std::string kOptions = "options";
 static const std::string kSelected = "selected";

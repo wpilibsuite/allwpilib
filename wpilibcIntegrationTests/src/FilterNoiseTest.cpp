@@ -17,6 +17,8 @@
 #include "TestBench.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 enum FilterNoiseTestType { TEST_SINGLE_POLE_IIR, TEST_MOVAVG };
 
 std::ostream& operator<<(std::ostream& os, const FilterNoiseTestType& type) {

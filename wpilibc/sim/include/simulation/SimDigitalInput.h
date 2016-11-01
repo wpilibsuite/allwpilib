@@ -15,6 +15,8 @@
 
 using namespace gazebo;
 
+namespace frc {
+
 class SimDigitalInput {
  public:
   explicit SimDigitalInput(std::string topic);
@@ -29,3 +31,5 @@ class SimDigitalInput {
   transport::SubscriberPtr sub;
   void callback(const msgs::ConstBoolPtr& msg);
 };
+
+}  // namespace frc

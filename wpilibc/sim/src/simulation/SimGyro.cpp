@@ -9,6 +9,8 @@
 
 #include "simulation/MainNode.h"
 
+using namespace frc;
+
 SimGyro::SimGyro(std::string topic) {
   commandPub =
       MainNode::Advertise<msgs::GzString>("~/simulator/" + topic + "/control");

@@ -15,6 +15,8 @@
 #include "PIDOutput.h"
 #include "PIDSource.h"
 
+namespace frc {
+
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:
   PIDCommand(const std::string& name, double p, double i, double d);
@@ -55,3 +57,5 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   void InitTable(std::shared_ptr<ITable> subtable) override;
   std::string GetSmartDashboardType() const override;
 };
+
+}  // namespace frc

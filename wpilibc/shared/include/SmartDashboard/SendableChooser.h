@@ -14,6 +14,8 @@
 #include "SmartDashboard/Sendable.h"
 #include "tables/ITable.h"
 
+namespace frc {
+
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection
  * of options to the {@link SmartDashboard}.
@@ -44,3 +46,5 @@ class SendableChooser : public Sendable {
   std::map<std::string, void*> m_choices;
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

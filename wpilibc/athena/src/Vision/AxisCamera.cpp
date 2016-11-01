@@ -21,6 +21,8 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 static const int kMaxPacketSize = 1536;
 static const int kImageBufferAllocationIncrement = 1000;
 

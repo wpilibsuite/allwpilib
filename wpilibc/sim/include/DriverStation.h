@@ -23,10 +23,12 @@
 #include <Winsock2.h>
 #endif
 
+using namespace gazebo;
+
+namespace frc {
+
 struct HALCommonControlData;
 class AnalogInput;
-
-using namespace gazebo;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -143,3 +145,5 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   msgs::DriverStationPtr state;
   msgs::FRCJoystickPtr joysticks[6];
 };
+
+}  // namespace frc

@@ -13,6 +13,8 @@
 #include "Base.h"
 #include "HAL/HAL.h"
 
+namespace frc {
+
 class DriverStation;
 
 #define START_ROBOT_CLASS(_ClassName_)                                       \
@@ -56,3 +58,5 @@ class RobotBase {
 
   DriverStation& m_ds;
 };
+
+}  // namespace frc

@@ -17,6 +17,8 @@
 #include "PIDSource.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 class DigitalSource;
 class DigitalGlitchFilter;
 
@@ -105,3 +107,5 @@ class Encoder : public SensorBase,
   std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;
 };
+
+}  // namespace frc

@@ -9,6 +9,8 @@
 
 #include "RobotBase.h"
 
+namespace frc {
+
 /**
  * IterativeRobot implements a specific type of Robot Program framework,
  * extending the RobotBase class.
@@ -68,3 +70,5 @@ class IterativeRobot : public RobotBase {
   bool m_teleopInitialized = false;
   bool m_testInitialized = false;
 };
+
+}  // namespace frc

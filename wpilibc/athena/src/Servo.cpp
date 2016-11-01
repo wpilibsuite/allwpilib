@@ -9,6 +9,8 @@
 
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 constexpr float Servo::kMaxServoAngle;
 constexpr float Servo::kMinServoAngle;
 

@@ -10,6 +10,8 @@
 #include <cstddef>
 #include <vector>
 
+namespace frc {
+
 /**
  * This is a simple circular buffer so we don't need to "bucket brigade" copy
  * old values.
@@ -41,5 +43,7 @@ class CircularBuffer {
   size_t ModuloInc(size_t index);
   size_t ModuloDec(size_t index);
 };
+
+}  // namespace frc
 
 #include "CircularBuffer.inc"

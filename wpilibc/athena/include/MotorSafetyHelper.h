@@ -12,6 +12,8 @@
 #include "ErrorBase.h"
 #include "HAL/cpp/priority_mutex.h"
 
+namespace frc {
+
 class MotorSafety;
 
 class MotorSafetyHelper : public ErrorBase {
@@ -43,3 +45,5 @@ class MotorSafetyHelper : public ErrorBase {
   // protect accesses to the list of helpers
   static priority_recursive_mutex m_listMutex;
 };
+
+}  // namespace frc

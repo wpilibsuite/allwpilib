@@ -12,6 +12,8 @@
 #include "Encoder.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 /**
  * Tests that configuring inputs to be filtered succeeds.
  *

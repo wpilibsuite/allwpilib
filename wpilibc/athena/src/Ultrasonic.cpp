@@ -16,6 +16,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 // Time (sec) for the ping trigger pulse.
 constexpr double Ultrasonic::kPingTime;
 // Priority that the ultrasonic round robin task runs.

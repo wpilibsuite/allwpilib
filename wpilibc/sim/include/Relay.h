@@ -17,6 +17,8 @@
 #include "tables/ITable.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 class MotorSafetyHelper;
 class DigitalModule;
 
@@ -73,3 +75,5 @@ class Relay : public MotorSafety,
   SimContinuousOutput* impl;
   bool go_pos, go_neg;
 };
+
+}  // namespace frc

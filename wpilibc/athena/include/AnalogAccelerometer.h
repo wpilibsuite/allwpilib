@@ -15,6 +15,8 @@
 #include "PIDSource.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 /**
  * Handle operation of an analog accelerometer.
  * The accelerometer reads acceleration directly through the sensor. Many
@@ -51,3 +53,5 @@ class AnalogAccelerometer : public SensorBase,
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

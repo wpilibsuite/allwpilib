@@ -14,6 +14,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "interfaces/Potentiometer.h"
 
+namespace frc {
+
 /**
  * Class for reading analog potentiometers. Analog potentiometers read
  * in an analog voltage that corresponds to a position. Usually the
@@ -93,3 +95,5 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    */
   void initPot(AnalogInput* input, double scale, double offset);
 };
+
+}  // namespace frc

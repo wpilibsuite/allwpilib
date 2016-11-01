@@ -11,6 +11,8 @@
 
 #include "Commands/Command.h"
 
+namespace frc {
+
 class WaitCommand : public Command {
  public:
   explicit WaitCommand(double timeout);
@@ -24,3 +26,5 @@ class WaitCommand : public Command {
   virtual void End();
   virtual void Interrupted();
 };
+
+}  // namespace frc

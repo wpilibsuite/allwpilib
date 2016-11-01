@@ -11,6 +11,8 @@
 
 #include "SmartDashboard/Sendable.h"
 
+namespace frc {
+
 /**
  * The interface for sendable objects that gives the sendable a default name in
  * the Smart Dashboard
@@ -24,3 +26,5 @@ class NamedSendable : public Sendable {
    */
   virtual std::string GetName() const = 0;
 };
+
+}  // namespace frc

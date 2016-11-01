@@ -16,6 +16,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 const int RobotDrive::kMaxNumberOfMotors;
 
 static auto make_shared_nodelete(SpeedController* ptr) {

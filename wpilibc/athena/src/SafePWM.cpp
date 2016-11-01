@@ -7,6 +7,8 @@
 
 #include "SafePWM.h"
 
+using namespace frc;
+
 /**
  * Constructor for a SafePWM object taking a channel number.
  *

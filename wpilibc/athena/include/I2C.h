@@ -9,6 +9,8 @@
 
 #include "SensorBase.h"
 
+namespace frc {
+
 /**
  * I2C bus interface class.
  *
@@ -40,3 +42,5 @@ class I2C : SensorBase {
   Port m_port;
   int m_deviceAddress;
 };
+
+}  // namespace frc

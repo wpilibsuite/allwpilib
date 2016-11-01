@@ -9,6 +9,8 @@
 
 #include <Utility.h>
 
+using namespace frc;
+
 void Potentiometer::SetPIDSourceType(PIDSourceType pidSource) {
   if (wpi_assert(pidSource == PIDSourceType::kDisplacement)) {
     m_pidSource = pidSource;

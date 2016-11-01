@@ -17,6 +17,8 @@
 #include "tables/ITable.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 class MotorSafetyHelper;
 
 /**
@@ -73,3 +75,5 @@ class Relay : public MotorSafety,
 
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 };
+
+}  // namespace frc

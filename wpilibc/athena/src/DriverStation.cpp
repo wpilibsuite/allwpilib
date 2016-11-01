@@ -18,6 +18,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
 
 const int DriverStation::kJoystickPorts;

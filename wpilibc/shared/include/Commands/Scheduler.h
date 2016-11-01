@@ -21,6 +21,8 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include "networktables/NetworkTable.h"
 
+namespace frc {
+
 class ButtonScheduler;
 class Subsystem;
 
@@ -67,3 +69,5 @@ class Scheduler : public ErrorBase, public NamedSendable {
   std::shared_ptr<ITable> m_table;
   bool m_runningCommandsChanged = false;
 };
+
+}  // namespace frc

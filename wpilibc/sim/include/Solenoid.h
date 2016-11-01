@@ -14,6 +14,8 @@
 #include "simulation/SimContinuousOutput.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 /**
  * Solenoid class for running high voltage Digital Output (PCM).
  *
@@ -43,3 +45,5 @@ class Solenoid : public LiveWindowSendable, public ITableListener {
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

@@ -11,6 +11,8 @@
 
 #include <sstream>
 
+namespace frc {
+
 class MotorSafety {
  public:
   virtual void SetExpiration(float timeout) = 0;
@@ -21,3 +23,5 @@ class MotorSafety {
   virtual bool IsSafetyEnabled() const = 0;
   virtual void GetDescription(std::ostringstream& desc) const = 0;
 };
+
+}  // namespace frc

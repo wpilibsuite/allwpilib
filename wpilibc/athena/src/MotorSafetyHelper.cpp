@@ -14,6 +14,8 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 std::set<MotorSafetyHelper*> MotorSafetyHelper::m_helperList;
 priority_recursive_mutex MotorSafetyHelper::m_listMutex;
 

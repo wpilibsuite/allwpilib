@@ -10,6 +10,8 @@
 #include "HAL/Types.h"
 #include "InterruptableSensorBase.h"
 
+namespace frc {
+
 /**
  * DigitalSource Interface.
  * The DigitalSource represents all the possible inputs for a counter or a
@@ -28,3 +30,5 @@ class DigitalSource : public InterruptableSensorBase {
   virtual bool IsAnalogTrigger() const = 0;
   virtual int GetChannel() const = 0;
 };
+
+}  // namespace frc

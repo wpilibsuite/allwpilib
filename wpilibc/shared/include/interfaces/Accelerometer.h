@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace frc {
+
 /**
  * Interface for 3-axis accelerometers
  */
@@ -45,3 +47,5 @@ class Accelerometer {
    */
   virtual double GetZ() = 0;
 };
+
+}  // namespace frc

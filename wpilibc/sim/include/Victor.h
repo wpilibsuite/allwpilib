@@ -11,6 +11,8 @@
 #include "SafePWM.h"
 #include "SpeedController.h"
 
+namespace frc {
+
 /**
  * IFI Victor Speed Controller.
  */
@@ -24,3 +26,5 @@ class Victor : public SafePWM, public SpeedController {
 
   void PIDWrite(float output) override;
 };
+
+}  // namespace frc

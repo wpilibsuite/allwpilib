@@ -13,6 +13,8 @@
 #include "MotorSafetyHelper.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Relay constructor given a channel.
  *

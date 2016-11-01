@@ -16,6 +16,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITable.h"
 
+namespace frc {
+
 struct LiveWindowComponent {
   std::string subsystem;
   std::string name;
@@ -81,3 +83,5 @@ class LiveWindow {
   bool m_enabled = false;
   bool m_firstTime = true;
 };
+
+}  // namespace frc

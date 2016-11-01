@@ -11,6 +11,8 @@
 #include "I2C.h"
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 const int ADXL345_I2C::kAddress;
 const int ADXL345_I2C::kPowerCtlRegister;
 const int ADXL345_I2C::kDataFormatRegister;

@@ -9,6 +9,8 @@
 
 #include "Base.h"
 
+namespace frc {
+
 /**
  * PIDOutput interface is a generic output for the PID class.
  * PWMs use this class.
@@ -19,3 +21,5 @@ class PIDOutput {
  public:
   virtual void PIDWrite(float output) = 0;
 };
+
+}  // namespace frc

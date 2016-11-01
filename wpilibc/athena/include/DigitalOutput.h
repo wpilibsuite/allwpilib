@@ -15,6 +15,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 /**
  * Class to write to digital outputs.
  * Write values to the digital output channels. Other devices implemented
@@ -58,3 +60,5 @@ class DigitalOutput : public DigitalSource,
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

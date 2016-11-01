@@ -12,6 +12,8 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /** The Preferences table name */
 static const char* kTableName = "Preferences";
 

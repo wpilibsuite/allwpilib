@@ -12,6 +12,8 @@
 
 #include "networktables/NetworkTable.h"
 
+using namespace frc;
+
 /**
  * Get an instance of the LiveWindow main class.
  *

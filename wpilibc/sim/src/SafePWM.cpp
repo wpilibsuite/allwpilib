@@ -10,6 +10,8 @@
 #include <memory>
 #include <sstream>
 
+using namespace frc;
+
 /**
  * Constructor for a SafePWM object taking a channel number.
  *

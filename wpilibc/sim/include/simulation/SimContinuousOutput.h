@@ -21,6 +21,8 @@
 
 using namespace gazebo;
 
+namespace frc {
+
 class SimContinuousOutput {
  private:
   transport::PublisherPtr pub;
@@ -44,3 +46,5 @@ class SimContinuousOutput {
    */
   float Get();
 };
+
+}  // namespace frc

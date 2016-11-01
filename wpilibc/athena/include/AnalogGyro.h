@@ -12,6 +12,8 @@
 #include "GyroBase.h"
 #include "HAL/Types.h"
 
+namespace frc {
+
 class AnalogInput;
 
 /**
@@ -58,3 +60,5 @@ class AnalogGyro : public GyroBase {
  private:
   HAL_GyroHandle m_gyroHandle = HAL_kInvalidHandle;
 };
+
+}  // namespace frc

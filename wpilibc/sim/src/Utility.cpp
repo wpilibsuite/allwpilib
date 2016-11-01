@@ -20,6 +20,8 @@
 #include "Timer.h"
 #include "simulation/simTime.h"
 
+using namespace frc;
+
 static bool stackTraceEnabled = false;
 static bool suspendOnAssertEnabled = false;
 
@@ -143,6 +145,8 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB, const std::string& message,
   return valueA != valueB;
 }
 
+namespace frc {
+
 /**
  * Read the microsecond-resolution timer on the FPGA.
  *
@@ -205,3 +209,5 @@ static std::string demangle(char const* mangledSymbol) {
 }
 std::string GetStackTrace(int offset) { return "no stack trace on windows"; }
 #endif
+
+}  // namespace frc

@@ -9,6 +9,8 @@
 
 #include <algorithm>
 
+namespace frc {
+
 template <class T>
 CircularBuffer<T>::CircularBuffer(size_t size) : m_data(size, 0) {}
 
@@ -183,3 +185,5 @@ size_t CircularBuffer<T>::ModuloDec(size_t index) {
     return index - 1;
   }
 }
+
+}  // namespace frc

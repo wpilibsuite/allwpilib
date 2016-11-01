@@ -10,6 +10,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static constexpr double kAccelerationTolerance = 0.1;
 /**
  * There's not much we can automatically test with the on-board accelerometer,

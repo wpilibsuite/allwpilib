@@ -9,6 +9,8 @@
 
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 constexpr double GearTooth::kGearToothThreshold;
 
 /**

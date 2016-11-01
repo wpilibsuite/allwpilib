@@ -16,6 +16,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 std::array<bool, 3> DigitalGlitchFilter::m_filterAllocated = {
     {false, false, false}};
 priority_mutex DigitalGlitchFilter::m_mutex;

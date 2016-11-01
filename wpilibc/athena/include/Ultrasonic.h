@@ -18,6 +18,8 @@
 #include "PIDSource.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 class DigitalInput;
 class DigitalOutput;
 
@@ -96,3 +98,5 @@ class Ultrasonic : public SensorBase,
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

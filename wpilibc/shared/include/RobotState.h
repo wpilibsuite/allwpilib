@@ -9,6 +9,8 @@
 
 #include <memory>
 
+namespace frc {
+
 class RobotStateInterface {
  public:
   virtual ~RobotStateInterface() = default;
@@ -32,3 +34,5 @@ class RobotState {
   static bool IsAutonomous();
   static bool IsTest();
 };
+
+}  // namespace frc

@@ -13,6 +13,8 @@
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
 
 /**

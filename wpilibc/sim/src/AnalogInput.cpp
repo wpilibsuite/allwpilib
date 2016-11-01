@@ -12,6 +12,8 @@
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Construct an analog input.
  *

@@ -12,6 +12,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static const double kDelayTime = 0.01;
 
 class RelayTest : public testing::Test {

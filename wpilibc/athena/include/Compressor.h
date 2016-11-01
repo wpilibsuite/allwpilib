@@ -15,6 +15,8 @@
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 /**
  * PCM compressor
  */
@@ -63,3 +65,5 @@ class Compressor : public SensorBase,
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

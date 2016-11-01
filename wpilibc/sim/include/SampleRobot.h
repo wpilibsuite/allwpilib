@@ -9,6 +9,8 @@
 
 #include "RobotBase.h"
 
+namespace frc {
+
 class SampleRobot : public RobotBase {
  public:
   SampleRobot();
@@ -24,3 +26,5 @@ class SampleRobot : public RobotBase {
  private:
   bool m_robotMainOverridden;
 };
+
+}  // namespace frc

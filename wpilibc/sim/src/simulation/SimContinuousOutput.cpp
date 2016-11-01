@@ -9,6 +9,8 @@
 
 #include "simulation/MainNode.h"
 
+using namespace frc;
+
 SimContinuousOutput::SimContinuousOutput(std::string topic) {
   pub = MainNode::Advertise<msgs::Float64>("~/simulator/" + topic);
   std::cout << "Initialized ~/simulator/" + topic << std::endl;

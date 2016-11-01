@@ -14,6 +14,8 @@
 #include "gtest/gtest.h"
 #include "ntcore.h"
 
+using namespace frc;
+
 static const char* kFileName = "networktables.ini";
 static const double kSaveTime = 1.2;
 

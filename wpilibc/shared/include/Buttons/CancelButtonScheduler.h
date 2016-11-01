@@ -9,6 +9,8 @@
 
 #include "Buttons/ButtonScheduler.h"
 
+namespace frc {
+
 class Trigger;
 class Command;
 
@@ -21,3 +23,5 @@ class CancelButtonScheduler : public ButtonScheduler {
  private:
   bool pressedLast;
 };
+
+}  // namespace frc

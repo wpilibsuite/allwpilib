@@ -14,6 +14,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "interfaces/Accelerometer.h"
 
+namespace frc {
+
 /**
  * ADXL345 Accelerometer on I2C.
  *
@@ -81,3 +83,5 @@ class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
  private:
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

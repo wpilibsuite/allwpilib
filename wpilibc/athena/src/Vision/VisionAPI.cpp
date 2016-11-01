@@ -12,6 +12,8 @@
 #include "Vision/BaeUtilities.h"
 #include "Vision/FrcError.h"
 
+namespace frc {
+
 int VisionAPI_debugFlag = 1;
 #define DPRINTF \
   if (VisionAPI_debugFlag) dprintf
@@ -827,3 +829,5 @@ int frcExtractHuePlane(const Image* image, Image* huePlane) {
 int frcExtractHuePlane(const Image* image, Image* huePlane, int minSaturation) {
   return frcExtractColorPlanes(image, IMAQ_HSL, huePlane, nullptr, nullptr);
 }
+
+}  // namespace frc

@@ -11,6 +11,8 @@
 
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Get then number of particles for the image.
  *

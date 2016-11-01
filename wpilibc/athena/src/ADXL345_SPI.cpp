@@ -12,6 +12,8 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 const int ADXL345_SPI::kPowerCtlRegister;
 const int ADXL345_SPI::kDataFormatRegister;
 const int ADXL345_SPI::kDataRegister;

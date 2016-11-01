@@ -7,6 +7,8 @@
 
 #include "Vision/Threshold.h"
 
+using namespace frc;
+
 Threshold::Threshold(int new_plane1Low, int new_plane1High, int new_plane2Low,
                      int new_plane2High, int new_plane3Low,
                      int new_plane3High) {

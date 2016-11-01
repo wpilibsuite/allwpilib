@@ -17,6 +17,8 @@
 #include <unistd.h>
 #endif
 
+using namespace frc;
+
 /**
  * Provide an alternate "main loop" via StartCompetition().
  *

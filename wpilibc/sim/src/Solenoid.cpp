@@ -13,6 +13,8 @@
 #include "WPIErrors.h"
 #include "simulation/simTime.h"
 
+using namespace frc;
+
 /**
  * Constructor.
  *

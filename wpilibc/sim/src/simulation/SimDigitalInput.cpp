@@ -9,6 +9,8 @@
 
 #include "simulation/MainNode.h"
 
+using namespace frc;
+
 SimDigitalInput::SimDigitalInput(std::string topic) {
   sub = MainNode::Subscribe("~/simulator/" + topic, &SimDigitalInput::callback,
                             this);

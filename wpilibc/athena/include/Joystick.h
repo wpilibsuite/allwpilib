@@ -16,6 +16,8 @@
 #include "ErrorBase.h"
 #include "GenericHID.h"
 
+namespace frc {
+
 class DriverStation;
 
 /**
@@ -116,3 +118,5 @@ class Joystick : public GenericHID, public ErrorBase {
   uint16_t m_leftRumble = 0;
   uint16_t m_rightRumble = 0;
 };
+
+}  // namespace frc

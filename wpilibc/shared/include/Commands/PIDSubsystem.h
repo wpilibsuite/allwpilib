@@ -15,6 +15,8 @@
 #include "PIDOutput.h"
 #include "PIDSource.h"
 
+namespace frc {
+
 /**
  * This class is designed to handle the case where there is a {@link Subsystem}
  * which uses a single {@link PIDController} almost constantly (for instance,
@@ -70,3 +72,5 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   void InitTable(std::shared_ptr<ITable> subtable) override;
   std::string GetSmartDashboardType() const override;
 };
+
+}  // namespace frc

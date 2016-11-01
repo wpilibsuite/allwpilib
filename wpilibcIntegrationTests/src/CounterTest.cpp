@@ -14,6 +14,8 @@
 #include "Victor.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static const double kMotorDelay = 2.5;
 
 static const double kMaxPeriod = 2.0;

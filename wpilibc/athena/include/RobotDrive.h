@@ -14,6 +14,8 @@
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
 
+namespace frc {
+
 class SpeedController;
 class GenericHID;
 
@@ -118,3 +120,5 @@ class RobotDrive : public MotorSafety, public ErrorBase {
     return motors;
   }
 };
+
+}  // namespace frc

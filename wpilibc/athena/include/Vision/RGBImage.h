@@ -9,6 +9,8 @@
 
 #include "ColorImage.h"
 
+namespace frc {
+
 /**
  * A color image represented in RGB color space at 3 bytes per pixel.
  */
@@ -18,3 +20,5 @@ class RGBImage : public ColorImage {
   explicit RGBImage(const char* fileName);
   virtual ~RGBImage() = default;
 };
+
+}  // namespace frc

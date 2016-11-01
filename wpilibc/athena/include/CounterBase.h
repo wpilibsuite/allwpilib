@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+namespace frc {
+
 /**
  * Interface for counting the number of ticks on a digital input channel.
  * Encoders, Gear tooth sensors, and counters should all subclass this so it can
@@ -29,3 +31,5 @@ class CounterBase {
   virtual bool GetStopped() const = 0;
   virtual bool GetDirection() const = 0;
 };
+
+}  // namespace frc

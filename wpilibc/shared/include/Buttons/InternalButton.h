@@ -9,6 +9,8 @@
 
 #include "Buttons/Button.h"
 
+namespace frc {
+
 class InternalButton : public Button {
  public:
   InternalButton() = default;
@@ -24,3 +26,5 @@ class InternalButton : public Button {
   bool m_pressed = false;
   bool m_inverted = false;
 };
+
+}  // namespace frc

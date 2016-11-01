@@ -27,6 +27,10 @@
 #define ERR_CAMERA_TASK_INPUT_OUT_OF_RANGE 166210  // AxisCamera.cpp
 #define ERR_CAMERA_COMMAND_FAILURE 166211          // AxisCamera.cpp
 
+namespace frc {
+
 /* error handling functions */
 int GetLastVisionError();
 const char* GetVisionErrorText(int errorCode);
+
+}  // namespace frc

@@ -16,6 +16,8 @@
 #include "networktables/NetworkTable.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 /**
  * The preferences class provides a relatively simple way to save important
  * values to the roboRIO to access the next time the roboRIO is booted.
@@ -69,3 +71,5 @@ class Preferences : public ErrorBase {
   };
   Listener m_listener;
 };
+
+}  // namespace frc

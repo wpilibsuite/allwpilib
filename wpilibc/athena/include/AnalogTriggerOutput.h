@@ -10,6 +10,8 @@
 #include "DigitalSource.h"
 #include "HAL/AnalogTrigger.h"
 
+namespace frc {
+
 class AnalogTrigger;
 
 /**
@@ -67,3 +69,5 @@ class AnalogTriggerOutput : public DigitalSource {
   const AnalogTrigger& m_trigger;
   AnalogTriggerType m_outputType;
 };
+
+}  // namespace frc

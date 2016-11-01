@@ -14,6 +14,8 @@
 #include "SensorBase.h"
 #include "interfaces/Accelerometer.h"
 
+namespace frc {
+
 /**
  * Built-in accelerometer.
  *
@@ -42,3 +44,5 @@ class BuiltInAccelerometer : public Accelerometer,
  private:
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

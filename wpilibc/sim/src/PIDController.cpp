@@ -13,6 +13,8 @@
 #include "PIDOutput.h"
 #include "PIDSource.h"
 
+using namespace frc;
+
 static const std::string kP = "p";
 static const std::string kI = "i";
 static const std::string kD = "d";

@@ -11,6 +11,8 @@
 
 #include "Commands/Command.h"
 
+namespace frc {
+
 class PrintCommand : public Command {
  public:
   explicit PrintCommand(const std::string& message);
@@ -26,3 +28,5 @@ class PrintCommand : public Command {
  private:
   std::string m_message;
 };
+
+}  // namespace frc

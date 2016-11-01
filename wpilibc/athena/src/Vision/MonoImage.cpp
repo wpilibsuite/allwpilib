@@ -9,6 +9,8 @@
 
 #include "nivision.h"
 
+using namespace frc;
+
 MonoImage::MonoImage() : ImageBase(IMAQ_IMAGE_U8) {}
 
 /**

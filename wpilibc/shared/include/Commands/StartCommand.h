@@ -9,6 +9,8 @@
 
 #include "Commands/Command.h"
 
+namespace frc {
+
 class StartCommand : public Command {
  public:
   explicit StartCommand(Command* commandToStart);
@@ -24,3 +26,5 @@ class StartCommand : public Command {
  private:
   Command* m_commandToFork;
 };
+
+}  // namespace frc

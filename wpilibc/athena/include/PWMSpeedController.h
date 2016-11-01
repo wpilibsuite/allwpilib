@@ -10,6 +10,8 @@
 #include "SafePWM.h"
 #include "SpeedController.h"
 
+namespace frc {
+
 /**
  * Common base class for all PWM Speed Controllers
  */
@@ -32,3 +34,5 @@ class PWMSpeedController : public SafePWM, public SpeedController {
  private:
   bool m_isInverted = false;
 };
+
+}  // namespace frc

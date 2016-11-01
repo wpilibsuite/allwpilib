@@ -15,6 +15,8 @@
 #include "SensorBase.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 /**
  * Class implements the PWM generation in the FPGA.
  *
@@ -78,3 +80,5 @@ class PWM : public SensorBase,
   int m_channel;
   HAL_DigitalHandle m_handle;
 };
+
+}  // namespace frc

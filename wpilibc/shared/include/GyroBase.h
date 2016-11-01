@@ -15,6 +15,8 @@
 #include "SensorBase.h"
 #include "interfaces/Gyro.h"
 
+namespace frc {
+
 /**
  * GyroBase is the common base class for Gyro implementations such as
  * AnalogGyro.
@@ -39,3 +41,5 @@ class GyroBase : public Gyro,
  private:
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

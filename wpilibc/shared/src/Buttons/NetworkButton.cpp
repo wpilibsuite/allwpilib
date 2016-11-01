@@ -9,6 +9,8 @@
 
 #include "networktables/NetworkTable.h"
 
+using namespace frc;
+
 NetworkButton::NetworkButton(const std::string& tableName,
                              const std::string& field)
     :  // TODO how is this supposed to work???

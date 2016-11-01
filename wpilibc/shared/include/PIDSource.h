@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace frc {
+
 enum class PIDSourceType { kDisplacement, kRate };
 
 /**
@@ -23,3 +25,5 @@ class PIDSource {
  protected:
   PIDSourceType m_pidSource = PIDSourceType::kDisplacement;
 };
+
+}  // namespace frc

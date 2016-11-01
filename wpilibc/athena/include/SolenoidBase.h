@@ -11,6 +11,8 @@
 
 #include "SensorBase.h"
 
+namespace frc {
+
 /**
  * SolenoidBase class is the common base class for the Solenoid and
  * DoubleSolenoid classes.
@@ -33,3 +35,5 @@ class SolenoidBase : public SensorBase {
   int m_moduleNumber;  ///< Slot number where the module is plugged into
                        /// the chassis.
 };
+
+}  // namespace frc

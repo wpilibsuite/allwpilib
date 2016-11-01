@@ -9,6 +9,8 @@
 
 #include "SmartDashboard/Sendable.h"
 
+namespace frc {
+
 /**
  * Live Window Sendable is a special type of object sendable to the live window.
  */
@@ -32,3 +34,5 @@ class LiveWindowSendable : public Sendable {
    */
   virtual void StopLiveWindowMode() = 0;
 };
+
+}  // namespace frc

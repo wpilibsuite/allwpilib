@@ -15,6 +15,8 @@
 
 using namespace gazebo;
 
+namespace frc {
+
 class SimFloatInput {
  public:
   explicit SimFloatInput(std::string topic);
@@ -29,3 +31,5 @@ class SimFloatInput {
   transport::SubscriberPtr sub;
   void callback(const msgs::ConstFloat64Ptr& msg);
 };
+
+}  // namespace frc

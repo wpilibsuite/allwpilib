@@ -10,6 +10,8 @@
 #include "TestBench.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static const double kWaitTime = 0.5;
 
 class TimerTest : public testing::Test {

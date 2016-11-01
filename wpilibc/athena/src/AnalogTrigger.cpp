@@ -13,6 +13,8 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Constructor for an analog trigger given a channel number.
  *

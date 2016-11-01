@@ -16,6 +16,8 @@
 #define DEFAULT_BORDER_SIZE 3            // VisionAPI.frcCreateImage
 #define DEFAULT_SATURATION_THRESHOLD 40  // TrackAPI.FindColor
 
+namespace frc {
+
 /* Forward Declare Data Structures */
 typedef struct FindEdgeOptions_struct FindEdgeOptions;
 typedef struct CircularEdgeReport_struct CircularEdgeReport;
@@ -174,3 +176,5 @@ int frcExtractColorPlanes(const Image* image, ColorMode mode, Image* plane1,
                           Image* plane2, Image* plane3);
 int frcExtractHuePlane(const Image* image, Image* huePlane);
 int frcExtractHuePlane(const Image* image, Image* huePlane, int minSaturation);
+
+}  // namespace frc

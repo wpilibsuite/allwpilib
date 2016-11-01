@@ -13,6 +13,8 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 static int kRegWrite = 0x0A;
 static int kRegRead = 0x0B;
 

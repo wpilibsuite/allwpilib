@@ -9,6 +9,8 @@
 
 #include "PWMSpeedController.h"
 
+namespace frc {
+
 /**
  * Cross the Road Electronics (CTRE) Talon and Talon SR Speed Controller
  */
@@ -17,3 +19,5 @@ class Talon : public PWMSpeedController {
   explicit Talon(int channel);
   virtual ~Talon() = default;
 };
+
+}  // namespace frc

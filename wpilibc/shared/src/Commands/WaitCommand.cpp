@@ -9,6 +9,8 @@
 
 #include <sstream>
 
+using namespace frc;
+
 WaitCommand::WaitCommand(double timeout)
     : Command(
           ((std::stringstream&)(std::stringstream("Wait(") << timeout << ")"))

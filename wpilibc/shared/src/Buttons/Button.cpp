@@ -7,6 +7,8 @@
 
 #include "Buttons/Button.h"
 
+using namespace frc;
+
 /**
  * Specifies the command to run when a button is first pressed.
  *

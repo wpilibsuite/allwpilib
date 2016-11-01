@@ -14,6 +14,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static constexpr double kServoResetTime = 2.0;
 
 static constexpr double kTestAngle = 90.0;

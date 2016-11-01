@@ -13,6 +13,8 @@
 #include "Timer.h"
 #include "Utility.h"
 
+using namespace frc;
+
 void Error::Clone(const Error& error) {
   m_code = error.m_code;
   m_message = error.m_message;

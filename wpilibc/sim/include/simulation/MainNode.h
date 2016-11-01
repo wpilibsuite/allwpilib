@@ -16,6 +16,8 @@
 
 using namespace gazebo;
 
+namespace frc {
+
 class MainNode {
  public:
   static MainNode* GetInstance() {
@@ -61,3 +63,5 @@ class MainNode {
     }
   }
 };
+
+}  // namespace frc

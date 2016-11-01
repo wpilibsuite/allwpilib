@@ -11,6 +11,8 @@
 
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Create an instance of a Digital Input class.
  * Creates a digital input given a channel and uses the default module.

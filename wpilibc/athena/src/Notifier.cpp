@@ -12,6 +12,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 priority_mutex Notifier::m_destructorMutex;
 
 /**

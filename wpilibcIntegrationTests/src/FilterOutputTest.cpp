@@ -17,6 +17,8 @@
 #include "TestBench.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 enum FilterOutputTestType { TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS, TEST_MOVAVG };
 
 std::ostream& operator<<(std::ostream& os, const FilterOutputTestType& type) {

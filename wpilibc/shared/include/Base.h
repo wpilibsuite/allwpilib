@@ -56,6 +56,8 @@ using decay_t = typename decay<T>::type;
 #endif
 #endif
 
+namespace frc {
+
 // A struct to use as a deleter when a std::shared_ptr must wrap a raw pointer
 // that is being deleted by someone else.
 template <class T>
@@ -63,7 +65,12 @@ struct NullDeleter {
   void operator()(T*) const noexcept {};
 };
 
+}  // namespace frc
+
 #include <atomic>
+
+namespace frc {
+
 // Use this for determining whether the default move constructor has been
 // called on a containing object. This serves the purpose of allowing us to
 // use the default move constructor of an object for moving all the data around
@@ -78,3 +85,10 @@ struct HasBeenMoved {
   std::atomic<bool> moved{false};
   operator bool() const { return moved; }
 };
+
+}  // namespace frc
+
+// For backwards compatibility
+#ifndef NAMESPACED_WPILIB
+using namespace frc;  // NOLINT
+#endif

@@ -21,6 +21,8 @@
 void sleep(unsigned int milliseconds) { Sleep(milliseconds); }
 #endif
 
+using namespace frc;
+
 SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
 
 /**

@@ -9,6 +9,8 @@
 
 #include "PWMSpeedController.h"
 
+namespace frc {
+
 /**
  * Luminary Micro / Vex Robotics Jaguar Speed Controller with PWM control
  */
@@ -17,3 +19,5 @@ class Jaguar : public PWMSpeedController {
   explicit Jaguar(int channel);
   virtual ~Jaguar() = default;
 };
+
+}  // namespace frc

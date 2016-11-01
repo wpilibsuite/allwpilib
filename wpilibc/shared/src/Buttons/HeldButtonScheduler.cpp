@@ -10,6 +10,8 @@
 #include "Buttons/Button.h"
 #include "Commands/Command.h"
 
+using namespace frc;
+
 HeldButtonScheduler::HeldButtonScheduler(bool last, Trigger* button,
                                          Command* orders)
     : ButtonScheduler(last, button, orders) {}

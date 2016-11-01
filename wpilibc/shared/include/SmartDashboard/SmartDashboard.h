@@ -17,6 +17,8 @@
 #include "SmartDashboard/Sendable.h"
 #include "tables/ITable.h"
 
+namespace frc {
+
 class SmartDashboard : public SensorBase {
  public:
   static void init();
@@ -94,3 +96,5 @@ class SmartDashboard : public SensorBase {
    */
   static std::map<std::shared_ptr<ITable>, Sendable*> m_tablesToData;
 };
+
+}  // namespace frc

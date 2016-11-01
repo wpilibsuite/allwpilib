@@ -9,6 +9,8 @@
 
 #include "SensorBase.h"
 
+namespace frc {
+
 class DigitalOutput;
 class DigitalInput;
 
@@ -68,3 +70,5 @@ class SPI : public SensorBase {
  private:
   void Init();
 };
+
+}  // namespace frc

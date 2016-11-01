@@ -9,6 +9,8 @@
 
 #include "SpeedController.h"
 
+namespace frc {
+
 /**
  * Interface for "smart" CAN-based speed controllers.
  */
@@ -98,3 +100,5 @@ class CANSpeedController : public SpeedController {
   // virtual void SetControlMode(ControlMode mode) = 0;
   // virtual ControlMode GetControlMode() const = 0;
 };
+
+}  // namespace frc

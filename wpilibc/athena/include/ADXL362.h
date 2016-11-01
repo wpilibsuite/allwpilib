@@ -15,6 +15,8 @@
 #include "SensorBase.h"
 #include "interfaces/Accelerometer.h"
 
+namespace frc {
+
 class DigitalInput;
 class DigitalOutput;
 
@@ -62,3 +64,5 @@ class ADXL362 : public Accelerometer, public LiveWindowSendable {
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

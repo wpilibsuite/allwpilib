@@ -13,6 +13,8 @@
 #include "Timer.h"
 #include "networktables/NetworkTable.h"
 
+using namespace frc;
+
 SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
 
 /**
