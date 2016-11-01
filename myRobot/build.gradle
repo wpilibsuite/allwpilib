@@ -1,0 +1,28 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+evaluationDependsOn(':wpilibj')
+
+mainClassName = 'edu.wpi.first.wpilibj.RobotBase'
+
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
+def wpilibj = project(':wpilibj')
+
+dependencies {
+    compile wpilibj
+    compile files(wpilibj.sourceSets.test.output.classesDir)
+    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:3.0.0-SNAPSHOT:arm'
+}
+
+build.dependsOn shadowJar
+
+jar {
+    manifest { attributes 'Robot-Class': 'MyRobot' }
+}
