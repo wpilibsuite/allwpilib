@@ -31,7 +31,6 @@ int32_t HAL_GetNumPCMModules(void);
 int32_t HAL_GetNumSolenoidChannels(void);
 int32_t HAL_GetNumPDPModules(void);
 int32_t HAL_GetNumPDPChannels(void);
-int32_t HAL_GetNumCanTalons(void);
 #ifdef __cplusplus
 }
 #endif

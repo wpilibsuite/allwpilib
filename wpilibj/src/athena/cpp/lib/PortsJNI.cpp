@@ -294,19 +294,4 @@ Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumPDPChannels(
   PORTSJNI_LOG(logDEBUG) << "Value = " << value;
   return value;
 }
-
-
-/*
- * Class:     edu_wpi_first_wpilibj_hal_PortsJNI
- * Method:    getNumCanTalons
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_PortsJNI_getNumCanTalons(
-    JNIEnv *env, jclass) {
-  PORTSJNI_LOG(logDEBUG) << "Calling PortsJNI getNumCanTalons";
-  jint value = HAL_GetNumCanTalons();
-  PORTSJNI_LOG(logDEBUG) << "Value = " << value;
-  return value;
-}
 }
