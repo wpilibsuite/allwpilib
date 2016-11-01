@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id 'net.ltgt.errorprone' version '0.0.8'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.2'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.4'
 }
 
 allprojects {
