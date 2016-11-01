@@ -18,6 +18,8 @@
 #include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
 #include "support/SafeThread.h"
 
+using namespace frc;
+
 TLogLevel interruptJNILogLevel = logERROR;
 
 #define INTERRUPTJNI_LOG(level)     \

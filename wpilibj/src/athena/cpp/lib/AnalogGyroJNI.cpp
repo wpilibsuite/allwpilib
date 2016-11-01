@@ -15,6 +15,8 @@
 #include "HALUtil.h"
 #include "HAL/handles/HandlesInternal.h"
 
+using namespace frc;
+
 // set the logging level
 TLogLevel analogGyroJNILogLevel = logWARNING;
 

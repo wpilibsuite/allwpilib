@@ -50,6 +50,8 @@ static jclass canNotInitializedExCls = nullptr;
 static jclass uncleanStatusExCls = nullptr;
 static jclass pwmConfigDataResultCls = nullptr;
 
+namespace frc {
+
 static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
   // create a throwable
   static jmethodID constructorId = nullptr;
@@ -268,6 +270,10 @@ jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
                         deadbandMaxPwm, centerPwm, deadbandMinPwm,
                         minPwm);
 }
+
+}  // namespace frc
+
+using namespace frc;
 
 extern "C" {
 

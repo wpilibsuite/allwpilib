@@ -10,6 +10,8 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_PDPJNI.h"
 
+using namespace frc;
+
 extern "C" {
 
 /*
