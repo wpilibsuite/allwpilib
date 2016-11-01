@@ -47,6 +47,26 @@ subprojects {
 
 apply from: 'cppSettings.gradle'
 
+def formatArgs
+if (project.hasProperty('formatArgs')) {
+    if (project.formatArgs.allWhitespace) {
+        formatArgs = null
+    } else {
+        formatArgs = project.formatArgs
+    }
+} else {
+    formatArgs = null
+}
+
+task format(type: Exec) {
+    workingDir "${rootDir}"
+    if (formatArgs != null) {
+        commandLine 'python', './styleguide/format.py', formatArgs
+    } else {
+        commandLine 'python', './styleguide/format.py'
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.0'
 }

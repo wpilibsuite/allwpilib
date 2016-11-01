@@ -67,7 +67,7 @@ The gradlew wrapper only exists in the root of the main project, so be sure to r
 
 There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
 
-format.py can be executed in either the styleguide or root directories of the repository via `python3 format.py` or `./format.py`.
+Formatting can be executed either via the `format` gradle task, or by executing format.py from either the styleguide or root directories of the repository via `python3 format.py` or `./format.py`. If using the gradle format command, arguments can be specified with `-PformatArgs="arg"`.
 
 ## Publishing
 
