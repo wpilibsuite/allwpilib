@@ -7,8 +7,6 @@
 
 #pragma once
 
-#define REAL
-
 #include "ADXL345_I2C.h"
 #include "ADXL345_SPI.h"
 #include "ADXL362.h"
