@@ -9,6 +9,8 @@
 
 #include <Commands/Command.h>
 
+namespace frc {
+
 class MockCommand : public Command {
  private:
   int32_t m_initializeCount;
@@ -40,3 +42,5 @@ class MockCommand : public Command {
   int32_t GetInterruptedCount() { return m_interruptedCount; }
   bool HasInterrupted();
 };
+
+}  // namespace frc

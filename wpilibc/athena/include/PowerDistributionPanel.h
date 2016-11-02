@@ -13,6 +13,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 /**
  * Class for getting voltage, current, temperature, power and energy from the
  * CAN PDP.
@@ -42,3 +44,5 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
   std::shared_ptr<ITable> m_table;
   int m_module;
 };
+
+}  // namespace frc

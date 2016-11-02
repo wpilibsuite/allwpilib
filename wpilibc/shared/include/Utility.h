@@ -46,8 +46,12 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
 
 void wpi_suspendOnAssertEnabled(bool enabled);
 
+namespace frc {
+
 int GetFPGAVersion();
 int64_t GetFPGARevision();
 uint64_t GetFPGATime();
 bool GetUserButton();
 std::string GetStackTrace(int offset);
+
+}  // namespace frc

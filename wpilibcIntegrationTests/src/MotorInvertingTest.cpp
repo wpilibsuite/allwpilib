@@ -13,6 +13,8 @@
 #include "Victor.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 enum MotorInvertingTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 static const double motorSpeed = 0.15;
 static const double delayTime = 0.5;

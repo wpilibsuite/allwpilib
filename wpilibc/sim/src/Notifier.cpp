@@ -11,6 +11,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 std::list<Notifier*> Notifier::timerQueue;
 priority_recursive_mutex Notifier::queueMutex;
 std::atomic<int> Notifier::refcount{0};

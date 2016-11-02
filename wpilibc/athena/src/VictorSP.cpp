@@ -10,6 +10,8 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 /**
  * Constructor for a VictorSP.
  *

@@ -7,6 +7,8 @@
 
 #include "PWMSpeedController.h"
 
+using namespace frc;
+
 /**
  * Constructor for a PWM Speed Controller connected via PWM.
  *

@@ -9,6 +9,8 @@
 
 #include "nivision.h"
 
+namespace frc {
+
 /**
  * Get the error code returned from the NI Vision library
  * @return The last error code.
@@ -2400,3 +2402,5 @@ const char* GetVisionErrorText(int errorCode) {
 
   return errorText;
 }  // NOLINT
+
+}  // namespace frc

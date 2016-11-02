@@ -10,6 +10,8 @@
 #include "RobotState.h"
 #include "Utility.h"
 
+using namespace frc;
+
 /**
  * Constructor for a generic robot program.
  *

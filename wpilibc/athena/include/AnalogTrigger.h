@@ -13,6 +13,8 @@
 #include "HAL/Types.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 class AnalogInput;
 
 class AnalogTrigger : public SensorBase {
@@ -39,3 +41,5 @@ class AnalogTrigger : public SensorBase {
   AnalogInput* m_analogInput = nullptr;
   bool m_ownsAnalog = false;
 };
+
+}  // namespace frc

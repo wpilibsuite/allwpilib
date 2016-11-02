@@ -7,6 +7,8 @@
 
 #include "AnalogPotentiometer.h"
 
+using namespace frc;
+
 /**
  * Common initialization code called by all constructors.
  */

@@ -7,6 +7,8 @@
 
 #include "HLUsageReporting.h"
 
+using namespace frc;
+
 HLUsageReportingInterface* HLUsageReporting::impl = nullptr;
 
 void HLUsageReporting::SetImplementation(HLUsageReportingInterface* i) {

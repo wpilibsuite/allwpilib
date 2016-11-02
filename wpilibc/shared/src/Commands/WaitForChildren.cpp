@@ -9,6 +9,8 @@
 
 #include "Commands/CommandGroup.h"
 
+using namespace frc;
+
 WaitForChildren::WaitForChildren(double timeout)
     : Command("WaitForChildren", timeout) {}
 

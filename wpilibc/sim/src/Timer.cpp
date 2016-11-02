@@ -26,6 +26,8 @@ void time_callback(const msgs::ConstFloat64Ptr& msg) {
 }
 }  // namespace wpilib
 
+namespace frc {
+
 /**
  * Pause the task for a specified time.
  *
@@ -64,6 +66,10 @@ double GetClock() { return Timer::GetFPGATimestamp(); }
 double GetTime() {
   return Timer::GetFPGATimestamp();  // The epoch starts when Gazebo starts
 }
+
+}  // namespace frc
+
+using namespace frc;
 
 // for compatibility with msvc12--see C2864
 const double Timer::kRolloverTime = (1ll << 32) / 1e6;

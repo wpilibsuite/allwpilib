@@ -13,6 +13,8 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include "networktables/NetworkTable.h"
 
+using namespace frc;
+
 /**
  * Provide an alternate "main loop" via StartCompetition().
  *

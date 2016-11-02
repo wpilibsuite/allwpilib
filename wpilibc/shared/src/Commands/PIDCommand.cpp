@@ -9,6 +9,8 @@
 
 #include <cfloat>
 
+using namespace frc;
+
 PIDCommand::PIDCommand(const std::string& name, double p, double i, double d,
                        double f, double period)
     : Command(name) {

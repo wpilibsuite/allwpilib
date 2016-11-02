@@ -14,6 +14,8 @@
 #include "command/MockCommand.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 class CommandTest : public testing::Test {
  protected:
   void SetUp() override {

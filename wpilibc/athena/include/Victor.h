@@ -9,6 +9,8 @@
 
 #include "PWMSpeedController.h"
 
+namespace frc {
+
 /**
  * Vex Robotics Victor 888 Speed Controller
  *
@@ -20,3 +22,5 @@ class Victor : public PWMSpeedController {
   explicit Victor(int channel);
   virtual ~Victor() = default;
 };
+
+}  // namespace frc

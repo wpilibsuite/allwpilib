@@ -10,6 +10,8 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 /**
  * Construct a TalonSRX connected via PWM.
  *

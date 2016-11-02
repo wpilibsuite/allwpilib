@@ -14,6 +14,8 @@
 #include "CircularBuffer.h"
 #include "Filter.h"
 
+namespace frc {
+
 /**
  * This class implements a linear, digital filter. All types of FIR and IIR
  * filters are supported. Static factory methods are provided to create commonly
@@ -100,3 +102,5 @@ class LinearDigitalFilter : public Filter {
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };
+
+}  // namespace frc

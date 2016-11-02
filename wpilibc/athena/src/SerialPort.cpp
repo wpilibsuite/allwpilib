@@ -12,6 +12,8 @@
 // static ViStatus _VI_FUNCH ioCompleteHandler (ViSession vi, ViEventType
 // eventType, ViEvent event, ViAddr userHandle);
 
+using namespace frc;
+
 /**
  * Create an instance of a Serial Port class.
  *

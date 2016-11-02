@@ -11,6 +11,8 @@
 #include "SafePWM.h"
 #include "SpeedController.h"
 
+namespace frc {
+
 /**
  * Luminary Micro Jaguar Speed Control.
  */
@@ -24,3 +26,5 @@ class Jaguar : public SafePWM, public SpeedController {
 
   void PIDWrite(float output) override;
 };
+
+}  // namespace frc

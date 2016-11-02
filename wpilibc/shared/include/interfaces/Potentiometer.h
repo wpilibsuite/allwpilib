@@ -9,6 +9,8 @@
 
 #include "PIDSource.h"
 
+namespace frc {
+
 /**
  * Interface for potentiometers.
  */
@@ -25,3 +27,5 @@ class Potentiometer : public PIDSource {
 
   void SetPIDSourceType(PIDSourceType pidSource) override;
 };
+
+}  // namespace frc

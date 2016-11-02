@@ -14,6 +14,8 @@
 #include "Victor.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static const double kMotorTime = 0.25;
 
 class PowerDistributionPanelTest : public testing::Test {

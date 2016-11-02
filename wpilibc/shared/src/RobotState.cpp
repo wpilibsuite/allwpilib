@@ -9,6 +9,8 @@
 
 #include "Base.h"
 
+using namespace frc;
+
 std::shared_ptr<RobotStateInterface> RobotState::impl;
 
 void RobotState::SetImplementation(RobotStateInterface& i) {

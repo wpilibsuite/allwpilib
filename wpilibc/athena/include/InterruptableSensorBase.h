@@ -13,6 +13,8 @@
 #include "HAL/Interrupts.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 class InterruptableSensorBase : public SensorBase {
  public:
   enum WaitResult {
@@ -48,3 +50,5 @@ class InterruptableSensorBase : public SensorBase {
   HAL_InterruptHandle m_interrupt = HAL_kInvalidHandle;
   void AllocateInterrupts(bool watcher);
 };
+
+}  // namespace frc

@@ -19,6 +19,8 @@
 #include "RobotState.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 /**
  * Provide access to the network communication data to / from the Driver
  * Station.
@@ -137,3 +139,5 @@ class DriverStation : public SensorBase, public RobotStateInterface {
 
   double m_nextMessageTime = 0;
 };
+
+}  // namespace frc

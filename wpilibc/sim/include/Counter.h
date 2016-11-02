@@ -14,6 +14,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 /**
  * Class for counting the number of ticks on a digital input channel.
  *
@@ -98,3 +100,5 @@ class Counter : public SensorBase,
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

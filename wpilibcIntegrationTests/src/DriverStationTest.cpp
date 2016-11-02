@@ -11,6 +11,8 @@
 #include "Utility.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 constexpr double TIMER_TOLERANCE = 0.2;
 constexpr int64_t TIMER_RUNTIME = 1000000;  // 1 second
 

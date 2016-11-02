@@ -15,6 +15,8 @@
 #include "SmartDashboard/NamedSendable.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 class CommandGroup;
 class Subsystem;
 
@@ -178,3 +180,5 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
  protected:
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

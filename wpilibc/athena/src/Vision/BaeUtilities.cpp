@@ -21,6 +21,8 @@
 #include "Servo.h"
 #include "Timer.h"
 
+namespace frc {
+
 /** @file
  *   Utility functions
  */
@@ -378,3 +380,5 @@ void stripString(char* string) {
   }
   string[j] = '\0';
 }
+
+}  // namespace frc

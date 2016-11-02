@@ -11,6 +11,8 @@
 #include "ImageBase.h"
 #include "Threshold.h"
 
+namespace frc {
+
 class ColorImage : public ImageBase {
  public:
   explicit ColorImage(ImageType type);
@@ -69,3 +71,5 @@ class ColorImage : public ImageBase {
   void ReplaceSecondColorPlane(ColorMode mode, MonoImage* plane);
   void ReplaceThirdColorPlane(ColorMode mode, MonoImage* plane);
 };
+
+}  // namespace frc

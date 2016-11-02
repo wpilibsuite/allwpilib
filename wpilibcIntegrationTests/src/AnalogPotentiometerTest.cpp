@@ -13,6 +13,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static const double kScale = 270.0;
 static const double kAngle = 180.0;
 

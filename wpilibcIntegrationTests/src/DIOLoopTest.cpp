@@ -14,6 +14,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static const double kCounterTime = 0.001;
 
 static const double kDelayTime = 0.1;

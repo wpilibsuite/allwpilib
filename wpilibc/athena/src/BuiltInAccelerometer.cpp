@@ -11,6 +11,8 @@
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Constructor.
  *

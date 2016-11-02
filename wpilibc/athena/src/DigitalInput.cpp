@@ -14,6 +14,8 @@
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Create an instance of a Digital Input class.
  *

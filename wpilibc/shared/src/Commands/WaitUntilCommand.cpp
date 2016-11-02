@@ -9,6 +9,8 @@
 
 #include "Timer.h"
 
+using namespace frc;
+
 /**
  * A {@link WaitCommand} will wait until a certain match time before finishing.
  *

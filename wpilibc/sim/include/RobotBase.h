@@ -21,6 +21,8 @@
     robot.StartCompetition();                                        \
   }
 
+namespace frc {
+
 /**
  * Implement a Robot Program framework.
  *
@@ -50,3 +52,5 @@ class RobotBase {
   DriverStation& m_ds;
   transport::SubscriberPtr time_sub;
 };
+
+}  // namespace frc

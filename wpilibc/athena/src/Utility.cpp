@@ -19,6 +19,8 @@
 #include "HAL/HAL.h"
 #include "nivision.h"
 
+using namespace frc;
+
 /**
  * Assert implementation.
  * This allows breakpoints to be set on an assert.
@@ -122,6 +124,8 @@ bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
   return valueA != valueB;
 }
 
+namespace frc {
+
 /**
  * Return the FPGA Version number.
  *
@@ -221,3 +225,5 @@ std::string GetStackTrace(int offset) {
 
   return trace.str();
 }
+
+}  // namespace frc

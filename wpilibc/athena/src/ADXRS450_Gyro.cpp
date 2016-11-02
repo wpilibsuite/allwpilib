@@ -12,6 +12,8 @@
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 
+using namespace frc;
+
 static constexpr double kSamplePeriod = 0.001;
 static constexpr double kCalibrationSampleTime = 5.0;
 static constexpr double kDegreePerSecondPerLSB = 0.0125;

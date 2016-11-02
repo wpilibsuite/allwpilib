@@ -10,6 +10,8 @@
 #include <cstdio>
 #include <sstream>
 
+using namespace frc;
+
 PrintCommand::PrintCommand(const std::string& message)
     : Command(((std::stringstream&)(std::stringstream("Print \"") << message
                                                                   << "\""))

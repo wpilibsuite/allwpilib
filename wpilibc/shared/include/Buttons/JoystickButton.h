@@ -10,6 +10,8 @@
 #include "Buttons/Button.h"
 #include "GenericHID.h"
 
+namespace frc {
+
 class JoystickButton : public Button {
  public:
   JoystickButton(GenericHID* joystick, int buttonNumber);
@@ -21,3 +23,5 @@ class JoystickButton : public Button {
   GenericHID* m_joystick;
   int m_buttonNumber;
 };
+
+}  // namespace frc

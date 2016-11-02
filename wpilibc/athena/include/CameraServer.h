@@ -19,6 +19,8 @@
 #include "USBCamera.h"
 #include "nivision.h"
 
+namespace frc {
+
 class CameraServer : public ErrorBase {
  private:
   static constexpr uint16_t kPort = 1180;
@@ -80,3 +82,5 @@ class CameraServer : public ErrorBase {
 
   void SetSize(int size);
 };
+
+}  // namespace frc

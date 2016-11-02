@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace frc {
+
 class ControllerPower {
  public:
   static float GetInputVoltage();
@@ -24,3 +26,5 @@ class ControllerPower {
   static bool GetEnabled6V();
   static int GetFaultCount6V();
 };
+
+}  // namespace frc

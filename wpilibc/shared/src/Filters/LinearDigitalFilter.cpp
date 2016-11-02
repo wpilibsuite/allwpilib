@@ -10,6 +10,8 @@
 #include <cassert>
 #include <cmath>
 
+using namespace frc;
+
 /**
  * Create a linear FIR or IIR filter.
  *

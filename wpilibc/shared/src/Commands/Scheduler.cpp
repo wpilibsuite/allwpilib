@@ -16,6 +16,8 @@
 #include "HLUsageReporting.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
 
 /**

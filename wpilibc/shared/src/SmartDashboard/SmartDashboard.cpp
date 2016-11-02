@@ -12,6 +12,8 @@
 #include "WPIErrors.h"
 #include "networktables/NetworkTable.h"
 
+using namespace frc;
+
 std::shared_ptr<ITable> SmartDashboard::m_table;
 std::map<std::shared_ptr<ITable>, Sendable*> SmartDashboard::m_tablesToData;
 

@@ -16,6 +16,8 @@
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"
 
+using namespace frc;
+
 priority_mutex ErrorBase::_globalErrorMutex;
 Error ErrorBase::_globalError;
 

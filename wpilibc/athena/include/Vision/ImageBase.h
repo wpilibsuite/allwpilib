@@ -12,6 +12,8 @@
 
 #define DEFAULT_BORDER_SIZE 3
 
+namespace frc {
+
 class ImageBase : public ErrorBase {
  public:
   explicit ImageBase(ImageType type);
@@ -24,3 +26,5 @@ class ImageBase : public ErrorBase {
  protected:
   Image* m_imaqImage;
 };
+
+}  // namespace frc

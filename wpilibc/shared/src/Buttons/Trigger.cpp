@@ -12,6 +12,8 @@
 #include "Buttons/ReleasedButtonScheduler.h"
 #include "Buttons/ToggleButtonScheduler.h"
 
+using namespace frc;
+
 bool Trigger::Grab() {
   if (Get()) {
     return true;

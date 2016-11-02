@@ -11,6 +11,8 @@
 #include "Controller.h"
 #include "LiveWindow/LiveWindow.h"
 
+namespace frc {
+
 class PIDInterface : public Controller {
   virtual void SetPID(double p, double i, double d) = 0;
   virtual double GetP() const = 0;
@@ -26,3 +28,5 @@ class PIDInterface : public Controller {
 
   virtual void Reset() = 0;
 };
+
+}  // namespace frc

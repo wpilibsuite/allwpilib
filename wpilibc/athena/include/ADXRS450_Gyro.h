@@ -14,6 +14,8 @@
 #include "Notifier.h"
 #include "SPI.h"
 
+namespace frc {
+
 /**
  * Use a rate gyro to return the robots heading relative to a starting position.
  * The Gyro class tracks the robots heading based on the starting position. As
@@ -41,3 +43,5 @@ class ADXRS450_Gyro : public GyroBase {
 
   uint16_t ReadRegister(int reg);
 };
+
+}  // namespace frc

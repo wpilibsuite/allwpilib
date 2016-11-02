@@ -18,6 +18,8 @@
 #include "WPILibVersion.h"
 #include "networktables/NetworkTable.h"
 
+using namespace frc;
+
 /**
  * Constructor for a generic robot program.
  *

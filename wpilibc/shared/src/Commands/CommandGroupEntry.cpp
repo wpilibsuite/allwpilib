@@ -9,6 +9,8 @@
 
 #include "Commands/Command.h"
 
+using namespace frc;
+
 CommandGroupEntry::CommandGroupEntry(Command* command, Sequence state,
                                      double timeout)
     : m_timeout(timeout), m_command(command), m_state(state) {}

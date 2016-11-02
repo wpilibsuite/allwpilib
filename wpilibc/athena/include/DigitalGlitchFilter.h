@@ -12,6 +12,8 @@
 #include "DigitalSource.h"
 #include "HAL/cpp/priority_mutex.h"
 
+namespace frc {
+
 class Encoder;
 class Counter;
 
@@ -50,3 +52,5 @@ class DigitalGlitchFilter : public SensorBase {
   static priority_mutex m_mutex;
   static ::std::array<bool, 3> m_filterAllocated;
 };
+
+}  // namespace frc

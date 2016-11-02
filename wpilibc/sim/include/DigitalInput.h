@@ -13,6 +13,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "simulation/SimDigitalInput.h"
 
+namespace frc {
+
 /**
  * Class to read a digital input.
  *
@@ -43,3 +45,5 @@ class DigitalInput : public LiveWindowSendable {
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

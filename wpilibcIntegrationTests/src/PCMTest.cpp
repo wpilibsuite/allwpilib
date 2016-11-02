@@ -15,6 +15,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 /* The PCM switches the compressor up to a couple seconds after the pressure
         switch changes. */
 static const double kCompressorDelayTime = 3.0;

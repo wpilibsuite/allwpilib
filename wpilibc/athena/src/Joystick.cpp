@@ -13,6 +13,8 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 const int Joystick::kDefaultXAxis;
 const int Joystick::kDefaultYAxis;
 const int Joystick::kDefaultZAxis;

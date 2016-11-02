@@ -15,6 +15,8 @@
 #include "SolenoidBase.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 /**
  * Solenoid class for running high voltage Digital Output (PCM).
  *
@@ -46,3 +48,5 @@ class Solenoid : public SolenoidBase,
   int m_channel;  ///< The channel on the module to control.
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

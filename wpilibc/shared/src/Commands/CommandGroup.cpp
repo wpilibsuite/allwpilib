@@ -9,6 +9,8 @@
 
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Creates a new {@link CommandGroup CommandGroup} with the given name.
  * @param name the name for this command group

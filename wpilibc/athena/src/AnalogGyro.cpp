@@ -15,6 +15,8 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 const int AnalogGyro::kOversampleBits;
 const int AnalogGyro::kAverageBits;
 constexpr float AnalogGyro::kSamplesPerSecond;

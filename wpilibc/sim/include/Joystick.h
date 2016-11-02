@@ -12,6 +12,8 @@
 #include "ErrorBase.h"
 #include "GenericHID.h"
 
+namespace frc {
+
 class DriverStation;
 
 /**
@@ -77,3 +79,5 @@ class Joystick : public GenericHID, public ErrorBase {
   std::unique_ptr<int[]> m_axes;
   std::unique_ptr<int[]> m_buttons;
 };
+
+}  // namespace frc

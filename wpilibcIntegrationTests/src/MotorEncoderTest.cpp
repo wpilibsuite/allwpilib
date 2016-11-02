@@ -14,6 +14,8 @@
 #include "Victor.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 enum MotorEncoderTestType { TEST_VICTOR, TEST_JAGUAR, TEST_TALON };
 
 std::ostream& operator<<(std::ostream& os, MotorEncoderTestType const& type) {

@@ -13,6 +13,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Allocate a PWM given a channel number.
  *

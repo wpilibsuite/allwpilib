@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace frc {
+
 class Trigger;
 class Command;
 
@@ -22,3 +24,5 @@ class ButtonScheduler {
   Trigger* m_button;
   Command* m_command;
 };
+
+}  // namespace frc

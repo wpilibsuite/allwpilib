@@ -11,6 +11,8 @@
 
 #include "PIDSource.h"
 
+namespace frc {
+
 /**
  * Interface for filters
  */
@@ -48,3 +50,5 @@ class Filter : public PIDSource {
  private:
   std::shared_ptr<PIDSource> m_source;
 };
+
+}  // namespace frc

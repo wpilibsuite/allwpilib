@@ -17,6 +17,8 @@
 
 #include "Utility.h"
 
+using namespace frc;
+
 // This macro expands the given imaq function to ensure that it is called and
 // properly checked for an error, calling the wpi_setImaqErrorWithContext
 // macro

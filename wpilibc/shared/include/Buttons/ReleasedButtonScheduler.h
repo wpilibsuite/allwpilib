@@ -9,6 +9,8 @@
 
 #include "Buttons/ButtonScheduler.h"
 
+namespace frc {
+
 class Trigger;
 class Command;
 
@@ -18,3 +20,5 @@ class ReleasedButtonScheduler : public ButtonScheduler {
   virtual ~ReleasedButtonScheduler() = default;
   virtual void Execute();
 };
+
+}  // namespace frc

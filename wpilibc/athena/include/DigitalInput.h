@@ -15,6 +15,8 @@
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
 
+namespace frc {
+
 class DigitalGlitchFilter;
 
 /**
@@ -51,3 +53,5 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;
 };
+
+}  // namespace frc

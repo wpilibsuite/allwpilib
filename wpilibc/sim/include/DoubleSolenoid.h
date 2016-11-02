@@ -14,6 +14,8 @@
 #include "simulation/SimContinuousOutput.h"
 #include "tables/ITableListener.h"
 
+namespace frc {
+
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output
  * (PCM).
@@ -47,3 +49,5 @@ class DoubleSolenoid : public LiveWindowSendable, public ITableListener {
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

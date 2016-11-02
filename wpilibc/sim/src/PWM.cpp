@@ -12,6 +12,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 const float PWM::kDefaultPwmPeriod = 5.05;
 const float PWM::kDefaultPwmCenter = 1.5;
 const int PWM::kDefaultPwmStepsDown = 1000;

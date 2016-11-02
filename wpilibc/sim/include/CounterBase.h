@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace frc {
+
 /**
  * Interface for counting the number of ticks on a digital input channel.
  *
@@ -28,3 +30,5 @@ class CounterBase {
   virtual bool GetStopped() const = 0;
   virtual bool GetDirection() const = 0;
 };
+
+}  // namespace frc

@@ -12,6 +12,8 @@
 #include "GyroBase.h"
 #include "simulation/SimGyro.h"
 
+namespace frc {
+
 class AnalogInput;
 class AnalogModule;
 
@@ -49,3 +51,5 @@ class AnalogGyro : public GyroBase {
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

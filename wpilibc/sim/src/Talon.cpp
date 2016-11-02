@@ -9,6 +9,8 @@
 
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 /**
  * @param channel The PWM channel that the Talon is attached to.
  */

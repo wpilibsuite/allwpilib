@@ -11,6 +11,8 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 InterruptableSensorBase::InterruptableSensorBase() {}
 
 /**

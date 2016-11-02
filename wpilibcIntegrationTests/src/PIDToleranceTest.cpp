@@ -12,6 +12,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 class PIDToleranceTest : public testing::Test {
  protected:
   const double setpoint = 50.0;

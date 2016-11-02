@@ -10,6 +10,8 @@
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Get the PIDOutput for the PIDSource base object. Can be set to return
  * angle or rate using SetPIDSourceType(). Defaults to angle.

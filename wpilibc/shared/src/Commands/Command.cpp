@@ -15,6 +15,8 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 static const std::string kName = "name";
 static const std::string kRunning = "running";
 static const std::string kIsParented = "isParented";

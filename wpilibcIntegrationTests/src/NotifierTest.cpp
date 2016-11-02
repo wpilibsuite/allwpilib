@@ -11,6 +11,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 unsigned notifierCounter;
 
 void notifierHandler(void*) { notifierCounter++; }

@@ -9,6 +9,8 @@
 
 #include "simulation/MainNode.h"
 
+using namespace frc;
+
 SimFloatInput::SimFloatInput(std::string topic) {
   sub = MainNode::Subscribe("~/simulator/" + topic, &SimFloatInput::callback,
                             this);

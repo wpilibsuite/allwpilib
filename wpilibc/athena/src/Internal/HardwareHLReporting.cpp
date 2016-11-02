@@ -9,6 +9,8 @@
 
 #include "HAL/HAL.h"
 
+using namespace frc;
+
 void HardwareHLReporting::ReportScheduler() {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand_Scheduler);

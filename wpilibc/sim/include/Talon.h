@@ -11,6 +11,8 @@
 #include "SafePWM.h"
 #include "SpeedController.h"
 
+namespace frc {
+
 /**
  * CTRE Talon Speed Controller.
  */
@@ -24,3 +26,5 @@ class Talon : public SafePWM, public SpeedController {
 
   void PIDWrite(float output) override;
 };
+
+}  // namespace frc

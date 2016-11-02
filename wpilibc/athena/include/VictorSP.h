@@ -9,6 +9,8 @@
 
 #include "PWMSpeedController.h"
 
+namespace frc {
+
 /**
  * Vex Robotics Victor SP Speed Controller
  */
@@ -17,3 +19,5 @@ class VictorSP : public PWMSpeedController {
   explicit VictorSP(int channel);
   virtual ~VictorSP() = default;
 };
+
+}  // namespace frc

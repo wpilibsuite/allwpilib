@@ -9,6 +9,8 @@
 
 #include "nivision.h"
 
+using namespace frc;
+
 /**
  * Create a new instance of an ImageBase.
  *

@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace frc {
+
 class HLUsageReportingInterface {
  public:
   virtual ~HLUsageReportingInterface() = default;
@@ -23,3 +25,5 @@ class HLUsageReporting {
   static void ReportScheduler();
   static void ReportSmartDashboard();
 };
+
+}  // namespace frc

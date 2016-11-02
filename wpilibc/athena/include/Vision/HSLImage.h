@@ -9,6 +9,8 @@
 
 #include "ColorImage.h"
 
+namespace frc {
+
 /**
  * A color image represented in HSL color space at 3 bytes per pixel.
  */
@@ -18,3 +20,5 @@ class HSLImage : public ColorImage {
   explicit HSLImage(const char* fileName);
   virtual ~HSLImage() = default;
 };
+
+}  // namespace frc

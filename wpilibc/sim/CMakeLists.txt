@@ -5,6 +5,8 @@ project(wpilibcSim)
 file(GLOB_RECURSE COM_SRC_FILES ../shared/src/*.cpp
   src/*.cpp)
 
+add_definitions(-DNAMESPACED_WPILIB)
+
 set (INCLUDE_FOLDERS include
   ../shared/include
   ../../hal/include

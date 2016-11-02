@@ -16,6 +16,8 @@
 
 using namespace gazebo;
 
+namespace frc {
+
 class SimEncoder {
  public:
   explicit SimEncoder(std::string topic);
@@ -35,3 +37,5 @@ class SimEncoder {
   void positionCallback(const msgs::ConstFloat64Ptr& msg);
   void velocityCallback(const msgs::ConstFloat64Ptr& msg);
 };
+
+}  // namespace frc

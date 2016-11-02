@@ -10,6 +10,8 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
+using namespace frc;
+
 /**
  * Note that the SD540 uses the following bounds for PWM values. These values
  * should work reasonably well for most controllers, but if users experience

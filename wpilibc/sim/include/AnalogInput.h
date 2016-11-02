@@ -15,6 +15,8 @@
 #include "SensorBase.h"
 #include "simulation/SimFloatInput.h"
 
+namespace frc {
+
 /**
  * Analog input class.
  *
@@ -59,3 +61,5 @@ class AnalogInput : public SensorBase,
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

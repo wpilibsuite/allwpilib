@@ -11,6 +11,8 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 const int SensorBase::kDigitalChannels = HAL_GetNumDigitalChannels();
 const int SensorBase::kAnalogInputs = HAL_GetNumAnalogInputs();
 const int SensorBase::kSolenoidChannels = HAL_GetNumSolenoidChannels();

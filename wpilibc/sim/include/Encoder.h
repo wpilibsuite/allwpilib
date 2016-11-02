@@ -18,6 +18,8 @@
 #include "SensorBase.h"
 #include "simulation/SimEncoder.h"
 
+namespace frc {
+
 /**
  * Class to read quad encoders.
  *
@@ -97,3 +99,5 @@ class Encoder : public SensorBase,
 
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

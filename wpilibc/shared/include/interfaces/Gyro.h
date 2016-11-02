@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace frc {
+
 /**
  * Interface for yaw rate gyros
  */
@@ -54,3 +56,5 @@ class Gyro {
    */
   virtual double GetRate() const = 0;
 };
+
+}  // namespace frc

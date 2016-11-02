@@ -11,6 +11,8 @@
 
 #include "ImageBase.h"
 
+namespace frc {
+
 class MonoImage : public ImageBase {
  public:
   MonoImage();
@@ -22,3 +24,5 @@ class MonoImage : public ImageBase {
   std::vector<EllipseMatch>* DetectEllipses(
       EllipseDescriptor* ellipseDescriptor);
 };
+
+}  // namespace frc

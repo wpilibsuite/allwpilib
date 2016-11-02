@@ -9,6 +9,8 @@
 
 #include "WPIErrors.h"
 
+using namespace frc;
+
 const int SensorBase::kDigitalChannels;
 const int SensorBase::kAnalogInputs;
 const int SensorBase::kSolenoidChannels;

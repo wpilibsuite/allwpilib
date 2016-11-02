@@ -9,6 +9,8 @@
 
 #include "ControllerPower.h"
 
+using namespace frc;
+
 /**
  * Construct an Analog Potentiometer object from a channel number.
  *

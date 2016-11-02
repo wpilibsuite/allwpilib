@@ -12,6 +12,8 @@
 #include "Base.h"
 #include "ErrorBase.h"
 
+namespace frc {
+
 /**
  * Base class for all sensors.
  * Stores most recent status information as well as containing utility functions
@@ -45,3 +47,5 @@ class SensorBase : public ErrorBase {
   static const int kRelayChannels;
   static const int kPDPChannels;
 };
+
+}  // namespace frc

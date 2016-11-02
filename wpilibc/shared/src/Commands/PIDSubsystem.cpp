@@ -9,6 +9,8 @@
 
 #include "PIDController.h"
 
+using namespace frc;
+
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
  * values.

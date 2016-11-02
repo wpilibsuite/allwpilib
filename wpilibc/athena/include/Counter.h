@@ -17,6 +17,8 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 
+namespace frc {
+
 class DigitalGlitchFilter;
 
 /**
@@ -113,3 +115,5 @@ class Counter : public SensorBase,
   std::shared_ptr<ITable> m_table;
   friend class DigitalGlitchFilter;
 };
+
+}  // namespace frc

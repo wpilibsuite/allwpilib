@@ -9,6 +9,8 @@
 
 #include "HAL/HAL.h"
 
+using namespace frc;
+
 /**
  * Constructor
  *

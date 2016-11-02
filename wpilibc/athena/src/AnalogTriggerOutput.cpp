@@ -11,6 +11,8 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Create an object that represents one of the four outputs from an analog
  * trigger.

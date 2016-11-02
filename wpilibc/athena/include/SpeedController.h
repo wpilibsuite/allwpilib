@@ -9,6 +9,8 @@
 
 #include "PIDOutput.h"
 
+namespace frc {
+
 /**
  * Interface for speed controlling devices.
  */
@@ -51,3 +53,5 @@ class SpeedController : public PIDOutput {
    */
   virtual void StopMotor() = 0;
 };
+
+}  // namespace frc

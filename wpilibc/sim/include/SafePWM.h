@@ -13,6 +13,8 @@
 #include "MotorSafetyHelper.h"
 #include "PWM.h"
 
+namespace frc {
+
 /**
  * A safe version of the PWM class.
  *
@@ -39,3 +41,5 @@ class SafePWM : public PWM, public MotorSafety {
  private:
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 };
+
+}  // namespace frc

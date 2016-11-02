@@ -15,6 +15,8 @@
 
 using namespace gazebo;
 
+namespace frc {
+
 class SimGyro {
  public:
   explicit SimGyro(std::string topic);
@@ -32,3 +34,5 @@ class SimGyro {
   void positionCallback(const msgs::ConstFloat64Ptr& msg);
   void velocityCallback(const msgs::ConstFloat64Ptr& msg);
 };
+
+}  // namespace frc

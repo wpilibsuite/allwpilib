@@ -13,6 +13,8 @@
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
 
+namespace frc {
+
 class Command;
 
 class Subsystem : public ErrorBase, public NamedSendable {
@@ -46,3 +48,5 @@ class Subsystem : public ErrorBase, public NamedSendable {
  protected:
   std::shared_ptr<ITable> m_table;
 };
+
+}  // namespace frc

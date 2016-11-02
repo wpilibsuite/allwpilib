@@ -13,6 +13,8 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 class TestEnvironment : public testing::Environment {
   bool m_alreadySetUp = false;
 

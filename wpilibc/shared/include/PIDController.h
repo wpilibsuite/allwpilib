@@ -21,6 +21,8 @@
 #include "PIDSource.h"
 #include "Timer.h"
 
+namespace frc {
+
 class PIDOutput;
 
 /**
@@ -147,3 +149,5 @@ class PIDController : public LiveWindowSendable,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
 };
+
+}  // namespace frc

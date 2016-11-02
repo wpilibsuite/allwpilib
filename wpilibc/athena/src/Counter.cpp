@@ -12,6 +12,8 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Create an instance of a counter where no sources are selected.
  *

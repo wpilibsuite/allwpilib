@@ -10,6 +10,8 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 /**
  * Constructor.
  *

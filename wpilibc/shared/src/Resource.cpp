@@ -10,6 +10,8 @@
 #include "ErrorBase.h"
 #include "WPIErrors.h"
 
+using namespace frc;
+
 priority_recursive_mutex Resource::m_createLock;
 
 /**

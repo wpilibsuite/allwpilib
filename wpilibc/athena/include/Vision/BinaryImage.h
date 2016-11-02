@@ -18,6 +18,8 @@
  */
 #include "Vision/VisionAPI.h"
 
+namespace frc {
+
 class BinaryImage : public MonoImage {
  public:
   virtual ~BinaryImage() = default;
@@ -42,3 +44,5 @@ class BinaryImage : public MonoImage {
   static bool CompareParticleSizes(ParticleAnalysisReport particle1,
                                    ParticleAnalysisReport particle2);
 };
+
+}  // namespace frc

@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+namespace frc {
+
 /**
  * GenericHID Interface.
  */
@@ -32,3 +34,5 @@ class GenericHID {
 
   virtual int GetPOV(int pov = 0) const = 0;
 };
+
+}  // namespace frc

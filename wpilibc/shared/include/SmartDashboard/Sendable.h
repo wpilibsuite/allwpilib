@@ -12,6 +12,8 @@
 
 #include "tables/ITable.h"
 
+namespace frc {
+
 class Sendable {
  public:
   /**
@@ -31,3 +33,5 @@ class Sendable {
    */
   virtual std::string GetSmartDashboardType() const = 0;
 };
+
+}  // namespace frc

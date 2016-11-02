@@ -14,6 +14,8 @@
 #include "MotorSafetyHelper.h"
 #include "PWM.h"
 
+namespace frc {
+
 /**
  * A safe version of the PWM class.
  * It is safe because it implements the MotorSafety interface that provides
@@ -39,3 +41,5 @@ class SafePWM : public PWM, public MotorSafety {
  private:
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;
 };
+
+}  // namespace frc

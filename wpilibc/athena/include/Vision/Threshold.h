@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+namespace frc {
+
 /**
  * Color threshold values.
  * This object represnts the threshold values for any type of color object
@@ -26,3 +28,5 @@ class Threshold {
   Threshold(int plane1Low, int plane1High, int plane2Low, int plane2High,
             int plane3Low, int plane3High);
 };
+
+}  // namespace frc

@@ -39,11 +39,11 @@
   } while (0)
 #define wpi_setStaticError(object, code) \
   wpi_setStaticErrorWithContext(object, code, "")
-#define wpi_setGlobalErrorWithContext(code, context)                       \
-  do {                                                                     \
-    if ((code) != 0)                                                       \
-      ErrorBase::SetGlobalError((code), (context), __FILE__, __FUNCTION__, \
-                                __LINE__);                                 \
+#define wpi_setGlobalErrorWithContext(code, context)                \
+  do {                                                              \
+    if ((code) != 0)                                                \
+      ::frc::ErrorBase::SetGlobalError((code), (context), __FILE__, \
+                                       __FUNCTION__, __LINE__);     \
   } while (0)
 #define wpi_setGlobalError(code) wpi_setGlobalErrorWithContext(code, "")
 #define wpi_setWPIErrorWithContext(error, context)                    \
@@ -55,10 +55,12 @@
                       __FUNCTION__, __LINE__)
 #define wpi_setStaticWPIError(object, error) \
   wpi_setStaticWPIErrorWithContext(object, error, "")
-#define wpi_setGlobalWPIErrorWithContext(error, context)                   \
-  ErrorBase::SetGlobalWPIError((wpi_error_s_##error), (context), __FILE__, \
-                               __FUNCTION__, __LINE__)
+#define wpi_setGlobalWPIErrorWithContext(error, context)                \
+  ::frc::ErrorBase::SetGlobalWPIError((wpi_error_s_##error), (context), \
+                                      __FILE__, __FUNCTION__, __LINE__)
 #define wpi_setGlobalWPIError(error) wpi_setGlobalWPIErrorWithContext(error, "")
+
+namespace frc {
 
 /**
  * Base class for most objects.
@@ -114,3 +116,5 @@ class ErrorBase {
   static priority_mutex _globalErrorMutex;
   static Error _globalError;
 };
+
+}  // namespace frc

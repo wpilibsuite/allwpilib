@@ -7,6 +7,8 @@
 
 #include "Commands/StartCommand.h"
 
+using namespace frc;
+
 StartCommand::StartCommand(Command* commandToStart) : Command("StartCommand") {
   m_commandToFork = commandToStart;
 }

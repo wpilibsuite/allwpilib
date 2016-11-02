@@ -11,6 +11,8 @@
 
 #include "ErrorBase.h"
 
+namespace frc {
+
 /**
  * Driver for the RS-232 serial port on the roboRIO.
  *
@@ -72,3 +74,5 @@ class SerialPort : public ErrorBase {
   bool m_consoleModeEnabled = false;
   int m_port;
 };
+
+}  // namespace frc

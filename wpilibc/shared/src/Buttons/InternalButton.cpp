@@ -7,6 +7,8 @@
 
 #include "Buttons/InternalButton.h"
 
+using namespace frc;
+
 InternalButton::InternalButton(bool inverted)
     : m_pressed(inverted), m_inverted(inverted) {}
 

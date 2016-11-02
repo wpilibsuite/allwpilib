@@ -15,6 +15,8 @@
 #include "HAL/HAL.h"
 #include "Utility.h"
 
+namespace frc {
+
 /**
  * Pause the task for a specified time.
  *
@@ -47,6 +49,10 @@ double GetTime() {
   return duration_cast<duration<double>>(system_clock::now().time_since_epoch())
       .count();
 }
+
+}  // namespace frc
+
+using namespace frc;
 
 // for compatibility with msvc12--see C2864
 const double Timer::kRolloverTime = (1ll << 32) / 1e6;

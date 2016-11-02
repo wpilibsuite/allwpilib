@@ -11,6 +11,8 @@
 
 #include "gtest/gtest.h"
 
+using namespace frc;
+
 static const std::array<double, 10> values = {
     751.848, 766.366, 342.657, 234.252, 716.126,
     132.344, 445.697, 22.727,  421.125, 799.913};

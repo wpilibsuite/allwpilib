@@ -7,6 +7,8 @@
 
 #pragma once
 
+namespace frc {
+
 /**
  * Interface for Controllers.
  * Common interface for controllers. Controllers run control loops, the most
@@ -28,3 +30,5 @@ class Controller {
    */
   virtual void Disable() = 0;
 };
+
+}  // namespace frc
