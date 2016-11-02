@@ -88,8 +88,6 @@ jar {
             classpath.files.findAll { it.exists() }.each {
                 if (file(it).directory) {
                     from it
-                } else {
-                    from zipTree(it.path)
                 }
             }
         }
