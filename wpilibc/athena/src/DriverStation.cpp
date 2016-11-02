@@ -11,6 +11,7 @@
 
 #include "AnalogInput.h"
 #include "FRC_NetworkCommunication/FRCComm.h"
+#include "HAL/HAL.h"
 #include "HAL/cpp/Log.h"
 #include "MotorSafetyHelper.h"
 #include "Timer.h"
@@ -23,7 +24,7 @@ const int DriverStation::kJoystickPorts;
 
 DriverStation::~DriverStation() {
   m_isRunning = false;
-  m_task.join();
+  m_dsThread.join();
 }
 
 /**
@@ -585,7 +586,7 @@ DriverStation::DriverStation() {
     m_joystickDescriptorCache[i].name[0] = '\0';
   }
 
-  m_task = Task("DriverStation", &DriverStation::Run, this);
+  m_dsThread = std::thread(&DriverStation::Run, this);
 }
 
 /**

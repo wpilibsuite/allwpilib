@@ -33,7 +33,6 @@
 #include "HAL/SPI.h"
 #include "HAL/SerialPort.h"
 #include "HAL/Solenoid.h"
-#include "HAL/Task.h"
 #include "HAL/Types.h"
 
 namespace HALUsageReporting = nUsageReporting;

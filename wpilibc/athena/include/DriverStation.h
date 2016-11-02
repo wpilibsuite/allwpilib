@@ -11,15 +11,13 @@
 #include <condition_variable>
 #include <memory>
 #include <string>
+#include <thread>
 
+#include "HAL/DriverStation.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "RobotState.h"
 #include "SensorBase.h"
-#include "Task.h"
-
-struct HALControlWord;
-class AnalogInput;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -114,7 +112,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptorCache;
 
   // Internal Driver Station thread
-  Task m_task;
+  std::thread m_dsThread;
   std::atomic<bool> m_isRunning{false};
 
   // WPILib WaitForData control variables
