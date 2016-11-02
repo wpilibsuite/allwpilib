@@ -43,6 +43,4 @@ public class PortsJNI extends JNIWrapper {
   public static native int getNumPDPModules();
 
   public static native int getNumPDPChannels();
-
-  public static native int getNumCanTalons();
 }

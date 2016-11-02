@@ -11,7 +11,6 @@
 
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control
- * @see CANTalon for CAN control
  */
 class TalonSRX : public PWMSpeedController {
  public:

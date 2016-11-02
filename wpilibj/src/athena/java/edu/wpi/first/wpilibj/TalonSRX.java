@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control.
- *
- * @see CANTalon CANTalon for CAN control of Talon SRX
  */
 public class TalonSRX extends PWMSpeedController {
 
