@@ -12,10 +12,11 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <sstream>
 
+#include "ErrorBase.h"
 #include "HAL/HAL.h"
-#include "Task.h"
 #include "nivision.h"
 
 /**

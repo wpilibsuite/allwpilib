@@ -10,6 +10,7 @@
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "Utility.h"
@@ -22,7 +23,6 @@ const int Ultrasonic::kPriority;
 // Max time (ms) between readings.
 constexpr double Ultrasonic::kMaxUltrasonicTime;
 constexpr double Ultrasonic::kSpeedOfSoundInchesPerSec;
-Task Ultrasonic::m_task;
 // automatic round robin mode
 std::atomic<bool> Ultrasonic::m_automaticEnabled{false};
 std::set<Ultrasonic*> Ultrasonic::m_sensors;
@@ -208,7 +208,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
       sensor->m_counter.Reset();
     }
 
-    m_task = Task("UltrasonicChecker", &Ultrasonic::UltrasonicChecker);
+    m_thread = std::thread(&Ultrasonic::UltrasonicChecker);
 
     // TODO: Currently, lvuser does not have permissions to set task priorities.
     // Until that is the case, uncommenting this will break user code that calls
@@ -216,7 +216,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     // m_task.SetPriority(kPriority);
   } else {
     // Wait for background task to stop running
-    m_task.join();
+    m_thread.join();
 
     /* Clear all the counters (data now invalid) since automatic mode is
      * disabled. No synchronization is needed because the background task is

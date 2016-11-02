@@ -10,6 +10,7 @@
 #include <cmath>
 
 #include "DriverStation.h"
+#include "HAL/HAL.h"
 #include "WPIErrors.h"
 
 const int Joystick::kDefaultXAxis;

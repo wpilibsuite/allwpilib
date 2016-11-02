@@ -8,6 +8,7 @@
 #include <cstdlib>
 
 #include "DriverStation.h"
+#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "gtest/gtest.h"
