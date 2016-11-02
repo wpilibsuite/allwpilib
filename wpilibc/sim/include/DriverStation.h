@@ -23,8 +23,6 @@
 #include <Winsock2.h>
 #endif
 
-using namespace gazebo;
-
 namespace frc {
 
 struct HALCommonControlData;
