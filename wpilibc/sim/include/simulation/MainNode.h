@@ -14,8 +14,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 namespace frc {
 
 class MainNode {
@@ -26,14 +24,14 @@ class MainNode {
   }
 
   template <typename M>
-  static transport::PublisherPtr Advertise(const std::string& topic,
-                                           int queueLimit = 10,
-                                           bool latch = false) {
+  static gazebo::transport::PublisherPtr Advertise(const std::string& topic,
+                                                   int queueLimit = 10,
+                                                   bool latch = false) {
     return GetInstance()->main->Advertise<M>(topic, queueLimit, latch);
   }
 
   template <typename M, typename T>
-  static transport::SubscriberPtr Subscribe(
+  static gazebo::transport::SubscriberPtr Subscribe(
       const std::string& topic,
       void (T::*fp)(const boost::shared_ptr<M const>&), T* obj,
       bool latching = false) {
@@ -41,20 +39,20 @@ class MainNode {
   }
 
   template <typename M>
-  static transport::SubscriberPtr Subscribe(
+  static gazebo::transport::SubscriberPtr Subscribe(
       const std::string& topic, void (*fp)(const boost::shared_ptr<M const>&),
       bool latching = false) {
     return GetInstance()->main->Subscribe(topic, fp, latching);
   }
 
-  transport::NodePtr main;
+  gazebo::transport::NodePtr main;
 
  private:
   MainNode() {
     bool success = gazebo::client::setup();
 
     if (success) {
-      main = transport::NodePtr(new transport::Node());
+      main = gazebo::transport::NodePtr(new gazebo::transport::Node());
       main->Init("frc");
       gazebo::transport::run();
     } else {

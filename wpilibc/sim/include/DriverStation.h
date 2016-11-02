@@ -119,14 +119,14 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   ///< TODO: Get rid of this and use the semaphore signaling
   static const float kUpdatePeriod;
 
-  void stateCallback(const msgs::ConstDriverStationPtr& msg);
-  void joystickCallback(const msgs::ConstFRCJoystickPtr& msg, int i);
-  void joystickCallback0(const msgs::ConstFRCJoystickPtr& msg);
-  void joystickCallback1(const msgs::ConstFRCJoystickPtr& msg);
-  void joystickCallback2(const msgs::ConstFRCJoystickPtr& msg);
-  void joystickCallback3(const msgs::ConstFRCJoystickPtr& msg);
-  void joystickCallback4(const msgs::ConstFRCJoystickPtr& msg);
-  void joystickCallback5(const msgs::ConstFRCJoystickPtr& msg);
+  void stateCallback(const gazebo::msgs::ConstDriverStationPtr& msg);
+  void joystickCallback(const gazebo::msgs::ConstFRCJoystickPtr& msg, int i);
+  void joystickCallback0(const gazebo::msgs::ConstFRCJoystickPtr& msg);
+  void joystickCallback1(const gazebo::msgs::ConstFRCJoystickPtr& msg);
+  void joystickCallback2(const gazebo::msgs::ConstFRCJoystickPtr& msg);
+  void joystickCallback3(const gazebo::msgs::ConstFRCJoystickPtr& msg);
+  void joystickCallback4(const gazebo::msgs::ConstFRCJoystickPtr& msg);
+  void joystickCallback5(const gazebo::msgs::ConstFRCJoystickPtr& msg);
 
   int m_digitalOut = 0;
   std::condition_variable m_waitForDataCond;
@@ -140,10 +140,10 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   bool m_userInTeleop = false;
   bool m_userInTest = false;
 
-  transport::SubscriberPtr stateSub;
-  transport::SubscriberPtr joysticksSub[6];
-  msgs::DriverStationPtr state;
-  msgs::FRCJoystickPtr joysticks[6];
+  gazebo::transport::SubscriberPtr stateSub;
+  gazebo::transport::SubscriberPtr joysticksSub[6];
+  gazebo::msgs::DriverStationPtr state;
+  gazebo::msgs::FRCJoystickPtr joysticks[6];
 };
 
 }  // namespace frc

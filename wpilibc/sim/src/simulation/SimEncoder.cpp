@@ -12,8 +12,8 @@
 using namespace frc;
 
 SimEncoder::SimEncoder(std::string topic) {
-  commandPub =
-      MainNode::Advertise<msgs::GzString>("~/simulator/" + topic + "/control");
+  commandPub = MainNode::Advertise<gazebo::msgs::GzString>("~/simulator/" +
+                                                           topic + "/control");
 
   posSub = MainNode::Subscribe("~/simulator/" + topic + "/position",
                                &SimEncoder::positionCallback, this);
@@ -41,15 +41,15 @@ double SimEncoder::GetPosition() { return position; }
 double SimEncoder::GetVelocity() { return velocity; }
 
 void SimEncoder::sendCommand(std::string cmd) {
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   msg.set_data(cmd);
   commandPub->Publish(msg);
 }
 
-void SimEncoder::positionCallback(const msgs::ConstFloat64Ptr& msg) {
+void SimEncoder::positionCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   position = msg->data();
 }
 
-void SimEncoder::velocityCallback(const msgs::ConstFloat64Ptr& msg) {
+void SimEncoder::velocityCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   velocity = msg->data();
 }

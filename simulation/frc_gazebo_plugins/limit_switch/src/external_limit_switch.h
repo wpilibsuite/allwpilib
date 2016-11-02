@@ -17,8 +17,6 @@
 #include <Winsock2.h>
 #endif
 
-using namespace gazebo;
-
 class ExternalLimitSwitch : public Switch {
  public:
   explicit ExternalLimitSwitch(sdf::ElementPtr sdf);
@@ -27,5 +25,5 @@ class ExternalLimitSwitch : public Switch {
   virtual bool Get();
 
  private:
-  sensors::ContactSensorPtr sensor;
+  gazebo::sensors::ContactSensorPtr sensor;
 };

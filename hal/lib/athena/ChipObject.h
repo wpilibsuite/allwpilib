@@ -40,6 +40,6 @@
 #include "FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tSysWatchdog.h"
 
 // FIXME: these should not be here!
-using namespace nFPGA;
-using namespace nRoboRIO_FPGANamespace;
+using namespace nFPGA;                   // NOLINT
+using namespace nRoboRIO_FPGANamespace;  // NOLINT
 #pragma GCC diagnostic pop

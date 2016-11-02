@@ -19,6 +19,6 @@ SimDigitalInput::SimDigitalInput(std::string topic) {
 
 bool SimDigitalInput::Get() { return value; }
 
-void SimDigitalInput::callback(const msgs::ConstBoolPtr& msg) {
+void SimDigitalInput::callback(const gazebo::msgs::ConstBoolPtr& msg) {
   value = msg->data();
 }

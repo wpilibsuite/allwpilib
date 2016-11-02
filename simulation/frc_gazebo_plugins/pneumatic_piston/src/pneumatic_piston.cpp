@@ -19,7 +19,8 @@
 
 GZ_REGISTER_MODEL_PLUGIN(PneumaticPiston)
 
-void PneumaticPiston::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void PneumaticPiston::Load(gazebo::physics::ModelPtr model,
+                           sdf::ElementPtr sdf) {
   this->model = model;
   signal = 0;
 
@@ -48,21 +49,21 @@ void PneumaticPiston::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   std::string scoped_name =
       model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
-  node = transport::NodePtr(new transport::Node());
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
   sub = node->Subscribe(topic, &PneumaticPiston::Callback, this);
 
   // Connect to the world update event.
   // This will trigger the Update function every Gazebo iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
+  updateConn = gazebo::event::Events::ConnectWorldUpdateBegin(
       boost::bind(&PneumaticPiston::Update, this, _1));
 }
 
-void PneumaticPiston::Update(const common::UpdateInfo& info) {
+void PneumaticPiston::Update(const gazebo::common::UpdateInfo& info) {
   joint->SetForce(0, signal);
 }
 
-void PneumaticPiston::Callback(const msgs::ConstFloat64Ptr& msg) {
+void PneumaticPiston::Callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   if (msg->data() < -0.001) {
     signal = -reverse_force;
   } else if (msg->data() > 0.001) {

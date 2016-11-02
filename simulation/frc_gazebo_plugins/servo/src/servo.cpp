@@ -19,7 +19,7 @@
 
 GZ_REGISTER_MODEL_PLUGIN(Servo)
 
-void Servo::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
+void Servo::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   this->model = model;
   signal = 0;
 
@@ -44,17 +44,17 @@ void Servo::Load(physics::ModelPtr model, sdf::ElementPtr sdf) {
   std::string scoped_name =
       model->GetWorld()->GetName() + "::" + model->GetScopedName();
   boost::replace_all(scoped_name, "::", "/");
-  node = transport::NodePtr(new transport::Node());
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
   node->Init(scoped_name);
   sub = node->Subscribe(topic, &Servo::Callback, this);
 
   // connect to the world update event
   // this will call update every iteration
-  updateConn = event::Events::ConnectWorldUpdateBegin(
+  updateConn = gazebo::event::Events::ConnectWorldUpdateBegin(
       boost::bind(&Servo::Update, this, _1));
 }
 
-void Servo::Update(const common::UpdateInfo& info) {
+void Servo::Update(const gazebo::common::UpdateInfo& info) {
   // torque is in kg*cm
   // joint->SetAngle(0,signal*180);
   if (joint->GetAngle(0) < signal) {
@@ -65,7 +65,7 @@ void Servo::Update(const common::UpdateInfo& info) {
   joint->SetForce(0, 0);
 }
 
-void Servo::Callback(const msgs::ConstFloat64Ptr& msg) {
+void Servo::Callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   signal = msg->data();
   if (signal < -1) {
     signal = -1;

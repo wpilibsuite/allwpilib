@@ -15,8 +15,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 /**
  * \brief Plugin for reading the speed and relative angle of a joint.
  *
@@ -45,13 +43,13 @@ using namespace gazebo;
  * (gazebo.msgs.String)
  * - `units`: Optional. Defaults to radians.
  */
-class Encoder : public ModelPlugin {
+class Encoder : public gazebo::ModelPlugin {
  public:
   /// \brief Load the encoder and configures it according to the sdf.
-  void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Sends out the encoder reading each timestep.
-  void Update(const common::UpdateInfo& info);
+  void Update(const gazebo::common::UpdateInfo& info);
 
  private:
   /// \brief Root topic for subtopics on this topic.
@@ -70,10 +68,10 @@ class Encoder : public ModelPlugin {
   double stop_value;
 
   /// \brief The joint that this encoder measures
-  physics::JointPtr joint;
+  gazebo::physics::JointPtr joint;
 
   /// \brief Callback for handling control data
-  void Callback(const msgs::ConstStringPtr& msg);
+  void Callback(const gazebo::msgs::ConstStringPtr& msg);
 
   /// \brief Gets the current angle, taking into account whether to
   ///        return radians or degrees.
@@ -83,10 +81,18 @@ class Encoder : public ModelPlugin {
   ///        return radians/second or degrees/second.
   double GetVelocity();
 
-  physics::ModelPtr model;  ///< \brief The model that this is attached to.
-  event::ConnectionPtr
-      updateConn;           ///< \brief Pointer to the world update function.
-  transport::NodePtr node;  ///< \brief The node we're advertising on.
-  transport::SubscriberPtr command_sub;      ///< \brief Subscriber handle.
-  transport::PublisherPtr pos_pub, vel_pub;  ///< \brief Publisher handles.
+  /// \brief The model to which this is attached.
+  gazebo::physics::ModelPtr model;
+
+  /// \brief Pointer to the world update function.
+  gazebo::event::ConnectionPtr updateConn;
+
+  /// \brief The node on which we're advertising.
+  gazebo::transport::NodePtr node;
+
+  /// \brief Subscriber handle.
+  gazebo::transport::SubscriberPtr command_sub;
+
+  /// \brief Publisher handles.
+  gazebo::transport::PublisherPtr pos_pub, vel_pub;
 };

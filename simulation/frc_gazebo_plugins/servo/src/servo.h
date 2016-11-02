@@ -13,8 +13,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 /**
  * \brief Plugin for controlling a servo.
  *
@@ -34,13 +32,13 @@ using namespace gazebo;
  * - `link`: Name of the link the servo is attached to.
  * - `topic`: Optional. Message type should be gazebo.msgs.Float64.
  */
-class Servo : public ModelPlugin {
+class Servo : public gazebo::ModelPlugin {
  public:
   /// \brief load the servo and configure it according to the sdf
-  void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Update the torque on the joint from the dc motor each timestep.
-  void Update(const common::UpdateInfo& info);
+  void Update(const gazebo::common::UpdateInfo& info);
 
  private:
   /// \brief Topic to read control signal from.
@@ -53,14 +51,20 @@ class Servo : public ModelPlugin {
   double torque;
 
   /// \brief the joint that this servo moves
-  physics::JointPtr joint;
+  gazebo::physics::JointPtr joint;
 
   /// \brief Callback for receiving msgs and storing the signal
-  void Callback(const msgs::ConstFloat64Ptr& msg);
+  void Callback(const gazebo::msgs::ConstFloat64Ptr& msg);
 
-  physics::ModelPtr model;  ///< \brief The model that this is attached to
-  event::ConnectionPtr
-      updateConn;           ///< \brief The Pointer to the world update function
-  transport::NodePtr node;  ///< \brief The node we're advertising torque on
-  transport::SubscriberPtr sub;  ///< \brief the Subscriber for the pwm signal
+  /// \brief The model to which this is attached
+  gazebo::physics::ModelPtr model;
+
+  /// \brief The pointer to the world update function
+  gazebo::event::ConnectionPtr updateConn;
+
+  /// \brief The node on which we're advertising torque
+  gazebo::transport::NodePtr node;
+
+  /// \brief The subscriber for the PWM signal
+  gazebo::transport::SubscriberPtr sub;
 };

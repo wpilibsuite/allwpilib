@@ -19,7 +19,7 @@ double simTime = 0;
 std::condition_variable time_wait;
 std::mutex time_wait_mutex;
 
-void time_callback(const msgs::ConstFloat64Ptr& msg) {
+void time_callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   simTime = msg->data();
   time_wait.notify_all();
 }

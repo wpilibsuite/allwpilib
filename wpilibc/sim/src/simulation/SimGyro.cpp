@@ -12,8 +12,8 @@
 using namespace frc;
 
 SimGyro::SimGyro(std::string topic) {
-  commandPub =
-      MainNode::Advertise<msgs::GzString>("~/simulator/" + topic + "/control");
+  commandPub = MainNode::Advertise<gazebo::msgs::GzString>("~/simulator/" +
+                                                           topic + "/control");
 
   posSub = MainNode::Subscribe("~/simulator/" + topic + "/position",
                                &SimGyro::positionCallback, this);
@@ -37,15 +37,15 @@ double SimGyro::GetAngle() { return position; }
 double SimGyro::GetVelocity() { return velocity; }
 
 void SimGyro::sendCommand(std::string cmd) {
-  msgs::GzString msg;
+  gazebo::msgs::GzString msg;
   msg.set_data(cmd);
   commandPub->Publish(msg);
 }
 
-void SimGyro::positionCallback(const msgs::ConstFloat64Ptr& msg) {
+void SimGyro::positionCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   position = msg->data();
 }
 
-void SimGyro::velocityCallback(const msgs::ConstFloat64Ptr& msg) {
+void SimGyro::velocityCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   velocity = msg->data();
 }

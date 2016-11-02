@@ -13,8 +13,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 /**
  * \brief Plugin for reading the range of obstacles.
  *
@@ -32,24 +30,30 @@ using namespace gazebo;
  * - `sensor`: Name of the sonar sensor that this rangefinder uses.
  * - `topic`: Optional. Message will be published as a gazebo.msgs.Float64.
  */
-class Rangefinder : public ModelPlugin {
+class Rangefinder : public gazebo::ModelPlugin {
  public:
   /// \brief Load the rangefinder and configures it according to the sdf.
-  void Load(physics::ModelPtr model, sdf::ElementPtr sdf);
+  void Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf);
 
   /// \brief Sends out the rangefinder reading each timestep.
-  void Update(const common::UpdateInfo& info);
+  void Update(const gazebo::common::UpdateInfo& info);
 
  private:
   /// \brief Publish the range on this topic.
   std::string topic;
 
   /// \brief The sonar sensor that this rangefinder uses
-  sensors::SonarSensorPtr sensor;
+  gazebo::sensors::SonarSensorPtr sensor;
 
-  physics::ModelPtr model;  ///< \brief The model that this is attached to.
-  event::ConnectionPtr
-      updateConn;           ///< \brief Pointer to the world update function.
-  transport::NodePtr node;  ///< \brief The node we're advertising on.
-  transport::PublisherPtr pub;  ///< \brief Publisher handle.
+  /// \brief The model to which this is attached.
+  gazebo::physics::ModelPtr model;
+
+  /// \brief Pointer to the world update function.
+  gazebo::event::ConnectionPtr updateConn;
+
+  /// \brief The node on which we're advertising.
+  gazebo::transport::NodePtr node;
+
+  /// \brief Publisher handle.
+  gazebo::transport::PublisherPtr pub;
 };

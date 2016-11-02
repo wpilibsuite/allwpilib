@@ -13,8 +13,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 namespace frc {
 
 class SimDigitalInput {
@@ -28,8 +26,8 @@ class SimDigitalInput {
 
  private:
   bool value;
-  transport::SubscriberPtr sub;
-  void callback(const msgs::ConstBoolPtr& msg);
+  gazebo::transport::SubscriberPtr sub;
+  void callback(const gazebo::msgs::ConstBoolPtr& msg);
 };
 
 }  // namespace frc

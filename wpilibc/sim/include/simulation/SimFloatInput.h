@@ -13,8 +13,6 @@
 
 #include "simulation/gz_msgs/msgs.h"
 
-using namespace gazebo;
-
 namespace frc {
 
 class SimFloatInput {
@@ -28,8 +26,8 @@ class SimFloatInput {
 
  private:
   double value;
-  transport::SubscriberPtr sub;
-  void callback(const msgs::ConstFloat64Ptr& msg);
+  gazebo::transport::SubscriberPtr sub;
+  void callback(const gazebo::msgs::ConstFloat64Ptr& msg);
 };
 
 }  // namespace frc
