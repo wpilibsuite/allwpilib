@@ -7,9 +7,9 @@
 
 #include "HAL/Encoder.h"
 
-#include "ChipObject.h"
 #include "EncoderInternal.h"
 #include "FPGAEncoder.h"
+#include "HAL/ChipObject.h"
 #include "HAL/Counter.h"
 #include "HAL/Errors.h"
 #include "HAL/handles/LimitedClassedHandleResource.h"

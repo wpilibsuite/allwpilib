@@ -1,5 +1,5 @@
 // These add the nilibraries shared library to the linker args
-def niLibraryPath = file('ni-libraries').path
+def niLibraryPath = file('ni-libraries/lib').path
 def niLibrary = niLibraryPath + "/libnilibraries.so"
 
 task downloadArmNetworkTables() {
@@ -267,6 +267,9 @@ subprojects {
                 }
             }
         }
+
+        ext.niLibraryHeadersRoot = "${rootDir}/ni-libraries/include"
+        ext.niLibraryHeadersChipObject = "${rootDir}/ni-libraries/include/FRC_FPGA_ChipObject"
 
         // This task adds the appropriate linker flags for the NI libraries
         ext.addNiLibraryLinks = { linker, targetPlatform ->

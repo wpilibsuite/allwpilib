@@ -11,7 +11,7 @@
 
 #include <memory>
 
-#include "ChipObject.h"
+#include "HAL/ChipObject.h"
 #include "HAL/Ports.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/IndexedHandleResource.h"
