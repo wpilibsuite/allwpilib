@@ -16,6 +16,8 @@
 #include "ChipObject.h"
 #include "HAL/HAL.h"
 
+using namespace hal;
+
 // The 7-bit I2C address with a 0 "send" bit
 static const uint8_t kSendAddress = (0x1c << 1) | 0;
 

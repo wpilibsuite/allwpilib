@@ -39,7 +39,9 @@
 #include "FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tSPI.h"
 #include "FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace/tSysWatchdog.h"
 
-// FIXME: these should not be here!
-using namespace nFPGA;                   // NOLINT
-using namespace nRoboRIO_FPGANamespace;  // NOLINT
+namespace hal {
+using namespace nFPGA;
+using namespace nRoboRIO_FPGANamespace;
+}  // namespace hal
+
 #pragma GCC diagnostic pop
