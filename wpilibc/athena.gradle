@@ -63,7 +63,7 @@ task wpilibcZip(type: Zip) {
     }
 
     // Finally, include all of the shared library objects from the ni directory
-    from(project.file('../ni-libraries')) {
+    from(project.file('../ni-libraries/lib')) {
         include 'libwpi.so'
         into 'lib'
     }
