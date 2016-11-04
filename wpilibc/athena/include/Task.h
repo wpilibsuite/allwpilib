@@ -12,13 +12,16 @@
 
 #include "ErrorBase.h"
 #include "HAL/HAL.h"
+#include "support/deprecated.h"
 
 namespace frc {
 
 /**
  * Wrapper class around std::thread that allows changing thread priority
  */
-class Task : public ErrorBase {
+class WPI_DEPRECATED(
+    "Task API scheduled for removal in 2018. Replace with std::thread") Task
+    : public ErrorBase {
  public:
   static const int kDefaultPriority = 60;
 

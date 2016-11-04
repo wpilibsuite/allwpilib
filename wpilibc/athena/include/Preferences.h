@@ -49,7 +49,7 @@ class Preferences : public ErrorBase {
   void PutFloat(llvm::StringRef key, float value);
   void PutBoolean(llvm::StringRef key, bool value);
   void PutLong(llvm::StringRef key, int64_t value);
-  DEPRECATED(
+  WPI_DEPRECATED(
       "Saving is now automatically performed by the NetworkTables server.")
   void Save();
   bool ContainsKey(llvm::StringRef key);
