@@ -7,7 +7,7 @@ task patchNiLibraries() {
         FileTree chipTree = fileTree(dir: "$rootDir/ni-libraries/include/FRC_FPGA_ChipObject/nRoboRIO_FPGANamespace")
         chipTree.each {File file ->
             String contents = file.getText( 'UTF-8' ) 
-            contents = contents.replaceAll( '#include \"tSystemInterface.h\"', '#include \"../tSystem.h\"\r\n#include \"../tSystemInterface.h\"' )
+            contents = contents.replaceAll( '#include \"tSystemInterface.h\"', '#include \"../tSystem.h\"\n#include \"../tSystemInterface.h\"' )
             file.write( contents, 'UTF-8' )
         }
 
