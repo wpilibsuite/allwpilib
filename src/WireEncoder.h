@@ -63,10 +63,8 @@ class WireEncoder {
 
   /* Writes a 32-bit word. */
   void Write32(unsigned long val) {
-    m_data.append({(char)((val >> 24) & 0xff),
-                   (char)((val >> 16) & 0xff),
-                   (char)((val >> 8) & 0xff),
-                   (char)(val & 0xff)});
+    m_data.append({(char)((val >> 24) & 0xff), (char)((val >> 16) & 0xff),
+                   (char)((val >> 8) & 0xff), (char)(val & 0xff)});
   }
 
   /* Writes a double. */

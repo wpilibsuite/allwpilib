@@ -85,10 +85,7 @@ class Notifier::Thread : public wpi::SafeThread {
   struct EntryNotification {
     EntryNotification(llvm::StringRef name_, std::shared_ptr<Value> value_,
                       unsigned int flags_, EntryListenerCallback only_)
-        : name(name_),
-          value(value_),
-          flags(flags_),
-          only(only_) {}
+        : name(name_), value(value_), flags(flags_), only(only_) {}
 
     std::string name;
     std::shared_ptr<Value> value;
@@ -154,7 +151,7 @@ void Notifier::Thread::Main() {
       }
 
       // Use index because iterator might get invalidated.
-      for (std::size_t i=0; i<m_entry_listeners.size(); ++i) {
+      for (std::size_t i = 0; i < m_entry_listeners.size(); ++i) {
         if (!m_entry_listeners[i]) continue;  // removed
 
         // Flags must be within requested flag set for this listener.
@@ -178,7 +175,7 @@ void Notifier::Thread::Main() {
 
         // Don't hold mutex during callback execution!
         lock.unlock();
-        callback(i+1, name, item.value, item.flags);
+        callback(i + 1, name, item.value, item.flags);
         lock.lock();
       }
     }
@@ -198,12 +195,12 @@ void Notifier::Thread::Main() {
       }
 
       // Use index because iterator might get invalidated.
-      for (std::size_t i=0; i<m_conn_listeners.size(); ++i) {
+      for (std::size_t i = 0; i < m_conn_listeners.size(); ++i) {
         if (!m_conn_listeners[i]) continue;  // removed
         auto callback = m_conn_listeners[i];
         // Don't hold mutex during callback execution!
         lock.unlock();
-        callback(i+1, item.connected, item.conn_info);
+        callback(i + 1, item.connected, item.conn_info);
         lock.lock();
       }
     }
@@ -252,8 +249,7 @@ void Notifier::RemoveConnectionListener(unsigned int conn_listener_uid) {
   thr->m_conn_listeners.erase(conn_listener_uid);
 }
 
-void Notifier::NotifyConnection(bool connected,
-                                const ConnectionInfo& conn_info,
+void Notifier::NotifyConnection(bool connected, const ConnectionInfo& conn_info,
                                 ConnectionListenerCallback only) {
   auto thr = m_owner.GetThread();
   if (!thr) return;

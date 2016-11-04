@@ -154,8 +154,7 @@ std::shared_ptr<Value> WireDecoder::ReadValue(NT_Type type) {
       const char* buf;
       if (!Read(&buf, size)) return nullptr;
       std::vector<int> v(size);
-      for (unsigned int i = 0; i < size; ++i)
-        v[i] = buf[i] ? 1 : 0;
+      for (unsigned int i = 0; i < size; ++i) v[i] = buf[i] ? 1 : 0;
       return Value::MakeBooleanArray(std::move(v));
     }
     case NT_DOUBLE_ARRAY: {
@@ -167,8 +166,7 @@ std::shared_ptr<Value> WireDecoder::ReadValue(NT_Type type) {
       const char* buf;
       if (!Read(&buf, size * 8)) return nullptr;
       std::vector<double> v(size);
-      for (unsigned int i = 0; i < size; ++i)
-        v[i] = ::ReadDouble(buf);
+      for (unsigned int i = 0; i < size; ++i) v[i] = ::ReadDouble(buf);
       return Value::MakeDoubleArray(std::move(v));
     }
     case NT_STRING_ARRAY: {

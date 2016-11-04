@@ -50,21 +50,15 @@ unsigned int GetEntryFlags(StringRef name) {
   return Storage::GetInstance().GetEntryFlags(name);
 }
 
-void DeleteEntry(StringRef name) {
-  Storage::GetInstance().DeleteEntry(name);
-}
+void DeleteEntry(StringRef name) { Storage::GetInstance().DeleteEntry(name); }
 
-void DeleteAllEntries() {
-  Storage::GetInstance().DeleteAllEntries();
-}
+void DeleteAllEntries() { Storage::GetInstance().DeleteAllEntries(); }
 
 std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types) {
   return Storage::GetInstance().GetEntryInfo(prefix, types);
 }
 
-void Flush() {
-  Dispatcher::GetInstance().Flush();
-}
+void Flush() { Dispatcher::GetInstance().Flush(); }
 
 /*
  * Callback Creation Functions
@@ -145,9 +139,9 @@ bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result) {
   return Storage::GetInstance().GetRpcResult(blocking, call_uid, result);
 }
 
-bool GetRpcResult(bool blocking, unsigned int call_uid, 
-                  double time_out, std::string* result) {
-  return Storage::GetInstance().GetRpcResult(blocking, call_uid, time_out, 
+bool GetRpcResult(bool blocking, unsigned int call_uid, double time_out,
+                  std::string* result) {
+  return Storage::GetInstance().GetRpcResult(blocking, call_uid, time_out,
                                              result);
 }
 
@@ -245,16 +239,14 @@ void SetNetworkIdentity(StringRef name) {
   Dispatcher::GetInstance().SetIdentity(name);
 }
 
-void StartServer(StringRef persist_filename, const char *listen_address,
+void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port) {
   Dispatcher::GetInstance().StartServer(persist_filename, listen_address, port);
 }
 
-void StopServer() {
-  Dispatcher::GetInstance().Stop();
-}
+void StopServer() { Dispatcher::GetInstance().Stop(); }
 
-void StartClient(const char *server_name, unsigned int port) {
+void StartClient(const char* server_name, unsigned int port) {
   Dispatcher::GetInstance().StartClient(server_name, port);
 }
 
@@ -262,17 +254,11 @@ void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers) {
   Dispatcher::GetInstance().StartClient(servers);
 }
 
-void StopClient() {
-  Dispatcher::GetInstance().Stop();
-}
+void StopClient() { Dispatcher::GetInstance().Stop(); }
 
-void StopRpcServer() {
-  RpcServer::GetInstance().Stop();
-}
+void StopRpcServer() { RpcServer::GetInstance().Stop(); }
 
-void StopNotifier() {
-  Notifier::GetInstance().Stop();
-}
+void StopNotifier() { Notifier::GetInstance().Stop(); }
 
 void SetUpdateRate(double interval) {
   Dispatcher::GetInstance().SetUpdateRate(interval);
@@ -296,9 +282,7 @@ const char* LoadPersistent(
   return Storage::GetInstance().LoadPersistent(filename, warn);
 }
 
-unsigned long long Now() {
-  return wpi::Now();
-}
+unsigned long long Now() { return wpi::Now(); }
 
 void SetLogger(LogFunc func, unsigned int min_level) {
   Logger& logger = Logger::GetInstance();

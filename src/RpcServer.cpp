@@ -28,9 +28,7 @@ class RpcServer::Thread : public wpi::SafeThread {
   std::function<void()> m_on_exit;
 };
 
-RpcServer::RpcServer() {
-  m_terminating = false;
-}
+RpcServer::RpcServer() { m_terminating = false; }
 
 RpcServer::~RpcServer() {
   Logger::GetInstance().SetLogger(nullptr);
@@ -47,12 +45,12 @@ void RpcServer::Stop() { m_owner.Stop(); }
 
 void RpcServer::ProcessRpc(StringRef name, std::shared_ptr<Message> msg,
                            RpcCallback func, unsigned int conn_id,
-                           SendMsgFunc send_response, 
+                           SendMsgFunc send_response,
                            const ConnectionInfo& conn_info) {
   if (func) {
     auto thr = m_owner.GetThread();
     if (!thr) return;
-    thr->m_call_queue.emplace(name, msg, func, conn_id, send_response, 
+    thr->m_call_queue.emplace(name, msg, func, conn_id, send_response,
                               conn_info);
     thr->m_cond.notify_one();
   } else {
@@ -66,15 +64,16 @@ bool RpcServer::PollRpc(bool blocking, RpcCallInfo* call_info) {
   return PollRpc(blocking, kTimeout_Indefinite, call_info);
 }
 
-bool RpcServer::PollRpc(bool blocking, double time_out, RpcCallInfo* call_info) {
+bool RpcServer::PollRpc(bool blocking, double time_out,
+                        RpcCallInfo* call_info) {
   std::unique_lock<std::mutex> lock(m_mutex);
 #if defined(_MSC_VER) && _MSC_VER < 1900
-  auto timeout_time = std::chrono::steady_clock::now() + 
-      std::chrono::duration<int64_t, std::nano>(static_cast<int64_t>
-      (time_out * 1e9));
+  auto timeout_time = std::chrono::steady_clock::now() +
+                      std::chrono::duration<int64_t, std::nano>(
+                          static_cast<int64_t>(time_out * 1e9));
 #else
-  auto timeout_time = std::chrono::steady_clock::now() + 
-      std::chrono::duration<double>(time_out);
+  auto timeout_time = std::chrono::steady_clock::now() +
+                      std::chrono::duration<double>(time_out);
 #endif
   while (m_poll_queue.empty()) {
     if (!blocking || m_terminating) return false;
@@ -95,7 +94,7 @@ bool RpcServer::PollRpc(bool blocking, double time_out, RpcCallInfo* call_info) 
   if (item.conn_id != 0xffff)
     call_uid = (item.conn_id << 16) | item.msg->seq_num_uid();
   else
-    call_uid = item.msg->seq_num_uid();  
+    call_uid = item.msg->seq_num_uid();
   call_info->rpc_id = item.msg->id();
   call_info->call_uid = call_uid;
   call_info->name = std::move(item.name);

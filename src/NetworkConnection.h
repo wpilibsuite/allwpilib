@@ -35,13 +35,13 @@ class NetworkConnection {
       std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs)>
       HandshakeFunc;
   typedef std::function<void(std::shared_ptr<Message> msg,
-                             NetworkConnection* conn)> ProcessIncomingFunc;
+                             NetworkConnection* conn)>
+      ProcessIncomingFunc;
   typedef std::vector<std::shared_ptr<Message>> Outgoing;
   typedef wpi::ConcurrentQueue<Outgoing> OutgoingQueue;
 
   NetworkConnection(std::unique_ptr<wpi::NetworkStream> stream,
-                    Notifier& notifier,
-                    HandshakeFunc handshake,
+                    Notifier& notifier, HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type);
   ~NetworkConnection();
 

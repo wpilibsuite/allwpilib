@@ -267,14 +267,15 @@ class NetworkTable : public ITable {
    * @return False if the table key already exists with a different type
    */
   bool PutNumber(llvm::StringRef key, double value) override;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultNumber(llvm::StringRef key, double defaultValue) override;
+  virtual bool SetDefaultNumber(llvm::StringRef key,
+                                double defaultValue) override;
 
   /**
    * Gets the number associated with the given name.
@@ -310,14 +311,14 @@ class NetworkTable : public ITable {
    * @return False if the table key already exists with a different type
    */
   virtual bool PutString(llvm::StringRef key, llvm::StringRef value) override;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultString(llvm::StringRef key, 
+  virtual bool SetDefaultString(llvm::StringRef key,
                                 llvm::StringRef defaultValue) override;
 
   /**
@@ -355,14 +356,15 @@ class NetworkTable : public ITable {
    * @return False if the table key already exists with a different type
    */
   virtual bool PutBoolean(llvm::StringRef key, bool value) override;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultBoolean(llvm::StringRef key, bool defaultValue) override;
+  virtual bool SetDefaultBoolean(llvm::StringRef key,
+                                 bool defaultValue) override;
 
   /**
    * Gets the boolean associated with the given name.
@@ -404,14 +406,14 @@ class NetworkTable : public ITable {
   virtual bool PutBooleanArray(llvm::StringRef key,
                                llvm::ArrayRef<int> value) override;
 
-  /** 
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
-   */                             
-  virtual bool SetDefaultBooleanArray(llvm::StringRef key,
-                                      llvm::ArrayRef<int> defaultValue) override;
+   */
+  virtual bool SetDefaultBooleanArray(
+      llvm::StringRef key, llvm::ArrayRef<int> defaultValue) override;
 
   /**
    * Returns the boolean array the key maps to. If the key does not exist or is
@@ -440,14 +442,14 @@ class NetworkTable : public ITable {
   virtual bool PutNumberArray(llvm::StringRef key,
                               llvm::ArrayRef<double> value) override;
 
-  /** 
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultNumberArray(llvm::StringRef key,
-                                     llvm::ArrayRef<double> defaultValue) override;
+  virtual bool SetDefaultNumberArray(
+      llvm::StringRef key, llvm::ArrayRef<double> defaultValue) override;
 
   /**
    * Returns the number array the key maps to. If the key does not exist or is
@@ -472,14 +474,14 @@ class NetworkTable : public ITable {
   virtual bool PutStringArray(llvm::StringRef key,
                               llvm::ArrayRef<std::string> value) override;
 
-  /** 
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultStringArray(llvm::StringRef key, 
-                                     llvm::ArrayRef<std::string> defaultValue) override;
+  virtual bool SetDefaultStringArray(
+      llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) override;
 
   /**
    * Returns the string array the key maps to. If the key does not exist or is
@@ -503,14 +505,14 @@ class NetworkTable : public ITable {
    * @return False if the table key already exists with a different type
    */
   virtual bool PutRaw(llvm::StringRef key, llvm::StringRef value) override;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultRaw(llvm::StringRef key, 
+  virtual bool SetDefaultRaw(llvm::StringRef key,
                              llvm::StringRef defaultValue) override;
 
   /**
@@ -535,15 +537,15 @@ class NetworkTable : public ITable {
    * @return False if the table key already exists with a different type
    */
   bool PutValue(llvm::StringRef key, std::shared_ptr<nt::Value> value) override;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultValue(llvm::StringRef key,
-                               std::shared_ptr<nt::Value> defaultValue) override;
+  virtual bool SetDefaultValue(
+      llvm::StringRef key, std::shared_ptr<nt::Value> defaultValue) override;
 
   /**
    * Gets the value associated with a key as an object

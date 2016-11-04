@@ -12,9 +12,9 @@
 #include "llvm/StringRef.h"
 
 #if defined(_MSC_VER)
-  #define NT_NOEXCEPT throw()
+#define NT_NOEXCEPT throw()
 #else
-  #define NT_NOEXCEPT noexcept
+#define NT_NOEXCEPT noexcept
 #endif
 
 /**

@@ -100,7 +100,7 @@ std::shared_ptr<Value> GetEntryValue(StringRef name);
  * Returns copy of current entry value if it exists.
  * Otherwise, sets passed in value, and returns set value.
  * Note that one of the type options is "unassigned".
- * 
+ *
  * @param name      entry name (UTF-8 string)
  * @param value     value to be set if name does not exist
  * @return False on error (value not set), True on success
@@ -195,8 +195,8 @@ void SetListenerOnStart(std::function<void()> on_start);
 void SetListenerOnExit(std::function<void()> on_exit);
 
 typedef std::function<void(unsigned int uid, StringRef name,
-                           std::shared_ptr<Value> value,
-                           unsigned int flags)> EntryListenerCallback;
+                           std::shared_ptr<Value> value, unsigned int flags)>
+    EntryListenerCallback;
 
 typedef std::function<void(unsigned int uid, bool connected,
                            const ConnectionInfo& conn)>
@@ -214,7 +214,7 @@ bool NotifierDestroyed();
 /*
  * Remote Procedure Call Functions
  */
- 
+
 #if defined(_MSC_VER) && _MSC_VER < 1900
 const double kTimeout_Indefinite = -1;
 #else
@@ -224,7 +224,7 @@ constexpr double kTimeout_Indefinite = -1;
 void SetRpcServerOnStart(std::function<void()> on_start);
 void SetRpcServerOnExit(std::function<void()> on_exit);
 
-typedef std::function<std::string(StringRef name, StringRef params, 
+typedef std::function<std::string(StringRef name, StringRef params,
                                   const ConnectionInfo& conn_info)>
     RpcCallback;
 
@@ -238,12 +238,12 @@ void PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
 
 unsigned int CallRpc(StringRef name, StringRef params);
 bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result);
-bool GetRpcResult(bool blocking, unsigned int call_uid, double time_out, 
+bool GetRpcResult(bool blocking, unsigned int call_uid, double time_out,
                   std::string* result);
 void CancelBlockingRpcResult(unsigned int call_uid);
 
 std::string PackRpcDefinition(const RpcDefinition& def);
-bool UnpackRpcDefinition(StringRef packed, RpcDefinition *def);
+bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def);
 std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values);
 std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
                                                     ArrayRef<NT_Type> types);
@@ -280,9 +280,10 @@ unsigned long long Now();
 
 /* logging */
 typedef std::function<void(unsigned int level, const char* file,
-                           unsigned int line, const char* msg)> LogFunc;
+                           unsigned int line, const char* msg)>
+    LogFunc;
 void SetLogger(LogFunc func, unsigned int min_level);
 
 }  // namespace nt
 
-#endif  /* NTCORE_CPP_H_ */
+#endif /* NTCORE_CPP_H_ */

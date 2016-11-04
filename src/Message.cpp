@@ -58,8 +58,8 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
     case kEntryAssign: {
       if (!decoder.ReadString(&msg->m_str)) return nullptr;
       NT_Type type;
-      if (!decoder.ReadType(&type)) return nullptr;  // name
-      if (!decoder.Read16(&msg->m_id)) return nullptr;  // id
+      if (!decoder.ReadType(&type)) return nullptr;              // name
+      if (!decoder.Read16(&msg->m_id)) return nullptr;           // id
       if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // seq num
       if (decoder.proto_rev() >= 0x0300u) {
         if (!decoder.Read8(&msg->m_flags)) return nullptr;  // flags
@@ -69,7 +69,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       break;
     }
     case kEntryUpdate: {
-      if (!decoder.Read16(&msg->m_id)) return nullptr;  // id
+      if (!decoder.Read16(&msg->m_id)) return nullptr;           // id
       if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // seq num
       NT_Type type;
       if (decoder.proto_rev() >= 0x0300u) {

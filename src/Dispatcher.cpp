@@ -169,8 +169,7 @@ void DispatcherBase::Flush() {
   {
     std::lock_guard<std::mutex> lock(m_flush_mutex);
     // don't allow flushes more often than every 10 ms
-    if ((now - m_last_flush) < std::chrono::milliseconds(10))
-      return;
+    if ((now - m_last_flush) < std::chrono::milliseconds(10)) return;
     m_last_flush = now;
     m_do_flush = true;
   }
@@ -207,8 +206,7 @@ void DispatcherBase::DispatchThreadMain() {
   while (m_active) {
     // handle loop taking too long
     auto start = std::chrono::steady_clock::now();
-    if (start > timeout_time)
-      timeout_time = start;
+    if (start > timeout_time) timeout_time = start;
 
     // wait for periodic or when flushed
     timeout_time += std::chrono::milliseconds(m_update_rate);
@@ -265,7 +263,8 @@ void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
     if (only && conn.get() != only) continue;
     auto state = conn->state();
     if (state != NetworkConnection::kSynchronized &&
-        state != NetworkConnection::kActive) continue;
+        state != NetworkConnection::kActive)
+      continue;
     conn->QueueOutgoing(msg);
   }
 }
@@ -356,8 +355,7 @@ void DispatcherBase::ClientThreadMain() {
 }
 
 bool DispatcherBase::ClientHandshake(
-    NetworkConnection& conn,
-    std::function<std::shared_ptr<Message>()> get_msg,
+    NetworkConnection& conn, std::function<std::shared_ptr<Message>()> get_msg,
     std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
   // get identity
   std::string self_id;
@@ -411,7 +409,9 @@ bool DispatcherBase::ClientHandshake(
     }
     if (!msg->Is(Message::kEntryAssign)) {
       // unexpected message
-      DEBUG("client: received message (" << msg->type() << ") other than entry assignment during initial handshake");
+      DEBUG("client: received message ("
+            << msg->type()
+            << ") other than entry assignment during initial handshake");
       return false;
     }
     incoming.emplace_back(std::move(msg));
@@ -435,8 +435,7 @@ bool DispatcherBase::ClientHandshake(
 }
 
 bool DispatcherBase::ServerHandshake(
-    NetworkConnection& conn,
-    std::function<std::shared_ptr<Message>()> get_msg,
+    NetworkConnection& conn, std::function<std::shared_ptr<Message>()> get_msg,
     std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
   // Wait for the client to send us a hello.
   auto msg = get_msg();

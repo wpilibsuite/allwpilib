@@ -105,7 +105,8 @@ class Value {
     return val;
   }
 #ifdef _MSC_VER
-  template <typename T, typename = std::enable_if_t<std::is_same<T, std::string>>>
+  template <typename T,
+            typename = std::enable_if_t<std::is_same<T, std::string>>>
 #else
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
@@ -125,7 +126,8 @@ class Value {
     return val;
   }
 #ifdef _MSC_VER
-  template <typename T, typename = std::enable_if_t<std::is_same<T, std::string>>>
+  template <typename T,
+            typename = std::enable_if_t<std::is_same<T, std::string>>>
 #else
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>

@@ -49,7 +49,7 @@ void NetworkTable::SetTeam(int team) {
   sprintf_s(tmp, "roboRIO-%d-FRC.local", team);
 #else
   using namespace std;
-  snprintf(tmp, 30, "roboRIO-%d-FRC.local",team);
+  snprintf(tmp, 30, "roboRIO-%d-FRC.local", team);
 #endif
   SetIPAddress(tmp);
 }
@@ -107,8 +107,7 @@ NetworkTable::NetworkTable(StringRef path, const private_init&)
     : m_path(path) {}
 
 NetworkTable::~NetworkTable() {
-  for (auto& i : m_listeners)
-    nt::RemoveEntryListener(i.second);
+  for (auto& i : m_listeners) nt::RemoveEntryListener(i.second);
 }
 
 void NetworkTable::AddTableListener(ITableListener* listener) {
@@ -156,8 +155,8 @@ void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
   path += key;
   unsigned int id = nt::AddEntryListener(
       path,
-      [=](unsigned int /*uid*/, StringRef name, std::shared_ptr<nt::Value> value,
-          unsigned int flags_) {
+      [=](unsigned int /*uid*/, StringRef name,
+          std::shared_ptr<nt::Value> value, unsigned int flags_) {
         if (name != path) return;
         listener->ValueChangedEx(this, name.substr(prefix_len), value, flags_);
       },
@@ -238,8 +237,7 @@ std::vector<std::string> NetworkTable::GetKeys(int types) const {
   path += PATH_SEPARATOR_CHAR;
   for (auto& entry : nt::GetEntryInfo(path, types)) {
     auto relative_key = StringRef(entry.name).substr(path.size());
-    if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos)
-      continue;
+    if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) continue;
     keys.push_back(relative_key);
   }
   return keys;
@@ -327,8 +325,7 @@ double NetworkTable::GetNumber(StringRef key, double defaultValue) const {
   path += PATH_SEPARATOR_CHAR;
   path += key;
   auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_DOUBLE)
-    return defaultValue;
+  if (!value || value->type() != NT_DOUBLE) return defaultValue;
   return value->GetDouble();
 }
 
@@ -362,8 +359,7 @@ std::string NetworkTable::GetString(StringRef key,
   path += PATH_SEPARATOR_CHAR;
   path += key;
   auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_STRING)
-    return defaultValue;
+  if (!value || value->type() != NT_STRING) return defaultValue;
   return value->GetString();
 }
 
@@ -396,8 +392,7 @@ bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {
   path += PATH_SEPARATOR_CHAR;
   path += key;
   auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_BOOLEAN)
-    return defaultValue;
+  if (!value || value->type() != NT_BOOLEAN) return defaultValue;
   return value->GetBoolean();
 }
 
@@ -414,7 +409,8 @@ bool NetworkTable::SetDefaultBooleanArray(StringRef key,
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  return nt::SetDefaultEntryValue(path, nt::Value::MakeBooleanArray(defaultValue));
+  return nt::SetDefaultEntryValue(path,
+                                  nt::Value::MakeBooleanArray(defaultValue));
 }
 
 std::vector<int> NetworkTable::GetBooleanArray(
@@ -423,8 +419,7 @@ std::vector<int> NetworkTable::GetBooleanArray(
   path += PATH_SEPARATOR_CHAR;
   path += key;
   auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_BOOLEAN_ARRAY)
-    return defaultValue;
+  if (!value || value->type() != NT_BOOLEAN_ARRAY) return defaultValue;
   return value->GetBooleanArray();
 }
 
@@ -441,7 +436,8 @@ bool NetworkTable::SetDefaultNumberArray(StringRef key,
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  return nt::SetDefaultEntryValue(path, nt::Value::MakeDoubleArray(defaultValue));
+  return nt::SetDefaultEntryValue(path,
+                                  nt::Value::MakeDoubleArray(defaultValue));
 }
 
 std::vector<double> NetworkTable::GetNumberArray(
@@ -450,8 +446,7 @@ std::vector<double> NetworkTable::GetNumberArray(
   path += PATH_SEPARATOR_CHAR;
   path += key;
   auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_DOUBLE_ARRAY)
-    return defaultValue;
+  if (!value || value->type() != NT_DOUBLE_ARRAY) return defaultValue;
   return value->GetDoubleArray();
 }
 
@@ -463,12 +458,13 @@ bool NetworkTable::PutStringArray(llvm::StringRef key,
   return nt::SetEntryValue(path, nt::Value::MakeStringArray(value));
 }
 
-bool NetworkTable::SetDefaultStringArray(StringRef key,
-                                         llvm::ArrayRef<std::string> defaultValue) {
+bool NetworkTable::SetDefaultStringArray(
+    StringRef key, llvm::ArrayRef<std::string> defaultValue) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  return nt::SetDefaultEntryValue(path, nt::Value::MakeStringArray(defaultValue));
+  return nt::SetDefaultEntryValue(path,
+                                  nt::Value::MakeStringArray(defaultValue));
 }
 
 std::vector<std::string> NetworkTable::GetStringArray(
@@ -477,8 +473,7 @@ std::vector<std::string> NetworkTable::GetStringArray(
   path += PATH_SEPARATOR_CHAR;
   path += key;
   auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_STRING_ARRAY)
-    return defaultValue;
+  if (!value || value->type() != NT_STRING_ARRAY) return defaultValue;
   return value->GetStringArray();
 }
 
@@ -489,8 +484,7 @@ bool NetworkTable::PutRaw(llvm::StringRef key, llvm::StringRef value) {
   return nt::SetEntryValue(path, nt::Value::MakeRaw(value));
 }
 
-bool NetworkTable::SetDefaultRaw(StringRef key,
-                                 StringRef defaultValue) {
+bool NetworkTable::SetDefaultRaw(StringRef key, StringRef defaultValue) {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
@@ -503,8 +497,7 @@ std::string NetworkTable::GetRaw(llvm::StringRef key,
   path += PATH_SEPARATOR_CHAR;
   path += key;
   auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_RAW)
-    return defaultValue;
+  if (!value || value->type() != NT_RAW) return defaultValue;
   return value->GetRaw();
 }
 

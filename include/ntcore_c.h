@@ -31,9 +31,7 @@ enum NT_Type {
 };
 
 /** NetworkTables entry flags. */
-enum NT_EntryFlags {
-  NT_PERSISTENT = 0x01
-};
+enum NT_EntryFlags { NT_PERSISTENT = 0x01 };
 
 /** NetworkTables logging levels. */
 enum NT_LogLevel {
@@ -70,7 +68,7 @@ struct NT_String {
    * When returned by the library, this is zero-terminated and allocated with
    * malloc().
    */
-  char *str;
+  char* str;
 
   /** Length of the string in bytes.  If the string happens to be zero
    * terminated, this does not include the zero-termination.
@@ -88,15 +86,15 @@ struct NT_Value {
     struct NT_String v_string;
     struct NT_String v_raw;
     struct {
-      int *arr;
+      int* arr;
       size_t size;
     } arr_boolean;
     struct {
-      double *arr;
+      double* arr;
       size_t size;
     } arr_double;
     struct {
-      struct NT_String *arr;
+      struct NT_String* arr;
       size_t size;
     } arr_string;
   } data;
@@ -143,9 +141,9 @@ struct NT_RpcDefinition {
   unsigned int version;
   struct NT_String name;
   size_t num_params;
-  NT_RpcParamDef *params;
+  NT_RpcParamDef* params;
   size_t num_results;
-  NT_RpcResultDef *results;
+  NT_RpcResultDef* results;
 };
 
 /** NetworkTables RPC Call Data */
@@ -172,9 +170,9 @@ struct NT_RpcCallInfo {
  * needed (the utility function NT_DisposeValue() is useful for this
  * purpose).
  */
-void NT_GetEntryValue(const char *name, size_t name_len,
-                      struct NT_Value *value);
-                      
+void NT_GetEntryValue(const char* name, size_t name_len,
+                      struct NT_Value* value);
+
 /** Set Default Entry Value.
  * Returns copy of current entry value if it exists.
  * Otherwise, sets passed in value, and returns set value.
@@ -185,8 +183,8 @@ void NT_GetEntryValue(const char *name, size_t name_len,
  * @param default_value     value to be set if name does not exist
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryValue(const char *name, size_t name_len,
-                            const struct NT_Value *default_value);
+int NT_SetDefaultEntryValue(const char* name, size_t name_len,
+                            const struct NT_Value* default_value);
 
 /** Set Entry Value.
  * Sets new entry value.  If type of new value differs from the type of the
@@ -197,8 +195,8 @@ int NT_SetDefaultEntryValue(const char *name, size_t name_len,
  * @param value     new entry value
  * @return 0 on error (type mismatch), 1 on success
  */
-int NT_SetEntryValue(const char *name, size_t name_len,
-                     const struct NT_Value *value);
+int NT_SetEntryValue(const char* name, size_t name_len,
+                     const struct NT_Value* value);
 
 /** Set Entry Type and Value.
  * Sets new entry value.  If type of new value differs from the type of the
@@ -212,16 +210,16 @@ int NT_SetEntryValue(const char *name, size_t name_len,
  * @param name_len  length of name in bytes
  * @param value     new entry value
  */
-void NT_SetEntryTypeValue(const char *name, size_t name_len,
-                          const struct NT_Value *value);
+void NT_SetEntryTypeValue(const char* name, size_t name_len,
+                          const struct NT_Value* value);
 
 /** Set Entry Flags.
  */
-void NT_SetEntryFlags(const char *name, size_t name_len, unsigned int flags);
+void NT_SetEntryFlags(const char* name, size_t name_len, unsigned int flags);
 
 /** Get Entry Flags.
  */
-unsigned int NT_GetEntryFlags(const char *name, size_t name_len);
+unsigned int NT_GetEntryFlags(const char* name, size_t name_len);
 
 /** Delete Entry.
  * Deletes an entry.  This is a new feature in version 3.0 of the protocol,
@@ -235,7 +233,7 @@ unsigned int NT_GetEntryFlags(const char *name, size_t name_len);
  * @param name      entry name (UTF-8 string)
  * @param name_len  length of name in bytes
  */
-void NT_DeleteEntry(const char *name, size_t name_len);
+void NT_DeleteEntry(const char* name, size_t name_len);
 
 /** Delete All Entries.
  * Deletes ALL table entries.  This is a new feature in version 3.0 of the
@@ -262,8 +260,8 @@ void NT_DeleteAllEntries(void);
  * @param count         output parameter; set to length of returned array
  * @return Array of entry information.
  */
-struct NT_EntryInfo *NT_GetEntryInfo(const char *prefix, size_t prefix_len,
-                                     unsigned int types, size_t *count);
+struct NT_EntryInfo* NT_GetEntryInfo(const char* prefix, size_t prefix_len,
+                                     unsigned int types, size_t* count);
 
 /** Flush Entries.
  * Forces an immediate flush of all local entry changes to network.
@@ -280,22 +278,23 @@ void NT_Flush(void);
  * Callback Creation Functions
  */
 
-void NT_SetListenerOnStart(void (*on_start)(void *data), void *data);
-void NT_SetListenerOnExit(void (*on_exit)(void *data), void *data);
+void NT_SetListenerOnStart(void (*on_start)(void* data), void* data);
+void NT_SetListenerOnExit(void (*on_exit)(void* data), void* data);
 
-typedef void (*NT_EntryListenerCallback)(
-    unsigned int uid, void *data, const char *name, size_t name_len,
-    const struct NT_Value *value, unsigned int flags);
+typedef void (*NT_EntryListenerCallback)(unsigned int uid, void* data,
+                                         const char* name, size_t name_len,
+                                         const struct NT_Value* value,
+                                         unsigned int flags);
 
 typedef void (*NT_ConnectionListenerCallback)(
-    unsigned int uid, void *data, int connected,
-    const struct NT_ConnectionInfo *conn);
+    unsigned int uid, void* data, int connected,
+    const struct NT_ConnectionInfo* conn);
 
-unsigned int NT_AddEntryListener(const char *prefix, size_t prefix_len,
-                                 void *data, NT_EntryListenerCallback callback,
+unsigned int NT_AddEntryListener(const char* prefix, size_t prefix_len,
+                                 void* data, NT_EntryListenerCallback callback,
                                  unsigned int flags);
 void NT_RemoveEntryListener(unsigned int entry_listener_uid);
-unsigned int NT_AddConnectionListener(void *data,
+unsigned int NT_AddConnectionListener(void* data,
                                       NT_ConnectionListenerCallback callback,
                                       int immediate_notify);
 void NT_RemoveConnectionListener(unsigned int conn_listener_uid);
@@ -306,45 +305,45 @@ int NT_NotifierDestroyed();
  * Remote Procedure Call Functions
  */
 
-void NT_SetRpcServerOnStart(void (*on_start)(void *data), void *data);
-void NT_SetRpcServerOnExit(void (*on_exit)(void *data), void *data);
+void NT_SetRpcServerOnStart(void (*on_start)(void* data), void* data);
+void NT_SetRpcServerOnExit(void (*on_exit)(void* data), void* data);
 
-typedef char *(*NT_RpcCallback)(void *data, const char *name, size_t name_len,
-                                const char *params, size_t params_len,
-                                size_t *results_len, 
+typedef char* (*NT_RpcCallback)(void* data, const char* name, size_t name_len,
+                                const char* params, size_t params_len,
+                                size_t* results_len,
                                 const struct NT_ConnectionInfo* conn_info);
 
-void NT_CreateRpc(const char *name, size_t name_len, const char *def,
-                  size_t def_len, void *data, NT_RpcCallback callback);
-void NT_CreatePolledRpc(const char *name, size_t name_len, const char *def,
+void NT_CreateRpc(const char* name, size_t name_len, const char* def,
+                  size_t def_len, void* data, NT_RpcCallback callback);
+void NT_CreatePolledRpc(const char* name, size_t name_len, const char* def,
                         size_t def_len);
 
 int NT_PollRpc(int blocking, struct NT_RpcCallInfo* call_info);
-int NT_PollRpcTimeout(int blocking, double time_out, 
+int NT_PollRpcTimeout(int blocking, double time_out,
                       struct NT_RpcCallInfo* call_info);
 void NT_PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
-                        const char *result, size_t result_len);
+                        const char* result, size_t result_len);
 
-unsigned int NT_CallRpc(const char *name, size_t name_len, const char *params,
+unsigned int NT_CallRpc(const char* name, size_t name_len, const char* params,
                         size_t params_len);
-char *NT_GetRpcResult(int blocking, unsigned int call_uid, size_t *result_len);
-char *NT_GetRpcResultTimeout(int blocking, unsigned int call_uid, 
-                             double time_out, size_t *result_len);
+char* NT_GetRpcResult(int blocking, unsigned int call_uid, size_t* result_len);
+char* NT_GetRpcResultTimeout(int blocking, unsigned int call_uid,
+                             double time_out, size_t* result_len);
 void NT_CancelBlockingRpcResult(unsigned int call_uid);
 
-char *NT_PackRpcDefinition(const struct NT_RpcDefinition *def,
-                           size_t *packed_len);
-int NT_UnpackRpcDefinition(const char *packed, size_t packed_len,
-                           struct NT_RpcDefinition *def);
-char *NT_PackRpcValues(const struct NT_Value **values, size_t values_len,
-                       size_t *packed_len);
-struct NT_Value **NT_UnpackRpcValues(const char *packed, size_t packed_len,
-                                     const NT_Type *types, size_t types_len);
+char* NT_PackRpcDefinition(const struct NT_RpcDefinition* def,
+                           size_t* packed_len);
+int NT_UnpackRpcDefinition(const char* packed, size_t packed_len,
+                           struct NT_RpcDefinition* def);
+char* NT_PackRpcValues(const struct NT_Value** values, size_t values_len,
+                       size_t* packed_len);
+struct NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
+                                     const NT_Type* types, size_t types_len);
 
 /*
  * Client/Server Functions
  */
-void NT_SetNetworkIdentity(const char *name, size_t name_len);
+void NT_SetNetworkIdentity(const char* name, size_t name_len);
 
 /** Start Server
  * Starts a server using the specified filename, listening address, and port.
@@ -355,7 +354,7 @@ void NT_SetNetworkIdentity(const char *name, size_t name_len);
  *                          address. (UTF-8 string, null terminated)
  * @param port              port to communicate over.
  */
-void NT_StartServer(const char *persist_filename, const char *listen_address,
+void NT_StartServer(const char* persist_filename, const char* listen_address,
                     unsigned int port);
 
 /** Stop Server
@@ -370,7 +369,7 @@ void NT_StopServer(void);
  * @param port        port to communicate over
  *
  */
-void NT_StartClient(const char *server_name, unsigned int port);
+void NT_StartClient(const char* server_name, unsigned int port);
 
 /** Starts Client
  * Starts a client using the specified (server, port) combinations.  The
@@ -382,8 +381,8 @@ void NT_StartClient(const char *server_name, unsigned int port);
  * @param ports        array of ports to communicate over (one for each server)
  *
  */
-void NT_StartClientMulti(size_t count, const char **server_names,
-                         const unsigned int *ports);
+void NT_StartClientMulti(size_t count, const char** server_names,
+                         const unsigned int* ports);
 
 /** Stop Client
  * Stops the client if it is running.
@@ -417,34 +416,34 @@ void NT_SetUpdateRate(double interval);
  * It is the caller's responsibility to free the array. The
  * NT_DisposeConnectionInfoArray function is useful for this purpose.
  */
-struct NT_ConnectionInfo *NT_GetConnections(size_t *count);
+struct NT_ConnectionInfo* NT_GetConnections(size_t* count);
 
 /*
  * Persistent Functions
  */
 /* return error string, or NULL if successful */
-const char *NT_SavePersistent(const char *filename);
-const char *NT_LoadPersistent(const char *filename,
-                              void (*warn)(size_t line, const char *msg));
+const char* NT_SavePersistent(const char* filename);
+const char* NT_LoadPersistent(const char* filename,
+                              void (*warn)(size_t line, const char* msg));
 
 /*
  * Utility Functions
  */
 
 /* frees value memory */
-void NT_DisposeValue(struct NT_Value *value);
+void NT_DisposeValue(struct NT_Value* value);
 
 /* sets type to unassigned and clears rest of struct */
-void NT_InitValue(struct NT_Value *value);
+void NT_InitValue(struct NT_Value* value);
 
 /* frees string memory */
-void NT_DisposeString(struct NT_String *str);
+void NT_DisposeString(struct NT_String* str);
 
 /* sets length to zero and pointer to null */
-void NT_InitString(struct NT_String *str);
+void NT_InitString(struct NT_String* str);
 
 /* Gets the type for the specified key, or unassigned if non existent. */
-enum NT_Type NT_GetType(const char *name, size_t name_len);
+enum NT_Type NT_GetType(const char* name, size_t name_len);
 
 /** Dispose Connection Info Array
  * Disposes a connection info array
@@ -453,7 +452,7 @@ enum NT_Type NT_GetType(const char *name, size_t name_len);
  * @param count number of elements in the array
  *
  */
-void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
+void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo* arr, size_t count);
 
 /** Dispose Entry Info Array
  * Disposes an entry info array
@@ -462,7 +461,7 @@ void NT_DisposeConnectionInfoArray(struct NT_ConnectionInfo *arr, size_t count);
  * @param count number of elements in the array
  *
  */
-void NT_DisposeEntryInfoArray(struct NT_EntryInfo *arr, size_t count);
+void NT_DisposeEntryInfoArray(struct NT_EntryInfo* arr, size_t count);
 
 /** Dispose Rpc Definition
  * Disposes a Rpc Definition structure
@@ -470,7 +469,7 @@ void NT_DisposeEntryInfoArray(struct NT_EntryInfo *arr, size_t count);
  * @param def  pointer to the struct to dispose
  *
  */
-void NT_DisposeRpcDefinition(struct NT_RpcDefinition *def);
+void NT_DisposeRpcDefinition(struct NT_RpcDefinition* def);
 
 /** Dispose Rpc Call Info
  * Disposes a Rpc Call Info structure
@@ -478,14 +477,14 @@ void NT_DisposeRpcDefinition(struct NT_RpcDefinition *def);
  * @param def  pointer to the struct to dispose
  *
  */
-void NT_DisposeRpcCallInfo(struct NT_RpcCallInfo *call_info);
+void NT_DisposeRpcCallInfo(struct NT_RpcCallInfo* call_info);
 
 /* timestamp */
 unsigned long long NT_Now(void);
 
 /* logging */
-typedef void (*NT_LogFunc)(unsigned int level, const char *file,
-                           unsigned int line, const char *msg);
+typedef void (*NT_LogFunc)(unsigned int level, const char* file,
+                           unsigned int line, const char* msg);
 void NT_SetLogger(NT_LogFunc func, unsigned int min_level);
 
 /*
@@ -505,7 +504,7 @@ void NT_SetLogger(NT_LogFunc func, unsigned int min_level);
  * After use, the array should be freed using the NT_FreeCharArray()
  * function.
  */
-char *NT_AllocateCharArray(size_t size);
+char* NT_AllocateCharArray(size_t size);
 
 /** Allocate Boolean Array
  * Allocates an array of booleans.
@@ -518,7 +517,7 @@ char *NT_AllocateCharArray(size_t size);
  * After use, the array should be freed using the NT_FreeBooleanArray()
  * function.
  */
-int *NT_AllocateBooleanArray(size_t size);
+int* NT_AllocateBooleanArray(size_t size);
 
 /** Allocate Double Array
  * Allocates an array of doubles.
@@ -531,7 +530,7 @@ int *NT_AllocateBooleanArray(size_t size);
  * After use, the array should be freed using the NT_FreeDoubleArray()
  * function.
  */
-double *NT_AllocateDoubleArray(size_t size);
+double* NT_AllocateDoubleArray(size_t size);
 
 /** Allocate NT_String Array
  * Allocates an array of NT_Strings.
@@ -544,28 +543,28 @@ double *NT_AllocateDoubleArray(size_t size);
  * After use, the array should be freed using the NT_FreeStringArray()
  * function.
  */
-struct NT_String *NT_AllocateStringArray(size_t size);
+struct NT_String* NT_AllocateStringArray(size_t size);
 
 /** Free Char Array
  * Frees an array of chars.
  *
  * @param v_boolean  pointer to the char array to free
  */
-void NT_FreeCharArray(char *v_char);
+void NT_FreeCharArray(char* v_char);
 
 /** Free Double Array
  * Frees an array of doubles.
  *
  * @param v_boolean  pointer to the double array to free
  */
-void NT_FreeDoubleArray(double *v_double);
+void NT_FreeDoubleArray(double* v_double);
 
 /** Free Boolean Array
  * Frees an array of booleans.
  *
  * @param v_boolean  pointer to the boolean array to free
  */
-void NT_FreeBooleanArray(int *v_boolean);
+void NT_FreeBooleanArray(int* v_boolean);
 
 /** Free String Array
  * Frees an array of NT_Strings.
@@ -577,7 +576,7 @@ void NT_FreeBooleanArray(int *v_boolean);
  * freed before calling this. This function will free all the strings
  * individually.
  */
-void NT_FreeStringArray(struct NT_String *v_string, size_t arr_size);
+void NT_FreeStringArray(struct NT_String* v_string, size_t arr_size);
 
 /** Get Value Type
  * Returns the type of an NT_Value struct.
@@ -586,7 +585,7 @@ void NT_FreeStringArray(struct NT_String *v_string, size_t arr_size);
  * @param value  The NT_Value struct to get the type from.
  * @return       The type of the value, or unassigned if null.
  */
-enum NT_Type NT_GetValueType(const struct NT_Value *value);
+enum NT_Type NT_GetValueType(const struct NT_Value* value);
 
 /** Get Value Boolean
  * Returns the boolean from the NT_Value.
@@ -597,8 +596,8 @@ enum NT_Type NT_GetValueType(const struct NT_Value *value);
  * @param v_boolean   returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a boolean
  */
-int NT_GetValueBoolean(const struct NT_Value *value,
-                       unsigned long long *last_change, int *v_boolean);
+int NT_GetValueBoolean(const struct NT_Value* value,
+                       unsigned long long* last_change, int* v_boolean);
 
 /** Get Value Double
  * Returns the double from the NT_Value.
@@ -609,8 +608,8 @@ int NT_GetValueBoolean(const struct NT_Value *value,
  * @param v_double    returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a double
  */
-int NT_GetValueDouble(const struct NT_Value *value,
-                      unsigned long long *last_change, double *v_double);
+int NT_GetValueDouble(const struct NT_Value* value,
+                      unsigned long long* last_change, double* v_double);
 
 /** Get Value String
  * Returns a copy of the string from the NT_Value.
@@ -626,8 +625,8 @@ int NT_GetValueDouble(const struct NT_Value *value,
  * returned string is a copy of the string in the value, and must be freed
  * separately.
  */
-char *NT_GetValueString(const struct NT_Value *value,
-                        unsigned long long *last_change, size_t *str_len);
+char* NT_GetValueString(const struct NT_Value* value,
+                        unsigned long long* last_change, size_t* str_len);
 
 /** Get Value Raw
  * Returns a copy of the raw value from the NT_Value.
@@ -643,8 +642,8 @@ char *NT_GetValueString(const struct NT_Value *value,
  * returned string is a copy of the string in the value, and must be freed
  * separately.
  */
-char *NT_GetValueRaw(const struct NT_Value *value,
-                     unsigned long long *last_change, size_t *raw_len);
+char* NT_GetValueRaw(const struct NT_Value* value,
+                     unsigned long long* last_change, size_t* raw_len);
 
 /** Get Value Boolean Array
  * Returns a copy of the boolean array from the NT_Value.
@@ -660,8 +659,8 @@ char *NT_GetValueRaw(const struct NT_Value *value,
  * The returned array is a copy of the array in the value, and must be
  * freed separately.
  */
-int *NT_GetValueBooleanArray(const struct NT_Value *value,
-                             unsigned long long *last_change, size_t *arr_size);
+int* NT_GetValueBooleanArray(const struct NT_Value* value,
+                             unsigned long long* last_change, size_t* arr_size);
 
 /** Get Value Double Array
  * Returns a copy of the double array from the NT_Value.
@@ -677,9 +676,9 @@ int *NT_GetValueBooleanArray(const struct NT_Value *value,
  * The returned array is a copy of the array in the value, and must be
  * freed separately.
  */
-double *NT_GetValueDoubleArray(const struct NT_Value *value,
-                               unsigned long long *last_change,
-                               size_t *arr_size);
+double* NT_GetValueDoubleArray(const struct NT_Value* value,
+                               unsigned long long* last_change,
+                               size_t* arr_size);
 
 /** Get Value String Array
  * Returns a copy of the NT_String array from the NT_Value.
@@ -693,13 +692,13 @@ double *NT_GetValueDoubleArray(const struct NT_Value *value,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeStringArray() function is useful for this purpose.
  * The returned array is a copy of the array in the value, and must be
- * freed seperately. Note that the individual NT_Strings should not be freed, 
+ * freed seperately. Note that the individual NT_Strings should not be freed,
  * but the entire array should be freed at once. The NT_FreeStringArray()
  * function will free all the NT_Strings.
  */
-NT_String *NT_GetValueStringArray(const struct NT_Value *value,
-                                  unsigned long long *last_change,
-                                  size_t *arr_size);
+NT_String* NT_GetValueStringArray(const struct NT_Value* value,
+                                  unsigned long long* last_change,
+                                  size_t* arr_size);
 
 /** Get Entry Boolean
  * Returns the boolean currently assigned to the entry name.
@@ -713,8 +712,8 @@ NT_String *NT_GetValueStringArray(const struct NT_Value *value,
  * @return            1 if successful, or 0 if value is unassigned or not a
  *                    boolean
  */
-int NT_GetEntryBoolean(const char *name, size_t name_len,
-                       unsigned long long *last_change, int *v_boolean);
+int NT_GetEntryBoolean(const char* name, size_t name_len,
+                       unsigned long long* last_change, int* v_boolean);
 
 /** Get Entry Double
  * Returns the double currently assigned to the entry name.
@@ -728,8 +727,8 @@ int NT_GetEntryBoolean(const char *name, size_t name_len,
  * @return            1 if successful, or 0 if value is unassigned or not a
  *                    double
  */
-int NT_GetEntryDouble(const char *name, size_t name_len,
-                      unsigned long long *last_change, double *v_double);
+int NT_GetEntryDouble(const char* name, size_t name_len,
+                      unsigned long long* last_change, double* v_double);
 
 /** Get Entry String
  * Returns a copy of the string assigned to the entry name.
@@ -745,8 +744,8 @@ int NT_GetEntryDouble(const char *name, size_t name_len,
  * It is the caller's responsibility to free the string once its no longer
  * needed. The NT_FreeCharArray() function is useful for this purpose.
  */
-char *NT_GetEntryString(const char *name, size_t name_len,
-                        unsigned long long *last_change, size_t *str_len);
+char* NT_GetEntryString(const char* name, size_t name_len,
+                        unsigned long long* last_change, size_t* str_len);
 
 /** Get Entry Raw
  * Returns a copy of the raw value assigned to the entry name.
@@ -762,8 +761,8 @@ char *NT_GetEntryString(const char *name, size_t name_len,
  * It is the caller's responsibility to free the raw value once its no longer
  * needed. The NT_FreeCharArray() function is useful for this purpose.
  */
-char *NT_GetEntryRaw(const char *name, size_t name_len,
-                     unsigned long long *last_change, size_t *raw_len);
+char* NT_GetEntryRaw(const char* name, size_t name_len,
+                     unsigned long long* last_change, size_t* raw_len);
 
 /** Get Entry Boolean Array
  * Returns a copy of the boolean array assigned to the entry name.
@@ -779,8 +778,8 @@ char *NT_GetEntryRaw(const char *name, size_t name_len,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeBooleanArray() function is useful for this purpose.
  */
-int *NT_GetEntryBooleanArray(const char *name, size_t name_len,
-                             unsigned long long *last_change, size_t *arr_size);
+int* NT_GetEntryBooleanArray(const char* name, size_t name_len,
+                             unsigned long long* last_change, size_t* arr_size);
 
 /** Get Entry Double Array
  * Returns a copy of the double array assigned to the entry name.
@@ -796,13 +795,13 @@ int *NT_GetEntryBooleanArray(const char *name, size_t name_len,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeDoubleArray() function is useful for this purpose.
  */
-double *NT_GetEntryDoubleArray(const char *name, size_t name_len,
-                               unsigned long long *last_change,
-                               size_t *arr_size);
+double* NT_GetEntryDoubleArray(const char* name, size_t name_len,
+                               unsigned long long* last_change,
+                               size_t* arr_size);
 
 /** Get Entry String Array
- * Returns a copy of the NT_String array assigned to the entry name. 
- * If the entry name is not currently assigned, or is assigned to a 
+ * Returns a copy of the NT_String array assigned to the entry name.
+ * If the entry name is not currently assigned, or is assigned to a
  * different type, returns null.
  *
  * @param name        entry name (UTF-8 string)
@@ -817,9 +816,9 @@ double *NT_GetEntryDoubleArray(const char *name, size_t name_len,
  * should be freed at once. The NT_FreeStringArray() function will free all the
  * NT_Strings.
  */
-NT_String *NT_GetEntryStringArray(const char *name, size_t name_len,
-                                  unsigned long long *last_change,
-                                  size_t *arr_size);
+NT_String* NT_GetEntryStringArray(const char* name, size_t name_len,
+                                  unsigned long long* last_change,
+                                  size_t* arr_size);
 
 /* Set Default Values */
 
@@ -833,7 +832,7 @@ NT_String *NT_GetEntryStringArray(const char *name, size_t name_len,
  * @param default_boolean     value to be set if name does not exist
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryBoolean(const char *name, size_t name_len,
+int NT_SetDefaultEntryBoolean(const char* name, size_t name_len,
                               int default_boolean);
 
 /** Set Default Entry Double.
@@ -846,7 +845,7 @@ int NT_SetDefaultEntryBoolean(const char *name, size_t name_len,
  * @param default_double     value to be set if name does not exist
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryDouble(const char *name, size_t name_len,
+int NT_SetDefaultEntryDouble(const char* name, size_t name_len,
                              double default_double);
 
 /** Set Default Entry String.
@@ -860,8 +859,8 @@ int NT_SetDefaultEntryDouble(const char *name, size_t name_len,
  * @param default_len       length of value
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryString(const char *name, size_t name_len,
-                             const char *default_value, size_t default_len);
+int NT_SetDefaultEntryString(const char* name, size_t name_len,
+                             const char* default_value, size_t default_len);
 
 /** Set Default Entry Raw.
  * Sets the default for the specified key.
@@ -874,8 +873,8 @@ int NT_SetDefaultEntryString(const char *name, size_t name_len,
  * @param default_len       length of value array
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryRaw(const char *name, size_t name_len,
-                          const char *default_value, size_t default_len);
+int NT_SetDefaultEntryRaw(const char* name, size_t name_len,
+                          const char* default_value, size_t default_len);
 
 /** Set Default Entry Boolean Array.
  * Sets the default for the specified key.
@@ -888,8 +887,8 @@ int NT_SetDefaultEntryRaw(const char *name, size_t name_len,
  * @param default_size      size of value array
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryBooleanArray(const char *name, size_t name_len,
-                                   const int *default_value, 
+int NT_SetDefaultEntryBooleanArray(const char* name, size_t name_len,
+                                   const int* default_value,
                                    size_t default_size);
 
 /** Set Default Entry Double Array.
@@ -903,8 +902,8 @@ int NT_SetDefaultEntryBooleanArray(const char *name, size_t name_len,
  * @param default_size      size of value array
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryDoubleArray(const char *name, size_t name_len,
-                                  const double *default_value, 
+int NT_SetDefaultEntryDoubleArray(const char* name, size_t name_len,
+                                  const double* default_value,
                                   size_t default_size);
 
 /** Set Default Entry String Array.
@@ -918,7 +917,7 @@ int NT_SetDefaultEntryDoubleArray(const char *name, size_t name_len,
  * @param default_size      size of value array
  * @return 0 on error (value not set), 1 on success
  */
-int NT_SetDefaultEntryStringArray(const char *name, size_t name_len,
+int NT_SetDefaultEntryStringArray(const char* name, size_t name_len,
                                   const struct NT_String* default_value,
                                   size_t default_size);
 
@@ -934,7 +933,7 @@ int NT_SetDefaultEntryStringArray(const char *name, size_t name_len,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-int NT_SetEntryBoolean(const char *name, size_t name_len, int v_boolean,
+int NT_SetEntryBoolean(const char* name, size_t name_len, int v_boolean,
                        int force);
 
 /** Set Entry Double
@@ -947,7 +946,7 @@ int NT_SetEntryBoolean(const char *name, size_t name_len, int v_boolean,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-int NT_SetEntryDouble(const char *name, size_t name_len, double v_double,
+int NT_SetEntryDouble(const char* name, size_t name_len, double v_double,
                       int force);
 
 /** Set Entry String
@@ -961,7 +960,7 @@ int NT_SetEntryDouble(const char *name, size_t name_len, double v_double,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-int NT_SetEntryString(const char *name, size_t name_len, const char *str,
+int NT_SetEntryString(const char* name, size_t name_len, const char* str,
                       size_t str_len, int force);
 
 /** Set Entry Raw
@@ -975,7 +974,7 @@ int NT_SetEntryString(const char *name, size_t name_len, const char *str,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-int NT_SetEntryRaw(const char *name, size_t name_len, const char *raw,
+int NT_SetEntryRaw(const char* name, size_t name_len, const char* raw,
                    size_t raw_len, int force);
 
 /** Set Entry Boolean Array
@@ -989,7 +988,7 @@ int NT_SetEntryRaw(const char *name, size_t name_len, const char *raw,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-int NT_SetEntryBooleanArray(const char *name, size_t name_len, const int *arr,
+int NT_SetEntryBooleanArray(const char* name, size_t name_len, const int* arr,
                             size_t size, int force);
 
 /** Set Entry Double Array
@@ -1003,7 +1002,7 @@ int NT_SetEntryBooleanArray(const char *name, size_t name_len, const int *arr,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-int NT_SetEntryDoubleArray(const char *name, size_t name_len, const double *arr,
+int NT_SetEntryDoubleArray(const char* name, size_t name_len, const double* arr,
                            size_t size, int force);
 
 /** Set Entry String Array
@@ -1017,8 +1016,8 @@ int NT_SetEntryDoubleArray(const char *name, size_t name_len, const double *arr,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-int NT_SetEntryStringArray(const char *name, size_t name_len,
-                           const struct NT_String *arr, size_t size, int force);
+int NT_SetEntryStringArray(const char* name, size_t name_len,
+                           const struct NT_String* arr, size_t size, int force);
 
 #ifdef __cplusplus
 }

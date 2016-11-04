@@ -26,10 +26,8 @@ class ITableListener {
    * @param isNew true if the key did not previously exist in the table,
    * otherwise it is false
    */
-  virtual void ValueChanged(ITable* source,
-                            llvm::StringRef key,
-                            std::shared_ptr<nt::Value> value,
-                            bool isNew) = 0;
+  virtual void ValueChanged(ITable* source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value, bool isNew) = 0;
 
   /**
    * Extended version of ValueChanged.  Called when a key-value pair is
@@ -41,8 +39,7 @@ class ITableListener {
    * @param flags update flags; for example, NT_NOTIFY_NEW if the key did not
    * previously exist in the table
    */
-  virtual void ValueChangedEx(ITable* source,
-                              llvm::StringRef key,
+  virtual void ValueChangedEx(ITable* source, llvm::StringRef key,
                               std::shared_ptr<nt::Value> value,
                               unsigned int flags);
 };

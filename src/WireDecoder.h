@@ -112,9 +112,7 @@ class WireDecoder {
   bool ReadDouble(double* val);
 
   /* Reads an ULEB128-encoded unsigned integer. */
-  bool ReadUleb128(unsigned long* val) {
-    return wpi::ReadUleb128(m_is, val);
-  }
+  bool ReadUleb128(unsigned long* val) { return wpi::ReadUleb128(m_is, val); }
 
   bool ReadType(NT_Type* type);
   bool ReadString(std::string* str);

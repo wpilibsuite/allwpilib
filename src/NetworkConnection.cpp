@@ -151,8 +151,7 @@ void NetworkConnection::ReadThreadMain() {
 
   set_state(kActive);
   while (m_active) {
-    if (!m_stream)
-      break;
+    if (!m_stream) break;
     decoder.set_proto_rev(m_proto_rev);
     decoder.Reset();
     auto msg = Message::Read(decoder, m_get_entry_type);

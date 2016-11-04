@@ -122,8 +122,8 @@ class ITable {
    * does not exist
    */
   virtual std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const = 0;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
@@ -150,8 +150,8 @@ class ITable {
    * @return False if the table key already exists with a different type
    */
   virtual bool PutNumber(llvm::StringRef key, double value) = 0;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
@@ -192,14 +192,14 @@ class ITable {
    * @return False if the table key already exists with a different type
    */
   virtual bool PutString(llvm::StringRef key, llvm::StringRef value) = 0;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultString(llvm::StringRef key, 
+  virtual bool SetDefaultString(llvm::StringRef key,
                                 llvm::StringRef defaultValue) = 0;
 
   /**
@@ -240,8 +240,8 @@ class ITable {
    * @return False if the table key already exists with a different type
    */
   virtual bool PutBoolean(llvm::StringRef key, bool value) = 0;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
@@ -287,13 +287,13 @@ class ITable {
    */
   virtual bool PutBooleanArray(llvm::StringRef key,
                                llvm::ArrayRef<int> value) = 0;
-                               
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
-   */                             
+   */
   virtual bool SetDefaultBooleanArray(llvm::StringRef key,
                                       llvm::ArrayRef<int> defaultValue) = 0;
 
@@ -323,8 +323,8 @@ class ITable {
    */
   virtual bool PutNumberArray(llvm::StringRef key,
                               llvm::ArrayRef<double> value) = 0;
-                              
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
@@ -355,15 +355,15 @@ class ITable {
    */
   virtual bool PutStringArray(llvm::StringRef key,
                               llvm::ArrayRef<std::string> value) = 0;
-                              
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultStringArray(llvm::StringRef key, 
-                                     llvm::ArrayRef<std::string> defaultValue) = 0;
+  virtual bool SetDefaultStringArray(
+      llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) = 0;
 
   /**
    * Returns the string array the key maps to. If the key does not exist or is
@@ -386,14 +386,14 @@ class ITable {
    * @return False if the table key already exists with a different type
    */
   virtual bool PutRaw(llvm::StringRef key, llvm::StringRef value) = 0;
-  
-  /** 
+
+  /**
    * Gets the current value in the table, setting it if it does not exist.
    * @param key the key
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultRaw(llvm::StringRef key, 
+  virtual bool SetDefaultRaw(llvm::StringRef key,
                              llvm::StringRef defaultValue) = 0;
 
   /**

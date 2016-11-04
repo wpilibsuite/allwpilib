@@ -40,6 +40,6 @@ class Logger : public wpi::Logger {
 #define DEBUG3(x) WPI_DEBUG3(nt::Logger::GetInstance(), x)
 #define DEBUG4(x) WPI_DEBUG4(nt::Logger::GetInstance(), x)
 
-} // namespace nt
+}  // namespace nt
 
 #endif  // NT_LOG_H_

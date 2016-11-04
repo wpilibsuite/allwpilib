@@ -14,6 +14,6 @@
 #ifdef __cplusplus
 /* C++ API */
 #include "ntcore_cpp.h"
-#endif  /* __cplusplus */
+#endif /* __cplusplus */
 
-#endif  /* NTCORE_H_ */
+#endif /* NTCORE_H_ */

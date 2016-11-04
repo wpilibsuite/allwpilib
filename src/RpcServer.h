@@ -24,6 +24,7 @@ namespace nt {
 
 class RpcServer {
   friend class RpcServerTest;
+
  public:
   static RpcServer& GetInstance() {
     ATOMIC_STATIC(RpcServer, instance);
@@ -41,8 +42,7 @@ class RpcServer {
 
   void ProcessRpc(StringRef name, std::shared_ptr<Message> msg,
                   RpcCallback func, unsigned int conn_id,
-                  SendMsgFunc send_response,
-                  const ConnectionInfo& conn_info);
+                  SendMsgFunc send_response, const ConnectionInfo& conn_info);
 
   bool PollRpc(bool blocking, RpcCallInfo* call_info);
   bool PollRpc(bool blocking, double time_out, RpcCallInfo* call_info);

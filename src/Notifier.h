@@ -18,6 +18,7 @@ namespace nt {
 
 class Notifier {
   friend class NotifierTest;
+
  public:
   static Notifier& GetInstance() {
     ATOMIC_STATIC(Notifier, instance);

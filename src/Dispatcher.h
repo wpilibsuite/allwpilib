@@ -33,6 +33,7 @@ namespace nt {
 
 class DispatcherBase {
   friend class DispatcherTest;
+
  public:
   typedef std::function<std::unique_ptr<wpi::NetworkStream>()> Connector;
 
@@ -91,7 +92,7 @@ class DispatcherBase {
   std::vector<std::shared_ptr<NetworkConnection>> m_connections;
   std::string m_identity;
 
-  std::atomic_bool m_active;  // set to false to terminate threads
+  std::atomic_bool m_active;       // set to false to terminate threads
   std::atomic_uint m_update_rate;  // periodic dispatch update rate, in ms
 
   // Condition variable for forced dispatch wakeup (flush)
@@ -108,6 +109,7 @@ class DispatcherBase {
 
 class Dispatcher : public DispatcherBase {
   friend class DispatcherTest;
+
  public:
   static Dispatcher& GetInstance() {
     ATOMIC_STATIC(Dispatcher, instance);
@@ -126,7 +128,6 @@ class Dispatcher : public DispatcherBase {
 
   ATOMIC_STATIC_DECL(Dispatcher)
 };
-
 
 }  // namespace nt
 

@@ -9,17 +9,17 @@
 
 #include <cstdio>
 #ifdef _WIN32
- #include <cstdlib>
+#include <cstdlib>
 #else
- #include <cstring>
+#include <cstring>
 #endif
 
 #ifdef __APPLE__
- #include <libgen.h>
+#include <libgen.h>
 #endif
 
 #ifdef __ANDROID__
- #include <libgen.h>
+#include <libgen.h>
 #endif
 
 using namespace nt;
