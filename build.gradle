@@ -47,6 +47,8 @@ subprojects {
 
 apply from: 'cppSettings.gradle'
 
+apply from: 'ni-libraries/ni-libraries.gradle'
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.0'
 }

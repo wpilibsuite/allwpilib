@@ -4,7 +4,8 @@
 #ifndef __nFRC_2017_17_0_2_Relay_h__
 #define __nFRC_2017_17_0_2_Relay_h__
 
-#include "tSystemInterface.h"
+#include "../tSystem.h"
+#include "../tSystemInterface.h"
 
 namespace nFPGA
 {
