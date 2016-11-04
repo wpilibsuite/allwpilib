@@ -65,10 +65,46 @@ struct VideoMode : public CS_VideoMode {
   explicit operator bool() const { return pixelFormat == kUnknown; }
 };
 
+/// Listener event
+struct RawEvent {
+  enum Type {
+    kSourceCreated = CS_SOURCE_CREATED,
+    kSourceDestroyed = CS_SOURCE_DESTROYED,
+    kSourceConnected = CS_SOURCE_CONNECTED,
+    kSourceDisconnected = CS_SOURCE_DISCONNECTED,
+    kSourceVideoModesUpdated = CS_SOURCE_VIDEOMODES_UPDATED,
+    kSourceVideoModeChanged = CS_SOURCE_VIDEOMODE_CHANGED,
+    kSinkCreated = CS_SINK_CREATED,
+    kSinkDestroyed = CS_SINK_DESTROYED,
+    kSinkEnabled = CS_SINK_ENABLED,
+    kSinkDisabled = CS_SINK_DISABLED,
+    kSourcePropertyCreated = CS_SOURCE_PROPERTY_CREATED,
+    kSourcePropertyValueUpdated = CS_SOURCE_PROPERTY_VALUE_UPDATED,
+    kSourcePropertyChoicesUpdated = CS_SOURCE_PROPERTY_CHOICES_UPDATED
+  };
+
+  Type type;
+
+  // Valid for kSource* and kSink* respectively
+  CS_Source sourceHandle;
+  CS_Sink sinkHandle;
+
+  // Source/sink name
+  std::string name;
+
+  // Fields for kSourceVideoModeChanged event
+  VideoMode mode;
+
+  // Fields for CS_SOURCE_PROPERTY_* events
+  CS_Property propertyHandle;
+  CS_PropertyType propertyType;
+  int value;
+  std::string valueStr;
+};
+
 //
 // Property Functions
 //
-
 CS_PropertyType GetPropertyType(CS_Property property, CS_Status* status);
 std::string GetPropertyName(CS_Property property, CS_Status* status);
 llvm::StringRef GetPropertyName(CS_Property property,
@@ -144,10 +180,6 @@ CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
                                  CS_PropertyType type, int minimum, int maximum,
                                  int step, int defaultValue, int value,
                                  CS_Status* status);
-CS_Property CreateSourcePropertyCallback(
-    CS_Source source, llvm::StringRef name, CS_PropertyType type, int minimum,
-    int maximum, int step, int defaultValue, int value,
-    std::function<void(CS_Property property)> onChange, CS_Status* status);
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                   llvm::ArrayRef<std::string> choices,
                                   CS_Status* status);
@@ -193,18 +225,10 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status);
 //
 // Listener Functions
 //
-CS_Listener AddSourceListener(
-    std::function<void(llvm::StringRef name, CS_Source source, int event)>
-        callback,
-    int eventMask, CS_Status* status);
+CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
+                        int eventMask, bool immediateNotify, CS_Status* status);
 
-void RemoveSourceListener(CS_Listener handle, CS_Status* status);
-
-CS_Listener AddSinkListener(
-    std::function<void(llvm::StringRef name, CS_Sink sink, int event)> callback,
-    int eventMask, CS_Status* status);
-
-void RemoveSinkListener(CS_Listener handle, CS_Status* status);
+void RemoveListener(CS_Listener handle, CS_Status* status);
 
 //
 // Utility Functions

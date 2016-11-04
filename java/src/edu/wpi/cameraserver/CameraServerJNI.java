@@ -156,16 +156,10 @@ public class CameraServerJNI {
   //
   // Listener Functions
   //
-  //public static native int addSourceListener(void (*callback)(String name, int source,
-  //                                          int event),
+  //public static native int addListener(void (*callback)(VideoEvent event),
   //                         int eventMask);
 
-  public static native void removeSourceListener(int handle);
-
-  //public static native int addSinkListener(void (*callback)(String name, int sink, int event),
-  //                       int eventMask);
-
-  public static native void removeSinkListener(int handle);
+  public static native void removeListener(int handle);
 
   //
   // Utility Functions

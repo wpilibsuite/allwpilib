@@ -800,27 +800,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSinkEnabled
 
 /*
  * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    removeSourceListener
+ * Method:    removeListener
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_removeSourceListener
+JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_removeListener
   (JNIEnv *env, jclass, jint handle)
 {
   CS_Status status = 0;
-  cs::RemoveSourceListener(handle, &status);
-  CheckStatus(env, status);
-}
-
-/*
- * Class:     edu_wpi_cameraserver_CameraServerJNI
- * Method:    removeSinkListener
- * Signature: (I)V
- */
-JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_removeSinkListener
-  (JNIEnv *env, jclass, jint handle)
-{
-  CS_Status status = 0;
-  cs::RemoveSinkListener(handle, &status);
+  cs::RemoveListener(handle, &status);
   CheckStatus(env, status);
 }
 

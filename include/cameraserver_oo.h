@@ -18,13 +18,13 @@ namespace cs {
 
 // Forward declarations so friend declarations work correctly
 class CvSource;
-class SinkListener;
-class SourceListener;
+class VideoEvent;
 class VideoSink;
 class VideoSource;
 
 class VideoProperty {
   friend class CvSource;
+  friend class VideoEvent;
   friend class VideoSink;
   friend class VideoSource;
 
@@ -70,6 +70,7 @@ class VideoProperty {
 
  private:
   explicit VideoProperty(CS_Property handle);
+  VideoProperty(CS_Property handle, Type type);
 
   mutable CS_Status m_status;
   CS_Property m_handle;
@@ -78,7 +79,7 @@ class VideoProperty {
 
 /// A source for video that provides a sequence of frames.
 class VideoSource {
-  friend class SourceListener;
+  friend class VideoEvent;
   friend class VideoSink;
 
  public:
@@ -241,21 +242,6 @@ class CvSource : public VideoSource {
                                int minimum, int maximum, int step,
                                int defaultValue, int value);
 
-  /// Create a property with a change callback.
-  /// @param name Property name
-  /// @param type Property type
-  /// @param minimum Minimum value
-  /// @param maximum Maximum value
-  /// @param step Step value
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @param onChange Callback to call when the property value changes
-  /// @return Property
-  VideoProperty CreateProperty(
-      llvm::StringRef name, VideoProperty::Type type, int minimum, int maximum,
-      int step, int defaultValue, int value,
-      std::function<void(VideoProperty property)> onChange);
-
   /// Configure enum property choices.
   /// @param property Property
   /// @param choices Choices
@@ -265,7 +251,7 @@ class CvSource : public VideoSource {
 
 /// A sink for video that accepts a sequence of frames.
 class VideoSink {
-  friend class SinkListener;
+  friend class VideoEvent;
 
  public:
   VideoSink() noexcept : m_handle(0) {}
@@ -372,56 +358,25 @@ class CvSink : public VideoSink {
   void SetEnabled(bool enabled);
 };
 
-class SourceListener {
+class VideoEvent : public RawEvent {
  public:
-  enum Event {
-    kCreated = CS_SOURCE_CREATED,
-    kDestroyed = CS_SOURCE_DESTROYED,
-    kConnected = CS_SOURCE_CONNECTED,
-    kDisconnected = CS_SOURCE_DISCONNECTED
-  };
-
-  SourceListener() : m_handle(0) {}
-  SourceListener(
-      std::function<void(llvm::StringRef name, VideoSource source, int event)>
-          callback,
-      int eventMask);
-
-  SourceListener(const SourceListener&) = delete;
-  SourceListener& operator=(const SourceListener&) = delete;
-  SourceListener(SourceListener&& other) noexcept;
-  ~SourceListener();
-
-  friend void swap(SourceListener& first, SourceListener& second) noexcept {
-    using std::swap;
-    swap(first.m_handle, second.m_handle);
-  }
-
- private:
-  CS_Listener m_handle;
+  VideoSource GetSource() const;
+  VideoSink GetSink() const;
+  VideoProperty GetProperty() const;
 };
 
-class SinkListener {
+class VideoListener {
  public:
-  enum Event {
-    kCreated = CS_SINK_CREATED,
-    kDestroyed = CS_SINK_DESTROYED,
-    kEnabled = CS_SINK_ENABLED,
-    kDisabled = CS_SINK_DISABLED
-  };
+  VideoListener() : m_handle(0) {}
+  VideoListener(std::function<void(const VideoEvent& event)> callback,
+                int eventMask, bool immediateNotify);
 
-  SinkListener() : m_handle(0) {}
-  SinkListener(
-      std::function<void(llvm::StringRef name, VideoSink sink, int event)>
-          callback,
-      int eventMask);
+  VideoListener(const VideoListener&) = delete;
+  VideoListener& operator=(const VideoListener&) = delete;
+  VideoListener(VideoListener&& other) noexcept;
+  ~VideoListener();
 
-  SinkListener(const SinkListener&) = delete;
-  SinkListener& operator=(const SinkListener&) = delete;
-  SinkListener(SinkListener&& other) noexcept;
-  ~SinkListener();
-
-  friend void swap(SinkListener& first, SinkListener& second) noexcept {
+  friend void swap(VideoListener& first, VideoListener& second) noexcept {
     using std::swap;
     swap(first.m_handle, second.m_handle);
   }

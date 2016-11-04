@@ -424,24 +424,13 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
 // Listener Functions
 //
 
-CS_Listener AddSourceListener(
-    std::function<void(llvm::StringRef name, CS_Source source, int event)>
-        callback,
-    int eventMask, CS_Status* status) {
+CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
+                        int eventMask, bool immediateNotify,
+                        CS_Status* status) {
   return 0;  // TODO
 }
 
-void RemoveSourceListener(CS_Listener handle, CS_Status* status) {
-  // TODO
-}
-
-CS_Listener AddSinkListener(
-    std::function<void(llvm::StringRef name, CS_Sink sink, int event)> callback,
-    int eventMask, CS_Status* status) {
-  return 0;  // TODO
-}
-
-void RemoveSinkListener(CS_Listener handle, CS_Status* status) {
+void RemoveListener(CS_Listener handle, CS_Status* status) {
   // TODO
 }
 

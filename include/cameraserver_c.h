@@ -75,9 +75,8 @@ typedef struct CS_VideoMode {
 } CS_VideoMode;
 
 //
-// Property Functions
+// Property types
 //
-
 enum CS_PropertyType {
   CS_PROP_NONE = 0,
   CS_PROP_BOOLEAN = 1,
@@ -86,6 +85,51 @@ enum CS_PropertyType {
   CS_PROP_ENUM = 8
 };
 
+//
+// Listener event types
+//
+enum CS_EventType {
+  CS_SOURCE_CREATED = 0x0001,
+  CS_SOURCE_DESTROYED = 0x0002,
+  CS_SOURCE_CONNECTED = 0x0004,
+  CS_SOURCE_DISCONNECTED = 0x0008,
+  CS_SOURCE_VIDEOMODES_UPDATED = 0x0010,
+  CS_SOURCE_VIDEOMODE_CHANGED = 0x0020,
+  CS_SINK_CREATED = 0x0100,
+  CS_SINK_DESTROYED = 0x0200,
+  CS_SINK_ENABLED = 0x0400,
+  CS_SINK_DISABLED = 0x0800,
+  CS_SOURCE_PROPERTY_CREATED = 0x1000,
+  CS_SOURCE_PROPERTY_VALUE_UPDATED = 0x2000,
+  CS_SOURCE_PROPERTY_CHOICES_UPDATED = 0x4000
+};
+
+//
+// Listener event
+//
+struct CS_Event {
+  CS_EventType type;
+
+  // Valid for CS_SOURCE_* and CS_SINK_* respectively
+  CS_Source source;
+  CS_Sink sink;
+
+  // Source/sink name
+  const char *name;
+
+  // Fields for CS_SOURCE_VIDEOMODE_CHANGED event
+  CS_VideoMode mode;
+
+  // Fields for CS_SOURCE_PROPERTY_* events
+  CS_Property property;
+  CS_PropertyType propertyType;
+  int value;
+  const char* valueStr;
+};
+
+//
+// Property Functions
+//
 enum CS_PropertyType CS_GetPropertyType(CS_Property property,
                                         CS_Status* status);
 char* CS_GetPropertyName(CS_Property property, CS_Status* status);
@@ -156,10 +200,6 @@ CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
                                     enum CS_PropertyType type, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status);
-CS_Property CS_CreateSourcePropertyCallback(
-    CS_Source source, const char* name, enum CS_PropertyType type, int minimum,
-    int maximum, int step, int defaultValue, int value, void* data,
-    void (*onChange)(void* data, CS_Property property), CS_Status* status);
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                      const char** choices, int count,
                                      CS_Status* status);
@@ -198,33 +238,12 @@ void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
 //
 // Listener Functions
 //
-enum CS_SourceEvent {
-  CS_SOURCE_CREATED = 0x01,
-  CS_SOURCE_DESTROYED = 0x02,
-  CS_SOURCE_CONNECTED = 0x04,
-  CS_SOURCE_DISCONNECTED = 0x08
-};
+CS_Listener CS_AddListener(void* data,
+                           void (*callback)(void* data, const CS_Event* event),
+                           int eventMask, int immediateNotify,
+                           CS_Status* status);
 
-CS_Listener CS_AddSourceListener(void* data,
-                                 void (*callback)(void* data, const char* name,
-                                                  CS_Source source, int event),
-                                 int eventMask, CS_Status* status);
-
-void CS_RemoveSourceListener(CS_Listener handle, CS_Status* status);
-
-enum CS_SinkEvent {
-  CS_SINK_CREATED = 0x01,
-  CS_SINK_DESTROYED = 0x02,
-  CS_SINK_ENABLED = 0x04,
-  CS_SINK_DISABLED = 0x08
-};
-
-CS_Listener CS_AddSinkListener(void* data,
-                               void (*callback)(void* data, const char* name,
-                                                CS_Sink sink, int event),
-                               int eventMask, CS_Status* status);
-
-void CS_RemoveSinkListener(CS_Listener handle, CS_Status* status);
+void CS_RemoveListener(CS_Listener handle, CS_Status* status);
 
 //
 // Utility Functions

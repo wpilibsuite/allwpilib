@@ -211,46 +211,29 @@ void CS_ReleaseSink(CS_Sink sink, CS_Status* status) {
   return cs::ReleaseSink(sink, status);
 }
 
-CS_Listener CS_AddSourceListener(void* data,
-                                 void (*callback)(void* data, const char* name,
-                                                  CS_Source source, int event),
-                                 int eventMask, CS_Status* status) {
-  return cs::AddSourceListener(
-      [=](llvm::StringRef name, CS_Source source, int event) {
-        // avoid the copy if possible
-        if (name[name.size()] == '\0') {
-          callback(data, name.data(), source, event);
-        } else {
-          llvm::SmallString<128> copy{name};
-          callback(data, copy.c_str(), source, event);
-        }
+CS_Listener CS_AddListener(void* data,
+                           void (*callback)(void* data, const CS_Event* event),
+                           int eventMask, int immediateNotify,
+                           CS_Status* status) {
+  return cs::AddListener(
+      [=](const cs::RawEvent& rawEvent) {
+        CS_Event event;
+        event.type = static_cast<CS_EventType>(static_cast<int>(rawEvent.type));
+        event.source = rawEvent.sourceHandle;
+        event.sink = rawEvent.sinkHandle;
+        event.name = rawEvent.name.c_str();
+        event.mode = rawEvent.mode;
+        event.property = rawEvent.propertyHandle;
+        event.propertyType = rawEvent.propertyType;
+        event.value = rawEvent.value;
+        event.valueStr = rawEvent.valueStr.c_str();
+        callback(data, &event);
       },
-      eventMask, status);
+      eventMask, immediateNotify, status);
 }
 
-void CS_RemoveSourceListener(CS_Listener handle, CS_Status* status) {
-  return cs::RemoveSourceListener(handle, status);
-}
-
-CS_Listener CS_AddSinkListener(void* data,
-                               void (*callback)(void* data, const char* name,
-                                                CS_Sink sink, int event),
-                               int eventMask, CS_Status* status) {
-  return cs::AddSinkListener(
-      [=](llvm::StringRef name, CS_Sink sink, int event) {
-        // avoid the copy if possible
-        if (name[name.size()] == '\0') {
-          callback(data, name.data(), sink, event);
-        } else {
-          llvm::SmallString<128> copy{name};
-          callback(data, copy.c_str(), sink, event);
-        }
-      },
-      eventMask, status);
-}
-
-void CS_RemoveSinkListener(CS_Listener handle, CS_Status* status) {
-  return cs::RemoveSinkListener(handle, status);
+void CS_RemoveListener(CS_Listener handle, CS_Status* status) {
+  return cs::RemoveListener(handle, status);
 }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {

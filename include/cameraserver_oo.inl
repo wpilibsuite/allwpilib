@@ -213,18 +213,6 @@ inline VideoProperty CvSource::CreateProperty(llvm::StringRef name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateProperty(
-    llvm::StringRef name, VideoProperty::Type type, int minimum, int maximum,
-    int step, int defaultValue, int value,
-    std::function<void(VideoProperty property)> onChange) {
-  m_status = 0;
-  return VideoProperty{CreateSourcePropertyCallback(
-      m_handle, name, static_cast<CS_PropertyType>(static_cast<int>(type)),
-      minimum, maximum, step, defaultValue, value,
-      [=](CS_Property property) { onChange(VideoProperty{property}); },
-      &m_status)};
-}
-
 inline void CvSource::SetEnumPropertyChoices(
     const VideoProperty& property, llvm::ArrayRef<std::string> choices) {
   m_status = 0;
@@ -310,48 +298,40 @@ inline void CvSink::SetEnabled(bool enabled) {
   SetSinkEnabled(m_handle, enabled, &m_status);
 }
 
-inline SourceListener::SourceListener(
-    std::function<void(llvm::StringRef name, VideoSource source, int event)>
-        callback,
-    int eventMask) {
+inline VideoSource VideoEvent::GetSource() const {
   CS_Status status = 0;
-  m_handle = AddSourceListener(
-      [=](llvm::StringRef name, CS_Source sourceHandle, int event) {
-        callback(name, VideoSource{sourceHandle}, event);
-      },
-      eventMask, &status);
+  return VideoSource{sourceHandle == 0 ? 0 : CopySource(sourceHandle, &status)};
 }
 
-inline SourceListener::SourceListener(SourceListener&& other) noexcept
-    : SourceListener() {
+inline VideoSink VideoEvent::GetSink() const {
+  CS_Status status = 0;
+  return VideoSink{sinkHandle == 0 ? 0 : CopySink(sinkHandle, &status)};
+}
+
+inline VideoProperty VideoEvent::GetProperty() const {
+  return VideoProperty{propertyHandle,
+                       static_cast<VideoProperty::Type>(propertyType)};
+}
+
+inline VideoListener::VideoListener(
+    std::function<void(const VideoEvent& event)> callback, int eventMask,
+    bool immediateNotify) {
+  CS_Status status = 0;
+  m_handle = AddListener(
+      [=](const RawEvent& event) {
+        callback(static_cast<const VideoEvent&>(event));
+      },
+      eventMask, immediateNotify, &status);
+}
+
+inline VideoListener::VideoListener(VideoListener&& other) noexcept
+    : VideoListener() {
   swap(*this, other);
 }
 
-inline SourceListener::~SourceListener() {
+inline VideoListener::~VideoListener() {
   CS_Status status = 0;
-  if (m_handle != 0) RemoveSourceListener(m_handle, &status);
-}
-
-inline SinkListener::SinkListener(
-    std::function<void(llvm::StringRef name, VideoSink sink, int event)>
-        callback,
-    int eventMask) {
-  CS_Status status = 0;
-  m_handle = AddSinkListener(
-      [=](llvm::StringRef name, CS_Sink sinkHandle, int event) {
-        callback(name, VideoSink{sinkHandle}, event);
-      },
-      eventMask, &status);
-}
-
-inline SinkListener::SinkListener(SinkListener&& other) noexcept
-    : SinkListener() {
-  swap(*this, other);
-}
-
-inline SinkListener::~SinkListener() {
-  CS_Status status = 0;
-  if (m_handle != 0) RemoveSinkListener(m_handle, &status);
+  if (m_handle != 0) RemoveListener(m_handle, &status);
 }
 
 }  // namespace cs
