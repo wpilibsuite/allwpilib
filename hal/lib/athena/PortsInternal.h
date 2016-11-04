@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "ChipObject.h"
+#include "HAL/ChipObject.h"
 
 namespace hal {
 constexpr int32_t kNumAccumulators = tAccumulator::kNumSystems;

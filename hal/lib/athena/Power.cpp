@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "ChipObject.h"
+#include "HAL/ChipObject.h"
 
 using namespace hal;
 

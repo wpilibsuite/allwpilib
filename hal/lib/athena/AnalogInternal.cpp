@@ -9,8 +9,8 @@
 
 #include <atomic>
 
-#include "ChipObject.h"
 #include "HAL/AnalogInput.h"
+#include "HAL/ChipObject.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "PortsInternal.h"
 

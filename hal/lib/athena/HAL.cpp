@@ -17,10 +17,10 @@
 #include <mutex>
 #include <thread>
 
-#include "ChipObject.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "FRC_NetworkCommunication/FRCComm.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
+#include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
