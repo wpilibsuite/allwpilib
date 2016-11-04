@@ -12,28 +12,7 @@
 
 #include "llvm/StringRef.h"
 #include "nt_Value.h"
-
-// [[deprecated(msg)]] is a C++14 feature not supported by MSVC or GCC < 4.9.
-// We provide an equivalent warning implementation for those compilers here.
-#ifndef NT_DEPRECATED
-  #if defined(_MSC_VER)
-    #define NT_DEPRECATED(msg) __declspec(deprecated(msg))
-  #elif defined(__GNUC__)
-    #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 8)
-      #if __cplusplus > 201103L
-        #define NT_DEPRECATED(msg) [[deprecated(msg)]]
-      #else
-        #define NT_DEPRECATED(msg) [[gnu::deprecated(msg)]]
-      #endif
-    #else
-      #define NT_DEPRECATED(msg) __attribute__((deprecated(msg)))
-    #endif
-  #elif __cplusplus > 201103L
-    #define NT_DEPRECATED(msg) [[deprecated(msg)]]
-  #else
-    #define NT_DEPRECATED(msg) /*nothing*/
-  #endif
-#endif
+#include "support/deprecated.h"
 
 class ITableListener;
 
@@ -190,8 +169,9 @@ class ITable {
    * @deprecated This exception-raising method has been replaced by the
    * default-taking method.
    */
-  NT_DEPRECATED("Raises an exception if key not found; "
-                "use GetNumber(StringRef key, double defaultValue) instead")
+  WPI_DEPRECATED(
+      "Raises an exception if key not found; "
+      "use GetNumber(StringRef key, double defaultValue) instead")
   virtual double GetNumber(llvm::StringRef key) const = 0;
 
   /**
@@ -232,8 +212,9 @@ class ITable {
    * @deprecated This exception-raising method has been replaced by the
    * default-taking method.
    */
-  NT_DEPRECATED("Raises an exception if key not found; "
-                "use GetString(StringRef key, StringRef defaultValue) instead")
+  WPI_DEPRECATED(
+      "Raises an exception if key not found; "
+      "use GetString(StringRef key, StringRef defaultValue) instead")
   virtual std::string GetString(llvm::StringRef key) const = 0;
 
   /**
@@ -278,8 +259,9 @@ class ITable {
    * @deprecated This exception-raising method has been replaced by the
    * default-taking method.
    */
-  NT_DEPRECATED("Raises an exception if key not found; "
-                "use GetBoolean(StringRef key, bool defaultValue) instead")
+  WPI_DEPRECATED(
+      "Raises an exception if key not found; "
+      "use GetBoolean(StringRef key, bool defaultValue) instead")
   virtual bool GetBoolean(llvm::StringRef key) const = 0;
 
   /**

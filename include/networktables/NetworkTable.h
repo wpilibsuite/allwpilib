@@ -286,8 +286,9 @@ class NetworkTable : public ITable {
    * @deprecated This exception-raising method has been replaced by the
    * default-taking method.
    */
-  NT_DEPRECATED("Raises an exception if key not found; "
-                "use GetNumber(StringRef key, double defaultValue) instead")
+  WPI_DEPRECATED(
+      "Raises an exception if key not found; "
+      "use GetNumber(StringRef key, double defaultValue) instead")
   virtual double GetNumber(llvm::StringRef key) const override;
 
   /**
@@ -329,8 +330,9 @@ class NetworkTable : public ITable {
    * @deprecated This exception-raising method has been replaced by the
    * default-taking method.
    */
-  NT_DEPRECATED("Raises an exception if key not found; "
-                "use GetString(StringRef key, StringRef defaultValue) instead")
+  WPI_DEPRECATED(
+      "Raises an exception if key not found; "
+      "use GetString(StringRef key, StringRef defaultValue) instead")
   virtual std::string GetString(llvm::StringRef key) const override;
 
   /**
@@ -372,8 +374,9 @@ class NetworkTable : public ITable {
    * @deprecated This exception-raising method has been replaced by the
    * default-taking method.
    */
-  NT_DEPRECATED("Raises an exception if key not found; "
-                "use GetBoolean(StringRef key, bool defaultValue) instead")
+  WPI_DEPRECATED(
+      "Raises an exception if key not found; "
+      "use GetBoolean(StringRef key, bool defaultValue) instead")
   virtual bool GetBoolean(llvm::StringRef key) const override;
 
   /**
