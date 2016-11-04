@@ -148,9 +148,14 @@ public class NetworkTablesJNI {
   public static native void setNetworkIdentity(String name);
   public static native void startServer(String persistFilename, String listenAddress, int port);
   public static native void stopServer();
+  public static native void startClient();
   public static native void startClient(String serverName, int port);
   public static native void startClient(String[] serverNames, int[] ports);
   public static native void stopClient();
+  public static native void setServer(String serverName, int port);
+  public static native void setServer(String[] serverNames, int[] ports);
+  public static native void startDSClient(int port);
+  public static native void stopDSClient();
   public static native void setUpdateRate(double interval);
 
   public static native ConnectionInfo[] getConnections();

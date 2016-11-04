@@ -14,6 +14,7 @@
 #include "support/timestamp.h"
 #include "Log.h"
 #include "Dispatcher.h"
+#include "DsClient.h"
 #include "Notifier.h"
 #include "RpcServer.h"
 #include "Storage.h"
@@ -246,15 +247,33 @@ void StartServer(StringRef persist_filename, const char* listen_address,
 
 void StopServer() { Dispatcher::GetInstance().Stop(); }
 
+void StartClient() { Dispatcher::GetInstance().StartClient(); }
+
 void StartClient(const char* server_name, unsigned int port) {
-  Dispatcher::GetInstance().StartClient(server_name, port);
+  auto& d = Dispatcher::GetInstance();
+  d.SetServer(server_name, port);
+  d.StartClient();
 }
 
 void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers) {
-  Dispatcher::GetInstance().StartClient(servers);
+  auto& d = Dispatcher::GetInstance();
+  d.SetServer(servers);
+  d.StartClient();
 }
 
 void StopClient() { Dispatcher::GetInstance().Stop(); }
+
+void SetServer(const char* server_name, unsigned int port) {
+  Dispatcher::GetInstance().SetServer(server_name, port);
+}
+
+void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+  Dispatcher::GetInstance().SetServer(servers);
+}
+
+void StartDSClient(unsigned int port) { DsClient::GetInstance().Start(port); }
+
+void StopDSClient() { DsClient::GetInstance().Stop(); }
 
 void StopRpcServer() { RpcServer::GetInstance().Stop(); }
 

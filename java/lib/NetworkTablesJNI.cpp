@@ -1150,6 +1150,17 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 /*
  * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Method:    startClient
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startClient__
+  (JNIEnv *env, jclass)
+{
+  nt::StartClient();
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    startClient
  * Signature: (Ljava/lang/String;I)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startClient__Ljava_lang_String_2I
@@ -1203,6 +1214,75 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   (JNIEnv *, jclass)
 {
   nt::StopClient();
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setServer
+ * Signature: (Ljava/lang/String;I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setServer__Ljava_lang_String_2I
+  (JNIEnv *env, jclass, jstring serverName, jint port)
+{
+  nt::SetServer(JStringRef{env, serverName}.c_str(), port);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    setServer
+ * Signature: ([Ljava/lang/String;[I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setServer___3Ljava_lang_String_2_3I
+  (JNIEnv *env, jclass, jobjectArray serverNames, jintArray ports)
+{
+  int len = env->GetArrayLength(serverNames);
+  if (len != env->GetArrayLength(ports)) {
+    env->ThrowNew(illegalArgEx,
+                  "serverNames and ports arrays must be the same size");
+    return;
+  }
+  jint* portInts = env->GetIntArrayElements(ports, nullptr);
+  if (!portInts) return;
+
+  std::vector<std::string> names;
+  std::vector<std::pair<nt::StringRef, unsigned int>> servers;
+  names.reserve(len);
+  servers.reserve(len);
+  for (int i = 0; i < len; ++i) {
+    JLocal<jstring> elem{
+        env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i))};
+    if (!elem) {
+      env->ThrowNew(illegalArgEx, "null string in serverNames");
+      return;
+    }
+    names.emplace_back(JStringRef{env, elem}.str());
+    servers.emplace_back(std::make_pair(nt::StringRef(names.back()),
+                                        portInts[i]));
+  }
+  env->ReleaseIntArrayElements(ports, portInts, JNI_ABORT);
+  nt::SetServer(servers);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    startDSClient
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startDSClient
+  (JNIEnv *env, jclass, jint port)
+{
+  nt::StartDSClient(port);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    stopDSClient
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_stopDSClient
+  (JNIEnv *env, jclass)
+{
+  nt::StopDSClient();
 }
 
 /*

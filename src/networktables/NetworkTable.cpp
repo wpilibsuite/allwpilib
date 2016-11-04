@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "llvm/raw_ostream.h"
 #include "llvm/SmallString.h"
 #include "llvm/StringMap.h"
 #include "tables/ITableListener.h"
@@ -11,20 +12,17 @@
 using llvm::StringRef;
 
 const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
-std::vector<std::string> NetworkTable::s_ip_addresses;
 std::string NetworkTable::s_persistent_filename = "networktables.ini";
 bool NetworkTable::s_client = false;
+bool NetworkTable::s_enable_ds = true;
 bool NetworkTable::s_running = false;
 unsigned int NetworkTable::s_port = NT_DEFAULT_PORT;
 
 void NetworkTable::Initialize() {
   if (s_running) Shutdown();
   if (s_client) {
-    std::vector<std::pair<StringRef, unsigned int>> servers;
-    servers.reserve(s_ip_addresses.size());
-    for (const auto& ip_address : s_ip_addresses)
-      servers.emplace_back(std::make_pair(ip_address, s_port));
-    nt::StartClient(servers);
+    nt::StartClient();
+    if (s_enable_ds) nt::StartDSClient(s_port);
   } else
     nt::StartServer(s_persistent_filename, "", s_port);
   s_running = true;
@@ -32,9 +30,10 @@ void NetworkTable::Initialize() {
 
 void NetworkTable::Shutdown() {
   if (!s_running) return;
-  if (s_client)
+  if (s_client) {
+    nt::StopDSClient();
     nt::StopClient();
-  else
+  } else
     nt::StopServer();
   s_running = false;
 }
@@ -44,26 +43,73 @@ void NetworkTable::SetClientMode() { s_client = true; }
 void NetworkTable::SetServerMode() { s_client = false; }
 
 void NetworkTable::SetTeam(int team) {
-  char tmp[30];
-#ifdef _MSC_VER
-  sprintf_s(tmp, "roboRIO-%d-FRC.local", team);
-#else
-  using namespace std;
-  snprintf(tmp, 30, "roboRIO-%d-FRC.local", team);
-#endif
-  SetIPAddress(tmp);
+  std::pair<StringRef, unsigned int> servers[4];
+
+  // 10.te.am.2
+  llvm::SmallString<32> fixed;
+  {
+    llvm::raw_svector_ostream oss{fixed};
+    oss << "10." << static_cast<int>(team / 100) << '.'
+        << static_cast<int>(team % 100) << ".2";
+    servers[0] = std::make_pair(oss.str(), s_port);
+  }
+
+  // 172.22.11.2
+  servers[1] = std::make_pair("172.22.11.2", s_port);
+
+  // roboRIO-<team>-FRC.local
+  llvm::SmallString<32> mdns;
+  {
+    llvm::raw_svector_ostream oss{mdns};
+    oss << "roboRIO-" << team << "-FRC.local";
+    servers[2] = std::make_pair(oss.str(), s_port);
+  }
+
+  // roboRIO-<team>-FRC.lan
+  llvm::SmallString<32> mdns_lan;
+  {
+    llvm::raw_svector_ostream oss{mdns_lan};
+    oss << "roboRIO-" << team << "-FRC.lan";
+    servers[3] = std::make_pair(oss.str(), s_port);
+  }
+
+  nt::SetServer(servers);
 }
 
 void NetworkTable::SetIPAddress(StringRef address) {
-  s_ip_addresses.clear();
-  s_ip_addresses.emplace_back(address);
+  llvm::SmallString<32> addr_copy{address};
+  nt::SetServer(addr_copy.c_str(), s_port);
+
+  // Stop the DS client if we're explicitly connecting to localhost
+  if (address == "localhost" || address == "127.0.0.1")
+    nt::StopDSClient();
+  else if (s_enable_ds)
+    nt::StartDSClient(s_port);
 }
 
 void NetworkTable::SetIPAddress(llvm::ArrayRef<std::string> addresses) {
-  s_ip_addresses = addresses;
+  llvm::SmallVector<std::pair<StringRef, unsigned int>, 8> servers;
+  for (const auto& ip_address : addresses)
+    servers.emplace_back(std::make_pair(ip_address, s_port));
+  nt::SetServer(servers);
+
+  // Stop the DS client if we're explicitly connecting to localhost
+  if (!addresses.empty() &&
+      (addresses[0] == "localhost" || addresses[0] == "127.0.0.1"))
+    nt::StopDSClient();
+  else if (s_enable_ds)
+    nt::StartDSClient(s_port);
 }
 
 void NetworkTable::SetPort(unsigned int port) { s_port = port; }
+
+void NetworkTable::SetDSClientEnabled(bool enabled) {
+  s_enable_ds = enabled;
+  if (s_enable_ds)
+    nt::StartDSClient(s_port);
+  else
+    nt::StopDSClient();
+}
 
 void NetworkTable::SetPersistentFilename(StringRef filename) {
   s_persistent_filename = filename;

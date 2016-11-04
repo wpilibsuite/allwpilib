@@ -21,9 +21,9 @@ public class NetworkTable implements ITable, IRemote {
   public static final int DEFAULT_PORT = 1735;
 
   private static boolean client = false;
+  private static boolean enableDS = true;
   private static boolean running = false;
   private static int port = DEFAULT_PORT;
-  private static String[] ipAddresses = new String[0];
   private static String persistentFilename = "networktables.ini";
 
   private synchronized static void checkInit() {
@@ -39,10 +39,9 @@ public class NetworkTable implements ITable, IRemote {
     if (running)
       shutdown();
     if (client) {
-      int[] ports = new int[ipAddresses.length];
-      for (int i=0; i<ipAddresses.length; i++)
-        ports[i] = port;
-      NetworkTablesJNI.startClient(ipAddresses, ports);
+      NetworkTablesJNI.startClient();
+      if (enableDS)
+        NetworkTablesJNI.startDSClient(port);
     } else
       NetworkTablesJNI.startServer(persistentFilename, "", port);
     running = true;
@@ -54,9 +53,10 @@ public class NetworkTable implements ITable, IRemote {
   public synchronized static void shutdown() {
     if (!running)
       return;
-    if (client)
+    if (client) {
+      NetworkTablesJNI.stopDSClient();
       NetworkTablesJNI.stopClient();
-    else
+    } else
       NetworkTablesJNI.stopServer();
     running = false;
   }
@@ -90,7 +90,12 @@ public class NetworkTable implements ITable, IRemote {
    * @param team the team number
    */
   public synchronized static void setTeam(int team) {
-    setIPAddress("roboRIO-" + team + "-FRC.local");
+    String[] addresses = new String[4];
+    addresses[0] = "10." + (int)(team / 100) + "." + (int)(team % 100) + ".2";
+    addresses[1] = "172.22.11.2";
+    addresses[2] = "roboRIO-" + team + "-FRC.local";
+    addresses[3] = "roboRIO-" + team + "-FRC.lan";
+    setIPAddress(addresses);
   }
 
   /**
@@ -98,11 +103,9 @@ public class NetworkTable implements ITable, IRemote {
    * mode
    */
   public synchronized static void setIPAddress(final String address) {
-    if (ipAddresses.length == 1 && ipAddresses[0].equals(address))
-      return;
-    checkInit();
-    ipAddresses = new String[1];
-    ipAddresses[0] = address;
+    String[] addresses = new String[1];
+    addresses[0] = address;
+    setIPAddress(addresses);
   }
 
   /**
@@ -110,19 +113,17 @@ public class NetworkTable implements ITable, IRemote {
    * client mode (in round robin order)
    */
   public synchronized static void setIPAddress(final String[] addresses) {
-    if (ipAddresses.length == addresses.length) {
-      boolean match = true;
-      for (int i=0; i<addresses.length; i++) {
-        if (!ipAddresses[i].equals(addresses[i])) {
-          match = false;
-          break;
-        }
-      }
-      if (match)
-        return;
-    }
-    checkInit();
-    ipAddresses = addresses;
+    int[] ports = new int[addresses.length];
+    for (int i=0; i<addresses.length; i++)
+      ports[i] = port;
+    NetworkTablesJNI.setServer(addresses, ports);
+
+    // Stop the DS client if we're explicitly connecting to localhost
+    if (addresses.length > 0 &&
+        (addresses[0].equals("localhost") || addresses[0].equals("127.0.0.1")))
+      NetworkTablesJNI.stopDSClient();
+    else if (enableDS)
+      NetworkTablesJNI.startDSClient(port);
   }
 
   /**
@@ -134,6 +135,18 @@ public class NetworkTable implements ITable, IRemote {
       return;
     checkInit();
     port = aport;
+  }
+
+  /**
+   * @param enabled whether to enable the connection to the local DS to get
+   * the robot IP address (defaults to enabled)
+   */
+  public synchronized static void setDSClientEnabled(boolean enabled) {
+    enableDS = enabled;
+    if (enableDS)
+      NetworkTablesJNI.startDSClient(port);
+    else
+      NetworkTablesJNI.stopDSClient();
   }
 
   /**

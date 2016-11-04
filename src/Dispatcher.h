@@ -41,14 +41,19 @@ class DispatcherBase {
 
   void StartServer(llvm::StringRef persist_filename,
                    std::unique_ptr<wpi::NetworkAcceptor> acceptor);
-  void StartClient(Connector connector);
-  void StartClient(std::vector<Connector>&& connectors);
+  void StartClient();
   void Stop();
   void SetUpdateRate(double interval);
   void SetIdentity(llvm::StringRef name);
   void Flush();
   std::vector<ConnectionInfo> GetConnections() const;
   void NotifyConnections(ConnectionListenerCallback callback) const;
+
+  void SetConnector(Connector connector);
+  void SetConnector(std::vector<Connector>&& connectors);
+
+  void SetConnectorOverride(Connector connector);
+  void ClearConnectorOverride();
 
   bool active() const { return m_active; }
 
@@ -85,6 +90,7 @@ class DispatcherBase {
   std::thread m_clientserver_thread;
 
   std::unique_ptr<wpi::NetworkAcceptor> m_server_acceptor;
+  Connector m_client_connector_override;
   std::vector<Connector> m_client_connectors;
 
   // Mutex for user-accessible items
@@ -118,8 +124,12 @@ class Dispatcher : public DispatcherBase {
 
   void StartServer(StringRef persist_filename, const char* listen_address,
                    unsigned int port);
-  void StartClient(const char* server_name, unsigned int port);
-  void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers);
+
+  void SetServer(const char* server_name, unsigned int port);
+  void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers);
+
+  void SetServerOverride(const char* server_name, unsigned int port);
+  void ClearServerOverride();
 
  private:
   Dispatcher();

@@ -29,6 +29,7 @@ class NetworkTable : public ITable {
   static std::vector<std::string> s_ip_addresses;
   static std::string s_persistent_filename;
   static bool s_client;
+  static bool s_enable_ds;
   static bool s_running;
   static unsigned int s_port;
 
@@ -85,6 +86,12 @@ class NetworkTable : public ITable {
    * mode or listen to in server mode
    */
   static void SetPort(unsigned int port);
+
+  /**
+   * @param enabled whether to enable the connection to the local DS to get
+   * the robot IP address (defaults to enabled)
+   */
+  static void SetDSClientEnabled(bool enabled);
 
   /**
    * Sets the persistent filename.

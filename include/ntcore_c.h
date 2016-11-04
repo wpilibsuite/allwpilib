@@ -363,6 +363,11 @@ void NT_StartServer(const char* persist_filename, const char* listen_address,
 void NT_StopServer(void);
 
 /** Starts Client
+ * Starts a client.  Use NT_SetServer to set the server name and port.
+ */
+void NT_StartClientNone(void);
+
+/** Starts Client
  * Starts a client using the specified server and port
  *
  * @param server_name server name (UTF-8 string, null terminated)
@@ -388,6 +393,37 @@ void NT_StartClientMulti(size_t count, const char** server_names,
  * Stops the client if it is running.
  */
 void NT_StopClient(void);
+
+/** Sets server address for client (without restarting client).
+ *
+ * @param server_name server name (UTF-8 string, null terminated)
+ * @param port        port to communicate over
+ *
+ */
+void NT_SetServer(const char* server_name, unsigned int port);
+
+/** Sets server addresses for client (without restarting client).
+ * The client will attempt to connect to each server in round robin fashion.
+ *
+ * @param count        length of the server_names and ports arrays
+ * @param server_names array of server names (each a UTF-8 string, null
+ *                     terminated)
+ * @param ports        array of ports to communicate over (one for each server)
+ *
+ */
+void NT_SetServerMulti(size_t count, const char** server_names,
+                       const unsigned int* ports);
+
+/** Starts requesting server address from Driver Station.
+ * This connects to the Driver Station running on localhost to obtain the
+ * server IP address.
+ *
+ * @param port server port to use in combination with IP from DS
+ */
+void NT_StartDSClient(unsigned int port);
+
+/** Stops requesting server address from Driver Station. */
+void NT_StopDSClient(void);
 
 /** Stop Rpc Server
  * Stops the Rpc server if it is running.

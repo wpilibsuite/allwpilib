@@ -255,9 +255,14 @@ void SetNetworkIdentity(StringRef name);
 void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port);
 void StopServer();
+void StartClient();
 void StartClient(const char* server_name, unsigned int port);
 void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers);
 void StopClient();
+void SetServer(const char* server_name, unsigned int port);
+void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers);
+void StartDSClient(unsigned int port);
+void StopDSClient();
 void StopRpcServer();
 void StopNotifier();
 void SetUpdateRate(double interval);

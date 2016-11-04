@@ -372,6 +372,8 @@ void NT_StartServer(const char* persist_filename, const char* listen_address,
 
 void NT_StopServer(void) { nt::StopServer(); }
 
+void NT_StartClientNone(void) { nt::StartClient(); }
+
 void NT_StartClient(const char* server_name, unsigned int port) {
   nt::StartClient(server_name, port);
 }
@@ -386,6 +388,23 @@ void NT_StartClientMulti(size_t count, const char** server_names,
 }
 
 void NT_StopClient(void) { nt::StopClient(); }
+
+void NT_SetServer(const char* server_name, unsigned int port) {
+  nt::SetServer(server_name, port);
+}
+
+void NT_SetServerMulti(size_t count, const char** server_names,
+                         const unsigned int* ports) {
+  std::vector<std::pair<StringRef, unsigned int>> servers;
+  servers.reserve(count);
+  for (size_t i = 0; i < count; ++i)
+    servers.emplace_back(std::make_pair(server_names[i], ports[i]));
+  nt::SetServer(servers);
+}
+
+void NT_StartDSClient(unsigned int port) { nt::StartDSClient(port); }
+
+void NT_StopDSClient(void) { nt::StopDSClient(); }
 
 void NT_StopRpcServer(void) { nt::StopRpcServer(); }
 

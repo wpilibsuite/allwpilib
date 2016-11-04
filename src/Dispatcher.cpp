@@ -26,16 +26,16 @@ void Dispatcher::StartServer(llvm::StringRef persist_filename,
           static_cast<int>(port), listen_address, Logger::GetInstance())));
 }
 
-void Dispatcher::StartClient(const char* server_name, unsigned int port) {
+void Dispatcher::SetServer(const char* server_name, unsigned int port) {
   std::string server_name_copy(server_name);
-  DispatcherBase::StartClient([=]() -> std::unique_ptr<wpi::NetworkStream> {
+  SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
     return wpi::TCPConnector::connect(server_name_copy.c_str(),
                                       static_cast<int>(port),
                                       Logger::GetInstance(), 1);
   });
 }
 
-void Dispatcher::StartClient(
+void Dispatcher::SetServer(
     ArrayRef<std::pair<StringRef, unsigned int>> servers) {
   std::vector<Connector> connectors;
   for (const auto& server : servers) {
@@ -47,8 +47,19 @@ void Dispatcher::StartClient(
                                         Logger::GetInstance(), 1);
     });
   }
-  DispatcherBase::StartClient(std::move(connectors));
+  SetConnector(std::move(connectors));
 }
+
+void Dispatcher::SetServerOverride(const char* server_name, unsigned int port) {
+  std::string server_name_copy(server_name);
+  SetConnectorOverride([=]() -> std::unique_ptr<wpi::NetworkStream> {
+    return wpi::TCPConnector::connect(server_name_copy.c_str(),
+                                      static_cast<int>(port),
+                                      Logger::GetInstance(), 1);
+  });
+}
+
+void Dispatcher::ClearServerOverride() { ClearConnectorOverride(); }
 
 Dispatcher::Dispatcher()
     : Dispatcher(Storage::GetInstance(), Notifier::GetInstance()) {}
@@ -98,18 +109,11 @@ void DispatcherBase::StartServer(
   m_clientserver_thread = std::thread(&Dispatcher::ServerThreadMain, this);
 }
 
-void DispatcherBase::StartClient(Connector connector) {
-  std::vector<Connector> connectors;
-  connectors.push_back(connector);
-  StartClient(std::move(connectors));
-}
-
-void DispatcherBase::StartClient(std::vector<Connector>&& connectors) {
+void DispatcherBase::StartClient() {
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
     if (m_active) return;
     m_active = true;
-    m_client_connectors = std::move(connectors);
   }
   m_server = false;
   using namespace std::placeholders;
@@ -193,6 +197,27 @@ void DispatcherBase::NotifyConnections(
     ConnectionListenerCallback callback) const {
   std::lock_guard<std::mutex> lock(m_user_mutex);
   for (const auto& conn : m_connections) conn->NotifyIfActive(callback);
+}
+
+void DispatcherBase::SetConnector(Connector connector) {
+  std::vector<Connector> connectors;
+  connectors.push_back(connector);
+  SetConnector(std::move(connectors));
+}
+
+void DispatcherBase::SetConnector(std::vector<Connector>&& connectors) {
+  std::lock_guard<std::mutex> lock(m_user_mutex);
+  m_client_connectors = std::move(connectors);
+}
+
+void DispatcherBase::SetConnectorOverride(Connector connector) {
+  std::lock_guard<std::mutex> lock(m_user_mutex);
+  m_client_connector_override = std::move(connector);
+}
+
+void DispatcherBase::ClearConnectorOverride() {
+  std::lock_guard<std::mutex> lock(m_user_mutex);
+  m_client_connector_override = nullptr;
 }
 
 void DispatcherBase::DispatchThreadMain() {
@@ -320,9 +345,13 @@ void DispatcherBase::ClientThreadMain() {
     // get next server to connect to
     {
       std::lock_guard<std::mutex> lock(m_user_mutex);
-      if (m_client_connectors.empty()) continue;
-      if (i >= m_client_connectors.size()) i = 0;
-      connect = m_client_connectors[i++];
+      if (m_client_connector_override) {
+        connect = m_client_connector_override;
+      } else {
+        if (m_client_connectors.empty()) continue;
+        if (i >= m_client_connectors.size()) i = 0;
+        connect = m_client_connectors[i++];
+      }
     }
 
     // try to connect (with timeout)
