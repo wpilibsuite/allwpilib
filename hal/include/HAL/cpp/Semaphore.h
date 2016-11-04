@@ -11,9 +11,12 @@
 
 #include <condition_variable>
 
+#include "HAL/cpp/Deprecate.h"
 #include "HAL/cpp/priority_mutex.h"
 
-class Semaphore {
+class WPI_DEPRECATED(
+    "Semaphore scheduled for removal in 2018. Recommended to replace with a "
+    "std::mutex and std::condition_variable") Semaphore {
  public:
   explicit Semaphore(int32_t count = 0);
   Semaphore(Semaphore&&);
