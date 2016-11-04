@@ -14,7 +14,7 @@
 #include <memory>
 #include <mutex>
 
-#include "ChipObject.h"
+#include "HAL/ChipObject.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"

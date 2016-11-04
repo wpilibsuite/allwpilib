@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <memory>
 
-#include "ChipObject.h"
+#include "HAL/ChipObject.h"
 #include "HAL/HAL.h"
 
 using namespace hal;

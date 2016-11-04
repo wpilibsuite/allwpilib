@@ -24,11 +24,11 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs = ["lib/athena", "lib/athena/FRC_FPGA_ChipObject", "lib/shared"]
+                        srcDirs = ["lib/athena", niLibraryHeadersChipObject, niLibraryHeadersRoot, "lib/shared"]
                         includes = ["**/*.cpp"]
                     }
                     exportedHeaders {
-                        srcDirs = ["include", "lib/athena/FRC_FPGA_ChipObject", wpiUtilInclude]
+                        srcDirs = ["include", niLibraryHeadersChipObject, niLibraryHeadersRoot, wpiUtilInclude]
                     }
                 }
             }
@@ -70,7 +70,8 @@ task halZip(type: Zip) {
                 spec.headerDirs.each {
                     def normalizedIt = it.toString().replace('/', '\\')
                     def normalizedWPIUtil = wpiUtilInclude.toString().replace('/', '\\')
-                    if (normalizedIt != normalizedWPIUtil) {
+                    // exclude the wpiUtil library, and any NI libraries (NI libraries grabbed later)
+                    if (normalizedIt != normalizedWPIUtil && !it.toString().contains('ni-libraries') ) {
                         from(it) {
                             into 'include'
                             // We don't want to include any of the .cpp files that are in some of the header directories
@@ -88,8 +89,19 @@ task halZip(type: Zip) {
         }
     }
 
+    // Grab the NI headers excluding the ChipObject folder
+    from(project.file('../ni-libraries/include')) {
+        exclude 'FRC_FPGA_ChipObject/'
+        into 'include'
+    }
+
+    // Grab the ChipObject headers manually and put them in the right spot
+    from(project.file('../ni-libraries/include/FRC_FPGA_ChipObject')) {
+        into 'include'
+    }
+
     // Finally, include all of the shared library objects from the ni directory
-    from(project.file('../ni-libraries')) {
+    from(project.file('../ni-libraries/lib')) {
         into 'lib'
         exclude 'genlinks'
         exclude 'libwpi.so'
