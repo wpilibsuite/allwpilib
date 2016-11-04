@@ -27,6 +27,8 @@
 #include "ctre/ctre.h"
 #include "visa/visa.h"
 
+using namespace hal;
+
 static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
 

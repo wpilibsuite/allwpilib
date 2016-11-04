@@ -11,6 +11,8 @@
 
 #include "ChipObject.h"
 
+using namespace hal;
+
 static std::unique_ptr<tPower> power;
 
 static void initializePower(int32_t* status) {

@@ -21,6 +21,8 @@
 #include "HAL/handles/UnlimitedHandleResource.h"
 #include "support/SafeThread.h"
 
+using namespace hal;
+
 static const int32_t kTimerInterruptNumber = 28;
 
 static priority_mutex notifierInterruptMutex;
