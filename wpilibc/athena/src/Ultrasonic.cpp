@@ -28,6 +28,7 @@ constexpr double Ultrasonic::kSpeedOfSoundInchesPerSec;
 // automatic round robin mode
 std::atomic<bool> Ultrasonic::m_automaticEnabled{false};
 std::set<Ultrasonic*> Ultrasonic::m_sensors;
+std::thread Ultrasonic::m_thread;
 
 /**
  * Background task that goes through the list of ultrasonic sensors and pings
