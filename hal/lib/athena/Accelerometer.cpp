@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <memory>
 
-#include "ChipObject.h"
+#include "HAL/ChipObject.h"
 #include "HAL/HAL.h"
 
 // The 7-bit I2C address with a 0 "send" bit

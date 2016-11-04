@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include "ChipObject.h"
+#include "HAL/ChipObject.h"
 
 static std::unique_ptr<tPower> power;
 

@@ -7,8 +7,8 @@
 
 #include "HAL/Solenoid.h"
 
-#include "ChipObject.h"
 #include "FRC_NetworkCommunication/LoadOut.h"
+#include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
 #include "HAL/Ports.h"
 #include "HAL/handles/HandlesInternal.h"

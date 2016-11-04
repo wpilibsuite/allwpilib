@@ -24,11 +24,11 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs = ["lib/athena", "lib/athena/FRC_FPGA_ChipObject", "lib/shared"]
+                        srcDirs = ["lib/athena", niLibraryHeadersChipObject, niLibraryHeadersRoot, "lib/shared"]
                         includes = ["**/*.cpp"]
                     }
                     exportedHeaders {
-                        srcDirs = ["include", "lib/athena/FRC_FPGA_ChipObject", wpiUtilInclude]
+                        srcDirs = ["include", niLibraryHeadersChipObject, niLibraryHeadersRoot, wpiUtilInclude]
                     }
                 }
             }
