@@ -175,6 +175,63 @@ def cameraserverZipTask = { project ->
     }
 }
 
+def cameraserverUberZipTask = { project ->
+    if (project.isArm) {
+        project.ext.cameraserverUberZip = project.tasks.create("armCameraserverUberZip", Zip) {
+            description = 'Create platform-specific zip of cameraserver libraries including opencv'
+            group = 'WPILib'
+            destinationDir = project.buildDir
+            baseName = 'cameraserver'
+            classifier= "uber${project.buildPlatform}"
+            duplicatesStrategy = 'exclude'
+            
+            from(file('include')) {
+                into 'include'
+            }
+            
+            if (!project.hasProperty('skipJava')) {
+                project.jniHeadersCameraServer.outputs.each {
+                    from(it) {
+                        into 'include'
+                    }
+                }
+            }
+            
+            project.model {
+                def openCvPlatform = project.getOpenCvPlatformPackage(targetPlatform)
+                from(file("${project.openCv}/${openCvPlatform}")) {
+                    exclude 'META-INF'
+                    into 'lib'
+                }
+                binaries {
+                    withType(StaticLibraryBinarySpec) { binary ->
+                        from(binary.staticLibraryFile) {
+                            into 'lib'
+                        }
+                    }
+                    withType(SharedLibraryBinarySpec) { binary ->
+                        from(binary.sharedLibraryFile) {
+                            into 'lib'
+                        }
+                        from (new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                            into 'lib'
+                        }
+                    }
+                }
+            }
+        }
+        
+        project.build.dependsOn project.cameraserverUberZip
+
+        project.tasks.whenTaskAdded { task ->
+            def name = task.name.toLowerCase()
+            if (name.contains("cameraserversharedlibrary") || name.contains("cameraserverstaticlibrary") || name.contains("cameraservertest")) {
+                project.cameraserverUberZip.dependsOn task
+            }
+        }
+    }
+}
+
 if (buildArm) {
     project(':arm') {
         apply plugin: 'cpp'
@@ -189,6 +246,7 @@ if (buildArm) {
         cameraserverZipTask(project)
         useWpiUtil(project)
         useOpenCv(project)
+        cameraserverUberZipTask(project)
     }
 }
 

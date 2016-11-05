@@ -50,7 +50,10 @@ publishing {
                     // If the library is not embedded include it in the repo
                     if (!project.hasProperty('compilerPrefix')) {
                         artifact camArm.cameraserverZip
-                    }    
+                    }
+                    artifact camArm.armCameraserverUberZip {
+                        classifier = 'uberzip'
+                    }
                 }
                 if (!OperatingSystem.current().isWindows()) {
                     if (project.hasProperty('makeDesktop')) {
@@ -72,6 +75,9 @@ publishing {
             artifact cameraserverSourceZip
             if (project.buildArm) {
                 artifact project(':arm').cameraserverZip
+                artifact project(':arm').armCameraserverUberZip {
+                        classifier = 'uberzip'
+                    }
             }
             if (!OperatingSystem.current().isWindows()) {
                 if (project.hasProperty('makeDesktop')) {
