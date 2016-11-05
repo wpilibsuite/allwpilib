@@ -15,7 +15,6 @@ otherExtensions {
 }
 
 genFolderExclude {
-  \.vscode
   FRC_FPGA_ChipObject
   NetworkCommunication
   ctre
@@ -38,15 +37,11 @@ genFileExclude {
 
 modifiableFolderExclude {
   \.git
-  \.gradle
-  __pycache__
-  build
   wpilibj/src/athena/cpp/include
   wpilibj/src/athena/cpp/lib
 }
 
 modifiableFileExclude {
-  \.jar$
   \.patch$
   \.png$
   \.py$
