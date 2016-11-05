@@ -97,7 +97,7 @@ Counter::Counter(int channel) : Counter(kTwoPulse) {
  *
  * @param trigger The pointer to the existing AnalogTrigger object.
  */
-DEPRECATED("Use pass-by-reference instead.")
+WPI_DEPRECATED("Use pass-by-reference instead.")
 Counter::Counter(AnalogTrigger* trigger) : Counter(kTwoPulse) {
   SetUpSource(trigger->CreateOutput(AnalogTriggerType::kState));
   ClearDownSource();

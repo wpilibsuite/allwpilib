@@ -462,7 +462,7 @@ void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
  * @param channel A digital source to set as the encoder index
  * @param type    The state that will cause the encoder to reset
  */
-DEPRECATED("Use pass-by-reference instead.")
+WPI_DEPRECATED("Use pass-by-reference instead.")
 void Encoder::SetIndexSource(DigitalSource* source,
                              Encoder::IndexingType type) {
   SetIndexSource(*source, type);

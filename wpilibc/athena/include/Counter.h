@@ -44,7 +44,7 @@ class Counter : public SensorBase,
   explicit Counter(int channel);
   explicit Counter(DigitalSource* source);
   explicit Counter(std::shared_ptr<DigitalSource> source);
-  DEPRECATED("Use pass-by-reference instead.")
+  WPI_DEPRECATED("Use pass-by-reference instead.")
   explicit Counter(AnalogTrigger* trigger);
   explicit Counter(const AnalogTrigger& trigger);
   Counter(EncodingType encodingType, DigitalSource* upSource,

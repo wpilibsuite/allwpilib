@@ -79,7 +79,7 @@ class Encoder : public SensorBase,
   double PIDGet() override;
 
   void SetIndexSource(int channel, IndexingType type = kResetOnRisingEdge);
-  DEPRECATED("Use pass-by-reference instead.")
+  WPI_DEPRECATED("Use pass-by-reference instead.")
   void SetIndexSource(DigitalSource* source,
                       IndexingType type = kResetOnRisingEdge);
   void SetIndexSource(const DigitalSource& source,
