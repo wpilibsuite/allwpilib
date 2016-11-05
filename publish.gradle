@@ -45,7 +45,12 @@ publishing {
                     artifact nat.cameraserverJavadoc
                 }
                 if (project.buildArm) {
-                    artifact project('arm').jar
+                    def camArm = project('arm')
+                    artifact camArm.jar
+                    // If the library is not embedded include it in the repo
+                    if (!project.hasProperty('compilerPrefix')) {
+                        artifact camArm.cameraserverZip
+                    }    
                 }
                 if (!OperatingSystem.current().isWindows()) {
                     if (project.hasProperty('makeDesktop')) {

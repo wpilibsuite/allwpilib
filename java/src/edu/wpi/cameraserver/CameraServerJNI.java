@@ -20,53 +20,53 @@ public class CameraServerJNI {
   static {
     if (!libraryLoaded) {
       try {
-        String osname = System.getProperty("os.name");
-        String resname;
-        if (osname.startsWith("Windows"))
-          resname = "/Windows/" + System.getProperty("os.arch") + "/";
-        else
-          resname = "/" + osname + "/" + System.getProperty("os.arch") + "/";
-        //System.out.println("platform: " + resname);
-        if (osname.startsWith("Windows"))
-          resname += "cameraserver.dll";
-        else if (osname.startsWith("Mac"))
-          resname += "libcameraserver.dylib";
-        else
-          resname += "libcameraserver.so";
-        InputStream is = CameraServerJNI.class.getResourceAsStream(resname);
-        if (is != null) {
-          // create temporary file
-          if (System.getProperty("os.name").startsWith("Windows"))
-            jniLibrary = File.createTempFile("CameraServerJNI", ".dll");
-          else if (System.getProperty("os.name").startsWith("Mac"))
-            jniLibrary = File.createTempFile("libCameraServerJNI", ".dylib");
+        System.loadLibrary("cameraserver");
+      } catch (UnsatisfiedLinkError e) {
+        try {
+          String osname = System.getProperty("os.name");
+          String resname;
+          if (osname.startsWith("Windows"))
+            resname = "/Windows/" + System.getProperty("os.arch") + "/";
           else
-            jniLibrary = File.createTempFile("libCameraServerJNI", ".so");
-          // flag for delete on exit
-          jniLibrary.deleteOnExit();
-          OutputStream os = new FileOutputStream(jniLibrary);
+            resname = "/" + osname + "/" + System.getProperty("os.arch") + "/";
+          System.out.println("platform: " + resname);
+          if (osname.startsWith("Windows"))
+            resname += "cameraserver.dll";
+          else if (osname.startsWith("Mac"))
+            resname += "libcameraserver.dylib";
+          else
+            resname += "libcameraserver.so";
+          InputStream is = CameraServerJNI.class.getResourceAsStream(resname);
+          if (is != null) {
+            // create temporary file
+            if (System.getProperty("os.name").startsWith("Windows"))
+              jniLibrary = File.createTempFile("CameraServerJNI", ".dll");
+            else if (System.getProperty("os.name").startsWith("Mac"))
+              jniLibrary = File.createTempFile("libCameraServerJNI", ".dylib");
+            else
+              jniLibrary = File.createTempFile("libCameraServerJNI", ".so");
+            // flag for delete on exit
+            jniLibrary.deleteOnExit();
+            OutputStream os = new FileOutputStream(jniLibrary);
 
-          byte[] buffer = new byte[1024];
-          int readBytes;
-          try {
-            while ((readBytes = is.read(buffer)) != -1) {
-              os.write(buffer, 0, readBytes);
+            byte[] buffer = new byte[1024];
+            int readBytes;
+            try {
+              while ((readBytes = is.read(buffer)) != -1) {
+                os.write(buffer, 0, readBytes);
+              }
+            } finally {
+              os.close();
+              is.close();
             }
-          } finally {
-            os.close();
-            is.close();
-          }
-          try {
             System.load(jniLibrary.getAbsolutePath());
-          } catch (UnsatisfiedLinkError e) {
+          } else {
             System.loadLibrary("cameraserver");
           }
-        } else {
-          System.loadLibrary("cameraserver");
+        } catch (IOException ex) {
+          ex.printStackTrace();
+          System.exit(1);
         }
-      } catch (IOException ex) {
-        ex.printStackTrace();
-        System.exit(1);
       }
       libraryLoaded = true;
     }
