@@ -22,6 +22,29 @@ using namespace wpi::java;
 static JavaVM *jvm = nullptr;
 static jclass usbCameraInfoCls = nullptr;
 static jclass videoModeCls = nullptr;
+static jclass videoEventCls = nullptr;
+// Thread-attached environment for listener callbacks.
+static JNIEnv *listenerEnv = nullptr;
+
+static void ListenerOnStart() {
+  if (!jvm) return;
+  JNIEnv *env;
+  JavaVMAttachArgs args;
+  args.version = JNI_VERSION_1_2;
+  args.name = const_cast<char*>("CSListener");
+  args.group = nullptr;
+  if (jvm->AttachCurrentThreadAsDaemon(reinterpret_cast<void **>(&env),
+                                       &args) != JNI_OK)
+    return;
+  if (!env || !env->functions) return;
+  listenerEnv = env;
+}
+
+static void ListenerOnExit() {
+  listenerEnv = nullptr;
+  if (!jvm) return;
+  jvm->DetachCurrentThread();
+}
 
 extern "C" {
 
@@ -47,6 +70,16 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (!videoModeCls) return JNI_ERR;
   env->DeleteLocalRef(local);
 
+  local = env->FindClass("edu/wpi/cameraserver/VideoEvent");
+  if (!local) return JNI_ERR;
+  videoEventCls = static_cast<jclass>(env->NewGlobalRef(local));
+  if (!videoEventCls) return JNI_ERR;
+  env->DeleteLocalRef(local);
+
+  // Initial configuration of listener start/exit
+  cs::SetListenerOnStart(ListenerOnStart);
+  cs::SetListenerOnExit(ListenerOnExit);
+
   return JNI_VERSION_1_6;
 }
 
@@ -57,10 +90,42 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   // Delete global references
   if (usbCameraInfoCls) env->DeleteGlobalRef(usbCameraInfoCls);
   if (videoModeCls) env->DeleteGlobalRef(videoModeCls);
+  if (videoEventCls) env->DeleteGlobalRef(videoEventCls);
   jvm = nullptr;
 }
 
 }  // extern "C"
+
+//
+// Helper class to create and clean up a global reference
+//
+template <typename T>
+class JGlobal {
+ public:
+  JGlobal(JNIEnv *env, T obj)
+      : m_obj(static_cast<T>(env->NewGlobalRef(obj))) {}
+  ~JGlobal() {
+    if (!jvm || cs::NotifierDestroyed()) return;
+    JNIEnv *env;
+    bool attached = false;
+    // don't attach and de-attach if already attached to a thread.
+    if (jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) ==
+        JNI_EDETACHED) {
+      if (jvm->AttachCurrentThread(reinterpret_cast<void **>(&env), nullptr) !=
+          JNI_OK)
+        return;
+      attached = true;
+    }
+    if (!env || !env->functions) return;
+    env->DeleteGlobalRef(m_obj);
+    if (attached) jvm->DetachCurrentThread();
+  }
+  operator T() { return m_obj; }
+  T obj() { return m_obj; }
+
+ private:
+  T m_obj;
+};
 
 static void ReportError(JNIEnv *env, CS_Status status, bool do_throw = true) {
   // TODO
@@ -88,6 +153,29 @@ static jobject MakeJObject(JNIEnv *env, const cs::VideoMode &videoMode) {
       videoModeCls, constructor, static_cast<jint>(videoMode.pixelFormat),
       static_cast<jint>(videoMode.width), static_cast<jint>(videoMode.height),
       static_cast<jint>(videoMode.fps));
+}
+
+static jobject MakeJObject(JNIEnv *env, const cs::RawEvent &event) {
+  static jmethodID constructor =
+      env->GetMethodID(videoEventCls, "<init>",
+                       "(IIILjava/lang/String;IIIIIIILjava/lang/String;)V");
+  JLocal<jstring> name(env, MakeJString(env, event.name));
+  JLocal<jstring> valueStr(env, MakeJString(env, event.valueStr));
+  return env->NewObject(
+      videoEventCls,
+      constructor,
+      static_cast<jint>(event.type),
+      static_cast<jint>(event.sourceHandle),
+      static_cast<jint>(event.sinkHandle),
+      name.obj(),
+      static_cast<jint>(event.mode.pixelFormat),
+      static_cast<jint>(event.mode.width),
+      static_cast<jint>(event.mode.height),
+      static_cast<jint>(event.mode.fps),
+      static_cast<jint>(event.propertyHandle),
+      static_cast<jint>(event.propertyType),
+      static_cast<jint>(event.value),
+      valueStr.obj());
 }
 
 extern "C" {
@@ -796,6 +884,57 @@ JNIEXPORT void JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_setSinkEnabled
   CS_Status status = 0;
   cs::SetSinkEnabled(sink, enabled, &status);
   CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cameraserver_CameraServerJNI
+ * Method:    addListener
+ * Signature: (Ledu/wpi/cameraserver/CameraServerJNI/ConnectionListenerFunction;IZ)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_cameraserver_CameraServerJNI_addListener
+  (JNIEnv *envouter, jclass, jobject listener, jint eventMask, jboolean immediateNotify)
+{
+  // the shared pointer to the weak global will keep it around until the
+  // entry listener is destroyed
+  auto listener_global =
+      std::make_shared<JGlobal<jobject>>(envouter, listener);
+
+  // cls is a temporary here; cannot be used within callback functor
+	jclass cls = envouter->GetObjectClass(listener);
+  if (!cls) return 0;
+
+  // method ids, on the other hand, are safe to retain
+  jmethodID mid = envouter->GetMethodID(cls, "apply",
+                                        "(Ledu/wpi/cameraserver/VideoEvent;)V");
+  if (!mid) return 0;
+
+  CS_Status status = 0;
+  CS_Listener handle = cs::AddListener(
+      [=](const cs::RawEvent &event) {
+        JNIEnv *env = listenerEnv;
+        if (!env || !env->functions) return;
+
+        // get the handler
+        auto handler = listener_global->obj();
+
+        // convert into the appropriate Java type
+        JLocal<jobject> jobj{env, MakeJObject(env, event)};
+        if (env->ExceptionCheck()) {
+          env->ExceptionDescribe();
+          env->ExceptionClear();
+          return;
+        }
+        if (!jobj) return;
+
+        env->CallVoidMethod(handler, mid, jobj.obj());
+        if (env->ExceptionCheck()) {
+          env->ExceptionDescribe();
+          env->ExceptionClear();
+        }
+      },
+      eventMask, immediateNotify != JNI_FALSE, &status);
+  CheckStatus(envouter, status);
+  return handle;
 }
 
 /*

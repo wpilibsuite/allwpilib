@@ -238,12 +238,16 @@ void CS_SetSinkEnabled(CS_Sink sink, CS_Bool enabled, CS_Status* status);
 //
 // Listener Functions
 //
+void CS_SetListenerOnStart(void (*onStart)(void* data), void* data);
+void CS_SetListenerOnExit(void (*onExit)(void* data), void* data);
 CS_Listener CS_AddListener(void* data,
                            void (*callback)(void* data, const CS_Event* event),
                            int eventMask, int immediateNotify,
                            CS_Status* status);
 
 void CS_RemoveListener(CS_Listener handle, CS_Status* status);
+
+int CS_NotifierDestroyed(void);
 
 //
 // Utility Functions

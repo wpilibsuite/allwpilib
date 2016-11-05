@@ -121,9 +121,6 @@ public class CameraServerJNI {
   public static native void setSourceConnected(int source, boolean connected);
   public static native void setSourceDescription(int source, String description);
   public static native int createSourceProperty(int source, String name, int type, int minimum, int maximum, int step, int defaultValue, int value);
-  //public static native int createSourcePropertyCallback(int source, String name,
-  //                                    int type, int minimum, int maximum, int step, int defaultValue, int value,
-  //                                    void (*onChange)(int property));
   public static native void setSourceEnumPropertyChoices(int source, int property, String[] choices);
 
   //
@@ -156,8 +153,8 @@ public class CameraServerJNI {
   //
   // Listener Functions
   //
-  //public static native int addListener(void (*callback)(VideoEvent event),
-  //                         int eventMask);
+  public static native int addListener(VideoListenerFunction listener,
+                                       int eventMask, boolean immediateNotify);
 
   public static native void removeListener(int handle);
 

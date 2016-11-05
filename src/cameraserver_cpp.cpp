@@ -9,6 +9,7 @@
 
 #include "llvm/SmallString.h"
 
+#include "Notifier.h"
 #include "SinkImpl.h"
 #include "SourceImpl.h"
 #include "Handle.h"
@@ -424,15 +425,34 @@ void ReleaseSink(CS_Sink sink, CS_Status* status) {
 // Listener Functions
 //
 
+void SetListenerOnStart(std::function<void()> onStart) {
+  Notifier::GetInstance().SetOnStart(onStart);
+}
+
+void SetListenerOnExit(std::function<void()> onExit) {
+  Notifier::GetInstance().SetOnExit(onExit);
+}
+
 CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
                         int eventMask, bool immediateNotify,
                         CS_Status* status) {
-  return 0;  // TODO
+  int uid = Notifier::GetInstance().AddListener(callback, eventMask);
+  if (immediateNotify) {
+    // TODO
+  }
+  return Handle{uid, Handle::kListener};
 }
 
 void RemoveListener(CS_Listener handle, CS_Status* status) {
-  // TODO
+  int uid = Handle{handle}.GetTypedIndex(Handle::kListener);
+  if (uid < 0) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  Notifier::GetInstance().RemoveListener(uid);
 }
+
+bool NotifierDestroyed() { return Notifier::destroyed(); }
 
 //
 // Utility Functions

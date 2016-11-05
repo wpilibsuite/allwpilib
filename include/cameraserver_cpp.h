@@ -83,11 +83,36 @@ struct RawEvent {
     kSourcePropertyChoicesUpdated = CS_SOURCE_PROPERTY_CHOICES_UPDATED
   };
 
+  RawEvent() = default;
+  RawEvent(llvm::StringRef name_, CS_Handle handle_, RawEvent::Type type_)
+      : type{type_}, name{name_} {
+    if (type_ == kSinkCreated || type_ == kSinkDestroyed ||
+        type_ == kSinkEnabled || type_ == kSinkDisabled)
+      sinkHandle = handle_;
+    else
+      sourceHandle = handle_;
+  }
+  RawEvent(llvm::StringRef name_, CS_Source source_, const VideoMode& mode_)
+      : type{kSourceVideoModeChanged},
+        sourceHandle{source_},
+        name{name_},
+        mode{mode_} {}
+  RawEvent(llvm::StringRef name_, CS_Source source_, RawEvent::Type type_,
+           CS_Property property_, CS_PropertyType propertyType_, int value_,
+           llvm::StringRef valueStr_)
+      : type{type_},
+        sourceHandle{source_},
+        name{name_},
+        propertyHandle{property_},
+        propertyType{propertyType_},
+        value{value_},
+        valueStr{valueStr_} {}
+
   Type type;
 
   // Valid for kSource* and kSink* respectively
-  CS_Source sourceHandle;
-  CS_Sink sinkHandle;
+  CS_Source sourceHandle = CS_INVALID_HANDLE;
+  CS_Sink sinkHandle = CS_INVALID_HANDLE;
 
   // Source/sink name
   std::string name;
@@ -95,7 +120,7 @@ struct RawEvent {
   // Fields for kSourceVideoModeChanged event
   VideoMode mode;
 
-  // Fields for CS_SOURCE_PROPERTY_* events
+  // Fields for kSourceProperty* events
   CS_Property propertyHandle;
   CS_PropertyType propertyType;
   int value;
@@ -225,10 +250,15 @@ void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status);
 //
 // Listener Functions
 //
+void SetListenerOnStart(std::function<void()> onStart);
+void SetListenerOnExit(std::function<void()> onExit);
+
 CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
                         int eventMask, bool immediateNotify, CS_Status* status);
 
 void RemoveListener(CS_Listener handle, CS_Status* status);
+
+bool NotifierDestroyed();
 
 //
 // Utility Functions
@@ -242,4 +272,4 @@ llvm::ArrayRef<CS_Sink> EnumerateSinkHandles(
 
 }  // namespace cs
 
-#endif  /* CAMERASERVER_CPP_H_ */
+#endif  // CAMERASERVER_CPP_H_

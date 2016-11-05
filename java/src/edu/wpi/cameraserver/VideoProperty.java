@@ -20,7 +20,7 @@ public class VideoProperty {
       return value;
     }
   }
-  private static final Type[] m_typeValues = Type.values();
+  static final Type[] m_typeValues = Type.values();
 
   public String getName() {
     return CameraServerJNI.getPropertyName(m_handle);
@@ -92,6 +92,11 @@ public class VideoProperty {
   VideoProperty(int handle) {
     m_handle = handle;
     m_type = m_typeValues[CameraServerJNI.getPropertyType(handle)];
+  }
+
+  VideoProperty(int handle, Type type) {
+    m_handle = handle;
+    m_type = type;
   }
 
   int m_handle;

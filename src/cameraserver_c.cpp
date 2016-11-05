@@ -211,6 +211,14 @@ void CS_ReleaseSink(CS_Sink sink, CS_Status* status) {
   return cs::ReleaseSink(sink, status);
 }
 
+void CS_SetListenerOnStart(void (*onStart)(void* data), void* data) {
+  cs::SetListenerOnStart([=]() { onStart(data); });
+}
+
+void CS_SetListenerOnExit(void (*onExit)(void* data), void* data) {
+  cs::SetListenerOnExit([=]() { onExit(data); });
+}
+
 CS_Listener CS_AddListener(void* data,
                            void (*callback)(void* data, const CS_Event* event),
                            int eventMask, int immediateNotify,
@@ -235,6 +243,8 @@ CS_Listener CS_AddListener(void* data,
 void CS_RemoveListener(CS_Listener handle, CS_Status* status) {
   return cs::RemoveListener(handle, status);
 }
+
+int CS_NotifierDestroyed(void) { return cs::NotifierDestroyed(); }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
   llvm::SmallVector<CS_Source, 32> buf;
