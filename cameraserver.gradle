@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 def cameraserverSetupModel = { project ->
     project.model {
         components {
@@ -191,23 +193,25 @@ if (buildArm) {
 }
 
 project(':native') {
-    apply plugin: 'cpp'
+    if (!OperatingSystem.current().isWindows()) {
+        apply plugin: 'cpp'
 
-    apply from: "${rootDir}/toolchains/native.gradle"
+        apply from: "${rootDir}/toolchains/native.gradle"
 
-    //if (!project.hasProperty("withoutTests")) {
-    //    apply from: "${rootDir}/test/tests.gradle"
-    //}
+        //if (!project.hasProperty("withoutTests")) {
+        //    apply from: "${rootDir}/test/tests.gradle"
+        //}
 
-    if (includeJava) {
-        apply from: "${rootDir}/java/java.gradle"
+        if (includeJava) {
+            apply from: "${rootDir}/java/java.gradle"
+        }
+
+        cameraserverSetupModel(project)
+        cameraserverSetupExamplesModel(project)
+        cameraserverZipTask(project)
+        useWpiUtil(project)
+        useOpenCv(project)
     }
-
-    cameraserverSetupModel(project)
-    cameraserverSetupExamplesModel(project)
-    cameraserverZipTask(project)
-    useWpiUtil(project)
-    useOpenCv(project)
 }
 
 task cameraserverSourceZip(type: Zip) {
@@ -230,10 +234,11 @@ task cameraserverSourceZip(type: Zip) {
         from('java/lib') {
             into 'src'
         }
-
-        project(':native').jniHeadersCameraServer.outputs.each {
-            from(it) {
-                into 'include'
+        if (!OperatingSystem.current().isWindows()) {
+            project(':native').jniHeadersCameraServer.outputs.each {
+                from(it) {
+                    into 'include'
+                }
             }
         }
     }

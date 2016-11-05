@@ -25,7 +25,9 @@ task clean(type: Delete) {
 
 outputVersions.mustRunAfter clean
 
-project(':native').build.dependsOn outputVersions
+if (!OperatingSystem.current().isWindows()) {
+    project(':native').build.dependsOn outputVersions
+}
 if (project.buildArm) {
     project(':arm').build.dependsOn outputVersions
 }
@@ -37,16 +39,19 @@ publishing {
         def nat = project('native')
         if (!project.hasProperty('skipJava')) {
             java(MavenPublication) {
-                artifact nat.jar
-                artifact nat.cameraserverJavaSource
-                artifact nat.cameraserverJavadoc
+                if (!OperatingSystem.current().isWindows()) {
+                    artifact nat.jar
+                    artifact nat.cameraserverJavaSource
+                    artifact nat.cameraserverJavadoc
+                }
                 if (project.buildArm) {
                     artifact project('arm').jar
                 }
-
-                if (project.hasProperty('makeDesktop')) {
-                    artifact nat.jar, {
-                        classifier = 'desktop'
+                if (!OperatingSystem.current().isWindows()) {
+                    if (project.hasProperty('makeDesktop')) {
+                        artifact nat.jar, {
+                            classifier = 'desktop'
+                        }
                     }
                 }
 
@@ -56,15 +61,18 @@ publishing {
             }
         }
         cpp(MavenPublication) {
-            artifact nat.cameraserverZip
+            if (!OperatingSystem.current().isWindows()) {
+                artifact nat.cameraserverZip
+            }
             artifact cameraserverSourceZip
             if (project.buildArm) {
                 artifact project(':arm').cameraserverZip
             }
-
-            if (project.hasProperty('makeDesktop')) {
-                artifact nat.cameraserverZip, {
-                    classifier = 'desktop'
+            if (!OperatingSystem.current().isWindows()) {
+                if (project.hasProperty('makeDesktop')) {
+                    artifact nat.cameraserverZip, {
+                        classifier = 'desktop'
+                    }
                 }
             }
 
