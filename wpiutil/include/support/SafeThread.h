@@ -18,11 +18,12 @@ namespace wpi {
 // Base class for SafeThreadOwner threads.
 class SafeThread {
  public:
+  SafeThread() { m_active = true; }
   virtual ~SafeThread() = default;
   virtual void Main() = 0;
 
   std::mutex m_mutex;
-  bool m_active = true;
+  std::atomic_bool m_active;
   std::condition_variable m_cond;
 };
 
@@ -92,7 +93,6 @@ inline void SafeThreadOwnerBase::Start(SafeThread* thr) {
 inline void SafeThreadOwnerBase::Stop() {
   SafeThread* thr = m_thread.exchange(nullptr);
   if (!thr) return;
-  std::lock_guard<std::mutex> lock(thr->m_mutex);
   thr->m_active = false;
   thr->m_cond.notify_one();
 }
