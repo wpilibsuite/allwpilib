@@ -17,7 +17,6 @@
 
 #include "ErrorBase.h"
 #include "HAL/HAL.h"
-#include "nivision.h"
 
 using namespace frc;
 
