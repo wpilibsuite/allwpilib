@@ -41,8 +41,11 @@ publishing {
             java(MavenPublication) {
                 if (!OperatingSystem.current().isWindows()) {
                     artifact nat.jar
-                    artifact nat.cameraserverJavaSource
-                    artifact nat.cameraserverJavadoc
+                    if (!project.buildArm) {
+                        artifact nat.cameraserverJavaSource
+                        artifact nat.cameraserverJavadoc
+                    }
+
                 }
                 if (project.buildArm) {
                     def camArm = project('arm')
@@ -51,6 +54,8 @@ publishing {
                     if (!project.hasProperty('compilerPrefix')) {
                         artifact camArm.cameraserverZip
                     }
+                    artifact camArm.cameraserverJavaSource
+                    artifact camArm.cameraserverJavadoc
                     artifact camArm.armCameraserverUberZip {
                         classifier = 'uberzip'
                     }
