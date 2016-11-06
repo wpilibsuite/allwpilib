@@ -87,6 +87,7 @@ namespace nUsageReporting
         kLanguage_CPlusPlus = 2,
         kLanguage_Java = 3,
         kLanguage_Python = 4,
+        kLanguage_DotNet = 5,
 
         kCANPlugin_BlackJagBridge = 1,
         kCANPlugin_2CAN = 2,
