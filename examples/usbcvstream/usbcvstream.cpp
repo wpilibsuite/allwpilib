@@ -1,4 +1,4 @@
-#include "cameraserver.h"
+#include "cscore.h"
 #include "opencv2/core/core.hpp"
 
 #include <iostream>

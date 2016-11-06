@@ -5,12 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "edu_wpi_cameraserver_CameraServerJNI.h"
+#include "edu_wpi_cscore_CameraServerJNI.h"
 
 #include "llvm/SmallString.h"
 #include "support/jni_util.h"
 
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 
 using namespace wpi::java;
 

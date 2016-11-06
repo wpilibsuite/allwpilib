@@ -11,7 +11,7 @@
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 #include "c_util.h"
 #include "Handle.h"
 #include "Log.h"

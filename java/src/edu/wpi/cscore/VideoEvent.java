@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.cameraserver;
+package edu.wpi.cscore;
 
 /// Video event
 public class VideoEvent {

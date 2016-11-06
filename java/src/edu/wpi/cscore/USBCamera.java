@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.cameraserver;
+package edu.wpi.cscore;
 
 /// A source that represents a USB camera.
 public class USBCamera extends VideoSource {

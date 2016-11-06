@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_HANDLE_H_
-#define CAMERASERVER_HANDLE_H_
+#ifndef CS_HANDLE_H_
+#define CS_HANDLE_H_
 
 #include <atomic>
 
 #include "llvm/StringRef.h"
 
-#include "cameraserver_c.h"
+#include "cscore_c.h"
 #include "UnlimitedHandleResource.h"
 
 namespace cs {
@@ -107,4 +107,4 @@ typedef StaticUnlimitedHandleResource<Handle, SinkData, Handle::kSink> Sinks;
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_HANDLE_H_
+#endif  // CS_HANDLE_H_

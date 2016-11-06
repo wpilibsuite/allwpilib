@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.cameraserver;
+package edu.wpi.cscore;
 
 import java.io.File;
 import java.io.InputStream;

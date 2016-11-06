@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.cameraserver;
+package edu.wpi.cscore;
 
 /// A sink that acts as a MJPEG-over-HTTP network server.
 public class MJPEGServer extends VideoSink {

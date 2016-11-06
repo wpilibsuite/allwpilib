@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_CVSOURCEIMPL_H_
-#define CAMERASERVER_CVSOURCEIMPL_H_
+#ifndef CS_CVSOURCEIMPL_H_
+#define CS_CVSOURCEIMPL_H_
 
 #include <atomic>
 #include <functional>
@@ -75,4 +75,4 @@ class CvSourceImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_CVSOURCEIMPL_H_
+#endif  // CS_CVSOURCEIMPL_H_

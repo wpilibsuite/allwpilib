@@ -1,9 +1,9 @@
 import org.gradle.internal.os.OperatingSystem
 
-def cameraserverSetupModel = { project ->
+def cscoreSetupModel = { project ->
     project.model {
         components {
-            cameraserver(NativeLibrarySpec) {
+            cscore(NativeLibrarySpec) {
                 if (project.isArm) {
                     targetPlatform 'arm'
                 } else {
@@ -15,11 +15,11 @@ def cameraserverSetupModel = { project ->
                 if (includeJava) {
                     project.setupJniIncludes(binaries)
                     binaries.all {
-                        project.setupDef(linker, "${rootDir}/cameraserver-jni.def")
+                        project.setupDef(linker, "${rootDir}/cscore-jni.def")
                     }
                 } else {
                     binaries.all {
-                        project.setupDef(linker, "${rootDir}/cameraserver.def")
+                        project.setupDef(linker, "${rootDir}/cscore.def")
                     }
                 }
 
@@ -35,7 +35,7 @@ def cameraserverSetupModel = { project ->
                         exportedHeaders {
                             srcDirs = ["${rootDir}/include", project.wpiUtilInclude, project.openCvInclude]
                             if (includeJava) {
-                                project.jniHeadersCameraServer.outputs.files.each { file ->
+                                project.jniHeadersCscore.outputs.files.each { file ->
                                     srcDirs file.getPath()
                                 }
                             }
@@ -48,7 +48,7 @@ def cameraserverSetupModel = { project ->
     }
 }
 
-def cameraserverSetupExamplesModel = { project ->
+def cscoreSetupExamplesModel = { project ->
     project.model {
         components {
             enum_usb(NativeExecutableSpec) {
@@ -69,7 +69,7 @@ def cameraserverSetupExamplesModel = { project ->
                             srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include"]
                             include '**/*.h'
                         }
-                        lib library: 'cameraserver', linkage: 'static'
+                        lib library: 'cscore', linkage: 'static'
                     }
                 }
             }
@@ -92,7 +92,7 @@ def cameraserverSetupExamplesModel = { project ->
                             srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include"]
                             include '**/*.h'
                         }
-                        lib library: 'cameraserver', linkage: 'static'
+                        lib library: 'cscore', linkage: 'static'
                     }
                 }
             }
@@ -115,7 +115,7 @@ def cameraserverSetupExamplesModel = { project ->
                             srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include", project.openCvInclude]
                             include '**/*.h'
                         }
-                        lib library: 'cameraserver', linkage: 'static'
+                        lib library: 'cscore', linkage: 'static'
                     }
                 }
             }
@@ -123,12 +123,12 @@ def cameraserverSetupExamplesModel = { project ->
     }
 }
 
-def cameraserverZipTask = { project ->
-    project.ext.cameraserverZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}CameraserverZip", Zip) {
-        description = 'Creates platform-specific zip of the desktop cameraserver libraries.'
+def cscoreZipTask = { project ->
+    project.ext.cscoreZip = project.tasks.create("${project.isArm ? 'arm' : 'native'}CscoreZip", Zip) {
+        description = 'Creates platform-specific zip of the desktop cscore libraries.'
         group = 'WPILib'
         destinationDir = project.buildDir
-        baseName = 'cameraserver'
+        baseName = 'cscore'
         classifier = "${project.buildPlatform}"
         duplicatesStrategy = 'exclude'
 
@@ -137,7 +137,7 @@ def cameraserverZipTask = { project ->
         }
 
         if (!project.hasProperty('skipJava')) {
-            project.jniHeadersCameraServer.outputs.each {
+            project.jniHeadersCscore.outputs.each {
                 from(it) {
                     into 'include'
                 }
@@ -163,25 +163,25 @@ def cameraserverZipTask = { project ->
         }
     }
 
-    project.build.dependsOn project.cameraserverZip
+    project.build.dependsOn project.cscoreZip
 
     project.debugStripSetup()
 
     project.tasks.whenTaskAdded { task ->
         def name = task.name.toLowerCase()
-        if (name.contains("cameraserversharedlibrary") || name.contains("cameraserverstaticlibrary") || name.contains("cameraservertest")) {
-            project.cameraserverZip.dependsOn task
+        if (name.contains("cscoresharedlibrary") || name.contains("cscorestaticlibrary") || name.contains("cscoretest")) {
+            project.cscoreZip.dependsOn task
         }
     }
 }
 
-def cameraserverUberZipTask = { project ->
+def cscoreUberZipTask = { project ->
     if (project.isArm) {
-        project.ext.cameraserverUberZip = project.tasks.create("armCameraserverUberZip", Zip) {
-            description = 'Create platform-specific zip of cameraserver libraries including opencv'
+        project.ext.cscoreUberZip = project.tasks.create("armCscoreUberZip", Zip) {
+            description = 'Create platform-specific zip of cscore libraries including opencv'
             group = 'WPILib'
             destinationDir = project.buildDir
-            baseName = 'cameraserver'
+            baseName = 'cscore'
             classifier= "uber${project.buildPlatform}"
             duplicatesStrategy = 'exclude'
             
@@ -190,7 +190,7 @@ def cameraserverUberZipTask = { project ->
             }
             
             if (!project.hasProperty('skipJava')) {
-                project.jniHeadersCameraServer.outputs.each {
+                project.jniHeadersCscore.outputs.each {
                     from(it) {
                         into 'include'
                     }
@@ -226,12 +226,12 @@ def cameraserverUberZipTask = { project ->
             }
         }
         
-        project.build.dependsOn project.cameraserverUberZip
+        project.build.dependsOn project.cscoreUberZip
 
         project.tasks.whenTaskAdded { task ->
             def name = task.name.toLowerCase()
-            if (name.contains("cameraserversharedlibrary") || name.contains("cameraserverstaticlibrary") || name.contains("cameraservertest")) {
-                project.cameraserverUberZip.dependsOn task
+            if (name.contains("cscoresharedlibrary") || name.contains("cscorestaticlibrary") || name.contains("cscoretest")) {
+                project.cscoreUberZip.dependsOn task
             }
         }
     }
@@ -246,12 +246,12 @@ if (buildArm) {
             apply from: "${rootDir}/java/java.gradle"
         }
 
-        cameraserverSetupModel(project)
-        cameraserverSetupExamplesModel(project)
-        cameraserverZipTask(project)
+        cscoreSetupModel(project)
+        cscoreSetupExamplesModel(project)
+        cscoreZipTask(project)
         useWpiUtil(project)
         useOpenCv(project)
-        cameraserverUberZipTask(project)
+        cscoreUberZipTask(project)
     }
 }
 
@@ -269,19 +269,19 @@ project(':native') {
             apply from: "${rootDir}/java/java.gradle"
         }
 
-        cameraserverSetupModel(project)
-        cameraserverSetupExamplesModel(project)
-        cameraserverZipTask(project)
+        cscoreSetupModel(project)
+        cscoreSetupExamplesModel(project)
+        cscoreZipTask(project)
         useWpiUtil(project)
         useOpenCv(project)
     }
 }
 
-task cameraserverSourceZip(type: Zip) {
-    description = 'Creates a sources-zip of the cameraserver source files'
+task cscoreSourceZip(type: Zip) {
+    description = 'Creates a sources-zip of the cscore source files'
     group = 'WPILib'
     destinationDir = project.buildDir
-    baseName = 'cameraserver'
+    baseName = 'cscore'
     classifier = "sources"
     duplicatesStrategy = 'exclude'
 
@@ -298,7 +298,7 @@ task cameraserverSourceZip(type: Zip) {
             into 'src'
         }
         if (!OperatingSystem.current().isWindows()) {
-            project(':native').jniHeadersCameraServer.outputs.each {
+            project(':native').jniHeadersCscore.outputs.each {
                 from(it) {
                     into 'include'
                 }

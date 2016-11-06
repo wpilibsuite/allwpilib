@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_NOTIFIER_H_
-#define CAMERASERVER_NOTIFIER_H_
+#ifndef CS_NOTIFIER_H_
+#define CS_NOTIFIER_H_
 
 #include <functional>
 
 #include "support/atomic_static.h"
 #include "support/SafeThread.h"
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 
 namespace cs {
 
@@ -64,4 +64,4 @@ class Notifier {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_NOTIFIER_H_
+#endif  // CS_NOTIFIER_H_

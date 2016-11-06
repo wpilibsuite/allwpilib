@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_C_UTIL_H_
-#define CAMERASERVER_C_UTIL_H_
+#ifndef CS_C_UTIL_H_
+#define CS_C_UTIL_H_
 
 namespace cs {
 
@@ -19,4 +19,4 @@ inline char* ConvertToC(llvm::StringRef in) {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_C_UTIL_H_
+#endif  // CS_C_UTIL_H_

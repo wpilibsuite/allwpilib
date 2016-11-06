@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_C_H_
-#define CAMERASERVER_C_H_
+#ifndef CSCORE_C_H_
+#define CSCORE_C_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -277,4 +277,4 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count);
 }
 #endif
 
-#endif /* CAMERASERVER_C_H_ */
+#endif /* CSCORE_C_H_ */

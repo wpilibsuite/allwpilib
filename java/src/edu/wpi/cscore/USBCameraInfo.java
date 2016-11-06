@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.cameraserver;
+package edu.wpi.cscore;
 
 /// USB camera information
 public class USBCameraInfo {

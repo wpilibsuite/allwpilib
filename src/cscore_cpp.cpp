@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 
 #include "llvm/SmallString.h"
 

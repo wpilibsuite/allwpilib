@@ -3,10 +3,10 @@ import org.gradle.internal.os.OperatingSystem
 apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
-def csFile = file("$buildDir/cameraserver.txt")
+def csFile = file("$buildDir/cscore.txt")
 
 task outputVersions() {
-    description = 'Prints the version of CameraServer to a file for use by the downstream packaging project'
+    description = 'Prints the version of cscore to a file for use by the downstream packaging project'
     group = 'Build'
     outputs.files(csFile)
 
@@ -42,8 +42,8 @@ publishing {
                 if (!OperatingSystem.current().isWindows()) {
                     artifact nat.jar
                     if (!project.buildArm) {
-                        artifact nat.cameraserverJavaSource
-                        artifact nat.cameraserverJavadoc
+                        artifact nat.cscoreJavaSource
+                        artifact nat.cscoreJavadoc
                     }
 
                 }
@@ -52,11 +52,11 @@ publishing {
                     artifact camArm.jar
                     // If the library is not embedded include it in the repo
                     if (!project.hasProperty('compilerPrefix')) {
-                        artifact camArm.cameraserverZip
+                        artifact camArm.cscoreZip
                     }
-                    artifact camArm.cameraserverJavaSource
-                    artifact camArm.cameraserverJavadoc
-                    artifact camArm.armCameraserverUberZip {
+                    artifact camArm.cscoreJavaSource
+                    artifact camArm.cscoreJavadoc
+                    artifact camArm.armCscoreUberZip {
                         classifier = 'uberzip'
                     }
                 }
@@ -68,32 +68,32 @@ publishing {
                     }
                 }
 
-                groupId 'edu.wpi.cameraserver.java'
-                artifactId 'CameraServer'
+                groupId 'edu.wpi.cscore.java'
+                artifactId 'cscore'
                 version WPILibVersion.version
             }
         }
         cpp(MavenPublication) {
             if (!OperatingSystem.current().isWindows()) {
-                artifact nat.cameraserverZip
+                artifact nat.cscoreZip
             }
-            artifact cameraserverSourceZip
+            artifact cscoreSourceZip
             if (project.buildArm) {
-                artifact project(':arm').cameraserverZip
-                artifact project(':arm').armCameraserverUberZip {
+                artifact project(':arm').cscoreZip
+                artifact project(':arm').armCscoreUberZip {
                         classifier = 'uberzip'
                     }
             }
             if (!OperatingSystem.current().isWindows()) {
                 if (project.hasProperty('makeDesktop')) {
-                    artifact nat.cameraserverZip, {
+                    artifact nat.cscoreZip, {
                         classifier = 'desktop'
                     }
                 }
             }
 
-            groupId 'edu.wpi.cameraserver.cpp'
-            artifactId 'CameraServer'
+            groupId 'edu.wpi.cscore.cpp'
+            artifactId 'cscore'
             version WPILibVersion.version
         }
     }

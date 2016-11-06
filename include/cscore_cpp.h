@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_CPP_H_
-#define CAMERASERVER_CPP_H_
+#ifndef CSCORE_CPP_H_
+#define CSCORE_CPP_H_
 
 #include <stdint.h>
 
@@ -18,7 +18,7 @@
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 
-#include "cameraserver_c.h"
+#include "cscore_c.h"
 
 namespace cv {
 class Mat;
@@ -272,4 +272,4 @@ llvm::ArrayRef<CS_Sink> EnumerateSinkHandles(
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_CPP_H_
+#endif  // CSCORE_CPP_H_

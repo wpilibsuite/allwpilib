@@ -1,4 +1,4 @@
-#include "cameraserver.h"
+#include "cscore.h"
 
 #include <stdio.h>
 

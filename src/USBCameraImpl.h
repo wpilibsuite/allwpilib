@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_USBCAMERAIMPL_H_
-#define CAMERASERVER_USBCAMERAIMPL_H_
+#ifndef CS_USBCAMERAIMPL_H_
+#define CS_USBCAMERAIMPL_H_
 
 #include <atomic>
 #include <thread>
@@ -171,4 +171,4 @@ class USBCameraImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_USBCAMERAIMPL_H_
+#endif  // CS_USBCAMERAIMPL_H_

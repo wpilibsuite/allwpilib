@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_UNLIMITEDHANDLERESOURCE_H_
-#define CAMERASERVER_UNLIMITEDHANDLERESOURCE_H_
+#ifndef CS_UNLIMITEDHANDLERESOURCE_H_
+#define CS_UNLIMITEDHANDLERESOURCE_H_
 
 #include <memory>
 #include <mutex>
@@ -154,4 +154,4 @@ class StaticUnlimitedHandleResource
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_UNLIMITEDHANDLERESOURCE_H_
+#endif  // CS_UNLIMITEDHANDLERESOURCE_H_

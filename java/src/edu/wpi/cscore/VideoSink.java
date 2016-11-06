@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.cameraserver;
+package edu.wpi.cscore;
 
 /// A source for video that provides a sequence of frames.  Each frame may
 /// consist of multiple images (e.g. from a stereo or depth camera); these

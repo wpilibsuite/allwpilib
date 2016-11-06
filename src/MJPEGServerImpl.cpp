@@ -15,7 +15,7 @@
 #include "support/raw_socket_ostream.h"
 #include "tcpsockets/TCPAcceptor.h"
 
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 #include "Handle.h"
 #include "Log.h"
 #include "SourceImpl.h"

@@ -70,13 +70,13 @@ ext.setupDefines = { project, binaries ->
     }
 }
 
-apply from: "cameraserver.gradle"
+apply from: "cscore.gradle"
 
-// Empty task for build so that cameraserverSourceZip will be
+// Empty task for build so that cscoreSourceZip will be
 // built when running ./gradlew build
 task build
 
-build.dependsOn cameraserverSourceZip
+build.dependsOn cscoreSourceZip
 
 apply from: 'publish.gradle'
 

@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_LOG_H_
-#define CAMERASERVER_LOG_H_
+#ifndef CS_LOG_H_
+#define CS_LOG_H_
 
 #include "support/atomic_static.h"
 #include "support/Logger.h"
@@ -42,4 +42,4 @@ class Logger : public wpi::Logger {
 
 } // namespace cs
 
-#endif  // CAMERASERVER_LOG_H_
+#endif  // CS_LOG_H_

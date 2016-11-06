@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_CVSINKIMPL_H_
-#define CAMERASERVER_CVSINKIMPL_H_
+#ifndef CS_CVSINKIMPL_H_
+#define CS_CVSINKIMPL_H_
 
 #include <atomic>
 #include <condition_variable>
@@ -50,4 +50,4 @@ class CvSinkImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_CVSINKIMPL_H_
+#endif  // CS_CVSINKIMPL_H_

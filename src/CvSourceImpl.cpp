@@ -12,7 +12,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "support/timestamp.h"
 
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 #include "c_util.h"
 #include "Handle.h"
 #include "Log.h"

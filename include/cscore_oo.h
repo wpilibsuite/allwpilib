@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_OO_H_
-#define CAMERASERVER_OO_H_
+#ifndef CSCORE_OO_H_
+#define CSCORE_OO_H_
 
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 
 namespace cs {
 
@@ -401,6 +401,6 @@ class VideoListener {
 
 }  // namespace cs
 
-#include "cameraserver_oo.inl"
+#include "cscore_oo.inl"
 
-#endif  // CAMERASERVER_OO_H_
+#endif  // CSCORE_OO_H_

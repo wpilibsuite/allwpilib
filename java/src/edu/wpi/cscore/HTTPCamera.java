@@ -5,16 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_H_
-#define CAMERASERVER_H_
+package edu.wpi.cscore;
 
-/* C API */
-#include "cameraserver_c.h"
-
-#ifdef __cplusplus
-/* C++ API */
-#include "cameraserver_cpp.h"
-#include "cameraserver_oo.h"
-#endif  /* __cplusplus */
-
-#endif  /* CAMERASERVER_H_ */
+/// A source that represents a MJPEG-over-HTTP (IP) camera.
+public class HTTPCamera extends VideoSource {
+  /// Create a source for a MJPEG-over-HTTP (IP) camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
+  public HTTPCamera(String name, String url) {
+    super(CameraServerJNI.createHTTPCamera(name, url));
+  }
+}

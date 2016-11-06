@@ -27,8 +27,8 @@ dependencies {
 }
 
 jar {
-    description = 'Generates CameraServer jar, with the JNI shared libraries embedded'
-    baseName = 'cameraserver'
+    description = 'Generates cscore jar, with the JNI shared libraries embedded'
+    baseName = 'cscore'
     classifier = "$buildPlatform"
     duplicatesStrategy = 'exclude'
 
@@ -48,41 +48,41 @@ jar {
 
 project.tasks.whenTaskAdded { task ->
     if (isArm) {
-        if (task.name == 'cameraserverSharedLibrary') jar.dependsOn task
+        if (task.name == 'cscoreSharedLibrary') jar.dependsOn task
     } else {
-        if (task.name == 'cameraserverX64SharedLibrary' || task.name == 'cameraserverX86SharedLibrary')
+        if (task.name == 'cscoreX64SharedLibrary' || task.name == 'cscoreX86SharedLibrary')
             jar.dependsOn task
     }
 }
 
-task cameraserverJavaSource(type: Jar, dependsOn: classes) {
-    description = 'Generates the source jar for CameraServer java'
+task cscoreJavaSource(type: Jar, dependsOn: classes) {
+    description = 'Generates the source jar for cscore java'
     group = 'WPILib'
-    baseName = 'cameraserver'
+    baseName = 'cscore'
     classifier = "sources"
     duplicatesStrategy = 'exclude'
 
     from sourceSets.main.allJava
 }
 
-task cameraserverJavadoc(type: Jar, dependsOn: javadoc) {
-    description = 'Generates the javadoc jar for CameraServer java'
+task cscoreJavadoc(type: Jar, dependsOn: javadoc) {
+    description = 'Generates the javadoc jar for cscore java'
     group = 'WPILib'
-    baseName = 'cameraserver'
+    baseName = 'cscore'
     classifier = "javadoc"
     duplicatesStrategy = 'exclude'
 
     from javadoc.destinationDir
 }
 
-build.dependsOn cameraserverJavaSource
-build.dependsOn cameraserverJavadoc
+build.dependsOn cscoreJavaSource
+build.dependsOn cscoreJavadoc
 
 /**
  * Generates the JNI headers
  */
-task jniHeadersCameraServer {
-    description = 'Generates JNI headers from edu.wpi.cameraserver.*'
+task jniHeadersCscore {
+    description = 'Generates JNI headers from edu.wpi.cscore.*'
     group = 'WPILib'
     def outputFolder = file(generatedJNIHeaderLoc)
     inputs.files sourceSets.main.output
@@ -93,7 +93,7 @@ task jniHeadersCameraServer {
             executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
             args '-d', outputFolder
             args '-classpath', sourceSets.main.runtimeClasspath.asPath
-            args 'edu.wpi.cameraserver.CameraServerJNI'
+            args 'edu.wpi.cscore.CameraServerJNI'
         }
     }
 }
@@ -145,7 +145,7 @@ ext.setupJniIncludes = { binaries ->
                 }
             }
 
-            jniHeadersCameraServer.outputs.files.each { file ->
+            jniHeadersCscore.outputs.files.each { file ->
                 if (buildPlatform == 'arm') {
                     cppCompiler.args '-I', file.getPath()
                 } else {
@@ -153,7 +153,7 @@ ext.setupJniIncludes = { binaries ->
                 }
             }
 
-            dependsOn jniHeadersCameraServer
+            dependsOn jniHeadersCscore
         }
     }
 }

@@ -5,8 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.cameraserver;
+#ifndef CSCORE_H_
+#define CSCORE_H_
 
-public interface VideoListenerFunction {
-  void apply(VideoEvent event);
-}
+/* C API */
+#include "cscore_c.h"
+
+#ifdef __cplusplus
+/* C++ API */
+#include "cscore_cpp.h"
+#include "cscore_oo.h"
+#endif  /* __cplusplus */
+
+#endif  /* CSCORE_H_ */

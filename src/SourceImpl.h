@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_SOURCEIMPL_H_
-#define CAMERASERVER_SOURCEIMPL_H_
+#ifndef CS_SOURCEIMPL_H_
+#define CS_SOURCEIMPL_H_
 
 #include <condition_variable>
 #include <cstddef>
@@ -18,7 +18,7 @@
 #include "llvm/ArrayRef.h"
 #include "llvm/StringMap.h"
 #include "llvm/StringRef.h"
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 #include "Frame.h"
 
 namespace cs {
@@ -209,4 +209,4 @@ class SourceImpl {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_SOURCEIMPL_H_
+#endif  // CS_SOURCEIMPL_H_

@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_SINKIMPL_H_
-#define CAMERASERVER_SINKIMPL_H_
+#ifndef CS_SINKIMPL_H_
+#define CS_SINKIMPL_H_
 
 #include <memory>
 #include <mutex>
@@ -77,4 +77,4 @@ class SinkImpl {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_SINKIMPL_H_
+#endif  // CS_SINKIMPL_H_

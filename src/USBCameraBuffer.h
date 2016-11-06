@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_USBCAMERABUFFER_H_
-#define CAMERASERVER_USBCAMERABUFFER_H_
+#ifndef CS_USBCAMERABUFFER_H_
+#define CS_USBCAMERABUFFER_H_
 
 #ifdef __linux__
 #include <sys/mman.h>
@@ -55,4 +55,4 @@ class USBCameraBuffer {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_USBCAMERABUFFER_H_
+#endif  // CS_USBCAMERABUFFER_H_

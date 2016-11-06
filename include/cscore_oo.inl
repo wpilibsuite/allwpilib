@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_OO_INL_
-#define CAMERASERVER_OO_INL_
+#ifndef CSCORE_OO_INL_
+#define CSCORE_OO_INL_
 
 namespace cs {
 
@@ -336,4 +336,4 @@ inline VideoListener::~VideoListener() {
 
 }  // namespace cs
 
-#endif  /* CAMERASERVER_OO_INL_ */
+#endif  /* CSCORE_OO_INL_ */

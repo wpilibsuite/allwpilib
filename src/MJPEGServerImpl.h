@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_MJPEGSERVERIMPL_H_
-#define CAMERASERVER_MJPEGSERVERIMPL_H_
+#ifndef CS_MJPEGSERVERIMPL_H_
+#define CS_MJPEGSERVERIMPL_H_
 
 #include <atomic>
 #include <memory>
@@ -64,4 +64,4 @@ class MJPEGServerImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_MJPEGSERVERIMPL_H_
+#endif  // CS_MJPEGSERVERIMPL_H_

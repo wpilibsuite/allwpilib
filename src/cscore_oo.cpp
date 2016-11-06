@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "cameraserver_oo.h"
+#include "cscore_oo.h"
 
 using namespace cs;
 

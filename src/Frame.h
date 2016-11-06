@@ -5,15 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CAMERASERVER_FRAME_H_
-#define CAMERASERVER_FRAME_H_
+#ifndef CS_FRAME_H_
+#define CS_FRAME_H_
 
 #include <atomic>
 #include <memory>
 
 #include "llvm/StringRef.h"
 
-#include "cameraserver_cpp.h"
+#include "cscore_cpp.h"
 
 namespace cs {
 
@@ -109,4 +109,4 @@ class Frame {
 
 }  // namespace cs
 
-#endif  // CAMERASERVER_FRAME_H_
+#endif  // CS_FRAME_H_
