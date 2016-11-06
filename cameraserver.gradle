@@ -196,6 +196,11 @@ def cameraserverUberZipTask = { project ->
                     }
                 }
             }
+
+            from(file("${project.openCvInclude}")) {
+                    exclude 'META-INF'
+                    into 'include'
+                }
             
             project.model {
                 def openCvPlatform = project.getOpenCvPlatformPackage(targetPlatform)
