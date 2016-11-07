@@ -20,7 +20,7 @@ public class CameraServerJNI {
   static {
     if (!libraryLoaded) {
       try {
-        System.loadLibrary("cameraserver");
+        System.loadLibrary("cscore");
       } catch (UnsatisfiedLinkError e) {
         try {
           String osname = System.getProperty("os.name");
@@ -61,7 +61,7 @@ public class CameraServerJNI {
             }
             System.load(jniLibrary.getAbsolutePath());
           } else {
-            System.loadLibrary("cameraserver");
+            System.loadLibrary("cscore");
           }
         } catch (IOException ex) {
           ex.printStackTrace();
