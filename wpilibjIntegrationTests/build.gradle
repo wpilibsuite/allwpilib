@@ -19,6 +19,8 @@ dependencies {
     compile wpilibj
     compile files(wpilibj.sourceSets.test.output.classesDir)
     compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
+    compile 'edu.wpi.cscore.java:cscore:+:arm'
+    compile 'org.opencv:opencv-java:+'
     compile 'junit:junit:4.11'
     compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
     compile 'org.apache.ant:ant:1.9.4'
@@ -36,14 +38,28 @@ clean {
 task copyIntegrationLibraries(type: Copy) {
     description = 'Copies all native libraries to an easy to find folder'
     group = 'WPILib'
+    destinationDir = file(nativeDirectory)
     dependsOn shadowJar
     dependsOn ':hal:build'
     dependsOn ':wpilibj:build'
+    dependsOn ':wpilibc:build'
 
     project(':wpilibj').model {
         binaries {
             withType(SharedLibraryBinarySpec) { spec ->
-                from(spec.sharedLibraryFile)
+                from(spec.sharedLibraryFile) {
+                    into '/'
+                }
+            }
+        }
+    }
+
+    project(':wpilibc').model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                from(spec.sharedLibraryFile) {
+                    into '/'
+                }
             }
         }
     }
@@ -51,19 +67,31 @@ task copyIntegrationLibraries(type: Copy) {
     project(':hal').model {
         binaries {
             withType(SharedLibraryBinarySpec) { spec ->
-                from(spec.sharedLibraryFile)
+                from(spec.sharedLibraryFile) {
+                    into '/'
+                }
             }
         }
     }
 
     defineNetworkTablesProperties()
     defineWpiUtilProperties()
+    defineCsCoreProperties()
 
-    from file(netSharedLib)
+    from (file(netSharedLib)) {
+        into '/'
+    }
 
-    from file(wpiUtilSharedLib)
+    from (file(wpiUtilSharedLib)) {
+        into '/'
+    }
 
-    into nativeDirectory
+    from (file(csLibArmLocation).path) {
+        include '**/*so.3.1'
+        include '**/libcscore.so'
+        include '**/libopencv_java310.so'
+        into '/'
+    }
 }
 
 compileJava.dependsOn tasks.getByPath(':wpilibj:testClasses')

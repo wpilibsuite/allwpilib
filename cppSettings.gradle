@@ -133,6 +133,43 @@ task unzipWpiUtil(type: Copy) {
     into wpiUtilUnzipLocation
 }
 
+task downloadArmCsCore() {
+    description = 'Downloads the C++ ARM CsCore Uberzip maven dependency.'
+    group = 'WPILib'
+    def depFolder = "$buildDir/dependencies"
+    def csZip = file("$depFolder/cscore-arm.zip")
+    outputs.file(csZip)
+    def armCsCore
+
+    doFirst {
+        def armCsDependency = project.dependencies.create('edu.wpi.cscore.cpp:cscore:+:athena-uberzip@zip')
+        def armConfig = project.configurations.detachedConfiguration(armCsDependency)
+        armConfig.setTransitive(false)
+        armCsCore = armConfig.files[0].canonicalFile
+    }
+
+    doLast {
+        copy {
+            from armCsCore
+            rename 'cscore(.+)', 'cscore-arm.zip'
+            into depFolder
+        }
+    }
+}
+
+def csCoreUnzipLocation = "$buildDir/cscore"
+
+// Create a task that will unzip the cscore files into a temporary build directory
+task unzipCsCore(type: Copy) {
+    description = 'Unzips the cscore maven dependency so that the include files and libraries can be used'
+    group = 'WPILib'
+    dependsOn downloadArmCsCore
+
+    from zipTree(downloadArmCsCore.outputs.files.singleFile)
+    into csCoreUnzipLocation
+}
+
+
 task clean(type: Delete) {
     description = "Deletes the build directory"
     group = "Build"
@@ -198,6 +235,26 @@ subprojects {
             addStaticWpiUtilLibraryLinks(compileTask, linker, targetPlatform)
         }
     }
+
+    // This defines a project property that projects depending on cscore can use to setup that dependency.
+    ext.defineCsCoreProperties = {
+        ext.csCore = csCoreUnzipLocation
+        ext.csCoreInclude = "$csCoreUnzipLocation/include"
+        ext.csLibArmLocation = "$csCoreUnzipLocation/lib"
+        ext.csSharedLib = "$csLibArmLocation/libcscore.so"
+        ext.cvSharedLib = "$csLibArmLocation/libopencv.so"
+
+        ext.addCsCoreLibraryLinks = { compileTask, linker, targetPlatform ->
+            compileTask.dependsOn project(':').unzipCsCore
+            String architecture = targetPlatform.architecture
+            if (architecture.contains('arm')) {
+                linker.args << '-L' + csLibArmLocation
+                linker.args csSharedLib
+                linker.args cvSharedLib
+            }
+        }
+    }
+
     plugins.withType(CppPlugin).whenPluginAdded {
         // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
         // If this ever changes, the prefix will need to be changed here

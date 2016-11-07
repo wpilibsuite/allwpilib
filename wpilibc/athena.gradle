@@ -1,5 +1,6 @@
 defineNetworkTablesProperties()
 defineWpiUtilProperties()
+defineCsCoreProperties()
 
 debugStripSetup(project)
 
@@ -14,6 +15,7 @@ model {
                     cppCompiler.args "-DNAMESPACED_WPILIB"
                     addNiLibraryLinks(linker, targetPlatform)
                     addNetworkTablesLibraryLinks(it, linker, targetPlatform)
+                    addCsCoreLibraryLinks(it, linker, targetPlatform)
                 }
             }
             sources {
@@ -23,7 +25,7 @@ model {
                         includes = ['**/*.cpp']
                     }
                     exportedHeaders {
-                        srcDirs = ["${project.shared}/include", "${project.athena}/include", netTablesInclude, wpiUtilInclude]
+                        srcDirs = ["${project.shared}/include", "${project.athena}/include", netTablesInclude, wpiUtilInclude, csCoreInclude]
                         includes = ['**/*.h']
                     }
                     lib project: ':hal', library: 'HALAthena', linkage: 'shared'

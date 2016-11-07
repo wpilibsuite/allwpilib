@@ -34,7 +34,7 @@ DEFAULT_JAVA_TEST_ARGS=""
 DEFAULT_LOCAL_JAVA_TEST_FILE=../wpilibjIntegrationTests/build/libs/wpilibjIntegrationTests-all.jar
 
 JAVA_REPORT=javareport.xml
-DEFAULT_LIBRARY_JAVA_FILES=../wpilibjIntegrationTests/build/nativelibraries
-DEFAULT_LIBRARY_JAVA_DESTINATION=/usr/local/frc/lib
+DEFAULT_LIBRARY_NATIVE_FILES=../wpilibjIntegrationTests/build/nativelibraries
+DEFAULT_LIBRARY_NATIVE_DESTINATION=/usr/local/frc/lib
 DEFAULT_LOCAL_JAVA_TEST_RESULT=${DEFAULT_LOCAL_TEST_RESULTS_DIR}/${JAVA_REPORT}
 DEFAULT_DESTINATION_JAVA_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/AntReports/TEST-edu.wpi.first.wpilibj.test.TestSuite.xml
