@@ -93,6 +93,7 @@ task halZip(type: Zip) {
     from(project.file('../ni-libraries/lib')) {
         into 'lib'
         exclude 'genlinks'
+        exclude 'genlinks.bat'
         exclude 'libwpi.so'
     }
 
