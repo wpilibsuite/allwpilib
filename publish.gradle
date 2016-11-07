@@ -53,12 +53,12 @@ publishing {
                     // If the library is not embedded include it in the repo
                     if (!project.hasProperty('compilerPrefix')) {
                         artifact camArm.cscoreZip
+                        artifact camArm.athenaCscoreUberZip {
+                            classifier = 'athena-uberzip'
+                        }
                     }
                     artifact camArm.cscoreJavaSource
                     artifact camArm.cscoreJavadoc
-                    artifact camArm.armCscoreUberZip {
-                        classifier = 'uberzip'
-                    }
                 }
                 if (!OperatingSystem.current().isWindows()) {
                     if (project.hasProperty('makeDesktop')) {
@@ -80,9 +80,11 @@ publishing {
             artifact cscoreSourceZip
             if (project.buildArm) {
                 artifact project(':arm').cscoreZip
-                artifact project(':arm').armCscoreUberZip {
-                        classifier = 'uberzip'
+                if (!project.hasProperty('compilerPrefix')) {
+                    artifact project(':arm').athenaCscoreUberZip {
+                        classifier = 'athena-uberzip'
                     }
+                }
             }
             if (!OperatingSystem.current().isWindows()) {
                 if (project.hasProperty('makeDesktop')) {

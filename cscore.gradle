@@ -175,45 +175,40 @@ def cscoreZipTask = { project ->
     }
 }
 
-def cscoreUberZipTask = { project ->
-    if (project.isArm) {
-        project.ext.cscoreUberZip = project.tasks.create("armCscoreUberZip", Zip) {
-            description = 'Create platform-specific zip of cscore libraries including opencv'
+def cscoreAthenaUberZipTask = { pjt ->
+    if (pjt.isArm && !project.hasProperty('compilerPrefix')) {
+        pjt.ext.cscoreAthenaUberZip = pjt.tasks.create("athenaCscoreUberZip", Zip) {
+            description = 'Create athena zip of cscore libraries including opencv'
             group = 'WPILib'
-            destinationDir = project.buildDir
+            destinationDir = pjt.buildDir
             baseName = 'cscore'
-            classifier= "uber${project.buildPlatform}"
+            classifier = 'athena-uberzip'
             duplicatesStrategy = 'exclude'
             
             from(file('include')) {
                 into 'include'
             }
             
-            if (!project.hasProperty('skipJava')) {
-                project.jniHeadersCscore.outputs.each {
+            if (!pjt.hasProperty('skipJava')) {
+                pjt.jniHeadersCscore.outputs.each {
                     from(it) {
                         into 'include'
                     }
                 }
             }
 
-            from(file("${project.openCvInclude}")) {
+            from(file("${pjt.openCvInclude}")) {
                     exclude 'META-INF'
                     into 'include'
                 }
             
-            project.model {
-                def openCvPlatform = project.getOpenCvPlatformPackage(targetPlatform)
-                from(file("${project.openCv}/${openCvPlatform}")) {
+            pjt.model {
+                def openCvPlatform = pjt.getOpenCvPlatformPackage(targetPlatform)
+                from(file("${pjt.openCv}/${openCvPlatform}")) {
                     exclude 'META-INF'
                     into 'lib'
                 }
                 binaries {
-                    withType(StaticLibraryBinarySpec) { binary ->
-                        from(binary.staticLibraryFile) {
-                            into 'lib'
-                        }
-                    }
                     withType(SharedLibraryBinarySpec) { binary ->
                         from(binary.sharedLibraryFile) {
                             into 'lib'
@@ -226,12 +221,12 @@ def cscoreUberZipTask = { project ->
             }
         }
         
-        project.build.dependsOn project.cscoreUberZip
+        pjt.build.dependsOn pjt.cscoreAthenaUberZip
 
-        project.tasks.whenTaskAdded { task ->
+        pjt.tasks.whenTaskAdded { task ->
             def name = task.name.toLowerCase()
             if (name.contains("cscoresharedlibrary") || name.contains("cscorestaticlibrary") || name.contains("cscoretest")) {
-                project.cscoreUberZip.dependsOn task
+                pjt.cscoreAthenaUberZip.dependsOn task
             }
         }
     }
@@ -251,7 +246,7 @@ if (buildArm) {
         cscoreZipTask(project)
         useWpiUtil(project)
         useOpenCv(project)
-        cscoreUberZipTask(project)
+        cscoreAthenaUberZipTask(project)
     }
 }
 
