@@ -14,6 +14,10 @@ dependencies {
     athenaCompile sourceSets.shared.output
     athenaCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
     athenaRuntime 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
+    athenaCompile 'edu.wpi.cscore.java:cscore:+:arm'
+    athenaRuntime 'edu.wpi.cscore.java:cscore:+:arm'
+    athenaCompile 'org.opencv:opencv-java:+'
+    athenaRuntime 'org.opencv:opencv-java:+'
 }
 
 defineWpiUtilProperties()

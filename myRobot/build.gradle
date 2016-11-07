@@ -19,6 +19,8 @@ dependencies {
     compile wpilibj
     compile files(wpilibj.sourceSets.test.output.classesDir)
     compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
+    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
+    compile 'edu.wpi.cscore.java:cscore:+:arm'
 }
 
 def nativeDirectory = "$buildDir/output"
@@ -30,16 +32,21 @@ clean {
 task copyRobotLibraries(type: Copy) {
     description = 'Copies all native libraries to an easy to find folder'
     group = 'WPILib'
+    destinationDir = file(nativeDirectory)
     dependsOn shadowJar
     dependsOn ':hal:build'
     dependsOn ':wpilibj:build'
 
-    from (shadowJar)
+    from (shadowJar) {
+        into '/'
+    }
 
     project(':wpilibj').model {
         binaries {
             withType(SharedLibraryBinarySpec) { spec ->
-                from(spec.sharedLibraryFile)
+                from(spec.sharedLibraryFile) {
+                    into '/'
+                }
             }
         }
     }
@@ -47,19 +54,32 @@ task copyRobotLibraries(type: Copy) {
     project(':hal').model {
         binaries {
             withType(SharedLibraryBinarySpec) { spec ->
-                from(spec.sharedLibraryFile)
+                from(spec.sharedLibraryFile) {
+                    into '/'
+                }
             }
         }
     }
 
     defineNetworkTablesProperties()
     defineWpiUtilProperties()
+    defineCsCoreProperties()
 
-    from file(netSharedLib)
+    from (file(netSharedLib)) {
+        into '/'
+    }
 
-    from file(wpiUtilSharedLib)
+    from (file(wpiUtilSharedLib)) {
+        into '/'
+    }
 
-    into nativeDirectory
+    from (file(csLibArmLocation).path) {
+        include '**/*so.3.1'
+        include '**/libcscore.so'
+        include '**/libopencv_java310.so'
+        into '/'
+    }
+
 }
 
 
