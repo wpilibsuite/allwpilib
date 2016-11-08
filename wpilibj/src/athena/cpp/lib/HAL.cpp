@@ -14,8 +14,10 @@
 #include "HAL/HAL.h"
 #include "edu_wpi_first_wpilibj_hal_HAL.h"
 #include "HALUtil.h"
+#include "support/jni_util.h"
 
 using namespace frc;
+using namespace wpi::java;
 
 // set the logging level
 static TLogLevel netCommLogLevel = logWARNING;
@@ -98,15 +100,14 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_report(
     JNIEnv* paramEnv, jclass, jint paramResource, jint paramInstanceNumber,
     jint paramContext, jstring paramFeature) {
-  const char *featureStr = paramEnv->GetStringUTFChars(paramFeature, nullptr);
+  JStringRef featureStr{paramEnv, paramFeature};
   NETCOMM_LOG(logDEBUG) << "Calling HAL report "
                         << "res:" << paramResource
                         << " instance:" << paramInstanceNumber
                         << " context:" << paramContext
-                        << " feature:" << featureStr;
+                        << " feature:" << featureStr.c_str();
   jint returnValue =
-      HAL_Report(paramResource, paramInstanceNumber, paramContext, featureStr);
-  paramEnv->ReleaseStringUTFChars(paramFeature, featureStr);
+      HAL_Report(paramResource, paramInstanceNumber, paramContext, featureStr.c_str());
   return returnValue;
 }
 
@@ -256,7 +257,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickName(JNIEnv* env, jclass,
                                                    jbyte port) {
   NETCOMM_LOG(logDEBUG) << "Calling HAL_GetJoystickName";
   char *joystickName = HAL_GetJoystickName(port);
-  jstring str = env->NewStringUTF(joystickName);
+  jstring str = MakeJString(env, joystickName);
   std::free(joystickName);
   return str;
 }
@@ -329,13 +330,11 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getBrownedOut(JNIEnv* env, jclass) {
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_setErrorData(JNIEnv* env, jclass,
                                                 jstring error) {
-  const char *errorStr = env->GetStringUTFChars(error, nullptr);
-  jsize length = env->GetStringUTFLength(error);
+  JStringRef errorStr{env, error};
 
-  NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr;
-  NETCOMM_LOG(logDEBUG) << "Length: " << length;
-  jint returnValue = HAL_SetErrorData(errorStr, (jint)length, 0);
-  env->ReleaseStringUTFChars(error, errorStr);
+  NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr.c_str();
+  NETCOMM_LOG(logDEBUG) << "Length: " << errorStr.size();
+  jint returnValue = HAL_SetErrorData(errorStr.c_str(), (int32_t)errorStr.size(), 0);
   return returnValue;
 }
 
@@ -351,18 +350,15 @@ Java_edu_wpi_first_wpilibj_hal_HAL_sendError(JNIEnv* env, jclass,
                                              jstring location,
                                              jstring callStack,
                                              jboolean printMsg) {
-  const char *detailsStr = env->GetStringUTFChars(details, nullptr);
-  const char *locationStr = env->GetStringUTFChars(location, nullptr);
-  const char *callStackStr = env->GetStringUTFChars(callStack, nullptr);
+  JStringRef detailsStr{env, details};
+  JStringRef locationStr{env, location};
+  JStringRef callStackStr{env, callStack};
 
-  NETCOMM_LOG(logDEBUG) << "Send Error: " << detailsStr;
-  NETCOMM_LOG(logDEBUG) << "Location: " << locationStr;
-  NETCOMM_LOG(logDEBUG) << "Call Stack: " << callStackStr;
-  jint returnValue = HAL_SendError(isError, errorCode, isLVCode, detailsStr,
-                                  locationStr, callStackStr, printMsg);
-  env->ReleaseStringUTFChars(details, detailsStr);
-  env->ReleaseStringUTFChars(location, locationStr);
-  env->ReleaseStringUTFChars(callStack, callStackStr);
+  NETCOMM_LOG(logDEBUG) << "Send Error: " << detailsStr.c_str();
+  NETCOMM_LOG(logDEBUG) << "Location: " << locationStr.c_str();
+  NETCOMM_LOG(logDEBUG) << "Call Stack: " << callStackStr.c_str();
+  jint returnValue = HAL_SendError(isError, errorCode, isLVCode, detailsStr.c_str(),
+                                  locationStr.c_str(), callStackStr.c_str(), printMsg);
   return returnValue;
 }
 

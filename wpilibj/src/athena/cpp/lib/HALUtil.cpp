@@ -18,6 +18,10 @@
 #include "HAL/HAL.h"
 #include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
+#include "llvm/SmallString.h"
+#include "support/jni_util.h"
+
+using namespace wpi::java;
 
 // set the logging level
 TLogLevel halUtilLogLevel = logWARNING;
@@ -52,7 +56,7 @@ static jclass pwmConfigDataResultCls = nullptr;
 
 namespace frc {
 
-static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
+static void GetStackTrace(JNIEnv *env, llvm::SmallVectorImpl<char> &res, llvm::SmallVectorImpl<char> &func) {
   // create a throwable
   static jmethodID constructorId = nullptr;
   if (!constructorId)
@@ -101,20 +105,22 @@ static void GetStackTrace(JNIEnv *env, std::string &res, std::string &func) {
 
     // add a line to res
     // res += " at ";
-    const char *tmp = env->GetStringUTFChars(stackElementString, nullptr);
-    res += tmp;
-    res += '\n';
+    JStringRef tmp{env, stackElementString};
+    res.append(tmp.str().begin(), tmp.str().end());
+    res.push_back('\n');
 
     // func is caller of immediate caller (if there was one)
     // or, if we see it, the first user function
-    if (i == 1)
-      func = tmp;
-    else if (i > 1 && !haveLoc &&
-             std::strncmp(tmp, "edu.wpi.first.wpilibj", 21) != 0) {
-      func = tmp;
+    if (i == 1) {
+      func.clear();
+      func.append(tmp.str().begin(), tmp.str().end());
+    }
+    else if (i > 1 && !haveLoc && 
+             !tmp.str().startswith("edu.wpi.first.wpilibj")) {
+      func.clear();
+      func.append(tmp.str().begin(), tmp.str().end());
       haveLoc = true;
     }
-    env->ReleaseStringUTFChars(stackElementString, tmp);
 
     env->DeleteLocalRef(curStackTraceElement);
     env->DeleteLocalRef(stackElementString);
@@ -155,8 +161,8 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
     env->ThrowNew(runtimeExCls, buf);
     delete[] buf;
   } else {
-    std::string stack = " at ";
-    std::string func;
+    llvm::SmallString<128> stack{" at "};
+    llvm::SmallString<128> func;
     GetStackTrace(env, stack, func);
     HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
   }
@@ -487,7 +493,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(
   const char *msg = HAL_GetErrorMessage(paramId);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil HAL_GetErrorMessage id=" << paramId
                         << " msg=" << msg;
-  return paramEnv->NewStringUTF(msg);
+  return MakeJString(paramEnv, msg);
 }
 
 /*
@@ -510,7 +516,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror(
   const char *msg = strerror(errno);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode="
                         << errorCode << " msg=" << msg;
-  return env->NewStringUTF(msg);
+  return MakeJString(env, msg);
 }
 
 }  // extern "C"
