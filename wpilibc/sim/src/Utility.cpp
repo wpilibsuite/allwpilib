@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "Timer.h"
+#include "llvm/SmallString.h"
 #include "simulation/simTime.h"
 
 using namespace frc;
@@ -56,15 +57,17 @@ static void wpi_handleTracing() {
  * The users don't call this, but instead use the wpi_assert macros in
  * Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue, const char* conditionText,
-                     const char* message, const char* fileName, int lineNumber,
-                     const char* funcName) {
+bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
+                     llvm::StringRef message, llvm::StringRef fileName,
+                     int lineNumber, llvm::StringRef funcName) {
   if (!conditionValue) {
     std::stringstream errorStream;
 
     errorStream << "Assertion \"" << conditionText << "\" ";
     errorStream << "on line " << lineNumber << " ";
-    errorStream << "of " << basename(fileName) << " ";
+
+    llvm::SmallString<128> fileTemp;
+    errorStream << "of " << basename(fileName.c_str(fileTemp)) << " ";
 
     if (message[0] != '\0') {
       errorStream << "failed: " << message << std::endl;
@@ -86,10 +89,10 @@ bool wpi_assert_impl(bool conditionValue, const char* conditionText,
  * wpi_assertEqual_impl and wpi_assertNotEqual_impl.
  */
 void wpi_assertEqual_common_impl(int valueA, int valueB,
-                                 const std::string& equalityType,
-                                 const std::string& message,
-                                 const std::string& fileName, int lineNumber,
-                                 const std::string& funcName) {
+                                 llvm::StringRef equalityType,
+                                 llvm::StringRef message,
+                                 llvm::StringRef fileName, int lineNumber,
+                                 llvm::StringRef funcName) {
   // Error string buffer
   std::stringstream error;
 
@@ -118,9 +121,9 @@ void wpi_assertEqual_common_impl(int valueA, int valueB,
  * The users don't call this, but instead use the wpi_assertEqual macros in
  * Utility.h.
  */
-bool wpi_assertEqual_impl(int valueA, int valueB, const std::string& message,
-                          const std::string& fileName, int lineNumber,
-                          const std::string& funcName) {
+bool wpi_assertEqual_impl(int valueA, int valueB, llvm::StringRef message,
+                          llvm::StringRef fileName, int lineNumber,
+                          llvm::StringRef funcName) {
   if (!(valueA == valueB)) {
     wpi_assertEqual_common_impl(valueA, valueB, "!=", message, fileName,
                                 lineNumber, funcName);
@@ -135,9 +138,9 @@ bool wpi_assertEqual_impl(int valueA, int valueB, const std::string& message,
  * The users don't call this, but instead use the wpi_assertNotEqual macros in
  * Utility.h.
  */
-bool wpi_assertNotEqual_impl(int valueA, int valueB, const std::string& message,
-                             const std::string& fileName, int lineNumber,
-                             const std::string& funcName) {
+bool wpi_assertNotEqual_impl(int valueA, int valueB, llvm::StringRef message,
+                             llvm::StringRef fileName, int lineNumber,
+                             llvm::StringRef funcName) {
   if (!(valueA != valueB)) {
     wpi_assertEqual_common_impl(valueA, valueB, "==", message, fileName,
                                 lineNumber, funcName);

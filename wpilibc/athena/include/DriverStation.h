@@ -32,11 +32,10 @@ class DriverStation : public SensorBase, public RobotStateInterface {
 
   virtual ~DriverStation();
   static DriverStation& GetInstance();
-  static void ReportError(std::string error);
-  static void ReportWarning(std::string error);
-  static void ReportError(bool is_error, int code, const std::string& error,
-                          const std::string& location,
-                          const std::string& stack);
+  static void ReportError(llvm::StringRef error);
+  static void ReportWarning(llvm::StringRef error);
+  static void ReportError(bool is_error, int code, llvm::StringRef error,
+                          llvm::StringRef location, llvm::StringRef stack);
 
   static const int kJoystickPorts = 6;
 
