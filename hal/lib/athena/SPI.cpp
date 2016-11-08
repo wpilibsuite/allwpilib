@@ -26,7 +26,7 @@ static int32_t m_spiCS3Handle = 0;
 static int32_t m_spiMXPHandle = 0;
 static priority_recursive_mutex spiOnboardMutex;
 static priority_recursive_mutex spiMXPMutex;
-static tSPI* spiSystem;
+static std::unique_ptr<tSPI> spiSystem;
 
 static HAL_DigitalHandle spiMXPDigitalHandle1 = HAL_kInvalidHandle;
 static HAL_DigitalHandle spiMXPDigitalHandle2 = HAL_kInvalidHandle;
@@ -79,7 +79,7 @@ std::unique_ptr<SPIAccumulator> spiAccumulators[5];
  * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
  */
 void HAL_InitializeSPI(int32_t port, int32_t* status) {
-  if (spiSystem == nullptr) spiSystem = tSPI::create(status);
+  if (spiSystem == nullptr) spiSystem.reset(tSPI::create(status));
   if (HAL_GetSPIHandle(port) != 0) return;
   switch (port) {
     case 0:
