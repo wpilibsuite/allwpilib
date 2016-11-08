@@ -19,6 +19,8 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
+  - ./gradlew build -PmakeSim
+
+  # Run formatter after build to check how it handles generated files
   - wpiformat
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-  - ./gradlew build -PmakeSim
