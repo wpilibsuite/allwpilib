@@ -90,6 +90,7 @@ class JStringRef {
   operator llvm::StringRef() const { return m_str; }
   llvm::StringRef str() const { return m_str; }
   const char* c_str() const { return m_str.data(); }
+  size_t size() const { return m_str.size(); }
 
  private:
   llvm::SmallString<128> m_str;
