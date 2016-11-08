@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
+import org.opencv.core.Core;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
@@ -168,6 +169,15 @@ public abstract class RobotBase {
     Timer.SetImplementation(new HardwareTimer());
     HLUsageReporting.SetImplementation(new HardwareHLUsageReporting());
     RobotState.SetImplementation(DriverStation.getInstance());
+
+    // Load opencv
+    try {
+      System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+    } catch (UnsatisfiedLinkError ex) {
+      System.out.println("OpenCV Native Libraries could not be loaded.");
+      System.out.println("Please try redeploying, or reimage your roboRIO and try again.");
+      ex.printStackTrace();
+    }
   }
 
   /**
