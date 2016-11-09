@@ -27,6 +27,7 @@ priority_recursive_mutex digitalPwmMutex;
 std::unique_ptr<tDIO> digitalSystem;
 std::unique_ptr<tRelay> relaySystem;
 std::unique_ptr<tPWM> pwmSystem;
+std::unique_ptr<tSPI> spiSystem;
 
 static std::atomic<bool> digitalSystemsInitialized{false};
 static priority_mutex initializeMutex;
@@ -94,8 +95,17 @@ void initializeDigital(int32_t* status) {
     }
   }
 
+  // SPI setup
+  spiSystem.reset(tSPI::create(status));
+
   digitalSystemsInitialized = true;
 }
+
+/**
+ * Map SPI channel numbers from their physical number (27 to 31) to their
+ * position in the bit field.
+ */
+int32_t remapSPIChannel(int32_t channel) { return channel - 26; }
 
 /**
  * Map DIO channel numbers from their physical number (10 to 26) to their
@@ -130,7 +140,11 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     return true;
   } else if (isHandleType(digitalSourceHandle, HAL_HandleEnum::DIO)) {
     int32_t index = getHandleIndex(digitalSourceHandle);
-    if (index >= kNumDigitalHeaders) {
+    if (index > kNumDigitalHeaders + kNumDigitalMXPChannels) {
+      // channels 10-15, so need to add headers to remap index
+      channel = remapSPIChannel(index) + kNumDigitalHeaders;
+      module = 0;
+    } else if (index >= kNumDigitalHeaders) {
       channel = remapMXPChannel(index);
       module = 1;
     } else {

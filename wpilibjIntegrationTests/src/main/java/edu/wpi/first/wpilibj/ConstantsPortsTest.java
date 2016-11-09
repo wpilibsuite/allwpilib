@@ -33,7 +33,7 @@ public class ConstantsPortsTest extends AbstractComsSetup {
    */
   @Test
   public void testDigitalChannels() {
-    assertEquals(26, SensorBase.kDigitalChannels);
+    assertEquals(31, SensorBase.kDigitalChannels);
   }
 
   /**

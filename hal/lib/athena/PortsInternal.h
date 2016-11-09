@@ -18,8 +18,11 @@ constexpr int32_t kNumAnalogInputs = 8;
 constexpr int32_t kNumAnalogOutputs = tAO::kNumMXPRegisters;
 constexpr int32_t kNumCounters = tCounter::kNumSystems;
 constexpr int32_t kNumDigitalHeaders = 10;
+constexpr int32_t kNumDigitalMXPChannels = 16;
+constexpr int32_t kNumDigitalSPIPortChannels = 5;
 constexpr int32_t kNumPWMHeaders = tPWM::kNumHdrRegisters;
-constexpr int32_t kNumDigitalChannels = 26;
+constexpr int32_t kNumDigitalChannels =
+    kNumDigitalHeaders + kNumDigitalMXPChannels + kNumDigitalSPIPortChannels;
 constexpr int32_t kNumPWMChannels = tPWM::kNumMXPRegisters + kNumPWMHeaders;
 constexpr int32_t kNumDigitalPWMOutputs =
     tDIO::kNumPWMDutyCycleAElements + tDIO::kNumPWMDutyCycleBElements;

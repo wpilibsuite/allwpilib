@@ -62,6 +62,7 @@ extern priority_recursive_mutex digitalPwmMutex;
 extern std::unique_ptr<tDIO> digitalSystem;
 extern std::unique_ptr<tRelay> relaySystem;
 extern std::unique_ptr<tPWM> pwmSystem;
+extern std::unique_ptr<tSPI> spiSystem;
 
 struct DigitalPort {
   uint8_t channel;
@@ -82,6 +83,7 @@ void initializeDigital(int32_t* status);
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         HAL_AnalogTriggerType analogTriggerType,
                         uint8_t& channel, uint8_t& module, bool& analogTrigger);
+int32_t remapSPIChannel(int32_t channel);
 int32_t remapMXPPWMChannel(int32_t channel);
 int32_t remapMXPChannel(int32_t channel);
 }  // namespace hal
