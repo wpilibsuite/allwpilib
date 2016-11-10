@@ -59,12 +59,10 @@ static VideoMode::PixelFormat ToPixelFormat(__u32 pixelformat) {
   switch (pixelformat) {
     case V4L2_PIX_FMT_MJPEG:
       return VideoMode::kMJPEG;
-#if 0
     case V4L2_PIX_FMT_YUYV:
       return VideoMode::kYUYV;
     case V4L2_PIX_FMT_RGB565:
       return VideoMode::kRGB565;
-#endif
     default:
       return VideoMode::kUnknown;
   }
@@ -557,6 +555,7 @@ void USBCameraImpl::CameraThreadMain() {
         }
 
         PutFrame(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat),
+                 m_mode.width, m_mode.height,
                  llvm::StringRef(
                      static_cast<const char*>(m_buffers[buf.index].m_data),
                      static_cast<std::size_t>(buf.bytesused)),

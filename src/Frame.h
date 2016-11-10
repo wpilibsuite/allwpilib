@@ -37,6 +37,8 @@ class Frame {
     std::size_t size;
     std::size_t capacity;
     VideoMode::PixelFormat pixelFormat;
+    int width;
+    int height;
   };
 
  public:
@@ -81,9 +83,24 @@ class Frame {
     return m_data->data;
   }
 
+  char* data() {
+    if (!m_data) return nullptr;
+    return m_data->data;
+  }
+
   VideoMode::PixelFormat GetPixelFormat() const {
     if (!m_data) return VideoMode::kUnknown;
     return m_data->pixelFormat;
+  }
+
+  int width() const {
+    if (!m_data) return 0;
+    return m_data->width;
+  }
+
+  int height() const {
+    if (!m_data) return 0;
+    return m_data->height;
   }
 
   Time time() const {

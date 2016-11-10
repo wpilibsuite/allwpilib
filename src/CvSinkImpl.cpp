@@ -9,6 +9,7 @@
 
 #include "llvm/SmallString.h"
 #include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
 #include "cscore_cpp.h"
@@ -46,8 +47,26 @@ uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
   if (!source) return 0;
   auto frame = source->GetNextFrame();  // blocks
   if (!frame) return 0;  // signal error
-  cv::imdecode(cv::InputArray{frame.data(), static_cast<int>(frame.size())},
-               cv::IMREAD_COLOR, &image);
+  switch (frame.GetPixelFormat()) {
+    case VideoMode::kMJPEG:
+      cv::imdecode(cv::InputArray{frame.data(), static_cast<int>(frame.size())},
+                   cv::IMREAD_COLOR, &image);
+      // Check to see if we successfully decoded
+      if (image.cols != frame.width() || image.rows != frame.height()) return 0;
+      break;
+    case VideoMode::kYUYV:
+      cv::cvtColor(cv::Mat{frame.height(), frame.width(), CV_8UC2,
+                           frame.data()},
+                   image, cv::COLOR_YUV2BGR_YUYV);
+      break;
+    case VideoMode::kRGB565:
+      cv::cvtColor(cv::Mat{frame.height(), frame.width(), CV_8UC2,
+                           frame.data()},
+                   image, cv::COLOR_BGR5652RGB);
+      break;
+    default:
+      return 0;
+  }
   return frame.time();
 }
 

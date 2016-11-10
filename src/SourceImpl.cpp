@@ -289,8 +289,8 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
   return m_videoModes;
 }
 
-void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat,
-                          llvm::StringRef data, Frame::Time time) {
+void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
+                          int height, llvm::StringRef data, Frame::Time time) {
   std::size_t dataSize = data.size();
 
   // If MJPEG, determine if we need to add DHT to it, and allocate enough space
@@ -343,6 +343,8 @@ done:
   frameData->time = time;
   frameData->size = dataSize;
   frameData->pixelFormat = pixelFormat;
+  frameData->width = width;
+  frameData->height = height;
 
   // Copy in image data
   DEBUG4("Copying data to " << ((void*)frameData->data) << " from "

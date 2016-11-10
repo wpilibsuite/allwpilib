@@ -389,7 +389,21 @@ void MJPEGServerImpl::SendStream(wpi::raw_socket_ostream& os) {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
       continue;
     }
-    DEBUG4("HTTP: sending frame size=" << frame.size());
+
+    const char* data = frame.data();
+    std::size_t size = frame.size();
+    switch (frame.GetPixelFormat()) {
+      case VideoMode::kMJPEG:
+        break;
+      case VideoMode::kYUYV:
+      case VideoMode::kRGB565:
+      default:
+        // Bad frame; sleep for 10 ms so we don't consume all processor time.
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        continue;
+    }
+
+    DEBUG4("HTTP: sending frame size=" << size);
 
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
@@ -398,11 +412,11 @@ void MJPEGServerImpl::SendStream(wpi::raw_socket_ostream& os) {
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n"
         << "Content-Type: image/jpeg\r\n"
-        << "Content-Length: " << frame.size() << "\r\n"
+        << "Content-Length: " << size << "\r\n"
         << "X-Timestamp: " << timestamp << "\r\n"
         << "\r\n";
     os << oss.str();
-    os << llvm::StringRef(frame.data(), frame.size());
+    os << llvm::StringRef(data, size);
     // os.flush();
   }
   Disable();

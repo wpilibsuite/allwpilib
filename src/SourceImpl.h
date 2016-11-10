@@ -116,10 +116,10 @@ class SourceImpl {
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
  protected:
-  void PutFrame(VideoMode::PixelFormat pixelFormat, llvm::StringRef data,
-                Frame::Time time);
+  void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
+                llvm::StringRef data, Frame::Time time);
   void PutError(llvm::StringRef msg, Frame::Time time) {
-    PutFrame(VideoMode::kUnknown, msg, time);
+    PutFrame(VideoMode::kUnknown, 0, 0, msg, time);
   }
 
   // Notification functions for corresponding atomics

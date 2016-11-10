@@ -93,7 +93,7 @@ void CvSourceImpl::PutFrame(cv::Mat& image) {
   }
   cv::imencode(".jpg", image, m_jpegBuf, m_compressionParams);
   SourceImpl::PutFrame(
-      VideoMode::kMJPEG,
+      VideoMode::kMJPEG, image.cols, image.rows,
       llvm::StringRef(reinterpret_cast<const char*>(m_jpegBuf.data()),
                       m_jpegBuf.size()),
       wpi::Now());
