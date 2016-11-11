@@ -92,7 +92,7 @@ public class HAL extends JNIWrapper {
 
   public static native short getJoystickPOVs(byte joystickNum, short[] povsArray);
 
-  public static native byte getJoystickButtons(byte joystickNum, ByteBuffer count);
+  public static native int getJoystickButtons(byte joystickNum, ByteBuffer count);
 
   public static native int setJoystickOutputs(byte joystickNum, int outputs, short leftRumble,
                                               short rightRumble);
