@@ -66,6 +66,8 @@ class SinkImpl {
   llvm::StringRef GetError(llvm::SmallVectorImpl<char>& buf) const;
 
  protected:
+  virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);
+
   mutable std::mutex m_mutex;
 
  private:

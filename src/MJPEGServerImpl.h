@@ -16,6 +16,7 @@
 #include "llvm/raw_ostream.h"
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
+#include "support/SafeThread.h"
 #include "support/raw_istream.h"
 #include "support/raw_socket_ostream.h"
 #include "tcpsockets/NetworkAcceptor.h"
@@ -35,31 +36,18 @@ class MJPEGServerImpl : public SinkImpl {
 
   void Stop();
 
-  static void SendHeader(llvm::raw_ostream& os, int code,
-                         llvm::StringRef codeText, llvm::StringRef contentType,
-                         llvm::StringRef extra = llvm::StringRef{});
-  static void SendError(llvm::raw_ostream& os, int code,
-                        llvm::StringRef message);
-  static bool ReadLine(wpi::raw_istream& istream,
-                       llvm::SmallVectorImpl<char>& buffer, int maxLen);
-  static bool UnescapeURI(llvm::StringRef str,
-                          llvm::SmallVectorImpl<char>& out);
-  static bool ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
-                             llvm::StringRef parameters, bool respond);
-  static void SendJSON(llvm::raw_ostream& os, SourceImpl& source, bool header);
-
-  void SendStream(wpi::raw_socket_ostream& os);
-
  private:
+  void SetSourceImpl(std::shared_ptr<SourceImpl> source) override;
+
   void ServerThreadMain();
-  void ConnThreadMain(wpi::NetworkStream* stream);
+
+  class ConnThread;
 
   std::unique_ptr<wpi::NetworkAcceptor> m_acceptor;
   std::atomic_bool m_active;  // set to false to terminate threads
   std::thread m_serverThread;
 
-  std::vector<std::thread> m_connThreads;
-  std::vector<std::unique_ptr<wpi::NetworkStream>> m_connStreams;
+  std::vector<wpi::SafeThreadOwner<ConnThread>> m_connThreads;
 };
 
 }  // namespace cs

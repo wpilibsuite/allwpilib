@@ -33,14 +33,17 @@ llvm::StringRef SinkImpl::GetDescription(
 }
 
 void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  if (m_source) {
-    if (m_enabledCount > 0) m_source->DisableSink();
-    m_source->RemoveSink();
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_source) {
+      if (m_enabledCount > 0) m_source->DisableSink();
+      m_source->RemoveSink();
+    }
+    m_source = source;
+    m_source->AddSink();
+    if (m_enabledCount > 0) m_source->EnableSink();
   }
-  m_source = source;
-  m_source->AddSink();
-  if (m_enabledCount > 0) m_source->EnableSink();
+  SetSourceImpl(source);
 }
 
 std::string SinkImpl::GetError() const {
@@ -59,3 +62,5 @@ llvm::StringRef SinkImpl::GetError(llvm::SmallVectorImpl<char>& buf) const {
   buf.append(frame.data(), frame.data() + frame.size());
   return llvm::StringRef{buf.data(), buf.size()};
 }
+
+void SinkImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {}
