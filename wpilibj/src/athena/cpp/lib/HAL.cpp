@@ -188,9 +188,9 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickPOVs(JNIEnv* env, jclass,
 /*
  * Class: edu_wpi_first_wpilibj_hal_HAL
  * Method:    HAL_GetJoystickButtons
- * Signature: (BL)B
+ * Signature: (BL)I
  */
-JNIEXPORT jbyte JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickButtons(JNIEnv* env, jclass,
                                                       jbyte joystickNum,
                                                       jobject count) {
