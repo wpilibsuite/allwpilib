@@ -64,14 +64,24 @@ class SafeThreadOwnerBase {
  public:
   void Stop();
 
- protected:
   SafeThreadOwnerBase() { m_thread = nullptr; }
   SafeThreadOwnerBase(const SafeThreadOwnerBase&) = delete;
   SafeThreadOwnerBase& operator=(const SafeThreadOwnerBase&) = delete;
+  SafeThreadOwnerBase(SafeThreadOwnerBase&& other)
+      : m_thread(other.m_thread.exchange(nullptr)) {}
+  SafeThreadOwnerBase& operator=(SafeThreadOwnerBase other) {
+    SafeThread* otherthr = other.m_thread.exchange(nullptr);
+    SafeThread* curthr = m_thread.exchange(otherthr);
+    other.m_thread.exchange(curthr);  // other destructor will clean up
+    return *this;
+  }
   ~SafeThreadOwnerBase() { Stop(); }
 
+  explicit operator bool() const { return m_thread.load(); }
+
+ protected:
   void Start(SafeThread* thr);
-  SafeThread* GetThread() { return m_thread.load(); }
+  SafeThread* GetThread() const { return m_thread.load(); }
 
  private:
   std::atomic<SafeThread*> m_thread;
@@ -106,7 +116,9 @@ class SafeThreadOwner : public detail::SafeThreadOwnerBase {
   void Start(T* thr) { detail::SafeThreadOwnerBase::Start(thr); }
 
   using Proxy = typename detail::SafeThreadProxy<T>;
-  Proxy GetThread() { return Proxy(detail::SafeThreadOwnerBase::GetThread()); }
+  Proxy GetThread() const {
+    return Proxy(detail::SafeThreadOwnerBase::GetThread());
+  }
 };
 
 }  // namespace wpi
