@@ -115,6 +115,10 @@ class SourceImpl {
 
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
+  std::unique_ptr<Frame::Data> AllocFrame(VideoMode::PixelFormat pixelFormat,
+                                          int width, int height,
+                                          std::size_t size, Frame::Time time);
+
  protected:
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
                 llvm::StringRef data, Frame::Time time);

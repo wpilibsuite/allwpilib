@@ -251,8 +251,9 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
   return m_videoModes;
 }
 
-void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
-                          int height, llvm::StringRef data, Frame::Time time) {
+std::unique_ptr<Frame::Data> SourceImpl::AllocFrame(
+    VideoMode::PixelFormat pixelFormat, int width, int height, std::size_t size,
+    Frame::Time time) {
   std::unique_ptr<Frame::Data> frameData;
   {
     std::lock_guard<std::mutex> lock{m_poolMutex};
@@ -260,7 +261,7 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
     int found = -1;
     for (std::size_t i = 0; i < m_framesAvail.size(); ++i) {
       // is it big enough?
-      if (m_framesAvail[i] && m_framesAvail[i]->capacity >= data.size()) {
+      if (m_framesAvail[i] && m_framesAvail[i]->capacity >= size) {
         // is it smaller than the last found?
         if (found < 0 ||
             m_framesAvail[i]->capacity < m_framesAvail[found]->capacity) {
@@ -272,7 +273,7 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
 
     // if nothing found, allocate a new buffer
     if (found < 0)
-      frameData.reset(new Frame::Data{data.size()});
+      frameData.reset(new Frame::Data{size});
     else
       frameData = std::move(m_framesAvail[found]);
   }
@@ -280,10 +281,18 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
   // Initialize frame data
   frameData->refcount = 0;
   frameData->time = time;
-  frameData->size = data.size();
+  frameData->size = size;
   frameData->pixelFormat = pixelFormat;
   frameData->width = width;
   frameData->height = height;
+
+  return frameData;
+}
+
+void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
+                          int height, llvm::StringRef data, Frame::Time time) {
+  std::unique_ptr<Frame::Data> frameData =
+      AllocFrame(pixelFormat, width, height, data.size(), time);
 
   // Copy in image data
   DEBUG4("Copying data to " << ((void*)frameData->data) << " from "
