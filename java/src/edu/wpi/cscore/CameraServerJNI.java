@@ -13,9 +13,11 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import org.opencv.core.Core;
 
 public class CameraServerJNI {
   static boolean libraryLoaded = false;
+  static boolean cvLibraryLoaded = false;
   static File jniLibrary = null;
   static {
     if (!libraryLoaded) {
@@ -69,6 +71,15 @@ public class CameraServerJNI {
         }
       }
       libraryLoaded = true;
+      if (!cvLibraryLoaded) {
+        try {
+          System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        } catch (UnsatisfiedLinkError ex) {
+          ex.printStackTrace();
+          System.exit(1);
+        }
+        cvLibraryLoaded = true;
+      }
     }
   }
 
