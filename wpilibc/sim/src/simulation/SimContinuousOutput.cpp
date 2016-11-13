@@ -7,13 +7,14 @@
 
 #include "simulation/SimContinuousOutput.h"
 
+#include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
 using namespace frc;
 
 SimContinuousOutput::SimContinuousOutput(std::string topic) {
   pub = MainNode::Advertise<gazebo::msgs::Float64>("~/simulator/" + topic);
-  std::cout << "Initialized ~/simulator/" + topic << std::endl;
+  llvm::outs() << "Initialized ~/simulator/" + topic << "\n";
 }
 
 void SimContinuousOutput::Set(double speed) {

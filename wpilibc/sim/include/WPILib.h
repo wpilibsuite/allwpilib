@@ -10,7 +10,6 @@
 #define SIMULATION "gazebo"
 
 #include <cstring>
-#include <iostream>
 
 #include "AnalogGyro.h"
 #include "AnalogInput.h"

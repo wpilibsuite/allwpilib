@@ -10,6 +10,7 @@
 #include "TestBench.h"
 #include "Timer.h"
 #include "gtest/gtest.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -21,21 +22,21 @@ void notifierHandler(void*) { notifierCounter++; }
  * Test if the Wait function works
  */
 TEST(NotifierTest, DISABLED_TestTimerNotifications) {
-  std::cout << "NotifierTest..." << std::endl;
+  llvm::outs() << "NotifierTest...\n";
   notifierCounter = 0;
-  std::cout << "notifier(notifierHandler, nullptr)..." << std::endl;
+  llvm::outs() << "notifier(notifierHandler, nullptr)...\n";
   Notifier notifier(notifierHandler, nullptr);
-  std::cout << "Start Periodic..." << std::endl;
+  llvm::outs() << "Start Periodic...\n";
   notifier.StartPeriodic(1.0);
 
-  std::cout << "Wait..." << std::endl;
+  llvm::outs() << "Wait...\n";
   Wait(10.5);
-  std::cout << "...Wait" << std::endl;
+  llvm::outs() << "...Wait\n";
 
   EXPECT_EQ(10u, notifierCounter) << "Received " << notifierCounter
                                   << " notifications in 10.5 seconds";
-  std::cout << "Received " << notifierCounter
-            << " notifications in 10.5 seconds";
+  llvm::outs() << "Received " << notifierCounter
+               << " notifications in 10.5 seconds";
 
-  std::cout << "...NotifierTest" << std::endl;
+  llvm::outs() << "...NotifierTest\n";
 }

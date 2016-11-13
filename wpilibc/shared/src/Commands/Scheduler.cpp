@@ -8,7 +8,6 @@
 #include "Commands/Scheduler.h"
 
 #include <algorithm>
-#include <iostream>
 #include <set>
 
 #include "Buttons/ButtonScheduler.h"

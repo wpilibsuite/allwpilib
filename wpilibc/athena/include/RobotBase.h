@@ -7,28 +7,27 @@
 
 #pragma once
 
-#include <cstdio>
-#include <iostream>
 #include <thread>
 
 #include "Base.h"
 #include "HAL/HAL.h"
+#include "llvm/raw_ostream.h"
 
 namespace frc {
 
 class DriverStation;
 
-#define START_ROBOT_CLASS(_ClassName_)                                       \
-  int main() {                                                               \
-    if (!HAL_Initialize(0)) {                                                \
-      std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl; \
-      return -1;                                                             \
-    }                                                                        \
-    HAL_Report(HALUsageReporting::kResourceType_Language,                    \
-               HALUsageReporting::kLanguage_CPlusPlus);                      \
-    static _ClassName_ robot;                                                \
-    std::printf("\n********** Robot program starting **********\n");         \
-    robot.StartCompetition();                                                \
+#define START_ROBOT_CLASS(_ClassName_)                                  \
+  int main() {                                                          \
+    if (!HAL_Initialize(0)) {                                           \
+      llvm::errs() << "FATAL ERROR: HAL could not be initialized\n";    \
+      return -1;                                                        \
+    }                                                                   \
+    HAL_Report(HALUsageReporting::kResourceType_Language,               \
+               HALUsageReporting::kLanguage_CPlusPlus);                 \
+    static _ClassName_ robot;                                           \
+    llvm::outs() << "\n********** Robot program starting **********\n"; \
+    robot.StartCompetition();                                           \
   }
 
 /**

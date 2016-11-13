@@ -8,8 +8,6 @@
 #pragma once
 
 #include <chrono>
-#include <iomanip>
-#include <iostream>
 #include <string>
 
 #include "llvm/SmallString.h"
@@ -60,7 +58,7 @@ inline llvm::raw_ostream& Log::Get(TLogLevel level) {
 
 inline Log::~Log() {
   oss << "\n";
-  std::cerr << oss.str();
+  llvm::errs() << oss.str();
 }
 
 inline TLogLevel& Log::ReportingLevel() {
