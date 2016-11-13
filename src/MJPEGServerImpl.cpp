@@ -432,6 +432,23 @@ void MJPEGServerImpl::Stop() {
     source->Wakeup();
 }
 
+static bool NeedsDHT(const char* data, std::size_t* size, std::size_t* locSOF) {
+  // Search first 2048 bytes (or until SOS) for DHT tag
+  for (llvm::StringRef::size_type i = 0; i < 2048 && i < *size; ++i) {
+    if (static_cast<unsigned char>(data[i]) != 0xff) continue;  // not a tag
+    unsigned char tag = static_cast<unsigned char>(data[i + 1]);
+    if (tag == 0xda) break;         // SOS
+    if (tag == 0xc4) return false;  // DHT
+    if (tag == 0xc0) *locSOF = i;   // SOF
+  }
+  // Only add DHT if we also found SOF (insertion point)
+  if (*locSOF != *size) {
+    *size += sizeof(dhtData);
+    return true;
+  }
+  return false;
+}
+
 // Send HTTP response and a stream of JPG-frames
 void MJPEGServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
   os.SetUnbuffered();
@@ -470,21 +487,7 @@ void MJPEGServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
       case VideoMode::kMJPEG:
         // Determine if we need to add DHT to it, and allocate enough space
         // for adding it if required.
-        // Search first 2048 bytes (or until SOS) for DHT tag
-        for (llvm::StringRef::size_type i = 0; i < 2048 && i < size; ++i) {
-          if (static_cast<unsigned char>(data[i]) != 0xff)
-            continue;  // not a tag
-          unsigned char tag = static_cast<unsigned char>(data[i + 1]);
-          if (tag == 0xda) break;       // SOS
-          if (tag == 0xc4) goto done;   // DHT
-          if (tag == 0xc0) locSOF = i;  // SOF
-        }
-        // Only add DHT if we also found SOF (insertion point)
-        if (locSOF != size) {
-          addDHT = true;
-          size += sizeof(dhtData);
-        }
-      done:
+        addDHT = NeedsDHT(data, &size, &locSOF);
         break;
       case VideoMode::kYUYV:
       case VideoMode::kRGB565:
