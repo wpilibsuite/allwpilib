@@ -26,6 +26,22 @@ public class VideoSource {
     return m_handle != 0;
   }
 
+  public int getHandle() {
+    return m_handle;
+  }
+
+  public boolean equals(Object other) {
+    if (this == other) return true;
+    if (other == null) return false;
+    if (getClass() != other.getClass()) return false;
+    VideoSource source = (VideoSource) other;
+    return m_handle == source.m_handle;
+  }
+
+  public int hashCode() {
+    return m_handle;
+  }
+
   /// Get the name of the source.  The name is an arbitrary identifier
   /// provided when the source is created, and should be unique.
   public String getName() {

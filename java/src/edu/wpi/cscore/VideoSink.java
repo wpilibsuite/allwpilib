@@ -26,6 +26,22 @@ public class VideoSink {
     return m_handle != 0;
   }
 
+  public int getHandle() {
+    return m_handle;
+  }
+
+  public boolean equals(Object other) {
+    if (this == other) return true;
+    if (other == null) return false;
+    if (getClass() != other.getClass()) return false;
+    VideoSink sink = (VideoSink) other;
+    return m_handle == sink.m_handle;
+  }
+
+  public int hashCode() {
+    return m_handle;
+  }
+
   /// Get the name of the sink.  The name is an arbitrary identifier
   /// provided when the sink is created, and should be unique.
   public String getName() {

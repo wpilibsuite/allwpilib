@@ -91,6 +91,14 @@ class VideoSource {
 
   explicit operator bool() const { return m_handle != 0; }
 
+  int GetHandle() const { return m_handle; }
+
+  bool operator==(const VideoSource& other) const {
+    return m_handle == other.m_handle;
+  }
+
+  bool operator!=(const VideoSource& other) const { return !(*this == other); }
+
   /// Get the name of the source.  The name is an arbitrary identifier
   /// provided when the source is created, and should be unique.
   std::string GetName() const;
@@ -261,6 +269,14 @@ class VideoSink {
   ~VideoSink();
 
   explicit operator bool() const { return m_handle != 0; }
+
+  int GetHandle() const { return m_handle; }
+
+  bool operator==(const VideoSink& other) const {
+    return m_handle == other.m_handle;
+  }
+
+  bool operator!=(const VideoSink& other) const { return !(*this == other); }
 
   /// Get the name of the sink.  The name is an arbitrary identifier
   /// provided when the sink is created, and should be unique.
