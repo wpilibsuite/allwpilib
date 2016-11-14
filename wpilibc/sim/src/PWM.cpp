@@ -7,10 +7,10 @@
 
 #include "PWM.h"
 
-#include <sstream>
-
 #include "Utility.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -30,16 +30,17 @@ const int PWM::kPwmDisabled = 0;
  *                port
  */
 PWM::PWM(int channel) {
-  std::stringstream ss;
+  llvm::SmallString<32> buf;
+  llvm::raw_svector_ostream oss(buf);
 
   if (!CheckPWMChannel(channel)) {
-    ss << "PWM Channel " << channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, ss.str());
+    oss << "PWM Channel " << channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, oss.str());
     return;
   }
 
-  ss << "pwm/" << channel;
-  impl = new SimContinuousOutput(ss.str());
+  oss << "pwm/" << channel;
+  impl = new SimContinuousOutput(oss.str());
   m_channel = channel;
   m_eliminateDeadband = false;
 

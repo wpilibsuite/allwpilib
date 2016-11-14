@@ -7,10 +7,10 @@
 
 #include "Encoder.h"
 
-#include <sstream>
-
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -52,9 +52,10 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection,
   } else {
     m_reverseDirection = reverseDirection;
   }
-  std::stringstream ss;
-  ss << "dio/" << channelA << "/" << channelB;
-  impl = new SimEncoder(ss.str());
+  llvm::SmallString<32> buf;
+  llvm::raw_svector_ostream oss(buf);
+  oss << "dio/" << channelA << "/" << channelB;
+  impl = new SimEncoder(oss.str());
   impl->Start();
 }
 

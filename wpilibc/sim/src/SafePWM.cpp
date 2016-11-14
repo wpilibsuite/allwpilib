@@ -8,7 +8,6 @@
 #include "SafePWM.h"
 
 #include <memory>
-#include <sstream>
 
 using namespace frc;
 
@@ -76,7 +75,7 @@ bool SafePWM::IsSafetyEnabled() const {
   return m_safetyHelper->IsSafetyEnabled();
 }
 
-void SafePWM::GetDescription(std::ostringstream& desc) const {
+void SafePWM::GetDescription(llvm::raw_ostream& desc) const {
   desc << "PWM " << GetChannel();
 }
 

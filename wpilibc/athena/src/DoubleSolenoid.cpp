@@ -7,13 +7,13 @@
 
 #include "DoubleSolenoid.h"
 
-#include <sstream>
-
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "HAL/Solenoid.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -41,7 +41,8 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
     : SolenoidBase(moduleNumber),
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
-  std::stringstream buf;
+  llvm::SmallString<32> str;
+  llvm::raw_svector_ostream buf(str);
   if (!CheckSolenoidModule(m_moduleNumber)) {
     buf << "Solenoid Module " << m_moduleNumber;
     wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf.str());

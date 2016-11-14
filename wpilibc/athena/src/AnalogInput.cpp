@@ -8,14 +8,14 @@
 #include "AnalogInput.h"
 #include "HAL/AnalogInput.h"
 
-#include <sstream>
-
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -30,7 +30,8 @@ const int AnalogInput::kAccumulatorChannels[] = {0, 1};
  *                on-board 4-7 are on the MXP port.
  */
 AnalogInput::AnalogInput(int channel) {
-  std::stringstream buf;
+  llvm::SmallString<32> str;
+  llvm::raw_svector_ostream buf(str);
   buf << "Analog Input " << channel;
 
   if (!SensorBase::CheckAnalogInputChannel(channel)) {

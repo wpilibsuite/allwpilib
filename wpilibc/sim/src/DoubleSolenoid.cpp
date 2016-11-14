@@ -9,6 +9,8 @@
 
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -37,10 +39,11 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
     forwardChannel = channel;
     m_reversed = true;
   }
-  std::stringstream ss;
-  ss << "pneumatic/" << moduleNumber << "/" << forwardChannel << "/"
-     << moduleNumber << "/" << reverseChannel;
-  m_impl = new SimContinuousOutput(ss.str());
+  llvm::SmallString<32> buf;
+  llvm::raw_svector_ostream oss(buf);
+  oss << "pneumatic/" << moduleNumber << "/" << forwardChannel << "/"
+      << moduleNumber << "/" << reverseChannel;
+  m_impl = new SimContinuousOutput(oss.str());
 
   LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", moduleNumber,
                                          forwardChannel, this);

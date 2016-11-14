@@ -7,13 +7,13 @@
 
 #include "PowerDistributionPanel.h"
 
-#include <sstream>
-
 #include "HAL/HAL.h"
 #include "HAL/PDP.h"
 #include "HAL/Ports.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -76,7 +76,8 @@ double PowerDistributionPanel::GetCurrent(int channel) const {
   int32_t status = 0;
 
   if (!CheckPDPChannel(channel)) {
-    std::stringstream buf;
+    llvm::SmallString<32> str;
+    llvm::raw_svector_ostream buf(str);
     buf << "PDP Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
   }

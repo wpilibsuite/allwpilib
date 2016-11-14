@@ -59,20 +59,21 @@ namespace frc {
 void ThrowAllocationException(JNIEnv *env, int32_t minRange, int32_t maxRange, 
     int32_t requestedValue, int32_t status) {
   const char *message = HAL_GetErrorMessage(status);
-  char *buf = new char[strlen(message) + 100];
-  sprintf(buf, 
-      " Code: $%d. %s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d", 
-      status, message, minRange, maxRange, requestedValue);
-  allocationExCls.Throw(env, buf);
-  delete[] buf;
+  llvm::SmallString<1024> buf;
+  llvm::raw_svector_ostream oss(buf);
+  oss << " Code: " << status << ". " << message << ", Minimum Value: "
+      << minRange << ", Maximum Value: " << maxRange << ", Requested Value: "
+      << requestedValue;
+  env->ThrowNew(allocationExCls, buf.c_str());
+  allocationExCls.Throw(env, buf.c_str());
 }
 
 void ThrowHalHandleException(JNIEnv *env, int32_t status) {
   const char *message = HAL_GetErrorMessage(status);
-  char *buf = new char[strlen(message) + 30];
-  sprintf(buf, " Code: $%d. %s", status, message);
-  halHandleExCls.Throw(env, buf);
-  delete[] buf;
+  llvm::SmallString<1024> buf;
+  llvm::raw_svector_ostream oss(buf);
+  oss << " Code: " << status << ". " << message;
+  halHandleExCls.Throw(env, buf.c_str());
 }
 
 constexpr const char wpilibjPrefix[] = "edu.wpi.first.wpilibj";  
@@ -84,10 +85,10 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   }
   const char *message = HAL_GetErrorMessage(status);
   if (do_throw && status < 0) {
-    char *buf = new char[strlen(message) + 30];
-    sprintf(buf, " Code: %d. %s", status, message);
-    runtimeExCls.Throw(env, buf);
-    delete[] buf;
+    llvm::SmallString<1024> buf;
+    llvm::raw_svector_ostream oss(buf);
+    oss << " Code: " << status << ". " << message;
+    runtimeExCls.Throw(env, buf.c_str());
   } else {
     std::string func;
     auto stack = GetJavaStackTrace<wpilibjPrefix>(env, &func);
@@ -107,10 +108,10 @@ void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange,
     ThrowHalHandleException(env, status);
   }
   const char *message = HAL_GetErrorMessage(status);
-  char *buf = new char[strlen(message) + 30];
-  sprintf(buf, " Code: %d. %s", status, message);
-  runtimeExCls.Throw(env, buf);
-  delete[] buf;
+  llvm::SmallString<1024> buf;
+  llvm::raw_svector_ostream oss(buf);
+  oss << " Code: " << status << ". " << message;
+  runtimeExCls.Throw(env, buf.c_str());
 }
 
 void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
@@ -143,9 +144,10 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
     }
     case ERR_CANSessionMux_NotAllowed:
     case kRIOStatusFeatureNotSupported: {
-      char buf[100];
-      sprintf(buf, "MessageID = %d", message_id);
-      canMessageNotAllowedExCls.Throw(env, buf);
+      llvm::SmallString<100> buf;
+      llvm::raw_svector_ostream oss(buf);
+      oss << "MessageID = " << message_id;
+      canMessageNotAllowedExCls.Throw(env, buf.c_str());
       break;
     }
     case ERR_CANSessionMux_NotInitialized:
@@ -160,9 +162,10 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
       break;
     }
     default: {
-      char buf[100];
-      sprintf(buf, "Fatal status code detected: %d", status);
-      uncleanStatusExCls.Throw(env, buf);
+      llvm::SmallString<100> buf;
+      llvm::raw_svector_ostream oss(buf);
+      oss << "Fatal status code detected: " << status;
+      uncleanStatusExCls.Throw(env, buf.c_str());
       break;
     }
   }

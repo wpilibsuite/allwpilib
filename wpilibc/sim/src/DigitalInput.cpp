@@ -20,9 +20,9 @@ using namespace frc;
  * @param channel The digital channel (1..14).
  */
 DigitalInput::DigitalInput(int channel) : m_channel(channel) {
-  std::stringstream ss;
-  ss << "dio/" << channel;
-  m_impl = new SimDigitalInput(ss.str());
+  std::ostringstream oss;
+  oss << "dio/" << channel;
+  m_impl = new SimDigitalInput(oss.str());
 }
 
 /**

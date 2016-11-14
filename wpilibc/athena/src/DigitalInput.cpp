@@ -8,13 +8,14 @@
 #include "DigitalInput.h"
 
 #include <limits>
-#include <sstream>
 
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -26,7 +27,8 @@ using namespace frc;
  * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
  */
 DigitalInput::DigitalInput(int channel) {
-  std::stringstream buf;
+  llvm::SmallString<32> str;
+  llvm::raw_svector_ostream buf(str);
 
   if (!CheckDigitalChannel(channel)) {
     buf << "Digital Channel " << channel;

@@ -7,11 +7,11 @@
 
 #include "AnalogGyro.h"
 
-#include <sstream>
-
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -34,9 +34,10 @@ const double AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
 void AnalogGyro::InitAnalogGyro(int channel) {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
-  std::stringstream ss;
-  ss << "analog/" << channel;
-  impl = new SimGyro(ss.str());
+  llvm::SmallString<128> buf;
+  llvm::raw_svector_ostream oss(buf);
+  oss << "analog/" << channel;
+  impl = new SimGyro(oss.str());
 
   LiveWindow::GetInstance()->AddSensor("AnalogGyro", channel, this);
 }

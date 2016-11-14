@@ -13,6 +13,7 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "SensorBase.h"
+#include "llvm/raw_ostream.h"
 #include "simulation/SimContinuousOutput.h"
 #include "tables/ITable.h"
 #include "tables/ITableListener.h"
@@ -55,7 +56,7 @@ class Relay : public MotorSafety,
   void StopMotor() override;
   bool IsSafetyEnabled() const override;
   void SetSafetyEnabled(bool enabled) override;
-  void GetDescription(std::ostringstream& desc) const override;
+  void GetDescription(llvm::raw_ostream& desc) const override;
 
   void ValueChanged(ITable* source, llvm::StringRef key,
                     std::shared_ptr<nt::Value> value, bool isNew) override;

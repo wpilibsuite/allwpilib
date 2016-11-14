@@ -8,12 +8,12 @@
 #include "HAL/PWM.h"
 #include "PWM.h"
 
-#include <sstream>
-
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "Utility.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -28,7 +28,8 @@ using namespace frc;
  *                MXP port
  */
 PWM::PWM(int channel) {
-  std::stringstream buf;
+  llvm::SmallString<32> str;
+  llvm::raw_svector_ostream buf(str);
 
   if (!CheckPWMChannel(channel)) {
     buf << "PWM Channel " << channel;

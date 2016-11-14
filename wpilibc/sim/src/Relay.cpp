@@ -7,11 +7,10 @@
 
 #include "Relay.h"
 
-#include <sstream>
-
 #include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
 
 using namespace frc;
 
@@ -26,21 +25,22 @@ using namespace frc;
  */
 Relay::Relay(int channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
-  std::stringstream ss;
+  llvm::SmallString<32> buf;
+  llvm::raw_svector_ostream oss(buf);
   if (!SensorBase::CheckRelayChannel(m_channel)) {
-    ss << "Relay Channel " << m_channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, ss.str());
+    oss << "Relay Channel " << m_channel;
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, oss.str());
     return;
   }
 
   m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
   m_safetyHelper->SetSafetyEnabled(false);
 
-  ss << "relay/" << m_channel;
-  impl = new SimContinuousOutput(ss.str());  // TODO: Allow two different relays
-                                             // (targetting the different halves
-                                             // of a relay) to be combined to
-                                             // control one motor.
+  oss << "relay/" << m_channel;
+
+  // TODO: Allow two different relays (targetting the different halves of a
+  // relay) to be combined to control one motor.
+  impl = new SimContinuousOutput(oss.str());
   LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
   go_pos = go_neg = false;
 }
@@ -194,7 +194,7 @@ bool Relay::IsSafetyEnabled() const {
   return m_safetyHelper->IsSafetyEnabled();
 }
 
-void Relay::GetDescription(std::ostringstream& desc) const {
+void Relay::GetDescription(llvm::raw_ostream& desc) const {
   desc << "Relay " << GetChannel();
 }
 
