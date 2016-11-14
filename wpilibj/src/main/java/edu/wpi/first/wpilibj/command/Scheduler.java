@@ -42,7 +42,10 @@ public class Scheduler implements NamedSendable {
    * @return the {@link Scheduler}
    */
   public static synchronized Scheduler getInstance() {
-    return instance == null ? instance = new Scheduler() : instance;
+    if (instance == null) {
+      instance = new Scheduler();
+    }
+    return instance;
   }
 
   /**
