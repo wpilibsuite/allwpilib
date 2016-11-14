@@ -193,14 +193,10 @@ class ErrorBase {
   /**
    * Retrieve the current global error.
    */
-  static Error& GetGlobalError();
+  static const Error& GetGlobalError();
 
  protected:
   mutable Error m_error;
-
-  // TODO: Replace globalError with a global list of all errors.
-  static wpi::mutex _globalErrorMutex;
-  static Error _globalError;
 };
 
 }  // namespace frc
