@@ -124,12 +124,14 @@ public class NetworkTablesJNI {
 
   public static native void flush();
 
+  @FunctionalInterface
   public interface EntryListenerFunction {
     void apply(int uid, String key, Object value, int flags);
   }
   public static native int addEntryListener(String prefix, EntryListenerFunction listener, int flags);
   public static native void removeEntryListener(int entryListenerUid);
 
+  @FunctionalInterface
   public interface ConnectionListenerFunction {
     void apply(int uid, boolean connected, ConnectionInfo conn);
   }
@@ -165,6 +167,7 @@ public class NetworkTablesJNI {
 
   public static native long now();
 
+  @FunctionalInterface
   public interface LoggerFunction {
     void apply(int level, String file, int line, String msg);
   }
