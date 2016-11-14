@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.function.Consumer;
 import org.opencv.core.Core;
 
 public class CameraServerJNI {
@@ -164,7 +165,7 @@ public class CameraServerJNI {
   //
   // Listener Functions
   //
-  public static native int addListener(VideoListenerFunction listener,
+  public static native int addListener(Consumer<VideoEvent> listener,
                                        int eventMask, boolean immediateNotify);
 
   public static native void removeListener(int handle);

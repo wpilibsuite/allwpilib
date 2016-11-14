@@ -889,7 +889,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSinkEnabled
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    addListener
- * Signature: (Ledu/wpi/cameraserver/CameraServerJNI/ConnectionListenerFunction;IZ)I
+ * Signature: (Ljava/util/function/Consumer;IZ)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_addListener
   (JNIEnv *envouter, jclass, jobject listener, jint eventMask, jboolean immediateNotify)
@@ -904,8 +904,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_addListener
   if (!cls) return 0;
 
   // method ids, on the other hand, are safe to retain
-  jmethodID mid = envouter->GetMethodID(cls, "apply",
-                                        "(Ledu/wpi/cameraserver/VideoEvent;)V");
+  jmethodID mid = envouter->GetMethodID(cls, "accept", "(Ljava/lang/Object;)V");
   if (!mid) return 0;
 
   CS_Status status = 0;
