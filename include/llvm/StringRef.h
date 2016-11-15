@@ -51,6 +51,8 @@ namespace llvm {
     const char *Data;
 
     /// The length of the string.
+    /// MSB of length indicates if we are null terminated or not
+    /// Flag set is null terminated, flag not set is not
     size_t Length;
 
     // Workaround memcmp issue with null pointers (undefined behavior)
@@ -58,6 +60,15 @@ namespace llvm {
     static int compareMemory(const char *Lhs, const char *Rhs, size_t Length) {
       if (Length == 0) { return 0; }
       return ::memcmp(Lhs,Rhs,Length);
+    }
+
+    /// Set the flag to say we are null terminated
+    void set_null_terminated(bool set) {
+      if (set)
+        Length |= ((size_t)1 << (sizeof(size_t) * 8 - 1));
+      else {
+        Length &= ~((size_t)1 << (sizeof(size_t) * 8 - 1));
+      }
     }
 
   public:
@@ -72,6 +83,10 @@ namespace llvm {
       : Data(Str) {
         assert(Str && "StringRef cannot be built from a NULL argument");
         Length = ::strlen(Str); // invoking strlen(NULL) is undefined behavior
+        // Require length to not use MSB of size
+        assert(Length < ~((size_t)1 << (sizeof(size_t) * 8 - 1)));
+        // If from a const char*, we are null terminated
+        set_null_terminated(true);
       }
 
     /// Construct a string ref from a pointer and length.
@@ -79,11 +94,20 @@ namespace llvm {
       : Data(data), Length(length) {
         assert((data || length == 0) &&
         "StringRef cannot be built from a NULL argument with non-null length");
+        // Require length to not use MSB of size
+        assert(Length < ~((size_t)1 << (sizeof(size_t) * 8 - 1)));
+        // If passed an explicit length, we are not null terminated
+        set_null_terminated(false);
       }
 
     /// Construct a string ref from an std::string.
     /*implicit*/ StringRef(const std::string &Str)
-      : Data(Str.data()), Length(Str.length()) {}
+    : Data(Str.data()), Length(Str.length()) {
+        // Require length to not use MSB of size
+        assert(Length < ~((size_t)1 << (sizeof(size_t) * 8 - 1)));
+        // If from a std::string, we are null terminated
+        set_null_terminated(true);
+      }
 
     /// @}
     /// @name Iterators
@@ -91,7 +115,7 @@ namespace llvm {
 
     iterator begin() const { return Data; }
 
-    iterator end() const { return Data + Length; }
+    iterator end() const { return Data + size(); }
 
     const unsigned char *bytes_begin() const {
       return reinterpret_cast<const unsigned char *>(begin());
@@ -111,11 +135,23 @@ namespace llvm {
     /// terminated).
     const char *data() const { return Data; }
 
+    /// c_str - Get a null terminated pointer to the start of the string
+    /// If string is not null terminated, use buffer to store new string
+    const char *c_str(llvm::SmallVectorImpl<char>& buf) const;
+
     /// empty - Check if the string is empty.
-    bool empty() const { return Length == 0; }
+    bool empty() const { return size() == 0; }
 
     /// size - Get the string size.
-    size_t size() const { return Length; }
+    size_t size() const { 
+      return Length & ~((size_t)1 << (sizeof(size_t) * 8 - 1)); 
+    }
+
+    /// is_null_terminated - Get if the string is guaranteed null terminated
+    bool is_null_terminated() const {
+      return (Length & ((size_t)1 << (sizeof(size_t) * 8 - 1))) ==
+             ((size_t)1 << (sizeof(size_t) * 8 - 1));
+    }
 
     /// front - Get the first character in the string.
     char front() const {
@@ -126,7 +162,7 @@ namespace llvm {
     /// back - Get the last character in the string.
     char back() const {
       assert(!empty());
-      return Data[Length-1];
+      return Data[size()-1];
     }
 
     // copy - Allocate copy in Allocator and return StringRef to it.
@@ -134,34 +170,34 @@ namespace llvm {
       // Don't request a length 0 copy from the allocator.
       if (empty())
         return StringRef();
-      char *S = A.template Allocate<char>(Length);
+      char *S = A.template Allocate<char>(size());
       std::copy(begin(), end(), S);
-      return StringRef(S, Length);
+      return StringRef(S, size());
     }
 
     /// equals - Check for string equality, this is more efficient than
     /// compare() when the relative ordering of inequal strings isn't needed.
     bool equals(StringRef RHS) const {
-      return (Length == RHS.Length &&
-              compareMemory(Data, RHS.Data, RHS.Length) == 0);
+      return (size() == RHS.size() &&
+              compareMemory(Data, RHS.Data, RHS.size()) == 0);
     }
 
     /// equals_lower - Check for string equality, ignoring case.
     bool equals_lower(StringRef RHS) const {
-      return Length == RHS.Length && compare_lower(RHS) == 0;
+      return size() == RHS.size() && compare_lower(RHS) == 0;
     }
 
     /// compare - Compare two strings; the result is -1, 0, or 1 if this string
     /// is lexicographically less than, equal to, or greater than the \p RHS.
     int compare(StringRef RHS) const {
       // Check the prefix for a mismatch.
-      if (int Res = compareMemory(Data, RHS.Data, std::min(Length, RHS.Length)))
+      if (int Res = compareMemory(Data, RHS.Data, std::min(size(), RHS.size())))
         return Res < 0 ? -1 : 1;
 
       // Otherwise the prefixes match, so we only need to check the lengths.
-      if (Length == RHS.Length)
+      if (size() == RHS.size())
         return 0;
-      return Length < RHS.Length ? -1 : 1;
+      return size() < RHS.size() ? -1 : 1;
     }
 
     /// compare_lower - Compare two strings, ignoring case.
@@ -174,7 +210,7 @@ namespace llvm {
     /// str - Get the contents as an std::string.
     std::string str() const {
       if (!Data) return std::string();
-      return std::string(Data, Length);
+      return std::string(Data, size());
     }
 
     /// @}
@@ -182,7 +218,7 @@ namespace llvm {
     /// @{
 
     char operator[](size_t Index) const {
-      assert(Index < Length && "Invalid index!");
+      assert(Index < size() && "Invalid index!");
       return Data[Index];
     }
 
@@ -200,8 +236,8 @@ namespace llvm {
 
     /// Check if this string starts with the given \p Prefix.
     bool startswith(StringRef Prefix) const {
-      return Length >= Prefix.Length &&
-             compareMemory(Data, Prefix.Data, Prefix.Length) == 0;
+      return size() >= Prefix.size() &&
+             compareMemory(Data, Prefix.Data, Prefix.size()) == 0;
     }
 
     /// Check if this string starts with the given \p Prefix, ignoring case.
@@ -209,8 +245,8 @@ namespace llvm {
 
     /// Check if this string ends with the given \p Suffix.
     bool endswith(StringRef Suffix) const {
-      return Length >= Suffix.Length &&
-        compareMemory(end() - Suffix.Length, Suffix.Data, Suffix.Length) == 0;
+      return size() >= Suffix.size() &&
+        compareMemory(end() - Suffix.size(), Suffix.Data, Suffix.size()) == 0;
     }
 
     /// Check if this string ends with the given \p Suffix, ignoring case.
@@ -225,10 +261,10 @@ namespace llvm {
     /// \returns The index of the first occurrence of \p C, or npos if not
     /// found.
     size_t find(char C, size_t From = 0) const {
-      size_t FindBegin = std::min(From, Length);
-      if (FindBegin < Length) { // Avoid calling memchr with nullptr.
+      size_t FindBegin = std::min(From, size());
+      if (FindBegin < size()) { // Avoid calling memchr with nullptr.
         // Just forward to memchr, which is faster than a hand-rolled loop.
-        if (const void *P = ::memchr(Data + FindBegin, C, Length - FindBegin))
+        if (const void *P = ::memchr(Data + FindBegin, C, size() - FindBegin))
           return static_cast<const char *>(P) - Data;
       }
       return npos;
@@ -245,7 +281,7 @@ namespace llvm {
     /// \returns The index of the last occurrence of \p C, or npos if not
     /// found.
     size_t rfind(char C, size_t From = npos) const {
-      From = std::min(From, Length);
+      From = std::min(From, size());
       size_t i = From;
       while (i != 0) {
         --i;
@@ -312,7 +348,7 @@ namespace llvm {
     /// Return the number of occurrences of \p C in the string.
     size_t count(char C) const {
       size_t Count = 0;
-      for (size_t i = 0, e = Length; i != e; ++i)
+      for (size_t i = 0, e = size(); i != e; ++i)
         if (Data[i] == C)
           ++Count;
       return Count;
@@ -378,8 +414,8 @@ namespace llvm {
     /// exceeds the number of characters remaining in the string, the string
     /// suffix (starting with \p Start) will be returned.
     StringRef substr(size_t Start, size_t N = npos) const {
-      Start = std::min(Start, Length);
-      return StringRef(Data + Start, std::min(N, Length - Start));
+      Start = std::min(Start, size());
+      return StringRef(Data + Start, std::min(N, size() - Start));
     }
 
     /// Return a StringRef equal to 'this' but with the first \p N elements
@@ -408,8 +444,8 @@ namespace llvm {
     /// will be returned. If this is less than \p Start, an empty string will
     /// be returned.
     StringRef slice(size_t Start, size_t End) const {
-      Start = std::min(Start, Length);
-      End = std::min(std::max(Start, End), Length);
+      Start = std::min(Start, size());
+      End = std::min(std::max(Start, End), size());
       return StringRef(Data + Start, End - Start);
     }
 
@@ -502,25 +538,25 @@ namespace llvm {
     /// Return string with consecutive \p Char characters starting from the
     /// the left removed.
     StringRef ltrim(char Char) const {
-      return drop_front(std::min(Length, find_first_not_of(Char)));
+      return drop_front(std::min(size(), find_first_not_of(Char)));
     }
 
     /// Return string with consecutive characters in \p Chars starting from
     /// the left removed.
     StringRef ltrim(StringRef Chars = " \t\n\v\f\r") const {
-      return drop_front(std::min(Length, find_first_not_of(Chars)));
+      return drop_front(std::min(size(), find_first_not_of(Chars)));
     }
 
     /// Return string with consecutive \p Char characters starting from the
     /// right removed.
     StringRef rtrim(char Char) const {
-      return drop_back(Length - std::min(Length, find_last_not_of(Char) + 1));
+      return drop_back(size() - std::min(size(), find_last_not_of(Char) + 1));
     }
 
     /// Return string with consecutive characters in \p Chars starting from
     /// the right removed.
     StringRef rtrim(StringRef Chars = " \t\n\v\f\r") const {
-      return drop_back(Length - std::min(Length, find_last_not_of(Chars) + 1));
+      return drop_back(size() - std::min(size(), find_last_not_of(Chars) + 1));
     }
 
     /// Return string with consecutive \p Char characters starting from the
