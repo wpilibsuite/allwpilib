@@ -74,6 +74,7 @@ struct RawEvent {
     kSourceDisconnected = CS_SOURCE_DISCONNECTED,
     kSourceVideoModesUpdated = CS_SOURCE_VIDEOMODES_UPDATED,
     kSourceVideoModeChanged = CS_SOURCE_VIDEOMODE_CHANGED,
+    kSinkSourceChanged = CS_SINK_SOURCE_CHANGED,
     kSinkCreated = CS_SINK_CREATED,
     kSinkDestroyed = CS_SINK_DESTROYED,
     kSinkEnabled = CS_SINK_ENABLED,

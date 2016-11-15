@@ -16,6 +16,7 @@ public class VideoEvent {
     kSourceDisconnected(0x0008),
     kSourceVideoModesUpdated(0x0010),
     kSourceVideoModeChanged(0x0020),
+    kSinkSourceChanged(0x0040),
     kSinkCreated(0x0100),
     kSinkDestroyed(0x0200),
     kSinkEnabled(0x0400),
