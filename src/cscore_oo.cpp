@@ -21,6 +21,18 @@ std::vector<VideoProperty> VideoSource::EnumerateProperties() const {
   return properties;
 }
 
+std::vector<VideoSink> VideoSource::EnumerateSinks() {
+  llvm::SmallVector<CS_Sink, 16> handles_buf;
+  CS_Status status = 0;
+  auto handles = EnumerateSourceSinks(m_handle, handles_buf, &status);
+
+  std::vector<VideoSink> sinks;
+  sinks.reserve(handles.size());
+  for (int handle : handles)
+    sinks.emplace_back(VideoSink{handle});
+  return sinks;
+}
+
 std::vector<VideoSource> VideoSource::EnumerateSources() {
   llvm::SmallVector<CS_Source, 16> handles_buf;
   CS_Status status = 0;

@@ -71,16 +71,10 @@ class Handle {
 };
 
 struct SourceData {
-  enum Type {
-    kUnknown = 0,
-    kUSB,
-    kHTTP,
-    kCv
-  };
-  SourceData(Type type_, std::shared_ptr<SourceImpl> source_)
+  SourceData(CS_SourceType type_, std::shared_ptr<SourceImpl> source_)
       : type{type_}, refCount{0}, source{source_} {}
 
-  Type type;
+  CS_SourceType type;
   std::atomic_int refCount;
   std::shared_ptr<SourceImpl> source;
 };
@@ -89,15 +83,10 @@ typedef StaticUnlimitedHandleResource<Handle, SourceData, Handle::kSource>
     Sources;
 
 struct SinkData {
-  enum Type {
-    kUnknown = 0,
-    kHTTP,
-    kCv
-  };
-  explicit SinkData(Type type_, std::shared_ptr<SinkImpl> sink_)
+  explicit SinkData(CS_SinkType type_, std::shared_ptr<SinkImpl> sink_)
       : type{type_}, refCount{0}, sourceHandle{0}, sink{sink_} {}
 
-  Type type;
+  CS_SinkType type;
   std::atomic_int refCount;
   std::atomic<CS_Source> sourceHandle;
   std::shared_ptr<SinkImpl> sink;

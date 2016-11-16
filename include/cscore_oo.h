@@ -83,6 +83,13 @@ class VideoSource {
   friend class VideoSink;
 
  public:
+  enum Type {
+    kUnknown = CS_SOURCE_UNKNOWN,
+    kUSB = CS_SOURCE_USB,
+    kHTTP = CS_SOURCE_HTTP,
+    kCv = CS_SOURCE_CV
+  };
+
   VideoSource() noexcept : m_handle(0) {}
   VideoSource(const VideoSource& source);
   VideoSource(VideoSource&& other) noexcept;
@@ -98,6 +105,9 @@ class VideoSource {
   }
 
   bool operator!=(const VideoSource& other) const { return !(*this == other); }
+
+  /// Get the type of the source.
+  Type GetType() const;
 
   /// Get the name of the source.  The name is an arbitrary identifier
   /// provided when the source is created, and should be unique.
@@ -157,6 +167,10 @@ class VideoSource {
   std::vector<VideoMode> EnumerateVideoModes() const;
 
   CS_Status GetLastStatus() const { return m_status; }
+
+  /// Enumerate all sinks connected to this source.
+  /// @return Vector of sinks.
+  std::vector<VideoSink> EnumerateSinks();
 
   /// Enumerate all existing sources.
   /// @return Vector of sources.
@@ -260,8 +274,15 @@ class CvSource : public VideoSource {
 /// A sink for video that accepts a sequence of frames.
 class VideoSink {
   friend class VideoEvent;
+  friend class VideoSource;
 
  public:
+  enum Type {
+    kUnknown = CS_SINK_UNKNOWN,
+    kMJPEG = CS_SINK_MJPEG,
+    kCv = CS_SINK_CV
+  };
+
   VideoSink() noexcept : m_handle(0) {}
   VideoSink(const VideoSink& sink);
   VideoSink(VideoSink&& sink) noexcept;
@@ -277,6 +298,9 @@ class VideoSink {
   }
 
   bool operator!=(const VideoSink& other) const { return !(*this == other); }
+
+  /// Get the type of the sink.
+  Type GetType() const;
 
   /// Get the name of the sink.  The name is an arbitrary identifier
   /// provided when the sink is created, and should be unique.

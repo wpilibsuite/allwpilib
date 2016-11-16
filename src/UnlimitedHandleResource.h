@@ -55,6 +55,10 @@ class UnlimitedHandleResource {
   template <typename T>
   llvm::ArrayRef<T> GetAll(llvm::SmallVectorImpl<T>& vec);
 
+  // @param func functor with (THandle, const TStruct&) parameters
+  template <typename F>
+  void ForEach(F func);
+
  private:
   THandle MakeHandle(size_t i) {
     return THandle{static_cast<int>(i),
@@ -128,12 +132,19 @@ template <typename T>
 llvm::ArrayRef<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
     llvm::SmallVectorImpl<T>& vec) {
+  ForEach([&](THandle handle, const TStruct& data) { vec.push_back(handle); });
+  return vec;
+}
+
+template <typename THandle, typename TStruct, int typeValue, typename TMutex>
+template <typename F>
+void UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::ForEach(
+    F func) {
   std::lock_guard<TMutex> sync(m_handleMutex);
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
-    if (m_structures[i] != nullptr) vec.push_back(MakeHandle(i));
+    if (m_structures[i] != nullptr) func(MakeHandle(i), *(m_structures[i]));
   }
-  return vec;
 }
 
 template <typename THandle, typename TStruct, int typeValue,

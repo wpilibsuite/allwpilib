@@ -696,7 +696,7 @@ CS_Sink CreateMJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress,
       name, desc.str(),
       std::unique_ptr<wpi::NetworkAcceptor>(
           new wpi::TCPAcceptor(port, str.c_str(), Logger::GetInstance())));
-  return Sinks::GetInstance().Allocate(SinkData::kHTTP, sink);
+  return Sinks::GetInstance().Allocate(CS_SINK_MJPEG, sink);
 }
 
 }  // namespace cs

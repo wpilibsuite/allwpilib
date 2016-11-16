@@ -93,6 +93,11 @@ inline VideoSource::~VideoSource() {
   if (m_handle != 0) ReleaseSource(m_handle, &m_status);
 }
 
+inline VideoSource::Type VideoSource::GetType() const {
+  m_status = 0;
+  return static_cast<VideoSource::Type>(GetSourceType(m_handle, &m_status));
+}
+
 inline std::string VideoSource::GetName() const {
   m_status = 0;
   return GetSourceName(m_handle, &m_status);
@@ -234,6 +239,11 @@ inline VideoSink& VideoSink::operator=(VideoSink other) noexcept {
 inline VideoSink::~VideoSink() {
   m_status = 0;
   if (m_handle != 0) ReleaseSink(m_handle, &m_status);
+}
+
+inline VideoSink::Type VideoSink::GetType() const {
+  m_status = 0;
+  return static_cast<VideoSink::Type>(GetSinkType(m_handle, &m_status));
 }
 
 inline std::string VideoSink::GetName() const {

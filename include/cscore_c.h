@@ -86,6 +86,25 @@ enum CS_PropertyType {
 };
 
 //
+// Source types
+//
+enum CS_SourceType {
+  CS_SOURCE_UNKNOWN = 0,
+  CS_SOURCE_USB = 1,
+  CS_SOURCE_HTTP = 2,
+  CS_SOURCE_CV = 4
+};
+
+//
+// Sink types
+//
+enum CS_SinkType {
+  CS_SINK_UNKNOWN = 0,
+  CS_SINK_MJPEG = 2,
+  CS_SINK_CV = 4
+};
+
+//
 // Listener event types
 //
 enum CS_EventType {
@@ -160,6 +179,7 @@ CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
 //
 // Source Functions
 //
+CS_SourceType CS_GetSourceType(CS_Source source, CS_Status* status);
 char* CS_GetSourceName(CS_Source source, CS_Status* status);
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
@@ -184,6 +204,8 @@ CS_Bool CS_SetSourceResolution(CS_Source source, int width, int height,
 CS_Bool CS_SetSourceFPS(CS_Source source, int fps, CS_Status* status);
 CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
                                            CS_Status* status);
+CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
+                                 CS_Status* status);
 CS_Source CS_CopySource(CS_Source source, CS_Status* status);
 void CS_ReleaseSource(CS_Source source, CS_Status* status);
 
@@ -218,6 +240,7 @@ CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
 //
 // Sink Functions
 //
+CS_SinkType CS_GetSinkType(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status);
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);

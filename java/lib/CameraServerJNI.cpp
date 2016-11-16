@@ -400,6 +400,20 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createCvSource
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getSourceType
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSourceType
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status = 0;
+  auto val = cs::GetSourceType(source, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    getSourceName
  * Signature: (I)Ljava/lang/String;
  */
@@ -584,6 +598,21 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateSour
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    enumerateSourceSinks
+ * Signature: (I)[I
+ */
+JNIEXPORT jintArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceSinks
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status = 0;
+  llvm::SmallVector<CS_Sink, 16> buf;
+  auto arr = cs::EnumerateSourceSinks(source, buf, &status);
+  if (!CheckStatus(env, status)) return nullptr;
+  return MakeJIntArray(env, arr);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    copySource
  * Signature: (I)I
  */
@@ -728,6 +757,20 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createCvSink
 {
   CS_Status status = 0;
   auto val = cs::CreateCvSink(JStringRef{env, name}, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getSinkType
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSinkType
+  (JNIEnv *env, jclass, jint sink)
+{
+  CS_Status status = 0;
+  auto val = cs::GetSinkType(sink, &status);
   CheckStatus(env, status);
   return val;
 }

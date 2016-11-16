@@ -165,6 +165,7 @@ CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
 //
 // Source Functions
 //
+CS_SourceType GetSourceType(CS_Source source, CS_Status* status);
 std::string GetSourceName(CS_Source source, CS_Status* status);
 llvm::StringRef GetSourceName(CS_Source source,
                               llvm::SmallVectorImpl<char>& buf,
@@ -190,6 +191,8 @@ bool SetSourceResolution(CS_Source source, int width, int height,
 bool SetSourceFPS(CS_Source source, int fps, CS_Status* status);
 std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
                                                  CS_Status* status);
+llvm::ArrayRef<CS_Sink> EnumerateSourceSinks(
+    CS_Source source, llvm::SmallVectorImpl<CS_Sink>& vec, CS_Status* status);
 CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 
@@ -223,6 +226,7 @@ CS_Sink CreateCvSinkCallback(llvm::StringRef name,
 //
 // Sink Functions
 //
+CS_SinkType GetSinkType(CS_Sink sink, CS_Status* status);
 std::string GetSinkName(CS_Sink sink, CS_Status* status);
 llvm::StringRef GetSinkName(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
                             CS_Status* status);

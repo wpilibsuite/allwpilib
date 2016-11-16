@@ -152,6 +152,15 @@ CS_Source CreateHTTPCamera(llvm::StringRef name, llvm::StringRef url,
 // Source Functions
 //
 
+CS_SourceType GetSourceType(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return CS_SOURCE_UNKNOWN;
+  }
+  return data->type;
+}
+
 std::string GetSourceName(CS_Source source, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
@@ -299,6 +308,20 @@ std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
   return data->source->EnumerateVideoModes(status);
 }
 
+llvm::ArrayRef<CS_Sink> EnumerateSourceSinks(
+    CS_Source source, llvm::SmallVectorImpl<CS_Sink>& vec, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return llvm::ArrayRef<CS_Sink>{};
+  }
+  vec.clear();
+  Sinks::GetInstance().ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
+    if (source == data.sourceHandle.load()) vec.push_back(sinkHandle);
+  });
+  return vec;
+}
+
 CS_Source CopySource(CS_Source source, CS_Status* status) {
   if (source == 0) return 0;
   auto data = Sources::GetInstance().Get(source);
@@ -324,6 +347,15 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
 //
 // Sink Functions
 //
+
+CS_SinkType GetSinkType(CS_Sink sink, CS_Status* status) {
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return CS_SINK_UNKNOWN;
+  }
+  return data->type;
+}
 
 std::string GetSinkName(CS_Sink sink, CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);

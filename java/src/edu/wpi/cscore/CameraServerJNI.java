@@ -110,6 +110,7 @@ public class CameraServerJNI {
   //
   // Source Functions
   //
+  public static native int getSourceType(int source);
   public static native String getSourceName(int source);
   public static native String getSourceDescription(int source);
   public static native long getSourceLastFrameTime(int source);
@@ -122,6 +123,7 @@ public class CameraServerJNI {
   public static native boolean setSourceResolution(int source, int width, int height);
   public static native boolean setSourceFPS(int source, int fps);
   public static native VideoMode[] enumerateSourceVideoModes(int source);
+  public static native int[] enumerateSourceSinks(int source);
   public static native int copySource(int source);
   public static native void releaseSource(int source);
 
@@ -146,6 +148,7 @@ public class CameraServerJNI {
   //
   // Sink Functions
   //
+  public static native int getSinkType(int sink);
   public static native String getSinkName(int sink);
   public static native String getSinkDescription(int sink);
   public static native void setSinkSource(int sink, int source);

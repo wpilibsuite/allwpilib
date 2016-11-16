@@ -1360,7 +1360,7 @@ CS_Source CreateUSBCameraDev(llvm::StringRef name, int dev, CS_Status* status) {
 CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status) {
   auto source = std::make_shared<USBCameraImpl>(name, path);
-  return Sources::GetInstance().Allocate(SourceData::kUSB, source);
+  return Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
 }
 
 std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {

@@ -11,6 +11,20 @@ package edu.wpi.cscore;
 /// consist of multiple images (e.g. from a stereo or depth camera); these
 /// are called channels.
 public class VideoSource {
+  public enum Type {
+    kUnknown(0), kUSB(1), kHTTP(2), kCv(4);
+    private int value;
+
+    private Type(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+  }
+  static final Type[] m_typeValues = Type.values();
+
   protected VideoSource(int handle) {
     m_handle = handle;
   }
@@ -40,6 +54,11 @@ public class VideoSource {
 
   public int hashCode() {
     return m_handle;
+  }
+
+  /// Get the type of the source.
+  public Type getType() {
+    return m_typeValues[CameraServerJNI.getSourceType(m_handle)];
   }
 
   /// Get the name of the source.  The name is an arbitrary identifier
@@ -127,6 +146,17 @@ public class VideoSource {
   /// Enumerate all known video modes for this source.
   public VideoMode[] enumerateVideoModes() {
     return CameraServerJNI.enumerateSourceVideoModes(m_handle);
+  }
+
+  /// Enumerate all sinks connected to this source.
+  /// @return Vector of sinks.
+  public VideoSink[] enumerateSinks() {
+    int[] handles = CameraServerJNI.enumerateSourceSinks(m_handle);
+    VideoSink[] rv = new VideoSink[handles.length];
+    for (int i=0; i<handles.length; i++) {
+      rv[i] = new VideoSink(handles[i]);
+    }
+    return rv;
   }
 
   /// Enumerate all existing sources.

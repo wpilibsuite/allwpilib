@@ -97,20 +97,20 @@ namespace cs {
 
 CS_Sink CreateCvSink(llvm::StringRef name, CS_Status* status) {
   auto sink = std::make_shared<CvSinkImpl>(name);
-  return Sinks::GetInstance().Allocate(SinkData::kCv, sink);
+  return Sinks::GetInstance().Allocate(CS_SINK_CV, sink);
 }
 
 CS_Sink CreateCvSinkCallback(llvm::StringRef name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status) {
   auto sink = std::make_shared<CvSinkImpl>(name, processFrame);
-  return Sinks::GetInstance().Allocate(SinkData::kCv, sink);
+  return Sinks::GetInstance().Allocate(CS_SINK_CV, sink);
 }
 
 void SetSinkDescription(CS_Sink sink, llvm::StringRef description,
                         CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
-  if (!data || data->type != SinkData::kCv) {
+  if (!data || data->type != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -119,7 +119,7 @@ void SetSinkDescription(CS_Sink sink, llvm::StringRef description,
 
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
-  if (!data || data->type != SinkData::kCv) {
+  if (!data || data->type != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
@@ -128,7 +128,7 @@ uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status) {
 
 std::string GetSinkError(CS_Sink sink, CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
-  if (!data || data->type != SinkData::kCv) {
+  if (!data || data->type != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
   }
@@ -138,7 +138,7 @@ std::string GetSinkError(CS_Sink sink, CS_Status* status) {
 llvm::StringRef GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
                              CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
-  if (!data || data->type != SinkData::kCv) {
+  if (!data || data->type != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return llvm::StringRef{};
   }
@@ -147,7 +147,7 @@ llvm::StringRef GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
 
 void SetSinkEnabled(CS_Sink sink, bool enabled, CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
-  if (!data || data->type != SinkData::kCv) {
+  if (!data || data->type != CS_SINK_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }

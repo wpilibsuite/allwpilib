@@ -80,6 +80,10 @@ CS_Source CS_CreateHTTPCamera(const char* name, const char* url,
   return cs::CreateHTTPCamera(name, url, status);
 }
 
+CS_SourceType CS_GetSourceType(CS_Source source, CS_Status* status) {
+  return cs::GetSourceType(source, status);
+}
+
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, status);
@@ -168,12 +172,27 @@ CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
   return out;
 }
 
+CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
+                                 CS_Status* status) {
+  llvm::SmallVector<CS_Sink, 32> buf;
+  auto handles = cs::EnumerateSourceSinks(source, buf, status);
+  CS_Sink* sinks =
+      static_cast<CS_Sink*>(std::malloc(handles.size() * sizeof(CS_Sink)));
+  *count = handles.size();
+  std::copy(handles.begin(), handles.end(), sinks);
+  return sinks;
+}
+
 CS_Source CS_CopySource(CS_Source source, CS_Status* status) {
   return cs::CopySource(source, status);
 }
 
 void CS_ReleaseSource(CS_Source source, CS_Status* status) {
   return cs::ReleaseSource(source, status);
+}
+
+CS_SinkType CS_GetSinkType(CS_Sink sink, CS_Status* status) {
+  return cs::GetSinkType(sink, status);
 }
 
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {

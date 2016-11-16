@@ -157,12 +157,12 @@ namespace cs {
 CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
                          CS_Status* status) {
   auto source = std::make_shared<CvSourceImpl>(name, mode);
-  return Sources::GetInstance().Allocate(SourceData::kCv, source);
+  return Sources::GetInstance().Allocate(CS_SOURCE_CV, source);
 }
 
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
+  if (!data || data->type != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -172,7 +172,7 @@ void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
 void NotifySourceError(CS_Source source, llvm::StringRef msg,
                        CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
+  if (!data || data->type != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -181,7 +181,7 @@ void NotifySourceError(CS_Source source, llvm::StringRef msg,
 
 void SetSourceConnected(CS_Source source, bool connected, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
+  if (!data || data->type != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -191,7 +191,7 @@ void SetSourceConnected(CS_Source source, bool connected, CS_Status* status) {
 void SetSourceDescription(CS_Source source, llvm::StringRef description,
                           CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
+  if (!data || data->type != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -203,7 +203,7 @@ CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
                                  int step, int defaultValue, int value,
                                  CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
+  if (!data || data->type != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return -1;
   }
@@ -216,7 +216,7 @@ CS_Property CreateSourcePropertyCallback(
     int maximum, int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
+  if (!data || data->type != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return -1;
   }
@@ -229,7 +229,7 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                   llvm::ArrayRef<std::string> choices,
                                   CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != SourceData::kCv) {
+  if (!data || data->type != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }

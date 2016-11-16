@@ -11,6 +11,20 @@ package edu.wpi.cscore;
 /// consist of multiple images (e.g. from a stereo or depth camera); these
 /// are called channels.
 public class VideoSink {
+  public enum Type {
+    kUnknown(0), kMJPEG(2), kCv(4);
+    private int value;
+
+    private Type(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+  }
+  static final Type[] m_typeValues = Type.values();
+
   protected VideoSink(int handle) {
     m_handle = handle;
   }
@@ -40,6 +54,11 @@ public class VideoSink {
 
   public int hashCode() {
     return m_handle;
+  }
+
+  /// Get the type of the sink.
+  public Type getType() {
+    return m_typeValues[CameraServerJNI.getSinkType(m_handle)];
   }
 
   /// Get the name of the sink.  The name is an arbitrary identifier
