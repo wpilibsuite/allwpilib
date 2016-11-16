@@ -15,7 +15,7 @@ int main() {
     llvm::outs() << "Properties:\n";
     for (const auto& prop : camera.EnumerateProperties()) {
       llvm::outs() << "  " << prop.GetName() << ": ";
-      switch (prop.type()) {
+      switch (prop.GetType()) {
         case cs::VideoProperty::kBoolean:
           llvm::outs() << "value=" << prop.Get()
                        << " default=" << prop.GetDefault();

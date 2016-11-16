@@ -26,7 +26,7 @@ public class VideoProperty {
     return CameraServerJNI.getPropertyName(m_handle);
   }
 
-  public Type type() {
+  public Type getType() {
     return m_type;
   }
 

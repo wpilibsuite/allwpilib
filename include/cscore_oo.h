@@ -41,7 +41,7 @@ class VideoProperty {
 
   std::string GetName() const;
 
-  Type type() const { return m_type; }
+  Type GetType() const { return m_type; }
 
   explicit operator bool() const { return m_type != kNone; }
 
