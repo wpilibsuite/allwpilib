@@ -84,7 +84,7 @@ class SourceImpl {
   int GetPropertyIndex(llvm::StringRef name) const;
   llvm::ArrayRef<int> EnumerateProperties(llvm::SmallVectorImpl<int>& vec,
                                           CS_Status* status) const;
-  CS_PropertyType GetPropertyType(int property) const;
+  CS_PropertyKind GetPropertyKind(int property) const;
   llvm::StringRef GetPropertyName(int property,
                                   llvm::SmallVectorImpl<char>& buf,
                                   CS_Status* status) const;
@@ -138,10 +138,10 @@ class SourceImpl {
   class PropertyBase {
    public:
     PropertyBase() = default;
-    PropertyBase(llvm::StringRef name_, CS_PropertyType type_, int minimum_,
+    PropertyBase(llvm::StringRef name_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
         : name{name_},
-          propType{type_},
+          propKind{kind_},
           minimum{minimum_},
           maximum{maximum_},
           step{step_},
@@ -152,7 +152,7 @@ class SourceImpl {
     PropertyBase& operator=(const PropertyBase& oth) = delete;
 
     std::string name;
-    CS_PropertyType propType{CS_PROP_NONE};
+    CS_PropertyKind propKind{CS_PROP_NONE};
     int minimum;
     int maximum;
     int step;

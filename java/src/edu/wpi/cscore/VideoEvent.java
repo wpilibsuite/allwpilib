@@ -9,7 +9,7 @@ package edu.wpi.cscore;
 
 /// Video event
 public class VideoEvent {
-  public enum Type {
+  public enum Kind {
     kSourceCreated(0x0001),
     kSourceDestroyed(0x0002),
     kSourceConnected(0x0004),
@@ -27,7 +27,7 @@ public class VideoEvent {
 
     private int value;
 
-    private Type(int value) {
+    private Kind(int value) {
       this.value = value;
     }
 
@@ -35,23 +35,23 @@ public class VideoEvent {
       return value;
     }
   }
-  private static final Type[] m_typeValues = Type.values();
+  private static final Kind[] m_kindValues = Kind.values();
 
-  VideoEvent(int type, int source, int sink, String name, int pixelFormat,
-             int width, int height, int fps, int property, int propertyType,
+  VideoEvent(int kind, int source, int sink, String name, int pixelFormat,
+             int width, int height, int fps, int property, int propertyKind,
              int value, String valueStr) {
-    this.type = m_typeValues[type];
+    this.kind = m_kindValues[kind];
     this.sourceHandle = source;
     this.sinkHandle = sink;
     this.name = name;
     this.mode = new VideoMode(pixelFormat, width, height, fps);
     this.propertyHandle = property;
-    this.propertyType = VideoProperty.m_typeValues[propertyType];
+    this.propertyKind = VideoProperty.m_kindValues[propertyKind];
     this.value = value;
     this.valueStr = valueStr;
   }
 
-  public Type type;
+  public Kind kind;
 
   // Valid for kSource* and kSink* respectively
   private int sourceHandle;
@@ -65,7 +65,7 @@ public class VideoEvent {
 
   // Fields for kSourceProperty* events
   private int propertyHandle;
-  public VideoProperty.Type propertyType;
+  public VideoProperty.Kind propertyKind;
   public int value;
   public String valueStr;
 
@@ -78,7 +78,7 @@ public class VideoEvent {
   }
 
   public VideoProperty getProperty() {
-    return new VideoProperty(propertyHandle, propertyType);
+    return new VideoProperty(propertyHandle, propertyKind);
   }
 
 }

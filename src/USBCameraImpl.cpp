@@ -91,21 +91,21 @@ USBCameraImpl::PropertyData::PropertyData(
                    ctrl.step, ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
-  // propType
+  // propKind
   switch (ctrl.type) {
     case V4L2_CTRL_TYPE_INTEGER:
     case V4L2_CTRL_TYPE_INTEGER64:
-      propType = CS_PROP_INTEGER;
+      propKind = CS_PROP_INTEGER;
       break;
     case V4L2_CTRL_TYPE_BOOLEAN:
-      propType = CS_PROP_BOOLEAN;
+      propKind = CS_PROP_BOOLEAN;
       break;
     case V4L2_CTRL_TYPE_INTEGER_MENU:
     case V4L2_CTRL_TYPE_MENU:
-      propType = CS_PROP_ENUM;
+      propKind = CS_PROP_ENUM;
       break;
     case V4L2_CTRL_TYPE_STRING:
-      propType = CS_PROP_STRING;
+      propKind = CS_PROP_STRING;
       break;
     default:
       return;  // others unsupported
@@ -124,21 +124,21 @@ USBCameraImpl::PropertyData::PropertyData(const struct v4l2_queryctrl& ctrl)
                    ctrl.step, ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
-  // propType
+  // propKind
   switch (ctrl.type) {
     case V4L2_CTRL_TYPE_INTEGER:
     case V4L2_CTRL_TYPE_INTEGER64:
-      propType = CS_PROP_INTEGER;
+      propKind = CS_PROP_INTEGER;
       break;
     case V4L2_CTRL_TYPE_BOOLEAN:
-      propType = CS_PROP_BOOLEAN;
+      propKind = CS_PROP_BOOLEAN;
       break;
     case V4L2_CTRL_TYPE_INTEGER_MENU:
     case V4L2_CTRL_TYPE_MENU:
-      propType = CS_PROP_ENUM;
+      propKind = CS_PROP_ENUM;
       break;
     case V4L2_CTRL_TYPE_STRING:
-      propType = CS_PROP_STRING;
+      propKind = CS_PROP_STRING;
       break;
     default:
       return;  // others unsupported
@@ -198,7 +198,7 @@ static std::unique_ptr<USBCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
   }
 
   // Cache enum property choices
-  if (prop->propType == CS_PROP_ENUM) {
+  if (prop->propKind == CS_PROP_ENUM) {
     prop->enumChoices.resize(prop->maximum + 1);
     v4l2_querymenu qmenu;
     std::memset(&qmenu, 0, sizeof(qmenu));
@@ -726,12 +726,12 @@ void USBCameraImpl::DeviceProcessCommands() {
     auto msg = std::move(m_commands.back());
     m_commands.pop_back();
 
-    if (msg->type == Message::kCmdSetMode ||
-        msg->type == Message::kCmdSetPixelFormat ||
-        msg->type == Message::kCmdSetResolution ||
-        msg->type == Message::kCmdSetFPS) {
+    if (msg->kind == Message::kCmdSetMode ||
+        msg->kind == Message::kCmdSetPixelFormat ||
+        msg->kind == Message::kCmdSetResolution ||
+        msg->kind == Message::kCmdSetFPS) {
       VideoMode newMode;
-      if (msg->type == Message::kCmdSetMode) {
+      if (msg->kind == Message::kCmdSetMode) {
         newMode.pixelFormat = msg->data[0];
         newMode.width = msg->data[1];
         newMode.height = msg->data[2];
@@ -739,16 +739,16 @@ void USBCameraImpl::DeviceProcessCommands() {
         m_modeSetPixelFormat = true;
         m_modeSetResolution = true;
         m_modeSetFPS = true;
-      } else if (msg->type == Message::kCmdSetPixelFormat) {
+      } else if (msg->kind == Message::kCmdSetPixelFormat) {
         newMode = m_mode;
         newMode.pixelFormat = msg->data[0];
         m_modeSetPixelFormat = true;
-      } else if (msg->type == Message::kCmdSetResolution) {
+      } else if (msg->kind == Message::kCmdSetResolution) {
         newMode = m_mode;
         newMode.width = msg->data[0];
         newMode.height = msg->data[1];
         m_modeSetResolution = true;
-      } else if (msg->type == Message::kCmdSetFPS) {
+      } else if (msg->kind == Message::kCmdSetFPS) {
         newMode = m_mode;
         newMode.fps = msg->data[0];
         m_modeSetFPS = true;
@@ -774,25 +774,25 @@ void USBCameraImpl::DeviceProcessCommands() {
         DeviceSetFPS();
         lock.lock();
       }
-    } else if (msg->type == Message::kCmdSetProperty ||
-               msg->type == Message::kCmdSetPropertyStr) {
+    } else if (msg->kind == Message::kCmdSetProperty ||
+               msg->kind == Message::kCmdSetPropertyStr) {
       int property = msg->data[0];
 
       // Look up
       auto prop = static_cast<PropertyData*>(GetProperty(property));
       if (!prop) {
-        msg->type = Message::kError;
+        msg->kind = Message::kError;
         msg->data[0] = CS_INVALID_PROPERTY;
         goto done;
       }
 
-      // Check type match
-      if ((msg->type == Message::kCmdSetPropertyStr &&
-           prop->propType != CS_PROP_STRING) ||
-          (msg->type == Message::kCmdSetProperty &&
-           (prop->propType &
+      // Check kind match
+      if ((msg->kind == Message::kCmdSetPropertyStr &&
+           prop->propKind != CS_PROP_STRING) ||
+          (msg->kind == Message::kCmdSetProperty &&
+           (prop->propKind &
             (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) == 0)) {
-        msg->type = Message::kError;
+        msg->kind = Message::kError;
         msg->data[0] = CS_WRONG_PROPERTY_TYPE;
         goto done;
       }
@@ -808,7 +808,7 @@ void USBCameraImpl::DeviceProcessCommands() {
 
         // Set the property value on the device
         lock.unlock();
-        if (msg->type == Message::kCmdSetPropertyStr)
+        if (msg->kind == Message::kCmdSetPropertyStr)
           rv = SetStringCtrlIoctl(fd, id, maximum, msg->dataStr);
         else
           rv =
@@ -816,7 +816,7 @@ void USBCameraImpl::DeviceProcessCommands() {
         lock.lock();
 
         if (rv < 0) {
-          msg->type = Message::kError;
+          msg->kind = Message::kError;
           msg->data[0] = CS_PROPERTY_WRITE_FAILED;
           goto done;
         }
@@ -825,14 +825,14 @@ void USBCameraImpl::DeviceProcessCommands() {
       // Cache the set value.  We need to re-get the pointer due to
       // releasing the lock.
       prop = static_cast<PropertyData*>(GetProperty(property));
-      if (msg->type == Message::kCmdSetPropertyStr)
+      if (msg->kind == Message::kCmdSetPropertyStr)
         prop->valueStr = msg->dataStr;
       else
         prop->value = msg->data[1];
       prop->valueSet = true;
-      msg->type = Message::kOk;
-    } else if (msg->type == Message::kNumSinksChanged ||
-               msg->type == Message::kNumSinksEnabledChanged) {
+      msg->kind = Message::kOk;
+    } else if (msg->kind == Message::kNumSinksChanged ||
+               msg->kind == Message::kNumSinksEnabledChanged) {
       // These are send-only messages, so recycle here.  DestroyMessage needs
       // the mutex, so unlock it.  We don't actually do anything directly
       // based on these messages (instead we check in the main loop), but
@@ -841,7 +841,7 @@ void USBCameraImpl::DeviceProcessCommands() {
       DestroyMessage(std::move(msg));
       lock.lock();
     } else {
-      msg->type = Message::kNone;
+      msg->kind = Message::kNone;
     }
 
 done:
@@ -1128,7 +1128,7 @@ bool USBCameraImpl::DeviceGetProperty(PropertyData* prop) {
   if (fd < 0) return true;
   int rv = 0;
 
-  switch (prop->propType) {
+  switch (prop->propKind) {
     case CS_PROP_BOOLEAN:
     case CS_PROP_INTEGER:
     case CS_PROP_ENUM:
@@ -1155,7 +1155,7 @@ bool USBCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
   unsigned id = prop.id;
   int rv = 0;
 
-  switch (prop.propType) {
+  switch (prop.propKind) {
     case CS_PROP_BOOLEAN:
     case CS_PROP_INTEGER:
     case CS_PROP_ENUM:
@@ -1264,7 +1264,7 @@ void USBCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   msg->data[1] = value;
   msg = std::move(SendAndWait(std::move(msg)));
   if (!msg) return;
-  if (msg->type == Message::kError) *status = msg->data[0];
+  if (msg->kind == Message::kError) *status = msg->data[0];
   DestroyMessage(std::move(msg));
 }
 
@@ -1275,7 +1275,7 @@ void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value,
   msg->dataStr = value;
   msg = std::move(SendAndWait(std::move(msg)));
   if (!msg) return;
-  if (msg->type == Message::kError) *status = msg->data[0];
+  if (msg->kind == Message::kError) *status = msg->data[0];
   DestroyMessage(std::move(msg));
 }
 
@@ -1288,7 +1288,7 @@ bool USBCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   msg = std::move(SendAndWait(std::move(msg)));
   if (!msg) return false;
   bool rv = true;
-  if (msg->type == Message::kError) {
+  if (msg->kind == Message::kError) {
     *status = msg->data[0];
     rv = false;
   }
@@ -1303,7 +1303,7 @@ bool USBCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
   msg = std::move(SendAndWait(std::move(msg)));
   if (!msg) return false;
   bool rv = true;
-  if (msg->type == Message::kError) {
+  if (msg->kind == Message::kError) {
     *status = msg->data[0];
     rv = false;
   }
@@ -1318,7 +1318,7 @@ bool USBCameraImpl::SetResolution(int width, int height, CS_Status* status) {
   msg = std::move(SendAndWait(std::move(msg)));
   if (!msg) return false;
   bool rv = true;
-  if (msg->type == Message::kError) {
+  if (msg->kind == Message::kError) {
     *status = msg->data[0];
     rv = false;
   }
@@ -1332,7 +1332,7 @@ bool USBCameraImpl::SetFPS(int fps, CS_Status* status) {
   msg = std::move(SendAndWait(std::move(msg)));
   if (!msg) return false;
   bool rv = true;
-  if (msg->type == Message::kError) {
+  if (msg->kind == Message::kError) {
     *status = msg->data[0];
     rv = false;
   }

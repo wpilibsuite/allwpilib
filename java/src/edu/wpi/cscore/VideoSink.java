@@ -11,11 +11,11 @@ package edu.wpi.cscore;
 /// consist of multiple images (e.g. from a stereo or depth camera); these
 /// are called channels.
 public class VideoSink {
-  public enum Type {
+  public enum Kind {
     kUnknown(0), kMJPEG(2), kCv(4);
     private int value;
 
-    private Type(int value) {
+    private Kind(int value) {
       this.value = value;
     }
 
@@ -23,7 +23,7 @@ public class VideoSink {
       return value;
     }
   }
-  static final Type[] m_typeValues = Type.values();
+  static final Kind[] m_kindValues = Kind.values();
 
   protected VideoSink(int handle) {
     m_handle = handle;
@@ -56,9 +56,9 @@ public class VideoSink {
     return m_handle;
   }
 
-  /// Get the type of the sink.
-  public Type getType() {
-    return m_typeValues[CameraServerJNI.getSinkType(m_handle)];
+  /// Get the kind of the sink.
+  public Kind getKind() {
+    return m_kindValues[CameraServerJNI.getSinkKind(m_handle)];
   }
 
   /// Get the name of the sink.  The name is an arbitrary identifier
@@ -67,7 +67,7 @@ public class VideoSink {
     return CameraServerJNI.getSinkName(m_handle);
   }
 
-  /// Get the sink description.  This is sink-type specific.
+  /// Get the sink description.  This is sink-kind specific.
   public String getDescription() {
     return CameraServerJNI.getSinkDescription(m_handle);
   }
@@ -90,7 +90,7 @@ public class VideoSink {
 
   /// Get a property of the associated source.
   /// @param name Property name
-  /// @return Property (type Property::kNone if no property with
+  /// @return Property (kind Property::kNone if no property with
   ///         the given name exists or no source connected)
   public VideoProperty getSourceProperty(String name) {
     return new VideoProperty(

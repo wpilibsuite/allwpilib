@@ -18,8 +18,8 @@
 
 extern "C" {
 
-CS_PropertyType CS_GetPropertyType(CS_Property property, CS_Status* status) {
-  return cs::GetPropertyType(property, status);
+CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
+  return cs::GetPropertyKind(property, status);
 }
 
 char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
@@ -80,8 +80,8 @@ CS_Source CS_CreateHTTPCamera(const char* name, const char* url,
   return cs::CreateHTTPCamera(name, url, status);
 }
 
-CS_SourceType CS_GetSourceType(CS_Source source, CS_Status* status) {
-  return cs::GetSourceType(source, status);
+CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
+  return cs::GetSourceKind(source, status);
 }
 
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
@@ -191,8 +191,8 @@ void CS_ReleaseSource(CS_Source source, CS_Status* status) {
   return cs::ReleaseSource(source, status);
 }
 
-CS_SinkType CS_GetSinkType(CS_Sink sink, CS_Status* status) {
-  return cs::GetSinkType(sink, status);
+CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
+  return cs::GetSinkKind(sink, status);
 }
 
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
@@ -245,13 +245,13 @@ CS_Listener CS_AddListener(void* data,
   return cs::AddListener(
       [=](const cs::RawEvent& rawEvent) {
         CS_Event event;
-        event.type = static_cast<CS_EventType>(static_cast<int>(rawEvent.type));
+        event.kind = static_cast<CS_EventKind>(static_cast<int>(rawEvent.kind));
         event.source = rawEvent.sourceHandle;
         event.sink = rawEvent.sinkHandle;
         event.name = rawEvent.name.c_str();
         event.mode = rawEvent.mode;
         event.property = rawEvent.propertyHandle;
-        event.propertyType = rawEvent.propertyType;
+        event.propertyKind = rawEvent.propertyKind;
         event.value = rawEvent.value;
         event.valueStr = rawEvent.valueStr.c_str();
         callback(data, &event);

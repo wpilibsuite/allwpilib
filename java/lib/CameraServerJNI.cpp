@@ -164,7 +164,7 @@ static jobject MakeJObject(JNIEnv *env, const cs::RawEvent &event) {
   return env->NewObject(
       videoEventCls,
       constructor,
-      static_cast<jint>(event.type),
+      static_cast<jint>(event.kind),
       static_cast<jint>(event.sourceHandle),
       static_cast<jint>(event.sinkHandle),
       name.obj(),
@@ -173,7 +173,7 @@ static jobject MakeJObject(JNIEnv *env, const cs::RawEvent &event) {
       static_cast<jint>(event.mode.height),
       static_cast<jint>(event.mode.fps),
       static_cast<jint>(event.propertyHandle),
-      static_cast<jint>(event.propertyType),
+      static_cast<jint>(event.propertyKind),
       static_cast<jint>(event.value),
       valueStr.obj());
 }
@@ -182,14 +182,14 @@ extern "C" {
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    getPropertyType
+ * Method:    getPropertyKind
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getPropertyType
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getPropertyKind
   (JNIEnv *env, jclass, jint property)
 {
   CS_Status status = 0;
-  auto val = cs::GetPropertyType(property, &status);
+  auto val = cs::GetPropertyKind(property, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -400,14 +400,14 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createCvSource
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    getSourceType
+ * Method:    getSourceKind
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSourceType
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSourceKind
   (JNIEnv *env, jclass, jint source)
 {
   CS_Status status = 0;
-  auto val = cs::GetSourceType(source, &status);
+  auto val = cs::GetSourceKind(source, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -697,11 +697,11 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSourceDescription
  * Signature: (ILjava/lang/String;IIIIII)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty
-  (JNIEnv *env, jclass, jint source, jstring name, jint type, jint minimum, jint maximum, jint step, jint defaultValue, jint value)
+  (JNIEnv *env, jclass, jint source, jstring name, jint kind, jint minimum, jint maximum, jint step, jint defaultValue, jint value)
 {
   CS_Status status = 0;
   auto val = cs::CreateSourceProperty(
-      source, JStringRef{env, name}, static_cast<CS_PropertyType>(type),
+      source, JStringRef{env, name}, static_cast<CS_PropertyKind>(kind),
       minimum, maximum, step, defaultValue, value, &status);
   CheckStatus(env, status);
   return val;
@@ -763,14 +763,14 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createCvSink
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    getSinkType
+ * Method:    getSinkKind
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSinkType
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSinkKind
   (JNIEnv *env, jclass, jint sink)
 {
   CS_Status status = 0;
-  auto val = cs::GetSinkType(sink, &status);
+  auto val = cs::GetSinkKind(sink, &status);
   CheckStatus(env, status);
   return val;
 }

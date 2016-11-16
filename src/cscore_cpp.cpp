@@ -40,11 +40,11 @@ namespace cs {
 // Property Functions
 //
 
-CS_PropertyType GetPropertyType(CS_Property property, CS_Status* status) {
+CS_PropertyKind GetPropertyKind(CS_Property property, CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return CS_PROP_NONE;
-  return source->GetPropertyType(propertyIndex);
+  return source->GetPropertyKind(propertyIndex);
 }
 
 std::string GetPropertyName(CS_Property property, CS_Status* status) {
@@ -152,13 +152,13 @@ CS_Source CreateHTTPCamera(llvm::StringRef name, llvm::StringRef url,
 // Source Functions
 //
 
-CS_SourceType GetSourceType(CS_Source source, CS_Status* status) {
+CS_SourceKind GetSourceKind(CS_Source source, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return CS_SOURCE_UNKNOWN;
   }
-  return data->type;
+  return data->kind;
 }
 
 std::string GetSourceName(CS_Source source, CS_Status* status) {
@@ -348,13 +348,13 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
 // Sink Functions
 //
 
-CS_SinkType GetSinkType(CS_Sink sink, CS_Status* status) {
+CS_SinkKind GetSinkKind(CS_Sink sink, CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return CS_SINK_UNKNOWN;
   }
-  return data->type;
+  return data->kind;
 }
 
 std::string GetSinkName(CS_Sink sink, CS_Status* status) {

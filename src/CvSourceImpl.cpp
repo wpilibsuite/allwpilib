@@ -49,7 +49,7 @@ void CvSourceImpl::SetProperty(int property, int value, CS_Status* status) {
     *status = CS_INVALID_PROPERTY;
     return;
   }
-  if ((prop->propType & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
+  if ((prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
       0) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return;
@@ -65,7 +65,7 @@ void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
     *status = CS_INVALID_PROPERTY;
     return;
   }
-  if (prop->propType != CS_PROP_STRING) {
+  if (prop->propKind != CS_PROP_STRING) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return;
   }
@@ -106,7 +106,7 @@ void CvSourceImpl::NotifyError(llvm::StringRef msg) {
 void CvSourceImpl::SetConnected(bool connected) { m_connected = connected; }
 
 CS_Property CvSourceImpl::CreateProperty(llvm::StringRef name,
-                                         CS_PropertyType type, int minimum,
+                                         CS_PropertyKind kind, int minimum,
                                          int maximum, int step,
                                          int defaultValue, int value) {
   std::unique_lock<std::mutex> lock(m_mutex);
@@ -115,11 +115,11 @@ CS_Property CvSourceImpl::CreateProperty(llvm::StringRef name,
     // create a new index
     ndx = m_propertyData.size() + 1;
     m_propertyData.emplace_back(llvm::make_unique<PropertyData>(
-        name, type, minimum, maximum, step, defaultValue, value));
+        name, kind, minimum, maximum, step, defaultValue, value));
   } else {
     // update all but value
     auto prop = GetProperty(ndx);
-    prop->propType = type;
+    prop->propKind = kind;
     prop->minimum = minimum;
     prop->maximum = maximum;
     prop->step = step;
@@ -129,7 +129,7 @@ CS_Property CvSourceImpl::CreateProperty(llvm::StringRef name,
 }
 
 CS_Property CvSourceImpl::CreateProperty(
-    llvm::StringRef name, CS_PropertyType type, int minimum, int maximum,
+    llvm::StringRef name, CS_PropertyKind kind, int minimum, int maximum,
     int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange) {
   // TODO
@@ -145,7 +145,7 @@ void CvSourceImpl::SetEnumPropertyChoices(CS_Property property,
     *status = CS_INVALID_PROPERTY;
     return;
   }
-  if (prop->propType != CS_PROP_ENUM) {
+  if (prop->propKind != CS_PROP_ENUM) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return;
   }
@@ -162,7 +162,7 @@ CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
 
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != CS_SOURCE_CV) {
+  if (!data || data->kind != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -172,7 +172,7 @@ void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
 void NotifySourceError(CS_Source source, llvm::StringRef msg,
                        CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != CS_SOURCE_CV) {
+  if (!data || data->kind != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -181,7 +181,7 @@ void NotifySourceError(CS_Source source, llvm::StringRef msg,
 
 void SetSourceConnected(CS_Source source, bool connected, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != CS_SOURCE_CV) {
+  if (!data || data->kind != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -191,7 +191,7 @@ void SetSourceConnected(CS_Source source, bool connected, CS_Status* status) {
 void SetSourceDescription(CS_Source source, llvm::StringRef description,
                           CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != CS_SOURCE_CV) {
+  if (!data || data->kind != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -199,29 +199,29 @@ void SetSourceDescription(CS_Source source, llvm::StringRef description,
 }
 
 CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
-                                 CS_PropertyType type, int minimum, int maximum,
+                                 CS_PropertyKind kind, int minimum, int maximum,
                                  int step, int defaultValue, int value,
                                  CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != CS_SOURCE_CV) {
+  if (!data || data->kind != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return -1;
   }
   return static_cast<CvSourceImpl&>(*data->source)
-      .CreateProperty(name, type, minimum, maximum, step, defaultValue, value);
+      .CreateProperty(name, kind, minimum, maximum, step, defaultValue, value);
 }
 
 CS_Property CreateSourcePropertyCallback(
-    CS_Source source, llvm::StringRef name, CS_PropertyType type, int minimum,
+    CS_Source source, llvm::StringRef name, CS_PropertyKind kind, int minimum,
     int maximum, int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != CS_SOURCE_CV) {
+  if (!data || data->kind != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return -1;
   }
   return static_cast<CvSourceImpl&>(*data->source)
-      .CreateProperty(name, type, minimum, maximum, step, defaultValue, value,
+      .CreateProperty(name, kind, minimum, maximum, step, defaultValue, value,
                       onChange);
 }
 
@@ -229,7 +229,7 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
                                   llvm::ArrayRef<std::string> choices,
                                   CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
-  if (!data || data->type != CS_SOURCE_CV) {
+  if (!data || data->kind != CS_SOURCE_CV) {
     *status = CS_INVALID_HANDLE;
     return;
   }
@@ -269,19 +269,19 @@ void CS_SetSourceDescription(CS_Source source, const char* description,
 }
 
 CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
-                                    enum CS_PropertyType type, int minimum,
+                                    enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status) {
-  return cs::CreateSourceProperty(source, name, type, minimum, maximum, step,
+  return cs::CreateSourceProperty(source, name, kind, minimum, maximum, step,
                                   defaultValue, value, status);
 }
 
 CS_Property CS_CreateSourcePropertyCallback(
-    CS_Source source, const char* name, enum CS_PropertyType type, int minimum,
+    CS_Source source, const char* name, enum CS_PropertyKind kind, int minimum,
     int maximum, int step, int defaultValue, int value, void* data,
     void (*onChange)(void* data, CS_Property property), CS_Status* status) {
   return cs::CreateSourcePropertyCallback(
-      source, name, type, minimum, maximum, step, defaultValue, value,
+      source, name, kind, minimum, maximum, step, defaultValue, value,
       [=](CS_Property property) { onChange(data, property); }, status);
 }
 

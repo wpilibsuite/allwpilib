@@ -8,11 +8,11 @@
 package edu.wpi.cscore;
 
 public class VideoProperty {
-  public enum Type {
+  public enum Kind {
     kNone(0), kBoolean(1), kInteger(2), kString(4), kEnum(8);
     private int value;
 
-    private Type(int value) {
+    private Kind(int value) {
       this.value = value;
     }
 
@@ -20,35 +20,35 @@ public class VideoProperty {
       return value;
     }
   }
-  static final Type[] m_typeValues = Type.values();
+  static final Kind[] m_kindValues = Kind.values();
 
   public String getName() {
     return CameraServerJNI.getPropertyName(m_handle);
   }
 
-  public Type getType() {
-    return m_type;
+  public Kind getKind() {
+    return m_kind;
   }
 
   public boolean isValid() {
-    return m_type != Type.kNone;
+    return m_kind != Kind.kNone;
   }
 
-  // Type checkers
+  // Kind checkers
   public boolean isBoolean() {
-    return m_type == Type.kBoolean;
+    return m_kind == Kind.kBoolean;
   }
 
   public boolean isInteger() {
-    return m_type == Type.kInteger;
+    return m_kind == Kind.kInteger;
   }
 
   public boolean isString() {
-    return m_type == Type.kString;
+    return m_kind == Kind.kString;
   }
 
   public boolean isEnum() {
-    return m_type == Type.kEnum;
+    return m_kind == Kind.kEnum;
   }
 
   public int get() {
@@ -91,14 +91,14 @@ public class VideoProperty {
 
   VideoProperty(int handle) {
     m_handle = handle;
-    m_type = m_typeValues[CameraServerJNI.getPropertyType(handle)];
+    m_kind = m_kindValues[CameraServerJNI.getPropertyKind(handle)];
   }
 
-  VideoProperty(int handle, Type type) {
+  VideoProperty(int handle, Kind kind) {
     m_handle = handle;
-    m_type = type;
+    m_kind = kind;
   }
 
   int m_handle;
-  private Type m_type;
+  private Kind m_kind;
 }

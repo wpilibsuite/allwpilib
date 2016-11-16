@@ -120,7 +120,7 @@ void Notifier::Thread::Main() {
         if (!m_listeners[i]) continue;  // removed
 
         // Event type must be within requested set for this listener.
-        if ((item.type & m_listeners[i].eventMask) == 0) continue;
+        if ((item.kind & m_listeners[i].eventMask) == 0) continue;
 
         // make a copy of the callback so we can safely release the mutex
         auto callback = m_listeners[i].callback;
@@ -151,10 +151,10 @@ void Notifier::RemoveListener(int uid) {
 }
 
 void Notifier::NotifySource(llvm::StringRef name, CS_Source source,
-                            RawEvent::Type type) {
+                            RawEvent::Kind kind) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_notifications.emplace(name, source, type);
+  thr->m_notifications.emplace(name, source, kind);
   thr->m_cond.notify_one();
 }
 
@@ -167,21 +167,21 @@ void Notifier::NotifySourceVideoMode(llvm::StringRef name, CS_Source source,
 }
 
 void Notifier::NotifySourceProperty(llvm::StringRef name, CS_Source source,
-                                    RawEvent::Type type, int property,
-                                    CS_PropertyType propertyType, int value,
+                                    RawEvent::Kind kind, int property,
+                                    CS_PropertyKind propertyKind, int value,
                                     llvm::StringRef valueStr) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_notifications.emplace(name, source, type,
+  thr->m_notifications.emplace(name, source, kind,
                                Handle{source, property, Handle::kProperty},
-                               propertyType, value, valueStr);
+                               propertyKind, value, valueStr);
   thr->m_cond.notify_one();
 }
 
 void Notifier::NotifySink(llvm::StringRef name, CS_Sink sink,
-                          RawEvent::Type type) {
+                          RawEvent::Kind kind) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_notifications.emplace(name, sink, type);
+  thr->m_notifications.emplace(name, sink, kind);
   thr->m_cond.notify_one();
 }

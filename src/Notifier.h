@@ -40,14 +40,14 @@ class Notifier {
 
   // Notification events
   void NotifySource(llvm::StringRef name, CS_Source source,
-                    RawEvent::Type type);
+                    RawEvent::Kind kind);
   void NotifySourceVideoMode(llvm::StringRef name, CS_Source source,
                              const VideoMode& mode);
   void NotifySourceProperty(llvm::StringRef name, CS_Source source,
-                            RawEvent::Type type, int property,
-                            CS_PropertyType propertyType, int value,
+                            RawEvent::Kind kind, int property,
+                            CS_PropertyKind propertyKind, int value,
                             llvm::StringRef valueStr);
-  void NotifySink(llvm::StringRef name, CS_Sink sink, RawEvent::Type type);
+  void NotifySink(llvm::StringRef name, CS_Sink sink, RawEvent::Kind kind);
 
  private:
   Notifier();

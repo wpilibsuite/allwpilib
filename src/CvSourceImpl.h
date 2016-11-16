@@ -37,11 +37,11 @@ class CvSourceImpl : public SourceImpl {
   void PutFrame(cv::Mat& image);
   void NotifyError(llvm::StringRef msg);
   void SetConnected(bool connected);
-  CS_Property CreateProperty(llvm::StringRef name, CS_PropertyType type,
+  CS_Property CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
                              int minimum, int maximum, int step,
                              int defaultValue, int value);
   CS_Property CreateProperty(
-      llvm::StringRef name, CS_PropertyType type, int minimum, int maximum,
+      llvm::StringRef name, CS_PropertyKind kind, int minimum, int maximum,
       int step, int defaultValue, int value,
       std::function<void(CS_Property property)> onChange);
   void SetEnumPropertyChoices(CS_Property property,
@@ -54,9 +54,9 @@ class CvSourceImpl : public SourceImpl {
   class PropertyData : public PropertyBase {
    public:
     PropertyData() = default;
-    PropertyData(llvm::StringRef name_, CS_PropertyType type_, int minimum_,
+    PropertyData(llvm::StringRef name_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
-        : PropertyBase{name_, type_,         minimum_, maximum_,
+        : PropertyBase{name_, kind_,         minimum_, maximum_,
                        step_, defaultValue_, value_} {}
     ~PropertyData() override = default;
 

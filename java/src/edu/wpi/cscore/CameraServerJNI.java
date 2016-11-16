@@ -87,7 +87,7 @@ public class CameraServerJNI {
   //
   // Property Functions
   //
-  public static native int getPropertyType(int property);
+  public static native int getPropertyKind(int property);
   public static native String getPropertyName(int property);
   public static native int getProperty(int property);
   public static native void setProperty(int property, int value);
@@ -110,7 +110,7 @@ public class CameraServerJNI {
   //
   // Source Functions
   //
-  public static native int getSourceType(int source);
+  public static native int getSourceKind(int source);
   public static native String getSourceName(int source);
   public static native String getSourceDescription(int source);
   public static native long getSourceLastFrameTime(int source);
@@ -134,7 +134,7 @@ public class CameraServerJNI {
   public static native void notifySourceError(int source, String msg);
   public static native void setSourceConnected(int source, boolean connected);
   public static native void setSourceDescription(int source, String description);
-  public static native int createSourceProperty(int source, String name, int type, int minimum, int maximum, int step, int defaultValue, int value);
+  public static native int createSourceProperty(int source, String name, int kind, int minimum, int maximum, int step, int defaultValue, int value);
   public static native void setSourceEnumPropertyChoices(int source, int property, String[] choices);
 
   //
@@ -148,7 +148,7 @@ public class CameraServerJNI {
   //
   // Sink Functions
   //
-  public static native int getSinkType(int sink);
+  public static native int getSinkKind(int sink);
   public static native String getSinkName(int sink);
   public static native String getSinkDescription(int sink);
   public static native void setSinkSource(int sink, int source);

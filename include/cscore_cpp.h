@@ -67,7 +67,7 @@ struct VideoMode : public CS_VideoMode {
 
 /// Listener event
 struct RawEvent {
-  enum Type {
+  enum Kind {
     kSourceCreated = CS_SOURCE_CREATED,
     kSourceDestroyed = CS_SOURCE_DESTROYED,
     kSourceConnected = CS_SOURCE_CONNECTED,
@@ -85,31 +85,31 @@ struct RawEvent {
   };
 
   RawEvent() = default;
-  RawEvent(llvm::StringRef name_, CS_Handle handle_, RawEvent::Type type_)
-      : type{type_}, name{name_} {
-    if (type_ == kSinkCreated || type_ == kSinkDestroyed ||
-        type_ == kSinkEnabled || type_ == kSinkDisabled)
+  RawEvent(llvm::StringRef name_, CS_Handle handle_, RawEvent::Kind kind_)
+      : kind{kind_}, name{name_} {
+    if (kind_ == kSinkCreated || kind_ == kSinkDestroyed ||
+        kind_ == kSinkEnabled || kind_ == kSinkDisabled)
       sinkHandle = handle_;
     else
       sourceHandle = handle_;
   }
   RawEvent(llvm::StringRef name_, CS_Source source_, const VideoMode& mode_)
-      : type{kSourceVideoModeChanged},
+      : kind{kSourceVideoModeChanged},
         sourceHandle{source_},
         name{name_},
         mode{mode_} {}
-  RawEvent(llvm::StringRef name_, CS_Source source_, RawEvent::Type type_,
-           CS_Property property_, CS_PropertyType propertyType_, int value_,
+  RawEvent(llvm::StringRef name_, CS_Source source_, RawEvent::Kind kind_,
+           CS_Property property_, CS_PropertyKind propertyKind_, int value_,
            llvm::StringRef valueStr_)
-      : type{type_},
+      : kind{kind_},
         sourceHandle{source_},
         name{name_},
         propertyHandle{property_},
-        propertyType{propertyType_},
+        propertyKind{propertyKind_},
         value{value_},
         valueStr{valueStr_} {}
 
-  Type type;
+  Kind kind;
 
   // Valid for kSource* and kSink* respectively
   CS_Source sourceHandle = CS_INVALID_HANDLE;
@@ -123,7 +123,7 @@ struct RawEvent {
 
   // Fields for kSourceProperty* events
   CS_Property propertyHandle;
-  CS_PropertyType propertyType;
+  CS_PropertyKind propertyKind;
   int value;
   std::string valueStr;
 };
@@ -131,7 +131,7 @@ struct RawEvent {
 //
 // Property Functions
 //
-CS_PropertyType GetPropertyType(CS_Property property, CS_Status* status);
+CS_PropertyKind GetPropertyKind(CS_Property property, CS_Status* status);
 std::string GetPropertyName(CS_Property property, CS_Status* status);
 llvm::StringRef GetPropertyName(CS_Property property,
                                 llvm::SmallVectorImpl<char>& buf,
@@ -165,7 +165,7 @@ CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
 //
 // Source Functions
 //
-CS_SourceType GetSourceType(CS_Source source, CS_Status* status);
+CS_SourceKind GetSourceKind(CS_Source source, CS_Status* status);
 std::string GetSourceName(CS_Source source, CS_Status* status);
 llvm::StringRef GetSourceName(CS_Source source,
                               llvm::SmallVectorImpl<char>& buf,
@@ -206,7 +206,7 @@ void SetSourceConnected(CS_Source source, bool connected, CS_Status* status);
 void SetSourceDescription(CS_Source source, llvm::StringRef description,
                           CS_Status* status);
 CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
-                                 CS_PropertyType type, int minimum, int maximum,
+                                 CS_PropertyKind kind, int minimum, int maximum,
                                  int step, int defaultValue, int value,
                                  CS_Status* status);
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
@@ -226,7 +226,7 @@ CS_Sink CreateCvSinkCallback(llvm::StringRef name,
 //
 // Sink Functions
 //
-CS_SinkType GetSinkType(CS_Sink sink, CS_Status* status);
+CS_SinkKind GetSinkKind(CS_Sink sink, CS_Status* status);
 std::string GetSinkName(CS_Sink sink, CS_Status* status);
 llvm::StringRef GetSinkName(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
                             CS_Status* status);

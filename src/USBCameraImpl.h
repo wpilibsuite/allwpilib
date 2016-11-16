@@ -59,12 +59,12 @@ class USBCameraImpl : public SourceImpl {
 #endif
 
     unsigned id;  // implementation-level id
-    int type;  // implementation type, not CS_PropertyType!
+    int type;  // implementation type, not CS_PropertyKind!
   };
 
   // Messages passed to/from camera thread
   struct Message {
-    enum Type {
+    enum Kind {
       kNone = 0,
       kCmdSetMode,
       kCmdSetPixelFormat,
@@ -79,9 +79,9 @@ class USBCameraImpl : public SourceImpl {
       kError
     };
 
-    Message(Type type_) : type(type_) {}
+    Message(Kind kind_) : kind(kind_) {}
 
-    Type type;
+    Kind kind;
     int data[4];
     std::string dataStr;
   };
@@ -94,12 +94,12 @@ class USBCameraImpl : public SourceImpl {
 
  private:
   // Message pool access
-  std::unique_ptr<Message> CreateMessage(Message::Type type) const {
+  std::unique_ptr<Message> CreateMessage(Message::Kind kind) const {
     std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_messagePool.empty()) return llvm::make_unique<Message>(type);
+    if (m_messagePool.empty()) return llvm::make_unique<Message>(kind);
     auto rv = std::move(m_messagePool.back());
     m_messagePool.pop_back();
-    rv->type = type;
+    rv->kind = kind;
     return rv;
   }
   void DestroyMessage(std::unique_ptr<Message> message) const {

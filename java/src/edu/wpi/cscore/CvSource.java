@@ -54,21 +54,21 @@ public class CvSource extends VideoSource {
 
   /// Create a property.
   /// @param name Property name
-  /// @param type Property type
+  /// @param kind Property kind
   /// @param minimum Minimum value
   /// @param maximum Maximum value
   /// @param step Step value
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  public VideoProperty createProperty(String name, VideoProperty.Type type, int minimum, int maximum, int step, int defaultValue, int value) {
+  public VideoProperty createProperty(String name, VideoProperty.Kind kind, int minimum, int maximum, int step, int defaultValue, int value) {
     return new VideoProperty(
-        CameraServerJNI.createSourceProperty(m_handle, name, type.getValue(), minimum, maximum, step, defaultValue, value));
+        CameraServerJNI.createSourceProperty(m_handle, name, kind.getValue(), minimum, maximum, step, defaultValue, value));
   }
 
   /// Create a property with a change callback.
   /// @param name Property name
-  /// @param type Property type
+  /// @param kind Property kind
   /// @param minimum Minimum value
   /// @param maximum Maximum value
   /// @param step Step value
@@ -77,7 +77,7 @@ public class CvSource extends VideoSource {
   /// @param onChange Callback to call when the property value changes
   /// @return Property
   //public VideoProperty createProperty(
-  //    String name, VideoProperty.Type type, int minimum, int maximum, int step, int defaultValue, int value,
+  //    String name, VideoProperty.Kind kind, int minimum, int maximum, int step, int defaultValue, int value,
   //    std::function<void(VideoProperty property)>
   //        onChange);
 

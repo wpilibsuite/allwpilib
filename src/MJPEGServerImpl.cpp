@@ -295,8 +295,8 @@ bool MJPEGServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
     }
 
     CS_Status status = 0;
-    auto type = source.GetPropertyType(prop);
-    switch (type) {
+    auto kind = source.GetPropertyKind(prop);
+    switch (kind) {
       case CS_PROP_BOOLEAN:
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM: {
@@ -349,17 +349,17 @@ void MJPEGServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
     os << "{";
     llvm::SmallString<128> name_buf;
     auto name = source.GetPropertyName(prop, name_buf, &status);
-    auto type = source.GetPropertyType(prop);
+    auto kind = source.GetPropertyKind(prop);
     os << "\n\"name\": \"" << name << '"';
     os << ",\n\"id\": \"" << prop << '"';
-    os << ",\n\"type\": \"" << type << '"';
+    os << ",\n\"type\": \"" << kind << '"';
     os << ",\n\"min\": \"" << source.GetPropertyMin(prop, &status) << '"';
     os << ",\n\"max\": \"" << source.GetPropertyMax(prop, &status) << '"';
     os << ",\n\"step\": \"" << source.GetPropertyStep(prop, &status) << '"';
     os << ",\n\"default\": \"" << source.GetPropertyDefault(prop, &status)
        << '"';
     os << ",\n\"value\": \"";
-    switch (type) {
+    switch (kind) {
       case CS_PROP_BOOLEAN:
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM:
@@ -379,7 +379,7 @@ void MJPEGServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
     // os << ",\n\"group\": \"" << param->group << '"';
 
     // append the menu object to the menu typecontrols
-    if (source.GetPropertyType(prop) == CS_PROP_ENUM) {
+    if (source.GetPropertyKind(prop) == CS_PROP_ENUM) {
       os << ",\n\"menu\": {";
       auto choices = source.GetEnumPropertyChoices(prop, &status);
       int j = 0;
@@ -535,27 +535,27 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
     return;
   }
 
-  enum { kCommand, kStream, kGetSettings } type;
+  enum { kCommand, kStream, kGetSettings } kind;
   llvm::StringRef parameters;
   size_t pos;
 
-  // Determine request type.  Most of these are for mjpgstreamer
+  // Determine request kind.  Most of these are for mjpgstreamer
   // compatibility.
   if ((pos = buf.find("POST /stream")) != llvm::StringRef::npos) {
-    type = kStream;
+    kind = kStream;
     parameters = buf.substr(buf.find('?', pos + 12)).substr(1);
   } else if ((pos = buf.find("GET /?action=stream")) != llvm::StringRef::npos) {
-    type = kStream;
+    kind = kStream;
     parameters = buf.substr(buf.find('&', pos + 19)).substr(1);
   } else if (buf.find("GET /input") != llvm::StringRef::npos &&
              buf.find(".json") != llvm::StringRef::npos) {
-    type = kGetSettings;
+    kind = kGetSettings;
   } else if (buf.find("GET /output") != llvm::StringRef::npos &&
              buf.find(".json") != llvm::StringRef::npos) {
-    type = kGetSettings;
+    kind = kGetSettings;
   } else if ((pos = buf.find("GET /?action=command")) !=
              llvm::StringRef::npos) {
-    type = kCommand;
+    kind = kCommand;
     parameters = buf.substr(buf.find('&', pos + 20)).substr(1);
   } else {
     DEBUG("HTTP request resource not found");
@@ -578,7 +578,7 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
   } while (!buf2.startswith("\r\n"));
 
   // Send response
-  switch (type) {
+  switch (kind) {
     case kStream:
       if (auto source = GetSource()) {
         DEBUG("request for stream " << source->GetName());

@@ -93,13 +93,13 @@ llvm::ArrayRef<int> SourceImpl::EnumerateProperties(
   return vec;
 }
 
-CS_PropertyType SourceImpl::GetPropertyType(int property) const {
+CS_PropertyKind SourceImpl::GetPropertyKind(int property) const {
   CS_Status status = 0;
   if (!m_properties_cached && !CacheProperties(&status)) return CS_PROP_NONE;
   std::lock_guard<std::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) return CS_PROP_NONE;
-  return prop->propType;
+  return prop->propKind;
 }
 
 llvm::StringRef SourceImpl::GetPropertyName(int property,
@@ -125,7 +125,7 @@ int SourceImpl::GetProperty(int property, CS_Status* status) const {
     *status = CS_INVALID_PROPERTY;
     return 0;
   }
-  if ((prop->propType & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
+  if ((prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
       0) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return 0;
@@ -187,7 +187,7 @@ llvm::StringRef SourceImpl::GetStringProperty(
     *status = CS_INVALID_PROPERTY;
     return llvm::StringRef{};
   }
-  if (prop->propType != CS_PROP_STRING) {
+  if (prop->propKind != CS_PROP_STRING) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return llvm::StringRef{};
   }
@@ -206,7 +206,7 @@ std::vector<std::string> SourceImpl::GetEnumPropertyChoices(
     *status = CS_INVALID_PROPERTY;
     return std::vector<std::string>{};
   }
-  if (prop->propType != CS_PROP_ENUM) {
+  if (prop->propKind != CS_PROP_ENUM) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return std::vector<std::string>{};
   }

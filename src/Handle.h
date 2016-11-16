@@ -71,10 +71,10 @@ class Handle {
 };
 
 struct SourceData {
-  SourceData(CS_SourceType type_, std::shared_ptr<SourceImpl> source_)
-      : type{type_}, refCount{0}, source{source_} {}
+  SourceData(CS_SourceKind kind_, std::shared_ptr<SourceImpl> source_)
+      : kind{kind_}, refCount{0}, source{source_} {}
 
-  CS_SourceType type;
+  CS_SourceKind kind;
   std::atomic_int refCount;
   std::shared_ptr<SourceImpl> source;
 };
@@ -83,10 +83,10 @@ typedef StaticUnlimitedHandleResource<Handle, SourceData, Handle::kSource>
     Sources;
 
 struct SinkData {
-  explicit SinkData(CS_SinkType type_, std::shared_ptr<SinkImpl> sink_)
-      : type{type_}, refCount{0}, sourceHandle{0}, sink{sink_} {}
+  explicit SinkData(CS_SinkKind kind_, std::shared_ptr<SinkImpl> sink_)
+      : kind{kind_}, refCount{0}, sourceHandle{0}, sink{sink_} {}
 
-  CS_SinkType type;
+  CS_SinkKind kind;
   std::atomic_int refCount;
   std::atomic<CS_Source> sourceHandle;
   std::shared_ptr<SinkImpl> sink;

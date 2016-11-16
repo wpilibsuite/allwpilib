@@ -29,7 +29,7 @@ class VideoProperty {
   friend class VideoSource;
 
  public:
-  enum Type {
+  enum Kind {
     kNone = CS_PROP_NONE,
     kBoolean = CS_PROP_BOOLEAN,
     kInteger = CS_PROP_INTEGER,
@@ -37,19 +37,19 @@ class VideoProperty {
     kEnum = CS_PROP_ENUM
   };
 
-  VideoProperty() : m_handle(0), m_type(kNone) {}
+  VideoProperty() : m_handle(0), m_kind(kNone) {}
 
   std::string GetName() const;
 
-  Type GetType() const { return m_type; }
+  Kind GetKind() const { return m_kind; }
 
-  explicit operator bool() const { return m_type != kNone; }
+  explicit operator bool() const { return m_kind != kNone; }
 
-  // Type checkers
-  bool IsBoolean() const { return m_type == kBoolean; }
-  bool IsInteger() const { return m_type == kInteger; }
-  bool IsString() const { return m_type == kString; }
-  bool IsEnum() const { return m_type == kEnum; }
+  // Kind checkers
+  bool IsBoolean() const { return m_kind == kBoolean; }
+  bool IsInteger() const { return m_kind == kInteger; }
+  bool IsString() const { return m_kind == kString; }
+  bool IsEnum() const { return m_kind == kEnum; }
 
   int Get() const;
   void Set(int value);
@@ -70,11 +70,11 @@ class VideoProperty {
 
  private:
   explicit VideoProperty(CS_Property handle);
-  VideoProperty(CS_Property handle, Type type);
+  VideoProperty(CS_Property handle, Kind kind);
 
   mutable CS_Status m_status;
   CS_Property m_handle;
-  Type m_type;
+  Kind m_kind;
 };
 
 /// A source for video that provides a sequence of frames.
@@ -83,7 +83,7 @@ class VideoSource {
   friend class VideoSink;
 
  public:
-  enum Type {
+  enum Kind {
     kUnknown = CS_SOURCE_UNKNOWN,
     kUSB = CS_SOURCE_USB,
     kHTTP = CS_SOURCE_HTTP,
@@ -106,14 +106,14 @@ class VideoSource {
 
   bool operator!=(const VideoSource& other) const { return !(*this == other); }
 
-  /// Get the type of the source.
-  Type GetType() const;
+  /// Get the kind of the source.
+  Kind GetKind() const;
 
   /// Get the name of the source.  The name is an arbitrary identifier
   /// provided when the source is created, and should be unique.
   std::string GetName() const;
 
-  /// Get the source description.  This is source-type specific.
+  /// Get the source description.  This is source-kind specific.
   std::string GetDescription() const;
 
   /// Get the last time a frame was captured.
@@ -124,7 +124,7 @@ class VideoSource {
 
   /// Get a property.
   /// @param name Property name
-  /// @return Property contents (of type Property::kNone if no property with
+  /// @return Property contents (of kind Property::kNone if no property with
   ///         the given name exists)
   VideoProperty GetProperty(llvm::StringRef name);
 
@@ -253,14 +253,14 @@ class CvSource : public VideoSource {
 
   /// Create a property.
   /// @param name Property name
-  /// @param type Property type
+  /// @param kind Property kind
   /// @param minimum Minimum value
   /// @param maximum Maximum value
   /// @param step Step value
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateProperty(llvm::StringRef name, VideoProperty::Type type,
+  VideoProperty CreateProperty(llvm::StringRef name, VideoProperty::Kind kind,
                                int minimum, int maximum, int step,
                                int defaultValue, int value);
 
@@ -277,7 +277,7 @@ class VideoSink {
   friend class VideoSource;
 
  public:
-  enum Type {
+  enum Kind {
     kUnknown = CS_SINK_UNKNOWN,
     kMJPEG = CS_SINK_MJPEG,
     kCv = CS_SINK_CV
@@ -299,14 +299,14 @@ class VideoSink {
 
   bool operator!=(const VideoSink& other) const { return !(*this == other); }
 
-  /// Get the type of the sink.
-  Type GetType() const;
+  /// Get the kind of the sink.
+  Kind GetKind() const;
 
   /// Get the name of the sink.  The name is an arbitrary identifier
   /// provided when the sink is created, and should be unique.
   std::string GetName() const;
 
-  /// Get the sink description.  This is sink-type specific.
+  /// Get the sink description.  This is sink-kind specific.
   std::string GetDescription() const;
 
   /// Configure which source should provide frames to this sink.  Each sink
@@ -321,7 +321,7 @@ class VideoSink {
 
   /// Get a property of the associated source.
   /// @param name Property name
-  /// @return Property (type Property::kNone if no property with
+  /// @return Property (kind Property::kNone if no property with
   ///         the given name exists or no source connected)
   VideoProperty GetSourceProperty(llvm::StringRef name);
 
@@ -419,7 +419,7 @@ class VideoListener {
 
   /// Create an event listener.
   /// @param callback Callback function
-  /// @param eventMask Bitmask of VideoEvent::Type values
+  /// @param eventMask Bitmask of VideoEvent::Kind values
   /// @param immediateNotify Whether callback should be immediately called with
   ///        a representative set of events for the current library state.
   VideoListener(std::function<void(const VideoEvent& event)> callback,

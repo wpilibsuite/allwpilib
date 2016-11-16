@@ -69,10 +69,10 @@ inline std::vector<std::string> VideoProperty::GetChoices() const {
 inline VideoProperty::VideoProperty(CS_Property handle) : m_handle(handle) {
   m_status = 0;
   if (handle == 0)
-    m_type = kNone;
+    m_kind = kNone;
   else
-    m_type =
-        static_cast<Type>(static_cast<int>(GetPropertyType(handle, &m_status)));
+    m_kind =
+        static_cast<Kind>(static_cast<int>(GetPropertyKind(handle, &m_status)));
 }
 
 inline VideoSource::VideoSource(const VideoSource& source)
@@ -93,9 +93,9 @@ inline VideoSource::~VideoSource() {
   if (m_handle != 0) ReleaseSource(m_handle, &m_status);
 }
 
-inline VideoSource::Type VideoSource::GetType() const {
+inline VideoSource::Kind VideoSource::GetKind() const {
   m_status = 0;
-  return static_cast<VideoSource::Type>(GetSourceType(m_handle, &m_status));
+  return static_cast<VideoSource::Kind>(GetSourceKind(m_handle, &m_status));
 }
 
 inline std::string VideoSource::GetName() const {
@@ -208,13 +208,13 @@ inline void CvSource::SetDescription(llvm::StringRef description) {
 }
 
 inline VideoProperty CvSource::CreateProperty(llvm::StringRef name,
-                                              VideoProperty::Type type,
+                                              VideoProperty::Kind kind,
                                               int minimum, int maximum,
                                               int step, int defaultValue,
                                               int value) {
   m_status = 0;
   return VideoProperty{CreateSourceProperty(
-      m_handle, name, static_cast<CS_PropertyType>(static_cast<int>(type)),
+      m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(kind)),
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
@@ -241,9 +241,9 @@ inline VideoSink::~VideoSink() {
   if (m_handle != 0) ReleaseSink(m_handle, &m_status);
 }
 
-inline VideoSink::Type VideoSink::GetType() const {
+inline VideoSink::Kind VideoSink::GetKind() const {
   m_status = 0;
-  return static_cast<VideoSink::Type>(GetSinkType(m_handle, &m_status));
+  return static_cast<VideoSink::Kind>(GetSinkKind(m_handle, &m_status));
 }
 
 inline std::string VideoSink::GetName() const {
@@ -320,7 +320,7 @@ inline VideoSink VideoEvent::GetSink() const {
 
 inline VideoProperty VideoEvent::GetProperty() const {
   return VideoProperty{propertyHandle,
-                       static_cast<VideoProperty::Type>(propertyType)};
+                       static_cast<VideoProperty::Kind>(propertyKind)};
 }
 
 inline VideoListener::VideoListener(

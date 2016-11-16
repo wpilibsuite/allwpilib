@@ -75,9 +75,9 @@ typedef struct CS_VideoMode {
 } CS_VideoMode;
 
 //
-// Property types
+// Property kinds
 //
-enum CS_PropertyType {
+enum CS_PropertyKind {
   CS_PROP_NONE = 0,
   CS_PROP_BOOLEAN = 1,
   CS_PROP_INTEGER = 2,
@@ -86,9 +86,9 @@ enum CS_PropertyType {
 };
 
 //
-// Source types
+// Source kinds
 //
-enum CS_SourceType {
+enum CS_SourceKind {
   CS_SOURCE_UNKNOWN = 0,
   CS_SOURCE_USB = 1,
   CS_SOURCE_HTTP = 2,
@@ -96,18 +96,18 @@ enum CS_SourceType {
 };
 
 //
-// Sink types
+// Sink kinds
 //
-enum CS_SinkType {
+enum CS_SinkKind {
   CS_SINK_UNKNOWN = 0,
   CS_SINK_MJPEG = 2,
   CS_SINK_CV = 4
 };
 
 //
-// Listener event types
+// Listener event kinds
 //
-enum CS_EventType {
+enum CS_EventKind {
   CS_SOURCE_CREATED = 0x0001,
   CS_SOURCE_DESTROYED = 0x0002,
   CS_SOURCE_CONNECTED = 0x0004,
@@ -128,7 +128,7 @@ enum CS_EventType {
 // Listener event
 //
 struct CS_Event {
-  CS_EventType type;
+  CS_EventKind kind;
 
   // Valid for CS_SOURCE_* and CS_SINK_* respectively
   CS_Source source;
@@ -142,7 +142,7 @@ struct CS_Event {
 
   // Fields for CS_SOURCE_PROPERTY_* events
   CS_Property property;
-  CS_PropertyType propertyType;
+  CS_PropertyKind propertyKind;
   int value;
   const char* valueStr;
 };
@@ -150,7 +150,7 @@ struct CS_Event {
 //
 // Property Functions
 //
-enum CS_PropertyType CS_GetPropertyType(CS_Property property,
+enum CS_PropertyKind CS_GetPropertyKind(CS_Property property,
                                         CS_Status* status);
 char* CS_GetPropertyName(CS_Property property, CS_Status* status);
 int CS_GetProperty(CS_Property property, CS_Status* status);
@@ -179,7 +179,7 @@ CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
 //
 // Source Functions
 //
-CS_SourceType CS_GetSourceType(CS_Source source, CS_Status* status);
+CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status);
 char* CS_GetSourceName(CS_Source source, CS_Status* status);
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status);
 uint64_t CS_GetSourceLastFrameTime(CS_Source source, CS_Status* status);
@@ -220,7 +220,7 @@ void CS_SetSourceConnected(CS_Source source, CS_Bool connected,
 void CS_SetSourceDescription(CS_Source source, const char* description,
                              CS_Status* status);
 CS_Property CS_CreateSourceProperty(CS_Source source, const char* name,
-                                    enum CS_PropertyType type, int minimum,
+                                    enum CS_PropertyKind kind, int minimum,
                                     int maximum, int step, int defaultValue,
                                     int value, CS_Status* status);
 void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
@@ -240,7 +240,7 @@ CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
 //
 // Sink Functions
 //
-CS_SinkType CS_GetSinkType(CS_Sink sink, CS_Status* status);
+CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status);
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status);
 void CS_SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status);

@@ -11,11 +11,11 @@ package edu.wpi.cscore;
 /// consist of multiple images (e.g. from a stereo or depth camera); these
 /// are called channels.
 public class VideoSource {
-  public enum Type {
+  public enum Kind {
     kUnknown(0), kUSB(1), kHTTP(2), kCv(4);
     private int value;
 
-    private Type(int value) {
+    private Kind(int value) {
       this.value = value;
     }
 
@@ -23,7 +23,7 @@ public class VideoSource {
       return value;
     }
   }
-  static final Type[] m_typeValues = Type.values();
+  static final Kind[] m_kindValues = Kind.values();
 
   protected VideoSource(int handle) {
     m_handle = handle;
@@ -56,9 +56,9 @@ public class VideoSource {
     return m_handle;
   }
 
-  /// Get the type of the source.
-  public Type getType() {
-    return m_typeValues[CameraServerJNI.getSourceType(m_handle)];
+  /// Get the kind of the source.
+  public Kind getKind() {
+    return m_kindValues[CameraServerJNI.getSourceKind(m_handle)];
   }
 
   /// Get the name of the source.  The name is an arbitrary identifier
@@ -67,7 +67,7 @@ public class VideoSource {
     return CameraServerJNI.getSourceName(m_handle);
   }
 
-  /// Get the source description.  This is source-type specific.
+  /// Get the source description.  This is source-kind specific.
   public String getDescription() {
     return CameraServerJNI.getSourceDescription(m_handle);
   }
@@ -84,7 +84,7 @@ public class VideoSource {
 
   /// Get a property.
   /// @param name Property name
-  /// @return Property contents (of type Property::kNone if no property with
+  /// @return Property contents (of kind Property::kNone if no property with
   ///         the given name exists)
   public VideoProperty getProperty(String name) {
     return new VideoProperty(CameraServerJNI.getSourceProperty(m_handle, name));
