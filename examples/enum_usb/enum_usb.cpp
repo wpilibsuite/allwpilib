@@ -14,22 +14,23 @@ int main() {
 
     llvm::outs() << "Properties:\n";
     for (const auto& prop : camera.EnumerateProperties()) {
-      llvm::outs() << "  " << prop.GetName() << ": ";
+      llvm::outs() << "  " << prop.GetName();
       switch (prop.GetKind()) {
         case cs::VideoProperty::kBoolean:
-          llvm::outs() << "value=" << prop.Get()
+          llvm::outs() << " (bool): " << "value=" << prop.Get()
                        << " default=" << prop.GetDefault();
           break;
         case cs::VideoProperty::kInteger:
-          llvm::outs() << "value=" << prop.Get() << " min=" << prop.GetMin()
+          llvm::outs() << " (int): "
+                       << "value=" << prop.Get() << " min=" << prop.GetMin()
                        << " max=" << prop.GetMax() << " step=" << prop.GetStep()
                        << " default=" << prop.GetDefault();
           break;
         case cs::VideoProperty::kString:
-          llvm::outs() << prop.GetString(buf);
+          llvm::outs() << " (string): " << prop.GetString(buf);
           break;
         case cs::VideoProperty::kEnum: {
-          llvm::outs() << "value=" << prop.Get();
+          llvm::outs() << " (enum): " << "value=" << prop.Get();
           auto choices = prop.GetChoices();
           for (size_t i = 0; i < choices.size(); ++i) {
             if (choices[i].empty()) continue;
