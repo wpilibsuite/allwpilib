@@ -173,6 +173,50 @@ inline std::vector<USBCameraInfo> USBCamera::EnumerateUSBCameras() {
   return ::cs::EnumerateUSBCameras(&status);
 }
 
+inline void USBCamera::SetBrightness(int brightness) {
+  if (brightness > 100) {
+    brightness = 100;
+  } else if (brightness < 0) {
+    brightness = 0;
+  }
+  GetProperty(kPropBrValue).Set(brightness);
+}
+
+inline int USBCamera::GetBrightness() {
+  return GetProperty(kPropBrValue).Get();
+}
+
+inline void USBCamera::SetWhiteBalanceAuto() {
+  GetProperty(kPropWbAuto).Set(1);  // auto
+}
+
+inline void USBCamera::SetWhiteBalanceHoldCurrent() {
+  GetProperty(kPropWbAuto).Set(0);  // manual
+}
+
+inline void USBCamera::SetWhiteBalanceManual(int value) {
+  GetProperty(kPropWbAuto).Set(0);  // manual
+  GetProperty(kPropWbValue).Set(value);
+}
+
+inline void USBCamera::SetExposureAuto() {
+  GetProperty(kPropExAuto).Set(0);  // auto; yes, this is opposite of WB
+}
+
+inline void USBCamera::SetExposureHoldCurrent() {
+  GetProperty(kPropExAuto).Set(1);  // manual
+}
+
+inline void USBCamera::SetExposureManual(int value) {
+  GetProperty(kPropExAuto).Set(1);  // manual
+  if (value > 100) {
+    value = 100;
+  } else if (value < 0) {
+    value = 0;
+  }
+  GetProperty(kPropExValue).Set(value);
+}
+
 inline HTTPCamera::HTTPCamera(llvm::StringRef name, llvm::StringRef url) {
   m_handle = CreateHTTPCamera(name, url, &m_status);
 }

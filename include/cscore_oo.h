@@ -191,7 +191,22 @@ class VideoSource {
 
 /// A source that represents a USB camera.
 class USBCamera : public VideoSource {
+ private:
+  static constexpr char const* kPropWbAuto = "white_balance_temperature_auto";
+  static constexpr char const* kPropWbValue = "white_balance_temperature";
+  static constexpr char const* kPropExAuto = "exposure_auto";
+  static constexpr char const* kPropExValue = "exposure_absolute";
+  static constexpr char const* kPropBrValue = "brightness";
+
  public:
+  enum WhiteBalance {
+    kFixedIndoor = 3000,
+    kFixedOutdoor1 = 4000,
+    kFixedOutdoor2 = 5000,
+    kFixedFluorescent1 = 5100,
+    kFixedFlourescent2 = 5200
+  };
+
   /// Create a source for a USB camera based on device number.
   /// @param name Source name (arbitrary unique identifier)
   /// @param dev Device number (e.g. 0 for /dev/video0)
@@ -205,6 +220,30 @@ class USBCamera : public VideoSource {
   /// Enumerate USB cameras on the local system.
   /// @return Vector of USB camera information (one for each camera)
   static std::vector<USBCameraInfo> EnumerateUSBCameras();
+
+  /// Set the brightness, as a percentage (0-100).
+  void SetBrightness(int brightness);
+
+  /// Get the brightness, as a percentage (0-100).
+  int GetBrightness();
+
+  /// Set the white balance to auto.
+  void SetWhiteBalanceAuto();
+
+  /// Set the white balance to hold current.
+  void SetWhiteBalanceHoldCurrent();
+
+  /// Set the white balance to manual, with specified color temperature.
+  void SetWhiteBalanceManual(int value);
+
+  /// Set the exposure to auto aperature.
+  void SetExposureAuto();
+
+  /// Set the exposure to hold current.
+  void SetExposureHoldCurrent();
+
+  /// Set the exposure to manual, as a percentage (0-100).
+  void SetExposureManual(int value);
 };
 
 /// A source that represents a MJPEG-over-HTTP (IP) camera.
