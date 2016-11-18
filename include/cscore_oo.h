@@ -207,6 +207,8 @@ class USBCamera : public VideoSource {
     kFixedFlourescent2 = 5200
   };
 
+  USBCamera() = default;
+
   /// Create a source for a USB camera based on device number.
   /// @param name Source name (arbitrary unique identifier)
   /// @param dev Device number (e.g. 0 for /dev/video0)
@@ -258,6 +260,8 @@ class HTTPCamera : public VideoSource {
 /// A source for user code to provide OpenCV images as video frames.
 class CvSource : public VideoSource {
  public:
+  CvSource() = default;
+
   /// Create an OpenCV source.
   /// @param name Source name (arbitrary unique identifier)
   /// @param mode Video mode being generated
@@ -386,6 +390,8 @@ class VideoSink {
 /// A sink that acts as a MJPEG-over-HTTP network server.
 class MJPEGServer : public VideoSink {
  public:
+  MJPEGServer() = default;
+
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
   /// @param listenAddress TCP listen address (empty string for all addresses)
@@ -401,6 +407,8 @@ class MJPEGServer : public VideoSink {
 /// A sink for user code to accept video frames as OpenCV images.
 class CvSink : public VideoSink {
  public:
+  CvSink() = default;
+
   /// Create a sink for accepting OpenCV images.
   /// WaitForFrame() must be called on the created sink to get each new
   /// image.
