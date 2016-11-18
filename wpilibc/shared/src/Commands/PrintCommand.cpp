@@ -7,25 +7,13 @@
 
 #include "Commands/PrintCommand.h"
 
-#include <cstdio>
-#include <sstream>
+#include <iostream>
 
 using namespace frc;
 
 PrintCommand::PrintCommand(const std::string& message)
-    : Command(((std::stringstream&)(std::stringstream("Print \"") << message
-                                                                  << "\""))
-                  .str()
-                  .c_str()) {
+    : InstantCommand("Print \"" + message + "\"") {
   m_message = message;
 }
 
-void PrintCommand::Initialize() { std::printf("%s", m_message.c_str()); }
-
-void PrintCommand::Execute() {}
-
-bool PrintCommand::IsFinished() { return true; }
-
-void PrintCommand::End() {}
-
-void PrintCommand::Interrupted() {}
+void PrintCommand::Initialize() { std::cout << m_message << "\n"; }

@@ -13,7 +13,7 @@ package edu.wpi.first.wpilibj.command;
  *
  * @see CommandGroup
  */
-public class WaitCommand extends Command {
+public class WaitCommand extends TimedCommand {
 
   /**
    * Instantiates a {@link WaitCommand} with the given timeout.
@@ -32,21 +32,5 @@ public class WaitCommand extends Command {
    */
   public WaitCommand(String name, double timeout) {
     super(name, timeout);
-  }
-
-  protected void initialize() {
-  }
-
-  protected void execute() {
-  }
-
-  protected boolean isFinished() {
-    return isTimedOut();
-  }
-
-  protected void end() {
-  }
-
-  protected void interrupted() {
   }
 }

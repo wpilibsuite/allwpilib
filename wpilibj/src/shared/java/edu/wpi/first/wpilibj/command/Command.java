@@ -248,7 +248,7 @@ public abstract class Command implements NamedSendable {
   /**
    * The initialize method is called the first time this Command is run after being started.
    */
-  protected abstract void initialize();
+  protected void initialize() {}
 
   /**
    * A shadow method called before {@link Command#initialize() initialize()}.
@@ -261,7 +261,7 @@ public abstract class Command implements NamedSendable {
    * The execute method is called repeatedly until this Command either finishes or is canceled.
    */
   @SuppressWarnings("MethodName")
-  protected abstract void execute();
+  protected void execute() {}
 
   /**
    * A shadow method called before {@link Command#execute() execute()}.
@@ -277,16 +277,22 @@ public abstract class Command implements NamedSendable {
    * <p>It may be useful for a team to reference the {@link Command#isTimedOut() isTimedOut()}
    * method for time-sensitive commands.
    *
+   * <p>By default this will always return false, which means it will never end automatically. It
+   * may still be cancelled manually or interrupted by another command. For most real-world
+   * scenarios you will override this method with additional logic.
+   *
    * @return whether this command is finished.
    * @see Command#isTimedOut() isTimedOut()
    */
-  protected abstract boolean isFinished();
+  protected boolean isFinished() {
+    return false;
+  }
 
   /**
    * Called when the command ended peacefully. This is where you may want to wrap up loose ends,
    * like shutting off a motor that was being used in the command.
    */
-  protected abstract void end();
+  protected void end() {}
 
   /**
    * A shadow method called after {@link Command#end() end()}.
@@ -303,16 +309,17 @@ public abstract class Command implements NamedSendable {
    * used in the command.
    *
    * <p>Generally, it is useful to simply call the {@link Command#end() end()} method within this
-   * method.
+   * method, as done here.
    */
-  protected abstract void interrupted();
+  protected void interrupted() {
+    end();
+  }
 
   /**
    * A shadow method called after {@link Command#interrupted() interrupted()}.
    */
   @SuppressWarnings("MethodName")
-  void _interrupted() {
-  }
+  void _interrupted() {}
 
   /**
    * Called to indicate that the timer should start. This is called right before {@link

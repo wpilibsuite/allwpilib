@@ -28,15 +28,7 @@ WaitUntilCommand::WaitUntilCommand(const std::string& name, double time)
   m_time = time;
 }
 
-void WaitUntilCommand::Initialize() {}
-
-void WaitUntilCommand::Execute() {}
-
 /**
  * Check if we've reached the actual finish time.
  */
 bool WaitUntilCommand::IsFinished() { return Timer::GetMatchTime() >= m_time; }
-
-void WaitUntilCommand::End() {}
-
-void WaitUntilCommand::Interrupted() {}

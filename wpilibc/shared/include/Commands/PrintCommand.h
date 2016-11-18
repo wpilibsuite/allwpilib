@@ -9,21 +9,17 @@
 
 #include <string>
 
-#include "Commands/Command.h"
+#include "Commands/InstantCommand.h"
 
 namespace frc {
 
-class PrintCommand : public Command {
+class PrintCommand : public InstantCommand {
  public:
   explicit PrintCommand(const std::string& message);
   virtual ~PrintCommand() = default;
 
  protected:
   virtual void Initialize();
-  virtual void Execute();
-  virtual bool IsFinished();
-  virtual void End();
-  virtual void Interrupted();
 
  private:
   std::string m_message;

@@ -1,26 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2011-2016. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#pragma once
+#include "Commands/TimedCommand.h"
 
-#include "Commands/InstantCommand.h"
+using namespace frc;
 
-namespace frc {
+TimedCommand::TimedCommand(const std::string& name, double timeout)
+    : Command(name, timeout) {}
 
-class StartCommand : public InstantCommand {
- public:
-  explicit StartCommand(Command* commandToStart);
-  virtual ~StartCommand() = default;
+TimedCommand::TimedCommand(double timeout) : Command(timeout) {}
 
- protected:
-  virtual void Initialize();
-
- private:
-  Command* m_commandToFork;
-};
-
-}  // namespace frc
+bool TimedCommand::IsFinished() { return IsTimedOut(); }

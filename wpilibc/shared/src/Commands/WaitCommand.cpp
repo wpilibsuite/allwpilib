@@ -7,26 +7,10 @@
 
 #include "Commands/WaitCommand.h"
 
-#include <sstream>
-
 using namespace frc;
 
 WaitCommand::WaitCommand(double timeout)
-    : Command(
-          ((std::stringstream&)(std::stringstream("Wait(") << timeout << ")"))
-              .str()
-              .c_str(),
-          timeout) {}
+    : TimedCommand("Wait(" + std::to_string(timeout) + ")", timeout) {}
 
 WaitCommand::WaitCommand(const std::string& name, double timeout)
-    : Command(name, timeout) {}
-
-void WaitCommand::Initialize() {}
-
-void WaitCommand::Execute() {}
-
-bool WaitCommand::IsFinished() { return IsTimedOut(); }
-
-void WaitCommand::End() {}
-
-void WaitCommand::Interrupted() {}
+    : TimedCommand(name, timeout) {}

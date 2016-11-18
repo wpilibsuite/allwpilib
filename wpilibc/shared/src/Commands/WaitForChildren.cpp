@@ -17,14 +17,6 @@ WaitForChildren::WaitForChildren(double timeout)
 WaitForChildren::WaitForChildren(const std::string& name, double timeout)
     : Command(name, timeout) {}
 
-void WaitForChildren::Initialize() {}
-
-void WaitForChildren::Execute() {}
-
-void WaitForChildren::End() {}
-
-void WaitForChildren::Interrupted() {}
-
 bool WaitForChildren::IsFinished() {
   return GetGroup() == nullptr || GetGroup()->GetSize() == 0;
 }

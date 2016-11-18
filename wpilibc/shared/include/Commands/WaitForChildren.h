@@ -20,11 +20,7 @@ class WaitForChildren : public Command {
   virtual ~WaitForChildren() = default;
 
  protected:
-  virtual void Initialize();
-  virtual void Execute();
   virtual bool IsFinished();
-  virtual void End();
-  virtual void Interrupted();
 };
 
 }  // namespace frc

@@ -81,45 +81,13 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   bool IsTimedOut() const;
   bool AssertUnlocked(const std::string& message);
   void SetParent(CommandGroup* parent);
-  /**
-   * The initialize method is called the first time this Command is run after
-   * being started.
-   */
-  virtual void Initialize() = 0;
-  /**
-   * The execute method is called repeatedly until this Command either finishes
-   * or is canceled.
-   */
-  virtual void Execute() = 0;
-  /**
-   * Returns whether this command is finished.
-   * If it is, then the command will be removed and {@link Command#end() end()}
-   * will be called.
-   *
-   * <p>It may be useful for a team to reference the {@link Command#isTimedOut()
-   * isTimedOut()} method for time-sensitive commands.</p>
-   * @return whether this command is finished.
-   * @see Command#isTimedOut() isTimedOut()
-   */
-  virtual bool IsFinished() = 0;
-  /**
-   * Called when the command ended peacefully.  This is where you may want
-   * to wrap up loose ends, like shutting off a motor that was being used
-   * in the command.
-   */
-  virtual void End() = 0;
-  /**
-   * Called when the command ends because somebody called
-   * {@link Command#cancel() cancel()} or another command shared the same
-   * requirements as this one, and booted it out.
-   *
-   * <p>This is where you may want to wrap up loose ends, like shutting off a
-   * motor that was being used in the command.</p>
-   *
-   * <p>Generally, it is useful to simply call the {@link Command#end() end()}
-   * method within this method</p>
-   */
-  virtual void Interrupted() = 0;
+
+  virtual void Initialize();
+  virtual void Execute();
+  virtual bool IsFinished();
+  virtual void End();
+  virtual void Interrupted();
+
   virtual void _Initialize();
   virtual void _Interrupted();
   virtual void _Execute();
