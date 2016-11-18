@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 #include "llvm/ArrayRef.h"
@@ -59,6 +60,10 @@ class UnlimitedHandleResource {
   template <typename F>
   void ForEach(F func);
 
+  // @pram func functor with (const TStruct&) parameter and bool return value
+  template <typename F>
+  std::pair<THandle, std::shared_ptr<TStruct>> FindIf(F func);
+
  private:
   THandle MakeHandle(size_t i) {
     return THandle{static_cast<int>(i),
@@ -105,8 +110,8 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
 }
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
-std::shared_ptr<TStruct> UnlimitedHandleResource<THandle, TStruct, typeValue,
-                                                 TMutex>::Get(THandle handle) {
+inline std::shared_ptr<TStruct> UnlimitedHandleResource<
+    THandle, TStruct, typeValue, TMutex>::Get(THandle handle) {
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
   if (index < 0) return nullptr;
@@ -117,7 +122,7 @@ std::shared_ptr<TStruct> UnlimitedHandleResource<THandle, TStruct, typeValue,
 }
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
-void UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
+inline void UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
     THandle handle) {
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
@@ -129,7 +134,7 @@ void UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Free(
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename T>
-llvm::ArrayRef<T>
+inline llvm::ArrayRef<T>
 UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
     llvm::SmallVectorImpl<T>& vec) {
   ForEach([&](THandle handle, const TStruct& data) { vec.push_back(handle); });
@@ -138,13 +143,25 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::GetAll(
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
 template <typename F>
-void UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::ForEach(
-    F func) {
+inline void
+UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::ForEach(F func) {
   std::lock_guard<TMutex> sync(m_handleMutex);
-  size_t i;
-  for (i = 0; i < m_structures.size(); i++) {
+  for (size_t i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] != nullptr) func(MakeHandle(i), *(m_structures[i]));
   }
+}
+
+template <typename THandle, typename TStruct, int typeValue, typename TMutex>
+template <typename F>
+inline std::pair<THandle, std::shared_ptr<TStruct>>
+UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FindIf(F func) {
+  std::lock_guard<TMutex> sync(m_handleMutex);
+  for (size_t i = 0; i < m_structures.size(); i++) {
+    auto& structure = m_structures[i];
+    if (structure != nullptr && func(*structure))
+      return std::make_pair(MakeHandle(i), structure);
+  }
+  return std::make_pair(0, nullptr);
 }
 
 template <typename THandle, typename TStruct, int typeValue,
@@ -158,7 +175,7 @@ class StaticUnlimitedHandleResource
   }
 
  private:
-  StaticUnlimitedHandleResource() {}
+  StaticUnlimitedHandleResource() = default;
 
   ATOMIC_STATIC_DECL(StaticUnlimitedHandleResource)
 };

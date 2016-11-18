@@ -79,8 +79,25 @@ struct SourceData {
   std::shared_ptr<SourceImpl> source;
 };
 
-typedef StaticUnlimitedHandleResource<Handle, SourceData, Handle::kSource>
-    Sources;
+class Sources
+    : public UnlimitedHandleResource<Handle, SourceData, Handle::kSource> {
+ public:
+  static Sources& GetInstance() {
+    ATOMIC_STATIC(Sources, instance);
+    return instance;
+  }
+
+  std::pair<CS_Source, std::shared_ptr<SourceData>> Find(
+      const SourceImpl& source) {
+    return FindIf(
+        [&](const SourceData& data) { return data.source.get() == &source; });
+  }
+
+ private:
+  Sources() = default;
+
+  ATOMIC_STATIC_DECL(Sources)
+};
 
 struct SinkData {
   explicit SinkData(CS_SinkKind kind_, std::shared_ptr<SinkImpl> sink_)
@@ -92,7 +109,23 @@ struct SinkData {
   std::shared_ptr<SinkImpl> sink;
 };
 
-typedef StaticUnlimitedHandleResource<Handle, SinkData, Handle::kSink> Sinks;
+class Sinks : public UnlimitedHandleResource<Handle, SinkData, Handle::kSink> {
+ public:
+  static Sinks& GetInstance() {
+    ATOMIC_STATIC(Sinks, instance);
+    return instance;
+  }
+
+  std::pair<CS_Sink, std::shared_ptr<SinkData>> Find(const SinkImpl& sink) {
+    return FindIf(
+        [&](const SinkData& data) { return data.sink.get() == &sink; });
+  }
+
+ private:
+  Sinks() = default;
+
+  ATOMIC_STATIC_DECL(Sinks)
+};
 
 }  // namespace cs
 
