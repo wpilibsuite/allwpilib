@@ -21,6 +21,8 @@ class CvSourceImpl : public SourceImpl {
   CvSourceImpl(llvm::StringRef name, const VideoMode& mode);
   ~CvSourceImpl() override;
 
+  void Start();
+
   bool IsConnected() const override;
 
   // Property functions
@@ -37,18 +39,13 @@ class CvSourceImpl : public SourceImpl {
   void PutFrame(cv::Mat& image);
   void NotifyError(llvm::StringRef msg);
   void SetConnected(bool connected);
-  CS_Property CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
-                             int minimum, int maximum, int step,
-                             int defaultValue, int value);
-  CS_Property CreateProperty(
-      llvm::StringRef name, CS_PropertyKind kind, int minimum, int maximum,
-      int step, int defaultValue, int value,
-      std::function<void(CS_Property property)> onChange);
-  void SetEnumPropertyChoices(CS_Property property,
-                              llvm::ArrayRef<std::string> choices,
+  int CreateProperty(llvm::StringRef name, CS_PropertyKind kind, int minimum,
+                     int maximum, int step, int defaultValue, int value);
+  int CreateProperty(llvm::StringRef name, CS_PropertyKind kind, int minimum,
+                     int maximum, int step, int defaultValue, int value,
+                     std::function<void(CS_Property property)> onChange);
+  void SetEnumPropertyChoices(int property, llvm::ArrayRef<std::string> choices,
                               CS_Status* status);
-  void RemoveProperty(CS_Property property);
-  void RemoveProperty(llvm::StringRef name);
 
   // Property data
   class PropertyData : public PropertyBase {

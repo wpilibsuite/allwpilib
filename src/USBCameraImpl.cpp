@@ -844,6 +844,11 @@ void USBCameraImpl::DeviceProcessCommands() {
       else
         prop->value = msg->data[1];
       prop->valueSet = true;
+      // Only notify updates after we've notified created
+      if (m_properties_cached)
+        Notifier::GetInstance().NotifySourceProperty(
+            *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
+            prop->value, prop->valueStr);
       msg->kind = Message::kOk;
     } else if (msg->kind == Message::kNumSinksChanged ||
                msg->kind == Message::kNumSinksEnabledChanged) {
@@ -1063,6 +1068,16 @@ void USBCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
     lock.lock();
     m_propertyData[ndx - 1] = std::move(prop);
   }
+  auto eventProp = static_cast<PropertyData*>(GetProperty(ndx));
+  auto& notifier = Notifier::GetInstance();
+  notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, ndx,
+                                eventProp->propKind, eventProp->value,
+                                eventProp->valueStr);
+  // also notify choices updated event for enum types
+  if (eventProp->propKind == CS_PROP_ENUM)
+    notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
+                                  ndx, eventProp->propKind, eventProp->value,
+                                  llvm::StringRef{});
 }
 
 void USBCameraImpl::DeviceCacheProperties() {

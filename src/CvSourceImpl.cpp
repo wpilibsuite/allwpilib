@@ -28,12 +28,14 @@ CvSourceImpl::CvSourceImpl(llvm::StringRef name, const VideoMode& mode)
   // Create jpeg quality property
   m_compressionParams.push_back(CV_IMWRITE_JPEG_QUALITY);
   m_compressionParams.push_back(80);
-
-  m_qualityProperty =
-      CreateProperty("jpeg_quality", CS_PROP_INTEGER, 0, 100, 1, 80, 80);
 }
 
 CvSourceImpl::~CvSourceImpl() {}
+
+void CvSourceImpl::Start() {
+  m_qualityProperty =
+      CreateProperty("jpeg_quality", CS_PROP_INTEGER, 0, 100, 1, 80, 80);
+}
 
 bool CvSourceImpl::IsConnected() const { return m_connected; }
 
@@ -56,6 +58,9 @@ void CvSourceImpl::SetProperty(int property, int value, CS_Status* status) {
     return;
   }
   prop->value = value;
+  Notifier::GetInstance().NotifySourceProperty(
+      *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
+      prop->value, prop->valueStr);
 }
 
 void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
@@ -71,6 +76,9 @@ void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
     return;
   }
   prop->valueStr = value;
+  Notifier::GetInstance().NotifySourceProperty(
+      *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, CS_PROP_STRING,
+      prop->value, prop->valueStr);
 }
 
 bool CvSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
@@ -112,10 +120,9 @@ void CvSourceImpl::SetConnected(bool connected) {
     Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
 }
 
-CS_Property CvSourceImpl::CreateProperty(llvm::StringRef name,
-                                         CS_PropertyKind kind, int minimum,
-                                         int maximum, int step,
-                                         int defaultValue, int value) {
+int CvSourceImpl::CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
+                                 int minimum, int maximum, int step,
+                                 int defaultValue, int value) {
   std::unique_lock<std::mutex> lock(m_mutex);
   int& ndx = m_properties[name];
   if (ndx == 0) {
@@ -131,11 +138,14 @@ CS_Property CvSourceImpl::CreateProperty(llvm::StringRef name,
     prop->maximum = maximum;
     prop->step = step;
     prop->defaultValue = defaultValue;
+    value = prop->value;
   }
+  Notifier::GetInstance().NotifySourceProperty(
+      *this, CS_SOURCE_PROPERTY_CREATED, ndx, kind, value, llvm::StringRef{});
   return ndx;
 }
 
-CS_Property CvSourceImpl::CreateProperty(
+int CvSourceImpl::CreateProperty(
     llvm::StringRef name, CS_PropertyKind kind, int minimum, int maximum,
     int step, int defaultValue, int value,
     std::function<void(CS_Property property)> onChange) {
@@ -143,7 +153,7 @@ CS_Property CvSourceImpl::CreateProperty(
   return 0;
 }
 
-void CvSourceImpl::SetEnumPropertyChoices(CS_Property property,
+void CvSourceImpl::SetEnumPropertyChoices(int property,
                                           llvm::ArrayRef<std::string> choices,
                                           CS_Status* status) {
   std::lock_guard<std::mutex> lock(m_mutex);
@@ -157,6 +167,9 @@ void CvSourceImpl::SetEnumPropertyChoices(CS_Property property,
     return;
   }
   prop->enumChoices = choices;
+  Notifier::GetInstance().NotifySourceProperty(
+      *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, property, CS_PROP_ENUM,
+      prop->value, llvm::StringRef{});
 }
 
 namespace cs {
@@ -165,13 +178,13 @@ CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
                          CS_Status* status) {
   auto source = std::make_shared<CvSourceImpl>(name, mode);
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_CV, source);
-  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  auto& notifier = Notifier::GetInstance();
+  notifier.NotifySource(name, handle, CS_SOURCE_CREATED);
   // Generate initial events here so they come after the source created event
-  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CONNECTED);
-  Notifier::GetInstance().NotifySource(name, handle,
-                                       CS_SOURCE_VIDEOMODES_UPDATED);
-  Notifier::GetInstance().NotifySource(name, handle,
-                                       CS_SOURCE_VIDEOMODE_CHANGED);
+  source->Start();  // causes a property event
+  notifier.NotifySource(name, handle, CS_SOURCE_CONNECTED);
+  notifier.NotifySource(name, handle, CS_SOURCE_VIDEOMODES_UPDATED);
+  notifier.NotifySource(name, handle, CS_SOURCE_VIDEOMODE_CHANGED);
   return handle;
 }
 
@@ -222,8 +235,10 @@ CS_Property CreateSourceProperty(CS_Source source, llvm::StringRef name,
     *status = CS_INVALID_HANDLE;
     return -1;
   }
-  return static_cast<CvSourceImpl&>(*data->source)
-      .CreateProperty(name, kind, minimum, maximum, step, defaultValue, value);
+  int property = static_cast<CvSourceImpl&>(*data->source)
+                     .CreateProperty(name, kind, minimum, maximum, step,
+                                     defaultValue, value);
+  return Handle{source, property, Handle::kProperty};
 }
 
 CS_Property CreateSourcePropertyCallback(
@@ -235,9 +250,10 @@ CS_Property CreateSourcePropertyCallback(
     *status = CS_INVALID_HANDLE;
     return -1;
   }
-  return static_cast<CvSourceImpl&>(*data->source)
-      .CreateProperty(name, kind, minimum, maximum, step, defaultValue, value,
-                      onChange);
+  int property = static_cast<CvSourceImpl&>(*data->source)
+                     .CreateProperty(name, kind, minimum, maximum, step,
+                                     defaultValue, value, onChange);
+  return Handle{source, property, Handle::kProperty};
 }
 
 void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
@@ -248,8 +264,22 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
     *status = CS_INVALID_HANDLE;
     return;
   }
+
+  // Get property index; also validate the source owns this property
+  Handle handle{property};
+  int i = handle.GetParentIndex();
+  if (i < 0) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  auto data2 = Sources::GetInstance().Get(Handle{i, Handle::kSource});
+  if (!data2 || data->source.get() != data2->source.get()) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  int propertyIndex = handle.GetIndex();
   static_cast<CvSourceImpl&>(*data->source)
-      .SetEnumPropertyChoices(property, choices, status);
+      .SetEnumPropertyChoices(propertyIndex, choices, status);
 }
 
 }  // namespace cs
