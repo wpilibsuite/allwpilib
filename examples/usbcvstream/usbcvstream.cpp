@@ -7,12 +7,12 @@
 int main() {
   cs::USBCamera camera{"usbcam", 0};
   camera.SetVideoMode(cs::VideoMode::kMJPEG, 320, 240, 30);
-  cs::MJPEGServer mjpegServer{"httpserver", 8080};
+  cs::MJPEGServer mjpegServer{"httpserver", 8081};
   mjpegServer.SetSource(camera);
   cs::CvSink cvsink{"cvsink"};
   cvsink.SetSource(camera);
   cs::CvSource cvsource{"cvsource", cs::VideoMode::kMJPEG, 320, 240, 30};
-  cs::MJPEGServer cvMjpegServer{"cvhttpserver", 8081};
+  cs::MJPEGServer cvMjpegServer{"cvhttpserver", 8082};
   cvMjpegServer.SetSource(cvsource);
 
   cv::Mat test;
