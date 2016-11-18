@@ -50,6 +50,8 @@ class Notifier {
                             int value, llvm::StringRef valueStr);
   void NotifySink(llvm::StringRef name, CS_Sink sink, CS_EventKind kind);
   void NotifySink(const SinkImpl& sink, CS_EventKind kind);
+  void NotifySinkSourceChanged(llvm::StringRef name, CS_Sink sink,
+                               CS_Source source);
 
  private:
   Notifier();

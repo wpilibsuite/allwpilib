@@ -204,3 +204,15 @@ void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
   auto handleData = Sinks::GetInstance().Find(sink);
   NotifySink(sink.GetName(), handleData.first, kind);
 }
+
+void Notifier::NotifySinkSourceChanged(llvm::StringRef name, CS_Sink sink,
+                                       CS_Source source) {
+  auto thr = m_owner.GetThread();
+  if (!thr) return;
+
+  RawEvent event{name, sink, RawEvent::kSinkSourceChanged};
+  event.sourceHandle = source;
+
+  thr->m_notifications.emplace(std::move(event));
+  thr->m_cond.notify_one();
+}

@@ -415,6 +415,8 @@ void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
   }
   data->sink->SetSource(sourceData->source);
   data->sourceHandle.store(source);
+  Notifier::GetInstance().NotifySinkSourceChanged(data->sink->GetName(), sink,
+                                                  source);
 }
 
 CS_Source GetSinkSource(CS_Sink sink, CS_Status* status) {
