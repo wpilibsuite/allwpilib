@@ -383,6 +383,11 @@ inline VideoListener::VideoListener(VideoListener&& other) noexcept
   swap(*this, other);
 }
 
+inline VideoListener& VideoListener::operator=(VideoListener&& other) noexcept {
+  swap(*this, other);
+  return *this;
+}
+
 inline VideoListener::~VideoListener() {
   CS_Status status = 0;
   if (m_handle != 0) RemoveListener(m_handle, &status);

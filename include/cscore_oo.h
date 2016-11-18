@@ -475,6 +475,7 @@ class VideoListener {
   VideoListener(const VideoListener&) = delete;
   VideoListener& operator=(const VideoListener&) = delete;
   VideoListener(VideoListener&& other) noexcept;
+  VideoListener& operator=(VideoListener&& other) noexcept;
   ~VideoListener();
 
   friend void swap(VideoListener& first, VideoListener& second) noexcept {
