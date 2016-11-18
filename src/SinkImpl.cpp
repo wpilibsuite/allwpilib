@@ -7,6 +7,7 @@
 
 #include "SinkImpl.h"
 
+#include "Notifier.h"
 #include "SourceImpl.h"
 
 using namespace cs;
@@ -30,6 +31,37 @@ llvm::StringRef SinkImpl::GetDescription(
   std::lock_guard<std::mutex> lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return llvm::StringRef{buf.data(), buf.size()};
+}
+
+void SinkImpl::Enable() {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  ++m_enabledCount;
+  if (m_enabledCount == 1) {
+    if (m_source) m_source->EnableSink();
+    Notifier::GetInstance().NotifySink(*this, CS_SINK_ENABLED);
+  }
+}
+
+void SinkImpl::Disable() {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  --m_enabledCount;
+  if (m_enabledCount == 0) {
+    if (m_source) m_source->DisableSink();
+    Notifier::GetInstance().NotifySink(*this, CS_SINK_DISABLED);
+  }
+}
+
+void SinkImpl::SetEnabled(bool enabled) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (enabled && m_enabledCount == 0) {
+    if (m_source) m_source->EnableSink();
+    m_enabledCount = 1;
+    Notifier::GetInstance().NotifySink(*this, CS_SINK_ENABLED);
+  } else if (!enabled && m_enabledCount > 0) {
+    if (m_source) m_source->DisableSink();
+    m_enabledCount = 0;
+    Notifier::GetInstance().NotifySink(*this, CS_SINK_DISABLED);
+  }
 }
 
 void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {

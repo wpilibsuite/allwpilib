@@ -32,28 +32,9 @@ class SinkImpl {
   void SetDescription(llvm::StringRef description);
   llvm::StringRef GetDescription(llvm::SmallVectorImpl<char>& buf) const;
 
-  void Enable() {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_enabledCount == 0 && m_source) m_source->EnableSink();
-    ++m_enabledCount;
-  }
-
-  void Disable() {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    --m_enabledCount;
-    if (m_enabledCount == 0 && m_source) m_source->DisableSink();
-  }
-
-  void SetEnabled(bool enabled) {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (enabled && m_enabledCount == 0) {
-      if (m_source) m_source->EnableSink();
-      m_enabledCount = 1;
-    } else if (!enabled && m_enabledCount > 0) {
-      if (m_source) m_source->DisableSink();
-      m_enabledCount = 0;
-    }
-  }
+  void Enable();
+  void Disable();
+  void SetEnabled(bool enabled);
 
   void SetSource(std::shared_ptr<SourceImpl> source);
 
