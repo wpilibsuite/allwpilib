@@ -48,7 +48,7 @@ class TiltPanCameraTest : public testing::Test {
   void SetUp() override {
     m_tilt = new Servo(TestBench::kCameraTiltChannel);
     m_pan = new Servo(TestBench::kCameraPanChannel);
-    m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS0);
+    m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS1);
 
     m_tilt->Set(kTiltSetpoint45);
     m_pan->SetAngle(0.0f);
