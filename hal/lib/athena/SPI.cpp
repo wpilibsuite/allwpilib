@@ -15,6 +15,7 @@
 #include "HAL/HAL.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
+#include "HAL/handles/HandlesInternal.h"
 #include "spilib/spi-lib.h"
 
 using namespace hal;
@@ -26,12 +27,11 @@ static int32_t m_spiCS3Handle = 0;
 static int32_t m_spiMXPHandle = 0;
 static priority_recursive_mutex spiOnboardMutex;
 static priority_recursive_mutex spiMXPMutex;
-static std::unique_ptr<tSPI> spiSystem;
 
-static HAL_DigitalHandle spiMXPDigitalHandle1 = HAL_kInvalidHandle;
-static HAL_DigitalHandle spiMXPDigitalHandle2 = HAL_kInvalidHandle;
-static HAL_DigitalHandle spiMXPDigitalHandle3 = HAL_kInvalidHandle;
-static HAL_DigitalHandle spiMXPDigitalHandle4 = HAL_kInvalidHandle;
+// MXP SPI does not count towards this
+std::atomic<int32_t> spiPortCount{0};
+
+static HAL_DigitalHandle digitalHandles[9]{HAL_kInvalidHandle};
 
 /**
  * Get the semaphore for a SPI port
@@ -73,56 +73,115 @@ struct SPIAccumulator {
 };
 std::unique_ptr<SPIAccumulator> spiAccumulators[5];
 
+static void CommonSPIPortInit(int32_t* status) {
+  // All false cases will set
+  if (spiPortCount.fetch_add(1) == 0) {
+    // Have not been initialized yet
+    initializeDigital(status);
+    if (*status != 0) return;
+    // MISO
+    if ((digitalHandles[3] = HAL_InitializeDIOPort(createPortHandleForSPI(29),
+                                                   false, status)) ==
+        HAL_kInvalidHandle) {
+      std::printf("Failed to allocate DIO 29 (MISO)\n");
+      return;
+    }
+    // MOSI
+    if ((digitalHandles[4] = HAL_InitializeDIOPort(createPortHandleForSPI(30),
+                                                   false, status)) ==
+        HAL_kInvalidHandle) {
+      std::printf("Failed to allocate DIO 30 (MOSI)\n");
+      HAL_FreeDIOPort(digitalHandles[3]);  // free the first port allocated
+      return;
+    }
+  }
+}
+
+static void CommonSPIPortFree() {
+  if (spiPortCount.fetch_sub(1) == 1) {
+    // Clean up SPI Handles
+    HAL_FreeDIOPort(digitalHandles[3]);
+    HAL_FreeDIOPort(digitalHandles[4]);
+  }
+}
+
 /*
  * Initialize the spi port. Opens the port if necessary and saves the handle.
  * If opening the MXP port, also sets up the channel functions appropriately
- * @param port The number of the port to use. 0-3 for Onboard CS0-CS2, 4 for MXP
+ * @param port The number of the port to use. 0-3 for Onboard CS0-CS3, 4 for MXP
  */
 void HAL_InitializeSPI(int32_t port, int32_t* status) {
-  if (spiSystem == nullptr) spiSystem.reset(tSPI::create(status));
   if (HAL_GetSPIHandle(port) != 0) return;
   switch (port) {
     case 0:
+      CommonSPIPortInit(status);
+      if (*status != 0) return;
+      // CS0 is not a DIO port, so nothing to allocate
       HAL_SetSPIHandle(0, spilib_open("/dev/spidev0.0"));
       break;
     case 1:
+      CommonSPIPortInit(status);
+      if (*status != 0) return;
+      // CS1, Allocate
+      if ((digitalHandles[0] = HAL_InitializeDIOPort(
+               HAL_GetPort(26), false, status)) == HAL_kInvalidHandle) {
+        std::printf("Failed to allocate DIO 26 (CS1)\n");
+        CommonSPIPortFree();
+        return;
+      }
       HAL_SetSPIHandle(1, spilib_open("/dev/spidev0.1"));
       break;
     case 2:
+      CommonSPIPortInit(status);
+      if (*status != 0) return;
+      // CS2, Allocate
+      if ((digitalHandles[1] = HAL_InitializeDIOPort(
+               HAL_GetPort(27), false, status)) == HAL_kInvalidHandle) {
+        std::printf("Failed to allocate DIO 27 (CS2)\n");
+        CommonSPIPortFree();
+        return;
+      }
       HAL_SetSPIHandle(2, spilib_open("/dev/spidev0.2"));
       break;
     case 3:
+      CommonSPIPortInit(status);
+      if (*status != 0) return;
+      // CS3, Allocate
+      if ((digitalHandles[2] = HAL_InitializeDIOPort(
+               HAL_GetPort(28), false, status)) == HAL_kInvalidHandle) {
+        std::printf("Failed to allocate DIO 28 (CS3)\n");
+        CommonSPIPortFree();
+        return;
+      }
       HAL_SetSPIHandle(3, spilib_open("/dev/spidev0.3"));
       break;
     case 4:
       initializeDigital(status);
       if (*status != 0) return;
-      if ((spiMXPDigitalHandle1 = HAL_InitializeDIOPort(
+      if ((digitalHandles[5] = HAL_InitializeDIOPort(
                HAL_GetPort(14), false, status)) == HAL_kInvalidHandle) {
         std::printf("Failed to allocate DIO 14\n");
         return;
       }
-      if ((spiMXPDigitalHandle2 = HAL_InitializeDIOPort(
+      if ((digitalHandles[6] = HAL_InitializeDIOPort(
                HAL_GetPort(15), false, status)) == HAL_kInvalidHandle) {
         std::printf("Failed to allocate DIO 15\n");
-        HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
+        HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         return;
       }
-      if ((spiMXPDigitalHandle3 = HAL_InitializeDIOPort(
+      if ((digitalHandles[7] = HAL_InitializeDIOPort(
                HAL_GetPort(16), false, status)) == HAL_kInvalidHandle) {
         std::printf("Failed to allocate DIO 16\n");
-        HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
-        HAL_FreeDIOPort(
-            spiMXPDigitalHandle2);  // free the second port allocated
+        HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
+        HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated
         return;
       }
-      if ((spiMXPDigitalHandle4 = HAL_InitializeDIOPort(
+      if ((digitalHandles[8] = HAL_InitializeDIOPort(
                HAL_GetPort(17), false, status)) == HAL_kInvalidHandle) {
         std::printf("Failed to allocate DIO 17\n");
-        HAL_FreeDIOPort(spiMXPDigitalHandle1);  // free the first port allocated
-        HAL_FreeDIOPort(
-            spiMXPDigitalHandle2);  // free the second port allocated
-        HAL_FreeDIOPort(spiMXPDigitalHandle3);  // free the third port allocated
+        HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
+        HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated
+        HAL_FreeDIOPort(digitalHandles[7]);  // free the third port allocated
         return;
       }
       digitalSystem->writeEnableMXPSpecialFunction(
@@ -205,11 +264,28 @@ void HAL_CloseSPI(int32_t port) {
   }
   spilib_close(HAL_GetSPIHandle(port));
   HAL_SetSPIHandle(port, 0);
-  if (port == 4) {
-    HAL_FreeDIOPort(spiMXPDigitalHandle1);
-    HAL_FreeDIOPort(spiMXPDigitalHandle2);
-    HAL_FreeDIOPort(spiMXPDigitalHandle3);
-    HAL_FreeDIOPort(spiMXPDigitalHandle4);
+  if (port < 4) {
+    CommonSPIPortFree();
+  }
+  switch (port) {
+    // Case 0 does not need to do anything
+    case 1:
+      HAL_FreeDIOPort(digitalHandles[0]);
+      break;
+    case 2:
+      HAL_FreeDIOPort(digitalHandles[1]);
+      break;
+    case 3:
+      HAL_FreeDIOPort(digitalHandles[2]);
+      break;
+    case 4:
+      HAL_FreeDIOPort(digitalHandles[5]);
+      HAL_FreeDIOPort(digitalHandles[6]);
+      HAL_FreeDIOPort(digitalHandles[7]);
+      HAL_FreeDIOPort(digitalHandles[8]);
+      break;
+    default:
+      break;
   }
   return;
 }

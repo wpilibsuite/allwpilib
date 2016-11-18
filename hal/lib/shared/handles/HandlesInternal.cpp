@@ -21,6 +21,21 @@ HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module) {
   return handle;
 }
 
+HAL_PortHandle createPortHandleForSPI(uint8_t channel) {
+  // set last 8 bits, then shift to first 8 bits
+  HAL_PortHandle handle = static_cast<HAL_PortHandle>(HAL_HandleEnum::Port);
+  handle = handle << 16;
+  // set second set up bits to 1
+  int32_t temp = 1;
+  temp = (temp << 8) & 0xff00;
+  handle += temp;
+  // shift to last set of bits
+  handle = handle << 8;
+  // add channel to last 8 bits
+  handle += channel;
+  return handle;
+}
+
 HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType) {
   if (index < 0) return HAL_kInvalidHandle;
   uint8_t hType = static_cast<uint8_t>(handleType);
