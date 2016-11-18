@@ -76,8 +76,8 @@ public class VideoEvent {
   public Kind kind;
 
   // Valid for kSource* and kSink* respectively
-  private int sourceHandle;
-  private int sinkHandle;
+  public int sourceHandle;
+  public int sinkHandle;
 
   // Source/sink name
   public String name;
