@@ -7,6 +7,7 @@
 
 #include "edu_wpi_cscore_CameraServerJNI.h"
 
+#include "llvm/raw_ostream.h"
 #include "llvm/SmallString.h"
 #include "support/jni_util.h"
 
@@ -23,6 +24,7 @@ static JavaVM *jvm = nullptr;
 static jclass usbCameraInfoCls = nullptr;
 static jclass videoModeCls = nullptr;
 static jclass videoEventCls = nullptr;
+static jclass videoExceptionCls = nullptr;
 // Thread-attached environment for listener callbacks.
 static JNIEnv *listenerEnv = nullptr;
 
@@ -76,6 +78,12 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (!videoEventCls) return JNI_ERR;
   env->DeleteLocalRef(local);
 
+  local = env->FindClass("edu/wpi/cscore/VideoException");
+  if (!local) return JNI_ERR;
+  videoExceptionCls = static_cast<jclass>(env->NewGlobalRef(local));
+  if (!videoExceptionCls) return JNI_ERR;
+  env->DeleteLocalRef(local);
+
   // Initial configuration of listener start/exit
   cs::SetListenerOnStart(ListenerOnStart);
   cs::SetListenerOnExit(ListenerOnExit);
@@ -91,6 +99,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (usbCameraInfoCls) env->DeleteGlobalRef(usbCameraInfoCls);
   if (videoModeCls) env->DeleteGlobalRef(videoModeCls);
   if (videoEventCls) env->DeleteGlobalRef(videoEventCls);
+  if (videoExceptionCls) env->DeleteGlobalRef(videoEventCls);
   jvm = nullptr;
 }
 
@@ -127,14 +136,51 @@ class JGlobal {
   T m_obj;
 };
 
-static void ReportError(JNIEnv *env, CS_Status status, bool do_throw = true) {
-  // TODO
+static void ReportError(JNIEnv *env, CS_Status status) {
+  if (status == CS_OK) return;
+  static jmethodID constructor = nullptr;
+  if (!constructor)
+    constructor =
+        env->GetMethodID(videoExceptionCls, "<init>", "(Ljava/lang/String;)V");
+
+  llvm::SmallString<64> msg;
+  switch (status) {
+    case CS_PROPERTY_WRITE_FAILED:
+      msg = "property write failed";
+      break;
+    case CS_INVALID_HANDLE:
+      msg = "invalid handle";
+      break;
+    case CS_WRONG_HANDLE_SUBTYPE:
+      msg = "wrong handle subtype";
+      break;
+    case CS_INVALID_PROPERTY:
+      msg = "invalid property";
+      break;
+    case CS_WRONG_PROPERTY_TYPE:
+      msg = "wrong property type";
+      break;
+    case CS_READ_FAILED:
+      msg = "read failed";
+      break;
+    case CS_SOURCE_IS_DISCONNECTED:
+      msg = "source is disconnected";
+      break;
+    default: {
+      llvm::raw_svector_ostream oss{msg};
+      oss << "unknown error code=" << status;
+      break;
+    }
+  }
+  JLocal<jstring> msg_jstr{env, MakeJString(env, msg)};
+  jobject exception =
+      env->NewObject(videoExceptionCls, constructor, msg_jstr.obj());
+  env->Throw(static_cast<jthrowable>(exception));
 }
 
-static inline bool CheckStatus(JNIEnv *env, CS_Status status,
-                               bool do_throw = true) {
-  if (status != 0) ReportError(env, status, do_throw);
-  return status == 0;
+static inline bool CheckStatus(JNIEnv *env, CS_Status status) {
+  if (status != CS_OK) ReportError(env, status);
+  return status == CS_OK;
 }
 
 static jobject MakeJObject(JNIEnv *env, const cs::USBCameraInfo &info) {

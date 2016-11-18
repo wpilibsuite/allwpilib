@@ -1,0 +1,20 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+package edu.wpi.cscore;
+
+/// An exception raised by the camera server.
+public class VideoException extends RuntimeException {
+  public VideoException(String msg) {
+    super(msg);
+  }
+
+  @Override
+  public String toString() {
+    return "VideoException [" + super.toString() + "]";
+  }
+}
