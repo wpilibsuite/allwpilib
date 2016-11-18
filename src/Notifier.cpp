@@ -11,6 +11,8 @@
 #include <vector>
 
 #include "Handle.h"
+#include "SinkImpl.h"
+#include "SourceImpl.h"
 
 using namespace cs;
 
@@ -151,37 +153,54 @@ void Notifier::RemoveListener(int uid) {
 }
 
 void Notifier::NotifySource(llvm::StringRef name, CS_Source source,
-                            RawEvent::Kind kind) {
+                            CS_EventKind kind) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_notifications.emplace(name, source, kind);
+  thr->m_notifications.emplace(name, source, static_cast<RawEvent::Kind>(kind));
   thr->m_cond.notify_one();
 }
 
-void Notifier::NotifySourceVideoMode(llvm::StringRef name, CS_Source source,
+void Notifier::NotifySource(const SourceImpl& source, CS_EventKind kind) {
+  auto handleData = Sources::GetInstance().Find(source);
+  NotifySource(source.GetName(), handleData.first, kind);
+}
+
+void Notifier::NotifySourceVideoMode(const SourceImpl& source,
                                      const VideoMode& mode) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_notifications.emplace(name, source, mode);
+
+  auto handleData = Sources::GetInstance().Find(source);
+
+  thr->m_notifications.emplace(source.GetName(), handleData.first, mode);
   thr->m_cond.notify_one();
 }
 
-void Notifier::NotifySourceProperty(llvm::StringRef name, CS_Source source,
-                                    RawEvent::Kind kind, int property,
-                                    CS_PropertyKind propertyKind, int value,
-                                    llvm::StringRef valueStr) {
+void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
+                                    int property, CS_PropertyKind propertyKind,
+                                    int value, llvm::StringRef valueStr) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_notifications.emplace(name, source, kind,
-                               Handle{source, property, Handle::kProperty},
-                               propertyKind, value, valueStr);
+
+  auto handleData = Sources::GetInstance().Find(source);
+
+  thr->m_notifications.emplace(
+      source.GetName(), handleData.first, static_cast<RawEvent::Kind>(kind),
+      Handle{handleData.first, property, Handle::kProperty}, propertyKind,
+      value, valueStr);
   thr->m_cond.notify_one();
 }
 
 void Notifier::NotifySink(llvm::StringRef name, CS_Sink sink,
-                          RawEvent::Kind kind) {
+                          CS_EventKind kind) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
-  thr->m_notifications.emplace(name, sink, kind);
+
+  thr->m_notifications.emplace(name, sink, static_cast<RawEvent::Kind>(kind));
   thr->m_cond.notify_one();
+}
+
+void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
+  auto handleData = Sinks::GetInstance().Find(sink);
+  NotifySink(sink.GetName(), handleData.first, kind);
 }

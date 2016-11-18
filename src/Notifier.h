@@ -16,6 +16,9 @@
 
 namespace cs {
 
+class SinkImpl;
+class SourceImpl;
+
 class Notifier {
   friend class NotifierTest;
 
@@ -39,15 +42,14 @@ class Notifier {
   void RemoveListener(int uid);
 
   // Notification events
-  void NotifySource(llvm::StringRef name, CS_Source source,
-                    RawEvent::Kind kind);
-  void NotifySourceVideoMode(llvm::StringRef name, CS_Source source,
-                             const VideoMode& mode);
-  void NotifySourceProperty(llvm::StringRef name, CS_Source source,
-                            RawEvent::Kind kind, int property,
-                            CS_PropertyKind propertyKind, int value,
-                            llvm::StringRef valueStr);
-  void NotifySink(llvm::StringRef name, CS_Sink sink, RawEvent::Kind kind);
+  void NotifySource(llvm::StringRef name, CS_Source source, CS_EventKind kind);
+  void NotifySource(const SourceImpl& source, CS_EventKind kind);
+  void NotifySourceVideoMode(const SourceImpl& source, const VideoMode& mode);
+  void NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
+                            int property, CS_PropertyKind propertyKind,
+                            int value, llvm::StringRef valueStr);
+  void NotifySink(llvm::StringRef name, CS_Sink sink, CS_EventKind kind);
+  void NotifySink(const SinkImpl& sink, CS_EventKind kind);
 
  private:
   Notifier();
