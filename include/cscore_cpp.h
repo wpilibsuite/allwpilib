@@ -74,14 +74,14 @@ struct RawEvent {
     kSourceDisconnected = CS_SOURCE_DISCONNECTED,
     kSourceVideoModesUpdated = CS_SOURCE_VIDEOMODES_UPDATED,
     kSourceVideoModeChanged = CS_SOURCE_VIDEOMODE_CHANGED,
+    kSourcePropertyCreated = CS_SOURCE_PROPERTY_CREATED,
+    kSourcePropertyValueUpdated = CS_SOURCE_PROPERTY_VALUE_UPDATED,
+    kSourcePropertyChoicesUpdated = CS_SOURCE_PROPERTY_CHOICES_UPDATED,
     kSinkSourceChanged = CS_SINK_SOURCE_CHANGED,
     kSinkCreated = CS_SINK_CREATED,
     kSinkDestroyed = CS_SINK_DESTROYED,
     kSinkEnabled = CS_SINK_ENABLED,
-    kSinkDisabled = CS_SINK_DISABLED,
-    kSourcePropertyCreated = CS_SOURCE_PROPERTY_CREATED,
-    kSourcePropertyValueUpdated = CS_SOURCE_PROPERTY_VALUE_UPDATED,
-    kSourcePropertyChoicesUpdated = CS_SOURCE_PROPERTY_CHOICES_UPDATED
+    kSinkDisabled = CS_SINK_DISABLED
   };
 
   RawEvent() = default;

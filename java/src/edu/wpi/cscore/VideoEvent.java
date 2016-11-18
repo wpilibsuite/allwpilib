@@ -16,14 +16,14 @@ public class VideoEvent {
     kSourceDisconnected(0x0008),
     kSourceVideoModesUpdated(0x0010),
     kSourceVideoModeChanged(0x0020),
-    kSinkSourceChanged(0x0040),
-    kSinkCreated(0x0100),
-    kSinkDestroyed(0x0200),
-    kSinkEnabled(0x0400),
-    kSinkDisabled(0x0800),
-    kSourcePropertyCreated(0x1000),
-    kSourcePropertyValueUpdated(0x2000),
-    kSourcePropertyChoicesUpdated(0x4000);
+    kSourcePropertyCreated(0x0040),
+    kSourcePropertyValueUpdated(0x0080),
+    kSourcePropertyChoicesUpdated(0x0100),
+    kSinkSourceChanged(0x0200),
+    kSinkCreated(0x0400),
+    kSinkDestroyed(0x0800),
+    kSinkEnabled(0x1000),
+    kSinkDisabled(0x2000);
 
     private int value;
 
