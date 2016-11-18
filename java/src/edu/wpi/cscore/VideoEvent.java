@@ -24,7 +24,8 @@ public class VideoEvent {
     kSinkCreated(0x0400),
     kSinkDestroyed(0x0800),
     kSinkEnabled(0x1000),
-    kSinkDisabled(0x2000);
+    kSinkDisabled(0x2000),
+    kNetworkInterfacesChanged(0x4000);
 
     private int value;
 
@@ -53,6 +54,7 @@ public class VideoEvent {
       case 0x0800: return Kind.kSinkDestroyed;
       case 0x1000: return Kind.kSinkEnabled;
       case 0x2000: return Kind.kSinkDisabled;
+      case 0x4000: return Kind.kNetworkInterfacesChanged;
       default: return Kind.kUnknown;
     }
   }

@@ -52,6 +52,7 @@ class Notifier {
   void NotifySink(const SinkImpl& sink, CS_EventKind kind);
   void NotifySinkSourceChanged(llvm::StringRef name, CS_Sink sink,
                                CS_Source source);
+  void NotifyNetworkInterfacesChanged();
 
  private:
   Notifier();

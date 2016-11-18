@@ -16,6 +16,7 @@
 
 #include "llvm/SmallString.h"
 
+#include "NetworkListener.h"
 #include "Notifier.h"
 #include "SinkImpl.h"
 #include "SourceImpl.h"
@@ -487,6 +488,10 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
                         int eventMask, bool immediateNotify,
                         CS_Status* status) {
   int uid = Notifier::GetInstance().AddListener(callback, eventMask);
+  if ((eventMask & CS_NETWORK_INTERFACES_CHANGED) != 0) {
+    // start network interface event listener
+    NetworkListener::GetInstance().Start();
+  }
   if (immediateNotify) {
     // TODO
   }

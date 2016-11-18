@@ -81,10 +81,12 @@ struct RawEvent {
     kSinkCreated = CS_SINK_CREATED,
     kSinkDestroyed = CS_SINK_DESTROYED,
     kSinkEnabled = CS_SINK_ENABLED,
-    kSinkDisabled = CS_SINK_DISABLED
+    kSinkDisabled = CS_SINK_DISABLED,
+    kNetworkInterfacesChanged = CS_NETWORK_INTERFACES_CHANGED
   };
 
   RawEvent() = default;
+  RawEvent(RawEvent::Kind kind_) : kind{kind_} {}
   RawEvent(llvm::StringRef name_, CS_Handle handle_, RawEvent::Kind kind_)
       : kind{kind_}, name{name_} {
     if (kind_ == kSinkCreated || kind_ == kSinkDestroyed ||
