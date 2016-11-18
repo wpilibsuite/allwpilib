@@ -104,7 +104,13 @@ void CvSourceImpl::NotifyError(llvm::StringRef msg) {
   PutError(msg, wpi::Now());
 }
 
-void CvSourceImpl::SetConnected(bool connected) { m_connected = connected; }
+void CvSourceImpl::SetConnected(bool connected) {
+  bool was_connected = m_connected.exchange(connected);
+  if (was_connected && !connected)
+    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_DISCONNECTED);
+  else if (!was_connected && connected)
+    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
+}
 
 CS_Property CvSourceImpl::CreateProperty(llvm::StringRef name,
                                          CS_PropertyKind kind, int minimum,
@@ -160,6 +166,12 @@ CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
   auto source = std::make_shared<CvSourceImpl>(name, mode);
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_CV, source);
   Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  // Generate initial events here so they come after the source created event
+  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CONNECTED);
+  Notifier::GetInstance().NotifySource(name, handle,
+                                       CS_SOURCE_VIDEOMODES_UPDATED);
+  Notifier::GetInstance().NotifySource(name, handle,
+                                       CS_SOURCE_VIDEOMODE_CHANGED);
   return handle;
 }
 

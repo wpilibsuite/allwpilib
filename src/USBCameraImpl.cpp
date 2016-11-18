@@ -377,8 +377,6 @@ USBCameraImpl::USBCameraImpl(llvm::StringRef name, llvm::StringRef path)
       m_command_fd{eventfd(0, 0)},
       m_active{true} {
   SetDescription(GetDescriptionImpl(m_path.c_str()));
-  // Kick off the camera thread
-  m_cameraThread = std::thread(&USBCameraImpl::CameraThreadMain, this);
 }
 
 USBCameraImpl::~USBCameraImpl() {
@@ -392,7 +390,7 @@ USBCameraImpl::~USBCameraImpl() {
   Send(CreateMessage(Message::kNone));
 
   // join camera thread
-  m_cameraThread.join();
+  if (m_cameraThread.joinable()) m_cameraThread.join();
 
   // close command fd
   int fd = m_command_fd.exchange(-1);
@@ -404,6 +402,11 @@ static inline void DoFdSet(int fd, fd_set* set, int* nfds) {
     FD_SET(fd, set);
     if ((fd + 1) > *nfds) *nfds = fd + 1;
   }
+}
+
+void USBCameraImpl::Start() {
+  // Kick off the camera thread
+  m_cameraThread = std::thread(&USBCameraImpl::CameraThreadMain, this);
 }
 
 void USBCameraImpl::CameraThreadMain() {
@@ -590,6 +593,9 @@ void USBCameraImpl::DeviceDisconnect() {
 
   // Close device
   close(fd);
+
+  // Notify
+  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_DISCONNECTED);
 }
 
 void USBCameraImpl::DeviceConnect() {
@@ -680,6 +686,9 @@ void USBCameraImpl::DeviceConnect() {
     DEBUG4("USB " << m_path << ": buf " << i
                   << " address=" << m_buffers[i].m_data);
   }
+
+  // Notify
+  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
 }
 
 bool USBCameraImpl::DeviceStreamOn() {
@@ -768,11 +777,15 @@ void USBCameraImpl::DeviceProcessCommands() {
           DeviceConnect();
         }
         if (wasStreaming) DeviceStreamOn();
+        Notifier::GetInstance().NotifySource(*this,
+                                             CS_SOURCE_VIDEOMODE_CHANGED);
         lock.lock();
       } else if (newMode.fps != m_mode.fps) {
         m_mode = newMode;
         lock.unlock();
         DeviceSetFPS();
+        Notifier::GetInstance().NotifySource(*this,
+                                             CS_SOURCE_VIDEOMODE_CHANGED);
         lock.lock();
       }
     } else if (msg->kind == Message::kCmdSetProperty ||
@@ -1015,6 +1028,8 @@ void USBCameraImpl::DeviceCacheMode() {
 
   if (formatChanged) DeviceSetMode();
   if (fpsChanged) DeviceSetFPS();
+
+  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODE_CHANGED);
 }
 
 void USBCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
@@ -1120,8 +1135,11 @@ void USBCameraImpl::DeviceCacheVideoModes() {
     }
   }
 
-  std::lock_guard<std::mutex> lock(m_mutex);
-  m_videoModes.swap(modes);
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_videoModes.swap(modes);
+  }
+  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
 bool USBCameraImpl::DeviceGetProperty(PropertyData* prop) {
@@ -1363,6 +1381,9 @@ CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
   auto source = std::make_shared<USBCameraImpl>(name, path);
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
   Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  // Start thread after the source created event to ensure other events
+  // come after it.
+  source->Start();
   return handle;
 }
 

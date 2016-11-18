@@ -31,6 +31,8 @@ class USBCameraImpl : public SourceImpl {
   USBCameraImpl(llvm::StringRef name, llvm::StringRef path);
   ~USBCameraImpl() override;
 
+  void Start();
+
   bool IsConnected() const override;
 
   // Property functions
