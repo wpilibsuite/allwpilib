@@ -10,6 +10,7 @@ package edu.wpi.cscore;
 /// Video event
 public class VideoEvent {
   public enum Kind {
+    kUnknown(0x0000),
     kSourceCreated(0x0001),
     kSourceDestroyed(0x0002),
     kSourceConnected(0x0004),
@@ -35,18 +36,37 @@ public class VideoEvent {
       return value;
     }
   }
-  private static final Kind[] m_kindValues = Kind.values();
+
+  public static Kind getKindFromInt(int kind) {
+    switch (kind) {
+      case 0x0001: return Kind.kSourceCreated;
+      case 0x0002: return Kind.kSourceDestroyed;
+      case 0x0004: return Kind.kSourceConnected;
+      case 0x0008: return Kind.kSourceDisconnected;
+      case 0x0010: return Kind.kSourceVideoModesUpdated;
+      case 0x0020: return Kind.kSourceVideoModeChanged;
+      case 0x0040: return Kind.kSourcePropertyCreated;
+      case 0x0080: return Kind.kSourcePropertyValueUpdated;
+      case 0x0100: return Kind.kSourcePropertyChoicesUpdated;
+      case 0x0200: return Kind.kSinkSourceChanged;
+      case 0x0400: return Kind.kSinkCreated;
+      case 0x0800: return Kind.kSinkDestroyed;
+      case 0x1000: return Kind.kSinkEnabled;
+      case 0x2000: return Kind.kSinkDisabled;
+      default: return Kind.kUnknown;
+    }
+  }
 
   VideoEvent(int kind, int source, int sink, String name, int pixelFormat,
              int width, int height, int fps, int property, int propertyKind,
              int value, String valueStr) {
-    this.kind = m_kindValues[kind];
+    this.kind = getKindFromInt(kind);
     this.sourceHandle = source;
     this.sinkHandle = sink;
     this.name = name;
     this.mode = new VideoMode(pixelFormat, width, height, fps);
     this.propertyHandle = property;
-    this.propertyKind = VideoProperty.m_kindValues[propertyKind];
+    this.propertyKind = VideoProperty.getKindFromInt(propertyKind);
     this.value = value;
     this.valueStr = valueStr;
   }

@@ -23,8 +23,12 @@ public class VideoMode {
   }
   private static final PixelFormat[] m_pixelFormatValues = PixelFormat.values();
 
+  public static PixelFormat getPixelFormatFromInt(int pixelFormat) {
+    return m_pixelFormatValues[pixelFormat];
+  }
+
   public VideoMode(int pixelFormat, int width, int height, int fps) {
-    this.pixelFormat = m_pixelFormatValues[pixelFormat];
+    this.pixelFormat = getPixelFormatFromInt(pixelFormat);
     this.width = width;
     this.height = height;
     this.fps = fps;

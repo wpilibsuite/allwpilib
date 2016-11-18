@@ -20,7 +20,16 @@ public class VideoProperty {
       return value;
     }
   }
-  static final Kind[] m_kindValues = Kind.values();
+
+  public static Kind getKindFromInt(int kind) {
+    switch (kind) {
+      case 1: return Kind.kBoolean;
+      case 2: return Kind.kInteger;
+      case 4: return Kind.kString;
+      case 8: return Kind.kEnum;
+      default: return Kind.kNone;
+    }
+  }
 
   public String getName() {
     return CameraServerJNI.getPropertyName(m_handle);
@@ -91,7 +100,7 @@ public class VideoProperty {
 
   VideoProperty(int handle) {
     m_handle = handle;
-    m_kind = m_kindValues[CameraServerJNI.getPropertyKind(handle)];
+    m_kind = getKindFromInt(CameraServerJNI.getPropertyKind(handle));
   }
 
   VideoProperty(int handle, Kind kind) {

@@ -23,7 +23,14 @@ public class VideoSink {
       return value;
     }
   }
-  static final Kind[] m_kindValues = Kind.values();
+
+  public static Kind getKindFromInt(int kind) {
+    switch (kind) {
+      case 2: return Kind.kMJPEG;
+      case 4: return Kind.kCv;
+      default: return Kind.kUnknown;
+    }
+  }
 
   protected VideoSink(int handle) {
     m_handle = handle;
@@ -58,7 +65,7 @@ public class VideoSink {
 
   /// Get the kind of the sink.
   public Kind getKind() {
-    return m_kindValues[CameraServerJNI.getSinkKind(m_handle)];
+    return getKindFromInt(CameraServerJNI.getSinkKind(m_handle));
   }
 
   /// Get the name of the sink.  The name is an arbitrary identifier

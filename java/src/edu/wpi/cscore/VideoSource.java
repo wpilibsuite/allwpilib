@@ -23,7 +23,15 @@ public class VideoSource {
       return value;
     }
   }
-  static final Kind[] m_kindValues = Kind.values();
+
+  public static Kind getKindFromInt(int kind) {
+    switch (kind) {
+      case 1: return Kind.kUSB;
+      case 2: return Kind.kHTTP;
+      case 4: return Kind.kCv;
+      default: return Kind.kUnknown;
+    }
+  }
 
   protected VideoSource(int handle) {
     m_handle = handle;
@@ -58,7 +66,7 @@ public class VideoSource {
 
   /// Get the kind of the source.
   public Kind getKind() {
-    return m_kindValues[CameraServerJNI.getSourceKind(m_handle)];
+    return getKindFromInt(CameraServerJNI.getSourceKind(m_handle));
   }
 
   /// Get the name of the source.  The name is an arbitrary identifier
