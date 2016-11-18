@@ -16,6 +16,7 @@
 #include "c_util.h"
 #include "Handle.h"
 #include "Log.h"
+#include "Notifier.h"
 
 using namespace cs;
 
@@ -97,14 +98,18 @@ namespace cs {
 
 CS_Sink CreateCvSink(llvm::StringRef name, CS_Status* status) {
   auto sink = std::make_shared<CvSinkImpl>(name);
-  return Sinks::GetInstance().Allocate(CS_SINK_CV, sink);
+  auto handle = Sinks::GetInstance().Allocate(CS_SINK_CV, sink);
+  Notifier::GetInstance().NotifySink(name, handle, CS_SINK_CREATED);
+  return handle;
 }
 
 CS_Sink CreateCvSinkCallback(llvm::StringRef name,
                              std::function<void(uint64_t time)> processFrame,
                              CS_Status* status) {
   auto sink = std::make_shared<CvSinkImpl>(name, processFrame);
-  return Sinks::GetInstance().Allocate(CS_SINK_CV, sink);
+  auto handle = Sinks::GetInstance().Allocate(CS_SINK_CV, sink);
+  Notifier::GetInstance().NotifySink(name, handle, CS_SINK_CREATED);
+  return handle;
 }
 
 void SetSinkDescription(CS_Sink sink, llvm::StringRef description,

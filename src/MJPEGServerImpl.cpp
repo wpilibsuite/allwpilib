@@ -18,6 +18,7 @@
 #include "cscore_cpp.h"
 #include "Handle.h"
 #include "Log.h"
+#include "Notifier.h"
 #include "SourceImpl.h"
 
 using namespace cs;
@@ -696,7 +697,9 @@ CS_Sink CreateMJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress,
       name, desc.str(),
       std::unique_ptr<wpi::NetworkAcceptor>(
           new wpi::TCPAcceptor(port, str.c_str(), Logger::GetInstance())));
-  return Sinks::GetInstance().Allocate(CS_SINK_MJPEG, sink);
+  auto handle = Sinks::GetInstance().Allocate(CS_SINK_MJPEG, sink);
+  Notifier::GetInstance().NotifySink(name, handle, CS_SINK_CREATED);
+  return handle;
 }
 
 }  // namespace cs

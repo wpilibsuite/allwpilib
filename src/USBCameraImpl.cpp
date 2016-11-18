@@ -37,6 +37,7 @@
 #include "c_util.h"
 #include "Handle.h"
 #include "Log.h"
+#include "Notifier.h"
 
 using namespace cs;
 
@@ -1360,7 +1361,9 @@ CS_Source CreateUSBCameraDev(llvm::StringRef name, int dev, CS_Status* status) {
 CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status) {
   auto source = std::make_shared<USBCameraImpl>(name, path);
-  return Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
+  auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
+  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  return handle;
 }
 
 std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {

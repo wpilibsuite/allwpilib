@@ -16,6 +16,7 @@
 #include "c_util.h"
 #include "Handle.h"
 #include "Log.h"
+#include "Notifier.h"
 
 using namespace cs;
 
@@ -157,7 +158,9 @@ namespace cs {
 CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
                          CS_Status* status) {
   auto source = std::make_shared<CvSourceImpl>(name, mode);
-  return Sources::GetInstance().Allocate(CS_SOURCE_CV, source);
+  auto handle = Sources::GetInstance().Allocate(CS_SOURCE_CV, source);
+  Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
+  return handle;
 }
 
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status) {
