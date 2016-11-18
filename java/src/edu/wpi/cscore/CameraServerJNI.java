@@ -181,4 +181,8 @@ public class CameraServerJNI {
   public static native int[] enumerateSources();
 
   public static native int[] enumerateSinks();
+
+  public static native String getHostname();
+
+  public static native String[] getNetworkInterfaces();
 }

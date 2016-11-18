@@ -321,4 +321,24 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
   std::free(modes);
 }
 
+char* CS_GetHostname() {
+  return cs::ConvertToC(cs::GetHostname());
+}
+
+char** CS_GetNetworkInterfaces(int* count) {
+  auto interfaces = cs::GetNetworkInterfaces();
+  char** out =
+      static_cast<char**>(std::malloc(interfaces.size() * sizeof(char*)));
+  *count = interfaces.size();
+  for (std::size_t i = 0; i < interfaces.size(); ++i)
+    out[i] = cs::ConvertToC(interfaces[i]);
+  return out;
+}
+
+void CS_FreeNetworkInterfaces(char** interfaces, int count) {
+  if (!interfaces) return;
+  for (int i = 0; i < count; ++i) std::free(interfaces[i]);
+  std::free(interfaces);
+}
+
 }  // extern "C"

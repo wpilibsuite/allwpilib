@@ -275,6 +275,10 @@ llvm::ArrayRef<CS_Source> EnumerateSourceHandles(
 llvm::ArrayRef<CS_Sink> EnumerateSinkHandles(
     llvm::SmallVectorImpl<CS_Sink>& vec, CS_Status* status);
 
+std::string GetHostname();
+
+std::vector<std::string> GetNetworkInterfaces();
+
 }  // namespace cs
 
 #endif  // CSCORE_CPP_H_

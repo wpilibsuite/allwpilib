@@ -1089,4 +1089,26 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateSinks
   return MakeJIntArray(env, arr);
 }
 
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getHostname
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getHostname
+  (JNIEnv *env, jclass)
+{
+  return MakeJString(env, cs::GetHostname());
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getNetworkInterfaces
+ * Signature: ()[Ljava/lang/String;
+ */
+JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_getNetworkInterfaces
+  (JNIEnv *env, jclass)
+{
+  return MakeJStringArray(env, cs::GetNetworkInterfaces());
+}
+
 }  // extern "C"

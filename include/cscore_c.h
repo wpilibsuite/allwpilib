@@ -297,6 +297,11 @@ void CS_FreeEnumPropertyChoices(char** choices, int count);
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count);
 void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count);
 
+char* CS_GetHostname();
+
+char** CS_GetNetworkInterfaces(int* count);
+void CS_FreeNetworkInterfaces(char** interfaces, int count);
+
 #ifdef __cplusplus
 }
 #endif
