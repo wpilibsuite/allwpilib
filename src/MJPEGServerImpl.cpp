@@ -29,6 +29,13 @@ using namespace cs;
 // It separates the multipart stream of pictures
 #define BOUNDARY "boundarydonotcross"
 
+// A bare-bones HTML webpage for user friendliness.
+static const char* rootPage =
+    "<html><head><title>CameraServer</title><body>"
+    "<img src=\"/stream.mjpg\" /><p />"
+    "<a href=\"/settings.json\">Settings JSON</a>"
+    "</body></html>";
+
 // DHT data for MJPEG images that don't have it.
 static const unsigned char dhtData[] = {
     0xff, 0xc4, 0x01, 0xa2, 0x00, 0x00, 0x01, 0x05, 0x01, 0x01, 0x01, 0x01,
@@ -169,6 +176,7 @@ static bool ReadLine(wpi::raw_istream& is, llvm::SmallVectorImpl<char>& buffer,
     char c;
     is.read(c);
     if (is.has_error()) return false;
+    if (c == '\r') continue;
     buffer.push_back(c);
     if (c == '\n') break;
   }
@@ -549,9 +557,11 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
     return;
   }
 
-  enum { kCommand, kStream, kGetSettings } kind;
+  enum { kCommand, kStream, kGetSettings, kRootPage } kind;
   llvm::StringRef parameters;
   size_t pos;
+
+  DEBUG("HTTP request: '" << buf << "'\n");
 
   // Determine request kind.  Most of these are for mjpgstreamer
   // compatibility, others are for Axis camera compatibility.
@@ -564,6 +574,9 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
   } else if ((pos = buf.find("GET /stream.mjpg")) != llvm::StringRef::npos) {
     kind = kStream;
     parameters = buf.substr(buf.find('?', pos + 16)).substr(1);
+  } else if (buf.find("GET /settings") != llvm::StringRef::npos &&
+             buf.find(".json") != llvm::StringRef::npos) {
+    kind = kGetSettings;
   } else if (buf.find("GET /input") != llvm::StringRef::npos &&
              buf.find(".json") != llvm::StringRef::npos) {
     kind = kGetSettings;
@@ -574,6 +587,8 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
              llvm::StringRef::npos) {
     kind = kCommand;
     parameters = buf.substr(buf.find('&', pos + 20)).substr(1);
+  } else if (buf.find("GET / ") != llvm::StringRef::npos || buf == "GET /\n") {
+    kind = kRootPage;
   } else {
     DEBUG("HTTP request resource not found");
     SendError(os, 404, "Resource not found");
@@ -588,11 +603,11 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
   DEBUG("command parameters: \"" << parameters << "\"");
 
   // Read the rest of the HTTP request.
-  // The end of the request is marked by a single, empty line with "\r\n"
+  // The end of the request is marked by a single, empty line
   llvm::SmallString<128> buf2;
   do {
     if (!ReadLine(is, buf2, 4096)) return;
-  } while (!buf2.startswith("\r\n"));
+  } while (!buf2.startswith("\n"));
 
   // Send response
   switch (kind) {
@@ -618,6 +633,11 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
         SendJSON(os, *source, true);
       else
         SendError(os, 404, "Resource not found");
+      break;
+    case kRootPage:
+      DEBUG("request for root page");
+      SendHeader(os, 200, "OK", "text/html");
+      os << rootPage << "\r\n";
       break;
   }
 
