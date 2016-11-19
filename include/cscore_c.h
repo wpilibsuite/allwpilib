@@ -211,6 +211,11 @@ CS_Source CS_CopySource(CS_Source source, CS_Status* status);
 void CS_ReleaseSource(CS_Source source, CS_Status* status);
 
 //
+// USBCamera Source Functions
+//
+char* CS_GetUSBCameraPath(CS_Source source, CS_Status* status);
+
+//
 // OpenCV Source Functions
 //
 void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
@@ -250,6 +255,12 @@ CS_Property CS_GetSinkSourceProperty(CS_Sink sink, const char* name,
 CS_Source CS_GetSinkSource(CS_Sink sink, CS_Status* status);
 CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status);
 void CS_ReleaseSink(CS_Sink sink, CS_Status* status);
+
+//
+// MJPEGServer Sink Functions
+//
+char* CS_GetMJPEGServerListenAddress(CS_Sink sink, CS_Status* status);
+int CS_GetMJPEGServerPort(CS_Sink sink, CS_Status* status);
 
 //
 // OpenCV Sink Functions

@@ -199,6 +199,11 @@ CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 
 //
+// USBCamera Source Functions
+//
+std::string GetUSBCameraPath(CS_Source source, CS_Status* status);
+
+//
 // OpenCV Source Functions
 //
 void PutSourceFrame(CS_Source source, cv::Mat& image, CS_Status* status);
@@ -242,6 +247,12 @@ CS_Property GetSinkSourceProperty(CS_Sink sink, llvm::StringRef name,
 CS_Source GetSinkSource(CS_Sink sink, CS_Status* status);
 CS_Sink CopySink(CS_Sink sink, CS_Status* status);
 void ReleaseSink(CS_Sink sink, CS_Status* status);
+
+//
+// MJPEGServer Sink Functions
+//
+std::string GetMJPEGServerListenAddress(CS_Sink sink, CS_Status* status);
+int GetMJPEGServerPort(CS_Sink sink, CS_Status* status);
 
 //
 // OpenCV Sink Functions

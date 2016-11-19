@@ -23,4 +23,14 @@ public class MJPEGServer extends VideoSink {
   public MJPEGServer(String name, int port) {
     this(name, "", port);
   }
+
+  /// Get the listen address of the server.
+  public String getListenAddress() {
+    return CameraServerJNI.getMJPEGServerListenAddress(m_handle);
+  }
+
+  /// Get the port number of the server.
+  public int getPort() {
+    return CameraServerJNI.getMJPEGServerPort(m_handle);
+  }
 }

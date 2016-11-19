@@ -49,6 +49,8 @@ class USBCameraImpl : public SourceImpl {
   void NumSinksChanged() override;
   void NumSinksEnabledChanged() override;
 
+  std::string GetPath() { return m_path; }
+
   // Property data
   class PropertyData : public PropertyBase {
    public:

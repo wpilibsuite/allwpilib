@@ -173,6 +173,11 @@ inline std::vector<USBCameraInfo> USBCamera::EnumerateUSBCameras() {
   return ::cs::EnumerateUSBCameras(&status);
 }
 
+inline std::string USBCamera::GetPath() const {
+  CS_Status status = 0;
+  return ::cs::GetUSBCameraPath(m_handle, &status);
+}
+
 inline void USBCamera::SetBrightness(int brightness) {
   if (brightness > 100) {
     brightness = 100;
@@ -321,6 +326,16 @@ inline VideoProperty VideoSink::GetSourceProperty(llvm::StringRef name) {
 inline MJPEGServer::MJPEGServer(llvm::StringRef name,
                                 llvm::StringRef listenAddress, int port) {
   m_handle = CreateMJPEGServer(name, listenAddress, port, &m_status);
+}
+
+inline std::string MJPEGServer::GetListenAddress() const {
+  m_status = 0;
+  return cs::GetMJPEGServerListenAddress(m_handle, &m_status);
+}
+
+inline int MJPEGServer::GetPort() const {
+  m_status = 0;
+  return cs::GetMJPEGServerPort(m_handle, &m_status);
 }
 
 inline CvSink::CvSink(llvm::StringRef name) {

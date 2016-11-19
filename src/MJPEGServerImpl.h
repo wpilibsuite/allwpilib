@@ -30,11 +30,13 @@ class SourceImpl;
 
 class MJPEGServerImpl : public SinkImpl {
  public:
-  MJPEGServerImpl(llvm::StringRef name, llvm::StringRef description,
+  MJPEGServerImpl(llvm::StringRef name, llvm::StringRef listenAddress, int port,
                   std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   ~MJPEGServerImpl() override;
 
   void Stop();
+  std::string GetListenAddress() { return m_listenAddress; }
+  int GetPort() { return m_port; }
 
  private:
   void SetSourceImpl(std::shared_ptr<SourceImpl> source) override;
@@ -42,6 +44,10 @@ class MJPEGServerImpl : public SinkImpl {
   void ServerThreadMain();
 
   class ConnThread;
+
+  // Never changed, so not protected by mutex
+  std::string m_listenAddress;
+  int m_port;
 
   std::unique_ptr<wpi::NetworkAcceptor> m_acceptor;
   std::atomic_bool m_active;  // set to false to terminate threads

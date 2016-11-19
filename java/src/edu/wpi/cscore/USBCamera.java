@@ -50,6 +50,11 @@ public class USBCamera extends VideoSource {
     return CameraServerJNI.enumerateUSBCameras();
   }
 
+  /// Get the path to the device.
+  public String getPath() {
+    return CameraServerJNI.getUSBCameraPath(m_handle);
+  }
+
   /// Set the brightness, as a percentage (0-100).
   public synchronized void setBrightness(int brightness) {
     if (brightness > 100) {

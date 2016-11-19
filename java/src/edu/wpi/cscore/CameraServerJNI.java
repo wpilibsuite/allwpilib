@@ -128,6 +128,11 @@ public class CameraServerJNI {
   public static native void releaseSource(int source);
 
   //
+  // USBCamera Source Functions
+  //
+  public static native String getUSBCameraPath(int source);
+
+  //
   // OpenCV Source Functions
   //
   public static native void putSourceFrame(int source, long imageNativeObj);
@@ -156,6 +161,12 @@ public class CameraServerJNI {
   public static native int getSinkSource(int sink);
   public static native int copySink(int sink);
   public static native void releaseSink(int sink);
+
+  //
+  // MJPEGServer Sink Functions
+  //
+  public static native String getMJPEGServerListenAddress(int sink);
+  public static native int getMJPEGServerPort(int sink);
 
   //
   // OpenCV Sink Functions

@@ -223,6 +223,9 @@ class USBCamera : public VideoSource {
   /// @return Vector of USB camera information (one for each camera)
   static std::vector<USBCameraInfo> EnumerateUSBCameras();
 
+  /// Get the path to the device.
+  std::string GetPath() const;
+
   /// Set the brightness, as a percentage (0-100).
   void SetBrightness(int brightness);
 
@@ -402,6 +405,12 @@ class MJPEGServer : public VideoSink {
   /// @param name Sink name (arbitrary unique identifier)
   /// @param port TCP port number
   MJPEGServer(llvm::StringRef name, int port) : MJPEGServer(name, "", port) {}
+
+  /// Get the listen address of the server.
+  std::string GetListenAddress() const;
+
+  /// Get the port number of the server.
+  int GetPort() const;
 };
 
 /// A sink for user code to accept video frames as OpenCV images.

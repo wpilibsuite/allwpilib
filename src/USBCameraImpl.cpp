@@ -1405,6 +1405,15 @@ CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
   return handle;
 }
 
+std::string GetUSBCameraPath(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data || data->kind != CS_SOURCE_USB) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return static_cast<USBCameraImpl&>(*data->source).GetPath();
+}
+
 std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {
   std::vector<USBCameraInfo> retval;
 
@@ -1452,6 +1461,10 @@ CS_Source CS_CreateUSBCameraDev(const char* name, int dev, CS_Status* status) {
 CS_Source CS_CreateUSBCameraPath(const char* name, const char* path,
                                  CS_Status* status) {
   return cs::CreateUSBCameraPath(name, path, status);
+}
+
+char* CS_GetUSBCameraPath(CS_Source source, CS_Status* status) {
+  return ConvertToC(cs::GetUSBCameraPath(source, status));
 }
 
 CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status) {

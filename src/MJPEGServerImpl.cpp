@@ -15,6 +15,7 @@
 #include "support/raw_socket_ostream.h"
 #include "tcpsockets/TCPAcceptor.h"
 
+#include "c_util.h"
 #include "cscore_cpp.h"
 #include "Handle.h"
 #include "Log.h"
@@ -401,11 +402,19 @@ void MJPEGServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
 }
 
 MJPEGServerImpl::MJPEGServerImpl(llvm::StringRef name,
-                                 llvm::StringRef description,
+                                 llvm::StringRef listenAddress, int port,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
-    : SinkImpl{name}, m_acceptor{std::move(acceptor)} {
+    : SinkImpl{name},
+      m_listenAddress(listenAddress),
+      m_port(port),
+      m_acceptor{std::move(acceptor)} {
   m_active = true;
-  SetDescription(description);
+
+  llvm::SmallString<128> descBuf;
+  llvm::raw_svector_ostream desc{descBuf};
+  desc << "HTTP Server on port " << port;
+  SetDescription(desc.str());
+
   m_serverThread = std::thread(&MJPEGServerImpl::ServerThreadMain, this);
 }
 
@@ -689,17 +698,32 @@ namespace cs {
 
 CS_Sink CreateMJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress,
                           int port, CS_Status* status) {
-  llvm::SmallString<128> descBuf;
-  llvm::raw_svector_ostream desc{descBuf};
-  desc << "HTTP Server on port " << port;
   llvm::SmallString<128> str{listenAddress};
   auto sink = std::make_shared<MJPEGServerImpl>(
-      name, desc.str(),
+      name, listenAddress, port,
       std::unique_ptr<wpi::NetworkAcceptor>(
           new wpi::TCPAcceptor(port, str.c_str(), Logger::GetInstance())));
   auto handle = Sinks::GetInstance().Allocate(CS_SINK_MJPEG, sink);
   Notifier::GetInstance().NotifySink(name, handle, CS_SINK_CREATED);
   return handle;
+}
+
+std::string GetMJPEGServerListenAddress(CS_Sink sink, CS_Status* status) {
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data || data->kind != CS_SINK_MJPEG) {
+    *status = CS_INVALID_HANDLE;
+    return std::string{};
+  }
+  return static_cast<MJPEGServerImpl&>(*data->sink).GetListenAddress();
+}
+
+int GetMJPEGServerPort(CS_Sink sink, CS_Status* status) {
+  auto data = Sinks::GetInstance().Get(sink);
+  if (!data || data->kind != CS_SINK_MJPEG) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  return static_cast<MJPEGServerImpl&>(*data->sink).GetPort();
 }
 
 }  // namespace cs
@@ -709,6 +733,14 @@ extern "C" {
 CS_Sink CS_CreateMJPEGServer(const char* name, const char* listenAddress,
                              int port, CS_Status* status) {
   return cs::CreateMJPEGServer(name, listenAddress, port, status);
+}
+
+char* CS_GetMJPEGServerListenAddress(CS_Sink sink, CS_Status* status) {
+  return ConvertToC(cs::GetMJPEGServerListenAddress(sink, status));
+}
+
+int CS_GetMJPEGServerPort(CS_Sink sink, CS_Status* status) {
+  return cs::GetMJPEGServerPort(sink, status);
 }
 
 }  // extern "C"
