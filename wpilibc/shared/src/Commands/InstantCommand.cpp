@@ -9,6 +9,10 @@
 
 using namespace frc;
 
+/**
+ * Creates a new {@link InstantCommand} with the given name.
+ * @param name the name for this command
+ */
 InstantCommand::InstantCommand(const std::string& name) : Command(name) {}
 
 bool InstantCommand::IsFinished() { return true; }

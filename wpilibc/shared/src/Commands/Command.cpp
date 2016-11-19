@@ -208,24 +208,6 @@ void Command::Execute() {}
 void Command::End() {}
 
 /**
- * Returns whether this command is finished.
- * If it is, then the command will be removed and {@link Command#end() end()}
- * will be called.
- *
- * <p>It may be useful for a team to reference the {@link Command#isTimedOut()
- * isTimedOut()} method for time-sensitive commands.</p>
- *
- * <p>By default this will always return false, which means it will never end
- * automatically. It may still be cancelled manually or interrupted by another
- * command. For most real-world scenarios you will override this method with
- * additional logic.</p>
- *
- * @return whether this command is finished.
- * @see Command#isTimedOut() isTimedOut()
- */
-bool Command::IsFinished() { return false; }
-
-/**
  * Called when the command ends because somebody called
  * {@link Command#cancel() cancel()} or another command shared the same
  * requirements as this one, and booted it out.

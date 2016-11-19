@@ -277,16 +277,15 @@ public abstract class Command implements NamedSendable {
    * <p>It may be useful for a team to reference the {@link Command#isTimedOut() isTimedOut()}
    * method for time-sensitive commands.
    *
-   * <p>By default this will always return false, which means it will never end automatically. It
-   * may still be cancelled manually or interrupted by another command. For most real-world
-   * scenarios you will override this method with additional logic.
+   * <p>Returning false will result in the command never ending automatically. It may still be
+   * cancelled manually or interrupted by another command. Returning true will result in the
+   * command executing once and finishing immediately. We recommend using {@link InstantCommand}
+   * for this.
    *
    * @return whether this command is finished.
    * @see Command#isTimedOut() isTimedOut()
    */
-  protected boolean isFinished() {
-    return false;
-  }
+  protected abstract boolean isFinished();
 
   /**
    * Called when the command ended peacefully. This is where you may want to wrap up loose ends,
