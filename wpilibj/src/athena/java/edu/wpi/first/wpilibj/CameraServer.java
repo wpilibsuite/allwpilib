@@ -232,7 +232,7 @@ public class CameraServer {
       String relativeKey = key.substring(kPublishName.length());
 
     }, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_UPDATE);
-    
+
   }
 
   /**

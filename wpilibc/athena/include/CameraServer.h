@@ -7,13 +7,16 @@
 
 #pragma once
 
+#include <memory>
 #include <mutex>
+#include <string>
+#include <vector>
 
-#include "cscore.h"
 #include "ErrorBase.h"
+#include "cscore.h"
 #include "llvm/DenseMap.h"
-#include "llvm/StringRef.h"
 #include "llvm/StringMap.h"
+#include "llvm/StringRef.h"
 #include "networktables/NetworkTable.h"
 
 namespace frc {
