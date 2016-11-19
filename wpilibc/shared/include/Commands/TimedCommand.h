@@ -13,6 +13,10 @@
 
 namespace frc {
 
+/**
+ * A {@link TimedCommand} will wait for a timeout before finishing.
+ * {@link TimedCommand} is used to execute a command for a given amount of time.
+ */
 class TimedCommand : public Command {
  public:
   TimedCommand(const std::string& name, double timeout);
@@ -20,7 +24,7 @@ class TimedCommand : public Command {
   virtual ~TimedCommand() = default;
 
  protected:
-  virtual bool IsFinished();
+  bool IsFinished() override;
 };
 
 }  // namespace frc

@@ -13,6 +13,12 @@
 
 namespace frc {
 
+/**
+ * This command will execute once, then finish immediately afterward.
+ *
+ * <p>Subclassing {@link InstantCommand} is shorthand for returning true from
+ * {@link Command isFinished}.
+ */
 class InstantCommand : public Command {
  public:
   explicit InstantCommand(const std::string& name);
@@ -20,7 +26,7 @@ class InstantCommand : public Command {
   virtual ~InstantCommand() = default;
 
  protected:
-  virtual bool IsFinished();
+  bool IsFinished() override;
 };
 
 }  // namespace frc

@@ -84,7 +84,25 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
 
   virtual void Initialize();
   virtual void Execute();
-  virtual bool IsFinished();
+
+  /**
+   * Returns whether this command is finished.
+   * If it is, then the command will be removed and {@link Command#end() end()}
+   * will be called.
+   *
+   * <p>It may be useful for a team to reference the {@link Command#isTimedOut()
+   * isTimedOut()} method for time-sensitive commands.</p>
+   *
+   * <p>Returning false will result in the command never ending automatically.
+   * It may still be cancelled manually or interrupted by another command.
+   * Returning true will result in the command executing once and finishing
+   * immediately. We recommend using {@link InstantCommand} for this.</p>
+   *
+   * @return whether this command is finished.
+   * @see Command#isTimedOut() isTimedOut()
+   */
+  virtual bool IsFinished() = 0;
+
   virtual void End();
   virtual void Interrupted();
 
