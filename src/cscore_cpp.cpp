@@ -491,6 +491,8 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
   if ((eventMask & CS_NETWORK_INTERFACES_CHANGED) != 0) {
     // start network interface event listener
     NetworkListener::GetInstance().Start();
+    if (immediateNotify)
+      Notifier::GetInstance().NotifyNetworkInterfacesChanged();
   }
   if (immediateNotify) {
     // TODO
