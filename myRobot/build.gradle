@@ -21,6 +21,7 @@ dependencies {
     compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
     compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
     compile 'edu.wpi.cscore.java:cscore:+:arm'
+    compile 'org.opencv:opencv-java:+'
 }
 
 def nativeDirectory = "$buildDir/output"
