@@ -9,15 +9,14 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * Handle input from standard Joysticks connected to the Driver Station. This class handles standard
  * input that comes from the Driver Station. Each time a value is requested the most recent value is
  * returned. There is a single class instance for each joystick and the mapping of ports to hardware
- * buttons depends on the code in the driver station.
+ * buttons depends on the code in the Driver Station.
  */
-public class Joystick extends GenericHID {
+public class Joystick extends JoystickBase {
 
   static final byte kDefaultXAxis = 0;
   static final byte kDefaultYAxis = 1;
@@ -55,16 +54,7 @@ public class Joystick extends GenericHID {
     }
   }
 
-
-  /**
-   * Represents a rumble output on the JoyStick.
-   */
-  public enum RumbleType {
-    kLeftRumble, kRightRumble
-  }
-
   private final DriverStation m_ds;
-  private final int m_port;
   private final byte[] m_axes;
   private final byte[] m_buttons;
   private int m_outputs;
@@ -72,10 +62,10 @@ public class Joystick extends GenericHID {
   private short m_rightRumble;
 
   /**
-   * Construct an instance of a joystick. The joystick index is the usb port on the drivers
+   * Construct an instance of a joystick. The joystick index is the USB port on the drivers
    * station.
    *
-   * @param port The port on the driver station that the joystick is plugged into.
+   * @param port The port on the Driver Station that the joystick is plugged into.
    */
   public Joystick(final int port) {
     this(port, AxisType.kNumAxis.value, ButtonType.kNumButton.value);
@@ -98,15 +88,16 @@ public class Joystick extends GenericHID {
    * <p>This constructor allows the subclass to configure the number of constants for axes and
    * buttons.
    *
-   * @param port           The port on the driver station that the joystick is plugged into.
+   * @param port           The port on the Driver Station that the joystick is plugged into.
    * @param numAxisTypes   The number of axis types in the enum.
    * @param numButtonTypes The number of button types in the enum.
    */
   protected Joystick(int port, int numAxisTypes, int numButtonTypes) {
+    super(port);
+
     m_ds = DriverStation.getInstance();
     m_axes = new byte[numAxisTypes];
     m_buttons = new byte[numButtonTypes];
-    m_port = port;
   }
 
   /**
@@ -116,7 +107,8 @@ public class Joystick extends GenericHID {
    * @param hand Unused
    * @return The X value of the joystick.
    */
-  public double getX(Hand hand) {
+  @Override
+  public final double getX(Hand hand) {
     return getRawAxis(m_axes[AxisType.kX.value]);
   }
 
@@ -127,18 +119,13 @@ public class Joystick extends GenericHID {
    * @param hand Unused
    * @return The Y value of the joystick.
    */
-  public double getY(Hand hand) {
+  @Override
+  public final double getY(Hand hand) {
     return getRawAxis(m_axes[AxisType.kY.value]);
   }
 
-  /**
-   * Get the Z value of the joystick. This depends on the mapping of the joystick connected to the
-   * current port.
-   *
-   * @param hand Unused
-   * @return The Z value of the joystick.
-   */
-  public double getZ(Hand hand) {
+  @Override
+  public final double getZ(Hand hand) {
     return getRawAxis(m_axes[AxisType.kZ.value]);
   }
 
@@ -169,7 +156,7 @@ public class Joystick extends GenericHID {
    * @return The value of the axis.
    */
   public double getRawAxis(final int axis) {
-    return m_ds.getStickAxis(m_port, axis);
+    return m_ds.getStickAxis(getPort(), axis);
   }
 
   /**
@@ -202,7 +189,7 @@ public class Joystick extends GenericHID {
    * For the current joystick, return the number of axis.
    */
   public int getAxisCount() {
-    return m_ds.getStickAxisCount(m_port);
+    return m_ds.getStickAxisCount(getPort());
   }
 
   /**
@@ -231,6 +218,16 @@ public class Joystick extends GenericHID {
     return getRawButton(m_buttons[ButtonType.kTop.value]);
   }
 
+  @Override
+  public int getPOV(int pov) {
+    return m_ds.getStickPOV(getPort(), pov);
+  }
+
+  @Override
+  public int getPOVCount() {
+    return m_ds.getStickPOVCount(getPort());
+  }
+
   /**
    * This is not supported for the Joystick. This method is only here to complete the GenericHID
    * interface.
@@ -252,34 +249,14 @@ public class Joystick extends GenericHID {
    * @return The state of the button.
    */
   public boolean getRawButton(final int button) {
-    return m_ds.getStickButton(m_port, (byte) button);
+    return m_ds.getStickButton(getPort(), (byte) button);
   }
 
   /**
    * For the current joystick, return the number of buttons.
    */
   public int getButtonCount() {
-    return m_ds.getStickButtonCount(m_port);
-  }
-
-  /**
-   * Get the angle in degrees of a POV on the joystick.
-   *
-   * <p>The POV angles start at 0 in the up direction, and increase clockwise (eg right is 90,
-   * upper-left is 315).
-   *
-   * @param pov The index of the POV to read (starting at 0)
-   * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
-   */
-  public int getPOV(int pov) {
-    return m_ds.getStickPOV(m_port, pov);
-  }
-
-  /**
-   * For the current joystick, return the number of POVs.
-   */
-  public int getPOVCount() {
-    return m_ds.getStickPOVCount(m_port);
+    return m_ds.getStickButtonCount(getPort());
   }
 
   /**
@@ -357,34 +334,7 @@ public class Joystick extends GenericHID {
    * @return A boolean that is true if the controller is an xbox controller.
    */
   public boolean getIsXbox() {
-    return m_ds.getJoystickIsXbox(m_port);
-  }
-
-  /**
-   * Get the HID type of the current joystick.
-   *
-   * @return The HID type value of the current joystick.
-   */
-  public int getType() {
-    return m_ds.getJoystickType(m_port);
-  }
-
-  /**
-   * Get the name of the current joystick.
-   *
-   * @return The name of the current joystick.
-   */
-  public String getName() {
-    return m_ds.getJoystickName(m_port);
-  }
-
-  /**
-   * Get the port number of the joystick.
-   *
-   * @return The port number of the joystick.
-   */
-  public int getPort() {
-    return m_port;
+    return m_ds.getJoystickIsXbox(getPort());
   }
 
   /**
@@ -393,17 +343,43 @@ public class Joystick extends GenericHID {
    * @return the axis type of a joystick axis.
    */
   public int getAxisType(int axis) {
-    return m_ds.getJoystickAxisType(m_port, axis);
+    return m_ds.getJoystickAxisType(getPort(), axis);
   }
 
   /**
-   * Set the rumble output for the joystick. The DS currently supports 2 rumble values, left rumble
-   * and right rumble.
+   * Get the type of the HID.
    *
-   * @param type  Which rumble value to set
-   * @param value The normalized value (0 to 1) to set the rumble to
+   * @return the type of the HID.
    */
-  public void setRumble(RumbleType type, float value) {
+  @Override
+  public HIDType getType() {
+    return HIDType.values()[m_ds.getJoystickType(getPort())];
+  }
+
+  /**
+   * Get the name of the HID.
+   *
+   * @return the name of the HID.
+   */
+  @Override
+  public String getName() {
+    return m_ds.getJoystickName(getPort());
+  }
+
+  @Override
+  public void setOutput(int outputNumber, boolean value) {
+    m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
+    HAL.setJoystickOutputs((byte) getPort(), m_outputs, m_leftRumble, m_rightRumble);
+  }
+
+  @Override
+  public void setOutputs(int value) {
+    m_outputs = value;
+    HAL.setJoystickOutputs((byte) getPort(), m_outputs, m_leftRumble, m_rightRumble);
+  }
+
+  @Override
+  public void setRumble(RumbleType type, double value) {
     if (value < 0) {
       value = 0;
     } else if (value > 1) {
@@ -414,28 +390,6 @@ public class Joystick extends GenericHID {
     } else {
       m_rightRumble = (short) (value * 65535);
     }
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
-  }
-
-  /**
-   * Set a single HID output value for the joystick.
-   *
-   * @param outputNumber The index of the output to set (1-32)
-   * @param value        The value to set the output to
-   */
-
-  public void setOutput(int outputNumber, boolean value) {
-    m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
-  }
-
-  /**
-   * Set all HID output values for the joystick.
-   *
-   * @param value The 32 bit output value (1 bit for each output)
-   */
-  public void setOutputs(int value) {
-    m_outputs = value;
-    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+    HAL.setJoystickOutputs((byte) getPort(), m_outputs, m_leftRumble, m_rightRumble);
   }
 }

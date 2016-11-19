@@ -82,6 +82,7 @@
 #include "Victor.h"
 #include "VictorSP.h"
 #include "WPIErrors.h"
+#include "XboxController.h"
 #include "interfaces/Accelerometer.h"
 #include "interfaces/Gyro.h"
 #include "interfaces/Potentiometer.h"
