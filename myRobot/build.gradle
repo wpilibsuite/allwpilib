@@ -89,3 +89,5 @@ build.dependsOn copyRobotLibraries
 jar {
     manifest { attributes 'Robot-Class': 'MyRobot' }
 }
+
+jar.dependsOn ':wpilibj:build'
