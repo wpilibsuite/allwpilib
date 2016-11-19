@@ -142,11 +142,11 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetFlowControl(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SerialPortJNI
  * Method:    serialSetTimeout
- * Signature: (BF)V
+ * Signature: (BD)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetTimeout(
-    JNIEnv* env, jclass, jbyte port, jfloat timeout) {
+    JNIEnv* env, jclass, jbyte port, jdouble timeout) {
   SERIALJNI_LOG(logDEBUG) << "Setting Serial Timeout";
   SERIALJNI_LOG(logDEBUG) << "Timeout: " << timeout;
   int32_t status = 0;

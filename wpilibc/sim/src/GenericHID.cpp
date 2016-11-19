@@ -21,7 +21,7 @@ GenericHID::GenericHID(int port) : m_ds(DriverStation::GetInstance()) {
  * @param axis The axis to read, starting at 0.
  * @return The value of the axis.
  */
-float GenericHID::GetRawAxis(int axis) const {
+double GenericHID::GetRawAxis(int axis) const {
   return m_ds.GetStickAxis(m_port, axis);
 }
 

@@ -98,13 +98,13 @@ Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorPressureSwitch(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_CompressorJNI
  * Method:    getCompressorCurrent
- * Signature: (J)F
+ * Signature: (J)D
  */
-JNIEXPORT jfloat JNICALL
+JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_wpilibj_hal_CompressorJNI_getCompressorCurrent(
     JNIEnv *env, jclass, jint compressorHandle) {
   int32_t status = 0;
-  float val = HAL_GetCompressorCurrent((HAL_CompressorHandle)compressorHandle, &status);
+  double val = HAL_GetCompressorCurrent((HAL_CompressorHandle)compressorHandle, &status);
   CheckStatus(env, status);
   return val;
 }

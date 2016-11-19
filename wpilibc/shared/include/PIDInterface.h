@@ -19,7 +19,7 @@ class PIDInterface : public Controller {
   virtual double GetI() const = 0;
   virtual double GetD() const = 0;
 
-  virtual void SetSetpoint(float setpoint) = 0;
+  virtual void SetSetpoint(double setpoint) = 0;
   virtual double GetSetpoint() const = 0;
 
   virtual void Enable() = 0;

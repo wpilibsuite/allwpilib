@@ -45,7 +45,7 @@ class Gyro {
    * @return the current heading of the robot in degrees. This heading is based
    *         on integration of the returned rate from the gyro.
    */
-  virtual float GetAngle() const = 0;
+  virtual double GetAngle() const = 0;
 
   /**
    * Return the rate of rotation of the gyro

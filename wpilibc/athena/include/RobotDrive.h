@@ -58,7 +58,7 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   RobotDrive(const RobotDrive&) = delete;
   RobotDrive& operator=(const RobotDrive&) = delete;
 
-  void Drive(float outputMagnitude, float curve);
+  void Drive(double outputMagnitude, double curve);
   void TankDrive(GenericHID* leftStick, GenericHID* rightStick,
                  bool squaredInputs = true);
   void TankDrive(GenericHID& leftStick, GenericHID& rightStick,
@@ -67,7 +67,8 @@ class RobotDrive : public MotorSafety, public ErrorBase {
                  int rightAxis, bool squaredInputs = true);
   void TankDrive(GenericHID& leftStick, int leftAxis, GenericHID& rightStick,
                  int rightAxis, bool squaredInputs = true);
-  void TankDrive(float leftValue, float rightValue, bool squaredInputs = true);
+  void TankDrive(double leftValue, double rightValue,
+                 bool squaredInputs = true);
   void ArcadeDrive(GenericHID* stick, bool squaredInputs = true);
   void ArcadeDrive(GenericHID& stick, bool squaredInputs = true);
   void ArcadeDrive(GenericHID* moveStick, int moveChannel,
@@ -76,19 +77,19 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   void ArcadeDrive(GenericHID& moveStick, int moveChannel,
                    GenericHID& rotateStick, int rotateChannel,
                    bool squaredInputs = true);
-  void ArcadeDrive(float moveValue, float rotateValue,
+  void ArcadeDrive(double moveValue, double rotateValue,
                    bool squaredInputs = true);
-  void MecanumDrive_Cartesian(float x, float y, float rotation,
-                              float gyroAngle = 0.0);
-  void MecanumDrive_Polar(float magnitude, float direction, float rotation);
-  void HolonomicDrive(float magnitude, float direction, float rotation);
-  virtual void SetLeftRightMotorOutputs(float leftOutput, float rightOutput);
+  void MecanumDrive_Cartesian(double x, double y, double rotation,
+                              double gyroAngle = 0.0);
+  void MecanumDrive_Polar(double magnitude, double direction, double rotation);
+  void HolonomicDrive(double magnitude, double direction, double rotation);
+  virtual void SetLeftRightMotorOutputs(double leftOutput, double rightOutput);
   void SetInvertedMotor(MotorType motor, bool isInverted);
-  void SetSensitivity(float sensitivity);
+  void SetSensitivity(double sensitivity);
   void SetMaxOutput(double maxOutput);
 
-  void SetExpiration(float timeout) override;
-  float GetExpiration() const override;
+  void SetExpiration(double timeout) override;
+  double GetExpiration() const override;
   bool IsAlive() const override;
   void StopMotor() override;
   bool IsSafetyEnabled() const override;
@@ -97,12 +98,12 @@ class RobotDrive : public MotorSafety, public ErrorBase {
 
  protected:
   void InitRobotDrive();
-  float Limit(float num);
+  double Limit(double num);
   void Normalize(double* wheelSpeeds);
   void RotateVector(double& x, double& y, double angle);
 
   static const int kMaxNumberOfMotors = 4;
-  float m_sensitivity = 0.5;
+  double m_sensitivity = 0.5;
   double m_maxOutput = 1.0;
   std::shared_ptr<SpeedController> m_frontLeftMotor;
   std::shared_ptr<SpeedController> m_frontRightMotor;

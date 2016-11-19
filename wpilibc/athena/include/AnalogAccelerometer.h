@@ -32,9 +32,9 @@ class AnalogAccelerometer : public SensorBase,
   explicit AnalogAccelerometer(std::shared_ptr<AnalogInput> channel);
   virtual ~AnalogAccelerometer() = default;
 
-  float GetAcceleration() const;
-  void SetSensitivity(float sensitivity);
-  void SetZero(float zero);
+  double GetAcceleration() const;
+  void SetSensitivity(double sensitivity);
+  void SetZero(double zero);
   double PIDGet() override;
 
   void UpdateTable() override;
@@ -48,8 +48,8 @@ class AnalogAccelerometer : public SensorBase,
   void InitAccelerometer();
 
   std::shared_ptr<AnalogInput> m_analogInput;
-  float m_voltsPerG = 1.0;
-  float m_zeroGVoltage = 2.5;
+  double m_voltsPerG = 1.0;
+  double m_zeroGVoltage = 2.5;
 
   std::shared_ptr<ITable> m_table;
 };

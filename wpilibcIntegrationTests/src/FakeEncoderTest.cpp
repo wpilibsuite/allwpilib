@@ -83,7 +83,7 @@ class FakeEncoderTest : public testing::Test {
  * Test the encoder by reseting it to 0 and reading the value.
  */
 TEST_F(FakeEncoderTest, TestDefaultState) {
-  EXPECT_FLOAT_EQ(0.0f, m_encoder->Get()) << "The encoder did not start at 0.";
+  EXPECT_FLOAT_EQ(0.0, m_encoder->Get()) << "The encoder did not start at 0.";
 }
 
 /**
@@ -93,7 +93,7 @@ TEST_F(FakeEncoderTest, TestCountUp) {
   m_encoder->Reset();
   Simulate100QuadratureTicks();
 
-  EXPECT_FLOAT_EQ(100.0f, m_encoder->Get()) << "Encoder did not count to 100.";
+  EXPECT_FLOAT_EQ(100.0, m_encoder->Get()) << "Encoder did not count to 100.";
 }
 
 /**

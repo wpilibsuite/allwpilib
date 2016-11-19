@@ -39,7 +39,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
 
   static const int kJoystickPorts = 6;
 
-  float GetStickAxis(int stick, int axis);
+  double GetStickAxis(int stick, int axis);
   int GetStickPOV(int stick, int pov);
   int GetStickButtons(int stick) const;
   bool GetStickButton(int stick, int button);
@@ -69,7 +69,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void WaitForData();
   bool WaitForData(double timeout);
   double GetMatchTime() const;
-  float GetBatteryVoltage() const;
+  double GetBatteryVoltage() const;
 
   /** Only to be used to tell the Driver Station what code you claim to be
    * executing for diagnostic purposes only

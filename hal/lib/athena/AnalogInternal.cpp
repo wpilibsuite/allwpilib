@@ -80,7 +80,7 @@ int32_t getAnalogNumChannelsToActivate(int32_t* status) {
  */
 void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
-  // TODO: Need float comparison with epsilon.
+  // TODO: Need double comparison with epsilon.
   // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
   analogSampleRateSet = true;
 

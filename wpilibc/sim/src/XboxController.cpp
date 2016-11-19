@@ -27,7 +27,7 @@ XboxController::XboxController(int port)
  *
  * @param hand Side of controller whose value should be returned.
  */
-float XboxController::GetX(JoystickHand hand) const {
+double XboxController::GetX(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawAxis(0);
   } else {
@@ -40,7 +40,7 @@ float XboxController::GetX(JoystickHand hand) const {
  *
  * @param hand Side of controller whose value should be returned.
  */
-float XboxController::GetY(JoystickHand hand) const {
+double XboxController::GetY(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawAxis(1);
   } else {
@@ -80,7 +80,7 @@ bool XboxController::GetStickButton(JoystickHand hand) const {
  *
  * @param hand Side of controller whose value should be returned.
  */
-float XboxController::GetTriggerAxis(JoystickHand hand) const {
+double XboxController::GetTriggerAxis(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawAxis(2);
   } else {

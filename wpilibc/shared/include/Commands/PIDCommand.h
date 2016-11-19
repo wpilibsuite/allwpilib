@@ -32,7 +32,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   void SetSetpointRelative(double deltaSetpoint);
 
   // PIDOutput interface
-  virtual void PIDWrite(float output);
+  virtual void PIDWrite(double output);
 
   // PIDSource interface
   virtual double PIDGet();

@@ -22,13 +22,13 @@ class SpeedController : public PIDOutput {
    *
    * @param speed The speed to set.  Value should be between -1.0 and 1.0.
    */
-  virtual void Set(float speed) = 0;
+  virtual void Set(double speed) = 0;
   /**
    * Common interface for getting the current set speed of a speed controller.
    *
    * @return The current set speed.  Value is between -1.0 and 1.0.
    */
-  virtual float Get() const = 0;
+  virtual double Get() const = 0;
   /**
    * Common interface for disabling a motor.
    */

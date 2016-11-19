@@ -14,8 +14,8 @@
 
 using namespace frc;
 
-const float PWM::kDefaultPwmPeriod = 5.05;
-const float PWM::kDefaultPwmCenter = 1.5;
+const double PWM::kDefaultPwmPeriod = 5.05;
+const double PWM::kDefaultPwmCenter = 1.5;
 const int PWM::kDefaultPwmStepsDown = 1000;
 const int PWM::kPwmDisabled = 0;
 
@@ -108,7 +108,7 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
  *
  * @param pos The position to set the servo between 0.0 and 1.0.
  */
-void PWM::SetPosition(float pos) {
+void PWM::SetPosition(double pos) {
   if (pos < 0.0) {
     pos = 0.0;
   } else if (pos > 1.0) {
@@ -128,8 +128,8 @@ void PWM::SetPosition(float pos) {
  *
  * @return The position the servo is set to between 0.0 and 1.0.
  */
-float PWM::GetPosition() const {
-  float value = impl->Get();
+double PWM::GetPosition() const {
+  double value = impl->Get();
   if (value < 0.0) {
     return 0.0;
   } else if (value > 1.0) {
@@ -152,7 +152,7 @@ float PWM::GetPosition() const {
  *
  * @param speed The speed to set the speed controller between -1.0 and 1.0.
  */
-void PWM::SetSpeed(float speed) {
+void PWM::SetSpeed(double speed) {
   // clamp speed to be in the range 1.0 >= speed >= -1.0
   if (speed < -1.0) {
     speed = -1.0;
@@ -175,8 +175,8 @@ void PWM::SetSpeed(float speed) {
  *
  * @return The most recently set speed between -1.0 and 1.0.
  */
-float PWM::GetSpeed() const {
-  float value = impl->Get();
+double PWM::GetSpeed() const {
+  double value = impl->Get();
   if (value > 1.0) {
     return 1.0;
   } else if (value < -1.0) {

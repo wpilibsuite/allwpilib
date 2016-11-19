@@ -73,7 +73,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
   }
 
   void Reset() {
-    m_speedController->Set(0.0f);
+    m_speedController->Set(0.0);
     m_encoder->Reset();
   }
 };
@@ -101,12 +101,12 @@ TEST_P(MotorEncoderTest, Decrement) {
   Reset();
 
   /* Drive the speed controller briefly to move the encoder */
-  m_speedController->Set(-0.2f);
+  m_speedController->Set(-0.2);
   Wait(kMotorTime);
-  m_speedController->Set(0.0f);
+  m_speedController->Set(0.0);
 
   /* The encoder should be positive now */
-  EXPECT_LT(m_encoder->Get(), 0.0f)
+  EXPECT_LT(m_encoder->Get(), 0.0)
       << "Encoder should have decremented after the motor moved";
 }
 
@@ -116,15 +116,15 @@ TEST_P(MotorEncoderTest, Decrement) {
 TEST_P(MotorEncoderTest, ClampSpeed) {
   Reset();
 
-  m_speedController->Set(2.0f);
+  m_speedController->Set(2.0);
   Wait(kMotorTime);
 
-  EXPECT_FLOAT_EQ(1.0f, m_speedController->Get());
+  EXPECT_FLOAT_EQ(1.0, m_speedController->Get());
 
-  m_speedController->Set(-2.0f);
+  m_speedController->Set(-2.0);
   Wait(kMotorTime);
 
-  EXPECT_FLOAT_EQ(-1.0f, m_speedController->Get());
+  EXPECT_FLOAT_EQ(-1.0, m_speedController->Get());
 }
 
 /**
@@ -134,9 +134,9 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
   double goal = 1000;
   m_encoder->SetPIDSourceType(PIDSourceType::kDisplacement);
-  PIDController pid(0.001f, 0.0005f, 0.0f, m_encoder, m_speedController);
-  pid.SetAbsoluteTolerance(50.0f);
-  pid.SetOutputRange(-0.2f, 0.2f);
+  PIDController pid(0.001, 0.0005, 0.0, m_encoder, m_speedController);
+  pid.SetAbsoluteTolerance(50.0);
+  pid.SetOutputRange(-0.2, 0.2);
   pid.SetSetpoint(goal);
 
   /* 10 seconds should be plenty time to get to the setpoint */
@@ -158,10 +158,10 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
   m_encoder->SetPIDSourceType(PIDSourceType::kRate);
-  PIDController pid(1e-5, 0.0f, 3e-5, 8e-5, m_encoder, m_speedController);
-  pid.SetAbsoluteTolerance(200.0f);
+  PIDController pid(1e-5, 0.0, 3e-5, 8e-5, m_encoder, m_speedController);
+  pid.SetAbsoluteTolerance(200.0);
   pid.SetToleranceBuffer(50);
-  pid.SetOutputRange(-0.3f, 0.3f);
+  pid.SetOutputRange(-0.3, 0.3);
   pid.SetSetpoint(600);
 
   /* 10 seconds should be plenty time to get to the setpoint */

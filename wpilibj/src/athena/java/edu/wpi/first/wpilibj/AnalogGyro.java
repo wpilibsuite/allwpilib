@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  */
 public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
 
-  private static final float kDefaultVoltsPerDegreePerSecond = 0.007f;
+  private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
   protected AnalogInput m_analog;
   private boolean m_channelAllocated = false;
 
@@ -108,7 +108,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
     }
     initGyro();
     AnalogGyroJNI.setAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
-                                          (float)offset, center);
+                                          offset, center);
     reset();
   }
 
@@ -174,7 +174,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
    */
   public void setSensitivity(double voltsPerDegreePerSecond) {
     AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle,
-                                                      (float)voltsPerDegreePerSecond);
+                                                       voltsPerDegreePerSecond);
   }
 
   /**
@@ -185,6 +185,6 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
    * @param volts The size of the deadband in volts
    */
   void setDeadband(double volts) {
-    AnalogGyroJNI.setAnalogGyroDeadband(m_gyroHandle, (float)volts);
+    AnalogGyroJNI.setAnalogGyroDeadband(m_gyroHandle, volts);
   }
 }

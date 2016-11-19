@@ -107,10 +107,10 @@ int AnalogInput::GetAverageValue() const {
  *
  * @return A scaled sample straight from this channel.
  */
-float AnalogInput::GetVoltage() const {
-  if (StatusIsFatal()) return 0.0f;
+double AnalogInput::GetVoltage() const {
+  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  float voltage = HAL_GetAnalogVoltage(m_port, &status);
+  double voltage = HAL_GetAnalogVoltage(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return voltage;
 }
@@ -129,10 +129,10 @@ float AnalogInput::GetVoltage() const {
  * @return A scaled sample from the output of the oversample and average engine
  * for this channel.
  */
-float AnalogInput::GetAverageVoltage() const {
-  if (StatusIsFatal()) return 0.0f;
+double AnalogInput::GetAverageVoltage() const {
+  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  float voltage = HAL_GetAnalogAverageVoltage(m_port, &status);
+  double voltage = HAL_GetAnalogAverageVoltage(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return voltage;
 }
@@ -293,9 +293,9 @@ void AnalogInput::ResetAccumulator() {
   if (!StatusIsFatal()) {
     // Wait until the next sample, so the next call to GetAccumulator*()
     // won't have old values.
-    const float sampleTime = 1.0f / GetSampleRate();
-    const float overSamples = 1 << GetOversampleBits();
-    const float averageSamples = 1 << GetAverageBits();
+    const double sampleTime = 1.0 / GetSampleRate();
+    const double overSamples = 1 << GetOversampleBits();
+    const double averageSamples = 1 << GetAverageBits();
     Wait(sampleTime * overSamples * averageSamples);
   }
 }
@@ -385,7 +385,7 @@ void AnalogInput::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
  *
  * @param samplesPerSecond The number of samples per second.
  */
-void AnalogInput::SetSampleRate(float samplesPerSecond) {
+void AnalogInput::SetSampleRate(double samplesPerSecond) {
   int32_t status = 0;
   HAL_SetAnalogSampleRate(samplesPerSecond, &status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -396,9 +396,9 @@ void AnalogInput::SetSampleRate(float samplesPerSecond) {
  *
  * @return Sample rate.
  */
-float AnalogInput::GetSampleRate() {
+double AnalogInput::GetSampleRate() {
   int32_t status = 0;
-  float sampleRate = HAL_GetAnalogSampleRate(&status);
+  double sampleRate = HAL_GetAnalogSampleRate(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return sampleRate;
 }

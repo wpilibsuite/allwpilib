@@ -39,14 +39,14 @@ Jaguar::Jaguar(int channel) : SafePWM(channel) {
  *
  * @param speed The speed value between -1.0 and 1.0 to set.
  */
-void Jaguar::Set(float speed) { SetSpeed(speed); }
+void Jaguar::Set(double speed) { SetSpeed(speed); }
 
 /**
  * Get the recently set value of the PWM.
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-float Jaguar::Get() const { return GetSpeed(); }
+double Jaguar::Get() const { return GetSpeed(); }
 
 /**
  * Common interface for disabling a motor.
@@ -58,4 +58,4 @@ void Jaguar::Disable() { SetRaw(kPwmDisabled); }
  *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void Jaguar::PIDWrite(float output) { Set(output); }
+void Jaguar::PIDWrite(double output) { Set(output); }

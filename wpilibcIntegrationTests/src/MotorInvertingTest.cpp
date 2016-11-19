@@ -66,7 +66,7 @@ class MotorInvertingTest
 
   void Reset() {
     m_speedController->SetInverted(false);
-    m_speedController->Set(0.0f);
+    m_speedController->Set(0.0);
     m_encoder->Reset();
   }
 };

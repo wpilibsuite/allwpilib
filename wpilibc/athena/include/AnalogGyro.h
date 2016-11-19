@@ -33,23 +33,23 @@ class AnalogGyro : public GyroBase {
  public:
   static const int kOversampleBits = 10;
   static const int kAverageBits = 0;
-  static constexpr float kSamplesPerSecond = 50.0;
-  static constexpr float kCalibrationSampleTime = 5.0;
-  static constexpr float kDefaultVoltsPerDegreePerSecond = 0.007;
+  static constexpr double kSamplesPerSecond = 50.0;
+  static constexpr double kCalibrationSampleTime = 5.0;
+  static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
 
   explicit AnalogGyro(int channel);
   explicit AnalogGyro(AnalogInput* channel);
   explicit AnalogGyro(std::shared_ptr<AnalogInput> channel);
-  AnalogGyro(int channel, int center, float offset);
-  AnalogGyro(std::shared_ptr<AnalogInput> channel, int center, float offset);
+  AnalogGyro(int channel, int center, double offset);
+  AnalogGyro(std::shared_ptr<AnalogInput> channel, int center, double offset);
   virtual ~AnalogGyro();
 
-  float GetAngle() const override;
+  double GetAngle() const override;
   double GetRate() const override;
   virtual int GetCenter() const;
-  virtual float GetOffset() const;
-  void SetSensitivity(float voltsPerDegreePerSecond);
-  void SetDeadband(float volts);
+  virtual double GetOffset() const;
+  void SetSensitivity(double voltsPerDegreePerSecond);
+  void SetDeadband(double volts);
   void Reset() override;
   virtual void InitGyro();
   void Calibrate() override;

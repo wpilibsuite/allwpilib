@@ -79,7 +79,7 @@ void DriverStation::ReportError(bool is_error, int32_t code,
  * @param axis  The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
  */
-float DriverStation::GetStickAxis(int stick, int axis) {
+double DriverStation::GetStickAxis(int stick, int axis) {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
@@ -94,7 +94,7 @@ float DriverStation::GetStickAxis(int stick, int axis) {
     else
       ReportJoystickUnpluggedWarning(
           "Joystick Axis missing, check if all controllers are plugged in");
-    return 0.0f;
+    return 0.0;
   }
 
   return m_joystickAxes[stick].axes[axis];
@@ -518,9 +518,9 @@ double DriverStation::GetMatchTime() const {
  *
  * @return The battery voltage in Volts.
  */
-float DriverStation::GetBatteryVoltage() const {
+double DriverStation::GetBatteryVoltage() const {
   int32_t status = 0;
-  float voltage = HAL_GetVinVoltage(&status);
+  double voltage = HAL_GetVinVoltage(&status);
   wpi_setErrorWithContext(status, "getVinVoltage");
 
   return voltage;

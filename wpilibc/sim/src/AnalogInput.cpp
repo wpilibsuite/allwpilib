@@ -35,7 +35,7 @@ AnalogInput::AnalogInput(int channel) : m_channel(channel) {
  *
  * @return A scaled sample straight from this channel.
  */
-float AnalogInput::GetVoltage() const { return m_impl->Get(); }
+double AnalogInput::GetVoltage() const { return m_impl->Get(); }
 
 /**
  * Get a scaled sample from the output of the oversample and average engine for
@@ -49,7 +49,7 @@ float AnalogInput::GetVoltage() const { return m_impl->Get(); }
  * @return A scaled sample from the output of the oversample and average engine
  *         for this channel.
  */
-float AnalogInput::GetAverageVoltage() const { return m_impl->Get(); }
+double AnalogInput::GetAverageVoltage() const { return m_impl->Get(); }
 
 /**
  * Get the channel number.

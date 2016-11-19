@@ -61,7 +61,7 @@ void MotorSafetyHelper::Feed() {
  *
  * @param expirationTime The timeout value in seconds.
  */
-void MotorSafetyHelper::SetExpiration(float expirationTime) {
+void MotorSafetyHelper::SetExpiration(double expirationTime) {
   std::lock_guard<priority_recursive_mutex> sync(m_syncMutex);
   m_expiration = expirationTime;
 }
@@ -71,7 +71,7 @@ void MotorSafetyHelper::SetExpiration(float expirationTime) {
  *
  * @return the timeout value in seconds.
  */
-float MotorSafetyHelper::GetExpiration() const {
+double MotorSafetyHelper::GetExpiration() const {
   std::lock_guard<priority_recursive_mutex> sync(m_syncMutex);
   return m_expiration;
 }

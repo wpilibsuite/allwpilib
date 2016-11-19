@@ -19,9 +19,9 @@ using namespace frc;
 
 const int AnalogGyro::kOversampleBits;
 const int AnalogGyro::kAverageBits;
-constexpr float AnalogGyro::kSamplesPerSecond;
-constexpr float AnalogGyro::kCalibrationSampleTime;
-constexpr float AnalogGyro::kDefaultVoltsPerDegreePerSecond;
+constexpr double AnalogGyro::kSamplesPerSecond;
+constexpr double AnalogGyro::kCalibrationSampleTime;
+constexpr double AnalogGyro::kDefaultVoltsPerDegreePerSecond;
 
 /**
  * Gyro constructor using the Analog Input channel number.
@@ -78,7 +78,7 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
  *                value.
  * @param offset  Preset uncalibrated value to use as the gyro offset.
  */
-AnalogGyro::AnalogGyro(int channel, int center, float offset) {
+AnalogGyro::AnalogGyro(int channel, int center, double offset) {
   m_analog = std::make_shared<AnalogInput>(channel);
   InitGyro();
   int32_t status = 0;
@@ -104,7 +104,7 @@ AnalogGyro::AnalogGyro(int channel, int center, float offset) {
  *                connected to.
  */
 AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
-                       float offset)
+                       double offset)
     : m_analog(channel) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -198,10 +198,10 @@ void AnalogGyro::Calibrate() {
  * @return the current heading of the robot in degrees. This heading is based on
  *         integration of the returned rate from the gyro.
  */
-float AnalogGyro::GetAngle() const {
-  if (StatusIsFatal()) return 0.f;
+double AnalogGyro::GetAngle() const {
+  if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  float value = HAL_GetAnalogGyroAngle(m_gyroHandle, &status);
+  double value = HAL_GetAnalogGyroAngle(m_gyroHandle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -227,10 +227,10 @@ double AnalogGyro::GetRate() const {
  *
  * @return the current offset value
  */
-float AnalogGyro::GetOffset() const {
+double AnalogGyro::GetOffset() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  float value = HAL_GetAnalogGyroOffset(m_gyroHandle, &status);
+  double value = HAL_GetAnalogGyroOffset(m_gyroHandle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return value;
 }
@@ -258,7 +258,7 @@ int AnalogGyro::GetCenter() const {
  *
  * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second
  */
-void AnalogGyro::SetSensitivity(float voltsPerDegreePerSecond) {
+void AnalogGyro::SetSensitivity(double voltsPerDegreePerSecond) {
   int32_t status = 0;
   HAL_SetAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle,
                                            voltsPerDegreePerSecond, &status);
@@ -274,7 +274,7 @@ void AnalogGyro::SetSensitivity(float voltsPerDegreePerSecond) {
  *
  * @param volts The size of the deadband in volts
  */
-void AnalogGyro::SetDeadband(float volts) {
+void AnalogGyro::SetDeadband(double volts) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogGyroDeadband(m_gyroHandle, volts, &status);

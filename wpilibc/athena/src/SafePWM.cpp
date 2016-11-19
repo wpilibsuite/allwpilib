@@ -25,7 +25,7 @@ SafePWM::SafePWM(int channel) : PWM(channel) {
  *
  * @param timeout The timeout (in seconds) for this motor object
  */
-void SafePWM::SetExpiration(float timeout) {
+void SafePWM::SetExpiration(double timeout) {
   m_safetyHelper->SetExpiration(timeout);
 }
 
@@ -34,7 +34,9 @@ void SafePWM::SetExpiration(float timeout) {
  *
  * @returns The expiration time value.
  */
-float SafePWM::GetExpiration() const { return m_safetyHelper->GetExpiration(); }
+double SafePWM::GetExpiration() const {
+  return m_safetyHelper->GetExpiration();
+}
 
 /**
  * Check if the PWM object is currently alive or stopped due to a timeout.
@@ -84,7 +86,7 @@ void SafePWM::GetDescription(std::ostringstream& desc) const {
  *
  * @param speed Value to pass to the PWM class
  */
-void SafePWM::SetSpeed(float speed) {
+void SafePWM::SetSpeed(double speed) {
   PWM::SetSpeed(speed);
   m_safetyHelper->Feed();
 }

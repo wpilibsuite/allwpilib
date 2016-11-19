@@ -89,10 +89,10 @@ bool Compressor::GetPressureSwitchValue() const {
  *
  * @return The current through the compressor, in amps
  */
-float Compressor::GetCompressorCurrent() const {
+double Compressor::GetCompressorCurrent() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
-  float value;
+  double value;
 
   value = HAL_GetCompressorCurrent(m_compressorHandle, &status);
 

@@ -42,20 +42,20 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   void Disable();
 
   // PIDOutput interface
-  virtual void PIDWrite(float output);
+  virtual void PIDWrite(double output);
 
   // PIDSource interface
   virtual double PIDGet();
   void SetSetpoint(double setpoint);
   void SetSetpointRelative(double deltaSetpoint);
-  void SetInputRange(float minimumInput, float maximumInput);
-  void SetOutputRange(float minimumOutput, float maximumOutput);
+  void SetInputRange(double minimumInput, double maximumInput);
+  void SetOutputRange(double minimumOutput, double maximumOutput);
   double GetSetpoint();
   double GetPosition();
   double GetRate();
 
-  virtual void SetAbsoluteTolerance(float absValue);
-  virtual void SetPercentTolerance(float percent);
+  virtual void SetAbsoluteTolerance(double absValue);
+  virtual void SetPercentTolerance(double percent);
   virtual bool OnTarget() const;
 
  protected:

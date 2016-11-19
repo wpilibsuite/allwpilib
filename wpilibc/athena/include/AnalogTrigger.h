@@ -25,7 +25,7 @@ class AnalogTrigger : public SensorBase {
   explicit AnalogTrigger(AnalogInput* channel);
   virtual ~AnalogTrigger();
 
-  void SetLimitsVoltage(float lower, float upper);
+  void SetLimitsVoltage(double lower, double upper);
   void SetLimitsRaw(int lower, int upper);
   void SetAveraged(bool useAveragedValue);
   void SetFiltered(bool useFilteredValue);

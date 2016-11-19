@@ -17,9 +17,9 @@ using namespace frc;
 
 const int AnalogGyro::kOversampleBits = 10;
 const int AnalogGyro::kAverageBits = 0;
-const float AnalogGyro::kSamplesPerSecond = 50.0;
-const float AnalogGyro::kCalibrationSampleTime = 5.0;
-const float AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
+const double AnalogGyro::kSamplesPerSecond = 50.0;
+const double AnalogGyro::kCalibrationSampleTime = 5.0;
+const double AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
 
 /**
  * Initialize the gyro.
@@ -71,7 +71,7 @@ void AnalogGyro::Calibrate() { Reset(); }
  * @return the current heading of the robot in degrees. This heading is based on
  *         integration of the returned rate from the gyro.
  */
-float AnalogGyro::GetAngle() const { return impl->GetAngle(); }
+double AnalogGyro::GetAngle() const { return impl->GetAngle(); }
 
 /**
  * Return the rate of rotation of the gyro

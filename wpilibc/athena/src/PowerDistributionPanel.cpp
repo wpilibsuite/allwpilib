@@ -36,11 +36,11 @@ PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
  *
  * @return The voltage of the PDP in volts
  */
-float PowerDistributionPanel::GetVoltage() const {
+double PowerDistributionPanel::GetVoltage() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
 
-  float voltage = HAL_GetPDPVoltage(m_module, &status);
+  double voltage = HAL_GetPDPVoltage(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -54,11 +54,11 @@ float PowerDistributionPanel::GetVoltage() const {
  *
  * @return The temperature of the PDP in degrees Celsius
  */
-float PowerDistributionPanel::GetTemperature() const {
+double PowerDistributionPanel::GetTemperature() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
 
-  float temperature = HAL_GetPDPTemperature(m_module, &status);
+  double temperature = HAL_GetPDPTemperature(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -72,7 +72,7 @@ float PowerDistributionPanel::GetTemperature() const {
  *
  * @return The current of one of the PDP channels (channels 0-15) in Amperes
  */
-float PowerDistributionPanel::GetCurrent(int channel) const {
+double PowerDistributionPanel::GetCurrent(int channel) const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
 
@@ -82,7 +82,7 @@ float PowerDistributionPanel::GetCurrent(int channel) const {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
   }
 
-  float current = HAL_GetPDPChannelCurrent(m_module, channel, &status);
+  double current = HAL_GetPDPChannelCurrent(m_module, channel, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -96,11 +96,11 @@ float PowerDistributionPanel::GetCurrent(int channel) const {
  *
  * @return The the total current drawn from the PDP channels in Amperes
  */
-float PowerDistributionPanel::GetTotalCurrent() const {
+double PowerDistributionPanel::GetTotalCurrent() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
 
-  float current = HAL_GetPDPTotalCurrent(m_module, &status);
+  double current = HAL_GetPDPTotalCurrent(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -114,11 +114,11 @@ float PowerDistributionPanel::GetTotalCurrent() const {
  *
  * @return The the total power drawn from the PDP channels in Watts
  */
-float PowerDistributionPanel::GetTotalPower() const {
+double PowerDistributionPanel::GetTotalPower() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
 
-  float power = HAL_GetPDPTotalPower(m_module, &status);
+  double power = HAL_GetPDPTotalPower(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");
@@ -132,11 +132,11 @@ float PowerDistributionPanel::GetTotalPower() const {
  *
  * @return The the total energy drawn from the PDP channels in Joules
  */
-float PowerDistributionPanel::GetTotalEnergy() const {
+double PowerDistributionPanel::GetTotalEnergy() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
 
-  float energy = HAL_GetPDPTotalEnergy(m_module, &status);
+  double energy = HAL_GetPDPTotalEnergy(m_module, &status);
 
   if (status) {
     wpi_setWPIErrorWithContext(Timeout, "");

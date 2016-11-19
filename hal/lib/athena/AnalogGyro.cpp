@@ -87,13 +87,13 @@ void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
   if (*status != 0) return;
   HAL_SetAnalogOversampleBits(gyro->handle, kOversampleBits, status);
   if (*status != 0) return;
-  float sampleRate =
+  double sampleRate =
       kSamplesPerSecond * (1 << (kAverageBits + kOversampleBits));
   HAL_SetAnalogSampleRate(sampleRate, status);
   if (*status != 0) return;
   Wait(0.1);
 
-  HAL_SetAnalogGyroDeadband(handle, 0.0f, status);
+  HAL_SetAnalogGyroDeadband(handle, 0.0, status);
   if (*status != 0) return;
 }
 

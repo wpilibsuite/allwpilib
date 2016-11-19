@@ -63,8 +63,8 @@ class CANSpeedController : public SpeedController {
     kLimitMode_SrxDisableSwitchInputs = 2,
   };
 
-  virtual float Get() const = 0;
-  virtual void Set(float value) = 0;
+  virtual double Get() const = 0;
+  virtual void Set(double value) = 0;
   virtual void StopMotor() = 0;
   virtual void Disable() = 0;
   virtual void SetP(double p) = 0;
@@ -74,10 +74,10 @@ class CANSpeedController : public SpeedController {
   virtual double GetP() const = 0;
   virtual double GetI() const = 0;
   virtual double GetD() const = 0;
-  virtual float GetBusVoltage() const = 0;
-  virtual float GetOutputVoltage() const = 0;
-  virtual float GetOutputCurrent() const = 0;
-  virtual float GetTemperature() const = 0;
+  virtual double GetBusVoltage() const = 0;
+  virtual double GetOutputVoltage() const = 0;
+  virtual double GetOutputCurrent() const = 0;
+  virtual double GetTemperature() const = 0;
   virtual double GetPosition() const = 0;
   virtual double GetSpeed() const = 0;
   virtual bool GetForwardLimitOK() const = 0;
@@ -95,7 +95,7 @@ class CANSpeedController : public SpeedController {
   virtual void ConfigForwardLimit(double forwardLimitPosition) = 0;
   virtual void ConfigReverseLimit(double reverseLimitPosition) = 0;
   virtual void ConfigMaxOutputVoltage(double voltage) = 0;
-  virtual void ConfigFaultTime(float faultTime) = 0;
+  virtual void ConfigFaultTime(double faultTime) = 0;
   // Hold off on interface until we figure out ControlMode enums.
   // virtual void SetControlMode(ControlMode mode) = 0;
   // virtual ControlMode GetControlMode() const = 0;

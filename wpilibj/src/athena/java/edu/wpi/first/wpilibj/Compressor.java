@@ -94,7 +94,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    *
    * @return current consumed by the compressor in amps
    */
-  public float getCompressorCurrent() {
+  public double getCompressorCurrent() {
     return CompressorJNI.getCompressorCurrent(m_compressorHandle);
   }
 

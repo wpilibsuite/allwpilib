@@ -16,10 +16,10 @@ SimContinuousOutput::SimContinuousOutput(std::string topic) {
   std::cout << "Initialized ~/simulator/" + topic << std::endl;
 }
 
-void SimContinuousOutput::Set(float speed) {
+void SimContinuousOutput::Set(double speed) {
   gazebo::msgs::Float64 msg;
   msg.set_data(speed);
   pub->Publish(msg);
 }
 
-float SimContinuousOutput::Get() { return speed; }
+double SimContinuousOutput::Get() { return speed; }

@@ -156,7 +156,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @pre SetMinNegativePwm() called.
    */
   public void setPosition(double pos) {
-    PWMJNI.setPWMPosition(m_handle, (float)pos);
+    PWMJNI.setPWMPosition(m_handle, pos);
   }
 
   /**
@@ -185,7 +185,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @pre SetMinNegativePwm() called.
    */
   public void setSpeed(double speed) {
-    PWMJNI.setPWMSpeed(m_handle, (float)speed);
+    PWMJNI.setPWMSpeed(m_handle, speed);
   }
 
   /**

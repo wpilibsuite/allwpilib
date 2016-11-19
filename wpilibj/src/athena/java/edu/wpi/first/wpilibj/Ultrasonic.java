@@ -84,7 +84,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
         }
         if (ultrasonic.isEnabled()) {
           // Do the ping
-          ultrasonic.m_pingChannel.pulse(m_pingChannel.getChannel(), (float) kPingTime);
+          ultrasonic.m_pingChannel.pulse(m_pingChannel.getChannel(), kPingTime);
         }
         ultrasonic = ultrasonic.m_nextSensor;
         Timer.delay(.1); // wait for ping to return
@@ -288,7 +288,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
     // single sensor
     m_counter.reset(); // reset the counter to zero (invalid data now)
     // do the ping to start getting a single range
-    m_pingChannel.pulse(m_pingChannel.getChannel(), (float) kPingTime);
+    m_pingChannel.pulse(m_pingChannel.getChannel(), kPingTime);
   }
 
   /**

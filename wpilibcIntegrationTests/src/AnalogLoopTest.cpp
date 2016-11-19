@@ -43,11 +43,11 @@ class AnalogLoopTest : public testing::Test {
 TEST_F(AnalogLoopTest, AnalogInputWorks) {
   // Set the output voltage and check if the input measures the same voltage
   for (int32_t i = 0; i < 50; i++) {
-    m_output->SetVoltage(i / 10.0f);
+    m_output->SetVoltage(i / 10.0);
 
     Wait(kDelayTime);
 
-    EXPECT_NEAR(m_output->GetVoltage(), m_input->GetVoltage(), 0.01f);
+    EXPECT_NEAR(m_output->GetVoltage(), m_input->GetVoltage(), 0.01);
   }
 }
 
@@ -57,23 +57,23 @@ TEST_F(AnalogLoopTest, AnalogInputWorks) {
  */
 TEST_F(AnalogLoopTest, AnalogTriggerWorks) {
   AnalogTrigger trigger(m_input);
-  trigger.SetLimitsVoltage(2.0f, 3.0f);
+  trigger.SetLimitsVoltage(2.0, 3.0);
 
-  m_output->SetVoltage(1.0f);
+  m_output->SetVoltage(1.0);
   Wait(kDelayTime);
 
   EXPECT_FALSE(trigger.GetInWindow())
       << "Analog trigger is in the window (2V, 3V)";
   EXPECT_FALSE(trigger.GetTriggerState()) << "Analog trigger is on";
 
-  m_output->SetVoltage(2.5f);
+  m_output->SetVoltage(2.5);
   Wait(kDelayTime);
 
   EXPECT_TRUE(trigger.GetInWindow())
       << "Analog trigger is not in the window (2V, 3V)";
   EXPECT_FALSE(trigger.GetTriggerState()) << "Analog trigger is on";
 
-  m_output->SetVoltage(4.0f);
+  m_output->SetVoltage(4.0);
   Wait(kDelayTime);
 
   EXPECT_FALSE(trigger.GetInWindow())
@@ -87,7 +87,7 @@ TEST_F(AnalogLoopTest, AnalogTriggerWorks) {
  */
 TEST_F(AnalogLoopTest, AnalogTriggerCounterWorks) {
   AnalogTrigger trigger(m_input);
-  trigger.SetLimitsVoltage(2.0f, 3.0f);
+  trigger.SetLimitsVoltage(2.0, 3.0);
 
   Counter counter(trigger);
 
@@ -111,7 +111,7 @@ static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
 TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
   int32_t param = 0;
   AnalogTrigger trigger(m_input);
-  trigger.SetLimitsVoltage(2.0f, 3.0f);
+  trigger.SetLimitsVoltage(2.0, 3.0);
 
   // Given an interrupt handler that sets an int32_t to 12345
   std::shared_ptr<AnalogTriggerOutput> triggerOutput =

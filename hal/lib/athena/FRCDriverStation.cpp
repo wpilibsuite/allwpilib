@@ -100,16 +100,16 @@ int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
       joystickNum, reinterpret_cast<JoystickAxes_t*>(&axesInt),
       HAL_kMaxJoystickAxes);
 
-  // copy integer values to float values
+  // copy integer values to double values
   axes->count = axesInt.count;
   // current scaling is -128 to 127, can easily be patched in the future by
   // changing this function.
   for (int32_t i = 0; i < axesInt.count; i++) {
     int8_t value = axesInt.axes[i];
     if (value < 0) {
-      axes->axes[i] = value / 128.0f;
+      axes->axes[i] = value / 128.0;
     } else {
-      axes->axes[i] = value / 127.0f;
+      axes->axes[i] = value / 127.0;
     }
   }
 

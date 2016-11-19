@@ -33,15 +33,15 @@ public class PWMJNI extends DIOJNI {
 
   public static native void setPWMRaw(int pwmPortHandle, short value);
 
-  public static native void setPWMSpeed(int pwmPortHandle, float speed);
+  public static native void setPWMSpeed(int pwmPortHandle, double speed);
 
-  public static native void setPWMPosition(int pwmPortHandle, float position);
+  public static native void setPWMPosition(int pwmPortHandle, double position);
 
   public static native short getPWMRaw(int pwmPortHandle);
 
-  public static native float getPWMSpeed(int pwmPortHandle);
+  public static native double getPWMSpeed(int pwmPortHandle);
 
-  public static native float getPWMPosition(int pwmPortHandle);
+  public static native double getPWMPosition(int pwmPortHandle);
 
   public static native  void setPWMDisabled(int pwmPortHandle);
 

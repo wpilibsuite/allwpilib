@@ -58,7 +58,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   @Test
   public void testAnalogOuput() {
     for (int i = 0; i < 50; i++) {
-      analogIO.getOutput().setVoltage(i / 10.0f);
+      analogIO.getOutput().setVoltage(i / 10.0);
       Timer.delay(kDelayTime);
       assertEquals(analogIO.getOutput().getVoltage(), analogIO.getInput().getVoltage(), 0.01);
     }
@@ -68,10 +68,10 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   public void testAnalogTriggerBelowWindow() {
     // Given
     AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
-    trigger.setLimitsVoltage(2.0f, 3.0f);
+    trigger.setLimitsVoltage(2.0, 3.0);
 
     // When the output voltage is than less the lower limit
-    analogIO.getOutput().setVoltage(1.0f);
+    analogIO.getOutput().setVoltage(1.0);
     Timer.delay(kDelayTime);
 
     // Then the analog trigger is not in the window and the trigger state is off
@@ -85,7 +85,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   public void testAnalogTriggerInWindow() {
     // Given
     AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
-    trigger.setLimitsVoltage(2.0f, 3.0f);
+    trigger.setLimitsVoltage(2.0, 3.0);
 
     // When the output voltage is within the lower and upper limits
     analogIO.getOutput().setVoltage(2.5f);
@@ -102,10 +102,10 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   public void testAnalogTriggerAboveWindow() {
     // Given
     AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
-    trigger.setLimitsVoltage(2.0f, 3.0f);
+    trigger.setLimitsVoltage(2.0, 3.0);
 
     // When the output voltage is greater than the upper limit
-    analogIO.getOutput().setVoltage(4.0f);
+    analogIO.getOutput().setVoltage(4.0);
     Timer.delay(kDelayTime);
 
     // Then the analog trigger is not in the window and the trigger state is on
@@ -119,7 +119,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   public void testAnalogTriggerCounter() {
     // Given
     AnalogTrigger trigger = new AnalogTrigger(analogIO.getInput());
-    trigger.setLimitsVoltage(2.0f, 3.0f);
+    trigger.setLimitsVoltage(2.0, 3.0);
     Counter counter = new Counter(trigger);
 
     // When the analog output is turned low and high 50 times
@@ -151,7 +151,7 @@ public class AnalogCrossConnectTest extends AbstractInterruptTest {
   @Override
   InterruptableSensorBase giveInterruptableSensorBase() {
     m_interruptTrigger = new AnalogTrigger(analogIO.getInput());
-    m_interruptTrigger.setLimitsVoltage(2.0f, 3.0f);
+    m_interruptTrigger.setLimitsVoltage(2.0, 3.0);
     m_interruptTriggerOutput = new AnalogTriggerOutput(m_interruptTrigger,
         AnalogTriggerType.kState);
     return m_interruptTriggerOutput;

@@ -119,7 +119,7 @@ public class SerialPort {
     setReadBufferSize(1);
 
     // Set the default timeout to 5 seconds.
-    setTimeout(5.0f);
+    setTimeout(5.0);
 
     // Don't wait until the buffer is full to transmit.
     setWriteBufferMode(WriteBufferMode.kFlushOnAccess);
@@ -291,7 +291,7 @@ public class SerialPort {
    * @param timeout The number of seconds to to wait for I/O.
    */
   public void setTimeout(double timeout) {
-    SerialPortJNI.serialSetTimeout(m_port, (float) timeout);
+    SerialPortJNI.serialSetTimeout(m_port, timeout);
   }
 
   /**

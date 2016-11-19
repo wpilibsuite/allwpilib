@@ -58,21 +58,21 @@ class Joystick : public JoystickBase, public ErrorBase {
   int GetAxisChannel(AxisType axis) const;
   void SetAxisChannel(AxisType axis, int channel);
 
-  float GetX(JoystickHand hand = kRightHand) const override;
-  float GetY(JoystickHand hand = kRightHand) const override;
-  float GetZ(JoystickHand hand = kRightHand) const override;
-  float GetTwist() const override;
-  float GetThrottle() const override;
-  virtual float GetAxis(AxisType axis) const;
+  double GetX(JoystickHand hand = kRightHand) const override;
+  double GetY(JoystickHand hand = kRightHand) const override;
+  double GetZ(JoystickHand hand = kRightHand) const override;
+  double GetTwist() const override;
+  double GetThrottle() const override;
+  virtual double GetAxis(AxisType axis) const;
 
   bool GetTrigger(JoystickHand hand = kRightHand) const override;
   bool GetTop(JoystickHand hand = kRightHand) const override;
   bool GetButton(ButtonType button) const;
   static Joystick* GetStickForPort(int port);
 
-  virtual float GetMagnitude() const;
-  virtual float GetDirectionRadians() const;
-  virtual float GetDirectionDegrees() const;
+  virtual double GetMagnitude() const;
+  virtual double GetDirectionRadians() const;
+  virtual double GetDirectionDegrees() const;
 
   int GetAxisType(int axis) const;
 

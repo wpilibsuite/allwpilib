@@ -81,7 +81,7 @@ AnalogAccelerometer::AnalogAccelerometer(std::shared_ptr<AnalogInput> channel)
  *
  * @return The current acceleration of the sensor in Gs.
  */
-float AnalogAccelerometer::GetAcceleration() const {
+double AnalogAccelerometer::GetAcceleration() const {
   return (m_analogInput->GetAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
 }
 
@@ -94,7 +94,7 @@ float AnalogAccelerometer::GetAcceleration() const {
  *
  * @param sensitivity The sensitivity of accelerometer in Volts per G.
  */
-void AnalogAccelerometer::SetSensitivity(float sensitivity) {
+void AnalogAccelerometer::SetSensitivity(double sensitivity) {
   m_voltsPerG = sensitivity;
 }
 
@@ -106,7 +106,7 @@ void AnalogAccelerometer::SetSensitivity(float sensitivity) {
  *
  * @param zero The zero G voltage.
  */
-void AnalogAccelerometer::SetZero(float zero) { m_zeroGVoltage = zero; }
+void AnalogAccelerometer::SetZero(double zero) { m_zeroGVoltage = zero; }
 
 /**
  * Get the Acceleration for the PID Source parent.

@@ -24,7 +24,7 @@ namespace frc {
 class SimContinuousOutput {
  private:
   gazebo::transport::PublisherPtr pub;
-  float speed;
+  double speed;
 
  public:
   explicit SimContinuousOutput(std::string topic);
@@ -37,12 +37,12 @@ class SimContinuousOutput {
    *
    * @param value The value between -1.0 and 1.0 to set.
    */
-  void Set(float value);
+  void Set(double value);
 
   /**
    * @return The most recently set value.
    */
-  float Get();
+  double Get();
 };
 
 }  // namespace frc

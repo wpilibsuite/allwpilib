@@ -51,7 +51,7 @@ void PIDCommand::SetSetpointRelative(double deltaSetpoint) {
   SetSetpoint(GetSetpoint() + deltaSetpoint);
 }
 
-void PIDCommand::PIDWrite(float output) { UsePIDOutput(output); }
+void PIDCommand::PIDWrite(double output) { UsePIDOutput(output); }
 
 double PIDCommand::PIDGet() { return ReturnPIDInput(); }
 

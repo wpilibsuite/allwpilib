@@ -63,7 +63,7 @@ class Counter : public SensorBase,
   void SetUpDownCounterMode();
   void SetExternalDirectionMode();
   void SetSemiPeriodMode(bool highSemiPeriod);
-  void SetPulseLengthMode(float threshold);
+  void SetPulseLengthMode(double threshold);
 
   void SetReverseDirection(bool reverseDirection);
 

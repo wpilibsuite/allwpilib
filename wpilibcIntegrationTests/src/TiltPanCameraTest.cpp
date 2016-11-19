@@ -51,7 +51,7 @@ class TiltPanCameraTest : public testing::Test {
     m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS1);
 
     m_tilt->Set(kTiltSetpoint45);
-    m_pan->SetAngle(0.0f);
+    m_pan->SetAngle(0.0);
 
     Wait(kServoResetTime);
 
@@ -75,7 +75,7 @@ AnalogGyro* TiltPanCameraTest::m_gyro = nullptr;
  * Test if the gyro angle defaults to 0 immediately after being reset.
  */
 void TiltPanCameraTest::DefaultGyroAngle() {
-  EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
+  EXPECT_NEAR(0.0, m_gyro->GetAngle(), 1.0);
 }
 
 /**
@@ -109,7 +109,7 @@ void TiltPanCameraTest::GyroAngle() {
   */
 void TiltPanCameraTest::GyroCalibratedParameters() {
   uint32_t cCenter = m_gyro->GetCenter();
-  float cOffset = m_gyro->GetOffset();
+  double cOffset = m_gyro->GetOffset();
   delete m_gyro;
   m_gyro = new AnalogGyro(TestBench::kCameraGyroChannel, cCenter, cOffset);
   m_gyro->SetSensitivity(kSensitivity);
@@ -117,8 +117,8 @@ void TiltPanCameraTest::GyroCalibratedParameters() {
   // Default gyro angle test
   // Accumulator needs a small amount of time to reset before being tested
   m_gyro->Reset();
-  Wait(.001);
-  EXPECT_NEAR(0.0f, m_gyro->GetAngle(), 1.0f);
+  Wait(0.001);
+  EXPECT_NEAR(0.0, m_gyro->GetAngle(), 1.0);
 
   // Gyro angle test
   // Make sure that the gyro doesn't get jerked when the servo goes to zero.

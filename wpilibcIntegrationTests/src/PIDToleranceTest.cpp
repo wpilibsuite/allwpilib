@@ -27,7 +27,7 @@ class PIDToleranceTest : public testing::Test {
     double PIDGet() { return val; }
   };
   class fakeOutput : public PIDOutput {
-    void PIDWrite(float output) {}
+    void PIDWrite(double output) {}
   };
   fakeInput inp;
   fakeOutput out;

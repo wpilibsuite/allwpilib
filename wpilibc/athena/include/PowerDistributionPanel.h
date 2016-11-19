@@ -24,12 +24,12 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
   PowerDistributionPanel();
   explicit PowerDistributionPanel(int module);
 
-  float GetVoltage() const;
-  float GetTemperature() const;
-  float GetCurrent(int channel) const;
-  float GetTotalCurrent() const;
-  float GetTotalPower() const;
-  float GetTotalEnergy() const;
+  double GetVoltage() const;
+  double GetTemperature() const;
+  double GetCurrent(int channel) const;
+  double GetTotalCurrent() const;
+  double GetTotalPower() const;
+  double GetTotalEnergy() const;
   void ResetTotalEnergy();
   void ClearStickyFaults();
 
