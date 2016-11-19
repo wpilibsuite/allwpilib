@@ -197,7 +197,7 @@ static bool UnescapeURI(llvm::StringRef str, llvm::SmallVectorImpl<char>& out) {
     }
 
     // are there enough characters left?
-    if (i + 2 < end) return false;
+    if (i + 2 >= end) return false;
 
     // replace %xx with the corresponding character
     unsigned val1 = llvm::hexDigitValue(*++i);
