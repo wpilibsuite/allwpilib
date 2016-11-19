@@ -88,8 +88,9 @@ llvm::ArrayRef<int> SourceImpl::EnumerateProperties(
   if (!m_properties_cached && !CacheProperties(status))
     return llvm::ArrayRef<int>{};
   std::lock_guard<std::mutex> lock(m_mutex);
-  for (int i = 0; i < static_cast<int>(m_propertyData.size()); ++i)
-    vec.push_back(i + 1);
+  for (int i = 0; i < static_cast<int>(m_propertyData.size()); ++i) {
+    if (m_propertyData[i]) vec.push_back(i + 1);
+  }
   return vec;
 }
 

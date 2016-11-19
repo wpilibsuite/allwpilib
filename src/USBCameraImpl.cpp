@@ -636,7 +636,7 @@ void USBCameraImpl::DeviceConnect() {
     std::unique_lock<std::mutex> lock2(m_mutex);
     for (std::size_t i = 0; i < m_propertyData.size(); ++i) {
       const auto& prop = m_propertyData[i];
-      if (!prop->valueSet) continue;
+      if (!prop || !prop->valueSet) continue;
       if (!DeviceSetProperty(lock2, static_cast<const PropertyData&>(*prop)))
         WARNING("USB " << m_path << ": failed to set property " << prop->name);
     }
@@ -786,7 +786,11 @@ void USBCameraImpl::DeviceProcessCommands() {
       } else if (newMode.fps != m_mode.fps) {
         m_mode = newMode;
         lock.unlock();
+        // Need to stop streaming to set FPS
+        bool wasStreaming = m_streaming;
+        if (wasStreaming) DeviceStreamOff();
         DeviceSetFPS();
+        if (wasStreaming) DeviceStreamOn();
         Notifier::GetInstance().NotifySource(*this,
                                              CS_SOURCE_VIDEOMODE_CHANGED);
         lock.lock();
