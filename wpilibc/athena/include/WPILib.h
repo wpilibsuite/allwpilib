@@ -22,6 +22,7 @@
 #include "Buttons/InternalButton.h"
 #include "Buttons/JoystickButton.h"
 #include "Buttons/NetworkButton.h"
+#include "CameraServer.h"
 #include "Commands/Command.h"
 #include "Commands/CommandGroup.h"
 #include "Commands/PIDCommand.h"

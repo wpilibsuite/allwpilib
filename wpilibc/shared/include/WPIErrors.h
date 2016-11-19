@@ -76,6 +76,7 @@ S(NetworkTablesCorrupt, -43, "NetworkTables data stream is corrupt");
 S(SmartDashboardMissingKey, -43, "SmartDashboard data does not exist");
 S(CommandIllegalUse, -50, "Illegal use of Command");
 S(UnsupportedInSimulation, -80, "Unsupported in simulation");
+S(CameraServerError, -90, "CameraServer error");
 
 /*
  * Warnings
