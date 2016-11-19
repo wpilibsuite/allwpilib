@@ -288,9 +288,13 @@ bool MJPEGServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
       continue;
     }
 
+    // ignore name parameter
+    if (param == "name") continue;
+
     // try to assign parameter
     auto prop = source.GetPropertyIndex(param);
     if (!prop) {
+      if (param == "compression") continue;  // silently ignore
       response << param << ": \"ignored\"\r\n";
       WARNING("ignoring HTTP parameter \"" << param << "\"");
       continue;
@@ -550,13 +554,16 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
   size_t pos;
 
   // Determine request kind.  Most of these are for mjpgstreamer
-  // compatibility.
+  // compatibility, others are for Axis camera compatibility.
   if ((pos = buf.find("POST /stream")) != llvm::StringRef::npos) {
     kind = kStream;
     parameters = buf.substr(buf.find('?', pos + 12)).substr(1);
   } else if ((pos = buf.find("GET /?action=stream")) != llvm::StringRef::npos) {
     kind = kStream;
     parameters = buf.substr(buf.find('&', pos + 19)).substr(1);
+  } else if ((pos = buf.find("GET /stream.mjpg")) != llvm::StringRef::npos) {
+    kind = kStream;
+    parameters = buf.substr(buf.find('?', pos + 16)).substr(1);
   } else if (buf.find("GET /input") != llvm::StringRef::npos &&
              buf.find(".json") != llvm::StringRef::npos) {
     kind = kGetSettings;
