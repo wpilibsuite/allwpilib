@@ -687,6 +687,9 @@ void USBCameraImpl::DeviceConnect() {
                   << " address=" << m_buffers[i].m_data);
   }
 
+  // Update description (as it may have changed)
+  SetDescription(GetDescriptionImpl(m_path.c_str()));
+
   // Notify
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
 }
