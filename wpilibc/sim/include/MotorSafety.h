@@ -15,8 +15,8 @@ namespace frc {
 
 class MotorSafety {
  public:
-  virtual void SetExpiration(float timeout) = 0;
-  virtual float GetExpiration() const = 0;
+  virtual void SetExpiration(double timeout) = 0;
+  virtual double GetExpiration() const = 0;
   virtual bool IsAlive() const = 0;
   virtual void StopMotor() = 0;
   virtual void SetSafetyEnabled(bool enabled) = 0;

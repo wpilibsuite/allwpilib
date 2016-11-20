@@ -34,7 +34,7 @@ class Compressor : public SensorBase,
 
   bool GetPressureSwitchValue() const;
 
-  float GetCompressorCurrent() const;
+  double GetCompressorCurrent() const;
 
   void SetClosedLoopControl(bool on);
   bool GetClosedLoopControl() const;

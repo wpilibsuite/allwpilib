@@ -20,11 +20,11 @@ class Victor : public SafePWM, public SpeedController {
  public:
   explicit Victor(int channel);
   virtual ~Victor() = default;
-  virtual void Set(float value);
-  virtual float Get() const;
+  virtual void Set(double value);
+  virtual double Get() const;
   virtual void Disable();
 
-  void PIDWrite(float output) override;
+  void PIDWrite(double output) override;
 };
 
 }  // namespace frc

@@ -172,7 +172,7 @@ double PIDSubsystem::GetSetpoint() { return m_controller->GetSetpoint(); }
  * @param minimumInput the minimum value expected from the input
  * @param maximumInput the maximum value expected from the output
  */
-void PIDSubsystem::SetInputRange(float minimumInput, float maximumInput) {
+void PIDSubsystem::SetInputRange(double minimumInput, double maximumInput) {
   m_controller->SetInputRange(minimumInput, maximumInput);
 }
 
@@ -182,7 +182,7 @@ void PIDSubsystem::SetInputRange(float minimumInput, float maximumInput) {
  * @param minimumOutput the minimum value to write to the output
  * @param maximumOutput the maximum value to write to the output
  */
-void PIDSubsystem::SetOutputRange(float minimumOutput, float maximumOutput) {
+void PIDSubsystem::SetOutputRange(double minimumOutput, double maximumOutput) {
   m_controller->SetOutputRange(minimumOutput, maximumOutput);
 }
 
@@ -192,7 +192,7 @@ void PIDSubsystem::SetOutputRange(float minimumOutput, float maximumOutput) {
  *
  * @param absValue absolute error which is tolerable
  */
-void PIDSubsystem::SetAbsoluteTolerance(float absValue) {
+void PIDSubsystem::SetAbsoluteTolerance(double absValue) {
   m_controller->SetAbsoluteTolerance(absValue);
 }
 
@@ -201,7 +201,7 @@ void PIDSubsystem::SetAbsoluteTolerance(float absValue) {
  *
  * @param percent percentage error which is tolerable
  */
-void PIDSubsystem::SetPercentTolerance(float percent) {
+void PIDSubsystem::SetPercentTolerance(double percent) {
   m_controller->SetPercentTolerance(percent);
 }
 
@@ -236,7 +236,7 @@ double PIDSubsystem::GetPosition() { return ReturnPIDInput(); }
  */
 double PIDSubsystem::GetRate() { return ReturnPIDInput(); }
 
-void PIDSubsystem::PIDWrite(float output) { UsePIDOutput(output); }
+void PIDSubsystem::PIDWrite(double output) { UsePIDOutput(output); }
 
 double PIDSubsystem::PIDGet() { return ReturnPIDInput(); }
 

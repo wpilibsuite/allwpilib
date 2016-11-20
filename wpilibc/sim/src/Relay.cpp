@@ -147,7 +147,7 @@ int Relay::GetChannel() const { return m_channel; }
  *
  * @param timeout The timeout (in seconds) for this relay object
  */
-void Relay::SetExpiration(float timeout) {
+void Relay::SetExpiration(double timeout) {
   m_safetyHelper->SetExpiration(timeout);
 }
 
@@ -156,7 +156,7 @@ void Relay::SetExpiration(float timeout) {
  *
  * @return The expiration time value.
  */
-float Relay::GetExpiration() const { return m_safetyHelper->GetExpiration(); }
+double Relay::GetExpiration() const { return m_safetyHelper->GetExpiration(); }
 
 /**
  * Check if the relay object is currently alive or stopped due to a timeout.

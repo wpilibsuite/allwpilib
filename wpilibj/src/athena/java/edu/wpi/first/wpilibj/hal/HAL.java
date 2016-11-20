@@ -105,7 +105,7 @@ public class HAL extends JNIWrapper {
 
   public static native int getJoystickAxisType(byte joystickNum, byte axis);
 
-  public static native float getMatchTime();
+  public static native double getMatchTime();
 
   public static native boolean getSystemActive();
 

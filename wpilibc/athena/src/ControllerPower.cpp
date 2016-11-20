@@ -20,9 +20,9 @@ using namespace frc;
  *
  * @return The controller input voltage value in Volts
  */
-float ControllerPower::GetInputVoltage() {
+double ControllerPower::GetInputVoltage() {
   int32_t status = 0;
-  float retVal = HAL_GetVinVoltage(&status);
+  double retVal = HAL_GetVinVoltage(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -32,9 +32,9 @@ float ControllerPower::GetInputVoltage() {
  *
  * @return The controller input current value in Amps
  */
-float ControllerPower::GetInputCurrent() {
+double ControllerPower::GetInputCurrent() {
   int32_t status = 0;
-  float retVal = HAL_GetVinCurrent(&status);
+  double retVal = HAL_GetVinCurrent(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -44,9 +44,9 @@ float ControllerPower::GetInputCurrent() {
  *
  * @return The controller 6V rail voltage value in Volts
  */
-float ControllerPower::GetVoltage6V() {
+double ControllerPower::GetVoltage6V() {
   int32_t status = 0;
-  float retVal = HAL_GetUserVoltage6V(&status);
+  double retVal = HAL_GetUserVoltage6V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -56,9 +56,9 @@ float ControllerPower::GetVoltage6V() {
  *
  * @return The controller 6V rail output current value in Amps
  */
-float ControllerPower::GetCurrent6V() {
+double ControllerPower::GetCurrent6V() {
   int32_t status = 0;
-  float retVal = HAL_GetUserCurrent6V(&status);
+  double retVal = HAL_GetUserCurrent6V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -94,9 +94,9 @@ int ControllerPower::GetFaultCount6V() {
  *
  * @return The controller 5V rail voltage value in Volts
  */
-float ControllerPower::GetVoltage5V() {
+double ControllerPower::GetVoltage5V() {
   int32_t status = 0;
-  float retVal = HAL_GetUserVoltage5V(&status);
+  double retVal = HAL_GetUserVoltage5V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -106,9 +106,9 @@ float ControllerPower::GetVoltage5V() {
  *
  * @return The controller 5V rail output current value in Amps
  */
-float ControllerPower::GetCurrent5V() {
+double ControllerPower::GetCurrent5V() {
   int32_t status = 0;
-  float retVal = HAL_GetUserCurrent5V(&status);
+  double retVal = HAL_GetUserCurrent5V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -144,9 +144,9 @@ int ControllerPower::GetFaultCount5V() {
  *
  * @return The controller 3.3V rail voltage value in Volts
  */
-float ControllerPower::GetVoltage3V3() {
+double ControllerPower::GetVoltage3V3() {
   int32_t status = 0;
-  float retVal = HAL_GetUserVoltage3V3(&status);
+  double retVal = HAL_GetUserVoltage3V3(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
@@ -156,9 +156,9 @@ float ControllerPower::GetVoltage3V3() {
  *
  * @return The controller 3.3V rail output current value in Amps
  */
-float ControllerPower::GetCurrent3V3() {
+double ControllerPower::GetCurrent3V3() {
   int32_t status = 0;
-  float retVal = HAL_GetUserCurrent3V3(&status);
+  double retVal = HAL_GetUserCurrent3V3(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }

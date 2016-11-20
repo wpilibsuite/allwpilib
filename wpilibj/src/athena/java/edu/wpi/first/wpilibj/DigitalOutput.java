@@ -88,7 +88,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    * @param channel     The channel to pulse.
    * @param pulseLength The length of the pulse.
    */
-  public void pulse(final int channel, final float pulseLength) {
+  public void pulse(final int channel, final double pulseLength) {
     DIOJNI.pulse(m_handle, pulseLength);
   }
 
@@ -100,10 +100,9 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    */
   @Deprecated
   public void pulse(final int channel, final int pulseLength) {
-    float convertedPulse =
-        (float) (pulseLength / 1.0e9 * (DIOJNI.getLoopTiming() * 25));
+    double convertedPulse = pulseLength / 1.0e9 * (DIOJNI.getLoopTiming() * 25);
     System.err
-        .println("You should use the float version of pulse for portability.  This is deprecated");
+        .println("You should use the double version of pulse for portability.  This is deprecated");
     DIOJNI.pulse(m_handle, convertedPulse);
   }
 

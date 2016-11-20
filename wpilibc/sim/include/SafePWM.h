@@ -28,15 +28,15 @@ class SafePWM : public PWM, public MotorSafety {
   explicit SafePWM(int channel);
   virtual ~SafePWM() = default;
 
-  void SetExpiration(float timeout);
-  float GetExpiration() const;
+  void SetExpiration(double timeout);
+  double GetExpiration() const;
   bool IsAlive() const;
   void StopMotor();
   bool IsSafetyEnabled() const;
   void SetSafetyEnabled(bool enabled);
   void GetDescription(std::ostringstream& desc) const;
 
-  virtual void SetSpeed(float speed);
+  virtual void SetSpeed(double speed);
 
  private:
   std::unique_ptr<MotorSafetyHelper> m_safetyHelper;

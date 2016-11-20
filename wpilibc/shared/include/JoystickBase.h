@@ -19,9 +19,9 @@ class JoystickBase : public GenericHID {
   explicit JoystickBase(int port);
   virtual ~JoystickBase() = default;
 
-  virtual float GetZ(JoystickHand hand = kRightHand) const = 0;
-  virtual float GetTwist() const = 0;
-  virtual float GetThrottle() const = 0;
+  virtual double GetZ(JoystickHand hand = kRightHand) const = 0;
+  virtual double GetTwist() const = 0;
+  virtual double GetThrottle() const = 0;
 
   virtual bool GetTrigger(JoystickHand hand = kRightHand) const = 0;
   virtual bool GetTop(JoystickHand hand = kRightHand) const = 0;

@@ -446,7 +446,7 @@ void Counter::SetSemiPeriodMode(bool highSemiPeriod) {
  * @param threshold The pulse length beyond which the counter counts the
  *                  opposite direction.  Units are seconds.
  */
-void Counter::SetPulseLengthMode(float threshold) {
+void Counter::SetPulseLengthMode(double threshold) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetCounterPulseLengthMode(m_counter, threshold, &status);

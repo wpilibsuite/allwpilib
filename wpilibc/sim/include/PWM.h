@@ -74,21 +74,21 @@ class PWM : public SensorBase,
    * scaling is implemented as an output squelch to get longer periods for old
    * devices.
    */
-  static const float kDefaultPwmPeriod;
+  static const double kDefaultPwmPeriod;
   /**
    * kDefaultPwmCenter is the PWM range center in ms
    */
-  static const float kDefaultPwmCenter;
+  static const double kDefaultPwmCenter;
   /**
    * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
    */
   static const int kDefaultPwmStepsDown;
   static const int kPwmDisabled;
 
-  virtual void SetPosition(float pos);
-  virtual float GetPosition() const;
-  virtual void SetSpeed(float speed);
-  virtual float GetSpeed() const;
+  virtual void SetPosition(double pos);
+  virtual double GetPosition() const;
+  virtual void SetSpeed(double speed);
+  virtual double GetSpeed() const;
 
   bool m_eliminateDeadband;
   int m_centerPwm;

@@ -46,8 +46,8 @@ class AnalogInput : public SensorBase,
   int GetValue() const;
   int GetAverageValue() const;
 
-  float GetVoltage() const;
-  float GetAverageVoltage() const;
+  double GetVoltage() const;
+  double GetAverageVoltage() const;
 
   int GetChannel() const;
 
@@ -69,8 +69,8 @@ class AnalogInput : public SensorBase,
   int64_t GetAccumulatorCount() const;
   void GetAccumulatorOutput(int64_t& value, int64_t& count) const;
 
-  static void SetSampleRate(float samplesPerSecond);
-  static float GetSampleRate();
+  static void SetSampleRate(double samplesPerSecond);
+  static double GetSampleRate();
 
   double PIDGet() override;
 

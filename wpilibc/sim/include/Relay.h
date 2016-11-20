@@ -49,8 +49,8 @@ class Relay : public MotorSafety,
   Value Get() const;
   int GetChannel() const;
 
-  void SetExpiration(float timeout) override;
-  float GetExpiration() const override;
+  void SetExpiration(double timeout) override;
+  double GetExpiration() const override;
   bool IsAlive() const override;
   void StopMotor() override;
   bool IsSafetyEnabled() const override;

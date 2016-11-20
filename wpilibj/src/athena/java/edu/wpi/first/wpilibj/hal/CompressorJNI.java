@@ -20,7 +20,7 @@ public class CompressorJNI extends JNIWrapper {
 
   public static native boolean getCompressorPressureSwitch(int compressorHandle);
 
-  public static native float getCompressorCurrent(int compressorHandle);
+  public static native double getCompressorCurrent(int compressorHandle);
 
   public static native boolean getCompressorCurrentTooHighFault(int compressorHandle);
 

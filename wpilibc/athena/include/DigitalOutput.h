@@ -32,12 +32,12 @@ class DigitalOutput : public DigitalSource,
   void Set(bool value);
   bool Get() const;
   int GetChannel() const override;
-  void Pulse(float length);
+  void Pulse(double length);
   bool IsPulsing() const;
-  void SetPWMRate(float rate);
-  void EnablePWM(float initialDutyCycle);
+  void SetPWMRate(double rate);
+  void EnablePWM(double initialDutyCycle);
   void DisablePWM();
-  void UpdateDutyCycle(float dutyCycle);
+  void UpdateDutyCycle(double dutyCycle);
 
   // Digital Source Interface
   HAL_Handle GetPortHandleForRouting() const override;

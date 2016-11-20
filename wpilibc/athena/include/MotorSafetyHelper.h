@@ -21,8 +21,8 @@ class MotorSafetyHelper : public ErrorBase {
   explicit MotorSafetyHelper(MotorSafety* safeObject);
   ~MotorSafetyHelper();
   void Feed();
-  void SetExpiration(float expirationTime);
-  float GetExpiration() const;
+  void SetExpiration(double expirationTime);
+  double GetExpiration() const;
   bool IsAlive() const;
   void Check();
   void SetSafetyEnabled(bool enabled);

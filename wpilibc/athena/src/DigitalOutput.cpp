@@ -102,7 +102,7 @@ int DigitalOutput::GetChannel() const { return m_channel; }
  *
  * @param length The pulselength in seconds
  */
-void DigitalOutput::Pulse(float length) {
+void DigitalOutput::Pulse(double length) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -134,7 +134,7 @@ bool DigitalOutput::IsPulsing() const {
  *
  * @param rate The frequency to output all digital output PWM signals.
  */
-void DigitalOutput::SetPWMRate(float rate) {
+void DigitalOutput::SetPWMRate(double rate) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -155,7 +155,7 @@ void DigitalOutput::SetPWMRate(float rate) {
  *
  * @param initialDutyCycle The duty-cycle to start generating. [0..1]
  */
-void DigitalOutput::EnablePWM(float initialDutyCycle) {
+void DigitalOutput::EnablePWM(double initialDutyCycle) {
   if (m_pwmGenerator != HAL_kInvalidHandle) return;
 
   int32_t status = 0;
@@ -202,7 +202,7 @@ void DigitalOutput::DisablePWM() {
  *
  * @param dutyCycle The duty-cycle to change to. [0..1]
  */
-void DigitalOutput::UpdateDutyCycle(float dutyCycle) {
+void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;

@@ -45,14 +45,14 @@ Victor::Victor(int channel) : SafePWM(channel) {
  *
  * @param speed The speed value between -1.0 and 1.0 to set.
  */
-void Victor::Set(float speed) { SetSpeed(speed); }
+void Victor::Set(double speed) { SetSpeed(speed); }
 
 /**
  * Get the recently set value of the PWM.
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-float Victor::Get() const { return GetSpeed(); }
+double Victor::Get() const { return GetSpeed(); }
 
 /**
  * Common interface for disabling a motor.
@@ -64,4 +64,4 @@ void Victor::Disable() { SetRaw(kPwmDisabled); }
  *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void Victor::PIDWrite(float output) { Set(output); }
+void Victor::PIDWrite(double output) { Set(output); }

@@ -100,8 +100,8 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
  * @param deadbandMin The low end of the deadband pulse width in ms
  * @param min         The minimum pulse width in ms
  */
-void PWM::SetBounds(float max, float deadbandMax, float center,
-                    float deadbandMin, float min) {
+void PWM::SetBounds(double max, double deadbandMax, double center,
+                    double deadbandMin, double min) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min,
@@ -162,7 +162,7 @@ void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
  *
  * @param pos The position to set the servo between 0.0 and 1.0.
  */
-void PWM::SetPosition(float pos) {
+void PWM::SetPosition(double pos) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMPosition(m_handle, pos, &status);
@@ -179,10 +179,10 @@ void PWM::SetPosition(float pos) {
  *
  * @return The position the servo is set to between 0.0 and 1.0.
  */
-float PWM::GetPosition() const {
+double PWM::GetPosition() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  float position = HAL_GetPWMPosition(m_handle, &status);
+  double position = HAL_GetPWMPosition(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return position;
 }
@@ -200,7 +200,7 @@ float PWM::GetPosition() const {
  *
  * @param speed The speed to set the speed controller between -1.0 and 1.0.
  */
-void PWM::SetSpeed(float speed) {
+void PWM::SetSpeed(double speed) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMSpeed(m_handle, speed, &status);
@@ -219,10 +219,10 @@ void PWM::SetSpeed(float speed) {
  *
  * @return The most recently set speed between -1.0 and 1.0.
  */
-float PWM::GetSpeed() const {
+double PWM::GetSpeed() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
-  float speed = HAL_GetPWMSpeed(m_handle, &status);
+  double speed = HAL_GetPWMSpeed(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return speed;
 }

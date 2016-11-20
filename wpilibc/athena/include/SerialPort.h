@@ -61,7 +61,7 @@ class SerialPort : public ErrorBase {
   int GetBytesReceived();
   int Read(char* buffer, int count);
   int Write(const std::string& buffer, int count);
-  void SetTimeout(float timeout);
+  void SetTimeout(double timeout);
   void SetReadBufferSize(int size);
   void SetWriteBufferSize(int size);
   void SetWriteBufferMode(WriteBufferMode mode);

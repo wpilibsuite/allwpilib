@@ -99,7 +99,7 @@ void InterruptableSensorBase::CancelInterrupts() {
  * @return What interrupts fired
  */
 InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
-    float timeout, bool ignorePrevious) {
+    double timeout, bool ignorePrevious) {
   if (StatusIsFatal()) return InterruptableSensorBase::kTimeout;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;

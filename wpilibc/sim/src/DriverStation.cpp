@@ -20,7 +20,7 @@ using namespace frc;
 const int DriverStation::kBatteryChannel;
 const int DriverStation::kJoystickPorts;
 const int DriverStation::kJoystickAxes;
-const float DriverStation::kUpdatePeriod = 0.02;
+const double DriverStation::kUpdatePeriod = 0.02;
 int DriverStation::m_updateNumber = 0;
 
 /**
@@ -66,7 +66,7 @@ DriverStation& DriverStation::GetInstance() {
  *
  * @return The battery voltage.
  */
-float DriverStation::GetBatteryVoltage() const {
+double DriverStation::GetBatteryVoltage() const {
   return 12.0;  // 12 volts all the time!
 }
 
@@ -78,7 +78,7 @@ float DriverStation::GetBatteryVoltage() const {
  * @param axis  The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
  */
-float DriverStation::GetStickAxis(int stick, int axis) {
+double DriverStation::GetStickAxis(int stick, int axis) {
   if (axis < 0 || axis > (kJoystickAxes - 1)) {
     wpi_setWPIError(BadJoystickAxis);
     return 0.0;
@@ -147,7 +147,7 @@ int16_t DriverStation::GetStickButtons(int stick) {
 }
 
 // 5V divided by 10 bits
-#define kDSAnalogInScaling (static_cast<float>(5.0 / 1023.0))
+#define kDSAnalogInScaling (5.0 / 1023.0)
 
 /**
  * Get an analog voltage from the Driver Station.
@@ -161,7 +161,7 @@ int16_t DriverStation::GetStickButtons(int stick) {
  *                Valid range is 1 - 4.
  * @return The analog voltage on the input.
  */
-float DriverStation::GetAnalogIn(int channel) {
+double DriverStation::GetAnalogIn(int channel) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetAnalogIn");
   return 0.0;
 }

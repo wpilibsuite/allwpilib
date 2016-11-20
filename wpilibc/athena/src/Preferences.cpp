@@ -94,7 +94,7 @@ double Preferences::GetDouble(llvm::StringRef key, double defaultValue) {
  * @return either the value in the table, or the defaultValue
  */
 float Preferences::GetFloat(llvm::StringRef key, float defaultValue) {
-  return static_cast<float>(m_table->GetNumber(key, defaultValue));
+  return m_table->GetNumber(key, defaultValue);
 }
 
 /**

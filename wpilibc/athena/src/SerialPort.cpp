@@ -44,7 +44,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   // Set the default timeout to 5 seconds.
-  SetTimeout(5.0f);
+  SetTimeout(5.0);
 
   // Don't wait until the buffer is full to transmit.
   SetWriteBufferMode(kFlushOnAccess);
@@ -150,7 +150,7 @@ int SerialPort::Write(const std::string& buffer, int count) {
  *
  * @param timeout The number of seconds to to wait for I/O.
  */
-void SerialPort::SetTimeout(float timeout) {
+void SerialPort::SetTimeout(double timeout) {
   int32_t status = 0;
   HAL_SetSerialTimeout(m_port, timeout, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

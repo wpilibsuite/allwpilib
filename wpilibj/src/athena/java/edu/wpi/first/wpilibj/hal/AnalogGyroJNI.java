@@ -15,23 +15,23 @@ public class AnalogGyroJNI extends JNIWrapper {
   public static native void freeAnalogGyro(int handle);
 
   public static native void setAnalogGyroParameters(int handle,
-                                                    float voltsPerDegreePerSecond,
-                                                    float offset, int center);
+                                                    double voltsPerDegreePerSecond,
+                                                    double offset, int center);
 
   public static native void setAnalogGyroVoltsPerDegreePerSecond(int handle,
-                                                                 float voltsPerDegreePerSecond);
+                                                                 double voltsPerDegreePerSecond);
 
   public static native void resetAnalogGyro(int handle);
 
   public static native void calibrateAnalogGyro(int handle);
 
-  public static native void setAnalogGyroDeadband(int handle, float volts);
+  public static native void setAnalogGyroDeadband(int handle, double volts);
 
-  public static native float getAnalogGyroAngle(int handle);
+  public static native double getAnalogGyroAngle(int handle);
 
   public static native double getAnalogGyroRate(int handle);
 
-  public static native float getAnalogGyroOffset(int handle);
+  public static native double getAnalogGyroOffset(int handle);
 
   public static native int getAnalogGyroCenter(int handle);
 }

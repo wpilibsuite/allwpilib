@@ -31,13 +31,13 @@ class XboxController : public GamepadBase, public ErrorBase {
   XboxController(const XboxController&) = delete;
   XboxController& operator=(const XboxController&) = delete;
 
-  float GetX(JoystickHand hand) const override;
-  float GetY(JoystickHand hand) const override;
+  double GetX(JoystickHand hand) const override;
+  double GetY(JoystickHand hand) const override;
 
   bool GetBumper(JoystickHand hand) const override;
   bool GetStickButton(JoystickHand hand) const override;
 
-  virtual float GetTriggerAxis(JoystickHand hand) const;
+  virtual double GetTriggerAxis(JoystickHand hand) const;
 
   bool GetAButton() const;
   bool GetBButton() const;

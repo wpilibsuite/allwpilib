@@ -33,13 +33,13 @@ class AnalogGyro : public GyroBase {
  public:
   static const int kOversampleBits;
   static const int kAverageBits;
-  static const float kSamplesPerSecond;
-  static const float kCalibrationSampleTime;
-  static const float kDefaultVoltsPerDegreePerSecond;
+  static const double kSamplesPerSecond;
+  static const double kCalibrationSampleTime;
+  static const double kDefaultVoltsPerDegreePerSecond;
 
   explicit AnalogGyro(int channel);
   virtual ~AnalogGyro() = default;
-  float GetAngle() const;
+  double GetAngle() const;
   void Calibrate() override;
   double GetRate() const;
   void Reset();

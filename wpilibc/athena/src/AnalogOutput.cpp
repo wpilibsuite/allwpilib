@@ -63,7 +63,7 @@ AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
  *
  * @param voltage The output value in Volts, from 0.0 to +5.0
  */
-void AnalogOutput::SetVoltage(float voltage) {
+void AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
   HAL_SetAnalogOutput(m_port, voltage, &status);
 
@@ -75,9 +75,9 @@ void AnalogOutput::SetVoltage(float voltage) {
  *
  * @return The value in Volts, from 0.0 to +5.0
  */
-float AnalogOutput::GetVoltage() const {
+double AnalogOutput::GetVoltage() const {
   int32_t status = 0;
-  float voltage = HAL_GetAnalogOutput(m_port, &status);
+  double voltage = HAL_GetAnalogOutput(m_port, &status);
 
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 

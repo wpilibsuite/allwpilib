@@ -40,8 +40,8 @@ class AnalogInput : public SensorBase,
   explicit AnalogInput(int channel);
   virtual ~AnalogInput() = default;
 
-  float GetVoltage() const;
-  float GetAverageVoltage() const;
+  double GetVoltage() const;
+  double GetAverageVoltage() const;
 
   int GetChannel() const;
 

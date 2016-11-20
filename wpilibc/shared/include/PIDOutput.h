@@ -19,7 +19,7 @@ namespace frc {
  */
 class PIDOutput {
  public:
-  virtual void PIDWrite(float output) = 0;
+  virtual void PIDWrite(double output) = 0;
 };
 
 }  // namespace frc

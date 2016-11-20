@@ -323,7 +323,7 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @param samplesPerSecond The number of samples per second.
    */
   public static void setGlobalSampleRate(final double samplesPerSecond) {
-    AnalogJNI.setAnalogSampleRate((float) samplesPerSecond);
+    AnalogJNI.setAnalogSampleRate(samplesPerSecond);
   }
 
   /**

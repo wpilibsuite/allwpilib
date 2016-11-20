@@ -287,9 +287,9 @@ Java_edu_wpi_first_wpilibj_hal_HAL_waitForDSData(JNIEnv* env, jclass) {
 /*
  * Class: edu_wpi_first_wpilibj_hal_HAL
  * Method:    HAL_GetMatchTime
- * Signature: ()F
+ * Signature: ()D
  */
-JNIEXPORT jfloat JNICALL
+JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_getMatchTime(JNIEnv* env, jclass) {
   int32_t status = 0;
   return HAL_GetMatchTime(&status);

@@ -176,10 +176,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRaw(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    setPWMSpeed
- * Signature: (IF)V
+ * Signature: (ID)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMSpeed(
-    JNIEnv* env, jclass, jint id, jfloat value) {
+    JNIEnv* env, jclass, jint id, jdouble value) {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
   PWMJNI_LOG(logDEBUG) << "PWM Value = " << value;
   int32_t status = 0;
@@ -191,10 +191,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMSpeed(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    setPWMPosition
- * Signature: (IF)V
+ * Signature: (ID)V
  */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMPosition(
-    JNIEnv* env, jclass, jint id, jfloat value) {
+    JNIEnv* env, jclass, jint id, jdouble value) {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
   PWMJNI_LOG(logDEBUG) << "PWM Value = " << value;
   int32_t status = 0;
@@ -223,14 +223,14 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMRaw(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    getPWMSpeed
- * Signature: (I)F
+ * Signature: (I)D
  */
-JNIEXPORT jfloat JNICALL
+JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMSpeed(
     JNIEnv* env, jclass, jint id) {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
   int32_t status = 0;
-  jfloat returnValue = HAL_GetPWMSpeed((HAL_DigitalHandle)id, &status);
+  jdouble returnValue = HAL_GetPWMSpeed((HAL_DigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "Value = " << returnValue;
   CheckStatus(env, status);
@@ -240,14 +240,14 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMSpeed(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    getPWMPosition
- * Signature: (I)F
+ * Signature: (I)D
  */
-JNIEXPORT jfloat JNICALL
+JNIEXPORT jdouble JNICALL
 Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMPosition(
     JNIEnv* env, jclass, jint id) {
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
   int32_t status = 0;
-  jfloat returnValue = HAL_GetPWMPosition((HAL_DigitalHandle)id, &status);
+  jdouble returnValue = HAL_GetPWMPosition((HAL_DigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "Value = " << returnValue;
   CheckStatus(env, status);

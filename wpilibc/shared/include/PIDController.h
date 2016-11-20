@@ -39,19 +39,19 @@ class PIDController : public LiveWindowSendable,
                       public PIDInterface,
                       public ITableListener {
  public:
-  PIDController(float p, float i, float d, PIDSource* source, PIDOutput* output,
-                float period = 0.05);
-  PIDController(float p, float i, float d, float f, PIDSource* source,
-                PIDOutput* output, float period = 0.05);
+  PIDController(double p, double i, double d, PIDSource* source,
+                PIDOutput* output, double period = 0.05);
+  PIDController(double p, double i, double d, double f, PIDSource* source,
+                PIDOutput* output, double period = 0.05);
   virtual ~PIDController();
 
   PIDController(const PIDController&) = delete;
   PIDController& operator=(const PIDController) = delete;
 
-  virtual float Get() const;
+  virtual double Get() const;
   virtual void SetContinuous(bool continuous = true);
-  virtual void SetInputRange(float minimumInput, float maximumInput);
-  virtual void SetOutputRange(float minimumOutput, float maximumOutput);
+  virtual void SetInputRange(double minimumInput, double maximumInput);
+  virtual void SetOutputRange(double minimumOutput, double maximumOutput);
   void SetPID(double p, double i, double d) override;
   virtual void SetPID(double p, double i, double d, double f);
   double GetP() const override;
@@ -59,19 +59,19 @@ class PIDController : public LiveWindowSendable,
   double GetD() const override;
   virtual double GetF() const;
 
-  void SetSetpoint(float setpoint) override;
+  void SetSetpoint(double setpoint) override;
   double GetSetpoint() const override;
   double GetDeltaSetpoint() const;
 
-  virtual float GetError() const;
-  virtual float GetAvgError() const;
+  virtual double GetError() const;
+  virtual double GetAvgError() const;
 
   virtual void SetPIDSourceType(PIDSourceType pidSource);
   virtual PIDSourceType GetPIDSourceType() const;
 
-  virtual void SetTolerance(float percent);
-  virtual void SetAbsoluteTolerance(float absValue);
-  virtual void SetPercentTolerance(float percentValue);
+  virtual void SetTolerance(double percent);
+  virtual void SetAbsoluteTolerance(double absValue);
+  virtual void SetPercentTolerance(double percentValue);
   virtual void SetToleranceBuffer(int buf = 1);
   virtual bool OnTarget() const;
 
@@ -94,27 +94,27 @@ class PIDController : public LiveWindowSendable,
 
  private:
   // factor for "proportional" control
-  float m_P;
+  double m_P;
   // factor for "integral" control
-  float m_I;
+  double m_I;
   // factor for "derivative" control
-  float m_D;
+  double m_D;
   // factor for "feed forward" control
-  float m_F;
+  double m_F;
   // |maximum output|
-  float m_maximumOutput = 1.0;
+  double m_maximumOutput = 1.0;
   // |minimum output|
-  float m_minimumOutput = -1.0;
+  double m_minimumOutput = -1.0;
   // maximum input - limit setpoint to this
-  float m_maximumInput = 0;
+  double m_maximumInput = 0;
   // minimum input - limit setpoint to this
-  float m_minimumInput = 0;
+  double m_minimumInput = 0;
   // do the endpoints wrap around? eg. Absolute encoder
   bool m_continuous = false;
   // is the pid controller enabled
   bool m_enabled = false;
   // the prior error (used to compute velocity)
-  float m_prevError = 0;
+  double m_prevError = 0;
   // the sum of the errors for use in the integral calc
   double m_totalError = 0;
   enum {
@@ -124,12 +124,12 @@ class PIDController : public LiveWindowSendable,
   } m_toleranceType = kNoTolerance;
 
   // the percetage or absolute error that is considered on target.
-  float m_tolerance = 0.05;
-  float m_setpoint = 0;
-  float m_prevSetpoint = 0;
-  float m_error = 0;
-  float m_result = 0;
-  float m_period;
+  double m_tolerance = 0.05;
+  double m_setpoint = 0;
+  double m_prevSetpoint = 0;
+  double m_error = 0;
+  double m_result = 0;
+  double m_period;
 
   // Length of buffer for averaging for tolerances.
   std::atomic<unsigned> m_bufLength{1};

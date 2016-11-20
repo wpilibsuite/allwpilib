@@ -48,11 +48,11 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   static const int kJoystickPorts = 4;
   static const int kJoystickAxes = 6;
 
-  float GetStickAxis(int stick, int axis);
+  double GetStickAxis(int stick, int axis);
   bool GetStickButton(int stick, int button);
   int16_t GetStickButtons(int stick);
 
-  float GetAnalogIn(int channel);
+  double GetAnalogIn(int channel);
   bool GetDigitalIn(int channel);
   void SetDigitalOut(int channel, bool value);
   bool GetDigitalOut(int channel);
@@ -70,7 +70,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   void WaitForData();
   bool WaitForData(double timeout);
   double GetMatchTime() const;
-  float GetBatteryVoltage() const;
+  double GetBatteryVoltage() const;
   uint16_t GetTeamNumber() const;
 
   void IncrementUpdateNumber() { m_updateNumber++; }
@@ -115,7 +115,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   static DriverStation* m_instance;
   static int m_updateNumber;
   ///< TODO: Get rid of this and use the semaphore signaling
-  static const float kUpdatePeriod;
+  static const double kUpdatePeriod;
 
   void stateCallback(const gazebo::msgs::ConstDriverStationPtr& msg);
   void joystickCallback(const gazebo::msgs::ConstFRCJoystickPtr& msg, int i);

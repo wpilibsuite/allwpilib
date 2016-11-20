@@ -35,7 +35,7 @@ class InterruptableSensorBase : public SensorBase {
   virtual void
   CancelInterrupts();  ///< Free up the underlying chipobject functions.
   virtual WaitResult WaitForInterrupt(
-      float timeout,
+      double timeout,
       bool ignorePrevious = true);  ///< Synchronus version.
   virtual void
   EnableInterrupts();  ///< Enable interrupts - after finishing setup.

@@ -83,7 +83,7 @@ void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
  * @param lower The lower limit of the trigger in Volts.
  * @param upper The upper limit of the trigger in Volts.
  */
-void AnalogTrigger::SetLimitsVoltage(float lower, float upper) {
+void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);

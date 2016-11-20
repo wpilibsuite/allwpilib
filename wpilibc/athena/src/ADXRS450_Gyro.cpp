@@ -137,9 +137,8 @@ void ADXRS450_Gyro::Reset() { m_spi.ResetAccumulator(); }
  * @return the current heading of the robot in degrees. This heading is based on
  *         integration of the returned rate from the gyro.
  */
-float ADXRS450_Gyro::GetAngle() const {
-  return static_cast<float>(m_spi.GetAccumulatorValue() *
-                            kDegreePerSecondPerLSB * kSamplePeriod);
+double ADXRS450_Gyro::GetAngle() const {
+  return m_spi.GetAccumulatorValue() * kDegreePerSecondPerLSB * kSamplePeriod;
 }
 
 /**

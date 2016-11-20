@@ -24,7 +24,7 @@ public class SerialPortJNI extends JNIWrapper {
 
   public static native void serialSetFlowControl(byte port, byte flow);
 
-  public static native void serialSetTimeout(byte port, float timeout);
+  public static native void serialSetTimeout(byte port, double timeout);
 
   public static native void serialEnableTermination(byte port, char terminator);
 

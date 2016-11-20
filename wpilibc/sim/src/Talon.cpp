@@ -43,14 +43,14 @@ Talon::Talon(int channel) : SafePWM(channel) {
  *
  * @param speed The speed value between -1.0 and 1.0 to set.
  */
-void Talon::Set(float speed) { SetSpeed(speed); }
+void Talon::Set(double speed) { SetSpeed(speed); }
 
 /**
  * Get the recently set value of the PWM.
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-float Talon::Get() const { return GetSpeed(); }
+double Talon::Get() const { return GetSpeed(); }
 
 /**
  * Common interface for disabling a motor.
@@ -62,4 +62,4 @@ void Talon::Disable() { SetRaw(kPwmDisabled); }
  *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void Talon::PIDWrite(float output) { Set(output); }
+void Talon::PIDWrite(double output) { Set(output); }

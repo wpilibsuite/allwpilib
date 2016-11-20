@@ -26,8 +26,8 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
   explicit AnalogOutput(int channel);
   virtual ~AnalogOutput();
 
-  void SetVoltage(float voltage);
-  float GetVoltage() const;
+  void SetVoltage(double voltage);
+  double GetVoltage() const;
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;

@@ -47,9 +47,9 @@ class GenericHID {
   explicit GenericHID(int port);
   virtual ~GenericHID() = default;
 
-  virtual float GetX(JoystickHand hand = kRightHand) const = 0;
-  virtual float GetY(JoystickHand hand = kRightHand) const = 0;
-  virtual float GetRawAxis(int axis) const;
+  virtual double GetX(JoystickHand hand = kRightHand) const = 0;
+  virtual double GetY(JoystickHand hand = kRightHand) const = 0;
+  virtual double GetRawAxis(int axis) const;
 
   bool GetRawButton(int button) const;
 

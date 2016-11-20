@@ -33,7 +33,7 @@ class ADXRS450_Gyro : public GyroBase {
   explicit ADXRS450_Gyro(SPI::Port port);
   virtual ~ADXRS450_Gyro() = default;
 
-  float GetAngle() const override;
+  double GetAngle() const override;
   double GetRate() const override;
   void Reset() override;
   void Calibrate() override;

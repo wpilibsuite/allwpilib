@@ -572,7 +572,7 @@ public class RobotDrive implements MotorSafety {
    * @param rotation  The rate of rotation for the robot that is completely independent of the
    *                  magnitute or direction.  [-1.0..1.0]
    */
-  void holonomicDrive(float magnitude, float direction, float rotation) {
+  void holonomicDrive(double magnitude, double direction, double rotation) {
     mecanumDrive_Polar(magnitude, direction, rotation);
   }
 

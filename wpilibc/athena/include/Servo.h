@@ -26,13 +26,13 @@ class Servo : public SafePWM {
  public:
   explicit Servo(int channel);
   virtual ~Servo();
-  void Set(float value);
+  void Set(double value);
   void SetOffline();
-  float Get() const;
-  void SetAngle(float angle);
-  float GetAngle() const;
-  static float GetMaxAngle() { return kMaxServoAngle; }
-  static float GetMinAngle() { return kMinServoAngle; }
+  double Get() const;
+  void SetAngle(double angle);
+  double GetAngle() const;
+  static double GetMaxAngle() { return kMaxServoAngle; }
+  static double GetMinAngle() { return kMinServoAngle; }
 
   void ValueChanged(ITable* source, llvm::StringRef key,
                     std::shared_ptr<nt::Value> value, bool isNew) override;
@@ -46,13 +46,13 @@ class Servo : public SafePWM {
   std::shared_ptr<ITable> m_table;
 
  private:
-  float GetServoAngleRange() const { return kMaxServoAngle - kMinServoAngle; }
+  double GetServoAngleRange() const { return kMaxServoAngle - kMinServoAngle; }
 
-  static constexpr float kMaxServoAngle = 180.0;
-  static constexpr float kMinServoAngle = 0.0;
+  static constexpr double kMaxServoAngle = 180.0;
+  static constexpr double kMinServoAngle = 0.0;
 
-  static constexpr float kDefaultMaxServoPWM = 2.4;
-  static constexpr float kDefaultMinServoPWM = .6;
+  static constexpr double kDefaultMaxServoPWM = 2.4;
+  static constexpr double kDefaultMinServoPWM = .6;
 };
 
 }  // namespace frc
