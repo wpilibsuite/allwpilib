@@ -87,16 +87,8 @@ publishing {
 jar {
     dependsOn { classes }
 
-    doFirst {
-        def addClasspath = { classpath ->
-            classpath.files.findAll { it.exists() }.each {
-                if (file(it).directory) {
-                    from it
-                }
-            }
-        }
-        addClasspath sourceSets.athena.runtimeClasspath
-    }
+    from sourceSets.athena.output
+    from sourceSets.shared.output
 }
 
 tasks.whenTaskAdded { task ->
