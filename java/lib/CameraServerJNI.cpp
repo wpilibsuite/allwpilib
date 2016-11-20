@@ -686,6 +686,20 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_releaseSource
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getUSBCameraPath
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getUSBCameraPath
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status = 0;
+  auto str = cs::GetUSBCameraPath(source, &status);
+  if (!CheckStatus(env, status)) return nullptr;
+  return MakeJString(env, str);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    putSourceFrame
  * Signature: (IJ)V
  */
@@ -917,6 +931,34 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_releaseSink
   CS_Status status = 0;
   cs::ReleaseSink(sink, &status);
   CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getMJPEGServerListenAddress
+ * Signature: (I)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getMJPEGServerListenAddress
+  (JNIEnv *env, jclass, jint sink)
+{
+  CS_Status status = 0;
+  auto str = cs::GetMJPEGServerListenAddress(sink, &status);
+  if (!CheckStatus(env, status)) return nullptr;
+  return MakeJString(env, str);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getMJPEGServerPort
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getMJPEGServerPort
+  (JNIEnv *env, jclass, jint sink)
+{
+  CS_Status status = 0;
+  auto val = cs::GetMJPEGServerPort(sink, &status);
+  CheckStatus(env, status);
+  return val;
 }
 
 /*
