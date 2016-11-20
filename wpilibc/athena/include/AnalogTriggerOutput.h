@@ -33,7 +33,7 @@ class AnalogTrigger;
  * The RisingPulse and FallingPulse outputs detect an instantaneous transition
  * from above the upper limit to below the lower limit, and vise versa. These
  * pulses represent a rollover condition of a sensor and can be routed to an up
- * / down couter or to interrupts. Because the outputs generate a pulse, they
+ * / down counter or to interrupts. Because the outputs generate a pulse, they
  * cannot be read directly. To help ensure that a rollover condition is not
  * missed, there is an average rejection filter available that operates on the
  * upper 8 bits of a 12 bit number and selects the nearest outlyer of 3 samples.
