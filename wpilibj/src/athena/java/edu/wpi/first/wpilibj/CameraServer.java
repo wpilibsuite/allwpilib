@@ -107,7 +107,7 @@ public class CameraServer {
       int port = CameraServerJNI.getMJPEGServerPort(sink);
 
       // Generate values
-      ArrayList<String> values = new ArrayList(m_addresses.length + 1);
+      ArrayList<String> values = new ArrayList<String>(m_addresses.length + 1);
       String listenAddress = CameraServerJNI.getMJPEGServerListenAddress(sink);
       if (!listenAddress.isEmpty()) {
         // If a listen address is specified, only use that
@@ -124,7 +124,7 @@ public class CameraServer {
       }
 
       // Set table value
-      table.putStringArray("streams", (String[]) values.toArray());
+      table.putStringArray("streams", values.toArray(new String[0]));
     }
   }
 
