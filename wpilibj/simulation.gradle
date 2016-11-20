@@ -14,21 +14,21 @@ task wpilibjSimJar(type: Jar, dependsOn: simClasses) {
     group = 'WPILib Simulation'
     duplicatesStrategy = 'exclude'
 
-    def addClasspath = { classpath ->
-        classpath.files.findAll { it.exists() }.each {
-            if (file(it).directory) {
-                from it
-            } else {
-                from zipTree(it.path)
+    doFirst {
+        def addClasspath = { classpath ->
+            classpath.files.findAll { it.exists() }.each {
+                if (!file(it).directory) {
+                    from zipTree(it.path)
+                }
             }
         }
+
+        addClasspath sourceSets.shared.runtimeClasspath
+        addClasspath sourceSets.sim.runtimeClasspath
     }
 
-    addClasspath sourceSets.shared.runtimeClasspath
-    addClasspath sourceSets.sim.runtimeClasspath
-
-    from sourceSets.sim.output.classesDir
-    from sourceSets.shared.output.classesDir
+    from sourceSets.sim.output
+    from sourceSets.shared.output
     baseName 'wpilibjSimulation'
 }
 
