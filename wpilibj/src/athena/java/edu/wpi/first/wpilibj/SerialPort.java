@@ -58,7 +58,7 @@ public class SerialPort {
    * Represents the number of stop bits to use for Serial Communication.
    */
   public enum StopBits {
-    kOne(0), kOnePointFive(1), kTwo(2);
+    kOne(10), kOnePointFive(15), kTwo(20);
 
     @SuppressWarnings("MemberName")
     public final int value;
@@ -72,7 +72,7 @@ public class SerialPort {
    * Represents what type of flow control to use for serial communication.
    */
   public enum FlowControl {
-    kNone(0), kXonXoff(1), kRtsCts(2), kDtsDsr(3);
+    kNone(0), kXonXoff(1), kRtsCts(2), kDtsDsr(4);
 
     @SuppressWarnings("MemberName")
     public final int value;
@@ -86,7 +86,7 @@ public class SerialPort {
    * Represents which type of buffer mode to use when writing to a serial m_port.
    */
   public enum WriteBufferMode {
-    kFlushOnAccess(0), kFlushWhenFull(1);
+    kFlushOnAccess(1), kFlushWhenFull(2);
 
     @SuppressWarnings("MemberName")
     public final int value;
