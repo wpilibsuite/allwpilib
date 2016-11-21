@@ -3,7 +3,14 @@ import org.gradle.internal.os.OperatingSystem
 apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
-def utilVersion = "1.0.2${-> WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))}"
+def getVersion = {
+    if (WPILibVersion.version.contains('-'))
+        return WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))
+    else
+        return WPIlibVersion.version
+}
+
+def utilVersion = "1.0.2${-> getVersion()}"
 def utilFile = file("$buildDir/wpiutil.txt")
 def ntcoreFile = file("$buildDir/ntcore.txt")
 
