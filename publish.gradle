@@ -7,7 +7,7 @@ def getVersion = {
     if (WPILibVersion.version.contains('-'))
         return WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))
     else
-        return WPIlibVersion.version
+        return ""
 }
 
 def utilVersion = "1.0.2${-> getVersion()}"
