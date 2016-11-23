@@ -30,7 +30,7 @@ public class SerialPort {
   private byte m_port;
 
   public enum Port {
-    kOnboard(0), kMXP(1), kUSB(2);
+    kOnboard(0), kMXP(1), kUSB(2), kUSB1(2), kUSB2(3);
 
     @SuppressWarnings("MemberName")
     public int value;

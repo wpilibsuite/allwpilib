@@ -46,7 +46,7 @@ class SerialPort : public ErrorBase {
     kFlowControl_DtrDsr = 4
   };
   enum WriteBufferMode { kFlushOnAccess = 1, kFlushWhenFull = 2 };
-  enum Port { kOnboard = 0, kMXP = 1, kUSB = 2 };
+  enum Port { kOnboard = 0, kMXP = 1, kUSB = 2, kUSB1 = 2, kUSB2 = 3 };
 
   SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
              Parity parity = kParity_None, StopBits stopBits = kStopBits_One);

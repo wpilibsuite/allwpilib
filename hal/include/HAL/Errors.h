@@ -83,6 +83,10 @@
 #define HAL_HANDLE_ERROR_MESSAGE \
   "HAL: A handle parameter was passed incorrectly"
 
+#define HAL_SERIAL_PORT_NOT_FOUND -1123
+#define HAL_SERIAL_PORT_NOT_FOUND_MESSAGE \
+  "HAL: The specified serial port device was not found";
+
 #define VI_ERROR_SYSTEM_ERROR_MESSAGE "HAL - VISA: System Error";
 #define VI_ERROR_INV_OBJECT_MESSAGE "HAL - VISA: Invalid Object"
 #define VI_ERROR_RSRC_LOCKED_MESSAGE "HAL - VISA: Resource Locked"
