@@ -161,6 +161,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return VI_ERROR_INV_PARAMETER_MESSAGE;
     case HAL_PWM_SCALE_ERROR:
       return HAL_PWM_SCALE_ERROR_MESSAGE;
+    case HAL_SERIAL_PORT_NOT_FOUND:
+      return HAL_SERIAL_PORT_NOT_FOUND_MESSAGE;
     default:
       return "Unknown error status";
   }

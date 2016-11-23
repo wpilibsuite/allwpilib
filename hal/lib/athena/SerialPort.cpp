@@ -7,109 +7,118 @@
 
 #include "HAL/SerialPort.h"
 
+#include <string>
+
+#include "SerialHelper.h"
 #include "visa/visa.h"
 
-static int32_t m_resourceManagerHandle;
-static int32_t m_portHandle[2];
+static int32_t resourceManagerHandle;
+static HAL_SerialPort portHandles[4];
 
 extern "C" {
 
-void HAL_InitializeSerialPort(int32_t port, int32_t* status) {
-  char const* portName;
+void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
+  std::string portName;
 
-  if (m_resourceManagerHandle == 0)
-    viOpenDefaultRM(reinterpret_cast<ViSession*>(&m_resourceManagerHandle));
+  if (resourceManagerHandle == 0)
+    viOpenDefaultRM(reinterpret_cast<ViSession*>(&resourceManagerHandle));
 
-  if (port == 0)
-    portName = "ASRL1::INSTR";
-  else if (port == 1)
-    portName = "ASRL2::INSTR";
-  else
-    portName = "ASRL3::INSTR";
+  hal::SerialHelper serialHelper(resourceManagerHandle);
 
-  *status =
-      viOpen(m_resourceManagerHandle, const_cast<char*>(portName), VI_NULL,
-             VI_NULL, reinterpret_cast<ViSession*>(&m_portHandle[port]));
+  portName = serialHelper.GetSerialPortName(port, status);
+
+  if (*status < 0) {
+    return;
+  }
+
+  *status = viOpen(resourceManagerHandle, const_cast<char*>(portName.c_str()),
+                   VI_NULL, VI_NULL,
+                   reinterpret_cast<ViSession*>(&portHandles[port]));
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialBaudRate(int32_t port, int32_t baud, int32_t* status) {
-  *status = viSetAttribute(m_portHandle[port], VI_ATTR_ASRL_BAUD, baud);
+void HAL_SetSerialBaudRate(HAL_SerialPort port, int32_t baud, int32_t* status) {
+  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_BAUD, baud);
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialDataBits(int32_t port, int32_t bits, int32_t* status) {
-  *status = viSetAttribute(m_portHandle[port], VI_ATTR_ASRL_DATA_BITS, bits);
+void HAL_SetSerialDataBits(HAL_SerialPort port, int32_t bits, int32_t* status) {
+  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_DATA_BITS, bits);
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialParity(int32_t port, int32_t parity, int32_t* status) {
-  *status = viSetAttribute(m_portHandle[port], VI_ATTR_ASRL_PARITY, parity);
+void HAL_SetSerialParity(HAL_SerialPort port, int32_t parity, int32_t* status) {
+  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_PARITY, parity);
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialStopBits(int32_t port, int32_t stopBits, int32_t* status) {
-  *status =
-      viSetAttribute(m_portHandle[port], VI_ATTR_ASRL_STOP_BITS, stopBits);
+void HAL_SetSerialStopBits(HAL_SerialPort port, int32_t stopBits,
+                           int32_t* status) {
+  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_STOP_BITS, stopBits);
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialWriteMode(int32_t port, int32_t mode, int32_t* status) {
-  *status = viSetAttribute(m_portHandle[port], VI_ATTR_WR_BUF_OPER_MODE, mode);
+void HAL_SetSerialWriteMode(HAL_SerialPort port, int32_t mode,
+                            int32_t* status) {
+  *status = viSetAttribute(portHandles[port], VI_ATTR_WR_BUF_OPER_MODE, mode);
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialFlowControl(int32_t port, int32_t flow, int32_t* status) {
-  *status = viSetAttribute(m_portHandle[port], VI_ATTR_ASRL_FLOW_CNTRL, flow);
+void HAL_SetSerialFlowControl(HAL_SerialPort port, int32_t flow,
+                              int32_t* status) {
+  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_FLOW_CNTRL, flow);
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialTimeout(int32_t port, double timeout, int32_t* status) {
-  *status = viSetAttribute(m_portHandle[port], VI_ATTR_TMO_VALUE,
+void HAL_SetSerialTimeout(HAL_SerialPort port, double timeout,
+                          int32_t* status) {
+  *status = viSetAttribute(portHandles[port], VI_ATTR_TMO_VALUE,
                            static_cast<uint32_t>(timeout * 1e3));
   if (*status > 0) *status = 0;
 }
 
-void HAL_EnableSerialTermination(int32_t port, char terminator,
+void HAL_EnableSerialTermination(HAL_SerialPort port, char terminator,
                                  int32_t* status) {
-  viSetAttribute(m_portHandle[port], VI_ATTR_TERMCHAR_EN, VI_TRUE);
-  viSetAttribute(m_portHandle[port], VI_ATTR_TERMCHAR, terminator);
-  *status = viSetAttribute(m_portHandle[port], VI_ATTR_ASRL_END_IN,
+  viSetAttribute(portHandles[port], VI_ATTR_TERMCHAR_EN, VI_TRUE);
+  viSetAttribute(portHandles[port], VI_ATTR_TERMCHAR, terminator);
+  *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_END_IN,
                            VI_ASRL_END_TERMCHAR);
   if (*status > 0) *status = 0;
 }
 
-void HAL_DisableSerialTermination(int32_t port, int32_t* status) {
-  viSetAttribute(m_portHandle[port], VI_ATTR_TERMCHAR_EN, VI_FALSE);
+void HAL_DisableSerialTermination(HAL_SerialPort port, int32_t* status) {
+  viSetAttribute(portHandles[port], VI_ATTR_TERMCHAR_EN, VI_FALSE);
   *status =
-      viSetAttribute(m_portHandle[port], VI_ATTR_ASRL_END_IN, VI_ASRL_END_NONE);
+      viSetAttribute(portHandles[port], VI_ATTR_ASRL_END_IN, VI_ASRL_END_NONE);
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialReadBufferSize(int32_t port, int32_t size, int32_t* status) {
-  *status = viSetBuf(m_portHandle[port], VI_READ_BUF, size);
+void HAL_SetSerialReadBufferSize(HAL_SerialPort port, int32_t size,
+                                 int32_t* status) {
+  *status = viSetBuf(portHandles[port], VI_READ_BUF, size);
   if (*status > 0) *status = 0;
 }
 
-void HAL_SetSerialWriteBufferSize(int32_t port, int32_t size, int32_t* status) {
-  *status = viSetBuf(m_portHandle[port], VI_WRITE_BUF, size);
+void HAL_SetSerialWriteBufferSize(HAL_SerialPort port, int32_t size,
+                                  int32_t* status) {
+  *status = viSetBuf(portHandles[port], VI_WRITE_BUF, size);
   if (*status > 0) *status = 0;
 }
 
-int32_t HAL_GetSerialBytesReceived(int32_t port, int32_t* status) {
+int32_t HAL_GetSerialBytesReceived(HAL_SerialPort port, int32_t* status) {
   int32_t bytes = 0;
 
-  *status = viGetAttribute(m_portHandle[port], VI_ATTR_ASRL_AVAIL_NUM, &bytes);
+  *status = viGetAttribute(portHandles[port], VI_ATTR_ASRL_AVAIL_NUM, &bytes);
   if (*status > 0) *status = 0;
   return bytes;
 }
 
-int32_t HAL_ReadSerial(int32_t port, char* buffer, int32_t count,
+int32_t HAL_ReadSerial(HAL_SerialPort port, char* buffer, int32_t count,
                        int32_t* status) {
   uint32_t retCount = 0;
 
   *status =
-      viRead(m_portHandle[port], (ViPBuf)buffer, count, (ViPUInt32)&retCount);
+      viRead(portHandles[port], (ViPBuf)buffer, count, (ViPUInt32)&retCount);
 
   if (*status == VI_ERROR_IO || *status == VI_ERROR_ASRL_OVERRUN ||
       *status == VI_ERROR_ASRL_FRAMING || *status == VI_ERROR_ASRL_PARITY) {
@@ -121,29 +130,29 @@ int32_t HAL_ReadSerial(int32_t port, char* buffer, int32_t count,
   return static_cast<int32_t>(retCount);
 }
 
-int32_t HAL_WriteSerial(int32_t port, const char* buffer, int32_t count,
+int32_t HAL_WriteSerial(HAL_SerialPort port, const char* buffer, int32_t count,
                         int32_t* status) {
   uint32_t retCount = 0;
 
   *status =
-      viWrite(m_portHandle[port], (ViPBuf)buffer, count, (ViPUInt32)&retCount);
+      viWrite(portHandles[port], (ViPBuf)buffer, count, (ViPUInt32)&retCount);
 
   if (*status > 0) *status = 0;
   return static_cast<int32_t>(retCount);
 }
 
-void HAL_FlushSerial(int32_t port, int32_t* status) {
-  *status = viFlush(m_portHandle[port], VI_WRITE_BUF);
+void HAL_FlushSerial(HAL_SerialPort port, int32_t* status) {
+  *status = viFlush(portHandles[port], VI_WRITE_BUF);
   if (*status > 0) *status = 0;
 }
 
-void HAL_ClearSerial(int32_t port, int32_t* status) {
-  *status = viClear(m_portHandle[port]);
+void HAL_ClearSerial(HAL_SerialPort port, int32_t* status) {
+  *status = viClear(portHandles[port]);
   if (*status > 0) *status = 0;
 }
 
-void HAL_CloseSerial(int32_t port, int32_t* status) {
-  *status = viClose(m_portHandle[port]);
+void HAL_CloseSerial(HAL_SerialPort port, int32_t* status) {
+  *status = viClose(portHandles[port]);
   if (*status > 0) *status = 0;
 }
 
