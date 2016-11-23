@@ -110,8 +110,8 @@ void SerialHelper::SortHubPathVector() {
   m_sortedHubPath.clear();
   m_sortedHubPath = m_unsortedHubPath;
   std::sort(m_sortedHubPath.begin(), m_sortedHubPath.end(),
-            [](llvm::SmallVectorImpl<char>& lhs,
-               llvm::SmallVectorImpl<char>& rhs) -> int {
+            [](const llvm::SmallVectorImpl<char>& lhs,
+               const llvm::SmallVectorImpl<char>& rhs) -> int {
               llvm::StringRef lhsRef(lhs.begin(), lhs.size());
               llvm::StringRef rhsRef(rhs.begin(), rhs.size());
               return lhsRef.compare(rhsRef);
