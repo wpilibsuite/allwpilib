@@ -58,6 +58,9 @@ model {
             }
         }
     }
+    tasks {
+        it.wpilibjNativeLibraries.dependsOn it.buildDependentsWpilibJavaJNISharedLibrary
+    }
 }
 
 // Maven publishing configuration
@@ -93,13 +96,6 @@ jar {
 
     from sourceSets.athena.output
     from sourceSets.shared.output
-}
-
-tasks.whenTaskAdded { task ->
-    if (task.name == 'wpilibJavaJNISharedLibrary') {
-        jar.dependsOn task
-        wpilibjNativeLibraries.dependsOn task
-    }
 }
 
 task wpilibjSources(type: Jar, dependsOn: classes) {
