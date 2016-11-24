@@ -2,7 +2,7 @@ apply plugin: 'cpp'
 
 def jniDir = 'src/athena/cpp'
 def generatedJNIHeaderLoc = "$buildDir/include"
-def ntSourceDir = "$buildDir/ntSources"
+def docSource = "$buildDir/docSource"
 
 debugStripSetup(project)
 
@@ -10,14 +10,18 @@ sourceSets {
     athena
 }
 
+configurations.create('doc')
+
 dependencies {
     athenaCompile sourceSets.shared.output
-    athenaCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
-    athenaRuntime 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
-    athenaCompile 'edu.wpi.cscore.java:cscore:+:arm'
-    athenaRuntime 'edu.wpi.cscore.java:cscore:+:arm'
+    athenaCompile ntcoreDep('java', 'arm')
+    athenaRuntime ntcoreDep('java', 'arm')
+    athenaCompile cscoreDep('java', 'arm')
+    athenaRuntime cscoreDep('java', 'arm')
     athenaCompile 'org.opencv:opencv-java:+'
     athenaRuntime 'org.opencv:opencv-java:+'
+    doc ntcoreDep('java', 'sources')
+    doc cscoreDep('java', 'sources')
 }
 
 defineWpiUtilProperties()
@@ -108,26 +112,16 @@ task wpilibjSources(type: Jar, dependsOn: classes) {
     from sourceSets.shared.allJava
 }
 
-task unzipJavaNtSources(type: Copy) {
-    description = 'Unzips the java networktables sources for doc creation'
-    group = 'WPILib'
-    doFirst {
-        def ntSourcesDependency =
-        project.dependencies.create('edu.wpi.first.wpilib.networktables.java:NetworkTables:+:sources@jar')
-        def ntSourcesConfig = project.configurations.detachedConfiguration(ntSourcesDependency)
-        ntSourcesDependency.setTransitive(false)
-        def ntSources = ntSourcesConfig.singleFile
+task unzipDocSources(type: Copy) {
+    configurations.doc.files.each {
+        from zipTree(it)
     }
-    doLast {
-        from zipTree(ntSources)
-        exclude 'META-INF/*'
-        into ntSourceDir
-    }
+    include '**/*.java'
+    into docSource
 }
 
 task javadoc(type: Javadoc, overwrite: true) {
-    dependsOn unzipJavaNtSources
-    source sourceSets.athena.allJava, sourceSets.shared.allJava, unzipJavaNtSources.outputs.files
+    source sourceSets.athena.allJava, sourceSets.shared.allJava, unzipDocSources
     classpath = files([sourceSets.athena.compileClasspath, sourceSets.shared.compileClasspath])
     javadoc.options.links("http://docs.oracle.com/javase/8/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
@@ -215,5 +209,5 @@ build.dependsOn wpilibjNativeLibraries
 
 clean {
     delete generatedJNIHeaderLoc
-    delete ntSourceDir
+    delete docSource
 }

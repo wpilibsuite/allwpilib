@@ -18,6 +18,18 @@ allprojects {
     repositories {
         mavenCentral()
     }
+
+    ext.ntcoreDep = { lang, classifier, extension = null ->
+        return "edu.wpi.first.wpilib.networktables.$lang:NetworkTables:+:$classifier${extension == null ? '' : '@' + extension}"
+    }
+
+    ext.cscoreDep = { lang, classifier, extension = null ->
+        return "edu.wpi.cscore.$lang:cscore:+:$classifier${extension == null ? '' : '@' + extension}"
+    }
+
+    ext.wpiUtilDep = { classifier ->
+        return "edu.wpi.first.wpilib:wpiutil:+:$classifier@zip"
+    }
 }
 
 subprojects {
