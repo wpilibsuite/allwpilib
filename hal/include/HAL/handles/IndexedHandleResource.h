@@ -9,8 +9,8 @@
 
 #include <stdint.h>
 
+#include <array>
 #include <memory>
-#include <vector>
 
 #include "HAL/Errors.h"
 #include "HAL/Types.h"
@@ -40,24 +40,15 @@ class IndexedHandleResource {
  public:
   IndexedHandleResource(const IndexedHandleResource&) = delete;
   IndexedHandleResource operator=(const IndexedHandleResource&) = delete;
-  IndexedHandleResource();
+  IndexedHandleResource() = default;
   THandle Allocate(int16_t index, int32_t* status);
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);
 
  private:
-  // Dynamic array to shrink HAL file size.
-  std::unique_ptr<std::shared_ptr<TStruct>[]> m_structures;
-  std::unique_ptr<priority_mutex[]> m_handleMutexes;
+  std::array<std::shared_ptr<TStruct>, size> m_structures;
+  std::array<priority_mutex, size> m_handleMutexes;
 };
-
-template <typename THandle, typename TStruct, int16_t size,
-          HAL_HandleEnum enumValue>
-IndexedHandleResource<THandle, TStruct, size,
-                      enumValue>::IndexedHandleResource() {
-  m_structures = std::make_unique<std::shared_ptr<TStruct>[]>(size);
-  m_handleMutexes = std::make_unique<priority_mutex[]>(size);
-}
 
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
