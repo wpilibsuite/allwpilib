@@ -12,6 +12,7 @@ model {
             targetPlatform 'arm'
             binaries.all {
                 tasks.withType(CppCompile) {
+                    dependsOn generateCppVersion
                     cppCompiler.args "-DNAMESPACED_WPILIB"
                     addNiLibraryLinks(linker, targetPlatform)
                     addNetworkTablesLibraryLinks(it, linker, targetPlatform)
@@ -32,6 +33,9 @@ model {
                 }
             }
         }
+    }
+    tasks { tasks ->
+        tasks.wpilibcZip.dependsOn tasks.wpilibcSharedLibrary
     }
 }
 
@@ -68,29 +72,6 @@ task wpilibcZip(type: Zip) {
     from(project.file('../ni-libraries/lib')) {
         include 'libwpi.so'
         into 'lib'
-    }
-}
-
-// Add the dependency on the wpilib_nonsharedStaticLibrary task to the wpilibc task. Because of the gradle lifecycle,
-// this cannot be done purely with dependsOn in the task, as the static library task doesn't exist yet. Same goes for
-// the networkTablesStaticLibrary task and the two HAL tasks below
-tasks.whenTaskAdded { task ->
-    if (task.name.toLowerCase() == 'wpilibcsharedlibrary') {
-        wpilibcZip.dependsOn task
-    }
-}
-
-// Add the hal static and shared libraries as a dependency
-project(':hal').tasks.whenTaskAdded { task ->
-    if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
-        wpilibcZip.dependsOn task
-    }
-}
-
-// Add the generate version file task as a dependency
-tasks.whenTaskAdded { task ->
-    if (task.name.toLowerCase().startsWith('compilewpilib')) {
-        task.dependsOn generateCppVersion
     }
 }
 
