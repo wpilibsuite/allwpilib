@@ -60,6 +60,7 @@ model {
     }
     tasks {
         it.wpilibjNativeLibraries.dependsOn it.buildDependentsWpilibJavaJNISharedLibrary
+        it.ensureNativeLibraryHasSymbols.dependsOn  it.wpilibJavaJNISharedLibrary
     }
 }
 
@@ -174,6 +175,45 @@ task jniHeaders {
     }
 }
 
+task ensureNativeLibraryHasSymbols() {
+    description = 'Checks to make sure all native JNI symbols exist'
+    group = 'WPILib'
+    dependsOn project(':wpilibj').jniHeaders
+
+    def nmOutput = new ByteArrayOutputStream()
+    def lib
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                lib = new File(spec.sharedLibraryFile.absolutePath)
+            }
+        }
+    }
+    doLast {
+        exec {
+            commandLine "arm-frc-linux-gnueabi-nm", lib
+            standardOutput = nmOutput
+        }
+        String nmSymbols = nmOutput.toString()
+
+        FileTree tree = fileTree(dir: generatedJNIHeaderLoc)
+        tree.each { File file ->
+            file.eachLine { line ->
+                if (line.trim()) {
+                    if (line.startsWith("JNIEXPORT ") && line.contains('JNICALL')) {
+                        def (p1, p2) = line.split('JNICALL').collect { it.trim() }
+                        // p2 is our JNI call
+                        def found = nmSymbols.contains(p2)
+                        if (!found) {
+                            throw new GradleException("Found a defintion that does not have a matching symbol ${p2}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 task wpilibjNativeLibraries(type: Jar) {
     description = 'Creates the native library jar for the maven publishing routine'
     baseName = 'nativelibraries'
@@ -195,10 +235,10 @@ task wpilibjNativeLibraries(type: Jar) {
         }
     }
     project(':wpilibj').jniHeaders.outputs.each {
-            from(it) {
-                into 'include'
-            }
+        from(it) {
+            into 'include'
         }
+    }
 }
 
 build.dependsOn wpilibjNativeLibraries
