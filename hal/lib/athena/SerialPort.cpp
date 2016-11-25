@@ -25,7 +25,7 @@ void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
 
   hal::SerialHelper serialHelper(resourceManagerHandle);
 
-  portName = serialHelper.GetSerialPortName(port, status);
+  portName = serialHelper.GetVISASerialPortName(port, status);
 
   if (*status < 0) {
     return;

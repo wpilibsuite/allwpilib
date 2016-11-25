@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <string>
+#include <vector>
 
 #include "HAL/SerialPort.h"
 #include "HAL/cpp/priority_mutex.h"
@@ -21,12 +22,18 @@ class SerialHelper {
  public:
   explicit SerialHelper(int32_t resourceHandle);
 
-  std::string GetSerialPortName(HAL_SerialPort port, int32_t* status);
+  std::string GetVISASerialPortName(HAL_SerialPort port, int32_t* status);
+  std::string GetOSSerialPortName(HAL_SerialPort port, int32_t* status);
+
+  std::vector<std::string> GetVISASerialPortList(int32_t* status);
+  std::vector<std::string> GetOSSerialPortList(int32_t* status);
 
  private:
   void SortHubPathVector();
   void CoiteratedSort(llvm::SmallVectorImpl<llvm::SmallString<16>>& vec);
   void QueryHubPaths(int32_t* status);
+
+  int32_t GetIndexForPort(HAL_SerialPort port, int32_t* status);
 
   // Vectors to hold data before sorting.
   // Note we will most likely have at max 2 instances, and the longest string
