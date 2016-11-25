@@ -18,9 +18,8 @@ def wpilibj = project(':wpilibj')
 dependencies {
     compile wpilibj
     compile files(wpilibj.sourceSets.test.output.classesDir)
-    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
-    compile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
-    compile 'edu.wpi.cscore.java:cscore:+:arm'
+    compile ntcoreDep('java', 'arm')
+    compile cscoreDep('java', 'arm')
     compile 'org.opencv:opencv-java:+'
 }
 

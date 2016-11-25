@@ -5,8 +5,8 @@ sourceSets {
 dependencies {
     simCompile sourceSets.shared.output
     simCompile project(':simulation:JavaGazebo')
-    simCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:desktop'
-    simRuntime "edu.wpi.first.wpilib.networktables.java:NetworkTables:+:desktop"
+    simCompile ntcoreDep('java', 'desktop')
+    simRuntime ntcoreDep('java', 'desktop')
 }
 
 task wpilibjSimJar(type: Jar, dependsOn: simClasses) {

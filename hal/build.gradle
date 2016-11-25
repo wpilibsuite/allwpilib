@@ -111,7 +111,7 @@ task athenaRuntimeZip(type: Zip) {
     }
 
     defineNetworkTablesProperties()
-    dependsOn project(':').unzipNetworkTables
+    dependsOn project(':').downloadNetworkTables
 
     from(project.file(netTablesInclude)) {
         into 'include'

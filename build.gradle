@@ -1,19 +1,22 @@
 plugins {
     id 'net.ltgt.errorprone' version '0.0.8'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.4'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.5.1'
 }
 
-def enableSimulation = hasProperty('enableSimulation')
-
-if (!hasProperty('repo')) {
-    ext.repo = 'development'
+// Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
+// already specified on the command line
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
 }
+
+def enableSimulation = hasProperty('makeSim')
 
 ext.simulationInstallDir = "$rootDir/build/install/simulation"
 
 allprojects {
     ext.enableSimulation = enableSimulation
-    ext.repo = repo
 
     repositories {
         mavenCentral()

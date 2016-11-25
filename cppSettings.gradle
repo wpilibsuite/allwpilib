@@ -2,173 +2,69 @@
 def niLibraryPath = file('ni-libraries/lib').path
 def niLibrary = niLibraryPath + "/libnilibraries.so"
 
-task downloadArmNetworkTables() {
-    description = 'Downloads the C++ ARM NetworkTables maven dependency.'
-    group = 'WPILib'
-    def depFolder = "$buildDir/dependencies"
-    def ntZip = file("$depFolder/ntcore-arm.zip")
-    outputs.file(ntZip)
-    def armNetTables
+configurations.create('armDeps')
 
-    doFirst {
-        def armNtDependency = project.dependencies.create('edu.wpi.first.wpilib.networktables.cpp:NetworkTables:+:arm@zip')
-        def armConfig = project.configurations.detachedConfiguration(armNtDependency)
-        armConfig.setTransitive(false)
-        armNetTables = armConfig.files[0].canonicalFile
-    }
+dependencies {
+    armDeps ntcoreDep('cpp', 'arm', 'zip')
+    armDeps wpiUtilDep('arm')
+    armDeps cscoreDep('cpp', 'athena-uberzip', 'zip')
+}
 
-    doLast {
-        copy {
-            from armNetTables
-            rename 'NetworkTables(.+)', 'ntcore-arm.zip'
-            into depFolder
-        }
+def depLocation = "$buildDir/dependencies"
+
+configurations.armDeps.files.each { file ->
+    def depName = file.name.substring(0, file.name.indexOf('-'))
+    def t = tasks.create("downloadArm${depName.capitalize()}", Copy) {
+        description = "Downloads and unzips the $depName dependency."
+        group = 'Dependencies'
+        from zipTree(file)
+        into "$depLocation/${depName.toLowerCase()}"
     }
 }
 
-if (project.hasProperty('makeSim')) {
-    task downloadDesktopNetworkTables() {
-        description = 'Downloads the C++ Desktop NetworkTables maven dependency.'
-        group = 'WPILib'
-        def depFolder = "$buildDir/dependencies"
-        def ntZip = file("$depFolder/ntcore-desk.zip")
-        outputs.file(ntZip)
-        def desktopNetTables
-        doFirst {
-            def desktopNtDependency = project.dependencies.create("edu.wpi.first.wpilib.networktables.cpp:NetworkTables:+:desktop@zip")
-            def desktopConfig = project.configurations.detachedConfiguration(desktopNtDependency)
-            desktopConfig.setTransitive(false)
-            desktopNetTables = desktopConfig.files[0].canonicalFile
-        }
-
-        doLast {
-            copy {
-                from desktopNetTables
-                rename 'NetworkTables(.+)', 'ntcore-desk.zip'
-                into depFolder
-            }
-        }
-    }
-}
-
-def netTablesUnzipLocation = "$buildDir/networktables"
-
-// Create a task that will unzip the networktables files into a temporary build directory
-task unzipNetworkTables(type: Copy) {
-    description = 'Unzips the networktables maven dependency so that the include files and libraries can be used'
-    group = 'WPILib'
+task downloadNetworkTables {
+    description = 'Downloads all needed versions of networktables.'
+    group = 'Dependencies'
     dependsOn downloadArmNetworkTables
-
-    if (project.hasProperty('makeSim')) {
-        dependsOn downloadDesktopNetworkTables
-        from zipTree(downloadDesktopNetworkTables.outputs.files.singleFile)
-    }
-    from zipTree(downloadArmNetworkTables.outputs.files.singleFile)
-    into netTablesUnzipLocation
 }
 
-task downloadArmWpiUtil() {
-    description = 'Downloads the C++ ARM wpiutil maven dependency.'
-    group = 'WPILib'
-    def depFolder = "$buildDir/dependencies"
-    def utilZip = file("$depFolder/wpiutil-arm.zip")
-    outputs.file(utilZip)
-    def armWpiUtil
+task downloadWpiutil {
+    description = 'Downloads all needed versions of WPIUtil.'
+    group = 'Dependencies'
+    dependsOn downloadArmWpiutil
+}
 
-    doFirst {
-        def armWpiUtilDependency = project.dependencies.create("edu.wpi.first.wpilib:wpiutil:+:arm@zip")
-        def armWpiUtilConfig = project.configurations.detachedConfiguration(armWpiUtilDependency)
-        armWpiUtilConfig.setTransitive(false)
-        armWpiUtil = armWpiUtilConfig.files[0].canonicalFile
+task downloadCscore {
+    description = 'Downloads all needed versions of cscore.'
+    group = 'Dependencies'
+    dependsOn downloadArmCscore
+}
+
+if (enableSimulation) {
+    configurations.create('nativeDeps')
+
+    dependencies {
+        nativeDeps ntcoreDep('cpp', 'desktop', 'zip')
+        nativeDeps wpiUtilDep('desktop')
     }
 
-    doLast {
-        copy {
-            from armWpiUtil
-            rename 'wpiutil(.+)', 'wpiutil-arm.zip'
-            into depFolder
+    configurations.nativeDeps.files.each { file ->
+        def depName = file.name.substring(0, file.name.indexOf('-'))
+        def t = tasks.create("downloadNative${depName.capitalize()}", Copy) {
+            description = "Downloads and unzips the $depName dependency."
+            group = 'Dependencies'
+            from zipTree(file)
+            into "$depLocation/${depName.toLowerCase()}"
         }
     }
+
+    downloadNetworkTables.dependsOn downloadNativeNetworkTables
+    downloadWpiutil.dependsOn downloadNativeWpiutil
 }
 
-if (project.hasProperty('makeSim')) {
-    task downloadDesktopWpiUtil() {
-        description = 'Downloads the C++ Desktop wpiutil maven dependency.'
-        group = 'WPILib'
-        def depFolder = "$buildDir/dependencies"
-        def wpiutilZip = file("$depFolder/wpiutil-desk.zip")
-        outputs.file(wpiutilZip)
-        def wpiUtil
-
-        doFirst {
-            def desktopWpiUtilDependency = project.dependencies.create("edu.wpi.first.wpilib:wpiutil:+:desktop@zip")
-            def desktopWpiUtilConfig = project.configurations.detachedConfiguration(desktopWpiUtilDependency)
-            desktopWpiUtilConfig.setTransitive(false)
-            wpiUtil = desktopWpiUtilConfig.files[0].canonicalFile
-        }
-
-        doLast {
-            copy {
-                from wpiUtil
-                rename 'wpiutil(.+)', 'wpiutil-desk.zip'
-                into depFolder
-            }
-        }
-    }
-}
-
-def wpiUtilUnzipLocation = "$buildDir/wpiutil"
-
-// Create a task that will unzip the wpiutil files into a temporary build directory
-task unzipWpiUtil(type: Copy) {
-    description = 'Unzips the wpiutil maven dependency so that the include files and libraries can be used'
-    group = 'WPILib'
-    dependsOn downloadArmWpiUtil
-
-    if (project.hasProperty('makeSim')) {
-        dependsOn downloadDesktopWpiUtil
-        from zipTree(downloadDesktopWpiUtil.outputs.files.singleFile)
-    }
-    from zipTree(downloadArmWpiUtil.outputs.files.singleFile)
-    into wpiUtilUnzipLocation
-}
-
-task downloadArmCsCore() {
-    description = 'Downloads the C++ ARM CsCore Uberzip maven dependency.'
-    group = 'WPILib'
-    def depFolder = "$buildDir/dependencies"
-    def csZip = file("$depFolder/cscore-arm.zip")
-    outputs.file(csZip)
-    def armCsCore
-
-    doFirst {
-        def armCsDependency = project.dependencies.create('edu.wpi.cscore.cpp:cscore:+:athena-uberzip@zip')
-        def armConfig = project.configurations.detachedConfiguration(armCsDependency)
-        armConfig.setTransitive(false)
-        armCsCore = armConfig.files[0].canonicalFile
-    }
-
-    doLast {
-        copy {
-            from armCsCore
-            rename 'cscore(.+)', 'cscore-arm.zip'
-            into depFolder
-        }
-    }
-}
-
-def csCoreUnzipLocation = "$buildDir/cscore"
-
-// Create a task that will unzip the cscore files into a temporary build directory
-task unzipCsCore(type: Copy) {
-    description = 'Unzips the cscore maven dependency so that the include files and libraries can be used'
-    group = 'WPILib'
-    dependsOn downloadArmCsCore
-
-    from zipTree(downloadArmCsCore.outputs.files.singleFile)
-    into csCoreUnzipLocation
-}
-
+def netTablesUnzipLocation = "$depLocation/networktables"
+def wpiUtilUnzipLocation = "$depLocation/wpiutil"
+def csCoreUnzipLocation = "$depLocation/cscore"
 
 task clean(type: Delete) {
     description = "Deletes the build directory"
@@ -181,7 +77,7 @@ subprojects {
         ext.wpiUtil = wpiUtilUnzipLocation
         ext.wpiUtilInclude = "$wpiUtilUnzipLocation/include"
         ext.wpiUtilLibArmLocation = "$wpiUtilUnzipLocation/Linux/arm"
-        if (project.hasProperty('makeSim')) {
+        if (enableSimulation) {
             ext.wpiUtilLibDesktopLocation = "$wpiUtilUnzipLocation/Linux/amd64"
         }
         ext.wpiUtilSharedLib = "$wpiUtilLibArmLocation/libwpiutil.so"
@@ -189,7 +85,7 @@ subprojects {
         ext.wpiUtilStaticLib = "$wpiUtilLibArmLocation/libwpiutil.a"
 
         ext.addWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
-            compileTask.dependsOn project(':').unzipWpiUtil
+            compileTask.dependsOn project(':').downloadWpiutil
             String architecture = targetPlatform.architecture
             if (architecture.contains('arm')) {
                 linker.args wpiUtilSharedLib
@@ -197,7 +93,7 @@ subprojects {
         }
 
         ext.addStaticWpiUtilLibraryLinks = { compileTask, linker, targetPlatform ->
-            compileTask.dependsOn project(':').unzipWpiUtil
+            compileTask.dependsOn project(':').downloadWpiutil
             String architecture = targetPlatform.architecture
             if (architecture.contains('arm')) {
                 linker.args wpiUtilStaticLib
@@ -210,7 +106,7 @@ subprojects {
         ext.netTables = netTablesUnzipLocation
         ext.netTablesInclude = "$netTablesUnzipLocation/include"
         ext.netLibArmLocation = "$netTablesUnzipLocation/Linux/arm"
-        if (project.hasProperty('makeSim')) {
+        if (enableSimulation) {
             ext.netLibDesktopLocation = "$netTablesUnzipLocation/Linux/amd64"
         }
         ext.netSharedLib = "$netLibArmLocation/libntcore.so"
@@ -218,7 +114,7 @@ subprojects {
         ext.netStaticLib = "$netLibArmLocation/libntcore.a"
 
         ext.addNetworkTablesLibraryLinks = { compileTask, linker, targetPlatform ->
-            compileTask.dependsOn project(':').unzipNetworkTables
+            compileTask.dependsOn project(':').downloadNetworkTables
             String architecture = targetPlatform.architecture
             if (architecture.contains('arm')) {
                 linker.args netSharedLib
@@ -227,7 +123,7 @@ subprojects {
         }
 
         ext.addStaticNetworkTablesLibraryLinks = { compileTask, linker, targetPlatform ->
-            compileTask.dependsOn project(':').unzipNetworkTables
+            compileTask.dependsOn project(':').downloadNetworkTables
             String architecture = targetPlatform.architecture
             if (architecture.contains('arm')) {
                 linker.args netStaticLib
@@ -245,7 +141,7 @@ subprojects {
         ext.cvSharedLib = "$csLibArmLocation/libopencv.so"
 
         ext.addCsCoreLibraryLinks = { compileTask, linker, targetPlatform ->
-            compileTask.dependsOn project(':').unzipCsCore
+            compileTask.dependsOn project(':').downloadCscore
             String architecture = targetPlatform.architecture
             if (architecture.contains('arm')) {
                 linker.args << '-L' + csLibArmLocation
