@@ -143,6 +143,23 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMEliminateDead
   CheckStatus(env, status);
 }
 
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
+ * Method:    getPWMEliminateDeadband
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMEliminateDeadband(
+    JNIEnv* env, jclass, jint id) {
+      PWMJNI_LOG(logDEBUG) << "PWM Handle = " << (HAL_DigitalHandle)id;
+      int32_t status = 0;
+      HAL_Bool retVal = HAL_GetPWMEliminateDeadband((HAL_DigitalHandle)id, &status);
+      PWMJNI_LOG(logDEBUG) << "Status = " << status;
+      CheckStatus(env, status);
+      return retVal;
+  }
+
+
 /*
  * Class:     edu_wpi_first_wpilibj_hal_PWMJNI
  * Method:    getPWMEliminateDeadband

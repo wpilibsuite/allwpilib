@@ -33,26 +33,10 @@ model {
                 }
             }
         }
-
-//        HALSim(NativeLibrarySpec) {
-//            binaries.all {
-//                if (toolChain in Gcc){
-//                    cppCompiler.args "-std=c++1y"
-//                }
-//            }
-//
-//            sources {
-//                cpp {
-//                    source {
-//                        srcDirs = ["lib/sim", "lib/shared"]
-//                        includes = ["**/*.cpp"]
-//                    }
-//                    exportedHeaders {
-//                        srcDirs = ["include", "lib/sim", "lib/shared"]
-//                    }
-//                }
-//            }
-//        }
+    }
+    tasks { tasks ->
+        tasks.halZip.dependsOn tasks.buildDependentsHALAthena
+        tasks.athenaRuntimeZip.dependsOn tasks.buildDependentsHALAthena
     }
 }
 
@@ -95,13 +79,6 @@ task halZip(type: Zip) {
         exclude 'genlinks'
         exclude 'genlinks.bat'
         exclude 'libwpi.so'
-    }
-
-    // Add the hal static and shared libraries as a dependency
-    project(':hal').tasks.whenTaskAdded { task ->
-        if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
-            halZip.dependsOn task
-        }
     }
 }
 
@@ -154,13 +131,6 @@ task athenaRuntimeZip(type: Zip) {
 
     from (file(wpiUtilSharedLibDebug)) {
         into 'lib'
-    }
-
-    // Add the hal static and shared libraries as a dependency
-    project(':hal').tasks.whenTaskAdded { task ->
-        if (task.name.toLowerCase() == 'halathenastaticlibrary' || task.name.toLowerCase() == 'halathenasharedlibrary') {
-            athenaRuntimeZip.dependsOn task
-        }
     }
 }
 
