@@ -478,11 +478,11 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton(JNIEnv *env, jclass) {
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_HALUtil
- * Method:    HAL_GetErrorMessage
+ * Method:    getHALErrorMessage
  * Signature: (I)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL
-Java_edu_wpi_first_wpilibj_hal_HALUtil_HAL_GetErrorMessage(
+Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(
     JNIEnv *paramEnv, jclass, jint paramId) {
   const char *msg = HAL_GetErrorMessage(paramId);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil HAL_GetErrorMessage id=" << paramId
