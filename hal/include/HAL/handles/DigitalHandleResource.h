@@ -9,8 +9,8 @@
 
 #include <stdint.h>
 
+#include <array>
 #include <memory>
-#include <vector>
 
 #include "HAL/Errors.h"
 #include "HAL/Types.h"
@@ -39,22 +39,15 @@ class DigitalHandleResource {
  public:
   DigitalHandleResource(const DigitalHandleResource&) = delete;
   DigitalHandleResource operator=(const DigitalHandleResource&) = delete;
-  DigitalHandleResource();
+  DigitalHandleResource() = default;
   THandle Allocate(int16_t index, HAL_HandleEnum enumValue, int32_t* status);
   std::shared_ptr<TStruct> Get(THandle handle, HAL_HandleEnum enumValue);
   void Free(THandle handle, HAL_HandleEnum enumValue);
 
  private:
-  // Dynamic array to shrink HAL file size.
-  std::unique_ptr<std::shared_ptr<TStruct>[]> m_structures;
-  std::unique_ptr<priority_mutex[]> m_handleMutexes;
+  std::array<std::shared_ptr<TStruct>, size> m_structures;
+  std::array<priority_mutex, size> m_handleMutexes;
 };
-
-template <typename THandle, typename TStruct, int16_t size>
-DigitalHandleResource<THandle, TStruct, size>::DigitalHandleResource() {
-  m_structures = std::make_unique<std::shared_ptr<TStruct>[]>(size);
-  m_handleMutexes = std::make_unique<priority_mutex[]>(size);
-}
 
 template <typename THandle, typename TStruct, int16_t size>
 THandle DigitalHandleResource<THandle, TStruct, size>::Allocate(
