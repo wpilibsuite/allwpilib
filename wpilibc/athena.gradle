@@ -76,16 +76,17 @@ task wpilibcZip(type: Zip) {
 }
 
 if (checkDoxygen()) {
-
-    def ntSourcesDependency = project.dependencies.create('edu.wpi.first.wpilib.networktables.cpp:NetworkTables:+:sources@zip')
-    def ntSourcesConfig = project.configurations.detachedConfiguration(ntSourcesDependency)
-    ntSourcesDependency.setTransitive(false)
-    def ntSources = ntSourcesConfig.singleFile
+    configurations.create('doc')
+    dependencies {
+        doc ntcoreDep('cpp', 'sources', 'zip')
+    }
 
     task unzipCppNtSources(type: Copy) {
-        description = 'Unzips the C++ networktables sources for doc creation'
-        group = 'WPILib'
-        from zipTree(ntSources)
+        description = 'Unzips the C++ networktables sources for doc creation.'
+        group = 'Dependencies'
+        configurations.doc.files.each {
+            from zipTree(it)
+        }
         exclude 'META-INF/*'
         into ntSourceDir
     }

@@ -7,7 +7,7 @@ include 'hal',
         'myRobotCpp'
 
 if (hasProperty("makeSim")){
-include 'simulation',
-        'simulation:JavaGazebo',
-        'simulation:SimDS'
+        include 'simulation',
+                'simulation:JavaGazebo',
+                'simulation:SimDS'
 }

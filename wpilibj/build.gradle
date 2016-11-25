@@ -59,18 +59,18 @@ sourceSets {
 compileSharedJava.dependsOn generateJavaVersion
 
 dependencies {
-    sharedCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
-    sharedRuntime 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:arm'
+    sharedCompile ntcoreDep('java', 'arm')
+    sharedRuntime ntcoreDep('java', 'arm')
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'junit:junit:4.12'
-    testCompile 'edu.wpi.first.wpilib.networktables.java:NetworkTables:+:desktop'
+    testCompile ntcoreDep('java', 'desktop')
     testCompile 'com.google.guava:guava:19.0'
     testCompile sourceSets.shared.output
 }
 
 apply from: 'athena.gradle'
 
-if (project.hasProperty('makeSim')) {
+if (enableSimulation) {
     apply from: 'simulation.gradle'
 }
 
