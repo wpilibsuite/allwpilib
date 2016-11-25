@@ -60,6 +60,7 @@ model {
     }
     tasks {
         it.wpilibjNativeLibraries.dependsOn it.wpilibJavaJNISharedLibrary
+        it.checkJNISymbols.dependsOn  it.wpilibJavaJNISharedLibrary
     }
 }
 
@@ -174,6 +175,49 @@ task jniHeaders {
     }
 }
 
+task checkJNISymbols() {
+    description = 'Checks to make sure all native JNI symbols exist'
+    group = 'WPILib'
+    dependsOn jniHeaders
+
+    def nmOutput = new ByteArrayOutputStream()
+    def lib
+    model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { spec ->
+                lib = new File(spec.sharedLibraryFile.absolutePath)
+            }
+        }
+    }
+    doLast {
+        defineCrossCompilerProperties()
+        exec {
+            commandLine "${compilerPrefix}nm", lib
+            standardOutput = nmOutput
+        }
+        // Remove '\r' so we can check for full string contents
+        String nmSymbols = nmOutput.toString().replace('\r', '')
+
+        jniHeaders.outputs.files.each {
+            FileTree tree = fileTree(dir: it)
+            tree.each { File file ->
+                file.eachLine { line ->
+                    if (line.trim()) {
+                        if (line.startsWith("JNIEXPORT ") && line.contains('JNICALL')) {
+                            def (p1, p2) = line.split('JNICALL').collect { it.trim() }
+                            // p2 is our JNI call. Add \n so we can check for the exact symbol
+                            def found = nmSymbols.contains(p2 + '\n')
+                            if (!found) {
+                                throw new GradleException("Found a definition that does not have a matching symbol ${p2}")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 task wpilibjNativeLibraries(type: Jar) {
     description = 'Creates the native library jar for the maven publishing routine'
     baseName = 'nativelibraries'
@@ -201,6 +245,7 @@ task wpilibjNativeLibraries(type: Jar) {
         }
 }
 
+build.dependsOn checkJNISymbols
 build.dependsOn wpilibjNativeLibraries
 
 clean {
