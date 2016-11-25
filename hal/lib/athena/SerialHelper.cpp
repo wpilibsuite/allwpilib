@@ -170,7 +170,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
   if (*status < 0) {
     // Handle the bad status elsewhere
     // Note let positive statii (warnings) continue
-    return;
+    goto done;
   }
   // Status might be positive, so reset it to 0
   *status = 0;
@@ -191,15 +191,15 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     // Open the resource, grab its interface name, and close it.
     ViSession vSession;
     *status = viOpen(m_resourceHandle, desc, VI_NULL, VI_NULL, &vSession);
-    if (*status < 0) return;
+    if (*status < 0) goto done;
     *status = 0;
 
     *status = viGetAttribute(vSession, VI_ATTR_INTF_INST_NAME, &osName);
     // Ignore an error here, as we want to close the session on an error
     // Use a seperate close variable so we can check
     ViStatus closeStatus = viClose(vSession);
-    if (*status < 0) return;
-    if (closeStatus < 0) return;
+    if (*status < 0) goto done;
+    if (closeStatus < 0) goto done;
     *status = 0;
 
     // split until (/dev/
@@ -277,6 +277,8 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
 
   CoiteratedSort(m_visaResource);
   CoiteratedSort(m_osResource);
+done:
+  viClose(viList);
 }
 
 int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
