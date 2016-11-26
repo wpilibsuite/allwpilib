@@ -151,10 +151,14 @@ subprojects {
         }
     }
 
-    plugins.withType(CppPlugin).whenPluginAdded {
+    ext.defineCrossCompilerProperties = {
         // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
         // If this ever changes, the prefix will need to be changed here
-        def compilerPrefix = 'arm-frc-linux-gnueabi-'
+        ext.compilerPrefix = 'arm-frc-linux-gnueabi-'
+    }
+
+    plugins.withType(CppPlugin).whenPluginAdded {
+        defineCrossCompilerProperties()
         model {
             buildTypes {
                 debug
