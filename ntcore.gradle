@@ -12,6 +12,7 @@ def ntcoreSetupModel = { project ->
 
                 if (includeJava) {
                     project.setupJniIncludes(binaries)
+                    project.checkNativeSymbols(project.getNativeJNISymbols)
                     binaries.all {
                         project.setupDef(linker, "${rootDir}/ntcore-jni.def")
                     }

@@ -50,3 +50,7 @@ ext.setupDef = { linker, deffile ->
 // This is a noop on Windows. On gcc platforms, we strip the release binary and create a separate
 // debug library, but Windows already separates debug symbols into a .pdb file.
 ext.debugStripSetup = { }
+
+// This is a noop on Windows. The def file already implicilty checks for the symbols
+ext.checkNativeSymbols = { getSymbolFunc ->
+}
