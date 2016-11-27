@@ -595,7 +595,7 @@ DriverStation::DriverStation() {
  * Reports errors related to unplugged joysticks
  * Throttles the errors so that they don't overwhelm the DS
  */
-void DriverStation::ReportJoystickUnpluggedError(std::string message) {
+void DriverStation::ReportJoystickUnpluggedError(llvm::StringRef message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportError(message);
@@ -608,7 +608,7 @@ void DriverStation::ReportJoystickUnpluggedError(std::string message) {
  *
  * Throttles the errors so that they don't overwhelm the DS.
  */
-void DriverStation::ReportJoystickUnpluggedWarning(std::string message) {
+void DriverStation::ReportJoystickUnpluggedWarning(llvm::StringRef message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportWarning(message);

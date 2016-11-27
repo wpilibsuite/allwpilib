@@ -18,6 +18,7 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "RobotState.h"
 #include "SensorBase.h"
+#include "llvm/StringRef.h"
 
 namespace frc {
 
@@ -96,8 +97,8 @@ class DriverStation : public SensorBase, public RobotStateInterface {
 
  private:
   DriverStation();
-  void ReportJoystickUnpluggedError(std::string message);
-  void ReportJoystickUnpluggedWarning(std::string message);
+  void ReportJoystickUnpluggedError(llvm::StringRef message);
+  void ReportJoystickUnpluggedWarning(llvm::StringRef message);
   void Run();
   void UpdateControlWord(bool force, HAL_ControlWord& controlWord) const;
 
