@@ -226,6 +226,7 @@ public abstract class RobotBase {
       file.createNewFile();
 
       try (FileOutputStream output = new FileOutputStream(file)) {
+        output.write("Java: ".getBytes());
         output.write(WPILibVersion.Version.getBytes());
       }
 
