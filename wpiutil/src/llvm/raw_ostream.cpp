@@ -845,12 +845,11 @@ raw_null_ostream::~raw_null_ostream() {
 #endif
 }
 
-void raw_null_ostream::write_impl(const char *Ptr, size_t Size) {
-}
+void raw_null_ostream::write_impl(const char * /*Ptr*/, size_t /*Size*/) {}
 
 uint64_t raw_null_ostream::current_pos() const {
   return 0;
 }
 
-void raw_null_ostream::pwrite_impl(const char *Ptr, size_t Size,
-                                   uint64_t Offset) {}
+void raw_null_ostream::pwrite_impl(const char * /*Ptr*/, size_t /*Size*/,
+                                   uint64_t /*Offset*/) {}
