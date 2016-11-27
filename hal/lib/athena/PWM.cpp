@@ -7,6 +7,8 @@
 
 #include "HAL/PWM.h"
 
+#include <cmath>
+
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
 #include "HAL/handles/HandlesInternal.h"
@@ -241,6 +243,8 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
     speed = -1.0;
   } else if (speed > 1.0) {
     speed = 1.0;
+  } else if (!std::isfinite(speed)) {
+    speed = 0.0;
   }
 
   // calculate the desired output pwm value by scaling the speed appropriately
