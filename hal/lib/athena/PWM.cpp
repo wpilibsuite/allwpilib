@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <cmath>
-
 #include "HAL/PWM.h"
+
+#include <cmath>
 
 #include "ConstantsInternal.h"
 #include "DigitalInternal.h"
