@@ -43,6 +43,7 @@ class TCPStream : public NetworkStream {
   int m_sd;
   std::string m_peerIP;
   int m_peerPort;
+  bool m_blocking;
 
  public:
   friend class TCPAcceptor;
@@ -58,6 +59,8 @@ class TCPStream : public NetworkStream {
   llvm::StringRef getPeerIP() const override;
   int getPeerPort() const override;
   void setNoDelay() override;
+  bool setBlocking(bool enabled) override;
+  int getNativeHandle() const override;
 
   TCPStream(const TCPStream& stream) = delete;
   TCPStream& operator=(const TCPStream&) = delete;

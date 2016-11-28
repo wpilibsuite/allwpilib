@@ -130,12 +130,21 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   // Set socket to non-blocking
 #ifdef _WIN32
   u_long mode = 1;
-  ioctlsocket(sd, FIONBIO, &mode);
+  if (ioctlsocket(sd, FIONBIO, &mode) == SOCKET_ERROR)
+    WPI_WARNING(logger,
+                "could not set socket to non-blocking: " << SocketStrerror());
 #else
   long arg;
   arg = fcntl(sd, F_GETFL, nullptr);
-  arg |= O_NONBLOCK;
-  fcntl(sd, F_SETFL, arg);
+  if (arg < 0) {
+    WPI_WARNING(logger,
+                "could not set socket to non-blocking: " << SocketStrerror());
+  } else {
+    arg |= O_NONBLOCK;
+    if (fcntl(sd, F_SETFL, arg) < 0)
+      WPI_WARNING(logger,
+                  "could not set socket to non-blocking: " << SocketStrerror());
+  }
 #endif
 
   // Connect with time limit
@@ -169,11 +178,20 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   // Return socket to blocking mode
 #ifdef _WIN32
   mode = 0;
-  ioctlsocket(sd, FIONBIO, &mode);
+  if (ioctlsocket(sd, FIONBIO, &mode) == SOCKET_ERROR)
+    WPI_WARNING(logger,
+                "could not set socket to blocking: " << SocketStrerror());
 #else
   arg = fcntl(sd, F_GETFL, nullptr);
-  arg &= (~O_NONBLOCK);
-  fcntl(sd, F_SETFL, arg);
+  if (arg < 0) {
+    WPI_WARNING(logger,
+                "could not set socket to blocking: " << SocketStrerror());
+  } else {
+    arg &= (~O_NONBLOCK);
+    if (fcntl(sd, F_SETFL, arg) < 0)
+      WPI_WARNING(logger,
+                  "could not set socket to blocking: " << SocketStrerror());
+  }
 #endif
 
   // Create stream object if connected, close if not.
