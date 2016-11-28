@@ -98,6 +98,27 @@ task jniHeadersCscore {
     }
 }
 
+ext.getNativeJNISymbols = {
+    def symbolsList = []
+
+    jniHeadersCscore.outputs.files.each {
+        FileTree tree = fileTree(dir: it)
+        tree.each { File file ->
+            file.eachLine { line ->
+                if (line.trim()) {
+                    if (line.startsWith("JNIEXPORT ") && line.contains('JNICALL')) {
+                        def (p1, p2) = line.split('JNICALL').collect { it.trim() }
+                        // p2 is our JNI call
+                        symbolsList << p2
+                    }
+                }
+            }
+        }
+    }
+
+    return symbolsList
+}
+
 clean {
     delete generatedJNIHeaderLoc
 }

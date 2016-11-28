@@ -14,6 +14,7 @@ def cscoreSetupModel = { project ->
 
                 if (includeJava) {
                     project.setupJniIncludes(binaries)
+                    project.checkNativeSymbols(project.getNativeJNISymbols)
                     binaries.all {
                         project.setupDef(linker, "${rootDir}/cscore-jni.def")
                     }
