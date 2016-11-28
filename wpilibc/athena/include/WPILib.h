@@ -76,6 +76,7 @@
 #include "SpeedController.h"
 #include "Talon.h"
 #include "TalonSRX.h"
+#include "Threads.h"
 #include "Timer.h"
 #include "Ultrasonic.h"
 #include "Utility.h"
