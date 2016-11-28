@@ -22,7 +22,8 @@ class NetworkStream {
   enum Error {
     kConnectionClosed = 0,
     kConnectionReset = -1,
-    kConnectionTimedOut = -2
+    kConnectionTimedOut = -2,
+    kWouldBlock = -3
   };
 
   virtual std::size_t send(const char* buffer, std::size_t len, Error* err) = 0;
@@ -33,6 +34,10 @@ class NetworkStream {
   virtual llvm::StringRef getPeerIP() const = 0;
   virtual int getPeerPort() const = 0;
   virtual void setNoDelay() = 0;
+
+  // returns false on failure
+  virtual bool setBlocking(bool enabled) = 0;
+  virtual int getNativeHandle() const = 0;
 
   NetworkStream(const NetworkStream&) = delete;
   NetworkStream& operator=(const NetworkStream&) = delete;
