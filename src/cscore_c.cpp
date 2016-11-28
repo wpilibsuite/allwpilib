@@ -75,11 +75,6 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
   return out;
 }
 
-CS_Source CS_CreateHttpCamera(const char* name, const char* url,
-                              CS_Status* status) {
-  return cs::CreateHttpCamera(name, url, status);
-}
-
 CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
   return cs::GetSourceKind(source, status);
 }

@@ -104,7 +104,8 @@ public class CameraServerJNI {
   //
   public static native int createUsbCameraDev(String name, int dev);
   public static native int createUsbCameraPath(String name, String path);
-  public static native int createHttpCamera(String name, String url);
+  public static native int createHttpCamera(String name, String url, int kind);
+  public static native int createHttpCameraMulti(String name, String[] urls, int kind);
   public static native int createCvSource(String name, int pixelFormat, int width, int height, int fps);
 
   //
@@ -131,6 +132,13 @@ public class CameraServerJNI {
   // UsbCamera Source Functions
   //
   public static native String getUsbCameraPath(int source);
+
+  //
+  // HttpCamera Source Functions
+  //
+  public static native int getHttpCameraKind(int source);
+  public static native void setHttpCameraUrls(int source, String[] urls);
+  public static native String[] getHttpCameraUrls(int source);
 
   //
   // OpenCV Source Functions

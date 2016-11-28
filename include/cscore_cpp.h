@@ -162,7 +162,10 @@ CS_Source CreateUsbCameraDev(llvm::StringRef name, int dev, CS_Status* status);
 CS_Source CreateUsbCameraPath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status);
 CS_Source CreateHttpCamera(llvm::StringRef name, llvm::StringRef url,
-                           CS_Status* status);
+                           CS_HttpCameraKind kind, CS_Status* status);
+CS_Source CreateHttpCamera(llvm::StringRef name,
+                           llvm::ArrayRef<std::string> urls,
+                           CS_HttpCameraKind kind, CS_Status* status);
 CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
                          CS_Status* status);
 
@@ -204,6 +207,14 @@ void ReleaseSource(CS_Source source, CS_Status* status);
 // UsbCamera Source Functions
 //
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status);
+
+//
+// HttpCamera Source Functions
+//
+CS_HttpCameraKind GetHttpCameraKind(CS_Source source, CS_Status* status);
+void SetHttpCameraUrls(CS_Source source, llvm::ArrayRef<std::string> urls,
+                       CS_Status* status);
+std::vector<std::string> GetHttpCameraUrls(CS_Source source, CS_Status* status);
 
 //
 // OpenCV Source Functions

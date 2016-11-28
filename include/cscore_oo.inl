@@ -222,8 +222,35 @@ inline void UsbCamera::SetExposureManual(int value) {
   GetProperty(kPropExValue).Set(value);
 }
 
-inline HttpCamera::HttpCamera(llvm::StringRef name, llvm::StringRef url) {
-  m_handle = CreateHttpCamera(name, url, &m_status);
+inline HttpCamera::HttpCamera(llvm::StringRef name, llvm::StringRef url,
+                              CameraKind kind) {
+  m_handle = CreateHttpCamera(
+      name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
+      &m_status);
+}
+
+inline HttpCamera::HttpCamera(llvm::StringRef name,
+                              llvm::ArrayRef<std::string> urls,
+                              CameraKind kind) {
+  m_handle = CreateHttpCamera(
+      name, urls, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
+      &m_status);
+}
+
+inline HttpCamera::CameraKind HttpCamera::GetCameraKind() const {
+  m_status = 0;
+  return static_cast<CameraKind>(
+      static_cast<int>(::cs::GetHttpCameraKind(m_handle, &m_status)));
+}
+
+inline void HttpCamera::SetUrls(llvm::ArrayRef<std::string> urls) {
+  m_status = 0;
+  ::cs::SetHttpCameraUrls(m_handle, urls, &m_status);
+}
+
+inline std::vector<std::string> HttpCamera::GetUrls() const {
+  m_status = 0;
+  return ::cs::GetHttpCameraUrls(m_handle, &m_status);
 }
 
 inline CvSource::CvSource(llvm::StringRef name, const VideoMode& mode) {

@@ -254,10 +254,37 @@ class UsbCamera : public VideoSource {
 /// A source that represents a MJPEG-over-HTTP (IP) camera.
 class HttpCamera : public VideoSource {
  public:
+  enum CameraKind {
+    kUnknown = CS_HTTP_UNKNOWN,
+    kMJPGStreamer = CS_HTTP_MJPGSTREAMER,
+    kCSCore = CS_HTTP_CSCORE,
+    kAxis = CS_HTTP_AXIS
+  };
+
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-  HttpCamera(llvm::StringRef name, llvm::StringRef url);
+  /// @param kind Camera kind (e.g. kAxis)
+  HttpCamera(llvm::StringRef name, llvm::StringRef url,
+             CameraKind kind = kUnknown);
+
+  /// Create a source for a MJPEG-over-HTTP (IP) camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param urls Array of Camera URLs
+  /// @param kind Camera kind (e.g. kAxis)
+  HttpCamera(llvm::StringRef name, llvm::ArrayRef<std::string> urls,
+             CameraKind kind = kUnknown);
+
+  /// Get the kind of HTTP camera.
+  /// Autodetection can result in returning a different value than the camera
+  /// was created with.
+  CameraKind GetCameraKind() const;
+
+  /// Change the URLs used to connect to the camera.
+  void SetUrls(llvm::ArrayRef<std::string> urls);
+
+  /// Get the URLs used to connect to the camera.
+  std::vector<std::string> GetUrls() const;
 };
 
 /// A source for user code to provide OpenCV images as video frames.

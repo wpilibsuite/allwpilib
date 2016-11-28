@@ -51,7 +51,9 @@ enum CS_StatusValue {
   CS_INVALID_PROPERTY = -2002,
   CS_WRONG_PROPERTY_TYPE = -2003,
   CS_READ_FAILED = -2004,
-  CS_SOURCE_IS_DISCONNECTED = -2005
+  CS_SOURCE_IS_DISCONNECTED = -2005,
+  CS_EMPTY_VALUE = -2006,
+  CS_BAD_URL = -2007
 };
 
 //
@@ -110,6 +112,16 @@ enum CS_SourceKind {
   CS_SOURCE_USB = 1,
   CS_SOURCE_HTTP = 2,
   CS_SOURCE_CV = 4
+};
+
+//
+// HTTP Camera kinds
+//
+enum CS_HttpCameraKind {
+  CS_HTTP_UNKNOWN = 0,
+  CS_HTTP_MJPGSTREAMER = 1,
+  CS_HTTP_CSCORE = 2,
+  CS_HTTP_AXIS = 3
 };
 
 //
@@ -190,7 +202,10 @@ CS_Source CS_CreateUsbCameraDev(const char* name, int dev, CS_Status* status);
 CS_Source CS_CreateUsbCameraPath(const char* name, const char* path,
                                  CS_Status* status);
 CS_Source CS_CreateHttpCamera(const char* name, const char* url,
-                              CS_Status* status);
+                              enum CS_HttpCameraKind kind, CS_Status* status);
+CS_Source CS_CreateHttpCameraMulti(const char* name, const char** urls,
+                                   int count, enum CS_HttpCameraKind kind,
+                                   CS_Status* status);
 CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
                             CS_Status* status);
 
@@ -231,6 +246,14 @@ void CS_ReleaseSource(CS_Source source, CS_Status* status);
 // UsbCamera Source Functions
 //
 char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);
+
+//
+// HttpCamera Source Functions
+//
+CS_HttpCameraKind CS_GetHttpCameraKind(CS_Source source, CS_Status* status);
+void CS_SetHttpCameraUrls(CS_Source source, const char** urls, int count,
+                          CS_Status* status);
+char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status);
 
 //
 // OpenCV Source Functions
@@ -329,6 +352,7 @@ void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count);
 
 void CS_FreeString(char* str);
 void CS_FreeEnumPropertyChoices(char** choices, int count);
+void CS_FreeHttpCameraUrls(char** urls, int count);
 
 void CS_FreeEnumeratedProperties(CS_Property* properties, int count);
 void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count);
