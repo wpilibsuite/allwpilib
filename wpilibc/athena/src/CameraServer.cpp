@@ -24,14 +24,14 @@ static llvm::StringRef MakeSourceValue(CS_Source source,
   CS_Status status = 0;
   buf.clear();
   switch (cs::GetSourceKind(source, &status)) {
-    case cs::VideoSource::kUSB: {
+    case cs::VideoSource::kUsb: {
       llvm::StringRef prefix{"usb:"};
       buf.append(prefix.begin(), prefix.end());
-      auto path = cs::GetUSBCameraPath(source, &status);
+      auto path = cs::GetUsbCameraPath(source, &status);
       buf.append(path.begin(), path.end());
       break;
     }
-    case cs::VideoSource::kHTTP: {
+    case cs::VideoSource::kHttp: {
       llvm::StringRef prefix{"ip:"};
       buf.append(prefix.begin(), prefix.end());
       // TODO
@@ -64,8 +64,8 @@ void CameraServer::UpdateStreamValues() {
   // Over all the sinks...
   for (const auto& i : m_sinks) {
     CS_Status status = 0;
-    // Ignore all but MJPEGServer
-    if (i.second.GetKind() != cs::VideoSink::kMJPEG) continue;
+    // Ignore all but MjpegServer
+    if (i.second.GetKind() != cs::VideoSink::kMjpeg) continue;
     CS_Sink sink = i.second.GetHandle();
 
     // Get the source's subtable (if none exists, we're done)
@@ -74,11 +74,11 @@ void CameraServer::UpdateStreamValues() {
     if (!table) continue;
 
     // Get port
-    int port = cs::GetMJPEGServerPort(sink, &status);
+    int port = cs::GetMjpegServerPort(sink, &status);
 
     // Generate values
     std::vector<std::string> values;
-    auto listenAddress = cs::GetMJPEGServerListenAddress(sink, &status);
+    auto listenAddress = cs::GetMjpegServerListenAddress(sink, &status);
     if (!listenAddress.empty()) {
       // If a listen address is specified, only use that
       values.emplace_back(MakeStreamValue(listenAddress, port));
@@ -197,30 +197,30 @@ CameraServer::CameraServer()
       0x7fff, true};
 }
 
-cs::USBCamera CameraServer::StartAutomaticCapture() {
+cs::UsbCamera CameraServer::StartAutomaticCapture() {
   return StartAutomaticCapture(0);
 }
 
-cs::USBCamera CameraServer::StartAutomaticCapture(int dev) {
+cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
   llvm::SmallString<64> buf;
   llvm::raw_svector_ostream name{buf};
   name << "USB Camera " << dev;
 
-  cs::USBCamera camera{name.str(), dev};
+  cs::UsbCamera camera{name.str(), dev};
   StartAutomaticCapture(camera);
   return camera;
 }
 
-cs::USBCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
+cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
                                                   int dev) {
-  cs::USBCamera camera{name, dev};
+  cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
   return camera;
 }
 
-cs::USBCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
+cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
                                                   llvm::StringRef path) {
-  cs::USBCamera camera{name, path};
+  cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
   return camera;
 }
@@ -278,6 +278,23 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
   return newsink;
 }
 
+cs::CvSink CameraServer::GetVideo(llvm::StringRef name) {
+  cs::VideoSource source;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_sources.find(name);
+    if (it == m_sources.end()) {
+      llvm::SmallString<64> buf;
+      llvm::raw_svector_ostream err{buf};
+      err << "could not find camera " << name;
+      wpi_setWPIErrorWithContext(CameraServerError, err.str());
+      return cs::CvSink{};
+    }
+    source = it->second;
+  }
+  return GetVideo(source);
+}
+
 cs::CvSource CameraServer::PutVideo(llvm::StringRef name, int width,
                                     int height) {
   cs::CvSource source{name, cs::VideoMode::kMJPEG, width, height, 30};
@@ -285,7 +302,7 @@ cs::CvSource CameraServer::PutVideo(llvm::StringRef name, int width,
   return source;
 }
 
-cs::MJPEGServer CameraServer::AddServer(llvm::StringRef name) {
+cs::MjpegServer CameraServer::AddServer(llvm::StringRef name) {
   int port;
   {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -294,8 +311,8 @@ cs::MJPEGServer CameraServer::AddServer(llvm::StringRef name) {
   return AddServer(name, port);
 }
 
-cs::MJPEGServer CameraServer::AddServer(llvm::StringRef name, int port) {
-  cs::MJPEGServer server{name, port};
+cs::MjpegServer CameraServer::AddServer(llvm::StringRef name, int port) {
+  cs::MjpegServer server{name, port};
   AddServer(server);
   return server;
 }
