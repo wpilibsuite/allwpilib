@@ -526,7 +526,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     // with firefox
     double timestamp = frame.time() / 10000000.0;
     header.clear();
-    oss << "--" BOUNDARY "\r\n"
+    oss << "\r\n--" BOUNDARY "\r\n"
         << "Content-Type: image/jpeg\r\n"
         << "Content-Length: " << size << "\r\n"
         << "X-Timestamp: " << timestamp << "\r\n"
