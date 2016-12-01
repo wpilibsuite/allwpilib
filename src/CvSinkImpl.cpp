@@ -185,6 +185,10 @@ uint64_t CS_GrabSinkFrame(CS_Sink sink, struct CvMat* image,
   return cs::GrabSinkFrame(sink, mat, status);
 }
 
+uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status) {
+   return cs::GrabSinkFrame(sink, *image, status);
+}
+
 char* CS_GetSinkError(CS_Sink sink, CS_Status* status) {
   llvm::SmallString<128> buf;
   auto str = cs::GetSinkError(sink, buf, status);

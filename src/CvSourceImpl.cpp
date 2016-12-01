@@ -298,6 +298,11 @@ void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
   return cs::PutSourceFrame(source, mat, status);
 }
 
+void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, 
+                          CS_Status* status) {
+  return cs::PutSourceFrame(source, *image, status);
+}
+
 void CS_NotifySourceError(CS_Source source, const char* msg,
                           CS_Status* status) {
   return cs::NotifySourceError(source, msg, status);

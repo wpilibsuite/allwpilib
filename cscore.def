@@ -64,3 +64,5 @@ CS_ReleaseEnumeratedSinks @61
 CS_FreeString @62
 CS_FreeEnumPropertyChoices @63
 CS_FreeEnumeratedProperties @64
+CS_GrabSinkFrameCpp @65
+CS_PutSourceFrameCpp @66
