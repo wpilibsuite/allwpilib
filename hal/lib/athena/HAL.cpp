@@ -255,18 +255,19 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return !(watchdog->readStatus_PowerAlive(status));
 }
 
-static void HALCleanupAtExit() {
-  global = nullptr;
-  watchdog = nullptr;
-
-  // Unregister our new data condition variable.
-  setNewDataSem(nullptr);
-}
-
 static void timerRollover(uint64_t currentTime, HAL_NotifierHandle handle) {
   // reschedule timer for next rollover
   int32_t status = 0;
   HAL_UpdateNotifierAlarm(handle, currentTime + 0x80000000ULL, &status);
+}
+
+void HAL_BaseInitialize(int32_t* status) {
+  // image 4; Fixes errors caused by multiple processes. Talk to NI about this
+  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
+      nLoadOut::kTargetClass_RoboRIO;
+
+  global.reset(tGlobal::create(status));
+  watchdog.reset(tSysWatchdog::create(status));
 }
 
 /**
@@ -279,15 +280,14 @@ int32_t HAL_Initialize(int32_t mode) {
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
   FRC_NetworkCommunication_Reserve(nullptr);
-  // image 4; Fixes errors caused by multiple processes. Talk to NI about this
-  nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
-      nLoadOut::kTargetClass_RoboRIO;
+
+  std::atexit([]() {
+    // Unregister our new data condition variable.
+    setNewDataSem(nullptr);
+  });
 
   int32_t status = 0;
-  global.reset(tGlobal::create(&status));
-  watchdog.reset(tSysWatchdog::create(&status));
-
-  std::atexit(HALCleanupAtExit);
+  HAL_BaseInitialize(&status);
 
   if (!rolloverNotifier)
     rolloverNotifier = HAL_InitializeNotifier(timerRollover, nullptr, &status);
