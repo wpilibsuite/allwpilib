@@ -5,13 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
 
 #include "FRC_NetworkCommunication/FRCComm.h"
-#include "HAL/HAL.h"
+#include "HAL/DriverStation.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 
@@ -41,16 +42,24 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   static constexpr int KEEP_MSGS = 5;
   std::lock_guard<priority_mutex> lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
-  static uint64_t prevMsgTime[KEEP_MSGS] = {0, 0, 0};
+  static std::chrono::time_point<std::chrono::steady_clock>
+      prevMsgTime[KEEP_MSGS];
+  static bool initialized = false;
+  if (!initialized) {
+    for (int i = 0; i < KEEP_MSGS; i++) {
+      prevMsgTime[i] =
+          std::chrono::steady_clock::now() - std::chrono::seconds(2);
+    }
+    initialized = true;
+  }
 
-  int32_t status = 0;
-  uint64_t curTime = HAL_GetFPGATime(&status);
+  auto curTime = std::chrono::steady_clock::now();
   int i;
   for (i = 0; i < KEEP_MSGS; ++i) {
     if (prevMsg[i] == details) break;
   }
   int retval = 0;
-  if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= 1000000) {
+  if (i == KEEP_MSGS || (curTime - prevMsgTime[i]) >= std::chrono::seconds(1)) {
     retval = FRC_NetworkCommunication_sendError(isError, errorCode, isLVCode,
                                                 details, location, callStack);
     if (printMsg) {
@@ -66,7 +75,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
     if (i == KEEP_MSGS) {
       // replace the oldest one
       i = 0;
-      uint64_t first = prevMsgTime[0];
+      auto first = prevMsgTime[0];
       for (int j = 1; j < KEEP_MSGS; ++j) {
         if (prevMsgTime[j] < first) {
           first = prevMsgTime[j];

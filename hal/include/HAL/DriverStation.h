@@ -104,6 +104,8 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble);
 double HAL_GetMatchTime(int32_t* status);
 
+#ifndef HAL_USE_LABVIEW
+
 void HAL_WaitForDSData(void);
 void HAL_InitializeDriverStation(void);
 
@@ -112,6 +114,9 @@ void HAL_ObserveUserProgramDisabled(void);
 void HAL_ObserveUserProgramAutonomous(void);
 void HAL_ObserveUserProgramTeleop(void);
 void HAL_ObserveUserProgramTest(void);
+
+#endif  // HAL_USE_LABVIEW
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

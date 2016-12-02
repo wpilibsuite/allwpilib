@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 
+#ifndef HAL_USE_LABVIEW
+
 #include "FRC_NetworkCommunication/UsageReporting.h"
 #include "HAL/Accelerometer.h"
 #include "HAL/AnalogAccumulator.h"
@@ -33,6 +35,9 @@
 #include "HAL/SPI.h"
 #include "HAL/SerialPort.h"
 #include "HAL/Solenoid.h"
+
+#endif  // HAL_USE_LABVIEW
+
 #include "HAL/Types.h"
 
 namespace HALUsageReporting = nUsageReporting;
@@ -42,19 +47,26 @@ enum HAL_RuntimeType : int32_t { HAL_Athena, HAL_Mock };
 #ifdef __cplusplus
 extern "C" {
 #endif
-HAL_PortHandle HAL_GetPort(int32_t channel);
-HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
+
 const char* HAL_GetErrorMessage(int32_t code);
 
 int32_t HAL_GetFPGAVersion(int32_t* status);
 int64_t HAL_GetFPGARevision(int32_t* status);
-uint64_t HAL_GetFPGATime(int32_t* status);
 
 HAL_RuntimeType HAL_GetRuntimeType();
 HAL_Bool HAL_GetFPGAButton(int32_t* status);
 
 HAL_Bool HAL_GetSystemActive(int32_t* status);
 HAL_Bool HAL_GetBrownedOut(int32_t* status);
+
+void HAL_BaseInitialize(int32_t* status);
+
+#ifndef HAL_USE_LABVIEW
+
+HAL_PortHandle HAL_GetPort(int32_t channel);
+HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
+
+uint64_t HAL_GetFPGATime(int32_t* status);
 
 int32_t HAL_Initialize(int32_t mode);
 
@@ -66,6 +78,8 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
                    const char* feature);
 #endif
+
+#endif  // HAL_USE_LABVIEW
 #ifdef __cplusplus
 }
 #endif
