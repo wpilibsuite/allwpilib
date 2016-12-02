@@ -2,7 +2,7 @@
 #ifndef __UsageReporting_h__
 #define __UsageReporting_h__
 
-#ifdef _WIN32
+#ifdef WIN32
 #include <stdint.h>
 #define EXPORT_FUNC __declspec(dllexport) __cdecl
 #elif defined (__vxworks)
@@ -79,6 +79,9 @@ namespace nUsageReporting
         kResourceType_MindsensorsSD540,
         kResourceType_DigitalFilter,
         kResourceType_ADIS16448,
+        kResourceType_PDP,
+        kResourceType_PCM, // 60
+        kResourceType_PigeonIMU,
     } tResourceType;
 
     typedef enum
