@@ -20,8 +20,8 @@ namespace frc {
  * Wrapper class around std::thread that allows changing thread priority
  */
 class WPI_DEPRECATED(
-    "Task API scheduled for removal in 2018. Replace with std::thread") Task
-    : public ErrorBase {
+    "Task API scheduled for removal in 2018. Replace with std::thread, and use "
+    "Threads API for setting priority") Task : public ErrorBase {
  public:
   static const int kDefaultPriority = 60;
 

@@ -163,6 +163,10 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_PWM_SCALE_ERROR_MESSAGE;
     case HAL_SERIAL_PORT_NOT_FOUND:
       return HAL_SERIAL_PORT_NOT_FOUND_MESSAGE;
+    case HAL_THREAD_PRIORITY_ERROR:
+      return HAL_THREAD_PRIORITY_ERROR_MESSAGE;
+    case HAL_THREAD_PRIORITY_RANGE_ERROR:
+      return HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }
