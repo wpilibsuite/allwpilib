@@ -79,6 +79,9 @@ namespace nUsageReporting
         kResourceType_MindsensorsSD540,
         kResourceType_DigitalFilter,
         kResourceType_ADIS16448,
+        kResourceType_PDP,
+        kResourceType_PCM, // 60
+        kResourceType_PigeonIMU,
     } tResourceType;
 
     typedef enum
