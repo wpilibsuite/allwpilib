@@ -301,6 +301,10 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
                             << " bytes)");
   std::memcpy(frameData->data, data.data(), data.size());
 
+  PutFrame(std::move(frameData));
+}
+
+void SourceImpl::PutFrame(std::unique_ptr<Frame::Data> frameData) {
   // Update frame
   {
     std::lock_guard<std::mutex> lock{m_frameMutex};

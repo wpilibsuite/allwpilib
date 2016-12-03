@@ -122,6 +122,7 @@ class SourceImpl {
  protected:
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
                 llvm::StringRef data, Frame::Time time);
+  void PutFrame(std::unique_ptr<Frame::Data> frameData);
   void PutError(llvm::StringRef msg, Frame::Time time) {
     PutFrame(VideoMode::kUnknown, 0, 0, msg, time);
   }
