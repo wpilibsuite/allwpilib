@@ -42,6 +42,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   file = std::fopen("/tmp/frc_versions/FRC_Lib_Version.ini", "w");
 
   if (file != nullptr) {
+    std::fputs("C++ ", file);
     std::fputs(WPILibVersion, file);
     std::fclose(file);
   }
