@@ -45,9 +45,17 @@ void CvSinkImpl::Stop() {
 uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
   SetEnabled(true);
   auto source = GetSource();
-  if (!source) return 0;
+  if (!source) {
+    // Source disconnected; sleep for one second
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return 0;
+  }
   auto frame = source->GetNextFrame();  // blocks
-  if (!frame) return 0;  // signal error
+  if (!frame) {
+    // Bad frame; sleep for 20 ms so we don't consume all processor time.
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    return 0;  // signal error
+  }
   switch (frame.GetPixelFormat()) {
     case VideoMode::kMJPEG:
       cv::imdecode(cv::InputArray{frame.data(), static_cast<int>(frame.size())},
