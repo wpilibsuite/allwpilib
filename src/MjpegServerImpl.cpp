@@ -401,8 +401,8 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     Frame frame = source->GetNextFrame();  // blocks
     if (!m_active) break;
     if (!frame) {
-      // Bad frame; sleep for 10 ms so we don't consume all processor time.
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      // Bad frame; sleep for 20 ms so we don't consume all processor time.
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
       continue;
     }
 
