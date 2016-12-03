@@ -25,7 +25,6 @@ class Frame {
  public:
   typedef uint64_t Time;
 
- private:
   struct Data {
     explicit Data(std::size_t capacity_)
         : data(new char[capacity_]), size(0), capacity(capacity_) {}
