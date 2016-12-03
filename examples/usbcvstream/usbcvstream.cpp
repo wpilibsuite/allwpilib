@@ -19,8 +19,11 @@ int main() {
   cv::Mat flip;
   for (;;) {
     uint64_t time = cvsink.GrabFrame(test);
+    if (time == 0) {
+      std::cout << "error: " << cvsink.GetError() << std::endl;
+      continue;
+    }
     std::cout << "got frame at time " << time << " size " << test.size() << std::endl;
-    if (time == 0) continue;
     cv::flip(test, flip, 0);
     cvsource.PutFrame(flip);
   }
