@@ -10,7 +10,6 @@
 #include <chrono>
 
 #include "llvm/SmallString.h"
-#include "llvm/StringExtras.h"
 #include "support/raw_socket_istream.h"
 #include "support/raw_socket_ostream.h"
 #include "tcpsockets/TCPAcceptor.h"
@@ -18,6 +17,7 @@
 #include "c_util.h"
 #include "cscore_cpp.h"
 #include "Handle.h"
+#include "HttpUtil.h"
 #include "Log.h"
 #include "Notifier.h"
 #include "SourceImpl.h"
@@ -166,50 +166,6 @@ static void SendError(llvm::raw_ostream& os, int code,
   os << baseMessage << "\r\n" << message;
 }
 
-// Read a line from an input stream (up to a maximum length).
-// The returned buffer will contain the trailing \n (unless the maximum length
-// was reached).
-static bool ReadLine(wpi::raw_istream& is, llvm::SmallVectorImpl<char>& buffer,
-                     int maxLen) {
-  buffer.clear();
-  for (int i = 0; i < maxLen; ++i) {
-    char c;
-    is.read(c);
-    if (is.has_error()) return false;
-    if (c == '\r') continue;
-    buffer.push_back(c);
-    if (c == '\n') break;
-  }
-  return true;
-}
-
-// Unescape a %xx-encoded URI.  Returns false on error.
-static bool UnescapeURI(llvm::StringRef str, llvm::SmallVectorImpl<char>& out) {
-  for (auto i = str.begin(), end = str.end(); i != end; ++i) {
-    // pass non-escaped characters to output
-    if (*i != '%') {
-      // decode + to space
-      if (*i == '+')
-        out.push_back(' ');
-      else
-        out.push_back(*i);
-      continue;
-    }
-
-    // are there enough characters left?
-    if (i + 2 >= end) return false;
-
-    // replace %xx with the corresponding character
-    unsigned val1 = llvm::hexDigitValue(*++i);
-    if (val1 == -1U) return false;
-    unsigned val2 = llvm::hexDigitValue(*++i);
-    if (val2 == -1U) return false;
-    out.push_back((val1 << 4) | val2);
-  }
-
-  return true;
-}
-
 // Perform a command specified by HTTP GET parameters.
 bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
                                                  SourceImpl& source,
@@ -229,8 +185,10 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
                                << "\"");
 
     // unescape param
-    llvm::SmallString<64> param;
-    if (!UnescapeURI(rawParam, param)) {
+    bool error = false;
+    llvm::SmallString<64> paramBuf;
+    llvm::StringRef param = UnescapeURI(rawParam, paramBuf, &error);
+    if (error) {
       llvm::SmallString<128> error;
       llvm::raw_svector_ostream oss{error};
       oss << "could not unescape parameter \"" << rawParam << "\"";
@@ -240,8 +198,9 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
     }
 
     // unescape value
-    llvm::SmallString<64> value;
-    if (!UnescapeURI(rawValue, value)) {
+    llvm::SmallString<64> valueBuf;
+    llvm::StringRef value = UnescapeURI(rawValue, valueBuf, &error);
+    if (error) {
       llvm::SmallString<128> error;
       llvm::raw_svector_ostream oss{error};
       oss << "could not unescape value \"" << rawValue << "\"";
@@ -254,7 +213,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
     // rather than as properties
     if (param == "resolution") {
       llvm::StringRef widthStr, heightStr;
-      std::tie(widthStr, heightStr) = value.str().split('x');
+      std::tie(widthStr, heightStr) = value.split('x');
       int width, height;
       if (widthStr.getAsInteger(10, width)) {
         response << param << ": \"width is not integer\"\r\n";
@@ -280,7 +239,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
 
     if (param == "fps") {
       int fps;
-      if (value.str().getAsInteger(10, fps)) {
+      if (value.getAsInteger(10, fps)) {
         response << param << ": \"invalid integer\"\r\n";
         WARNING("HTTP parameter \"" << param << "\" value \"" << value
                                     << "\" is not an integer");
@@ -315,7 +274,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
       case CS_PROP_INTEGER:
       case CS_PROP_ENUM: {
         int val;
-        if (value.str().getAsInteger(10, val)) {
+        if (value.getAsInteger(10, val)) {
           response << param << ": \"invalid integer\"\r\n";
           WARNING("HTTP parameter \"" << param << "\" value \"" << value
                                       << "\" is not an integer");
@@ -551,8 +510,10 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   wpi::raw_socket_ostream os{*m_stream, true};
 
   // Read the request string from the stream
-  llvm::SmallString<128> buf;
-  if (!ReadLine(is, buf, 4096)) {
+  bool error = false;
+  llvm::SmallString<128> reqBuf;
+  llvm::StringRef req = ReadLine(is, reqBuf, 4096, &error);
+  if (error) {
     DEBUG("HTTP error getting request string");
     return;
   }
@@ -561,33 +522,33 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   llvm::StringRef parameters;
   size_t pos;
 
-  DEBUG("HTTP request: '" << buf << "'\n");
+  DEBUG("HTTP request: '" << req << "'\n");
 
   // Determine request kind.  Most of these are for mjpgstreamer
   // compatibility, others are for Axis camera compatibility.
-  if ((pos = buf.find("POST /stream")) != llvm::StringRef::npos) {
+  if ((pos = req.find("POST /stream")) != llvm::StringRef::npos) {
     kind = kStream;
-    parameters = buf.substr(buf.find('?', pos + 12)).substr(1);
-  } else if ((pos = buf.find("GET /?action=stream")) != llvm::StringRef::npos) {
+    parameters = req.substr(req.find('?', pos + 12)).substr(1);
+  } else if ((pos = req.find("GET /?action=stream")) != llvm::StringRef::npos) {
     kind = kStream;
-    parameters = buf.substr(buf.find('&', pos + 19)).substr(1);
-  } else if ((pos = buf.find("GET /stream.mjpg")) != llvm::StringRef::npos) {
+    parameters = req.substr(req.find('&', pos + 19)).substr(1);
+  } else if ((pos = req.find("GET /stream.mjpg")) != llvm::StringRef::npos) {
     kind = kStream;
-    parameters = buf.substr(buf.find('?', pos + 16)).substr(1);
-  } else if (buf.find("GET /settings") != llvm::StringRef::npos &&
-             buf.find(".json") != llvm::StringRef::npos) {
+    parameters = req.substr(req.find('?', pos + 16)).substr(1);
+  } else if (req.find("GET /settings") != llvm::StringRef::npos &&
+             req.find(".json") != llvm::StringRef::npos) {
     kind = kGetSettings;
-  } else if (buf.find("GET /input") != llvm::StringRef::npos &&
-             buf.find(".json") != llvm::StringRef::npos) {
+  } else if (req.find("GET /input") != llvm::StringRef::npos &&
+             req.find(".json") != llvm::StringRef::npos) {
     kind = kGetSettings;
-  } else if (buf.find("GET /output") != llvm::StringRef::npos &&
-             buf.find(".json") != llvm::StringRef::npos) {
+  } else if (req.find("GET /output") != llvm::StringRef::npos &&
+             req.find(".json") != llvm::StringRef::npos) {
     kind = kGetSettings;
-  } else if ((pos = buf.find("GET /?action=command")) !=
+  } else if ((pos = req.find("GET /?action=command")) !=
              llvm::StringRef::npos) {
     kind = kCommand;
-    parameters = buf.substr(buf.find('&', pos + 20)).substr(1);
-  } else if (buf.find("GET / ") != llvm::StringRef::npos || buf == "GET /\n") {
+    parameters = req.substr(req.find('&', pos + 20)).substr(1);
+  } else if (req.find("GET / ") != llvm::StringRef::npos || req == "GET /\n") {
     kind = kRootPage;
   } else {
     DEBUG("HTTP request resource not found");
@@ -604,10 +565,11 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
 
   // Read the rest of the HTTP request.
   // The end of the request is marked by a single, empty line
-  llvm::SmallString<128> buf2;
-  do {
-    if (!ReadLine(is, buf2, 4096)) return;
-  } while (!buf2.startswith("\n"));
+  llvm::SmallString<128> lineBuf;
+  for (;;) {
+    if (ReadLine(is, lineBuf, 4096, &error).startswith("\n")) break;
+    if (error) return;
+  }
 
   // Send response
   switch (kind) {
