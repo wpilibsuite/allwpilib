@@ -44,16 +44,20 @@ class CameraServer : public ErrorBase {
    * If you also want to perform vision processing on the roboRIO, use
    * getVideo() to get access to the camera images.
    *
-   * This overload calls {@link #startAutomaticCapture(int)} with device 0.
+   * This overload calls {@link #StartAutomaticCapture(int)} with device 0,
+   * creating a camera named "USB Camera 0".
    */
-  cs::USBCamera StartAutomaticCapture();
+  cs::UsbCamera StartAutomaticCapture();
 
   /**
    * Start automatically capturing images to send to the dashboard.
    *
+   * <p>This overload calls {@link #StartAutomaticCapture(String, int)} with
+   * a name of "USB Camera {dev}".
+   *
    * @param dev The device number of the camera interface
    */
-  cs::USBCamera StartAutomaticCapture(int dev);
+  cs::UsbCamera StartAutomaticCapture(int dev);
 
   /**
    * Start automatically capturing images to send to the dashboard.
@@ -61,7 +65,7 @@ class CameraServer : public ErrorBase {
    * @param name The name to give the camera
    * @param dev The device number of the camera interface
    */
-  cs::USBCamera StartAutomaticCapture(llvm::StringRef name, int dev);
+  cs::UsbCamera StartAutomaticCapture(llvm::StringRef name, int dev);
 
   /**
    * Start automatically capturing images to send to the dashboard.
@@ -69,7 +73,7 @@ class CameraServer : public ErrorBase {
    * @param name The name to give the camera
    * @param path The device path (e.g. "/dev/video0") of the camera
    */
-  cs::USBCamera StartAutomaticCapture(llvm::StringRef name,
+  cs::UsbCamera StartAutomaticCapture(llvm::StringRef name,
                                       llvm::StringRef path);
 
   /**
@@ -98,6 +102,14 @@ class CameraServer : public ErrorBase {
   cs::CvSink GetVideo(const cs::VideoSource& camera);
 
   /**
+   * Get OpenCV access to the specified camera.  This allows you to get
+   * images from the camera for image processing on the roboRIO.
+   *
+   * @param name Camera name
+   */
+  cs::CvSink GetVideo(llvm::StringRef name);
+
+  /**
    * Create a MJPEG stream with OpenCV input. This can be called to pass custom
    * annotated images to the dashboard.
    *
@@ -112,14 +124,14 @@ class CameraServer : public ErrorBase {
    *
    * @param name Server name
    */
-  cs::MJPEGServer AddServer(llvm::StringRef name);
+  cs::MjpegServer AddServer(llvm::StringRef name);
 
   /**
    * Adds a MJPEG server.
    *
    * @param name Server name
    */
-  cs::MJPEGServer AddServer(llvm::StringRef name, int port);
+  cs::MjpegServer AddServer(llvm::StringRef name, int port);
 
   /**
    * Adds an already created server.
@@ -154,7 +166,7 @@ class CameraServer : public ErrorBase {
    * the correct mode, or set it directly on a camera and call the appropriate
    * StartAutomaticCapture method.
    *
-   * @deprecated Use SetResolution on the USBCamera returned by
+   * @deprecated Use SetResolution on the UsbCamera returned by
    *     StartAutomaticCapture() instead.
    * @param size The size to use
    */
