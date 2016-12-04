@@ -12,7 +12,7 @@ package edu.wpi.cscore;
 /// are called channels.
 public class VideoSink {
   public enum Kind {
-    kUnknown(0), kMJPEG(2), kCv(4);
+    kUnknown(0), kMjpeg(2), kCv(4);
     private int value;
 
     private Kind(int value) {
@@ -26,7 +26,7 @@ public class VideoSink {
 
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
-      case 2: return Kind.kMJPEG;
+      case 2: return Kind.kMjpeg;
       case 4: return Kind.kCv;
       default: return Kind.kUnknown;
     }

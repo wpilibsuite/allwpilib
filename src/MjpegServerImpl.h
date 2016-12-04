@@ -28,11 +28,11 @@ namespace cs {
 
 class SourceImpl;
 
-class MJPEGServerImpl : public SinkImpl {
+class MjpegServerImpl : public SinkImpl {
  public:
-  MJPEGServerImpl(llvm::StringRef name, llvm::StringRef listenAddress, int port,
+  MjpegServerImpl(llvm::StringRef name, llvm::StringRef listenAddress, int port,
                   std::unique_ptr<wpi::NetworkAcceptor> acceptor);
-  ~MJPEGServerImpl() override;
+  ~MjpegServerImpl() override;
 
   void Stop();
   std::string GetListenAddress() { return m_listenAddress; }

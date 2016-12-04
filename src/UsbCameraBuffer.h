@@ -14,21 +14,21 @@
 
 namespace cs {
 
-class USBCameraBuffer {
+class UsbCameraBuffer {
  public:
-  USBCameraBuffer() noexcept : m_data{nullptr}, m_length{0} {}
-  USBCameraBuffer(USBCameraBuffer&& other) noexcept : USBCameraBuffer() {
+  UsbCameraBuffer() noexcept : m_data{nullptr}, m_length{0} {}
+  UsbCameraBuffer(UsbCameraBuffer&& other) noexcept : UsbCameraBuffer() {
     swap(*this, other);
   }
-  USBCameraBuffer& operator=(USBCameraBuffer&& other) noexcept {
+  UsbCameraBuffer& operator=(UsbCameraBuffer&& other) noexcept {
     swap(*this, other);
     return *this;
   }
-  USBCameraBuffer(const USBCameraBuffer&) = delete;
-  USBCameraBuffer& operator=(const USBCameraBuffer&) = delete;
+  UsbCameraBuffer(const UsbCameraBuffer&) = delete;
+  UsbCameraBuffer& operator=(const UsbCameraBuffer&) = delete;
 
 #ifdef __linux__
-  USBCameraBuffer(int fd, size_t length, off_t offset) noexcept
+  UsbCameraBuffer(int fd, size_t length, off_t offset) noexcept
       : m_length{length} {
     m_data =
         mmap(nullptr, length, PROT_READ | PROT_WRITE, MAP_SHARED, fd, offset);
@@ -38,12 +38,12 @@ class USBCameraBuffer {
     }
   }
 
-  ~USBCameraBuffer() {
+  ~UsbCameraBuffer() {
     if (m_data) munmap(m_data, m_length);
   }
 #endif
 
-  friend void swap(USBCameraBuffer& first, USBCameraBuffer& second) noexcept {
+  friend void swap(UsbCameraBuffer& first, UsbCameraBuffer& second) noexcept {
     using std::swap;
     swap(first.m_data, second.m_data);
     swap(first.m_length, second.m_length);

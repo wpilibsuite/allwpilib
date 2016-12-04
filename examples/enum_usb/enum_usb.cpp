@@ -7,10 +7,10 @@ int main() {
   CS_Status status = 0;
   llvm::SmallString<64> buf;
 
-  for (const auto& caminfo : cs::EnumerateUSBCameras(&status)) {
+  for (const auto& caminfo : cs::EnumerateUsbCameras(&status)) {
     llvm::outs() << caminfo.dev << ": " << caminfo.path << " (" << caminfo.name
                  << ")\n";
-    cs::USBCamera camera{"usbcam", caminfo.dev};
+    cs::UsbCamera camera{"usbcam", caminfo.dev};
 
     llvm::outs() << "Properties:\n";
     for (const auto& prop : camera.EnumerateProperties()) {

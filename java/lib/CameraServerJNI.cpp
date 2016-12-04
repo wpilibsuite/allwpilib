@@ -60,7 +60,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   // Cache references to classes
   jclass local;
 
-  local = env->FindClass("edu/wpi/cscore/USBCameraInfo");
+  local = env->FindClass("edu/wpi/cscore/UsbCameraInfo");
   if (!local) return JNI_ERR;
   usbCameraInfoCls = static_cast<jclass>(env->NewGlobalRef(local));
   if (!usbCameraInfoCls) return JNI_ERR;
@@ -183,7 +183,7 @@ static inline bool CheckStatus(JNIEnv *env, CS_Status status) {
   return status == CS_OK;
 }
 
-static jobject MakeJObject(JNIEnv *env, const cs::USBCameraInfo &info) {
+static jobject MakeJObject(JNIEnv *env, const cs::UsbCameraInfo &info) {
   static jmethodID constructor = env->GetMethodID(
       usbCameraInfoCls, "<init>", "(ILjava/lang/String;Ljava/lang/String;)V");
   JLocal<jstring> path(env, MakeJString(env, info.path));
@@ -382,28 +382,28 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_getEnumProper
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    createUSBCameraDev
+ * Method:    createUsbCameraDev
  * Signature: (Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUSBCameraDev
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraDev
   (JNIEnv *env, jclass, jstring name, jint dev)
 {
   CS_Status status = 0;
-  auto val = cs::CreateUSBCameraDev(JStringRef{env, name}, dev, &status);
+  auto val = cs::CreateUsbCameraDev(JStringRef{env, name}, dev, &status);
   CheckStatus(env, status);
   return val;
 }
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    createUSBCameraPath
+ * Method:    createUsbCameraPath
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUSBCameraPath
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraPath
   (JNIEnv *env, jclass, jstring name, jstring path)
 {
   CS_Status status = 0;
-  auto val = cs::CreateUSBCameraPath(JStringRef{env, name},
+  auto val = cs::CreateUsbCameraPath(JStringRef{env, name},
                                      JStringRef{env, path}, &status);
   CheckStatus(env, status);
   return val;
@@ -414,11 +414,11 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUSBCameraPath
  * Method:    createHTTPCamera
  * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createHTTPCamera
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createHttpCamera
   (JNIEnv *env, jclass, jstring name, jstring url)
 {
   CS_Status status = 0;
-  auto val = cs::CreateHTTPCamera(JStringRef{env, name},
+  auto val = cs::CreateHttpCamera(JStringRef{env, name},
                                   JStringRef{env, url}, &status);
   CheckStatus(env, status);
   return val;
@@ -686,14 +686,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_releaseSource
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    getUSBCameraPath
+ * Method:    getUsbCameraPath
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getUSBCameraPath
+JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getUsbCameraPath
   (JNIEnv *env, jclass, jint source)
 {
   CS_Status status = 0;
-  auto str = cs::GetUSBCameraPath(source, &status);
+  auto str = cs::GetUsbCameraPath(source, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
@@ -794,14 +794,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSourceEnumProperty
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    createMJPEGServer
+ * Method:    createMjpegServer
  * Signature: (Ljava/lang/String;Ljava/lang/String;I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createMJPEGServer
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createMjpegServer
   (JNIEnv *env, jclass, jstring name, jstring listenAddress, jint port)
 {
   CS_Status status = 0;
-  auto val = cs::CreateMJPEGServer(
+  auto val = cs::CreateMjpegServer(
       JStringRef{env, name}, JStringRef{env, listenAddress}, port, &status);
   CheckStatus(env, status);
   return val;
@@ -935,28 +935,28 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_releaseSink
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    getMJPEGServerListenAddress
+ * Method:    getMjpegServerListenAddress
  * Signature: (I)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getMJPEGServerListenAddress
+JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerListenAddress
   (JNIEnv *env, jclass, jint sink)
 {
   CS_Status status = 0;
-  auto str = cs::GetMJPEGServerListenAddress(sink, &status);
+  auto str = cs::GetMjpegServerListenAddress(sink, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
 }
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    getMJPEGServerPort
+ * Method:    getMjpegServerPort
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getMJPEGServerPort
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerPort
   (JNIEnv *env, jclass, jint sink)
 {
   CS_Status status = 0;
-  auto val = cs::GetMJPEGServerPort(sink, &status);
+  auto val = cs::GetMjpegServerPort(sink, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -1082,14 +1082,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_removeListener
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
- * Method:    enumerateUSBCameras
- * Signature: ()[Ledu/wpi/cameraserver/USBCameraInfo;
+ * Method:    enumerateUsbCameras
+ * Signature: ()[Ledu/wpi/cameraserver/UsbCameraInfo;
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateUSBCameras
+JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateUsbCameras
   (JNIEnv *env, jclass)
 {
   CS_Status status = 0;
-  auto arr = cs::EnumerateUSBCameras(&status);
+  auto arr = cs::EnumerateUsbCameras(&status);
   if (!CheckStatus(env, status)) return nullptr;
   jobjectArray jarr =
       env->NewObjectArray(arr.size(), usbCameraInfoCls, nullptr);

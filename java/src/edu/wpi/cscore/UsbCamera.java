@@ -8,7 +8,7 @@
 package edu.wpi.cscore;
 
 /// A source that represents a USB camera.
-public class USBCamera extends VideoSource {
+public class UsbCamera extends VideoSource {
   private static final String kPropWbAuto = "white_balance_temperature_auto";
   private static final String kPropWbValue = "white_balance_temperature";
   private static final String kPropExAuto = "exposure_auto";
@@ -33,26 +33,26 @@ public class USBCamera extends VideoSource {
   /// Create a source for a USB camera based on device number.
   /// @param name Source name (arbitrary unique identifier)
   /// @param dev Device number (e.g. 0 for /dev/video0)
-  public USBCamera(String name, int dev) {
-    super(CameraServerJNI.createUSBCameraDev(name, dev));
+  public UsbCamera(String name, int dev) {
+    super(CameraServerJNI.createUsbCameraDev(name, dev));
   }
 
   /// Create a source for a USB camera based on device path.
   /// @param name Source name (arbitrary unique identifier)
   /// @param path Path to device (e.g. "/dev/video0" on Linux)
-  public USBCamera(String name, String path) {
-    super(CameraServerJNI.createUSBCameraPath(name, path));
+  public UsbCamera(String name, String path) {
+    super(CameraServerJNI.createUsbCameraPath(name, path));
   }
 
   /// Enumerate USB cameras on the local system.
   /// @return Vector of USB camera information (one for each camera)
-  public static USBCameraInfo[] enumerateUSBCameras() {
-    return CameraServerJNI.enumerateUSBCameras();
+  public static UsbCameraInfo[] enumerateUsbCameras() {
+    return CameraServerJNI.enumerateUsbCameras();
   }
 
   /// Get the path to the device.
   public String getPath() {
-    return CameraServerJNI.getUSBCameraPath(m_handle);
+    return CameraServerJNI.getUsbCameraPath(m_handle);
   }
 
   /// Set the brightness, as a percentage (0-100).

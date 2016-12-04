@@ -12,7 +12,7 @@ package edu.wpi.cscore;
 /// are called channels.
 public class VideoSource {
   public enum Kind {
-    kUnknown(0), kUSB(1), kHTTP(2), kCv(4);
+    kUnknown(0), kUsb(1), kHttp(2), kCv(4);
     private int value;
 
     private Kind(int value) {
@@ -26,8 +26,8 @@ public class VideoSource {
 
   public static Kind getKindFromInt(int kind) {
     switch (kind) {
-      case 1: return Kind.kUSB;
-      case 2: return Kind.kHTTP;
+      case 1: return Kind.kUsb;
+      case 2: return Kind.kHttp;
       case 4: return Kind.kCv;
       default: return Kind.kUnknown;
     }

@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "MJPEGServerImpl.h"
+#include "MjpegServerImpl.h"
 
 #include <chrono>
 
@@ -74,7 +74,7 @@ static const unsigned char dhtData[] = {
     0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe7,
     0xe8, 0xe9, 0xea, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa};
 
-class MJPEGServerImpl::ConnThread : public wpi::SafeThread {
+class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  public:
   void Main();
 
@@ -211,7 +211,7 @@ static bool UnescapeURI(llvm::StringRef str, llvm::SmallVectorImpl<char>& out) {
 }
 
 // Perform a command specified by HTTP GET parameters.
-bool MJPEGServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
+bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
                                                  SourceImpl& source,
                                                  llvm::StringRef parameters,
                                                  bool respond) {
@@ -347,7 +347,7 @@ bool MJPEGServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
 }
 
 // Send a JSON file which is contains information about the source parameters.
-void MJPEGServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
+void MjpegServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
                                            SourceImpl& source, bool header) {
   if (header) SendHeader(os, 200, "OK", "application/x-javascript");
 
@@ -413,7 +413,7 @@ void MJPEGServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
   os.flush();
 }
 
-MJPEGServerImpl::MJPEGServerImpl(llvm::StringRef name,
+MjpegServerImpl::MjpegServerImpl(llvm::StringRef name,
                                  llvm::StringRef listenAddress, int port,
                                  std::unique_ptr<wpi::NetworkAcceptor> acceptor)
     : SinkImpl{name},
@@ -427,12 +427,12 @@ MJPEGServerImpl::MJPEGServerImpl(llvm::StringRef name,
   desc << "HTTP Server on port " << port;
   SetDescription(desc.str());
 
-  m_serverThread = std::thread(&MJPEGServerImpl::ServerThreadMain, this);
+  m_serverThread = std::thread(&MjpegServerImpl::ServerThreadMain, this);
 }
 
-MJPEGServerImpl::~MJPEGServerImpl() { Stop(); }
+MjpegServerImpl::~MjpegServerImpl() { Stop(); }
 
-void MJPEGServerImpl::Stop() {
+void MjpegServerImpl::Stop() {
   m_active = false;
 
   // wake up server thread by shutting down the socket
@@ -472,7 +472,7 @@ static bool NeedsDHT(const char* data, std::size_t* size, std::size_t* locSOF) {
 }
 
 // Send HTTP response and a stream of JPG-frames
-void MJPEGServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
+void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
   os.SetUnbuffered();
 
   llvm::SmallString<256> header;
@@ -546,7 +546,7 @@ void MJPEGServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
   StopStream();
 }
 
-void MJPEGServerImpl::ConnThread::ProcessRequest() {
+void MjpegServerImpl::ConnThread::ProcessRequest() {
   wpi::raw_socket_istream is{*m_stream};
   wpi::raw_socket_ostream os{*m_stream, true};
 
@@ -645,7 +645,7 @@ void MJPEGServerImpl::ConnThread::ProcessRequest() {
 }
 
 // worker thread for clients that connected to this server
-void MJPEGServerImpl::ConnThread::Main() {
+void MjpegServerImpl::ConnThread::Main() {
   std::unique_lock<std::mutex> lock(m_mutex);
   while (m_active) {
     while (!m_stream) {
@@ -660,7 +660,7 @@ void MJPEGServerImpl::ConnThread::Main() {
 }
 
 // Main server thread
-void MJPEGServerImpl::ServerThreadMain() {
+void MjpegServerImpl::ServerThreadMain() {
   if (m_acceptor->start() != 0) {
     m_active = false;
     return;
@@ -707,7 +707,7 @@ void MJPEGServerImpl::ServerThreadMain() {
   DEBUG("leaving server thread");
 }
 
-void MJPEGServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
+void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
   std::lock_guard<std::mutex> lock(m_mutex);
   for (auto& connThread : m_connThreads) {
     if (auto thr = connThread.GetThread()) {
@@ -723,10 +723,10 @@ void MJPEGServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
 
 namespace cs {
 
-CS_Sink CreateMJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress,
+CS_Sink CreateMjpegServer(llvm::StringRef name, llvm::StringRef listenAddress,
                           int port, CS_Status* status) {
   llvm::SmallString<128> str{listenAddress};
-  auto sink = std::make_shared<MJPEGServerImpl>(
+  auto sink = std::make_shared<MjpegServerImpl>(
       name, listenAddress, port,
       std::unique_ptr<wpi::NetworkAcceptor>(
           new wpi::TCPAcceptor(port, str.c_str(), Logger::GetInstance())));
@@ -735,39 +735,39 @@ CS_Sink CreateMJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress,
   return handle;
 }
 
-std::string GetMJPEGServerListenAddress(CS_Sink sink, CS_Status* status) {
+std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data || data->kind != CS_SINK_MJPEG) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
   }
-  return static_cast<MJPEGServerImpl&>(*data->sink).GetListenAddress();
+  return static_cast<MjpegServerImpl&>(*data->sink).GetListenAddress();
 }
 
-int GetMJPEGServerPort(CS_Sink sink, CS_Status* status) {
+int GetMjpegServerPort(CS_Sink sink, CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data || data->kind != CS_SINK_MJPEG) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  return static_cast<MJPEGServerImpl&>(*data->sink).GetPort();
+  return static_cast<MjpegServerImpl&>(*data->sink).GetPort();
 }
 
 }  // namespace cs
 
 extern "C" {
 
-CS_Sink CS_CreateMJPEGServer(const char* name, const char* listenAddress,
+CS_Sink CS_CreateMjpegServer(const char* name, const char* listenAddress,
                              int port, CS_Status* status) {
-  return cs::CreateMJPEGServer(name, listenAddress, port, status);
+  return cs::CreateMjpegServer(name, listenAddress, port, status);
 }
 
-char* CS_GetMJPEGServerListenAddress(CS_Sink sink, CS_Status* status) {
-  return ConvertToC(cs::GetMJPEGServerListenAddress(sink, status));
+char* CS_GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status) {
+  return ConvertToC(cs::GetMjpegServerListenAddress(sink, status));
 }
 
-int CS_GetMJPEGServerPort(CS_Sink sink, CS_Status* status) {
-  return cs::GetMJPEGServerPort(sink, status);
+int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status) {
+  return cs::GetMjpegServerPort(sink, status);
 }
 
 }  // extern "C"

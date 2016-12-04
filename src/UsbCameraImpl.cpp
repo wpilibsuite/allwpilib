@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "USBCameraImpl.h"
+#include "UsbCameraImpl.h"
 
 #include <algorithm>
 
@@ -86,7 +86,7 @@ static llvm::StringRef NormalizeName(llvm::StringRef name,
 }
 
 #ifdef VIDIOC_QUERY_EXT_CTRL
-USBCameraImpl::PropertyData::PropertyData(
+UsbCameraImpl::PropertyData::PropertyData(
     const struct v4l2_query_ext_ctrl& ctrl)
     : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.minimum, ctrl.maximum,
                    ctrl.step, ctrl.default_value, 0),
@@ -120,7 +120,7 @@ USBCameraImpl::PropertyData::PropertyData(
 }
 #endif
 
-USBCameraImpl::PropertyData::PropertyData(const struct v4l2_queryctrl& ctrl)
+UsbCameraImpl::PropertyData::PropertyData(const struct v4l2_queryctrl& ctrl)
     : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.minimum, ctrl.maximum,
                    ctrl.step, ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
@@ -171,10 +171,10 @@ static inline int CheckedIoctl(int fd, unsigned long req, void* data,
 #define TryIoctl(fd, req, data) \
   CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, true)
 
-static std::unique_ptr<USBCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
+static std::unique_ptr<UsbCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
                                                                  __u32* id) {
   int rc;
-  std::unique_ptr<USBCameraImpl::PropertyData> prop;
+  std::unique_ptr<UsbCameraImpl::PropertyData> prop;
 #ifdef VIDIOC_QUERY_EXT_CTRL
   v4l2_query_ext_ctrl qc_ext;
   std::memset(&qc_ext, 0, sizeof(qc_ext));
@@ -184,7 +184,7 @@ static std::unique_ptr<USBCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
     *id = qc_ext.id;  // copy back
     // We don't support array types
     if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return nullptr;
-    prop = llvm::make_unique<USBCameraImpl::PropertyData>(qc_ext);
+    prop = llvm::make_unique<UsbCameraImpl::PropertyData>(qc_ext);
   }
 #endif
   if (!prop) {
@@ -195,7 +195,7 @@ static std::unique_ptr<USBCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
     rc = TryIoctl(fd, VIDIOC_QUERYCTRL, &qc);
     *id = qc.id;  // copy back
     if (rc != 0) return nullptr;
-    prop = llvm::make_unique<USBCameraImpl::PropertyData>(qc);
+    prop = llvm::make_unique<UsbCameraImpl::PropertyData>(qc);
   }
 
   // Cache enum property choices
@@ -370,7 +370,7 @@ static std::string GetDescriptionImpl(const char* cpath) {
   return std::string{};
 }
 
-USBCameraImpl::USBCameraImpl(llvm::StringRef name, llvm::StringRef path)
+UsbCameraImpl::UsbCameraImpl(llvm::StringRef name, llvm::StringRef path)
     : SourceImpl{name},
       m_path{path},
       m_fd{-1},
@@ -379,7 +379,7 @@ USBCameraImpl::USBCameraImpl(llvm::StringRef name, llvm::StringRef path)
   SetDescription(GetDescriptionImpl(m_path.c_str()));
 }
 
-USBCameraImpl::~USBCameraImpl() {
+UsbCameraImpl::~UsbCameraImpl() {
   m_active = false;
 
   // Just in case anyone is waiting...
@@ -404,12 +404,12 @@ static inline void DoFdSet(int fd, fd_set* set, int* nfds) {
   }
 }
 
-void USBCameraImpl::Start() {
+void UsbCameraImpl::Start() {
   // Kick off the camera thread
-  m_cameraThread = std::thread(&USBCameraImpl::CameraThreadMain, this);
+  m_cameraThread = std::thread(&UsbCameraImpl::CameraThreadMain, this);
 }
 
-void USBCameraImpl::CameraThreadMain() {
+void UsbCameraImpl::CameraThreadMain() {
   // We want to be notified on file creation and deletion events in the device
   // path.  This is used to detect disconnects and reconnects.
   std::unique_ptr<wpi::raw_fd_istream> notify_is;
@@ -583,13 +583,13 @@ void USBCameraImpl::CameraThreadMain() {
   DeviceDisconnect();
 }
 
-void USBCameraImpl::DeviceDisconnect() {
+void UsbCameraImpl::DeviceDisconnect() {
   int fd = m_fd.exchange(-1);
   if (fd < 0) return;  // already disconnected
 
   // Unmap buffers
   for (int i = 0; i < kNumBuffers; ++i)
-    m_buffers[i] = std::move(USBCameraBuffer{});
+    m_buffers[i] = std::move(UsbCameraBuffer{});
 
   // Close device
   close(fd);
@@ -598,7 +598,7 @@ void USBCameraImpl::DeviceDisconnect() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_DISCONNECTED);
 }
 
-void USBCameraImpl::DeviceConnect() {
+void UsbCameraImpl::DeviceConnect() {
   if (m_fd >= 0) return;
 
   INFO("Connecting to USB camera on " << m_path);
@@ -673,11 +673,11 @@ void USBCameraImpl::DeviceConnect() {
     DEBUG4("USB " << m_path << ": buf " << i << " length=" << buf.length
                   << " offset=" << buf.m.offset);
 
-    m_buffers[i] = std::move(USBCameraBuffer(fd, buf.length, buf.m.offset));
+    m_buffers[i] = std::move(UsbCameraBuffer(fd, buf.length, buf.m.offset));
     if (!m_buffers[i].m_data) {
       WARNING("USB " << m_path << ": could not map buffer " << i);
       // release other buffers
-      for (int j = 0; j < i; ++j) m_buffers[j] = std::move(USBCameraBuffer{});
+      for (int j = 0; j < i; ++j) m_buffers[j] = std::move(UsbCameraBuffer{});
       close(fd);
       m_fd = -1;
       return;
@@ -694,7 +694,7 @@ void USBCameraImpl::DeviceConnect() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
 }
 
-bool USBCameraImpl::DeviceStreamOn() {
+bool UsbCameraImpl::DeviceStreamOn() {
   if (m_streaming) return false;  // ignore if already enabled
   int fd = m_fd.load();
   if (fd < 0) return false;
@@ -721,7 +721,7 @@ bool USBCameraImpl::DeviceStreamOn() {
   return true;
 }
 
-bool USBCameraImpl::DeviceStreamOff() {
+bool UsbCameraImpl::DeviceStreamOff() {
   if (!m_streaming) return false;  // ignore if already disabled
   int fd = m_fd.load();
   if (fd < 0) return false;
@@ -732,7 +732,7 @@ bool USBCameraImpl::DeviceStreamOff() {
   return true;
 }
 
-void USBCameraImpl::DeviceProcessCommands() {
+void UsbCameraImpl::DeviceProcessCommands() {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_commands.empty()) return;
   while (!m_commands.empty()) {
@@ -877,7 +877,7 @@ done:
   m_responseCv.notify_all();
 }
 
-void USBCameraImpl::DeviceSetMode() {
+void UsbCameraImpl::DeviceSetMode() {
   int fd = m_fd.load();
   if (fd < 0) return;
 
@@ -918,7 +918,7 @@ void USBCameraImpl::DeviceSetMode() {
   }
 }
 
-void USBCameraImpl::DeviceSetFPS() {
+void UsbCameraImpl::DeviceSetFPS() {
   int fd = m_fd.load();
   if (fd < 0) return;
 
@@ -936,7 +936,7 @@ void USBCameraImpl::DeviceSetFPS() {
     INFO("USB " << m_path << ": set FPS to " << m_mode.fps);
 }
 
-void USBCameraImpl::DeviceCacheMode() {
+void UsbCameraImpl::DeviceCacheMode() {
   int fd = m_fd.load();
   if (fd < 0) return;
 
@@ -1044,7 +1044,7 @@ void USBCameraImpl::DeviceCacheMode() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODE_CHANGED);
 }
 
-void USBCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
+void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
   std::unique_lock<std::mutex> lock(m_mutex);
   int& ndx = m_properties[prop->name];
   if (ndx == 0) {
@@ -1087,7 +1087,7 @@ void USBCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
                                   llvm::StringRef{});
 }
 
-void USBCameraImpl::DeviceCacheProperties() {
+void UsbCameraImpl::DeviceCacheProperties() {
   int fd = m_fd.load();
   if (fd < 0) return;
 
@@ -1116,7 +1116,7 @@ void USBCameraImpl::DeviceCacheProperties() {
   }
 }
 
-void USBCameraImpl::DeviceCacheVideoModes() {
+void UsbCameraImpl::DeviceCacheVideoModes() {
   int fd = m_fd.load();
   if (fd < 0) return;
 
@@ -1164,7 +1164,7 @@ void USBCameraImpl::DeviceCacheVideoModes() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
-bool USBCameraImpl::DeviceGetProperty(PropertyData* prop) {
+bool UsbCameraImpl::DeviceGetProperty(PropertyData* prop) {
   int fd = m_fd.load();
   if (fd < 0) return true;
   int rv = 0;
@@ -1189,7 +1189,7 @@ bool USBCameraImpl::DeviceGetProperty(PropertyData* prop) {
   return rv >= 0;
 }
 
-bool USBCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
+bool UsbCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
                                       const PropertyData& prop) {
   int fd = m_fd.load();
   if (fd < 0) return true;
@@ -1224,7 +1224,7 @@ bool USBCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
   return rv >= 0;
 }
 
-std::unique_ptr<USBCameraImpl::Message> USBCameraImpl::SendAndWait(
+std::unique_ptr<UsbCameraImpl::Message> UsbCameraImpl::SendAndWait(
     std::unique_ptr<Message> msg) const {
   int fd = m_command_fd.load();
   if (fd < 0) {
@@ -1263,7 +1263,7 @@ std::unique_ptr<USBCameraImpl::Message> USBCameraImpl::SendAndWait(
   return nullptr;
 }
 
-void USBCameraImpl::Send(std::unique_ptr<Message> msg) const {
+void UsbCameraImpl::Send(std::unique_ptr<Message> msg) const {
   int fd = m_command_fd.load();
   if (fd < 0) {
     // not possible to signal, exit early
@@ -1281,7 +1281,7 @@ void USBCameraImpl::Send(std::unique_ptr<Message> msg) const {
   eventfd_write(fd, 1);
 }
 
-bool USBCameraImpl::CacheProperties(CS_Status* status) const {
+bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   // Wake up camera thread; this will try to reconnect
   auto msg = CreateMessage(Message::kNone);
   msg = std::move(SendAndWait(std::move(msg)));
@@ -1297,9 +1297,9 @@ bool USBCameraImpl::CacheProperties(CS_Status* status) const {
   return true;
 }
 
-bool USBCameraImpl::IsConnected() const { return m_fd >= 0; }
+bool UsbCameraImpl::IsConnected() const { return m_fd >= 0; }
 
-void USBCameraImpl::SetProperty(int property, int value, CS_Status* status) {
+void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetProperty);
   msg->data[0] = property;
   msg->data[1] = value;
@@ -1309,7 +1309,7 @@ void USBCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   DestroyMessage(std::move(msg));
 }
 
-void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value,
+void UsbCameraImpl::SetStringProperty(int property, llvm::StringRef value,
                                       CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetPropertyStr);
   msg->data[0] = property;
@@ -1320,7 +1320,7 @@ void USBCameraImpl::SetStringProperty(int property, llvm::StringRef value,
   DestroyMessage(std::move(msg));
 }
 
-bool USBCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
+bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetMode);
   msg->data[0] = mode.pixelFormat;
   msg->data[1] = mode.width;
@@ -1337,7 +1337,7 @@ bool USBCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   return rv;
 }
 
-bool USBCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
+bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
                                    CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetPixelFormat);
   msg->data[0] = pixelFormat;
@@ -1352,7 +1352,7 @@ bool USBCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
   return rv;
 }
 
-bool USBCameraImpl::SetResolution(int width, int height, CS_Status* status) {
+bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetResolution);
   msg->data[0] = width;
   msg->data[1] = height;
@@ -1367,7 +1367,7 @@ bool USBCameraImpl::SetResolution(int width, int height, CS_Status* status) {
   return rv;
 }
 
-bool USBCameraImpl::SetFPS(int fps, CS_Status* status) {
+bool UsbCameraImpl::SetFPS(int fps, CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetFPS);
   msg->data[0] = fps;
   msg = std::move(SendAndWait(std::move(msg)));
@@ -1381,26 +1381,26 @@ bool USBCameraImpl::SetFPS(int fps, CS_Status* status) {
   return rv;
 }
 
-void USBCameraImpl::NumSinksChanged() {
+void UsbCameraImpl::NumSinksChanged() {
   Send(CreateMessage(Message::kNumSinksChanged));
 }
 
-void USBCameraImpl::NumSinksEnabledChanged() {
+void UsbCameraImpl::NumSinksEnabledChanged() {
   Send(CreateMessage(Message::kNumSinksEnabledChanged));
 }
 
 namespace cs {
 
-CS_Source CreateUSBCameraDev(llvm::StringRef name, int dev, CS_Status* status) {
+CS_Source CreateUsbCameraDev(llvm::StringRef name, int dev, CS_Status* status) {
   llvm::SmallString<32> path;
   llvm::raw_svector_ostream oss{path};
   oss << "/dev/video" << dev;
-  return CreateUSBCameraPath(name, oss.str(), status);
+  return CreateUsbCameraPath(name, oss.str(), status);
 }
 
-CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
+CS_Source CreateUsbCameraPath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status) {
-  auto source = std::make_shared<USBCameraImpl>(name, path);
+  auto source = std::make_shared<UsbCameraImpl>(name, path);
   auto handle = Sources::GetInstance().Allocate(CS_SOURCE_USB, source);
   Notifier::GetInstance().NotifySource(name, handle, CS_SOURCE_CREATED);
   // Start thread after the source created event to ensure other events
@@ -1409,24 +1409,24 @@ CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
   return handle;
 }
 
-std::string GetUSBCameraPath(CS_Source source, CS_Status* status) {
+std::string GetUsbCameraPath(CS_Source source, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data || data->kind != CS_SOURCE_USB) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
   }
-  return static_cast<USBCameraImpl&>(*data->source).GetPath();
+  return static_cast<UsbCameraImpl&>(*data->source).GetPath();
 }
 
-std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {
-  std::vector<USBCameraInfo> retval;
+std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
+  std::vector<UsbCameraInfo> retval;
 
   if (DIR* dp = opendir("/dev")) {
     while (struct dirent* ep = readdir(dp)) {
       llvm::StringRef fname{ep->d_name};
       if (!fname.startswith("video")) continue;
 
-      USBCameraInfo info;
+      UsbCameraInfo info;
       info.dev = -1;
       fname.substr(5).getAsInteger(10, info.dev);
       llvm::SmallString<32> path{"/dev/"};
@@ -1447,7 +1447,7 @@ std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {
 
   // sort by device number
   std::sort(retval.begin(), retval.end(),
-            [](const USBCameraInfo& a, const USBCameraInfo& b) {
+            [](const UsbCameraInfo& a, const UsbCameraInfo& b) {
               return a.dev < b.dev;
             });
 
@@ -1458,23 +1458,23 @@ std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status) {
 
 extern "C" {
 
-CS_Source CS_CreateUSBCameraDev(const char* name, int dev, CS_Status* status) {
-  return cs::CreateUSBCameraDev(name, dev, status);
+CS_Source CS_CreateUsbCameraDev(const char* name, int dev, CS_Status* status) {
+  return cs::CreateUsbCameraDev(name, dev, status);
 }
 
-CS_Source CS_CreateUSBCameraPath(const char* name, const char* path,
+CS_Source CS_CreateUsbCameraPath(const char* name, const char* path,
                                  CS_Status* status) {
-  return cs::CreateUSBCameraPath(name, path, status);
+  return cs::CreateUsbCameraPath(name, path, status);
 }
 
-char* CS_GetUSBCameraPath(CS_Source source, CS_Status* status) {
-  return ConvertToC(cs::GetUSBCameraPath(source, status));
+char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status) {
+  return ConvertToC(cs::GetUsbCameraPath(source, status));
 }
 
-CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status) {
-  auto cameras = cs::EnumerateUSBCameras(status);
-  CS_USBCameraInfo* out = static_cast<CS_USBCameraInfo*>(
-      std::malloc(cameras.size() * sizeof(CS_USBCameraInfo)));
+CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status) {
+  auto cameras = cs::EnumerateUsbCameras(status);
+  CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
+      std::malloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
   *count = cameras.size();
   for (std::size_t i = 0; i < cameras.size(); ++i) {
     out[i].dev = cameras[i].dev;
@@ -1484,7 +1484,7 @@ CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status) {
   return out;
 }
 
-void CS_FreeEnumeratedUSBCameras(CS_USBCameraInfo* cameras, int count) {
+void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count) {
   if (!cameras) return;
   for (int i = 0; i < count; ++i) {
     std::free(cameras[i].path);

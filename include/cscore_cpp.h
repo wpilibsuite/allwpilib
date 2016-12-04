@@ -33,7 +33,7 @@ namespace cs {
 //
 
 /// USB camera information
-struct USBCameraInfo {
+struct UsbCameraInfo {
   /// Device number (e.g. N in '/dev/videoN' on Linux)
   int dev;
   /// Path to device if available (e.g. '/dev/video0' on Linux)
@@ -156,10 +156,10 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
 //
 // Source Creation Functions
 //
-CS_Source CreateUSBCameraDev(llvm::StringRef name, int dev, CS_Status* status);
-CS_Source CreateUSBCameraPath(llvm::StringRef name, llvm::StringRef path,
+CS_Source CreateUsbCameraDev(llvm::StringRef name, int dev, CS_Status* status);
+CS_Source CreateUsbCameraPath(llvm::StringRef name, llvm::StringRef path,
                               CS_Status* status);
-CS_Source CreateHTTPCamera(llvm::StringRef name, llvm::StringRef url,
+CS_Source CreateHttpCamera(llvm::StringRef name, llvm::StringRef url,
                            CS_Status* status);
 CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
                          CS_Status* status);
@@ -199,9 +199,9 @@ CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 
 //
-// USBCamera Source Functions
+// UsbCamera Source Functions
 //
-std::string GetUSBCameraPath(CS_Source source, CS_Status* status);
+std::string GetUsbCameraPath(CS_Source source, CS_Status* status);
 
 //
 // OpenCV Source Functions
@@ -223,7 +223,7 @@ void SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 //
 // Sink Creation Functions
 //
-CS_Sink CreateMJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress,
+CS_Sink CreateMjpegServer(llvm::StringRef name, llvm::StringRef listenAddress,
                           int port, CS_Status* status);
 CS_Sink CreateCvSink(llvm::StringRef name, CS_Status* status);
 CS_Sink CreateCvSinkCallback(llvm::StringRef name,
@@ -249,10 +249,10 @@ CS_Sink CopySink(CS_Sink sink, CS_Status* status);
 void ReleaseSink(CS_Sink sink, CS_Status* status);
 
 //
-// MJPEGServer Sink Functions
+// MjpegServer Sink Functions
 //
-std::string GetMJPEGServerListenAddress(CS_Sink sink, CS_Status* status);
-int GetMJPEGServerPort(CS_Sink sink, CS_Status* status);
+std::string GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status);
+int GetMjpegServerPort(CS_Sink sink, CS_Status* status);
 
 //
 // OpenCV Sink Functions
@@ -281,7 +281,7 @@ bool NotifierDestroyed();
 //
 // Utility Functions
 //
-std::vector<USBCameraInfo> EnumerateUSBCameras(CS_Status* status);
+std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status);
 
 llvm::ArrayRef<CS_Source> EnumerateSourceHandles(
     llvm::SmallVectorImpl<CS_Source>& vec, CS_Status* status);

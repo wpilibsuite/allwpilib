@@ -102,9 +102,9 @@ public class CameraServerJNI {
   //
   // Source Creation Functions
   //
-  public static native int createUSBCameraDev(String name, int dev);
-  public static native int createUSBCameraPath(String name, String path);
-  public static native int createHTTPCamera(String name, String url);
+  public static native int createUsbCameraDev(String name, int dev);
+  public static native int createUsbCameraPath(String name, String path);
+  public static native int createHttpCamera(String name, String url);
   public static native int createCvSource(String name, int pixelFormat, int width, int height, int fps);
 
   //
@@ -128,9 +128,9 @@ public class CameraServerJNI {
   public static native void releaseSource(int source);
 
   //
-  // USBCamera Source Functions
+  // UsbCamera Source Functions
   //
-  public static native String getUSBCameraPath(int source);
+  public static native String getUsbCameraPath(int source);
 
   //
   // OpenCV Source Functions
@@ -145,7 +145,7 @@ public class CameraServerJNI {
   //
   // Sink Creation Functions
   //
-  public static native int createMJPEGServer(String name, String listenAddress, int port);
+  public static native int createMjpegServer(String name, String listenAddress, int port);
   public static native int createCvSink(String name);
   //public static native int createCvSinkCallback(String name,
   //                            void (*processFrame)(long time));
@@ -163,10 +163,10 @@ public class CameraServerJNI {
   public static native void releaseSink(int sink);
 
   //
-  // MJPEGServer Sink Functions
+  // MjpegServer Sink Functions
   //
-  public static native String getMJPEGServerListenAddress(int sink);
-  public static native int getMJPEGServerPort(int sink);
+  public static native String getMjpegServerListenAddress(int sink);
+  public static native int getMjpegServerPort(int sink);
 
   //
   // OpenCV Sink Functions
@@ -187,7 +187,7 @@ public class CameraServerJNI {
   //
   // Utility Functions
   //
-  public static native USBCameraInfo[] enumerateUSBCameras();
+  public static native UsbCameraInfo[] enumerateUsbCameras();
 
   public static native int[] enumerateSources();
 

@@ -152,7 +152,7 @@ std::vector<std::string> GetEnumPropertyChoices(CS_Property property,
 // Source Creation Functions
 //
 
-CS_Source CreateHTTPCamera(llvm::StringRef name, llvm::StringRef url,
+CS_Source CreateHttpCamera(llvm::StringRef name, llvm::StringRef url,
                            CS_Status* status) {
   return 0;  // TODO
 }

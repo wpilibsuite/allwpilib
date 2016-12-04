@@ -169,10 +169,10 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
 //
 // Source Creation Functions
 //
-CS_Source CS_CreateUSBCameraDev(const char* name, int dev, CS_Status* status);
-CS_Source CS_CreateUSBCameraPath(const char* name, const char* path,
+CS_Source CS_CreateUsbCameraDev(const char* name, int dev, CS_Status* status);
+CS_Source CS_CreateUsbCameraPath(const char* name, const char* path,
                                  CS_Status* status);
-CS_Source CS_CreateHTTPCamera(const char* name, const char* url,
+CS_Source CS_CreateHttpCamera(const char* name, const char* url,
                               CS_Status* status);
 CS_Source CS_CreateCvSource(const char* name, const CS_VideoMode* mode,
                             CS_Status* status);
@@ -211,9 +211,9 @@ CS_Source CS_CopySource(CS_Source source, CS_Status* status);
 void CS_ReleaseSource(CS_Source source, CS_Status* status);
 
 //
-// USBCamera Source Functions
+// UsbCamera Source Functions
 //
-char* CS_GetUSBCameraPath(CS_Source source, CS_Status* status);
+char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);
 
 //
 // OpenCV Source Functions
@@ -236,7 +236,7 @@ void CS_SetSourceEnumPropertyChoices(CS_Source source, CS_Property property,
 //
 // Sink Creation Functions
 //
-CS_Sink CS_CreateMJPEGServer(const char* name, const char* listenAddress,
+CS_Sink CS_CreateMjpegServer(const char* name, const char* listenAddress,
                              int port, CS_Status* status);
 CS_Sink CS_CreateCvSink(const char* name, CS_Status* status);
 CS_Sink CS_CreateCvSinkCallback(const char* name, void* data,
@@ -257,10 +257,10 @@ CS_Sink CS_CopySink(CS_Sink sink, CS_Status* status);
 void CS_ReleaseSink(CS_Sink sink, CS_Status* status);
 
 //
-// MJPEGServer Sink Functions
+// MjpegServer Sink Functions
 //
-char* CS_GetMJPEGServerListenAddress(CS_Sink sink, CS_Status* status);
-int CS_GetMJPEGServerPort(CS_Sink sink, CS_Status* status);
+char* CS_GetMjpegServerListenAddress(CS_Sink sink, CS_Status* status);
+int CS_GetMjpegServerPort(CS_Sink sink, CS_Status* status);
 
 //
 // OpenCV Sink Functions
@@ -288,14 +288,14 @@ int CS_NotifierDestroyed(void);
 //
 // Utility Functions
 //
-typedef struct CS_USBCameraInfo {
+typedef struct CS_UsbCameraInfo {
   int dev;
   char* path;
   char* name;
-} CS_USBCameraInfo;
+} CS_UsbCameraInfo;
 
-CS_USBCameraInfo* CS_EnumerateUSBCameras(int* count, CS_Status* status);
-void CS_FreeEnumeratedUSBCameras(CS_USBCameraInfo* cameras, int count);
+CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status);
+void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count);
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status);
 void CS_ReleaseEnumeratedSources(CS_Source* sources, int count);

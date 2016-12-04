@@ -22,14 +22,14 @@
 #include "support/raw_istream.h"
 
 #include "SourceImpl.h"
-#include "USBCameraBuffer.h"
+#include "UsbCameraBuffer.h"
 
 namespace cs {
 
-class USBCameraImpl : public SourceImpl {
+class UsbCameraImpl : public SourceImpl {
  public:
-  USBCameraImpl(llvm::StringRef name, llvm::StringRef path);
-  ~USBCameraImpl() override;
+  UsbCameraImpl(llvm::StringRef name, llvm::StringRef path);
+  ~UsbCameraImpl() override;
 
   void Start();
 
@@ -147,7 +147,7 @@ class USBCameraImpl : public SourceImpl {
 #endif
   // Number of buffers to ask OS for
   static constexpr int kNumBuffers = 4;
-  std::array<USBCameraBuffer, kNumBuffers> m_buffers;
+  std::array<UsbCameraBuffer, kNumBuffers> m_buffers;
 
   //
   // Path never changes, so not protected by mutex.

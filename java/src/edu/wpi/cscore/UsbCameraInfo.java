@@ -8,8 +8,8 @@
 package edu.wpi.cscore;
 
 /// USB camera information
-public class USBCameraInfo {
-  public USBCameraInfo(int dev, String path, String name) {
+public class UsbCameraInfo {
+  public UsbCameraInfo(int dev, String path, String name) {
     this.dev = dev;
     this.path = path;
     this.name = name;

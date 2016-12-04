@@ -85,8 +85,8 @@ class VideoSource {
  public:
   enum Kind {
     kUnknown = CS_SOURCE_UNKNOWN,
-    kUSB = CS_SOURCE_USB,
-    kHTTP = CS_SOURCE_HTTP,
+    kUsb = CS_SOURCE_USB,
+    kHttp = CS_SOURCE_HTTP,
     kCv = CS_SOURCE_CV
   };
 
@@ -190,7 +190,7 @@ class VideoSource {
 };
 
 /// A source that represents a USB camera.
-class USBCamera : public VideoSource {
+class UsbCamera : public VideoSource {
  private:
   static constexpr char const* kPropWbAuto = "white_balance_temperature_auto";
   static constexpr char const* kPropWbValue = "white_balance_temperature";
@@ -207,21 +207,21 @@ class USBCamera : public VideoSource {
     kFixedFlourescent2 = 5200
   };
 
-  USBCamera() = default;
+  UsbCamera() = default;
 
   /// Create a source for a USB camera based on device number.
   /// @param name Source name (arbitrary unique identifier)
   /// @param dev Device number (e.g. 0 for /dev/video0)
-  USBCamera(llvm::StringRef name, int dev);
+  UsbCamera(llvm::StringRef name, int dev);
 
   /// Create a source for a USB camera based on device path.
   /// @param name Source name (arbitrary unique identifier)
   /// @param path Path to device (e.g. "/dev/video0" on Linux)
-  USBCamera(llvm::StringRef name, llvm::StringRef path);
+  UsbCamera(llvm::StringRef name, llvm::StringRef path);
 
   /// Enumerate USB cameras on the local system.
   /// @return Vector of USB camera information (one for each camera)
-  static std::vector<USBCameraInfo> EnumerateUSBCameras();
+  static std::vector<UsbCameraInfo> EnumerateUsbCameras();
 
   /// Get the path to the device.
   std::string GetPath() const;
@@ -252,12 +252,12 @@ class USBCamera : public VideoSource {
 };
 
 /// A source that represents a MJPEG-over-HTTP (IP) camera.
-class HTTPCamera : public VideoSource {
+class HttpCamera : public VideoSource {
  public:
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
-  HTTPCamera(llvm::StringRef name, llvm::StringRef url);
+  HttpCamera(llvm::StringRef name, llvm::StringRef url);
 };
 
 /// A source for user code to provide OpenCV images as video frames.
@@ -325,7 +325,7 @@ class VideoSink {
  public:
   enum Kind {
     kUnknown = CS_SINK_UNKNOWN,
-    kMJPEG = CS_SINK_MJPEG,
+    kMjpeg = CS_SINK_MJPEG,
     kCv = CS_SINK_CV
   };
 
@@ -391,20 +391,20 @@ class VideoSink {
 };
 
 /// A sink that acts as a MJPEG-over-HTTP network server.
-class MJPEGServer : public VideoSink {
+class MjpegServer : public VideoSink {
  public:
-  MJPEGServer() = default;
+  MjpegServer() = default;
 
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
   /// @param listenAddress TCP listen address (empty string for all addresses)
   /// @param port TCP port number
-  MJPEGServer(llvm::StringRef name, llvm::StringRef listenAddress, int port);
+  MjpegServer(llvm::StringRef name, llvm::StringRef listenAddress, int port);
 
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
   /// @param port TCP port number
-  MJPEGServer(llvm::StringRef name, int port) : MJPEGServer(name, "", port) {}
+  MjpegServer(llvm::StringRef name, int port) : MjpegServer(name, "", port) {}
 
   /// Get the listen address of the server.
   std::string GetListenAddress() const;

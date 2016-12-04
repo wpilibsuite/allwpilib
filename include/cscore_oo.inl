@@ -160,25 +160,25 @@ inline std::vector<VideoMode> VideoSource::EnumerateVideoModes() const {
   return EnumerateSourceVideoModes(m_handle, &status);
 }
 
-inline USBCamera::USBCamera(llvm::StringRef name, int dev) {
-  m_handle = CreateUSBCameraDev(name, dev, &m_status);
+inline UsbCamera::UsbCamera(llvm::StringRef name, int dev) {
+  m_handle = CreateUsbCameraDev(name, dev, &m_status);
 }
 
-inline USBCamera::USBCamera(llvm::StringRef name, llvm::StringRef path) {
-  m_handle = CreateUSBCameraPath(name, path, &m_status);
+inline UsbCamera::UsbCamera(llvm::StringRef name, llvm::StringRef path) {
+  m_handle = CreateUsbCameraPath(name, path, &m_status);
 }
 
-inline std::vector<USBCameraInfo> USBCamera::EnumerateUSBCameras() {
+inline std::vector<UsbCameraInfo> UsbCamera::EnumerateUsbCameras() {
   CS_Status status = 0;
-  return ::cs::EnumerateUSBCameras(&status);
+  return ::cs::EnumerateUsbCameras(&status);
 }
 
-inline std::string USBCamera::GetPath() const {
-  CS_Status status = 0;
-  return ::cs::GetUSBCameraPath(m_handle, &status);
+inline std::string UsbCamera::GetPath() const {
+  m_status = 0;
+  return ::cs::GetUsbCameraPath(m_handle, &m_status);
 }
 
-inline void USBCamera::SetBrightness(int brightness) {
+inline void UsbCamera::SetBrightness(int brightness) {
   if (brightness > 100) {
     brightness = 100;
   } else if (brightness < 0) {
@@ -187,32 +187,32 @@ inline void USBCamera::SetBrightness(int brightness) {
   GetProperty(kPropBrValue).Set(brightness);
 }
 
-inline int USBCamera::GetBrightness() {
+inline int UsbCamera::GetBrightness() {
   return GetProperty(kPropBrValue).Get();
 }
 
-inline void USBCamera::SetWhiteBalanceAuto() {
+inline void UsbCamera::SetWhiteBalanceAuto() {
   GetProperty(kPropWbAuto).Set(1);  // auto
 }
 
-inline void USBCamera::SetWhiteBalanceHoldCurrent() {
+inline void UsbCamera::SetWhiteBalanceHoldCurrent() {
   GetProperty(kPropWbAuto).Set(0);  // manual
 }
 
-inline void USBCamera::SetWhiteBalanceManual(int value) {
+inline void UsbCamera::SetWhiteBalanceManual(int value) {
   GetProperty(kPropWbAuto).Set(0);  // manual
   GetProperty(kPropWbValue).Set(value);
 }
 
-inline void USBCamera::SetExposureAuto() {
+inline void UsbCamera::SetExposureAuto() {
   GetProperty(kPropExAuto).Set(0);  // auto; yes, this is opposite of WB
 }
 
-inline void USBCamera::SetExposureHoldCurrent() {
+inline void UsbCamera::SetExposureHoldCurrent() {
   GetProperty(kPropExAuto).Set(1);  // manual
 }
 
-inline void USBCamera::SetExposureManual(int value) {
+inline void UsbCamera::SetExposureManual(int value) {
   GetProperty(kPropExAuto).Set(1);  // manual
   if (value > 100) {
     value = 100;
@@ -222,8 +222,8 @@ inline void USBCamera::SetExposureManual(int value) {
   GetProperty(kPropExValue).Set(value);
 }
 
-inline HTTPCamera::HTTPCamera(llvm::StringRef name, llvm::StringRef url) {
-  m_handle = CreateHTTPCamera(name, url, &m_status);
+inline HttpCamera::HttpCamera(llvm::StringRef name, llvm::StringRef url) {
+  m_handle = CreateHttpCamera(name, url, &m_status);
 }
 
 inline CvSource::CvSource(llvm::StringRef name, const VideoMode& mode) {
@@ -323,19 +323,19 @@ inline VideoProperty VideoSink::GetSourceProperty(llvm::StringRef name) {
   return VideoProperty{GetSinkSourceProperty(m_handle, name, &m_status)};
 }
 
-inline MJPEGServer::MJPEGServer(llvm::StringRef name,
+inline MjpegServer::MjpegServer(llvm::StringRef name,
                                 llvm::StringRef listenAddress, int port) {
-  m_handle = CreateMJPEGServer(name, listenAddress, port, &m_status);
+  m_handle = CreateMjpegServer(name, listenAddress, port, &m_status);
 }
 
-inline std::string MJPEGServer::GetListenAddress() const {
+inline std::string MjpegServer::GetListenAddress() const {
   m_status = 0;
-  return cs::GetMJPEGServerListenAddress(m_handle, &m_status);
+  return cs::GetMjpegServerListenAddress(m_handle, &m_status);
 }
 
-inline int MJPEGServer::GetPort() const {
+inline int MjpegServer::GetPort() const {
   m_status = 0;
-  return cs::GetMJPEGServerPort(m_handle, &m_status);
+  return cs::GetMjpegServerPort(m_handle, &m_status);
 }
 
 inline CvSink::CvSink(llvm::StringRef name) {
