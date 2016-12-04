@@ -8,6 +8,7 @@
 #ifndef CS_SOURCEIMPL_H_
 #define CS_SOURCEIMPL_H_
 
+#include <atomic>
 #include <condition_variable>
 #include <cstddef>
 #include <memory>
@@ -37,7 +38,8 @@ class SourceImpl {
   void SetDescription(llvm::StringRef description);
   llvm::StringRef GetDescription(llvm::SmallVectorImpl<char>& buf) const;
 
-  virtual bool IsConnected() const = 0;
+  void SetConnected(bool connected);
+  bool IsConnected() const { return m_connected; }
 
   // Functions to keep track of the overall number of sinks connected to this
   // source.  Primarily used by sinks to determine if other sinks are using
@@ -210,6 +212,8 @@ class SourceImpl {
   // Pool of frame data to reduce malloc traffic.
   std::mutex m_poolMutex;
   std::vector<std::unique_ptr<Frame::Data>> m_framesAvail;
+
+  std::atomic_bool m_connected{false};
 };
 
 }  // namespace cs

@@ -23,8 +23,6 @@ class CvSourceImpl : public SourceImpl {
 
   void Start();
 
-  bool IsConnected() const override;
-
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
   void SetStringProperty(int property, llvm::StringRef value,
@@ -38,7 +36,6 @@ class CvSourceImpl : public SourceImpl {
   // OpenCV-specific functions
   void PutFrame(cv::Mat& image);
   void NotifyError(llvm::StringRef msg);
-  void SetConnected(bool connected);
   int CreateProperty(llvm::StringRef name, CS_PropertyKind kind, int minimum,
                      int maximum, int step, int defaultValue, int value);
   int CreateProperty(llvm::StringRef name, CS_PropertyKind kind, int minimum,

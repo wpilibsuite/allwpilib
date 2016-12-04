@@ -11,6 +11,7 @@
 #include <cstring>
 
 #include "Log.h"
+#include "Notifier.h"
 
 using namespace cs;
 
@@ -42,6 +43,14 @@ llvm::StringRef SourceImpl::GetDescription(
   std::lock_guard<std::mutex> lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return llvm::StringRef{buf.data(), buf.size()};
+}
+
+void SourceImpl::SetConnected(bool connected) {
+  bool wasConnected = m_connected.exchange(connected);
+  if (wasConnected && !connected)
+    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_DISCONNECTED);
+  else if (!wasConnected && connected)
+    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
 }
 
 uint64_t SourceImpl::GetCurFrameTime() {

@@ -595,7 +595,7 @@ void UsbCameraImpl::DeviceDisconnect() {
   close(fd);
 
   // Notify
-  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_DISCONNECTED);
+  SetConnected(false);
 }
 
 void UsbCameraImpl::DeviceConnect() {
@@ -691,7 +691,7 @@ void UsbCameraImpl::DeviceConnect() {
   SetDescription(GetDescriptionImpl(m_path.c_str()));
 
   // Notify
-  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
+  SetConnected(true);
 }
 
 bool UsbCameraImpl::DeviceStreamOn() {
@@ -1296,8 +1296,6 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   }
   return true;
 }
-
-bool UsbCameraImpl::IsConnected() const { return m_fd >= 0; }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
   auto msg = CreateMessage(Message::kCmdSetProperty);

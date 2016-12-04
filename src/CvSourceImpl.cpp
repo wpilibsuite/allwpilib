@@ -37,8 +37,6 @@ void CvSourceImpl::Start() {
       CreateProperty("jpeg_quality", CS_PROP_INTEGER, 0, 100, 1, 80, 80);
 }
 
-bool CvSourceImpl::IsConnected() const { return m_connected; }
-
 bool CvSourceImpl::CacheProperties(CS_Status* status) const {
   // Doesn't need to do anything.
   m_properties_cached = true;
@@ -110,14 +108,6 @@ void CvSourceImpl::PutFrame(cv::Mat& image) {
 
 void CvSourceImpl::NotifyError(llvm::StringRef msg) {
   PutError(msg, wpi::Now());
-}
-
-void CvSourceImpl::SetConnected(bool connected) {
-  bool was_connected = m_connected.exchange(connected);
-  if (was_connected && !connected)
-    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_DISCONNECTED);
-  else if (!was_connected && connected)
-    Notifier::GetInstance().NotifySource(*this, CS_SOURCE_CONNECTED);
 }
 
 int CvSourceImpl::CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
