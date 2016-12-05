@@ -54,11 +54,11 @@ apply from: "dependencies.gradle"
 
 ext.setupDefines = { project, binaries ->
     binaries.all {
-	if (project.hasProperty('debug')) {
-	    project.setupDebugDefines(cppCompiler, linker)
-	} else {
-	    project.setupReleaseDefines(cppCompiler, linker)
-	}
+        if (project.hasProperty('debug')) {
+            project.setupDebugDefines(cppCompiler, linker)
+        } else {
+            project.setupReleaseDefines(cppCompiler, linker)
+        }
         tasks.withType(CppCompile) {
             if (!project.hasProperty('compilerPrefix') && targetPlatform.architecture.name == 'arm-v7') {
                 project.addWpiUtilSharedLibraryLinks(it, linker, targetPlatform)

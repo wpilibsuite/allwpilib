@@ -15,11 +15,11 @@ if (OperatingSystem.current().isLinux()) {
 
 model {
     platforms {
-	x86 {
-	    architecture 'x86'
-	}
-	x64 {
-	    architecture 'x86_64'
-	}
+        x86 {
+            architecture 'x86'
+        }
+        x64 {
+            architecture 'x86_64'
+        }
     }
 }

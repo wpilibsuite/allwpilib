@@ -4,10 +4,10 @@ ext.buildPlatform = 'arm'
 def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPrefix : 'arm-frc-linux-gnueabi-'
 model {
     platforms {
-	arm {
-	    architecture 'arm'
-	    operatingSystem 'linux'
-	}
+        arm {
+            architecture 'arm'
+            operatingSystem 'linux'
+        }
     }
     toolChains {
         gcc(Gcc) {
