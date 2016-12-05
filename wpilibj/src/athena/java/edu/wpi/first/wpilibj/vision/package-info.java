@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2016. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,7 @@
 /**
  * Classes in the {@code edu.wpi.first.wpilibj.vision} package are designed to
  * simplify using OpenCV vision processing code from a robot program.
- * <p>
+ *
  * <p>An example usecase for finding targets:
  * <br>
  * <pre><code>
@@ -29,9 +29,6 @@
  *
  *      // The pipeline outputs we want
  *      private List&lt;MatOfPoint&gt; goalContours = null;
- *
- *      // The last known absolute (field-oriented) angle needed to turn to face the goal
- *      private double lastKnownAngleToGoal = 0;
  *
  *     {@literal @}Override
  *      public void {@link edu.wpi.first.wpilibj.vision.VisionRunner.Listener#copyPipelineOutputs() copyPipelineOutputs()} {
