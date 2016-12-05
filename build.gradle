@@ -60,7 +60,7 @@ ext.setupDefines = { project, binaries ->
 	    project.setupReleaseDefines(cppCompiler, linker)
 	}
         tasks.withType(CppCompile) {
-            if (project.hasProperty('compilerPrefix') && project.targetPlatform.arm) {
+            if (!project.hasProperty('compilerPrefix') && targetPlatform.architecture.name == 'arm-v7') {
                 project.addWpiUtilSharedLibraryLinks(it, linker, targetPlatform)
             } else {
                 project.addWpiUtilStaticLibraryLinks(it, linker, targetPlatform)
