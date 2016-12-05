@@ -9,7 +9,7 @@
  * Classes in the {@code edu.wpi.first.wpilibj.vision} package are designed to
  * simplify using OpenCV vision processing code from a robot program.
  *
- * <p>An example usecase for finding targets:
+ * <p>An example usecase:
  * <br>
  * <pre><code>
  * public class Robot extends IterativeRobot implements VisionRunner.Listener {
@@ -31,7 +31,8 @@
  *      private List&lt;MatOfPoint&gt; goalContours = null;
  *
  *     {@literal @}Override
- *      public void {@link edu.wpi.first.wpilibj.vision.VisionRunner.Listener#copyPipelineOutputs() copyPipelineOutputs()} {
+ *      public void {@link edu.wpi.first.wpilibj.vision.VisionRunner.Listener#copyPipelineOutputs()
+ *              copyPipelineOutputs()} {
  *          synchronized (visionLock) {
  *              // Take a snapshot of the pipeline's output because
  *              // it may have changed the next time this method is called!

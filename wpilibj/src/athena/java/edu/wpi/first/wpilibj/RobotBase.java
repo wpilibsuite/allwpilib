@@ -40,7 +40,8 @@ public abstract class RobotBase {
   /**
    * The ID of the main Java thread.
    */
-  public static final long MAIN_THREAD_ID = Thread.currentThread().getId(); // This is usually 1, but it's best to make sure
+  // This is usually 1, but it is best to make sure
+  public static final long MAIN_THREAD_ID = Thread.currentThread().getId();
 
   protected final DriverStation m_ds;
 

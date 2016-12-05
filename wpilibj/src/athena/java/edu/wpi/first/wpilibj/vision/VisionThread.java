@@ -8,8 +8,9 @@
 package edu.wpi.first.wpilibj.vision;
 
 /**
- * A vision thread is a special thread that runs a vision pipeline. These threads are <i>daemon</i> threads; they do not
- * prevent the program from exiting when all other non-daemon threads have finished running.
+ * A vision thread is a special thread that runs a vision pipeline. It is a <i>daemon</i> thread;
+ * it does not prevent the program from exiting when all other non-daemon threads
+ * have finished running.
  *
  * @see VisionPipeline
  * @see VisionRunner
@@ -23,7 +24,7 @@ public class VisionThread extends Thread {
    * @param visionRunner the runner for a vision pipeline
    */
   public VisionThread(VisionRunner visionRunner) {
-    super(visionRunner::runForever, "WPILib vision thread");
+    super(visionRunner::runForever, "WPILib Vision Thread");
     setDaemon(true);
   }
 
