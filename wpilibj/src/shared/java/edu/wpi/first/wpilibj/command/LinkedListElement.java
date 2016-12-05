@@ -46,6 +46,7 @@ class LinkedListElement {
     }
   }
 
+  @SuppressWarnings("PMD.EmptyIfStmt")
   public LinkedListElement remove() {
     if (m_previous == null && m_next == null) {
       // no-op

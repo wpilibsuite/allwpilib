@@ -12,7 +12,6 @@ import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
-import edu.wpi.cscore.VideoEvent;
 import edu.wpi.cscore.VideoException;
 import edu.wpi.cscore.VideoListener;
 import edu.wpi.cscore.VideoMode;
@@ -86,7 +85,7 @@ public class CameraServer {
     return m_tables.get(source);
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
   private synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {

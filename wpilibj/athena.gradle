@@ -99,6 +99,10 @@ jar {
     from sourceSets.shared.output
 }
 
+pmd {
+    sourceSets = [sourceSets.shared, sourceSets.athena]
+}
+
 task wpilibjSources(type: Jar, dependsOn: classes) {
     description = 'Creates the sources jar for the maven publishing routine'
     group = 'WPILib'

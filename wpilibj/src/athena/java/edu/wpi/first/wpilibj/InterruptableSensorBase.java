@@ -75,7 +75,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
     allocateInterrupts(false);
 
-    assert (m_interrupt != 0);
+    assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
                                    getAnalogTriggerTypeForRouting());
@@ -96,7 +96,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
 
     allocateInterrupts(true);
 
-    assert (m_interrupt != 0);
+    assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
                                    getAnalogTriggerTypeForRouting());

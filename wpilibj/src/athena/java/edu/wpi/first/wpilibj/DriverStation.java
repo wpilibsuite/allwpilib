@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import edu.wpi.first.wpilibj.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.hal.ControlWord;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.PowerJNI;
 
 /**
@@ -191,7 +190,7 @@ public class DriverStation implements RobotState.Interface {
     if (traces.length > 3) {
       locString = traces[3].toString();
     } else {
-      locString = new String();
+      locString = "";
     }
     boolean haveLoc = false;
     String traceString = " at ";
@@ -855,7 +854,7 @@ public class DriverStation implements RobotState.Interface {
   private void updateControlWord(boolean force) {
     long now = System.currentTimeMillis();
     synchronized (m_controlWordMutex) {
-      if ((now - m_lastControlWordUpdate > 50) || force) {
+      if (now - m_lastControlWordUpdate > 50 || force) {
         HAL.getControlWord(m_controlWordCache);
         m_lastControlWordUpdate = now;
       }

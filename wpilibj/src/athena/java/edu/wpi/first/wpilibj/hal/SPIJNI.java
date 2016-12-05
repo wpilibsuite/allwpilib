@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.hal;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 
 @SuppressWarnings("AbbreviationAsWordInName")

@@ -83,6 +83,7 @@ public class SampleRobot extends RobotBase {
    * Test code should go here. Users should add test code to this method that should run while the
    * robot is in test mode.
    */
+  @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void test() {
     System.out.println("Default test() method running, consider providing your own");
   }

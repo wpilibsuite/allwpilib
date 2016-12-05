@@ -89,10 +89,10 @@ public abstract class SensorBase {
   protected static void checkSolenoidModule(final int moduleNumber) {
     if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested solenoid module is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kPCMModules);
-      buf.append(", Requested: ");
-      buf.append(moduleNumber);
+      buf.append("Requested solenoid module is out of range. Minimumm: 0, Maximum: ")
+        .append(kPCMModules)
+        .append(", Requested: ")
+        .append(moduleNumber);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }
@@ -106,10 +106,10 @@ public abstract class SensorBase {
   protected static void checkDigitalChannel(final int channel) {
     if (!DIOJNI.checkDIOChannel(channel)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested DIO channel is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kDigitalChannels);
-      buf.append(", Requested: ");
-      buf.append(channel);
+      buf.append("Requested DIO channel is out of range. Minimumm: 0, Maximum: ")
+        .append(kDigitalChannels)
+        .append(", Requested: ")
+        .append(channel);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }
@@ -123,10 +123,10 @@ public abstract class SensorBase {
   protected static void checkRelayChannel(final int channel) {
     if (!RelayJNI.checkRelayChannel(channel)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested relay channel is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kRelayChannels);
-      buf.append(", Requested: ");
-      buf.append(channel);
+      buf.append("Requested relay channel is out of range. Minimumm: 0, Maximum: ")
+        .append(kRelayChannels)
+        .append(", Requested: ")
+        .append(channel);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }
@@ -140,10 +140,10 @@ public abstract class SensorBase {
   protected static void checkPWMChannel(final int channel) {
     if (!PWMJNI.checkPWMChannel(channel)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested PWM channel is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kPwmChannels);
-      buf.append(", Requested: ");
-      buf.append(channel);
+      buf.append("Requested PWM channel is out of range. Minimumm: 0, Maximum: ")
+        .append(kPwmChannels)
+        .append(", Requested: ")
+        .append(channel);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }
@@ -157,10 +157,10 @@ public abstract class SensorBase {
   protected static void checkAnalogInputChannel(final int channel) {
     if (!AnalogJNI.checkAnalogInputChannel(channel)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested analog input channel is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kAnalogInputChannels);
-      buf.append(", Requested: ");
-      buf.append(channel);
+      buf.append("Requested analog input channel is out of range. Minimumm: 0, Maximum: ")
+        .append(kAnalogInputChannels)
+        .append(", Requested: ")
+        .append(channel);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }
@@ -174,10 +174,10 @@ public abstract class SensorBase {
   protected static void checkAnalogOutputChannel(final int channel) {
     if (!AnalogJNI.checkAnalogOutputChannel(channel)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested analog output channel is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kAnalogOutputChannels);
-      buf.append(", Requested: ");
-      buf.append(channel);
+      buf.append("Requested analog output channel is out of range. Minimumm: 0, Maximum: ")
+        .append(kAnalogOutputChannels)
+        .append(", Requested: ")
+        .append(channel);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }
@@ -190,10 +190,10 @@ public abstract class SensorBase {
   protected static void checkSolenoidChannel(final int channel) {
     if (!SolenoidJNI.checkSolenoidChannel(channel)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested solenoid channel is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kSolenoidChannels);
-      buf.append(", Requested: ");
-      buf.append(channel);
+      buf.append("Requested solenoid channel is out of range. Minimumm: 0, Maximum: ")
+        .append(kSolenoidChannels)
+        .append(", Requested: ")
+        .append(channel);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }
@@ -207,10 +207,10 @@ public abstract class SensorBase {
   protected static void checkPDPChannel(final int channel) {
     if (!PDPJNI.checkPDPChannel(channel)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested PDP channel is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kPDPChannels);
-      buf.append(", Requested: ");
-      buf.append(channel);
+      buf.append("Requested PDP channel is out of range. Minimumm: 0, Maximum: ")
+        .append(kPDPChannels)
+        .append(", Requested: ")
+        .append(channel);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }
@@ -223,10 +223,10 @@ public abstract class SensorBase {
   protected static void checkPDPModule(final int module) {
     if (!PDPJNI.checkPDPModule(module)) {
       StringBuilder buf = new StringBuilder();
-      buf.append("Requested PDP module is out of range. Minimumm: 0, Maximum: ");
-      buf.append(kPDPModules);
-      buf.append(", Requested: ");
-      buf.append(module);
+      buf.append("Requested PDP module is out of range. Minimumm: 0, Maximum: ")
+        .append(kPDPModules)
+        .append(", Requested: ")
+        .append(module);
       throw new IndexOutOfBoundsException(buf.toString());
     }
   }

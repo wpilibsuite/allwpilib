@@ -39,10 +39,9 @@ public abstract class Trigger implements Sendable {
    *
    * @return whether get() return true or the internal table for SmartDashboard use is pressed.
    */
+  @SuppressWarnings("PMD.UselessParentheses")
   private boolean grab() {
-    // FIXME make is connected work?
-    return get()
-        || (m_table != null /* && m_table.isConnected() */ && m_table.getBoolean("pressed", false));
+    return get() || (m_table != null && m_table.getBoolean("pressed", false));
 
   }
 
