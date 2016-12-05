@@ -312,21 +312,14 @@ void RobotDrive::TankDrive(double leftValue, double rightValue,
     reported = true;
   }
 
-  // square the inputs (while preserving the sign) to increase fine control
-  // while permitting full power
   leftValue = Limit(leftValue);
   rightValue = Limit(rightValue);
+
+  // square the inputs (while preserving the sign) to increase fine control
+  // while permitting full power
   if (squaredInputs) {
-    if (leftValue >= 0.0) {
-      leftValue = (leftValue * leftValue);
-    } else {
-      leftValue = -(leftValue * leftValue);
-    }
-    if (rightValue >= 0.0) {
-      rightValue = (rightValue * rightValue);
-    } else {
-      rightValue = -(rightValue * rightValue);
-    }
+    leftValue = SquarePreserveSign(leftValue);
+    rightValue = SquarePreserveSign(rightValue);
   }
 
   SetLeftRightMotorOutputs(leftValue, rightValue);
@@ -443,19 +436,11 @@ void RobotDrive::ArcadeDrive(double moveValue, double rotateValue,
   moveValue = Limit(moveValue);
   rotateValue = Limit(rotateValue);
 
+  // square the inputs (while preserving the sign) to increase fine control
+  // while permitting full power
   if (squaredInputs) {
-    // square the inputs (while preserving the sign) to increase fine control
-    // while permitting full power
-    if (moveValue >= 0.0) {
-      moveValue = (moveValue * moveValue);
-    } else {
-      moveValue = -(moveValue * moveValue);
-    }
-    if (rotateValue >= 0.0) {
-      rotateValue = (rotateValue * rotateValue);
-    } else {
-      rotateValue = -(rotateValue * rotateValue);
-    }
+    moveValue = SquarePreserveSign(moveValue);
+    rotateValue = SquarePreserveSign(rotateValue);
   }
 
   if (moveValue > 0.0) {
@@ -625,14 +610,21 @@ void RobotDrive::SetLeftRightMotorOutputs(double leftOutput,
 /**
  * Limit motor values to the -1.0 to +1.0 range.
  */
-double RobotDrive::Limit(double num) {
-  if (num > 1.0) {
+double RobotDrive::Limit(double number) {
+  if (number > 1.0) {
     return 1.0;
   }
-  if (num < -1.0) {
+  if (number < -1.0) {
     return -1.0;
   }
-  return num;
+  return number;
+}
+
+/**
+ * Squares the number but preserves the sign.
+ */
+double RobotDrive::SquarePreserveSign(double number) {
+  return std::copysign(number * number, number);
 }
 
 /**
