@@ -8,13 +8,10 @@
 package edu.wpi.first.wpilibj.hal;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 
-//
-// base class for all JNI wrappers
-//
+/**
+ * Base class for all JNI wrappers.
+ */
 public class JNIWrapper {
   static boolean libraryLoaded = false;
   static File jniLibrary = null;

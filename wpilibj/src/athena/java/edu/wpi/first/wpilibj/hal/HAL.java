@@ -9,8 +9,6 @@ package edu.wpi.first.wpilibj.hal;
 
 import java.nio.ByteBuffer;
 
-import edu.wpi.first.wpilibj.hal.JNIWrapper;
-
 /**
  * JNI Wrapper for HAL<br>.
  */

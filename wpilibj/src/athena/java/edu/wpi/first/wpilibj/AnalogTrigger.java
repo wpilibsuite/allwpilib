@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Class for creating and configuring Analog Triggers.
  */

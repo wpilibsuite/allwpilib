@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import edu.wpi.first.wpilibj.hal.JNIWrapper;
-
 /**
  * JNI wrapper for library <b>FRC_NetworkCommunication</b><br>.
  */
