@@ -12,20 +12,16 @@ import org.opencv.core.Mat;
 /**
  * A vision pipeline is responsible for running a group of
  * OpenCV algorithms to extract data from an image.
+ *
+ * @see VisionRunner
+ * @see VisionThread
  */
 public interface VisionPipeline {
-
-  /**
-   * Sets the image input to this vision pipeline. This should be called before {@link #process()}.
-   *
-   * @param image the image to extract data from
-   */
-  void setImageInput(Mat image);
 
   /**
    * Processes the image input and sets the result objects.
    * Implementations should make these objects accessible.
    */
-  void process();
+  void process(Mat image);
 
 }
