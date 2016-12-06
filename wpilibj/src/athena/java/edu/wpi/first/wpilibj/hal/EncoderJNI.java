@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import java.nio.IntBuffer;
-
 public class EncoderJNI extends JNIWrapper {
 
   public static native int initializeEncoder(int digitalSourceHandleA, int analogTriggerTypeA,
