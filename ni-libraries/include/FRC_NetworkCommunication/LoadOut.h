@@ -3,7 +3,7 @@
 #define __LoadOut_h__
 
 #ifdef _WIN32
-#include <vxWorks_compat.h>
+#include <windows.h>
 #define EXPORT_FUNC __declspec(dllexport) __cdecl
 #elif defined (__vxworks)
 #include <vxWorks.h>

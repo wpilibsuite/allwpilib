@@ -15,7 +15,7 @@
 #define __FRC_COMM_H__
 
 #ifdef _WIN32
-# include <windows.h>
+#include <windows.h>
 #ifdef USE_THRIFT
 #  define EXPORT_FUNC
 # else

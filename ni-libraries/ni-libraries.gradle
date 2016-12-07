@@ -16,7 +16,8 @@ task patchNiLibraries() {
         netTree.each {File file ->
             String contents = file.getText('UTF-8') 
             contents = contents.replaceAll('#ifdef WIN32', '#ifdef _WIN32')
-            contents = contents.replaceAll('# include <vxWorks_compat.h>', '# include <windows.h>')
+            contents = contents.replaceAll('# include <vxWorks_compat.h>', '#include <windows.h>')
+            contents = contents.replaceAll('#include <vxWorks_compat.h>', '#include <windows.h>')
             file.write(contents, 'UTF-8')
         }
 
