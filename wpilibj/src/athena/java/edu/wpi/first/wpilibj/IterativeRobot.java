@@ -185,6 +185,7 @@ public class IterativeRobot extends RobotBase {
    * <p>Users should override this method for initialization code which will be called each time the
    * robot enters test mode.
    */
+  @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testInit() {
     System.out.println("Default IterativeRobot.testInit() method... Overload me!");
   }
@@ -283,6 +284,7 @@ public class IterativeRobot extends RobotBase {
    * disconnected.  For most use cases the variable timing will not be an issue.  If your code does
    * require guaranteed fixed periodic timing, consider using Notifier or PIDController instead.
    */
+  @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
   public void testPeriodic() {
     if (m_tmpFirstRun) {
       System.out.println("Default IterativeRobot.testPeriodic() method... Overload me!");

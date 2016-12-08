@@ -282,12 +282,12 @@ public class RobotDrive implements MotorSafety {
     rightValue = limit(rightValue);
     if (squaredInputs) {
       if (leftValue >= 0.0) {
-        leftValue = (leftValue * leftValue);
+        leftValue = leftValue * leftValue;
       } else {
         leftValue = -(leftValue * leftValue);
       }
       if (rightValue >= 0.0) {
-        rightValue = (rightValue * rightValue);
+        rightValue = rightValue * rightValue;
       } else {
         rightValue = -(rightValue * rightValue);
       }
@@ -395,12 +395,12 @@ public class RobotDrive implements MotorSafety {
       // square the inputs (while preserving the sign) to increase fine control
       // while permitting full power
       if (moveValue >= 0.0) {
-        moveValue = (moveValue * moveValue);
+        moveValue = moveValue * moveValue;
       } else {
         moveValue = -(moveValue * moveValue);
       }
       if (rotateValue >= 0.0) {
-        rotateValue = (rotateValue * rotateValue);
+        rotateValue = rotateValue * rotateValue;
       } else {
         rotateValue = -(rotateValue * rotateValue);
       }

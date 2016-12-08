@@ -153,7 +153,7 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
    */
   public boolean isFwdSolenoidBlackListed() {
     int blackList = getPCMSolenoidBlackList();
-    return ((blackList & m_forwardMask) != 0);
+    return (blackList & m_forwardMask) != 0;
   }
 
   /**
@@ -165,7 +165,7 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
    */
   public boolean isRevSolenoidBlackListed() {
     int blackList = getPCMSolenoidBlackList();
-    return ((blackList & m_reverseMask) != 0);
+    return (blackList & m_reverseMask) != 0;
   }
 
   /*

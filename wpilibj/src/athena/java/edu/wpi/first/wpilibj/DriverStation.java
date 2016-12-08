@@ -190,7 +190,7 @@ public class DriverStation implements RobotState.Interface {
     if (traces.length > 3) {
       locString = traces[3].toString();
     } else {
-      locString = new String();
+      locString = "";
     }
     boolean haveLoc = false;
     String traceString = " at ";
@@ -854,7 +854,7 @@ public class DriverStation implements RobotState.Interface {
   private void updateControlWord(boolean force) {
     long now = System.currentTimeMillis();
     synchronized (m_controlWordMutex) {
-      if ((now - m_lastControlWordUpdate > 50) || force) {
+      if (now - m_lastControlWordUpdate > 50 || force) {
         HAL.getControlWord(m_controlWordCache);
         m_lastControlWordUpdate = now;
       }
