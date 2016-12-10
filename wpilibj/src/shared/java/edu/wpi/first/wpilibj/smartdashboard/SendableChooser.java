@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
@@ -38,12 +38,10 @@ public class SendableChooser implements Sendable {
    */
   private static final String OPTIONS = "options";
   /**
-   * A table linking strings to the objects the represent.
+   * A map linking strings to the objects the represent.
    */
-  private final ArrayList<String> m_choices = new ArrayList<>();
-  private final ArrayList<Object> m_values = new ArrayList<>();
+  private final HashMap<String, Object> m_map = new HashMap<>();
   private String m_defaultChoice = null;
-  private Object m_defaultValue = null;
 
   /**
    * Instantiates a {@link SendableChooser}.
@@ -64,19 +62,10 @@ public class SendableChooser implements Sendable {
       addDefault(name, object);
       return;
     }
-    for (int i = 0; i < m_choices.size(); ++i) {
-      if (m_choices.get(i).equals(name)) {
-        m_choices.set(i, name);
-        m_values.set(i, object);
-        return;
-      }
-    }
-    // not found
-    m_choices.add(name);
-    m_values.add(object);
+    m_map.put(name, object);
 
     if (m_table != null) {
-      m_table.putStringArray(OPTIONS, m_choices.toArray(new String[0]));
+      m_table.putStringArray(OPTIONS, m_map.keySet().toArray(new String[0]));
     }
   }
 
@@ -94,7 +83,6 @@ public class SendableChooser implements Sendable {
       throw new NullPointerException("Name cannot be null");
     }
     m_defaultChoice = name;
-    m_defaultValue = object;
     if (m_table != null) {
       m_table.putString(DEFAULT, m_defaultChoice);
     }
@@ -109,13 +97,7 @@ public class SendableChooser implements Sendable {
    */
   public Object getSelected() {
     String selected = m_table.getString(SELECTED, null);
-    for (int i = 0; i < m_values.size(); ++i) {
-      if (m_choices.get(i).equals(selected)) {
-        return m_values.get(i);
-      }
-    }
-    return m_defaultValue;
-
+    return m_map.getOrDefault(selected, m_map.get(m_defaultChoice));
   }
 
   @Override
@@ -129,7 +111,7 @@ public class SendableChooser implements Sendable {
   public void initTable(ITable table) {
     m_table = table;
     if (table != null) {
-      table.putStringArray(OPTIONS, m_choices.toArray(new String[0]));
+      table.putStringArray(OPTIONS, m_map.keySet().toArray(new String[0]));
       if (m_defaultChoice != null) {
         table.putString(DEFAULT, m_defaultChoice);
       }
