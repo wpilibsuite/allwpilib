@@ -50,7 +50,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   if (*status != 0) return HAL_kInvalidHandle;
 
   int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
+  if (channel == InvalidHandleIndex || channel >= kNumPWMChannels) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
