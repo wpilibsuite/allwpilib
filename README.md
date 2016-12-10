@@ -25,13 +25,13 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 - [ARM Compiler Toolchain](http://first.wpi.edu/FRC/roborio/toolchains/)
 - Doxygen (Only required if you want to build the C++ documentation)
-- [format.py](https://github.com/wpilibsuite/styleguide)
+- [wpiformat](https://github.com/wpilibsuite/styleguide)
 
 ## Setup
 
 Clone the WPILib repository. If the toolchains are not installed, install them, and make sure they are available on the system PATH.
 
-See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/master/README.md) for format.py setup instructions.
+See the [styleguide README](https://github.com/wpilibsuite/styleguide/blob/master/README.md) for wpiformat setup instructions.
 
 ## Building
 
@@ -67,7 +67,7 @@ The gradlew wrapper only exists in the root of the main project, so be sure to r
 
 There are a few tasks other than `build` available. To see them, run the meta-task `tasks`. This will print a list of all available tasks, with a description of each task.
 
-format.py can be executed in either the styleguide or root directories of the repository via `python3 format.py` or `./format.py`.
+wpiformat can be executed anywhere in the repository via `py -3 -m wpiformat` on Windows or `python3 -m wpiformat` on other platforms.
 
 ## Publishing
 
