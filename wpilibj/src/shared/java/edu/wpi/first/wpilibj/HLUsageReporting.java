@@ -57,6 +57,7 @@ public class HLUsageReporting {
     public void reportScheduler() {
     }
 
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public void reportPIDController(int num) {
     }
 

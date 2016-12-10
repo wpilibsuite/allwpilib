@@ -75,7 +75,6 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
 
   private int m_forwardHandle = 0;
   private int m_reverseHandle = 0;
-  private long m_port;
 
   private Direction m_direction;
 

@@ -201,6 +201,7 @@ public class Joystick extends JoystickBase {
    *             GenericHID interface.
    * @return The state of the trigger.
    */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public boolean getTrigger(Hand hand) {
     return getRawButton(m_buttons[ButtonType.kTrigger.value]);
   }
@@ -214,6 +215,7 @@ public class Joystick extends JoystickBase {
    *             GenericHID interface.
    * @return The state of the top button.
    */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public boolean getTop(Hand hand) {
     return getRawButton(m_buttons[ButtonType.kTop.value]);
   }
@@ -236,6 +238,7 @@ public class Joystick extends JoystickBase {
    *             GenericHID interface.
    * @return The state of the bumper (always false)
    */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public boolean getBumper(Hand hand) {
     return false;
   }

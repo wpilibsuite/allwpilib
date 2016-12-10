@@ -28,6 +28,7 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
 
   void SetVoltage(double voltage);
   double GetVoltage() const;
+  int GetChannel();
 
   void UpdateTable() override;
   void StartLiveWindowMode() override;

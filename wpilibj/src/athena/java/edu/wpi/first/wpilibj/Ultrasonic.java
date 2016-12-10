@@ -40,10 +40,6 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
 
   // Time (sec) for the ping trigger pulse.
   private static final double kPingTime = 10 * 1e-6;
-  // Priority that the ultrasonic round robin task runs.
-  private static final int kPriority = 90;
-  // Max time (ms) between readings.
-  private static final double kMaxUltrasonicTime = 0.1;
   private static final double kSpeedOfSoundInchesPerSec = 1130.0 * 12.0;
   // head of the ultrasonic sensor list
   private static Ultrasonic m_firstSensor = null;
@@ -84,7 +80,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
         }
         if (ultrasonic.isEnabled()) {
           // Do the ping
-          ultrasonic.m_pingChannel.pulse(m_pingChannel.getChannel(), kPingTime);
+          ultrasonic.m_pingChannel.pulse(kPingTime);
         }
         ultrasonic = ultrasonic.m_nextSensor;
         Timer.delay(.1); // wait for ping to return
@@ -288,7 +284,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
     // single sensor
     m_counter.reset(); // reset the counter to zero (invalid data now)
     // do the ping to start getting a single range
-    m_pingChannel.pulse(m_pingChannel.getChannel(), kPingTime);
+    m_pingChannel.pulse(kPingTime);
   }
 
   /**

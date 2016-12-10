@@ -55,8 +55,8 @@ public class CameraServer {
   private HashMap<String, VideoSink> m_sinks;
   private HashMap<Integer, ITable> m_tables;  // indexed by source handle
   private ITable m_publishTable;
-  private VideoListener m_videoListener;
-  private int m_tableListener;
+  private VideoListener m_videoListener; //NOPMD
+  private int m_tableListener; //NOPMD
   private int m_nextPort;
   private String[] m_addresses;
 
@@ -127,7 +127,7 @@ public class CameraServer {
     }
   }
 
-  @SuppressWarnings("JavadocMethod")
+  @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable"})
   private CameraServer() {
     m_sources = new HashMap<String, VideoSource>();
     m_sinks = new HashMap<String, VideoSink>();

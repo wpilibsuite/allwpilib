@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
 /**
  * ADXL345 I2C Accelerometer.
  */
-@SuppressWarnings("TypeName")
+@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
 public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindowSendable {
 
   private static final byte kAddress = 0x1D;

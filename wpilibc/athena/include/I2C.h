@@ -35,7 +35,7 @@ class I2C : SensorBase {
   bool WriteBulk(uint8_t* data, int count);
   bool Read(int registerAddress, int count, uint8_t* data);
   bool ReadOnly(int count, uint8_t* buffer);
-  void Broadcast(int registerAddress, uint8_t data);
+  // void Broadcast(int registerAddress, uint8_t data);
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
