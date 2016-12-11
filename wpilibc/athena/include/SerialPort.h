@@ -10,6 +10,8 @@
 #include <string>
 
 #include "ErrorBase.h"
+#include "llvm/StringRef.h"
+#include "support/deprecated.h"
 
 namespace frc {
 
@@ -60,7 +62,12 @@ class SerialPort : public ErrorBase {
   void DisableTermination();
   int GetBytesReceived();
   int Read(char* buffer, int count);
+  WPI_DEPRECATED(
+      "Potential for unexpected behavior. Please use StringRef overload for "
+      "custom length buffers using std::string")
   int Write(const std::string& buffer, int count);
+  int Write(const char* buffer, int count);
+  int Write(llvm::StringRef buffer);
   void SetTimeout(double timeout);
   void SetReadBufferSize(int size);
   void SetWriteBufferSize(int size);
