@@ -39,6 +39,8 @@ static const char* rootPage =
 
 class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  public:
+  ConnThread(llvm::StringRef name) : m_name(name) {}
+
   void Main();
 
   bool ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
@@ -52,6 +54,9 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   bool m_streaming = false;
 
  private:
+  std::string m_name;
+  llvm::StringRef GetName() { return m_name; }
+
   std::shared_ptr<SourceImpl> GetSource() {
     std::lock_guard<std::mutex> lock(m_mutex);
     return m_source;
@@ -144,8 +149,8 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
     if (rawParam.empty()) continue;  // ignore "&&"
     std::tie(rawParam, rawValue) = rawParam.split('=');
     if (rawParam.empty() || rawValue.empty()) continue;  // ignore "param="
-    DEBUG4("HTTP parameter \"" << rawParam << "\" value \"" << rawValue
-                               << "\"");
+    SDEBUG4("HTTP parameter \"" << rawParam << "\" value \"" << rawValue
+                                << "\"");
 
     // unescape param
     bool error = false;
@@ -156,7 +161,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
       llvm::raw_svector_ostream oss{error};
       oss << "could not unescape parameter \"" << rawParam << "\"";
       SendError(os, 500, error.str());
-      DEBUG(error.str());
+      SDEBUG(error.str());
       return false;
     }
 
@@ -168,7 +173,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
       llvm::raw_svector_ostream oss{error};
       oss << "could not unescape value \"" << rawValue << "\"";
       SendError(os, 500, error.str());
-      DEBUG(error.str());
+      SDEBUG(error.str());
       return false;
     }
 
@@ -180,20 +185,20 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
       int width, height;
       if (widthStr.getAsInteger(10, width)) {
         response << param << ": \"width is not integer\"\r\n";
-        WARNING("HTTP parameter \"" << param << "\" width \"" << widthStr
-                                    << "\" is not integer");
+        SWARNING("HTTP parameter \"" << param << "\" width \"" << widthStr
+                                     << "\" is not integer");
         continue;
       }
       if (heightStr.getAsInteger(10, height)) {
         response << param << ": \"height is not integer\"\r\n";
-        WARNING("HTTP parameter \"" << param << "\" height \"" << heightStr
-                                    << "\" is not integer");
+        SWARNING("HTTP parameter \"" << param << "\" height \"" << heightStr
+                                     << "\" is not integer");
         continue;
       }
       CS_Status status = 0;
       if (!source.SetResolution(width, height, &status)) {
         response << param << ": \"error\"\r\n";
-        WARNING("Could not set resolution to " << width << "x" << height);
+        SWARNING("Could not set resolution to " << width << "x" << height);
       } else {
         response << param << ": \"ok\"\r\n";
       }
@@ -204,14 +209,14 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
       int fps;
       if (value.getAsInteger(10, fps)) {
         response << param << ": \"invalid integer\"\r\n";
-        WARNING("HTTP parameter \"" << param << "\" value \"" << value
-                                    << "\" is not an integer");
+        SWARNING("HTTP parameter \"" << param << "\" value \"" << value
+                                     << "\" is not an integer");
         continue;
       }
       CS_Status status = 0;
       if (!source.SetFPS(fps, &status)) {
         response << param << ": \"error\"\r\n";
-        WARNING("Could not set FPS to " << fps);
+        SWARNING("Could not set FPS to " << fps);
       } else {
         response << param << ": \"ok\"\r\n";
       }
@@ -226,7 +231,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
     if (!prop) {
       if (param == "compression") continue;  // silently ignore
       response << param << ": \"ignored\"\r\n";
-      WARNING("ignoring HTTP parameter \"" << param << "\"");
+      SWARNING("ignoring HTTP parameter \"" << param << "\"");
       continue;
     }
 
@@ -239,18 +244,18 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
         int val;
         if (value.getAsInteger(10, val)) {
           response << param << ": \"invalid integer\"\r\n";
-          WARNING("HTTP parameter \"" << param << "\" value \"" << value
-                                      << "\" is not an integer");
+          SWARNING("HTTP parameter \"" << param << "\" value \"" << value
+                                       << "\" is not an integer");
         } else {
           response << param << ": " << val << "\r\n";
-          DEBUG4("HTTP parameter \"" << param << "\" value " << value);
+          SDEBUG4("HTTP parameter \"" << param << "\" value " << value);
           source.SetProperty(prop, val, &status);
         }
         break;
       }
       case CS_PROP_STRING: {
         response << param << ": \"ok\"\r\n";
-        DEBUG4("HTTP parameter \"" << param << "\" value \"" << value << "\"");
+        SDEBUG4("HTTP parameter \"" << param << "\" value \"" << value << "\"");
         source.SetStringProperty(prop, value, &status);
         break;
       }
@@ -387,7 +392,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
              "Access-Control-Allow-Origin: *");
   os << oss.str();
 
-  DEBUG("HTTP: Headers send, sending stream now");
+  SDEBUG("Headers send, sending stream now");
 
   StartStream();
   while (m_active && !os.has_error()) {
@@ -397,7 +402,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
       std::this_thread::sleep_for(std::chrono::seconds(1));
       continue;
     }
-    DEBUG4("HTTP: waiting for frame");
+    SDEBUG4("waiting for frame");
     Frame frame = source->GetNextFrame();  // blocks
     if (!m_active) break;
     if (!frame) {
@@ -424,7 +429,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
         continue;
     }
 
-    DEBUG4("HTTP: sending frame size=" << size);
+    SDEBUG4("sending frame size=" << size);
 
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
@@ -459,7 +464,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   llvm::SmallString<128> reqBuf;
   llvm::StringRef req = ReadLine(is, reqBuf, 4096, &error);
   if (error) {
-    DEBUG("HTTP error getting request string");
+    SDEBUG("error getting request string");
     return;
   }
 
@@ -467,7 +472,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   llvm::StringRef parameters;
   size_t pos;
 
-  DEBUG("HTTP request: '" << req << "'\n");
+  SDEBUG("HTTP request: '" << req << "'\n");
 
   // Determine request kind.  Most of these are for mjpgstreamer
   // compatibility, others are for Axis camera compatibility.
@@ -496,7 +501,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   } else if (req.find("GET / ") != llvm::StringRef::npos || req == "GET /\n") {
     kind = kRootPage;
   } else {
-    DEBUG("HTTP request resource not found");
+    SDEBUG("HTTP request resource not found");
     SendError(os, 404, "Resource not found");
     return;
   }
@@ -506,7 +511,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
       "-=&1234567890%./");
   parameters = parameters.substr(0, pos);
-  DEBUG("command parameters: \"" << parameters << "\"");
+  SDEBUG("command parameters: \"" << parameters << "\"");
 
   // Read the rest of the HTTP request.
   // The end of the request is marked by a single, empty line
@@ -520,7 +525,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   switch (kind) {
     case kStream:
       if (auto source = GetSource()) {
-        DEBUG("request for stream " << source->GetName());
+        SDEBUG("request for stream " << source->GetName());
         if (!ProcessCommand(os, *source, parameters, false)) return;
       }
       SendStream(os);
@@ -531,24 +536,24 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       } else {
         SendHeader(os, 200, "OK", "text/plain");
         os << "Ignored due to no connected source." << "\r\n";
-        DEBUG("Ignored due to no connected source.");
+        SDEBUG("Ignored due to no connected source.");
       }
       break;
     case kGetSettings:
-      DEBUG("request for JSON file");
+      SDEBUG("request for JSON file");
       if (auto source = GetSource())
         SendJSON(os, *source, true);
       else
         SendError(os, 404, "Resource not found");
       break;
     case kRootPage:
-      DEBUG("request for root page");
+      SDEBUG("request for root page");
       SendHeader(os, 200, "OK", "text/html");
       os << rootPage << "\r\n";
       break;
   }
 
-  DEBUG("leaving HTTP client thread");
+  SDEBUG("leaving HTTP client thread");
 }
 
 // worker thread for clients that connected to this server
@@ -573,7 +578,7 @@ void MjpegServerImpl::ServerThreadMain() {
     return;
   }
 
-  DEBUG("waiting for clients to connect");
+  SDEBUG("waiting for clients to connect");
   while (m_active) {
     auto stream = m_acceptor->accept();
     if (!stream) {
@@ -582,7 +587,7 @@ void MjpegServerImpl::ServerThreadMain() {
     }
     if (!m_active) return;
 
-    DEBUG("server: client connection from " << stream->getPeerIP());
+    SDEBUG("client connection from " << stream->getPeerIP());
 
     auto source = GetSource();
 
@@ -601,7 +606,7 @@ void MjpegServerImpl::ServerThreadMain() {
     // Start it if not already started
     {
       auto thr = it->GetThread();
-      if (!thr) it->Start();
+      if (!thr) it->Start(new ConnThread{GetName()});
     }
 
     // Hand off connection to it
@@ -611,7 +616,7 @@ void MjpegServerImpl::ServerThreadMain() {
     thr->m_cond.notify_one();
   }
 
-  DEBUG("leaving server thread");
+  SDEBUG("leaving server thread");
 }
 
 void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {

@@ -305,9 +305,9 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
       AllocFrame(pixelFormat, width, height, data.size(), time);
 
   // Copy in image data
-  DEBUG4("Copying data to " << ((void*)frameData->data) << " from "
-                            << ((void*)data.data()) << " (" << data.size()
-                            << " bytes)");
+  SDEBUG4("Copying data to " << ((void*)frameData->data) << " from "
+                             << ((void*)data.data()) << " (" << data.size()
+                             << " bytes)");
   std::memcpy(frameData->data, data.data(), data.size());
 
   PutFrame(std::move(frameData));

@@ -484,7 +484,7 @@ void UsbCameraImpl::CameraThreadMain() {
     DoFdSet(notify_fd, &readfds, &nfds);
 
     if (select(nfds, &readfds, nullptr, nullptr, &tv) < 0) {
-      ERROR("USB select(): " << strerror(errno));
+      SERROR("select(): " << strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
 
@@ -493,7 +493,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
     // Handle notify events
     if (notify_fd >= 0 && FD_ISSET(notify_fd, &readfds)) {
-      DEBUG4("USB " << m_path << ": notify event");
+      SDEBUG4("notify event");
       struct inotify_event event;
       do {
         // Read the event structure
@@ -504,9 +504,9 @@ void UsbCameraImpl::CameraThreadMain() {
         notify_is->read(raw_name.data(), event.len);
         // If the name is what we expect...
         llvm::StringRef name{raw_name.c_str()};
-        DEBUG4("USB " << m_path << ": got event on '" << name << "' ("
-                      << name.size() << ") compare to '" << base << "' ("
-                      << base.size() << ") mask " << event.mask);
+        SDEBUG4("got event on '" << name << "' (" << name.size()
+                                 << ") compare to '" << base << "' ("
+                                 << base.size() << ") mask " << event.mask);
         if (name == base) {
           if ((event.mask & IN_DELETE) != 0) {
             wasStreaming = m_streaming;
@@ -523,7 +523,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
     // Handle commands
     if (command_fd >= 0 && FD_ISSET(command_fd, &readfds)) {
-      DEBUG4("USB " << m_path << ": got command");
+      SDEBUG4("got command");
       // Read it to clear
       eventfd_t val;
       eventfd_read(command_fd, &val);
@@ -533,7 +533,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
     // Handle frames
     if (m_streaming && fd >= 0 && FD_ISSET(fd, &readfds)) {
-      DEBUG4("USB " << m_path << ": grabbing image");
+      SDEBUG4("grabbing image");
 
       // Dequeue buffer
       struct v4l2_buffer buf;
@@ -541,7 +541,7 @@ void UsbCameraImpl::CameraThreadMain() {
       buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       buf.memory = V4L2_MEMORY_MMAP;
       if (DoIoctl(fd, VIDIOC_DQBUF, &buf) != 0) {
-        WARNING("USB " << m_path << ": could not dequeue buffer");
+        SWARNING("could not dequeue buffer");
         wasStreaming = m_streaming;
         DeviceStreamOff();
         DeviceDisconnect();
@@ -550,11 +550,10 @@ void UsbCameraImpl::CameraThreadMain() {
       }
 
       if ((buf.flags & V4L2_BUF_FLAG_ERROR) == 0) {
-        DEBUG4("USB " << m_path << ": got image size=" << buf.bytesused
-                      << " index=" << buf.index);
+        SDEBUG4("got image size=" << buf.bytesused << " index=" << buf.index);
 
         if (buf.index >= kNumBuffers || !m_buffers[buf.index].m_data) {
-          WARNING("USB " << m_path << ": invalid buffer" << buf.index);
+          SWARNING("invalid buffer" << buf.index);
           continue;
         }
 
@@ -568,7 +567,7 @@ void UsbCameraImpl::CameraThreadMain() {
 
       // Requeue buffer
       if (DoIoctl(fd, VIDIOC_QBUF, &buf) != 0) {
-        WARNING("USB " << m_path << ": could not requeue buffer");
+        SWARNING("could not requeue buffer");
         wasStreaming = m_streaming;
         DeviceStreamOff();
         DeviceDisconnect();
@@ -601,16 +600,16 @@ void UsbCameraImpl::DeviceDisconnect() {
 void UsbCameraImpl::DeviceConnect() {
   if (m_fd >= 0) return;
 
-  INFO("Connecting to USB camera on " << m_path);
+  SINFO("Connecting to USB camera on " << m_path);
 
   // Try to open the device
-  DEBUG3("USB " << m_path << ": opening device");
+  SDEBUG3("opening device");
   int fd = open(m_path.c_str(), O_RDWR);
   if (fd < 0) return;
   m_fd = fd;
 
   // Get capabilities
-  DEBUG3("USB " << m_path << ": getting capabilities");
+  SDEBUG3("getting capabilities");
   struct v4l2_capability vcap;
   std::memset(&vcap, 0, sizeof(vcap));
   if (DoIoctl(fd, VIDIOC_QUERYCAP, &vcap) >= 0) {
@@ -621,43 +620,43 @@ void UsbCameraImpl::DeviceConnect() {
 
   // Get or restore video mode
   if (!m_properties_cached) {
-    DEBUG3("USB " << m_path << ": caching properties");
+    SDEBUG3("caching properties");
     DeviceCacheProperties();
     DeviceCacheVideoModes();
     DeviceCacheMode();
     m_properties_cached = true;
   } else {
-    DEBUG3("USB " << m_path << ": restoring video mode");
+    SDEBUG3("restoring video mode");
     DeviceSetMode();
     DeviceSetFPS();
 
     // Restore settings
-    DEBUG3("USB " << m_path << ": restoring settings");
+    SDEBUG3("restoring settings");
     std::unique_lock<std::mutex> lock2(m_mutex);
     for (std::size_t i = 0; i < m_propertyData.size(); ++i) {
       const auto& prop = m_propertyData[i];
       if (!prop || !prop->valueSet) continue;
       if (!DeviceSetProperty(lock2, static_cast<const PropertyData&>(*prop)))
-        WARNING("USB " << m_path << ": failed to set property " << prop->name);
+        SWARNING("failed to set property " << prop->name);
     }
   }
 
   // Request buffers
-  DEBUG3("USB " << m_path << ": allocating buffers");
+  SDEBUG3("allocating buffers");
   struct v4l2_requestbuffers rb;
   std::memset(&rb, 0, sizeof(rb));
   rb.count = kNumBuffers;
   rb.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   rb.memory = V4L2_MEMORY_MMAP;
   if (DoIoctl(fd, VIDIOC_REQBUFS, &rb) != 0) {
-    WARNING("USB " << m_path << ": could not allocate buffers");
+    SWARNING("could not allocate buffers");
     close(fd);
     m_fd = -1;
     return;
   }
 
   // Map buffers
-  DEBUG3("USB " << m_path << ": mapping buffers");
+  SDEBUG3("mapping buffers");
   for (int i = 0; i < kNumBuffers; ++i) {
     struct v4l2_buffer buf;
     std::memset(&buf, 0, sizeof(buf));
@@ -665,17 +664,17 @@ void UsbCameraImpl::DeviceConnect() {
     buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buf.memory = V4L2_MEMORY_MMAP;
     if (DoIoctl(fd, VIDIOC_QUERYBUF, &buf) != 0) {
-      WARNING("USB " << m_path << ": could not query buffer " << i);
+      SWARNING("could not query buffer " << i);
       close(fd);
       m_fd = -1;
       return;
     }
-    DEBUG4("USB " << m_path << ": buf " << i << " length=" << buf.length
-                  << " offset=" << buf.m.offset);
+    SDEBUG4("buf " << i << " length=" << buf.length
+                   << " offset=" << buf.m.offset);
 
     m_buffers[i] = std::move(UsbCameraBuffer(fd, buf.length, buf.m.offset));
     if (!m_buffers[i].m_data) {
-      WARNING("USB " << m_path << ": could not map buffer " << i);
+      SWARNING("could not map buffer " << i);
       // release other buffers
       for (int j = 0; j < i; ++j) m_buffers[j] = std::move(UsbCameraBuffer{});
       close(fd);
@@ -683,8 +682,7 @@ void UsbCameraImpl::DeviceConnect() {
       return;
     }
 
-    DEBUG4("USB " << m_path << ": buf " << i
-                  << " address=" << m_buffers[i].m_data);
+    SDEBUG4("buf " << i << " address=" << m_buffers[i].m_data);
   }
 
   // Update description (as it may have changed)
@@ -700,7 +698,7 @@ bool UsbCameraImpl::DeviceStreamOn() {
   if (fd < 0) return false;
 
   // Queue buffers
-  DEBUG3("USB " << m_path << ": queuing buffers");
+  SDEBUG3("queuing buffers");
   for (int i = 0; i < kNumBuffers; ++i) {
     struct v4l2_buffer buf;
     std::memset(&buf, 0, sizeof(buf));
@@ -708,7 +706,7 @@ bool UsbCameraImpl::DeviceStreamOn() {
     buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buf.memory = V4L2_MEMORY_MMAP;
     if (DoIoctl(fd, VIDIOC_QBUF, &buf) != 0) {
-      WARNING("USB " << m_path << ": could not queue buffer " << i);
+      SWARNING("could not queue buffer " << i);
       return false;
     }
   }
@@ -716,7 +714,7 @@ bool UsbCameraImpl::DeviceStreamOn() {
   // Turn stream on
   int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (DoIoctl(fd, VIDIOC_STREAMON, &type) != 0) return false;
-  DEBUG4("USB " << m_path << ": enabled streaming");
+  SDEBUG4("enabled streaming");
   m_streaming = true;
   return true;
 }
@@ -727,7 +725,7 @@ bool UsbCameraImpl::DeviceStreamOff() {
   if (fd < 0) return false;
   int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (DoIoctl(fd, VIDIOC_STREAMOFF, &type) != 0) return false;
-  DEBUG4("USB " << m_path << ": disabled streaming");
+  SDEBUG4("disabled streaming");
   m_streaming = false;
   return true;
 }
@@ -900,8 +898,8 @@ void UsbCameraImpl::DeviceSetMode() {
       vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB565;
       break;
     default:
-      WARNING("USB " << m_path << ": could not set format "
-                     << m_mode.pixelFormat << ", defaulting to MJPEG");
+      SWARNING("could not set format " << m_mode.pixelFormat
+                                       << ", defaulting to MJPEG");
       vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
       break;
   }
@@ -909,12 +907,11 @@ void UsbCameraImpl::DeviceSetMode() {
   vfmt.fmt.pix.height = m_mode.height;
   vfmt.fmt.pix.field = V4L2_FIELD_ANY;
   if (DoIoctl(fd, VIDIOC_S_FMT, &vfmt) != 0) {
-    WARNING("USB " << m_path << ": could not set format "
-                   << m_mode.pixelFormat << " res " << m_mode.width << "x"
-                   << m_mode.height);
+    SWARNING("could not set format " << m_mode.pixelFormat << " res "
+                                     << m_mode.width << "x" << m_mode.height);
   } else {
-    INFO("USB " << m_path << ": set format " << m_mode.pixelFormat << " res "
-                << m_mode.width << "x" << m_mode.height);
+    SINFO("set format " << m_mode.pixelFormat << " res " << m_mode.width << "x"
+                        << m_mode.height);
   }
 }
 
@@ -931,9 +928,9 @@ void UsbCameraImpl::DeviceSetFPS() {
   parm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   parm.parm.capture.timeperframe = FPSToFract(m_mode.fps);
   if (DoIoctl(fd, VIDIOC_S_PARM, &parm) != 0)
-    WARNING("USB " << m_path << ": could not set FPS to " << m_mode.fps);
+    SWARNING("could not set FPS to " << m_mode.fps);
   else
-    INFO("USB " << m_path << ": set FPS to " << m_mode.fps);
+    SINFO("set FPS to " << m_mode.fps);
 }
 
 void UsbCameraImpl::DeviceCacheMode() {
@@ -950,7 +947,7 @@ void UsbCameraImpl::DeviceCacheMode() {
 #endif
   vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   if (DoIoctl(fd, VIDIOC_G_FMT, &vfmt) != 0) {
-    ERROR("USB " << m_path << ": could not read current video mode");
+    SERROR("could not read current video mode");
     std::lock_guard<std::mutex> lock(m_mutex);
     m_mode = VideoMode{VideoMode::kMJPEG, 320, 240, 30};
     return;
@@ -1051,7 +1048,7 @@ void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
     // get the value
     lock.unlock();
     if (!DeviceGetProperty(prop.get()))
-      WARNING("USB " << m_path << ": failed to get property " << prop->name);
+      SWARNING("failed to get property " << prop->name);
     lock.lock();
     // create a new index
     ndx = m_propertyData.size() + 1;
@@ -1066,11 +1063,11 @@ void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
     if (prop->valueSet) {
       // set the value if it was previously set
       if (!DeviceSetProperty(lock, *prop))
-        WARNING("USB " << m_path << ": failed to set property " << prop->name);
+        SWARNING("failed to set property " << prop->name);
     } else {
       // otherwise get the value
       if (!DeviceGetProperty(prop.get()))
-        WARNING("USB " << m_path << ": failed to get property " << prop->name);
+        SWARNING("failed to get property " << prop->name);
     }
     lock.lock();
     m_propertyData[ndx - 1] = std::move(prop);

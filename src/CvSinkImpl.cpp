@@ -89,7 +89,7 @@ void CvSinkImpl::ThreadMain() {
       std::this_thread::sleep_for(std::chrono::seconds(1));
       continue;
     }
-    DEBUG4("Cv: waiting for frame");
+    SDEBUG4("waiting for frame");
     Frame frame = source->GetNextFrame();  // blocks
     if (!m_active) break;
     if (!frame) {

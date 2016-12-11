@@ -40,6 +40,16 @@ class Logger : public wpi::Logger {
 #define DEBUG3(x) WPI_DEBUG3(cs::Logger::GetInstance(), x)
 #define DEBUG4(x) WPI_DEBUG4(cs::Logger::GetInstance(), x)
 
+#define SERROR(x) ERROR(GetName() << ": " << x)
+#define SWARNING(x) WARNING(GetName() << ": " << x)
+#define SINFO(x) INFO(GetName() << ": " << x)
+
+#define SDEBUG(x) DEBUG(GetName() << ": " << x)
+#define SDEBUG1(x) DEBUG1(GetName() << ": " << x)
+#define SDEBUG2(x) DEBUG2(GetName() << ": " << x)
+#define SDEBUG3(x) DEBUG3(GetName() << ": " << x)
+#define SDEBUG4(x) DEBUG4(GetName() << ": " << x)
+
 } // namespace cs
 
 #endif  // CS_LOG_H_
