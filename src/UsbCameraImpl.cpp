@@ -713,7 +713,19 @@ bool UsbCameraImpl::DeviceStreamOn() {
 
   // Turn stream on
   int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  if (DoIoctl(fd, VIDIOC_STREAMON, &type) != 0) return false;
+  if (TryIoctl(fd, VIDIOC_STREAMON, &type) < 0) {
+    if (errno == ENOSPC) {
+      // indicates too much USB bandwidth requested
+      SERROR(
+          "could not start streaming due to USB bandwidth limitations; try a "
+          "lower resolution or a different pixel format (VIDIOC_STREAMON: "
+          "No space left on device)");
+    } else {
+      // some other error
+      SERROR("ioctl VIDIOC_STREAMON failed: " << std::strerror(errno));
+    }
+    return false;
+  }
   SDEBUG4("enabled streaming");
   m_streaming = true;
   return true;
