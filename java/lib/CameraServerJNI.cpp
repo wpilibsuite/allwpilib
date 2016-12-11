@@ -1154,3 +1154,67 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_getNetworkInt
 }
 
 }  // extern "C"
+
+namespace {
+
+struct LogMessage {
+ public:
+  LogMessage(unsigned int level, const char *file, unsigned int line,
+             const char *msg)
+      : m_level(level), m_file(file), m_line(line), m_msg(msg) {}
+
+  void CallJava(JNIEnv* env, jobject func, jmethodID mid) {
+    JLocal<jstring> file{env, MakeJString(env, m_file)};
+    JLocal<jstring> msg{env, MakeJString(env, m_msg)};
+    env->CallVoidMethod(func, mid, (jint)m_level, file.obj(),
+                        (jint)m_line, msg.obj());
+  }
+
+  static const char* GetName() { return "NTLogger"; }
+  static JavaVM* GetJVM() { return jvm; }
+
+ private:
+  unsigned int m_level;
+  const char* m_file;
+  unsigned int m_line;
+  std::string m_msg;
+};
+
+typedef JSingletonCallbackManager<LogMessage> LoggerJNI;
+
+}  // anonymous namespace
+
+ATOMIC_STATIC_INIT(LoggerJNI)
+
+extern "C" {
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setLogger
+ * Signature: (Ledu/wpi/cscore/CameraServerJNI/LoggerFunction;I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setLogger
+  (JNIEnv *env, jclass, jobject func, jint minLevel)
+{
+  // cls is a temporary here; cannot be used within callback functor
+  jclass cls = env->GetObjectClass(func);
+  if (!cls) return;
+
+  // method ids, on the other hand, are safe to retain
+  jmethodID mid = env->GetMethodID(
+      cls, "apply", "(ILjava/lang/String;ILjava/lang/String;)V");
+  if (!mid) return;
+
+  auto& logger = LoggerJNI::GetInstance();
+  logger.Start();
+  logger.SetFunc(env, func, mid);
+
+  cs::SetLogger(
+      [](unsigned int level, const char *file, unsigned int line,
+         const char *msg) {
+        LoggerJNI::GetInstance().Send(level, file, line, msg);
+      },
+      minLevel);
+}
+
+}  // extern "C"

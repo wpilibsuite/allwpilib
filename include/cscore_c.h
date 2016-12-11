@@ -55,6 +55,21 @@ enum CS_StatusValue {
 };
 
 //
+// Logging levels
+//
+enum CS_LogLevel {
+  CS_LOG_CRITICAL = 50,
+  CS_LOG_ERROR = 40,
+  CS_LOG_WARNING = 30,
+  CS_LOG_INFO = 20,
+  CS_LOG_DEBUG = 10,
+  CS_LOG_DEBUG1 = 9,
+  CS_LOG_DEBUG2 = 8,
+  CS_LOG_DEBUG3 = 7,
+  CS_LOG_DEBUG4 = 6
+};
+
+//
 // Pixel formats
 //
 enum CS_PixelFormat {
@@ -284,6 +299,13 @@ CS_Listener CS_AddListener(void* data,
 void CS_RemoveListener(CS_Listener handle, CS_Status* status);
 
 int CS_NotifierDestroyed(void);
+
+//
+// Logging Functions
+//
+typedef void (*CS_LogFunc)(unsigned int level, const char* file,
+                           unsigned int line, const char* msg);
+void CS_SetLogger(CS_LogFunc func, unsigned int min_level);
 
 //
 // Utility Functions

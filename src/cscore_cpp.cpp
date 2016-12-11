@@ -16,6 +16,7 @@
 
 #include "llvm/SmallString.h"
 
+#include "Log.h"
 #include "NetworkListener.h"
 #include "Notifier.h"
 #include "SinkImpl.h"
@@ -510,6 +511,15 @@ void RemoveListener(CS_Listener handle, CS_Status* status) {
 }
 
 bool NotifierDestroyed() { return Notifier::destroyed(); }
+
+//
+// Logging Functions
+//
+void SetLogger(LogFunc func, unsigned int min_level) {
+  Logger& logger = Logger::GetInstance();
+  logger.SetLogger(func);
+  logger.set_min_level(min_level);
+}
 
 //
 // Utility Functions

@@ -279,6 +279,14 @@ void RemoveListener(CS_Listener handle, CS_Status* status);
 bool NotifierDestroyed();
 
 //
+// Logging Functions
+//
+typedef std::function<void(unsigned int level, const char* file,
+                           unsigned int line, const char* msg)>
+    LogFunc;
+void SetLogger(LogFunc func, unsigned int min_level);
+
+//
 // Utility Functions
 //
 std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status);

@@ -185,6 +185,15 @@ public class CameraServerJNI {
   public static native void removeListener(int handle);
 
   //
+  // Logging Functions
+  //
+  @FunctionalInterface
+  public interface LoggerFunction {
+    void apply(int level, String file, int line, String msg);
+  }
+  public static native void setLogger(LoggerFunction func, int minLevel);
+
+  //
   // Utility Functions
   //
   public static native UsbCameraInfo[] enumerateUsbCameras();
