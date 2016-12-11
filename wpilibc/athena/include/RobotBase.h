@@ -9,6 +9,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <thread>
 
 #include "Base.h"
 #include "HAL/HAL.h"
@@ -47,6 +48,7 @@ class RobotBase {
   bool IsOperatorControl() const;
   bool IsTest() const;
   bool IsNewDataAvailable() const;
+  static std::thread::id GetThreadId();
   virtual void StartCompetition() = 0;
 
  protected:
@@ -57,6 +59,8 @@ class RobotBase {
   RobotBase& operator=(const RobotBase&) = delete;
 
   DriverStation& m_ds;
+
+  static std::thread::id m_threadId;
 };
 
 }  // namespace frc

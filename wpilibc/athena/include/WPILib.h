@@ -87,3 +87,4 @@
 #include "interfaces/Accelerometer.h"
 #include "interfaces/Gyro.h"
 #include "interfaces/Potentiometer.h"
+#include "vision/VisionRunner.h"
