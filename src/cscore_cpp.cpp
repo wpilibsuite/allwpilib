@@ -16,13 +16,12 @@
 
 #include "llvm/SmallString.h"
 
+#include "Handle.h"
 #include "Log.h"
 #include "NetworkListener.h"
 #include "Notifier.h"
 #include "SinkImpl.h"
 #include "SourceImpl.h"
-#include "Handle.h"
-#include "Notifier.h"
 
 using namespace cs;
 
