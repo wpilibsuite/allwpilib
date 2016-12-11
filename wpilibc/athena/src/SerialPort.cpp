@@ -135,16 +135,41 @@ int SerialPort::Read(char* buffer, int count) {
 }
 
 /**
+ * Write raw bytes to the buffer. Deprecated, please use StringRef overload. Use
+ * Write({data, len}) to get a buffer that is shorter then the length of the
+ * std::string.
+ *
+ * @param buffer Pointer to the buffer to read the bytes from. If string.size()
+ * is less then count, only the length of string.size() will be sent.
+ * @param count  The maximum number of bytes to write.
+ * @return The number of bytes actually written into the port.
+ */
+int SerialPort::Write(const std::string& buffer, int count) {
+  return Write(llvm::StringRef(
+      buffer.data(), std::min(static_cast<int>(buffer.size()), count)));
+}
+
+/**
  * Write raw bytes to the buffer.
  *
  * @param buffer Pointer to the buffer to read the bytes from.
  * @param count  The maximum number of bytes to write.
  * @return The number of bytes actually written into the port.
  */
-int SerialPort::Write(const std::string& buffer, int count) {
+int SerialPort::Write(const char* buffer, int count) {
+  return Write(llvm::StringRef(buffer, static_cast<size_t>(count)));
+}
+
+/**
+ * Write raw bytes to the buffer.
+ *
+ * @param buffer StringRef to the buffer to read the bytes from.
+ * @return The number of bytes actually written into the port.
+ */
+int SerialPort::Write(llvm::StringRef buffer) {
   int32_t status = 0;
   int retVal = HAL_WriteSerial(static_cast<HAL_SerialPort>(m_port),
-                               buffer.c_str(), count, &status);
+                               buffer.data(), buffer.size(), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return retVal;
 }
