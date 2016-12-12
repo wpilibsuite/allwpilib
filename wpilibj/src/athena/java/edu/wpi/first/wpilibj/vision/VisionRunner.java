@@ -76,6 +76,10 @@ public class VisionRunner<P extends VisionPipeline> {
    * thread using a {@link VisionThread}.</p>
    */
   public void runOnce() {
+    if (Thread.currentThread().getId() == RobotBase.MAIN_THREAD_ID) {
+      throw new IllegalStateException(
+          "VisionRunner.runOnce() cannot be called from the main robot thread");
+    }
     long frameTime = m_cvSink.grabFrame(m_image);
     if (frameTime == 0) {
       // There was an error, report it
