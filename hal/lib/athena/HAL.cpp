@@ -11,6 +11,7 @@
 #include <sys/prctl.h>
 #include <unistd.h>
 
+#include <atomic>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -262,12 +263,21 @@ static void timerRollover(uint64_t currentTime, HAL_NotifierHandle handle) {
 }
 
 void HAL_BaseInitialize(int32_t* status) {
+  static std::atomic_bool initialized{false};
+  static priority_mutex initializeMutex;
+  // Initial check, as if it's true initialization has finished
+  if (initialized) return;
+
+  std::lock_guard<priority_mutex> lock(initializeMutex);
+  // Second check in case another thread was waiting
+  if (initialized) return;
   // image 4; Fixes errors caused by multiple processes. Talk to NI about this
   nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
       nLoadOut::kTargetClass_RoboRIO;
 
   global.reset(tGlobal::create(status));
   watchdog.reset(tSysWatchdog::create(status));
+  initialized = true;
 }
 
 /**
