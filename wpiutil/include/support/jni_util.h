@@ -32,7 +32,9 @@ namespace java {
 // to potential shutdown issues with doing so.
 class JClass {
  public:
-  JClass(JNIEnv* env, const char* name) : m_cls(nullptr) {
+  JClass() = default;
+
+  JClass(JNIEnv* env, const char* name) {
     jclass local = env->FindClass(name);
     if (!local) return;
     m_cls = static_cast<jclass>(env->NewGlobalRef(local));
@@ -40,7 +42,7 @@ class JClass {
   }
 
   void free(JNIEnv *env) {
-    env->DeleteGlobalRef(m_cls);
+    if (m_cls) env->DeleteGlobalRef(m_cls);
     m_cls = nullptr;
   }
 
@@ -49,7 +51,7 @@ class JClass {
   operator jclass() const { return m_cls; }
 
  private:
-  jclass m_cls;
+  jclass m_cls = nullptr;
 };
 
 // Container class for cleaning up Java local references.
