@@ -167,7 +167,7 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
       m_elements = env->Get##F##ArrayElements(jarr, nullptr);                 \
     }                                                                         \
     ~J##F##ArrayRef() {                                                       \
-      if (m_elements)                                                         \
+      if (m_jarr && m_elements)                                               \
         m_env->Release##F##ArrayElements(static_cast<T##Array>(m_jarr),       \
                                          m_elements, JNI_ABORT);              \
     }                                                                         \
@@ -181,7 +181,7 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
           static_cast<T *>(env->GetPrimitiveArrayCritical(jarr, nullptr));    \
     }                                                                         \
     ~CriticalJ##F##ArrayRef() {                                               \
-      if (m_elements)                                                         \
+      if (m_jarr && m_elements)                                               \
         m_env->ReleasePrimitiveArrayCritical(m_jarr, m_elements, JNI_ABORT);  \
     }                                                                         \
   };
