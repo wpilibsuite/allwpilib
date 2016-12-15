@@ -18,6 +18,7 @@
 
 #include "llvm/ArrayRef.h"
 #include "llvm/ConvertUTF.h"
+#include "llvm/raw_ostream.h"
 #include "llvm/SmallString.h"
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
@@ -26,6 +27,17 @@
 
 namespace wpi {
 namespace java {
+
+// Gets a Java stack trace.  This version also provides the last function
+// in the stack trace not starting with excludeFuncPrefix (useful for e.g.
+// finding the first user call to a series of library functions).
+template <const char* excludeFuncPrefix = nullptr>
+std::string GetJavaStackTrace(JNIEnv* env, std::string* func);
+
+// Gets a Java stack trace.
+inline std::string GetJavaStackTrace(JNIEnv* env) {
+  return GetJavaStackTrace(env, nullptr);
+}
 
 // Finds a class and keep it as a global reference.
 // Use with caution, as the destructor does NOT call DeleteGlobalRef due
@@ -467,6 +479,77 @@ class JSingletonCallbackManager : public JCallbackManager<T> {
  private:
   ATOMIC_STATIC_DECL(JSingletonCallbackManager<T>)
 };
+
+template<const char* excludeFuncPrefix>
+std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
+  // create a throwable
+  static JClass throwableCls(env, "java/lang/Throwable");
+  if (!throwableCls) return "";
+  static jmethodID constructorId = nullptr;
+  if (!constructorId)
+    constructorId = env->GetMethodID(throwableCls, "<init>", "()V");
+  JLocal<jobject> throwable(env, env->NewObject(throwableCls, constructorId));
+
+  // retrieve information from the exception.
+  // get method id
+  // getStackTrace returns an array of StackTraceElement
+  static jmethodID getStackTraceId = nullptr;
+  if (!getStackTraceId)
+    getStackTraceId = env->GetMethodID(throwableCls, "getStackTrace",
+                                       "()[Ljava/lang/StackTraceElement;");
+
+  // call getStackTrace
+  JLocal<jobjectArray> stackTrace(
+      env, static_cast<jobjectArray>(
+               env->CallObjectMethod(throwable, getStackTraceId)));
+
+  if (!stackTrace) return "";
+
+  // get length of the array
+  jsize stackTraceLength = env->GetArrayLength(stackTrace);
+
+  // get toString methodId of StackTraceElement class
+  static JClass stackTraceElementCls(env, "java/lang/StackTraceElement");
+  if (!stackTraceElementCls) return "";
+  static jmethodID toStringId = nullptr;
+  if (!toStringId)
+    toStringId = env->GetMethodID(stackTraceElementCls, "toString",
+                                  "()Ljava/lang/String;");
+
+  bool haveLoc = false;
+  std::string buf;
+  llvm::raw_string_ostream oss(buf);
+  for (jsize i = 0; i < stackTraceLength; i++) {
+    // add the result of toString method of each element in the result
+    JLocal<jobject> curStackTraceElement(
+        env, env->GetObjectArrayElement(stackTrace, i));
+
+    // call to string on the object
+    JLocal<jstring> stackElementString(
+        env, static_cast<jstring>(
+                 env->CallObjectMethod(curStackTraceElement, toStringId)));
+
+    if (!stackElementString) return "";
+
+    // add a line to res
+    JStringRef elem(env, stackElementString);
+    oss << elem << '\n';
+
+    if (func) {
+      // func is caller of immediate caller (if there was one)
+      // or, if we see it, the first user function
+      if (i == 1)
+        *func = elem.str();
+      else if (i > 1 && !haveLoc && excludeFuncPrefix != nullptr &&
+               !elem.str().startswith(excludeFuncPrefix)) {
+        *func = elem.str();
+        haveLoc = true;
+      }
+    }
+  }
+
+  return oss.str();
+}
 
 }  // namespace java
 }  // namespace wpi
