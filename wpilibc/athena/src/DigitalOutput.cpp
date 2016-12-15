@@ -100,7 +100,7 @@ int DigitalOutput::GetChannel() const { return m_channel; }
  * Send a single pulse on the digital output line where the pulse duration is
  * specified in seconds. Maximum pulse length is 0.0016 seconds.
  *
- * @param length The pulselength in seconds
+ * @param length The pulse length in seconds
  */
 void DigitalOutput::Pulse(double length) {
   if (StatusIsFatal()) return;
