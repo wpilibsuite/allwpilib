@@ -104,11 +104,16 @@ class JLocal {
 class JStringRef {
  public:
   JStringRef(JNIEnv *env, jstring str) {
-    jsize size = env->GetStringLength(str);
-    const jchar *chars = env->GetStringCritical(str, nullptr);
-    if (chars) {
-      llvm::convertUTF16ToUTF8String(llvm::makeArrayRef(chars, size), m_str);
-      env->ReleaseStringCritical(str, chars);
+    if (str) {
+      jsize size = env->GetStringLength(str);
+      const jchar *chars = env->GetStringCritical(str, nullptr);
+      if (chars) {
+        llvm::convertUTF16ToUTF8String(llvm::makeArrayRef(chars, size), m_str);
+        env->ReleaseStringCritical(str, chars);
+      }
+    } else {
+      llvm::errs() << "JStringRef was passed a null pointer at \n"
+                   << GetJavaStackTrace(env);
     }
   }
 
@@ -186,7 +191,7 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
   JArrayRefBase(JNIEnv *env, jarray jarr) {
     this->m_env = env;
     this->m_jarr = jarr;
-    this->m_size = env->GetArrayLength(jarr);
+    this->m_size = jarr ? env->GetArrayLength(jarr) : 0;
     this->m_elements = nullptr;
   }
 
@@ -200,34 +205,48 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
 
 // Java array / DirectBuffer reference.
 
-#define WPI_JNI_JARRAYREF(T, F)                                               \
-  class J##F##ArrayRef : public detail::JArrayRefBase<T> {                    \
-   public:                                                                    \
-    J##F##ArrayRef(JNIEnv *env, jobject bb, int len)                          \
-        : detail::JArrayRefBase<T>(                                           \
-              env, static_cast<T *>(env->GetDirectBufferAddress(bb)), len) {} \
-    J##F##ArrayRef(JNIEnv *env, T##Array jarr)                                \
-        : detail::JArrayRefBase<T>(env, jarr) {                               \
-      m_elements = env->Get##F##ArrayElements(jarr, nullptr);                 \
-    }                                                                         \
-    ~J##F##ArrayRef() {                                                       \
-      if (m_jarr && m_elements)                                               \
-        m_env->Release##F##ArrayElements(static_cast<T##Array>(m_jarr),       \
-                                         m_elements, JNI_ABORT);              \
-    }                                                                         \
-  };                                                                          \
-                                                                              \
-  class CriticalJ##F##ArrayRef : public detail::JArrayRefBase<T> {            \
-   public:                                                                    \
-    CriticalJ##F##ArrayRef(JNIEnv *env, T##Array jarr)                        \
-        : detail::JArrayRefBase<T>(env, jarr) {                               \
-      m_elements =                                                            \
-          static_cast<T *>(env->GetPrimitiveArrayCritical(jarr, nullptr));    \
-    }                                                                         \
-    ~CriticalJ##F##ArrayRef() {                                               \
-      if (m_jarr && m_elements)                                               \
-        m_env->ReleasePrimitiveArrayCritical(m_jarr, m_elements, JNI_ABORT);  \
-    }                                                                         \
+#define WPI_JNI_JARRAYREF(T, F)                                                \
+  class J##F##ArrayRef : public detail::JArrayRefBase<T> {                     \
+   public:                                                                     \
+    J##F##ArrayRef(JNIEnv* env, jobject bb, int len)                           \
+        : detail::JArrayRefBase<T>(                                            \
+              env,                                                             \
+              static_cast<T*>(bb ? env->GetDirectBufferAddress(bb) : nullptr), \
+              len) {                                                           \
+      if (!bb)                                                                 \
+        llvm::errs() << "JArrayRef was passed a null pointer at \n"            \
+                     << GetJavaStackTrace(env);                                \
+    }                                                                          \
+    J##F##ArrayRef(JNIEnv* env, T##Array jarr)                                 \
+        : detail::JArrayRefBase<T>(env, jarr) {                                \
+      if (jarr)                                                                \
+        m_elements = env->Get##F##ArrayElements(jarr, nullptr);                \
+      else                                                                     \
+        llvm::errs() << "JArrayRef was passed a null pointer at \n"            \
+                     << GetJavaStackTrace(env);                                \
+    }                                                                          \
+    ~J##F##ArrayRef() {                                                        \
+      if (m_jarr && m_elements)                                                \
+        m_env->Release##F##ArrayElements(static_cast<T##Array>(m_jarr),        \
+                                         m_elements, JNI_ABORT);               \
+    }                                                                          \
+  };                                                                           \
+                                                                               \
+  class CriticalJ##F##ArrayRef : public detail::JArrayRefBase<T> {             \
+   public:                                                                     \
+    CriticalJ##F##ArrayRef(JNIEnv* env, T##Array jarr)                         \
+        : detail::JArrayRefBase<T>(env, jarr) {                                \
+      if (jarr)                                                                \
+        m_elements =                                                           \
+            static_cast<T*>(env->GetPrimitiveArrayCritical(jarr, nullptr));    \
+      else                                                                     \
+        llvm::errs() << "JArrayRef was passed a null pointer at \n"            \
+                     << GetJavaStackTrace(env);                                \
+    }                                                                          \
+    ~CriticalJ##F##ArrayRef() {                                                \
+      if (m_jarr && m_elements)                                                \
+        m_env->ReleasePrimitiveArrayCritical(m_jarr, m_elements, JNI_ABORT);   \
+    }                                                                          \
   };
 
 WPI_JNI_JARRAYREF(jboolean, Boolean)
