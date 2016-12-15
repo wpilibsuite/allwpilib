@@ -31,6 +31,7 @@ static JClass entryInfoCls;
 static JClass keyNotDefinedEx;
 static JClass persistentEx;
 static JClass illegalArgEx;
+static JClass nullPointerEx;
 // Thread-attached environment for listener callbacks.
 static JNIEnv *listenerEnv = nullptr;
 
@@ -88,6 +89,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   illegalArgEx = JClass(env, "java/lang/IllegalArgumentException");
   if (!illegalArgEx) return JNI_ERR;
 
+  nullPointerEx = JClass(env, "java/lang/NullPointerException");
+  if (!nullPointerEx) return JNI_ERR;
+
   // Initial configuration of listener start/exit
   nt::SetListenerOnStart(ListenerOnStart);
   nt::SetListenerOnExit(ListenerOnExit);
@@ -107,6 +111,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   keyNotDefinedEx.free(env);
   persistentEx.free(env);
   illegalArgEx.free(env);
+  nullPointerEx.free(env);
   jvm = nullptr;
 }
 
@@ -307,6 +312,10 @@ extern "C" {
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_containsKey
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val) return false;
   return true;
@@ -320,6 +329,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getType
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return 0;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val) return NT_UNASSIGNED;
   return val->type();
@@ -333,6 +346,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putBoolean
   (JNIEnv *env, jclass, jstring key, jboolean value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
   return nt::SetEntryValue(JStringRef{env, key},
                            nt::Value::MakeBoolean(value != JNI_FALSE));
 }
@@ -345,6 +362,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putDouble
   (JNIEnv *env, jclass, jstring key, jdouble value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
   return nt::SetEntryValue(JStringRef{env, key},
                            nt::Value::MakeDouble(value));
 }
@@ -357,6 +378,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putString
   (JNIEnv *env, jclass, jstring key, jstring value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return false;
+  }
   return nt::SetEntryValue(JStringRef{env, key},
                            nt::Value::MakeString(JStringRef{env, value}));
 }
@@ -369,6 +398,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putRaw__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return false;
+  }
   auto v = FromJavaRaw(env, value);
   if (!v) return false;
   return nt::SetEntryValue(JStringRef{env, key}, v);
@@ -382,6 +419,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putRaw__Ljava_lang_String_2Ljava_nio_ByteBuffer_2I
   (JNIEnv *env, jclass, jstring key, jobject value, jint len)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return false;
+  }
   auto v = FromJavaRawBB(env, value, len);
   if (!v) return false;
   return nt::SetEntryValue(JStringRef{env, key}, v);
@@ -395,6 +440,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putBooleanArray
   (JNIEnv *env, jclass, jstring key, jbooleanArray value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return false;
+  }
   auto v = FromJavaBooleanArray(env, value);
   if (!v) return false;
   return nt::SetEntryValue(JStringRef{env, key}, v);
@@ -408,6 +461,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putDoubleArray
   (JNIEnv *env, jclass, jstring key, jdoubleArray value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return false;
+  }
   auto v = FromJavaDoubleArray(env, value);
   if (!v) return false;
   return nt::SetEntryValue(JStringRef{env, key}, v);
@@ -421,6 +482,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_putStringArray
   (JNIEnv *env, jclass, jstring key, jobjectArray value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return false;
+  }
   auto v = FromJavaStringArray(env, value);
   if (!v) return false;
   return nt::SetEntryValue(JStringRef{env, key}, v);
@@ -434,6 +503,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutBoolean
   (JNIEnv *env, jclass, jstring key, jboolean value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
   nt::SetEntryTypeValue(JStringRef{env, key},
                         nt::Value::MakeBoolean(value != JNI_FALSE));
 }
@@ -446,6 +519,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutDouble
   (JNIEnv *env, jclass, jstring key, jdouble value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
   nt::SetEntryTypeValue(JStringRef{env, key}, nt::Value::MakeDouble(value));
 }
 
@@ -457,6 +534,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutString
   (JNIEnv *env, jclass, jstring key, jstring value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return;
+  }
   nt::SetEntryTypeValue(JStringRef{env, key},
                         nt::Value::MakeString(JStringRef{env, value}));
 }
@@ -469,6 +554,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutRaw__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return;
+  }
   auto v = FromJavaRaw(env, value);
   if (!v) return;
   nt::SetEntryTypeValue(JStringRef{env, key}, v);
@@ -482,6 +575,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutRaw__Ljava_lang_String_2Ljava_nio_ByteBuffer_2I
   (JNIEnv *env, jclass, jstring key, jobject value, jint len)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return;
+  }
   auto v = FromJavaRawBB(env, value, len);
   if (!v) return;
   nt::SetEntryTypeValue(JStringRef{env, key}, v);
@@ -495,6 +596,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutBooleanArray
   (JNIEnv *env, jclass, jstring key, jbooleanArray value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return;
+  }
   auto v = FromJavaBooleanArray(env, value);
   if (!v) return;
   nt::SetEntryTypeValue(JStringRef{env, key}, v);
@@ -508,6 +617,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutDoubleArray
   (JNIEnv *env, jclass, jstring key, jdoubleArray value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return;
+  }
   auto v = FromJavaDoubleArray(env, value);
   if (!v) return;
   nt::SetEntryTypeValue(JStringRef{env, key}, v);
@@ -521,6 +638,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_forcePutStringArray
   (JNIEnv *env, jclass, jstring key, jobjectArray value)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
+  if (!value) {
+    env->ThrowNew(nullPointerEx, "value cannot be null");
+    return;
+  }
   auto v = FromJavaStringArray(env, value);
   if (!v) return;
   nt::SetEntryTypeValue(JStringRef{env, key}, v);
@@ -534,6 +659,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val) {
     ThrowTableKeyNotDefined(env, key);
@@ -550,6 +679,10 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBoolean__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsBoolean()) {
     ThrowTableKeyNotDefined(env, key);
@@ -566,6 +699,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDouble__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return 0;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsDouble()) {
     ThrowTableKeyNotDefined(env, key);
@@ -582,6 +719,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getString__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsString()) {
     ThrowTableKeyNotDefined(env, key);
@@ -598,6 +739,10 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRaw__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsRaw()) {
     ThrowTableKeyNotDefined(env, key);
@@ -614,6 +759,10 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
 JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBooleanArray__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsBooleanArray()) {
     ThrowTableKeyNotDefined(env, key);
@@ -630,6 +779,10 @@ JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_Network
 JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDoubleArray__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsDoubleArray()) {
     ThrowTableKeyNotDefined(env, key);
@@ -646,6 +799,10 @@ JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getStringArray__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsStringArray()) {
     ThrowTableKeyNotDefined(env, key);
@@ -662,6 +819,10 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue__Ljava_lang_String_2Ljava_lang_Object_2
   (JNIEnv *env, jclass, jstring key, jobject defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val) return defaultValue;
   return MakeJObject(env, *val);
@@ -675,6 +836,10 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBoolean__Ljava_lang_String_2Z
   (JNIEnv *env, jclass, jstring key, jboolean defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsBoolean()) return defaultValue;
   return val->GetBoolean();
@@ -688,6 +853,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDouble__Ljava_lang_String_2D
   (JNIEnv *env, jclass, jstring key, jdouble defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return 0;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsDouble()) return defaultValue;
   return val->GetDouble();
@@ -701,6 +870,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getString__Ljava_lang_String_2Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key, jstring defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsString()) return defaultValue;
   return MakeJString(env, val->GetString());
@@ -714,6 +887,10 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
 JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRaw__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsRaw()) return defaultValue;
   return MakeJByteArray(env, val->GetRaw());
@@ -727,6 +904,10 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
 JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBooleanArray__Ljava_lang_String_2_3Z
   (JNIEnv *env, jclass, jstring key, jbooleanArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsBooleanArray()) return defaultValue;
   return MakeJBooleanArray(env, val->GetBooleanArray());
@@ -740,6 +921,10 @@ JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_Network
 JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDoubleArray__Ljava_lang_String_2_3D
   (JNIEnv *env, jclass, jstring key, jdoubleArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsDoubleArray()) return defaultValue;
   return MakeJDoubleArray(env, val->GetDoubleArray());
@@ -753,6 +938,10 @@ JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getStringArray__Ljava_lang_String_2_3Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key, jobjectArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsStringArray()) return defaultValue;
   return MakeJStringArray(env, val->GetStringArray());
@@ -766,6 +955,10 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultBoolean
   (JNIEnv *env, jclass, jstring key, jboolean defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
   return nt::SetDefaultEntryValue(JStringRef{env, key}, 
                                   nt::Value::MakeBoolean(defaultValue != JNI_FALSE));
 }
@@ -778,6 +971,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultDouble
   (JNIEnv *env, jclass, jstring key, jdouble defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return 0;
+  }
   return nt::SetDefaultEntryValue(JStringRef{env, key},
                                   nt::Value::MakeDouble(defaultValue));
 }
@@ -790,6 +987,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultString
   (JNIEnv *env, jclass, jstring key, jstring defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!defaultValue) {
+    env->ThrowNew(nullPointerEx, "defaultValue cannot be null");
+    return false;
+  }
   return nt::SetDefaultEntryValue(
       JStringRef{env, key},
       nt::Value::MakeString(JStringRef{env, defaultValue}));
@@ -803,6 +1008,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultRaw
   (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!defaultValue) {
+    env->ThrowNew(nullPointerEx, "defaultValue cannot be null");
+    return false;
+  }
   auto v = FromJavaRaw(env, defaultValue);
   return nt::SetDefaultEntryValue(JStringRef{env, key}, v);
 }
@@ -815,6 +1028,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultBooleanArray
   (JNIEnv *env, jclass, jstring key, jbooleanArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!defaultValue) {
+    env->ThrowNew(nullPointerEx, "defaultValue cannot be null");
+    return false;
+  }
   auto v = FromJavaBooleanArray(env, defaultValue);
   return nt::SetDefaultEntryValue(JStringRef{env, key}, v);
 }
@@ -827,6 +1048,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultDoubleArray
   (JNIEnv *env, jclass, jstring key, jdoubleArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!defaultValue) {
+    env->ThrowNew(nullPointerEx, "defaultValue cannot be null");
+    return false;
+  }
   auto v = FromJavaDoubleArray(env, defaultValue);
   return nt::SetDefaultEntryValue(JStringRef{env, key}, v);
 }
@@ -839,6 +1068,14 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultStringArray
   (JNIEnv *env, jclass, jstring key, jobjectArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return false;
+  }
+  if (!defaultValue) {
+    env->ThrowNew(nullPointerEx, "defaultValue cannot be null");
+    return false;
+  }
   auto v = FromJavaStringArray(env, defaultValue);
   return nt::SetDefaultEntryValue(JStringRef{env, key}, v);
 }
@@ -851,6 +1088,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setEntryFlags
   (JNIEnv *env, jclass, jstring key, jint flags)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
   nt::SetEntryFlags(JStringRef{env, key}, flags);
 }
 
@@ -862,6 +1103,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getEntryFlags
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return 0;
+  }
   return nt::GetEntryFlags(JStringRef{env, key});
 }
 
@@ -873,6 +1118,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_deleteEntry
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return;
+  }
   nt::DeleteEntry(JStringRef{env, key});
 }
 
@@ -895,6 +1144,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getEntries
   (JNIEnv *env, jclass, jstring prefix, jint types)
 {
+  if (!prefix) {
+    env->ThrowNew(nullPointerEx, "prefix cannot be null");
+    return nullptr;
+  }
   auto arr = nt::GetEntryInfo(JStringRef{env, prefix}, types);
   jobjectArray jarr = env->NewObjectArray(arr.size(), entryInfoCls, nullptr);
   if (!jarr) return nullptr;
@@ -924,6 +1177,15 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_addEntryListener
   (JNIEnv *envouter, jclass, jstring prefix, jobject listener, jint flags)
 {
+  if (!prefix) {
+    envouter->ThrowNew(nullPointerEx, "prefix cannot be null");
+    return 0;
+  }
+  if (!listener) {
+    envouter->ThrowNew(nullPointerEx, "listener cannot be null");
+    return 0;
+  }
+
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
   auto listener_global =
@@ -987,6 +1249,11 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_addConnectionListener
   (JNIEnv *envouter, jclass, jobject listener, jboolean immediateNotify)
 {
+  if (!listener) {
+    envouter->ThrowNew(nullPointerEx, "listener cannot be null");
+    return 0;
+  }
+
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
   auto listener_global =
@@ -1048,6 +1315,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRpc__Ljava_lang_String_2
   (JNIEnv *env, jclass, jstring key)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsRpc()) {
     ThrowTableKeyNotDefined(env, key);
@@ -1064,6 +1335,14 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
 JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRpc__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return nullptr;
+  }
+  if (!defaultValue) {
+    env->ThrowNew(nullPointerEx, "defaultValue cannot be null");
+    return nullptr;
+  }
   auto val = nt::GetEntryValue(JStringRef{env, key});
   if (!val || !val->IsRpc()) return defaultValue;
   return MakeJByteArray(env, val->GetRpc());
@@ -1077,6 +1356,14 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_callRpc__Ljava_lang_String_2_3B
   (JNIEnv *env, jclass, jstring key, jbyteArray params)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return 0;
+  }
+  if (!params) {
+    env->ThrowNew(nullPointerEx, "params cannot be null");
+    return 0;
+  }
   return nt::CallRpc(JStringRef{env, key}, JByteArrayRef{env, params});
 }
 
@@ -1088,6 +1375,14 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_callRpc__Ljava_lang_String_2Ljava_nio_ByteBuffer_2I
   (JNIEnv *env, jclass, jstring key, jobject params, jint params_len)
 {
+  if (!key) {
+    env->ThrowNew(nullPointerEx, "key cannot be null");
+    return 0;
+  }
+  if (!params) {
+    env->ThrowNew(nullPointerEx, "params cannot be null");
+    return 0;
+  }
   return nt::CallRpc(JStringRef{env, key},
                      JByteArrayRef{env, params, params_len});
 }
@@ -1100,6 +1395,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setNetworkIdentity
   (JNIEnv *env, jclass, jstring name)
 {
+  if (!name) {
+    env->ThrowNew(nullPointerEx, "name cannot be null");
+    return;
+  }
   nt::SetNetworkIdentity(JStringRef{env, name});
 }
 
@@ -1112,6 +1411,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
   (JNIEnv *env, jclass, jstring persistFilename, jstring listenAddress,
    jint port)
 {
+  if (!persistFilename) {
+    env->ThrowNew(nullPointerEx, "persistFilename cannot be null");
+    return;
+  }
+  if (!listenAddress) {
+    env->ThrowNew(nullPointerEx, "listenAddress cannot be null");
+    return;
+  }
   nt::StartServer(JStringRef{env, persistFilename},
                   JStringRef{env, listenAddress}.c_str(), port);
 }
@@ -1146,6 +1453,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startClient__Ljava_lang_String_2I
   (JNIEnv *env, jclass, jstring serverName, jint port)
 {
+  if (!serverName) {
+    env->ThrowNew(nullPointerEx, "serverName cannot be null");
+    return;
+  }
   nt::StartClient(JStringRef{env, serverName}.c_str(), port);
 }
 
@@ -1157,6 +1468,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_startClient___3Ljava_lang_String_2_3I
   (JNIEnv *env, jclass, jobjectArray serverNames, jintArray ports)
 {
+  if (!serverNames) {
+    env->ThrowNew(nullPointerEx, "serverNames cannot be null");
+    return;
+  }
+  if (!ports) {
+    env->ThrowNew(nullPointerEx, "ports cannot be null");
+    return;
+  }
   int len = env->GetArrayLength(serverNames);
   if (len != env->GetArrayLength(ports)) {
     env->ThrowNew(illegalArgEx,
@@ -1174,7 +1493,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
     JLocal<jstring> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i))};
     if (!elem) {
-      env->ThrowNew(illegalArgEx, "null string in serverNames");
+      env->ThrowNew(nullPointerEx, "null string in serverNames");
       return;
     }
     names.emplace_back(JStringRef{env, elem}.str());
@@ -1204,6 +1523,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setServer__Ljava_lang_String_2I
   (JNIEnv *env, jclass, jstring serverName, jint port)
 {
+  if (!serverName) {
+    env->ThrowNew(nullPointerEx, "serverName cannot be null");
+    return;
+  }
   nt::SetServer(JStringRef{env, serverName}.c_str(), port);
 }
 
@@ -1215,6 +1538,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setServer___3Ljava_lang_String_2_3I
   (JNIEnv *env, jclass, jobjectArray serverNames, jintArray ports)
 {
+  if (!serverNames) {
+    env->ThrowNew(nullPointerEx, "serverNames cannot be null");
+    return;
+  }
+  if (!ports) {
+    env->ThrowNew(nullPointerEx, "ports cannot be null");
+    return;
+  }
   int len = env->GetArrayLength(serverNames);
   if (len != env->GetArrayLength(ports)) {
     env->ThrowNew(illegalArgEx,
@@ -1232,7 +1563,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
     JLocal<jstring> elem{
         env, static_cast<jstring>(env->GetObjectArrayElement(serverNames, i))};
     if (!elem) {
-      env->ThrowNew(illegalArgEx, "null string in serverNames");
+      env->ThrowNew(nullPointerEx, "null string in serverNames");
       return;
     }
     names.emplace_back(JStringRef{env, elem}.str());
@@ -1303,6 +1634,10 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_savePersistent
   (JNIEnv *env, jclass, jstring filename)
 {
+  if (!filename) {
+    env->ThrowNew(nullPointerEx, "filename cannot be null");
+    return;
+  }
   const char *err = nt::SavePersistent(JStringRef{env, filename});
   if (err) env->ThrowNew(persistentEx, err);
 }
@@ -1315,6 +1650,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_loadPersistent
   (JNIEnv *env, jclass, jstring filename)
 {
+  if (!filename) {
+    env->ThrowNew(nullPointerEx, "filename cannot be null");
+    return nullptr;
+  }
   std::vector<std::string> warns;
   const char *err = nt::LoadPersistent(JStringRef{env, filename},
                                        [&](size_t line, const char *msg) {
@@ -1383,6 +1722,11 @@ extern "C" {
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setLogger
   (JNIEnv *env, jclass, jobject func, jint minLevel)
 {
+  if (!func) {
+    env->ThrowNew(nullPointerEx, "func cannot be null");
+    return;
+  }
+
   // cls is a temporary here; cannot be used within callback functor
 	jclass cls = env->GetObjectClass(func);
   if (!cls) return;
