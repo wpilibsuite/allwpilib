@@ -60,6 +60,17 @@ template <typename T>
 class JLocal {
  public:
   JLocal(JNIEnv *env, T obj) : m_env(env), m_obj(obj) {}
+  JLocal(const JLocal&) = delete;
+  JLocal(JLocal&& oth) : m_env(oth.m_env), m_obj(oth.m_obj) {
+    oth.m_obj = nullptr;
+  }
+  JLocal& operator=(const JLocal&) = delete;
+  JLocal& operator=(JLocal&& oth) {
+    m_env = oth.m_env;
+    m_obj = oth.m_obj;
+    oth.m_obj = nullptr;
+    return *this;
+  }
   ~JLocal() {
     if (m_obj) m_env->DeleteLocalRef(m_obj);
   }
@@ -129,6 +140,27 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
   llvm::ArrayRef<T> array() const {
     if (!this->m_elements) return llvm::ArrayRef<T>{};
     return llvm::ArrayRef<T>{this->m_elements, this->m_size};
+  }
+
+  JArrayRefBase(const JArrayRefBase&) = delete;
+  JArrayRefBase& operator=(const JArrayRefBase&) = delete;
+
+  JArrayRefBase(JArrayRefBase&& oth)
+      : m_env(oth.m_env),
+        m_jarr(oth.m_jarr),
+        m_size(oth.m_size),
+        m_elements(oth.m_elements) {
+    oth.m_jarr = nullptr;
+    oth.m_elements = nullptr;
+  }
+
+  JArrayRefBase& operator=(JArrayRefBase&& oth) {
+    this->m_env = oth.m_env;
+    this->m_jarr = oth.m_jarr;
+    this->m_size = oth.m_size;
+    this->m_elements = oth.m_elements;
+    oth.m_jarr = nullptr;
+    oth.m_elements = nullptr;
   }
 
  protected:
