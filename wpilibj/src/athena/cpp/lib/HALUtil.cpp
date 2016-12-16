@@ -40,95 +40,19 @@ TLogLevel halUtilLogLevel = logWARNING;
 #define kRIOStatusResourceNotInitialized -52010
 
 JavaVM *jvm = nullptr;
-static jclass throwableCls = nullptr;
-static jclass stackTraceElementCls = nullptr;
-static jclass runtimeExCls = nullptr;
-static jclass illegalArgExCls = nullptr;
-static jclass boundaryExCls = nullptr;
-static jclass allocationExCls = nullptr;
-static jclass halHandleExCls = nullptr;
-static jclass canInvalidBufferExCls = nullptr;
-static jclass canMessageNotFoundExCls = nullptr;
-static jclass canMessageNotAllowedExCls = nullptr;
-static jclass canNotInitializedExCls = nullptr;
-static jclass uncleanStatusExCls = nullptr;
-static jclass pwmConfigDataResultCls = nullptr;
+static JException runtimeExCls;
+static JException illegalArgExCls;
+static JException boundaryExCls;
+static JException allocationExCls;
+static JException halHandleExCls;
+static JException canInvalidBufferExCls;
+static JException canMessageNotFoundExCls;
+static JException canMessageNotAllowedExCls;
+static JException canNotInitializedExCls;
+static JException uncleanStatusExCls;
+static JClass pwmConfigDataResultCls;
 
 namespace frc {
-
-static void GetStackTrace(JNIEnv *env, llvm::SmallVectorImpl<char> &res, llvm::SmallVectorImpl<char> &func) {
-  // create a throwable
-  static jmethodID constructorId = nullptr;
-  if (!constructorId)
-    constructorId = env->GetMethodID(throwableCls, "<init>", "()V");
-  jobject throwable = env->NewObject(throwableCls, constructorId);
-
-  // retrieve information from the exception.
-  // get method id
-  // getStackTrace returns an array of StackTraceElement
-  static jmethodID getStackTraceId = nullptr;
-  if (!getStackTraceId)
-    getStackTraceId = env->GetMethodID(throwableCls, "getStackTrace",
-                                       "()[Ljava/lang/StackTraceElement;");
-
-  // call getStackTrace
-  jobjectArray stackTrace =
-      static_cast<jobjectArray>(env->CallObjectMethod(throwable,
-                                                      getStackTraceId));
-
-  if (!stackTrace) return;
-
-  // get length of the array
-  jsize stackTraceLength = env->GetArrayLength(stackTrace);
-
-  // get toString methodId of StackTraceElement class
-  static jmethodID toStringId = nullptr;
-  if (!toStringId)
-    toStringId = env->GetMethodID(stackTraceElementCls, "toString",
-                                  "()Ljava/lang/String;");
-
-  bool haveLoc = false;
-  for (jsize i = 0; i < stackTraceLength; i++) {
-    // add the result of toString method of each element in the result
-    jobject curStackTraceElement = env->GetObjectArrayElement(stackTrace, i);
-
-    // call to string on the object
-    jstring stackElementString =
-        static_cast<jstring>(env->CallObjectMethod(curStackTraceElement,
-                                                   toStringId));
-
-    if (!stackElementString) {
-      env->DeleteLocalRef(stackTrace);
-      env->DeleteLocalRef(curStackTraceElement);
-      return;
-    }
-
-    // add a line to res
-    // res += " at ";
-    JStringRef tmp{env, stackElementString};
-    res.append(tmp.str().begin(), tmp.str().end());
-    res.push_back('\n');
-
-    // func is caller of immediate caller (if there was one)
-    // or, if we see it, the first user function
-    if (i == 1) {
-      func.clear();
-      func.append(tmp.str().begin(), tmp.str().end());
-    }
-    else if (i > 1 && !haveLoc && 
-             !tmp.str().startswith("edu.wpi.first.wpilibj")) {
-      func.clear();
-      func.append(tmp.str().begin(), tmp.str().end());
-      haveLoc = true;
-    }
-
-    env->DeleteLocalRef(curStackTraceElement);
-    env->DeleteLocalRef(stackElementString);
-  }
-
-  // release java resources
-  env->DeleteLocalRef(stackTrace);
-}
 
 void ThrowAllocationException(JNIEnv *env, int32_t minRange, int32_t maxRange, 
     int32_t requestedValue, int32_t status) {
@@ -137,7 +61,7 @@ void ThrowAllocationException(JNIEnv *env, int32_t minRange, int32_t maxRange,
   sprintf(buf, 
       " Code: $%d. %s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d", 
       status, message, minRange, maxRange, requestedValue);
-  env->ThrowNew(allocationExCls, buf);
+  allocationExCls.Throw(env, buf);
   delete[] buf;
 }
 
@@ -145,9 +69,11 @@ void ThrowHalHandleException(JNIEnv *env, int32_t status) {
   const char *message = HAL_GetErrorMessage(status);
   char *buf = new char[strlen(message) + 30];
   sprintf(buf, " Code: $%d. %s", status, message);
-  env->ThrowNew(halHandleExCls, buf);
+  halHandleExCls.Throw(env, buf);
   delete[] buf;
 }
+
+constexpr const char wpilibjPrefix[] = "edu.wpi.first.wpilibj";  
 
 void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   if (status == 0) return;
@@ -158,12 +84,11 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   if (do_throw && status < 0) {
     char *buf = new char[strlen(message) + 30];
     sprintf(buf, " Code: %d. %s", status, message);
-    env->ThrowNew(runtimeExCls, buf);
+    runtimeExCls.Throw(env, buf);
     delete[] buf;
   } else {
-    llvm::SmallString<128> stack{" at "};
-    llvm::SmallString<128> func;
-    GetStackTrace(env, stack, func);
+    std::string func;
+    auto stack = GetJavaStackTrace<wpilibjPrefix>(env, &func);
     HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
   }
 }
@@ -182,7 +107,7 @@ void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange,
   const char *message = HAL_GetErrorMessage(status);
   char *buf = new char[strlen(message) + 30];
   sprintf(buf, " Code: %d. %s", status, message);
-  env->ThrowNew(runtimeExCls, buf);
+  runtimeExCls.Throw(env, buf);
   delete[] buf;
 }
 
@@ -218,7 +143,7 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
     case kRIOStatusFeatureNotSupported: {
       char buf[100];
       sprintf(buf, "MessageID = %d", message_id);
-      env->ThrowNew(canMessageNotAllowedExCls, buf);
+      canMessageNotAllowedExCls.Throw(env, buf);
       break;
     }
     case ERR_CANSessionMux_NotInitialized:
@@ -235,14 +160,14 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
     default: {
       char buf[100];
       sprintf(buf, "Fatal status code detected: %d", status);
-      env->ThrowNew(uncleanStatusExCls, buf);
+      uncleanStatusExCls.Throw(env, buf);
       break;
     }
   }
 }
 
 void ThrowIllegalArgumentException(JNIEnv *env, const char *msg) {
-  env->ThrowNew(illegalArgExCls, msg);
+  illegalArgExCls.Throw(env, msg);
 }
 
 void ThrowBoundaryException(JNIEnv *env, double value, double lower,
@@ -296,89 +221,38 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
     return JNI_ERR;
 
-  // Cache references to classes
-  jclass local;
-
-  local = env->FindClass("java/lang/Throwable");
-  if (!local) return JNI_ERR;
-  throwableCls = static_cast<jclass>(env->NewGlobalRef(local));
-  if (!throwableCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
-
-  local = env->FindClass("java/lang/StackTraceElement");
-  if (!local) return JNI_ERR;
-  stackTraceElementCls = static_cast<jclass>(env->NewGlobalRef(local));
-  if (!stackTraceElementCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
-
-  local = env->FindClass("java/lang/RuntimeException");
-  if (!local) return JNI_ERR;
-  runtimeExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  runtimeExCls = JException(env, "java/lang/RuntimeException");
   if (!runtimeExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local = env->FindClass("java/lang/IllegalArgumentException");
-  if (!local) return JNI_ERR;
-  illegalArgExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  illegalArgExCls = JException(env, "java/lang/IllegalArgumentException");
   if (!illegalArgExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local = env->FindClass("edu/wpi/first/wpilibj/util/BoundaryException");
-  if (!local) return JNI_ERR;
-  boundaryExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  boundaryExCls = JException(env, "edu/wpi/first/wpilibj/util/BoundaryException");
   if (!boundaryExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
-  
-  local = env->FindClass("edu/wpi/first/wpilibj/util/AllocationException");
-  if (!local) return JNI_ERR;
-  allocationExCls = static_cast<jclass>(env->NewGlobalRef(local));
+
+  allocationExCls = JException(env, "edu/wpi/first/wpilibj/util/AllocationException");
   if (!allocationExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
-  
-  local = env->FindClass("edu/wpi/first/wpilibj/util/HalHandleException");
-  if (!local) return JNI_ERR;
-  halHandleExCls = static_cast<jclass>(env->NewGlobalRef(local));
+
+  halHandleExCls = JException(env, "edu/wpi/first/wpilibj/util/HalHandleException");
   if (!halHandleExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local = env->FindClass("edu/wpi/first/wpilibj/can/CANInvalidBufferException");
-  if (!local) return JNI_ERR;
-  canInvalidBufferExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  canInvalidBufferExCls = JException(env, "edu/wpi/first/wpilibj/can/CANInvalidBufferException");
   if (!canInvalidBufferExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local =
-      env->FindClass("edu/wpi/first/wpilibj/can/CANMessageNotFoundException");
-  if (!local) return JNI_ERR;
-  canMessageNotFoundExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  canMessageNotFoundExCls = JException(env, "edu/wpi/first/wpilibj/can/CANMessageNotFoundException");
   if (!canMessageNotFoundExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local =
-      env->FindClass("edu/wpi/first/wpilibj/can/CANMessageNotAllowedException");
-  if (!local) return JNI_ERR;
-  canMessageNotAllowedExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  canMessageNotAllowedExCls = JException(env, "edu/wpi/first/wpilibj/can/CANMessageNotAllowedException");
   if (!canMessageNotAllowedExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local =
-      env->FindClass("edu/wpi/first/wpilibj/can/CANNotInitializedException");
-  if (!local) return JNI_ERR;
-  canNotInitializedExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  canNotInitializedExCls = JException(env, "edu/wpi/first/wpilibj/can/CANNotInitializedException");
   if (!canNotInitializedExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local = env->FindClass("edu/wpi/first/wpilibj/util/UncleanStatusException");
-  if (!local) return JNI_ERR;
-  uncleanStatusExCls = static_cast<jclass>(env->NewGlobalRef(local));
+  uncleanStatusExCls = JException(env,"edu/wpi/first/wpilibj/util/UncleanStatusException");
   if (!uncleanStatusExCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
-  
-  local = env->FindClass("edu/wpi/first/wpilibj/PWMConfigDataResult");
-  if (!local) return JNI_ERR;
-  pwmConfigDataResultCls = static_cast<jclass>(env->NewGlobalRef(local));
+
+  pwmConfigDataResultCls = JClass(env, "edu/wpi/first/wpilibj/PWMConfigDataResult");
   if (!pwmConfigDataResultCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
   return JNI_VERSION_1_6;
 }
@@ -388,20 +262,17 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
   // Delete global references
-  if (throwableCls) env->DeleteGlobalRef(throwableCls);
-  if (stackTraceElementCls) env->DeleteGlobalRef(stackTraceElementCls);
-  if (runtimeExCls) env->DeleteGlobalRef(runtimeExCls);
-  if (illegalArgExCls) env->DeleteGlobalRef(illegalArgExCls);
-  if (boundaryExCls) env->DeleteGlobalRef(boundaryExCls);
-  if (allocationExCls) env->DeleteGlobalRef(allocationExCls);
-  if (halHandleExCls) env->DeleteGlobalRef(halHandleExCls);
-  if (canInvalidBufferExCls) env->DeleteGlobalRef(canInvalidBufferExCls);
-  if (canMessageNotFoundExCls) env->DeleteGlobalRef(canMessageNotFoundExCls);
-  if (canMessageNotAllowedExCls)
-    env->DeleteGlobalRef(canMessageNotAllowedExCls);
-  if (canNotInitializedExCls) env->DeleteGlobalRef(canNotInitializedExCls);
-  if (uncleanStatusExCls) env->DeleteGlobalRef(uncleanStatusExCls);
-  if (pwmConfigDataResultCls) env->DeleteGlobalRef(pwmConfigDataResultCls);
+  runtimeExCls.free(env);
+  illegalArgExCls.free(env);
+  boundaryExCls.free(env);
+  allocationExCls.free(env);
+  halHandleExCls.free(env);
+  canInvalidBufferExCls.free(env);
+  canMessageNotFoundExCls.free(env);
+  canMessageNotAllowedExCls.free(env);
+  canNotInitializedExCls.free(env);
+  uncleanStatusExCls.free(env);
+  pwmConfigDataResultCls.free(env);
   jvm = nullptr;
 }
 

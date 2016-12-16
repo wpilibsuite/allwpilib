@@ -15,4 +15,8 @@ public class CANInvalidBufferException extends RuntimeException {
   public CANInvalidBufferException() {
     super();
   }
+
+  public CANInvalidBufferException(String msg) {
+    super(msg);
+  }
 }
