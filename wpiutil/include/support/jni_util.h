@@ -62,7 +62,7 @@ class JClass {
 
   operator jclass() const { return m_cls; }
 
- private:
+ protected:
   jclass m_cls = nullptr;
 };
 
@@ -569,6 +569,34 @@ std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
 
   return oss.str();
 }
+
+// Finds an exception class and keep it as a global reference.
+// Similar to JClass, but provides Throw methods.
+// Use with caution, as the destructor does NOT call DeleteGlobalRef due
+// to potential shutdown issues with doing so.
+class JException : public JClass {
+ public:
+  JException() = default;
+  JException(JNIEnv* env, const char* name) : JClass(env, name) {
+    if (m_cls)
+      m_constructor =
+          env->GetMethodID(m_cls, "<init>", "(Ljava/lang/String;)V");
+  }
+
+  void Throw(JNIEnv* env, jstring msg) {
+    jobject exception = env->NewObject(m_cls, m_constructor, msg);
+    env->Throw(static_cast<jthrowable>(exception));
+  }
+
+  void Throw(JNIEnv* env, llvm::StringRef msg) {
+    Throw(env, MakeJString(env, msg));
+  }
+
+  explicit operator bool() const { return m_constructor; }
+
+ private:
+  jmethodID m_constructor = nullptr;
+};
 
 }  // namespace java
 }  // namespace wpi
