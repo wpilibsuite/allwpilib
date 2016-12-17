@@ -11,7 +11,6 @@
 
 #ifndef HAL_USE_LABVIEW
 
-#include "FRC_NetworkCommunication/UsageReporting.h"
 #include "HAL/Accelerometer.h"
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/AnalogGyro.h"
@@ -38,6 +37,7 @@
 
 #endif  // HAL_USE_LABVIEW
 
+#include "FRC_NetworkCommunication/UsageReporting.h"
 #include "HAL/Types.h"
 
 namespace HALUsageReporting = nUsageReporting;
