@@ -38,7 +38,9 @@ static llvm::StringRef MakeSourceValue(CS_Source source,
       break;
     }
     case cs::VideoSource::kCv:
-      return "cv:";
+      // FIXME: Should be "cv:", but LabVIEW dashboard requires "usb:".
+      // https://github.com/wpilibsuite/allwpilib/issues/407
+      return "usb:";
     default:
       return "unknown:";
   }
