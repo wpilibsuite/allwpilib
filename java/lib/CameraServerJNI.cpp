@@ -21,10 +21,11 @@ using namespace wpi::java;
 
 // Used for callback.
 static JavaVM *jvm = nullptr;
-static jclass usbCameraInfoCls = nullptr;
-static jclass videoModeCls = nullptr;
-static jclass videoEventCls = nullptr;
-static jclass videoExceptionCls = nullptr;
+static JClass usbCameraInfoCls;
+static JClass videoModeCls;
+static JClass videoEventCls;
+static JException videoEx;
+static JException nullPointerEx;
 // Thread-attached environment for listener callbacks.
 static JNIEnv *listenerEnv = nullptr;
 
@@ -58,31 +59,20 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_ERR;
 
   // Cache references to classes
-  jclass local;
-
-  local = env->FindClass("edu/wpi/cscore/UsbCameraInfo");
-  if (!local) return JNI_ERR;
-  usbCameraInfoCls = static_cast<jclass>(env->NewGlobalRef(local));
+  usbCameraInfoCls = JClass{env, "edu/wpi/cscore/UsbCameraInfo"};
   if (!usbCameraInfoCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local = env->FindClass("edu/wpi/cscore/VideoMode");
-  if (!local) return JNI_ERR;
-  videoModeCls = static_cast<jclass>(env->NewGlobalRef(local));
+  videoModeCls = JClass{env, "edu/wpi/cscore/VideoMode"};
   if (!videoModeCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local = env->FindClass("edu/wpi/cscore/VideoEvent");
-  if (!local) return JNI_ERR;
-  videoEventCls = static_cast<jclass>(env->NewGlobalRef(local));
+  videoEventCls = JClass{env, "edu/wpi/cscore/VideoEvent"};
   if (!videoEventCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
 
-  local = env->FindClass("edu/wpi/cscore/VideoException");
-  if (!local) return JNI_ERR;
-  videoExceptionCls = static_cast<jclass>(env->NewGlobalRef(local));
-  if (!videoExceptionCls) return JNI_ERR;
-  env->DeleteLocalRef(local);
+  videoEx = JException{env, "edu/wpi/cscore/VideoException"};
+  if (!videoEx) return JNI_ERR;
+
+  nullPointerEx = JException(env, "java/lang/NullPointerException");
+  if (!nullPointerEx) return JNI_ERR;
 
   // Initial configuration of listener start/exit
   cs::SetListenerOnStart(ListenerOnStart);
@@ -96,10 +86,11 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
     return;
   // Delete global references
-  if (usbCameraInfoCls) env->DeleteGlobalRef(usbCameraInfoCls);
-  if (videoModeCls) env->DeleteGlobalRef(videoModeCls);
-  if (videoEventCls) env->DeleteGlobalRef(videoEventCls);
-  if (videoExceptionCls) env->DeleteGlobalRef(videoEventCls);
+  usbCameraInfoCls.free(env);
+  videoModeCls.free(env);
+  videoEventCls.free(env);
+  videoEx.free(env);
+  nullPointerEx.free(env);
   jvm = nullptr;
 }
 
@@ -138,11 +129,6 @@ class JGlobal {
 
 static void ReportError(JNIEnv *env, CS_Status status) {
   if (status == CS_OK) return;
-  static jmethodID constructor = nullptr;
-  if (!constructor)
-    constructor =
-        env->GetMethodID(videoExceptionCls, "<init>", "(Ljava/lang/String;)V");
-
   llvm::SmallString<64> msg;
   switch (status) {
     case CS_PROPERTY_WRITE_FAILED:
@@ -172,10 +158,7 @@ static void ReportError(JNIEnv *env, CS_Status status) {
       break;
     }
   }
-  JLocal<jstring> msg_jstr{env, MakeJString(env, msg)};
-  jobject exception =
-      env->NewObject(videoExceptionCls, constructor, msg_jstr.obj());
-  env->Throw(static_cast<jthrowable>(exception));
+  videoEx.Throw(env, msg);
 }
 
 static inline bool CheckStatus(JNIEnv *env, CS_Status status) {
@@ -361,6 +344,10 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getStringProperty
 JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setStringProperty
   (JNIEnv *env, jclass, jint property, jstring value)
 {
+  if (!value) {
+    nullPointerEx.Throw(env, "value cannot be null");
+    return;
+  }
   CS_Status status = 0;
   cs::SetStringProperty(property, JStringRef{env, value}, &status);
   CheckStatus(env, status);
@@ -388,6 +375,10 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_getEnumProper
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraDev
   (JNIEnv *env, jclass, jstring name, jint dev)
 {
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
   CS_Status status = 0;
   auto val = cs::CreateUsbCameraDev(JStringRef{env, name}, dev, &status);
   CheckStatus(env, status);
@@ -402,6 +393,14 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraDev
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraPath
   (JNIEnv *env, jclass, jstring name, jstring path)
 {
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
+  if (!path) {
+    nullPointerEx.Throw(env, "path cannot be null");
+    return 0;
+  }
   CS_Status status = 0;
   auto val = cs::CreateUsbCameraPath(JStringRef{env, name},
                                      JStringRef{env, path}, &status);
@@ -417,6 +416,14 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createUsbCameraPath
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createHttpCamera
   (JNIEnv *env, jclass, jstring name, jstring url)
 {
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
+  if (!url) {
+    nullPointerEx.Throw(env, "url cannot be null");
+    return 0;
+  }
   CS_Status status = 0;
   auto val = cs::CreateHttpCamera(JStringRef{env, name},
                                   JStringRef{env, url}, &status);
@@ -433,6 +440,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createCvSource
   (JNIEnv *env, jclass, jstring name, jint pixelFormat, jint width, jint height,
    jint fps)
 {
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
   CS_Status status = 0;
   auto val = cs::CreateCvSource(
       JStringRef{env, name},
@@ -524,6 +535,10 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_cscore_CameraServerJNI_isSourceConnected
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSourceProperty
   (JNIEnv *env, jclass, jint source, jstring name)
 {
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
   CS_Status status = 0;
   auto val = cs::GetSourceProperty(source, JStringRef{env, name}, &status);
   CheckStatus(env, status);
@@ -720,6 +735,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_putSourceFrame
 JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_notifySourceError
   (JNIEnv *env, jclass, jint source, jstring msg)
 {
+  if (!msg) {
+    nullPointerEx.Throw(env, "msg cannot be null");
+    return;
+  }
   CS_Status status = 0;
   cs::NotifySourceError(source, JStringRef{env, msg}, &status);
   CheckStatus(env, status);
@@ -746,6 +765,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSourceConnected
 JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSourceDescription
   (JNIEnv *env, jclass, jint source, jstring description)
 {
+  if (!description) {
+    nullPointerEx.Throw(env, "description cannot be null");
+    return;
+  }
   CS_Status status = 0;
   cs::SetSourceDescription(source, JStringRef{env, description}, &status);
   CheckStatus(env, status);
@@ -775,6 +798,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createSourceProperty
 JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSourceEnumPropertyChoices
   (JNIEnv *env, jclass, jint source, jint property, jobjectArray choices)
 {
+  if (!choices) {
+    nullPointerEx.Throw(env, "choices cannot be null");
+    return;
+  }
   size_t len = env->GetArrayLength(choices);
   llvm::SmallVector<std::string, 8> vec;
   vec.reserve(len);
@@ -800,6 +827,14 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSourceEnumProperty
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createMjpegServer
   (JNIEnv *env, jclass, jstring name, jstring listenAddress, jint port)
 {
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
+  if (!listenAddress) {
+    nullPointerEx.Throw(env, "listenAddress cannot be null");
+    return 0;
+  }
   CS_Status status = 0;
   auto val = cs::CreateMjpegServer(
       JStringRef{env, name}, JStringRef{env, listenAddress}, port, &status);
@@ -815,6 +850,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createMjpegServer
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createCvSink
   (JNIEnv *env, jclass, jstring name)
 {
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
   CS_Status status = 0;
   auto val = cs::CreateCvSink(JStringRef{env, name}, &status);
   CheckStatus(env, status);
@@ -886,6 +925,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSinkSource
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSinkSourceProperty
   (JNIEnv *env, jclass, jint sink, jstring name)
 {
+  if (!name) {
+    nullPointerEx.Throw(env, "name cannot be null");
+    return 0;
+  }
   CS_Status status = 0;
   auto val = cs::GetSinkSourceProperty(sink, JStringRef{env, name}, &status);
   CheckStatus(env, status);
@@ -969,6 +1012,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerPort
 JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSinkDescription
   (JNIEnv *env, jclass, jint sink, jstring description)
 {
+  if (!description) {
+    nullPointerEx.Throw(env, "description cannot be null");
+    return;
+  }
   CS_Status status = 0;
   cs::SetSinkDescription(sink, JStringRef{env, description}, &status);
   CheckStatus(env, status);
@@ -1025,6 +1072,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSinkEnabled
 JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_addListener
   (JNIEnv *envouter, jclass, jobject listener, jint eventMask, jboolean immediateNotify)
 {
+  if (!listener) {
+    nullPointerEx.Throw(envouter, "listener cannot be null");
+    return 0;
+  }
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
   auto listener_global =
@@ -1170,7 +1221,7 @@ struct LogMessage {
                         (jint)m_line, msg.obj());
   }
 
-  static const char* GetName() { return "NTLogger"; }
+  static const char* GetName() { return "CSLogger"; }
   static JavaVM* GetJVM() { return jvm; }
 
  private:
@@ -1196,6 +1247,10 @@ extern "C" {
 JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setLogger
   (JNIEnv *env, jclass, jobject func, jint minLevel)
 {
+  if (!func) {
+    nullPointerEx.Throw(env, "func cannot be null");
+    return;
+  }
   // cls is a temporary here; cannot be used within callback functor
   jclass cls = env->GetObjectClass(func);
   if (!cls) return;
