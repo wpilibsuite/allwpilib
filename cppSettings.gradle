@@ -72,6 +72,8 @@ task clean(type: Delete) {
     delete buildDir
 }
 
+ext.toolChainPath = null
+
 subprojects {
     ext.defineWpiUtilProperties = {
         ext.wpiUtil = wpiUtilUnzipLocation
@@ -165,8 +167,10 @@ subprojects {
             }
             // Adds a custom toolchain for our compiler prefix and options
             toolChains {
-                gcc(Gcc) {
-                    target('arm') {
+                roborioGcc(Gcc) {
+                    if (toolChainPath != null)
+                        path toolChainPath
+                    target('roborio-arm') {
                         cppCompiler.executable = compilerPrefix + cppCompiler.executable
                         linker.executable = compilerPrefix + linker.executable
                         assembler.executable = compilerPrefix + assembler.executable
@@ -188,37 +192,10 @@ subprojects {
                         staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
                     }
                 }
-                // Workaround for OS X. Macs for some reason want to use Xcode's gcc
-                // (which just wraps Clang), so we have to explicitly make it so
-                // that trying to compile with Clang will call gcc instead
-                macGcc(Clang) {
-                    target('arm') {
-                        cppCompiler.executable = compilerPrefix + 'g++'
-                        linker.executable = compilerPrefix + 'g++'
-                        assembler.executable = compilerPrefix + 'gcc'
-                        // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
-                        // arm, and doesn't understand this flag, so it is removed from both
-                        cppCompiler.withArguments { args ->
-                            args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-                            args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-Og' << '-g3' << '-rdynamic'
-                            //TODO: When the compiler allows us to actually call deprecated functions from within
-                            // deprecated function, remove this line (this will cause calling deprecated functions
-                            // to be treated as a warning rather than an error).
-                            args << '-Wno-error=deprecated-declarations'
-                            args.remove('-m32')
-                        }
-                        linker.withArguments { args ->
-                            args << '-rdynamic'
-                            args.remove('-m32')
-                        }
-                        staticLibArchiver.executable = compilerPrefix + 'ar'
-                    }
-                }
             }
 
-            // The only platform is arm linux
             platforms {
-                arm {
+                "roborio-arm" {
                     architecture 'arm'
                     operatingSystem 'linux'
                 }
@@ -227,6 +204,10 @@ subprojects {
 
         ext.niLibraryHeadersRoot = "${rootDir}/ni-libraries/include"
         ext.niLibraryHeadersChipObject = "${rootDir}/ni-libraries/include/FRC_FPGA_ChipObject"
+
+        ext.binTool = { tool ->
+            if (toolChainPath != null) return "${toolChainPath}/${compilerPrefix}${tool}"
+        }
 
         // This task adds the appropriate linker flags for the NI libraries
         ext.addNiLibraryLinks = { linker, targetPlatform ->
@@ -246,9 +227,9 @@ subprojects {
                         def library = task.outputFile.absolutePath
                         def debugLibrary = task.outputFile.absolutePath + ".debug"
                         task.doLast {
-                            exec { commandLine "${compilerPrefix}objcopy", '--only-keep-debug', library, debugLibrary }
-                            exec { commandLine "${compilerPrefix}strip", '-g', library }
-                            exec { commandLine "${compilerPrefix}objcopy", "--add-gnu-debuglink=$debugLibrary", library }
+                            exec { commandLine binTool("objcopy"), '--only-keep-debug', library, debugLibrary }
+                            exec { commandLine binTool("strip"), '-g', library }
+                            exec { commandLine binTool("objcopy"), "--add-gnu-debuglink=$debugLibrary", library }
                         }
                     }
                 }

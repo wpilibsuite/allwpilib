@@ -9,7 +9,7 @@ def ntSourceDir = "$buildDir/ntSources"
 model {
     components {
         wpilibc(NativeLibrarySpec) {
-            targetPlatform 'arm'
+            targetPlatform 'roborio-arm'
             binaries.all {
                 tasks.withType(CppCompile) {
                     dependsOn generateCppVersion
