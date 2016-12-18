@@ -171,6 +171,7 @@ subprojects {
                     if (toolChainPath != null)
                         path toolChainPath
                     target('roborio-arm') {
+                        cCompiler.executable = compilerPrefix + cCompiler.executable
                         cppCompiler.executable = compilerPrefix + cppCompiler.executable
                         linker.executable = compilerPrefix + linker.executable
                         assembler.executable = compilerPrefix + assembler.executable
@@ -207,6 +208,7 @@ subprojects {
 
         ext.binTool = { tool ->
             if (toolChainPath != null) return "${toolChainPath}/${compilerPrefix}${tool}"
+            return "${compilerPrefix}${tool}"
         }
 
         // This task adds the appropriate linker flags for the NI libraries
