@@ -113,7 +113,7 @@ void CvSourceImpl::NotifyError(llvm::StringRef msg) {
 int CvSourceImpl::CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
                                  int minimum, int maximum, int step,
                                  int defaultValue, int value) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::lock_guard<std::mutex> lock(m_mutex);
   int& ndx = m_properties[name];
   if (ndx == 0) {
     // create a new index
