@@ -69,7 +69,9 @@ public class CameraServer {
         // TODO
         return "ip:";
       case kCv:
-        return "cv:";
+        // FIXME: Should be "cv:", but LabVIEW dashboard requires "usb:".
+        // https://github.com/wpilibsuite/allwpilib/issues/407
+        return "usb:";
       default:
         return "unknown:";
     }
