@@ -37,9 +37,10 @@ class UnlimitedHandleResource {
   friend class UnlimitedHandleResourceTest;
 
  public:
-  UnlimitedHandleResource(const UnlimitedHandleResource&) = delete;
-  UnlimitedHandleResource operator=(const UnlimitedHandleResource&) = delete;
   UnlimitedHandleResource() = default;
+  UnlimitedHandleResource(const UnlimitedHandleResource&) = delete;
+  UnlimitedHandleResource& operator=(const UnlimitedHandleResource&) = delete;
+
   THandle Allocate(std::shared_ptr<TStruct> structure);
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);

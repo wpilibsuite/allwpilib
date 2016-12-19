@@ -38,9 +38,10 @@ class IndexedHandleResource {
   friend class IndexedHandleResourceTest;
 
  public:
-  IndexedHandleResource(const IndexedHandleResource&) = delete;
-  IndexedHandleResource operator=(const IndexedHandleResource&) = delete;
   IndexedHandleResource() = default;
+  IndexedHandleResource(const IndexedHandleResource&) = delete;
+  IndexedHandleResource& operator=(const IndexedHandleResource&) = delete;
+
   THandle Allocate(int16_t index, int32_t* status);
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);

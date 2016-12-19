@@ -37,9 +37,10 @@ class DigitalHandleResource {
   friend class DigitalHandleResourceTest;
 
  public:
-  DigitalHandleResource(const DigitalHandleResource&) = delete;
-  DigitalHandleResource operator=(const DigitalHandleResource&) = delete;
   DigitalHandleResource() = default;
+  DigitalHandleResource(const DigitalHandleResource&) = delete;
+  DigitalHandleResource& operator=(const DigitalHandleResource&) = delete;
+
   THandle Allocate(int16_t index, HAL_HandleEnum enumValue, int32_t* status);
   std::shared_ptr<TStruct> Get(THandle handle, HAL_HandleEnum enumValue);
   void Free(THandle handle, HAL_HandleEnum enumValue);

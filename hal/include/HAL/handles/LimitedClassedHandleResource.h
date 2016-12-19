@@ -36,10 +36,11 @@ class LimitedClassedHandleResource {
   friend class LimitedClassedHandleResourceTest;
 
  public:
-  LimitedClassedHandleResource(const LimitedClassedHandleResource&) = delete;
-  LimitedClassedHandleResource operator=(const LimitedClassedHandleResource&) =
-      delete;
   LimitedClassedHandleResource() = default;
+  LimitedClassedHandleResource(const LimitedClassedHandleResource&) = delete;
+  LimitedClassedHandleResource& operator=(const LimitedClassedHandleResource&) =
+      delete;
+
   THandle Allocate(std::shared_ptr<TStruct> toSet);
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);
