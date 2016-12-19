@@ -8,7 +8,8 @@ before_install:
   - sudo add-apt-repository ppa:wpilib/toolchain -y
   - sudo apt-get update -q || true
   - sudo apt-get install frc-toolchain libgazebo7-dev protobuf-compiler libprotobuf-dev python3 clang-format-3.8 -y
-
+install:
+  - pip3 install wpiformat
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -17,10 +18,7 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-before_script:
-  - git clone git://github.com/wpilibsuite/styleguide $HOME/styleguide
-
 script:
-  - WPI_FORMAT=$HOME/styleguide python3 styleguide/format.py
+  - wpiformat
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
   - ./gradlew build -PmakeSim
