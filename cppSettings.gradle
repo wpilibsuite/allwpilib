@@ -72,7 +72,9 @@ task clean(type: Delete) {
     delete buildDir
 }
 
-ext.toolChainPath = null
+if (!hasProperty("toolChainPath")) {
+    ext.toolChainPath = null
+}
 
 subprojects {
     ext.defineWpiUtilProperties = {
@@ -196,7 +198,7 @@ subprojects {
             }
 
             platforms {
-                "roborio-arm" {
+                'roborio-arm' {
                     architecture 'arm'
                     operatingSystem 'linux'
                 }
@@ -229,9 +231,9 @@ subprojects {
                         def library = task.outputFile.absolutePath
                         def debugLibrary = task.outputFile.absolutePath + ".debug"
                         task.doLast {
-                            exec { commandLine binTool("objcopy"), '--only-keep-debug', library, debugLibrary }
-                            exec { commandLine binTool("strip"), '-g', library }
-                            exec { commandLine binTool("objcopy"), "--add-gnu-debuglink=$debugLibrary", library }
+                            exec { commandLine binTool('objcopy'), '--only-keep-debug', library, debugLibrary }
+                            exec { commandLine binTool('strip'), '-g', library }
+                            exec { commandLine binTool('objcopy'), "--add-gnu-debuglink=$debugLibrary", library }
                         }
                     }
                 }
