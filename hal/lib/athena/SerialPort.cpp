@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include "SerialHelper.h"
+#include "HAL/cpp/SerialHelper.h"
 #include "visa/visa.h"
 
 static int32_t resourceManagerHandle;
@@ -23,7 +23,7 @@ void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
   if (resourceManagerHandle == 0)
     viOpenDefaultRM(reinterpret_cast<ViSession*>(&resourceManagerHandle));
 
-  hal::SerialHelper serialHelper(resourceManagerHandle);
+  hal::SerialHelper serialHelper;
 
   portName = serialHelper.GetVISASerialPortName(port, status);
 

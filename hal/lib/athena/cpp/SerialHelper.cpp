@@ -5,29 +5,30 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SerialHelper.h"
+#include "HAL/cpp/SerialHelper.h"
 
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
 
+#include "../visa/visa.h"
 #include "HAL/Errors.h"
 #include "llvm/StringRef.h"
-#include "visa/visa.h"
 
 constexpr const char* OnboardResourceVISA = "ASRL1::INSTR";
 constexpr const char* MxpResourceVISA = "ASRL2::INSTR";
 
-constexpr const char* OnboardResourceOS = "ttyS0";
-constexpr const char* MxpResourceOS = "ttyS1";
+constexpr const char* OnboardResourceOS = "/dev/ttyS0";
+constexpr const char* MxpResourceOS = "/dev/ttyS1";
 
 namespace hal {
 std::string SerialHelper::m_usbNames[2]{"", ""};
 
 priority_mutex SerialHelper::m_nameMutex;
 
-SerialHelper::SerialHelper(int32_t resourceHandle)
-    : m_resourceHandle(resourceHandle) {}
+SerialHelper::SerialHelper() {
+  viOpenDefaultRM(reinterpret_cast<ViSession*>(&m_resourceHandle));
+}
 
 std::string SerialHelper::GetVISASerialPortName(HAL_SerialPort port,
                                                 int32_t* status) {
@@ -269,7 +270,8 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
       m_unsortedHubPath.emplace_back(
           llvm::StringRef{pathSplitVec[hubIndex - 2]});
       m_visaResource.emplace_back(desc);
-      m_osResource.emplace_back(matchString);
+      m_osResource.emplace_back(
+          llvm::StringRef{osName}.split("(").second.split(")").first);
     }
   }
 
