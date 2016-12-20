@@ -73,6 +73,12 @@ BUILD FAILED
 Total time: 2.441 secs
 ```
 
+If you have the Toolchain installed somewhere not on the System PATH, you can use the `toolChainPath` property to specify where the bin location of the toolchain is installed to, for example:
+
+```bash
+./gradlew :arm:build -PtoolChainPath=some/path/to/my/toolchain/bin
+```
+
 ## Testing
 By default, tests will be built for the x86 and x64 versions of ntcore, and will be run during any execution of the `build` or `publish` tasks. To skip building and running the tests, use the `-PwithoutTests` command line flag when running Gradle.
 
