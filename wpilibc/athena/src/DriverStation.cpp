@@ -12,6 +12,7 @@
 #include "AnalogInput.h"
 #include "FRC_NetworkCommunication/FRCComm.h"
 #include "HAL/HAL.h"
+#include "HAL/Power.h"
 #include "HAL/cpp/Log.h"
 #include "MotorSafetyHelper.h"
 #include "Timer.h"

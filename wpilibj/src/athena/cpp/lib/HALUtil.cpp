@@ -16,6 +16,8 @@
 
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include "HAL/HAL.h"
+#include "HAL/DriverStation.h"
+#include "HAL/Errors.h"
 #include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
 

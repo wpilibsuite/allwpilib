@@ -12,6 +12,7 @@
 #include "HAL/cpp/Log.h"
 
 #include "HAL/HAL.h"
+#include "HAL/DriverStation.h"
 #include "edu_wpi_first_wpilibj_hal_HAL.h"
 #include "HALUtil.h"
 

@@ -15,6 +15,7 @@
 #include <mutex>
 
 #include "HAL/ChipObject.h"
+#include "HAL/Errors.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"

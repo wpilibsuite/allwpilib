@@ -6,8 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Compressor.h"
+#include "HAL/Compressor.h"
 
 #include "HAL/HAL.h"
+#include "HAL/Ports.h"
+#include "HAL/Solenoid.h"
 #include "WPIErrors.h"
 
 using namespace frc;

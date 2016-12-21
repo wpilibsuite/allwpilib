@@ -8,6 +8,7 @@
 #include "SolenoidBase.h"
 
 #include "HAL/HAL.h"
+#include "HAL/Solenoid.h"
 
 using namespace frc;
 

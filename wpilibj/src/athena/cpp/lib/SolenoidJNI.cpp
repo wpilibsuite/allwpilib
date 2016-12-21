@@ -6,7 +6,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include <jni.h>
-#include "HAL/HAL.h"
+#include "HAL/Solenoid.h"
+#include "HAL/Ports.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/cpp/Log.h"
 

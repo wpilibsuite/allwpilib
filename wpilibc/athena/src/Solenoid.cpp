@@ -5,11 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HAL/Solenoid.h"
 #include "Solenoid.h"
 
 #include <sstream>
 
 #include "HAL/HAL.h"
+#include "HAL/Ports.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

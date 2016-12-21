@@ -5,6 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HAL/SerialPort.h"
 #include "SerialPort.h"
 
 #include "HAL/HAL.h"
