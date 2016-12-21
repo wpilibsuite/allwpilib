@@ -38,6 +38,7 @@
 #include "Handle.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "UsbUtil.h"
 
 using namespace cs;
 
@@ -308,10 +309,59 @@ static int SetStringCtrlIoctl(int fd, int id, int maximum,
   return DoIoctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls);
 }
 
+static bool GetDescriptionSysV4L(llvm::StringRef path, std::string* desc) {
+  llvm::SmallString<64> ifpath{"/sys/class/video4linux/"};
+  ifpath += path.substr(5);
+  ifpath += "/device/interface";
+
+  int fd = open(ifpath.c_str(), O_RDONLY);
+  if (fd < 0) return false;
+
+  char readBuf[128];
+  ssize_t n = read(fd, readBuf, sizeof(readBuf));
+  close(fd);
+
+  if (n <= 0) return false;
+
+  *desc = llvm::StringRef(readBuf, n).rtrim();
+  return true;
+}
+
+static bool GetDescriptionIoctl(const char* cpath, std::string* desc) {
+  int fd = open(cpath, O_RDWR);
+  if (fd < 0) return false;
+
+  struct v4l2_capability vcap;
+  std::memset(&vcap, 0, sizeof(vcap));
+  if (DoIoctl(fd, VIDIOC_QUERYCAP, &vcap) < 0) {
+    close(fd);
+    return false;
+  }
+  close(fd);
+
+  llvm::StringRef card{reinterpret_cast<const char*>(vcap.card)};
+  // try to convert "UVC Camera (0000:0000)" into a better name
+  int vendor = 0;
+  int product = 0;
+  if (card.startswith("UVC Camera (") &&
+      !card.substr(12, 4).getAsInteger(16, vendor) &&
+      !card.substr(17, 4).getAsInteger(16, product)) {
+    llvm::SmallString<64> card2Buf;
+    llvm::StringRef card2 = GetUsbNameFromId(vendor, product, card2Buf);
+    if (!card2.empty()) {
+      *desc = card2;
+      return true;
+    }
+  }
+
+  *desc = card;
+  return true;
+}
+
 static std::string GetDescriptionImpl(const char* cpath) {
   llvm::StringRef path{cpath};
-  int fd;
   char pathBuf[128];
+  std::string rv;
 
   // If trying to get by id or path, follow symlink
   if (path.startswith("/dev/v4l/by-id/")) {
@@ -324,48 +374,11 @@ static std::string GetDescriptionImpl(const char* cpath) {
 
   if (path.startswith("/dev/video")) {
     // Sometimes the /sys tree gives a better name.
-    llvm::SmallString<64> ifpath{"/sys/class/video4linux/"};
-    ifpath += path.substr(5);
-    ifpath += "/device/interface";
-    fd = open(ifpath.c_str(), O_RDONLY);
-    if (fd >= 0) {
-      char readBuf[128];
-      ssize_t n = read(fd, readBuf, sizeof(readBuf));
-      if (n > 0) {
-        close(fd);
-        return llvm::StringRef(readBuf, n).rtrim();
-      }
-      close(fd);
-    }
+    if (GetDescriptionSysV4L(path, &rv)) return rv;
   }
 
   // Otherwise use an ioctl to query the caps and get the card name
-  fd = open(cpath, O_RDWR);
-  if (fd >= 0) {
-    struct v4l2_capability vcap;
-    std::memset(&vcap, 0, sizeof(vcap));
-    if (DoIoctl(fd, VIDIOC_QUERYCAP, &vcap) >= 0) {
-      close(fd);
-      llvm::StringRef card{reinterpret_cast<const char*>(vcap.card)};
-      // try to convert "UVC Camera (0000:0000)" into a better name
-      int vendor = 0;
-      int product = 0;
-      if (card.startswith("UVC Camera (") &&
-        !card.substr(12, 4).getAsInteger(16, vendor) &&
-        !card.substr(17, 4).getAsInteger(16, product)) {
-        switch (vendor) {
-          case 0x046d:
-            switch (product) {
-              case 0x081b: return "Logitech, Inc. Webcam C310";
-              case 0x0825: return "Logitech, Inc. Webcam C270";
-            }
-            break;
-        }
-      }
-      return card;
-    }
-    close(fd);
-  }
+  if (GetDescriptionIoctl(cpath, &rv)) return rv;
 
   return std::string{};
 }
