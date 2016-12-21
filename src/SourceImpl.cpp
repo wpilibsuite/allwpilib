@@ -19,8 +19,9 @@ using namespace cs;
 
 static constexpr std::size_t kMaxImagesAvail = 32;
 
-SourceImpl::SourceImpl(llvm::StringRef name)
-    : m_name{name}, m_frame{*this, llvm::StringRef{}, 0} {}
+SourceImpl::SourceImpl(llvm::StringRef name) : m_name{name} {
+  m_frame = Frame{*this, llvm::StringRef{}, 0};
+}
 
 SourceImpl::~SourceImpl() {
   // Wake up anyone who is waiting.  This also clears the current frame,
