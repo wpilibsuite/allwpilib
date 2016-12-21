@@ -81,17 +81,16 @@ void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
 std::string SinkImpl::GetError() const {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_source) return "no source connected";
-  auto frame = m_source->GetCurFrame();
-  if (frame) return std::string{};  // no error
-  return llvm::StringRef{frame};
+  return m_source->GetCurFrame().GetError();
 }
 
 llvm::StringRef SinkImpl::GetError(llvm::SmallVectorImpl<char>& buf) const {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (!m_source) return "no source connected";
-  auto frame = m_source->GetCurFrame();
-  if (frame) return llvm::StringRef{};  // no error
-  buf.append(frame.data(), frame.data() + frame.size());
+  // Make a copy as it's shared data
+  llvm::StringRef error = m_source->GetCurFrame().GetError();
+  buf.clear();
+  buf.append(error.data(), error.data() + error.size());
   return llvm::StringRef{buf.data(), buf.size()};
 }
 

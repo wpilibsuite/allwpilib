@@ -73,6 +73,11 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
     m_source->DisableSink();
     m_streaming = false;
   }
+
+  int m_width{0};
+  int m_height{0};
+  int m_compression{80};
+  int m_fps{0};
 };
 
 // Standard header to send along with other header information like mimetype.
@@ -177,31 +182,27 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
       return false;
     }
 
-    // handle resolution and FPS; these are handled via separate interfaces
-    // rather than as properties
+    // Handle resolution, compression, and FPS.  These are handled locally
+    // rather than passed to the source.
     if (param == "resolution") {
       llvm::StringRef widthStr, heightStr;
       std::tie(widthStr, heightStr) = value.split('x');
       int width, height;
       if (widthStr.getAsInteger(10, width)) {
-        response << param << ": \"width is not integer\"\r\n";
+        response << param << ": \"width is not an integer\"\r\n";
         SWARNING("HTTP parameter \"" << param << "\" width \"" << widthStr
-                                     << "\" is not integer");
+                                     << "\" is not an integer");
         continue;
       }
       if (heightStr.getAsInteger(10, height)) {
-        response << param << ": \"height is not integer\"\r\n";
+        response << param << ": \"height is not an integer\"\r\n";
         SWARNING("HTTP parameter \"" << param << "\" height \"" << heightStr
-                                     << "\" is not integer");
+                                     << "\" is not an integer");
         continue;
       }
-      CS_Status status = 0;
-      if (!source.SetResolution(width, height, &status)) {
-        response << param << ": \"error\"\r\n";
-        SWARNING("Could not set resolution to " << width << "x" << height);
-      } else {
-        response << param << ": \"ok\"\r\n";
-      }
+      m_width = width;
+      m_height = height;
+      response << param << ": \"ok\"\r\n";
       continue;
     }
 
@@ -212,12 +213,22 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
         SWARNING("HTTP parameter \"" << param << "\" value \"" << value
                                      << "\" is not an integer");
         continue;
-      }
-      CS_Status status = 0;
-      if (!source.SetFPS(fps, &status)) {
-        response << param << ": \"error\"\r\n";
-        SWARNING("Could not set FPS to " << fps);
       } else {
+        m_fps = fps;
+        response << param << ": \"ok\"\r\n";
+      }
+      continue;
+    }
+
+    if (param == "compression") {
+      int compression;
+      if (value.getAsInteger(10, compression)) {
+        response << param << ": \"invalid integer\"\r\n";
+        SWARNING("HTTP parameter \"" << param << "\" value \"" << value
+                                     << "\" is not an integer");
+        continue;
+      } else {
+        m_compression = compression;
         response << param << ": \"ok\"\r\n";
       }
       continue;
@@ -229,7 +240,6 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
     // try to assign parameter
     auto prop = source.GetPropertyIndex(param);
     if (!prop) {
-      if (param == "compression") continue;  // silently ignore
       response << param << ": \"ignored\"\r\n";
       SWARNING("ignoring HTTP parameter \"" << param << "\"");
       continue;
@@ -411,11 +421,21 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
       continue;
     }
 
-    const char* data = frame.data();
-    std::size_t size = frame.size();
+    int width = m_width != 0 ? m_width : frame.GetOriginalWidth();
+    int height = m_height != 0 ? m_height : frame.GetOriginalHeight();
+    Image* image =
+        frame.GetImage(width, height, VideoMode::kMJPEG, m_compression);
+    if (!image) {
+      // Shouldn't happen, but just in case...
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      continue;
+    }
+
+    const char* data = image->data();
+    std::size_t size = image->size();
     bool addDHT = false;
     std::size_t locSOF = size;
-    switch (frame.GetPixelFormat()) {
+    switch (image->pixelFormat) {
       case VideoMode::kMJPEG:
         // Determine if we need to add DHT to it, and allocate enough space
         // for adding it if required.
@@ -434,7 +454,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
     // with firefox
-    double timestamp = frame.time() / 10000000.0;
+    double timestamp = frame.GetTime() / 10000000.0;
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n"
         << "Content-Type: image/jpeg\r\n"
@@ -446,7 +466,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
       // Insert DHT data immediately before SOF
       os << llvm::StringRef(data, locSOF);
       os << JpegGetDHT();
-      os << llvm::StringRef(data + locSOF, frame.size() - locSOF);
+      os << llvm::StringRef(data + locSOF, image->size() - locSOF);
     } else {
       os << llvm::StringRef(data, size);
     }
@@ -458,6 +478,12 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 void MjpegServerImpl::ConnThread::ProcessRequest() {
   wpi::raw_socket_istream is{*m_stream};
   wpi::raw_socket_ostream os{*m_stream, true};
+
+  // Reset per-request settings
+  m_width = 0;
+  m_height = 0;
+  m_compression = 80;
+  m_fps = 0;
 
   // Read the request string from the stream
   bool error = false;

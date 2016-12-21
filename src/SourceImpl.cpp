@@ -10,15 +10,17 @@
 #include <algorithm>
 #include <cstring>
 
+#include "llvm/STLExtras.h"
+
 #include "Log.h"
 #include "Notifier.h"
 
 using namespace cs;
 
-static constexpr std::size_t kMaxFramesAvail = 32;
+static constexpr std::size_t kMaxImagesAvail = 32;
 
 SourceImpl::SourceImpl(llvm::StringRef name)
-    : m_name{name}, m_frame{*this, nullptr} {}
+    : m_name{name}, m_frame{*this, llvm::StringRef{}, 0} {}
 
 SourceImpl::~SourceImpl() {
   // Wake up anyone who is waiting.  This also clears the current frame,
@@ -55,7 +57,7 @@ void SourceImpl::SetConnected(bool connected) {
 
 uint64_t SourceImpl::GetCurFrameTime() {
   std::unique_lock<std::mutex> lock{m_frameMutex};
-  return m_frame.time();
+  return m_frame.GetTime();
 }
 
 Frame SourceImpl::GetCurFrame() {
@@ -65,15 +67,15 @@ Frame SourceImpl::GetCurFrame() {
 
 Frame SourceImpl::GetNextFrame() {
   std::unique_lock<std::mutex> lock{m_frameMutex};
-  auto oldTime = m_frame.time();
-  m_frameCv.wait(lock, [=] { return m_frame.time() != oldTime; });
+  auto oldTime = m_frame.GetTime();
+  m_frameCv.wait(lock, [=] { return m_frame.GetTime() != oldTime; });
   return m_frame;
 }
 
 void SourceImpl::Wakeup() {
   {
     std::lock_guard<std::mutex> lock{m_frameMutex};
-    m_frame = Frame{*this, nullptr};
+    m_frame = Frame{*this, llvm::StringRef{}, 0};
   }
   m_frameCv.notify_all();
 }
@@ -261,20 +263,20 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
   return m_videoModes;
 }
 
-std::unique_ptr<Frame::Data> SourceImpl::AllocFrame(
-    VideoMode::PixelFormat pixelFormat, int width, int height, std::size_t size,
-    Frame::Time time) {
-  std::unique_ptr<Frame::Data> frameData;
+std::unique_ptr<Image> SourceImpl::AllocImage(
+    VideoMode::PixelFormat pixelFormat, int width, int height,
+    std::size_t size) {
+  std::unique_ptr<Image> image;
   {
     std::lock_guard<std::mutex> lock{m_poolMutex};
     // find the smallest existing frame that is at least big enough.
     int found = -1;
-    for (std::size_t i = 0; i < m_framesAvail.size(); ++i) {
+    for (std::size_t i = 0; i < m_imagesAvail.size(); ++i) {
       // is it big enough?
-      if (m_framesAvail[i] && m_framesAvail[i]->capacity >= size) {
+      if (m_imagesAvail[i] && m_imagesAvail[i]->capacity() >= size) {
         // is it smaller than the last found?
         if (found < 0 ||
-            m_framesAvail[i]->capacity < m_framesAvail[found]->capacity) {
+            m_imagesAvail[i]->capacity() < m_imagesAvail[found]->capacity()) {
           // yes, update
           found = i;
         }
@@ -283,65 +285,88 @@ std::unique_ptr<Frame::Data> SourceImpl::AllocFrame(
 
     // if nothing found, allocate a new buffer
     if (found < 0)
-      frameData.reset(new Frame::Data{size});
+      image.reset(new Image{size});
     else
-      frameData = std::move(m_framesAvail[found]);
+      image = std::move(m_imagesAvail[found]);
   }
 
-  // Initialize frame data
-  frameData->refcount = 0;
-  frameData->time = time;
-  frameData->size = size;
-  frameData->pixelFormat = pixelFormat;
-  frameData->width = width;
-  frameData->height = height;
+  // Initialize image
+  image->SetSize(size);
+  image->pixelFormat = pixelFormat;
+  image->width = width;
+  image->height = height;
 
-  return frameData;
+  return image;
 }
 
 void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
                           int height, llvm::StringRef data, Frame::Time time) {
-  std::unique_ptr<Frame::Data> frameData =
-      AllocFrame(pixelFormat, width, height, data.size(), time);
+  auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data
-  SDEBUG4("Copying data to " << ((void*)frameData->data) << " from "
+  SDEBUG4("Copying data to " << ((void*)image->data()) << " from "
                              << ((void*)data.data()) << " (" << data.size()
                              << " bytes)");
-  std::memcpy(frameData->data, data.data(), data.size());
+  std::memcpy(image->data(), data.data(), data.size());
 
-  PutFrame(std::move(frameData));
+  PutFrame(std::move(image), time);
 }
 
-void SourceImpl::PutFrame(std::unique_ptr<Frame::Data> frameData) {
+void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   // Update frame
   {
     std::lock_guard<std::mutex> lock{m_frameMutex};
-    m_frame = Frame{*this, std::move(frameData)};
+    m_frame = Frame{*this, std::move(image), time};
   }
 
   // Signal listeners
   m_frameCv.notify_all();
 }
 
-void SourceImpl::ReleaseFrame(std::unique_ptr<Frame::Data> data) {
+void SourceImpl::PutError(llvm::StringRef msg, Frame::Time time) {
+  // Update frame
+  {
+    std::lock_guard<std::mutex> lock{m_frameMutex};
+    m_frame = Frame{*this, msg, time};
+  }
+
+  // Signal listeners
+  m_frameCv.notify_all();
+}
+
+void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
   std::lock_guard<std::mutex> lock{m_poolMutex};
   if (m_destroyFrames) return;
   // Return the frame to the pool.  First try to find an empty slot, otherwise
   // add it to the end.
-  auto it = std::find(m_framesAvail.begin(), m_framesAvail.end(), nullptr);
-  if (it != m_framesAvail.end())
-    (*it) = std::move(data);
-  else if (m_framesAvail.size() > kMaxFramesAvail) {
+  auto it = std::find(m_imagesAvail.begin(), m_imagesAvail.end(), nullptr);
+  if (it != m_imagesAvail.end())
+    *it = std::move(image);
+  else if (m_imagesAvail.size() > kMaxImagesAvail) {
     // Replace smallest buffer; don't need to check for null because the above
     // find would have found it.
-    auto it2 = std::min_element(m_framesAvail.begin(), m_framesAvail.end(),
-                                [](const std::unique_ptr<Frame::Data>& a,
-                                   const std::unique_ptr<Frame::Data>& b) {
-                                  return a->capacity < b->capacity;
-                                });
-    if ((*it2)->capacity < data->capacity)
-      *it2 = std::move(data);
+    auto it2 = std::min_element(
+        m_imagesAvail.begin(), m_imagesAvail.end(),
+        [](const std::unique_ptr<Image>& a, const std::unique_ptr<Image>& b) {
+          return a->capacity() < b->capacity();
+        });
+    if ((*it2)->capacity() < image->capacity()) *it2 = std::move(image);
   } else
-    m_framesAvail.emplace_back(std::move(data));
+    m_imagesAvail.emplace_back(std::move(image));
+}
+
+std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
+  std::lock_guard<std::mutex> lock{m_poolMutex};
+
+  if (m_framesAvail.empty()) return llvm::make_unique<Frame::Impl>(*this);
+
+  auto impl = std::move(m_framesAvail.back());
+  m_framesAvail.pop_back();
+  return impl;
+}
+
+void SourceImpl::ReleaseFrameImpl(std::unique_ptr<Frame::Impl> impl) {
+  std::lock_guard<std::mutex> lock{m_poolMutex};
+  if (m_destroyFrames) return;
+  m_framesAvail.push_back(std::move(impl));
 }

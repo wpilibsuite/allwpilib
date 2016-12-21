@@ -44,39 +44,28 @@ void CvSinkImpl::Stop() {
 
 uint64_t CvSinkImpl::GrabFrame(cv::Mat& image) {
   SetEnabled(true);
+
   auto source = GetSource();
   if (!source) {
     // Source disconnected; sleep for one second
     std::this_thread::sleep_for(std::chrono::seconds(1));
     return 0;
   }
+
   auto frame = source->GetNextFrame();  // blocks
   if (!frame) {
     // Bad frame; sleep for 20 ms so we don't consume all processor time.
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     return 0;  // signal error
   }
-  switch (frame.GetPixelFormat()) {
-    case VideoMode::kMJPEG:
-      cv::imdecode(cv::InputArray{frame.data(), static_cast<int>(frame.size())},
-                   cv::IMREAD_COLOR, &image);
-      // Check to see if we successfully decoded
-      if (image.cols != frame.width() || image.rows != frame.height()) return 0;
-      break;
-    case VideoMode::kYUYV:
-      cv::cvtColor(cv::Mat{frame.height(), frame.width(), CV_8UC2,
-                           frame.data()},
-                   image, cv::COLOR_YUV2BGR_YUYV);
-      break;
-    case VideoMode::kRGB565:
-      cv::cvtColor(cv::Mat{frame.height(), frame.width(), CV_8UC2,
-                           frame.data()},
-                   image, cv::COLOR_BGR5652RGB);
-      break;
-    default:
-      return 0;
+
+  if (!frame.GetCv(image)) {
+    // Shouldn't happen, but just in case...
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    return 0;
   }
-  return frame.time();
+
+  return frame.GetTime();
 }
 
 // Send HTTP response and a stream of JPG-frames

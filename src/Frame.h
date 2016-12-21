@@ -10,10 +10,12 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 
-#include "llvm/StringRef.h"
+#include "llvm/SmallVector.h"
 
 #include "cscore_cpp.h"
+#include "Image.h"
 
 namespace cs {
 
@@ -25,33 +27,28 @@ class Frame {
  public:
   typedef uint64_t Time;
 
-  struct Data {
-    explicit Data(std::size_t capacity_)
-        : data(new char[capacity_]), size(0), capacity(capacity_) {}
-    ~Data() { delete[] data; }
+ private:
+  struct Impl {
+    Impl(SourceImpl& source_) : source(source_) {}
 
+    std::recursive_mutex mutex;
     std::atomic_int refcount{0};
-    Time time;
-    char* data;
-    std::size_t size;
-    std::size_t capacity;
-    VideoMode::PixelFormat pixelFormat;
-    int width;
-    int height;
+    Time time{0};
+    SourceImpl& source;
+    std::string error;
+    llvm::SmallVector<Image*, 4> images;
+    std::vector<int> compressionParams;
   };
 
  public:
-  Frame() noexcept : m_source{nullptr}, m_data{nullptr} {}
+  Frame() noexcept : m_impl{nullptr} {}
 
-  Frame(SourceImpl& source, std::unique_ptr<Data> data) noexcept
-      : m_source{&source},
-        m_data{data.release()} {
-    if (m_data) ++(m_data->refcount);
-  }
+  Frame(SourceImpl& source, llvm::StringRef error, Time time);
 
-  Frame(const Frame& frame) noexcept : m_source{frame.m_source},
-                                       m_data{frame.m_data} {
-    if (m_data) ++(m_data->refcount);
+  Frame(SourceImpl& source, std::unique_ptr<Image> image, Time time);
+
+  Frame(const Frame& frame) noexcept : m_impl{frame.m_impl} {
+    if (m_impl) ++m_impl->refcount;
   }
 
   Frame(Frame&& other) noexcept : Frame() { swap(*this, other); }
@@ -63,64 +60,94 @@ class Frame {
     return *this;
   }
 
-  explicit operator bool() const {
-    return m_data && m_data->pixelFormat != VideoMode::kUnknown;
-  }
-
-  operator llvm::StringRef() const {
-    if (!m_data) return llvm::StringRef{};
-    return llvm::StringRef(m_data->data, m_data->size);
-  }
-
-  std::size_t size() const {
-    if (!m_data) return 0;
-    return m_data->size;
-  }
-
-  const char* data() const {
-    if (!m_data) return nullptr;
-    return m_data->data;
-  }
-
-  char* data() {
-    if (!m_data) return nullptr;
-    return m_data->data;
-  }
-
-  VideoMode::PixelFormat GetPixelFormat() const {
-    if (!m_data) return VideoMode::kUnknown;
-    return m_data->pixelFormat;
-  }
-
-  int width() const {
-    if (!m_data) return 0;
-    return m_data->width;
-  }
-
-  int height() const {
-    if (!m_data) return 0;
-    return m_data->height;
-  }
-
-  Time time() const {
-    if (!m_data) return Time{};
-    return m_data->time;
-  }
+  explicit operator bool() const { return m_impl && m_impl->error.empty(); }
 
   friend void swap(Frame& first, Frame& second) noexcept {
     using std::swap;
-    swap(first.m_source, second.m_source);
-    swap(first.m_data, second.m_data);
+    swap(first.m_impl, second.m_impl);
   }
+
+  Time GetTime() const { return m_impl ? m_impl->time : 0; }
+
+  llvm::StringRef GetError() const {
+    if (!m_impl) return llvm::StringRef{};
+    return m_impl->error;
+  }
+
+  int GetOriginalWidth() const {
+    if (!m_impl) return 0;
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    if (m_impl->images.empty()) return 0;
+    return m_impl->images[0]->width;
+  }
+
+  int GetOriginalHeight() const {
+    if (!m_impl) return 0;
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    if (m_impl->images.empty()) return 0;
+    return m_impl->images[0]->height;
+  }
+
+  int GetOriginalPixelFormat() const {
+    if (!m_impl) return 0;
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    if (m_impl->images.empty()) return 0;
+    return m_impl->images[0]->pixelFormat;
+  }
+
+  Image* GetExistingImage(std::size_t i = 0) const {
+    if (!m_impl) return nullptr;
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    if (i >= m_impl->images.size()) return nullptr;
+    return m_impl->images[i];
+  }
+
+  Image* GetExistingImage(int width, int height) const {
+    if (!m_impl) return nullptr;
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    for (auto i : m_impl->images) {
+      if (i->Is(width, height)) return i;
+    }
+    return nullptr;
+  }
+
+  Image* GetExistingImage(int width, int height,
+                          VideoMode::PixelFormat pixelFormat) const {
+    if (!m_impl) return nullptr;
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    for (auto i : m_impl->images) {
+      if (i->Is(width, height, pixelFormat)) return i;
+    }
+    return nullptr;
+  }
+
+  Image* GetNearestImage(int width, int height) const;
+  Image* GetNearestImage(int width, int height,
+                         VideoMode::PixelFormat pixelFormat) const;
+
+  Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat,
+                 int jpegQuality = 80);
+  Image* ConvertMJPEGToBGR(Image* image);
+  Image* ConvertYUYVToBGR(Image* image);
+  Image* ConvertBGRToRGB565(Image* image);
+  Image* ConvertRGB565ToBGR(Image* image);
+  Image* ConvertBGRToMJPEG(Image* image, int quality);
+
+  Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat,
+                  int jpegQuality = 80);
+
+  bool GetCv(cv::Mat& image) {
+    return GetCv(image, GetOriginalWidth(), GetOriginalHeight());
+  }
+  bool GetCv(cv::Mat& image, int width, int height);
 
  private:
   void DecRef() {
-    if (m_data && --(m_data->refcount) == 0) ReleaseFrame();
+    if (m_impl && --(m_impl->refcount) == 0) ReleaseFrame();
   }
   void ReleaseFrame();
 
-  SourceImpl* m_source;
-  Data* m_data;
+  Impl* m_impl;
 };
 
 }  // namespace cs

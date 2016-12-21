@@ -21,6 +21,7 @@
 #include "llvm/StringRef.h"
 #include "cscore_cpp.h"
 #include "Frame.h"
+#include "Image.h"
 
 namespace cs {
 
@@ -117,17 +118,14 @@ class SourceImpl {
 
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
-  std::unique_ptr<Frame::Data> AllocFrame(VideoMode::PixelFormat pixelFormat,
-                                          int width, int height,
-                                          std::size_t size, Frame::Time time);
+  std::unique_ptr<Image> AllocImage(VideoMode::PixelFormat pixelFormat,
+                                    int width, int height, std::size_t size);
 
  protected:
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
                 llvm::StringRef data, Frame::Time time);
-  void PutFrame(std::unique_ptr<Frame::Data> frameData);
-  void PutError(llvm::StringRef msg, Frame::Time time) {
-    PutFrame(VideoMode::kUnknown, 0, 0, msg, time);
-  }
+  void PutFrame(std::unique_ptr<Image> image, Frame::Time time);
+  void PutError(llvm::StringRef msg, Frame::Time time);
 
   // Notification functions for corresponding atomics
   virtual void NumSinksChanged() = 0;
@@ -195,7 +193,9 @@ class SourceImpl {
   mutable std::mutex m_mutex;
 
  private:
-  void ReleaseFrame(std::unique_ptr<Frame::Data> data);
+  void ReleaseImage(std::unique_ptr<Image> image);
+  std::unique_ptr<Frame::Impl> AllocFrameImpl();
+  void ReleaseFrameImpl(std::unique_ptr<Frame::Impl> data);
 
   std::string m_name;
   std::string m_description;
@@ -209,9 +209,10 @@ class SourceImpl {
 
   bool m_destroyFrames{false};
 
-  // Pool of frame data to reduce malloc traffic.
+  // Pool of frames/images to reduce malloc traffic.
   std::mutex m_poolMutex;
-  std::vector<std::unique_ptr<Frame::Data>> m_framesAvail;
+  std::vector<std::unique_ptr<Frame::Impl>> m_framesAvail;
+  std::vector<std::unique_ptr<Image>> m_imagesAvail;
 
   std::atomic_bool m_connected{false};
 };

@@ -62,9 +62,6 @@ class CvSourceImpl : public SourceImpl {
 
  private:
   std::atomic_bool m_connected{true};
-  std::vector<unsigned char> m_jpegBuf;
-  std::vector<int> m_compressionParams;
-  int m_qualityProperty;
 };
 
 }  // namespace cs

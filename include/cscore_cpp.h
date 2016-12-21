@@ -48,7 +48,8 @@ struct VideoMode : public CS_VideoMode {
     kUnknown = CS_PIXFMT_UNKNOWN,
     kMJPEG = CS_PIXFMT_MJPEG,
     kYUYV = CS_PIXFMT_YUYV,
-    kRGB565 = CS_PIXFMT_RGB565
+    kRGB565 = CS_PIXFMT_RGB565,
+    kBGR = CS_PIXFMT_BGR
   };
   VideoMode() {
     pixelFormat = 0;

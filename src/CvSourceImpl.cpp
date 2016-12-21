@@ -24,18 +24,11 @@ CvSourceImpl::CvSourceImpl(llvm::StringRef name, const VideoMode& mode)
     : SourceImpl{name} {
   m_mode = mode;
   m_videoModes.push_back(m_mode);
-
-  // Create jpeg quality property
-  m_compressionParams.push_back(CV_IMWRITE_JPEG_QUALITY);
-  m_compressionParams.push_back(80);
 }
 
 CvSourceImpl::~CvSourceImpl() {}
 
-void CvSourceImpl::Start() {
-  m_qualityProperty =
-      CreateProperty("jpeg_quality", CS_PROP_INTEGER, 0, 100, 1, 80, 80);
-}
+void CvSourceImpl::Start() {}
 
 bool CvSourceImpl::CacheProperties(CS_Status* status) const {
   // Doesn't need to do anything.
@@ -93,17 +86,10 @@ void CvSourceImpl::NumSinksEnabledChanged() {
 }
 
 void CvSourceImpl::PutFrame(cv::Mat& image) {
-  std::unique_lock<std::mutex> lock(m_mutex);
-  if (auto prop = GetProperty(m_qualityProperty)) {
-    if (prop->value >= 0 && prop->value <= 100)
-      m_compressionParams[1] = prop->value;
-  }
-  cv::imencode(".jpg", image, m_jpegBuf, m_compressionParams);
-  SourceImpl::PutFrame(
-      VideoMode::kMJPEG, image.cols, image.rows,
-      llvm::StringRef(reinterpret_cast<const char*>(m_jpegBuf.data()),
-                      m_jpegBuf.size()),
-      wpi::Now());
+  auto dest = AllocImage(VideoMode::kBGR, image.cols, image.rows,
+                         image.total() * image.elemSize());
+  image.copyTo(dest->AsMat());
+  SourceImpl::PutFrame(std::move(dest), wpi::Now());
 }
 
 void CvSourceImpl::NotifyError(llvm::StringRef msg) {

@@ -10,7 +10,7 @@ package edu.wpi.cscore;
 /// Video mode
 public class VideoMode {
   public enum PixelFormat {
-    kUnknown(0), kMJPEG(1), kYUYV(2), kRGB565(3);
+    kUnknown(0), kMJPEG(1), kYUYV(2), kRGB565(3), kBGR(4);
     private int value;
 
     private PixelFormat(int value) {
