@@ -11,11 +11,12 @@
 
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
+#include "llvm/StringRef.h"
 
 using namespace frc;
 
 /** The Preferences table name */
-static const char* kTableName = "Preferences";
+static llvm::StringRef kTableName{"Preferences"};
 
 void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
                                          std::shared_ptr<nt::Value> value,

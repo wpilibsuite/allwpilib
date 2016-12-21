@@ -15,6 +15,7 @@
 
 #include "RobotState.h"
 #include "SensorBase.h"
+#include "llvm/StringRef.h"
 #include "simulation/gz_msgs/msgs.h"
 
 #ifdef _WIN32
@@ -38,11 +39,10 @@ class DriverStation : public SensorBase, public RobotStateInterface {
 
   virtual ~DriverStation() = default;
   static DriverStation& GetInstance();
-  static void ReportError(std::string error);
-  static void ReportWarning(std::string error);
-  static void ReportError(bool is_error, int code, const std::string& error,
-                          const std::string& location,
-                          const std::string& stack);
+  static void ReportError(llvm::StringRef error);
+  static void ReportWarning(llvm::StringRef error);
+  static void ReportError(bool is_error, int code, llvm::StringRef error,
+                          llvm::StringRef location, llvm::StringRef stack);
 
   static const int kBatteryChannel = 7;
   static const int kJoystickPorts = 4;

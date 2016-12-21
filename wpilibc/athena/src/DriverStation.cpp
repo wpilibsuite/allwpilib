@@ -17,6 +17,7 @@
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
 
 using namespace frc;
 
@@ -44,8 +45,9 @@ DriverStation& DriverStation::GetInstance() {
  *
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(std::string error) {
-  HAL_SendError(1, 1, 0, error.c_str(), "", "", 1);
+void DriverStation::ReportError(llvm::StringRef error) {
+  llvm::SmallString<128> temp;
+  HAL_SendError(1, 1, 0, error.c_str(temp), "", "", 1);
 }
 
 /**
@@ -53,8 +55,9 @@ void DriverStation::ReportError(std::string error) {
  *
  * The warning is also printed to the program console.
  */
-void DriverStation::ReportWarning(std::string error) {
-  HAL_SendError(0, 1, 0, error.c_str(), "", "", 1);
+void DriverStation::ReportWarning(llvm::StringRef error) {
+  llvm::SmallString<128> temp;
+  HAL_SendError(0, 1, 0, error.c_str(temp), "", "", 1);
 }
 
 /**
@@ -63,11 +66,13 @@ void DriverStation::ReportWarning(std::string error) {
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(bool is_error, int32_t code,
-                                const std::string& error,
-                                const std::string& location,
-                                const std::string& stack) {
-  HAL_SendError(is_error, code, 0, error.c_str(), location.c_str(),
-                stack.c_str(), 1);
+                                llvm::StringRef error, llvm::StringRef location,
+                                llvm::StringRef stack) {
+  llvm::SmallString<128> errorTemp;
+  llvm::SmallString<128> locationTemp;
+  llvm::SmallString<128> stackTemp;
+  HAL_SendError(is_error, code, 0, error.c_str(errorTemp),
+                location.c_str(locationTemp), stack.c_str(stackTemp), 1);
 }
 
 /**

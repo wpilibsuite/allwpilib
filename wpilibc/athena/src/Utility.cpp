@@ -17,6 +17,7 @@
 
 #include "ErrorBase.h"
 #include "HAL/HAL.h"
+#include "llvm/SmallString.h"
 
 using namespace frc;
 
@@ -26,13 +27,14 @@ using namespace frc;
  * The users don't call this, but instead use the wpi_assert macros in
  * Utility.h.
  */
-bool wpi_assert_impl(bool conditionValue, const char* conditionText,
-                     const char* message, const char* fileName, int lineNumber,
-                     const char* funcName) {
+bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
+                     llvm::StringRef message, llvm::StringRef fileName,
+                     int lineNumber, llvm::StringRef funcName) {
   if (!conditionValue) {
     std::stringstream locStream;
     locStream << funcName << " [";
-    locStream << basename(fileName) << ":" << lineNumber << "]";
+    llvm::SmallString<128> fileTemp;
+    locStream << basename(fileName.c_str(fileTemp)) << ":" << lineNumber << "]";
 
     std::stringstream errorStream;
 
@@ -60,13 +62,15 @@ bool wpi_assert_impl(bool conditionValue, const char* conditionText,
  * This should not be called directly; it should only be used by
  * wpi_assertEqual_impl and wpi_assertNotEqual_impl.
  */
-void wpi_assertEqual_common_impl(const char* valueA, const char* valueB,
-                                 const char* equalityType, const char* message,
-                                 const char* fileName, int lineNumber,
-                                 const char* funcName) {
+void wpi_assertEqual_common_impl(llvm::StringRef valueA, llvm::StringRef valueB,
+                                 llvm::StringRef equalityType,
+                                 llvm::StringRef message,
+                                 llvm::StringRef fileName, int lineNumber,
+                                 llvm::StringRef funcName) {
   std::stringstream locStream;
   locStream << funcName << " [";
-  locStream << basename(fileName) << ":" << lineNumber << "]";
+  llvm::SmallString<128> fileTemp;
+  locStream << basename(fileName.c_str(fileTemp)) << ":" << lineNumber << "]";
 
   std::stringstream errorStream;
 
@@ -94,10 +98,10 @@ void wpi_assertEqual_common_impl(const char* valueA, const char* valueB,
  * The users don't call this, but instead use the wpi_assertEqual macros in
  * Utility.h.
  */
-bool wpi_assertEqual_impl(int valueA, int valueB, const char* valueAString,
-                          const char* valueBString, const char* message,
-                          const char* fileName, int lineNumber,
-                          const char* funcName) {
+bool wpi_assertEqual_impl(int valueA, int valueB, llvm::StringRef valueAString,
+                          llvm::StringRef valueBString, llvm::StringRef message,
+                          llvm::StringRef fileName, int lineNumber,
+                          llvm::StringRef funcName) {
   if (!(valueA == valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "==", message,
                                 fileName, lineNumber, funcName);
@@ -112,10 +116,11 @@ bool wpi_assertEqual_impl(int valueA, int valueB, const char* valueAString,
  * The users don't call this, but instead use the wpi_assertNotEqual macros in
  * Utility.h.
  */
-bool wpi_assertNotEqual_impl(int valueA, int valueB, const char* valueAString,
-                             const char* valueBString, const char* message,
-                             const char* fileName, int lineNumber,
-                             const char* funcName) {
+bool wpi_assertNotEqual_impl(int valueA, int valueB,
+                             llvm::StringRef valueAString,
+                             llvm::StringRef valueBString,
+                             llvm::StringRef message, llvm::StringRef fileName,
+                             int lineNumber, llvm::StringRef funcName) {
   if (!(valueA != valueB)) {
     wpi_assertEqual_common_impl(valueAString, valueBString, "!=", message,
                                 fileName, lineNumber, funcName);

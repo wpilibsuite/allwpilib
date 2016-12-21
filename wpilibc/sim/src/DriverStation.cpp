@@ -330,7 +330,7 @@ double DriverStation::GetMatchTime() const {
  * Report an error to the DriverStation messages window.
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(std::string error) {
+void DriverStation::ReportError(llvm::StringRef error) {
   std::cout << error << std::endl;
 }
 
@@ -338,7 +338,7 @@ void DriverStation::ReportError(std::string error) {
  * Report a warning to the DriverStation messages window.
  * The warning is also printed to the program console.
  */
-void DriverStation::ReportWarning(std::string error) {
+void DriverStation::ReportWarning(llvm::StringRef error) {
   std::cout << error << std::endl;
 }
 
@@ -346,10 +346,9 @@ void DriverStation::ReportWarning(std::string error) {
  * Report an error to the DriverStation messages window.
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(bool is_error, int code,
-                                const std::string& error,
-                                const std::string& location,
-                                const std::string& stack) {
+void DriverStation::ReportError(bool is_error, int code, llvm::StringRef error,
+                                llvm::StringRef location,
+                                llvm::StringRef stack) {
   if (!location.empty())
     std::cout << (is_error ? "Error" : "Warning") << " at " << location << ": ";
   std::cout << error << std::endl;
