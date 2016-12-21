@@ -8,38 +8,55 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "ErrorBase.h"
 #include "cscore.h"
-#include "opencv2/core/mat.hpp"
 #include "vision/VisionPipeline.h"
 
 namespace frc {
 
 /**
- * A vision runner is a convenient wrapper object to make it easy to run vision
- * pipelines from robot code. The easiest  way to use this is to run it in a
- * std::thread and use the listener to take snapshots of the pipeline's outputs.
- *
- * @see VisionPipeline
+ * Non-template base class for VisionRunner.
  */
-template <typename T>
-class VisionRunner : public ErrorBase {
+class VisionRunnerBase : public ErrorBase {
  public:
-  VisionRunner(cs::VideoSource videoSource, T* pipeline,
-               std::function<void(T&)> listener);
-  virtual ~VisionRunner() = default;
+  VisionRunnerBase(cs::VideoSource videoSource);
+  ~VisionRunnerBase() override;
 
-  VisionRunner(const VisionRunner&) = delete;
-  VisionRunner& operator=(const VisionRunner&) = delete;
+  VisionRunnerBase(const VisionRunnerBase&) = delete;
+  VisionRunnerBase& operator=(const VisionRunnerBase&) = delete;
 
   void RunOnce();
 
   void RunForever();
 
+ protected:
+  virtual void DoProcess(cv::Mat& image) = 0;
+
  private:
-  cv::Mat m_image;
+  std::unique_ptr<cv::Mat> m_image;
   cs::CvSink m_cvSink;
+};
+
+/**
+ * A vision runner is a convenient wrapper object to make it easy to run vision
+ * pipelines from robot code. The easiest way to use this is to run it in a
+ * std::thread and use the listener to take snapshots of the pipeline's outputs.
+ *
+ * @see VisionPipeline
+ */
+template <typename T>
+class VisionRunner : public VisionRunnerBase {
+ public:
+  VisionRunner(cs::VideoSource videoSource, T* pipeline,
+               std::function<void(T&)> listener);
+  virtual ~VisionRunner() = default;
+
+ protected:
+  void DoProcess(cv::Mat& image) override;
+
+ private:
   T* m_pipeline;
   std::function<void(T&)> m_listener;
 };
