@@ -634,7 +634,7 @@ int64_t HAL_GetSPIAccumulatorCount(int32_t port, int32_t* status) {
 double HAL_GetSPIAccumulatorAverage(int32_t port, int32_t* status) {
   int64_t value;
   int64_t count;
-  HAL_GetAccumulatorOutput(port, &value, &count, status);
+  HAL_GetSPIAccumulatorOutput(port, &value, &count, status);
   if (count == 0) return 0.0;
   return static_cast<double>(value) / count;
 }
