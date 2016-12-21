@@ -20,7 +20,7 @@
 namespace hal {
 class SerialHelper {
  public:
-  explicit SerialHelper(int32_t resourceHandle);
+  SerialHelper();
 
   std::string GetVISASerialPortName(HAL_SerialPort port, int32_t* status);
   std::string GetOSSerialPortName(HAL_SerialPort port, int32_t* status);
