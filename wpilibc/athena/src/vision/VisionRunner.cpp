@@ -43,8 +43,7 @@ VisionRunnerBase::~VisionRunnerBase() {}
 void VisionRunnerBase::RunOnce() {
   if (std::this_thread::get_id() == RobotBase::GetThreadId()) {
     wpi_setErrnoErrorWithContext(
-        "VisionRunner::RunForever() cannot be called from the main robot "
-        "thread");
+        "VisionRunner::RunOnce() cannot be called from the main robot thread");
     return;
   }
   auto frameTime = m_cvSink.GrabFrame(*m_image);
