@@ -47,6 +47,12 @@ To build a specific subproject, such as WPILibC, you must access the subproject 
 ./gradlew :wpilibc:build
 ```
 
+If you have installed the FRC Toolchain to a directory other than the default, or if the Toolchain location is not on your System PATH, you can pass the `toolChainPath` property to specify where it is located. Example:
+
+```bash
+./gradlew build -PtoolChainPath=some/path/to/frc/toolchain/bin
+```
+
 If you also want simulation to be built, add -PmakeSim. This requires gazebo_transport. We have tested on 14.04 and 15.05, but any correct install of Gazebo should work, even on Windows if you build Gazebo from source. Correct means CMake needs to be able to find gazebo-config.cmake. See [The Gazebo website](https://gazebosim.org/) for installation instructions.
 
 ```bash

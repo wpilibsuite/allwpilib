@@ -11,7 +11,7 @@ ext.hal = project(':hal').projectDir.getAbsolutePath()
 model {
     components {
         FRCUserProgram(NativeExecutableSpec) {
-            targetPlatform 'arm'
+            targetPlatform 'roborio-arm'
             binaries.all {
                 tasks.withType(CppCompile) {
                     cppCompiler.args "-DNAMESPACED_WPILIB"

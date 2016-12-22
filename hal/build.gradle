@@ -14,7 +14,7 @@ debugStripSetup(project)
 model {
     components {
         HALAthena(NativeLibrarySpec) {
-            targetPlatform 'arm'
+            targetPlatform 'roborio-arm'
             binaries.all {
                 tasks.withType(CppCompile) {
                     addNiLibraryLinks(linker, targetPlatform)
