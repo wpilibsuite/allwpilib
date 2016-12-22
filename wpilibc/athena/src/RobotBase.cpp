@@ -20,6 +20,8 @@
 
 using namespace frc;
 
+std::thread::id RobotBase::m_threadId;
+
 /**
  * Constructor for a generic robot program.
  *
@@ -32,6 +34,8 @@ using namespace frc;
  * boot so ensure that it runs.
  */
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
+  m_threadId = std::this_thread::get_id();
+
   RobotState::SetImplementation(DriverStation::GetInstance());
   HLUsageReporting::SetImplementation(new HardwareHLReporting());
 
@@ -87,3 +91,8 @@ bool RobotBase::IsTest() const { return m_ds.IsTest(); }
  * function was called?
  */
 bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
+
+/**
+ * Gets the ID of the main robot thread
+ */
+std::thread::id RobotBase::GetThreadId() { return m_threadId; }
