@@ -10,6 +10,8 @@
 #include <sstream>
 
 #include "HAL/HAL.h"
+#include "HAL/Ports.h"
+#include "HAL/Solenoid.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

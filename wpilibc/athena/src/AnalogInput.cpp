@@ -6,10 +6,13 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
+#include "HAL/AnalogInput.h"
 
 #include <sstream>
 
+#include "HAL/AnalogAccumulator.h"
 #include "HAL/HAL.h"
+#include "HAL/Ports.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"

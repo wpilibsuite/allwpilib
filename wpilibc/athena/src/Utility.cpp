@@ -16,6 +16,7 @@
 #include <sstream>
 
 #include "ErrorBase.h"
+#include "HAL/DriverStation.h"
 #include "HAL/HAL.h"
 #include "llvm/SmallString.h"
 

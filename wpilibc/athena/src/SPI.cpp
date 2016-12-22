@@ -5,6 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HAL/SPI.h"
 #include "SPI.h"
 
 #include <cstring>

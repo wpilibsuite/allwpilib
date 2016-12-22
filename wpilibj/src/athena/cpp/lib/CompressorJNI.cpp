@@ -5,7 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/HAL.h"
+#include "HAL/Compressor.h"
+#include "HAL/Ports.h"
+#include "HAL/Solenoid.h"
 #include "HALUtil.h"
 #include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_CompressorJNI.h"

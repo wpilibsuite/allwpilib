@@ -13,6 +13,7 @@
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
+#include "HAL/Notifier.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"

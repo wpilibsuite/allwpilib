@@ -5,11 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HAL/PWM.h"
 #include "PWM.h"
 
 #include <sstream>
 
 #include "HAL/HAL.h"
+#include "HAL/Ports.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 

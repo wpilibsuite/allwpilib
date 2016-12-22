@@ -5,11 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "HAL/Relay.h"
 #include "Relay.h"
 
 #include <sstream>
 
 #include "HAL/HAL.h"
+#include "HAL/Ports.h"
 #include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "WPIErrors.h"

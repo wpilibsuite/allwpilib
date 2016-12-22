@@ -10,7 +10,9 @@
 #include <limits>
 #include <sstream>
 
+#include "HAL/DIO.h"
 #include "HAL/HAL.h"
+#include "HAL/Ports.h"
 #include "WPIErrors.h"
 
 using namespace frc;
