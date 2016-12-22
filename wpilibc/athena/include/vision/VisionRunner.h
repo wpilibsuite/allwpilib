@@ -21,7 +21,7 @@ namespace frc {
  */
 class VisionRunnerBase : public ErrorBase {
  public:
-  VisionRunnerBase(cs::VideoSource videoSource);
+  explicit VisionRunnerBase(cs::VideoSource videoSource);
   ~VisionRunnerBase() override;
 
   VisionRunnerBase(const VisionRunnerBase&) = delete;
