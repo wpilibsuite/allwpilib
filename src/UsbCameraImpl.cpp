@@ -220,7 +220,7 @@ UsbCameraImpl::~UsbCameraImpl() {
 
   // Send message to wake up thread; select timeout will wake us up anyway,
   // but this speeds shutdown.
-  Send(CreateMessage(Message::kNone));
+  Send(Message{Message::kNone});
 
   // join camera thread
   if (m_cameraThread.joinable()) m_cameraThread.join();
@@ -689,40 +689,22 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   return CS_OK;
 }
 
-std::unique_ptr<UsbCameraImpl::Message> UsbCameraImpl::DeviceProcessCommand(
-    std::unique_lock<std::mutex>& lock, std::unique_ptr<Message> msg) {
-  CS_StatusValue status = CS_OK;
-
-  if (msg->kind == Message::kCmdSetMode ||
-      msg->kind == Message::kCmdSetPixelFormat ||
-      msg->kind == Message::kCmdSetResolution ||
-      msg->kind == Message::kCmdSetFPS) {
-    status = DeviceCmdSetMode(lock, *msg);
-  } else if (msg->kind == Message::kCmdSetProperty ||
-             msg->kind == Message::kCmdSetPropertyStr) {
-    status = DeviceCmdSetProperty(lock, *msg);
-  } else if (msg->kind == Message::kNumSinksChanged ||
-             msg->kind == Message::kNumSinksEnabledChanged) {
-    // These are send-only messages, so recycle here.  DestroyMessage needs
-    // the mutex, so unlock it.  We don't actually do anything directly
-    // based on these messages (instead we check in the main loop), but
-    // they do wake up the thread.
-    lock.unlock();
-    DestroyMessage(std::move(msg));
-    lock.lock();
-    return nullptr;
+CS_StatusValue UsbCameraImpl::DeviceProcessCommand(
+    std::unique_lock<std::mutex>& lock, const Message& msg) {
+  if (msg.kind == Message::kCmdSetMode ||
+      msg.kind == Message::kCmdSetPixelFormat ||
+      msg.kind == Message::kCmdSetResolution ||
+      msg.kind == Message::kCmdSetFPS) {
+    return DeviceCmdSetMode(lock, msg);
+  } else if (msg.kind == Message::kCmdSetProperty ||
+             msg.kind == Message::kCmdSetPropertyStr) {
+    return DeviceCmdSetProperty(lock, msg);
+  } else if (msg.kind == Message::kNumSinksChanged ||
+             msg.kind == Message::kNumSinksEnabledChanged) {
+    return CS_OK;
   } else {
-    msg->kind = Message::kNone;
-    return msg;
+    return CS_OK;
   }
-
-  if (status == CS_OK) {
-    msg->kind = Message::kOk;
-  } else {
-    msg->kind = Message::kError;
-    msg->data[0] = status;
-  }
-  return msg;
 }
 
 void UsbCameraImpl::DeviceProcessCommands() {
@@ -731,8 +713,11 @@ void UsbCameraImpl::DeviceProcessCommands() {
   while (!m_commands.empty()) {
     auto msg = std::move(m_commands.back());
     m_commands.pop_back();
-    msg = DeviceProcessCommand(lock, std::move(msg));
-    if (msg) m_responses.emplace_back(std::move(msg));
+
+    CS_StatusValue status = DeviceProcessCommand(lock, msg);
+    if (msg.kind != Message::kNumSinksChanged &&
+        msg.kind != Message::kNumSinksEnabledChanged)
+      m_responses.emplace_back(msg.from, status);
   }
   lock.unlock();
   m_responseCv.notify_all();
@@ -1062,17 +1047,12 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
-std::unique_ptr<UsbCameraImpl::Message> UsbCameraImpl::SendAndWait(
-    std::unique_ptr<Message> msg) const {
+CS_StatusValue UsbCameraImpl::SendAndWait(Message&& msg) const {
   int fd = m_command_fd.load();
-  if (fd < 0) {
-    // not possible to signal, exit early
-    DestroyMessage(std::move(msg));
-    return nullptr;
-  }
+  // exit early if not possible to signal
+  if (fd < 0) return CS_SOURCE_IS_DISCONNECTED;
 
-  // Use the message address as a unique identifier
-  Message* ptr = msg.get();
+  auto from = msg.from;
 
   // Add the message to the command queue
   {
@@ -1081,33 +1061,33 @@ std::unique_ptr<UsbCameraImpl::Message> UsbCameraImpl::SendAndWait(
   }
 
   // Signal the camera thread
-  if (eventfd_write(fd, 1) < 0) return nullptr;
+  if (eventfd_write(fd, 1) < 0) return CS_SOURCE_IS_DISCONNECTED;
 
   std::unique_lock<std::mutex> lock(m_mutex);
   while (m_active) {
     // Did we get a response to *our* request?
-    auto it = std::find_if(
-        m_responses.begin(), m_responses.end(),
-        [=](const std::unique_ptr<Message>& m) { return m.get() == ptr; });
+    auto it =
+        std::find_if(m_responses.begin(), m_responses.end(),
+                     [=](const std::pair<std::thread::id, CS_StatusValue>& r) {
+                       return r.first == from;
+                     });
     if (it != m_responses.end()) {
       // Yes, remove it from the vector and we're done.
-      auto rv = std::move(*it);
+      auto rv = it->second;
       m_responses.erase(it);
       return rv;
     }
     // No, keep waiting for a response
     m_responseCv.wait(lock);
   }
-  return nullptr;
+
+  return CS_SOURCE_IS_DISCONNECTED;
 }
 
-void UsbCameraImpl::Send(std::unique_ptr<Message> msg) const {
+void UsbCameraImpl::Send(Message&& msg) const {
   int fd = m_command_fd.load();
-  if (fd < 0) {
-    // not possible to signal, exit early
-    DestroyMessage(std::move(msg));
-    return;
-  }
+  // exit early if not possible to signal
+  if (fd < 0) return;
 
   // Add the message to the command queue
   {
@@ -1126,13 +1106,8 @@ std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
 
 bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
   // Wake up camera thread; this will try to reconnect
-  auto msg = CreateMessage(Message::kNone);
-  msg = std::move(SendAndWait(std::move(msg)));
-  if (!msg) {
-    *status = CS_SOURCE_IS_DISCONNECTED;
-    return false;
-  }
-  DestroyMessage(std::move(msg));
+  *status = SendAndWait(Message{Message::kNone});
+  if (*status != CS_OK) return false;
   if (!m_properties_cached) {
     *status = CS_SOURCE_IS_DISCONNECTED;
     return false;
@@ -1146,93 +1121,59 @@ void UsbCameraImpl::SetQuirks() {
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
-  auto msg = CreateMessage(Message::kCmdSetProperty);
-  msg->data[0] = property;
-  msg->data[1] = value;
-  msg = std::move(SendAndWait(std::move(msg)));
-  if (!msg) return;
-  if (msg->kind == Message::kError) *status = msg->data[0];
-  DestroyMessage(std::move(msg));
+  Message msg{Message::kCmdSetProperty};
+  msg.data[0] = property;
+  msg.data[1] = value;
+  *status = SendAndWait(std::move(msg));
 }
 
 void UsbCameraImpl::SetStringProperty(int property, llvm::StringRef value,
                                       CS_Status* status) {
-  auto msg = CreateMessage(Message::kCmdSetPropertyStr);
-  msg->data[0] = property;
-  msg->dataStr = value;
-  msg = std::move(SendAndWait(std::move(msg)));
-  if (!msg) return;
-  if (msg->kind == Message::kError) *status = msg->data[0];
-  DestroyMessage(std::move(msg));
+  Message msg{Message::kCmdSetPropertyStr};
+  msg.data[0] = property;
+  msg.dataStr = value;
+  *status = SendAndWait(std::move(msg));
 }
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  auto msg = CreateMessage(Message::kCmdSetMode);
-  msg->data[0] = mode.pixelFormat;
-  msg->data[1] = mode.width;
-  msg->data[2] = mode.height;
-  msg->data[3] = mode.fps;
-  msg = std::move(SendAndWait(std::move(msg)));
-  if (!msg) return false;
-  bool rv = true;
-  if (msg->kind == Message::kError) {
-    *status = msg->data[0];
-    rv = false;
-  }
-  DestroyMessage(std::move(msg));
-  return rv;
+  Message msg{Message::kCmdSetMode};
+  msg.data[0] = mode.pixelFormat;
+  msg.data[1] = mode.width;
+  msg.data[2] = mode.height;
+  msg.data[3] = mode.fps;
+  *status = SendAndWait(std::move(msg));
+  return *status == CS_OK;
 }
 
 bool UsbCameraImpl::SetPixelFormat(VideoMode::PixelFormat pixelFormat,
                                    CS_Status* status) {
-  auto msg = CreateMessage(Message::kCmdSetPixelFormat);
-  msg->data[0] = pixelFormat;
-  msg = std::move(SendAndWait(std::move(msg)));
-  if (!msg) return false;
-  bool rv = true;
-  if (msg->kind == Message::kError) {
-    *status = msg->data[0];
-    rv = false;
-  }
-  DestroyMessage(std::move(msg));
-  return rv;
+  Message msg{Message::kCmdSetPixelFormat};
+  msg.data[0] = pixelFormat;
+  *status = SendAndWait(std::move(msg));
+  return *status == CS_OK;
 }
 
 bool UsbCameraImpl::SetResolution(int width, int height, CS_Status* status) {
-  auto msg = CreateMessage(Message::kCmdSetResolution);
-  msg->data[0] = width;
-  msg->data[1] = height;
-  msg = std::move(SendAndWait(std::move(msg)));
-  if (!msg) return false;
-  bool rv = true;
-  if (msg->kind == Message::kError) {
-    *status = msg->data[0];
-    rv = false;
-  }
-  DestroyMessage(std::move(msg));
-  return rv;
+  Message msg{Message::kCmdSetResolution};
+  msg.data[0] = width;
+  msg.data[1] = height;
+  *status = SendAndWait(std::move(msg));
+  return *status == CS_OK;
 }
 
 bool UsbCameraImpl::SetFPS(int fps, CS_Status* status) {
-  auto msg = CreateMessage(Message::kCmdSetFPS);
-  msg->data[0] = fps;
-  msg = std::move(SendAndWait(std::move(msg)));
-  if (!msg) return false;
-  bool rv = true;
-  if (msg->kind == Message::kError) {
-    *status = msg->data[0];
-    rv = false;
-  }
-  DestroyMessage(std::move(msg));
-  return rv;
+  Message msg{Message::kCmdSetFPS};
+  msg.data[0] = fps;
+  *status = SendAndWait(std::move(msg));
+  return *status == CS_OK;
 }
 
 void UsbCameraImpl::NumSinksChanged() {
-  Send(CreateMessage(Message::kNumSinksChanged));
+  Send(Message{Message::kNumSinksChanged});
 }
 
 void UsbCameraImpl::NumSinksEnabledChanged() {
-  Send(CreateMessage(Message::kNumSinksEnabledChanged));
+  Send(Message{Message::kNumSinksEnabledChanged});
 }
 
 namespace cs {

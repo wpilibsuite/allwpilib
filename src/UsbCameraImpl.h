@@ -67,11 +67,12 @@ class UsbCameraImpl : public SourceImpl {
       kError
     };
 
-    Message(Kind kind_) : kind(kind_) {}
+    Message(Kind kind_) : kind(kind_), from(std::this_thread::get_id()) {}
 
     Kind kind;
     int data[4];
     std::string dataStr;
+    std::thread::id from;
   };
 
  protected:
@@ -84,24 +85,10 @@ class UsbCameraImpl : public SourceImpl {
   bool CacheProperties(CS_Status* status) const override;
 
  private:
-  // Message pool access
-  std::unique_ptr<Message> CreateMessage(Message::Kind kind) const {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    if (m_messagePool.empty()) return llvm::make_unique<Message>(kind);
-    auto rv = std::move(m_messagePool.back());
-    m_messagePool.pop_back();
-    rv->kind = kind;
-    return rv;
-  }
-  void DestroyMessage(std::unique_ptr<Message> message) const {
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_messagePool.emplace_back(std::move(message));
-  }
-
   // Send a message to the camera thread and wait for a response (generic)
-  std::unique_ptr<Message> SendAndWait(std::unique_ptr<Message> msg) const;
+  CS_StatusValue SendAndWait(Message&& msg) const;
   // Send a message to the camera thread with no response
-  void Send(std::unique_ptr<Message> msg) const;
+  void Send(Message&& msg) const;
 
   // The camera processing thread
   void CameraThreadMain();
@@ -120,8 +107,8 @@ class UsbCameraImpl : public SourceImpl {
   void DeviceCacheVideoModes();
 
   // Command helper functions
-  std::unique_ptr<Message> DeviceProcessCommand(
-      std::unique_lock<std::mutex>& lock, std::unique_ptr<Message> msg);
+  CS_StatusValue DeviceProcessCommand(std::unique_lock<std::mutex>& lock,
+                                      const Message& msg);
   CS_StatusValue DeviceCmdSetMode(std::unique_lock<std::mutex>& lock,
                                   const Message& msg);
   CS_StatusValue DeviceCmdSetProperty(std::unique_lock<std::mutex>& lock,
@@ -167,10 +154,9 @@ class UsbCameraImpl : public SourceImpl {
   // Variables protected by m_mutex
   //
 
-  // Message pool and queues
-  mutable std::vector<std::unique_ptr<Message>> m_messagePool;
-  mutable std::vector<std::unique_ptr<Message>> m_commands;
-  mutable std::vector<std::unique_ptr<Message>> m_responses;
+  // Message queues
+  mutable std::vector<Message> m_commands;
+  mutable std::vector<std::pair<std::thread::id, CS_StatusValue>> m_responses;
   mutable std::condition_variable m_responseCv;
 };
 
