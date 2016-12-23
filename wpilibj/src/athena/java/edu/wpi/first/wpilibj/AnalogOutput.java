@@ -47,6 +47,13 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
     m_channel = 0;
   }
 
+  /**
+   * Get the channel of this AnalogOutput.
+   */
+  public int getChannel() {
+    return m_channel;
+  }
+
   public void setVoltage(double voltage) {
     AnalogJNI.setAnalogOutput(m_port, voltage);
   }

@@ -100,6 +100,7 @@ public class XboxController extends GamepadBase {
    *             GenericHID interface.
    * @return The state of the trigger (always false)
    */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public boolean getTrigger(Hand hand) {
     return false;
   }
@@ -112,6 +113,7 @@ public class XboxController extends GamepadBase {
    *             GenericHID interface.
    * @return The state of the top button (always false)
    */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public boolean getTop(Hand hand) {
     return false;
   }

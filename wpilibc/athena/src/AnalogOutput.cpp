@@ -60,6 +60,11 @@ AnalogOutput::AnalogOutput(int channel) {
 AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
 
 /**
+ * Get the channel of this AnalogOutput.
+ */
+int AnalogOutput::GetChannel() { return m_channel; }
+
+/**
  * Set the value of the analog output.
  *
  * @param voltage The output value in Volts, from 0.0 to +5.0

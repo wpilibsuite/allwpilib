@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
 /**
  * ADXL345 SPI Accelerometer.
  */
-@SuppressWarnings({"TypeName"})
+@SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
 public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindowSendable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;

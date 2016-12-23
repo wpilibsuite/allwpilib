@@ -189,6 +189,7 @@ public abstract class RobotBase {
   /**
    * Starting point for the applications.
    */
+  @SuppressWarnings("PMD.UnusedFormalParameter")
   public static void main(String... args) {
     initializeHardwareConfiguration();
 

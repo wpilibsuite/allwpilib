@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.tables.ITable;
  *
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
+@SuppressWarnings("PMD.UnusedPrivateField")
 public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSendable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;

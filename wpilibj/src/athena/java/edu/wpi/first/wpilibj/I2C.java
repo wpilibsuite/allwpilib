@@ -294,7 +294,7 @@ public class I2C extends SensorBase {
         < count;
   }
 
-  /**
+  /*
    * Send a broadcast write to all devices on the I2C bus.
    *
    * <p>This is not currently implemented!
@@ -302,8 +302,8 @@ public class I2C extends SensorBase {
    * @param registerAddress The register to write on all devices on the bus.
    * @param data            The value to write to the devices.
    */
-  public void broadcast(int registerAddress, int data) {
-  }
+  // public void broadcast(int registerAddress, int data) {
+  // }
 
   /**
    * Verify that a device's registers contain expected values.
