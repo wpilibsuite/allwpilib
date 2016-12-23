@@ -21,7 +21,7 @@ public:
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoids
      * @Param 	-	state			Bitfield to set all solenoids to
      */
-    CTR_Code 	SetAllSolenoids(unsigned char state);
+    CTR_Code 	SetAllSolenoids(UINT8 tate);
 
     /* Enables PCM Closed Loop Control of Compressor via pressure switch
      * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
@@ -199,7 +199,7 @@ public:
 extern "C" {
 	void * c_PCM_Init(void);
 	CTR_Code c_SetSolenoid(void * handle,unsigned char idx,INT8 param);
-	CTR_Code c_SetAllSolenoids(void * handle,unsigned char state);
+	CTR_Code c_SetAllSolenoids(void * handle,UINT8 state);
 	CTR_Code c_SetClosedLoopControl(void * handle,INT8 param);
 	CTR_Code c_ClearStickyFaults(void * handle,INT8 param);
 	CTR_Code c_GetSolenoid(void * handle,UINT8 idx,INT8 * status);
