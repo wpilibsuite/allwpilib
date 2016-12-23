@@ -23,6 +23,7 @@
 
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"
+#include "UsbCameraProperty.h"
 
 namespace cs {
 
@@ -48,43 +49,6 @@ class UsbCameraImpl : public SourceImpl {
   void NumSinksEnabledChanged() override;
 
   std::string GetPath() { return m_path; }
-
-  // Property data
-  class PropertyData : public PropertyImpl {
-   public:
-    PropertyData() = default;
-    PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
-
-    // Normalized property constructor
-    PropertyData(llvm::StringRef name_, int rawIndex_,
-                 const PropertyData& rawProp, int defaultValue_, int value_)
-        : PropertyImpl(name_, rawProp.propKind, 1, defaultValue_, value_),
-          percentage{true},
-          propPair{rawIndex_},
-          id{rawProp.id},
-          type{rawProp.type} {
-      hasMinimum = true;
-      minimum = 0;
-      hasMaximum = true;
-      maximum = 100;
-    }
-
-#ifdef __linux__
-#ifdef VIDIOC_QUERY_EXT_CTRL
-    PropertyData(const struct v4l2_query_ext_ctrl& ctrl);
-#endif
-    PropertyData(const struct v4l2_queryctrl& ctrl);
-#endif
-
-    // If this is a percentage (rather than raw) property
-    bool percentage{false};
-
-    // If not 0, index of corresponding raw/percentage property
-    int propPair{0};
-
-    unsigned id{0};  // implementation-level id
-    int type{0};  // implementation type, not CS_PropertyKind!
-  };
 
   // Messages passed to/from camera thread
   struct Message {
@@ -151,15 +115,9 @@ class UsbCameraImpl : public SourceImpl {
   void DeviceSetMode();
   void DeviceSetFPS();
   void DeviceCacheMode();
-  void DeviceCacheProperty(std::unique_ptr<PropertyData> rawProp);
+  void DeviceCacheProperty(std::unique_ptr<UsbCameraProperty> rawProp);
   void DeviceCacheProperties();
   void DeviceCacheVideoModes();
-  bool DeviceGetProperty(PropertyData* prop);
-  bool DeviceSetProperty(std::unique_lock<std::mutex>& lock,
-                         const PropertyData& prop);
-  bool DeviceSetProperty(std::unique_lock<std::mutex>& lock,
-                         const PropertyData& prop, int value,
-                         llvm::StringRef valueStr);
 
   // Command helper functions
   CS_StatusValue DeviceCmdSetProperty(std::unique_lock<std::mutex>& lock,
@@ -167,8 +125,8 @@ class UsbCameraImpl : public SourceImpl {
                                       llvm::StringRef valueStr);
 
   // Property helper functions
-  int RawToPercentage(const PropertyData& rawProp, int rawValue);
-  int PercentageToRaw(const PropertyData& rawProp, int percentValue);
+  int RawToPercentage(const UsbCameraProperty& rawProp, int rawValue);
+  int PercentageToRaw(const UsbCameraProperty& rawProp, int percentValue);
 
   //
   // Variables only used within camera thread

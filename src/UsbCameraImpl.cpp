@@ -88,22 +88,6 @@ static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
   }
 }
 
-// Removes non-alphanumeric characters and replaces spaces with underscores.
-// e.g. "Zoom, Absolute" -> "zoom_absolute", "Pan (Absolute)" -> "pan_absolute"
-static llvm::StringRef NormalizeName(llvm::StringRef name,
-                                     llvm::SmallVectorImpl<char>& buf) {
-  bool newWord = false;
-  for (auto ch : name) {
-    if (std::isalnum(ch)) {
-      if (newWord) buf.push_back('_');
-      newWord = false;
-      buf.push_back(std::tolower(ch));
-    } else if (!buf.empty())
-      newWord = true;
-  }
-  return llvm::StringRef(buf.data(), buf.size());
-}
-
 static bool IsPercentageProperty(llvm::StringRef name) {
   if (name.startswith("raw_")) name = name.substr(4);
   return name == "brightness" || name == "contrast" || name == "saturation" ||
@@ -111,117 +95,21 @@ static bool IsPercentageProperty(llvm::StringRef name) {
          name == "exposure_absolute";
 }
 
-int UsbCameraImpl::RawToPercentage(const PropertyData& rawProp, int rawValue) {
+int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
+                                   int rawValue) {
   return 100.0 * (rawValue - rawProp.minimum) /
          (rawProp.maximum - rawProp.minimum);
 }
 
-int UsbCameraImpl::PercentageToRaw(const PropertyData& rawProp,
+int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
                                    int percentValue) {
   return rawProp.minimum +
          (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
 }
 
-#ifdef VIDIOC_QUERY_EXT_CTRL
-UsbCameraImpl::PropertyData::PropertyData(
-    const struct v4l2_query_ext_ctrl& ctrl)
-    : PropertyImpl(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
-                   ctrl.default_value, 0),
-      id(ctrl.id & V4L2_CTRL_ID_MASK),
-      type(ctrl.type) {
-  hasMinimum = true;
-  minimum = ctrl.minimum;
-  hasMaximum = true;
-  maximum = ctrl.maximum;
-
-  // propKind
-  switch (ctrl.type) {
-    case V4L2_CTRL_TYPE_INTEGER:
-    case V4L2_CTRL_TYPE_INTEGER64:
-      propKind = CS_PROP_INTEGER;
-      break;
-    case V4L2_CTRL_TYPE_BOOLEAN:
-      propKind = CS_PROP_BOOLEAN;
-      break;
-    case V4L2_CTRL_TYPE_INTEGER_MENU:
-    case V4L2_CTRL_TYPE_MENU:
-      propKind = CS_PROP_ENUM;
-      break;
-    case V4L2_CTRL_TYPE_STRING:
-      propKind = CS_PROP_STRING;
-      break;
-    default:
-      return;  // others unsupported
-  }
-
-  // name
-  std::size_t len = 0;
-  while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
-  llvm::SmallString<64> name_buf;
-  name = NormalizeName(llvm::StringRef(ctrl.name, len), name_buf);
-}
-#endif
-
-UsbCameraImpl::PropertyData::PropertyData(const struct v4l2_queryctrl& ctrl)
-    : PropertyImpl(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
-                   ctrl.default_value, 0),
-      id(ctrl.id & V4L2_CTRL_ID_MASK),
-      type(ctrl.type) {
-  hasMinimum = true;
-  minimum = ctrl.minimum;
-  hasMaximum = true;
-  maximum = ctrl.maximum;
-
-  // propKind
-  switch (ctrl.type) {
-    case V4L2_CTRL_TYPE_INTEGER:
-    case V4L2_CTRL_TYPE_INTEGER64:
-      propKind = CS_PROP_INTEGER;
-      break;
-    case V4L2_CTRL_TYPE_BOOLEAN:
-      propKind = CS_PROP_BOOLEAN;
-      break;
-    case V4L2_CTRL_TYPE_INTEGER_MENU:
-    case V4L2_CTRL_TYPE_MENU:
-      propKind = CS_PROP_ENUM;
-      break;
-    case V4L2_CTRL_TYPE_STRING:
-      propKind = CS_PROP_STRING;
-      break;
-    default:
-      return;  // others unsupported
-  }
-
-  // name
-  std::size_t len = 0;
-  while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
-  llvm::SmallString<64> name_buf;
-  name = NormalizeName(
-      llvm::StringRef(reinterpret_cast<const char*>(ctrl.name), len), name_buf);
-}
-
-static inline int CheckedIoctl(int fd, unsigned long req, void* data,
-                               const char* name, const char* file, int line,
-                               bool quiet) {
-  int retval = ioctl(fd, req, data);
-  if (!quiet && retval < 0) {
-    llvm::SmallString<64> localfile{file};
-    localfile.push_back('\0');
-    ERROR("ioctl " << name << " failed at " << basename(localfile.data()) << ":"
-                   << line << ": " << std::strerror(errno));
-  }
-  return retval;
-}
-
-#define DoIoctl(fd, req, data) \
-  CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, false)
-#define TryIoctl(fd, req, data) \
-  CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, true)
-
-static std::unique_ptr<UsbCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
-                                                                 __u32* id) {
+static std::unique_ptr<UsbCameraProperty> ExtCtrlIoctl(int fd, __u32* id) {
   int rc;
-  std::unique_ptr<UsbCameraImpl::PropertyData> prop;
+  std::unique_ptr<UsbCameraProperty> prop;
 #ifdef VIDIOC_QUERY_EXT_CTRL
   v4l2_query_ext_ctrl qc_ext;
   std::memset(&qc_ext, 0, sizeof(qc_ext));
@@ -231,7 +119,7 @@ static std::unique_ptr<UsbCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
     *id = qc_ext.id;  // copy back
     // We don't support array types
     if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return nullptr;
-    prop = llvm::make_unique<UsbCameraImpl::PropertyData>(qc_ext);
+    prop = llvm::make_unique<UsbCameraProperty>(qc_ext);
   }
 #endif
   if (!prop) {
@@ -242,7 +130,7 @@ static std::unique_ptr<UsbCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
     rc = TryIoctl(fd, VIDIOC_QUERYCTRL, &qc);
     *id = qc.id;  // copy back
     if (rc != 0) return nullptr;
-    prop = llvm::make_unique<UsbCameraImpl::PropertyData>(qc);
+    prop = llvm::make_unique<UsbCameraProperty>(qc);
   }
 
   // Cache enum property choices
@@ -259,100 +147,6 @@ static std::unique_ptr<UsbCameraImpl::PropertyData> ExtCtrlIoctl(int fd,
   }
 
   return prop;
-}
-
-static int GetIntCtrlIoctl(int fd, unsigned id, int type, int64_t* value) {
-  unsigned ctrl_class = V4L2_CTRL_ID2CLASS(id);
-  if (type == V4L2_CTRL_TYPE_INTEGER64 || V4L2_CTRL_DRIVER_PRIV(id) ||
-      (ctrl_class != V4L2_CTRL_CLASS_USER &&
-       ctrl_class != V4L2_CID_PRIVATE_BASE)) {
-    // Use extended control
-    struct v4l2_ext_control ctrl;
-    struct v4l2_ext_controls ctrls;
-    std::memset(&ctrl, 0, sizeof(ctrl));
-    std::memset(&ctrls, 0, sizeof(ctrls));
-    ctrl.id = id;
-    ctrls.ctrl_class = ctrl_class;
-    ctrls.count = 1;
-    ctrls.controls = &ctrl;
-    int rc = DoIoctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
-    if (rc < 0) return rc;
-    *value = ctrl.value;
-  } else {
-    // Use normal control
-    struct v4l2_control ctrl;
-    std::memset(&ctrl, 0, sizeof(ctrl));
-    ctrl.id = id;
-    int rc = DoIoctl(fd, VIDIOC_G_CTRL, &ctrl);
-    if (rc < 0) return rc;
-    *value = ctrl.value;
-  }
-  return 0;
-}
-
-static int SetIntCtrlIoctl(int fd, unsigned id, int type, int64_t value) {
-  unsigned ctrl_class = V4L2_CTRL_ID2CLASS(id);
-  if (type == V4L2_CTRL_TYPE_INTEGER64 || V4L2_CTRL_DRIVER_PRIV(id) ||
-      (ctrl_class != V4L2_CTRL_CLASS_USER &&
-       ctrl_class != V4L2_CID_PRIVATE_BASE)) {
-    // Use extended control
-    struct v4l2_ext_control ctrl;
-    struct v4l2_ext_controls ctrls;
-    std::memset(&ctrl, 0, sizeof(ctrl));
-    std::memset(&ctrls, 0, sizeof(ctrls));
-    ctrl.id = id;
-    if (type == V4L2_CTRL_TYPE_INTEGER64)
-      ctrl.value64 = value;
-    else
-      ctrl.value = static_cast<__s32>(value);
-    ctrls.ctrl_class = ctrl_class;
-    ctrls.count = 1;
-    ctrls.controls = &ctrl;
-    return DoIoctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls);
-  } else {
-    // Use normal control
-    struct v4l2_control ctrl;
-    ctrl.id = id;
-    ctrl.value = static_cast<__s32>(value);
-    return DoIoctl(fd, VIDIOC_S_CTRL, &ctrl);
-  }
-}
-
-static int GetStringCtrlIoctl(int fd, int id, int maximum,
-                              std::string* value) {
-  struct v4l2_ext_control ctrl;
-  struct v4l2_ext_controls ctrls;
-  std::memset(&ctrl, 0, sizeof(ctrl));
-  std::memset(&ctrls, 0, sizeof(ctrls));
-  ctrl.id = id;
-  ctrls.ctrl_class = V4L2_CTRL_ID2CLASS(id);
-  ctrls.count = 1;
-  ctrls.controls = &ctrl;
-  int rc = DoIoctl(fd, VIDIOC_G_EXT_CTRLS, &ctrls);
-  if (rc < 0) {
-    value->clear();
-    return rc;
-  }
-  value->assign(ctrl.string, std::strlen(ctrl.string));
-  return 0;
-}
-
-static int SetStringCtrlIoctl(int fd, int id, int maximum,
-                              llvm::StringRef value) {
-  llvm::SmallString<64> str{value.substr(
-      0, std::min(value.size(), static_cast<std::size_t>(maximum)))};
-
-  struct v4l2_ext_control ctrl;
-  struct v4l2_ext_controls ctrls;
-  std::memset(&ctrl, 0, sizeof(ctrl));
-  std::memset(&ctrls, 0, sizeof(ctrls));
-  ctrl.id = id;
-  ctrl.size = str.size();
-  ctrl.string = const_cast<char*>(str.c_str());
-  ctrls.ctrl_class = V4L2_CTRL_ID2CLASS(id);
-  ctrls.count = 1;
-  ctrls.controls = &ctrl;
-  return DoIoctl(fd, VIDIOC_S_EXT_CTRLS, &ctrls);
 }
 
 static bool GetDescriptionSysV4L(llvm::StringRef path, std::string* desc) {
@@ -694,9 +488,9 @@ void UsbCameraImpl::DeviceConnect() {
     std::unique_lock<std::mutex> lock2(m_mutex);
     for (std::size_t i = 0; i < m_propertyData.size(); ++i) {
       const auto prop =
-          static_cast<const PropertyData*>(m_propertyData[i].get());
+          static_cast<const UsbCameraProperty*>(m_propertyData[i].get());
       if (!prop || !prop->valueSet || prop->percentage) continue;
-      if (!DeviceSetProperty(lock2, *prop))
+      if (!prop->DeviceSet(lock2, m_fd))
         SWARNING("failed to set property " << prop->name);
     }
   }
@@ -1040,7 +834,8 @@ void UsbCameraImpl::DeviceCacheMode() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODE_CHANGED);
 }
 
-void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> rawProp) {
+void UsbCameraImpl::DeviceCacheProperty(
+    std::unique_ptr<UsbCameraProperty> rawProp) {
   // For percentage properties, we want to cache both the raw and the
   // percentage versions.  This function is always called with prop being
   // the raw property (as it's coming from the camera) so if required, we need
@@ -1049,22 +844,25 @@ void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> rawProp) {
   // This is complicated by the fact that either the percentage version or the
   // the raw version may have been set previously.  If both were previously set,
   // the raw version wins.
-  std::unique_ptr<PropertyData> perProp;
+  std::unique_ptr<UsbCameraProperty> perProp;
   if (IsPercentageProperty(rawProp->name)) {
-    perProp = llvm::make_unique<PropertyData>(rawProp->name, 0, *rawProp, 0, 0);
+    perProp =
+        llvm::make_unique<UsbCameraProperty>(rawProp->name, 0, *rawProp, 0, 0);
     rawProp->name = "raw_" + perProp->name;
   }
 
   std::unique_lock<std::mutex> lock(m_mutex);
   int* rawIndex = &m_properties[rawProp->name];
   bool newRaw = *rawIndex == 0;
-  PropertyData* oldRawProp =
-      newRaw ? nullptr : static_cast<PropertyData*>(GetProperty(*rawIndex));
+  UsbCameraProperty* oldRawProp =
+      newRaw ? nullptr
+             : static_cast<UsbCameraProperty*>(GetProperty(*rawIndex));
 
   int* perIndex = perProp ? &m_properties[perProp->name] : nullptr;
   bool newPer = !perIndex || *perIndex == 0;
-  PropertyData* oldPerProp =
-      newPer ? nullptr : static_cast<PropertyData*>(GetProperty(*perIndex));
+  UsbCameraProperty* oldPerProp =
+      newPer ? nullptr
+             : static_cast<UsbCameraProperty*>(GetProperty(*perIndex));
 
   if (oldRawProp && oldRawProp->valueSet) {
     // Merge existing raw setting and set percentage from it
@@ -1084,10 +882,8 @@ void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> rawProp) {
     rawProp->valueStr = perProp->valueStr;  // copy
   } else {
     // Read current raw value and set percentage from it
-    lock.unlock();
-    if (!DeviceGetProperty(rawProp.get()))
+    if (!rawProp->DeviceGet(lock, m_fd))
       SWARNING("failed to get property " << rawProp->name);
-    lock.lock();
 
     if (perProp) {
       perProp->SetValue(RawToPercentage(*rawProp, rawProp->value));
@@ -1097,7 +893,7 @@ void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> rawProp) {
 
   // Set value on device if user-configured
   if (rawProp->valueSet) {
-    if (!DeviceSetProperty(lock, *rawProp))
+    if (!rawProp->DeviceSet(lock, m_fd))
       SWARNING("failed to set property " << rawProp->name);
   }
 
@@ -1164,7 +960,7 @@ void UsbCameraImpl::DeviceCacheProperties() {
         DeviceCacheProperty(std::move(prop));
     }
     // ... and custom controls
-    std::unique_ptr<PropertyData> prop;
+    std::unique_ptr<UsbCameraProperty> prop;
     for (id = V4L2_CID_PRIVATE_BASE; (prop = ExtCtrlIoctl(fd, &id)); ++id)
       DeviceCacheProperty(std::move(prop));
   }
@@ -1218,77 +1014,11 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
 }
 
-bool UsbCameraImpl::DeviceGetProperty(PropertyData* prop) {
-  int fd = m_fd.load();
-  if (fd < 0) return true;
-  int rv = 0;
-
-  switch (prop->propKind) {
-    case CS_PROP_BOOLEAN:
-    case CS_PROP_INTEGER:
-    case CS_PROP_ENUM:
-      {
-        int64_t value = 0;
-        rv = GetIntCtrlIoctl(fd, prop->id, prop->type, &value);
-        if (rv >= 0) prop->value = value;
-      }
-      break;
-    case CS_PROP_STRING:
-      rv = GetStringCtrlIoctl(fd, prop->id, prop->maximum, &prop->valueStr);
-      break;
-    default:
-      break;
-  }
-
-  return rv >= 0;
-}
-
-bool UsbCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
-                                      const PropertyData& prop) {
-  // Make a copy of the string as we're about to release the lock
-  llvm::SmallString<128> valueStr{prop.valueStr};
-  return DeviceSetProperty(lock, prop, prop.value, valueStr);
-}
-
-bool UsbCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
-                                      const PropertyData& prop, int value,
-                                      llvm::StringRef valueStr) {
-  int fd = m_fd.load();
-  if (fd < 0) return true;
-  unsigned id = prop.id;
-  int rv = 0;
-
-  switch (prop.propKind) {
-    case CS_PROP_BOOLEAN:
-    case CS_PROP_INTEGER:
-    case CS_PROP_ENUM:
-      {
-        int type = prop.type;
-        lock.unlock();
-        rv = SetIntCtrlIoctl(fd, id, type, value);
-        lock.lock();
-      }
-      break;
-    case CS_PROP_STRING:
-      {
-        int maximum = prop.maximum;
-        lock.unlock();
-        rv = SetStringCtrlIoctl(fd, id, maximum, valueStr);
-        lock.lock();
-      }
-      break;
-    default:
-      break;
-  }
-
-  return rv >= 0;
-}
-
 CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
     std::unique_lock<std::mutex>& lock, int property, bool setString, int value,
     llvm::StringRef valueStr) {
   // Look up
-  auto prop = static_cast<PropertyData*>(GetProperty(property));
+  auto prop = static_cast<UsbCameraProperty*>(GetProperty(property));
   if (!prop) return CS_INVALID_PROPERTY;
 
   // If setting before we get, guess initial type based on set
@@ -1312,7 +1042,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   if (percentageProperty != 0) {
     if (prop->percentage) {
       std::swap(percentageProperty, property);
-      prop = static_cast<PropertyData*>(GetProperty(property));
+      prop = static_cast<UsbCameraProperty*>(GetProperty(property));
       value = PercentageToRaw(*prop, percentageValue);
     } else {
       percentageValue = RawToPercentage(*prop, value);
@@ -1320,7 +1050,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
   }
 
   // Actually set the new value on the device (if possible)
-  if (!DeviceSetProperty(lock, *prop, value, valueStr))
+  if (!prop->DeviceSet(lock, m_fd, value, valueStr))
     return CS_PROPERTY_WRITE_FAILED;
 
   // Cache the set values
@@ -1391,7 +1121,7 @@ void UsbCameraImpl::Send(std::unique_ptr<Message> msg) const {
 
 std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
     llvm::StringRef name) const {
-  return llvm::make_unique<PropertyData>(name);
+  return llvm::make_unique<UsbCameraProperty>(name);
 }
 
 bool UsbCameraImpl::CacheProperties(CS_Status* status) const {

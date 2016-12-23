@@ -8,6 +8,10 @@
 #include "UsbUtil.h"
 
 #include <fcntl.h>
+#ifdef __linux__
+#include <libgen.h>
+#include <sys/ioctl.h>
+#endif
 
 #include "llvm/Format.h"
 #include "llvm/SmallString.h"
@@ -15,6 +19,7 @@
 #include "support/raw_istream.h"
 
 #include "HttpUtil.h"
+#include "Log.h"
 
 namespace cs {
 
@@ -104,5 +109,21 @@ llvm::StringRef GetUsbNameFromId(int vendor, int product,
 
   return os.str();
 }
+
+#ifdef __linux__
+
+int CheckedIoctl(int fd, unsigned long req, void* data, const char* name,
+                 const char* file, int line, bool quiet) {
+  int retval = ioctl(fd, req, data);
+  if (!quiet && retval < 0) {
+    llvm::SmallString<64> localfile{file};
+    localfile.push_back('\0');
+    ERROR("ioctl " << name << " failed at " << basename(localfile.data()) << ":"
+                   << line << ": " << std::strerror(errno));
+  }
+  return retval;
+}
+
+#endif  // __linux__
 
 }  // namespace cs

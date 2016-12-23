@@ -16,6 +16,17 @@ namespace cs {
 llvm::StringRef GetUsbNameFromId(int vendor, int product,
                                  llvm::SmallVectorImpl<char>& buf);
 
+#ifdef __linux__
+int CheckedIoctl(int fd, unsigned long req, void* data, const char* name,
+                 const char* file, int line, bool quiet);
+
+#define DoIoctl(fd, req, data) \
+  CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, false)
+#define TryIoctl(fd, req, data) \
+  CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, true)
+
+#endif  // __linux__
+
 }  // namespace cs
 
 #endif  // CS_USBUTIL_H_
