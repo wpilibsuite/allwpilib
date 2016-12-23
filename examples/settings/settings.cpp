@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
       propName = llvm::StringRef{};
     }
   }
-  if (llvm::StringRef{argv[arg]} == "--") ++arg;
+  if (arg < argc && llvm::StringRef{argv[arg]} == "--") ++arg;
 
   // Wait to connect
   while (!camera.IsConnected())
