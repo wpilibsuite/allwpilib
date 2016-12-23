@@ -15,4 +15,8 @@ public class CANNotInitializedException extends RuntimeException {
   public CANNotInitializedException() {
     super();
   }
+
+  public CANNotInitializedException(String msg) {
+    super(msg);
+  }
 }
