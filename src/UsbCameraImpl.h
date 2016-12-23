@@ -120,9 +120,12 @@ class UsbCameraImpl : public SourceImpl {
   void DeviceCacheVideoModes();
 
   // Command helper functions
+  std::unique_ptr<Message> DeviceProcessCommand(
+      std::unique_lock<std::mutex>& lock, std::unique_ptr<Message> msg);
+  CS_StatusValue DeviceCmdSetMode(std::unique_lock<std::mutex>& lock,
+                                  const Message& msg);
   CS_StatusValue DeviceCmdSetProperty(std::unique_lock<std::mutex>& lock,
-                                      int property, bool setString, int value,
-                                      llvm::StringRef valueStr);
+                                      const Message& msg);
 
   // Property helper functions
   int RawToPercentage(const UsbCameraProperty& rawProp, int rawValue);

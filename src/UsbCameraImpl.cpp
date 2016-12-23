@@ -596,95 +596,159 @@ bool UsbCameraImpl::DeviceStreamOff() {
   return true;
 }
 
+CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
+    std::unique_lock<std::mutex>& lock, const Message& msg) {
+  VideoMode newMode;
+  if (msg.kind == Message::kCmdSetMode) {
+    newMode.pixelFormat = msg.data[0];
+    newMode.width = msg.data[1];
+    newMode.height = msg.data[2];
+    newMode.fps = msg.data[3];
+    m_modeSetPixelFormat = true;
+    m_modeSetResolution = true;
+    m_modeSetFPS = true;
+  } else if (msg.kind == Message::kCmdSetPixelFormat) {
+    newMode = m_mode;
+    newMode.pixelFormat = msg.data[0];
+    m_modeSetPixelFormat = true;
+  } else if (msg.kind == Message::kCmdSetResolution) {
+    newMode = m_mode;
+    newMode.width = msg.data[0];
+    newMode.height = msg.data[1];
+    m_modeSetResolution = true;
+  } else if (msg.kind == Message::kCmdSetFPS) {
+    newMode = m_mode;
+    newMode.fps = msg.data[0];
+    m_modeSetFPS = true;
+  }
+
+  // If the pixel format or resolution changed, we need to disconnect and
+  // reconnect
+  if (newMode.pixelFormat != m_mode.pixelFormat ||
+      newMode.width != m_mode.width || newMode.height != m_mode.height) {
+    m_mode = newMode;
+    lock.unlock();
+    bool wasStreaming = m_streaming;
+    if (wasStreaming) DeviceStreamOff();
+    if (m_fd >= 0) {
+      DeviceDisconnect();
+      DeviceConnect();
+    }
+    if (wasStreaming) DeviceStreamOn();
+    Notifier::GetInstance().NotifySource(*this,
+                                         CS_SOURCE_VIDEOMODE_CHANGED);
+    lock.lock();
+  } else if (newMode.fps != m_mode.fps) {
+    m_mode = newMode;
+    lock.unlock();
+    // Need to stop streaming to set FPS
+    bool wasStreaming = m_streaming;
+    if (wasStreaming) DeviceStreamOff();
+    DeviceSetFPS();
+    if (wasStreaming) DeviceStreamOn();
+    Notifier::GetInstance().NotifySource(*this,
+                                         CS_SOURCE_VIDEOMODE_CHANGED);
+    lock.lock();
+  }
+
+  return CS_OK;
+}
+
+CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
+    std::unique_lock<std::mutex>& lock, const Message& msg) {
+  bool setString = (msg.kind == Message::kCmdSetPropertyStr);
+  int property = msg.data[0];
+  int value = msg.data[1];
+  llvm::StringRef valueStr = msg.dataStr;
+
+  // Look up
+  auto prop = static_cast<UsbCameraProperty*>(GetProperty(property));
+  if (!prop) return CS_INVALID_PROPERTY;
+
+  // If setting before we get, guess initial type based on set
+  if (prop->propKind == CS_PROP_NONE) {
+    if (setString)
+      prop->propKind = CS_PROP_STRING;
+    else
+      prop->propKind = CS_PROP_INTEGER;
+  }
+
+  // Check kind match
+  if ((setString && prop->propKind != CS_PROP_STRING) ||
+      (!setString &&
+       (prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
+           0))
+    return CS_WRONG_PROPERTY_TYPE;
+
+  // Handle percentage property
+  int percentageProperty = prop->propPair;
+  int percentageValue = value;
+  if (percentageProperty != 0) {
+    if (prop->percentage) {
+      std::swap(percentageProperty, property);
+      prop = static_cast<UsbCameraProperty*>(GetProperty(property));
+      value = PercentageToRaw(*prop, percentageValue);
+    } else {
+      percentageValue = RawToPercentage(*prop, value);
+    }
+  }
+
+  // Actually set the new value on the device (if possible)
+  if (!prop->DeviceSet(lock, m_fd, value, valueStr))
+    return CS_PROPERTY_WRITE_FAILED;
+
+  // Cache the set values
+  UpdatePropertyValue(property, setString, value, valueStr);
+  if (percentageProperty != 0)
+    UpdatePropertyValue(percentageProperty, setString, percentageValue,
+                        valueStr);
+
+  return CS_OK;
+}
+
+std::unique_ptr<UsbCameraImpl::Message> UsbCameraImpl::DeviceProcessCommand(
+    std::unique_lock<std::mutex>& lock, std::unique_ptr<Message> msg) {
+  CS_StatusValue status = CS_OK;
+
+  if (msg->kind == Message::kCmdSetMode ||
+      msg->kind == Message::kCmdSetPixelFormat ||
+      msg->kind == Message::kCmdSetResolution ||
+      msg->kind == Message::kCmdSetFPS) {
+    status = DeviceCmdSetMode(lock, *msg);
+  } else if (msg->kind == Message::kCmdSetProperty ||
+             msg->kind == Message::kCmdSetPropertyStr) {
+    status = DeviceCmdSetProperty(lock, *msg);
+  } else if (msg->kind == Message::kNumSinksChanged ||
+             msg->kind == Message::kNumSinksEnabledChanged) {
+    // These are send-only messages, so recycle here.  DestroyMessage needs
+    // the mutex, so unlock it.  We don't actually do anything directly
+    // based on these messages (instead we check in the main loop), but
+    // they do wake up the thread.
+    lock.unlock();
+    DestroyMessage(std::move(msg));
+    lock.lock();
+    return nullptr;
+  } else {
+    msg->kind = Message::kNone;
+    return msg;
+  }
+
+  if (status == CS_OK) {
+    msg->kind = Message::kOk;
+  } else {
+    msg->kind = Message::kError;
+    msg->data[0] = status;
+  }
+  return msg;
+}
+
 void UsbCameraImpl::DeviceProcessCommands() {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_commands.empty()) return;
   while (!m_commands.empty()) {
     auto msg = std::move(m_commands.back());
     m_commands.pop_back();
-
-    if (msg->kind == Message::kCmdSetMode ||
-        msg->kind == Message::kCmdSetPixelFormat ||
-        msg->kind == Message::kCmdSetResolution ||
-        msg->kind == Message::kCmdSetFPS) {
-      VideoMode newMode;
-      if (msg->kind == Message::kCmdSetMode) {
-        newMode.pixelFormat = msg->data[0];
-        newMode.width = msg->data[1];
-        newMode.height = msg->data[2];
-        newMode.fps = msg->data[3];
-        m_modeSetPixelFormat = true;
-        m_modeSetResolution = true;
-        m_modeSetFPS = true;
-      } else if (msg->kind == Message::kCmdSetPixelFormat) {
-        newMode = m_mode;
-        newMode.pixelFormat = msg->data[0];
-        m_modeSetPixelFormat = true;
-      } else if (msg->kind == Message::kCmdSetResolution) {
-        newMode = m_mode;
-        newMode.width = msg->data[0];
-        newMode.height = msg->data[1];
-        m_modeSetResolution = true;
-      } else if (msg->kind == Message::kCmdSetFPS) {
-        newMode = m_mode;
-        newMode.fps = msg->data[0];
-        m_modeSetFPS = true;
-      }
-
-      // If the pixel format or resolution changed, we need to disconnect and
-      // reconnect
-      if (newMode.pixelFormat != m_mode.pixelFormat ||
-          newMode.width != m_mode.width || newMode.height != m_mode.height) {
-        m_mode = newMode;
-        lock.unlock();
-        bool wasStreaming = m_streaming;
-        if (wasStreaming) DeviceStreamOff();
-        if (m_fd >= 0) {
-          DeviceDisconnect();
-          DeviceConnect();
-        }
-        if (wasStreaming) DeviceStreamOn();
-        Notifier::GetInstance().NotifySource(*this,
-                                             CS_SOURCE_VIDEOMODE_CHANGED);
-        lock.lock();
-      } else if (newMode.fps != m_mode.fps) {
-        m_mode = newMode;
-        lock.unlock();
-        // Need to stop streaming to set FPS
-        bool wasStreaming = m_streaming;
-        if (wasStreaming) DeviceStreamOff();
-        DeviceSetFPS();
-        if (wasStreaming) DeviceStreamOn();
-        Notifier::GetInstance().NotifySource(*this,
-                                             CS_SOURCE_VIDEOMODE_CHANGED);
-        lock.lock();
-      }
-    } else if (msg->kind == Message::kCmdSetProperty ||
-               msg->kind == Message::kCmdSetPropertyStr) {
-      bool setString = (msg->kind == Message::kCmdSetPropertyStr);
-      int property = msg->data[0];
-      int value = msg->data[1];
-      CS_StatusValue status =
-          DeviceCmdSetProperty(lock, property, setString, value, msg->dataStr);
-      if (status == CS_OK) {
-        msg->kind = Message::kOk;
-      } else {
-        msg->kind = Message::kError;
-        msg->data[0] = status;
-      }
-    } else if (msg->kind == Message::kNumSinksChanged ||
-               msg->kind == Message::kNumSinksEnabledChanged) {
-      // These are send-only messages, so recycle here.  DestroyMessage needs
-      // the mutex, so unlock it.  We don't actually do anything directly
-      // based on these messages (instead we check in the main loop), but
-      // they do wake up the thread.
-      lock.unlock();
-      DestroyMessage(std::move(msg));
-      lock.lock();
-    } else {
-      msg->kind = Message::kNone;
-    }
-
+    msg = DeviceProcessCommand(lock, std::move(msg));
     if (msg) m_responses.emplace_back(std::move(msg));
   }
   lock.unlock();
@@ -1012,54 +1076,6 @@ void UsbCameraImpl::DeviceCacheVideoModes() {
     m_videoModes.swap(modes);
   }
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODES_UPDATED);
-}
-
-CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
-    std::unique_lock<std::mutex>& lock, int property, bool setString, int value,
-    llvm::StringRef valueStr) {
-  // Look up
-  auto prop = static_cast<UsbCameraProperty*>(GetProperty(property));
-  if (!prop) return CS_INVALID_PROPERTY;
-
-  // If setting before we get, guess initial type based on set
-  if (prop->propKind == CS_PROP_NONE) {
-    if (setString)
-      prop->propKind = CS_PROP_STRING;
-    else
-      prop->propKind = CS_PROP_INTEGER;
-  }
-
-  // Check kind match
-  if ((setString && prop->propKind != CS_PROP_STRING) ||
-      (!setString &&
-       (prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
-           0))
-    return CS_WRONG_PROPERTY_TYPE;
-
-  // Handle percentage property
-  int percentageProperty = prop->propPair;
-  int percentageValue = value;
-  if (percentageProperty != 0) {
-    if (prop->percentage) {
-      std::swap(percentageProperty, property);
-      prop = static_cast<UsbCameraProperty*>(GetProperty(property));
-      value = PercentageToRaw(*prop, percentageValue);
-    } else {
-      percentageValue = RawToPercentage(*prop, value);
-    }
-  }
-
-  // Actually set the new value on the device (if possible)
-  if (!prop->DeviceSet(lock, m_fd, value, valueStr))
-    return CS_PROPERTY_WRITE_FAILED;
-
-  // Cache the set values
-  UpdatePropertyValue(property, setString, value, valueStr);
-  if (percentageProperty != 0)
-    UpdatePropertyValue(percentageProperty, setString, percentageValue,
-                        valueStr);
-
-  return CS_OK;
 }
 
 std::unique_ptr<UsbCameraImpl::Message> UsbCameraImpl::SendAndWait(
