@@ -37,6 +37,12 @@ public abstract class RobotBase {
    */
   public static final int ROBOT_TASK_PRIORITY = 101;
 
+  /**
+   * The ID of the main Java thread.
+   */
+  // This is usually 1, but it is best to make sure
+  public static final long MAIN_THREAD_ID = Thread.currentThread().getId();
+
   protected final DriverStation m_ds;
 
   /**
