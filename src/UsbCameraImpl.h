@@ -131,6 +131,8 @@ class UsbCameraImpl : public SourceImpl {
   int RawToPercentage(const UsbCameraProperty& rawProp, int rawValue);
   int PercentageToRaw(const UsbCameraProperty& rawProp, int percentValue);
 
+  void SetQuirks();
+
   //
   // Variables only used within camera thread
   //
@@ -157,6 +159,9 @@ class UsbCameraImpl : public SourceImpl {
 
   std::atomic_bool m_active;  // set to false to terminate thread
   std::thread m_cameraThread;
+
+  // Quirks
+  bool m_hd3000{false};  // Microsoft LifeCam HD-3000
 
   //
   // Variables protected by m_mutex

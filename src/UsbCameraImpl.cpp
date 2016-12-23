@@ -95,14 +95,35 @@ static bool IsPercentageProperty(llvm::StringRef name) {
          name == "exposure_absolute";
 }
 
+static constexpr const int quirkLifeCamHd3000[] = {
+    5, 10, 20, 39, 78, 156, 312, 625, 1250, 2500, 5000, 10000, 20000};
+
 int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
                                    int rawValue) {
+  // LifeCam HD-3000 exposure setting quirk
+  if (m_hd3000 && rawProp.name == "raw_exposure_absolute" &&
+      rawProp.minimum == 5 && rawProp.maximum == 20000) {
+    int nelems = llvm::array_lengthof(quirkLifeCamHd3000);
+    for (int i = 0; i < nelems; ++i) {
+      if (rawValue < quirkLifeCamHd3000[i]) return 100.0 * i / nelems;
+    }
+    return 100;
+  }
   return 100.0 * (rawValue - rawProp.minimum) /
          (rawProp.maximum - rawProp.minimum);
 }
 
 int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
                                    int percentValue) {
+  // LifeCam HD-3000 exposure setting quirk
+  if (m_hd3000 && rawProp.name == "raw_exposure_absolute" &&
+      rawProp.minimum == 5 && rawProp.maximum == 20000) {
+    int nelems = llvm::array_lengthof(quirkLifeCamHd3000);
+    int ndx = nelems * percentValue / 100.0;
+    if (ndx < 0) ndx = 0;
+    if (ndx >= nelems) ndx = nelems - 1;
+    return quirkLifeCamHd3000[ndx];
+  }
   return rawProp.minimum +
          (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
 }
@@ -188,6 +209,7 @@ UsbCameraImpl::UsbCameraImpl(llvm::StringRef name, llvm::StringRef path)
       m_command_fd{eventfd(0, 0)},
       m_active{true} {
   SetDescription(GetDescriptionImpl(m_path.c_str()));
+  SetQuirks();
 }
 
 UsbCameraImpl::~UsbCameraImpl() {
@@ -499,6 +521,9 @@ void UsbCameraImpl::DeviceConnect() {
 
   // Update description (as it may have changed)
   SetDescription(GetDescriptionImpl(m_path.c_str()));
+
+  // Update quirks settings
+  SetQuirks();
 
   // Notify
   SetConnected(true);
@@ -1113,6 +1138,11 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
     return false;
   }
   return true;
+}
+
+void UsbCameraImpl::SetQuirks() {
+  llvm::SmallString<128> desc;
+  m_hd3000 = GetDescription(desc).endswith("LifeCam HD-3000");
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
