@@ -90,7 +90,7 @@ int SourceImpl::GetPropertyIndex(llvm::StringRef name) const {
   if (ndx == 0) {
     // create a new index
     ndx = m_propertyData.size() + 1;
-    m_propertyData.emplace_back();
+    m_propertyData.emplace_back(CreateEmptyProperty(name));
   }
   return ndx;
 }

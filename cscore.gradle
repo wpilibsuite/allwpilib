@@ -120,6 +120,29 @@ def cscoreSetupExamplesModel = { project ->
                     }
                 }
             }
+
+            settings(NativeExecutableSpec) {
+                if (project.isArm) {
+                    targetPlatform 'arm'
+                } else {
+                    //targetPlatform 'x86'
+                    targetPlatform 'x64'
+                }
+                setupDefines(project, binaries)
+                sources {
+                    cpp {
+                        source {
+                            srcDir "${rootDir}/examples/settings"
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include", project.openCvInclude]
+                            include '**/*.h'
+                        }
+                        lib library: 'cscore', linkage: 'static'
+                    }
+                }
+            }
         }
     }
 }

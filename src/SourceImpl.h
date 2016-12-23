@@ -139,12 +139,11 @@ class SourceImpl {
   class PropertyBase {
    public:
     PropertyBase() = default;
-    PropertyBase(llvm::StringRef name_, CS_PropertyKind kind_, int minimum_,
-                 int maximum_, int step_, int defaultValue_, int value_)
+    PropertyBase(llvm::StringRef name_) : name{name_} {}
+    PropertyBase(llvm::StringRef name_, CS_PropertyKind kind_, int step_,
+                 int defaultValue_, int value_)
         : name{name_},
           propKind{kind_},
-          minimum{minimum_},
-          maximum{maximum_},
           step{step_},
           defaultValue{defaultValue_},
           value{value_} {}
@@ -152,12 +151,38 @@ class SourceImpl {
     PropertyBase(const PropertyBase& oth) = delete;
     PropertyBase& operator=(const PropertyBase& oth) = delete;
 
+    void SetValue(int v) {
+      if (hasMinimum && v < minimum)
+        value = minimum;
+      else if (hasMaximum && v > maximum)
+        value = maximum;
+      else
+        value = v;
+      valueSet = true;
+    }
+
+    void SetValue(llvm::StringRef v) {
+      valueStr = v;
+      valueSet = true;
+    }
+
+    void SetDefaultValue(int v) {
+      if (hasMinimum && v < minimum)
+        defaultValue = minimum;
+      else if (hasMaximum && v > maximum)
+        defaultValue = maximum;
+      else
+        defaultValue = v;
+    }
+
     std::string name;
     CS_PropertyKind propKind{CS_PROP_NONE};
-    int minimum;
-    int maximum;
-    int step;
-    int defaultValue;
+    bool hasMinimum{false};
+    bool hasMaximum{false};
+    int minimum{0};
+    int maximum{100};
+    int step{1};
+    int defaultValue{0};
     int value{0};
     std::string valueStr;
     std::vector<std::string> enumChoices;
@@ -175,6 +200,12 @@ class SourceImpl {
       return nullptr;
     return m_propertyData[property - 1].get();
   }
+
+  // Create an "empty" property.  This is called by GetPropertyIndex to create
+  // properties that don't exist (as GetPropertyIndex can't fail).
+  // Note: called with m_mutex held.
+  virtual std::unique_ptr<PropertyBase> CreateEmptyProperty(
+      llvm::StringRef name) const = 0;
 
   // Cache properties.  Implementations must return false and set status to
   // CS_SOURCE_IS_DISCONNECTED if not possible to cache.

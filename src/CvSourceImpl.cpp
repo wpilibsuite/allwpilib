@@ -30,6 +30,11 @@ CvSourceImpl::~CvSourceImpl() {}
 
 void CvSourceImpl::Start() {}
 
+std::unique_ptr<SourceImpl::PropertyBase> CvSourceImpl::CreateEmptyProperty(
+    llvm::StringRef name) const {
+  return llvm::make_unique<PropertyData>(name);
+}
+
 bool CvSourceImpl::CacheProperties(CS_Status* status) const {
   // Doesn't need to do anything.
   m_properties_cached = true;
@@ -43,15 +48,20 @@ void CvSourceImpl::SetProperty(int property, int value, CS_Status* status) {
     *status = CS_INVALID_PROPERTY;
     return;
   }
+
+  // Guess it's integer if we've set before get
+  if (prop->propKind == CS_PROP_NONE) prop->propKind = CS_PROP_INTEGER;
+
   if ((prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
       0) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return;
   }
-  prop->value = value;
-  Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
-      prop->value, prop->valueStr);
+  prop->SetValue(value);
+  if (m_properties_cached)
+    Notifier::GetInstance().NotifySourceProperty(
+        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
+        prop->value, prop->valueStr);
 }
 
 void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
@@ -62,14 +72,19 @@ void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
     *status = CS_INVALID_PROPERTY;
     return;
   }
+
+  // Guess it's string if we've set before get
+  if (prop->propKind == CS_PROP_NONE) prop->propKind = CS_PROP_STRING;
+
   if (prop->propKind != CS_PROP_STRING) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return;
   }
-  prop->valueStr = value;
-  Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, CS_PROP_STRING,
-      prop->value, prop->valueStr);
+  prop->SetValue(value);
+  if (m_properties_cached)
+    Notifier::GetInstance().NotifySourceProperty(
+        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, CS_PROP_STRING,
+        prop->value, prop->valueStr);
 }
 
 bool CvSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {

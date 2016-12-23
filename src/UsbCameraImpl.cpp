@@ -57,16 +57,34 @@ static inline struct v4l2_fract FPSToFract(int fps) {
 }
 
 // Conversion from v4l2_format pixelformat to VideoMode::PixelFormat
-static VideoMode::PixelFormat ToPixelFormat(__u32 pixelformat) {
-  switch (pixelformat) {
+static VideoMode::PixelFormat ToPixelFormat(__u32 pixelFormat) {
+  switch (pixelFormat) {
     case V4L2_PIX_FMT_MJPEG:
       return VideoMode::kMJPEG;
     case V4L2_PIX_FMT_YUYV:
       return VideoMode::kYUYV;
     case V4L2_PIX_FMT_RGB565:
       return VideoMode::kRGB565;
+    case V4L2_PIX_FMT_BGR24:
+      return VideoMode::kBGR;
     default:
       return VideoMode::kUnknown;
+  }
+}
+
+// Conversion from VideoMode::PixelFormat to v4l2_format pixelformat
+static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
+  switch (pixelFormat) {
+    case VideoMode::kMJPEG:
+      return V4L2_PIX_FMT_MJPEG;
+    case VideoMode::kYUYV:
+      return V4L2_PIX_FMT_YUYV;
+    case VideoMode::kRGB565:
+      return V4L2_PIX_FMT_RGB565;
+    case VideoMode::kBGR:
+      return V4L2_PIX_FMT_BGR24;
+    default:
+      return 0;
   }
 }
 
@@ -86,13 +104,53 @@ static llvm::StringRef NormalizeName(llvm::StringRef name,
   return llvm::StringRef(buf.data(), buf.size());
 }
 
+static bool IsPercentageProperty(llvm::StringRef name) {
+  if (name.startswith("raw_")) name = name.substr(4);
+  return name == "brightness" || name == "contrast" || name == "saturation" ||
+         name == "hue" || name == "sharpness" || name == "gain" ||
+         name == "exposure_absolute";
+}
+
+int UsbCameraImpl::RawToPercentage(const PropertyData& rawProp, int rawValue) {
+  return 100.0 * (rawValue - rawProp.minimum) /
+         (rawProp.maximum - rawProp.minimum);
+}
+
+int UsbCameraImpl::PercentageToRaw(const PropertyData& rawProp,
+                                   int percentValue) {
+  return rawProp.minimum +
+         (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
+}
+
+void UsbCameraImpl::UpdatePropertyValue(int property, bool setString, int value,
+                                        llvm::StringRef valueStr) {
+  auto prop = static_cast<PropertyData*>(GetProperty(property));
+  if (!prop) return;
+
+  if (setString)
+    prop->SetValue(valueStr);
+  else
+    prop->SetValue(value);
+
+  // Only notify updates after we've notified created
+  if (m_properties_cached)
+    Notifier::GetInstance().NotifySourceProperty(
+        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
+        prop->value, prop->valueStr);
+}
+
 #ifdef VIDIOC_QUERY_EXT_CTRL
 UsbCameraImpl::PropertyData::PropertyData(
     const struct v4l2_query_ext_ctrl& ctrl)
-    : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.minimum, ctrl.maximum,
-                   ctrl.step, ctrl.default_value, 0),
+    : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
+                   ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
+  hasMinimum = true;
+  minimum = ctrl.minimum;
+  hasMaximum = true;
+  maximum = ctrl.maximum;
+
   // propKind
   switch (ctrl.type) {
     case V4L2_CTRL_TYPE_INTEGER:
@@ -122,10 +180,15 @@ UsbCameraImpl::PropertyData::PropertyData(
 #endif
 
 UsbCameraImpl::PropertyData::PropertyData(const struct v4l2_queryctrl& ctrl)
-    : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.minimum, ctrl.maximum,
-                   ctrl.step, ctrl.default_value, 0),
+    : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
+                   ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
+  hasMinimum = true;
+  minimum = ctrl.minimum;
+  hasMaximum = true;
+  maximum = ctrl.maximum;
+
   // propKind
   switch (ctrl.type) {
     case V4L2_CTRL_TYPE_INTEGER:
@@ -647,9 +710,10 @@ void UsbCameraImpl::DeviceConnect() {
     SDEBUG3("restoring settings");
     std::unique_lock<std::mutex> lock2(m_mutex);
     for (std::size_t i = 0; i < m_propertyData.size(); ++i) {
-      const auto& prop = m_propertyData[i];
-      if (!prop || !prop->valueSet) continue;
-      if (!DeviceSetProperty(lock2, static_cast<const PropertyData&>(*prop)))
+      const auto prop =
+          static_cast<const PropertyData*>(m_propertyData[i].get());
+      if (!prop || !prop->valueSet || prop->percentage) continue;
+      if (!DeviceSetProperty(lock2, *prop))
         SWARNING("failed to set property " << prop->name);
     }
   }
@@ -820,66 +884,17 @@ void UsbCameraImpl::DeviceProcessCommands() {
       }
     } else if (msg->kind == Message::kCmdSetProperty ||
                msg->kind == Message::kCmdSetPropertyStr) {
+      bool setString = (msg->kind == Message::kCmdSetPropertyStr);
       int property = msg->data[0];
-
-      // Look up
-      auto prop = static_cast<PropertyData*>(GetProperty(property));
-      if (!prop) {
+      int value = msg->data[1];
+      CS_StatusValue status =
+          DeviceCmdSetProperty(lock, property, setString, value, msg->dataStr);
+      if (status == CS_OK) {
+        msg->kind = Message::kOk;
+      } else {
         msg->kind = Message::kError;
-        msg->data[0] = CS_INVALID_PROPERTY;
-        goto done;
+        msg->data[0] = status;
       }
-
-      // Check kind match
-      if ((msg->kind == Message::kCmdSetPropertyStr &&
-           prop->propKind != CS_PROP_STRING) ||
-          (msg->kind == Message::kCmdSetProperty &&
-           (prop->propKind &
-            (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) == 0)) {
-        msg->kind = Message::kError;
-        msg->data[0] = CS_WRONG_PROPERTY_TYPE;
-        goto done;
-      }
-
-      // If we're connected...
-      int fd = m_fd.load();
-      if (fd >= 0) {
-        // Get into local variables before we release the lock
-        int rv;
-        unsigned id = prop->id;
-        int maximum = prop->maximum;
-        int type = prop->type;
-
-        // Set the property value on the device
-        lock.unlock();
-        if (msg->kind == Message::kCmdSetPropertyStr)
-          rv = SetStringCtrlIoctl(fd, id, maximum, msg->dataStr);
-        else
-          rv =
-              SetIntCtrlIoctl(fd, id, type, static_cast<int64_t>(msg->data[1]));
-        lock.lock();
-
-        if (rv < 0) {
-          msg->kind = Message::kError;
-          msg->data[0] = CS_PROPERTY_WRITE_FAILED;
-          goto done;
-        }
-      }
-
-      // Cache the set value.  We need to re-get the pointer due to
-      // releasing the lock.
-      prop = static_cast<PropertyData*>(GetProperty(property));
-      if (msg->kind == Message::kCmdSetPropertyStr)
-        prop->valueStr = msg->dataStr;
-      else
-        prop->value = msg->data[1];
-      prop->valueSet = true;
-      // Only notify updates after we've notified created
-      if (m_properties_cached)
-        Notifier::GetInstance().NotifySourceProperty(
-            *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
-            prop->value, prop->valueStr);
-      msg->kind = Message::kOk;
     } else if (msg->kind == Message::kNumSinksChanged ||
                msg->kind == Message::kNumSinksEnabledChanged) {
       // These are send-only messages, so recycle here.  DestroyMessage needs
@@ -893,7 +908,6 @@ void UsbCameraImpl::DeviceProcessCommands() {
       msg->kind = Message::kNone;
     }
 
-done:
     if (msg) m_responses.emplace_back(std::move(msg));
   }
   lock.unlock();
@@ -912,21 +926,12 @@ void UsbCameraImpl::DeviceSetMode() {
                           : 0;
 #endif
   vfmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  switch (m_mode.pixelFormat) {
-    case VideoMode::kMJPEG:
-      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
-      break;
-    case VideoMode::kYUYV:
-      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-      break;
-    case VideoMode::kRGB565:
-      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_RGB565;
-      break;
-    default:
-      SWARNING("could not set format " << m_mode.pixelFormat
-                                       << ", defaulting to MJPEG");
-      vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
-      break;
+  vfmt.fmt.pix.pixelformat =
+      FromPixelFormat(static_cast<VideoMode::PixelFormat>(m_mode.pixelFormat));
+  if (vfmt.fmt.pix.pixelformat == 0) {
+    SWARNING("could not set format " << m_mode.pixelFormat
+                                     << ", defaulting to MJPEG");
+    vfmt.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
   }
   vfmt.fmt.pix.width = m_mode.width;
   vfmt.fmt.pix.height = m_mode.height;
@@ -977,21 +982,7 @@ void UsbCameraImpl::DeviceCacheMode() {
     m_mode = VideoMode{VideoMode::kMJPEG, 320, 240, 30};
     return;
   }
-  VideoMode::PixelFormat pixelFormat;
-  switch (vfmt.fmt.pix.pixelformat) {
-    case V4L2_PIX_FMT_MJPEG:
-      pixelFormat = VideoMode::kMJPEG;
-      break;
-    case V4L2_PIX_FMT_YUYV:
-      pixelFormat = VideoMode::kYUYV;
-      break;
-    case V4L2_PIX_FMT_RGB565:
-      pixelFormat = VideoMode::kRGB565;
-      break;
-    default:
-      pixelFormat = VideoMode::kUnknown;
-      break;
-  }
+  VideoMode::PixelFormat pixelFormat = ToPixelFormat(vfmt.fmt.pix.pixelformat);
   int width = vfmt.fmt.pix.width;
   int height = vfmt.fmt.pix.height;
 
@@ -1066,47 +1057,116 @@ void UsbCameraImpl::DeviceCacheMode() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODE_CHANGED);
 }
 
-void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> prop) {
-  std::unique_lock<std::mutex> lock(m_mutex);
-  int& ndx = m_properties[prop->name];
-  if (ndx == 0) {
-    // get the value
-    lock.unlock();
-    if (!DeviceGetProperty(prop.get()))
-      SWARNING("failed to get property " << prop->name);
-    lock.lock();
-    // create a new index
-    ndx = m_propertyData.size() + 1;
-    m_propertyData.emplace_back(std::move(prop));
-  } else {
-    // merge with existing settings
-    auto prop2 = static_cast<PropertyData*>(GetProperty(ndx));
-    prop->valueSet = prop2->valueSet;
-    prop->value = prop2->value;
-    prop->valueStr = std::move(prop2->valueStr);
-    lock.unlock();
-    if (prop->valueSet) {
-      // set the value if it was previously set
-      if (!DeviceSetProperty(lock, *prop))
-        SWARNING("failed to set property " << prop->name);
-    } else {
-      // otherwise get the value
-      if (!DeviceGetProperty(prop.get()))
-        SWARNING("failed to get property " << prop->name);
-    }
-    lock.lock();
-    m_propertyData[ndx - 1] = std::move(prop);
-  }
-  auto eventProp = static_cast<PropertyData*>(GetProperty(ndx));
+void UsbCameraImpl::NotifyPropertyCreated(int propIndex, PropertyData& prop) {
   auto& notifier = Notifier::GetInstance();
-  notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, ndx,
-                                eventProp->propKind, eventProp->value,
-                                eventProp->valueStr);
+  notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, propIndex,
+                                prop.propKind, prop.value, prop.valueStr);
   // also notify choices updated event for enum types
-  if (eventProp->propKind == CS_PROP_ENUM)
+  if (prop.propKind == CS_PROP_ENUM)
     notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-                                  ndx, eventProp->propKind, eventProp->value,
+                                  propIndex, prop.propKind, prop.value,
                                   llvm::StringRef{});
+}
+
+void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> rawProp) {
+  // For percentage properties, we want to cache both the raw and the
+  // percentage versions.  This function is always called with prop being
+  // the raw property (as it's coming from the camera) so if required, we need
+  // to rename this one as well as create/cache the percentage version.
+  //
+  // This is complicated by the fact that either the percentage version or the
+  // the raw version may have been set previously.  If both were previously set,
+  // the raw version wins.
+  std::unique_ptr<PropertyData> perProp;
+  if (IsPercentageProperty(rawProp->name)) {
+    perProp = llvm::make_unique<PropertyData>(rawProp->name, 0, *rawProp, 0, 0);
+    rawProp->name = "raw_" + perProp->name;
+  }
+
+  std::unique_lock<std::mutex> lock(m_mutex);
+  int* rawIndex = &m_properties[rawProp->name];
+  bool newRaw = *rawIndex == 0;
+  PropertyData* oldRawProp =
+      newRaw ? nullptr : static_cast<PropertyData*>(GetProperty(*rawIndex));
+
+  int* perIndex = perProp ? &m_properties[perProp->name] : nullptr;
+  bool newPer = !perIndex || *perIndex == 0;
+  PropertyData* oldPerProp =
+      newPer ? nullptr : static_cast<PropertyData*>(GetProperty(*perIndex));
+
+  if (oldRawProp && oldRawProp->valueSet) {
+    // Merge existing raw setting and set percentage from it
+    rawProp->SetValue(oldRawProp->value);
+    rawProp->valueStr = std::move(oldRawProp->valueStr);
+
+    if (perProp) {
+      perProp->SetValue(RawToPercentage(*rawProp, rawProp->value));
+      perProp->valueStr = rawProp->valueStr;  // copy
+    }
+  } else if (oldPerProp && oldPerProp->valueSet) {
+    // Merge existing percentage setting and set raw from it
+    perProp->SetValue(oldPerProp->value);
+    perProp->valueStr = std::move(oldPerProp->valueStr);
+
+    rawProp->SetValue(PercentageToRaw(*rawProp, perProp->value));
+    rawProp->valueStr = perProp->valueStr;  // copy
+  } else {
+    // Read current raw value and set percentage from it
+    lock.unlock();
+    if (!DeviceGetProperty(rawProp.get()))
+      SWARNING("failed to get property " << rawProp->name);
+    lock.lock();
+
+    if (perProp) {
+      perProp->SetValue(RawToPercentage(*rawProp, rawProp->value));
+      perProp->valueStr = rawProp->valueStr;  // copy
+    }
+  }
+
+  // Set value on device if user-configured
+  if (rawProp->valueSet) {
+    if (!DeviceSetProperty(lock, *rawProp))
+      SWARNING("failed to set property " << rawProp->name);
+  }
+
+  // Update pointers since we released the lock
+  rawIndex = &m_properties[rawProp->name];
+  perIndex = perProp ? &m_properties[perProp->name] : nullptr;
+
+  // Get pointers before we move the std::unique_ptr values
+  auto rawPropPtr = rawProp.get();
+  auto perPropPtr = perProp.get();
+
+  if (newRaw) {
+    // create a new index
+    *rawIndex = m_propertyData.size() + 1;
+    m_propertyData.emplace_back(std::move(rawProp));
+  } else {
+    // update
+    m_propertyData[*rawIndex - 1] = std::move(rawProp);
+  }
+
+  // Finish setting up percentage property
+  if (perProp) {
+    perProp->propPair = *rawIndex;
+    perProp->defaultValue =
+        RawToPercentage(*rawPropPtr, rawPropPtr->defaultValue);
+
+    if (newPer) {
+      // create a new index
+      *perIndex = m_propertyData.size() + 1;
+      m_propertyData.emplace_back(std::move(perProp));
+    } else if (perIndex) {
+      // update
+      m_propertyData[*perIndex - 1] = std::move(perProp);
+    }
+
+    // Tell raw property where to find percentage property
+    rawPropPtr->propPair = *perIndex;
+  }
+
+  NotifyPropertyCreated(*rawIndex, *rawPropPtr);
+  if (perPropPtr) NotifyPropertyCreated(*perIndex, *perPropPtr);
 }
 
 void UsbCameraImpl::DeviceCacheProperties() {
@@ -1213,6 +1273,14 @@ bool UsbCameraImpl::DeviceGetProperty(PropertyData* prop) {
 
 bool UsbCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
                                       const PropertyData& prop) {
+  // Make a copy of the string as we're about to release the lock
+  llvm::SmallString<128> valueStr{prop.valueStr};
+  return DeviceSetProperty(lock, prop, prop.value, valueStr);
+}
+
+bool UsbCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
+                                      const PropertyData& prop, int value,
+                                      llvm::StringRef valueStr) {
   int fd = m_fd.load();
   if (fd < 0) return true;
   unsigned id = prop.id;
@@ -1224,7 +1292,6 @@ bool UsbCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
     case CS_PROP_ENUM:
       {
         int type = prop.type;
-        int value = prop.value;
         lock.unlock();
         rv = SetIntCtrlIoctl(fd, id, type, value);
         lock.lock();
@@ -1233,7 +1300,6 @@ bool UsbCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
     case CS_PROP_STRING:
       {
         int maximum = prop.maximum;
-        llvm::SmallString<128> valueStr{prop.valueStr};
         lock.unlock();
         rv = SetStringCtrlIoctl(fd, id, maximum, valueStr);
         lock.lock();
@@ -1244,6 +1310,54 @@ bool UsbCameraImpl::DeviceSetProperty(std::unique_lock<std::mutex>& lock,
   }
 
   return rv >= 0;
+}
+
+CS_StatusValue UsbCameraImpl::DeviceCmdSetProperty(
+    std::unique_lock<std::mutex>& lock, int property, bool setString, int value,
+    llvm::StringRef valueStr) {
+  // Look up
+  auto prop = static_cast<PropertyData*>(GetProperty(property));
+  if (!prop) return CS_INVALID_PROPERTY;
+
+  // If setting before we get, guess initial type based on set
+  if (prop->propKind == CS_PROP_NONE) {
+    if (setString)
+      prop->propKind = CS_PROP_STRING;
+    else
+      prop->propKind = CS_PROP_INTEGER;
+  }
+
+  // Check kind match
+  if ((setString && prop->propKind != CS_PROP_STRING) ||
+      (!setString &&
+       (prop->propKind & (CS_PROP_BOOLEAN | CS_PROP_INTEGER | CS_PROP_ENUM)) ==
+           0))
+    return CS_WRONG_PROPERTY_TYPE;
+
+  // Handle percentage property
+  int percentageProperty = prop->propPair;
+  int percentageValue = value;
+  if (percentageProperty != 0) {
+    if (prop->percentage) {
+      std::swap(percentageProperty, property);
+      prop = static_cast<PropertyData*>(GetProperty(property));
+      value = PercentageToRaw(*prop, percentageValue);
+    } else {
+      percentageValue = RawToPercentage(*prop, value);
+    }
+  }
+
+  // Actually set the new value on the device (if possible)
+  if (!DeviceSetProperty(lock, *prop, value, valueStr))
+    return CS_PROPERTY_WRITE_FAILED;
+
+  // Cache the set values
+  UpdatePropertyValue(property, setString, value, valueStr);
+  if (percentageProperty != 0)
+    UpdatePropertyValue(percentageProperty, setString, percentageValue,
+                        valueStr);
+
+  return CS_OK;
 }
 
 std::unique_ptr<UsbCameraImpl::Message> UsbCameraImpl::SendAndWait(
@@ -1301,6 +1415,11 @@ void UsbCameraImpl::Send(std::unique_ptr<Message> msg) const {
 
   // Signal the camera thread
   eventfd_write(fd, 1);
+}
+
+std::unique_ptr<SourceImpl::PropertyBase> UsbCameraImpl::CreateEmptyProperty(
+    llvm::StringRef name) const {
+  return llvm::make_unique<PropertyData>(name);
 }
 
 bool UsbCameraImpl::CacheProperties(CS_Status* status) const {

@@ -48,16 +48,24 @@ class CvSourceImpl : public SourceImpl {
   class PropertyData : public PropertyBase {
    public:
     PropertyData() = default;
+    PropertyData(llvm::StringRef name_) : PropertyBase{name_} {}
     PropertyData(llvm::StringRef name_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
-        : PropertyBase{name_, kind_,         minimum_, maximum_,
-                       step_, defaultValue_, value_} {}
+        : PropertyBase{name_, kind_, step_, defaultValue_, value_} {
+      hasMinimum = true;
+      minimum = minimum_;
+      hasMaximum = true;
+      maximum = maximum_;
+    }
     ~PropertyData() override = default;
 
     std::function<void(CS_Property property)> onChange;
   };
 
  protected:
+  std::unique_ptr<PropertyBase> CreateEmptyProperty(
+      llvm::StringRef name) const override;
+
   bool CacheProperties(CS_Status* status) const override;
 
  private:
