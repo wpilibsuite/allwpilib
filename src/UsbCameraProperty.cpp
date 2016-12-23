@@ -8,6 +8,7 @@
 #include "UsbCameraProperty.h"
 
 #include "llvm/SmallString.h"
+#include "llvm/STLExtras.h"
 
 #include "UsbUtil.h"
 
@@ -200,6 +201,49 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_queryctrl& ctrl)
   llvm::SmallString<64> name_buf;
   name = NormalizeName(
       llvm::StringRef(reinterpret_cast<const char*>(ctrl.name), len), name_buf);
+}
+
+std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
+                                                                  __u32* id) {
+  int rc;
+  std::unique_ptr<UsbCameraProperty> prop;
+#ifdef VIDIOC_QUERY_EXT_CTRL
+  v4l2_query_ext_ctrl qc_ext;
+  std::memset(&qc_ext, 0, sizeof(qc_ext));
+  qc_ext.id = *id;
+  rc = TryIoctl(fd, VIDIOC_QUERY_EXT_CTRL, &qc_ext);
+  if (rc == 0) {
+    *id = qc_ext.id;  // copy back
+    // We don't support array types
+    if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return nullptr;
+    prop = llvm::make_unique<UsbCameraProperty>(qc_ext);
+  }
+#endif
+  if (!prop) {
+    // Fall back to normal QUERYCTRL
+    struct v4l2_queryctrl qc;
+    std::memset(&qc, 0, sizeof(qc));
+    qc.id = *id;
+    rc = TryIoctl(fd, VIDIOC_QUERYCTRL, &qc);
+    *id = qc.id;  // copy back
+    if (rc != 0) return nullptr;
+    prop = llvm::make_unique<UsbCameraProperty>(qc);
+  }
+
+  // Cache enum property choices
+  if (prop->propKind == CS_PROP_ENUM) {
+    prop->enumChoices.resize(prop->maximum + 1);
+    v4l2_querymenu qmenu;
+    std::memset(&qmenu, 0, sizeof(qmenu));
+    qmenu.id = *id;
+    for (int i = prop->minimum; i <= prop->maximum; ++i) {
+      qmenu.index = static_cast<__u32>(i);
+      if (TryIoctl(fd, VIDIOC_QUERYMENU, &qmenu) != 0) continue;
+      prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
+    }
+  }
+
+  return prop;
 }
 
 bool UsbCameraProperty::DeviceGet(std::unique_lock<std::mutex>& lock, int fd) {

@@ -107,48 +107,6 @@ int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
          (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
 }
 
-static std::unique_ptr<UsbCameraProperty> ExtCtrlIoctl(int fd, __u32* id) {
-  int rc;
-  std::unique_ptr<UsbCameraProperty> prop;
-#ifdef VIDIOC_QUERY_EXT_CTRL
-  v4l2_query_ext_ctrl qc_ext;
-  std::memset(&qc_ext, 0, sizeof(qc_ext));
-  qc_ext.id = *id;
-  rc = TryIoctl(fd, VIDIOC_QUERY_EXT_CTRL, &qc_ext);
-  if (rc == 0) {
-    *id = qc_ext.id;  // copy back
-    // We don't support array types
-    if (qc_ext.elems > 1 || qc_ext.nr_of_dims > 0) return nullptr;
-    prop = llvm::make_unique<UsbCameraProperty>(qc_ext);
-  }
-#endif
-  if (!prop) {
-    // Fall back to normal QUERYCTRL
-    struct v4l2_queryctrl qc;
-    std::memset(&qc, 0, sizeof(qc));
-    qc.id = *id;
-    rc = TryIoctl(fd, VIDIOC_QUERYCTRL, &qc);
-    *id = qc.id;  // copy back
-    if (rc != 0) return nullptr;
-    prop = llvm::make_unique<UsbCameraProperty>(qc);
-  }
-
-  // Cache enum property choices
-  if (prop->propKind == CS_PROP_ENUM) {
-    prop->enumChoices.resize(prop->maximum + 1);
-    v4l2_querymenu qmenu;
-    std::memset(&qmenu, 0, sizeof(qmenu));
-    qmenu.id = *id;
-    for (int i = prop->minimum; i <= prop->maximum; ++i) {
-      qmenu.index = static_cast<__u32>(i);
-      if (TryIoctl(fd, VIDIOC_QUERYMENU, &qmenu) != 0) continue;
-      prop->enumChoices[i] = reinterpret_cast<const char*>(qmenu.name);
-    }
-  }
-
-  return prop;
-}
-
 static bool GetDescriptionSysV4L(llvm::StringRef path, std::string* desc) {
   llvm::SmallString<64> ifpath{"/sys/class/video4linux/"};
   ifpath += path.substr(5);
@@ -1012,7 +970,7 @@ void UsbCameraImpl::DeviceCacheProperties() {
       ;
   __u32 id = nextFlags;
 
-  while (auto prop = ExtCtrlIoctl(fd, &id)) {
+  while (auto prop = UsbCameraProperty::DeviceQuery(fd, &id)) {
     DeviceCacheProperty(std::move(prop));
     id |= nextFlags;
   }
@@ -1020,12 +978,13 @@ void UsbCameraImpl::DeviceCacheProperties() {
   if (id == nextFlags) {
     // try just enumerating standard...
     for (id = V4L2_CID_BASE; id < V4L2_CID_LASTP1; ++id) {
-      if (auto prop = ExtCtrlIoctl(fd, &id))
+      if (auto prop = UsbCameraProperty::DeviceQuery(fd, &id))
         DeviceCacheProperty(std::move(prop));
     }
     // ... and custom controls
     std::unique_ptr<UsbCameraProperty> prop;
-    for (id = V4L2_CID_PRIVATE_BASE; (prop = ExtCtrlIoctl(fd, &id)); ++id)
+    for (id = V4L2_CID_PRIVATE_BASE;
+         (prop = UsbCameraProperty::DeviceQuery(fd, &id)); ++id)
       DeviceCacheProperty(std::move(prop));
   }
 }

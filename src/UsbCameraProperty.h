@@ -8,6 +8,7 @@
 #ifndef CS_USBCAMERAPROPERTY_H_
 #define CS_USBCAMERAPROPERTY_H_
 
+#include <memory>
 #include <mutex>
 
 #ifdef __linux__
@@ -44,6 +45,8 @@ class UsbCameraProperty : public PropertyImpl {
   UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl);
 #endif
   UsbCameraProperty(const struct v4l2_queryctrl& ctrl);
+
+  static std::unique_ptr<UsbCameraProperty> DeviceQuery(int fd, __u32* id);
 
   bool DeviceGet(std::unique_lock<std::mutex>& lock, int fd);
   bool DeviceSet(std::unique_lock<std::mutex>& lock, int fd) const;
