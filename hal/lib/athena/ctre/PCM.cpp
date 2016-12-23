@@ -140,6 +140,19 @@ CTR_Code PCM::SetSolenoid(unsigned char idx, bool en)
 	return CTR_OKAY;
 }
 
+/* Set all PCM solenoid states
+ *
+ * @Return	-	CTR_Code	-	Error code (if any) for setting solenoids
+ * @Param 	-	state			Bitfield to set all solenoids to
+ */
+CTR_Code PCM::SetAllSolenoids(UINT8 state) {
+	CtreCanNode::txTask<PcmControl_t> toFill = GetTx<PcmControl_t>(CONTROL_1 | GetDeviceNumber());
+	if(toFill.IsEmpty())return CTR_UnexpectedArbId;
+	toFill->solenoidBits = state;
+	FlushTx(toFill);
+	return CTR_OKAY;
+}
+
 /* Clears PCM sticky faults (indicators of past faults
  *
  * @Return	-	CTR_Code	-	Error code (if any) for setting solenoid
@@ -464,6 +477,9 @@ extern "C" {
 	}
 	CTR_Code c_SetSolenoid(void * handle, unsigned char idx, INT8 param) {
 		return ((PCM*) handle)->SetSolenoid(idx, param);
+	}
+	CTR_Code c_SetAllSolenoids(void * handle, UINT8 state) {
+		return ((PCM*) handle)->SetAllSolenoids(state);
 	}
 	CTR_Code c_SetClosedLoopControl(void * handle, INT8 param) {
 		return ((PCM*) handle)->SetClosedLoopControl(param);
