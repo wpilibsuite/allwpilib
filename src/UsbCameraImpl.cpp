@@ -122,27 +122,10 @@ int UsbCameraImpl::PercentageToRaw(const PropertyData& rawProp,
          (rawProp.maximum - rawProp.minimum) * (percentValue / 100.0);
 }
 
-void UsbCameraImpl::UpdatePropertyValue(int property, bool setString, int value,
-                                        llvm::StringRef valueStr) {
-  auto prop = static_cast<PropertyData*>(GetProperty(property));
-  if (!prop) return;
-
-  if (setString)
-    prop->SetValue(valueStr);
-  else
-    prop->SetValue(value);
-
-  // Only notify updates after we've notified created
-  if (m_properties_cached)
-    Notifier::GetInstance().NotifySourceProperty(
-        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
-        prop->value, prop->valueStr);
-}
-
 #ifdef VIDIOC_QUERY_EXT_CTRL
 UsbCameraImpl::PropertyData::PropertyData(
     const struct v4l2_query_ext_ctrl& ctrl)
-    : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
+    : PropertyImpl(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
                    ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
@@ -180,7 +163,7 @@ UsbCameraImpl::PropertyData::PropertyData(
 #endif
 
 UsbCameraImpl::PropertyData::PropertyData(const struct v4l2_queryctrl& ctrl)
-    : PropertyBase(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
+    : PropertyImpl(llvm::StringRef{}, CS_PROP_NONE, ctrl.step,
                    ctrl.default_value, 0),
       id(ctrl.id & V4L2_CTRL_ID_MASK),
       type(ctrl.type) {
@@ -1057,17 +1040,6 @@ void UsbCameraImpl::DeviceCacheMode() {
   Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODE_CHANGED);
 }
 
-void UsbCameraImpl::NotifyPropertyCreated(int propIndex, PropertyData& prop) {
-  auto& notifier = Notifier::GetInstance();
-  notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, propIndex,
-                                prop.propKind, prop.value, prop.valueStr);
-  // also notify choices updated event for enum types
-  if (prop.propKind == CS_PROP_ENUM)
-    notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-                                  propIndex, prop.propKind, prop.value,
-                                  llvm::StringRef{});
-}
-
 void UsbCameraImpl::DeviceCacheProperty(std::unique_ptr<PropertyData> rawProp) {
   // For percentage properties, we want to cache both the raw and the
   // percentage versions.  This function is always called with prop being
@@ -1417,7 +1389,7 @@ void UsbCameraImpl::Send(std::unique_ptr<Message> msg) const {
   eventfd_write(fd, 1);
 }
 
-std::unique_ptr<SourceImpl::PropertyBase> UsbCameraImpl::CreateEmptyProperty(
+std::unique_ptr<PropertyImpl> UsbCameraImpl::CreateEmptyProperty(
     llvm::StringRef name) const {
   return llvm::make_unique<PropertyData>(name);
 }

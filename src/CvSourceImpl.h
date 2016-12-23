@@ -45,13 +45,13 @@ class CvSourceImpl : public SourceImpl {
                               CS_Status* status);
 
   // Property data
-  class PropertyData : public PropertyBase {
+  class PropertyData : public PropertyImpl {
    public:
     PropertyData() = default;
-    PropertyData(llvm::StringRef name_) : PropertyBase{name_} {}
+    PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
     PropertyData(llvm::StringRef name_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
-        : PropertyBase{name_, kind_, step_, defaultValue_, value_} {
+        : PropertyImpl{name_, kind_, step_, defaultValue_, value_} {
       hasMinimum = true;
       minimum = minimum_;
       hasMaximum = true;
@@ -63,7 +63,7 @@ class CvSourceImpl : public SourceImpl {
   };
 
  protected:
-  std::unique_ptr<PropertyBase> CreateEmptyProperty(
+  std::unique_ptr<PropertyImpl> CreateEmptyProperty(
       llvm::StringRef name) const override;
 
   bool CacheProperties(CS_Status* status) const override;

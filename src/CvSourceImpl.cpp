@@ -30,7 +30,7 @@ CvSourceImpl::~CvSourceImpl() {}
 
 void CvSourceImpl::Start() {}
 
-std::unique_ptr<SourceImpl::PropertyBase> CvSourceImpl::CreateEmptyProperty(
+std::unique_ptr<PropertyImpl> CvSourceImpl::CreateEmptyProperty(
     llvm::StringRef name) const {
   return llvm::make_unique<PropertyData>(name);
 }
@@ -57,11 +57,8 @@ void CvSourceImpl::SetProperty(int property, int value, CS_Status* status) {
     *status = CS_WRONG_PROPERTY_TYPE;
     return;
   }
-  prop->SetValue(value);
-  if (m_properties_cached)
-    Notifier::GetInstance().NotifySourceProperty(
-        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
-        prop->value, prop->valueStr);
+
+  UpdatePropertyValue(property, false, value, llvm::StringRef{});
 }
 
 void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
@@ -80,11 +77,8 @@ void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
     *status = CS_WRONG_PROPERTY_TYPE;
     return;
   }
-  prop->SetValue(value);
-  if (m_properties_cached)
-    Notifier::GetInstance().NotifySourceProperty(
-        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, CS_PROP_STRING,
-        prop->value, prop->valueStr);
+
+  UpdatePropertyValue(property, true, 0, value);
 }
 
 bool CvSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {

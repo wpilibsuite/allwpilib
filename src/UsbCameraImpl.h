@@ -50,15 +50,15 @@ class UsbCameraImpl : public SourceImpl {
   std::string GetPath() { return m_path; }
 
   // Property data
-  class PropertyData : public PropertyBase {
+  class PropertyData : public PropertyImpl {
    public:
     PropertyData() = default;
-    PropertyData(llvm::StringRef name_) : PropertyBase{name_} {}
+    PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
 
     // Normalized property constructor
     PropertyData(llvm::StringRef name_, int rawIndex_,
                  const PropertyData& rawProp, int defaultValue_, int value_)
-        : PropertyBase(name_, rawProp.propKind, 1, defaultValue_, value_),
+        : PropertyImpl(name_, rawProp.propKind, 1, defaultValue_, value_),
           percentage{true},
           propPair{rawIndex_},
           id{rawProp.id},
@@ -111,7 +111,7 @@ class UsbCameraImpl : public SourceImpl {
   };
 
  protected:
-  std::unique_ptr<PropertyBase> CreateEmptyProperty(
+  std::unique_ptr<PropertyImpl> CreateEmptyProperty(
       llvm::StringRef name) const override;
 
   // Cache properties.  Immediately successful if properties are already cached.
@@ -169,9 +169,6 @@ class UsbCameraImpl : public SourceImpl {
   // Property helper functions
   int RawToPercentage(const PropertyData& rawProp, int rawValue);
   int PercentageToRaw(const PropertyData& rawProp, int percentValue);
-  void UpdatePropertyValue(int property, bool setString, int value,
-                           llvm::StringRef valueStr);
-  void NotifyPropertyCreated(int propIndex, PropertyData& prop);
 
   //
   // Variables only used within camera thread

@@ -335,6 +335,34 @@ void SourceImpl::PutError(llvm::StringRef msg, Frame::Time time) {
   m_frameCv.notify_all();
 }
 
+void SourceImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
+  auto& notifier = Notifier::GetInstance();
+  notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, propIndex,
+                                prop.propKind, prop.value, prop.valueStr);
+  // also notify choices updated event for enum types
+  if (prop.propKind == CS_PROP_ENUM)
+    notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
+                                  propIndex, prop.propKind, prop.value,
+                                  llvm::StringRef{});
+}
+
+void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
+                                     llvm::StringRef valueStr) {
+  auto prop = GetProperty(property);
+  if (!prop) return;
+
+  if (setString)
+    prop->SetValue(valueStr);
+  else
+    prop->SetValue(value);
+
+  // Only notify updates after we've notified created
+  if (m_properties_cached)
+    Notifier::GetInstance().NotifySourceProperty(
+        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
+        prop->value, prop->valueStr);
+}
+
 void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
   std::lock_guard<std::mutex> lock{m_poolMutex};
   if (m_destroyFrames) return;
