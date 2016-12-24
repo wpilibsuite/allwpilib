@@ -100,13 +100,15 @@ int TCPAcceptor::start() {
 
   int result = bind(m_lsd, (struct sockaddr*)&address, sizeof(address));
   if (result != 0) {
-    WPI_ERROR(m_logger, "bind() failed: " << SocketStrerror());
+    WPI_ERROR(m_logger, "bind() to port " << m_port
+                                          << " failed: " << SocketStrerror());
     return result;
   }
 
   result = listen(m_lsd, 5);
   if (result != 0) {
-    WPI_ERROR(m_logger, "listen() failed: " << SocketStrerror());
+    WPI_ERROR(m_logger, "listen() on port " << m_port
+                                            << " failed: " << SocketStrerror());
     return result;
   }
   m_listening = true;
@@ -174,7 +176,8 @@ std::unique_ptr<NetworkStream> TCPAcceptor::accept() {
   int sd = ::accept(m_lsd, (struct sockaddr*)&address, &len);
   if (sd < 0) {
     if (!m_shutdown)
-      WPI_ERROR(m_logger, "accept() failed: " << SocketStrerror());
+      WPI_ERROR(m_logger, "accept() on port "
+                              << m_port << " failed: " << SocketStrerror());
     return nullptr;
   }
   if (m_shutdown) {
