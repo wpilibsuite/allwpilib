@@ -8,6 +8,8 @@
 #ifndef CSCORE_OO_H_
 #define CSCORE_OO_H_
 
+#include <initializer_list>
+
 #include "cscore_cpp.h"
 
 namespace cs {
@@ -270,9 +272,30 @@ class HttpCamera : public VideoSource {
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
+  /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
+  /// @param kind Camera kind (e.g. kAxis)
+  HttpCamera(llvm::StringRef name, const char* url, CameraKind kind = kUnknown);
+
+  /// Create a source for a MJPEG-over-HTTP (IP) camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
+  /// @param kind Camera kind (e.g. kAxis)
+  HttpCamera(llvm::StringRef name, const std::string& url,
+             CameraKind kind = kUnknown);
+
+  /// Create a source for a MJPEG-over-HTTP (IP) camera.
+  /// @param name Source name (arbitrary unique identifier)
   /// @param urls Array of Camera URLs
   /// @param kind Camera kind (e.g. kAxis)
   HttpCamera(llvm::StringRef name, llvm::ArrayRef<std::string> urls,
+             CameraKind kind = kUnknown);
+
+  /// Create a source for a MJPEG-over-HTTP (IP) camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param urls Array of Camera URLs
+  /// @param kind Camera kind (e.g. kAxis)
+  template <typename T>
+  HttpCamera(llvm::StringRef name, std::initializer_list<T> urls,
              CameraKind kind = kUnknown);
 
   /// Get the kind of HTTP camera.
@@ -283,8 +306,52 @@ class HttpCamera : public VideoSource {
   /// Change the URLs used to connect to the camera.
   void SetUrls(llvm::ArrayRef<std::string> urls);
 
+  /// Change the URLs used to connect to the camera.
+  template <typename T>
+  void SetUrls(std::initializer_list<T> urls);
+
   /// Get the URLs used to connect to the camera.
   std::vector<std::string> GetUrls() const;
+};
+
+/// A source that represents an Axis IP camera.
+class AxisCamera : public HttpCamera {
+  static std::string HostToUrl(llvm::StringRef host);
+  static std::vector<std::string> HostToUrl(llvm::ArrayRef<std::string> hosts);
+  template <typename T>
+  static std::vector<std::string> HostToUrl(std::initializer_list<T> hosts);
+
+ public:
+  /// Create a source for an Axis IP camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+  /// @param kind Camera kind (e.g. kAxis)
+  AxisCamera(llvm::StringRef name, llvm::StringRef host);
+
+  /// Create a source for an Axis IP camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+  /// @param kind Camera kind (e.g. kAxis)
+  AxisCamera(llvm::StringRef name, const char* host);
+
+  /// Create a source for an Axis IP camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+  /// @param kind Camera kind (e.g. kAxis)
+  AxisCamera(llvm::StringRef name, const std::string& host);
+
+  /// Create a source for an Axis IP camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param hosts Array of Camera host IPs/DNS names
+  /// @param kind Camera kind (e.g. kAxis)
+  AxisCamera(llvm::StringRef name, llvm::ArrayRef<std::string> hosts);
+
+  /// Create a source for an Axis IP camera.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param hosts Array of Camera host IPs/DNS names
+  /// @param kind Camera kind (e.g. kAxis)
+  template <typename T>
+  AxisCamera(llvm::StringRef name, std::initializer_list<T> hosts);
 };
 
 /// A source for user code to provide OpenCV images as video frames.
@@ -343,6 +410,13 @@ class CvSource : public VideoSource {
   /// @param choices Choices
   void SetEnumPropertyChoices(const VideoProperty& property,
                               llvm::ArrayRef<std::string> choices);
+
+  /// Configure enum property choices.
+  /// @param property Property
+  /// @param choices Choices
+  template <typename T>
+  void SetEnumPropertyChoices(const VideoProperty& property,
+                              std::initializer_list<T> choices);
 };
 
 /// A sink for video that accepts a sequence of frames.

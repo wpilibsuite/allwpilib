@@ -229,11 +229,33 @@ inline HttpCamera::HttpCamera(llvm::StringRef name, llvm::StringRef url,
       &m_status);
 }
 
+inline HttpCamera::HttpCamera(llvm::StringRef name, const char* url,
+                              CameraKind kind) {
+  m_handle = CreateHttpCamera(
+      name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
+      &m_status);
+}
+
+inline HttpCamera::HttpCamera(llvm::StringRef name, const std::string& url,
+                              CameraKind kind)
+    : HttpCamera(name, llvm::StringRef{url}, kind) {}
+
 inline HttpCamera::HttpCamera(llvm::StringRef name,
                               llvm::ArrayRef<std::string> urls,
                               CameraKind kind) {
   m_handle = CreateHttpCamera(
       name, urls, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
+      &m_status);
+}
+
+template <typename T>
+inline HttpCamera::HttpCamera(llvm::StringRef name,
+                              std::initializer_list<T> urls, CameraKind kind) {
+  std::vector<std::string> vec;
+  vec.reserve(urls.size());
+  for (const auto& url : urls) vec.emplace_back(url);
+  m_handle = CreateHttpCamera(
+      name, vec, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
@@ -248,10 +270,63 @@ inline void HttpCamera::SetUrls(llvm::ArrayRef<std::string> urls) {
   ::cs::SetHttpCameraUrls(m_handle, urls, &m_status);
 }
 
+template <typename T>
+inline void HttpCamera::SetUrls(std::initializer_list<T> urls) {
+  std::vector<std::string> vec;
+  vec.reserve(urls.size());
+  for (const auto& url : urls) vec.emplace_back(url);
+  m_status = 0;
+  ::cs::SetHttpCameraUrls(m_handle, vec, &m_status);
+}
+
 inline std::vector<std::string> HttpCamera::GetUrls() const {
   m_status = 0;
   return ::cs::GetHttpCameraUrls(m_handle, &m_status);
 }
+
+inline std::string AxisCamera::HostToUrl(llvm::StringRef host) {
+  std::string rv{"http://"};
+  rv += host;
+  rv += "/mjpg/video.mjpg";
+  return rv;
+}
+
+inline std::vector<std::string> AxisCamera::HostToUrl(
+    llvm::ArrayRef<std::string> hosts) {
+  std::vector<std::string> rv;
+  rv.reserve(hosts.size());
+  for (const auto& host : hosts)
+    rv.emplace_back(HostToUrl(llvm::StringRef{host}));
+  return rv;
+}
+
+template <typename T>
+inline std::vector<std::string> AxisCamera::HostToUrl(
+    std::initializer_list<T> hosts) {
+  std::vector<std::string> rv;
+  rv.reserve(hosts.size());
+  for (const auto& host : hosts)
+    rv.emplace_back(HostToUrl(llvm::StringRef{host}));
+  return rv;
+}
+
+inline AxisCamera::AxisCamera(llvm::StringRef name, llvm::StringRef host)
+    : HttpCamera(name, HostToUrl(host), kAxis) {}
+
+inline AxisCamera::AxisCamera(llvm::StringRef name, const char* host)
+    : HttpCamera(name, HostToUrl(host), kAxis) {}
+
+inline AxisCamera::AxisCamera(llvm::StringRef name, const std::string& host)
+    : HttpCamera(name, HostToUrl(llvm::StringRef{host}), kAxis) {}
+
+inline AxisCamera::AxisCamera(llvm::StringRef name,
+                              llvm::ArrayRef<std::string> hosts)
+    : HttpCamera(name, HostToUrl(hosts), kAxis) {}
+
+template <typename T>
+inline AxisCamera::AxisCamera(llvm::StringRef name,
+                              std::initializer_list<T> hosts)
+    : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
 inline CvSource::CvSource(llvm::StringRef name, const VideoMode& mode) {
   m_handle = CreateCvSource(name, mode, &m_status);
@@ -298,6 +373,16 @@ inline void CvSource::SetEnumPropertyChoices(
     const VideoProperty& property, llvm::ArrayRef<std::string> choices) {
   m_status = 0;
   SetSourceEnumPropertyChoices(m_handle, property.m_handle, choices, &m_status);
+}
+
+template <typename T>
+inline void CvSource::SetEnumPropertyChoices(const VideoProperty& property,
+                                             std::initializer_list<T> choices) {
+  std::vector<std::string> vec;
+  vec.reserve(choices.size());
+  for (const auto& choice : choices) vec.emplace_back(choice);
+  m_status = 0;
+  SetSourceEnumPropertyChoices(m_handle, property.m_handle, vec, &m_status);
 }
 
 inline VideoSink::VideoSink(const VideoSink& sink)
