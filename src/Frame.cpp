@@ -163,7 +163,7 @@ Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat,
   // Color convert; if ultimate destination is JPEG, we need to convert to BGR
   switch (pixelFormat) {
     case VideoMode::kRGB565:
-      // If source is YUYV, need to convert to BGR first
+      // If source is YUYV or Gray, need to convert to BGR first
       if (cur->pixelFormat == VideoMode::kYUYV) {
         // Check to see if BGR version already exists...
         if (Image* newImage =
@@ -171,14 +171,45 @@ Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat,
           cur = newImage;
         else
           cur = ConvertYUYVToBGR(cur);
+      } else if (cur->pixelFormat == VideoMode::kGray) {
+        // Check to see if BGR version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR))
+          cur = newImage;
+        else
+          cur = ConvertGrayToBGR(cur);
       }
       return ConvertBGRToRGB565(cur);
+    case VideoMode::kGray:
+      // If source is YUYV or RGB565, need to convert to BGR first
+      if (cur->pixelFormat == VideoMode::kYUYV) {
+        // Check to see if BGR version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR))
+          cur = newImage;
+        else
+          cur = ConvertYUYVToBGR(cur);
+      } else if (cur->pixelFormat == VideoMode::kRGB565) {
+        // Check to see if BGR version already exists...
+        if (Image* newImage =
+                GetExistingImage(cur->width, cur->height, VideoMode::kBGR))
+          cur = newImage;
+        else
+          cur = ConvertRGB565ToBGR(cur);
+      }
+      return ConvertBGRToGray(cur);
     case VideoMode::kBGR:
     case VideoMode::kMJPEG:
       if (cur->pixelFormat == VideoMode::kYUYV)
         cur = ConvertYUYVToBGR(cur);
       else if (cur->pixelFormat == VideoMode::kRGB565)
         cur = ConvertRGB565ToBGR(cur);
+      else if (cur->pixelFormat == VideoMode::kGray) {
+        if (pixelFormat == VideoMode::kBGR)
+          return ConvertGrayToBGR(cur);
+        else
+          return ConvertGrayToMJPEG(cur, jpegQuality);
+      }
       break;
     case VideoMode::kYUYV:
     default:
@@ -203,6 +234,27 @@ Image* Frame::ConvertMJPEGToBGR(Image* image) {
   // Decode
   cv::Mat newMat = newImage->AsMat();
   cv::imdecode(image->AsInputArray(), cv::IMREAD_COLOR, &newMat);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertMJPEGToGray(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kMJPEG) return nullptr;
+
+  // Allocate an grayscale image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+                                image->width * image->height);
+
+  // Decode
+  cv::Mat newMat = newImage->AsMat();
+  cv::imdecode(image->AsInputArray(), cv::IMREAD_GRAYSCALE, &newMat);
 
   // Save the result
   Image* rv = newImage.release();
@@ -273,6 +325,46 @@ Image* Frame::ConvertRGB565ToBGR(Image* image) {
   return rv;
 }
 
+Image* Frame::ConvertBGRToGray(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kBGR) return nullptr;
+
+  // Allocate a Grayscale image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kGray, image->width, image->height,
+                                image->width * image->height);
+
+  // Convert
+  cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_BGR2GRAY);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
+Image* Frame::ConvertGrayToBGR(Image* image) {
+  if (!image || image->pixelFormat != VideoMode::kBGR) return nullptr;
+
+  // Allocate a BGR image
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kBGR, image->width, image->height,
+                                image->width * image->height * 3);
+
+  // Convert
+  cv::cvtColor(image->AsMat(), newImage->AsMat(), cv::COLOR_GRAY2BGR);
+
+  // Save the result
+  Image* rv = newImage.release();
+  if (m_impl) {
+    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    m_impl->images.push_back(rv);
+  }
+  return rv;
+}
+
 Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
   if (!image || image->pixelFormat != VideoMode::kBGR) return nullptr;
   if (!m_impl) return nullptr;
@@ -287,6 +379,37 @@ Image* Frame::ConvertBGRToMJPEG(Image* image, int quality) {
   auto newImage =
       m_impl->source.AllocImage(VideoMode::kMJPEG, image->width, image->height,
                                 image->width * image->height * 1.5);
+
+  // Compress
+  if (m_impl->compressionParams.empty()) {
+    m_impl->compressionParams.push_back(CV_IMWRITE_JPEG_QUALITY);
+    m_impl->compressionParams.push_back(quality);
+  } else {
+    m_impl->compressionParams[1] = quality;
+  }
+  cv::imencode(".jpg", image->AsMat(), newImage->vec(),
+               m_impl->compressionParams);
+
+  // Save the result
+  Image* rv = newImage.release();
+  m_impl->images.push_back(rv);
+  return rv;
+}
+
+Image* Frame::ConvertGrayToMJPEG(Image* image, int quality) {
+  if (!image || image->pixelFormat != VideoMode::kGray) return nullptr;
+  if (!m_impl) return nullptr;
+  std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+
+  // Allocate a JPEG image.  We don't actually know what the resulting size
+  // will be; while the destination will automatically grow, doing so will
+  // cause an extra malloc, so we don't want to be too conservative here.
+  // Per Wikipedia, Q=100 on a sample image results in 8.25 bits per pixel,
+  // this is a little bit more conservative in assuming 25% space savings over
+  // the equivalent grayscale image.
+  auto newImage =
+      m_impl->source.AllocImage(VideoMode::kMJPEG, image->width, image->height,
+                                image->width * image->height * 0.75);
 
   // Compress
   if (m_impl->compressionParams.empty()) {

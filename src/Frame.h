@@ -128,10 +128,14 @@ class Frame {
   Image* Convert(Image* image, VideoMode::PixelFormat pixelFormat,
                  int jpegQuality = 80);
   Image* ConvertMJPEGToBGR(Image* image);
+  Image* ConvertMJPEGToGray(Image* image);
   Image* ConvertYUYVToBGR(Image* image);
   Image* ConvertBGRToRGB565(Image* image);
   Image* ConvertRGB565ToBGR(Image* image);
+  Image* ConvertBGRToGray(Image* image);
+  Image* ConvertGrayToBGR(Image* image);
   Image* ConvertBGRToMJPEG(Image* image, int quality);
+  Image* ConvertGrayToMJPEG(Image* image, int quality);
 
   Image* GetImage(int width, int height, VideoMode::PixelFormat pixelFormat,
                   int jpegQuality = 80);

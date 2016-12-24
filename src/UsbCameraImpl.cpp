@@ -67,6 +67,8 @@ static VideoMode::PixelFormat ToPixelFormat(__u32 pixelFormat) {
       return VideoMode::kRGB565;
     case V4L2_PIX_FMT_BGR24:
       return VideoMode::kBGR;
+    case V4L2_PIX_FMT_GREY:
+      return VideoMode::kGray;
     default:
       return VideoMode::kUnknown;
   }
@@ -83,6 +85,8 @@ static __u32 FromPixelFormat(VideoMode::PixelFormat pixelFormat) {
       return V4L2_PIX_FMT_RGB565;
     case VideoMode::kBGR:
       return V4L2_PIX_FMT_BGR24;
+    case VideoMode::kGray:
+      return V4L2_PIX_FMT_GREY;
     default:
       return 0;
   }

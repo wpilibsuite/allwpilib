@@ -39,6 +39,7 @@ public class CvSink extends VideoSink {
   }
 
   /// Wait for the next frame and get the image.
+  /// The provided image will have three 3-bit channels stored in BGR order.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
   public long grabFrame(Mat image) {

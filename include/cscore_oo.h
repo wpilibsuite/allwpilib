@@ -280,8 +280,9 @@ class CvSource : public VideoSource {
            int height, int fps);
 
   /// Put an OpenCV image and notify sinks.
-  /// This is identical in behavior to calling PutImage(0, image) followed by
-  /// NotifyFrame().
+  /// Only 8-bit single-channel or 3-channel (with BGR channel order) images
+  /// are supported. If the format, depth or channel order is different, use
+  /// cv::Mat::convertTo() and/or cv::cvtColor() to convert it first.
   /// @param image OpenCV image
   void PutFrame(cv::Mat& image);
 
@@ -439,6 +440,7 @@ class CvSink : public VideoSink {
   void SetDescription(llvm::StringRef description);
 
   /// Wait for the next frame and get the image.
+  /// The provided image will have three 8-bit channels stored in BGR order.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
   uint64_t GrabFrame(cv::Mat& image) const;

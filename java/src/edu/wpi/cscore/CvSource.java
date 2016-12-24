@@ -29,6 +29,9 @@ public class CvSource extends VideoSource {
   }
 
   /// Put an OpenCV image and notify sinks.
+  /// Only 8-bit single-channel or 3-channel (with BGR channel order) images
+  /// are supported. If the format, depth or channel order is different, use
+  /// Mat.convertTo() and/or cvtColor() to convert it first.
   /// @param image OpenCV image
   public void putFrame(Mat image) {
     CameraServerJNI.putSourceFrame(m_handle, image.nativeObj);

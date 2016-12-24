@@ -9,6 +9,7 @@
 
 #include "llvm/STLExtras.h"
 #include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "support/timestamp.h"
 
@@ -95,9 +96,35 @@ void CvSourceImpl::NumSinksEnabledChanged() {
 }
 
 void CvSourceImpl::PutFrame(cv::Mat& image) {
-  auto dest = AllocImage(VideoMode::kBGR, image.cols, image.rows,
-                         image.total() * image.elemSize());
-  image.copyTo(dest->AsMat());
+  // We only support 8-bit images; convert if necessary.
+  cv::Mat finalImage;
+  if (image.depth() == CV_8U)
+    finalImage = image;
+  else
+    image.convertTo(finalImage, CV_8U);
+
+  std::unique_ptr<Image> dest;
+  switch (image.channels()) {
+    case 1:
+      dest =
+          AllocImage(VideoMode::kGray, image.cols, image.rows, image.total());
+      finalImage.copyTo(dest->AsMat());
+      break;
+    case 3:
+      dest = AllocImage(VideoMode::kBGR, image.cols, image.rows,
+                        image.total() * 3);
+      finalImage.copyTo(dest->AsMat());
+      break;
+    case 4:
+      dest = AllocImage(VideoMode::kBGR, image.cols, image.rows,
+                        image.total() * 3);
+      cv::cvtColor(finalImage, dest->AsMat(), cv::COLOR_BGRA2BGR);
+      break;
+    default:
+      SERROR("PutFrame: " << image.channels()
+                          << "-channel images not supported");
+      return;
+  }
   SourceImpl::PutFrame(std::move(dest), wpi::Now());
 }
 

@@ -58,6 +58,7 @@ class Image {
       case VideoMode::kBGR:
         type = CV_8UC3;
         break;
+      case VideoMode::kGray:
       case VideoMode::kMJPEG:
       default:
         type = CV_8UC1;
