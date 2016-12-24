@@ -58,9 +58,10 @@ bool IsJpeg(llvm::StringRef data) {
     return false;
 
   // Check for valid JPEG header (null terminated JFIF)
-  if (bytes[2] != 0xff || bytes[3] != 0xe0 || data.substr(6, 4) != "JFIF" ||
-      bytes[10] != 0x00)
+  if (bytes[2] == 0xff && bytes[3] == 0xe0) {
+    if (data.substr(6, 4) != "JFIF" || bytes[10] != 0x00)
     return false;
+  }
 
   return true;
 }
