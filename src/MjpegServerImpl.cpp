@@ -52,9 +52,11 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   std::unique_ptr<wpi::NetworkStream> m_stream;
   std::shared_ptr<SourceImpl> m_source;
   bool m_streaming = false;
+  bool m_noStreaming = false;
 
  private:
   std::string m_name;
+
   llvm::StringRef GetName() { return m_name; }
 
   std::shared_ptr<SourceImpl> GetSource() {
@@ -128,6 +130,10 @@ static void SendError(llvm::raw_ostream& os, int code,
     case 403:
       codeText = "Forbidden";
       baseMessage = "403: Forbidden!";
+      break;
+    case 503:
+      codeText = "Service Unavailable";
+      baseMessage = "503: Service Unavailable";
       break;
     default:
       code = 501;
@@ -393,6 +399,12 @@ void MjpegServerImpl::Stop() {
 
 // Send HTTP response and a stream of JPG-frames
 void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
+  if (m_noStreaming) {
+    SERROR("Too many simultaneous client streams");
+    SendError(os, 503, "Too many simultaneous streams");
+    return;
+  }
+
   os.SetUnbuffered();
 
   llvm::SmallString<256> header;
@@ -449,7 +461,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
         continue;
     }
 
-    SDEBUG4("sending frame size=" << size);
+    SDEBUG4("sending frame size=" << size << " addDHT=" << addDHT);
 
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
@@ -635,10 +647,18 @@ void MjpegServerImpl::ServerThreadMain() {
       if (!thr) it->Start(new ConnThread{GetName()});
     }
 
+    auto nstreams =
+        std::count_if(m_connThreads.begin(), m_connThreads.end(),
+                      [](const wpi::SafeThreadOwner<ConnThread>& owner) {
+                        auto thr = owner.GetThread();
+                        return thr && thr->m_streaming;
+                      });
+
     // Hand off connection to it
     auto thr = it->GetThread();
     thr->m_stream = std::move(stream);
     thr->m_source = source;
+    thr->m_noStreaming = nstreams >= 10;
     thr->m_cond.notify_one();
   }
 
