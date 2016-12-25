@@ -85,6 +85,100 @@ class CameraServer : public ErrorBase {
   void StartAutomaticCapture(const cs::VideoSource& camera);
 
   /**
+   * Adds an Axis IP camera.
+   *
+   * <p>This overload calls {@link #AddAxisCamera(String, String)} with
+   * name "Axis Camera".
+   *
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  cs::AxisCamera AddAxisCamera(llvm::StringRef host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * <p>This overload calls {@link #AddAxisCamera(String, String)} with
+   * name "Axis Camera".
+   *
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  cs::AxisCamera AddAxisCamera(const char* host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * <p>This overload calls {@link #AddAxisCamera(String, String)} with
+   * name "Axis Camera".
+   *
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  cs::AxisCamera AddAxisCamera(const std::string& host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * <p>This overload calls {@link #AddAxisCamera(String, String[])} with
+   * name "Axis Camera".
+   *
+   * @param hosts Array of Camera host IPs/DNS names
+   */
+  cs::AxisCamera AddAxisCamera(llvm::ArrayRef<std::string> hosts);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * <p>This overload calls {@link #AddAxisCamera(String, String[])} with
+   * name "Axis Camera".
+   *
+   * @param hosts Array of Camera host IPs/DNS names
+   */
+  template <typename T>
+  cs::AxisCamera AddAxisCamera(std::initializer_list<T> hosts);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  cs::AxisCamera AddAxisCamera(llvm::StringRef name, llvm::StringRef host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  cs::AxisCamera AddAxisCamera(llvm::StringRef name, const char* host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  cs::AxisCamera AddAxisCamera(llvm::StringRef name, const std::string& host);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param hosts Array of Camera host IPs/DNS names
+   */
+  cs::AxisCamera AddAxisCamera(llvm::StringRef name,
+                               llvm::ArrayRef<std::string> hosts);
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param hosts Array of Camera host IPs/DNS names
+   */
+  template <typename T>
+  cs::AxisCamera AddAxisCamera(llvm::StringRef name,
+                               std::initializer_list<T> hosts);
+
+  /**
    * Get OpenCV access to the primary camera feed.  This allows you to
    * get images from the camera for image processing on the roboRIO.
    *
@@ -176,6 +270,7 @@ class CameraServer : public ErrorBase {
   CameraServer();
 
   std::shared_ptr<ITable> GetSourceTable(CS_Source source);
+  std::vector<std::string> GetSinkStreamValues(CS_Sink sink);
   void UpdateStreamValues();
 
   static constexpr char const* kPublishName = "/CameraPublisher";
@@ -193,3 +288,5 @@ class CameraServer : public ErrorBase {
 };
 
 }  // namespace frc
+
+#include "CameraServer.inc"

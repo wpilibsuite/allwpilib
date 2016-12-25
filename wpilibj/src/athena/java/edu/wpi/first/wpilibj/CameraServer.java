@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;
@@ -65,9 +66,14 @@ public class CameraServer {
     switch (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))) {
       case kUsb:
         return "usb:" + CameraServerJNI.getUsbCameraPath(source);
-      case kHttp:
-        // TODO
-        return "ip:";
+      case kHttp: {
+        String[] urls = CameraServerJNI.getHttpCameraUrls(source);
+        if (urls.length > 0) {
+          return "ip:" + urls[0];
+        } else {
+          return "ip:";
+        }
+      }
       case kCv:
         // FIXME: Should be "cv:", but LabVIEW dashboard requires "usb:".
         // https://github.com/wpilibsuite/allwpilib/issues/407
@@ -88,44 +94,83 @@ public class CameraServer {
   }
 
   @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  private synchronized String[] getSinkStreamValues(int sink) {
+    // Ignore all but MjpegServer
+    if (VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) != VideoSink.Kind.kMjpeg) {
+      return new String[0];
+    }
+
+    // Get port
+    int port = CameraServerJNI.getMjpegServerPort(sink);
+
+    // Generate values
+    ArrayList<String> values = new ArrayList<String>(m_addresses.length + 1);
+    String listenAddress = CameraServerJNI.getMjpegServerListenAddress(sink);
+    if (!listenAddress.isEmpty()) {
+      // If a listen address is specified, only use that
+      values.add(makeStreamValue(listenAddress, port));
+    } else {
+      // Otherwise generate for hostname and all interface addresses
+      values.add(makeStreamValue(CameraServerJNI.getHostname() + ".local", port));
+      for (String addr : m_addresses) {
+        if (addr.equals("127.0.0.1")) {
+          continue;  // ignore localhost
+        }
+        values.add(makeStreamValue(addr, port));
+      }
+    }
+
+    return values.toArray(new String[0]);
+  }
+
+  @SuppressWarnings("JavadocMethod")
+  private static String[] getSourceStreamValues(int source) {
+    // Ignore all but HttpCamera
+    if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
+            != VideoSource.Kind.kHttp) {
+      return new String[0];
+    }
+
+    // Generate values
+    String[] values = CameraServerJNI.getHttpCameraUrls(source);
+    for (int j = 0; j < values.length; j++) {
+      values[j] = "mjpg:" + values[j];
+    }
+
+    return values;
+  }
+
+  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
   private synchronized void updateStreamValues() {
     // Over all the sinks...
     for (VideoSink i : m_sinks.values()) {
-      // Ignore all but MjpegServer
-      if (i.getKind() != VideoSink.Kind.kMjpeg) {
-        continue;
-      }
       int sink = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
       int source = CameraServerJNI.getSinkSource(sink);
       ITable table = m_tables.get(source);
-      if (table == null) {
-        continue;
-      }
-
-      // Get port
-      int port = CameraServerJNI.getMjpegServerPort(sink);
-
-      // Generate values
-      ArrayList<String> values = new ArrayList<String>(m_addresses.length + 1);
-      String listenAddress = CameraServerJNI.getMjpegServerListenAddress(sink);
-      if (!listenAddress.isEmpty()) {
-        // If a listen address is specified, only use that
-        values.add(makeStreamValue(listenAddress, port));
-      } else {
-        // Otherwise generate for hostname and all interface addresses
-        values.add(makeStreamValue(CameraServerJNI.getHostname() + ".local", port));
-        for (String addr : m_addresses) {
-          if (addr.equals("127.0.0.1")) {
-            continue;  // ignore localhost
-          }
-          values.add(makeStreamValue(addr, port));
+      if (table != null) {
+        // Set table value
+        String[] values = getSinkStreamValues(sink);
+        if (values.length > 0) {
+          table.putStringArray("streams", values);
         }
       }
+    }
 
-      // Set table value
-      table.putStringArray("streams", values.toArray(new String[0]));
+    // Over all the sources...
+    for (VideoSource i : m_sources.values()) {
+      int source = i.getHandle();
+
+      // Get the source's subtable (if none exists, we're done)
+      ITable table = m_tables.get(source);
+      if (table != null) {
+        // Set table value
+        String[] values = getSourceStreamValues(source);
+        if (values.length > 0) {
+          table.putStringArray("streams", values);
+        }
+      }
     }
   }
 
@@ -157,7 +202,7 @@ public class CameraServer {
           table.putString("description",
               CameraServerJNI.getSourceDescription(event.sourceHandle));
           table.putBoolean("connected", CameraServerJNI.isSourceConnected(event.sourceHandle));
-          table.putStringArray("streams", new String[0]);
+          table.putStringArray("streams", getSourceStreamValues(event.sourceHandle));
           break;
         }
         case kSourceDestroyed: {
@@ -298,6 +343,54 @@ public class CameraServer {
     addCamera(camera);
     VideoSink server = addServer("serve_" + camera.getName());
     server.setSource(camera);
+  }
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * <p>This overload calls {@link #addAxisCamera(String, String)} with
+   * name "Axis Camera".
+   *
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  public AxisCamera addAxisCamera(String host) {
+    return addAxisCamera("Axis Camera", host);
+  }
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * <p>This overload calls {@link #addAxisCamera(String, String[])} with
+   * name "Axis Camera".
+   *
+   * @param hosts Array of Camera host IPs/DNS names
+   */
+  public AxisCamera addAxisCamera(String[] hosts) {
+    return addAxisCamera("Axis Camera", hosts);
+  }
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
+  public AxisCamera addAxisCamera(String name, String host) {
+    AxisCamera camera = new AxisCamera(name, host);
+    addCamera(camera);
+    return camera;
+  }
+
+  /**
+   * Adds an Axis IP camera.
+   *
+   * @param name The name to give the camera
+   * @param hosts Array of Camera host IPs/DNS names
+   */
+  public AxisCamera addAxisCamera(String name, String[] hosts) {
+    AxisCamera camera = new AxisCamera(name, hosts);
+    addCamera(camera);
+    return camera;
   }
 
   /**
