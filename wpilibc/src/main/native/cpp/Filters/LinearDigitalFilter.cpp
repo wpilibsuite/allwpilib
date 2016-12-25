@@ -95,8 +95,8 @@ double LinearDigitalFilter::Get() const {
 }
 
 void LinearDigitalFilter::Reset() {
-  m_inputs.Reset();
-  m_outputs.Reset();
+  m_inputs.reset();
+  m_outputs.reset();
 }
 
 /**
@@ -108,7 +108,7 @@ double LinearDigitalFilter::PIDGet() {
   double retVal = 0.0;
 
   // Rotate the inputs
-  m_inputs.PushFront(PIDGetSource());
+  m_inputs.push_front(PIDGetSource());
 
   // Calculate the new value
   for (size_t i = 0; i < m_inputGains.size(); i++) {
@@ -119,7 +119,7 @@ double LinearDigitalFilter::PIDGet() {
   }
 
   // Rotate the outputs
-  m_outputs.PushFront(retVal);
+  m_outputs.push_front(retVal);
 
   return retVal;
 }
