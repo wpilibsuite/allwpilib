@@ -89,14 +89,14 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
 #ifdef _WIN32
     llvm::SmallString<128> addr_copy(server);
     addr_copy.push_back('\0');
-    int size = sizeof(address);
-    if (WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size) != 0) {
+    int res = InetPton(PF_INET, addr_copy.data(), &(address.sin_addr));
+#else
+    int res = inet_pton(PF_INET, server, &(address.sin_addr));
+#endif
+    if (res != 1) {
       WPI_ERROR(logger, "could not resolve " << server << " address");
       return nullptr;
     }
-#else
-    inet_pton(PF_INET, server, &(address.sin_addr));
-#endif
   }
   address.sin_port = htons(port);
 

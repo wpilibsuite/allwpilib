@@ -26,6 +26,7 @@
 #include <fcntl.h>
 #ifdef _WIN32
 #include <WinSock2.h>
+#include <Ws2tcpip.h>
 #else
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
@@ -38,8 +39,7 @@ TCPStream::TCPStream(int sd, sockaddr_in* address)
     : m_sd(sd), m_blocking(true) {
   char ip[50];
 #ifdef _WIN32
-  unsigned long size = sizeof(ip) - 1;
-  WSAAddressToString((sockaddr*)address, sizeof sockaddr_in, nullptr, ip, &size);
+  InetNtop(PF_INET, &(address->sin_addr.s_addr), ip, sizeof(ip) - 1);
 #else
   inet_ntop(PF_INET, (in_addr*)&(address->sin_addr.s_addr), ip,
             sizeof(ip) - 1);

@@ -27,6 +27,7 @@
 #include <cstring>
 #ifdef _WIN32
 #include <WinSock2.h>
+#include <Ws2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
@@ -85,11 +86,14 @@ int TCPAcceptor::start() {
 #ifdef _WIN32
     llvm::SmallString<128> addr_copy(m_address);
     addr_copy.push_back('\0');
-    int size = sizeof(address);
-    WSAStringToAddress(addr_copy.data(), PF_INET, nullptr, (struct sockaddr*)&address, &size);
+    int res = InetPton(PF_INET, addr_copy.data(), &(address.sin_addr));
 #else
-    inet_pton(PF_INET, m_address.c_str(), &(address.sin_addr));
+    int res = inet_pton(PF_INET, m_address.c_str(), &(address.sin_addr));
 #endif
+    if (res != 1) {
+      WPI_ERROR(m_logger, "could not resolve " << m_address << " address");
+      return -1;
+    }
   } else {
     address.sin_addr.s_addr = INADDR_ANY;
   }
