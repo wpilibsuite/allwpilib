@@ -56,9 +56,9 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       }
       break;
     case kEntryAssign: {
-      if (!decoder.ReadString(&msg->m_str)) return nullptr;
+      if (!decoder.ReadString(&msg->m_str)) return nullptr;      // name
       NT_Type type;
-      if (!decoder.ReadType(&type)) return nullptr;              // name
+      if (!decoder.ReadType(&type)) return nullptr;              // entry type
       if (!decoder.Read16(&msg->m_id)) return nullptr;           // id
       if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // seq num
       if (decoder.proto_rev() >= 0x0300u) {
