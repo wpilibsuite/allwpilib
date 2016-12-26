@@ -94,8 +94,9 @@ void LiveWindow::AddSensor(const std::string& subsystem,
 void LiveWindow::AddSensor(const std::string& subsystem,
                            const std::string& name,
                            LiveWindowSendable& component) {
-  AddSensor(subsystem, name, std::shared_ptr<LiveWindowSendable>(
-                                 &component, [](LiveWindowSendable*) {}));
+  AddSensor(subsystem, name,
+            std::shared_ptr<LiveWindowSendable>(&component,
+                                                [](LiveWindowSendable*) {}));
 }
 
 /**
@@ -105,8 +106,9 @@ void LiveWindow::AddSensor(const std::string& subsystem,
 void LiveWindow::AddSensor(const std::string& subsystem,
                            const std::string& name,
                            LiveWindowSendable* component) {
-  AddSensor(subsystem, name, std::shared_ptr<LiveWindowSendable>(
-                                 component, NullDeleter<LiveWindowSendable>()));
+  AddSensor(subsystem, name,
+            std::shared_ptr<LiveWindowSendable>(
+                component, NullDeleter<LiveWindowSendable>()));
 }
 //@}
 
@@ -137,8 +139,9 @@ void LiveWindow::AddActuator(const std::string& subsystem,
 void LiveWindow::AddActuator(const std::string& subsystem,
                              const std::string& name,
                              LiveWindowSendable& component) {
-  AddActuator(subsystem, name, std::shared_ptr<LiveWindowSendable>(
-                                   &component, [](LiveWindowSendable*) {}));
+  AddActuator(subsystem, name,
+              std::shared_ptr<LiveWindowSendable>(&component,
+                                                  [](LiveWindowSendable*) {}));
 }
 
 /**

@@ -81,10 +81,10 @@ void DigitalOutput::Set(bool value) {
 }
 
 /**
-   * Gets the value being output from the Digital Output.
-   *
-   * @return the state of the digital output.
-   */
+ * Gets the value being output from the Digital Output.
+ *
+ * @return the state of the digital output.
+ */
 bool DigitalOutput::Get() const {
   if (StatusIsFatal()) return false;
 

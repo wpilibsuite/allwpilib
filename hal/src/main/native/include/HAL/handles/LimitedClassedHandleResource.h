@@ -73,8 +73,9 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
 
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
-std::shared_ptr<TStruct> LimitedClassedHandleResource<
-    THandle, TStruct, size, enumValue>::Get(THandle handle) {
+std::shared_ptr<TStruct>
+LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
+    THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) {
