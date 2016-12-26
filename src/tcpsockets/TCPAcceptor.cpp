@@ -90,7 +90,7 @@ int TCPAcceptor::start() {
 #else
     int res = inet_pton(PF_INET, m_address.c_str(), &(address.sin_addr));
 #endif
-    if (res != 1 && !m_address.empty()) {
+    if (res != 1) {
       WPI_ERROR(m_logger, "could not resolve " << m_address << " address");
       return -1;
     }
