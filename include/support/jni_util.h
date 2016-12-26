@@ -115,6 +115,9 @@ class JStringRef {
       llvm::errs() << "JStringRef was passed a null pointer at \n"
                    << GetJavaStackTrace(env);
     }
+    // Ensure str is null-terminated.
+    m_str.push_back('\0');
+    m_str.pop_back();
   }
 
   operator llvm::StringRef() const { return m_str; }
