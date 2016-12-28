@@ -67,13 +67,16 @@ void SinkImpl::SetEnabled(bool enabled) {
 void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
   {
     std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_source == source) return;
     if (m_source) {
       if (m_enabledCount > 0) m_source->DisableSink();
       m_source->RemoveSink();
     }
     m_source = source;
-    m_source->AddSink();
-    if (m_enabledCount > 0) m_source->EnableSink();
+    if (m_source) {
+      m_source->AddSink();
+      if (m_enabledCount > 0) m_source->EnableSink();
+    }
   }
   SetSourceImpl(source);
 }

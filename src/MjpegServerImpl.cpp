@@ -671,9 +671,9 @@ void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
     if (auto thr = connThread.GetThread()) {
       if (thr->m_source != source) {
         bool streaming = thr->m_streaming;
-        if (streaming) thr->m_source->DisableSink();
+        if (thr->m_source && streaming) thr->m_source->DisableSink();
         thr->m_source = source;
-        if (streaming) thr->m_source->EnableSink();
+        if (source && streaming) thr->m_source->EnableSink();
       }
     }
   }

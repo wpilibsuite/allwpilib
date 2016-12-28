@@ -407,12 +407,16 @@ void SetSinkSource(CS_Sink sink, CS_Source source, CS_Status* status) {
     *status = CS_INVALID_HANDLE;
     return;
   }
-  auto sourceData = Sources::GetInstance().Get(source);
-  if (!sourceData) {
-    *status = CS_INVALID_HANDLE;
-    return;
+  if (source == 0) {
+    data->sink->SetSource(nullptr);
+  } else {
+    auto sourceData = Sources::GetInstance().Get(source);
+    if (!sourceData) {
+      *status = CS_INVALID_HANDLE;
+      return;
+    }
+    data->sink->SetSource(sourceData->source);
   }
-  data->sink->SetSource(sourceData->source);
   data->sourceHandle.store(source);
   Notifier::GetInstance().NotifySinkSourceChanged(data->sink->GetName(), sink,
                                                   source);

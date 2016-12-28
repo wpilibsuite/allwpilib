@@ -84,7 +84,11 @@ public class VideoSink {
   /// provide frames to multiple clients.
   /// @param source Source
   public void setSource(VideoSource source) {
-    CameraServerJNI.setSinkSource(m_handle, source.m_handle);
+    if (source == null) {
+      CameraServerJNI.setSinkSource(m_handle, 0);
+    } else {
+      CameraServerJNI.setSinkSource(m_handle, source.m_handle);
+    }
   }
 
   /// Get the connected source.
