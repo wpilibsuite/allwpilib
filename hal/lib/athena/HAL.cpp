@@ -170,6 +170,8 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return HAL_THREAD_PRIORITY_ERROR_MESSAGE;
     case HAL_THREAD_PRIORITY_RANGE_ERROR:
       return HAL_THREAD_PRIORITY_RANGE_ERROR_MESSAGE;
+    case HAL_SERIAL_PORT_OPEN_ERROR:
+      return HAL_SERIAL_PORT_OPEN_ERROR_MESSAGE;
     default:
       return "Unknown error status";
   }

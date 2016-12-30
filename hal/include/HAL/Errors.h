@@ -87,6 +87,14 @@
 #define HAL_SERIAL_PORT_NOT_FOUND_MESSAGE \
   "HAL: The specified serial port device was not found";
 
+#define HAL_SERIAL_PORT_OPEN_ERROR -1124
+#define HAL_SERIAL_PORT_OPEN_ERROR_MESSAGE \
+  "HAL: The serial port could not be opened"
+
+#define HAL_SERIAL_PORT_ERROR -1125;
+#define HAL_SERIAL_PORT_ERROR_MESSAGE \
+  "HAL: There was an error on the serial port"
+
 #define HAL_THREAD_PRIORITY_ERROR -1152
 #define HAL_THREAD_PRIORITY_ERROR_MESSAGE \
   "HAL: Getting or setting the priority of a thread has failed";
