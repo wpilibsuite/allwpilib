@@ -175,6 +175,7 @@ task jniHeaders {
             args 'edu.wpi.first.wpilibj.hal.PDPJNI'
             args 'edu.wpi.first.wpilibj.hal.PowerJNI'
             args 'edu.wpi.first.wpilibj.hal.SerialPortJNI'
+            args 'edu.wpi.first.wpilibj.hal.OSSerialPortJNI'
             args 'edu.wpi.first.wpilibj.hal.ThreadsJNI'
         }
     }
