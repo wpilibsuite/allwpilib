@@ -10,7 +10,6 @@
 #include "DriverStation.h"
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
-#include "SmartDashboard/SmartDashboard.h"
 #include "networktables/NetworkTable.h"
 
 using namespace frc;
@@ -27,7 +26,6 @@ void IterativeRobot::StartCompetition() {
 
   LiveWindow* lw = LiveWindow::GetInstance();
   // first and one-time initialization
-  SmartDashboard::init();
   NetworkTable::GetTable("LiveWindow")
       ->GetSubTable("~STATUS~")
       ->PutBoolean("LW Enabled", false);

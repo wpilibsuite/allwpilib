@@ -10,7 +10,6 @@
 #include <cstdio>
 
 #include "LiveWindow/LiveWindow.h"
-#include "SmartDashboard/SmartDashboard.h"
 #include "Timer.h"
 #include "networktables/NetworkTable.h"
 
@@ -105,7 +104,6 @@ void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
 void SampleRobot::StartCompetition() {
   LiveWindow* lw = LiveWindow::GetInstance();
 
-  SmartDashboard::init();
   NetworkTable::GetTable("LiveWindow")
       ->GetSubTable("~STATUS~")
       ->PutBoolean("LW Enabled", false);

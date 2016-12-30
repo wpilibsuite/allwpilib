@@ -9,7 +9,6 @@
 
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
-#include "SmartDashboard/SmartDashboard.h"
 #include "Timer.h"
 #include "networktables/NetworkTable.h"
 
@@ -106,7 +105,6 @@ void SampleRobot::StartCompetition() {
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Simple);
 
-  SmartDashboard::init();
   NetworkTable::GetTable("LiveWindow")
       ->GetSubTable("~STATUS~")
       ->PutBoolean("LW Enabled", false);
