@@ -22,8 +22,10 @@ import edu.wpi.first.wpilibj.tables.ITable;
  * SendableChooser} and then put it into the {@link SmartDashboard} to have a list of options appear
  * on the laptop. Once autonomous starts, simply ask the {@link SendableChooser} what the selected
  * value is.
+ *
+ * @param <V> The type of the values to be stored
  */
-public class SendableChooser implements Sendable {
+public class SendableChooser<V> implements Sendable {
 
   /**
    * The key for the default value.
@@ -40,7 +42,7 @@ public class SendableChooser implements Sendable {
   /**
    * A map linking strings to the objects the represent.
    */
-  private final HashMap<String, Object> m_map = new HashMap<>();
+  private final HashMap<String, V> m_map = new HashMap<>();
   private String m_defaultChoice = null;
 
   /**
@@ -56,7 +58,7 @@ public class SendableChooser implements Sendable {
    * @param name   the name of the option
    * @param object the option
    */
-  public void addObject(String name, Object object) {
+  public void addObject(String name, V object) {
     // if we don't have a default, set the default automatically
     if (m_defaultChoice == null) {
       addDefault(name, object);
@@ -78,7 +80,7 @@ public class SendableChooser implements Sendable {
    * @param name   the name of the option
    * @param object the option
    */
-  public void addDefault(String name, Object object) {
+  public void addDefault(String name, V object) {
     if (name == null) {
       throw new NullPointerException("Name cannot be null");
     }
@@ -95,7 +97,7 @@ public class SendableChooser implements Sendable {
    *
    * @return the option selected
    */
-  public Object getSelected() {
+  public V getSelected() {
     String selected = m_table.getString(SELECTED, null);
     return m_map.getOrDefault(selected, m_map.get(m_defaultChoice));
   }
