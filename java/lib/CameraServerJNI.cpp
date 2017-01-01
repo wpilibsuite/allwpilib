@@ -759,6 +759,111 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_releaseSource
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setCameraBrightness
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setCameraBrightness
+  (JNIEnv *env, jclass, jint source, jint brightness)
+{
+  CS_Status status = 0;
+  cs::SetCameraBrightness(source, brightness, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    getCameraBrightness
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_getCameraBrightness
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status = 0;
+  auto val = cs::GetCameraBrightness(source, &status);
+  CheckStatus(env, status);
+  return val;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setCameraWhiteBalanceAuto
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceAuto
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status = 0;
+  cs::SetCameraWhiteBalanceAuto(source, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setCameraWhiteBalanceHoldCurrent
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceHoldCurrent
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status = 0;
+  cs::SetCameraWhiteBalanceHoldCurrent(source, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setCameraWhiteBalanceManual
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setCameraWhiteBalanceManual
+  (JNIEnv *env, jclass, jint source, jint value)
+{
+  CS_Status status = 0;
+  cs::SetCameraWhiteBalanceManual(source, value, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setCameraExposureAuto
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureAuto
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status = 0;
+  cs::SetCameraExposureAuto(source, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setCameraExposureHoldCurrent
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureHoldCurrent
+  (JNIEnv *env, jclass, jint source)
+{
+  CS_Status status = 0;
+  cs::SetCameraExposureHoldCurrent(source, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    setCameraExposureManual
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setCameraExposureManual
+  (JNIEnv *env, jclass, jint source, jint value)
+{
+  CS_Status status = 0;
+  cs::SetCameraExposureManual(source, value, &status);
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    getUsbCameraPath
  * Signature: (I)Ljava/lang/String;
  */

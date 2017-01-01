@@ -349,6 +349,83 @@ void ReleaseSource(CS_Source source, CS_Status* status) {
 }
 
 //
+// Camera Source Common Property Fuctions
+//
+
+void SetCameraBrightness(CS_Source source, int brightness, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetBrightness(brightness, status);
+}
+
+int GetCameraBrightness(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return 0;
+  }
+  return data->source->GetBrightness(status);
+}
+
+void SetCameraWhiteBalanceAuto(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetWhiteBalanceAuto(status);
+}
+
+void SetCameraWhiteBalanceHoldCurrent(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetWhiteBalanceHoldCurrent(status);
+}
+
+void SetCameraWhiteBalanceManual(CS_Source source, int value,
+                                 CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetWhiteBalanceManual(value, status);
+}
+
+void SetCameraExposureAuto(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetExposureAuto(status);
+}
+
+void SetCameraExposureHoldCurrent(CS_Source source, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetExposureHoldCurrent(status);
+}
+
+void SetCameraExposureManual(CS_Source source, int value, CS_Status* status) {
+  auto data = Sources::GetInstance().Get(source);
+  if (!data) {
+    *status = CS_INVALID_HANDLE;
+    return;
+  }
+  data->source->SetExposureManual(value, status);
+}
+
+//
 // Sink Functions
 //
 

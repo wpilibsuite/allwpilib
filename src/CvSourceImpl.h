@@ -28,6 +28,16 @@ class CvSourceImpl : public SourceImpl {
   void SetStringProperty(int property, llvm::StringRef value,
                          CS_Status* status) override;
 
+  // Standard common camera properties
+  void SetBrightness(int brightness, CS_Status* status) override;
+  int GetBrightness(CS_Status* status) const override;
+  void SetWhiteBalanceAuto(CS_Status* status) override;
+  void SetWhiteBalanceHoldCurrent(CS_Status* status) override;
+  void SetWhiteBalanceManual(int value, CS_Status* status) override;
+  void SetExposureAuto(CS_Status* status) override;
+  void SetExposureHoldCurrent(CS_Status* status) override;
+  void SetExposureManual(int value, CS_Status* status) override;
+
   bool SetVideoMode(const VideoMode& mode, CS_Status* status) override;
 
   void NumSinksChanged() override;

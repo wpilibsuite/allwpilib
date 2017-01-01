@@ -243,6 +243,20 @@ CS_Source CS_CopySource(CS_Source source, CS_Status* status);
 void CS_ReleaseSource(CS_Source source, CS_Status* status);
 
 //
+// Camera Source Common Property Fuctions
+//
+void CS_SetCameraBrightness(CS_Source source, int brightness,
+                            CS_Status* status);
+int CS_GetCameraBrightness(CS_Source source, CS_Status* status);
+void CS_SetCameraWhiteBalanceAuto(CS_Source source, CS_Status* status);
+void CS_SetCameraWhiteBalanceHoldCurrent(CS_Source source, CS_Status* status);
+void CS_SetCameraWhiteBalanceManual(CS_Source source, int value,
+                                    CS_Status* status);
+void CS_SetCameraExposureAuto(CS_Source source, CS_Status* status);
+void CS_SetCameraExposureHoldCurrent(CS_Source source, CS_Status* status);
+void CS_SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
+
+//
 // UsbCamera Source Functions
 //
 char* CS_GetUsbCameraPath(CS_Source source, CS_Status* status);

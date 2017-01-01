@@ -387,6 +387,39 @@ void HttpCameraImpl::SetStringProperty(int property, llvm::StringRef value,
   // TODO
 }
 
+void HttpCameraImpl::SetBrightness(int brightness, CS_Status* status) {
+  // TODO
+}
+
+int HttpCameraImpl::GetBrightness(CS_Status* status) const {
+  // TODO
+  return 0;
+}
+
+void HttpCameraImpl::SetWhiteBalanceAuto(CS_Status* status) {
+  // TODO
+}
+
+void HttpCameraImpl::SetWhiteBalanceHoldCurrent(CS_Status* status) {
+  // TODO
+}
+
+void HttpCameraImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
+  // TODO
+}
+
+void HttpCameraImpl::SetExposureAuto(CS_Status* status) {
+  // TODO
+}
+
+void HttpCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
+  // TODO
+}
+
+void HttpCameraImpl::SetExposureManual(int value, CS_Status* status) {
+  // TODO
+}
+
 bool HttpCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   if (mode.pixelFormat != VideoMode::kMJPEG) return false;
   std::lock_guard<std::mutex> lock(m_mutex);

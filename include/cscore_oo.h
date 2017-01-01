@@ -191,15 +191,8 @@ class VideoSource {
   CS_Source m_handle;
 };
 
-/// A source that represents a USB camera.
-class UsbCamera : public VideoSource {
- private:
-  static constexpr char const* kPropWbAuto = "white_balance_temperature_auto";
-  static constexpr char const* kPropWbValue = "white_balance_temperature";
-  static constexpr char const* kPropExAuto = "exposure_auto";
-  static constexpr char const* kPropExValue = "exposure_absolute";
-  static constexpr char const* kPropBrValue = "brightness";
-
+/// A source that represents a video camera.
+class VideoCamera : public VideoSource {
  public:
   enum WhiteBalance {
     kFixedIndoor = 3000,
@@ -209,24 +202,7 @@ class UsbCamera : public VideoSource {
     kFixedFlourescent2 = 5200
   };
 
-  UsbCamera() = default;
-
-  /// Create a source for a USB camera based on device number.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param dev Device number (e.g. 0 for /dev/video0)
-  UsbCamera(llvm::StringRef name, int dev);
-
-  /// Create a source for a USB camera based on device path.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param path Path to device (e.g. "/dev/video0" on Linux)
-  UsbCamera(llvm::StringRef name, llvm::StringRef path);
-
-  /// Enumerate USB cameras on the local system.
-  /// @return Vector of USB camera information (one for each camera)
-  static std::vector<UsbCameraInfo> EnumerateUsbCameras();
-
-  /// Get the path to the device.
-  std::string GetPath() const;
+  VideoCamera() = default;
 
   /// Set the brightness, as a percentage (0-100).
   void SetBrightness(int brightness);
@@ -251,12 +227,38 @@ class UsbCamera : public VideoSource {
 
   /// Set the exposure to manual, as a percentage (0-100).
   void SetExposureManual(int value);
+
+ protected:
+  explicit VideoCamera(CS_Source handle) : VideoSource(handle) {}
+};
+
+/// A source that represents a USB camera.
+class UsbCamera : public VideoCamera {
+ public:
+  UsbCamera() = default;
+
+  /// Create a source for a USB camera based on device number.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param dev Device number (e.g. 0 for /dev/video0)
+  UsbCamera(llvm::StringRef name, int dev);
+
+  /// Create a source for a USB camera based on device path.
+  /// @param name Source name (arbitrary unique identifier)
+  /// @param path Path to device (e.g. "/dev/video0" on Linux)
+  UsbCamera(llvm::StringRef name, llvm::StringRef path);
+
+  /// Enumerate USB cameras on the local system.
+  /// @return Vector of USB camera information (one for each camera)
+  static std::vector<UsbCameraInfo> EnumerateUsbCameras();
+
+  /// Get the path to the device.
+  std::string GetPath() const;
 };
 
 /// A source that represents a MJPEG-over-HTTP (IP) camera.
-class HttpCamera : public VideoSource {
+class HttpCamera : public VideoCamera {
  public:
-  enum CameraKind {
+  enum HttpCameraKind {
     kUnknown = CS_HTTP_UNKNOWN,
     kMJPGStreamer = CS_HTTP_MJPGSTREAMER,
     kCSCore = CS_HTTP_CSCORE,
@@ -268,27 +270,28 @@ class HttpCamera : public VideoSource {
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
   /// @param kind Camera kind (e.g. kAxis)
   HttpCamera(llvm::StringRef name, llvm::StringRef url,
-             CameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown);
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
   /// @param kind Camera kind (e.g. kAxis)
-  HttpCamera(llvm::StringRef name, const char* url, CameraKind kind = kUnknown);
+  HttpCamera(llvm::StringRef name, const char* url,
+             HttpCameraKind kind = kUnknown);
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
   /// @param kind Camera kind (e.g. kAxis)
   HttpCamera(llvm::StringRef name, const std::string& url,
-             CameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown);
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param urls Array of Camera URLs
   /// @param kind Camera kind (e.g. kAxis)
   HttpCamera(llvm::StringRef name, llvm::ArrayRef<std::string> urls,
-             CameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown);
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
@@ -296,12 +299,12 @@ class HttpCamera : public VideoSource {
   /// @param kind Camera kind (e.g. kAxis)
   template <typename T>
   HttpCamera(llvm::StringRef name, std::initializer_list<T> urls,
-             CameraKind kind = kUnknown);
+             HttpCameraKind kind = kUnknown);
 
   /// Get the kind of HTTP camera.
   /// Autodetection can result in returning a different value than the camera
   /// was created with.
-  CameraKind GetCameraKind() const;
+  HttpCameraKind GetHttpCameraKind() const;
 
   /// Change the URLs used to connect to the camera.
   void SetUrls(llvm::ArrayRef<std::string> urls);

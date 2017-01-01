@@ -186,6 +186,41 @@ void CS_ReleaseSource(CS_Source source, CS_Status* status) {
   return cs::ReleaseSource(source, status);
 }
 
+void CS_SetCameraBrightness(CS_Source source, int brightness,
+                            CS_Status* status) {
+  return cs::SetCameraBrightness(source, brightness, status);
+}
+
+int CS_GetCameraBrightness(CS_Source source, CS_Status* status) {
+  return cs::GetCameraBrightness(source, status);
+}
+
+void CS_SetCameraWhiteBalanceAuto(CS_Source source, CS_Status* status) {
+  return cs::SetCameraWhiteBalanceAuto(source, status);
+}
+
+void CS_SetCameraWhiteBalanceHoldCurrent(CS_Source source, CS_Status* status) {
+  return cs::SetCameraWhiteBalanceHoldCurrent(source, status);
+}
+
+void CS_SetCameraWhiteBalanceManual(CS_Source source, int value,
+                                    CS_Status* status) {
+  return cs::SetCameraWhiteBalanceManual(source, value, status);
+}
+
+void CS_SetCameraExposureAuto(CS_Source source, CS_Status* status) {
+  return cs::SetCameraExposureAuto(source, status);
+}
+
+void CS_SetCameraExposureHoldCurrent(CS_Source source, CS_Status* status) {
+  return cs::SetCameraExposureHoldCurrent(source, status);
+}
+
+void CS_SetCameraExposureManual(CS_Source source, int value,
+                                CS_Status* status) {
+  return cs::SetCameraExposureManual(source, value, status);
+}
+
 CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
   return cs::GetSinkKind(sink, status);
 }

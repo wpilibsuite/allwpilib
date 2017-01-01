@@ -107,6 +107,16 @@ class SourceImpl {
   std::vector<std::string> GetEnumPropertyChoices(int property,
                                                   CS_Status* status) const;
 
+  // Standard common camera properties
+  virtual void SetBrightness(int brightness, CS_Status* status) = 0;
+  virtual int GetBrightness(CS_Status* status) const = 0;
+  virtual void SetWhiteBalanceAuto(CS_Status* status) = 0;
+  virtual void SetWhiteBalanceHoldCurrent(CS_Status* status) = 0;
+  virtual void SetWhiteBalanceManual(int value, CS_Status* status) = 0;
+  virtual void SetExposureAuto(CS_Status* status) = 0;
+  virtual void SetExposureHoldCurrent(CS_Status* status) = 0;
+  virtual void SetExposureManual(int value, CS_Status* status) = 0;
+
   // Video mode functions
   VideoMode GetVideoMode(CS_Status* status) const;
   virtual bool SetVideoMode(const VideoMode& mode, CS_Status* status) = 0;

@@ -42,6 +42,12 @@
 
 using namespace cs;
 
+static constexpr char const* kPropWbAuto = "white_balance_temperature_auto";
+static constexpr char const* kPropWbValue = "white_balance_temperature";
+static constexpr char const* kPropExAuto = "exposure_auto";
+static constexpr char const* kPropExValue = "exposure_absolute";
+static constexpr char const* kPropBrValue = "brightness";
+
 #ifdef __linux__
 
 // Conversions v4l2_fract time per frame from/to frames per second (fps)
@@ -1137,6 +1143,51 @@ void UsbCameraImpl::SetStringProperty(int property, llvm::StringRef value,
   msg.data[0] = property;
   msg.dataStr = value;
   *status = SendAndWait(std::move(msg));
+}
+
+void UsbCameraImpl::SetBrightness(int brightness, CS_Status* status) {
+  if (brightness > 100) {
+    brightness = 100;
+  } else if (brightness < 0) {
+    brightness = 0;
+  }
+  SetProperty(GetPropertyIndex(kPropBrValue), brightness, status);
+}
+
+int UsbCameraImpl::GetBrightness(CS_Status* status) const {
+  return GetProperty(GetPropertyIndex(kPropBrValue), status);
+}
+
+void UsbCameraImpl::SetWhiteBalanceAuto(CS_Status* status) {
+  SetProperty(GetPropertyIndex(kPropWbAuto), 1, status);  // auto
+}
+
+void UsbCameraImpl::SetWhiteBalanceHoldCurrent(CS_Status* status) {
+  SetProperty(GetPropertyIndex(kPropWbAuto), 0, status);  // manual
+}
+
+void UsbCameraImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
+  SetProperty(GetPropertyIndex(kPropWbAuto), 0, status);  // manual
+  SetProperty(GetPropertyIndex(kPropWbValue), value, status);
+}
+
+void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
+  // auto; yes, this is opposite of WB
+  SetProperty(GetPropertyIndex(kPropExAuto), 0, status);
+}
+
+void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
+  SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+}
+
+void UsbCameraImpl::SetExposureManual(int value, CS_Status* status) {
+  SetProperty(GetPropertyIndex(kPropExAuto), 1, status);  // manual
+  if (value > 100) {
+    value = 100;
+  } else if (value < 0) {
+    value = 0;
+  }
+  SetProperty(GetPropertyIndex(kPropExValue), value, status);
 }
 
 bool UsbCameraImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {

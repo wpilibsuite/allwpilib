@@ -160,6 +160,46 @@ inline std::vector<VideoMode> VideoSource::EnumerateVideoModes() const {
   return EnumerateSourceVideoModes(m_handle, &status);
 }
 
+inline void VideoCamera::SetBrightness(int brightness) {
+  m_status = 0;
+  SetCameraBrightness(m_handle, brightness, &m_status);
+}
+
+inline int VideoCamera::GetBrightness() {
+  m_status = 0;
+  return GetCameraBrightness(m_handle, &m_status);
+}
+
+inline void VideoCamera::SetWhiteBalanceAuto() {
+  m_status = 0;
+  SetCameraWhiteBalanceAuto(m_handle, &m_status);
+}
+
+inline void VideoCamera::SetWhiteBalanceHoldCurrent() {
+  m_status = 0;
+  SetCameraWhiteBalanceHoldCurrent(m_handle, &m_status);
+}
+
+inline void VideoCamera::SetWhiteBalanceManual(int value) {
+  m_status = 0;
+  SetCameraWhiteBalanceManual(m_handle, value, &m_status);
+}
+
+inline void VideoCamera::SetExposureAuto() {
+  m_status = 0;
+  SetCameraExposureAuto(m_handle, &m_status);
+}
+
+inline void VideoCamera::SetExposureHoldCurrent() {
+  m_status = 0;
+  SetCameraExposureHoldCurrent(m_handle, &m_status);
+}
+
+inline void VideoCamera::SetExposureManual(int value) {
+  m_status = 0;
+  SetCameraExposureManual(m_handle, value, &m_status);
+}
+
 inline UsbCamera::UsbCamera(llvm::StringRef name, int dev) {
   m_handle = CreateUsbCameraDev(name, dev, &m_status);
 }
@@ -178,71 +218,27 @@ inline std::string UsbCamera::GetPath() const {
   return ::cs::GetUsbCameraPath(m_handle, &m_status);
 }
 
-inline void UsbCamera::SetBrightness(int brightness) {
-  if (brightness > 100) {
-    brightness = 100;
-  } else if (brightness < 0) {
-    brightness = 0;
-  }
-  GetProperty(kPropBrValue).Set(brightness);
-}
-
-inline int UsbCamera::GetBrightness() {
-  return GetProperty(kPropBrValue).Get();
-}
-
-inline void UsbCamera::SetWhiteBalanceAuto() {
-  GetProperty(kPropWbAuto).Set(1);  // auto
-}
-
-inline void UsbCamera::SetWhiteBalanceHoldCurrent() {
-  GetProperty(kPropWbAuto).Set(0);  // manual
-}
-
-inline void UsbCamera::SetWhiteBalanceManual(int value) {
-  GetProperty(kPropWbAuto).Set(0);  // manual
-  GetProperty(kPropWbValue).Set(value);
-}
-
-inline void UsbCamera::SetExposureAuto() {
-  GetProperty(kPropExAuto).Set(0);  // auto; yes, this is opposite of WB
-}
-
-inline void UsbCamera::SetExposureHoldCurrent() {
-  GetProperty(kPropExAuto).Set(1);  // manual
-}
-
-inline void UsbCamera::SetExposureManual(int value) {
-  GetProperty(kPropExAuto).Set(1);  // manual
-  if (value > 100) {
-    value = 100;
-  } else if (value < 0) {
-    value = 0;
-  }
-  GetProperty(kPropExValue).Set(value);
-}
-
 inline HttpCamera::HttpCamera(llvm::StringRef name, llvm::StringRef url,
-                              CameraKind kind) {
+                              HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
 inline HttpCamera::HttpCamera(llvm::StringRef name, const char* url,
-                              CameraKind kind) {
+                              HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
 inline HttpCamera::HttpCamera(llvm::StringRef name, const std::string& url,
-                              CameraKind kind)
+                              HttpCameraKind kind)
     : HttpCamera(name, llvm::StringRef{url}, kind) {}
 
 inline HttpCamera::HttpCamera(llvm::StringRef name,
                               llvm::ArrayRef<std::string> urls,
-                              CameraKind kind) {
+                              HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, urls, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
@@ -250,7 +246,8 @@ inline HttpCamera::HttpCamera(llvm::StringRef name,
 
 template <typename T>
 inline HttpCamera::HttpCamera(llvm::StringRef name,
-                              std::initializer_list<T> urls, CameraKind kind) {
+                              std::initializer_list<T> urls,
+                              HttpCameraKind kind) {
   std::vector<std::string> vec;
   vec.reserve(urls.size());
   for (const auto& url : urls) vec.emplace_back(url);
@@ -259,9 +256,9 @@ inline HttpCamera::HttpCamera(llvm::StringRef name,
       &m_status);
 }
 
-inline HttpCamera::CameraKind HttpCamera::GetCameraKind() const {
+inline HttpCamera::HttpCameraKind HttpCamera::GetHttpCameraKind() const {
   m_status = 0;
-  return static_cast<CameraKind>(
+  return static_cast<HttpCameraKind>(
       static_cast<int>(::cs::GetHttpCameraKind(m_handle, &m_status)));
 }
 

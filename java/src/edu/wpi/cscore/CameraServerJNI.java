@@ -129,6 +129,18 @@ public class CameraServerJNI {
   public static native void releaseSource(int source);
 
   //
+  // Camera Source Common Property Fuctions
+  //
+  public static native void setCameraBrightness(int source, int brightness);
+  public static native int getCameraBrightness(int source);
+  public static native void setCameraWhiteBalanceAuto(int source);
+  public static native void setCameraWhiteBalanceHoldCurrent(int source);
+  public static native void setCameraWhiteBalanceManual(int source, int value);
+  public static native void setCameraExposureAuto(int source);
+  public static native void setCameraExposureHoldCurrent(int source);
+  public static native void setCameraExposureManual(int source, int value);
+
+  //
   // UsbCamera Source Functions
   //
   public static native String getUsbCameraPath(int source);

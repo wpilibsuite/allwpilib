@@ -204,6 +204,19 @@ CS_Source CopySource(CS_Source source, CS_Status* status);
 void ReleaseSource(CS_Source source, CS_Status* status);
 
 //
+// Camera Source Common Property Fuctions
+//
+void SetCameraBrightness(CS_Source source, int brightness, CS_Status* status);
+int GetCameraBrightness(CS_Source source, CS_Status* status);
+void SetCameraWhiteBalanceAuto(CS_Source source, CS_Status* status);
+void SetCameraWhiteBalanceHoldCurrent(CS_Source source, CS_Status* status);
+void SetCameraWhiteBalanceManual(CS_Source source, int value,
+                                 CS_Status* status);
+void SetCameraExposureAuto(CS_Source source, CS_Status* status);
+void SetCameraExposureHoldCurrent(CS_Source source, CS_Status* status);
+void SetCameraExposureManual(CS_Source source, int value, CS_Status* status);
+
+//
 // UsbCamera Source Functions
 //
 std::string GetUsbCameraPath(CS_Source source, CS_Status* status);
