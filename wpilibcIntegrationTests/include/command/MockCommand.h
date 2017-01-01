@@ -12,21 +12,6 @@
 namespace frc {
 
 class MockCommand : public Command {
- private:
-  int32_t m_initializeCount;
-  int32_t m_executeCount;
-  int32_t m_isFinishedCount;
-  bool m_hasFinished;
-  int32_t m_endCount;
-  int32_t m_interruptedCount;
-
- protected:
-  virtual void Initialize();
-  virtual void Execute();
-  virtual bool IsFinished();
-  virtual void End();
-  virtual void Interrupted();
-
  public:
   MockCommand();
   int32_t GetInitializeCount() { return m_initializeCount; }
@@ -41,6 +26,21 @@ class MockCommand : public Command {
 
   int32_t GetInterruptedCount() { return m_interruptedCount; }
   bool HasInterrupted();
+
+ protected:
+  void Initialize() override;
+  void Execute() override;
+  bool IsFinished() override;
+  void End() override;
+  void Interrupted() override;
+
+ private:
+  int32_t m_initializeCount;
+  int32_t m_executeCount;
+  int32_t m_isFinishedCount;
+  bool m_hasFinished;
+  int32_t m_endCount;
+  int32_t m_interruptedCount;
 };
 
 }  // namespace frc
