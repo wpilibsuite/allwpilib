@@ -8,6 +8,7 @@
 #include "RobotBase.h"
 
 #include "RobotState.h"
+#include "SmartDashboard/SmartDashboard.h"
 #include "Utility.h"
 
 using namespace frc;
@@ -25,6 +26,7 @@ using namespace frc;
  */
 RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   RobotState::SetImplementation(DriverStation::GetInstance());
+  SmartDashboard::init();
   time_sub = MainNode::Subscribe("~/time", &wpilib::internal::time_callback);
 }
 
