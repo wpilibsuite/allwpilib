@@ -12,6 +12,7 @@
 
 #include "HAL/Errors.h"
 
+extern "C" {
 /**
  * Get the thread priority for the specified thread.
  *
@@ -94,10 +95,10 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
     sch.sched_priority = 0;
   if (pthread_setschedparam(*handle, scheduler, &sch)) {
     *status = HAL_THREAD_PRIORITY_ERROR;
-    return true;
+    return false;
   } else {
     *status = 0;
-    return false;
+    return true;
   }
 }
 
@@ -117,4 +118,5 @@ HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
                                       int32_t* status) {
   auto thread = pthread_self();
   return HAL_SetThreadPriority(&thread, realTime, priority, status);
+}
 }
