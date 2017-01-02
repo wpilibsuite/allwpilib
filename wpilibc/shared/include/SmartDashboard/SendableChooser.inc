@@ -33,7 +33,7 @@ const std::string SendableChooser<T>::kSelected = "selected";
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddObject(const std::string& name, T* object) {
+void SendableChooser<T>::AddObject(const std::string& name, T& object) {
   m_choices[name] = object;
 }
 
@@ -47,7 +47,7 @@ void SendableChooser<T>::AddObject(const std::string& name, T* object) {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddObject(const std::string& name, const T* object) {
+void SendableChooser<T>::AddObject(const std::string& name, const T& object) {
   m_choices[name] = const_cast<T*>(object);
 }
 
@@ -62,7 +62,7 @@ void SendableChooser<T>::AddObject(const std::string& name, const T* object) {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddDefault(const std::string& name, T* object) {
+void SendableChooser<T>::AddDefault(const std::string& name, T& object) {
   m_defaultChoice = name;
   AddObject(name, object);
 }
@@ -78,7 +78,7 @@ void SendableChooser<T>::AddDefault(const std::string& name, T* object) {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddDefault(const std::string& name, const T* object) {
+void SendableChooser<T>::AddDefault(const std::string& name, const T& object) {
   m_defaultChoice = name;
   AddObject(name, const_cast<T*>(object));
 }
@@ -92,7 +92,7 @@ void SendableChooser<T>::AddDefault(const std::string& name, const T* object) {
  * @return the option selected
  */
 template <class T>
-T* SendableChooser<T>::GetSelected() {
+T SendableChooser<T>::GetSelected() {
   std::string selected = m_table->GetString(kSelected, m_defaultChoice);
   if (selected == "") {
     return nullptr;
