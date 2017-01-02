@@ -18,6 +18,12 @@ MockCommand::MockCommand() {
   m_interruptedCount = 0;
 }
 
+bool MockCommand::HasInitialized() { return GetInitializeCount() > 0; }
+
+bool MockCommand::HasEnd() { return GetEndCount() > 0; }
+
+bool MockCommand::HasInterrupted() { return GetInterruptedCount() > 0; }
+
 void MockCommand::Initialize() { ++m_initializeCount; }
 
 void MockCommand::Execute() { ++m_executeCount; }
@@ -30,9 +36,3 @@ bool MockCommand::IsFinished() {
 void MockCommand::End() { ++m_endCount; }
 
 void MockCommand::Interrupted() { ++m_interruptedCount; }
-
-bool MockCommand::HasInitialized() { return GetInitializeCount() > 0; }
-
-bool MockCommand::HasEnd() { return GetEndCount() > 0; }
-
-bool MockCommand::HasInterrupted() { return GetInterruptedCount() > 0; }
