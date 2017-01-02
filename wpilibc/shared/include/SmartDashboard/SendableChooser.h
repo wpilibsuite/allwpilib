@@ -30,14 +30,14 @@ namespace frc {
  * @tparam T The type of values to be stored
  * @see SmartDashboard
  */
-template <class T = void*>
+template <class T>
 class SendableChooser : public Sendable {
  public:
   virtual ~SendableChooser() = default;
 
-  void AddObject(const std::string& name, T object);
-  void AddDefault(const std::string& name, T object);
-  T GetSelected();
+  void AddObject(const std::string& name, T* object);
+  void AddDefault(const std::string& name, T* object);
+  T* GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
   std::shared_ptr<ITable> GetTable() const override;
@@ -49,10 +49,10 @@ class SendableChooser : public Sendable {
   static const std::string kSelected;
 
   std::string m_defaultChoice;
-  std::map<std::string, T> m_choices;
+  std::map<std::string, T*> m_choices;
   std::shared_ptr<ITable> m_table;
 };
 
-#include "SendableChooser.inc"
-
 }  // namespace frc
+
+#include "SendableChooser.inc"
