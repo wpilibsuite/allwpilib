@@ -1,5 +1,5 @@
 plugins {
-    id 'org.ysb33r.doxygen' version '0.2'
+    id 'org.ysb33r.doxygen' version '0.3'
     id 'cpp'
     id 'maven-publish'
 }
