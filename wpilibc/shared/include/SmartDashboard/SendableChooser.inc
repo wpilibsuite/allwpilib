@@ -38,6 +38,20 @@ void SendableChooser<T>::AddObject(const std::string& name, T* object) {
 }
 
 /**
+ * Adds the given object to the list of options.
+ *
+ * On the {@link SmartDashboard} on the desktop, the object will appear as the
+ * given name.
+ *
+ * @param name   the name of the option
+ * @param object the option
+ */
+template <class T>
+void SendableChooser<T>::AddObject(const std::string& name, const T* object) {
+  m_choices[name] = const_cast<T*>(object);
+}
+
+/**
  * Add the given object to the list of options and marks it as the default.
  *
  * Functionally, this is very close to {@link SendableChooser#AddObject(const
@@ -51,6 +65,22 @@ template <class T>
 void SendableChooser<T>::AddDefault(const std::string& name, T* object) {
   m_defaultChoice = name;
   AddObject(name, object);
+}
+
+/**
+ * Add the given object to the list of options and marks it as the default.
+ *
+ * Functionally, this is very close to {@link SendableChooser#AddObject(const
+ * char *name, void *object) AddObject(...)} except that it will use this as
+ * the default option if none other is explicitly selected.
+ *
+ * @param name   the name of the option
+ * @param object the option
+ */
+template <class T>
+void SendableChooser<T>::AddDefault(const std::string& name, const T* object) {
+  m_defaultChoice = name;
+  AddObject(name, const_cast<T*>(object));
 }
 
 /**

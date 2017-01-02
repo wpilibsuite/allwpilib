@@ -36,7 +36,9 @@ class SendableChooser : public Sendable {
   virtual ~SendableChooser() = default;
 
   void AddObject(const std::string& name, T* object);
+  void AddObject(const std::string& name, const T* object);
   void AddDefault(const std::string& name, T* object);
+  void AddDefault(const std::string& name, const T* object);
   T* GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
