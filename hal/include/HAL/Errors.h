@@ -85,13 +85,13 @@
 
 #define HAL_SERIAL_PORT_NOT_FOUND -1123
 #define HAL_SERIAL_PORT_NOT_FOUND_MESSAGE \
-  "HAL: The specified serial port device was not found";
+  "HAL: The specified serial port device was not found"
 
 #define HAL_SERIAL_PORT_OPEN_ERROR -1124
 #define HAL_SERIAL_PORT_OPEN_ERROR_MESSAGE \
   "HAL: The serial port could not be opened"
 
-#define HAL_SERIAL_PORT_ERROR -1125;
+#define HAL_SERIAL_PORT_ERROR -1125
 #define HAL_SERIAL_PORT_ERROR_MESSAGE \
   "HAL: There was an error on the serial port"
 

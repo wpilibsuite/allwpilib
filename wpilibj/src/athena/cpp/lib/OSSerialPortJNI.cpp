@@ -19,10 +19,10 @@ using namespace frc;
 // set the logging level
 TLogLevel osserialJNILogLevel = logWARNING;
 
-#define SERIALJNI_LOG(level)     \
+#define SERIALJNI_LOG(level)       \
   if (level > osserialJNILogLevel) \
-    ;                            \
-  else                           \
+    ;                              \
+  else                             \
   Log().Get(level)
 
 extern "C" {
@@ -246,7 +246,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialRead
   dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
   int32_t status = 0;
   jint retVal = HAL_ReadOSSerial(static_cast<HAL_SerialPort>(port), reinterpret_cast<char*>(dataReceivedPtr), 
-                               size, &status);
+                                 size, &status);
   SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -267,7 +267,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialWrit
   }
   int32_t status = 0;
   jint retVal = HAL_WriteOSSerial(static_cast<HAL_SerialPort>(port), reinterpret_cast<char*>(dataToSendPtr), 
-                                size, &status);
+                                  size, &status);
   SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);

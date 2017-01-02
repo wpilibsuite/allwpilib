@@ -1,19 +1,28 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "HAL/OSSerialPort.h"
 
-#include <string>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <unistd.h>
 
-#include "HAL/cpp/SerialHelper.h"
-#include "HAL/Errors.h"
 #include <chrono>
 #include <cstring>
+#include <string>
 
-#include <unistd.h>   //Used for UART
-#include <fcntl.h>    //Used for UART
-#include <termios.h>  //Used for UART
-#include <sys/ioctl.h>
+#include "HAL/Errors.h"
+#include "HAL/cpp/SerialHelper.h"
 
-static int portHandles[4]{-1};
-static std::chrono::milliseconds portTimeouts[4]{std::chrono::milliseconds(0)};
+static int portHandles[4]{-1, -1, -1, -1};
+static std::chrono::milliseconds portTimeouts[4]{
+    std::chrono::milliseconds(0), std::chrono::milliseconds(0),
+    std::chrono::milliseconds(0), std::chrono::milliseconds(0)};
 
 extern "C" {
 
@@ -44,6 +53,7 @@ void HAL_InitializeOSSerialPort(HAL_SerialPort port, int32_t* status) {
   tcflush(fs, TCIFLUSH);
   tcsetattr(fs, TCSANOW, &options);
 }
+
 void HAL_SetOSSerialBaudRate(HAL_SerialPort port, int32_t baud,
                              int32_t* status) {
   int baudRate = -1;
@@ -63,10 +73,9 @@ void HAL_SetOSSerialBaudRate(HAL_SerialPort port, int32_t baud,
     case 115200:
       baudRate = B115200;
       break;
-  }
-  if (baudRate == -1) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return;
+    default:
+      *status = PARAMETER_OUT_OF_RANGE;
+      return;
   }
 
   struct termios options;
@@ -82,6 +91,7 @@ void HAL_SetOSSerialBaudRate(HAL_SerialPort port, int32_t baud,
     return;
   }
 }
+
 void HAL_SetOSSerialDataBits(HAL_SerialPort port, int32_t bits,
                              int32_t* status) {
   int numBits = -1;
@@ -98,11 +108,9 @@ void HAL_SetOSSerialDataBits(HAL_SerialPort port, int32_t bits,
     case 8:
       numBits = CS8;
       break;
-  }
-
-  if (numBits == -1) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return;
+    default:
+      *status = PARAMETER_OUT_OF_RANGE;
+      return;
   }
 
   struct termios options;
@@ -115,6 +123,7 @@ void HAL_SetOSSerialDataBits(HAL_SerialPort port, int32_t bits,
     return;
   }
 }
+
 void HAL_SetOSSerialParity(HAL_SerialPort port, int32_t parity,
                            int32_t* status) {
   // Just set none parity
@@ -127,6 +136,7 @@ void HAL_SetOSSerialParity(HAL_SerialPort port, int32_t parity,
     return;
   }
 }
+
 void HAL_SetOSSerialStopBits(HAL_SerialPort port, int32_t stopBits,
                              int32_t* status) {
   // Force 1 stop bit
@@ -139,41 +149,50 @@ void HAL_SetOSSerialStopBits(HAL_SerialPort port, int32_t stopBits,
     return;
   }
 }
+
 void HAL_SetOSSerialWriteMode(HAL_SerialPort port, int32_t mode,
                               int32_t* status) {
   // No op
 }
+
 void HAL_SetOSSerialFlowControl(HAL_SerialPort port, int32_t flow,
                                 int32_t* status) {
   // No op
 }
+
 void HAL_SetOSSerialTimeout(HAL_SerialPort port, double timeout,
                             int32_t* status) {
   // Convert to millis
   int t = timeout / 1000;
   portTimeouts[port] = std::chrono::milliseconds(t);
 }
+
 void HAL_EnableOSSerialTermination(HAL_SerialPort port, char terminator,
                                    int32_t* status) {
   // \n is hardcoded for now. Will fix later
   // Seems like a VISA only setting, need to check
 }
+
 void HAL_DisableOSSerialTermination(HAL_SerialPort port, int32_t* status) {
   // Seems like a VISA only setting, need to check
 }
+
 void HAL_SetOSSerialReadBufferSize(HAL_SerialPort port, int32_t size,
                                    int32_t* status) {
   // No op
 }
+
 void HAL_SetOSSerialWriteBufferSize(HAL_SerialPort port, int32_t size,
                                     int32_t* status) {
   // No op
 }
+
 int32_t HAL_GetOSSerialBytesReceived(HAL_SerialPort port, int32_t* status) {
   int bytes = 0;
   ioctl(portHandles[port], FIONREAD, &bytes);
   return bytes;
 }
+
 int32_t HAL_ReadOSSerial(HAL_SerialPort port, char* buffer, int32_t count,
                          int32_t* status) {
   auto endTime = std::chrono::steady_clock::now() + portTimeouts[port];
@@ -196,6 +215,7 @@ int32_t HAL_ReadOSSerial(HAL_SerialPort port, char* buffer, int32_t count,
   } while (std::chrono::steady_clock::now() < endTime);
   return bytesRead;
 }
+
 int32_t HAL_WriteOSSerial(HAL_SerialPort port, const char* buffer,
                           int32_t count, int32_t* status) {
   return write(portHandles[port], buffer, count);
