@@ -384,6 +384,8 @@ public class RobotDrive implements MotorSafety {
     moveValue = limit(moveValue);
     rotateValue = limit(rotateValue);
 
+    // square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power
     if (squaredInputs) {
       // square the inputs (while preserving the sign) to increase fine control
       // while permitting full power
