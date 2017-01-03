@@ -301,7 +301,8 @@ struct ConvertIntArray<T, true> {
   static jintArray ToJava(JNIEnv *env, llvm::ArrayRef<T> arr) {
     jintArray jarr = env->NewIntArray(arr.size());
     if (!jarr) return nullptr;
-    env->SetIntArrayRegion(jarr, 0, arr.size(), arr.data());
+    env->SetIntArrayRegion(jarr, 0, arr.size(), 
+                           reinterpret_cast<const jint*>(arr.data()));
     return jarr;
   }
 };
