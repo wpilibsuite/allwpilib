@@ -13,10 +13,11 @@
 
 namespace cs {
 
+#ifdef __linux__
+
 llvm::StringRef GetUsbNameFromId(int vendor, int product,
                                  llvm::SmallVectorImpl<char>& buf);
 
-#ifdef __linux__
 int CheckedIoctl(int fd, unsigned long req, void* data, const char* name,
                  const char* file, int line, bool quiet);
 

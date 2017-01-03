@@ -23,6 +23,8 @@
 
 namespace cs {
 
+#ifdef __linux__
+
 static llvm::StringRef GetUsbNameFromFile(int vendor, int product,
                                           llvm::SmallVectorImpl<char>& buf) {
   int fd = open("/var/lib/usbutils/usb.ids", O_RDONLY);
@@ -109,8 +111,6 @@ llvm::StringRef GetUsbNameFromId(int vendor, int product,
 
   return os.str();
 }
-
-#ifdef __linux__
 
 int CheckedIoctl(int fd, unsigned long req, void* data, const char* name,
                  const char* file, int line, bool quiet) {

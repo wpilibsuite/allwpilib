@@ -25,9 +25,7 @@ task clean(type: Delete) {
 
 outputVersions.mustRunAfter clean
 
-if (!OperatingSystem.current().isWindows()) {
-    project(':native').build.dependsOn outputVersions
-}
+project(':native').build.dependsOn outputVersions
 if (project.buildArm) {
     project(':arm').build.dependsOn outputVersions
 }
@@ -45,13 +43,10 @@ publishing {
         def nat = project('native')
         if (!project.hasProperty('skipJava')) {
             java(MavenPublication) {
-                if (!OperatingSystem.current().isWindows()) {
-                    artifact nat.jar
-                    if (!project.buildArm) {
-                        artifact nat.cscoreJavaSource
-                        artifact nat.cscoreJavadoc
-                    }
-
+                artifact nat.jar
+                if (!project.buildArm) {
+                    artifact nat.cscoreJavaSource
+                    artifact nat.cscoreJavadoc
                 }
                 if (project.buildArm) {
                     def camArm = project('arm')
@@ -66,11 +61,9 @@ publishing {
                     artifact camArm.cscoreJavaSource
                     artifact camArm.cscoreJavadoc
                 }
-                if (!OperatingSystem.current().isWindows()) {
-                    if (project.hasProperty('makeDesktop')) {
-                        artifact nat.jar, {
-                            classifier = 'desktop'
-                        }
+                if (project.hasProperty('makeDesktop')) {
+                    artifact nat.jar, {
+                        classifier = 'desktop'
                     }
                 }
 
@@ -80,9 +73,7 @@ publishing {
             }
         }
         cpp(MavenPublication) {
-            if (!OperatingSystem.current().isWindows()) {
-                artifact nat.cscoreZip
-            }
+            artifact nat.cscoreZip
             artifact cscoreSourceZip
             if (project.buildArm) {
                 artifact project(':arm').cscoreZip
@@ -92,11 +83,9 @@ publishing {
                     }
                 }
             }
-            if (!OperatingSystem.current().isWindows()) {
-                if (project.hasProperty('makeDesktop')) {
-                    artifact nat.cscoreZip, {
-                        classifier = 'desktop'
-                    }
+            if (project.hasProperty('makeDesktop')) {
+                artifact nat.cscoreZip, {
+                    classifier = 'desktop'
                 }
             }
 

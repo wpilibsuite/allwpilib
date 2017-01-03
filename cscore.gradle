@@ -52,94 +52,96 @@ def cscoreSetupModel = { project ->
 def cscoreSetupExamplesModel = { project ->
     project.model {
         components {
-            enum_usb(NativeExecutableSpec) {
-                if (project.isArm) {
-                    targetPlatform 'arm'
-                } else {
-                    //targetPlatform 'x86'
-                    targetPlatform 'x64'
-                }
-                setupDefines(project, binaries)
-                sources {
-                    cpp {
-                        source {
-                            srcDir "${rootDir}/examples/enum_usb"
-                            include '**/*.cpp'
+            if (!OperatingSystem.current().isWindows() && !project.isArm) {
+                enum_usb(NativeExecutableSpec) {
+                    if (project.isArm) {
+                        targetPlatform 'arm'
+                    } else {
+                        //targetPlatform 'x86'
+                        targetPlatform 'x64'
+                    }
+                    setupDefines(project, binaries)
+                    sources {
+                        cpp {
+                            source {
+                                srcDir "${rootDir}/examples/enum_usb"
+                                include '**/*.cpp'
+                            }
+                            exportedHeaders {
+                                srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include"]
+                                include '**/*.h'
+                            }
+                            lib library: 'cscore', linkage: 'static'
                         }
-                        exportedHeaders {
-                            srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include"]
-                            include '**/*.h'
-                        }
-                        lib library: 'cscore', linkage: 'static'
                     }
                 }
-            }
 
-            usbstream(NativeExecutableSpec) {
-                if (project.isArm) {
-                    targetPlatform 'arm'
-                } else {
-                    //targetPlatform 'x86'
-                    targetPlatform 'x64'
-                }
-                setupDefines(project, binaries)
-                sources {
-                    cpp {
-                        source {
-                            srcDir "${rootDir}/examples/usbstream"
-                            include '**/*.cpp'
+                usbstream(NativeExecutableSpec) {
+                    if (project.isArm) {
+                        targetPlatform 'arm'
+                    } else {
+                        //targetPlatform 'x86'
+                        targetPlatform 'x64'
+                    }
+                    setupDefines(project, binaries)
+                    sources {
+                        cpp {
+                            source {
+                                srcDir "${rootDir}/examples/usbstream"
+                                include '**/*.cpp'
+                            }
+                            exportedHeaders {
+                                srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include"]
+                                include '**/*.h'
+                            }
+                            lib library: 'cscore', linkage: 'static'
                         }
-                        exportedHeaders {
-                            srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include"]
-                            include '**/*.h'
-                        }
-                        lib library: 'cscore', linkage: 'static'
                     }
                 }
-            }
 
-            usbcvstream(NativeExecutableSpec) {
-                if (project.isArm) {
-                    targetPlatform 'arm'
-                } else {
-                    //targetPlatform 'x86'
-                    targetPlatform 'x64'
-                }
-                setupDefines(project, binaries)
-                sources {
-                    cpp {
-                        source {
-                            srcDir "${rootDir}/examples/usbcvstream"
-                            include '**/*.cpp'
+                usbcvstream(NativeExecutableSpec) {
+                    if (project.isArm) {
+                        targetPlatform 'arm'
+                    } else {
+                        //targetPlatform 'x86'
+                        targetPlatform 'x64'
+                    }
+                    setupDefines(project, binaries)
+                    sources {
+                        cpp {
+                            source {
+                                srcDir "${rootDir}/examples/usbcvstream"
+                                include '**/*.cpp'
+                            }
+                            exportedHeaders {
+                                srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include", project.openCvInclude]
+                                include '**/*.h'
+                            }
+                            lib library: 'cscore', linkage: 'static'
                         }
-                        exportedHeaders {
-                            srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include", project.openCvInclude]
-                            include '**/*.h'
-                        }
-                        lib library: 'cscore', linkage: 'static'
                     }
                 }
-            }
 
-            settings(NativeExecutableSpec) {
-                if (project.isArm) {
-                    targetPlatform 'arm'
-                } else {
-                    //targetPlatform 'x86'
-                    targetPlatform 'x64'
-                }
-                setupDefines(project, binaries)
-                sources {
-                    cpp {
-                        source {
-                            srcDir "${rootDir}/examples/settings"
-                            include '**/*.cpp'
+                settings(NativeExecutableSpec) {
+                    if (project.isArm) {
+                        targetPlatform 'arm'
+                    } else {
+                        //targetPlatform 'x86'
+                        targetPlatform 'x64'
+                    }
+                    setupDefines(project, binaries)
+                    sources {
+                        cpp {
+                            source {
+                                srcDir "${rootDir}/examples/settings"
+                                include '**/*.cpp'
+                            }
+                            exportedHeaders {
+                                srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include", project.openCvInclude]
+                                include '**/*.h'
+                            }
+                            lib library: 'cscore', linkage: 'static'
                         }
-                        exportedHeaders {
-                            srcDirs = ["${rootDir}/include", "${rootDir}/wpiutil/include", project.openCvInclude]
-                            include '**/*.h'
-                        }
-                        lib library: 'cscore', linkage: 'static'
                     }
                 }
             }
@@ -298,25 +300,23 @@ if (buildArm) {
 }
 
 project(':native') {
-    if (!OperatingSystem.current().isWindows()) {
-        apply plugin: 'cpp'
+    apply plugin: 'cpp'
 
-        apply from: "${rootDir}/toolchains/native.gradle"
+    apply from: "${rootDir}/toolchains/native.gradle"
 
-        //if (!project.hasProperty("withoutTests")) {
-        //    apply from: "${rootDir}/test/tests.gradle"
-        //}
+    //if (!project.hasProperty("withoutTests")) {
+    //    apply from: "${rootDir}/test/tests.gradle"
+    //}
 
-        if (includeJava) {
-            apply from: "${rootDir}/java/java.gradle"
-        }
-
-        cscoreSetupModel(project)
-        cscoreSetupExamplesModel(project)
-        cscoreZipTask(project)
-        useWpiUtil(project)
-        useOpenCv(project)
+    if (includeJava) {
+        apply from: "${rootDir}/java/java.gradle"
     }
+
+    cscoreSetupModel(project)
+    cscoreSetupExamplesModel(project)
+    cscoreZipTask(project)
+    useWpiUtil(project)
+    useOpenCv(project)
 }
 
 task cscoreSourceZip(type: Zip) {

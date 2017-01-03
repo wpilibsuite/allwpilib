@@ -132,7 +132,9 @@ class UsbCameraImpl : public SourceImpl {
 #endif
   // Number of buffers to ask OS for
   static constexpr int kNumBuffers = 4;
+#ifdef __linux__
   std::array<UsbCameraBuffer, kNumBuffers> m_buffers;
+#endif
 
   //
   // Path never changes, so not protected by mutex.

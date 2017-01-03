@@ -25,10 +25,18 @@ class Image {
   friend class Frame;
 
  public:
+
+#ifdef _WIN32
+  explicit Image(std::size_t capacity) {
+    m_data.reserve(capacity);
+  }
+#else
   explicit Image(std::size_t capacity)
-      : m_data{capacity, default_init_allocator<char>{}} {
+      : m_data{capacity, default_init_allocator<uchar>{}} {
     m_data.resize(0);
   }
+#endif
+
   Image(const Image&) = delete;
   Image& operator=(const Image&) = delete;
 
