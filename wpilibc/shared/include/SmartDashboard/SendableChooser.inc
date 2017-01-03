@@ -69,7 +69,7 @@ void SendableChooser<T>::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   if (m_table != nullptr) {
     for (const auto& choice : m_choices) {
-      keys.push_back(choice.first);
+      keys.push_back(choice.first());
     }
 
     // Unlike std::map, llvm::StringMap elements are not sorted
