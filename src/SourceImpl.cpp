@@ -337,13 +337,14 @@ void SourceImpl::PutError(llvm::StringRef msg, Frame::Time time) {
 
 void SourceImpl::NotifyPropertyCreated(int propIndex, PropertyImpl& prop) {
   auto& notifier = Notifier::GetInstance();
-  notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, propIndex,
-                                prop.propKind, prop.value, prop.valueStr);
+  notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CREATED, prop.name,
+                                propIndex, prop.propKind, prop.value,
+                                prop.valueStr);
   // also notify choices updated event for enum types
   if (prop.propKind == CS_PROP_ENUM)
     notifier.NotifySourceProperty(*this, CS_SOURCE_PROPERTY_CHOICES_UPDATED,
-                                  propIndex, prop.propKind, prop.value,
-                                  llvm::StringRef{});
+                                  prop.name, propIndex, prop.propKind,
+                                  prop.value, llvm::StringRef{});
 }
 
 void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
@@ -359,8 +360,8 @@ void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
   // Only notify updates after we've notified created
   if (m_properties_cached)
     Notifier::GetInstance().NotifySourceProperty(
-        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, property, prop->propKind,
-        prop->value, prop->valueStr);
+        *this, CS_SOURCE_PROPERTY_VALUE_UPDATED, prop->name, property,
+        prop->propKind, prop->value, prop->valueStr);
 }
 
 void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {

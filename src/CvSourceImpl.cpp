@@ -188,7 +188,8 @@ int CvSourceImpl::CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
     value = prop->value;
   }
   Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CREATED, ndx, kind, value, llvm::StringRef{});
+      *this, CS_SOURCE_PROPERTY_CREATED, name, ndx, kind, value,
+      llvm::StringRef{});
   return ndx;
 }
 
@@ -215,8 +216,8 @@ void CvSourceImpl::SetEnumPropertyChoices(int property,
   }
   prop->enumChoices = choices;
   Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, property, CS_PROP_ENUM,
-      prop->value, llvm::StringRef{});
+      *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, prop->name, property,
+      CS_PROP_ENUM, prop->value, llvm::StringRef{});
 }
 
 namespace cs {

@@ -79,7 +79,7 @@ public class VideoEvent {
   public int sourceHandle;
   public int sinkHandle;
 
-  // Source/sink name
+  // Source/sink/property name
   public String name;
 
   // Fields for kSourceVideoModeChanged event

@@ -177,15 +177,16 @@ void Notifier::NotifySourceVideoMode(const SourceImpl& source,
 }
 
 void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                                    int property, CS_PropertyKind propertyKind,
-                                    int value, llvm::StringRef valueStr) {
+                                    llvm::StringRef propertyName, int property,
+                                    CS_PropertyKind propertyKind, int value,
+                                    llvm::StringRef valueStr) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
 
   auto handleData = Sources::GetInstance().Find(source);
 
   thr->m_notifications.emplace(
-      source.GetName(), handleData.first, static_cast<RawEvent::Kind>(kind),
+      propertyName, handleData.first, static_cast<RawEvent::Kind>(kind),
       Handle{handleData.first, property, Handle::kProperty}, propertyKind,
       value, valueStr);
   thr->m_cond.notify_one();

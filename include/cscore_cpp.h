@@ -119,7 +119,7 @@ struct RawEvent {
   CS_Source sourceHandle = CS_INVALID_HANDLE;
   CS_Sink sinkHandle = CS_INVALID_HANDLE;
 
-  // Source/sink name
+  // Source/sink/property name
   std::string name;
 
   // Fields for kSourceVideoModeChanged event

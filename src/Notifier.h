@@ -46,8 +46,9 @@ class Notifier {
   void NotifySource(const SourceImpl& source, CS_EventKind kind);
   void NotifySourceVideoMode(const SourceImpl& source, const VideoMode& mode);
   void NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                            int property, CS_PropertyKind propertyKind,
-                            int value, llvm::StringRef valueStr);
+                            llvm::StringRef propertyName, int property,
+                            CS_PropertyKind propertyKind, int value,
+                            llvm::StringRef valueStr);
   void NotifySink(llvm::StringRef name, CS_Sink sink, CS_EventKind kind);
   void NotifySink(const SinkImpl& sink, CS_EventKind kind);
   void NotifySinkSourceChanged(llvm::StringRef name, CS_Sink sink,

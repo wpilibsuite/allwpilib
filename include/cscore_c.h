@@ -164,7 +164,7 @@ struct CS_Event {
   CS_Source source;
   CS_Sink sink;
 
-  // Source/sink name
+  // Source/sink/property name
   const char *name;
 
   // Fields for CS_SOURCE_VIDEOMODE_CHANGED event

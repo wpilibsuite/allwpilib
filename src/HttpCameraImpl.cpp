@@ -335,8 +335,8 @@ void HttpCameraImpl::CreateProperty(llvm::StringRef name,
       value));
 
   Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CREATED, m_propertyData.size() + 1, kind, value,
-      llvm::StringRef{});
+      *this, CS_SOURCE_PROPERTY_CREATED, name, m_propertyData.size() + 1, kind,
+      value, llvm::StringRef{});
 }
 
 template <typename T>
@@ -353,11 +353,11 @@ void HttpCameraImpl::CreateEnumProperty(
   for (const auto& choice : choices) enumChoices.emplace_back(choice);
 
   Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CREATED, m_propertyData.size() + 1,
+      *this, CS_SOURCE_PROPERTY_CREATED, name, m_propertyData.size() + 1,
       CS_PROP_ENUM, value, llvm::StringRef{});
   Notifier::GetInstance().NotifySourceProperty(
-      *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, m_propertyData.size() + 1,
-      CS_PROP_ENUM, value, llvm::StringRef{});
+      *this, CS_SOURCE_PROPERTY_CHOICES_UPDATED, name,
+      m_propertyData.size() + 1, CS_PROP_ENUM, value, llvm::StringRef{});
 }
 
 std::unique_ptr<PropertyImpl> HttpCameraImpl::CreateEmptyProperty(
