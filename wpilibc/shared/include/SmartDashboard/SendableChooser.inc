@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <utility>
@@ -24,7 +25,7 @@ namespace frc {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddObject(const std::string& name, const T& object) {
+void SendableChooser<T>::AddObject(llvm::StringRef name, const T& object) {
   m_choices[name] = object;
 }
 
@@ -39,7 +40,7 @@ void SendableChooser<T>::AddObject(const std::string& name, const T& object) {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddDefault(const std::string& name, const T& object) {
+void SendableChooser<T>::AddDefault(llvm::StringRef name, const T& object) {
   m_defaultChoice = name;
   AddObject(name, object);
 }
@@ -67,9 +68,13 @@ void SendableChooser<T>::InitTable(std::shared_ptr<ITable> subtable) {
   std::vector<std::string> keys;
   m_table = subtable;
   if (m_table != nullptr) {
-    for (auto& choice : m_choices) {
+    for (const auto& choice : m_choices) {
       keys.push_back(choice.first);
     }
+
+    // Unlike std::map, llvm::StringMap elements are not sorted
+    std::sort(keys.begin(), keys.end());
+
     m_table->PutValue(kOptions, nt::Value::MakeStringArray(std::move(keys)));
     m_table->PutString(kDefault, m_defaultChoice);
   }

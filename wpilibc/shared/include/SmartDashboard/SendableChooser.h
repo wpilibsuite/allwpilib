@@ -7,11 +7,12 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <string>
 
 #include "SmartDashboard/SendableChooserBase.h"
+#include "llvm/StringMap.h"
+#include "llvm/StringRef.h"
 #include "tables/ITable.h"
 
 namespace frc {
@@ -35,14 +36,14 @@ class SendableChooser : public SendableChooserBase {
  public:
   virtual ~SendableChooser() = default;
 
-  void AddObject(const std::string& name, const T& object);
-  void AddDefault(const std::string& name, const T& object);
+  void AddObject(llvm::StringRef name, const T& object);
+  void AddDefault(llvm::StringRef name, const T& object);
   T GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
 
  private:
-  std::map<std::string, T> m_choices;
+  llvm::StringMap<T> m_choices;
 };
 
 }  // namespace frc
