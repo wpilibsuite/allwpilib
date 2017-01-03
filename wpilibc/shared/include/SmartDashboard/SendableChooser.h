@@ -11,7 +11,7 @@
 #include <memory>
 #include <string>
 
-#include "SmartDashboard/Sendable.h"
+#include "SmartDashboard/SendableChooserBase.h"
 #include "tables/ITable.h"
 
 namespace frc {
@@ -31,14 +31,12 @@ namespace frc {
  * @see SmartDashboard
  */
 template <class T>
-class SendableChooser : public Sendable {
+class SendableChooser : public SendableChooserBase {
  public:
   virtual ~SendableChooser() = default;
 
-  void AddObject(const std::string& name, T& object);
-  void AddObject(const std::string& name, const T& object);
-  void AddDefault(const std::string& name, T& object);
-  void AddDefault(const std::string& name, const T& object);
+  void AddObject(const std::string& name, T object);
+  void AddDefault(const std::string& name, T object);
   T GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
@@ -46,13 +44,7 @@ class SendableChooser : public Sendable {
   std::string GetSmartDashboardType() const override;
 
  private:
-  static const std::string kDefault;
-  static const std::string kOptions;
-  static const std::string kSelected;
-
-  std::string m_defaultChoice;
   std::map<std::string, T> m_choices;
-  std::shared_ptr<ITable> m_table;
 };
 
 }  // namespace frc
