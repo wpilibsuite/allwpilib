@@ -24,7 +24,7 @@ namespace frc {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddObject(const std::string& name, T object) {
+void SendableChooser<T>::AddObject(const std::string& name, const T& object) {
   m_choices[name] = object;
 }
 
@@ -39,7 +39,7 @@ void SendableChooser<T>::AddObject(const std::string& name, T object) {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddDefault(const std::string& name, T object) {
+void SendableChooser<T>::AddDefault(const std::string& name, const T& object) {
   m_defaultChoice = name;
   AddObject(name, object);
 }
