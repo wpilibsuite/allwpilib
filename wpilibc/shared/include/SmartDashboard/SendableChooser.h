@@ -7,11 +7,12 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <string>
 
-#include "SmartDashboard/Sendable.h"
+#include "SmartDashboard/SendableChooserBase.h"
+#include "llvm/StringMap.h"
+#include "llvm/StringRef.h"
 #include "tables/ITable.h"
 
 namespace frc {
@@ -27,24 +28,24 @@ namespace frc {
  * laptop.  Once autonomous starts, simply ask the {@link SendableChooser} what
  * the selected value is.</p>
  *
+ * @tparam T The type of values to be stored
  * @see SmartDashboard
  */
-class SendableChooser : public Sendable {
+template <class T>
+class SendableChooser : public SendableChooserBase {
  public:
   virtual ~SendableChooser() = default;
 
-  void AddObject(const std::string& name, void* object);
-  void AddDefault(const std::string& name, void* object);
-  void* GetSelected();
+  void AddObject(llvm::StringRef name, const T& object);
+  void AddDefault(llvm::StringRef name, const T& object);
+  T GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
-  std::string GetSmartDashboardType() const override;
 
  private:
-  std::string m_defaultChoice;
-  std::map<std::string, void*> m_choices;
-  std::shared_ptr<ITable> m_table;
+  llvm::StringMap<T> m_choices;
 };
 
 }  // namespace frc
+
+#include "SendableChooser.inc"

@@ -5,13 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "SmartDashboard/SendableChooser.h"
+#pragma once
 
-using namespace frc;
+#include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
-static const std::string kDefault = "default";
-static const std::string kOptions = "options";
-static const std::string kSelected = "selected";
+namespace frc {
 
 /**
  * Adds the given object to the list of options.
@@ -22,7 +24,8 @@ static const std::string kSelected = "selected";
  * @param name   the name of the option
  * @param object the option
  */
-void SendableChooser::AddObject(const std::string& name, void* object) {
+template <class T>
+void SendableChooser<T>::AddObject(llvm::StringRef name, const T& object) {
   m_choices[name] = object;
 }
 
@@ -36,7 +39,8 @@ void SendableChooser::AddObject(const std::string& name, void* object) {
  * @param name   the name of the option
  * @param object the option
  */
-void SendableChooser::AddDefault(const std::string& name, void* object) {
+template <class T>
+void SendableChooser<T>::AddDefault(llvm::StringRef name, const T& object) {
   m_defaultChoice = name;
   AddObject(name, object);
 }
@@ -49,29 +53,31 @@ void SendableChooser::AddDefault(const std::string& name, void* object) {
  *
  * @return the option selected
  */
-void* SendableChooser::GetSelected() {
+template <class T>
+T SendableChooser<T>::GetSelected() {
   std::string selected = m_table->GetString(kSelected, m_defaultChoice);
-  if (selected == "")
+  if (selected == "") {
     return nullptr;
-  else
+  } else {
     return m_choices[selected];
+  }
 }
 
-void SendableChooser::InitTable(std::shared_ptr<ITable> subtable) {
+template <class T>
+void SendableChooser<T>::InitTable(std::shared_ptr<ITable> subtable) {
   std::vector<std::string> keys;
   m_table = subtable;
   if (m_table != nullptr) {
-    std::map<std::string, void*>::iterator iter;
-    for (iter = m_choices.begin(); iter != m_choices.end(); iter++) {
-      keys.push_back(iter->first);
+    for (const auto& choice : m_choices) {
+      keys.push_back(choice.first());
     }
+
+    // Unlike std::map, llvm::StringMap elements are not sorted
+    std::sort(keys.begin(), keys.end());
+
     m_table->PutValue(kOptions, nt::Value::MakeStringArray(std::move(keys)));
     m_table->PutString(kDefault, m_defaultChoice);
   }
 }
 
-std::shared_ptr<ITable> SendableChooser::GetTable() const { return m_table; }
-
-std::string SendableChooser::GetSmartDashboardType() const {
-  return "String Chooser";
-}
+}  // namespace frc
