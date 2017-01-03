@@ -107,7 +107,7 @@ public class VisionRunner<P extends VisionPipeline> {
       throw new IllegalStateException(
           "VisionRunner.runForever() cannot be called from the main robot thread");
     }
-    while (true) {
+    while (!Thread.interrupted()) {
       runOnce();
     }
   }
