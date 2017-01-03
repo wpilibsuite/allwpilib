@@ -32,6 +32,12 @@ if (project.buildArm) {
     project(':arm').build.dependsOn outputVersions
 }
 
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
 // We change what repo we publish to depending on whether this is a development, beta, stable, or full
 // release. This is set up in the main gradle file.
 publishing {
