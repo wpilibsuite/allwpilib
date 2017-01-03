@@ -40,8 +40,6 @@ class SendableChooser : public SendableChooserBase {
   T GetSelected();
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
-  std::string GetSmartDashboardType() const override;
 
  private:
   std::map<std::string, T> m_choices;

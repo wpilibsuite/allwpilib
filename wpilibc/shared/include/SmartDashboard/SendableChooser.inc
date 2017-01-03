@@ -75,14 +75,4 @@ void SendableChooser<T>::InitTable(std::shared_ptr<ITable> subtable) {
   }
 }
 
-template <class T>
-std::shared_ptr<ITable> SendableChooser<T>::GetTable() const {
-  return m_table;
-}
-
-template <class T>
-std::string SendableChooser<T>::GetSmartDashboardType() const {
-  return "String Chooser";
-}
-
 }  // namespace frc

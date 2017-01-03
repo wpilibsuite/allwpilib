@@ -25,6 +25,9 @@ class SendableChooserBase : public Sendable {
  public:
   virtual ~SendableChooserBase() = default;
 
+  std::shared_ptr<ITable> GetTable() const override;
+  std::string GetSmartDashboardType() const override;
+
  protected:
   static const char* kDefault;
   static const char* kOptions;
