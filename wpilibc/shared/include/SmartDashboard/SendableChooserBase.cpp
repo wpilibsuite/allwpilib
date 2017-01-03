@@ -7,10 +7,10 @@
 
 #pragma once
 
-namespace frc {
+#include "SmartDashboard/SendableChooserBase.h"
+
+using namespace frc;
 
 const char* SendableChooserBase::kDefault = "default";
 const char* SendableChooserBase::kOptions = "options";
 const char* SendableChooserBase::kSelected = "selected";
-
-}  // namespace frc

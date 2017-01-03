@@ -35,5 +35,3 @@ class SendableChooserBase : public Sendable {
 };
 
 }  // namespace frc
-
-#include "SendableChooserBase.inc"
