@@ -86,7 +86,7 @@ public class VideoEvent {
   public VideoMode mode;
 
   // Fields for kSourceProperty* events
-  private int propertyHandle;
+  public int propertyHandle;
   public VideoProperty.Kind propertyKind;
   public int value;
   public String valueStr;
