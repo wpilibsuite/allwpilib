@@ -61,7 +61,12 @@ def ntcoreZipTask = { project ->
         group = 'WPILib'
         destinationDir = project.buildDir
         baseName = 'ntcore'
-        classifier = "${project.buildPlatform}"
+        if (project.isArm && project.hasProperty('compilerPrefix')
+            && project.hasProperty('armSuffix')) {
+            classifier = "${project.buildPlatform}${project.armSuffix}"
+        } else {
+            classifier = "${project.buildPlatform}"
+        }
         duplicatesStrategy = 'exclude'
 
         from(file('include')) {
