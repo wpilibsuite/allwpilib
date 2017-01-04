@@ -59,11 +59,6 @@ public class SendableChooser<V> implements Sendable {
    * @param object the option
    */
   public void addObject(String name, V object) {
-    // if we don't have a default, set the default automatically
-    if (m_defaultChoice == null) {
-      addDefault(name, object);
-      return;
-    }
     m_map.put(name, object);
 
     if (m_table != null) {
@@ -73,9 +68,8 @@ public class SendableChooser<V> implements Sendable {
 
   /**
    * Add the given object to the list of options and marks it as the default. Functionally, this is
-   * very close to {@link SendableChooser#addObject(java.lang.String, java.lang.Object)
-   * addObject(...)} except that it will use this as the default option if none other is explicitly
-   * selected.
+   * very close to {@link #addObject(String, Object)} except that it will use this as the default
+   * option if none other is explicitly selected.
    *
    * @param name   the name of the option
    * @param object the option
