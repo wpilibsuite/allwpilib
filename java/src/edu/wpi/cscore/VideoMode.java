@@ -34,6 +34,13 @@ public class VideoMode {
     this.fps = fps;
   }
 
+  public VideoMode(PixelFormat pixelFormat, int width, int height, int fps) {
+    this.pixelFormat = pixelFormat;
+    this.width = width;
+    this.height = height;
+    this.fps = fps;
+  }
+
   /// Pixel format
   public PixelFormat pixelFormat;
   /// Width in pixels
