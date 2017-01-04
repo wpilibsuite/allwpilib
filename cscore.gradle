@@ -52,7 +52,7 @@ def cscoreSetupModel = { project ->
 def cscoreSetupExamplesModel = { project ->
     project.model {
         components {
-            if (!OperatingSystem.current().isWindows() && !project.isArm) {
+            if (!OperatingSystem.current().isWindows() || project.isArm) {
                 enum_usb(NativeExecutableSpec) {
                     if (project.isArm) {
                         targetPlatform 'arm'
