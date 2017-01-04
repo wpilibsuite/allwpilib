@@ -8,7 +8,13 @@ ext.useWpiUtil = { project ->
         def wpiUtil
 
         doFirst {
-            def wpiUtilDependency = project.dependencies.create("edu.wpi.first.wpilib:wpiutil:+:${project.isArm ? 'arm' : 'desktop'}@zip")
+            def wpiUtilDependency
+            if (project.isArm && project.hasProperty('compilerPrefix') && project.hasProperty('armSuffix')) {
+                wpiUtilDependency = project.dependencies.create("edu.wpi.first.wpilib:wpiutil:+:arm${project.armSuffix}@zip")
+            } else {
+                wpiUtilDependency = project.dependencies.create("edu.wpi.first.wpilib:wpiutil:+:${project.isArm ? 'arm' : 'desktop'}@zip")
+            }
+             
             def wpiUtilConfig = project.configurations.detachedConfiguration(wpiUtilDependency)
             wpiUtilConfig.setTransitive(false)
             wpiUtil = wpiUtilConfig.files[0].canonicalFile
@@ -59,7 +65,9 @@ ext.useWpiUtil = { project ->
 }
 
 ext.getOpenCvPlatformPackage = { targetPlatform ->
-    if (targetPlatform.architecture.arm) {
+    if (targetPlatform.architecture.arm && project.hasProperty('compilerPrefix') && project.hasProperty('armSuffix')) {
+        return "linux-arm${project.armSuffix}"
+    } else if (targetPlatform.architecture.arm) {
         return 'linux-arm'
     } else if (targetPlatform.operatingSystem.linux) {
         if (targetPlatform.architecture.amd64) {
