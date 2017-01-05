@@ -24,7 +24,12 @@ sourceSets {
 jar {
     description = 'Generates NetworkTables jar, with the JNI shared libraries embedded'
     baseName = 'ntcore'
-    classifier = "$buildPlatform"
+    if (project.isArm && project.hasProperty('compilerPrefix')
+        && project.hasProperty('armSuffix')) {
+        classifier = "${buildPlatform}${project.armSuffix}"
+    } else {
+        classifier = "${buildPlatform}"
+    }
     duplicatesStrategy = 'exclude'
 
     dependsOn { classes }
