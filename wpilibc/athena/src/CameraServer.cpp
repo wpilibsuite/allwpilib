@@ -11,6 +11,7 @@
 #include "WPIErrors.h"
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
+#include "ntcore_cpp.h"
 
 using namespace frc;
 
@@ -91,7 +92,7 @@ std::vector<std::string> CameraServer::GetSinkStreamValues(CS_Sink sink) {
   return values;
 }
 
-static std::vector<std::string> GetSourceStreamValues(CS_Source source) {
+std::vector<std::string> CameraServer::GetSourceStreamValues(CS_Source source) {
   CS_Status status = 0;
 
   // Ignore all but HttpCamera
@@ -101,6 +102,19 @@ static std::vector<std::string> GetSourceStreamValues(CS_Source source) {
   // Generate values
   auto values = cs::GetHttpCameraUrls(source, &status);
   for (auto& value : values) value = "mjpg:" + value;
+
+  // Look to see if we have a passthrough server for this source
+  for (const auto& i : m_sinks) {
+    CS_Sink sink = i.second.GetHandle();
+    CS_Source sinkSource = cs::GetSinkSource(sink, &status);
+    if (source == sinkSource &&
+        cs::GetSinkKind(sink, &status) == CS_SINK_MJPEG) {
+      // Add USB-only passthrough
+      int port = cs::GetMjpegServerPort(sink, &status);
+      values.emplace_back(MakeStreamValue("172.22.11.2", port));
+      break;
+    }
+  }
 
   // Set table value
   return values;
@@ -115,8 +129,12 @@ void CameraServer::UpdateStreamValues() {
 
     // Get the source's subtable (if none exists, we're done)
     CS_Source source = cs::GetSinkSource(sink, &status);
+    if (source == 0) continue;
     auto table = m_tables.lookup(source);
     if (table) {
+      // Don't set stream values if this is a HttpCamera passthrough
+      if (cs::GetSourceKind(source, &status) == CS_SOURCE_HTTP) continue;
+
       // Set table value
       auto values = GetSinkStreamValues(sink);
       if (!values.empty()) table->PutStringArray("streams", values);
@@ -137,6 +155,158 @@ void CameraServer::UpdateStreamValues() {
   }
 }
 
+static std::string PixelFormatToString(int pixelFormat) {
+  switch (pixelFormat) {
+    case cs::VideoMode::PixelFormat::kMJPEG:
+      return "MJPEG";
+    case cs::VideoMode::PixelFormat::kYUYV:
+      return "YUYV";
+    case cs::VideoMode::PixelFormat::kRGB565:
+      return "RGB565";
+    case cs::VideoMode::PixelFormat::kBGR:
+      return "BGR";
+    case cs::VideoMode::PixelFormat::kGray:
+      return "Gray";
+    default:
+      return "Unknown";
+  }
+}
+
+static cs::VideoMode::PixelFormat PixelFormatFromString(llvm::StringRef str) {
+  if (str == "MJPEG" || str == "mjpeg" || str == "JPEG" || str == "jpeg")
+    return cs::VideoMode::PixelFormat::kMJPEG;
+  if (str == "YUYV" || str == "yuyv") return cs::VideoMode::PixelFormat::kYUYV;
+  if (str == "RGB565" || str == "rgb565")
+    return cs::VideoMode::PixelFormat::kRGB565;
+  if (str == "BGR" || str == "bgr") return cs::VideoMode::PixelFormat::kBGR;
+  if (str == "GRAY" || str == "Gray" || str == "gray")
+    return cs::VideoMode::PixelFormat::kGray;
+  return cs::VideoMode::PixelFormat::kUnknown;
+}
+
+static cs::VideoMode VideoModeFromString(llvm::StringRef modeStr) {
+  cs::VideoMode mode;
+  size_t pos;
+
+  // width: [0-9]+
+  pos = modeStr.find_first_not_of("0123456789");
+  llvm::StringRef widthStr = modeStr.slice(0, pos);
+  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
+
+  // 'x'
+  if (modeStr.empty() || modeStr[0] != 'x') return mode;
+  modeStr = modeStr.drop_front(1).ltrim();  // drop whitespace too
+
+  // height: [0-9]+
+  pos = modeStr.find_first_not_of("0123456789");
+  llvm::StringRef heightStr = modeStr.slice(0, pos);
+  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
+
+  // format: all characters until whitespace
+  pos = modeStr.find_first_of(" \t\n\v\f\r");
+  llvm::StringRef formatStr = modeStr.slice(0, pos);
+  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
+
+  // fps: [0-9.]+
+  pos = modeStr.find_first_not_of("0123456789.");
+  llvm::StringRef fpsStr = modeStr.slice(0, pos);
+  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
+
+  // "fps"
+  if (!modeStr.startswith("fps")) return mode;
+
+  // make fps an integer string by dropping after the decimal
+  fpsStr = fpsStr.slice(0, fpsStr.find('.'));
+
+  // convert width, height, and fps to integers
+  if (widthStr.getAsInteger(10, mode.width)) return mode;
+  if (heightStr.getAsInteger(10, mode.height)) return mode;
+  if (fpsStr.getAsInteger(10, mode.fps)) return mode;
+
+  // convert format to enum value
+  mode.pixelFormat = PixelFormatFromString(formatStr);
+
+  return mode;
+}
+
+static std::string VideoModeToString(const cs::VideoMode& mode) {
+  std::string rv;
+  llvm::raw_string_ostream oss{rv};
+  oss << mode.width << "x" << mode.height;
+  oss << " " << PixelFormatToString(mode.pixelFormat) << " ";
+  oss << mode.fps << " fps";
+  return oss.str();
+}
+
+static std::vector<std::string> GetSourceModeValues(int source) {
+  std::vector<std::string> rv;
+  CS_Status status = 0;
+  for (const auto& mode : cs::EnumerateSourceVideoModes(source, &status))
+    rv.emplace_back(VideoModeToString(mode));
+  return rv;
+}
+
+static inline llvm::StringRef Concatenate(llvm::StringRef lhs,
+                                          llvm::StringRef rhs,
+                                          llvm::SmallVectorImpl<char>& buf) {
+  buf.clear();
+  llvm::raw_svector_ostream oss{buf};
+  oss << lhs << rhs;
+  return oss.str();
+}
+
+static void PutSourcePropertyValue(ITable* table, const cs::VideoEvent& event,
+                                   bool isNew) {
+  llvm::SmallString<64> name;
+  llvm::SmallString<64> infoName;
+  if (llvm::StringRef{event.name}.startswith("raw_")) {
+    name = "RawProperty/";
+    name += llvm::StringRef{event.name}.substr(4);
+    infoName = "RawPropertyInfo/";
+    infoName += llvm::StringRef{event.name}.substr(4);
+  } else {
+    name = "Property/";
+    name += event.name;
+    infoName = "PropertyInfo/";
+    infoName += event.name;
+  }
+
+  llvm::SmallString<64> buf;
+  CS_Status status = 0;
+  switch (event.propertyKind) {
+    case cs::VideoProperty::kBoolean:
+      if (isNew)
+        table->SetDefaultBoolean(name, event.value != 0);
+      else
+        table->PutBoolean(name, event.value != 0);
+      break;
+    case cs::VideoProperty::kInteger:
+    case cs::VideoProperty::kEnum:
+      if (isNew) {
+        table->SetDefaultNumber(name, event.value);
+        table->PutNumber(Concatenate(infoName, "/min", buf),
+                         cs::GetPropertyMin(event.propertyHandle, &status));
+        table->PutNumber(Concatenate(infoName, "/max", buf),
+                         cs::GetPropertyMax(event.propertyHandle, &status));
+        table->PutNumber(Concatenate(infoName, "/step", buf),
+                         cs::GetPropertyStep(event.propertyHandle, &status));
+        table->PutNumber(Concatenate(infoName, "/default", buf),
+                         cs::GetPropertyDefault(event.propertyHandle, &status));
+      } else {
+        table->PutNumber(name, event.value);
+      }
+      break;
+    case cs::VideoProperty::kString:
+      if (isNew)
+        table->SetDefaultString(name, event.valueStr);
+      else
+        table->PutString(name, event.valueStr);
+      break;
+    default:
+      break;
+  }
+}
+
 CameraServer::CameraServer()
     : m_publishTable{NetworkTable::GetTable(kPublishName)},
       m_nextPort(kBasePort) {
@@ -144,7 +314,12 @@ CameraServer::CameraServer()
   // "/CameraPublisher/{Source.Name}/" - root
   // - "source" (string): Descriptive, prefixed with type (e.g. "usb:0")
   // - "streams" (string array): URLs that can be used to stream data
-  // - properties (scaled units)
+  // - "description" (string): Description of the source
+  // - "connected" (boolean): Whether source is connected
+  // - "mode" (string): Current video mode
+  // - "modes" (string array): Available video modes
+  // - "Property/{Property}" - Property values
+  // - "PropertyInfo/{Property}" - Property supporting information
 
   // Listener for video events
   m_videoListener = cs::VideoListener{
@@ -169,6 +344,10 @@ CameraServer::CameraServer()
                                                event.sourceHandle, &status));
             table->PutStringArray("streams",
                                   GetSourceStreamValues(event.sourceHandle));
+            auto mode = cs::GetSourceVideoMode(event.sourceHandle, &status);
+            table->SetDefaultString("mode", VideoModeToString(mode));
+            table->PutStringArray("modes",
+                                  GetSourceModeValues(event.sourceHandle));
             break;
           }
           case cs::VideoEvent::kSourceDestroyed: {
@@ -176,6 +355,7 @@ CameraServer::CameraServer()
             if (table) {
               table->PutString("source", "");
               table->PutStringArray("streams", std::vector<std::string>{});
+              table->PutStringArray("modes", std::vector<std::string>{});
             }
             break;
           }
@@ -197,34 +377,43 @@ CameraServer::CameraServer()
             break;
           }
           case cs::VideoEvent::kSourceVideoModesUpdated: {
+            auto table = GetSourceTable(event.sourceHandle);
+            if (table)
+              table->PutStringArray("modes",
+                                    GetSourceModeValues(event.sourceHandle));
             break;
           }
           case cs::VideoEvent::kSourceVideoModeChanged: {
+            auto table = GetSourceTable(event.sourceHandle);
+            if (table) table->PutString("mode", VideoModeToString(event.mode));
             break;
           }
           case cs::VideoEvent::kSourcePropertyCreated: {
+            auto table = GetSourceTable(event.sourceHandle);
+            if (table) PutSourcePropertyValue(table.get(), event, true);
             break;
           }
           case cs::VideoEvent::kSourcePropertyValueUpdated: {
+            auto table = GetSourceTable(event.sourceHandle);
+            if (table) PutSourcePropertyValue(table.get(), event, false);
             break;
           }
           case cs::VideoEvent::kSourcePropertyChoicesUpdated: {
+            auto table = GetSourceTable(event.sourceHandle);
+            if (table) {
+              llvm::SmallString<64> name{"PropertyInfo/"};
+              name += event.name;
+              name += "/choices";
+              auto choices =
+                  cs::GetEnumPropertyChoices(event.propertyHandle, &status);
+              table->PutStringArray(name, choices);
+            }
             break;
           }
-          case cs::VideoEvent::kSinkSourceChanged: {
-            UpdateStreamValues();
-            break;
-          }
-          case cs::VideoEvent::kSinkCreated: {
-            break;
-          }
+          case cs::VideoEvent::kSinkSourceChanged:
+          case cs::VideoEvent::kSinkCreated:
           case cs::VideoEvent::kSinkDestroyed: {
-            break;
-          }
-          case cs::VideoEvent::kSinkEnabled: {
-            break;
-          }
-          case cs::VideoEvent::kSinkDisabled: {
+            UpdateStreamValues();
             break;
           }
           case cs::VideoEvent::kNetworkInterfacesChanged: {
@@ -235,7 +424,73 @@ CameraServer::CameraServer()
             break;
         }
       },
-      0x7fff, true};
+      0x4fff, true};
+
+  // Listener for NetworkTable events
+  llvm::SmallString<64> buf;
+  m_tableListener = nt::AddEntryListener(
+      Concatenate(kPublishName, "/", buf),
+      [=](unsigned int uid, llvm::StringRef key,
+          std::shared_ptr<nt::Value> value, unsigned int flags) {
+        llvm::StringRef relativeKey =
+            key.substr(llvm::StringRef(kPublishName).size() + 1);
+
+        // get source (sourceName/...)
+        auto subKeyIndex = relativeKey.find('/');
+        if (subKeyIndex == llvm::StringRef::npos) return;
+        llvm::StringRef sourceName = relativeKey.slice(0, subKeyIndex);
+        auto sourceIt = m_sources.find(sourceName);
+        if (sourceIt == m_sources.end()) return;
+
+        // get subkey
+        relativeKey = relativeKey.substr(subKeyIndex + 1);
+
+        // handle standard names
+        llvm::SmallString<64> propNameBuf;
+        llvm::StringRef propName;
+        if (relativeKey == "mode") {
+          if (!value->IsString()) return;
+          auto mode = VideoModeFromString(value->GetString());
+          if (mode.pixelFormat == cs::VideoMode::PixelFormat::kUnknown ||
+              !sourceIt->second.SetVideoMode(mode)) {
+            // reset to current mode
+            nt::SetEntryValue(key, nt::Value::MakeString(VideoModeToString(
+                                       sourceIt->second.GetVideoMode())));
+          }
+          return;
+        } else if (relativeKey.startswith("Property/")) {
+          propName = relativeKey.substr(9);
+        } else if (relativeKey.startswith("RawProperty/")) {
+          propNameBuf = "raw_";
+          propNameBuf += relativeKey.substr(12);
+          propName = propNameBuf.str();
+        } else {
+          return;  // ignore
+        }
+
+        // everything else is a property
+        auto property = sourceIt->second.GetProperty(propName);
+        switch (property.GetKind()) {
+          case cs::VideoProperty::kNone:
+            return;
+          case cs::VideoProperty::kBoolean:
+            if (!value->IsBoolean()) return;
+            property.Set(value->GetBoolean() ? 1 : 0);
+            return;
+          case cs::VideoProperty::kInteger:
+          case cs::VideoProperty::kEnum:
+            if (!value->IsDouble()) return;
+            property.Set(static_cast<int>(value->GetDouble()));
+            return;
+          case cs::VideoProperty::kString:
+            if (!value->IsString()) return;
+            property.SetString(value->GetString());
+            return;
+          default:
+            return;
+        }
+      },
+      NT_NOTIFY_IMMEDIATE | NT_NOTIFY_UPDATE);
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
@@ -285,28 +540,28 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::ArrayRef<std::string> hosts) {
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            llvm::StringRef host) {
   cs::AxisCamera camera{name, host};
-  AddCamera(camera);
+  StartAutomaticCapture(camera);
   return camera;
 }
 
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            const char* host) {
   cs::AxisCamera camera{name, host};
-  AddCamera(camera);
+  StartAutomaticCapture(camera);
   return camera;
 }
 
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            const std::string& host) {
   cs::AxisCamera camera{name, host};
-  AddCamera(camera);
+  StartAutomaticCapture(camera);
   return camera;
 }
 
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            llvm::ArrayRef<std::string> hosts) {
   cs::AxisCamera camera{name, hosts};
-  AddCamera(camera);
+  StartAutomaticCapture(camera);
   return camera;
 }
 
