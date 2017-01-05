@@ -3,6 +3,19 @@ import org.gradle.internal.os.OperatingSystem
 apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+def csVersion
+if (project.hasProperty("csPublishVersion")) {
+    csVersion = project.csPublishVersion
+} else {
+    csVersion = WPILibVersion.version
+}
+
 def csFile = file("$buildDir/cscore.txt")
 
 task outputVersions() {
@@ -15,7 +28,7 @@ task outputVersions() {
     }
 
     doLast {
-        csFile.write WPILibVersion.version
+        csFile.write csVersion
     }
 }
 
@@ -28,12 +41,6 @@ outputVersions.mustRunAfter clean
 project(':native').build.dependsOn outputVersions
 if (project.buildArm) {
     project(':arm').build.dependsOn outputVersions
-}
-
-if (!hasProperty('releaseType')) {
-    WPILibVersion {
-        releaseType = 'dev'
-    }
 }
 
 // We change what repo we publish to depending on whether this is a development, beta, stable, or full
@@ -69,7 +76,7 @@ publishing {
 
                 groupId 'edu.wpi.cscore.java'
                 artifactId 'cscore'
-                version WPILibVersion.version
+                version csVersion
             }
         }
         cpp(MavenPublication) {
@@ -91,7 +98,7 @@ publishing {
 
             groupId 'edu.wpi.cscore.cpp'
             artifactId 'cscore'
-            version WPILibVersion.version
+            version csVersion
         }
     }
 }
