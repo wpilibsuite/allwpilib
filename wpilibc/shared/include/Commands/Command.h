@@ -81,6 +81,7 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   bool IsTimedOut() const;
   bool AssertUnlocked(const std::string& message);
   void SetParent(CommandGroup* parent);
+  void ClearRequirements();
 
   virtual void Initialize();
   virtual void Execute();
@@ -111,6 +112,8 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   virtual void _Execute();
   virtual void _End();
   virtual void _Cancel();
+
+  friend class ConditionalCommand;
 
  private:
   void LockChanges();

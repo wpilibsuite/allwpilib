@@ -387,6 +387,15 @@ public abstract class Command implements NamedSendable {
   }
 
   /**
+   * Clears list of subsystem requirements. This is only used by
+   * {@link ConditionalCommand} so cancelling the chosen command works properly
+   * in {@link CommandGroup}.
+   */
+  protected void clearRequirements() {
+    m_requirements = new Set();
+  }
+
+  /**
    * Starts up the command. Gets the command ready to start. <p> Note that the command will
    * eventually start, however it will not necessarily do so immediately, and may in fact be
    * canceled before initialize is even called. </p>
