@@ -29,7 +29,12 @@ dependencies {
 jar {
     description = 'Generates cscore jar, with the JNI shared libraries embedded'
     baseName = 'cscore'
-    classifier = "$buildPlatform"
+    if (project.isArm && project.hasProperty('compilerPrefix')
+        && project.hasProperty('armSuffix')) {
+        classifier = "${buildPlatform}${project.armSuffix}"
+    } else {
+        classifier = "${buildPlatform}"
+    }
     duplicatesStrategy = 'exclude'
 
     dependsOn { classes }
