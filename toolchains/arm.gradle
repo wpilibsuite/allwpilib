@@ -2,6 +2,7 @@ ext.isArm = true
 ext.buildPlatform = 'arm'
 
 def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPrefix : 'arm-frc-linux-gnueabi-'
+def toolChainPath = project.hasProperty('toolChainPath') ? project.toolChainPath : null
 model {
     platforms {
         arm {
@@ -10,10 +11,12 @@ model {
         }
     }
     toolChains {
-        gcc(Gcc) {
+        armGcc(Gcc) {
+            if (toolChainPath != null) path(toolChainPath)
             target("arm") {
                 // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
                 // If this ever changes, the prefix will need to be changed here
+                cCompiler.executable = compilerPrefix + cCompiler.executable
                 cppCompiler.executable = compilerPrefix + cppCompiler.executable
                 linker.executable = compilerPrefix + linker.executable
                 assembler.executable = compilerPrefix + assembler.executable
@@ -35,35 +38,12 @@ model {
                 staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
             }
         }
-        // Workaround for OS X. Macs for some reason want to use Xcode's gcc
-        // (which just wraps Clang), so we have to explicitly make it so
-        // that trying to compile with Clang will call gcc instead
-        macGcc(Clang) {
-            target('arm') {
-                // We use a custom-built cross compiler with the prefix arm-frc-linux-gnueabi-<util name>
-                // If this ever changes, the prefix will need to be changed here
-                cppCompiler.executable = compilerPrefix + 'g++'
-                linker.executable = compilerPrefix + 'g++'
-                assembler.executable = compilerPrefix + 'gcc'
-                // Gradle auto-adds the -m32 argument to the linker and compiler. Our compiler only supports
-                // arm, and doesn't understand this flag, so it is removed from both
-                cppCompiler.withArguments { args ->
-                    args << '-std=c++1y' << '-Wformat=2' << '-Wall' << '-Wextra' << '-Werror' << '-pedantic'
-                    args << '-Wno-psabi' << '-Wno-unused-parameter' << '-fPIC' << '-O0' << '-g3' << '-rdynamic'
-                    //TODO: When the compiler allows us to actually call deprecated functions from within
-                    // deprecated function, remove this line (this will cause calling deprecated functions
-                    // to be treated as a warning rather than an error).
-                    args << '-Wno-error=deprecated-declarations' << '-pthread'
-                    args.remove('-m32')
-                }
-                linker.withArguments { args ->
-                    args << '-rdynamic' << '-pthread'
-                    args.remove('-m32')
-                }
-                staticLibArchiver.executable = compilerPrefix + 'ar'
-            }
-        }
     }
+}
+
+ext.binTools = { tool ->
+    if (toolChainPath != null) return "${toolChainPath}/${compilerPrefix}${tool}"
+    return "${compilerPrefix}${tool}"
 }
 
 ext.setupReleaseDefines = { cppCompiler, linker ->
@@ -84,9 +64,9 @@ ext.debugStripSetup = {
                 def library = task.outputFile.absolutePath
                 def debugLibrary = task.outputFile.absolutePath + ".debug"
                 task.doLast {
-                    exec { commandLine "${compilerPrefix}objcopy", '--only-keep-debug', library, debugLibrary }
-                    exec { commandLine "${compilerPrefix}strip", '-g', library }
-                    exec { commandLine "${compilerPrefix}objcopy", "--add-gnu-debuglink=$debugLibrary", library }
+                    exec { commandLine binTools('objcopy'), '--only-keep-debug', library, debugLibrary }
+                    exec { commandLine binTools('strip'), '-g', library }
+                    exec { commandLine binTools('objcopy'), "--add-gnu-debuglink=$debugLibrary", library }
                 }
             }
         }
@@ -100,7 +80,7 @@ ext.checkNativeSymbols = { getSymbolFunc ->
             task.doLast {
                 def nmOutput = new ByteArrayOutputStream()
                 exec { 
-                    commandLine "${compilerPrefix}nm", library
+                    commandLine binTools('nm'), library
                     standardOutput nmOutput
                 }
                 // Remove '\r' so we can check for full string contents
