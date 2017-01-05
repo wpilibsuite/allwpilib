@@ -43,10 +43,9 @@ namespace frc {
  *   - TestPeriodic()
  *
  */
-
 class IterativeRobot : public RobotBase {
  public:
-  virtual void StartCompetition();
+  void StartCompetition() override;
 
   virtual void RobotInit();
   virtual void DisabledInit();
@@ -61,8 +60,8 @@ class IterativeRobot : public RobotBase {
   virtual void TestPeriodic();
 
  protected:
-  virtual ~IterativeRobot() = default;
   IterativeRobot() = default;
+  virtual ~IterativeRobot() = default;
 
  private:
   bool m_disabledInitialized = false;

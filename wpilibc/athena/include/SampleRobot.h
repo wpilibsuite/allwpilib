@@ -13,15 +13,18 @@ namespace frc {
 
 class SampleRobot : public RobotBase {
  public:
-  SampleRobot();
-  virtual ~SampleRobot() = default;
+  void StartCompetition() override;
+
   virtual void RobotInit();
   virtual void Disabled();
   virtual void Autonomous();
   virtual void OperatorControl();
   virtual void Test();
   virtual void RobotMain();
-  void StartCompetition();
+
+ protected:
+  SampleRobot();
+  virtual ~SampleRobot() = default;
 
  private:
   bool m_robotMainOverridden;

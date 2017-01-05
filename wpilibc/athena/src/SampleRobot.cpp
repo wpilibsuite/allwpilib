@@ -14,7 +14,64 @@
 
 using namespace frc;
 
-SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
+/**
+ * Start a competition.
+ *
+ * This code needs to track the order of the field starting to ensure that
+ * everything happens in the right order. Repeatedly run the correct method,
+ * either Autonomous or OperatorControl or Test when the robot is enabled.
+ * After running the correct method, wait for some state to change, either the
+ * other mode starts or the robot is disabled. Then go back and wait for the
+ * robot to be enabled again.
+ */
+void SampleRobot::StartCompetition() {
+  LiveWindow* lw = LiveWindow::GetInstance();
+
+  HAL_Report(HALUsageReporting::kResourceType_Framework,
+             HALUsageReporting::kFramework_Simple);
+
+  NetworkTable::GetTable("LiveWindow")
+      ->GetSubTable("~STATUS~")
+      ->PutBoolean("LW Enabled", false);
+
+  RobotInit();
+
+  // Tell the DS that the robot is ready to be enabled
+  HAL_ObserveUserProgramStarting();
+
+  RobotMain();
+
+  if (!m_robotMainOverridden) {
+    // first and one-time initialization
+    lw->SetEnabled(false);
+
+    while (true) {
+      if (IsDisabled()) {
+        m_ds.InDisabled(true);
+        Disabled();
+        m_ds.InDisabled(false);
+        while (IsDisabled()) m_ds.WaitForData();
+      } else if (IsAutonomous()) {
+        m_ds.InAutonomous(true);
+        Autonomous();
+        m_ds.InAutonomous(false);
+        while (IsAutonomous() && IsEnabled()) m_ds.WaitForData();
+      } else if (IsTest()) {
+        lw->SetEnabled(true);
+        m_ds.InTest(true);
+        Test();
+        m_ds.InTest(false);
+        while (IsTest() && IsEnabled()) m_ds.WaitForData();
+        lw->SetEnabled(false);
+      } else {
+        m_ds.InOperatorControl(true);
+        OperatorControl();
+        m_ds.InOperatorControl(false);
+        while (IsOperatorControl() && IsEnabled()) m_ds.WaitForData();
+      }
+    }
+  }
+}
 
 /**
  * Robot-wide initialization code should go here.
@@ -89,61 +146,4 @@ void SampleRobot::Test() {
  */
 void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
 
-/**
- * Start a competition.
- *
- * This code needs to track the order of the field starting to ensure that
- * everything happens in the right order. Repeatedly run the correct method,
- * either Autonomous or OperatorControl or Test when the robot is enabled.
- * After running the correct method, wait for some state to change, either the
- * other mode starts or the robot is disabled. Then go back and wait for the
- * robot to be enabled again.
- */
-void SampleRobot::StartCompetition() {
-  LiveWindow* lw = LiveWindow::GetInstance();
-
-  HAL_Report(HALUsageReporting::kResourceType_Framework,
-             HALUsageReporting::kFramework_Simple);
-
-  NetworkTable::GetTable("LiveWindow")
-      ->GetSubTable("~STATUS~")
-      ->PutBoolean("LW Enabled", false);
-
-  RobotInit();
-
-  // Tell the DS that the robot is ready to be enabled
-  HAL_ObserveUserProgramStarting();
-
-  RobotMain();
-
-  if (!m_robotMainOverridden) {
-    // first and one-time initialization
-    lw->SetEnabled(false);
-
-    while (true) {
-      if (IsDisabled()) {
-        m_ds.InDisabled(true);
-        Disabled();
-        m_ds.InDisabled(false);
-        while (IsDisabled()) m_ds.WaitForData();
-      } else if (IsAutonomous()) {
-        m_ds.InAutonomous(true);
-        Autonomous();
-        m_ds.InAutonomous(false);
-        while (IsAutonomous() && IsEnabled()) m_ds.WaitForData();
-      } else if (IsTest()) {
-        lw->SetEnabled(true);
-        m_ds.InTest(true);
-        Test();
-        m_ds.InTest(false);
-        while (IsTest() && IsEnabled()) m_ds.WaitForData();
-        lw->SetEnabled(false);
-      } else {
-        m_ds.InOperatorControl(true);
-        OperatorControl();
-        m_ds.InOperatorControl(false);
-        while (IsOperatorControl() && IsEnabled()) m_ds.WaitForData();
-      }
-    }
-  }
-}
+SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
