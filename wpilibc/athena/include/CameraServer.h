@@ -271,6 +271,7 @@ class CameraServer : public ErrorBase {
 
   std::shared_ptr<ITable> GetSourceTable(CS_Source source);
   std::vector<std::string> GetSinkStreamValues(CS_Sink sink);
+  std::vector<std::string> GetSourceStreamValues(CS_Source source);
   void UpdateStreamValues();
 
   static constexpr char const* kPublishName = "/CameraPublisher";

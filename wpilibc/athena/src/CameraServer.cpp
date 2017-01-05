@@ -92,7 +92,7 @@ std::vector<std::string> CameraServer::GetSinkStreamValues(CS_Sink sink) {
   return values;
 }
 
-static std::vector<std::string> GetSourceStreamValues(CS_Source source) {
+std::vector<std::string> CameraServer::GetSourceStreamValues(CS_Source source) {
   CS_Status status = 0;
 
   // Ignore all but HttpCamera
@@ -102,6 +102,19 @@ static std::vector<std::string> GetSourceStreamValues(CS_Source source) {
   // Generate values
   auto values = cs::GetHttpCameraUrls(source, &status);
   for (auto& value : values) value = "mjpg:" + value;
+
+  // Look to see if we have a passthrough server for this source
+  for (const auto& i : m_sinks) {
+    CS_Sink sink = i.second.GetHandle();
+    CS_Source sinkSource = cs::GetSinkSource(sink, &status);
+    if (source == sinkSource &&
+        cs::GetSinkKind(sink, &status) == CS_SINK_MJPEG) {
+      // Add USB-only passthrough
+      int port = cs::GetMjpegServerPort(sink, &status);
+      values.emplace_back(MakeStreamValue("172.22.11.2", port));
+      break;
+    }
+  }
 
   // Set table value
   return values;
@@ -116,8 +129,12 @@ void CameraServer::UpdateStreamValues() {
 
     // Get the source's subtable (if none exists, we're done)
     CS_Source source = cs::GetSinkSource(sink, &status);
+    if (source == 0) continue;
     auto table = m_tables.lookup(source);
     if (table) {
+      // Don't set stream values if this is a HttpCamera passthrough
+      if (cs::GetSourceKind(source, &status) == CS_SOURCE_HTTP) continue;
+
       // Set table value
       auto values = GetSinkStreamValues(sink);
       if (!values.empty()) table->PutStringArray("streams", values);
@@ -368,8 +385,6 @@ CameraServer::CameraServer()
           }
           case cs::VideoEvent::kSourceVideoModeChanged: {
             auto table = GetSourceTable(event.sourceHandle);
-            llvm::outs() << "Mode Changed: " << event.mode.pixelFormat << "," <<
-                event.mode.width << "," << event.mode.height << "," << event.mode.fps << "\n";
             if (table) table->PutString("mode", VideoModeToString(event.mode));
             break;
           }
@@ -525,28 +540,28 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::ArrayRef<std::string> hosts) {
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            llvm::StringRef host) {
   cs::AxisCamera camera{name, host};
-  AddCamera(camera);
+  StartAutomaticCapture(camera);
   return camera;
 }
 
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            const char* host) {
   cs::AxisCamera camera{name, host};
-  AddCamera(camera);
+  StartAutomaticCapture(camera);
   return camera;
 }
 
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            const std::string& host) {
   cs::AxisCamera camera{name, host};
-  AddCamera(camera);
+  StartAutomaticCapture(camera);
   return camera;
 }
 
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            llvm::ArrayRef<std::string> hosts) {
   cs::AxisCamera camera{name, hosts};
-  AddCamera(camera);
+  StartAutomaticCapture(camera);
   return camera;
 }
 

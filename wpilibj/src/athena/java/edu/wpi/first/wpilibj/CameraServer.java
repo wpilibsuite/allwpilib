@@ -128,8 +128,8 @@ public class CameraServer {
     return values.toArray(new String[0]);
   }
 
-  @SuppressWarnings("JavadocMethod")
-  private static String[] getSourceStreamValues(int source) {
+  @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
+  private synchronized String[] getSourceStreamValues(int source) {
     // Ignore all but HttpCamera
     if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
             != VideoSource.Kind.kHttp) {
@@ -140,6 +140,23 @@ public class CameraServer {
     String[] values = CameraServerJNI.getHttpCameraUrls(source);
     for (int j = 0; j < values.length; j++) {
       values[j] = "mjpg:" + values[j];
+    }
+
+    // Look to see if we have a passthrough server for this source
+    for (VideoSink i : m_sinks.values()) {
+      int sink = i.getHandle();
+      int sinkSource = CameraServerJNI.getSinkSource(sink);
+      if (source == sinkSource
+          && VideoSink.getKindFromInt(CameraServerJNI.getSinkKind(sink)) == VideoSink.Kind.kMjpeg) {
+        // Add USB-only passthrough
+        String[] finalValues = new String[values.length + 1];
+        for (int j = 0; j < values.length; j++) {
+          finalValues[j] = values[j];
+        }
+        int port = CameraServerJNI.getMjpegServerPort(sink);
+        finalValues[values.length] = makeStreamValue("172.22.11.2", port);
+        return finalValues;
+      }
     }
 
     return values;
@@ -153,8 +170,17 @@ public class CameraServer {
 
       // Get the source's subtable (if none exists, we're done)
       int source = CameraServerJNI.getSinkSource(sink);
+      if (source == 0) {
+        continue;
+      }
       ITable table = m_tables.get(source);
       if (table != null) {
+        // Don't set stream values if this is a HttpCamera passthrough
+        if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
+            == VideoSource.Kind.kHttp) {
+          continue;
+        }
+
         // Set table value
         String[] values = getSinkStreamValues(sink);
         if (values.length > 0) {
@@ -576,7 +602,8 @@ public class CameraServer {
    */
   public AxisCamera addAxisCamera(String name, String host) {
     AxisCamera camera = new AxisCamera(name, host);
-    addCamera(camera);
+    // Create a passthrough MJPEG server for USB access
+    startAutomaticCapture(camera);
     return camera;
   }
 
@@ -588,7 +615,8 @@ public class CameraServer {
    */
   public AxisCamera addAxisCamera(String name, String[] hosts) {
     AxisCamera camera = new AxisCamera(name, hosts);
-    addCamera(camera);
+    // Create a passthrough MJPEG server for USB access
+    startAutomaticCapture(camera);
     return camera;
   }
 
