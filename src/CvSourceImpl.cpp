@@ -232,7 +232,7 @@ CS_Source CreateCvSource(llvm::StringRef name, const VideoMode& mode,
   source->Start();  // causes a property event
   notifier.NotifySource(name, handle, CS_SOURCE_CONNECTED);
   notifier.NotifySource(name, handle, CS_SOURCE_VIDEOMODES_UPDATED);
-  notifier.NotifySource(name, handle, CS_SOURCE_VIDEOMODE_CHANGED);
+  notifier.NotifySourceVideoMode(*source, mode);
   return handle;
 }
 

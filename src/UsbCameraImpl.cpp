@@ -628,8 +628,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
       DeviceConnect();
     }
     if (wasStreaming) DeviceStreamOn();
-    Notifier::GetInstance().NotifySource(*this,
-                                         CS_SOURCE_VIDEOMODE_CHANGED);
+    Notifier::GetInstance().NotifySourceVideoMode(*this, newMode);
     lock.lock();
   } else if (newMode.fps != m_mode.fps) {
     m_mode = newMode;
@@ -639,8 +638,7 @@ CS_StatusValue UsbCameraImpl::DeviceCmdSetMode(
     if (wasStreaming) DeviceStreamOff();
     DeviceSetFPS();
     if (wasStreaming) DeviceStreamOn();
-    Notifier::GetInstance().NotifySource(*this,
-                                         CS_SOURCE_VIDEOMODE_CHANGED);
+    Notifier::GetInstance().NotifySourceVideoMode(*this, newMode);
     lock.lock();
   }
 
@@ -873,7 +871,7 @@ void UsbCameraImpl::DeviceCacheMode() {
   if (formatChanged) DeviceSetMode();
   if (fpsChanged) DeviceSetFPS();
 
-  Notifier::GetInstance().NotifySource(*this, CS_SOURCE_VIDEOMODE_CHANGED);
+  Notifier::GetInstance().NotifySourceVideoMode(*this, m_mode);
 }
 
 void UsbCameraImpl::DeviceCacheProperty(
