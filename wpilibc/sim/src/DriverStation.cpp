@@ -230,7 +230,6 @@ bool DriverStation::IsTest() const {
 
 /**
  * Is the driver station attached to a Field Management System?
- * Note: This does not work with the Blue DS.
  * @return True if the robot is competing on a field being controlled by a Field
  *         Management System
  */
