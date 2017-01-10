@@ -199,7 +199,7 @@ HttpLocation::HttpLocation(llvm::StringRef url_, bool* error,
   // scheme:
   llvm::StringRef scheme;
   std::tie(scheme, query) = query.split(':');
-  if (scheme != "http") {
+  if (!scheme.equals_lower("http")) {
     ERROR(cameraName << ": only supports http URLs, got \"" << url << "\"");
     *error = true;
     return;
