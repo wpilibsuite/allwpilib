@@ -34,11 +34,11 @@ public class CameraServerJNI {
             resname = "/" + osname + "/" + System.getProperty("os.arch") + "/";
           System.out.println("platform: " + resname);
           if (osname.startsWith("Windows"))
-            resname += "cameraserver.dll";
+            resname += "cscore.dll";
           else if (osname.startsWith("Mac"))
-            resname += "libcameraserver.dylib";
+            resname += "libcscore.dylib";
           else
-            resname += "libcameraserver.so";
+            resname += "libcscore.so";
           InputStream is = CameraServerJNI.class.getResourceAsStream(resname);
           if (is != null) {
             // create temporary file
