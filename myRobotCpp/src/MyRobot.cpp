@@ -45,4 +45,4 @@ class MyRobot : public IterativeRobot {
   void RobotPeriodic() override {}
 };
 
-START_ROBOT_CLASS(MyRobot)
+START_ROBOT_CLASS(MyRobot);
