@@ -546,9 +546,9 @@ public class DriverStation implements RobotState.Interface {
     return m_newControlData.getAndSet(false);
   }
 
+  @SuppressWarnings({"SummaryJavadoc", "JavadocMethod"})
   /**
-   * Is the driver station attached to a Field Management System? Note: This does not work with the
-   * Blue DS.
+   * Is the driver station attached to a Field Management System?
    *
    * @return True if the robot is competing on a field being controlled by a Field Management System
    */
