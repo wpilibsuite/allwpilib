@@ -55,8 +55,7 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
 
   auto handle =
       solenoidHandles.Allocate(module * kNumSolenoidChannels + channel, status);
-  if (handle == HAL_kInvalidHandle) {  // out of resources
-    *status = NO_AVAILABLE_RESOURCES;
+  if (*status != 0) {
     return HAL_kInvalidHandle;
   }
   auto solenoidPort = solenoidHandles.Get(handle);
