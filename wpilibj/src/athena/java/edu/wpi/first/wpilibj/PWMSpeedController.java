@@ -34,7 +34,7 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
   @Override
   public void set(double speed) {
     setSpeed(m_isInverted ? -speed : speed);
-    Feed();
+    feed();
   }
 
   /**
