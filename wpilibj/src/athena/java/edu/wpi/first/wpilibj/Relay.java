@@ -86,7 +86,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
   private void initRelay() {
     SensorBase.checkRelayChannel(m_channel);
 
-    int portHandle = RelayJNI.getPort((byte)m_channel);
+    int portHandle = RelayJNI.getPort((byte) m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
       m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);
       HAL.report(tResourceType.kResourceType_Relay, m_channel);
@@ -105,12 +105,12 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
   /**
    * Relay constructor given a channel.
    *
-   * @param channel   The channel number for this relay (0 - 3).
+   * @param channel The channel number for this relay (0 - 3).
    * @param direction The direction that the Relay object will control.
    */
   public Relay(final int channel, Direction direction) {
     m_channel = channel;
-    m_direction = requireNonNull( direction, "Null Direction was given");
+    m_direction = requireNonNull(direction, "Null Direction was given");
     initRelay();
     set(Value.kOff);
   }
@@ -345,19 +345,16 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
 
   @Override
   public void startLiveWindowMode() {
-    m_tableListener = new ITableListener() {
-      @Override
-      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-        String val = ((String) value);
-        if (val.equals("Off")) {
-          set(Value.kOff);
-        } else if (val.equals("On")) {
-          set(Value.kOn);
-        } else if (val.equals("Forward")) {
-          set(Value.kForward);
-        } else if (val.equals("Reverse")) {
-          set(Value.kReverse);
-        }
+    m_tableListener = (source, key, value, isNew) -> {
+      String val = ((String) value);
+      if (val.equals("Off")) {
+        set(Value.kOff);
+      } else if (val.equals("On")) {
+        set(Value.kOn);
+      } else if (val.equals("Forward")) {
+        set(Value.kForward);
+      } else if (val.equals("Reverse")) {
+        set(Value.kReverse);
       }
     };
     m_table.addTableListener("Value", m_tableListener, true);

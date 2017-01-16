@@ -292,11 +292,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   @Override
   public void startLiveWindowMode() {
     setSpeed(0); // Stop for safety
-    m_tableListener = new ITableListener() {
-      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-        setSpeed((Double) value);
-      }
-    };
+    m_tableListener = (source, key, value, isNew) -> setSpeed((double) value);
     m_table.addTableListener("Value", m_tableListener, true);
   }
 

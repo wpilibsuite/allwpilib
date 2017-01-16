@@ -128,7 +128,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   @Override
   public void startLiveWindowMode() {
     set(false); // Stop for safety
-    m_tableListener = (source, key, value, isNew) -> set((Boolean) value);
+    m_tableListener = (source, key, value, isNew) -> set((boolean) value);
     m_table.addTableListener("Value", m_tableListener, true);
   }
 
