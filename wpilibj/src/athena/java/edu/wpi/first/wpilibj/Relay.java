@@ -15,6 +15,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -49,7 +52,24 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * The state to drive a Relay to.
    */
   public enum Value {
-    kOff, kOn, kForward, kReverse
+    kOff("Off"),
+    kOn("On"),
+    kForward("Forward"),
+    kReverse("Reverse");
+
+    private final String m_prettyValue;
+
+    Value(String prettyValue) {
+      m_prettyValue = prettyValue;
+    }
+
+    public String getPrettyValue() {
+      return m_prettyValue;
+    }
+
+    public static Optional<Value> getValueOf(String value) {
+      return Arrays.stream(Value.values()).filter(v -> v.m_prettyValue.equals(value)).findFirst();
+    }
   }
 
   /**
@@ -331,32 +351,14 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
   @Override
   public void updateTable() {
     if (m_table != null) {
-      if (get() == Value.kOn) {
-        m_table.putString("Value", "On");
-      } else if (get() == Value.kForward) {
-        m_table.putString("Value", "Forward");
-      } else if (get() == Value.kReverse) {
-        m_table.putString("Value", "Reverse");
-      } else {
-        m_table.putString("Value", "Off");
-      }
+      m_table.putString("Value", get().getPrettyValue());
     }
   }
 
   @Override
   public void startLiveWindowMode() {
-    m_tableListener = (source, key, value, isNew) -> {
-      String val = ((String) value);
-      if (val.equals("Off")) {
-        set(Value.kOff);
-      } else if (val.equals("On")) {
-        set(Value.kOn);
-      } else if (val.equals("Forward")) {
-        set(Value.kForward);
-      } else if (val.equals("Reverse")) {
-        set(Value.kReverse);
-      }
-    };
+    m_tableListener =
+        (source, key, value, isNew) -> set(Value.getValueOf((String) value).orElse(Value.kOff));
     m_table.addTableListener("Value", m_tableListener, true);
   }
 
