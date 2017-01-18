@@ -49,7 +49,7 @@ public class CameraServer {
   /**
    * Get the CameraServer instance.
    */
-  public static CameraServer getInstance() {
+  public static synchronized CameraServer getInstance() {
     if (server == null) {
       server = new CameraServer();
     }
@@ -57,12 +57,12 @@ public class CameraServer {
   }
 
   private String m_primarySourceName;
-  private HashMap<String, VideoSource> m_sources;
-  private HashMap<String, VideoSink> m_sinks;
-  private HashMap<Integer, ITable> m_tables;  // indexed by source handle
-  private ITable m_publishTable;
-  private VideoListener m_videoListener; //NOPMD
-  private int m_tableListener; //NOPMD
+  private final HashMap<String, VideoSource> m_sources;
+  private final HashMap<String, VideoSink> m_sinks;
+  private final HashMap<Integer, ITable> m_tables;  // indexed by source handle
+  private final ITable m_publishTable;
+  private final VideoListener m_videoListener; //NOPMD
+  private final int m_tableListener; //NOPMD
   private int m_nextPort;
   private String[] m_addresses;
 
@@ -94,8 +94,10 @@ public class CameraServer {
   }
 
   @SuppressWarnings("JavadocMethod")
-  private synchronized ITable getSourceTable(int source) {
-    return m_tables.get(source);
+  private ITable getSourceTable(int source) {
+    synchronized (m_tables) {
+      return m_tables.get(source);
+    }
   }
 
   @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
@@ -173,7 +175,7 @@ public class CameraServer {
       if (source == 0) {
         continue;
       }
-      ITable table = m_tables.get(source);
+      ITable table = getSourceTable(source);
       if (table != null) {
         // Don't set stream values if this is a HttpCamera passthrough
         if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
@@ -194,7 +196,7 @@ public class CameraServer {
       int source = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
-      ITable table = m_tables.get(source);
+      ITable table = getSourceTable(source);
       if (table != null) {
         // Set table value
         String[] values = getSourceStreamValues(source);
@@ -290,8 +292,8 @@ public class CameraServer {
     String name;
     String infoName;
     if (event.name.startsWith("raw_")) {
-      name = "RawProperty/" + event.name.substring(4);
-      infoName = "RawPropertyInfo/" + event.name.substring(4);
+      name = "RawProperty/" + event.name;
+      infoName = "RawPropertyInfo/" + event.name;
     } else {
       name = "Property/" + event.name;
       infoName = "PropertyInfo/" + event.name;
@@ -359,7 +361,7 @@ public class CameraServer {
         case kSourceCreated: {
           // Create subtable for the camera
           ITable table = m_publishTable.getSubTable(event.name);
-          synchronized (this) {
+          synchronized (m_tables) {
             m_tables.put(event.sourceHandle, table);
           }
           table.putString("source", makeSourceValue(event.sourceHandle));
@@ -450,8 +452,11 @@ public class CameraServer {
     }, 0x4fff, true);
 
     // Listener for NetworkTable events
+    // We don't currently support changing settings via NT due to
+    // synchronization issues, so just update to current setting if someone
+    // else tries to change it.
     m_tableListener = NetworkTablesJNI.addEntryListener(kPublishName + "/",
-      (uid, key, value, flags) -> {
+      (uid, key, eventValue, flags) -> {
         String relativeKey = key.substring(kPublishName.length() + 1);
 
         // get source (sourceName/...)
@@ -471,16 +476,13 @@ public class CameraServer {
         // handle standard names
         String propName;
         if (relativeKey.equals("mode")) {
-          VideoMode mode = videoModeFromString((String) value);
-          if (mode.pixelFormat == PixelFormat.kUnknown || !source.setVideoMode(mode)) {
-            // reset to current mode
-            NetworkTablesJNI.putString(key, videoModeToString(source.getVideoMode()));
-          }
+          // reset to current mode
+          NetworkTablesJNI.putString(key, videoModeToString(source.getVideoMode()));
           return;
         } else if (relativeKey.startsWith("Property/")) {
           propName = relativeKey.substring(9);
         } else if (relativeKey.startsWith("RawProperty/")) {
-          propName = "raw_" + relativeKey.substring(12);
+          propName = relativeKey.substring(12);
         } else {
           return;  // ignore
         }
@@ -491,14 +493,17 @@ public class CameraServer {
           case kNone:
             return;
           case kBoolean:
-            property.set(((Boolean) value).booleanValue() ? 1 : 0);
+            // reset to current setting
+            NetworkTablesJNI.putBoolean(key, property.get() != 0);
             return;
           case kInteger:
           case kEnum:
-            property.set(((Double) value).intValue());
+            // reset to current setting
+            NetworkTablesJNI.putDouble(key, property.get());
             return;
           case kString:
-            property.setString((String) value);
+            // reset to current setting
+            NetworkTablesJNI.putString(key, property.getString());
             return;
           default:
             return;

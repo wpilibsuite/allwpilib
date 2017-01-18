@@ -171,7 +171,7 @@ static std::string PixelFormatToString(int pixelFormat) {
       return "Unknown";
   }
 }
-
+#if 0
 static cs::VideoMode::PixelFormat PixelFormatFromString(llvm::StringRef str) {
   if (str == "MJPEG" || str == "mjpeg" || str == "JPEG" || str == "jpeg")
     return cs::VideoMode::PixelFormat::kMJPEG;
@@ -228,7 +228,7 @@ static cs::VideoMode VideoModeFromString(llvm::StringRef modeStr) {
 
   return mode;
 }
-
+#endif
 static std::string VideoModeToString(const cs::VideoMode& mode) {
   std::string rv;
   llvm::raw_string_ostream oss{rv};
@@ -261,9 +261,9 @@ static void PutSourcePropertyValue(ITable* table, const cs::VideoEvent& event,
   llvm::SmallString<64> infoName;
   if (llvm::StringRef{event.name}.startswith("raw_")) {
     name = "RawProperty/";
-    name += llvm::StringRef{event.name}.substr(4);
+    name += event.name;
     infoName = "RawPropertyInfo/";
-    infoName += llvm::StringRef{event.name}.substr(4);
+    infoName += event.name;
   } else {
     name = "Property/";
     name += event.name;
@@ -427,6 +427,9 @@ CameraServer::CameraServer()
       0x4fff, true};
 
   // Listener for NetworkTable events
+  // We don't currently support changing settings via NT due to
+  // synchronization issues, so just update to current setting if someone
+  // else tries to change it.
   llvm::SmallString<64> buf;
   m_tableListener = nt::AddEntryListener(
       Concatenate(kPublishName, "/", buf),
@@ -446,24 +449,16 @@ CameraServer::CameraServer()
         relativeKey = relativeKey.substr(subKeyIndex + 1);
 
         // handle standard names
-        llvm::SmallString<64> propNameBuf;
         llvm::StringRef propName;
         if (relativeKey == "mode") {
-          if (!value->IsString()) return;
-          auto mode = VideoModeFromString(value->GetString());
-          if (mode.pixelFormat == cs::VideoMode::PixelFormat::kUnknown ||
-              !sourceIt->second.SetVideoMode(mode)) {
-            // reset to current mode
-            nt::SetEntryValue(key, nt::Value::MakeString(VideoModeToString(
-                                       sourceIt->second.GetVideoMode())));
-          }
+          // reset to current mode
+          nt::SetEntryValue(key, nt::Value::MakeString(VideoModeToString(
+                                     sourceIt->second.GetVideoMode())));
           return;
         } else if (relativeKey.startswith("Property/")) {
           propName = relativeKey.substr(9);
         } else if (relativeKey.startswith("RawProperty/")) {
-          propNameBuf = "raw_";
-          propNameBuf += relativeKey.substr(12);
-          propName = propNameBuf.str();
+          propName = relativeKey.substr(12);
         } else {
           return;  // ignore
         }
@@ -474,17 +469,14 @@ CameraServer::CameraServer()
           case cs::VideoProperty::kNone:
             return;
           case cs::VideoProperty::kBoolean:
-            if (!value->IsBoolean()) return;
-            property.Set(value->GetBoolean() ? 1 : 0);
+            nt::SetEntryValue(key, nt::Value::MakeBoolean(property.Get() != 0));
             return;
           case cs::VideoProperty::kInteger:
           case cs::VideoProperty::kEnum:
-            if (!value->IsDouble()) return;
-            property.Set(static_cast<int>(value->GetDouble()));
+            nt::SetEntryValue(key, nt::Value::MakeDouble(property.Get()));
             return;
           case cs::VideoProperty::kString:
-            if (!value->IsString()) return;
-            property.SetString(value->GetString());
+            nt::SetEntryValue(key, nt::Value::MakeString(property.GetString()));
             return;
           default:
             return;
