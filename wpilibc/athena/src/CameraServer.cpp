@@ -494,7 +494,7 @@ CameraServer::CameraServer()
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
-  return StartAutomaticCapture(0);
+  return StartAutomaticCapture(m_defaultUsbDevice++);
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
@@ -665,6 +665,33 @@ void CameraServer::AddServer(const cs::VideoSink& server) {
 void CameraServer::RemoveServer(llvm::StringRef name) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_sinks.erase(name);
+}
+
+cs::VideoSink CameraServer::GetServer() {
+  llvm::SmallString<64> name;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    if (m_primarySourceName.empty()) {
+      wpi_setWPIErrorWithContext(CameraServerError, "no camera available");
+      return cs::VideoSink{};
+    }
+    name = "serve_";
+    name += m_primarySourceName;
+  }
+  return GetServer(name);
+}
+
+cs::VideoSink CameraServer::GetServer(llvm::StringRef name) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  auto it = m_sinks.find(name);
+  if (it == m_sinks.end()) {
+    llvm::SmallString<64> buf;
+    llvm::raw_svector_ostream err{buf};
+    err << "could not find server " << name;
+    wpi_setWPIErrorWithContext(CameraServerError, err.str());
+    return cs::VideoSink{};
+  }
+  return it->second;
 }
 
 void CameraServer::AddCamera(const cs::VideoSource& camera) {

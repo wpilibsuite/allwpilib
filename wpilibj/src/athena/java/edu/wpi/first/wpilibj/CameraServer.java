@@ -24,6 +24,7 @@ import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.tables.ITable;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -56,6 +57,7 @@ public class CameraServer {
     return server;
   }
 
+  private AtomicInteger m_defaultUsbDevice;
   private String m_primarySourceName;
   private HashMap<String, VideoSource> m_sources;
   private HashMap<String, VideoSink> m_sinks;
@@ -335,6 +337,7 @@ public class CameraServer {
 
   @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable"})
   private CameraServer() {
+    m_defaultUsbDevice = new AtomicInteger();
     m_sources = new HashMap<String, VideoSource>();
     m_sinks = new HashMap<String, VideoSink>();
     m_tables = new HashMap<Integer, ITable>();
@@ -513,11 +516,13 @@ public class CameraServer {
    * If you also want to perform vision processing on the roboRIO, use
    * getVideo() to get access to the camera images.
    *
-   * <p>This overload calls {@link #startAutomaticCapture(int)} with device 0,
-   * creating a camera named "USB Camera 0".
+   * <p>The first time this overload is called, it calls
+   * {@link #startAutomaticCapture(int)} with device 0, creating a camera
+   * named "USB Camera 0".  Subsequent calls increment the device number
+   * (e.g. 1, 2, etc).
    */
   public UsbCamera startAutomaticCapture() {
-    return startAutomaticCapture(0);
+    return startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
   }
 
   /**
@@ -742,6 +747,32 @@ public class CameraServer {
   public void removeServer(String name) {
     synchronized (this) {
       m_sinks.remove(name);
+    }
+  }
+
+  /**
+   * Get server for the primary camera feed.
+   *
+   * <p>This is only valid to call after a camera feed has been added
+   * with startAutomaticCapture() or addServer().
+   */
+  public VideoSink getServer() {
+    synchronized (this) {
+      if (m_primarySourceName == null) {
+        throw new VideoException("no camera available");
+      }
+      return getServer("serve_" + m_primarySourceName);
+    }
+  }
+
+  /**
+   * Gets a server by name.
+   *
+   * @param name Server name
+   */
+  public VideoSink getServer(String name) {
+    synchronized (this) {
+      return m_sinks.get(name);
     }
   }
 
