@@ -31,11 +31,34 @@ using namespace cs;
 #define BOUNDARY "boundarydonotcross"
 
 // A bare-bones HTML webpage for user friendliness.
-static const char* rootPage =
-    "<html><head><title>CameraServer</title><body>"
+static const char* emptyRootPage =
+    "<html><head><title>CameraServer</title></head><body>"
     "<img src=\"/stream.mjpg\" /><p />"
     "<a href=\"/settings.json\">Settings JSON</a>"
     "</body></html>";
+
+// An HTML page to be sent when a source exists
+static const char* startRootPage = "<html><head>\n"
+    "<script>\n"
+    "function httpGetAsync(name, val)\n"
+    "{\n"
+    "    var host = location.protocol + '//' + location.host + '/?action=command&' + name + '=' + val;\n"
+    "    var xmlHttp = new XMLHttpRequest();\n"
+    "    xmlHttp.open(\"GET\", host, true);\n"
+    "    xmlHttp.send(null);\n"
+    "}\n"
+    "function updateInt(prop, name, val) {\n"
+    "    document.querySelector(prop).value = val;\n"
+    "    httpGetAsync(name, val);\n"
+    "}\n"
+    "function update(name, val) {\n"
+    "    httpGetAsync(name, val);\n"
+    "}\n"
+    "</script>\n"
+    "<title>CameraServer</title></head><body>\n"
+    "<img src=\"/stream.mjpg\" /><p />\n"
+    "<a href=\"/settings.json\">Settings JSON</a>\n";
+static const char* endRootPage ="</body></html>";
 
 class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  public:
@@ -46,6 +69,7 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   bool ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
                       llvm::StringRef parameters, bool respond);
   void SendJSON(llvm::raw_ostream& os, SourceImpl& source, bool header);
+  void SendHTML(llvm::raw_ostream& os, SourceImpl& source, bool header);
   void SendStream(wpi::raw_socket_ostream& os);
   void ProcessRequest();
 
@@ -287,6 +311,83 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
   }
 
   return true;
+}
+
+// Send the root html file with controls for all the settable properties.
+void MjpegServerImpl::ConnThread::SendHTML(llvm::raw_ostream& os,
+                                           SourceImpl& source, bool header) {
+  if (header) SendHeader(os, 200, "OK", "application/x-javascript");
+
+  os << startRootPage;
+  llvm::SmallVector<int, 32> properties_vec;
+  CS_Status status = 0;
+  for (auto prop : source.EnumerateProperties(properties_vec, &status)) {
+    llvm::SmallString<128> name_buf;
+    auto name = source.GetPropertyName(prop, name_buf, &status);
+    if (name.startswith("raw_")) continue;
+    auto kind = source.GetPropertyKind(prop);
+    os << "<p />"
+       << "<label for=\"" << name << "\">" << name << "</label>\n";
+    switch (kind) {
+      case CS_PROP_BOOLEAN:
+        os << "<input id=\"" << name
+           << "\" type=\"checkbox\" onclick=\"update('" << name
+           << "', this.checked ? 1 : 0)\" ";
+        if (source.GetProperty(prop, &status) != 0)
+          os << "checked />\n";
+        else
+          os << " />\n";
+        break;
+      case CS_PROP_INTEGER: {
+        auto valI = source.GetProperty(prop, &status);
+        auto min = source.GetPropertyMin(prop, &status);
+        auto max = source.GetPropertyMax(prop, &status);
+        auto step = source.GetPropertyStep(prop, &status);
+        os << "<input type=\"range\" min=\"" << min << "\" max=\"" << max
+           << "\" value=\"" << valI << "\" id=\"" << name << "\" step=\""
+           << step << "\" oninput=\"updateInt('#" << name << "op', '" << name
+           << "', value)\" />\n";
+        os << "<output for=\"" << name << "\" id=\"" << name << "op\">" << valI
+           << "</output>\n";
+        break;
+      }
+      case CS_PROP_ENUM: {
+        auto valE = source.GetProperty(prop, &status);
+        auto choices = source.GetEnumPropertyChoices(prop, &status);
+        int j = 0;
+        for (auto choice = choices.begin(), end = choices.end(); choice != end;
+             ++j, ++choice) {
+          if (choice->empty()) continue;  // skip empty choices
+          // replace any non-printable characters in name with spaces
+          llvm::SmallString<128> ch_name;
+          for (char ch : *choice) ch_name.push_back(isprint(ch) ? ch : ' ');
+          os << "<input id=\"" << name << j << "\" type=\"radio\" name=\""
+             << name << "\" value=\"" << ch_name << "\" onclick=\"update('"
+             << name << "', " << j << ")\"";
+          if (j == valE) {
+            os << " checked";
+          }
+          os << " /><label for=\"" << name << j << "\">" << ch_name
+             << "</label>\n";
+        }
+        break;
+      }
+      case CS_PROP_STRING: {
+        llvm::SmallString<128> strval_buf;
+        os << "<input type=\"text\" id=\"" << name << "box\" name=\"" << name
+           << "\" value=\""
+           << source.GetStringProperty(prop, strval_buf, &status) << "\" />\n";
+        os << "<input type=\"button\" value =\"Submit\" onclick=\"update('"
+           << name << "', " << name << "box.value)\" />\n";
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  os << endRootPage << "\r\n";
+  os.flush();
 }
 
 // Send a JSON file which is contains information about the source parameters.
@@ -587,7 +688,11 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
     case kRootPage:
       SDEBUG("request for root page");
       SendHeader(os, 200, "OK", "text/html");
-      os << rootPage << "\r\n";
+      if (auto source = GetSource()) {
+        SendHTML(os, *source, false);
+      } else {
+        os << emptyRootPage << "\r\n";
+      }
       break;
   }
 
