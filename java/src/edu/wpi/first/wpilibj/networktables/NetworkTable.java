@@ -1007,7 +1007,7 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * Set the periodic update rate.
    *
-   * @param interval update interval in seconds (range 0.1 to 1.0)
+   * @param interval update interval in seconds (range 0.01 to 1.0)
    */
   public static void setUpdateRate(double interval) {
     NetworkTablesJNI.setUpdateRate(interval);

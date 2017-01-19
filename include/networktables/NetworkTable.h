@@ -123,7 +123,7 @@ class NetworkTable : public ITable {
   /**
    * Set the periodic update rate.
    *
-   * @param interval update interval in seconds (range 0.1 to 1.0)
+   * @param interval update interval in seconds (range 0.01 to 1.0)
    */
   static void SetUpdateRate(double interval);
 
