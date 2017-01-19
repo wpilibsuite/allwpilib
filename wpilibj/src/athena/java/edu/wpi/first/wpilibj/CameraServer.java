@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.tables.ITable;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,9 +57,9 @@ public class CameraServer {
   }
 
   private String m_primarySourceName;
-  private final HashMap<String, VideoSource> m_sources;
-  private final HashMap<String, VideoSink> m_sinks;
-  private final HashMap<Integer, ITable> m_tables;  // indexed by source handle
+  private final Hashtable<String, VideoSource> m_sources;
+  private final Hashtable<String, VideoSink> m_sinks;
+  private final Hashtable<Integer, ITable> m_tables;  // indexed by source handle
   private final ITable m_publishTable;
   private final VideoListener m_videoListener; //NOPMD
   private final int m_tableListener; //NOPMD
@@ -91,13 +91,6 @@ public class CameraServer {
   @SuppressWarnings("JavadocMethod")
   private static String makeStreamValue(String address, int port) {
     return "mjpg:http://" + address + ":" + port + "/?action=stream";
-  }
-
-  @SuppressWarnings("JavadocMethod")
-  private ITable getSourceTable(int source) {
-    synchronized (m_tables) {
-      return m_tables.get(source);
-    }
   }
 
   @SuppressWarnings({"JavadocMethod", "PMD.AvoidUsingHardCodedIP"})
@@ -175,7 +168,7 @@ public class CameraServer {
       if (source == 0) {
         continue;
       }
-      ITable table = getSourceTable(source);
+      ITable table = m_tables.get(source);
       if (table != null) {
         // Don't set stream values if this is a HttpCamera passthrough
         if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
@@ -196,7 +189,7 @@ public class CameraServer {
       int source = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
-      ITable table = getSourceTable(source);
+      ITable table = m_tables.get(source);
       if (table != null) {
         // Set table value
         String[] values = getSourceStreamValues(source);
@@ -337,9 +330,9 @@ public class CameraServer {
 
   @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable"})
   private CameraServer() {
-    m_sources = new HashMap<String, VideoSource>();
-    m_sinks = new HashMap<String, VideoSink>();
-    m_tables = new HashMap<Integer, ITable>();
+    m_sources = new Hashtable<String, VideoSource>();
+    m_sinks = new Hashtable<String, VideoSink>();
+    m_tables = new Hashtable<Integer, ITable>();
     m_publishTable = NetworkTable.getTable(kPublishName);
     m_nextPort = kBasePort;
     m_addresses = new String[0];
@@ -361,9 +354,7 @@ public class CameraServer {
         case kSourceCreated: {
           // Create subtable for the camera
           ITable table = m_publishTable.getSubTable(event.name);
-          synchronized (m_tables) {
-            m_tables.put(event.sourceHandle, table);
-          }
+          m_tables.put(event.sourceHandle, table);
           table.putString("source", makeSourceValue(event.sourceHandle));
           table.putString("description",
               CameraServerJNI.getSourceDescription(event.sourceHandle));
@@ -375,7 +366,7 @@ public class CameraServer {
           break;
         }
         case kSourceDestroyed: {
-          ITable table = getSourceTable(event.sourceHandle);
+          ITable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             table.putString("source", "");
             table.putStringArray("streams", new String[0]);
@@ -384,7 +375,7 @@ public class CameraServer {
           break;
         }
         case kSourceConnected: {
-          ITable table = getSourceTable(event.sourceHandle);
+          ITable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             // update the description too (as it may have changed)
             table.putString("description",
@@ -394,42 +385,42 @@ public class CameraServer {
           break;
         }
         case kSourceDisconnected: {
-          ITable table = getSourceTable(event.sourceHandle);
+          ITable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             table.putBoolean("connected", false);
           }
           break;
         }
         case kSourceVideoModesUpdated: {
-          ITable table = getSourceTable(event.sourceHandle);
+          ITable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             table.putStringArray("modes", getSourceModeValues(event.sourceHandle));
           }
           break;
         }
         case kSourceVideoModeChanged: {
-          ITable table = getSourceTable(event.sourceHandle);
+          ITable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             table.putString("mode", videoModeToString(event.mode));
           }
           break;
         }
         case kSourcePropertyCreated: {
-          ITable table = getSourceTable(event.sourceHandle);
+          ITable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             putSourcePropertyValue(table, event, true);
           }
           break;
         }
         case kSourcePropertyValueUpdated: {
-          ITable table = getSourceTable(event.sourceHandle);
+          ITable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             putSourcePropertyValue(table, event, false);
           }
           break;
         }
         case kSourcePropertyChoicesUpdated: {
-          ITable table = getSourceTable(event.sourceHandle);
+          ITable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             String[] choices = CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
             table.putStringArray("PropertyInfo/" + event.name + "/choices", choices);
