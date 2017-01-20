@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -44,8 +45,10 @@ class CameraServer : public ErrorBase {
    * If you also want to perform vision processing on the roboRIO, use
    * getVideo() to get access to the camera images.
    *
-   * This overload calls {@link #StartAutomaticCapture(int)} with device 0,
-   * creating a camera named "USB Camera 0".
+   * The first time this overload is called, it calls
+   * {@link #StartAutomaticCapture(int)} with device 0, creating a camera
+   * named "USB Camera 0".  Subsequent calls increment the device number
+   * (e.g. 1, 2, etc).
    */
   cs::UsbCamera StartAutomaticCapture();
 
@@ -242,6 +245,21 @@ class CameraServer : public ErrorBase {
   void RemoveServer(llvm::StringRef name);
 
   /**
+   * Get server for the primary camera feed.
+   *
+   * <p>This is only valid to call after a camera feed has been added
+   * with StartAutomaticCapture() or AddServer().
+   */
+  cs::VideoSink GetServer();
+
+  /**
+   * Gets a server by name.
+   *
+   * @param name Server name
+   */
+  cs::VideoSink GetServer(llvm::StringRef name);
+
+  /**
    * Adds an already created camera.
    *
    * @param camera Camera
@@ -277,6 +295,7 @@ class CameraServer : public ErrorBase {
   static constexpr char const* kPublishName = "/CameraPublisher";
 
   std::mutex m_mutex;
+  std::atomic<int> m_defaultUsbDevice;
   std::string m_primarySourceName;
   llvm::StringMap<cs::VideoSource> m_sources;
   llvm::StringMap<cs::VideoSink> m_sinks;
