@@ -360,9 +360,13 @@ public class CameraServer {
               CameraServerJNI.getSourceDescription(event.sourceHandle));
           table.putBoolean("connected", CameraServerJNI.isSourceConnected(event.sourceHandle));
           table.putStringArray("streams", getSourceStreamValues(event.sourceHandle));
-          VideoMode mode = CameraServerJNI.getSourceVideoMode(event.sourceHandle);
-          table.setDefaultString("mode", videoModeToString(mode));
-          table.putStringArray("modes", getSourceModeValues(event.sourceHandle));
+          try {
+            VideoMode mode = CameraServerJNI.getSourceVideoMode(event.sourceHandle);
+            table.setDefaultString("mode", videoModeToString(mode));
+            table.putStringArray("modes", getSourceModeValues(event.sourceHandle));
+          } catch (VideoException ex) {
+            // Do nothing. Let the other event handlers update this if there is an error.
+          }
           break;
         }
         case kSourceDestroyed: {
