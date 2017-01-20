@@ -75,6 +75,9 @@ inline VideoProperty::VideoProperty(CS_Property handle) : m_handle(handle) {
         static_cast<Kind>(static_cast<int>(GetPropertyKind(handle, &m_status)));
 }
 
+inline VideoProperty::VideoProperty(CS_Property handle, Kind kind)
+  : m_handle(handle), m_kind(kind) {}
+
 inline VideoSource::VideoSource(const VideoSource& source)
     : m_handle(source.m_handle == 0 ? 0
                                     : CopySource(source.m_handle, &m_status)) {}
