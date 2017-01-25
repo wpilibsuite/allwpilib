@@ -22,7 +22,13 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  *
  * <p>Alternatively you can override the robotMain() method and manage all aspects of the robot
  * yourself.
+ *
+ * @deprecated WARNING: While it may look like a good choice to use for your code if you're
+ *     inexperienced, don't. Unless you know what you are doing, complex code will
+ *     be much more difficult under this system. Use IterativeRobot or Command-Based
+ *     instead.
  */
+@Deprecated
 public class SampleRobot extends RobotBase {
 
   private boolean m_robotMainOverridden = true;
