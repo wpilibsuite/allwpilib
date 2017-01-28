@@ -12,6 +12,7 @@
 
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
+#include "llvm/SmallVector.h"
 
 using namespace frc;
 
@@ -147,9 +148,9 @@ int SPI::Write(uint8_t* data, int size) {
 int SPI::Read(bool initiate, uint8_t* dataReceived, int size) {
   int retVal = 0;
   if (initiate) {
-    auto dataToSend = new uint8_t[size];
-    std::memset(dataToSend, 0, size);
-    retVal = HAL_TransactionSPI(m_port, dataToSend, dataReceived, size);
+    llvm::SmallVector<uint8_t, 32> dataToSend;
+    dataToSend.resize(size);
+    retVal = HAL_TransactionSPI(m_port, dataToSend.data(), dataReceived, size);
   } else {
     retVal = HAL_ReadSPI(m_port, dataReceived, size);
   }
