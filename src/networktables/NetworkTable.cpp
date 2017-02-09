@@ -43,7 +43,7 @@ void NetworkTable::SetClientMode() { s_client = true; }
 void NetworkTable::SetServerMode() { s_client = false; }
 
 void NetworkTable::SetTeam(int team) {
-  std::pair<StringRef, unsigned int> servers[4];
+  std::pair<StringRef, unsigned int> servers[5];
 
   // 10.te.am.2
   llvm::SmallString<32> fixed;
@@ -71,6 +71,14 @@ void NetworkTable::SetTeam(int team) {
     llvm::raw_svector_ostream oss{mdns_lan};
     oss << "roboRIO-" << team << "-FRC.lan";
     servers[3] = std::make_pair(oss.str(), s_port);
+  }
+
+  // roboRIO-<team>-FRC.frc-field.local
+  llvm::SmallString<64> field_local;
+  {
+    llvm::raw_svector_ostream oss{field_local};
+    oss << "roboRIO-" << team << "-FRC.frc-field.local";
+    servers[4] = std::make_pair(oss.str(), s_port);
   }
 
   nt::SetServer(servers);

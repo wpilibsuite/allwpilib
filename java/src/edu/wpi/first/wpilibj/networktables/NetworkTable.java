@@ -90,11 +90,12 @@ public class NetworkTable implements ITable, IRemote {
    * @param team the team number
    */
   public synchronized static void setTeam(int team) {
-    String[] addresses = new String[4];
+    String[] addresses = new String[5];
     addresses[0] = "10." + (int)(team / 100) + "." + (int)(team % 100) + ".2";
     addresses[1] = "172.22.11.2";
     addresses[2] = "roboRIO-" + team + "-FRC.local";
     addresses[3] = "roboRIO-" + team + "-FRC.lan";
+    addresses[4] = "roboRIO-" + team + "-FRC.frc-field.local";
     setIPAddress(addresses);
   }
 
