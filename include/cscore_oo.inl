@@ -427,7 +427,8 @@ inline void VideoSink::SetSource(VideoSource source) {
 
 inline VideoSource VideoSink::GetSource() const {
   m_status = 0;
-  return VideoSource{GetSinkSource(m_handle, &m_status)};
+  auto handle = GetSinkSource(m_handle, &m_status);
+  return VideoSource{handle == 0 ? 0 : CopySource(handle, &m_status)};
 }
 
 inline VideoProperty VideoSink::GetSourceProperty(llvm::StringRef name) {
