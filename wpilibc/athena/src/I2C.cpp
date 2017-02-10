@@ -122,8 +122,8 @@ bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
     wpi_setWPIErrorWithContext(NullParameter, "buffer");
     return true;
   }
-  return Transaction(reinterpret_cast<uint8_t*>(&registerAddress),
-                     sizeof(registerAddress), buffer, count);
+  uint8_t regAddr = registerAddress;
+  return Transaction(&regAddr, sizeof(regAddr), buffer, count);
 }
 
 /**
