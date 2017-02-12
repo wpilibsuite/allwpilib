@@ -140,13 +140,13 @@ RobotDrive::RobotDrive(std::shared_ptr<SpeedController> leftMotor,
  *
  * Speed controller input version of RobotDrive (see previous comments).
  *
- * @param rearLeftMotor   The back left SpeedController object used to drive
- *                        the robot.
  * @param frontLeftMotor  The front left SpeedController object used to drive
  *                        the robot.
- * @param rearRightMotor  The back right SpeedController object used to drive
+ * @param rearLeftMotor   The back left SpeedController object used to drive
  *                        the robot.
  * @param frontRightMotor The front right SpeedController object used to drive
+ *                        the robot.
+ * @param rearRightMotor  The back right SpeedController object used to drive
  *                        the robot.
  */
 RobotDrive::RobotDrive(SpeedController* frontLeftMotor,
