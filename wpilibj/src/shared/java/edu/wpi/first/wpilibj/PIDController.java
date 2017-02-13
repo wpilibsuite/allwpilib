@@ -65,6 +65,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   Timer m_setpointTimer;
   private boolean m_freed = false;
   private boolean m_usingPercentTolerance;
+  private double m_maxErrorToIntegrate;
 
   /**
    * Tolerance is the type of tolerance used to specify if the PID controller is on target.
@@ -165,6 +166,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     m_pidInput = source;
     m_pidOutput = output;
     m_period = period;
+
+    m_maxErrorToIntegrate = Double.POSITIVE_INFINITY;
 
     m_controlLoop.schedule(new PIDTask(this), 0L, (long) (m_period * 1000));
 
@@ -284,7 +287,9 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
                 + calculateFeedForward();
           }
         } else {
-          if (m_I != 0) {
+          if (Math.abs(m_error) > m_maxErrorToIntegrate) {
+            m_totalError = 0.0;
+          } else if (m_I != 0) {
             double potentialIGain = (m_totalError + m_error) * m_I;
             if (potentialIGain < m_maximumOutput) {
               if (potentialIGain > m_minimumOutput) {
@@ -485,6 +490,32 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     }
     m_minimumOutput = minimumOutput;
     m_maximumOutput = maximumOutput;
+  }
+
+  /**
+   * Set the maximum error value that will cause the accumulated integral to calculated. If the
+   * error term is large, it can potentially accumulate to have a huge effect on the output
+   * of the PID calculation. Any time the error is larger than the value specified in this function
+   * the running integral will be set to zero causing it to not effect the output until the error
+   * is closer to the setpoint.
+   *
+   * <p>The default maximum error to integrate is {@link Double#POSITIVE_INFINITY}.
+   *
+   * @param maximumErrorToIntegrate the maximum error where integration will occur
+   */
+  public synchronized void setMaxErrorToIntegrate(double maximumErrorToIntegrate) {
+    m_maxErrorToIntegrate = maximumErrorToIntegrate;
+  }
+
+  /**
+   * Get the max error to integrate.
+   *
+   * @see #setMaxErrorToIntegrate(double)
+   *
+   * @return the max error to integrate
+   */
+  public synchronized double getMaxErrorToIntegrate() {
+    return m_maxErrorToIntegrate;
   }
 
   /**
