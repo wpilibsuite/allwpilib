@@ -128,10 +128,10 @@ public class RobotDrive implements MotorSafety {
    * Constructor for RobotDrive with 4 motors specified as SpeedController objects. Speed controller
    * input version of RobotDrive (see previous comments).
    *
-   * @param rearLeftMotor   The back left SpeedController object used to drive the robot.
    * @param frontLeftMotor  The front left SpeedController object used to drive the robot
-   * @param rearRightMotor  The back right SpeedController object used to drive the robot.
+   * @param rearLeftMotor   The back left SpeedController object used to drive the robot.
    * @param frontRightMotor The front right SpeedController object used to drive the robot.
+   * @param rearRightMotor  The back right SpeedController object used to drive the robot.
    */
   public RobotDrive(SpeedController frontLeftMotor, SpeedController rearLeftMotor,
                     SpeedController frontRightMotor, SpeedController rearRightMotor) {
