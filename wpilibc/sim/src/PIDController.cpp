@@ -144,7 +144,9 @@ void PIDController::Calculate() {
 
         m_result = m_D * m_error + m_P * m_totalError + CalculateFeedForward();
       } else {
-        if (m_I != 0) {
+        if (std::abs(m_error) > m_maxErrorToIntegrate) {
+          m_totalError = 0.0;
+        } else if (m_I != 0) {
           double potentialIGain = (m_totalError + m_error) * m_I;
           if (potentialIGain < m_maximumOutput) {
             if (potentialIGain > m_minimumOutput) {
@@ -344,6 +346,33 @@ void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
   std::lock_guard<priority_recursive_mutex> lock(m_mutex);
   m_minimumOutput = minimumOutput;
   m_maximumOutput = maximumOutput;
+}
+
+/**
+ * Set the maximum error value that will cause the accumulated integral to be
+ * calculated. If the error term is large, it can potentially accumulate to have
+ * a huge effect on the output of the PID calculation. Any time the error is
+ * larger than the value specified in this function, the running integral will
+ * be set to zero causing it to not effect the output until the error is closer
+ * to the setpoint.
+ *
+ * <p>The default maximum error to integrate is positive infinity.
+ *
+ * @param maximumErrorToIntegrate the maximum error where integration will occur
+ */
+void PIDController::SetMaxErrorToIntegrate(double maximumErrorToIntegrate) {
+  m_maxErrorToIntegrate = maximumErrorToIntegrate;
+}
+
+/**
+ * Get the max error to integrate.
+ *
+ * @see #SetMaxErrorToIntegrate(double)
+ *
+ * @return the max error to integrate
+ */
+double PIDController::GetMaxErrorToIntegrate() const {
+  return m_maxErrorToIntegrate;
 }
 
 /**

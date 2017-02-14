@@ -493,9 +493,9 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Set the maximum error value that will cause the accumulated integral to calculated. If the
+   * Set the maximum error value that will cause the accumulated integral to be calculated. If the
    * error term is large, it can potentially accumulate to have a huge effect on the output
-   * of the PID calculation. Any time the error is larger than the value specified in this function
+   * of the PID calculation. Any time the error is larger than the value specified in this function,
    * the running integral will be set to zero causing it to not effect the output until the error
    * is closer to the setpoint.
    *

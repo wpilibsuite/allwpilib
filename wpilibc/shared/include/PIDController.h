@@ -8,6 +8,7 @@
 #pragma once
 
 #include <atomic>
+#include <limits>
 #include <memory>
 #include <queue>
 #include <string>
@@ -52,6 +53,8 @@ class PIDController : public LiveWindowSendable,
   virtual void SetContinuous(bool continuous = true);
   virtual void SetInputRange(double minimumInput, double maximumInput);
   virtual void SetOutputRange(double minimumOutput, double maximumOutput);
+  void SetMaxErrorToIntegrate(double maximumErrorToIntegrate);
+  double GetMaxErrorToIntegrate() const;
   void SetPID(double p, double i, double d) override;
   virtual void SetPID(double p, double i, double d, double f);
   double GetP() const override;
@@ -140,6 +143,7 @@ class PIDController : public LiveWindowSendable,
 
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;
+  double m_maxErrorToIntegrate = std::numeric_limits<double>::infinity();
 
   std::shared_ptr<ITable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
