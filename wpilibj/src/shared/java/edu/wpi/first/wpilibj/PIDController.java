@@ -727,7 +727,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         setSetpoint((Double) value);
       }
     } else if (key.equals("enabled")) {
-      if (isEnable() != (Boolean) value) {
+      if (isEnabled() != (Boolean) value) {
         if ((Boolean) value) {
           enable();
         } else {
@@ -750,7 +750,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
       table.putNumber("d", getD());
       table.putNumber("f", getF());
       table.putNumber("setpoint", getSetpoint());
-      table.putBoolean("enabled", isEnable());
+      table.putBoolean("enabled", isEnabled());
       table.addTableListener(m_listener, false);
     }
   }
