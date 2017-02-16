@@ -55,6 +55,12 @@ static const char* startRootPage = "<html><head>\n"
     "    httpGetAsync(name, val);\n"
     "}\n"
     "</script>\n"
+    "<style>\n"
+    "table, th, td {\n"
+    "    border: 1px solid black;\n"
+    "    border-collapse: collapse;\n"
+    "}\n"
+    "</style>\n"
     "<title>CameraServer</title></head><body>\n"
     "<img src=\"/stream.mjpg\" /><p />\n"
     "<a href=\"/settings.json\">Settings JSON</a>\n";
@@ -386,6 +392,28 @@ void MjpegServerImpl::ConnThread::SendHTML(llvm::raw_ostream& os,
     }
   }
 
+  os << "<p>Supported Video Modes:</p>\n";
+  os << "<table cols=\"4\" style=\"border: 1px solid black\">\n";
+  os << "<tr><th>Pixel Format</th>"
+     << "<th>Width</th>"
+     << "<th>Height</th>"
+     << "<th>FPS</th></tr>";
+  for (auto mode : source.EnumerateVideoModes(&status)) {
+    os << "<tr><td>";
+    switch (mode.pixelFormat) {
+      case VideoMode::kMJPEG: os << "MJPEG"; break;
+      case VideoMode::kYUYV: os << "YUYV"; break;
+      case VideoMode::kRGB565: os << "RGB565"; break;
+      case VideoMode::kBGR: os << "BGR"; break;
+      case VideoMode::kGray: os << "gray"; break;
+      default: os << "unknown"; break;
+    }
+    os << "</td><td>" << mode.width;
+    os << "</td><td>" << mode.height;
+    os << "</td><td>" << mode.fps;
+    os << "</td></tr>";
+  }
+  os << "</table>\n";
   os << endRootPage << "\r\n";
   os.flush();
 }
@@ -404,7 +432,7 @@ void MjpegServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
       first = false;
     else
       os << ",\n";
-    os << "{";
+    os << '{';
     llvm::SmallString<128> name_buf;
     auto name = source.GetPropertyName(prop, name_buf, &status);
     auto kind = source.GetPropertyKind(prop);
@@ -451,6 +479,28 @@ void MjpegServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
       }
       os << "}\n";
     }
+    os << '}';
+  }
+  os << "\n],\n\"modes\": [\n";
+  first = true;
+  for (auto mode : source.EnumerateVideoModes(&status)) {
+    if (first)
+      first = false;
+    else
+      os << ",\n";
+    os << '{';
+    os << "\n\"pixelFormat\": \"";
+    switch (mode.pixelFormat) {
+      case VideoMode::kMJPEG: os << "MJPEG"; break;
+      case VideoMode::kYUYV: os << "YUYV"; break;
+      case VideoMode::kRGB565: os << "RGB565"; break;
+      case VideoMode::kBGR: os << "BGR"; break;
+      case VideoMode::kGray: os << "gray"; break;
+      default: os << "unknown"; break;
+    }
+    os << "\",\n\"width\": \"" << mode.width << '"';
+    os << ",\n\"height\": \"" << mode.height << '"';
+    os << ",\n\"fps\": \"" << mode.fps << '"';
     os << '}';
   }
   os << "\n]\n}\n";
