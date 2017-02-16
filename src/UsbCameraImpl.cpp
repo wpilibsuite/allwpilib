@@ -1170,8 +1170,8 @@ void UsbCameraImpl::SetWhiteBalanceManual(int value, CS_Status* status) {
 }
 
 void UsbCameraImpl::SetExposureAuto(CS_Status* status) {
-  // auto; yes, this is opposite of WB
-  SetProperty(GetPropertyIndex(kPropExAuto), 0, status);
+  // auto; this is an enum value
+  SetProperty(GetPropertyIndex(kPropExAuto), 3, status);
 }
 
 void UsbCameraImpl::SetExposureHoldCurrent(CS_Status* status) {
