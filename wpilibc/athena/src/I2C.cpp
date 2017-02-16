@@ -51,7 +51,7 @@ bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
   status = HAL_TransactionI2C(m_port, m_deviceAddress, dataToSend, sendSize,
                               dataReceived, receiveSize);
   // wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-  return status < receiveSize;
+  return status < 0;
 }
 
 /**
@@ -81,7 +81,7 @@ bool I2C::Write(int registerAddress, uint8_t data) {
   buffer[1] = data;
   int32_t status = 0;
   status = HAL_WriteI2C(m_port, m_deviceAddress, buffer, sizeof(buffer));
-  return status < static_cast<int>(sizeof(buffer));
+  return status < 0;
 }
 
 /**
@@ -97,7 +97,7 @@ bool I2C::Write(int registerAddress, uint8_t data) {
 bool I2C::WriteBulk(uint8_t* data, int count) {
   int32_t status = 0;
   status = HAL_WriteI2C(m_port, m_deviceAddress, data, count);
-  return status < count;
+  return status < 0;
 }
 
 /**
@@ -146,9 +146,7 @@ bool I2C::ReadOnly(int count, uint8_t* buffer) {
     wpi_setWPIErrorWithContext(NullParameter, "buffer");
     return true;
   }
-  int32_t status = 0;
-  status = HAL_ReadI2C(m_port, m_deviceAddress, buffer, count);
-  return status < count;
+  return HAL_ReadI2C(m_port, m_deviceAddress, buffer, count) < 0;
 }
 
 /**

@@ -83,7 +83,7 @@ public class I2C extends SensorBase {
     if (receiveSize > 0 && dataReceived != null) {
       dataReceivedBuffer.get(dataReceived);
     }
-    return status < receiveSize;
+    return status < 0;
   }
 
   /**
@@ -117,7 +117,7 @@ public class I2C extends SensorBase {
     }
 
     return I2CJNI.i2CTransaction((byte) m_port.value, (byte) m_deviceAddress, dataToSend,
-                                 (byte) sendSize, dataReceived, (byte) receiveSize) < receiveSize;
+                                 (byte) sendSize, dataReceived, (byte) receiveSize) < 0;
   }
 
   /**
@@ -139,6 +139,7 @@ public class I2C extends SensorBase {
    *
    * @param registerAddress The address of the register on the device to be written.
    * @param data            The byte to write to the register on the device.
+   * @return Transfer Aborted... false for success, true for aborted.
    */
   public synchronized boolean write(int registerAddress, int data) {
     byte[] buffer = new byte[2];
@@ -149,7 +150,7 @@ public class I2C extends SensorBase {
     dataToSendBuffer.put(buffer);
 
     return I2CJNI.i2CWrite((byte) m_port.value, (byte) m_deviceAddress, dataToSendBuffer,
-                           (byte) buffer.length) < buffer.length;
+                           (byte) buffer.length) < 0;
   }
 
   /**
@@ -158,13 +159,14 @@ public class I2C extends SensorBase {
    * <p>Write multiple bytes to a register on a device and wait until the transaction is complete.
    *
    * @param data The data to write to the device.
+   * @return Transfer Aborted... false for success, true for aborted.
    */
   public synchronized boolean writeBulk(byte[] data) {
     ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(data.length);
     dataToSendBuffer.put(data);
 
     return I2CJNI.i2CWrite((byte) m_port.value, (byte) m_deviceAddress, dataToSendBuffer,
-                           (byte) data.length) < data.length;
+                           (byte) data.length) < 0;
   }
 
   /**
@@ -173,6 +175,7 @@ public class I2C extends SensorBase {
    * <p>Write multiple bytes to a register on a device and wait until the transaction is complete.
    *
    * @param data The data to write to the device. Must be created using ByteBuffer.allocateDirect().
+   * @return Transfer Aborted... false for success, true for aborted.
    */
   public synchronized boolean writeBulk(ByteBuffer data, int size) {
     if (!data.isDirect()) {
@@ -183,7 +186,7 @@ public class I2C extends SensorBase {
           "buffer is too small, must be at least " + size);
     }
 
-    return I2CJNI.i2CWrite((byte) m_port.value, (byte) m_deviceAddress, data, (byte) size) < size;
+    return I2CJNI.i2CWrite((byte) m_port.value, (byte) m_deviceAddress, data, (byte) size) < 0;
   }
 
   /**
@@ -264,7 +267,7 @@ public class I2C extends SensorBase {
     int retVal = I2CJNI.i2CRead((byte) m_port.value, (byte) m_deviceAddress, dataReceivedBuffer,
                                 (byte) count);
     dataReceivedBuffer.get(buffer);
-    return retVal < count;
+    return retVal < 0;
   }
 
   /**
@@ -291,7 +294,7 @@ public class I2C extends SensorBase {
     }
 
     return I2CJNI.i2CRead((byte) m_port.value, (byte) m_deviceAddress, buffer, (byte) count)
-        < count;
+        < 0;
   }
 
   /*

@@ -78,7 +78,7 @@ void HAL_InitializeI2C(int32_t port, int32_t* status) {
  * @param sendSize Number of bytes to send as part of the transaction.
  * @param dataReceived Buffer to read data into.
  * @param receiveSize Number of bytes to read from the device.
- * @return The number of bytes read (>= 0) or -1 on transfer abort.
+ * @return >= 0 on success or -1 on transfer abort.
  */
 int32_t HAL_TransactionI2C(int32_t port, int32_t deviceAddress,
                            uint8_t* dataToSend, int32_t sendSize,
@@ -110,7 +110,7 @@ int32_t HAL_TransactionI2C(int32_t port, int32_t deviceAddress,
  * @param registerAddress The address of the register on the device to be
  * written.
  * @param data The byte to write to the register on the device.
- * @return The number of bytes written (>= 0) or -1 on transfer abort.
+ * @return >= 0 on success or -1 on transfer abort.
  */
 int32_t HAL_WriteI2C(int32_t port, int32_t deviceAddress, uint8_t* dataToSend,
                      int32_t sendSize) {
@@ -140,7 +140,7 @@ int32_t HAL_WriteI2C(int32_t port, int32_t deviceAddress, uint8_t* dataToSend,
  * @param count The number of bytes to read in the transaction.
  * @param buffer A pointer to the array of bytes to store the data read from the
  * device.
- * @return The number of bytes read (>= 0) or -1 on transfer abort.
+ * @return >= 0 on success or -1 on transfer abort.
  */
 int32_t HAL_ReadI2C(int32_t port, int32_t deviceAddress, uint8_t* buffer,
                     int32_t count) {
