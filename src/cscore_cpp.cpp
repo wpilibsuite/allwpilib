@@ -592,6 +592,12 @@ void SetLogger(LogFunc func, unsigned int min_level) {
   logger.set_min_level(min_level);
 }
 
+void SetDefaultLogger(unsigned int min_level) {
+  Logger& logger = Logger::GetInstance();
+  logger.SetDefaultLogger();
+  logger.set_min_level(min_level);
+}
+
 //
 // Utility Functions
 //

@@ -84,3 +84,4 @@ CS_SetCameraWhiteBalanceManual @81
 CS_SetCameraExposureAuto @82
 CS_SetCameraExposureHoldCurrent @83
 CS_SetCameraExposureManual @84
+CS_SetDefaultLogger @85

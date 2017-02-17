@@ -21,6 +21,8 @@ class Logger : public wpi::Logger {
   }
   ~Logger();
 
+  void SetDefaultLogger();
+
  private:
   Logger();
 

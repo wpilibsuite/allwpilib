@@ -345,6 +345,7 @@ int CS_NotifierDestroyed(void);
 typedef void (*CS_LogFunc)(unsigned int level, const char* file,
                            unsigned int line, const char* msg);
 void CS_SetLogger(CS_LogFunc func, unsigned int min_level);
+void CS_SetDefaultLogger(unsigned int min_level);
 
 //
 // Utility Functions

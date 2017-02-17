@@ -61,6 +61,8 @@ static void def_log_func(unsigned int level, const char* file,
 #endif
 }
 
-Logger::Logger() { SetLogger(def_log_func); }
+Logger::Logger() { SetDefaultLogger(); }
 
 Logger::~Logger() {}
+
+void Logger::SetDefaultLogger() { SetLogger(def_log_func); }

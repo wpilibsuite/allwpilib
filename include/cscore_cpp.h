@@ -311,6 +311,7 @@ typedef std::function<void(unsigned int level, const char* file,
                            unsigned int line, const char* msg)>
     LogFunc;
 void SetLogger(LogFunc func, unsigned int min_level);
+void SetDefaultLogger(unsigned int min_level);
 
 //
 // Utility Functions

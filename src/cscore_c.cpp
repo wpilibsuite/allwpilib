@@ -299,6 +299,10 @@ void CS_SetLogger(CS_LogFunc func, unsigned int min_level) {
   cs::SetLogger(func, min_level);
 }
 
+void CS_SetDefaultLogger(unsigned int min_level) {
+  cs::SetDefaultLogger(min_level);
+}
+
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
   llvm::SmallVector<CS_Source, 32> buf;
   auto handles = cs::EnumerateSourceHandles(buf, status);
