@@ -161,7 +161,30 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width,
     }
 
     pos += blockLength;
+
     bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
+    if (bytes[0] != 0xff) return false;     // not a tag
+    if (bytes[1] == 0xda) {
+      // SOS: need to keep reading until we reach a normal marker.
+      // Byte stuffing ensures we don't get false markers.
+      bool maybeMarker = false;
+      for (;;) {
+        ReadInto(is, buf, 1);
+        if (is.has_error()) return false;
+        ++pos;
+        bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
+        if (maybeMarker) {
+          if (bytes[0] != 0x00 && bytes[0] != 0xff &&
+              (bytes[0] < 0xd0 || bytes[0] > 0xd7))
+            break;
+          maybeMarker = false;
+        } else if (bytes[0] == 0xff)
+          maybeMarker = true;
+      }
+      // Point back to the start of the block
+      --pos;
+      bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
+    }
     if (bytes[0] != 0xff) return false;     // not a tag
     if (bytes[1] == 0xd9) return true;      // EOI, we're done
     if (bytes[1] == 0xc0) sofBlock = true;  // SOF
