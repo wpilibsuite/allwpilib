@@ -39,6 +39,7 @@ class CvSinkImpl : public SinkImpl {
   void Stop();
 
   uint64_t GrabFrame(cv::Mat& image);
+  uint64_t GrabFrame(cv::Mat& image, double timeout);
 
  private:
   void ThreadMain();

@@ -1263,6 +1263,21 @@ JNIEXPORT jlong JNICALL Java_edu_wpi_cscore_CameraServerJNI_grabSinkFrame
 
 /*
  * Class:     edu_wpi_cscore_CameraServerJNI
+ * Method:    grabSinkFrameTimeout
+ * Signature: (IJD)J
+ */
+JNIEXPORT jlong JNICALL Java_edu_wpi_cscore_CameraServerJNI_grabSinkFrameTimeout
+  (JNIEnv *env, jclass, jint sink, jlong imageNativeObj, jdouble timeout)
+{
+  cv::Mat& image = *((cv::Mat*)imageNativeObj);
+  CS_Status status = 0;
+  auto rv = cs::GrabSinkFrameTimeout(sink, image, timeout, &status);
+  CheckStatus(env, status);
+  return rv;
+}
+
+/*
+ * Class:     edu_wpi_cscore_CameraServerJNI
  * Method:    getSinkError
  * Signature: (I)Ljava/lang/String;
  */

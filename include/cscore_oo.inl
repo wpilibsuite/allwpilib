@@ -465,7 +465,12 @@ inline void CvSink::SetDescription(llvm::StringRef description) {
   SetSinkDescription(m_handle, description, &m_status);
 }
 
-inline uint64_t CvSink::GrabFrame(cv::Mat& image) const {
+inline uint64_t CvSink::GrabFrame(cv::Mat& image, double timeout) const {
+  m_status = 0;
+  return GrabSinkFrameTimeout(m_handle, image, timeout, &m_status);
+}
+
+inline uint64_t CvSink::GrabFrameNoTimeout(cv::Mat& image) const {
   m_status = 0;
   return GrabSinkFrame(m_handle, image, &m_status);
 }

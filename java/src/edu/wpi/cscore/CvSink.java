@@ -39,10 +39,28 @@ public class CvSink extends VideoSink {
   }
 
   /// Wait for the next frame and get the image.
+  /// Times out (returning 0) after 0.225 seconds.
   /// The provided image will have three 3-bit channels stored in BGR order.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
   public long grabFrame(Mat image) {
+    return grabFrame(image, 0.225);
+  }
+
+  /// Wait for the next frame and get the image.
+  /// Times out (returning 0) after timeout seconds.
+  /// The provided image will have three 3-bit channels stored in BGR order.
+  /// @return Frame time, or 0 on error (call GetError() to obtain the error
+  ///         message);
+  public long grabFrame(Mat image, double timeout) {
+    return CameraServerJNI.grabSinkFrameTimeout(m_handle, image.nativeObj, timeout);
+  }
+
+  /// Wait for the next frame and get the image.  May block forever.
+  /// The provided image will have three 3-bit channels stored in BGR order.
+  /// @return Frame time, or 0 on error (call GetError() to obtain the error
+  ///         message);
+  public long grabFrameNoTimeout(Mat image) {
     return CameraServerJNI.grabSinkFrame(m_handle, image.nativeObj);
   }
 

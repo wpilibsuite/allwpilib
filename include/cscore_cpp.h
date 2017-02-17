@@ -286,6 +286,8 @@ int GetMjpegServerPort(CS_Sink sink, CS_Status* status);
 void SetSinkDescription(CS_Sink sink, llvm::StringRef description,
                         CS_Status* status);
 uint64_t GrabSinkFrame(CS_Sink sink, cv::Mat& image, CS_Status* status);
+uint64_t GrabSinkFrameTimeout(CS_Sink sink, cv::Mat& image, double timeout,
+                              CS_Status* status);
 std::string GetSinkError(CS_Sink sink, CS_Status* status);
 llvm::StringRef GetSinkError(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
                              CS_Status* status);
@@ -332,6 +334,8 @@ std::vector<std::string> GetNetworkInterfaces();
 // C functions taking a cv::Mat* for specific interop implementations
 extern "C" {
 uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status);
+uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
+                                    double timeout, CS_Status* status);
 void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
 }
 

@@ -193,6 +193,7 @@ public class CameraServerJNI {
   //
   public static native void setSinkDescription(int sink, String description);
   public static native long grabSinkFrame(int sink, long imageNativeObj);
+  public static native long grabSinkFrameTimeout(int sink, long imageNativeObj, double timeout);
   public static native String getSinkError(int sink);
   public static native void setSinkEnabled(int sink, boolean enabled);
 

@@ -571,15 +571,17 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
   while (m_active && !os.has_error()) {
     auto source = GetSource();
     if (!source) {
-      // Source disconnected; sleep for one second
-      std::this_thread::sleep_for(std::chrono::seconds(1));
+      // Source disconnected; sleep so we don't consume all processor time.
+      os << "\r\n";  // Keep connection alive
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
       continue;
     }
     SDEBUG4("waiting for frame");
-    Frame frame = source->GetNextFrame();  // blocks
+    Frame frame = source->GetNextFrame(0.225);  // blocks
     if (!m_active) break;
     if (!frame) {
       // Bad frame; sleep for 20 ms so we don't consume all processor time.
+      os << "\r\n";  // Keep connection alive
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
       continue;
     }

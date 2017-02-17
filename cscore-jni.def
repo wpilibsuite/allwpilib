@@ -85,6 +85,7 @@ CS_SetCameraExposureAuto @82
 CS_SetCameraExposureHoldCurrent @83
 CS_SetCameraExposureManual @84
 CS_SetDefaultLogger @85
+CS_GrabSinkFrameTimeout @86
 
 ; JNI functions
 JNI_OnLoad
@@ -153,6 +154,7 @@ Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerListenAddress
 Java_edu_wpi_cscore_CameraServerJNI_getMjpegServerPort
 Java_edu_wpi_cscore_CameraServerJNI_setSinkDescription
 Java_edu_wpi_cscore_CameraServerJNI_grabSinkFrame
+Java_edu_wpi_cscore_CameraServerJNI_grabSinkFrameTimeout
 Java_edu_wpi_cscore_CameraServerJNI_getSinkError
 Java_edu_wpi_cscore_CameraServerJNI_setSinkEnabled
 Java_edu_wpi_cscore_CameraServerJNI_addListener

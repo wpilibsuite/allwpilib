@@ -544,10 +544,17 @@ class CvSink : public VideoSink {
   void SetDescription(llvm::StringRef description);
 
   /// Wait for the next frame and get the image.
+  /// Times out (returning 0) after timeout seconds.
   /// The provided image will have three 8-bit channels stored in BGR order.
   /// @return Frame time, or 0 on error (call GetError() to obtain the error
   ///         message);
-  uint64_t GrabFrame(cv::Mat& image) const;
+  uint64_t GrabFrame(cv::Mat& image, double timeout = 0.225) const;
+
+  /// Wait for the next frame and get the image.  May block forever.
+  /// The provided image will have three 8-bit channels stored in BGR order.
+  /// @return Frame time, or 0 on error (call GetError() to obtain the error
+  ///         message);
+  uint64_t GrabFrameNoTimeout(cv::Mat& image) const;
 
   /// Get error string.  Call this if WaitForFrame() returns 0 to determine
   /// what the error is.
