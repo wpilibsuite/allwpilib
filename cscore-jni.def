@@ -86,6 +86,7 @@ CS_SetCameraExposureHoldCurrent @83
 CS_SetCameraExposureManual @84
 CS_SetDefaultLogger @85
 CS_GrabSinkFrameTimeout @86
+CS_GrabSinkFrameTimeoutCpp @87
 
 ; JNI functions
 JNI_OnLoad
