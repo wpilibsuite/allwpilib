@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
@@ -42,7 +42,7 @@ public class SendableChooser<V> implements Sendable {
   /**
    * A map linking strings to the objects the represent.
    */
-  private final HashMap<String, V> m_map = new HashMap<>();
+  private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
   private String m_defaultChoice = null;
 
   /**
