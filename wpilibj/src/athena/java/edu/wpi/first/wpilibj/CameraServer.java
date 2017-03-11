@@ -436,12 +436,10 @@ public class CameraServer {
         }
         case kSinkSourceChanged:
         case kSinkCreated:
-        case kSinkDestroyed: {
-          updateStreamValues();
-          break;
-        }
+        case kSinkDestroyed:
         case kNetworkInterfacesChanged: {
           m_addresses = CameraServerJNI.getNetworkInterfaces();
+          updateStreamValues();
           break;
         }
         default:
