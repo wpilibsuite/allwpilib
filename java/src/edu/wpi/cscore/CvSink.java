@@ -9,12 +9,16 @@ package edu.wpi.cscore;
 
 import org.opencv.core.Mat;
 
-/// A sink for user code to accept video frames as OpenCV images.
+/**
+ * A sink for user code to accept video frames as OpenCV images.
+ */
 public class CvSink extends VideoSink {
-  /// Create a sink for accepting OpenCV images.
-  /// WaitForFrame() must be called on the created sink to get each new
-  /// image.
-  /// @param name Source name (arbitrary unique identifier)
+  /**
+   * Create a sink for accepting OpenCV images.
+   * WaitForFrame() must be called on the created sink to get each new
+   * image.
+   * @param name Source name (arbitrary unique identifier)
+   */
   public CvSink(String name) {
     super(CameraServerJNI.createCvSink(name));
   }
@@ -32,48 +36,60 @@ public class CvSink extends VideoSink {
   //  super(CameraServerJNI.createCvSinkCallback(name, processFrame));
   //}
 
-  /// Set sink description.
-  /// @param description Description
+  /**
+   * Set sink description.
+   * @param description Description
+   */
   public void setDescription(String description) {
     CameraServerJNI.setSinkDescription(m_handle, description);
   }
 
-  /// Wait for the next frame and get the image.
-  /// Times out (returning 0) after 0.225 seconds.
-  /// The provided image will have three 3-bit channels stored in BGR order.
-  /// @return Frame time, or 0 on error (call GetError() to obtain the error
-  ///         message);
+  /**
+   * Wait for the next frame and get the image.
+   * Times out (returning 0) after 0.225 seconds.
+   * The provided image will have three 3-bit channels stored in BGR order.
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message)
+   */
   public long grabFrame(Mat image) {
     return grabFrame(image, 0.225);
   }
 
-  /// Wait for the next frame and get the image.
-  /// Times out (returning 0) after timeout seconds.
-  /// The provided image will have three 3-bit channels stored in BGR order.
-  /// @return Frame time, or 0 on error (call GetError() to obtain the error
-  ///         message);
+  /**
+   * Wait for the next frame and get the image.
+   * Times out (returning 0) after timeout seconds.
+   * The provided image will have three 3-bit channels stored in BGR order.
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message)
+   */
   public long grabFrame(Mat image, double timeout) {
     return CameraServerJNI.grabSinkFrameTimeout(m_handle, image.nativeObj, timeout);
   }
 
-  /// Wait for the next frame and get the image.  May block forever.
-  /// The provided image will have three 3-bit channels stored in BGR order.
-  /// @return Frame time, or 0 on error (call GetError() to obtain the error
-  ///         message);
+  /**
+   * Wait for the next frame and get the image.  May block forever.
+   * The provided image will have three 3-bit channels stored in BGR order.
+   * @return Frame time, or 0 on error (call GetError() to obtain the error
+   *         message)
+   */
   public long grabFrameNoTimeout(Mat image) {
     return CameraServerJNI.grabSinkFrame(m_handle, image.nativeObj);
   }
 
-  /// Get error string.  Call this if WaitForFrame() returns 0 to determine
-  /// what the error is.
+  /**
+   * Get error string.  Call this if WaitForFrame() returns 0 to determine
+   * what the error is.
+   */
   public String getError() {
     return CameraServerJNI.getSinkError(m_handle);
   }
 
-  /// Enable or disable getting new frames.
-  /// Disabling will cause processFrame (for callback-based CvSinks) to not
-  /// be called and WaitForFrame() to not return.  This can be used to save
-  /// processor resources when frames are not needed.
+  /**
+   * Enable or disable getting new frames.
+   * Disabling will cause processFrame (for callback-based CvSinks) to not
+   * be called and WaitForFrame() to not return.  This can be used to save
+   * processor resources when frames are not needed.
+   */
   public void setEnabled(boolean enabled) {
     CameraServerJNI.setSinkEnabled(m_handle, enabled);
   }

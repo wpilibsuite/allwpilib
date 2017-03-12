@@ -7,7 +7,9 @@
 
 package edu.wpi.cscore;
 
-/// An exception raised by the camera server.
+/**
+ * An exception raised by the camera server.
+ */
 public class VideoException extends RuntimeException {
   public VideoException(String msg) {
     super(msg);

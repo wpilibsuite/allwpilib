@@ -7,7 +7,9 @@
 
 package edu.wpi.cscore;
 
-/// Video event
+/**
+ * Video event
+ */
 public class VideoEvent {
   public enum Kind {
     kUnknown(0x0000),

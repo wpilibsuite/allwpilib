@@ -7,7 +7,9 @@
 
 package edu.wpi.cscore;
 
-/// Video mode
+/**
+ * Video mode
+ */
 public class VideoMode {
   public enum PixelFormat {
     kUnknown(0), kMJPEG(1), kYUYV(2), kRGB565(3), kBGR(4), kGray(5);
@@ -41,12 +43,23 @@ public class VideoMode {
     this.fps = fps;
   }
 
-  /// Pixel format
+  /**
+   * Pixel format
+   */
   public PixelFormat pixelFormat;
-  /// Width in pixels
+
+  /**
+   * Width in pixels
+   */
   public int width;
-  /// Height in pixels
+
+  /**
+   * Height in pixels
+   */
   public int height;
-  /// Frames per second
+
+  /**
+   * Frames per second
+   */
   public int fps;
 }

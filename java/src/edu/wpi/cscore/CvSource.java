@@ -9,61 +9,77 @@ package edu.wpi.cscore;
 
 import org.opencv.core.Mat;
 
-/// A source that represents a video camera.
+/**
+ * A source that represents a video camera.
+ */
 public class CvSource extends VideoSource {
-  /// Create an OpenCV source.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param mode Video mode being generated
+  /**
+   * Create an OpenCV source.
+   * @param name Source name (arbitrary unique identifier)
+   * @param mode Video mode being generated
+   */
   public CvSource(String name, VideoMode mode) {
     super(CameraServerJNI.createCvSource(name, mode.pixelFormat.getValue(), mode.width, mode.height, mode.fps));
   }
 
-  /// Create an OpenCV source.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param pixelFormat Pixel format
-  /// @param width width
-  /// @param height height
-  /// @param fps fps
+  /**
+   * Create an OpenCV source.
+   * @param name Source name (arbitrary unique identifier)
+   * @param pixelFormat Pixel format
+   * @param width width
+   * @param height height
+   * @param fps fps
+   */
   public CvSource(String name, VideoMode.PixelFormat pixelFormat, int width, int height, int fps) {
     super(CameraServerJNI.createCvSource(name, pixelFormat.getValue(), width, height, fps));
   }
 
-  /// Put an OpenCV image and notify sinks.
-  /// Only 8-bit single-channel or 3-channel (with BGR channel order) images
-  /// are supported. If the format, depth or channel order is different, use
-  /// Mat.convertTo() and/or cvtColor() to convert it first.
-  /// @param image OpenCV image
+  /**
+   * Put an OpenCV image and notify sinks.
+   * Only 8-bit single-channel or 3-channel (with BGR channel order) images
+   * are supported. If the format, depth or channel order is different, use
+   * Mat.convertTo() and/or cvtColor() to convert it first.
+   * @param image OpenCV image
+   */
   public void putFrame(Mat image) {
     CameraServerJNI.putSourceFrame(m_handle, image.nativeObj);
   }
 
-  /// Signal sinks that an error has occurred.  This should be called instead
-  /// of NotifyFrame when an error occurs.
+  /**
+   * Signal sinks that an error has occurred.  This should be called instead
+   * of NotifyFrame when an error occurs.
+   */
   public void notifyError(String msg) {
     CameraServerJNI.notifySourceError(m_handle, msg);
   }
 
-  /// Set source connection status.  Defaults to true.
-  /// @param connected True for connected, false for disconnected
+  /**
+   * Set source connection status.  Defaults to true.
+   * @param connected True for connected, false for disconnected
+   */
   public void setConnected(boolean connected) {
     CameraServerJNI.setSourceConnected(m_handle, connected);
   }
 
-  /// Set source description.
-  /// @param description Description
+  /**
+   * Set source description.
+   * @param description Description
+   */
   public void setDescription(String description) {
     CameraServerJNI.setSourceDescription(m_handle, description);
   }
 
-  /// Create a property.
-  /// @param name Property name
-  /// @param kind Property kind
-  /// @param minimum Minimum value
-  /// @param maximum Maximum value
-  /// @param step Step value
-  /// @param defaultValue Default value
-  /// @param value Current value
-  /// @return Property
+  /**
+   * Create a property.
+   * @param name Property name
+   * @param kind Property kind
+   * @param minimum Minimum value
+   * @param maximum Maximum value
+   * @param step Step value
+   * @param defaultValue Default value
+   * @param value Current value
+   * @return Property
+   */
   public VideoProperty createProperty(String name, VideoProperty.Kind kind, int minimum, int maximum, int step, int defaultValue, int value) {
     return new VideoProperty(
         CameraServerJNI.createSourceProperty(m_handle, name, kind.getValue(), minimum, maximum, step, defaultValue, value));
@@ -84,9 +100,11 @@ public class CvSource extends VideoSource {
   //    std::function<void(VideoProperty property)>
   //        onChange);
 
-  /// Configure enum property choices.
-  /// @param property Property
-  /// @param choices Choices
+  /**
+   * Configure enum property choices.
+   * @param property Property
+   * @param choices Choices
+   */
   public void SetEnumPropertyChoices(VideoProperty property, String[] choices) {
     CameraServerJNI.setSourceEnumPropertyChoices(m_handle, property.m_handle, choices);
   }

@@ -7,7 +7,9 @@
 
 package edu.wpi.cscore;
 
-/// A source that represents an Axis IP camera.
+/**
+ * A source that represents an Axis IP camera.
+ */
 public class AxisCamera extends HttpCamera {
   private static String hostToUrl(String host) {
     return "http://" + host + "/mjpg/video.mjpg";
@@ -21,16 +23,20 @@ public class AxisCamera extends HttpCamera {
     return urls;
   }
 
-  /// Create a source for an Axis IP camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+  /**
+   * Create a source for an Axis IP camera.
+   * @param name Source name (arbitrary unique identifier)
+   * @param host Camera host IP or DNS name (e.g. "10.x.y.11")
+   */
   public AxisCamera(String name, String host) {
     super(name, hostToUrl(host), HttpCameraKind.kAxis);
   }
 
-  /// Create a source for an Axis IP camera.
-  /// @param name Source name (arbitrary unique identifier)
-  /// @param hosts Array of Camera host IPs/DNS names
+  /**
+   * Create a source for an Axis IP camera.
+   * @param name Source name (arbitrary unique identifier)
+   * @param hosts Array of Camera host IPs/DNS names
+   */
   public AxisCamera(String name, String[] hosts) {
     super(name, hostToUrl(hosts), HttpCameraKind.kAxis);
   }

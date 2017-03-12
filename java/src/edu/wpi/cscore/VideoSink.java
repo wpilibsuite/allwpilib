@@ -7,9 +7,11 @@
 
 package edu.wpi.cscore;
 
-/// A source for video that provides a sequence of frames.  Each frame may
-/// consist of multiple images (e.g. from a stereo or depth camera); these
-/// are called channels.
+/**
+ * A source for video that provides a sequence of frames.  Each frame may
+ * consist of multiple images (e.g. from a stereo or depth camera); these
+ * are called channels.
+ */
 public class VideoSink {
   public enum Kind {
     kUnknown(0), kMjpeg(2), kCv(4);
@@ -63,26 +65,34 @@ public class VideoSink {
     return m_handle;
   }
 
-  /// Get the kind of the sink.
+  /**
+   * Get the kind of the sink.
+   */
   public Kind getKind() {
     return getKindFromInt(CameraServerJNI.getSinkKind(m_handle));
   }
 
-  /// Get the name of the sink.  The name is an arbitrary identifier
-  /// provided when the sink is created, and should be unique.
+  /**
+   * Get the name of the sink.  The name is an arbitrary identifier
+   * provided when the sink is created, and should be unique.
+   */
   public String getName() {
     return CameraServerJNI.getSinkName(m_handle);
   }
 
-  /// Get the sink description.  This is sink-kind specific.
+  /**
+   * Get the sink description.  This is sink-kind specific.
+   */
   public String getDescription() {
     return CameraServerJNI.getSinkDescription(m_handle);
   }
 
-  /// Configure which source should provide frames to this sink.  Each sink
-  /// can accept frames from only a single source, but a single source can
-  /// provide frames to multiple clients.
-  /// @param source Source
+  /**
+   * Configure which source should provide frames to this sink.  Each sink
+   * can accept frames from only a single source, but a single source can
+   * provide frames to multiple clients.
+   * @param source Source
+   */
   public void setSource(VideoSource source) {
     if (source == null) {
       CameraServerJNI.setSinkSource(m_handle, 0);
@@ -91,25 +101,31 @@ public class VideoSink {
     }
   }
 
-  /// Get the connected source.
-  /// @return Connected source; nullptr if no source connected.
+  /**
+   * Get the connected source.
+   * @return Connected source; nullptr if no source connected.
+   */
   public VideoSource getSource() {
     // While VideoSource.free() will call releaseSource(), getSinkSource()
     // increments the internal reference count so this is okay to do.
     return new VideoSource(CameraServerJNI.getSinkSource(m_handle));
   }
 
-  /// Get a property of the associated source.
-  /// @param name Property name
-  /// @return Property (kind Property::kNone if no property with
-  ///         the given name exists or no source connected)
+  /**
+   * Get a property of the associated source.
+   * @param name Property name
+   * @return Property (kind Property::kNone if no property with
+   *         the given name exists or no source connected)
+   */
   public VideoProperty getSourceProperty(String name) {
     return new VideoProperty(
         CameraServerJNI.getSinkSourceProperty(m_handle, name));
   }
 
-  /// Enumerate all existing sinks.
-  /// @return Vector of sinks.
+  /**
+   * Enumerate all existing sinks.
+   * @return Vector of sinks.
+   */
   public static VideoSink[] enumerateSinks() {
     int[] handles = CameraServerJNI.enumerateSinks();
     VideoSink[] rv = new VideoSink[handles.length];

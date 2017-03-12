@@ -7,7 +7,9 @@
 
 package edu.wpi.cscore;
 
-/// USB camera information
+/**
+ * USB camera information
+ */
 public class UsbCameraInfo {
   public UsbCameraInfo(int dev, String path, String name) {
     this.dev = dev;
@@ -15,10 +17,18 @@ public class UsbCameraInfo {
     this.name = name;
   }
 
-  /// Device number (e.g. N in '/dev/videoN' on Linux)
+  /**
+   * Device number (e.g. N in '/dev/videoN' on Linux)
+   */
   public int dev;
-  /// Path to device if available (e.g. '/dev/video0' on Linux)
+
+  /**
+   * Path to device if available (e.g. '/dev/video0' on Linux)
+   */
   public String path;
-  /// Vendor/model name of the camera as provided by the USB driver
+
+  /**
+   * Vendor/model name of the camera as provided by the USB driver
+   */
   public String name;
 }
