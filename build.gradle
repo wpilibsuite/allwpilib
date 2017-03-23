@@ -66,4 +66,5 @@ apply from: 'ni-libraries/ni-libraries.gradle'
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.3'
+    distributionType = Wrapper.DistributionType.ALL
 }
