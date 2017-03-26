@@ -95,6 +95,11 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   }
 }
 
+void ReportError(JNIEnv *env, int32_t status, int32_t min, int32_t max, int32_t requested, 
+                 bool do_throw) {
+  ReportError(env, status, do_throw);
+}
+
 void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange, 
                 int32_t requestedValue) {
   if (status == 0) return;
