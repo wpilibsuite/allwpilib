@@ -108,7 +108,13 @@ InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
   result = HAL_WaitForInterrupt(m_interrupt, timeout, ignorePrevious, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  return static_cast<WaitResult>(result);
+  // Rising edge result is the interrupt bit set in the byte 0xFF
+  // Falling edge result is the interrupt bit set in the byte 0xFF00
+  // Set any bit set to be true for that edge, and AND the 2 results
+  // together to match the existing enum for all interrupts
+  int32_t rising = (result & 0xFF) ? 0x1 : 0x0;
+  int32_t falling = ((result & 0xFF00) ? 0x0100 : 0x0);
+  return static_cast<WaitResult>(falling | rising);
 }
 
 /**

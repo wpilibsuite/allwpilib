@@ -142,6 +142,14 @@ public abstract class InterruptableSensorBase extends SensorBase {
     }
     int result = InterruptJNI.waitForInterrupt(m_interrupt, timeout, ignorePrevious);
 
+    // Rising edge result is the interrupt bit set in the byte 0xFF
+    // Falling edge result is the interrupt bit set in the byte 0xFF00
+    // Set any bit set to be true for that edge, and AND the 2 results
+    // together to match the existing enum for all interrupts
+    int rising = ((result & 0xFF) != 0) ? 0x1 : 0x0;
+    int falling = ((result & 0xFF00) != 0) ? 0x0100 : 0x0;
+    result = rising | falling;
+
     for (WaitResult mode : WaitResult.values()) {
       if (mode.value == result) {
         return mode;
