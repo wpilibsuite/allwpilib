@@ -218,9 +218,7 @@ public class CommandGroup extends Command {
   void _execute() {
     Entry entry = null;
     Command cmd = null;
-    boolean firstRun = false;
     if (m_currentCommandIndex == -1) {
-      firstRun = true;
       m_currentCommandIndex = 0;
     }
 
@@ -243,11 +241,10 @@ public class CommandGroup extends Command {
       switch (entry.m_state) {
         case Entry.IN_SEQUENCE:
           cmd = entry.m_command;
-          if (firstRun) {
+          if (!cmd.isRunning()) {
             cmd.startRunning();
             cancelConflicts(cmd);
           }
-          firstRun = false;
           break;
         case Entry.BRANCH_PEER:
           m_currentCommandIndex++;
