@@ -86,27 +86,27 @@ public class CommandSequentialGroupTest extends AbstractCommandTest {
     
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
-    assertCommandState(command2, 1, 3, 3, 0, 1);
+    assertCommandState(command2, 1, 2, 2, 0, 1);
     assertCommandState(command3, 0, 0, 0, 0, 0);
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
-    assertCommandState(command2, 1, 3, 3, 0, 1);
+    assertCommandState(command2, 1, 2, 2, 0, 1);
     assertCommandState(command3, 1, 1, 1, 0, 0);
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
-    assertCommandState(command2, 1, 3, 3, 0, 1);
+    assertCommandState(command2, 1, 2, 2, 0, 1);
     assertCommandState(command3, 1, 2, 2, 0, 0);
     command3.setHasFinished(true);
     assertCommandState(command1, 1, 1, 1, 0, 1);
-    assertCommandState(command2, 1, 3, 3, 0, 1);
+    assertCommandState(command2, 1, 2, 2, 0, 1);
     assertCommandState(command3, 1, 2, 2, 0, 0);
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
-    assertCommandState(command2, 1, 3, 3, 0, 1);
+    assertCommandState(command2, 1, 2, 2, 0, 1);
     assertCommandState(command3, 1, 3, 3, 1, 0);
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
-    assertCommandState(command2, 1, 3, 3, 0, 1);
+    assertCommandState(command2, 1, 2, 2, 0, 1);
     assertCommandState(command3, 1, 3, 3, 1, 0);
   }
 
