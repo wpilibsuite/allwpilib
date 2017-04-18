@@ -105,6 +105,8 @@ The hal directory contains more C++ code meant to run on the roboRIO. HAL is an 
 
 The [styleguide repository](https://github.com/wpilibsuite/styleguide) contains our style guides for C++ and Java code. Anything submitted to the WPILib project needs to follow the code style guides outlined in there. For details about the style, please see the contributors document [here](CONTRIBUTING.md#coding-guidelines).
 
+The design-docs folder contains all design documents that have been submitted for feature additions into WPILib. Anyone wishing to add a new feature to WPILib should create a pull request containing a design document according to the rules listed in the README in that folder.
+
 # Contributing to WPILib
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
