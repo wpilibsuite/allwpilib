@@ -1,38 +1,50 @@
 #include <chrono>
+#include <climits>
 #include <cstdio>
 #include <thread>
 #include <iostream>
 
+#include "support/json.h"
+
 #include "ntcore.h"
 
-std::string callback1(nt::StringRef name, nt::StringRef params_str,
-                      const nt::ConnectionInfo& conn_info) {
-  auto params = nt::UnpackRpcValues(params_str, NT_DOUBLE);
-  if (params.empty()) {
-    std::fputs("empty params?\n", stderr);
-    return "";
+void callback1(const nt::RpcAnswer& answer) {
+  wpi::json params;
+  try {
+    params = wpi::json::from_cbor(answer.params);
+  } catch (wpi::json::parse_error err) {
+    std::fputs("could not decode params?\n", stderr);
+    return;
   }
-  return nt::PackRpcValues(nt::Value::MakeDouble(params[0]->GetDouble() + 1.2));
+  if (!params.is_number()) {
+    std::fputs("did not get number\n", stderr);
+    return;
+  }
+  double val = params.get<double>();
+  answer.PostResponse(wpi::json::to_cbor(val + 1.2));
 }
 
 int main() {
-  nt::RpcDefinition def;
-  def.version = 1;
-  def.name = "myfunc1";
-  def.params.emplace_back("param1", nt::Value::MakeDouble(0.0));
-  def.results.emplace_back("result1", NT_DOUBLE);
-  nt::CreateRpc("func1", nt::PackRpcDefinition(def), callback1);
+  auto inst = nt::GetDefaultInstance();
+  nt::StartServer(inst, "rpc_speed.ini", "", 10000);
+  auto entry = nt::GetEntry(inst, "func1");
+  nt::CreateRpc(entry, nt::StringRef("", 1), callback1);
   std::string call1_result_str;
 
   auto start2 = std::chrono::high_resolution_clock::now();
   auto start = nt::Now();
   for (int i=0; i<10000; ++i) {
-    unsigned int call1_uid =
-        nt::CallRpc("func1", nt::PackRpcValues(nt::Value::MakeDouble(i)));
-    nt::GetRpcResult(true, call1_uid, &call1_result_str);
-    auto call1_result = nt::UnpackRpcValues(call1_result_str, NT_DOUBLE);
-    if (call1_result.empty()) {
-      std::fputs("empty result?\n", stderr);
+    unsigned int call1_uid = nt::CallRpc(entry, wpi::json::to_cbor(i));
+    nt::GetRpcResult(entry, call1_uid, &call1_result_str);
+    wpi::json call1_result;
+    try {
+      call1_result = wpi::json::from_cbor(call1_result_str);
+    } catch (wpi::json::parse_error err) {
+      std::fputs("could not decode result?\n", stderr);
+      return 1;
+    }
+    if (!call1_result.is_number()) {
+      std::fputs("result is not number?\n", stderr);
       return 1;
     }
   }

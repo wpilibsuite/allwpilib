@@ -17,22 +17,26 @@
 
 using namespace nt;
 
-ATOMIC_STATIC_INIT(DsClient)
-
 class DsClient::Thread : public wpi::SafeThread {
  public:
-  Thread(unsigned int port) : m_port(port) {}
+  Thread(Dispatcher& dispatcher, wpi::Logger& logger, unsigned int port)
+      : m_dispatcher(dispatcher), m_logger(logger), m_port(port) {}
 
   void Main();
 
+  Dispatcher& m_dispatcher;
+  wpi::Logger& m_logger;
   unsigned int m_port;
   std::unique_ptr<wpi::NetworkStream> m_stream;
 };
 
+DsClient::DsClient(Dispatcher& dispatcher, wpi::Logger& logger)
+    : m_dispatcher(dispatcher), m_logger(logger) {}
+
 void DsClient::Start(unsigned int port) {
   auto thr = m_owner.GetThread();
   if (!thr)
-    m_owner.Start(new Thread(port));
+    m_owner.Start(new Thread(m_dispatcher, m_logger, port));
   else
     thr->m_port = port;
 }
@@ -122,7 +126,7 @@ void DsClient::Thread::Main() {
 
       // If zero, clear the server override
       if (ip == 0) {
-        Dispatcher::GetInstance().ClearServerOverride();
+        m_dispatcher.ClearServerOverride();
         oldip = 0;
         continue;
       }
@@ -137,14 +141,14 @@ void DsClient::Thread::Main() {
       os << ((ip >> 24) & 0xff) << "." << ((ip >> 16) & 0xff) << "."
          << ((ip >> 8) & 0xff) << "." << (ip & 0xff);
       INFO("client: DS overriding server IP to " << os.str());
-      Dispatcher::GetInstance().SetServerOverride(json.c_str(), port);
+      m_dispatcher.SetServerOverride(json.c_str(), port);
     }
 
     // We disconnected from the DS, clear the server override
-    Dispatcher::GetInstance().ClearServerOverride();
+    m_dispatcher.ClearServerOverride();
     oldip = 0;
   }
 
 done:
-  Dispatcher::GetInstance().ClearServerOverride();
+  m_dispatcher.ClearServerOverride();
 }

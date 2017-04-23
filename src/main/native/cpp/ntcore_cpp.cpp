@@ -12,142 +12,665 @@
 #include <cstdlib>
 
 #include "support/timestamp.h"
+
+#include "Handle.h"
+#include "InstanceImpl.h"
 #include "Log.h"
-#include "Dispatcher.h"
-#include "DsClient.h"
-#include "Notifier.h"
-#include "RpcServer.h"
-#include "Storage.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
 
 namespace nt {
 
 /*
+ * Instance Functions
+ */
+
+NT_Inst GetDefaultInstance() {
+  return Handle{InstanceImpl::GetDefaultIndex(), 0, Handle::kInstance};
+}
+
+NT_Inst CreateInstance() {
+  return Handle{InstanceImpl::Alloc(), 0, Handle::kInstance};
+}
+
+void DestroyInstance(NT_Inst inst) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  if (i < 0) return;
+  InstanceImpl::Destroy(i);
+}
+
+NT_Inst GetInstanceFromHandle(NT_Handle handle) {
+  Handle h{handle};
+  auto type = h.GetType();
+  if (type >= Handle::kConnectionListener && type <= Handle::kRpcCallPoller)
+    return Handle(h.GetInst(), 0, Handle::kInstance);
+
+  return 0;
+}
+
+/*
  * Table Functions
  */
 
+NT_Entry GetEntry(NT_Inst inst, StringRef name) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return 0;
+
+  unsigned int id = ii->storage.GetEntry(name);
+  if (id == UINT_MAX) return 0;
+  return Handle(i, id, Handle::kEntry);
+}
+
+std::vector<NT_Entry> GetEntries(NT_Inst inst, StringRef prefix,
+                                 unsigned int types) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return std::vector<NT_Entry>{};
+
+  auto arr = ii->storage.GetEntries(prefix, types);
+  // convert indices to handles
+  for (auto& val : arr) val = Handle(i, val, Handle::kEntry);
+  return arr;
+}
+
+std::string GetEntryName(NT_Entry entry) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::string{};
+
+  return ii->storage.GetEntryName(id);
+}
+
+NT_Type GetEntryType(NT_Entry entry) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return NT_UNASSIGNED;
+
+  return ii->storage.GetEntryType(id);
+}
+
+unsigned long long GetEntryLastChange(NT_Entry entry) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return 0;
+
+  return ii->storage.GetEntryLastChange(id);
+}
+
 std::shared_ptr<Value> GetEntryValue(StringRef name) {
-  return Storage::GetInstance().GetEntryValue(name);
+  return InstanceImpl::GetDefault()->storage.GetEntryValue(name);
+}
+
+std::shared_ptr<Value> GetEntryValue(NT_Entry entry) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return nullptr;
+
+  return ii->storage.GetEntryValue(id);
 }
 
 bool SetDefaultEntryValue(StringRef name, std::shared_ptr<Value> value) {
-  return Storage::GetInstance().SetDefaultEntryValue(name, value);
+  return InstanceImpl::GetDefault()->storage.SetDefaultEntryValue(name, value);
+}
+
+bool SetDefaultEntryValue(NT_Entry entry, std::shared_ptr<Value> value) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return false;
+
+  return ii->storage.SetDefaultEntryValue(id, value);
 }
 
 bool SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
-  return Storage::GetInstance().SetEntryValue(name, value);
+  return InstanceImpl::GetDefault()->storage.SetEntryValue(name, value);
+}
+
+bool SetEntryValue(NT_Entry entry, std::shared_ptr<Value> value) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return false;
+
+  return ii->storage.SetEntryValue(id, value);
 }
 
 void SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
-  Storage::GetInstance().SetEntryTypeValue(name, value);
+  InstanceImpl::GetDefault()->storage.SetEntryTypeValue(name, value);
+}
+
+void SetEntryTypeValue(NT_Entry entry, std::shared_ptr<Value> value) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->storage.SetEntryTypeValue(id, value);
 }
 
 void SetEntryFlags(StringRef name, unsigned int flags) {
-  Storage::GetInstance().SetEntryFlags(name, flags);
+  InstanceImpl::GetDefault()->storage.SetEntryFlags(name, flags);
+}
+
+void SetEntryFlags(NT_Entry entry, unsigned int flags) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->storage.SetEntryFlags(id, flags);
 }
 
 unsigned int GetEntryFlags(StringRef name) {
-  return Storage::GetInstance().GetEntryFlags(name);
+  return InstanceImpl::GetDefault()->storage.GetEntryFlags(name);
 }
 
-void DeleteEntry(StringRef name) { Storage::GetInstance().DeleteEntry(name); }
+unsigned int GetEntryFlags(NT_Entry entry) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return 0;
 
-void DeleteAllEntries() { Storage::GetInstance().DeleteAllEntries(); }
+  return ii->storage.GetEntryFlags(id);
+}
+
+void DeleteEntry(StringRef name) {
+  InstanceImpl::GetDefault()->storage.DeleteEntry(name);
+}
+
+void DeleteEntry(NT_Entry entry) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->storage.DeleteEntry(id);
+}
+
+void DeleteAllEntries() {
+  InstanceImpl::GetDefault()->storage.DeleteAllEntries();
+}
+
+void DeleteAllEntries(NT_Inst inst) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (i < 0 || !ii) return;
+
+  ii->storage.DeleteAllEntries();
+}
 
 std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types) {
-  return Storage::GetInstance().GetEntryInfo(prefix, types);
+  return InstanceImpl::GetDefault()->storage.GetEntryInfo(0, prefix, types);
 }
 
-void Flush() { Dispatcher::GetInstance().Flush(); }
+std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, StringRef prefix,
+                                    unsigned int types) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return std::vector<EntryInfo>{};
+
+  return ii->storage.GetEntryInfo(i, prefix, types);
+}
+
+EntryInfo GetEntryInfo(NT_Entry entry) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  int i = handle.GetInst();
+  auto ii = InstanceImpl::Get(i);
+  if (id < 0 || !ii) {
+    EntryInfo info;
+    info.entry = 0;
+    info.type = NT_UNASSIGNED;
+    info.flags = 0;
+    info.last_change = 0;
+    return info;
+  }
+
+  return ii->storage.GetEntryInfo(i, id);
+}
 
 /*
  * Callback Creation Functions
  */
 
-void SetListenerOnStart(std::function<void()> on_start) {
-  Notifier::GetInstance().SetOnStart(on_start);
+NT_EntryListener AddEntryListener(StringRef prefix,
+                                  EntryListenerCallback callback,
+                                  unsigned int flags) {
+  return AddEntryListener(
+      Handle(InstanceImpl::GetDefaultIndex(), 0, Handle::kInstance), prefix,
+      [=](const EntryNotification& event) {
+        callback(event.listener, event.name, event.value, event.flags);
+      },
+      flags);
 }
 
-void SetListenerOnExit(std::function<void()> on_exit) {
-  Notifier::GetInstance().SetOnExit(on_exit);
+NT_EntryListener AddEntryListener(
+    NT_Inst inst, StringRef prefix,
+    std::function<void(const EntryNotification& event)> callback,
+    unsigned int flags) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (i < 0 || !ii) return 0;
+
+  unsigned int uid = ii->entry_notifier.Add(callback, prefix, flags);
+  // perform immediate notifications
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
+    for (auto& i : ii->storage.GetEntries(prefix, 0)) {
+      ii->entry_notifier.NotifyEntry(i, ii->storage.GetEntryName(i),
+                                     ii->storage.GetEntryValue(i),
+                                     NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
+    }
+  }
+  return Handle(i, uid, Handle::kEntryListener);
 }
 
-unsigned int AddEntryListener(StringRef prefix, EntryListenerCallback callback,
-                              unsigned int flags) {
-  unsigned int uid =
-      Notifier::GetInstance().AddEntryListener(prefix, callback, flags);
-  if ((flags & NT_NOTIFY_IMMEDIATE) != 0)
-    Storage::GetInstance().NotifyEntries(prefix, callback);
-  return uid;
+NT_EntryListener AddEntryListener(
+    NT_Entry entry,
+    std::function<void(const EntryNotification& event)> callback,
+    unsigned int flags) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  int i = handle.GetInst();
+  auto ii = InstanceImpl::Get(i);
+  if (id < 0 || !ii) return 0;
+
+  unsigned int uid = ii->entry_notifier.Add(callback, id, flags);
+  // perform immediate notifications
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
+    auto name = ii->storage.GetEntryName(id);
+    auto value = ii->storage.GetEntryValue(id);
+    // if no name or value, don't notify
+    if (!name.empty() && value) {
+      ii->entry_notifier.NotifyEntry(id, name, value,
+                                     NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
+    }
+  }
+  return Handle(i, uid, Handle::kEntryListener);
 }
 
-void RemoveEntryListener(unsigned int entry_listener_uid) {
-  Notifier::GetInstance().RemoveEntryListener(entry_listener_uid);
+NT_EntryListenerPoller CreateEntryListenerPoller(NT_Inst inst) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return 0;
+
+  return Handle(i, ii->entry_notifier.CreatePoller(),
+                Handle::kEntryListenerPoller);
 }
 
-unsigned int AddConnectionListener(ConnectionListenerCallback callback,
-                                   bool immediate_notify) {
-  unsigned int uid = Notifier::GetInstance().AddConnectionListener(callback);
-  if (immediate_notify) Dispatcher::GetInstance().NotifyConnections(callback);
-  return uid;
+void DestroyEntryListenerPoller(NT_EntryListenerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->entry_notifier.RemovePoller(id);
 }
 
-void RemoveConnectionListener(unsigned int conn_listener_uid) {
-  Notifier::GetInstance().RemoveConnectionListener(conn_listener_uid);
+NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
+                                        StringRef prefix, unsigned int flags) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
+  int i = handle.GetInst();
+  auto ii = InstanceImpl::Get(i);
+  if (id < 0 || !ii) return 0;
+
+  unsigned int uid = ii->entry_notifier.AddPolled(id, prefix, flags);
+  // perform immediate notifications
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
+    for (auto& i : ii->storage.GetEntries(prefix, 0)) {
+      ii->entry_notifier.NotifyEntry(i, ii->storage.GetEntryName(i),
+                                     ii->storage.GetEntryValue(i),
+                                     NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
+    }
+  }
+  return Handle(i, uid, Handle::kEntryListener);
 }
 
-bool NotifierDestroyed() { return Notifier::destroyed(); }
+NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
+                                        NT_Entry entry, unsigned int flags) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  int i = handle.GetInst();
+  auto ii = InstanceImpl::Get(i);
+  if (id < 0 || !ii) return 0;
+
+  Handle phandle{poller};
+  int p_id = phandle.GetTypedIndex(Handle::kEntryListenerPoller);
+  if (p_id < 0) return 0;
+  if (handle.GetInst() != phandle.GetInst()) return 0;
+
+  unsigned int uid = ii->entry_notifier.AddPolled(p_id, entry, flags);
+  // perform immediate notifications
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
+    auto name = ii->storage.GetEntryName(id);
+    auto value = ii->storage.GetEntryValue(id);
+    // if no name or value, don't notify
+    if (!name.empty() && value) {
+      ii->entry_notifier.NotifyEntry(id, name, value,
+                                     NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
+    }
+  }
+  return Handle(i, uid, Handle::kEntryListener);
+}
+
+std::vector<EntryNotification> PollEntryListener(
+    NT_EntryListenerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::vector<EntryNotification>{};
+
+  return ii->entry_notifier.Poll(static_cast<unsigned int>(id));
+}
+
+std::vector<EntryNotification> PollEntryListener(NT_EntryListenerPoller poller,
+                                                 double timeout,
+                                                 bool* timed_out) {
+  *timed_out = false;
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::vector<EntryNotification>{};
+
+  return ii->entry_notifier.Poll(static_cast<unsigned int>(id), timeout,
+                                 timed_out);
+}
+
+void CancelPollEntryListener(NT_EntryListenerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->entry_notifier.CancelPoll(id);
+}
+
+void RemoveEntryListener(NT_EntryListener entry_listener) {
+  Handle handle{entry_listener};
+  int uid = handle.GetTypedIndex(Handle::kEntryListener);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (uid < 0 || !ii) return;
+
+  ii->entry_notifier.Remove(uid);
+}
+
+bool WaitForEntryListenerQueue(NT_Inst inst, double timeout) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return true;
+  return ii->entry_notifier.WaitForQueue(timeout);
+}
+
+NT_ConnectionListener AddConnectionListener(ConnectionListenerCallback callback,
+                                            bool immediate_notify) {
+  return AddConnectionListener(
+      Handle(InstanceImpl::GetDefaultIndex(), 0, Handle::kInstance),
+      [=](const ConnectionNotification& event) {
+        callback(event.listener, event.connected, event.conn);
+      },
+      immediate_notify);
+}
+
+NT_ConnectionListener AddConnectionListener(
+    NT_Inst inst,
+    std::function<void(const ConnectionNotification& event)> callback,
+    bool immediate_notify) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return 0;
+
+  unsigned int uid = ii->connection_notifier.Add(callback);
+  if (immediate_notify) {
+    for (auto& conn : ii->dispatcher.GetConnections())
+      ii->connection_notifier.NotifyConnection(true, conn, uid);
+  }
+  return Handle(i, uid, Handle::kConnectionListener);
+}
+
+NT_ConnectionListenerPoller CreateConnectionListenerPoller(NT_Inst inst) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return 0;
+
+  return Handle(i, ii->connection_notifier.CreatePoller(),
+                Handle::kConnectionListenerPoller);
+}
+
+void DestroyConnectionListenerPoller(NT_ConnectionListenerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->connection_notifier.RemovePoller(id);
+}
+
+NT_ConnectionListener AddPolledConnectionListener(
+    NT_ConnectionListenerPoller poller, bool immediate_notify) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
+  int i = handle.GetInst();
+  auto ii = InstanceImpl::Get(i);
+  if (id < 0 || !ii) return 0;
+
+  unsigned int uid = ii->connection_notifier.AddPolled(id);
+  // perform immediate notifications
+  if (immediate_notify) {
+    for (auto& conn : ii->dispatcher.GetConnections())
+      ii->connection_notifier.NotifyConnection(true, conn, uid);
+  }
+  return Handle(i, uid, Handle::kConnectionListener);
+}
+
+std::vector<ConnectionNotification> PollConnectionListener(
+    NT_ConnectionListenerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::vector<ConnectionNotification>{};
+
+  return ii->connection_notifier.Poll(static_cast<unsigned int>(id));
+}
+
+std::vector<ConnectionNotification> PollConnectionListener(
+    NT_ConnectionListenerPoller poller, double timeout, bool* timed_out) {
+  *timed_out = false;
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::vector<ConnectionNotification>{};
+
+  return ii->connection_notifier.Poll(static_cast<unsigned int>(id), timeout,
+                                      timed_out);
+}
+
+void CancelPollConnectionListener(NT_ConnectionListenerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kConnectionListenerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->connection_notifier.CancelPoll(id);
+}
+
+void RemoveConnectionListener(NT_ConnectionListener conn_listener) {
+  Handle handle{conn_listener};
+  int uid = handle.GetTypedIndex(Handle::kConnectionListener);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (uid < 0 || !ii) return;
+
+  ii->connection_notifier.Remove(uid);
+}
+
+bool WaitForConnectionListenerQueue(NT_Inst inst, double timeout) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return true;
+  return ii->connection_notifier.WaitForQueue(timeout);
+}
 
 /*
  * Remote Procedure Call Functions
  */
 
-void SetRpcServerOnStart(std::function<void()> on_start) {
-  RpcServer::GetInstance().SetOnStart(on_start);
+void CreateRpc(NT_Entry entry, StringRef def,
+               std::function<void(const RpcAnswer& answer)> callback) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  // only server can create RPCs
+  if ((ii->dispatcher.GetNetworkMode() & NT_NET_MODE_SERVER) == 0) return;
+  if (def.empty() || !callback) return;
+
+  ii->storage.CreateRpc(id, def, ii->rpc_server.Add(callback));
 }
 
-void SetRpcServerOnExit(std::function<void()> on_exit) {
-  RpcServer::GetInstance().SetOnExit(on_exit);
+NT_RpcCallPoller CreateRpcCallPoller(NT_Inst inst) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return 0;
+
+  return Handle(i, ii->rpc_server.CreatePoller(), Handle::kRpcCallPoller);
 }
 
-void CreateRpc(StringRef name, StringRef def, RpcCallback callback) {
-  Storage::GetInstance().CreateRpc(name, def, callback);
+void DestroyRpcCallPoller(NT_RpcCallPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kRpcCallPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->rpc_server.RemovePoller(id);
 }
 
-void CreatePolledRpc(StringRef name, StringRef def) {
-  Storage::GetInstance().CreatePolledRpc(name, def);
+void CreatePolledRpc(NT_Entry entry, StringRef def, NT_RpcCallPoller poller) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  Handle phandle{poller};
+  int p_id = phandle.GetTypedIndex(Handle::kRpcCallPoller);
+  if (p_id < 0) return;
+  if (handle.GetInst() != phandle.GetInst()) return;
+
+  // only server can create RPCs
+  if ((ii->dispatcher.GetNetworkMode() & NT_NET_MODE_SERVER) == 0) return;
+  if (def.empty()) return;
+
+  ii->storage.CreateRpc(id, def, ii->rpc_server.AddPolled(p_id));
 }
 
-bool PollRpc(bool blocking, RpcCallInfo* call_info) {
-  return RpcServer::GetInstance().PollRpc(blocking, call_info);
+std::vector<RpcAnswer> PollRpc(NT_RpcCallPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kRpcCallPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::vector<RpcAnswer>{};
+
+  return ii->rpc_server.Poll(static_cast<unsigned int>(id));
 }
 
-bool PollRpc(bool blocking, double time_out, RpcCallInfo* call_info) {
-  return RpcServer::GetInstance().PollRpc(blocking, time_out, call_info);
+std::vector<RpcAnswer> PollRpc(NT_RpcCallPoller poller, double timeout,
+                               bool* timed_out) {
+  *timed_out = false;
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kRpcCallPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::vector<RpcAnswer>{};
+
+  return ii->rpc_server.Poll(static_cast<unsigned int>(id), timeout, timed_out);
 }
 
-void PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
-                     StringRef result) {
-  RpcServer::GetInstance().PostRpcResponse(rpc_id, call_uid, result);
+void CancelPollRpc(NT_RpcCallPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kRpcCallPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->rpc_server.CancelPoll(id);
 }
 
-unsigned int CallRpc(StringRef name, StringRef params) {
-  return Storage::GetInstance().CallRpc(name, params);
+bool WaitForRpcCallQueue(NT_Inst inst, double timeout) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return true;
+  return ii->rpc_server.WaitForQueue(timeout);
 }
 
-bool GetRpcResult(bool blocking, unsigned int call_uid, std::string* result) {
-  return Storage::GetInstance().GetRpcResult(blocking, call_uid, result);
+void PostRpcResponse(NT_Entry entry, NT_RpcCall call, StringRef result) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  Handle chandle{call};
+  int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
+  if (call_uid < 0) return;
+  if (handle.GetInst() != chandle.GetInst()) return;
+
+  ii->rpc_server.PostRpcResponse(id, call_uid, result);
 }
 
-bool GetRpcResult(bool blocking, unsigned int call_uid, double time_out,
-                  std::string* result) {
-  return Storage::GetInstance().GetRpcResult(blocking, call_uid, time_out,
-                                             result);
+NT_RpcCall CallRpc(NT_Entry entry, StringRef params) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  int i = handle.GetInst();
+  auto ii = InstanceImpl::Get(i);
+  if (id < 0 || !ii) return 0;
+
+  unsigned int call_uid = ii->storage.CallRpc(id, params);
+  if (call_uid == 0) return 0;
+  return Handle(i, call_uid, Handle::kRpcCall);
 }
 
-void CancelBlockingRpcResult(unsigned int call_uid) {
-  Storage::GetInstance().CancelBlockingRpcResult(call_uid);
+bool GetRpcResult(NT_Entry entry, NT_RpcCall call, std::string* result) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return false;
+
+  Handle chandle{call};
+  int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
+  if (call_uid < 0) return false;
+  if (handle.GetInst() != chandle.GetInst()) return false;
+
+  return ii->storage.GetRpcResult(id, call_uid, result);
+}
+
+bool GetRpcResult(NT_Entry entry, NT_RpcCall call, std::string* result,
+                  double timeout, bool* timed_out) {
+  *timed_out = false;
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return false;
+
+  Handle chandle{call};
+  int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
+  if (call_uid < 0) return false;
+  if (handle.GetInst() != chandle.GetInst()) return false;
+
+  return ii->storage.GetRpcResult(id, call_uid, result, timeout, timed_out);
+}
+
+void CancelRpcResult(NT_Entry entry, NT_RpcCall call) {
+  Handle handle{entry};
+  int id = handle.GetTypedIndex(Handle::kEntry);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  Handle chandle{call};
+  int call_uid = chandle.GetTypedIndex(Handle::kRpcCall);
+  if (call_uid < 0) return;
+  if (handle.GetInst() != chandle.GetInst()) return;
+
+  ii->storage.CancelRpcResult(id, call_uid);
 }
 
 std::string PackRpcDefinition(const RpcDefinition& def) {
@@ -179,7 +702,8 @@ std::string PackRpcDefinition(const RpcDefinition& def) {
 
 bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def) {
   wpi::raw_mem_istream is(packed.data(), packed.size());
-  WireDecoder dec(is, 0x0300);
+  wpi::Logger logger;
+  WireDecoder dec(is, 0x0300, logger);
   if (!dec.Read8(&def->version)) return false;
   if (!dec.ReadString(&def->name)) return false;
 
@@ -222,7 +746,8 @@ std::string PackRpcValues(ArrayRef<std::shared_ptr<Value>> values) {
 std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
                                                     ArrayRef<NT_Type> types) {
   wpi::raw_mem_istream is(packed.data(), packed.size());
-  WireDecoder dec(is, 0x0300);
+  wpi::Logger logger;
+  WireDecoder dec(is, 0x0300, logger);
   std::vector<std::shared_ptr<Value>> vec;
   for (auto type : types) {
     auto item = dec.ReadValue(type);
@@ -232,64 +757,198 @@ std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
   return vec;
 }
 
+unsigned long long Now() { return wpi::Now(); }
+
 /*
  * Client/Server Functions
  */
 
 void SetNetworkIdentity(StringRef name) {
-  Dispatcher::GetInstance().SetIdentity(name);
+  InstanceImpl::GetDefault()->dispatcher.SetIdentity(name);
+}
+
+void SetNetworkIdentity(NT_Inst inst, StringRef name) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.SetIdentity(name);
 }
 
 unsigned int GetNetworkMode() {
-  auto& d = Dispatcher::GetInstance();
-  return d.GetNetworkMode();
+  return InstanceImpl::GetDefault()->dispatcher.GetNetworkMode();
+}
+
+unsigned int GetNetworkMode(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return 0;
+
+  return ii->dispatcher.GetNetworkMode();
 }
 
 void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port) {
-  Dispatcher::GetInstance().StartServer(persist_filename, listen_address, port);
+  auto ii = InstanceImpl::GetDefault();
+  ii->dispatcher.StartServer(persist_filename, listen_address, port);
 }
 
-void StopServer() { Dispatcher::GetInstance().Stop(); }
+void StartServer(NT_Inst inst, StringRef persist_filename,
+                 const char* listen_address, unsigned int port) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
 
-void StartClient() { Dispatcher::GetInstance().StartClient(); }
+  ii->dispatcher.StartServer(persist_filename, listen_address, port);
+}
+
+void StopServer() { InstanceImpl::GetDefault()->dispatcher.Stop(); }
+
+void StopServer(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.Stop();
+}
+
+void StartClient() { InstanceImpl::GetDefault()->dispatcher.StartClient(); }
+
+void StartClient(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.StartClient();
+}
 
 void StartClient(const char* server_name, unsigned int port) {
-  auto& d = Dispatcher::GetInstance();
-  d.SetServer(server_name, port);
-  d.StartClient();
+  auto ii = InstanceImpl::GetDefault();
+  ii->dispatcher.SetServer(server_name, port);
+  ii->dispatcher.StartClient();
+}
+
+void StartClient(NT_Inst inst, const char* server_name, unsigned int port) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.SetServer(server_name, port);
+  ii->dispatcher.StartClient();
 }
 
 void StartClient(ArrayRef<std::pair<StringRef, unsigned int>> servers) {
-  auto& d = Dispatcher::GetInstance();
-  d.SetServer(servers);
-  d.StartClient();
+  auto ii = InstanceImpl::GetDefault();
+  ii->dispatcher.SetServer(servers);
+  ii->dispatcher.StartClient();
 }
 
-void StopClient() { Dispatcher::GetInstance().Stop(); }
+void StartClient(NT_Inst inst,
+                 ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.SetServer(servers);
+  ii->dispatcher.StartClient();
+}
+
+void StartClientTeam(NT_Inst inst, unsigned int team, unsigned int port) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.SetServerTeam(team, port);
+  ii->dispatcher.StartClient();
+}
+
+void StopClient() { InstanceImpl::GetDefault()->dispatcher.Stop(); }
+
+void StopClient(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.Stop();
+}
 
 void SetServer(const char* server_name, unsigned int port) {
-  Dispatcher::GetInstance().SetServer(server_name, port);
+  InstanceImpl::GetDefault()->dispatcher.SetServer(server_name, port);
+}
+
+void SetServer(NT_Inst inst, const char* server_name, unsigned int port) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.SetServer(server_name, port);
 }
 
 void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers) {
-  Dispatcher::GetInstance().SetServer(servers);
+  InstanceImpl::GetDefault()->dispatcher.SetServer(servers);
 }
 
-void StartDSClient(unsigned int port) { DsClient::GetInstance().Start(port); }
+void SetServer(NT_Inst inst,
+               ArrayRef<std::pair<StringRef, unsigned int>> servers) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
 
-void StopDSClient() { DsClient::GetInstance().Stop(); }
+  ii->dispatcher.SetServer(servers);
+}
 
-void StopRpcServer() { RpcServer::GetInstance().Stop(); }
+void SetServerTeam(NT_Inst inst, unsigned int team, unsigned int port) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
 
-void StopNotifier() { Notifier::GetInstance().Stop(); }
+  ii->dispatcher.SetServerTeam(team, port);
+}
+
+void StartDSClient(unsigned int port) {
+  InstanceImpl::GetDefault()->ds_client.Start(port);
+}
+
+void StartDSClient(NT_Inst inst, unsigned int port) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->ds_client.Start(port);
+}
+
+void StopDSClient() { InstanceImpl::GetDefault()->ds_client.Stop(); }
+
+void StopDSClient(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->ds_client.Stop();
+}
 
 void SetUpdateRate(double interval) {
-  Dispatcher::GetInstance().SetUpdateRate(interval);
+  InstanceImpl::GetDefault()->dispatcher.SetUpdateRate(interval);
+}
+
+void SetUpdateRate(NT_Inst inst, double interval) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.SetUpdateRate(interval);
+}
+
+void Flush() { InstanceImpl::GetDefault()->dispatcher.Flush(); }
+
+void Flush(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return;
+
+  ii->dispatcher.Flush();
 }
 
 std::vector<ConnectionInfo> GetConnections() {
-  return Dispatcher::GetInstance().GetConnections();
+  return InstanceImpl::GetDefault()->dispatcher.GetConnections();
+}
+
+std::vector<ConnectionInfo> GetConnections(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return std::vector<ConnectionInfo>{};
+
+  return ii->dispatcher.GetConnections();
+}
+
+bool IsConnected(NT_Inst inst) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return false;
+
+  return ii->dispatcher.IsConnected();
 }
 
 /*
@@ -297,21 +956,133 @@ std::vector<ConnectionInfo> GetConnections() {
  */
 
 const char* SavePersistent(StringRef filename) {
-  return Storage::GetInstance().SavePersistent(filename, false);
+  return InstanceImpl::GetDefault()->storage.SavePersistent(filename, false);
+}
+
+const char* SavePersistent(NT_Inst inst, StringRef filename) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return "invalid instance handle";
+
+  return ii->storage.SavePersistent(filename, false);
 }
 
 const char* LoadPersistent(
     StringRef filename,
     std::function<void(size_t line, const char* msg)> warn) {
-  return Storage::GetInstance().LoadPersistent(filename, warn);
+  return InstanceImpl::GetDefault()->storage.LoadPersistent(filename, warn);
 }
 
-unsigned long long Now() { return wpi::Now(); }
+const char* LoadPersistent(
+    NT_Inst inst, StringRef filename,
+    std::function<void(size_t line, const char* msg)> warn) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return "invalid instance handle";
+
+  return ii->storage.LoadPersistent(filename, warn);
+}
 
 void SetLogger(LogFunc func, unsigned int min_level) {
-  Logger& logger = Logger::GetInstance();
-  logger.SetLogger(func);
-  logger.set_min_level(min_level);
+  auto ii = InstanceImpl::GetDefault();
+  static std::mutex mutex;
+  static unsigned int logger = 0;
+  std::lock_guard<std::mutex> lock(mutex);
+  if (logger != 0) ii->logger_impl.Remove(logger);
+  logger = ii->logger_impl.Add(
+      [=](const LogMessage& msg) {
+        func(msg.level, msg.filename, msg.line, msg.message.c_str());
+      },
+      min_level, UINT_MAX);
+}
+
+NT_Logger AddLogger(NT_Inst inst,
+                    std::function<void(const LogMessage& msg)> func,
+                    unsigned int min_level, unsigned int max_level) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return 0;
+
+  if (min_level < ii->logger.min_level()) ii->logger.set_min_level(min_level);
+
+  return Handle(i, ii->logger_impl.Add(func, min_level, max_level),
+                Handle::kLogger);
+}
+
+NT_LoggerPoller CreateLoggerPoller(NT_Inst inst) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return 0;
+
+  return Handle(i, ii->logger_impl.CreatePoller(), Handle::kLoggerPoller);
+}
+
+void DestroyLoggerPoller(NT_LoggerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->logger_impl.RemovePoller(id);
+}
+
+NT_Logger AddPolledLogger(NT_LoggerPoller poller, unsigned int min_level,
+                          unsigned int max_level) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
+  int i = handle.GetInst();
+  auto ii = InstanceImpl::Get(i);
+  if (id < 0 || !ii) return 0;
+
+  if (min_level < ii->logger.min_level()) ii->logger.set_min_level(min_level);
+
+  return Handle(i, ii->logger_impl.AddPolled(id, min_level, max_level),
+                Handle::kLogger);
+}
+
+std::vector<LogMessage> PollLogger(NT_LoggerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::vector<LogMessage>{};
+
+  return ii->logger_impl.Poll(static_cast<unsigned int>(id));
+}
+
+std::vector<LogMessage> PollLogger(NT_LoggerPoller poller, double timeout,
+                                   bool* timed_out) {
+  *timed_out = false;
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return std::vector<LogMessage>{};
+
+  return ii->logger_impl.Poll(static_cast<unsigned int>(id), timeout,
+                              timed_out);
+}
+
+void CancelPollLogger(NT_LoggerPoller poller) {
+  Handle handle{poller};
+  int id = handle.GetTypedIndex(Handle::kLoggerPoller);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (id < 0 || !ii) return;
+
+  ii->logger_impl.CancelPoll(id);
+}
+
+void RemoveLogger(NT_Logger logger) {
+  Handle handle{logger};
+  int uid = handle.GetTypedIndex(Handle::kLogger);
+  auto ii = InstanceImpl::Get(handle.GetInst());
+  if (uid < 0 || !ii) return;
+
+  ii->logger_impl.Remove(uid);
+  ii->logger.set_min_level(ii->logger_impl.GetMinLevel());
+}
+
+bool WaitForLoggerQueue(NT_Inst inst, double timeout) {
+  int i = Handle{inst}.GetTypedInst(Handle::kInstance);
+  auto ii = InstanceImpl::Get(i);
+  if (!ii) return true;
+  return ii->logger_impl.WaitForQueue(timeout);
 }
 
 }  // namespace nt

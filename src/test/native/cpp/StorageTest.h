@@ -12,42 +12,37 @@
 #include <memory>
 #include <vector>
 
+#include "Log.h"
 #include "Storage.h"
+
+#include "MockDispatcher.h"
+#include "MockEntryNotifier.h"
+#include "MockRpcServer.h"
 
 namespace nt {
 
 class StorageTest {
  public:
-  StorageTest() : tmp_entry("foobar") {}
+  StorageTest() : storage(notifier, rpc_server, logger), tmp_entry("foobar") {}
 
   Storage::EntriesMap& entries() { return storage.m_entries; }
   Storage::IdMap& idmap() { return storage.m_idmap; }
 
   Storage::Entry* GetEntry(StringRef name) {
     auto i = storage.m_entries.find(name);
-    return i == storage.m_entries.end() ? &tmp_entry : i->getValue().get();
+    return i == storage.m_entries.end() ? &tmp_entry : i->getValue();
   }
 
   void HookOutgoing(bool server) {
-    using namespace std::placeholders;
-    storage.SetOutgoing(
-        std::bind(&StorageTest::QueueOutgoing, this, _1, _2, _3), server);
+    storage.SetDispatcher(&dispatcher, server);
   }
 
-  struct OutgoingData {
-    std::shared_ptr<Message> msg;
-    NetworkConnection* only;
-    NetworkConnection* except;
-  };
-
-  void QueueOutgoing(std::shared_ptr<Message> msg, NetworkConnection* only,
-                     NetworkConnection* except) {
-    outgoing.emplace_back(OutgoingData{msg, only, except});
-  }
-
+  wpi::Logger logger;
+  ::testing::StrictMock<MockEntryNotifier> notifier;
+  ::testing::StrictMock<MockRpcServer> rpc_server;
+  ::testing::StrictMock<MockDispatcher> dispatcher;
   Storage storage;
   Storage::Entry tmp_entry;
-  std::vector<OutgoingData> outgoing;
 };
 
 }  // namespace nt

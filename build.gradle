@@ -90,12 +90,12 @@ dependencies {
 model {
     jniConfigs {
         ntcore(JNIConfig) {
-            jniDefinitionClasses = [ "edu.wpi.first.wpilibj.networktables.NetworkTablesJNI" ]
+            jniDefinitionClasses = [ "edu.wpi.first.networktables.NetworkTablesJNI" ]
             jniArmHeaderLocations = [ all: file("${rootDir}/src/arm-linux-jni") ]
             sourceSets = [ project.sourceSets.main ]
         }
         ntcoreJNI(JNIConfig) {
-            jniDefinitionClasses = [ "edu.wpi.first.wpilibj.networktables.NetworkTablesJNI" ]
+            jniDefinitionClasses = [ "edu.wpi.first.networktables.NetworkTablesJNI" ]
             jniArmHeaderLocations = [ all: file("${rootDir}/src/arm-linux-jni") ]
             sourceSets = [ project.sourceSets.main ]
         }

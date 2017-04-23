@@ -8,6 +8,7 @@
 #include "WireEncoder.h"
 
 #include "gtest/gtest.h"
+#include "TestPrinters.h"
 
 #include <cfloat>
 #include <climits>

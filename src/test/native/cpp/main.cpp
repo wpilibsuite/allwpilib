@@ -5,20 +5,20 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 
-#include "Log.h"
+#include <climits>
 
-int main(int argc, char **argv)
-{
-  nt::Logger::GetInstance().SetLogger(
-      [](unsigned int level, const char* file, unsigned int line,
-         const char* msg) {
-        std::fputs(msg, stderr);
-        std::fputc('\n', stderr);
-      });
-  nt::Logger::GetInstance().set_min_level(0);
-    ::testing::InitGoogleTest(&argc, argv);
-    int ret = RUN_ALL_TESTS();
-    return ret;
+#include "ntcore.h"
+
+int main(int argc, char** argv) {
+  nt::AddLogger(nt::GetDefaultInstance(),
+                [](const nt::LogMessage& msg) {
+                  std::fputs(msg.message.c_str(), stderr);
+                  std::fputc('\n', stderr);
+                },
+                0, UINT_MAX);
+  ::testing::InitGoogleMock(&argc, argv);
+  int ret = RUN_ALL_TESTS();
+  return ret;
 }

@@ -5,10 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "nt_Value.h"
+#include "networktables/NetworkTableValue.h"
 #include "Value_internal.h"
 
 #include "gtest/gtest.h"
+#include "TestPrinters.h"
 
 namespace nt {
 

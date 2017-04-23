@@ -1,13 +1,42 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj.networktables;
 
-import edu.wpi.first.wpilibj.tables.*;
-import java.io.*;
+import edu.wpi.first.networktables.ConnectionInfo;
+import edu.wpi.first.networktables.ConnectionNotification;
+import edu.wpi.first.networktables.EntryInfo;
+import edu.wpi.first.networktables.EntryNotification;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableType;
+import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.NetworkTablesJNI;
+import edu.wpi.first.networktables.PersistentException;
+import edu.wpi.first.wpilibj.tables.IRemote;
+import edu.wpi.first.wpilibj.tables.IRemoteConnectionListener;
+import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.wpilibj.tables.ITableListener;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 
 /**
  * A network table that knows its subtable path.
+ * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable} instead.
  */
+@Deprecated
 public class NetworkTable implements ITable, IRemote {
   /**
    * The path separator for sub-tables and keys
@@ -33,37 +62,47 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * initializes network tables
+   * @deprecated Use {@link NetworkTableInstance#startServer()} or
+   * {@link NetworkTableInstance#startClient()} instead.
    */
+  @Deprecated
   public synchronized static void initialize() {
     if (running)
       shutdown();
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
     if (client) {
-      NetworkTablesJNI.startClient();
+      inst.startClient();
       if (enableDS)
-        NetworkTablesJNI.startDSClient(port);
+        inst.startDSClient(port);
     } else
-      NetworkTablesJNI.startServer(persistentFilename, "", port);
+      inst.startServer(persistentFilename, "", port);
     running = true;
   }
 
   /**
    * shuts down network tables
+   * @deprecated Use {@link NetworkTableInstance#stopServer()} or
+   * {@link NetworkTableInstance#stopClient()} instead.
    */
+  @Deprecated
   public synchronized static void shutdown() {
     if (!running)
       return;
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
     if (client) {
-      NetworkTablesJNI.stopDSClient();
-      NetworkTablesJNI.stopClient();
+      inst.stopDSClient();
+      inst.stopClient();
     } else
-      NetworkTablesJNI.stopServer();
+      inst.stopServer();
     running = false;
   }
 
   /**
    * set that network tables should be a server
    * This must be called before initialize or getTable
+   * @deprecated Use {@link NetworkTableInstance#startServer()} instead.
    */
+  @Deprecated
   public synchronized static void setServerMode() {
     if (!client)
       return;
@@ -74,7 +113,9 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * set that network tables should be a client
    * This must be called before initialize or getTable
+   * @deprecated Use {@link NetworkTableInstance#startClient()} instead.
    */
+  @Deprecated
   public synchronized static void setClientMode() {
     if (client)
       return;
@@ -87,21 +128,24 @@ public class NetworkTable implements ITable, IRemote {
    * network tables will connect to in client mode)
    * This must be called before initialize or getTable
    * @param team the team number
+   * @deprecated Use {@link NetworkTableInstance#setServerTeam(int)} or
+   * {@link NetworkTableInstance#startClientTeam(int)} instead.
    */
+  @Deprecated
   public synchronized static void setTeam(int team) {
-    String[] addresses = new String[5];
-    addresses[0] = "10." + (int)(team / 100) + "." + (int)(team % 100) + ".2";
-    addresses[1] = "172.22.11.2";
-    addresses[2] = "roboRIO-" + team + "-FRC.local";
-    addresses[3] = "roboRIO-" + team + "-FRC.lan";
-    addresses[4] = "roboRIO-" + team + "-FRC.frc-field.local";
-    setIPAddress(addresses);
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    inst.setServerTeam(team, port);
+    if (enableDS)
+      inst.startDSClient(port);
   }
 
   /**
-   * @param address the adress that network tables will connect to in client
+   * @param address the address that network tables will connect to in client
    * mode
+   * @deprecated Use {@link NetworkTableInstance#setServer(String)} or
+   * {@link NetworkTableInstance#startClient(String)} instead.
    */
+  @Deprecated
   public synchronized static void setIPAddress(final String address) {
     String[] addresses = new String[1];
     addresses[0] = address;
@@ -111,25 +155,33 @@ public class NetworkTable implements ITable, IRemote {
   /**
    * @param addresses the adresses that network tables will connect to in
    * client mode (in round robin order)
+   * @deprecated Use {@link NetworkTableInstance#setServer(String[])} or
+   * {@link NetworkTableInstance#startClient(String[])} instead.
    */
+  @Deprecated
   public synchronized static void setIPAddress(final String[] addresses) {
-    int[] ports = new int[addresses.length];
-    for (int i=0; i<addresses.length; i++)
-      ports[i] = port;
-    NetworkTablesJNI.setServer(addresses, ports);
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    inst.setServer(addresses, port);
 
     // Stop the DS client if we're explicitly connecting to localhost
     if (addresses.length > 0 &&
         (addresses[0].equals("localhost") || addresses[0].equals("127.0.0.1")))
-      NetworkTablesJNI.stopDSClient();
+      inst.stopDSClient();
     else if (enableDS)
-      NetworkTablesJNI.startDSClient(port);
+      inst.startDSClient(port);
   }
 
   /**
-   * @param aport the port number that network tables will connect to in client
-   * mode or listen to in server mode
+   * Set the port number that network tables will connect to in client
+   * mode or listen to in server mode.
+   * @param aport the port number
+   * @deprecated Use the appropriate parameters to
+   * {@link NetworkTableInstance#setServer(String, int)},
+   * {@link NetworkTableInstance#startClient(String, int)},
+   * {@link NetworkTableInstance#startServer(String, String, int)}, and
+   * {@link NetworkTableInstance#startDSClient(int)} instead.
    */
+  @Deprecated
   public synchronized static void setPort(int aport) {
     if (port == aport)
       return;
@@ -138,22 +190,29 @@ public class NetworkTable implements ITable, IRemote {
   }
 
   /**
-   * @param enabled whether to enable the connection to the local DS to get
-   * the robot IP address (defaults to enabled)
+   * Enable requesting the server address from the Driver Station.
+   * @param enabled whether to enable the connection to the local DS
+   * @deprecated Use {@link NetworkTableInstance#startDSClient()} and
+   * {@link NetworkTableInstance#stopDSClient()} instead.
    */
+  @Deprecated
   public synchronized static void setDSClientEnabled(boolean enabled) {
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
     enableDS = enabled;
     if (enableDS)
-      NetworkTablesJNI.startDSClient(port);
+      inst.startDSClient(port);
     else
-      NetworkTablesJNI.stopDSClient();
+      inst.stopDSClient();
   }
 
   /**
    * Sets the persistent filename.
    * @param filename the filename that the network tables server uses for
    * automatic loading and saving of persistent values
+   * @deprecated Use the appropriate parameter to
+   * {@link NetworkTableInstance#startServer()} instead.
    */
+  @Deprecated
   public synchronized static void setPersistentFilename(final String filename) {
     if (persistentFilename.equals(filename))
       return;
@@ -165,9 +224,12 @@ public class NetworkTable implements ITable, IRemote {
    * Sets the network identity.
    * This is provided in the connection info on the remote end.
    * @param name identity
+   * @deprecated Use {@link NetworkTableInstance#setNetworkIdentity(String)}
+   * instead.
    */
+  @Deprecated
   public static void setNetworkIdentity(String name) {
-    NetworkTablesJNI.setNetworkIdentity(name);
+    NetworkTableInstance.getDefault().setNetworkIdentity(name);
   }
 
   public static boolean[] toNative(Boolean[] arr) {
@@ -200,49 +262,91 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * Gets the table with the specified key. If the table does not exist, a new
-   *table will be created.<br>
+   * table will be created.<br>
    * This will automatically initialize network tables if it has not been
-   *already
+   * already
    *
-   * @param key
-   *            the key name
+   * @deprecated Use {@link NetworkTableInstance#getTable(String)} instead.
+   *
+   * @param key   the key name
    * @return the network table requested
    */
+  @Deprecated
   public synchronized static NetworkTable getTable(String key) {
     if (!running)
       initialize();
-    if (key.isEmpty() || key.charAt(0) == PATH_SEPARATOR)
-      return new NetworkTable(key);
-    return new NetworkTable(PATH_SEPARATOR + key);
+    String theKey;
+    if (key.isEmpty() || key.equals("/")) {
+      theKey = "";
+    } else if (key.charAt(0) == NetworkTable.PATH_SEPARATOR) {
+      theKey = key;
+    } else {
+      theKey = NetworkTable.PATH_SEPARATOR + key;
+    }
+    return new NetworkTable(NetworkTableInstance.getDefault(), theKey);
   }
 
   private final String path;
   private final String pathWithSep;
+  private final NetworkTableInstance inst;
 
-  NetworkTable(String path) {
+  NetworkTable(NetworkTableInstance inst, String path) {
     this.path = path;
     this.pathWithSep = path + PATH_SEPARATOR;
+    this.inst = inst;
   }
+
   public String toString() { return "NetworkTable: " + path; }
 
+  private final ConcurrentMap<String, NetworkTableEntry> entries = new ConcurrentHashMap<String, NetworkTableEntry>();
+
+  /**
+   * Gets the entry for a subkey.
+   * @param key the key name
+   * @return Network table entry.
+   */
+  private NetworkTableEntry getEntry(String key) {
+    NetworkTableEntry entry = entries.get(key);
+    if (entry == null) {
+      entry = inst.getEntry(pathWithSep + key);
+      entries.putIfAbsent(key, entry);
+    }
+    return entry;
+  }
+
+  /**
+   * Gets the current network connections.
+   * @return An array of connection information.
+   * @deprecated Use {@link NetworkTableInstance#getConnections()} instead.
+   */
+  @Deprecated
   public static ConnectionInfo[] connections() {
-    return NetworkTablesJNI.getConnections();
+    return NetworkTableInstance.getDefault().getConnections();
   }
 
+  /**
+   * Determine whether or not a network connection is active.
+   * @return True if connected, false if not connected.
+   * @deprecated Use {@link NetworkTableInstance#isConnected()} instead.
+   */
+  @Deprecated
   public boolean isConnected() {
-    ConnectionInfo[] conns = NetworkTablesJNI.getConnections();
-    return conns.length > 0;
+    return inst.isConnected();
   }
 
+  /**
+   * Determine whether NetworkTables is operating as a server or as a client.
+   * @return True if operating as a server, false otherwise.
+   * @deprecated Use {@link NetworkTableInstance#getNetworkMode()} instead.
+   */
+  @Deprecated
   public boolean isServer() {
-    return !client;
+    return (inst.getNetworkMode() & NetworkTableInstance.kNetModeServer) != 0;
   }
 
-  private static class ListenerBase {
+  /* Backwards compatibility shims for IRemoteConnectionListener */
+  private static class ConnectionListenerAdapter implements Consumer<ConnectionNotification> {
     public int uid;
-  }
-
-  private static class ConnectionListenerAdapter extends ListenerBase implements NetworkTablesJNI.ConnectionListenerFunction {
     private final IRemote targetSource;
     private final IRemoteConnectionListener targetListener;
 
@@ -251,14 +355,17 @@ public class NetworkTable implements ITable, IRemote {
       this.targetListener = targetListener;
     }
 
-    public void apply(int uid, boolean connected, ConnectionInfo conn) {
-      if (connected)
-        targetListener.connectedEx(targetSource, conn);
+    @Override
+    public void accept(ConnectionNotification event) {
+      if (event.connected)
+        targetListener.connectedEx(targetSource, event.conn);
       else
-        targetListener.disconnectedEx(targetSource, conn);
+        targetListener.disconnectedEx(targetSource, event.conn);
     }
   }
-  
+
+  private static final HashMap<IRemoteConnectionListener,ConnectionListenerAdapter> globalConnectionListenerMap = new HashMap<IRemoteConnectionListener,ConnectionListenerAdapter>();
+
   private static IRemote staticRemote = new IRemote() {
     public void addConnectionListener(IRemoteConnectionListener listener, boolean immediateNotify) {
       NetworkTable.addGlobalConnectionListener(listener, immediateNotify);
@@ -267,64 +374,91 @@ public class NetworkTable implements ITable, IRemote {
       NetworkTable.removeGlobalConnectionListener(listener);
     }
     public boolean isConnected() {
-      ConnectionInfo[] conns = NetworkTablesJNI.getConnections();
+      ConnectionInfo[] conns = NetworkTableInstance.getDefault().getConnections();
       return conns.length > 0;
     }
     public boolean isServer() {
-      return !client;
+      return (NetworkTableInstance.getDefault().getNetworkMode() & NetworkTableInstance.kNetModeServer) != 0;
     }
   };
-  
-  private static final Hashtable<IRemoteConnectionListener,ConnectionListenerAdapter> globalConnectionListenerMap = new Hashtable<IRemoteConnectionListener,ConnectionListenerAdapter>();
-  public static synchronized void addGlobalConnectionListener(IRemoteConnectionListener listener,
-                                                              boolean immediateNotify) {
-    ConnectionListenerAdapter adapter = globalConnectionListenerMap.get(listener);
-    if (adapter != null)
+
+  private final HashMap<IRemoteConnectionListener,ConnectionListenerAdapter> connectionListenerMap = new HashMap<IRemoteConnectionListener,ConnectionListenerAdapter>();
+
+  /**
+   * Add a connection listener.
+   * @param listener connection listener
+   * @param immediateNotify call listener immediately for all existing connections
+   * @deprecated Use {@link NetworkTableInstance#addConnectionListener(Consumer, boolean)} instead.
+   */
+  @Deprecated
+  public static synchronized void addGlobalConnectionListener(IRemoteConnectionListener listener, boolean immediateNotify) {
+    ConnectionListenerAdapter adapter = new ConnectionListenerAdapter(staticRemote, listener);
+    if (globalConnectionListenerMap.putIfAbsent(listener, adapter) != null) {
       throw new IllegalStateException("Cannot add the same listener twice");
-    adapter = new ConnectionListenerAdapter(staticRemote, listener);
-    adapter.uid = NetworkTablesJNI.addConnectionListener(adapter, immediateNotify);
-    globalConnectionListenerMap.put(listener, adapter);
+    }
+    adapter.uid = NetworkTableInstance.getDefault().addConnectionListener(adapter, immediateNotify);
   }
 
+  /**
+   * Remove a connection listener.
+   * @param listener connection listener
+   * @deprecated Use {@link NetworkTableInstance#removeConnectionListener(int)} instead.
+   */
+  @Deprecated
   public static synchronized void removeGlobalConnectionListener(IRemoteConnectionListener listener) {
-    ConnectionListenerAdapter adapter = globalConnectionListenerMap.get(listener);
+    ConnectionListenerAdapter adapter = globalConnectionListenerMap.remove(listener);
     if (adapter != null) {
-      NetworkTablesJNI.removeConnectionListener(adapter.uid);
-      globalConnectionListenerMap.remove(listener);
+      NetworkTableInstance.getDefault().removeConnectionListener(adapter.uid);
     }
   }
 
-  private final Hashtable<IRemoteConnectionListener,ConnectionListenerAdapter> connectionListenerMap = new Hashtable<IRemoteConnectionListener,ConnectionListenerAdapter>();
+  /**
+   * Add a connection listener.
+   * @param listener connection listener
+   * @param immediateNotify call listener immediately for all existing connections
+   * @deprecated Use {@link NetworkTableInstance#addConnectionListener(Consumer, boolean)} instead.
+   */
+  @Deprecated
   public synchronized void addConnectionListener(IRemoteConnectionListener listener,
                                                  boolean immediateNotify) {
-    ConnectionListenerAdapter adapter = connectionListenerMap.get(listener);
-    if (adapter != null)
+    ConnectionListenerAdapter adapter = new ConnectionListenerAdapter(this, listener);
+    if (connectionListenerMap.putIfAbsent(listener, adapter) != null) {
       throw new IllegalStateException("Cannot add the same listener twice");
-    adapter = new ConnectionListenerAdapter(this, listener);
-    adapter.uid = NetworkTablesJNI.addConnectionListener(adapter, immediateNotify);
-    connectionListenerMap.put(listener, adapter);
+    }
+    adapter.uid = inst.addConnectionListener(adapter, immediateNotify);
   }
 
+  /**
+   * Remove a connection listener.
+   * @param listener connection listener
+   * @deprecated Use {@link NetworkTableInstance#removeConnectionListener(int)} instead.
+   */
+  @Deprecated
   public synchronized void removeConnectionListener(IRemoteConnectionListener listener) {
     ConnectionListenerAdapter adapter = connectionListenerMap.get(listener);
-    if (adapter != null) {
-      NetworkTablesJNI.removeConnectionListener(adapter.uid);
-      connectionListenerMap.remove(listener);
+    if (adapter != null && connectionListenerMap.remove(listener, adapter)) {
+      inst.removeConnectionListener(adapter.uid);
     }
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable#addEntryListener(TableEntryListener, int)} instead
+   * (with flags value of NOTIFY_NEW | NOTIFY_UPDATE).
    */
   @Override
+  @Deprecated
   public void addTableListener(ITableListener listener) {
     addTableListenerEx(listener, NOTIFY_NEW | NOTIFY_UPDATE);
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable#addEntryListener(TableEntryListener, int)} instead
+   * (with flags value of NOTIFY_NEW | NOTIFY_UPDATE | NOTIFY_IMMEDIATE).
    */
   @Override
+  @Deprecated
   public void addTableListener(ITableListener listener,
                                boolean immediateNotify) {
     int flags = NOTIFY_NEW | NOTIFY_UPDATE;
@@ -333,43 +467,59 @@ public class NetworkTable implements ITable, IRemote {
     addTableListenerEx(listener, flags);
   }
 
-  private class TableListenerAdapter extends ListenerBase implements NetworkTablesJNI.EntryListenerFunction {
+  /* Base class for listeners; stores uid to implement remove functions */
+  private static class ListenerBase {
+    public int uid;
+  }
+
+  private class OldTableListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
     private final int prefixLen;
     private final ITable targetSource;
     private final ITableListener targetListener;
 
-    public TableListenerAdapter(int prefixLen, ITable targetSource, ITableListener targetListener) {
+    public OldTableListenerAdapter(int prefixLen, ITable targetSource, ITableListener targetListener) {
       this.prefixLen = prefixLen;
       this.targetSource = targetSource;
       this.targetListener = targetListener;
     }
 
-    public void apply(int uid, String key, Object value, int flags) {
-      String relativeKey = key.substring(prefixLen);
+    @Override
+    public void accept(EntryNotification event) {
+      String relativeKey = event.name.substring(prefixLen);
       if (relativeKey.indexOf(PATH_SEPARATOR) != -1)
         return;
-      targetListener.valueChangedEx(targetSource, relativeKey, value, flags);
+      targetListener.valueChangedEx(targetSource, relativeKey, event.value.getValue(), event.flags);
     }
   }
 
-  private final Hashtable<ITableListener,List<ListenerBase>> listenerMap = new Hashtable<ITableListener,List<ListenerBase>>();
+  private final HashMap<ITableListener,List<ListenerBase>> oldListenerMap = new HashMap<ITableListener,List<ListenerBase>>();
+
+  /**
+   * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable#addEntryListener(TableEntryListener, int)} instead.
+   */
+  @Override
+  @Deprecated
   public synchronized void addTableListenerEx(ITableListener listener,
                                               int flags) {
-    List<ListenerBase> adapters = listenerMap.get(listener);
+    List<ListenerBase> adapters = oldListenerMap.get(listener);
     if (adapters == null) {
       adapters = new ArrayList<ListenerBase>();
-      listenerMap.put(listener, adapters);
+      oldListenerMap.put(listener, adapters);
     }
-    TableListenerAdapter adapter =
-        new TableListenerAdapter(path.length() + 1, this, listener);
-    adapter.uid = NetworkTablesJNI.addEntryListener(pathWithSep, adapter, flags);
+    OldTableListenerAdapter adapter =
+        new OldTableListenerAdapter(path.length() + 1, this, listener);
+    adapter.uid = inst.addEntryListener(pathWithSep, adapter, flags);
     adapters.add(adapter);
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable#addEntryListener(String, TableEntryListener, int)}
+   * or {@link NetworkTableEntry#addListener(Consumer, int)} instead.
    */
   @Override
+  @Deprecated
   public void addTableListener(String key, ITableListener listener,
                                boolean immediateNotify) {
     int flags = NOTIFY_NEW | NOTIFY_UPDATE;
@@ -378,67 +528,69 @@ public class NetworkTable implements ITable, IRemote {
     addTableListenerEx(key, listener, flags);
   }
 
-  private class KeyListenerAdapter extends ListenerBase implements NetworkTablesJNI.EntryListenerFunction {
+  private class OldKeyListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
     private final String relativeKey;
-    private final String fullKey;
     private final ITable targetSource;
     private final ITableListener targetListener;
 
-    public KeyListenerAdapter(String relativeKey, String fullKey, ITable targetSource, ITableListener targetListener) {
+    public OldKeyListenerAdapter(String relativeKey, ITable targetSource, ITableListener targetListener) {
       this.relativeKey = relativeKey;
-      this.fullKey = fullKey;
       this.targetSource = targetSource;
       this.targetListener = targetListener;
     }
 
-    public void apply(int uid, String key, Object value, int flags) {
-      if (!key.equals(fullKey))
-        return;
-      targetListener.valueChangedEx(targetSource, relativeKey, value, flags);
+    @Override
+    public void accept(EntryNotification event) {
+      targetListener.valueChangedEx(targetSource, relativeKey, event.value.getValue(), event.flags);
     }
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable#addEntryListener(String, TableEntryListener, int)}
+   * or {@link NetworkTableEntry#addListener(Consumer, int)} instead.
    */
   @Override
+  @Deprecated
   public synchronized void addTableListenerEx(String key,
                                               ITableListener listener,
                                               int flags) {
-    List<ListenerBase> adapters = listenerMap.get(listener);
+    List<ListenerBase> adapters = oldListenerMap.get(listener);
     if (adapters == null) {
       adapters = new ArrayList<ListenerBase>();
-      listenerMap.put(listener, adapters);
+      oldListenerMap.put(listener, adapters);
     }
-    String fullKey = pathWithSep + key;
-    KeyListenerAdapter adapter =
-        new KeyListenerAdapter(key, fullKey, this, listener);
-    adapter.uid = NetworkTablesJNI.addEntryListener(fullKey, adapter, flags);
+    OldKeyListenerAdapter adapter = new OldKeyListenerAdapter(key, this, listener);
+    adapter.uid = inst.addEntryListener(getEntry(key), adapter, flags);
     adapters.add(adapter);
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable#addSubTableListener(TableListener, boolean)}
+   * instead.
    */
   @Override
+  @Deprecated
   public void addSubTableListener(final ITableListener listener) {
     addSubTableListener(listener, false);
   }
 
-  private class SubListenerAdapter extends ListenerBase implements NetworkTablesJNI.EntryListenerFunction {
+  private class OldSubListenerAdapter extends ListenerBase implements Consumer<EntryNotification> {
     private final int prefixLen;
     private final ITable targetSource;
     private final ITableListener targetListener;
     private final Set<String> notifiedTables = new HashSet<String>();
 
-    public SubListenerAdapter(int prefixLen, ITable targetSource, ITableListener targetListener) {
+    public OldSubListenerAdapter(int prefixLen, ITable targetSource, ITableListener targetListener) {
       this.prefixLen = prefixLen;
       this.targetSource = targetSource;
       this.targetListener = targetListener;
     }
 
-    public void apply(int uid, String key, Object value, int flags) {
-      String relativeKey = key.substring(prefixLen);
+    @Override
+    public void accept(EntryNotification event) {
+      String relativeKey = event.name.substring(prefixLen);
       int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
       if (endSubTable == -1)
         return;
@@ -446,40 +598,44 @@ public class NetworkTable implements ITable, IRemote {
       if (notifiedTables.contains(subTableKey))
         return;
       notifiedTables.add(subTableKey);
-      targetListener.valueChangedEx(targetSource, subTableKey, targetSource.getSubTable(subTableKey), flags);
+      targetListener.valueChangedEx(targetSource, subTableKey, targetSource.getSubTable(subTableKey), event.flags);
     }
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable#addSubTableListener(TableListener, boolean)}
+   * instead.
    */
   @Override
+  @Deprecated
   public synchronized void addSubTableListener(final ITableListener listener,
                                                boolean localNotify) {
-    List<ListenerBase> adapters = listenerMap.get(listener);
+    List<ListenerBase> adapters = oldListenerMap.get(listener);
     if (adapters == null) {
       adapters = new ArrayList<ListenerBase>();
-      listenerMap.put(listener, adapters);
+      oldListenerMap.put(listener, adapters);
     }
-    SubListenerAdapter adapter =
-        new SubListenerAdapter(path.length() + 1, this, listener);
+    OldSubListenerAdapter adapter =
+        new OldSubListenerAdapter(path.length() + 1, this, listener);
     int flags = NOTIFY_NEW | NOTIFY_IMMEDIATE;
     if (localNotify)
       flags |= NOTIFY_LOCAL;
-    adapter.uid = NetworkTablesJNI.addEntryListener(pathWithSep, adapter, flags);
+    adapter.uid = inst.addEntryListener(pathWithSep, adapter, flags);
     adapters.add(adapter);
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTable#removeTableListener(int)} instead.
    */
   @Override
+  @Deprecated
   public synchronized void removeTableListener(ITableListener listener) {
-    List<ListenerBase> adapters = listenerMap.get(listener);
+    List<ListenerBase> adapters = oldListenerMap.remove(listener);
     if (adapters != null) {
-      for (int i = 0; i < adapters.size(); ++i)
-        NetworkTablesJNI.removeEntryListener(adapters.get(i).uid);
-      adapters.clear();
+      for (ListenerBase adapter : adapters)
+        inst.removeEntryListener(adapter.uid);
     }
   }
 
@@ -488,7 +644,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public ITable getSubTable(String key) {
-    return new NetworkTable(pathWithSep + key);
+    return new NetworkTable(inst, pathWithSep + key);
   }
 
   /**
@@ -496,12 +652,12 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean containsKey(String key) {
-    return NetworkTablesJNI.containsKey(pathWithSep + key);
+    return getEntry(key).exists();
   }
 
   public boolean containsSubTable(String key) {
-    EntryInfo[] entries = NetworkTablesJNI.getEntries(pathWithSep + key + PATH_SEPARATOR, 0);
-    return entries.length != 0;
+    int[] handles = NetworkTablesJNI.getEntries(inst.getHandle(), pathWithSep + key + PATH_SEPARATOR, 0);
+    return handles.length != 0;
   }
 
   /**
@@ -511,11 +667,15 @@ public class NetworkTable implements ITable, IRemote {
   public Set<String> getKeys(int types) {
     Set<String> keys = new HashSet<String>();
     int prefixLen = path.length() + 1;
-    for (EntryInfo entry : NetworkTablesJNI.getEntries(pathWithSep, types)) {
-      String relativeKey = entry.name.substring(prefixLen);
+    for (EntryInfo info : inst.getEntryInfo(pathWithSep, types)) {
+      String relativeKey = info.name.substring(prefixLen);
       if (relativeKey.indexOf(PATH_SEPARATOR) != -1)
         continue;
       keys.add(relativeKey);
+      // populate entries as we go
+      if (entries.get(relativeKey) == null) {
+        entries.putIfAbsent(relativeKey, new NetworkTableEntry(inst, info.entry));
+      }
     }
     return keys;
   }
@@ -535,8 +695,8 @@ public class NetworkTable implements ITable, IRemote {
   public Set<String> getSubTables() {
     Set<String> keys = new HashSet<String>();
     int prefixLen = path.length() + 1;
-    for (EntryInfo entry : NetworkTablesJNI.getEntries(pathWithSep, 0)) {
-      String relativeKey = entry.name.substring(prefixLen);
+    for (EntryInfo info : inst.getEntryInfo(pathWithSep, 0)) {
+      String relativeKey = info.name.substring(prefixLen);
       int endSubTable = relativeKey.indexOf(PATH_SEPARATOR);
       if (endSubTable == -1)
         continue;
@@ -550,15 +710,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putNumber(String key, double value) {
-    return NetworkTablesJNI.putDouble(pathWithSep + key, value);
+    return getEntry(key).setNumber(value);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultNumber(String key, double defaultValue) {
-    return NetworkTablesJNI.setDefaultDouble(pathWithSep + key,
-                                             defaultValue);
+    return getEntry(key).setDefaultDouble(defaultValue);
   }
 
   /**
@@ -566,7 +725,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public double getNumber(String key, double defaultValue) {
-    return NetworkTablesJNI.getDouble(pathWithSep + key, defaultValue);
+    return getEntry(key).getDouble(defaultValue);
   }
 
   /**
@@ -574,15 +733,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putString(String key, String value) {
-    return NetworkTablesJNI.putString(pathWithSep + key, value);
+    return getEntry(key).setString(value);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultString(String key, String defaultValue) {
-    return NetworkTablesJNI.setDefaultString(pathWithSep + key,
-                                             defaultValue);
+    return getEntry(key).setDefaultString(defaultValue);
   }
 
   /**
@@ -590,7 +748,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public String getString(String key, String defaultValue) {
-    return NetworkTablesJNI.getString(pathWithSep + key, defaultValue);
+    return getEntry(key).getString(defaultValue);
   }
 
   /**
@@ -598,15 +756,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putBoolean(String key, boolean value) {
-    return NetworkTablesJNI.putBoolean(pathWithSep + key, value);
+    return getEntry(key).setBoolean(value);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultBoolean(String key, boolean defaultValue) {
-    return NetworkTablesJNI.setDefaultBoolean(pathWithSep + key,
-                                              defaultValue);
+    return getEntry(key).setDefaultBoolean(defaultValue);
   }
 
   /**
@@ -614,7 +771,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean getBoolean(String key, boolean defaultValue) {
-    return NetworkTablesJNI.getBoolean(pathWithSep + key, defaultValue);
+    return getEntry(key).getBoolean(defaultValue);
   }
 
   /**
@@ -622,7 +779,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putBooleanArray(String key, boolean[] value) {
-    return NetworkTablesJNI.putBooleanArray(pathWithSep + key, value);
+    return getEntry(key).setBooleanArray(value);
   }
 
   /**
@@ -630,23 +787,21 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putBooleanArray(String key, Boolean[] value) {
-    return putBooleanArray(key, toNative(value));
+    return getEntry(key).setBooleanArray(value);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultBooleanArray(String key, boolean[] defaultValue) {
-    return NetworkTablesJNI.setDefaultBooleanArray(pathWithSep + key,
-                                                   defaultValue);
+    return getEntry(key).setDefaultBooleanArray(defaultValue);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
-    return NetworkTablesJNI.setDefaultBooleanArray(pathWithSep + key,
-                                                   toNative(defaultValue));
+    return getEntry(key).setDefaultBooleanArray(defaultValue);
   }
 
   /**
@@ -654,7 +809,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean[] getBooleanArray(String key, boolean[] defaultValue) {
-    return NetworkTablesJNI.getBooleanArray(pathWithSep + key, defaultValue);
+    return getEntry(key).getBooleanArray(defaultValue);
   }
 
   /**
@@ -662,7 +817,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public Boolean[] getBooleanArray(String key, Boolean[] defaultValue) {
-    return fromNative(getBooleanArray(key, toNative(defaultValue)));
+    return getEntry(key).getBooleanArray(defaultValue);
   }
 
   /**
@@ -670,7 +825,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putNumberArray(String key, double[] value) {
-    return NetworkTablesJNI.putDoubleArray(pathWithSep + key, value);
+    return getEntry(key).setDoubleArray(value);
   }
 
   /**
@@ -678,23 +833,21 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putNumberArray(String key, Double[] value) {
-    return putNumberArray(key, toNative(value));
+    return getEntry(key).setNumberArray(value);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultNumberArray(String key, double[] defaultValue) {
-    return NetworkTablesJNI.setDefaultDoubleArray(pathWithSep + key,
-                                                  defaultValue);
+    return getEntry(key).setDefaultDoubleArray(defaultValue);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultNumberArray(String key, Double[] defaultValue) {
-    return NetworkTablesJNI.setDefaultDoubleArray(pathWithSep + key,
-                                                  toNative(defaultValue));
+    return getEntry(key).setDefaultNumberArray(defaultValue);
   }
 
   /**
@@ -702,7 +855,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public double[] getNumberArray(String key, double[] defaultValue) {
-    return NetworkTablesJNI.getDoubleArray(pathWithSep + key, defaultValue);
+    return getEntry(key).getDoubleArray(defaultValue);
   }
 
   /**
@@ -710,7 +863,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public Double[] getNumberArray(String key, Double[] defaultValue) {
-    return fromNative(getNumberArray(key, toNative(defaultValue)));
+    return getEntry(key).getDoubleArray(defaultValue);
   }
 
   /**
@@ -718,23 +871,22 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putStringArray(String key, String[] value) {
-    return NetworkTablesJNI.putStringArray(pathWithSep + key, value);
+    return getEntry(key).setStringArray(value);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultStringArray(String key, String[] defaultValue) {
-    return NetworkTablesJNI.setDefaultStringArray(pathWithSep + key,
-                                                  defaultValue);
+    return getEntry(key).setDefaultStringArray(defaultValue);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
   public String[] getStringArray(String key, String[] defaultValue) {
-    return NetworkTablesJNI.getStringArray(pathWithSep + key, defaultValue);
+    return getEntry(key).getStringArray(defaultValue);
   }
 
   /**
@@ -742,15 +894,14 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putRaw(String key, byte[] value) {
-    return NetworkTablesJNI.putRaw(pathWithSep + key, value);
+    return getEntry(key).setRaw(value);
   }
-  
+
   /**
    * {@inheritDoc}
    */
   public boolean setDefaultRaw(String key, byte[] defaultValue) {
-    return NetworkTablesJNI.setDefaultRaw(pathWithSep + key,
-                                          defaultValue);
+    return getEntry(key).setDefaultRaw(defaultValue);
   }
 
   /**
@@ -758,11 +909,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean putRaw(String key, ByteBuffer value, int len) {
-    if (!value.isDirect())
-      throw new IllegalArgumentException("must be a direct buffer");
-    if (value.capacity() < len)
-      throw new IllegalArgumentException("buffer is too small, must be at least " + len);
-    return NetworkTablesJNI.putRaw(pathWithSep + key, value, len);
+    return getEntry(key).setRaw(value, len);
   }
 
   /**
@@ -770,42 +917,82 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public byte[] getRaw(String key, byte[] defaultValue) {
-    return NetworkTablesJNI.getRaw(pathWithSep + key, defaultValue);
+    return getEntry(key).getRaw(defaultValue);
+  }
+
+  /**
+   * Put a value in the table
+   * @param key the key to be assigned to
+   * @param value the value that will be assigned
+   * @return False if the table key already exists with a different type
+   */
+  public boolean putValue(String key, NetworkTableValue value) {
+    return getEntry(key).setValue(value);
+  }
+
+  /**
+   * Sets the current value in the table if it does not exist.
+   * @param key the key
+   * @param defaultValue the default value to set if key doens't exist.
+   * @return False if the table key exists with a different type
+   */
+  public boolean setDefaultValue(String key, NetworkTableValue defaultValue) {
+    return getEntry(key).setDefaultValue(defaultValue);
+  }
+
+  /**
+   * Gets the value associated with a key as a NetworkTableValue object.
+   * @param key the key of the value to look up
+   * @return the value associated with the given key
+   */
+  public NetworkTableValue getValue(String key) {
+    return getEntry(key).getValue();
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTableEntry#setValue(NetworkTableValue)}
+   * instead, e.g. `NetworkTable.getEntry(key).setValue(NetworkTableEntry.makeBoolean(false));`
    */
-  @Override
+  @Deprecated
   public boolean putValue(String key, Object value) throws IllegalArgumentException {
     if (value instanceof Boolean)
-      return NetworkTablesJNI.putBoolean(pathWithSep + key, ((Boolean)value).booleanValue());
+      return putBoolean(key, ((Boolean)value).booleanValue());
     else if (value instanceof Number)
-      return NetworkTablesJNI.putDouble(pathWithSep + key, ((Number)value).doubleValue());
+      return putDouble(key, ((Number)value).doubleValue());
     else if (value instanceof String)
-      return NetworkTablesJNI.putString(pathWithSep + key, (String)value);
+      return putString(key, (String)value);
     else if (value instanceof byte[])
-      return NetworkTablesJNI.putRaw(pathWithSep + key, (byte[])value);
+      return putRaw(key, (byte[])value);
     else if (value instanceof boolean[])
-      return NetworkTablesJNI.putBooleanArray(pathWithSep + key, (boolean[])value);
+      return putBooleanArray(key, (boolean[])value);
     else if (value instanceof double[])
-      return NetworkTablesJNI.putDoubleArray(pathWithSep + key, (double[])value);
+      return putNumberArray(key, (double[])value);
     else if (value instanceof Boolean[])
-      return NetworkTablesJNI.putBooleanArray(pathWithSep + key, toNative((Boolean[])value));
+      return putBooleanArray(key, toNative((Boolean[])value));
     else if (value instanceof Number[])
-      return NetworkTablesJNI.putDoubleArray(pathWithSep + key, toNative((Number[])value));
+      return putNumberArray(key, toNative((Number[])value));
     else if (value instanceof String[])
-      return NetworkTablesJNI.putStringArray(pathWithSep + key, (String[])value);
+      return putStringArray(key, (String[])value);
+    else if (value instanceof NetworkTableValue)
+      return getEntry(key).setValue((NetworkTableValue)value);
     else
       throw new IllegalArgumentException("Value of type " + value.getClass().getName() + " cannot be put into a table");
   }
 
   /**
    * {@inheritDoc}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTableEntry#getValue()}
+   * instead, e.g. `NetworkTable.getEntry(key).getValue();`
    */
   @Override
+  @Deprecated
   public Object getValue(String key, Object defaultValue) {
-    return NetworkTablesJNI.getValue(pathWithSep + key, defaultValue);
+    NetworkTableValue value = getValue(key);
+    if (value.getType() == NetworkTableType.kUnassigned) {
+      return defaultValue;
+    }
+    return value.getValue();
   }
 
   /** The persistent flag value. */
@@ -816,7 +1003,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public void setPersistent(String key) {
-    setFlags(key, PERSISTENT);
+    getEntry(key).setPersistent();
   }
 
   /**
@@ -824,7 +1011,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public void clearPersistent(String key) {
-    clearFlags(key, PERSISTENT);
+    getEntry(key).clearPersistent();
   }
 
   /**
@@ -832,7 +1019,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public boolean isPersistent(String key) {
-    return (getFlags(key) & PERSISTENT) != 0;
+    return getEntry(key).isPersistent();
   }
 
   /**
@@ -840,7 +1027,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public void setFlags(String key, int flags) {
-    NetworkTablesJNI.setEntryFlags(pathWithSep + key, getFlags(key) | flags);
+    getEntry(key).setFlags(flags);
   }
 
   /**
@@ -848,7 +1035,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public void clearFlags(String key, int flags) {
-    NetworkTablesJNI.setEntryFlags(pathWithSep + key, getFlags(key) & ~flags);
+    getEntry(key).clearFlags(flags);
   }
 
   /**
@@ -856,7 +1043,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public int getFlags(String key) {
-    return NetworkTablesJNI.getEntryFlags(pathWithSep + key);
+    return getEntry(key).getFlags();
   }
 
   /**
@@ -864,14 +1051,16 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public void delete(String key) {
-    NetworkTablesJNI.deleteEntry(pathWithSep + key);
+    getEntry(key).delete();
   }
 
   /**
    * Deletes ALL keys in ALL subtables.  Use with caution!
+   * @deprecated Use {@link NetworkTableInstance#deleteAllEntries()} instead.
    */
+  @Deprecated
   public static void globalDeleteAll() {
-    NetworkTablesJNI.deleteAllEntries();
+    NetworkTableInstance.getDefault().deleteAllEntries();
   }
 
   /**
@@ -879,18 +1068,23 @@ public class NetworkTable implements ITable, IRemote {
    * Note: This is rate-limited to protect the network from flooding.
    * This is primarily useful for synchronizing network updates with
    * user code.
+   * @deprecated Use {@link NetworkTableInstance#flush()} instead.
    */
+  @Deprecated
   public static void flush() {
-    NetworkTablesJNI.flush();
+    NetworkTableInstance.getDefault().flush();
   }
 
   /**
    * Set the periodic update rate.
    *
    * @param interval update interval in seconds (range 0.01 to 1.0)
+   * @deprecated Use {@link NetworkTableInstance#setUpdateRate(double)}
+   * instead.
    */
+  @Deprecated
   public static void setUpdateRate(double interval) {
-    NetworkTablesJNI.setUpdateRate(interval);
+    NetworkTableInstance.getDefault().setUpdateRate(interval);
   }
 
   /**
@@ -898,9 +1092,12 @@ public class NetworkTable implements ITable, IRemote {
    *
    * @param filename file name
    * @throws PersistentException if error saving file
+   * @deprecated Use {@link NetworkTableInstance#savePersistent(String)}
+   * instead.
    */
+  @Deprecated
   public static void savePersistent(String filename) throws PersistentException {
-    NetworkTablesJNI.savePersistent(filename);
+    NetworkTableInstance.getDefault().savePersistent(filename);
   }
 
   /**
@@ -909,9 +1106,12 @@ public class NetworkTable implements ITable, IRemote {
    * @param filename file name
    * @return List of warnings (errors result in an exception instead)
    * @throws PersistentException if error reading file
+   * @deprecated Use {@link NetworkTableInstance#loadPersistent(String)}
+   * instead.
    */
+  @Deprecated
   public static String[] loadPersistent(String filename) throws PersistentException {
-    return NetworkTablesJNI.loadPersistent(filename);
+    return NetworkTableInstance.getDefault().loadPersistent(filename);
   }
 
   /*
@@ -940,11 +1140,26 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * {@inheritDoc}
-   * @return
    */
   @Override
   public String getPath() {
     return path;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (o == this) {
+      return true;
+    }
+    if (!(o instanceof NetworkTable)) {
+      return false;
+    }
+    NetworkTable other = (NetworkTable) o;
+    return inst.equals(other.inst) && path.equals(other.path);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(inst, path);
+  }
 }

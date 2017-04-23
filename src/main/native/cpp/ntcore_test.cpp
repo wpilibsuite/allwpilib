@@ -226,16 +226,16 @@ struct NT_RpcDefinition* NT_GetRpcDefinitionForTesting(
 }
 // No need for free as one already exists in the main library
 
-struct NT_RpcCallInfo* NT_GetRpcCallInfoForTesting(
+struct NT_RpcAnswer* NT_GetRpcAnswerForTesting(
     unsigned int rpc_id, unsigned int call_uid, const char* name,
     const char* params, size_t params_len, int* struct_size) {
-  struct NT_RpcCallInfo* info =
-      static_cast<NT_RpcCallInfo*>(std::calloc(1, sizeof(NT_RpcCallInfo)));
-  info->rpc_id = rpc_id;
-  info->call_uid = call_uid;
+  struct NT_RpcAnswer* info =
+      static_cast<NT_RpcAnswer*>(std::calloc(1, sizeof(NT_RpcAnswer)));
+  info->entry = rpc_id;
+  info->call = call_uid;
   nt::ConvertToC(llvm::StringRef(name), &info->name);
   nt::ConvertToC(llvm::StringRef(params, params_len), &info->params);
-  *struct_size = sizeof(NT_RpcCallInfo);
+  *struct_size = sizeof(NT_RpcAnswer);
   return info;
 }
 // No need for free as one already exists in the main library

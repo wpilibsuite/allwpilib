@@ -5,44 +5,81 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Storage.h"
 #include "StorageTest.h"
+#include "Storage.h"
 
 #include <sstream>
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
+#include "MessageMatcher.h"
+#include "TestPrinters.h"
+#include "ValueMatcher.h"
+
+using ::testing::_;
+using ::testing::AnyNumber;
+using ::testing::IsNull;
+using ::testing::Return;
+
 namespace nt {
 
 class StorageTestEmpty : public StorageTest,
                          public ::testing::TestWithParam<bool> {
  public:
-  StorageTestEmpty() { HookOutgoing(GetParam()); }
+  StorageTestEmpty() {
+    HookOutgoing(GetParam());
+    EXPECT_CALL(notifier, local_notifiers())
+        .Times(AnyNumber())
+        .WillRepeatedly(Return(true));
+  }
 };
 
 class StorageTestPopulateOne : public StorageTestEmpty {
  public:
   StorageTestPopulateOne() {
+    EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
+    EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _)).Times(AnyNumber());
+    EXPECT_CALL(notifier, local_notifiers())
+        .Times(AnyNumber())
+        .WillRepeatedly(Return(false));
     storage.SetEntryTypeValue("foo", Value::MakeBoolean(true));
-    outgoing.clear();
+    ::testing::Mock::VerifyAndClearExpectations(&dispatcher);
+    ::testing::Mock::VerifyAndClearExpectations(&notifier);
+    EXPECT_CALL(notifier, local_notifiers())
+        .Times(AnyNumber())
+        .WillRepeatedly(Return(true));
   }
 };
 
 class StorageTestPopulated : public StorageTestEmpty {
  public:
   StorageTestPopulated() {
+    EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
+    EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _)).Times(AnyNumber());
+    EXPECT_CALL(notifier, local_notifiers())
+        .Times(AnyNumber())
+        .WillRepeatedly(Return(false));
     storage.SetEntryTypeValue("foo", Value::MakeBoolean(true));
     storage.SetEntryTypeValue("foo2", Value::MakeDouble(0.0));
     storage.SetEntryTypeValue("bar", Value::MakeDouble(1.0));
     storage.SetEntryTypeValue("bar2", Value::MakeBoolean(false));
-    outgoing.clear();
+    ::testing::Mock::VerifyAndClearExpectations(&dispatcher);
+    ::testing::Mock::VerifyAndClearExpectations(&notifier);
+    EXPECT_CALL(notifier, local_notifiers())
+        .Times(AnyNumber())
+        .WillRepeatedly(Return(true));
   }
 };
 
 class StorageTestPersistent : public StorageTestEmpty {
  public:
   StorageTestPersistent() {
+    EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
+    EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _)).Times(AnyNumber());
+    EXPECT_CALL(notifier, local_notifiers())
+        .Times(AnyNumber())
+        .WillRepeatedly(Return(false));
     storage.SetEntryTypeValue("boolean/true", Value::MakeBoolean(true));
     storage.SetEntryTypeValue("boolean/false", Value::MakeBoolean(false));
     storage.SetEntryTypeValue("double/neg", Value::MakeDouble(-1.5));
@@ -80,7 +117,11 @@ class StorageTestPersistent : public StorageTestEmpty {
     storage.SetEntryTypeValue(StringRef("\0\3\5\n", 4),
                               Value::MakeBoolean(true));
     storage.SetEntryTypeValue("=", Value::MakeBoolean(true));
-    outgoing.clear();
+    ::testing::Mock::VerifyAndClearExpectations(&dispatcher);
+    ::testing::Mock::VerifyAndClearExpectations(&notifier);
+    EXPECT_CALL(notifier, local_notifiers())
+        .Times(AnyNumber())
+        .WillRepeatedly(Return(true));
   }
 };
 
@@ -107,19 +148,27 @@ TEST_P(StorageTestEmpty, GetEntryValueNotExist) {
   EXPECT_FALSE(storage.GetEntryValue("foo"));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, GetEntryValueExist) {
   auto value = Value::MakeBoolean(true);
+  EXPECT_CALL(dispatcher, QueueOutgoing(_, IsNull(), IsNull()));
+  EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _));
   storage.SetEntryTypeValue("foo", value);
-  outgoing.clear();
   EXPECT_EQ(value, storage.GetEntryValue("foo"));
 }
 
 TEST_P(StorageTestEmpty, SetEntryTypeValueAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
+  // id assigned if server
+  EXPECT_CALL(dispatcher,
+              QueueOutgoing(MessageEq(Message::EntryAssign(
+                                "foo", GetParam() ? 0 : 0xffff, 1, value, 0)),
+                            IsNull(), IsNull()));
+  EXPECT_CALL(notifier, NotifyEntry(0, StringRef("foo"), value,
+                                    NT_NOTIFY_NEW | NT_NOTIFY_LOCAL, UINT_MAX));
+
   storage.SetEntryTypeValue("foo", value);
   EXPECT_EQ(value, GetEntry("foo")->value);
   if (GetParam()) {
@@ -128,41 +177,23 @@ TEST_P(StorageTestEmpty, SetEntryTypeValueAssignNew) {
   } else {
     EXPECT_TRUE(idmap().empty());
   }
-
-  ASSERT_EQ(1u, outgoing.size());
-  EXPECT_FALSE(outgoing[0].only);
-  EXPECT_FALSE(outgoing[0].except);
-  auto msg = outgoing[0].msg;
-  EXPECT_EQ(Message::kEntryAssign, msg->type());
-  EXPECT_EQ("foo", msg->str());
-  if (GetParam())
-    EXPECT_EQ(0u, msg->id());  // assigned as server
-  else
-    EXPECT_EQ(0xffffu, msg->id());  // not assigned as client
-  EXPECT_EQ(1u, msg->seq_num_uid());
-  EXPECT_EQ(value, msg->value());
-  EXPECT_EQ(0u, msg->flags());
 }
 
 TEST_P(StorageTestPopulateOne, SetEntryTypeValueAssignTypeChange) {
   // update with different type results in assignment message
   auto value = Value::MakeDouble(0.0);
+
+  // id assigned if server; seq_num incremented
+  EXPECT_CALL(dispatcher,
+              QueueOutgoing(MessageEq(Message::EntryAssign(
+                                "foo", GetParam() ? 0 : 0xffff, 2, value, 0)),
+                            IsNull(), IsNull()));
+  EXPECT_CALL(notifier,
+              NotifyEntry(0, StringRef("foo"), value,
+                          NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL, UINT_MAX));
+
   storage.SetEntryTypeValue("foo", value);
   EXPECT_EQ(value, GetEntry("foo")->value);
-
-  ASSERT_EQ(1u, outgoing.size());
-  EXPECT_FALSE(outgoing[0].only);
-  EXPECT_FALSE(outgoing[0].except);
-  auto msg = outgoing[0].msg;
-  EXPECT_EQ(Message::kEntryAssign, msg->type());
-  EXPECT_EQ("foo", msg->str());
-  if (GetParam())
-    EXPECT_EQ(0u, msg->id());  // assigned as server
-  else
-    EXPECT_EQ(0xffffu, msg->id());  // not assigned as client
-  EXPECT_EQ(2u, msg->seq_num_uid());  // incremented
-  EXPECT_EQ(value, msg->value());
-  EXPECT_EQ(0u, msg->flags());
 }
 
 TEST_P(StorageTestPopulateOne, SetEntryTypeValueEqualValue) {
@@ -171,28 +202,28 @@ TEST_P(StorageTestPopulateOne, SetEntryTypeValueEqualValue) {
   auto value = Value::MakeBoolean(true);
   storage.SetEntryTypeValue("foo", value);
   EXPECT_EQ(value, GetEntry("foo")->value);
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulated, SetEntryTypeValueDifferentValue) {
   // update with same type and different value results in value update message
   auto value = Value::MakeDouble(1.0);
+
+  // client shouldn't send an update as id not assigned yet
+  if (GetParam()) {
+    // id assigned if server; seq_num incremented
+    EXPECT_CALL(dispatcher,
+                QueueOutgoing(MessageEq(Message::EntryUpdate(1, 2, value)),
+                              IsNull(), IsNull()));
+  }
+  EXPECT_CALL(notifier,
+              NotifyEntry(1, StringRef("foo2"), value,
+                          NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL, UINT_MAX));
   storage.SetEntryTypeValue("foo2", value);
   EXPECT_EQ(value, GetEntry("foo2")->value);
 
-  if (GetParam()) {
-    ASSERT_EQ(1u, outgoing.size());
-    EXPECT_FALSE(outgoing[0].only);
-    EXPECT_FALSE(outgoing[0].except);
-    auto msg = outgoing[0].msg;
-    EXPECT_EQ(Message::kEntryUpdate, msg->type());
-    EXPECT_EQ(1u, msg->id());  // assigned as server
-    EXPECT_EQ(2u, msg->seq_num_uid());  // incremented
-    EXPECT_EQ(value, msg->value());
-  } else {
-    // shouldn't send an update id not assigned yet (happens on client only)
-    EXPECT_TRUE(outgoing.empty());
-    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());  // still should be incremented
+  if (!GetParam()) {
+    // seq_num should still be incremented
+    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());
   }
 }
 
@@ -201,44 +232,36 @@ TEST_P(StorageTestEmpty, SetEntryTypeValueEmptyName) {
   storage.SetEntryTypeValue("", value);
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, SetEntryTypeValueEmptyValue) {
   storage.SetEntryTypeValue("foo", nullptr);
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, SetEntryValueAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
+
+  // id assigned if server
+  EXPECT_CALL(dispatcher,
+              QueueOutgoing(MessageEq(Message::EntryAssign(
+                                "foo", GetParam() ? 0 : 0xffff, 1, value, 0)),
+                            IsNull(), IsNull()));
+  EXPECT_CALL(notifier, NotifyEntry(0, StringRef("foo"), value,
+                                    NT_NOTIFY_NEW | NT_NOTIFY_LOCAL, UINT_MAX));
+
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
   EXPECT_EQ(value, GetEntry("foo")->value);
-
-  ASSERT_EQ(1u, outgoing.size());
-  EXPECT_FALSE(outgoing[0].only);
-  EXPECT_FALSE(outgoing[0].except);
-  auto msg = outgoing[0].msg;
-  EXPECT_EQ(Message::kEntryAssign, msg->type());
-  EXPECT_EQ("foo", msg->str());
-  if (GetParam())
-    EXPECT_EQ(0u, msg->id());  // assigned as server
-  else
-    EXPECT_EQ(0xffffu, msg->id());  // not assigned as client
-  EXPECT_EQ(0u, msg->seq_num_uid());
-  EXPECT_EQ(value, msg->value());
-  EXPECT_EQ(0u, msg->flags());
 }
 
 TEST_P(StorageTestPopulateOne, SetEntryValueAssignTypeChange) {
-  // update with different type results in error and no message
+  // update with different type results in error and no message or notification
   auto value = Value::MakeDouble(0.0);
   EXPECT_FALSE(storage.SetEntryValue("foo", value));
   auto entry = GetEntry("foo");
   EXPECT_NE(value, entry->value);
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulateOne, SetEntryValueEqualValue) {
@@ -248,29 +271,30 @@ TEST_P(StorageTestPopulateOne, SetEntryValueEqualValue) {
   EXPECT_TRUE(storage.SetEntryValue("foo", value));
   auto entry = GetEntry("foo");
   EXPECT_EQ(value, entry->value);
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulated, SetEntryValueDifferentValue) {
   // update with same type and different value results in value update message
   auto value = Value::MakeDouble(1.0);
+
+  // client shouldn't send an update as id not assigned yet
+  if (GetParam()) {
+    // id assigned if server; seq_num incremented
+    EXPECT_CALL(dispatcher,
+                QueueOutgoing(MessageEq(Message::EntryUpdate(1, 2, value)),
+                              IsNull(), IsNull()));
+  }
+  EXPECT_CALL(notifier,
+              NotifyEntry(1, StringRef("foo2"), value,
+                          NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL, UINT_MAX));
+
   EXPECT_TRUE(storage.SetEntryValue("foo2", value));
   auto entry = GetEntry("foo2");
   EXPECT_EQ(value, entry->value);
 
-  if (GetParam()) {
-    ASSERT_EQ(1u, outgoing.size());
-    EXPECT_FALSE(outgoing[0].only);
-    EXPECT_FALSE(outgoing[0].except);
-    auto msg = outgoing[0].msg;
-    EXPECT_EQ(Message::kEntryUpdate, msg->type());
-    EXPECT_EQ(1u, msg->id());  // assigned as server
-    EXPECT_EQ(2u, msg->seq_num_uid());  // incremented
-    EXPECT_EQ(value, msg->value());
-  } else {
-    // shouldn't send an update id not assigned yet (happens on client only)
-    EXPECT_TRUE(outgoing.empty());
-    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());  // still should be incremented
+  if (!GetParam()) {
+    // seq_num should still be incremented
+    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());
   }
 }
 
@@ -279,36 +303,29 @@ TEST_P(StorageTestEmpty, SetEntryValueEmptyName) {
   EXPECT_TRUE(storage.SetEntryValue("", value));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, SetEntryValueEmptyValue) {
   EXPECT_TRUE(storage.SetEntryValue("foo", nullptr));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, SetDefaultEntryAssignNew) {
   // brand new entry
   auto value = Value::MakeBoolean(true);
+
+  // id assigned if server
+  EXPECT_CALL(dispatcher,
+              QueueOutgoing(MessageEq(Message::EntryAssign(
+                                "foo", GetParam() ? 0 : 0xffff, 1, value, 0)),
+                            IsNull(), IsNull()));
+  EXPECT_CALL(notifier, NotifyEntry(0, StringRef("foo"), value,
+                                    NT_NOTIFY_NEW | NT_NOTIFY_LOCAL, UINT_MAX));
+
   auto ret_val = storage.SetDefaultEntryValue("foo", value);
   EXPECT_TRUE(ret_val);
   EXPECT_EQ(value, GetEntry("foo")->value);
-
-  ASSERT_EQ(1u, outgoing.size());
-  EXPECT_FALSE(outgoing[0].only);
-  EXPECT_FALSE(outgoing[0].except);
-  auto msg = outgoing[0].msg;
-  EXPECT_EQ(Message::kEntryAssign, msg->type());
-  EXPECT_EQ("foo", msg->str());
-  if (GetParam())
-    EXPECT_EQ(0u, msg->id());  // assigned as server
-  else
-    EXPECT_EQ(0xffffu, msg->id());  // not assigned as client
-  EXPECT_EQ(0u, msg->seq_num_uid());
-  EXPECT_EQ(value, msg->value());
-  EXPECT_EQ(0u, msg->flags());
 }
 
 TEST_P(StorageTestPopulateOne, SetDefaultEntryExistsSameType) {
@@ -317,8 +334,6 @@ TEST_P(StorageTestPopulateOne, SetDefaultEntryExistsSameType) {
   auto ret_val = storage.SetDefaultEntryValue("foo", value);
   EXPECT_TRUE(ret_val);
   EXPECT_NE(value, GetEntry("foo")->value);
-  
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulateOne, SetDefaultEntryExistsDifferentType) {
@@ -328,8 +343,6 @@ TEST_P(StorageTestPopulateOne, SetDefaultEntryExistsDifferentType) {
   EXPECT_FALSE(ret_val);
   // should not have updated value in table if it already existed.
   EXPECT_NE(value, GetEntry("foo")->value);
-  
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, SetDefaultEntryEmptyName) {
@@ -344,7 +357,6 @@ TEST_P(StorageTestEmpty, SetDefaultEntryEmptyName) {
   EXPECT_EQ(SequenceNumber(), entry->seq_num);
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, SetDefaultEntryEmptyValue) {
@@ -359,7 +371,6 @@ TEST_P(StorageTestEmpty, SetDefaultEntryEmptyValue) {
   EXPECT_EQ(SequenceNumber(), entry->seq_num);
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulated, SetDefaultEntryEmptyName) {
@@ -372,7 +383,6 @@ TEST_P(StorageTestPopulated, SetDefaultEntryEmptyName) {
     EXPECT_EQ(4u, idmap().size());
   else
     EXPECT_EQ(0u, idmap().size());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulated, SetDefaultEntryEmptyValue) { 
@@ -385,16 +395,13 @@ TEST_P(StorageTestPopulated, SetDefaultEntryEmptyValue) {
     EXPECT_EQ(4u, idmap().size());
   else
     EXPECT_EQ(0u, idmap().size());
-  EXPECT_TRUE(outgoing.empty());
 }
-
 
 TEST_P(StorageTestEmpty, SetEntryFlagsNew) {
   // flags setting doesn't create an entry
   storage.SetEntryFlags("foo", 0u);
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulateOne, SetEntryFlagsEqualValue) {
@@ -403,111 +410,101 @@ TEST_P(StorageTestPopulateOne, SetEntryFlagsEqualValue) {
   storage.SetEntryFlags("foo", 0u);
   auto entry = GetEntry("foo");
   EXPECT_EQ(0u, entry->flags);
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulated, SetEntryFlagsDifferentValue) {
   // update with different value results in flags update message
+  // client shouldn't send an update as id not assigned yet
+  if (GetParam()) {
+    // id assigned as this is the server
+    EXPECT_CALL(dispatcher, QueueOutgoing(MessageEq(Message::FlagsUpdate(1, 1)),
+                                          IsNull(), IsNull()));
+  }
+  EXPECT_CALL(notifier,
+              NotifyEntry(1, StringRef("foo2"), _,
+                          NT_NOTIFY_FLAGS | NT_NOTIFY_LOCAL, UINT_MAX));
   storage.SetEntryFlags("foo2", 1u);
   EXPECT_EQ(1u, GetEntry("foo2")->flags);
-
-  if (GetParam()) {
-    ASSERT_EQ(1u, outgoing.size());
-    EXPECT_FALSE(outgoing[0].only);
-    EXPECT_FALSE(outgoing[0].except);
-    auto msg = outgoing[0].msg;
-    EXPECT_EQ(Message::kFlagsUpdate, msg->type());
-    EXPECT_EQ(1u, msg->id());  // assigned as server
-    EXPECT_EQ(1u, msg->flags());
-  } else {
-    // shouldn't send an update id not assigned yet (happens on client only)
-    EXPECT_TRUE(outgoing.empty());
-  }
 }
 
 TEST_P(StorageTestEmpty, SetEntryFlagsEmptyName) {
   storage.SetEntryFlags("", 0u);
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, GetEntryFlagsNotExist) {
   EXPECT_EQ(0u, storage.GetEntryFlags("foo"));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestPopulateOne, GetEntryFlagsExist) {
+  EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
+  EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _));
   storage.SetEntryFlags("foo", 1u);
-  outgoing.clear();
+  ::testing::Mock::VerifyAndClearExpectations(&dispatcher);
   EXPECT_EQ(1u, storage.GetEntryFlags("foo"));
-  EXPECT_TRUE(outgoing.empty());
 }
 
-TEST_P(StorageTestEmpty, DeleteEntryNotExist) {
-  storage.DeleteEntry("foo");
-  EXPECT_TRUE(outgoing.empty());
-}
+TEST_P(StorageTestEmpty, DeleteEntryNotExist) { storage.DeleteEntry("foo"); }
 
 TEST_P(StorageTestPopulated, DeleteEntryExist) {
+  // client shouldn't send an update as id not assigned yet
+  if (GetParam()) {
+    // id assigned as this is the server
+    EXPECT_CALL(dispatcher, QueueOutgoing(MessageEq(Message::EntryDelete(1)),
+                                          IsNull(), IsNull()));
+  }
+  EXPECT_CALL(notifier,
+              NotifyEntry(1, StringRef("foo2"), ValueEq(Value::MakeDouble(0)),
+                          NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL, UINT_MAX));
+
   storage.DeleteEntry("foo2");
   EXPECT_TRUE(entries().count("foo2") == 0);
   if (GetParam()) {
     ASSERT_TRUE(idmap().size() >= 2);
     EXPECT_FALSE(idmap()[1]);
   }
-
-  if (GetParam()) {
-    ASSERT_EQ(1u, outgoing.size());
-    EXPECT_FALSE(outgoing[0].only);
-    EXPECT_FALSE(outgoing[0].except);
-    auto msg = outgoing[0].msg;
-    EXPECT_EQ(Message::kEntryDelete, msg->type());
-    EXPECT_EQ(1u, msg->id());  // assigned as server
-  } else {
-    // shouldn't send an update id not assigned yet (happens on client only)
-    EXPECT_TRUE(outgoing.empty());
-  }
 }
 
 TEST_P(StorageTestEmpty, DeleteAllEntriesEmpty) {
   storage.DeleteAllEntries();
-  EXPECT_TRUE(outgoing.empty());
+  ASSERT_TRUE(entries().empty());
 }
 
 TEST_P(StorageTestPopulated, DeleteAllEntries) {
+  EXPECT_CALL(dispatcher, QueueOutgoing(MessageEq(Message::ClearEntries()),
+                                        IsNull(), IsNull()));
+  EXPECT_CALL(notifier, NotifyEntry(_, _, _, NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL,
+                                    UINT_MAX))
+      .Times(4);
+
   storage.DeleteAllEntries();
   ASSERT_TRUE(entries().empty());
-
-  ASSERT_EQ(1u, outgoing.size());
-  EXPECT_FALSE(outgoing[0].only);
-  EXPECT_FALSE(outgoing[0].except);
-  auto msg = outgoing[0].msg;
-  EXPECT_EQ(Message::kClearEntries, msg->type());
 }
 
 TEST_P(StorageTestPopulated, DeleteAllEntriesPersistent) {
   GetEntry("foo2")->flags = NT_PERSISTENT;
+
+  EXPECT_CALL(dispatcher, QueueOutgoing(MessageEq(Message::ClearEntries()),
+                                        IsNull(), IsNull()));
+  EXPECT_CALL(notifier, NotifyEntry(_, _, _, NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL,
+                                    UINT_MAX))
+      .Times(3);
+
   storage.DeleteAllEntries();
   ASSERT_EQ(1u, entries().size());
   EXPECT_EQ(1u, entries().count("foo2"));
-
-  ASSERT_EQ(1u, outgoing.size());
-  EXPECT_FALSE(outgoing[0].only);
-  EXPECT_FALSE(outgoing[0].except);
-  auto msg = outgoing[0].msg;
-  EXPECT_EQ(Message::kClearEntries, msg->type());
 }
 
 TEST_P(StorageTestPopulated, GetEntryInfoAll) {
-  auto info = storage.GetEntryInfo("", 0u);
+  auto info = storage.GetEntryInfo(0, "", 0u);
   ASSERT_EQ(4u, info.size());
 }
 
 TEST_P(StorageTestPopulated, GetEntryInfoPrefix) {
-  auto info = storage.GetEntryInfo("foo", 0u);
+  auto info = storage.GetEntryInfo(0, "foo", 0u);
   ASSERT_EQ(2u, info.size());
   if (info[0].name == "foo") {
     EXPECT_EQ("foo", info[0].name);
@@ -523,7 +520,7 @@ TEST_P(StorageTestPopulated, GetEntryInfoPrefix) {
 }
 
 TEST_P(StorageTestPopulated, GetEntryInfoTypes) {
-  auto info = storage.GetEntryInfo("", NT_DOUBLE);
+  auto info = storage.GetEntryInfo(0, "", NT_DOUBLE);
   ASSERT_EQ(2u, info.size());
   EXPECT_EQ(NT_DOUBLE, info[0].type);
   EXPECT_EQ(NT_DOUBLE, info[1].type);
@@ -537,7 +534,7 @@ TEST_P(StorageTestPopulated, GetEntryInfoTypes) {
 }
 
 TEST_P(StorageTestPopulated, GetEntryInfoPrefixTypes) {
-  auto info = storage.GetEntryInfo("bar", NT_BOOLEAN);
+  auto info = storage.GetEntryInfo(0, "bar", NT_BOOLEAN);
   ASSERT_EQ(1u, info.size());
   EXPECT_EQ("bar2", info[0].name);
   EXPECT_EQ(NT_BOOLEAN, info[0].type);
@@ -612,78 +609,92 @@ TEST_P(StorageTestPersistent, SavePersistent) {
 
 TEST_P(StorageTestEmpty, LoadPersistentBadHeader) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
 
   std::istringstream iss("");
-  EXPECT_CALL(warn, Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
+  EXPECT_CALL(
+      warn,
+      Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
   EXPECT_FALSE(storage.LoadPersistent(iss, warn_func));
 
   std::istringstream iss2("[NetworkTables");
-  EXPECT_CALL(warn, Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
+  EXPECT_CALL(
+      warn,
+      Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
   EXPECT_FALSE(storage.LoadPersistent(iss2, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, LoadPersistentCommentHeader) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
 
   std::istringstream iss(
       "\n; comment\n# comment\n[NetworkTables Storage 3.0]\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, LoadPersistentEmptyName) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
 }
 
 TEST_P(StorageTestEmpty, LoadPersistentAssign) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
+
+  auto value = Value::MakeBoolean(true);
+
+  // id assigned if server
+  EXPECT_CALL(dispatcher, QueueOutgoing(MessageEq(Message::EntryAssign(
+                                            "foo", GetParam() ? 0 : 0xffff, 1,
+                                            value, NT_PERSISTENT)),
+                                        IsNull(), IsNull()));
+  EXPECT_CALL(notifier, NotifyEntry(0, StringRef("foo"),
+                                    ValueEq(Value::MakeBoolean(true)),
+                                    NT_NOTIFY_NEW | NT_NOTIFY_LOCAL, UINT_MAX));
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo");
-  EXPECT_EQ(*Value::MakeBoolean(true), *entry->value);
+  EXPECT_EQ(*value, *entry->value);
   EXPECT_EQ(NT_PERSISTENT, entry->flags);
-
-  ASSERT_EQ(1u, outgoing.size());
-  EXPECT_FALSE(outgoing[0].only);
-  EXPECT_FALSE(outgoing[0].except);
-  auto msg = outgoing[0].msg;
-  EXPECT_EQ(Message::kEntryAssign, msg->type());
-  EXPECT_EQ("foo", msg->str());
-  if (GetParam())
-    EXPECT_EQ(0u, msg->id());  // assigned as server
-  else
-    EXPECT_EQ(0xffffu, msg->id());  // not assigned as client
-  EXPECT_EQ(1u, msg->seq_num_uid());
-  EXPECT_EQ(*Value::MakeBoolean(true), *msg->value());
-  EXPECT_EQ(NT_PERSISTENT, msg->flags());
 }
 
 TEST_P(StorageTestPopulated, LoadPersistentUpdateFlags) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
+
+  // client shouldn't send an update as id not assigned yet
+  if (GetParam()) {
+    // id assigned as this is server
+    EXPECT_CALL(dispatcher,
+                QueueOutgoing(MessageEq(Message::FlagsUpdate(1, NT_PERSISTENT)),
+                              IsNull(), IsNull()));
+  }
+  EXPECT_CALL(notifier,
+              NotifyEntry(1, StringRef("foo2"), ValueEq(Value::MakeDouble(0)),
+                          NT_NOTIFY_FLAGS | NT_NOTIFY_LOCAL, UINT_MAX));
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=0.0\n");
@@ -691,90 +702,83 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateFlags) {
   auto entry = GetEntry("foo2");
   EXPECT_EQ(*Value::MakeDouble(0.0), *entry->value);
   EXPECT_EQ(NT_PERSISTENT, entry->flags);
-
-  if (GetParam()) {
-    ASSERT_EQ(1u, outgoing.size());
-    EXPECT_FALSE(outgoing[0].only);
-    EXPECT_FALSE(outgoing[0].except);
-    auto msg = outgoing[0].msg;
-    EXPECT_EQ(Message::kFlagsUpdate, msg->type());
-    EXPECT_EQ(1u, msg->id());  // assigned as server
-    EXPECT_EQ(NT_PERSISTENT, msg->flags());
-  } else {
-    // shouldn't send an update id not assigned yet (happens on client only)
-    EXPECT_TRUE(outgoing.empty());
-  }
 }
 
 TEST_P(StorageTestPopulated, LoadPersistentUpdateValue) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
 
   GetEntry("foo2")->flags = NT_PERSISTENT;
+
+  auto value = Value::MakeDouble(1.0);
+
+  // client shouldn't send an update as id not assigned yet
+  if (GetParam()) {
+    // id assigned as this is the server; seq_num incremented
+    EXPECT_CALL(dispatcher,
+                QueueOutgoing(MessageEq(Message::EntryUpdate(1, 2, value)),
+                              IsNull(), IsNull()));
+  }
+  EXPECT_CALL(notifier,
+              NotifyEntry(1, StringRef("foo2"), ValueEq(Value::MakeDouble(1)),
+                          NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL, UINT_MAX));
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=1.0\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo2");
-  EXPECT_EQ(*Value::MakeDouble(1.0), *entry->value);
+  EXPECT_EQ(*value, *entry->value);
   EXPECT_EQ(NT_PERSISTENT, entry->flags);
 
-  if (GetParam()) {
-    ASSERT_EQ(1u, outgoing.size());
-    EXPECT_FALSE(outgoing[0].only);
-    EXPECT_FALSE(outgoing[0].except);
-    auto msg = outgoing[0].msg;
-    EXPECT_EQ(Message::kEntryUpdate, msg->type());
-    EXPECT_EQ(1u, msg->id());  // assigned as server
-    EXPECT_EQ(2u, msg->seq_num_uid());  // incremented
-    EXPECT_EQ(*Value::MakeDouble(1.0), *msg->value());
-  } else {
-    // shouldn't send an update id not assigned yet (happens on client only)
-    EXPECT_TRUE(outgoing.empty());
-    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());  // still should be incremented
+  if (!GetParam()) {
+    // seq_num should still be incremented
+    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());
   }
 }
 
 TEST_P(StorageTestPopulated, LoadPersistentUpdateValueFlags) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
+
+  auto value = Value::MakeDouble(1.0);
+
+  // client shouldn't send an update as id not assigned yet
+  if (GetParam()) {
+    // id assigned as this is the server; seq_num incremented
+    EXPECT_CALL(dispatcher,
+                QueueOutgoing(MessageEq(Message::EntryUpdate(1, 2, value)),
+                              IsNull(), IsNull()));
+    EXPECT_CALL(dispatcher,
+                QueueOutgoing(MessageEq(Message::FlagsUpdate(1, NT_PERSISTENT)),
+                              IsNull(), IsNull()));
+  }
+  EXPECT_CALL(notifier,
+              NotifyEntry(1, StringRef("foo2"), ValueEq(Value::MakeDouble(1)),
+                          NT_NOTIFY_FLAGS | NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL,
+                          UINT_MAX));
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=1.0\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo2");
-  EXPECT_EQ(*Value::MakeDouble(1.0), *entry->value);
+  EXPECT_EQ(*value, *entry->value);
   EXPECT_EQ(NT_PERSISTENT, entry->flags);
 
-  if (GetParam()) {
-    ASSERT_EQ(2u, outgoing.size());
-    EXPECT_FALSE(outgoing[0].only);
-    EXPECT_FALSE(outgoing[0].except);
-    auto msg = outgoing[0].msg;
-    EXPECT_EQ(Message::kEntryUpdate, msg->type());
-    EXPECT_EQ(1u, msg->id());  // assigned as server
-    EXPECT_EQ(2u, msg->seq_num_uid());  // incremented
-    EXPECT_EQ(*Value::MakeDouble(1.0), *msg->value());
-
-    EXPECT_FALSE(outgoing[1].only);
-    EXPECT_FALSE(outgoing[1].except);
-    msg = outgoing[1].msg;
-    EXPECT_EQ(Message::kFlagsUpdate, msg->type());
-    EXPECT_EQ(1u, msg->id());  // assigned as server
-    EXPECT_EQ(NT_PERSISTENT, msg->flags());
-  } else {
-    // shouldn't send an update id not assigned yet (happens on client only)
-    EXPECT_TRUE(outgoing.empty());
-    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());  // still should be incremented
+  if (!GetParam()) {
+    // seq_num should still be incremented
+    EXPECT_EQ(2u, GetEntry("foo2")->seq_num.value());
   }
 }
 
 TEST_P(StorageTestEmpty, LoadPersistent) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
 
   std::string in = "[NetworkTables Storage 3.0]\n";
   in += "boolean \"\\x00\\x03\\x05\\n\"=true\n";
@@ -800,10 +804,14 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
   in += "array string \"stringarr/one\"=\"hello\"\n";
   in += "array string \"stringarr/two\"=\"hello\",\"world\\n\"\n";
 
+  EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(22);
+  EXPECT_CALL(notifier,
+              NotifyEntry(_, _, _, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL, UINT_MAX))
+      .Times(22);
+
   std::istringstream iss(in);
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   ASSERT_EQ(22u, entries().size());
-  EXPECT_EQ(22u, outgoing.size());
 
   EXPECT_EQ(*Value::MakeBoolean(true), *storage.GetEntryValue("boolean/true"));
   EXPECT_EQ(*Value::MakeBoolean(false),
@@ -816,10 +824,8 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
             *storage.GetEntryValue("string/normal"));
   EXPECT_EQ(*Value::MakeString(StringRef("\0\3\5\n", 4)),
             *storage.GetEntryValue("string/special"));
-  EXPECT_EQ(*Value::MakeRaw(""),
-            *storage.GetEntryValue("raw/empty"));
-  EXPECT_EQ(*Value::MakeRaw("hello"),
-            *storage.GetEntryValue("raw/normal"));
+  EXPECT_EQ(*Value::MakeRaw(""), *storage.GetEntryValue("raw/empty"));
+  EXPECT_EQ(*Value::MakeRaw("hello"), *storage.GetEntryValue("raw/normal"));
   EXPECT_EQ(*Value::MakeRaw(StringRef("\0\3\5\n", 4)),
             *storage.GetEntryValue("raw/special"));
   EXPECT_EQ(*Value::MakeBooleanArray(std::vector<int>{}),
@@ -848,18 +854,37 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
 
 TEST_P(StorageTestEmpty, LoadPersistentWarn) {
   MockLoadWarn warn;
-  auto warn_func =
-      [&](std::size_t line, const char* msg) { warn.Warn(line, msg); };
+  auto warn_func = [&](std::size_t line, const char* msg) {
+    warn.Warn(line, msg);
+  };
 
   std::istringstream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=foo\n");
-  EXPECT_CALL(warn,
-              Warn(2, llvm::StringRef("unrecognized boolean value, not 'true' or 'false'")));
+  EXPECT_CALL(
+      warn, Warn(2, llvm::StringRef(
+                        "unrecognized boolean value, not 'true' or 'false'")));
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
 
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
-  EXPECT_TRUE(outgoing.empty());
+}
+
+TEST_P(StorageTestEmpty, ProcessIncomingEntryAssign) {
+  std::shared_ptr<NetworkConnection> conn;
+  auto value = Value::MakeDouble(1.0);
+  if (GetParam()) {
+    // id assign message reply generated on the server
+    EXPECT_CALL(
+        dispatcher,
+        QueueOutgoing(MessageEq(Message::EntryAssign("foo", 0, 0, value, 0)),
+                      IsNull(), IsNull()));
+  }
+  EXPECT_CALL(notifier, NotifyEntry(0, StringRef("foo"), ValueEq(value),
+                                    NT_NOTIFY_NEW, UINT_MAX));
+
+  storage.ProcessIncoming(
+      Message::EntryAssign("foo", GetParam() ? 0xffff : 0, 0, value, 0),
+      conn.get(), conn);
 }
 
 INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty,

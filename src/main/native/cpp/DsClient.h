@@ -8,29 +8,27 @@
 #ifndef NT_DSCLIENT_H_
 #define NT_DSCLIENT_H_
 
-#include "support/atomic_static.h"
 #include "support/SafeThread.h"
+
+#include "Log.h"
 
 namespace nt {
 
+class Dispatcher;
+
 class DsClient {
  public:
-  static DsClient& GetInstance() {
-    ATOMIC_STATIC(DsClient, instance);
-    return instance;
-  }
+  DsClient(Dispatcher& dispatcher, wpi::Logger& logger);
   ~DsClient() = default;
 
   void Start(unsigned int port);
   void Stop();
 
  private:
-  DsClient() = default;
-
   class Thread;
   wpi::SafeThreadOwner<Thread> m_owner;
-
-  ATOMIC_STATIC_DECL(DsClient)
+  Dispatcher& m_dispatcher;
+  wpi::Logger& m_logger;
 };
 
 }  // namespace nt

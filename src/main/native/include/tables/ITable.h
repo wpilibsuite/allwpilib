@@ -11,15 +11,19 @@
 #include <memory>
 
 #include "llvm/StringRef.h"
-#include "nt_Value.h"
+#include "networktables/NetworkTableValue.h"
 #include "support/deprecated.h"
+
+namespace nt {
+class NetworkTable;
+}  // namespace nt
 
 class ITableListener;
 
 /**
  * A table whose values can be read and written to
  */
-class ITable {
+class WPI_DEPRECATED("Use NetworkTable directly") ITable {
  public:
   /**
    * Determines whether the given key is in this table.
@@ -45,7 +49,7 @@ class ITable {
    * @param key the name of the table relative to this one
    * @return a sub table relative to this one
    */
-  virtual std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) const = 0;
+  virtual std::shared_ptr<nt::NetworkTable> GetSubTable(llvm::StringRef key) const = 0;
 
   /**
    * @param types bitmask of types; 0 is treated as a "don't care".

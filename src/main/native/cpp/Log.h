@@ -8,38 +8,19 @@
 #ifndef NT_LOG_H_
 #define NT_LOG_H_
 
-#include "support/atomic_static.h"
 #include "support/Logger.h"
 
-namespace nt {
-
-class Logger : public wpi::Logger {
- public:
-  static Logger& GetInstance() {
-    ATOMIC_STATIC(Logger, instance);
-    return instance;
-  }
-  ~Logger();
-
- private:
-  Logger();
-
-  ATOMIC_STATIC_DECL(Logger)
-};
-
-#define LOG(level, x) WPI_LOG(nt::Logger::GetInstance(), level, x)
+#define LOG(level, x) WPI_LOG(m_logger, level, x)
 
 #undef ERROR
-#define ERROR(x) WPI_ERROR(nt::Logger::GetInstance(), x)
-#define WARNING(x) WPI_WARNING(nt::Logger::GetInstance(), x)
-#define INFO(x) WPI_INFO(nt::Logger::GetInstance(), x)
+#define ERROR(x) WPI_ERROR(m_logger, x)
+#define WARNING(x) WPI_WARNING(m_logger, x)
+#define INFO(x) WPI_INFO(m_logger, x)
 
-#define DEBUG(x) WPI_DEBUG(nt::Logger::GetInstance(), x)
-#define DEBUG1(x) WPI_DEBUG1(nt::Logger::GetInstance(), x)
-#define DEBUG2(x) WPI_DEBUG2(nt::Logger::GetInstance(), x)
-#define DEBUG3(x) WPI_DEBUG3(nt::Logger::GetInstance(), x)
-#define DEBUG4(x) WPI_DEBUG4(nt::Logger::GetInstance(), x)
-
-}  // namespace nt
+#define DEBUG(x) WPI_DEBUG(m_logger, x)
+#define DEBUG1(x) WPI_DEBUG1(m_logger, x)
+#define DEBUG2(x) WPI_DEBUG2(m_logger, x)
+#define DEBUG3(x) WPI_DEBUG3(m_logger, x)
+#define DEBUG4(x) WPI_DEBUG4(m_logger, x)
 
 #endif  // NT_LOG_H_

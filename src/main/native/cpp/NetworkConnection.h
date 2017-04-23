@@ -18,12 +18,13 @@
 #include "ntcore_cpp.h"
 
 namespace wpi {
+class Logger;
 class NetworkStream;
 }
 
 namespace nt {
 
-class Notifier;
+class IConnectionNotifier;
 
 class NetworkConnection {
  public:
@@ -40,8 +41,10 @@ class NetworkConnection {
   typedef std::vector<std::shared_ptr<Message>> Outgoing;
   typedef wpi::ConcurrentQueue<Outgoing> OutgoingQueue;
 
-  NetworkConnection(std::unique_ptr<wpi::NetworkStream> stream,
-                    Notifier& notifier, HandshakeFunc handshake,
+  NetworkConnection(unsigned int uid,
+                    std::unique_ptr<wpi::NetworkStream> stream,
+                    IConnectionNotifier& notifier, wpi::Logger& logger,
+                    HandshakeFunc handshake,
                     Message::GetEntryTypeFunc get_entry_type);
   ~NetworkConnection();
 
@@ -60,7 +63,6 @@ class NetworkConnection {
 
   void QueueOutgoing(std::shared_ptr<Message> msg);
   void PostOutgoing(bool keep_alive);
-  void NotifyIfActive(ConnectionListenerCallback callback) const;
 
   unsigned int uid() const { return m_uid; }
 
@@ -82,11 +84,10 @@ class NetworkConnection {
   void ReadThreadMain();
   void WriteThreadMain();
 
-  static std::atomic_uint s_uid;
-
   unsigned int m_uid;
   std::unique_ptr<wpi::NetworkStream> m_stream;
-  Notifier& m_notifier;
+  IConnectionNotifier& m_notifier;
+  wpi::Logger& m_logger;
   OutgoingQueue m_outgoing;
   HandshakeFunc m_handshake;
   Message::GetEntryTypeFunc m_get_entry_type;

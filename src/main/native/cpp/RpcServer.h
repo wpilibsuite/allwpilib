@@ -8,86 +8,100 @@
 #ifndef NT_RPCSERVER_H_
 #define NT_RPCSERVER_H_
 
-#include <atomic>
-#include <condition_variable>
-#include <mutex>
-#include <queue>
-#include <utility>
-
 #include "llvm/DenseMap.h"
-#include "support/atomic_static.h"
-#include "support/SafeThread.h"
-#include "Message.h"
-#include "ntcore_cpp.h"
+
+#include "CallbackManager.h"
+#include "Handle.h"
+#include "IRpcServer.h"
+#include "Log.h"
 
 namespace nt {
 
-class RpcServer {
+namespace impl {
+
+typedef std::pair<unsigned int, unsigned int> RpcIdPair;
+
+struct RpcNotifierData : public RpcAnswer {
+  RpcNotifierData(NT_Entry entry_, NT_RpcCall call_, StringRef name_,
+                  StringRef params_, const ConnectionInfo& conn_,
+                  IRpcServer::SendResponseFunc send_response_)
+      : RpcAnswer{entry_, call_, name_, params_, conn_},
+        send_response{send_response_} {}
+
+  IRpcServer::SendResponseFunc send_response;
+};
+
+using RpcListenerData =
+    ListenerData<std::function<void(const RpcAnswer& answer)>>;
+
+class RpcServerThread
+    : public CallbackThread<RpcServerThread, RpcAnswer, RpcListenerData,
+                            RpcNotifierData> {
+ public:
+  RpcServerThread(int inst, wpi::Logger& logger)
+      : m_inst(inst), m_logger(logger) {}
+
+  bool Matches(const RpcListenerData& listener, const RpcNotifierData& data) {
+    return !data.name.empty() && data.send_response;
+  }
+
+  void SetListener(RpcNotifierData* data, unsigned int listener_uid) {
+    unsigned int local_id = Handle{data->entry}.GetIndex();
+    unsigned int call_uid = Handle{data->call}.GetIndex();
+    RpcIdPair lookup_uid{local_id, call_uid};
+    m_response_map.insert(std::make_pair(lookup_uid, data->send_response));
+  }
+
+  void DoCallback(std::function<void(const RpcAnswer& call)> callback,
+                  const RpcNotifierData& data) {
+    DEBUG4("rpc calling " << data.name);
+    unsigned int local_id = Handle{data.entry}.GetIndex();
+    unsigned int call_uid = Handle{data.call}.GetIndex();
+    RpcIdPair lookup_uid{local_id, call_uid};
+    callback(data);
+    {
+      std::lock_guard<std::mutex> lock(m_mutex);
+      auto i = m_response_map.find(lookup_uid);
+      if (i != m_response_map.end()) {
+        // post an empty response and erase it
+        (i->getSecond())("");
+        m_response_map.erase(i);
+      }
+    }
+  }
+
+  int m_inst;
+  wpi::Logger& m_logger;
+  llvm::DenseMap<RpcIdPair, IRpcServer::SendResponseFunc> m_response_map;
+};
+
+}  // namespace impl
+
+class RpcServer : public IRpcServer,
+                  public CallbackManager<RpcServer, impl::RpcServerThread> {
   friend class RpcServerTest;
+  friend class CallbackManager<RpcServer, impl::RpcServerThread>;
 
  public:
-  static RpcServer& GetInstance() {
-    ATOMIC_STATIC(RpcServer, instance);
-    return instance;
-  }
-  ~RpcServer();
-
-  typedef std::function<void(std::shared_ptr<Message>)> SendMsgFunc;
+  RpcServer(int inst, wpi::Logger& logger);
 
   void Start();
-  void Stop();
 
-  void SetOnStart(std::function<void()> on_start) { m_on_start = on_start; }
-  void SetOnExit(std::function<void()> on_exit) { m_on_exit = on_exit; }
+  unsigned int Add(std::function<void(const RpcAnswer& answer)> callback);
+  unsigned int AddPolled(unsigned int poller_uid);
+  void RemoveRpc(unsigned int rpc_uid) override;
 
-  void ProcessRpc(StringRef name, std::shared_ptr<Message> msg,
-                  RpcCallback func, unsigned int conn_id,
-                  SendMsgFunc send_response, const ConnectionInfo& conn_info);
+  void ProcessRpc(unsigned int local_id, unsigned int call_uid, StringRef name,
+                  StringRef params, const ConnectionInfo& conn,
+                  SendResponseFunc send_response,
+                  unsigned int rpc_uid) override;
 
-  bool PollRpc(bool blocking, RpcCallInfo* call_info);
-  bool PollRpc(bool blocking, double time_out, RpcCallInfo* call_info);
-  void PostRpcResponse(unsigned int rpc_id, unsigned int call_uid,
+  void PostRpcResponse(unsigned int local_id, unsigned int call_uid,
                        llvm::StringRef result);
 
  private:
-  RpcServer();
-
-  class Thread;
-  wpi::SafeThreadOwner<Thread> m_owner;
-
-  struct RpcCall {
-    RpcCall(StringRef name_, std::shared_ptr<Message> msg_, RpcCallback func_,
-            unsigned int conn_id_, SendMsgFunc send_response_,
-            const ConnectionInfo conn_info_)
-        : name(name_),
-          msg(msg_),
-          func(func_),
-          conn_id(conn_id_),
-          send_response(send_response_),
-          conn_info(conn_info_) {}
-
-    std::string name;
-    std::shared_ptr<Message> msg;
-    RpcCallback func;
-    unsigned int conn_id;
-    SendMsgFunc send_response;
-    ConnectionInfo conn_info;
-  };
-
-  std::mutex m_mutex;
-
-  std::queue<RpcCall> m_poll_queue;
-  llvm::DenseMap<std::pair<unsigned int, unsigned int>, SendMsgFunc>
-      m_response_map;
-
-  std::condition_variable m_poll_cond;
-
-  std::atomic_bool m_terminating;
-
-  std::function<void()> m_on_start;
-  std::function<void()> m_on_exit;
-
-  ATOMIC_STATIC_DECL(RpcServer)
+  int m_inst;
+  wpi::Logger& m_logger;
 };
 
 }  // namespace nt

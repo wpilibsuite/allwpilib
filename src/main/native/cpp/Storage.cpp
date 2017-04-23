@@ -14,36 +14,36 @@
 #include "llvm/StringExtras.h"
 #include "support/Base64.h"
 #include "support/timestamp.h"
+
+#include "Handle.h"
+#include "IDispatcher.h"
+#include "IEntryNotifier.h"
+#include "IRpcServer.h"
 #include "Log.h"
 #include "NetworkConnection.h"
 
 using namespace nt;
 
-ATOMIC_STATIC_INIT(Storage)
-
-Storage::Storage()
-    : Storage(Notifier::GetInstance(), RpcServer::GetInstance()) {}
-
-Storage::Storage(Notifier& notifier, RpcServer& rpc_server)
-    : m_notifier(notifier), m_rpc_server(rpc_server) {
+Storage::Storage(IEntryNotifier& notifier, IRpcServer& rpc_server,
+                 wpi::Logger& logger)
+    : m_notifier(notifier), m_rpc_server(rpc_server), m_logger(logger) {
   m_terminating = false;
 }
 
 Storage::~Storage() {
-  Logger::GetInstance().SetLogger(nullptr);
   m_terminating = true;
   m_rpc_results_cond.notify_all();
 }
 
-void Storage::SetOutgoing(QueueOutgoingFunc queue_outgoing, bool server) {
+void Storage::SetDispatcher(IDispatcher* dispatcher, bool server) {
   std::lock_guard<std::mutex> lock(m_mutex);
-  m_queue_outgoing = queue_outgoing;
+  m_dispatcher = dispatcher;
   m_server = server;
 }
 
-void Storage::ClearOutgoing() { m_queue_outgoing = nullptr; }
+void Storage::ClearDispatcher() { m_dispatcher = nullptr; }
 
-NT_Type Storage::GetEntryType(unsigned int id) const {
+NT_Type Storage::GetMessageEntryType(unsigned int id) const {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (id >= m_idmap.size()) return NT_UNASSIGNED;
   Entry* entry = m_idmap[id];
@@ -75,33 +75,12 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         // to be assigned, and we need to send the new assignment back to
         // the sender as well as all other connections.
         if (id == 0xffff) {
+          entry = GetOrNew(name);
           // see if it was already assigned; ignore if so.
-          if (m_entries.count(name) != 0) return;
+          if (entry->id != 0xffff) return;
 
-          // create it locally
-          id = m_idmap.size();
-          auto& new_entry = m_entries[name];
-          if (!new_entry) new_entry.reset(new Entry(name));
-          entry = new_entry.get();
-          entry->value = msg->value();
           entry->flags = msg->flags();
-          entry->id = id;
-          m_idmap.push_back(entry);
-
-          // update persistent dirty flag if it's persistent
-          if (entry->IsPersistent()) m_persistent_dirty = true;
-
-          // notify
-          m_notifier.NotifyEntry(name, entry->value, NT_NOTIFY_NEW);
-
-          // send the assignment to everyone (including the originator)
-          if (m_queue_outgoing) {
-            auto queue_outgoing = m_queue_outgoing;
-            auto outmsg = Message::EntryAssign(name, id, entry->seq_num.value(),
-                                               msg->value(), msg->flags());
-            lock.unlock();
-            queue_outgoing(outmsg, nullptr, nullptr);
-          }
+          SetEntryValueImpl(entry, msg->value(), lock, false);
           return;
         }
         if (id >= m_idmap.size() || !m_idmap[id]) {
@@ -123,32 +102,30 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         entry = m_idmap[id];
         if (!entry) {
           // create local
-          auto& new_entry = m_entries[name];
-          if (!new_entry) {
+          bool is_new;
+          entry = GetOrNew(name, &is_new);
+          entry->id = id;
+          m_idmap[id] = entry;
+          if (is_new) {
             // didn't exist at all (rather than just being a response to a
             // id assignment request)
-            new_entry.reset(new Entry(name));
-            new_entry->value = msg->value();
-            new_entry->flags = msg->flags();
-            new_entry->id = id;
-            m_idmap[id] = new_entry.get();
+            entry->value = msg->value();
+            entry->flags = msg->flags();
 
             // notify
-            m_notifier.NotifyEntry(name, new_entry->value, NT_NOTIFY_NEW);
+            m_notifier.NotifyEntry(entry->local_id, name, entry->value,
+                                   NT_NOTIFY_NEW);
             return;
           }
           may_need_update = true;  // we may need to send an update message
-          entry = new_entry.get();
-          entry->id = id;
-          m_idmap[id] = entry;
 
           // if the received flags don't match what we sent, we most likely
           // updated flags locally in the interim; send flags update message.
           if (msg->flags() != entry->flags) {
-            auto queue_outgoing = m_queue_outgoing;
+            auto dispatcher = m_dispatcher;
             auto outmsg = Message::FlagsUpdate(id, entry->flags);
             lock.unlock();
-            queue_outgoing(outmsg, nullptr, nullptr);
+            dispatcher->QueueOutgoing(outmsg, nullptr, nullptr);
             lock.lock();
           }
         }
@@ -160,11 +137,11 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       SequenceNumber seq_num(msg->seq_num_uid());
       if (seq_num < entry->seq_num) {
         if (may_need_update) {
-          auto queue_outgoing = m_queue_outgoing;
+          auto dispatcher = m_dispatcher;
           auto outmsg = Message::EntryUpdate(entry->id, entry->seq_num.value(),
                                              entry->value);
           lock.unlock();
-          queue_outgoing(outmsg, nullptr, nullptr);
+          dispatcher->QueueOutgoing(outmsg, nullptr, nullptr);
         }
         return;
       }
@@ -197,16 +174,16 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       entry->seq_num = seq_num;
 
       // notify
-      m_notifier.NotifyEntry(name, entry->value, notify_flags);
+      m_notifier.NotifyEntry(entry->local_id, name, entry->value, notify_flags);
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
-      if (m_server && m_queue_outgoing) {
-        auto queue_outgoing = m_queue_outgoing;
+      if (m_server && m_dispatcher) {
+        auto dispatcher = m_dispatcher;
         auto outmsg = Message::EntryAssign(entry->name, id, msg->seq_num_uid(),
                                            msg->value(), entry->flags);
         lock.unlock();
-        queue_outgoing(outmsg, nullptr, conn);
+        dispatcher->QueueOutgoing(outmsg, nullptr, conn);
       }
       break;
     }
@@ -233,14 +210,15 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
       if (entry->IsPersistent()) m_persistent_dirty = true;
 
       // notify
-      m_notifier.NotifyEntry(entry->name, entry->value, NT_NOTIFY_UPDATE);
+      m_notifier.NotifyEntry(entry->local_id, entry->name, entry->value,
+                             NT_NOTIFY_UPDATE);
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
-      if (m_server && m_queue_outgoing) {
-        auto queue_outgoing = m_queue_outgoing;
+      if (m_server && m_dispatcher) {
+        auto dispatcher = m_dispatcher;
         lock.unlock();
-        queue_outgoing(msg, nullptr, conn);
+        dispatcher->QueueOutgoing(msg, nullptr, conn);
       }
       break;
     }
@@ -253,27 +231,16 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         DEBUG("received flags update to unknown entry");
         return;
       }
-      Entry* entry = m_idmap[id];
-
-      // ignore if flags didn't actually change
-      if (entry->flags == msg->flags()) return;
-
-      // update persistent dirty flag if persistent flag changed
-      if ((entry->flags & NT_PERSISTENT) != (msg->flags() & NT_PERSISTENT))
-        m_persistent_dirty = true;
 
       // update local
-      entry->flags = msg->flags();
-
-      // notify
-      m_notifier.NotifyEntry(entry->name, entry->value, NT_NOTIFY_FLAGS);
+      SetEntryFlagsImpl(m_idmap[id], msg->flags(), lock, false);
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
-      if (m_server && m_queue_outgoing) {
-        auto queue_outgoing = m_queue_outgoing;
+      if (m_server && m_dispatcher) {
+        auto dispatcher = m_dispatcher;
         lock.unlock();
-        queue_outgoing(msg, nullptr, conn);
+        dispatcher->QueueOutgoing(msg, nullptr, conn);
       }
       break;
     }
@@ -286,44 +253,29 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         DEBUG("received delete to unknown entry");
         return;
       }
-      Entry* entry = m_idmap[id];
 
-      // update persistent dirty flag if it's a persistent value
-      if (entry->IsPersistent()) m_persistent_dirty = true;
-
-      // delete it from idmap
-      m_idmap[id] = nullptr;
-
-      // get entry (as we'll need it for notify) and erase it from the map
-      // it should always be in the map, but sanity check just in case
-      auto i = m_entries.find(entry->name);
-      if (i != m_entries.end()) {
-        auto entry2 = std::move(i->getValue());  // move the value out
-        m_entries.erase(i);
-
-        // notify
-        m_notifier.NotifyEntry(entry2->name, entry2->value, NT_NOTIFY_DELETE);
-      }
+      // update local
+      DeleteEntryImpl(m_idmap[id], m_entries.end(), lock, false);
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
-      if (m_server && m_queue_outgoing) {
-        auto queue_outgoing = m_queue_outgoing;
+      if (m_server && m_dispatcher) {
+        auto dispatcher = m_dispatcher;
         lock.unlock();
-        queue_outgoing(msg, nullptr, conn);
+        dispatcher->QueueOutgoing(msg, nullptr, conn);
       }
       break;
     }
     case Message::kClearEntries: {
       // update local
-      DeleteAllEntriesImpl();
+      DeleteAllEntriesImpl(false);
 
       // broadcast to all other connections (note for client there won't
       // be any other connections, so don't bother)
-      if (m_server && m_queue_outgoing) {
-        auto queue_outgoing = m_queue_outgoing;
+      if (m_server && m_dispatcher) {
+        auto dispatcher = m_dispatcher;
         lock.unlock();
-        queue_outgoing(msg, nullptr, conn);
+        dispatcher->QueueOutgoing(msg, nullptr, conn);
       }
       break;
     }
@@ -338,7 +290,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         return;
       }
       Entry* entry = m_idmap[id];
-      if (!entry->value->IsRpc()) {
+      if (!entry->value || !entry->value->IsRpc()) {
         lock.unlock();
         DEBUG("received RPC call to non-RPC entry");
         return;
@@ -354,19 +306,34 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
         conn_info.last_update = 0;
         conn_info.protocol_version = 0;
       }
-      m_rpc_server.ProcessRpc(entry->name, msg, entry->rpc_callback,
-                              conn->uid(),
-                              [=](std::shared_ptr<Message> msg) {
-                                auto c = conn_weak.lock();
-                                if (c) c->QueueOutgoing(msg);
-                              },
-                              conn_info);
+      unsigned int call_uid = msg->seq_num_uid();
+      m_rpc_server.ProcessRpc(
+          entry->local_id, call_uid, entry->name, msg->str(), conn_info,
+          [=](StringRef result) {
+            auto c = conn_weak.lock();
+            if (c) c->QueueOutgoing(Message::RpcResponse(id, call_uid, result));
+          },
+          entry->rpc_uid);
       break;
     }
     case Message::kRpcResponse: {
       if (m_server) return;  // only process on client
+      unsigned int id = msg->id();
+      if (id >= m_idmap.size() || !m_idmap[id]) {
+        // ignore response to non-existent RPC
+        // this can happen due to deleted entries
+        lock.unlock();
+        DEBUG("received rpc response to unknown entry");
+        return;
+      }
+      Entry* entry = m_idmap[id];
+      if (!entry->value || !entry->value->IsRpc()) {
+        lock.unlock();
+        DEBUG("received RPC response to non-RPC entry");
+        return;
+      }
       m_rpc_results.insert(std::make_pair(
-          std::make_pair(msg->id(), msg->seq_num_uid()), msg->str()));
+          RpcIdPair{entry->local_id, msg->seq_num_uid()}, msg->str()));
       m_rpc_results_cond.notify_all();
       break;
     }
@@ -380,7 +347,7 @@ void Storage::GetInitialAssignments(
   std::lock_guard<std::mutex> lock(m_mutex);
   conn.set_state(NetworkConnection::kSynchronized);
   for (auto& i : m_entries) {
-    Entry* entry = i.getValue().get();
+    Entry* entry = i.getValue();
     msgs->emplace_back(Message::EntryAssign(i.getKey(), entry->id,
                                             entry->seq_num.value(),
                                             entry->value, entry->flags));
@@ -419,15 +386,16 @@ void Storage::ApplyInitialAssignments(
     SequenceNumber seq_num(msg->seq_num_uid());
     StringRef name = msg->str();
 
-    auto& entry = m_entries[name];
-    if (!entry) {
+    bool is_new;
+    Entry* entry = GetOrNew(name, &is_new);
+    if (is_new) {
       // doesn't currently exist
-      entry.reset(new Entry(name));
       entry->value = msg->value();
       entry->flags = msg->flags();
       entry->seq_num = seq_num;
       // notify
-      m_notifier.NotifyEntry(name, entry->value, NT_NOTIFY_NEW);
+      m_notifier.NotifyEntry(entry->local_id, name, entry->value,
+                             NT_NOTIFY_NEW);
     } else {
       // if reconnect and sequence number not higher than local, then we
       // don't update the local value and instead send it back to the server
@@ -445,76 +413,69 @@ void Storage::ApplyInitialAssignments(
           entry->flags = msg->flags();
         }
         // notify
-        m_notifier.NotifyEntry(name, entry->value, notify_flags);
+        m_notifier.NotifyEntry(entry->local_id, name, entry->value,
+                               notify_flags);
       }
     }
 
     // set id and save to idmap
     entry->id = id;
     if (id >= m_idmap.size()) m_idmap.resize(id + 1);
-    m_idmap[id] = entry.get();
+    m_idmap[id] = entry;
   }
 
   // generate assign messages for unassigned local entries
   for (auto& i : m_entries) {
-    Entry* entry = i.getValue().get();
+    Entry* entry = i.getValue();
     if (entry->id != 0xffff) continue;
     out_msgs->emplace_back(Message::EntryAssign(entry->name, entry->id,
                                                 entry->seq_num.value(),
                                                 entry->value, entry->flags));
   }
-  auto queue_outgoing = m_queue_outgoing;
+  auto dispatcher = m_dispatcher;
   lock.unlock();
-  for (auto& msg : update_msgs) queue_outgoing(msg, nullptr, nullptr);
+  for (auto& msg : update_msgs)
+    dispatcher->QueueOutgoing(msg, nullptr, nullptr);
 }
 
 std::shared_ptr<Value> Storage::GetEntryValue(StringRef name) const {
   std::lock_guard<std::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
-  return i == m_entries.end() ? nullptr : i->getValue()->value;
+  if (i == m_entries.end()) return nullptr;
+  return i->getValue()->value;
+}
+
+std::shared_ptr<Value> Storage::GetEntryValue(unsigned int local_id) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return nullptr;
+  return m_localmap[local_id]->value;
 }
 
 bool Storage::SetDefaultEntryValue(StringRef name,
                                    std::shared_ptr<Value> value) {
-  if (!value) return false;        // can't compare to a null value
-  if (name.empty()) return false;  // can't compare empty name
+  if (name.empty()) return false;
+  if (!value) return false;
   std::unique_lock<std::mutex> lock(m_mutex);
-  auto& new_entry = m_entries[name];
-  if (new_entry) {  // entry already exists
-    auto old_value = new_entry->value;
-    // if types match return true
-    if (old_value && old_value->type() == value->type())
-      return true;
-    else
-      return false;  // entry exists but doesn't match type
-  }
+  Entry* entry = GetOrNew(name);
 
-  // if we've gotten here, entry does not exist, and we can write it.
-  new_entry.reset(new Entry(name));
-  Entry* entry = new_entry.get();
-  // don't need to compare old value as we know it will assign
-  entry->value = value;
+  // we return early if value already exists; if types match return true
+  if (entry->value) return entry->value->type() == value->type();
 
-  // if we're the server, assign an id if it doesn't have one
-  if (m_server && entry->id == 0xffff) {
-    unsigned int id = m_idmap.size();
-    entry->id = id;
-    m_idmap.push_back(entry);
-  }
+  SetEntryValueImpl(entry, value, lock, true);
+  return true;
+}
 
-  // notify (for local listeners)
-  if (m_notifier.local_notifiers()) {
-    // always a new entry if we got this far
-    m_notifier.NotifyEntry(name, value, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
-  }
+bool Storage::SetDefaultEntryValue(unsigned int local_id,
+                                   std::shared_ptr<Value> value) {
+  if (!value) return false;
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return false;
+  Entry* entry = m_localmap[local_id].get();
 
-  // generate message
-  if (!m_queue_outgoing) return true;
-  auto queue_outgoing = m_queue_outgoing;
-  auto msg = Message::EntryAssign(name, entry->id, entry->seq_num.value(),
-                                  value, entry->flags);
-  lock.unlock();
-  queue_outgoing(msg, nullptr, nullptr);
+  // we return early if value already exists; if types match return true
+  if (entry->value) return entry->value->type() == value->type();
+
+  SetEntryValueImpl(entry, value, lock, true);
   return true;
 }
 
@@ -522,12 +483,34 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   if (name.empty()) return true;
   if (!value) return true;
   std::unique_lock<std::mutex> lock(m_mutex);
-  auto& new_entry = m_entries[name];
-  if (!new_entry) new_entry.reset(new Entry(name));
-  Entry* entry = new_entry.get();
-  auto old_value = entry->value;
-  if (old_value && old_value->type() != value->type())
+  Entry* entry = GetOrNew(name);
+
+  if (entry->value && entry->value->type() != value->type())
     return false;  // error on type mismatch
+
+  SetEntryValueImpl(entry, value, lock, true);
+  return true;
+}
+
+bool Storage::SetEntryValue(unsigned int local_id,
+                            std::shared_ptr<Value> value) {
+  if (!value) return true;
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return true;
+  Entry* entry = m_localmap[local_id].get();
+
+  if (entry->value && entry->value->type() != value->type())
+    return false;  // error on type mismatch
+
+  SetEntryValueImpl(entry, value, lock, true);
+  return true;
+}
+
+void Storage::SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
+                                std::unique_lock<std::mutex>& lock,
+                                bool local) {
+  if (!value) return;
+  auto old_value = entry->value;
   entry->value = value;
 
   // if we're the server, assign an id if it doesn't have one
@@ -538,83 +521,55 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   }
 
   // update persistent dirty flag if value changed and it's persistent
-  if (entry->IsPersistent() && *old_value != *value) m_persistent_dirty = true;
+  if (entry->IsPersistent() && (!old_value || *old_value != *value))
+    m_persistent_dirty = true;
 
-  // notify (for local listeners)
-  if (m_notifier.local_notifiers()) {
-    if (!old_value)
-      m_notifier.NotifyEntry(name, value, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
-    else if (*old_value != *value)
-      m_notifier.NotifyEntry(name, value, NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL);
-  }
+  // notify
+  if (!old_value)
+    m_notifier.NotifyEntry(entry->local_id, entry->name, value,
+                           NT_NOTIFY_NEW | (local ? NT_NOTIFY_LOCAL : 0));
+  else if (*old_value != *value)
+    m_notifier.NotifyEntry(entry->local_id, entry->name, value,
+                           NT_NOTIFY_UPDATE | (local ? NT_NOTIFY_LOCAL : 0));
 
   // generate message
-  if (!m_queue_outgoing) return true;
-  auto queue_outgoing = m_queue_outgoing;
-  if (!old_value) {
-    auto msg = Message::EntryAssign(name, entry->id, entry->seq_num.value(),
-                                    value, entry->flags);
+  if (!m_dispatcher || (!local && !m_server)) return;
+  auto dispatcher = m_dispatcher;
+  if (!old_value || old_value->type() != value->type()) {
+    if (local) ++entry->seq_num;
+    auto msg = Message::EntryAssign(
+        entry->name, entry->id, entry->seq_num.value(), value, entry->flags);
     lock.unlock();
-    queue_outgoing(msg, nullptr, nullptr);
+    dispatcher->QueueOutgoing(msg, nullptr, nullptr);
   } else if (*old_value != *value) {
-    ++entry->seq_num;
+    if (local) ++entry->seq_num;
     // don't send an update if we don't have an assigned id yet
     if (entry->id != 0xffff) {
       auto msg = Message::EntryUpdate(entry->id, entry->seq_num.value(), value);
       lock.unlock();
-      queue_outgoing(msg, nullptr, nullptr);
+      dispatcher->QueueOutgoing(msg, nullptr, nullptr);
     }
   }
-  return true;
 }
 
 void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
   if (name.empty()) return;
   if (!value) return;
   std::unique_lock<std::mutex> lock(m_mutex);
-  auto& new_entry = m_entries[name];
-  if (!new_entry) new_entry.reset(new Entry(name));
-  Entry* entry = new_entry.get();
-  auto old_value = entry->value;
-  entry->value = value;
-  if (old_value && *old_value == *value) return;
+  Entry* entry = GetOrNew(name);
 
-  // if we're the server, assign an id if it doesn't have one
-  if (m_server && entry->id == 0xffff) {
-    unsigned int id = m_idmap.size();
-    entry->id = id;
-    m_idmap.push_back(entry);
-  }
+  SetEntryValueImpl(entry, value, lock, true);
+}
 
-  // update persistent dirty flag if it's a persistent value
-  if (entry->IsPersistent()) m_persistent_dirty = true;
+void Storage::SetEntryTypeValue(unsigned int local_id,
+                                std::shared_ptr<Value> value) {
+  if (!value) return;
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return;
+  Entry* entry = m_localmap[local_id].get();
+  if (!entry) return;
 
-  // notify (for local listeners)
-  if (m_notifier.local_notifiers()) {
-    if (!old_value)
-      m_notifier.NotifyEntry(name, value, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
-    else
-      m_notifier.NotifyEntry(name, value, NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL);
-  }
-
-  // generate message
-  if (!m_queue_outgoing) return;
-  auto queue_outgoing = m_queue_outgoing;
-  if (!old_value || old_value->type() != value->type()) {
-    ++entry->seq_num;
-    auto msg = Message::EntryAssign(name, entry->id, entry->seq_num.value(),
-                                    value, entry->flags);
-    lock.unlock();
-    queue_outgoing(msg, nullptr, nullptr);
-  } else {
-    ++entry->seq_num;
-    // don't send an update if we don't have an assigned id yet
-    if (entry->id != 0xffff) {
-      auto msg = Message::EntryUpdate(entry->id, entry->seq_num.value(), value);
-      lock.unlock();
-      queue_outgoing(msg, nullptr, nullptr);
-    }
-  }
+  SetEntryValueImpl(entry, value, lock, true);
 }
 
 void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
@@ -622,7 +577,18 @@ void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
   std::unique_lock<std::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return;
-  Entry* entry = i->getValue().get();
+  SetEntryFlagsImpl(i->getValue(), flags, lock, true);
+}
+
+void Storage::SetEntryFlags(unsigned int id_local, unsigned int flags) {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (id_local >= m_localmap.size()) return;
+  SetEntryFlagsImpl(m_localmap[id_local].get(), flags, lock, true);
+}
+
+void Storage::SetEntryFlagsImpl(Entry* entry, unsigned int flags,
+                                std::unique_lock<std::mutex>& lock,
+                                bool local) {
   if (entry->flags == flags) return;
 
   // update persistent dirty flag if persistent flag changed
@@ -632,74 +598,108 @@ void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
   entry->flags = flags;
 
   // notify
-  m_notifier.NotifyEntry(name, entry->value, NT_NOTIFY_FLAGS | NT_NOTIFY_LOCAL);
+  m_notifier.NotifyEntry(entry->local_id, entry->name, entry->value,
+                         NT_NOTIFY_FLAGS | (local ? NT_NOTIFY_LOCAL : 0));
 
   // generate message
-  if (!m_queue_outgoing) return;
-  auto queue_outgoing = m_queue_outgoing;
+  if (!local || !m_dispatcher) return;
+  auto dispatcher = m_dispatcher;
   unsigned int id = entry->id;
   // don't send an update if we don't have an assigned id yet
   if (id != 0xffff) {
     lock.unlock();
-    queue_outgoing(Message::FlagsUpdate(id, flags), nullptr, nullptr);
+    dispatcher->QueueOutgoing(Message::FlagsUpdate(id, flags), nullptr,
+                              nullptr);
   }
 }
 
 unsigned int Storage::GetEntryFlags(StringRef name) const {
   std::lock_guard<std::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
-  return i == m_entries.end() ? 0 : i->getValue()->flags;
+  if (i == m_entries.end()) return 0;
+  return i->getValue()->flags;
+}
+
+unsigned int Storage::GetEntryFlags(unsigned int local_id) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return 0;
+  return m_localmap[local_id]->flags;
 }
 
 void Storage::DeleteEntry(StringRef name) {
   std::unique_lock<std::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return;
-  auto entry = std::move(i->getValue());
+  DeleteEntryImpl(i->getValue(), i, lock, true);
+}
+
+void Storage::DeleteEntry(unsigned int local_id) {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return;
+  DeleteEntryImpl(m_localmap[local_id].get(), m_entries.end(), lock, true);
+}
+
+void Storage::DeleteEntryImpl(Entry* entry, EntriesMap::iterator it,
+                              std::unique_lock<std::mutex>& lock, bool local) {
   unsigned int id = entry->id;
+
+  // Erase entry from name and id mappings.
+  // Get iterator if it wasn't provided.
+  if (it == m_entries.end()) it = m_entries.find(entry->name);
+  if (it != m_entries.end()) m_entries.erase(it);
+  if (id < m_idmap.size()) m_idmap[id] = nullptr;
+
+  // empty the value and reset id
+  std::shared_ptr<Value> old_value;
+  old_value.swap(entry->value);
+  entry->id = 0xffff;
+
+  // remove RPC if there was one
+  if (entry->rpc_uid != UINT_MAX) {
+    m_rpc_server.RemoveRpc(entry->rpc_uid);
+    entry->rpc_uid = UINT_MAX;
+  }
 
   // update persistent dirty flag if it's a persistent value
   if (entry->IsPersistent()) m_persistent_dirty = true;
 
-  m_entries.erase(i);  // erase from map
-  if (id < m_idmap.size()) m_idmap[id] = nullptr;
-
-  if (!entry->value) return;
+  if (!old_value) return;  // was not previously assigned
 
   // notify
-  m_notifier.NotifyEntry(name, entry->value,
-                         NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL);
+  m_notifier.NotifyEntry(entry->local_id, entry->name, old_value,
+                         NT_NOTIFY_DELETE | (local ? NT_NOTIFY_LOCAL : 0));
 
   // if it had a value, generate message
   // don't send an update if we don't have an assigned id yet
-  if (id != 0xffff) {
-    if (!m_queue_outgoing) return;
-    auto queue_outgoing = m_queue_outgoing;
+  if (local && id != 0xffff) {
+    if (!m_dispatcher) return;
+    auto dispatcher = m_dispatcher;
     lock.unlock();
-    queue_outgoing(Message::EntryDelete(id), nullptr, nullptr);
+    dispatcher->QueueOutgoing(Message::EntryDelete(id), nullptr, nullptr);
   }
 }
 
-void Storage::DeleteAllEntriesImpl() {
+void Storage::DeleteAllEntriesImpl(bool local) {
   if (m_entries.empty()) return;
 
   // only delete non-persistent values
   // can't erase without invalidating iterators, so build a new map
   EntriesMap entries;
   for (auto& i : m_entries) {
-    Entry* entry = i.getValue().get();
+    Entry* entry = i.getValue();
     if (!entry->IsPersistent()) {
       // notify it's being deleted
-      if (m_notifier.local_notifiers()) {
-        m_notifier.NotifyEntry(i.getKey(), i.getValue()->value,
-                               NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL);
-      }
+      m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
+                             NT_NOTIFY_DELETE | (local ? NT_NOTIFY_LOCAL : 0));
       // remove it from idmap
-      if (entry->id != 0xffff) m_idmap[entry->id] = nullptr;
-    } else {
-      // add it to new entries
-      entries.insert(std::make_pair(i.getKey(), std::move(i.getValue())));
+      if (entry->id < m_idmap.size()) m_idmap[entry->id] = nullptr;
+      entry->id = 0xffff;
+      entry->value.reset();
+      continue;
     }
+
+    // add it to new entries
+    entries.insert(std::make_pair(i.getKey(), std::move(i.getValue())));
   }
   m_entries.swap(entries);
 }
@@ -708,26 +708,102 @@ void Storage::DeleteAllEntries() {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_entries.empty()) return;
 
-  DeleteAllEntriesImpl();
+  DeleteAllEntriesImpl(true);
 
   // generate message
-  if (!m_queue_outgoing) return;
-  auto queue_outgoing = m_queue_outgoing;
+  if (!m_dispatcher) return;
+  auto dispatcher = m_dispatcher;
   lock.unlock();
-  queue_outgoing(Message::ClearEntries(), nullptr, nullptr);
+  dispatcher->QueueOutgoing(Message::ClearEntries(), nullptr, nullptr);
 }
 
-std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
+inline Storage::Entry* Storage::GetOrNew(StringRef name, bool* is_new) {
+  auto& entry = m_entries[name];
+  if (!entry) {
+    if (is_new) *is_new = true;
+    m_localmap.emplace_back(new Entry(name));
+    entry = m_localmap.back().get();
+    entry->local_id = m_localmap.size() - 1;
+  } else {
+    if (is_new) *is_new = false;
+  }
+  return entry;
+}
+
+unsigned int Storage::GetEntry(StringRef name) {
+  if (name.empty()) return UINT_MAX;
+  std::unique_lock<std::mutex> lock(m_mutex);
+  return GetOrNew(name)->local_id;
+}
+
+std::vector<unsigned int> Storage::GetEntries(StringRef prefix,
+                                              unsigned int types) {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  std::vector<unsigned int> ids;
+  for (auto& i : m_entries) {
+    if (!i.getKey().startswith(prefix)) continue;
+    Entry* entry = i.getValue();
+    if (types != 0 && (!entry->value || (types & entry->value->type()) == 0))
+      continue;
+    ids.push_back(entry->local_id);
+  }
+  return ids;
+}
+
+EntryInfo Storage::GetEntryInfo(int inst, unsigned int local_id) const {
+  EntryInfo info;
+  info.entry = 0;
+  info.type = NT_UNASSIGNED;
+  info.flags = 0;
+  info.last_change = 0;
+
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return info;
+  Entry* entry = m_localmap[local_id].get();
+  if (!entry->value) return info;
+
+  info.entry = Handle(inst, local_id, Handle::kEntry);
+  info.name = entry->name;
+  info.type = entry->value->type();
+  info.flags = entry->flags;
+  info.last_change = entry->value->last_change();
+  return info;
+}
+
+std::string Storage::GetEntryName(unsigned int local_id) const {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return std::string{};
+  return m_localmap[local_id]->name;
+}
+
+NT_Type Storage::GetEntryType(unsigned int local_id) const {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return NT_UNASSIGNED;
+  Entry* entry = m_localmap[local_id].get();
+  if (!entry->value) return NT_UNASSIGNED;
+  return entry->value->type();
+}
+
+unsigned long long Storage::GetEntryLastChange(unsigned int local_id) const {
+  std::unique_lock<std::mutex> lock(m_mutex);
+  if (local_id >= m_localmap.size()) return 0;
+  Entry* entry = m_localmap[local_id].get();
+  if (!entry->value) return 0;
+  return entry->value->last_change();
+}
+
+std::vector<EntryInfo> Storage::GetEntryInfo(int inst, StringRef prefix,
                                              unsigned int types) {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::vector<EntryInfo> infos;
   for (auto& i : m_entries) {
     if (!i.getKey().startswith(prefix)) continue;
-    Entry* entry = i.getValue().get();
+    Entry* entry = i.getValue();
     auto value = entry->value;
     if (!value) continue;
     if (types != 0 && (types & value->type()) == 0) continue;
     EntryInfo info;
+    info.entry = Handle(inst, entry->local_id, Handle::kEntry);
     info.name = i.getKey();
     info.type = value->type();
     info.flags = entry->flags;
@@ -735,16 +811,6 @@ std::vector<EntryInfo> Storage::GetEntryInfo(StringRef prefix,
     infos.push_back(std::move(info));
   }
   return infos;
-}
-
-void Storage::NotifyEntries(StringRef prefix,
-                            EntryListenerCallback only) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
-  for (auto& i : m_entries) {
-    if (!i.getKey().startswith(prefix)) continue;
-    m_notifier.NotifyEntry(i.getKey(), i.getValue()->value, NT_NOTIFY_IMMEDIATE,
-                           only);
-  }
 }
 
 /* Escapes and writes a string, including start and end double quotes */
@@ -791,7 +857,7 @@ bool Storage::GetPersistentEntries(
     m_persistent_dirty = false;
     entries->reserve(m_entries.size());
     for (auto& i : m_entries) {
-      Entry* entry = i.getValue().get();
+      Entry* entry = i.getValue();
       // only write persistent-flagged values
       if (!entry->IsPersistent()) continue;
       entries->emplace_back(i.getKey(), entry->value);
@@ -1242,9 +1308,7 @@ bool Storage::LoadPersistent(
     std::vector<std::shared_ptr<Message>> msgs;
     std::unique_lock<std::mutex> lock(m_mutex);
     for (auto& i : entries) {
-      auto& new_entry = m_entries[i.first];
-      if (!new_entry) new_entry.reset(new Entry(i.first));
-      Entry* entry = new_entry.get();
+      Entry* entry = GetOrNew(i.first);
       auto old_value = entry->value;
       entry->value = i.second;
       bool was_persist = entry->IsPersistent();
@@ -1259,17 +1323,21 @@ bool Storage::LoadPersistent(
 
       // notify (for local listeners)
       if (m_notifier.local_notifiers()) {
-        if (!old_value)
-          m_notifier.NotifyEntry(i.first, i.second,
+        if (!old_value) {
+          m_notifier.NotifyEntry(entry->local_id, i.first, i.second,
                                  NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
-        else if (*old_value != *i.second) {
+        } else if (*old_value != *i.second) {
           unsigned int notify_flags = NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL;
           if (!was_persist) notify_flags |= NT_NOTIFY_FLAGS;
-          m_notifier.NotifyEntry(i.first, i.second, notify_flags);
+          m_notifier.NotifyEntry(entry->local_id, i.first, i.second,
+                                 notify_flags);
+        } else if (!was_persist) {
+          m_notifier.NotifyEntry(entry->local_id, i.first, i.second,
+                                 NT_NOTIFY_FLAGS | NT_NOTIFY_LOCAL);
         }
       }
 
-      if (!m_queue_outgoing) continue;  // shortcut
+      if (!m_dispatcher) continue;  // shortcut
       ++entry->seq_num;
 
       // put on update queue
@@ -1287,10 +1355,11 @@ bool Storage::LoadPersistent(
       }
     }
 
-    if (m_queue_outgoing) {
-      auto queue_outgoing = m_queue_outgoing;
+    if (m_dispatcher) {
+      auto dispatcher = m_dispatcher;
       lock.unlock();
-      for (auto& msg : msgs) queue_outgoing(std::move(msg), nullptr, nullptr);
+      for (auto& msg : msgs)
+        dispatcher->QueueOutgoing(std::move(msg), nullptr, nullptr);
     }
   }
 
@@ -1306,23 +1375,18 @@ const char* Storage::LoadPersistent(
   return nullptr;
 }
 
-void Storage::CreateRpc(StringRef name, StringRef def, RpcCallback callback) {
-  if (name.empty() || def.empty() || !callback) return;
+void Storage::CreateRpc(unsigned int local_id, StringRef def,
+                        unsigned int rpc_uid) {
   std::unique_lock<std::mutex> lock(m_mutex);
-  if (!m_server) return;  // only server can create RPCs
+  if (local_id >= m_localmap.size()) return;
+  Entry* entry = m_localmap[local_id].get();
 
-  auto& new_entry = m_entries[name];
-  if (!new_entry) new_entry.reset(new Entry(name));
-  Entry* entry = new_entry.get();
   auto old_value = entry->value;
   auto value = Value::MakeRpc(def);
   entry->value = value;
 
-  // set up the new callback
-  entry->rpc_callback = callback;
-
-  // start the RPC server
-  m_rpc_server.Start();
+  // set up the RPC info
+  entry->rpc_uid = rpc_uid;
 
   if (old_value && *old_value == *value) return;
 
@@ -1334,78 +1398,40 @@ void Storage::CreateRpc(StringRef name, StringRef def, RpcCallback callback) {
   }
 
   // generate message
-  if (!m_queue_outgoing) return;
-  auto queue_outgoing = m_queue_outgoing;
+  if (!m_dispatcher) return;
+  auto dispatcher = m_dispatcher;
   if (!old_value || old_value->type() != value->type()) {
     ++entry->seq_num;
-    auto msg = Message::EntryAssign(name, entry->id, entry->seq_num.value(),
-                                    value, entry->flags);
+    auto msg = Message::EntryAssign(
+        entry->name, entry->id, entry->seq_num.value(), value, entry->flags);
     lock.unlock();
-    queue_outgoing(msg, nullptr, nullptr);
+    dispatcher->QueueOutgoing(msg, nullptr, nullptr);
   } else {
     ++entry->seq_num;
     auto msg = Message::EntryUpdate(entry->id, entry->seq_num.value(), value);
     lock.unlock();
-    queue_outgoing(msg, nullptr, nullptr);
+    dispatcher->QueueOutgoing(msg, nullptr, nullptr);
   }
 }
 
-void Storage::CreatePolledRpc(StringRef name, StringRef def) {
-  if (name.empty() || def.empty()) return;
+unsigned int Storage::CallRpc(unsigned int local_id, StringRef params) {
   std::unique_lock<std::mutex> lock(m_mutex);
-  if (!m_server) return;  // only server can create RPCs
+  if (local_id >= m_localmap.size()) return 0;
+  Entry* entry = m_localmap[local_id].get();
 
-  auto& new_entry = m_entries[name];
-  if (!new_entry) new_entry.reset(new Entry(name));
-  Entry* entry = new_entry.get();
-  auto old_value = entry->value;
-  auto value = Value::MakeRpc(def);
-  entry->value = value;
-
-  // a nullptr callback indicates a polled RPC
-  entry->rpc_callback = nullptr;
-
-  if (old_value && *old_value == *value) return;
-
-  // assign an id if it doesn't have one
-  if (entry->id == 0xffff) {
-    unsigned int id = m_idmap.size();
-    entry->id = id;
-    m_idmap.push_back(entry);
-  }
-
-  // generate message
-  if (!m_queue_outgoing) return;
-  auto queue_outgoing = m_queue_outgoing;
-  if (!old_value || old_value->type() != value->type()) {
-    ++entry->seq_num;
-    auto msg = Message::EntryAssign(name, entry->id, entry->seq_num.value(),
-                                    value, entry->flags);
-    lock.unlock();
-    queue_outgoing(msg, nullptr, nullptr);
-  } else {
-    ++entry->seq_num;
-    auto msg = Message::EntryUpdate(entry->id, entry->seq_num.value(), value);
-    lock.unlock();
-    queue_outgoing(msg, nullptr, nullptr);
-  }
-}
-
-unsigned int Storage::CallRpc(StringRef name, StringRef params) {
-  std::unique_lock<std::mutex> lock(m_mutex);
-  auto i = m_entries.find(name);
-  if (i == m_entries.end()) return 0;
-  auto& entry = i->getValue();
-  if (!entry->value->IsRpc()) return 0;
+  if (!entry->value || !entry->value->IsRpc()) return 0;
 
   ++entry->rpc_call_uid;
   if (entry->rpc_call_uid > 0xffff) entry->rpc_call_uid = 0;
-  unsigned int combined_uid = (entry->id << 16) | entry->rpc_call_uid;
-  auto msg = Message::ExecuteRpc(entry->id, entry->rpc_call_uid, params);
+  unsigned int call_uid = entry->rpc_call_uid;
+
+  auto msg = Message::ExecuteRpc(entry->id, call_uid, params);
+  StringRef name{entry->name};
+
   if (m_server) {
     // RPCs are unlikely to be used locally on the server, but handle it
     // gracefully anyway.
-    auto rpc_callback = entry->rpc_callback;
+    auto rpc_uid = entry->rpc_uid;
     lock.unlock();
     ConnectionInfo conn_info;
     conn_info.remote_id = "Server";
@@ -1413,79 +1439,86 @@ unsigned int Storage::CallRpc(StringRef name, StringRef params) {
     conn_info.remote_port = 0;
     conn_info.last_update = wpi::Now();
     conn_info.protocol_version = 0x0300;
-    m_rpc_server.ProcessRpc(
-        name, msg, rpc_callback, 0xffffU,
-        [this](std::shared_ptr<Message> msg) {
-          std::lock_guard<std::mutex> lock(m_mutex);
-          m_rpc_results.insert(std::make_pair(
-              std::make_pair(msg->id(), msg->seq_num_uid()), msg->str()));
-          m_rpc_results_cond.notify_all();
-        },
-        conn_info);
+    unsigned int call_uid = msg->seq_num_uid();
+    m_rpc_server.ProcessRpc(local_id, call_uid, name, msg->str(), conn_info,
+                            [=](StringRef result) {
+                              std::lock_guard<std::mutex> lock(m_mutex);
+                              m_rpc_results.insert(std::make_pair(
+                                  RpcIdPair{local_id, call_uid}, result));
+                              m_rpc_results_cond.notify_all();
+                            },
+                            rpc_uid);
   } else {
-    auto queue_outgoing = m_queue_outgoing;
+    auto dispatcher = m_dispatcher;
     lock.unlock();
-    queue_outgoing(msg, nullptr, nullptr);
+    dispatcher->QueueOutgoing(msg, nullptr, nullptr);
   }
-  return combined_uid;
+  return call_uid;
 }
 
-bool Storage::GetRpcResult(bool blocking, unsigned int call_uid,
+bool Storage::GetRpcResult(unsigned int local_id, unsigned int call_uid,
                            std::string* result) {
-  return GetRpcResult(blocking, call_uid, -1, result);
+  bool timed_out = false;
+  return GetRpcResult(local_id, call_uid, result, -1, &timed_out);
 }
 
-bool Storage::GetRpcResult(bool blocking, unsigned int call_uid,
-                           double time_out, std::string* result) {
+bool Storage::GetRpcResult(unsigned int local_id, unsigned int call_uid,
+                           std::string* result, double timeout,
+                           bool* timed_out) {
   std::unique_lock<std::mutex> lock(m_mutex);
+
+  RpcIdPair call_pair{local_id, call_uid};
+
   // only allow one blocking call per rpc call uid
-  if (!m_rpc_blocking_calls.insert(call_uid).second) return false;
+  if (!m_rpc_blocking_calls.insert(call_pair).second) return false;
+
 #if defined(_MSC_VER) && _MSC_VER < 1900
   auto timeout_time = std::chrono::steady_clock::now() +
                       std::chrono::duration<int64_t, std::nano>(
-                          static_cast<int64_t>(time_out * 1e9));
+                          static_cast<int64_t>(timeout * 1e9));
 #else
-  auto timeout_time = std::chrono::steady_clock::now() +
-                      std::chrono::duration<double>(time_out);
+  auto timeout_time =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 #endif
+  *timed_out = false;
   for (;;) {
-    auto i =
-        m_rpc_results.find(std::make_pair(call_uid >> 16, call_uid & 0xffff));
+    auto i = m_rpc_results.find(call_pair);
     if (i == m_rpc_results.end()) {
-      if (!blocking || m_terminating) {
-        m_rpc_blocking_calls.erase(call_uid);
+      if (timeout == 0 || m_terminating) {
+        m_rpc_blocking_calls.erase(call_pair);
         return false;
       }
-      if (time_out < 0) {
+      if (timeout < 0) {
         m_rpc_results_cond.wait(lock);
       } else {
-        auto timed_out = m_rpc_results_cond.wait_until(lock, timeout_time);
-        if (timed_out == std::cv_status::timeout) {
-          m_rpc_blocking_calls.erase(call_uid);
+        auto cond_timed_out = m_rpc_results_cond.wait_until(lock, timeout_time);
+        if (cond_timed_out == std::cv_status::timeout) {
+          m_rpc_blocking_calls.erase(call_pair);
+          *timed_out = true;
           return false;
         }
       }
       // if element does not exist, we have been canceled
-      if (m_rpc_blocking_calls.count(call_uid) == 0) {
+      if (m_rpc_blocking_calls.count(call_pair) == 0) {
         return false;
       }
       if (m_terminating) {
-        m_rpc_blocking_calls.erase(call_uid);
+        m_rpc_blocking_calls.erase(call_pair);
         return false;
       }
       continue;
     }
     result->swap(i->getSecond());
     // safe to erase even if id does not exist
-    m_rpc_blocking_calls.erase(call_uid);
+    m_rpc_blocking_calls.erase(call_pair);
     m_rpc_results.erase(i);
     return true;
   }
 }
 
-void Storage::CancelBlockingRpcResult(unsigned int call_uid) {
+void Storage::CancelRpcResult(unsigned int local_id, unsigned int call_uid) {
   std::unique_lock<std::mutex> lock(m_mutex);
   // safe to erase even if id does not exist
-  m_rpc_blocking_calls.erase(call_uid);
+  m_rpc_blocking_calls.erase(RpcIdPair{local_id, call_uid});
   m_rpc_results_cond.notify_all();
 }

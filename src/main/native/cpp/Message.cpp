@@ -77,7 +77,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       } else {
         type = get_entry_type(msg->m_id);
       }
-      DEBUG4("update message data type: " << type);
+      WPI_DEBUG4(decoder.logger(), "update message data type: " << type);
       msg->m_value = decoder.ReadValue(type);
       if (!msg->m_value) return nullptr;
       break;
@@ -143,7 +143,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
     }
     default:
       decoder.set_error("unrecognized message type");
-      INFO("unrecognized message type: " << msg_type);
+      WPI_INFO(decoder.logger(), "unrecognized message type: " << msg_type);
       return nullptr;
   }
   return msg;
@@ -211,9 +211,9 @@ std::shared_ptr<Message> Message::ExecuteRpc(unsigned int id, unsigned int uid,
 }
 
 std::shared_ptr<Message> Message::RpcResponse(unsigned int id, unsigned int uid,
-                                              llvm::StringRef results) {
+                                              llvm::StringRef result) {
   auto msg = std::make_shared<Message>(kRpcResponse, private_init());
-  msg->m_str = results;
+  msg->m_str = result;
   msg->m_id = id;
   msg->m_seq_num_uid = uid;
   return msg;

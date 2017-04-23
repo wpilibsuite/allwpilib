@@ -45,8 +45,9 @@ static double ReadDouble(const char*& buf) {
   return llvm::BitsToDouble(val);
 }
 
-WireDecoder::WireDecoder(wpi::raw_istream& is, unsigned int proto_rev)
-    : m_is(is) {
+WireDecoder::WireDecoder(wpi::raw_istream& is, unsigned int proto_rev,
+                         wpi::Logger& logger)
+    : m_is(is), m_logger(logger) {
   // Start with a 1K temporary buffer.  Use malloc instead of new so we can
   // realloc.
   m_allocated = 1024;

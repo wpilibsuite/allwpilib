@@ -12,20 +12,35 @@
 #include <mutex>
 #include <vector>
 
+#include "llvm/StringMap.h"
+#include "networktables/NetworkTableEntry.h"
+#include "networktables/TableEntryListener.h"
+#include "networktables/TableListener.h"
+#include "ntcore_c.h"
 #include "tables/ITable.h"
 
 namespace nt {
 
+using llvm::ArrayRef;
+using llvm::StringRef;
+
+class NetworkTableInstance;
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 /**
  * A network table that knows its subtable path.
  */
-class NetworkTable : public ITable {
+class NetworkTable final : public ITable {
  private:
-  struct private_init {};
-
+  NT_Inst m_inst;
   std::string m_path;
-  std::mutex m_mutex;
-  typedef std::pair<ITableListener*, unsigned int> Listener;
+  mutable std::mutex m_mutex;
+  mutable llvm::StringMap<NT_Entry> m_entries;
+  typedef std::pair<ITableListener*, NT_EntryListener> Listener;
   std::vector<Listener> m_listeners;
 
   static std::vector<std::string> s_ip_addresses;
@@ -36,31 +51,48 @@ class NetworkTable : public ITable {
   static unsigned int s_port;
 
  public:
-  NetworkTable(llvm::StringRef path, const private_init&);
+  NetworkTable(NT_Inst inst, StringRef path);
   virtual ~NetworkTable();
 
   /**
+   * Gets the instance for the table.
+   * @return Instance
+   */
+  NetworkTableInstance GetInstance() const;
+
+  /**
    * The path separator for sub-tables and keys
-   *
    */
   static const char PATH_SEPARATOR_CHAR;
 
   /**
-   * @throws IOException
+   * Initializes network tables
    */
+  WPI_DEPRECATED(
+      "use NetworkTableInstance::StartServer() or "
+      "NetworkTableInstance::StartClient() instead")
   static void Initialize();
+
+  /**
+   * Shuts down network tables
+   */
+  WPI_DEPRECATED(
+      "use NetworkTableInstance::StopServer() or "
+      "NetworkTableInstance::StopClient() instead")
   static void Shutdown();
 
   /**
    * set that network tables should be a client
    * This must be called before initialize or GetTable
    */
+  WPI_DEPRECATED("use NetworkTableInstance::StartClient() instead")
   static void SetClientMode();
 
   /**
    * set that network tables should be a server
    * This must be called before initialize or GetTable
    */
+  WPI_DEPRECATED("use NetworkTableInstance::StartServer() instead")
   static void SetServerMode();
 
   /**
@@ -69,30 +101,48 @@ class NetworkTable : public ITable {
    * This must be called before initialize or GetTable
    * @param team the team number
    */
+  WPI_DEPRECATED(
+      "use NetworkTableInstance::SetServerTeam() or "
+      "NetworkTableInstance::StartClientTeam() instead")
   static void SetTeam(int team);
 
   /**
    * @param address the adress that network tables will connect to in client
    * mode
    */
-  static void SetIPAddress(llvm::StringRef address);
+  WPI_DEPRECATED(
+      "use NetworkTableInstance::SetServer() or "
+      "NetworkTableInstance::StartClient() instead")
+  static void SetIPAddress(StringRef address);
 
   /**
    * @param addresses the addresses that network tables will connect to in
    * client mode (in round robin order)
    */
-  static void SetIPAddress(llvm::ArrayRef<std::string> addresses);
+  WPI_DEPRECATED(
+      "use NetworkTableInstance::SetServer() or "
+      "NetworkTableInstance::StartClient() instead")
+  static void SetIPAddress(ArrayRef<std::string> addresses);
 
   /**
-   * @param port the port number that network tables will connect to in client
-   * mode or listen to in server mode
+   * Set the port number that network tables will connect to in client
+   * mode or listen to in server mode.
+   * @param port the port number
    */
+  WPI_DEPRECATED(
+      "use the appropriate parameters to NetworkTableInstance::SetServer(), "
+      "NetworkTableInstance::StartClient(), "
+      "NetworkTableInstance::StartServer(), and "
+      "NetworkTableInstance::StartDSClient() instead")
   static void SetPort(unsigned int port);
 
   /**
-   * @param enabled whether to enable the connection to the local DS to get
-   * the robot IP address (defaults to enabled)
+   * Enable requesting the server address from the Driver Station.
+   * @param enabled whether to enable the connection to the local DS
    */
+  WPI_DEPRECATED(
+      "use NetworkTableInstance::StartDSClient() and "
+      "NetworkTableInstance::StopDSClient() instead")
   static void SetDSClientEnabled(bool enabled);
 
   /**
@@ -100,18 +150,23 @@ class NetworkTable : public ITable {
    * @param filename the filename that the network tables server uses for
    * automatic loading and saving of persistent values
    */
-  static void SetPersistentFilename(llvm::StringRef filename);
+  WPI_DEPRECATED(
+      "use the appropriate parameter to NetworkTableInstance::StartServer() "
+      "instead")
+  static void SetPersistentFilename(StringRef filename);
 
   /**
    * Sets the network identity.
    * This is provided in the connection info on the remote end.
    * @param name identity
    */
-  static void SetNetworkIdentity(llvm::StringRef name);
+  WPI_DEPRECATED("use NetworkTableInstance::SetNetworkIdentity() instead")
+  static void SetNetworkIdentity(StringRef name);
 
   /**
    * Deletes ALL keys in ALL subtables.  Use with caution!
    */
+  WPI_DEPRECATED("use NetworkTableInstance::DeleteAllEntries() instead")
   static void GlobalDeleteAll();
 
   /**
@@ -120,13 +175,16 @@ class NetworkTable : public ITable {
    * This is primarily useful for synchronizing network updates with
    * user code.
    */
+  WPI_DEPRECATED("use NetworkTableInstance::Flush() instead")
   static void Flush();
 
   /**
    * Set the periodic update rate.
+   * Sets how frequently updates are sent to other nodes over the network.
    *
    * @param interval update interval in seconds (range 0.01 to 1.0)
    */
+  WPI_DEPRECATED("use NetworkTableInstance::SetUpdateRate() instead")
   static void SetUpdateRate(double interval);
 
   /**
@@ -135,7 +193,8 @@ class NetworkTable : public ITable {
    * @param filename file name
    * @return Error (or nullptr).
    */
-  static const char* SavePersistent(llvm::StringRef filename);
+  WPI_DEPRECATED("use NetworkTableInstance::SavePersistent() instead")
+  static const char* SavePersistent(StringRef filename);
 
   /**
    * Loads persistent keys from a file.  The server does this automatically.
@@ -144,8 +203,9 @@ class NetworkTable : public ITable {
    * @param warn callback function called for warnings
    * @return Error (or nullptr).
    */
+  WPI_DEPRECATED("use NetworkTableInstance::LoadPersistent() instead")
   static const char* LoadPersistent(
-      llvm::StringRef filename,
+      StringRef filename,
       std::function<void(size_t line, const char* msg)> warn);
 
   /**
@@ -154,34 +214,103 @@ class NetworkTable : public ITable {
    * This will automatically initialize network tables if it has not been
    * already.
    *
-   * @param key
-   *            the key name
+   * @param key  the key name
    * @return the network table requested
    */
-  static std::shared_ptr<NetworkTable> GetTable(llvm::StringRef key);
+  WPI_DEPRECATED(
+      "use NetworkTableInstance::GetTable() or "
+      "NetworkTableInstance::GetEntry() instead")
+  static std::shared_ptr<NetworkTable> GetTable(StringRef key);
 
+  /**
+   * Gets the entry for a subkey.
+   * @param key the key name
+   * @return Network table entry.
+   */
+  NetworkTableEntry GetEntry(StringRef key) const;
+
+  /**
+   * Listen to keys only within this table.
+   * @param listener    listener to add
+   * @param flags       EntryListenerFlags bitmask
+   * @return Listener handle
+   */
+  NT_EntryListener AddEntryListener(TableEntryListener listener,
+                                    unsigned int flags) const;
+
+  /**
+   * Listen to a single key.
+   * @param key         the key name
+   * @param listener    listener to add
+   * @param flags       EntryListenerFlags bitmask
+   * @return Listener handle
+   */
+  NT_EntryListener AddEntryListener(StringRef key, TableEntryListener listener,
+                                    unsigned int flags) const;
+
+  /**
+   * Remove an entry listener.
+   * @param listener    listener handle
+   */
+  void RemoveEntryListener(NT_EntryListener listener) const;
+
+  /**
+   * Listen for sub-table creation.
+   * This calls the listener once for each newly created sub-table.
+   * It immediately calls the listener for any existing sub-tables.
+   * @param listener        listener to add
+   * @param localNotify     notify local changes as well as remote
+   * @return Listener handle
+   */
+  NT_EntryListener AddSubTableListener(TableListener listener,
+                                       bool localNotify = false) const;
+
+  /**
+   * Remove a sub-table listener.
+   * @param listener    listener handle
+   */
+  void RemoveTableListener(NT_EntryListener listener) const;
+
+  WPI_DEPRECATED(
+      "use AddEntryListener() instead with flags value of NT_NOTIFY_NEW | "
+      "NT_NOTIFY_UPDATE")
   void AddTableListener(ITableListener* listener) override;
+
+  WPI_DEPRECATED(
+      "use AddEntryListener() instead with flags value of NT_NOTIFY_NEW | "
+      "NT_NOTIFY_UPDATE | NT_NOTIFY_IMMEDIATE")
   void AddTableListener(ITableListener* listener,
                         bool immediateNotify) override;
+
+  WPI_DEPRECATED("use AddEntryListener() instead")
   void AddTableListenerEx(ITableListener* listener,
                           unsigned int flags) override;
-  void AddTableListener(llvm::StringRef key, ITableListener* listener,
+
+  WPI_DEPRECATED("use AddEntryListener() instead")
+  void AddTableListener(StringRef key, ITableListener* listener,
                         bool immediateNotify) override;
-  void AddTableListenerEx(llvm::StringRef key, ITableListener* listener,
+
+  WPI_DEPRECATED("use AddEntryListener() instead")
+  void AddTableListenerEx(StringRef key, ITableListener* listener,
                           unsigned int flags) override;
+
+  WPI_DEPRECATED("use AddSubTableListener(TableListener, bool) instead")
   void AddSubTableListener(ITableListener* listener) override;
+
+  WPI_DEPRECATED("use AddSubTableListener(TableListener, bool) instead")
   void AddSubTableListener(ITableListener* listener, bool localNotify) override;
+
+  WPI_DEPRECATED("use RemoveTableListener(NT_EntryListener) instead")
   void RemoveTableListener(ITableListener* listener) override;
 
   /**
    * Returns the table at the specified key. If there is no table at the
    * specified key, it will create a new table
    *
-   * @param key
-   *            the key name
+   * @param key the key name
    * @return the networktable to be returned
    */
-  std::shared_ptr<ITable> GetSubTable(llvm::StringRef key) const override;
+  std::shared_ptr<NetworkTable> GetSubTable(StringRef key) const override;
 
   /**
    * Determines whether the given key is in this table.
@@ -189,7 +318,7 @@ class NetworkTable : public ITable {
    * @param key the key to search for
    * @return true if the table as a value assigned to the given key
    */
-  bool ContainsKey(llvm::StringRef key) const override;
+  bool ContainsKey(StringRef key) const override;
 
   /**
    * Determines whether there exists a non-empty subtable for this key
@@ -199,15 +328,17 @@ class NetworkTable : public ITable {
    * @return true if there is a subtable with the key which contains at least
    * one key/subtable of its own
    */
-  bool ContainsSubTable(llvm::StringRef key) const override;
+  bool ContainsSubTable(StringRef key) const override;
 
   /**
+   * Gets all keys in the table (not including sub-tables).
    * @param types bitmask of types; 0 is treated as a "don't care".
    * @return keys currently in the table
    */
   std::vector<std::string> GetKeys(int types = 0) const override;
 
   /**
+   * Gets the names of all subtables in the table.
    * @return subtables currently in the table
    */
   std::vector<std::string> GetSubTables() const override;
@@ -217,7 +348,7 @@ class NetworkTable : public ITable {
    *
    * @param key the key to make persistent
    */
-  void SetPersistent(llvm::StringRef key) override;
+  void SetPersistent(StringRef key) override;
 
   /**
    * Stop making a key's value persistent through program restarts.
@@ -225,7 +356,7 @@ class NetworkTable : public ITable {
    *
    * @param key the key name
    */
-  void ClearPersistent(llvm::StringRef key) override;
+  void ClearPersistent(StringRef key) override;
 
   /**
    * Returns whether the value is persistent through program restarts.
@@ -233,7 +364,7 @@ class NetworkTable : public ITable {
    *
    * @param key the key name
    */
-  bool IsPersistent(llvm::StringRef key) const override;
+  bool IsPersistent(StringRef key) const override;
 
   /**
    * Sets flags on the specified key in this table. The key can
@@ -242,7 +373,7 @@ class NetworkTable : public ITable {
    * @param key the key name
    * @param flags the flags to set (bitmask)
    */
-  void SetFlags(llvm::StringRef key, unsigned int flags) override;
+  void SetFlags(StringRef key, unsigned int flags) override;
 
   /**
    * Clears flags on the specified key in this table. The key can
@@ -251,7 +382,7 @@ class NetworkTable : public ITable {
    * @param key the key name
    * @param flags the flags to clear (bitmask)
    */
-  void ClearFlags(llvm::StringRef key, unsigned int flags) override;
+  void ClearFlags(StringRef key, unsigned int flags) override;
 
   /**
    * Returns the flags for the specified key.
@@ -259,14 +390,14 @@ class NetworkTable : public ITable {
    * @param key the key name
    * @return the flags, or 0 if the key is not defined
    */
-  unsigned int GetFlags(llvm::StringRef key) const override;
+  unsigned int GetFlags(StringRef key) const override;
 
   /**
    * Deletes the specified key in this table.
    *
    * @param key the key name
    */
-  void Delete(llvm::StringRef key) override;
+  void Delete(StringRef key) override;
 
   /**
    * Put a number in the table
@@ -275,7 +406,7 @@ class NetworkTable : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutNumber(llvm::StringRef key, double value) override;
+  bool PutNumber(StringRef key, double value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -283,8 +414,7 @@ class NetworkTable : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultNumber(llvm::StringRef key,
-                                double defaultValue) override;
+  bool SetDefaultNumber(StringRef key, double defaultValue) override;
 
   /**
    * Gets the number associated with the given name.
@@ -294,8 +424,7 @@ class NetworkTable : public ITable {
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
    */
-  virtual double GetNumber(llvm::StringRef key,
-                           double defaultValue) const override;
+  double GetNumber(StringRef key, double defaultValue) const override;
 
   /**
    * Put a string in the table
@@ -304,7 +433,7 @@ class NetworkTable : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  virtual bool PutString(llvm::StringRef key, llvm::StringRef value) override;
+  bool PutString(StringRef key, StringRef value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -312,8 +441,7 @@ class NetworkTable : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultString(llvm::StringRef key,
-                                llvm::StringRef defaultValue) override;
+  bool SetDefaultString(StringRef key, StringRef defaultValue) override;
 
   /**
    * Gets the string associated with the given name. If the key does not
@@ -324,8 +452,7 @@ class NetworkTable : public ITable {
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
    */
-  virtual std::string GetString(llvm::StringRef key,
-                                llvm::StringRef defaultValue) const override;
+  std::string GetString(StringRef key, StringRef defaultValue) const override;
 
   /**
    * Put a boolean in the table
@@ -334,7 +461,7 @@ class NetworkTable : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  virtual bool PutBoolean(llvm::StringRef key, bool value) override;
+  bool PutBoolean(StringRef key, bool value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -342,8 +469,7 @@ class NetworkTable : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultBoolean(llvm::StringRef key,
-                                 bool defaultValue) override;
+  bool SetDefaultBoolean(StringRef key, bool defaultValue) override;
 
   /**
    * Gets the boolean associated with the given name. If the key does not
@@ -354,8 +480,7 @@ class NetworkTable : public ITable {
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
    */
-  virtual bool GetBoolean(llvm::StringRef key,
-                          bool defaultValue) const override;
+  bool GetBoolean(StringRef key, bool defaultValue) const override;
 
   /**
    * Put a boolean array in the table
@@ -367,8 +492,7 @@ class NetworkTable : public ITable {
    *       std::vector<bool> is special-cased in C++.  0 is false, any
    *       non-zero value is true.
    */
-  virtual bool PutBooleanArray(llvm::StringRef key,
-                               llvm::ArrayRef<int> value) override;
+  bool PutBooleanArray(StringRef key, ArrayRef<int> value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -376,8 +500,8 @@ class NetworkTable : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultBooleanArray(
-      llvm::StringRef key, llvm::ArrayRef<int> defaultValue) override;
+  bool SetDefaultBooleanArray(StringRef key,
+                              ArrayRef<int> defaultValue) override;
 
   /**
    * Returns the boolean array the key maps to. If the key does not exist or is
@@ -394,8 +518,8 @@ class NetworkTable : public ITable {
    *       because std::vector<bool> is special-cased in C++.  0 is false, any
    *       non-zero value is true.
    */
-  virtual std::vector<int> GetBooleanArray(
-      llvm::StringRef key, llvm::ArrayRef<int> defaultValue) const override;
+  std::vector<int> GetBooleanArray(StringRef key,
+                                   ArrayRef<int> defaultValue) const override;
 
   /**
    * Put a number array in the table
@@ -403,8 +527,7 @@ class NetworkTable : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  virtual bool PutNumberArray(llvm::StringRef key,
-                              llvm::ArrayRef<double> value) override;
+  bool PutNumberArray(StringRef key, ArrayRef<double> value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -412,8 +535,8 @@ class NetworkTable : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultNumberArray(
-      llvm::StringRef key, llvm::ArrayRef<double> defaultValue) override;
+  bool SetDefaultNumberArray(StringRef key,
+                             ArrayRef<double> defaultValue) override;
 
   /**
    * Returns the number array the key maps to. If the key does not exist or is
@@ -426,8 +549,8 @@ class NetworkTable : public ITable {
    * @note This makes a copy of the array.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  virtual std::vector<double> GetNumberArray(
-      llvm::StringRef key, llvm::ArrayRef<double> defaultValue) const override;
+  std::vector<double> GetNumberArray(
+      StringRef key, ArrayRef<double> defaultValue) const override;
 
   /**
    * Put a string array in the table
@@ -435,8 +558,7 @@ class NetworkTable : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  virtual bool PutStringArray(llvm::StringRef key,
-                              llvm::ArrayRef<std::string> value) override;
+  bool PutStringArray(StringRef key, ArrayRef<std::string> value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -444,8 +566,8 @@ class NetworkTable : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultStringArray(
-      llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) override;
+  bool SetDefaultStringArray(StringRef key,
+                             ArrayRef<std::string> defaultValue) override;
 
   /**
    * Returns the string array the key maps to. If the key does not exist or is
@@ -458,9 +580,8 @@ class NetworkTable : public ITable {
    * @note This makes a copy of the array.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  virtual std::vector<std::string> GetStringArray(
-      llvm::StringRef key,
-      llvm::ArrayRef<std::string> defaultValue) const override;
+  std::vector<std::string> GetStringArray(
+      StringRef key, ArrayRef<std::string> defaultValue) const override;
 
   /**
    * Put a raw value (byte array) in the table
@@ -468,7 +589,7 @@ class NetworkTable : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  virtual bool PutRaw(llvm::StringRef key, llvm::StringRef value) override;
+  bool PutRaw(StringRef key, StringRef value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -476,8 +597,7 @@ class NetworkTable : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultRaw(llvm::StringRef key,
-                             llvm::StringRef defaultValue) override;
+  bool SetDefaultRaw(StringRef key, StringRef defaultValue) override;
 
   /**
    * Returns the raw value (byte array) the key maps to. If the key does not
@@ -490,8 +610,7 @@ class NetworkTable : public ITable {
    * @note This makes a copy of the raw contents.  If the overhead of this is a
    *       concern, use GetValue() instead.
    */
-  virtual std::string GetRaw(llvm::StringRef key,
-                             llvm::StringRef defaultValue) const override;
+  std::string GetRaw(StringRef key, StringRef defaultValue) const override;
 
   /**
    * Put a value in the table
@@ -500,7 +619,7 @@ class NetworkTable : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutValue(llvm::StringRef key, std::shared_ptr<Value> value) override;
+  bool PutValue(StringRef key, std::shared_ptr<Value> value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -508,8 +627,8 @@ class NetworkTable : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultValue(
-      llvm::StringRef key, std::shared_ptr<Value> defaultValue) override;
+  bool SetDefaultValue(StringRef key,
+                       std::shared_ptr<Value> defaultValue) override;
 
   /**
    * Gets the value associated with a key as an object
@@ -518,13 +637,18 @@ class NetworkTable : public ITable {
    * @return the value associated with the given key, or nullptr if the key
    * does not exist
    */
-  std::shared_ptr<Value> GetValue(llvm::StringRef key) const override;
+  std::shared_ptr<Value> GetValue(StringRef key) const override;
 
   /**
-   * Gets the full path of this table.
+   * Gets the full path of this table.  Does not include the trailing "/".
+   * @return The path (e.g "", "/foo").
    */
-  llvm::StringRef GetPath() const override;
+  StringRef GetPath() const override;
 };
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 }  // namespace nt
 

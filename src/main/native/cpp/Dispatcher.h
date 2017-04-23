@@ -19,24 +19,28 @@
 
 #include "llvm/StringRef.h"
 
-#include "support/atomic_static.h"
+#include "IDispatcher.h"
 #include "NetworkConnection.h"
-#include "Notifier.h"
-#include "Storage.h"
 
 namespace wpi {
+class Logger;
 class NetworkAcceptor;
 class NetworkStream;
 }
 
 namespace nt {
 
-class DispatcherBase {
+class IConnectionNotifier;
+class IStorage;
+
+class DispatcherBase : public IDispatcher {
   friend class DispatcherTest;
 
  public:
   typedef std::function<std::unique_ptr<wpi::NetworkStream>()> Connector;
 
+  DispatcherBase(IStorage& storage, IConnectionNotifier& notifier,
+                 wpi::Logger& logger);
   virtual ~DispatcherBase();
 
   unsigned int GetNetworkMode() const;
@@ -48,7 +52,7 @@ class DispatcherBase {
   void SetIdentity(llvm::StringRef name);
   void Flush();
   std::vector<ConnectionInfo> GetConnections() const;
-  void NotifyConnections(ConnectionListenerCallback callback) const;
+  bool IsConnected() const;
 
   void SetConnector(Connector connector);
   void SetConnectorOverride(Connector connector);
@@ -58,9 +62,6 @@ class DispatcherBase {
 
   DispatcherBase(const DispatcherBase&) = delete;
   DispatcherBase& operator=(const DispatcherBase&) = delete;
-
- protected:
-  DispatcherBase(Storage& storage, Notifier& notifier);
 
  private:
   void DispatchThreadMain();
@@ -79,10 +80,10 @@ class DispatcherBase {
   void ClientReconnect(unsigned int proto_rev = 0x0300);
 
   void QueueOutgoing(std::shared_ptr<Message> msg, NetworkConnection* only,
-                     NetworkConnection* except);
+                     NetworkConnection* except) override;
 
-  Storage& m_storage;
-  Notifier& m_notifier;
+  IStorage& m_storage;
+  IConnectionNotifier& m_notifier;
   unsigned int m_networkMode = NT_NET_MODE_NONE;
   std::string m_persist_filename;
   std::thread m_dispatch_thread;
@@ -91,6 +92,7 @@ class DispatcherBase {
   std::unique_ptr<wpi::NetworkAcceptor> m_server_acceptor;
   Connector m_client_connector_override;
   Connector m_client_connector;
+  uint8_t m_connections_uid = 0;
 
   // Mutex for user-accessible items
   mutable std::mutex m_user_mutex;
@@ -110,32 +112,28 @@ class DispatcherBase {
   std::condition_variable m_reconnect_cv;
   unsigned int m_reconnect_proto_rev = 0x0300;
   bool m_do_reconnect = true;
+
+ protected:
+  wpi::Logger& m_logger;
 };
 
 class Dispatcher : public DispatcherBase {
   friend class DispatcherTest;
 
  public:
-  static Dispatcher& GetInstance() {
-    ATOMIC_STATIC(Dispatcher, instance);
-    return instance;
-  }
+  Dispatcher(IStorage& storage, IConnectionNotifier& notifier,
+             wpi::Logger& logger)
+      : DispatcherBase(storage, notifier, logger) {}
 
   void StartServer(StringRef persist_filename, const char* listen_address,
                    unsigned int port);
 
   void SetServer(const char* server_name, unsigned int port);
   void SetServer(ArrayRef<std::pair<StringRef, unsigned int>> servers);
+  void SetServerTeam(unsigned int team, unsigned int port);
 
   void SetServerOverride(const char* server_name, unsigned int port);
   void ClearServerOverride();
-
- private:
-  Dispatcher();
-  Dispatcher(Storage& storage, Notifier& notifier)
-      : DispatcherBase(storage, notifier) {}
-
-  ATOMIC_STATIC_DECL(Dispatcher)
 };
 
 }  // namespace nt

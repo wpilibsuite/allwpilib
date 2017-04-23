@@ -1,9 +1,10 @@
 #include "ntcore.h"
-#include "nt_Value.h"
 #include <iostream>
 
 int main() {
-    nt::SetEntryValue("MyValue", nt::Value::MakeString("Hello World"));
+    auto myValue = nt::GetEntry(nt::GetDefaultInstance(), "MyValue");
 
-    std::cout << nt::GetEntryValue("MyValue")->GetString() << std::endl;
+    nt::SetEntryValue(myValue, nt::Value::MakeString("Hello World"));
+
+    std::cout << nt::GetEntryValue(myValue)->GetString() << std::endl;
 }

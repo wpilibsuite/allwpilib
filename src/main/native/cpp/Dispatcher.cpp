@@ -10,28 +10,28 @@
 #include <algorithm>
 #include <iterator>
 
-#include "Log.h"
 #include "tcpsockets/TCPAcceptor.h"
 #include "tcpsockets/TCPConnector.h"
 
-using namespace nt;
+#include "IConnectionNotifier.h"
+#include "Log.h"
+#include "IStorage.h"
 
-ATOMIC_STATIC_INIT(Dispatcher)
+using namespace nt;
 
 void Dispatcher::StartServer(llvm::StringRef persist_filename,
                              const char* listen_address, unsigned int port) {
   DispatcherBase::StartServer(
       persist_filename,
       std::unique_ptr<wpi::NetworkAcceptor>(new wpi::TCPAcceptor(
-          static_cast<int>(port), listen_address, Logger::GetInstance())));
+          static_cast<int>(port), listen_address, m_logger)));
 }
 
 void Dispatcher::SetServer(const char* server_name, unsigned int port) {
   std::string server_name_copy(server_name);
   SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
     return wpi::TCPConnector::connect(server_name_copy.c_str(),
-                                      static_cast<int>(port),
-                                      Logger::GetInstance(), 1);
+                                      static_cast<int>(port), m_logger, 1);
   });
 }
 
@@ -46,39 +46,72 @@ void Dispatcher::SetServer(
     llvm::SmallVector<std::pair<const char*, int>, 16> servers_copy2;
     for (const auto& server : servers_copy)
       servers_copy2.emplace_back(server.first.c_str(), server.second);
-    return wpi::TCPConnector::connect_parallel(servers_copy2,
-                                               Logger::GetInstance(), 1);
+    return wpi::TCPConnector::connect_parallel(servers_copy2, m_logger, 1);
   });
+}
+
+void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
+  std::pair<StringRef, unsigned int> servers[5];
+
+  // 10.te.am.2
+  llvm::SmallString<32> fixed;
+  {
+    llvm::raw_svector_ostream oss{fixed};
+    oss << "10." << static_cast<int>(team / 100) << '.'
+        << static_cast<int>(team % 100) << ".2";
+    servers[0] = std::make_pair(oss.str(), port);
+  }
+
+  // 172.22.11.2
+  servers[1] = std::make_pair("172.22.11.2", port);
+
+  // roboRIO-<team>-FRC.local
+  llvm::SmallString<32> mdns;
+  {
+    llvm::raw_svector_ostream oss{mdns};
+    oss << "roboRIO-" << team << "-FRC.local";
+    servers[2] = std::make_pair(oss.str(), port);
+  }
+
+  // roboRIO-<team>-FRC.lan
+  llvm::SmallString<32> mdns_lan;
+  {
+    llvm::raw_svector_ostream oss{mdns_lan};
+    oss << "roboRIO-" << team << "-FRC.lan";
+    servers[3] = std::make_pair(oss.str(), port);
+  }
+
+  // roboRIO-<team>-FRC.frc-field.local
+  llvm::SmallString<64> field_local;
+  {
+    llvm::raw_svector_ostream oss{field_local};
+    oss << "roboRIO-" << team << "-FRC.frc-field.local";
+    servers[4] = std::make_pair(oss.str(), port);
+  }
+
+  SetServer(servers);
 }
 
 void Dispatcher::SetServerOverride(const char* server_name, unsigned int port) {
   std::string server_name_copy(server_name);
   SetConnectorOverride([=]() -> std::unique_ptr<wpi::NetworkStream> {
     return wpi::TCPConnector::connect(server_name_copy.c_str(),
-                                      static_cast<int>(port),
-                                      Logger::GetInstance(), 1);
+                                      static_cast<int>(port), m_logger, 1);
   });
 }
 
 void Dispatcher::ClearServerOverride() { ClearConnectorOverride(); }
 
-Dispatcher::Dispatcher()
-    : Dispatcher(Storage::GetInstance(), Notifier::GetInstance()) {}
-
-DispatcherBase::DispatcherBase(Storage& storage, Notifier& notifier)
-    : m_storage(storage), m_notifier(notifier) {
+DispatcherBase::DispatcherBase(IStorage& storage, IConnectionNotifier& notifier,
+                               wpi::Logger& logger)
+    : m_storage(storage), m_notifier(notifier), m_logger(logger) {
   m_active = false;
   m_update_rate = 100;
 }
 
-DispatcherBase::~DispatcherBase() {
-  Logger::GetInstance().SetLogger(nullptr);
-  Stop();
-}
+DispatcherBase::~DispatcherBase() { Stop(); }
 
-unsigned int DispatcherBase::GetNetworkMode() const {
-  return m_networkMode;
-}
+unsigned int DispatcherBase::GetNetworkMode() const { return m_networkMode; }
 
 void DispatcherBase::StartServer(
     StringRef persist_filename,
@@ -106,9 +139,7 @@ void DispatcherBase::StartServer(
         });
   }
 
-  using namespace std::placeholders;
-  m_storage.SetOutgoing(std::bind(&Dispatcher::QueueOutgoing, this, _1, _2, _3),
-                        (m_networkMode & NT_NET_MODE_SERVER) != 0);
+  m_storage.SetDispatcher(this, true);
 
   m_dispatch_thread = std::thread(&Dispatcher::DispatchThreadMain, this);
   m_clientserver_thread = std::thread(&Dispatcher::ServerThreadMain, this);
@@ -121,9 +152,7 @@ void DispatcherBase::StartClient() {
     m_active = true;
   }
   m_networkMode = NT_NET_MODE_CLIENT | NT_NET_MODE_STARTING;
-  using namespace std::placeholders;
-  m_storage.SetOutgoing(std::bind(&Dispatcher::QueueOutgoing, this, _1, _2, _3),
-                        (m_networkMode & NT_NET_MODE_SERVER) != 0);
+  m_storage.SetDispatcher(this, false);
 
   m_dispatch_thread = std::thread(&Dispatcher::DispatchThreadMain, this);
   m_clientserver_thread = std::thread(&Dispatcher::ClientThreadMain, this);
@@ -198,10 +227,15 @@ std::vector<ConnectionInfo> DispatcherBase::GetConnections() const {
   return conns;
 }
 
-void DispatcherBase::NotifyConnections(
-    ConnectionListenerCallback callback) const {
+bool DispatcherBase::IsConnected() const {
+  if (!m_active) return false;
+
   std::lock_guard<std::mutex> lock(m_user_mutex);
-  for (const auto& conn : m_connections) conn->NotifyIfActive(callback);
+  for (auto& conn : m_connections) {
+    if (conn->state() == NetworkConnection::kActive) return true;
+  }
+
+  return false;
 }
 
 void DispatcherBase::SetConnector(Connector connector) {
@@ -242,7 +276,8 @@ void DispatcherBase::DispatchThreadMain() {
     if (!m_active) break;  // in case we were woken up to terminate
 
     // perform periodic persistent save
-    if ((m_networkMode & NT_NET_MODE_SERVER) != 0 && !m_persist_filename.empty() && start > next_save_time) {
+    if ((m_networkMode & NT_NET_MODE_SERVER) != 0 &&
+        !m_persist_filename.empty() && start > next_save_time) {
       next_save_time += save_delta_time;
       // handle loop taking too long
       if (start > next_save_time) next_save_time = start + save_delta_time;
@@ -266,7 +301,8 @@ void DispatcherBase::DispatchThreadMain() {
           conn->PostOutgoing((m_networkMode & NT_NET_MODE_CLIENT) != 0);
 
         // if client, reconnect if connection died
-        if ((m_networkMode & NT_NET_MODE_CLIENT) != 0 && conn->state() == NetworkConnection::kDead)
+        if ((m_networkMode & NT_NET_MODE_CLIENT) != 0 &&
+            conn->state() == NetworkConnection::kDead)
           reconnect = true;
       }
       // reconnect if we disconnected (and a reconnect is not in progress)
@@ -316,11 +352,11 @@ void DispatcherBase::ServerThreadMain() {
     // add to connections list
     using namespace std::placeholders;
     auto conn = std::make_shared<NetworkConnection>(
-        std::move(stream), m_notifier,
+        ++m_connections_uid, std::move(stream), m_notifier, m_logger,
         std::bind(&Dispatcher::ServerHandshake, this, _1, _2, _3),
-        std::bind(&Storage::GetEntryType, &m_storage, _1));
+        std::bind(&IStorage::GetMessageEntryType, &m_storage, _1));
     conn->set_process_incoming(
-        std::bind(&Storage::ProcessIncoming, &m_storage, _1, _2,
+        std::bind(&IStorage::ProcessIncoming, &m_storage, _1, _2,
                   std::weak_ptr<NetworkConnection>(conn)));
     {
       std::lock_guard<std::mutex> lock(m_user_mutex);
@@ -373,11 +409,11 @@ void DispatcherBase::ClientThreadMain() {
     std::unique_lock<std::mutex> lock(m_user_mutex);
     using namespace std::placeholders;
     auto conn = std::make_shared<NetworkConnection>(
-        std::move(stream), m_notifier,
+        ++m_connections_uid, std::move(stream), m_notifier, m_logger,
         std::bind(&Dispatcher::ClientHandshake, this, _1, _2, _3),
-        std::bind(&Storage::GetEntryType, &m_storage, _1));
+        std::bind(&IStorage::GetMessageEntryType, &m_storage, _1));
     conn->set_process_incoming(
-        std::bind(&Storage::ProcessIncoming, &m_storage, _1, _2,
+        std::bind(&IStorage::ProcessIncoming, &m_storage, _1, _2,
                   std::weak_ptr<NetworkConnection>(conn)));
     m_connections.resize(0);  // disconnect any current
     m_connections.emplace_back(conn);

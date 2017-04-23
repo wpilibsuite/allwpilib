@@ -12,7 +12,7 @@
 #include <memory>
 #include <string>
 
-#include "nt_Value.h"
+#include "networktables/NetworkTableValue.h"
 
 namespace nt {
 
@@ -96,7 +96,7 @@ class Message {
   static std::shared_ptr<Message> ExecuteRpc(unsigned int id, unsigned int uid,
                                              llvm::StringRef params);
   static std::shared_ptr<Message> RpcResponse(unsigned int id, unsigned int uid,
-                                              llvm::StringRef results);
+                                              llvm::StringRef result);
 
   Message(const Message&) = delete;
   Message& operator=(const Message&) = delete;

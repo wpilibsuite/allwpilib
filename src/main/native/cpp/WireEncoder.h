@@ -13,7 +13,7 @@
 
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
-#include "nt_Value.h"
+#include "networktables/NetworkTableValue.h"
 
 namespace nt {
 

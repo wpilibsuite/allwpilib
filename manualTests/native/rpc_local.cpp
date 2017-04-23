@@ -1,48 +1,60 @@
 #include <chrono>
+#include <climits>
 #include <cstdio>
 #include <thread>
 
+#include "support/json.h"
+
 #include "ntcore.h"
 
-std::string callback1(nt::StringRef name, nt::StringRef params_str,
-                      const nt::ConnectionInfo& conn_info) {
-  auto params = nt::UnpackRpcValues(params_str, NT_DOUBLE);
-  if (params.empty()) {
-    std::fputs("empty params?\n", stderr);
-    return "";
+void callback1(const nt::RpcAnswer& answer) {
+  wpi::json params;
+  try {
+    params = wpi::json::from_cbor(answer.params);
+  } catch (wpi::json::parse_error err) {
+    std::fputs("could not decode params?\n", stderr);
+    return;
   }
-  std::fprintf(stderr, "called with %g\n", params[0]->GetDouble());
+  if (!params.is_number()) {
+    std::fputs("did not get number\n", stderr);
+    return;
+  }
+  double val = params.get<double>();
+  std::fprintf(stderr, "called with %g\n", val);
 
-  return nt::PackRpcValues(nt::Value::MakeDouble(params[0]->GetDouble() + 1.2));
+  answer.PostResponse(wpi::json::to_cbor(val + 1.2));
 }
 
 int main() {
-  nt::SetLogger(
-      [](unsigned int level, const char* file, unsigned int line,
-         const char* msg) {
-        std::fputs(msg, stderr);
+  auto inst = nt::GetDefaultInstance();
+  nt::AddLogger(
+      inst,
+      [](const nt::LogMessage& msg) {
+        std::fputs(msg.message.c_str(), stderr);
         std::fputc('\n', stderr);
       },
-      0);
+      0, UINT_MAX);
 
-  nt::RpcDefinition def;
-  def.version = 1;
-  def.name = "myfunc1";
-  def.params.emplace_back("param1", nt::Value::MakeDouble(0.0));
-  def.results.emplace_back("result1", NT_DOUBLE);
-  nt::CreateRpc("func1", nt::PackRpcDefinition(def), callback1);
+  nt::StartServer(inst, "rpc_local.ini", "", 10000);
+  auto entry = nt::GetEntry(inst, "func1");
+  nt::CreateRpc(entry, nt::StringRef("", 1), callback1);
   std::fputs("calling rpc\n", stderr);
-  unsigned int call1_uid =
-      nt::CallRpc("func1", nt::PackRpcValues(nt::Value::MakeDouble(2.0)));
+  unsigned int call1_uid = nt::CallRpc(entry, wpi::json::to_cbor(2.0));
   std::string call1_result_str;
   std::fputs("waiting for rpc result\n", stderr);
-  nt::GetRpcResult(true, call1_uid, &call1_result_str);
-  auto call1_result = nt::UnpackRpcValues(call1_result_str, NT_DOUBLE);
-  if (call1_result.empty()) {
-    std::fputs("empty result?\n", stderr);
+  nt::GetRpcResult(entry, call1_uid, &call1_result_str);
+  wpi::json call1_result;
+  try {
+    call1_result = wpi::json::from_cbor(call1_result_str);
+  } catch (wpi::json::parse_error err) {
+    std::fputs("could not decode result?\n", stderr);
     return 1;
   }
-  std::fprintf(stderr, "got %g\n", call1_result[0]->GetDouble());
+  if (!call1_result.is_number()) {
+    std::fputs("result is not number?\n", stderr);
+    return 1;
+  }
+  std::fprintf(stderr, "got %g\n", call1_result.get<double>());
 
   return 0;
 }

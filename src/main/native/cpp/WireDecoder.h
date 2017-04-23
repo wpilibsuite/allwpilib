@@ -10,10 +10,10 @@
 
 #include <cstddef>
 
-#include "nt_Value.h"
+#include "networktables/NetworkTableValue.h"
 #include "support/leb128.h"
 #include "support/raw_istream.h"
-//#include "Log.h"
+#include "Log.h"
 
 namespace nt {
 
@@ -26,13 +26,17 @@ namespace nt {
  */
 class WireDecoder {
  public:
-  explicit WireDecoder(wpi::raw_istream& is, unsigned int proto_rev);
+  WireDecoder(wpi::raw_istream& is, unsigned int proto_rev,
+              wpi::Logger& logger);
   ~WireDecoder();
 
   void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
 
   /* Get the active protocol revision. */
   unsigned int proto_rev() const { return m_proto_rev; }
+
+  /* Get the logger. */
+  wpi::Logger& logger() const { return m_logger; }
 
   /* Clears error indicator. */
   void Reset() { m_error = nullptr; }
@@ -54,8 +58,7 @@ class WireDecoder {
     *buf = m_buf;
     m_is.read(m_buf, len);
 #if 0
-    nt::Logger& logger = nt::Logger::GetInstance();
-    if (logger.min_level() <= NT_LOG_DEBUG4 && logger.HasLogger()) {
+    if (m_logger.min_level() <= NT_LOG_DEBUG4 && m_logger.HasLogger()) {
       std::ostringstream oss;
       oss << "read " << len << " bytes:" << std::hex;
       if (!rv)
@@ -64,7 +67,7 @@ class WireDecoder {
         for (std::size_t i=0; i < len; ++i)
           oss << ' ' << (unsigned int)((*buf)[i]);
       }
-      logger.Log(NT_LOG_DEBUG4, __FILE__, __LINE__, oss.str().c_str());
+      m_logger.Log(NT_LOG_DEBUG4, __FILE__, __LINE__, oss.str().c_str());
     }
 #endif
     return !m_is.has_error();
@@ -134,6 +137,9 @@ class WireDecoder {
 
   /* input stream */
   wpi::raw_istream& m_is;
+
+  /* logger */
+  wpi::Logger& m_logger;
 
   /* temporary buffer */
   char* m_buf;

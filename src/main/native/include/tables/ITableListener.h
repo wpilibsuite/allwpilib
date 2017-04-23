@@ -8,14 +8,22 @@
 #include <memory>
 
 #include "llvm/StringRef.h"
-#include "nt_Value.h"
+#include "networktables/NetworkTableValue.h"
+#include "support/deprecated.h"
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 class ITable;
 
 /**
  * A listener that listens to changes in values in a {@link ITable}
  */
-class ITableListener {
+class WPI_DEPRECATED(
+    "Use EntryListener, TableEntryListener, or TableListener as appropriate")
+    ITableListener {
  public:
   virtual ~ITableListener() = default;
   /**
@@ -43,5 +51,9 @@ class ITableListener {
                               std::shared_ptr<nt::Value> value,
                               unsigned int flags);
 };
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif /* ITABLELISTENER_H_ */

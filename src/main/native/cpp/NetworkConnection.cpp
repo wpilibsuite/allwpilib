@@ -10,22 +10,24 @@
 #include "support/raw_socket_istream.h"
 #include "support/timestamp.h"
 #include "tcpsockets/NetworkStream.h"
+
+#include "IConnectionNotifier.h"
 #include "Log.h"
-#include "Notifier.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
 
 using namespace nt;
 
-std::atomic_uint NetworkConnection::s_uid;
-
-NetworkConnection::NetworkConnection(std::unique_ptr<wpi::NetworkStream> stream,
-                                     Notifier& notifier,
+NetworkConnection::NetworkConnection(unsigned int uid,
+                                     std::unique_ptr<wpi::NetworkStream> stream,
+                                     IConnectionNotifier& notifier,
+                                     wpi::Logger& logger,
                                      HandshakeFunc handshake,
                                      Message::GetEntryTypeFunc get_entry_type)
-    : m_uid(s_uid.fetch_add(1)),
+    : m_uid(uid),
       m_stream(std::move(stream)),
       m_notifier(notifier),
+      m_logger(logger),
       m_handshake(handshake),
       m_get_entry_type(get_entry_type),
       m_state(kCreated) {
@@ -112,12 +114,6 @@ void NetworkConnection::set_state(State state) {
   m_state = state;
 }
 
-void NetworkConnection::NotifyIfActive(
-    ConnectionListenerCallback callback) const {
-  std::lock_guard<std::mutex> lock(m_state_mutex);
-  if (m_state == kActive) m_notifier.NotifyConnection(true, info(), callback);
-}
-
 std::string NetworkConnection::remote_id() const {
   std::lock_guard<std::mutex> lock(m_remote_id_mutex);
   return m_remote_id;
@@ -130,7 +126,7 @@ void NetworkConnection::set_remote_id(StringRef remote_id) {
 
 void NetworkConnection::ReadThreadMain() {
   wpi::raw_socket_istream is(*m_stream);
-  WireDecoder decoder(is, m_proto_rev);
+  WireDecoder decoder(is, m_proto_rev, m_logger);
 
   set_state(kHandshake);
   if (!m_handshake(*this,

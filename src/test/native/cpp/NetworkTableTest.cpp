@@ -6,22 +6,39 @@
 /*----------------------------------------------------------------------------*/
 
 #include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableInstance.h"
 
 #include "gtest/gtest.h"
+#include "TestPrinters.h"
 
 class NetworkTableTest : public ::testing::Test {};
 
 TEST_F(NetworkTableTest, ContainsKey) {
-  auto nt = NetworkTable::GetTable("containskey");
+  auto inst = nt::NetworkTableInstance::Create();
+  auto nt = inst.GetTable("containskey");
   ASSERT_FALSE(nt->ContainsKey("testkey"));
   nt->PutNumber("testkey", 5);
   ASSERT_TRUE(nt->ContainsKey("testkey"));
+  ASSERT_TRUE(inst.GetEntry("/containskey/testkey").Exists());
+  ASSERT_FALSE(inst.GetEntry("containskey/testkey").Exists());
 }
 
 TEST_F(NetworkTableTest, LeadingSlash) {
-  auto nt = NetworkTable::GetTable("leadingslash");
-  auto nt2 = NetworkTable::GetTable("/leadingslash");
+  auto inst = nt::NetworkTableInstance::Create();
+  auto nt = inst.GetTable("leadingslash");
+  auto nt2 = inst.GetTable("/leadingslash");
   ASSERT_FALSE(nt->ContainsKey("testkey"));
   nt2->PutNumber("testkey", 5);
   ASSERT_TRUE(nt->ContainsKey("testkey"));
+  ASSERT_TRUE(inst.GetEntry("/leadingslash/testkey").Exists());
+}
+
+TEST_F(NetworkTableTest, EmptyOrNoSlash) {
+  auto inst = nt::NetworkTableInstance::Create();
+  auto nt = inst.GetTable("/");
+  auto nt2 = inst.GetTable("");
+  ASSERT_FALSE(nt->ContainsKey("testkey"));
+  nt2->PutNumber("testkey", 5);
+  ASSERT_TRUE(nt->ContainsKey("testkey"));
+  ASSERT_TRUE(inst.GetEntry("/testkey").Exists());
 }

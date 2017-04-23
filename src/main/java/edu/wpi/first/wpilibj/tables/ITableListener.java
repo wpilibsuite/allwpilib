@@ -2,11 +2,12 @@ package edu.wpi.first.wpilibj.tables;
 
 /**
  * A listener that listens to changes in values in a {@link ITable}
- * 
- * @author Mitchell
- *
+ * @deprecated Use Consumer&lt;{@link edu.wpi.first.networktables.EntryNotification}&gt;,
+ * {@link edu.wpi.first.networktables.TableEntryListener}, or
+ * {@link edu.wpi.first.networktables.TableListener} as appropriate.
  */
 @FunctionalInterface
+@Deprecated
 public interface ITableListener {
     /**
      * Called when a key-value pair is changed in a {@link ITable}
