@@ -356,9 +356,7 @@ bool DriverStation::IsDSAttached() const {
  *
  * @return True if the control data has been updated since the last call.
  */
-bool DriverStation::IsNewControlData() const {
-  return m_newControlData.exchange(false);
-}
+bool DriverStation::IsNewControlData() const { return HAL_IsNewControlData(); }
 
 /**
  * Is the driver station attached to a Field Management System?
@@ -475,28 +473,7 @@ void DriverStation::WaitForData() { WaitForData(0); }
  * @return true if new data, otherwise false
  */
 bool DriverStation::WaitForData(double timeout) {
-#if defined(_MSC_VER) && _MSC_VER < 1900
-  auto timeoutTime = std::chrono::steady_clock::now() +
-                     std::chrono::duration<int64_t, std::nano>(
-                         static_cast<int64_t>(timeout * 1e9));
-#else
-  auto timeoutTime =
-      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
-#endif
-
-  std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
-  while (!m_waitForDataPredicate) {
-    if (timeout > 0) {
-      auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
-      if (timedOut == std::cv_status::timeout) {
-        return false;
-      }
-    } else {
-      m_waitForDataCond.wait(lock);
-    }
-  }
-  m_waitForDataPredicate = false;
-  return true;
+  return static_cast<bool>(HAL_WaitForDSDataTimeout(timeout));
 }
 
 /**
@@ -628,15 +605,6 @@ void DriverStation::Run() {
   while (m_isRunning) {
     HAL_WaitForDSData();
     GetData();
-    // notify IsNewControlData variables
-    m_newControlData = true;
-
-    // notify WaitForData block
-    {
-      std::lock_guard<priority_mutex> lock(m_waitForDataMutex);
-      m_waitForDataPredicate = true;
-    }
-    m_waitForDataCond.notify_all();
 
     if (++period >= 4) {
       MotorSafetyHelper::CheckMotors();

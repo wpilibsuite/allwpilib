@@ -277,13 +277,44 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickAxisType(JNIEnv*, jclass,
 }
 
 /*
+ * Class:     edu_wpi_first_wpilibj_hal_HAL
+ * Method:    isNewControlData
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean JNICALL 
+Java_edu_wpi_first_wpilibj_hal_HAL_isNewControlData(JNIEnv *, jclass) {
+  return static_cast<jboolean>(HAL_IsNewControlData());
+}
+
+/*
  * Class: edu_wpi_first_wpilibj_hal_HAL
- * Method:    HAL_waitForDSData
+ * Method:    waitForDSData
  * Signature: ()V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_waitForDSData(JNIEnv* env, jclass) {
   HAL_WaitForDSData();
+}
+
+/*
+ * Class: edu_wpi_first_wpilibj_hal_HAL
+ * Method:    releaseDSMutex
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_HAL_releaseDSMutex(JNIEnv* env, jclass) {
+  HAL_ReleaseDSMutex();
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_HAL
+ * Method:    waitForDSDataTimeout
+ * Signature: (D)Z
+ */
+JNIEXPORT jboolean JNICALL 
+Java_edu_wpi_first_wpilibj_hal_HAL_waitForDSDataTimeout(JNIEnv *, jclass, 
+                                                        jdouble timeout) {
+  return static_cast<jboolean>(HAL_WaitForDSDataTimeout(timeout));
 }
 
 /*

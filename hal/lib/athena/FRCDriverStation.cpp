@@ -5,6 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -27,6 +28,7 @@ struct HAL_JoystickAxesInt {
 static priority_mutex msgMutex;
 static priority_condition_variable newDSDataAvailableCond;
 static priority_mutex newDSDataAvailableMutex;
+static int newDSDataAvailableCounter{0};
 
 extern "C" {
 int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
@@ -244,17 +246,96 @@ void HAL_ObserveUserProgramTest(void) {
   FRC_NetworkCommunication_observeUserProgramTest();
 }
 
+bool HAL_IsNewControlData(void) {
+  // There is a rollover error condition here. At Packet# = n * (uintmax), this
+  // will return false when instead it should return true. However, this at a
+  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
+  // worth the cycles to check.
+  thread_local int lastCount{-1};
+  int currentCount = 0;
+  {
+    std::unique_lock<priority_mutex> lock(newDSDataAvailableMutex);
+    currentCount = newDSDataAvailableCounter;
+  }
+  if (lastCount == currentCount) return false;
+  lastCount = currentCount;
+  return true;
+}
+
 /**
  * Waits for the newest DS packet to arrive. Note that this is a blocking call.
  */
-void HAL_WaitForDSData(void) {
+void HAL_WaitForDSData(void) { HAL_WaitForDSDataTimeout(0); }
+
+/**
+ * Waits for the newest DS packet to arrive. If timeout is <= 0, this will wait
+ * forever. Otherwise, it will wait until either a new packet, or the timeout
+ * time has passed. Returns true on new data, false on timeout.
+ */
+HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
+  auto timeoutTime =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+
   std::unique_lock<priority_mutex> lock(newDSDataAvailableMutex);
-  newDSDataAvailableCond.wait(lock);
+  int currentCount = newDSDataAvailableCounter;
+  while (newDSDataAvailableCounter == currentCount) {
+    if (timeout > 0) {
+      auto timedOut = newDSDataAvailableCond.wait_until(lock, timeoutTime);
+      if (timedOut == std::cv_status::timeout) {
+        return false;
+      }
+    } else {
+      newDSDataAvailableCond.wait(lock);
+    }
+  }
+  return true;
 }
 
-void HAL_InitializeDriverStation(void) {
-  //  Set our DS new data condition variable.
-  setNewDataSem(newDSDataAvailableCond.native_handle());
+// Internal NetComm function to set new packet callback
+extern int NetCommRPCProxy_SetOccurFuncPointer(
+    int32_t (*occurFunc)(uint32_t refNum));
+
+// Constant number to be used for our occur handle
+constexpr int32_t refNumber = 42;
+
+static int32_t newDataOccur(uint32_t refNum) {
+  // Since we could get other values, require our specific handle
+  // to signal our threads
+  if (refNum != refNumber) return 0;
+  std::lock_guard<priority_mutex> lock(newDSDataAvailableMutex);
+  // Nofify all threads
+  newDSDataAvailableCounter++;
+  newDSDataAvailableCond.notify_all();
+  return 0;
 }
+
+/*
+ * Call this to initialize the driver station communication. This will properly
+ * handle multiple calls. However note that this CANNOT be called from a library
+ * that interfaces with LabVIEW.
+ */
+void HAL_InitializeDriverStation(void) {
+  static std::atomic_bool initialized{false};
+  static priority_mutex initializeMutex;
+  // Initial check, as if it's true initialization has finished
+  if (initialized) return;
+
+  std::lock_guard<priority_mutex> lock(initializeMutex);
+  // Second check in case another thread was waiting
+  if (initialized) return;
+
+  // Set up the occur function internally with NetComm
+  NetCommRPCProxy_SetOccurFuncPointer(newDataOccur);
+  // Set up our occur reference number
+  setNewDataOccurRef(refNumber);
+
+  initialized = true;
+}
+
+/*
+ * Releases the DS Mutex to allow proper shutdown of any threads that are
+ * waiting on it.
+ */
+void HAL_ReleaseDSMutex(void) { newDataOccur(refNumber); }
 
 }  // extern "C"
