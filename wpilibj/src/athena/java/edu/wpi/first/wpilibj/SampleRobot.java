@@ -25,14 +25,18 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  */
 public class SampleRobot extends RobotBase {
 
-  private boolean m_robotMainOverridden;
+  private boolean m_robotMainOverridden = true;
 
   /**
    * Create a new SampleRobot.
    */
   public SampleRobot() {
-    super();
-    m_robotMainOverridden = true;
+    robotInit();
+
+    // Tell the DS that the robot is ready to be enabled
+    HAL.observeUserProgramStarting();
+
+    HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Simple);
   }
 
   /**
@@ -111,19 +115,8 @@ public class SampleRobot extends RobotBase {
    * for the robot to be enabled again.
    */
   public void startCompetition() {
-    HAL.report(tResourceType.kResourceType_Framework,
-                                   tInstances.kFramework_Simple);
-
-    robotInit();
-
-    // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
-
     robotMain();
     if (!m_robotMainOverridden) {
-      // first and one-time initialization
-      LiveWindow.setEnabled(false);
-
       while (true) {
         if (isDisabled()) {
           m_ds.InDisabled(true);

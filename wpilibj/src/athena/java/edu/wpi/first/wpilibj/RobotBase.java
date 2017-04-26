@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 
@@ -55,16 +56,14 @@ public abstract class RobotBase {
    * to put this code into it's own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
-    // TODO: StartCAPI();
-    // TODO: See if the next line is necessary
-    // Resource.RestartProgram();
-
     NetworkTable.setNetworkIdentity("Robot");
     NetworkTable.setPersistentFilename("/home/lvuser/networktables.ini");
     NetworkTable.setServerMode(); // must be before b
     m_ds = DriverStation.getInstance();
     NetworkTable.getTable(""); // forces network tables to initialize
     NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
+
+    LiveWindow.setEnabled(false);
   }
 
   /**
@@ -212,6 +211,8 @@ public abstract class RobotBase {
       }
     }
 
+    System.out.println("********** Robot program starting **********");
+
     RobotBase robot;
     try {
       robot = (RobotBase) Class.forName(robotName).newInstance();
@@ -244,7 +245,6 @@ public abstract class RobotBase {
 
     boolean errorOnExit = false;
     try {
-      System.out.println("********** Robot program starting **********");
       robot.startCompetition();
     } catch (Throwable throwable) {
       DriverStation.reportError(

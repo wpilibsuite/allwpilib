@@ -27,7 +27,7 @@ class SampleRobot : public RobotBase {
   virtual ~SampleRobot() = default;
 
  private:
-  bool m_robotMainOverridden;
+  bool m_robotMainOverridden = true;
 };
 
 }  // namespace frc

@@ -13,6 +13,7 @@
 #include "HAL/HAL.h"
 #include "HLUsageReporting.h"
 #include "Internal/HardwareHLReporting.h"
+#include "LiveWindow/LiveWindow.h"
 #include "RobotState.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "Utility.h"
@@ -53,6 +54,13 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
     std::fputs(WPILibVersion, file);
     std::fclose(file);
   }
+
+  // First and one-time initialization
+  NetworkTable::GetTable("LiveWindow")
+      ->GetSubTable("~STATUS~")
+      ->PutBoolean("LW Enabled", false);
+
+  LiveWindow::GetInstance()->SetEnabled(false);
 }
 
 /**

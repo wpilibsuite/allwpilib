@@ -25,8 +25,8 @@ class DriverStation;
     }                                                                   \
     HAL_Report(HALUsageReporting::kResourceType_Language,               \
                HALUsageReporting::kLanguage_CPlusPlus);                 \
-    static _ClassName_ robot;                                           \
     llvm::outs() << "\n********** Robot program starting **********\n"; \
+    static _ClassName_ robot;                                           \
     robot.StartCompetition();                                           \
   }
 
