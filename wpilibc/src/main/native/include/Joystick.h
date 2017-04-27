@@ -7,82 +7,90 @@
 
 #pragma once
 
-#include <stdint.h>
-
-#include <memory>
 #include <vector>
 
-#include "ErrorBase.h"
-#include "JoystickBase.h"
+#include <support/deprecated.h>
+
+#include "GenericHID.h"
 
 namespace frc {
 
-class DriverStation;
-
 /**
  * Handle input from standard Joysticks connected to the Driver Station.
+ *
  * This class handles standard input that comes from the Driver Station. Each
  * time a value is requested the most recent value is returned. There is a
  * single class instance for each joystick and the mapping of ports to hardware
  * buttons depends on the code in the Driver Station.
  */
-class Joystick : public JoystickBase, public ErrorBase {
+class Joystick : public GenericHID {
  public:
-  static const int kDefaultXAxis = 0;
-  static const int kDefaultYAxis = 1;
-  static const int kDefaultZAxis = 2;
-  static const int kDefaultTwistAxis = 2;
-  static const int kDefaultThrottleAxis = 3;
+  static constexpr int kDefaultXAxis = 0;
+  static constexpr int kDefaultYAxis = 1;
+  static constexpr int kDefaultZAxis = 2;
+  static constexpr int kDefaultTwistAxis = 2;
+  static constexpr int kDefaultThrottleAxis = 3;
+  static constexpr int kMinNumAxes = 4;
 
-  typedef enum {
-    kXAxis,
-    kYAxis,
-    kZAxis,
-    kTwistAxis,
-    kThrottleAxis,
-    kNumAxisTypes
-  } AxisType;
-
-  static const int kDefaultTriggerButton = 1;
-  static const int kDefaultTopButton = 2;
-
-  typedef enum { kTriggerButton, kTopButton, kNumButtonTypes } ButtonType;
+  enum AxisType { kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis };
+  enum ButtonType { kTriggerButton, kTopButton };
 
   explicit Joystick(int port);
-  Joystick(int port, int numAxisTypes, int numButtonTypes);
   virtual ~Joystick() = default;
 
   Joystick(const Joystick&) = delete;
   Joystick& operator=(const Joystick&) = delete;
 
-  int GetAxisChannel(AxisType axis) const;
+  void SetXChannel(int channel);
+  void SetYChannel(int channel);
+  void SetZChannel(int channel);
+  void SetTwistChannel(int channel);
+  void SetThrottleChannel(int channel);
+
+  WPI_DEPRECATED("Use the more specific axis channel setter functions.")
   void SetAxisChannel(AxisType axis, int channel);
+
+  int GetXChannel() const;
+  int GetYChannel() const;
+  int GetZChannel() const;
+  int GetTwistChannel() const;
+  int GetThrottleChannel() const;
+
+  WPI_DEPRECATED("Use the more specific axis channel getter functions.")
+  int GetAxisChannel(AxisType axis) const;
 
   double GetX(JoystickHand hand = kRightHand) const override;
   double GetY(JoystickHand hand = kRightHand) const override;
-  double GetZ(JoystickHand hand = kRightHand) const override;
-  double GetTwist() const override;
-  double GetThrottle() const override;
-  virtual double GetAxis(AxisType axis) const;
+  double GetZ() const;
+  double GetTwist() const;
+  double GetThrottle() const;
 
-  bool GetTrigger(JoystickHand hand = kRightHand) const override;
-  bool GetTop(JoystickHand hand = kRightHand) const override;
-  bool GetButton(ButtonType button) const;
+  WPI_DEPRECATED("Use the more specific axis channel getter functions.")
+  double GetAxis(AxisType axis) const;
+
+  bool GetTrigger() const;
+  bool GetTriggerPressed();
+  bool GetTriggerReleased();
+
+  bool GetTop() const;
+  bool GetTopPressed();
+  bool GetTopReleased();
+
+  WPI_DEPRECATED("Use Joystick instances instead.")
   static Joystick* GetStickForPort(int port);
 
-  virtual double GetMagnitude() const;
-  virtual double GetDirectionRadians() const;
-  virtual double GetDirectionDegrees() const;
+  WPI_DEPRECATED("Use the more specific button getter functions.")
+  bool GetButton(ButtonType button) const;
 
-  int GetAxisType(int axis) const;
-
-  int GetAxisCount() const;
-  int GetButtonCount() const;
+  double GetMagnitude() const;
+  double GetDirectionRadians() const;
+  double GetDirectionDegrees() const;
 
  private:
-  DriverStation& m_ds;
+  enum class Axis { kX, kY, kZ, kTwist, kThrottle };
+  enum class Button { kTrigger = 1, kTop = 2 };
+
   std::vector<int> m_axes;
-  std::vector<int> m_buttons;
 };
 
 }  // namespace frc

@@ -10,11 +10,51 @@
 #include <HAL/HAL.h>
 
 #include "DriverStation.h"
+#include "WPIErrors.h"
 
 using namespace frc;
 
 GenericHID::GenericHID(int port) : m_ds(DriverStation::GetInstance()) {
+  if (port >= DriverStation::kJoystickPorts) {
+    wpi_setWPIError(BadJoystickIndex);
+  }
   m_port = port;
+}
+
+/**
+ * Get the button value (starting at button 1).
+ *
+ * The buttons are returned in a single 16 bit value with one bit representing
+ * the state of each button. The appropriate button is returned as a boolean
+ * value.
+ *
+ * @param button The button number to be read (starting at 1)
+ * @return The state of the button.
+ */
+bool GenericHID::GetRawButton(int button) const {
+  return m_ds.GetStickButton(m_port, button);
+}
+
+/**
+ * Whether the button was pressed since the last check. Button indexes begin at
+ * 1.
+ *
+ * @param button The button index, beginning at 1.
+ * @return Whether the button was pressed since the last check.
+ */
+bool GenericHID::GetRawButtonPressed(int button) {
+  return m_ds.GetStickButtonPressed(m_port, button);
+}
+
+/**
+ * Whether the button was released since the last check. Button indexes begin at
+ * 1.
+ *
+ * @param button The button index, beginning at 1.
+ * @return Whether the button was released since the last check.
+ */
+bool GenericHID::GetRawButtonReleased(int button) {
+  return m_ds.GetStickButtonReleased(m_port, button);
 }
 
 /**
@@ -28,20 +68,6 @@ double GenericHID::GetRawAxis(int axis) const {
 }
 
 /**
- * Get the button value (starting at button 1)
- *
- * The buttons are returned in a single 16 bit value with one bit representing
- * the state of each button. The appropriate button is returned as a boolean
- * value.
- *
- * @param button The button number to be read (starting at 1)
- * @return The state of the button.
- **/
-bool GenericHID::GetRawButton(int button) const {
-  return m_ds.GetStickButton(m_port, button);
-}
-
-/**
  * Get the angle in degrees of a POV on the HID.
  *
  * The POV angles start at 0 in the up direction, and increase clockwise
@@ -50,23 +76,30 @@ bool GenericHID::GetRawButton(int button) const {
  * @param pov The index of the POV to read (starting at 0)
  * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
  */
-int GenericHID::GetPOV(int pov) const {
-  return m_ds.GetStickPOV(GetPort(), pov);
-}
+int GenericHID::GetPOV(int pov) const { return m_ds.GetStickPOV(m_port, pov); }
+
+/**
+ * Get the number of axes for the HID.
+ *
+ * @return the number of axis for the current HID
+ */
+int GenericHID::GetAxisCount() const { return m_ds.GetStickAxisCount(m_port); }
 
 /**
  * Get the number of POVs for the HID.
  *
  * @return the number of POVs for the current HID
  */
-int GenericHID::GetPOVCount() const { return m_ds.GetStickPOVCount(GetPort()); }
+int GenericHID::GetPOVCount() const { return m_ds.GetStickPOVCount(m_port); }
 
 /**
- * Get the port number of the HID.
+ * Get the number of buttons for the HID.
  *
- * @return The port number of the HID.
+ * @return the number of buttons on the current HID
  */
-int GenericHID::GetPort() const { return m_port; }
+int GenericHID::GetButtonCount() const {
+  return m_ds.GetStickButtonCount(m_port);
+}
 
 /**
  * Get the type of the HID.
@@ -83,6 +116,22 @@ GenericHID::HIDType GenericHID::GetType() const {
  * @return the name of the HID.
  */
 std::string GenericHID::GetName() const { return m_ds.GetJoystickName(m_port); }
+
+/**
+ * Get the axis type of a joystick axis.
+ *
+ * @return the axis type of a joystick axis.
+ */
+int GenericHID::GetAxisType(int axis) const {
+  return m_ds.GetJoystickAxisType(m_port, axis);
+}
+
+/**
+ * Get the port number of the HID.
+ *
+ * @return The port number of the HID.
+ */
+int GenericHID::GetPort() const { return m_port; }
 
 /**
  * Set a single HID output value for the HID.
