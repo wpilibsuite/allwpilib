@@ -68,8 +68,8 @@ void Scheduler::ProcessCommandAddition(Command* command) {
   if (found == m_commands.end()) {
     // Check that the requirements can be had
     Command::SubsystemSet requirements = command->GetRequirements();
-    Command::SubsystemSet::iterator iter;
-    for (iter = requirements.begin(); iter != requirements.end(); iter++) {
+    for (Command::SubsystemSet::iterator iter = requirements.begin();
+         iter != requirements.end(); iter++) {
       Subsystem* lock = *iter;
       if (lock->GetCurrentCommand() != nullptr &&
           !lock->GetCurrentCommand()->IsInterruptible())
@@ -78,7 +78,8 @@ void Scheduler::ProcessCommandAddition(Command* command) {
 
     // Give it the requirements
     m_adding = true;
-    for (iter = requirements.begin(); iter != requirements.end(); iter++) {
+    for (Command::SubsystemSet::iterator iter = requirements.begin();
+         iter != requirements.end(); iter++) {
       Subsystem* lock = *iter;
       if (lock->GetCurrentCommand() != nullptr) {
         lock->GetCurrentCommand()->Cancel();
@@ -115,8 +116,8 @@ void Scheduler::Run() {
     if (!m_enabled) return;
 
     std::lock_guard<priority_mutex> sync(m_buttonsLock);
-    auto rButtonIter = m_buttons.rbegin();
-    for (; rButtonIter != m_buttons.rend(); rButtonIter++) {
+    for (auto rButtonIter = m_buttons.rbegin(); rButtonIter != m_buttons.rend();
+         rButtonIter++) {
       (*rButtonIter)->Execute();
     }
   }
@@ -124,11 +125,11 @@ void Scheduler::Run() {
   m_runningCommandsChanged = false;
 
   // Loop through the commands
-  auto commandIter = m_commands.begin();
-  for (; commandIter != m_commands.end();) {
+  for (auto commandIter = m_commands.begin();
+       commandIter != m_commands.end();) {
     Command* command = *commandIter;
     // Increment before potentially removing to keep the iterator valid
-    commandIter++;
+    ++commandIter;
     if (!command->Run()) {
       Remove(command);
       m_runningCommandsChanged = true;
@@ -138,16 +139,16 @@ void Scheduler::Run() {
   // Add the new things
   {
     std::lock_guard<priority_mutex> sync(m_additionsLock);
-    auto additionsIter = m_additions.begin();
-    for (; additionsIter != m_additions.end(); additionsIter++) {
+    for (auto additionsIter = m_additions.begin();
+         additionsIter != m_additions.end(); additionsIter++) {
       ProcessCommandAddition(*additionsIter);
     }
     m_additions.clear();
   }
 
   // Add in the defaults
-  auto subsystemIter = m_subsystems.begin();
-  for (; subsystemIter != m_subsystems.end(); subsystemIter++) {
+  for (auto subsystemIter = m_subsystems.begin();
+       subsystemIter != m_subsystems.end(); subsystemIter++) {
     Subsystem* lock = *subsystemIter;
     if (lock->GetCurrentCommand() == nullptr) {
       ProcessCommandAddition(lock->GetDefaultCommand());
@@ -188,8 +189,7 @@ void Scheduler::Remove(Command* command) {
   if (!m_commands.erase(command)) return;
 
   Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) {
+  for (auto iter = requirements.begin(); iter != requirements.end(); iter++) {
     Subsystem* lock = *iter;
     lock->SetCurrentCommand(nullptr);
   }
@@ -220,7 +220,6 @@ void Scheduler::ResetAll() {
  * SmartDashboard.
  */
 void Scheduler::UpdateTable() {
-  CommandSet::iterator commandIter;
   if (m_table != nullptr) {
     // Get the list of possible commands to cancel
     auto new_toCancel = m_table->GetValue("Cancel");
@@ -233,8 +232,8 @@ void Scheduler::UpdateTable() {
     // cancel commands that have had the cancel buttons pressed
     // on the SmartDashboad
     if (!toCancel.empty()) {
-      for (commandIter = m_commands.begin(); commandIter != m_commands.end();
-           ++commandIter) {
+      for (auto commandIter = m_commands.begin();
+           commandIter != m_commands.end(); ++commandIter) {
         for (size_t i = 0; i < toCancel.size(); i++) {
           Command* c = *commandIter;
           if (c->GetID() == toCancel[i]) {
@@ -250,8 +249,8 @@ void Scheduler::UpdateTable() {
     if (m_runningCommandsChanged) {
       commands.resize(0);
       ids.resize(0);
-      for (commandIter = m_commands.begin(); commandIter != m_commands.end();
-           ++commandIter) {
+      for (auto commandIter = m_commands.begin();
+           commandIter != m_commands.end(); ++commandIter) {
         Command* c = *commandIter;
         commands.push_back(c->GetName());
         ids.push_back(c->GetID());

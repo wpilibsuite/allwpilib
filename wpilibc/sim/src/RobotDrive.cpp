@@ -633,13 +633,12 @@ double RobotDrive::Limit(double num) {
  */
 void RobotDrive::Normalize(double* wheelSpeeds) {
   double maxMagnitude = std::fabs(wheelSpeeds[0]);
-  int i;
-  for (i = 1; i < kMaxNumberOfMotors; i++) {
+  for (int i = 1; i < kMaxNumberOfMotors; i++) {
     double temp = std::fabs(wheelSpeeds[i]);
     if (maxMagnitude < temp) maxMagnitude = temp;
   }
   if (maxMagnitude > 1.0) {
-    for (i = 0; i < kMaxNumberOfMotors; i++) {
+    for (int i = 0; i < kMaxNumberOfMotors; i++) {
       wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
     }
   }

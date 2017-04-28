@@ -134,11 +134,12 @@ int16_t DriverStation::GetStickButtons(int stick) {
                                "stick must be between 0 and 5");
     return false;
   }
-  int16_t btns = 0, btnid;
+  int16_t btns = 0;
 
   std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
   gazebo::msgs::FRCJoystickPtr joy = joysticks[stick];
-  for (btnid = 0; btnid < joy->buttons().size() && btnid < 12; btnid++) {
+  for (int16_t btnid = 0; btnid < joy->buttons().size() && btnid < 12;
+       btnid++) {
     if (joysticks[stick]->buttons(btnid)) {
       btns |= (1 << btnid);
     }

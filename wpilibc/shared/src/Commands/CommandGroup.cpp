@@ -43,8 +43,8 @@ void CommandGroup::AddSequential(Command* command) {
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
   Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) Requires(*iter);
+  for (auto iter = requirements.begin(); iter != requirements.end(); iter++)
+    Requires(*iter);
 }
 
 /**
@@ -83,8 +83,8 @@ void CommandGroup::AddSequential(Command* command, double timeout) {
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
   Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) Requires(*iter);
+  for (auto iter = requirements.begin(); iter != requirements.end(); iter++)
+    Requires(*iter);
 }
 
 /**
@@ -120,8 +120,8 @@ void CommandGroup::AddParallel(Command* command) {
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
   Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) Requires(*iter);
+  for (auto iter = requirements.begin(); iter != requirements.end(); iter++)
+    Requires(*iter);
 }
 
 /**
@@ -168,8 +168,8 @@ void CommandGroup::AddParallel(Command* command, double timeout) {
   // Iterate through command->GetRequirements() and call Requires() on each
   // required subsystem
   Command::SubsystemSet requirements = command->GetRequirements();
-  auto iter = requirements.begin();
-  for (; iter != requirements.end(); iter++) Requires(*iter);
+  for (auto iter = requirements.begin(); iter != requirements.end(); iter++)
+    Requires(*iter);
 }
 
 void CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
@@ -227,8 +227,7 @@ void CommandGroup::_Execute() {
   }
 
   // Run Children
-  auto iter = m_children.begin();
-  for (; iter != m_children.end();) {
+  for (auto iter = m_children.begin(); iter != m_children.end();) {
     entry = *iter;
     Command* child = entry.m_command;
     if (entry.IsTimedOut()) child->_Cancel();
@@ -252,8 +251,7 @@ void CommandGroup::_End() {
     cmd->Removed();
   }
 
-  auto iter = m_children.begin();
-  for (; iter != m_children.end(); iter++) {
+  for (auto iter = m_children.begin(); iter != m_children.end(); iter++) {
     Command* cmd = iter->m_command;
     cmd->_Cancel();
     cmd->Removed();
@@ -289,8 +287,7 @@ bool CommandGroup::IsInterruptible() const {
     if (!cmd->IsInterruptible()) return false;
   }
 
-  auto iter = m_children.cbegin();
-  for (; iter != m_children.cend(); iter++) {
+  for (auto iter = m_children.cbegin(); iter != m_children.cend(); iter++) {
     if (!iter->m_command->IsInterruptible()) return false;
   }
 
@@ -298,14 +295,13 @@ bool CommandGroup::IsInterruptible() const {
 }
 
 void CommandGroup::CancelConflicts(Command* command) {
-  auto childIter = m_children.begin();
-  for (; childIter != m_children.end();) {
+  for (auto childIter = m_children.begin(); childIter != m_children.end();) {
     Command* child = childIter->m_command;
     bool erased = false;
 
     Command::SubsystemSet requirements = command->GetRequirements();
-    auto requirementIter = requirements.begin();
-    for (; requirementIter != requirements.end(); requirementIter++) {
+    for (auto requirementIter = requirements.begin();
+         requirementIter != requirements.end(); requirementIter++) {
       if (child->DoesRequire(*requirementIter)) {
         child->_Cancel();
         child->Removed();
