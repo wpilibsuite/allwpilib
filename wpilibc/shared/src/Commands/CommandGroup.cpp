@@ -172,9 +172,9 @@ void CommandGroup::AddParallel(Command* command, double timeout) {
   for (; iter != requirements.end(); iter++) Requires(*iter);
 }
 
-void CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
+void CommandGroup::Initialize() { m_currentCommandIndex = -1; }
 
-void CommandGroup::_Execute() {
+void CommandGroup::Execute() {
   CommandGroupEntry entry;
   Command* cmd = nullptr;
   bool firstRun = false;
@@ -242,7 +242,7 @@ void CommandGroup::_Execute() {
   }
 }
 
-void CommandGroup::_End() {
+void CommandGroup::End() {
   // Theoretically, we don't have to check this, but we do if teams override the
   // IsFinished method
   if (m_currentCommandIndex != -1 &&
@@ -260,20 +260,6 @@ void CommandGroup::_End() {
   }
   m_children.clear();
 }
-
-void CommandGroup::_Interrupted() { _End(); }
-
-// Can be overwritten by teams
-void CommandGroup::Initialize() {}
-
-// Can be overwritten by teams
-void CommandGroup::Execute() {}
-
-// Can be overwritten by teams
-void CommandGroup::End() {}
-
-// Can be overwritten by teams
-void CommandGroup::Interrupted() {}
 
 bool CommandGroup::IsFinished() {
   return static_cast<size_t>(m_currentCommandIndex) >= m_commands.size() &&

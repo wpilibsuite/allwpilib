@@ -107,10 +107,6 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
   virtual void End();
   virtual void Interrupted();
 
-  virtual void _Initialize();
-  virtual void _Interrupted();
-  virtual void _Execute();
-  virtual void _End();
   virtual void _Cancel();
 
   friend class ConditionalCommand;

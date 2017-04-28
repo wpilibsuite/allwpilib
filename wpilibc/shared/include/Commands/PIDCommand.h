@@ -39,9 +39,8 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
 
  protected:
   std::shared_ptr<PIDController> GetPIDController() const;
-  virtual void _Initialize();
-  virtual void _Interrupted();
-  virtual void _End();
+  virtual void Interrupted();
+  virtual void End();
   void SetSetpoint(double setpoint);
   double GetSetpoint() const;
   double GetPosition();

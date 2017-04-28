@@ -117,20 +117,14 @@ public abstract class PIDCommand extends Command implements Sendable {
 
   @Override
   @SuppressWarnings("MethodName")
-  void _initialize() {
+  void initialize() {
     m_controller.enable();
   }
 
   @Override
   @SuppressWarnings("MethodName")
-  void _end() {
+  void end() {
     m_controller.disable();
-  }
-
-  @Override
-  @SuppressWarnings("MethodName")
-  void _interrupted() {
-    _end();
   }
 
   /**
