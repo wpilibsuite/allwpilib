@@ -12,20 +12,21 @@
 // MSVC 2013 doesn't allow "= default" on move constructors, but since we are
 // (currently) only actually using the move constructors in non-MSVC situations
 // (ie, wpilibC++Devices), we can just ignore it in MSVC.
-#if !defined(_MSC_VER)
-#define DEFAULT_MOVE_CONSTRUCTOR(ClassName) ClassName(ClassName&&) = default
-#else
+#if defined(_MSC_VER) && _MSC_VER < 1900
 #define DEFAULT_MOVE_CONSTRUCTOR(ClassName)
+#else
+#define DEFAULT_MOVE_CONSTRUCTOR(ClassName) ClassName(ClassName&&) = default
 #endif
 
-#if (__cplusplus < 201103L)
-#if !defined(_MSC_VER)
-#define nullptr NULL
-#endif
+#if defined(_MSC_VER) && _MSC_VER < 1900
 #define constexpr const
 #endif
 
-#if defined(_MSC_VER)
+#if (__cplusplus < 201103L) && !defined(_MSC_VER)
+#define nullptr NULL
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
 #define noexcept throw()
 #endif
 
