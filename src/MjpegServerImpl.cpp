@@ -60,11 +60,16 @@ static const char* startRootPage = "<html><head>\n"
     "    border: 1px solid black;\n"
     "    border-collapse: collapse;\n"
     "}\n"
+    ".settings { float: left; }\n"
+    ".stream { display: inline-block; margin-left: 10px; }\n"
     "</style>\n"
     "<title>CameraServer</title></head><body>\n"
+    "<div class=\"stream\">\n"
     "<img src=\"/stream.mjpg\" /><p />\n"
-    "<a href=\"/settings.json\">Settings JSON</a>\n";
-static const char* endRootPage ="</body></html>";
+    "<a href=\"/settings.json\">Settings JSON</a>\n"
+    "</div>\n"
+    "<div class=\"settings\">\n";
+static const char* endRootPage ="</div></body></html>";
 
 class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  public:
