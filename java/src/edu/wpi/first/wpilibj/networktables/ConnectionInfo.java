@@ -7,7 +7,7 @@ public class ConnectionInfo {
   public final long last_update;
   public final int protocol_version;
 
-  ConnectionInfo(String remote_id, String remote_ip, int remote_port, long last_update, int protocol_version) {
+  public ConnectionInfo(String remote_id, String remote_ip, int remote_port, long last_update, int protocol_version) {
     this.remote_id = remote_id;
     this.remote_ip = remote_ip;
     this.remote_port = remote_port;

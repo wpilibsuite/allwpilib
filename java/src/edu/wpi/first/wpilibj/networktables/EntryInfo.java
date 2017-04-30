@@ -6,7 +6,7 @@ public class EntryInfo {
   public final int flags;
   public final long last_change;
 
-  EntryInfo(String name, int type, int flags, long last_change) {
+  public EntryInfo(String name, int type, int flags, long last_change) {
     this.name = name;
     this.type = type;
     this.flags = flags;
