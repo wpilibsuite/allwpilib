@@ -28,7 +28,7 @@ ext.getPlatformPath = { binary ->
         if (binary.targetPlatform.architecture.amd64) {
             return 'Linux/amd64'
         } else {
-            return 'Linux/' + binary.targetPlatform.architecture.name
+            return 'Linux/i386'
         }
     } else if (binary.targetPlatform.operatingSystem.windows) {
         if (binary.targetPlatform.architecture.amd64) {
