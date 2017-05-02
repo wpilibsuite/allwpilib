@@ -23,7 +23,7 @@ int GetThreadPriority(std::thread& thread, bool* isRealTime) {
   int32_t status = 0;
   HAL_Bool rt = false;
   auto native = thread.native_handle();
-  auto ret = HAL_GetThreadPriority(&native, &rt, &status);
+  auto ret = HAL_GetThreadPriority(native, &rt, &status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   *isRealTime = rt;
   return ret;
@@ -58,7 +58,7 @@ int GetCurrentThreadPriority(bool* isRealTime) {
 bool SetThreadPriority(std::thread& thread, bool realTime, int priority) {
   int32_t status = 0;
   auto native = thread.native_handle();
-  auto ret = HAL_SetThreadPriority(&native, realTime, priority, &status);
+  auto ret = HAL_SetThreadPriority(native, realTime, priority, &status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return ret;
 }

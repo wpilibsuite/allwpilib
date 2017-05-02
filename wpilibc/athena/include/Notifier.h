@@ -35,6 +35,8 @@ class Notifier : public ErrorBase {
   Notifier(const Notifier&) = delete;
   Notifier& operator=(const Notifier&) = delete;
 
+  bool SetPriority(bool realTime, int priority);
+  int GetPriority(bool* isRealTime);
   void StartSingle(double delay);
   void StartPeriodic(double period);
   void Stop();

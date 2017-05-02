@@ -25,6 +25,11 @@ void* HAL_GetNotifierParam(HAL_NotifierHandle notifierHandle, int32_t* status);
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status);
 void HAL_StopNotifierAlarm(HAL_NotifierHandle notifierHandle, int32_t* status);
+HAL_Bool HAL_SetNotifierThreadPriority(HAL_NotifierHandle notifierHandle,
+                                       HAL_Bool realTime, int32_t priority,
+                                       int32_t* status);
+int32_t HAL_GetNotifierThreadPriority(HAL_NotifierHandle notifierHandle,
+                                      HAL_Bool* isRealTime, int32_t* status);
 #ifdef __cplusplus
 }
 #endif

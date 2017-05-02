@@ -8,6 +8,7 @@
 #include "Notifier.h"
 
 #include "HAL/HAL.h"
+#include "HAL/Threads.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
@@ -85,6 +86,23 @@ void Notifier::Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
 
   if (handler) handler();
   notifier->m_processMutex.unlock();
+}
+
+bool Notifier::SetPriority(bool realTime, int priority) {
+  int32_t status = 0;
+  auto retVal =
+      HAL_SetNotifierThreadPriority(m_notifier, realTime, priority, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return retVal;
+}
+
+int Notifier::GetPriority(bool* isRealTime) {
+  int32_t status = 0;
+  HAL_Bool isRt = false;
+  auto retVal = HAL_GetNotifierThreadPriority(m_notifier, &isRt, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  *isRealTime = isRt;
+  return retVal;
 }
 
 /**

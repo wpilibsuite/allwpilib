@@ -25,7 +25,7 @@ int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
                               int32_t* status) {
   sched_param sch;
   int policy;
-  int success = pthread_getschedparam(*handle, &policy, &sch);
+  int success = pthread_getschedparam(handle, &policy, &sch);
   if (success == 0) {
     *status = 0;
   } else {
@@ -52,7 +52,7 @@ int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
  */
 int32_t HAL_GetCurrentThreadPriority(HAL_Bool* isRealTime, int32_t* status) {
   auto thread = pthread_self();
-  return HAL_GetThreadPriority(&thread, isRealTime, status);
+  return HAL_GetThreadPriority(thread, isRealTime, status);
 }
 
 /**
@@ -69,7 +69,7 @@ int32_t HAL_GetCurrentThreadPriority(HAL_Bool* isRealTime, int32_t* status) {
  */
 HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
                                int32_t priority, int32_t* status) {
-  if (handle == nullptr) {
+  if (handle == 0) {
     *status = NULL_PARAMETER;
     return false;
   }
@@ -87,13 +87,13 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
 
   sched_param sch;
   int policy;
-  pthread_getschedparam(*handle, &policy, &sch);
+  pthread_getschedparam(handle, &policy, &sch);
   if (scheduler == SCHED_FIFO || scheduler == SCHED_RR)
     sch.sched_priority = priority;
   else
     // Only need to set 0 priority for non RT thread
     sch.sched_priority = 0;
-  if (pthread_setschedparam(*handle, scheduler, &sch)) {
+  if (pthread_setschedparam(handle, scheduler, &sch)) {
     *status = HAL_THREAD_PRIORITY_ERROR;
     return false;
   } else {
@@ -117,6 +117,6 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
 HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
                                       int32_t* status) {
   auto thread = pthread_self();
-  return HAL_SetThreadPriority(&thread, realTime, priority, status);
+  return HAL_SetThreadPriority(thread, realTime, priority, status);
 }
 }

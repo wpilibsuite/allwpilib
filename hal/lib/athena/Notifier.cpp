@@ -17,6 +17,7 @@
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
 #include "HAL/HAL.h"
+#include "HAL/Threads.h"
 #include "HAL/cpp/NotifierInternal.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
@@ -83,6 +84,15 @@ class NotifierThreadOwner : public wpi::SafeThreadOwner<NotifierThread> {
     thr->m_handle = handle;
     thr->m_notify = true;
     thr->m_cond.notify_one();
+  }
+
+  HAL_Bool SetPriority(HAL_Bool realTime, int32_t priority, int32_t* status) {
+    return HAL_SetThreadPriority(GetNativeThreadHandle(), realTime, priority,
+                                 status);
+  }
+
+  int32_t GetPriority(HAL_Bool* isRealTime, int32_t* status) {
+    return HAL_GetThreadPriority(GetNativeThreadHandle(), isRealTime, status);
   }
 
   void* m_param;
@@ -295,6 +305,31 @@ void HAL_StopNotifierAlarm(HAL_NotifierHandle notifierHandle, int32_t* status) {
   auto notifier = notifierHandles.Get(notifierHandle);
   if (!notifier) return;
   notifier->triggerTime = UINT64_MAX;
+}
+
+HAL_Bool HAL_SetNotifierThreadPriority(HAL_NotifierHandle notifierHandle,
+                                       HAL_Bool realTime, int32_t priority,
+                                       int32_t* status) {
+  std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
+  auto notifier = notifierHandles.Get(notifierHandle);
+  if (!notifier) return false;
+  if (!notifier->threaded) return false;
+  NotifierThreadOwner* owner =
+      static_cast<NotifierThreadOwner*>(notifier->param);
+  if (!owner) return false;
+  return owner->SetPriority(realTime, priority, status);
+}
+
+int32_t HAL_GetNotifierThreadPriority(HAL_NotifierHandle notifierHandle,
+                                      HAL_Bool* isRealTime, int32_t* status) {
+  std::lock_guard<priority_recursive_mutex> sync(notifierMutex);
+  auto notifier = notifierHandles.Get(notifierHandle);
+  if (!notifier) return -1;
+  if (!notifier->threaded) return -1;
+  NotifierThreadOwner* owner =
+      static_cast<NotifierThreadOwner*>(notifier->param);
+  if (!owner) return -1;
+  return owner->GetPriority(isRealTime, status);
 }
 
 }  // extern "C"

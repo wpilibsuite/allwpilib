@@ -11,10 +11,10 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#define NativeThreadHandle const HANDLE*
+#define NativeThreadHandle const HANDLE
 #else
 #include <pthread.h>
-#define NativeThreadHandle const pthread_t*
+#define NativeThreadHandle const pthread_t
 #endif
 
 extern "C" {
