@@ -369,6 +369,36 @@ inline VideoProperty CvSource::CreateProperty(llvm::StringRef name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
+inline VideoProperty CvSource::CreateIntegerProperty(llvm::StringRef name,
+                                                    int minimum, int maximum,
+                                                    int step, int defaultValue,
+                                                    int value) {
+  m_status = 0;
+  return VideoProperty{CreateSourceProperty(
+      m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(VideoProperty::Kind::kInteger)),
+      minimum, maximum, step, defaultValue, value, &m_status)};
+}
+
+inline VideoProperty CvSource::CreateBooleanProperty(llvm::StringRef name,
+                                                     bool defaultValue,
+                                                     bool value) {
+  m_status = 0;
+  return VideoProperty{CreateSourceProperty(
+      m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(VideoProperty::Kind::kBoolean)),
+      0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
+}
+
+inline VideoProperty CvSource::CreateStringProperty(llvm::StringRef name,
+                                                    llvm::StringRef value) {
+  m_status = 0;
+  auto prop = VideoProperty{CreateSourceProperty(
+      m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(VideoProperty::Kind::kString)),
+      0, 0, 0, 0, 0, &m_status)};
+  prop.SetString(value);
+  return prop;
+}
+
+
 inline void CvSource::SetEnumPropertyChoices(
     const VideoProperty& property, llvm::ArrayRef<std::string> choices) {
   m_status = 0;

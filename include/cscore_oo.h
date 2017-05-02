@@ -408,6 +408,34 @@ class CvSource : public VideoSource {
                                int minimum, int maximum, int step,
                                int defaultValue, int value);
 
+  /// Create an integer property.
+  /// @param name Property name
+  /// @param minimum Minimum value
+  /// @param maximum Maximum value
+  /// @param step Step value
+  /// @param defaultValue Default value
+  /// @param value Current value
+  /// @return Property
+  VideoProperty CreateIntegerProperty(llvm::StringRef name,
+                                      int minimum, int maximum, int step,
+                                      int defaultValue, int value);
+
+  /// Create a boolean property.
+  /// @param name Property name
+  /// @param defaultValue Default value
+  /// @param value Current value
+  /// @return Property
+  VideoProperty CreateBooleanProperty(llvm::StringRef name,
+                                      bool defaultValue, bool value);
+  
+  /// Create a string property.
+  /// @param name Property name
+  /// @param defaultValue Default value
+  /// @param value Current value
+  /// @return Property
+  VideoProperty CreateStringProperty(llvm::StringRef name,
+                                     llvm::StringRef value);
+
   /// Configure enum property choices.
   /// @param property Property
   /// @param choices Choices

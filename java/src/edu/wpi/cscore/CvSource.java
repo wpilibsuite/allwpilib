@@ -84,6 +84,40 @@ public class CvSource extends VideoSource {
     return new VideoProperty(
         CameraServerJNI.createSourceProperty(m_handle, name, kind.getValue(), minimum, maximum, step, defaultValue, value));
   }
+  
+  /// Create an integer property.
+  /// @param name Property name
+  /// @param minimum Minimum value
+  /// @param maximum Maximum value
+  /// @param step Step value
+  /// @param defaultValue Default value
+  /// @param value Current value
+  /// @return Property
+  public VideoProperty createIntegerProperty(String name, int minimum, int maximum, int step, int defaultValue, int value) {
+    return new VideoProperty(
+        CameraServerJNI.createSourceProperty(m_handle, name, VideoProperty.Kind.kInteger.getValue(), minimum, maximum, step, defaultValue, value));
+  }
+  
+  /// Create a boolean property.
+  /// @param name Property name
+  /// @param defaultValue Default value
+  /// @param value Current value
+  /// @return Property
+  public VideoProperty createBooleanProperty(String name, boolean defaultValue, boolean value) {
+    return new VideoProperty(
+        CameraServerJNI.createSourceProperty(m_handle, name, VideoProperty.Kind.kBoolean.getValue(), 0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0));
+  }
+  
+  /// Create a string property.
+  /// @param name Property name
+  /// @param value Current value
+  /// @return Property
+  public VideoProperty createStringProperty(String name, String value) {
+    VideoProperty prop = new VideoProperty(
+        CameraServerJNI.createSourceProperty(m_handle, name, VideoProperty.Kind.kString.getValue(), 0, 0, 0, 0, 0));
+    prop.setString(value);
+    return prop;
+  }
 
   /// Create a property with a change callback.
   /// @param name Property name
