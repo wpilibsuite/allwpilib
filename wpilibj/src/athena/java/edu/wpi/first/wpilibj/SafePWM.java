@@ -75,9 +75,20 @@ public class SafePWM extends PWM implements MotorSafety {
   /**
    * Feed the MotorSafety timer. This method is called by the subclass motor whenever it updates its
    * speed, thereby resetting the timeout value.
+   *
+   * @deprecated Use {@link #feed()} instead.
    */
+  @Deprecated
   @SuppressWarnings("MethodName")
   public void Feed() {
+    feed();
+  }
+
+  /**
+   * Feed the MotorSafety timer. This method is called by the subclass motor whenever it updates its
+   * speed, thereby resetting the timeout value.
+   */
+  public void feed() {
     m_safetyHelper.feed();
   }
 
