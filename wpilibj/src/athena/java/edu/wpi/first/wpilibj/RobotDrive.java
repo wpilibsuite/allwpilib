@@ -282,8 +282,8 @@ public class RobotDrive implements MotorSafety {
     // square the inputs (while preserving the sign) to increase fine control
     // while permitting full power
     if (squaredInputs) {
-      leftValue = squarePreserveSign(leftValue);
-      rightValue = squarePreserveSign(rightValue);
+      leftValue = Math.copySign(leftValue * leftValue, leftValue);
+      rightValue = Math.copySign(rightValue * rightValue, rightValue);
     }
     setLeftRightMotorOutputs(leftValue, rightValue);
   }
@@ -389,8 +389,8 @@ public class RobotDrive implements MotorSafety {
     if (squaredInputs) {
       // square the inputs (while preserving the sign) to increase fine control
       // while permitting full power
-      moveValue = squarePreserveSign(moveValue);
-      rotateValue = squarePreserveSign(rotateValue);
+      moveValue = Math.copySign(moveValue * moveValue, moveValue);
+      rotateValue = Math.copySign(rotateValue * rotateValue, rotateValue);
     }
 
     if (moveValue > 0.0) {
@@ -575,13 +575,6 @@ public class RobotDrive implements MotorSafety {
       return -1.0;
     }
     return number;
-  }
-
-  /**
-   * Squares the number but preserves the sign.
-   */
-  protected static double squarePreserveSign(double number) {
-    return Math.copySign(number * number, number);
   }
 
   /**

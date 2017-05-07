@@ -99,7 +99,6 @@ class RobotDrive : public MotorSafety, public ErrorBase {
  protected:
   void InitRobotDrive();
   double Limit(double number);
-  double SquarePreserveSign(double number);
   void Normalize(double* wheelSpeeds);
   void RotateVector(double& x, double& y, double angle);
 

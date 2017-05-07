@@ -318,8 +318,8 @@ void RobotDrive::TankDrive(double leftValue, double rightValue,
   // square the inputs (while preserving the sign) to increase fine control
   // while permitting full power
   if (squaredInputs) {
-    leftValue = SquarePreserveSign(leftValue);
-    rightValue = SquarePreserveSign(rightValue);
+    leftValue = std::copysign(leftValue * leftValue, leftValue);
+    rightValue = std::copysign(rightValue * rightValue, rightValue);
   }
 
   SetLeftRightMotorOutputs(leftValue, rightValue);
@@ -439,8 +439,8 @@ void RobotDrive::ArcadeDrive(double moveValue, double rotateValue,
   // square the inputs (while preserving the sign) to increase fine control
   // while permitting full power
   if (squaredInputs) {
-    moveValue = SquarePreserveSign(moveValue);
-    rotateValue = SquarePreserveSign(rotateValue);
+    moveValue = std::copysign(moveValue * moveValue, moveValue);
+    rotateValue = std::copysign(rotateValue * rotateValue, rotateValue);
   }
 
   if (moveValue > 0.0) {
@@ -618,13 +618,6 @@ double RobotDrive::Limit(double number) {
     return -1.0;
   }
   return number;
-}
-
-/**
- * Squares the number but preserves the sign.
- */
-double RobotDrive::SquarePreserveSign(double number) {
-  return std::copysign(number * number, number);
 }
 
 /**
