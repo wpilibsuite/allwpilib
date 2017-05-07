@@ -104,14 +104,14 @@ public class SmartDashboard {
    * @param types bitmask of types; 0 is treated as a "don't care".
    * @return keys currently in the table
    */
-  public Set<String> getKeys(int types) {
+  public static Set<String> getKeys(int types) {
     return table.getKeys(types);
   }
 
   /**
    * @return keys currently in the table.
    */
-  public Set<String> getKeys() {
+  public static Set<String> getKeys() {
     return table.getKeys();
   }
 
@@ -121,7 +121,7 @@ public class SmartDashboard {
    *
    * @param key the key name
    */
-  public void setPersistent(String key) {
+  public static void setPersistent(String key) {
     table.setPersistent(key);
   }
 
@@ -131,7 +131,7 @@ public class SmartDashboard {
    *
    * @param key the key name
    */
-  public void clearPersistent(String key) {
+  public static void clearPersistent(String key) {
     table.clearPersistent(key);
   }
 
@@ -142,7 +142,7 @@ public class SmartDashboard {
    * @param key the key name
    * @return True if the value is persistent.
    */
-  public boolean isPersistent(String key) {
+  public static boolean isPersistent(String key) {
     return table.isPersistent(key);
   }
 
@@ -153,7 +153,7 @@ public class SmartDashboard {
    * @param key the key name
    * @param flags the flags to set (bitmask)
    */
-  public void setFlags(String key, int flags) {
+  public static void setFlags(String key, int flags) {
     table.setFlags(key, flags);
   }
 
@@ -164,7 +164,7 @@ public class SmartDashboard {
    * @param key the key name
    * @param flags the flags to clear (bitmask)
    */
-  public void clearFlags(String key, int flags) {
+  public static void clearFlags(String key, int flags) {
     table.clearFlags(key, flags);
   }
 
@@ -174,7 +174,7 @@ public class SmartDashboard {
    * @param key the key name
    * @return the flags, or 0 if the key is not defined
    */
-  public int getFlags(String key) {
+  public static int getFlags(String key) {
     return table.getFlags(key);
   }
 
@@ -184,7 +184,7 @@ public class SmartDashboard {
    *
    * @param key the key name
    */
-  public void delete(String key) {
+  public static void delete(String key) {
     table.delete(key);
   }
 
@@ -204,7 +204,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultBoolean(String key, boolean defaultValue) {
+  public static boolean setDefaultBoolean(String key, boolean defaultValue) {
     return table.setDefaultBoolean(key, defaultValue);
   }
 
@@ -250,7 +250,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultNumber(String key, double defaultValue) {
+  public static boolean setDefaultNumber(String key, double defaultValue) {
     return table.setDefaultNumber(key, defaultValue);
   }
 
@@ -296,7 +296,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultString(String key, String defaultValue) {
+  public static boolean setDefaultString(String key, String defaultValue) {
     return table.setDefaultString(key, defaultValue);
   }
 
@@ -332,7 +332,7 @@ public class SmartDashboard {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  public boolean putBooleanArray(String key, boolean[] value) {
+  public static boolean putBooleanArray(String key, boolean[] value) {
     return table.putBooleanArray(key, value);
   }
 
@@ -342,7 +342,7 @@ public class SmartDashboard {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  public boolean putBooleanArray(String key, Boolean[] value) {
+  public static boolean putBooleanArray(String key, Boolean[] value) {
     return table.putBooleanArray(key, value);
   }
 
@@ -352,7 +352,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultBooleanArray(String key, boolean[] defaultValue) {
+  public static boolean setDefaultBooleanArray(String key, boolean[] defaultValue) {
     return table.setDefaultBooleanArray(key, defaultValue);
   }
 
@@ -362,7 +362,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
+  public static boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
     return table.setDefaultBooleanArray(key, defaultValue);
   }
 
@@ -388,7 +388,7 @@ public class SmartDashboard {
    * @return the value associated with the given key or the given default value
    *     if there is no value associated with the key
    */
-  public boolean[] getBooleanArray(String key, boolean[] defaultValue) {
+  public static boolean[] getBooleanArray(String key, boolean[] defaultValue) {
     return table.getBooleanArray(key, defaultValue);
   }
 
@@ -400,7 +400,7 @@ public class SmartDashboard {
    * @return the value associated with the given key or the given default value
    *     if there is no value associated with the key
    */
-  public Boolean[] getBooleanArray(String key, Boolean[] defaultValue) {
+  public static Boolean[] getBooleanArray(String key, Boolean[] defaultValue) {
     return table.getBooleanArray(key, defaultValue);
   }
 
@@ -410,7 +410,7 @@ public class SmartDashboard {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  public boolean putNumberArray(String key, double[] value) {
+  public static boolean putNumberArray(String key, double[] value) {
     return table.putNumberArray(key, value);
   }
 
@@ -420,7 +420,7 @@ public class SmartDashboard {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  public boolean putNumberArray(String key, Double[] value) {
+  public static boolean putNumberArray(String key, Double[] value) {
     return table.putNumberArray(key, value);
   }
 
@@ -430,7 +430,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultNumberArray(String key, double[] defaultValue) {
+  public static boolean setDefaultNumberArray(String key, double[] defaultValue) {
     return table.setDefaultNumberArray(key, defaultValue);
   }
 
@@ -440,7 +440,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultNumberArray(String key, Double[] defaultValue) {
+  public static boolean setDefaultNumberArray(String key, Double[] defaultValue) {
     return table.setDefaultNumberArray(key, defaultValue);
   }
 
@@ -466,7 +466,7 @@ public class SmartDashboard {
    * @return the value associated with the given key or the given default value
    *     if there is no value associated with the key
    */
-  public double[] getNumberArray(String key, double[] defaultValue) {
+  public static double[] getNumberArray(String key, double[] defaultValue) {
     return table.getNumberArray(key, defaultValue);
   }
 
@@ -478,7 +478,7 @@ public class SmartDashboard {
    * @return the value associated with the given key or the given default value
    *     if there is no value associated with the key
    */
-  public Double[] getNumberArray(String key, Double[] defaultValue) {
+  public static Double[] getNumberArray(String key, Double[] defaultValue) {
     return table.getNumberArray(key, defaultValue);
   }
 
@@ -488,7 +488,7 @@ public class SmartDashboard {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  public boolean putStringArray(String key, String[] value) {
+  public static boolean putStringArray(String key, String[] value) {
     return table.putStringArray(key, value);
   }
 
@@ -498,7 +498,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultStringArray(String key, String[] defaultValue) {
+  public static boolean setDefaultStringArray(String key, String[] defaultValue) {
     return table.setDefaultStringArray(key, defaultValue);
   }
 
@@ -524,7 +524,7 @@ public class SmartDashboard {
    * @return the value associated with the given key or the given default value
    *     if there is no value associated with the key
    */
-  public String[] getStringArray(String key, String[] defaultValue) {
+  public static String[] getStringArray(String key, String[] defaultValue) {
     return table.getStringArray(key, defaultValue);
   }
 
@@ -534,7 +534,7 @@ public class SmartDashboard {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  public boolean putRaw(String key, byte[] value) {
+  public static boolean putRaw(String key, byte[] value) {
     return table.putRaw(key, value);
   }
 
@@ -545,7 +545,7 @@ public class SmartDashboard {
    * @param len the length of the value
    * @return False if the table key already exists with a different type
    */
-  public boolean putRaw(String key, ByteBuffer value, int len) {
+  public static boolean putRaw(String key, ByteBuffer value, int len) {
     return table.putRaw(key, value, len);
   }
 
@@ -555,7 +555,7 @@ public class SmartDashboard {
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
-  public boolean setDefaultRaw(String key, byte[] defaultValue) {
+  public static boolean setDefaultRaw(String key, byte[] defaultValue) {
     return table.setDefaultRaw(key, defaultValue);
   }
 
@@ -581,7 +581,7 @@ public class SmartDashboard {
    * @return the value associated with the given key or the given default value
    *     if there is no value associated with the key
    */
-  public byte[] getRaw(String key, byte[] defaultValue) {
+  public static byte[] getRaw(String key, byte[] defaultValue) {
     return table.getRaw(key, defaultValue);
   }
 
