@@ -37,7 +37,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
     checkDigitalChannel(channel);
     m_channel = channel;
 
-    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte)channel), false);
+    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), false);
 
     HAL.report(tResourceType.kResourceType_DigitalOutput, channel);
   }

@@ -47,7 +47,7 @@ public class BuiltInAccelerometerTest extends AbstractComsSetup {
   @Parameters
   public static Collection<Accelerometer.Range[]> generateData() {
     return Arrays.asList(new Accelerometer.Range[][]{{Accelerometer.Range.k2G},
-        {Accelerometer.Range.k4G}, {Accelerometer.Range.k8G},});
+        {Accelerometer.Range.k4G}, {Accelerometer.Range.k8G}});
   }
 
   @Override

@@ -649,7 +649,7 @@ public class DriverStation implements RobotState.Interface {
    */
   public boolean waitForData(double timeout) {
     long startTime = Utility.getFPGATime();
-    long timeoutMicros = (long)(timeout * 1000000);
+    long timeoutMicros = (long) (timeout * 1000000);
     m_dataMutex.lock();
     try {
       try {

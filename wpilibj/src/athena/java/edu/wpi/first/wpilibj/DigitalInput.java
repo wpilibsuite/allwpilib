@@ -33,7 +33,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
     checkDigitalChannel(channel);
     m_channel = channel;
 
-    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte)channel), true);
+    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), true);
 
     LiveWindow.addSensor("DigitalInput", channel, this);
     HAL.report(tResourceType.kResourceType_DigitalInput, channel);
