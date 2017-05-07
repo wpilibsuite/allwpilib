@@ -412,12 +412,10 @@ CameraServer::CameraServer()
           }
           case cs::VideoEvent::kSinkSourceChanged:
           case cs::VideoEvent::kSinkCreated:
-          case cs::VideoEvent::kSinkDestroyed: {
-            UpdateStreamValues();
-            break;
-          }
+          case cs::VideoEvent::kSinkDestroyed:
           case cs::VideoEvent::kNetworkInterfacesChanged: {
             m_addresses = cs::GetNetworkInterfaces();
+            UpdateStreamValues();
             break;
           }
           default:
