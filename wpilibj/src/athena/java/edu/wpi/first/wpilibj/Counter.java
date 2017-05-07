@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
  * Class for counting the number of ticks on a digital input channel. This is a general purpose
@@ -541,8 +540,10 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   public void setPIDSourceType(PIDSourceType pidSource) {
     if (pidSource == null) {
       throw new NullPointerException("PID Source Parameter given was null");
+    } else if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
+      throw new IllegalArgumentException("PID Source parameter was not valid type: " + pidSource);
     }
-    BoundaryException.assertWithinBounds(pidSource.value, 0, 1);
+
     m_pidSource = pidSource;
   }
 
