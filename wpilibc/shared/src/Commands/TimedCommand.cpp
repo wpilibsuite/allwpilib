@@ -9,9 +9,23 @@
 
 using namespace frc;
 
+/**
+ * Creates a new TimedCommand with the given name and timeout.
+ *
+ * @param name    the name of the command
+ * @param timeout the time (in seconds) before this command "times out"
+ */
 TimedCommand::TimedCommand(const std::string& name, double timeout)
     : Command(name, timeout) {}
 
+/**
+ * Creates a new WaitCommand with the given timeout.
+ *
+ * @param timeout the time (in seconds) before this command "times out"
+ */
 TimedCommand::TimedCommand(double timeout) : Command(timeout) {}
 
+/**
+ * Ends command when timed out.
+ */
 bool TimedCommand::IsFinished() { return IsTimedOut(); }
