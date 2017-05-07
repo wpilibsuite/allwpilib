@@ -17,6 +17,7 @@ using namespace frc;
  */
 WaitCommand::WaitCommand(double timeout)
     : TimedCommand("Wait(" + std::to_string(timeout) + ")", timeout) {}
+
 /**
  * Creates a new WaitCommand with the given timeout.
  *
