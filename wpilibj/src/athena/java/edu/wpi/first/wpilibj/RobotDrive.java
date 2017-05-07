@@ -276,21 +276,14 @@ public class RobotDrive implements MotorSafety {
       kTank_Reported = true;
     }
 
-    // square the inputs (while preserving the sign) to increase fine control
-    // while permitting full power
     leftValue = limit(leftValue);
     rightValue = limit(rightValue);
+
+    // square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power
     if (squaredInputs) {
-      if (leftValue >= 0.0) {
-        leftValue = leftValue * leftValue;
-      } else {
-        leftValue = -(leftValue * leftValue);
-      }
-      if (rightValue >= 0.0) {
-        rightValue = rightValue * rightValue;
-      } else {
-        rightValue = -(rightValue * rightValue);
-      }
+      leftValue = Math.copySign(leftValue * leftValue, leftValue);
+      rightValue = Math.copySign(rightValue * rightValue, rightValue);
     }
     setLeftRightMotorOutputs(leftValue, rightValue);
   }
@@ -391,19 +384,13 @@ public class RobotDrive implements MotorSafety {
     moveValue = limit(moveValue);
     rotateValue = limit(rotateValue);
 
+    // square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power
     if (squaredInputs) {
       // square the inputs (while preserving the sign) to increase fine control
       // while permitting full power
-      if (moveValue >= 0.0) {
-        moveValue = moveValue * moveValue;
-      } else {
-        moveValue = -(moveValue * moveValue);
-      }
-      if (rotateValue >= 0.0) {
-        rotateValue = rotateValue * rotateValue;
-      } else {
-        rotateValue = -(rotateValue * rotateValue);
-      }
+      moveValue = Math.copySign(moveValue * moveValue, moveValue);
+      rotateValue = Math.copySign(rotateValue * rotateValue, rotateValue);
     }
 
     if (moveValue > 0.0) {
@@ -580,14 +567,14 @@ public class RobotDrive implements MotorSafety {
   /**
    * Limit motor values to the -1.0 to +1.0 range.
    */
-  protected static double limit(double num) {
-    if (num > 1.0) {
+  protected static double limit(double number) {
+    if (number > 1.0) {
       return 1.0;
     }
-    if (num < -1.0) {
+    if (number < -1.0) {
       return -1.0;
     }
-    return num;
+    return number;
   }
 
   /**
