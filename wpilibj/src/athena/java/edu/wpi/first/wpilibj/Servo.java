@@ -132,11 +132,7 @@ public class Servo extends PWM {
 
   @Override
   public void startLiveWindowMode() {
-    m_tableListener = new ITableListener() {
-      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-        set(((Double) value).doubleValue());
-      }
-    };
+    m_tableListener = (source, key, value, isNew) -> set((double) value);
     m_table.addTableListener("Value", m_tableListener, true);
   }
 

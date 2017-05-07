@@ -256,12 +256,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
 
   @Override
   public void startLiveWindowMode() {
-    m_tableListener = new ITableListener() {
-      @Override
-      public void valueChanged(ITable itable, String key, Object value, boolean bln) {
-        set((Boolean) value);
-      }
-    };
+    m_tableListener = (source, key, value, isNew) -> set((boolean) value);
     m_table.addTableListener("Value", m_tableListener, true);
   }
 
