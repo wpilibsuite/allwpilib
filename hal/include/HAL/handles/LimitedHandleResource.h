@@ -54,8 +54,7 @@ template <typename THandle, typename TStruct, int16_t size,
 THandle LimitedHandleResource<THandle, TStruct, size, enumValue>::Allocate() {
   // globally lock to loop through indices
   std::lock_guard<priority_mutex> sync(m_allocateMutex);
-  int16_t i;
-  for (i = 0; i < size; i++) {
+  for (int16_t i = 0; i < size; i++) {
     if (m_structures[i] == nullptr) {
       // if a false index is found, grab its specific mutex
       // and allocate it.
