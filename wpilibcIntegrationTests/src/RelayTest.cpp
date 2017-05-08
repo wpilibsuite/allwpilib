@@ -47,22 +47,46 @@ TEST_F(RelayTest, Relay) {
   Wait(kDelayTime);
   EXPECT_TRUE(m_forward->Get()) << "Relay did not set forward";
   EXPECT_FALSE(m_reverse->Get()) << "Relay did not set forward";
+  EXPECT_EQ(m_relay->Get(), Relay::kForward);
 
   // set the relay to reverse
   m_relay->Set(Relay::kReverse);
   Wait(kDelayTime);
   EXPECT_TRUE(m_reverse->Get()) << "Relay did not set reverse";
   EXPECT_FALSE(m_forward->Get()) << "Relay did not set reverse";
+  EXPECT_EQ(m_relay->Get(), Relay::kReverse);
 
   // set the relay to off
   m_relay->Set(Relay::kOff);
   Wait(kDelayTime);
   EXPECT_FALSE(m_forward->Get()) << "Relay did not set off";
   EXPECT_FALSE(m_reverse->Get()) << "Relay did not set off";
+  EXPECT_EQ(m_relay->Get(), Relay::kOff);
 
   // set the relay to on
   m_relay->Set(Relay::kOn);
   Wait(kDelayTime);
   EXPECT_TRUE(m_forward->Get()) << "Relay did not set on";
   EXPECT_TRUE(m_reverse->Get()) << "Relay did not set on";
+  EXPECT_EQ(m_relay->Get(), Relay::kOn);
+  
+  // test forward direction
+  delete(m_relay);
+  m_relay = new Relay(TestBench::kRelayChannel, Relay::kForwardOnly);
+  
+  m_relay->Set(Relay::kOn);
+  Wait(kDelayTime);
+  EXPECT_TRUE(m_forward->Get()) << "Relay did not set forward";
+  EXPECT_FALSE(m_reverse->Get()) << "Relay did not set forward";
+  EXPECT_EQ(m_relay->Get(), Relay::kOn);
+    
+  // test reverse direction
+  delete(m_relay);
+  m_relay = new Relay(TestBench::kRelayChannel, Relay::kReverseOnly);
+
+  m_relay->Set(Relay::kOn);
+  Wait(kDelayTime);
+  EXPECT_FALSE(m_forward->Get()) << "Relay did not set reverse";
+  EXPECT_TRUE(m_reverse->Get()) << "Relay did not set reverse";
+  EXPECT_EQ(m_relay->Get(), Relay::kOn);
 }
