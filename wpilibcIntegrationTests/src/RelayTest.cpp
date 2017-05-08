@@ -69,19 +69,19 @@ TEST_F(RelayTest, Relay) {
   EXPECT_TRUE(m_forward->Get()) << "Relay did not set on";
   EXPECT_TRUE(m_reverse->Get()) << "Relay did not set on";
   EXPECT_EQ(m_relay->Get(), Relay::kOn);
-  
+
   // test forward direction
-  delete(m_relay);
+  delete m_relay;
   m_relay = new Relay(TestBench::kRelayChannel, Relay::kForwardOnly);
-  
+
   m_relay->Set(Relay::kOn);
   Wait(kDelayTime);
   EXPECT_TRUE(m_forward->Get()) << "Relay did not set forward";
   EXPECT_FALSE(m_reverse->Get()) << "Relay did not set forward";
   EXPECT_EQ(m_relay->Get(), Relay::kOn);
-    
+
   // test reverse direction
-  delete(m_relay);
+  delete m_relay;
   m_relay = new Relay(TestBench::kRelayChannel, Relay::kReverseOnly);
 
   m_relay->Set(Relay::kOn);
