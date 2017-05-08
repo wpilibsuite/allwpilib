@@ -87,13 +87,13 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     assertEquals(Value.kReverse, m_relayFixture.getRelay().get());
     assertEquals("Reverse", table.getString("Value"));
   }
-  
+
   @Test
   public void testForwardDirection() {
     m_relayFixture.getRelay().setDirection(Direction.kForward);
     m_relayFixture.getRelay().set(Value.kOn);
     m_relayFixture.getRelay().updateTable();
-    assertFalse("Input one was not low when relay set Value.kOn in kForward Direction", 
+    assertFalse("Input one was not low when relay set Value.kOn in kForward Direction",
         m_relayFixture.getInputOne().get());
     assertTrue("Input two was not high when relay set Value.kOn in kForward Direction",
         m_relayFixture.getInputTwo().get());
@@ -106,14 +106,14 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     m_relayFixture.getRelay().setDirection(Direction.kReverse);
     m_relayFixture.getRelay().set(Value.kOn);
     m_relayFixture.getRelay().updateTable();
-    assertTrue("Input one was not high when relay set Value.kOn in kReverse Direction", 
+    assertTrue("Input one was not high when relay set Value.kOn in kReverse Direction",
         m_relayFixture.getInputOne().get());
-    assertFalse("Input two was not low when relay set Value.kOn in kReverse Direction", 
+    assertFalse("Input two was not low when relay set Value.kOn in kReverse Direction",
         m_relayFixture.getInputTwo().get());
     assertEquals(Value.kOn, m_relayFixture.getRelay().get());
     assertEquals("On", table.getString("Value"));
   }
-  
+
   @Test(expected = InvalidValueException.class)
   public void testSetValueForwardWithDirectionReverseThrowingException() {
     m_relayFixture.getRelay().setDirection(Direction.kForward);
