@@ -345,6 +345,52 @@ public class RobotDrive implements MotorSafety {
 
     arcadeDrive(moveValue, rotateValue, squaredInputs);
   }
+  
+  /**
+   * Most commonly used with Video Game like style Driving.
+   * EX: Right Trigger to go forward, Left Trigger to go backwards, left/right joystick to turn.
+   * 
+   * @param forwardTrigger     The Joystick object that represents the forward direction
+   * @param forwardAxis        The axis on the moveStick object to use for forwards
+   * @param reverseTrigger     The Joystick object that represents the reverse direction
+   * @param reverseAxis        The axis on the moveStick object to use for reverse
+   * @param rotateStick        The Joystick object that represents the rotation value
+   * @param rotateAxis         The axis on the rotation object to use for the rotate right/left
+   *                           (typically X_AXIS)
+   * @param squaredInputs      Setting this parameter to true decreases the sensitivity at lower speeds
+   */
+  
+  public void 3AxisArcadeDrive(GenericHID forwardTrigger, final int forwardAxis, 
+			GenericHID reverseTrigger, final int reverseAxis, GenericHID rotateStick, 
+			final int rotateAxis, boolean squaredInputs)
+	{
+		double moveValue;
+		
+		if(forwardTrigger.getRawAxis(forwardAxis) != 0 &&
+				reverseTrigger.getRawAxis(reverseAxis) == 0)
+		{
+			moveValue = forwardTrigger.getRawAxis(forwardAxis);
+		}
+		else if(reverseTrigger.getRawAxis(reverseAxis) != 0 &&
+				forwardTrigger.getRawAxis(forwardAxis) == 0)
+		{
+			moveValue = reverseTrigger.getRawAxis(reverseAxis) * -1;
+		}
+		else if(reverseTrigger.getRawAxis(reverseAxis) != 0 &&
+				forwardTrigger.getRawAxis(forwardAxis) != 0)
+		{
+			moveValue = forwardTrigger.getRawAxis(forwardAxis);
+		}
+		else
+		{
+			moveValue = 0;
+		}
+		
+		double rotateValue = rotateStick.getRawAxis(rotateAxis);
+		
+		arcadeDrive(moveValue, rotateValue, squaredInputs);
+		 
+	}
 
   /**
    * Arcade drive implements single stick driving. Given two joystick instances and two axis,
