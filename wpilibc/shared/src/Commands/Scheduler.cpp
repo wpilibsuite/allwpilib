@@ -154,6 +154,7 @@ void Scheduler::Run() {
       ProcessCommandAddition(lock->GetDefaultCommand());
     }
     lock->ConfirmCommand();
+    lock->Periodic();
   }
 
   UpdateTable();

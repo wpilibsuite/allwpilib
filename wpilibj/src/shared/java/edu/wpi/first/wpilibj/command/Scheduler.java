@@ -223,6 +223,7 @@ public class Scheduler implements NamedSendable {
         _add(lock.getDefaultCommand());
       }
       lock.confirmCommand();
+      lock.periodic();
     }
 
     updateTable();
