@@ -25,21 +25,21 @@ class Notification {
  public:
   // Efficiently waits until the Notification has been notified once.
   void Wait() {
-    std::unique_lock<priority_mutex> lock(m_mutex);
+    std::unique_lock<hal::priority_mutex> lock(m_mutex);
     while (!m_set) {
       m_condition.wait(lock);
     }
   }
   // Sets the condition to true, and wakes all waiting threads.
   void Notify() {
-    std::lock_guard<priority_mutex> lock(m_mutex);
+    std::lock_guard<hal::priority_mutex> lock(m_mutex);
     m_set = true;
     m_condition.notify_all();
   }
 
  private:
-  // priority_mutex used for the notification and to protect the bit.
-  priority_mutex m_mutex;
+  // hal::priority_mutex used for the notification and to protect the bit.
+  hal::priority_mutex m_mutex;
   // Condition for threads to sleep on.
   std::condition_variable_any m_condition;
   // Bool which is true when the notification has been notified.
@@ -87,7 +87,7 @@ class LowPriorityThread {
   bool success() { return m_success.load(); }
 
  private:
-  // priority_mutex to grab and release.
+  // hal::priority_mutex to grab and release.
   MutexType* m_mutex;
   Notification m_started;
   // Atomic type used to signal when the thread should unlock the mutex.
@@ -226,7 +226,7 @@ class InversionTestRunner {
 
 // Priority inversion test.
 TEST(MutexTest, DISABLED_PriorityInversionTest) {
-  InversionTestRunner<priority_mutex> runner;
+  InversionTestRunner<hal::priority_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
   EXPECT_TRUE(runner.success());
@@ -242,7 +242,7 @@ TEST(MutexTest, DISABLED_StdMutexPriorityInversionTest) {
 
 // Smoke test to make sure that mutexes lock and unlock.
 TEST(MutexTest, TryLock) {
-  priority_mutex m;
+  hal::priority_mutex m;
   m.lock();
   EXPECT_FALSE(m.try_lock());
   m.unlock();
@@ -251,7 +251,7 @@ TEST(MutexTest, TryLock) {
 
 // Priority inversion test.
 TEST(MutexTest, DISABLED_ReentrantPriorityInversionTest) {
-  InversionTestRunner<priority_recursive_mutex> runner;
+  InversionTestRunner<hal::priority_recursive_mutex> runner;
   std::thread runner_thread(std::ref(runner));
   runner_thread.join();
   EXPECT_TRUE(runner.success());
@@ -259,7 +259,7 @@ TEST(MutexTest, DISABLED_ReentrantPriorityInversionTest) {
 
 // Smoke test to make sure that mutexes lock and unlock.
 TEST(MutexTest, ReentrantTryLock) {
-  priority_recursive_mutex m;
+  hal::priority_recursive_mutex m;
   m.lock();
   EXPECT_TRUE(m.try_lock());
   m.unlock();

@@ -295,7 +295,7 @@ bool DriverStation::WaitForData(double timeout) {
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 #endif
 
-  std::unique_lock<priority_mutex> lock(m_waitForDataMutex);
+  std::unique_lock<hal::priority_mutex> lock(m_waitForDataMutex);
   while (!m_updatedControlLoopData) {
     if (timeout > 0) {
       auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
@@ -368,7 +368,7 @@ void DriverStation::stateCallback(
     *state = *msg;
   }
   {
-    std::lock_guard<priority_mutex> lock(m_waitForDataMutex);
+    std::lock_guard<hal::priority_mutex> lock(m_waitForDataMutex);
     m_updatedControlLoopData = true;
   }
   m_waitForDataCond.notify_all();

@@ -37,12 +37,12 @@ class MotorSafetyHelper : public ErrorBase {
   // the FPGA clock value when this motor has expired
   double m_stopTime;
   // protect accesses to the state for this object
-  mutable priority_recursive_mutex m_syncMutex;
+  mutable hal::priority_recursive_mutex m_syncMutex;
   MotorSafety* m_safeObject;  // the object that is using the helper
   // List of all existing MotorSafetyHelper objects.
   static std::set<MotorSafetyHelper*> m_helperList;
   // protect accesses to the list of helpers
-  static priority_recursive_mutex m_listMutex;
+  static hal::priority_recursive_mutex m_listMutex;
 };
 
 }  // namespace frc

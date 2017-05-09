@@ -30,7 +30,7 @@ std::unique_ptr<tPWM> pwmSystem;
 std::unique_ptr<tSPI> spiSystem;
 
 static std::atomic<bool> digitalSystemsInitialized{false};
-static priority_mutex initializeMutex;
+static hal::priority_mutex initializeMutex;
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalChannels + kNumPWMHeaders>
@@ -43,7 +43,7 @@ void initializeDigital(int32_t* status) {
   // Initial check, as if it's true initialization has finished
   if (digitalSystemsInitialized) return;
 
-  std::lock_guard<priority_mutex> lock(initializeMutex);
+  std::lock_guard<hal::priority_mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (digitalSystemsInitialized) return;
 

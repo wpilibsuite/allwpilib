@@ -44,9 +44,9 @@ class Notifier : public ErrorBase {
   static void Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle);
 
   // used to constrain execution between destructors and callback
-  static priority_mutex m_destructorMutex;
+  static hal::priority_mutex m_destructorMutex;
   // held while updating process information
-  priority_mutex m_processMutex;
+  hal::priority_mutex m_processMutex;
   // HAL handle, atomic for proper destruction
   std::atomic<HAL_NotifierHandle> m_notifier{0};
   // address of the handler

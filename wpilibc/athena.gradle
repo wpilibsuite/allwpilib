@@ -14,6 +14,7 @@ model {
                 tasks.withType(CppCompile) {
                     dependsOn generateCppVersion
                     cppCompiler.args "-DNAMESPACED_WPILIB"
+                    cppCompiler.args "-DNAMESPACED_PRIORITY"
                     addNiLibraryLinks(linker, targetPlatform)
                     addNetworkTablesLibraryLinks(it, linker, targetPlatform)
                     addCsCoreLibraryLinks(it, linker, targetPlatform)

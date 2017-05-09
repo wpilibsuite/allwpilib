@@ -45,7 +45,7 @@ class SerialHelper {
 
   int32_t m_resourceHandle;
 
-  static priority_mutex m_nameMutex;
+  static hal::priority_mutex m_nameMutex;
   static std::string m_usbNames[2];
 };
 }  // namespace hal

@@ -26,7 +26,7 @@ using namespace hal;
 
 static const int32_t kTimerInterruptNumber = 28;
 
-static priority_mutex notifierInterruptMutex;
+static hal::priority_mutex notifierInterruptMutex;
 static priority_recursive_mutex notifierMutex;
 static std::unique_ptr<tAlarm> notifierAlarm;
 static std::unique_ptr<tInterruptManager> notifierManager;
@@ -182,7 +182,7 @@ HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
   if (!notifierAtexitRegistered.test_and_set())
     std::atexit(cleanupNotifierAtExit);
   if (notifierRefCount.fetch_add(1) == 0) {
-    std::lock_guard<priority_mutex> sync(notifierInterruptMutex);
+    std::lock_guard<hal::priority_mutex> sync(notifierInterruptMutex);
     // create manager and alarm if not already created
     if (!notifierManager) {
       notifierManager = std::make_unique<tInterruptManager>(
@@ -254,7 +254,7 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   }
 
   if (notifierRefCount.fetch_sub(1) == 1) {
-    std::lock_guard<priority_mutex> sync(notifierInterruptMutex);
+    std::lock_guard<hal::priority_mutex> sync(notifierInterruptMutex);
     // if this was the last notifier, clean up alarm and manager
     if (notifierAlarm) {
       notifierAlarm->writeEnable(false, status);

@@ -39,8 +39,8 @@ class Notifier : public ErrorBase {
 
  private:
   static std::list<Notifier*> timerQueue;
-  static priority_recursive_mutex queueMutex;
-  static priority_mutex halMutex;
+  static hal::priority_recursive_mutex queueMutex;
+  static hal::priority_mutex halMutex;
   static void* m_notifier;
   static std::atomic<int> refcount;
 
@@ -67,7 +67,7 @@ class Notifier : public ErrorBase {
   // Indicates if this entry is queued
   bool m_queued = false;
   // Held by interrupt manager task while handler call is in progress
-  priority_mutex m_handlerMutex;
+  hal::priority_mutex m_handlerMutex;
   static std::thread m_task;
   static std::atomic<bool> m_stopped;
   static void Run();

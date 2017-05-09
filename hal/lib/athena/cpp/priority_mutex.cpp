@@ -7,6 +7,8 @@
 
 #include "HAL/cpp/priority_mutex.h"
 
+using namespace hal;
+
 void priority_recursive_mutex::lock() { pthread_mutex_lock(&m_mutex); }
 
 void priority_recursive_mutex::unlock() { pthread_mutex_unlock(&m_mutex); }
