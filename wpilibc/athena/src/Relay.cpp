@@ -185,25 +185,31 @@ void Relay::Set(Relay::Value value) {
 Relay::Value Relay::Get() const {
   int32_t status;
 
-  if (HAL_GetRelay(m_forwardHandle, &status)) {
+  if (m_direction == kForwardOnly) {
+    if (HAL_GetRelay(m_forwardHandle, &status)) {
+      return kOn;
+    } else {
+      return kOff;
+    }
+  } else if (m_direction == kReverseOnly) {
     if (HAL_GetRelay(m_reverseHandle, &status)) {
       return kOn;
     } else {
-      if (m_direction == kForwardOnly) {
+      return kOff;
+    }
+  } else {
+    if (HAL_GetRelay(m_forwardHandle, &status)) {
+      if (HAL_GetRelay(m_reverseHandle, &status)) {
         return kOn;
       } else {
         return kForward;
       }
-    }
-  } else {
-    if (HAL_GetRelay(m_reverseHandle, &status)) {
-      if (m_direction == kReverseOnly) {
-        return kOn;
-      } else {
-        return kReverse;
-      }
     } else {
-      return kOff;
+      if (HAL_GetRelay(m_reverseHandle, &status)) {
+        return kReverse;
+      } else {
+        return kOff;
+      }
     }
   }
 
