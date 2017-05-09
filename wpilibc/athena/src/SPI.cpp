@@ -19,10 +19,9 @@ using namespace frc;
 /**
  * Constructor
  *
- * @param SPIport the physical SPI port
+ * @param port the physical SPI port
  */
-SPI::SPI(Port SPIport) {
-  m_port = SPIport;
+SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
   int32_t status = 0;
   HAL_InitializeSPI(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

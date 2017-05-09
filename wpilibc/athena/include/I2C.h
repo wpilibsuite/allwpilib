@@ -9,6 +9,8 @@
 
 #include "SensorBase.h"
 
+enum HAL_I2CPort : int32_t;
+
 namespace frc {
 
 /**
@@ -20,7 +22,7 @@ namespace frc {
  */
 class I2C : SensorBase {
  public:
-  enum Port { kOnboard, kMXP };
+  enum Port { kOnboard = 0, kMXP };
 
   I2C(Port port, int deviceAddress);
   virtual ~I2C();
@@ -39,7 +41,7 @@ class I2C : SensorBase {
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:
-  Port m_port;
+  HAL_I2CPort m_port;
   int m_deviceAddress;
 };
 
