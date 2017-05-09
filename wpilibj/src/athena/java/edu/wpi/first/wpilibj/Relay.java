@@ -235,25 +235,31 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * @return The current state of the relay as a Relay::Value
    */
   public Value get() {
-    if (RelayJNI.getRelay(m_forwardHandle)) {
+    if (m_direction == Direction.kForward) {
+      if (RelayJNI.getRelay(m_forwardHandle)) {
+        return Value.kOn;
+      } else {
+        return Value.kOff;
+      }
+    } else if (m_direction == Direction.kReverse) {
       if (RelayJNI.getRelay(m_reverseHandle)) {
         return Value.kOn;
       } else {
-        if (m_direction == Direction.kForward) {
+        return Value.kOff;
+      }
+    } else {
+      if (RelayJNI.getRelay(m_forwardHandle)) {
+        if (RelayJNI.getRelay(m_reverseHandle)) {
           return Value.kOn;
         } else {
           return Value.kForward;
         }
-      }
-    } else {
-      if (RelayJNI.getRelay(m_reverseHandle)) {
-        if (m_direction == Direction.kReverse) {
-          return Value.kOn;
-        } else {
-          return Value.kReverse;
-        }
       } else {
-        return Value.kOff;
+        if (RelayJNI.getRelay(m_reverseHandle)) {
+          return Value.kReverse;
+        } else {
+          return Value.kOff;
+        }
       }
     }
   }
