@@ -20,13 +20,13 @@ public class SolenoidJNI extends JNIWrapper {
 
   public static native boolean getSolenoid(int portHandle);
 
-  public static native byte getAllSolenoids(byte module);
+  public static native int getAllSolenoids(int module);
 
-  public static native int getPCMSolenoidBlackList(byte module);
+  public static native int getPCMSolenoidBlackList(int module);
 
-  public static native boolean getPCMSolenoidVoltageStickyFault(byte module);
+  public static native boolean getPCMSolenoidVoltageStickyFault(int module);
 
-  public static native boolean getPCMSolenoidVoltageFault(byte module);
+  public static native boolean getPCMSolenoidVoltageFault(int module);
 
-  public static native void clearAllPCMStickyFaults(byte module);
+  public static native void clearAllPCMStickyFaults(int module);
 }
