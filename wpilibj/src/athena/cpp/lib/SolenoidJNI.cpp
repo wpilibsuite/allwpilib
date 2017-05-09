@@ -124,13 +124,13 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getAllSolenoids
- * Signature: (B)Z
+ * Signature: (I)I
  */
-JNIEXPORT jbyte JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getAllSolenoids(
-    JNIEnv *env, jclass, jbyte module) {
+    JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
-  jbyte val = HAL_GetAllSolenoids(module, &status);
+  jint val = HAL_GetAllSolenoids(module, &status);
   CheckStatus(env, status);
   return val;
 }
@@ -138,11 +138,11 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getAllSolenoids(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPCMSolenoidBlackList
- * Signature: (B)I
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidBlackList(
-    JNIEnv *env, jclass, jbyte module) {
+    JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   jint val = HAL_GetPCMSolenoidBlackList(module, &status);
   CheckStatus(env, status);
@@ -151,11 +151,11 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidBlackList(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPCMSolenoidVoltageStickyFault
- * Signature: (B)Z
+ * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageStickyFault(
-    JNIEnv *env, jclass, jbyte module) {
+    JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   bool val = HAL_GetPCMSolenoidVoltageStickyFault(module, &status);
   CheckStatus(env, status);
@@ -164,11 +164,11 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageStickyFault(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    getPCMSolenoidVoltageFault
- * Signature: (B)Z
+ * Signature: (I)Z
  */
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageFault(
-    JNIEnv *env, jclass, jbyte module) {
+    JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   bool val = HAL_GetPCMSolenoidVoltageFault(module, &status);
   CheckStatus(env, status);
@@ -177,11 +177,11 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageFault(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SolenoidJNI
  * Method:    clearAllPCMStickyFaults
- * Signature: (B)V
+ * Signature: (I)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_clearAllPCMStickyFaults(
-    JNIEnv *env, jclass, jbyte module) {
+    JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   HAL_ClearAllPCMStickyFaults(module, &status);
   CheckStatus(env, status);

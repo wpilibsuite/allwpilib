@@ -20,20 +20,23 @@ namespace frc {
 class SolenoidBase : public SensorBase {
  public:
   virtual ~SolenoidBase() = default;
-  int GetAll(int module = 0) const;
+  static int GetAll(int module);
+  int GetAll() const;
 
-  int GetPCMSolenoidBlackList(int module) const;
-  bool GetPCMSolenoidVoltageStickyFault(int module) const;
-  bool GetPCMSolenoidVoltageFault(int module) const;
-  void ClearAllPCMStickyFaults(int module);
+  static int GetPCMSolenoidBlackList(int module);
+  int GetPCMSolenoidBlackList() const;
+  static bool GetPCMSolenoidVoltageStickyFault(int module);
+  bool GetPCMSolenoidVoltageStickyFault() const;
+  static bool GetPCMSolenoidVoltageFault(int module);
+  bool GetPCMSolenoidVoltageFault() const;
+  static void ClearAllPCMStickyFaults(int module);
+  void ClearAllPCMStickyFaults();
 
  protected:
   explicit SolenoidBase(int pcmID);
   static const int m_maxModules = 63;
   static const int m_maxPorts = 8;
-  // static void* m_ports[m_maxModules][m_maxPorts];
-  int m_moduleNumber;  ///< Slot number where the module is plugged into
-                       /// the chassis.
+  int m_moduleNumber;  // PCM module number
 };
 
 }  // namespace frc
