@@ -9,6 +9,8 @@
 
 #include "SensorBase.h"
 
+enum HAL_SPIPort : int32_t;
+
 namespace frc {
 
 class DigitalOutput;
@@ -23,8 +25,8 @@ class DigitalInput;
  */
 class SPI : public SensorBase {
  public:
-  enum Port { kOnboardCS0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
-  explicit SPI(Port SPIport);
+  enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
+  explicit SPI(Port port);
   virtual ~SPI();
 
   SPI(const SPI&) = delete;
@@ -62,7 +64,7 @@ class SPI : public SensorBase {
   void GetAccumulatorOutput(int64_t& value, int64_t& count) const;
 
  protected:
-  int m_port;
+  HAL_SPIPort m_port;
   bool m_msbFirst = false;          // default little-endian
   bool m_sampleOnTrailing = false;  // default data updated on falling edge
   bool m_clk_idle_high = false;     // default clock active high

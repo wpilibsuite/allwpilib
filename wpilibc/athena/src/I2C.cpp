@@ -20,7 +20,7 @@ using namespace frc;
  * @param deviceAddress The address of the device on the I2C bus.
  */
 I2C::I2C(Port port, int deviceAddress)
-    : m_port(port), m_deviceAddress(deviceAddress) {
+    : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
   HAL_InitializeI2C(m_port, &status);
   // wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

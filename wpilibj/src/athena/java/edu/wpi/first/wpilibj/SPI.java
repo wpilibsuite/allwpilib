@@ -32,7 +32,7 @@ public class SPI extends SensorBase {
 
   private static int devices = 0;
 
-  private byte m_port;
+  private int m_port;
   private int m_bitOrder;
   private int m_clockPolarity;
   private int m_dataOnTrailing;
