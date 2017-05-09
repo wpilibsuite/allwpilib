@@ -19,6 +19,6 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - wpiformat
+  - wpiformat -y 2017
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
   - ./gradlew build -PmakeSim
