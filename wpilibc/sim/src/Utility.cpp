@@ -69,7 +69,7 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
     llvm::SmallString<128> fileTemp;
     errorStream << "of " << basename(fileName.c_str(fileTemp)) << " ";
 
-    if (message[0] != '\0') {
+    if (!message.empty()) {
       errorStream << "failed: " << message << std::endl;
     } else {
       errorStream << "failed." << std::endl;
@@ -98,7 +98,7 @@ void wpi_assertEqual_common_impl(int valueA, int valueB,
 
   // If an error message was specified, include it
   // Build error string
-  if (message.size() > 0) {
+  if (!message.empty()) {
     error << "Assertion failed: \"" << message << "\", \"" << valueA << "\" "
           << equalityType << " \"" << valueB << "\" in " << funcName << "() in "
           << fileName << " at line " << lineNumber << "\n";

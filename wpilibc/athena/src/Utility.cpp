@@ -41,7 +41,7 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
 
     errorStream << "Assertion \"" << conditionText << "\" ";
 
-    if (message[0] != '\0') {
+    if (!message.empty()) {
       errorStream << "failed: " << message << std::endl;
     } else {
       errorStream << "failed." << std::endl;
@@ -78,7 +78,7 @@ void wpi_assertEqual_common_impl(llvm::StringRef valueA, llvm::StringRef valueB,
   errorStream << "Assertion \"" << valueA << " " << equalityType << " "
               << valueB << "\" ";
 
-  if (message[0] != '\0') {
+  if (!message.empty()) {
     errorStream << "failed: " << message << std::endl;
   } else {
     errorStream << "failed." << std::endl;
