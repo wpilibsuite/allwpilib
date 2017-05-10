@@ -35,14 +35,22 @@
 #include "HAL/SerialPort.h"
 #include "HAL/Solenoid.h"
 
-#endif  // HAL_USE_LABVIEW
+#endif /* HAL_USE_LABVIEW */
 
 #include "FRC_NetworkCommunication/UsageReporting.h"
 #include "HAL/Types.h"
 
+#ifdef __cplusplus
 namespace HALUsageReporting = nUsageReporting;
+#endif
 
-enum HAL_RuntimeType : int32_t { HAL_Athena, HAL_Mock };
+/* clang-format off */
+HAL_ENUM_START(HAL_RuntimeType, int32_t) {
+  HAL_Athena,
+  HAL_Mock
+}
+HAL_ENUM_END(HAL_RuntimeType, int32_t)
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,7 +78,7 @@ uint64_t HAL_GetFPGATime(int32_t* status);
 
 int32_t HAL_Initialize(int32_t mode);
 
-// ifdef's definition is to allow for default parameters in C++.
+/* ifdef's definition is to allow for default parameters in C++. */
 #ifdef __cplusplus
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber,
                    int32_t context = 0, const char* feature = nullptr);
@@ -79,7 +87,7 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
                    const char* feature);
 #endif
 
-#endif  // HAL_USE_LABVIEW
+#endif /* HAL_USE_LABVIEW */
 #ifdef __cplusplus
 }
 #endif

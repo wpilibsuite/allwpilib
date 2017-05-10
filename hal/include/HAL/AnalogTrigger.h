@@ -11,12 +11,15 @@
 
 #include "HAL/Types.h"
 
-enum HAL_AnalogTriggerType : int32_t {
+/* clang-format off */
+HAL_ENUM_START(HAL_AnalogTriggerType, int32_t) {
   HAL_Trigger_kInWindow = 0,
   HAL_Trigger_kState = 1,
   HAL_Trigger_kRisingPulse = 2,
   HAL_Trigger_kFallingPulse = 3
-};
+}
+HAL_ENUM_END(HAL_AnalogTriggerType, int32_t)
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {
