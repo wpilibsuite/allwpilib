@@ -82,9 +82,13 @@ class SafeThreadOwnerBase {
  protected:
   void Start(SafeThread* thr);
   SafeThread* GetThread() const { return m_thread.load(); }
+  std::thread::native_handle_type GetNativeThreadHandle() const {
+    return m_nativeHandle;
+  }
 
  private:
   std::atomic<SafeThread*> m_thread;
+  std::atomic<std::thread::native_handle_type> m_nativeHandle;
 };
 
 inline void SafeThreadOwnerBase::Start(SafeThread* thr) {
@@ -94,10 +98,12 @@ inline void SafeThreadOwnerBase::Start(SafeThread* thr) {
     delete newthr;
     return;
   }
-  std::thread([=]() {
+  std::thread stdThread([=]() {
     newthr->Main();
     delete newthr;
-  }).detach();
+  });
+  m_nativeHandle = stdThread.native_handle();
+  stdThread.detach();
 }
 
 inline void SafeThreadOwnerBase::Stop() {
