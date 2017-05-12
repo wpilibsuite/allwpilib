@@ -137,5 +137,5 @@ class priority_condition_variable {
 
 // For backwards compatibility
 #ifndef NAMESPACED_PRIORITY
-using priority_condition_variable = hal::priority_condition_variable;  // NOLINT
+using hal::priority_condition_variable;  // NOLINT
 #endif

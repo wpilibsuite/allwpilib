@@ -87,6 +87,6 @@ class priority_mutex {
 
 // For backwards compatibility
 #ifndef NAMESPACED_PRIORITY
-using priority_mutex = hal::priority_mutex;                      // NOLINT
-using priority_recursive_mutex = hal::priority_recursive_mutex;  // NOLINT
+using hal::priority_mutex;            // NOLINT
+using hal::priority_recursive_mutex;  // NOLINT
 #endif
