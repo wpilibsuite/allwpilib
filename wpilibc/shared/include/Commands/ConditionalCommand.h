@@ -40,10 +40,9 @@ namespace frc {
  */
 class ConditionalCommand : public Command {
  public:
-  explicit ConditionalCommand(Command* onTrue,
-                              Command* onFalse = new InstantCommand());
+  explicit ConditionalCommand(Command* onTrue, Command* onFalse = nullptr);
   ConditionalCommand(const std::string& name, Command* onTrue,
-                     Command* onFalse = new InstantCommand());
+                     Command* onFalse = nullptr);
   virtual ~ConditionalCommand() = default;
 
  protected:

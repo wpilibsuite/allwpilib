@@ -47,6 +47,20 @@ public abstract class ConditionalCommand extends Command {
    */
   private Command m_chosenCommand = null;
 
+  private void requireAll() {
+    if (m_onTrue != null) {
+      for (Enumeration e = m_onTrue.getRequirements(); e.hasMoreElements(); ) {
+        requires((Subsystem) e.nextElement());
+      }
+    }
+
+    if (m_onFalse != null) {
+      for (Enumeration e = m_onFalse.getRequirements(); e.hasMoreElements(); ) {
+        requires((Subsystem) e.nextElement());
+      }
+    }
+  }
+
   /**
    * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
    *
@@ -55,7 +69,7 @@ public abstract class ConditionalCommand extends Command {
    * @param onTrue The Command to execute if {@link ConditionalCommand#condition()} returns true
    */
   public ConditionalCommand(Command onTrue) {
-    this(onTrue, new InstantCommand());
+    this(onTrue, null);
   }
 
   /**
@@ -70,13 +84,7 @@ public abstract class ConditionalCommand extends Command {
     m_onTrue = onTrue;
     m_onFalse = onFalse;
 
-    for (Enumeration e = m_onTrue.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
-    }
-
-    for (Enumeration e = m_onFalse.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
-    }
+    requireAll();
   }
 
   /**
@@ -88,7 +96,7 @@ public abstract class ConditionalCommand extends Command {
    * @param onTrue The Command to execute if {@link ConditionalCommand#condition()} returns true
    */
   public ConditionalCommand(String name, Command onTrue) {
-    this(name, onTrue, new InstantCommand());
+    this(name, onTrue, null);
   }
 
   /**
@@ -105,13 +113,7 @@ public abstract class ConditionalCommand extends Command {
     m_onTrue = onTrue;
     m_onFalse = onFalse;
 
-    for (Enumeration e = m_onTrue.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
-    }
-
-    for (Enumeration e = m_onFalse.getRequirements(); e.hasMoreElements(); ) {
-      requires((Subsystem) e.nextElement());
-    }
+    requireAll();
   }
 
   /**
@@ -132,10 +134,15 @@ public abstract class ConditionalCommand extends Command {
       m_chosenCommand = m_onFalse;
     }
 
-    // This is a hack to make cancelling the chosen command inside a CommandGroup work properly
-    m_chosenCommand.clearRequirements();
+    if (m_chosenCommand != null) {
+      /*
+       * This is a hack to make cancelling the chosen command inside a
+       * CommandGroup work properly
+       */
+      m_chosenCommand.clearRequirements();
 
-    m_chosenCommand.start();
+      m_chosenCommand.start();
+    }
   }
 
   @Override
