@@ -34,6 +34,7 @@ model {
             binaries.all {
                 tasks.withType(CppCompile) {
                     dependsOn jniHeaders
+                    cppCompiler.args "-DNAMESPACED_PRIORITY"
                     addNiLibraryLinks(linker, targetPlatform)
                     addWpiUtilLibraryLinks(it, linker, targetPlatform)
                 }

@@ -14,7 +14,7 @@
 
 using namespace frc;
 
-priority_mutex Notifier::m_destructorMutex;
+hal::priority_mutex Notifier::m_destructorMutex;
 
 /**
  * Create a Notifier for timer event notification.
@@ -44,8 +44,8 @@ Notifier::~Notifier() {
   /* Acquire the mutex; this makes certain that the handler is not being
    * executed by the interrupt manager.
    */
-  std::lock_guard<priority_mutex> lockStatic(Notifier::m_destructorMutex);
-  std::lock_guard<priority_mutex> lock(m_processMutex);
+  std::lock_guard<hal::priority_mutex> lockStatic(Notifier::m_destructorMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_processMutex);
 }
 
 /**
@@ -68,7 +68,7 @@ void Notifier::Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
   Notifier* notifier;
   {
     // Lock static mutex to grab the notifier param
-    std::lock_guard<priority_mutex> lock(Notifier::m_destructorMutex);
+    std::lock_guard<hal::priority_mutex> lock(Notifier::m_destructorMutex);
     int32_t status = 0;
     auto notifierPointer = HAL_GetNotifierParam(handle, &status);
     if (notifierPointer == nullptr) return;
@@ -95,7 +95,7 @@ void Notifier::Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
  * @param delay Seconds to wait before the handler is called.
  */
 void Notifier::StartSingle(double delay) {
-  std::lock_guard<priority_mutex> sync(m_processMutex);
+  std::lock_guard<hal::priority_mutex> sync(m_processMutex);
   m_periodic = false;
   m_period = delay;
   m_expirationTime = GetClock() + m_period;
@@ -113,7 +113,7 @@ void Notifier::StartSingle(double delay) {
  *               after the call to this method.
  */
 void Notifier::StartPeriodic(double period) {
-  std::lock_guard<priority_mutex> sync(m_processMutex);
+  std::lock_guard<hal::priority_mutex> sync(m_processMutex);
   m_periodic = true;
   m_period = period;
   m_expirationTime = GetClock() + m_period;
@@ -136,6 +136,6 @@ void Notifier::Stop() {
 
   // Wait for a currently executing handler to complete before returning from
   // Stop()
-  std::lock_guard<priority_mutex> lockStatic(Notifier::m_destructorMutex);
-  std::lock_guard<priority_mutex> lock(m_processMutex);
+  std::lock_guard<hal::priority_mutex> lockStatic(Notifier::m_destructorMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_processMutex);
 }

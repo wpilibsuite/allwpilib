@@ -13,6 +13,7 @@ model {
             targetPlatform 'roborio-arm'
             binaries.all {
                 tasks.withType(CppCompile) {
+                    cppCompiler.args "-DNAMESPACED_PRIORITY"
                     addNiLibraryLinks(linker, targetPlatform)
                     addNetworkTablesLibraryLinks(it, linker, targetPlatform)
                     addCsCoreLibraryLinks(it, linker, targetPlatform)

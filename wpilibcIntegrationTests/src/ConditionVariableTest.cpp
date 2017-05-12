@@ -23,13 +23,13 @@ namespace testing {
 // does work.
 class ConditionVariableTest : public ::testing::Test {
  protected:
-  typedef std::unique_lock<priority_mutex> priority_lock;
+  typedef std::unique_lock<hal::priority_mutex> priority_lock;
 
   // Condition variable to test.
-  priority_condition_variable m_cond;
+  hal::priority_condition_variable m_cond;
 
   // Mutex to pass to condition variable when waiting.
-  priority_mutex m_mutex;
+  hal::priority_mutex m_mutex;
 
   // flags for testing when threads are completed.
   std::atomic<bool> m_done1{false}, m_done2{false};

@@ -51,7 +51,7 @@ class Timer {
   double m_startTime = 0.0;
   double m_accumulatedTime = 0.0;
   bool m_running = false;
-  mutable priority_mutex m_mutex;
+  mutable hal::priority_mutex m_mutex;
 };
 
 }  // namespace frc

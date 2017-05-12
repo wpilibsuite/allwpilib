@@ -11,13 +11,17 @@
 #include <mutex>
 
 #if defined(FRC_SIMULATOR) || defined(_WIN32)
+namespace hal {
 // We do not want to use pthreads if in the simulator; however, in the
 // simulator, we do not care about priority inversion.
 typedef std::mutex priority_mutex;
 typedef std::recursive_mutex priority_recursive_mutex;
+}  // namespace hal
 #else  // Covers rest of file.
 
 #include <pthread.h>
+
+namespace hal {
 
 class priority_recursive_mutex {
  public:
@@ -77,5 +81,12 @@ class priority_mutex {
   pthread_mutex_t m_mutex = {{0, 0, 0, 0x20, 0, {0}}};
 #endif
 };
+}  // namespace hal
 
 #endif  // FRC_SIMULATOR
+
+// For backwards compatibility
+#ifndef NAMESPACED_PRIORITY
+using priority_mutex = hal::priority_mutex;                      // NOLINT
+using priority_recursive_mutex = hal::priority_recursive_mutex;  // NOLINT
+#endif

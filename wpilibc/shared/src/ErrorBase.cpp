@@ -18,7 +18,7 @@
 
 using namespace frc;
 
-priority_mutex ErrorBase::_globalErrorMutex;
+hal::priority_mutex ErrorBase::_globalErrorMutex;
 Error ErrorBase::_globalError;
 
 /**
@@ -62,7 +62,7 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
   m_error.Set(-1, err, filename, function, lineNumber, this);
 
   // Update the global error if there is not one already set.
-  std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+  std::lock_guard<hal::priority_mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() == 0) {
     _globalError.Clone(m_error);
   }
@@ -90,7 +90,7 @@ void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
     m_error.Set(success, err.str(), filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
-    std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+    std::lock_guard<hal::priority_mutex> mutex(_globalErrorMutex);
     if (_globalError.GetCode() == 0) {
       _globalError.Clone(m_error);
     }
@@ -115,7 +115,7 @@ void ErrorBase::SetError(Error::Code code, llvm::StringRef contextMessage,
     m_error.Set(code, contextMessage, filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
-    std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+    std::lock_guard<hal::priority_mutex> mutex(_globalErrorMutex);
     if (_globalError.GetCode() == 0) {
       _globalError.Clone(m_error);
     }
@@ -153,7 +153,7 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
     delete[] buf;
 
     // Update the global error if there is not one already set.
-    std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+    std::lock_guard<hal::priority_mutex> mutex(_globalErrorMutex);
     if (_globalError.GetCode() == 0) {
       _globalError.Clone(m_error);
     }
@@ -179,7 +179,7 @@ void ErrorBase::SetWPIError(llvm::StringRef errorMessage, Error::Code code,
   m_error.Set(code, err, filename, function, lineNumber, this);
 
   // Update the global error if there is not one already set.
-  std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+  std::lock_guard<hal::priority_mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() == 0) {
     _globalError.Clone(m_error);
   }
@@ -201,7 +201,7 @@ void ErrorBase::SetGlobalError(Error::Code code, llvm::StringRef contextMessage,
                                llvm::StringRef function, int lineNumber) {
   // If there was an error
   if (code != 0) {
-    std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+    std::lock_guard<hal::priority_mutex> mutex(_globalErrorMutex);
 
     // Set the current error information for this object.
     _globalError.Set(code, contextMessage, filename, function, lineNumber,
@@ -215,7 +215,7 @@ void ErrorBase::SetGlobalWPIError(llvm::StringRef errorMessage,
                                   llvm::StringRef function, int lineNumber) {
   std::string err = errorMessage.str() + ": " + contextMessage.str();
 
-  std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+  std::lock_guard<hal::priority_mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() != 0) {
     _globalError.Clear();
   }
@@ -226,6 +226,6 @@ void ErrorBase::SetGlobalWPIError(llvm::StringRef errorMessage,
  * Retrieve the current global error.
  */
 Error& ErrorBase::GetGlobalError() {
-  std::lock_guard<priority_mutex> mutex(_globalErrorMutex);
+  std::lock_guard<hal::priority_mutex> mutex(_globalErrorMutex);
   return _globalError;
 }

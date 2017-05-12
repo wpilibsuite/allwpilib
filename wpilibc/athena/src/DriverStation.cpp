@@ -90,7 +90,7 @@ double DriverStation::GetStickAxis(int stick, int axis) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::unique_lock<priority_mutex> lock(m_joystickDataMutex);
+  std::unique_lock<hal::priority_mutex> lock(m_joystickDataMutex);
   if (axis >= m_joystickAxes[stick].count) {
     // Unlock early so error printing isn't locked.
     m_joystickDataMutex.unlock();
@@ -116,7 +116,7 @@ int DriverStation::GetStickPOV(int stick, int pov) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
-  std::unique_lock<priority_mutex> lock(m_joystickDataMutex);
+  std::unique_lock<hal::priority_mutex> lock(m_joystickDataMutex);
   if (pov >= m_joystickPOVs[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
@@ -142,7 +142,7 @@ int DriverStation::GetStickButtons(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   return m_joystickButtons[stick].buttons;
 }
 
@@ -163,7 +163,7 @@ bool DriverStation::GetStickButton(int stick, int button) {
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
-  std::unique_lock<priority_mutex> lock(m_joystickDataMutex);
+  std::unique_lock<hal::priority_mutex> lock(m_joystickDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
@@ -187,7 +187,7 @@ int DriverStation::GetStickAxisCount(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   return m_joystickAxes[stick].count;
 }
 
@@ -202,7 +202,7 @@ int DriverStation::GetStickPOVCount(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   return m_joystickPOVs[stick].count;
 }
 
@@ -217,7 +217,7 @@ int DriverStation::GetStickButtonCount(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   return m_joystickButtons[stick].count;
 }
 
@@ -232,7 +232,7 @@ bool DriverStation::GetJoystickIsXbox(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   return static_cast<bool>(m_joystickDescriptor[stick].isXbox);
 }
 
@@ -247,7 +247,7 @@ int DriverStation::GetJoystickType(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   return static_cast<int>(m_joystickDescriptor[stick].type);
 }
 
@@ -261,7 +261,7 @@ std::string DriverStation::GetJoystickName(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
   }
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   std::string retVal(m_joystickDescriptor[stick].name);
   return retVal;
 }
@@ -277,7 +277,7 @@ int DriverStation::GetJoystickAxisType(int stick, int axis) const {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   return m_joystickDescriptor[stick].axisTypes[axis];
 }
 
@@ -528,7 +528,7 @@ void DriverStation::GetData() {
   UpdateControlWord(true, controlWord);
   // Obtain a write lock on the data, swap the cached data into the
   // main data arrays
-  std::lock_guard<priority_mutex> lock(m_joystickDataMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_joystickDataMutex);
   m_joystickAxes.swap(m_joystickAxesCache);
   m_joystickPOVs.swap(m_joystickPOVsCache);
   m_joystickButtons.swap(m_joystickButtonsCache);
@@ -629,7 +629,7 @@ void DriverStation::Run() {
 void DriverStation::UpdateControlWord(bool force,
                                       HAL_ControlWord& controlWord) const {
   auto now = std::chrono::steady_clock::now();
-  std::lock_guard<priority_mutex> lock(m_controlWordMutex);
+  std::lock_guard<hal::priority_mutex> lock(m_controlWordMutex);
   // Update every 50 ms or on force.
   if ((now - m_lastControlWordUpdate > std::chrono::milliseconds(50)) ||
       force) {

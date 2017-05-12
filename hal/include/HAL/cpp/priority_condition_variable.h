@@ -22,6 +22,8 @@
 
 #include "priority_mutex.h"
 
+namespace hal {
+
 class priority_condition_variable {
   typedef std::chrono::system_clock clock;
 
@@ -130,3 +132,10 @@ class priority_condition_variable {
     Lock& m_lock;
   };
 };
+
+}  // namespace hal
+
+// For backwards compatibility
+#ifndef NAMESPACED_PRIORITY
+using priority_condition_variable = hal::priority_condition_variable;  // NOLINT
+#endif

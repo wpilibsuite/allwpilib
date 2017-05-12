@@ -113,7 +113,7 @@ class ErrorBase {
  protected:
   mutable Error m_error;
   // TODO: Replace globalError with a global list of all errors.
-  static priority_mutex _globalErrorMutex;
+  static hal::priority_mutex _globalErrorMutex;
   static Error _globalError;
 };
 
