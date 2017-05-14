@@ -7,9 +7,8 @@
 
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.ctrlsys.INode;
+import edu.wpi.first.wpilibj.ctrlsys.PIDController;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 
@@ -24,22 +23,10 @@ public class DriveStraight extends Command {
 
 	public DriveStraight(double distance) {
 		requires(Robot.m_drivetrain);
-		m_pid = new PIDController(4, 0, 0, new PIDSource() {
-			PIDSourceType m_sourceType = PIDSourceType.kDisplacement;
-
+		m_pid = new PIDController(4, 0, 0, new INode() {
 			@Override
-			public double pidGet() {
+			public double getOutput() {
 				return Robot.m_drivetrain.getDistance();
-			}
-
-			@Override
-			public void setPIDSourceType(PIDSourceType pidSource) {
-				m_sourceType = pidSource;
-			}
-
-			@Override
-			public PIDSourceType getPIDSourceType() {
-				return m_sourceType;
 			}
 		}, d -> Robot.m_drivetrain.drive(d, d));
 

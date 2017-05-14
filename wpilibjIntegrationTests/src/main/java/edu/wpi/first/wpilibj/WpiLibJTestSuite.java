@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import edu.wpi.first.wpilibj.ctrlsys.FilterNoiseTest;
+import edu.wpi.first.wpilibj.ctrlsys.FilterOutputTest;
 import edu.wpi.first.wpilibj.test.AbstractTestSuite;
 
 /**
@@ -22,8 +24,8 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
     BuiltInAccelerometerTest.class,
     CircularBufferTest.class, ConstantsPortsTest.class, CounterTest.class,
     DigitalGlitchFilterTest.class, DIOCrossConnectTest.class, DriverStationTest.class,
-    EncoderTest.class, FilterNoiseTest.class, FilterOutputTest.class, GyroTest.class,
-    MotorEncoderTest.class, MotorInvertingTest.class, PCMTest.class, PDPTest.class,
+    EncoderTest.class, FilterNoiseTest.class, FilterOutputTest.class,
+    GyroTest.class, MotorEncoderTest.class, MotorInvertingTest.class, PCMTest.class, PDPTest.class,
     PIDTest.class, PIDToleranceTest.class, PreferencesTest.class, RelayCrossConnectTest.class,
     RobotDriveTest.class, SampleTest.class, TimerTest.class})
 public class WpiLibJTestSuite extends AbstractTestSuite {

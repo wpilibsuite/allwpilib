@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.ctrlsys.INode;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -25,7 +26,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput extends SensorBase implements PIDSource, Sendable {
+public class AnalogInput extends SensorBase implements INode, Sendable {
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
@@ -325,23 +326,13 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
     return AnalogJNI.getAnalogSampleRate();
   }
 
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
   /**
    * Get the average voltage for use with PIDController.
    *
    * @return the average voltage
    */
   @Override
-  public double pidGet() {
+  public double getOutput() {
     return getAverageVoltage();
   }
 

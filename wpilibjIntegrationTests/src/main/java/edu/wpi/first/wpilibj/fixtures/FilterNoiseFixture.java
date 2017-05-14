@@ -11,8 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.ctrlsys.INode;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
@@ -22,7 +21,7 @@ import edu.wpi.first.wpilibj.test.TestBench;
  * access this fixture. This allows tests to be mailable so that you can easily reconfigure the
  * physical testbed without breaking the tests.
  */
-public abstract class FilterNoiseFixture<T extends PIDSource> implements ITestFixture {
+public abstract class FilterNoiseFixture<T extends INode> implements ITestFixture {
   private static final Logger logger = Logger.getLogger(FilterNoiseFixture.class.getName());
   private boolean m_initialized = false;
   private boolean m_tornDown = false;
@@ -32,7 +31,7 @@ public abstract class FilterNoiseFixture<T extends PIDSource> implements ITestFi
   /**
    * Where the implementer of this class should pass the filter constructor.
    */
-  protected abstract T giveFilter(PIDSource source);
+  protected abstract T giveFilter(INode source);
 
   private void initialize() {
     synchronized (this) {
@@ -116,7 +115,7 @@ public abstract class FilterNoiseFixture<T extends PIDSource> implements ITestFi
    * Adds Gaussian white noise to a function returning data. The noise will have the standard
    * deviation provided in the constructor.
    */
-  public abstract class NoiseGenerator implements PIDSource {
+  public abstract class NoiseGenerator implements INode {
     private double m_noise = 0.0;
 
     // Make sure first call to pidGet() uses count == 0
@@ -132,21 +131,12 @@ public abstract class FilterNoiseFixture<T extends PIDSource> implements ITestFi
     @SuppressWarnings("ParameterName")
     public abstract double getData(double t);
 
-    @Override
-    public void setPIDSourceType(PIDSourceType pidSource) {
-    }
-
-    @Override
-    public PIDSourceType getPIDSourceType() {
-      return PIDSourceType.kDisplacement;
-    }
-
     public double get() {
       return getData(m_count) + m_noise;
     }
 
     @Override
-    public double pidGet() {
+    public double getOutput() {
       m_noise = m_gen.nextGaussian() * m_stdDev;
       m_count += TestBench.kFilterStep;
       return getData(m_count) + m_noise;

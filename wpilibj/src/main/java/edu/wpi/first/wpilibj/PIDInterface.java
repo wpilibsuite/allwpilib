@@ -23,8 +23,6 @@ public interface PIDInterface extends Controller {
 
   double getSetpoint();
 
-  double getError();
-
   void enable();
 
   void disable();

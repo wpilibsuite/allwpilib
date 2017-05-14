@@ -19,7 +19,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
+import edu.wpi.first.wpilibj.ctrlsys.FuncNode;
+import edu.wpi.first.wpilibj.ctrlsys.LinearFilter;
+import edu.wpi.first.wpilibj.ctrlsys.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -175,7 +177,6 @@ public class MotorEncoderTest extends AbstractComsSetup {
 
   @Test
   public void testPositionPIDController() {
-    me.getEncoder().setPIDSourceType(PIDSourceType.kDisplacement);
     PIDController pid = new PIDController(0.001, 0.0005, 0, me.getEncoder(), me.getMotor());
     pid.setAbsoluteTolerance(50.0);
     pid.setOutputRange(-0.2, 0.2);
@@ -186,18 +187,20 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pid.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The current error was" + pid
-            .getError(), pid.onTarget());
+        "PID loop did not reach setpoint within 10 seconds. The average error was: " + pid
+            .getError() + "The current error was" + pid.getError(), pid.onTarget());
 
     pid.free();
   }
 
   @Test
   public void testVelocityPIDController() {
-    me.getEncoder().setPIDSourceType(PIDSourceType.kRate);
-    LinearDigitalFilter filter = LinearDigitalFilter.movingAverage(me.getEncoder(), 50);
+    FuncNode rate = new FuncNode(() -> {
+      return me.getEncoder().getRate();
+    });
+    LinearFilter filter = LinearFilter.movingAverage(rate, 50);
     PIDController pid =
-        new PIDController(1e-5, 0.0, 3e-5, 8e-5, filter, me.getMotor());
+        new PIDController(3e-5, 1e-5, 0.0, 8e-5, filter, me.getMotor());
     pid.setAbsoluteTolerance(200);
     pid.setOutputRange(-0.3, 0.3);
     pid.setSetpoint(600);

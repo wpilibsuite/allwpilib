@@ -8,9 +8,9 @@
 #include <array>
 
 #include <AnalogInput.h>
+#include <CtrlSys/PIDController.h>
 #include <IterativeRobot.h>
 #include <Joystick.h>
-#include <PIDController.h>
 #include <Spark.h>
 
 /**
@@ -74,7 +74,7 @@ private:
 	 * &elevatorMotor to get their pointers.
 	 */
 	frc::PIDController m_pidController{
-			kP, kI, kD, &m_potentiometer, &m_elevatorMotor};
+			kP, kI, kD, m_potentiometer, m_elevatorMotor};
 };
 
 constexpr std::array<double, 3> Robot::kSetPoints;

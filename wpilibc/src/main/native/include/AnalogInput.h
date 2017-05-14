@@ -11,7 +11,7 @@
 
 #include <HAL/Types.h>
 
-#include "PIDSource.h"
+#include "CtrlSys/INode.h"
 #include "SensorBase.h"
 
 namespace frc {
@@ -28,7 +28,7 @@ namespace frc {
  * are divided by the number of samples to retain the resolution, but get more
  * stable values.
  */
-class AnalogInput : public SensorBase, public PIDSource {
+class AnalogInput : public SensorBase, public INode {
   friend class AnalogTrigger;
   friend class AnalogGyro;
 
@@ -69,7 +69,7 @@ class AnalogInput : public SensorBase, public PIDSource {
   static void SetSampleRate(double samplesPerSecond);
   static double GetSampleRate();
 
-  double PIDGet() override;
+  double GetOutput() override;
 
   void InitSendable(SendableBuilder& builder) override;
 

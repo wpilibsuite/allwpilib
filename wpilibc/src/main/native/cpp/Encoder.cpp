@@ -438,21 +438,11 @@ int Encoder::GetSamplesToAverage() const {
 }
 
 /**
- * Implement the PIDSource interface.
+ * Implement the INode interface.
  *
  * @return The current value of the selected source parameter.
  */
-double Encoder::PIDGet() {
-  if (StatusIsFatal()) return 0.0;
-  switch (GetPIDSourceType()) {
-    case PIDSourceType::kDisplacement:
-      return GetDistance();
-    case PIDSourceType::kRate:
-      return GetRate();
-    default:
-      return 0.0;
-  }
-}
+double Encoder::GetOutput() { return GetDistance(); }
 
 /**
  * Set the index source for the encoder.

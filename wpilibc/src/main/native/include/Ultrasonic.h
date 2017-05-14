@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "Counter.h"
-#include "PIDSource.h"
+#include "CtrlSys/INode.h"
 #include "SensorBase.h"
 
 namespace frc {
@@ -33,7 +33,7 @@ class DigitalOutput;
  * received. The time that the line is high determines the round trip distance
  * (time of flight).
  */
-class Ultrasonic : public SensorBase, public PIDSource {
+class Ultrasonic : public SensorBase, public INode {
  public:
   enum DistanceUnit { kInches = 0, kMilliMeters = 1 };
 
@@ -55,8 +55,7 @@ class Ultrasonic : public SensorBase, public PIDSource {
   bool IsEnabled() const { return m_enabled; }
   void SetEnabled(bool enable) { m_enabled = enable; }
 
-  double PIDGet() override;
-  void SetPIDSourceType(PIDSourceType pidSource) override;
+  double GetOutput() override;
   void SetDistanceUnits(DistanceUnit units);
   DistanceUnit GetDistanceUnits() const;
 

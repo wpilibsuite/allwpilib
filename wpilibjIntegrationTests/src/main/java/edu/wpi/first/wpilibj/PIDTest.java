@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.ctrlsys.PIDController;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
@@ -181,7 +182,7 @@ public class PIDTest extends AbstractComsSetup {
     setupAbsoluteTolerance();
     setupOutputRange();
     double setpoint = 1000.0;
-    assertEquals(pidData() + "did not start at 0", 0, m_controller.get(), 0);
+    assertEquals(pidData() + "did not start at 0", 0, me.getEncoder().get(), 0);
     m_controller.setSetpoint(setpoint);
     assertEquals(pidData() + "did not have an error of " + setpoint, setpoint,
         m_controller.getError(), 0);
