@@ -33,4 +33,8 @@ public class SolenoidJNI extends JNIWrapper {
   public static native void setOneShotDuration(int portHandle, long durationMS);
 
   public static native void fireOneShot(int portHandle);
+
+  public static native void setOneShotDuration(int portHandle, long durationMS);
+
+  public static native void fireOneShot(int portHandle);
 }
