@@ -8,12 +8,13 @@
 #include "AnalogOutput.h"
 
 #include <limits>
-#include <sstream>
 
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -25,8 +26,9 @@ using namespace frc;
  * @param channel The channel number on the roboRIO to represent.
  */
 AnalogOutput::AnalogOutput(int channel) {
-  std::stringstream buf;
-  buf << "analog input " << channel;
+  llvm::SmallString<32> str;
+  llvm::raw_svector_ostream buf(str);
+  buf << "analog output " << channel;
 
   if (!SensorBase::CheckAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());

@@ -15,10 +15,10 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
-#include <sstream>
 
 #include "Timer.h"
 #include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 #include "simulation/simTime.h"
 
 using namespace frc;
@@ -61,7 +61,8 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
                      llvm::StringRef message, llvm::StringRef fileName,
                      int lineNumber, llvm::StringRef funcName) {
   if (!conditionValue) {
-    std::stringstream errorStream;
+    llvm::SmallString<1024> errorBuf;
+    llvm::raw_svector_ostream errorStream(errorBuf);
 
     errorStream << "Assertion \"" << conditionText << "\" ";
     errorStream << "on line " << lineNumber << " ";
@@ -70,9 +71,9 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
     errorStream << "of " << basename(fileName.c_str(fileTemp)) << " ";
 
     if (!message.empty()) {
-      errorStream << "failed: " << message << std::endl;
+      errorStream << "failed: " << message << "\n";
     } else {
-      errorStream << "failed." << std::endl;
+      errorStream << "failed.\n";
     }
 
     // Print to console and send to remote dashboard
@@ -94,7 +95,8 @@ void wpi_assertEqual_common_impl(int valueA, int valueB,
                                  llvm::StringRef fileName, int lineNumber,
                                  llvm::StringRef funcName) {
   // Error string buffer
-  std::stringstream error;
+  llvm::SmallString<1024> buf;
+  llvm::raw_svector_ostream error(buf);
 
   // If an error message was specified, include it
   // Build error string
@@ -192,12 +194,13 @@ std::string GetStackTrace(int offset) {
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
-  std::stringstream trace;
+  llvm::SmallString<1024> buf;
+  llvm::raw_svector_ostream trace(buf);
 
   for (int i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
     if (i == 0 || stackTrace[i] != stackTrace[i - 1]) {
-      trace << "\tat " << demangle(mangledSymbols[i]) << std::endl;
+      trace << "\tat " << demangle(mangledSymbols[i]) << "\n";
     }
   }
 

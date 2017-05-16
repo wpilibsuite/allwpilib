@@ -8,12 +8,13 @@
 #include "DigitalOutput.h"
 
 #include <limits>
-#include <sstream>
 
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -26,7 +27,8 @@ using namespace frc;
  *                port
  */
 DigitalOutput::DigitalOutput(int channel) {
-  std::stringstream buf;
+  llvm::SmallString<32> str;
+  llvm::raw_svector_ostream buf(str);
 
   m_pwmGenerator = HAL_kInvalidHandle;
   if (!CheckDigitalChannel(channel)) {

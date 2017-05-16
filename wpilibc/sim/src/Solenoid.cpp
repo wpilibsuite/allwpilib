@@ -7,10 +7,10 @@
 
 #include "Solenoid.h"
 
-#include <sstream>
-
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 #include "simulation/simTime.h"
 
 using namespace frc;
@@ -29,9 +29,10 @@ Solenoid::Solenoid(int channel) : Solenoid(1, channel) {}
  * @param channel      The channel on the solenoid module to control (1..8).
  */
 Solenoid::Solenoid(int moduleNumber, int channel) {
-  std::stringstream ss;
-  ss << "pneumatic/" << moduleNumber << "/" << channel;
-  m_impl = new SimContinuousOutput(ss.str());
+  llvm::SmallString<32> buf;
+  llvm::raw_svector_ostream oss(buf);
+  oss << "pneumatic/" << moduleNumber << "/" << channel;
+  m_impl = new SimContinuousOutput(oss.str());
 
   LiveWindow::GetInstance()->AddActuator("Solenoid", moduleNumber, channel,
                                          this);

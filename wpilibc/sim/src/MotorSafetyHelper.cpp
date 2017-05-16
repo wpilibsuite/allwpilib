@@ -7,12 +7,12 @@
 
 #include "MotorSafetyHelper.h"
 
-#include <sstream>
-
 #include "DriverStation.h"
 #include "MotorSafety.h"
 #include "Timer.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -100,10 +100,11 @@ void MotorSafetyHelper::Check() {
 
   std::lock_guard<hal::priority_recursive_mutex> sync(m_syncMutex);
   if (m_stopTime < Timer::GetFPGATimestamp()) {
-    std::ostringstream desc;
+    llvm::SmallString<128> buf;
+    llvm::raw_svector_ostream desc(buf);
     m_safeObject->GetDescription(desc);
     desc << "... Output not updated often enough.";
-    wpi_setWPIErrorWithContext(Timeout, desc.str().c_str());
+    wpi_setWPIErrorWithContext(Timeout, desc.str());
     m_safeObject->StopMotor();
   }
 }

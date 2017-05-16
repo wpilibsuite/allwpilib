@@ -13,12 +13,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <sstream>
 
 #include "ErrorBase.h"
 #include "HAL/DriverStation.h"
 #include "HAL/HAL.h"
 #include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -32,19 +32,21 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
                      llvm::StringRef message, llvm::StringRef fileName,
                      int lineNumber, llvm::StringRef funcName) {
   if (!conditionValue) {
-    std::stringstream locStream;
+    llvm::SmallString<128> locBuf;
+    llvm::raw_svector_ostream locStream(locBuf);
     locStream << funcName << " [";
     llvm::SmallString<128> fileTemp;
     locStream << basename(fileName.c_str(fileTemp)) << ":" << lineNumber << "]";
 
-    std::stringstream errorStream;
+    llvm::SmallString<128> errorBuf;
+    llvm::raw_svector_ostream errorStream(errorBuf);
 
     errorStream << "Assertion \"" << conditionText << "\" ";
 
     if (!message.empty()) {
-      errorStream << "failed: " << message << std::endl;
+      errorStream << "failed: " << message << "\n";
     } else {
-      errorStream << "failed." << std::endl;
+      errorStream << "failed.\n";
     }
 
     std::string stack = GetStackTrace(2);
@@ -68,20 +70,22 @@ void wpi_assertEqual_common_impl(llvm::StringRef valueA, llvm::StringRef valueB,
                                  llvm::StringRef message,
                                  llvm::StringRef fileName, int lineNumber,
                                  llvm::StringRef funcName) {
-  std::stringstream locStream;
+  llvm::SmallString<128> locBuf;
+  llvm::raw_svector_ostream locStream(locBuf);
   locStream << funcName << " [";
   llvm::SmallString<128> fileTemp;
   locStream << basename(fileName.c_str(fileTemp)) << ":" << lineNumber << "]";
 
-  std::stringstream errorStream;
+  llvm::SmallString<128> errorBuf;
+  llvm::raw_svector_ostream errorStream(errorBuf);
 
   errorStream << "Assertion \"" << valueA << " " << equalityType << " "
               << valueB << "\" ";
 
   if (!message.empty()) {
-    errorStream << "failed: " << message << std::endl;
+    errorStream << "failed: " << message << "\n";
   } else {
-    errorStream << "failed." << std::endl;
+    errorStream << "failed.\n";
   }
 
   std::string trace = GetStackTrace(3);
@@ -217,12 +221,13 @@ std::string GetStackTrace(int offset) {
   void* stackTrace[128];
   int stackSize = backtrace(stackTrace, 128);
   char** mangledSymbols = backtrace_symbols(stackTrace, stackSize);
-  std::stringstream trace;
+  llvm::SmallString<1024> buf;
+  llvm::raw_svector_ostream trace(buf);
 
   for (int i = offset; i < stackSize; i++) {
     // Only print recursive functions once in a row.
     if (i == 0 || stackTrace[i] != stackTrace[i - 1]) {
-      trace << "\tat " << demangle(mangledSymbols[i]) << std::endl;
+      trace << "\tat " << demangle(mangledSymbols[i]) << "\n";
     }
   }
 

@@ -7,11 +7,11 @@
 
 #include "Error.h"
 
-#include <sstream>
-
 #include "DriverStation.h"
 #include "Timer.h"
 #include "Utility.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -64,7 +64,8 @@ void Error::Set(Code code, llvm::StringRef contextMessage,
 }
 
 void Error::Report() {
-  std::stringstream locStream;
+  llvm::SmallString<128> buf;
+  llvm::raw_svector_ostream locStream(buf);
   locStream << m_function << " [";
 
 #if defined(_WIN32)

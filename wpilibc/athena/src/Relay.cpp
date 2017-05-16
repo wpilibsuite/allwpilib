@@ -8,13 +8,12 @@
 #include "HAL/Relay.h"
 #include "Relay.h"
 
-#include <sstream>
-
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
 #include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
 
 using namespace frc;
 
@@ -29,7 +28,8 @@ using namespace frc;
  */
 Relay::Relay(int channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
-  std::stringstream buf;
+  llvm::SmallString<128> str;
+  llvm::raw_svector_ostream buf(str);
   if (!SensorBase::CheckRelayChannel(m_channel)) {
     buf << "Relay Channel " << m_channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
@@ -268,7 +268,7 @@ bool Relay::IsSafetyEnabled() const {
   return m_safetyHelper->IsSafetyEnabled();
 }
 
-void Relay::GetDescription(std::ostringstream& desc) const {
+void Relay::GetDescription(llvm::raw_ostream& desc) const {
   desc << "Relay " << GetChannel();
 }
 

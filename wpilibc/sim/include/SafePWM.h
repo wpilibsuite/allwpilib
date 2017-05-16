@@ -12,6 +12,7 @@
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
 #include "PWM.h"
+#include "llvm/raw_ostream.h"
 
 namespace frc {
 
@@ -34,7 +35,7 @@ class SafePWM : public PWM, public MotorSafety {
   void StopMotor();
   bool IsSafetyEnabled() const;
   void SetSafetyEnabled(bool enabled);
-  void GetDescription(std::ostringstream& desc) const;
+  void GetDescription(llvm::raw_ostream& desc) const;
 
   virtual void SetSpeed(double speed);
 

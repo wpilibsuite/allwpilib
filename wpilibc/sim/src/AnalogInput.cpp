@@ -7,10 +7,10 @@
 
 #include "AnalogInput.h"
 
-#include <sstream>
-
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -20,9 +20,10 @@ using namespace frc;
  * @param channel The channel number to represent.
  */
 AnalogInput::AnalogInput(int channel) : m_channel(channel) {
-  std::stringstream ss;
-  ss << "analog/" << channel;
-  m_impl = new SimFloatInput(ss.str());
+  llvm::SmallString<32> buf;
+  llvm::raw_svector_ostream oss(buf);
+  oss << "analog/" << channel;
+  m_impl = new SimFloatInput(oss.str());
 
   LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
 }

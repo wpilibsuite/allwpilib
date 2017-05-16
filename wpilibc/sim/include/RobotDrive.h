@@ -14,6 +14,7 @@
 #include "ErrorBase.h"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
+#include "llvm/raw_ostream.h"
 
 namespace frc {
 
@@ -97,7 +98,7 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   void StopMotor() override;
   bool IsSafetyEnabled() const override;
   void SetSafetyEnabled(bool enabled) override;
-  void GetDescription(std::ostringstream& desc) const override;
+  void GetDescription(llvm::raw_ostream& desc) const override;
 
  protected:
   void InitRobotDrive();

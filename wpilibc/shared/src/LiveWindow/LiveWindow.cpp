@@ -8,8 +8,9 @@
 #include "LiveWindow/LiveWindow.h"
 
 #include <algorithm>
-#include <sstream>
 
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 #include "networktables/NetworkTable.h"
 
 using namespace frc;
@@ -154,7 +155,8 @@ void LiveWindow::AddActuator(const std::string& subsystem,
  */
 void LiveWindow::AddSensor(std::string type, int channel,
                            LiveWindowSendable* component) {
-  std::ostringstream oss;
+  llvm::SmallString<128> buf;
+  llvm::raw_svector_ostream oss(buf);
   oss << type << "[" << channel << "]";
   AddSensor("Ungrouped", oss.str(), component);
   std::shared_ptr<LiveWindowSendable> component_stl(
@@ -169,7 +171,8 @@ void LiveWindow::AddSensor(std::string type, int channel,
  */
 void LiveWindow::AddActuator(std::string type, int channel,
                              LiveWindowSendable* component) {
-  std::ostringstream oss;
+  llvm::SmallString<128> buf;
+  llvm::raw_svector_ostream oss(buf);
   oss << type << "[" << channel << "]";
   AddActuator("Ungrouped", oss.str(),
               std::shared_ptr<LiveWindowSendable>(component,
@@ -181,7 +184,8 @@ void LiveWindow::AddActuator(std::string type, int channel,
  */
 void LiveWindow::AddActuator(std::string type, int module, int channel,
                              LiveWindowSendable* component) {
-  std::ostringstream oss;
+  llvm::SmallString<128> buf;
+  llvm::raw_svector_ostream oss(buf);
   oss << type << "[" << module << "," << channel << "]";
   AddActuator("Ungrouped", oss.str(),
               std::shared_ptr<LiveWindowSendable>(component,

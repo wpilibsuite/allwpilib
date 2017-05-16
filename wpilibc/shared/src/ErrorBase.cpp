@@ -15,6 +15,8 @@
 
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -83,7 +85,8 @@ void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
                              int lineNumber) const {
   // If there was an error
   if (success <= 0) {
-    std::stringstream err;
+    llvm::SmallString<128> buf;
+    llvm::raw_svector_ostream err(buf);
     err << success << ": " << contextMessage;
 
     // Set the current error information for this object.

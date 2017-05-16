@@ -10,8 +10,10 @@
 #include <chrono>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <string>
+
+#include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 inline std::string NowTime();
 
@@ -31,7 +33,7 @@ class Log {
  public:
   Log();
   virtual ~Log();
-  std::ostringstream& Get(TLogLevel level = logINFO);
+  llvm::raw_ostream& Get(TLogLevel level = logINFO);
 
  public:
   static TLogLevel& ReportingLevel();
@@ -39,7 +41,8 @@ class Log {
   static TLogLevel FromString(const std::string& level);
 
  protected:
-  std::ostringstream os;
+  llvm::SmallString<128> buf;
+  llvm::raw_svector_ostream oss{buf};
 
  private:
   Log(const Log&);
@@ -48,16 +51,16 @@ class Log {
 
 inline Log::Log() {}
 
-inline std::ostringstream& Log::Get(TLogLevel level) {
-  os << "- " << NowTime();
-  os << " " << ToString(level) << ": ";
-  os << std::string(level > logDEBUG ? level - logDEBUG : 0, '\t');
-  return os;
+inline llvm::raw_ostream& Log::Get(TLogLevel level) {
+  oss << "- " << NowTime();
+  oss << " " << ToString(level) << ": ";
+  oss << std::string(level > logDEBUG ? level - logDEBUG : 0, '\t');
+  return oss;
 }
 
 inline Log::~Log() {
-  os << std::endl;
-  std::cerr << os.str();
+  oss << "\n";
+  std::cerr << oss.str();
 }
 
 inline TLogLevel& Log::ReportingLevel() {
@@ -96,16 +99,29 @@ typedef Log FILELog;
   Log().Get(level)
 
 inline std::string NowTime() {
-  std::stringstream ss;
-  ss << std::setfill('0') << std::setw(2);
+  llvm::SmallString<128> buf;
+  llvm::raw_svector_ostream oss(buf);
 
   using namespace std::chrono;
   auto now = system_clock::now().time_since_epoch();
 
-  ss << duration_cast<hours>(now).count() % 24 << ":"
-     << duration_cast<minutes>(now).count() % 60 << ":"
-     << duration_cast<seconds>(now).count() % 60 << "."
-     << duration_cast<milliseconds>(now).count() % 1000;
+  // Hours
+  auto count = duration_cast<hours>(now).count() % 24;
+  if (count < 10) oss << "0";
+  oss << count << ":";
 
-  return ss.str();
+  // Minutes
+  count = duration_cast<minutes>(now).count() % 60;
+  if (count < 10) oss << "0";
+  oss << count << ":";
+
+  // Seconds
+  count = duration_cast<seconds>(now).count() % 60;
+  if (count < 10) oss << "0";
+  oss << count << ".";
+
+  // Milliseconds
+  oss << duration_cast<milliseconds>(now).count() % 1000;
+
+  return oss.str();
 }
