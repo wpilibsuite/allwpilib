@@ -41,11 +41,9 @@ PIDCommand::PIDCommand(double p, double i, double d, double period) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this, period);
 }
 
-void PIDCommand::_Initialize() { m_controller->Enable(); }
+void PIDCommand::Initialize() { m_controller->Enable(); }
 
-void PIDCommand::_End() { m_controller->Disable(); }
-
-void PIDCommand::_Interrupted() { _End(); }
+void PIDCommand::End() { m_controller->Disable(); }
 
 void PIDCommand::SetSetpointRelative(double deltaSetpoint) {
   SetSetpoint(GetSetpoint() + deltaSetpoint);

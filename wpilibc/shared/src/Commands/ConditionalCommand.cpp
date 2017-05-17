@@ -46,7 +46,7 @@ ConditionalCommand::ConditionalCommand(const std::string& name, Command* onTrue,
   for (auto requirement : m_onFalse->GetRequirements()) Requires(requirement);
 }
 
-void ConditionalCommand::_Initialize() {
+void ConditionalCommand::Initialize() {
   if (Condition()) {
     m_chosenCommand = m_onTrue;
   } else {

@@ -55,10 +55,6 @@ class CommandGroup : public Command {
   virtual bool IsFinished();
   virtual void End();
   virtual void Interrupted();
-  virtual void _Initialize();
-  virtual void _Interrupted();
-  virtual void _Execute();
-  virtual void _End();
 
  private:
   void CancelConflicts(Command* command);

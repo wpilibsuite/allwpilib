@@ -54,7 +54,6 @@ class ConditionalCommand : public Command {
    */
   virtual bool Condition() = 0;
 
-  void _Initialize() override;
   void _Cancel() override;
   bool IsFinished() override;
   void Interrupted() override;

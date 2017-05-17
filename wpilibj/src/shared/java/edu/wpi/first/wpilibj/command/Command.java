@@ -207,10 +207,8 @@ public abstract class Command implements NamedSendable {
     if (m_initialized) {
       if (isCanceled()) {
         interrupted();
-        _interrupted();
       } else {
         end();
-        _end();
       }
     }
     m_initialized = false;
@@ -236,10 +234,8 @@ public abstract class Command implements NamedSendable {
     if (!m_initialized) {
       m_initialized = true;
       startTiming();
-      _initialize();
       initialize();
     }
-    _execute();
     execute();
     return !isFinished();
   }
@@ -250,24 +246,10 @@ public abstract class Command implements NamedSendable {
   protected void initialize() {}
 
   /**
-   * A shadow method called before {@link Command#initialize() initialize()}.
-   */
-  @SuppressWarnings("MethodName")
-  void _initialize() {
-  }
-
-  /**
    * The execute method is called repeatedly until this Command either finishes or is canceled.
    */
   @SuppressWarnings("MethodName")
   protected void execute() {}
-
-  /**
-   * A shadow method called before {@link Command#execute() execute()}.
-   */
-  @SuppressWarnings("MethodName")
-  void _execute() {
-  }
 
   /**
    * Returns whether this command is finished. If it is, then the command will be removed and {@link
@@ -293,13 +275,6 @@ public abstract class Command implements NamedSendable {
   protected void end() {}
 
   /**
-   * A shadow method called after {@link Command#end() end()}.
-   */
-  @SuppressWarnings("MethodName")
-  void _end() {
-  }
-
-  /**
    * Called when the command ends because somebody called {@link Command#cancel() cancel()} or
    * another command shared the same requirements as this one, and booted it out.
    *
@@ -312,12 +287,6 @@ public abstract class Command implements NamedSendable {
   protected void interrupted() {
     end();
   }
-
-  /**
-   * A shadow method called after {@link Command#interrupted() interrupted()}.
-   */
-  @SuppressWarnings("MethodName")
-  void _interrupted() {}
 
   /**
    * Called to indicate that the timer should start. This is called right before {@link

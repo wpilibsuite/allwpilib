@@ -125,7 +125,7 @@ public abstract class ConditionalCommand extends Command {
    * Calls {@link ConditionalCommand#condition()} and runs the proper command.
    */
   @Override
-  protected void _initialize() {
+  protected void initialize() {
     if (condition()) {
       m_chosenCommand = m_onTrue;
     } else {

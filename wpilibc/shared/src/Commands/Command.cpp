@@ -137,10 +137,8 @@ void Command::Removed() {
   if (m_initialized) {
     if (IsCanceled()) {
       Interrupted();
-      _Interrupted();
     } else {
       End();
-      _End();
     }
   }
   m_initialized = false;
@@ -180,10 +178,8 @@ bool Command::Run() {
   if (!m_initialized) {
     m_initialized = true;
     StartTiming();
-    _Initialize();
     Initialize();
   }
-  _Execute();
   Execute();
   return !IsFinished();
 }
@@ -219,14 +215,6 @@ void Command::End() {}
  * method within this method, as done here.</p>
  */
 void Command::Interrupted() { End(); }
-
-void Command::_Initialize() {}
-
-void Command::_Interrupted() {}
-
-void Command::_Execute() {}
-
-void Command::_End() {}
 
 /**
  * Called to indicate that the timer should start.
