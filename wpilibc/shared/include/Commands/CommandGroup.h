@@ -42,6 +42,8 @@ class CommandGroup : public Command {
   explicit CommandGroup(const std::string& name);
   virtual ~CommandGroup() = default;
 
+  template <class... T>
+  void AddParallelGroup(Command* command1, T... commands);
   void AddSequential(Command* command);
   void AddSequential(Command* command, double timeout);
   void AddParallel(Command* command);
@@ -71,6 +73,32 @@ class CommandGroup : public Command {
 
   /** The current command, -1 signifies that none have been run */
   int m_currentCommandIndex = -1;
+
+  template <class... Commands>
+  void _addParallelGroup(Command*, Command*, Commands...);
+  void _addParallelGroup(Command*);
+  template <class... Commands>
+  bool _checkNull(Command*, Commands...);
+  bool _checkNull(Command*);
 };
+
+template <class... Commands>
+void CommandGroup::AddParallelGroup(Command* command1, Commands... commands) {
+  if (!AssertUnlocked("Cannot add new command to command group")) return;
+  if (_checkNull(command1) || _checkNull(commands...)) return;
+  _addParallelGroup(command1, commands...);
+}
+
+template <class... Commands>
+void CommandGroup::_addParallelGroup(Command* command1, Command* command2,
+                                     Commands... commands) {
+  AddParallel(command1);
+  _asip(command2, commands...);
+}
+
+template <class... Commands>
+bool CommandGroup::_checkNull(Command* command1, Commands... commands) {
+  return _checkNull(command1) || _checkNull(commands...);
+}
 
 }  // namespace frc

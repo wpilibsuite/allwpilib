@@ -315,3 +315,15 @@ void CommandGroup::CancelConflicts(Command* command) {
 }
 
 int CommandGroup::GetSize() const { return m_children.size(); }
+
+void CommandGroup::_addParallelGroup(Command* command) {
+  AddSequential(command);
+}
+
+bool CommandGroup::_checkNull(Command* command) {
+  if (command == nullptr) {
+    wpi_setWPIErrorWithContext(NullParameter, "command");
+    return true;
+  }
+  return false;
+}

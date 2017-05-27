@@ -65,6 +65,44 @@ public class CommandGroup extends Command {
   }
 
   /**
+   * Adds a set of {@link Command Commands} to the group.  The {@link Command Commands} will be
+   * started after all previously added {@link Command Commands}, but at the same time as the other
+   * commands added here.
+   *
+   * <p> Note that any requirements the given {@link Command Commands} will be added to the
+   * group. For this reason, a {@link Command Command's} requirements can not be changed after being
+   * added to a group. </p>
+   *
+   * <p> It is recommended that this method be called in the constructor. </p>
+   *
+   * @param command1 The first {@link Command Command} to be added
+   * @param commands The rest of the {@link Command Commands} to be added
+   * @throws IllegalUseOfCommandException if the group has been started before or been given to
+   *                                      another group
+   * @throws IllegalArgumentException     if command1 or any of the {@liink Command Commands} in
+   *                                      commands is null
+   */
+  public final synchronized void addParallelGroup(Command command1, Command... commands) {
+    validate("Can not add new command to command group");
+    if (command1 == null) {
+      throw new IllegalArgumentException("Given null command");
+    }
+    for (Command c : commands) {
+      if (c == null) {
+        throw new IllegalArgumentException("Given null command");
+      }
+    }
+
+    Command head = command1;
+    for (Command c : commands) {
+      addParallel(head);
+      head = c;
+    }
+
+    addSequential(head);
+  }
+
+  /**
    * Adds a new {@link Command Command} to the group. The {@link Command Command} will be started
    * after all the previously added {@link Command Commands}.
    *
