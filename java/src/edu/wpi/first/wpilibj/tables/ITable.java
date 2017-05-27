@@ -625,4 +625,10 @@ public interface ITable {
    */
   @Deprecated
   public double getDouble(String key, double defaultValue);
+
+  /**
+   * Gets the full path of this table.
+   */
+  public String getPath();
+
 }

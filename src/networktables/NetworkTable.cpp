@@ -576,3 +576,7 @@ std::shared_ptr<nt::Value> NetworkTable::GetValue(StringRef key) const {
   path += key;
   return nt::GetEntryValue(path);
 }
+
+StringRef NetworkTable::GetPath() const {
+  return m_path;
+}

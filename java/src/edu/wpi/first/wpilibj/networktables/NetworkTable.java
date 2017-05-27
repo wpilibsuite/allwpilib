@@ -1102,4 +1102,14 @@ public class NetworkTable implements ITable, IRemote {
   public double getDouble(String key, double defaultValue) {
     return getNumber(key, defaultValue);
   }
+
+  /**
+   * {@inheritDoc}
+   * @return
+   */
+  @Override
+  public String getPath() {
+    return path;
+  }
+
 }

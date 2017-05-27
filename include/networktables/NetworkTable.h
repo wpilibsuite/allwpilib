@@ -562,6 +562,11 @@ class NetworkTable : public ITable {
    * does not exist
    */
   std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const override;
+
+  /**
+   * Gets the full path of this table.
+   */
+  llvm::StringRef GetPath() const override;
 };
 
 #endif  // NETWORKTABLE_H_

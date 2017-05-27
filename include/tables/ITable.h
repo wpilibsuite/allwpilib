@@ -482,6 +482,12 @@ class ITable {
    * @param listener the listener to be removed
    */
   virtual void RemoveTableListener(ITableListener* listener) = 0;
+
+  /**
+   * Gets the full path of this table.
+   */
+  virtual llvm::StringRef GetPath() const = 0;
+
 };
 
 #endif  // ITABLE_H_
