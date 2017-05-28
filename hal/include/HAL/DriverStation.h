@@ -99,6 +99,7 @@ int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
 HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum);
 int32_t HAL_GetJoystickType(int32_t joystickNum);
 char* HAL_GetJoystickName(int32_t joystickNum);
+void HAL_FreeJoystickName(char* name);
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis);
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble);
