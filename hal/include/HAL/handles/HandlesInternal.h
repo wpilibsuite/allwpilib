@@ -13,7 +13,7 @@
 
 /* General Handle Data Layout
  * Bits 0-15:  Handle Index
- * Bits 16-23: Unused
+ * Bits 16-23: 8 bit rolling reset detection
  * Bits 24-30: Handle Type
  * Bit 31:     1 if handle error, 0 if no error
  *
@@ -22,6 +22,19 @@
  */
 
 namespace hal {
+
+class HandleBase {
+ public:
+  HandleBase();
+  ~HandleBase();
+  HandleBase(const HandleBase&) = delete;
+  HandleBase& operator=(const HandleBase&) = delete;
+  virtual void ResetHandles();
+  static void ResetGlobalHandles();
+
+ protected:
+  int16_t m_version;
+};
 
 constexpr int16_t InvalidHandleIndex = -1;
 
@@ -57,9 +70,16 @@ static inline HAL_HandleEnum getHandleType(HAL_Handle handle) {
 static inline bool isHandleType(HAL_Handle handle, HAL_HandleEnum handleType) {
   return handleType == getHandleType(handle);
 }
+static inline bool isHandleCorrectVersion(HAL_Handle handle, int16_t version) {
+  return (((handle & 0xFF0000) >> 16) & version) == version;
+}
 static inline int16_t getHandleTypedIndex(HAL_Handle handle,
-                                          HAL_HandleEnum enumType) {
+                                          HAL_HandleEnum enumType,
+                                          int16_t version) {
   if (!isHandleType(handle, enumType)) return InvalidHandleIndex;
+#if !defined(CONFIG_ATHENA)
+  if (!isHandleCorrectVersion(handle, version)) return InvalidHandleIndex;
+#endif
   return getHandleIndex(handle);
 }
 
@@ -94,5 +114,6 @@ HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module);
 
 HAL_PortHandle createPortHandleForSPI(uint8_t channel);
 
-HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType);
+HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
+                        int16_t version);
 }  // namespace hal

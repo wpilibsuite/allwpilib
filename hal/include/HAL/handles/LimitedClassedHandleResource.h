@@ -32,7 +32,7 @@ namespace hal {
  */
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
-class LimitedClassedHandleResource {
+class LimitedClassedHandleResource : public HandleBase {
   friend class LimitedClassedHandleResourceTest;
 
  public:
@@ -44,6 +44,7 @@ class LimitedClassedHandleResource {
   THandle Allocate(std::shared_ptr<TStruct> toSet);
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);
+  void ResetHandles() override;
 
  private:
   std::array<std::shared_ptr<TStruct>, size> m_structures;
@@ -64,7 +65,7 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
       // and allocate it.
       std::lock_guard<hal::priority_mutex> sync(m_handleMutexes[i]);
       m_structures[i] = toSet;
-      return static_cast<THandle>(createHandle(i, enumValue));
+      return static_cast<THandle>(createHandle(i, enumValue, m_version));
     }
   }
   return HAL_kInvalidHandle;
@@ -75,7 +76,7 @@ template <typename THandle, typename TStruct, int16_t size,
 std::shared_ptr<TStruct> LimitedClassedHandleResource<
     THandle, TStruct, size, enumValue>::Get(THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
-  int16_t index = getHandleTypedIndex(handle, enumValue);
+  int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) {
     return nullptr;
   }
@@ -90,11 +91,25 @@ template <typename THandle, typename TStruct, int16_t size,
 void LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Free(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
-  int16_t index = getHandleTypedIndex(handle, enumValue);
+  int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) return;
   // lock and deallocated handle
   std::lock_guard<hal::priority_mutex> sync(m_allocateMutex);
   std::lock_guard<hal::priority_mutex> lock(m_handleMutexes[index]);
   m_structures[index].reset();
+}
+
+template <typename THandle, typename TStruct, int16_t size,
+          HAL_HandleEnum enumValue>
+void LimitedClassedHandleResource<THandle, TStruct, size,
+                                  enumValue>::ResetHandles() {
+  {
+    std::lock_guard<hal::priority_mutex> lock(m_allocateMutex);
+    for (int i = 0; i < size; i++) {
+      std::lock_guard<hal::priority_mutex> sync(m_handleMutexes[i]);
+      m_structures[i].reset();
+    }
+  }
+  HandleBase::ResetHandles();
 }
 }  // namespace hal

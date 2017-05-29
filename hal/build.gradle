@@ -18,6 +18,7 @@ model {
             binaries.all {
                 tasks.withType(CppCompile) {
                     cppCompiler.args "-DNAMESPACED_PRIORITY"
+                    cppCompiler.args "-DCONFIG_ATHENA"
                     addNiLibraryLinks(linker, targetPlatform)
                     addWpiUtilLibraryLinks(it, linker, targetPlatform)
                 }
