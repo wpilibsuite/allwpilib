@@ -18,6 +18,7 @@
 #include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_NotifierJNI.h"
 #include "support/SafeThread.h"
+#include "HAL/cpp/NotifierInternal.h"
 
 using namespace frc;
 
@@ -147,7 +148,8 @@ Java_edu_wpi_first_wpilibj_hal_NotifierJNI_initializeNotifier(
   notify->Start();
   notify->SetFunc(env, func, mid);
   int32_t status = 0;
-  HAL_NotifierHandle notifierHandle = HAL_InitializeNotifier(notifierHandler, notify, &status);
+  HAL_NotifierHandle notifierHandle = 
+      HAL_InitializeNotifierNonThreadedUnsafe(notifierHandler, notify, &status);
 
   NOTIFIERJNI_LOG(logDEBUG) << "Notifier Handle = " << notifierHandle;
   NOTIFIERJNI_LOG(logDEBUG) << "Status = " << status;

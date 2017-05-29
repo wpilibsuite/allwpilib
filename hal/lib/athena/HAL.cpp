@@ -25,6 +25,7 @@
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
 #include "HAL/Notifier.h"
+#include "HAL/cpp/NotifierInternal.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "ctre/ctre.h"
@@ -306,7 +307,8 @@ int32_t HAL_Initialize(int32_t mode) {
   HAL_BaseInitialize(&status);
 
   if (!rolloverNotifier)
-    rolloverNotifier = HAL_InitializeNotifier(timerRollover, nullptr, &status);
+    rolloverNotifier = HAL_InitializeNotifierNonThreadedUnsafe(
+        timerRollover, nullptr, &status);
   if (status == 0) {
     uint64_t curTime = HAL_GetFPGATime(&status);
     if (status == 0)
