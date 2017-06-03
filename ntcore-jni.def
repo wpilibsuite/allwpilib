@@ -119,6 +119,8 @@ NT_StartDSClient @119
 NT_StopDSClient @120
 NT_StartClientNone @121
 
+NT_GetNetworkMode @122
+
 ; JNI functions
 JNI_OnLoad
 JNI_OnUnload
@@ -194,3 +196,4 @@ Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultRaw
 Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultBooleanArray
 Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultDoubleArray
 Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_setDefaultStringArray
+Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getNetworkMode

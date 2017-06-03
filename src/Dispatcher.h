@@ -39,6 +39,7 @@ class DispatcherBase {
 
   virtual ~DispatcherBase();
 
+  unsigned int GetNetworkMode() const;
   void StartServer(llvm::StringRef persist_filename,
                    std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   void StartClient();
@@ -84,7 +85,7 @@ class DispatcherBase {
 
   Storage& m_storage;
   Notifier& m_notifier;
-  bool m_server = false;
+  unsigned int m_networkMode = NT_NET_MODE_NONE;
   std::string m_persist_filename;
   std::thread m_dispatch_thread;
   std::thread m_clientserver_thread;

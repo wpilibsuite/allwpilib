@@ -365,6 +365,10 @@ void NT_SetNetworkIdentity(const char* name, size_t name_len) {
   nt::SetNetworkIdentity(StringRef(name, name_len));
 }
 
+unsigned int NT_GetNetworkMode() {
+  return nt::GetNetworkMode();
+}
+
 void NT_StartServer(const char* persist_filename, const char* listen_address,
                     unsigned int port) {
   nt::StartServer(persist_filename, listen_address, port);

@@ -252,6 +252,7 @@ std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
  * Client/Server Functions
  */
 void SetNetworkIdentity(StringRef name);
+unsigned int GetNetworkMode();
 void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port);
 void StopServer();

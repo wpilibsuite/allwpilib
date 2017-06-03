@@ -240,6 +240,11 @@ void SetNetworkIdentity(StringRef name) {
   Dispatcher::GetInstance().SetIdentity(name);
 }
 
+unsigned int GetNetworkMode() {
+  auto& d = Dispatcher::GetInstance();
+  return d.GetNetworkMode();
+}
+
 void StartServer(StringRef persist_filename, const char* listen_address,
                  unsigned int port) {
   Dispatcher::GetInstance().StartServer(persist_filename, listen_address, port);

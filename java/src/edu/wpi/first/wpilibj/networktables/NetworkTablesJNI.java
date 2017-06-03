@@ -67,6 +67,12 @@ public class NetworkTablesJNI {
     }
   }
 
+  public static final int NT_NET_MODE_NONE = 0x00;
+  public static final int NT_NET_MODE_SERVER = 0x01;
+  public static final int NT_NET_MODE_CLIENT = 0x02;
+  public static final int NT_NET_MODE_STARTING = 0x04;
+  public static final int NT_NET_MODE_FAILURE = 0x08;
+
   public static native boolean containsKey(String key);
   public static native int getType(String key);
 
@@ -148,6 +154,7 @@ public class NetworkTablesJNI {
   // public static native byte[] getRpcResultNonblocking(int callUid) throws RpcNoResponseException;
 
   public static native void setNetworkIdentity(String name);
+  public static native int getNetworkMode();
   public static native void startServer(String persistFilename, String listenAddress, int port);
   public static native void stopServer();
   public static native void startClient();

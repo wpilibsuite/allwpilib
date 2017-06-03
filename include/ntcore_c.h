@@ -57,6 +57,15 @@ enum NT_NotifyKind {
   NT_NOTIFY_FLAGS = 0x20      /* flags changed */
 };
 
+/** Client/server modes */
+enum NT_NetworkMode {
+  NT_NET_MODE_NONE = 0x00,        /* not running */
+  NT_NET_MODE_SERVER = 0x01,      /* running in server mode */
+  NT_NET_MODE_CLIENT = 0x02,      /* running in client mode */
+  NT_NET_MODE_STARTING = 0x04,    /* flag for starting (either client or server) */
+  NT_NET_MODE_FAILURE = 0x08,     /* flag for failure (either client or server) */
+};
+
 /*
  * Structures
  */
@@ -344,6 +353,11 @@ struct NT_Value** NT_UnpackRpcValues(const char* packed, size_t packed_len,
  * Client/Server Functions
  */
 void NT_SetNetworkIdentity(const char* name, size_t name_len);
+
+/**
+ * Get the current network mode.
+ */
+unsigned int NT_GetNetworkMode();
 
 /** Start Server
  * Starts a server using the specified filename, listening address, and port.

@@ -118,3 +118,5 @@ NT_SetServerMulti @118
 NT_StartDSClient @119
 NT_StopDSClient @120
 NT_StartClientNone @121
+
+NT_GetNetworkMode @122

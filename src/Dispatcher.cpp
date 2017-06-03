@@ -75,6 +75,10 @@ DispatcherBase::~DispatcherBase() {
   Stop();
 }
 
+unsigned int DispatcherBase::GetNetworkMode() const {
+  return m_networkMode;
+}
+
 void DispatcherBase::StartServer(
     StringRef persist_filename,
     std::unique_ptr<wpi::NetworkAcceptor> acceptor) {
@@ -83,7 +87,7 @@ void DispatcherBase::StartServer(
     if (m_active) return;
     m_active = true;
   }
-  m_server = true;
+  m_networkMode = NT_NET_MODE_SERVER | NT_NET_MODE_STARTING;
   m_persist_filename = persist_filename;
   m_server_acceptor = std::move(acceptor);
 
@@ -103,7 +107,7 @@ void DispatcherBase::StartServer(
 
   using namespace std::placeholders;
   m_storage.SetOutgoing(std::bind(&Dispatcher::QueueOutgoing, this, _1, _2, _3),
-                        m_server);
+                        (m_networkMode & NT_NET_MODE_SERVER) != 0);
 
   m_dispatch_thread = std::thread(&Dispatcher::DispatchThreadMain, this);
   m_clientserver_thread = std::thread(&Dispatcher::ServerThreadMain, this);
@@ -115,10 +119,10 @@ void DispatcherBase::StartClient() {
     if (m_active) return;
     m_active = true;
   }
-  m_server = false;
+  m_networkMode = NT_NET_MODE_CLIENT | NT_NET_MODE_STARTING;
   using namespace std::placeholders;
   m_storage.SetOutgoing(std::bind(&Dispatcher::QueueOutgoing, this, _1, _2, _3),
-                        m_server);
+                        (m_networkMode & NT_NET_MODE_SERVER) != 0);
 
   m_dispatch_thread = std::thread(&Dispatcher::DispatchThreadMain, this);
   m_clientserver_thread = std::thread(&Dispatcher::ClientThreadMain, this);
@@ -243,7 +247,7 @@ void DispatcherBase::DispatchThreadMain() {
     if (!m_active) break;  // in case we were woken up to terminate
 
     // perform periodic persistent save
-    if (m_server && !m_persist_filename.empty() && start > next_save_time) {
+    if ((m_networkMode & NT_NET_MODE_SERVER) != 0 && !m_persist_filename.empty() && start > next_save_time) {
       next_save_time += save_delta_time;
       // handle loop taking too long
       if (start > next_save_time) next_save_time = start + save_delta_time;
@@ -264,10 +268,10 @@ void DispatcherBase::DispatchThreadMain() {
         // post outgoing messages if connection is active
         // only send keep-alives on client
         if (conn->state() == NetworkConnection::kActive)
-          conn->PostOutgoing(!m_server);
+          conn->PostOutgoing((m_networkMode & NT_NET_MODE_CLIENT) != 0);
 
         // if client, reconnect if connection died
-        if (!m_server && conn->state() == NetworkConnection::kDead)
+        if ((m_networkMode & NT_NET_MODE_CLIENT) != 0 && conn->state() == NetworkConnection::kDead)
           reconnect = true;
       }
       // reconnect if we disconnected (and a reconnect is not in progress)
@@ -297,15 +301,20 @@ void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
 void DispatcherBase::ServerThreadMain() {
   if (m_server_acceptor->start() != 0) {
     m_active = false;
+    m_networkMode = NT_NET_MODE_SERVER | NT_NET_MODE_FAILURE;
     return;
   }
+  m_networkMode = NT_NET_MODE_SERVER;
   while (m_active) {
     auto stream = m_server_acceptor->accept();
     if (!stream) {
       m_active = false;
       return;
     }
-    if (!m_active) return;
+    if (!m_active) {
+      m_networkMode = NT_NET_MODE_NONE;
+      return;
+    }
     DEBUG("server: client connection from " << stream->getPeerIP() << " port "
                                             << stream->getPeerPort());
 
@@ -333,6 +342,7 @@ void DispatcherBase::ServerThreadMain() {
       conn->Start();
     }
   }
+  m_networkMode = NT_NET_MODE_NONE;
 }
 
 void DispatcherBase::ClientThreadMain() {
@@ -348,7 +358,10 @@ void DispatcherBase::ClientThreadMain() {
       if (m_client_connector_override) {
         connect = m_client_connector_override;
       } else {
-        if (m_client_connectors.empty()) continue;
+        if (m_client_connectors.empty()) {
+          m_networkMode = NT_NET_MODE_CLIENT | NT_NET_MODE_FAILURE;
+          continue;
+        }
         if (i >= m_client_connectors.size()) i = 0;
         connect = m_client_connectors[i++];
       }
@@ -357,8 +370,12 @@ void DispatcherBase::ClientThreadMain() {
     // try to connect (with timeout)
     DEBUG("client trying to connect");
     auto stream = connect();
-    if (!stream) continue;  // keep retrying
+    if (!stream) {
+      m_networkMode = NT_NET_MODE_CLIENT | NT_NET_MODE_FAILURE;
+      continue;  // keep retrying
+    }
     DEBUG("client connected");
+    m_networkMode = NT_NET_MODE_CLIENT;
 
     std::unique_lock<std::mutex> lock(m_user_mutex);
     using namespace std::placeholders;
@@ -381,6 +398,7 @@ void DispatcherBase::ClientThreadMain() {
     m_do_reconnect = false;
     m_reconnect_cv.wait(lock, [&] { return !m_active || m_do_reconnect; });
   }
+  m_networkMode = NT_NET_MODE_NONE;
 }
 
 bool DispatcherBase::ClientHandshake(
@@ -551,7 +569,7 @@ bool DispatcherBase::ServerHandshake(
 }
 
 void DispatcherBase::ClientReconnect(unsigned int proto_rev) {
-  if (m_server) return;
+  if ((m_networkMode & NT_NET_MODE_SERVER) != 0) return;
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
     m_reconnect_proto_rev = proto_rev;

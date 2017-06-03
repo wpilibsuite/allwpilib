@@ -1504,6 +1504,17 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 
 /*
  * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
+ * Method:    getNetworkMode
+ * Signature: ()
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getNetworkMode
+  (JNIEnv *, jclass)
+{
+  return nt::GetNetworkMode();
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Method:    setServer
  * Signature: (Ljava/lang/String;I)V
  */
