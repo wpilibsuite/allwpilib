@@ -3,7 +3,7 @@
 Simluation is a mix of wpilib and other components.
 The wpilib components are in their respective locations in the /wpilibc and /wpilibj directories.
 
-The gazbeo plugins are currently built with CMake.
+The gazebo plugins are currently built with CMake.
 Eventually they will be built with gradle.
 
 ## Simulation delivery and installation
