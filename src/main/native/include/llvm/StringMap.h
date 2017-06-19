@@ -14,8 +14,10 @@
 #ifndef LLVM_ADT_STRINGMAP_H
 #define LLVM_ADT_STRINGMAP_H
 
+#include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 #include "llvm/PointerLikeTypeTraits.h"
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <utility>
@@ -470,6 +472,91 @@ public:
     return static_cast<StringMapEntry<ValueTy>*>(*this->Ptr);
   }
 };
+
+template <typename ValueTy>
+bool operator==(const StringMap<ValueTy>& lhs, const StringMap<ValueTy>& rhs) {
+  // same instance?
+  if (&lhs == &rhs) return true;
+
+  // first check that sizes are identical
+  if (lhs.size() != rhs.size()) return false;
+
+  // copy into vectors and sort by key
+  SmallVector<StringMapConstIterator<ValueTy>, 16> lhs_items;
+  lhs_items.reserve(lhs.size());
+  for (auto i = lhs.begin(), end = lhs.end(); i != end; ++i)
+    lhs_items.push_back(i);
+  std::sort(lhs_items.begin(), lhs_items.end(),
+            [](const StringMapConstIterator<ValueTy>& a,
+               const StringMapConstIterator<ValueTy>& b) {
+              return a->getKey() < b->getKey();
+            });
+
+  SmallVector<StringMapConstIterator<ValueTy>, 16> rhs_items;
+  rhs_items.reserve(rhs.size());
+  for (auto i = rhs.begin(), end = rhs.end(); i != end; ++i)
+    rhs_items.push_back(i);
+  std::sort(rhs_items.begin(), rhs_items.end(),
+            [](const StringMapConstIterator<ValueTy>& a,
+               const StringMapConstIterator<ValueTy>& b) {
+              return a->getKey() < b->getKey();
+            });
+
+  // compare vector keys and values
+  for (auto a = lhs_items.begin(), b = rhs_items.begin(),
+            aend = lhs_items.end(), bend = rhs_items.end();
+       a != aend && b != bend; ++a, ++b) {
+    if ((*a)->first() != (*b)->first() || (*a)->second != (*b)->second)
+      return false;
+  }
+  return true;
+}
+
+template <typename ValueTy>
+inline bool operator!=(const StringMap<ValueTy>& lhs,
+                       const StringMap<ValueTy>& rhs) {
+  return !(lhs == rhs);
+}
+
+template <typename ValueTy>
+bool operator<(const StringMap<ValueTy>& lhs, const StringMap<ValueTy>& rhs) {
+  // same instance?
+  if (&lhs == &rhs) return false;
+
+  // copy into vectors and sort by key
+  SmallVector<StringRef, 16> lhs_keys;
+  lhs_keys.reserve(lhs.size());
+  for (auto i = lhs.begin(), end = lhs.end(); i != end; ++i)
+    lhs_keys.push_back(i->getKey());
+  std::sort(lhs_keys.begin(), lhs_keys.end());
+
+  SmallVector<StringRef, 16> rhs_keys;
+  rhs_keys.reserve(rhs.size());
+  for (auto i = rhs.begin(), end = rhs.end(); i != end; ++i)
+    rhs_keys.push_back(i->getKey());
+  std::sort(rhs_keys.begin(), rhs_keys.end());
+
+  // use std::vector comparison
+  return lhs_keys < rhs_keys;
+}
+
+template <typename ValueTy>
+inline bool operator<=(const StringMap<ValueTy>& lhs,
+                       const StringMap<ValueTy>& rhs) {
+  return !(rhs < lhs);
+}
+
+template <typename ValueTy>
+inline bool operator>(const StringMap<ValueTy>& lhs,
+                      const StringMap<ValueTy>& rhs) {
+  return !(lhs <= rhs);
+}
+
+template <typename ValueTy>
+inline bool operator>=(const StringMap<ValueTy>& lhs,
+                       const StringMap<ValueTy>& rhs) {
+  return !(lhs < rhs);
+}
 
 } // namespace llvm
 
