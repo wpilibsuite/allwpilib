@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <llvm/raw_ostream.h>
+#include <support/deprecated.h>
 
 #include "ErrorBase.h"
 #include "MotorSafety.h"
@@ -30,7 +31,9 @@ class GenericHID;
  * function (intended for hand created drive code, such as autonomous) or with
  * the Tank/Arcade functions intended to be used for Operator Control driving.
  */
-class RobotDrive : public MotorSafety, public ErrorBase {
+class WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
+    RobotDrive : public MotorSafety,
+                 public ErrorBase {
  public:
   enum MotorType {
     kFrontLeftMotor = 0,
