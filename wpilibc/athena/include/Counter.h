@@ -23,6 +23,7 @@ class DigitalGlitchFilter;
 
 /**
  * Class for counting the number of ticks on a digital input channel.
+ *
  * This is a general purpose class for counting repetitive events. It can return
  * the number of counts, the period of the most recent cycle, and detect when
  * the signal being counted has stopped by supplying a maximum cycle time.
@@ -44,8 +45,6 @@ class Counter : public SensorBase,
   explicit Counter(int channel);
   explicit Counter(DigitalSource* source);
   explicit Counter(std::shared_ptr<DigitalSource> source);
-  WPI_DEPRECATED("Use pass-by-reference instead.")
-  explicit Counter(AnalogTrigger* trigger);
   explicit Counter(const AnalogTrigger& trigger);
   Counter(EncodingType encodingType, DigitalSource* upSource,
           DigitalSource* downSource, bool inverted);

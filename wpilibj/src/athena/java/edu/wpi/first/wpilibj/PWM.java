@@ -93,25 +93,6 @@ public class PWM extends SensorBase implements LiveWindowSendable {
   }
 
   /**
-   * Set the bounds on the PWM values. This sets the bounds on the PWM values for a particular each
-   * type of controller. The values determine the upper and lower speeds as well as the deadband
-   * bracket.
-   *
-   * @param max         The Minimum pwm value
-   * @param deadbandMax The high end of the deadband range
-   * @param center      The center speed (off)
-   * @param deadbandMin The low end of the deadband range
-   * @param min         The minimum pwm value
-   * @deprecated Recommended to set bounds in ms using {@link #setBounds(double, double, double,
-   * double, double)}
-   */
-  @Deprecated
-  public void setRawBounds(final int max, final int deadbandMax, final int center,
-                        final int deadbandMin, final int min) {
-    PWMJNI.setPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min);
-  }
-
-  /**
    * Set the bounds on the PWM pulse widths. This sets the bounds on the PWM values for a particular
    * type of controller. The values determine the upper and lower speeds as well as the deadband
    * bracket.

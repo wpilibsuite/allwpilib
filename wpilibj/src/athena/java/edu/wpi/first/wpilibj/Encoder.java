@@ -16,13 +16,14 @@ import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.AllocationException;
 
 /**
- * Class to read quadrature encoders. Quadrature encoders are devices that count shaft rotation and
- * can sense direction. The output of the Encoder class is an integer that can count either up or
- * down, and can go negative for reverse direction counting. When creating Encoders, a direction
- * can be supplied that inverts the sense of the output to make code more readable if the encoder is
- * mounted such that forward movement generates negative values. Quadrature encoders have two
- * digital outputs, an A Channel and a B Channel, that are out of phase with each other for
- * direction sensing.
+ * Class to read quadrature encoders.
+ *
+ * <p>Quadrature encoders are devices that count shaft rotation and can sense direction. The output
+ * of the Encoder class is an integer that can count either up or down, and can go negative for
+ * reverse direction counting. When creating Encoders, a direction can be supplied that inverts the
+ * sense of the output to make code more readable if the encoder is mounted such that forward
+ * movement generates negative values. Quadrature encoders have two digital outputs, an A Channel
+ * and a B Channel, that are out of phase with each other for direction sensing.
  *
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
@@ -377,8 +378,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    * Returns the period of the most recent pulse. Returns the period of the most recent Encoder
    * pulse in seconds. This method compensates for the decoding type.
    *
-   * <p><b>Warning:</b> This returns unscaled periods and getRate() scales using value from
-   * setDistancePerPulse().
+   * <p><b>Warning:</b> This returns unscaled periods. Use getRate() for rates that are scaled using
+   * the value from setDistancePerPulse().
    *
    * @return Period in seconds of the most recent pulse.
    * @deprecated Use getRate() in favor of this method.

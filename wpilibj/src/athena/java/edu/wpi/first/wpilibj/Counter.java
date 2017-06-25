@@ -18,10 +18,11 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
- * Class for counting the number of ticks on a digital input channel. This is a general purpose
- * class for counting repetitive events. It can return the number of counts, the period of the most
- * recent cycle, and detect when the signal being counted has stopped by supplying a maximum cycle
- * time.
+ * Class for counting the number of ticks on a digital input channel.
+ *
+ * <p>This is a general purpose class for counting repetitive events. It can return the number of
+ * counts, the period of the most recent cycle, and detect when the signal being counted has
+ * stopped by supplying a maximum cycle time.
  *
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.

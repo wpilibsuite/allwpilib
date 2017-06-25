@@ -91,35 +91,6 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   }
 
   /**
-   * Generate a single pulse. Write a pulse to the specified digital output channel. There can only
-   * be a single pulse going at any time.
-   *
-   * @param channel     Unused
-   * @param pulseLength The length of the pulse.
-   * @deprecated Use {@link #pulse(double)} instead.
-   */
-  @Deprecated
-  @SuppressWarnings("PMD.UnusedFormalParameter")
-  public void pulse(final int channel, final double pulseLength) {
-    DIOJNI.pulse(m_handle, pulseLength);
-  }
-
-  /**
-   * @param channel     Unused
-   * @param pulseLength The length of the pulse.
-   * @deprecated Generate a single pulse. Write a pulse to the specified digital output channel.
-   *             There can only be a single pulse going at any time.
-   */
-  @Deprecated
-  @SuppressWarnings("PMD.UnusedFormalParameter")
-  public void pulse(final int channel, final int pulseLength) {
-    double convertedPulse = pulseLength / 1.0e9 * (DIOJNI.getLoopTiming() * 25);
-    System.err
-        .println("You should use the double version of pulse for portability.  This is deprecated");
-    DIOJNI.pulse(m_handle, convertedPulse);
-  }
-
-  /**
    * Determine if the pulse is still going. Determine if a previously started pulse is still going.
    *
    * @return true if pulsing

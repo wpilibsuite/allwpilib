@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import java.nio.ByteBuffer;
 import java.util.Hashtable;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import edu.wpi.first.wpilibj.HLUsageReporting;
@@ -18,7 +17,6 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.networktables.NetworkTableKeyNotDefined;
 import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
 
 /**
  * The {@link SmartDashboard} class is the bridge between robot programs and the SmartDashboard on
@@ -209,20 +207,6 @@ public class SmartDashboard {
   }
 
   /**
-   * Returns the boolean the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   *     the given key
-   * @deprecated This exception-raising method has been replaced by the
-   *     default-taking method {@link #getBoolean(String, boolean)}.
-   */
-  @Deprecated
-  public static boolean getBoolean(String key) throws TableKeyNotDefinedException {
-    return table.getBoolean(key);
-  }
-
-  /**
    * Returns the boolean the key maps to. If the key does not exist or is of
    *     different type, it will return the default value.
    * @param key the key to look up
@@ -255,20 +239,6 @@ public class SmartDashboard {
   }
 
   /**
-   * Returns the number the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   *     the given key
-   * @deprecated This exception-raising method has been replaced by the
-   *     default-taking method {@link #getNumber(String, double)}.
-   */
-  @Deprecated
-  public static double getNumber(String key) throws TableKeyNotDefinedException {
-    return table.getNumber(key);
-  }
-
-  /**
    * Returns the number the key maps to. If the key does not exist or is of
    *     different type, it will return the default value.
    * @param key the key to look up
@@ -298,20 +268,6 @@ public class SmartDashboard {
    */
   public static boolean setDefaultString(String key, String defaultValue) {
     return table.setDefaultString(key, defaultValue);
-  }
-
-  /**
-   * Returns the string the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   *     the given key
-   * @deprecated This exception-raising method has been replaced by the
-   *     default-taking method {@link #getString(String, String)}.
-   */
-  @Deprecated
-  public static String getString(String key) throws TableKeyNotDefinedException {
-    return table.getString(key);
   }
 
   /**
@@ -364,20 +320,6 @@ public class SmartDashboard {
    */
   public static boolean setDefaultBooleanArray(String key, Boolean[] defaultValue) {
     return table.setDefaultBooleanArray(key, defaultValue);
-  }
-
-  /**
-   * Returns the boolean array the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   *     the given key
-   * @deprecated This exception-raising method has been replaced by the
-   *     default-taking method {@link #getBooleanArray(String, boolean[])}.
-   */
-  @Deprecated
-  public boolean[] getBooleanArray(String key) throws TableKeyNotDefinedException {
-    return table.getBooleanArray(key);
   }
 
   /**
@@ -445,20 +387,6 @@ public class SmartDashboard {
   }
 
   /**
-   * Returns the number array the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   *     the given key
-   * @deprecated This exception-raising method has been replaced by the
-   *     default-taking method {@link #getNumberArray(String, double[])}.
-   */
-  @Deprecated
-  public double[] getNumberArray(String key) throws TableKeyNotDefinedException {
-    return table.getNumberArray(key);
-  }
-
-  /**
    * Returns the number array the key maps to. If the key does not exist or is
    *     of different type, it will return the default value.
    * @param key the key to look up
@@ -500,20 +428,6 @@ public class SmartDashboard {
    */
   public static boolean setDefaultStringArray(String key, String[] defaultValue) {
     return table.setDefaultStringArray(key, defaultValue);
-  }
-
-  /**
-   * Returns the string array the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   *     the given key
-   * @deprecated This exception-raising method has been replaced by the
-   *     default-taking method {@link #getStringArray(String, String[])}.
-   */
-  @Deprecated
-  public String[] getStringArray(String key) throws TableKeyNotDefinedException {
-    return table.getStringArray(key);
   }
 
   /**
@@ -560,20 +474,6 @@ public class SmartDashboard {
   }
 
   /**
-   * Returns the raw value (byte array) the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   *     the given key
-   * @deprecated This exception-raising method has been replaced by the
-   *     default-taking method {@link #getRaw(String, byte[])}.
-   */
-  @Deprecated
-  public byte[] getRaw(String key) throws TableKeyNotDefinedException {
-    return table.getRaw(key);
-  }
-
-  /**
    * Returns the raw value (byte array) the key maps to. If the key does not
    *     exist or is of different type, it will return the default value.
    * @param key the key to look up
@@ -584,106 +484,4 @@ public class SmartDashboard {
   public static byte[] getRaw(String key, byte[] defaultValue) {
     return table.getRaw(key, defaultValue);
   }
-
-  /*
-   * Deprecated Methods
-   */
-
-  /**
-   * Maps the specified key to the specified value in this table.
-   *
-   * <p>The key can not be null. The value can be retrieved by calling the get method with a key
-   * that is equal to the original key.
-   *
-   * @param key   the key
-   * @param value the value
-   * @throws IllegalArgumentException if key is null
-   * @deprecated Use {@link #putNumber(java.lang.String, double) putNumber method} instead
-   */
-  @Deprecated
-  public static void putInt(String key, int value) {
-    table.putNumber(key, value);
-  }
-
-  /**
-   * Returns the value at the specified key.
-   *
-   * @param key the key
-   * @return the value
-   * @throws TableKeyNotDefinedException if there is no value mapped to by the key
-   * @throws IllegalArgumentException    if the value mapped to by the key is not an int
-   * @throws IllegalArgumentException    if the key is null
-   * @deprecated Use {@link #getNumber(java.lang.String) getNumber} instead
-   */
-  @Deprecated
-  public static int getInt(String key) throws TableKeyNotDefinedException {
-    return (int) table.getNumber(key);
-  }
-
-  /**
-   * Returns the value at the specified key.
-   *
-   * @param key          the key
-   * @param defaultValue the value returned if the key is undefined
-   * @return the value
-   * @throws TableKeyNotDefinedException if there is no value mapped to by the key
-   * @throws IllegalArgumentException    if the value mapped to by the key is not an int
-   * @throws IllegalArgumentException    if the key is null
-   * @deprecated Use {@link #getNumber(java.lang.String, double) getNumber} instead
-   */
-  @Deprecated
-  public static int getInt(String key, int defaultValue) throws TableKeyNotDefinedException {
-    try {
-      return (int) table.getNumber(key);
-    } catch (NoSuchElementException ex) {
-      return defaultValue;
-    }
-  }
-
-  /**
-   * Maps the specified key to the specified value in this table.
-   *
-   * <p>The key can not be null. The value can be retrieved by calling the get method with a key
-   * that is equal to the original key.
-   *
-   * @param key   the key
-   * @param value the value
-   * @throws IllegalArgumentException if key is null
-   * @deprecated Use{@link #putNumber(java.lang.String, double) putNumber} instead
-   */
-  @Deprecated
-  public static void putDouble(String key, double value) {
-    table.putNumber(key, value);
-  }
-
-  /**
-   * Returns the value at the specified key.
-   *
-   * @param key the key
-   * @return the value
-   * @throws TableKeyNotDefinedException if there is no value mapped to by the key
-   * @throws IllegalArgumentException    if the value mapped to by the key is not a double
-   * @throws IllegalArgumentException    if the key is null
-   * @deprecated Use {@link #getNumber(java.lang.String) getNumber} instead
-   */
-  @Deprecated
-  public static double getDouble(String key) throws TableKeyNotDefinedException {
-    return table.getNumber(key);
-  }
-
-  /**
-   * Returns the value at the specified key.
-   *
-   * @param key          the key
-   * @param defaultValue the value returned if the key is undefined
-   * @return the value
-   * @throws IllegalArgumentException if the value mapped to by the key is not a double
-   * @throws IllegalArgumentException if the key is null
-   * @deprecated Use {@link #getNumber(java.lang.String, double) getNumber} instead.
-   */
-  @Deprecated
-  public static double getDouble(String key, double defaultValue) {
-    return table.getNumber(key, defaultValue);
-  }
-
 }

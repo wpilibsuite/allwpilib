@@ -24,6 +24,7 @@ class DigitalGlitchFilter;
 
 /**
  * Class to read quad encoders.
+ *
  * Quadrature encoders are devices that count shaft rotation and can sense
  * direction. The output of the QuadEncoder class is an integer that can count
  * either up or down, and can go negative for reverse direction counting. When
@@ -79,9 +80,6 @@ class Encoder : public SensorBase,
   double PIDGet() override;
 
   void SetIndexSource(int channel, IndexingType type = kResetOnRisingEdge);
-  WPI_DEPRECATED("Use pass-by-reference instead.")
-  void SetIndexSource(DigitalSource* source,
-                      IndexingType type = kResetOnRisingEdge);
   void SetIndexSource(const DigitalSource& source,
                       IndexingType type = kResetOnRisingEdge);
 

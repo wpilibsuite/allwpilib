@@ -76,7 +76,6 @@ TEST(PreferencesTest, WritePreferencesToFile) {
   preferences->PutFloat("testFilePutFloat", 0.25f);
   preferences->PutBoolean("testFilePutBoolean", true);
   preferences->PutLong("testFilePutLong", 1000000000000000000ll);
-  preferences->Save();
 
   Wait(kSaveTime);
 

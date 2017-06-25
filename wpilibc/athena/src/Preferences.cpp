@@ -202,14 +202,6 @@ void Preferences::PutLong(llvm::StringRef key, int64_t value) {
 }
 
 /**
- * This function is no longer required, as NetworkTables automatically
- * saves persistent values (which all Preferences values are) periodically
- * when running as a server.
- * @deprecated backwards compatibility shim
- */
-void Preferences::Save() {}
-
-/**
  * Returns whether or not there is a key with the given name.
  *
  * @param key the key

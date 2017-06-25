@@ -222,12 +222,11 @@ void Encoder::Reset() {
 /**
  * Returns the period of the most recent pulse.
  *
- * Returns the period of the most recent Encoder pulse in seconds.
- * This method compensates for the decoding type.
+ * Returns the period of the most recent Encoder pulse in seconds. This method
+ * compensates for the decoding type.
  *
- * @deprecated Use GetRate() in favor of this method.  This returns unscaled
- *             periods and GetRate() scales using value from
- *             SetDistancePerPulse().
+ * Warning: This returns unscaled periods. Use GetRate() for rates that are
+ * scaled using the value from SetDistancePerPulse().
  *
  * @return Period in seconds of the most recent pulse.
  */
@@ -451,21 +450,7 @@ double Encoder::PIDGet() {
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_unique<DigitalInput>(channel);
-  SetIndexSource(m_indexSource.get(), type);
-}
-
-/**
- * Set the index source for the encoder.
- *
- * When this source is activated, the encoder count automatically resets.
- *
- * @param channel A digital source to set as the encoder index
- * @param type    The state that will cause the encoder to reset
- */
-WPI_DEPRECATED("Use pass-by-reference instead.")
-void Encoder::SetIndexSource(DigitalSource* source,
-                             Encoder::IndexingType type) {
-  SetIndexSource(*source, type);
+  SetIndexSource(*m_indexSource.get(), type);
 }
 
 /**

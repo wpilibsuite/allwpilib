@@ -130,7 +130,7 @@ public class PIDTest extends AbstractComsSetup {
     setupOutputRange();
     double setpoint = 2500.0;
     m_controller.setSetpoint(setpoint);
-    assertFalse("PID did not begin disabled", m_controller.isEnable());
+    assertFalse("PID did not begin disabled", m_controller.isEnabled());
     assertEquals("PID.getError() did not start at " + setpoint, setpoint,
         m_controller.getError(), 0);
     assertEquals(k_p, m_table.getNumber("p"), 0);
@@ -149,11 +149,11 @@ public class PIDTest extends AbstractComsSetup {
     m_controller.enable();
     Timer.delay(.5);
     assertTrue(m_table.getBoolean("enabled"));
-    assertTrue(m_controller.isEnable());
+    assertTrue(m_controller.isEnabled());
     assertThat(0.0, is(not(me.getMotor().get())));
     m_controller.reset();
     assertFalse(m_table.getBoolean("enabled"));
-    assertFalse(m_controller.isEnable());
+    assertFalse(m_controller.isEnabled());
     assertEquals(0, me.getMotor().get(), 0);
   }
 

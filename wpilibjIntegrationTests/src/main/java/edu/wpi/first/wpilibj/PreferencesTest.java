@@ -104,7 +104,6 @@ public class PreferencesTest extends AbstractComsSetup {
     assertEquals(m_pref.getFloat("checkedValueFloat", 0), 0, 0);
     assertFalse(m_pref.getBoolean("checkedValueBoolean", false));
     addCheckedValue();
-    m_pref.save();
     assertEquals(m_check, m_pref.getLong("checkedValueLong", 0));
     assertEquals(m_pref.getDouble("checkedValueDouble", 0), 1, 0);
     assertEquals(m_pref.getString("checkedValueString", ""), "checked");
