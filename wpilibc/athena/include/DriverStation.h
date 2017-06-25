@@ -8,13 +8,11 @@
 #pragma once
 
 #include <atomic>
-#include <condition_variable>
 #include <memory>
 #include <string>
 #include <thread>
 
 #include "HAL/DriverStation.h"
-#include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "RobotState.h"
 #include "SensorBase.h"

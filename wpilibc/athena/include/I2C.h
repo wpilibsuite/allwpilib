@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "SensorBase.h"
 
 enum HAL_I2CPort : int32_t;

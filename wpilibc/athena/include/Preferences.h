@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <map>
+#include <stdint.h>
+
 #include <memory>
 #include <string>
 #include <vector>

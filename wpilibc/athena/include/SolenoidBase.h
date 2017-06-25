@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "SensorBase.h"
 
 namespace frc {

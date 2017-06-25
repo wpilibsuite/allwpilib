@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "AnalogTriggerType.h"
 #include "HAL/Interrupts.h"
 #include "SensorBase.h"
