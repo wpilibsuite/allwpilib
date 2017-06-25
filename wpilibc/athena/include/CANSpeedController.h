@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include "SpeedController.h"
 
 namespace frc {

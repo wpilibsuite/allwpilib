@@ -7,11 +7,9 @@
 
 #pragma once
 
-#include <memory>
+#include <stdint.h>
 
 #include "GyroBase.h"
-#include "HAL/cpp/priority_mutex.h"
-#include "Notifier.h"
 #include "SPI.h"
 
 namespace frc {

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <array>
 
 #include "DigitalSource.h"
@@ -50,7 +52,7 @@ class DigitalGlitchFilter : public SensorBase {
 
   int m_channelIndex = -1;
   static hal::priority_mutex m_mutex;
-  static ::std::array<bool, 3> m_filterAllocated;
+  static std::array<bool, 3> m_filterAllocated;
 };
 
 }  // namespace frc
