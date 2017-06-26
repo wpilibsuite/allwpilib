@@ -15,17 +15,6 @@ SpeedControllerGroup::SpeedControllerGroup(
     std::initializer_list<SpeedController*> speedControllers)
     : m_speedControllers(speedControllers) {}
 
-void SpeedControllerGroup::Add(SpeedController* speedController) {
-  m_speedControllers.push_back(speedController);
-}
-
-void SpeedControllerGroup::Remove(SpeedController* speedController) {
-  m_speedControllers.erase(
-      std::remove(m_speedControllers.begin(), m_speedControllers.end(),
-                  speedController),
-      m_speedControllers.end());
-}
-
 double SpeedControllerGroup::Get() const {
   if (!m_speedControllers.empty()) {
     return m_speedControllers.front()->Get();

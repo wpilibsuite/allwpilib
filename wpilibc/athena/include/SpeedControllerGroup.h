@@ -15,12 +15,8 @@ namespace frc {
 
 class SpeedControllerGroup : public SpeedController {
  public:
-  SpeedControllerGroup() = default;
   SpeedControllerGroup(
       std::initializer_list<SpeedController*> speedControllers);
-
-  void Add(SpeedController* speedController);
-  void Remove(SpeedController* speedController);
 
   void Set(double speed) override;
   double Get() const override;
