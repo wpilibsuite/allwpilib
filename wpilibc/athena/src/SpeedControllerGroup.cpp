@@ -7,24 +7,18 @@
 
 #include "SpeedControllerGroup.h"
 
-#include <algorithm>
-
 using namespace frc;
-
-SpeedControllerGroup::SpeedControllerGroup(
-    std::initializer_list<SpeedController*> speedControllers)
-    : m_speedControllers(speedControllers) {}
 
 double SpeedControllerGroup::Get() const {
   if (!m_speedControllers.empty()) {
-    return m_speedControllers.front()->Get();
+    return m_speedControllers.front().get().Get();
   }
   return 0.0;
 }
 
 void SpeedControllerGroup::Set(double speed) {
   for (auto speedController : m_speedControllers) {
-    speedController->Set(m_isInverted ? -speed : speed);
+    speedController.get().Set(m_isInverted ? -speed : speed);
   }
 }
 
@@ -36,18 +30,18 @@ bool SpeedControllerGroup::GetInverted() const { return m_isInverted; }
 
 void SpeedControllerGroup::Disable() {
   for (auto speedController : m_speedControllers) {
-    speedController->Disable();
+    speedController.get().Disable();
   }
 }
 
 void SpeedControllerGroup::StopMotor() {
   for (auto speedController : m_speedControllers) {
-    speedController->StopMotor();
+    speedController.get().StopMotor();
   }
 }
 
 void SpeedControllerGroup::PIDWrite(double output) {
   for (auto speedController : m_speedControllers) {
-    speedController->PIDWrite(output);
+    speedController.get().PIDWrite(output);
   }
 }

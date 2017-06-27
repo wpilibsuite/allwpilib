@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <functional>
 #include <vector>
 
 #include "SpeedController.h"
@@ -15,8 +16,9 @@ namespace frc {
 
 class SpeedControllerGroup : public SpeedController {
  public:
-  SpeedControllerGroup(
-      std::initializer_list<SpeedController*> speedControllers);
+  template <class... SpeedControllers>
+  explicit SpeedControllerGroup(SpeedController& speedController,
+                                SpeedControllers&&... speedControllers);
 
   void Set(double speed) override;
   double Get() const override;
@@ -28,7 +30,9 @@ class SpeedControllerGroup : public SpeedController {
 
  private:
   bool m_isInverted = false;
-  std::vector<SpeedController*> m_speedControllers;
+  std::vector<std::reference_wrapper<SpeedController>> m_speedControllers;
 };
 
 }  // namespace frc
+
+#include "SpeedControllerGroup.inc"

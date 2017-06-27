@@ -8,6 +8,7 @@
 #include "WPILib.h"
 
 class MyRobot : public IterativeRobot {
+ public:
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -43,6 +44,12 @@ class MyRobot : public IterativeRobot {
    * This function is called periodically during all modes
    */
   void RobotPeriodic() override {}
+
+ private:
+  frc::Talon m_motor1{1};
+  frc::Talon m_motor2{2};
+  frc::SpeedControllerGroup m_group1{m_motor1, m_motor2};
+  frc::SpeedControllerGroup m_group2{m_motor1};
 };
 
 START_ROBOT_CLASS(MyRobot)

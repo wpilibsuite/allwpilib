@@ -20,8 +20,13 @@ public class SpeedControllerGroup implements SpeedController {
    *
    * @param speedControllers The SpeedControllers to add
    */
-  public SpeedControllerGroup(SpeedController... speedControllers) {
-    m_speedControllers = speedControllers;
+  public SpeedControllerGroup(SpeedController speedController,
+                              SpeedController... speedControllers) {
+    m_speedControllers = new SpeedController[speedControllers.length + 1];
+    m_speedControllers[1] = speedController;
+    for (int i = 1; i < m_speedControllers.length; i++) {
+      m_speedControllers[i] = speedControllers[i - 1];
+    }
   }
 
   @Override
