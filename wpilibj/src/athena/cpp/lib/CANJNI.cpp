@@ -9,7 +9,6 @@
 #include <jni.h>
 
 #include "FRC_NetworkCommunication/CANSessionMux.h"
-#include "HAL/CAN.h"
 #include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
