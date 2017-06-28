@@ -29,6 +29,19 @@ public class SpeedControllerGroup implements SpeedController {
     }
   }
 
+  /**
+   * Create a new SpeedControllerGroup with the provided SpeedControllers.
+   *
+   * @param speedControllers The SpeedControllers to add
+   */
+  public <T extends SpeedController> SpeedControllerGroup(Followable<T> speedController,
+                                                          T... speedControllers) {
+    m_speedControllers = new SpeedController[]{speedController};
+    for (T follower : speedControllers) {
+      speedController.addFollower(follower);
+    }
+  }
+
   @Override
   public double get() {
     if (m_speedControllers.length > 0) {
