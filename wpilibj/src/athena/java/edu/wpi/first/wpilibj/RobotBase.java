@@ -168,8 +168,9 @@ public abstract class RobotBase {
    * Common initialization for all robot programs.
    */
   public static void initializeHardwareConfiguration() {
-    int rv = HAL.initialize(0);
-    assert rv == 1;
+    if (!HAL.initialize(500, 0)) {
+      throw new IllegalStateException("Failed to initialize. Terminating");
+    }
 
     // Set some implementations so that the static methods work properly
     Timer.SetImplementation(new HardwareTimer());

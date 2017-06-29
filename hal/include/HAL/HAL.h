@@ -68,7 +68,7 @@ HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel);
 
 uint64_t HAL_GetFPGATime(int32_t* status);
 
-int32_t HAL_Initialize(int32_t mode);
+HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode);
 
 // ifdef's definition is to allow for default parameters in C++.
 #ifdef __cplusplus

@@ -34,11 +34,11 @@ extern "C" {
 /*
  * Class: edu_wpi_first_wpilibj_hal_HAL
  * Method:    Initialize
- * Signature: (I)I
+ * Signature: (Z)II
  */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HAL_initialize(JNIEnv*, jclass, jint mode) {
-  return HAL_Initialize(mode);
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_wpilibj_hal_HAL_initialize(JNIEnv*, jclass, jint timeout, jint mode) {
+  return HAL_Initialize(timeout, mode);
 }
 
 /*
