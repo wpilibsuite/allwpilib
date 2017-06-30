@@ -205,6 +205,8 @@ char* HAL_GetJoystickName(int32_t joystickNum) {
   }
 }
 
+void HAL_FreeJoystickName(char* name) { std::free(name); }
+
 int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) {
   HAL_JoystickDescriptor joystickDesc;
   if (HAL_GetJoystickDescriptor(joystickNum, &joystickDesc) < 0) {

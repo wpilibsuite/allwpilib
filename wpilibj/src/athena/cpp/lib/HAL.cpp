@@ -259,7 +259,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickName(JNIEnv* env, jclass,
   NETCOMM_LOG(logDEBUG) << "Calling HAL_GetJoystickName";
   char *joystickName = HAL_GetJoystickName(port);
   jstring str = MakeJString(env, joystickName);
-  std::free(joystickName);
+  HAL_FreeJoystickName(joystickName);
   return str;
 }
 
