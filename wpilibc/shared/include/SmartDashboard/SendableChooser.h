@@ -33,17 +33,26 @@ namespace frc {
  */
 template <class T>
 class SendableChooser : public SendableChooserBase {
+  llvm::StringMap<T> m_choices;
+
+  template <class U>
+  static U _unwrap_smart_ptr(const U& value);
+
+  template <class U>
+  static U* _unwrap_smart_ptr(const std::unique_ptr<U>& value);
+
+  template <class U>
+  static std::weak_ptr<U> _unwrap_smart_ptr(const std::shared_ptr<U>& value);
+
  public:
   virtual ~SendableChooser() = default;
 
-  void AddObject(llvm::StringRef name, const T& object);
-  void AddDefault(llvm::StringRef name, const T& object);
-  T GetSelected();
+  void AddObject(llvm::StringRef name, T object);
+  void AddDefault(llvm::StringRef name, T object);
+
+  auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 
   void InitTable(std::shared_ptr<ITable> subtable) override;
-
- private:
-  llvm::StringMap<T> m_choices;
 };
 
 }  // namespace frc

@@ -25,8 +25,8 @@ namespace frc {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddObject(llvm::StringRef name, const T& object) {
-  m_choices[name] = object;
+void SendableChooser<T>::AddObject(llvm::StringRef name, T object) {
+  m_choices[name] = std::move(object);
 }
 
 /**
@@ -40,26 +40,30 @@ void SendableChooser<T>::AddObject(llvm::StringRef name, const T& object) {
  * @param object the option
  */
 template <class T>
-void SendableChooser<T>::AddDefault(llvm::StringRef name, const T& object) {
+void SendableChooser<T>::AddDefault(llvm::StringRef name, T object) {
   m_defaultChoice = name;
-  AddObject(name, object);
+  AddObject(name, std::move(object));
 }
 
 /**
- * Returns the selected option.
+ * Returns a copy of the selected option (a raw pointer U* if T =
+ * std::unique_ptr<U> or a std::weak_ptr<U> if T = std::shared_ptr<U>).
  *
  * If there is none selected, it will return the default.  If there is none
- * selected and no default, then it will return {@code nullptr}.
+ * selected and no default, then it will return a value-initialized instance.
+ * For integer types, this is 0. For container types like std::string, this is
+ * an empty string.
  *
  * @return the option selected
  */
 template <class T>
-T SendableChooser<T>::GetSelected() {
+auto SendableChooser<T>::GetSelected()
+    -> decltype(_unwrap_smart_ptr(m_choices[""])) {
   std::string selected = m_table->GetString(kSelected, m_defaultChoice);
   if (selected == "") {
-    return nullptr;
+    return decltype(_unwrap_smart_ptr(m_choices[""])){};
   } else {
-    return m_choices[selected];
+    return _unwrap_smart_ptr(m_choices[selected]);
   }
 }
 
@@ -78,6 +82,25 @@ void SendableChooser<T>::InitTable(std::shared_ptr<ITable> subtable) {
     m_table->PutValue(kOptions, nt::Value::MakeStringArray(std::move(keys)));
     m_table->PutString(kDefault, m_defaultChoice);
   }
+}
+
+template <class T>
+template <class U>
+U SendableChooser<T>::_unwrap_smart_ptr(const U& value) {
+  return value;
+}
+
+template <class T>
+template <class U>
+U* SendableChooser<T>::_unwrap_smart_ptr(const std::unique_ptr<U>& value) {
+  return value.get();
+}
+
+template <class T>
+template <class U>
+std::weak_ptr<U> SendableChooser<T>::_unwrap_smart_ptr(
+    const std::shared_ptr<U>& value) {
+  return value;
 }
 
 }  // namespace frc
