@@ -8,6 +8,7 @@
 #include "HAL/cpp/fpga_clock.h"
 
 #include "HAL/HAL.h"
+#include "llvm/raw_ostream.h"
 
 namespace hal {
 constexpr fpga_clock::time_point fpga_clock::min_time;
@@ -15,7 +16,13 @@ constexpr fpga_clock::time_point fpga_clock::min_time;
 fpga_clock::time_point fpga_clock::now() noexcept {
   int32_t status = 0;
   uint64_t currentTime = HAL_GetFPGATime(&status);
-  if (status != 0) return epoch();
+  if (status != 0) {
+    llvm::errs()
+        << "Call to HAL_GetFPGATime failed."
+        << "Initialization might have failed. Time will not be correct";
+    llvm::errs().flush();
+    return epoch();
+  }
   return time_point(std::chrono::microseconds(currentTime));
 }
 }  // namespace hal
