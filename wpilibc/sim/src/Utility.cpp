@@ -12,9 +12,7 @@
 #include <execinfo.h>
 #endif
 
-#include <cstdio>
 #include <cstdlib>
-#include <iostream>
 
 #include "Timer.h"
 #include "llvm/SmallString.h"
@@ -45,10 +43,10 @@ void wpi_suspendOnAssertEnabled(bool enabled) {
 static void wpi_handleTracing() {
   // if (stackTraceEnabled)
   // {
-  //   std::printf("\n-----------<Stack Trace>----------------\n");
+  //   llvm::outs() << "\n-----------<Stack Trace>----------------\n";
   //   printCurrentStackTrace();
   // }
-  std::printf("\n");
+  llvm::outs() << "\n";
 }
 
 /**
@@ -77,7 +75,7 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
     }
 
     // Print to console and send to remote dashboard
-    std::cout << "\n\n>>>>" << errorStream.str();
+    llvm::outs() << "\n\n>>>>" << errorStream.str();
     wpi_handleTracing();
   }
 
@@ -111,7 +109,7 @@ void wpi_assertEqual_common_impl(int valueA, int valueB,
   }
 
   // Print to console and send to remote dashboard
-  std::cout << "\n\n>>>>" << error.str();
+  llvm::outs() << "\n\n>>>>" << error.str();
 
   wpi_handleTracing();
 }

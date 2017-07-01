@@ -12,6 +12,7 @@
 #include <gazebo/gazebo_client.hh>
 #include <gazebo/transport/transport.hh>
 
+#include "llvm/raw_ostream.h"
 #include "simulation/gz_msgs/msgs.h"
 
 namespace frc {
@@ -56,8 +57,7 @@ class MainNode {
       main->Init("frc");
       gazebo::transport::run();
     } else {
-      std::cout << "An error has occured setting up gazebo_client!"
-                << std::endl;
+      llvm::outs() << "An error has occured setting up gazebo_client!\n";
     }
   }
 };

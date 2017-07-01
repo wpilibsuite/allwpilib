@@ -7,6 +7,7 @@
 
 #include "simulation/SimGyro.h"
 
+#include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
 using namespace frc;
@@ -22,11 +23,10 @@ SimGyro::SimGyro(std::string topic) {
 
   if (commandPub->WaitForConnection(
           gazebo::common::Time(5.0))) {  // Wait up to five seconds.
-    std::cout << "Initialized ~/simulator/" + topic << std::endl;
+    llvm::outs() << "Initialized ~/simulator/" + topic << "\n";
   } else {
-    std::cerr << "Failed to initialize ~/simulator/" + topic +
-                     ": does the gyro exist?"
-              << std::endl;
+    llvm::errs() << "Failed to initialize ~/simulator/" + topic +
+                        ": does the gyro exist?\n";
   }
 }
 

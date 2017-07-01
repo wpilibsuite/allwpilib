@@ -12,6 +12,7 @@
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "gtest/gtest.h"
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -26,7 +27,7 @@ class TestEnvironment : public testing::Environment {
     m_alreadySetUp = true;
 
     if (!HAL_Initialize(0)) {
-      std::cerr << "FATAL ERROR: HAL could not be initialized" << std::endl;
+      llvm::errs() << "FATAL ERROR: HAL could not be initialized\n";
       std::exit(-1);
     }
 
@@ -37,7 +38,7 @@ class TestEnvironment : public testing::Environment {
     HAL_ObserveUserProgramStarting();
     LiveWindow::GetInstance()->SetEnabled(false);
 
-    std::cout << "Waiting for enable" << std::endl;
+    llvm::outs() << "Waiting for enable\n";
 
     while (!DriverStation::GetInstance().IsEnabled()) {
       Wait(0.1);

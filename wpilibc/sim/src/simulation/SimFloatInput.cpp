@@ -7,6 +7,7 @@
 
 #include "simulation/SimFloatInput.h"
 
+#include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
 using namespace frc;
@@ -14,7 +15,7 @@ using namespace frc;
 SimFloatInput::SimFloatInput(std::string topic) {
   sub = MainNode::Subscribe("~/simulator/" + topic, &SimFloatInput::callback,
                             this);
-  std::cout << "Initialized ~/simulator/" + topic << std::endl;
+  llvm::outs() << "Initialized ~/simulator/" + topic << "\n";
 }
 
 double SimFloatInput::Get() { return value; }

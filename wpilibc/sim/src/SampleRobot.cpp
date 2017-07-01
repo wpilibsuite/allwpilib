@@ -7,10 +7,9 @@
 
 #include "SampleRobot.h"
 
-#include <cstdio>
-
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
+#include "llvm/raw_ostream.h"
 #include "networktables/NetworkTable.h"
 
 #if defined(_UNIX)
@@ -31,7 +30,7 @@ SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
  * which will be called each time the robot enters the disabled state.
  */
 void SampleRobot::RobotInit() {
-  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
+  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -41,7 +40,7 @@ void SampleRobot::RobotInit() {
  * field is disabled.
  */
 void SampleRobot::Disabled() {
-  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
+  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -52,7 +51,7 @@ void SampleRobot::Disabled() {
  * robot enters the autonomous state.
  */
 void SampleRobot::Autonomous() {
-  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
+  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -63,7 +62,7 @@ void SampleRobot::Autonomous() {
  * each time the robot enters the teleop state.
  */
 void SampleRobot::OperatorControl() {
-  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
+  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**
@@ -74,7 +73,7 @@ void SampleRobot::OperatorControl() {
  * test mode.
  */
 void SampleRobot::Test() {
-  std::printf("Default %s() method... Override me!\n", __FUNCTION__);
+  llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
 /**

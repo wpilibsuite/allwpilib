@@ -7,7 +7,7 @@
 
 #include "Commands/PrintCommand.h"
 
-#include <iostream>
+#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -16,4 +16,4 @@ PrintCommand::PrintCommand(const std::string& message)
   m_message = message;
 }
 
-void PrintCommand::Initialize() { std::cout << m_message << "\n"; }
+void PrintCommand::Initialize() { llvm::outs() << m_message << "\n"; }

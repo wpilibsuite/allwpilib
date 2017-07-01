@@ -7,18 +7,17 @@
 
 #pragma once
 
-#include <cstdio>
-
 #include "Base.h"
 #include "DriverStation.h"
+#include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 #include "simulation/simTime.h"
 
-#define START_ROBOT_CLASS(_ClassName_)                               \
-  int main() {                                                       \
-    static _ClassName_ robot;                                        \
-    std::printf("\n********** Robot program starting **********\n"); \
-    robot.StartCompetition();                                        \
+#define START_ROBOT_CLASS(_ClassName_)                                  \
+  int main() {                                                          \
+    static _ClassName_ robot;                                           \
+    llvm::outs() << "\n********** Robot program starting **********\n"; \
+    robot.StartCompetition();                                           \
   }
 
 namespace frc {

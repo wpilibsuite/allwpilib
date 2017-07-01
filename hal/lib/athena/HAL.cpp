@@ -14,7 +14,6 @@
 #include <atomic>
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
 #include <mutex>
 #include <thread>
 
@@ -29,6 +28,7 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "ctre/ctre.h"
+#include "llvm/raw_ostream.h"
 #include "visa/visa.h"
 
 using namespace hal;
@@ -328,20 +328,20 @@ int32_t HAL_Initialize(int32_t mode) {
     // see if the pid is around, but we don't want to mess with init id=1, or
     // ourselves
     if (pid >= 2 && kill(pid, 0) == 0 && pid != getpid()) {
-      std::cout << "Killing previously running FRC program..." << std::endl;
+      llvm::outs() << "Killing previously running FRC program...\n";
       kill(pid, SIGTERM);  // try to kill it
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
       if (kill(pid, 0) == 0) {
         // still not successfull
         if (mode == 0) {
-          std::cout << "FRC pid " << pid
-                    << " did not die within 110ms. Aborting" << std::endl;
+          llvm::outs() << "FRC pid " << pid
+                       << " did not die within 110ms. Aborting\n";
           return 0;              // just fail
         } else if (mode == 1) {  // kill -9 it
           kill(pid, SIGKILL);
         } else {
-          std::cout << "WARNING: FRC pid " << pid
-                    << " did not die within 110ms." << std::endl;
+          llvm::outs() << "WARNING: FRC pid " << pid
+                       << " did not die within 110ms.\n";
         }
       }
     }

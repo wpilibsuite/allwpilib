@@ -13,6 +13,7 @@
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
+#include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
 using namespace frc;
@@ -331,7 +332,7 @@ double DriverStation::GetMatchTime() const {
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(llvm::StringRef error) {
-  std::cout << error << std::endl;
+  llvm::outs() << error << "\n";
 }
 
 /**
@@ -339,7 +340,7 @@ void DriverStation::ReportError(llvm::StringRef error) {
  * The warning is also printed to the program console.
  */
 void DriverStation::ReportWarning(llvm::StringRef error) {
-  std::cout << error << std::endl;
+  llvm::outs() << error << "\n";
 }
 
 /**
@@ -350,9 +351,10 @@ void DriverStation::ReportError(bool is_error, int code, llvm::StringRef error,
                                 llvm::StringRef location,
                                 llvm::StringRef stack) {
   if (!location.empty())
-    std::cout << (is_error ? "Error" : "Warning") << " at " << location << ": ";
-  std::cout << error << std::endl;
-  if (!stack.empty()) std::cout << stack << std::endl;
+    llvm::outs() << (is_error ? "Error" : "Warning") << " at " << location
+                 << ": ";
+  llvm::outs() << error << "\n";
+  if (!stack.empty()) llvm::outs() << stack << "\n";
 }
 
 /**
