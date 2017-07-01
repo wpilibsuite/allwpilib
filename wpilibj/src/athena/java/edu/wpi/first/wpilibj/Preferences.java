@@ -247,14 +247,4 @@ public class Preferences {
   public long getLong(String key, long backup) {
     return (long) m_table.getNumber(key, backup);
   }
-
-  /**
-   * This function is no longer required, as NetworkTables automatically saves persistent values
-   * (which all Preferences values are) periodically when running as a server.
-   *
-   * @deprecated backwards compatibility shim
-   */
-  @Deprecated
-  public void save() {
-  }
 }

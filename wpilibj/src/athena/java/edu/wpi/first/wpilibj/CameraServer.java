@@ -799,38 +799,4 @@ public class CameraServer {
       m_sources.remove(name);
     }
   }
-
-  /**
-   * Sets the size of the image to use. Use the public kSize constants to set the correct mode, or
-   * set it directly on a camera and call the appropriate startAutomaticCapture method.
-   *
-   * @deprecated Use setResolution on the UsbCamera returned by startAutomaticCapture() instead.
-   * @param size The size to use
-   */
-  @Deprecated
-  public void setSize(int size) {
-    VideoSource source = null;
-    synchronized (this) {
-      if (m_primarySourceName == null) {
-        return;
-      }
-      source = m_sources.get(m_primarySourceName);
-      if (source == null) {
-        return;
-      }
-    }
-    switch (size) {
-      case kSize640x480:
-        source.setResolution(640, 480);
-        break;
-      case kSize320x240:
-        source.setResolution(320, 240);
-        break;
-      case kSize160x120:
-        source.setResolution(160, 120);
-        break;
-      default:
-        throw new IllegalArgumentException("Unsupported size: " + size);
-    }
-  }
 }

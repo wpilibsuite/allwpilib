@@ -585,18 +585,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Set the percentage error which is considered tolerable for use with OnTarget. (Input of 15.0 =
-   * 15 percent).
-   *
-   * @param percent error which is tolerable
-   * @deprecated Use {@link #setPercentTolerance} or {@link #setAbsoluteTolerance} instead.
-   */
-  @Deprecated
-  public synchronized void setTolerance(double percent) {
-    m_tolerance = new PercentageTolerance(percent);
-  }
-
-  /**
    * Set the PID tolerance using a Tolerance object. Tolerance can be specified as a percentage of
    * the range or as an absolute value. The Tolerance object encapsulates those options in an
    * object. Use it by creating the type of tolerance that you want to use: setTolerance(new
@@ -679,16 +667,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     if (m_table != null) {
       m_table.putBoolean("enabled", false);
     }
-  }
-
-  /**
-   * Return true if PIDController is enabled.
-   *
-   * @deprecated Call {@link #isEnabled()} instead.
-   */
-  @Deprecated
-  public synchronized boolean isEnable() {
-    return isEnabled();
   }
 
   /**
