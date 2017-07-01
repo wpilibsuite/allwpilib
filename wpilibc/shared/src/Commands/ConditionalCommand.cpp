@@ -11,6 +11,17 @@
 
 using namespace frc;
 
+static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
+  if (onTrue != nullptr) {
+    for (auto requirement : onTrue->GetRequirements())
+      command.Requires(requirement);
+  }
+  if (onFalse != nullptr) {
+    for (auto requirement : onFalse->GetRequirements())
+      command.Requires(requirement);
+  }
+}
+
 /**
  * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
  *
@@ -23,8 +34,7 @@ ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
   m_onTrue = onTrue;
   m_onFalse = onFalse;
 
-  for (auto requirement : m_onTrue->GetRequirements()) Requires(requirement);
-  for (auto requirement : m_onFalse->GetRequirements()) Requires(requirement);
+  RequireAll(*this, onTrue, onFalse);
 }
 
 /**
@@ -42,8 +52,7 @@ ConditionalCommand::ConditionalCommand(const std::string& name, Command* onTrue,
   m_onTrue = onTrue;
   m_onFalse = onFalse;
 
-  for (auto requirement : m_onTrue->GetRequirements()) Requires(requirement);
-  for (auto requirement : m_onFalse->GetRequirements()) Requires(requirement);
+  RequireAll(*this, onTrue, onFalse);
 }
 
 void ConditionalCommand::_Initialize() {
@@ -53,13 +62,15 @@ void ConditionalCommand::_Initialize() {
     m_chosenCommand = m_onFalse;
   }
 
-  /*
-   * This is a hack to make cancelling the chosen command inside a CommandGroup
-   * work properly
-   */
-  m_chosenCommand->ClearRequirements();
+  if (m_chosenCommand != nullptr) {
+    /*
+     * This is a hack to make cancelling the chosen command inside a
+     * CommandGroup work properly
+     */
+    m_chosenCommand->ClearRequirements();
 
-  m_chosenCommand->Start();
+    m_chosenCommand->Start();
+  }
 }
 
 void ConditionalCommand::_Cancel() {
