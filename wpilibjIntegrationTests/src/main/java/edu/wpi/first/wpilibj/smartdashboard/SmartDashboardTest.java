@@ -13,7 +13,6 @@ import org.junit.Test;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.networktables.NetworkTableKeyNotDefined;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 
 import static org.junit.Assert.assertEquals;
@@ -29,17 +28,12 @@ public class SmartDashboardTest extends AbstractComsSetup {
     return logger;
   }
 
-  @Test(expected = NetworkTableKeyNotDefined.class)
-  public void testGetBadValue() {
-    SmartDashboard.getString("_404_STRING_KEY_SHOULD_NOT_BE_FOUND_");
-  }
-
   @Test
   public void testPutString() {
     String key = "testPutString";
     String value = "thisIsAValue";
     SmartDashboard.putString(key, value);
-    assertEquals(value, SmartDashboard.getString(key));
+    assertEquals(value, SmartDashboard.getString(key, ""));
     assertEquals(value, table.getString(key));
   }
 
@@ -48,7 +42,7 @@ public class SmartDashboardTest extends AbstractComsSetup {
     String key = "testPutNumber";
     int value = 2147483647;
     SmartDashboard.putNumber(key, value);
-    assertEquals(value, SmartDashboard.getNumber(key), 0.01);
+    assertEquals(value, SmartDashboard.getNumber(key, 0.0), 0.01);
     assertEquals(value, table.getNumber(key), 0.01);
   }
 
@@ -57,7 +51,7 @@ public class SmartDashboardTest extends AbstractComsSetup {
     String key = "testPutBoolean";
     boolean value = true;
     SmartDashboard.putBoolean(key, value);
-    assertEquals(value, SmartDashboard.getBoolean(key));
+    assertEquals(value, SmartDashboard.getBoolean(key, false));
     assertEquals(value, table.getBoolean(key));
   }
 
@@ -66,12 +60,12 @@ public class SmartDashboardTest extends AbstractComsSetup {
     String key = "testReplaceString";
     String valueOld = "oldValue";
     SmartDashboard.putString(key, valueOld);
-    assertEquals(valueOld, SmartDashboard.getString(key));
+    assertEquals(valueOld, SmartDashboard.getString(key, ""));
     assertEquals(valueOld, table.getString(key));
 
     String valueNew = "newValue";
     SmartDashboard.putString(key, valueNew);
-    assertEquals(valueNew, SmartDashboard.getString(key));
+    assertEquals(valueNew, SmartDashboard.getString(key, ""));
     assertEquals(valueNew, table.getString(key));
   }
 
