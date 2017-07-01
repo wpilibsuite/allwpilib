@@ -26,7 +26,7 @@ class TestEnvironment : public testing::Environment {
     if (m_alreadySetUp) return;
     m_alreadySetUp = true;
 
-    if (!HAL_Initialize(0)) {
+    if (!HAL_Initialize(500, 0)) {
       llvm::errs() << "FATAL ERROR: HAL could not be initialized\n";
       std::exit(-1);
     }

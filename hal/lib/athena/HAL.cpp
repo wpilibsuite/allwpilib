@@ -287,14 +287,60 @@ void HAL_BaseInitialize(int32_t* status) {
   initialized = true;
 }
 
+static bool killExistingProgram(int timeout, int mode) {
+  // Kill any previous robot programs
+  std::fstream fs;
+  // By making this both in/out, it won't give us an error if it doesnt exist
+  fs.open("/var/lock/frc.pid", std::fstream::in | std::fstream::out);
+  if (fs.bad()) return false;
+
+  pid_t pid = 0;
+  if (!fs.eof() && !fs.fail()) {
+    fs >> pid;
+    // see if the pid is around, but we don't want to mess with init id=1, or
+    // ourselves
+    if (pid >= 2 && kill(pid, 0) == 0 && pid != getpid()) {
+      llvm::outs() << "Killing previously running FRC program...\n";
+      kill(pid, SIGTERM);  // try to kill it
+      std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+      if (kill(pid, 0) == 0) {
+        // still not successfull
+        if (mode == 0) {
+          llvm::outs() << "FRC pid " << pid << " did not die within " << timeout
+                       << "ms. Aborting\n";
+          return 0;              // just fail
+        } else if (mode == 1) {  // kill -9 it
+          kill(pid, SIGKILL);
+        } else {
+          llvm::outs() << "WARNING: FRC pid " << pid << " did not die within "
+                       << timeout << "ms.\n";
+        }
+      }
+    }
+  }
+  fs.close();
+  // we will re-open it write only to truncate the file
+  fs.open("/var/lock/frc.pid", std::fstream::out | std::fstream::trunc);
+  fs.seekp(0);
+  pid = getpid();
+  fs << pid << std::endl;
+  fs.close();
+  return true;
+}
+
 /**
  * Call this to start up HAL. This is required for robot programs.
  */
-int32_t HAL_Initialize(int32_t mode) {
+HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   setlinebuf(stdin);
   setlinebuf(stdout);
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
+
+  // Return false if program failed to kill an existing program
+  if (!killExistingProgram(timeout, mode)) {
+    return false;
+  }
 
   FRC_NetworkCommunication_Reserve(nullptr);
 
@@ -311,52 +357,21 @@ int32_t HAL_Initialize(int32_t mode) {
         timerRollover, nullptr, &status);
   if (status == 0) {
     uint64_t curTime = HAL_GetFPGATime(&status);
-    if (status == 0)
+    if (status == 0) {
       HAL_UpdateNotifierAlarm(rolloverNotifier, curTime + 0x80000000ULL,
                               &status);
-  }
-
-  // Kill any previous robot programs
-  std::fstream fs;
-  // By making this both in/out, it won't give us an error if it doesnt exist
-  fs.open("/var/lock/frc.pid", std::fstream::in | std::fstream::out);
-  if (fs.bad()) return 0;
-
-  pid_t pid = 0;
-  if (!fs.eof() && !fs.fail()) {
-    fs >> pid;
-    // see if the pid is around, but we don't want to mess with init id=1, or
-    // ourselves
-    if (pid >= 2 && kill(pid, 0) == 0 && pid != getpid()) {
-      llvm::outs() << "Killing previously running FRC program...\n";
-      kill(pid, SIGTERM);  // try to kill it
-      std::this_thread::sleep_for(std::chrono::milliseconds(100));
-      if (kill(pid, 0) == 0) {
-        // still not successfull
-        if (mode == 0) {
-          llvm::outs() << "FRC pid " << pid
-                       << " did not die within 110ms. Aborting\n";
-          return 0;              // just fail
-        } else if (mode == 1) {  // kill -9 it
-          kill(pid, SIGKILL);
-        } else {
-          llvm::outs() << "WARNING: FRC pid " << pid
-                       << " did not die within 110ms.\n";
-        }
-      }
+    } else {
+      // return false if status failed.
+      return false;
     }
+  } else {
+    // return false if status failed.
+    return false;
   }
-  fs.close();
-  // we will re-open it write only to truncate the file
-  fs.open("/var/lock/frc.pid", std::fstream::out | std::fstream::trunc);
-  fs.seekp(0);
-  pid = getpid();
-  fs << pid << std::endl;
-  fs.close();
 
   HAL_InitializeDriverStation();
 
-  return 1;
+  return true;
 }
 
 int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,

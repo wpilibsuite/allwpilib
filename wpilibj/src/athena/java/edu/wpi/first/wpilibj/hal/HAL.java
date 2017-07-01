@@ -16,7 +16,7 @@ import java.nio.ByteBuffer;
 public class HAL extends JNIWrapper {
   public static native void waitForDSData();
 
-  public static native int initialize(int mode);
+  public static native boolean initialize(int timeout, int mode);
 
   public static native void observeUserProgramStarting();
 
