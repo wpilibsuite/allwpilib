@@ -17,6 +17,7 @@
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
 #include "HAL/HAL.h"
+#include "HAL/cpp/NotifierInternal.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
@@ -173,8 +174,8 @@ static void threadedNotifierHandler(uint64_t currentTimeInt,
 
 extern "C" {
 
-HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
-                                          void* param, int32_t* status) {
+HAL_NotifierHandle HAL_InitializeNotifierNonThreadedUnsafe(
+    HAL_NotifierProcessFunction process, void* param, int32_t* status) {
   if (!process) {
     *status = NULL_PARAMETER;
     return 0;
@@ -211,14 +212,14 @@ HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
   return handle;
 }
 
-HAL_NotifierHandle HAL_InitializeNotifierThreaded(
-    HAL_NotifierProcessFunction process, void* param, int32_t* status) {
+HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
+                                          void* param, int32_t* status) {
   NotifierThreadOwner* notify = new NotifierThreadOwner;
   notify->Start();
   notify->SetFunc(process, param);
 
-  auto notifierHandle =
-      HAL_InitializeNotifier(threadedNotifierHandler, notify, status);
+  auto notifierHandle = HAL_InitializeNotifierNonThreadedUnsafe(
+      threadedNotifierHandler, notify, status);
 
   if (notifierHandle == HAL_kInvalidHandle || *status != 0) {
     delete notify;
