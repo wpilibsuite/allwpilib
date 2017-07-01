@@ -198,6 +198,13 @@ public class Scheduler implements NamedSendable {
         ((ButtonScheduler) m_buttons.elementAt(i)).execute();
       }
     }
+
+    // Call every subsystem's periodic method
+    Enumeration subsystems = m_subsystems.getElements();
+    while (subsystems.hasMoreElements()) {
+      ((Subsystem) subsystems.nextElement()).periodic();
+    }
+
     // Loop through the commands
     LinkedListElement element = m_firstCommand;
     while (element != null) {
@@ -223,7 +230,6 @@ public class Scheduler implements NamedSendable {
         _add(lock.getDefaultCommand());
       }
       lock.confirmCommand();
-      lock.periodic();
     }
 
     updateTable();

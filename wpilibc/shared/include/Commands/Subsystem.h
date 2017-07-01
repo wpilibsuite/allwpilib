@@ -28,7 +28,7 @@ class Subsystem : public ErrorBase, public NamedSendable {
   Command* GetDefaultCommand();
   void SetCurrentCommand(Command* command);
   Command* GetCurrentCommand() const;
-  void Periodic();
+  virtual void Periodic();
   virtual void InitDefaultCommand();
 
  private:
