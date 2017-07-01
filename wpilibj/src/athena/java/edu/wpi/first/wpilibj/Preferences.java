@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
-import edu.wpi.first.wpilibj.tables.TableKeyNotDefinedException;
 
 /**
  * The preferences class provides a relatively simple way to save important values to the roboRIO to
@@ -84,12 +83,8 @@ public class Preferences {
    * Gets the vector of keys.
    * @return a vector of the keys
    */
-  public Vector getKeys() {
-    Vector<String> keys = new Vector<String>();
-    for (String key : m_table.getKeys()) {
-      keys.add(key);
-    }
-    return keys;
+  public Vector<String> getKeys() {
+    return new Vector<>(m_table.getKeys());
   }
 
   /**
@@ -202,11 +197,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public int getInt(String key, int backup) {
-    try {
-      return (int) m_table.getNumber(key);
-    } catch (TableKeyNotDefinedException ex) {
-      return backup;
-    }
+    return (int) m_table.getNumber(key, backup);
   }
 
   /**
@@ -218,7 +209,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public double getDouble(String key, double backup) {
-    return m_table.getDouble(key, backup);
+    return m_table.getNumber(key, backup);
   }
 
   /**
@@ -242,11 +233,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public float getFloat(String key, float backup) {
-    try {
-      return (float) m_table.getNumber(key);
-    } catch (TableKeyNotDefinedException ex) {
-      return backup;
-    }
+    return (float) m_table.getNumber(key, backup);
   }
 
   /**
@@ -258,11 +245,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public long getLong(String key, long backup) {
-    try {
-      return (long) m_table.getNumber(key);
-    } catch (TableKeyNotDefinedException ex) {
-      return backup;
-    }
+    return (long) m_table.getNumber(key, backup);
   }
 
   /**
