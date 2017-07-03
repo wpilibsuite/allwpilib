@@ -6,9 +6,16 @@
 /*----------------------------------------------------------------------------*/
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Talon;
 
 @SuppressWarnings("all")
 public class MyRobot extends IterativeRobot {
+  private Talon m_motor1 = new Talon(1);
+  private Talon m_motor2 = new Talon(2);
+  private SpeedControllerGroup m_group1 = new SpeedControllerGroup(m_motor1, m_motor2);
+  private SpeedControllerGroup m_group2 = new SpeedControllerGroup(m_motor1);
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
