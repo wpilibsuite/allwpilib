@@ -74,6 +74,13 @@ public abstract class Subsystem implements NamedSendable {
   protected abstract void initDefaultCommand();
 
   /**
+   * When the run method of the scheduler is called this method will be called.
+   */
+  public void periodic() {
+    // Override me!
+  }
+
+  /**
    * Sets the default command. If this is not called or is called with null, then there will be no
    * default command for the subsystem.
    *

@@ -105,6 +105,11 @@ void Subsystem::SetCurrentCommand(Command* command) {
 Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
 
 /**
+ * When the run method of the scheduler is called this method will be called.
+ */
+void Subsystem::Periodic() {}
+
+/**
  * Call this to alert Subsystem that the current command is actually the
  * command.
  *

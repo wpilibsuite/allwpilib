@@ -121,6 +121,13 @@ void Scheduler::Run() {
     }
   }
 
+  // Call every subsystem's periodic method
+  for (auto subsystemIter = m_subsystems.begin();
+       subsystemIter != m_subsystems.end(); subsystemIter++) {
+    Subsystem* subsystem = *subsystemIter;
+    subsystem->Periodic();
+  }
+
   m_runningCommandsChanged = false;
 
   // Loop through the commands
