@@ -21,7 +21,8 @@ using namespace frc;
 
 const int RobotDrive::kMaxNumberOfMotors;
 
-static auto make_shared_nodelete(SpeedController* ptr) {
+static std::shared_ptr<SpeedController> make_shared_nodelete(
+    SpeedController* ptr) {
   return std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
 }
 
