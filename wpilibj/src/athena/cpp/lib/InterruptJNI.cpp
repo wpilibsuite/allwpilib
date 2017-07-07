@@ -164,7 +164,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_cleanInterrupts(
  * Method:    waitForInterrupt
  * Signature: (JD)V
  */
-JNIEXPORT int32_t JNICALL
+JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt(
     JNIEnv* env, jclass, jint interruptHandle, jdouble timeout,
     jboolean ignorePrevious) {

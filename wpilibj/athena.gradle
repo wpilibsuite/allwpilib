@@ -35,6 +35,7 @@ model {
                 tasks.withType(CppCompile) {
                     dependsOn jniHeaders
                     cppCompiler.args "-DNAMESPACED_PRIORITY"
+                    cppCompiler.args "-DCONFIG_ATHENA"
                     addNiLibraryLinks(linker, targetPlatform)
                     addWpiUtilLibraryLinks(it, linker, targetPlatform)
                 }
