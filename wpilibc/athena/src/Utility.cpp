@@ -7,9 +7,12 @@
 
 #include "Utility.h"
 
+#ifndef _WIN32
 #include <cxxabi.h>
 #include <execinfo.h>
+#endif
 
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
@@ -35,7 +38,23 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
     llvm::raw_svector_ostream locStream(locBuf);
     locStream << funcName << " [";
     llvm::SmallString<128> fileTemp;
+
+#ifdef _WIN32
+    char fname[60];
+    char ext[10];
+    _splitpath_s(fileName.c_str(fileTemp), nullptr, 0, nullptr, 0, fname, 60,
+                 ext, 10);
+    locStream << fname << ":" << lineNumber << "]";
+#elif __APPLE__
+    auto file = fileName.c_str(fileTemp);
+    int len = std::strlen(file) + 1;
+    char* basestr = new char[len + 1];
+    std::strncpy(basestr, file, len);
+    locStream << basestr << ":" << lineNumber << "]";
+    delete[] basestr;
+#else
     locStream << basename(fileName.c_str(fileTemp)) << ":" << lineNumber << "]";
+#endif
 
     llvm::SmallString<128> errorBuf;
     llvm::raw_svector_ostream errorStream(errorBuf);
@@ -73,7 +92,23 @@ void wpi_assertEqual_common_impl(llvm::StringRef valueA, llvm::StringRef valueB,
   llvm::raw_svector_ostream locStream(locBuf);
   locStream << funcName << " [";
   llvm::SmallString<128> fileTemp;
+
+#ifdef _WIN32
+  char fname[60];
+  char ext[10];
+  _splitpath_s(fileName.c_str(fileTemp), nullptr, 0, nullptr, 0, fname, 60, ext,
+               10);
+  locStream << fname << ":" << lineNumber << "]";
+#elif __APPLE__
+  auto file = fileName.c_str(fileTemp);
+  int len = std::strlen(file) + 1;
+  char* basestr = new char[len + 1];
+  std::strncpy(basestr, file, len);
+  locStream << basestr << ":" << lineNumber << "]";
+  delete[] basestr;
+#else
   locStream << basename(fileName.c_str(fileTemp)) << ":" << lineNumber << "]";
+#endif
 
   llvm::SmallString<128> errorBuf;
   llvm::raw_svector_ostream errorStream(errorBuf);
@@ -189,6 +224,8 @@ bool GetUserButton() {
   return value;
 }
 
+#ifndef _WIN32
+
 /**
  * Demangle a C++ symbol, used for printing stack traces.
  */
@@ -234,5 +271,13 @@ std::string GetStackTrace(int offset) {
 
   return trace.str();
 }
+
+#else
+static std::string demangle(char const* mangledSymbol) {
+  return "no demangling on windows";
+}
+
+std::string GetStackTrace(int offset) { return "no stack trace on windows"; }
+#endif
 
 }  // namespace frc
