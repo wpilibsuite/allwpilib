@@ -28,13 +28,6 @@ using namespace frc;
 void SampleRobot::StartCompetition() {
   LiveWindow* lw = LiveWindow::GetInstance();
 
-  HAL_Report(HALUsageReporting::kResourceType_Framework,
-             HALUsageReporting::kFramework_Simple);
-
-  NetworkTable::GetTable("LiveWindow")
-      ->GetSubTable("~STATUS~")
-      ->PutBoolean("LW Enabled", false);
-
   RobotInit();
 
   // Tell the DS that the robot is ready to be enabled
@@ -43,9 +36,6 @@ void SampleRobot::StartCompetition() {
   RobotMain();
 
   if (!m_robotMainOverridden) {
-    // first and one-time initialization
-    lw->SetEnabled(false);
-
     while (true) {
       if (IsDisabled()) {
         m_ds.InDisabled(true);
@@ -147,4 +137,7 @@ void SampleRobot::Test() {
  */
 void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
 
-SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
+SampleRobot::SampleRobot() {
+  HAL_Report(HALUsageReporting::kResourceType_Framework,
+             HALUsageReporting::kFramework_Simple);
+}
