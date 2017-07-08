@@ -15,7 +15,9 @@
 #include <cstring>
 #include <string>
 
+#ifdef CONFIG_ATHENA
 #include "FRC_NetworkCommunication/CANSessionMux.h"
+#endif
 #include "HAL/HAL.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
@@ -78,7 +80,11 @@ void ThrowHalHandleException(JNIEnv *env, int32_t status) {
   halHandleExCls.Throw(env, buf.c_str());
 }
 
-constexpr const char wpilibjPrefix[] = "edu.wpi.first.wpilibj";
+#ifndef _WIN32
+constexpr const char JNI_wpilibjPrefix[] = "edu.wpi.first.wpilibj";
+#else
+extern const char JNI_wpilibjPrefix[] = "edu.wpi.first.wpilibj";
+#endif
 
 void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
   if (status == 0) return;
@@ -93,7 +99,7 @@ void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
     runtimeExCls.Throw(env, buf.c_str());
   } else {
     std::string func;
-    auto stack = GetJavaStackTrace<wpilibjPrefix>(env, &func);
+    auto stack = GetJavaStackTrace<JNI_wpilibjPrefix>(env, &func);
     HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
   }
 }
@@ -122,7 +128,9 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
     case kRioStatusSuccess:
       // Everything is ok... don't throw.
       break;
+#ifdef CONFIG_ATHENA
     case ERR_CANSessionMux_InvalidBuffer:
+#endif
     case kRIOStatusBufferInvalidSize: {
       static jmethodID invalidBufConstruct = nullptr;
       if (!invalidBufConstruct)
@@ -133,7 +141,9 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
       env->Throw(static_cast<jthrowable>(exception));
       break;
     }
+#ifdef CONFIG_ATHENA
     case ERR_CANSessionMux_MessageNotFound:
+#endif
     case kRIOStatusOperationTimedOut: {
       static jmethodID messageNotFoundConstruct = nullptr;
       if (!messageNotFoundConstruct)
@@ -144,7 +154,9 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
       env->Throw(static_cast<jthrowable>(exception));
       break;
     }
+#ifdef CONFIG_ATHENA
     case ERR_CANSessionMux_NotAllowed:
+#endif
     case kRIOStatusFeatureNotSupported: {
       llvm::SmallString<100> buf;
       llvm::raw_svector_ostream oss(buf);
@@ -152,7 +164,9 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
       canMessageNotAllowedExCls.Throw(env, buf.c_str());
       break;
     }
+#ifdef CONFIG_ATHENA
     case ERR_CANSessionMux_NotInitialized:
+#endif
     case kRIOStatusResourceNotInitialized: {
       static jmethodID notInitConstruct = nullptr;
       if (!notInitConstruct)

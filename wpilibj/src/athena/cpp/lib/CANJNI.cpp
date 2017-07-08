@@ -8,7 +8,9 @@
 #include <assert.h>
 #include <jni.h>
 
+#ifdef CONFIG_ATHENA
 #include "FRC_NetworkCommunication/CANSessionMux.h"
+#endif
 #include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
@@ -37,6 +39,7 @@ extern "C" {
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
     JNIEnv *env, jclass, jint messageID, jobject data, jint periodMs) {
+#ifdef CONFIG_ATHENA
   CANJNI_LOG(logDEBUG)
       << "Calling CANJNI FRCNetCommCANSessionMuxSendMessage";
 
@@ -69,6 +72,9 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
 
   CANJNI_LOG(logDEBUG) << "Status: " << status;
   CheckCANStatus(env, status, messageID);
+#else
+  // TODO: Make this throw
+#endif
 }
 
 static uint8_t buffer[8];
@@ -82,6 +88,7 @@ JNIEXPORT jobject JNICALL
 Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
     JNIEnv *env, jclass, jobject messageID, jint messageIDMask,
     jobject timeStamp) {
+#ifdef CONFIG_ATHENA
   CANJNI_LOG(logDEBUG)
       << "Calling CANJNI FRCNetCommCANSessionMuxReceiveMessage";
 
@@ -118,6 +125,10 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
 
   if (!CheckCANStatus(env, status, *messageIDPtr)) return nullptr;
   return env->NewDirectByteBuffer(buffer, dataSize);
+#else
+  // TODO: Make throw
+  return nullptr;
+#endif
 }
 
 }  // extern "C"
