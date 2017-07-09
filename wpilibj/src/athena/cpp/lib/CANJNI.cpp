@@ -77,7 +77,9 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
 #endif
 }
 
+#ifdef CONFIG_ATHENA
 static uint8_t buffer[8];
+#endif
 
 /*
  * Class:     edu_wpi_first_wpilibj_can_CANJNI
