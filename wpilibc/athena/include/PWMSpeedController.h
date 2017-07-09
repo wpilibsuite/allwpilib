@@ -20,13 +20,12 @@ class PWMSpeedController : public SafePWM, public SpeedController {
   virtual ~PWMSpeedController() = default;
   void Set(double value) override;
   double Get() const override;
+  void SetInverted(bool isInverted) override;
+  bool GetInverted() const override;
   void Disable() override;
   void StopMotor() override;
 
   void PIDWrite(double output) override;
-
-  void SetInverted(bool isInverted) override;
-  bool GetInverted() const override;
 
  protected:
   explicit PWMSpeedController(int channel);

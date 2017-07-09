@@ -11,6 +11,12 @@ package edu.wpi.first.wpilibj;
  * Interface for speed controlling devices.
  */
 public interface SpeedController extends PIDOutput {
+  /**
+   * Common interface for setting the speed of a speed controller.
+   *
+   * @param speed The speed to set. Value should be between -1.0 and 1.0.
+   */
+  void set(double speed);
 
   /**
    * Common interface for getting the current set speed of a speed controller.
@@ -18,13 +24,6 @@ public interface SpeedController extends PIDOutput {
    * @return The current set speed. Value is between -1.0 and 1.0.
    */
   double get();
-
-  /**
-   * Common interface for setting the speed of a speed controller.
-   *
-   * @param speed The speed to set. Value should be between -1.0 and 1.0.
-   */
-  void set(double speed);
 
   /**
    * Common interface for inverting direction of a speed controller.
