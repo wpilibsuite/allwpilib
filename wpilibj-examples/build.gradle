@@ -1,0 +1,14 @@
+apply plugin: 'java'
+
+dependencies {
+    compile project(':wpilibj')
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    compile 'edu.wpi.first.ntcore:ntcore-java:+'
+
+    compile 'org.opencv:opencv-java:+'
+}
+
+checkstyle {
+    ignoreFailures = true
+    showViolations = false
+}
