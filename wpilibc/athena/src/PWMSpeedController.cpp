@@ -36,27 +36,15 @@ void PWMSpeedController::Set(double speed) {
  */
 double PWMSpeedController::Get() const { return GetSpeed(); }
 
-/**
- * Common interface for disabling a motor.
- */
-void PWMSpeedController::Disable() { SetDisabled(); }
-
-/**
- * Common interface for inverting direction of a speed controller.
- *
- * @param isInverted The state of inversion, true is inverted.
- */
 void PWMSpeedController::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
 
-/**
- * Common interface for the inverting direction of a speed controller.
- *
- * @return isInverted The state of inversion, true is inverted.
- *
- */
 bool PWMSpeedController::GetInverted() const { return m_isInverted; }
+
+void PWMSpeedController::Disable() { SetDisabled(); }
+
+void PWMSpeedController::StopMotor() { SafePWM::StopMotor(); }
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
@@ -64,8 +52,3 @@ bool PWMSpeedController::GetInverted() const { return m_isInverted; }
  * @param output Write out the PWM value as was found in the PIDController
  */
 void PWMSpeedController::PIDWrite(double output) { Set(output); }
-
-/**
- * Common interface to stop the motor until Set is called again.
- */
-void PWMSpeedController::StopMotor() { this->SafePWM::StopMotor(); }

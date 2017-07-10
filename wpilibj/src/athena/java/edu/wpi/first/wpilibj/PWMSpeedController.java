@@ -38,26 +38,6 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
   }
 
   /**
-   * Common interface for inverting direction of a speed controller.
-   *
-   * @param isInverted The state of inversion true is inverted
-   */
-  @Override
-  public void setInverted(boolean isInverted) {
-    m_isInverted = isInverted;
-  }
-
-  /**
-   * Common interface for the inverting direction of a speed controller.
-   *
-   * @return isInverted The state of inversion, true is inverted.
-   */
-  @Override
-  public boolean getInverted() {
-    return m_isInverted;
-  }
-
-  /**
    * Get the recently set value of the PWM.
    *
    * @return The most recently set value for the PWM between -1.0 and 1.0.
@@ -65,6 +45,16 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
   @Override
   public double get() {
     return getSpeed();
+  }
+
+  @Override
+  public void setInverted(boolean isInverted) {
+    m_isInverted = isInverted;
+  }
+
+  @Override
+  public boolean getInverted() {
+    return m_isInverted;
   }
 
   /**
