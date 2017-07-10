@@ -23,10 +23,10 @@ public class CANJNI extends JNIWrapper {
 
   @SuppressWarnings("MethodName")
   public static native void FRCNetCommCANSessionMuxSendMessage(int messageID,
-                                                                            ByteBuffer data,
-                                                                            int periodMs);
+                                                               byte[] data,
+                                                               int periodMs);
 
   @SuppressWarnings("MethodName")
-  public static native ByteBuffer FRCNetCommCANSessionMuxReceiveMessage(
+  public static native byte[] FRCNetCommCANSessionMuxReceiveMessage(
       IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp);
 }

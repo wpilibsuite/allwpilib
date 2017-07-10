@@ -16,8 +16,10 @@
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
+#include "support/jni_util.h"
 
 using namespace frc;
+using namespace wpi::java;
 
 // set the logging level
 // TLogLevel canJNILogLevel = logDEBUG;
@@ -34,18 +36,19 @@ extern "C" {
 /*
  * Class:     edu_wpi_first_wpilibj_can_CANJNI
  * Method:    FRCNetCommCANSessionMuxSendMessage
- * Signature: (ILjava/nio/ByteBuffer;I)V
+ * Signature: (I[BI)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
-    JNIEnv *env, jclass, jint messageID, jobject data, jint periodMs) {
+    JNIEnv *env, jclass, jint messageID, jbyteArray data, jint periodMs) {
 #ifdef CONFIG_ATHENA
   CANJNI_LOG(logDEBUG)
       << "Calling CANJNI FRCNetCommCANSessionMuxSendMessage";
 
-  uint8_t *dataBuffer =
-      (uint8_t *)(data ? env->GetDirectBufferAddress(data) : 0);
-  uint8_t dataSize = (uint8_t)(data ? env->GetDirectBufferCapacity(data) : 0);
+  JByteArrayRef dataArray{env, data};
+
+  const uint8_t *dataBuffer = reinterpret_cast<const uint8_t*>(dataArray.array().data());
+  uint8_t dataSize = dataArray.array().size();
 
   CANJNI_LOG(logDEBUG) << "Message ID ";
   CANJNI_LOG(logDEBUG).write_hex(messageID);
@@ -73,20 +76,16 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
   CANJNI_LOG(logDEBUG) << "Status: " << status;
   CheckCANStatus(env, status, messageID);
 #else
-  // TODO: Make this throw
+  // Noop on other platforms
 #endif
 }
-
-#ifdef CONFIG_ATHENA
-static uint8_t buffer[8];
-#endif
 
 /*
  * Class:     edu_wpi_first_wpilibj_can_CANJNI
  * Method:    FRCNetCommCANSessionMuxReceiveMessage
- * Signature: (Ljava/nio/IntBuffer;ILjava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;
+ * Signature: (Ljava/nio/IntBuffer;ILjava/nio/ByteBuffer;)[B
  */
-JNIEXPORT jobject JNICALL
+JNIEXPORT jbyteArray JNICALL
 Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
     JNIEnv *env, jclass, jobject messageID, jint messageIDMask,
     jobject timeStamp) {
@@ -98,6 +97,7 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   uint32_t *timeStampPtr = (uint32_t *)env->GetDirectBufferAddress(timeStamp);
 
   uint8_t dataSize = 0;
+  uint8_t buffer[8];
 
   int32_t status = 0;
   FRC_NetworkCommunication_CANSessionMux_receiveMessage(
@@ -126,9 +126,10 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   CANJNI_LOG(logDEBUG) << "Status: " << status;
 
   if (!CheckCANStatus(env, status, *messageIDPtr)) return nullptr;
-  return env->NewDirectByteBuffer(buffer, dataSize);
+  return MakeJByteArray(env, llvm::StringRef{reinterpret_cast<const char*>(buffer), 
+                        static_cast<size_t>(dataSize)});
 #else
-  // TODO: Make throw
+  // Noop on other platforms. Return nullptr
   return nullptr;
 #endif
 }
