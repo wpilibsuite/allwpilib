@@ -591,13 +591,12 @@ void PIDController::InitTable(std::shared_ptr<ITable> subtable) {
  * @return Error for continuous inputs.
  */
 double PIDController::GetContinuousError(double error) const {
-  if (m_continuous) {
-    if (std::fabs(error) > (m_maximumInput - m_minimumInput) / 2) {
-      if (error > 0) {
-        return error - (m_maximumInput - m_minimumInput);
-      } else {
-        return error + (m_maximumInput - m_minimumInput);
-      }
+  if (m_continuous &&
+      std::fabs(error) > (m_maximumInput - m_minimumInput) / 2) {
+    if (error > 0) {
+      return error - (m_maximumInput - m_minimumInput);
+    } else {
+      return error + (m_maximumInput - m_minimumInput);
     }
   }
 
