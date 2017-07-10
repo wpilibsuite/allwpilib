@@ -17,7 +17,8 @@ def wpilibj = project(':wpilibj')
 
 dependencies {
     compile wpilibj
-    compile files(wpilibj.sourceSets.test.output.classesDir)
+    compile files(wpilibj.sourceSets.athena.output.classesDir)
+    compile files(wpilibj.sourceSets.shared.output.classesDir)
     compile ntcoreDep('java', 'arm')
     compile cscoreDep('java', 'arm')
     compile 'org.opencv:opencv-java:+'
