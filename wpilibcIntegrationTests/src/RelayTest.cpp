@@ -36,6 +36,7 @@ class RelayTest : public testing::Test {
 
   void Reset() { m_relay->Set(Relay::kOff); }
 };
+
 /**
  * Test the relay by setting it forward, reverse, off, and on.
  */

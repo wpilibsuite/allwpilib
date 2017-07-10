@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include <Commands/ConditionalCommand.h>
-
+#include "Commands/ConditionalCommand.h"
 #include "command/MockCommand.h"
 
 namespace frc {
