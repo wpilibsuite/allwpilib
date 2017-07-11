@@ -12,7 +12,6 @@
 #include "HAL/HAL.h"
 
 using namespace frc;
-using namespace std::chrono_literals;
 
 /**
  * Provide an alternate "main loop" via StartCompetition().
@@ -22,7 +21,7 @@ void TimedRobot::StartCompetition() {
   m_startLoop = true;
   m_loop->StartPeriodic(m_period);
   while (true) {
-    std::this_thread::sleep_for(24h);
+    std::this_thread::sleep_for(std::chrono::hours(24));
   }
 }
 
