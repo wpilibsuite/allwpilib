@@ -63,8 +63,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   protected PIDOutput m_pidOutput;
   java.util.Timer m_controlLoop;
   Timer m_setpointTimer;
-  private boolean m_freed = false;
-  private boolean m_usingPercentTolerance;
 
   /**
    * Tolerance is the type of tolerance used to specify if the PID controller is on target.
@@ -95,8 +93,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     @Override
     public boolean onTarget() {
-      return isAvgErrorValid() && (Math.abs(getAvgError()) < m_percentage / 100 * (m_maximumInput
-          - m_minimumInput));
+      return isAvgErrorValid() && Math.abs(getAvgError()) < m_percentage / 100 * (m_maximumInput
+          - m_minimumInput);
     }
   }
 
@@ -228,7 +226,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   public void free() {
     m_controlLoop.cancel();
     synchronized (this) {
-      m_freed = true;
       m_pidOutput = null;
       m_pidInput = null;
       m_controlLoop = null;
@@ -704,13 +701,11 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
       if (getSetpoint() != (Double) value) {
         setSetpoint((Double) value);
       }
-    } else if (key.equals("enabled")) {
-      if (isEnabled() != (Boolean) value) {
-        if ((Boolean) value) {
-          enable();
-        } else {
-          disable();
-        }
+    } else if (key.equals("enabled") && isEnabled() != (Boolean) value) {
+      if ((Boolean) value) {
+        enable();
+      } else {
+        disable();
       }
     }
   };
@@ -741,13 +736,11 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @return Error for continuous inputs.
    */
   protected double getContinuousError(double error) {
-    if (m_continuous) {
-      if (Math.abs(error) > (m_maximumInput - m_minimumInput) / 2) {
-        if (error > 0) {
-          return error - (m_maximumInput - m_minimumInput);
-        } else {
-          return error + (m_maximumInput - m_minimumInput);
-        }
+    if (m_continuous && Math.abs(error) > (m_maximumInput - m_minimumInput) / 2) {
+      if (error > 0) {
+        return error - (m_maximumInput - m_minimumInput);
+      } else {
+        return error + (m_maximumInput - m_minimumInput);
       }
     }
 

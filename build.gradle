@@ -1,5 +1,5 @@
 plugins {
-    id 'net.ltgt.errorprone' version '0.0.8'
+    id 'net.ltgt.errorprone' version '0.0.10'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.6'
 }
 
@@ -65,6 +65,6 @@ apply from: 'cppSettings.gradle'
 apply from: 'ni-libraries/ni-libraries.gradle'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.3'
+    gradleVersion = '4.0.1'
     distributionType = Wrapper.DistributionType.ALL
 }

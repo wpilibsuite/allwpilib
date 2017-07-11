@@ -27,8 +27,6 @@ import edu.wpi.first.wpilibj.tables.ITable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Singleton class for creating and keeping camera servers.
@@ -218,50 +216,6 @@ public class CameraServer {
       default:
         return "Unknown";
     }
-  }
-
-  @SuppressWarnings("JavadocMethod")
-  private static PixelFormat pixelFormatFromString(String pixelFormatStr) {
-    switch (pixelFormatStr) {
-      case "MJPEG":
-      case "mjpeg":
-      case "JPEG":
-      case "jpeg":
-        return PixelFormat.kMJPEG;
-      case "YUYV":
-      case "yuyv":
-        return PixelFormat.kYUYV;
-      case "RGB565":
-      case "rgb565":
-        return PixelFormat.kRGB565;
-      case "BGR":
-      case "bgr":
-        return PixelFormat.kBGR;
-      case "GRAY":
-      case "Gray":
-      case "gray":
-        return PixelFormat.kGray;
-      default:
-        return PixelFormat.kUnknown;
-    }
-  }
-
-  private static final Pattern reMode =
-      Pattern.compile("(?<width>[0-9]+)\\s*x\\s*(?<height>[0-9]+)\\s+(?<format>.*?)\\s+"
-          + "(?<fps>[0-9.]+)\\s*fps");
-
-  /// Construct a video mode from a string description.
-  @SuppressWarnings("JavadocMethod")
-  private static VideoMode videoModeFromString(String modeStr) {
-    Matcher matcher = reMode.matcher(modeStr);
-    if (!matcher.matches()) {
-      return new VideoMode(PixelFormat.kUnknown, 0, 0, 0);
-    }
-    PixelFormat pixelFormat = pixelFormatFromString(matcher.group("format"));
-    int width = Integer.parseInt(matcher.group("width"));
-    int height = Integer.parseInt(matcher.group("height"));
-    int fps = (int) Double.parseDouble(matcher.group("fps"));
-    return new VideoMode(pixelFormat, width, height, fps);
   }
 
   /// Provide string description of video mode.
