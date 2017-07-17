@@ -53,7 +53,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     @SuppressWarnings("MemberName")
     public final byte value;
 
-    private Axes(byte value) {
+    Axes(byte value) {
       this.value = value;
     }
   }

@@ -23,7 +23,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private WaitResult(int value) {
+    WaitResult(int value) {
       this.value = value;
     }
   }

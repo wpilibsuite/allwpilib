@@ -21,7 +21,7 @@ class LiveWindowComponent {
   String m_name;
   boolean m_isSensor;
 
-  public LiveWindowComponent(String subsystem, String name, boolean isSensor) {
+  LiveWindowComponent(String subsystem, String name, boolean isSensor) {
     m_subsystem = subsystem;
     m_name = name;
     m_isSensor = isSensor;

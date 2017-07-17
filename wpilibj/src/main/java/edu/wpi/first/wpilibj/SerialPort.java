@@ -35,7 +35,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public int value;
 
-    private Port(int value) {
+    Port(int value) {
       this.value = value;
     }
   }
@@ -49,7 +49,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private Parity(int value) {
+    Parity(int value) {
       this.value = value;
     }
   }
@@ -63,7 +63,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private StopBits(int value) {
+    StopBits(int value) {
       this.value = value;
     }
   }
@@ -77,7 +77,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private FlowControl(int value) {
+    FlowControl(int value) {
       this.value = value;
     }
   }
@@ -91,7 +91,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private WriteBufferMode(int value) {
+    WriteBufferMode(int value) {
       this.value = value;
     }
   }

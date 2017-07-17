@@ -107,7 +107,7 @@ public class FakeEncoderSource {
   /**
    * Common initialization code.
    */
-  private final void initQuadEncoder() {
+  private void initQuadEncoder() {
     m_milliSec = 1;
     m_forward = true;
     m_task = new QuadEncoderThread(this);

@@ -40,7 +40,7 @@ public abstract class GenericHID {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private HIDType(int value) {
+    HIDType(int value) {
       this.value = value;
     }
   }
@@ -54,7 +54,7 @@ public abstract class GenericHID {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private Hand(int value) {
+    Hand(int value) {
       this.value = value;
     }
   }
