@@ -10,11 +10,16 @@ package edu.wpi.first.wpilibj;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.TimerTask;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.BoundaryException;
+
+import javax.measure.Quantity;
+import javax.measure.Unit;
+import javax.measure.quantity.Length;
 
 import static java.util.Objects.requireNonNull;
 
@@ -214,6 +219,26 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
                        PIDOutput output) {
     this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
+  }
+
+  public PIDController(double Kp, double Ki, double Kd, Supplier<Quantity<Length>> source,
+                       PIDOutput output, Unit<Length> unit) {
+    this(Kp, Ki, Kd, new PIDSource() {
+      @Override
+      public void setPIDSourceType(PIDSourceType pidSource) {
+        // NO-OP
+      }
+
+      @Override
+      public PIDSourceType getPIDSourceType() {
+        return PIDSourceType.kDisplacement;
+      }
+
+      @Override
+      public double pidGet() {
+        return source.get().to(unit).getValue().doubleValue();
+      }
+    }, output);
   }
 
   /**
@@ -504,6 +529,11 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     if (m_table != null) {
       m_table.putNumber("setpoint", m_setpoint);
     }
+  }
+
+  // TODO:
+  public void setSetpoint(double setpoint, Unit unit) {
+    setSetpoint(setpoint);
   }
 
   /**

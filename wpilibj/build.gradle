@@ -111,6 +111,7 @@ dependencies {
     compile 'edu.wpi.first.ntcore:ntcore-java:+'
     compile 'org.opencv:opencv-java:3.2.0'
     compile 'edu.wpi.first.cscore:cscore-java:+'
+    compile 'systems.uom:systems-common-java8:0.7.1'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.guava:guava:19.0'
