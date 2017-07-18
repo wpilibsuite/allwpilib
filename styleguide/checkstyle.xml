@@ -215,11 +215,5 @@
             <property name="exceptionVariableName" value="expected"/>
         </module>
         <module name="CommentsIndentation"/>
-
-        <module name="Regexp">
-            <property name="format" value="throw new NullPointerException\("/>
-            <property name="message" value="Use Objects.requireNonNull() instead"/>
-            <property name="illegalPattern" value="true"/>
-        </module>
     </module>
 </module>
