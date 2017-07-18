@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
  * tracks the robots heading based on the starting position. As the robot rotates the new heading is
@@ -70,10 +72,9 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
    *                on-board channels 0-1.
    */
   public AnalogGyro(AnalogInput channel) {
+    requireNonNull(channel, "AnalogInput supplied to Gyro constructor is null");
+
     m_analog = channel;
-    if (m_analog == null) {
-      throw new NullPointerException("AnalogInput supplied to Gyro constructor is null");
-    }
     initGyro();
     calibrate();
   }
@@ -102,10 +103,9 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
    * @param offset  Preset uncalibrated value to use as the gyro offset.
    */
   public AnalogGyro(AnalogInput channel, int center, double offset) {
+    requireNonNull(channel, "AnalogInput supplied to Gyro constructor is null");
+
     m_analog = channel;
-    if (m_analog == null) {
-      throw new NullPointerException("AnalogInput supplied to Gyro constructor is null");
-    }
     initGyro();
     AnalogGyroJNI.setAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
                                           offset, center);

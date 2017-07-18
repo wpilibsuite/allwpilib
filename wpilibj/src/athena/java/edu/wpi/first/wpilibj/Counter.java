@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Class for counting the number of ticks on a digital input channel.
  *
@@ -108,9 +110,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   public Counter(DigitalSource source) {
     this();
-    if (source == null) {
-      throw new NullPointerException("Digital Source given was null");
-    }
+
+    requireNonNull(source, "Digital Source given was null");
     setUpSource(source);
   }
 
@@ -140,19 +141,16 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   public Counter(EncodingType encodingType, DigitalSource upSource, DigitalSource downSource,
                  boolean inverted) {
     this(Mode.kExternalDirection);
-    if (encodingType == null) {
-      throw new NullPointerException("Encoding type given was null");
-    }
+
+    requireNonNull(encodingType, "Encoding type given was null");
+    requireNonNull(upSource, "Up Source given was null");
+    requireNonNull(downSource, "Down Source given was null");
+
     if (encodingType != EncodingType.k1X && encodingType != EncodingType.k2X) {
       throw new RuntimeException("Counters only support 1X and 2X quadreature decoding!");
     }
-    if (upSource == null) {
-      throw new NullPointerException("Up Source given was null");
-    }
+
     setUpSource(upSource);
-    if (downSource == null) {
-      throw new NullPointerException("Down Source given was null");
-    }
     setDownSource(downSource);
 
     if (encodingType == EncodingType.k1X) {
@@ -176,9 +174,9 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    */
   public Counter(AnalogTrigger trigger) {
     this();
-    if (trigger == null) {
-      throw new NullPointerException("The Analog Trigger given was null");
-    }
+
+    requireNonNull(trigger, "The Analog Trigger given was null");
+
     setUpSource(trigger.createOutput(AnalogTriggerType.kState));
   }
 
@@ -238,12 +236,9 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param triggerType   The analog trigger output that will trigger the counter.
    */
   public void setUpSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
-    if (analogTrigger == null) {
-      throw new NullPointerException("Analog Trigger given was null");
-    }
-    if (triggerType == null) {
-      throw new NullPointerException("Analog Trigger Type given was null");
-    }
+    requireNonNull(analogTrigger, "Analog Trigger given was null");
+    requireNonNull(triggerType, "Analog Trigger Type given was null");
+
     setUpSource(analogTrigger.createOutput(triggerType));
     m_allocatedUpSource = true;
   }
@@ -292,9 +287,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param source the digital source to count
    */
   public void setDownSource(DigitalSource source) {
-    if (source == null) {
-      throw new NullPointerException("The Digital Source given was null");
-    }
+    requireNonNull(source, "The Digital Source given was null");
 
     if (m_downSource != null && m_allocatedDownSource) {
       m_downSource.free();
@@ -312,12 +305,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param triggerType   The analog trigger output that will trigger the counter.
    */
   public void setDownSource(AnalogTrigger analogTrigger, AnalogTriggerType triggerType) {
-    if (analogTrigger == null) {
-      throw new NullPointerException("Analog Trigger given was null");
-    }
-    if (triggerType == null) {
-      throw new NullPointerException("Analog Trigger Type given was null");
-    }
+    requireNonNull(analogTrigger, "Analog Trigger given was null");
+    requireNonNull(triggerType, "Analog Trigger Type given was null");
 
     setDownSource(analogTrigger.createOutput(triggerType));
     m_allocatedDownSource = true;
@@ -331,9 +320,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param fallingEdge true to count the falling edge
    */
   public void setDownSourceEdge(boolean risingEdge, boolean fallingEdge) {
-    if (m_downSource == null) {
-      throw new RuntimeException(" Down Source must be set before setting the edge!");
-    }
+    requireNonNull(m_downSource, "Down Source must be set before setting the edge!");
+
     CounterJNI.setCounterDownSourceEdge(m_counter, risingEdge, fallingEdge);
   }
 
@@ -539,9 +527,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
    * @param pidSource An enum to select the parameter.
    */
   public void setPIDSourceType(PIDSourceType pidSource) {
-    if (pidSource == null) {
-      throw new NullPointerException("PID Source Parameter given was null");
-    } else if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
+    requireNonNull(pidSource, "PID Source Parameter given was null");
+    if (pidSource != PIDSourceType.kDisplacement && pidSource != PIDSourceType.kRate) {
       throw new IllegalArgumentException("PID Source parameter was not valid type: " + pidSource);
     }
 

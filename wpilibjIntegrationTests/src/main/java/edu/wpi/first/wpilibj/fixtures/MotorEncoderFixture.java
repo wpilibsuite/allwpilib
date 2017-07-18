@@ -170,6 +170,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    * deallocated.
    */
   @Override
+  @SuppressWarnings("Regexp")
   public boolean teardown() {
     String type;
     if (m_motor != null) {

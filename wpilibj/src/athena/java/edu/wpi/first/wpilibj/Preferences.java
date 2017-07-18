@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * The preferences class provides a relatively simple way to save important values to the roboRIO to
  * access the next time the roboRIO is booted.
@@ -95,9 +97,8 @@ public class Preferences {
    * @throws NullPointerException if value is null
    */
   public void putString(String key, String value) {
-    if (value == null) {
-      throw new NullPointerException("Value is null");
-    }
+    requireNonNull(value, "Provided value was null");
+
     m_table.putString(key, value);
     m_table.setPersistent(key);
   }
