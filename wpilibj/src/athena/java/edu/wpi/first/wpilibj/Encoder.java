@@ -277,7 +277,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     m_allocatedA = false;
     m_allocatedB = false;
     m_allocatedI = false;
-    if (sourceB == null) {
+    if (sourceA == null) {
       throw new NullPointerException("Digital Source A was null");
     }
     m_aSource = sourceA;
