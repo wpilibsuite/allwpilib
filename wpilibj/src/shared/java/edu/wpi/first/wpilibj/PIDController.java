@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Class implements a PID Control Loop.
  *
@@ -116,9 +118,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     private PIDController m_controller;
 
     public PIDTask(PIDController controller) {
-      if (controller == null) {
-        throw new NullPointerException("Given PIDController was null");
-      }
+      requireNonNull(controller, "Given PIDController was null");
+
       m_controller = controller;
     }
 
@@ -143,13 +144,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   @SuppressWarnings("ParameterName")
   public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
                        PIDOutput output, double period) {
-
-    if (source == null) {
-      throw new NullPointerException("Null PIDSource was given");
-    }
-    if (output == null) {
-      throw new NullPointerException("Null PIDOutput was given");
-    }
+    requireNonNull(source, "Null PIDSource was given");
+    requireNonNull(output, "Null PIDOutput was given");
 
     m_controlLoop = new java.util.Timer();
     m_setpointTimer = new Timer();

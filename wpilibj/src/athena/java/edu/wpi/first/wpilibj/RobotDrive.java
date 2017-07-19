@@ -109,10 +109,9 @@ public class RobotDrive implements MotorSafety {
    * @param rightMotor the right SpeedController object used to drive the robot.
    */
   public RobotDrive(SpeedController leftMotor, SpeedController rightMotor) {
-    if (leftMotor == null || rightMotor == null) {
-      m_rearLeftMotor = m_rearRightMotor = null;
-      throw new NullPointerException("Null motor provided");
-    }
+    requireNonNull(leftMotor, "Provided left motor was null");
+    requireNonNull(rightMotor, "Provided right motor was null");
+
     m_frontLeftMotor = null;
     m_rearLeftMotor = leftMotor;
     m_frontRightMotor = null;
@@ -204,9 +203,9 @@ public class RobotDrive implements MotorSafety {
    * @param rightStick The joystick to control the right side of the robot.
    */
   public void tankDrive(GenericHID leftStick, GenericHID rightStick) {
-    if (leftStick == null || rightStick == null) {
-      throw new NullPointerException("Null HID provided");
-    }
+    requireNonNull(leftStick, "Provided left stick was null");
+    requireNonNull(rightStick, "Provided right stick was null");
+
     tankDrive(leftStick.getY(), rightStick.getY(), true);
   }
 
@@ -219,9 +218,9 @@ public class RobotDrive implements MotorSafety {
    * @param squaredInputs Setting this parameter to true decreases the sensitivity at lower speeds
    */
   public void tankDrive(GenericHID leftStick, GenericHID rightStick, boolean squaredInputs) {
-    if (leftStick == null || rightStick == null) {
-      throw new NullPointerException("Null HID provided");
-    }
+    requireNonNull(leftStick, "Provided left stick was null");
+    requireNonNull(rightStick, "Provided right stick was null");
+
     tankDrive(leftStick.getY(), rightStick.getY(), squaredInputs);
   }
 
@@ -236,9 +235,9 @@ public class RobotDrive implements MotorSafety {
    */
   public void tankDrive(GenericHID leftStick, final int leftAxis, GenericHID rightStick,
                         final int rightAxis) {
-    if (leftStick == null || rightStick == null) {
-      throw new NullPointerException("Null HID provided");
-    }
+    requireNonNull(leftStick, "Provided left stick was null");
+    requireNonNull(rightStick, "Provided right stick was null");
+
     tankDrive(leftStick.getRawAxis(leftAxis), rightStick.getRawAxis(rightAxis), true);
   }
 
@@ -254,9 +253,9 @@ public class RobotDrive implements MotorSafety {
    */
   public void tankDrive(GenericHID leftStick, final int leftAxis, GenericHID rightStick,
                         final int rightAxis, boolean squaredInputs) {
-    if (leftStick == null || rightStick == null) {
-      throw new NullPointerException("Null HID provided");
-    }
+    requireNonNull(leftStick, "Provided left stick was null");
+    requireNonNull(rightStick, "Provided right stick was null");
+
     tankDrive(leftStick.getRawAxis(leftAxis), rightStick.getRawAxis(rightAxis), squaredInputs);
   }
 
@@ -545,9 +544,8 @@ public class RobotDrive implements MotorSafety {
    * @param rightOutput The speed to send to the right side of the robot.
    */
   public void setLeftRightMotorOutputs(double leftOutput, double rightOutput) {
-    if (m_rearLeftMotor == null || m_rearRightMotor == null) {
-      throw new NullPointerException("Null motor provided");
-    }
+    requireNonNull(m_rearLeftMotor, "Provided left motor was null");
+    requireNonNull(m_rearRightMotor, "Provided right motor was null");
 
     if (m_frontLeftMotor != null) {
       m_frontLeftMotor.set(limit(leftOutput) * m_maxOutput);

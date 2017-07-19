@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj.command;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A {@link CommandGroup} is a list of commands which are executed in sequence.
  *
@@ -153,10 +155,8 @@ public class CommandGroup extends Command {
    * @throws IllegalArgumentException     if command is null
    */
   public final synchronized void addParallel(Command command) {
+    requireNonNull(command, "Provided command was null");
     validate("Can not add new command to command group");
-    if (command == null) {
-      throw new NullPointerException("Given null command");
-    }
 
     command.setParent(this);
 
@@ -193,13 +193,11 @@ public class CommandGroup extends Command {
    * @throws IllegalArgumentException     if command is null
    */
   public final synchronized void addParallel(Command command, double timeout) {
-    validate("Can not add new command to command group");
-    if (command == null) {
-      throw new NullPointerException("Given null command");
-    }
+    requireNonNull(command, "Provided command was null");
     if (timeout < 0) {
       throw new IllegalArgumentException("Can not be given a negative timeout");
     }
+    validate("Can not add new command to command group");
 
     command.setParent(this);
 

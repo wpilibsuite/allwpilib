@@ -318,17 +318,13 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
    * @param direction The direction for the relay to operate in
    */
   public void setDirection(Direction direction) {
-    if (direction == null) {
-      throw new NullPointerException("Null Direction was given");
-    }
+    requireNonNull(direction, "Null Direction was given");
     if (m_direction == direction) {
       return;
     }
 
     free();
-
     m_direction = direction;
-
     initRelay();
   }
 

@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -43,9 +44,7 @@ public class TestSuite extends AbstractTestSuite {
     // Sets up the logging output
     final InputStream inputStream = TestSuite.class.getResourceAsStream("/logging.properties");
     try {
-      if (inputStream == null) {
-        throw new NullPointerException("./logging.properties was not loaded");
-      }
+      Objects.requireNonNull(inputStream, "./logging.properties was not loaded");
       LogManager.getLogManager().readConfiguration(inputStream);
       Logger.getAnonymousLogger().info("Loaded");
     } catch (final IOException | NullPointerException ex) {

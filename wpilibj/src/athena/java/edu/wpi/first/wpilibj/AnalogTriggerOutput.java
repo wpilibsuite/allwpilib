@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Class to represent a specific output from an analog trigger. This class is used to get the
  * current output value and also as a DigitalSource to provide routing of an output to digital
@@ -66,15 +68,11 @@ public class AnalogTriggerOutput extends DigitalSource {
    * @param outputType An enum that specifies the output on the trigger to represent.
    */
   public AnalogTriggerOutput(AnalogTrigger trigger, final AnalogTriggerType outputType) {
-    if (trigger == null) {
-      throw new NullPointerException("Analog Trigger given was null");
-    }
-    if (outputType == null) {
-      throw new NullPointerException("Analog Trigger Type given was null");
-    }
+    requireNonNull(trigger, "Analog Trigger given was null");
+    requireNonNull(outputType, "Analog Trigger Type given was null");
+
     m_trigger = trigger;
     m_outputType = outputType;
-
     HAL.report(tResourceType.kResourceType_AnalogTriggerOutput,
         trigger.getIndex(), outputType.value);
   }
@@ -86,7 +84,6 @@ public class AnalogTriggerOutput extends DigitalSource {
     if (m_interrupt != 0) {
       cancelInterrupts();
     }
-
   }
 
   /**

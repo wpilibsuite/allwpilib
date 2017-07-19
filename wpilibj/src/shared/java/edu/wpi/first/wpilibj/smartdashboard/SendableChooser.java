@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.tables.ITable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * The {@link SendableChooser} class is a useful tool for presenting a selection of options to the
  * {@link SmartDashboard}.
@@ -75,9 +77,8 @@ public class SendableChooser<V> implements Sendable {
    * @param object the option
    */
   public void addDefault(String name, V object) {
-    if (name == null) {
-      throw new NullPointerException("Name cannot be null");
-    }
+    requireNonNull(name, "Provided name was null");
+
     m_defaultChoice = name;
     if (m_table != null) {
       m_table.putString(DEFAULT, m_defaultChoice);

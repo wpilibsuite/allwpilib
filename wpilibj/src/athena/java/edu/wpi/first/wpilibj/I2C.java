@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.I2CJNI;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * I2C bus interface class.
  *
@@ -201,13 +203,12 @@ public class I2C extends SensorBase {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean read(int registerAddress, int count, byte[] buffer) {
+    requireNonNull(buffer, "Null return buffer was given");
+
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
     }
 
-    if (buffer == null) {
-      throw new NullPointerException("Null return buffer was given");
-    }
     byte[] registerAddressArray = new byte[1];
     registerAddressArray[0] = (byte) registerAddress;
 
@@ -254,12 +255,9 @@ public class I2C extends SensorBase {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean readOnly(byte[] buffer, int count) {
+    requireNonNull(buffer, "Null return buffer was given");
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
-    }
-
-    if (buffer == null) {
-      throw new NullPointerException("Null return buffer was given");
     }
 
     ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);

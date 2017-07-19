@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 
+import static java.util.Objects.requireNonNull;
 
 /**
  * Handle operation of an analog accelerometer. The accelerometer reads acceleration directly
@@ -58,10 +59,9 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    *                connected to
    */
   public AnalogAccelerometer(AnalogInput channel) {
+    requireNonNull(channel, "Analog Channel given was null");
+
     m_allocatedChannel = false;
-    if (channel == null) {
-      throw new NullPointerException("Analog Channel given was null");
-    }
     m_analogChannel = channel;
     initAccelerometer();
   }

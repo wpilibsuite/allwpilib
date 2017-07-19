@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.util.AllocationException;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Class to read quadrature encoders.
  *
@@ -131,12 +133,11 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   public Encoder(final int channelA, final int channelB, boolean reverseDirection,
                  final EncodingType encodingType) {
+    requireNonNull(encodingType, "Given encoding type was null");
+
     m_allocatedA = true;
     m_allocatedB = true;
     m_allocatedI = false;
-    if (encodingType == null) {
-      throw new NullPointerException("Given encoding type was null");
-    }
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
     initEncoder(reverseDirection, encodingType);
@@ -193,16 +194,13 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *                         if necessary so forward represents positive values.
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection) {
+    requireNonNull(sourceA, "Digital Source A was null");
+    requireNonNull(sourceB, "Digital Source B was null");
+
     m_allocatedA = false;
     m_allocatedB = false;
     m_allocatedI = false;
-    if (sourceA == null) {
-      throw new NullPointerException("Digital Source A was null");
-    }
     m_aSource = sourceA;
-    if (sourceB == null) {
-      throw new NullPointerException("Digital Source B was null");
-    }
     m_bSource = sourceB;
     initEncoder(reverseDirection, EncodingType.k4X);
   }
@@ -241,19 +239,13 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection,
                  final EncodingType encodingType) {
+    requireNonNull(sourceA, "Digital Source A was null");
+    requireNonNull(sourceB, "Digital Source B was null");
+    requireNonNull(encodingType, "Given encoding type was null");
+
     m_allocatedA = false;
     m_allocatedB = false;
     m_allocatedI = false;
-    if (encodingType == null) {
-      throw new NullPointerException("Given encoding type was null");
-    }
-    if (sourceA == null) {
-      throw new NullPointerException("Digital Source A was null");
-    }
-    m_aSource = sourceA;
-    if (sourceB == null) {
-      throw new NullPointerException("Digital Source B was null");
-    }
     m_aSource = sourceA;
     m_bSource = sourceB;
     initEncoder(reverseDirection, encodingType);
@@ -274,16 +266,12 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource,
                  boolean reverseDirection) {
+    requireNonNull(sourceA, "Digital Source A was null");
+    requireNonNull(sourceB, "Digital Source B was null");
+
     m_allocatedA = false;
     m_allocatedB = false;
     m_allocatedI = false;
-    if (sourceA == null) {
-      throw new NullPointerException("Digital Source A was null");
-    }
-    m_aSource = sourceA;
-    if (sourceB == null) {
-      throw new NullPointerException("Digital Source B was null");
-    }
     m_aSource = sourceA;
     m_bSource = sourceB;
     m_indexSource = indexSource;
