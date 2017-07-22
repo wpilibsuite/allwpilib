@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'pmd'
 
 dependencies {
     compile project(':wpilibj')
@@ -9,6 +10,12 @@ dependencies {
 }
 
 checkstyle {
-    ignoreFailures = true
-    showViolations = false
+    configFile = new File(rootDir, "styleguide/checkstyleEclipse.xml")
+}
+
+pmd {
+    consoleOutput = true
+    reportsDir = file("$project.buildDir/reports/pmd")
+    ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
+    ruleSets = []
 }
