@@ -531,6 +531,87 @@
     ],
     "foldername": "DriveDistanceOffboard",
     "gradlebase": "cpp",
-    "commandversion": 2
+    "commandversion": 2,
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "StateSpaceDifferentialDrive",
+    "description": "An example that demonstates a state-space controller for a differential drive.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "StateSpaceDifferentialDrive",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "StateSpaceElevator",
+    "description": "An example that demonstates a state-space controller for an elevator.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "StateSpaceElevator",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "StateSpaceFlywheel",
+    "description": "An example that demonstates a state-space controller for a flywheel.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "StateSpaceFlywheel",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "StateSpaceSingleJointedArm",
+    "description": "An example that demonstates a state-space controller for a single-jointed arm.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "StateSpaceSingleJointedArm",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "PeriodVariantDifferentialDrive",
+    "description": "An example that demonstates a period-variant state-space controller for a differential drive.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "PeriodVariantDifferentialDrive",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "PeriodVariantElevator",
+    "description": "An example that demonstates a period-variant state-space controller for an elevator.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "PeriodVariantElevator",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "PeriodVariantFlywheel",
+    "description": "An example that demonstates a period-variant state-space controller for a flywheel.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "PeriodVariantFlywheel",
+    "gradlebase": "cpp"
+  },
+  {
+    "name": "PeriodVariantSingleJointedArm",
+    "description": "An example that demonstates a period-variant state-space controller for a single-jointed arm.",
+    "tags": [
+      "State-space",
+      "Complete List"
+    ],
+    "foldername": "PeriodVariantSingleJointedArm",
+    "gradlebase": "cpp"
   }
 ]
