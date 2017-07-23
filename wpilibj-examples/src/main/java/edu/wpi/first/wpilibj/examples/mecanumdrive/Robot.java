@@ -18,34 +18,34 @@ import edu.wpi.first.wpilibj.RobotDrive.MotorType;
  */
 public class Robot extends IterativeRobot {
 
-	private final int kFrontLeftChannel = 2;
-	private final int kRearLeftChannel = 3;
-	private final int kFrontRightChannel = 1;
-	private final int kRearRightChannel = 0;
+	private static final int kFrontLeftChannel = 2;
+	private static final int kRearLeftChannel = 3;
+	private static final int kFrontRightChannel = 1;
+	private static final int kRearRightChannel = 0;
 
-	private final int kJoystickChannel = 0;
+	private static final int kJoystickChannel = 0;
 
-	private RobotDrive robotDrive;
-	private Joystick stick;
+	private RobotDrive m_robotDrive;
+	private Joystick m_stick;
 
 	@Override
 	public void robotInit() {
-		robotDrive = new RobotDrive(kFrontLeftChannel,
+		m_robotDrive = new RobotDrive(kFrontLeftChannel,
 				kRearLeftChannel,
 				kFrontRightChannel,
 				kRearRightChannel);
 
 		// Invert the left side motors. You may need to change or remove this to match your robot.
-		robotDrive.setInvertedMotor(MotorType.kFrontLeft, true);
-		robotDrive.setInvertedMotor(MotorType.kRearLeft, true);
+		m_robotDrive.setInvertedMotor(MotorType.kFrontLeft, true);
+		m_robotDrive.setInvertedMotor(MotorType.kRearLeft, true);
 
-		stick = new Joystick(kJoystickChannel);
+		m_stick = new Joystick(kJoystickChannel);
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		// Use the joystick X axis for lateral movement, Y axis for forward
 		// movement, and Z axis for rotation.
-		robotDrive.mecanumDrive_Cartesian(stick.getX(), stick.getY(), stick.getZ(), 0.0);
+		m_robotDrive.mecanumDrive_Cartesian(m_stick.getX(), m_stick.getY(), m_stick.getZ(), 0.0);
 	}
 }

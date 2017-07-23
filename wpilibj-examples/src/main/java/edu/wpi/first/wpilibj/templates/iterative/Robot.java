@@ -19,10 +19,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends IterativeRobot {
-	final String defaultAuto = "Default";
-	final String customAuto = "My Auto";
-	String autoSelected;
-	SendableChooser<String> chooser = new SendableChooser<>();
+
+	private static final String kDefaultAuto = "Default";
+	private static final String kCustomAuto = "My Auto";
+	private String m_autoSelected;
+	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -30,9 +31,9 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void robotInit() {
-		chooser.addDefault("Default Auto", defaultAuto);
-		chooser.addObject("My Auto", customAuto);
-		SmartDashboard.putData("Auto choices", chooser);
+		m_chooser.addDefault("Default Auto", kDefaultAuto);
+		m_chooser.addObject("My Auto", kCustomAuto);
+		SmartDashboard.putData("Auto choices", m_chooser);
 	}
 
 	/**
@@ -42,43 +43,43 @@ public class Robot extends IterativeRobot {
 	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
 	 * getString line to get the auto name from the text box below the Gyro
 	 *
-	 * You can add additional auto modes by adding additional comparisons to the
+	 * <p>You can add additional auto modes by adding additional comparisons to the
 	 * switch structure below with additional strings. If using the
 	 * SendableChooser make sure to add them to the chooser code above as well.
 	 */
 	@Override
 	public void autonomousInit() {
-		autoSelected = chooser.getSelected();
+		m_autoSelected = m_chooser.getSelected();
 		// autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
-		System.out.println("Auto selected: " + autoSelected);
+		System.out.println("Auto selected: " + m_autoSelected);
 	}
 
 	/**
-	 * This function is called periodically during autonomous
+	 * This function is called periodically during autonomous.
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		switch (autoSelected) {
-		case customAuto:
-			// Put custom auto code here
-			break;
-		case defaultAuto:
-		default:
-			// Put default auto code here
-			break;
+		switch (m_autoSelected) {
+			case kCustomAuto:
+				// Put custom auto code here
+				break;
+			case kDefaultAuto:
+			default:
+				// Put default auto code here
+				break;
 		}
 	}
 
 	/**
-	 * This function is called periodically during operator control
+	 * This function is called periodically during operator control.
 	 */
 	@Override
 	public void teleopPeriodic() {
 	}
 
 	/**
-	 * This function is called periodically during test mode
+	 * This function is called periodically during test mode.
 	 */
 	@Override
 	public void testPeriodic() {

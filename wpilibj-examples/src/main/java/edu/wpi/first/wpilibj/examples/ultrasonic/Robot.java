@@ -30,8 +30,8 @@ public class Robot extends IterativeRobot {
 	private static final int kRightMotorPort = 1;
 	private static final int kUltrasonicPort = 0;
 
-	private AnalogInput ultrasonic = new AnalogInput(kUltrasonicPort);
-	private RobotDrive myRobot = new RobotDrive(kLeftMotorPort, kRightMotorPort);
+	private AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
+	private RobotDrive m_myRobot = new RobotDrive(kLeftMotorPort, kRightMotorPort);
 
 	/**
 	 * Tells the robot to drive to a set distance (in inches) from an object
@@ -39,12 +39,12 @@ public class Robot extends IterativeRobot {
 	 */
 	public void teleopPeriodic() {
 		// sensor returns a value from 0-4095 that is scaled to inches
-		double currentDistance = ultrasonic.getValue() * kValueToInches;
+		double currentDistance = m_ultrasonic.getValue() * kValueToInches;
 
 		// convert distance error to a motor speed
 		double currentSpeed = (kHoldDistance - currentDistance) * kP;
 
 		// drive robot
-		myRobot.drive(currentSpeed, 0);
+		m_myRobot.drive(currentSpeed, 0);
 	}
 }

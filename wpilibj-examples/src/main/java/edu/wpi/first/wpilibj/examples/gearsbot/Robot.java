@@ -27,13 +27,14 @@ import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	Command autonomousCommand;
 
-	public static DriveTrain drivetrain;
-	public static Elevator elevator;
-	public static Wrist wrist;
-	public static Claw claw;
-	public static OI oi;
+	Command m_autonomousCommand;
+
+	public static DriveTrain m_drivetrain;
+	public static Elevator m_elevator;
+	public static Wrist m_wrist;
+	public static Claw m_claw;
+	public static OI m_oi;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -42,29 +43,29 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void robotInit() {
 		// Initialize all subsystems
-		drivetrain = new DriveTrain();
-		elevator = new Elevator();
-		wrist = new Wrist();
-		claw = new Claw();
-		oi = new OI();
+		m_drivetrain = new DriveTrain();
+		m_elevator = new Elevator();
+		m_wrist = new Wrist();
+		m_claw = new Claw();
+		m_oi = new OI();
 
 		// instantiate the command used for the autonomous period
-		autonomousCommand = new Autonomous();
+		m_autonomousCommand = new Autonomous();
 
 		// Show what command your subsystem is running on the SmartDashboard
-		SmartDashboard.putData(drivetrain);
-		SmartDashboard.putData(elevator);
-		SmartDashboard.putData(wrist);
-		SmartDashboard.putData(claw);
+		SmartDashboard.putData(m_drivetrain);
+		SmartDashboard.putData(m_elevator);
+		SmartDashboard.putData(m_wrist);
+		SmartDashboard.putData(m_claw);
 	}
 
 	@Override
 	public void autonomousInit() {
-		autonomousCommand.start(); // schedule the autonomous command (example)
+		m_autonomousCommand.start(); // schedule the autonomous command (example)
 	}
 
 	/**
-	 * This function is called periodically during autonomous
+	 * This function is called periodically during autonomous.
 	 */
 	@Override
 	public void autonomousPeriodic() {
@@ -78,11 +79,11 @@ public class Robot extends IterativeRobot {
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		autonomousCommand.cancel();
+		m_autonomousCommand.cancel();
 	}
 
 	/**
-	 * This function is called periodically during operator control
+	 * This function is called periodically during teleoperated mode.
 	 */
 	@Override
 	public void teleopPeriodic() {
@@ -91,7 +92,7 @@ public class Robot extends IterativeRobot {
 	}
 
 	/**
-	 * This function is called periodically during test mode
+	 * This function is called periodically during test mode.
 	 */
 	@Override
 	public void testPeriodic() {
@@ -102,9 +103,9 @@ public class Robot extends IterativeRobot {
 	 * The log method puts interesting information to the SmartDashboard.
 	 */
 	private void log() {
-		wrist.log();
-		elevator.log();
-		drivetrain.log();
-		claw.log();
+		m_wrist.log();
+		m_elevator.log();
+		m_drivetrain.log();
+		m_claw.log();
 	}
 }

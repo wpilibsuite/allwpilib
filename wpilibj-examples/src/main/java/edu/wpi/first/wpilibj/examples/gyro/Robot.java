@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
  * backwards while the gyro is used for direction keeping.
  */
 public class Robot extends IterativeRobot {
+
 	private static final double kAngleSetpoint = 0.0;
 	private static final double kP = 0.005; // propotional turning constant
 
@@ -30,13 +31,13 @@ public class Robot extends IterativeRobot {
 	private static final int kGyroPort = 0;
 	private static final int kJoystickPort = 0;
 
-	private RobotDrive myRobot = new RobotDrive(kLeftMotorPort, kRightMotorPort);
-	private AnalogGyro gyro = new AnalogGyro(kGyroPort);
-	private Joystick joystick = new Joystick(kJoystickPort);
+	private RobotDrive m_myRobot = new RobotDrive(kLeftMotorPort, kRightMotorPort);
+	private AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+	private Joystick m_joystick = new Joystick(kJoystickPort);
 
 	@Override
 	public void robotInit() {
-		gyro.setSensitivity(kVoltsPerDegreePerSecond);
+		m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
 	}
 
 	/**
@@ -45,9 +46,9 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		double turningValue = (kAngleSetpoint - gyro.getAngle()) * kP;
+		double turningValue = (kAngleSetpoint - m_gyro.getAngle()) * kP;
 		// Invert the direction of the turn if we are going backwards
-		turningValue = Math.copySign(turningValue, joystick.getY());
-		myRobot.drive(joystick.getY(), turningValue);
+		turningValue = Math.copySign(turningValue, m_joystick.getY());
+		m_myRobot.drive(m_joystick.getY(), turningValue);
 	}
 }

@@ -20,33 +20,35 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * call your Autonomous and OperatorControl methods at the right time as
  * controlled by the switches on the driver station or the field controls.
  *
- * The VM is configured to automatically run this class, and to call the
+ * <p>The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the SampleRobot
  * documentation. If you change the name of this class or the package after
  * creating this project, you must also update the build.properties file in the
  * project.
  *
- * WARNING: While it may look like a good choice to use for your code if you're
+ * <p>WARNING: While it may look like a good choice to use for your code if you're
  * inexperienced, don't. Unless you know what you are doing, complex code will
  * be much more difficult under this system. Use IterativeRobot or Command-Based
  * instead if you're new.
  */
 public class Robot extends SampleRobot {
-	RobotDrive myRobot = new RobotDrive(0, 1);
-	Joystick stick = new Joystick(0);
-	final String defaultAuto = "Default";
-	final String customAuto = "My Auto";
-	SendableChooser<String> chooser = new SendableChooser<>();
+
+	private static final String kDefaultAuto = "Default";
+	private static final String kCustomAuto = "My Auto";
+
+	private RobotDrive m_myRobot = new RobotDrive(0, 1);
+	private Joystick m_stick = new Joystick(0);
+	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
 	public Robot() {
-		myRobot.setExpiration(0.1);
+		m_myRobot.setExpiration(0.1);
 	}
 
 	@Override
 	public void robotInit() {
-		chooser.addDefault("Default Auto", defaultAuto);
-		chooser.addObject("My Auto", customAuto);
-		SmartDashboard.putData("Auto modes", chooser);
+		m_chooser.addDefault("Default Auto", kDefaultAuto);
+		m_chooser.addObject("My Auto", kCustomAuto);
+		SmartDashboard.putData("Auto modes", m_chooser);
 	}
 
 	/**
@@ -56,11 +58,11 @@ public class Robot extends SampleRobot {
 	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
 	 * getString line to get the auto name from the text box below the Gyro
 	 *
-	 * You can add additional auto modes by adding additional comparisons to the
+	 * <p>You can add additional auto modes by adding additional comparisons to the
 	 * if-else structure below with additional strings. If using the
 	 * SendableChooser make sure to add them to the chooser code above as well.
 	 *
-	 * If you wanted to run a similar autonomous mode with an IterativeRobot you would write:
+	 * <p>If you wanted to run a similar autonomous mode with an IterativeRobot you would write:
 	 *
 	 * <blockquote><pre>{@code
 	 * Timer timer = new Timer();
@@ -86,51 +88,50 @@ public class Robot extends SampleRobot {
 	 */
 	@Override
 	public void autonomous() {
-		String autoSelected = chooser.getSelected();
+		String autoSelected = m_chooser.getSelected();
 		// String autoSelected = SmartDashboard.getString("Auto Selector",
 		// defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
 
 		switch (autoSelected) {
-		case customAuto:
-			myRobot.setSafetyEnabled(false);
-			myRobot.drive(-0.5, 1.0); // spin at half speed
-			Timer.delay(2.0); // for 2 seconds
-			myRobot.drive(0.0, 0.0); // stop robot
-			break;
-		case defaultAuto:
-		default:
-			myRobot.setSafetyEnabled(false);
-			myRobot.drive(-0.5, 0.0); // drive forwards half speed
-			Timer.delay(2.0); // for 2 seconds
-			myRobot.drive(0.0, 0.0); // stop robot
-			break;
+			case kCustomAuto:
+				m_myRobot.setSafetyEnabled(false);
+				m_myRobot.drive(-0.5, 1.0); // spin at half speed
+				Timer.delay(2.0); // for 2 seconds
+				m_myRobot.drive(0.0, 0.0); // stop robot
+				break;
+			case kDefaultAuto:
+			default:
+				m_myRobot.setSafetyEnabled(false);
+				m_myRobot.drive(-0.5, 0.0); // drive forwards half speed
+				Timer.delay(2.0); // for 2 seconds
+				m_myRobot.drive(0.0, 0.0); // stop robot
+				break;
 		}
 	}
 
 	/**
 	 * Runs the motors with arcade steering.
 	 *
-	 * If you wanted to run a similar teleoperated mode with an IterativeRobot you would write:
+	 * <p>If you wanted to run a similar teleoperated mode with an IterativeRobot you would write:
 	 * <blockquote><pre>{@code
 	 * // This function is called periodically during operator control
 	 * public void teleopPeriodic() {
 	 *     myRobot.arcadeDrive(stick);
 	 * }
-	 * }
+	 * }</pre></blockquote>
 	 */
 	@Override
 	public void operatorControl() {
-		myRobot.setSafetyEnabled(true);
+		m_myRobot.setSafetyEnabled(true);
 		while (isOperatorControl() && isEnabled()) {
-			myRobot.arcadeDrive(stick); // drive with arcade style (use right
-										// stick)
+			m_myRobot.arcadeDrive(m_stick); // drive with arcade style (use right stick)
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}
 
 	/**
-	 * Runs during test mode
+	 * Runs during test mode.
 	 */
 	@Override
 	public void test() {

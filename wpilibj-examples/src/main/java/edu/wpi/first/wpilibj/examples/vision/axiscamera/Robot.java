@@ -24,11 +24,12 @@ import org.opencv.imgproc.Imgproc;
  * processing.
  */
 public class Robot extends IterativeRobot {
-	Thread visionThread;
+
+	Thread m_visionThread;
 
 	@Override
 	public void robotInit() {
-		visionThread = new Thread(() -> {
+		m_visionThread = new Thread(() -> {
 			// Get the Axis camera from CameraServer
 			AxisCamera camera = CameraServer.getInstance().addAxisCamera("axis-camera.local");
 			// Set the resolution
@@ -61,7 +62,7 @@ public class Robot extends IterativeRobot {
 				outputStream.putFrame(mat);
 			}
 		});
-		visionThread.setDaemon(true);
-		visionThread.start();
+		m_visionThread.setDaemon(true);
+		m_visionThread.start();
 	}
 }

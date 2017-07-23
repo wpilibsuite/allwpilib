@@ -11,12 +11,12 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.templates.commandbased.Robot;
 
 /**
- *
+ * An example command.  You can replace me with your own command.
  */
 public class ExampleCommand extends Command {
 	public ExampleCommand() {
 		// Use requires() here to declare subsystem dependencies
-		requires(Robot.exampleSubsystem);
+		requires(Robot.kExampleSubsystem);
 	}
 
 	// Called just before this Command runs the first time

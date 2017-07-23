@@ -5,10 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -21,23 +17,23 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * PID!
  */
 public class SetElevatorSetpoint extends Command {
-	private double setpoint;
+	private double m_setpoint;
 
 	public SetElevatorSetpoint(double setpoint) {
-		this.setpoint = setpoint;
-		requires(Robot.elevator);
+		m_setpoint = setpoint;
+		requires(Robot.m_elevator);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Robot.elevator.enable();
-		Robot.elevator.setSetpoint(setpoint);
+		Robot.m_elevator.enable();
+		Robot.m_elevator.setSetpoint(m_setpoint);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return Robot.elevator.onTarget();
+		return Robot.m_elevator.onTarget();
 	}
 }

@@ -24,7 +24,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
-	private Joystick joy = new Joystick(0);
+
+	private Joystick m_joystick = new Joystick(0);
 
 	public OI() {
 		// Put Some buttons on the SmartDashboard
@@ -41,20 +42,20 @@ public class OI {
 		SmartDashboard.putData("Deliver Soda", new Autonomous());
 
 		// Create some buttons
-		JoystickButton d_up = new JoystickButton(joy, 5);
-		JoystickButton d_right = new JoystickButton(joy, 6);
-		JoystickButton d_down = new JoystickButton(joy, 7);
-		JoystickButton d_left = new JoystickButton(joy, 8);
-		JoystickButton l2 = new JoystickButton(joy, 9);
-		JoystickButton r2 = new JoystickButton(joy, 10);
-		JoystickButton l1 = new JoystickButton(joy, 11);
-		JoystickButton r1 = new JoystickButton(joy, 12);
+		JoystickButton dpadUp = new JoystickButton(m_joystick, 5);
+		JoystickButton dpadRight = new JoystickButton(m_joystick, 6);
+		JoystickButton dpadDown = new JoystickButton(m_joystick, 7);
+		JoystickButton dpadLeft = new JoystickButton(m_joystick, 8);
+		JoystickButton l2 = new JoystickButton(m_joystick, 9);
+		JoystickButton r2 = new JoystickButton(m_joystick, 10);
+		JoystickButton l1 = new JoystickButton(m_joystick, 11);
+		JoystickButton r1 = new JoystickButton(m_joystick, 12);
 
 		// Connect the buttons to commands
-		d_up.whenPressed(new SetElevatorSetpoint(0.2));
-		d_down.whenPressed(new SetElevatorSetpoint(-0.2));
-		d_right.whenPressed(new CloseClaw());
-		d_left.whenPressed(new OpenClaw());
+		dpadUp.whenPressed(new SetElevatorSetpoint(0.2));
+		dpadDown.whenPressed(new SetElevatorSetpoint(-0.2));
+		dpadRight.whenPressed(new CloseClaw());
+		dpadLeft.whenPressed(new OpenClaw());
 
 		r1.whenPressed(new PrepareToPickup());
 		r2.whenPressed(new Pickup());
@@ -63,6 +64,6 @@ public class OI {
 	}
 
 	public Joystick getJoystick() {
-		return joy;
+		return m_joystick;
 	}
 }

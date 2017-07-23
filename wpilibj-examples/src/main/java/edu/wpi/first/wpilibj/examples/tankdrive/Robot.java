@@ -17,19 +17,19 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class Robot extends IterativeRobot {
 
-	private RobotDrive myRobot;
-	private Joystick leftStick;
-	private Joystick rightStick;
+	private RobotDrive m_myRobot;
+	private Joystick m_leftStick;
+	private Joystick m_rightStick;
 
 	@Override
 	public void robotInit() {
-		myRobot = new RobotDrive(0, 1);
-		leftStick = new Joystick(0);
-		rightStick = new Joystick(1);
+		m_myRobot = new RobotDrive(0, 1);
+		m_leftStick = new Joystick(0);
+		m_rightStick = new Joystick(1);
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		myRobot.tankDrive(leftStick, rightStick);
+		m_myRobot.tankDrive(m_leftStick, m_rightStick);
 	}
 }

@@ -5,14 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.command.Command;
@@ -25,16 +20,17 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * encoders.
  */
 public class SetDistanceToBox extends Command {
-	private PIDController pid;
+
+	private PIDController m_pid;
 
 	public SetDistanceToBox(double distance) {
-		requires(Robot.drivetrain);
-		pid = new PIDController(-2, 0, 0, new PIDSource() {
+		requires(Robot.m_drivetrain);
+		m_pid = new PIDController(-2, 0, 0, new PIDSource() {
 			PIDSourceType m_sourceType = PIDSourceType.kDisplacement;
 
 			@Override
 			public double pidGet() {
-				return Robot.drivetrain.getDistanceToObstacle();
+				return Robot.m_drivetrain.getDistanceToObstacle();
 			}
 
 			@Override
@@ -46,36 +42,32 @@ public class SetDistanceToBox extends Command {
 			public PIDSourceType getPIDSourceType() {
 				return m_sourceType;
 			}
-		}, new PIDOutput() {
-			@Override
-			public void pidWrite(double d) {
-				Robot.drivetrain.drive(d, d);
-			}
-		});
-		pid.setAbsoluteTolerance(0.01);
-		pid.setSetpoint(distance);
+		}, d -> Robot.m_drivetrain.drive(d, d));
+
+		m_pid.setAbsoluteTolerance(0.01);
+		m_pid.setSetpoint(distance);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
 		// Get everything in a safe starting state.
-		Robot.drivetrain.reset();
-		pid.reset();
-		pid.enable();
+		Robot.m_drivetrain.reset();
+		m_pid.reset();
+		m_pid.enable();
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return pid.onTarget();
+		return m_pid.onTarget();
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
 		// Stop PID and the wheels
-		pid.disable();
-		Robot.drivetrain.drive(0, 0);
+		m_pid.disable();
+		Robot.m_drivetrain.drive(0, 0);
 	}
 }

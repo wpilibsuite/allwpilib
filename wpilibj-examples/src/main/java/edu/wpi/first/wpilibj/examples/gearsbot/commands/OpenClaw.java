@@ -5,10 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.command.TimedCommand;
@@ -21,18 +17,18 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 public class OpenClaw extends TimedCommand {
 	public OpenClaw() {
 		super(1);
-		requires(Robot.claw);
+		requires(Robot.m_claw);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Robot.claw.open();
+		Robot.m_claw.open();
 	}
 
 	// Called once after isFinished returns true
 	@Override
 	protected void end() {
-		Robot.claw.stop();
+		Robot.m_claw.stop();
 	}
 }

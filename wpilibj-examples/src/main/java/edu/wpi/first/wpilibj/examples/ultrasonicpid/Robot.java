@@ -40,9 +40,10 @@ public class Robot extends IterativeRobot {
 	private static final int kRightMotorPort = 1;
 	private static final int kUltrasonicPort = 0;
 
-	private AnalogInput ultrasonic = new AnalogInput(kUltrasonicPort);
-	private RobotDrive myRobot = new RobotDrive(kLeftMotorPort, kRightMotorPort);
-	private PIDController pidController = new PIDController(kP, kI, kD, ultrasonic, new MyPidOutput());
+	private AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
+	private RobotDrive m_myRobot = new RobotDrive(kLeftMotorPort, kRightMotorPort);
+	private PIDController m_pidController = new PIDController(kP, kI, kD, m_ultrasonic,
+			new MyPidOutput());
 
 	/**
 	 * Drives the robot a set distance from an object using PID control and the
@@ -52,16 +53,16 @@ public class Robot extends IterativeRobot {
 	public void teleopInit() {
 		// Set expected range to 0-24 inches; e.g. at 24 inches from object go
 		// full forward, at 0 inches from object go full backward.
-		pidController.setInputRange(0, kMaxDistance * kValueToInches);
-		// Set setpoint of the pidController
-		pidController.setSetpoint(kHoldDistance * kValueToInches);
-		pidController.enable(); // begin PID control
+		m_pidController.setInputRange(0, kMaxDistance * kValueToInches);
+		// Set setpoint of the pid controller
+		m_pidController.setSetpoint(kHoldDistance * kValueToInches);
+		m_pidController.enable(); // begin PID control
 	}
 
 	private class MyPidOutput implements PIDOutput {
 		@Override
 		public void pidWrite(double output) {
-			myRobot.drive(output, 0);
+			m_myRobot.drive(output, 0);
 		}
 	}
 }

@@ -5,10 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.examples.gearsbot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
@@ -20,23 +16,23 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * commands using the wrist should make sure they disable PID!
  */
 public class SetWristSetpoint extends Command {
-	private double setpoint;
+	private double m_setpoint;
 
 	public SetWristSetpoint(double setpoint) {
-		this.setpoint = setpoint;
-		requires(Robot.wrist);
+		m_setpoint = setpoint;
+		requires(Robot.m_wrist);
 	}
 
 	// Called just before this Command runs the first time
 	@Override
 	protected void initialize() {
-		Robot.wrist.enable();
-		Robot.wrist.setSetpoint(setpoint);
+		Robot.m_wrist.enable();
+		Robot.m_wrist.setSetpoint(m_setpoint);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	@Override
 	protected boolean isFinished() {
-		return Robot.wrist.onTarget();
+		return Robot.m_wrist.onTarget();
 	}
 }

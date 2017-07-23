@@ -5,10 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -23,15 +19,16 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * don't stall.
  */
 public class Claw extends Subsystem {
-	private SpeedController motor = new Victor(7);
-	private DigitalInput contact = new DigitalInput(5);
+
+	private SpeedController m_motor = new Victor(7);
+	private DigitalInput m_contact = new DigitalInput(5);
 
 	public Claw() {
 		super();
 
 		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Claw", "Motor", (Victor) motor);
-		LiveWindow.addActuator("Claw", "Limit Switch", contact);
+		LiveWindow.addActuator("Claw", "Motor", (Victor) m_motor);
+		LiveWindow.addActuator("Claw", "Limit Switch", m_contact);
 	}
 
 	@Override
@@ -45,21 +42,21 @@ public class Claw extends Subsystem {
 	 * Set the claw motor to move in the open direction.
 	 */
 	public void open() {
-		motor.set(-1);
+		m_motor.set(-1);
 	}
 
 	/**
 	 * Set the claw motor to move in the close direction.
 	 */
 	public void close() {
-		motor.set(1);
+		m_motor.set(1);
 	}
 
 	/**
 	 * Stops the claw motor from moving.
 	 */
 	public void stop() {
-		motor.set(0);
+		m_motor.set(0);
 	}
 
 	/**
@@ -67,6 +64,6 @@ public class Claw extends Subsystem {
 	 * the limit switch.
 	 */
 	public boolean isGrabbing() {
-		return contact.get();
+		return m_contact.get();
 	}
 }

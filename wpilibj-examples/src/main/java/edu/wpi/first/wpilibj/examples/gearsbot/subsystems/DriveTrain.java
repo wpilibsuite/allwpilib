@@ -27,17 +27,19 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * and a gyro.
  */
 public class DriveTrain extends Subsystem {
-	private SpeedController frontLeftMotor = new Talon(1);
-	private SpeedController rearLeftMotor = new Talon(2);
-	private SpeedController frontRightMotor = new Talon(3);
-	private SpeedController rearRightMotor = new Talon(4);
 
-	private RobotDrive drive = new RobotDrive(frontLeftMotor, rearLeftMotor, frontRightMotor, rearRightMotor);
+	private SpeedController m_frontLeftMotor = new Talon(1);
+	private SpeedController m_rearLeftMotor = new Talon(2);
+	private SpeedController m_frontRightMotor = new Talon(3);
+	private SpeedController m_rearRightMotor = new Talon(4);
 
-	private Encoder leftEncoder = new Encoder(1, 2);
-	private Encoder rightEncoder = new Encoder(3, 4);
-	private AnalogInput rangefinder = new AnalogInput(6);
-	private AnalogGyro gyro = new AnalogGyro(1);
+	private RobotDrive m_drive = new RobotDrive(m_frontLeftMotor, m_rearLeftMotor, m_frontRightMotor,
+			m_rearRightMotor);
+
+	private Encoder m_leftEncoder = new Encoder(1, 2);
+	private Encoder m_rightEncoder = new Encoder(3, 4);
+	private AnalogInput m_rangefinder = new AnalogInput(6);
+	private AnalogGyro m_gyro = new AnalogGyro(1);
 
 	public DriveTrain() {
 		super();
@@ -48,23 +50,23 @@ public class DriveTrain extends Subsystem {
 		// simulate 360 tick encoders. This if statement allows for the
 		// real robot to handle this difference in devices.
 		if (Robot.isReal()) {
-			leftEncoder.setDistancePerPulse(0.042);
-			rightEncoder.setDistancePerPulse(0.042);
+			m_leftEncoder.setDistancePerPulse(0.042);
+			m_rightEncoder.setDistancePerPulse(0.042);
 		} else {
 			// Circumference in ft = 4in/12(in/ft)*PI
-			leftEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
-			rightEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
+			m_leftEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
+			m_rightEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
 		}
 
 		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Drive Train", "Front_Left Motor", (Talon) frontLeftMotor);
-		LiveWindow.addActuator("Drive Train", "Back Left Motor", (Talon) rearLeftMotor);
-		LiveWindow.addActuator("Drive Train", "Front Right Motor", (Talon) frontRightMotor);
-		LiveWindow.addActuator("Drive Train", "Back Right Motor", (Talon) rearRightMotor);
-		LiveWindow.addSensor("Drive Train", "Left Encoder", leftEncoder);
-		LiveWindow.addSensor("Drive Train", "Right Encoder", rightEncoder);
-		LiveWindow.addSensor("Drive Train", "Rangefinder", rangefinder);
-		LiveWindow.addSensor("Drive Train", "Gyro", gyro);
+		LiveWindow.addActuator("Drive Train", "Front_Left Motor", (Talon) m_frontLeftMotor);
+		LiveWindow.addActuator("Drive Train", "Back Left Motor", (Talon) m_rearLeftMotor);
+		LiveWindow.addActuator("Drive Train", "Front Right Motor", (Talon) m_frontRightMotor);
+		LiveWindow.addActuator("Drive Train", "Back Right Motor", (Talon) m_rearRightMotor);
+		LiveWindow.addSensor("Drive Train", "Left Encoder", m_leftEncoder);
+		LiveWindow.addSensor("Drive Train", "Right Encoder", m_rightEncoder);
+		LiveWindow.addSensor("Drive Train", "Rangefinder", m_rangefinder);
+		LiveWindow.addSensor("Drive Train", "Gyro", m_gyro);
 	}
 
 	/**
@@ -80,11 +82,11 @@ public class DriveTrain extends Subsystem {
 	 * The log method puts interesting information to the SmartDashboard.
 	 */
 	public void log() {
-		SmartDashboard.putNumber("Left Distance", leftEncoder.getDistance());
-		SmartDashboard.putNumber("Right Distance", rightEncoder.getDistance());
-		SmartDashboard.putNumber("Left Speed", leftEncoder.getRate());
-		SmartDashboard.putNumber("Right Speed", rightEncoder.getRate());
-		SmartDashboard.putNumber("Gyro", gyro.getAngle());
+		SmartDashboard.putNumber("Left Distance", m_leftEncoder.getDistance());
+		SmartDashboard.putNumber("Right Distance", m_rightEncoder.getDistance());
+		SmartDashboard.putNumber("Left Speed", m_leftEncoder.getRate());
+		SmartDashboard.putNumber("Right Speed", m_rightEncoder.getRate());
+		SmartDashboard.putNumber("Gyro", m_gyro.getAngle());
 	}
 
 	/**
@@ -96,7 +98,7 @@ public class DriveTrain extends Subsystem {
 	 *            Speed in range [-1,1]
 	 */
 	public void drive(double left, double right) {
-		drive.tankDrive(left, right);
+		m_drive.tankDrive(left, right);
 	}
 
 	/**
@@ -111,23 +113,23 @@ public class DriveTrain extends Subsystem {
 	 * @return The robots heading in degrees.
 	 */
 	public double getHeading() {
-		return gyro.getAngle();
+		return m_gyro.getAngle();
 	}
 
 	/**
 	 * Reset the robots sensors to the zero states.
 	 */
 	public void reset() {
-		gyro.reset();
-		leftEncoder.reset();
-		rightEncoder.reset();
+		m_gyro.reset();
+		m_leftEncoder.reset();
+		m_rightEncoder.reset();
 	}
 
 	/**
 	 * @return The distance driven (average of left and right encoders).
 	 */
 	public double getDistance() {
-		return (leftEncoder.getDistance() + rightEncoder.getDistance()) / 2;
+		return (m_leftEncoder.getDistance() + m_rightEncoder.getDistance()) / 2;
 	}
 
 	/**
@@ -135,6 +137,6 @@ public class DriveTrain extends Subsystem {
 	 */
 	public double getDistanceToObstacle() {
 		// Really meters in simulation since it's a rangefinder...
-		return rangefinder.getAverageVoltage();
+		return m_rangefinder.getAverageVoltage();
 	}
 }

@@ -26,7 +26,7 @@ public class Robot extends IterativeRobot {
 	private static final int kJoystickChannel = 0;
 
 	// bottom, middle, and top elevator setpoints
-	private static final double kSetPoints[] = { 1.0, 2.6, 4.3 };
+	private static final double[] kSetPoints = {1.0, 2.6, 4.3};
 
 	// proportional, integral, and derivative speed constants; motor inverted
 	// DANGER: when tuning PID constants, high/inappropriate values for kP, kI,
@@ -36,40 +36,40 @@ public class Robot extends IterativeRobot {
 	private static final double kI = -0.02;
 	private static final double kD = -2.0;
 
-	private PIDController pidController;
-	private AnalogInput potentiometer;
-	private SpeedController elevatorMotor;
-	private Joystick joystick;
+	private PIDController m_pidController;
+	private AnalogInput m_potentiometer;
+	private SpeedController m_elevatorMotor;
+	private Joystick m_joystick;
 
-	private int index = 0;
-	private boolean previousButtonValue = false;
+	private int m_index = 0;
+	private boolean m_previousButtonValue = false;
 
 	@Override
 	public void robotInit() {
-		potentiometer = new AnalogInput(kPotChannel);
-		elevatorMotor = new Spark(kMotorChannel);
-		joystick = new Joystick(kJoystickChannel);
+		m_potentiometer = new AnalogInput(kPotChannel);
+		m_elevatorMotor = new Spark(kMotorChannel);
+		m_joystick = new Joystick(kJoystickChannel);
 
-		pidController = new PIDController(kP, kI, kD, potentiometer, elevatorMotor);
-		pidController.setInputRange(0, 5);
+		m_pidController = new PIDController(kP, kI, kD, m_potentiometer, m_elevatorMotor);
+		m_pidController.setInputRange(0, 5);
 	}
 
 	@Override
 	public void teleopInit() {
-		pidController.enable();
+		m_pidController.enable();
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		// when the button is pressed once, the selected elevator setpoint
 		// is incremented
-		boolean currentButtonValue = joystick.getTrigger();
-		if (currentButtonValue && !previousButtonValue) {
+		boolean currentButtonValue = m_joystick.getTrigger();
+		if (currentButtonValue && !m_previousButtonValue) {
 			// index of the elevator setpoint wraps around.
-			index = (index + 1) % kSetPoints.length;
+			m_index = (m_index + 1) % kSetPoints.length;
 		}
-		previousButtonValue = currentButtonValue;
+		m_previousButtonValue = currentButtonValue;
 
-		pidController.setSetpoint(kSetPoints[index]);
+		m_pidController.setSetpoint(kSetPoints[m_index]);
 	}
 }

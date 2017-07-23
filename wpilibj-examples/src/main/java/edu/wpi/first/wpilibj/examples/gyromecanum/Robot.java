@@ -30,21 +30,21 @@ public class Robot extends IterativeRobot {
 	private static final int kGyroPort = 0;
 	private static final int kJoystickPort = 0;
 
-	private RobotDrive myRobot;
-	private AnalogGyro gyro = new AnalogGyro(kGyroPort);
-	private Joystick joystick = new Joystick(kJoystickPort);
+	private RobotDrive m_myRobot;
+	private AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
+	private Joystick m_joystick = new Joystick(kJoystickPort);
 
 	@Override
 	public void robotInit() {
-		myRobot = new RobotDrive(kFrontLeftMotorPort, kFrontRightMotorPort,
-			kRearLeftMotorPort, kRearRightMotorPort);
+		m_myRobot = new RobotDrive(kFrontLeftMotorPort, kFrontRightMotorPort, kRearLeftMotorPort,
+				kRearRightMotorPort);
 
 		// invert the left side motors
 		// you may need to change or remove this to match your robot
-		myRobot.setInvertedMotor(MotorType.kFrontLeft, true);
-		myRobot.setInvertedMotor(MotorType.kRearLeft, true);
+		m_myRobot.setInvertedMotor(MotorType.kFrontLeft, true);
+		m_myRobot.setInvertedMotor(MotorType.kRearLeft, true);
 
-		gyro.setSensitivity(kVoltsPerDegreePerSecond);
+		m_gyro.setSensitivity(kVoltsPerDegreePerSecond);
 	}
 
 	/**
@@ -52,6 +52,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		myRobot.mecanumDrive_Cartesian(joystick.getX(), joystick.getY(), joystick.getZ(), gyro.getAngle());
+		m_myRobot.mecanumDrive_Cartesian(m_joystick.getX(), m_joystick.getY(), m_joystick.getZ(),
+				m_gyro.getAngle());
 	}
 }

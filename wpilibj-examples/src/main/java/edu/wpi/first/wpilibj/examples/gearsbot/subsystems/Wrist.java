@@ -5,10 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -25,32 +21,33 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * of a linear joint.
  */
 public class Wrist extends PIDSubsystem {
-	private SpeedController motor;
-	private Potentiometer pot;
 
-	private static final double kP_real = 1, kP_simulation = 0.05;
+	private SpeedController m_motor;
+	private Potentiometer m_pot;
+
+	private static final double kP_real = 1;
+	private static final double kP_simulation = 0.05;
 
 	public Wrist() {
 		super(kP_real, 0, 0);
-		if (Robot.isSimulation()) { // Check for simulation and update PID
-									// values
+		if (Robot.isSimulation()) { // Check for simulation and update PID values
 			getPIDController().setPID(kP_simulation, 0, 0, 0);
 		}
 		setAbsoluteTolerance(2.5);
 
-		motor = new Victor(6);
+		m_motor = new Victor(6);
 
 		// Conversion value of potentiometer varies between the real world and
 		// simulation
 		if (Robot.isReal()) {
-			pot = new AnalogPotentiometer(3, -270.0 / 5);
+			m_pot = new AnalogPotentiometer(3, -270.0 / 5);
 		} else {
-			pot = new AnalogPotentiometer(3); // Defaults to degrees
+			m_pot = new AnalogPotentiometer(3); // Defaults to degrees
 		}
 
 		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Wrist", "Motor", (Victor) motor);
-		LiveWindow.addSensor("Wrist", "Pot", (AnalogPotentiometer) pot);
+		LiveWindow.addActuator("Wrist", "Motor", (Victor) m_motor);
+		LiveWindow.addSensor("Wrist", "Pot", (AnalogPotentiometer) m_pot);
 		LiveWindow.addActuator("Wrist", "PID", getPIDController());
 	}
 
@@ -62,7 +59,7 @@ public class Wrist extends PIDSubsystem {
 	 * The log method puts interesting information to the SmartDashboard.
 	 */
 	public void log() {
-		SmartDashboard.putData("Wrist Angle", (AnalogPotentiometer) pot);
+		SmartDashboard.putData("Wrist Angle", (AnalogPotentiometer) m_pot);
 	}
 
 	/**
@@ -71,7 +68,7 @@ public class Wrist extends PIDSubsystem {
 	 */
 	@Override
 	protected double returnPIDInput() {
-		return pot.get();
+		return m_pot.get();
 	}
 
 	/**
@@ -79,7 +76,7 @@ public class Wrist extends PIDSubsystem {
 	 * the subsystem.
 	 */
 	@Override
-	protected void usePIDOutput(double d) {
-		motor.set(d);
+	protected void usePIDOutput(double power) {
+		m_motor.set(power);
 	}
 }

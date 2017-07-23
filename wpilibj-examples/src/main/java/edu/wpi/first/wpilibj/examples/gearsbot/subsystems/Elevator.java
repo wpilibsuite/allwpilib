@@ -5,10 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -26,32 +22,35 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * world do to minor differences.
  */
 public class Elevator extends PIDSubsystem {
-	private SpeedController motor;
-	private Potentiometer pot;
 
-	private static final double kP_real = 4, kI_real = 0.07, kP_simulation = 18, kI_simulation = 0.2;
+	private SpeedController m_motor;
+	private Potentiometer m_pot;
+
+	private static final double kP_real = 4;
+	private static final double kI_real = 0.07;
+	private static final double kP_simulation = 18;
+	private static final double kI_simulation = 0.2;
 
 	public Elevator() {
 		super(kP_real, kI_real, 0);
-		if (Robot.isSimulation()) { // Check for simulation and update PID
-									// values
+		if (Robot.isSimulation()) { // Check for simulation and update PID values
 			getPIDController().setPID(kP_simulation, kI_simulation, 0, 0);
 		}
 		setAbsoluteTolerance(0.005);
 
-		motor = new Victor(5);
+		m_motor = new Victor(5);
 
 		// Conversion value of potentiometer varies between the real world and
 		// simulation
 		if (Robot.isReal()) {
-			pot = new AnalogPotentiometer(2, -2.0 / 5);
+			m_pot = new AnalogPotentiometer(2, -2.0 / 5);
 		} else {
-			pot = new AnalogPotentiometer(2); // Defaults to meters
+			m_pot = new AnalogPotentiometer(2); // Defaults to meters
 		}
 
 		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Elevator", "Motor", (Victor) motor);
-		LiveWindow.addSensor("Elevator", "Pot", (AnalogPotentiometer) pot);
+		LiveWindow.addActuator("Elevator", "Motor", (Victor) m_motor);
+		LiveWindow.addSensor("Elevator", "Pot", (AnalogPotentiometer) m_pot);
 		LiveWindow.addActuator("Elevator", "PID", getPIDController());
 	}
 
@@ -63,7 +62,7 @@ public class Elevator extends PIDSubsystem {
 	 * The log method puts interesting information to the SmartDashboard.
 	 */
 	public void log() {
-		SmartDashboard.putData("Wrist Pot", (AnalogPotentiometer) pot);
+		SmartDashboard.putData("Wrist Pot", (AnalogPotentiometer) m_pot);
 	}
 
 	/**
@@ -72,7 +71,7 @@ public class Elevator extends PIDSubsystem {
 	 */
 	@Override
 	protected double returnPIDInput() {
-		return pot.get();
+		return m_pot.get();
 	}
 
 	/**
@@ -80,7 +79,7 @@ public class Elevator extends PIDSubsystem {
 	 * the subsystem.
 	 */
 	@Override
-	protected void usePIDOutput(double d) {
-		motor.set(d);
+	protected void usePIDOutput(double power) {
+		m_motor.set(power);
 	}
 }
