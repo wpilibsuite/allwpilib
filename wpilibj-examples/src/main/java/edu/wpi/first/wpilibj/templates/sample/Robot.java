@@ -26,10 +26,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * creating this project, you must also update the build.properties file in the
  * project.
  *
- * <p>WARNING: While it may look like a good choice to use for your code if you're
- * inexperienced, don't. Unless you know what you are doing, complex code will
- * be much more difficult under this system. Use IterativeRobot or Command-Based
- * instead if you're new.
+ * <p>WARNING: While it may look like a good choice to use for your code if
+ * you're inexperienced, don't. Unless you know what you are doing, complex code
+ * will be much more difficult under this system. Use IterativeRobot or
+ * Command-Based instead if you're new.
  */
 public class Robot extends SampleRobot {
 
@@ -58,11 +58,12 @@ public class Robot extends SampleRobot {
 	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
 	 * getString line to get the auto name from the text box below the Gyro
 	 *
-	 * <p>You can add additional auto modes by adding additional comparisons to the
-	 * if-else structure below with additional strings. If using the
+	 * <p>You can add additional auto modes by adding additional comparisons to
+	 * the if-else structure below with additional strings. If using the
 	 * SendableChooser make sure to add them to the chooser code above as well.
 	 *
-	 * <p>If you wanted to run a similar autonomous mode with an IterativeRobot you would write:
+	 * <p>If you wanted to run a similar autonomous mode with an IterativeRobot
+	 * you would write:
 	 *
 	 * <blockquote><pre>{@code
 	 * Timer timer = new Timer();
@@ -103,7 +104,7 @@ public class Robot extends SampleRobot {
 			case kDefaultAuto:
 			default:
 				m_myRobot.setSafetyEnabled(false);
-				m_myRobot.drive(-0.5, 0.0); // drive forwards half speed
+				m_myRobot.drive(-0.5, 0.0); // drive forwards
 				Timer.delay(2.0); // for 2 seconds
 				m_myRobot.drive(0.0, 0.0); // stop robot
 				break;
@@ -113,7 +114,9 @@ public class Robot extends SampleRobot {
 	/**
 	 * Runs the motors with arcade steering.
 	 *
-	 * <p>If you wanted to run a similar teleoperated mode with an IterativeRobot you would write:
+	 * <p>If you wanted to run a similar teleoperated mode with an IterativeRobot
+	 * you would write:
+	 *
 	 * <blockquote><pre>{@code
 	 * // This function is called periodically during operator control
 	 * public void teleopPeriodic() {
@@ -125,7 +128,7 @@ public class Robot extends SampleRobot {
 	public void operatorControl() {
 		m_myRobot.setSafetyEnabled(true);
 		while (isOperatorControl() && isEnabled()) {
-			m_myRobot.arcadeDrive(m_stick); // drive with arcade style (use right stick)
+			m_myRobot.arcadeDrive(m_stick); // drive arcade style
 			Timer.delay(0.005); // wait for a motor update time
 		}
 	}

@@ -19,8 +19,8 @@ import org.opencv.imgproc.Imgproc;
 
 /**
  * This is a demo program showing the use of OpenCV to do vision processing. The
- * image is acquired from the USB camera, then a rectangle is put on the image and
- * sent to the dashboard. OpenCV has many methods for different types of
+ * image is acquired from the USB camera, then a rectangle is put on the image
+ * and sent to the dashboard. OpenCV has many methods for different types of
  * processing.
  */
 public class Robot extends IterativeRobot {
@@ -38,7 +38,8 @@ public class Robot extends IterativeRobot {
 			// Get a CvSink. This will capture Mats from the camera
 			CvSink cvSink = CameraServer.getInstance().getVideo();
 			// Setup a CvSource. This will send images back to the Dashboard
-			CvSource outputStream = CameraServer.getInstance().putVideo("Rectangle", 640, 480);
+			CvSource outputStream
+					= CameraServer.getInstance().putVideo("Rectangle", 640, 480);
 
 			// Mats are very memory expensive. Lets reuse this Mat.
 			Mat mat = new Mat();

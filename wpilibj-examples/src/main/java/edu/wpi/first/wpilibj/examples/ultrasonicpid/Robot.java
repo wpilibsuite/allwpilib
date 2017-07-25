@@ -41,9 +41,10 @@ public class Robot extends IterativeRobot {
 	private static final int kUltrasonicPort = 0;
 
 	private AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-	private RobotDrive m_myRobot = new RobotDrive(kLeftMotorPort, kRightMotorPort);
-	private PIDController m_pidController = new PIDController(kP, kI, kD, m_ultrasonic,
-			new MyPidOutput());
+	private RobotDrive m_myRobot
+			= new RobotDrive(kLeftMotorPort, kRightMotorPort);
+	private PIDController m_pidController
+			= new PIDController(kP, kI, kD, m_ultrasonic, new MyPidOutput());
 
 	/**
 	 * Drives the robot a set distance from an object using PID control and the

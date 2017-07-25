@@ -36,8 +36,8 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void robotInit() {
-		m_myRobot = new RobotDrive(kFrontLeftMotorPort, kFrontRightMotorPort, kRearLeftMotorPort,
-				kRearRightMotorPort);
+		m_myRobot = new RobotDrive(kFrontLeftMotorPort, kFrontRightMotorPort,
+				kRearLeftMotorPort, kRearRightMotorPort);
 
 		// invert the left side motors
 		// you may need to change or remove this to match your robot
@@ -52,7 +52,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		m_myRobot.mecanumDrive_Cartesian(m_joystick.getX(), m_joystick.getY(), m_joystick.getZ(),
-				m_gyro.getAngle());
+		m_myRobot.mecanumDrive_Cartesian(m_joystick.getX(), m_joystick.getY(),
+				m_joystick.getZ(), m_gyro.getAngle());
 	}
 }

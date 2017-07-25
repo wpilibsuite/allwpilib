@@ -50,7 +50,8 @@ public class Robot extends IterativeRobot {
 		m_elevatorMotor = new Spark(kMotorChannel);
 		m_joystick = new Joystick(kJoystickChannel);
 
-		m_pidController = new PIDController(kP, kI, kD, m_potentiometer, m_elevatorMotor);
+		m_pidController
+				= new PIDController(kP, kI, kD, m_potentiometer, m_elevatorMotor);
 		m_pidController.setInputRange(0, 5);
 	}
 

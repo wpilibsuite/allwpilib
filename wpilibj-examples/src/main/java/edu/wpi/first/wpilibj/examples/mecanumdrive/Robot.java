@@ -35,7 +35,8 @@ public class Robot extends IterativeRobot {
 				kFrontRightChannel,
 				kRearRightChannel);
 
-		// Invert the left side motors. You may need to change or remove this to match your robot.
+		// Invert the left side motors.
+		// You may need to change or remove this to match your robot.
 		m_robotDrive.setInvertedMotor(MotorType.kFrontLeft, true);
 		m_robotDrive.setInvertedMotor(MotorType.kRearLeft, true);
 
@@ -46,6 +47,7 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		// Use the joystick X axis for lateral movement, Y axis for forward
 		// movement, and Z axis for rotation.
-		m_robotDrive.mecanumDrive_Cartesian(m_stick.getX(), m_stick.getY(), m_stick.getZ(), 0.0);
+		m_robotDrive.mecanumDrive_Cartesian(m_stick.getX(), m_stick.getY(),
+				m_stick.getZ(), 0.0);
 	}
 }

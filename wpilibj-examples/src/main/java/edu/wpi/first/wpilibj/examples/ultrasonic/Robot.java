@@ -31,7 +31,8 @@ public class Robot extends IterativeRobot {
 	private static final int kUltrasonicPort = 0;
 
 	private AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-	private RobotDrive m_myRobot = new RobotDrive(kLeftMotorPort, kRightMotorPort);
+	private RobotDrive m_myRobot
+			= new RobotDrive(kLeftMotorPort, kRightMotorPort);
 
 	/**
 	 * Tells the robot to drive to a set distance (in inches) from an object

@@ -33,8 +33,8 @@ public class DriveTrain extends Subsystem {
 	private SpeedController m_frontRightMotor = new Talon(3);
 	private SpeedController m_rearRightMotor = new Talon(4);
 
-	private RobotDrive m_drive = new RobotDrive(m_frontLeftMotor, m_rearLeftMotor, m_frontRightMotor,
-			m_rearRightMotor);
+	private RobotDrive m_drive = new RobotDrive(m_frontLeftMotor, m_rearLeftMotor,
+			m_frontRightMotor, m_rearRightMotor);
 
 	private Encoder m_leftEncoder = new Encoder(1, 2);
 	private Encoder m_rightEncoder = new Encoder(3, 4);
@@ -59,10 +59,14 @@ public class DriveTrain extends Subsystem {
 		}
 
 		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Drive Train", "Front_Left Motor", (Talon) m_frontLeftMotor);
-		LiveWindow.addActuator("Drive Train", "Back Left Motor", (Talon) m_rearLeftMotor);
-		LiveWindow.addActuator("Drive Train", "Front Right Motor", (Talon) m_frontRightMotor);
-		LiveWindow.addActuator("Drive Train", "Back Right Motor", (Talon) m_rearRightMotor);
+		LiveWindow.addActuator("Drive Train", "Front_Left Motor",
+				(Talon) m_frontLeftMotor);
+		LiveWindow.addActuator("Drive Train", "Back Left Motor",
+				(Talon) m_rearLeftMotor);
+		LiveWindow.addActuator("Drive Train", "Front Right Motor",
+				(Talon) m_frontRightMotor);
+		LiveWindow.addActuator("Drive Train", "Back Right Motor",
+				(Talon) m_rearRightMotor);
 		LiveWindow.addSensor("Drive Train", "Left Encoder", m_leftEncoder);
 		LiveWindow.addSensor("Drive Train", "Right Encoder", m_rightEncoder);
 		LiveWindow.addSensor("Drive Train", "Rangefinder", m_rangefinder);

@@ -25,7 +25,8 @@ import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
  */
 public class Robot extends IterativeRobot {
 
-	public static final ExampleSubsystem kExampleSubsystem = new ExampleSubsystem();
+	public static final ExampleSubsystem kExampleSubsystem
+			= new ExampleSubsystem();
 	public static OI m_oi;
 
 	Command m_autonomousCommand;
