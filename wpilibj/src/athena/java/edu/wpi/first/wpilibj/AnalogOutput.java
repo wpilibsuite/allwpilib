@@ -27,9 +27,8 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
    * @param channel The channel number to represent.
    */
   public AnalogOutput(final int channel) {
+    checkAnalogOutputChannel(channel);
     m_channel = channel;
-
-    SensorBase.checkAnalogOutputChannel(channel);
 
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);

@@ -37,7 +37,6 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
    * Initialize the gyro. Calibration is handled by calibrate().
    */
   public void initGyro() {
-
     if (m_gyroHandle == 0) {
       m_gyroHandle = AnalogGyroJNI.initializeAnalogGyro(m_analog.m_port);
     }
