@@ -12,10 +12,9 @@
 #include "HAL/cpp/make_unique.h"
 #include "PortsInternal.h"
 
-namespace hal {
-std::unique_ptr<PCM> PCM_modules[kNumPCMModules];
+std::unique_ptr<PCM> hal::PCM_modules[kNumPCMModules];
 
-void initializePCM(int32_t module, int32_t* status) {
+void hal::initializePCM(int32_t module, int32_t* status) {
   if (!HAL_CheckSolenoidModule(module)) {
     *status = RESOURCE_OUT_OF_RANGE;
     return;
@@ -24,4 +23,3 @@ void initializePCM(int32_t module, int32_t* status) {
     PCM_modules[module] = std::make_unique<PCM>(module);
   }
 }
-}  // namespace hal

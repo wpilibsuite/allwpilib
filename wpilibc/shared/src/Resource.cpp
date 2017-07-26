@@ -10,9 +10,7 @@
 #include "ErrorBase.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
-hal::priority_recursive_mutex Resource::m_createLock;
+hal::priority_recursive_mutex frc::Resource::m_createLock;
 
 /**
  * Allocate storage for a new instance of Resource.
@@ -21,7 +19,7 @@ hal::priority_recursive_mutex Resource::m_createLock;
  * resources have been allocated yet. The indicies of the resources are [0 ..
  * elements - 1].
  */
-Resource::Resource(uint32_t elements) {
+frc::Resource::Resource(uint32_t elements) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_createLock);
   m_isAllocated = std::vector<bool>(elements, false);
 }
@@ -37,8 +35,8 @@ Resource::Resource(uint32_t elements) {
  *                 track, that is, it will allocate resource numbers in the
  *                 range [0 .. elements - 1].
  */
-/*static*/ void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
-                                               uint32_t elements) {
+/*static*/ void frc::Resource::CreateResourceObject(
+    std::unique_ptr<Resource>& r, uint32_t elements) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_createLock);
   if (!r) {
     r = std::make_unique<Resource>(elements);
@@ -52,7 +50,7 @@ Resource::Resource(uint32_t elements) {
  * resource value within the range is located and returned after it is marked
  * allocated.
  */
-uint32_t Resource::Allocate(const std::string& resourceDesc) {
+uint32_t frc::Resource::Allocate(const std::string& resourceDesc) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_allocateLock);
   for (uint32_t i = 0; i < m_isAllocated.size(); i++) {
     if (!m_isAllocated[i]) {
@@ -70,7 +68,8 @@ uint32_t Resource::Allocate(const std::string& resourceDesc) {
  * The user requests a specific resource value, i.e. channel number and it is
  * verified unallocated, then returned.
  */
-uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
+uint32_t frc::Resource::Allocate(uint32_t index,
+                                 const std::string& resourceDesc) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_allocateLock);
   if (index >= m_isAllocated.size()) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
@@ -91,7 +90,7 @@ uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
  * a channel assignment class, Free will release the resource value so it can
  * be reused somewhere else in the program.
  */
-void Resource::Free(uint32_t index) {
+void frc::Resource::Free(uint32_t index) {
   std::unique_lock<hal::priority_recursive_mutex> sync(m_allocateLock);
   if (index == std::numeric_limits<uint32_t>::max()) return;
   if (index >= m_isAllocated.size()) {

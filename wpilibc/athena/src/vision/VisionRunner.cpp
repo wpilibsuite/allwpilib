@@ -11,21 +11,19 @@
 #include "RobotBase.h"
 #include "opencv2/core/mat.hpp"
 
-using namespace frc;
-
 /**
  * Creates a new vision runner. It will take images from the {@code
  * videoSource}, and call the virtual DoProcess() method.
  *
  * @param videoSource the video source to use to supply images for the pipeline
  */
-VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
+frc::VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
     : m_image(std::make_unique<cv::Mat>()), m_cvSink("VisionRunner CvSink") {
   m_cvSink.SetSource(videoSource);
 }
 
 // Located here and not in header due to cv::Mat forward declaration.
-VisionRunnerBase::~VisionRunnerBase() {}
+frc::VisionRunnerBase::~VisionRunnerBase() {}
 
 /**
  * Runs the pipeline one time, giving it the next image from the video source
@@ -40,7 +38,7 @@ VisionRunnerBase::~VisionRunnerBase() {}
  * have their own ways to run the pipeline. Most teams, however, should just
  * use {@link #runForever} in its own thread using a std::thread.</p>
  */
-void VisionRunnerBase::RunOnce() {
+void frc::VisionRunnerBase::RunOnce() {
   if (std::this_thread::get_id() == RobotBase::GetThreadId()) {
     wpi_setErrnoErrorWithContext(
         "VisionRunner::RunOnce() cannot be called from the main robot thread");
@@ -63,7 +61,7 @@ void VisionRunnerBase::RunOnce() {
  * <p><strong>Do not call this method directly from the main
  * thread.</strong></p>
  */
-void VisionRunnerBase::RunForever() {
+void frc::VisionRunnerBase::RunForever() {
   if (std::this_thread::get_id() == RobotBase::GetThreadId()) {
     wpi_setErrnoErrorWithContext(
         "VisionRunner::RunForever() cannot be called from the main robot "

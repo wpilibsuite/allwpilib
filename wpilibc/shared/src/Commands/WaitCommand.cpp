@@ -7,15 +7,13 @@
 
 #include "Commands/WaitCommand.h"
 
-using namespace frc;
-
 /**
  * Creates a new WaitCommand with the given name and timeout.
  *
  * @param name    the name of the command
  * @param timeout the time (in seconds) before this command "times out"
  */
-WaitCommand::WaitCommand(double timeout)
+frc::WaitCommand::WaitCommand(double timeout)
     : TimedCommand("Wait(" + std::to_string(timeout) + ")", timeout) {}
 
 /**
@@ -23,5 +21,5 @@ WaitCommand::WaitCommand(double timeout)
  *
  * @param timeout the time (in seconds) before this command "times out"
  */
-WaitCommand::WaitCommand(const std::string& name, double timeout)
+frc::WaitCommand::WaitCommand(const std::string& name, double timeout)
     : TimedCommand(name, timeout) {}

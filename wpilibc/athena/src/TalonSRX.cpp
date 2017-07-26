@@ -10,15 +10,13 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
-
 /**
  * Construct a TalonSRX connected via PWM.
  *
  * @param channel The PWM channel that the TalonSRX is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-TalonSRX::TalonSRX(int channel) : PWMSpeedController(channel) {
+frc::TalonSRX::TalonSRX(int channel) : PWMSpeedController(channel) {
   /* Note that the TalonSRX uses the following bounds for PWM values. These
    * values should work reasonably well for most controllers, but if users
    * experience issues such as asymmetric behavior around the deadband or

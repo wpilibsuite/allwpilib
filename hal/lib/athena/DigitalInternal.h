@@ -46,14 +46,17 @@ constexpr int32_t kExpectedLoopTiming = 40;
  * devices.
  */
 constexpr double kDefaultPwmPeriod = 5.05;
+
 /**
  * kDefaultPwmCenter is the PWM range center in ms
  */
 constexpr double kDefaultPwmCenter = 1.5;
+
 /**
  * kDefaultPWMStepsDown is the number of PWM steps below the centerpoint
  */
 constexpr int32_t kDefaultPwmStepsDown = 1000;
+
 constexpr int32_t kPwmDisabled = 0;
 
 // Create a mutex to protect changes to the DO PWM config

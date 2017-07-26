@@ -10,17 +10,15 @@
 #include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
-using namespace frc;
-
-SimContinuousOutput::SimContinuousOutput(std::string topic) {
+frc::SimContinuousOutput::SimContinuousOutput(std::string topic) {
   pub = MainNode::Advertise<gazebo::msgs::Float64>("~/simulator/" + topic);
   llvm::outs() << "Initialized ~/simulator/" + topic << "\n";
 }
 
-void SimContinuousOutput::Set(double speed) {
+void frc::SimContinuousOutput::Set(double speed) {
   gazebo::msgs::Float64 msg;
   msg.set_data(speed);
   pub->Publish(msg);
 }
 
-double SimContinuousOutput::Get() { return speed; }
+double frc::SimContinuousOutput::Get() { return speed; }

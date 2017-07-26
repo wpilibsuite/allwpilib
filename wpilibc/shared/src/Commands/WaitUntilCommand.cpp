@@ -9,8 +9,6 @@
 
 #include "Timer.h"
 
-using namespace frc;
-
 /**
  * A {@link WaitCommand} will wait until a certain match time before finishing.
  *
@@ -18,12 +16,12 @@ using namespace frc;
  * next command.
  * @see CommandGroup
  */
-WaitUntilCommand::WaitUntilCommand(double time)
+frc::WaitUntilCommand::WaitUntilCommand(double time)
     : Command("WaitUntilCommand", time) {
   m_time = time;
 }
 
-WaitUntilCommand::WaitUntilCommand(const std::string& name, double time)
+frc::WaitUntilCommand::WaitUntilCommand(const std::string& name, double time)
     : Command(name, time) {
   m_time = time;
 }
@@ -31,4 +29,6 @@ WaitUntilCommand::WaitUntilCommand(const std::string& name, double time)
 /**
  * Check if we've reached the actual finish time.
  */
-bool WaitUntilCommand::IsFinished() { return Timer::GetMatchTime() >= m_time; }
+bool frc::WaitUntilCommand::IsFinished() {
+  return Timer::GetMatchTime() >= m_time;
+}

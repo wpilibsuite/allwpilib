@@ -138,6 +138,7 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
   return FRC_NetworkCommunication_getJoystickButtons(
       joystickNum, &buttons->buttons, &buttons->count);
 }
+
 /**
  * Retrieve the Joystick Descriptor for particular slot
  * @param desc [out] descriptor (data transfer object) to fill in.  desc is

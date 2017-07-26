@@ -11,17 +11,15 @@
 
 #include "HAL/HAL.h"
 
-using namespace frc;
-using namespace std::chrono_literals;
-
 /**
  * Provide an alternate "main loop" via StartCompetition().
  */
-void TimedRobot::StartCompetition() {
+void frc::TimedRobot::StartCompetition() {
   // Loop forever, calling the appropriate mode-dependent function
   m_startLoop = true;
   m_loop->StartPeriodic(m_period);
   while (true) {
+    using namespace std::chrono_literals;
     std::this_thread::sleep_for(24h);
   }
 }
@@ -35,7 +33,7 @@ void TimedRobot::StartCompetition() {
  *
  * @param period Period in seconds.
  */
-void TimedRobot::SetPeriod(double period) {
+void frc::TimedRobot::SetPeriod(double period) {
   m_period = period;
 
   if (m_startLoop) {
@@ -43,8 +41,8 @@ void TimedRobot::SetPeriod(double period) {
   }
 }
 
-TimedRobot::TimedRobot() {
-  m_loop = std::make_unique<Notifier>(&TimedRobot::LoopFunc, this);
+frc::TimedRobot::TimedRobot() {
+  m_loop = std::make_unique<Notifier>(&frc::TimedRobot::LoopFunc, this);
 
   // HAL_Report(HALUsageReporting::kResourceType_Framework,
   //            HALUsageReporting::kFramework_Periodic);
@@ -52,4 +50,4 @@ TimedRobot::TimedRobot() {
              HALUsageReporting::kFramework_Iterative);
 }
 
-TimedRobot::~TimedRobot() { m_loop->Stop(); }
+frc::TimedRobot::~TimedRobot() { m_loop->Stop(); }

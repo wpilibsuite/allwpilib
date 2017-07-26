@@ -11,13 +11,11 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
-std::list<Notifier*> Notifier::timerQueue;
-hal::priority_recursive_mutex Notifier::queueMutex;
-std::atomic<int> Notifier::refcount{0};
-std::thread Notifier::m_task;
-std::atomic<bool> Notifier::m_stopped(false);
+std::list<frc::Notifier*> frc::Notifier::timerQueue;
+hal::priority_recursive_mutex frc::Notifier::queueMutex;
+std::atomic<int> frc::Notifier::refcount{0};
+std::thread frc::Notifier::m_task;
+std::atomic<bool> frc::Notifier::m_stopped(false);
 
 /**
  * Create a Notifier for timer event notification.
@@ -25,7 +23,7 @@ std::atomic<bool> Notifier::m_stopped(false);
  * @param handler The handler is called at the notification time which is set
  *                using StartSingle or StartPeriodic.
  */
-Notifier::Notifier(TimerEventHandler handler) {
+frc::Notifier::Notifier(TimerEventHandler handler) {
   if (handler == nullptr)
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
@@ -48,7 +46,7 @@ Notifier::Notifier(TimerEventHandler handler) {
  * All resources will be freed and the timer event will be removed from the
  * queue if necessary.
  */
-Notifier::~Notifier() {
+frc::Notifier::~Notifier() {
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(queueMutex);
     DeleteFromQueue();
@@ -74,7 +72,7 @@ Notifier::~Notifier() {
  * WARNING: this method does not do synchronization! It must be called from
  * somewhere that is taking care of synchronizing access to the queue.
  */
-void Notifier::UpdateAlarm() {}
+void frc::Notifier::UpdateAlarm() {}
 
 /**
  * ProcessQueue is called whenever there is a timer interrupt.
@@ -83,7 +81,7 @@ void Notifier::UpdateAlarm() {}
  * long as its scheduled time is after the current time. Then the item is
  * removed or rescheduled (repetitive events) in the queue.
  */
-void Notifier::ProcessQueue(int mask, void* params) {
+void frc::Notifier::ProcessQueue(int mask, void* params) {
   Notifier* current;
 
   // keep processing events until no more
@@ -139,7 +137,7 @@ void Notifier::ProcessQueue(int mask, void* params) {
  * This ensures that the public methods only update the queue after finishing
  * inserting.
  */
-void Notifier::InsertInQueue(bool reschedule) {
+void frc::Notifier::InsertInQueue(bool reschedule) {
   if (reschedule) {
     m_expirationTime += m_period;
   } else {
@@ -180,7 +178,7 @@ void Notifier::InsertInQueue(bool reschedule) {
  * Remove this Notifier from the timer queue and adjust the next interrupt time
  * to reflect the current top of the queue.
  */
-void Notifier::DeleteFromQueue() {
+void frc::Notifier::DeleteFromQueue() {
   if (m_queued) {
     m_queued = false;
     wpi_assert(!timerQueue.empty());
@@ -201,7 +199,7 @@ void Notifier::DeleteFromQueue() {
  *
  * @param delay Seconds to wait before the handler is called.
  */
-void Notifier::StartSingle(double delay) {
+void frc::Notifier::StartSingle(double delay) {
   std::lock_guard<hal::priority_recursive_mutex> sync(queueMutex);
   m_periodic = false;
   m_period = delay;
@@ -219,7 +217,7 @@ void Notifier::StartSingle(double delay) {
  * @param period Period in seconds to call the handler starting one period after
  *               the call to this method.
  */
-void Notifier::StartPeriodic(double period) {
+void frc::Notifier::StartPeriodic(double period) {
   std::lock_guard<hal::priority_recursive_mutex> sync(queueMutex);
   m_periodic = true;
   m_period = period;
@@ -235,7 +233,7 @@ void Notifier::StartPeriodic(double period) {
  * registered handler is in progress, this function will block until the
  * handler call is complete.
  */
-void Notifier::Stop() {
+void frc::Notifier::Stop() {
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(queueMutex);
     DeleteFromQueue();
@@ -245,9 +243,9 @@ void Notifier::Stop() {
   std::lock_guard<hal::priority_mutex> sync(m_handlerMutex);
 }
 
-void Notifier::Run() {
+void frc::Notifier::Run() {
   while (!m_stopped) {
-    Notifier::ProcessQueue(0, nullptr);
+    frc::Notifier::ProcessQueue(0, nullptr);
     bool isEmpty;
     {
       std::lock_guard<hal::priority_recursive_mutex> sync(queueMutex);

@@ -13,13 +13,11 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
-const int AnalogGyro::kOversampleBits = 10;
-const int AnalogGyro::kAverageBits = 0;
-const double AnalogGyro::kSamplesPerSecond = 50.0;
-const double AnalogGyro::kCalibrationSampleTime = 5.0;
-const double AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
+const int frc::AnalogGyro::kOversampleBits = 10;
+const int frc::AnalogGyro::kAverageBits = 0;
+const double frc::AnalogGyro::kSamplesPerSecond = 50.0;
+const double frc::AnalogGyro::kCalibrationSampleTime = 5.0;
+const double frc::AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
 
 /**
  * Initialize the gyro.
@@ -31,7 +29,7 @@ const double AnalogGyro::kDefaultVoltsPerDegreePerSecond = 0.007;
  * this is typically done when the robot is first turned on while it's sitting
  * at rest before the competition starts.
  */
-void AnalogGyro::InitAnalogGyro(int channel) {
+void frc::AnalogGyro::InitAnalogGyro(int channel) {
   SetPIDSourceType(PIDSourceType::kDisplacement);
 
   llvm::SmallString<128> buf;
@@ -47,7 +45,7 @@ void AnalogGyro::InitAnalogGyro(int channel) {
  *
  * @param channel The analog channel the gyro is connected to.
  */
-AnalogGyro::AnalogGyro(int channel) { InitAnalogGyro(channel); }
+frc::AnalogGyro::AnalogGyro(int channel) { InitAnalogGyro(channel); }
 
 /**
  * Reset the gyro.
@@ -56,9 +54,9 @@ AnalogGyro::AnalogGyro(int channel) { InitAnalogGyro(channel); }
  * significant drift in the gyro and it needs to be recalibrated after it has
  * been running.
  */
-void AnalogGyro::Reset() { impl->Reset(); }
+void frc::AnalogGyro::Reset() { impl->Reset(); }
 
-void AnalogGyro::Calibrate() { Reset(); }
+void frc::AnalogGyro::Calibrate() { Reset(); }
 
 /**
  * Return the actual angle in degrees that the robot is currently facing.
@@ -72,7 +70,7 @@ void AnalogGyro::Calibrate() { Reset(); }
  * @return the current heading of the robot in degrees. This heading is based on
  *         integration of the returned rate from the gyro.
  */
-double AnalogGyro::GetAngle() const { return impl->GetAngle(); }
+double frc::AnalogGyro::GetAngle() const { return impl->GetAngle(); }
 
 /**
  * Return the rate of rotation of the gyro
@@ -81,4 +79,4 @@ double AnalogGyro::GetAngle() const { return impl->GetAngle(); }
  *
  * @return the current rate in degrees per second
  */
-double AnalogGyro::GetRate() const { return impl->GetVelocity(); }
+double frc::AnalogGyro::GetRate() const { return impl->GetVelocity(); }

@@ -11,8 +11,6 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include "Utility.h"
 
-using namespace frc;
-
 /**
  * Constructor for a generic robot program.
  *
@@ -24,7 +22,7 @@ using namespace frc;
  * future it would be nice to put this code into it's own task that loads on
  * boot so ensure that it runs.
  */
-RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
+frc::RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   RobotState::SetImplementation(DriverStation::GetInstance());
   SmartDashboard::init();
   time_sub = MainNode::Subscribe("~/time", &wpilib::internal::time_callback);
@@ -35,14 +33,14 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
  *
  * @return True if the Robot is currently enabled by the field controls.
  */
-bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
+bool frc::RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
 
 /**
  * Determine if the Robot is currently disabled.
  *
  * @return True if the Robot is currently disabled by the field controls.
  */
-bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
+bool frc::RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
 
 /**
  * Determine if the robot is currently in Autnomous mode.
@@ -50,7 +48,7 @@ bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
  * @return True if the robot is currently operating Autonomously as determined
  *         by the field controls.
  */
-bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
+bool frc::RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
 
 /**
  * Determine if the robot is currently in Operator Control mode.
@@ -58,7 +56,9 @@ bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
  * @return True if the robot is currently operating in Tele-Op mode as
  *         determined by the field controls.
  */
-bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
+bool frc::RobotBase::IsOperatorControl() const {
+  return m_ds.IsOperatorControl();
+}
 
 /**
  * Determine if the robot is currently in Test mode.
@@ -66,4 +66,4 @@ bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
  * @return True if the robot is currently running tests as determined by the
  *         field controls.
  */
-bool RobotBase::IsTest() const { return m_ds.IsTest(); }
+bool frc::RobotBase::IsTest() const { return m_ds.IsTest(); }

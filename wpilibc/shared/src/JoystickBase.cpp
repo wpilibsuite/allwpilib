@@ -7,6 +7,4 @@
 
 #include "JoystickBase.h"
 
-using namespace frc;
-
-JoystickBase::JoystickBase(int port) : GenericHID(port) {}
+frc::JoystickBase::JoystickBase(int port) : GenericHID(port) {}

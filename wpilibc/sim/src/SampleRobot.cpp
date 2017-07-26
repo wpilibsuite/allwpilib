@@ -19,9 +19,7 @@
 void sleep(unsigned int milliseconds) { Sleep(milliseconds); }
 #endif
 
-using namespace frc;
-
-SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
+frc::SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
 
 /**
  * Robot-wide initialization code should go here.
@@ -29,7 +27,7 @@ SampleRobot::SampleRobot() : m_robotMainOverridden(true) {}
  * Programmers should override this method for default Robot-wide initialization
  * which will be called each time the robot enters the disabled state.
  */
-void SampleRobot::RobotInit() {
+void frc::SampleRobot::RobotInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -39,7 +37,7 @@ void SampleRobot::RobotInit() {
  * Programmers should override this method to run code that should run while the
  * field is disabled.
  */
-void SampleRobot::Disabled() {
+void frc::SampleRobot::Disabled() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -50,7 +48,7 @@ void SampleRobot::Disabled() {
  * field is in the autonomous period. This will be called once each time the
  * robot enters the autonomous state.
  */
-void SampleRobot::Autonomous() {
+void frc::SampleRobot::Autonomous() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -61,7 +59,7 @@ void SampleRobot::Autonomous() {
  * field is in the Operator Control (tele-operated) period. This is called once
  * each time the robot enters the teleop state.
  */
-void SampleRobot::OperatorControl() {
+void frc::SampleRobot::OperatorControl() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -72,7 +70,7 @@ void SampleRobot::OperatorControl() {
  * robot is in test mode. This will be called once whenever the robot enters
  * test mode.
  */
-void SampleRobot::Test() {
+void frc::SampleRobot::Test() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -88,7 +86,7 @@ void SampleRobot::Test() {
  * has not been overridden by a user subclass (i.e. the default version runs),
  * then the Autonomous() and OperatorControl() methods will be called.
  */
-void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
+void frc::SampleRobot::RobotMain() { m_robotMainOverridden = false; }
 
 /**
  * Start a competition.
@@ -100,7 +98,7 @@ void SampleRobot::RobotMain() { m_robotMainOverridden = false; }
  * other mode starts or the robot is disabled. Then go back and wait for the
  * robot to be enabled again.
  */
-void SampleRobot::StartCompetition() {
+void frc::SampleRobot::StartCompetition() {
   LiveWindow* lw = LiveWindow::GetInstance();
 
   NetworkTable::GetTable("LiveWindow")

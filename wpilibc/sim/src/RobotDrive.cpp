@@ -16,13 +16,12 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-using namespace frc;
+const int frc::RobotDrive::kMaxNumberOfMotors;
 
-const int RobotDrive::kMaxNumberOfMotors;
-
-static std::shared_ptr<SpeedController> make_shared_nodelete(
-    SpeedController* ptr) {
-  return std::shared_ptr<SpeedController>(ptr, NullDeleter<SpeedController>());
+static std::shared_ptr<frc::SpeedController> make_shared_nodelete(
+    frc::SpeedController* ptr) {
+  return std::shared_ptr<frc::SpeedController>(
+      ptr, frc::NullDeleter<frc::SpeedController>());
 }
 
 /*
@@ -40,7 +39,7 @@ static std::shared_ptr<SpeedController> make_shared_nodelete(
  * initialize all the motor assignments. The default timeout is set for the
  * robot drive.
  */
-void RobotDrive::InitRobotDrive() {
+void frc::RobotDrive::InitRobotDrive() {
   // FIXME: m_safetyHelper = new MotorSafetyHelper(this);
   // FIXME: m_safetyHelper->SetSafetyEnabled(true);
 }
@@ -55,7 +54,7 @@ void RobotDrive::InitRobotDrive() {
  * @param leftMotorChannel  The PWM channel number that drives the left motor.
  * @param rightMotorChannel The PWM channel number that drives the right motor.
  */
-RobotDrive::RobotDrive(int leftMotorChannel, int rightMotorChannel) {
+frc::RobotDrive::RobotDrive(int leftMotorChannel, int rightMotorChannel) {
   InitRobotDrive();
   m_rearLeftMotor = std::make_shared<Talon>(leftMotorChannel);
   m_rearRightMotor = std::make_shared<Talon>(rightMotorChannel);
@@ -75,8 +74,8 @@ RobotDrive::RobotDrive(int leftMotorChannel, int rightMotorChannel) {
  * @param frontRightMotor Front right motor channel number
  * @param rearRightMotor  Rear Right motor channel number
  */
-RobotDrive::RobotDrive(int frontLeftMotor, int rearLeftMotor,
-                       int frontRightMotor, int rearRightMotor) {
+frc::RobotDrive::RobotDrive(int frontLeftMotor, int rearLeftMotor,
+                            int frontRightMotor, int rearRightMotor) {
   InitRobotDrive();
   m_rearLeftMotor = std::make_shared<Talon>(rearLeftMotor);
   m_rearRightMotor = std::make_shared<Talon>(rearRightMotor);
@@ -98,8 +97,8 @@ RobotDrive::RobotDrive(int frontLeftMotor, int rearLeftMotor,
  * @param leftMotor  The left SpeedController object used to drive the robot.
  * @param rightMotor the right SpeedController object used to drive the robot.
  */
-RobotDrive::RobotDrive(SpeedController* leftMotor,
-                       SpeedController* rightMotor) {
+frc::RobotDrive::RobotDrive(SpeedController* leftMotor,
+                            SpeedController* rightMotor) {
   InitRobotDrive();
   if (leftMotor == nullptr || rightMotor == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -111,15 +110,15 @@ RobotDrive::RobotDrive(SpeedController* leftMotor,
 }
 
 // TODO: Change to rvalue references & move syntax.
-RobotDrive::RobotDrive(SpeedController& leftMotor,
-                       SpeedController& rightMotor) {
+frc::RobotDrive::RobotDrive(SpeedController& leftMotor,
+                            SpeedController& rightMotor) {
   InitRobotDrive();
   m_rearLeftMotor = make_shared_nodelete(&leftMotor);
   m_rearRightMotor = make_shared_nodelete(&rightMotor);
 }
 
-RobotDrive::RobotDrive(std::shared_ptr<SpeedController> leftMotor,
-                       std::shared_ptr<SpeedController> rightMotor) {
+frc::RobotDrive::RobotDrive(std::shared_ptr<SpeedController> leftMotor,
+                            std::shared_ptr<SpeedController> rightMotor) {
   InitRobotDrive();
   if (leftMotor == nullptr || rightMotor == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -145,10 +144,10 @@ RobotDrive::RobotDrive(std::shared_ptr<SpeedController> leftMotor,
  * @param frontRightMotor The front right SpeedController object used to drive
  *                        the robot.
  */
-RobotDrive::RobotDrive(SpeedController* frontLeftMotor,
-                       SpeedController* rearLeftMotor,
-                       SpeedController* frontRightMotor,
-                       SpeedController* rearRightMotor) {
+frc::RobotDrive::RobotDrive(SpeedController* frontLeftMotor,
+                            SpeedController* rearLeftMotor,
+                            SpeedController* frontRightMotor,
+                            SpeedController* rearRightMotor) {
   InitRobotDrive();
   if (frontLeftMotor == nullptr || rearLeftMotor == nullptr ||
       frontRightMotor == nullptr || rearRightMotor == nullptr) {
@@ -161,10 +160,10 @@ RobotDrive::RobotDrive(SpeedController* frontLeftMotor,
   m_rearRightMotor = make_shared_nodelete(rearRightMotor);
 }
 
-RobotDrive::RobotDrive(SpeedController& frontLeftMotor,
-                       SpeedController& rearLeftMotor,
-                       SpeedController& frontRightMotor,
-                       SpeedController& rearRightMotor) {
+frc::RobotDrive::RobotDrive(SpeedController& frontLeftMotor,
+                            SpeedController& rearLeftMotor,
+                            SpeedController& frontRightMotor,
+                            SpeedController& rearRightMotor) {
   InitRobotDrive();
   m_frontLeftMotor = make_shared_nodelete(&frontLeftMotor);
   m_rearLeftMotor = make_shared_nodelete(&rearLeftMotor);
@@ -172,10 +171,10 @@ RobotDrive::RobotDrive(SpeedController& frontLeftMotor,
   m_rearRightMotor = make_shared_nodelete(&rearRightMotor);
 }
 
-RobotDrive::RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,
-                       std::shared_ptr<SpeedController> rearLeftMotor,
-                       std::shared_ptr<SpeedController> frontRightMotor,
-                       std::shared_ptr<SpeedController> rearRightMotor) {
+frc::RobotDrive::RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,
+                            std::shared_ptr<SpeedController> rearLeftMotor,
+                            std::shared_ptr<SpeedController> frontRightMotor,
+                            std::shared_ptr<SpeedController> rearRightMotor) {
   InitRobotDrive();
   if (frontLeftMotor == nullptr || rearLeftMotor == nullptr ||
       frontRightMotor == nullptr || rearRightMotor == nullptr) {
@@ -209,7 +208,7 @@ RobotDrive::RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,
  *                        radius r = -ln(curve)*w for a given value of curve and
  *                        wheelbase w.
  */
-void RobotDrive::Drive(double outputMagnitude, double curve) {
+void frc::RobotDrive::Drive(double outputMagnitude, double curve) {
   double leftOutput, rightOutput;
   static bool reported = false;
   if (!reported) {
@@ -244,8 +243,8 @@ void RobotDrive::Drive(double outputMagnitude, double curve) {
  * @param leftStick  The joystick to control the left side of the robot.
  * @param rightStick The joystick to control the right side of the robot.
  */
-void RobotDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
-                           bool squaredInputs) {
+void frc::RobotDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
+                                bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
     return;
@@ -253,8 +252,8 @@ void RobotDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
   TankDrive(leftStick->GetY(), rightStick->GetY(), squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
-                           bool squaredInputs) {
+void frc::RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
+                                bool squaredInputs) {
   TankDrive(leftStick.GetY(), rightStick.GetY(), squaredInputs);
 }
 
@@ -269,9 +268,9 @@ void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
  * @param rightStick The Joystick object to use for the right side of the robot.
  * @param rightAxis  The axis to select on the right side Joystick object.
  */
-void RobotDrive::TankDrive(GenericHID* leftStick, int leftAxis,
-                           GenericHID* rightStick, int rightAxis,
-                           bool squaredInputs) {
+void frc::RobotDrive::TankDrive(GenericHID* leftStick, int leftAxis,
+                                GenericHID* rightStick, int rightAxis,
+                                bool squaredInputs) {
   if (leftStick == nullptr || rightStick == nullptr) {
     wpi_setWPIError(NullParameter);
     return;
@@ -280,9 +279,9 @@ void RobotDrive::TankDrive(GenericHID* leftStick, int leftAxis,
             squaredInputs);
 }
 
-void RobotDrive::TankDrive(GenericHID& leftStick, int leftAxis,
-                           GenericHID& rightStick, int rightAxis,
-                           bool squaredInputs) {
+void frc::RobotDrive::TankDrive(GenericHID& leftStick, int leftAxis,
+                                GenericHID& rightStick, int rightAxis,
+                                bool squaredInputs) {
   TankDrive(leftStick.GetRawAxis(leftAxis), rightStick.GetRawAxis(rightAxis),
             squaredInputs);
 }
@@ -295,8 +294,8 @@ void RobotDrive::TankDrive(GenericHID& leftStick, int leftAxis,
  * @param leftValue  The value of the left stick.
  * @param rightValue The value of the right stick.
  */
-void RobotDrive::TankDrive(double leftValue, double rightValue,
-                           bool squaredInputs) {
+void frc::RobotDrive::TankDrive(double leftValue, double rightValue,
+                                bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
     reported = true;
@@ -335,7 +334,7 @@ void RobotDrive::TankDrive(double leftValue, double rightValue,
  * @param squaredInputs If true, the sensitivity will be increased for small
  *                      values
  */
-void RobotDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs) {
+void frc::RobotDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs) {
   // simply call the full-featured ArcadeDrive with the appropriate values
   ArcadeDrive(stick->GetY(), stick->GetX(), squaredInputs);
 }
@@ -353,7 +352,7 @@ void RobotDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs) {
  * @param squaredInputs If true, the sensitivity will be increased for small
  *                      values
  */
-void RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {
+void frc::RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {
   // simply call the full-featured ArcadeDrive with the appropriate values
   ArcadeDrive(stick.GetY(), stick.GetX(), squaredInputs);
 }
@@ -374,9 +373,9 @@ void RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {
  * @param squaredInputs Setting this parameter to true increases the sensitivity
  *                      at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID* moveStick, int moveAxis,
-                             GenericHID* rotateStick, int rotateAxis,
-                             bool squaredInputs) {
+void frc::RobotDrive::ArcadeDrive(GenericHID* moveStick, int moveAxis,
+                                  GenericHID* rotateStick, int rotateAxis,
+                                  bool squaredInputs) {
   double moveValue = moveStick->GetRawAxis(moveAxis);
   double rotateValue = rotateStick->GetRawAxis(rotateAxis);
 
@@ -399,9 +398,9 @@ void RobotDrive::ArcadeDrive(GenericHID* moveStick, int moveAxis,
  * @param squaredInputs Setting this parameter to true increases the sensitivity
  *                      at lower speeds
  */
-void RobotDrive::ArcadeDrive(GenericHID& moveStick, int moveAxis,
-                             GenericHID& rotateStick, int rotateAxis,
-                             bool squaredInputs) {
+void frc::RobotDrive::ArcadeDrive(GenericHID& moveStick, int moveAxis,
+                                  GenericHID& rotateStick, int rotateAxis,
+                                  bool squaredInputs) {
   double moveValue = moveStick.GetRawAxis(moveAxis);
   double rotateValue = rotateStick.GetRawAxis(rotateAxis);
 
@@ -417,8 +416,8 @@ void RobotDrive::ArcadeDrive(GenericHID& moveStick, int moveAxis,
  * @param rotateValue   The value to use for the rotate right/left
  * @param squaredInputs If set, increases the sensitivity at low speeds
  */
-void RobotDrive::ArcadeDrive(double moveValue, double rotateValue,
-                             bool squaredInputs) {
+void frc::RobotDrive::ArcadeDrive(double moveValue, double rotateValue,
+                                  bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
     reported = true;
@@ -486,8 +485,9 @@ void RobotDrive::ArcadeDrive(double moveValue, double rotateValue,
  * @param gyroAngle The current angle reading from the gyro.  Use this to
  *                  implement field-oriented controls.
  */
-void RobotDrive::MecanumDrive_Cartesian(double x, double y, double rotation,
-                                        double gyroAngle) {
+void frc::RobotDrive::MecanumDrive_Cartesian(double x, double y,
+                                             double rotation,
+                                             double gyroAngle) {
   static bool reported = false;
   if (!reported) {
     reported = true;
@@ -536,8 +536,8 @@ void RobotDrive::MecanumDrive_Cartesian(double x, double y, double rotation,
  * @param rotation  The rate of rotation for the robot that is completely
  *                  independent of the magnitute or direction. [-1.0..1.0]
  */
-void RobotDrive::MecanumDrive_Polar(double magnitude, double direction,
-                                    double rotation) {
+void frc::RobotDrive::MecanumDrive_Polar(double magnitude, double direction,
+                                         double rotation) {
   static bool reported = false;
   if (!reported) {
     reported = true;
@@ -582,8 +582,8 @@ void RobotDrive::MecanumDrive_Polar(double magnitude, double direction,
  * @param rotation  The rate of rotation for the robot that is completely
  *                  independent of the magnitude or direction.  [-1.0..1.0]
  */
-void RobotDrive::HolonomicDrive(double magnitude, double direction,
-                                double rotation) {
+void frc::RobotDrive::HolonomicDrive(double magnitude, double direction,
+                                     double rotation) {
   MecanumDrive_Polar(magnitude, direction, rotation);
 }
 
@@ -597,8 +597,8 @@ void RobotDrive::HolonomicDrive(double magnitude, double direction,
  * @param leftOutput  The speed to send to the left side of the robot.
  * @param rightOutput The speed to send to the right side of the robot.
  */
-void RobotDrive::SetLeftRightMotorOutputs(double leftOutput,
-                                          double rightOutput) {
+void frc::RobotDrive::SetLeftRightMotorOutputs(double leftOutput,
+                                               double rightOutput) {
   wpi_assert(m_rearLeftMotor != nullptr && m_rearRightMotor != nullptr);
 
   if (m_frontLeftMotor != nullptr)
@@ -619,7 +619,7 @@ void RobotDrive::SetLeftRightMotorOutputs(double leftOutput,
 /**
  * Limit motor values to the -1.0 to +1.0 range.
  */
-double RobotDrive::Limit(double num) {
+double frc::RobotDrive::Limit(double num) {
   if (num > 1.0) {
     return 1.0;
   }
@@ -632,7 +632,7 @@ double RobotDrive::Limit(double num) {
 /**
  * Normalize all wheel speeds if the magnitude of any wheel is greater than 1.0.
  */
-void RobotDrive::Normalize(double* wheelSpeeds) {
+void frc::RobotDrive::Normalize(double* wheelSpeeds) {
   double maxMagnitude = std::fabs(wheelSpeeds[0]);
   for (int i = 1; i < kMaxNumberOfMotors; i++) {
     double temp = std::fabs(wheelSpeeds[i]);
@@ -648,7 +648,7 @@ void RobotDrive::Normalize(double* wheelSpeeds) {
 /**
  * Rotate a vector in Cartesian space.
  */
-void RobotDrive::RotateVector(double& x, double& y, double angle) {
+void frc::RobotDrive::RotateVector(double& x, double& y, double angle) {
   double cosA = std::cos(angle * (3.14159 / 180.0));
   double sinA = std::sin(angle * (3.14159 / 180.0));
   double xOut = x * cosA - y * sinA;
@@ -667,7 +667,7 @@ void RobotDrive::RotateVector(double& x, double& y, double angle) {
  * @param motor      The motor index to invert.
  * @param isInverted True if the motor should be inverted when operated.
  */
-void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted) {
+void frc::RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted) {
   if (motor < 0 || motor > 3) {
     wpi_setWPIError(InvalidMotorIndex);
     return;
@@ -683,7 +683,7 @@ void RobotDrive::SetInvertedMotor(MotorType motor, bool isInverted) {
  * @param sensitivity Effectively sets the turning sensitivity (or turn radius
  *                    for a given value)
  */
-void RobotDrive::SetSensitivity(double sensitivity) {
+void frc::RobotDrive::SetSensitivity(double sensitivity) {
   m_sensitivity = sensitivity;
 }
 
@@ -694,33 +694,35 @@ void RobotDrive::SetSensitivity(double sensitivity) {
  * @param maxOutput Multiplied with the output percentage computed by the drive
  *                  functions.
  */
-void RobotDrive::SetMaxOutput(double maxOutput) { m_maxOutput = maxOutput; }
+void frc::RobotDrive::SetMaxOutput(double maxOutput) {
+  m_maxOutput = maxOutput;
+}
 
-void RobotDrive::SetExpiration(double timeout) {
+void frc::RobotDrive::SetExpiration(double timeout) {
   // FIXME: m_safetyHelper->SetExpiration(timeout);
 }
 
-double RobotDrive::GetExpiration() const {
+double frc::RobotDrive::GetExpiration() const {
   return -1;  // FIXME: return m_safetyHelper->GetExpiration();
 }
 
-bool RobotDrive::IsAlive() const {
+bool frc::RobotDrive::IsAlive() const {
   return true;  // FIXME: m_safetyHelper->IsAlive();
 }
 
-bool RobotDrive::IsSafetyEnabled() const {
+bool frc::RobotDrive::IsSafetyEnabled() const {
   return false;  // FIXME: return m_safetyHelper->IsSafetyEnabled();
 }
 
-void RobotDrive::SetSafetyEnabled(bool enabled) {
+void frc::RobotDrive::SetSafetyEnabled(bool enabled) {
   // FIXME: m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void RobotDrive::GetDescription(llvm::raw_ostream& desc) const {
+void frc::RobotDrive::GetDescription(llvm::raw_ostream& desc) const {
   desc << "RobotDrive";
 }
 
-void RobotDrive::StopMotor() {
+void frc::RobotDrive::StopMotor() {
   if (m_frontLeftMotor != nullptr) m_frontLeftMotor->Disable();
   if (m_frontRightMotor != nullptr) m_frontRightMotor->Disable();
   if (m_rearLeftMotor != nullptr) m_rearLeftMotor->Disable();

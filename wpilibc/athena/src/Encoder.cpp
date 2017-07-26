@@ -12,8 +12,6 @@
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
 /**
  * Common initialization code for Encoders.
  *
@@ -32,7 +30,8 @@ using namespace frc;
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
+void frc::Encoder::InitEncoder(bool reverseDirection,
+                               EncodingType encodingType) {
   int32_t status = 0;
   m_encoder = HAL_InitializeEncoder(
       m_aSource->GetPortHandleForRouting(),
@@ -71,8 +70,8 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
-                 EncodingType encodingType) {
+frc::Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
+                      EncodingType encodingType) {
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
@@ -101,8 +100,8 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
-                 bool reverseDirection, EncodingType encodingType)
+frc::Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
+                      bool reverseDirection, EncodingType encodingType)
     : m_aSource(aSource, NullDeleter<DigitalSource>()),
       m_bSource(bSource, NullDeleter<DigitalSource>()) {
   if (m_aSource == nullptr || m_bSource == nullptr)
@@ -111,9 +110,9 @@ Encoder::Encoder(DigitalSource* aSource, DigitalSource* bSource,
     InitEncoder(reverseDirection, encodingType);
 }
 
-Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
-                 std::shared_ptr<DigitalSource> bSource, bool reverseDirection,
-                 EncodingType encodingType)
+frc::Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
+                      std::shared_ptr<DigitalSource> bSource,
+                      bool reverseDirection, EncodingType encodingType)
     : m_aSource(aSource), m_bSource(bSource) {
   if (m_aSource == nullptr || m_bSource == nullptr)
     wpi_setWPIError(NullParameter);
@@ -144,8 +143,8 @@ Encoder::Encoder(std::shared_ptr<DigitalSource> aSource,
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
-                 bool reverseDirection, EncodingType encodingType)
+frc::Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
+                      bool reverseDirection, EncodingType encodingType)
     : m_aSource(&aSource, NullDeleter<DigitalSource>()),
       m_bSource(&bSource, NullDeleter<DigitalSource>()) {
   InitEncoder(reverseDirection, encodingType);
@@ -156,7 +155,7 @@ Encoder::Encoder(DigitalSource& aSource, DigitalSource& bSource,
  *
  * Frees the FPGA resources associated with an Encoder.
  */
-Encoder::~Encoder() {
+frc::Encoder::~Encoder() {
   int32_t status = 0;
   HAL_FreeEncoder(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -167,7 +166,7 @@ Encoder::~Encoder() {
  *
  * Used to divide raw edge counts down to spec'd counts.
  */
-int Encoder::GetEncodingScale() const {
+int frc::Encoder::GetEncodingScale() const {
   int32_t status = 0;
   int val = HAL_GetEncoderEncodingScale(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -182,7 +181,7 @@ int Encoder::GetEncodingScale() const {
  *
  * @return Current raw count from the encoder
  */
-int Encoder::GetRaw() const {
+int frc::Encoder::GetRaw() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetEncoderRaw(m_encoder, &status);
@@ -199,7 +198,7 @@ int Encoder::GetRaw() const {
  * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale
  *         factor.
  */
-int Encoder::Get() const {
+int frc::Encoder::Get() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetEncoder(m_encoder, &status);
@@ -212,7 +211,7 @@ int Encoder::Get() const {
  *
  * Resets the current count to zero on the encoder.
  */
-void Encoder::Reset() {
+void frc::Encoder::Reset() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_ResetEncoder(m_encoder, &status);
@@ -230,7 +229,7 @@ void Encoder::Reset() {
  *
  * @return Period in seconds of the most recent pulse.
  */
-double Encoder::GetPeriod() const {
+double frc::Encoder::GetPeriod() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetEncoderPeriod(m_encoder, &status);
@@ -254,7 +253,7 @@ double Encoder::GetPeriod() const {
  *                  the FPGA will report the device stopped. This is expressed
  *                  in seconds.
  */
-void Encoder::SetMaxPeriod(double maxPeriod) {
+void frc::Encoder::SetMaxPeriod(double maxPeriod) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderMaxPeriod(m_encoder, maxPeriod, &status);
@@ -270,7 +269,7 @@ void Encoder::SetMaxPeriod(double maxPeriod) {
  *
  * @return True if the encoder is considered stopped.
  */
-bool Encoder::GetStopped() const {
+bool frc::Encoder::GetStopped() const {
   if (StatusIsFatal()) return true;
   int32_t status = 0;
   bool value = HAL_GetEncoderStopped(m_encoder, &status);
@@ -283,7 +282,7 @@ bool Encoder::GetStopped() const {
  *
  * @return The last direction the encoder value changed.
  */
-bool Encoder::GetDirection() const {
+bool frc::Encoder::GetDirection() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value = HAL_GetEncoderDirection(m_encoder, &status);
@@ -295,7 +294,7 @@ bool Encoder::GetDirection() const {
  * The scale needed to convert a raw counter value into a number of encoder
  * pulses.
  */
-double Encoder::DecodingScaleFactor() const {
+double frc::Encoder::DecodingScaleFactor() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double val = HAL_GetEncoderDecodingScaleFactor(m_encoder, &status);
@@ -309,7 +308,7 @@ double Encoder::DecodingScaleFactor() const {
  * @return The distance driven since the last reset as scaled by the value from
  *         SetDistancePerPulse().
  */
-double Encoder::GetDistance() const {
+double frc::Encoder::GetDistance() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetEncoderDistance(m_encoder, &status);
@@ -325,7 +324,7 @@ double Encoder::GetDistance() const {
  *
  * @return The current rate of the encoder.
  */
-double Encoder::GetRate() const {
+double frc::Encoder::GetRate() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetEncoderRate(m_encoder, &status);
@@ -339,7 +338,7 @@ double Encoder::GetRate() const {
  * @param minRate The minimum rate.  The units are in distance per second as
  *                scaled by the value from SetDistancePerPulse().
  */
-void Encoder::SetMinRate(double minRate) {
+void frc::Encoder::SetMinRate(double minRate) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderMinRate(m_encoder, minRate, &status);
@@ -363,7 +362,7 @@ void Encoder::SetMinRate(double minRate) {
  * @param distancePerPulse The scale factor that will be used to convert pulses
  *                         to useful units.
  */
-void Encoder::SetDistancePerPulse(double distancePerPulse) {
+void frc::Encoder::SetDistancePerPulse(double distancePerPulse) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderDistancePerPulse(m_encoder, distancePerPulse, &status);
@@ -378,7 +377,7 @@ void Encoder::SetDistancePerPulse(double distancePerPulse) {
  *
  * @param reverseDirection true if the encoder direction should be reversed
  */
-void Encoder::SetReverseDirection(bool reverseDirection) {
+void frc::Encoder::SetReverseDirection(bool reverseDirection) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetEncoderReverseDirection(m_encoder, reverseDirection, &status);
@@ -394,7 +393,7 @@ void Encoder::SetReverseDirection(bool reverseDirection) {
  *
  * @param samplesToAverage The number of samples to average from 1 to 127.
  */
-void Encoder::SetSamplesToAverage(int samplesToAverage) {
+void frc::Encoder::SetSamplesToAverage(int samplesToAverage) {
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     wpi_setWPIErrorWithContext(
         ParameterOutOfRange,
@@ -415,7 +414,7 @@ void Encoder::SetSamplesToAverage(int samplesToAverage) {
  *
  * @return The number of samples being averaged (from 1 to 127)
  */
-int Encoder::GetSamplesToAverage() const {
+int frc::Encoder::GetSamplesToAverage() const {
   int32_t status = 0;
   int result = HAL_GetEncoderSamplesToAverage(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -427,7 +426,7 @@ int Encoder::GetSamplesToAverage() const {
  *
  * @return The current value of the selected source parameter.
  */
-double Encoder::PIDGet() {
+double frc::Encoder::PIDGet() {
   if (StatusIsFatal()) return 0.0;
   switch (GetPIDSourceType()) {
     case PIDSourceType::kDisplacement:
@@ -447,7 +446,8 @@ double Encoder::PIDGet() {
  * @param channel A DIO channel to set as the encoder index
  * @param type    The state that will cause the encoder to reset
  */
-void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
+void frc::Encoder::SetIndexSource(int channel,
+                                  frc::Encoder::IndexingType type) {
   // Force digital input if just given an index
   m_indexSource = std::make_unique<DigitalInput>(channel);
   SetIndexSource(*m_indexSource.get(), type);
@@ -461,8 +461,8 @@ void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
  * @param channel A digital source to set as the encoder index
  * @param type    The state that will cause the encoder to reset
  */
-void Encoder::SetIndexSource(const DigitalSource& source,
-                             Encoder::IndexingType type) {
+void frc::Encoder::SetIndexSource(const DigitalSource& source,
+                                  frc::Encoder::IndexingType type) {
   int32_t status = 0;
   HAL_SetEncoderIndexSource(
       m_encoder, source.GetPortHandleForRouting(),
@@ -471,14 +471,14 @@ void Encoder::SetIndexSource(const DigitalSource& source,
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-int Encoder::GetFPGAIndex() const {
+int frc::Encoder::GetFPGAIndex() const {
   int32_t status = 0;
   int val = HAL_GetEncoderFPGAIndex(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   return val;
 }
 
-void Encoder::UpdateTable() {
+void frc::Encoder::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Speed", GetRate());
     m_table->PutNumber("Distance", GetDistance());
@@ -490,11 +490,11 @@ void Encoder::UpdateTable() {
   }
 }
 
-void Encoder::StartLiveWindowMode() {}
+void frc::Encoder::StartLiveWindowMode() {}
 
-void Encoder::StopLiveWindowMode() {}
+void frc::Encoder::StopLiveWindowMode() {}
 
-std::string Encoder::GetSmartDashboardType() const {
+std::string frc::Encoder::GetSmartDashboardType() const {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -504,9 +504,9 @@ std::string Encoder::GetSmartDashboardType() const {
     return "Encoder";
 }
 
-void Encoder::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::Encoder::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> Encoder::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Encoder::GetTable() const { return m_table; }

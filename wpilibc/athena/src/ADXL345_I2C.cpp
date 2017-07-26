@@ -11,13 +11,11 @@
 #include "I2C.h"
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
-
-const int ADXL345_I2C::kAddress;
-const int ADXL345_I2C::kPowerCtlRegister;
-const int ADXL345_I2C::kDataFormatRegister;
-const int ADXL345_I2C::kDataRegister;
-constexpr double ADXL345_I2C::kGsPerLSB;
+const int frc::ADXL345_I2C::kAddress;
+const int frc::ADXL345_I2C::kPowerCtlRegister;
+const int frc::ADXL345_I2C::kDataFormatRegister;
+const int frc::ADXL345_I2C::kDataRegister;
+constexpr double frc::ADXL345_I2C::kGsPerLSB;
 
 /**
  * Constructs the ADXL345 Accelerometer over I2C.
@@ -26,7 +24,7 @@ constexpr double ADXL345_I2C::kGsPerLSB;
  * @param range         The range (+ or -) that the accelerometer will measure
  * @param deviceAddress The I2C address of the accelerometer (0x1D or 0x53)
  */
-ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
+frc::ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
     : m_i2c(port, deviceAddress) {
   // Turn on the measurements
   m_i2c.Write(kPowerCtlRegister, kPowerCtl_Measure);
@@ -38,16 +36,16 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
   LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
 }
 
-void ADXL345_I2C::SetRange(Range range) {
+void frc::ADXL345_I2C::SetRange(Range range) {
   m_i2c.Write(kDataFormatRegister,
               kDataFormat_FullRes | static_cast<uint8_t>(range));
 }
 
-double ADXL345_I2C::GetX() { return GetAcceleration(kAxis_X); }
+double frc::ADXL345_I2C::GetX() { return GetAcceleration(kAxis_X); }
 
-double ADXL345_I2C::GetY() { return GetAcceleration(kAxis_Y); }
+double frc::ADXL345_I2C::GetY() { return GetAcceleration(kAxis_Y); }
 
-double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
+double frc::ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
 
 /**
  * Get the acceleration of one axis in Gs.
@@ -55,7 +53,7 @@ double ADXL345_I2C::GetZ() { return GetAcceleration(kAxis_Z); }
  * @param axis The axis to read from.
  * @return Acceleration of the ADXL345 in Gs.
  */
-double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
+double frc::ADXL345_I2C::GetAcceleration(frc::ADXL345_I2C::Axes axis) {
   int16_t rawAccel = 0;
   m_i2c.Read(kDataRegister + static_cast<int>(axis), sizeof(rawAccel),
              reinterpret_cast<uint8_t*>(&rawAccel));
@@ -68,7 +66,7 @@ double ADXL345_I2C::GetAcceleration(ADXL345_I2C::Axes axis) {
  * @return An object containing the acceleration measured on each axis of the
  *         ADXL345 in Gs.
  */
-ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
+frc::ADXL345_I2C::AllAxes frc::ADXL345_I2C::GetAccelerations() {
   AllAxes data = AllAxes();
   int16_t rawData[3];
   m_i2c.Read(kDataRegister, sizeof(rawData),
@@ -80,19 +78,19 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
   return data;
 }
 
-std::string ADXL345_I2C::GetSmartDashboardType() const {
+std::string frc::ADXL345_I2C::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void ADXL345_I2C::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::ADXL345_I2C::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
 
-void ADXL345_I2C::UpdateTable() {
+void frc::ADXL345_I2C::UpdateTable() {
   m_table->PutNumber("X", GetX());
   m_table->PutNumber("Y", GetY());
   m_table->PutNumber("Z", GetZ());
 }
 
-std::shared_ptr<ITable> ADXL345_I2C::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::ADXL345_I2C::GetTable() const { return m_table; }

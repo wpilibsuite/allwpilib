@@ -16,19 +16,17 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
 // Time (sec) for the ping trigger pulse.
-constexpr double Ultrasonic::kPingTime;
+constexpr double frc::Ultrasonic::kPingTime;
 // Priority that the ultrasonic round robin task runs.
-const int Ultrasonic::kPriority;
+const int frc::Ultrasonic::kPriority;
 // Max time (ms) between readings.
-constexpr double Ultrasonic::kMaxUltrasonicTime;
-constexpr double Ultrasonic::kSpeedOfSoundInchesPerSec;
+constexpr double frc::Ultrasonic::kMaxUltrasonicTime;
+constexpr double frc::Ultrasonic::kSpeedOfSoundInchesPerSec;
 // automatic round robin mode
-std::atomic<bool> Ultrasonic::m_automaticEnabled{false};
-std::set<Ultrasonic*> Ultrasonic::m_sensors;
-std::thread Ultrasonic::m_thread;
+std::atomic<bool> frc::Ultrasonic::m_automaticEnabled{false};
+std::set<frc::Ultrasonic*> frc::Ultrasonic::m_sensors;
+std::thread frc::Ultrasonic::m_thread;
 
 /**
  * Background task that goes through the list of ultrasonic sensors and pings
@@ -40,7 +38,7 @@ std::thread Ultrasonic::m_thread;
  * will change while it's running. Make sure to disable automatic mode before
  * touching the list.
  */
-void Ultrasonic::UltrasonicChecker() {
+void frc::Ultrasonic::UltrasonicChecker() {
   while (m_automaticEnabled) {
     for (auto& sensor : m_sensors) {
       if (!m_automaticEnabled) break;
@@ -62,7 +60,7 @@ void Ultrasonic::UltrasonicChecker() {
  * automatic mode (round robin) when the new sensor is added, it is stopped,
  * the sensor is added, then automatic mode is restored.
  */
-void Ultrasonic::Initialize() {
+void frc::Ultrasonic::Initialize() {
   bool originalMode = m_automaticEnabled;
   SetAutomaticMode(false);  // kill task when adding a new sensor
   // link this instance on the list
@@ -94,7 +92,8 @@ void Ultrasonic::Initialize() {
  *                    round trip time of the ping, and the distance.
  * @param units       The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(int pingChannel, int echoChannel, DistanceUnit units)
+frc::Ultrasonic::Ultrasonic(int pingChannel, int echoChannel,
+                            DistanceUnit units)
     : m_pingChannel(std::make_shared<DigitalOutput>(pingChannel)),
       m_echoChannel(std::make_shared<DigitalInput>(echoChannel)),
       m_counter(m_echoChannel) {
@@ -112,8 +111,8 @@ Ultrasonic::Ultrasonic(int pingChannel, int echoChannel, DistanceUnit units)
  *                    determine the range.
  * @param units       The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel,
-                       DistanceUnit units)
+frc::Ultrasonic::Ultrasonic(DigitalOutput* pingChannel,
+                            DigitalInput* echoChannel, DistanceUnit units)
     : m_pingChannel(pingChannel, NullDeleter<DigitalOutput>()),
       m_echoChannel(echoChannel, NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
@@ -136,8 +135,8 @@ Ultrasonic::Ultrasonic(DigitalOutput* pingChannel, DigitalInput* echoChannel,
  *                    determine the range.
  * @param units       The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel,
-                       DistanceUnit units)
+frc::Ultrasonic::Ultrasonic(DigitalOutput& pingChannel,
+                            DigitalInput& echoChannel, DistanceUnit units)
     : m_pingChannel(&pingChannel, NullDeleter<DigitalOutput>()),
       m_echoChannel(&echoChannel, NullDeleter<DigitalInput>()),
       m_counter(m_echoChannel) {
@@ -155,9 +154,9 @@ Ultrasonic::Ultrasonic(DigitalOutput& pingChannel, DigitalInput& echoChannel,
  *                    determine the range.
  * @param units       The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
-                       std::shared_ptr<DigitalInput> echoChannel,
-                       DistanceUnit units)
+frc::Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
+                            std::shared_ptr<DigitalInput> echoChannel,
+                            DistanceUnit units)
     : m_pingChannel(pingChannel),
       m_echoChannel(echoChannel),
       m_counter(m_echoChannel) {
@@ -173,7 +172,7 @@ Ultrasonic::Ultrasonic(std::shared_ptr<DigitalOutput> pingChannel,
  * stopped, then started again after this sensor is removed (provided this
  * wasn't the last sensor).
  */
-Ultrasonic::~Ultrasonic() {
+frc::Ultrasonic::~Ultrasonic() {
   bool wasAutomaticMode = m_automaticEnabled;
   SetAutomaticMode(false);
 
@@ -198,7 +197,7 @@ Ultrasonic::~Ultrasonic() {
  *                 prefered, it can be implemented by pinging the sensors
  *                 manually and waiting for the results to come back.
  */
-void Ultrasonic::SetAutomaticMode(bool enabling) {
+void frc::Ultrasonic::SetAutomaticMode(bool enabling) {
   if (enabling == m_automaticEnabled) return;  // ignore the case of no change
 
   m_automaticEnabled = enabling;
@@ -211,11 +210,11 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
       sensor->m_counter.Reset();
     }
 
-    m_thread = std::thread(&Ultrasonic::UltrasonicChecker);
+    m_thread = std::thread(&frc::Ultrasonic::UltrasonicChecker);
 
     // TODO: Currently, lvuser does not have permissions to set task priorities.
     // Until that is the case, uncommenting this will break user code that calls
-    // Ultrasonic::SetAutomicMode().
+    // frc::Ultrasonic::SetAutomicMode().
     // m_task.SetPriority(kPriority);
   } else {
     // Wait for background task to stop running
@@ -239,7 +238,7 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
  * should count the semi-period when it comes in. The counter is reset to make
  * the current value invalid.
  */
-void Ultrasonic::Ping() {
+void frc::Ultrasonic::Ping() {
   wpi_assert(!m_automaticEnabled);
   m_counter.Reset();  // reset the counter to zero (invalid data now)
   m_pingChannel->Pulse(
@@ -253,7 +252,7 @@ void Ultrasonic::Ping() {
  * the echo (return) signal. If the count is not at least 2, then the range has
  * not yet been measured, and is invalid.
  */
-bool Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
+bool frc::Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
 
 /**
  * Get the range in inches from the ultrasonic sensor.
@@ -262,7 +261,7 @@ bool Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
  *         sensor. If there is no valid value yet, i.e. at least one
  *         measurement hasn't completed, then return 0.
  */
-double Ultrasonic::GetRangeInches() const {
+double frc::Ultrasonic::GetRangeInches() const {
   if (IsRangeValid())
     return m_counter.GetPeriod() * kSpeedOfSoundInchesPerSec / 2.0;
   else
@@ -276,25 +275,25 @@ double Ultrasonic::GetRangeInches() const {
  *         sensor. If there is no valid value yet, i.e. at least one
  *         measurement hasn't completed, then return 0.
  */
-double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
+double frc::Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
 
 /**
  * Get the range in the current DistanceUnit for the PIDSource base object.
  *
  * @return The range in DistanceUnit
  */
-double Ultrasonic::PIDGet() {
+double frc::Ultrasonic::PIDGet() {
   switch (m_units) {
-    case Ultrasonic::kInches:
+    case frc::Ultrasonic::kInches:
       return GetRangeInches();
-    case Ultrasonic::kMilliMeters:
+    case frc::Ultrasonic::kMilliMeters:
       return GetRangeMM();
     default:
       return 0.0;
   }
 }
 
-void Ultrasonic::SetPIDSourceType(PIDSourceType pidSource) {
+void frc::Ultrasonic::SetPIDSourceType(PIDSourceType pidSource) {
   if (wpi_assert(pidSource == PIDSourceType::kDisplacement)) {
     m_pidSource = pidSource;
   }
@@ -306,32 +305,34 @@ void Ultrasonic::SetPIDSourceType(PIDSourceType pidSource) {
  *
  * @param units The DistanceUnit that should be used.
  */
-void Ultrasonic::SetDistanceUnits(DistanceUnit units) { m_units = units; }
+void frc::Ultrasonic::SetDistanceUnits(DistanceUnit units) { m_units = units; }
 
 /**
  * Get the current DistanceUnit that is used for the PIDSource base object.
  *
  * @return The type of DistanceUnit that is being used.
  */
-Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits() const {
+frc::Ultrasonic::DistanceUnit frc::Ultrasonic::GetDistanceUnits() const {
   return m_units;
 }
 
-void Ultrasonic::UpdateTable() {
+void frc::Ultrasonic::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", GetRangeInches());
   }
 }
 
-void Ultrasonic::StartLiveWindowMode() {}
+void frc::Ultrasonic::StartLiveWindowMode() {}
 
-void Ultrasonic::StopLiveWindowMode() {}
+void frc::Ultrasonic::StopLiveWindowMode() {}
 
-std::string Ultrasonic::GetSmartDashboardType() const { return "Ultrasonic"; }
+std::string frc::Ultrasonic::GetSmartDashboardType() const {
+  return "Ultrasonic";
+}
 
-void Ultrasonic::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::Ultrasonic::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> Ultrasonic::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Ultrasonic::GetTable() const { return m_table; }

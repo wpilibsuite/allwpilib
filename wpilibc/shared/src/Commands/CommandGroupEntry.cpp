@@ -9,13 +9,11 @@
 
 #include "Commands/Command.h"
 
-using namespace frc;
-
-CommandGroupEntry::CommandGroupEntry(Command* command, Sequence state,
-                                     double timeout)
+frc::CommandGroupEntry::CommandGroupEntry(Command* command, Sequence state,
+                                          double timeout)
     : m_timeout(timeout), m_command(command), m_state(state) {}
 
-bool CommandGroupEntry::IsTimedOut() const {
+bool frc::CommandGroupEntry::IsTimedOut() const {
   if (m_timeout < 0.0) return false;
   double time = m_command->TimeSinceInitialized();
   if (time == 0.0) return false;

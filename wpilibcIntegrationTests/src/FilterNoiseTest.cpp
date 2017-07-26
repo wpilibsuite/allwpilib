@@ -17,8 +17,6 @@
 #include "TestBench.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 enum FilterNoiseTestType { TEST_SINGLE_POLE_IIR, TEST_MOVAVG };
 
 std::ostream& operator<<(std::ostream& os, const FilterNoiseTestType& type) {
@@ -34,22 +32,20 @@ std::ostream& operator<<(std::ostream& os, const FilterNoiseTestType& type) {
   return os;
 }
 
-using std::chrono::system_clock;
-
 constexpr double kStdDev = 10.0;
 
 /**
  * Adds Gaussian white noise to a function returning data. The noise will have
  * the standard deviation provided in the constructor.
  */
-class NoiseGenerator : public PIDSource {
+class NoiseGenerator : public frc::PIDSource {
  public:
   NoiseGenerator(double (*dataFunc)(double), double stdDev)
       : m_distr(0.0, stdDev) {
     m_dataFunc = dataFunc;
   }
 
-  void SetPIDSourceType(PIDSourceType pidSource) override {}
+  void SetPIDSourceType(frc::PIDSourceType pidSource) override {}
 
   double Get() { return m_dataFunc(m_count) + m_noise; }
 
@@ -78,7 +74,7 @@ class NoiseGenerator : public PIDSource {
  */
 class FilterNoiseTest : public testing::TestWithParam<FilterNoiseTestType> {
  protected:
-  std::unique_ptr<PIDSource> m_filter;
+  std::unique_ptr<frc::PIDSource> m_filter;
   std::shared_ptr<NoiseGenerator> m_noise;
 
   static double GetData(double t) { return 100.0 * std::sin(2.0 * M_PI * t); }
@@ -88,17 +84,17 @@ class FilterNoiseTest : public testing::TestWithParam<FilterNoiseTestType> {
 
     switch (GetParam()) {
       case TEST_SINGLE_POLE_IIR: {
-        m_filter = std::make_unique<LinearDigitalFilter>(
-            LinearDigitalFilter::SinglePoleIIR(
+        m_filter = std::make_unique<frc::LinearDigitalFilter>(
+            frc::LinearDigitalFilter::SinglePoleIIR(
                 m_noise, TestBench::kSinglePoleIIRTimeConstant,
                 TestBench::kFilterStep));
         break;
       }
 
       case TEST_MOVAVG: {
-        m_filter = std::make_unique<LinearDigitalFilter>(
-            LinearDigitalFilter::MovingAverage(m_noise,
-                                               TestBench::kMovAvgTaps));
+        m_filter = std::make_unique<frc::LinearDigitalFilter>(
+            frc::LinearDigitalFilter::MovingAverage(m_noise,
+                                                    TestBench::kMovAvgTaps));
         break;
       }
     }

@@ -18,12 +18,10 @@
 #include "PortsInternal.h"
 #include "support/SafeThread.h"
 
-using namespace hal;
-
 namespace {
 struct Interrupt {
-  std::unique_ptr<tInterrupt> anInterrupt;
-  std::unique_ptr<tInterruptManager> manager;
+  std::unique_ptr<hal::tInterrupt> anInterrupt;
+  std::unique_ptr<hal::tInterruptManager> manager;
 };
 
 // Safe thread to allow callbacks to run on their own thread
@@ -74,8 +72,9 @@ static void threadedInterruptHandler(uint32_t mask, void* param) {
   static_cast<InterruptThreadOwner*>(param)->Notify(mask);
 }
 
-static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
-                             HAL_HandleEnum::Interrupt>
+static hal::LimitedHandleResource<HAL_InterruptHandle, Interrupt,
+                                  hal::kNumInterrupts,
+                                  hal::HAL_HandleEnum::Interrupt>
     interruptHandles;
 
 extern "C" {
@@ -88,11 +87,12 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
     return HAL_kInvalidHandle;
   }
   auto anInterrupt = interruptHandles.Get(handle);
-  uint32_t interruptIndex = static_cast<uint32_t>(getHandleIndex(handle));
+  uint32_t interruptIndex = static_cast<uint32_t>(hal::getHandleIndex(handle));
   // Expects the calling leaf class to allocate an interrupt index.
-  anInterrupt->anInterrupt.reset(tInterrupt::create(interruptIndex, status));
+  anInterrupt->anInterrupt.reset(
+      hal::tInterrupt::create(interruptIndex, status));
   anInterrupt->anInterrupt->writeConfig_WaitForAck(false, status);
-  anInterrupt->manager = std::make_unique<tInterruptManager>(
+  anInterrupt->manager = std::make_unique<hal::tInterruptManager>(
       (1u << interruptIndex) | (1u << (interruptIndex + 8u)), watcher, status);
   return handle;
 }
@@ -204,9 +204,9 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
   bool routingAnalogTrigger = false;
   uint8_t routingChannel = 0;
   uint8_t routingModule = 0;
-  bool success =
-      remapDigitalSource(digitalSourceHandle, analogTriggerType, routingChannel,
-                         routingModule, routingAnalogTrigger);
+  bool success = hal::remapDigitalSource(digitalSourceHandle, analogTriggerType,
+                                         routingChannel, routingModule,
+                                         routingAnalogTrigger);
   if (!success) {
     *status = HAL_HANDLE_ERROR;
     return;

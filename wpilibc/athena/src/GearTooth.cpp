@@ -9,14 +9,12 @@
 
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
-
-constexpr double GearTooth::kGearToothThreshold;
+constexpr double frc::GearTooth::kGearToothThreshold;
 
 /**
  * Common code called by the constructors.
  */
-void GearTooth::EnableDirectionSensing(bool directionSensitive) {
+void frc::GearTooth::EnableDirectionSensing(bool directionSensitive) {
   if (directionSensitive) {
     SetPulseLengthMode(kGearToothThreshold);
   }
@@ -30,7 +28,8 @@ void GearTooth::EnableDirectionSensing(bool directionSensitive) {
  * @param directionSensitive True to enable the pulse length decoding in
  *                           hardware to specify count direction.
  */
-GearTooth::GearTooth(int channel, bool directionSensitive) : Counter(channel) {
+frc::GearTooth::GearTooth(int channel, bool directionSensitive)
+    : Counter(channel) {
   EnableDirectionSensing(directionSensitive);
   LiveWindow::GetInstance()->AddSensor("GearTooth", channel, this);
 }
@@ -45,7 +44,7 @@ GearTooth::GearTooth(int channel, bool directionSensitive) : Counter(channel) {
  * @param directionSensitive True to enable the pulse length decoding in
  *                           hardware to specify count direction.
  */
-GearTooth::GearTooth(DigitalSource* source, bool directionSensitive)
+frc::GearTooth::GearTooth(DigitalSource* source, bool directionSensitive)
     : Counter(source) {
   EnableDirectionSensing(directionSensitive);
 }
@@ -60,10 +59,12 @@ GearTooth::GearTooth(DigitalSource* source, bool directionSensitive)
  * @param directionSensitive True to enable the pulse length decoding in
  *                           hardware to specify count direction.
  */
-GearTooth::GearTooth(std::shared_ptr<DigitalSource> source,
-                     bool directionSensitive)
+frc::GearTooth::GearTooth(std::shared_ptr<DigitalSource> source,
+                          bool directionSensitive)
     : Counter(source) {
   EnableDirectionSensing(directionSensitive);
 }
 
-std::string GearTooth::GetSmartDashboardType() const { return "GearTooth"; }
+std::string frc::GearTooth::GetSmartDashboardType() const {
+  return "GearTooth";
+}

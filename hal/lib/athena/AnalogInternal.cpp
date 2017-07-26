@@ -14,25 +14,25 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "PortsInternal.h"
 
-namespace hal {
-priority_recursive_mutex analogRegisterWindowMutex;
-std::unique_ptr<tAI> analogInputSystem;
-std::unique_ptr<tAO> analogOutputSystem;
+hal::priority_recursive_mutex hal::analogRegisterWindowMutex;
+std::unique_ptr<hal::tAI> hal::analogInputSystem;
+std::unique_ptr<hal::tAO> hal::analogOutputSystem;
 
-IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
-                      HAL_HandleEnum::AnalogInput>
-    analogInputHandles;
+hal::IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
+                           hal::kNumAnalogInputs,
+                           hal::HAL_HandleEnum::AnalogInput>
+    hal::analogInputHandles;
 
 static int32_t analogNumChannelsToActivate = 0;
 
 static std::atomic<bool> analogSystemInitialized{false};
 
-bool analogSampleRateSet = false;
+bool hal::analogSampleRateSet = false;
 
 /**
  * Initialize the analog System.
  */
-void initializeAnalog(int32_t* status) {
+void hal::initializeAnalog(int32_t* status) {
   if (analogSystemInitialized) return;
   std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
@@ -48,7 +48,7 @@ void initializeAnalog(int32_t* status) {
  *
  * @return Active channels.
  */
-int32_t getAnalogNumActiveChannels(int32_t* status) {
+int32_t hal::getAnalogNumActiveChannels(int32_t* status) {
   int32_t scanSize = analogInputSystem->readConfig_ScanSize(status);
   if (scanSize == 0) return 8;
   return scanSize;
@@ -65,7 +65,7 @@ int32_t getAnalogNumActiveChannels(int32_t* status) {
  *
  * @return Value to write to the active channels field.
  */
-int32_t getAnalogNumChannelsToActivate(int32_t* status) {
+int32_t hal::getAnalogNumChannelsToActivate(int32_t* status) {
   if (analogNumChannelsToActivate == 0)
     return getAnalogNumActiveChannels(status);
   return analogNumChannelsToActivate;
@@ -78,7 +78,7 @@ int32_t getAnalogNumChannelsToActivate(int32_t* status) {
  *
  * @param samplesPerSecond The number of samples per channel per second.
  */
-void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
+void hal::setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need double comparison with epsilon.
   // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
@@ -115,7 +115,6 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
  *
  * @param channels Number of active channels.
  */
-void setAnalogNumChannelsToActivate(int32_t channels) {
+void hal::setAnalogNumChannelsToActivate(int32_t channels) {
   analogNumChannelsToActivate = channels;
 }
-}  // namespace hal

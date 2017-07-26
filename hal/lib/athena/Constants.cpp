@@ -9,10 +9,8 @@
 
 #include "ConstantsInternal.h"
 
-using namespace hal;
-
 extern "C" {
 int32_t HAL_GetSystemClockTicksPerMicrosecond(void) {
-  return kSystemClockTicksPerMicrosecond;
+  return hal::kSystemClockTicksPerMicrosecond;
 }
 }

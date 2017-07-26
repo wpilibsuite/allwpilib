@@ -13,15 +13,13 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
 /**
  * Constructor for an analog trigger given a channel number.
  *
  * @param channel The channel number on the roboRIO to represent. 0-3 are
  *                on-board 4-7 are on the MXP port.
  */
-AnalogTrigger::AnalogTrigger(int channel)
+frc::AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
 }
@@ -34,7 +32,7 @@ AnalogTrigger::AnalogTrigger(int channel)
  *
  * @param channel The pointer to the existing AnalogInput object
  */
-AnalogTrigger::AnalogTrigger(AnalogInput* input) {
+frc::AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_analogInput = input;
   int32_t status = 0;
   int index = 0;
@@ -50,7 +48,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, input->m_channel);
 }
 
-AnalogTrigger::~AnalogTrigger() {
+frc::AnalogTrigger::~AnalogTrigger() {
   int32_t status = 0;
   HAL_CleanAnalogTrigger(m_trigger, &status);
 
@@ -68,7 +66,7 @@ AnalogTrigger::~AnalogTrigger() {
  * @param lower The lower limit of the trigger in ADC codes (12-bit values).
  * @param upper The upper limit of the trigger in ADC codes (12-bit values).
  */
-void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
+void frc::AnalogTrigger::SetLimitsRaw(int lower, int upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsRaw(m_trigger, lower, upper, &status);
@@ -83,7 +81,7 @@ void AnalogTrigger::SetLimitsRaw(int lower, int upper) {
  * @param lower The lower limit of the trigger in Volts.
  * @param upper The upper limit of the trigger in Volts.
  */
-void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
+void frc::AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerLimitsVoltage(m_trigger, lower, upper, &status);
@@ -99,7 +97,7 @@ void AnalogTrigger::SetLimitsVoltage(double lower, double upper) {
  * @param useAveragedValue If true, use the Averaged value, otherwise use the
  *                         instantaneous reading
  */
-void AnalogTrigger::SetAveraged(bool useAveragedValue) {
+void frc::AnalogTrigger::SetAveraged(bool useAveragedValue) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerAveraged(m_trigger, useAveragedValue, &status);
@@ -116,7 +114,7 @@ void AnalogTrigger::SetAveraged(bool useAveragedValue) {
  * @param useFilteredValue If true, use the 3 point rejection filter, otherwise
  *                         use the unfiltered value
  */
-void AnalogTrigger::SetFiltered(bool useFilteredValue) {
+void frc::AnalogTrigger::SetFiltered(bool useFilteredValue) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogTriggerFiltered(m_trigger, useFilteredValue, &status);
@@ -130,7 +128,7 @@ void AnalogTrigger::SetFiltered(bool useFilteredValue) {
  *
  * @return The index of the analog trigger.
  */
-int AnalogTrigger::GetIndex() const {
+int frc::AnalogTrigger::GetIndex() const {
   if (StatusIsFatal()) return -1;
   return m_index;
 }
@@ -142,7 +140,7 @@ int AnalogTrigger::GetIndex() const {
  *
  * @return True if the analog input is between the upper and lower limits.
  */
-bool AnalogTrigger::GetInWindow() {
+bool frc::AnalogTrigger::GetInWindow() {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerInWindow(m_trigger, &status);
@@ -160,7 +158,7 @@ bool AnalogTrigger::GetInWindow() {
  * @return True if above upper limit. False if below lower limit. If in
  *         Hysteresis, maintain previous state.
  */
-bool AnalogTrigger::GetTriggerState() {
+bool frc::AnalogTrigger::GetTriggerState() {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool result = HAL_GetAnalogTriggerTriggerState(m_trigger, &status);
@@ -177,7 +175,7 @@ bool AnalogTrigger::GetTriggerState() {
  * @param type An enum of the type of output object to create.
  * @return A pointer to a new AnalogTriggerOutput object.
  */
-std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
+std::shared_ptr<frc::AnalogTriggerOutput> frc::AnalogTrigger::CreateOutput(
     AnalogTriggerType type) const {
   if (StatusIsFatal()) return nullptr;
   return std::shared_ptr<AnalogTriggerOutput>(

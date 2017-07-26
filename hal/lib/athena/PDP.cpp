@@ -15,9 +15,7 @@
 #include "PortsInternal.h"
 #include "ctre/PDP.h"
 
-using namespace hal;
-
-static std::unique_ptr<PDP> pdp[kNumPDPModules];
+static std::unique_ptr<PDP> pdp[hal::kNumPDPModules];
 
 static inline bool checkPDPInit(int32_t module, int32_t* status) {
   if (!HAL_CheckPDPModule(module)) {
@@ -44,11 +42,11 @@ void HAL_InitializePDP(int32_t module, int32_t* status) {
 }
 
 HAL_Bool HAL_CheckPDPModule(int32_t module) {
-  return module < kNumPDPModules && module >= 0;
+  return module < hal::kNumPDPModules && module >= 0;
 }
 
 HAL_Bool HAL_CheckPDPChannel(int32_t channel) {
-  return channel < kNumPDPChannels && channel >= 0;
+  return channel < hal::kNumPDPChannels && channel >= 0;
 }
 
 double HAL_GetPDPTemperature(int32_t module, int32_t* status) {

@@ -14,8 +14,6 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const double kCounterTime = 0.001;
 
 static const double kDelayTime = 0.1;
@@ -29,12 +27,12 @@ static const double kSynchronousInterruptTimeTolerance = 0.01;
  */
 class DIOLoopTest : public testing::Test {
  protected:
-  DigitalInput* m_input;
-  DigitalOutput* m_output;
+  frc::DigitalInput* m_input;
+  frc::DigitalOutput* m_output;
 
   void SetUp() override {
-    m_input = new DigitalInput(TestBench::kLoop1InputChannel);
-    m_output = new DigitalOutput(TestBench::kLoop1OutputChannel);
+    m_input = new frc::DigitalInput(TestBench::kLoop1InputChannel);
+    m_output = new frc::DigitalOutput(TestBench::kLoop1OutputChannel);
   }
 
   void TearDown() override {
@@ -53,12 +51,12 @@ TEST_F(DIOLoopTest, Loop) {
   Reset();
 
   m_output->Set(false);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
   EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
                                << "the digital input is on.";
 
   m_output->Set(true);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
   EXPECT_TRUE(m_input->Get()) << "The digital output was turned on, but "
                               << "the digital input is off.";
 }
@@ -69,7 +67,7 @@ TEST_F(DIOLoopTest, DIOPWM) {
   Reset();
 
   m_output->Set(false);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
   EXPECT_FALSE(m_input->Get()) << "The digital output was turned off, but "
                                << "the digital input is on.";
 
@@ -77,34 +75,34 @@ TEST_F(DIOLoopTest, DIOPWM) {
   m_output->SetPWMRate(2.0);
   // Enable PWM, but leave it off
   m_output->EnablePWM(0.0);
-  Wait(0.5);
+  frc::Wait(0.5);
   m_output->UpdateDutyCycle(0.5);
   m_input->RequestInterrupts();
   m_input->SetUpSourceEdge(false, true);
-  InterruptableSensorBase::WaitResult result =
+  frc::InterruptableSensorBase::WaitResult result =
       m_input->WaitForInterrupt(3.0, true);
 
-  Wait(0.5);
+  frc::Wait(0.5);
   bool firstCycle = m_input->Get();
-  Wait(0.5);
+  frc::Wait(0.5);
   bool secondCycle = m_input->Get();
-  Wait(0.5);
+  frc::Wait(0.5);
   bool thirdCycle = m_input->Get();
-  Wait(0.5);
+  frc::Wait(0.5);
   bool forthCycle = m_input->Get();
-  Wait(0.5);
+  frc::Wait(0.5);
   bool fifthCycle = m_input->Get();
-  Wait(0.5);
+  frc::Wait(0.5);
   bool sixthCycle = m_input->Get();
-  Wait(0.5);
+  frc::Wait(0.5);
   bool seventhCycle = m_input->Get();
   m_output->DisablePWM();
-  Wait(0.5);
+  frc::Wait(0.5);
   bool firstAfterStop = m_input->Get();
-  Wait(0.5);
+  frc::Wait(0.5);
   bool secondAfterStop = m_input->Get();
 
-  EXPECT_EQ(InterruptableSensorBase::WaitResult::kFallingEdge, result)
+  EXPECT_EQ(frc::InterruptableSensorBase::WaitResult::kFallingEdge, result)
       << "WaitForInterrupt was not falling.";
 
   EXPECT_FALSE(firstCycle) << "Input not low after first delay";
@@ -125,16 +123,16 @@ TEST_F(DIOLoopTest, DIOPWM) {
 TEST_F(DIOLoopTest, FakeCounter) {
   Reset();
 
-  Counter counter(m_input);
+  frc::Counter counter(m_input);
 
   EXPECT_EQ(0, counter.Get()) << "Counter did not initialize to 0.";
 
   /* Count 100 ticks.  The counter value should be 100 after this loop. */
   for (int32_t i = 0; i < 100; i++) {
     m_output->Set(true);
-    Wait(kCounterTime);
+    frc::Wait(kCounterTime);
     m_output->Set(false);
-    Wait(kCounterTime);
+    frc::Wait(kCounterTime);
   }
 
   EXPECT_EQ(100, counter.Get()) << "Counter did not count up to 100.";
@@ -157,14 +155,14 @@ TEST_F(DIOLoopTest, AsynchronousInterruptWorks) {
   m_input->CancelInterrupts();
 
   // Then the int32_t should be 12345
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }
 
 static void* InterruptTriggerer(void* data) {
-  DigitalOutput* output = static_cast<DigitalOutput*>(data);
+  frc::DigitalOutput* output = static_cast<frc::DigitalOutput*>(data);
   output->Set(false);
-  Wait(kSynchronousInterruptTime);
+  frc::Wait(kSynchronousInterruptTime);
   output->Set(true);
   return nullptr;
 }
@@ -179,7 +177,7 @@ TEST_F(DIOLoopTest, SynchronousInterruptWorks) {
                  m_output);
 
   // Then this thread should pause and resume after that number of seconds
-  Timer timer;
+  frc::Timer timer;
   timer.Start();
   m_input->WaitForInterrupt(kSynchronousInterruptTime + 1.0);
   EXPECT_NEAR(kSynchronousInterruptTime, timer.Get(),

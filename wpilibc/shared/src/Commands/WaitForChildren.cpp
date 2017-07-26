@@ -9,14 +9,12 @@
 
 #include "Commands/CommandGroup.h"
 
-using namespace frc;
-
-WaitForChildren::WaitForChildren(double timeout)
+frc::WaitForChildren::WaitForChildren(double timeout)
     : Command("WaitForChildren", timeout) {}
 
-WaitForChildren::WaitForChildren(const std::string& name, double timeout)
+frc::WaitForChildren::WaitForChildren(const std::string& name, double timeout)
     : Command(name, timeout) {}
 
-bool WaitForChildren::IsFinished() {
+bool frc::WaitForChildren::IsFinished() {
   return GetGroup() == nullptr || GetGroup()->GetSize() == 0;
 }

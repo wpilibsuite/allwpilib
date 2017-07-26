@@ -9,13 +9,11 @@
 
 #include "HAL/HAL.h"
 
-using namespace frc;
-
-void HardwareHLReporting::ReportScheduler() {
+void frc::HardwareHLReporting::ReportScheduler() {
   HAL_Report(HALUsageReporting::kResourceType_Command,
              HALUsageReporting::kCommand_Scheduler);
 }
 
-void HardwareHLReporting::ReportSmartDashboard() {
+void frc::HardwareHLReporting::ReportSmartDashboard() {
   HAL_Report(HALUsageReporting::kResourceType_SmartDashboard, 0);
 }

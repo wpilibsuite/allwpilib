@@ -18,8 +18,6 @@
 #include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
 #include "support/SafeThread.h"
 
-using namespace frc;
-
 TLogLevel interruptJNILogLevel = logERROR;
 
 #define INTERRUPTJNI_LOG(level)     \
@@ -136,7 +134,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_initializeInterrupts(
   INTERRUPTJNI_LOG(logDEBUG) << "Interrupt Handle = " << interrupt;
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
-  CheckStatusForceThrow(env, status);
+  frc::CheckStatusForceThrow(env, status);
   return (jint)interrupt;
 }
 
@@ -177,7 +175,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_waitForInterrupt(
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return result;
 }
 
@@ -197,7 +195,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_enableInterrupts(
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -216,7 +214,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_disableInterrupts(
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
 
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -234,7 +232,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readInterruptRisingTimestamp(
   jdouble timeStamp = HAL_ReadInterruptRisingTimestamp((HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return timeStamp;
 }
 
@@ -253,7 +251,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_readInterruptFallingTimestamp(
   jdouble timeStamp = HAL_ReadInterruptFallingTimestamp((HAL_InterruptHandle)interruptHandle, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return timeStamp;
 }
 
@@ -276,7 +274,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_requestInterrupts(
                     (HAL_AnalogTriggerType)analogTriggerType, &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -318,7 +316,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_attachInterruptHandler(
                          &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -340,7 +338,7 @@ Java_edu_wpi_first_wpilibj_hal_InterruptJNI_setInterruptUpSourceEdge(
                            &status);
 
   INTERRUPTJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 }  // extern "C"

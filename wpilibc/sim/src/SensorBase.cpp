@@ -9,22 +9,20 @@
 
 #include "WPIErrors.h"
 
-using namespace frc;
-
-const int SensorBase::kDigitalChannels;
-const int SensorBase::kAnalogInputs;
-const int SensorBase::kSolenoidChannels;
-const int SensorBase::kSolenoidModules;
-const int SensorBase::kPwmChannels;
-const int SensorBase::kRelayChannels;
-const int SensorBase::kPDPChannels;
+const int frc::SensorBase::kDigitalChannels;
+const int frc::SensorBase::kAnalogInputs;
+const int frc::SensorBase::kSolenoidChannels;
+const int frc::SensorBase::kSolenoidModules;
+const int frc::SensorBase::kPwmChannels;
+const int frc::SensorBase::kRelayChannels;
+const int frc::SensorBase::kPDPChannels;
 
 /**
  * Check that the solenoid module number is valid.
  *
  * @return Solenoid module number is valid
  */
-bool SensorBase::CheckSolenoidModule(int moduleNumber) {
+bool frc::SensorBase::CheckSolenoidModule(int moduleNumber) {
   return moduleNumber >= 0 && moduleNumber < kSolenoidModules;
 }
 
@@ -36,7 +34,7 @@ bool SensorBase::CheckSolenoidModule(int moduleNumber) {
  *
  * @return Digital channel is valid
  */
-bool SensorBase::CheckDigitalChannel(int channel) {
+bool frc::SensorBase::CheckDigitalChannel(int channel) {
   if (channel >= 0 && channel < kDigitalChannels) return true;
   return false;
 }
@@ -49,7 +47,7 @@ bool SensorBase::CheckDigitalChannel(int channel) {
  *
  * @return Relay channel is valid
  */
-bool SensorBase::CheckRelayChannel(int channel) {
+bool frc::SensorBase::CheckRelayChannel(int channel) {
   if (channel >= 0 && channel < kRelayChannels) return true;
   return false;
 }
@@ -62,7 +60,7 @@ bool SensorBase::CheckRelayChannel(int channel) {
  *
  * @return PWM channel is valid
  */
-bool SensorBase::CheckPWMChannel(int channel) {
+bool frc::SensorBase::CheckPWMChannel(int channel) {
   if (channel >= 0 && channel < kPwmChannels) return true;
   return false;
 }
@@ -75,7 +73,7 @@ bool SensorBase::CheckPWMChannel(int channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogInputChannel(int channel) {
+bool frc::SensorBase::CheckAnalogInputChannel(int channel) {
   if (channel >= 0 && channel < kAnalogInputs) return true;
   return false;
 }
@@ -88,7 +86,7 @@ bool SensorBase::CheckAnalogInputChannel(int channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogOutputChannel(int channel) {
+bool frc::SensorBase::CheckAnalogOutputChannel(int channel) {
   if (channel >= 0 && channel < kAnalogOutputs) return true;
   return false;
 }
@@ -98,7 +96,7 @@ bool SensorBase::CheckAnalogOutputChannel(int channel) {
  *
  * @return Solenoid channel is valid
  */
-bool SensorBase::CheckSolenoidChannel(int channel) {
+bool frc::SensorBase::CheckSolenoidChannel(int channel) {
   if (channel >= 0 && channel < kSolenoidChannels) return true;
   return false;
 }
@@ -108,7 +106,7 @@ bool SensorBase::CheckSolenoidChannel(int channel) {
  *
  * @return PDP channel is valid
  */
-bool SensorBase::CheckPDPChannel(int channel) {
+bool frc::SensorBase::CheckPDPChannel(int channel) {
   if (channel >= 0 && channel < kPDPChannels) return true;
   return false;
 }

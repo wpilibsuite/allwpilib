@@ -17,8 +17,6 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Create an instance of a Digital Input class.
  *
@@ -26,7 +24,7 @@ using namespace frc;
  *
  * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
  */
-DigitalInput::DigitalInput(int channel) {
+frc::DigitalInput::DigitalInput(int channel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
 
@@ -55,7 +53,7 @@ DigitalInput::DigitalInput(int channel) {
 /**
  * Free resources associated with the Digital Input class.
  */
-DigitalInput::~DigitalInput() {
+frc::DigitalInput::~DigitalInput() {
   if (StatusIsFatal()) return;
   if (m_interrupt != HAL_kInvalidHandle) {
     int32_t status = 0;
@@ -72,7 +70,7 @@ DigitalInput::~DigitalInput() {
  *
  * Retrieve the value of a single digital input channel from the FPGA.
  */
-bool DigitalInput::Get() const {
+bool frc::DigitalInput::Get() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value = HAL_GetDIO(m_handle, &status);
@@ -83,42 +81,45 @@ bool DigitalInput::Get() const {
 /**
  * @return The GPIO channel number that this object represents.
  */
-int DigitalInput::GetChannel() const { return m_channel; }
+int frc::DigitalInput::GetChannel() const { return m_channel; }
 
 /**
  * @return The HAL Handle to the specified source.
  */
-HAL_Handle DigitalInput::GetPortHandleForRouting() const { return m_handle; }
+HAL_Handle frc::DigitalInput::GetPortHandleForRouting() const {
+  return m_handle;
+}
 
 /**
  * Is source an AnalogTrigger
  */
-bool DigitalInput::IsAnalogTrigger() const { return false; }
+bool frc::DigitalInput::IsAnalogTrigger() const { return false; }
 
 /**
  * @return The type of analog trigger output to be used. 0 for Digitals
  */
-AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
-  return (AnalogTriggerType)0;
+frc::AnalogTriggerType frc::DigitalInput::GetAnalogTriggerTypeForRouting()
+    const {
+  return static_cast<AnalogTriggerType>(0);
 }
 
-void DigitalInput::UpdateTable() {
+void frc::DigitalInput::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutBoolean("Value", Get());
   }
 }
 
-void DigitalInput::StartLiveWindowMode() {}
+void frc::DigitalInput::StartLiveWindowMode() {}
 
-void DigitalInput::StopLiveWindowMode() {}
+void frc::DigitalInput::StopLiveWindowMode() {}
 
-std::string DigitalInput::GetSmartDashboardType() const {
+std::string frc::DigitalInput::GetSmartDashboardType() const {
   return "DigitalInput";
 }
 
-void DigitalInput::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::DigitalInput::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> DigitalInput::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::DigitalInput::GetTable() const { return m_table; }

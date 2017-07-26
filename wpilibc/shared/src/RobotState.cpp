@@ -9,48 +9,47 @@
 
 #include "Base.h"
 
-using namespace frc;
+std::shared_ptr<frc::RobotStateInterface> frc::RobotState::impl;
 
-std::shared_ptr<RobotStateInterface> RobotState::impl;
-
-void RobotState::SetImplementation(RobotStateInterface& i) {
+void frc::RobotState::SetImplementation(RobotStateInterface& i) {
   impl = std::shared_ptr<RobotStateInterface>(
       &i, NullDeleter<RobotStateInterface>());
 }
 
-void RobotState::SetImplementation(std::shared_ptr<RobotStateInterface> i) {
+void frc::RobotState::SetImplementation(
+    std::shared_ptr<RobotStateInterface> i) {
   impl = i;
 }
 
-bool RobotState::IsDisabled() {
+bool frc::RobotState::IsDisabled() {
   if (impl != nullptr) {
     return impl->IsDisabled();
   }
   return true;
 }
 
-bool RobotState::IsEnabled() {
+bool frc::RobotState::IsEnabled() {
   if (impl != nullptr) {
     return impl->IsEnabled();
   }
   return false;
 }
 
-bool RobotState::IsOperatorControl() {
+bool frc::RobotState::IsOperatorControl() {
   if (impl != nullptr) {
     return impl->IsOperatorControl();
   }
   return true;
 }
 
-bool RobotState::IsAutonomous() {
+bool frc::RobotState::IsAutonomous() {
   if (impl != nullptr) {
     return impl->IsAutonomous();
   }
   return false;
 }
 
-bool RobotState::IsTest() {
+bool frc::RobotState::IsTest() {
   if (impl != nullptr) {
     return impl->IsTest();
   }

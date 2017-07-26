@@ -14,8 +14,6 @@
 #include "command/MockConditionalCommand.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 class ConditionalCommandTest : public testing::Test {
  public:
   MockConditionalCommand* m_command;
@@ -24,8 +22,8 @@ class ConditionalCommandTest : public testing::Test {
 
  protected:
   void SetUp() override {
-    RobotState::SetImplementation(DriverStation::GetInstance());
-    Scheduler::GetInstance()->SetEnabled(true);
+    frc::RobotState::SetImplementation(frc::DriverStation::GetInstance());
+    frc::Scheduler::GetInstance()->SetEnabled(true);
 
     m_onTrue = new MockCommand();
     m_onFalse = new MockCommand();
@@ -42,7 +40,7 @@ class ConditionalCommandTest : public testing::Test {
    * segfault). This cannot be done within the virtual void Teardown() method
    * because it is called outside of the scope of the test.
    */
-  void TeardownScheduler() { Scheduler::GetInstance()->ResetAll(); }
+  void TeardownScheduler() { frc::Scheduler::GetInstance()->ResetAll(); }
 
   void AssertCommandState(MockCommand& command, int32_t initialize,
                           int32_t execute, int32_t isFinished, int32_t end,
@@ -58,15 +56,15 @@ class ConditionalCommandTest : public testing::Test {
 TEST_F(ConditionalCommandTest, OnTrueTest) {
   m_command->SetCondition(true);
 
-  Scheduler::GetInstance()->AddCommand(m_command);
+  frc::Scheduler::GetInstance()->AddCommand(m_command);
   AssertCommandState(*m_onTrue, 0, 0, 0, 0, 0);
-  Scheduler::GetInstance()->Run();  // init command and select m_onTrue
+  frc::Scheduler::GetInstance()->Run();  // init command and select m_onTrue
   AssertCommandState(*m_onTrue, 0, 0, 0, 0, 0);
-  Scheduler::GetInstance()->Run();  // init m_onTrue
+  frc::Scheduler::GetInstance()->Run();  // init m_onTrue
   AssertCommandState(*m_onTrue, 0, 0, 0, 0, 0);
-  Scheduler::GetInstance()->Run();
+  frc::Scheduler::GetInstance()->Run();
   AssertCommandState(*m_onTrue, 1, 1, 2, 0, 0);
-  Scheduler::GetInstance()->Run();
+  frc::Scheduler::GetInstance()->Run();
   AssertCommandState(*m_onTrue, 1, 2, 4, 0, 0);
 
   EXPECT_TRUE(m_onTrue->GetInitializeCount() > 0)
@@ -80,15 +78,15 @@ TEST_F(ConditionalCommandTest, OnTrueTest) {
 TEST_F(ConditionalCommandTest, OnFalseTest) {
   m_command->SetCondition(false);
 
-  Scheduler::GetInstance()->AddCommand(m_command);
+  frc::Scheduler::GetInstance()->AddCommand(m_command);
   AssertCommandState(*m_onFalse, 0, 0, 0, 0, 0);
-  Scheduler::GetInstance()->Run();  // init command and select m_onTrue
+  frc::Scheduler::GetInstance()->Run();  // init command and select m_onTrue
   AssertCommandState(*m_onFalse, 0, 0, 0, 0, 0);
-  Scheduler::GetInstance()->Run();  // init m_onTrue
+  frc::Scheduler::GetInstance()->Run();  // init m_onTrue
   AssertCommandState(*m_onFalse, 0, 0, 0, 0, 0);
-  Scheduler::GetInstance()->Run();
+  frc::Scheduler::GetInstance()->Run();
   AssertCommandState(*m_onFalse, 1, 1, 2, 0, 0);
-  Scheduler::GetInstance()->Run();
+  frc::Scheduler::GetInstance()->Run();
   AssertCommandState(*m_onFalse, 1, 2, 4, 0, 0);
 
   EXPECT_TRUE(m_onFalse->GetInitializeCount() > 0)

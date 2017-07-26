@@ -15,21 +15,19 @@
 #include "HLUsageReporting.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
-Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
+frc::Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
 
 /**
  * Returns the {@link Scheduler}, creating it if one does not exist.
  *
  * @return the {@link Scheduler}
  */
-Scheduler* Scheduler::GetInstance() {
+frc::Scheduler* frc::Scheduler::GetInstance() {
   static Scheduler instance;
   return &instance;
 }
 
-void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
+void frc::Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
 
 /**
  * Add a command to be scheduled later.
@@ -39,7 +37,7 @@ void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
  *
  * @param command The command to be scheduled
  */
-void Scheduler::AddCommand(Command* command) {
+void frc::Scheduler::AddCommand(Command* command) {
   std::lock_guard<hal::priority_mutex> sync(m_additionsLock);
   if (std::find(m_additions.begin(), m_additions.end(), command) !=
       m_additions.end())
@@ -47,12 +45,12 @@ void Scheduler::AddCommand(Command* command) {
   m_additions.push_back(command);
 }
 
-void Scheduler::AddButton(ButtonScheduler* button) {
+void frc::Scheduler::AddButton(ButtonScheduler* button) {
   std::lock_guard<hal::priority_mutex> sync(m_buttonsLock);
   m_buttons.push_back(button);
 }
 
-void Scheduler::ProcessCommandAddition(Command* command) {
+void frc::Scheduler::ProcessCommandAddition(Command* command) {
   if (command == nullptr) return;
 
   // Check to make sure no adding during adding
@@ -109,7 +107,7 @@ void Scheduler::ProcessCommandAddition(Command* command) {
  * <li> Add Defaults </li>
  * </ol>
  */
-void Scheduler::Run() {
+void frc::Scheduler::Run() {
   // Get button input (going backwards preserves button priority)
   {
     if (!m_enabled) return;
@@ -173,7 +171,7 @@ void Scheduler::Run() {
  *
  * @param system the system
  */
-void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
+void frc::Scheduler::RegisterSubsystem(Subsystem* subsystem) {
   if (subsystem == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "subsystem");
     return;
@@ -186,7 +184,7 @@ void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
  *
  * @param command the command to remove
  */
-void Scheduler::Remove(Command* command) {
+void frc::Scheduler::Remove(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -203,7 +201,7 @@ void Scheduler::Remove(Command* command) {
   command->Removed();
 }
 
-void Scheduler::RemoveAll() {
+void frc::Scheduler::RemoveAll() {
   while (m_commands.size() > 0) {
     Remove(*m_commands.begin());
   }
@@ -212,7 +210,7 @@ void Scheduler::RemoveAll() {
 /**
  * Completely resets the scheduler. Undefined behavior if running.
  */
-void Scheduler::ResetAll() {
+void frc::Scheduler::ResetAll() {
   RemoveAll();
   m_subsystems.clear();
   m_buttons.clear();
@@ -225,7 +223,7 @@ void Scheduler::ResetAll() {
  * Update the network tables associated with the Scheduler object on the
  * SmartDashboard.
  */
-void Scheduler::UpdateTable() {
+void frc::Scheduler::UpdateTable() {
   if (m_table != nullptr) {
     // Get the list of possible commands to cancel
     auto new_toCancel = m_table->GetValue("Cancel");
@@ -267,13 +265,15 @@ void Scheduler::UpdateTable() {
   }
 }
 
-std::string Scheduler::GetName() const { return "Scheduler"; }
+std::string frc::Scheduler::GetName() const { return "Scheduler"; }
 
-std::string Scheduler::GetType() const { return "Scheduler"; }
+std::string frc::Scheduler::GetType() const { return "Scheduler"; }
 
-std::string Scheduler::GetSmartDashboardType() const { return "Scheduler"; }
+std::string frc::Scheduler::GetSmartDashboardType() const {
+  return "Scheduler";
+}
 
-void Scheduler::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::Scheduler::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
 
   m_table->PutValue("Names", nt::Value::MakeStringArray(commands));
@@ -281,4 +281,4 @@ void Scheduler::InitTable(std::shared_ptr<ITable> subTable) {
   m_table->PutValue("Cancel", nt::Value::MakeDoubleArray(toCancel));
 }
 
-std::shared_ptr<ITable> Scheduler::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Scheduler::GetTable() const { return m_table; }

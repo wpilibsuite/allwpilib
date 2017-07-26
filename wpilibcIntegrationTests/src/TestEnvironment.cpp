@@ -14,8 +14,6 @@
 #include "gtest/gtest.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 class TestEnvironment : public testing::Environment {
   bool m_alreadySetUp = false;
 
@@ -36,12 +34,12 @@ class TestEnvironment : public testing::Environment {
             station returns that the robot is enabled, to ensure that tests
             will be able to run on the hardware. */
     HAL_ObserveUserProgramStarting();
-    LiveWindow::GetInstance()->SetEnabled(false);
+    frc::LiveWindow::GetInstance()->SetEnabled(false);
 
     llvm::outs() << "Waiting for enable\n";
 
-    while (!DriverStation::GetInstance().IsEnabled()) {
-      Wait(0.1);
+    while (!frc::DriverStation::GetInstance().IsEnabled()) {
+      frc::Wait(0.1);
     }
   }
 

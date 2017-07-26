@@ -7,8 +7,6 @@
 
 #include "command/MockCommand.h"
 
-using namespace frc;
-
 MockCommand::MockCommand() {
   m_initializeCount = 0;
   m_executeCount = 0;

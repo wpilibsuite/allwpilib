@@ -15,14 +15,14 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
-PowerDistributionPanel::PowerDistributionPanel() : PowerDistributionPanel(0) {}
+frc::PowerDistributionPanel::PowerDistributionPanel()
+    : PowerDistributionPanel(0) {}
 
 /**
  * Initialize the PDP.
  */
-PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
+frc::PowerDistributionPanel::PowerDistributionPanel(int module)
+    : m_module(module) {
   int32_t status = 0;
   HAL_InitializePDP(m_module, &status);
   if (status != 0) {
@@ -38,7 +38,7 @@ PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
  *
  * @return The voltage of the PDP in volts
  */
-double PowerDistributionPanel::GetVoltage() const {
+double frc::PowerDistributionPanel::GetVoltage() const {
   int32_t status = 0;
 
   double voltage = HAL_GetPDPVoltage(m_module, &status);
@@ -55,7 +55,7 @@ double PowerDistributionPanel::GetVoltage() const {
  *
  * @return The temperature of the PDP in degrees Celsius
  */
-double PowerDistributionPanel::GetTemperature() const {
+double frc::PowerDistributionPanel::GetTemperature() const {
   int32_t status = 0;
 
   double temperature = HAL_GetPDPTemperature(m_module, &status);
@@ -72,7 +72,7 @@ double PowerDistributionPanel::GetTemperature() const {
  *
  * @return The current of one of the PDP channels (channels 0-15) in Amperes
  */
-double PowerDistributionPanel::GetCurrent(int channel) const {
+double frc::PowerDistributionPanel::GetCurrent(int channel) const {
   int32_t status = 0;
 
   if (!CheckPDPChannel(channel)) {
@@ -96,7 +96,7 @@ double PowerDistributionPanel::GetCurrent(int channel) const {
  *
  * @return The the total current drawn from the PDP channels in Amperes
  */
-double PowerDistributionPanel::GetTotalCurrent() const {
+double frc::PowerDistributionPanel::GetTotalCurrent() const {
   int32_t status = 0;
 
   double current = HAL_GetPDPTotalCurrent(m_module, &status);
@@ -113,7 +113,7 @@ double PowerDistributionPanel::GetTotalCurrent() const {
  *
  * @return The the total power drawn from the PDP channels in Watts
  */
-double PowerDistributionPanel::GetTotalPower() const {
+double frc::PowerDistributionPanel::GetTotalPower() const {
   int32_t status = 0;
 
   double power = HAL_GetPDPTotalPower(m_module, &status);
@@ -130,7 +130,7 @@ double PowerDistributionPanel::GetTotalPower() const {
  *
  * @return The the total energy drawn from the PDP channels in Joules
  */
-double PowerDistributionPanel::GetTotalEnergy() const {
+double frc::PowerDistributionPanel::GetTotalEnergy() const {
   int32_t status = 0;
 
   double energy = HAL_GetPDPTotalEnergy(m_module, &status);
@@ -147,7 +147,7 @@ double PowerDistributionPanel::GetTotalEnergy() const {
  *
  * @see PowerDistributionPanel#GetTotalEnergy
  */
-void PowerDistributionPanel::ResetTotalEnergy() {
+void frc::PowerDistributionPanel::ResetTotalEnergy() {
   int32_t status = 0;
 
   HAL_ResetPDPTotalEnergy(m_module, &status);
@@ -160,7 +160,7 @@ void PowerDistributionPanel::ResetTotalEnergy() {
 /**
  * Remove all of the fault flags on the PDP.
  */
-void PowerDistributionPanel::ClearStickyFaults() {
+void frc::PowerDistributionPanel::ClearStickyFaults() {
   int32_t status = 0;
 
   HAL_ClearPDPStickyFaults(m_module, &status);
@@ -170,7 +170,7 @@ void PowerDistributionPanel::ClearStickyFaults() {
   }
 }
 
-void PowerDistributionPanel::UpdateTable() {
+void frc::PowerDistributionPanel::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Chan0", GetCurrent(0));
     m_table->PutNumber("Chan1", GetCurrent(1));
@@ -193,19 +193,19 @@ void PowerDistributionPanel::UpdateTable() {
   }
 }
 
-void PowerDistributionPanel::StartLiveWindowMode() {}
+void frc::PowerDistributionPanel::StartLiveWindowMode() {}
 
-void PowerDistributionPanel::StopLiveWindowMode() {}
+void frc::PowerDistributionPanel::StopLiveWindowMode() {}
 
-std::string PowerDistributionPanel::GetSmartDashboardType() const {
+std::string frc::PowerDistributionPanel::GetSmartDashboardType() const {
   return "PowerDistributionPanel";
 }
 
-void PowerDistributionPanel::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::PowerDistributionPanel::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> PowerDistributionPanel::GetTable() const {
+std::shared_ptr<ITable> frc::PowerDistributionPanel::GetTable() const {
   return m_table;
 }

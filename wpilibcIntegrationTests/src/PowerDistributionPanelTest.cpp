@@ -14,22 +14,20 @@
 #include "Victor.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const double kMotorTime = 0.25;
 
 class PowerDistributionPanelTest : public testing::Test {
  protected:
-  PowerDistributionPanel* m_pdp;
-  Talon* m_talon;
-  Victor* m_victor;
-  Jaguar* m_jaguar;
+  frc::PowerDistributionPanel* m_pdp;
+  frc::Talon* m_talon;
+  frc::Victor* m_victor;
+  frc::Jaguar* m_jaguar;
 
   void SetUp() override {
-    m_pdp = new PowerDistributionPanel();
-    m_talon = new Talon(TestBench::kTalonChannel);
-    m_victor = new Victor(TestBench::kVictorChannel);
-    m_jaguar = new Jaguar(TestBench::kJaguarChannel);
+    m_pdp = new frc::PowerDistributionPanel();
+    m_talon = new frc::Talon(TestBench::kTalonChannel);
+    m_victor = new frc::Victor(TestBench::kVictorChannel);
+    m_jaguar = new frc::Jaguar(TestBench::kJaguarChannel);
   }
 
   void TearDown() override {
@@ -44,7 +42,7 @@ class PowerDistributionPanelTest : public testing::Test {
  * Test if the current changes when the motor is driven using a talon
  */
 TEST_F(PowerDistributionPanelTest, CheckCurrentTalon) {
-  Wait(kMotorTime);
+  frc::Wait(kMotorTime);
 
   /* The Current should be 0 */
   EXPECT_FLOAT_EQ(0, m_pdp->GetCurrent(TestBench::kTalonPDPChannel))
@@ -52,7 +50,7 @@ TEST_F(PowerDistributionPanelTest, CheckCurrentTalon) {
 
   /* Set the motor to full forward */
   m_talon->Set(1.0);
-  Wait(kMotorTime);
+  frc::Wait(kMotorTime);
 
   /* The current should now be positive */
   ASSERT_GT(m_pdp->GetCurrent(TestBench::kTalonPDPChannel), 0)

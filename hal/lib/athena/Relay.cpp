@@ -11,8 +11,6 @@
 #include "HAL/handles/IndexedHandleResource.h"
 #include "PortsInternal.h"
 
-using namespace hal;
-
 namespace {
 struct Relay {
   uint8_t channel;
@@ -20,27 +18,27 @@ struct Relay {
 };
 }
 
-static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
-                             HAL_HandleEnum::Relay>
+static hal::IndexedHandleResource<
+    HAL_RelayHandle, Relay, hal::kNumRelayChannels, hal::HAL_HandleEnum::Relay>
     relayHandles;
 
 // Create a mutex to protect changes to the relay values
-static priority_recursive_mutex digitalRelayMutex;
+static hal::priority_recursive_mutex digitalRelayMutex;
 
 extern "C" {
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
                                         int32_t* status) {
-  initializeDigital(status);
+  hal::initializeDigital(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
+  int16_t channel = hal::getPortHandleChannel(portHandle);
+  if (channel == hal::InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
 
-  if (!fwd) channel += kNumRelayHeaders;  // add 4 to reverse channels
+  if (!fwd) channel += hal::kNumRelayHeaders;  // add 4 to reverse channels
 
   auto handle = relayHandles.Allocate(channel, status);
 
@@ -55,7 +53,7 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 
   if (!fwd) {
     // Subtract number of headers to put channel in range
-    channel -= kNumRelayHeaders;
+    channel -= hal::kNumRelayHeaders;
 
     port->fwd = false;  // set to reverse
   } else {
@@ -75,7 +73,7 @@ HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
   // roboRIO only has 4 headers, and the FPGA has
   // seperate functions for forward and reverse,
   // instead of seperate channel IDs
-  return channel < kNumRelayHeaders && channel >= 0;
+  return channel < hal::kNumRelayHeaders && channel >= 0;
 }
 
 /**
@@ -89,12 +87,12 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  std::lock_guard<priority_recursive_mutex> sync(digitalRelayMutex);
+  std::lock_guard<hal::priority_recursive_mutex> sync(digitalRelayMutex);
   uint8_t relays = 0;
   if (port->fwd) {
-    relays = relaySystem->readValue_Forward(status);
+    relays = hal::relaySystem->readValue_Forward(status);
   } else {
-    relays = relaySystem->readValue_Reverse(status);
+    relays = hal::relaySystem->readValue_Reverse(status);
   }
 
   if (*status != 0) return;  // bad status read
@@ -106,9 +104,9 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
   }
 
   if (port->fwd) {
-    relaySystem->writeValue_Forward(relays, status);
+    hal::relaySystem->writeValue_Forward(relays, status);
   } else {
-    relaySystem->writeValue_Reverse(relays, status);
+    hal::relaySystem->writeValue_Reverse(relays, status);
   }
 }
 
@@ -124,9 +122,9 @@ HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
 
   uint8_t relays = 0;
   if (port->fwd) {
-    relays = relaySystem->readValue_Forward(status);
+    relays = hal::relaySystem->readValue_Forward(status);
   } else {
-    relays = relaySystem->readValue_Reverse(status);
+    relays = hal::relaySystem->readValue_Reverse(status);
   }
 
   return (relays & (1 << port->channel)) != 0;

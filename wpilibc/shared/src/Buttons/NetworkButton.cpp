@@ -9,19 +9,17 @@
 
 #include "networktables/NetworkTable.h"
 
-using namespace frc;
-
-NetworkButton::NetworkButton(const std::string& tableName,
-                             const std::string& field)
+frc::NetworkButton::NetworkButton(const std::string& tableName,
+                                  const std::string& field)
     :  // TODO how is this supposed to work???
       m_netTable(NetworkTable::GetTable(tableName)),
       m_field(field) {}
 
-NetworkButton::NetworkButton(std::shared_ptr<ITable> table,
-                             const std::string& field)
+frc::NetworkButton::NetworkButton(std::shared_ptr<ITable> table,
+                                  const std::string& field)
     : m_netTable(table), m_field(field) {}
 
-bool NetworkButton::Get() {
+bool frc::NetworkButton::Get() {
   /*if (m_netTable->isConnected())
           return m_netTable->GetBoolean(m_field.c_str());
   else

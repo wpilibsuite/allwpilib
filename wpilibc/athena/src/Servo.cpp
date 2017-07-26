@@ -9,19 +9,17 @@
 
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
+constexpr double frc::Servo::kMaxServoAngle;
+constexpr double frc::Servo::kMinServoAngle;
 
-constexpr double Servo::kMaxServoAngle;
-constexpr double Servo::kMinServoAngle;
-
-constexpr double Servo::kDefaultMaxServoPWM;
-constexpr double Servo::kDefaultMinServoPWM;
+constexpr double frc::Servo::kDefaultMaxServoPWM;
+constexpr double frc::Servo::kDefaultMinServoPWM;
 
 /**
  * @param channel The PWM channel to which the servo is attached. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-Servo::Servo(int channel) : SafePWM(channel) {
+frc::Servo::Servo(int channel) : SafePWM(channel) {
   // Set minimum and maximum PWM values supported by the servo
   SetBounds(kDefaultMaxServoPWM, 0.0, 0.0, 0.0, kDefaultMinServoPWM);
 
@@ -29,7 +27,7 @@ Servo::Servo(int channel) : SafePWM(channel) {
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 }
 
-Servo::~Servo() {
+frc::Servo::~Servo() {
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
@@ -43,14 +41,14 @@ Servo::~Servo() {
  *
  * @param value Position from 0.0 to 1.0.
  */
-void Servo::Set(double value) { SetPosition(value); }
+void frc::Servo::Set(double value) { SetPosition(value); }
 
 /**
  * Set the servo to offline.
  *
  * Set the servo raw value to 0 (undriven)
  */
-void Servo::SetOffline() { SetRaw(0); }
+void frc::Servo::SetOffline() { SetRaw(0); }
 
 /**
  * Get the servo position.
@@ -60,7 +58,7 @@ void Servo::SetOffline() { SetRaw(0); }
  *
  * @return Position from 0.0 to 1.0.
  */
-double Servo::Get() const { return GetPosition(); }
+double frc::Servo::Get() const { return GetPosition(); }
 
 /**
  * Set the servo angle.
@@ -76,7 +74,7 @@ double Servo::Get() const { return GetPosition(); }
  *
  * @param degrees The angle in degrees to set the servo.
  */
-void Servo::SetAngle(double degrees) {
+void frc::Servo::SetAngle(double degrees) {
   if (degrees < kMinServoAngle) {
     degrees = kMinServoAngle;
   } else if (degrees > kMaxServoAngle) {
@@ -94,39 +92,39 @@ void Servo::SetAngle(double degrees) {
  *
  * @return The angle in degrees to which the servo is set.
  */
-double Servo::GetAngle() const {
+double frc::Servo::GetAngle() const {
   return GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-void Servo::ValueChanged(ITable* source, llvm::StringRef key,
-                         std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::Servo::ValueChanged(ITable* source, llvm::StringRef key,
+                              std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsDouble()) return;
   Set(value->GetDouble());
 }
 
-void Servo::UpdateTable() {
+void frc::Servo::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }
 
-void Servo::StartLiveWindowMode() {
+void frc::Servo::StartLiveWindowMode() {
   if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
-void Servo::StopLiveWindowMode() {
+void frc::Servo::StopLiveWindowMode() {
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
 
-std::string Servo::GetSmartDashboardType() const { return "Servo"; }
+std::string frc::Servo::GetSmartDashboardType() const { return "Servo"; }
 
-void Servo::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::Servo::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> Servo::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Servo::GetTable() const { return m_table; }

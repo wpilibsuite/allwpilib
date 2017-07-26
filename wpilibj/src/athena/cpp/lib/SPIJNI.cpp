@@ -14,8 +14,6 @@
 #include "HAL/SPI.h"
 #include "HALUtil.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel spiJNILogLevel = logWARNING;
 
@@ -39,7 +37,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitialize(
   int32_t status = 0;
   HAL_InitializeSPI(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatusForceThrow(env, status);
+  frc::CheckStatusForceThrow(env, status);
 }
 
 /*
@@ -158,7 +156,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveHigh(
   int32_t status = 0;
   HAL_SetSPIChipSelectActiveHigh(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -174,7 +172,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetChipSelectActiveLow(
   int32_t status = 0;
   HAL_SetSPIChipSelectActiveLow(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -201,7 +199,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiInitAccumulator(
   HAL_InitSPIAccumulator(static_cast<HAL_SPIPort>(port), period, cmd, xferSize, validMask, validValue,
                      dataShift, dataSize, isSigned, bigEndian, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -216,7 +214,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiFreeAccumulator(
   int32_t status = 0;
   HAL_FreeSPIAccumulator(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -232,7 +230,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiResetAccumulator(
   int32_t status = 0;
   HAL_ResetSPIAccumulator(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -249,7 +247,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorCenter(
   int32_t status = 0;
   HAL_SetSPIAccumulatorCenter(static_cast<HAL_SPIPort>(port), center, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -266,7 +264,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiSetAccumulatorDeadband(
   int32_t status = 0;
   HAL_SetSPIAccumulatorDeadband(static_cast<HAL_SPIPort>(port), deadband, &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -283,7 +281,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorLastValue(
   jint retVal = HAL_GetSPIAccumulatorLastValue(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return retVal;
 }
 
@@ -301,7 +299,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorValue(
   jlong retVal = HAL_GetSPIAccumulatorValue(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return retVal;
 }
 
@@ -319,7 +317,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorCount(
   jint retVal = HAL_GetSPIAccumulatorCount(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return retVal;
 }
 
@@ -337,7 +335,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorAverage(
   jdouble retVal = HAL_GetSPIAccumulatorAverage(static_cast<HAL_SPIPort>(port), &status);
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return retVal;
 }
 
@@ -361,7 +359,7 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorOutput(
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "Value = " << *valuePtr;
   SPIJNI_LOG(logDEBUG) << "Count = " << *countPtr;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 }  // extern "C"

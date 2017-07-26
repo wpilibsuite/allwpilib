@@ -52,11 +52,11 @@ void Wait(double seconds) {
 /*
  * Return the FPGA system clock time in seconds.
  *
- * This is deprecated and just forwards to Timer::GetFPGATimestamp().
+ * This is deprecated and just forwards to frc::Timer::GetFPGATimestamp().
  *
  * @returns Robot running time in seconds.
  */
-double GetClock() { return Timer::GetFPGATimestamp(); }
+double GetClock() { return frc::Timer::GetFPGATimestamp(); }
 
 /**
  * @brief Gives real-time clock system time with nanosecond resolution
@@ -64,22 +64,21 @@ double GetClock() { return Timer::GetFPGATimestamp(); }
  *         on Saturday (except in simulation).
  */
 double GetTime() {
-  return Timer::GetFPGATimestamp();  // The epoch starts when Gazebo starts
+  return frc::Timer::GetFPGATimestamp();  // The epoch starts when Gazebo starts
 }
 
 }  // namespace frc
 
-using namespace frc;
-
 // for compatibility with msvc12--see C2864
-const double Timer::kRolloverTime = (1ll << 32) / 1e6;
+const double frc::Timer::kRolloverTime = (1ll << 32) / 1e6;
 /**
  * Create a new timer object.
  *
  * Create a new timer object and reset the time to zero. The timer is initially
  * not running and must be started.
  */
-Timer::Timer() : m_startTime(0.0), m_accumulatedTime(0.0), m_running(false) {
+frc::Timer::Timer()
+    : m_startTime(0.0), m_accumulatedTime(0.0), m_running(false) {
   // Creates a semaphore to control access to critical regions.
   // Initially 'open'
   Reset();
@@ -94,7 +93,7 @@ Timer::Timer() : m_startTime(0.0), m_accumulatedTime(0.0), m_running(false) {
  *
  * @return Current time value for this timer in seconds
  */
-double Timer::Get() const {
+double frc::Timer::Get() const {
   double result;
   double currentTime = GetFPGATimestamp();
 
@@ -116,7 +115,7 @@ double Timer::Get() const {
  * Make the timer startTime the current time so new requests will be relative to
  * now.
  */
-void Timer::Reset() {
+void frc::Timer::Reset() {
   std::lock_guard<hal::priority_mutex> sync(m_mutex);
   m_accumulatedTime = 0;
   m_startTime = GetFPGATimestamp();
@@ -128,7 +127,7 @@ void Timer::Reset() {
  * Just set the running flag to true indicating that all time requests should be
  * relative to the system clock.
  */
-void Timer::Start() {
+void frc::Timer::Start() {
   std::lock_guard<hal::priority_mutex> sync(m_mutex);
   if (!m_running) {
     m_startTime = GetFPGATimestamp();
@@ -143,7 +142,7 @@ void Timer::Start() {
  * subsequent time requests to be read from the accumulated time rather than
  * looking at the system clock.
  */
-void Timer::Stop() {
+void frc::Timer::Stop() {
   double temp = Get();
 
   std::lock_guard<hal::priority_mutex> sync(m_mutex);
@@ -161,7 +160,7 @@ void Timer::Stop() {
  * @param period The period to check for (in seconds).
  * @return If the period has passed.
  */
-bool Timer::HasPeriodPassed(double period) {
+bool frc::Timer::HasPeriodPassed(double period) {
   if (Get() > period) {
     std::lock_guard<hal::priority_mutex> sync(m_mutex);
     // Advance the start time by the period.
@@ -180,7 +179,7 @@ bool Timer::HasPeriodPassed(double period) {
  *
  * @return Robot running time in seconds.
  */
-double Timer::GetFPGATimestamp() {
+double frc::Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
   // Call the helper GetFPGATime() in Utility.cpp
   return wpilib::internal::simTime;
@@ -189,4 +188,4 @@ double Timer::GetFPGATimestamp() {
 /*
  * Not in a match.
  */
-double Timer::GetMatchTime() { return Timer::GetFPGATimestamp(); }
+double frc::Timer::GetMatchTime() { return frc::Timer::GetFPGATimestamp(); }

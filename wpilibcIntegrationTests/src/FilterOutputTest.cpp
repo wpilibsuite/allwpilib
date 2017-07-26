@@ -17,8 +17,6 @@
 #include "TestBench.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 enum FilterOutputTestType { TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS, TEST_MOVAVG };
 
 std::ostream& operator<<(std::ostream& os, const FilterOutputTestType& type) {
@@ -37,11 +35,11 @@ std::ostream& operator<<(std::ostream& os, const FilterOutputTestType& type) {
   return os;
 }
 
-class DataWrapper : public PIDSource {
+class DataWrapper : public frc::PIDSource {
  public:
   explicit DataWrapper(double (*dataFunc)(double)) { m_dataFunc = dataFunc; }
 
-  virtual void SetPIDSourceType(PIDSourceType pidSource) {}
+  virtual void SetPIDSourceType(frc::PIDSourceType pidSource) {}
 
   virtual double PIDGet() {
     m_count += TestBench::kFilterStep;
@@ -62,7 +60,7 @@ class DataWrapper : public PIDSource {
  */
 class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
  protected:
-  std::unique_ptr<PIDSource> m_filter;
+  std::unique_ptr<frc::PIDSource> m_filter;
   std::shared_ptr<DataWrapper> m_data;
   double m_expectedOutput = 0.0;
 
@@ -75,8 +73,8 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
 
     switch (GetParam()) {
       case TEST_SINGLE_POLE_IIR: {
-        m_filter = std::make_unique<LinearDigitalFilter>(
-            LinearDigitalFilter::SinglePoleIIR(
+        m_filter = std::make_unique<frc::LinearDigitalFilter>(
+            frc::LinearDigitalFilter::SinglePoleIIR(
                 m_data, TestBench::kSinglePoleIIRTimeConstant,
                 TestBench::kFilterStep));
         m_expectedOutput = TestBench::kSinglePoleIIRExpectedOutput;
@@ -84,17 +82,18 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
       }
 
       case TEST_HIGH_PASS: {
-        m_filter =
-            std::make_unique<LinearDigitalFilter>(LinearDigitalFilter::HighPass(
-                m_data, TestBench::kHighPassTimeConstant,
-                TestBench::kFilterStep));
+        m_filter = std::make_unique<frc::LinearDigitalFilter>(
+            frc::LinearDigitalFilter::HighPass(m_data,
+                                               TestBench::kHighPassTimeConstant,
+                                               TestBench::kFilterStep));
         m_expectedOutput = TestBench::kHighPassExpectedOutput;
         break;
       }
 
       case TEST_MOVAVG: {
-        m_filter = std::make_unique<LinearDigitalFilter>(
-            LinearDigitalFilter::MovingAverage(m_data, TestBench::kMovAvgTaps));
+        m_filter = std::make_unique<frc::LinearDigitalFilter>(
+            frc::LinearDigitalFilter::MovingAverage(m_data,
+                                                    TestBench::kMovAvgTaps));
         m_expectedOutput = TestBench::kMovAvgExpectedOutput;
         break;
       }

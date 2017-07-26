@@ -22,8 +22,8 @@ class InterruptableSensorBase : public SensorBase {
     kBoth = 0x101,
   };
 
-  InterruptableSensorBase();
   virtual ~InterruptableSensorBase() = default;
+
   virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
   virtual void RequestInterrupts(

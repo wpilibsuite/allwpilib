@@ -7,15 +7,13 @@
 
 #include "SafePWM.h"
 
-using namespace frc;
-
 /**
  * Constructor for a SafePWM object taking a channel number.
  *
  * @param channel The PWM channel number 0-9 are on-board, 10-19 are on the MXP
  *                port
  */
-SafePWM::SafePWM(int channel) : PWM(channel) {
+frc::SafePWM::SafePWM(int channel) : PWM(channel) {
   m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
   m_safetyHelper->SetSafetyEnabled(false);
 }
@@ -25,7 +23,7 @@ SafePWM::SafePWM(int channel) : PWM(channel) {
  *
  * @param timeout The timeout (in seconds) for this motor object
  */
-void SafePWM::SetExpiration(double timeout) {
+void frc::SafePWM::SetExpiration(double timeout) {
   m_safetyHelper->SetExpiration(timeout);
 }
 
@@ -34,7 +32,7 @@ void SafePWM::SetExpiration(double timeout) {
  *
  * @returns The expiration time value.
  */
-double SafePWM::GetExpiration() const {
+double frc::SafePWM::GetExpiration() const {
   return m_safetyHelper->GetExpiration();
 }
 
@@ -44,7 +42,7 @@ double SafePWM::GetExpiration() const {
  * @return a bool value that is true if the motor has NOT timed out and should
  *         still be running.
  */
-bool SafePWM::IsAlive() const { return m_safetyHelper->IsAlive(); }
+bool frc::SafePWM::IsAlive() const { return m_safetyHelper->IsAlive(); }
 
 /**
  * Stop the motor associated with this PWM object.
@@ -52,7 +50,7 @@ bool SafePWM::IsAlive() const { return m_safetyHelper->IsAlive(); }
  * This is called by the MotorSafetyHelper object when it has a timeout for this
  * PWM and needs to stop it from running.
  */
-void SafePWM::StopMotor() { SetDisabled(); }
+void frc::SafePWM::StopMotor() { SetDisabled(); }
 
 /**
  * Enable/disable motor safety for this device.
@@ -61,7 +59,7 @@ void SafePWM::StopMotor() { SetDisabled(); }
  *
  * @param enabled True if motor safety is enforced for this object
  */
-void SafePWM::SetSafetyEnabled(bool enabled) {
+void frc::SafePWM::SetSafetyEnabled(bool enabled) {
   m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
@@ -70,11 +68,11 @@ void SafePWM::SetSafetyEnabled(bool enabled) {
  *
  * @returns True if motor safety is enforced for this object
  */
-bool SafePWM::IsSafetyEnabled() const {
+bool frc::SafePWM::IsSafetyEnabled() const {
   return m_safetyHelper->IsSafetyEnabled();
 }
 
-void SafePWM::GetDescription(llvm::raw_ostream& desc) const {
+void frc::SafePWM::GetDescription(llvm::raw_ostream& desc) const {
   desc << "PWM " << GetChannel();
 }
 
@@ -86,7 +84,7 @@ void SafePWM::GetDescription(llvm::raw_ostream& desc) const {
  *
  * @param speed Value to pass to the PWM class
  */
-void SafePWM::SetSpeed(double speed) {
+void frc::SafePWM::SetSpeed(double speed) {
   PWM::SetSpeed(speed);
   m_safetyHelper->Feed();
 }

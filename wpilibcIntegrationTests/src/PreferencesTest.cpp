@@ -14,8 +14,6 @@
 #include "gtest/gtest.h"
 #include "ntcore.h"
 
-using namespace frc;
-
 static const char* kFileName = "networktables.ini";
 static const double kSaveTime = 1.2;
 
@@ -44,7 +42,7 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
   preferencesFile.close();
   NetworkTable::Initialize();
 
-  Preferences* preferences = Preferences::GetInstance();
+  frc::Preferences* preferences = frc::Preferences::GetInstance();
   EXPECT_EQ("Hello, preferences file",
             preferences->GetString("testFileGetString"));
   EXPECT_EQ(1, preferences->GetInt("testFileGetInt"));
@@ -61,6 +59,7 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
 TEST(PreferencesTest, WritePreferencesToFile) {
   NetworkTable::Shutdown();
   NetworkTable::GlobalDeleteAll();
+
   // persistent keys don't get deleted normally, so make remaining keys
   // non-persistent and delete them too
   for (const auto& info : nt::GetEntryInfo("", 0)) {
@@ -68,8 +67,9 @@ TEST(PreferencesTest, WritePreferencesToFile) {
   }
   NetworkTable::GlobalDeleteAll();
   std::remove(kFileName);
+
   NetworkTable::Initialize();
-  Preferences* preferences = Preferences::GetInstance();
+  frc::Preferences* preferences = frc::Preferences::GetInstance();
   preferences->PutString("testFilePutString", "Hello, preferences file");
   preferences->PutInt("testFilePutInt", 1);
   preferences->PutDouble("testFilePutDouble", 0.5);
@@ -77,7 +77,7 @@ TEST(PreferencesTest, WritePreferencesToFile) {
   preferences->PutBoolean("testFilePutBoolean", true);
   preferences->PutLong("testFilePutLong", 1000000000000000000ll);
 
-  Wait(kSaveTime);
+  frc::Wait(kSaveTime);
 
   static char const* kExpectedFileContents[] = {
       "[NetworkTables Storage 3.0]",

@@ -12,20 +12,18 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const double kDelayTime = 0.01;
 
 class RelayTest : public testing::Test {
  protected:
-  Relay* m_relay;
-  DigitalInput* m_forward;
-  DigitalInput* m_reverse;
+  frc::Relay* m_relay;
+  frc::DigitalInput* m_forward;
+  frc::DigitalInput* m_reverse;
 
   void SetUp() override {
-    m_relay = new Relay(TestBench::kRelayChannel);
-    m_forward = new DigitalInput(TestBench::kFakeRelayForward);
-    m_reverse = new DigitalInput(TestBench::kFakeRelayReverse);
+    m_relay = new frc::Relay(TestBench::kRelayChannel);
+    m_forward = new frc::DigitalInput(TestBench::kFakeRelayForward);
+    m_reverse = new frc::DigitalInput(TestBench::kFakeRelayReverse);
   }
 
   void TearDown() override {
@@ -34,7 +32,7 @@ class RelayTest : public testing::Test {
     delete m_reverse;
   }
 
-  void Reset() { m_relay->Set(Relay::kOff); }
+  void Reset() { m_relay->Set(frc::Relay::kOff); }
 };
 
 /**
@@ -44,50 +42,50 @@ TEST_F(RelayTest, Relay) {
   Reset();
 
   // set the relay to forward
-  m_relay->Set(Relay::kForward);
-  Wait(kDelayTime);
+  m_relay->Set(frc::Relay::kForward);
+  frc::Wait(kDelayTime);
   EXPECT_TRUE(m_forward->Get()) << "Relay did not set forward";
   EXPECT_FALSE(m_reverse->Get()) << "Relay did not set forward";
-  EXPECT_EQ(m_relay->Get(), Relay::kForward);
+  EXPECT_EQ(m_relay->Get(), frc::Relay::kForward);
 
   // set the relay to reverse
-  m_relay->Set(Relay::kReverse);
-  Wait(kDelayTime);
+  m_relay->Set(frc::Relay::kReverse);
+  frc::Wait(kDelayTime);
   EXPECT_TRUE(m_reverse->Get()) << "Relay did not set reverse";
   EXPECT_FALSE(m_forward->Get()) << "Relay did not set reverse";
-  EXPECT_EQ(m_relay->Get(), Relay::kReverse);
+  EXPECT_EQ(m_relay->Get(), frc::Relay::kReverse);
 
   // set the relay to off
-  m_relay->Set(Relay::kOff);
-  Wait(kDelayTime);
+  m_relay->Set(frc::Relay::kOff);
+  frc::Wait(kDelayTime);
   EXPECT_FALSE(m_forward->Get()) << "Relay did not set off";
   EXPECT_FALSE(m_reverse->Get()) << "Relay did not set off";
-  EXPECT_EQ(m_relay->Get(), Relay::kOff);
+  EXPECT_EQ(m_relay->Get(), frc::Relay::kOff);
 
   // set the relay to on
-  m_relay->Set(Relay::kOn);
-  Wait(kDelayTime);
+  m_relay->Set(frc::Relay::kOn);
+  frc::Wait(kDelayTime);
   EXPECT_TRUE(m_forward->Get()) << "Relay did not set on";
   EXPECT_TRUE(m_reverse->Get()) << "Relay did not set on";
-  EXPECT_EQ(m_relay->Get(), Relay::kOn);
+  EXPECT_EQ(m_relay->Get(), frc::Relay::kOn);
 
   // test forward direction
   delete m_relay;
-  m_relay = new Relay(TestBench::kRelayChannel, Relay::kForwardOnly);
+  m_relay = new frc::Relay(TestBench::kRelayChannel, frc::Relay::kForwardOnly);
 
-  m_relay->Set(Relay::kOn);
-  Wait(kDelayTime);
+  m_relay->Set(frc::Relay::kOn);
+  frc::Wait(kDelayTime);
   EXPECT_TRUE(m_forward->Get()) << "Relay did not set forward";
   EXPECT_FALSE(m_reverse->Get()) << "Relay did not set forward";
-  EXPECT_EQ(m_relay->Get(), Relay::kOn);
+  EXPECT_EQ(m_relay->Get(), frc::Relay::kOn);
 
   // test reverse direction
   delete m_relay;
-  m_relay = new Relay(TestBench::kRelayChannel, Relay::kReverseOnly);
+  m_relay = new frc::Relay(TestBench::kRelayChannel, frc::Relay::kReverseOnly);
 
-  m_relay->Set(Relay::kOn);
-  Wait(kDelayTime);
+  m_relay->Set(frc::Relay::kOn);
+  frc::Wait(kDelayTime);
   EXPECT_FALSE(m_forward->Get()) << "Relay did not set reverse";
   EXPECT_TRUE(m_reverse->Get()) << "Relay did not set reverse";
-  EXPECT_EQ(m_relay->Get(), Relay::kOn);
+  EXPECT_EQ(m_relay->Get(), frc::Relay::kOn);
 }

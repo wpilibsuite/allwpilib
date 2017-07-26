@@ -18,9 +18,6 @@
 #include "llvm/raw_ostream.h"
 #include "support/jni_util.h"
 
-using namespace frc;
-using namespace wpi::java;
-
 // set the logging level
 // TLogLevel canJNILogLevel = logDEBUG;
 TLogLevel canJNILogLevel = logERROR;
@@ -45,7 +42,7 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
   CANJNI_LOG(logDEBUG)
       << "Calling CANJNI FRCNetCommCANSessionMuxSendMessage";
 
-  JByteArrayRef dataArray{env, data};
+  wpi::java::JByteArrayRef dataArray{env, data};
 
   const uint8_t *dataBuffer = reinterpret_cast<const uint8_t*>(dataArray.array().data());
   uint8_t dataSize = dataArray.array().size();
@@ -74,7 +71,7 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
       messageID, dataBuffer, dataSize, periodMs, &status);
 
   CANJNI_LOG(logDEBUG) << "Status: " << status;
-  CheckCANStatus(env, status, messageID);
+  frc::CheckCANStatus(env, status, messageID);
 #else
   // Noop on other platforms
 #endif
@@ -125,9 +122,10 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   CANJNI_LOG(logDEBUG) << "Timestamp: " << *timeStampPtr;
   CANJNI_LOG(logDEBUG) << "Status: " << status;
 
-  if (!CheckCANStatus(env, status, *messageIDPtr)) return nullptr;
-  return MakeJByteArray(env, llvm::StringRef{reinterpret_cast<const char*>(buffer), 
-                        static_cast<size_t>(dataSize)});
+  if (!frc::CheckCANStatus(env, status, *messageIDPtr)) return nullptr;
+  return wpi::java::MakeJByteArray(env,
+    llvm::StringRef{reinterpret_cast<const char*>(buffer),
+                    static_cast<size_t>(dataSize)});
 #else
   // Noop on other platforms. Return nullptr
   return nullptr;

@@ -17,8 +17,6 @@
 #include "HAL/Ports.h"
 #include "HAL/handles/HandlesInternal.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel dioJNILogLevel = logWARNING;
 
@@ -45,8 +43,8 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_initializeDIOPort(
   auto dio = HAL_InitializeDIOPort((HAL_PortHandle)id, (uint8_t)input, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "DIO Handle = " << dio;
-  CheckStatusRange(env, status, 0, HAL_GetNumDigitalChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  frc::CheckStatusRange(env, status, 0, HAL_GetNumDigitalChannels(),
+                        hal::getPortHandleChannel((HAL_PortHandle)id));
   return (jint)dio;
 }
 
@@ -87,7 +85,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDIO(
   int32_t status = 0;
   HAL_SetDIO((HAL_DigitalHandle)id, value, &status);
   // DIOJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -103,7 +101,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIO(JNIEnv *env, jclass, jint id) {
   jboolean returnValue = HAL_GetDIO((HAL_DigitalHandle)id, &status);
   // DIOJNI_LOG(logDEBUG) << "Status = " << status;
   // DIOJNI_LOG(logDEBUG) << "getDIOResult = " << (jint)returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -121,7 +119,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_getDIODirection(
   jboolean returnValue = HAL_GetDIODirection((HAL_DigitalHandle)id, &status);
   // DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "getDIODirectionResult = " << (jint)returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -138,7 +136,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_pulse(
   int32_t status = 0;
   HAL_Pulse((HAL_DigitalHandle)id, value, &status);
   DIOJNI_LOG(logDEBUG) << "Did it work? Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -154,7 +152,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_isPulsing(JNIEnv *env, jclass, jint id) {
   jboolean returnValue = HAL_IsPulsing((HAL_DigitalHandle)id, &status);
   // DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "isPulsingResult = " << (jint)returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -170,7 +168,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_isAnyPulsing(JNIEnv *env, jclass) {
   jboolean returnValue = HAL_IsAnyPulsing(&status);
   // DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "isAnyPulsingResult = " << (jint)returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -186,7 +184,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTiming(JNIEnv *env, jclass) {
   jshort returnValue = HAL_GetLoopTiming(&status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "LoopTiming = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -203,7 +201,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_allocateDigitalPWM(JNIEnv* env, jclass) {
   auto pwm = HAL_AllocateDigitalPWM(&status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "PWM Handle = " << pwm;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return (jint)pwm;
 }
 
@@ -219,7 +217,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_freeDigitalPWM(JNIEnv* env, jclass, jint i
   int32_t status = 0;
   HAL_FreeDigitalPWM((HAL_DigitalPWMHandle)id, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -234,7 +232,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDigitalPWMRate(
   int32_t status = 0;
   HAL_SetDigitalPWMRate(value, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -250,7 +248,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDigitalPWMDutyCy
   int32_t status = 0;
   HAL_SetDigitalPWMDutyCycle((HAL_DigitalPWMHandle)id, value, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -267,7 +265,7 @@ Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDigitalPWMOutputChannel(
   int32_t status = 0;
   HAL_SetDigitalPWMOutputChannel((HAL_DigitalPWMHandle)id, (uint32_t)value, &status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 }  // extern "C"

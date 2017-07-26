@@ -15,8 +15,6 @@
 #include "PIDOutput.h"
 #include "PIDSource.h"
 
-using namespace frc;
-
 static const std::string kP = "p";
 static const std::string kI = "i";
 static const std::string kD = "d";
@@ -36,8 +34,9 @@ static const std::string kEnabled = "enabled";
  *               effects calculations of the integral and differental terms.
  *               The default is 50ms.
  */
-PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource* source,
-                             PIDOutput* output, double period)
+frc::PIDController::PIDController(double Kp, double Ki, double Kd,
+                                  PIDSource* source, PIDOutput* output,
+                                  double period)
     : PIDController(Kp, Ki, Kd, 0.0, source, output, period) {}
 
 /**
@@ -52,10 +51,11 @@ PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource* source,
  *               effects calculations of the integral and differental terms.
  *               The default is 50ms.
  */
-PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
-                             PIDSource* source, PIDOutput* output,
-                             double period) {
-  m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
+frc::PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
+                                  PIDSource* source, PIDOutput* output,
+                                  double period) {
+  m_controlLoop =
+      std::make_unique<Notifier>(&frc::PIDController::Calculate, this);
 
   m_P = Kp;
   m_I = Ki;
@@ -74,7 +74,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
 }
 
-PIDController::~PIDController() {
+frc::PIDController::~PIDController() {
   // forcefully stopping the notifier so the callback can successfully run.
   m_controlLoop->Stop();
   if (m_table != nullptr) m_table->RemoveTableListener(this);
@@ -84,7 +84,7 @@ PIDController::~PIDController() {
  * Read the input, calculate the output accordingly, and write to the output.
  * This should only be called by the Notifier.
  */
-void PIDController::Calculate() {
+void frc::PIDController::Calculate() {
   bool enabled;
   PIDSource* pidInput;
   PIDOutput* pidOutput;
@@ -175,7 +175,7 @@ void PIDController::Calculate() {
  * output measured in setpoint units per this controller's update period (see
  * the default period in this class's constructor).
  */
-double PIDController::CalculateFeedForward() {
+double frc::PIDController::CalculateFeedForward() {
   if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
     return m_F * GetSetpoint();
   } else {
@@ -195,7 +195,7 @@ double PIDController::CalculateFeedForward() {
  * @param i Integral coefficient
  * @param d Differential coefficient
  */
-void PIDController::SetPID(double p, double i, double d) {
+void frc::PIDController::SetPID(double p, double i, double d) {
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
     m_P = p;
@@ -220,7 +220,7 @@ void PIDController::SetPID(double p, double i, double d) {
  * @param d Differential coefficient
  * @param f Feed forward coefficient
  */
-void PIDController::SetPID(double p, double i, double d, double f) {
+void frc::PIDController::SetPID(double p, double i, double d, double f) {
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
     m_P = p;
@@ -242,7 +242,7 @@ void PIDController::SetPID(double p, double i, double d, double f) {
  *
  * @return proportional coefficient
  */
-double PIDController::GetP() const {
+double frc::PIDController::GetP() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   return m_P;
 }
@@ -252,7 +252,7 @@ double PIDController::GetP() const {
  *
  * @return integral coefficient
  */
-double PIDController::GetI() const {
+double frc::PIDController::GetI() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   return m_I;
 }
@@ -262,7 +262,7 @@ double PIDController::GetI() const {
  *
  * @return differential coefficient
  */
-double PIDController::GetD() const {
+double frc::PIDController::GetD() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   return m_D;
 }
@@ -272,7 +272,7 @@ double PIDController::GetD() const {
  *
  * @return Feed forward coefficient
  */
-double PIDController::GetF() const {
+double frc::PIDController::GetF() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   return m_F;
 }
@@ -284,7 +284,7 @@ double PIDController::GetF() const {
  *
  * @return the latest calculated output
  */
-double PIDController::Get() const {
+double frc::PIDController::Get() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   return m_result;
 }
@@ -298,7 +298,7 @@ double PIDController::Get() const {
  *
  * @param continuous true turns on continuous, false turns off continuous
  */
-void PIDController::SetContinuous(bool continuous) {
+void frc::PIDController::SetContinuous(bool continuous) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   m_continuous = continuous;
 }
@@ -309,7 +309,8 @@ void PIDController::SetContinuous(bool continuous) {
  * @param minimumInput the minimum value expected from the input
  * @param maximumInput the maximum value expected from the output
  */
-void PIDController::SetInputRange(double minimumInput, double maximumInput) {
+void frc::PIDController::SetInputRange(double minimumInput,
+                                       double maximumInput) {
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
     m_minimumInput = minimumInput;
@@ -325,7 +326,8 @@ void PIDController::SetInputRange(double minimumInput, double maximumInput) {
  * @param minimumOutput the minimum value to write to the output
  * @param maximumOutput the maximum value to write to the output
  */
-void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
+void frc::PIDController::SetOutputRange(double minimumOutput,
+                                        double maximumOutput) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   m_minimumOutput = minimumOutput;
   m_maximumOutput = maximumOutput;
@@ -338,7 +340,7 @@ void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
  *
  * @param setpoint the desired setpoint
  */
-void PIDController::SetSetpoint(double setpoint) {
+void frc::PIDController::SetSetpoint(double setpoint) {
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
 
@@ -368,7 +370,7 @@ void PIDController::SetSetpoint(double setpoint) {
  *
  * @return the current setpoint
  */
-double PIDController::GetSetpoint() const {
+double frc::PIDController::GetSetpoint() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   return m_setpoint;
 }
@@ -378,7 +380,7 @@ double PIDController::GetSetpoint() const {
  *
  * @return the change in setpoint over time
  */
-double PIDController::GetDeltaSetpoint() const {
+double frc::PIDController::GetDeltaSetpoint() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
 }
@@ -388,7 +390,7 @@ double PIDController::GetDeltaSetpoint() const {
  *
  * @return the current error
  */
-double PIDController::GetError() const {
+double frc::PIDController::GetError() const {
   double setpoint = GetSetpoint();
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
@@ -399,7 +401,7 @@ double PIDController::GetError() const {
 /**
  * Sets what type of input the PID controller will use.
  */
-void PIDController::SetPIDSourceType(PIDSourceType pidSource) {
+void frc::PIDController::SetPIDSourceType(PIDSourceType pidSource) {
   m_pidInput->SetPIDSourceType(pidSource);
 }
 /**
@@ -407,7 +409,7 @@ void PIDController::SetPIDSourceType(PIDSourceType pidSource) {
  *
  * @return the PID controller input type
  */
-PIDSourceType PIDController::GetPIDSourceType() const {
+frc::PIDSourceType frc::PIDController::GetPIDSourceType() const {
   return m_pidInput->GetPIDSourceType();
 }
 
@@ -419,7 +421,7 @@ PIDSourceType PIDController::GetPIDSourceType() const {
  *
  * @return the average error
  */
-double PIDController::GetAvgError() const {
+double frc::PIDController::GetAvgError() const {
   double avgError = 0;
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
@@ -435,7 +437,7 @@ double PIDController::GetAvgError() const {
  *
  * @param percentage error which is tolerable
  */
-void PIDController::SetTolerance(double percent) {
+void frc::PIDController::SetTolerance(double percent) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   m_toleranceType = kPercentTolerance;
   m_tolerance = percent;
@@ -447,7 +449,7 @@ void PIDController::SetTolerance(double percent) {
  *
  * @param percentage error which is tolerable
  */
-void PIDController::SetAbsoluteTolerance(double absTolerance) {
+void frc::PIDController::SetAbsoluteTolerance(double absTolerance) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   m_toleranceType = kAbsoluteTolerance;
   m_tolerance = absTolerance;
@@ -459,7 +461,7 @@ void PIDController::SetAbsoluteTolerance(double absTolerance) {
  *
  * @param percentage error which is tolerable
  */
-void PIDController::SetPercentTolerance(double percent) {
+void frc::PIDController::SetPercentTolerance(double percent) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   m_toleranceType = kPercentTolerance;
   m_tolerance = percent;
@@ -475,7 +477,7 @@ void PIDController::SetPercentTolerance(double percent) {
  *
  * @param bufLength Number of previous cycles to average. Defaults to 1.
  */
-void PIDController::SetToleranceBuffer(int bufLength) {
+void frc::PIDController::SetToleranceBuffer(int bufLength) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   m_bufLength = bufLength;
 
@@ -497,7 +499,7 @@ void PIDController::SetToleranceBuffer(int bufLength) {
  *
  * This will return false until at least one input value has been computed.
  */
-bool PIDController::OnTarget() const {
+bool frc::PIDController::OnTarget() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   if (m_buf.size() == 0) return false;
   double error = GetAvgError();
@@ -519,7 +521,7 @@ bool PIDController::OnTarget() const {
 /**
  * Begin running the PIDController.
  */
-void PIDController::Enable() {
+void frc::PIDController::Enable() {
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
     m_enabled = true;
@@ -533,7 +535,7 @@ void PIDController::Enable() {
 /**
  * Stop running the PIDController, this sets the output to zero before stopping.
  */
-void PIDController::Disable() {
+void frc::PIDController::Disable() {
   {
     std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
     m_pidOutput->PIDWrite(0);
@@ -548,7 +550,7 @@ void PIDController::Disable() {
 /**
  * Return true if PIDController is enabled.
  */
-bool PIDController::IsEnabled() const {
+bool frc::PIDController::IsEnabled() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
   return m_enabled;
 }
@@ -556,7 +558,7 @@ bool PIDController::IsEnabled() const {
 /**
  * Reset the previous error, the integral term, and disable the controller.
  */
-void PIDController::Reset() {
+void frc::PIDController::Reset() {
   Disable();
 
   std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
@@ -565,11 +567,11 @@ void PIDController::Reset() {
   m_result = 0;
 }
 
-std::string PIDController::GetSmartDashboardType() const {
+std::string frc::PIDController::GetSmartDashboardType() const {
   return "PIDController";
 }
 
-void PIDController::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::PIDController::InitTable(std::shared_ptr<ITable> subtable) {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
   m_table = subtable;
   if (m_table != nullptr) {
@@ -590,7 +592,7 @@ void PIDController::InitTable(std::shared_ptr<ITable> subtable) {
  * @param error The current error of the PID controller.
  * @return Error for continuous inputs.
  */
-double PIDController::GetContinuousError(double error) const {
+double frc::PIDController::GetContinuousError(double error) const {
   if (m_continuous &&
       std::fabs(error) > (m_maximumInput - m_minimumInput) / 2) {
     if (error > 0) {
@@ -603,10 +605,11 @@ double PIDController::GetContinuousError(double error) const {
   return error;
 }
 
-std::shared_ptr<ITable> PIDController::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::PIDController::GetTable() const { return m_table; }
 
-void PIDController::ValueChanged(ITable* source, llvm::StringRef key,
-                                 std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::PIDController::ValueChanged(ITable* source, llvm::StringRef key,
+                                      std::shared_ptr<nt::Value> value,
+                                      bool isNew) {
   if (key == kP || key == kI || key == kD || key == kF) {
     if (m_P != m_table->GetNumber(kP, 0.0) ||
         m_I != m_table->GetNumber(kI, 0.0) ||
@@ -628,8 +631,8 @@ void PIDController::ValueChanged(ITable* source, llvm::StringRef key,
   }
 }
 
-void PIDController::UpdateTable() {}
+void frc::PIDController::UpdateTable() {}
 
-void PIDController::StartLiveWindowMode() { Disable(); }
+void frc::PIDController::StartLiveWindowMode() { Disable(); }
 
-void PIDController::StopLiveWindowMode() {}
+void frc::PIDController::StopLiveWindowMode() {}

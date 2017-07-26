@@ -13,19 +13,18 @@
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
 
-using namespace hal;
-
 namespace {
 struct Encoder {
-  std::unique_ptr<tEncoder> encoder;
+  std::unique_ptr<hal::tEncoder> encoder;
   uint8_t index;
 };
 }
 
 static const double DECODING_SCALING_FACTOR = 0.25;
 
-static LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder, kNumEncoders,
-                             HAL_HandleEnum::FPGAEncoder>
+static hal::LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder,
+                                  hal::kNumEncoders,
+                                  hal::HAL_HandleEnum::FPGAEncoder>
     fpgaEncoderHandles;
 
 extern "C" {
@@ -36,15 +35,15 @@ HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
   bool routingAnalogTriggerA = false;
   uint8_t routingChannelA = 0;
   uint8_t routingModuleA = 0;
-  bool successA = remapDigitalSource(digitalSourceHandleA, analogTriggerTypeA,
-                                     routingChannelA, routingModuleA,
-                                     routingAnalogTriggerA);
+  bool successA = hal::remapDigitalSource(
+      digitalSourceHandleA, analogTriggerTypeA, routingChannelA, routingModuleA,
+      routingAnalogTriggerA);
   bool routingAnalogTriggerB = false;
   uint8_t routingChannelB = 0;
   uint8_t routingModuleB = 0;
-  bool successB = remapDigitalSource(digitalSourceHandleB, analogTriggerTypeB,
-                                     routingChannelB, routingModuleB,
-                                     routingAnalogTriggerB);
+  bool successB = hal::remapDigitalSource(
+      digitalSourceHandleB, analogTriggerTypeB, routingChannelB, routingModuleB,
+      routingAnalogTriggerB);
 
   if (!successA || !successB) {
     *status = HAL_HANDLE_ERROR;
@@ -63,10 +62,10 @@ HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
     return HAL_kInvalidHandle;
   }
 
-  encoder->index = static_cast<uint8_t>(getHandleIndex(handle));
+  encoder->index = static_cast<uint8_t>(hal::getHandleIndex(handle));
   *index = encoder->index;
   // TODO: if (index == ~0ul) { CloneError(quadEncoders); return; }
-  encoder->encoder.reset(tEncoder::create(encoder->index, status));
+  encoder->encoder.reset(hal::tEncoder::create(encoder->index, status));
   encoder->encoder->writeConfig_ASource_Module(routingModuleA, status);
   encoder->encoder->writeConfig_ASource_Channel(routingChannelA, status);
   encoder->encoder->writeConfig_ASource_AnalogTrigger(routingAnalogTriggerA,
@@ -134,7 +133,8 @@ double HAL_GetFPGAEncoderPeriod(HAL_FPGAEncoderHandle fpgaEncoderHandle,
     *status = HAL_HANDLE_ERROR;
     return 0.0;
   }
-  tEncoder::tTimerOutput output = encoder->encoder->readTimerOutput(status);
+  hal::tEncoder::tTimerOutput output =
+      encoder->encoder->readTimerOutput(status);
   double value;
   if (output.Stalled) {
     // Return infinity
@@ -278,9 +278,9 @@ void HAL_SetFPGAEncoderIndexSource(HAL_FPGAEncoderHandle fpgaEncoderHandle,
   bool routingAnalogTrigger = false;
   uint8_t routingChannel = 0;
   uint8_t routingModule = 0;
-  bool success =
-      remapDigitalSource(digitalSourceHandle, analogTriggerType, routingChannel,
-                         routingModule, routingAnalogTrigger);
+  bool success = hal::remapDigitalSource(digitalSourceHandle, analogTriggerType,
+                                         routingChannel, routingModule,
+                                         routingAnalogTrigger);
   if (!success) {
     *status = HAL_HANDLE_ERROR;
     return;

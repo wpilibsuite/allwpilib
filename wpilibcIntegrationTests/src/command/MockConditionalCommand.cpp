@@ -7,8 +7,6 @@
 
 #include "command/MockConditionalCommand.h"
 
-using namespace frc;
-
 MockConditionalCommand::MockConditionalCommand(MockCommand* onTrue,
                                                MockCommand* onFalse)
     : ConditionalCommand(onTrue, onFalse) {}

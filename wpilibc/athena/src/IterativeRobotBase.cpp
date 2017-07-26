@@ -13,8 +13,6 @@
 #include "LiveWindow/LiveWindow.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Robot-wide initialization code should go here.
  *
@@ -27,7 +25,7 @@ using namespace frc;
  * waits for enable will cause the robot to never indicate that the code is
  * ready, causing the robot to be bypassed in a match.
  */
-void IterativeRobotBase::RobotInit() {
+void frc::IterativeRobotBase::RobotInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -38,7 +36,7 @@ void IterativeRobotBase::RobotInit() {
  * called each time
  * the robot enters disabled mode.
  */
-void IterativeRobotBase::DisabledInit() {
+void frc::IterativeRobotBase::DisabledInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -48,7 +46,7 @@ void IterativeRobotBase::DisabledInit() {
  * Users should override this method for initialization code which will be
  * called each time the robot enters autonomous mode.
  */
-void IterativeRobotBase::AutonomousInit() {
+void frc::IterativeRobotBase::AutonomousInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -58,7 +56,7 @@ void IterativeRobotBase::AutonomousInit() {
  * Users should override this method for initialization code which will be
  * called each time the robot enters teleop mode.
  */
-void IterativeRobotBase::TeleopInit() {
+void frc::IterativeRobotBase::TeleopInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -68,7 +66,7 @@ void IterativeRobotBase::TeleopInit() {
  * Users should override this method for initialization code which will be
  * called each time the robot enters test mode.
  */
-void IterativeRobotBase::TestInit() {
+void frc::IterativeRobotBase::TestInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -78,7 +76,7 @@ void IterativeRobotBase::TestInit() {
  * This function is called each time a new packet is received from the driver
  * station.
  */
-void IterativeRobotBase::RobotPeriodic() {
+void frc::IterativeRobotBase::RobotPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -93,7 +91,7 @@ void IterativeRobotBase::RobotPeriodic() {
  * new packet is received from the driver station and the robot is in disabled
  * mode.
  */
-void IterativeRobotBase::DisabledPeriodic() {
+void frc::IterativeRobotBase::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -108,7 +106,7 @@ void IterativeRobotBase::DisabledPeriodic() {
  * new packet is received from the driver station and the robot is in autonomous
  * mode.
  */
-void IterativeRobotBase::AutonomousPeriodic() {
+void frc::IterativeRobotBase::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -123,7 +121,7 @@ void IterativeRobotBase::AutonomousPeriodic() {
  * new packet is received from the driver station and the robot is in teleop
  * mode.
  */
-void IterativeRobotBase::TeleopPeriodic() {
+void frc::IterativeRobotBase::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -137,7 +135,7 @@ void IterativeRobotBase::TeleopPeriodic() {
  * Users should override this method for code which will be called each time a
  * new packet is received from the driver station and the robot is in test mode.
  */
-void IterativeRobotBase::TestPeriodic() {
+void frc::IterativeRobotBase::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -145,14 +143,14 @@ void IterativeRobotBase::TestPeriodic() {
   }
 }
 
-IterativeRobotBase::IterativeRobotBase() {
+frc::IterativeRobotBase::IterativeRobotBase() {
   RobotInit();
 
   // Tell the DS that the robot is ready to be enabled
   HAL_ObserveUserProgramStarting();
 }
 
-void IterativeRobotBase::LoopFunc() {
+void frc::IterativeRobotBase::LoopFunc() {
   // Call the appropriate function depending upon the current robot mode
   if (IsDisabled()) {
     // call DisabledInit() if we are now just entering disabled mode from

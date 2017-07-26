@@ -10,16 +10,14 @@
 #include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
-using namespace frc;
-
-SimFloatInput::SimFloatInput(std::string topic) {
+frc::SimFloatInput::SimFloatInput(std::string topic) {
   sub = MainNode::Subscribe("~/simulator/" + topic, &SimFloatInput::callback,
                             this);
   llvm::outs() << "Initialized ~/simulator/" + topic << "\n";
 }
 
-double SimFloatInput::Get() { return value; }
+double frc::SimFloatInput::Get() { return value; }
 
-void SimFloatInput::callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
+void frc::SimFloatInput::callback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   value = msg->data();
 }

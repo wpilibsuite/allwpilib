@@ -13,9 +13,7 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
-void Error::Clone(const Error& error) {
+void frc::Error::Clone(const Error& error) {
   m_code = error.m_code;
   m_message = error.m_message;
   m_filename = error.m_filename;
@@ -25,25 +23,25 @@ void Error::Clone(const Error& error) {
   m_timestamp = error.m_timestamp;
 }
 
-Error::Code Error::GetCode() const { return m_code; }
+frc::Error::Code frc::Error::GetCode() const { return m_code; }
 
-std::string Error::GetMessage() const { return m_message; }
+std::string frc::Error::GetMessage() const { return m_message; }
 
-std::string Error::GetFilename() const { return m_filename; }
+std::string frc::Error::GetFilename() const { return m_filename; }
 
-std::string Error::GetFunction() const { return m_function; }
+std::string frc::Error::GetFunction() const { return m_function; }
 
-int Error::GetLineNumber() const { return m_lineNumber; }
+int frc::Error::GetLineNumber() const { return m_lineNumber; }
 
-const ErrorBase* Error::GetOriginatingObject() const {
+const frc::ErrorBase* frc::Error::GetOriginatingObject() const {
   return m_originatingObject;
 }
 
-double Error::GetTimestamp() const { return m_timestamp; }
+double frc::Error::GetTimestamp() const { return m_timestamp; }
 
-void Error::Set(Code code, llvm::StringRef contextMessage,
-                llvm::StringRef filename, llvm::StringRef function,
-                int lineNumber, const ErrorBase* originatingObject) {
+void frc::Error::Set(Code code, llvm::StringRef contextMessage,
+                     llvm::StringRef filename, llvm::StringRef function,
+                     int lineNumber, const ErrorBase* originatingObject) {
   bool report = true;
 
   if (code == m_code && GetTime() - m_timestamp < 1) {
@@ -63,7 +61,7 @@ void Error::Set(Code code, llvm::StringRef contextMessage,
   }
 }
 
-void Error::Report() {
+void frc::Error::Report() {
   llvm::SmallString<128> buf;
   llvm::raw_svector_ostream locStream(buf);
   locStream << m_function << " [";
@@ -83,7 +81,7 @@ void Error::Report() {
                              GetStackTrace(4));
 }
 
-void Error::Clear() {
+void frc::Error::Clear() {
   m_code = 0;
   m_message = "";
   m_filename = "";

@@ -12,6 +12,7 @@
 #include "HAL/HAL.h"
 
 namespace frc {
+
 /**
  * Get the thread priority for the specified thread.
  *
@@ -79,4 +80,5 @@ bool SetCurrentThreadPriority(bool realTime, int priority) {
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
   return ret;
 }
+
 }  // namespace frc

@@ -9,12 +9,10 @@
 
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
-
 /**
  * @param channel The PWM channel that the Victor is attached to.
  */
-Victor::Victor(int channel) : SafePWM(channel) {
+frc::Victor::Victor(int channel) : SafePWM(channel) {
   /* Note that the Victor uses the following bounds for PWM values. These values
    * were determined empirically and optimized for the Victor 888. These values
    * should work reasonably well for Victor 884 controllers as well but if users
@@ -45,23 +43,23 @@ Victor::Victor(int channel) : SafePWM(channel) {
  *
  * @param speed The speed value between -1.0 and 1.0 to set.
  */
-void Victor::Set(double speed) { SetSpeed(speed); }
+void frc::Victor::Set(double speed) { SetSpeed(speed); }
 
 /**
  * Get the recently set value of the PWM.
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-double Victor::Get() const { return GetSpeed(); }
+double frc::Victor::Get() const { return GetSpeed(); }
 
 /**
  * Common interface for disabling a motor.
  */
-void Victor::Disable() { SetRaw(kPwmDisabled); }
+void frc::Victor::Disable() { SetRaw(kPwmDisabled); }
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void Victor::PIDWrite(double output) { Set(output); }
+void frc::Victor::PIDWrite(double output) { Set(output); }

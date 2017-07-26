@@ -12,9 +12,7 @@
 #include "Buttons/ReleasedButtonScheduler.h"
 #include "Buttons/ToggleButtonScheduler.h"
 
-using namespace frc;
-
-bool Trigger::Grab() {
+bool frc::Trigger::Grab() {
   if (Get()) {
     return true;
   } else if (m_table != nullptr) {
@@ -24,38 +22,38 @@ bool Trigger::Grab() {
   }
 }
 
-void Trigger::WhenActive(Command* command) {
+void frc::Trigger::WhenActive(Command* command) {
   auto pbs = new PressedButtonScheduler(Grab(), this, command);
   pbs->Start();
 }
 
-void Trigger::WhileActive(Command* command) {
+void frc::Trigger::WhileActive(Command* command) {
   auto hbs = new HeldButtonScheduler(Grab(), this, command);
   hbs->Start();
 }
 
-void Trigger::WhenInactive(Command* command) {
+void frc::Trigger::WhenInactive(Command* command) {
   auto rbs = new ReleasedButtonScheduler(Grab(), this, command);
   rbs->Start();
 }
 
-void Trigger::CancelWhenActive(Command* command) {
+void frc::Trigger::CancelWhenActive(Command* command) {
   auto cbs = new CancelButtonScheduler(Grab(), this, command);
   cbs->Start();
 }
 
-void Trigger::ToggleWhenActive(Command* command) {
+void frc::Trigger::ToggleWhenActive(Command* command) {
   auto tbs = new ToggleButtonScheduler(Grab(), this, command);
   tbs->Start();
 }
 
-std::string Trigger::GetSmartDashboardType() const { return "Button"; }
+std::string frc::Trigger::GetSmartDashboardType() const { return "Button"; }
 
-void Trigger::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::Trigger::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   if (m_table != nullptr) {
     m_table->PutBoolean("pressed", Get());
   }
 }
 
-std::shared_ptr<ITable> Trigger::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Trigger::GetTable() const { return m_table; }

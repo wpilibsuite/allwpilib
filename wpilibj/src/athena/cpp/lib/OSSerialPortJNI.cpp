@@ -14,8 +14,6 @@
 #include "HAL/OSSerialPort.h"
 #include "HALUtil.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel osserialJNILogLevel = logWARNING;
 
@@ -40,7 +38,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialInitializePort(
   int32_t status = 0;
   HAL_InitializeOSSerialPort(static_cast<HAL_SerialPort>(port), &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatusForceThrow(env, status);
+  frc::CheckStatusForceThrow(env, status);
 }
 
 /*
@@ -56,7 +54,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetBaudRate(
   int32_t status = 0;
   HAL_SetOSSerialBaudRate(static_cast<HAL_SerialPort>(port), rate, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -72,7 +70,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetDataBits(
   int32_t status = 0;
   HAL_SetOSSerialDataBits(static_cast<HAL_SerialPort>(port), bits, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -88,7 +86,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetParity(
   int32_t status = 0;
   HAL_SetOSSerialParity(static_cast<HAL_SerialPort>(port), parity, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -104,7 +102,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetStopBits(
   int32_t status = 0;
   HAL_SetOSSerialStopBits(static_cast<HAL_SerialPort>(port), bits, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -120,7 +118,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetWriteMode(
   int32_t status = 0;
   HAL_SetOSSerialWriteMode(static_cast<HAL_SerialPort>(port), mode, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -136,7 +134,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetFlowControl(
   int32_t status = 0;
   HAL_SetOSSerialFlowControl(static_cast<HAL_SerialPort>(port), flow, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -152,7 +150,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetTimeout(
   int32_t status = 0;
   HAL_SetOSSerialTimeout(static_cast<HAL_SerialPort>(port), timeout, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -168,7 +166,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialEnableTermination(
   int32_t status = 0;
   HAL_EnableOSSerialTermination(static_cast<HAL_SerialPort>(port), terminator, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -183,7 +181,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialDisableTermination(
   int32_t status = 0;
   HAL_DisableOSSerialTermination(static_cast<HAL_SerialPort>(port), &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -199,7 +197,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetReadBufferSize(
   int32_t status = 0;
   HAL_SetOSSerialReadBufferSize(static_cast<HAL_SerialPort>(port), size, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -215,7 +213,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialSetWriteBufferSize(
   int32_t status = 0;
   HAL_SetOSSerialWriteBufferSize(static_cast<HAL_SerialPort>(port), size, &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -230,7 +228,7 @@ Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialGetBytesRecieved(
   int32_t status = 0;
   jint retVal = HAL_GetOSSerialBytesReceived(static_cast<HAL_SerialPort>(port), &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return retVal;
 }
 
@@ -249,7 +247,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialRead
                                  size, &status);
   SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return retVal;
 }
 
@@ -270,7 +268,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialWrit
                                   size, &status);
   SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return retVal;
 }
 
@@ -285,7 +283,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialFlus
   int32_t status = 0;
   HAL_FlushOSSerial(static_cast<HAL_SerialPort>(port), &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -299,7 +297,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialClea
   int32_t status = 0;
   HAL_ClearOSSerial(static_cast<HAL_SerialPort>(port), &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -313,7 +311,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_OSSerialPortJNI_serialClos
   int32_t status = 0;
   HAL_CloseOSSerial(static_cast<HAL_SerialPort>(port), &status);
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 }  // extern "C"

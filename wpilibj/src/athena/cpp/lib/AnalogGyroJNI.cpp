@@ -15,8 +15,6 @@
 #include "HALUtil.h"
 #include "HAL/handles/HandlesInternal.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel analogGyroJNILogLevel = logWARNING;
 
@@ -41,7 +39,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_initializeAn
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << handle;
   // Analog input does range checking, so we don't need to do so.
-  CheckStatusForceThrow(env, status);
+  frc::CheckStatusForceThrow(env, status);
   return (jint) handle;
 }
 
@@ -57,7 +55,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setupAnalogG
   int32_t status = 0;
   HAL_SetupAnalogGyro((HAL_GyroHandle)id, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -84,7 +82,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyr
   int32_t status = 0;
   HAL_SetAnalogGyroParameters((HAL_GyroHandle)id, vPDPS, offset, center, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -100,7 +98,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyr
   int32_t status = 0;
   HAL_SetAnalogGyroVoltsPerDegreePerSecond((HAL_GyroHandle)id, vPDPS, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -115,7 +113,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_resetAnalogG
   int32_t status = 0;
   HAL_ResetAnalogGyro((HAL_GyroHandle)id, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -130,7 +128,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_calibrateAna
   int32_t status = 0;
   HAL_CalibrateAnalogGyro((HAL_GyroHandle)id, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -145,7 +143,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyr
   int32_t status = 0;
   HAL_SetAnalogGyroDeadband((HAL_GyroHandle)id, deadband, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -161,7 +159,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalog
   jdouble value = HAL_GetAnalogGyroAngle((HAL_GyroHandle)id, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGGYROJNI_LOG(logDEBUG) << "Result = " << value;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return value;
 }
 
@@ -178,7 +176,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalog
   jdouble value = HAL_GetAnalogGyroRate((HAL_GyroHandle)id, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGGYROJNI_LOG(logDEBUG) << "Result = " << value;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return value;
 }
 
@@ -195,7 +193,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalog
   jdouble value = HAL_GetAnalogGyroOffset((HAL_GyroHandle)id, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGGYROJNI_LOG(logDEBUG) << "Result = " << value;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return value;
 }
 
@@ -212,7 +210,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyr
   jint value = HAL_GetAnalogGyroCenter((HAL_GyroHandle)id, &status);
   ANALOGGYROJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGGYROJNI_LOG(logDEBUG) << "Result = " << value;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return value;
 }
 

@@ -17,13 +17,11 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
-const int AnalogGyro::kOversampleBits;
-const int AnalogGyro::kAverageBits;
-constexpr double AnalogGyro::kSamplesPerSecond;
-constexpr double AnalogGyro::kCalibrationSampleTime;
-constexpr double AnalogGyro::kDefaultVoltsPerDegreePerSecond;
+const int frc::AnalogGyro::kOversampleBits;
+const int frc::AnalogGyro::kAverageBits;
+constexpr double frc::AnalogGyro::kSamplesPerSecond;
+constexpr double frc::AnalogGyro::kCalibrationSampleTime;
+constexpr double frc::AnalogGyro::kDefaultVoltsPerDegreePerSecond;
 
 /**
  * Gyro constructor using the Analog Input channel number.
@@ -31,7 +29,7 @@ constexpr double AnalogGyro::kDefaultVoltsPerDegreePerSecond;
  * @param channel The analog channel the gyro is connected to. Gyros can only
  *                be used on on-board Analog Inputs 0-1.
  */
-AnalogGyro::AnalogGyro(int channel)
+frc::AnalogGyro::AnalogGyro(int channel)
     : AnalogGyro(std::make_shared<AnalogInput>(channel)) {}
 
 /**
@@ -46,7 +44,7 @@ AnalogGyro::AnalogGyro(int channel)
  * @param channel A pointer to the AnalogInput object that the gyro is
  *                connected to.
  */
-AnalogGyro::AnalogGyro(AnalogInput* channel)
+frc::AnalogGyro::AnalogGyro(AnalogInput* channel)
     : AnalogGyro(
           std::shared_ptr<AnalogInput>(channel, NullDeleter<AnalogInput>())) {}
 
@@ -60,7 +58,7 @@ AnalogGyro::AnalogGyro(AnalogInput* channel)
  * @param channel A pointer to the AnalogInput object that the gyro is
  *                connected to.
  */
-AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
+frc::AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
     : m_analog(channel) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -80,7 +78,7 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
  *                value.
  * @param offset  Preset uncalibrated value to use as the gyro offset.
  */
-AnalogGyro::AnalogGyro(int channel, int center, double offset) {
+frc::AnalogGyro::AnalogGyro(int channel, int center, double offset) {
   m_analog = std::make_shared<AnalogInput>(channel);
   InitGyro();
   int32_t status = 0;
@@ -105,8 +103,8 @@ AnalogGyro::AnalogGyro(int channel, int center, double offset) {
  * @param channel A pointer to the AnalogInput object that the gyro is
  *                connected to.
  */
-AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
-                       double offset)
+frc::AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
+                            double offset)
     : m_analog(channel) {
   if (channel == nullptr) {
     wpi_setWPIError(NullParameter);
@@ -128,7 +126,7 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel, int center,
  * AnalogGyro Destructor
  *
  */
-AnalogGyro::~AnalogGyro() { HAL_FreeAnalogGyro(m_gyroHandle); }
+frc::AnalogGyro::~AnalogGyro() { HAL_FreeAnalogGyro(m_gyroHandle); }
 
 /**
  * Reset the gyro.
@@ -137,7 +135,7 @@ AnalogGyro::~AnalogGyro() { HAL_FreeAnalogGyro(m_gyroHandle); }
  * significant drift in the gyro and it needs to be recalibrated after it has
  * been running.
  */
-void AnalogGyro::Reset() {
+void frc::AnalogGyro::Reset() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_ResetAnalogGyro(m_gyroHandle, &status);
@@ -147,7 +145,7 @@ void AnalogGyro::Reset() {
 /**
  * Initialize the gyro.  Calibration is handled by Calibrate().
  */
-void AnalogGyro::InitGyro() {
+void frc::AnalogGyro::InitGyro() {
   if (StatusIsFatal()) return;
   if (m_gyroHandle == HAL_kInvalidHandle) {
     int32_t status = 0;
@@ -181,7 +179,7 @@ void AnalogGyro::InitGyro() {
                                        this);
 }
 
-void AnalogGyro::Calibrate() {
+void frc::AnalogGyro::Calibrate() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_CalibrateAnalogGyro(m_gyroHandle, &status);
@@ -200,7 +198,7 @@ void AnalogGyro::Calibrate() {
  * @return the current heading of the robot in degrees. This heading is based on
  *         integration of the returned rate from the gyro.
  */
-double AnalogGyro::GetAngle() const {
+double frc::AnalogGyro::GetAngle() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetAnalogGyroAngle(m_gyroHandle, &status);
@@ -215,7 +213,7 @@ double AnalogGyro::GetAngle() const {
  *
  * @return the current rate in degrees per second
  */
-double AnalogGyro::GetRate() const {
+double frc::AnalogGyro::GetRate() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetAnalogGyroRate(m_gyroHandle, &status);
@@ -229,7 +227,7 @@ double AnalogGyro::GetRate() const {
  *
  * @return the current offset value
  */
-double AnalogGyro::GetOffset() const {
+double frc::AnalogGyro::GetOffset() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double value = HAL_GetAnalogGyroOffset(m_gyroHandle, &status);
@@ -243,7 +241,7 @@ double AnalogGyro::GetOffset() const {
  *
  * @return the current center value
  */
-int AnalogGyro::GetCenter() const {
+int frc::AnalogGyro::GetCenter() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetAnalogGyroCenter(m_gyroHandle, &status);
@@ -260,7 +258,7 @@ int AnalogGyro::GetCenter() const {
  *
  * @param voltsPerDegreePerSecond The sensitivity in Volts/degree/second
  */
-void AnalogGyro::SetSensitivity(double voltsPerDegreePerSecond) {
+void frc::AnalogGyro::SetSensitivity(double voltsPerDegreePerSecond) {
   int32_t status = 0;
   HAL_SetAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle,
                                            voltsPerDegreePerSecond, &status);
@@ -276,7 +274,7 @@ void AnalogGyro::SetSensitivity(double voltsPerDegreePerSecond) {
  *
  * @param volts The size of the deadband in volts
  */
-void AnalogGyro::SetDeadband(double volts) {
+void frc::AnalogGyro::SetDeadband(double volts) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogGyroDeadband(m_gyroHandle, volts, &status);

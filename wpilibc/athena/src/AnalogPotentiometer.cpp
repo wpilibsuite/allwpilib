@@ -9,8 +9,6 @@
 
 #include "ControllerPower.h"
 
-using namespace frc;
-
 /**
  * Construct an Analog Potentiometer object from a channel number.
  *
@@ -21,8 +19,8 @@ using namespace frc;
  * @param offset    The angular value (in desired units) representing the
  *                  angular output at 0V.
  */
-AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
-                                         double offset)
+frc::AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
+                                              double offset)
     : m_analog_input(std::make_unique<AnalogInput>(channel)),
       m_fullRange(fullRange),
       m_offset(offset) {}
@@ -37,8 +35,8 @@ AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
  * @param offset    The angular value (in desired units) representing the
  *                  angular output at 0V.
  */
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
-                                         double offset)
+frc::AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input,
+                                              double fullRange, double offset)
     : m_analog_input(input, NullDeleter<AnalogInput>()),
       m_fullRange(fullRange),
       m_offset(offset) {}
@@ -53,8 +51,8 @@ AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double fullRange,
  * @param offset    The angular value (in desired units) representing the
  *                  angular output at 0V.
  */
-AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
-                                         double fullRange, double offset)
+frc::AnalogPotentiometer::AnalogPotentiometer(
+    std::shared_ptr<AnalogInput> input, double fullRange, double offset)
     : m_analog_input(input), m_fullRange(fullRange), m_offset(offset) {}
 
 /**
@@ -63,7 +61,7 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
  * @return The current position of the potentiometer (in the units used for
  *         fullRange and offset).
  */
-double AnalogPotentiometer::Get() const {
+double frc::AnalogPotentiometer::Get() const {
   return (m_analog_input->GetVoltage() / ControllerPower::GetVoltage5V()) *
              m_fullRange +
          m_offset;
@@ -74,29 +72,29 @@ double AnalogPotentiometer::Get() const {
  *
  * @return The current reading.
  */
-double AnalogPotentiometer::PIDGet() { return Get(); }
+double frc::AnalogPotentiometer::PIDGet() { return Get(); }
 
 /**
  * @return the Smart Dashboard Type
  */
-std::string AnalogPotentiometer::GetSmartDashboardType() const {
+std::string frc::AnalogPotentiometer::GetSmartDashboardType() const {
   return "Analog Input";
 }
 
 /**
  * Live Window code, only does anything if live window is activated.
  */
-void AnalogPotentiometer::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::AnalogPotentiometer::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
 
-void AnalogPotentiometer::UpdateTable() {
+void frc::AnalogPotentiometer::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }
 
-std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const {
+std::shared_ptr<ITable> frc::AnalogPotentiometer::GetTable() const {
   return m_table;
 }

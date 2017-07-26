@@ -19,8 +19,6 @@
 #include "llvm/raw_ostream.h"
 #include "simulation/simTime.h"
 
-using namespace frc;
-
 static bool stackTraceEnabled = false;
 static bool suspendOnAssertEnabled = false;
 

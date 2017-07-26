@@ -13,21 +13,20 @@
 #include "WPIErrors.h"
 #include "llvm/StringRef.h"
 
-using namespace frc;
-
 /** The Preferences table name */
 static llvm::StringRef kTableName{"Preferences"};
 
-void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
-                                         std::shared_ptr<nt::Value> value,
-                                         bool isNew) {}
-void Preferences::Listener::ValueChangedEx(ITable* source, llvm::StringRef key,
-                                           std::shared_ptr<nt::Value> value,
-                                           uint32_t flags) {
+void frc::Preferences::Listener::ValueChanged(ITable* source,
+                                              llvm::StringRef key,
+                                              std::shared_ptr<nt::Value> value,
+                                              bool isNew) {}
+void frc::Preferences::Listener::ValueChangedEx(
+    ITable* source, llvm::StringRef key, std::shared_ptr<nt::Value> value,
+    uint32_t flags) {
   source->SetPersistent(key);
 }
 
-Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
+frc::Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
   m_table->AddTableListenerEx(&m_listener, NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
   HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
 }
@@ -37,7 +36,7 @@ Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
  *
  * @return pointer to the {@link Preferences}
  */
-Preferences* Preferences::GetInstance() {
+frc::Preferences* frc::Preferences::GetInstance() {
   static Preferences instance;
   return &instance;
 }
@@ -47,7 +46,9 @@ Preferences* Preferences::GetInstance() {
  *
  * @return a vector of the keys
  */
-std::vector<std::string> Preferences::GetKeys() { return m_table->GetKeys(); }
+std::vector<std::string> frc::Preferences::GetKeys() {
+  return m_table->GetKeys();
+}
 
 /**
  * Returns the string at the given key.  If this table does not have a value
@@ -57,8 +58,8 @@ std::vector<std::string> Preferences::GetKeys() { return m_table->GetKeys(); }
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-std::string Preferences::GetString(llvm::StringRef key,
-                                   llvm::StringRef defaultValue) {
+std::string frc::Preferences::GetString(llvm::StringRef key,
+                                        llvm::StringRef defaultValue) {
   return m_table->GetString(key, defaultValue);
 }
 
@@ -70,7 +71,7 @@ std::string Preferences::GetString(llvm::StringRef key,
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-int Preferences::GetInt(llvm::StringRef key, int defaultValue) {
+int frc::Preferences::GetInt(llvm::StringRef key, int defaultValue) {
   return static_cast<int>(m_table->GetNumber(key, defaultValue));
 }
 
@@ -82,7 +83,7 @@ int Preferences::GetInt(llvm::StringRef key, int defaultValue) {
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-double Preferences::GetDouble(llvm::StringRef key, double defaultValue) {
+double frc::Preferences::GetDouble(llvm::StringRef key, double defaultValue) {
   return m_table->GetNumber(key, defaultValue);
 }
 
@@ -94,7 +95,7 @@ double Preferences::GetDouble(llvm::StringRef key, double defaultValue) {
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-float Preferences::GetFloat(llvm::StringRef key, float defaultValue) {
+float frc::Preferences::GetFloat(llvm::StringRef key, float defaultValue) {
   return m_table->GetNumber(key, defaultValue);
 }
 
@@ -106,7 +107,7 @@ float Preferences::GetFloat(llvm::StringRef key, float defaultValue) {
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-bool Preferences::GetBoolean(llvm::StringRef key, bool defaultValue) {
+bool frc::Preferences::GetBoolean(llvm::StringRef key, bool defaultValue) {
   return m_table->GetBoolean(key, defaultValue);
 }
 
@@ -118,7 +119,7 @@ bool Preferences::GetBoolean(llvm::StringRef key, bool defaultValue) {
  * @param defaultValue the value to return if none exists in the table
  * @return either the value in the table, or the defaultValue
  */
-int64_t Preferences::GetLong(llvm::StringRef key, int64_t defaultValue) {
+int64_t frc::Preferences::GetLong(llvm::StringRef key, int64_t defaultValue) {
   return static_cast<int64_t>(m_table->GetNumber(key, defaultValue));
 }
 
@@ -131,7 +132,7 @@ int64_t Preferences::GetLong(llvm::StringRef key, int64_t defaultValue) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
+void frc::Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
   m_table->PutString(key, value);
   m_table->SetPersistent(key);
 }
@@ -144,7 +145,7 @@ void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutInt(llvm::StringRef key, int value) {
+void frc::Preferences::PutInt(llvm::StringRef key, int value) {
   m_table->PutNumber(key, value);
   m_table->SetPersistent(key);
 }
@@ -157,7 +158,7 @@ void Preferences::PutInt(llvm::StringRef key, int value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutDouble(llvm::StringRef key, double value) {
+void frc::Preferences::PutDouble(llvm::StringRef key, double value) {
   m_table->PutNumber(key, value);
   m_table->SetPersistent(key);
 }
@@ -170,7 +171,7 @@ void Preferences::PutDouble(llvm::StringRef key, double value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutFloat(llvm::StringRef key, float value) {
+void frc::Preferences::PutFloat(llvm::StringRef key, float value) {
   m_table->PutNumber(key, value);
   m_table->SetPersistent(key);
 }
@@ -183,7 +184,7 @@ void Preferences::PutFloat(llvm::StringRef key, float value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutBoolean(llvm::StringRef key, bool value) {
+void frc::Preferences::PutBoolean(llvm::StringRef key, bool value) {
   m_table->PutBoolean(key, value);
   m_table->SetPersistent(key);
 }
@@ -196,7 +197,7 @@ void Preferences::PutBoolean(llvm::StringRef key, bool value) {
  * @param key   the key
  * @param value the value
  */
-void Preferences::PutLong(llvm::StringRef key, int64_t value) {
+void frc::Preferences::PutLong(llvm::StringRef key, int64_t value) {
   m_table->PutNumber(key, value);
   m_table->SetPersistent(key);
 }
@@ -207,7 +208,7 @@ void Preferences::PutLong(llvm::StringRef key, int64_t value) {
  * @param key the key
  * @return if there is a value at the given key
  */
-bool Preferences::ContainsKey(llvm::StringRef key) {
+bool frc::Preferences::ContainsKey(llvm::StringRef key) {
   return m_table->ContainsKey(key);
 }
 
@@ -216,4 +217,4 @@ bool Preferences::ContainsKey(llvm::StringRef key) {
  *
  * @param key the key
  */
-void Preferences::Remove(llvm::StringRef key) { m_table->Delete(key); }
+void frc::Preferences::Remove(llvm::StringRef key) { m_table->Delete(key); }

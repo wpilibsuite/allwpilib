@@ -13,8 +13,6 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
-
 static int kRegWrite = 0x0A;
 static int kRegRead = 0x0B;
 
@@ -37,7 +35,7 @@ static int kPowerCtl_Measure = 0x02;
  *
  * @param range The range (+ or -) that the accelerometer will measure.
  */
-ADXL362::ADXL362(Range range) : ADXL362(SPI::Port::kOnboardCS1, range) {}
+frc::ADXL362::ADXL362(Range range) : ADXL362(SPI::Port::kOnboardCS1, range) {}
 
 /**
  * Constructor.
@@ -45,7 +43,7 @@ ADXL362::ADXL362(Range range) : ADXL362(SPI::Port::kOnboardCS1, range) {}
  * @param port  The SPI port the accelerometer is attached to
  * @param range The range (+ or -) that the accelerometer will measure.
  */
-ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
+frc::ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
   m_spi.SetClockRate(3000000);
   m_spi.SetMSBFirst();
   m_spi.SetSampleDataOnFalling();
@@ -77,7 +75,7 @@ ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
   LiveWindow::GetInstance()->AddSensor("ADXL362", port, this);
 }
 
-void ADXL362::SetRange(Range range) {
+void frc::ADXL362::SetRange(Range range) {
   if (m_gsPerLSB == 0.0) return;
 
   uint8_t commands[3];
@@ -103,11 +101,11 @@ void ADXL362::SetRange(Range range) {
   m_spi.Write(commands, 3);
 }
 
-double ADXL362::GetX() { return GetAcceleration(kAxis_X); }
+double frc::ADXL362::GetX() { return GetAcceleration(kAxis_X); }
 
-double ADXL362::GetY() { return GetAcceleration(kAxis_Y); }
+double frc::ADXL362::GetY() { return GetAcceleration(kAxis_Y); }
 
-double ADXL362::GetZ() { return GetAcceleration(kAxis_Z); }
+double frc::ADXL362::GetZ() { return GetAcceleration(kAxis_Z); }
 
 /**
  * Get the acceleration of one axis in Gs.
@@ -115,7 +113,7 @@ double ADXL362::GetZ() { return GetAcceleration(kAxis_Z); }
  * @param axis The axis to read from.
  * @return Acceleration of the ADXL362 in Gs.
  */
-double ADXL362::GetAcceleration(ADXL362::Axes axis) {
+double frc::ADXL362::GetAcceleration(frc::ADXL362::Axes axis) {
   if (m_gsPerLSB == 0.0) return 0.0;
 
   uint8_t buffer[4];
@@ -135,7 +133,7 @@ double ADXL362::GetAcceleration(ADXL362::Axes axis) {
  * @return An object containing the acceleration measured on each axis of the
  *         ADXL362 in Gs.
  */
-ADXL362::AllAxes ADXL362::GetAccelerations() {
+frc::ADXL362::AllAxes frc::ADXL362::GetAccelerations() {
   AllAxes data = AllAxes();
   if (m_gsPerLSB == 0.0) {
     data.XAxis = data.YAxis = data.ZAxis = 0.0;
@@ -162,16 +160,16 @@ ADXL362::AllAxes ADXL362::GetAccelerations() {
   return data;
 }
 
-std::string ADXL362::GetSmartDashboardType() const {
+std::string frc::ADXL362::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void ADXL362::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::ADXL362::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
 
-void ADXL362::UpdateTable() {
+void frc::ADXL362::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("X", GetX());
     m_table->PutNumber("Y", GetY());
@@ -179,4 +177,4 @@ void ADXL362::UpdateTable() {
   }
 }
 
-std::shared_ptr<ITable> ADXL362::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::ADXL362::GetTable() const { return m_table; }

@@ -12,12 +12,10 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
-const double PWM::kDefaultPwmPeriod = 5.05;
-const double PWM::kDefaultPwmCenter = 1.5;
-const int PWM::kDefaultPwmStepsDown = 1000;
-const int PWM::kPwmDisabled = 0;
+const double frc::PWM::kDefaultPwmPeriod = 5.05;
+const double frc::PWM::kDefaultPwmCenter = 1.5;
+const int frc::PWM::kDefaultPwmStepsDown = 1000;
+const int frc::PWM::kPwmDisabled = 0;
 
 /**
  * Allocate a PWM given a channel number.
@@ -29,7 +27,7 @@ const int PWM::kPwmDisabled = 0;
  * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP
  *                port
  */
-PWM::PWM(int channel) {
+frc::PWM::PWM(int channel) {
   llvm::SmallString<32> buf;
   llvm::raw_svector_ostream oss(buf);
 
@@ -47,7 +45,7 @@ PWM::PWM(int channel) {
   m_centerPwm = kPwmDisabled;  // In simulation, the same thing.
 }
 
-PWM::~PWM() {
+frc::PWM::~PWM() {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
@@ -59,7 +57,7 @@ PWM::~PWM() {
  *                          Otherwise, keep the full range without modifying
  *                          any values.
  */
-void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
+void frc::PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   m_eliminateDeadband = eliminateDeadband;
 }
 
@@ -76,8 +74,8 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
  * @param deadbandMin The low end of the deadband range
  * @param min         The minimum pwm value
  */
-void PWM::SetBounds(int max, int deadbandMax, int center, int deadbandMin,
-                    int min) {
+void frc::PWM::SetBounds(int max, int deadbandMax, int center, int deadbandMin,
+                         int min) {
   // Nothing to do in simulation.
 }
 
@@ -94,8 +92,8 @@ void PWM::SetBounds(int max, int deadbandMax, int center, int deadbandMin,
  * @param deadbandMin The low end of the deadband pulse width in ms
  * @param min         The minimum pulse width in ms
  */
-void PWM::SetBounds(double max, double deadbandMax, double center,
-                    double deadbandMin, double min) {
+void frc::PWM::SetBounds(double max, double deadbandMax, double center,
+                         double deadbandMin, double min) {
   // Nothing to do in simulation.
 }
 
@@ -109,7 +107,7 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
  *
  * @param pos The position to set the servo between 0.0 and 1.0.
  */
-void PWM::SetPosition(double pos) {
+void frc::PWM::SetPosition(double pos) {
   if (pos < 0.0) {
     pos = 0.0;
   } else if (pos > 1.0) {
@@ -129,7 +127,7 @@ void PWM::SetPosition(double pos) {
  *
  * @return The position the servo is set to between 0.0 and 1.0.
  */
-double PWM::GetPosition() const {
+double frc::PWM::GetPosition() const {
   double value = impl->Get();
   if (value < 0.0) {
     return 0.0;
@@ -153,7 +151,7 @@ double PWM::GetPosition() const {
  *
  * @param speed The speed to set the speed controller between -1.0 and 1.0.
  */
-void PWM::SetSpeed(double speed) {
+void frc::PWM::SetSpeed(double speed) {
   // clamp speed to be in the range 1.0 >= speed >= -1.0
   if (speed < -1.0) {
     speed = -1.0;
@@ -176,7 +174,7 @@ void PWM::SetSpeed(double speed) {
  *
  * @return The most recently set speed between -1.0 and 1.0.
  */
-double PWM::GetSpeed() const {
+double frc::PWM::GetSpeed() const {
   double value = impl->Get();
   if (value > 1.0) {
     return 1.0;
@@ -194,7 +192,7 @@ double PWM::GetSpeed() const {
  *
  * @param value Raw PWM value.
  */
-void PWM::SetRaw(uint16_t value) {
+void frc::PWM::SetRaw(uint16_t value) {
   wpi_assert(value == kPwmDisabled);
   impl->Set(0);
 }
@@ -204,41 +202,43 @@ void PWM::SetRaw(uint16_t value) {
  *
  * @param mult The period multiplier to apply to this channel
  */
-void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
+void frc::PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
   // Do nothing in simulation.
 }
 
-void PWM::ValueChanged(ITable* source, llvm::StringRef key,
-                       std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::PWM::ValueChanged(ITable* source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsDouble()) return;
   SetSpeed(value->GetDouble());
 }
 
-void PWM::UpdateTable() {
+void frc::PWM::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", GetSpeed());
   }
 }
 
-void PWM::StartLiveWindowMode() {
+void frc::PWM::StartLiveWindowMode() {
   SetSpeed(0);
   if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
-void PWM::StopLiveWindowMode() {
+void frc::PWM::StopLiveWindowMode() {
   SetSpeed(0);
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
 
-std::string PWM::GetSmartDashboardType() const { return "Speed Controller"; }
+std::string frc::PWM::GetSmartDashboardType() const {
+  return "Speed Controller";
+}
 
-void PWM::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::PWM::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> PWM::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::PWM::GetTable() const { return m_table; }

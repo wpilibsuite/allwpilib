@@ -15,14 +15,12 @@
 #include "HAL/handles/LimitedClassedHandleResource.h"
 #include "PortsInternal.h"
 
-using namespace hal;
-
-Encoder::Encoder(HAL_Handle digitalSourceHandleA,
-                 HAL_AnalogTriggerType analogTriggerTypeA,
-                 HAL_Handle digitalSourceHandleB,
-                 HAL_AnalogTriggerType analogTriggerTypeB,
-                 bool reverseDirection, HAL_EncoderEncodingType encodingType,
-                 int32_t* status) {
+hal::Encoder::Encoder(HAL_Handle digitalSourceHandleA,
+                      HAL_AnalogTriggerType analogTriggerTypeA,
+                      HAL_Handle digitalSourceHandleB,
+                      HAL_AnalogTriggerType analogTriggerTypeB,
+                      bool reverseDirection,
+                      HAL_EncoderEncodingType encodingType, int32_t* status) {
   m_encodingType = encodingType;
   switch (encodingType) {
     case HAL_Encoder_k4X: {
@@ -52,13 +50,13 @@ Encoder::Encoder(HAL_Handle digitalSourceHandleA,
   }
 }
 
-void Encoder::SetupCounter(HAL_Handle digitalSourceHandleA,
-                           HAL_AnalogTriggerType analogTriggerTypeA,
-                           HAL_Handle digitalSourceHandleB,
-                           HAL_AnalogTriggerType analogTriggerTypeB,
-                           bool reverseDirection,
-                           HAL_EncoderEncodingType encodingType,
-                           int32_t* status) {
+void hal::Encoder::SetupCounter(HAL_Handle digitalSourceHandleA,
+                                HAL_AnalogTriggerType analogTriggerTypeA,
+                                HAL_Handle digitalSourceHandleB,
+                                HAL_AnalogTriggerType analogTriggerTypeB,
+                                bool reverseDirection,
+                                HAL_EncoderEncodingType encodingType,
+                                int32_t* status) {
   m_encodingScale = encodingType == HAL_Encoder_k1X ? 1 : 2;
   m_counter =
       HAL_InitializeCounter(HAL_Counter_kExternalDirection, &m_index, status);
@@ -81,7 +79,7 @@ void Encoder::SetupCounter(HAL_Handle digitalSourceHandleA,
   HAL_SetCounterDownSourceEdge(m_counter, reverseDirection, true, status);
 }
 
-Encoder::~Encoder() {
+hal::Encoder::~Encoder() {
   if (m_counter != HAL_kInvalidHandle) {
     int32_t status = 0;
     HAL_FreeCounter(m_counter, &status);
@@ -92,11 +90,11 @@ Encoder::~Encoder() {
 }
 
 // CounterBase interface
-int32_t Encoder::Get(int32_t* status) const {
+int32_t hal::Encoder::Get(int32_t* status) const {
   return static_cast<int32_t>(GetRaw(status) * DecodingScaleFactor());
 }
 
-int32_t Encoder::GetRaw(int32_t* status) const {
+int32_t hal::Encoder::GetRaw(int32_t* status) const {
   if (m_counter) {
     return HAL_GetCounter(m_counter, status);
   } else {
@@ -104,11 +102,11 @@ int32_t Encoder::GetRaw(int32_t* status) const {
   }
 }
 
-int32_t Encoder::GetEncodingScale(int32_t* status) const {
+int32_t hal::Encoder::GetEncodingScale(int32_t* status) const {
   return m_encodingScale;
 }
 
-void Encoder::Reset(int32_t* status) {
+void hal::Encoder::Reset(int32_t* status) {
   if (m_counter) {
     HAL_ResetCounter(m_counter, status);
   } else {
@@ -116,7 +114,7 @@ void Encoder::Reset(int32_t* status) {
   }
 }
 
-double Encoder::GetPeriod(int32_t* status) const {
+double hal::Encoder::GetPeriod(int32_t* status) const {
   if (m_counter) {
     return HAL_GetCounterPeriod(m_counter, status) / DecodingScaleFactor();
   } else {
@@ -124,7 +122,7 @@ double Encoder::GetPeriod(int32_t* status) const {
   }
 }
 
-void Encoder::SetMaxPeriod(double maxPeriod, int32_t* status) {
+void hal::Encoder::SetMaxPeriod(double maxPeriod, int32_t* status) {
   if (m_counter) {
     HAL_SetCounterMaxPeriod(m_counter, maxPeriod, status);
   } else {
@@ -132,7 +130,7 @@ void Encoder::SetMaxPeriod(double maxPeriod, int32_t* status) {
   }
 }
 
-bool Encoder::GetStopped(int32_t* status) const {
+bool hal::Encoder::GetStopped(int32_t* status) const {
   if (m_counter) {
     return HAL_GetCounterStopped(m_counter, status);
   } else {
@@ -140,7 +138,7 @@ bool Encoder::GetStopped(int32_t* status) const {
   }
 }
 
-bool Encoder::GetDirection(int32_t* status) const {
+bool hal::Encoder::GetDirection(int32_t* status) const {
   if (m_counter) {
     return HAL_GetCounterDirection(m_counter, status);
   } else {
@@ -148,23 +146,24 @@ bool Encoder::GetDirection(int32_t* status) const {
   }
 }
 
-double Encoder::GetDistance(int32_t* status) const {
+double hal::Encoder::GetDistance(int32_t* status) const {
   return GetRaw(status) * DecodingScaleFactor() * m_distancePerPulse;
 }
 
-double Encoder::GetRate(int32_t* status) const {
+double hal::Encoder::GetRate(int32_t* status) const {
   return m_distancePerPulse / GetPeriod(status);
 }
 
-void Encoder::SetMinRate(double minRate, int32_t* status) {
+void hal::Encoder::SetMinRate(double minRate, int32_t* status) {
   SetMaxPeriod(m_distancePerPulse / minRate, status);
 }
 
-void Encoder::SetDistancePerPulse(double distancePerPulse, int32_t* status) {
+void hal::Encoder::SetDistancePerPulse(double distancePerPulse,
+                                       int32_t* status) {
   m_distancePerPulse = distancePerPulse;
 }
 
-void Encoder::SetReverseDirection(bool reverseDirection, int32_t* status) {
+void hal::Encoder::SetReverseDirection(bool reverseDirection, int32_t* status) {
   if (m_counter) {
     HAL_SetCounterReverseDirection(m_counter, reverseDirection, status);
   } else {
@@ -172,7 +171,8 @@ void Encoder::SetReverseDirection(bool reverseDirection, int32_t* status) {
   }
 }
 
-void Encoder::SetSamplesToAverage(int32_t samplesToAverage, int32_t* status) {
+void hal::Encoder::SetSamplesToAverage(int32_t samplesToAverage,
+                                       int32_t* status) {
   if (samplesToAverage < 1 || samplesToAverage > 127) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
@@ -184,7 +184,7 @@ void Encoder::SetSamplesToAverage(int32_t samplesToAverage, int32_t* status) {
   }
 }
 
-int32_t Encoder::GetSamplesToAverage(int32_t* status) const {
+int32_t hal::Encoder::GetSamplesToAverage(int32_t* status) const {
   if (m_counter) {
     return HAL_GetCounterSamplesToAverage(m_counter, status);
   } else {
@@ -192,9 +192,10 @@ int32_t Encoder::GetSamplesToAverage(int32_t* status) const {
   }
 }
 
-void Encoder::SetIndexSource(HAL_Handle digitalSourceHandle,
-                             HAL_AnalogTriggerType analogTriggerType,
-                             HAL_EncoderIndexingType type, int32_t* status) {
+void hal::Encoder::SetIndexSource(HAL_Handle digitalSourceHandle,
+                                  HAL_AnalogTriggerType analogTriggerType,
+                                  HAL_EncoderIndexingType type,
+                                  int32_t* status) {
   if (m_counter) {
     *status = HAL_COUNTER_NOT_SUPPORTED;
     return;
@@ -208,7 +209,7 @@ void Encoder::SetIndexSource(HAL_Handle digitalSourceHandle,
                                 status);
 }
 
-double Encoder::DecodingScaleFactor() const {
+double hal::Encoder::DecodingScaleFactor() const {
   switch (m_encodingType) {
     case HAL_Encoder_k1X:
       return 1.0;
@@ -221,18 +222,19 @@ double Encoder::DecodingScaleFactor() const {
   }
 }
 
-static LimitedClassedHandleResource<HAL_EncoderHandle, Encoder,
-                                    kNumEncoders + kNumCounters,
-                                    HAL_HandleEnum::Encoder>
+static hal::LimitedClassedHandleResource<HAL_EncoderHandle, hal::Encoder,
+                                         hal::kNumEncoders + hal::kNumCounters,
+                                         hal::HAL_HandleEnum::Encoder>
     encoderHandles;
 
 extern "C" {
+
 HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
     HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
     int32_t* status) {
-  auto encoder = std::make_shared<Encoder>(
+  auto encoder = std::make_shared<hal::Encoder>(
       digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
       analogTriggerTypeB, reverseDirection, encodingType, status);
   if (*status != 0) return HAL_kInvalidHandle;  // return in creation error

@@ -20,30 +20,29 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "PortsInternal.h"
 
-namespace hal {
 // Create a mutex to protect changes to the DO PWM config
-priority_recursive_mutex digitalPwmMutex;
+hal::priority_recursive_mutex hal::digitalPwmMutex;
 
-std::unique_ptr<tDIO> digitalSystem;
-std::unique_ptr<tRelay> relaySystem;
-std::unique_ptr<tPWM> pwmSystem;
-std::unique_ptr<tSPI> spiSystem;
+std::unique_ptr<hal::tDIO> hal::digitalSystem;
+std::unique_ptr<hal::tRelay> hal::relaySystem;
+std::unique_ptr<hal::tPWM> hal::pwmSystem;
+std::unique_ptr<hal::tSPI> hal::spiSystem;
 
 static std::atomic<bool> digitalSystemsInitialized{false};
 static hal::priority_mutex initializeMutex;
 
-DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                      kNumDigitalChannels + kNumPWMHeaders>
-    digitalChannelHandles;
+hal::DigitalHandleResource<HAL_DigitalHandle, hal::DigitalPort,
+                           hal::kNumDigitalChannels + hal::kNumPWMHeaders>
+    hal::digitalChannelHandles;
 
 /**
  * Initialize the digital system.
  */
-void initializeDigital(int32_t* status) {
+void hal::initializeDigital(int32_t* status) {
   // Initial check, as if it's true initialization has finished
   if (digitalSystemsInitialized) return;
 
-  std::lock_guard<hal::priority_mutex> lock(initializeMutex);
+  std::lock_guard<priority_mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (digitalSystemsInitialized) return;
 
@@ -105,15 +104,15 @@ void initializeDigital(int32_t* status) {
  * Map SPI channel numbers from their physical number (27 to 31) to their
  * position in the bit field.
  */
-int32_t remapSPIChannel(int32_t channel) { return channel - 26; }
+int32_t hal::remapSPIChannel(int32_t channel) { return channel - 26; }
 
 /**
  * Map DIO channel numbers from their physical number (10 to 26) to their
  * position in the bit field.
  */
-int32_t remapMXPChannel(int32_t channel) { return channel - 10; }
+int32_t hal::remapMXPChannel(int32_t channel) { return channel - 10; }
 
-int32_t remapMXPPWMChannel(int32_t channel) {
+int32_t hal::remapMXPPWMChannel(int32_t channel) {
   if (channel < 14) {
     return channel - 10;  // first block of 4 pwms (MXP 0-3)
   } else {
@@ -127,10 +126,10 @@ int32_t remapMXPPWMChannel(int32_t channel) {
  * channel else do normal digital input remapping based on channel number
  * (MXP)
  */
-bool remapDigitalSource(HAL_Handle digitalSourceHandle,
-                        HAL_AnalogTriggerType analogTriggerType,
-                        uint8_t& channel, uint8_t& module,
-                        bool& analogTrigger) {
+bool hal::remapDigitalSource(HAL_Handle digitalSourceHandle,
+                             HAL_AnalogTriggerType analogTriggerType,
+                             uint8_t& channel, uint8_t& module,
+                             bool& analogTrigger) {
   if (isHandleType(digitalSourceHandle, HAL_HandleEnum::AnalogTrigger)) {
     // If handle passed, index is not negative
     int32_t index = getHandleIndex(digitalSourceHandle);
@@ -157,4 +156,3 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     return false;
   }
 }
-}  // namespace hal

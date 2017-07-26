@@ -12,14 +12,12 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Construct an analog input.
  *
  * @param channel The channel number to represent.
  */
-AnalogInput::AnalogInput(int channel) : m_channel(channel) {
+frc::AnalogInput::AnalogInput(int channel) : m_channel(channel) {
   llvm::SmallString<32> buf;
   llvm::raw_svector_ostream oss(buf);
   oss << "analog/" << channel;
@@ -36,7 +34,7 @@ AnalogInput::AnalogInput(int channel) : m_channel(channel) {
  *
  * @return A scaled sample straight from this channel.
  */
-double AnalogInput::GetVoltage() const { return m_impl->Get(); }
+double frc::AnalogInput::GetVoltage() const { return m_impl->Get(); }
 
 /**
  * Get a scaled sample from the output of the oversample and average engine for
@@ -50,39 +48,39 @@ double AnalogInput::GetVoltage() const { return m_impl->Get(); }
  * @return A scaled sample from the output of the oversample and average engine
  *         for this channel.
  */
-double AnalogInput::GetAverageVoltage() const { return m_impl->Get(); }
+double frc::AnalogInput::GetAverageVoltage() const { return m_impl->Get(); }
 
 /**
  * Get the channel number.
  *
  * @return The channel number.
  */
-int AnalogInput::GetChannel() const { return m_channel; }
+int frc::AnalogInput::GetChannel() const { return m_channel; }
 
 /**
  * Get the Average value for the PID Source base object.
  *
  * @return The average voltage.
  */
-double AnalogInput::PIDGet() { return GetAverageVoltage(); }
+double frc::AnalogInput::PIDGet() { return GetAverageVoltage(); }
 
-void AnalogInput::UpdateTable() {
+void frc::AnalogInput::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", GetAverageVoltage());
   }
 }
 
-void AnalogInput::StartLiveWindowMode() {}
+void frc::AnalogInput::StartLiveWindowMode() {}
 
-void AnalogInput::StopLiveWindowMode() {}
+void frc::AnalogInput::StopLiveWindowMode() {}
 
-std::string AnalogInput::GetSmartDashboardType() const {
+std::string frc::AnalogInput::GetSmartDashboardType() const {
   return "Analog Input";
 }
 
-void AnalogInput::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::AnalogInput::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> AnalogInput::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::AnalogInput::GetTable() const { return m_table; }

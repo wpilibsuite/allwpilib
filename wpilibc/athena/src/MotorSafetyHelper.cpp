@@ -14,10 +14,8 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
-std::set<MotorSafetyHelper*> MotorSafetyHelper::m_helperList;
-hal::priority_recursive_mutex MotorSafetyHelper::m_listMutex;
+std::set<frc::MotorSafetyHelper*> frc::MotorSafetyHelper::m_helperList;
+hal::priority_recursive_mutex frc::MotorSafetyHelper::m_listMutex;
 
 /**
  * The constructor for a MotorSafetyHelper object.
@@ -31,7 +29,7 @@ hal::priority_recursive_mutex MotorSafetyHelper::m_listMutex;
  * @param safeObject a pointer to the motor object implementing MotorSafety.
  *                   This is used to call the Stop() method on the motor.
  */
-MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
+frc::MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
     : m_safeObject(safeObject) {
   m_enabled = false;
   m_expiration = DEFAULT_SAFETY_EXPIRATION;
@@ -41,7 +39,7 @@ MotorSafetyHelper::MotorSafetyHelper(MotorSafety* safeObject)
   m_helperList.insert(this);
 }
 
-MotorSafetyHelper::~MotorSafetyHelper() {
+frc::MotorSafetyHelper::~MotorSafetyHelper() {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_listMutex);
   m_helperList.erase(this);
 }
@@ -50,7 +48,7 @@ MotorSafetyHelper::~MotorSafetyHelper() {
  * Feed the motor safety object.
  * Resets the timer on this object that is used to do the timeouts.
  */
-void MotorSafetyHelper::Feed() {
+void frc::MotorSafetyHelper::Feed() {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_syncMutex);
   m_stopTime = Timer::GetFPGATimestamp() + m_expiration;
 }
@@ -59,7 +57,7 @@ void MotorSafetyHelper::Feed() {
  * Set the expiration time for the corresponding motor safety object.
  * @param expirationTime The timeout value in seconds.
  */
-void MotorSafetyHelper::SetExpiration(double expirationTime) {
+void frc::MotorSafetyHelper::SetExpiration(double expirationTime) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_syncMutex);
   m_expiration = expirationTime;
 }
@@ -68,7 +66,7 @@ void MotorSafetyHelper::SetExpiration(double expirationTime) {
  * Retrieve the timeout value for the corresponding motor safety object.
  * @return the timeout value in seconds.
  */
-double MotorSafetyHelper::GetExpiration() const {
+double frc::MotorSafetyHelper::GetExpiration() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_syncMutex);
   return m_expiration;
 }
@@ -78,7 +76,7 @@ double MotorSafetyHelper::GetExpiration() const {
  * @return a true value if the motor is still operating normally and hasn't
  * timed out.
  */
-bool MotorSafetyHelper::IsAlive() const {
+bool frc::MotorSafetyHelper::IsAlive() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_syncMutex);
   return !m_enabled || m_stopTime > Timer::GetFPGATimestamp();
 }
@@ -89,7 +87,7 @@ bool MotorSafetyHelper::IsAlive() const {
  * its timeout value. If it has, the stop method is called, and the motor is
  * shut down until its value is updated again.
  */
-void MotorSafetyHelper::Check() {
+void frc::MotorSafetyHelper::Check() {
   DriverStation& ds = DriverStation::GetInstance();
   if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
 
@@ -109,7 +107,7 @@ void MotorSafetyHelper::Check() {
  * Turn on and off the motor safety option for this PWM object.
  * @param enabled True if motor safety is enforced for this object
  */
-void MotorSafetyHelper::SetSafetyEnabled(bool enabled) {
+void frc::MotorSafetyHelper::SetSafetyEnabled(bool enabled) {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_syncMutex);
   m_enabled = enabled;
 }
@@ -119,7 +117,7 @@ void MotorSafetyHelper::SetSafetyEnabled(bool enabled) {
  * Return if the motor safety is currently enabled for this devicce.
  * @return True if motor safety is enforced for this device
  */
-bool MotorSafetyHelper::IsSafetyEnabled() const {
+bool frc::MotorSafetyHelper::IsSafetyEnabled() const {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_syncMutex);
   return m_enabled;
 }
@@ -129,7 +127,7 @@ bool MotorSafetyHelper::IsSafetyEnabled() const {
  * This static  method is called periodically to poll all the motors and stop
  * any that have timed out.
  */
-void MotorSafetyHelper::CheckMotors() {
+void frc::MotorSafetyHelper::CheckMotors() {
   std::lock_guard<hal::priority_recursive_mutex> sync(m_listMutex);
   for (auto elem : m_helperList) {
     elem->Check();

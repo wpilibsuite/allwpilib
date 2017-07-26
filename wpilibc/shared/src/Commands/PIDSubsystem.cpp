@@ -9,8 +9,6 @@
 
 #include "PIDController.h"
 
-using namespace frc;
-
 /**
  * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
  * values.
@@ -20,8 +18,8 @@ using namespace frc;
  * @param i    the integral value
  * @param d    the derivative value
  */
-PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
-                           double d)
+frc::PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
+                                double d)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
@@ -36,8 +34,8 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
  * @param d    the derivative value
  * @param f    the feedforward value
  */
-PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
-                           double d, double f)
+frc::PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
+                                double d, double f)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
 }
@@ -56,8 +54,8 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
  * @param f      the feedfoward value
  * @param period the time (in seconds) between calculations
  */
-PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
-                           double d, double f, double period)
+frc::PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
+                                double d, double f, double period)
     : Subsystem(name) {
   m_controller =
       std::make_shared<PIDController>(p, i, d, f, this, this, period);
@@ -73,7 +71,7 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
  * @param i the integral value
  * @param d the derivative value
  */
-PIDSubsystem::PIDSubsystem(double p, double i, double d)
+frc::PIDSubsystem::PIDSubsystem(double p, double i, double d)
     : Subsystem("PIDSubsystem") {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
 }
@@ -89,7 +87,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d)
  * @param d the derivative value
  * @param f the feedforward value
  */
-PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
+frc::PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
     : Subsystem("PIDSubsystem") {
   m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
 }
@@ -107,8 +105,8 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
  * @param f      the feedforward value
  * @param period the time (in seconds) between calculations
  */
-PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
-                           double period)
+frc::PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
+                                double period)
     : Subsystem("PIDSubsystem") {
   m_controller =
       std::make_shared<PIDController>(p, i, d, f, this, this, period);
@@ -117,12 +115,12 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
 /**
  * Enables the internal {@link PIDController}.
  */
-void PIDSubsystem::Enable() { m_controller->Enable(); }
+void frc::PIDSubsystem::Enable() { m_controller->Enable(); }
 
 /**
   * Disables the internal {@link PIDController}.
   */
-void PIDSubsystem::Disable() { m_controller->Disable(); }
+void frc::PIDSubsystem::Disable() { m_controller->Disable(); }
 
 /**
  * Returns the {@link PIDController} used by this {@link PIDSubsystem}.
@@ -131,7 +129,7 @@ void PIDSubsystem::Disable() { m_controller->Disable(); }
  *
  * @return the {@link PIDController} used by this {@link PIDSubsystem}
  */
-std::shared_ptr<PIDController> PIDSubsystem::GetPIDController() {
+std::shared_ptr<frc::PIDController> frc::PIDSubsystem::GetPIDController() {
   return m_controller;
 }
 
@@ -143,7 +141,7 @@ std::shared_ptr<PIDController> PIDSubsystem::GetPIDController() {
  *
  * @param setpoint the new setpoint
  */
-void PIDSubsystem::SetSetpoint(double setpoint) {
+void frc::PIDSubsystem::SetSetpoint(double setpoint) {
   m_controller->SetSetpoint(setpoint);
 }
 
@@ -155,7 +153,7 @@ void PIDSubsystem::SetSetpoint(double setpoint) {
  *
  * @param deltaSetpoint the change in the setpoint
  */
-void PIDSubsystem::SetSetpointRelative(double deltaSetpoint) {
+void frc::PIDSubsystem::SetSetpointRelative(double deltaSetpoint) {
   SetSetpoint(GetSetpoint() + deltaSetpoint);
 }
 
@@ -164,7 +162,7 @@ void PIDSubsystem::SetSetpointRelative(double deltaSetpoint) {
  *
  * @return The current setpoint
  */
-double PIDSubsystem::GetSetpoint() { return m_controller->GetSetpoint(); }
+double frc::PIDSubsystem::GetSetpoint() { return m_controller->GetSetpoint(); }
 
 /**
  * Sets the maximum and minimum values expected from the input.
@@ -172,7 +170,8 @@ double PIDSubsystem::GetSetpoint() { return m_controller->GetSetpoint(); }
  * @param minimumInput the minimum value expected from the input
  * @param maximumInput the maximum value expected from the output
  */
-void PIDSubsystem::SetInputRange(double minimumInput, double maximumInput) {
+void frc::PIDSubsystem::SetInputRange(double minimumInput,
+                                      double maximumInput) {
   m_controller->SetInputRange(minimumInput, maximumInput);
 }
 
@@ -182,7 +181,8 @@ void PIDSubsystem::SetInputRange(double minimumInput, double maximumInput) {
  * @param minimumOutput the minimum value to write to the output
  * @param maximumOutput the maximum value to write to the output
  */
-void PIDSubsystem::SetOutputRange(double minimumOutput, double maximumOutput) {
+void frc::PIDSubsystem::SetOutputRange(double minimumOutput,
+                                       double maximumOutput) {
   m_controller->SetOutputRange(minimumOutput, maximumOutput);
 }
 
@@ -192,7 +192,7 @@ void PIDSubsystem::SetOutputRange(double minimumOutput, double maximumOutput) {
  *
  * @param absValue absolute error which is tolerable
  */
-void PIDSubsystem::SetAbsoluteTolerance(double absValue) {
+void frc::PIDSubsystem::SetAbsoluteTolerance(double absValue) {
   m_controller->SetAbsoluteTolerance(absValue);
 }
 
@@ -201,7 +201,7 @@ void PIDSubsystem::SetAbsoluteTolerance(double absValue) {
  *
  * @param percent percentage error which is tolerable
  */
-void PIDSubsystem::SetPercentTolerance(double percent) {
+void frc::PIDSubsystem::SetPercentTolerance(double percent) {
   m_controller->SetPercentTolerance(percent);
 }
 
@@ -220,29 +220,31 @@ void PIDSubsystem::SetPercentTolerance(double percent) {
  * @return true if the error is within the percentage tolerance of the input
  *         range
  */
-bool PIDSubsystem::OnTarget() const { return m_controller->OnTarget(); }
+bool frc::PIDSubsystem::OnTarget() const { return m_controller->OnTarget(); }
 
 /**
  * Returns the current position.
  *
  * @return the current position
  */
-double PIDSubsystem::GetPosition() { return ReturnPIDInput(); }
+double frc::PIDSubsystem::GetPosition() { return ReturnPIDInput(); }
 
 /**
  * Returns the current rate.
  *
  * @return the current rate
  */
-double PIDSubsystem::GetRate() { return ReturnPIDInput(); }
+double frc::PIDSubsystem::GetRate() { return ReturnPIDInput(); }
 
-void PIDSubsystem::PIDWrite(double output) { UsePIDOutput(output); }
+void frc::PIDSubsystem::PIDWrite(double output) { UsePIDOutput(output); }
 
-double PIDSubsystem::PIDGet() { return ReturnPIDInput(); }
+double frc::PIDSubsystem::PIDGet() { return ReturnPIDInput(); }
 
-std::string PIDSubsystem::GetSmartDashboardType() const { return "PIDCommand"; }
+std::string frc::PIDSubsystem::GetSmartDashboardType() const {
+  return "PIDCommand";
+}
 
-void PIDSubsystem::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::PIDSubsystem::InitTable(std::shared_ptr<ITable> subtable) {
   m_controller->InitTable(subtable);
   Subsystem::InitTable(subtable);
 }

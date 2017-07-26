@@ -11,14 +11,12 @@
 #include "Commands/Scheduler.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
 /**
  * Creates a subsystem with the given name.
  *
  * @param name the name of the subsystem
  */
-Subsystem::Subsystem(const std::string& name) {
+frc::Subsystem::Subsystem(const std::string& name) {
   m_name = name;
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
@@ -32,7 +30,7 @@ Subsystem::Subsystem(const std::string& name) {
  *
  * This should be overridden by a Subsystem that has a default Command
  */
-void Subsystem::InitDefaultCommand() {}
+void frc::Subsystem::InitDefaultCommand() {}
 
 /**
  * Sets the default command.  If this is not called or is called with null,
@@ -43,7 +41,7 @@ void Subsystem::InitDefaultCommand() {}
  *
  * @param command the default command (or null if there should be none)
  */
-void Subsystem::SetDefaultCommand(Command* command) {
+void frc::Subsystem::SetDefaultCommand(Command* command) {
   if (command == nullptr) {
     m_defaultCommand = nullptr;
   } else {
@@ -79,7 +77,7 @@ void Subsystem::SetDefaultCommand(Command* command) {
  *
  * @return the default command
  */
-Command* Subsystem::GetDefaultCommand() {
+frc::Command* frc::Subsystem::GetDefaultCommand() {
   if (!m_initializedDefaultCommand) {
     m_initializedDefaultCommand = true;
     InitDefaultCommand();
@@ -92,7 +90,7 @@ Command* Subsystem::GetDefaultCommand() {
  *
  * @param command the new current command
  */
-void Subsystem::SetCurrentCommand(Command* command) {
+void frc::Subsystem::SetCurrentCommand(Command* command) {
   m_currentCommand = command;
   m_currentCommandChanged = true;
 }
@@ -102,12 +100,14 @@ void Subsystem::SetCurrentCommand(Command* command) {
  *
  * @return the command which currently claims this subsystem
  */
-Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
+frc::Command* frc::Subsystem::GetCurrentCommand() const {
+  return m_currentCommand;
+}
 
 /**
  * When the run method of the scheduler is called this method will be called.
  */
-void Subsystem::Periodic() {}
+void frc::Subsystem::Periodic() {}
 
 /**
  * Call this to alert Subsystem that the current command is actually the
@@ -117,7 +117,7 @@ void Subsystem::Periodic() {}
  * {@link Scheduler} is going through the loop, only to be soon after given a
  * new one.  This will avoid that situation.
  */
-void Subsystem::ConfirmCommand() {
+void frc::Subsystem::ConfirmCommand() {
   if (m_currentCommandChanged) {
     if (m_table != nullptr) {
       if (m_currentCommand != nullptr) {
@@ -131,11 +131,13 @@ void Subsystem::ConfirmCommand() {
   }
 }
 
-std::string Subsystem::GetName() const { return m_name; }
+std::string frc::Subsystem::GetName() const { return m_name; }
 
-std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
+std::string frc::Subsystem::GetSmartDashboardType() const {
+  return "Subsystem";
+}
 
-void Subsystem::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::Subsystem::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   if (m_table != nullptr) {
     if (m_defaultCommand != nullptr) {
@@ -153,4 +155,4 @@ void Subsystem::InitTable(std::shared_ptr<ITable> subtable) {
   }
 }
 
-std::shared_ptr<ITable> Subsystem::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Subsystem::GetTable() const { return m_table; }
