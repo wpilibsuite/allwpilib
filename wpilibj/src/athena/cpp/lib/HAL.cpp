@@ -120,10 +120,14 @@ Java_edu_wpi_first_wpilibj_hal_HAL_report(
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_nativeGetControlWord(JNIEnv*, jclass) {
   NETCOMM_LOG(logDEBUG) << "Calling HAL Control Word";
+  static_assert(sizeof(HAL_ControlWord) == sizeof(jint), 
+      "Java int must match the size of control word");
   HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(HAL_ControlWord));
   HAL_GetControlWord(&controlWord);
-  return *reinterpret_cast<jint*>(&controlWord);
+  jint retVal = 0;
+  std::memcpy(&retVal, &controlWord, sizeof(HAL_ControlWord));
+  return retVal;
 }
 
 /*
@@ -136,7 +140,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_nativeGetAllianceStation(JNIEnv*, jclass) {
   NETCOMM_LOG(logDEBUG) << "Calling HAL Alliance Station";
   int32_t status = 0;
   auto allianceStation = HAL_GetAllianceStation(&status);
-  return *reinterpret_cast<jint*>(&allianceStation);
+  return static_cast<jint>(allianceStation);
 }
 
 /*
