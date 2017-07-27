@@ -45,9 +45,8 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @param channel The channel number to represent. 0-3 are on-board 4-7 are on the MXP port.
    */
   public AnalogInput(final int channel) {
+    checkAnalogInputChannel(channel);
     m_channel = channel;
-
-    SensorBase.checkAnalogInputChannel(channel);
 
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);

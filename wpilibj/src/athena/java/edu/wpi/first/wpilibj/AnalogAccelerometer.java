@@ -45,8 +45,8 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    * @param channel The channel number for the analog input the accelerometer is connected to
    */
   public AnalogAccelerometer(final int channel) {
-    m_allocatedChannel = true;
     m_analogChannel = new AnalogInput(channel);
+    m_allocatedChannel = true;
     initAccelerometer();
   }
 
