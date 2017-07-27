@@ -28,6 +28,7 @@ import static org.junit.Assert.assertEquals;
  * Yes, this is the test system testing itself. Functionally, this is making sure that all tests get
  * run correctly when you use parametrized arguments.
  */
+@SuppressWarnings("MultipleTopLevelClasses")
 public class AbstractTestSuiteTest {
 
   @Ignore("Prevents ANT from trying to run these as tests")
