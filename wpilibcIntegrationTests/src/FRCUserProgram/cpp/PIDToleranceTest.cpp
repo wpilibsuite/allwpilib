@@ -20,7 +20,7 @@ class PIDToleranceTest : public testing::Test {
   const double range = 200;
   const double tolerance = 10.0;
 
-  class fakeInput : public PIDSource {
+  class FakeInput : public PIDSource {
    public:
     double val = 0;
 
@@ -31,12 +31,12 @@ class PIDToleranceTest : public testing::Test {
     double PIDGet() { return val; }
   };
 
-  class fakeOutput : public PIDOutput {
+  class FakeOutput : public PIDOutput {
     void PIDWrite(double output) {}
   };
 
-  fakeInput inp;
-  fakeOutput out;
+  FakeInput inp;
+  FakeOutput out;
   PIDController* pid;
 
   void SetUp() override {
