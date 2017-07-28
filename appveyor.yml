@@ -1,0 +1,26 @@
+version: "{branch} {build}"
+
+image:
+- Visual Studio 2015
+
+build:
+  verbosity: detailed
+
+build_script:
+  - gradlew.bat assemble --info -PbuildAll
+
+test_script:
+- cmd: >-
+    SET JAVA_HOME=C:\Program Files\Java\jdk1.8.0
+
+    gradlew.bat check --info -PbuildAll
+
+    SET JAVA_HOME=C:\Program Files (x86)\Java\jdk1.8.0
+
+    gradlew.bat check --info -PbuildAll
+
+cache:
+  - C:\Users\appveyor\.gradle
+
+matrix:
+  fast_finish: true

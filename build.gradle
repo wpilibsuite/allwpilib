@@ -1,0 +1,109 @@
+import edu.wpi.first.nativeutils.NativeUtils
+
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.0'
+        classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:1.6'
+    }
+}
+
+ext.getClassifier = { binary->
+    return NativeUtils.getClassifier(binary)
+}
+
+ext.getPlatformPath = { binary->
+    return NativeUtils.getPlatformPath(binary)
+}
+
+apply plugin: 'cpp'
+apply plugin: 'google-test'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'java'
+
+apply from: 'config.gradle'
+
+model {
+    // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
+    // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
+    // where some extra symbols are added that cannot be resolved at link time. This configuration
+    // lets you specify specific symbols to exlude from exporting.
+    exportsConfigs {
+        wpiutil(ExportsConfig) {
+            x86ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                  '_TI5?AVfailure' ]
+            x64ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                  '_TI5?AVfailure' ]
+        }
+    }
+    components {
+        wpiutil(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+        }
+        // By default, a development executable will be generated. This is to help the case of
+        // testing specific functionality of the library.
+        if (!project.hasProperty('skipDevExe')) {
+            wpiutilDev(NativeExecutableSpec) {
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/dev/native/cpp'
+                            include '**/*.cpp'
+                            lib library: "wpiutil"
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/dev/native/include'
+                        }
+                    }
+                }
+            }
+        }
+        // The TestingBase library is a workaround for an issue with the GoogleTest plugin.
+        // The plugin by default will rebuild the entire test source set, which increases
+        // build time. By testing an empty library, and then just linking the already built component
+        // into the test, we save the extra build
+        wpiutilTestingBase(NativeLibrarySpec) { }
+    }
+    testSuites {
+        wpiutilTestingBaseTest {
+            sources {
+                cpp.source.srcDir 'src/test/native/cpp'
+                cpp.exportedHeaders.srcDir 'src/test/native/include'
+            }
+        }
+    }
+    binaries {
+        withType(GoogleTestTestSuiteBinarySpec) {
+            if (it.component.testedComponent.name.contains('TestingBase') && !project.hasProperty('onlyAthena')) {
+                lib project: ':gmock', library: 'gmock', linkage: 'static'
+                lib library: 'wpiutil', linkage: 'shared'
+            } else {
+                it.buildable = false
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0.1'
+}

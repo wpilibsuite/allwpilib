@@ -1,0 +1,192 @@
+apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+def getVersion = {
+    if (WPILibVersion.version.contains('-'))
+        return WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))
+    else
+        return ""
+}
+
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+def pubVersion
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+def outputsFolder = file("$buildDir/outputs")
+
+def versionFile = file("$outputsFolder/version.txt")
+
+task outputVersions() {
+    description = 'Prints the versions of wpiutil to a file for use by the downstream packaging project'
+    group = 'Build'
+    outputs.files(versionFile)
+
+    doFirst {
+        outputsFolder.mkdir()
+    }
+
+    doLast {
+        versionFile.write pubVersion
+    }
+}
+
+build.dependsOn outputVersions
+
+def baseArtifactId = 'wpiutil'
+def artifactGroupId = 'edu.wpi.first.wpiutil'
+
+def licenseFile = new File("$rootDir/license.txt")
+
+task cppSourcesZip(type: Zip) {
+    destinationDir = outputsFolder
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDir = outputsFolder
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    archives cppHeadersZip
+    archives cppSourcesZip
+    outputVersions.outputs.files.each {
+        archives it
+    }
+}
+
+def createComponentZipTasks = { components, name, base, type, project, func ->
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && it.name == name) {
+            it.binaries.each {
+                def target = getClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
+                }
+            }
+        }
+    }
+    def taskList = []
+    configMap.each { key, value ->
+        def baseN = base + name
+        def task = project.tasks.create(baseN + "-${key}", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDir =  outputsFolder
+            classifier = key
+            baseName = baseN + '-classifier'
+            duplicatesStrategy = 'exclude'
+
+            from(licenseFile) {
+                into '/'
+            }
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            archives task
+        }
+    }
+    return taskList
+}
+
+model {
+    publishing {
+        def wpiutilTaskList = createComponentZipTasks($.components, 'wpiutil', 'zipcppwpiutil', Zip, project, { task, value ->
+            value.each { binary->
+                if (binary.buildable) {
+                    if (binary instanceof SharedLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                        task.from (binary.sharedLibraryFile) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                        task.from (binary.sharedLibraryLinkFile) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                    } else if (binary instanceof StaticLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from (binary.staticLibraryFile) {
+                            into getPlatformPath(binary) + '/static'
+                        }
+                    }
+                }
+            }
+        })
+
+        publications {
+            cpp(MavenPublication) {
+                wpiutilTaskList.each {
+                    artifact it
+                }
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                artifactId = "${baseArtifactId}-cpp"
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}
+
+publishing {
+  publications {
+
+    java(MavenPublication) {
+        artifact jar
+        artifact sourcesJar
+        artifact javadocJar
+
+        artifactId = "${baseArtifactId}-java"
+        groupId artifactGroupId
+        version pubVersion
+    }
+  }
+}

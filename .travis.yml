@@ -1,0 +1,31 @@
+language: java
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+    - os: osx
+      osx_image: xcode8
+
+addons:
+  apt:
+    packages:
+      - g++-multilib
+      - lib32stdc++6
+
+before_install:
+  - .travis-scripts/install.sh
+
+install:
+  - ./gradlew assemble -PbuildAll
+
+script:
+  - ./gradlew build -PbuildAll
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
