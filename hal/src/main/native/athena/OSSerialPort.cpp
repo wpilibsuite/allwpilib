@@ -229,4 +229,5 @@ void HAL_ClearOSSerial(HAL_SerialPort port, int32_t* status) {
 void HAL_CloseOSSerial(HAL_SerialPort port, int32_t* status) {
   close(portHandles[port]);
 }
-}
+
+}  // extern "C"

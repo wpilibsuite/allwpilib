@@ -13,6 +13,7 @@
 using namespace hal;
 
 extern "C" {
+
 /**
  * Is the channel attached to an accumulator.
  *
@@ -193,4 +194,5 @@ void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analogPortHandle,
   *value = output.Value;
   *count = output.Count;
 }
-}
+
+}  // extern "C"

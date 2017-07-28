@@ -670,4 +670,5 @@ void HAL_GetSPIAccumulatorOutput(HAL_SPIPort port, int64_t* value,
   *value = accum->value;
   *count = accum->count;
 }
-}
+
+}  // extern "C"

@@ -13,6 +13,7 @@
 #include "HAL/Types.h"
 
 extern "C" {
+
 HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
     HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
@@ -44,4 +45,5 @@ void HAL_SetFPGAEncoderIndexSource(HAL_FPGAEncoderHandle fpgaEncoderHandle,
                                    HAL_AnalogTriggerType analogTriggerType,
                                    HAL_Bool activeHigh, HAL_Bool edgeSensitive,
                                    int32_t* status);
-}
+
+}  // extern "C"

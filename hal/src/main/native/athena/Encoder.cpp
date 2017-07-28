@@ -445,4 +445,5 @@ int32_t HAL_GetEncoderFPGAIndex(HAL_EncoderHandle encoderHandle,
   }
   return encoder->GetFPGAIndex();
 }
-}
+
+}  // extern "C"

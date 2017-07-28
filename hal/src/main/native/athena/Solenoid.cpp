@@ -18,11 +18,13 @@
 #include "ctre/PCM.h"
 
 namespace {
+
 struct Solenoid {
   uint8_t module;
   uint8_t channel;
 };
-}
+
+}  // namespace
 
 using namespace hal;
 

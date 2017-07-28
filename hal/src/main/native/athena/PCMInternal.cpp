@@ -13,6 +13,7 @@
 #include "PortsInternal.h"
 
 namespace hal {
+
 std::unique_ptr<PCM> PCM_modules[kNumPCMModules];
 
 void initializePCM(int32_t module, int32_t* status) {
@@ -24,4 +25,5 @@ void initializePCM(int32_t module, int32_t* status) {
     PCM_modules[module] = std::make_unique<PCM>(module);
   }
 }
+
 }  // namespace hal

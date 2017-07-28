@@ -529,4 +529,5 @@ int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
   }
   return hdrPeriod;
 }
-}
+
+}  // extern "C"

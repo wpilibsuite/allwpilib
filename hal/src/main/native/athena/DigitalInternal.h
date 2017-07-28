@@ -20,6 +20,7 @@
 #include "PortsInternal.h"
 
 namespace hal {
+
 /**
  * MXP channels when used as digital output PWM are offset from actual value
  */
@@ -86,4 +87,5 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
 int32_t remapSPIChannel(int32_t channel);
 int32_t remapMXPPWMChannel(int32_t channel);
 int32_t remapMXPChannel(int32_t channel);
+
 }  // namespace hal

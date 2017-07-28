@@ -34,6 +34,7 @@ static std::unique_ptr<tInterruptManager> notifierManager;
 static uint64_t closestTrigger = UINT64_MAX;
 
 namespace {
+
 struct Notifier {
   std::shared_ptr<Notifier> prev, next;
   void* param;
@@ -87,6 +88,7 @@ class NotifierThreadOwner : public wpi::SafeThreadOwner<NotifierThread> {
 
   void* m_param;
 };
+
 }  // namespace
 
 static std::shared_ptr<Notifier> notifiers;

@@ -16,17 +16,20 @@
 using namespace hal;
 
 namespace {
+
 struct Counter {
   std::unique_ptr<tCounter> counter;
   uint8_t index;
 };
-}
+
+}  // namespace
 
 static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                              HAL_HandleEnum::Counter>
     counterHandles;
 
 extern "C" {
+
 HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
                                         int32_t* status) {
   auto handle = counterHandles.Allocate();
@@ -463,4 +466,5 @@ void HAL_SetCounterReverseDirection(HAL_CounterHandle counterHandle,
       HAL_SetCounterDownSourceEdge(counterHandle, false, true, status);
   }
 }
-}
+
+}  // extern "C"

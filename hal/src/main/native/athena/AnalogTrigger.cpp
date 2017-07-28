@@ -17,12 +17,14 @@
 using namespace hal;
 
 namespace {
+
 struct AnalogTrigger {
   std::unique_ptr<tAnalogTrigger> trigger;
   HAL_AnalogInputHandle analogHandle;
   uint8_t index;
 };
-}
+
+}  // namespace
 
 static LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
                              kNumAnalogTriggers, HAL_HandleEnum::AnalogTrigger>
@@ -203,4 +205,5 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
   }
   return result;
 }
-}
+
+}  // extern "C"

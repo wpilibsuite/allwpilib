@@ -12,6 +12,7 @@
 #include "HAL/ChipObject.h"
 
 namespace hal {
+
 constexpr int32_t kNumAccumulators = tAccumulator::kNumSystems;
 constexpr int32_t kNumAnalogTriggers = tAnalogTrigger::kNumSystems;
 constexpr int32_t kNumAnalogInputs = 8;
@@ -34,4 +35,5 @@ constexpr int32_t kNumPCMModules = 63;
 constexpr int32_t kNumSolenoidChannels = 8;
 constexpr int32_t kNumPDPModules = 63;
 constexpr int32_t kNumPDPChannels = 16;
+
 }  // namespace hal

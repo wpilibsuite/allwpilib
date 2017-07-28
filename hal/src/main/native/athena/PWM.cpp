@@ -449,4 +449,5 @@ int32_t HAL_GetLoopTiming(int32_t* status) {
   if (*status != 0) return 0;
   return pwmSystem->readLoopTiming(status);
 }
-}
+
+}  // extern "C"

@@ -21,6 +21,7 @@
 #include "PortsInternal.h"
 
 namespace hal {
+
 // Create a mutex to protect changes to the DO PWM config
 priority_recursive_mutex digitalPwmMutex;
 
@@ -157,4 +158,5 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
     return false;
   }
 }
+
 }  // namespace hal
