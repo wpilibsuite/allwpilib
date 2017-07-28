@@ -273,7 +273,7 @@ public class SerialPort {
   }
 
   /**
-   * Write a string to the serial port
+   * Write a string to the serial port.
    *
    * @param data The string to write to the serial port.
    * @return The number of bytes actually written into the port.

@@ -44,7 +44,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Constructs the test
+   * Constructs the test.
    *
    * @param mef The fixture under test.
    */

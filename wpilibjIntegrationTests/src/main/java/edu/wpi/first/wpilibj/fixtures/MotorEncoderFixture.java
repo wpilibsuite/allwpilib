@@ -139,7 +139,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    */
   public boolean isMotorSpeedWithinRange(double value, double accuracy) {
     initialize();
-    return Math.abs((Math.abs(m_motor.get()) - Math.abs(value))) < Math.abs(accuracy);
+    return Math.abs(Math.abs(m_motor.get()) - Math.abs(value)) < Math.abs(accuracy);
   }
 
   @Override

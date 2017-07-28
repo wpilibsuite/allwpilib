@@ -70,6 +70,8 @@ public class MockCommand extends Command {
   }
 
   /**
+   * Get what value the isFinished method will return.
+   *
    * @return what value the isFinished method will return.
    */
   public boolean isHasFinished() {
@@ -77,6 +79,8 @@ public class MockCommand extends Command {
   }
 
   /**
+   * Set what value the isFinished method will return.
+   *
    * @param hasFinished set what value the isFinished method will return.
    */
   public void setHasFinished(boolean hasFinished) {

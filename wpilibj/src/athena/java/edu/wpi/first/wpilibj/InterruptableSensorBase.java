@@ -105,7 +105,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
   }
 
   /**
-   * Allocate the interrupt
+   * Allocate the interrupt.
    *
    * @param watcher true if the interrupt should be in synchronous mode where the user program will
    *                have to explicitly wait for the interrupt to occur.

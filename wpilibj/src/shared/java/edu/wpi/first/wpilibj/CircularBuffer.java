@@ -20,6 +20,8 @@ public class CircularBuffer {
   private int m_length = 0;
 
   /**
+   * Create a CircularBuffer with the provided size.
+   *
    * @param size The size of the circular buffer.
    */
   public CircularBuffer(int size) {
@@ -124,6 +126,8 @@ public class CircularBuffer {
   }
 
   /**
+   * Get the element at the provided index relative to the start of the buffer.
+   *
    * @return Element at index starting from front of buffer.
    */
   public double get(int index) {

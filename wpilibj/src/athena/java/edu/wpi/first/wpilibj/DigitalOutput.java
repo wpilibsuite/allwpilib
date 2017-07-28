@@ -74,7 +74,9 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
   }
 
   /**
-   * @return The GPIO channel number that this object represents.
+   * Get the GPIO channel number that this object represents.
+   *
+   * @return The GPIO channel number.
    */
   @Override
   public int getChannel() {

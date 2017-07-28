@@ -102,7 +102,7 @@ public class DriverStation implements RobotState.Interface {
   private long m_lastControlWordUpdate;
 
   /**
-   * Gets an instance of the DriverStation
+   * Gets an instance of the DriverStation.
    *
    * @return The DriverStation.
    */
@@ -519,8 +519,8 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
-   * Has a new control packet from the driver station arrived since the last time this function was
-   * called?
+   * Gets if a new control packet from the driver station arrived since the last time this function
+   * was called.
    *
    * @return True if the control data has been updated since the last call.
    */
@@ -528,11 +528,10 @@ public class DriverStation implements RobotState.Interface {
     return HAL.isNewControlData();
   }
 
-  @SuppressWarnings({"SummaryJavadoc", "JavadocMethod"})
   /**
-   * Is the driver station attached to a Field Management System?
+   * Gets if the driver station attached to a Field Management System.
    *
-   * @return True if the robot is competing on a field being controlled by a Field Management System
+   * @return true if the robot is competing on a field being controlled by a Field Management System
    */
   public boolean isFMSAttached() {
     synchronized (m_controlWordMutex) {

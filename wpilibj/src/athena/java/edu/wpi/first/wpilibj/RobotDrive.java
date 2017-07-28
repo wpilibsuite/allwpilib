@@ -503,10 +503,10 @@ public class RobotDrive implements MotorSafety {
     double sinD = Math.sin(dirInRad);
 
     double[] wheelSpeeds = new double[kMaxNumberOfMotors];
-    wheelSpeeds[MotorType.kFrontLeft.value] = (sinD * magnitude + rotation);
-    wheelSpeeds[MotorType.kFrontRight.value] = (cosD * magnitude - rotation);
-    wheelSpeeds[MotorType.kRearLeft.value] = (cosD * magnitude + rotation);
-    wheelSpeeds[MotorType.kRearRight.value] = (sinD * magnitude - rotation);
+    wheelSpeeds[MotorType.kFrontLeft.value] = sinD * magnitude + rotation;
+    wheelSpeeds[MotorType.kFrontRight.value] = cosD * magnitude - rotation;
+    wheelSpeeds[MotorType.kRearLeft.value] = cosD * magnitude + rotation;
+    wheelSpeeds[MotorType.kRearRight.value] = sinD * magnitude - rotation;
 
     normalize(wheelSpeeds);
 

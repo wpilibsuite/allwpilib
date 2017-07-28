@@ -23,7 +23,7 @@ import java.io.File;
 public class AntJunitLanucher {
 
   /**
-   * Main entry point for jenkins
+   * Main entry point for jenkins.
    *
    * @param args Arguments passed to java.
    */

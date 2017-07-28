@@ -295,6 +295,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
   }
 
   /**
+   * Get the FPGA index of the encoder.
+   *
    * @return The Encoder's FPGA index.
    */
   @SuppressWarnings("AbbreviationAsWordInName")
