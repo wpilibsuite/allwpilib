@@ -85,8 +85,15 @@ model {
     testSuites {
         wpiutilTestingBaseTest {
             sources {
-                cpp.source.srcDir 'src/test/native/cpp'
-                cpp.exportedHeaders.srcDir 'src/test/native/include'
+                cpp {
+                    source {
+                        srcDirs 'src/test/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                    }
+                }
             }
         }
     }
