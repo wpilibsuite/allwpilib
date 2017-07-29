@@ -99,6 +99,8 @@ public class SmartDashboard {
   }
 
   /**
+   * Get the keys stored in the SmartDashboard table of NetworkTables.
+   *
    * @param types bitmask of types; 0 is treated as a "don't care".
    * @return keys currently in the table
    */
@@ -107,6 +109,8 @@ public class SmartDashboard {
   }
 
   /**
+   * Get the keys stored in the SmartDashboard table of NetworkTables.
+   *
    * @return keys currently in the table.
    */
   public static Set<String> getKeys() {

@@ -130,7 +130,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Allocate a PID object with the given constants for P, I, D, and F
+   * Allocate a PID object with the given constants for P, I, D, and F.
    *
    * @param Kp     the proportional coefficient
    * @param Ki     the integral coefficient
@@ -170,7 +170,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Allocate a PID object with the given constants for P, I, D and period
+   * Allocate a PID object with the given constants for P, I, D and period.
    *
    * @param Kp     the proportional coefficient
    * @param Ki     the integral coefficient

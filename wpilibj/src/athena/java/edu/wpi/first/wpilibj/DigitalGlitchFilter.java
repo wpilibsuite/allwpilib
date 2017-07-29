@@ -27,7 +27,7 @@ public class DigitalGlitchFilter extends SensorBase {
   public DigitalGlitchFilter() {
     synchronized (m_mutex) {
       int index = 0;
-      while (m_filterAllocated[index] != false && index < m_filterAllocated.length) {
+      while (m_filterAllocated[index] && index < m_filterAllocated.length) {
         index++;
       }
       if (index != m_filterAllocated.length) {

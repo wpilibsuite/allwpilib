@@ -67,7 +67,7 @@ public final class Resource {
    */
   public int allocate() throws CheckedAllocationException {
     for (int i = 0; i < m_size; i++) {
-      if (m_numAllocated[i] == false) {
+      if (!m_numAllocated[i]) {
         m_numAllocated[i] = true;
         return i;
       }
@@ -87,7 +87,7 @@ public final class Resource {
     if (index >= m_size || index < 0) {
       throw new CheckedAllocationException("Index " + index + " out of range");
     }
-    if (m_numAllocated[index] == true) {
+    if (m_numAllocated[index]) {
       throw new CheckedAllocationException("Resource at index " + index + " already allocated");
     }
     m_numAllocated[index] = true;
@@ -102,7 +102,7 @@ public final class Resource {
    * @param index The index of the resource to free.
    */
   public void free(final int index) {
-    if (m_numAllocated[index] == false) {
+    if (!m_numAllocated[index]) {
       throw new AllocationException("No resource available to be freed");
     }
     m_numAllocated[index] = false;

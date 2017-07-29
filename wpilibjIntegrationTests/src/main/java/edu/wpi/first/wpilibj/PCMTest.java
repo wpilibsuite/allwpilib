@@ -161,21 +161,21 @@ public class PCMTest extends AbstractComsSetup {
     Timer.delay(kSolenoidDelayTime);
     assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
     assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report off", (solenoid.get() == DoubleSolenoid.Value.kOff));
+    assertTrue("DoubleSolenoid did not report off", solenoid.get() == DoubleSolenoid.Value.kOff);
 
     solenoid.set(DoubleSolenoid.Value.kForward);
     Timer.delay(kSolenoidDelayTime);
     assertFalse("Solenoid #1 did not turn on", fakeSolenoid1.get());
     assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report Forward", (solenoid.get() == DoubleSolenoid.Value
-        .kForward));
+    assertTrue("DoubleSolenoid did not report Forward", solenoid.get() == DoubleSolenoid.Value
+        .kForward);
 
     solenoid.set(DoubleSolenoid.Value.kReverse);
     Timer.delay(kSolenoidDelayTime);
     assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
     assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report Reverse", (solenoid.get() == DoubleSolenoid.Value
-        .kReverse));
+    assertTrue("DoubleSolenoid did not report Reverse", solenoid.get() == DoubleSolenoid.Value
+        .kReverse);
 
     solenoid.free();
   }

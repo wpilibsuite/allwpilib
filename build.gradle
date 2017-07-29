@@ -41,7 +41,7 @@ subprojects {
     apply plugin: 'checkstyle'
 
     checkstyle {
-        toolVersion = "6.18"
+        toolVersion = "8.1"
         configFile = new File(rootDir, "styleguide/checkstyle.xml")
     }
 

@@ -53,7 +53,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   }
 
   /**
-   * Gyro constructor using the channel number
+   * Gyro constructor using the channel number.
    *
    * @param channel The analog channel the gyro is connected to. Gyros can only be used on on-board
    *                channels 0-1.

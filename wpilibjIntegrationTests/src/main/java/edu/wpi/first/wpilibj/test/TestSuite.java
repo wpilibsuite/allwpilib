@@ -153,7 +153,7 @@ public class TestSuite extends AbstractTestSuite {
 
   /**
    * Parses the arguments passed at runtime and runs the appropriate tests based upon these
-   * arguments
+   * arguments.
    *
    * @param args the args passed into the program at runtime
    * @return the restults of the tests that have run. If no tests were run then null is returned.

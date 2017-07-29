@@ -343,7 +343,7 @@ public final class TestBench {
         false));
     encoderPortPairs.addAll(getPairArray(getDIOCrossConnect().get(1), getDIOCrossConnect().get(0),
         false));
-    assert (encoderPortPairs.size() == 8);
+    assert encoderPortPairs.size() == 8;
     return encoderPortPairs;
   }
 

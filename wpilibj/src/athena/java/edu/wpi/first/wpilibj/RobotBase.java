@@ -73,6 +73,8 @@ public abstract class RobotBase {
   }
 
   /**
+   * Get if the robot is a simulation.
+   *
    * @return If the robot is running in simulation.
    */
   public static boolean isSimulation() {
@@ -80,6 +82,8 @@ public abstract class RobotBase {
   }
 
   /**
+   * Get if the robot is real.
+   *
    * @return If the robot is running in the real world.
    */
   public static boolean isReal() {

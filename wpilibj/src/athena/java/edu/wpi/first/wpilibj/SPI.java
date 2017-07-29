@@ -234,7 +234,7 @@ public class SPI extends SensorBase {
   }
 
   /**
-   * Perform a simultaneous read/write transaction with the device
+   * Perform a simultaneous read/write transaction with the device.
    *
    * @param dataToSend   The data to be written out to the device. Must be created using
    *                     ByteBuffer.allocateDirect().

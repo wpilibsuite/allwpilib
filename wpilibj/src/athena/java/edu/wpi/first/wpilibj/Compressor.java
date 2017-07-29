@@ -137,14 +137,18 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
   }
 
   /**
-   * @return true if PCM sticky fault is set : Compressor output appears to be shorted.
+   * If PCM sticky fault is set : Compressor output appears to be shorted.
+   *
+   * @return true if PCM sticky fault is set.
    */
   public boolean getCompressorShortedStickyFault() {
     return CompressorJNI.getCompressorShortedStickyFault(m_compressorHandle);
   }
 
   /**
-   * @return true if PCM is in fault state : Compressor output appears to be shorted.
+   * If PCM is in fault state : Compressor output appears to be shorted.
+   *
+   * @return true if PCM is in fault state.
    */
   public boolean getCompressorShortedFault() {
     return CompressorJNI.getCompressorShortedFault(m_compressorHandle);

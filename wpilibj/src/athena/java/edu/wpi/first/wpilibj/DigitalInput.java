@@ -61,7 +61,7 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
   }
 
   /**
-   * Get the channel of the digital input
+   * Get the channel of the digital input.
    *
    * @return The GPIO channel number that this object represents.
    */

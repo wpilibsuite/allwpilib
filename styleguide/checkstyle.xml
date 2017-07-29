@@ -30,6 +30,9 @@
     <module name="FileTabCharacter">
         <property name="eachLine" value="true"/>
     </module>
+    <module name="NewlineAtEndOfFile">
+        <property name="lineSeparator" value="lf"/>
+    </module>
 
     <module name="SuppressWarningsFilter" />
 
@@ -84,6 +87,10 @@
         <module name="ArrayTypeStyle"/>
         <module name="MissingSwitchDefault"/>
         <module name="FallThrough"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="StringLiteralEquality"/>
+        <module name="UnnecessaryParentheses"/>
         <module name="UpperEll"/>
         <module name="ModifierOrder"/>
         <module name="EmptyLineSeparator">
