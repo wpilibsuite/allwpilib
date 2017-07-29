@@ -23,20 +23,26 @@
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 #include "support/atomic_static.h"
+#include "support/deprecated.h"
 #include "support/SafeThread.h"
 
 namespace wpi {
 namespace java {
 
-// Gets a Java stack trace.  This version also provides the last function
+// Gets a Java stack trace.  Also provides the last function
 // in the stack trace not starting with excludeFuncPrefix (useful for e.g.
 // finding the first user call to a series of library functions).
-template <const char* excludeFuncPrefix = nullptr>
-std::string GetJavaStackTrace(JNIEnv* env, std::string* func);
+std::string GetJavaStackTrace(
+    JNIEnv* env, std::string* func = nullptr,
+    llvm::StringRef excludeFuncPrefix = llvm::StringRef());
 
-// Gets a Java stack trace.
-inline std::string GetJavaStackTrace(JNIEnv* env) {
-  return GetJavaStackTrace(env, nullptr);
+// Shim for backwards compatibility
+template<const char* excludeFuncPrefix>
+WPI_DEPRECATED("use StringRef function instead")
+std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
+  return GetJavaStackTrace(env, func, excludeFuncPrefix == nullptr
+                                          ? llvm::StringRef()
+                                          : excludeFuncPrefix);
 }
 
 // Finds a class and keep it as a global reference.
@@ -503,8 +509,8 @@ class JSingletonCallbackManager : public JCallbackManager<T> {
   ATOMIC_STATIC_DECL(JSingletonCallbackManager<T>)
 };
 
-template<const char* excludeFuncPrefix>
-std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
+inline std::string GetJavaStackTrace(JNIEnv* env, std::string* func,
+                                     llvm::StringRef excludeFuncPrefix) {
   // create a throwable
   static JClass throwableCls(env, "java/lang/Throwable");
   if (!throwableCls) return "";
@@ -563,7 +569,7 @@ std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
       // or, if we see it, the first user function
       if (i == 1)
         *func = elem.str();
-      else if (i > 1 && !haveLoc && excludeFuncPrefix != nullptr &&
+      else if (i > 1 && !haveLoc && !excludeFuncPrefix.empty() &&
                !elem.str().startswith(excludeFuncPrefix)) {
         *func = elem.str();
         haveLoc = true;
