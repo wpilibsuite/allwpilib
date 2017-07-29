@@ -32,6 +32,11 @@ class Logger {
   typedef std::function<void(unsigned int level, const char* file,
                              unsigned int line, const char* msg)> LogFunc;
 
+  Logger() = default;
+  explicit Logger(const LogFunc& func) : m_func(func) {}
+  Logger(const LogFunc& func, unsigned int min_level)
+      : m_func(func), m_min_level(min_level) {}
+
   void SetLogger(LogFunc func) { m_func = func; }
 
   void set_min_level(unsigned int level) { m_min_level = level; }
