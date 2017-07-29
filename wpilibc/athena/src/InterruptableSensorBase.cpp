@@ -13,8 +13,6 @@
 
 using namespace frc;
 
-InterruptableSensorBase::InterruptableSensorBase() {}
-
 /**
  * Request one of the 8 interrupts asynchronously on this digital input.
  *

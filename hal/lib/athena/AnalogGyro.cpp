@@ -7,7 +7,6 @@
 
 #include "HAL/AnalogGyro.h"
 
-#include <chrono>
 #include <thread>
 
 #include "AnalogInternal.h"

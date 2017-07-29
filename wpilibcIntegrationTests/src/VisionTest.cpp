@@ -12,6 +12,7 @@ using namespace frc;
 class VisionTester : public VisionPipeline {
  public:
   virtual ~VisionTester() = default;
+
   void Process(cv::Mat& mat) override {}
   void TestThing() {}
 };

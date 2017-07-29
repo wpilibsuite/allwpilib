@@ -16,13 +16,13 @@ extern JavaVM *jvm;
 
 namespace frc {
 
-void ReportError(JNIEnv *env, int32_t status, bool do_throw = true);
+void ReportError(JNIEnv *env, int32_t status, bool doThrow = true);
                  
 void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange, 
                 int32_t requestedValue);
 
-inline bool CheckStatus(JNIEnv *env, int32_t status, bool do_throw = true) {
-  if (status != 0) ReportError(env, status, do_throw);
+inline bool CheckStatus(JNIEnv *env, int32_t status, bool doThrow = true) {
+  if (status != 0) ReportError(env, status, doThrow);
   return status == 0;
 }
 
