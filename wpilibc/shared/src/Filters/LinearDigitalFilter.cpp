@@ -10,8 +10,6 @@
 #include <cassert>
 #include <cmath>
 
-using namespace frc;
-
 /**
  * Create a linear FIR or IIR filter.
  *
@@ -19,9 +17,9 @@ using namespace frc;
  * @param ffGains The "feed forward" or FIR gains
  * @param fbGains The "feed back" or IIR gains
  */
-LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         std::initializer_list<double> ffGains,
-                                         std::initializer_list<double> fbGains)
+frc::LinearDigitalFilter::LinearDigitalFilter(
+    std::shared_ptr<PIDSource> source, std::initializer_list<double> ffGains,
+    std::initializer_list<double> fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
@@ -35,9 +33,9 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  * @param ffGains The "feed forward" or FIR gains
  * @param fbGains The "feed back" or IIR gains
  */
-LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         std::initializer_list<double> ffGains,
-                                         const std::vector<double>& fbGains)
+frc::LinearDigitalFilter::LinearDigitalFilter(
+    std::shared_ptr<PIDSource> source, std::initializer_list<double> ffGains,
+    const std::vector<double>& fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
@@ -51,9 +49,9 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  * @param ffGains The "feed forward" or FIR gains
  * @param fbGains The "feed back" or IIR gains
  */
-LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         const std::vector<double>& ffGains,
-                                         std::initializer_list<double> fbGains)
+frc::LinearDigitalFilter::LinearDigitalFilter(
+    std::shared_ptr<PIDSource> source, const std::vector<double>& ffGains,
+    std::initializer_list<double> fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
@@ -67,9 +65,9 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  * @param ffGains The "feed forward" or FIR gains
  * @param fbGains The "feed back" or IIR gains
  */
-LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         const std::vector<double>& ffGains,
-                                         const std::vector<double>& fbGains)
+frc::LinearDigitalFilter::LinearDigitalFilter(
+    std::shared_ptr<PIDSource> source, const std::vector<double>& ffGains,
+    const std::vector<double>& fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
@@ -87,7 +85,7 @@ LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
  * @param timeConstant The discrete-time time constant in seconds
  * @param period       The period in seconds between samples taken by the user
  */
-LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(
+frc::LinearDigitalFilter frc::LinearDigitalFilter::SinglePoleIIR(
     std::shared_ptr<PIDSource> source, double timeConstant, double period) {
   double gain = std::exp(-period / timeConstant);
   return LinearDigitalFilter(std::move(source), {1.0 - gain}, {-gain});
@@ -104,7 +102,7 @@ LinearDigitalFilter LinearDigitalFilter::SinglePoleIIR(
  * @param timeConstant The discrete-time time constant in seconds
  * @param period       The period in seconds between samples taken by the user
  */
-LinearDigitalFilter LinearDigitalFilter::HighPass(
+frc::LinearDigitalFilter frc::LinearDigitalFilter::HighPass(
     std::shared_ptr<PIDSource> source, double timeConstant, double period) {
   double gain = std::exp(-period / timeConstant);
   return LinearDigitalFilter(std::move(source), {gain, -gain}, {-gain});
@@ -120,7 +118,7 @@ LinearDigitalFilter LinearDigitalFilter::HighPass(
  * @param taps   The number of samples to average over. Higher = smoother but
  *               slower
  */
-LinearDigitalFilter LinearDigitalFilter::MovingAverage(
+frc::LinearDigitalFilter frc::LinearDigitalFilter::MovingAverage(
     std::shared_ptr<PIDSource> source, int taps) {
   assert(taps > 0);
 
@@ -128,7 +126,7 @@ LinearDigitalFilter LinearDigitalFilter::MovingAverage(
   return LinearDigitalFilter(std::move(source), gains, {});
 }
 
-double LinearDigitalFilter::Get() const {
+double frc::LinearDigitalFilter::Get() const {
   double retVal = 0.0;
 
   // Calculate the new value
@@ -142,7 +140,7 @@ double LinearDigitalFilter::Get() const {
   return retVal;
 }
 
-void LinearDigitalFilter::Reset() {
+void frc::LinearDigitalFilter::Reset() {
   m_inputs.Reset();
   m_outputs.Reset();
 }
@@ -152,7 +150,7 @@ void LinearDigitalFilter::Reset() {
  *
  * @return The filtered value at this step
  */
-double LinearDigitalFilter::PIDGet() {
+double frc::LinearDigitalFilter::PIDGet() {
   double retVal = 0.0;
 
   // Rotate the inputs

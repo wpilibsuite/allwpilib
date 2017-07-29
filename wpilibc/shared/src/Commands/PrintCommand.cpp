@@ -9,11 +9,9 @@
 
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
-PrintCommand::PrintCommand(const std::string& message)
+frc::PrintCommand::PrintCommand(const std::string& message)
     : InstantCommand("Print \"" + message + "\"") {
   m_message = message;
 }
 
-void PrintCommand::Initialize() { llvm::outs() << m_message << "\n"; }
+void frc::PrintCommand::Initialize() { llvm::outs() << m_message << "\n"; }

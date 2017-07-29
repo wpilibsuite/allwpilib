@@ -17,8 +17,6 @@
 #include <unistd.h>
 #endif
 
-using namespace frc;
-
 /**
  * Provide an alternate "main loop" via StartCompetition().
  *
@@ -27,7 +25,7 @@ using namespace frc;
  * is called periodically, and a "fast loop" (a.k.a. "spin loop") that is
  * called as fast as possible with no delay between calls.
  */
-void IterativeRobot::StartCompetition() {
+void frc::IterativeRobot::StartCompetition() {
   LiveWindow* lw = LiveWindow::GetInstance();
   // first and one-time initialization
   NetworkTable::GetTable("LiveWindow")
@@ -109,7 +107,7 @@ void IterativeRobot::StartCompetition() {
  * will be called when the robot is first powered on.  It will be called
  * exactly 1 time.
  */
-void IterativeRobot::RobotInit() {
+void frc::IterativeRobot::RobotInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -119,7 +117,7 @@ void IterativeRobot::RobotInit() {
  * Users should override this method for initialization code which will be
  * called each time the robot enters disabled mode.
  */
-void IterativeRobot::DisabledInit() {
+void frc::IterativeRobot::DisabledInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -129,7 +127,7 @@ void IterativeRobot::DisabledInit() {
  * Users should override this method for initialization code which will be
  * called each time the robot enters autonomous mode.
  */
-void IterativeRobot::AutonomousInit() {
+void frc::IterativeRobot::AutonomousInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -139,7 +137,7 @@ void IterativeRobot::AutonomousInit() {
  * Users should override this method for initialization code which will be
  * called each time the robot enters teleop mode.
  */
-void IterativeRobot::TeleopInit() {
+void frc::IterativeRobot::TeleopInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -149,7 +147,7 @@ void IterativeRobot::TeleopInit() {
  * Users should override this method for initialization code which will be
  * called each time the robot enters test mode.
  */
-void IterativeRobot::TestInit() {
+void frc::IterativeRobot::TestInit() {
   llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
 }
 
@@ -159,7 +157,7 @@ void IterativeRobot::TestInit() {
  * Users should override this method for code which will be called periodically
  * at a regular rate while the robot is in any mode.
  */
-void IterativeRobot::RobotPeriodic() {
+void frc::IterativeRobot::RobotPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -173,7 +171,7 @@ void IterativeRobot::RobotPeriodic() {
  * Users should override this method for code which will be called periodically
  * at a regular rate while the robot is in disabled mode.
  */
-void IterativeRobot::DisabledPeriodic() {
+void frc::IterativeRobot::DisabledPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -187,7 +185,7 @@ void IterativeRobot::DisabledPeriodic() {
  * Users should override this method for code which will be called periodically
  * at a regular rate while the robot is in autonomous mode.
  */
-void IterativeRobot::AutonomousPeriodic() {
+void frc::IterativeRobot::AutonomousPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -201,7 +199,7 @@ void IterativeRobot::AutonomousPeriodic() {
  * Users should override this method for code which will be called periodically
  * at a regular rate while the robot is in teleop mode.
  */
-void IterativeRobot::TeleopPeriodic() {
+void frc::IterativeRobot::TeleopPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -215,7 +213,7 @@ void IterativeRobot::TeleopPeriodic() {
  * Users should override this method for code which will be called periodically
  * at a regular rate while the robot is in test mode.
  */
-void IterativeRobot::TestPeriodic() {
+void frc::IterativeRobot::TestPeriodic() {
   static bool firstRun = true;
   if (firstRun) {
     llvm::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";

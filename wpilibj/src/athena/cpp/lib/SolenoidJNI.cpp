@@ -15,8 +15,6 @@
 
 #include "HALUtil.h"
 
-using namespace frc;
-
 TLogLevel solenoidJNILogLevel = logERROR;
 
 #define SOLENOIDJNI_LOG(level)     \
@@ -47,8 +45,8 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_initializeSolenoidPort(
   SOLENOIDJNI_LOG(logDEBUG) << "Solenoid Port Handle = " << handle;
 
   // Use solenoid channels, as we have to pick one.
-  CheckStatusRange(env, status, 0, HAL_GetNumSolenoidChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));;
+  frc::CheckStatusRange(env, status, 0, HAL_GetNumSolenoidChannels(),
+                        hal::getPortHandleChannel((HAL_PortHandle)id));;
   return (jint)handle;
 }
 
@@ -104,7 +102,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_setSolenoid(
 
   int32_t status = 0;
   HAL_SetSolenoid((HAL_SolenoidHandle)solenoid_port, value, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -117,7 +115,7 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getSolenoid(
     JNIEnv *env, jclass, jint solenoid_port) {
   int32_t status = 0;
   jboolean val = HAL_GetSolenoid((HAL_SolenoidHandle)solenoid_port, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return val;
 }
 
@@ -131,7 +129,7 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getAllSolenoids(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   jint val = HAL_GetAllSolenoids(module, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return val;
 }
 
@@ -145,7 +143,7 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidBlackList(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   jint val = HAL_GetPCMSolenoidBlackList(module, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return val;
 }
 /*
@@ -158,7 +156,7 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageStickyFault(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   bool val = HAL_GetPCMSolenoidVoltageStickyFault(module, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return val;
 }
 /*
@@ -171,7 +169,7 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_getPCMSolenoidVoltageFault(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   bool val = HAL_GetPCMSolenoidVoltageFault(module, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return val;
 }
 /*
@@ -184,7 +182,7 @@ Java_edu_wpi_first_wpilibj_hal_SolenoidJNI_clearAllPCMStickyFaults(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   HAL_ClearAllPCMStickyFaults(module, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 }  // extern "C"

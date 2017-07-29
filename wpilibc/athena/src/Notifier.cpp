@@ -12,9 +12,7 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
-hal::priority_mutex Notifier::m_destructorMutex;
+hal::priority_mutex frc::Notifier::m_destructorMutex;
 
 /**
  * Create a Notifier for timer event notification.
@@ -22,19 +20,19 @@ hal::priority_mutex Notifier::m_destructorMutex;
  * @param handler The handler is called at the notification time which is set
  *                using StartSingle or StartPeriodic.
  */
-Notifier::Notifier(TimerEventHandler handler) {
+frc::Notifier::Notifier(TimerEventHandler handler) {
   if (handler == nullptr)
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
   int32_t status = 0;
-  m_notifier = HAL_InitializeNotifier(&Notifier::Notify, this, &status);
+  m_notifier = HAL_InitializeNotifier(&frc::Notifier::Notify, this, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
  * Free the resources for a timer event.
  */
-Notifier::~Notifier() {
+frc::Notifier::~Notifier() {
   int32_t status = 0;
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
@@ -44,14 +42,15 @@ Notifier::~Notifier() {
   /* Acquire the mutex; this makes certain that the handler is not being
    * executed by the interrupt manager.
    */
-  std::lock_guard<hal::priority_mutex> lockStatic(Notifier::m_destructorMutex);
+  std::lock_guard<hal::priority_mutex> lockStatic(
+      frc::Notifier::m_destructorMutex);
   std::lock_guard<hal::priority_mutex> lock(m_processMutex);
 }
 
 /**
  * Update the HAL alarm time.
  */
-void Notifier::UpdateAlarm() {
+void frc::Notifier::UpdateAlarm() {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
   if (m_notifier == 0) return;
@@ -64,11 +63,11 @@ void Notifier::UpdateAlarm() {
  * Notify is called by the HAL layer.  We simply need to pass it through to
  * the user handler.
  */
-void Notifier::Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
+void frc::Notifier::Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
   Notifier* notifier;
   {
     // Lock static mutex to grab the notifier param
-    std::lock_guard<hal::priority_mutex> lock(Notifier::m_destructorMutex);
+    std::lock_guard<hal::priority_mutex> lock(frc::Notifier::m_destructorMutex);
     int32_t status = 0;
     auto notifierPointer = HAL_GetNotifierParam(handle, &status);
     if (notifierPointer == nullptr) return;
@@ -94,7 +93,7 @@ void Notifier::Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
  *
  * @param delay Seconds to wait before the handler is called.
  */
-void Notifier::StartSingle(double delay) {
+void frc::Notifier::StartSingle(double delay) {
   std::lock_guard<hal::priority_mutex> sync(m_processMutex);
   m_periodic = false;
   m_period = delay;
@@ -112,7 +111,7 @@ void Notifier::StartSingle(double delay) {
  * @param period Period in seconds to call the handler starting one period
  *               after the call to this method.
  */
-void Notifier::StartPeriodic(double period) {
+void frc::Notifier::StartPeriodic(double period) {
   std::lock_guard<hal::priority_mutex> sync(m_processMutex);
   m_periodic = true;
   m_period = period;
@@ -129,13 +128,14 @@ void Notifier::StartPeriodic(double period) {
  * If a timer-based call to the registered handler is in progress, this function
  * will block until the handler call is complete.
  */
-void Notifier::Stop() {
+void frc::Notifier::Stop() {
   int32_t status = 0;
   HAL_StopNotifierAlarm(m_notifier, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   // Wait for a currently executing handler to complete before returning from
   // Stop()
-  std::lock_guard<hal::priority_mutex> lockStatic(Notifier::m_destructorMutex);
+  std::lock_guard<hal::priority_mutex> lockStatic(
+      frc::Notifier::m_destructorMutex);
   std::lock_guard<hal::priority_mutex> lock(m_processMutex);
 }

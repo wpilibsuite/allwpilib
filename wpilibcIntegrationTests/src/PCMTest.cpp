@@ -15,8 +15,6 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 /* The PCM switches the compressor up to a couple seconds after the pressure
         switch changes. */
 static const double kCompressorDelayTime = 3.0;
@@ -31,21 +29,21 @@ static const double kCompressorOffVoltage = 1.68;
 
 class PCMTest : public testing::Test {
  protected:
-  Compressor* m_compressor;
+  frc::Compressor* m_compressor;
 
-  DigitalOutput* m_fakePressureSwitch;
-  AnalogInput* m_fakeCompressor;
-  DoubleSolenoid* m_doubleSolenoid;
-  DigitalInput *m_fakeSolenoid1, *m_fakeSolenoid2;
+  frc::DigitalOutput* m_fakePressureSwitch;
+  frc::AnalogInput* m_fakeCompressor;
+  frc::DoubleSolenoid* m_doubleSolenoid;
+  frc::DigitalInput *m_fakeSolenoid1, *m_fakeSolenoid2;
 
   void SetUp() override {
-    m_compressor = new Compressor();
+    m_compressor = new frc::Compressor();
 
     m_fakePressureSwitch =
-        new DigitalOutput(TestBench::kFakePressureSwitchChannel);
-    m_fakeCompressor = new AnalogInput(TestBench::kFakeCompressorChannel);
-    m_fakeSolenoid1 = new DigitalInput(TestBench::kFakeSolenoid1Channel);
-    m_fakeSolenoid2 = new DigitalInput(TestBench::kFakeSolenoid2Channel);
+        new frc::DigitalOutput(TestBench::kFakePressureSwitchChannel);
+    m_fakeCompressor = new frc::AnalogInput(TestBench::kFakeCompressorChannel);
+    m_fakeSolenoid1 = new frc::DigitalInput(TestBench::kFakeSolenoid1Channel);
+    m_fakeSolenoid2 = new frc::DigitalInput(TestBench::kFakeSolenoid2Channel);
   }
 
   void TearDown() override {
@@ -72,13 +70,13 @@ TEST_F(PCMTest, PressureSwitch) {
 
   // Turn on the compressor
   m_fakePressureSwitch->Set(true);
-  Wait(kCompressorDelayTime);
+  frc::Wait(kCompressorDelayTime);
   EXPECT_NEAR(kCompressorOnVoltage, m_fakeCompressor->GetVoltage(), 0.5)
       << "Compressor did not turn on when the pressure switch turned on.";
 
   // Turn off the compressor
   m_fakePressureSwitch->Set(false);
-  Wait(kCompressorDelayTime);
+  frc::Wait(kCompressorDelayTime);
   EXPECT_NEAR(kCompressorOffVoltage, m_fakeCompressor->GetVoltage(), 0.5)
       << "Compressor did not turn off when the pressure switch turned off.";
 }
@@ -88,13 +86,13 @@ TEST_F(PCMTest, PressureSwitch) {
  */
 TEST_F(PCMTest, Solenoid) {
   Reset();
-  Solenoid solenoid1(TestBench::kSolenoidChannel1);
-  Solenoid solenoid2(TestBench::kSolenoidChannel2);
+  frc::Solenoid solenoid1(TestBench::kSolenoidChannel1);
+  frc::Solenoid solenoid2(TestBench::kSolenoidChannel2);
 
   // Turn both solenoids off
   solenoid1.Set(false);
   solenoid2.Set(false);
-  Wait(kSolenoidDelayTime);
+  frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
   EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
@@ -103,7 +101,7 @@ TEST_F(PCMTest, Solenoid) {
   // Turn one solenoid on and one off
   solenoid1.Set(true);
   solenoid2.Set(false);
-  Wait(kSolenoidDelayTime);
+  frc::Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn on";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
   EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
@@ -112,7 +110,7 @@ TEST_F(PCMTest, Solenoid) {
   // Turn one solenoid on and one off
   solenoid1.Set(false);
   solenoid2.Set(true);
-  Wait(kSolenoidDelayTime);
+  frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_FALSE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn on";
   EXPECT_FALSE(solenoid1.Get()) << "Solenoid #1 did not read off";
@@ -121,7 +119,7 @@ TEST_F(PCMTest, Solenoid) {
   // Turn both on
   solenoid1.Set(true);
   solenoid2.Set(true);
-  Wait(kSolenoidDelayTime);
+  frc::Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn on";
   EXPECT_FALSE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn on";
   EXPECT_TRUE(solenoid1.Get()) << "Solenoid #1 did not read on";
@@ -133,27 +131,27 @@ TEST_F(PCMTest, Solenoid) {
  * with the DoubleSolenoid class.
  */
 TEST_F(PCMTest, DoubleSolenoid) {
-  DoubleSolenoid solenoid(TestBench::kSolenoidChannel1,
-                          TestBench::kSolenoidChannel2);
+  frc::DoubleSolenoid solenoid(TestBench::kSolenoidChannel1,
+                               TestBench::kSolenoidChannel2);
 
-  solenoid.Set(DoubleSolenoid::kOff);
-  Wait(kSolenoidDelayTime);
+  solenoid.Set(frc::DoubleSolenoid::kOff);
+  frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
-  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kOff)
+  EXPECT_TRUE(solenoid.Get() == frc::DoubleSolenoid::kOff)
       << "Solenoid does not read off";
 
-  solenoid.Set(DoubleSolenoid::kForward);
-  Wait(kSolenoidDelayTime);
+  solenoid.Set(frc::DoubleSolenoid::kForward);
+  frc::Wait(kSolenoidDelayTime);
   EXPECT_FALSE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn on";
   EXPECT_TRUE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn off";
-  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kForward)
+  EXPECT_TRUE(solenoid.Get() == frc::DoubleSolenoid::kForward)
       << "Solenoid does not read forward";
 
-  solenoid.Set(DoubleSolenoid::kReverse);
-  Wait(kSolenoidDelayTime);
+  solenoid.Set(frc::DoubleSolenoid::kReverse);
+  frc::Wait(kSolenoidDelayTime);
   EXPECT_TRUE(m_fakeSolenoid1->Get()) << "Solenoid #1 did not turn off";
   EXPECT_FALSE(m_fakeSolenoid2->Get()) << "Solenoid #2 did not turn on";
-  EXPECT_TRUE(solenoid.Get() == DoubleSolenoid::kReverse)
+  EXPECT_TRUE(solenoid.Get() == frc::DoubleSolenoid::kReverse)
       << "Solenoid does not read reverse";
 }

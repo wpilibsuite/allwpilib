@@ -14,8 +14,6 @@
 #include "HAL/Threads.h"
 #include "HALUtil.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel threadsJNILogLevel = logWARNING;
 
@@ -37,7 +35,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_getCurrentThrea
   int32_t status = 0;
   HAL_Bool isRT = false;
   auto ret = HAL_GetCurrentThreadPriority(&isRT, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return (jint)ret;
 }
 
@@ -52,7 +50,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_getCurrentT
   int32_t status = 0;
   HAL_Bool isRT = false;
   HAL_GetCurrentThreadPriority(&isRT, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return (jboolean)isRT;
 }
 
@@ -66,7 +64,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_setCurrentT
   THREADSJNI_LOG(logDEBUG) << "Callling SetCurrentThreadPriority";
   int32_t status = 0;
   auto ret = HAL_SetCurrentThreadPriority((HAL_Bool)realTime, (int32_t)priority, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return (jboolean)ret;
 }
 

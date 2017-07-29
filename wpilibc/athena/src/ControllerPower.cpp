@@ -13,14 +13,12 @@
 #include "HAL/HAL.h"
 #include "HAL/Power.h"
 
-using namespace frc;
-
 /**
  * Get the input voltage to the robot controller.
  *
  * @return The controller input voltage value in Volts
  */
-double ControllerPower::GetInputVoltage() {
+double frc::ControllerPower::GetInputVoltage() {
   int32_t status = 0;
   double retVal = HAL_GetVinVoltage(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -32,7 +30,7 @@ double ControllerPower::GetInputVoltage() {
  *
  * @return The controller input current value in Amps
  */
-double ControllerPower::GetInputCurrent() {
+double frc::ControllerPower::GetInputCurrent() {
   int32_t status = 0;
   double retVal = HAL_GetVinCurrent(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -44,7 +42,7 @@ double ControllerPower::GetInputCurrent() {
  *
  * @return The controller 6V rail voltage value in Volts
  */
-double ControllerPower::GetVoltage6V() {
+double frc::ControllerPower::GetVoltage6V() {
   int32_t status = 0;
   double retVal = HAL_GetUserVoltage6V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -56,7 +54,7 @@ double ControllerPower::GetVoltage6V() {
  *
  * @return The controller 6V rail output current value in Amps
  */
-double ControllerPower::GetCurrent6V() {
+double frc::ControllerPower::GetCurrent6V() {
   int32_t status = 0;
   double retVal = HAL_GetUserCurrent6V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -69,7 +67,7 @@ double ControllerPower::GetCurrent6V() {
  *
  * @return The controller 6V rail enabled value. True for enabled.
  */
-bool ControllerPower::GetEnabled6V() {
+bool frc::ControllerPower::GetEnabled6V() {
   int32_t status = 0;
   bool retVal = HAL_GetUserActive6V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -82,7 +80,7 @@ bool ControllerPower::GetEnabled6V() {
  *
  * @return The number of faults.
  */
-int ControllerPower::GetFaultCount6V() {
+int frc::ControllerPower::GetFaultCount6V() {
   int32_t status = 0;
   int retVal = HAL_GetUserCurrentFaults6V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -94,7 +92,7 @@ int ControllerPower::GetFaultCount6V() {
  *
  * @return The controller 5V rail voltage value in Volts
  */
-double ControllerPower::GetVoltage5V() {
+double frc::ControllerPower::GetVoltage5V() {
   int32_t status = 0;
   double retVal = HAL_GetUserVoltage5V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -106,7 +104,7 @@ double ControllerPower::GetVoltage5V() {
  *
  * @return The controller 5V rail output current value in Amps
  */
-double ControllerPower::GetCurrent5V() {
+double frc::ControllerPower::GetCurrent5V() {
   int32_t status = 0;
   double retVal = HAL_GetUserCurrent5V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -119,7 +117,7 @@ double ControllerPower::GetCurrent5V() {
  *
  * @return The controller 5V rail enabled value. True for enabled.
  */
-bool ControllerPower::GetEnabled5V() {
+bool frc::ControllerPower::GetEnabled5V() {
   int32_t status = 0;
   bool retVal = HAL_GetUserActive5V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -132,7 +130,7 @@ bool ControllerPower::GetEnabled5V() {
  *
  * @return The number of faults
  */
-int ControllerPower::GetFaultCount5V() {
+int frc::ControllerPower::GetFaultCount5V() {
   int32_t status = 0;
   int retVal = HAL_GetUserCurrentFaults5V(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -144,7 +142,7 @@ int ControllerPower::GetFaultCount5V() {
  *
  * @return The controller 3.3V rail voltage value in Volts
  */
-double ControllerPower::GetVoltage3V3() {
+double frc::ControllerPower::GetVoltage3V3() {
   int32_t status = 0;
   double retVal = HAL_GetUserVoltage3V3(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -156,7 +154,7 @@ double ControllerPower::GetVoltage3V3() {
  *
  * @return The controller 3.3V rail output current value in Amps
  */
-double ControllerPower::GetCurrent3V3() {
+double frc::ControllerPower::GetCurrent3V3() {
   int32_t status = 0;
   double retVal = HAL_GetUserCurrent3V3(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -169,7 +167,7 @@ double ControllerPower::GetCurrent3V3() {
  *
  * @return The controller 3.3V rail enabled value. True for enabled.
  */
-bool ControllerPower::GetEnabled3V3() {
+bool frc::ControllerPower::GetEnabled3V3() {
   int32_t status = 0;
   bool retVal = HAL_GetUserActive3V3(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -182,7 +180,7 @@ bool ControllerPower::GetEnabled3V3() {
  *
  * @return The number of faults
  */
-int ControllerPower::GetFaultCount3V3() {
+int frc::ControllerPower::GetFaultCount3V3() {
   int32_t status = 0;
   int retVal = HAL_GetUserCurrentFaults3V3(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));

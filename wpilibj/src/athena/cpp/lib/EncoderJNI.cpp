@@ -15,8 +15,6 @@
 #include "HAL/Errors.h"
 #include "HALUtil.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel encoderJNILogLevel = logWARNING;
 
@@ -55,7 +53,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEncoder(
       
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "ENCODER Handle = " << encoder;
-  CheckStatusForceThrow(env, status);
+  frc::CheckStatusForceThrow(env, status);
   return (jint)encoder;
 }
 
@@ -71,7 +69,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_freeEncoder(
   int32_t status = 0;
   HAL_FreeEncoder((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -87,7 +85,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoder(
   jint returnValue = HAL_GetEncoder((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -104,7 +102,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderRaw(
   jint returnValue = HAL_GetEncoderRaw((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getRawEncoderResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -121,7 +119,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncodingScal
   jint returnValue = HAL_GetEncoderEncodingScale((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncodingScaleFactorResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -137,7 +135,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_EncoderJNI_resetEncoder(
   int32_t status = 0;
   HAL_ResetEncoder((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -154,7 +152,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderPeriod(
   double returnValue = HAL_GetEncoderPeriod((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderPeriodEncoderResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -171,7 +169,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderMaxPeriod(
   int32_t status = 0;
   HAL_SetEncoderMaxPeriod((HAL_EncoderHandle)id, value, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -188,7 +186,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderStopped(
   jboolean returnValue = HAL_GetEncoderStopped((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getStoppedEncoderResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -206,7 +204,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDirection(
   jboolean returnValue = HAL_GetEncoderDirection((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getDirectionEncoderResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -224,7 +222,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDistance(
   jdouble returnValue = HAL_GetEncoderDistance((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getDistanceEncoderResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -242,7 +240,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderRate(
   jdouble returnValue = HAL_GetEncoderRate((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getRateEncoderResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -259,7 +257,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderMinRate(
   int32_t status = 0;
   HAL_SetEncoderMinRate((HAL_EncoderHandle)id, value, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -275,7 +273,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderDistancePerPulse(
   int32_t status = 0;
   HAL_SetEncoderDistancePerPulse((HAL_EncoderHandle)id, value, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -291,7 +289,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderReverseDirection(
   int32_t status = 0;
   HAL_SetEncoderReverseDirection((HAL_EncoderHandle)id, value, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -308,10 +306,10 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderSamplesToAverage(
   HAL_SetEncoderSamplesToAverage((HAL_EncoderHandle)id, value, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   if (status == PARAMETER_OUT_OF_RANGE) {
-    ThrowBoundaryException(env, value, 1, 127);
+    frc::ThrowBoundaryException(env, value, 1, 127);
     return;
   }
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -329,7 +327,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderSamplesToAverage(
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = "
                            << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -353,7 +351,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderIndexSource(
                             (HAL_AnalogTriggerType)analogTriggerType, 
                             (HAL_EncoderIndexingType)type, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -371,7 +369,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderFPGAIndex(
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = "
                            << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -390,7 +388,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderEncodingScale(
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = "
                            << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -409,7 +407,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDecodingScaleFactor(
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = "
                            << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -428,7 +426,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDistancePerPulse(
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = "
                            << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -447,7 +445,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderEncodingType(
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = "
                            << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 

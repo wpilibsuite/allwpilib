@@ -10,16 +10,14 @@
 #include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
-using namespace frc;
-
-SimDigitalInput::SimDigitalInput(std::string topic) {
+frc::SimDigitalInput::SimDigitalInput(std::string topic) {
   sub = MainNode::Subscribe("~/simulator/" + topic, &SimDigitalInput::callback,
                             this);
   llvm::outs() << "Initialized ~/simulator/" + topic << "\n";
 }
 
-bool SimDigitalInput::Get() { return value; }
+bool frc::SimDigitalInput::Get() { return value; }
 
-void SimDigitalInput::callback(const gazebo::msgs::ConstBoolPtr& msg) {
+void frc::SimDigitalInput::callback(const gazebo::msgs::ConstBoolPtr& msg) {
   value = msg->data();
 }

@@ -15,8 +15,6 @@
 #include "HAL/Errors.h"
 #include "HALUtil.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel counterJNILogLevel = logWARNING;
 
@@ -45,7 +43,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_initializeCounter(
   COUNTERJNI_LOG(logDEBUG) << "Index = " << *indexPtr;
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   COUNTERJNI_LOG(logDEBUG) << "COUNTER Handle = " << counter;
-  CheckStatusForceThrow(env, status);
+  frc::CheckStatusForceThrow(env, status);
   return (jint)counter;
 }
 
@@ -61,7 +59,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_freeCounter(
   int32_t status = 0;
   HAL_FreeCounter((HAL_CounterHandle)id, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -78,7 +76,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterAverageSize(
   int32_t status = 0;
   HAL_SetCounterAverageSize((HAL_CounterHandle)id, value, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -98,7 +96,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSource(
   HAL_SetCounterUpSource((HAL_CounterHandle)id, (HAL_Handle)digitalSourceHandle, 
                      (HAL_AnalogTriggerType)analogTriggerType, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -116,7 +114,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSourceEdge(
   int32_t status = 0;
   HAL_SetCounterUpSourceEdge((HAL_CounterHandle)id, valueRise, valueFall, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -132,7 +130,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterUpSource(
   int32_t status = 0;
   HAL_ClearCounterUpSource((HAL_CounterHandle)id, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -153,12 +151,12 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSource(
                        (HAL_AnalogTriggerType)analogTriggerType, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   if (status == PARAMETER_OUT_OF_RANGE) {
-    ThrowIllegalArgumentException(env,
+    frc::ThrowIllegalArgumentException(env,
                                   "Counter only supports DownSource in "
                                   "TwoPulse and ExternalDirection modes.");
     return;
   }
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -176,7 +174,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSourceEdge(
   int32_t status = 0;
   HAL_SetCounterDownSourceEdge((HAL_CounterHandle)id, valueRise, valueFall, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -192,7 +190,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_clearCounterDownSource(
   int32_t status = 0;
   HAL_ClearCounterDownSource((HAL_CounterHandle)id, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -208,7 +206,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpDownMode(
   int32_t status = 0;
   HAL_SetCounterUpDownMode((HAL_CounterHandle)id, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -225,7 +223,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterExternalDirectionMode(
   int32_t status = 0;
   HAL_SetCounterExternalDirectionMode((HAL_CounterHandle)id, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -242,7 +240,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSemiPeriodMode(
   int32_t status = 0;
   HAL_SetCounterSemiPeriodMode((HAL_CounterHandle)id, value, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -259,7 +257,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterPulseLengthMode(
   int32_t status = 0;
   HAL_SetCounterPulseLengthMode((HAL_CounterHandle)id, value, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -277,7 +275,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterSamplesToAverage(
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   COUNTERJNI_LOG(logDEBUG) << "getCounterSamplesToAverageResult = "
                            << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -296,10 +294,10 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterSamplesToAverage(
   HAL_SetCounterSamplesToAverage((HAL_CounterHandle)id, value, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   if (status == PARAMETER_OUT_OF_RANGE) {
-    ThrowBoundaryException(env, value, 1, 127);
+    frc::ThrowBoundaryException(env, value, 1, 127);
     return;
   }
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -314,7 +312,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_resetCounter(
   int32_t status = 0;
   HAL_ResetCounter((HAL_CounterHandle)id, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -330,7 +328,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounter(
   jint returnValue = HAL_GetCounter((HAL_CounterHandle)id, &status);
   // COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   // COUNTERJNI_LOG(logDEBUG) << "getCounterResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -348,7 +346,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterPeriod(
   jdouble returnValue = HAL_GetCounterPeriod((HAL_CounterHandle)id, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   COUNTERJNI_LOG(logDEBUG) << "getCounterPeriodResult = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -366,7 +364,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterMaxPeriod(
   int32_t status = 0;
   HAL_SetCounterMaxPeriod((HAL_CounterHandle)id, value, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -383,7 +381,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpdateWhenEmpty(
   int32_t status = 0;
   HAL_SetCounterUpdateWhenEmpty((HAL_CounterHandle)id, value, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -400,7 +398,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterStopped(
   jboolean returnValue = HAL_GetCounterStopped((HAL_CounterHandle)id, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   COUNTERJNI_LOG(logDEBUG) << "getCounterStoppedResult = " << (jint)returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -419,7 +417,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_getCounterDirection(
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   COUNTERJNI_LOG(logDEBUG) << "getCounterDirectionResult = "
                            << (jint)returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -437,7 +435,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterReverseDirection(
   int32_t status = 0;
   HAL_SetCounterReverseDirection((HAL_CounterHandle)id, value, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 }  // extern "C"

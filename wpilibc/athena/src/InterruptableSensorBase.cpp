@@ -11,10 +11,6 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
-InterruptableSensorBase::InterruptableSensorBase() {}
-
 /**
  * Request one of the 8 interrupts asynchronously on this digital input.
  *
@@ -23,7 +19,7 @@ InterruptableSensorBase::InterruptableSensorBase() {}
  * thread priority should use the synchronous method with their own spawned
  * thread. The default is interrupt on rising edges only.
  */
-void InterruptableSensorBase::RequestInterrupts(
+void frc::InterruptableSensorBase::RequestInterrupts(
     HAL_InterruptHandlerFunction handler, void* param) {
   if (StatusIsFatal()) return;
 
@@ -48,7 +44,7 @@ void InterruptableSensorBase::RequestInterrupts(
  * explicitly wait for the interrupt to occur using WaitForInterrupt.
  * The default is interrupt on rising edges only.
  */
-void InterruptableSensorBase::RequestInterrupts() {
+void frc::InterruptableSensorBase::RequestInterrupts() {
   if (StatusIsFatal()) return;
 
   wpi_assert(m_interrupt == HAL_kInvalidHandle);
@@ -64,7 +60,7 @@ void InterruptableSensorBase::RequestInterrupts() {
   SetUpSourceEdge(true, false);
 }
 
-void InterruptableSensorBase::AllocateInterrupts(bool watcher) {
+void frc::InterruptableSensorBase::AllocateInterrupts(bool watcher) {
   wpi_assert(m_interrupt == HAL_kInvalidHandle);
   // Expects the calling leaf class to allocate an interrupt index.
   int32_t status = 0;
@@ -77,7 +73,7 @@ void InterruptableSensorBase::AllocateInterrupts(bool watcher) {
  *
  * This deallocates all the chipobject structures and disables any interrupts.
  */
-void InterruptableSensorBase::CancelInterrupts() {
+void frc::InterruptableSensorBase::CancelInterrupts() {
   if (StatusIsFatal()) return;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
@@ -98,9 +94,10 @@ void InterruptableSensorBase::CancelInterrupts() {
  *                       WaitForInterrupt was called.
  * @return What interrupts fired
  */
-InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
-    double timeout, bool ignorePrevious) {
-  if (StatusIsFatal()) return InterruptableSensorBase::kTimeout;
+frc::InterruptableSensorBase::WaitResult
+frc::InterruptableSensorBase::WaitForInterrupt(double timeout,
+                                               bool ignorePrevious) {
+  if (StatusIsFatal()) return frc::InterruptableSensorBase::kTimeout;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   int result;
@@ -124,7 +121,7 @@ InterruptableSensorBase::WaitResult InterruptableSensorBase::WaitForInterrupt(
  * time to do the setup of the other options before starting to field
  * interrupts.
  */
-void InterruptableSensorBase::EnableInterrupts() {
+void frc::InterruptableSensorBase::EnableInterrupts() {
   if (StatusIsFatal()) return;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
@@ -135,7 +132,7 @@ void InterruptableSensorBase::EnableInterrupts() {
 /**
  * Disable Interrupts without without deallocating structures.
  */
-void InterruptableSensorBase::DisableInterrupts() {
+void frc::InterruptableSensorBase::DisableInterrupts() {
   if (StatusIsFatal()) return;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
@@ -152,7 +149,7 @@ void InterruptableSensorBase::DisableInterrupts() {
  *
  * @return Timestamp in seconds since boot.
  */
-double InterruptableSensorBase::ReadRisingTimestamp() {
+double frc::InterruptableSensorBase::ReadRisingTimestamp() {
   if (StatusIsFatal()) return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
@@ -170,7 +167,7 @@ double InterruptableSensorBase::ReadRisingTimestamp() {
  *
  * @return Timestamp in seconds since boot.
 */
-double InterruptableSensorBase::ReadFallingTimestamp() {
+double frc::InterruptableSensorBase::ReadFallingTimestamp() {
   if (StatusIsFatal()) return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
@@ -185,8 +182,8 @@ double InterruptableSensorBase::ReadFallingTimestamp() {
  * @param risingEdge  true to interrupt on rising edge
  * @param fallingEdge true to interrupt on falling edge
  */
-void InterruptableSensorBase::SetUpSourceEdge(bool risingEdge,
-                                              bool fallingEdge) {
+void frc::InterruptableSensorBase::SetUpSourceEdge(bool risingEdge,
+                                                   bool fallingEdge) {
   if (StatusIsFatal()) return;
   if (m_interrupt == HAL_kInvalidHandle) {
     wpi_setWPIErrorWithContext(

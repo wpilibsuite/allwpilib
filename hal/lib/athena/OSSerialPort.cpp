@@ -220,12 +220,15 @@ int32_t HAL_WriteOSSerial(HAL_SerialPort port, const char* buffer,
                           int32_t count, int32_t* status) {
   return write(portHandles[port], buffer, count);
 }
+
 void HAL_FlushOSSerial(HAL_SerialPort port, int32_t* status) {
   tcdrain(portHandles[port]);
 }
+
 void HAL_ClearOSSerial(HAL_SerialPort port, int32_t* status) {
   tcflush(portHandles[port], TCIOFLUSH);
 }
+
 void HAL_CloseOSSerial(HAL_SerialPort port, int32_t* status) {
   close(portHandles[port]);
 }

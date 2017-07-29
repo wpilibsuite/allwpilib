@@ -13,14 +13,12 @@
 #include "HAL/Solenoid.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
 /**
  * Constructor.
  *
  * @param module The PCM ID to use (0-62)
  */
-Compressor::Compressor(int pcmID) : m_module(pcmID) {
+frc::Compressor::Compressor(int pcmID) : m_module(pcmID) {
   int32_t status = 0;
   m_compressorHandle = HAL_InitializeCompressor(m_module, &status);
   if (status != 0) {
@@ -35,7 +33,7 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
  * Starts closed-loop control. Note that closed loop control is enabled by
  * default.
  */
-void Compressor::Start() {
+void frc::Compressor::Start() {
   if (StatusIsFatal()) return;
   SetClosedLoopControl(true);
 }
@@ -44,7 +42,7 @@ void Compressor::Start() {
  * Stops closed-loop control. Note that closed loop control is enabled by
  * default.
  */
-void Compressor::Stop() {
+void frc::Compressor::Stop() {
   if (StatusIsFatal()) return;
   SetClosedLoopControl(false);
 }
@@ -54,7 +52,7 @@ void Compressor::Stop() {
  *
  * @return true if the compressor is on
  */
-bool Compressor::Enabled() const {
+bool frc::Compressor::Enabled() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -73,7 +71,7 @@ bool Compressor::Enabled() const {
  *
  * @return true if pressure is low
  */
-bool Compressor::GetPressureSwitchValue() const {
+bool frc::Compressor::GetPressureSwitchValue() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -92,7 +90,7 @@ bool Compressor::GetPressureSwitchValue() const {
  *
  * @return The current through the compressor, in amps
  */
-double Compressor::GetCompressorCurrent() const {
+double frc::Compressor::GetCompressorCurrent() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   double value;
@@ -113,7 +111,7 @@ double Compressor::GetCompressorCurrent() const {
  * @param on Set to true to enable closed loop control of the compressor. False
  *           to disable.
  */
-void Compressor::SetClosedLoopControl(bool on) {
+void frc::Compressor::SetClosedLoopControl(bool on) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
 
@@ -131,7 +129,7 @@ void Compressor::SetClosedLoopControl(bool on) {
  * @return True if closed loop control of the compressor is enabled. False if
  *         disabled.
  */
-bool Compressor::GetClosedLoopControl() const {
+bool frc::Compressor::GetClosedLoopControl() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -151,7 +149,7 @@ bool Compressor::GetClosedLoopControl() const {
  * @return true if PCM is in fault state : Compressor Drive is
  *         disabled due to compressor current being too high.
  */
-bool Compressor::GetCompressorCurrentTooHighFault() const {
+bool frc::Compressor::GetCompressorCurrentTooHighFault() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -175,7 +173,7 @@ bool Compressor::GetCompressorCurrentTooHighFault() const {
  * @return true if PCM sticky fault is set : Compressor Drive is
  *         disabled due to compressor current being too high.
  */
-bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
+bool frc::Compressor::GetCompressorCurrentTooHighStickyFault() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -200,7 +198,7 @@ bool Compressor::GetCompressorCurrentTooHighStickyFault() const {
  * @return true if PCM sticky fault is set : Compressor output
  *         appears to be shorted.
  */
-bool Compressor::GetCompressorShortedStickyFault() const {
+bool frc::Compressor::GetCompressorShortedStickyFault() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -220,7 +218,7 @@ bool Compressor::GetCompressorShortedStickyFault() const {
  * @return true if PCM is in fault state : Compressor output
  *         appears to be shorted.
  */
-bool Compressor::GetCompressorShortedFault() const {
+bool frc::Compressor::GetCompressorShortedFault() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -243,7 +241,7 @@ bool Compressor::GetCompressorShortedFault() const {
  * @return true if PCM sticky fault is set : Compressor does not
  *         appear to be wired, i.e. compressor is not drawing enough current.
  */
-bool Compressor::GetCompressorNotConnectedStickyFault() const {
+bool frc::Compressor::GetCompressorNotConnectedStickyFault() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -263,7 +261,7 @@ bool Compressor::GetCompressorNotConnectedStickyFault() const {
  * @return true if PCM is in fault state : Compressor does not
  *         appear to be wired, i.e. compressor is not drawing enough current.
  */
-bool Compressor::GetCompressorNotConnectedFault() const {
+bool frc::Compressor::GetCompressorNotConnectedFault() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value;
@@ -287,7 +285,7 @@ bool Compressor::GetCompressorNotConnectedFault() const {
  *
  * If no sticky faults are set then this call will have no effect.
  */
-void Compressor::ClearAllPCMStickyFaults() {
+void frc::Compressor::ClearAllPCMStickyFaults() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
 
@@ -298,28 +296,31 @@ void Compressor::ClearAllPCMStickyFaults() {
   }
 }
 
-void Compressor::UpdateTable() {
+void frc::Compressor::UpdateTable() {
   if (m_table) {
     m_table->PutBoolean("Enabled", Enabled());
     m_table->PutBoolean("Pressure switch", GetPressureSwitchValue());
   }
 }
 
-void Compressor::StartLiveWindowMode() {}
+void frc::Compressor::StartLiveWindowMode() {}
 
-void Compressor::StopLiveWindowMode() {}
+void frc::Compressor::StopLiveWindowMode() {}
 
-std::string Compressor::GetSmartDashboardType() const { return "Compressor"; }
+std::string frc::Compressor::GetSmartDashboardType() const {
+  return "Compressor";
+}
 
-void Compressor::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::Compressor::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> Compressor::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Compressor::GetTable() const { return m_table; }
 
-void Compressor::ValueChanged(ITable* source, llvm::StringRef key,
-                              std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::Compressor::ValueChanged(ITable* source, llvm::StringRef key,
+                                   std::shared_ptr<nt::Value> value,
+                                   bool isNew) {
   if (!value->IsBoolean()) return;
   if (value->GetBoolean())
     Start();

@@ -16,8 +16,6 @@
 #include "HALUtil.h"
 #include "HAL/handles/HandlesInternal.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel relayJNILogLevel = logWARNING;
 
@@ -43,8 +41,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_initializeRelayPo
   HAL_RelayHandle handle = HAL_InitializeRelayPort((HAL_PortHandle)id, (uint8_t) fwd, &status);
   RELAYJNI_LOG(logDEBUG) << "Status = " << status;
   RELAYJNI_LOG(logDEBUG) << "Relay Handle = " << handle;
-  CheckStatusRange(env, status, 0, HAL_GetNumRelayChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  frc::CheckStatusRange(env, status, 0, HAL_GetNumRelayChannels(),
+                        hal::getPortHandleChannel((HAL_PortHandle)id));
   return (jint) handle;
 }
 
@@ -85,7 +83,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_RelayJNI_setRelay(
   int32_t status = 0;
   HAL_SetRelay((HAL_RelayHandle)id, value, &status);
   RELAYJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -102,7 +100,7 @@ Java_edu_wpi_first_wpilibj_hal_RelayJNI_getRelay(
   jboolean returnValue = HAL_GetRelay((HAL_RelayHandle)id, &status);
   RELAYJNI_LOG(logDEBUG) << "Status = " << status;
   RELAYJNI_LOG(logDEBUG) << "getRelayResult = " << (jint)returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 

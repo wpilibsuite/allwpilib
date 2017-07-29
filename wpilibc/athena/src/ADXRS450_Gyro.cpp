@@ -12,8 +12,6 @@
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 
-using namespace frc;
-
 static constexpr double kSamplePeriod = 0.001;
 static constexpr double kCalibrationSampleTime = 5.0;
 static constexpr double kDegreePerSecondPerLSB = 0.0125;
@@ -39,7 +37,7 @@ static constexpr int kSNLowRegister = 0x10;
  * calculations are in progress, this is typically done when the robot is first
  * turned on while it's sitting at rest before the competition starts.
  */
-void ADXRS450_Gyro::Calibrate() {
+void frc::ADXRS450_Gyro::Calibrate() {
   Wait(0.1);
 
   m_spi.SetAccumulatorCenter(0);
@@ -54,14 +52,14 @@ void ADXRS450_Gyro::Calibrate() {
 /**
  * Gyro constructor on onboard CS0.
  */
-ADXRS450_Gyro::ADXRS450_Gyro() : ADXRS450_Gyro(SPI::kOnboardCS0) {}
+frc::ADXRS450_Gyro::ADXRS450_Gyro() : ADXRS450_Gyro(SPI::kOnboardCS0) {}
 
 /**
  * Gyro constructor on the specified SPI port.
  *
  * @param port The SPI port the gyro is attached to.
  */
-ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
+frc::ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
   m_spi.SetClockRate(3000000);
   m_spi.SetMSBFirst();
   m_spi.SetSampleDataOnRising();
@@ -100,7 +98,7 @@ static inline int BytesToIntBE(uint8_t* buf) {
   return result;
 }
 
-uint16_t ADXRS450_Gyro::ReadRegister(int reg) {
+uint16_t frc::ADXRS450_Gyro::ReadRegister(int reg) {
   int cmd = 0x80000000 | static_cast<int>(reg) << 17;
   if (!CalcParity(cmd)) cmd |= 1u;
 
@@ -123,7 +121,7 @@ uint16_t ADXRS450_Gyro::ReadRegister(int reg) {
  * significant drift in the gyro and it needs to be recalibrated after it has
  * been running.
  */
-void ADXRS450_Gyro::Reset() { m_spi.ResetAccumulator(); }
+void frc::ADXRS450_Gyro::Reset() { m_spi.ResetAccumulator(); }
 
 /**
  * Return the actual angle in degrees that the robot is currently facing.
@@ -137,7 +135,7 @@ void ADXRS450_Gyro::Reset() { m_spi.ResetAccumulator(); }
  * @return the current heading of the robot in degrees. This heading is based on
  *         integration of the returned rate from the gyro.
  */
-double ADXRS450_Gyro::GetAngle() const {
+double frc::ADXRS450_Gyro::GetAngle() const {
   return m_spi.GetAccumulatorValue() * kDegreePerSecondPerLSB * kSamplePeriod;
 }
 
@@ -148,7 +146,7 @@ double ADXRS450_Gyro::GetAngle() const {
  *
  * @return the current rate in degrees per second
  */
-double ADXRS450_Gyro::GetRate() const {
+double frc::ADXRS450_Gyro::GetRate() const {
   return static_cast<double>(m_spi.GetAccumulatorLastValue()) *
          kDegreePerSecondPerLSB;
 }

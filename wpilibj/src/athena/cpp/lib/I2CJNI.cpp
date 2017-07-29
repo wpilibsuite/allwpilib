@@ -14,8 +14,6 @@
 #include "HAL/I2C.h"
 #include "HALUtil.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel i2cJNILogLevel = logWARNING;
 
@@ -39,7 +37,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CInitialize(
   int32_t status = 0;
   HAL_InitializeI2C(static_cast<HAL_I2CPort>(port), &status);
   I2CJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatusForceThrow(env, status);
+  frc::CheckStatusForceThrow(env, status);
 }
 
 /*

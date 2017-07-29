@@ -20,9 +20,7 @@
 #include "WPILibVersion.h"
 #include "networktables/NetworkTable.h"
 
-using namespace frc;
-
-std::thread::id RobotBase::m_threadId;
+std::thread::id frc::RobotBase::m_threadId;
 
 /**
  * Constructor for a generic robot program.
@@ -35,7 +33,7 @@ std::thread::id RobotBase::m_threadId;
  * future it would be nice to put this code into it's own task that loads on
  * boot so ensure that it runs.
  */
-RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
+frc::RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   m_threadId = std::this_thread::get_id();
 
   RobotState::SetImplementation(DriverStation::GetInstance());
@@ -67,43 +65,47 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
  * Determine if the Robot is currently enabled.
  * @return True if the Robot is currently enabled by the field controls.
  */
-bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
+bool frc::RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
 
 /**
  * Determine if the Robot is currently disabled.
  * @return True if the Robot is currently disabled by the field controls.
  */
-bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
+bool frc::RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
 
 /**
  * Determine if the robot is currently in Autonomous mode.
  * @return True if the robot is currently operating Autonomously as determined
  * by the field controls.
  */
-bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
+bool frc::RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
 
 /**
  * Determine if the robot is currently in Operator Control mode.
  * @return True if the robot is currently operating in Tele-Op mode as
  * determined by the field controls.
  */
-bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
+bool frc::RobotBase::IsOperatorControl() const {
+  return m_ds.IsOperatorControl();
+}
 
 /**
  * Determine if the robot is currently in Test mode.
  * @return True if the robot is currently running tests as determined by the
  * field controls.
  */
-bool RobotBase::IsTest() const { return m_ds.IsTest(); }
+bool frc::RobotBase::IsTest() const { return m_ds.IsTest(); }
 
 /**
  * Indicates if new data is available from the driver station.
  * @return Has new data arrived over the network since the last time this
  * function was called?
  */
-bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
+bool frc::RobotBase::IsNewDataAvailable() const {
+  return m_ds.IsNewControlData();
+}
 
 /**
  * Gets the ID of the main robot thread
  */
-std::thread::id RobotBase::GetThreadId() { return m_threadId; }
+std::thread::id frc::RobotBase::GetThreadId() { return m_threadId; }

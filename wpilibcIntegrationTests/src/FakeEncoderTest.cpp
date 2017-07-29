@@ -14,33 +14,31 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const double kDelayTime = 0.001;
 
 class FakeEncoderTest : public testing::Test {
  protected:
-  DigitalOutput* m_outputA;
-  DigitalOutput* m_outputB;
-  AnalogOutput* m_indexOutput;
+  frc::DigitalOutput* m_outputA;
+  frc::DigitalOutput* m_outputB;
+  frc::AnalogOutput* m_indexOutput;
 
-  Encoder* m_encoder;
-  AnalogTrigger* m_indexAnalogTrigger;
-  std::shared_ptr<AnalogTriggerOutput> m_indexAnalogTriggerOutput;
+  frc::Encoder* m_encoder;
+  frc::AnalogTrigger* m_indexAnalogTrigger;
+  std::shared_ptr<frc::AnalogTriggerOutput> m_indexAnalogTriggerOutput;
 
   void SetUp() override {
-    m_outputA = new DigitalOutput(TestBench::kLoop2OutputChannel);
-    m_outputB = new DigitalOutput(TestBench::kLoop1OutputChannel);
-    m_indexOutput = new AnalogOutput(TestBench::kAnalogOutputChannel);
+    m_outputA = new frc::DigitalOutput(TestBench::kLoop2OutputChannel);
+    m_outputB = new frc::DigitalOutput(TestBench::kLoop1OutputChannel);
+    m_indexOutput = new frc::AnalogOutput(TestBench::kAnalogOutputChannel);
     m_outputA->Set(false);
     m_outputB->Set(false);
-    m_encoder = new Encoder(TestBench::kLoop1InputChannel,
-                            TestBench::kLoop2InputChannel);
+    m_encoder = new frc::Encoder(TestBench::kLoop1InputChannel,
+                                 TestBench::kLoop2InputChannel);
     m_indexAnalogTrigger =
-        new AnalogTrigger(TestBench::kFakeAnalogOutputChannel);
+        new frc::AnalogTrigger(TestBench::kFakeAnalogOutputChannel);
     m_indexAnalogTrigger->SetLimitsVoltage(2.0, 3.0);
     m_indexAnalogTriggerOutput =
-        m_indexAnalogTrigger->CreateOutput(AnalogTriggerType::kState);
+        m_indexAnalogTrigger->CreateOutput(frc::AnalogTriggerType::kState);
   }
 
   void TearDown() override {
@@ -58,24 +56,24 @@ class FakeEncoderTest : public testing::Test {
   void Simulate100QuadratureTicks() {
     for (int32_t i = 0; i < 100; i++) {
       m_outputA->Set(true);
-      Wait(kDelayTime);
+      frc::Wait(kDelayTime);
       m_outputB->Set(true);
-      Wait(kDelayTime);
+      frc::Wait(kDelayTime);
       m_outputA->Set(false);
-      Wait(kDelayTime);
+      frc::Wait(kDelayTime);
       m_outputB->Set(false);
-      Wait(kDelayTime);
+      frc::Wait(kDelayTime);
     }
   }
 
   void SetIndexHigh() {
     m_indexOutput->SetVoltage(5.0);
-    Wait(kDelayTime);
+    frc::Wait(kDelayTime);
   }
 
   void SetIndexLow() {
     m_indexOutput->SetVoltage(0.0);
-    Wait(kDelayTime);
+    frc::Wait(kDelayTime);
   }
 };
 
@@ -101,7 +99,7 @@ TEST_F(FakeEncoderTest, TestCountUp) {
  */
 TEST_F(FakeEncoderTest, TestResetWhileHigh) {
   m_encoder->SetIndexSource(*m_indexAnalogTriggerOutput,
-                            Encoder::IndexingType::kResetWhileHigh);
+                            frc::Encoder::IndexingType::kResetWhileHigh);
 
   SetIndexLow();
   Simulate100QuadratureTicks();
@@ -117,7 +115,7 @@ TEST_F(FakeEncoderTest, TestResetWhileHigh) {
  */
 TEST_F(FakeEncoderTest, TestResetOnRisingEdge) {
   m_encoder->SetIndexSource(*m_indexAnalogTriggerOutput,
-                            Encoder::IndexingType::kResetOnRisingEdge);
+                            frc::Encoder::IndexingType::kResetOnRisingEdge);
 
   SetIndexLow();
   Simulate100QuadratureTicks();
@@ -133,7 +131,7 @@ TEST_F(FakeEncoderTest, TestResetOnRisingEdge) {
  */
 TEST_F(FakeEncoderTest, TestResetWhileLow) {
   m_encoder->SetIndexSource(*m_indexAnalogTriggerOutput,
-                            Encoder::IndexingType::kResetWhileLow);
+                            frc::Encoder::IndexingType::kResetWhileLow);
 
   SetIndexHigh();
   Simulate100QuadratureTicks();
@@ -149,7 +147,7 @@ TEST_F(FakeEncoderTest, TestResetWhileLow) {
  */
 TEST_F(FakeEncoderTest, TestResetOnFallingEdge) {
   m_encoder->SetIndexSource(*m_indexAnalogTriggerOutput,
-                            Encoder::IndexingType::kResetOnFallingEdge);
+                            frc::Encoder::IndexingType::kResetOnFallingEdge);
 
   SetIndexHigh();
   Simulate100QuadratureTicks();

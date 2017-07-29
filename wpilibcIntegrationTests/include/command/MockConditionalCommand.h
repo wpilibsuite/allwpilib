@@ -10,9 +10,7 @@
 #include "Commands/ConditionalCommand.h"
 #include "command/MockCommand.h"
 
-namespace frc {
-
-class MockConditionalCommand : public ConditionalCommand {
+class MockConditionalCommand : public frc::ConditionalCommand {
  public:
   MockConditionalCommand(MockCommand* onTrue, MockCommand* onFalse);
   void SetCondition(bool condition);
@@ -23,5 +21,3 @@ class MockConditionalCommand : public ConditionalCommand {
  private:
   bool m_condition = false;
 };
-
-}  // namespace frc

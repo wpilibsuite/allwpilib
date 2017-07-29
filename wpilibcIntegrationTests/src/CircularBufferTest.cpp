@@ -11,8 +11,6 @@
 
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const std::array<double, 10> values = {
     751.848, 766.366, 342.657, 234.252, 716.126,
     132.344, 445.697, 22.727,  421.125, 799.913};
@@ -24,7 +22,7 @@ static const std::array<double, 8> pushBackOut = {
     342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913};
 
 TEST(CircularBufferTest, PushFrontTest) {
-  CircularBuffer<double> queue(8);
+  frc::CircularBuffer<double> queue(8);
 
   for (auto& value : values) {
     queue.PushFront(value);
@@ -36,7 +34,7 @@ TEST(CircularBufferTest, PushFrontTest) {
 }
 
 TEST(CircularBufferTest, PushBackTest) {
-  CircularBuffer<double> queue(8);
+  frc::CircularBuffer<double> queue(8);
 
   for (auto& value : values) {
     queue.PushBack(value);
@@ -48,7 +46,7 @@ TEST(CircularBufferTest, PushBackTest) {
 }
 
 TEST(CircularBufferTest, PushPopTest) {
-  CircularBuffer<double> queue(3);
+  frc::CircularBuffer<double> queue(3);
 
   // Insert three elements into the buffer
   queue.PushBack(1.0);
@@ -91,7 +89,7 @@ TEST(CircularBufferTest, PushPopTest) {
 }
 
 TEST(CircularBufferTest, ResetTest) {
-  CircularBuffer<double> queue(5);
+  frc::CircularBuffer<double> queue(5);
 
   for (size_t i = 1; i < 6; i++) {
     queue.PushBack(i);
@@ -105,7 +103,7 @@ TEST(CircularBufferTest, ResetTest) {
 }
 
 TEST(CircularBufferTest, ResizeTest) {
-  CircularBuffer<double> queue(5);
+  frc::CircularBuffer<double> queue(5);
 
   /* Buffer contains {1, 2, 3, _, _}
    *                  ^ front

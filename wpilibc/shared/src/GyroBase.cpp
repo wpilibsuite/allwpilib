@@ -10,15 +10,13 @@
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
 /**
  * Get the PIDOutput for the PIDSource base object. Can be set to return
  * angle or rate using SetPIDSourceType(). Defaults to angle.
  *
  * @return The PIDOutput (angle or rate, defaults to angle)
  */
-double GyroBase::PIDGet() {
+double frc::GyroBase::PIDGet() {
   switch (GetPIDSourceType()) {
     case PIDSourceType::kRate:
       return GetRate();
@@ -29,21 +27,21 @@ double GyroBase::PIDGet() {
   }
 }
 
-void GyroBase::UpdateTable() {
+void frc::GyroBase::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", GetAngle());
   }
 }
 
-void GyroBase::StartLiveWindowMode() {}
+void frc::GyroBase::StartLiveWindowMode() {}
 
-void GyroBase::StopLiveWindowMode() {}
+void frc::GyroBase::StopLiveWindowMode() {}
 
-std::string GyroBase::GetSmartDashboardType() const { return "Gyro"; }
+std::string frc::GyroBase::GetSmartDashboardType() const { return "Gyro"; }
 
-void GyroBase::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::GyroBase::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> GyroBase::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::GyroBase::GetTable() const { return m_table; }

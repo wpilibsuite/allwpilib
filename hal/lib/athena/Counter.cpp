@@ -13,17 +13,15 @@
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
 
-using namespace hal;
-
 namespace {
 struct Counter {
-  std::unique_ptr<tCounter> counter;
+  std::unique_ptr<hal::tCounter> counter;
   uint8_t index;
 };
 }
 
-static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
-                             HAL_HandleEnum::Counter>
+static hal::LimitedHandleResource<HAL_CounterHandle, Counter, hal::kNumCounters,
+                                  hal::HAL_HandleEnum::Counter>
     counterHandles;
 
 extern "C" {
@@ -39,10 +37,10 @@ HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
-  counter->index = static_cast<uint8_t>(getHandleIndex(handle));
+  counter->index = static_cast<uint8_t>(hal::getHandleIndex(handle));
   *index = counter->index;
 
-  counter->counter.reset(tCounter::create(counter->index, status));
+  counter->counter.reset(hal::tCounter::create(counter->index, status));
   counter->counter->writeConfig_Mode(mode, status);
   counter->counter->writeTimerConfig_AverageSize(1, status);
   return handle;
@@ -79,9 +77,9 @@ void HAL_SetCounterUpSource(HAL_CounterHandle counterHandle,
   bool routingAnalogTrigger = false;
   uint8_t routingChannel = 0;
   uint8_t routingModule = 0;
-  bool success =
-      remapDigitalSource(digitalSourceHandle, analogTriggerType, routingChannel,
-                         routingModule, routingAnalogTrigger);
+  bool success = hal::remapDigitalSource(digitalSourceHandle, analogTriggerType,
+                                         routingChannel, routingModule,
+                                         routingAnalogTrigger);
   if (!success) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -157,9 +155,9 @@ void HAL_SetCounterDownSource(HAL_CounterHandle counterHandle,
   bool routingAnalogTrigger = false;
   uint8_t routingChannel = 0;
   uint8_t routingModule = 0;
-  bool success =
-      remapDigitalSource(digitalSourceHandle, analogTriggerType, routingChannel,
-                         routingModule, routingAnalogTrigger);
+  bool success = hal::remapDigitalSource(digitalSourceHandle, analogTriggerType,
+                                         routingChannel, routingModule,
+                                         routingAnalogTrigger);
   if (!success) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -269,7 +267,7 @@ void HAL_SetCounterPulseLengthMode(HAL_CounterHandle counterHandle,
   counter->counter->writeConfig_Mode(HAL_Counter_kPulseLength, status);
   counter->counter->writeConfig_PulseLengthThreshold(
       static_cast<uint32_t>(threshold * 1.0e6) *
-          kSystemClockTicksPerMicrosecond,
+          hal::kSystemClockTicksPerMicrosecond,
       status);
 }
 
@@ -350,7 +348,8 @@ double HAL_GetCounterPeriod(HAL_CounterHandle counterHandle, int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return 0.0;
   }
-  tCounter::tTimerOutput output = counter->counter->readTimerOutput(status);
+  hal::tCounter::tTimerOutput output =
+      counter->counter->readTimerOutput(status);
   double period;
   if (output.Stalled) {
     // Return infinity

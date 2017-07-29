@@ -11,8 +11,6 @@
 
 #include "edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI.h"
 
-using namespace frc;
-
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    setFilterSelect
@@ -24,7 +22,7 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect(
 
   HAL_SetFilterSelect(static_cast<HAL_DigitalHandle>(id), filter_index,
                       &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -38,7 +36,7 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect(
 
   jint result =
       HAL_GetFilterSelect(static_cast<HAL_DigitalHandle>(id), &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return result;
 }
 
@@ -52,7 +50,7 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterPeriod(
   int32_t status = 0;
 
   HAL_SetFilterPeriod(filter_index, fpga_cycles, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -65,6 +63,6 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterPeriod(
   int32_t status = 0;
 
   jint result = HAL_GetFilterPeriod(filter_index, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return result;
 }

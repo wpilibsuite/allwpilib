@@ -14,8 +14,6 @@
 #include "HAL/Ports.h"
 #include "HALUtil.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel portsJNILogLevel = logWARNING;
 

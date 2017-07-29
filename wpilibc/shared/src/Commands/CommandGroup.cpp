@@ -9,13 +9,11 @@
 
 #include "WPIErrors.h"
 
-using namespace frc;
-
 /**
  * Creates a new {@link CommandGroup CommandGroup} with the given name.
  * @param name the name for this command group
  */
-CommandGroup::CommandGroup(const std::string& name) : Command(name) {}
+frc::CommandGroup::CommandGroup(const std::string& name) : Command(name) {}
 
 /**
  * Adds a new {@link Command Command} to the group.  The {@link Command Command}
@@ -29,7 +27,7 @@ CommandGroup::CommandGroup(const std::string& name) : Command(name) {}
  *
  * @param command The {@link Command Command} to be added
  */
-void CommandGroup::AddSequential(Command* command) {
+void frc::CommandGroup::AddSequential(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -65,7 +63,7 @@ void CommandGroup::AddSequential(Command* command) {
  * @param command The {@link Command Command} to be added
  * @param timeout The timeout (in seconds)
  */
-void CommandGroup::AddSequential(Command* command, double timeout) {
+void frc::CommandGroup::AddSequential(Command* command, double timeout) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -106,7 +104,7 @@ void CommandGroup::AddSequential(Command* command, double timeout) {
  *
  * @param command The command to be added
  */
-void CommandGroup::AddParallel(Command* command) {
+void frc::CommandGroup::AddParallel(Command* command) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -150,7 +148,7 @@ void CommandGroup::AddParallel(Command* command) {
  * @param command The command to be added
  * @param timeout The timeout (in seconds)
  */
-void CommandGroup::AddParallel(Command* command, double timeout) {
+void frc::CommandGroup::AddParallel(Command* command, double timeout) {
   if (command == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "command");
     return;
@@ -172,9 +170,9 @@ void CommandGroup::AddParallel(Command* command, double timeout) {
     Requires(*iter);
 }
 
-void CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
+void frc::CommandGroup::_Initialize() { m_currentCommandIndex = -1; }
 
-void CommandGroup::_Execute() {
+void frc::CommandGroup::_Execute() {
   CommandGroupEntry entry;
   Command* cmd = nullptr;
   bool firstRun = false;
@@ -241,7 +239,7 @@ void CommandGroup::_Execute() {
   }
 }
 
-void CommandGroup::_End() {
+void frc::CommandGroup::_End() {
   // Theoretically, we don't have to check this, but we do if teams override the
   // IsFinished method
   if (m_currentCommandIndex != -1 &&
@@ -259,26 +257,26 @@ void CommandGroup::_End() {
   m_children.clear();
 }
 
-void CommandGroup::_Interrupted() { _End(); }
+void frc::CommandGroup::_Interrupted() { _End(); }
 
 // Can be overwritten by teams
-void CommandGroup::Initialize() {}
+void frc::CommandGroup::Initialize() {}
 
 // Can be overwritten by teams
-void CommandGroup::Execute() {}
+void frc::CommandGroup::Execute() {}
 
 // Can be overwritten by teams
-void CommandGroup::End() {}
+void frc::CommandGroup::End() {}
 
 // Can be overwritten by teams
-void CommandGroup::Interrupted() {}
+void frc::CommandGroup::Interrupted() {}
 
-bool CommandGroup::IsFinished() {
+bool frc::CommandGroup::IsFinished() {
   return static_cast<size_t>(m_currentCommandIndex) >= m_commands.size() &&
          m_children.empty();
 }
 
-bool CommandGroup::IsInterruptible() const {
+bool frc::CommandGroup::IsInterruptible() const {
   if (!Command::IsInterruptible()) return false;
 
   if (m_currentCommandIndex != -1 &&
@@ -294,7 +292,7 @@ bool CommandGroup::IsInterruptible() const {
   return true;
 }
 
-void CommandGroup::CancelConflicts(Command* command) {
+void frc::CommandGroup::CancelConflicts(Command* command) {
   for (auto childIter = m_children.begin(); childIter != m_children.end();) {
     Command* child = childIter->m_command;
     bool erased = false;
@@ -314,4 +312,4 @@ void CommandGroup::CancelConflicts(Command* command) {
   }
 }
 
-int CommandGroup::GetSize() const { return m_children.size(); }
+int frc::CommandGroup::GetSize() const { return m_children.size(); }

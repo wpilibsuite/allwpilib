@@ -10,9 +10,7 @@
 #include "DriverStation.h"
 #include "HAL/HAL.h"
 
-using namespace frc;
-
-IterativeRobot::IterativeRobot() {
+frc::IterativeRobot::IterativeRobot() {
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Iterative);
 }
@@ -23,7 +21,7 @@ IterativeRobot::IterativeRobot() {
  * This specific StartCompetition() implements "main loop" behaviour synced with
  * the DS packets.
  */
-void IterativeRobot::StartCompetition() {
+void frc::IterativeRobot::StartCompetition() {
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
     // wait for driver station data so the loop doesn't hog the CPU

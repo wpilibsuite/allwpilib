@@ -14,14 +14,12 @@
 #include "WPIErrors.h"
 #include "llvm/SmallVector.h"
 
-using namespace frc;
-
 /**
  * Constructor
  *
  * @param port the physical SPI port
  */
-SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
+frc::SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
   int32_t status = 0;
   HAL_InitializeSPI(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -34,7 +32,7 @@ SPI::SPI(Port port) : m_port(static_cast<HAL_SPIPort>(port)) {
 /**
  * Destructor.
  */
-SPI::~SPI() { HAL_CloseSPI(m_port); }
+frc::SPI::~SPI() { HAL_CloseSPI(m_port); }
 
 /**
  * Configure the rate of the generated clock signal.
@@ -44,13 +42,13 @@ SPI::~SPI() { HAL_CloseSPI(m_port); }
  *
  * @param hz The clock rate in Hertz.
  */
-void SPI::SetClockRate(double hz) { HAL_SetSPISpeed(m_port, hz); }
+void frc::SPI::SetClockRate(double hz) { HAL_SetSPISpeed(m_port, hz); }
 
 /**
  * Configure the order that bits are sent and received on the wire
  * to be most significant bit first.
  */
-void SPI::SetMSBFirst() {
+void frc::SPI::SetMSBFirst() {
   m_msbFirst = true;
   HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
 }
@@ -59,7 +57,7 @@ void SPI::SetMSBFirst() {
  * Configure the order that bits are sent and received on the wire
  * to be least significant bit first.
  */
-void SPI::SetLSBFirst() {
+void frc::SPI::SetLSBFirst() {
   m_msbFirst = false;
   HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
 }
@@ -68,7 +66,7 @@ void SPI::SetLSBFirst() {
  * Configure that the data is stable on the falling edge and the data
  * changes on the rising edge.
  */
-void SPI::SetSampleDataOnFalling() {
+void frc::SPI::SetSampleDataOnFalling() {
   m_sampleOnTrailing = true;
   HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
 }
@@ -77,7 +75,7 @@ void SPI::SetSampleDataOnFalling() {
  * Configure that the data is stable on the rising edge and the data
  * changes on the falling edge.
  */
-void SPI::SetSampleDataOnRising() {
+void frc::SPI::SetSampleDataOnRising() {
   m_sampleOnTrailing = false;
   HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
 }
@@ -86,7 +84,7 @@ void SPI::SetSampleDataOnRising() {
  * Configure the clock output line to be active low.
  * This is sometimes called clock polarity high or clock idle high.
  */
-void SPI::SetClockActiveLow() {
+void frc::SPI::SetClockActiveLow() {
   m_clk_idle_high = true;
   HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
 }
@@ -95,7 +93,7 @@ void SPI::SetClockActiveLow() {
  * Configure the clock output line to be active high.
  * This is sometimes called clock polarity low or clock idle low.
  */
-void SPI::SetClockActiveHigh() {
+void frc::SPI::SetClockActiveHigh() {
   m_clk_idle_high = false;
   HAL_SetSPIOpts(m_port, m_msbFirst, m_sampleOnTrailing, m_clk_idle_high);
 }
@@ -103,7 +101,7 @@ void SPI::SetClockActiveHigh() {
 /**
  * Configure the chip select line to be active high.
  */
-void SPI::SetChipSelectActiveHigh() {
+void frc::SPI::SetChipSelectActiveHigh() {
   int32_t status = 0;
   HAL_SetSPIChipSelectActiveHigh(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -112,7 +110,7 @@ void SPI::SetChipSelectActiveHigh() {
 /**
  * Configure the chip select line to be active low.
  */
-void SPI::SetChipSelectActiveLow() {
+void frc::SPI::SetChipSelectActiveLow() {
   int32_t status = 0;
   HAL_SetSPIChipSelectActiveLow(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -125,7 +123,7 @@ void SPI::SetChipSelectActiveLow() {
  * If not running in output only mode, also saves the data received
  * on the MISO input during the transfer into the receive FIFO.
  */
-int SPI::Write(uint8_t* data, int size) {
+int frc::SPI::Write(uint8_t* data, int size) {
   int retVal = 0;
   retVal = HAL_WriteSPI(m_port, data, size);
   return retVal;
@@ -144,7 +142,7 @@ int SPI::Write(uint8_t* data, int size) {
  *                 that data is already in the receive FIFO from a previous
  *                 write.
  */
-int SPI::Read(bool initiate, uint8_t* dataReceived, int size) {
+int frc::SPI::Read(bool initiate, uint8_t* dataReceived, int size) {
   int retVal = 0;
   if (initiate) {
     llvm::SmallVector<uint8_t, 32> dataToSend;
@@ -163,7 +161,8 @@ int SPI::Read(bool initiate, uint8_t* dataReceived, int size) {
  * @param dataReceived Buffer to receive data from the device
  * @param size         The length of the transaction, in bytes
  */
-int SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size) {
+int frc::SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
+                          int size) {
   int retVal = 0;
   retVal = HAL_TransactionSPI(m_port, dataToSend, dataReceived, size);
   return retVal;
@@ -184,9 +183,9 @@ int SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size) {
  * @param is_signed  Is data field signed?
  * @param big_endian Is device big endian?
  */
-void SPI::InitAccumulator(double period, int cmd, int xfer_size, int valid_mask,
-                          int valid_value, int data_shift, int data_size,
-                          bool is_signed, bool big_endian) {
+void frc::SPI::InitAccumulator(double period, int cmd, int xfer_size,
+                               int valid_mask, int valid_value, int data_shift,
+                               int data_size, bool is_signed, bool big_endian) {
   int32_t status = 0;
   HAL_InitSPIAccumulator(m_port, static_cast<int32_t>(period * 1e6), cmd,
                          xfer_size, valid_mask, valid_value, data_shift,
@@ -197,7 +196,7 @@ void SPI::InitAccumulator(double period, int cmd, int xfer_size, int valid_mask,
 /**
  * Frees the accumulator.
  */
-void SPI::FreeAccumulator() {
+void frc::SPI::FreeAccumulator() {
   int32_t status = 0;
   HAL_FreeSPIAccumulator(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -206,7 +205,7 @@ void SPI::FreeAccumulator() {
 /**
  * Resets the accumulator to zero.
  */
-void SPI::ResetAccumulator() {
+void frc::SPI::ResetAccumulator() {
   int32_t status = 0;
   HAL_ResetSPIAccumulator(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -220,7 +219,7 @@ void SPI::ResetAccumulator() {
  * accelerometers to make integration work and to take the device offset into
  * account when integrating.
  */
-void SPI::SetAccumulatorCenter(int center) {
+void frc::SPI::SetAccumulatorCenter(int center) {
   int32_t status = 0;
   HAL_SetSPIAccumulatorCenter(m_port, center, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -229,7 +228,7 @@ void SPI::SetAccumulatorCenter(int center) {
 /**
  * Set the accumulator's deadband.
  */
-void SPI::SetAccumulatorDeadband(int deadband) {
+void frc::SPI::SetAccumulatorDeadband(int deadband) {
   int32_t status = 0;
   HAL_SetSPIAccumulatorDeadband(m_port, deadband, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -238,7 +237,7 @@ void SPI::SetAccumulatorDeadband(int deadband) {
 /**
  * Read the last value read by the accumulator engine.
  */
-int SPI::GetAccumulatorLastValue() const {
+int frc::SPI::GetAccumulatorLastValue() const {
   int32_t status = 0;
   int retVal = HAL_GetSPIAccumulatorLastValue(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -250,7 +249,7 @@ int SPI::GetAccumulatorLastValue() const {
  *
  * @return The 64-bit value accumulated since the last Reset().
  */
-int64_t SPI::GetAccumulatorValue() const {
+int64_t frc::SPI::GetAccumulatorValue() const {
   int32_t status = 0;
   int64_t retVal = HAL_GetSPIAccumulatorValue(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -265,7 +264,7 @@ int64_t SPI::GetAccumulatorValue() const {
  *
  * @return The number of times samples from the channel were accumulated.
  */
-int64_t SPI::GetAccumulatorCount() const {
+int64_t frc::SPI::GetAccumulatorCount() const {
   int32_t status = 0;
   int64_t retVal = HAL_GetSPIAccumulatorCount(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -277,7 +276,7 @@ int64_t SPI::GetAccumulatorCount() const {
  *
  * @return The accumulated average value (value / count).
  */
-double SPI::GetAccumulatorAverage() const {
+double frc::SPI::GetAccumulatorAverage() const {
   int32_t status = 0;
   double retVal = HAL_GetSPIAccumulatorAverage(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -293,7 +292,7 @@ double SPI::GetAccumulatorAverage() const {
  * @param value Pointer to the 64-bit accumulated output.
  * @param count Pointer to the number of accumulation cycles.
  */
-void SPI::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
+void frc::SPI::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
   int32_t status = 0;
   HAL_GetSPIAccumulatorOutput(m_port, &value, &count, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

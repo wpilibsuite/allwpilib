@@ -7,21 +7,19 @@
 
 #include "HLUsageReporting.h"
 
-using namespace frc;
+frc::HLUsageReportingInterface* frc::HLUsageReporting::impl = nullptr;
 
-HLUsageReportingInterface* HLUsageReporting::impl = nullptr;
-
-void HLUsageReporting::SetImplementation(HLUsageReportingInterface* i) {
+void frc::HLUsageReporting::SetImplementation(HLUsageReportingInterface* i) {
   impl = i;
 }
 
-void HLUsageReporting::ReportScheduler() {
+void frc::HLUsageReporting::ReportScheduler() {
   if (impl != nullptr) {
     impl->ReportScheduler();
   }
 }
 
-void HLUsageReporting::ReportSmartDashboard() {
+void frc::HLUsageReporting::ReportSmartDashboard() {
   if (impl != nullptr) {
     impl->ReportSmartDashboard();
   }

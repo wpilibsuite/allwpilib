@@ -13,20 +13,18 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const double kScale = 270.0;
 static const double kAngle = 180.0;
 
 class AnalogPotentiometerTest : public testing::Test {
  protected:
-  AnalogOutput* m_fakePot;
-  AnalogPotentiometer* m_pot;
+  frc::AnalogOutput* m_fakePot;
+  frc::AnalogPotentiometer* m_pot;
 
   void SetUp() override {
-    m_fakePot = new AnalogOutput(TestBench::kAnalogOutputChannel);
-    m_pot =
-        new AnalogPotentiometer(TestBench::kFakeAnalogOutputChannel, kScale);
+    m_fakePot = new frc::AnalogOutput(TestBench::kAnalogOutputChannel);
+    m_pot = new frc::AnalogPotentiometer(TestBench::kFakeAnalogOutputChannel,
+                                         kScale);
   }
 
   void TearDown() override {
@@ -37,14 +35,14 @@ class AnalogPotentiometerTest : public testing::Test {
 
 TEST_F(AnalogPotentiometerTest, TestInitialSettings) {
   m_fakePot->SetVoltage(0.0);
-  Wait(0.1);
+  frc::Wait(0.1);
   EXPECT_NEAR(0.0, m_pot->Get(), 5.0)
       << "The potentiometer did not initialize to 0.";
 }
 
 TEST_F(AnalogPotentiometerTest, TestRangeValues) {
-  m_fakePot->SetVoltage(kAngle / kScale * ControllerPower::GetVoltage5V());
-  Wait(0.1);
+  m_fakePot->SetVoltage(kAngle / kScale * frc::ControllerPower::GetVoltage5V());
+  frc::Wait(0.1);
   EXPECT_NEAR(kAngle, m_pot->Get(), 2.0)
       << "The potentiometer did not measure the correct angle.";
 }

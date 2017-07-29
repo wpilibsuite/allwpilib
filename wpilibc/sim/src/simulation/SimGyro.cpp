@@ -10,16 +10,14 @@
 #include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
-using namespace frc;
-
-SimGyro::SimGyro(std::string topic) {
+frc::SimGyro::SimGyro(std::string topic) {
   commandPub = MainNode::Advertise<gazebo::msgs::GzString>("~/simulator/" +
                                                            topic + "/control");
 
   posSub = MainNode::Subscribe("~/simulator/" + topic + "/position",
-                               &SimGyro::positionCallback, this);
+                               &frc::SimGyro::positionCallback, this);
   velSub = MainNode::Subscribe("~/simulator/" + topic + "/velocity",
-                               &SimGyro::velocityCallback, this);
+                               &frc::SimGyro::velocityCallback, this);
 
   if (commandPub->WaitForConnection(
           gazebo::common::Time(5.0))) {  // Wait up to five seconds.
@@ -30,22 +28,22 @@ SimGyro::SimGyro(std::string topic) {
   }
 }
 
-void SimGyro::Reset() { sendCommand("reset"); }
+void frc::SimGyro::Reset() { sendCommand("reset"); }
 
-double SimGyro::GetAngle() { return position; }
+double frc::SimGyro::GetAngle() { return position; }
 
-double SimGyro::GetVelocity() { return velocity; }
+double frc::SimGyro::GetVelocity() { return velocity; }
 
-void SimGyro::sendCommand(std::string cmd) {
+void frc::SimGyro::sendCommand(std::string cmd) {
   gazebo::msgs::GzString msg;
   msg.set_data(cmd);
   commandPub->Publish(msg);
 }
 
-void SimGyro::positionCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
+void frc::SimGyro::positionCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   position = msg->data();
 }
 
-void SimGyro::velocityCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
+void frc::SimGyro::velocityCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
   velocity = msg->data();
 }

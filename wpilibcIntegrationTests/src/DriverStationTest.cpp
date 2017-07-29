@@ -11,8 +11,6 @@
 #include "Utility.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 constexpr double TIMER_TOLERANCE = 0.2;
 constexpr int64_t TIMER_RUNTIME = 1000000;  // 1 second
 
@@ -22,13 +20,13 @@ class DriverStationTest : public testing::Test {};
  * Test if the WaitForData function works
  */
 TEST_F(DriverStationTest, WaitForData) {
-  uint64_t initialTime = GetFPGATime();
+  uint64_t initialTime = frc::GetFPGATime();
 
   for (int i = 0; i < 50; i++) {
-    DriverStation::GetInstance().WaitForData();
+    frc::DriverStation::GetInstance().WaitForData();
   }
 
-  uint64_t finalTime = GetFPGATime();
+  uint64_t finalTime = frc::GetFPGATime();
 
   EXPECT_NEAR(TIMER_RUNTIME, finalTime - initialTime,
               TIMER_TOLERANCE * TIMER_RUNTIME);

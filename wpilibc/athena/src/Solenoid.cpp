@@ -15,14 +15,12 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Constructor using the default PCM ID (0).
  *
  * @param channel The channel on the PCM to control (0..7).
  */
-Solenoid::Solenoid(int channel)
+frc::Solenoid::Solenoid(int channel)
     : Solenoid(GetDefaultSolenoidModule(), channel) {}
 
 /**
@@ -31,7 +29,7 @@ Solenoid::Solenoid(int channel)
  * @param moduleNumber The CAN ID of the PCM the solenoid is attached to
  * @param channel      The channel on the PCM to control (0..7).
  */
-Solenoid::Solenoid(int moduleNumber, int channel)
+frc::Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
@@ -65,7 +63,7 @@ Solenoid::Solenoid(int moduleNumber, int channel)
 /**
  * Destructor.
  */
-Solenoid::~Solenoid() {
+frc::Solenoid::~Solenoid() {
   HAL_FreeSolenoidPort(m_solenoidHandle);
   if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
@@ -75,7 +73,7 @@ Solenoid::~Solenoid() {
  *
  * @param on Turn the solenoid output off or on.
  */
-void Solenoid::Set(bool on) {
+void frc::Solenoid::Set(bool on) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetSolenoid(m_solenoidHandle, on, &status);
@@ -87,7 +85,7 @@ void Solenoid::Set(bool on) {
  *
  * @return The current value of the solenoid.
  */
-bool Solenoid::Get() const {
+bool frc::Solenoid::Get() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool value = HAL_GetSolenoid(m_solenoidHandle, &status);
@@ -105,42 +103,42 @@ bool Solenoid::Get() const {
  *
  * @return If solenoid is disabled due to short.
  */
-bool Solenoid::IsBlackListed() const {
+bool frc::Solenoid::IsBlackListed() const {
   int value = GetPCMSolenoidBlackList(m_moduleNumber) & (1 << m_channel);
   return (value != 0);
 }
 
-void Solenoid::ValueChanged(ITable* source, llvm::StringRef key,
-                            std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::Solenoid::ValueChanged(ITable* source, llvm::StringRef key,
+                                 std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsBoolean()) return;
   Set(value->GetBoolean());
 }
 
-void Solenoid::UpdateTable() {
+void frc::Solenoid::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutBoolean("Value", Get());
   }
 }
 
-void Solenoid::StartLiveWindowMode() {
+void frc::Solenoid::StartLiveWindowMode() {
   Set(false);
   if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
-void Solenoid::StopLiveWindowMode() {
+void frc::Solenoid::StopLiveWindowMode() {
   Set(false);
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
 
-std::string Solenoid::GetSmartDashboardType() const { return "Solenoid"; }
+std::string frc::Solenoid::GetSmartDashboardType() const { return "Solenoid"; }
 
-void Solenoid::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::Solenoid::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> Solenoid::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Solenoid::GetTable() const { return m_table; }

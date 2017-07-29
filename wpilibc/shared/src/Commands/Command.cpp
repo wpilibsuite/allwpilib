@@ -15,26 +15,24 @@
 #include "Timer.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
 static const std::string kName = "name";
 static const std::string kRunning = "running";
 static const std::string kIsParented = "isParented";
 
-int Command::m_commandCounter = 0;
+int frc::Command::m_commandCounter = 0;
 
 /**
  * Creates a new command.
  * The name of this command will be default.
  */
-Command::Command() : Command("", -1.0) {}
+frc::Command::Command() : Command("", -1.0) {}
 
 /**
  * Creates a new command with the given name and no timeout.
  *
  * @param name the name for this command
  */
-Command::Command(const std::string& name) : Command(name, -1.0) {}
+frc::Command::Command(const std::string& name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
@@ -42,7 +40,7 @@ Command::Command(const std::string& name) : Command(name, -1.0) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
-Command::Command(double timeout) : Command("", timeout) {}
+frc::Command::Command(double timeout) : Command("", timeout) {}
 
 /**
  * Creates a new command with the given name and timeout.
@@ -51,7 +49,7 @@ Command::Command(double timeout) : Command("", timeout) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see Command#isTimedOut() isTimedOut()
  */
-Command::Command(const std::string& name, double timeout) {
+frc::Command::Command(const std::string& name, double timeout) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
@@ -66,7 +64,7 @@ Command::Command(const std::string& name, double timeout) {
   }
 }
 
-Command::~Command() {
+frc::Command::~Command() {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
@@ -77,7 +75,7 @@ Command::~Command() {
  *
  * @return the ID of this command
  */
-int Command::GetID() const { return m_commandID; }
+int frc::Command::GetID() const { return m_commandID; }
 
 /**
  * Sets the timeout of this command.
@@ -85,7 +83,7 @@ int Command::GetID() const { return m_commandID; }
  * @param timeout the timeout (in seconds)
  * @see Command#isTimedOut() isTimedOut()
  */
-void Command::SetTimeout(double timeout) {
+void frc::Command::SetTimeout(double timeout) {
   if (timeout < 0.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
   else
@@ -99,7 +97,7 @@ void Command::SetTimeout(double timeout) {
  *
  * @return the time since this command was initialized (in seconds).
  */
-double Command::TimeSinceInitialized() const {
+double frc::Command::TimeSinceInitialized() const {
   if (m_startTime < 0.0)
     return 0.0;
   else
@@ -118,7 +116,7 @@ double Command::TimeSinceInitialized() const {
  * @param subsystem the {@link Subsystem} required
  * @see Subsystem
  */
-void Command::Requires(Subsystem* subsystem) {
+void frc::Command::Requires(Subsystem* subsystem) {
   if (!AssertUnlocked("Can not add new requirement to command")) return;
 
   if (subsystem != nullptr)
@@ -133,7 +131,7 @@ void Command::Requires(Subsystem* subsystem) {
  * This will call {@link Command#interrupted() interrupted()} or
  * {@link Command#end() end()}.
  */
-void Command::Removed() {
+void frc::Command::Removed() {
   if (m_initialized) {
     if (IsCanceled()) {
       Interrupted();
@@ -156,7 +154,7 @@ void Command::Removed() {
  * necessarily do so immediately, and may in fact be canceled before initialize
  * is even called.</p>
  */
-void Command::Start() {
+void frc::Command::Start() {
   LockChanges();
   if (m_parent != nullptr)
     wpi_setWPIErrorWithContext(
@@ -171,7 +169,7 @@ void Command::Start() {
  *
  * @return whether or not the command should stay within the {@link Scheduler}.
  */
-bool Command::Run() {
+bool frc::Command::Run() {
   if (!m_runWhenDisabled && m_parent == nullptr && RobotState::IsDisabled())
     Cancel();
 
@@ -192,20 +190,20 @@ bool Command::Run() {
  * The initialize method is called the first time this Command is run after
  * being started.
  */
-void Command::Initialize() {}
+void frc::Command::Initialize() {}
 
 /**
  * The execute method is called repeatedly until this Command either finishes
  * or is canceled.
  */
-void Command::Execute() {}
+void frc::Command::Execute() {}
 
 /**
  * Called when the command ended peacefully.  This is where you may want
  * to wrap up loose ends, like shutting off a motor that was being used
  * in the command.
  */
-void Command::End() {}
+void frc::Command::End() {}
 
 /**
  * Called when the command ends because somebody called
@@ -218,15 +216,15 @@ void Command::End() {}
  * <p>Generally, it is useful to simply call the {@link Command#end() end()}
  * method within this method, as done here.</p>
  */
-void Command::Interrupted() { End(); }
+void frc::Command::Interrupted() { End(); }
 
-void Command::_Initialize() {}
+void frc::Command::_Initialize() {}
 
-void Command::_Interrupted() {}
+void frc::Command::_Interrupted() {}
 
-void Command::_Execute() {}
+void frc::Command::_Execute() {}
 
-void Command::_End() {}
+void frc::Command::_End() {}
 
 /**
  * Called to indicate that the timer should start.
@@ -234,7 +232,7 @@ void Command::_End() {}
  * This is called right before {@link Command#initialize() initialize()} is,
  * inside the {@link Command#run() run()} method.
  */
-void Command::StartTiming() { m_startTime = Timer::GetFPGATimestamp(); }
+void frc::Command::StartTiming() { m_startTime = Timer::GetFPGATimestamp(); }
 
 /**
  * Returns whether or not the
@@ -245,7 +243,7 @@ void Command::StartTiming() { m_startTime = Timer::GetFPGATimestamp(); }
  *
  * @return whether the time has expired
  */
-bool Command::IsTimedOut() const {
+bool frc::Command::IsTimedOut() const {
   return m_timeout != -1 && TimeSinceInitialized() >= m_timeout;
 }
 
@@ -256,14 +254,14 @@ bool Command::IsTimedOut() const {
  * @return the requirements (as an std::set of {@link Subsystem Subsystems}
  *         pointers) of this command
  */
-Command::SubsystemSet Command::GetRequirements() const {
+frc::Command::SubsystemSet frc::Command::GetRequirements() const {
   return m_requirements;
 }
 
 /**
  * Prevents further changes from being made.
  */
-void Command::LockChanges() { m_locked = true; }
+void frc::Command::LockChanges() { m_locked = true; }
 
 /**
  * If changes are locked, then this will generate a CommandIllegalUse error.
@@ -272,7 +270,7 @@ void Command::LockChanges() { m_locked = true; }
  *                message)
  * @return true if assert passed, false if assert failed
  */
-bool Command::AssertUnlocked(const std::string& message) {
+bool frc::Command::AssertUnlocked(const std::string& message) {
   if (m_locked) {
     std::string buf =
         message + " after being started or being added to a command group";
@@ -287,7 +285,7 @@ bool Command::AssertUnlocked(const std::string& message) {
  *
  * @param parent the parent
  */
-void Command::SetParent(CommandGroup* parent) {
+void frc::Command::SetParent(CommandGroup* parent) {
   if (parent == nullptr) {
     wpi_setWPIErrorWithContext(NullParameter, "parent");
   } else if (m_parent != nullptr) {
@@ -308,7 +306,7 @@ void Command::SetParent(CommandGroup* parent) {
  * {@link ConditionalCommand} so cancelling the chosen command works properly in
  * {@link CommandGroup}.
  */
-void Command::ClearRequirements() { m_requirements.clear(); }
+void frc::Command::ClearRequirements() { m_requirements.clear(); }
 
 /**
  * This is used internally to mark that the command has been started.
@@ -322,7 +320,7 @@ void Command::ClearRequirements() { m_requirements.clear(); }
  * It is very important that startRunning and removed be called in order or some
  * assumptions of the code will be broken.
  */
-void Command::StartRunning() {
+void frc::Command::StartRunning() {
   m_running = true;
   m_startTime = -1;
   if (m_table != nullptr) m_table->PutBoolean(kRunning, true);
@@ -336,7 +334,7 @@ void Command::StartRunning() {
  *
  * @return whether or not the command is running
  */
-bool Command::IsRunning() const { return m_running; }
+bool frc::Command::IsRunning() const { return m_running; }
 
 /**
  * This will cancel the current command.
@@ -349,7 +347,7 @@ bool Command::IsRunning() const { return m_running; }
  * <p>A command can not be canceled if it is a part of a command group, you
  * must cancel the command group instead.</p>
  */
-void Command::Cancel() {
+void frc::Command::Cancel() {
   if (m_parent != nullptr)
     wpi_setWPIErrorWithContext(
         CommandIllegalUse,
@@ -364,7 +362,7 @@ void Command::Cancel() {
  *
  * Should only be called by the parent command group.
  */
-void Command::_Cancel() {
+void frc::Command::_Cancel() {
   if (IsRunning()) m_canceled = true;
 }
 
@@ -373,21 +371,21 @@ void Command::_Cancel() {
  *
  * @return whether or not this has been canceled
  */
-bool Command::IsCanceled() const { return m_canceled; }
+bool frc::Command::IsCanceled() const { return m_canceled; }
 
 /**
  * Returns whether or not this command can be interrupted.
  *
  * @return whether or not this command can be interrupted
  */
-bool Command::IsInterruptible() const { return m_interruptible; }
+bool frc::Command::IsInterruptible() const { return m_interruptible; }
 
 /**
  * Sets whether or not this command can be interrupted.
  *
  * @param interruptible whether or not this command can be interrupted
  */
-void Command::SetInterruptible(bool interruptible) {
+void frc::Command::SetInterruptible(bool interruptible) {
   m_interruptible = interruptible;
 }
 
@@ -397,7 +395,7 @@ void Command::SetInterruptible(bool interruptible) {
  * @param system the system
  * @return whether or not the subsystem is required (false if given nullptr)
  */
-bool Command::DoesRequire(Subsystem* system) const {
+bool frc::Command::DoesRequire(Subsystem* system) const {
   return m_requirements.count(system) > 0;
 }
 
@@ -409,7 +407,7 @@ bool Command::DoesRequire(Subsystem* system) const {
  * @return the {@link CommandGroup} that this command is a part of (or null if
  *         not in group)
  */
-CommandGroup* Command::GetGroup() const { return m_parent; }
+frc::CommandGroup* frc::Command::GetGroup() const { return m_parent; }
 
 /**
  * Sets whether or not this {@link Command} should run when the robot is
@@ -420,7 +418,7 @@ CommandGroup* Command::GetGroup() const { return m_parent; }
  *
  * @param run whether or not this command should run when the robot is disabled
  */
-void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
+void frc::Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
 
 /**
  * Returns whether or not this {@link Command} will run when the robot is
@@ -429,13 +427,13 @@ void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
  * @return whether or not this {@link Command} will run when the robot is
  *         disabled, or if it will cancel itself
  */
-bool Command::WillRunWhenDisabled() const { return m_runWhenDisabled; }
+bool frc::Command::WillRunWhenDisabled() const { return m_runWhenDisabled; }
 
-std::string Command::GetName() const { return m_name; }
+std::string frc::Command::GetName() const { return m_name; }
 
-std::string Command::GetSmartDashboardType() const { return "Command"; }
+std::string frc::Command::GetSmartDashboardType() const { return "Command"; }
 
-void Command::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::Command::InitTable(std::shared_ptr<ITable> subtable) {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
   m_table = subtable;
   if (m_table != nullptr) {
@@ -446,10 +444,10 @@ void Command::InitTable(std::shared_ptr<ITable> subtable) {
   }
 }
 
-std::shared_ptr<ITable> Command::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Command::GetTable() const { return m_table; }
 
-void Command::ValueChanged(ITable* source, llvm::StringRef key,
-                           std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::Command::ValueChanged(ITable* source, llvm::StringRef key,
+                                std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsBoolean()) return;
   if (value->GetBoolean()) {
     if (!IsRunning()) Start();

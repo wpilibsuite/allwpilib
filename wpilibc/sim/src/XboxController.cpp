@@ -9,8 +9,6 @@
 
 #include "DriverStation.h"
 
-using namespace frc;
-
 /**
  * Construct an instance of an Xbox controller.
  *
@@ -19,7 +17,7 @@ using namespace frc;
  * @param port The port on the Driver Station that the joystick is plugged into
  *             (0-5).
  */
-XboxController::XboxController(int port)
+frc::XboxController::XboxController(int port)
     : GamepadBase(port), m_ds(DriverStation::GetInstance()) {}
 
 /**
@@ -27,7 +25,7 @@ XboxController::XboxController(int port)
  *
  * @param hand Side of controller whose value should be returned.
  */
-double XboxController::GetX(JoystickHand hand) const {
+double frc::XboxController::GetX(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawAxis(0);
   } else {
@@ -40,7 +38,7 @@ double XboxController::GetX(JoystickHand hand) const {
  *
  * @param hand Side of controller whose value should be returned.
  */
-double XboxController::GetY(JoystickHand hand) const {
+double frc::XboxController::GetY(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawAxis(1);
   } else {
@@ -53,7 +51,7 @@ double XboxController::GetY(JoystickHand hand) const {
  *
  * @param hand Side of controller whose value should be returned.
  */
-bool XboxController::GetBumper(JoystickHand hand) const {
+bool frc::XboxController::GetBumper(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawButton(5);
   } else {
@@ -67,7 +65,7 @@ bool XboxController::GetBumper(JoystickHand hand) const {
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetStickButton(JoystickHand hand) const {
+bool frc::XboxController::GetStickButton(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawButton(9);
   } else {
@@ -80,7 +78,7 @@ bool XboxController::GetStickButton(JoystickHand hand) const {
  *
  * @param hand Side of controller whose value should be returned.
  */
-double XboxController::GetTriggerAxis(JoystickHand hand) const {
+double frc::XboxController::GetTriggerAxis(JoystickHand hand) const {
   if (hand == kLeftHand) {
     return GetRawAxis(2);
   } else {
@@ -94,7 +92,7 @@ double XboxController::GetTriggerAxis(JoystickHand hand) const {
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetAButton() const { return GetRawButton(1); }
+bool frc::XboxController::GetAButton() const { return GetRawButton(1); }
 
 /**
  * Read the value of the B button on the controller.
@@ -102,7 +100,7 @@ bool XboxController::GetAButton() const { return GetRawButton(1); }
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetBButton() const { return GetRawButton(2); }
+bool frc::XboxController::GetBButton() const { return GetRawButton(2); }
 
 /**
  * Read the value of the X button on the controller.
@@ -110,7 +108,7 @@ bool XboxController::GetBButton() const { return GetRawButton(2); }
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetXButton() const { return GetRawButton(3); }
+bool frc::XboxController::GetXButton() const { return GetRawButton(3); }
 
 /**
  * Read the value of the Y button on the controller.
@@ -118,7 +116,7 @@ bool XboxController::GetXButton() const { return GetRawButton(3); }
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetYButton() const { return GetRawButton(4); }
+bool frc::XboxController::GetYButton() const { return GetRawButton(4); }
 
 /**
  * Read the value of the back button on the controller.
@@ -126,7 +124,7 @@ bool XboxController::GetYButton() const { return GetRawButton(4); }
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetBackButton() const { return GetRawButton(7); }
+bool frc::XboxController::GetBackButton() const { return GetRawButton(7); }
 
 /**
  * Read the value of the start button on the controller.
@@ -134,4 +132,4 @@ bool XboxController::GetBackButton() const { return GetRawButton(7); }
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetStartButton() const { return GetRawButton(8); }
+bool frc::XboxController::GetStartButton() const { return GetRawButton(8); }

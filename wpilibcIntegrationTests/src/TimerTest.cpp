@@ -10,15 +10,13 @@
 #include "TestBench.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const double kWaitTime = 0.5;
 
 class TimerTest : public testing::Test {
  protected:
-  Timer* m_timer;
+  frc::Timer* m_timer;
 
-  void SetUp() override { m_timer = new Timer; }
+  void SetUp() override { m_timer = new frc::Timer; }
 
   void TearDown() override { delete m_timer; }
 
@@ -33,7 +31,7 @@ TEST_F(TimerTest, Wait) {
 
   double initialTime = m_timer->GetFPGATimestamp();
 
-  Wait(kWaitTime);
+  frc::Wait(kWaitTime);
 
   double finalTime = m_timer->GetFPGATimestamp();
 

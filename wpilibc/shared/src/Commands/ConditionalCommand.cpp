@@ -9,9 +9,8 @@
 
 #include "Commands/Scheduler.h"
 
-using namespace frc;
-
-static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
+static void RequireAll(frc::Command& command, frc::Command* onTrue,
+                       frc::Command* onFalse) {
   if (onTrue != nullptr) {
     for (auto requirement : onTrue->GetRequirements())
       command.Requires(requirement);
@@ -30,7 +29,7 @@ static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
  * @param onFalse The Command to execute if {@link
  * ConditionalCommand#Condition()} returns false
  */
-ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
+frc::ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
   m_onTrue = onTrue;
   m_onFalse = onFalse;
 
@@ -46,8 +45,8 @@ ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
  * @param onFalse The Command to execute if {@link
  * ConditionalCommand#Condition()} returns false
  */
-ConditionalCommand::ConditionalCommand(const std::string& name, Command* onTrue,
-                                       Command* onFalse)
+frc::ConditionalCommand::ConditionalCommand(const std::string& name,
+                                            Command* onTrue, Command* onFalse)
     : Command(name) {
   m_onTrue = onTrue;
   m_onFalse = onFalse;
@@ -55,7 +54,7 @@ ConditionalCommand::ConditionalCommand(const std::string& name, Command* onTrue,
   RequireAll(*this, onTrue, onFalse);
 }
 
-void ConditionalCommand::_Initialize() {
+void frc::ConditionalCommand::_Initialize() {
   if (Condition()) {
     m_chosenCommand = m_onTrue;
   } else {
@@ -73,7 +72,7 @@ void ConditionalCommand::_Initialize() {
   }
 }
 
-void ConditionalCommand::_Cancel() {
+void frc::ConditionalCommand::_Cancel() {
   if (m_chosenCommand != nullptr && m_chosenCommand->IsRunning()) {
     m_chosenCommand->Cancel();
   }
@@ -81,12 +80,12 @@ void ConditionalCommand::_Cancel() {
   Command::_Cancel();
 }
 
-bool ConditionalCommand::IsFinished() {
+bool frc::ConditionalCommand::IsFinished() {
   return m_chosenCommand != nullptr && m_chosenCommand->IsRunning() &&
          m_chosenCommand->IsFinished();
 }
 
-void ConditionalCommand::Interrupted() {
+void frc::ConditionalCommand::Interrupted() {
   if (m_chosenCommand != nullptr && m_chosenCommand->IsRunning()) {
     m_chosenCommand->Cancel();
   }

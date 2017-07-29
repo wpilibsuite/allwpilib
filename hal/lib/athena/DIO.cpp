@@ -14,13 +14,12 @@
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
 
-using namespace hal;
-
 // Create a mutex to protect changes to the digital output values
-static priority_recursive_mutex digitalDIOMutex;
+static hal::priority_recursive_mutex digitalDIOMutex;
 
-static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                             kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>
+static hal::LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
+                                  hal::kNumDigitalPWMOutputs,
+                                  hal::HAL_HandleEnum::DigitalPWM>
     digitalPWMHandles;
 
 extern "C" {
@@ -30,23 +29,24 @@ extern "C" {
  */
 HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
                                         HAL_Bool input, int32_t* status) {
-  initializeDigital(status);
+  hal::initializeDigital(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex || channel >= kNumDigitalChannels) {
+  int16_t channel = hal::getPortHandleChannel(portHandle);
+  if (channel == hal::InvalidHandleIndex ||
+      channel >= hal::kNumDigitalChannels) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
 
-  auto handle =
-      digitalChannelHandles.Allocate(channel, HAL_HandleEnum::DIO, status);
+  auto handle = hal::digitalChannelHandles.Allocate(
+      channel, hal::HAL_HandleEnum::DIO, status);
 
   if (*status != 0)
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
-  auto port = digitalChannelHandles.Get(handle, HAL_HandleEnum::DIO);
+  auto port = hal::digitalChannelHandles.Get(handle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -54,18 +54,19 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
 
   port->channel = static_cast<uint8_t>(channel);
 
-  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
+  std::lock_guard<hal::priority_recursive_mutex> sync(digitalDIOMutex);
 
-  tDIO::tOutputEnable outputEnable = digitalSystem->readOutputEnable(status);
+  hal::tDIO::tOutputEnable outputEnable =
+      hal::digitalSystem->readOutputEnable(status);
 
-  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
-    if (!getPortHandleSPIEnable(portHandle)) {
+  if (port->channel >= hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
+    if (!hal::getPortHandleSPIEnable(portHandle)) {
       // if this flag is not set, we actually want DIO.
-      uint32_t bitToSet = 1u << remapSPIChannel(port->channel);
+      uint32_t bitToSet = 1u << hal::remapSPIChannel(port->channel);
 
-      uint16_t specialFunctions = spiSystem->readEnableDIO(status);
+      uint16_t specialFunctions = hal::spiSystem->readEnableDIO(status);
       // Set the field to enable SPI DIO
-      spiSystem->writeEnableDIO(specialFunctions | bitToSet, status);
+      hal::spiSystem->writeEnableDIO(specialFunctions | bitToSet, status);
 
       if (input) {
         outputEnable.SPIPort =
@@ -75,7 +76,7 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
             outputEnable.SPIPort | bitToSet;  // set the bits for write
       }
     }
-  } else if (port->channel < kNumDigitalHeaders) {
+  } else if (port->channel < hal::kNumDigitalHeaders) {
     uint32_t bitToSet = 1u << port->channel;
     if (input) {
       outputEnable.Headers =
@@ -85,12 +86,12 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
           outputEnable.Headers | bitToSet;  // set the bit for write
     }
   } else {
-    uint32_t bitToSet = 1u << remapMXPChannel(port->channel);
+    uint32_t bitToSet = 1u << hal::remapMXPChannel(port->channel);
 
     uint16_t specialFunctions =
-        digitalSystem->readEnableMXPSpecialFunction(status);
-    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions & ~bitToSet,
-                                                 status);
+        hal::digitalSystem->readEnableMXPSpecialFunction(status);
+    hal::digitalSystem->writeEnableMXPSpecialFunction(
+        specialFunctions & ~bitToSet, status);
 
     if (input) {
       outputEnable.MXP =
@@ -100,35 +101,36 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
     }
   }
 
-  digitalSystem->writeOutputEnable(outputEnable, status);
+  hal::digitalSystem->writeOutputEnable(outputEnable, status);
 
   return handle;
 }
 
 HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
-  return channel < kNumDigitalChannels && channel >= 0;
+  return channel < hal::kNumDigitalChannels && channel >= 0;
 }
 
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port =
+      hal::digitalChannelHandles.Get(dioPortHandle, hal::HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
-  digitalChannelHandles.Free(dioPortHandle, HAL_HandleEnum::DIO);
+  hal::digitalChannelHandles.Free(dioPortHandle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) return;
   int32_t status = 0;
-  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+  std::lock_guard<hal::priority_recursive_mutex> sync(digitalDIOMutex);
+  if (port->channel >= hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
     // Unset the SPI flag
-    int32_t bitToUnset = 1 << remapSPIChannel(port->channel);
-    uint16_t specialFunctions = spiSystem->readEnableDIO(&status);
-    spiSystem->writeEnableDIO(specialFunctions & ~bitToUnset, &status);
-  } else if (port->channel >= kNumDigitalHeaders) {
+    int32_t bitToUnset = 1 << hal::remapSPIChannel(port->channel);
+    uint16_t specialFunctions = hal::spiSystem->readEnableDIO(&status);
+    hal::spiSystem->writeEnableDIO(specialFunctions & ~bitToUnset, &status);
+  } else if (port->channel >= hal::kNumDigitalHeaders) {
     // Unset the MXP flag
-    uint32_t bitToUnset = 1u << remapMXPChannel(port->channel);
+    uint32_t bitToUnset = 1u << hal::remapMXPChannel(port->channel);
 
     uint16_t specialFunctions =
-        digitalSystem->readEnableMXPSpecialFunction(&status);
-    digitalSystem->writeEnableMXPSpecialFunction(specialFunctions | bitToUnset,
-                                                 &status);
+        hal::digitalSystem->readEnableMXPSpecialFunction(&status);
+    hal::digitalSystem->writeEnableMXPSpecialFunction(
+        specialFunctions | bitToUnset, &status);
   }
 }
 
@@ -150,7 +152,7 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
-  *id = static_cast<uint8_t>(getHandleIndex(handle));
+  *id = static_cast<uint8_t>(hal::getHandleIndex(handle));
 
   return handle;
 }
@@ -177,13 +179,14 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
   // Currently rounding in the log rate domain... heavy weight toward picking a
   // higher freq.
   // TODO: Round in the linear rate domain.
-  initializeDigital(status);
+  hal::initializeDigital(status);
   if (*status != 0) return;
   uint8_t pwmPeriodPower = static_cast<uint8_t>(
-      std::log(1.0 / (pwmSystem->readLoopTiming(status) * 0.25E-6 * rate)) /
+      std::log(1.0 /
+               (hal::pwmSystem->readLoopTiming(status) * 0.25E-6 * rate)) /
           std::log(2.0) +
       0.5);
-  digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
+  hal::digitalSystem->writePWMPeriodPower(pwmPeriodPower, status);
 }
 
 /**
@@ -205,18 +208,18 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
   double rawDutyCycle = 256.0 * dutyCycle;
   if (rawDutyCycle > 255.5) rawDutyCycle = 255.5;
   {
-    std::lock_guard<priority_recursive_mutex> sync(digitalPwmMutex);
-    uint16_t pwmPeriodPower = digitalSystem->readPWMPeriodPower(status);
+    std::lock_guard<hal::priority_recursive_mutex> sync(hal::digitalPwmMutex);
+    uint16_t pwmPeriodPower = hal::digitalSystem->readPWMPeriodPower(status);
     if (pwmPeriodPower < 4) {
       // The resolution of the duty cycle drops close to the highest
       // frequencies.
       rawDutyCycle = rawDutyCycle / std::pow(2.0, 4 - pwmPeriodPower);
     }
     if (id < 4)
-      digitalSystem->writePWMDutyCycleA(id, static_cast<uint8_t>(rawDutyCycle),
-                                        status);
+      hal::digitalSystem->writePWMDutyCycleA(
+          id, static_cast<uint8_t>(rawDutyCycle), status);
     else
-      digitalSystem->writePWMDutyCycleB(
+      hal::digitalSystem->writePWMDutyCycleB(
           id - 4, static_cast<uint8_t>(rawDutyCycle), status);
   }
 }
@@ -234,16 +237,16 @@ void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  int32_t id = *port;
-  if (channel >= kNumDigitalHeaders &&
-      channel <
-          kNumDigitalHeaders + kNumDigitalMXPChannels) {  // If it is on the MXP
-    /* Then to write as a digital PWM channel an offset is needed to write on
-     * the correct channel
-     */
-    channel += kMXPDigitalPWMOffset;
+
+  // If digital PWM channel is on the MXP, then an offset is needed to write to
+  // the correct channel.
+  if (channel >= hal::kNumDigitalHeaders &&
+      channel < hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
+    channel += hal::kMXPDigitalPWMOffset;
   }
-  digitalSystem->writePWMOutputSelect(id, channel, status);
+
+  int32_t id = *port;
+  hal::digitalSystem->writePWMOutputSelect(id, channel, status);
 }
 
 /**
@@ -256,7 +259,8 @@ void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
  */
 void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
                 int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port =
+      hal::digitalChannelHandles.Get(dioPortHandle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -265,18 +269,19 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     if (value != 0) value = 1;
   }
   {
-    std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-    tDIO::tDO currentDIO = digitalSystem->readDO(status);
+    std::lock_guard<hal::priority_recursive_mutex> sync(digitalDIOMutex);
+    hal::tDIO::tDO currentDIO = hal::digitalSystem->readDO(status);
 
-    if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+    if (port->channel >=
+        hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
       if (value == 0) {
         currentDIO.SPIPort =
-            currentDIO.SPIPort & ~(1u << remapSPIChannel(port->channel));
+            currentDIO.SPIPort & ~(1u << hal::remapSPIChannel(port->channel));
       } else if (value == 1) {
         currentDIO.SPIPort =
-            currentDIO.SPIPort | (1u << remapSPIChannel(port->channel));
+            currentDIO.SPIPort | (1u << hal::remapSPIChannel(port->channel));
       }
-    } else if (port->channel < kNumDigitalHeaders) {
+    } else if (port->channel < hal::kNumDigitalHeaders) {
       if (value == 0) {
         currentDIO.Headers = currentDIO.Headers & ~(1u << port->channel);
       } else if (value == 1) {
@@ -285,13 +290,13 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
     } else {
       if (value == 0) {
         currentDIO.MXP =
-            currentDIO.MXP & ~(1u << remapMXPChannel(port->channel));
+            currentDIO.MXP & ~(1u << hal::remapMXPChannel(port->channel));
       } else if (value == 1) {
         currentDIO.MXP =
-            currentDIO.MXP | (1u << remapMXPChannel(port->channel));
+            currentDIO.MXP | (1u << hal::remapMXPChannel(port->channel));
       }
     }
-    digitalSystem->writeDO(currentDIO, status);
+    hal::digitalSystem->writeDO(currentDIO, status);
   }
 }
 
@@ -303,23 +308,25 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
  * @return The state of the specified channel
  */
 HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port =
+      hal::digitalChannelHandles.Get(dioPortHandle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  tDIO::tDI currentDIO = digitalSystem->readDI(status);
+  hal::tDIO::tDI currentDIO = hal::digitalSystem->readDI(status);
   // Shift 00000001 over channel-1 places.
   // AND it against the currentDIO
   // if it == 0, then return false
   // else return true
 
-  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
-    return ((currentDIO.SPIPort >> remapSPIChannel(port->channel)) & 1) != 0;
-  } else if (port->channel < kNumDigitalHeaders) {
+  if (port->channel >= hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
+    return ((currentDIO.SPIPort >> hal::remapSPIChannel(port->channel)) & 1) !=
+           0;
+  } else if (port->channel < hal::kNumDigitalHeaders) {
     return ((currentDIO.Headers >> port->channel) & 1) != 0;
   } else {
-    return ((currentDIO.MXP >> remapMXPChannel(port->channel)) & 1) != 0;
+    return ((currentDIO.MXP >> hal::remapMXPChannel(port->channel)) & 1) != 0;
   }
 }
 
@@ -331,26 +338,28 @@ HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status) {
  * @return The direction of the specified channel
  */
 HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port =
+      hal::digitalChannelHandles.Get(dioPortHandle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  tDIO::tOutputEnable currentOutputEnable =
-      digitalSystem->readOutputEnable(status);
+  hal::tDIO::tOutputEnable currentOutputEnable =
+      hal::digitalSystem->readOutputEnable(status);
   // Shift 00000001 over port->channel-1 places.
   // AND it against the currentOutputEnable
   // if it == 0, then return false
   // else return true
 
-  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
-    return ((currentOutputEnable.SPIPort >> remapSPIChannel(port->channel)) &
+  if (port->channel >= hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
+    return ((currentOutputEnable.SPIPort >>
+             hal::remapSPIChannel(port->channel)) &
             1) != 0;
-  } else if (port->channel < kNumDigitalHeaders) {
+  } else if (port->channel < hal::kNumDigitalHeaders) {
     return ((currentOutputEnable.Headers >> port->channel) & 1) != 0;
   } else {
-    return ((currentOutputEnable.MXP >> remapMXPChannel(port->channel)) & 1) !=
-           0;
+    return ((currentOutputEnable.MXP >> hal::remapMXPChannel(port->channel)) &
+            1) != 0;
   }
 }
 
@@ -364,26 +373,27 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
  */
 void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port =
+      hal::digitalChannelHandles.Get(dioPortHandle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  tDIO::tPulse pulse;
+  hal::tDIO::tPulse pulse;
 
-  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
-    pulse.SPIPort = 1u << remapSPIChannel(port->channel);
-  } else if (port->channel < kNumDigitalHeaders) {
+  if (port->channel >= hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
+    pulse.SPIPort = 1u << hal::remapSPIChannel(port->channel);
+  } else if (port->channel < hal::kNumDigitalHeaders) {
     pulse.Headers = 1u << port->channel;
   } else {
-    pulse.MXP = 1u << remapMXPChannel(port->channel);
+    pulse.MXP = 1u << hal::remapMXPChannel(port->channel);
   }
 
-  digitalSystem->writePulseLength(
+  hal::digitalSystem->writePulseLength(
       static_cast<uint8_t>(1.0e9 * pulseLength /
-                           (pwmSystem->readLoopTiming(status) * 25)),
+                           (hal::pwmSystem->readLoopTiming(status) * 25)),
       status);
-  digitalSystem->writePulse(pulse, status);
+  hal::digitalSystem->writePulse(pulse, status);
 }
 
 /**
@@ -392,19 +402,22 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
  * @return A pulse is in progress
  */
 HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port =
+      hal::digitalChannelHandles.Get(dioPortHandle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
   }
-  tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
+  hal::tDIO::tPulse pulseRegister = hal::digitalSystem->readPulse(status);
 
-  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
-    return (pulseRegister.SPIPort & (1 << remapSPIChannel(port->channel))) != 0;
-  } else if (port->channel < kNumDigitalHeaders) {
+  if (port->channel >= hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
+    return (pulseRegister.SPIPort &
+            (1 << hal::remapSPIChannel(port->channel))) != 0;
+  } else if (port->channel < hal::kNumDigitalHeaders) {
     return (pulseRegister.Headers & (1 << port->channel)) != 0;
   } else {
-    return (pulseRegister.MXP & (1 << remapMXPChannel(port->channel))) != 0;
+    return (pulseRegister.MXP & (1 << hal::remapMXPChannel(port->channel))) !=
+           0;
   }
 }
 
@@ -414,9 +427,9 @@ HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
  * @return A pulse on some line is in progress
  */
 HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
-  initializeDigital(status);
+  hal::initializeDigital(status);
   if (*status != 0) return false;
-  tDIO::tPulse pulseRegister = digitalSystem->readPulse(status);
+  hal::tDIO::tPulse pulseRegister = hal::digitalSystem->readPulse(status);
   return pulseRegister.Headers != 0 && pulseRegister.MXP != 0 &&
          pulseRegister.SPIPort != 0;
 }
@@ -431,22 +444,24 @@ HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
  */
 void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
                          int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port =
+      hal::digitalChannelHandles.Get(dioPortHandle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
 
-  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+  std::lock_guard<hal::priority_recursive_mutex> sync(digitalDIOMutex);
+  if (port->channel >= hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
     // Channels 10-15 are SPI channels, so subtract our MXP channels
-    digitalSystem->writeFilterSelectHdr(port->channel - kNumDigitalMXPChannels,
-                                        filterIndex, status);
-  } else if (port->channel < kNumDigitalHeaders) {
-    digitalSystem->writeFilterSelectHdr(port->channel, filterIndex, status);
+    hal::digitalSystem->writeFilterSelectHdr(
+        port->channel - hal::kNumDigitalMXPChannels, filterIndex, status);
+  } else if (port->channel < hal::kNumDigitalHeaders) {
+    hal::digitalSystem->writeFilterSelectHdr(port->channel, filterIndex,
+                                             status);
   } else {
-    digitalSystem->writeFilterSelectMXP(remapMXPChannel(port->channel),
-                                        filterIndex, status);
+    hal::digitalSystem->writeFilterSelectMXP(
+        hal::remapMXPChannel(port->channel), filterIndex, status);
   }
 }
 
@@ -459,22 +474,23 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
  * where 0 means "none" and 1 - 3 means filter # filterIndex - 1.
  */
 int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port =
+      hal::digitalChannelHandles.Get(dioPortHandle, hal::HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
 
-  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+  std::lock_guard<hal::priority_recursive_mutex> sync(digitalDIOMutex);
+  if (port->channel >= hal::kNumDigitalHeaders + hal::kNumDigitalMXPChannels) {
     // Channels 10-15 are SPI channels, so subtract our MXP channels
-    return digitalSystem->readFilterSelectHdr(
-        port->channel - kNumDigitalMXPChannels, status);
-  } else if (port->channel < kNumDigitalHeaders) {
-    return digitalSystem->readFilterSelectHdr(port->channel, status);
+    return hal::digitalSystem->readFilterSelectHdr(
+        port->channel - hal::kNumDigitalMXPChannels, status);
+  } else if (port->channel < hal::kNumDigitalHeaders) {
+    return hal::digitalSystem->readFilterSelectHdr(port->channel, status);
   } else {
-    return digitalSystem->readFilterSelectMXP(remapMXPChannel(port->channel),
-                                              status);
+    return hal::digitalSystem->readFilterSelectMXP(
+        hal::remapMXPChannel(port->channel), status);
   }
 }
 
@@ -490,12 +506,12 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
  * counted as a transition.
  */
 void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
-  initializeDigital(status);
+  hal::initializeDigital(status);
   if (*status != 0) return;
-  std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-  digitalSystem->writeFilterPeriodHdr(filterIndex, value, status);
+  std::lock_guard<hal::priority_recursive_mutex> sync(digitalDIOMutex);
+  hal::digitalSystem->writeFilterPeriodHdr(filterIndex, value, status);
   if (*status == 0) {
-    digitalSystem->writeFilterPeriodMXP(filterIndex, value, status);
+    hal::digitalSystem->writeFilterPeriodMXP(filterIndex, value, status);
   }
 }
 
@@ -512,15 +528,15 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
  * counted as a transition.
  */
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
-  initializeDigital(status);
+  hal::initializeDigital(status);
   if (*status != 0) return 0;
   uint32_t hdrPeriod = 0;
   uint32_t mxpPeriod = 0;
   {
-    std::lock_guard<priority_recursive_mutex> sync(digitalDIOMutex);
-    hdrPeriod = digitalSystem->readFilterPeriodHdr(filterIndex, status);
+    std::lock_guard<hal::priority_recursive_mutex> sync(digitalDIOMutex);
+    hdrPeriod = hal::digitalSystem->readFilterPeriodHdr(filterIndex, status);
     if (*status == 0) {
-      mxpPeriod = digitalSystem->readFilterPeriodMXP(filterIndex, status);
+      mxpPeriod = hal::digitalSystem->readFilterPeriodMXP(filterIndex, status);
     }
   }
   if (hdrPeriod != mxpPeriod) {

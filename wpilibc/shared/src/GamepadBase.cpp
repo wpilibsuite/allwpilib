@@ -7,6 +7,4 @@
 
 #include "GamepadBase.h"
 
-using namespace frc;
-
-GamepadBase::GamepadBase(int port) : GenericHID(port) {}
+frc::GamepadBase::GamepadBase(int port) : GenericHID(port) {}

@@ -12,12 +12,10 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
-
-const int ADXL345_SPI::kPowerCtlRegister;
-const int ADXL345_SPI::kDataFormatRegister;
-const int ADXL345_SPI::kDataRegister;
-constexpr double ADXL345_SPI::kGsPerLSB;
+const int frc::ADXL345_SPI::kPowerCtlRegister;
+const int frc::ADXL345_SPI::kDataFormatRegister;
+const int frc::ADXL345_SPI::kDataRegister;
+constexpr double frc::ADXL345_SPI::kGsPerLSB;
 
 /**
  * Constructor.
@@ -25,7 +23,7 @@ constexpr double ADXL345_SPI::kGsPerLSB;
  * @param port  The SPI port the accelerometer is attached to
  * @param range The range (+ or -) that the accelerometer will measure
  */
-ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
+frc::ADXL345_SPI::ADXL345_SPI(SPI::Port port, frc::ADXL345_SPI::Range range)
     : m_spi(port) {
   m_spi.SetClockRate(500000);
   m_spi.SetMSBFirst();
@@ -47,7 +45,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
   LiveWindow::GetInstance()->AddSensor("ADXL345_SPI", port, this);
 }
 
-void ADXL345_SPI::SetRange(Range range) {
+void frc::ADXL345_SPI::SetRange(Range range) {
   uint8_t commands[2];
 
   // Specify the data format to read
@@ -56,11 +54,11 @@ void ADXL345_SPI::SetRange(Range range) {
   m_spi.Transaction(commands, commands, 2);
 }
 
-double ADXL345_SPI::GetX() { return GetAcceleration(kAxis_X); }
+double frc::ADXL345_SPI::GetX() { return GetAcceleration(kAxis_X); }
 
-double ADXL345_SPI::GetY() { return GetAcceleration(kAxis_Y); }
+double frc::ADXL345_SPI::GetY() { return GetAcceleration(kAxis_Y); }
 
-double ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
+double frc::ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
 
 /**
  * Get the acceleration of one axis in Gs.
@@ -68,7 +66,7 @@ double ADXL345_SPI::GetZ() { return GetAcceleration(kAxis_Z); }
  * @param axis The axis to read from.
  * @return Acceleration of the ADXL345 in Gs.
  */
-double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
+double frc::ADXL345_SPI::GetAcceleration(frc::ADXL345_SPI::Axes axis) {
   uint8_t buffer[3];
   uint8_t command[3] = {0, 0, 0};
   command[0] = (kAddress_Read | kAddress_MultiByte | kDataRegister) +
@@ -86,7 +84,7 @@ double ADXL345_SPI::GetAcceleration(ADXL345_SPI::Axes axis) {
  * @return An object containing the acceleration measured on each axis of the
  *         ADXL345 in Gs.
  */
-ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
+frc::ADXL345_SPI::AllAxes frc::ADXL345_SPI::GetAccelerations() {
   AllAxes data = AllAxes();
   uint8_t dataBuffer[7] = {0, 0, 0, 0, 0, 0, 0};
   int16_t rawData[3];
@@ -107,16 +105,16 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
   return data;
 }
 
-std::string ADXL345_SPI::GetSmartDashboardType() const {
+std::string frc::ADXL345_SPI::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void ADXL345_SPI::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::ADXL345_SPI::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
 
-void ADXL345_SPI::UpdateTable() {
+void frc::ADXL345_SPI::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("X", GetX());
     m_table->PutNumber("Y", GetY());
@@ -124,4 +122,4 @@ void ADXL345_SPI::UpdateTable() {
   }
 }
 
-std::shared_ptr<ITable> ADXL345_SPI::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::ADXL345_SPI::GetTable() const { return m_table; }

@@ -14,8 +14,6 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static constexpr double kServoResetTime = 2.0;
 
 static constexpr double kTestAngle = 90.0;
@@ -32,28 +30,29 @@ static constexpr double kSensitivity = 0.013;
  */
 class TiltPanCameraTest : public testing::Test {
  protected:
-  static AnalogGyro* m_gyro;
-  Servo *m_tilt, *m_pan;
-  Accelerometer* m_spiAccel;
+  static frc::AnalogGyro* m_gyro;
+  frc::Servo* m_tilt;
+  frc::Servo* m_pan;
+  frc::Accelerometer* m_spiAccel;
 
   static void SetUpTestCase() {
     // The gyro object blocks for 5 seconds in the constructor, so only
     // construct it once for the whole test case
-    m_gyro = new AnalogGyro(TestBench::kCameraGyroChannel);
+    m_gyro = new frc::AnalogGyro(TestBench::kCameraGyroChannel);
     m_gyro->SetSensitivity(kSensitivity);
   }
 
   static void TearDownTestCase() { delete m_gyro; }
 
   void SetUp() override {
-    m_tilt = new Servo(TestBench::kCameraTiltChannel);
-    m_pan = new Servo(TestBench::kCameraPanChannel);
-    m_spiAccel = new ADXL345_SPI(SPI::kOnboardCS1);
+    m_tilt = new frc::Servo(TestBench::kCameraTiltChannel);
+    m_pan = new frc::Servo(TestBench::kCameraPanChannel);
+    m_spiAccel = new frc::ADXL345_SPI(frc::SPI::kOnboardCS1);
 
     m_tilt->Set(kTiltSetpoint45);
     m_pan->SetAngle(0.0);
 
-    Wait(kServoResetTime);
+    frc::Wait(kServoResetTime);
 
     m_gyro->Reset();
   }
@@ -69,7 +68,7 @@ class TiltPanCameraTest : public testing::Test {
   }
 };
 
-AnalogGyro* TiltPanCameraTest::m_gyro = nullptr;
+frc::AnalogGyro* TiltPanCameraTest::m_gyro = nullptr;
 
 /**
  * Test if the gyro angle defaults to 0 immediately after being reset.
@@ -87,12 +86,12 @@ void TiltPanCameraTest::DefaultGyroAngle() {
 void TiltPanCameraTest::GyroAngle() {
   // Make sure that the gyro doesn't get jerked when the servo goes to zero.
   m_pan->SetAngle(0.0);
-  Wait(0.5);
+  frc::Wait(0.5);
   m_gyro->Reset();
 
   for (int32_t i = 0; i < 600; i++) {
     m_pan->Set(i / 1000.0);
-    Wait(0.001);
+    frc::Wait(0.001);
   }
 
   double gyroAngle = m_gyro->GetAngle();
@@ -111,24 +110,24 @@ void TiltPanCameraTest::GyroCalibratedParameters() {
   uint32_t cCenter = m_gyro->GetCenter();
   double cOffset = m_gyro->GetOffset();
   delete m_gyro;
-  m_gyro = new AnalogGyro(TestBench::kCameraGyroChannel, cCenter, cOffset);
+  m_gyro = new frc::AnalogGyro(TestBench::kCameraGyroChannel, cCenter, cOffset);
   m_gyro->SetSensitivity(kSensitivity);
 
   // Default gyro angle test
   // Accumulator needs a small amount of time to reset before being tested
   m_gyro->Reset();
-  Wait(0.001);
+  frc::Wait(0.001);
   EXPECT_NEAR(0.0, m_gyro->GetAngle(), 1.0);
 
   // Gyro angle test
   // Make sure that the gyro doesn't get jerked when the servo goes to zero.
   m_pan->SetAngle(0.0);
-  Wait(0.5);
+  frc::Wait(0.5);
   m_gyro->Reset();
 
   for (int32_t i = 0; i < 600; i++) {
     m_pan->Set(i / 1000.0);
-    Wait(0.001);
+    frc::Wait(0.001);
   }
 
   double gyroAngle = m_gyro->GetAngle();
@@ -153,19 +152,19 @@ TEST_F(TiltPanCameraTest, TestAllGyroTests) {
  */
 TEST_F(TiltPanCameraTest, SPIAccelerometer) {
   m_tilt->Set(kTiltSetpoint0);
-  Wait(kTiltTime);
+  frc::Wait(kTiltTime);
   EXPECT_NEAR(-1.0, m_spiAccel->GetX(), kAccelerometerTolerance);
   EXPECT_NEAR(0.0, m_spiAccel->GetY(), kAccelerometerTolerance);
   EXPECT_NEAR(0.0, m_spiAccel->GetZ(), kAccelerometerTolerance);
 
   m_tilt->Set(kTiltSetpoint45);
-  Wait(kTiltTime);
+  frc::Wait(kTiltTime);
   EXPECT_NEAR(-std::sqrt(0.5), m_spiAccel->GetX(), kAccelerometerTolerance);
   EXPECT_NEAR(0.0, m_spiAccel->GetY(), kAccelerometerTolerance);
   EXPECT_NEAR(std::sqrt(0.5), m_spiAccel->GetZ(), kAccelerometerTolerance);
 
   m_tilt->Set(kTiltSetpoint90);
-  Wait(kTiltTime);
+  frc::Wait(kTiltTime);
   EXPECT_NEAR(0.0, m_spiAccel->GetX(), kAccelerometerTolerance);
   EXPECT_NEAR(0.0, m_spiAccel->GetY(), kAccelerometerTolerance);
   EXPECT_NEAR(1.0, m_spiAccel->GetZ(), kAccelerometerTolerance);

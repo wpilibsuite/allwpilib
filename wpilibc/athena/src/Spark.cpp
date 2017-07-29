@@ -10,8 +10,6 @@
 #include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
-
 /**
  * Note that the Spark uses the following bounds for PWM values. These values
  * should work reasonably well for most controllers, but if users experience
@@ -33,7 +31,7 @@ using namespace frc;
  * @param channel The PWM channel that the Spark is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-Spark::Spark(int channel) : PWMSpeedController(channel) {
+frc::Spark::Spark(int channel) : PWMSpeedController(channel) {
   SetBounds(2.003, 1.55, 1.50, 1.46, .999);
   SetPeriodMultiplier(kPeriodMultiplier_1X);
   SetSpeed(0.0);

@@ -12,8 +12,6 @@
 #include "gtest/gtest.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 unsigned notifierCounter;
 
 void notifierHandler(void*) { notifierCounter++; }
@@ -25,12 +23,12 @@ TEST(NotifierTest, DISABLED_TestTimerNotifications) {
   llvm::outs() << "NotifierTest...\n";
   notifierCounter = 0;
   llvm::outs() << "notifier(notifierHandler, nullptr)...\n";
-  Notifier notifier(notifierHandler, nullptr);
+  frc::Notifier notifier(notifierHandler, nullptr);
   llvm::outs() << "Start Periodic...\n";
   notifier.StartPeriodic(1.0);
 
   llvm::outs() << "Wait...\n";
-  Wait(10.5);
+  frc::Wait(10.5);
   llvm::outs() << "...Wait\n";
 
   EXPECT_EQ(10u, notifierCounter) << "Received " << notifierCounter

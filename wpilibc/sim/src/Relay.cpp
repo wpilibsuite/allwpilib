@@ -12,8 +12,6 @@
 #include "WPIErrors.h"
 #include "llvm/SmallString.h"
 
-using namespace frc;
-
 /**
  * Relay constructor given a channel.
  *
@@ -23,7 +21,7 @@ using namespace frc;
  * @param channel   The channel number (0-3).
  * @param direction The direction that the Relay object will control.
  */
-Relay::Relay(int channel, Relay::Direction direction)
+frc::Relay::Relay(int channel, frc::Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
   llvm::SmallString<32> buf;
   llvm::raw_svector_ostream oss(buf);
@@ -50,7 +48,7 @@ Relay::Relay(int channel, Relay::Direction direction)
  *
  * The relay channels are set to free and the relay output is turned off.
  */
-Relay::~Relay() {
+frc::Relay::~Relay() {
   impl->Set(0);
   if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
@@ -70,7 +68,7 @@ Relay::~Relay() {
  *
  * @param value The state to set the relay.
  */
-void Relay::Set(Relay::Value value) {
+void frc::Relay::Set(frc::Relay::Value value) {
   switch (value) {
     case kOff:
       if (m_direction == kBothDirections || m_direction == kForwardOnly) {
@@ -124,9 +122,9 @@ void Relay::Set(Relay::Value value) {
  * When set to kForwardOnly or kReverseOnly, value is returned as kOn/kOff not
  * kForward/kReverse (per the recommendation in Set).
  *
- * @return The current state of the relay as a Relay::Value
+ * @return The current state of the relay as a frc::Relay::Value
  */
-Relay::Value Relay::Get() const {
+frc::Relay::Value frc::Relay::Get() const {
   // TODO: Don't assume that the go_pos and go_neg fields are correct?
   if ((go_pos || m_direction == kReverseOnly) &&
       (go_neg || m_direction == kForwardOnly)) {
@@ -140,14 +138,14 @@ Relay::Value Relay::Get() const {
   }
 }
 
-int Relay::GetChannel() const { return m_channel; }
+int frc::Relay::GetChannel() const { return m_channel; }
 
 /**
  * Set the expiration time for the Relay object.
  *
  * @param timeout The timeout (in seconds) for this relay object
  */
-void Relay::SetExpiration(double timeout) {
+void frc::Relay::SetExpiration(double timeout) {
   m_safetyHelper->SetExpiration(timeout);
 }
 
@@ -156,7 +154,9 @@ void Relay::SetExpiration(double timeout) {
  *
  * @return The expiration time value.
  */
-double Relay::GetExpiration() const { return m_safetyHelper->GetExpiration(); }
+double frc::Relay::GetExpiration() const {
+  return m_safetyHelper->GetExpiration();
+}
 
 /**
  * Check if the relay object is currently alive or stopped due to a timeout.
@@ -164,7 +164,7 @@ double Relay::GetExpiration() const { return m_safetyHelper->GetExpiration(); }
  * @return a bool value that is true if the motor has NOT timed out and should
  *         still be running.
  */
-bool Relay::IsAlive() const { return m_safetyHelper->IsAlive(); }
+bool frc::Relay::IsAlive() const { return m_safetyHelper->IsAlive(); }
 
 /**
  * Stop the motor associated with this PWM object.
@@ -172,7 +172,7 @@ bool Relay::IsAlive() const { return m_safetyHelper->IsAlive(); }
  * This is called by the MotorSafetyHelper object when it has a timeout for this
  * relay and needs to stop it from running.
  */
-void Relay::StopMotor() { Set(kOff); }
+void frc::Relay::StopMotor() { Set(kOff); }
 
 /**
  * Enable/disable motor safety for this device
@@ -181,7 +181,7 @@ void Relay::StopMotor() { Set(kOff); }
  *
  * @param enabled True if motor safety is enforced for this object
  */
-void Relay::SetSafetyEnabled(bool enabled) {
+void frc::Relay::SetSafetyEnabled(bool enabled) {
   m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
@@ -190,16 +190,16 @@ void Relay::SetSafetyEnabled(bool enabled) {
  *
  * @return True if motor safety is enforced for this object
  */
-bool Relay::IsSafetyEnabled() const {
+bool frc::Relay::IsSafetyEnabled() const {
   return m_safetyHelper->IsSafetyEnabled();
 }
 
-void Relay::GetDescription(llvm::raw_ostream& desc) const {
+void frc::Relay::GetDescription(llvm::raw_ostream& desc) const {
   desc << "Relay " << GetChannel();
 }
 
-void Relay::ValueChanged(ITable* source, llvm::StringRef key,
-                         std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::Relay::ValueChanged(ITable* source, llvm::StringRef key,
+                              std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsString()) return;
   if (value->GetString() == "Off")
     Set(kOff);
@@ -209,7 +209,7 @@ void Relay::ValueChanged(ITable* source, llvm::StringRef key,
     Set(kReverse);
 }
 
-void Relay::UpdateTable() {
+void frc::Relay::UpdateTable() {
   if (m_table != nullptr) {
     if (Get() == kOn) {
       m_table->PutString("Value", "On");
@@ -223,23 +223,23 @@ void Relay::UpdateTable() {
   }
 }
 
-void Relay::StartLiveWindowMode() {
+void frc::Relay::StartLiveWindowMode() {
   if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
-void Relay::StopLiveWindowMode() {
+void frc::Relay::StopLiveWindowMode() {
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
 
-std::string Relay::GetSmartDashboardType() const { return "Relay"; }
+std::string frc::Relay::GetSmartDashboardType() const { return "Relay"; }
 
-void Relay::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::Relay::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> Relay::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Relay::GetTable() const { return m_table; }

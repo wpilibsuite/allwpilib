@@ -16,8 +16,6 @@
 #include "HAL/ChipObject.h"
 #include "HAL/HAL.h"
 
-using namespace hal;
-
 // The 7-bit I2C address with a 0 "send" bit
 static const uint8_t kSendAddress = (0x1c << 1) | 0;
 
@@ -28,7 +26,7 @@ static const uint8_t kControlTxRx = 1;
 static const uint8_t kControlStart = 2;
 static const uint8_t kControlStop = 4;
 
-static std::unique_ptr<tAccel> accel;
+static std::unique_ptr<hal::tAccel> accel;
 static HAL_AccelerometerRange accelerometerRange;
 
 // Register addresses
@@ -87,7 +85,7 @@ static void initializeAccelerometer() {
   int32_t status;
 
   if (!accel) {
-    accel.reset(tAccel::create(&status));
+    accel.reset(hal::tAccel::create(&status));
 
     // Enable I2C
     accel->writeCNFG(1, &status);

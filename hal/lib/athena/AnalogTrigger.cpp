@@ -14,18 +14,17 @@
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
 
-using namespace hal;
-
 namespace {
 struct AnalogTrigger {
-  std::unique_ptr<tAnalogTrigger> trigger;
+  std::unique_ptr<hal::tAnalogTrigger> trigger;
   HAL_AnalogInputHandle analogHandle;
   uint8_t index;
 };
 }
 
-static LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
-                             kNumAnalogTriggers, HAL_HandleEnum::AnalogTrigger>
+static hal::LimitedHandleResource<HAL_AnalogTriggerHandle, AnalogTrigger,
+                                  hal::kNumAnalogTriggers,
+                                  hal::HAL_HandleEnum::AnalogTrigger>
     analogTriggerHandles;
 
 extern "C" {
@@ -33,7 +32,7 @@ extern "C" {
 HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     HAL_AnalogInputHandle portHandle, int32_t* index, int32_t* status) {
   // ensure we are given a valid and active AnalogInput handle
-  auto analog_port = analogInputHandles.Get(portHandle);
+  auto analog_port = hal::analogInputHandles.Get(portHandle);
   if (analog_port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -49,10 +48,10 @@ HAL_AnalogTriggerHandle HAL_InitializeAnalogTrigger(
     return HAL_kInvalidHandle;
   }
   trigger->analogHandle = portHandle;
-  trigger->index = static_cast<uint8_t>(getHandleIndex(handle));
+  trigger->index = static_cast<uint8_t>(hal::getHandleIndex(handle));
   *index = trigger->index;
 
-  trigger->trigger.reset(tAnalogTrigger::create(trigger->index, status));
+  trigger->trigger.reset(hal::tAnalogTrigger::create(trigger->index, status));
   trigger->trigger->writeSourceSelect_Channel(analog_port->channel, status);
   return handle;
 }

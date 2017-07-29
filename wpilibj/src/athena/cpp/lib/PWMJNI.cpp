@@ -17,8 +17,6 @@
 #include "HALUtil.h"
 #include "HAL/handles/HandlesInternal.h"
 
-using namespace frc;
-
 // set the logging level
 TLogLevel pwmJNILogLevel = logWARNING;
 
@@ -44,8 +42,8 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_initializePWMPort(
   auto pwm = HAL_InitializePWMPort((HAL_PortHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "PWM Handle = " << pwm;
-  CheckStatusRange(env, status, 0, HAL_GetNumPWMChannels(),
-                   hal::getPortHandleChannel((HAL_PortHandle)id));
+  frc::CheckStatusRange(env, status, 0, HAL_GetNumPWMChannels(),
+                        hal::getPortHandleChannel((HAL_PortHandle)id));
   return (jint)pwm;
 }
 
@@ -72,7 +70,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMPort(
   PWMJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_DigitalHandle)id;
   int32_t status = 0;
   HAL_FreePWMPort((HAL_DigitalHandle)id, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -88,7 +86,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfigRaw(
   int32_t status = 0;
   HAL_SetPWMConfigRaw((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm, 
                deadbandMinPwm, minPwm, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -104,7 +102,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfig(
   int32_t status = 0;
   HAL_SetPWMConfig((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm, 
                deadbandMinPwm, minPwm, &status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -124,9 +122,9 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMConfigRaw(
   int32_t minPwm = 0;
   HAL_GetPWMConfigRaw((HAL_DigitalHandle)id, &maxPwm, &deadbandMaxPwm, &centerPwm, 
                &deadbandMinPwm, &minPwm, &status);
-  CheckStatus(env, status);
-  return CreatePWMConfigDataResult(env, maxPwm, deadbandMaxPwm, centerPwm,
-                                   deadbandMinPwm, minPwm);
+  frc::CheckStatus(env, status);
+  return frc::CreatePWMConfigDataResult(env, maxPwm, deadbandMaxPwm, centerPwm,
+                                        deadbandMinPwm, minPwm);
 }
 
 /*
@@ -140,7 +138,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMEliminateDead
   int32_t status = 0;
   HAL_SetPWMEliminateDeadband((HAL_DigitalHandle)id, value, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -154,7 +152,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMEliminate
   int32_t status = 0;
   auto val = HAL_GetPWMEliminateDeadband((HAL_DigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return (jboolean)val;
 }
 
@@ -170,7 +168,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMRaw(
   int32_t status = 0;
   HAL_SetPWMRaw((HAL_DigitalHandle)id, value, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -185,7 +183,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMSpeed(
   int32_t status = 0;
   HAL_SetPWMSpeed((HAL_DigitalHandle)id, value, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -200,7 +198,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMPosition(
   int32_t status = 0;
   HAL_SetPWMPosition((HAL_DigitalHandle)id, value, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -216,7 +214,7 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMRaw(
   jshort returnValue = HAL_GetPWMRaw((HAL_DigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "Value = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -233,7 +231,7 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMSpeed(
   jdouble returnValue = HAL_GetPWMSpeed((HAL_DigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "Value = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -250,7 +248,7 @@ Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMPosition(
   jdouble returnValue = HAL_GetPWMPosition((HAL_DigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
   PWMJNI_LOG(logDEBUG) << "Value = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -265,7 +263,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMDisabled(
   int32_t status = 0;
   HAL_SetPWMDisabled((HAL_DigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -279,7 +277,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_latchPWMZero(
   int32_t status = 0;
   HAL_LatchPWMZero((HAL_DigitalHandle)id, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 /*
@@ -294,7 +292,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMPeriodScale(
   int32_t status = 0;
   HAL_SetPWMPeriodScale((HAL_DigitalHandle)id, value, &status);
   PWMJNI_LOG(logDEBUG) << "Status = " << status;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
 }
 
 }  // extern "C"

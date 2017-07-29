@@ -13,15 +13,13 @@
 #include "llvm/raw_ostream.h"
 #include "networktables/NetworkTable.h"
 
-using namespace frc;
-
 /**
  * Get an instance of the LiveWindow main class.
  *
  * This is a singleton to guarantee that there is only a single instance
  * regardless of how many times GetInstance is called.
  */
-LiveWindow* LiveWindow::GetInstance() {
+frc::LiveWindow* frc::LiveWindow::GetInstance() {
   static LiveWindow instance;
   return &instance;
 }
@@ -31,7 +29,7 @@ LiveWindow* LiveWindow::GetInstance() {
  *
  * Allocate the necessary tables.
  */
-LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
+frc::LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
   m_liveWindowTable = NetworkTable::GetTable("LiveWindow");
   m_statusTable = m_liveWindowTable->GetSubTable("~STATUS~");
 }
@@ -41,7 +39,7 @@ LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
  *
  * If it changes to enabled, start livewindow running otherwise stop it
  */
-void LiveWindow::SetEnabled(bool enabled) {
+void frc::LiveWindow::SetEnabled(bool enabled) {
   if (m_enabled == enabled) return;
   if (enabled) {
     if (m_firstTime) {
@@ -76,9 +74,9 @@ void LiveWindow::SetEnabled(bool enabled) {
 /**
  * @brief Use a STL smart pointer to share ownership of component.
  */
-void LiveWindow::AddSensor(const std::string& subsystem,
-                           const std::string& name,
-                           std::shared_ptr<LiveWindowSendable> component) {
+void frc::LiveWindow::AddSensor(const std::string& subsystem,
+                                const std::string& name,
+                                std::shared_ptr<LiveWindowSendable> component) {
   m_components[component].subsystem = subsystem;
   m_components[component].name = name;
   m_components[component].isSensor = true;
@@ -87,9 +85,9 @@ void LiveWindow::AddSensor(const std::string& subsystem,
 /**
  * @brief Pass a reference to LiveWindow and retain ownership of the component.
  */
-void LiveWindow::AddSensor(const std::string& subsystem,
-                           const std::string& name,
-                           LiveWindowSendable& component) {
+void frc::LiveWindow::AddSensor(const std::string& subsystem,
+                                const std::string& name,
+                                LiveWindowSendable& component) {
   AddSensor(subsystem, name, std::shared_ptr<LiveWindowSendable>(
                                  &component, [](LiveWindowSendable*) {}));
 }
@@ -98,9 +96,9 @@ void LiveWindow::AddSensor(const std::string& subsystem,
  * @brief Use a raw pointer to the LiveWindow.
  * @deprecated Prefer smart pointers or references.
  */
-void LiveWindow::AddSensor(const std::string& subsystem,
-                           const std::string& name,
-                           LiveWindowSendable* component) {
+void frc::LiveWindow::AddSensor(const std::string& subsystem,
+                                const std::string& name,
+                                LiveWindowSendable* component) {
   AddSensor(subsystem, name, std::shared_ptr<LiveWindowSendable>(
                                  component, NullDeleter<LiveWindowSendable>()));
 }
@@ -119,9 +117,9 @@ void LiveWindow::AddSensor(const std::string& subsystem,
 /**
  * @brief Use a STL smart pointer to share ownership of component.
  */
-void LiveWindow::AddActuator(const std::string& subsystem,
-                             const std::string& name,
-                             std::shared_ptr<LiveWindowSendable> component) {
+void frc::LiveWindow::AddActuator(
+    const std::string& subsystem, const std::string& name,
+    std::shared_ptr<LiveWindowSendable> component) {
   m_components[component].subsystem = subsystem;
   m_components[component].name = name;
   m_components[component].isSensor = false;
@@ -130,9 +128,9 @@ void LiveWindow::AddActuator(const std::string& subsystem,
 /**
  * @brief Pass a reference to LiveWindow and retain ownership of the component.
  */
-void LiveWindow::AddActuator(const std::string& subsystem,
-                             const std::string& name,
-                             LiveWindowSendable& component) {
+void frc::LiveWindow::AddActuator(const std::string& subsystem,
+                                  const std::string& name,
+                                  LiveWindowSendable& component) {
   AddActuator(subsystem, name, std::shared_ptr<LiveWindowSendable>(
                                    &component, [](LiveWindowSendable*) {}));
 }
@@ -141,9 +139,9 @@ void LiveWindow::AddActuator(const std::string& subsystem,
  * @brief Use a raw pointer to the LiveWindow.
  * @deprecated Prefer smart pointers or references.
  */
-void LiveWindow::AddActuator(const std::string& subsystem,
-                             const std::string& name,
-                             LiveWindowSendable* component) {
+void frc::LiveWindow::AddActuator(const std::string& subsystem,
+                                  const std::string& name,
+                                  LiveWindowSendable* component) {
   AddActuator(subsystem, name,
               std::shared_ptr<LiveWindowSendable>(
                   component, NullDeleter<LiveWindowSendable>()));
@@ -153,8 +151,8 @@ void LiveWindow::AddActuator(const std::string& subsystem,
 /**
  * Meant for internal use in other WPILib classes.
  */
-void LiveWindow::AddSensor(std::string type, int channel,
-                           LiveWindowSendable* component) {
+void frc::LiveWindow::AddSensor(std::string type, int channel,
+                                LiveWindowSendable* component) {
   llvm::SmallString<128> buf;
   llvm::raw_svector_ostream oss(buf);
   oss << type << "[" << channel << "]";
@@ -169,8 +167,8 @@ void LiveWindow::AddSensor(std::string type, int channel,
 /**
  * Meant for internal use in other WPILib classes.
  */
-void LiveWindow::AddActuator(std::string type, int channel,
-                             LiveWindowSendable* component) {
+void frc::LiveWindow::AddActuator(std::string type, int channel,
+                                  LiveWindowSendable* component) {
   llvm::SmallString<128> buf;
   llvm::raw_svector_ostream oss(buf);
   oss << type << "[" << channel << "]";
@@ -182,8 +180,8 @@ void LiveWindow::AddActuator(std::string type, int channel,
 /**
  * Meant for internal use in other WPILib classes.
  */
-void LiveWindow::AddActuator(std::string type, int module, int channel,
-                             LiveWindowSendable* component) {
+void frc::LiveWindow::AddActuator(std::string type, int module, int channel,
+                                  LiveWindowSendable* component) {
   llvm::SmallString<128> buf;
   llvm::raw_svector_ostream oss(buf);
   oss << type << "[" << module << "," << channel << "]";
@@ -198,7 +196,7 @@ void LiveWindow::AddActuator(std::string type, int module, int channel,
  * Actuators are handled through callbacks on their value changing from the
  * SmartDashboard widgets.
  */
-void LiveWindow::UpdateValues() {
+void frc::LiveWindow::UpdateValues() {
   for (auto& elem : m_sensors) {
     elem->UpdateTable();
   }
@@ -208,7 +206,7 @@ void LiveWindow::UpdateValues() {
  * This method is called periodically to cause the sensors to send new values
  * to the SmartDashboard.
  */
-void LiveWindow::Run() {
+void frc::LiveWindow::Run() {
   if (m_enabled) {
     UpdateValues();
   }
@@ -221,7 +219,7 @@ void LiveWindow::Run() {
  * sensor and actuator values to be created that are replaced with the custom
  * names from users calling addActuator and addSensor.
  */
-void LiveWindow::InitializeLiveWindowComponents() {
+void frc::LiveWindow::InitializeLiveWindowComponents() {
   for (auto& elem : m_components) {
     std::shared_ptr<LiveWindowSendable> component = elem.first;
     LiveWindowComponent c = elem.second;

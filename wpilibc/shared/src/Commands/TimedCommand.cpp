@@ -7,15 +7,13 @@
 
 #include "Commands/TimedCommand.h"
 
-using namespace frc;
-
 /**
  * Creates a new TimedCommand with the given name and timeout.
  *
  * @param name    the name of the command
  * @param timeout the time (in seconds) before this command "times out"
  */
-TimedCommand::TimedCommand(const std::string& name, double timeout)
+frc::TimedCommand::TimedCommand(const std::string& name, double timeout)
     : Command(name, timeout) {}
 
 /**
@@ -23,9 +21,9 @@ TimedCommand::TimedCommand(const std::string& name, double timeout)
  *
  * @param timeout the time (in seconds) before this command "times out"
  */
-TimedCommand::TimedCommand(double timeout) : Command(timeout) {}
+frc::TimedCommand::TimedCommand(double timeout) : Command(timeout) {}
 
 /**
  * Ends command when timed out.
  */
-bool TimedCommand::IsFinished() { return IsTimedOut(); }
+bool frc::TimedCommand::IsFinished() { return IsTimedOut(); }

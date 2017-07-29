@@ -22,8 +22,6 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Assert implementation.
  * This allows breakpoints to be set on an assert.
@@ -67,7 +65,7 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
       errorStream << "failed.\n";
     }
 
-    std::string stack = GetStackTrace(2);
+    std::string stack = frc::GetStackTrace(2);
     std::string location = locStream.str();
     std::string error = errorStream.str();
 
@@ -122,7 +120,7 @@ void wpi_assertEqual_common_impl(llvm::StringRef valueA, llvm::StringRef valueB,
     errorStream << "failed.\n";
   }
 
-  std::string trace = GetStackTrace(3);
+  std::string trace = frc::GetStackTrace(3);
   std::string location = locStream.str();
   std::string error = errorStream.str();
 

@@ -9,9 +9,7 @@
 
 #include "Commands/Command.h"
 
-namespace frc {
-
-class MockCommand : public Command {
+class MockCommand : public frc::Command {
  public:
   MockCommand();
   int32_t GetInitializeCount() { return m_initializeCount; }
@@ -42,5 +40,3 @@ class MockCommand : public Command {
   int32_t m_endCount;
   int32_t m_interruptedCount;
 };
-
-}  // namespace frc

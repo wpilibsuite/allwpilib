@@ -15,8 +15,6 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Constructor.
  *
@@ -25,7 +23,7 @@ using namespace frc;
  * @param forwardChannel The forward channel number on the PCM (0..7).
  * @param reverseChannel The reverse channel number on the PCM (0..7).
  */
-DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
+frc::DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
     : DoubleSolenoid(GetDefaultSolenoidModule(), forwardChannel,
                      reverseChannel) {}
 
@@ -36,8 +34,8 @@ DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
  * @param forwardChannel The forward channel on the PCM to control (0..7).
  * @param reverseChannel The reverse channel on the PCM to control (0..7).
  */
-DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
-                               int reverseChannel)
+frc::DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
+                                    int reverseChannel)
     : SolenoidBase(moduleNumber),
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
@@ -95,7 +93,7 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
 /**
  * Destructor.
  */
-DoubleSolenoid::~DoubleSolenoid() {
+frc::DoubleSolenoid::~DoubleSolenoid() {
   HAL_FreeSolenoidPort(m_forwardHandle);
   HAL_FreeSolenoidPort(m_reverseHandle);
   if (m_table != nullptr) m_table->RemoveTableListener(this);
@@ -106,7 +104,7 @@ DoubleSolenoid::~DoubleSolenoid() {
  *
  * @param value The value to set (Off, Forward or Reverse)
  */
-void DoubleSolenoid::Set(Value value) {
+void frc::DoubleSolenoid::Set(Value value) {
   if (StatusIsFatal()) return;
 
   bool forward = false;
@@ -139,7 +137,7 @@ void DoubleSolenoid::Set(Value value) {
  *
  * @return The current value of the solenoid.
  */
-DoubleSolenoid::Value DoubleSolenoid::Get() const {
+frc::DoubleSolenoid::Value frc::DoubleSolenoid::Get() const {
   if (StatusIsFatal()) return kOff;
   int fstatus = 0;
   int rstatus = 0;
@@ -162,7 +160,7 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
  *
  * @return If solenoid is disabled due to short.
  */
-bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
+bool frc::DoubleSolenoid::IsFwdSolenoidBlackListed() const {
   int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
   return (blackList & m_forwardMask) ? 1 : 0;
 }
@@ -175,14 +173,14 @@ bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
  *
  * @return If solenoid is disabled due to short.
  */
-bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
+bool frc::DoubleSolenoid::IsRevSolenoidBlackListed() const {
   int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
   return (blackList & m_reverseMask) ? 1 : 0;
 }
 
-void DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
-                                  std::shared_ptr<nt::Value> value,
-                                  bool isNew) {
+void frc::DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
+                                       std::shared_ptr<nt::Value> value,
+                                       bool isNew) {
   if (!value->IsString()) return;
   Value lvalue = kOff;
   if (value->GetString() == "Forward")
@@ -192,7 +190,7 @@ void DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
   Set(lvalue);
 }
 
-void DoubleSolenoid::UpdateTable() {
+void frc::DoubleSolenoid::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutString(
         "Value", (Get() == kForward ? "Forward"
@@ -200,27 +198,29 @@ void DoubleSolenoid::UpdateTable() {
   }
 }
 
-void DoubleSolenoid::StartLiveWindowMode() {
+void frc::DoubleSolenoid::StartLiveWindowMode() {
   Set(kOff);
   if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
-void DoubleSolenoid::StopLiveWindowMode() {
+void frc::DoubleSolenoid::StopLiveWindowMode() {
   Set(kOff);
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
 
-std::string DoubleSolenoid::GetSmartDashboardType() const {
+std::string frc::DoubleSolenoid::GetSmartDashboardType() const {
   return "Double Solenoid";
 }
 
-void DoubleSolenoid::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::DoubleSolenoid::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> DoubleSolenoid::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::DoubleSolenoid::GetTable() const {
+  return m_table;
+}

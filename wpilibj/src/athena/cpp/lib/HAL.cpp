@@ -17,9 +17,6 @@
 #include "HALUtil.h"
 #include "support/jni_util.h"
 
-using namespace frc;
-using namespace wpi::java;
-
 // set the logging level
 static TLogLevel netCommLogLevel = logWARNING;
 
@@ -101,7 +98,7 @@ JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_report(
     JNIEnv* paramEnv, jclass, jint paramResource, jint paramInstanceNumber,
     jint paramContext, jstring paramFeature) {
-  JStringRef featureStr{paramEnv, paramFeature};
+  wpi::java::JStringRef featureStr{paramEnv, paramFeature};
   NETCOMM_LOG(logDEBUG) << "Calling HAL report "
                         << "res:" << paramResource
                         << " instance:" << paramInstanceNumber
@@ -159,7 +156,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickAxes(JNIEnv* env, jclass,
   jsize javaSize = env->GetArrayLength(axesArray);
   if (axes.count > javaSize)
   {
-    ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
+    frc::ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
   }
 
   env->SetFloatArrayRegion(axesArray, 0, axes.count, axes.axes);
@@ -183,7 +180,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickPOVs(JNIEnv* env, jclass,
   jsize javaSize = env->GetArrayLength(povsArray);
   if (povs.count > javaSize)
   {
-    ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
+    frc::ThrowIllegalArgumentException(env, "Native array size larger then passed in java array size");
   }
 
   env->SetShortArrayRegion(povsArray, 0, povs.count, povs.povs);
@@ -262,7 +259,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickName(JNIEnv* env, jclass,
                                                    jbyte port) {
   NETCOMM_LOG(logDEBUG) << "Calling HAL_GetJoystickName";
   char *joystickName = HAL_GetJoystickName(port);
-  jstring str = MakeJString(env, joystickName);
+  jstring str = wpi::java::MakeJString(env, joystickName);
   HAL_FreeJoystickName(joystickName);
   return str;
 }
@@ -341,7 +338,7 @@ JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_getSystemActive(JNIEnv* env, jclass) {
   int32_t status = 0;
   bool val = HAL_GetSystemActive(&status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return val;
 }
 
@@ -354,7 +351,7 @@ JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_getBrownedOut(JNIEnv* env, jclass) {
   int32_t status = 0;
   bool val = HAL_GetBrownedOut(&status);
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return val;
 }
 
@@ -366,7 +363,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getBrownedOut(JNIEnv* env, jclass) {
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_setErrorData(JNIEnv* env, jclass,
                                                 jstring error) {
-  JStringRef errorStr{env, error};
+  wpi::java::JStringRef errorStr{env, error};
 
   NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr.c_str();
   NETCOMM_LOG(logDEBUG) << "Length: " << errorStr.size();
@@ -386,9 +383,9 @@ Java_edu_wpi_first_wpilibj_hal_HAL_sendError(JNIEnv* env, jclass,
                                              jstring location,
                                              jstring callStack,
                                              jboolean printMsg) {
-  JStringRef detailsStr{env, details};
-  JStringRef locationStr{env, location};
-  JStringRef callStackStr{env, callStack};
+  wpi::java::JStringRef detailsStr{env, details};
+  wpi::java::JStringRef locationStr{env, location};
+  wpi::java::JStringRef callStackStr{env, callStack};
 
   NETCOMM_LOG(logDEBUG) << "Send Error: " << detailsStr.c_str();
   NETCOMM_LOG(logDEBUG) << "Location: " << locationStr.c_str();

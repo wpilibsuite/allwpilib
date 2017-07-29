@@ -10,16 +10,14 @@
 #include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
-using namespace frc;
-
-SimEncoder::SimEncoder(std::string topic) {
+frc::SimEncoder::SimEncoder(std::string topic) {
   commandPub = MainNode::Advertise<gazebo::msgs::GzString>("~/simulator/" +
                                                            topic + "/control");
 
   posSub = MainNode::Subscribe("~/simulator/" + topic + "/position",
-                               &SimEncoder::positionCallback, this);
+                               &frc::SimEncoder::positionCallback, this);
   velSub = MainNode::Subscribe("~/simulator/" + topic + "/velocity",
-                               &SimEncoder::velocityCallback, this);
+                               &frc::SimEncoder::velocityCallback, this);
 
   if (commandPub->WaitForConnection(
           gazebo::common::Time(5.0))) {  // Wait up to five seconds.
@@ -30,26 +28,28 @@ SimEncoder::SimEncoder(std::string topic) {
   }
 }
 
-void SimEncoder::Reset() { sendCommand("reset"); }
+void frc::SimEncoder::Reset() { sendCommand("reset"); }
 
-void SimEncoder::Start() { sendCommand("start"); }
+void frc::SimEncoder::Start() { sendCommand("start"); }
 
-void SimEncoder::Stop() { sendCommand("stop"); }
+void frc::SimEncoder::Stop() { sendCommand("stop"); }
 
-double SimEncoder::GetPosition() { return position; }
+double frc::SimEncoder::GetPosition() { return position; }
 
-double SimEncoder::GetVelocity() { return velocity; }
+double frc::SimEncoder::GetVelocity() { return velocity; }
 
-void SimEncoder::sendCommand(std::string cmd) {
+void frc::SimEncoder::sendCommand(std::string cmd) {
   gazebo::msgs::GzString msg;
   msg.set_data(cmd);
   commandPub->Publish(msg);
 }
 
-void SimEncoder::positionCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
+void frc::SimEncoder::positionCallback(
+    const gazebo::msgs::ConstFloat64Ptr& msg) {
   position = msg->data();
 }
 
-void SimEncoder::velocityCallback(const gazebo::msgs::ConstFloat64Ptr& msg) {
+void frc::SimEncoder::velocityCallback(
+    const gazebo::msgs::ConstFloat64Ptr& msg) {
   velocity = msg->data();
 }

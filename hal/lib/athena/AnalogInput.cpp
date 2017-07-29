@@ -17,8 +17,6 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "PortsInternal.h"
 
-using namespace hal;
-
 extern "C" {
 /**
  * Initialize the analog input port using the given port object.
@@ -27,38 +25,39 @@ extern "C" {
  */
 HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
                                                     int32_t* status) {
-  initializeAnalog(status);
+  hal::initializeAnalog(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
+  int16_t channel = hal::getPortHandleChannel(portHandle);
+  if (channel == hal::InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
 
-  HAL_AnalogInputHandle handle = analogInputHandles.Allocate(channel, status);
+  HAL_AnalogInputHandle handle =
+      hal::analogInputHandles.Allocate(channel, status);
 
   if (*status != 0)
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
   // Initialize port structure
-  auto analog_port = analogInputHandles.Get(handle);
+  auto analog_port = hal::analogInputHandles.Get(handle);
   if (analog_port == nullptr) {  // would only error on thread issue
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
   }
   analog_port->channel = static_cast<uint8_t>(channel);
   if (HAL_IsAccumulatorChannel(handle, status)) {
-    analog_port->accumulator.reset(tAccumulator::create(channel, status));
+    analog_port->accumulator.reset(hal::tAccumulator::create(channel, status));
   } else {
     analog_port->accumulator = nullptr;
   }
 
   // Set default configuration
-  analogInputSystem->writeScanList(channel, channel, status);
-  HAL_SetAnalogAverageBits(handle, kDefaultAverageBits, status);
-  HAL_SetAnalogOversampleBits(handle, kDefaultOversampleBits, status);
+  hal::analogInputSystem->writeScanList(channel, channel, status);
+  HAL_SetAnalogAverageBits(handle, hal::kDefaultAverageBits, status);
+  HAL_SetAnalogOversampleBits(handle, hal::kDefaultOversampleBits, status);
   return handle;
 }
 
@@ -67,7 +66,7 @@ HAL_AnalogInputHandle HAL_InitializeAnalogInputPort(HAL_PortHandle portHandle,
  */
 void HAL_FreeAnalogInputPort(HAL_AnalogInputHandle analogPortHandle) {
   // no status, so no need to check for a proper free.
-  analogInputHandles.Free(analogPortHandle);
+  hal::analogInputHandles.Free(analogPortHandle);
 }
 
 /**
@@ -87,7 +86,7 @@ HAL_Bool HAL_CheckAnalogModule(int32_t module) { return module == 1; }
  * @return Analog channel is valid
  */
 HAL_Bool HAL_CheckAnalogInputChannel(int32_t channel) {
-  return channel < kNumAnalogInputs && channel >= 0;
+  return channel < hal::kNumAnalogInputs && channel >= 0;
 }
 
 /**
@@ -101,9 +100,9 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
   // TODO: This will change when variable size scan lists are implemented.
   // TODO: Need double comparison with epsilon.
   // wpi_assert(!sampleRateSet || GetSampleRate() == samplesPerSecond);
-  initializeAnalog(status);
+  hal::initializeAnalog(status);
   if (*status != 0) return;
-  setAnalogSampleRate(samplesPerSecond, status);
+  hal::setAnalogSampleRate(samplesPerSecond, status);
 }
 
 /**
@@ -115,12 +114,13 @@ void HAL_SetAnalogSampleRate(double samplesPerSecond, int32_t* status) {
  * @return Sample rate.
  */
 double HAL_GetAnalogSampleRate(int32_t* status) {
-  initializeAnalog(status);
+  hal::initializeAnalog(status);
   if (*status != 0) return 0;
-  uint32_t ticksPerConversion = analogInputSystem->readLoopTiming(status);
+  uint32_t ticksPerConversion = hal::analogInputSystem->readLoopTiming(status);
   uint32_t ticksPerSample =
-      ticksPerConversion * getAnalogNumActiveChannels(status);
-  return static_cast<double>(kTimebase) / static_cast<double>(ticksPerSample);
+      ticksPerConversion * hal::getAnalogNumActiveChannels(status);
+  return static_cast<double>(hal::kTimebase) /
+         static_cast<double>(ticksPerSample);
 }
 
 /**
@@ -135,13 +135,13 @@ double HAL_GetAnalogSampleRate(int32_t* status) {
  */
 void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                               int32_t bits, int32_t* status) {
-  auto port = analogInputHandles.Get(analogPortHandle);
+  auto port = hal::analogInputHandles.Get(analogPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  analogInputSystem->writeAverageBits(port->channel, static_cast<uint8_t>(bits),
-                                      status);
+  hal::analogInputSystem->writeAverageBits(port->channel,
+                                           static_cast<uint8_t>(bits), status);
 }
 
 /**
@@ -155,12 +155,13 @@ void HAL_SetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
  */
 int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t* status) {
-  auto port = analogInputHandles.Get(analogPortHandle);
+  auto port = hal::analogInputHandles.Get(analogPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return kDefaultAverageBits;
+    return hal::kDefaultAverageBits;
   }
-  uint8_t result = analogInputSystem->readAverageBits(port->channel, status);
+  uint8_t result =
+      hal::analogInputSystem->readAverageBits(port->channel, status);
   return result;
 }
 
@@ -177,13 +178,13 @@ int32_t HAL_GetAnalogAverageBits(HAL_AnalogInputHandle analogPortHandle,
  */
 void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                  int32_t bits, int32_t* status) {
-  auto port = analogInputHandles.Get(analogPortHandle);
+  auto port = hal::analogInputHandles.Get(analogPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  analogInputSystem->writeOversampleBits(port->channel,
-                                         static_cast<uint8_t>(bits), status);
+  hal::analogInputSystem->writeOversampleBits(
+      port->channel, static_cast<uint8_t>(bits), status);
 }
 
 /**
@@ -198,12 +199,13 @@ void HAL_SetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
  */
 int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
                                     int32_t* status) {
-  auto port = analogInputHandles.Get(analogPortHandle);
+  auto port = hal::analogInputHandles.Get(analogPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
-    return kDefaultOversampleBits;
+    return hal::kDefaultOversampleBits;
   }
-  uint8_t result = analogInputSystem->readOversampleBits(port->channel, status);
+  uint8_t result =
+      hal::analogInputSystem->readOversampleBits(port->channel, status);
   return result;
 }
 
@@ -219,20 +221,21 @@ int32_t HAL_GetAnalogOversampleBits(HAL_AnalogInputHandle analogPortHandle,
  */
 int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
                            int32_t* status) {
-  auto port = analogInputHandles.Get(analogPortHandle);
+  auto port = hal::analogInputHandles.Get(analogPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
 
-  tAI::tReadSelect readSelect;
+  hal::tAI::tReadSelect readSelect;
   readSelect.Channel = port->channel;
   readSelect.Averaged = false;
 
-  std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
-  analogInputSystem->writeReadSelect(readSelect, status);
-  analogInputSystem->strobeLatchOutput(status);
-  return static_cast<int16_t>(analogInputSystem->readOutput(status));
+  std::lock_guard<hal::priority_recursive_mutex> sync(
+      hal::analogRegisterWindowMutex);
+  hal::analogInputSystem->writeReadSelect(readSelect, status);
+  hal::analogInputSystem->strobeLatchOutput(status);
+  return static_cast<int16_t>(hal::analogInputSystem->readOutput(status));
 }
 
 /**
@@ -251,19 +254,20 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
  */
 int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
                                   int32_t* status) {
-  auto port = analogInputHandles.Get(analogPortHandle);
+  auto port = hal::analogInputHandles.Get(analogPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
   }
-  tAI::tReadSelect readSelect;
+  hal::tAI::tReadSelect readSelect;
   readSelect.Channel = port->channel;
   readSelect.Averaged = true;
 
-  std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
-  analogInputSystem->writeReadSelect(readSelect, status);
-  analogInputSystem->strobeLatchOutput(status);
-  return static_cast<int32_t>(analogInputSystem->readOutput(status));
+  std::lock_guard<hal::priority_recursive_mutex> sync(
+      hal::analogRegisterWindowMutex);
+  hal::analogInputSystem->writeReadSelect(readSelect, status);
+  hal::analogInputSystem->strobeLatchOutput(status);
+  return static_cast<int32_t>(hal::analogInputSystem->readOutput(status));
 }
 
 /**
@@ -351,7 +355,7 @@ int32_t HAL_GetAnalogVoltsToValue(HAL_AnalogInputHandle analogPortHandle,
  */
 int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
                                int32_t* status) {
-  auto port = analogInputHandles.Get(analogPortHandle);
+  auto port = hal::analogInputHandles.Get(analogPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -373,7 +377,7 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
  */
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
-  auto port = analogInputHandles.Get(analogPortHandle);
+  auto port = hal::analogInputHandles.Get(analogPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;

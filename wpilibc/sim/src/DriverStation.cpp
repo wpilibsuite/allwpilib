@@ -16,48 +16,46 @@
 #include "llvm/raw_ostream.h"
 #include "simulation/MainNode.h"
 
-using namespace frc;
-
-const int DriverStation::kBatteryChannel;
-const int DriverStation::kJoystickPorts;
-const int DriverStation::kJoystickAxes;
-const double DriverStation::kUpdatePeriod = 0.02;
-int DriverStation::m_updateNumber = 0;
+const int frc::DriverStation::kBatteryChannel;
+const int frc::DriverStation::kJoystickPorts;
+const int frc::DriverStation::kJoystickAxes;
+const double frc::DriverStation::kUpdatePeriod = 0.02;
+int frc::DriverStation::m_updateNumber = 0;
 
 /**
  * DriverStation contructor.
  *
  * This is only called once the first time GetInstance() is called
  */
-DriverStation::DriverStation() {
+frc::DriverStation::DriverStation() {
   state = gazebo::msgs::DriverStationPtr(new gazebo::msgs::DriverStation());
-  stateSub =
-      MainNode::Subscribe("~/ds/state", &DriverStation::stateCallback, this);
+  stateSub = MainNode::Subscribe("~/ds/state",
+                                 &frc::DriverStation::stateCallback, this);
   // TODO: for loop + boost bind
   joysticks[0] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[0] = MainNode::Subscribe(
-      "~/ds/joysticks/0", &DriverStation::joystickCallback0, this);
+      "~/ds/joysticks/0", &frc::DriverStation::joystickCallback0, this);
   joysticks[1] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[1] = MainNode::Subscribe(
-      "~/ds/joysticks/1", &DriverStation::joystickCallback1, this);
+      "~/ds/joysticks/1", &frc::DriverStation::joystickCallback1, this);
   joysticks[2] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[2] = MainNode::Subscribe(
-      "~/ds/joysticks/2", &DriverStation::joystickCallback2, this);
+      "~/ds/joysticks/2", &frc::DriverStation::joystickCallback2, this);
   joysticks[3] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[3] = MainNode::Subscribe(
-      "~/ds/joysticks/5", &DriverStation::joystickCallback3, this);
+      "~/ds/joysticks/5", &frc::DriverStation::joystickCallback3, this);
   joysticks[4] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[4] = MainNode::Subscribe(
-      "~/ds/joysticks/4", &DriverStation::joystickCallback4, this);
+      "~/ds/joysticks/4", &frc::DriverStation::joystickCallback4, this);
   joysticks[5] = gazebo::msgs::FRCJoystickPtr(new gazebo::msgs::FRCJoystick());
   joysticksSub[5] = MainNode::Subscribe(
-      "~/ds/joysticks/5", &DriverStation::joystickCallback5, this);
+      "~/ds/joysticks/5", &frc::DriverStation::joystickCallback5, this);
 }
 
 /**
  * Return a pointer to the singleton DriverStation.
  */
-DriverStation& DriverStation::GetInstance() {
+frc::DriverStation& frc::DriverStation::GetInstance() {
   static DriverStation instance;
   return instance;
 }
@@ -67,7 +65,7 @@ DriverStation& DriverStation::GetInstance() {
  *
  * @return The battery voltage.
  */
-double DriverStation::GetBatteryVoltage() const {
+double frc::DriverStation::GetBatteryVoltage() const {
   return 12.0;  // 12 volts all the time!
 }
 
@@ -79,7 +77,7 @@ double DriverStation::GetBatteryVoltage() const {
  * @param axis  The analog axis value to read from the joystick.
  * @return The value of the axis on the joystick.
  */
-double DriverStation::GetStickAxis(int stick, int axis) {
+double frc::DriverStation::GetStickAxis(int stick, int axis) {
   if (axis < 0 || axis > (kJoystickAxes - 1)) {
     wpi_setWPIError(BadJoystickAxis);
     return 0.0;
@@ -106,7 +104,7 @@ double DriverStation::GetStickAxis(int stick, int axis) {
  * @param button The button number to check.
  * @return If the button is pressed.
  */
-bool DriverStation::GetStickButton(int stick, int button) {
+bool frc::DriverStation::GetStickButton(int stick, int button) {
   if (stick < 0 || stick >= 6) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                "stick must be between 0 and 5");
@@ -129,7 +127,7 @@ bool DriverStation::GetStickButton(int stick, int button) {
  * @param stick The joystick to read.
  * @return The state of the buttons on the joystick.
  */
-int16_t DriverStation::GetStickButtons(int stick) {
+int16_t frc::DriverStation::GetStickButtons(int stick) {
   if (stick < 0 || stick >= 6) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange,
                                "stick must be between 0 and 5");
@@ -163,7 +161,7 @@ int16_t DriverStation::GetStickButtons(int stick) {
  *                Valid range is 1 - 4.
  * @return The analog voltage on the input.
  */
-double DriverStation::GetAnalogIn(int channel) {
+double frc::DriverStation::GetAnalogIn(int channel) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetAnalogIn");
   return 0.0;
 }
@@ -176,7 +174,7 @@ double DriverStation::GetAnalogIn(int channel) {
  *
  * @param channel The digital input to get. Valid range is 1 - 8.
  */
-bool DriverStation::GetDigitalIn(int channel) {
+bool frc::DriverStation::GetDigitalIn(int channel) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalIn");
   return false;
 }
@@ -190,7 +188,7 @@ bool DriverStation::GetDigitalIn(int channel) {
  * @param channel The digital output to set. Valid range is 1 - 8.
  * @param value   The state to set the digital output.
  */
-void DriverStation::SetDigitalOut(int channel, bool value) {
+void frc::DriverStation::SetDigitalOut(int channel, bool value) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "SetDigitalOut");
 }
 
@@ -200,30 +198,30 @@ void DriverStation::SetDigitalOut(int channel, bool value) {
  * @param channel The digital ouput to monitor. Valid range is 1 through 8.
  * @return A digital value being output on the Drivers Station.
  */
-bool DriverStation::GetDigitalOut(int channel) {
+bool frc::DriverStation::GetDigitalOut(int channel) {
   wpi_setWPIErrorWithContext(UnsupportedInSimulation, "GetDigitalOut");
   return false;
 }
 
-bool DriverStation::IsEnabled() const {
+bool frc::DriverStation::IsEnabled() const {
   std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
   return state != nullptr ? state->enabled() : false;
 }
 
-bool DriverStation::IsDisabled() const { return !IsEnabled(); }
+bool frc::DriverStation::IsDisabled() const { return !IsEnabled(); }
 
-bool DriverStation::IsAutonomous() const {
+bool frc::DriverStation::IsAutonomous() const {
   std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
   return state != nullptr
              ? state->state() == gazebo::msgs::DriverStation_State_AUTO
              : false;
 }
 
-bool DriverStation::IsOperatorControl() const {
+bool frc::DriverStation::IsOperatorControl() const {
   return !(IsAutonomous() || IsTest());
 }
 
-bool DriverStation::IsTest() const {
+bool frc::DriverStation::IsTest() const {
   std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
   return state != nullptr
              ? state->state() == gazebo::msgs::DriverStation_State_TEST
@@ -235,7 +233,7 @@ bool DriverStation::IsTest() const {
  * @return True if the robot is competing on a field being controlled by a Field
  *         Management System
  */
-bool DriverStation::IsFMSAttached() const {
+bool frc::DriverStation::IsFMSAttached() const {
   return false;  // No FMS in simulation
 }
 
@@ -244,7 +242,7 @@ bool DriverStation::IsFMSAttached() const {
  * This could return kRed or kBlue.
  * @return The Alliance enum
  */
-DriverStation::Alliance DriverStation::GetAlliance() const {
+frc::DriverStation::Alliance frc::DriverStation::GetAlliance() const {
   // if (m_controlData->dsID_Alliance == 'R') return kRed;
   // if (m_controlData->dsID_Alliance == 'B') return kBlue;
   // wpi_assert(false);
@@ -256,7 +254,7 @@ DriverStation::Alliance DriverStation::GetAlliance() const {
  * This could return 1, 2, or 3.
  * @return The location of the driver station
  */
-int DriverStation::GetLocation() const {
+int frc::DriverStation::GetLocation() const {
   return -1;  // TODO: Support locations
 }
 
@@ -268,7 +266,7 @@ int DriverStation::GetLocation() const {
  * This is a good way to delay processing until there is new driver station data
  * to act on.
  */
-void DriverStation::WaitForData() { WaitForData(0); }
+void frc::DriverStation::WaitForData() { WaitForData(0); }
 
 /**
  * Wait until a new packet comes from the driver station, or wait for a timeout.
@@ -286,7 +284,7 @@ void DriverStation::WaitForData() { WaitForData(0); }
  *
  * @return true if new data, otherwise false
  */
-bool DriverStation::WaitForData(double timeout) {
+bool frc::DriverStation::WaitForData(double timeout) {
 #if defined(_MSC_VER) && _MSC_VER < 1900
   auto timeoutTime = std::chrono::steady_clock::now() +
                      std::chrono::duration<int64_t, std::nano>(
@@ -322,7 +320,7 @@ bool DriverStation::WaitForData(double timeout) {
  * referees)
  * @return Match time in seconds since the beginning of autonomous
  */
-double DriverStation::GetMatchTime() const {
+double frc::DriverStation::GetMatchTime() const {
   if (m_approxMatchTimeOffset < 0.0) return 0.0;
   return Timer::GetFPGATimestamp() - m_approxMatchTimeOffset;
 }
@@ -331,7 +329,7 @@ double DriverStation::GetMatchTime() const {
  * Report an error to the DriverStation messages window.
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(llvm::StringRef error) {
+void frc::DriverStation::ReportError(llvm::StringRef error) {
   llvm::outs() << error << "\n";
 }
 
@@ -339,7 +337,7 @@ void DriverStation::ReportError(llvm::StringRef error) {
  * Report a warning to the DriverStation messages window.
  * The warning is also printed to the program console.
  */
-void DriverStation::ReportWarning(llvm::StringRef error) {
+void frc::DriverStation::ReportWarning(llvm::StringRef error) {
   llvm::outs() << error << "\n";
 }
 
@@ -347,9 +345,10 @@ void DriverStation::ReportWarning(llvm::StringRef error) {
  * Report an error to the DriverStation messages window.
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(bool is_error, int code, llvm::StringRef error,
-                                llvm::StringRef location,
-                                llvm::StringRef stack) {
+void frc::DriverStation::ReportError(bool is_error, int code,
+                                     llvm::StringRef error,
+                                     llvm::StringRef location,
+                                     llvm::StringRef stack) {
   if (!location.empty())
     llvm::outs() << (is_error ? "Error" : "Warning") << " at " << location
                  << ": ";
@@ -361,9 +360,9 @@ void DriverStation::ReportError(bool is_error, int code, llvm::StringRef error,
  * Return the team number that the Driver Station is configured for.
  * @return The team number
  */
-uint16_t DriverStation::GetTeamNumber() const { return 348; }
+uint16_t frc::DriverStation::GetTeamNumber() const { return 348; }
 
-void DriverStation::stateCallback(
+void frc::DriverStation::stateCallback(
     const gazebo::msgs::ConstDriverStationPtr& msg) {
   {
     std::unique_lock<std::recursive_mutex> lock(m_stateMutex);
@@ -376,38 +375,38 @@ void DriverStation::stateCallback(
   m_waitForDataCond.notify_all();
 }
 
-void DriverStation::joystickCallback(
+void frc::DriverStation::joystickCallback(
     const gazebo::msgs::ConstFRCJoystickPtr& msg, int i) {
   std::unique_lock<std::recursive_mutex> lock(m_joystickMutex);
   *(joysticks[i]) = *msg;
 }
 
-void DriverStation::joystickCallback0(
+void frc::DriverStation::joystickCallback0(
     const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 0);
 }
 
-void DriverStation::joystickCallback1(
+void frc::DriverStation::joystickCallback1(
     const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 1);
 }
 
-void DriverStation::joystickCallback2(
+void frc::DriverStation::joystickCallback2(
     const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 2);
 }
 
-void DriverStation::joystickCallback3(
+void frc::DriverStation::joystickCallback3(
     const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 3);
 }
 
-void DriverStation::joystickCallback4(
+void frc::DriverStation::joystickCallback4(
     const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 4);
 }
 
-void DriverStation::joystickCallback5(
+void frc::DriverStation::joystickCallback5(
     const gazebo::msgs::ConstFRCJoystickPtr& msg) {
   joystickCallback(msg, 5);
 }

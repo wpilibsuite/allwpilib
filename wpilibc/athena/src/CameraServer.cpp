@@ -13,9 +13,7 @@
 #include "llvm/raw_ostream.h"
 #include "ntcore_cpp.h"
 
-using namespace frc;
-
-CameraServer* CameraServer::GetInstance() {
+frc::CameraServer* frc::CameraServer::GetInstance() {
   static CameraServer instance;
   return &instance;
 }
@@ -58,12 +56,12 @@ static std::string MakeStreamValue(llvm::StringRef address, int port) {
   return rv;
 }
 
-std::shared_ptr<ITable> CameraServer::GetSourceTable(CS_Source source) {
+std::shared_ptr<ITable> frc::CameraServer::GetSourceTable(CS_Source source) {
   std::lock_guard<std::mutex> lock(m_mutex);
   return m_tables.lookup(source);
 }
 
-std::vector<std::string> CameraServer::GetSinkStreamValues(CS_Sink sink) {
+std::vector<std::string> frc::CameraServer::GetSinkStreamValues(CS_Sink sink) {
   CS_Status status = 0;
 
   // Ignore all but MjpegServer
@@ -92,7 +90,8 @@ std::vector<std::string> CameraServer::GetSinkStreamValues(CS_Sink sink) {
   return values;
 }
 
-std::vector<std::string> CameraServer::GetSourceStreamValues(CS_Source source) {
+std::vector<std::string> frc::CameraServer::GetSourceStreamValues(
+    CS_Source source) {
   CS_Status status = 0;
 
   // Ignore all but HttpCamera
@@ -120,7 +119,7 @@ std::vector<std::string> CameraServer::GetSourceStreamValues(CS_Source source) {
   return values;
 }
 
-void CameraServer::UpdateStreamValues() {
+void frc::CameraServer::UpdateStreamValues() {
   std::lock_guard<std::mutex> lock(m_mutex);
   // Over all the sinks...
   for (const auto& i : m_sinks) {
@@ -307,7 +306,7 @@ static void PutSourcePropertyValue(ITable* table, const cs::VideoEvent& event,
   }
 }
 
-CameraServer::CameraServer()
+frc::CameraServer::CameraServer()
     : m_publishTable{NetworkTable::GetTable(kPublishName)},
       m_nextPort(kBasePort) {
   // We publish sources to NetworkTables using the following structure:
@@ -483,11 +482,11 @@ CameraServer::CameraServer()
       NT_NOTIFY_IMMEDIATE | NT_NOTIFY_UPDATE);
 }
 
-cs::UsbCamera CameraServer::StartAutomaticCapture() {
+cs::UsbCamera frc::CameraServer::StartAutomaticCapture() {
   return StartAutomaticCapture(m_defaultUsbDevice++);
 }
 
-cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
+cs::UsbCamera frc::CameraServer::StartAutomaticCapture(int dev) {
   llvm::SmallString<64> buf;
   llvm::raw_svector_ostream name{buf};
   name << "USB Camera " << dev;
@@ -497,65 +496,66 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
   return camera;
 }
 
-cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
-                                                  int dev) {
+cs::UsbCamera frc::CameraServer::StartAutomaticCapture(llvm::StringRef name,
+                                                       int dev) {
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
   return camera;
 }
 
-cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
-                                                  llvm::StringRef path) {
+cs::UsbCamera frc::CameraServer::StartAutomaticCapture(llvm::StringRef name,
+                                                       llvm::StringRef path) {
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
   return camera;
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef host) {
+cs::AxisCamera frc::CameraServer::AddAxisCamera(llvm::StringRef host) {
   return AddAxisCamera("Axis Camera", host);
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(const char* host) {
+cs::AxisCamera frc::CameraServer::AddAxisCamera(const char* host) {
   return AddAxisCamera("Axis Camera", host);
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(const std::string& host) {
+cs::AxisCamera frc::CameraServer::AddAxisCamera(const std::string& host) {
   return AddAxisCamera("Axis Camera", host);
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::ArrayRef<std::string> hosts) {
+cs::AxisCamera frc::CameraServer::AddAxisCamera(
+    llvm::ArrayRef<std::string> hosts) {
   return AddAxisCamera("Axis Camera", hosts);
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
-                                           llvm::StringRef host) {
+cs::AxisCamera frc::CameraServer::AddAxisCamera(llvm::StringRef name,
+                                                llvm::StringRef host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
   return camera;
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
-                                           const char* host) {
+cs::AxisCamera frc::CameraServer::AddAxisCamera(llvm::StringRef name,
+                                                const char* host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
   return camera;
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
-                                           const std::string& host) {
+cs::AxisCamera frc::CameraServer::AddAxisCamera(llvm::StringRef name,
+                                                const std::string& host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
   return camera;
 }
 
-cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
-                                           llvm::ArrayRef<std::string> hosts) {
+cs::AxisCamera frc::CameraServer::AddAxisCamera(
+    llvm::StringRef name, llvm::ArrayRef<std::string> hosts) {
   cs::AxisCamera camera{name, hosts};
   StartAutomaticCapture(camera);
   return camera;
 }
 
-void CameraServer::StartAutomaticCapture(const cs::VideoSource& camera) {
+void frc::CameraServer::StartAutomaticCapture(const cs::VideoSource& camera) {
   llvm::SmallString<64> name{"serve_"};
   name += camera.GetName();
 
@@ -564,7 +564,7 @@ void CameraServer::StartAutomaticCapture(const cs::VideoSource& camera) {
   server.SetSource(camera);
 }
 
-cs::CvSink CameraServer::GetVideo() {
+cs::CvSink frc::CameraServer::GetVideo() {
   cs::VideoSource source;
   {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -582,7 +582,7 @@ cs::CvSink CameraServer::GetVideo() {
   return GetVideo(std::move(source));
 }
 
-cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
+cs::CvSink frc::CameraServer::GetVideo(const cs::VideoSource& camera) {
   llvm::SmallString<64> name{"opencv_"};
   name += camera.GetName();
 
@@ -608,7 +608,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
   return newsink;
 }
 
-cs::CvSink CameraServer::GetVideo(llvm::StringRef name) {
+cs::CvSink frc::CameraServer::GetVideo(llvm::StringRef name) {
   cs::VideoSource source;
   {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -625,14 +625,14 @@ cs::CvSink CameraServer::GetVideo(llvm::StringRef name) {
   return GetVideo(source);
 }
 
-cs::CvSource CameraServer::PutVideo(llvm::StringRef name, int width,
-                                    int height) {
+cs::CvSource frc::CameraServer::PutVideo(llvm::StringRef name, int width,
+                                         int height) {
   cs::CvSource source{name, cs::VideoMode::kMJPEG, width, height, 30};
   StartAutomaticCapture(source);
   return source;
 }
 
-cs::MjpegServer CameraServer::AddServer(llvm::StringRef name) {
+cs::MjpegServer frc::CameraServer::AddServer(llvm::StringRef name) {
   int port;
   {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -641,23 +641,23 @@ cs::MjpegServer CameraServer::AddServer(llvm::StringRef name) {
   return AddServer(name, port);
 }
 
-cs::MjpegServer CameraServer::AddServer(llvm::StringRef name, int port) {
+cs::MjpegServer frc::CameraServer::AddServer(llvm::StringRef name, int port) {
   cs::MjpegServer server{name, port};
   AddServer(server);
   return server;
 }
 
-void CameraServer::AddServer(const cs::VideoSink& server) {
+void frc::CameraServer::AddServer(const cs::VideoSink& server) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_sinks.emplace_second(server.GetName(), server);
 }
 
-void CameraServer::RemoveServer(llvm::StringRef name) {
+void frc::CameraServer::RemoveServer(llvm::StringRef name) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_sinks.erase(name);
 }
 
-cs::VideoSink CameraServer::GetServer() {
+cs::VideoSink frc::CameraServer::GetServer() {
   llvm::SmallString<64> name;
   {
     std::lock_guard<std::mutex> lock(m_mutex);
@@ -671,7 +671,7 @@ cs::VideoSink CameraServer::GetServer() {
   return GetServer(name);
 }
 
-cs::VideoSink CameraServer::GetServer(llvm::StringRef name) {
+cs::VideoSink frc::CameraServer::GetServer(llvm::StringRef name) {
   std::lock_guard<std::mutex> lock(m_mutex);
   auto it = m_sinks.find(name);
   if (it == m_sinks.end()) {
@@ -684,19 +684,19 @@ cs::VideoSink CameraServer::GetServer(llvm::StringRef name) {
   return it->second;
 }
 
-void CameraServer::AddCamera(const cs::VideoSource& camera) {
+void frc::CameraServer::AddCamera(const cs::VideoSource& camera) {
   std::string name = camera.GetName();
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_primarySourceName.empty()) m_primarySourceName = name;
   m_sources.emplace_second(name, camera);
 }
 
-void CameraServer::RemoveCamera(llvm::StringRef name) {
+void frc::CameraServer::RemoveCamera(llvm::StringRef name) {
   std::lock_guard<std::mutex> lock(m_mutex);
   m_sources.erase(name);
 }
 
-void CameraServer::SetSize(int size) {
+void frc::CameraServer::SetSize(int size) {
   std::lock_guard<std::mutex> lock(m_mutex);
   if (m_primarySourceName.empty()) return;
   auto it = m_sources.find(m_primarySourceName);

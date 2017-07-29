@@ -9,12 +9,10 @@
 
 #include "LiveWindow/LiveWindow.h"
 
-using namespace frc;
-
 /**
  * @param channel The PWM channel that the Jaguar is attached to.
  */
-Jaguar::Jaguar(int channel) : SafePWM(channel) {
+frc::Jaguar::Jaguar(int channel) : SafePWM(channel) {
   /*
    * Input profile defined by Luminary Micro.
    *
@@ -39,23 +37,23 @@ Jaguar::Jaguar(int channel) : SafePWM(channel) {
  *
  * @param speed The speed value between -1.0 and 1.0 to set.
  */
-void Jaguar::Set(double speed) { SetSpeed(speed); }
+void frc::Jaguar::Set(double speed) { SetSpeed(speed); }
 
 /**
  * Get the recently set value of the PWM.
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-double Jaguar::Get() const { return GetSpeed(); }
+double frc::Jaguar::Get() const { return GetSpeed(); }
 
 /**
  * Common interface for disabling a motor.
  */
-void Jaguar::Disable() { SetRaw(kPwmDisabled); }
+void frc::Jaguar::Disable() { SetRaw(kPwmDisabled); }
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void Jaguar::PIDWrite(double output) { Set(output); }
+void frc::Jaguar::PIDWrite(double output) { Set(output); }

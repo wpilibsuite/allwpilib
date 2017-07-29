@@ -18,13 +18,11 @@
 #include "Utility.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
-std::array<bool, 3> DigitalGlitchFilter::m_filterAllocated = {
+std::array<bool, 3> frc::DigitalGlitchFilter::m_filterAllocated = {
     {false, false, false}};
-hal::priority_mutex DigitalGlitchFilter::m_mutex;
+hal::priority_mutex frc::DigitalGlitchFilter::m_mutex;
 
-DigitalGlitchFilter::DigitalGlitchFilter() {
+frc::DigitalGlitchFilter::DigitalGlitchFilter() {
   std::lock_guard<hal::priority_mutex> sync(m_mutex);
   auto index =
       std::find(m_filterAllocated.begin(), m_filterAllocated.end(), false);
@@ -36,7 +34,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
   HAL_Report(HALUsageReporting::kResourceType_DigitalFilter, m_channelIndex);
 }
 
-DigitalGlitchFilter::~DigitalGlitchFilter() {
+frc::DigitalGlitchFilter::~DigitalGlitchFilter() {
   if (m_channelIndex >= 0) {
     std::lock_guard<hal::priority_mutex> sync(m_mutex);
     m_filterAllocated[m_channelIndex] = false;
@@ -48,11 +46,12 @@ DigitalGlitchFilter::~DigitalGlitchFilter() {
  *
  * @param input The DigitalSource to add.
  */
-void DigitalGlitchFilter::Add(DigitalSource* input) {
+void frc::DigitalGlitchFilter::Add(DigitalSource* input) {
   DoAdd(input, m_channelIndex + 1);
 }
 
-void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requested_index) {
+void frc::DigitalGlitchFilter::DoAdd(DigitalSource* input,
+                                     int requested_index) {
   // Some sources from Counters and Encoders are null.  By pushing the check
   // here, we catch the issue more generally.
   if (input) {
@@ -82,7 +81,7 @@ void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requested_index) {
  *
  * @param input The Encoder to add.
  */
-void DigitalGlitchFilter::Add(Encoder* input) {
+void frc::DigitalGlitchFilter::Add(Encoder* input) {
   Add(input->m_aSource.get());
   if (StatusIsFatal()) {
     return;
@@ -95,7 +94,7 @@ void DigitalGlitchFilter::Add(Encoder* input) {
  *
  * @param input The Counter to add.
  */
-void DigitalGlitchFilter::Add(Counter* input) {
+void frc::DigitalGlitchFilter::Add(Counter* input) {
   Add(input->m_upSource.get());
   if (StatusIsFatal()) {
     return;
@@ -111,7 +110,7 @@ void DigitalGlitchFilter::Add(Counter* input) {
  *
  * @param input The DigitalSource to remove.
  */
-void DigitalGlitchFilter::Remove(DigitalSource* input) { DoAdd(input, 0); }
+void frc::DigitalGlitchFilter::Remove(DigitalSource* input) { DoAdd(input, 0); }
 
 /**
  * Removes an encoder from this filter.
@@ -121,7 +120,7 @@ void DigitalGlitchFilter::Remove(DigitalSource* input) { DoAdd(input, 0); }
  *
  * @param input The Encoder to remove.
  */
-void DigitalGlitchFilter::Remove(Encoder* input) {
+void frc::DigitalGlitchFilter::Remove(Encoder* input) {
   Remove(input->m_aSource.get());
   if (StatusIsFatal()) {
     return;
@@ -137,7 +136,7 @@ void DigitalGlitchFilter::Remove(Encoder* input) {
  *
  * @param input The Counter to remove.
  */
-void DigitalGlitchFilter::Remove(Counter* input) {
+void frc::DigitalGlitchFilter::Remove(Counter* input) {
   Remove(input->m_upSource.get());
   if (StatusIsFatal()) {
     return;
@@ -150,7 +149,7 @@ void DigitalGlitchFilter::Remove(Counter* input) {
  *
  * @param fpga_cycles The number of FPGA cycles.
  */
-void DigitalGlitchFilter::SetPeriodCycles(int fpga_cycles) {
+void frc::DigitalGlitchFilter::SetPeriodCycles(int fpga_cycles) {
   int32_t status = 0;
   HAL_SetFilterPeriod(m_channelIndex, fpga_cycles, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -161,7 +160,7 @@ void DigitalGlitchFilter::SetPeriodCycles(int fpga_cycles) {
  *
  * @param nanoseconds The number of nanoseconds.
  */
-void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
+void frc::DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
   int32_t status = 0;
   int fpga_cycles =
       nanoseconds * HAL_GetSystemClockTicksPerMicrosecond() / 4 / 1000;
@@ -175,7 +174,7 @@ void DigitalGlitchFilter::SetPeriodNanoSeconds(uint64_t nanoseconds) {
  *
  * @return The number of cycles.
  */
-int DigitalGlitchFilter::GetPeriodCycles() {
+int frc::DigitalGlitchFilter::GetPeriodCycles() {
   int32_t status = 0;
   int fpga_cycles = HAL_GetFilterPeriod(m_channelIndex, &status);
 
@@ -189,7 +188,7 @@ int DigitalGlitchFilter::GetPeriodCycles() {
  *
  * @return The number of nanoseconds.
  */
-uint64_t DigitalGlitchFilter::GetPeriodNanoSeconds() {
+uint64_t frc::DigitalGlitchFilter::GetPeriodNanoSeconds() {
   int32_t status = 0;
   int fpga_cycles = HAL_GetFilterPeriod(m_channelIndex, &status);
 

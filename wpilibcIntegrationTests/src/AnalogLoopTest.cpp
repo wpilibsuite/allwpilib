@@ -13,8 +13,6 @@
 #include "Timer.h"
 #include "gtest/gtest.h"
 
-using namespace frc;
-
 static const double kDelayTime = 0.01;
 
 /**
@@ -22,12 +20,12 @@ static const double kDelayTime = 0.01;
  */
 class AnalogLoopTest : public testing::Test {
  protected:
-  AnalogInput* m_input;
-  AnalogOutput* m_output;
+  frc::AnalogInput* m_input;
+  frc::AnalogOutput* m_output;
 
   void SetUp() override {
-    m_input = new AnalogInput(TestBench::kFakeAnalogOutputChannel);
-    m_output = new AnalogOutput(TestBench::kAnalogOutputChannel);
+    m_input = new frc::AnalogInput(TestBench::kFakeAnalogOutputChannel);
+    m_output = new frc::AnalogOutput(TestBench::kAnalogOutputChannel);
   }
 
   void TearDown() override {
@@ -45,7 +43,7 @@ TEST_F(AnalogLoopTest, AnalogInputWorks) {
   for (int32_t i = 0; i < 50; i++) {
     m_output->SetVoltage(i / 10.0);
 
-    Wait(kDelayTime);
+    frc::Wait(kDelayTime);
 
     EXPECT_NEAR(m_output->GetVoltage(), m_input->GetVoltage(), 0.01);
   }
@@ -56,25 +54,25 @@ TEST_F(AnalogLoopTest, AnalogInputWorks) {
  * range correctly.
  */
 TEST_F(AnalogLoopTest, AnalogTriggerWorks) {
-  AnalogTrigger trigger(m_input);
+  frc::AnalogTrigger trigger(m_input);
   trigger.SetLimitsVoltage(2.0, 3.0);
 
   m_output->SetVoltage(1.0);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_FALSE(trigger.GetInWindow())
       << "Analog trigger is in the window (2V, 3V)";
   EXPECT_FALSE(trigger.GetTriggerState()) << "Analog trigger is on";
 
   m_output->SetVoltage(2.5);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_TRUE(trigger.GetInWindow())
       << "Analog trigger is not in the window (2V, 3V)";
   EXPECT_FALSE(trigger.GetTriggerState()) << "Analog trigger is on";
 
   m_output->SetVoltage(4.0);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
 
   EXPECT_FALSE(trigger.GetInWindow())
       << "Analog trigger is in the window (2V, 3V)";
@@ -86,17 +84,17 @@ TEST_F(AnalogLoopTest, AnalogTriggerWorks) {
  * a counter.
  */
 TEST_F(AnalogLoopTest, AnalogTriggerCounterWorks) {
-  AnalogTrigger trigger(m_input);
+  frc::AnalogTrigger trigger(m_input);
   trigger.SetLimitsVoltage(2.0, 3.0);
 
-  Counter counter(trigger);
+  frc::Counter counter(trigger);
 
   // Turn the analog output low and high 50 times
   for (int32_t i = 0; i < 50; i++) {
     m_output->SetVoltage(1.0);
-    Wait(kDelayTime);
+    frc::Wait(kDelayTime);
     m_output->SetVoltage(4.0);
-    Wait(kDelayTime);
+    frc::Wait(kDelayTime);
   }
 
   // The counter should be 50
@@ -110,22 +108,22 @@ static void InterruptHandler(uint32_t interruptAssertedMask, void* param) {
 
 TEST_F(AnalogLoopTest, AsynchronusInterruptWorks) {
   int32_t param = 0;
-  AnalogTrigger trigger(m_input);
+  frc::AnalogTrigger trigger(m_input);
   trigger.SetLimitsVoltage(2.0, 3.0);
 
   // Given an interrupt handler that sets an int32_t to 12345
-  std::shared_ptr<AnalogTriggerOutput> triggerOutput =
-      trigger.CreateOutput(AnalogTriggerType::kState);
+  std::shared_ptr<frc::AnalogTriggerOutput> triggerOutput =
+      trigger.CreateOutput(frc::AnalogTriggerType::kState);
   triggerOutput->RequestInterrupts(InterruptHandler, &param);
   triggerOutput->EnableInterrupts();
 
   // If the analog output moves from below to above the window
   m_output->SetVoltage(0.0);
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
   m_output->SetVoltage(5.0);
   triggerOutput->CancelInterrupts();
 
   // Then the int32_t should be 12345
-  Wait(kDelayTime);
+  frc::Wait(kDelayTime);
   EXPECT_EQ(12345, param) << "The interrupt did not run.";
 }

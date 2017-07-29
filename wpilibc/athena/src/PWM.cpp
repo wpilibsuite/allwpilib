@@ -15,8 +15,6 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Allocate a PWM given a channel number.
  *
@@ -27,7 +25,7 @@ using namespace frc;
  * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the
  *                MXP port
  */
-PWM::PWM(int channel) {
+frc::PWM::PWM(int channel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
 
@@ -63,7 +61,7 @@ PWM::PWM(int channel) {
  *
  * Free the resource associated with the PWM channel and set the value to 0.
  */
-PWM::~PWM() {
+frc::PWM::~PWM() {
   int32_t status = 0;
 
   HAL_SetPWMDisabled(m_handle, &status);
@@ -83,7 +81,7 @@ PWM::~PWM() {
  *                          Otherwise, keep the full range without modifying
  *                          any values.
  */
-void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
+void frc::PWM::EnableDeadbandElimination(bool eliminateDeadband) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMEliminateDeadband(m_handle, eliminateDeadband, &status);
@@ -103,8 +101,8 @@ void PWM::EnableDeadbandElimination(bool eliminateDeadband) {
  * @param deadbandMin The low end of the deadband pulse width in ms
  * @param min         The minimum pulse width in ms
  */
-void PWM::SetBounds(double max, double deadbandMax, double center,
-                    double deadbandMin, double min) {
+void frc::PWM::SetBounds(double max, double deadbandMax, double center,
+                         double deadbandMin, double min) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min,
@@ -125,8 +123,8 @@ void PWM::SetBounds(double max, double deadbandMax, double center,
  * @param deadbandMin The low end of the deadband range
  * @param min         The minimum pwm value
  */
-void PWM::SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
-                       int min) {
+void frc::PWM::SetRawBounds(int max, int deadbandMax, int center,
+                            int deadbandMin, int min) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
@@ -147,8 +145,8 @@ void PWM::SetRawBounds(int max, int deadbandMax, int center, int deadbandMin,
  * @param deadbandMin The low end of the deadband range
  * @param min         The minimum pwm value
  */
-void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
-                       int* deadbandMin, int* min) {
+void frc::PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
+                            int* deadbandMin, int* min) {
   int32_t status = 0;
   HAL_GetPWMConfigRaw(m_handle, max, deadbandMax, center, deadbandMin, min,
                       &status);
@@ -165,7 +163,7 @@ void PWM::GetRawBounds(int* max, int* deadbandMax, int* center,
  *
  * @param pos The position to set the servo between 0.0 and 1.0.
  */
-void PWM::SetPosition(double pos) {
+void frc::PWM::SetPosition(double pos) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMPosition(m_handle, pos, &status);
@@ -182,7 +180,7 @@ void PWM::SetPosition(double pos) {
  *
  * @return The position the servo is set to between 0.0 and 1.0.
  */
-double PWM::GetPosition() const {
+double frc::PWM::GetPosition() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double position = HAL_GetPWMPosition(m_handle, &status);
@@ -203,7 +201,7 @@ double PWM::GetPosition() const {
  *
  * @param speed The speed to set the speed controller between -1.0 and 1.0.
  */
-void PWM::SetSpeed(double speed) {
+void frc::PWM::SetSpeed(double speed) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetPWMSpeed(m_handle, speed, &status);
@@ -222,7 +220,7 @@ void PWM::SetSpeed(double speed) {
  *
  * @return The most recently set speed between -1.0 and 1.0.
  */
-double PWM::GetSpeed() const {
+double frc::PWM::GetSpeed() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double speed = HAL_GetPWMSpeed(m_handle, &status);
@@ -237,7 +235,7 @@ double PWM::GetSpeed() const {
  *
  * @param value Raw PWM value.
  */
-void PWM::SetRaw(uint16_t value) {
+void frc::PWM::SetRaw(uint16_t value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -252,7 +250,7 @@ void PWM::SetRaw(uint16_t value) {
  *
  * @return Raw PWM control value.
  */
-uint16_t PWM::GetRaw() const {
+uint16_t frc::PWM::GetRaw() const {
   if (StatusIsFatal()) return 0;
 
   int32_t status = 0;
@@ -267,7 +265,7 @@ uint16_t PWM::GetRaw() const {
  *
  * @param mult The period multiplier to apply to this channel
  */
-void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
+void frc::PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -295,7 +293,7 @@ void PWM::SetPeriodMultiplier(PeriodMultiplier mult) {
  * Temporarily disables the PWM output. The next set call will reenable
  * the output.
  */
-void PWM::SetDisabled() {
+void frc::PWM::SetDisabled() {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -304,7 +302,7 @@ void PWM::SetDisabled() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void PWM::SetZeroLatch() {
+void frc::PWM::SetZeroLatch() {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -313,37 +311,39 @@ void PWM::SetZeroLatch() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void PWM::ValueChanged(ITable* source, llvm::StringRef key,
-                       std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::PWM::ValueChanged(ITable* source, llvm::StringRef key,
+                            std::shared_ptr<nt::Value> value, bool isNew) {
   if (!value->IsDouble()) return;
   SetSpeed(value->GetDouble());
 }
 
-void PWM::UpdateTable() {
+void frc::PWM::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", GetSpeed());
   }
 }
 
-void PWM::StartLiveWindowMode() {
+void frc::PWM::StartLiveWindowMode() {
   SetSpeed(0);
   if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
-void PWM::StopLiveWindowMode() {
+void frc::PWM::StopLiveWindowMode() {
   SetSpeed(0);
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
 
-std::string PWM::GetSmartDashboardType() const { return "Speed Controller"; }
+std::string frc::PWM::GetSmartDashboardType() const {
+  return "Speed Controller";
+}
 
-void PWM::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::PWM::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> PWM::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::PWM::GetTable() const { return m_table; }

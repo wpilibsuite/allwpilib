@@ -11,15 +11,13 @@
 #include "HAL/HAL.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
 /**
  * Constructor.
  *
  * @param port          The I2C port to which the device is connected.
  * @param deviceAddress The address of the device on the I2C bus.
  */
-I2C::I2C(Port port, int deviceAddress)
+frc::I2C::I2C(Port port, int deviceAddress)
     : m_port(static_cast<HAL_I2CPort>(port)), m_deviceAddress(deviceAddress) {
   int32_t status = 0;
   HAL_InitializeI2C(m_port, &status);
@@ -31,7 +29,7 @@ I2C::I2C(Port port, int deviceAddress)
 /**
  * Destructor.
  */
-I2C::~I2C() { HAL_CloseI2C(m_port); }
+frc::I2C::~I2C() { HAL_CloseI2C(m_port); }
 
 /**
  * Generic transaction.
@@ -45,8 +43,8 @@ I2C::~I2C() { HAL_CloseI2C(m_port); }
  * @param receiveSize  Number of bytes to read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
-                      int receiveSize) {
+bool frc::I2C::Transaction(uint8_t* dataToSend, int sendSize,
+                           uint8_t* dataReceived, int receiveSize) {
   int32_t status = 0;
   status = HAL_TransactionI2C(m_port, m_deviceAddress, dataToSend, sendSize,
                               dataReceived, receiveSize);
@@ -62,7 +60,7 @@ bool I2C::Transaction(uint8_t* dataToSend, int sendSize, uint8_t* dataReceived,
  *
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::AddressOnly() { return Transaction(nullptr, 0, nullptr, 0); }
+bool frc::I2C::AddressOnly() { return Transaction(nullptr, 0, nullptr, 0); }
 
 /**
  * Execute a write transaction with the device.
@@ -75,7 +73,7 @@ bool I2C::AddressOnly() { return Transaction(nullptr, 0, nullptr, 0); }
  * @param data            The byte to write to the register on the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::Write(int registerAddress, uint8_t data) {
+bool frc::I2C::Write(int registerAddress, uint8_t data) {
   uint8_t buffer[2];
   buffer[0] = registerAddress;
   buffer[1] = data;
@@ -94,7 +92,7 @@ bool I2C::Write(int registerAddress, uint8_t data) {
  * @param count The number of bytes to be written.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::WriteBulk(uint8_t* data, int count) {
+bool frc::I2C::WriteBulk(uint8_t* data, int count) {
   int32_t status = 0;
   status = HAL_WriteI2C(m_port, m_deviceAddress, data, count);
   return status < 0;
@@ -113,7 +111,7 @@ bool I2C::WriteBulk(uint8_t* data, int count) {
  *                        read from the device.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
+bool frc::I2C::Read(int registerAddress, int count, uint8_t* buffer) {
   if (count < 1) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
@@ -137,7 +135,7 @@ bool I2C::Read(int registerAddress, int count, uint8_t* buffer) {
  * @param count  The number of bytes to read in the transaction.
  * @return Transfer Aborted... false for success, true for aborted.
  */
-bool I2C::ReadOnly(int count, uint8_t* buffer) {
+bool frc::I2C::ReadOnly(int count, uint8_t* buffer) {
   if (count < 1) {
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "count");
     return true;
@@ -157,7 +155,8 @@ bool I2C::ReadOnly(int count, uint8_t* buffer) {
  * @param registerAddress The register to write on all devices on the bus.
  * @param data            The value to write to the devices.
  */
-// [[gnu::warning("I2C::Broadcast() is not implemented.")]] void I2C::Broadcast(
+// [[gnu::warning("frc::I2C::Broadcast() is not implemented.")]] void
+// frc::I2C::Broadcast(
 //     int registerAddress, uint8_t data) {}
 
 /**
@@ -175,8 +174,8 @@ bool I2C::ReadOnly(int count, uint8_t* buffer) {
  * @param expected        A buffer containing the values expected from the
  *                        device.
  */
-bool I2C::VerifySensor(int registerAddress, int count,
-                       const uint8_t* expected) {
+bool frc::I2C::VerifySensor(int registerAddress, int count,
+                            const uint8_t* expected) {
   // TODO: Make use of all 7 read bytes
   uint8_t deviceData[4];
   for (int i = 0, curRegisterAddress = registerAddress; i < count;

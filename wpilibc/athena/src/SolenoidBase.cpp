@@ -10,14 +10,13 @@
 #include "HAL/HAL.h"
 #include "HAL/Solenoid.h"
 
-using namespace frc;
-
 /**
  * Constructor
  *
  * @param moduleNumber The CAN PCM ID.
  */
-SolenoidBase::SolenoidBase(int moduleNumber) : m_moduleNumber(moduleNumber) {}
+frc::SolenoidBase::SolenoidBase(int moduleNumber)
+    : m_moduleNumber(moduleNumber) {}
 
 /**
  * Read all 8 solenoids as a single byte
@@ -25,7 +24,7 @@ SolenoidBase::SolenoidBase(int moduleNumber) : m_moduleNumber(moduleNumber) {}
  * @param module the module to read from
  * @return The current value of all 8 solenoids on the module.
  */
-int SolenoidBase::GetAll(int module) {
+int frc::SolenoidBase::GetAll(int module) {
   int value = 0;
   int32_t status = 0;
   value = HAL_GetAllSolenoids(module, &status);
@@ -38,8 +37,8 @@ int SolenoidBase::GetAll(int module) {
  *
  * @return The current value of all 8 solenoids on the module.
  */
-int SolenoidBase::GetAll() const {
-  return SolenoidBase::GetAll(m_moduleNumber);
+int frc::SolenoidBase::GetAll() const {
+  return frc::SolenoidBase::GetAll(m_moduleNumber);
 }
 
 /**
@@ -52,7 +51,7 @@ int SolenoidBase::GetAll() const {
  * @param module the module to read from
  * @return The solenoid blacklist of all 8 solenoids on the module.
  */
-int SolenoidBase::GetPCMSolenoidBlackList(int module) {
+int frc::SolenoidBase::GetPCMSolenoidBlackList(int module) {
   int32_t status = 0;
   return HAL_GetPCMSolenoidBlackList(module, &status);
 }
@@ -66,8 +65,8 @@ int SolenoidBase::GetPCMSolenoidBlackList(int module) {
  *
  * @return The solenoid blacklist of all 8 solenoids on the module.
  */
-int SolenoidBase::GetPCMSolenoidBlackList() const {
-  return SolenoidBase::GetPCMSolenoidBlackList(m_moduleNumber);
+int frc::SolenoidBase::GetPCMSolenoidBlackList() const {
+  return frc::SolenoidBase::GetPCMSolenoidBlackList(m_moduleNumber);
 }
 
 /**
@@ -75,7 +74,7 @@ int SolenoidBase::GetPCMSolenoidBlackList() const {
  * @return true if PCM sticky fault is set : The common highside solenoid
  *         voltage rail is too low, most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) {
+bool frc::SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) {
   int32_t status = 0;
   return HAL_GetPCMSolenoidVoltageStickyFault(module, &status);
 }
@@ -84,8 +83,8 @@ bool SolenoidBase::GetPCMSolenoidVoltageStickyFault(int module) {
  * @return true if PCM sticky fault is set : The common highside solenoid
  *         voltage rail is too low, most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageStickyFault() const {
-  return SolenoidBase::GetPCMSolenoidVoltageStickyFault(m_moduleNumber);
+bool frc::SolenoidBase::GetPCMSolenoidVoltageStickyFault() const {
+  return frc::SolenoidBase::GetPCMSolenoidVoltageStickyFault(m_moduleNumber);
 }
 
 /**
@@ -93,7 +92,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageStickyFault() const {
  * @return true if PCM is in fault state : The common highside solenoid voltage
  *         rail is too low, most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) {
+bool frc::SolenoidBase::GetPCMSolenoidVoltageFault(int module) {
   int32_t status = 0;
   return HAL_GetPCMSolenoidVoltageFault(module, &status);
 }
@@ -102,8 +101,8 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault(int module) {
  * @return true if PCM is in fault state : The common highside solenoid voltage
  *         rail is too low, most likely a solenoid channel is shorted.
  */
-bool SolenoidBase::GetPCMSolenoidVoltageFault() const {
-  return SolenoidBase::GetPCMSolenoidVoltageFault(m_moduleNumber);
+bool frc::SolenoidBase::GetPCMSolenoidVoltageFault() const {
+  return frc::SolenoidBase::GetPCMSolenoidVoltageFault(m_moduleNumber);
 }
 
 /**
@@ -118,7 +117,7 @@ bool SolenoidBase::GetPCMSolenoidVoltageFault() const {
  *
  * @param module the module to read from
  */
-void SolenoidBase::ClearAllPCMStickyFaults(int module) {
+void frc::SolenoidBase::ClearAllPCMStickyFaults(int module) {
   int32_t status = 0;
   return HAL_ClearAllPCMStickyFaults(module, &status);
 }
@@ -133,6 +132,6 @@ void SolenoidBase::ClearAllPCMStickyFaults(int module) {
  *
  * If no sticky faults are set then this call will have no effect.
  */
-void SolenoidBase::ClearAllPCMStickyFaults() {
-  SolenoidBase::ClearAllPCMStickyFaults(m_moduleNumber);
+void frc::SolenoidBase::ClearAllPCMStickyFaults() {
+  frc::SolenoidBase::ClearAllPCMStickyFaults(m_moduleNumber);
 }

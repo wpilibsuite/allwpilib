@@ -7,15 +7,13 @@
 
 #include "PWMSpeedController.h"
 
-using namespace frc;
-
 /**
  * Constructor for a PWM Speed Controller connected via PWM.
  *
  * @param channel The PWM channel that the controller is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-PWMSpeedController::PWMSpeedController(int channel) : SafePWM(channel) {}
+frc::PWMSpeedController::PWMSpeedController(int channel) : SafePWM(channel) {}
 
 /**
  * Set the PWM value.
@@ -25,7 +23,7 @@ PWMSpeedController::PWMSpeedController(int channel) : SafePWM(channel) {}
  *
  * @param speed The speed value between -1.0 and 1.0 to set.
  */
-void PWMSpeedController::Set(double speed) {
+void frc::PWMSpeedController::Set(double speed) {
   SetSpeed(m_isInverted ? -speed : speed);
 }
 
@@ -34,21 +32,21 @@ void PWMSpeedController::Set(double speed) {
  *
  * @return The most recently set value for the PWM between -1.0 and 1.0.
  */
-double PWMSpeedController::Get() const { return GetSpeed(); }
+double frc::PWMSpeedController::Get() const { return GetSpeed(); }
 
-void PWMSpeedController::SetInverted(bool isInverted) {
+void frc::PWMSpeedController::SetInverted(bool isInverted) {
   m_isInverted = isInverted;
 }
 
-bool PWMSpeedController::GetInverted() const { return m_isInverted; }
+bool frc::PWMSpeedController::GetInverted() const { return m_isInverted; }
 
-void PWMSpeedController::Disable() { SetDisabled(); }
+void frc::PWMSpeedController::Disable() { SetDisabled(); }
 
-void PWMSpeedController::StopMotor() { SafePWM::StopMotor(); }
+void frc::PWMSpeedController::StopMotor() { SafePWM::StopMotor(); }
 
 /**
  * Write out the PID value as seen in the PIDOutput base object.
  *
  * @param output Write out the PWM value as was found in the PIDController
  */
-void PWMSpeedController::PIDWrite(double output) { Set(output); }
+void frc::PWMSpeedController::PIDWrite(double output) { Set(output); }

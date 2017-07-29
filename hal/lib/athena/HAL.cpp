@@ -31,24 +31,20 @@
 #include "llvm/raw_ostream.h"
 #include "visa/visa.h"
 
-using namespace hal;
-
-static std::unique_ptr<tGlobal> global;
-static std::unique_ptr<tSysWatchdog> watchdog;
+static std::unique_ptr<hal::tGlobal> global;
+static std::unique_ptr<hal::tSysWatchdog> watchdog;
 
 static hal::priority_mutex timeMutex;
 static uint32_t timeEpoch = 0;
 static uint32_t prevFPGATime = 0;
 static HAL_NotifierHandle rolloverNotifier = 0;
 
-using namespace hal;
-
 extern "C" {
 
 HAL_PortHandle HAL_GetPort(int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
   if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
-  return createPortHandle(channel, 1);
+  return hal::createPortHandle(channel, 1);
 }
 
 /**
@@ -58,7 +54,7 @@ HAL_PortHandle HAL_GetPortWithModule(int32_t module, int32_t channel) {
   // Dont allow a number that wouldn't fit in a uint8_t
   if (channel < 0 || channel >= 255) return HAL_kInvalidHandle;
   if (module < 0 || module >= 255) return HAL_kInvalidHandle;
-  return createPortHandle(channel, module);
+  return hal::createPortHandle(channel, module);
 }
 
 const char* HAL_GetErrorMessage(int32_t code) {
@@ -282,8 +278,8 @@ void HAL_BaseInitialize(int32_t* status) {
   nFPGA::nRoboRIO_FPGANamespace::g_currentTargetClass =
       nLoadOut::kTargetClass_RoboRIO;
 
-  global.reset(tGlobal::create(status));
-  watchdog.reset(tSysWatchdog::create(status));
+  global.reset(hal::tGlobal::create(status));
+  watchdog.reset(hal::tSysWatchdog::create(status));
   initialized = true;
 }
 

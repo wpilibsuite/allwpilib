@@ -16,8 +16,6 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Create an instance of a digital output.
  *
@@ -26,7 +24,7 @@ using namespace frc;
  * @param channel The digital channel 0-9 are on-board, 10-25 are on the MXP
  *                port
  */
-DigitalOutput::DigitalOutput(int channel) {
+frc::DigitalOutput::DigitalOutput(int channel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
 
@@ -55,7 +53,7 @@ DigitalOutput::DigitalOutput(int channel) {
 /**
  * Free the resources associated with a digital output.
  */
-DigitalOutput::~DigitalOutput() {
+frc::DigitalOutput::~DigitalOutput() {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
   if (StatusIsFatal()) return;
   // Disable the PWM in case it was running.
@@ -71,7 +69,7 @@ DigitalOutput::~DigitalOutput() {
  *
  * @param value 1 (true) for high, 0 (false) for disabled
  */
-void DigitalOutput::Set(bool value) {
+void frc::DigitalOutput::Set(bool value) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -84,7 +82,7 @@ void DigitalOutput::Set(bool value) {
    *
    * @return the state of the digital output.
    */
-bool DigitalOutput::Get() const {
+bool frc::DigitalOutput::Get() const {
   if (StatusIsFatal()) return false;
 
   int32_t status = 0;
@@ -96,7 +94,7 @@ bool DigitalOutput::Get() const {
 /**
  * @return The GPIO channel number that this object represents.
  */
-int DigitalOutput::GetChannel() const { return m_channel; }
+int frc::DigitalOutput::GetChannel() const { return m_channel; }
 
 /**
  * Output a single pulse on the digital output line.
@@ -106,7 +104,7 @@ int DigitalOutput::GetChannel() const { return m_channel; }
  *
  * @param length The pulse length in seconds
  */
-void DigitalOutput::Pulse(double length) {
+void frc::DigitalOutput::Pulse(double length) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -119,7 +117,7 @@ void DigitalOutput::Pulse(double length) {
  *
  * Determine if a previously started pulse is still going.
  */
-bool DigitalOutput::IsPulsing() const {
+bool frc::DigitalOutput::IsPulsing() const {
   if (StatusIsFatal()) return false;
 
   int32_t status = 0;
@@ -138,7 +136,7 @@ bool DigitalOutput::IsPulsing() const {
  *
  * @param rate The frequency to output all digital output PWM signals.
  */
-void DigitalOutput::SetPWMRate(double rate) {
+void frc::DigitalOutput::SetPWMRate(double rate) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -159,7 +157,7 @@ void DigitalOutput::SetPWMRate(double rate) {
  *
  * @param initialDutyCycle The duty-cycle to start generating. [0..1]
  */
-void DigitalOutput::EnablePWM(double initialDutyCycle) {
+void frc::DigitalOutput::EnablePWM(double initialDutyCycle) {
   if (m_pwmGenerator != HAL_kInvalidHandle) return;
 
   int32_t status = 0;
@@ -182,7 +180,7 @@ void DigitalOutput::EnablePWM(double initialDutyCycle) {
  *
  * Free up one of the 6 DO PWM generator resources that were in use.
  */
-void DigitalOutput::DisablePWM() {
+void frc::DigitalOutput::DisablePWM() {
   if (StatusIsFatal()) return;
   if (m_pwmGenerator == HAL_kInvalidHandle) return;
 
@@ -206,7 +204,7 @@ void DigitalOutput::DisablePWM() {
  *
  * @param dutyCycle The duty-cycle to change to. [0..1]
  */
-void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
+void frc::DigitalOutput::UpdateDutyCycle(double dutyCycle) {
   if (StatusIsFatal()) return;
 
   int32_t status = 0;
@@ -217,47 +215,51 @@ void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
 /**
  * @return The HAL Handle to the specified source.
  */
-HAL_Handle DigitalOutput::GetPortHandleForRouting() const { return m_handle; }
+HAL_Handle frc::DigitalOutput::GetPortHandleForRouting() const {
+  return m_handle;
+}
 
 /**
  * Is source an AnalogTrigger
  */
-bool DigitalOutput::IsAnalogTrigger() const { return false; }
+bool frc::DigitalOutput::IsAnalogTrigger() const { return false; }
 
 /**
  * @return The type of analog trigger output to be used. 0 for Digitals
  */
-AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
-  return (AnalogTriggerType)0;
+frc::AnalogTriggerType frc::DigitalOutput::GetAnalogTriggerTypeForRouting()
+    const {
+  return static_cast<AnalogTriggerType>(0);
 }
 
-void DigitalOutput::ValueChanged(ITable* source, llvm::StringRef key,
-                                 std::shared_ptr<nt::Value> value, bool isNew) {
+void frc::DigitalOutput::ValueChanged(ITable* source, llvm::StringRef key,
+                                      std::shared_ptr<nt::Value> value,
+                                      bool isNew) {
   if (!value->IsBoolean()) return;
   Set(value->GetBoolean());
 }
 
-void DigitalOutput::UpdateTable() {}
+void frc::DigitalOutput::UpdateTable() {}
 
-void DigitalOutput::StartLiveWindowMode() {
+void frc::DigitalOutput::StartLiveWindowMode() {
   if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
-void DigitalOutput::StopLiveWindowMode() {
+void frc::DigitalOutput::StopLiveWindowMode() {
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
 
-std::string DigitalOutput::GetSmartDashboardType() const {
+std::string frc::DigitalOutput::GetSmartDashboardType() const {
   return "Digital Output";
 }
 
-void DigitalOutput::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::DigitalOutput::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> DigitalOutput::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::DigitalOutput::GetTable() const { return m_table; }

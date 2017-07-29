@@ -7,11 +7,9 @@
 
 #include "Commands/StartCommand.h"
 
-using namespace frc;
-
-StartCommand::StartCommand(Command* commandToStart)
+frc::StartCommand::StartCommand(Command* commandToStart)
     : InstantCommand("StartCommand") {
   m_commandToFork = commandToStart;
 }
 
-void StartCommand::Initialize() { m_commandToFork->Start(); }
+void frc::StartCommand::Initialize() { m_commandToFork->Start(); }

@@ -12,15 +12,13 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Constructor.
  *
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
  */
-DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
+frc::DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
     : DoubleSolenoid(1, forwardChannel, reverseChannel) {}
 
 /**
@@ -30,8 +28,8 @@ DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
  * @param forwardChannel The forward channel on the module to control.
  * @param reverseChannel The reverse channel on the module to control.
  */
-DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
-                               int reverseChannel) {
+frc::DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
+                                    int reverseChannel) {
   m_reversed = false;
   if (reverseChannel < forwardChannel) {  // Swap ports to get the right address
     int channel = reverseChannel;
@@ -49,7 +47,7 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
                                          forwardChannel, this);
 }
 
-DoubleSolenoid::~DoubleSolenoid() {
+frc::DoubleSolenoid::~DoubleSolenoid() {
   if (m_table != nullptr) m_table->RemoveTableListener(this);
 }
 
@@ -58,7 +56,7 @@ DoubleSolenoid::~DoubleSolenoid() {
  *
  * @param value Move the solenoid to forward, reverse, or don't move it.
  */
-void DoubleSolenoid::Set(Value value) {
+void frc::DoubleSolenoid::Set(Value value) {
   m_value = value;
   switch (value) {
     case kOff:
@@ -78,11 +76,11 @@ void DoubleSolenoid::Set(Value value) {
  *
  * @return The current value of the solenoid.
  */
-DoubleSolenoid::Value DoubleSolenoid::Get() const { return m_value; }
+frc::DoubleSolenoid::Value frc::DoubleSolenoid::Get() const { return m_value; }
 
-void DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
-                                  std::shared_ptr<nt::Value> value,
-                                  bool isNew) {
+void frc::DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
+                                       std::shared_ptr<nt::Value> value,
+                                       bool isNew) {
   if (!value->IsString()) return;
   Value lvalue = kOff;
   if (value->GetString() == "Forward")
@@ -92,7 +90,7 @@ void DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
   Set(lvalue);
 }
 
-void DoubleSolenoid::UpdateTable() {
+void frc::DoubleSolenoid::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutString(
         "Value", (Get() == kForward ? "Forward"
@@ -100,27 +98,29 @@ void DoubleSolenoid::UpdateTable() {
   }
 }
 
-void DoubleSolenoid::StartLiveWindowMode() {
+void frc::DoubleSolenoid::StartLiveWindowMode() {
   Set(kOff);
   if (m_table != nullptr) {
     m_table->AddTableListener("Value", this, true);
   }
 }
 
-void DoubleSolenoid::StopLiveWindowMode() {
+void frc::DoubleSolenoid::StopLiveWindowMode() {
   Set(kOff);
   if (m_table != nullptr) {
     m_table->RemoveTableListener(this);
   }
 }
 
-std::string DoubleSolenoid::GetSmartDashboardType() const {
+std::string frc::DoubleSolenoid::GetSmartDashboardType() const {
   return "Double Solenoid";
 }
 
-void DoubleSolenoid::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::DoubleSolenoid::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> DoubleSolenoid::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::DoubleSolenoid::GetTable() const {
+  return m_table;
+}

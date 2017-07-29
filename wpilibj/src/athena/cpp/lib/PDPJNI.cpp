@@ -10,8 +10,6 @@
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_PDPJNI.h"
 
-using namespace frc;
-
 extern "C" {
 
 /*
@@ -23,7 +21,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_initializePDP(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   HAL_InitializePDP(module, &status);
-  CheckStatusRange(env, status, 0, HAL_GetNumPDPModules(), module);
+  frc::CheckStatusRange(env, status, 0, HAL_GetNumPDPModules(), module);
 }
 
 /*
@@ -56,7 +54,7 @@ Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTemperature(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   double temperature = HAL_GetPDPTemperature(module, &status);
-  CheckStatus(env, status, false);
+  frc::CheckStatus(env, status, false);
   return temperature;
 }
 
@@ -69,7 +67,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPVoltage(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   double voltage = HAL_GetPDPVoltage(module, &status);
-  CheckStatus(env, status, false);
+  frc::CheckStatus(env, status, false);
   return voltage;
 }
 
@@ -83,7 +81,7 @@ Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPChannelCurrent(
     JNIEnv *env, jclass, jbyte channel, jint module) {
   int32_t status = 0;
   double current = HAL_GetPDPChannelCurrent(module, channel, &status);
-  CheckStatus(env, status, false);
+  frc::CheckStatus(env, status, false);
   return current;
 }
 
@@ -97,7 +95,7 @@ Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalCurrent(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   double current = HAL_GetPDPTotalCurrent(module, &status);
-  CheckStatus(env, status, false);
+  frc::CheckStatus(env, status, false);
   return current;
 }
 
@@ -111,7 +109,7 @@ Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalPower(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   double power = HAL_GetPDPTotalPower(module, &status);
-  CheckStatus(env, status, false);
+  frc::CheckStatus(env, status, false);
   return power;
 }
 
@@ -125,7 +123,7 @@ Java_edu_wpi_first_wpilibj_hal_PDPJNI_getPDPTotalEnergy(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   double energy = HAL_GetPDPTotalEnergy(module, &status);
-  CheckStatus(env, status, false);
+  frc::CheckStatus(env, status, false);
   return energy;
 }
 
@@ -139,7 +137,7 @@ Java_edu_wpi_first_wpilibj_hal_PDPJNI_resetPDPTotalEnergy(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   HAL_ResetPDPTotalEnergy(module, &status);
-  CheckStatus(env, status, false);
+  frc::CheckStatus(env, status, false);
 }
 
 /*
@@ -152,7 +150,7 @@ Java_edu_wpi_first_wpilibj_hal_PDPJNI_clearPDPStickyFaults(
     JNIEnv *env, jclass, jint module) {
   int32_t status = 0;
   HAL_ClearPDPStickyFaults(module, &status);
-  CheckStatus(env, status, false);
+  frc::CheckStatus(env, status, false);
 }
 
 }  // extern "C"

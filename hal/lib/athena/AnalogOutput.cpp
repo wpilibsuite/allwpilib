@@ -13,16 +13,15 @@
 #include "HAL/handles/IndexedHandleResource.h"
 #include "PortsInternal.h"
 
-using namespace hal;
-
 namespace {
 struct AnalogOutput {
   uint8_t channel;
 };
 }
 
-static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
-                             kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>
+static hal::IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
+                                  hal::kNumAnalogOutputs,
+                                  hal::HAL_HandleEnum::AnalogOutput>
     analogOutputHandles;
 
 extern "C" {
@@ -32,12 +31,12 @@ extern "C" {
  */
 HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
                                                       int32_t* status) {
-  initializeAnalog(status);
+  hal::initializeAnalog(status);
 
   if (*status != 0) return HAL_kInvalidHandle;
 
-  int16_t channel = getPortHandleChannel(portHandle);
-  if (channel == InvalidHandleIndex) {
+  int16_t channel = hal::getPortHandleChannel(portHandle);
+  if (channel == hal::InvalidHandleIndex) {
     *status = PARAMETER_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
@@ -70,7 +69,7 @@ void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analogOutputHandle) {
  * @return Analog channel is valid
  */
 HAL_Bool HAL_CheckAnalogOutputChannel(int32_t channel) {
-  return channel < kNumAnalogOutputs && channel >= 0;
+  return channel < hal::kNumAnalogOutputs && channel >= 0;
 }
 
 void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
@@ -88,7 +87,7 @@ void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
   else if (voltage > 5.0)
     rawValue = 0x1000;
 
-  analogOutputSystem->writeMXP(port->channel, rawValue, status);
+  hal::analogOutputSystem->writeMXP(port->channel, rawValue, status);
 }
 
 double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
@@ -99,7 +98,7 @@ double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
     return 0.0;
   }
 
-  uint16_t rawValue = analogOutputSystem->readMXP(port->channel, status);
+  uint16_t rawValue = hal::analogOutputSystem->readMXP(port->channel, status);
 
   return rawValue * 5.0 / 0x1000;
 }

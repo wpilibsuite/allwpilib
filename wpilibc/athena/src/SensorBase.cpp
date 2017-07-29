@@ -19,22 +19,20 @@
 #include "HAL/Solenoid.h"
 #include "WPIErrors.h"
 
-using namespace frc;
-
-const int SensorBase::kDigitalChannels = HAL_GetNumDigitalChannels();
-const int SensorBase::kAnalogInputs = HAL_GetNumAnalogInputs();
-const int SensorBase::kSolenoidChannels = HAL_GetNumSolenoidChannels();
-const int SensorBase::kSolenoidModules = HAL_GetNumPCMModules();
-const int SensorBase::kPwmChannels = HAL_GetNumPWMChannels();
-const int SensorBase::kRelayChannels = HAL_GetNumRelayHeaders();
-const int SensorBase::kPDPChannels = HAL_GetNumPDPChannels();
+const int frc::SensorBase::kDigitalChannels = HAL_GetNumDigitalChannels();
+const int frc::SensorBase::kAnalogInputs = HAL_GetNumAnalogInputs();
+const int frc::SensorBase::kSolenoidChannels = HAL_GetNumSolenoidChannels();
+const int frc::SensorBase::kSolenoidModules = HAL_GetNumPCMModules();
+const int frc::SensorBase::kPwmChannels = HAL_GetNumPWMChannels();
+const int frc::SensorBase::kRelayChannels = HAL_GetNumRelayHeaders();
+const int frc::SensorBase::kPDPChannels = HAL_GetNumPDPChannels();
 
 /**
  * Check that the solenoid module number is valid.
  *
  * @return Solenoid module is valid and present
  */
-bool SensorBase::CheckSolenoidModule(int moduleNumber) {
+bool frc::SensorBase::CheckSolenoidModule(int moduleNumber) {
   return HAL_CheckSolenoidModule(moduleNumber);
 }
 
@@ -46,7 +44,7 @@ bool SensorBase::CheckSolenoidModule(int moduleNumber) {
  *
  * @return Digital channel is valid
  */
-bool SensorBase::CheckDigitalChannel(int channel) {
+bool frc::SensorBase::CheckDigitalChannel(int channel) {
   return HAL_CheckDIOChannel(channel);
 }
 
@@ -58,7 +56,7 @@ bool SensorBase::CheckDigitalChannel(int channel) {
  *
  * @return Relay channel is valid
  */
-bool SensorBase::CheckRelayChannel(int channel) {
+bool frc::SensorBase::CheckRelayChannel(int channel) {
   return HAL_CheckRelayChannel(channel);
 }
 
@@ -70,7 +68,7 @@ bool SensorBase::CheckRelayChannel(int channel) {
  *
  * @return PWM channel is valid
  */
-bool SensorBase::CheckPWMChannel(int channel) {
+bool frc::SensorBase::CheckPWMChannel(int channel) {
   return HAL_CheckPWMChannel(channel);
 }
 
@@ -82,7 +80,7 @@ bool SensorBase::CheckPWMChannel(int channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogInputChannel(int channel) {
+bool frc::SensorBase::CheckAnalogInputChannel(int channel) {
   return HAL_CheckAnalogInputChannel(channel);
 }
 
@@ -94,7 +92,7 @@ bool SensorBase::CheckAnalogInputChannel(int channel) {
  *
  * @return Analog channel is valid
  */
-bool SensorBase::CheckAnalogOutputChannel(int channel) {
+bool frc::SensorBase::CheckAnalogOutputChannel(int channel) {
   return HAL_CheckAnalogOutputChannel(channel);
 }
 
@@ -103,7 +101,7 @@ bool SensorBase::CheckAnalogOutputChannel(int channel) {
  *
  * @return Solenoid channel is valid
  */
-bool SensorBase::CheckSolenoidChannel(int channel) {
+bool frc::SensorBase::CheckSolenoidChannel(int channel) {
   return HAL_CheckSolenoidChannel(channel);
 }
 
@@ -112,6 +110,6 @@ bool SensorBase::CheckSolenoidChannel(int channel) {
  *
  * @return PDP channel is valid
  */
-bool SensorBase::CheckPDPChannel(int channel) {
+bool frc::SensorBase::CheckPDPChannel(int channel) {
   return HAL_CheckPDPModule(channel);
 }

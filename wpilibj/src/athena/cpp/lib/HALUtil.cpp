@@ -27,8 +27,6 @@
 #include "llvm/raw_ostream.h"
 #include "support/jni_util.h"
 
-using namespace wpi::java;
-
 // set the logging level
 TLogLevel halUtilLogLevel = logWARNING;
 
@@ -46,17 +44,17 @@ TLogLevel halUtilLogLevel = logWARNING;
 #define kRIOStatusResourceNotInitialized -52010
 
 JavaVM *jvm = nullptr;
-static JException runtimeExCls;
-static JException illegalArgExCls;
-static JException boundaryExCls;
-static JException allocationExCls;
-static JException halHandleExCls;
-static JException canInvalidBufferExCls;
-static JException canMessageNotFoundExCls;
-static JException canMessageNotAllowedExCls;
-static JException canNotInitializedExCls;
-static JException uncleanStatusExCls;
-static JClass pwmConfigDataResultCls;
+static wpi::java::JException runtimeExCls;
+static wpi::java::JException illegalArgExCls;
+static wpi::java::JException boundaryExCls;
+static wpi::java::JException allocationExCls;
+static wpi::java::JException halHandleExCls;
+static wpi::java::JException canInvalidBufferExCls;
+static wpi::java::JException canMessageNotFoundExCls;
+static wpi::java::JException canMessageNotAllowedExCls;
+static wpi::java::JException canNotInitializedExCls;
+static wpi::java::JException uncleanStatusExCls;
+static wpi::java::JClass pwmConfigDataResultCls;
 
 namespace frc {
 
@@ -86,20 +84,20 @@ constexpr const char JNI_wpilibjPrefix[] = "edu.wpi.first.wpilibj";
 extern const char JNI_wpilibjPrefix[] = "edu.wpi.first.wpilibj";
 #endif
 
-void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
+void ReportError(JNIEnv *env, int32_t status, bool doThrow) {
   if (status == 0) return;
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
   }
   const char *message = HAL_GetErrorMessage(status);
-  if (do_throw && status < 0) {
+  if (doThrow && status < 0) {
     llvm::SmallString<1024> buf;
     llvm::raw_svector_ostream oss(buf);
     oss << " Code: " << status << ". " << message;
     runtimeExCls.Throw(env, buf.c_str());
   } else {
     std::string func;
-    auto stack = GetJavaStackTrace<JNI_wpilibjPrefix>(env, &func);
+    auto stack = wpi::java::GetJavaStackTrace<JNI_wpilibjPrefix>(env, &func);
     HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
   }
 }
@@ -225,8 +223,6 @@ jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
 
 }  // namespace frc
 
-using namespace frc;
-
 extern "C" {
 
 //
@@ -242,37 +238,47 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK)
     return JNI_ERR;
 
-  runtimeExCls = JException(env, "java/lang/RuntimeException");
+  runtimeExCls = wpi::java::JException(env, "java/lang/RuntimeException");
   if (!runtimeExCls) return JNI_ERR;
 
-  illegalArgExCls = JException(env, "java/lang/IllegalArgumentException");
+  illegalArgExCls =
+    wpi::java::JException(env, "java/lang/IllegalArgumentException");
   if (!illegalArgExCls) return JNI_ERR;
 
-  boundaryExCls = JException(env, "edu/wpi/first/wpilibj/util/BoundaryException");
+  boundaryExCls =
+    wpi::java::JException(env, "edu/wpi/first/wpilibj/util/BoundaryException");
   if (!boundaryExCls) return JNI_ERR;
 
-  allocationExCls = JException(env, "edu/wpi/first/wpilibj/util/AllocationException");
+  allocationExCls =
+    wpi::java::JException(env, "edu/wpi/first/wpilibj/util/AllocationException");
   if (!allocationExCls) return JNI_ERR;
 
-  halHandleExCls = JException(env, "edu/wpi/first/wpilibj/util/HalHandleException");
+  halHandleExCls =
+    wpi::java::JException(env, "edu/wpi/first/wpilibj/util/HalHandleException");
   if (!halHandleExCls) return JNI_ERR;
 
-  canInvalidBufferExCls = JException(env, "edu/wpi/first/wpilibj/can/CANInvalidBufferException");
+  canInvalidBufferExCls =
+    wpi::java::JException(env, "edu/wpi/first/wpilibj/can/CANInvalidBufferException");
   if (!canInvalidBufferExCls) return JNI_ERR;
 
-  canMessageNotFoundExCls = JException(env, "edu/wpi/first/wpilibj/can/CANMessageNotFoundException");
+  canMessageNotFoundExCls =
+    wpi::java::JException(env, "edu/wpi/first/wpilibj/can/CANMessageNotFoundException");
   if (!canMessageNotFoundExCls) return JNI_ERR;
 
-  canMessageNotAllowedExCls = JException(env, "edu/wpi/first/wpilibj/can/CANMessageNotAllowedException");
+  canMessageNotAllowedExCls =
+    wpi::java::JException(env, "edu/wpi/first/wpilibj/can/CANMessageNotAllowedException");
   if (!canMessageNotAllowedExCls) return JNI_ERR;
 
-  canNotInitializedExCls = JException(env, "edu/wpi/first/wpilibj/can/CANNotInitializedException");
+  canNotInitializedExCls =
+    wpi::java::JException(env, "edu/wpi/first/wpilibj/can/CANNotInitializedException");
   if (!canNotInitializedExCls) return JNI_ERR;
 
-  uncleanStatusExCls = JException(env,"edu/wpi/first/wpilibj/util/UncleanStatusException");
+  uncleanStatusExCls =
+    wpi::java::JException(env,"edu/wpi/first/wpilibj/util/UncleanStatusException");
   if (!uncleanStatusExCls) return JNI_ERR;
 
-  pwmConfigDataResultCls = JClass(env, "edu/wpi/first/wpilibj/PWMConfigDataResult");
+  pwmConfigDataResultCls =
+    wpi::java::JClass(env, "edu/wpi/first/wpilibj/PWMConfigDataResult");
   if (!pwmConfigDataResultCls) return JNI_ERR;
 
   return JNI_VERSION_1_6;
@@ -309,7 +315,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAVersion(JNIEnv *env, jclass) {
   jshort returnValue = HAL_GetFPGAVersion(&status);
   HALUTIL_LOG(logDEBUG) << "Status = " << status;
   HALUTIL_LOG(logDEBUG) << "FPGAVersion = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -325,7 +331,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGARevision(JNIEnv *env, jclass) {
   jint returnValue = HAL_GetFPGARevision(&status);
   HALUTIL_LOG(logDEBUG) << "Status = " << status;
   HALUTIL_LOG(logDEBUG) << "FPGARevision = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -341,7 +347,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGATime(JNIEnv *env, jclass) {
   jlong returnValue = HAL_GetFPGATime(&status);
   // HALUTIL_LOG(logDEBUG) << "Status = " << status;
   // HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -370,7 +376,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getFPGAButton(JNIEnv *env, jclass) {
   jboolean returnValue = HAL_GetFPGAButton(&status);
   // HALUTIL_LOG(logDEBUG) << "Status = " << status;
   // HALUTIL_LOG(logDEBUG) << "FPGATime = " << returnValue;
-  CheckStatus(env, status);
+  frc::CheckStatus(env, status);
   return returnValue;
 }
 
@@ -385,7 +391,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrorMessage(
   const char *msg = HAL_GetErrorMessage(paramId);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil HAL_GetErrorMessage id=" << paramId
                         << " msg=" << msg;
-  return MakeJString(paramEnv, msg);
+  return wpi::java::MakeJString(paramEnv, msg);
 }
 
 /*
@@ -408,7 +414,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror(
   const char *msg = strerror(errno);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode="
                         << errorCode << " msg=" << msg;
-  return MakeJString(env, msg);
+  return wpi::java::MakeJString(env, msg);
 }
 
 }  // extern "C"

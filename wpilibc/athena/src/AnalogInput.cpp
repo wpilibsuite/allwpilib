@@ -17,11 +17,9 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
-const int AnalogInput::kAccumulatorModuleNumber;
-const int AnalogInput::kAccumulatorNumChannels;
-const int AnalogInput::kAccumulatorChannels[] = {0, 1};
+const int frc::AnalogInput::kAccumulatorModuleNumber;
+const int frc::AnalogInput::kAccumulatorNumChannels;
+const int frc::AnalogInput::kAccumulatorChannels[] = {0, 1};
 
 /**
  * Construct an analog input.
@@ -29,7 +27,7 @@ const int AnalogInput::kAccumulatorChannels[] = {0, 1};
  * @param channel The channel number on the roboRIO to represent. 0-3 are
  *                on-board 4-7 are on the MXP port.
  */
-AnalogInput::AnalogInput(int channel) {
+frc::AnalogInput::AnalogInput(int channel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
   buf << "Analog Input " << channel;
@@ -59,7 +57,7 @@ AnalogInput::AnalogInput(int channel) {
 /**
  * Channel destructor.
  */
-AnalogInput::~AnalogInput() {
+frc::AnalogInput::~AnalogInput() {
   HAL_FreeAnalogInputPort(m_port);
   m_port = HAL_kInvalidHandle;
 }
@@ -73,7 +71,7 @@ AnalogInput::~AnalogInput() {
  *
  * @return A sample straight from this channel.
  */
-int AnalogInput::GetValue() const {
+int frc::AnalogInput::GetValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetAnalogValue(m_port, &status);
@@ -95,7 +93,7 @@ int AnalogInput::GetValue() const {
  *
  * @return A sample from the oversample and average engine for this channel.
  */
-int AnalogInput::GetAverageValue() const {
+int frc::AnalogInput::GetAverageValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int value = HAL_GetAnalogAverageValue(m_port, &status);
@@ -111,7 +109,7 @@ int AnalogInput::GetAverageValue() const {
  *
  * @return A scaled sample straight from this channel.
  */
-double AnalogInput::GetVoltage() const {
+double frc::AnalogInput::GetVoltage() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double voltage = HAL_GetAnalogVoltage(m_port, &status);
@@ -133,7 +131,7 @@ double AnalogInput::GetVoltage() const {
  * @return A scaled sample from the output of the oversample and average engine
  * for this channel.
  */
-double AnalogInput::GetAverageVoltage() const {
+double frc::AnalogInput::GetAverageVoltage() const {
   if (StatusIsFatal()) return 0.0;
   int32_t status = 0;
   double voltage = HAL_GetAnalogAverageVoltage(m_port, &status);
@@ -148,7 +146,7 @@ double AnalogInput::GetAverageVoltage() const {
  *
  * @return Least significant bit weight.
  */
-int AnalogInput::GetLSBWeight() const {
+int frc::AnalogInput::GetLSBWeight() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int lsbWeight = HAL_GetAnalogLSBWeight(m_port, &status);
@@ -163,7 +161,7 @@ int AnalogInput::GetLSBWeight() const {
  *
  * @return Offset constant.
  */
-int AnalogInput::GetOffset() const {
+int frc::AnalogInput::GetOffset() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int offset = HAL_GetAnalogOffset(m_port, &status);
@@ -176,7 +174,7 @@ int AnalogInput::GetOffset() const {
  *
  * @return The channel number.
  */
-int AnalogInput::GetChannel() const {
+int frc::AnalogInput::GetChannel() const {
   if (StatusIsFatal()) return 0;
   return m_channel;
 }
@@ -192,7 +190,7 @@ int AnalogInput::GetChannel() const {
  *
  * @param bits Number of bits of averaging.
  */
-void AnalogInput::SetAverageBits(int bits) {
+void frc::AnalogInput::SetAverageBits(int bits) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogAverageBits(m_port, bits, &status);
@@ -207,7 +205,7 @@ void AnalogInput::SetAverageBits(int bits) {
  *
  * @return Number of bits of averaging previously configured.
  */
-int AnalogInput::GetAverageBits() const {
+int frc::AnalogInput::GetAverageBits() const {
   int32_t status = 0;
   int averageBits = HAL_GetAnalogAverageBits(m_port, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -224,7 +222,7 @@ int AnalogInput::GetAverageBits() const {
  *
  * @param bits Number of bits of oversampling.
  */
-void AnalogInput::SetOversampleBits(int bits) {
+void frc::AnalogInput::SetOversampleBits(int bits) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAnalogOversampleBits(m_port, bits, &status);
@@ -240,7 +238,7 @@ void AnalogInput::SetOversampleBits(int bits) {
  *
  * @return Number of bits of oversampling previously configured.
  */
-int AnalogInput::GetOversampleBits() const {
+int frc::AnalogInput::GetOversampleBits() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int oversampleBits = HAL_GetAnalogOversampleBits(m_port, &status);
@@ -253,7 +251,7 @@ int AnalogInput::GetOversampleBits() const {
  *
  * @return The analog input is attached to an accumulator.
  */
-bool AnalogInput::IsAccumulatorChannel() const {
+bool frc::AnalogInput::IsAccumulatorChannel() const {
   if (StatusIsFatal()) return false;
   int32_t status = 0;
   bool isAccum = HAL_IsAccumulatorChannel(m_port, &status);
@@ -264,7 +262,7 @@ bool AnalogInput::IsAccumulatorChannel() const {
 /**
  * Initialize the accumulator.
  */
-void AnalogInput::InitAccumulator() {
+void frc::AnalogInput::InitAccumulator() {
   if (StatusIsFatal()) return;
   m_accumulatorOffset = 0;
   int32_t status = 0;
@@ -280,7 +278,7 @@ void AnalogInput::InitAccumulator() {
  * @param initialValue The value that the accumulator should start from when
  *                     reset.
  */
-void AnalogInput::SetAccumulatorInitialValue(int64_t initialValue) {
+void frc::AnalogInput::SetAccumulatorInitialValue(int64_t initialValue) {
   if (StatusIsFatal()) return;
   m_accumulatorOffset = initialValue;
 }
@@ -288,7 +286,7 @@ void AnalogInput::SetAccumulatorInitialValue(int64_t initialValue) {
 /**
  * Resets the accumulator to the initial value.
  */
-void AnalogInput::ResetAccumulator() {
+void frc::AnalogInput::ResetAccumulator() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_ResetAccumulator(m_port, &status);
@@ -315,7 +313,7 @@ void AnalogInput::ResetAccumulator() {
  * source from the accumulator channel. Because of this, any non-zero
  * oversample bits will affect the size of the value for this field.
  */
-void AnalogInput::SetAccumulatorCenter(int center) {
+void frc::AnalogInput::SetAccumulatorCenter(int center) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAccumulatorCenter(m_port, center, &status);
@@ -325,7 +323,7 @@ void AnalogInput::SetAccumulatorCenter(int center) {
 /**
  * Set the accumulator's deadband.
  */
-void AnalogInput::SetAccumulatorDeadband(int deadband) {
+void frc::AnalogInput::SetAccumulatorDeadband(int deadband) {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_SetAccumulatorDeadband(m_port, deadband, &status);
@@ -340,7 +338,7 @@ void AnalogInput::SetAccumulatorDeadband(int deadband) {
  *
  * @return The 64-bit value accumulated since the last Reset().
  */
-int64_t AnalogInput::GetAccumulatorValue() const {
+int64_t frc::AnalogInput::GetAccumulatorValue() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int64_t value = HAL_GetAccumulatorValue(m_port, &status);
@@ -356,7 +354,7 @@ int64_t AnalogInput::GetAccumulatorValue() const {
  *
  * @return The number of times samples from the channel were accumulated.
  */
-int64_t AnalogInput::GetAccumulatorCount() const {
+int64_t frc::AnalogInput::GetAccumulatorCount() const {
   if (StatusIsFatal()) return 0;
   int32_t status = 0;
   int64_t count = HAL_GetAccumulatorCount(m_port, &status);
@@ -373,7 +371,8 @@ int64_t AnalogInput::GetAccumulatorCount() const {
  * @param value Reference to the 64-bit accumulated output.
  * @param count Reference to the number of accumulation cycles.
  */
-void AnalogInput::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
+void frc::AnalogInput::GetAccumulatorOutput(int64_t& value,
+                                            int64_t& count) const {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_GetAccumulatorOutput(m_port, &value, &count, &status);
@@ -389,7 +388,7 @@ void AnalogInput::GetAccumulatorOutput(int64_t& value, int64_t& count) const {
  *
  * @param samplesPerSecond The number of samples per second.
  */
-void AnalogInput::SetSampleRate(double samplesPerSecond) {
+void frc::AnalogInput::SetSampleRate(double samplesPerSecond) {
   int32_t status = 0;
   HAL_SetAnalogSampleRate(samplesPerSecond, &status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -400,7 +399,7 @@ void AnalogInput::SetSampleRate(double samplesPerSecond) {
  *
  * @return Sample rate.
  */
-double AnalogInput::GetSampleRate() {
+double frc::AnalogInput::GetSampleRate() {
   int32_t status = 0;
   double sampleRate = HAL_GetAnalogSampleRate(&status);
   wpi_setGlobalErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -412,28 +411,28 @@ double AnalogInput::GetSampleRate() {
  *
  * @return The average voltage.
  */
-double AnalogInput::PIDGet() {
+double frc::AnalogInput::PIDGet() {
   if (StatusIsFatal()) return 0.0;
   return GetAverageVoltage();
 }
 
-void AnalogInput::UpdateTable() {
+void frc::AnalogInput::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", GetAverageVoltage());
   }
 }
 
-void AnalogInput::StartLiveWindowMode() {}
+void frc::AnalogInput::StartLiveWindowMode() {}
 
-void AnalogInput::StopLiveWindowMode() {}
+void frc::AnalogInput::StopLiveWindowMode() {}
 
-std::string AnalogInput::GetSmartDashboardType() const {
+std::string frc::AnalogInput::GetSmartDashboardType() const {
   return "Analog Input";
 }
 
-void AnalogInput::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::AnalogInput::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> AnalogInput::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::AnalogInput::GetTable() const { return m_table; }

@@ -10,13 +10,11 @@
 #include "Buttons/Button.h"
 #include "Commands/Command.h"
 
-using namespace frc;
-
-PressedButtonScheduler::PressedButtonScheduler(bool last, Trigger* button,
-                                               Command* orders)
+frc::PressedButtonScheduler::PressedButtonScheduler(bool last, Trigger* button,
+                                                    Command* orders)
     : ButtonScheduler(last, button, orders) {}
 
-void PressedButtonScheduler::Execute() {
+void frc::PressedButtonScheduler::Execute() {
   if (m_button->Grab()) {
     if (!m_pressedLast) {
       m_pressedLast = true;

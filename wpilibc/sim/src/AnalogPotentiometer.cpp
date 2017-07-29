@@ -7,37 +7,35 @@
 
 #include "AnalogPotentiometer.h"
 
-using namespace frc;
-
 /**
  * Common initialization code called by all constructors.
  */
-void AnalogPotentiometer::initPot(AnalogInput* input, double scale,
-                                  double offset) {
+void frc::AnalogPotentiometer::initPot(AnalogInput* input, double scale,
+                                       double offset) {
   m_scale = scale;
   m_offset = offset;
   m_analog_input = input;
 }
 
-AnalogPotentiometer::AnalogPotentiometer(int channel, double scale,
-                                         double offset) {
+frc::AnalogPotentiometer::AnalogPotentiometer(int channel, double scale,
+                                              double offset) {
   m_init_analog_input = true;
   initPot(new AnalogInput(channel), scale, offset);
 }
 
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double scale,
-                                         double offset) {
+frc::AnalogPotentiometer::AnalogPotentiometer(AnalogInput* input, double scale,
+                                              double offset) {
   m_init_analog_input = false;
   initPot(input, scale, offset);
 }
 
-AnalogPotentiometer::AnalogPotentiometer(AnalogInput& input, double scale,
-                                         double offset) {
+frc::AnalogPotentiometer::AnalogPotentiometer(AnalogInput& input, double scale,
+                                              double offset) {
   m_init_analog_input = false;
   initPot(&input, scale, offset);
 }
 
-AnalogPotentiometer::~AnalogPotentiometer() {
+frc::AnalogPotentiometer::~AnalogPotentiometer() {
   if (m_init_analog_input) {
     delete m_analog_input;
     m_init_analog_input = false;
@@ -49,7 +47,7 @@ AnalogPotentiometer::~AnalogPotentiometer() {
  *
  * @return The current position of the potentiometer.
  */
-double AnalogPotentiometer::Get() const {
+double frc::AnalogPotentiometer::Get() const {
   return m_analog_input->GetVoltage() * m_scale + m_offset;
 }
 
@@ -58,29 +56,29 @@ double AnalogPotentiometer::Get() const {
  *
  * @return The current reading.
  */
-double AnalogPotentiometer::PIDGet() { return Get(); }
+double frc::AnalogPotentiometer::PIDGet() { return Get(); }
 
 /**
  * @return the Smart Dashboard Type
  */
-std::string AnalogPotentiometer::GetSmartDashboardType() const {
+std::string frc::AnalogPotentiometer::GetSmartDashboardType() const {
   return "Analog Input";
 }
 
 /**
  * Live Window code, only does anything if live window is activated.
  */
-void AnalogPotentiometer::InitTable(std::shared_ptr<ITable> subtable) {
+void frc::AnalogPotentiometer::InitTable(std::shared_ptr<ITable> subtable) {
   m_table = subtable;
   UpdateTable();
 }
 
-void AnalogPotentiometer::UpdateTable() {
+void frc::AnalogPotentiometer::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", Get());
   }
 }
 
-std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const {
+std::shared_ptr<ITable> frc::AnalogPotentiometer::GetTable() const {
   return m_table;
 }

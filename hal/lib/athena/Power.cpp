@@ -11,13 +11,11 @@
 
 #include "HAL/ChipObject.h"
 
-using namespace hal;
-
-static std::unique_ptr<tPower> power;
+static std::unique_ptr<hal::tPower> power;
 
 static void initializePower(int32_t* status) {
   if (power == nullptr) {
-    power.reset(tPower::create(status));
+    power.reset(hal::tPower::create(status));
   }
 }
 

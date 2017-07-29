@@ -7,13 +7,11 @@
 
 #include "Buttons/InternalButton.h"
 
-using namespace frc;
-
-InternalButton::InternalButton(bool inverted)
+frc::InternalButton::InternalButton(bool inverted)
     : m_pressed(inverted), m_inverted(inverted) {}
 
-void InternalButton::SetInverted(bool inverted) { m_inverted = inverted; }
+void frc::InternalButton::SetInverted(bool inverted) { m_inverted = inverted; }
 
-void InternalButton::SetPressed(bool pressed) { m_pressed = pressed; }
+void frc::InternalButton::SetPressed(bool pressed) { m_pressed = pressed; }
 
-bool InternalButton::Get() { return m_pressed ^ m_inverted; }
+bool frc::InternalButton::Get() { return m_pressed ^ m_inverted; }

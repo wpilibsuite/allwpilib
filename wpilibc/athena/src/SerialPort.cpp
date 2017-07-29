@@ -13,8 +13,6 @@
 // static ViStatus _VI_FUNCH ioCompleteHandler (ViSession vi, ViEventType
 // eventType, ViEvent event, ViAddr userHandle);
 
-using namespace frc;
-
 /**
  * Create an instance of a Serial Port class.
  *
@@ -26,9 +24,9 @@ using namespace frc;
  * @param stopBits The number of stop bits to use as defined by the enum
  *                 StopBits.
  */
-SerialPort::SerialPort(int baudRate, Port port, int dataBits,
-                       SerialPort::Parity parity,
-                       SerialPort::StopBits stopBits) {
+frc::SerialPort::SerialPort(int baudRate, Port port, int dataBits,
+                            frc::SerialPort::Parity parity,
+                            frc::SerialPort::StopBits stopBits) {
   int32_t status = 0;
 
   m_port = port;
@@ -64,7 +62,7 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
 /**
  * Destructor.
  */
-SerialPort::~SerialPort() {
+frc::SerialPort::~SerialPort() {
   int32_t status = 0;
   HAL_CloseSerial(static_cast<HAL_SerialPort>(m_port), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -75,7 +73,7 @@ SerialPort::~SerialPort() {
  *
  * By default, flow control is disabled.
  */
-void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
+void frc::SerialPort::SetFlowControl(frc::SerialPort::FlowControl flowControl) {
   int32_t status = 0;
   HAL_SetSerialFlowControl(static_cast<HAL_SerialPort>(m_port), flowControl,
                            &status);
@@ -91,7 +89,7 @@ void SerialPort::SetFlowControl(SerialPort::FlowControl flowControl) {
  *
  * @param terminator The character to use for termination.
  */
-void SerialPort::EnableTermination(char terminator) {
+void frc::SerialPort::EnableTermination(char terminator) {
   int32_t status = 0;
   HAL_EnableSerialTermination(static_cast<HAL_SerialPort>(m_port), terminator,
                               &status);
@@ -101,7 +99,7 @@ void SerialPort::EnableTermination(char terminator) {
 /**
  * Disable termination behavior.
  */
-void SerialPort::DisableTermination() {
+void frc::SerialPort::DisableTermination() {
   int32_t status = 0;
   HAL_DisableSerialTermination(static_cast<HAL_SerialPort>(m_port), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -112,7 +110,7 @@ void SerialPort::DisableTermination() {
  *
  * @return The number of bytes available to read
  */
-int SerialPort::GetBytesReceived() {
+int frc::SerialPort::GetBytesReceived() {
   int32_t status = 0;
   int retVal =
       HAL_GetSerialBytesReceived(static_cast<HAL_SerialPort>(m_port), &status);
@@ -127,7 +125,7 @@ int SerialPort::GetBytesReceived() {
  * @param count  The maximum number of bytes to read.
  * @return The number of bytes actually read into the buffer.
  */
-int SerialPort::Read(char* buffer, int count) {
+int frc::SerialPort::Read(char* buffer, int count) {
   int32_t status = 0;
   int retVal = HAL_ReadSerial(static_cast<HAL_SerialPort>(m_port), buffer,
                               count, &status);
@@ -142,7 +140,7 @@ int SerialPort::Read(char* buffer, int count) {
  * @param count  The maximum number of bytes to write.
  * @return The number of bytes actually written into the port.
  */
-int SerialPort::Write(const char* buffer, int count) {
+int frc::SerialPort::Write(const char* buffer, int count) {
   return Write(llvm::StringRef(buffer, static_cast<size_t>(count)));
 }
 
@@ -155,7 +153,7 @@ int SerialPort::Write(const char* buffer, int count) {
  * @param buffer StringRef to the buffer to read the bytes from.
  * @return The number of bytes actually written into the port.
  */
-int SerialPort::Write(llvm::StringRef buffer) {
+int frc::SerialPort::Write(llvm::StringRef buffer) {
   int32_t status = 0;
   int retVal = HAL_WriteSerial(static_cast<HAL_SerialPort>(m_port),
                                buffer.data(), buffer.size(), &status);
@@ -171,7 +169,7 @@ int SerialPort::Write(llvm::StringRef buffer) {
  *
  * @param timeout The number of seconds to to wait for I/O.
  */
-void SerialPort::SetTimeout(double timeout) {
+void frc::SerialPort::SetTimeout(double timeout) {
   int32_t status = 0;
   HAL_SetSerialTimeout(static_cast<HAL_SerialPort>(m_port), timeout, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -189,7 +187,7 @@ void SerialPort::SetTimeout(double timeout) {
  *
  * @param size The read buffer size.
  */
-void SerialPort::SetReadBufferSize(int size) {
+void frc::SerialPort::SetReadBufferSize(int size) {
   int32_t status = 0;
   HAL_SetSerialReadBufferSize(static_cast<HAL_SerialPort>(m_port), size,
                               &status);
@@ -204,7 +202,7 @@ void SerialPort::SetReadBufferSize(int size) {
  *
  * @param size The write buffer size.
  */
-void SerialPort::SetWriteBufferSize(int size) {
+void frc::SerialPort::SetWriteBufferSize(int size) {
   int32_t status = 0;
   HAL_SetSerialWriteBufferSize(static_cast<HAL_SerialPort>(m_port), size,
                                &status);
@@ -222,7 +220,8 @@ void SerialPort::SetWriteBufferSize(int size) {
  *
  * @param mode The write buffer mode.
  */
-void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
+void frc::SerialPort::SetWriteBufferMode(
+    frc::SerialPort::WriteBufferMode mode) {
   int32_t status = 0;
   HAL_SetSerialWriteMode(static_cast<HAL_SerialPort>(m_port), mode, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -234,7 +233,7 @@ void SerialPort::SetWriteBufferMode(SerialPort::WriteBufferMode mode) {
  * This is used when SetWriteBufferMode() is set to kFlushWhenFull to force a
  * flush before the buffer is full.
  */
-void SerialPort::Flush() {
+void frc::SerialPort::Flush() {
   int32_t status = 0;
   HAL_FlushSerial(static_cast<HAL_SerialPort>(m_port), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
@@ -245,7 +244,7 @@ void SerialPort::Flush() {
  *
  * Empty the transmit and receive buffers in the device and formatted I/O.
  */
-void SerialPort::Reset() {
+void frc::SerialPort::Reset() {
   int32_t status = 0;
   HAL_ClearSerial(static_cast<HAL_SerialPort>(m_port), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));

@@ -11,15 +11,13 @@
 
 #include "WPIErrors.h"
 
-using namespace frc;
-
 /**
  * Create an instance of a Digital Input class.
  * Creates a digital input given a channel and uses the default module.
  *
  * @param channel The digital channel (1..14).
  */
-DigitalInput::DigitalInput(int channel) : m_channel(channel) {
+frc::DigitalInput::DigitalInput(int channel) : m_channel(channel) {
   std::ostringstream oss;
   oss << "dio/" << channel;
   m_impl = new SimDigitalInput(oss.str());
@@ -29,30 +27,30 @@ DigitalInput::DigitalInput(int channel) : m_channel(channel) {
  * Get the value from a digital input channel.
  * Retrieve the value of a single digital input channel from the FPGA.
  */
-int DigitalInput::Get() const { return m_impl->Get(); }
+int frc::DigitalInput::Get() const { return m_impl->Get(); }
 
 /**
  * @return The GPIO channel number that this object represents.
  */
-int DigitalInput::GetChannel() const { return m_channel; }
+int frc::DigitalInput::GetChannel() const { return m_channel; }
 
-void DigitalInput::UpdateTable() {
+void frc::DigitalInput::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutBoolean("Value", Get());
   }
 }
 
-void DigitalInput::StartLiveWindowMode() {}
+void frc::DigitalInput::StartLiveWindowMode() {}
 
-void DigitalInput::StopLiveWindowMode() {}
+void frc::DigitalInput::StopLiveWindowMode() {}
 
-std::string DigitalInput::GetSmartDashboardType() const {
+std::string frc::DigitalInput::GetSmartDashboardType() const {
   return "DigitalInput";
 }
 
-void DigitalInput::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::DigitalInput::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> DigitalInput::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::DigitalInput::GetTable() const { return m_table; }

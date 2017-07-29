@@ -7,9 +7,7 @@
 
 #include "vision/VisionRunner.h"
 
-using namespace frc;
-
-class VisionTester : public VisionPipeline {
+class VisionTester : public frc::VisionPipeline {
  public:
   virtual ~VisionTester() = default;
   void Process(cv::Mat& mat) override {}
@@ -19,8 +17,8 @@ class VisionTester : public VisionPipeline {
 void TestVisionInitialization() {
   cs::CvSource source;
   VisionTester tester;
-  VisionRunner<VisionTester> runner(source, &tester,
-                                    [](VisionTester& t) { t.TestThing(); });
+  frc::VisionRunner<VisionTester> runner(
+      source, &tester, [](VisionTester& t) { t.TestThing(); });
 
   runner.RunOnce();
   runner.RunForever();

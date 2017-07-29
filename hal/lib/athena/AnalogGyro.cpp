@@ -30,10 +30,9 @@ static constexpr double kSamplesPerSecond = 50.0;
 static constexpr double kCalibrationSampleTime = 5.0;
 static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
 
-using namespace hal;
-
-static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
-                             HAL_HandleEnum::AnalogGyro>
+static hal::IndexedHandleResource<HAL_GyroHandle, AnalogGyro,
+                                  hal::kNumAccumulators,
+                                  hal::HAL_HandleEnum::AnalogGyro>
     analogGyroHandles;
 
 static void Wait(double seconds) {
@@ -52,7 +51,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
   }
 
   // handle known to be correct, so no need to type check
-  int16_t channel = getHandleIndex(analogHandle);
+  int16_t channel = hal::getHandleIndex(analogHandle);
 
   auto handle = analogGyroHandles.Allocate(channel, status);
 

@@ -16,8 +16,6 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Construct an analog output on the given channel.
  *
@@ -25,7 +23,7 @@ using namespace frc;
  *
  * @param channel The channel number on the roboRIO to represent.
  */
-AnalogOutput::AnalogOutput(int channel) {
+frc::AnalogOutput::AnalogOutput(int channel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
   buf << "analog output " << channel;
@@ -59,19 +57,19 @@ AnalogOutput::AnalogOutput(int channel) {
  *
  * Frees analog output resource.
  */
-AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
+frc::AnalogOutput::~AnalogOutput() { HAL_FreeAnalogOutputPort(m_port); }
 
 /**
  * Get the channel of this AnalogOutput.
  */
-int AnalogOutput::GetChannel() { return m_channel; }
+int frc::AnalogOutput::GetChannel() { return m_channel; }
 
 /**
  * Set the value of the analog output.
  *
  * @param voltage The output value in Volts, from 0.0 to +5.0
  */
-void AnalogOutput::SetVoltage(double voltage) {
+void frc::AnalogOutput::SetVoltage(double voltage) {
   int32_t status = 0;
   HAL_SetAnalogOutput(m_port, voltage, &status);
 
@@ -83,7 +81,7 @@ void AnalogOutput::SetVoltage(double voltage) {
  *
  * @return The value in Volts, from 0.0 to +5.0
  */
-double AnalogOutput::GetVoltage() const {
+double frc::AnalogOutput::GetVoltage() const {
   int32_t status = 0;
   double voltage = HAL_GetAnalogOutput(m_port, &status);
 
@@ -92,23 +90,23 @@ double AnalogOutput::GetVoltage() const {
   return voltage;
 }
 
-void AnalogOutput::UpdateTable() {
+void frc::AnalogOutput::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Value", GetVoltage());
   }
 }
 
-void AnalogOutput::StartLiveWindowMode() {}
+void frc::AnalogOutput::StartLiveWindowMode() {}
 
-void AnalogOutput::StopLiveWindowMode() {}
+void frc::AnalogOutput::StopLiveWindowMode() {}
 
-std::string AnalogOutput::GetSmartDashboardType() const {
+std::string frc::AnalogOutput::GetSmartDashboardType() const {
   return "Analog Output";
 }
 
-void AnalogOutput::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::AnalogOutput::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> AnalogOutput::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::AnalogOutput::GetTable() const { return m_table; }

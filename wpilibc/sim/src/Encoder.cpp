@@ -12,8 +12,6 @@
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
-using namespace frc;
-
 /**
  * Common initialization code for Encoders.
  * This code allocates resources for Encoders and is common to all constructors.
@@ -31,8 +29,9 @@ using namespace frc;
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection,
-                          EncodingType encodingType) {
+void frc::Encoder::InitEncoder(int channelA, int channelB,
+                               bool reverseDirection,
+                               EncodingType encodingType) {
   m_table = nullptr;
   this->channelA = channelA;
   this->channelB = channelB;
@@ -79,8 +78,8 @@ void Encoder::InitEncoder(int channelA, int channelB, bool reverseDirection,
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
-                 EncodingType encodingType) {
+frc::Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
+                      EncodingType encodingType) {
   InitEncoder(aChannel, bChannel, reverseDirection, encodingType);
 }
 
@@ -106,7 +105,8 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-/* TODO: [Not Supported] Encoder::Encoder(DigitalSource *aSource, DigitalSource
+/* TODO: [Not Supported] frc::Encoder::Encoder(DigitalSource *aSource,
+DigitalSource
 *bSource, bool reverseDirection, EncodingType encodingType) :
         m_encoder(nullptr),
         m_counter(nullptr)
@@ -143,7 +143,7 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
  *                         value will either exactly match the spec'd count or
  *                         be double (2x) the spec'd count.
  */
-/*// TODO: [Not Supported] Encoder::Encoder(DigitalSource &aSource,
+/*// TODO: [Not Supported] frc::Encoder::Encoder(DigitalSource &aSource,
 DigitalSource &bSource, bool reverseDirection, EncodingType encodingType) :
         m_encoder(nullptr),
         m_counter(nullptr)
@@ -160,7 +160,7 @@ DigitalSource &bSource, bool reverseDirection, EncodingType encodingType) :
  *
  * Resets the current count to zero on the encoder.
  */
-void Encoder::Reset() { impl->Reset(); }
+void frc::Encoder::Reset() { impl->Reset(); }
 
 /**
  * Determine if the encoder is stopped.
@@ -171,7 +171,7 @@ void Encoder::Reset() { impl->Reset(); }
  *
  * @return True if the encoder is considered stopped.
  */
-bool Encoder::GetStopped() const {
+bool frc::Encoder::GetStopped() const {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -180,7 +180,7 @@ bool Encoder::GetStopped() const {
  *
  * @return The last direction the encoder value changed.
  */
-bool Encoder::GetDirection() const {
+bool frc::Encoder::GetDirection() const {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -188,7 +188,7 @@ bool Encoder::GetDirection() const {
  * The scale needed to convert a raw counter value into a number of encoder
  * pulses.
  */
-double Encoder::DecodingScaleFactor() const {
+double frc::Encoder::DecodingScaleFactor() const {
   switch (m_encodingType) {
     case k1X:
       return 1.0;
@@ -206,7 +206,7 @@ double Encoder::DecodingScaleFactor() const {
  *
  * Used to divide raw edge counts down to spec'd counts.
  */
-int Encoder::GetEncodingScale() const { return m_encodingScale; }
+int frc::Encoder::GetEncodingScale() const { return m_encodingScale; }
 
 /**
  * Gets the raw value from the encoder.
@@ -216,7 +216,7 @@ int Encoder::GetEncodingScale() const { return m_encodingScale; }
  *
  * @return Current raw count from the encoder
  */
-int Encoder::GetRaw() const {
+int frc::Encoder::GetRaw() const {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -229,7 +229,7 @@ int Encoder::GetRaw() const {
  * @return Current count from the Encoder adjusted for the 1x, 2x, or 4x scale
  *         factor.
  */
-int Encoder::Get() const {
+int frc::Encoder::Get() const {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -245,7 +245,7 @@ int Encoder::Get() const {
  *
  * @return Period in seconds of the most recent pulse.
  */
-double Encoder::GetPeriod() const {
+double frc::Encoder::GetPeriod() const {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -265,7 +265,7 @@ double Encoder::GetPeriod() const {
  *                  FPGA will report the device stopped. This is expressed in
  *                  seconds.
  */
-void Encoder::SetMaxPeriod(double maxPeriod) {
+void frc::Encoder::SetMaxPeriod(double maxPeriod) {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -275,7 +275,7 @@ void Encoder::SetMaxPeriod(double maxPeriod) {
  * @return The distance driven since the last reset as scaled by the value from
  *         SetDistancePerPulse().
  */
-double Encoder::GetDistance() const {
+double frc::Encoder::GetDistance() const {
   return m_distancePerPulse * impl->GetPosition();
 }
 
@@ -287,7 +287,7 @@ double Encoder::GetDistance() const {
  *
  * @return The current rate of the encoder.
  */
-double Encoder::GetRate() const {
+double frc::Encoder::GetRate() const {
   return m_distancePerPulse * impl->GetVelocity();
 }
 
@@ -297,7 +297,7 @@ double Encoder::GetRate() const {
  * @param minRate The minimum rate.  The units are in distance per second as
  *                scaled by the value from SetDistancePerPulse().
  */
-void Encoder::SetMinRate(double minRate) {
+void frc::Encoder::SetMinRate(double minRate) {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -314,7 +314,7 @@ void Encoder::SetMinRate(double minRate) {
  * @param distancePerPulse The scale factor that will be used to convert pulses
  *                         to useful units.
  */
-void Encoder::SetDistancePerPulse(double distancePerPulse) {
+void frc::Encoder::SetDistancePerPulse(double distancePerPulse) {
   if (m_reverseDirection) {
     m_distancePerPulse = -distancePerPulse;
   } else {
@@ -330,7 +330,7 @@ void Encoder::SetDistancePerPulse(double distancePerPulse) {
  *
  * @param reverseDirection true if the encoder direction should be reversed
  */
-void Encoder::SetReverseDirection(bool reverseDirection) {
+void frc::Encoder::SetReverseDirection(bool reverseDirection) {
   throw "Simulation doesn't currently support this method.";
 }
 
@@ -340,7 +340,7 @@ void Encoder::SetReverseDirection(bool reverseDirection) {
  *
  * @param pidSource An enum to select the parameter.
  */
-void Encoder::SetPIDSourceType(PIDSourceType pidSource) {
+void frc::Encoder::SetPIDSourceType(PIDSourceType pidSource) {
   m_pidSource = pidSource;
 }
 
@@ -349,7 +349,7 @@ void Encoder::SetPIDSourceType(PIDSourceType pidSource) {
  *
  * @return The current value of the selected source parameter.
  */
-double Encoder::PIDGet() {
+double frc::Encoder::PIDGet() {
   switch (m_pidSource) {
     case PIDSourceType::kDisplacement:
       return GetDistance();
@@ -360,7 +360,7 @@ double Encoder::PIDGet() {
   }
 }
 
-void Encoder::UpdateTable() {
+void frc::Encoder::UpdateTable() {
   if (m_table != nullptr) {
     m_table->PutNumber("Speed", GetRate());
     m_table->PutNumber("Distance", GetDistance());
@@ -370,20 +370,20 @@ void Encoder::UpdateTable() {
   }
 }
 
-void Encoder::StartLiveWindowMode() {}
+void frc::Encoder::StartLiveWindowMode() {}
 
-void Encoder::StopLiveWindowMode() {}
+void frc::Encoder::StopLiveWindowMode() {}
 
-std::string Encoder::GetSmartDashboardType() const {
+std::string frc::Encoder::GetSmartDashboardType() const {
   if (m_encodingType == k4X)
     return "Quadrature Encoder";
   else
     return "Encoder";
 }
 
-void Encoder::InitTable(std::shared_ptr<ITable> subTable) {
+void frc::Encoder::InitTable(std::shared_ptr<ITable> subTable) {
   m_table = subTable;
   UpdateTable();
 }
 
-std::shared_ptr<ITable> Encoder::GetTable() const { return m_table; }
+std::shared_ptr<ITable> frc::Encoder::GetTable() const { return m_table; }
