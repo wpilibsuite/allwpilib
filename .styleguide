@@ -1,18 +1,14 @@
-cppHeaderExtensions {
-  h
-  hpp
-  inc
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
 }
 
-cppSrcExtensions {
-  cpp
+cppSrcFileInclude {
+  \.cpp$
 }
 
-otherExtensions {
-  java
-}
-
-genFileExclude {
+generatedFileExclude {
   gmock/
   ni-libraries/
   hal/src/main/native/athena/ctre/
