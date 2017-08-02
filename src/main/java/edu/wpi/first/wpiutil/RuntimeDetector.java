@@ -31,9 +31,9 @@ public class RuntimeDetector {
       filePrefix = "lib";
       fileExtension = ".dylib";
       if (intel32) {
-        filePath = "/mac/x86";
+        filePath = "/osx/x86";
       } else {
-        filePath = "/mac/x86-64/";
+        filePath = "/osx/x86-64/";
       }
     } else if (isLinux()) {
       filePrefix = "lib";
