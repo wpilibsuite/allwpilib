@@ -26,6 +26,7 @@
 
 #include <memory>
 
+#include "llvm/ArrayRef.h"
 #include "tcpsockets/NetworkStream.h"
 
 namespace wpi {
@@ -37,6 +38,9 @@ class TCPConnector {
   static std::unique_ptr<NetworkStream> connect(const char* server, int port,
                                                 Logger& logger,
                                                 int timeout = 0);
+  static std::unique_ptr<NetworkStream> connect_parallel(
+      llvm::ArrayRef<std::pair<const char*, int>> servers, Logger& logger,
+      int timeout = 0);
 };
 
 }  // namespace wpi
