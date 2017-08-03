@@ -82,6 +82,12 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+if (project.hasProperty('jenkinsBuild')) {
+    jar {
+        classifier = 'javaArtifact'
+    }
+}
+
 artifacts {
     archives sourcesJar
     archives javadocJar
@@ -180,11 +186,7 @@ publishing {
   publications {
 
     java(MavenPublication) {
-        artifact (jar) {
-            if (project.hasProperty('jenkinsBuild')) {
-                classifier = 'javaArtifact'
-            }
-        }
+        artifact jar
         artifact sourcesJar
         artifact javadocJar
 
