@@ -44,7 +44,7 @@ build.dependsOn outputVersions
 def baseArtifactId = 'wpiutil'
 def artifactGroupId = 'edu.wpi.first.wpiutil'
 
-def licenseFile = new File("$rootDir/license.txt")
+def licenseFile = file("$rootDir/license.txt")
 
 task cppSourcesZip(type: Zip) {
     destinationDir = outputsFolder

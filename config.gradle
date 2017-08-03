@@ -22,7 +22,7 @@ def mac32BitArg = '-m32'
 
 def buildAll = project.hasProperty('buildAll')
 
-def windows64PlatformDetect = { config->
+def windows64PlatformDetect = {
     def arch = System.getProperty("os.arch")
     def isWin = OperatingSystem.current().isWindows()
     if (buildAll) {
@@ -32,7 +32,7 @@ def windows64PlatformDetect = { config->
     }
 }
 
-def windows32PlatformDetect = { config->
+def windows32PlatformDetect = {
     def arch = System.getProperty("os.arch")
     def isWin = OperatingSystem.current().isWindows()
     if (buildAll) {
@@ -42,7 +42,7 @@ def windows32PlatformDetect = { config->
     }
 }
 
-def linux32IntelPlatformDetect = { config->
+def linux32IntelPlatformDetect = {
     def arch = System.getProperty("os.arch")
     def isLinux = OperatingSystem.current().isLinux()
     def isIntel = (arch == 'amd64' || arch == 'i386')
@@ -53,7 +53,7 @@ def linux32IntelPlatformDetect = { config->
     }
 }
 
-def linux64IntelPlatformDetect = { config->
+def linux64IntelPlatformDetect = {
     def arch = System.getProperty("os.arch")
     def isLinux = OperatingSystem.current().isLinux()
     def isIntel = (arch == 'amd64' || arch == 'i386')
@@ -64,13 +64,13 @@ def linux64IntelPlatformDetect = { config->
     }
 }
 
-def linuxArmPlatformDetect = { config->
+def linuxArmPlatformDetect = {
     def arch = System.getProperty("os.arch")
     def isIntel = (arch == 'amd64' || arch == 'i386')
     return OperatingSystem.current().isLinux() && !isIntel
 }
 
-def mac64PlatformDetect = { config->
+def mac64PlatformDetect = {
     def arch = System.getProperty("os.arch")
     def isMac = OperatingSystem.current().isMacOsX()
     if (buildAll) {
@@ -80,7 +80,7 @@ def mac64PlatformDetect = { config->
     }
 }
 
-def mac32PlatformDetect = { config->
+def mac32PlatformDetect = {
     def arch = System.getProperty("os.arch")
     def isMac = OperatingSystem.current().isMacOsX()
     if (buildAll) {
