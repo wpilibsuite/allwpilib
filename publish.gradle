@@ -180,7 +180,11 @@ publishing {
   publications {
 
     java(MavenPublication) {
-        artifact jar
+        artifact (jar) {
+            if (project.hasProperty('jenkinsBuild')) {
+                classifier = 'javaArtifact'
+            }
+        }
         artifact sourcesJar
         artifact javadocJar
 
