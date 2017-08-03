@@ -1,14 +1,5 @@
-import org.gradle.internal.os.OperatingSystem
-
 apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
-
-def getVersion = {
-    if (WPILibVersion.version.contains('-'))
-        return WPILibVersion.version.substring(WPILibVersion.version.indexOf('-'))
-    else
-        return ""
-}
 
 if (!hasProperty('releaseType')) {
     WPILibVersion {
@@ -16,117 +7,216 @@ if (!hasProperty('releaseType')) {
     }
 }
 
-def ntVersion
-def utilVersion
-if (project.hasProperty("ntPublishVersion")) {
-    ntVersion = project.ntPublishVersion
+def pubVersion
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
 } else {
-    ntVersion = WPILibVersion.version
+    pubVersion = WPILibVersion.version
 }
 
-if (project.hasProperty("utilPublishVersion")) {
-    utilVersion = project.utilPublishVersion
-} else {
-    utilVersion = "1.0.2${-> getVersion()}"
-}
+def outputsFolder = file("$buildDir/outputs")
 
-def utilFile = file("$buildDir/wpiutil.txt")
-def ntcoreFile = file("$buildDir/ntcore.txt")
+def versionFile = file("$outputsFolder/version.txt")
 
 task outputVersions() {
-    description = 'Prints the versions of ntcore and wpiutil to a file for use by the downstream packaging project'
+    description = 'Prints the versions of ntcore to a file for use by the downstream packaging project'
     group = 'Build'
-    outputs.files(utilFile, ntcoreFile)
+    outputs.files(versionFile)
 
     doFirst {
-        buildDir.mkdir()
+        outputsFolder.mkdir()
     }
 
     doLast {
-        utilFile.write utilVersion
-        ntcoreFile.write ntVersion
+        versionFile.write pubVersion
     }
 }
 
-task clean(type: Delete) {
-    delete utilFile
-    delete ntcoreFile
+build.dependsOn outputVersions
+
+def baseArtifactId = 'ntcore'
+def artifactGroupId = 'edu.wpi.first.ntcore'
+
+def licenseFile = file("$rootDir/license.txt")
+
+task cppSourcesZip(type: Zip) {
+    destinationDir = outputsFolder
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+
+    model {
+        tasks {
+            it.each {
+                if (it in getJNIHeadersClass()) {
+                    from (it.outputs.files) {
+                        into '/'
+                    }
+                    dependsOn it
+                }
+            }
+        }
+    }
 }
 
-outputVersions.mustRunAfter clean
+task cppHeadersZip(type: Zip) {
+    destinationDir = outputsFolder
+    classifier = "headers"
 
-project(':native:wpiutil').build.dependsOn outputVersions
-project(':native:ntcore').build.dependsOn outputVersions
-if (project.buildArm) {
-    project(':arm:wpiutil').build.dependsOn outputVersions
-    project(':arm:ntcore').build.dependsOn outputVersions
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
 
-// We change what repo we publish to depending on whether this is a development, beta, stable, or full
-// release. This is set up in the main gradle file.
+if (project.hasProperty('jenkinsBuild')) {
+    jar {
+        classifier = 'javaArtifact'
+    }
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    archives cppHeadersZip
+    archives cppSourcesZip
+}
+
+def createComponentZipTasks = { components, name, base, type, project, func ->
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && it.name == name) {
+            it.binaries.each {
+                def target = getClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
+                }
+            }
+        }
+    }
+    def taskList = []
+    configMap.each { key, value ->
+        def baseN = base + name
+        def task = project.tasks.create(baseN + "-${key}", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDir =  outputsFolder
+            classifier = key
+            baseName = baseN + '-classifier'
+            duplicatesStrategy = 'exclude'
+
+            from(licenseFile) {
+                into '/'
+            }
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            task
+        }
+    }
+    return taskList
+}
+
+model {
+    publishing {
+        def ntcoreTaskList = createComponentZipTasks($.components, 'ntcore', 'zipcppntcore', Zip, project, { task, value ->
+            value.each { binary->
+                if (binary.buildable) {
+                    if (binary instanceof SharedLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                        task.from (binary.sharedLibraryFile) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                        task.from (binary.sharedLibraryLinkFile) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                    } else if (binary instanceof StaticLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from (binary.staticLibraryFile) {
+                            into getPlatformPath(binary) + '/static'
+                        }
+                    }
+                }
+            }
+        })
+
+        def ntcoreJNITaskList = createComponentZipTasks($.components, 'ntcoreJNI', 'jnijnintcore', Jar, project, { task, value ->
+            value.each { binary->
+                if (binary.buildable) {
+                    if (binary instanceof SharedLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from (binary.sharedLibraryFile) {
+                            into getPlatformPath(binary)
+                        }
+                    }
+                }
+            }
+        })
+
+        publications {
+            cpp(MavenPublication) {
+                ntcoreTaskList.each {
+                    artifact it
+                }
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                artifactId = "${baseArtifactId}-cpp"
+                groupId artifactGroupId
+                version pubVersion
+            }
+            jni(MavenPublication) {
+                ntcoreJNITaskList.each {
+                    artifact it
+                }
+
+                artifactId = "${baseArtifactId}-jni"
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}
+
 publishing {
     publications {
-        def nat = project('native:ntcore')
-        if (!project.hasProperty('skipJava')) {
-            java(MavenPublication) {
-                artifact nat.jar
-                artifact nat.networktablesJavaSource
-                artifact nat.networktablesJavadoc
-                if (project.buildArm) {
-                    def natArm = project('arm:ntcore')
-                    artifact natArm.jar
-                    // If the library is not embedded include it in the repo
-                    if (!project.hasProperty('compilerPrefix')) {
-                        artifact natArm.ntcoreZip
-                    }
-                }
+        java(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
 
-                if (project.hasProperty('makeDesktop')) {
-                    artifact nat.jar, {
-                        classifier = 'desktop'
-                    }
-                }
-
-                groupId 'edu.wpi.first.wpilib.networktables.java'
-                artifactId 'NetworkTables'
-                version ntVersion
-            }
-        }
-        cpp(MavenPublication) {
-            artifact nat.ntcoreZip
-            artifact ntcoreSourceZip
-            if (project.buildArm) {
-                artifact project(':arm:ntcore').ntcoreZip
-            }
-
-            if (project.hasProperty('makeDesktop')) {
-                artifact nat.ntcoreZip, {
-                    classifier = 'desktop'
-                }
-            }
-
-            groupId 'edu.wpi.first.wpilib.networktables.cpp'
-            artifactId 'NetworkTables'
-            version ntVersion
-        }
-        wpiutil(MavenPublication) {
-            artifact project(':native:wpiutil').wpiutilZip
-            artifact wpiutilSourceZip
-            if (project.buildArm) {
-                artifact project(':arm:wpiutil').wpiutilZip
-            }
-
-            if (project.hasProperty('makeDesktop')) {
-                artifact project(':native:wpiutil').wpiutilZip, {
-                    classifier = 'desktop'
-                }
-            }
-
-            groupId 'edu.wpi.first.wpilib'
-            artifactId 'wpiutil'
-            version utilVersion
+            artifactId = "${baseArtifactId}-java"
+            groupId artifactGroupId
+            version pubVersion
         }
     }
 }

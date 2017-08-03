@@ -1,49 +1,38 @@
 import org.gradle.internal.os.OperatingSystem
 
-apply plugin: 'cpp'
-apply plugin: 'visual-studio'
+if (!project.hasProperty('onlyAthena')) {
+    apply plugin: 'cpp'
+    apply plugin: 'visual-studio'
+    apply plugin: 'edu.wpi.first.NativeUtils'
 
-// Apply the correct toolchain settings for the target platform
-if (OperatingSystem.current().isLinux()) {
-    apply from: '../toolchains/linux.gradle'
-} else if (OperatingSystem.current().isMacOsX()) {
-    apply from: '../toolchains/mac.gradle'
-} else if (OperatingSystem.current().isWindows()) {
-    apply from: '../toolchains/windows.gradle'
-} else {
-    throw new GradleException("ntcore does not support building on ${OperatingSystem.current().getFamilyName()}.")
-}
+    ext.gmockProject = true
 
-model {
-    platforms {
-        x86 {
-            architecture 'x86'
-        }
-        x64 {
-            architecture 'x86_64'
-        }
-    }
-    components {
-        gmock(NativeLibrarySpec) {
-            targetPlatform 'x86'
-            targetPlatform 'x64'
-            sources {
-                cpp {
-                    source {
-                        srcDirs = ['src', 'gtest/src']
-                        includes = ['*-all.cc']
-                    }
-                    exportedHeaders {
-                        srcDirs = ['include', 'gtest/include', '.', 'gtest']
-                        includes = ['**/*.h', '**/*.cc']
+    apply from: '../config.gradle'
+
+    model {
+        components {
+            gmock(NativeLibrarySpec) {
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ['src', 'gtest/src']
+                            includes = ['*-all.cc']
+                        }
+                        exportedHeaders {
+                            srcDirs = ['include', 'gtest/include', '.', 'gtest']
+                            includes = ['**/*.h', '**/*.cc']
+                        }
                     }
                 }
-            }
-            binaries.all {
-                if (toolChain in VisualCpp) {
-                    cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32',  '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
-                } else {
-                    cppCompiler.args '-Wall', '-Wshadow', '-fexceptions', '-Wextra', '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-pthread', '-fPIC'
+                binaries.all {
+                    if (toolChain in VisualCpp) {
+                        cppCompiler.args '-D_UNICODE', '-DUNICODE', '-DWIN32',  '-D_WIN32', '-DSTRICT', '-DWIN32_LEAN_AND_MEAN', '-D_HAS_EXCEPTIONS=1'
+                    } else {
+                        cppCompiler.args '-Wall', '-Wshadow', '-fexceptions', '-Wextra', '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-pthread', '-fPIC'
+                    }
+                }
+                binaries.withType(SharedLibraryBinarySpec) {
+                    buildable = false
                 }
             }
         }

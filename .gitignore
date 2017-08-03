@@ -41,7 +41,7 @@
 
 # Build directories
 /.gradle
-/build*
+/build/
 !build.gradle
 /native
 /arm

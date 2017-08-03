@@ -1,74 +1,201 @@
+import edu.wpi.first.nativeutils.NativeUtils
+import org.gradle.api.file.FileCollection
 import org.gradle.internal.os.OperatingSystem
+import edu.wpi.first.nativeutils.tasks.JNIHeaders
 
 buildscript {
     repositories {
+        mavenLocal()
         maven {
             url "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
-        classpath 'net.ltgt.gradle:gradle-errorprone-plugin:0.0.8'
+        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.2.9'
         classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:1.6'
     }
 }
 
-ext.buildArm = !project.hasProperty('skipArm')
-ext.includeJava = !project.hasProperty('skipJava')
-
-if (hasProperty('makeDesktop')) {
-    println 'Making desktop classifier jar. NOTE: This desktop version should only be used for local testing.' +
-            'It will only support the current platform, and will override fetching the latest development version from' +
-            ' the maven repo until you manually delete it!'
+repositories {
+    mavenCentral()
 }
 
-ext.getPlatformPath = { binary ->
-    if (binary.targetPlatform.architecture.arm) {
-        return 'Linux/arm'
-    } else if (binary.targetPlatform.operatingSystem.linux) {
-        if (binary.targetPlatform.architecture.amd64) {
-            return 'Linux/amd64'
-        } else {
-            return 'Linux/i386'
+ext.getClassifier = { binary->
+    return NativeUtils.getClassifier(binary)
+}
+
+ext.getPlatformPath = { binary->
+    return NativeUtils.getPlatformPath(binary)
+}
+
+ext.getJNIHeadersClass = {
+    return JNIHeaders
+}
+
+apply plugin: 'cpp'
+apply plugin: 'google-test'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'java'
+
+apply from: 'config.gradle'
+
+if (project.hasProperty('onlyAthena')) {
+    test.enabled = false
+}
+
+task nativeTestFilesJar(type: Jar) {
+    destinationDir = project.buildDir
+    classifier = "nativeTestFiles"
+
+    project.model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { binary ->
+                if (binary.component.name == 'ntcoreJNI') {
+                    from(binary.sharedLibraryFile) {
+                        into NativeUtils.getPlatformPath(binary)
+                    }
+                }
+            }
         }
-    } else if (binary.targetPlatform.operatingSystem.windows) {
-        if (binary.targetPlatform.architecture.amd64) {
-            return 'Windows/amd64'
-        } else {
-            return 'Windows/' + binary.targetPlatform.architecture.name
-        }
-    } else if (binary.targetPlatform.operatingSystem.macOsX) {
-        if (binary.targetPlatform.architecture.amd64) {
-            return 'Mac OS X/x86_64'
-        } else {
-            return 'Mac OS X/' + binary.targetPlatform.architecture.name
-        }
-    } else {
-        return binary.targetPlatform.operatingSystem.name + '/' + binary.targetPlatform.architecture.name
     }
 }
 
-ext.setupDefines = { project, binaries ->
-    binaries.all {
-	if (project.hasProperty('debug')) {
-	    project.setupDebugDefines(cppCompiler, linker)
-	} else {
-	    project.setupReleaseDefines(cppCompiler, linker)
-	}
-    }
+test.dependsOn nativeTestFilesJar
+
+dependencies {
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    runtime 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    testCompile 'junit:junit:4.12'
+    testRuntime files(project(':').nativeTestFilesJar.archivePath)
 }
 
-apply from: "ntcore.gradle"
-apply from: "wpiutil.gradle"
 
-// Empty task for build so that ntcoreSourceZip and wpiutilSourceZip will be
-// built when running ./gradlew build
-task build
-
-build.dependsOn ntcoreSourceZip
-build.dependsOn wpiutilSourceZip
+model {
+    jniConfigs {
+        ntcore(JNIConfig) {
+            jniDefinitionClasses = [ "edu.wpi.first.wpilibj.networktables.NetworkTablesJNI" ]
+            jniArmHeaderLocations = [ all: file("${rootDir}/src/arm-linux-jni") ]
+            sourceSets = [ project.sourceSets.main ]
+        }
+        ntcoreJNI(JNIConfig) {
+            jniDefinitionClasses = [ "edu.wpi.first.wpilibj.networktables.NetworkTablesJNI" ]
+            jniArmHeaderLocations = [ all: file("${rootDir}/src/arm-linux-jni") ]
+            sourceSets = [ project.sourceSets.main ]
+        }
+    }
+    exportsConfigs {
+        ntcore(ExportsConfig) {
+            x86ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                  '_CT??_R0?AVbad_cast',
+                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                  '_TI5?AVfailure' ]
+            x64ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                  '_CT??_R0?AVbad_cast',
+                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                  '_TI5?AVfailure' ]
+        }
+        ntcoreJNI(ExportsConfig) {
+            x86SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('NT_') || symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+            x64SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('NT_') || symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+        }
+    }
+    dependencyConfigs {
+        wpiutil(DependencyConfig) {
+            groupId = 'edu.wpi.first.wpiutil'
+            artifactId = 'wpiutil-cpp'
+            headerClassifier = 'headers'
+            ext = 'zip'
+            version = '+'
+            sharedConfigs = [ ntcore: [],
+                              ntcoreExe: [],
+                              ntcoreTestingBaseTest: [] ]
+            staticConfigs = [ ntcoreJNI: [] ]
+        }
+    }
+    components {
+        ntcore(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+        }
+        ntcoreJNI(NativeLibrarySpec) {
+            baseName = 'ntcore'
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
+                }
+            }
+        }
+        if (!project.hasProperty('skipTestExe')) {
+            ntcoreExe(NativeExecutableSpec) {
+                sources {
+                    cpp {
+                        lib library: "ntcore"
+                    }
+                }
+            }
+        }
+        ntcoreTestingBase(NativeLibrarySpec) { }
+    }
+    testSuites {
+        ntcoreTestingBaseTest {
+            sources {
+                cpp.source.srcDir 'src/test/native/cpp'
+                cpp.exportedHeaders.srcDir 'src/test/native/include'
+            }
+        }
+    }
+    binaries {
+        withType(StaticLibraryBinarySpec) {
+            if (it.component.name == 'ntcoreJNI') {
+                it.buildable = false
+            }
+        }
+        withType(GoogleTestTestSuiteBinarySpec) {
+            if (it.component.testedComponent.name.contains('TestingBase') && !project.hasProperty('onlyAthena')) {
+                lib project: ':gmock', library: 'gmock', linkage: 'static'
+                lib library: 'ntcore', linkage: 'shared'
+                NativeUtils.setPlatformSpecificIncludeFlag("${rootDir}/src/main/native/cpp".toString(), cppCompiler)
+            } else {
+                it.buildable = false
+            }
+        }
+    }
+}
 
 apply from: 'publish.gradle'
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.3'
+    gradleVersion = '4.0.2'
 }

@@ -7,7 +7,6 @@ matrix:
       sudo: required
     - os: osx
       osx_image: xcode8
-      env: WPILIB_FLAGS=-PskipArm
 
 addons:
   apt:
@@ -19,10 +18,10 @@ before_install:
   - .travis-scripts/install.sh
 
 install:
-  - ./gradlew assemble $WPILIB_FLAGS
+  - ./gradlew build -PbuildAll
 
 script:
-  - ./gradlew build $WPILIB_FLAGS
+  - ./gradlew build -PbuildAll
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
