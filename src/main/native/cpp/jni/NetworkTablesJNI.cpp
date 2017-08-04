@@ -28,7 +28,6 @@ static JClass booleanCls;
 static JClass doubleCls;
 static JClass connectionInfoCls;
 static JClass entryInfoCls;
-static JException keyNotDefinedEx;
 static JException persistentEx;
 static JException illegalArgEx;
 static JException nullPointerEx;
@@ -78,10 +77,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   entryInfoCls = JClass(env, "edu/wpi/first/wpilibj/networktables/EntryInfo");
   if (!entryInfoCls) return JNI_ERR;
 
-  keyNotDefinedEx = JException(
-      env, "edu/wpi/first/wpilibj/networktables/NetworkTableKeyNotDefined");
-  if (!keyNotDefinedEx) return JNI_ERR;
-
   persistentEx = JException(
       env, "edu/wpi/first/wpilibj/networktables/PersistentException");
   if (!persistentEx) return JNI_ERR;
@@ -108,7 +103,6 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   doubleCls.free(env);
   connectionInfoCls.free(env);
   entryInfoCls.free(env);
-  keyNotDefinedEx.free(env);
   persistentEx.free(env);
   illegalArgEx.free(env);
   nullPointerEx.free(env);
@@ -641,169 +635,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 /*
  * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Method:    getValue
- * Signature: (Ljava/lang/String;)Ljava/lang/Object;
- */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return nullptr;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val) {
-    keyNotDefinedEx.Throw(env, key);
-    return nullptr;
-  }
-  return MakeJObject(env, *val);
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getBoolean
- * Signature: (Ljava/lang/String;)Z
- */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBoolean__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return false;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val || !val->IsBoolean()) {
-    keyNotDefinedEx.Throw(env, key);
-    return false;
-  }
-  return val->GetBoolean();
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getDouble
- * Signature: (Ljava/lang/String;)D
- */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDouble__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return 0;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val || !val->IsDouble()) {
-    keyNotDefinedEx.Throw(env, key);
-    return 0;
-  }
-  return val->GetDouble();
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getString
- * Signature: (Ljava/lang/String;)Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getString__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return nullptr;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val || !val->IsString()) {
-    keyNotDefinedEx.Throw(env, key);
-    return nullptr;
-  }
-  return MakeJString(env, val->GetString());
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getRaw
- * Signature: (Ljava/lang/String;)[B
- */
-JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRaw__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return nullptr;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val || !val->IsRaw()) {
-    keyNotDefinedEx.Throw(env, key);
-    return nullptr;
-  }
-  return MakeJByteArray(env, val->GetRaw());
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getBooleanArray
- * Signature: (Ljava/lang/String;)[Z
- */
-JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBooleanArray__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return nullptr;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val || !val->IsBooleanArray()) {
-    keyNotDefinedEx.Throw(env, key);
-    return nullptr;
-  }
-  return MakeJBooleanArray(env, val->GetBooleanArray());
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getDoubleArray
- * Signature: (Ljava/lang/String;)[D
- */
-JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDoubleArray__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return nullptr;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val || !val->IsDoubleArray()) {
-    keyNotDefinedEx.Throw(env, key);
-    return nullptr;
-  }
-  return MakeJDoubleArray(env, val->GetDoubleArray());
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getStringArray
- * Signature: (Ljava/lang/String;)[Ljava/lang/String;
- */
-JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getStringArray__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return nullptr;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val || !val->IsStringArray()) {
-    keyNotDefinedEx.Throw(env, key);
-    return nullptr;
-  }
-  return MakeJStringArray(env, val->GetStringArray());
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getValue
  * Signature: (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
  */
-JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue__Ljava_lang_String_2Ljava_lang_Object_2
+JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getValue
   (JNIEnv *env, jclass, jstring key, jobject defaultValue)
 {
   if (!key) {
@@ -820,7 +654,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
  * Method:    getBoolean
  * Signature: (Ljava/lang/String;Z)Z
  */
-JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBoolean__Ljava_lang_String_2Z
+JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBoolean
   (JNIEnv *env, jclass, jstring key, jboolean defaultValue)
 {
   if (!key) {
@@ -837,7 +671,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTable
  * Method:    getDouble
  * Signature: (Ljava/lang/String;D)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDouble__Ljava_lang_String_2D
+JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDouble
   (JNIEnv *env, jclass, jstring key, jdouble defaultValue)
 {
   if (!key) {
@@ -854,7 +688,7 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
  * Method:    getString
  * Signature: (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getString__Ljava_lang_String_2Ljava_lang_String_2
+JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getString
   (JNIEnv *env, jclass, jstring key, jstring defaultValue)
 {
   if (!key) {
@@ -871,7 +705,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTables
  * Method:    getRaw
  * Signature: (Ljava/lang/String;[B)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRaw__Ljava_lang_String_2_3B
+JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRaw
   (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
 {
   if (!key) {
@@ -888,7 +722,7 @@ JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTab
  * Method:    getBooleanArray
  * Signature: (Ljava/lang/String;[Z)[Z
  */
-JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBooleanArray__Ljava_lang_String_2_3Z
+JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getBooleanArray
   (JNIEnv *env, jclass, jstring key, jbooleanArray defaultValue)
 {
   if (!key) {
@@ -905,7 +739,7 @@ JNIEXPORT jbooleanArray JNICALL Java_edu_wpi_first_wpilibj_networktables_Network
  * Method:    getDoubleArray
  * Signature: (Ljava/lang/String;[D)[D
  */
-JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDoubleArray__Ljava_lang_String_2_3D
+JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getDoubleArray
   (JNIEnv *env, jclass, jstring key, jdoubleArray defaultValue)
 {
   if (!key) {
@@ -922,7 +756,7 @@ JNIEXPORT jdoubleArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkT
  * Method:    getStringArray
  * Signature: (Ljava/lang/String;[Ljava/lang/String;)[Ljava/lang/String;
  */
-JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getStringArray__Ljava_lang_String_2_3Ljava_lang_String_2
+JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getStringArray
   (JNIEnv *env, jclass, jstring key, jobjectArray defaultValue)
 {
   if (!key) {
@@ -1297,29 +1131,9 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
 /*
  * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
  * Method:    getRpc
- * Signature: (Ljava/lang/String;)[B
- */
-JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRpc__Ljava_lang_String_2
-  (JNIEnv *env, jclass, jstring key)
-{
-  if (!key) {
-    nullPointerEx.Throw(env, "key cannot be null");
-    return nullptr;
-  }
-  auto val = nt::GetEntryValue(JStringRef{env, key});
-  if (!val || !val->IsRpc()) {
-    keyNotDefinedEx.Throw(env, key);
-    return nullptr;
-  }
-  return MakeJByteArray(env, val->GetRpc());
-}
-
-/*
- * Class:     edu_wpi_first_wpilibj_networktables_NetworkTablesJNI
- * Method:    getRpc
  * Signature: (Ljava/lang/String;[B)[B
  */
-JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRpc__Ljava_lang_String_2_3B
+JNIEXPORT jbyteArray JNICALL Java_edu_wpi_first_wpilibj_networktables_NetworkTablesJNI_getRpc
   (JNIEnv *env, jclass, jstring key, jbyteArray defaultValue)
 {
   if (!key) {

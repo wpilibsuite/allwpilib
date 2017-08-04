@@ -163,21 +163,6 @@ class ITable {
    * Gets the number associated with the given name.
    *
    * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method.
-   */
-  WPI_DEPRECATED(
-      "Raises an exception if key not found; "
-      "use GetNumber(StringRef key, double defaultValue) instead")
-  virtual double GetNumber(llvm::StringRef key) const = 0;
-
-  /**
-   * Gets the number associated with the given name.
-   *
-   * @param key the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
    * if there is no value associated with the key
@@ -201,21 +186,6 @@ class ITable {
    */
   virtual bool SetDefaultString(llvm::StringRef key,
                                 llvm::StringRef defaultValue) = 0;
-
-  /**
-   * Gets the string associated with the given name.
-   *
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method.
-   */
-  WPI_DEPRECATED(
-      "Raises an exception if key not found; "
-      "use GetString(StringRef key, StringRef defaultValue) instead")
-  virtual std::string GetString(llvm::StringRef key) const = 0;
 
   /**
    * Gets the string associated with the given name. If the key does not
@@ -248,21 +218,6 @@ class ITable {
    * @returns False if the table key exists with a different type
    */
   virtual bool SetDefaultBoolean(llvm::StringRef key, bool defaultValue) = 0;
-
-  /**
-   * Gets the boolean associated with the given name.
-   *
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method.
-   */
-  WPI_DEPRECATED(
-      "Raises an exception if key not found; "
-      "use GetBoolean(StringRef key, bool defaultValue) instead")
-  virtual bool GetBoolean(llvm::StringRef key) const = 0;
 
   /**
    * Gets the boolean associated with the given name. If the key does not

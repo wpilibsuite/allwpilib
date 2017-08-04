@@ -1,7 +1,6 @@
 package edu.wpi.first.wpilibj.tables;
 
 import java.nio.ByteBuffer;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 
@@ -110,22 +109,6 @@ public interface ITable {
   public void delete(String key);
 
   /**
-   * Gets the value associated with a key as an object. If the key does not
-   * exist, it will return the default value
-   * NOTE: If the value is a double, it will return a Double object,
-   * not a primitive.  To get the primitive, use
-   * {@link #getDouble(String, double)}.
-   * @param key the key of the value to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getValue(String, Object)}.
-   */
-  @Deprecated
-  public Object getValue(String key) throws TableKeyNotDefinedException;
-
-  /**
    * Gets the value associated with a key as an object.
    * NOTE: If the value is a double, it will return a Double object,
    * not a primitive.  To get the primitive, use
@@ -148,17 +131,6 @@ public interface ITable {
       throws IllegalArgumentException;
 
   /**
-   * Retrieve an array data type from the table.
-   * @param key the key to be assigned to
-   * @param externalValue the array data type to retreive into
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated Use get*Array functions instead.
-   */
-  @Deprecated
-  public void retrieveValue(String key, Object externalValue) throws TableKeyNotDefinedException;
-
-  /**
    * Put a number in the table
    * @param key the key to be assigned to
    * @param value the value that will be assigned
@@ -174,17 +146,6 @@ public interface ITable {
    */
   public boolean setDefaultNumber(String key, double defaultValue);
   
-  /**
-   * Returns the number the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getNumber(String, double)}.
-   */
-  @Deprecated
-  public double getNumber(String key) throws TableKeyNotDefinedException;
   /**
    * Returns the number the key maps to. If the key does not exist or is of
    * different type, it will return the default value.
@@ -212,17 +173,6 @@ public interface ITable {
   public boolean setDefaultString(String key, String defaultValue);
   
   /**
-   * Returns the string the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getString(String, String)}.
-   */
-  @Deprecated
-  public String getString(String key) throws TableKeyNotDefinedException;
-  /**
    * Returns the string the key maps to. If the key does not exist or is of
    * different type, it will return the default value.
    * @param key the key to look up
@@ -248,17 +198,6 @@ public interface ITable {
    */
   public boolean setDefaultBoolean(String key, boolean defaultValue);
   
-  /**
-   * Returns the boolean the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getBoolean(String, boolean)}.
-   */
-  @Deprecated
-  public boolean getBoolean(String key) throws TableKeyNotDefinedException;
   /**
    * Returns the boolean the key maps to. If the key does not exist or is of
    * different type, it will return the default value.
@@ -301,17 +240,6 @@ public interface ITable {
    */
   public boolean setDefaultBooleanArray(String key, Boolean[] defaultValue);
   
-  /**
-   * Returns the boolean array the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getBooleanArray(String, boolean[])}.
-   */
-  @Deprecated
-  public boolean[] getBooleanArray(String key) throws TableKeyNotDefinedException;
   /**
    * Returns the boolean array the key maps to. If the key does not exist or is
    * of different type, it will return the default value.
@@ -364,17 +292,6 @@ public interface ITable {
   public boolean setDefaultNumberArray(String key, Double[] defaultValue);
   
   /**
-   * Returns the number array the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getNumberArray(String, double[])}.
-   */
-  @Deprecated
-  public double[] getNumberArray(String key) throws TableKeyNotDefinedException;
-  /**
    * Returns the number array the key maps to. If the key does not exist or is
    * of different type, it will return the default value.
    * @param key the key to look up
@@ -410,17 +327,6 @@ public interface ITable {
   public boolean setDefaultStringArray(String key, String[] defaultValue);
   
   /**
-   * Returns the string array the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getStringArray(String, String[])}.
-   */
-  @Deprecated
-  public String[] getStringArray(String key) throws TableKeyNotDefinedException;
-  /**
    * Returns the string array the key maps to. If the key does not exist or is
    * of different type, it will return the default value.
    * @param key the key to look up
@@ -454,17 +360,7 @@ public interface ITable {
    * @return False if the table key already exists with a different type
    */
   public boolean putRaw(String key, ByteBuffer value, int len);
-  /**
-   * Returns the raw value (byte array) the key maps to.
-   * @param key the key to look up
-   * @return the value associated with the given key
-   * @throws TableKeyNotDefinedException if there is no value associated with
-   * the given key
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getRaw(String, byte[])}.
-   */
-  @Deprecated
-  public byte[] getRaw(String key) throws TableKeyNotDefinedException;
+
   /**
    * Returns the raw value (byte array) the key maps to. If the key does not
    * exist or is of different type, it will return the default value.
@@ -555,63 +451,7 @@ public interface ITable {
    * @deprecated Use {@link #putNumber(String, double)} instead.
    */
   @Deprecated
-  public boolean putInt(String key, int value);
-
-  /**
-   * Returns the value at the specified key.
-   * @param key the key
-   * @return the value
-   * @throws TableKeyNotDefinedException if there is no value mapped to by the
-   * key
-   * @throws IllegalArgumentException if the value mapped to by the key is not
-   * an int
-   * @throws IllegalArgumentException if the key is null
-   * @deprecated Use {@link #getNumber(String, double)} instead.
-   */
-  @Deprecated
-  public int getInt(String key) throws TableKeyNotDefinedException;
-
-  /**
-   * Returns the value at the specified key.
-   * @param key the key
-   * @param defaultValue the value returned if the key is undefined
-   * @return the value
-   * @throws IllegalArgumentException if the value mapped to by the key is not
-   * an int
-   * @throws IllegalArgumentException if the key is null
-   * @deprecated Use {@link #getNumber(String, double)} instead.
-   */
-  @Deprecated
-  public int getInt(String key, int defaultValue)
-      throws TableKeyNotDefinedException;
-
-  /**
-   * Maps the specified key to the specified value in this table.
-   * The key can not be null.
-   * The value can be retrieved by calling the get method with a key that is
-   * equal to the original key.
-   * @param key the key
-   * @param value the value
-   * @return False if the table key already exists with a different type
-   * @throws IllegalArgumentException if key is null
-   * @deprecated Use {@link #putNumber(String, double)} instead.
-   */
-  @Deprecated
   public boolean putDouble(String key, double value);
-
-  /**
-   * Returns the value at the specified key.
-   * @param key the key
-   * @return the value
-   * @throws TableKeyNotDefinedException if there is no
-   * value mapped to by the key
-   * @throws IllegalArgumentException if the value mapped to by the key is not a
-   * double
-   * @throws IllegalArgumentException if the key is null
-   * @deprecated Use {@link #getNumber(String, double)} instead.
-   */
-  @Deprecated
-  public double getDouble(String key) throws TableKeyNotDefinedException;
 
   /**
    * Returns the value at the specified key.

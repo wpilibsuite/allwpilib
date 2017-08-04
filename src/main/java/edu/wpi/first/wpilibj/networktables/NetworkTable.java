@@ -564,17 +564,6 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * {@inheritDoc}
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getNumber(String, double)}.
-   */
-  @Override
-  @Deprecated
-  public double getNumber(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getDouble(pathWithSep + key);
-  }
-
-  /**
-   * {@inheritDoc}
    */
   @Override
   public double getNumber(String key, double defaultValue) {
@@ -599,17 +588,6 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * {@inheritDoc}
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getString(String, String)}.
-   */
-  @Override
-  @Deprecated
-  public String getString(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getString(pathWithSep + key);
-  }
-
-  /**
-   * {@inheritDoc}
    */
   @Override
   public String getString(String key, String defaultValue) {
@@ -630,17 +608,6 @@ public class NetworkTable implements ITable, IRemote {
   public boolean setDefaultBoolean(String key, boolean defaultValue) {
     return NetworkTablesJNI.setDefaultBoolean(pathWithSep + key,
                                               defaultValue);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getBoolean(String, boolean)}.
-   */
-  @Override
-  @Deprecated
-  public boolean getBoolean(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getBoolean(pathWithSep + key);
   }
 
   /**
@@ -685,17 +652,6 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * {@inheritDoc}
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getBooleanArray(String, boolean[])}.
-   */
-  @Override
-  @Deprecated
-  public boolean[] getBooleanArray(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getBooleanArray(pathWithSep + key);
-  }
-
-  /**
-   * {@inheritDoc}
    */
   @Override
   public boolean[] getBooleanArray(String key, boolean[] defaultValue) {
@@ -707,11 +663,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public Boolean[] getBooleanArray(String key, Boolean[] defaultValue) {
-    try {
-      return fromNative(getBooleanArray(key));
-    } catch (TableKeyNotDefinedException e) {
-      return defaultValue;
-    }
+    return fromNative(getBooleanArray(key, toNative(defaultValue)));
   }
 
   /**
@@ -748,17 +700,6 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * {@inheritDoc}
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getNumberArray(String, double[])}.
-   */
-  @Override
-  @Deprecated
-  public double[] getNumberArray(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getDoubleArray(pathWithSep + key);
-  }
-
-  /**
-   * {@inheritDoc}
    */
   @Override
   public double[] getNumberArray(String key, double[] defaultValue) {
@@ -770,11 +711,7 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   public Double[] getNumberArray(String key, Double[] defaultValue) {
-    try {
-      return fromNative(getNumberArray(key));
-    } catch (TableKeyNotDefinedException e) {
-      return defaultValue;
-    }
+    return fromNative(getNumberArray(key, toNative(defaultValue)));
   }
 
   /**
@@ -793,17 +730,6 @@ public class NetworkTable implements ITable, IRemote {
                                                   defaultValue);
   }
   
-  /**
-   * {@inheritDoc}
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getStringArray(String, String[])}.
-   */
-  @Override
-  @Deprecated
-  public String[] getStringArray(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getStringArray(pathWithSep + key);
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -838,17 +764,6 @@ public class NetworkTable implements ITable, IRemote {
     if (value.capacity() < len)
       throw new IllegalArgumentException("buffer is too small, must be at least " + len);
     return NetworkTablesJNI.putRaw(pathWithSep + key, value, len);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getRaw(String, byte[])}.
-   */
-  @Override
-  @Deprecated
-  public byte[] getRaw(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getRaw(pathWithSep + key);
   }
 
   /**
@@ -890,35 +805,6 @@ public class NetworkTable implements ITable, IRemote {
       return NetworkTablesJNI.putStringArray(pathWithSep + key, (String[])((ArrayData)value).getDataArray());
     else
       throw new IllegalArgumentException("Value of type " + value.getClass().getName() + " cannot be put into a table");
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated Use get*Array functions instead.
-   */
-  @Override
-  @Deprecated
-  public void retrieveValue(String key, Object externalData) throws TableKeyNotDefinedException {
-    Object value = getValue(key);
-    if (value instanceof boolean[] && externalData instanceof BooleanArray)
-      ((ArrayData)externalData).setDataArray(fromNative((boolean[])value));
-    else if (value instanceof double[] && externalData instanceof NumberArray)
-      ((ArrayData)externalData).setDataArray(fromNative((double[])value));
-    else if (value instanceof String[] && externalData instanceof StringArray)
-      ((ArrayData)externalData).setDataArray((String[])value);
-    else
-      throw new TableKeyNotDefinedException(key);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated This exception-raising method has been replaced by the
-   * default-taking method {@link #getValue(String, Object)}.
-   */
-  @Override
-  @Deprecated
-  public Object getValue(String key) throws TableKeyNotDefinedException {
-    return NetworkTablesJNI.getValue(pathWithSep + key);
   }
 
   /**
@@ -1045,52 +931,8 @@ public class NetworkTable implements ITable, IRemote {
    */
   @Override
   @Deprecated
-  public boolean putInt(String key, int value) {
-    return putNumber(key, value);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated Use {@link #getNumber(String, double)} instead.
-   */
-  @Override
-  @Deprecated
-  public int getInt(String key) throws TableKeyNotDefinedException {
-    return (int)getNumber(key);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated Use {@link #getNumber(String, double)} instead.
-   */
-  @Override
-  @Deprecated
-  public int getInt(String key, int defaultValue) throws TableKeyNotDefinedException {
-    try {
-      return (int)getNumber(key);
-    } catch (NoSuchElementException ex) {
-      return defaultValue;
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated Use {@link #putNumber(String, double)} instead.
-   */
-  @Override
-  @Deprecated
   public boolean putDouble(String key, double value) {
     return putNumber(key, value);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @deprecated Use {@link #getNumber(String, double)} instead.
-   */
-  @Override
-  @Deprecated
-  public double getDouble(String key) throws TableKeyNotDefinedException {
-    return getNumber(key);
   }
 
   /**

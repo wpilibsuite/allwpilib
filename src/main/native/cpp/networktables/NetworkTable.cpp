@@ -6,7 +6,6 @@
 #include "llvm/SmallString.h"
 #include "llvm/StringMap.h"
 #include "tables/ITableListener.h"
-#include "tables/TableKeyNotDefinedException.h"
 #include "ntcore.h"
 
 using llvm::StringRef;
@@ -365,16 +364,6 @@ bool NetworkTable::SetDefaultNumber(StringRef key, double defaultValue) {
   return nt::SetDefaultEntryValue(path, nt::Value::MakeDouble(defaultValue));
 }
 
-double NetworkTable::GetNumber(StringRef key) const {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  path += key;
-  auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_DOUBLE)
-    throw TableKeyNotDefinedException(path);
-  return value->GetDouble();
-}
-
 double NetworkTable::GetNumber(StringRef key, double defaultValue) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
@@ -396,16 +385,6 @@ bool NetworkTable::SetDefaultString(StringRef key, StringRef defaultValue) {
   path += PATH_SEPARATOR_CHAR;
   path += key;
   return nt::SetDefaultEntryValue(path, nt::Value::MakeString(defaultValue));
-}
-
-std::string NetworkTable::GetString(StringRef key) const {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  path += key;
-  auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_STRING)
-    throw TableKeyNotDefinedException(path);
-  return value->GetString();
 }
 
 std::string NetworkTable::GetString(StringRef key,
@@ -430,16 +409,6 @@ bool NetworkTable::SetDefaultBoolean(StringRef key, bool defaultValue) {
   path += PATH_SEPARATOR_CHAR;
   path += key;
   return nt::SetDefaultEntryValue(path, nt::Value::MakeBoolean(defaultValue));
-}
-
-bool NetworkTable::GetBoolean(StringRef key) const {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  path += key;
-  auto value = nt::GetEntryValue(path);
-  if (!value || value->type() != NT_BOOLEAN)
-    throw TableKeyNotDefinedException(path);
-  return value->GetBoolean();
 }
 
 bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {

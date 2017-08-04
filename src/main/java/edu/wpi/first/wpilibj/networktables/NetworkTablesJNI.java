@@ -1,7 +1,5 @@
 package edu.wpi.first.wpilibj.networktables;
 
-import edu.wpi.first.wpilibj.tables.*;
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -83,15 +81,6 @@ public class NetworkTablesJNI {
   public static native void forcePutDoubleArray(String key, double[] value);
   public static native void forcePutStringArray(String key, String[] value);
 
-  public static native Object getValue(String key) throws TableKeyNotDefinedException;
-  public static native boolean getBoolean(String key) throws TableKeyNotDefinedException;
-  public static native double getDouble(String key) throws TableKeyNotDefinedException;
-  public static native String getString(String key) throws TableKeyNotDefinedException;
-  public static native byte[] getRaw(String key) throws TableKeyNotDefinedException;
-  public static native boolean[] getBooleanArray(String key) throws TableKeyNotDefinedException;
-  public static native double[] getDoubleArray(String key) throws TableKeyNotDefinedException;
-  public static native String[] getStringArray(String key) throws TableKeyNotDefinedException;
-
   public static native Object getValue(String key, Object defaultValue);
   public static native boolean getBoolean(String key, boolean defaultValue);
   public static native double getDouble(String key, double defaultValue);
@@ -135,7 +124,6 @@ public class NetworkTablesJNI {
 
   // public static native void createRpc(String key, byte[] def, IRpc rpc);
   // public static native void createRpc(String key, ByteBuffer def, int def_len, IRpc rpc);
-  public static native byte[] getRpc(String key) throws TableKeyNotDefinedException;
   public static native byte[] getRpc(String key, byte[] defaultValue);
   public static native int callRpc(String key, byte[] params);
   public static native int callRpc(String key, ByteBuffer params, int params_len);
