@@ -10,6 +10,7 @@
 #include "ntcore.h"
 
 using llvm::StringRef;
+using nt::NetworkTable;
 
 const char NetworkTable::PATH_SEPARATOR_CHAR = '/';
 std::string NetworkTable::s_persistent_filename = "networktables.ini";

@@ -14,6 +14,8 @@
 
 #include "tables/ITable.h"
 
+namespace nt {
+
 /**
  * A network table that knows its subtable path.
  */
@@ -543,7 +545,7 @@ class NetworkTable : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutValue(llvm::StringRef key, std::shared_ptr<nt::Value> value) override;
+  bool PutValue(llvm::StringRef key, std::shared_ptr<Value> value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -552,7 +554,7 @@ class NetworkTable : public ITable {
    * @returns False if the table key exists with a different type
    */
   virtual bool SetDefaultValue(
-      llvm::StringRef key, std::shared_ptr<nt::Value> defaultValue) override;
+      llvm::StringRef key, std::shared_ptr<Value> defaultValue) override;
 
   /**
    * Gets the value associated with a key as an object
@@ -561,12 +563,19 @@ class NetworkTable : public ITable {
    * @return the value associated with the given key, or nullptr if the key
    * does not exist
    */
-  std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const override;
+  std::shared_ptr<Value> GetValue(llvm::StringRef key) const override;
 
   /**
    * Gets the full path of this table.
    */
   llvm::StringRef GetPath() const override;
 };
+
+}  // namespace nt
+
+// For backwards compatability
+#ifndef NAMESPACED_NT
+using nt::NetworkTable;  // NOLINT
+#endif
 
 #endif  // NETWORKTABLE_H_
