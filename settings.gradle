@@ -1,0 +1,8 @@
+include 'gmock'
+include 'ni-libraries'
+include 'hal'
+include 'wpilibc'
+include 'wpilibj'
+include 'wpilibc-examples'
+include 'wpilibcIntegrationTests'
+include 'wpilibjIntegrationTests'

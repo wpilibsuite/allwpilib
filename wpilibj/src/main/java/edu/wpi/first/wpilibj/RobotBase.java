@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
-import org.opencv.core.Core;
+//import org.opencv.core.Core;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
@@ -181,6 +181,7 @@ public abstract class RobotBase {
     RobotState.SetImplementation(DriverStation.getInstance());
 
     // Load opencv
+    /* TODO (after opencv is added again)
     try {
       System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     } catch (UnsatisfiedLinkError ex) {
@@ -188,6 +189,7 @@ public abstract class RobotBase {
       System.out.println("Please try redeploying, or reimage your roboRIO and try again.");
       ex.printStackTrace();
     }
+    */
   }
 
   /**

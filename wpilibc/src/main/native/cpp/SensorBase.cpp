@@ -7,7 +7,6 @@
 
 #include "SensorBase.h"
 
-#include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/AnalogOutput.h"
 #include "HAL/DIO.h"

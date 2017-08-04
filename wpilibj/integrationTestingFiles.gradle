@@ -1,0 +1,44 @@
+def testBuildOutput = project(':wpilibjIntegrationTests').buildDir
+
+model {
+    tasks {
+        def bin = $.binaries
+        copyWpilibJTestLibrariesToOutput(Task) {
+            bin.each {
+                if (it in SharedLibraryBinarySpec && it.component.name == 'wpilibJNIShared' && getClassifier(it) == 'linuxathena') {
+                    def spec = it
+                    dependsOn spec.buildTask
+                }
+            }
+            def wpilibCTask = project(':wpilibcIntegrationTests').tasks.getByPath('copyWpilibCTestLibrariesToOutput')
+            def destDir = "$testBuildOutput/testFiles";
+            outputs.file destDir
+            outputs.upToDateWhen { false }
+
+            doLast {
+
+
+                bin.each {
+                    if (it in SharedLibraryBinarySpec && it.component.name == 'wpilibJNIShared' && getClassifier(it) == 'linuxathena') {
+                        def spec = it
+                        copy {
+                            from spec.sharedLibraryFile
+                            into destDir + '/libs'
+                        }
+                    }
+                }
+
+                wpilibCTask.outputs.files.each { file ->
+                    copy {
+                        from files(file)
+                        into destDir + '/'
+                        exclude 'FRCUserProgram'
+                        exclude 'libwpilibc.so'
+                    }
+                }
+            }
+            dependsOn wpilibCTask
+        }
+        build.dependsOn copyWpilibJTestLibrariesToOutput
+    }
+}
