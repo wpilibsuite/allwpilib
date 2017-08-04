@@ -55,6 +55,7 @@ task nativeTestFilesJar(type: Jar) {
                     from(binary.sharedLibraryFile) {
                         into NativeUtils.getPlatformPath(binary)
                     }
+                    dependsOn binary.buildTask
                 }
             }
         }
