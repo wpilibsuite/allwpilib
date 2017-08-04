@@ -7,7 +7,11 @@
 
 #include <iostream>
 
+#include "HAL/HAL.h"
+#include "WPILibVersion.h"
+
 int main() {
   std::cout << "Hello World" << std::endl;
-  return 0;
+  std::cout << HAL_GetRuntimeType() << std::endl;
+  std::cout << WPILibVersion << std::endl;
 }

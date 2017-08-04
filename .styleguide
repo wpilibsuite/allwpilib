@@ -17,9 +17,9 @@ otherExtensions {
 genFolderExclude {
   FRC_FPGA_ChipObject
   NetworkCommunication
-  gmock
   ctre
   frccansae
+  gmock
   gtest
   i2clib
   msgs
@@ -34,13 +34,12 @@ genFileExclude {
   NIIMAQdx\.h$
   can_proto\.h$
   nivision\.h$
-  UsageReporting.h
+  UsageReporting\.h$
 }
 
 modifiableFolderExclude {
   \.git
   wpilibj/src/arm-linux-jni
-  wpilibj/src/arm-linux-jni/linux
   wpilibj/src/main/native/cpp
 }
 
