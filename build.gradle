@@ -162,6 +162,13 @@ model {
                 sources {
                     cpp {
                         lib library: "ntcore"
+                        source {
+                            srcDirs 'src/dev/native/cpp'
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/dev/native/include'
+                        }
                     }
                 }
             }
