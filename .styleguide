@@ -17,6 +17,7 @@ otherExtensions {
 genFolderExclude {
   FRC_FPGA_ChipObject
   NetworkCommunication
+  gmock
   ctre
   frccansae
   gtest
@@ -33,12 +34,14 @@ genFileExclude {
   NIIMAQdx\.h$
   can_proto\.h$
   nivision\.h$
+  UsageReporting.h
 }
 
 modifiableFolderExclude {
   \.git
-  wpilibj/src/athena/cpp/include
-  wpilibj/src/athena/cpp/lib
+  wpilibj/src/arm-linux-jni
+  wpilibj/src/arm-linux-jni/linux
+  wpilibj/src/main/native/cpp
 }
 
 modifiableFileExclude {

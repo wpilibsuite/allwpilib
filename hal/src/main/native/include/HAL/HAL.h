@@ -37,8 +37,8 @@
 
 #endif  // HAL_USE_LABVIEW
 
-#include "UsageReporting.h"
 #include "HAL/Types.h"
+#include "UsageReporting.h"
 
 namespace HALUsageReporting = nUsageReporting;
 
