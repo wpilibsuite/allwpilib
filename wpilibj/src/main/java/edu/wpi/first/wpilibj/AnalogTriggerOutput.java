@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
  * of a sensor and can be routed to an up / down counter or to interrupts. Because the outputs
  * generate a pulse, they cannot be read directly. To help ensure that a rollover condition is not
  * missed, there is an average rejection filter available that operates on the upper 8 bits of a 12
- * bit number and selects the nearest outlyer of 3 samples. This will reject a sample that is (due
+ * bit number and selects the nearest outlier of 3 samples. This will reject a sample that is (due
  * to averaging or sampling) errantly between the two limits. This filter will fail if more than one
  * sample in a row is errantly in between the two limits. You may see this problem if attempting to
  * use this feature with a mechanical rollover sensor, such as a 360 degree no-stop potentiometer

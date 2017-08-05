@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -12,10 +12,8 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 
 /**
  * Base for sensors to be used with interrupts.
- *
- * @deprecated Use {@code InterruptibleSensorBase} instead
  */
-public abstract class InterruptableSensorBase extends SensorBase {
+public abstract class InterruptibleSensorBase extends SensorBase {
 
   @SuppressWarnings("JavadocMethod")
   public enum WaitResult {
@@ -42,7 +40,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
   /**
    * Create a new InterrupatableSensorBase.
    */
-  public InterruptableSensorBase() {
+  public InterruptibleSensorBase() {
     m_interrupt = 0;
   }
 
@@ -79,7 +77,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-                                   getAnalogTriggerTypeForRouting());
+        getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
     InterruptJNI.attachInterruptHandler(m_interrupt, handler.m_function,
         handler.overridableParameter());
@@ -100,7 +98,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-                                   getAnalogTriggerTypeForRouting());
+        getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
 
   }
@@ -224,5 +222,4 @@ public abstract class InterruptableSensorBase extends SensorBase {
     }
     return InterruptJNI.readInterruptFallingTimestamp(m_interrupt);
   }
-
 }

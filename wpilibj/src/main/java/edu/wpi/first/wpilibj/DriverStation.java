@@ -542,7 +542,7 @@ public class DriverStation implements RobotState.Interface {
 
   /**
    * Gets a value indicating whether the FPGA outputs are enabled. The outputs may be disabled if
-   * the robot is disabled or e-stopped, the watdhog has expired, or if the roboRIO browns out.
+   * the robot is disabled or e-stopped, the watchdog has expired, or if the roboRIO browns out.
    *
    * @return True if the FPGA outputs are enabled.
    */

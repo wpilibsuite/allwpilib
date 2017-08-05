@@ -18,7 +18,7 @@ public class I2CJNI extends JNIWrapper {
 
   public static native int i2CWrite(int port, byte address, ByteBuffer dataToSend, byte sendSize);
 
-  public static native int i2CRead(int port, byte address, ByteBuffer dataRecieved,
+  public static native int i2CRead(int port, byte address, ByteBuffer dataReceived,
                                    byte receiveSize);
 
   public static native void i2CClose(int port);

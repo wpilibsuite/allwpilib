@@ -46,7 +46,7 @@ public abstract class InterruptHandlerFunction<T> {
   /**
    * Override this method if you would like to pass a specific parameter to the {@link
    * #interruptFired(int, Object)} when it is fired by the interrupt. This method is called once
-   * when {@link InterruptableSensorBase#requestInterrupts(InterruptHandlerFunction)} is run.
+   * when {@link InterruptibleSensorBase#requestInterrupts(InterruptHandlerFunction)} is run.
    *
    * @return The object that should be passed to the interrupt when it runs
    */

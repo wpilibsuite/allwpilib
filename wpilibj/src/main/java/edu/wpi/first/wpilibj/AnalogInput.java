@@ -34,7 +34,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
 public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSendable {
 
   private static final int kAccumulatorSlot = 1;
-  int m_port; // explicit no modifier, private and package accessable.
+  int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;
   private static final int[] kAccumulatorChannels = {0, 1};
   private long m_accumulatorOffset;

@@ -103,7 +103,7 @@ public final class MotorSafetyHelper {
 
   /**
    * Return the state of the motor safety enabled flag Return if the motor safety is currently
-   * enabled for this devicce.
+   * enabled for this device.
    *
    * @return True if motor safety is enforced for this device
    */

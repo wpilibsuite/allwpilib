@@ -162,7 +162,7 @@ public class Joystick extends JoystickBase {
   /**
    * For the current joystick, return the axis determined by the argument.
    *
-   * <p>This is for cases where the joystick axis is returned programatically, otherwise one of the
+   * <p>This is for cases where the joystick axis is returned programmatically, otherwise one of the
    * previous functions would be preferable (for example getX()).
    *
    * @param axis The axis to read.
@@ -302,8 +302,6 @@ public class Joystick extends JoystickBase {
 
   /**
    * Get the direction of the vector formed by the joystick and its origin in degrees.
-   *
-   * <p>Uses acos(-1) to represent Pi due to absence of readily accessable Pi constant in C++
    *
    * @return The direction of the vector in degrees
    */
