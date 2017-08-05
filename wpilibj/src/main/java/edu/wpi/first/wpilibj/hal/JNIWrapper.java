@@ -29,7 +29,6 @@ public class JNIWrapper {
       } catch (UnsatisfiedLinkError ule) {
         try {
           String resname = RuntimeDetector.getLibraryResource(jniFileName);
-          System.out.println(resname);
           InputStream is = JNIWrapper.class.getResourceAsStream(resname);
           if (is != null) {
             // create temporary file
