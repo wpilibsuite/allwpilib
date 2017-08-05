@@ -1,7 +1,6 @@
 package edu.wpi.first.wpilibj.networktables;
 
 import edu.wpi.first.wpilibj.tables.*;
-import edu.wpi.first.wpilibj.networktables2.type.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -797,12 +796,6 @@ public class NetworkTable implements ITable, IRemote {
       return NetworkTablesJNI.putDoubleArray(pathWithSep + key, toNative((Number[])value));
     else if (value instanceof String[])
       return NetworkTablesJNI.putStringArray(pathWithSep + key, (String[])value);
-    else if (value instanceof BooleanArray)
-      return NetworkTablesJNI.putBooleanArray(pathWithSep + key, toNative((Boolean[])((ArrayData)value).getDataArray()));
-    else if (value instanceof NumberArray)
-      return NetworkTablesJNI.putDoubleArray(pathWithSep + key, toNative((Double[])((ArrayData)value).getDataArray()));
-    else if (value instanceof StringArray)
-      return NetworkTablesJNI.putStringArray(pathWithSep + key, (String[])((ArrayData)value).getDataArray());
     else
       throw new IllegalArgumentException("Value of type " + value.getClass().getName() + " cannot be put into a table");
   }
