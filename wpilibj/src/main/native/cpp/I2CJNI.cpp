@@ -86,7 +86,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_I2CJNI_i2CWrite(
     dataToSendPtr = (uint8_t*)env->GetDirectBufferAddress(dataToSend);
   }
   I2CJNI_LOG(logDEBUG) << "DataToSendPtr = " << dataToSendPtr;
-  I2CJNI_LOG(logDEBUG) << "SendSize = " << (jint)dataToSend;
+  I2CJNI_LOG(logDEBUG) << "SendSize = " << (jint)sendSize;
   jint returnValue = HAL_WriteI2C(static_cast<HAL_I2CPort>(port), address, dataToSendPtr, sendSize);
   I2CJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)returnValue;
   return returnValue;
