@@ -104,7 +104,7 @@ public class CameraServer {
     int port = CameraServerJNI.getMjpegServerPort(sink);
 
     // Generate values
-    ArrayList<String> values = new ArrayList<String>(m_addresses.length + 1);
+    ArrayList<String> values = new ArrayList<>(m_addresses.length + 1);
     String listenAddress = CameraServerJNI.getMjpegServerListenAddress(sink);
     if (!listenAddress.isEmpty()) {
       // If a listen address is specified, only use that
@@ -287,9 +287,9 @@ public class CameraServer {
   @SuppressWarnings({"JavadocMethod", "PMD.UnusedLocalVariable"})
   private CameraServer() {
     m_defaultUsbDevice = new AtomicInteger();
-    m_sources = new Hashtable<String, VideoSource>();
-    m_sinks = new Hashtable<String, VideoSink>();
-    m_tables = new Hashtable<Integer, ITable>();
+    m_sources = new Hashtable<>();
+    m_sinks = new Hashtable<>();
+    m_tables = new Hashtable<>();
     m_publishTable = NetworkTable.getTable(kPublishName);
     m_nextPort = kBasePort;
     m_addresses = new String[0];
