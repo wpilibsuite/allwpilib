@@ -305,8 +305,8 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
    * @return The analog channel is attached to an accumulator.
    */
   public boolean isAccumulatorChannel() {
-    for (int i = 0; i < kAccumulatorChannels.length; i++) {
-      if (m_channel == kAccumulatorChannels[i]) {
+    for (int channel : kAccumulatorChannels) {
+      if (m_channel == channel) {
         return true;
       }
     }

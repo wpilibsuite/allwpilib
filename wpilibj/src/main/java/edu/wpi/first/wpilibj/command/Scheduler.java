@@ -324,8 +324,8 @@ public class Scheduler implements NamedSendable {
       double[] toCancel = m_table.getNumberArray("Cancel", new double[0]);
       if (toCancel.length > 0) {
         for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-          for (int i = 0; i < toCancel.length; i++) {
-            if (e.getData().hashCode() == toCancel[i]) {
+          for (double d : toCancel) {
+            if (e.getData().hashCode() == d) {
               e.getData().cancel();
             }
           }
