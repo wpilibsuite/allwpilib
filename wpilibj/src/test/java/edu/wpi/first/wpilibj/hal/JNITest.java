@@ -7,13 +7,14 @@
 
 package edu.wpi.first.wpilibj.hal;
 
+import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 import org.junit.Test;
 
 public class JNITest {
     @Test
     public void jniNtcoreLinkTest() {
         // Test to verify that the JNI test link works correctly.
-        edu.wpi.first.wpilibj.networktables.NetworkTablesJNI.flush();
+        NetworkTablesJNI.flush();
     }
 
     @Test
