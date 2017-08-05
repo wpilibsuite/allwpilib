@@ -117,7 +117,7 @@ public class PreferencesTest extends AbstractComsSetup {
     String networkedNumber = "networkCheckedValue";
     int networkNumberValue = 100;
     m_pref.putInt(networkedNumber, networkNumberValue);
-    assertEquals(networkNumberValue, (int) (m_prefTable.getNumber(networkedNumber)));
+    assertEquals(networkNumberValue, (int) (m_prefTable.getNumber(networkedNumber, 9999999)));
     m_pref.remove(networkedNumber);
   }
 
