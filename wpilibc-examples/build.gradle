@@ -8,7 +8,7 @@ apply from: '../config.gradle'
 
 ext.examplesMap = [:]
 
-def tree = new File("$projectDir/src")
+def tree = file("$projectDir/src")
 tree.list().each {
     examplesMap.put(it, [])
 }
@@ -32,16 +32,13 @@ model {
             sharedConfigs = examplesMap
         }
     }
-}
 
-class ExampleComponentRules extends RuleSource {
-    @Mutate
-    void createComponent(ComponentSpecContainer tasks, ProjectLayout projectLayout) {
-        projectLayout.projectIdentifier.examplesMap.each {
-            tasks.create(it.key, NativeLibrarySpec) {
+    components {
+        examplesMap.each {
+            "${it.key}"(NativeLibrarySpec) {
                 binaries.all { binary->
                     if (binary.targetPlatform.architecture.name == 'athena') {
-                        //projectLayout.projectIdentifier.rootProject(':ni-libraries').addNiLibrariesToLinker(binary)
+                        project(':ni-libraries').addNiLibrariesToLinker(binary)
                         binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
                         binary.lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
                     } else {
@@ -52,5 +49,3 @@ class ExampleComponentRules extends RuleSource {
         }
     }
 }
-
-apply plugin: ExampleComponentRules
