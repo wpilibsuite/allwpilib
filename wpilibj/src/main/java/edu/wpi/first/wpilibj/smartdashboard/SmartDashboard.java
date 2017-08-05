@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.networktables.NetworkTableKeyNotDefined;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
