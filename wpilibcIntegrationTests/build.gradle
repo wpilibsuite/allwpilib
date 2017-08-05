@@ -4,7 +4,6 @@ apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
 
-ext.onlyAthena = true
 apply from: '../config.gradle'
 
 ext.examplesMap = [:]
@@ -47,17 +46,21 @@ model {
                 }
             }
             binaries.all { binary->
-                binary.tasks.withType(CppCompile) {
-                    cppCompiler.args "-DNAMESPACED_WPILIB"
-                    cppCompiler.args "-DNAMESPACED_PRIORITY"
-                    cppCompiler.args "-DCONFIG_ATHENA"
-                    cppCompiler.args "-Wno-missing-field-initializers"
-                    cppCompiler.args "-Wno-unused-variable"
+                if (binary.targetPlatform.architecture.name == 'athena') {
+                    binary.tasks.withType(CppCompile) {
+                        cppCompiler.args "-DNAMESPACED_WPILIB"
+                        cppCompiler.args "-DNAMESPACED_PRIORITY"
+                        cppCompiler.args "-DCONFIG_ATHENA"
+                        cppCompiler.args "-Wno-missing-field-initializers"
+                        cppCompiler.args "-Wno-unused-variable"
+                    }
+                    binary.lib project: ':gmock', library: 'gmock', linkage: 'static'
+                    project(':ni-libraries').addNiLibrariesToLinker(binary)
+                    binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
+                    binary.lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                } else {
+                    binary.buildable = false
                 }
-                binary.lib project: ':gmock', library: 'gmock', linkage: 'static'
-                project(':ni-libraries').addNiLibrariesToLinker(binary)
-                binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
-                binary.lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
             }
         }
     }

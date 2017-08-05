@@ -4,7 +4,6 @@ apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 apply plugin: 'edu.wpi.first.NativeUtils'
 
-ext.onlyAthena = true
 apply from: '../config.gradle'
 
 ext.examplesMap = [:]
@@ -41,9 +40,13 @@ class ExampleComponentRules extends RuleSource {
         projectLayout.projectIdentifier.examplesMap.each {
             tasks.create(it.key, NativeLibrarySpec) {
                 binaries.all { binary->
-                    //projectLayout.projectIdentifier.rootProject(':ni-libraries').addNiLibrariesToLinker(binary)
-                    binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
-                    binary.lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    if (binary.targetPlatform.architecture.name == 'athena') {
+                        //projectLayout.projectIdentifier.rootProject(':ni-libraries').addNiLibrariesToLinker(binary)
+                        binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
+                        binary.lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
+                    } else {
+                        binary.buildable = false
+                    }
                 }
             }
         }

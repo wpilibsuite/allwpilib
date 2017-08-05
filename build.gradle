@@ -110,6 +110,32 @@ task clean(type: Delete) {
     delete buildDir
 }
 
+subprojects {
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'checkstyle'
+
+    checkstyle {
+        toolVersion = "8.1"
+        configFile = new File(rootDir, "styleguide/checkstyle.xml")
+    }
+
+    ext.armBuild = true
+
+    // Disables doclint in java 8.
+    if (JavaVersion.current().isJava8Compatible()) {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+    ext.setupWpilibRepo = { publishing ->
+        publishing.repositories.maven {
+            url = WPILibVersion.mavenLocalUrl
+        }
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '4.0.2'
+    distributionType = Wrapper.DistributionType.ALL
 }

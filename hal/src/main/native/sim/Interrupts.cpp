@@ -97,8 +97,10 @@ void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status) {
 static void ProcessInterruptDigitalSynchronous(const char* name, void* param,
                                                const struct HAL_Value* value) {
   // void* is a SynchronousWaitDataHandle.
+  // convert to intptr_t first, then to handle
+  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
   SynchronousWaitDataHandle handle =
-      reinterpret_cast<SynchronousWaitDataHandle>(param);
+      static_cast<SynchronousWaitDataHandle>(handleTmp);
   auto interruptData = synchronousInterruptHandles.Get(handle);
   if (interruptData == nullptr) return;
   auto interrupt = interruptHandles.Get(interruptData->interruptHandle);
@@ -128,8 +130,10 @@ static double GetAnalogTriggerValue(HAL_Handle triggerHandle,
 static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
                                               const struct HAL_Value* value) {
   // void* is a SynchronousWaitDataHandle.
+  // convert to intptr_t first, then to handle
+  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
   SynchronousWaitDataHandle handle =
-      reinterpret_cast<SynchronousWaitDataHandle>(param);
+      static_cast<SynchronousWaitDataHandle>(handleTmp);
   auto interruptData = synchronousInterruptHandles.Get(handle);
   if (interruptData == nullptr) return;
   auto interrupt = interruptHandles.Get(interruptData->interruptHandle);
@@ -323,7 +327,9 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
 static void ProcessInterruptDigitalAsynchronous(const char* name, void* param,
                                                 const struct HAL_Value* value) {
   // void* is a HAL handle
-  HAL_InterruptHandle handle = reinterpret_cast<HAL_InterruptHandle>(param);
+  // convert to intptr_t first, then to handle
+  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  HAL_InterruptHandle handle = static_cast<HAL_InterruptHandle>(handleTmp);
   auto interrupt = interruptHandles.Get(handle);
   if (interrupt == nullptr) return;
   // Have a valid interrupt
@@ -353,7 +359,9 @@ static void ProcessInterruptDigitalAsynchronous(const char* name, void* param,
 static void ProcessInterruptAnalogAsynchronous(const char* name, void* param,
                                                const struct HAL_Value* value) {
   // void* is a HAL handle
-  HAL_InterruptHandle handle = reinterpret_cast<HAL_InterruptHandle>(param);
+  // convert to intptr_t first, then to handle
+  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  HAL_InterruptHandle handle = static_cast<HAL_InterruptHandle>(handleTmp);
   auto interrupt = interruptHandles.Get(handle);
   if (interrupt == nullptr) return;
   // Have a valid interrupt

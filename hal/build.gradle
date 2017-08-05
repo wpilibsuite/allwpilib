@@ -85,6 +85,11 @@ model {
                     }
                 }
             }
+            binaries.all { binary->
+                if (binary.targetPlatform.architecture.name != 'athena') {
+                    binary.buildable = false
+                }
+            }
         }
         halSim(NativeLibrarySpec) {
             baseName = 'wpiHal'
