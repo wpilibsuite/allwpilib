@@ -1,162 +1,179 @@
-// There are two hal libraries that are built
-// - desktop which is used by simulation (gcc/msvc)
-// - athena which is used by the roborio (arm)
+apply plugin: 'cpp'
+apply plugin: 'google-test'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
 
-plugins {
-    id 'cpp'
-    id 'maven-publish'
+apply from: '../config.gradle'
+
+ext.addHalCompilerArguments = { binary->
+    if (binary.targetPlatform.architecture.name == 'athena') {
+        tasks.withType(CppCompile) {
+            binary.cppCompiler.args "-DCONFIG_ATHENA"
+        }
+    }
+    tasks.withType(CppCompile) {
+        binary.cppCompiler.args "-DNAMESPACED_PRIORITY"
+    }
 }
 
-defineWpiUtilProperties()
-
-debugStripSetup(project)
+ext.addHalToLinker = { binary->
+    if (binary.targetPlatform.architecture.name == 'athena') {
+        binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
+    } else {
+        binary.lib project: ':hal', library: 'halSim', linkage: 'shared'
+    }
+}
 
 model {
-    components {
-        HALAthena(NativeLibrarySpec) {
-            targetPlatform 'roborio-arm'
-            binaries.all {
-                tasks.withType(CppCompile) {
-                    cppCompiler.args "-DNAMESPACED_PRIORITY"
-                    cppCompiler.args "-DCONFIG_ATHENA"
-                    addNiLibraryLinks(linker, targetPlatform)
-                    addWpiUtilLibraryLinks(it, linker, targetPlatform)
+    dependencyConfigs {
+        wpiutil(DependencyConfig) {
+            groupId = 'edu.wpi.first.wpiutil'
+            artifactId = 'wpiutil-cpp'
+            headerClassifier = 'headers'
+            ext = 'zip'
+            version = '+'
+            sharedConfigs = [ halAthena: [], halSim: [], halDev: [], halSimStaticDeps: [], halSimTestingBaseTest: [] ]
+        }
+    }
+    // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
+    // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
+    // where some extra symbols are added that cannot be resolved at link time. This configuration
+    // lets you specify specific symbols to exlude from exporting.
+    exportsConfigs {
+        halSim(ExportsConfig) {
+            x86ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                  '_CT??_R0?AVbad_cast',
+                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                  '_TI5?AVfailure' ]
+            x64ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                  '_CT??_R0?AVbad_cast',
+                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                  '_TI5?AVfailure' ]
+        }
+        halSimStaticDeps(ExportsConfig) {
+            x86SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('HAL_')) {
+                        retList << symbol
+                    }
                 }
+                return retList
             }
+            x64SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('HAL_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+        }
+    }
+    components {
+        halAthena(NativeLibrarySpec) {
+            baseName = 'wpiHal'
             sources {
                 cpp {
                     source {
-                        srcDirs = ["lib/athena", niLibraryHeadersRoot, "lib/shared"]
+                        srcDirs = [ 'src/main/native/shared', 'src/main/native/athena' ]
                         includes = ["**/*.cpp"]
                     }
                     exportedHeaders {
-                        srcDirs = ["include", niLibraryHeadersRoot, wpiUtilInclude]
+                        srcDirs = ["src/main/native/include"]
+                    }
+                }
+            }
+            binaries.all { binary->
+                if (binary.targetPlatform.architecture.name != 'athena') {
+                    binary.buildable = false
+                }
+            }
+        }
+        halSim(NativeLibrarySpec) {
+            baseName = 'wpiHal'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
+                        includes = ["**/*.cpp"]
+                    }
+                    exportedHeaders {
+                        srcDirs = ["src/main/native/include"]
                     }
                 }
             }
         }
-    }
-    tasks { tasks ->
-        tasks.halZip.dependsOn tasks.HALAthenaSharedLibrary
-        tasks.athenaRuntimeZip.dependsOn tasks.HALAthenaSharedLibrary
-    }
-}
-
-task halZip(type: Zip) {
-    description = 'Zips the HAL'
-    group = 'WPILib'
-    baseName = 'hal'
-    destinationDir = project.buildDir
-    duplicatesStrategy = 'exclude'
-
-    // Include the shared library file and header files from this project
-    model {
-        binaries {
-            withType(SharedLibraryBinarySpec) { spec ->
-                spec.headerDirs.each {
-                    def normalizedIt = it.toString().replace('/', '\\')
-                    def normalizedWPIUtil = wpiUtilInclude.toString().replace('/', '\\')
-                    // exclude the wpiUtil library, and any NI libraries (NI libraries grabbed later)
-                    if (normalizedIt != normalizedWPIUtil) {
-                        from(it) {
-                            into 'include'
-                            // We don't want to include any of the .cpp files that are in some of the header directories
-                            exclude '**/*.cpp'
+        if (project.hasProperty('buildHalStaticDeps')) {
+            halSimStaticDeps(NativeLibrarySpec) {
+                baseName = 'wpiHal'
+                binaries {
+                    withType(StaticLibraryBinarySpec) {
+                        buildable = false
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/main/native/include"]
                         }
                     }
                 }
-                from(spec.sharedLibraryFile) {
-                    into 'lib'
-                }
-                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
-                    into 'lib'
-                }
             }
         }
-    }
-
-    // Finally, include all of the shared library objects from the ni directory
-    from(project.file('../ni-libraries/lib')) {
-        into 'lib'
-        exclude 'genlinks'
-        exclude 'genlinks.bat'
-        exclude 'libwpi.so'
-    }
-}
-
-task athenaRuntimeZip(type: Zip) {
-    description = 'Zips the Athena Runtime libraries'
-    group = 'WPILib'
-    baseName = 'athena-runtime'
-    destinationDir = project.buildDir
-    duplicatesStrategy = 'exclude'
-
-    // Include the static library file and header files from this project
-    model {
-        binaries {
-            withType(SharedLibraryBinarySpec) { spec ->
-                spec.headerDirs.each {
-                    from(it) {
-                        into 'include'
-                        // We don't want to include any of the .cpp files that are in some of the header directories
-                        exclude '**/*.cpp'
+        // The TestingBase library is a workaround for an issue with the GoogleTest plugin.
+        // The plugin by default will rebuild the entire test source set, which increases
+        // build time. By testing an empty library, and then just linking the already built component
+        // into the test, we save the extra build
+        halSimTestingBase(NativeLibrarySpec) { }
+        // By default, a development executable will be generated. This is to help the case of
+        // testing specific functionality of the library.
+        if (!project.hasProperty('skipDevExe')) {
+            halDev(NativeExecutableSpec) {
+                binaries.all {
+                    project.addHalToLinker(it)
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/dev/native/cpp'
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/dev/native/include'
+                        }
                     }
                 }
-                from(spec.sharedLibraryFile) {
-                    into 'lib'
-                }
-                from(new File(spec.sharedLibraryFile.absolutePath + ".debug")) {
-                    into 'lib'
-                }
             }
         }
     }
-
-    defineNetworkTablesProperties()
-    dependsOn project(':').downloadNetworkTables
-
-    from(project.file(netTablesInclude)) {
-        into 'include'
+    testSuites {
+        halSimTestingBaseTest {
+            sources {
+                cpp.source.srcDir 'src/test/native/cpp'
+                cpp.exportedHeaders.srcDir 'src/test/native/include'
+            }
+        }
     }
-
-    from (file(netSharedLib)) {
-        into 'lib'
-    }
-
-    from (file(netSharedLibDebug)) {
-        into 'lib'
-    }
-
-    from (file(wpiUtilSharedLib)) {
-        into 'lib'
-    }
-
-    from (file(wpiUtilSharedLibDebug)) {
-        into 'lib'
+    binaries {
+        all {
+            project.addHalCompilerArguments(it)
+            project(':ni-libraries').addNiLibrariesToLinker(it)
+        }
+        withType(GoogleTestTestSuiteBinarySpec) {
+            if (!it.component.testedComponent.name.contains('TestingBase')) {
+                it.buildable = false
+            } else {
+                lib project: ':gmock', library: 'gmock', linkage: 'static'
+                lib library: 'halSim', linkage: 'shared'
+            }
+        }
     }
 }
 
-
-publishing {
-    publications {
-        hal(MavenPublication) {
-            artifact halZip
-
-            groupId 'edu.wpi.first.wpilib'
-            artifactId 'hal'
-            version WPILibVersion.version
-        }
-        athenaruntime(MavenPublication) {
-            artifact athenaRuntimeZip
-
-            groupId 'edu.wpi.first.wpilib'
-            artifactId 'athena-runtime'
-            version WPILibVersion.version
-        }
-    }
-
-    setupWpilibRepo(it)
-}
-
-build.dependsOn halZip
-build.dependsOn athenaRuntimeZip
+apply from: 'publish.gradle'

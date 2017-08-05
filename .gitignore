@@ -1,15 +1,8 @@
 # WPIlib Specific
 
 dependency-reduced-pom.xml
-/wpilibj/src/athena/cpp/nivision/*.c
-/wpilibj/src/athena/cpp/nivision/*.cpp
-/wpilibj/src/athena/cpp/nivision/*.s
-/wpilibj/src/athena/cpp/nivision/*_arm.ini
-/wpilibj/src/athena/cpp/nivision/*.java
-/wpilibj/src/athena/cpp/nivision/nivision_funcs.txt
-/wpilibj/src/athena/cpp/nivision/imaqdx_funcs.txt
-/wpilibj/src/shared/java/edu/wpi/first/wpilibj/util/WPILibVersion.java
-/wpilibc/shared/src/WPILibVersion.cpp
+/wpilibj/src/main/java/edu/wpi/first/wpilibj/util/WPILibVersion.java
+/wpilibc/src/main/native/cpp/WPILibVersion.cpp
 doxygen.log
 
 # Created by the jenkins test script

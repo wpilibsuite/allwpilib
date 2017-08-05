@@ -1,11 +1,43 @@
+import edu.wpi.first.nativeutils.NativeUtils
+import org.gradle.api.file.FileCollection
+import org.gradle.internal.os.OperatingSystem
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: 'java'
-apply plugin: 'maven-publish'
 apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'pmd'
 
 configurations.errorprone {
     resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
 }
+
+apply from: '../config.gradle'
+
+task nativeTestFilesJar(type: Jar) {
+    destinationDir = project.buildDir
+    classifier = "nativeTestFiles"
+
+    project.model {
+        binaries {
+            withType(SharedLibraryBinarySpec) { binary ->
+                if (binary.component.name == 'wpilibJNIStatic') {
+                    from(binary.sharedLibraryFile) {
+                        into NativeUtils.getPlatformPath(binary)
+                    }
+                    dependsOn binary.buildTask
+                }
+            }
+        }
+    }
+}
+
+test.dependsOn nativeTestFilesJar
 
 def versionClass = """
 package edu.wpi.first.wpilibj.util;
@@ -20,7 +52,7 @@ public final class WPILibVersion {
 }
 """.trim()
 
-def wpilibVersionFile = file('src/shared/java/edu/wpi/first/wpilibj/util/WPILibVersion.java')
+def wpilibVersionFile = file('src/main/java/edu/wpi/first/wpilibj/util/WPILibVersion.java')
 
 def willPublish = false
 gradle.taskGraph.addTaskExecutionGraphListener { graph ->
@@ -53,34 +85,189 @@ clean {
     delete wpilibVersionFile
 }
 
+compileJava.dependsOn generateJavaVersion
+
 pmd {
+    sourceSets = [sourceSets.main]
     consoleOutput = true
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
     ruleSets = []
 }
 
-sourceSets {
-    shared
-}
-
-compileSharedJava.dependsOn generateJavaVersion
-
 dependencies {
-    sharedCompile ntcoreDep('java', 'arm')
-    sharedRuntime ntcoreDep('java', 'arm')
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    runtime 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    compile 'edu.wpi.first.ntcore:ntcore-java:+'
+    runtime 'edu.wpi.first.ntcore:ntcore-java:+'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'junit:junit:4.12'
-    testCompile ntcoreDep('java', 'desktop')
     testCompile 'com.google.guava:guava:19.0'
-    testCompile sourceSets.shared.output
+    testRuntime files(project.nativeTestFilesJar.archivePath)
 }
 
-apply from: 'athena.gradle'
-
-if (enableSimulation) {
-    apply from: 'simulation.gradle'
+model {
+    components {
+        def c = $.buildConfigs
+        c.each { config ->
+            if (NativeUtils.isConfigEnabled(config, project)) {
+                project.dependencies {
+                    def base = 'edu.wpi.first.ntcore:ntcore-jni:+:'
+                    testRuntime base + NativeUtils.getClassifier(config)
+                }
+            }
+        }
+    }
 }
+
+def jniClasses = [
+    'edu.wpi.first.wpilibj.can.CANJNI',
+    'edu.wpi.first.wpilibj.hal.FRCNetComm',
+    'edu.wpi.first.wpilibj.hal.HAL',
+    'edu.wpi.first.wpilibj.hal.HALUtil',
+    'edu.wpi.first.wpilibj.hal.JNIWrapper',
+    'edu.wpi.first.wpilibj.hal.AccelerometerJNI',
+    'edu.wpi.first.wpilibj.hal.AnalogJNI',
+    'edu.wpi.first.wpilibj.hal.AnalogGyroJNI',
+    'edu.wpi.first.wpilibj.hal.ConstantsJNI',
+    'edu.wpi.first.wpilibj.hal.CounterJNI',
+    'edu.wpi.first.wpilibj.hal.DigitalGlitchFilterJNI',
+    'edu.wpi.first.wpilibj.hal.DIOJNI',
+    'edu.wpi.first.wpilibj.hal.EncoderJNI',
+    'edu.wpi.first.wpilibj.hal.I2CJNI',
+    'edu.wpi.first.wpilibj.hal.InterruptJNI',
+    'edu.wpi.first.wpilibj.hal.NotifierJNI',
+    'edu.wpi.first.wpilibj.hal.PortsJNI',
+    'edu.wpi.first.wpilibj.hal.PWMJNI',
+    'edu.wpi.first.wpilibj.hal.RelayJNI',
+    'edu.wpi.first.wpilibj.hal.SPIJNI',
+    'edu.wpi.first.wpilibj.hal.SolenoidJNI',
+    'edu.wpi.first.wpilibj.hal.CompressorJNI',
+    'edu.wpi.first.wpilibj.hal.PDPJNI',
+    'edu.wpi.first.wpilibj.hal.PowerJNI',
+    'edu.wpi.first.wpilibj.hal.SerialPortJNI',
+    'edu.wpi.first.wpilibj.hal.OSSerialPortJNI',
+    'edu.wpi.first.wpilibj.hal.ThreadsJNI',
+]
+
+model {
+    jniConfigs {
+        wpilibJNIShared(JNIConfig) {
+            jniDefinitionClasses = jniClasses
+            jniArmHeaderLocations = [ all: file("${projectDir}/src/arm-linux-jni") ]
+            sourceSets = [ project.sourceSets.main ]
+        }
+        wpilibJNIStatic(JNIConfig) {
+            jniDefinitionClasses = jniClasses
+            jniArmHeaderLocations = [ all: file("${projectDir}/src/arm-linux-jni") ]
+            sourceSets = [ project.sourceSets.main ]
+        }
+    }
+    exportsConfigs {
+        wpilibJNIShared(ExportsConfig) {
+            x86SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+            x64SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+        }
+        wpilibJNIStatic(ExportsConfig) {
+            x86SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+            x64SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('Java_') || symbol.startsWith('JNI_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+        }
+    }
+    dependencyConfigs {
+        wpiutil(DependencyConfig) {
+            groupId = 'edu.wpi.first.wpiutil'
+            artifactId = 'wpiutil-cpp'
+            headerClassifier = 'headers'
+            ext = 'zip'
+            version = '+'
+            sharedConfigs = [ wpilibJNIShared: [] ]
+            staticConfigs = [ wpilibJNIStatic: [] ]
+        }
+    }
+    components {
+        wpilibJNIStatic(NativeLibrarySpec) {
+            baseName = 'wpilibJNI'
+            binaries.withType(NativeBinarySpec) { binary ->
+                if (binary.targetPlatform.architecture.name == 'athena') {
+                    binary.lib project: ':hal', library: 'halAthena', linkage: 'static'
+                } else {
+                    binary.lib project: ':hal', library: 'halSim', linkage: 'static'
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/main/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                }
+            }
+        }
+        wpilibJNIShared(NativeLibrarySpec) {
+            baseName = 'wpilibJNI'
+            binaries.withType(NativeBinarySpec) { binary ->
+                if (binary.targetPlatform.architecture.name == 'athena') {
+                    binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
+                } else {
+                    binary.lib project: ':hal', library: 'halSim', linkage: 'shared'
+                }
+            }
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/main/native/cpp']
+                        includes = ['**/*.cpp']
+                    }
+                }
+            }
+        }
+
+    }
+    binaries {
+        withType(NativeBinarySpec) {
+            project(':hal').addHalCompilerArguments(it)
+            project(':ni-libraries').addNiLibrariesToLinker(it)
+        }
+        withType(StaticLibraryBinarySpec) {
+            it.buildable = false
+        }
+    }
+}
+
+apply from: 'publish.gradle'
+apply from: 'integrationTestingFiles.gradle'
 
 test {
     testLogging {
