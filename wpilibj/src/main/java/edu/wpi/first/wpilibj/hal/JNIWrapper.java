@@ -20,12 +20,13 @@ import java.io.OutputStream;
 public class JNIWrapper {
   static boolean libraryLoaded = false;
   static File jniLibrary = null;
+
   static {
     if (!libraryLoaded) {
       String jniFileName = "wpilibJNI";
       try {
         System.loadLibrary(jniFileName);
-      } catch (UnsatisfiedLinkError e) {
+      } catch (UnsatisfiedLinkError ule) {
         try {
           String resname = RuntimeDetector.getLibraryResource(jniFileName);
           System.out.println(resname);
@@ -65,6 +66,7 @@ public class JNIWrapper {
       libraryLoaded = true;
     }
   }
+
   public static native int getPortWithModule(byte module, byte channel);
 
   public static native int getPort(byte channel);

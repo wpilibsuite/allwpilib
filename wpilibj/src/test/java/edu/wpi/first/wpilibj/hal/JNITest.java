@@ -11,15 +11,15 @@ import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 import org.junit.Test;
 
 public class JNITest {
-    @Test
-    public void jniNtcoreLinkTest() {
-        // Test to verify that the JNI test link works correctly.
-        NetworkTablesJNI.flush();
-    }
+  @Test
+  public void jniNtcoreLinkTest() {
+    // Test to verify that the JNI test link works correctly.
+    NetworkTablesJNI.flush();
+  }
 
-    @Test
-    public void jniHalLinkTest() {
-        // Test to verify that the JNI test link works correctly.
-        HALUtil.getHALRuntimeType();
-    }
+  @Test
+  public void jniHalLinkTest() {
+    // Test to verify that the JNI test link works correctly.
+    HALUtil.getHALRuntimeType();
+  }
 }

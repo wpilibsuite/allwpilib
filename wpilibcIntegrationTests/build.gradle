@@ -72,7 +72,7 @@ model {
         def bin = $.binaries
         copyWpilibCTestLibrariesToOutput(Task) {
             bin.each {
-                if (it in NativeExecutableBinarySpec) {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
                     def spec = it
                     dependsOn spec.buildTask
                 }
@@ -83,7 +83,7 @@ model {
 
             doLast {
                 bin.each {
-                    if (it in NativeExecutableBinarySpec) {
+                    if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
                         def spec = it
                         spec.libs.each {
                             it.runtimeFiles.each { f ->
