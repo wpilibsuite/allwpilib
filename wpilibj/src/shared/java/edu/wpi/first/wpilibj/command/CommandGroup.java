@@ -36,14 +36,14 @@ public class CommandGroup extends Command {
   /**
    * The commands in this group (stored in entries).
    */
-  private final Vector m_commands = new Vector();
+  private final Vector<Entry> m_commands = new Vector<>();
   /*
    * Intentionally package private
    */
   /**
    * The active children in this group (stored in entries).
    */
-  final Vector m_children = new Vector();
+  final Vector<Entry> m_children = new Vector<>();
   /**
    * The current command, -1 signifies that none have been run.
    */
@@ -239,7 +239,7 @@ public class CommandGroup extends Command {
         }
       }
 
-      entry = (Entry) m_commands.elementAt(m_currentCommandIndex);
+      entry = m_commands.elementAt(m_currentCommandIndex);
       cmd = null;
 
       switch (entry.m_state) {
@@ -268,7 +268,7 @@ public class CommandGroup extends Command {
 
     // Run Children
     for (int i = 0; i < m_children.size(); i++) {
-      entry = (Entry) m_children.elementAt(i);
+      entry = m_children.elementAt(i);
       Command child = entry.m_command;
       if (entry.isTimedOut()) {
         child._cancel();
@@ -285,7 +285,7 @@ public class CommandGroup extends Command {
     // Theoretically, we don't have to check this, but we do if teams override
     // the isFinished method
     if (m_currentCommandIndex != -1 && m_currentCommandIndex < m_commands.size()) {
-      Command cmd = ((Entry) m_commands.elementAt(m_currentCommandIndex)).m_command;
+      Command cmd = m_commands.elementAt(m_currentCommandIndex).m_command;
       cmd._cancel();
       cmd.removed();
     }
@@ -346,14 +346,14 @@ public class CommandGroup extends Command {
     }
 
     if (m_currentCommandIndex != -1 && m_currentCommandIndex < m_commands.size()) {
-      Command cmd = ((Entry) m_commands.elementAt(m_currentCommandIndex)).m_command;
+      Command cmd = m_commands.elementAt(m_currentCommandIndex).m_command;
       if (!cmd.isInterruptible()) {
         return false;
       }
     }
 
     for (int i = 0; i < m_children.size(); i++) {
-      if (!((Entry) m_children.elementAt(i)).m_command.isInterruptible()) {
+      if (!m_children.elementAt(i).m_command.isInterruptible()) {
         return false;
       }
     }
@@ -363,7 +363,7 @@ public class CommandGroup extends Command {
 
   private void cancelConflicts(Command command) {
     for (int i = 0; i < m_children.size(); i++) {
-      Command child = ((Entry) m_children.elementAt(i)).m_command;
+      Command child = m_children.elementAt(i).m_command;
 
       Enumeration requirements = command.getRequirements();
 

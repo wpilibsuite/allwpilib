@@ -22,9 +22,9 @@ import edu.wpi.first.wpilibj.tables.ITable;
  */
 public class LiveWindow {
 
-  private static Vector sensors = new Vector();
+  private static Vector<LiveWindowSendable> sensors = new Vector<>();
   // private static Vector actuators = new Vector();
-  private static Hashtable components = new Hashtable();
+  private static Hashtable<LiveWindowSendable, LiveWindowComponent> components = new Hashtable<>();
   private static ITable livewindowTable;
   private static ITable statusTable;
   private static boolean liveWindowEnabled = false;
@@ -42,7 +42,7 @@ public class LiveWindow {
     statusTable = livewindowTable.getSubTable("~STATUS~");
     for (Enumeration e = components.keys(); e.hasMoreElements(); ) {
       LiveWindowSendable component = (LiveWindowSendable) e.nextElement();
-      LiveWindowComponent liveWindowComponent = (LiveWindowComponent) components.get(component);
+      LiveWindowComponent liveWindowComponent = components.get(component);
       String subsystem = liveWindowComponent.getSubsystem();
       String name = liveWindowComponent.getName();
       System.out.println("Initializing table for '" + subsystem + "' '" + name + "'");
@@ -170,7 +170,7 @@ public class LiveWindow {
   private static void updateValues() {
     // TODO: gross - needs to be sped up
     for (int i = 0; i < sensors.size(); i++) {
-      LiveWindowSendable lws = (LiveWindowSendable) sensors.elementAt(i);
+      LiveWindowSendable lws = sensors.elementAt(i);
       lws.updateTable();
     }
     // TODO: Add actuators?

@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.networktables.NetworkTableKeyNotDefined;
 import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
@@ -34,7 +33,7 @@ public class SmartDashboard {
    * A table linking tables in the SmartDashboard to the {@link Sendable} objects they
    * came from.
    */
-  private static final Hashtable tablesToData = new Hashtable();
+  private static final Hashtable<ITable, Sendable> tablesToData = new Hashtable<>();
 
   static {
     HLUsageReporting.reportSmartDashboard();
@@ -52,7 +51,7 @@ public class SmartDashboard {
     ITable dataTable = table.getSubTable(key);
     dataTable.putString("~TYPE~", data.getSmartDashboardType());
     data.initTable(dataTable);
-    tablesToData.put(data, key);
+    tablesToData.put(dataTable, data);
   }
 
 
@@ -75,16 +74,15 @@ public class SmartDashboard {
    *
    * @param key the key
    * @return the value
-   * @throws NetworkTableKeyNotDefined if there is no value mapped to by the key
    * @throws IllegalArgumentException  if the key is null
    */
   public static Sendable getData(String key) {
     ITable subtable = table.getSubTable(key);
-    Object data = tablesToData.get(subtable);
+    Sendable data = tablesToData.get(subtable);
     if (data == null) {
       throw new IllegalArgumentException("SmartDashboard data does not exist: " + key);
     } else {
-      return (Sendable) data;
+      return data;
     }
   }
 
