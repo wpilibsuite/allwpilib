@@ -7,6 +7,8 @@
 
 #include "HAL/cpp/priority_mutex.h"
 
+#if !defined(_WIN32)
+
 using namespace hal;
 
 void priority_recursive_mutex::lock() { pthread_mutex_lock(&m_mutex); }
@@ -28,3 +30,5 @@ bool priority_mutex::try_lock() noexcept {
 }
 
 pthread_mutex_t* priority_mutex::native_handle() { return &m_mutex; }
+
+#endif
