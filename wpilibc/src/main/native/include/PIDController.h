@@ -120,6 +120,8 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   double m_maximumInput = 0;
   // minimum input - limit setpoint to this
   double m_minimumInput = 0;
+  // input range - difference between maximum and minimum
+  double m_inputRange = 0;
   // do the endpoints wrap around? eg. Absolute encoder
   bool m_continuous = false;
   // is the pid controller enabled

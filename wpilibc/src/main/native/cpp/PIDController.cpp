@@ -313,6 +313,7 @@ void PIDController::SetInputRange(double minimumInput, double maximumInput) {
     std::lock_guard<std::mutex> sync(m_mutex);
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
+    m_inputRange = maximumInput - minimumInput;
   }
 
   SetSetpoint(m_setpoint);
@@ -505,8 +506,7 @@ bool PIDController::OnTarget() const {
   std::lock_guard<std::mutex> sync(m_mutex);
   switch (m_toleranceType) {
     case kPercentTolerance:
-      return std::fabs(error) <
-             m_tolerance / 100 * (m_maximumInput - m_minimumInput);
+      return std::fabs(error) < m_tolerance / 100 * m_inputRange;
       break;
     case kAbsoluteTolerance:
       return std::fabs(error) < m_tolerance;
@@ -643,12 +643,11 @@ void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
  * @return Error for continuous inputs.
  */
 double PIDController::GetContinuousError(double error) const {
-  if (m_continuous &&
-      std::fabs(error) > (m_maximumInput - m_minimumInput) / 2) {
+  if (m_continuous && std::fabs(error) > m_inputRange / 2) {
     if (error > 0) {
-      return error - (m_maximumInput - m_minimumInput);
+      return error - m_inputRange;
     } else {
-      return error + (m_maximumInput - m_minimumInput);
+      return error + m_inputRange;
     }
   }
 
