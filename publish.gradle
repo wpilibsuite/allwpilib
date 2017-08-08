@@ -182,6 +182,44 @@ model {
             }
         })
 
+        def allJniTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allJniTask = project.tasks.create("ntcoreJNIAllJar", Jar) {
+                description = 'Creates a jar with all JNI artifacts'
+                classifier = 'all'
+                baseName = 'jnijnintcorentcoreJNI'
+                destinationDir = outputsFolder
+                duplicatesStrategy = 'exclude'
+
+                ntcoreJNITaskList.each { 
+                    it.outputs.files.each {
+                        from project.zipTree(it)
+                    }
+                    dependsOn it
+                }
+            }
+            project.build.dependsOn allJniTask
+        }
+
+        def allCppTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allCppTask = project.tasks.create("ntcoreAllZip", Zip) {
+                description = 'Creates a zip with all Cpp artifacts'
+                classifier = 'all'
+                baseName = 'zipcppntcorentcore'
+                destinationDir = outputsFolder
+                duplicatesStrategy = 'exclude'
+
+                ntcoreTaskList.each { 
+                    it.outputs.files.each {
+                        from project.zipTree(it)
+                    }
+                    dependsOn it
+                }
+            }
+            project.build.dependsOn allCppTask
+        }
+
         publications {
             cpp(MavenPublication) {
                 ntcoreTaskList.each {
@@ -190,6 +228,10 @@ model {
                 artifact cppHeadersZip
                 artifact cppSourcesZip
 
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allCppTask
+                }
+
                 artifactId = "${baseArtifactId}-cpp"
                 groupId artifactGroupId
                 version pubVersion
@@ -197,6 +239,10 @@ model {
             jni(MavenPublication) {
                 ntcoreJNITaskList.each {
                     artifact it
+                }
+
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allJniTask
                 }
 
                 artifactId = "${baseArtifactId}-jni"
