@@ -77,6 +77,8 @@ enum Register {
   kReg_OffZ = 0x31
 };
 
+namespace hal {
+
 static void writeRegister(Register reg, uint8_t data);
 static uint8_t readRegister(Register reg);
 
@@ -181,6 +183,8 @@ static double unpackAxis(int16_t raw) {
       return 0.0;
   }
 }
+
+}  // namespace hal
 
 extern "C" {
 

@@ -38,6 +38,7 @@ class MotorInvertingTest
  protected:
   SpeedController* m_speedController;
   Encoder* m_encoder;
+
   void SetUp() override {
     switch (GetParam()) {
       case TEST_VICTOR:
@@ -59,6 +60,7 @@ class MotorInvertingTest
         break;
     }
   }
+
   void TearDown() override {
     delete m_speedController;
     delete m_encoder;
@@ -73,54 +75,82 @@ class MotorInvertingTest
 
 TEST_P(MotorInvertingTest, InvertingPositive) {
   Reset();
+
   m_speedController->Set(motorSpeed);
+
   Wait(delayTime);
+
   bool initDirection = m_encoder->GetDirection();
   m_speedController->SetInverted(true);
   m_speedController->Set(motorSpeed);
+
   Wait(delayTime);
+
   EXPECT_TRUE(m_encoder->GetDirection() != initDirection)
       << "Inverting with Positive value does not change direction";
+
   Reset();
 }
+
 TEST_P(MotorInvertingTest, InvertingNegative) {
   Reset();
+
   m_speedController->SetInverted(false);
   m_speedController->Set(-motorSpeed);
+
   Wait(delayTime);
+
   bool initDirection = m_encoder->GetDirection();
   m_speedController->SetInverted(true);
   m_speedController->Set(-motorSpeed);
+
   Wait(delayTime);
+
   EXPECT_TRUE(m_encoder->GetDirection() != initDirection)
       << "Inverting with Negative value does not change direction";
+
   Reset();
 }
+
 TEST_P(MotorInvertingTest, InvertingSwitchingPosToNeg) {
   Reset();
+
   m_speedController->SetInverted(false);
   m_speedController->Set(motorSpeed);
+
   Wait(delayTime);
+
   bool initDirection = m_encoder->GetDirection();
   m_speedController->SetInverted(true);
   m_speedController->Set(-motorSpeed);
+
   Wait(delayTime);
+
   EXPECT_TRUE(m_encoder->GetDirection() == initDirection)
       << "Inverting with Switching value does change direction";
+
   Reset();
 }
+
 TEST_P(MotorInvertingTest, InvertingSwitchingNegToPos) {
   Reset();
+
   m_speedController->SetInverted(false);
   m_speedController->Set(-motorSpeed);
+
   Wait(delayTime);
+
   bool initDirection = m_encoder->GetDirection();
   m_speedController->SetInverted(true);
   m_speedController->Set(motorSpeed);
+
   Wait(delayTime);
+
   EXPECT_TRUE(m_encoder->GetDirection() == initDirection)
       << "Inverting with Switching value does change direction";
+
   Reset();
 }
+
 INSTANTIATE_TEST_CASE_P(Test, MotorInvertingTest,
                         testing::Values(TEST_VICTOR, TEST_JAGUAR, TEST_TALON));

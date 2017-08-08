@@ -86,13 +86,13 @@ constexpr const char JNI_wpilibjPrefix[] = "edu.wpi.first.wpilibj";
 extern const char JNI_wpilibjPrefix[] = "edu.wpi.first.wpilibj";
 #endif
 
-void ReportError(JNIEnv *env, int32_t status, bool do_throw) {
+void ReportError(JNIEnv *env, int32_t status, bool doThrow) {
   if (status == 0) return;
   if (status == HAL_HANDLE_ERROR) {
     ThrowHalHandleException(env, status);
   }
   const char *message = HAL_GetErrorMessage(status);
-  if (do_throw && status < 0) {
+  if (doThrow && status < 0) {
     llvm::SmallString<1024> buf;
     llvm::raw_svector_ostream oss(buf);
     oss << " Code: " << status << ". " << message;

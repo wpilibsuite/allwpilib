@@ -34,8 +34,6 @@ std::ostream& operator<<(std::ostream& os, const FilterNoiseTestType& type) {
   return os;
 }
 
-using std::chrono::system_clock;
-
 constexpr double kStdDev = 10.0;
 
 /**

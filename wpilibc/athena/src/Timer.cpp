@@ -44,7 +44,10 @@ double GetClock() { return Timer::GetFPGATimestamp(); }
  *         on Saturday.
  */
 double GetTime() {
-  using namespace std::chrono;
+  using std::chrono::duration;
+  using std::chrono::duration_cast;
+  using std::chrono::system_clock;
+
   return duration_cast<duration<double>>(system_clock::now().time_since_epoch())
       .count();
 }

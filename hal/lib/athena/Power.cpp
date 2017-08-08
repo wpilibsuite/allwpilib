@@ -13,6 +13,8 @@
 
 using namespace hal;
 
+namespace hal {
+
 static std::unique_ptr<tPower> power;
 
 static void initializePower(int32_t* status) {
@@ -20,6 +22,8 @@ static void initializePower(int32_t* status) {
     power.reset(tPower::create(status));
   }
 }
+
+}  // namespace hal
 
 extern "C" {
 

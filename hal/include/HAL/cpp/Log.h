@@ -100,26 +100,27 @@ inline std::string NowTime() {
   llvm::SmallString<128> buf;
   llvm::raw_svector_ostream oss(buf);
 
-  using namespace std::chrono;
-  auto now = system_clock::now().time_since_epoch();
+  using std::chrono::duration_cast;
+
+  auto now = std::chrono::system_clock::now().time_since_epoch();
 
   // Hours
-  auto count = duration_cast<hours>(now).count() % 24;
+  auto count = duration_cast<std::chrono::hours>(now).count() % 24;
   if (count < 10) oss << "0";
   oss << count << ":";
 
   // Minutes
-  count = duration_cast<minutes>(now).count() % 60;
+  count = duration_cast<std::chrono::minutes>(now).count() % 60;
   if (count < 10) oss << "0";
   oss << count << ":";
 
   // Seconds
-  count = duration_cast<seconds>(now).count() % 60;
+  count = duration_cast<std::chrono::seconds>(now).count() % 60;
   if (count < 10) oss << "0";
   oss << count << ".";
 
   // Milliseconds
-  oss << duration_cast<milliseconds>(now).count() % 1000;
+  oss << duration_cast<std::chrono::milliseconds>(now).count() % 1000;
 
   return oss.str();
 }
