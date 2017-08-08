@@ -166,6 +166,25 @@ model {
             }
         })
 
+        def allCppTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allCppTask = project.tasks.create("wpiutilAllZip", Zip) {
+                description = 'Creates a zip with all Cpp artifacts'
+                classifier = 'all'
+                baseName = 'zipcppwpiutilwpiutil'
+                destinationDir = outputsFolder
+                duplicatesStrategy = 'exclude'
+
+                wpiutilTaskList.each { 
+                    it.outputs.files.each {
+                        from project.zipTree(it)
+                    }
+                    dependsOn it
+                }
+            }
+            project.build.dependsOn allCppTask
+        }
+
         publications {
             cpp(MavenPublication) {
                 wpiutilTaskList.each {
@@ -173,6 +192,10 @@ model {
                 }
                 artifact cppHeadersZip
                 artifact cppSourcesZip
+
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allCppTask
+                }
 
                 artifactId = "${baseArtifactId}-cpp"
                 groupId artifactGroupId
