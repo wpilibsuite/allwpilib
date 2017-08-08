@@ -134,6 +134,7 @@ static void SendHeader(llvm::raw_ostream& os, int code,
         "Pragma: no-cache\r\n"
         "Expires: Mon, 3 Jan 2000 12:34:56 GMT\r\n";
   os << "Content-Type: " << contentType << "\r\n";
+  os << "Access-Control-Allow-Origin: *\r\nAccess-Control-Allow-Methods: *\r\n";
   if (!extra.empty()) os << extra << "\r\n";
   os << "\r\n";  // header ends with a blank line
 }
@@ -566,8 +567,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
   llvm::SmallString<256> header;
   llvm::raw_svector_ostream oss{header};
 
-  SendHeader(oss, 200, "OK", "multipart/x-mixed-replace;boundary=" BOUNDARY,
-             "Access-Control-Allow-Origin: *");
+  SendHeader(oss, 200, "OK", "multipart/x-mixed-replace;boundary=" BOUNDARY);
   os << oss.str();
 
   SDEBUG("Headers send, sending stream now");
