@@ -51,7 +51,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   if (file != nullptr) {
     std::fputs("C++ ", file);
-    std::fputs(WPILibVersion, file);
+    std::fputs(GetWPILibVersion(), file);
     std::fclose(file);
   }
 
