@@ -57,7 +57,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     assertTrue("Input two was not high when relay set both high", m_relayFixture.getInputTwo()
         .get());
     assertEquals(Value.kOn, m_relayFixture.getRelay().get());
-    assertEquals("On", table.getString("Value"));
+    assertEquals("On", table.getString("Value", ""));
   }
 
   @Test
@@ -71,7 +71,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
         .getInputTwo()
         .get());
     assertEquals(Value.kForward, m_relayFixture.getRelay().get());
-    assertEquals("Forward", table.getString("Value"));
+    assertEquals("Forward", table.getString("Value", ""));
   }
 
   @Test
@@ -85,7 +85,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
         .getInputTwo()
         .get());
     assertEquals(Value.kReverse, m_relayFixture.getRelay().get());
-    assertEquals("Reverse", table.getString("Value"));
+    assertEquals("Reverse", table.getString("Value", ""));
   }
 
   @Test
@@ -98,7 +98,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     assertTrue("Input two was not high when relay set Value.kOn in kForward Direction",
         m_relayFixture.getInputTwo().get());
     assertEquals(Value.kOn, m_relayFixture.getRelay().get());
-    assertEquals("On", table.getString("Value"));
+    assertEquals("On", table.getString("Value", ""));
   }
 
   @Test
@@ -111,7 +111,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     assertFalse("Input two was not low when relay set Value.kOn in kReverse Direction",
         m_relayFixture.getInputTwo().get());
     assertEquals(Value.kOn, m_relayFixture.getRelay().get());
-    assertEquals("On", table.getString("Value"));
+    assertEquals("On", table.getString("Value", ""));
   }
 
   @Test(expected = InvalidValueException.class)
@@ -132,7 +132,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     // Initially both outputs should be off
     assertFalse(m_relayFixture.getInputOne().get());
     assertFalse(m_relayFixture.getInputTwo().get());
-    assertEquals("Off", table.getString("Value"));
+    assertEquals("Off", table.getString("Value", ""));
   }
 
   @Override
