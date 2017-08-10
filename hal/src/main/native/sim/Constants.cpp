@@ -5,24 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "vision/VisionRunner.h"
+#include "HAL/Constants.h"
 
-using namespace frc;
+#include "ConstantsInternal.h"
 
-class VisionTester : public VisionPipeline {
- public:
-  virtual ~VisionTester() = default;
+using namespace hal;
 
-  void Process(cv::Mat& mat) override {}
-  void TestThing() {}
-};
-
-void TestVisionInitialization() {
-  cs::CvSource source;
-  VisionTester tester;
-  VisionRunner<VisionTester> runner(source, &tester,
-                                    [](VisionTester& t) { t.TestThing(); });
-
-  runner.RunOnce();
-  runner.RunForever();
+extern "C" {
+int32_t HAL_GetSystemClockTicksPerMicrosecond(void) {
+  return kSystemClockTicksPerMicrosecond;
+}
 }
