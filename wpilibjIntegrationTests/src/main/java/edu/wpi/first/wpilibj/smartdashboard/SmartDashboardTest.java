@@ -39,7 +39,7 @@ public class SmartDashboardTest extends AbstractComsSetup {
     String value = "thisIsAValue";
     SmartDashboard.putString(key, value);
     assertEquals(value, SmartDashboard.getString(key, ""));
-    assertEquals(value, table.getString(key));
+    assertEquals(value, table.getString(key, ""));
   }
 
   @Test
@@ -48,7 +48,7 @@ public class SmartDashboardTest extends AbstractComsSetup {
     int value = 2147483647;
     SmartDashboard.putNumber(key, value);
     assertEquals(value, SmartDashboard.getNumber(key, 0), 0.01);
-    assertEquals(value, table.getNumber(key), 0.01);
+    assertEquals(value, table.getNumber(key, 0), 0.01);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class SmartDashboardTest extends AbstractComsSetup {
     boolean value = true;
     SmartDashboard.putBoolean(key, value);
     assertEquals(value, SmartDashboard.getBoolean(key, !value));
-    assertEquals(value, table.getBoolean(key));
+    assertEquals(value, table.getBoolean(key, false));
   }
 
   @Test
@@ -66,12 +66,12 @@ public class SmartDashboardTest extends AbstractComsSetup {
     String valueOld = "oldValue";
     SmartDashboard.putString(key, valueOld);
     assertEquals(valueOld, SmartDashboard.getString(key, ""));
-    assertEquals(valueOld, table.getString(key));
+    assertEquals(valueOld, table.getString(key, ""));
 
     String valueNew = "newValue";
     SmartDashboard.putString(key, valueNew);
     assertEquals(valueNew, SmartDashboard.getString(key, ""));
-    assertEquals(valueNew, table.getString(key));
+    assertEquals(valueNew, table.getString(key, ""));
   }
 
   @Ignore
