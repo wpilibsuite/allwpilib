@@ -1,0 +1,36 @@
+apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+def pubVersion
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+if (pubVersion == null || pubVersion == "") {
+  pubVersion = "424242-SNAPSHOT"
+}
+
+def baseArtifactId = 'ni-libraries'
+def artifactGroupId = 'edu.wpi.first.ni-libraries'
+
+
+publishing {
+  publications {
+    nilibraries(MavenPublication) {
+      artifact libZip
+      artifact headersZip
+
+      artifactId = "${baseArtifactId}"
+      groupId artifactGroupId
+      version pubVersion
+    }
+  }
+}

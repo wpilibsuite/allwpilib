@@ -1,2 +1,0 @@
-OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( libnirio_emb_can.so.16.0.0 )

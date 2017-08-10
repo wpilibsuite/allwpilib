@@ -1,3 +1,0 @@
-/* GNU ld script */
-OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( AS_NEEDED ( -lFRC_NetworkCommunication -li2c -lni_emb -lNiFpgaLv -lNiFpga -lnirio_emb_can -lNiRioSrv -lni_rtlog -lRoboRIO_FRC_ChipObject -lspi -lvisa -ldl -lpthread -lrt -lGCBase_gcc-4.4-arm_v3_0_NI -lGenApi_gcc-4.4-arm_v3_0_NI -lLog_gcc-4.4-arm_v3_0_NI -lMathParser_gcc-4.4-arm_v3_0_NI -llog4cpp_gcc-4.4-arm_v3_0_NI -lniimaqdx -lnivision -lnivissvc -lnipalu -lNodeMapData_gcc-4.4-arm_v3_0_NI -lXmlParser_gcc-4.4-arm_v3_0_NI -lavcodec -lavformat -lavutil -lniriodevenum -lniriosession -lswscale) )

@@ -1,3 +1,0 @@
-/* GNU ld script */
-OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( AS_NEEDED ( -lwpilibc -lHALAthena -lntcore -lwpiutil -lcscore -lopencv -lnilibraries ) )
