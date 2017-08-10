@@ -8,6 +8,11 @@ ext.gmockProject = true
 
 apply from: '../config.gradle'
 
+ext.addGmockToLinker = { binary->
+    binary.lib project: ':gmock', library: 'gmock', linkage: 'static'
+}
+
+
 model {
     components {
         gmock(NativeLibrarySpec) {

@@ -22,7 +22,6 @@
 #include "Buttons/InternalButton.h"
 #include "Buttons/JoystickButton.h"
 #include "Buttons/NetworkButton.h"
-#include "CameraServer.h"
 #include "Commands/Command.h"
 #include "Commands/CommandGroup.h"
 #include "Commands/PIDCommand.h"
@@ -88,4 +87,3 @@
 #include "interfaces/Accelerometer.h"
 #include "interfaces/Gyro.h"
 #include "interfaces/Potentiometer.h"
-#include "vision/VisionRunner.h"
