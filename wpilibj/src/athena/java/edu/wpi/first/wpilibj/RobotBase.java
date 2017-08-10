@@ -61,7 +61,7 @@ public abstract class RobotBase {
     NetworkTable.setServerMode(); // must be before b
     m_ds = DriverStation.getInstance();
     NetworkTable.getTable(""); // forces network tables to initialize
-    NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
+    NetworkTable.getTable("LiveWindow").getSubTable(".status").putBoolean("LW Enabled", false);
 
     LiveWindow.setEnabled(false);
   }

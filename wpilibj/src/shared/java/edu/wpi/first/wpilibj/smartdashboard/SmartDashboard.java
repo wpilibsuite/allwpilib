@@ -49,7 +49,7 @@ public class SmartDashboard {
    */
   public static void putData(String key, Sendable data) {
     ITable dataTable = table.getSubTable(key);
-    dataTable.putString("~TYPE~", data.getSmartDashboardType());
+    dataTable.putString(".type", data.getSmartDashboardType());
     data.initTable(dataTable);
     tablesToData.put(dataTable, data);
   }

@@ -104,7 +104,7 @@ void SampleRobot::StartCompetition() {
   LiveWindow* lw = LiveWindow::GetInstance();
 
   NetworkTable::GetTable("LiveWindow")
-      ->GetSubTable("~STATUS~")
+      ->GetSubTable(".status")
       ->PutBoolean("LW Enabled", false);
 
   RobotMain();

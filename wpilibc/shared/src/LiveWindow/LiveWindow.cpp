@@ -33,7 +33,7 @@ LiveWindow* LiveWindow::GetInstance() {
  */
 LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
   m_liveWindowTable = NetworkTable::GetTable("LiveWindow");
-  m_statusTable = m_liveWindowTable->GetSubTable("~STATUS~");
+  m_statusTable = m_liveWindowTable->GetSubTable(".status");
 }
 
 /**
@@ -227,11 +227,11 @@ void LiveWindow::InitializeLiveWindowComponents() {
     LiveWindowComponent c = elem.second;
     std::string subsystem = c.subsystem;
     std::string name = c.name;
-    m_liveWindowTable->GetSubTable(subsystem)->PutString("~TYPE~",
+    m_liveWindowTable->GetSubTable(subsystem)->PutString(".type",
                                                          "LW Subsystem");
     std::shared_ptr<ITable> table(
         m_liveWindowTable->GetSubTable(subsystem)->GetSubTable(name));
-    table->PutString("~TYPE~", component->GetSmartDashboardType());
+    table->PutString(".type", component->GetSmartDashboardType());
     table->PutString("Name", name);
     table->PutString("Subsystem", subsystem);
     component->InitTable(table);

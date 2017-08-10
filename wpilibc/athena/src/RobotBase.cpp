@@ -57,7 +57,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   // First and one-time initialization
   NetworkTable::GetTable("LiveWindow")
-      ->GetSubTable("~STATUS~")
+      ->GetSubTable(".status")
       ->PutBoolean("LW Enabled", false);
 
   LiveWindow::GetInstance()->SetEnabled(false);

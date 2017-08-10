@@ -145,7 +145,7 @@ public interface CANSpeedController extends SpeedController, PIDInterface, LiveW
   default void updateTable() {
     ITable table = getTable();
     if (table != null) {
-      table.putString("~TYPE~", SMART_DASHBOARD_TYPE);
+      table.putString(".type", SMART_DASHBOARD_TYPE);
       table.putString("Type", getClass().getSimpleName());
       table.putNumber("Mode", getControlMode().getValue());
       if (getControlMode().isPID()) {
