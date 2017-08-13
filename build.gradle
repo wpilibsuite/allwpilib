@@ -210,7 +210,6 @@ model {
             if (it.component.testedComponent.name.contains('TestingBase') && !project.hasProperty('onlyAthena')) {
                 lib project: ':gmock', library: 'gmock', linkage: 'static'
                 lib library: 'ntcore', linkage: 'shared'
-                NativeUtils.setPlatformSpecificIncludeFlag("${rootDir}/src/main/native/cpp".toString(), cppCompiler)
             } else {
                 it.buildable = false
             }
