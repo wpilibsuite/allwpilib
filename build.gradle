@@ -109,6 +109,26 @@ model {
             }
         }
     }
+    tasks {
+        def c = $.components
+        project.tasks.create('runCpp', Exec) {
+            def found = false
+            c.each {
+                if (it in NativeExecutableSpec && it.name == 'wpiutilDev') {
+                    it.binaries.each {
+                        if (!found) {
+                            def arch = it.targetPlatform.architecture.name
+                            if (arch == 'x86-64' || arch == 'x86') {
+                                dependsOn it.tasks.install
+                                commandLine it.tasks.install.runScript
+                                found = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 apply from: 'publish.gradle'
