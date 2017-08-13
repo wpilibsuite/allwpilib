@@ -8,6 +8,7 @@
 #include "support/Base64.h"
 
 #include "gtest/gtest.h"
+#include "llvm/SmallString.h"
 
 namespace wpi {
 
@@ -34,17 +35,45 @@ class Base64Test : public ::testing::TestWithParam<Base64TestParam> {
   }
 };
 
-TEST_P(Base64Test, Encode) {
+TEST_P(Base64Test, EncodeStdString) {
   std::string s;
+  Base64Encode(GetPlain(), &s);
+  ASSERT_EQ(GetParam().encoded, s);
+
+  // text already in s
   Base64Encode(GetPlain(), &s);
   ASSERT_EQ(GetParam().encoded, s);
 }
 
-TEST_P(Base64Test, Decode) {
+TEST_P(Base64Test, EncodeSmallString) {
+  llvm::SmallString<128> buf;
+  ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain(), buf));
+  // reuse buf
+  ASSERT_EQ(GetParam().encoded, Base64Encode(GetPlain(), buf));
+}
+
+TEST_P(Base64Test, DecodeStdString) {
   std::string s;
   llvm::StringRef encoded = GetParam().encoded;
   EXPECT_EQ(encoded.size(), Base64Decode(encoded, &s));
   ASSERT_EQ(GetPlain(), s);
+
+  // text already in s
+  Base64Decode(encoded, &s);
+  ASSERT_EQ(GetPlain(), s);
+}
+
+TEST_P(Base64Test, DecodeSmallString) {
+  llvm::SmallString<128> buf;
+  llvm::StringRef encoded = GetParam().encoded;
+  std::size_t len;
+  llvm::StringRef plain = Base64Decode(encoded, &len, buf);
+  EXPECT_EQ(encoded.size(), len);
+  ASSERT_EQ(GetPlain(), plain);
+
+  // reuse buf
+  plain = Base64Decode(encoded, &len, buf);
+  ASSERT_EQ(GetPlain(), plain);
 }
 
 static Base64TestParam sample[] = {

@@ -64,6 +64,9 @@
 
 #include "support/Base64.h"
 
+#include "llvm/SmallVector.h"
+#include "llvm/raw_ostream.h"
+
 namespace wpi {
 
 // aaaack but it's fast and const should make it shared text page.
@@ -88,65 +91,91 @@ static const unsigned char pr2six[256] =
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64
 };
 
-std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain) {
+std::size_t Base64Decode(llvm::raw_ostream& os, llvm::StringRef encoded) {
   const unsigned char *end = encoded.bytes_begin();
   while (pr2six[*end] <= 63 && end != encoded.bytes_end()) ++end;
   std::size_t nprbytes = end - encoded.bytes_begin();
-
-  plain->clear();
-  if (nprbytes == 0)
-    return 0;
-  plain->reserve(((nprbytes + 3) / 4) * 3);
+  if (nprbytes == 0) return 0;
 
   const unsigned char *cur = encoded.bytes_begin();
 
   while (nprbytes > 4) {
-    (*plain) += (pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
-    (*plain) += (pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
-    (*plain) += (pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+    os << static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+    os << static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+    os << static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
     cur += 4;
     nprbytes -= 4;
   }
 
   // Note: (nprbytes == 1) would be an error, so just ignore that case
-  if (nprbytes > 1) (*plain) += (pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
-  if (nprbytes > 2) (*plain) += (pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
-  if (nprbytes > 3) (*plain) += (pr2six[cur[2]] << 6 | pr2six[cur[3]]);
+  if (nprbytes > 1)
+    os << static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
+  if (nprbytes > 2)
+    os << static_cast<unsigned char>(pr2six[cur[1]] << 4 | pr2six[cur[2]] >> 2);
+  if (nprbytes > 3)
+    os << static_cast<unsigned char>(pr2six[cur[2]] << 6 | pr2six[cur[3]]);
 
   return (end - encoded.bytes_begin()) + ((4 - nprbytes) & 3);
+}
+
+std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain) {
+  plain->resize(0);
+  llvm::raw_string_ostream os(*plain);
+  std::size_t rv = Base64Decode(os, encoded);
+  os.flush();
+  return rv;
+}
+
+llvm::StringRef Base64Decode(llvm::StringRef encoded, std::size_t* num_read,
+                             llvm::SmallVectorImpl<char>& buf) {
+  buf.clear();
+  llvm::raw_svector_ostream os(buf);
+  *num_read = Base64Decode(os, encoded);
+  return os.str();
 }
 
 static const char basis_64[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-void Base64Encode(llvm::StringRef plain, std::string* encoded) {
-  encoded->clear();
-  if (plain.empty())
-    return;
+void Base64Encode(llvm::raw_ostream& os, llvm::StringRef plain) {
+  if (plain.empty()) return;
   std::size_t len = plain.size();
-  encoded->reserve(((len + 2) / 3 * 4) + 1);
 
   std::size_t i;
   for (i = 0; (i + 2) < len; i += 3) {
-    (*encoded) += basis_64[(plain[i] >> 2) & 0x3F];
-    (*encoded) +=
-        basis_64[((plain[i] & 0x3) << 4) | ((int)(plain[i + 1] & 0xF0) >> 4)];
-    (*encoded) += basis_64[((plain[i + 1] & 0xF) << 2) |
-                           ((int)(plain[i + 2] & 0xC0) >> 6)];
-    (*encoded) += basis_64[plain[i + 2] & 0x3F];
+    os << basis_64[(plain[i] >> 2) & 0x3F];
+    os << basis_64[((plain[i] & 0x3) << 4) | ((int)(plain[i + 1] & 0xF0) >> 4)];
+    os << basis_64[((plain[i + 1] & 0xF) << 2) |
+                   ((int)(plain[i + 2] & 0xC0) >> 6)];
+    os << basis_64[plain[i + 2] & 0x3F];
   }
   if (i < len) {
-    (*encoded) += basis_64[(plain[i] >> 2) & 0x3F];
+    os << basis_64[(plain[i] >> 2) & 0x3F];
     if (i == (len - 1)) {
-      (*encoded) += basis_64[((plain[i] & 0x3) << 4)];
-      (*encoded) += '=';
+      os << basis_64[((plain[i] & 0x3) << 4)];
+      os << '=';
     } else {
-      (*encoded) +=
-          basis_64[((plain[i] & 0x3) << 4) | ((int)(plain[i + 1] & 0xF0) >> 4)];
-      (*encoded) += basis_64[((plain[i + 1] & 0xF) << 2)];
+      os << basis_64[((plain[i] & 0x3) << 4) |
+                     ((int)(plain[i + 1] & 0xF0) >> 4)];
+      os << basis_64[((plain[i + 1] & 0xF) << 2)];
     }
-    (*encoded) += '=';
+    os << '=';
   }
+}
+
+void Base64Encode(llvm::StringRef plain, std::string* encoded) {
+  encoded->resize(0);
+  llvm::raw_string_ostream os(*encoded);
+  Base64Encode(os, plain);
+  os.flush();
+}
+
+llvm::StringRef Base64Encode(llvm::StringRef plain,
+                             llvm::SmallVectorImpl<char>& buf) {
+  buf.clear();
+  llvm::raw_svector_ostream os(buf);
+  Base64Encode(os, plain);
+  return os.str();
 }
 
 }  // namespace wpi

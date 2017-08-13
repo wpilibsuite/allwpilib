@@ -13,10 +13,27 @@
 
 #include "llvm/StringRef.h"
 
+namespace llvm {
+template <typename T>
+class SmallVectorImpl;
+class raw_ostream;
+}
+
 namespace wpi {
 
+std::size_t Base64Decode(llvm::raw_ostream& os, llvm::StringRef encoded);
+
 std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain);
+
+llvm::StringRef Base64Decode(llvm::StringRef encoded, std::size_t* num_read,
+                             llvm::SmallVectorImpl<char>& buf);
+
+void Base64Encode(llvm::raw_ostream& os, llvm::StringRef plain);
+
 void Base64Encode(llvm::StringRef plain, std::string* encoded);
+
+llvm::StringRef Base64Encode(llvm::StringRef plain,
+                             llvm::SmallVectorImpl<char>& buf);
 
 }  // namespace wpi
 
