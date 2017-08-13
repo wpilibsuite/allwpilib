@@ -44,6 +44,10 @@ if (project.hasProperty('onlyAthena')) {
     test.enabled = false
 }
 
+sourceSets {
+    dev
+}
+
 task nativeTestFilesJar(type: Jar) {
     destinationDir = project.buildDir
     classifier = "nativeTestFiles"
@@ -62,13 +66,23 @@ task nativeTestFilesJar(type: Jar) {
     }
 }
 
+task run(type: JavaExec) {
+    classpath = sourceSets.dev.runtimeClasspath
+
+    main = 'edu.wpi.first.ntcore.DevMain'
+}
+
 test.dependsOn nativeTestFilesJar
+run.dependsOn nativeTestFilesJar
+
 
 dependencies {
     compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
-    runtime 'edu.wpi.first.wpiutil:wpiutil-java:+'
     testCompile 'junit:junit:4.12'
     testRuntime files(project(':').nativeTestFilesJar.archivePath)
+    devCompile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    devCompile sourceSets.main.output
+    devRuntime files(project(':').nativeTestFilesJar.archivePath)
 }
 
 
