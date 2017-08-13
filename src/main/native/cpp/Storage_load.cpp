@@ -10,8 +10,10 @@
 #include <cctype>
 #include <string>
 
+#include "llvm/SmallString.h"
 #include "llvm/StringExtras.h"
 #include "support/Base64.h"
+#include "support/raw_istream.h"
 
 #include "IDispatcher.h"
 #include "IEntryNotifier.h"
@@ -25,7 +27,7 @@ class LoadPersistentImpl {
   typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
   typedef std::function<void(std::size_t line, const char* msg)> WarnFunc;
 
-  LoadPersistentImpl(std::istream& is, WarnFunc warn)
+  LoadPersistentImpl(wpi::raw_istream& is, WarnFunc warn)
       : m_is(is), m_warn(warn) {}
 
   bool Load(std::vector<Entry>* entries);
@@ -34,7 +36,7 @@ class LoadPersistentImpl {
   bool ReadLine();
   bool ReadHeader();
   NT_Type ReadType();
-  bool ReadName(std::string* name);
+  llvm::StringRef ReadName(llvm::SmallVectorImpl<char>& buf);
   std::shared_ptr<Value> ReadValue(NT_Type type);
   std::shared_ptr<Value> ReadBooleanValue();
   std::shared_ptr<Value> ReadDoubleValue();
@@ -48,14 +50,13 @@ class LoadPersistentImpl {
     if (m_warn) m_warn(m_line_num, msg);
   }
 
-  std::istream& m_is;
+  wpi::raw_istream& m_is;
   WarnFunc m_warn;
 
   llvm::StringRef m_line;
-  std::string m_line_buf;
+  llvm::SmallString<128> m_line_buf;
   std::size_t m_line_num = 0;
 
-  std::string m_buf_str;
   std::vector<int> m_buf_boolean_array;
   std::vector<double> m_buf_double_array;
   std::vector<std::string> m_buf_string_array;
@@ -98,29 +99,30 @@ static int fromxdigit(char ch) {
     return ch - '0';
 }
 
-static void UnescapeString(llvm::StringRef source, std::string* dest) {
+static llvm::StringRef UnescapeString(llvm::StringRef source,
+                                      llvm::SmallVectorImpl<char>& buf) {
   assert(source.size() >= 2 && source.front() == '"' && source.back() == '"');
-  dest->clear();
-  dest->reserve(source.size() - 2);
+  buf.clear();
+  buf.reserve(source.size() - 2);
   for (auto s = source.begin() + 1, end = source.end() - 1; s != end; ++s) {
     if (*s != '\\') {
-      dest->push_back(*s);
+      buf.push_back(*s);
       continue;
     }
     switch (*++s) {
       case '\\':
       case '"':
-        dest->push_back(s[-1]);
+        buf.push_back(s[-1]);
         break;
       case 't':
-        dest->push_back('\t');
+        buf.push_back('\t');
         break;
       case 'n':
-        dest->push_back('\n');
+        buf.push_back('\n');
         break;
       case 'x': {
         if (!isxdigit(*(s + 1))) {
-          dest->push_back('x');  // treat it like a unknown escape
+          buf.push_back('x');  // treat it like a unknown escape
           break;
         }
         int ch = fromxdigit(*++s);
@@ -128,21 +130,19 @@ static void UnescapeString(llvm::StringRef source, std::string* dest) {
           ch <<= 4;
           ch |= fromxdigit(*++s);
         }
-        dest->push_back(static_cast<char>(ch));
+        buf.push_back(static_cast<char>(ch));
         break;
       }
       default:
-        dest->push_back(s[-1]);
+        buf.push_back(s[-1]);
         break;
     }
   }
+  return llvm::StringRef{buf.data(), buf.size()};
 }
 
 bool LoadPersistentImpl::Load(std::vector<Entry>* entries) {
   if (!ReadHeader()) return false;  // header
-
-  // declare this outside the loop to reduce reallocs
-  std::string name;
 
   while (ReadLine()) {
     // type
@@ -153,7 +153,9 @@ bool LoadPersistentImpl::Load(std::vector<Entry>* entries) {
     }
 
     // name
-    if (!ReadName(&name)) continue;
+    llvm::SmallString<128> buf;
+    llvm::StringRef name = ReadName(buf);
+    if (name.empty()) continue;
 
     // =
     m_line = m_line.ltrim(" \t");
@@ -167,17 +169,16 @@ bool LoadPersistentImpl::Load(std::vector<Entry>* entries) {
     auto value = ReadValue(type);
 
     // move to entries
-    if (!name.empty() && value)
-      entries->emplace_back(std::move(name), std::move(value));
+    if (value) entries->emplace_back(name, std::move(value));
   }
   return true;
 }
 
 bool LoadPersistentImpl::ReadLine() {
   // ignore blank lines and lines that start with ; or # (comments)
-  while (std::getline(m_is, m_line_buf)) {
+  while (!m_is.has_error()) {
     ++m_line_num;
-    m_line = llvm::StringRef(m_line_buf).trim();
+    m_line = m_is.getline(m_line_buf, INT_MAX).trim();
     if (!m_line.empty() && m_line.front() != ';' && m_line.front() != '#')
       return true;
   }
@@ -217,19 +218,18 @@ NT_Type LoadPersistentImpl::ReadType() {
   return NT_UNASSIGNED;
 }
 
-bool LoadPersistentImpl::ReadName(std::string* name) {
+llvm::StringRef LoadPersistentImpl::ReadName(llvm::SmallVectorImpl<char>& buf) {
   llvm::StringRef tok;
   std::tie(tok, m_line) = ReadStringToken(m_line);
   if (tok.empty()) {
     Warn("missing name");
-    return false;
+    return llvm::StringRef{};
   }
   if (tok.back() != '"') {
     Warn("unterminated name string");
-    return false;
+    return llvm::StringRef{};
   }
-  UnescapeString(tok, name);
-  return true;
+  return UnescapeString(tok, buf);
 }
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadValue(NT_Type type) {
@@ -263,10 +263,9 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanValue() {
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleValue() {
   // need to convert to null-terminated string for strtod()
-  m_buf_str.clear();
-  m_buf_str += m_line;
+  llvm::SmallString<64> buf;
   char* end;
-  double v = std::strtod(m_buf_str.c_str(), &end);
+  double v = std::strtod(m_line.c_str(buf), &end);
   if (*end != '\0') {
     Warn("invalid double value");
     return nullptr;
@@ -285,13 +284,14 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringValue() {
     Warn("unterminated string value");
     return nullptr;
   }
-  UnescapeString(tok, &m_buf_str);
-  return Value::MakeString(std::move(m_buf_str));
+  llvm::SmallString<128> buf;
+  return Value::MakeString(UnescapeString(tok, buf));
 }
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadRawValue() {
-  wpi::Base64Decode(m_line, &m_buf_str);
-  return Value::MakeRaw(std::move(m_buf_str));
+  llvm::SmallString<128> buf;
+  std::size_t nr;
+  return Value::MakeRaw(wpi::Base64Decode(m_line, &nr, buf));
 }
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanArrayValue() {
@@ -319,10 +319,9 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleArrayValue() {
     std::tie(tok, m_line) = m_line.split(',');
     tok = tok.trim(" \t");
     // need to convert to null-terminated string for strtod()
-    m_buf_str.clear();
-    m_buf_str += tok;
+    llvm::SmallString<64> buf;
     char* end;
-    double v = std::strtod(m_buf_str.c_str(), &end);
+    double v = std::strtod(tok.c_str(buf), &end);
     if (*end != '\0') {
       Warn("invalid double value");
       return nullptr;
@@ -347,8 +346,8 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
       return nullptr;
     }
 
-    UnescapeString(tok, &m_buf_str);
-    m_buf_string_array.push_back(std::move(m_buf_str));
+    llvm::SmallString<128> buf;
+    m_buf_string_array.push_back(UnescapeString(tok, buf));
 
     m_line = m_line.ltrim(" \t");
     if (m_line.empty()) break;
@@ -363,7 +362,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
 }
 
 bool Storage::LoadPersistent(
-    std::istream& is,
+    wpi::raw_istream& is,
     std::function<void(std::size_t line, const char* msg)> warn) {
   // entries to add
   std::vector<LoadPersistentImpl::Entry> entries;
@@ -434,8 +433,9 @@ bool Storage::LoadPersistent(
 const char* Storage::LoadPersistent(
     StringRef filename,
     std::function<void(std::size_t line, const char* msg)> warn) {
-  std::ifstream is(filename);
-  if (!is) return "could not open file";
+  std::error_code ec;
+  wpi::raw_fd_istream is(filename, ec);
+  if (ec.value() != 0) return "could not open file";
   if (!LoadPersistent(is, warn)) return "error reading file";
   return nullptr;
 }

@@ -11,9 +11,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <cstddef>
-#include <fstream>
 #include <functional>
-#include <iosfwd>
 #include <memory>
 #include <mutex>
 
@@ -26,8 +24,13 @@
 
 #include "IStorage.h"
 
+namespace llvm {
+class raw_ostream;
+}
+
 namespace wpi {
 class Logger;
+class raw_istream;
 }
 
 namespace nt {
@@ -113,9 +116,9 @@ class Storage : public IStorage {
 
   // Stream-based save/load functions (exposed for testing purposes).  These
   // implement the guts of the filename-based functions.
-  void SavePersistent(std::ostream& os, bool periodic) const;
+  void SavePersistent(llvm::raw_ostream& os, bool periodic) const;
   bool LoadPersistent(
-      std::istream& is,
+      wpi::raw_istream& is,
       std::function<void(std::size_t line, const char* msg)> warn);
 
   // RPC configuration needs to come through here as RPC definitions are

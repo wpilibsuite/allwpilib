@@ -8,10 +8,10 @@
 #include "StorageTest.h"
 #include "Storage.h"
 
-#include <sstream>
-
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include "llvm/raw_ostream.h"
+#include "support/raw_istream.h"
 
 #include "MessageMatcher.h"
 #include "TestPrinters.h"
@@ -541,16 +541,18 @@ TEST_P(StorageTestPopulated, GetEntryInfoPrefixTypes) {
 }
 
 TEST_P(StorageTestPersistent, SavePersistentEmpty) {
-  std::ostringstream oss;
+  llvm::SmallString<256> buf;
+  llvm::raw_svector_ostream oss(buf);
   storage.SavePersistent(oss, false);
   ASSERT_EQ("[NetworkTables Storage 3.0]\n", oss.str());
 }
 
 TEST_P(StorageTestPersistent, SavePersistent) {
   for (auto& i : entries()) i.getValue()->flags = NT_PERSISTENT;
-  std::ostringstream oss;
+  llvm::SmallString<256> buf;
+  llvm::raw_svector_ostream oss(buf);
   storage.SavePersistent(oss, false);
-  std::string out = oss.str();
+  llvm::StringRef out = oss.str();
   //fputs(out.c_str(), stderr);
   llvm::StringRef line, rem = out;
   std::tie(line, rem) = rem.split('\n');
@@ -613,16 +615,17 @@ TEST_P(StorageTestEmpty, LoadPersistentBadHeader) {
     warn.Warn(line, msg);
   };
 
-  std::istringstream iss("");
-  EXPECT_CALL(
-      warn,
-      Warn(0, llvm::StringRef("header line mismatch, ignoring rest of file")));
-  EXPECT_FALSE(storage.LoadPersistent(iss, warn_func));
-
-  std::istringstream iss2("[NetworkTables");
+  wpi::raw_mem_istream iss("");
   EXPECT_CALL(
       warn,
       Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
+  EXPECT_FALSE(storage.LoadPersistent(iss, warn_func));
+
+  wpi::raw_mem_istream iss2("[NetworkTables");
+  EXPECT_CALL(
+      warn,
+      Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
+
   EXPECT_FALSE(storage.LoadPersistent(iss2, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
@@ -634,7 +637,7 @@ TEST_P(StorageTestEmpty, LoadPersistentCommentHeader) {
     warn.Warn(line, msg);
   };
 
-  std::istringstream iss(
+  wpi::raw_mem_istream iss(
       "\n; comment\n# comment\n[NetworkTables Storage 3.0]\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   EXPECT_TRUE(entries().empty());
@@ -647,7 +650,7 @@ TEST_P(StorageTestEmpty, LoadPersistentEmptyName) {
     warn.Warn(line, msg);
   };
 
-  std::istringstream iss(
+  wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\nboolean \"\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   EXPECT_TRUE(entries().empty());
@@ -671,7 +674,7 @@ TEST_P(StorageTestEmpty, LoadPersistentAssign) {
                                     ValueEq(Value::MakeBoolean(true)),
                                     NT_NOTIFY_NEW | NT_NOTIFY_LOCAL, UINT_MAX));
 
-  std::istringstream iss(
+  wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo");
@@ -696,7 +699,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateFlags) {
               NotifyEntry(1, StringRef("foo2"), ValueEq(Value::MakeDouble(0)),
                           NT_NOTIFY_FLAGS | NT_NOTIFY_LOCAL, UINT_MAX));
 
-  std::istringstream iss(
+  wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=0.0\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo2");
@@ -725,7 +728,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValue) {
               NotifyEntry(1, StringRef("foo2"), ValueEq(Value::MakeDouble(1)),
                           NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL, UINT_MAX));
 
-  std::istringstream iss(
+  wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=1.0\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo2");
@@ -761,7 +764,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValueFlags) {
                           NT_NOTIFY_FLAGS | NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL,
                           UINT_MAX));
 
-  std::istringstream iss(
+  wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=1.0\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   auto entry = GetEntry("foo2");
@@ -809,7 +812,7 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
               NotifyEntry(_, _, _, NT_NOTIFY_NEW | NT_NOTIFY_LOCAL, UINT_MAX))
       .Times(22);
 
-  std::istringstream iss(in);
+  wpi::raw_mem_istream iss(in);
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   ASSERT_EQ(22u, entries().size());
 
@@ -858,7 +861,7 @@ TEST_P(StorageTestEmpty, LoadPersistentWarn) {
     warn.Warn(line, msg);
   };
 
-  std::istringstream iss(
+  wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=foo\n");
   EXPECT_CALL(
       warn, Warn(2, llvm::StringRef(

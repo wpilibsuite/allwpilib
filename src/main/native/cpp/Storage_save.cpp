@@ -10,7 +10,10 @@
 #include <cctype>
 #include <string>
 
+#include "llvm/Format.h"
+#include "llvm/SmallString.h"
 #include "llvm/StringExtras.h"
+#include "llvm/raw_ostream.h"
 #include "support/Base64.h"
 
 #include "Log.h"
@@ -23,7 +26,7 @@ class SavePersistentImpl {
  public:
   typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
 
-  SavePersistentImpl(std::ostream& os) : m_os(os) {}
+  SavePersistentImpl(llvm::raw_ostream& os) : m_os(os) {}
 
   void Save(llvm::ArrayRef<Entry> entries);
 
@@ -35,7 +38,7 @@ class SavePersistentImpl {
   bool WriteType(NT_Type type);
   void WriteValue(const Value& value);
 
-  std::ostream& m_os;
+  llvm::raw_ostream& m_os;
 };
 
 }  // anonymous namespace
@@ -131,15 +134,13 @@ void SavePersistentImpl::WriteValue(const Value& value) {
       m_os << (value.GetBoolean() ? "true" : "false");
       break;
     case NT_DOUBLE:
-      m_os << value.GetDouble();
+      m_os << llvm::format("%g", value.GetDouble());
       break;
     case NT_STRING:
       WriteString(value.GetString());
       break;
     case NT_RAW: {
-      std::string base64_encoded;
-      wpi::Base64Encode(value.GetRaw(), &base64_encoded);
-      m_os << base64_encoded;
+      wpi::Base64Encode(m_os, value.GetRaw());
       break;
     }
     case NT_BOOLEAN_ARRAY: {
@@ -156,7 +157,7 @@ void SavePersistentImpl::WriteValue(const Value& value) {
       for (auto elem : value.GetDoubleArray()) {
         if (!first) m_os << ',';
         first = false;
-        m_os << elem;
+        m_os << llvm::format("%g", elem);
       }
       break;
     }
@@ -174,17 +175,17 @@ void SavePersistentImpl::WriteValue(const Value& value) {
   }
 }
 
-void Storage::SavePersistent(std::ostream& os, bool periodic) const {
+void Storage::SavePersistent(llvm::raw_ostream& os, bool periodic) const {
   std::vector<SavePersistentImpl::Entry> entries;
   if (!GetPersistentEntries(periodic, &entries)) return;
   SavePersistentImpl(os).Save(entries);
 }
 
 const char* Storage::SavePersistent(StringRef filename, bool periodic) const {
-  std::string fn = filename;
-  std::string tmp = filename;
+  llvm::SmallString<128> fn = filename;
+  llvm::SmallString<128> tmp = filename;
   tmp += ".tmp";
-  std::string bak = filename;
+  llvm::SmallString<128> bak = filename;
   bak += ".bak";
 
   // Get entries before creating file
@@ -194,21 +195,20 @@ const char* Storage::SavePersistent(StringRef filename, bool periodic) const {
   const char* err = nullptr;
 
   // start by writing to temporary file
-  std::ofstream os(tmp);
-  if (!os) {
+  std::error_code ec;
+  llvm::raw_fd_ostream os(tmp, ec, llvm::sys::fs::F_Text);
+  if (ec.value() != 0) {
     err = "could not open file";
     goto done;
   }
   DEBUG("saving persistent file '" << filename << "'");
   SavePersistentImpl(os).Save(entries);
-  os.flush();
-  if (!os) {
-    os.close();
+  os.close();
+  if (os.has_error()) {
     std::remove(tmp.c_str());
     err = "error saving file";
     goto done;
   }
-  os.close();
 
   // Safely move to real file.  We ignore any failures related to the backup.
   std::remove(bak.c_str());
