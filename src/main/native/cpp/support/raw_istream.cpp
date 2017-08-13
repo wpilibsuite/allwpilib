@@ -16,7 +16,24 @@
 #include <unistd.h>
 #endif
 
+#include "llvm/SmallVector.h"
+#include "llvm/StringRef.h"
+
 using namespace wpi;
+
+llvm::StringRef raw_istream::getline(llvm::SmallVectorImpl<char>& buf,
+                                     int maxLen) {
+  buf.clear();
+  for (int i = 0; i < maxLen; ++i) {
+    char c;
+    read(c);
+    if (has_error()) return llvm::StringRef{buf.data(), buf.size()};
+    if (c == '\r') continue;
+    buf.push_back(c);
+    if (c == '\n') break;
+  }
+  return llvm::StringRef{buf.data(), buf.size()};
+}
 
 void raw_mem_istream::close() {}
 

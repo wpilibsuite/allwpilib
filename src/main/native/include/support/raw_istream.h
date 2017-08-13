@@ -11,6 +11,12 @@
 #include <algorithm>
 #include <cstddef>
 
+namespace llvm {
+template <typename T>
+class SmallVectorImpl;
+class StringRef;
+}
+
 namespace wpi {
 
 class raw_istream {
@@ -44,6 +50,14 @@ class raw_istream {
     read_impl(data, readlen);
     return readlen;
   };
+
+  // Read a line from an input stream (up to a maximum length).
+  // The returned buffer will contain the trailing \n (unless the maximum length
+  // was reached).  \r's are stripped from the buffer.
+  // @param buf Buffer for output
+  // @param maxLen Maximum length
+  // @return Line
+  llvm::StringRef getline(llvm::SmallVectorImpl<char>& buf, int maxLen);
 
   virtual void close() = 0;
   virtual std::size_t in_avail() const = 0;

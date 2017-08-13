@@ -23,15 +23,6 @@
 
 namespace wpi {
 
-// Read a line from an input stream (up to a maximum length).
-// The returned buffer will contain the trailing \n (unless the maximum length
-// was reached).  \r's are stripped from the buffer.
-// @param buf Buffer for output
-// @param error Set to true if an error occurred
-// @return Line
-llvm::StringRef ReadLine(wpi::raw_istream& is, llvm::SmallVectorImpl<char>& buf,
-                         int maxLen, bool* error);
-
 // Unescape a %xx-encoded URI.
 // @param buf Buffer for output
 // @param error Set to true if an error occurred

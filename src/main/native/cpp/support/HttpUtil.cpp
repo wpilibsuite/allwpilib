@@ -17,24 +17,6 @@
 
 namespace wpi {
 
-llvm::StringRef ReadLine(raw_istream& is, llvm::SmallVectorImpl<char>& buf,
-                         int maxLen, bool* error) {
-  buf.clear();
-  for (int i = 0; i < maxLen; ++i) {
-    char c;
-    is.read(c);
-    if (is.has_error()) {
-      *error = true;
-      return llvm::StringRef{buf.data(), buf.size()};
-    }
-    if (c == '\r') continue;
-    buf.push_back(c);
-    if (c == '\n') break;
-  }
-  *error = false;
-  return llvm::StringRef{buf.data(), buf.size()};
-}
-
 llvm::StringRef UnescapeURI(llvm::StringRef str,
                             llvm::SmallVectorImpl<char>& buf, bool* error) {
   buf.clear();
@@ -109,9 +91,8 @@ bool ParseHttpHeaders(raw_istream& is, llvm::SmallVectorImpl<char>* contentType,
   bool inContentLength = false;
   llvm::SmallString<64> lineBuf;
   for (;;) {
-    bool error;
-    llvm::StringRef line = ReadLine(is, lineBuf, 1024, &error).rtrim();
-    if (error) return false;
+    llvm::StringRef line = is.getline(lineBuf, 1024).rtrim();
+    if (is.has_error()) return false;
     if (line.empty()) return true;  // empty line signals end of headers
 
     // header fields start at the beginning of the line
@@ -319,10 +300,9 @@ bool HttpConnection::Handshake(const HttpRequest& request,
   os.flush();
 
   // read first line of response
-  bool error = false;
   llvm::SmallString<64> lineBuf;
-  llvm::StringRef line = ReadLine(is, lineBuf, 1024, &error).rtrim();
-  if (error) {
+  llvm::StringRef line = is.getline(lineBuf, 1024).rtrim();
+  if (is.has_error()) {
     *warnMsg = "disconnected before response";
     return false;
   }
