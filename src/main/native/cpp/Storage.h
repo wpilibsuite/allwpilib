@@ -192,6 +192,22 @@ class Storage : public IStorage {
   IRpcServer& m_rpc_server;
   wpi::Logger& m_logger;
 
+  void ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
+                                  NetworkConnection* conn);
+  void ProcessIncomingEntryUpdate(std::shared_ptr<Message> msg,
+                                  NetworkConnection* conn);
+  void ProcessIncomingFlagsUpdate(std::shared_ptr<Message> msg,
+                                  NetworkConnection* conn);
+  void ProcessIncomingEntryDelete(std::shared_ptr<Message> msg,
+                                  NetworkConnection* conn);
+  void ProcessIncomingClearEntries(std::shared_ptr<Message> msg,
+                                   NetworkConnection* conn);
+  void ProcessIncomingExecuteRpc(std::shared_ptr<Message> msg,
+                                 NetworkConnection* conn,
+                                 std::weak_ptr<NetworkConnection> conn_weak);
+  void ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
+                                  NetworkConnection* conn);
+
   bool GetPersistentEntries(
       bool periodic,
       std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
