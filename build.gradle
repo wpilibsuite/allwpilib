@@ -29,6 +29,21 @@ apply plugin: 'java'
 
 apply from: 'config.gradle'
 
+sourceSets {
+    dev
+}
+
+task run(type: JavaExec) {
+    classpath = sourceSets.dev.runtimeClasspath
+
+    main = 'edu.wpi.first.wpiutil.DevMain'
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+    devCompile sourceSets.main.output
+}
+
 model {
     // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
     // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
