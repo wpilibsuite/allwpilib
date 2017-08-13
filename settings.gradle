@@ -1,13 +1,9 @@
-include 'hal',
-        'wpilibc',
-        'wpilibcIntegrationTests',
-        'wpilibj',
-        'wpilibjIntegrationTests',
-        'myRobot',
-        'myRobotCpp'
-
-if (hasProperty("makeSim")){
-        include 'simulation',
-                'simulation:JavaGazebo',
-                'simulation:SimDS'
-}
+include 'gmock'
+include 'ni-libraries'
+include 'hal'
+include 'wpilibc'
+include 'wpilibcIntegrationTests'
+include 'wpilibj'
+include 'wpilibc-examples'
+include 'wpilibjIntegrationTests'
+include 'myRobot'

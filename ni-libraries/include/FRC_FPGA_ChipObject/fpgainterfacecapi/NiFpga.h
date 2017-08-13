@@ -1,7 +1,7 @@
 /*
- * FPGA Interface C API 16.0 header file.
+ * FPGA Interface C API 17.0 header file.
  *
- * Copyright (c) 2016,
+ * Copyright (c) 2017,
  * National Instruments Corporation.
  * All rights reserved.
  */

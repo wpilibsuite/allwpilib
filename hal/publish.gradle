@@ -1,0 +1,90 @@
+apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+def pubVersion = ''
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+def baseArtifactId = 'hal'
+def artifactGroupId = 'edu.wpi.first.hal'
+
+task cppSourcesZip(type: Zip) {
+    destinationDir = project.buildDir
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/athena') {
+        into '/athena'
+    }
+
+    from('src/main/native/sim') {
+        into '/sim'
+    }
+
+    from('src/main/native/shared') {
+        into '/shared'
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDir = project.buildDir
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+model {
+    publishing {
+        def halAthenaTaskList = createComponentZipTasks($.components, 'halAthena', 'zipcpp', Zip, project, includeStandardZipFormat)
+
+        def halSimTaskList = createComponentZipTasks($.components, 'halSim', 'zipcpp', Zip, project, includeStandardZipFormat)
+
+        def halSimStaticDepsTaskList = createComponentZipTasks($.components, 'halSimStaticDeps', 'zipcpp', Zip, project, includeStandardZipFormat)
+
+        publications {
+            cpp(MavenPublication) {
+                halAthenaTaskList.each {
+                    artifact it
+                }
+                halSimTaskList.each {
+                    artifact it
+                }
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                artifactId = baseArtifactId
+                groupId artifactGroupId
+                version pubVersion
+            }
+            if (project.hasProperty('buildHalStaticDeps')) {
+                cppStaticDeps(MavenPublication) {
+                    halSimStaticDepsTaskList.each {
+                        artifact it
+                    }
+
+                    artifactId = baseArtifactId + 'StaticDeps'
+                    groupId artifactGroupId
+                    version pubVersion
+                }
+            }
+        }
+    }
+}

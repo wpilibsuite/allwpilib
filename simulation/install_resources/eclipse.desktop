@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=Eclipse
-Exec=/usr/bin/eclipse
-Icon=/opt/eclipse/icon.xpm
-Type=Application
-Categories=Development;Education;Science;
-StartupNotify=true

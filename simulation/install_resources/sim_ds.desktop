@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Sim DS
-Keywords=frcsim,driverstation
-Exec=/usr/bin/sim_ds
-Icon=/usr/share/icons/sim_ds/sim_ds_logo.png
-Type=Application
-StartupNotify=true
-Terminal=false
-Categories=Development;IDE;Java;Education;Science

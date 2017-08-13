@@ -1,6 +1,101 @@
+import edu.wpi.first.nativeutils.NativeUtils
+import edu.wpi.first.nativeutils.tasks.JNIHeaders
+
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.2.9'
+    }
+}
+
 plugins {
     id 'net.ltgt.errorprone' version '0.0.10'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.6'
+}
+
+ext.licenseFile = file("$rootDir/license.txt")
+
+ext.getJNIHeadersClass = {
+    return JNIHeaders
+}
+
+ext.getClassifier = { binary->
+    return NativeUtils.getClassifier(binary)
+}
+
+ext.getPlatformPath = { binary->
+    return NativeUtils.getPlatformPath(binary)
+}
+
+ext.createComponentZipTasks = { components, name, base, type, project, func ->
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && it.name == name) {
+            it.binaries.each {
+                def target = getClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
+                }
+            }
+        }
+    }
+    def taskList = []
+    configMap.each { key, value ->
+        def baseN = base + name
+        def task = project.tasks.create(baseN + "-${key}", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDir =  project.buildDir
+            classifier = key
+            baseName = baseN
+            duplicatesStrategy = 'exclude'
+
+            from(licenseFile) {
+                into '/'
+            }
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            task
+        }
+    }
+    return taskList
+}
+
+ext.includeStandardZipFormat = { task, value ->
+    value.each { binary->
+        if (binary.buildable) {
+            if (binary instanceof SharedLibraryBinarySpec) {
+                task.dependsOn binary.buildTask
+                task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                    into getPlatformPath(binary) + '/shared'
+                }
+                task.from (binary.sharedLibraryFile) {
+                    into getPlatformPath(binary) + '/shared'
+                }
+                task.from (binary.sharedLibraryLinkFile) {
+                    into getPlatformPath(binary) + '/shared'
+                }
+            } else if (binary instanceof StaticLibraryBinarySpec) {
+                task.dependsOn binary.buildTask
+                task.from (binary.staticLibraryFile) {
+                    into getPlatformPath(binary) + '/static'
+                }
+            }
+        }
+    }
 }
 
 // Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
@@ -11,28 +106,8 @@ if (!hasProperty('releaseType')) {
     }
 }
 
-def enableSimulation = hasProperty('makeSim')
-
-ext.simulationInstallDir = "$rootDir/build/install/simulation"
-
-allprojects {
-    ext.enableSimulation = enableSimulation
-
-    repositories {
-        mavenCentral()
-    }
-
-    ext.ntcoreDep = { lang, classifier, extension = null ->
-        return "edu.wpi.first.wpilib.networktables.$lang:NetworkTables:+:$classifier${extension == null ? '' : '@' + extension}"
-    }
-
-    ext.cscoreDep = { lang, classifier, extension = null ->
-        return "edu.wpi.cscore.$lang:cscore:+:$classifier${extension == null ? '' : '@' + extension}"
-    }
-
-    ext.wpiUtilDep = { classifier ->
-        return "edu.wpi.first.wpilib:wpiutil:+:$classifier@zip"
-    }
+task clean(type: Delete) {
+    delete buildDir
 }
 
 subprojects {
@@ -44,8 +119,6 @@ subprojects {
         toolVersion = "8.1"
         configFile = new File(rootDir, "styleguide/checkstyle.xml")
     }
-
-    ext.armBuild = true
 
     // Disables doclint in java 8.
     if (JavaVersion.current().isJava8Compatible()) {
@@ -60,11 +133,7 @@ subprojects {
     }
 }
 
-apply from: 'cppSettings.gradle'
-
-apply from: 'ni-libraries/ni-libraries.gradle'
-
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.0.1'
+    gradleVersion = '4.1'
     distributionType = Wrapper.DistributionType.ALL
 }
