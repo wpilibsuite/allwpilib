@@ -74,32 +74,6 @@ static inline bool RunningWindows8OrGreater() {
                             Mask) != FALSE;
 }
 
-static std::error_code UTF8ToUTF16(llvm::StringRef utf8,
-                                   llvm::SmallVectorImpl<wchar_t> &utf16) {
-  if (!utf8.empty()) {
-    int len = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.begin(),
-                                    utf8.size(), utf16.begin(), 0);
-
-    if (len == 0)
-      return llvm::mapWindowsError(::GetLastError());
-
-    utf16.reserve(len + 1);
-    utf16.set_size(len);
-
-    len = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, utf8.begin(),
-                                utf8.size(), utf16.begin(), utf16.size());
-
-    if (len == 0)
-      return llvm::mapWindowsError(::GetLastError());
-  }
-
-  // Make utf16 null terminated.
-  utf16.push_back(0);
-  utf16.pop_back();
-
-  return std::error_code();
-}
-
 #endif
 
 using namespace llvm;
@@ -548,82 +522,9 @@ static int getFD(StringRef Filename, std::error_code &EC,
 
   int FD;
 
-  //EC = sys::fs::openFileForWrite(Filename, FD, Flags);
-  //if (EC)
-  //  return -1;
-#if defined(_WIN32)
-  // Verify that we don't have both "append" and "excl".
-  assert((!(Flags & sys::fs::F_Excl) || !(Flags & sys::fs::F_Append)) &&
-         "Cannot specify both 'excl' and 'append' file creation flags!");
-
-  SmallVector<wchar_t, 128> PathUTF16;
-
-  EC = UTF8ToUTF16(Filename, PathUTF16);
-  if (EC) return -1;
-
-  DWORD CreationDisposition;
-  if (Flags & sys::fs::F_Excl)
-    CreationDisposition = CREATE_NEW;
-  else if (Flags & sys::fs::F_Append)
-    CreationDisposition = OPEN_ALWAYS;
-  else
-    CreationDisposition = CREATE_ALWAYS;
-
-  DWORD Access = GENERIC_WRITE;
-  if (Flags & sys::fs::F_RW)
-    Access |= GENERIC_READ;
-
-  HANDLE H = ::CreateFileW(PathUTF16.begin(), Access,
-                           FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                           CreationDisposition, FILE_ATTRIBUTE_NORMAL, NULL);
-
-  if (H == INVALID_HANDLE_VALUE) {
-    DWORD LastError = ::GetLastError();
-    EC = mapWindowsError(LastError);
+  EC = sys::fs::openFileForWrite(Filename, FD, Flags);
+  if (EC)
     return -1;
-  }
-
-  int OpenFlags = 0;
-  if (Flags & sys::fs::F_Append)
-    OpenFlags |= _O_APPEND;
-
-  if (Flags & sys::fs::F_Text)
-    OpenFlags |= _O_TEXT;
-
-  FD = ::_open_osfhandle(intptr_t(H), OpenFlags);
-  if (FD == -1) {
-    ::CloseHandle(H);
-    EC = mapWindowsError(ERROR_INVALID_HANDLE);
-    return -1;
-  }
-#else
-  // Verify that we don't have both "append" and "excl".
-  assert((!(Flags & sys::fs::F_Excl) || !(Flags & sys::fs::F_Append)) &&
-         "Cannot specify both 'excl' and 'append' file creation flags!");
-
-  int OpenFlags = O_CREAT;
-
-  if (Flags & sys::fs::F_RW)
-    OpenFlags |= O_RDWR;
-  else
-    OpenFlags |= O_WRONLY;
-
-  if (Flags & sys::fs::F_Append)
-    OpenFlags |= O_APPEND;
-  else
-    OpenFlags |= O_TRUNC;
-
-  if (Flags & sys::fs::F_Excl)
-    OpenFlags |= O_EXCL;
-
-  SmallString<128> Storage{Filename};
-  while ((FD = open(Storage.c_str(), OpenFlags, 0666)) < 0) {
-    if (errno != EINTR) {
-      EC = std::error_code(errno, std::generic_category());
-      return -1;
-    }
-  }
-#endif
 
   EC = std::error_code();
   return FD;

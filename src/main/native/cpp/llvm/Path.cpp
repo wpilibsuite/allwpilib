@@ -22,6 +22,7 @@
 #include <io.h>
 #endif
 
+#include "llvm/FileSystem.h"
 #include "llvm/SmallString.h"
 
 using namespace llvm;

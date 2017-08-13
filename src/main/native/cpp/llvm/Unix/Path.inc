@@ -16,10 +16,95 @@
 //===          is guaranteed to work on *all* UNIX variants.
 //===----------------------------------------------------------------------===//
 
+#include <fcntl.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/param.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+namespace llvm {
+namespace sys  {
+namespace fs {
+
+#if !defined(F_GETPATH)
+static bool hasProcSelfFD() {
+  // If we have a /proc filesystem mounted, we can quickly establish the
+  // real name of the file with readlink
+  static const bool Result = (::access("/proc/self/fd", R_OK) == 0);
+  return Result;
+}
+#endif
+
+std::error_code openFileForRead(const Twine &Name, int &ResultFD,
+                                SmallVectorImpl<char> *RealPath) {
+  SmallString<128> Storage;
+  StringRef P = Name.toNullTerminatedStringRef(Storage);
+  while ((ResultFD = open(P.begin(), O_RDONLY)) < 0) {
+    if (errno != EINTR)
+      return std::error_code(errno, std::generic_category());
+  }
+  // Attempt to get the real name of the file, if the user asked
+  if(!RealPath)
+    return std::error_code();
+  RealPath->clear();
+#if defined(F_GETPATH)
+  // When F_GETPATH is availble, it is the quickest way to get
+  // the real path name.
+  char Buffer[MAXPATHLEN];
+  if (::fcntl(ResultFD, F_GETPATH, Buffer) != -1)
+    RealPath->append(Buffer, Buffer + strlen(Buffer));
+#else
+  char Buffer[PATH_MAX];
+  if (hasProcSelfFD()) {
+    char ProcPath[64];
+    snprintf(ProcPath, sizeof(ProcPath), "/proc/self/fd/%d", ResultFD);
+    ssize_t CharCount = ::readlink(ProcPath, Buffer, sizeof(Buffer));
+    if (CharCount > 0)
+      RealPath->append(Buffer, Buffer + CharCount);
+  } else {
+    // Use ::realpath to get the real path name
+    if (::realpath(P.begin(), Buffer) != nullptr)
+      RealPath->append(Buffer, Buffer + strlen(Buffer));
+  }
+#endif
+  return std::error_code();
+}
+
+std::error_code openFileForWrite(const Twine &Name, int &ResultFD,
+                                 OpenFlags Flags, unsigned Mode) {
+  // Verify that we don't have both "append" and "excl".
+  assert((!(Flags & F_Excl) || !(Flags & F_Append)) &&
+         "Cannot specify both 'excl' and 'append' file creation flags!");
+
+  int OpenFlags = O_CREAT;
+
+  if (Flags & F_RW)
+    OpenFlags |= O_RDWR;
+  else
+    OpenFlags |= O_WRONLY;
+
+  if (Flags & F_Append)
+    OpenFlags |= O_APPEND;
+  else
+    OpenFlags |= O_TRUNC;
+
+  if (Flags & F_Excl)
+    OpenFlags |= O_EXCL;
+
+  SmallString<128> Storage;
+  StringRef P = Name.toNullTerminatedStringRef(Storage);
+  while ((ResultFD = open(P.begin(), OpenFlags, Mode)) < 0) {
+    if (errno != EINTR)
+      return std::error_code(errno, std::generic_category());
+  }
+  return std::error_code();
+}
+
+} // end namespace fs
+} // end namespace sys
+} // end namespace llvm
 
 namespace llvm {
 namespace sys  {

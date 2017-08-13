@@ -19,6 +19,18 @@
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 
+#if defined(_MSC_VER)
+#ifndef STDIN_FILENO
+# define STDIN_FILENO 0
+#endif
+#ifndef STDOUT_FILENO
+# define STDOUT_FILENO 1
+#endif
+#ifndef STDERR_FILENO
+# define STDERR_FILENO 2
+#endif
+#endif
+
 using namespace wpi;
 
 llvm::StringRef raw_istream::getline(llvm::SmallVectorImpl<char>& buf,

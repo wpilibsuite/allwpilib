@@ -14,6 +14,7 @@
 #ifndef LLVM_SUPPORT_RAW_OSTREAM_H
 #define LLVM_SUPPORT_RAW_OSTREAM_H
 
+#include "llvm/FileSystem.h"
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 #include <cstdint>
@@ -24,39 +25,6 @@ class format_object_base;
 class FormattedString;
 class FormattedNumber;
 template <typename T> class SmallVectorImpl;
-
-namespace sys {
-namespace fs {
-enum OpenFlags : unsigned {
-  F_None = 0,
-
-  /// F_Excl - When opening a file, this flag makes raw_fd_ostream
-  /// report an error if the file already exists.
-  F_Excl = 1,
-
-  /// F_Append - When opening a file, if it already exists append to the
-  /// existing file instead of returning an error.  This may not be specified
-  /// with F_Excl.
-  F_Append = 2,
-
-  /// The file should be opened in text mode on platforms that make this
-  /// distinction.
-  F_Text = 4,
-
-  /// Open the file for read and write.
-  F_RW = 8
-};
-
-inline OpenFlags operator|(OpenFlags A, OpenFlags B) {
-  return OpenFlags(unsigned(A) | unsigned(B));
-}
-
-inline OpenFlags &operator|=(OpenFlags &A, OpenFlags B) {
-  A = A | B;
-  return A;
-}
-}  // namespace fs
-}  // namespace sys
 
 /// This class implements an extremely fast bulk output stream that can *only*
 /// output to a stream.  It does not support seeking, reopening, rewinding, line
