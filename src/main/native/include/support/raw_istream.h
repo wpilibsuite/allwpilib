@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <system_error>
 
 namespace llvm {
 template <typename T>
@@ -92,6 +93,8 @@ class raw_mem_istream : public raw_istream {
 
 class raw_fd_istream : public raw_istream {
  public:
+  raw_fd_istream(llvm::StringRef filename, std::error_code& ec,
+                 std::size_t bufSize = 4096);
   raw_fd_istream(int fd, bool shouldClose, std::size_t bufSize = 4096);
   ~raw_fd_istream() override;
   void close() override;

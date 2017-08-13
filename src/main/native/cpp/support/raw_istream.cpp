@@ -16,6 +16,7 @@
 #include <unistd.h>
 #endif
 
+#include "llvm/FileSystem.h"
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 
@@ -60,6 +61,29 @@ void raw_mem_istream::read_impl(void* data, std::size_t len) {
   m_cur += len;
   m_left -= len;
 }
+
+static int getFD(llvm::StringRef Filename, std::error_code &EC) {
+  // Handle "-" as stdin. Note that when we do this, we consider ourself
+  // the owner of stdin. This means that we can do things like close the
+  // file descriptor when we're done and set the "binary" flag globally.
+  if (Filename == "-") {
+    EC = std::error_code();
+    return STDIN_FILENO;
+  }
+
+  int FD;
+
+  EC = llvm::sys::fs::openFileForRead(Filename, FD);
+  if (EC)
+    return -1;
+
+  EC = std::error_code();
+  return FD;
+}
+
+raw_fd_istream::raw_fd_istream(llvm::StringRef filename, std::error_code& ec,
+                               std::size_t bufSize)
+    : raw_fd_istream(getFD(filename, ec), true, bufSize) {}
 
 raw_fd_istream::raw_fd_istream(int fd, bool shouldClose, std::size_t bufSize)
     : m_bufSize(bufSize), m_fd(fd), m_shouldClose(shouldClose) {
