@@ -194,7 +194,9 @@ model {
         ntcoreTestingBaseTest {
             sources {
                 cpp.source.srcDir 'src/test/native/cpp'
-                cpp.exportedHeaders.srcDir 'src/test/native/include'
+                cpp.exportedHeaders {
+                    srcDirs 'src/test/native/include', 'src/main/native/cpp'
+                }
             }
         }
     }
