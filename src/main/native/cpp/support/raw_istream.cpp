@@ -48,6 +48,9 @@ llvm::StringRef raw_istream::getline(llvm::SmallVectorImpl<char>& buf,
   return llvm::StringRef{buf.data(), buf.size()};
 }
 
+raw_mem_istream::raw_mem_istream(llvm::StringRef mem)
+    : raw_mem_istream(mem.data(), mem.size()) {}
+
 void raw_mem_istream::close() {}
 
 std::size_t raw_mem_istream::in_avail() const { return m_left; }

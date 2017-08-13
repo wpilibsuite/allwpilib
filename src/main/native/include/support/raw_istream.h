@@ -80,6 +80,7 @@ class raw_istream {
 
 class raw_mem_istream : public raw_istream {
  public:
+  raw_mem_istream(llvm::StringRef mem);
   raw_mem_istream(const char* mem, std::size_t len) : m_cur(mem), m_left(len) {}
   void close() override;
   std::size_t in_avail() const override;
