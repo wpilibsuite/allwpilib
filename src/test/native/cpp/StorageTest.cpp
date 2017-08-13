@@ -385,7 +385,7 @@ TEST_P(StorageTestPopulated, SetDefaultEntryEmptyName) {
     EXPECT_EQ(0u, idmap().size());
 }
 
-TEST_P(StorageTestPopulated, SetDefaultEntryEmptyValue) { 
+TEST_P(StorageTestPopulated, SetDefaultEntryEmptyValue) {
   auto value = Value::MakeBoolean(true);
   auto ret_val = storage.SetDefaultEntryValue("", nullptr);
   EXPECT_FALSE(ret_val);
@@ -616,7 +616,7 @@ TEST_P(StorageTestEmpty, LoadPersistentBadHeader) {
   std::istringstream iss("");
   EXPECT_CALL(
       warn,
-      Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
+      Warn(0, llvm::StringRef("header line mismatch, ignoring rest of file")));
   EXPECT_FALSE(storage.LoadPersistent(iss, warn_func));
 
   std::istringstream iss2("[NetworkTables");

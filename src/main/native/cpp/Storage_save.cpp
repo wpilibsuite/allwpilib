@@ -1,0 +1,226 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#include "Storage.h"
+
+#include <cctype>
+#include <string>
+
+#include "llvm/StringExtras.h"
+#include "support/Base64.h"
+
+#include "Log.h"
+
+using namespace nt;
+
+namespace {
+
+class SavePersistentImpl {
+ public:
+  typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
+
+  SavePersistentImpl(std::ostream& os) : m_os(os) {}
+
+  void Save(llvm::ArrayRef<Entry> entries);
+
+ private:
+  void WriteString(llvm::StringRef str);
+  void WriteHeader();
+  void WriteEntries(llvm::ArrayRef<Entry> entries);
+  void WriteEntry(llvm::StringRef name, const Value& value);
+  bool WriteType(NT_Type type);
+  void WriteValue(const Value& value);
+
+  std::ostream& m_os;
+};
+
+}  // anonymous namespace
+
+/* Escapes and writes a string, including start and end double quotes */
+void SavePersistentImpl::WriteString(llvm::StringRef str) {
+  m_os << '"';
+  for (auto c : str) {
+    switch (c) {
+      case '\\':
+        m_os << "\\\\";
+        break;
+      case '\t':
+        m_os << "\\t";
+        break;
+      case '\n':
+        m_os << "\\n";
+        break;
+      case '"':
+        m_os << "\\\"";
+        break;
+      default:
+        if (std::isprint(c) && c != '=') {
+          m_os << c;
+          break;
+        }
+
+        // Write out the escaped representation.
+        m_os << "\\x";
+        m_os << llvm::hexdigit((c >> 4) & 0xF);
+        m_os << llvm::hexdigit((c >> 0) & 0xF);
+    }
+  }
+  m_os << '"';
+}
+
+void SavePersistentImpl::Save(llvm::ArrayRef<Entry> entries) {
+  WriteHeader();
+  WriteEntries(entries);
+}
+
+void SavePersistentImpl::WriteHeader() {
+  m_os << "[NetworkTables Storage 3.0]\n";
+}
+
+void SavePersistentImpl::WriteEntries(llvm::ArrayRef<Entry> entries) {
+  for (auto& i : entries) {
+    if (!i.second) continue;
+    WriteEntry(i.first, *i.second);
+  }
+}
+
+void SavePersistentImpl::WriteEntry(llvm::StringRef name, const Value& value) {
+  if (!WriteType(value.type())) return;  // type
+  WriteString(name);                     // name
+  m_os << '=';                           // '='
+  WriteValue(value);                     // value
+  m_os << '\n';                          // eol
+}
+
+bool SavePersistentImpl::WriteType(NT_Type type) {
+  switch (type) {
+    case NT_BOOLEAN:
+      m_os << "boolean ";
+      break;
+    case NT_DOUBLE:
+      m_os << "double ";
+      break;
+    case NT_STRING:
+      m_os << "string ";
+      break;
+    case NT_RAW:
+      m_os << "raw ";
+      break;
+    case NT_BOOLEAN_ARRAY:
+      m_os << "array boolean ";
+      break;
+    case NT_DOUBLE_ARRAY:
+      m_os << "array double ";
+      break;
+    case NT_STRING_ARRAY:
+      m_os << "array string ";
+      break;
+    default:
+      return false;
+  }
+  return true;
+}
+
+void SavePersistentImpl::WriteValue(const Value& value) {
+  switch (value.type()) {
+    case NT_BOOLEAN:
+      m_os << (value.GetBoolean() ? "true" : "false");
+      break;
+    case NT_DOUBLE:
+      m_os << value.GetDouble();
+      break;
+    case NT_STRING:
+      WriteString(value.GetString());
+      break;
+    case NT_RAW: {
+      std::string base64_encoded;
+      wpi::Base64Encode(value.GetRaw(), &base64_encoded);
+      m_os << base64_encoded;
+      break;
+    }
+    case NT_BOOLEAN_ARRAY: {
+      bool first = true;
+      for (auto elem : value.GetBooleanArray()) {
+        if (!first) m_os << ',';
+        first = false;
+        m_os << (elem ? "true" : "false");
+      }
+      break;
+    }
+    case NT_DOUBLE_ARRAY: {
+      bool first = true;
+      for (auto elem : value.GetDoubleArray()) {
+        if (!first) m_os << ',';
+        first = false;
+        m_os << elem;
+      }
+      break;
+    }
+    case NT_STRING_ARRAY: {
+      bool first = true;
+      for (auto& elem : value.GetStringArray()) {
+        if (!first) m_os << ',';
+        first = false;
+        WriteString(elem);
+      }
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+void Storage::SavePersistent(std::ostream& os, bool periodic) const {
+  std::vector<SavePersistentImpl::Entry> entries;
+  if (!GetPersistentEntries(periodic, &entries)) return;
+  SavePersistentImpl(os).Save(entries);
+}
+
+const char* Storage::SavePersistent(StringRef filename, bool periodic) const {
+  std::string fn = filename;
+  std::string tmp = filename;
+  tmp += ".tmp";
+  std::string bak = filename;
+  bak += ".bak";
+
+  // Get entries before creating file
+  std::vector<SavePersistentImpl::Entry> entries;
+  if (!GetPersistentEntries(periodic, &entries)) return nullptr;
+
+  const char* err = nullptr;
+
+  // start by writing to temporary file
+  std::ofstream os(tmp);
+  if (!os) {
+    err = "could not open file";
+    goto done;
+  }
+  DEBUG("saving persistent file '" << filename << "'");
+  SavePersistentImpl(os).Save(entries);
+  os.flush();
+  if (!os) {
+    os.close();
+    std::remove(tmp.c_str());
+    err = "error saving file";
+    goto done;
+  }
+  os.close();
+
+  // Safely move to real file.  We ignore any failures related to the backup.
+  std::remove(bak.c_str());
+  std::rename(fn.c_str(), bak.c_str());
+  if (std::rename(tmp.c_str(), fn.c_str()) != 0) {
+    std::rename(bak.c_str(), fn.c_str());  // attempt to restore backup
+    err = "could not rename temp file to real file";
+    goto done;
+  }
+
+done:
+  // try again if there was an error
+  if (err && periodic) m_persistent_dirty = true;
+  return err;
+}
