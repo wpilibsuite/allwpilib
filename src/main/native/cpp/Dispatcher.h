@@ -51,8 +51,6 @@ class DispatcherBase {
   void NotifyConnections(ConnectionListenerCallback callback) const;
 
   void SetConnector(Connector connector);
-  void SetConnector(std::vector<Connector>&& connectors);
-
   void SetConnectorOverride(Connector connector);
   void ClearConnectorOverride();
 
@@ -92,7 +90,7 @@ class DispatcherBase {
 
   std::unique_ptr<wpi::NetworkAcceptor> m_server_acceptor;
   Connector m_client_connector_override;
-  std::vector<Connector> m_client_connectors;
+  Connector m_client_connector;
 
   // Mutex for user-accessible items
   mutable std::mutex m_user_mutex;

@@ -37,17 +37,18 @@ void Dispatcher::SetServer(const char* server_name, unsigned int port) {
 
 void Dispatcher::SetServer(
     ArrayRef<std::pair<StringRef, unsigned int>> servers) {
-  std::vector<Connector> connectors;
-  for (const auto& server : servers) {
-    std::string server_name(server.first);
-    unsigned int port = server.second;
-    connectors.emplace_back([=]() -> std::unique_ptr<wpi::NetworkStream> {
-      return wpi::TCPConnector::connect(server_name.c_str(),
-                                        static_cast<int>(port),
-                                        Logger::GetInstance(), 1);
-    });
-  }
-  SetConnector(std::move(connectors));
+  llvm::SmallVector<std::pair<std::string, int>, 16> servers_copy;
+  for (const auto& server : servers)
+    servers_copy.emplace_back(std::string{server.first},
+                              static_cast<int>(server.second));
+
+  SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
+    llvm::SmallVector<std::pair<const char*, int>, 16> servers_copy2;
+    for (const auto& server : servers_copy)
+      servers_copy2.emplace_back(server.first.c_str(), server.second);
+    return wpi::TCPConnector::connect_parallel(servers_copy2,
+                                               Logger::GetInstance(), 1);
+  });
 }
 
 void Dispatcher::SetServerOverride(const char* server_name, unsigned int port) {
@@ -137,7 +138,7 @@ void DispatcherBase::Stop() {
   // wake up client thread with a reconnect
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
-    m_client_connectors.resize(0);
+    m_client_connector = nullptr;
   }
   ClientReconnect();
 
@@ -204,14 +205,8 @@ void DispatcherBase::NotifyConnections(
 }
 
 void DispatcherBase::SetConnector(Connector connector) {
-  std::vector<Connector> connectors;
-  connectors.push_back(connector);
-  SetConnector(std::move(connectors));
-}
-
-void DispatcherBase::SetConnector(std::vector<Connector>&& connectors) {
   std::lock_guard<std::mutex> lock(m_user_mutex);
-  m_client_connectors = std::move(connectors);
+  m_client_connector = std::move(connector);
 }
 
 void DispatcherBase::SetConnectorOverride(Connector connector) {
@@ -346,7 +341,6 @@ void DispatcherBase::ServerThreadMain() {
 }
 
 void DispatcherBase::ClientThreadMain() {
-  std::size_t i = 0;
   while (m_active) {
     // sleep between retries
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
@@ -358,12 +352,11 @@ void DispatcherBase::ClientThreadMain() {
       if (m_client_connector_override) {
         connect = m_client_connector_override;
       } else {
-        if (m_client_connectors.empty()) {
+        if (!m_client_connector) {
           m_networkMode = NT_NET_MODE_CLIENT | NT_NET_MODE_FAILURE;
           continue;
         }
-        if (i >= m_client_connectors.size()) i = 0;
-        connect = m_client_connectors[i++];
+        connect = m_client_connector;
       }
     }
 
