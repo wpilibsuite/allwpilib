@@ -156,6 +156,10 @@ class Storage : public IStorage {
     // Sequence number for update resolution.
     SequenceNumber seq_num;
 
+    // If value has been written locally.  Used during initial handshake
+    // on client to determine whether or not to accept remote changes.
+    bool local_write{false};
+
     // RPC handle.
     unsigned int rpc_uid{UINT_MAX};
 
@@ -220,6 +224,8 @@ class Storage : public IStorage {
                        std::unique_lock<std::mutex>& lock, bool local);
 
   // Must be called with m_mutex held
+  template <typename F>
+  void DeleteAllEntriesImpl(bool local, F should_delete);
   void DeleteAllEntriesImpl(bool local);
   Entry* GetOrNew(StringRef name, bool* is_new = nullptr);
 };
