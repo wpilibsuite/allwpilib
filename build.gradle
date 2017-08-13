@@ -125,7 +125,7 @@ model {
             ext = 'zip'
             version = '+'
             sharedConfigs = [ ntcore: [],
-                              ntcoreExe: [],
+                              ntcoreDev: [],
                               ntcoreTestingBaseTest: [] ]
             staticConfigs = [ ntcoreJNI: [] ]
         }
@@ -159,7 +159,7 @@ model {
             }
         }
         if (!project.hasProperty('skipTestExe')) {
-            ntcoreExe(NativeExecutableSpec) {
+            ntcoreDev(NativeExecutableSpec) {
                 sources {
                     cpp {
                         lib library: "ntcore"
@@ -197,6 +197,26 @@ model {
                 NativeUtils.setPlatformSpecificIncludeFlag("${rootDir}/src/main/native/cpp".toString(), cppCompiler)
             } else {
                 it.buildable = false
+            }
+        }
+    }
+    tasks {
+        def c = $.components
+        project.tasks.create('runCpp', Exec) {
+            def found = false
+            c.each {
+                if (it in NativeExecutableSpec && it.name == 'ntcoreDev') {
+                    it.binaries.each {
+                        if (!found) {
+                            def arch = it.targetPlatform.architecture.name
+                            if (arch == 'x86-64' || arch == 'x86') {
+                                dependsOn it.tasks.install
+                                commandLine it.tasks.install.runScript
+                                found = true
+                            }
+                        }
+                    }
+                }
             }
         }
     }
