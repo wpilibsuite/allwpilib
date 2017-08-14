@@ -9,7 +9,15 @@
 
 #include <stdint.h>
 
-enum HAL_I2CPort : int32_t { HAL_I2C_kOnboard = 0, HAL_I2C_kMXP };
+#include "HAL/Types.h"
+
+/* clang-format off */
+HAL_ENUM_START(HAL_I2CPort, int32_t) {
+  HAL_I2C_kOnboard = 0,
+  HAL_I2C_kMXP
+}
+HAL_ENUM_END(HAL_I2CPort, int32_t)
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {

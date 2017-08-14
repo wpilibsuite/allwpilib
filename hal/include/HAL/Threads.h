@@ -17,7 +17,10 @@
 #define NativeThreadHandle const pthread_t*
 #endif
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
                               int32_t* status);
 int32_t HAL_GetCurrentThreadPriority(HAL_Bool* isRealTime, int32_t* status);
@@ -25,4 +28,6 @@ HAL_Bool HAL_SetThreadPriority(NativeThreadHandle handle, HAL_Bool realTime,
                                int32_t priority, int32_t* status);
 HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
                                       int32_t* status);
+#ifdef __cplusplus
 }
+#endif

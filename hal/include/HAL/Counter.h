@@ -12,12 +12,15 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
-enum HAL_Counter_Mode : int32_t {
+/* clang-format off */
+HAL_ENUM_START(HAL_Counter_Mode, int32_t) {
   HAL_Counter_kTwoPulse = 0,
   HAL_Counter_kSemiperiod = 1,
   HAL_Counter_kPulseLength = 2,
   HAL_Counter_kExternalDirection = 3
-};
+}
+HAL_ENUM_END(HAL_Counter_Mode, int32_t)
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {

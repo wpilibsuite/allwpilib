@@ -12,17 +12,24 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
-enum HAL_EncoderIndexingType : int32_t {
+/* clang-format off */
+HAL_ENUM_START(HAL_EncoderIndexingType, int32_t) {
   HAL_kResetWhileHigh,
   HAL_kResetWhileLow,
   HAL_kResetOnFallingEdge,
   HAL_kResetOnRisingEdge
-};
-enum HAL_EncoderEncodingType : int32_t {
+}
+HAL_ENUM_END(HAL_EncoderIndexingType, int32_t)
+/* clang-format on */
+
+/* clang-format off */
+HAL_ENUM_START(HAL_EncoderEncodingType, int32_t) {
   HAL_Encoder_k1X,
   HAL_Encoder_k2X,
   HAL_Encoder_k4X
-};
+}
+HAL_ENUM_END(HAL_EncoderEncodingType, int32_t)
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {

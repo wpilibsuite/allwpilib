@@ -11,13 +11,16 @@
 
 #include "HAL/Types.h"
 
-enum HAL_SPIPort : int32_t {
+/* clang-format off */
+HAL_ENUM_START(HAL_SPIPort, int32_t) {
   HAL_SPI_kOnboardCS0 = 0,
   HAL_SPI_kOnboardCS1,
   HAL_SPI_kOnboardCS2,
   HAL_SPI_kOnboardCS3,
   HAL_SPI_kMXP
-};
+}
+HAL_ENUM_END(HAL_SPIPort, int32_t)
+/* clang-format on */
 
 #ifdef __cplusplus
 extern "C" {
