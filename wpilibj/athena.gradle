@@ -18,8 +18,8 @@ dependencies {
     athenaRuntime ntcoreDep('java', 'arm')
     athenaCompile cscoreDep('java', 'arm')
     athenaRuntime cscoreDep('java', 'arm')
-    athenaCompile 'org.opencv:opencv-java:3.1.0'
-    athenaRuntime 'org.opencv:opencv-java:3.1.0'
+    athenaCompile 'org.opencv:opencv-java:+'
+    athenaRuntime 'org.opencv:opencv-java:+'
     doc ntcoreDep('java', 'sources')
     doc cscoreDep('java', 'sources')
 }

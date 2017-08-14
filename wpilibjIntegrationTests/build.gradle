@@ -20,7 +20,7 @@ dependencies {
     compile files(wpilibj.sourceSets.test.output.classesDir)
     compile ntcoreDep('java', 'arm')
     compile cscoreDep('java', 'arm')
-    compile 'org.opencv:opencv-java:3.1.0'
+    compile 'org.opencv:opencv-java:+'
     compile 'junit:junit:4.11'
     compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
     compile 'org.apache.ant:ant:1.9.4'
