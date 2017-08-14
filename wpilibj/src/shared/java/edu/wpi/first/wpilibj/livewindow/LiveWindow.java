@@ -39,16 +39,16 @@ public class LiveWindow {
   private static void initializeLiveWindowComponents() {
     System.out.println("Initializing the components first time");
     livewindowTable = NetworkTable.getTable("LiveWindow");
-    statusTable = livewindowTable.getSubTable("~STATUS~");
+    statusTable = livewindowTable.getSubTable(".status");
     for (Enumeration e = components.keys(); e.hasMoreElements(); ) {
       LiveWindowSendable component = (LiveWindowSendable) e.nextElement();
       LiveWindowComponent liveWindowComponent = components.get(component);
       String subsystem = liveWindowComponent.getSubsystem();
       String name = liveWindowComponent.getName();
       System.out.println("Initializing table for '" + subsystem + "' '" + name + "'");
-      livewindowTable.getSubTable(subsystem).putString("~TYPE~", "LW Subsystem");
+      livewindowTable.getSubTable(subsystem).putString(".type", "LW Subsystem");
       ITable table = livewindowTable.getSubTable(subsystem).getSubTable(name);
-      table.putString("~TYPE~", component.getSmartDashboardType());
+      table.putString(".type", component.getSmartDashboardType());
       table.putString("Name", name);
       table.putString("Subsystem", subsystem);
       component.initTable(table);

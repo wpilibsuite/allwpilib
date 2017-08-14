@@ -31,7 +31,7 @@ void IterativeRobot::StartCompetition() {
   LiveWindow* lw = LiveWindow::GetInstance();
   // first and one-time initialization
   NetworkTable::GetTable("LiveWindow")
-      ->GetSubTable("~STATUS~")
+      ->GetSubTable(".status")
       ->PutBoolean("LW Enabled", false);
   RobotInit();
 
