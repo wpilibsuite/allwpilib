@@ -51,7 +51,7 @@ void HttpCameraImpl::Start() {
   m_settingsThread = std::thread(&HttpCameraImpl::SettingsThreadMain, this);
 }
 
-#ifndef _WIN32
+#ifdef __linux__
 static inline void DoFdSet(int fd, fd_set* set, int* nfds) {
   if (fd >= 0) {
     FD_SET(fd, set);
@@ -234,7 +234,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
              wpi::Now());
     return true;
   }
- 
+
   // We know how big it is!  Just get a frame of the right size and read
   // the data directly into it.
   auto image = AllocImage(VideoMode::PixelFormat::kMJPEG, 0, 0, contentLength);

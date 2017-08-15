@@ -42,13 +42,13 @@
 
 using namespace cs;
 
+#ifdef __linux__
+
 static constexpr char const* kPropWbAuto = "white_balance_temperature_auto";
 static constexpr char const* kPropWbValue = "white_balance_temperature";
 static constexpr char const* kPropExAuto = "exposure_auto";
 static constexpr char const* kPropExValue = "exposure_absolute";
 static constexpr char const* kPropBrValue = "brightness";
-
-#ifdef __linux__
 
 // Conversions v4l2_fract time per frame from/to frames per second (fps)
 static inline int FractToFPS(const struct v4l2_fract& timeperframe) {

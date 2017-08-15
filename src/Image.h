@@ -26,7 +26,7 @@ class Image {
 
  public:
 
-#ifdef _WIN32
+#ifndef __linux__
   explicit Image(std::size_t capacity) {
     m_data.reserve(capacity);
   }
