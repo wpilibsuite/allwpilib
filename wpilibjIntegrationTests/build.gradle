@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+repositories {
+    mavenCentral()
+}
+
+mainClassName = 'edu.wpi.first.wpilibj.test.AntJunitLanucher'
+
+dependencies {
+    compile project(':wpilibj')
+    compile files(project(':wpilibj').sourceSets.test.output)
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    compile 'edu.wpi.first.ntcore:ntcore-java:+'
+    compile 'org.opencv:opencv-java:3.2.0'
+    compile 'edu.wpi.first.cscore:cscore-java:+'
+    compile 'junit:junit:4.11'
+    compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
+    compile 'org.apache.ant:ant:1.9.4'
+    compile 'org.apache.ant:ant-junit:1.9.4'
+}
+
+build.dependsOn shadowJar
+
+def testOutputFolder = file("${project(':').buildDir}/integrationTestFiles")
+
+task copyWpilibJIntegrationTestJarToOutput(type: Copy) {
+    destinationDir testOutputFolder
+    dependsOn shadowJar
+    inputs.file shadowJar
+    from (shadowJar) {
+        into 'java'
+    }
+}
+
+build.dependsOn copyWpilibJIntegrationTestJarToOutput

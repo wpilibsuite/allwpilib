@@ -14,10 +14,6 @@ if (project.hasProperty("publishVersion")) {
     pubVersion = WPILibVersion.version
 }
 
-if (pubVersion == null || pubVersion == "") {
-  pubVersion = "424242-SNAPSHOT"
-}
-
 def baseArtifactId = 'ni-libraries'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
 

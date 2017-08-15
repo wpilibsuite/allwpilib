@@ -1,0 +1,198 @@
+apply plugin: 'cpp'
+apply plugin: 'google-test'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+apply from: '../config.gradle'
+
+ext.addHalCompilerArguments = { binary->
+    if (binary.targetPlatform.architecture.name == 'athena') {
+        tasks.withType(CppCompile) {
+            binary.cppCompiler.args "-DCONFIG_ATHENA"
+        }
+    }
+    tasks.withType(CppCompile) {
+        binary.cppCompiler.args "-DNAMESPACED_PRIORITY"
+    }
+}
+
+ext.addHalToLinker = { binary->
+    if (binary.targetPlatform.architecture.name == 'athena') {
+        binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
+    } else {
+        binary.lib project: ':hal', library: 'halSim', linkage: 'shared'
+    }
+}
+
+model {
+    dependencyConfigs {
+        wpiutil(DependencyConfig) {
+            groupId = 'edu.wpi.first.wpiutil'
+            artifactId = 'wpiutil-cpp'
+            headerClassifier = 'headers'
+            ext = 'zip'
+            version = '+'
+            sharedConfigs = [ halAthena: [], halSim: [], halDev: [], halSimStaticDeps: [], halSimTestingBaseTest: [] ]
+        }
+    }
+    // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.
+    // This removes the need for DllExport on a library. However, the gradle C++ builder has a bug
+    // where some extra symbols are added that cannot be resolved at link time. This configuration
+    // lets you specify specific symbols to exlude from exporting.
+    exportsConfigs {
+        halSim(ExportsConfig) {
+            x86ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                  '_CT??_R0?AVbad_cast',
+                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                  '_TI5?AVfailure' ]
+            x64ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                  '_CT??_R0?AVbad_cast',
+                                  '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                  '_TI5?AVfailure' ]
+        }
+        halSimStaticDeps(ExportsConfig) {
+            x86SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('HAL_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+            x64SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('HAL_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+        }
+    }
+    components {
+        halAthena(NativeLibrarySpec) {
+            baseName = 'wpiHal'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = [ 'src/main/native/shared', 'src/main/native/athena' ]
+                        includes = ["**/*.cpp"]
+                    }
+                    exportedHeaders {
+                        srcDirs = ["src/main/native/include"]
+                    }
+                }
+            }
+            binaries.all { binary->
+                if (binary.targetPlatform.architecture.name != 'athena') {
+                    binary.buildable = false
+                }
+            }
+        }
+        halSim(NativeLibrarySpec) {
+            baseName = 'wpiHal'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
+                        includes = ["**/*.cpp"]
+                    }
+                    exportedHeaders {
+                        srcDirs = ["src/main/native/include"]
+                    }
+                }
+            }
+        }
+        if (project.hasProperty('buildHalStaticDeps')) {
+            halSimStaticDeps(NativeLibrarySpec) {
+                baseName = 'wpiHal'
+                binaries {
+                    withType(StaticLibraryBinarySpec) {
+                        buildable = false
+                    }
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/main/native/include"]
+                        }
+                    }
+                }
+            }
+        }
+        // The TestingBase library is a workaround for an issue with the GoogleTest plugin.
+        // The plugin by default will rebuild the entire test source set, which increases
+        // build time. By testing an empty library, and then just linking the already built component
+        // into the test, we save the extra build
+        halSimTestingBase(NativeLibrarySpec) { }
+        // By default, a development executable will be generated. This is to help the case of
+        // testing specific functionality of the library.
+        if (!project.hasProperty('skipDevExe')) {
+            halDev(NativeExecutableSpec) {
+                binaries.all {
+                    project.addHalToLinker(it)
+                }
+                sources {
+                    cpp {
+                        source {
+                            srcDirs 'src/dev/native/cpp'
+                            include '**/*.cpp'
+                        }
+                        exportedHeaders {
+                            srcDirs 'src/dev/native/include'
+                        }
+                    }
+                }
+            }
+        }
+    }
+    testSuites {
+        halSimTestingBaseTest {
+            sources {
+                cpp.source.srcDir 'src/test/native/cpp'
+                cpp.exportedHeaders.srcDir 'src/test/native/include'
+            }
+        }
+    }
+    binaries {
+        all {
+            project.addHalCompilerArguments(it)
+            project(':ni-libraries').addNiLibrariesToLinker(it)
+        }
+        withType(GoogleTestTestSuiteBinarySpec) {
+            if (!it.component.testedComponent.name.contains('TestingBase')) {
+                it.buildable = false
+            } else {
+                project(':gmock').addGmockToLinker(it)
+                project.addHalToLinker(it)
+            }
+        }
+    }
+    tasks {
+        runCpp(Exec) {
+            def found = false
+            $.components.each {
+                if (it in NativeExecutableSpec && it.name == 'halDev') {
+                    it.binaries.each {
+                        if (!found) {
+                            def arch = it.targetPlatform.architecture.name
+                            if (arch == 'x86-64' || arch == 'x86') {
+                                dependsOn it.tasks.install
+                                commandLine it.tasks.install.runScript
+                                found = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+apply from: 'publish.gradle'
