@@ -202,10 +202,6 @@ class SourceImpl {
   std::mutex m_frameMutex;
   std::condition_variable m_frameCv;
 
-  // Most recent frame (returned to callers of GetNextFrame)
-  // Access protected by m_frameMutex.
-  Frame m_frame;
-
   bool m_destroyFrames{false};
 
   // Pool of frames/images to reduce malloc traffic.
@@ -214,6 +210,12 @@ class SourceImpl {
   std::vector<std::unique_ptr<Image>> m_imagesAvail;
 
   std::atomic_bool m_connected{false};
+
+  // Most recent frame (returned to callers of GetNextFrame)
+  // Access protected by m_frameMutex.
+  // MUST be located below m_poolMutex as the Frame destructor calls back
+  // into SourceImpl::ReleaseImage, which locks m_poolMutex.
+  Frame m_frame;
 };
 
 }  // namespace cs
