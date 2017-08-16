@@ -62,7 +62,7 @@ static const std::pair<json::value_t, const char*> type_name_cases[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(JsonTypeNameTests, JsonTypeNameTest,
-                        ::testing::ValuesIn(type_name_cases));
+                        ::testing::ValuesIn(type_name_cases), );
 
 class JsonStringEscapeTest
     : public ::testing::TestWithParam<std::pair<const char*, const char*>> {};
@@ -118,4 +118,4 @@ static const std::pair<const char*, const char*> string_escape_cases[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(JsonStringEscapeTests, JsonStringEscapeTest,
-                        ::testing::ValuesIn(string_escape_cases));
+                        ::testing::ValuesIn(string_escape_cases), );

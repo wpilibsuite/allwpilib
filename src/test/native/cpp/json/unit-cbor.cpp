@@ -140,7 +140,7 @@ static const int64_t neg8_numbers[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborSignedNeg8Tests, CborSignedNeg8Test,
-                        ::testing::ValuesIn(neg8_numbers));
+                        ::testing::ValuesIn(neg8_numbers), );
 
 // -4294967296..-65537
 class CborSignedNeg4Test : public ::testing::TestWithParam<int64_t> {};
@@ -190,7 +190,7 @@ static const int64_t neg4_numbers[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborSignedNeg4Tests, CborSignedNeg4Test,
-                        ::testing::ValuesIn(neg4_numbers));
+                        ::testing::ValuesIn(neg4_numbers), );
 
 // -65536..-257
 TEST(CborSignedTest, Neg2)
@@ -448,7 +448,7 @@ static const uint32_t pos4_numbers[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborSignedPos4Tests, CborSignedPos4Test,
-                        ::testing::ValuesIn(pos4_numbers));
+                        ::testing::ValuesIn(pos4_numbers), );
 
 // 4294967296..4611686018427387903
 class CborSignedPos8Test : public ::testing::TestWithParam<uint64_t> {};
@@ -501,7 +501,7 @@ static const uint64_t pos8_numbers[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborSignedPos8Tests, CborSignedPos8Test,
-                        ::testing::ValuesIn(pos8_numbers));
+                        ::testing::ValuesIn(pos8_numbers), );
 
 /*
 // -32768..-129 (int 16)
@@ -671,7 +671,7 @@ TEST_P(CborUnsignedPos4Test, Case)
 }
 
 INSTANTIATE_TEST_CASE_P(CborUnsignedPos4Tests, CborUnsignedPos4Test,
-                        ::testing::ValuesIn(pos4_numbers));
+                        ::testing::ValuesIn(pos4_numbers), );
 
 // 4294967296..4611686018427387903 (eight-byte uint64_t)
 class CborUnsignedPos8Test : public ::testing::TestWithParam<uint64_t> {};
@@ -717,7 +717,7 @@ TEST_P(CborUnsignedPos8Test, Case)
 }
 
 INSTANTIATE_TEST_CASE_P(CborUnsignedPos8Tests, CborUnsignedPos8Test,
-                        ::testing::ValuesIn(pos8_numbers));
+                        ::testing::ValuesIn(pos8_numbers), );
 
 // 3.1415925
 TEST(CborFloatTest, Number)
@@ -845,7 +845,7 @@ static size_t string3_lens[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborString3Tests, CborString3Test,
-                        ::testing::ValuesIn(string3_lens));
+                        ::testing::ValuesIn(string3_lens), );
 
 // N = 65536..4294967295
 class CborString5Test : public ::testing::TestWithParam<size_t> {};
@@ -882,7 +882,7 @@ static size_t string5_lens[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborString5Tests, CborString5Test,
-                        ::testing::ValuesIn(string5_lens));
+                        ::testing::ValuesIn(string5_lens), );
 
 TEST(CborArrayTest, Empty)
 {
@@ -1225,7 +1225,7 @@ static const char* unsupported_bytes_cases[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborUnsupportedBytesTests, CborUnsupportedBytesTest,
-                        ::testing::ValuesIn(unsupported_bytes_cases));
+                        ::testing::ValuesIn(unsupported_bytes_cases), );
 #if 0
 // use this testcase outside [hide] to run it with Valgrind
 TEST(CborRoundtripTest, Sample)
@@ -1633,7 +1633,7 @@ static const CborRoundtripTestParam rfc7049_appendix_a_numbers[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixANumberTests, CborRoundtripTest,
-                        ::testing::ValuesIn(rfc7049_appendix_a_numbers));
+                        ::testing::ValuesIn(rfc7049_appendix_a_numbers), );
 
 static const CborRoundtripTestParam rfc7049_appendix_a_simple_values[] = {
     {"false", "\xf4", true},
@@ -1641,7 +1641,7 @@ static const CborRoundtripTestParam rfc7049_appendix_a_simple_values[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixASimpleValueTests, CborRoundtripTest,
-                        ::testing::ValuesIn(rfc7049_appendix_a_simple_values));
+                        ::testing::ValuesIn(rfc7049_appendix_a_simple_values), );
 
 static const CborRoundtripTestParam rfc7049_appendix_a_strings[] = {
     {"\"\"", "\x60", true},
@@ -1655,7 +1655,7 @@ static const CborRoundtripTestParam rfc7049_appendix_a_strings[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAStringTests, CborRoundtripTest,
-                        ::testing::ValuesIn(rfc7049_appendix_a_strings));
+                        ::testing::ValuesIn(rfc7049_appendix_a_strings), );
 
 static const CborRoundtripTestParam rfc7049_appendix_a_arrays[] = {
     {"[]", "\x80", true},
@@ -1672,7 +1672,7 @@ static const CborRoundtripTestParam rfc7049_appendix_a_arrays[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAArrayTests, CborRoundtripTest,
-                        ::testing::ValuesIn(rfc7049_appendix_a_arrays));
+                        ::testing::ValuesIn(rfc7049_appendix_a_arrays), );
 
 static const CborRoundtripTestParam rfc7049_appendix_a_objects[] = {
     {"{}", "\xa0", true},
@@ -1686,4 +1686,4 @@ static const CborRoundtripTestParam rfc7049_appendix_a_objects[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(CborRfc7049AppendixAObjectTests, CborRoundtripTest,
-                        ::testing::ValuesIn(rfc7049_appendix_a_objects));
+                        ::testing::ValuesIn(rfc7049_appendix_a_objects), );

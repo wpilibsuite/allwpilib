@@ -68,7 +68,7 @@ static const json::value_t construct_type_cases[] = {
 };
 
 INSTANTIATE_TEST_CASE_P(JsonConstructTypeTests, JsonConstructTypeTest,
-                        ::testing::ValuesIn(construct_type_cases));
+                        ::testing::ValuesIn(construct_type_cases), );
 
 
 TEST(JsonConstructNullTest, NoParameter)

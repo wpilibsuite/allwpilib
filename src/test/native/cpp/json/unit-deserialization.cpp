@@ -135,4 +135,4 @@ static const char* error_cases[] = {
 
 INSTANTIATE_TEST_CASE_P(JsonDeserializationErrorTests,
                         JsonDeserializationErrorTest,
-                        ::testing::ValuesIn(error_cases));
+                        ::testing::ValuesIn(error_cases), );
