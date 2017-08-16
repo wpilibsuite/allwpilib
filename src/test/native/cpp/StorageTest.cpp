@@ -862,12 +862,13 @@ TEST_P(StorageTestEmpty, LoadPersistentWarn) {
   EXPECT_TRUE(outgoing.empty());
 }
 
-INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty, ::testing::Bool());
+INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty,
+                        ::testing::Bool(), );
 INSTANTIATE_TEST_CASE_P(StorageTestsPopulateOne, StorageTestPopulateOne,
-                        ::testing::Bool());
+                        ::testing::Bool(), );
 INSTANTIATE_TEST_CASE_P(StorageTestsPopulated, StorageTestPopulated,
-                        ::testing::Bool());
+                        ::testing::Bool(), );
 INSTANTIATE_TEST_CASE_P(StorageTestsPersistent, StorageTestPersistent,
-                        ::testing::Bool());
+                        ::testing::Bool(), );
 
 }  // namespace nt
