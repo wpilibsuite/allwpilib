@@ -40,6 +40,8 @@ class CameraServer : public ErrorBase {
    */
   static CameraServer* GetInstance();
 
+#ifdef __linux__
+// USBCamera does not work on anything except linux
   /**
    * Start automatically capturing images to send to the dashboard.
    *
@@ -80,6 +82,7 @@ class CameraServer : public ErrorBase {
    */
   cs::UsbCamera StartAutomaticCapture(llvm::StringRef name,
                                       llvm::StringRef path);
+#endif
 
   /**
    * Start automatically capturing images to send to the dashboard from

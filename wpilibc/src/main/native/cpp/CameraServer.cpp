@@ -25,6 +25,7 @@ static llvm::StringRef MakeSourceValue(CS_Source source,
   CS_Status status = 0;
   buf.clear();
   switch (cs::GetSourceKind(source, &status)) {
+#ifdef __linux__
     case cs::VideoSource::kUsb: {
       llvm::StringRef prefix{"usb:"};
       buf.append(prefix.begin(), prefix.end());
@@ -32,6 +33,7 @@ static llvm::StringRef MakeSourceValue(CS_Source source,
       buf.append(path.begin(), path.end());
       break;
     }
+#endif
     case cs::VideoSource::kHttp: {
       llvm::StringRef prefix{"ip:"};
       buf.append(prefix.begin(), prefix.end());
@@ -482,7 +484,7 @@ CameraServer::CameraServer()
       },
       NT_NOTIFY_IMMEDIATE | NT_NOTIFY_UPDATE);
 }
-
+#ifdef __linux__
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
   return StartAutomaticCapture(m_defaultUsbDevice++);
 }
@@ -510,6 +512,7 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
   StartAutomaticCapture(camera);
   return camera;
 }
+#endif
 
 cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef host) {
   return AddAxisCamera("Axis Camera", host);
