@@ -19,7 +19,7 @@ namespace frc {
 
 /**
  * Class for operating a compressor connected to a %PCM (Pneumatic Control
- * Module). The %PCM will qutomatically run in closed loop mode by default
+ * Module). The %PCM will automatically run in closed loop mode by default
  * whenever a Solenoid object is created. For most cases, a Compressor object
  * does not need to be instantiated or used in a robot program. This class is
  * only required in cases where the robot program needs a more detailed status
