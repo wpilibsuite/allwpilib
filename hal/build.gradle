@@ -32,7 +32,8 @@ model {
             headerClassifier = 'headers'
             ext = 'zip'
             version = '+'
-            sharedConfigs = [ halAthena: [], halSim: [], halDev: [], halSimStaticDeps: [], halSimTestingBaseTest: [] ]
+            sharedConfigs = [ halAthena: [], halSim: [], halDev: [], halSimTestingBaseTest: [] ]
+            staticConfigs = [ halSimStaticDeps: [] ]
         }
     }
     // Exports config is a utility to enable exporting all symbols in a C++ library on windows to a DLL.

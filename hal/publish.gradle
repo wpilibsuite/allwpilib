@@ -107,8 +107,6 @@ model {
                         artifact it
                     }
 
-                    artifact allCppStaticDepsTask
-
                     artifactId = baseArtifactId + 'StaticDeps'
                     groupId artifactGroupId
                     version pubVersion
