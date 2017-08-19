@@ -166,11 +166,11 @@ model {
             project(':ni-libraries').addNiLibrariesToLinker(it)
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (!it.component.testedComponent.name.contains('TestingBase')) {
-                it.buildable = false
-            } else {
+            if (it.component.testedComponent.name.contains('TestingBase') && !project.hasProperty('onlyAthena')) {
                 project(':gmock').addGmockToLinker(it)
                 project.addHalToLinker(it)
+            } else {
+                it.buildable = false
             }
         }
     }
