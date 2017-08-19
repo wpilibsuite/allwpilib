@@ -74,6 +74,7 @@ task run(type: JavaExec) {
 
 test.dependsOn nativeTestFilesJar
 run.dependsOn nativeTestFilesJar
+build.dependsOn devClasses
 
 
 dependencies {
