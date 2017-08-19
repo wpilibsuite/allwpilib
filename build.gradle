@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.2.11'
+        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.2.12'
         classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:1.6'
     }
 }
