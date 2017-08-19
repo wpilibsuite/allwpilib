@@ -161,6 +161,8 @@ if (!project.hasProperty('onlyAthena')) {
                 detectPlatform = linux64IntelPlatformDetect
                 exclude << 'halAthena'
             }
+            /*
+            Disable x86 mac builds
             macX86(BuildConfig) {
                 architecture = 'x86'
                 operatingSystem = 'osx'
@@ -173,6 +175,7 @@ if (!project.hasProperty('onlyAthena')) {
                 detectPlatform = mac32PlatformDetect
                 exclude << 'halAthena'
             }
+            */
             macX64(BuildConfig) {
                 architecture = 'x86-64'
                 operatingSystem = 'osx'
