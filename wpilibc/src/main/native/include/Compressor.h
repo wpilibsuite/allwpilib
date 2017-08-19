@@ -18,15 +18,17 @@
 namespace frc {
 
 /**
- * Class for operating a compressor connected to a %PCM (Pneumatic Control Module). The %PCM will
- * automatically run in closed loop mode by default whenever a Solenoid object is created.
- * For most cases, a Compressor object does not need to be instantiated or used in a robot program.
- * This class is only required in cases where the robot program needs a more detailed status of the
- * compressor or to enable/disable closed loop control.
+ * Class for operating a compressor connected to a %PCM (Pneumatic Control
+ * Module). The %PCM will qutomatically run in closed loop mode by default
+ * whenever a Solenoid object is created. For most cases, a Compressor object
+ * does not need to be instantiated or used in a robot program. This class is
+ * only required in cases where the robot program needs a more detailed status
+ * of the compressor or to enable/disable closed loop control.
  *
- * Note: you cannot operate the compressor directly from this class as doing so would circumvent
- * the safety provided by using the pressure switch and closed loop control. You can only turn off
- * closed loop control, thereby stopping the compressor from operating.
+ * Note: you cannot operate the compressor directly from this class as doing so
+ * would circumvent the safety provided by using the pressure switch and closed
+ * loop control. You can only turn off closed loop control, thereby stopping
+ * the compressor from operating.
  */
 class Compressor : public SensorBase,
                    public LiveWindowSendable,
