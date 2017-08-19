@@ -1,5 +1,0 @@
-#!/bin/bash
-export GAZEBO_PLUGIN_PATH="${HOME}/wpilib/simulation/plugins:${GAZEBO_PLUGIN_PATH}"
-export GAZEBO_MODEL_PATH="${HOME}/wpilib/simulation/models:${GAZEBO_MODEL_PATH}"
-export LD_LIBRARY_PATH="${HOME}/wpilib/simulation/plugins:${HOME}/wpilib/simulation/lib:${LD_LIBRARY_PATH}"
-gazebo --verbose $@

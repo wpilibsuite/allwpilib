@@ -133,11 +133,11 @@ public class PIDTest extends AbstractComsSetup {
     assertFalse("PID did not begin disabled", m_controller.isEnabled());
     assertEquals("PID.getError() did not start at " + setpoint, setpoint,
         m_controller.getError(), 0);
-    assertEquals(k_p, m_table.getNumber("p"), 0);
-    assertEquals(k_i, m_table.getNumber("i"), 0);
-    assertEquals(k_d, m_table.getNumber("d"), 0);
-    assertEquals(setpoint, m_table.getNumber("setpoint"), 0);
-    assertFalse(m_table.getBoolean("enabled"));
+    assertEquals(k_p, m_table.getNumber("p", 9999999), 0);
+    assertEquals(k_i, m_table.getNumber("i", 9999999), 0);
+    assertEquals(k_d, m_table.getNumber("d", 9999999), 0);
+    assertEquals(setpoint, m_table.getNumber("setpoint", 9999999), 0);
+    assertFalse(m_table.getBoolean("enabled", true));
   }
 
   @Test
@@ -148,11 +148,11 @@ public class PIDTest extends AbstractComsSetup {
     m_controller.setSetpoint(setpoint);
     m_controller.enable();
     Timer.delay(.5);
-    assertTrue(m_table.getBoolean("enabled"));
+    assertTrue(m_table.getBoolean("enabled", false));
     assertTrue(m_controller.isEnabled());
     assertThat(0.0, is(not(me.getMotor().get())));
     m_controller.reset();
-    assertFalse(m_table.getBoolean("enabled"));
+    assertFalse(m_table.getBoolean("enabled", true));
     assertFalse(m_controller.isEnabled());
     assertEquals(0, me.getMotor().get(), 0);
   }
