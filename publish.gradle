@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 apply plugin: 'maven-publish'
 apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
 
@@ -9,96 +7,262 @@ if (!hasProperty('releaseType')) {
     }
 }
 
-def csVersion
-if (project.hasProperty("csPublishVersion")) {
-    csVersion = project.csPublishVersion
+def pubVersion
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
 } else {
-    csVersion = WPILibVersion.version
+    pubVersion = WPILibVersion.version
 }
 
-def csFile = file("$buildDir/cscore.txt")
+def outputsFolder = file("$buildDir/outputs")
+
+def versionFile = file("$outputsFolder/version.txt")
 
 task outputVersions() {
-    description = 'Prints the version of cscore to a file for use by the downstream packaging project'
+    description = 'Prints the versions of cscore to a file for use by the downstream packaging project'
     group = 'Build'
-    outputs.files(csFile)
+    outputs.files(versionFile)
 
     doFirst {
-        buildDir.mkdir()
+        outputsFolder.mkdir()
     }
 
     doLast {
-        csFile.write csVersion
+        versionFile.write pubVersion
     }
 }
 
-task clean(type: Delete) {
-    delete csFile
-}
+build.dependsOn outputVersions
 
-outputVersions.mustRunAfter clean
+def baseArtifactId = 'cscore'
+def artifactGroupId = 'edu.wpi.first.cscore'
 
-project(':native').build.dependsOn outputVersions
-if (project.buildArm) {
-    project(':arm').build.dependsOn outputVersions
-}
+def licenseFile = file("$rootDir/license.txt")
 
-// We change what repo we publish to depending on whether this is a development, beta, stable, or full
-// release. This is set up in the main gradle file.
-publishing {
-    publications {
-        def nat = project('native')
-        if (!project.hasProperty('skipJava')) {
-            java(MavenPublication) {
-                artifact nat.jar
-                if (!project.buildArm) {
-                    artifact nat.cscoreJavaSource
-                    artifact nat.cscoreJavadoc
-                }
-                if (project.buildArm) {
-                    def camArm = project('arm')
-                    artifact camArm.jar
-                    // If the library is not embedded include it in the repo
-                    if (!project.hasProperty('compilerPrefix')) {
-                        artifact camArm.cscoreZip
-                        artifact camArm.athenaCscoreUberZip {
-                            classifier = 'athena-uberzip'
-                        }
+task cppSourcesZip(type: Zip) {
+    destinationDir = outputsFolder
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+
+    model {
+        tasks {
+            it.each {
+                if (it in getJNIHeadersClass()) {
+                    from (it.outputs.files) {
+                        into '/'
                     }
-                    artifact camArm.cscoreJavaSource
-                    artifact camArm.cscoreJavadoc
+                    dependsOn it
                 }
-                if (project.hasProperty('makeDesktop')) {
-                    artifact nat.jar, {
-                        classifier = 'desktop'
-                    }
-                }
-
-                groupId 'edu.wpi.cscore.java'
-                artifactId 'cscore'
-                version csVersion
             }
         }
-        cpp(MavenPublication) {
-            artifact nat.cscoreZip
-            artifact cscoreSourceZip
-            if (project.buildArm) {
-                artifact project(':arm').cscoreZip
-                if (!project.hasProperty('compilerPrefix')) {
-                    artifact project(':arm').athenaCscoreUberZip {
-                        classifier = 'athena-uberzip'
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDir = outputsFolder
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+if (project.hasProperty('jenkinsBuild')) {
+    jar {
+        classifier = 'javaArtifact'
+    }
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    archives cppHeadersZip
+    archives cppSourcesZip
+}
+
+def createComponentZipTasks = { components, name, base, type, project, func ->
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && it.name == name) {
+            it.binaries.each {
+                def target = getClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
+                }
+            }
+        }
+    }
+    def taskList = []
+    configMap.each { key, value ->
+        def baseN = base + name
+        def task = project.tasks.create(baseN + "-${key}", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDir =  outputsFolder
+            classifier = key
+            baseName = baseN + '-classifier'
+            duplicatesStrategy = 'exclude'
+
+            from(licenseFile) {
+                into '/'
+            }
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            task
+        }
+    }
+    return taskList
+}
+
+model {
+    publishing {
+        def cscoreTaskList = createComponentZipTasks($.components, 'cscore', 'zipcppcscore', Zip, project, { task, value ->
+            value.each { binary->
+                if (binary.buildable) {
+                    if (binary instanceof SharedLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                        task.from (binary.sharedLibraryFile) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                        task.from (binary.sharedLibraryLinkFile) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                    } else if (binary instanceof StaticLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from (binary.staticLibraryFile) {
+                            into getPlatformPath(binary) + '/static'
+                        }
                     }
                 }
             }
-            if (project.hasProperty('makeDesktop')) {
-                artifact nat.cscoreZip, {
-                    classifier = 'desktop'
+        })
+
+        def cscoreJNITaskList = createComponentZipTasks($.components, 'cscoreJNI', 'jnijnicscore', Jar, project, { task, value ->
+            value.each { binary->
+                if (binary.buildable) {
+                    if (binary instanceof SharedLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from (binary.sharedLibraryFile) {
+                            into getPlatformPath(binary)
+                        }
+                    }
                 }
             }
+        })
 
-            groupId 'edu.wpi.cscore.cpp'
-            artifactId 'cscore'
-            version csVersion
+        def allJniTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allJniTask = project.tasks.create("cscoreJNIAllJar", Jar) {
+                description = 'Creates a jar with all JNI artifacts'
+                classifier = 'all'
+                baseName = 'jnijnicscorecscoreJNI'
+                destinationDir = outputsFolder
+                duplicatesStrategy = 'exclude'
+
+                cscoreJNITaskList.each {
+                    it.outputs.files.each {
+                        from project.zipTree(it)
+                    }
+                    dependsOn it
+                }
+            }
+            project.build.dependsOn allJniTask
+        }
+
+        def allCppTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allCppTask = project.tasks.create("cscoreAllZip", Zip) {
+                description = 'Creates a zip with all Cpp artifacts'
+                classifier = 'all'
+                baseName = 'zipcppcscorecscore'
+                destinationDir = outputsFolder
+                duplicatesStrategy = 'exclude'
+
+                cscoreTaskList.each {
+                    it.outputs.files.each {
+                        from project.zipTree(it)
+                    }
+                    dependsOn it
+                }
+            }
+            project.build.dependsOn allCppTask
+        }
+
+        publications {
+            cpp(MavenPublication) {
+                cscoreTaskList.each {
+                    artifact it
+                }
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allCppTask
+                }
+
+                artifactId = "${baseArtifactId}-cpp"
+                groupId artifactGroupId
+                version pubVersion
+            }
+            jni(MavenPublication) {
+                cscoreJNITaskList.each {
+                    artifact it
+                }
+
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allJniTask
+                }
+
+                artifactId = "${baseArtifactId}-jni"
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        java(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
+
+            artifactId = "${baseArtifactId}-java"
+            groupId artifactGroupId
+            version pubVersion
         }
     }
 }

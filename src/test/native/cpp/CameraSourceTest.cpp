@@ -7,7 +7,7 @@
 
 #include "gtest/gtest.h"
 
-#include "cameraserver.h"
+#include "cscore.h"
 
 namespace cs {
 
@@ -18,7 +18,7 @@ class CameraSourceTest : public ::testing::Test {
 };
 
 TEST_F(CameraSourceTest, HTTPCamera) {
-  auto source = HTTPCamera("axis", "http://localhost:8000");
+  auto source = HttpCamera("axis", "http://localhost:8000");
 }
 
 }  // namespace cs

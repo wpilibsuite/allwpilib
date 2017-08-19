@@ -1,6 +1,1 @@
-include 'native'
 include 'gmock'
-
-if (!hasProperty('skipArm')) {
-    include 'arm'
-}

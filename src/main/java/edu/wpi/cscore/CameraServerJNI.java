@@ -15,30 +15,20 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 import org.opencv.core.Core;
+import edu.wpi.first.wpiutil.RuntimeDetector;
 
 public class CameraServerJNI {
   static boolean libraryLoaded = false;
-  static boolean cvLibraryLoaded = false;
   static File jniLibrary = null;
+  static boolean cvLibraryLoaded = false;
+  static File cvJniLibrary = null;
   static {
     if (!libraryLoaded) {
       try {
         System.loadLibrary("cscore");
       } catch (UnsatisfiedLinkError e) {
         try {
-          String osname = System.getProperty("os.name");
-          String resname;
-          if (osname.startsWith("Windows"))
-            resname = "/Windows/" + System.getProperty("os.arch") + "/";
-          else
-            resname = "/" + osname + "/" + System.getProperty("os.arch") + "/";
-          System.out.println("platform: " + resname);
-          if (osname.startsWith("Windows"))
-            resname += "cscore.dll";
-          else if (osname.startsWith("Mac"))
-            resname += "libcscore.dylib";
-          else
-            resname += "libcscore.so";
+          String resname = RuntimeDetector.getLibraryResource("cscore");
           InputStream is = CameraServerJNI.class.getResourceAsStream(resname);
           if (is != null) {
             // create temporary file
@@ -72,17 +62,53 @@ public class CameraServerJNI {
         }
       }
       libraryLoaded = true;
-      if (!cvLibraryLoaded) {
+    }
+
+    String opencvName = Core.NATIVE_LIBRARY_NAME;
+    if (!cvLibraryLoaded) {
+      try {
+
+        System.loadLibrary(opencvName);
+      } catch (UnsatisfiedLinkError e) {
         try {
-          System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        } catch (UnsatisfiedLinkError ex) {
+          String resname = RuntimeDetector.getLibraryResource(opencvName);
+          InputStream is = CameraServerJNI.class.getResourceAsStream(resname);
+          if (is != null) {
+            // create temporary file
+            if (System.getProperty("os.name").startsWith("Windows"))
+              cvJniLibrary = File.createTempFile("OpenCVJNI", ".dll");
+            else if (System.getProperty("os.name").startsWith("Mac"))
+              cvJniLibrary = File.createTempFile("libOpenCVJNI", ".dylib");
+            else
+              cvJniLibrary = File.createTempFile("libOpenCVJNI", ".so");
+            // flag for delete on exit
+            cvJniLibrary.deleteOnExit();
+            OutputStream os = new FileOutputStream(cvJniLibrary);
+
+            byte[] buffer = new byte[1024];
+            int readBytes;
+            try {
+              while ((readBytes = is.read(buffer)) != -1) {
+                os.write(buffer, 0, readBytes);
+              }
+            } finally {
+              os.close();
+              is.close();
+            }
+            System.load(cvJniLibrary.getAbsolutePath());
+          } else {
+            System.loadLibrary(opencvName);
+          }
+        } catch (IOException ex) {
           ex.printStackTrace();
           System.exit(1);
         }
-        cvLibraryLoaded = true;
       }
+      cvLibraryLoaded = true;
     }
   }
+
+  public static void ForceLoad() {}
 
   //
   // Property Functions
