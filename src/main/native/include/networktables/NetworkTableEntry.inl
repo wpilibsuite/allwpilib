@@ -33,7 +33,7 @@ inline unsigned int NetworkTableEntry::GetFlags() const {
   return GetEntryFlags(m_handle);
 }
 
-inline unsigned long long NetworkTableEntry::GetLastChange() const {
+inline uint64_t NetworkTableEntry::GetLastChange() const {
   return GetEntryLastChange(m_handle);
 }
 

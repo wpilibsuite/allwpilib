@@ -5,12 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_MOCKENTRYNOTIFIER_H_
-#define NT_TEST_MOCKENTRYNOTIFIER_H_
+#ifndef NTCORE_MOCKENTRYNOTIFIER_H_
+#define NTCORE_MOCKENTRYNOTIFIER_H_
 
-#include "gmock/gmock.h"
+#include <memory>
 
 #include "IEntryNotifier.h"
+#include "gmock/gmock.h"
 
 namespace nt {
 
@@ -39,4 +40,4 @@ class MockEntryNotifier : public IEntryNotifier {
 
 }  // namespace nt
 
-#endif  // NT_TEST_MOCKENTRYNOTIFIER_H_
+#endif  // NTCORE_MOCKENTRYNOTIFIER_H_

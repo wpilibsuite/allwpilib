@@ -5,13 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ntcore_cpp.h"
-
 #include <chrono>
 #include <thread>
 
 #include "TestPrinters.h"
 #include "gtest/gtest.h"
+#include "ntcore_cpp.h"
 
 class ConnectionListenerTest : public ::testing::Test {
  public:

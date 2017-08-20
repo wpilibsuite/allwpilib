@@ -5,12 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_MOCKCONNECTIONNOTIFIER_H_
-#define NT_TEST_MOCKCONNECTIONNOTIFIER_H_
-
-#include "gmock/gmock.h"
+#ifndef NTCORE_MOCKCONNECTIONNOTIFIER_H_
+#define NTCORE_MOCKCONNECTIONNOTIFIER_H_
 
 #include "IConnectionNotifier.h"
+#include "gmock/gmock.h"
 
 namespace nt {
 
@@ -28,4 +27,4 @@ class MockConnectionNotifier : public IConnectionNotifier {
 
 }  // namespace nt
 
-#endif  // NT_TEST_MOCKCONNECTIONNOTIFIER_H_
+#endif  // NTCORE_MOCKCONNECTIONNOTIFIER_H_

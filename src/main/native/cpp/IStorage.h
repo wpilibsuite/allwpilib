@@ -1,19 +1,19 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_ISTORAGE_H_
-#define NT_ISTORAGE_H_
+#ifndef NTCORE_ISTORAGE_H_
+#define NTCORE_ISTORAGE_H_
 
 #include <functional>
 #include <memory>
 #include <vector>
 
-#include "llvm/ArrayRef.h"
-#include "llvm/Twine.h"
+#include <llvm/ArrayRef.h>
+#include <llvm/Twine.h>
 
 #include "Message.h"
 #include "ntcore_cpp.h"
@@ -57,9 +57,9 @@ class IStorage {
                                      bool periodic) const = 0;
   virtual const char* LoadPersistent(
       const Twine& filename,
-      std::function<void(std::size_t line, const char* msg)> warn) = 0;
+      std::function<void(size_t line, const char* msg)> warn) = 0;
 };
 
 }  // namespace nt
 
-#endif  // NT_ISTORAGE_H_
+#endif  // NTCORE_ISTORAGE_H_

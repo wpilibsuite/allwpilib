@@ -1,13 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "networktables/NetworkTableValue.h"
+#include <stdint.h>
+
+#include <support/timestamp.h>
+
 #include "Value_internal.h"
-#include "support/timestamp.h"
+#include "networktables/NetworkTableValue.h"
 
 using namespace nt;
 
@@ -16,7 +19,7 @@ Value::Value() {
   m_val.last_change = wpi::Now();
 }
 
-Value::Value(NT_Type type, unsigned long long time, const private_init&) {
+Value::Value(NT_Type type, uint64_t time, const private_init&) {
   m_val.type = type;
   if (time == 0)
     m_val.last_change = wpi::Now();
@@ -40,7 +43,7 @@ Value::~Value() {
 }
 
 std::shared_ptr<Value> Value::MakeBooleanArray(llvm::ArrayRef<int> value,
-                                               unsigned long long time) {
+                                               uint64_t time) {
   auto val = std::make_shared<Value>(NT_BOOLEAN_ARRAY, time, private_init());
   val->m_val.data.arr_boolean.arr = new int[value.size()];
   val->m_val.data.arr_boolean.size = value.size();
@@ -49,7 +52,7 @@ std::shared_ptr<Value> Value::MakeBooleanArray(llvm::ArrayRef<int> value,
 }
 
 std::shared_ptr<Value> Value::MakeDoubleArray(llvm::ArrayRef<double> value,
-                                              unsigned long long time) {
+                                              uint64_t time) {
   auto val = std::make_shared<Value>(NT_DOUBLE_ARRAY, time, private_init());
   val->m_val.data.arr_double.arr = new double[value.size()];
   val->m_val.data.arr_double.size = value.size();
@@ -57,29 +60,29 @@ std::shared_ptr<Value> Value::MakeDoubleArray(llvm::ArrayRef<double> value,
   return val;
 }
 
-std::shared_ptr<Value> Value::MakeStringArray(
-    llvm::ArrayRef<std::string> value, unsigned long long time) {
+std::shared_ptr<Value> Value::MakeStringArray(llvm::ArrayRef<std::string> value,
+                                              uint64_t time) {
   auto val = std::make_shared<Value>(NT_STRING_ARRAY, time, private_init());
   val->m_string_array = value;
   // point NT_Value to the contents in the vector.
   val->m_val.data.arr_string.arr = new NT_String[value.size()];
   val->m_val.data.arr_string.size = val->m_string_array.size();
-  for (std::size_t i = 0; i < value.size(); ++i) {
+  for (size_t i = 0; i < value.size(); ++i) {
     val->m_val.data.arr_string.arr[i].str = const_cast<char*>(value[i].c_str());
     val->m_val.data.arr_string.arr[i].len = value[i].size();
   }
   return val;
 }
 
-std::shared_ptr<Value> Value::MakeStringArray(
-    std::vector<std::string>&& value, unsigned long long time) {
+std::shared_ptr<Value> Value::MakeStringArray(std::vector<std::string>&& value,
+                                              uint64_t time) {
   auto val = std::make_shared<Value>(NT_STRING_ARRAY, time, private_init());
   val->m_string_array = std::move(value);
   value.clear();
   // point NT_Value to the contents in the vector.
   val->m_val.data.arr_string.arr = new NT_String[val->m_string_array.size()];
   val->m_val.data.arr_string.size = val->m_string_array.size();
-  for (std::size_t i = 0; i < val->m_string_array.size(); ++i) {
+  for (size_t i = 0; i < val->m_string_array.size(); ++i) {
     val->m_val.data.arr_string.arr[i].str =
         const_cast<char*>(val->m_string_array[i].c_str());
     val->m_val.data.arr_string.arr[i].len = val->m_string_array[i].size();

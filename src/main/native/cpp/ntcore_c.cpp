@@ -1,18 +1,19 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ntcore.h"
+#include <stdint.h>
 
 #include <cassert>
 #include <cstdlib>
 
-#include "support/timestamp.h"
+#include <support/timestamp.h>
 
 #include "Value_internal.h"
+#include "ntcore.h"
 
 using namespace nt;
 
@@ -205,7 +206,7 @@ char* NT_GetEntryName(NT_Entry entry, size_t* name_len) {
 
 enum NT_Type NT_GetEntryType(NT_Entry entry) { return nt::GetEntryType(entry); }
 
-unsigned long long NT_GetEntryLastChange(NT_Entry entry) {
+uint64_t NT_GetEntryLastChange(NT_Entry entry) {
   return nt::GetEntryLastChange(entry);
 }
 
@@ -660,7 +661,7 @@ const char* NT_LoadEntries(NT_Inst inst, const char* filename,
  * Utility Functions
  */
 
-unsigned long long NT_Now() { return wpi::Now(); }
+uint64_t NT_Now(void) { return wpi::Now(); }
 
 NT_Logger NT_AddLogger(NT_Inst inst, void* data, NT_LogFunc func,
                        unsigned int min_level, unsigned int max_level) {
@@ -866,8 +867,8 @@ void NT_FreeStringArray(struct NT_String* v_string, size_t arr_size) {
   std::free(v_string);
 }
 
-NT_Bool NT_SetEntryDouble(NT_Entry entry, unsigned long long time,
-                          double v_double, NT_Bool force) {
+NT_Bool NT_SetEntryDouble(NT_Entry entry, uint64_t time, double v_double,
+                          NT_Bool force) {
   if (force != 0) {
     nt::SetEntryTypeValue(entry, Value::MakeDouble(v_double, time));
     return 1;
@@ -876,8 +877,8 @@ NT_Bool NT_SetEntryDouble(NT_Entry entry, unsigned long long time,
   }
 }
 
-NT_Bool NT_SetEntryBoolean(NT_Entry entry, unsigned long long time,
-                           NT_Bool v_boolean, NT_Bool force) {
+NT_Bool NT_SetEntryBoolean(NT_Entry entry, uint64_t time, NT_Bool v_boolean,
+                           NT_Bool force) {
   if (force != 0) {
     nt::SetEntryTypeValue(entry, Value::MakeBoolean(v_boolean != 0, time));
     return 1;
@@ -886,8 +887,8 @@ NT_Bool NT_SetEntryBoolean(NT_Entry entry, unsigned long long time,
   }
 }
 
-NT_Bool NT_SetEntryString(NT_Entry entry, unsigned long long time,
-                          const char* str, size_t str_len, NT_Bool force) {
+NT_Bool NT_SetEntryString(NT_Entry entry, uint64_t time, const char* str,
+                          size_t str_len, NT_Bool force) {
   if (force != 0) {
     nt::SetEntryTypeValue(entry,
                           Value::MakeString(StringRef(str, str_len), time));
@@ -898,7 +899,7 @@ NT_Bool NT_SetEntryString(NT_Entry entry, unsigned long long time,
   }
 }
 
-NT_Bool NT_SetEntryRaw(NT_Entry entry, unsigned long long time, const char* raw,
+NT_Bool NT_SetEntryRaw(NT_Entry entry, uint64_t time, const char* raw,
                        size_t raw_len, NT_Bool force) {
   if (force != 0) {
     nt::SetEntryTypeValue(entry, Value::MakeRaw(StringRef(raw, raw_len), time));
@@ -909,7 +910,7 @@ NT_Bool NT_SetEntryRaw(NT_Entry entry, unsigned long long time, const char* raw,
   }
 }
 
-NT_Bool NT_SetEntryBooleanArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetEntryBooleanArray(NT_Entry entry, uint64_t time,
                                 const NT_Bool* arr, size_t size,
                                 NT_Bool force) {
   if (force != 0) {
@@ -922,8 +923,8 @@ NT_Bool NT_SetEntryBooleanArray(NT_Entry entry, unsigned long long time,
   }
 }
 
-NT_Bool NT_SetEntryDoubleArray(NT_Entry entry, unsigned long long time,
-                               const double* arr, size_t size, NT_Bool force) {
+NT_Bool NT_SetEntryDoubleArray(NT_Entry entry, uint64_t time, const double* arr,
+                               size_t size, NT_Bool force) {
   if (force != 0) {
     nt::SetEntryTypeValue(
         entry, Value::MakeDoubleArray(llvm::makeArrayRef(arr, size), time));
@@ -934,7 +935,7 @@ NT_Bool NT_SetEntryDoubleArray(NT_Entry entry, unsigned long long time,
   }
 }
 
-NT_Bool NT_SetEntryStringArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetEntryStringArray(NT_Entry entry, uint64_t time,
                                const struct NT_String* arr, size_t size,
                                NT_Bool force) {
   std::vector<std::string> v;
@@ -954,8 +955,7 @@ enum NT_Type NT_GetValueType(const struct NT_Value* value) {
   return value->type;
 }
 
-NT_Bool NT_GetValueBoolean(const struct NT_Value* value,
-                           unsigned long long* last_change,
+NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
                            NT_Bool* v_boolean) {
   if (!value || value->type != NT_Type::NT_BOOLEAN) return 0;
   *v_boolean = value->data.v_boolean;
@@ -963,63 +963,60 @@ NT_Bool NT_GetValueBoolean(const struct NT_Value* value,
   return 1;
 }
 
-NT_Bool NT_GetValueDouble(const struct NT_Value* value,
-                          unsigned long long* last_change, double* v_double) {
+NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
+                          double* v_double) {
   if (!value || value->type != NT_Type::NT_DOUBLE) return 0;
   *last_change = value->last_change;
   *v_double = value->data.v_double;
   return 1;
 }
 
-char* NT_GetValueString(const struct NT_Value* value,
-                        unsigned long long* last_change, size_t* str_len) {
+char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
+                        size_t* str_len) {
   if (!value || value->type != NT_Type::NT_STRING) return nullptr;
   *last_change = value->last_change;
   *str_len = value->data.v_string.len;
-  char* str = (char*)std::malloc(value->data.v_string.len + 1);
+  char* str = static_cast<char*>(std::malloc(value->data.v_string.len + 1));
   std::memcpy(str, value->data.v_string.str, value->data.v_string.len + 1);
   return str;
 }
 
-char* NT_GetValueRaw(const struct NT_Value* value,
-                     unsigned long long* last_change, size_t* raw_len) {
+char* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
+                     size_t* raw_len) {
   if (!value || value->type != NT_Type::NT_RAW) return nullptr;
   *last_change = value->last_change;
   *raw_len = value->data.v_string.len;
-  char* raw = (char*)std::malloc(value->data.v_string.len + 1);
+  char* raw = static_cast<char*>(std::malloc(value->data.v_string.len + 1));
   std::memcpy(raw, value->data.v_string.str, value->data.v_string.len + 1);
   return raw;
 }
 
 NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
-                                 unsigned long long* last_change,
-                                 size_t* arr_size) {
+                                 uint64_t* last_change, size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_BOOLEAN_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_boolean.size;
-  NT_Bool* arr =
-      (int*)std::malloc(value->data.arr_boolean.size * sizeof(NT_Bool));
+  NT_Bool* arr = static_cast<int*>(
+      std::malloc(value->data.arr_boolean.size * sizeof(NT_Bool)));
   std::memcpy(arr, value->data.arr_boolean.arr,
               value->data.arr_boolean.size * sizeof(NT_Bool));
   return arr;
 }
 
 double* NT_GetValueDoubleArray(const struct NT_Value* value,
-                               unsigned long long* last_change,
-                               size_t* arr_size) {
+                               uint64_t* last_change, size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_DOUBLE_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_double.size;
-  double* arr =
-      (double*)std::malloc(value->data.arr_double.size * sizeof(double));
+  double* arr = static_cast<double*>(
+      std::malloc(value->data.arr_double.size * sizeof(double)));
   std::memcpy(arr, value->data.arr_double.arr,
               value->data.arr_double.size * sizeof(double));
   return arr;
 }
 
 NT_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                  unsigned long long* last_change,
-                                  size_t* arr_size) {
+                                  uint64_t* last_change, size_t* arr_size) {
   if (!value || value->type != NT_Type::NT_STRING_ARRAY) return nullptr;
   *last_change = value->last_change;
   *arr_size = value->data.arr_string.size;
@@ -1028,38 +1025,38 @@ NT_String* NT_GetValueStringArray(const struct NT_Value* value,
   for (size_t i = 0; i < value->data.arr_string.size; ++i) {
     size_t len = value->data.arr_string.arr[i].len;
     arr[i].len = len;
-    arr[i].str = (char*)std::malloc(len + 1);
+    arr[i].str = static_cast<char*>(std::malloc(len + 1));
     std::memcpy(arr[i].str, value->data.arr_string.arr[i].str, len + 1);
   }
   return arr;
 }
 
-NT_Bool NT_SetDefaultEntryBoolean(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryBoolean(NT_Entry entry, uint64_t time,
                                   NT_Bool default_boolean) {
   return nt::SetDefaultEntryValue(
       entry, Value::MakeBoolean(default_boolean != 0, time));
 }
 
-NT_Bool NT_SetDefaultEntryDouble(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryDouble(NT_Entry entry, uint64_t time,
                                  double default_double) {
   return nt::SetDefaultEntryValue(entry,
                                   Value::MakeDouble(default_double, time));
 }
 
-NT_Bool NT_SetDefaultEntryString(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryString(NT_Entry entry, uint64_t time,
                                  const char* default_value,
                                  size_t default_len) {
   return nt::SetDefaultEntryValue(
       entry, Value::MakeString(StringRef(default_value, default_len), time));
 }
 
-NT_Bool NT_SetDefaultEntryRaw(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryRaw(NT_Entry entry, uint64_t time,
                               const char* default_value, size_t default_len) {
   return nt::SetDefaultEntryValue(
       entry, Value::MakeRaw(StringRef(default_value, default_len), time));
 }
 
-NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, uint64_t time,
                                        const NT_Bool* default_value,
                                        size_t default_size) {
   return nt::SetDefaultEntryValue(
@@ -1067,7 +1064,7 @@ NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, unsigned long long time,
                  llvm::makeArrayRef(default_value, default_size), time));
 }
 
-NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, uint64_t time,
                                       const double* default_value,
                                       size_t default_size) {
   return nt::SetDefaultEntryValue(
@@ -1075,7 +1072,7 @@ NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, unsigned long long time,
                  llvm::makeArrayRef(default_value, default_size), time));
 }
 
-NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, uint64_t time,
                                       const struct NT_String* default_value,
                                       size_t default_size) {
   std::vector<std::string> vec;
@@ -1087,7 +1084,7 @@ NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, unsigned long long time,
                                   Value::MakeStringArray(std::move(vec), time));
 }
 
-NT_Bool NT_GetEntryBoolean(NT_Entry entry, unsigned long long* last_change,
+NT_Bool NT_GetEntryBoolean(NT_Entry entry, uint64_t* last_change,
                            NT_Bool* v_boolean) {
   auto v = nt::GetEntryValue(entry);
   if (!v || !v->IsBoolean()) return 0;
@@ -1096,7 +1093,7 @@ NT_Bool NT_GetEntryBoolean(NT_Entry entry, unsigned long long* last_change,
   return 1;
 }
 
-NT_Bool NT_GetEntryDouble(NT_Entry entry, unsigned long long* last_change,
+NT_Bool NT_GetEntryDouble(NT_Entry entry, uint64_t* last_change,
                           double* v_double) {
   auto v = nt::GetEntryValue(entry);
   if (!v || !v->IsDouble()) return 0;
@@ -1105,7 +1102,7 @@ NT_Bool NT_GetEntryDouble(NT_Entry entry, unsigned long long* last_change,
   return 1;
 }
 
-char* NT_GetEntryString(NT_Entry entry, unsigned long long* last_change,
+char* NT_GetEntryString(NT_Entry entry, uint64_t* last_change,
                         size_t* str_len) {
   auto v = nt::GetEntryValue(entry);
   if (!v || !v->IsString()) return nullptr;
@@ -1116,8 +1113,7 @@ char* NT_GetEntryString(NT_Entry entry, unsigned long long* last_change,
   return v_string.str;
 }
 
-char* NT_GetEntryRaw(NT_Entry entry, unsigned long long* last_change,
-                     size_t* raw_len) {
+char* NT_GetEntryRaw(NT_Entry entry, uint64_t* last_change, size_t* raw_len) {
   auto v = nt::GetEntryValue(entry);
   if (!v || !v->IsRaw()) return nullptr;
   *last_change = v->last_change();
@@ -1127,8 +1123,7 @@ char* NT_GetEntryRaw(NT_Entry entry, unsigned long long* last_change,
   return v_raw.str;
 }
 
-NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry,
-                                 unsigned long long* last_change,
+NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry, uint64_t* last_change,
                                  size_t* arr_size) {
   auto v = nt::GetEntryValue(entry);
   if (!v || !v->IsBooleanArray()) return nullptr;
@@ -1140,7 +1135,7 @@ NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry,
   return arr;
 }
 
-double* NT_GetEntryDoubleArray(NT_Entry entry, unsigned long long* last_change,
+double* NT_GetEntryDoubleArray(NT_Entry entry, uint64_t* last_change,
                                size_t* arr_size) {
   auto v = nt::GetEntryValue(entry);
   if (!v || !v->IsDoubleArray()) return nullptr;
@@ -1152,8 +1147,7 @@ double* NT_GetEntryDoubleArray(NT_Entry entry, unsigned long long* last_change,
   return arr;
 }
 
-NT_String* NT_GetEntryStringArray(NT_Entry entry,
-                                  unsigned long long* last_change,
+NT_String* NT_GetEntryStringArray(NT_Entry entry, uint64_t* last_change,
                                   size_t* arr_size) {
   auto v = nt::GetEntryValue(entry);
   if (!v || !v->IsStringArray()) return nullptr;

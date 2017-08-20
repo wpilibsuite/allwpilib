@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_ICONNECTIONNOTIFIER_H_
-#define NT_ICONNECTIONNOTIFIER_H_
+#ifndef NTCORE_ICONNECTIONNOTIFIER_H_
+#define NTCORE_ICONNECTIONNOTIFIER_H_
 
 #include <climits>
 
@@ -29,4 +29,4 @@ class IConnectionNotifier {
 
 }  // namespace nt
 
-#endif  // NT_ICONNECTIONNOTIFIER_H_
+#endif  // NTCORE_ICONNECTIONNOTIFIER_H_

@@ -1,14 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_LOG_H_
-#define NT_LOG_H_
+#ifndef NTCORE_LOG_H_
+#define NTCORE_LOG_H_
 
-#include "support/Logger.h"
+#include <support/Logger.h>
 
 #define LOG(level, x) WPI_LOG(m_logger, level, x)
 
@@ -23,4 +23,4 @@
 #define DEBUG3(x) WPI_DEBUG3(m_logger, x)
 #define DEBUG4(x) WPI_DEBUG4(m_logger, x)
 
-#endif  // NT_LOG_H_
+#endif  // NTCORE_LOG_H_

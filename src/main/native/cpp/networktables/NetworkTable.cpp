@@ -1,10 +1,18 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "networktables/NetworkTable.h"
 
 #include <algorithm>
 
-#include "llvm/SmallString.h"
-#include "llvm/StringMap.h"
-#include "llvm/raw_ostream.h"
+#include <llvm/SmallString.h>
+#include <llvm/StringMap.h>
+#include <llvm/raw_ostream.h>
+
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore.h"
 #include "tables/ITableListener.h"
@@ -83,8 +91,9 @@ void NetworkTable::Initialize() {
   if (s_client) {
     inst.StartClient();
     if (s_enable_ds) inst.StartDSClient(s_port);
-  } else
+  } else {
     inst.StartServer(s_persistent_filename, "", s_port);
+  }
   s_running = true;
 }
 
@@ -94,8 +103,9 @@ void NetworkTable::Shutdown() {
   if (s_client) {
     inst.StopDSClient();
     inst.StopClient();
-  } else
+  } else {
     inst.StopServer();
+  }
   s_running = false;
 }
 
@@ -203,7 +213,7 @@ NetworkTableEntry NetworkTable::GetEntry(const Twine& key) const {
 
 NT_EntryListener NetworkTable::AddEntryListener(TableEntryListener listener,
                                                 unsigned int flags) const {
-  std::size_t prefix_len = m_path.size() + 1;
+  size_t prefix_len = m_path.size() + 1;
   return nt::AddEntryListener(
       m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
       [=](const EntryNotification& event) {
@@ -218,7 +228,7 @@ NT_EntryListener NetworkTable::AddEntryListener(TableEntryListener listener,
 NT_EntryListener NetworkTable::AddEntryListener(const Twine& key,
                                                 TableEntryListener listener,
                                                 unsigned int flags) const {
-  std::size_t prefix_len = m_path.size() + 1;
+  size_t prefix_len = m_path.size() + 1;
   auto entry = GetEntry(key);
   return nt::AddEntryListener(entry.GetHandle(),
                               [=](const EntryNotification& event) {
@@ -249,7 +259,7 @@ void NetworkTable::AddTableListenerEx(ITableListener* listener,
   std::lock_guard<wpi::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
-  std::size_t prefix_len = path.size();
+  size_t prefix_len = path.size();
   NT_EntryListener id = nt::AddEntryListener(
       m_inst, path,
       [=](const EntryNotification& event) {
@@ -271,7 +281,7 @@ void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
 void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
                                       unsigned int flags) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  std::size_t prefix_len = m_path.size() + 1;
+  size_t prefix_len = m_path.size() + 1;
   auto entry = GetEntry(key);
   NT_EntryListener id = nt::AddEntryListener(
       entry.GetHandle(),
@@ -290,7 +300,7 @@ void NetworkTable::AddSubTableListener(ITableListener* listener) {
 void NetworkTable::AddSubTableListener(ITableListener* listener,
                                        bool localNotify) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  std::size_t prefix_len = m_path.size() + 1;
+  size_t prefix_len = m_path.size() + 1;
 
   // The lambda needs to be copyable, but StringMap is not, so use
   // a shared_ptr to it.
@@ -366,7 +376,7 @@ std::vector<std::string> NetworkTable::GetSubTables() const {
   for (auto& entry :
        GetEntryInfo(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR), 0)) {
     auto relative_key = StringRef(entry.name).substr(prefix_len);
-    std::size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
+    size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
     if (end_subtable == StringRef::npos) continue;
     keys.push_back(relative_key.substr(0, end_subtable));
   }
@@ -468,8 +478,8 @@ bool NetworkTable::PutStringArray(StringRef key, ArrayRef<std::string> value) {
   return GetEntry(key).SetStringArray(value);
 }
 
-bool NetworkTable::SetDefaultStringArray(
-    StringRef key, ArrayRef<std::string> defaultValue) {
+bool NetworkTable::SetDefaultStringArray(StringRef key,
+                                         ArrayRef<std::string> defaultValue) {
   return GetEntry(key).SetDefaultStringArray(defaultValue);
 }
 

@@ -1,12 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_DISPATCHER_H_
-#define NT_DISPATCHER_H_
+#ifndef NTCORE_DISPATCHER_H_
+#define NTCORE_DISPATCHER_H_
 
 #include <atomic>
 #include <chrono>
@@ -14,12 +14,13 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
-#include "llvm/StringRef.h"
-#include "llvm/Twine.h"
-#include "support/condition_variable.h"
-#include "support/mutex.h"
+#include <llvm/StringRef.h>
+#include <llvm/Twine.h>
+#include <support/condition_variable.h>
+#include <support/mutex.h>
 
 #include "IDispatcher.h"
 #include "INetworkConnection.h"
@@ -28,7 +29,7 @@ namespace wpi {
 class Logger;
 class NetworkAcceptor;
 class NetworkStream;
-}
+}  // namespace wpi
 
 namespace nt {
 
@@ -147,4 +148,4 @@ class Dispatcher : public DispatcherBase {
 
 }  // namespace nt
 
-#endif  // NT_DISPATCHER_H_
+#endif  // NTCORE_DISPATCHER_H_

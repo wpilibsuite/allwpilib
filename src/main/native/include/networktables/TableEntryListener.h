@@ -5,13 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TABLEENTRYLISTENER_H_
-#define NT_TABLEENTRYLISTENER_H_
+#ifndef NTCORE_NETWORKTABLES_TABLEENTRYLISTENER_H_
+#define NTCORE_NETWORKTABLES_TABLEENTRYLISTENER_H_
 
 #include <functional>
 #include <memory>
 
-#include "llvm/StringRef.h"
+#include <llvm/StringRef.h>
 
 namespace nt {
 
@@ -40,4 +40,4 @@ typedef std::function<void(NetworkTable* table, StringRef name,
 
 }  // namespace nt
 
-#endif  // NT_TABLEENTRYLISTENER_H_
+#endif  // NTCORE_NETWORKTABLES_TABLEENTRYLISTENER_H_

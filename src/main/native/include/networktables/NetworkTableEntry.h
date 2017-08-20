@@ -5,14 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_ENTRY_H_
-#define NT_ENTRY_H_
+#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_H_
+#define NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_H_
+
+#include <stdint.h>
 
 #include <memory>
 #include <string>
+#include <vector>
 
-#include "llvm/StringRef.h"
-#include "llvm/Twine.h"
+#include <llvm/StringRef.h>
+#include <llvm/Twine.h>
 
 #include "networktables/NetworkTableType.h"
 #include "networktables/NetworkTableValue.h"
@@ -93,7 +96,7 @@ class NetworkTableEntry final {
    * Gets the last time the entry's value was changed.
    * @return Entry last change time
    */
-  unsigned long long GetLastChange() const;
+  uint64_t GetLastChange() const;
 
   /**
    * Gets combined information about the entry.
@@ -448,4 +451,4 @@ class NetworkTableEntry final {
 
 #include "networktables/NetworkTableEntry.inl"
 
-#endif  // NT_ENTRY_H_
+#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEENTRY_H_

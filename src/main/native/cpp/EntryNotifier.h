@@ -1,24 +1,25 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_ENTRYNOTIFIER_H_
-#define NT_ENTRYNOTIFIER_H_
-
-#include "ntcore_cpp.h"
+#ifndef NTCORE_ENTRYNOTIFIER_H_
+#define NTCORE_ENTRYNOTIFIER_H_
 
 #include <atomic>
+#include <memory>
+#include <string>
 
 #include "CallbackManager.h"
 #include "Handle.h"
 #include "IEntryNotifier.h"
+#include "ntcore_cpp.h"
 
 namespace wpi {
 class Logger;
-}
+}  // namespace wpi
 
 namespace nt {
 
@@ -51,7 +52,7 @@ class EntryNotifierThread
     : public CallbackThread<EntryNotifierThread, EntryNotification,
                             EntryListenerData> {
  public:
-  EntryNotifierThread(int inst) : m_inst(inst) {}
+  explicit EntryNotifierThread(int inst) : m_inst(inst) {}
 
   bool Matches(const EntryListenerData& listener,
                const EntryNotification& data);
@@ -105,4 +106,4 @@ class EntryNotifier
 
 }  // namespace nt
 
-#endif  // NT_ENTRYNOTIFIER_H_
+#endif  // NTCORE_ENTRYNOTIFIER_H_

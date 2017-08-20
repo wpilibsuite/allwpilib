@@ -1,21 +1,27 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_NETWORKCONNECTION_H_
-#define NT_NETWORKCONNECTION_H_
+#ifndef NTCORE_NETWORKCONNECTION_H_
+#define NTCORE_NETWORKCONNECTION_H_
+
+#include <stdint.h>
 
 #include <atomic>
 #include <chrono>
 #include <memory>
+#include <string>
 #include <thread>
+#include <utility>
+#include <vector>
 
-#include "support/condition_variable.h"
-#include "support/mutex.h"
-#include "support/ConcurrentQueue.h"
+#include <support/ConcurrentQueue.h>
+#include <support/condition_variable.h>
+#include <support/mutex.h>
+
 #include "INetworkConnection.h"
 #include "Message.h"
 #include "ntcore_cpp.h"
@@ -23,7 +29,7 @@
 namespace wpi {
 class Logger;
 class NetworkStream;
-}
+}  // namespace wpi
 
 namespace nt {
 
@@ -76,7 +82,7 @@ class NetworkConnection : public INetworkConnection {
   std::string remote_id() const;
   void set_remote_id(StringRef remote_id);
 
-  unsigned long long last_update() const { return m_last_update; }
+  uint64_t last_update() const { return m_last_update; }
 
   NetworkConnection(const NetworkConnection&) = delete;
   NetworkConnection& operator=(const NetworkConnection&) = delete;
@@ -106,7 +112,7 @@ class NetworkConnection : public INetworkConnection {
 
   wpi::mutex m_pending_mutex;
   Outgoing m_pending_outgoing;
-  std::vector<std::pair<std::size_t, std::size_t>> m_pending_update;
+  std::vector<std::pair<size_t, size_t>> m_pending_update;
 
   // Condition variables for shutdown
   wpi::mutex m_shutdown_mutex;
@@ -118,4 +124,4 @@ class NetworkConnection : public INetworkConnection {
 
 }  // namespace nt
 
-#endif  // NT_NETWORKCONNECTION_H_
+#endif  // NTCORE_NETWORKCONNECTION_H_

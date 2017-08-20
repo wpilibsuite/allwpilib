@@ -1,12 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_MESSAGE_H_
-#define NT_MESSAGE_H_
+#ifndef NTCORE_MESSAGE_H_
+#define NTCORE_MESSAGE_H_
 
 #include <functional>
 #include <memory>
@@ -114,4 +114,4 @@ class Message {
 
 }  // namespace nt
 
-#endif  // NT_MESSAGE_H_
+#endif  // NTCORE_MESSAGE_H_

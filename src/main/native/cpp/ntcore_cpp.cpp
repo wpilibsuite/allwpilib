@@ -1,23 +1,24 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ntcore.h"
+#include <stdint.h>
 
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
 
-#include "support/timestamp.h"
+#include <support/timestamp.h>
 
 #include "Handle.h"
 #include "InstanceImpl.h"
 #include "Log.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
+#include "ntcore.h"
 
 namespace nt {
 
@@ -92,7 +93,7 @@ NT_Type GetEntryType(NT_Entry entry) {
   return ii->storage.GetEntryType(id);
 }
 
-unsigned long long GetEntryLastChange(NT_Entry entry) {
+uint64_t GetEntryLastChange(NT_Entry entry) {
   Handle handle{entry};
   int id = handle.GetTypedIndex(Handle::kEntry);
   auto ii = InstanceImpl::Get(handle.GetInst());
@@ -638,7 +639,7 @@ std::string PackRpcDefinition(const RpcDefinition& def) {
   unsigned int params_size = def.params.size();
   if (params_size > 0xff) params_size = 0xff;
   enc.Write8(params_size);
-  for (std::size_t i = 0; i < params_size; ++i) {
+  for (size_t i = 0; i < params_size; ++i) {
     enc.WriteType(def.params[i].def_value->type());
     enc.WriteString(def.params[i].name);
     enc.WriteValue(*def.params[i].def_value);
@@ -648,7 +649,7 @@ std::string PackRpcDefinition(const RpcDefinition& def) {
   unsigned int results_size = def.results.size();
   if (results_size > 0xff) results_size = 0xff;
   enc.Write8(results_size);
-  for (std::size_t i = 0; i < results_size; ++i) {
+  for (size_t i = 0; i < results_size; ++i) {
     enc.WriteType(def.results[i].type);
     enc.WriteString(def.results[i].name);
   }
@@ -668,7 +669,7 @@ bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def) {
   if (!dec.Read8(&params_size)) return false;
   def->params.resize(0);
   def->params.reserve(params_size);
-  for (std::size_t i = 0; i < params_size; ++i) {
+  for (size_t i = 0; i < params_size; ++i) {
     RpcParamDef pdef;
     NT_Type type;
     if (!dec.ReadType(&type)) return false;
@@ -683,7 +684,7 @@ bool UnpackRpcDefinition(StringRef packed, RpcDefinition* def) {
   if (!dec.Read8(&results_size)) return false;
   def->results.resize(0);
   def->results.reserve(results_size);
-  for (std::size_t i = 0; i < results_size; ++i) {
+  for (size_t i = 0; i < results_size; ++i) {
     RpcResultDef rdef;
     if (!dec.ReadType(&rdef.type)) return false;
     if (!dec.ReadString(&rdef.name)) return false;
@@ -713,7 +714,7 @@ std::vector<std::shared_ptr<Value>> UnpackRpcValues(StringRef packed,
   return vec;
 }
 
-unsigned long long Now() { return wpi::Now(); }
+uint64_t Now() { return wpi::Now(); }
 
 /*
  * Client/Server Functions

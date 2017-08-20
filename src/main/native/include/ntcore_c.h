@@ -1,16 +1,18 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NTCORE_C_H_
-#define NTCORE_C_H_
+#ifndef NTCORE_NTCORE_C_H_
+#define NTCORE_NTCORE_C_H_
 
-#include <stddef.h>
+#include <stdint.h>
 
-#include "support/deprecated.h"
+#include <cstddef>
+
+#include <support/deprecated.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -93,7 +95,7 @@ struct NT_String {
    * String contents (UTF-8).
    * The string is NOT required to be zero-terminated.
    * When returned by the library, this is zero-terminated and allocated with
-   * malloc().
+   * std::malloc().
    */
   char* str;
 
@@ -107,7 +109,7 @@ struct NT_String {
 /** NetworkTables Entry Value.  Note this is a typed union. */
 struct NT_Value {
   enum NT_Type type;
-  unsigned long long last_change;
+  uint64_t last_change;
   union {
     NT_Bool v_boolean;
     double v_double;
@@ -143,7 +145,7 @@ struct NT_EntryInfo {
   unsigned int flags;
 
   /** Timestamp of last change to entry (type or value). */
-  unsigned long long last_change;
+  uint64_t last_change;
 };
 
 /** NetworkTables Connection Information */
@@ -164,7 +166,7 @@ struct NT_ConnectionInfo {
    * The last time any update was received from the remote node (same scale as
    * returned by nt::Now()).
    */
-  unsigned long long last_update;
+  uint64_t last_update;
 
   /**
    * The protocol version being used for this connection.  This in protocol
@@ -341,7 +343,7 @@ enum NT_Type NT_GetEntryType(NT_Entry entry);
  * @param entry   entry handle
  * @return Entry last change time
  */
-unsigned long long NT_GetEntryLastChange(NT_Entry entry);
+uint64_t NT_GetEntryLastChange(NT_Entry entry);
 
 /**
  * Get Entry Value.
@@ -559,9 +561,9 @@ NT_EntryListener NT_AddPolledEntryListenerSingle(NT_EntryListenerPoller poller,
 
 /**
  * Get the next entry listener event.  This blocks until the next event occurs.
- * This is intended to be used with NT_AddPolledEntryListener(); entry listeners
- * created using NT_AddEntryListener() will not be serviced through this
- * function.
+ * This is intended to be used with NT_AddPolledEntryListener(void); entry
+ * listeners created using NT_AddEntryListener() will not be serviced through
+ * this function.
  * @param poller    poller handle
  * @param len       length of returned array (output)
  * @return Array of information on the entry listener events.  Returns NULL if
@@ -788,7 +790,7 @@ void NT_CreatePolledRpc(NT_Entry entry, const char* def, size_t def_len,
 
 /**
  * Get the next incoming RPC call.  This blocks until the next incoming RPC
- * call is received.  This is intended to be used with NT_CreatePolledRpc();
+ * call is received.  This is intended to be used with NT_CreatePolledRpc(void);
  * RPC calls created using NT_CreateRpc() will not be serviced through this
  * function.  Upon successful return, NT_PostRpcResponse() must be called to
  * send the return value to the caller.  The returned array must be freed
@@ -897,7 +899,7 @@ void NT_CancelRpcResult(NT_Entry entry, NT_RpcCall call);
  * Pack a RPC version 1 definition.
  * @param def         RPC version 1 definition
  * @param packed_len  length of return value in bytes
- * @return Raw packed bytes.  Use C standard library free() to release.
+ * @return Raw packed bytes.  Use C standard library std::free() to release.
  */
 char* NT_PackRpcDefinition(const struct NT_RpcDefinition* def,
                            size_t* packed_len);
@@ -918,7 +920,7 @@ NT_Bool NT_UnpackRpcDefinition(const char* packed, size_t packed_len,
  * @param values      array of values to pack
  * @param values_len  length of values
  * @param packed_len  length of return value in bytes
- * @return Raw packed bytes.  Use C standard library free() to release.
+ * @return Raw packed bytes.  Use C standard library std::free() to release.
  */
 char* NT_PackRpcValues(const struct NT_Value** values, size_t values_len,
                        size_t* packed_len);
@@ -1292,7 +1294,7 @@ void NT_DisposeLogMessage(struct NT_LogMessage* info);
  * This function is a compatibility wrapper around WPI_Now().
  * @return Timestamp
  */
-unsigned long long NT_Now(void);
+uint64_t NT_Now(void);
 
 /** @} */
 
@@ -1522,8 +1524,8 @@ enum NT_Type NT_GetValueType(const struct NT_Value* value);
  * @param v_boolean   returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a boolean
  */
-NT_Bool NT_GetValueBoolean(const struct NT_Value* value,
-                           unsigned long long* last_change, NT_Bool* v_boolean);
+NT_Bool NT_GetValueBoolean(const struct NT_Value* value, uint64_t* last_change,
+                           NT_Bool* v_boolean);
 
 /**
  * Returns the double from the NT_Value.
@@ -1534,8 +1536,8 @@ NT_Bool NT_GetValueBoolean(const struct NT_Value* value,
  * @param v_double    returns the boolean assigned to the name
  * @return            1 if successful, or 0 if value is null or not a double
  */
-NT_Bool NT_GetValueDouble(const struct NT_Value* value,
-                          unsigned long long* last_change, double* v_double);
+NT_Bool NT_GetValueDouble(const struct NT_Value* value, uint64_t* last_change,
+                          double* v_double);
 
 /**
  * Returns a copy of the string from the NT_Value.
@@ -1551,8 +1553,8 @@ NT_Bool NT_GetValueDouble(const struct NT_Value* value,
  * returned string is a copy of the string in the value, and must be freed
  * separately.
  */
-char* NT_GetValueString(const struct NT_Value* value,
-                        unsigned long long* last_change, size_t* str_len);
+char* NT_GetValueString(const struct NT_Value* value, uint64_t* last_change,
+                        size_t* str_len);
 
 /**
  * Returns a copy of the raw value from the NT_Value.
@@ -1568,8 +1570,8 @@ char* NT_GetValueString(const struct NT_Value* value,
  * returned string is a copy of the string in the value, and must be freed
  * separately.
  */
-char* NT_GetValueRaw(const struct NT_Value* value,
-                     unsigned long long* last_change, size_t* raw_len);
+char* NT_GetValueRaw(const struct NT_Value* value, uint64_t* last_change,
+                     size_t* raw_len);
 
 /**
  * Returns a copy of the boolean array from the NT_Value.
@@ -1586,8 +1588,7 @@ char* NT_GetValueRaw(const struct NT_Value* value,
  * freed separately.
  */
 NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
-                                 unsigned long long* last_change,
-                                 size_t* arr_size);
+                                 uint64_t* last_change, size_t* arr_size);
 
 /**
  * Returns a copy of the double array from the NT_Value.
@@ -1604,8 +1605,7 @@ NT_Bool* NT_GetValueBooleanArray(const struct NT_Value* value,
  * freed separately.
  */
 double* NT_GetValueDoubleArray(const struct NT_Value* value,
-                               unsigned long long* last_change,
-                               size_t* arr_size);
+                               uint64_t* last_change, size_t* arr_size);
 
 /**
  * Returns a copy of the NT_String array from the NT_Value.
@@ -1624,8 +1624,7 @@ double* NT_GetValueDoubleArray(const struct NT_Value* value,
  * function will free all the NT_Strings.
  */
 NT_String* NT_GetValueStringArray(const struct NT_Value* value,
-                                  unsigned long long* last_change,
-                                  size_t* arr_size);
+                                  uint64_t* last_change, size_t* arr_size);
 
 /**
  * Returns the boolean currently assigned to the entry name.
@@ -1638,7 +1637,7 @@ NT_String* NT_GetValueStringArray(const struct NT_Value* value,
  * @return            1 if successful, or 0 if value is unassigned or not a
  *                    boolean
  */
-NT_Bool NT_GetEntryBoolean(NT_Entry entry, unsigned long long* last_change,
+NT_Bool NT_GetEntryBoolean(NT_Entry entry, uint64_t* last_change,
                            NT_Bool* v_boolean);
 
 /**
@@ -1652,7 +1651,7 @@ NT_Bool NT_GetEntryBoolean(NT_Entry entry, unsigned long long* last_change,
  * @return            1 if successful, or 0 if value is unassigned or not a
  *                    double
  */
-NT_Bool NT_GetEntryDouble(NT_Entry entry, unsigned long long* last_change,
+NT_Bool NT_GetEntryDouble(NT_Entry entry, uint64_t* last_change,
                           double* v_double);
 
 /**
@@ -1668,8 +1667,7 @@ NT_Bool NT_GetEntryDouble(NT_Entry entry, unsigned long long* last_change,
  * It is the caller's responsibility to free the string once its no longer
  * needed. The NT_FreeCharArray() function is useful for this purpose.
  */
-char* NT_GetEntryString(NT_Entry entry, unsigned long long* last_change,
-                        size_t* str_len);
+char* NT_GetEntryString(NT_Entry entry, uint64_t* last_change, size_t* str_len);
 
 /**
  * Returns a copy of the raw value assigned to the entry name.
@@ -1684,8 +1682,7 @@ char* NT_GetEntryString(NT_Entry entry, unsigned long long* last_change,
  * It is the caller's responsibility to free the raw value once its no longer
  * needed. The NT_FreeCharArray() function is useful for this purpose.
  */
-char* NT_GetEntryRaw(NT_Entry entry, unsigned long long* last_change,
-                     size_t* raw_len);
+char* NT_GetEntryRaw(NT_Entry entry, uint64_t* last_change, size_t* raw_len);
 
 /**
  * Returns a copy of the boolean array assigned to the entry name.
@@ -1700,8 +1697,7 @@ char* NT_GetEntryRaw(NT_Entry entry, unsigned long long* last_change,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeBooleanArray() function is useful for this purpose.
  */
-NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry,
-                                 unsigned long long* last_change,
+NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry, uint64_t* last_change,
                                  size_t* arr_size);
 
 /**
@@ -1717,7 +1713,7 @@ NT_Bool* NT_GetEntryBooleanArray(NT_Entry entry,
  * It is the caller's responsibility to free the array once its no longer
  * needed. The NT_FreeDoubleArray() function is useful for this purpose.
  */
-double* NT_GetEntryDoubleArray(NT_Entry entry, unsigned long long* last_change,
+double* NT_GetEntryDoubleArray(NT_Entry entry, uint64_t* last_change,
                                size_t* arr_size);
 
 /**
@@ -1736,8 +1732,7 @@ double* NT_GetEntryDoubleArray(NT_Entry entry, unsigned long long* last_change,
  * should be freed at once. The NT_FreeStringArray() function will free all the
  * NT_Strings.
  */
-NT_String* NT_GetEntryStringArray(NT_Entry entry,
-                                  unsigned long long* last_change,
+NT_String* NT_GetEntryStringArray(NT_Entry entry, uint64_t* last_change,
                                   size_t* arr_size);
 
 /** @} */
@@ -1757,7 +1752,7 @@ NT_String* NT_GetEntryStringArray(NT_Entry entry,
  * @param default_boolean     value to be set if name does not exist
  * @return 0 on error (value not set), 1 on success
  */
-NT_Bool NT_SetDefaultEntryBoolean(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryBoolean(NT_Entry entry, uint64_t time,
                                   NT_Bool default_boolean);
 
 /** Set Default Entry Double.
@@ -1770,7 +1765,7 @@ NT_Bool NT_SetDefaultEntryBoolean(NT_Entry entry, unsigned long long time,
  * @param default_double     value to be set if name does not exist
  * @return 0 on error (value not set), 1 on success
  */
-NT_Bool NT_SetDefaultEntryDouble(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryDouble(NT_Entry entry, uint64_t time,
                                  double default_double);
 
 /** Set Default Entry String.
@@ -1784,7 +1779,7 @@ NT_Bool NT_SetDefaultEntryDouble(NT_Entry entry, unsigned long long time,
  * @param default_len       length of value
  * @return 0 on error (value not set), 1 on success
  */
-NT_Bool NT_SetDefaultEntryString(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryString(NT_Entry entry, uint64_t time,
                                  const char* default_value, size_t default_len);
 
 /** Set Default Entry Raw.
@@ -1798,7 +1793,7 @@ NT_Bool NT_SetDefaultEntryString(NT_Entry entry, unsigned long long time,
  * @param default_len       length of value array
  * @return 0 on error (value not set), 1 on success
  */
-NT_Bool NT_SetDefaultEntryRaw(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryRaw(NT_Entry entry, uint64_t time,
                               const char* default_value, size_t default_len);
 
 /** Set Default Entry Boolean Array.
@@ -1812,7 +1807,7 @@ NT_Bool NT_SetDefaultEntryRaw(NT_Entry entry, unsigned long long time,
  * @param default_size      size of value array
  * @return 0 on error (value not set), 1 on success
  */
-NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, uint64_t time,
                                        const int* default_value,
                                        size_t default_size);
 
@@ -1827,7 +1822,7 @@ NT_Bool NT_SetDefaultEntryBooleanArray(NT_Entry entry, unsigned long long time,
  * @param default_size      size of value array
  * @return 0 on error (value not set), 1 on success
  */
-NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, uint64_t time,
                                       const double* default_value,
                                       size_t default_size);
 
@@ -1842,7 +1837,7 @@ NT_Bool NT_SetDefaultEntryDoubleArray(NT_Entry entry, unsigned long long time,
  * @param default_size      size of value array
  * @return 0 on error (value not set), 1 on success
  */
-NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, uint64_t time,
                                       const struct NT_String* default_value,
                                       size_t default_size);
 
@@ -1863,8 +1858,8 @@ NT_Bool NT_SetDefaultEntryStringArray(NT_Entry entry, unsigned long long time,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-NT_Bool NT_SetEntryBoolean(NT_Entry entry, unsigned long long time,
-                           NT_Bool v_boolean, NT_Bool force);
+NT_Bool NT_SetEntryBoolean(NT_Entry entry, uint64_t time, NT_Bool v_boolean,
+                           NT_Bool force);
 
 /** Set Entry Double
  * Sets an entry double. If the entry name is not currently assigned to a
@@ -1876,8 +1871,8 @@ NT_Bool NT_SetEntryBoolean(NT_Entry entry, unsigned long long time,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-NT_Bool NT_SetEntryDouble(NT_Entry entry, unsigned long long time,
-                          double v_double, NT_Bool force);
+NT_Bool NT_SetEntryDouble(NT_Entry entry, uint64_t time, double v_double,
+                          NT_Bool force);
 
 /** Set Entry String
  * Sets an entry string. If the entry name is not currently assigned to a
@@ -1890,8 +1885,8 @@ NT_Bool NT_SetEntryDouble(NT_Entry entry, unsigned long long time,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-NT_Bool NT_SetEntryString(NT_Entry entry, unsigned long long time,
-                          const char* str, size_t str_len, NT_Bool force);
+NT_Bool NT_SetEntryString(NT_Entry entry, uint64_t time, const char* str,
+                          size_t str_len, NT_Bool force);
 
 /** Set Entry Raw
  * Sets the raw value of an entry. If the entry name is not currently assigned
@@ -1904,7 +1899,7 @@ NT_Bool NT_SetEntryString(NT_Entry entry, unsigned long long time,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-NT_Bool NT_SetEntryRaw(NT_Entry entry, unsigned long long time, const char* raw,
+NT_Bool NT_SetEntryRaw(NT_Entry entry, uint64_t time, const char* raw,
                        size_t raw_len, NT_Bool force);
 
 /** Set Entry Boolean Array
@@ -1918,8 +1913,8 @@ NT_Bool NT_SetEntryRaw(NT_Entry entry, unsigned long long time, const char* raw,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-NT_Bool NT_SetEntryBooleanArray(NT_Entry entry, unsigned long long time,
-                                const int* arr, size_t size, NT_Bool force);
+NT_Bool NT_SetEntryBooleanArray(NT_Entry entry, uint64_t time, const int* arr,
+                                size_t size, NT_Bool force);
 
 /** Set Entry Double Array
  * Sets an entry double array. If the entry name is not currently assigned to
@@ -1932,8 +1927,8 @@ NT_Bool NT_SetEntryBooleanArray(NT_Entry entry, unsigned long long time,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-NT_Bool NT_SetEntryDoubleArray(NT_Entry entry, unsigned long long time,
-                               const double* arr, size_t size, NT_Bool force);
+NT_Bool NT_SetEntryDoubleArray(NT_Entry entry, uint64_t time, const double* arr,
+                               size_t size, NT_Bool force);
 
 /** Set Entry String Array
  * Sets an entry string array. If the entry name is not currently assigned to
@@ -1946,7 +1941,7 @@ NT_Bool NT_SetEntryDoubleArray(NT_Entry entry, unsigned long long time,
  * @param force     1 to force the entry to get overwritten, otherwise 0
  * @return          0 on error (type mismatch), 1 on success
  */
-NT_Bool NT_SetEntryStringArray(NT_Entry entry, unsigned long long time,
+NT_Bool NT_SetEntryStringArray(NT_Entry entry, uint64_t time,
                                const struct NT_String* arr, size_t size,
                                NT_Bool force);
 
@@ -1954,7 +1949,7 @@ NT_Bool NT_SetEntryStringArray(NT_Entry entry, unsigned long long time,
 /** @} */
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif
 
-#endif /* NTCORE_C_H_ */
+#endif  // NTCORE_NTCORE_C_H_

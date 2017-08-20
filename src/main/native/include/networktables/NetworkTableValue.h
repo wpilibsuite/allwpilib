@@ -1,22 +1,25 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_VALUE_H_
-#define NT_VALUE_H_
+#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEVALUE_H_
+#define NTCORE_NETWORKTABLES_NETWORKTABLEVALUE_H_
+
+#include <stdint.h>
 
 #include <cassert>
 #include <memory>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
-#include "llvm/ArrayRef.h"
-#include "llvm/StringRef.h"
-#include "llvm/Twine.h"
+#include <llvm/ArrayRef.h>
+#include <llvm/StringRef.h>
+#include <llvm/Twine.h>
 
 #include "ntcore_c.h"
 
@@ -34,7 +37,7 @@ class Value final {
 
  public:
   Value();
-  Value(NT_Type type, unsigned long long time, const private_init&);
+  Value(NT_Type type, uint64_t time, const private_init&);
   ~Value();
 
   /**
@@ -53,13 +56,13 @@ class Value final {
    * Get the creation time of the value.
    * @return The time, in the units returned by nt::Now().
    */
-  unsigned long long last_change() const { return m_val.last_change; }
+  uint64_t last_change() const { return m_val.last_change; }
 
   /**
    * Get the creation time of the value.
    * @return The time, in the units returned by nt::Now().
    */
-  unsigned long long time() const { return m_val.last_change; }
+  uint64_t time() const { return m_val.last_change; }
 
   /**
    * @defgroup TypeCheckers Type Checkers
@@ -215,8 +218,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeBoolean(bool value,
-                                            unsigned long long time = 0) {
+  static std::shared_ptr<Value> MakeBoolean(bool value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_BOOLEAN, time, private_init());
     val->m_val.data.v_boolean = value;
     return val;
@@ -229,8 +231,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeDouble(double value,
-                                           unsigned long long time = 0) {
+  static std::shared_ptr<Value> MakeDouble(double value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_DOUBLE, time, private_init());
     val->m_val.data.v_double = value;
     return val;
@@ -244,7 +245,7 @@ class Value final {
    * @return The entry value
    */
   static std::shared_ptr<Value> MakeString(const Twine& value,
-                                           unsigned long long time = 0) {
+                                           uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_STRING, time, private_init());
     val->m_string = value.str();
     val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
@@ -252,13 +253,13 @@ class Value final {
     return val;
   }
 
-  /**
-   * Creates a string entry value.
-   * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
-   * @return The entry value
-   */
+/**
+ * Creates a string entry value.
+ * @param value the value
+ * @param time if nonzero, the creation time to use (instead of the current
+ *             time)
+ * @return The entry value
+ */
 #ifdef _MSC_VER
   template <typename T,
             typename = std::enable_if_t<std::is_same<T, std::string>>>
@@ -266,8 +267,7 @@ class Value final {
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
 #endif
-  static std::shared_ptr<Value> MakeString(T&& value,
-                                           unsigned long long time = 0) {
+  static std::shared_ptr<Value> MakeString(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_STRING, time, private_init());
     val->m_string = std::move(value);
     val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
@@ -282,8 +282,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeRaw(StringRef value,
-                                        unsigned long long time = 0) {
+  static std::shared_ptr<Value> MakeRaw(StringRef value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RAW, time, private_init());
     val->m_string = value;
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -291,13 +290,13 @@ class Value final {
     return val;
   }
 
-  /**
-   * Creates a raw entry value.
-   * @param value the value
-   * @param time if nonzero, the creation time to use (instead of the current
-   *             time)
-   * @return The entry value
-   */
+/**
+ * Creates a raw entry value.
+ * @param value the value
+ * @param time if nonzero, the creation time to use (instead of the current
+ *             time)
+ * @return The entry value
+ */
 #ifdef _MSC_VER
   template <typename T,
             typename = std::enable_if_t<std::is_same<T, std::string>>>
@@ -305,8 +304,7 @@ class Value final {
   template <typename T,
             typename std::enable_if<std::is_same<T, std::string>::value>::type>
 #endif
-  static std::shared_ptr<Value> MakeRaw(T&& value,
-                                        unsigned long long time = 0) {
+  static std::shared_ptr<Value> MakeRaw(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RAW, time, private_init());
     val->m_string = std::move(value);
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -321,8 +319,7 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeRpc(StringRef value,
-                                        unsigned long long time = 0) {
+  static std::shared_ptr<Value> MakeRpc(StringRef value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RPC, time, private_init());
     val->m_string = value;
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -338,8 +335,7 @@ class Value final {
    * @return The entry value
    */
   template <typename T>
-  static std::shared_ptr<Value> MakeRpc(T&& value,
-                                        unsigned long long time = 0) {
+  static std::shared_ptr<Value> MakeRpc(T&& value, uint64_t time = 0) {
     auto val = std::make_shared<Value>(NT_RPC, time, private_init());
     val->m_string = std::move(value);
     val->m_val.data.v_raw.str = const_cast<char*>(val->m_string.c_str());
@@ -355,7 +351,7 @@ class Value final {
    * @return The entry value
    */
   static std::shared_ptr<Value> MakeBooleanArray(ArrayRef<int> value,
-                                                 unsigned long long time = 0);
+                                                 uint64_t time = 0);
 
   /**
    * Creates a double array entry value.
@@ -365,7 +361,7 @@ class Value final {
    * @return The entry value
    */
   static std::shared_ptr<Value> MakeDoubleArray(ArrayRef<double> value,
-                                                unsigned long long time = 0);
+                                                uint64_t time = 0);
 
   /**
    * Creates a string array entry value.
@@ -375,11 +371,11 @@ class Value final {
    * @return The entry value
    */
   static std::shared_ptr<Value> MakeStringArray(ArrayRef<std::string> value,
-                                                unsigned long long time = 0);
+                                                uint64_t time = 0);
 
   // Note: This function moves the values out of the vector.
   static std::shared_ptr<Value> MakeStringArray(
-      std::vector<std::string>&& value, unsigned long long time = 0);
+      std::vector<std::string>&& value, uint64_t time = 0);
 
   /** @} */
 
@@ -403,4 +399,4 @@ typedef Value NetworkTableValue;
 
 }  // namespace nt
 
-#endif  // NT_VALUE_H_
+#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEVALUE_H_

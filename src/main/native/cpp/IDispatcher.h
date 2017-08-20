@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_IDISPATCHER_H_
-#define NT_IDISPATCHER_H_
+#ifndef NTCORE_IDISPATCHER_H_
+#define NTCORE_IDISPATCHER_H_
 
 #include <memory>
 
@@ -31,4 +31,4 @@ class IDispatcher {
 
 }  // namespace nt
 
-#endif  // NT_IDISPATCHER_H_
+#endif  // NTCORE_IDISPATCHER_H_

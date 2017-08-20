@@ -1,19 +1,22 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef ITABLE_H_
-#define ITABLE_H_
+#ifndef NTCORE_TABLES_ITABLE_H_
+#define NTCORE_TABLES_ITABLE_H_
 
 #include <memory>
+#include <string>
+#include <vector>
 
-#include "llvm/StringRef.h"
-#include "llvm/Twine.h"
+#include <llvm/StringRef.h>
+#include <llvm/Twine.h>
+#include <support/deprecated.h>
+
 #include "networktables/NetworkTableValue.h"
-#include "support/deprecated.h"
 
 namespace nt {
 class NetworkTable;
@@ -448,7 +451,6 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
    * Gets the full path of this table.
    */
   virtual llvm::StringRef GetPath() const = 0;
-
 };
 
-#endif  // ITABLE_H_
+#endif  // NTCORE_TABLES_ITABLE_H_

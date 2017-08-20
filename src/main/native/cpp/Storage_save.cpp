@@ -1,22 +1,21 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Storage.h"
-
 #include <cctype>
 #include <string>
 
-#include "llvm/Format.h"
-#include "llvm/SmallString.h"
-#include "llvm/StringExtras.h"
-#include "llvm/raw_ostream.h"
-#include "support/Base64.h"
+#include <llvm/Format.h>
+#include <llvm/SmallString.h>
+#include <llvm/StringExtras.h>
+#include <llvm/raw_ostream.h>
+#include <support/Base64.h>
 
 #include "Log.h"
+#include "Storage.h"
 
 using namespace nt;
 
@@ -26,7 +25,7 @@ class SavePersistentImpl {
  public:
   typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
 
-  SavePersistentImpl(llvm::raw_ostream& os) : m_os(os) {}
+  explicit SavePersistentImpl(llvm::raw_ostream& os) : m_os(os) {}
 
   void Save(llvm::ArrayRef<Entry> entries);
 
@@ -41,7 +40,7 @@ class SavePersistentImpl {
   llvm::raw_ostream& m_os;
 };
 
-}  // anonymous namespace
+}  // namespace
 
 /* Escapes and writes a string, including start and end double quotes */
 void SavePersistentImpl::WriteString(llvm::StringRef str) {

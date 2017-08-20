@@ -1,23 +1,22 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_STORAGETEST_H_
-#define NT_TEST_STORAGETEST_H_
+#ifndef NTCORE_STORAGETEST_H_
+#define NTCORE_STORAGETEST_H_
 
 #include <functional>
 #include <memory>
 #include <vector>
 
 #include "Log.h"
-#include "Storage.h"
-
 #include "MockDispatcher.h"
 #include "MockEntryNotifier.h"
 #include "MockRpcServer.h"
+#include "Storage.h"
 
 namespace nt {
 
@@ -33,9 +32,7 @@ class StorageTest {
     return i == storage.m_entries.end() ? &tmp_entry : i->getValue();
   }
 
-  void HookOutgoing(bool server) {
-    storage.SetDispatcher(&dispatcher, server);
-  }
+  void HookOutgoing(bool server) { storage.SetDispatcher(&dispatcher, server); }
 
   wpi::Logger logger;
   ::testing::StrictMock<MockEntryNotifier> notifier;
@@ -47,4 +44,4 @@ class StorageTest {
 
 }  // namespace nt
 
-#endif  // NT_TEST_STORAGETEST_H_
+#endif  // NTCORE_STORAGETEST_H_

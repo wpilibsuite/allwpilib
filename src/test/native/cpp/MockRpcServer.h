@@ -5,12 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_MOCKRPCSERVER_H_
-#define NT_TEST_MOCKRPCSERVER_H_
-
-#include "gmock/gmock.h"
+#ifndef NTCORE_MOCKRPCSERVER_H_
+#define NTCORE_MOCKRPCSERVER_H_
 
 #include "IRpcServer.h"
+#include "gmock/gmock.h"
 
 namespace nt {
 
@@ -27,4 +26,4 @@ class MockRpcServer : public IRpcServer {
 
 }  // namespace nt
 
-#endif  // NT_TEST_MOCKRPCSERVER_H_
+#endif  // NTCORE_MOCKRPCSERVER_H_

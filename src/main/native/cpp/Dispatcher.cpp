@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,13 +10,12 @@
 #include <algorithm>
 #include <iterator>
 
+#include "IConnectionNotifier.h"
+#include "IStorage.h"
+#include "Log.h"
+#include "NetworkConnection.h"
 #include "tcpsockets/TCPAcceptor.h"
 #include "tcpsockets/TCPConnector.h"
-
-#include "IConnectionNotifier.h"
-#include "Log.h"
-#include "IStorage.h"
-#include "NetworkConnection.h"
 
 using namespace nt;
 
@@ -132,7 +131,7 @@ void DispatcherBase::StartServer(
        !persist_filename.getSingleStringRef().empty())) {
     bool first = true;
     m_storage.LoadPersistent(
-        persist_filename, [&](std::size_t line, const char* msg) {
+        persist_filename, [&](size_t line, const char* msg) {
           if (first) {
             first = false;
             WARNING("When reading initial persistent values from '"

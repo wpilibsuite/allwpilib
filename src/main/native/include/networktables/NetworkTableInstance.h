@@ -5,17 +5,18 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_INSTANCE_H_
-#define NT_INSTANCE_H_
+#ifndef NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_
+#define NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_
 
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
-#include "llvm/ArrayRef.h"
-#include "llvm/StringRef.h"
-#include "llvm/Twine.h"
+#include <llvm/ArrayRef.h>
+#include <llvm/StringRef.h>
+#include <llvm/Twine.h>
 
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
@@ -212,7 +213,7 @@ class NetworkTableInstance final {
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
-  */
+   */
   bool WaitForEntryListenerQueue(double timeout);
 
   /** @} */
@@ -240,8 +241,10 @@ class NetworkTableInstance final {
   static void RemoveConnectionListener(NT_ConnectionListener conn_listener);
 
   /**
-   * Wait for the connection listener queue to be empty.  This is primarily useful
-   * for deterministic testing.  This blocks until either the connection listener
+   * Wait for the connection listener queue to be empty.  This is primarily
+   * useful
+   * for deterministic testing.  This blocks until either the connection
+   * listener
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
    * @param timeout   timeout, in seconds.  Set to 0 for non-blocking behavior,
@@ -507,7 +510,8 @@ class NetworkTableInstance final {
   static void RemoveLogger(NT_Logger logger);
 
   /**
-   * Wait for the incoming log event queue to be empty.  This is primarily useful
+   * Wait for the incoming log event queue to be empty.  This is primarily
+   * useful
    * for deterministic testing.  This blocks until either the log event
    * queue is empty (e.g. there are no more events that need to be passed along
    * to callbacks or poll queues) or the timeout expires.
@@ -541,4 +545,4 @@ class NetworkTableInstance final {
 
 #include "networktables/NetworkTableInstance.inl"
 
-#endif  // NT_INSTANCE_H_
+#endif  // NTCORE_NETWORKTABLES_NETWORKTABLEINSTANCE_H_

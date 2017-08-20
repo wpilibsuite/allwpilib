@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_INETWORKCONNECTION_H_
-#define NT_INETWORKCONNECTION_H_
+#ifndef NTCORE_INETWORKCONNECTION_H_
+#define NTCORE_INETWORKCONNECTION_H_
 
 #include <memory>
 
@@ -38,4 +38,4 @@ class INetworkConnection {
 
 }  // namespace nt
 
-#endif  // NT_INETWORKCONNECTION_H_
+#endif  // NTCORE_INETWORKCONNECTION_H_

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,7 @@
 
 #include "Storage.h"
 
-#include "support/timestamp.h"
+#include <support/timestamp.h>
 
 #include "Handle.h"
 #include "IDispatcher.h"
@@ -461,9 +461,9 @@ void Storage::ApplyInitialAssignments(
     // if we have written the value locally, we send an assign message to the
     // server instead of deleting
     if (entry->local_write) {
-      out_msgs->emplace_back(
-          Message::EntryAssign(entry->name, entry->id, entry->seq_num.value(),
-                                entry->value, entry->flags));
+      out_msgs->emplace_back(Message::EntryAssign(entry->name, entry->id,
+                                                  entry->seq_num.value(),
+                                                  entry->value, entry->flags));
       return false;
     }
     // otherwise delete
@@ -827,7 +827,7 @@ NT_Type Storage::GetEntryType(unsigned int local_id) const {
   return entry->value->type();
 }
 
-unsigned long long Storage::GetEntryLastChange(unsigned int local_id) const {
+uint64_t Storage::GetEntryLastChange(unsigned int local_id) const {
   std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return 0;
   Entry* entry = m_localmap[local_id].get();

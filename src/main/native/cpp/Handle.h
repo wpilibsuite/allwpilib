@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_HANDLE_H_
-#define NT_HANDLE_H_
+#ifndef NTCORE_HANDLE_H_
+#define NTCORE_HANDLE_H_
 
 #include "ntcore_c.h"
 
@@ -33,7 +33,7 @@ class Handle {
   };
   enum { kIndexMax = 0xfffff };
 
-  Handle(NT_Handle handle) : m_handle(handle) {}
+  explicit Handle(NT_Handle handle) : m_handle(handle) {}
   operator NT_Handle() const { return m_handle; }
 
   NT_Handle handle() const { return m_handle; }
@@ -43,8 +43,8 @@ class Handle {
       m_handle = 0;
       return;
     }
-    m_handle = ((static_cast<int>(type) & 0xf) << 27) |
-               ((inst & 0x7f) << 20) | (index & 0xfffff);
+    m_handle = ((static_cast<int>(type) & 0xf) << 27) | ((inst & 0x7f) << 20) |
+               (index & 0xfffff);
   }
 
   int GetIndex() const { return static_cast<int>(m_handle) & 0xfffff; }
@@ -62,4 +62,4 @@ class Handle {
 
 }  // namespace nt
 
-#endif  // NT_HANDLE_H_
+#endif  // NTCORE_HANDLE_H_

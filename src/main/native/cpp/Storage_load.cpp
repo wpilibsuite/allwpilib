@@ -1,22 +1,21 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "Storage.h"
-
 #include <cctype>
 #include <string>
 
-#include "llvm/SmallString.h"
-#include "llvm/StringExtras.h"
-#include "support/Base64.h"
-#include "support/raw_istream.h"
+#include <llvm/SmallString.h>
+#include <llvm/StringExtras.h>
+#include <support/Base64.h>
+#include <support/raw_istream.h>
 
 #include "IDispatcher.h"
 #include "IEntryNotifier.h"
+#include "Storage.h"
 
 using namespace nt;
 
@@ -25,7 +24,7 @@ namespace {
 class LoadPersistentImpl {
  public:
   typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
-  typedef std::function<void(std::size_t line, const char* msg)> WarnFunc;
+  typedef std::function<void(size_t line, const char* msg)> WarnFunc;
 
   LoadPersistentImpl(wpi::raw_istream& is, WarnFunc warn)
       : m_is(is), m_warn(warn) {}
@@ -55,14 +54,14 @@ class LoadPersistentImpl {
 
   llvm::StringRef m_line;
   llvm::SmallString<128> m_line_buf;
-  std::size_t m_line_num = 0;
+  size_t m_line_num = 0;
 
   std::vector<int> m_buf_boolean_array;
   std::vector<double> m_buf_double_array;
   std::vector<std::string> m_buf_string_array;
 };
 
-}  // anonymous namespace
+}  // namespace
 
 /* Extracts an escaped string token.  Does not unescape the string.
  * If a string cannot be matched, an empty string is returned.
@@ -79,8 +78,8 @@ static std::pair<llvm::StringRef, llvm::StringRef> ReadStringToken(
     return std::make_pair(llvm::StringRef(), source);
 
   // Scan for ending double quote, checking for escaped as we go.
-  std::size_t size = source.size();
-  std::size_t pos;
+  size_t size = source.size();
+  size_t pos;
   for (pos = 1; pos < size; ++pos) {
     if (source[pos] == '"' && source[pos - 1] != '\\') {
       ++pos;  // we want to include the trailing quote in the result
@@ -126,7 +125,7 @@ static llvm::StringRef UnescapeString(llvm::StringRef source,
           break;
         }
         int ch = fromxdigit(*++s);
-        if (isxdigit(*(s + 1))) {
+        if (std::isxdigit(*(s + 1))) {
           ch <<= 4;
           ch |= fromxdigit(*++s);
         }
@@ -197,15 +196,15 @@ bool LoadPersistentImpl::ReadHeader() {
 NT_Type LoadPersistentImpl::ReadType() {
   llvm::StringRef tok;
   std::tie(tok, m_line) = m_line.split(' ');
-  if (tok == "boolean")
+  if (tok == "boolean") {
     return NT_BOOLEAN;
-  else if (tok == "double")
+  } else if (tok == "double") {
     return NT_DOUBLE;
-  else if (tok == "string")
+  } else if (tok == "string") {
     return NT_STRING;
-  else if (tok == "raw")
+  } else if (tok == "raw") {
     return NT_RAW;
-  else if (tok == "array") {
+  } else if (tok == "array") {
     llvm::StringRef array_tok;
     std::tie(array_tok, m_line) = m_line.split(' ');
     if (array_tok == "boolean")
@@ -262,7 +261,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanValue() {
 }
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleValue() {
-  // need to convert to null-terminated string for strtod()
+  // need to convert to null-terminated string for std::strtod()
   llvm::SmallString<64> buf;
   char* end;
   double v = std::strtod(m_line.c_str(buf), &end);
@@ -290,7 +289,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringValue() {
 
 std::shared_ptr<Value> LoadPersistentImpl::ReadRawValue() {
   llvm::SmallString<128> buf;
-  std::size_t nr;
+  size_t nr;
   return Value::MakeRaw(wpi::Base64Decode(m_line, &nr, buf));
 }
 
@@ -300,11 +299,11 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadBooleanArrayValue() {
     llvm::StringRef tok;
     std::tie(tok, m_line) = m_line.split(',');
     tok = tok.trim(" \t");
-    if (tok == "true")
+    if (tok == "true") {
       m_buf_boolean_array.push_back(1);
-    else if (tok == "false")
+    } else if (tok == "false") {
       m_buf_boolean_array.push_back(0);
-    else {
+    } else {
       Warn("unrecognized boolean value, not 'true' or 'false'");
       return nullptr;
     }
@@ -318,7 +317,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadDoubleArrayValue() {
     llvm::StringRef tok;
     std::tie(tok, m_line) = m_line.split(',');
     tok = tok.trim(" \t");
-    // need to convert to null-terminated string for strtod()
+    // need to convert to null-terminated string for std::strtod()
     llvm::SmallString<64> buf;
     char* end;
     double v = std::strtod(tok.c_str(buf), &end);
@@ -363,7 +362,7 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
 
 bool Storage::LoadEntries(
     wpi::raw_istream& is, const Twine& prefix, bool persistent,
-    std::function<void(std::size_t line, const char* msg)> warn) {
+    std::function<void(size_t line, const char* msg)> warn) {
   llvm::SmallString<128> prefixBuf;
   StringRef prefixStr = prefix.toStringRef(prefixBuf);
 
@@ -410,10 +409,10 @@ bool Storage::LoadEntries(
     ++entry->seq_num;
 
     // put on update queue
-    if (!old_value || old_value->type() != i.second->type())
+    if (!old_value || old_value->type() != i.second->type()) {
       msgs.emplace_back(Message::EntryAssign(
           i.first, entry->id, entry->seq_num.value(), i.second, entry->flags));
-    else if (entry->id != 0xffff) {
+    } else if (entry->id != 0xffff) {
       // don't send an update if we don't have an assigned id yet
       if (*old_value != *i.second)
         msgs.emplace_back(
@@ -435,7 +434,7 @@ bool Storage::LoadEntries(
 
 const char* Storage::LoadPersistent(
     const Twine& filename,
-    std::function<void(std::size_t line, const char* msg)> warn) {
+    std::function<void(size_t line, const char* msg)> warn) {
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);
   if (ec.value() != 0) return "could not open file";
@@ -445,7 +444,7 @@ const char* Storage::LoadPersistent(
 
 const char* Storage::LoadEntries(
     const Twine& filename, const Twine& prefix,
-    std::function<void(std::size_t line, const char* msg)> warn) {
+    std::function<void(size_t line, const char* msg)> warn) {
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);
   if (ec.value() != 0) return "could not open file";

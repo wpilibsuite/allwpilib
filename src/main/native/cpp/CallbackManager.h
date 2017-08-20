@@ -5,20 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_CALLBACKMANAGER_H_
-#define NT_CALLBACKMANAGER_H_
+#ifndef NTCORE_CALLBACKMANAGER_H_
+#define NTCORE_CALLBACKMANAGER_H_
 
 #include <atomic>
 #include <climits>
 #include <functional>
+#include <memory>
 #include <queue>
 #include <utility>
+#include <vector>
 
-#include "llvm/raw_ostream.h"
-#include "support/condition_variable.h"
-#include "support/mutex.h"
-#include "support/SafeThread.h"
-#include "support/UidVector.h"
+#include <llvm/raw_ostream.h>
+#include <support/SafeThread.h>
+#include <support/UidVector.h>
+#include <support/condition_variable.h>
+#include <support/mutex.h>
 
 namespace nt {
 
@@ -28,8 +30,8 @@ template <typename Callback>
 class ListenerData {
  public:
   ListenerData() = default;
-  ListenerData(Callback callback_) : callback(callback_) {}
-  ListenerData(unsigned int poller_uid_) : poller_uid(poller_uid_) {}
+  explicit ListenerData(Callback callback_) : callback(callback_) {}
+  explicit ListenerData(unsigned int poller_uid_) : poller_uid(poller_uid_) {}
 
   explicit operator bool() const { return callback || poller_uid != UINT_MAX; }
 
@@ -57,7 +59,7 @@ class CallbackThread : public wpi::SafeThread {
 
   ~CallbackThread() {
     // Wake up any blocked pollers
-    for (std::size_t i = 0; i < m_pollers.size(); ++i) {
+    for (size_t i = 0; i < m_pollers.size(); ++i) {
       if (auto poller = m_pollers[i]) poller->Terminate();
     }
   }
@@ -187,7 +189,7 @@ class CallbackManager {
     if (!thr) return;
 
     // Remove any listeners that are associated with this poller
-    for (std::size_t i = 0; i < thr->m_listeners.size(); ++i) {
+    for (size_t i = 0; i < thr->m_listeners.size(); ++i) {
       if (thr->m_listeners[i].poller_uid == poller_uid)
         thr->m_listeners.erase(i);
     }
@@ -335,4 +337,4 @@ class CallbackManager {
 
 }  // namespace nt
 
-#endif  // NT_CALLBACKMANAGER_H_
+#endif  // NTCORE_CALLBACKMANAGER_H_

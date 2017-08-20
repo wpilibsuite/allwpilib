@@ -1,27 +1,27 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "StorageTest.h"
-#include "Storage.h"
 
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
-#include "llvm/raw_ostream.h"
-#include "support/raw_istream.h"
+#include <llvm/raw_ostream.h>
+#include <support/raw_istream.h>
 
 #include "MessageMatcher.h"
 #include "MockNetworkConnection.h"
+#include "Storage.h"
 #include "TestPrinters.h"
 #include "ValueMatcher.h"
+#include "gmock/gmock.h"
+#include "gtest/gtest.h"
 
-using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::IsNull;
 using ::testing::Return;
+using ::testing::_;
 
 namespace nt {
 
@@ -128,7 +128,7 @@ class StorageTestPersistent : public StorageTestEmpty {
 
 class MockLoadWarn {
  public:
-  MOCK_METHOD2(Warn, void(std::size_t line, llvm::StringRef msg));
+  MOCK_METHOD2(Warn, void(size_t line, llvm::StringRef msg));
 };
 
 TEST_P(StorageTestEmpty, Construct) {
@@ -558,7 +558,7 @@ TEST_P(StorageTestPersistent, SavePersistent) {
   llvm::raw_svector_ostream oss(buf);
   storage.SavePersistent(oss, false);
   llvm::StringRef out = oss.str();
-  // fputs(out.c_str(), stderr);
+  // std::fputs(out.c_str(), stderr);
   llvm::StringRef line, rem = out;
   std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("[NetworkTables Storage 3.0]", line);
@@ -616,9 +616,7 @@ TEST_P(StorageTestPersistent, SavePersistent) {
 
 TEST_P(StorageTestEmpty, LoadPersistentBadHeader) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   wpi::raw_mem_istream iss("");
   EXPECT_CALL(
@@ -638,9 +636,7 @@ TEST_P(StorageTestEmpty, LoadPersistentBadHeader) {
 
 TEST_P(StorageTestEmpty, LoadPersistentCommentHeader) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   wpi::raw_mem_istream iss(
       "\n; comment\n# comment\n[NetworkTables Storage 3.0]\n");
@@ -651,9 +647,7 @@ TEST_P(StorageTestEmpty, LoadPersistentCommentHeader) {
 
 TEST_P(StorageTestEmpty, LoadPersistentEmptyName) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   wpi::raw_mem_istream iss("[NetworkTables Storage 3.0]\nboolean \"\"=true\n");
   EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
@@ -663,9 +657,7 @@ TEST_P(StorageTestEmpty, LoadPersistentEmptyName) {
 
 TEST_P(StorageTestEmpty, LoadPersistentAssign) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   auto value = Value::MakeBoolean(true);
 
@@ -688,9 +680,7 @@ TEST_P(StorageTestEmpty, LoadPersistentAssign) {
 
 TEST_P(StorageTestPopulated, LoadPersistentUpdateFlags) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   // client shouldn't send an update as id not assigned yet
   if (GetParam()) {
@@ -713,9 +703,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateFlags) {
 
 TEST_P(StorageTestPopulated, LoadPersistentUpdateValue) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   GetEntry("foo2")->flags = NT_PERSISTENT;
 
@@ -747,9 +735,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValue) {
 
 TEST_P(StorageTestPopulated, LoadPersistentUpdateValueFlags) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   auto value = Value::MakeDouble(1.0);
 
@@ -783,9 +769,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValueFlags) {
 
 TEST_P(StorageTestEmpty, LoadPersistent) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   std::string in = "[NetworkTables Storage 3.0]\n";
   in += "boolean \"\\x00\\x03\\x05\\n\"=true\n";
@@ -861,9 +845,7 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
 
 TEST_P(StorageTestEmpty, LoadPersistentWarn) {
   MockLoadWarn warn;
-  auto warn_func = [&](std::size_t line, const char* msg) {
-    warn.Warn(line, msg);
-  };
+  auto warn_func = [&](size_t line, const char* msg) { warn.Warn(line, msg); };
 
   wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=foo\n");

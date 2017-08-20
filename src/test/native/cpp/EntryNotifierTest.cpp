@@ -5,19 +5,17 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <support/Logger.h>
+
 #include "EntryNotifier.h"
-
-#include "gtest/gtest.h"
-
-#include "support/Logger.h"
-
 #include "TestPrinters.h"
 #include "ValueMatcher.h"
+#include "gtest/gtest.h"
 
-using ::testing::_;
 using ::testing::AnyNumber;
 using ::testing::IsNull;
 using ::testing::Return;
+using ::testing::_;
 
 namespace nt {
 
@@ -128,16 +126,16 @@ TEST_F(EntryNotifierTest, PollEntryBasic) {
     EXPECT_EQ(Handle{result.entry}.GetIndex(), 6);
     EXPECT_EQ(Handle{result.listener}.GetType(), Handle::kEntryListener);
     EXPECT_EQ(Handle{result.listener}.GetInst(), 1);
-    if (Handle{result.listener}.GetIndex() == (int)g1) {
+    if (Handle{result.listener}.GetIndex() == static_cast<int>(g1)) {
       ++g1count;
       EXPECT_TRUE((result.flags & NT_NOTIFY_NEW) != 0);
-    } else if (Handle{result.listener}.GetIndex() == (int)g2) {
+    } else if (Handle{result.listener}.GetIndex() == static_cast<int>(g2)) {
       ++g2count;
       EXPECT_TRUE((result.flags & NT_NOTIFY_DELETE) != 0);
-    } else if (Handle{result.listener}.GetIndex() == (int)g3) {
+    } else if (Handle{result.listener}.GetIndex() == static_cast<int>(g3)) {
       ++g3count;
       EXPECT_TRUE((result.flags & NT_NOTIFY_UPDATE) != 0);
-    } else if (Handle{result.listener}.GetIndex() == (int)g4) {
+    } else if (Handle{result.listener}.GetIndex() == static_cast<int>(g4)) {
       ++g4count;
       EXPECT_TRUE((result.flags & NT_NOTIFY_FLAGS) != 0);
     } else {
@@ -257,16 +255,16 @@ TEST_F(EntryNotifierTest, PollPrefixBasic) {
     EXPECT_EQ(Handle{result.entry}.GetIndex(), 5);
     EXPECT_EQ(Handle{result.listener}.GetType(), Handle::kEntryListener);
     EXPECT_EQ(Handle{result.listener}.GetInst(), 1);
-    if (Handle{result.listener}.GetIndex() == (int)g1) {
+    if (Handle{result.listener}.GetIndex() == static_cast<int>(g1)) {
       ++g1count;
       EXPECT_TRUE((result.flags & NT_NOTIFY_NEW) != 0);
-    } else if (Handle{result.listener}.GetIndex() == (int)g2) {
+    } else if (Handle{result.listener}.GetIndex() == static_cast<int>(g2)) {
       ++g2count;
       EXPECT_TRUE((result.flags & NT_NOTIFY_DELETE) != 0);
-    } else if (Handle{result.listener}.GetIndex() == (int)g3) {
+    } else if (Handle{result.listener}.GetIndex() == static_cast<int>(g3)) {
       ++g3count;
       EXPECT_TRUE((result.flags & NT_NOTIFY_UPDATE) != 0);
-    } else if (Handle{result.listener}.GetIndex() == (int)g4) {
+    } else if (Handle{result.listener}.GetIndex() == static_cast<int>(g4)) {
       ++g4count;
       EXPECT_TRUE((result.flags & NT_NOTIFY_FLAGS) != 0);
     } else {

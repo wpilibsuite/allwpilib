@@ -5,19 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_TESTPRINTERS_H_
-#define NT_TEST_TESTPRINTERS_H_
+#ifndef NTCORE_TESTPRINTERS_H_
+#define NTCORE_TESTPRINTERS_H_
 
 #include <memory>
 #include <ostream>
 
-#include "gtest/gtest.h"
+#include <llvm/StringRef.h>
 
-#include "llvm/StringRef.h"
+#include "gtest/gtest.h"
 
 namespace llvm {
 
-inline void PrintTo(StringRef str, ::std::ostream *os) {
+inline void PrintTo(StringRef str, ::std::ostream* os) {
   ::testing::internal::PrintStringTo(str.str(), os);
 }
 
@@ -51,4 +51,4 @@ inline void PrintTo(std::shared_ptr<Value> value, std::ostream* os) {
 
 }  // namespace nt
 
-#endif  // NT_TEST_TESTPRINTERS_H_
+#endif  // NTCORE_TESTPRINTERS_H_

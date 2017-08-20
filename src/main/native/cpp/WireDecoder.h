@@ -1,19 +1,24 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_WIREDECODER_H_
-#define NT_WIREDECODER_H_
+#ifndef NTCORE_WIREDECODER_H_
+#define NTCORE_WIREDECODER_H_
+
+#include <stdint.h>
 
 #include <cstddef>
+#include <memory>
+#include <string>
 
-#include "networktables/NetworkTableValue.h"
-#include "support/leb128.h"
-#include "support/raw_istream.h"
+#include <support/leb128.h>
+#include <support/raw_istream.h>
+
 #include "Log.h"
+#include "networktables/NetworkTableValue.h"
 
 namespace nt {
 
@@ -53,7 +58,7 @@ class WireDecoder {
    * @param len number of bytes to read
    * Caution: the buffer is only temporarily valid.
    */
-  bool Read(const char** buf, std::size_t len) {
+  bool Read(const char** buf, size_t len) {
     if (len > m_allocated) Realloc(len);
     *buf = m_buf;
     m_is.read(m_buf, len);
@@ -61,11 +66,11 @@ class WireDecoder {
     if (m_logger.min_level() <= NT_LOG_DEBUG4 && m_logger.HasLogger()) {
       std::ostringstream oss;
       oss << "read " << len << " bytes:" << std::hex;
-      if (!rv)
+      if (!rv) {
         oss << "error";
-      else {
-        for (std::size_t i=0; i < len; ++i)
-          oss << ' ' << (unsigned int)((*buf)[i]);
+      } else {
+        for (size_t i = 0; i < len; ++i)
+          oss << ' ' << static_cast<unsigned int>((*buf)[i]);
       }
       m_logger.Log(NT_LOG_DEBUG4, __FILE__, __LINE__, oss.str().c_str());
     }
@@ -94,7 +99,7 @@ class WireDecoder {
   }
 
   /* Reads a 32-bit word. */
-  bool Read32(unsigned long* val) {
+  bool Read32(uint32_t* val) {
     const char* buf;
     if (!Read(&buf, 4)) return false;
     unsigned int v = (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
@@ -115,7 +120,7 @@ class WireDecoder {
   bool ReadDouble(double* val);
 
   /* Reads an ULEB128-encoded unsigned integer. */
-  bool ReadUleb128(unsigned long* val) { return wpi::ReadUleb128(m_is, val); }
+  bool ReadUleb128(uint64_t* val) { return wpi::ReadUleb128(m_is, val); }
 
   bool ReadType(NT_Type* type);
   bool ReadString(std::string* str);
@@ -133,7 +138,7 @@ class WireDecoder {
 
  private:
   /* Reallocate temporary buffer to specified length. */
-  void Realloc(std::size_t len);
+  void Realloc(size_t len);
 
   /* input stream */
   wpi::raw_istream& m_is;
@@ -145,9 +150,9 @@ class WireDecoder {
   char* m_buf;
 
   /* allocated size of temporary buffer */
-  std::size_t m_allocated;
+  size_t m_allocated;
 };
 
 }  // namespace nt
 
-#endif  // NT_WIREDECODER_H_
+#endif  // NTCORE_WIREDECODER_H_

@@ -5,12 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_MOCKDISPATCHER_H_
-#define NT_TEST_MOCKDISPATCHER_H_
+#ifndef NTCORE_MOCKDISPATCHER_H_
+#define NTCORE_MOCKDISPATCHER_H_
 
-#include "gmock/gmock.h"
+#include <memory>
 
 #include "IDispatcher.h"
+#include "gmock/gmock.h"
 
 namespace nt {
 
@@ -23,4 +24,4 @@ class MockDispatcher : public IDispatcher {
 
 }  // namespace nt
 
-#endif  // NT_TEST_MOCKDISPATCHER_H_
+#endif  // NTCORE_MOCKDISPATCHER_H_

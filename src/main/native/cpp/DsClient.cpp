@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,13 +7,13 @@
 
 #include "DsClient.h"
 
-#include "llvm/raw_ostream.h"
-#include "llvm/SmallString.h"
-#include "support/raw_socket_istream.h"
-#include "tcpsockets/TCPConnector.h"
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+#include <support/raw_socket_istream.h>
 
 #include "Dispatcher.h"
 #include "Log.h"
+#include "tcpsockets/TCPConnector.h"
 
 using namespace nt;
 
@@ -70,8 +70,7 @@ void DsClient::Thread::Main() {
     if (!m_active) goto done;
 
     // Try to connect to DS on the local machine
-    m_stream =
-        wpi::TCPConnector::connect("127.0.0.1", 1742, nolog, 1);
+    m_stream = wpi::TCPConnector::connect("127.0.0.1", 1742, nolog, 1);
     if (!m_active) goto done;
     if (!m_stream) continue;
 

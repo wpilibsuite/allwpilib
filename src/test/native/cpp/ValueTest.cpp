@@ -1,15 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "networktables/NetworkTableValue.h"
-#include "Value_internal.h"
-
-#include "gtest/gtest.h"
 #include "TestPrinters.h"
+#include "Value_internal.h"
+#include "gtest/gtest.h"
+#include "networktables/NetworkTableValue.h"
 
 namespace nt {
 
@@ -107,7 +106,7 @@ TEST_F(ValueTest, Raw) {
 }
 
 TEST_F(ValueTest, BooleanArray) {
-  std::vector<int> vec{1,0,1};
+  std::vector<int> vec{1, 0, 1};
   auto v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v->type());
   ASSERT_EQ(llvm::ArrayRef<int>(vec), v->GetBooleanArray());
@@ -121,7 +120,7 @@ TEST_F(ValueTest, BooleanArray) {
   ASSERT_EQ(vec[2], cv.data.arr_boolean.arr[2]);
 
   // assign with same size
-  vec = {0,1,0};
+  vec = {0, 1, 0};
   v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v->type());
   ASSERT_EQ(llvm::ArrayRef<int>(vec), v->GetBooleanArray());
@@ -133,7 +132,7 @@ TEST_F(ValueTest, BooleanArray) {
   ASSERT_EQ(vec[2], cv.data.arr_boolean.arr[2]);
 
   // assign with different size
-  vec = {1,0};
+  vec = {1, 0};
   v = Value::MakeBooleanArray(vec);
   ASSERT_EQ(NT_BOOLEAN_ARRAY, v->type());
   ASSERT_EQ(llvm::ArrayRef<int>(vec), v->GetBooleanArray());
@@ -147,7 +146,7 @@ TEST_F(ValueTest, BooleanArray) {
 }
 
 TEST_F(ValueTest, DoubleArray) {
-  std::vector<double> vec{0.5,0.25,0.5};
+  std::vector<double> vec{0.5, 0.25, 0.5};
   auto v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v->type());
   ASSERT_EQ(llvm::ArrayRef<double>(vec), v->GetDoubleArray());
@@ -161,7 +160,7 @@ TEST_F(ValueTest, DoubleArray) {
   ASSERT_EQ(vec[2], cv.data.arr_double.arr[2]);
 
   // assign with same size
-  vec = {0.25,0.5,0.25};
+  vec = {0.25, 0.5, 0.25};
   v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v->type());
   ASSERT_EQ(llvm::ArrayRef<double>(vec), v->GetDoubleArray());
@@ -173,7 +172,7 @@ TEST_F(ValueTest, DoubleArray) {
   ASSERT_EQ(vec[2], cv.data.arr_double.arr[2]);
 
   // assign with different size
-  vec = {0.5,0.25};
+  vec = {0.5, 0.25};
   v = Value::MakeDoubleArray(vec);
   ASSERT_EQ(NT_DOUBLE_ARRAY, v->type());
   ASSERT_EQ(llvm::ArrayRef<double>(vec), v->GetDoubleArray());
@@ -293,35 +292,35 @@ TEST_F(ValueTest, StringComparison) {
 }
 
 TEST_F(ValueTest, BooleanArrayComparison) {
-  std::vector<int> vec{1,0,1};
+  std::vector<int> vec{1, 0, 1};
   auto v1 = Value::MakeBooleanArray(vec);
   auto v2 = Value::MakeBooleanArray(vec);
   ASSERT_EQ(*v1, *v2);
 
   // different contents
-  vec = {1,1,1};
+  vec = {1, 1, 1};
   v2 = Value::MakeBooleanArray(vec);
   ASSERT_NE(*v1, *v2);
 
   // different size
-  vec = {1,0};
+  vec = {1, 0};
   v2 = Value::MakeBooleanArray(vec);
   ASSERT_NE(*v1, *v2);
 }
 
 TEST_F(ValueTest, DoubleArrayComparison) {
-  std::vector<double> vec{0.5,0.25,0.5};
+  std::vector<double> vec{0.5, 0.25, 0.5};
   auto v1 = Value::MakeDoubleArray(vec);
   auto v2 = Value::MakeDoubleArray(vec);
   ASSERT_EQ(*v1, *v2);
 
   // different contents
-  vec = {0.5,0.5,0.5};
+  vec = {0.5, 0.5, 0.5};
   v2 = Value::MakeDoubleArray(vec);
   ASSERT_NE(*v1, *v2);
 
   // different size
-  vec = {0.5,0.25};
+  vec = {0.5, 0.25};
   v2 = Value::MakeDoubleArray(vec);
   ASSERT_NE(*v1, *v2);
 }

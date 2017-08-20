@@ -5,10 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_IENTRYNOTIFIER_H_
-#define NT_IENTRYNOTIFIER_H_
+#ifndef NTCORE_IENTRYNOTIFIER_H_
+#define NTCORE_IENTRYNOTIFIER_H_
 
 #include <climits>
+#include <memory>
 
 #include "ntcore_cpp.h"
 
@@ -41,4 +42,4 @@ class IEntryNotifier {
 
 }  // namespace nt
 
-#endif  // NT_IENTRYNOTIFIER_H_
+#endif  // NTCORE_IENTRYNOTIFIER_H_

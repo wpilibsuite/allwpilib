@@ -4,9 +4,10 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
+
 #include "networktables/NetworkTableInstance.h"
 
-#include "llvm/SmallString.h"
+#include <llvm/SmallString.h>
 
 using namespace nt;
 

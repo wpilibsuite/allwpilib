@@ -1,14 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2016-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_DSCLIENT_H_
-#define NT_DSCLIENT_H_
+#ifndef NTCORE_DSCLIENT_H_
+#define NTCORE_DSCLIENT_H_
 
-#include "support/SafeThread.h"
+#include <support/SafeThread.h>
 
 #include "Log.h"
 
@@ -33,4 +33,4 @@ class DsClient {
 
 }  // namespace nt
 
-#endif  // NT_DSCLIENT_H_
+#endif  // NTCORE_DSCLIENT_H_

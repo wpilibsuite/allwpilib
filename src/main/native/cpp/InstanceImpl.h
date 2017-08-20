@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_INSTANCEIMPL_H_
-#define NT_INSTANCEIMPL_H_
+#ifndef NTCORE_INSTANCEIMPL_H_
+#define NTCORE_INSTANCEIMPL_H_
 
 #include <atomic>
 #include <memory>
 
-#include "support/mutex.h"
-#include "support/UidVector.h"
+#include <support/UidVector.h>
+#include <support/mutex.h>
 
 #include "ConnectionNotifier.h"
 #include "Dispatcher.h"
@@ -57,4 +57,4 @@ class InstanceImpl {
 
 }  // namespace nt
 
-#endif  // NT_INSTANCEIMPL_H_
+#endif  // NTCORE_INSTANCEIMPL_H_

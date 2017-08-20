@@ -73,6 +73,6 @@ The `ntcore-java` artifact will contain a jar with no classifiers. This is the j
 
 All of these artifacts by default are published to `~/releases/maven/development`. To switch to the release repository (`~/release/maven/release`), use the flag `-PreleaseType=OFFICIAL`.
 
-All downstream projects are configured to use the individual classifier artifacts. The previouse `desktop` classifier does not exist anymore. 
+All downstream projects are configured to use the individual classifier artifacts. The previouse `desktop` classifier does not exist anymore.
 
 When you do a publish of ntcore locally, the locally built copy will override all references to networktables dependencies from the FRC Maven server. To undo this, you must delete `~/releases/maven/<repo>/edu/wpi/first/ntcore`.

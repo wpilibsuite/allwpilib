@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,14 +7,14 @@
 
 #include "NetworkConnection.h"
 
-#include "support/raw_socket_istream.h"
-#include "support/timestamp.h"
-#include "tcpsockets/NetworkStream.h"
+#include <support/raw_socket_istream.h>
+#include <support/timestamp.h>
 
 #include "IConnectionNotifier.h"
 #include "Log.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
+#include "tcpsockets/NetworkStream.h"
 
 using namespace nt;
 
@@ -241,11 +241,12 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
           // need to update assignment with new seq_num and value
           oldmsg = Message::EntryAssign(oldmsg->str(), id, msg->seq_num_uid(),
                                         msg->value(), oldmsg->flags());
-        } else
+        } else {
           oldmsg = msg;  // easy update
+        }
       } else {
         // new, but remember it
-        std::size_t pos = m_pending_outgoing.size();
+        size_t pos = m_pending_outgoing.size();
         m_pending_outgoing.push_back(msg);
         if (id >= m_pending_update.size()) m_pending_update.resize(id + 1);
         m_pending_update[id].first = pos + 1;
@@ -288,7 +289,7 @@ void NetworkConnection::QueueOutgoing(std::shared_ptr<Message> msg) {
         m_pending_outgoing[m_pending_update[id].second - 1] = msg;
       } else {
         // new, but remember it
-        std::size_t pos = m_pending_outgoing.size();
+        size_t pos = m_pending_outgoing.size();
         m_pending_outgoing.push_back(msg);
         if (id >= m_pending_update.size()) m_pending_update.resize(id + 1);
         m_pending_update[id].second = pos + 1;

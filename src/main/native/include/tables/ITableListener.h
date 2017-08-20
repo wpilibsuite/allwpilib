@@ -1,15 +1,19 @@
-/*
- * ITableListener.h
- */
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
-#ifndef ITABLELISTENER_H_
-#define ITABLELISTENER_H_
+#ifndef NTCORE_TABLES_ITABLELISTENER_H_
+#define NTCORE_TABLES_ITABLELISTENER_H_
 
 #include <memory>
 
-#include "llvm/StringRef.h"
+#include <llvm/StringRef.h>
+#include <support/deprecated.h>
+
 #include "networktables/NetworkTableValue.h"
-#include "support/deprecated.h"
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -56,4 +60,4 @@ class WPI_DEPRECATED(
 #pragma GCC diagnostic pop
 #endif
 
-#endif /* ITABLELISTENER_H_ */
+#endif  // NTCORE_TABLES_ITABLELISTENER_H_

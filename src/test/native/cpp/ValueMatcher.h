@@ -5,14 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_VALUEMATCHER_H_
-#define NT_TEST_VALUEMATCHER_H_
+#ifndef NTCORE_VALUEMATCHER_H_
+#define NTCORE_VALUEMATCHER_H_
 
 #include <memory>
 #include <ostream>
 
 #include "gmock/gmock.h"
-
 #include "networktables/NetworkTableValue.h"
 
 namespace nt {
@@ -20,7 +19,7 @@ namespace nt {
 class ValueMatcher
     : public ::testing::MatcherInterface<std::shared_ptr<Value>> {
  public:
-  ValueMatcher(std::shared_ptr<Value> goodval_) : goodval(goodval_) {}
+  explicit ValueMatcher(std::shared_ptr<Value> goodval_) : goodval(goodval_) {}
 
   bool MatchAndExplain(std::shared_ptr<Value> msg,
                        ::testing::MatchResultListener* listener) const override;
@@ -38,4 +37,4 @@ inline ::testing::Matcher<std::shared_ptr<Value>> ValueEq(
 
 }  // namespace nt
 
-#endif  // NT_TEST_VALUEMATCHER_H_
+#endif  // NTCORE_VALUEMATCHER_H_

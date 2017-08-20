@@ -191,7 +191,7 @@ model {
                 destinationDir = outputsFolder
                 duplicatesStrategy = 'exclude'
 
-                ntcoreJNITaskList.each { 
+                ntcoreJNITaskList.each {
                     it.outputs.files.each {
                         from project.zipTree(it)
                     }
@@ -210,7 +210,7 @@ model {
                 destinationDir = outputsFolder
                 duplicatesStrategy = 'exclude'
 
-                ntcoreTaskList.each { 
+                ntcoreTaskList.each {
                     it.outputs.files.each {
                         from project.zipTree(it)
                     }

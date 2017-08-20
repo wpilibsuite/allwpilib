@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_RPCCALL_H_
-#define NT_RPCCALL_H_
+#ifndef NTCORE_NETWORKTABLES_RPCCALL_H_
+#define NTCORE_NETWORKTABLES_RPCCALL_H_
 
 #include <string>
 #include <utility>
@@ -30,8 +30,7 @@ class RpcCall final {
    * @param entry Entry handle
    * @param call  Call handle
    */
-  RpcCall(NT_Entry entry, NT_RpcCall call)
-      : m_entry(entry), m_call(call) {}
+  RpcCall(NT_Entry entry, NT_RpcCall call) : m_entry(entry), m_call(call) {}
 
   RpcCall(RpcCall&& other);
   RpcCall(const RpcCall&) = delete;
@@ -98,4 +97,4 @@ class RpcCall final {
 
 #include "networktables/RpcCall.inl"
 
-#endif  // NT_RPCCALL_H_
+#endif  // NTCORE_NETWORKTABLES_RPCCALL_H_

@@ -5,24 +5,23 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_MESSAGEMATCHER_H_
-#define NT_TEST_MESSAGEMATCHER_H_
+#ifndef NTCORE_MESSAGEMATCHER_H_
+#define NTCORE_MESSAGEMATCHER_H_
 
 #include <memory>
 #include <ostream>
 
-#include "gmock/gmock.h"
-
-#include "TestPrinters.h"
-
 #include "Message.h"
+#include "TestPrinters.h"
+#include "gmock/gmock.h"
 
 namespace nt {
 
 class MessageMatcher
     : public ::testing::MatcherInterface<std::shared_ptr<Message>> {
  public:
-  MessageMatcher(std::shared_ptr<Message> goodmsg_) : goodmsg(goodmsg_) {}
+  explicit MessageMatcher(std::shared_ptr<Message> goodmsg_)
+      : goodmsg(goodmsg_) {}
 
   bool MatchAndExplain(std::shared_ptr<Message> msg,
                        ::testing::MatchResultListener* listener) const override;
@@ -40,4 +39,4 @@ inline ::testing::Matcher<std::shared_ptr<Message>> MessageEq(
 
 }  // namespace nt
 
-#endif  // NT_TEST_MESSAGEMATCHER_H_
+#endif  // NTCORE_MESSAGEMATCHER_H_

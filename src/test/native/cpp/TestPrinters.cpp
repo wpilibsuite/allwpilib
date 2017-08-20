@@ -133,7 +133,6 @@ void PrintTo(const Value& value, std::ostream* os) {
       break;
     case NT_RAW:
       *os << ::testing::PrintToString(value.GetRaw());
-      ;
       break;
     case NT_BOOLEAN_ARRAY:
       *os << ::testing::PrintToString(value.GetBooleanArray());

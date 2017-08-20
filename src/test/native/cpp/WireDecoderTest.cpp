@@ -1,20 +1,21 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WireDecoder.h"
-
-#include "gtest/gtest.h"
-#include "TestPrinters.h"
+#include <stdint.h>
 
 #include <cfloat>
 #include <climits>
 #include <string>
 
-#include "llvm/StringRef.h"
+#include <llvm/StringRef.h>
+
+#include "TestPrinters.h"
+#include "WireDecoder.h"
+#include "gtest/gtest.h"
 
 namespace nt {
 
@@ -36,8 +37,7 @@ class WireDecoderTest : public ::testing::Test {
     v_string_array = Value::MakeStringArray(std::move(sa));
 
     sa.clear();
-    for (int i=0; i<255; ++i)
-      sa.push_back("h");
+    for (int i = 0; i < 255; ++i) sa.push_back("h");
     v_string_array_big = Value::MakeStringArray(std::move(sa));
 
     s_normal = std::string("hello");
@@ -118,7 +118,7 @@ TEST_F(WireDecoderTest, Read32) {
       20);
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
-  unsigned long val;
+  uint32_t val;
   ASSERT_TRUE(d.Read32(&val));
   EXPECT_EQ(5ul, val);
   ASSERT_TRUE(d.Read32(&val));
@@ -164,14 +164,14 @@ TEST_F(WireDecoderTest, ReadUleb128) {
   wpi::raw_mem_istream is("\x00\x7f\x80\x01\x80", 5);
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
-  unsigned long val;
+  uint64_t val;
   ASSERT_TRUE(d.ReadUleb128(&val));
   EXPECT_EQ(0ul, val);
   ASSERT_TRUE(d.ReadUleb128(&val));
   EXPECT_EQ(0x7ful, val);
   ASSERT_TRUE(d.ReadUleb128(&val));
   EXPECT_EQ(0x80ul, val);
-  ASSERT_FALSE(d.ReadUleb128(&val)); // partial
+  ASSERT_FALSE(d.ReadUleb128(&val));  // partial
   ASSERT_EQ(nullptr, d.error());
 }
 
@@ -227,12 +227,12 @@ TEST_F(WireDecoderTest, ReadBooleanValue2) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_BOOLEAN);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_boolean, *val);
 
   auto v_false = Value::MakeBoolean(false);
   val = d.ReadValue(NT_BOOLEAN);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_false, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_BOOLEAN));
@@ -247,11 +247,11 @@ TEST_F(WireDecoderTest, ReadDoubleValue2) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_DOUBLE);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_double, *val);
 
   val = d.ReadValue(NT_DOUBLE);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_double, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_DOUBLE));
@@ -259,16 +259,19 @@ TEST_F(WireDecoderTest, ReadDoubleValue2) {
 }
 
 TEST_F(WireDecoderTest, ReadStringValue2) {
-  wpi::raw_mem_istream is("\x00\x05hello\x00\x03" "bye\x55", 13);
+  wpi::raw_mem_istream is(
+      "\x00\x05hello\x00\x03"
+      "bye\x55",
+      13);
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_STRING);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_string, *val);
 
   auto v_bye = Value::MakeString(llvm::StringRef("bye"));
   val = d.ReadValue(NT_STRING);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_bye, *val);
 
   unsigned int b;
@@ -284,12 +287,12 @@ TEST_F(WireDecoderTest, ReadBooleanArrayValue2) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_BOOLEAN_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_boolean_array, *val);
 
   auto v_boolean_array2 = Value::MakeBooleanArray(std::vector<int>{1, 0});
   val = d.ReadValue(NT_BOOLEAN_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_boolean_array2, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_BOOLEAN_ARRAY));
@@ -304,7 +307,7 @@ TEST_F(WireDecoderTest, ReadBooleanArrayBigValue2) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_BOOLEAN_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_boolean_array_big, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_BOOLEAN_ARRAY));
@@ -319,7 +322,7 @@ TEST_F(WireDecoderTest, ReadDoubleArrayValue2) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_DOUBLE_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_double_array, *val);
 
   unsigned int b;
@@ -333,12 +336,12 @@ TEST_F(WireDecoderTest, ReadDoubleArrayValue2) {
 TEST_F(WireDecoderTest, ReadDoubleArrayBigValue2) {
   std::string s;
   s.push_back('\xff');
-  s.append(255*8, '\x00');
+  s.append(255 * 8, '\x00');
   wpi::raw_mem_istream is(s.data(), s.size());
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_DOUBLE_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_double_array_big, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_DOUBLE_ARRAY));
@@ -350,7 +353,7 @@ TEST_F(WireDecoderTest, ReadStringArrayValue2) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_STRING_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_string_array, *val);
 
   unsigned int b;
@@ -364,13 +367,12 @@ TEST_F(WireDecoderTest, ReadStringArrayValue2) {
 TEST_F(WireDecoderTest, ReadStringArrayBigValue2) {
   std::string s;
   s.push_back('\xff');
-  for (int i=0; i<255; ++i)
-    s.append("\x00\x01h", 3);
+  for (int i = 0; i < 255; ++i) s.append("\x00\x01h", 3);
   wpi::raw_mem_istream is(s.data(), s.size());
   wpi::Logger logger;
   WireDecoder d(is, 0x0200u, logger);
   auto val = d.ReadValue(NT_STRING_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_string_array_big, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_STRING_ARRAY));
@@ -398,12 +400,12 @@ TEST_F(WireDecoderTest, ReadBooleanValue3) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_BOOLEAN);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_boolean, *val);
 
   auto v_false = Value::MakeBoolean(false);
   val = d.ReadValue(NT_BOOLEAN);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_false, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_BOOLEAN));
@@ -418,11 +420,11 @@ TEST_F(WireDecoderTest, ReadDoubleValue3) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_DOUBLE);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_double, *val);
 
   val = d.ReadValue(NT_DOUBLE);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_double, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_DOUBLE));
@@ -430,16 +432,19 @@ TEST_F(WireDecoderTest, ReadDoubleValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadStringValue3) {
-  wpi::raw_mem_istream is("\x05hello\x03" "bye\x55", 11);
+  wpi::raw_mem_istream is(
+      "\x05hello\x03"
+      "bye\x55",
+      11);
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_STRING);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_string, *val);
 
   auto v_bye = Value::MakeString(llvm::StringRef("bye"));
   val = d.ReadValue(NT_STRING);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_bye, *val);
 
   unsigned int b;
@@ -451,16 +456,19 @@ TEST_F(WireDecoderTest, ReadStringValue3) {
 }
 
 TEST_F(WireDecoderTest, ReadRawValue3) {
-  wpi::raw_mem_istream is("\x05hello\x03" "bye\x55", 11);
+  wpi::raw_mem_istream is(
+      "\x05hello\x03"
+      "bye\x55",
+      11);
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_RAW);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_raw, *val);
 
   auto v_bye = Value::MakeRaw(llvm::StringRef("bye"));
   val = d.ReadValue(NT_RAW);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_bye, *val);
 
   unsigned int b;
@@ -476,12 +484,12 @@ TEST_F(WireDecoderTest, ReadBooleanArrayValue3) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_BOOLEAN_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_boolean_array, *val);
 
   auto v_boolean_array2 = Value::MakeBooleanArray(std::vector<int>{1, 0});
   val = d.ReadValue(NT_BOOLEAN_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_boolean_array2, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_BOOLEAN_ARRAY));
@@ -496,7 +504,7 @@ TEST_F(WireDecoderTest, ReadBooleanArrayBigValue3) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_BOOLEAN_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_boolean_array_big, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_BOOLEAN_ARRAY));
@@ -511,7 +519,7 @@ TEST_F(WireDecoderTest, ReadDoubleArrayValue3) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_DOUBLE_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_double_array, *val);
 
   unsigned int b;
@@ -525,12 +533,12 @@ TEST_F(WireDecoderTest, ReadDoubleArrayValue3) {
 TEST_F(WireDecoderTest, ReadDoubleArrayBigValue3) {
   std::string s;
   s.push_back('\xff');
-  s.append(255*8, '\x00');
+  s.append(255 * 8, '\x00');
   wpi::raw_mem_istream is(s.data(), s.size());
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_DOUBLE_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_double_array_big, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_DOUBLE_ARRAY));
@@ -542,7 +550,7 @@ TEST_F(WireDecoderTest, ReadStringArrayValue3) {
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_STRING_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_string_array, *val);
 
   unsigned int b;
@@ -556,13 +564,12 @@ TEST_F(WireDecoderTest, ReadStringArrayValue3) {
 TEST_F(WireDecoderTest, ReadStringArrayBigValue3) {
   std::string s;
   s.push_back('\xff');
-  for (int i=0; i<255; ++i)
-    s.append("\x01h", 2);
+  for (int i = 0; i < 255; ++i) s.append("\x01h", 2);
   wpi::raw_mem_istream is(s.data(), s.size());
   wpi::Logger logger;
   WireDecoder d(is, 0x0300u, logger);
   auto val = d.ReadValue(NT_STRING_ARRAY);
-  ASSERT_TRUE(bool(val));
+  ASSERT_TRUE(static_cast<bool>(val));
   EXPECT_EQ(*v_string_array_big, *val);
 
   ASSERT_FALSE(d.ReadValue(NT_STRING_ARRAY));

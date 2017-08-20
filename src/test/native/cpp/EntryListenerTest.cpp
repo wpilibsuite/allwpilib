@@ -5,14 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "ntcore_cpp.h"
-
 #include <chrono>
 #include <thread>
 
 #include "TestPrinters.h"
 #include "ValueMatcher.h"
 #include "gtest/gtest.h"
+#include "ntcore_cpp.h"
 
 class EntryListenerTest : public ::testing::Test {
  public:

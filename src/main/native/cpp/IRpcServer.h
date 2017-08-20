@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_IRPCSERVER_H_
-#define NT_IRPCSERVER_H_
+#ifndef NTCORE_IRPCSERVER_H_
+#define NTCORE_IRPCSERVER_H_
 
 #include <memory>
 
@@ -35,4 +35,4 @@ class IRpcServer {
 
 }  // namespace nt
 
-#endif  // NT_IRPCSERVER_H_
+#endif  // NTCORE_IRPCSERVER_H_

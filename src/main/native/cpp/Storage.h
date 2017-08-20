@@ -1,37 +1,42 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_STORAGE_H_
-#define NT_STORAGE_H_
+#ifndef NTCORE_STORAGE_H_
+#define NTCORE_STORAGE_H_
+
+#include <stdint.h>
 
 #include <atomic>
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include "llvm/DenseMap.h"
-#include "llvm/SmallSet.h"
-#include "llvm/StringMap.h"
-#include "support/condition_variable.h"
-#include "support/mutex.h"
-#include "Message.h"
-#include "ntcore_cpp.h"
-#include "SequenceNumber.h"
+#include <llvm/DenseMap.h>
+#include <llvm/SmallSet.h>
+#include <llvm/StringMap.h>
+#include <support/condition_variable.h>
+#include <support/mutex.h>
 
 #include "IStorage.h"
+#include "Message.h"
+#include "SequenceNumber.h"
+#include "ntcore_cpp.h"
 
 namespace llvm {
 class raw_ostream;
-}
+}  // namespace llvm
 
 namespace wpi {
 class Logger;
 class raw_istream;
-}
+}  // namespace wpi
 
 namespace nt {
 
@@ -120,7 +125,7 @@ class Storage : public IStorage {
   EntryInfo GetEntryInfo(int inst, unsigned int local_id) const;
   std::string GetEntryName(unsigned int local_id) const;
   NT_Type GetEntryType(unsigned int local_id) const;
-  unsigned long long GetEntryLastChange(unsigned int local_id) const;
+  uint64_t GetEntryLastChange(unsigned int local_id) const;
 
   // Filename-based save/load functions.  Used both by periodic saves and
   // accessible directly via the user API.
@@ -128,18 +133,18 @@ class Storage : public IStorage {
                              bool periodic) const override;
   const char* LoadPersistent(
       const Twine& filename,
-      std::function<void(std::size_t line, const char* msg)> warn) override;
+      std::function<void(size_t line, const char* msg)> warn) override;
 
   const char* SaveEntries(const Twine& filename, const Twine& prefix) const;
   const char* LoadEntries(
       const Twine& filename, const Twine& prefix,
-      std::function<void(std::size_t line, const char* msg)> warn);
+      std::function<void(size_t line, const char* msg)> warn);
 
   // Stream-based save/load functions (exposed for testing purposes).  These
   // implement the guts of the filename-based functions.
   void SavePersistent(llvm::raw_ostream& os, bool periodic) const;
   bool LoadEntries(wpi::raw_istream& is, const Twine& prefix, bool persistent,
-                   std::function<void(std::size_t line, const char* msg)> warn);
+                   std::function<void(size_t line, const char* msg)> warn);
 
   void SaveEntries(llvm::raw_ostream& os, const Twine& prefix) const;
 
@@ -156,7 +161,7 @@ class Storage : public IStorage {
  private:
   // Data for each table entry.
   struct Entry {
-    Entry(llvm::StringRef name_) : name(name_) {}
+    explicit Entry(llvm::StringRef name_) : name(name_) {}
     bool IsPersistent() const { return (flags & NT_PERSISTENT) != 0; }
 
     // We redundantly store the name so that it's available when accessing the
@@ -257,4 +262,4 @@ class Storage : public IStorage {
 
 }  // namespace nt
 
-#endif  // NT_STORAGE_H_
+#endif  // NTCORE_STORAGE_H_

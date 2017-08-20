@@ -5,12 +5,13 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TEST_MOCKNETWORKCONNECTION_H_
-#define NT_TEST_MOCKNETWORKCONNECTION_H_
+#ifndef NTCORE_MOCKNETWORKCONNECTION_H_
+#define NTCORE_MOCKNETWORKCONNECTION_H_
 
-#include "gmock/gmock.h"
+#include <memory>
 
 #include "INetworkConnection.h"
+#include "gmock/gmock.h"
 
 namespace nt {
 
@@ -30,4 +31,4 @@ class MockNetworkConnection : public INetworkConnection {
 
 }  // namespace nt
 
-#endif  // NT_TEST_MOCKNETWORKCONNECTION_H_
+#endif  // NTCORE_MOCKNETWORKCONNECTION_H_

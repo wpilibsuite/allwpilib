@@ -1,11 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "Message.h"
+
+#include <stdint.h>
 
 #include "Log.h"
 #include "WireDecoder.h"
@@ -56,7 +58,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       }
       break;
     case kEntryAssign: {
-      if (!decoder.ReadString(&msg->m_str)) return nullptr;      // name
+      if (!decoder.ReadString(&msg->m_str)) return nullptr;  // name
       NT_Type type;
       if (!decoder.ReadType(&type)) return nullptr;              // entry type
       if (!decoder.Read16(&msg->m_id)) return nullptr;           // id
@@ -104,7 +106,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
         decoder.set_error("received CLEAR_ENTRIES in protocol < 3.0");
         return nullptr;
       }
-      unsigned long magic;
+      uint32_t magic;
       if (!decoder.Read32(&magic)) return nullptr;
       if (magic != kClearAllMagic) {
         decoder.set_error(
@@ -120,7 +122,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       }
       if (!decoder.Read16(&msg->m_id)) return nullptr;
       if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // uid
-      unsigned long size;
+      uint64_t size;
       if (!decoder.ReadUleb128(&size)) return nullptr;
       const char* params;
       if (!decoder.Read(&params, size)) return nullptr;
@@ -134,7 +136,7 @@ std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
       }
       if (!decoder.Read16(&msg->m_id)) return nullptr;
       if (!decoder.Read16(&msg->m_seq_num_uid)) return nullptr;  // uid
-      unsigned long size;
+      uint64_t size;
       if (!decoder.ReadUleb128(&size)) return nullptr;
       const char* results;
       if (!decoder.Read(&results, size)) return nullptr;

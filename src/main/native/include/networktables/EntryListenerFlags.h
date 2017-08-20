@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_ENTRYLISTENERFLAGS_H_
-#define NT_ENTRYLISTENERFLAGS_H_
+#ifndef NTCORE_NETWORKTABLES_ENTRYLISTENERFLAGS_H_
+#define NTCORE_NETWORKTABLES_ENTRYLISTENERFLAGS_H_
 
 #include "ntcore_c.h"
 
@@ -70,4 +70,4 @@ enum {
 
 }  // namespace nt
 
-#endif  // NT_ENTRYLISTENERFLAGS_H_
+#endif  // NTCORE_NETWORKTABLES_ENTRYLISTENERFLAGS_H_

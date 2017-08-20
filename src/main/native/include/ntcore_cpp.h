@@ -1,12 +1,14 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NTCORE_CPP_H_
-#define NTCORE_CPP_H_
+#ifndef NTCORE_NTCORE_CPP_H_
+#define NTCORE_NTCORE_CPP_H_
+
+#include <stdint.h>
 
 #include <cassert>
 #include <functional>
@@ -15,10 +17,10 @@
 #include <utility>
 #include <vector>
 
-#include "llvm/ArrayRef.h"
-#include "llvm/StringRef.h"
-#include "llvm/Twine.h"
-#include "support/deprecated.h"
+#include <llvm/ArrayRef.h>
+#include <llvm/StringRef.h>
+#include <llvm/Twine.h>
+#include <support/deprecated.h>
 
 #include "networktables/NetworkTableValue.h"
 
@@ -43,7 +45,7 @@ struct EntryInfo {
   unsigned int flags;
 
   /** Timestamp of last change to entry (type or value). */
-  unsigned long long last_change;
+  uint64_t last_change;
 
   friend void swap(EntryInfo& first, EntryInfo& second) {
     using std::swap;
@@ -73,7 +75,7 @@ struct ConnectionInfo {
    * The last time any update was received from the remote node (same scale as
    * returned by nt::Now()).
    */
-  unsigned long long last_update;
+  uint64_t last_update;
 
   /**
    * The protocol version being used for this connection.  This in protocol
@@ -351,7 +353,7 @@ NT_Type GetEntryType(NT_Entry entry);
  * @param entry   entry handle
  * @return Entry last change time
  */
-unsigned long long GetEntryLastChange(NT_Entry entry);
+uint64_t GetEntryLastChange(NT_Entry entry);
 
 /**
  * Get Entry Value.
@@ -1353,7 +1355,7 @@ const char* LoadEntries(NT_Inst inst, const Twine& filename,
  * This function is a compatibility wrapper around wpi::Now().
  * @return Timestamp
  */
-unsigned long long Now();
+uint64_t Now();
 
 /** @} */
 
@@ -1484,4 +1486,4 @@ inline void RpcAnswer::PostResponse(StringRef result) const {
 
 }  // namespace nt
 
-#endif /* NTCORE_CPP_H_ */
+#endif  // NTCORE_NTCORE_CPP_H_

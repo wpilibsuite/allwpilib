@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NT_TYPE_H_
-#define NT_TYPE_H_
+#ifndef NTCORE_NETWORKTABLES_NETWORKTABLETYPE_H_
+#define NTCORE_NETWORKTABLES_NETWORKTABLETYPE_H_
 
 #include "ntcore_c.h"
 
@@ -26,4 +26,4 @@ enum class NetworkTableType {
 
 }  // namespace nt
 
-#endif  // NT_TYPE_H_
+#endif  // NTCORE_NETWORKTABLES_NETWORKTABLETYPE_H_

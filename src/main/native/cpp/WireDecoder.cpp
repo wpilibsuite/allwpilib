@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) FIRST 2015-2017. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,19 +7,20 @@
 
 #include "WireDecoder.h"
 
+#include <stdint.h>
+
 #include <cassert>
-#include <cstdint>
 #include <cstdlib>
 #include <cstring>
 
-#include "llvm/MathExtras.h"
-#include "support/leb128.h"
+#include <llvm/MathExtras.h>
+#include <support/leb128.h>
 
 using namespace nt;
 
 static double ReadDouble(const char*& buf) {
   // Fast but non-portable!
-  std::uint64_t val = (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
+  uint64_t val = (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
   val <<= 8;
   val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
@@ -65,10 +66,10 @@ bool WireDecoder::ReadDouble(double* val) {
   return true;
 }
 
-void WireDecoder::Realloc(std::size_t len) {
+void WireDecoder::Realloc(size_t len) {
   // Double current buffer size until we have enough space.
   if (m_allocated >= len) return;
-  std::size_t newlen = m_allocated * 2;
+  size_t newlen = m_allocated * 2;
   while (newlen < len) newlen *= 2;
   m_buf = static_cast<char*>(std::realloc(m_buf, newlen));
   m_allocated = newlen;
@@ -195,7 +196,7 @@ bool WireDecoder::ReadString(std::string* str) {
     if (!Read16(&v)) return false;
     len = v;
   } else {
-    unsigned long v;
+    uint64_t v;
     if (!ReadUleb128(&v)) return false;
     len = v;
   }
