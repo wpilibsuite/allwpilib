@@ -10,6 +10,7 @@
 #include "DriverStation.h"
 #include "Timer.h"
 #include "Utility.h"
+#include "llvm/Path.h"
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
@@ -66,17 +67,7 @@ void Error::Set(Code code, llvm::StringRef contextMessage,
 void Error::Report() {
   llvm::SmallString<128> buf;
   llvm::raw_svector_ostream locStream(buf);
-  locStream << m_function << " [";
-
-#if defined(_WIN32)
-  const int MAX_DIR = 100;
-  char basename[MAX_DIR];
-  _splitpath_s(m_filename.c_str(), nullptr, 0, basename, MAX_DIR, nullptr, 0,
-               nullptr, 0);
-  locStream << basename;
-#else
-  locStream << basename(m_filename.c_str());
-#endif
+  locStream << m_function << " [" << llvm::sys::path::filename(m_filename);
   locStream << ":" << m_lineNumber << "]";
 
   DriverStation::ReportError(true, m_code, m_message, locStream.str(),
