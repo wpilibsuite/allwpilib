@@ -42,10 +42,10 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   void Disable();
 
   // PIDOutput interface
-  virtual void PIDWrite(double output);
+  void PIDWrite(double output) override;
 
   // PIDSource interface
-  virtual double PIDGet();
+  double PIDGet() override;
   void SetSetpoint(double setpoint);
   void SetSetpointRelative(double deltaSetpoint);
   void SetInputRange(double minimumInput, double maximumInput);

@@ -37,12 +37,12 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
   bool IsAnalogTrigger() const override;
 
-  void UpdateTable();
-  void StartLiveWindowMode();
-  void StopLiveWindowMode();
-  std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<ITable> subTable);
-  std::shared_ptr<ITable> GetTable() const;
+  void UpdateTable() override;
+  void StartLiveWindowMode() override;
+  void StopLiveWindowMode() override;
+  std::string GetSmartDashboardType() const override;
+  void InitTable(std::shared_ptr<ITable> subTable) override;
+  std::shared_ptr<ITable> GetTable() const override;
 
  private:
   int m_channel;
