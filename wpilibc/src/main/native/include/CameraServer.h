@@ -41,7 +41,7 @@ class CameraServer : public ErrorBase {
   static CameraServer* GetInstance();
 
 #ifdef __linux__
-// USBCamera does not work on anything except linux
+  // USBCamera does not work on anything except linux
   /**
    * Start automatically capturing images to send to the dashboard.
    *

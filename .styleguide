@@ -1,8 +1,6 @@
-cExtensions {
-}
-
 cppHeaderExtensions {
   h
+  hpp
   inc
 }
 
@@ -14,52 +12,25 @@ otherExtensions {
   java
 }
 
-genFolderExclude {
-  FRC_FPGA_ChipObject
-  NetworkCommunication
-  ctre
-  frccansae
-  gmock
-  gtest
-  i2clib
-  msgs
-  ni-libraries
-  ni/vision
-  spilib
-  wpilibj/src/athena/cpp/nivision
-  visa
-}
-
 genFileExclude {
-  NIIMAQdx\.h$
-  can_proto\.h$
-  nivision\.h$
+  gmock/
+  ni-libraries/
+  hal/src/main/native/athena/ctre/
+  hal/src/main/native/athena/frccansae/
+  hal/src/main/native/athena/visa/
+  hal/src/main/native/include/ctre/
+  simulation/JavaGazebo/build/classes/main/gazebo/msgs/
+  wpilibj/src/athena/cpp/nivision/
   UsageReporting\.h$
 }
 
-modifiableFolderExclude {
-  \.git
-  wpilibj/src/arm-linux-jni
-  wpilibj/src/main/native/cpp
-}
-
 modifiableFileExclude {
+  wpilibj/src/arm-linux-jni/
+  wpilibj/src/main/native/cpp/
   \.patch$
   \.png$
   \.py$
   \.so$
-}
-
-includeRelated {
-}
-
-includeCSys {
-}
-
-includeCppSys {
-}
-
-includeOtherLibs {
 }
 
 includeProject {
