@@ -32,16 +32,16 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   void SetSetpointRelative(double deltaSetpoint);
 
   // PIDOutput interface
-  virtual void PIDWrite(double output);
+  void PIDWrite(double output) override;
 
   // PIDSource interface
-  virtual double PIDGet();
+  double PIDGet() override;
 
  protected:
   std::shared_ptr<PIDController> GetPIDController() const;
-  virtual void _Initialize();
-  virtual void _Interrupted();
-  virtual void _End();
+  void _Initialize() override;
+  void _Interrupted() override;
+  void _End() override;
   void SetSetpoint(double setpoint);
   double GetSetpoint() const;
   double GetPosition();
