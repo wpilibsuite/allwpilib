@@ -11,7 +11,9 @@
 #include "llvm/raw_ostream.h"
 
 namespace hal {
-constexpr fpga_clock::time_point fpga_clock::min_time;
+const fpga_clock::time_point fpga_clock::min_time =
+    fpga_clock::time_point(fpga_clock::duration(
+        std::numeric_limits<fpga_clock::duration::rep>::min()));
 
 fpga_clock::time_point fpga_clock::now() noexcept {
   int32_t status = 0;

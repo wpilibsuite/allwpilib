@@ -22,11 +22,10 @@ class fpga_clock {
   static fpga_clock::time_point now() noexcept;
   static constexpr bool is_steady = true;
 
-  static constexpr fpga_clock::time_point epoch() { return time_point(zero()); }
+  static fpga_clock::time_point epoch() noexcept { return time_point(zero()); }
 
-  static constexpr fpga_clock::duration zero() { return duration(0); }
+  static fpga_clock::duration zero() noexcept { return duration(0); }
 
-  static constexpr time_point min_time{
-      time_point(duration(std::numeric_limits<duration::rep>::min()))};
+  static const time_point min_time;
 };
 }  // namespace hal
