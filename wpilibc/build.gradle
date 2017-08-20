@@ -172,7 +172,7 @@ model {
             project.addWpilibCCompilerArguments(it)
         }
         withType(GoogleTestTestSuiteBinarySpec) {
-            if (it.component.testedComponent.name.contains('TestingBase')) {
+            if (it.component.testedComponent.name.contains('TestingBase') && !project.hasProperty('onlyAthena')) {
                 project(':gmock').addGmockToLinker(it)
                 project.addWpilibCToLinker(it)
             } else {

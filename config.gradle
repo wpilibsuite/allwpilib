@@ -15,7 +15,7 @@ def linuxDebugCompilerArgs = ['-O0']
 def linux32BitArg = '-m32'
 
 def macCompilerArgs =  ['-std=c++11', '-Wall', '-Wextra', '-Werror', '-pedantic-errors', '-fPIC', '-g',
-                            '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-Wno-unused-private-field']
+                            '-Wno-unused-parameter', '-Wno-missing-field-initializers', '-Wno-unused-private-field', '-pthread']
 def macReleaseCompilerArgs = ['-O2']
 def macDebugCompilerArgs = ['-O0']
 def mac32BitArg = '-m32'
@@ -137,6 +137,7 @@ if (!project.hasProperty('onlyAthena')) {
                 detectPlatform = windows64PlatformDetect
                 exclude << 'halAthena'
             }
+            /* Disable 32 bit linux until we can figure out jenkins
             linuxX86(BuildConfig) {
                 architecture = 'x86'
                 operatingSystem = 'linux'
@@ -150,6 +151,7 @@ if (!project.hasProperty('onlyAthena')) {
                 detectPlatform = linux32IntelPlatformDetect
                 exclude << 'halAthena'
             }
+            */
             linuxX64(BuildConfig) {
                 architecture = 'x86-64'
                 operatingSystem = 'linux'
@@ -161,6 +163,8 @@ if (!project.hasProperty('onlyAthena')) {
                 detectPlatform = linux64IntelPlatformDetect
                 exclude << 'halAthena'
             }
+            /* 32 bit Mac OS X not supported by OpenCV.
+             * If support is ever added, will add this back in
             macX86(BuildConfig) {
                 architecture = 'x86'
                 operatingSystem = 'osx'
@@ -173,6 +177,7 @@ if (!project.hasProperty('onlyAthena')) {
                 detectPlatform = mac32PlatformDetect
                 exclude << 'halAthena'
             }
+            */
             macX64(BuildConfig) {
                 architecture = 'x86-64'
                 operatingSystem = 'osx'

@@ -10,7 +10,7 @@
 // Allows usage with std::lock_guard without including <mutex> separately
 #include <mutex>
 
-#if defined(_WIN32)
+#if !defined(__linux__)
 namespace hal {
 // We do not want to use pthreads if in the simulator; however, in the
 // simulator, we do not care about priority inversion.
