@@ -7,7 +7,7 @@
 
 #include "HAL/cpp/priority_mutex.h"
 
-#if !defined(_WIN32)
+#if defined(__linux__)
 
 using namespace hal;
 

@@ -1,77 +1,79 @@
 import org.gradle.language.base.internal.ProjectLayout
 
-apply plugin: 'cpp'
-apply plugin: 'visual-studio'
-apply plugin: 'edu.wpi.first.NativeUtils'
+if (!project.hasProperty('skipAthena')) {
+    apply plugin: 'cpp'
+    apply plugin: 'visual-studio'
+    apply plugin: 'edu.wpi.first.NativeUtils'
 
-apply from: '../config.gradle'
+    apply from: '../config.gradle'
 
-model {
-    dependencyConfigs {
-        wpiutil(DependencyConfig) {
-            groupId = 'edu.wpi.first.wpiutil'
-            artifactId = 'wpiutil-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '+'
-            sharedConfigs = [ wpilibcIntegrationTests: [] ]
-        }
-        ntcore(DependencyConfig) {
-            groupId = 'edu.wpi.first.ntcore'
-            artifactId = 'ntcore-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '+'
-            sharedConfigs = [ wpilibcIntegrationTests: [] ]
-        }
-        opencv(DependencyConfig) {
-            groupId = 'org.opencv'
-            artifactId = 'opencv-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '3.2.0'
-            sharedConfigs = [ wpilibcIntegrationTests: [] ]
-        }
-        cscore(DependencyConfig) {
-            groupId = 'edu.wpi.first.cscore'
-            artifactId = 'cscore-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '+'
-            sharedConfigs = [ wpilibcIntegrationTests: [] ]
+    model {
+        dependencyConfigs {
+            wpiutil(DependencyConfig) {
+                groupId = 'edu.wpi.first.wpiutil'
+                artifactId = 'wpiutil-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '+'
+                sharedConfigs = [ wpilibcIntegrationTests: [] ]
+            }
+            ntcore(DependencyConfig) {
+                groupId = 'edu.wpi.first.ntcore'
+                artifactId = 'ntcore-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '+'
+                sharedConfigs = [ wpilibcIntegrationTests: [] ]
+            }
+            opencv(DependencyConfig) {
+                groupId = 'org.opencv'
+                artifactId = 'opencv-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '3.2.0'
+                sharedConfigs = [ wpilibcIntegrationTests: [] ]
+            }
+            cscore(DependencyConfig) {
+                groupId = 'edu.wpi.first.cscore'
+                artifactId = 'cscore-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '+'
+                sharedConfigs = [ wpilibcIntegrationTests: [] ]
+            }
         }
     }
-}
 
-model {
-    components {
-        wpilibcIntegrationTests(NativeExecutableSpec) {
-            baseName = 'FRCUserProgram'
-            sources {
-                cpp {
-                    source {
-                        srcDirs = ["${rootDir}/gmock/gtest/src", 'src/FRCUserProgram/cpp']
-                        includes = ['*-all.cc', '*_main.cc', '*.cpp']
-                    }
-                    exportedHeaders {
-                        srcDirs = ["${rootDir}/gmock/gtest/include", "${rootDir}/gmock/gtest", 'src/FRCUserProgram/headers']
-                        includes = ['**/*.h', '**/*.cc']
+    model {
+        components {
+            wpilibcIntegrationTests(NativeExecutableSpec) {
+                baseName = 'FRCUserProgram'
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ["${rootDir}/gmock/gtest/src", 'src/FRCUserProgram/cpp']
+                            includes = ['*-all.cc', '*_main.cc', '*.cpp']
+                        }
+                        exportedHeaders {
+                            srcDirs = ["${rootDir}/gmock/gtest/include", "${rootDir}/gmock/gtest", 'src/FRCUserProgram/headers']
+                            includes = ['**/*.h', '**/*.cc']
+                        }
                     }
                 }
-            }
-            binaries.all { binary->
-                if (binary.targetPlatform.architecture.name == 'athena') {
-                    binary.tasks.withType(CppCompile) {
-                        cppCompiler.args "-Wno-missing-field-initializers"
-                        cppCompiler.args "-Wno-unused-variable"
+                binaries.all { binary->
+                    if (binary.targetPlatform.architecture.name == 'athena') {
+                        binary.tasks.withType(CppCompile) {
+                            cppCompiler.args "-Wno-missing-field-initializers"
+                            cppCompiler.args "-Wno-unused-variable"
+                        }
+                        project(':ni-libraries').addNiLibrariesToLinker(binary)
+                        project(':hal').addHalCompilerArguments(binary)
+                        project(':hal').addHalToLinker(binary)
+                        project(':wpilibc').addWpilibCCompilerArguments(binary)
+                        project(':wpilibc').addWpilibCToLinker(binary)
+                    } else {
+                        binary.buildable = false
                     }
-                    project(':ni-libraries').addNiLibrariesToLinker(binary)
-                    project(':hal').addHalCompilerArguments(binary)
-                    project(':hal').addHalToLinker(binary)
-                    project(':wpilibc').addWpilibCCompilerArguments(binary)
-                    project(':wpilibc').addWpilibCToLinker(binary)
-                } else {
-                    binary.buildable = false
                 }
             }
         }
@@ -79,6 +81,7 @@ model {
 }
 
 def testOutputFolder = file("${project(':').buildDir}/integrationTestFiles")
+
 
 model {
     tasks {
@@ -113,6 +116,10 @@ model {
                 }
             }
         }
-        build.dependsOn copyWpilibCTestLibrariesToOutput
+        // This is in a separate if statement because of what I would assume is a bug in grade.
+        // Will file an issue on their side.
+        if (!project.hasProperty('skipAthena')) {
+            build.dependsOn copyWpilibCTestLibrariesToOutput
+        }
     }
 }
