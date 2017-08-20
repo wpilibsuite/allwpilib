@@ -7,6 +7,10 @@
 
 #include "HAL/DriverStation.h"
 
+#ifdef __APPLE__
+#include <pthread.h>
+#endif
+
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -168,12 +172,32 @@ void HAL_ObserveUserProgramTest(void) {
   // TODO
 }
 
+#ifdef __APPLE__
+static pthread_key_t lastCountKey;
+static pthread_once_t lastCountKeyOnce = PTHREAD_ONCE_INIT;
+
+static void InitLastCountKey() {
+  pthread_key_create(&lastCountKey, std::free);
+}
+#endif
+
 bool HAL_IsNewControlData(void) {
   // There is a rollover error condition here. At Packet# = n * (uintmax), this
   // will return false when instead it should return true. However, this at a
   // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
   // worth the cycles to check.
+#ifdef __APPLE__
+  pthread_once(&lastCountKeyOnce, InitLastCountKey);
+  int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
+  if (!lastCountPtr) {
+    lastCountPtr = static_cast<int*>(std::malloc(sizeof(int)));
+    *lastCountPtr = -1;
+    pthread_setspecific(lastCountKey, lastCountPtr);
+  }
+  int& lastCount = *lastCountPtr;
+#else
   thread_local int lastCount{-1};
+#endif
   int currentCount = 0;
   {
     std::unique_lock<hal::priority_mutex> lock(newDSDataAvailableMutex);
