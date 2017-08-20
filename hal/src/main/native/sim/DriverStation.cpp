@@ -7,6 +7,10 @@
 
 #include "HAL/DriverStation.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <string>
+
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "MockData/DriverStationDataInternal.h"
