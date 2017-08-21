@@ -67,7 +67,7 @@ model {
             ext = 'zip'
             version = '+'
             sharedConfigs = [ wpilibc: [],
-                              wpilibcTestingBase: [],
+                              wpilibcTestingBaseTest: [],
                               wpilibcDev: [] ]
         }
         ntcore(DependencyConfig) {
@@ -77,7 +77,7 @@ model {
             ext = 'zip'
             version = '+'
             sharedConfigs = [ wpilibc: [],
-                              wpilibcTestingBase: [],
+                              wpilibcTestingBaseTest: [],
                               wpilibcDev: [] ]
         }
         opencv(DependencyConfig) {
@@ -87,7 +87,7 @@ model {
             ext = 'zip'
             version = '3.2.0'
             sharedConfigs = [ wpilibc: [],
-                              wpilibcTestingBase: [],
+                              wpilibcTestingBaseTest: [],
                               wpilibcDev: [] ]
         }
         cscore(DependencyConfig) {
@@ -97,7 +97,7 @@ model {
             ext = 'zip'
             version = '+'
             sharedConfigs = [ wpilibc: [],
-                    wpilibcTestingBase: [],
+                    wpilibcTestingBaseTest: [],
                     wpilibcDev: [] ]
         }
     }
