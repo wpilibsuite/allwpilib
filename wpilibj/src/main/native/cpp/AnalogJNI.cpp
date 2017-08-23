@@ -509,7 +509,11 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput(
   int32_t status = 0;
   jlong *valuePtr = (jlong *)env->GetDirectBufferAddress(value);
   jlong *countPtr = (jlong *)env->GetDirectBufferAddress(count);
-  HAL_GetAccumulatorOutput((HAL_AnalogInputHandle)id, valuePtr, countPtr, &status);
+  int64_t valueInt64;
+  int64_t countInt64;
+  HAL_GetAccumulatorOutput((HAL_AnalogInputHandle)id, &valueInt64, &countInt64, &status);
+  *valuePtr = valueInt64;
+  *countPtr = countInt64;
   ANALOGJNI_LOG(logDEBUG) << "Value = " << *valuePtr;
   ANALOGJNI_LOG(logDEBUG) << "Count = " << *countPtr;
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
