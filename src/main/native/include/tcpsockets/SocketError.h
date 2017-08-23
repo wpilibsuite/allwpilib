@@ -10,21 +10,9 @@
 
 #include <string>
 
-#ifdef _WIN32
-#include <WinSock2.h>
-#else
-#include <errno.h>
-#endif
-
 namespace wpi {
 
-static inline int SocketErrno() {
-#ifdef _WIN32
-  return WSAGetLastError();
-#else
-  return errno;
-#endif
-}
+int SocketErrno();
 
 std::string SocketStrerror(int code);
 

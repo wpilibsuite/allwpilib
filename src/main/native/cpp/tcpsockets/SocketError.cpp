@@ -8,12 +8,22 @@
 #include "tcpsockets/SocketError.h"
 
 #ifdef _WIN32
+#include <WinSock2.h>
 #include <windows.h>
 #else
+#include <errno.h>
 #include <string.h>
 #endif
 
 namespace wpi {
+
+int SocketErrno() {
+#ifdef _WIN32
+  return WSAGetLastError();
+#else
+  return errno;
+#endif
+}
 
 std::string SocketStrerror(int code) {
 #ifdef _WIN32
