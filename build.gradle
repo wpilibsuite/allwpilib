@@ -39,6 +39,8 @@ task run(type: JavaExec) {
     main = 'edu.wpi.first.wpiutil.DevMain'
 }
 
+build.dependsOn devClasses
+
 dependencies {
     testCompile 'junit:junit:4.12'
     devCompile sourceSets.main.output
