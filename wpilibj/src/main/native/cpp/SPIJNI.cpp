@@ -356,7 +356,13 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorOutput(
   jlong *valuePtr = (jlong *)env->GetDirectBufferAddress(value);
   jlong *countPtr = (jlong *)env->GetDirectBufferAddress(count);
 
-  HAL_GetSPIAccumulatorOutput(static_cast<HAL_SPIPort>(port), valuePtr, countPtr, &status);
+  int64_t valueInt64;
+  int64_t countInt64;
+
+  HAL_GetSPIAccumulatorOutput(static_cast<HAL_SPIPort>(port), &valueInt64, &countInt64, &status);
+
+  *valuePtr = valueInt64;
+  *countPtr = countInt64;
 
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
   SPIJNI_LOG(logDEBUG) << "Value = " << *valuePtr;
