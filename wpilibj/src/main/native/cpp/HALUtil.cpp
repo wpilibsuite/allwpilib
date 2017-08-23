@@ -80,12 +80,6 @@ void ThrowHalHandleException(JNIEnv *env, int32_t status) {
   halHandleExCls.Throw(env, buf.c_str());
 }
 
-#ifndef _WIN32
-constexpr const char JNI_wpilibjPrefix[] = "edu.wpi.first.wpilibj";
-#else
-extern const char JNI_wpilibjPrefix[] = "edu.wpi.first.wpilibj";
-#endif
-
 void ReportError(JNIEnv *env, int32_t status, bool doThrow) {
   if (status == 0) return;
   if (status == HAL_HANDLE_ERROR) {
@@ -99,7 +93,7 @@ void ReportError(JNIEnv *env, int32_t status, bool doThrow) {
     runtimeExCls.Throw(env, buf.c_str());
   } else {
     std::string func;
-    auto stack = GetJavaStackTrace<JNI_wpilibjPrefix>(env, &func);
+    auto stack = GetJavaStackTrace(env, &func, "edu.wpi.first.wpilibj");
     HAL_SendError(1, status, 0, message, func.c_str(), stack.c_str(), 1);
   }
 }
