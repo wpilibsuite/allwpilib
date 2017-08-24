@@ -75,8 +75,8 @@ public class SortedVector<E> extends Vector<E> {
     Object[] array = new Object[size()];
     copyInto(array);
     removeAllElements();
-    for (int i = 0; i < array.length; i++) {
-      addElement((E) array[i]);
+    for (Object o : array) {
+      addElement((E) o);
     }
   }
 }
