@@ -15,13 +15,15 @@
 #include "HAL/handles/IndexedHandleResource.h"
 
 namespace {
+
 struct AnalogGyro {
   HAL_AnalogInputHandle handle;
   double voltsPerDegreePerSecond;
   double offset;
   int32_t center;
 };
-}
+
+}  // namespace
 
 static constexpr uint32_t kOversampleBits = 10;
 static constexpr uint32_t kAverageBits = 0;
@@ -41,6 +43,7 @@ static void Wait(double seconds) {
 }
 
 extern "C" {
+
 HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
                                         int32_t* status) {
   if (!HAL_IsAccumulatorChannel(analogHandle, status)) {
@@ -238,4 +241,5 @@ int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status) {
   }
   return gyro->center;
 }
-}
+
+}  // extern "C"

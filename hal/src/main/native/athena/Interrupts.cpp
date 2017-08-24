@@ -21,6 +21,7 @@
 using namespace hal;
 
 namespace {
+
 struct Interrupt {
   std::unique_ptr<tInterrupt> anInterrupt;
   std::unique_ptr<tInterruptManager> manager;

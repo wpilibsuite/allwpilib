@@ -190,4 +190,5 @@ HAL_Bool HAL_GetCompressorNotConnectedFault(
 
   return value;
 }
+
 }  // extern "C"

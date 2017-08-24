@@ -18,6 +18,7 @@
 #include "ctre/PCM.h"
 
 namespace hal {
+
 extern std::unique_ptr<PCM> PCM_modules[kNumPCMModules];
 
 static inline bool checkPCMInit(int32_t module, int32_t* status) {
@@ -33,4 +34,5 @@ static inline bool checkPCMInit(int32_t module, int32_t* status) {
 }
 
 void initializePCM(int32_t module, int32_t* status);
+
 }  // namespace hal

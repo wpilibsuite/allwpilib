@@ -16,10 +16,12 @@
 using namespace hal;
 
 namespace {
+
 struct AnalogOutput {
   uint8_t channel;
 };
-}
+
+}  // namespace
 
 static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
                              kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>
@@ -103,4 +105,5 @@ double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
 
   return rawValue * 5.0 / 0x1000;
 }
-}
+
+}  // extern "C"

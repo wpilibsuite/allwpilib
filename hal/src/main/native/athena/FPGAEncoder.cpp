@@ -16,11 +16,13 @@
 using namespace hal;
 
 namespace {
+
 struct Encoder {
   std::unique_ptr<tEncoder> encoder;
   uint8_t index;
 };
-}
+
+}  // namespace
 
 static const double DECODING_SCALING_FACTOR = 0.25;
 
@@ -29,6 +31,7 @@ static LimitedHandleResource<HAL_FPGAEncoderHandle, Encoder, kNumEncoders,
     fpgaEncoderHandles;
 
 extern "C" {
+
 HAL_FPGAEncoderHandle HAL_InitializeFPGAEncoder(
     HAL_Handle digitalSourceHandleA, HAL_AnalogTriggerType analogTriggerTypeA,
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
@@ -293,4 +296,5 @@ void HAL_SetFPGAEncoderIndexSource(HAL_FPGAEncoderHandle fpgaEncoderHandle,
   encoder->encoder->writeConfig_IndexActiveHigh(activeHigh, status);
   encoder->encoder->writeConfig_IndexEdgeSensitive(edgeSensitive, status);
 }
-}
+
+}  // extern "C"

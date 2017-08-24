@@ -20,6 +20,7 @@
 using namespace hal;
 
 extern "C" {
+
 /**
  * Initialize the analog input port using the given port object.
  *
@@ -382,4 +383,5 @@ int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
       0, port->channel, status);  // XXX: aiSystemIndex == 0?
   return offset;
 }
-}
+
+}  // extern "C"

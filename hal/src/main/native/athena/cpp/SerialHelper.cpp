@@ -22,6 +22,7 @@ constexpr const char* OnboardResourceOS = "/dev/ttyS0";
 constexpr const char* MxpResourceOS = "/dev/ttyS1";
 
 namespace hal {
+
 std::string SerialHelper::m_usbNames[2]{"", ""};
 
 priority_mutex SerialHelper::m_nameMutex;

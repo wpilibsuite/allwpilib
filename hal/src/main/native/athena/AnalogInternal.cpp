@@ -15,6 +15,7 @@
 #include "PortsInternal.h"
 
 namespace hal {
+
 priority_recursive_mutex analogRegisterWindowMutex;
 std::unique_ptr<tAI> analogInputSystem;
 std::unique_ptr<tAO> analogOutputSystem;
@@ -118,4 +119,5 @@ void setAnalogSampleRate(double samplesPerSecond, int32_t* status) {
 void setAnalogNumChannelsToActivate(int32_t channels) {
   analogNumChannelsToActivate = channels;
 }
+
 }  // namespace hal

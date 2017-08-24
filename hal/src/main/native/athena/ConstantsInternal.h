@@ -10,5 +10,7 @@
 #include <stdint.h>
 
 namespace hal {
+
 constexpr int32_t kSystemClockTicksPerMicrosecond = 40;
-}
+
+}  // namespace hal

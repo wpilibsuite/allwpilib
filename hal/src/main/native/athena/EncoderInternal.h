@@ -12,6 +12,7 @@
 #include "HAL/Encoder.h"
 
 namespace hal {
+
 class Encoder {
  public:
   Encoder(HAL_Handle digitalSourceHandleA,
@@ -73,4 +74,5 @@ class Encoder {
 
   int32_t m_encodingScale;
 };
+
 }  // namespace hal

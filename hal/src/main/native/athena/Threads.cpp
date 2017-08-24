@@ -13,6 +13,7 @@
 #include "HAL/Errors.h"
 
 extern "C" {
+
 /**
  * Get the thread priority for the specified thread.
  *
@@ -119,4 +120,5 @@ HAL_Bool HAL_SetCurrentThreadPriority(HAL_Bool realTime, int32_t priority,
   auto thread = pthread_self();
   return HAL_SetThreadPriority(&thread, realTime, priority, status);
 }
-}
+
+}  // extern "C"

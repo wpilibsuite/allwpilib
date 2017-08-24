@@ -14,11 +14,13 @@
 using namespace hal;
 
 namespace {
+
 struct Relay {
   uint8_t channel;
   bool fwd;
 };
-}
+
+}  // namespace
 
 static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
                              HAL_HandleEnum::Relay>
@@ -28,6 +30,7 @@ static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
 static priority_recursive_mutex digitalRelayMutex;
 
 extern "C" {
+
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
                                         int32_t* status) {
   initializeDigital(status);
@@ -131,4 +134,5 @@ HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
 
   return (relays & (1 << port->channel)) != 0;
 }
-}
+
+}  // extern "C"
