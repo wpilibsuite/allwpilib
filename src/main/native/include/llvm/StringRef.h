@@ -90,14 +90,15 @@ namespace llvm {
       }
 
     /// Construct a string ref from a pointer and length.
-    /*implicit*/ StringRef(const char *data, size_t length)
+    /*implicit*/ StringRef(const char *data, size_t length, bool isNullTerminated = false)
       : Data(data), Length(length) {
         assert((data || length == 0) &&
         "StringRef cannot be built from a NULL argument with non-null length");
         // Require length to not use MSB of size
         assert(Length < ~((size_t)1 << (sizeof(size_t) * 8 - 1)));
-        // If passed an explicit length, we are not null terminated
-        set_null_terminated(false);
+        // If passed an explicit length, use the parameter
+        // Default to false (not null) to match previous behavior.
+        set_null_terminated(isNullTerminated);
       }
 
     /// Construct a string ref from an std::string.
@@ -143,8 +144,8 @@ namespace llvm {
     bool empty() const { return size() == 0; }
 
     /// size - Get the string size.
-    size_t size() const { 
-      return Length & ~((size_t)1 << (sizeof(size_t) * 8 - 1)); 
+    size_t size() const {
+      return Length & ~((size_t)1 << (sizeof(size_t) * 8 - 1));
     }
 
     /// is_null_terminated - Get if the string is guaranteed null terminated
