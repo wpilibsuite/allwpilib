@@ -9,8 +9,9 @@
 
 #include <string>
 
+#include <llvm/StringRef.h>
+
 #include "ErrorBase.h"
-#include "llvm/StringRef.h"
 
 namespace frc {
 

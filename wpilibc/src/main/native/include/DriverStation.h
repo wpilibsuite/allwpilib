@@ -12,11 +12,12 @@
 #include <string>
 #include <thread>
 
-#include "HAL/DriverStation.h"
-#include "HAL/cpp/priority_mutex.h"
+#include <HAL/DriverStation.h>
+#include <HAL/cpp/priority_mutex.h>
+#include <llvm/StringRef.h>
+
 #include "RobotState.h"
 #include "SensorBase.h"
-#include "llvm/StringRef.h"
 
 namespace frc {
 

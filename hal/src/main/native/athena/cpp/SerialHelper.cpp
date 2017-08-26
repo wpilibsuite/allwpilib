@@ -11,9 +11,10 @@
 #include <cstdio>
 #include <cstring>
 
+#include <llvm/StringRef.h>
+
 #include "../visa/visa.h"
 #include "HAL/Errors.h"
-#include "llvm/StringRef.h"
 
 constexpr const char* OnboardResourceVISA = "ASRL1::INSTR";
 constexpr const char* MxpResourceVISA = "ASRL2::INSTR";

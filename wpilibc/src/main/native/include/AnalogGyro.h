@@ -9,8 +9,9 @@
 
 #include <memory>
 
+#include <HAL/Types.h>
+
 #include "GyroBase.h"
-#include "HAL/Types.h"
 
 namespace frc {
 

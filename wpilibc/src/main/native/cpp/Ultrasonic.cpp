@@ -7,10 +7,11 @@
 
 #include "Ultrasonic.h"
 
+#include <HAL/HAL.h>
+
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
-#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "Utility.h"

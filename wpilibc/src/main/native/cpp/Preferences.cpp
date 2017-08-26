@@ -9,9 +9,10 @@
 
 #include <algorithm>
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
+#include <llvm/StringRef.h>
+
 #include "WPIErrors.h"
-#include "llvm/StringRef.h"
 
 using namespace frc;
 

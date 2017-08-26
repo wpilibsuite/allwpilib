@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "HAL/Types.h"
-
 #ifdef _WIN32
 #include <windows.h>
 #define NativeThreadHandle const HANDLE*
@@ -16,6 +14,8 @@
 #include <pthread.h>
 #define NativeThreadHandle const pthread_t*
 #endif
+
+#include "HAL/Types.h"
 
 extern "C" {
 int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,

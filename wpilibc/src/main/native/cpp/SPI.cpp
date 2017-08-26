@@ -5,14 +5,15 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/SPI.h"
 #include "SPI.h"
 
 #include <cstring>
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
+#include <HAL/SPI.h>
+#include <llvm/SmallVector.h>
+
 #include "WPIErrors.h"
-#include "llvm/SmallVector.h"
 
 using namespace frc;
 

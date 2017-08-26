@@ -7,8 +7,9 @@
 
 #include "BuiltInAccelerometer.h"
 
-#include "HAL/Accelerometer.h"
-#include "HAL/HAL.h"
+#include <HAL/Accelerometer.h>
+#include <HAL/HAL.h>
+
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

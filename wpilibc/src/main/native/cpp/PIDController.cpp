@@ -10,7 +10,8 @@
 #include <cmath>
 #include <vector>
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
+
 #include "Notifier.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"

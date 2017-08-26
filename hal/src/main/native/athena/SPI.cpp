@@ -9,6 +9,9 @@
 
 #include <atomic>
 
+#include <llvm/raw_ostream.h>
+#include <spilib/spi-lib.h>
+
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
@@ -16,8 +19,6 @@
 #include "HAL/cpp/make_unique.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
-#include "llvm/raw_ostream.h"
-#include "spilib/spi-lib.h"
 
 using namespace hal;
 

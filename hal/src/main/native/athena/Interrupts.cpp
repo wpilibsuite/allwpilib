@@ -9,6 +9,8 @@
 
 #include <memory>
 
+#include <support/SafeThread.h>
+
 #include "DigitalInternal.h"
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
@@ -16,7 +18,6 @@
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
-#include "support/SafeThread.h"
 
 using namespace hal;
 

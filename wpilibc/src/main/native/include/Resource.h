@@ -13,8 +13,9 @@
 #include <string>
 #include <vector>
 
+#include <HAL/cpp/priority_mutex.h>
+
 #include "ErrorBase.h"
-#include "HAL/cpp/priority_mutex.h"
 
 namespace frc {
 

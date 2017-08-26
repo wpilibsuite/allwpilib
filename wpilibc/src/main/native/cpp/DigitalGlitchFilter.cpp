@@ -10,11 +10,12 @@
 #include <algorithm>
 #include <array>
 
+#include <HAL/Constants.h>
+#include <HAL/DIO.h>
+#include <HAL/HAL.h>
+
 #include "Counter.h"
 #include "Encoder.h"
-#include "HAL/Constants.h"
-#include "HAL/DIO.h"
-#include "HAL/HAL.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 

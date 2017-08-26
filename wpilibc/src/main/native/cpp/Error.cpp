@@ -7,12 +7,13 @@
 
 #include "Error.h"
 
+#include <llvm/Path.h>
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+
 #include "DriverStation.h"
 #include "Timer.h"
 #include "Utility.h"
-#include "llvm/Path.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 

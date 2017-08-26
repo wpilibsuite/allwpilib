@@ -7,7 +7,8 @@
 
 #include "Talon.h"
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
+
 #include "LiveWindow/LiveWindow.h"
 
 using namespace frc;

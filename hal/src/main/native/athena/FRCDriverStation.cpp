@@ -11,11 +11,12 @@
 #include <cstring>
 #include <limits>
 
-#include "FRC_NetworkCommunication/FRCComm.h"
+#include <FRC_NetworkCommunication/FRCComm.h>
+#include <llvm/raw_ostream.h>
+
 #include "HAL/DriverStation.h"
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
-#include "llvm/raw_ostream.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");

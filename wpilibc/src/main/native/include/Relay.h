@@ -10,11 +10,12 @@
 #include <memory>
 #include <string>
 
-#include "HAL/Types.h"
+#include <HAL/Types.h>
+#include <llvm/raw_ostream.h>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "MotorSafety.h"
 #include "SensorBase.h"
-#include "llvm/raw_ostream.h"
 #include "tables/ITable.h"
 #include "tables/ITableListener.h"
 

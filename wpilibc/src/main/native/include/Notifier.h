@@ -13,9 +13,10 @@
 #include <functional>
 #include <utility>
 
+#include <HAL/Notifier.h>
+#include <HAL/cpp/priority_mutex.h>
+
 #include "ErrorBase.h"
-#include "HAL/Notifier.h"
-#include "HAL/cpp/priority_mutex.h"
 
 namespace frc {
 

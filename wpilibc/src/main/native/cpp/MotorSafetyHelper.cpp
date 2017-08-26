@@ -7,12 +7,13 @@
 
 #include "MotorSafetyHelper.h"
 
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+
 #include "DriverStation.h"
 #include "MotorSafety.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 

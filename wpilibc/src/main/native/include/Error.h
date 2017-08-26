@@ -11,14 +11,15 @@
 
 #include <string>
 
-#include "Base.h"
-#include "llvm/StringRef.h"
+#include <llvm/StringRef.h>
 
 #ifdef _WIN32
 #include <Windows.h>
 // Windows.h defines #define GetMessage GetMessageW, which we don't want.
 #undef GetMessage
 #endif
+
+#include "Base.h"
 
 namespace frc {
 

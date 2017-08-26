@@ -9,8 +9,9 @@
 
 #include <cstdio>
 
+#include <HAL/HAL.h>
+
 #include "DriverStation.h"
-#include "HAL/HAL.h"
 #include "HLUsageReporting.h"
 #include "Internal/HardwareHLReporting.h"
 #include "LiveWindow/LiveWindow.h"

@@ -7,8 +7,9 @@
 
 #pragma once
 
+#include <HAL/Interrupts.h>
+
 #include "AnalogTriggerType.h"
-#include "HAL/Interrupts.h"
 #include "SensorBase.h"
 
 namespace frc {

@@ -6,16 +6,17 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogInput.h"
-#include "HAL/AnalogInput.h"
 
-#include "HAL/AnalogAccumulator.h"
-#include "HAL/HAL.h"
-#include "HAL/Ports.h"
+#include <HAL/AnalogAccumulator.h>
+#include <HAL/AnalogInput.h>
+#include <HAL/HAL.h>
+#include <HAL/Ports.h>
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 

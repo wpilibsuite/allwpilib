@@ -7,7 +7,8 @@
 
 #include "Notifier.h"
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
+
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"

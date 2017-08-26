@@ -7,8 +7,9 @@
 
 #include "HAL/cpp/fpga_clock.h"
 
+#include <llvm/raw_ostream.h>
+
 #include "HAL/HAL.h"
-#include "llvm/raw_ostream.h"
 
 namespace hal {
 const fpga_clock::time_point fpga_clock::min_time =

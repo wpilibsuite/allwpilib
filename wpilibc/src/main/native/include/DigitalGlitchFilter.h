@@ -11,8 +11,9 @@
 
 #include <array>
 
+#include <HAL/cpp/priority_mutex.h>
+
 #include "DigitalSource.h"
-#include "HAL/cpp/priority_mutex.h"
 
 namespace frc {
 

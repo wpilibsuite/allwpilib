@@ -7,10 +7,11 @@
 
 #include "SampleRobot.h"
 
+#include <llvm/raw_ostream.h>
+
 #include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
-#include "llvm/raw_ostream.h"
 #include "networktables/NetworkTable.h"
 
 using namespace frc;

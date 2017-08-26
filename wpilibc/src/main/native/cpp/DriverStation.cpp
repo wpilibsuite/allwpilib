@@ -9,15 +9,16 @@
 
 #include <chrono>
 
+#include <HAL/HAL.h>
+#include <HAL/Power.h>
+#include <HAL/cpp/Log.h>
+#include <llvm/SmallString.h>
+
 #include "AnalogInput.h"
-#include "HAL/HAL.h"
-#include "HAL/Power.h"
-#include "HAL/cpp/Log.h"
 #include "MotorSafetyHelper.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "llvm/SmallString.h"
 
 using namespace frc;
 

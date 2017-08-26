@@ -5,15 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PWM.h"
 #include "PWM.h"
 
-#include "HAL/HAL.h"
-#include "HAL/Ports.h"
+#include <HAL/HAL.h>
+#include <HAL/PWM.h>
+#include <HAL/Ports.h>
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 

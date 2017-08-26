@@ -7,10 +7,11 @@
 
 #include "ADXL362.h"
 
+#include <HAL/HAL.h>
+
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
 #include "DriverStation.h"
-#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 
 using namespace frc;

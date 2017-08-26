@@ -9,8 +9,9 @@
 
 #include <algorithm>
 
+#include <llvm/SmallVector.h>
+
 #include "HAL/cpp/priority_mutex.h"
-#include "llvm/SmallVector.h"
 
 namespace hal {
 static llvm::SmallVector<HandleBase*, 32> globalHandles;

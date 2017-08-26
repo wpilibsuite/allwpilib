@@ -5,7 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "DigitalInput.h"   // NOLINT(build/include_order)
+#include "DigitalInput.h"  // NOLINT(build/include_order)
+
 #include "DigitalOutput.h"  // NOLINT(build/include_order)
 
 #include "Counter.h"

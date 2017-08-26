@@ -10,9 +10,10 @@
 #include <memory>
 #include <string>
 
+#include <HAL/Encoder.h>
+
 #include "Counter.h"
 #include "CounterBase.h"
-#include "HAL/Encoder.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"

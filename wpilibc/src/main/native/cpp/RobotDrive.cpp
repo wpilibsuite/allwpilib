@@ -10,8 +10,9 @@
 #include <algorithm>
 #include <cmath>
 
+#include <HAL/HAL.h>
+
 #include "GenericHID.h"
-#include "HAL/HAL.h"
 #include "Joystick.h"
 #include "Talon.h"
 #include "Utility.h"

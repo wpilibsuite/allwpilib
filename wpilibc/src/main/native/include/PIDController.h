@@ -12,9 +12,10 @@
 #include <queue>
 #include <string>
 
+#include <HAL/cpp/priority_mutex.h>
+
 #include "Base.h"
 #include "Controller.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Notifier.h"
 #include "PIDInterface.h"

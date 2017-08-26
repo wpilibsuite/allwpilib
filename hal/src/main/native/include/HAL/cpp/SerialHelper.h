@@ -12,10 +12,11 @@
 #include <string>
 #include <vector>
 
+#include <llvm/SmallString.h>
+#include <llvm/SmallVector.h>
+
 #include "HAL/SerialPort.h"
 #include "HAL/cpp/priority_mutex.h"
-#include "llvm/SmallString.h"
-#include "llvm/SmallVector.h"
 
 namespace hal {
 class SerialHelper {

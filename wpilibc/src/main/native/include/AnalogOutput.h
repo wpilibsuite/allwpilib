@@ -10,7 +10,8 @@
 #include <memory>
 #include <string>
 
-#include "HAL/AnalogOutput.h"
+#include <HAL/AnalogOutput.h>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 

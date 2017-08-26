@@ -10,10 +10,11 @@
 #include <memory>
 #include <string>
 
+#include <HAL/Counter.h>
+#include <HAL/Types.h>
+
 #include "AnalogTrigger.h"
 #include "CounterBase.h"
-#include "HAL/Counter.h"
-#include "HAL/Types.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 

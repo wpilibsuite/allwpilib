@@ -9,9 +9,10 @@
 
 #include <thread>
 
+#include <HAL/HAL.h>
+#include <llvm/raw_ostream.h>
+
 #include "Base.h"
-#include "HAL/HAL.h"
-#include "llvm/raw_ostream.h"
 
 namespace frc {
 

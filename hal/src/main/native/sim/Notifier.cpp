@@ -10,12 +10,13 @@
 #include <chrono>
 #include <iostream>
 
+#include <support/SafeThread.h>
+#include <support/timestamp.h>
+
 #include "HAL/HAL.h"
 #include "HAL/cpp/fpga_clock.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
-#include "support/SafeThread.h"
-#include "support/timestamp.h"
 
 namespace {
 class NotifierThread : public wpi::SafeThread {

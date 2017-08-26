@@ -10,7 +10,8 @@
 #include <memory>
 #include <string>
 
-#include "HAL/Types.h"
+#include <HAL/Types.h>
+
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "tables/ITableListener.h"

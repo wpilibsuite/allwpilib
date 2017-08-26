@@ -7,8 +7,9 @@
 
 #include "ADXRS450_Gyro.h"
 
+#include <HAL/HAL.h>
+
 #include "DriverStation.h"
-#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 

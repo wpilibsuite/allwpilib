@@ -9,8 +9,9 @@
 
 #include <algorithm>
 
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+
 #include "networktables/NetworkTable.h"
 
 using namespace frc;

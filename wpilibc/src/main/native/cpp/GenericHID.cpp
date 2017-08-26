@@ -7,8 +7,9 @@
 
 #include "GenericHID.h"
 
+#include <HAL/HAL.h>
+
 #include "DriverStation.h"
-#include "HAL/HAL.h"
 
 using namespace frc;
 

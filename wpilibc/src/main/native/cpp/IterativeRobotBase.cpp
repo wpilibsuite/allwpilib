@@ -9,9 +9,10 @@
 
 #include <cstdio>
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
+#include <llvm/raw_ostream.h>
+
 #include "LiveWindow/LiveWindow.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 

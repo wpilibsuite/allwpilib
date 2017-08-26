@@ -7,8 +7,9 @@
 
 #include "Encoder.h"
 
+#include <HAL/HAL.h>
+
 #include "DigitalInput.h"
-#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

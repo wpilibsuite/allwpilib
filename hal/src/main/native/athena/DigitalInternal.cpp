@@ -11,8 +11,9 @@
 #include <mutex>
 #include <thread>
 
+#include <FRC_NetworkCommunication/LoadOut.h>
+
 #include "ConstantsInternal.h"
-#include "FRC_NetworkCommunication/LoadOut.h"
 #include "HAL/AnalogTrigger.h"
 #include "HAL/ChipObject.h"
 #include "HAL/HAL.h"

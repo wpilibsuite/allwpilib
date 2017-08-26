@@ -10,8 +10,9 @@
 #include <memory>
 #include <string>
 
+#include <HAL/Types.h>
+
 #include "DigitalSource.h"
-#include "HAL/Types.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "tables/ITableListener.h"
 

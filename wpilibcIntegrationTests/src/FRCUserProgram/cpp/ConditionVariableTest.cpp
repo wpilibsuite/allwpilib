@@ -11,8 +11,9 @@
 #include <mutex>
 #include <thread>
 
-#include "HAL/cpp/priority_condition_variable.h"
-#include "HAL/cpp/priority_mutex.h"
+#include <HAL/cpp/priority_condition_variable.h>
+#include <HAL/cpp/priority_mutex.h>
+
 #include "TestBench.h"
 #include "gtest/gtest.h"
 

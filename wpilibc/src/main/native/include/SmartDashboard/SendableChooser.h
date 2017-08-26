@@ -10,9 +10,10 @@
 #include <memory>
 #include <string>
 
+#include <llvm/StringMap.h>
+#include <llvm/StringRef.h>
+
 #include "SmartDashboard/SendableChooserBase.h"
-#include "llvm/StringMap.h"
-#include "llvm/StringRef.h"
 #include "tables/ITable.h"
 
 namespace frc {

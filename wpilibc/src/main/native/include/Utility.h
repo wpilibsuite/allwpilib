@@ -15,7 +15,7 @@
 
 #include <string>
 
-#include "llvm/StringRef.h"
+#include <llvm/StringRef.h>
 
 #define wpi_assert(condition) \
   wpi_assert_impl(condition, #condition, "", __FILE__, __LINE__, __FUNCTION__)
