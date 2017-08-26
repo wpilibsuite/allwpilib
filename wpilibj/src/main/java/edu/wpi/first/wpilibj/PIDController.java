@@ -221,9 +221,22 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
   }
 
-  public PIDController(double Kp, double Ki, double Kd, Supplier<Quantity<Length>> source,
-                       PIDOutput output, Unit<Length> unit) {
-    this(Kp, Ki, Kd, new PIDSource() {
+  /**
+   * Work in Progress!
+   *
+   * <p>Allocate a PID object with the given constants for P, I, D, using a 50ms period.
+   *
+   * @param Kp     the proportional coefficient
+   * @param Ki     the integral coefficient
+   * @param Kd     the derivative coefficient
+   * @param Kf     the feed forward term
+   * @param source The PIDSource object that is used to get values
+   * @param output The PIDOutput object that is set to the output percentage
+   */
+  @SuppressWarnings("ParameterName")
+  public PIDController(double Kp, double Ki, double Kd, double Kf,
+                       Supplier<Quantity<Length>> source, PIDOutput output, Unit<Length> unit) {
+    this(Kp, Ki, Kd, Kf, new PIDSource() {
       @Override
       public void setPIDSourceType(PIDSourceType pidSource) {
         // NO-OP
@@ -529,11 +542,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     if (m_table != null) {
       m_table.putNumber("setpoint", m_setpoint);
     }
-  }
-
-  // TODO:
-  public void setSetpoint(double setpoint, Unit unit) {
-    setSetpoint(setpoint);
   }
 
   /**

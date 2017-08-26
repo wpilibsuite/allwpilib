@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
-import si.uom.SI;
 import systems.uom.common.USCustomary;
+import tec.uom.se.unit.Units;
 
 @SuppressWarnings("all")
 public class MyRobot extends IterativeRobot {
@@ -27,10 +27,11 @@ public class MyRobot extends IterativeRobot {
    */
   @Override
   public void robotInit() {
-    encoder = new DistanceEncoder(0, 1, 2 * Math.PI, SI.METRE);
+    encoder = new DistanceEncoder(0, 1, 2 * Math.PI, Units.METRE);
     motor = new Spark(0);
 
-    autoController = new PIDController(0.5, 0, 0, encoder.value(), motor, SI.METRE);
+    autoController = new PIDController(0.5, 0, 0, 0,
+        encoder.value(), motor, USCustomary.FOOT);
   }
 
   /**
@@ -58,7 +59,7 @@ public class MyRobot extends IterativeRobot {
   }
 
   private void pidAuto() {
-    autoController.setSetpoint(12, SI.METRE);
+    //autoController.setSetpoint(1200, MetricPrefix.CENTI(Units.METRE));
     autoController.enable();
   }
 

@@ -10,8 +10,8 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
-import si.uom.SI;
 import tec.uom.se.quantity.Quantities;
+import tec.uom.se.unit.Units;
 
 import javax.measure.Unit;
 import javax.measure.quantity.ElectricCurrent;
@@ -70,7 +70,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return The electric potential of the PDP
    */
   public double getVoltage(Unit<ElectricPotential> unit) {
-    return Quantities.getQuantity(getVoltage(), SI.VOLT).to(unit).getValue().doubleValue();
+    return Quantities.getQuantity(getVoltage(), Units.VOLT).to(unit).getValue().doubleValue();
   }
 
   /**
@@ -97,7 +97,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return The temperature of the PDP
    */
   public double getTemperature(Unit<Temperature> unit) {
-    return Quantities.getQuantity(getTemperature(), SI.CELSIUS).to(unit).getValue().doubleValue();
+    return Quantities.getQuantity(getTemperature(), Units.CELSIUS)
+        .to(unit).getValue().doubleValue();
   }
 
   /**
@@ -130,7 +131,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return The current of one of the PDP channels (channels 0-15)
    */
   public double getCurrent(int channel, Unit<ElectricCurrent> unit) {
-    return Quantities.getQuantity(getCurrent(channel), SI.AMPERE).to(unit).getValue().doubleValue();
+    return Quantities.getQuantity(getCurrent(channel), Units.AMPERE)
+        .to(unit).getValue().doubleValue();
   }
 
   /**
@@ -157,7 +159,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return The current of all the channels
    */
   public double getTotalCurrent(Unit<ElectricCurrent> unit) {
-    return Quantities.getQuantity(getTotalCurrent(), SI.AMPERE).to(unit).getValue().doubleValue();
+    return Quantities.getQuantity(getTotalCurrent(), Units.AMPERE)
+        .to(unit).getValue().doubleValue();
   }
 
   /**
@@ -184,7 +187,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return the total power in Watts
    */
   public double getTotalPower(Unit<Power> unit) {
-    return Quantities.getQuantity(getTotalPower(), SI.WATT).to(unit).getValue().doubleValue();
+    return Quantities.getQuantity(getTotalPower(), Units.WATT).to(unit).getValue().doubleValue();
   }
 
   /**
@@ -211,7 +214,8 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * @return the total energy in Joules
    */
   public double getTotalEnergy(Unit<Energy> unit) {
-    return Quantities.getQuantity(PDPJNI.getPDPTotalEnergy(m_module), SI.JOULE).to(unit).getValue().doubleValue();
+    return Quantities.getQuantity(PDPJNI.getPDPTotalEnergy(m_module), Units.JOULE)
+        .to(unit).getValue().doubleValue();
   }
 
   /**
@@ -252,24 +256,24 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   @Override
   public void updateTable() {
     if (m_table != null) {
-      m_table.putNumber("Chan0", getCurrent(0, SI.AMPERE));
-      m_table.putNumber("Chan1", getCurrent(1, SI.AMPERE));
-      m_table.putNumber("Chan2", getCurrent(2, SI.AMPERE));
-      m_table.putNumber("Chan3", getCurrent(3, SI.AMPERE));
-      m_table.putNumber("Chan4", getCurrent(4, SI.AMPERE));
-      m_table.putNumber("Chan5", getCurrent(5, SI.AMPERE));
-      m_table.putNumber("Chan6", getCurrent(6, SI.AMPERE));
-      m_table.putNumber("Chan7", getCurrent(7, SI.AMPERE));
-      m_table.putNumber("Chan8", getCurrent(8, SI.AMPERE));
-      m_table.putNumber("Chan9", getCurrent(9, SI.AMPERE));
-      m_table.putNumber("Chan10", getCurrent(10, SI.AMPERE));
-      m_table.putNumber("Chan11", getCurrent(11, SI.AMPERE));
-      m_table.putNumber("Chan12", getCurrent(12, SI.AMPERE));
-      m_table.putNumber("Chan13", getCurrent(13, SI.AMPERE));
-      m_table.putNumber("Chan14", getCurrent(14, SI.AMPERE));
-      m_table.putNumber("Chan15", getCurrent(15, SI.AMPERE));
-      m_table.putNumber("Voltage", getVoltage(SI.VOLT));
-      m_table.putNumber("TotalCurrent", getTotalCurrent(SI.AMPERE));
+      m_table.putNumber("Chan0", getCurrent(0, Units.AMPERE));
+      m_table.putNumber("Chan1", getCurrent(1, Units.AMPERE));
+      m_table.putNumber("Chan2", getCurrent(2, Units.AMPERE));
+      m_table.putNumber("Chan3", getCurrent(3, Units.AMPERE));
+      m_table.putNumber("Chan4", getCurrent(4, Units.AMPERE));
+      m_table.putNumber("Chan5", getCurrent(5, Units.AMPERE));
+      m_table.putNumber("Chan6", getCurrent(6, Units.AMPERE));
+      m_table.putNumber("Chan7", getCurrent(7, Units.AMPERE));
+      m_table.putNumber("Chan8", getCurrent(8, Units.AMPERE));
+      m_table.putNumber("Chan9", getCurrent(9, Units.AMPERE));
+      m_table.putNumber("Chan10", getCurrent(10, Units.AMPERE));
+      m_table.putNumber("Chan11", getCurrent(11, Units.AMPERE));
+      m_table.putNumber("Chan12", getCurrent(12, Units.AMPERE));
+      m_table.putNumber("Chan13", getCurrent(13, Units.AMPERE));
+      m_table.putNumber("Chan14", getCurrent(14, Units.AMPERE));
+      m_table.putNumber("Chan15", getCurrent(15, Units.AMPERE));
+      m_table.putNumber("Voltage", getVoltage(Units.VOLT));
+      m_table.putNumber("TotalCurrent", getTotalCurrent(Units.AMPERE));
     }
   }
 

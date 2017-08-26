@@ -4,9 +4,11 @@ import tec.uom.se.quantity.Quantities;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
+
 import java.util.function.Supplier;
 
 /**
+ * Class to read quadrature encoders.
  *
  * @param <Q> The Quantity being measured. (ex: Length, Angle)
  * @param <S> The Speed of the Quantity being measured. (ex: Speed, AngularSpeed)
@@ -15,52 +17,16 @@ import java.util.function.Supplier;
 abstract class QuantityEncoder<Q extends Quantity<Q>, S extends Quantity<S>> {
 
   private final Encoder m_encoder;
+  private final Unit<Q> m_valueUnit;
+  private final Unit<S> m_speedUnit;
 
-  public QuantityEncoder(int channelA, int channelB, double distancePerPule, Unit<Q> unit) {
+  public QuantityEncoder(int channelA, int channelB, Quantity<Q> quantityPerPulse,
+                         Unit<Q> valueUnit, Unit<S> speedUnit) {
     m_encoder = new Encoder(channelA, channelB);
+    m_valueUnit = valueUnit;
+    m_speedUnit = speedUnit;
 
-    m_encoder.setDistancePerPulse(Quantities.getQuantity(distancePerPule, unit).to(unit.getSystemUnit())
-        .getValue().doubleValue());
-  }
-
-  public QuantityEncoder(int channelA, int channelB, Quantity<Q> quantityPerPulse) {
-    m_encoder = new Encoder(channelA, channelB);
-
-    m_encoder.setDistancePerPulse(quantityPerPulse.to(quantityPerPulse.getUnit().getSystemUnit())
-        .getValue().doubleValue());
-  }
-
-  public QuantityEncoder(int channelA, int channelB, int indexChannel,
-                      Quantity<Q> quantityPerPulse) {
-    m_encoder = new Encoder(channelA, channelB, indexChannel);
-
-    m_encoder.setDistancePerPulse(quantityPerPulse.to(quantityPerPulse.getUnit().getSystemUnit())
-        .getValue().doubleValue());
-  }
-
-  public QuantityEncoder(DigitalSource sourceA, DigitalSource sourceB,
-                      Quantity<Q> quantityPerPulse) {
-    m_encoder = new Encoder(sourceA, sourceB);
-
-    m_encoder.setDistancePerPulse(quantityPerPulse.to(quantityPerPulse.getUnit().getSystemUnit())
-        .getValue().doubleValue());
-  }
-
-  public QuantityEncoder(DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource,
-                      Quantity<Q> quantityPerPulse) {
-    m_encoder = new Encoder(sourceA, sourceB, indexSource);
-
-    m_encoder.setDistancePerPulse(quantityPerPulse.to(quantityPerPulse.getUnit().getSystemUnit())
-        .getValue().doubleValue());
-  }
-
-  /**
-   * Set the minimum rate of the device before the hardware reports it stopped.
-   *
-   * @param minRate The minimum speed.
-   */
-  public void setMinimumSpeed(Quantity<S> minRate) {
-    m_encoder.setMinRate(minRate.to(minRate.getUnit().getSystemUnit()).getValue().doubleValue());
+    m_encoder.setDistancePerPulse(quantityPerPulse.to(valueUnit).getValue().doubleValue());
   }
 
   /**
@@ -69,7 +35,7 @@ abstract class QuantityEncoder<Q extends Quantity<Q>, S extends Quantity<S>> {
    * @return The speed of the encoder.
    */
   public Quantity<S> getSpeed() {
-    return Quantities.getQuantity(m_encoder.getRate(), getSpeedUnit().getSystemUnit());
+    return Quantities.getQuantity(m_encoder.getRate(), m_speedUnit);
   }
 
   /**
@@ -97,7 +63,7 @@ abstract class QuantityEncoder<Q extends Quantity<Q>, S extends Quantity<S>> {
    * @return The value driven since the last reset
    */
   public Quantity<Q> get() {
-    return Quantities.getQuantity(m_encoder.getDistance(), getUnit().getSystemUnit());
+    return Quantities.getQuantity(m_encoder.getDistance(), m_valueUnit);
   }
 
   /**
@@ -118,9 +84,5 @@ abstract class QuantityEncoder<Q extends Quantity<Q>, S extends Quantity<S>> {
   public Supplier<Quantity<Q>> value() {
     return this::get;
   }
-
-  public abstract Unit<Q> getUnit();
-
-  public abstract Unit<S> getSpeedUnit();
 
 }
