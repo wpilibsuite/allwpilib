@@ -10,6 +10,15 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
+import si.uom.SI;
+import tec.uom.se.quantity.Quantities;
+
+import javax.measure.Unit;
+import javax.measure.quantity.ElectricCurrent;
+import javax.measure.quantity.ElectricPotential;
+import javax.measure.quantity.Energy;
+import javax.measure.quantity.Power;
+import javax.measure.quantity.Temperature;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the Power Distribution
@@ -41,25 +50,63 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
    * Query the input voltage of the PDP.
    *
    * @return The voltage of the PDP in volts
+   * @deprecated Will be replaced with a method that returns a Quantity of ElectricPotential in 2019
    */
+  @Deprecated
   public double getVoltage() {
     return PDPJNI.getPDPVoltage(m_module);
+  }
+
+  /*
+  public Quantity<ElectricPotential> getVoltage() {
+    return Quantities.getQuantity(PDPJNI.getPDPVoltage(m_module), SI.VOLT);
+  }
+  */
+
+  /**
+   * Query the input voltage of the PDP.
+   *
+   * @param unit The unit to return as
+   * @return The electric potential of the PDP
+   */
+  public double getVoltage(Unit<ElectricPotential> unit) {
+    return Quantities.getQuantity(getVoltage(), SI.VOLT).to(unit).getValue().doubleValue();
   }
 
   /**
    * Query the temperature of the PDP.
    *
    * @return The temperature of the PDP in degrees Celsius
+   * @deprecated Will be replaced with a method that returns a Quantity of Temperature in 2019
    */
+  @Deprecated
   public double getTemperature() {
     return PDPJNI.getPDPTemperature(m_module);
+  }
+
+  /*
+  public Quantity<Temperature> getTemperature() {
+    return Quantities.getQuantity(PDPJNI.getPDPTemperature(m_module), SI.CELSIUS);
+  }
+  */
+
+  /**
+   * Query the temperature of the PDP.
+   *
+   * @param unit The unit to return as
+   * @return The temperature of the PDP
+   */
+  public double getTemperature(Unit<Temperature> unit) {
+    return Quantities.getQuantity(getTemperature(), SI.CELSIUS).to(unit).getValue().doubleValue();
   }
 
   /**
    * Query the current of a single channel of the PDP.
    *
    * @return The current of one of the PDP channels (channels 0-15) in Amperes
+   * @deprecated Will be replaced with a method that returns a Quantity of ElectricCurrent in 2019
    */
+  @Deprecated
   public double getCurrent(int channel) {
     double current = PDPJNI.getPDPChannelCurrent((byte) channel, m_module);
 
@@ -68,31 +115,103 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
     return current;
   }
 
+  /*
+  public Quantity<ElectricCurrent> getCurrent(int channel) {
+    checkPDPChannel(channel);
+
+    return Quantities.getQuantity(PDPJNI.getPDPChannelCurrent((byte) channel, m_module), SI.AMPERE);
+  }
+  */
+
+  /**
+   * Query the current of a single channel of the PDP.
+   *
+   * @param unit The unit to return as
+   * @return The current of one of the PDP channels (channels 0-15)
+   */
+  public double getCurrent(int channel, Unit<ElectricCurrent> unit) {
+    return Quantities.getQuantity(getCurrent(channel), SI.AMPERE).to(unit).getValue().doubleValue();
+  }
+
   /**
    * Query the current of all monitored PDP channels (0-15).
    *
    * @return The current of all the channels in Amperes
+   * @deprecated Will be replaced with a method that returns a Quantity of ElectricCurrent in 2019
    */
+  @Deprecated
   public double getTotalCurrent() {
     return PDPJNI.getPDPTotalCurrent(m_module);
+  }
+
+  /*
+  public Quantity<ElectricCurrent> getTotalCurrent() {
+    return Quantities.getQuantity(PDPJNI.getPDPTotalCurrent(m_module), SI.AMPERE);
+  }
+  */
+
+  /**
+   * Query the current of all monitored PDP channels (0-15).
+   *
+   * @param unit The unit to return as
+   * @return The current of all the channels
+   */
+  public double getTotalCurrent(Unit<ElectricCurrent> unit) {
+    return Quantities.getQuantity(getTotalCurrent(), SI.AMPERE).to(unit).getValue().doubleValue();
   }
 
   /**
    * Query the total power drawn from the monitored PDP channels.
    *
    * @return the total power in Watts
+   * @deprecated Will be replaced with a method that returns a Quantity of Power in 2019
    */
+  @Deprecated
   public double getTotalPower() {
     return PDPJNI.getPDPTotalPower(m_module);
+  }
+
+  /*
+  public Quantity<Power> getTotalPower() {
+    return Quantities.getQuantity(PDPJNI.getPDPTotalPower(m_module), SI.WATT);
+  }
+  */
+
+  /**
+   * Query the total power drawn from the monitored PDP channels.
+   *
+   * @param unit The unit to return as
+   * @return the total power in Watts
+   */
+  public double getTotalPower(Unit<Power> unit) {
+    return Quantities.getQuantity(getTotalPower(), SI.WATT).to(unit).getValue().doubleValue();
   }
 
   /**
    * Query the total energy drawn from the monitored PDP channels.
    *
    * @return the total energy in Joules
+   * @deprecated Will be replaced with a method that returns a Quantity of Energy in 2019
    */
+  @Deprecated
   public double getTotalEnergy() {
     return PDPJNI.getPDPTotalEnergy(m_module);
+  }
+
+  /*
+  public Quantity<Energy> getTotalEnergy() {
+    return Quantities.getQuantity(PDPJNI.getPDPTotalEnergy(m_module), SI.JOULE);
+  }
+  */
+
+  /**
+   * Query the total energy drawn from the monitored PDP channels.
+   *
+   * @param unit The unit to return as
+   * @return the total energy in Joules
+   */
+  public double getTotalEnergy(Unit<Energy> unit) {
+    return Quantities.getQuantity(PDPJNI.getPDPTotalEnergy(m_module), SI.JOULE).to(unit).getValue().doubleValue();
   }
 
   /**
@@ -133,24 +252,24 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   @Override
   public void updateTable() {
     if (m_table != null) {
-      m_table.putNumber("Chan0", getCurrent(0));
-      m_table.putNumber("Chan1", getCurrent(1));
-      m_table.putNumber("Chan2", getCurrent(2));
-      m_table.putNumber("Chan3", getCurrent(3));
-      m_table.putNumber("Chan4", getCurrent(4));
-      m_table.putNumber("Chan5", getCurrent(5));
-      m_table.putNumber("Chan6", getCurrent(6));
-      m_table.putNumber("Chan7", getCurrent(7));
-      m_table.putNumber("Chan8", getCurrent(8));
-      m_table.putNumber("Chan9", getCurrent(9));
-      m_table.putNumber("Chan10", getCurrent(10));
-      m_table.putNumber("Chan11", getCurrent(11));
-      m_table.putNumber("Chan12", getCurrent(12));
-      m_table.putNumber("Chan13", getCurrent(13));
-      m_table.putNumber("Chan14", getCurrent(14));
-      m_table.putNumber("Chan15", getCurrent(15));
-      m_table.putNumber("Voltage", getVoltage());
-      m_table.putNumber("TotalCurrent", getTotalCurrent());
+      m_table.putNumber("Chan0", getCurrent(0, SI.AMPERE));
+      m_table.putNumber("Chan1", getCurrent(1, SI.AMPERE));
+      m_table.putNumber("Chan2", getCurrent(2, SI.AMPERE));
+      m_table.putNumber("Chan3", getCurrent(3, SI.AMPERE));
+      m_table.putNumber("Chan4", getCurrent(4, SI.AMPERE));
+      m_table.putNumber("Chan5", getCurrent(5, SI.AMPERE));
+      m_table.putNumber("Chan6", getCurrent(6, SI.AMPERE));
+      m_table.putNumber("Chan7", getCurrent(7, SI.AMPERE));
+      m_table.putNumber("Chan8", getCurrent(8, SI.AMPERE));
+      m_table.putNumber("Chan9", getCurrent(9, SI.AMPERE));
+      m_table.putNumber("Chan10", getCurrent(10, SI.AMPERE));
+      m_table.putNumber("Chan11", getCurrent(11, SI.AMPERE));
+      m_table.putNumber("Chan12", getCurrent(12, SI.AMPERE));
+      m_table.putNumber("Chan13", getCurrent(13, SI.AMPERE));
+      m_table.putNumber("Chan14", getCurrent(14, SI.AMPERE));
+      m_table.putNumber("Chan15", getCurrent(15, SI.AMPERE));
+      m_table.putNumber("Voltage", getVoltage(SI.VOLT));
+      m_table.putNumber("TotalCurrent", getTotalCurrent(SI.AMPERE));
     }
   }
 
