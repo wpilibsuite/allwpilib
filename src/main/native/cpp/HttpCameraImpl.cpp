@@ -79,7 +79,7 @@ void HttpCameraImpl::StreamThreadMain() {
 
     // connect
     llvm::SmallString<64> boundary;
-    HttpConnection* conn = DeviceStreamConnect(boundary);
+    wpi::HttpConnection* conn = DeviceStreamConnect(boundary);
 
     if (!m_active) break;
 
@@ -97,10 +97,10 @@ void HttpCameraImpl::StreamThreadMain() {
   SetConnected(false);
 }
 
-HttpConnection* HttpCameraImpl::DeviceStreamConnect(
+wpi::HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     llvm::SmallVectorImpl<char>& boundary) {
   // Build the request
-  HttpRequest req;
+  wpi::HttpRequest req;
   {
     std::lock_guard<std::mutex> lock(m_mutex);
     if (m_locations.empty()) {
@@ -109,7 +109,7 @@ HttpConnection* HttpCameraImpl::DeviceStreamConnect(
       return nullptr;
     }
     if (m_nextLocation >= m_locations.size()) m_nextLocation = 0;
-    req = HttpRequest{m_locations[m_nextLocation++], m_streamSettings};
+    req = wpi::HttpRequest{m_locations[m_nextLocation++], m_streamSettings};
     m_streamSettingsUpdated = false;
   }
 
@@ -119,8 +119,8 @@ HttpConnection* HttpCameraImpl::DeviceStreamConnect(
 
   if (!m_active || !stream) return nullptr;
 
-  auto connPtr = llvm::make_unique<HttpConnection>(std::move(stream), 1);
-  HttpConnection* conn = connPtr.get();
+  auto connPtr = llvm::make_unique<wpi::HttpConnection>(std::move(stream), 1);
+  wpi::HttpConnection* conn = connPtr.get();
 
   // update m_streamConn
   {
@@ -128,7 +128,9 @@ HttpConnection* HttpCameraImpl::DeviceStreamConnect(
     m_streamConn = std::move(connPtr);
   }
 
-  if (!conn->Handshake(req, GetName())) {
+  std::string warn;
+  if (!conn->Handshake(req, &warn)) {
+    SWARNING(GetName() << ": " << warn);
     std::lock_guard<std::mutex> lock(m_mutex);
     m_streamConn = nullptr;
     return nullptr;
@@ -254,7 +256,7 @@ bool HttpCameraImpl::DeviceStreamFrame(wpi::raw_istream& is,
 
 void HttpCameraImpl::SettingsThreadMain() {
   for (;;) {
-    HttpRequest req;
+    wpi::HttpRequest req;
     {
       std::unique_lock<std::mutex> lock(m_mutex);
       m_settingsCond.wait(lock, [=] {
@@ -263,7 +265,7 @@ void HttpCameraImpl::SettingsThreadMain() {
       if (!m_active) break;
 
       // Build the request
-      req = HttpRequest{m_locations[m_prefLocation], m_settings};
+      req = wpi::HttpRequest{m_locations[m_prefLocation], m_settings};
     }
 
     DeviceSendSettings(req);
@@ -272,15 +274,15 @@ void HttpCameraImpl::SettingsThreadMain() {
   SDEBUG("Settings Thread exiting");
 }
 
-void HttpCameraImpl::DeviceSendSettings(HttpRequest& req) {
+void HttpCameraImpl::DeviceSendSettings(wpi::HttpRequest& req) {
   // Try to connect
   auto stream = wpi::TCPConnector::connect(req.host.c_str(), req.port,
                                            Logger::GetInstance(), 1);
 
   if (!m_active || !stream) return;
 
-  auto connPtr = llvm::make_unique<HttpConnection>(std::move(stream), 1);
-  HttpConnection* conn = connPtr.get();
+  auto connPtr = llvm::make_unique<wpi::HttpConnection>(std::move(stream), 1);
+  wpi::HttpConnection* conn = connPtr.get();
 
   // update m_settingsConn
   {
@@ -289,7 +291,8 @@ void HttpCameraImpl::DeviceSendSettings(HttpRequest& req) {
   }
 
   // Just need a handshake as settings are sent via GET parameters
-  conn->Handshake(req, GetName());
+  std::string warn;
+  if (!conn->Handshake(req, &warn)) SWARNING(GetName() << ": " << warn);
 
   conn->stream->close();
 }
@@ -301,11 +304,13 @@ CS_HttpCameraKind HttpCameraImpl::GetKind() const {
 
 bool HttpCameraImpl::SetUrls(llvm::ArrayRef<std::string> urls,
                              CS_Status* status) {
-  std::vector<HttpLocation> locations;
+  std::vector<wpi::HttpLocation> locations;
   for (const auto& url : urls) {
     bool error = false;
-    locations.emplace_back(url, &error, GetName());
+    std::string errorMsg;
+    locations.emplace_back(url, &error, &errorMsg);
     if (error) {
+      SERROR(GetName() << ": " << errorMsg);
       *status = CS_BAD_URL;
       return false;
     }

@@ -10,12 +10,12 @@
 #include <chrono>
 
 #include <llvm/SmallString.h>
+#include <support/HttpUtil.h>
 #include <support/raw_socket_istream.h>
 #include <support/raw_socket_ostream.h>
 #include <tcpsockets/TCPAcceptor.h>
 
 #include "Handle.h"
-#include "HttpUtil.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
@@ -203,7 +203,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
     // unescape param
     bool error = false;
     llvm::SmallString<64> paramBuf;
-    llvm::StringRef param = UnescapeURI(rawParam, paramBuf, &error);
+    llvm::StringRef param = wpi::UnescapeURI(rawParam, paramBuf, &error);
     if (error) {
       llvm::SmallString<128> error;
       llvm::raw_svector_ostream oss{error};
@@ -215,7 +215,7 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
 
     // unescape value
     llvm::SmallString<64> valueBuf;
-    llvm::StringRef value = UnescapeURI(rawValue, valueBuf, &error);
+    llvm::StringRef value = wpi::UnescapeURI(rawValue, valueBuf, &error);
     if (error) {
       llvm::SmallString<128> error;
       llvm::raw_svector_ostream oss{error};
@@ -681,10 +681,9 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   m_fps = 0;
 
   // Read the request string from the stream
-  bool error = false;
   llvm::SmallString<128> reqBuf;
-  llvm::StringRef req = ReadLine(is, reqBuf, 4096, &error);
-  if (error) {
+  llvm::StringRef req = is.getline(reqBuf, 4096);
+  if (is.has_error()) {
     SDEBUG("error getting request string");
     return;
   }
@@ -738,8 +737,8 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
   // The end of the request is marked by a single, empty line
   llvm::SmallString<128> lineBuf;
   for (;;) {
-    if (ReadLine(is, lineBuf, 4096, &error).startswith("\n")) break;
-    if (error) return;
+    if (is.getline(lineBuf, 4096).startswith("\n")) break;
+    if (is.has_error()) return;
   }
 
   // Send response

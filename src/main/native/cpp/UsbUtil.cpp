@@ -19,7 +19,6 @@
 #include <llvm/raw_ostream.h>
 #include <support/raw_istream.h>
 
-#include "HttpUtil.h"
 #include "Log.h"
 
 namespace cs {
@@ -44,9 +43,8 @@ static llvm::StringRef GetUsbNameFromFile(int vendor, int product,
   llvm::SmallString<128> lineBuf;
   bool foundVendor = false;
   for (;;) {
-    bool error = false;
-    auto line = ReadLine(is, lineBuf, 4096, &error);
-    if (error) break;
+    auto line = is.getline(lineBuf, 4096);
+    if (is.has_error()) break;
 
     if (line.empty()) continue;
 

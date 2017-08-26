@@ -19,9 +19,9 @@
 
 #include <llvm/SmallString.h>
 #include <llvm/StringMap.h>
+#include <support/HttpUtil.h>
 #include <support/raw_istream.h>
 
-#include "HttpUtil.h"
 #include "SourceImpl.h"
 #include "cscore_cpp.h"
 
@@ -100,13 +100,14 @@ class HttpCameraImpl : public SourceImpl {
   void StreamThreadMain();
 
   // Functions used by StreamThreadMain()
-  HttpConnection* DeviceStreamConnect(llvm::SmallVectorImpl<char>& boundary);
+  wpi::HttpConnection* DeviceStreamConnect(
+      llvm::SmallVectorImpl<char>& boundary);
   void DeviceStream(wpi::raw_istream& is, llvm::StringRef boundary);
   bool DeviceStreamFrame(wpi::raw_istream& is, std::string& imageBuf);
 
   // The camera settings thread
   void SettingsThreadMain();
-  void DeviceSendSettings(HttpRequest& req);
+  void DeviceSendSettings(wpi::HttpRequest& req);
 
   std::atomic_bool m_connected{false};
   std::atomic_bool m_active{true};  // set to false to terminate thread
@@ -118,12 +119,12 @@ class HttpCameraImpl : public SourceImpl {
   //
 
   // The camera connections
-  std::unique_ptr<HttpConnection> m_streamConn;
-  std::unique_ptr<HttpConnection> m_settingsConn;
+  std::unique_ptr<wpi::HttpConnection> m_streamConn;
+  std::unique_ptr<wpi::HttpConnection> m_settingsConn;
 
   CS_HttpCameraKind m_kind;
 
-  std::vector<HttpLocation> m_locations;
+  std::vector<wpi::HttpLocation> m_locations;
   size_t m_nextLocation{0};
   int m_prefLocation{-1};  // preferred location
 
