@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,10 +9,10 @@
 
 #include <cctype>
 
-#include "llvm/STLExtras.h"
-#include "support/Base64.h"
-#include "llvm/StringExtras.h"
-#include "tcpsockets/TCPConnector.h"
+#include <llvm/STLExtras.h>
+#include <llvm/StringExtras.h>
+#include <support/Base64.h>
+#include <tcpsockets/TCPConnector.h>
 
 #include "Log.h"
 
@@ -76,7 +76,7 @@ llvm::StringRef UnescapeURI(llvm::StringRef str,
 
 llvm::StringRef EscapeURI(llvm::StringRef str, llvm::SmallVectorImpl<char>& buf,
                           bool spacePlus) {
-  static const char *const hexLut = "0123456789ABCDEF";
+  static const char* const hexLut = "0123456789ABCDEF";
 
   buf.clear();
   for (auto i = str.begin(), end = str.end(); i != end; ++i) {
@@ -104,7 +104,6 @@ llvm::StringRef EscapeURI(llvm::StringRef str, llvm::SmallVectorImpl<char>& buf,
 bool ParseHttpHeaders(wpi::raw_istream& is,
                       llvm::SmallVectorImpl<char>* contentType,
                       llvm::SmallVectorImpl<char>* contentLength) {
-
   if (contentType) contentType->clear();
   if (contentLength) contentLength->clear();
 
@@ -176,11 +175,9 @@ bool FindMultipartBoundary(wpi::raw_istream& is, llvm::StringRef boundary,
     // Fast-scan for '-'
     size_t pos = searchBuf.find('-', searchBuf[0] == '-' ? 1 : 0);
     if (pos == llvm::StringRef::npos) {
-      if (saveBuf)
-        saveBuf->append(searchBuf.data(), searchBuf.size());
+      if (saveBuf) saveBuf->append(searchBuf.data(), searchBuf.size());
     } else {
-      if (saveBuf)
-        saveBuf->append(searchBuf.data(), pos);
+      if (saveBuf) saveBuf->append(searchBuf.data(), pos);
 
       // move '-' and following to start of buffer (next read will fill)
       std::memmove(searchBuf.data(), searchBuf.data() + pos,

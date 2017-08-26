@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -84,7 +84,7 @@ public class CvSource extends VideoSource {
     return new VideoProperty(
         CameraServerJNI.createSourceProperty(m_handle, name, kind.getValue(), minimum, maximum, step, defaultValue, value));
   }
-  
+
   /// Create an integer property.
   /// @param name Property name
   /// @param minimum Minimum value
@@ -97,7 +97,7 @@ public class CvSource extends VideoSource {
     return new VideoProperty(
         CameraServerJNI.createSourceProperty(m_handle, name, VideoProperty.Kind.kInteger.getValue(), minimum, maximum, step, defaultValue, value));
   }
-  
+
   /// Create a boolean property.
   /// @param name Property name
   /// @param defaultValue Default value
@@ -107,7 +107,7 @@ public class CvSource extends VideoSource {
     return new VideoProperty(
         CameraServerJNI.createSourceProperty(m_handle, name, VideoProperty.Kind.kBoolean.getValue(), 0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0));
   }
-  
+
   /// Create a string property.
   /// @param name Property name
   /// @param value Current value

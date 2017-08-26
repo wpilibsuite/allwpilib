@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,19 +7,20 @@
 
 #include "Log.h"
 
-#include <cstdio>
-#ifdef _WIN32
- #include <cstdlib>
-#else
- #include <cstring>
-#endif
-
 #ifdef __APPLE__
- #include <libgen.h>
+#include <libgen.h>
 #endif
 
 #ifdef __ANDROID__
- #include <libgen.h>
+#include <libgen.h>
+#endif
+
+#include <cstdio>
+
+#ifdef _WIN32
+#include <cstdlib>
+#else
+#include <cstring>
 #endif
 
 using namespace cs;
@@ -49,9 +50,9 @@ static void def_log_func(unsigned int level, const char* file,
   std::fprintf(stderr, "CS: %s: %s (%s%s:%d)\n", levelmsg, msg, fname, ext,
                line);
 #elif __APPLE__
-  int len = strlen(msg) + 1;
+  int len = std::strlen(msg) + 1;
   char* basestr = new char[len + 1];
-  strncpy(basestr, file, len);
+  std::strncpy(basestr, file, len);
   std::fprintf(stderr, "CS: %s: %s (%s:%d)\n", levelmsg, msg, basename(basestr),
                line);
   delete[] basestr;

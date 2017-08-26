@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,15 +10,15 @@
 #include <algorithm>
 #include <cstring>
 
-#include "llvm/STLExtras.h"
-#include "support/timestamp.h"
+#include <llvm/STLExtras.h>
+#include <support/timestamp.h>
 
 #include "Log.h"
 #include "Notifier.h"
 
 using namespace cs;
 
-static constexpr std::size_t kMaxImagesAvail = 32;
+static constexpr size_t kMaxImagesAvail = 32;
 
 SourceImpl::SourceImpl(llvm::StringRef name) : m_name{name} {
   m_frame = Frame{*this, llvm::StringRef{}, 0};
@@ -202,8 +202,9 @@ int SourceImpl::GetPropertyDefault(int property, CS_Status* status) const {
   return prop->defaultValue;
 }
 
-llvm::StringRef SourceImpl::GetStringProperty(
-    int property, llvm::SmallVectorImpl<char>& buf, CS_Status* status) const {
+llvm::StringRef SourceImpl::GetStringProperty(int property,
+                                              llvm::SmallVectorImpl<char>& buf,
+                                              CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return llvm::StringRef{};
   std::lock_guard<std::mutex> lock(m_mutex);
@@ -239,8 +240,7 @@ std::vector<std::string> SourceImpl::GetEnumPropertyChoices(
 }
 
 VideoMode SourceImpl::GetVideoMode(CS_Status* status) const {
-  if (!m_properties_cached && !CacheProperties(status))
-    return VideoMode{};
+  if (!m_properties_cached && !CacheProperties(status)) return VideoMode{};
   std::lock_guard<std::mutex> lock(m_mutex);
   return m_mode;
 }
@@ -277,14 +277,13 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
 }
 
 std::unique_ptr<Image> SourceImpl::AllocImage(
-    VideoMode::PixelFormat pixelFormat, int width, int height,
-    std::size_t size) {
+    VideoMode::PixelFormat pixelFormat, int width, int height, size_t size) {
   std::unique_ptr<Image> image;
   {
     std::lock_guard<std::mutex> lock{m_poolMutex};
     // find the smallest existing frame that is at least big enough.
     int found = -1;
-    for (std::size_t i = 0; i < m_imagesAvail.size(); ++i) {
+    for (size_t i = 0; i < m_imagesAvail.size(); ++i) {
       // is it big enough?
       if (m_imagesAvail[i] && m_imagesAvail[i]->capacity() >= size) {
         // is it smaller than the last found?
@@ -317,9 +316,10 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
   auto image = AllocImage(pixelFormat, width, height, data.size());
 
   // Copy in image data
-  SDEBUG4("Copying data to " << ((void*)image->data()) << " from "
-                             << ((void*)data.data()) << " (" << data.size()
-                             << " bytes)");
+  SDEBUG4("Copying data to "
+          << reinterpret_cast<const void*>(image->data()) << " from "
+          << reinterpret_cast<const void*>(data.data()) << " (" << data.size()
+          << " bytes)");
   std::memcpy(image->data(), data.data(), data.size());
 
   PutFrame(std::move(image), time);
@@ -382,9 +382,9 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
   // Return the frame to the pool.  First try to find an empty slot, otherwise
   // add it to the end.
   auto it = std::find(m_imagesAvail.begin(), m_imagesAvail.end(), nullptr);
-  if (it != m_imagesAvail.end())
+  if (it != m_imagesAvail.end()) {
     *it = std::move(image);
-  else if (m_imagesAvail.size() > kMaxImagesAvail) {
+  } else if (m_imagesAvail.size() > kMaxImagesAvail) {
     // Replace smallest buffer; don't need to check for null because the above
     // find would have found it.
     auto it2 = std::min_element(
@@ -393,8 +393,9 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
           return a->capacity() < b->capacity();
         });
     if ((*it2)->capacity() < image->capacity()) *it2 = std::move(image);
-  } else
+  } else {
     m_imagesAvail.emplace_back(std::move(image));
+  }
 }
 
 std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {

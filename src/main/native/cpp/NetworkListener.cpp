@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2016. All Rights Reserved.                        */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,6 @@
 #include "NetworkListener.h"
 
 #ifdef __linux__
-#include <errno.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <sys/eventfd.h>
@@ -17,6 +16,8 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include <cerrno>
 #endif
 
 #include "Log.h"
@@ -58,14 +59,15 @@ void NetworkListener::Thread::Main() {
   // Create event socket so we can be shut down
   m_command_fd = ::eventfd(0, 0);
   if (m_command_fd < 0) {
-    ERROR("NetworkListener: could not create eventfd: " << strerror(errno));
+    ERROR(
+        "NetworkListener: could not create eventfd: " << std::strerror(errno));
     return;
   }
 
   // Create netlink socket
   int sd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
   if (sd < 0) {
-    ERROR("NetworkListener: could not create socket: " << strerror(errno));
+    ERROR("NetworkListener: could not create socket: " << std::strerror(errno));
     ::close(m_command_fd);
     m_command_fd = -1;
     return;
@@ -77,7 +79,7 @@ void NetworkListener::Thread::Main() {
   addr.nl_family = AF_NETLINK;
   addr.nl_groups = RTMGRP_LINK | RTMGRP_IPV4_IFADDR;
   if (bind(sd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
-    ERROR("NetworkListener: could not create socket: " << strerror(errno));
+    ERROR("NetworkListener: could not create socket: " << std::strerror(errno));
     ::close(sd);
     ::close(m_command_fd);
     m_command_fd = -1;
@@ -96,11 +98,11 @@ void NetworkListener::Thread::Main() {
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(m_command_fd, &readfds);
-    FD_SET(sd, &readfds); 
+    FD_SET(sd, &readfds);
     int nfds = std::max(m_command_fd, sd) + 1;
 
     if (::select(nfds, &readfds, nullptr, nullptr, &tv) < 0) {
-      ERROR("NetworkListener: select(): " << strerror(errno));
+      ERROR("NetworkListener: select(): " << std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
 
@@ -115,7 +117,8 @@ void NetworkListener::Thread::Main() {
     int len = ::recvmsg(sd, &msg, 0);
     if (len < 0) {
       if (errno == EWOULDBLOCK || errno == EAGAIN) continue;
-      ERROR("NetworkListener: could not read netlink: " << strerror(errno));
+      ERROR(
+          "NetworkListener: could not read netlink: " << std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
     if (len == 0) continue;  // EOF?

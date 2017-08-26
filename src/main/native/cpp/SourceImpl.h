@@ -1,12 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_SOURCEIMPL_H_
-#define CS_SOURCEIMPL_H_
+#ifndef CSCORE_SOURCEIMPL_H_
+#define CSCORE_SOURCEIMPL_H_
 
 #include <atomic>
 #include <condition_variable>
@@ -16,14 +16,14 @@
 #include <string>
 #include <vector>
 
-#include "llvm/ArrayRef.h"
-#include "llvm/StringMap.h"
-#include "llvm/StringRef.h"
+#include <llvm/ArrayRef.h>
+#include <llvm/StringMap.h>
+#include <llvm/StringRef.h>
 
-#include "cscore_cpp.h"
 #include "Frame.h"
 #include "Image.h"
 #include "PropertyImpl.h"
+#include "cscore_cpp.h"
 
 namespace cs {
 
@@ -31,7 +31,7 @@ class SourceImpl {
   friend class Frame;
 
  public:
-  SourceImpl(llvm::StringRef name);
+  explicit SourceImpl(llvm::StringRef name);
   virtual ~SourceImpl();
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
@@ -135,7 +135,7 @@ class SourceImpl {
   std::vector<VideoMode> EnumerateVideoModes(CS_Status* status) const;
 
   std::unique_ptr<Image> AllocImage(VideoMode::PixelFormat pixelFormat,
-                                    int width, int height, std::size_t size);
+                                    int width, int height, size_t size);
 
  protected:
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
@@ -220,4 +220,4 @@ class SourceImpl {
 
 }  // namespace cs
 
-#endif  // CS_SOURCEIMPL_H_
+#endif  // CSCORE_SOURCEIMPL_H_

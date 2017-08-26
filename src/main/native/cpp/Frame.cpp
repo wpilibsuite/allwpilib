@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,9 +7,9 @@
 
 #include "Frame.h"
 
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "Log.h"
 #include "SourceImpl.h"
@@ -200,11 +200,11 @@ Image* Frame::Convert(Image* image, VideoMode::PixelFormat pixelFormat,
       return ConvertBGRToGray(cur);
     case VideoMode::kBGR:
     case VideoMode::kMJPEG:
-      if (cur->pixelFormat == VideoMode::kYUYV)
+      if (cur->pixelFormat == VideoMode::kYUYV) {
         cur = ConvertYUYVToBGR(cur);
-      else if (cur->pixelFormat == VideoMode::kRGB565)
+      } else if (cur->pixelFormat == VideoMode::kRGB565) {
         cur = ConvertRGB565ToBGR(cur);
-      else if (cur->pixelFormat == VideoMode::kGray) {
+      } else if (cur->pixelFormat == VideoMode::kGray) {
         if (pixelFormat == VideoMode::kBGR)
           return ConvertGrayToBGR(cur);
         else

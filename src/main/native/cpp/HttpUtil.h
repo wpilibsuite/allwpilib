@@ -1,25 +1,27 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_HTTPUTIL_H_
-#define CS_HTTPUTIL_H_
+#ifndef CSCORE_HTTPUTIL_H_
+#define CSCORE_HTTPUTIL_H_
 
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
-#include "llvm/ArrayRef.h"
-#include "llvm/SmallString.h"
-#include "llvm/SmallVector.h"
-#include "llvm/StringMap.h"
-#include "llvm/StringRef.h"
-#include "support/raw_istream.h"
-#include "support/raw_socket_istream.h"
-#include "support/raw_socket_ostream.h"
-#include "tcpsockets/NetworkStream.h"
+#include <llvm/ArrayRef.h>
+#include <llvm/SmallString.h>
+#include <llvm/SmallVector.h>
+#include <llvm/StringMap.h>
+#include <llvm/StringRef.h>
+#include <support/raw_istream.h>
+#include <support/raw_socket_istream.h>
+#include <support/raw_socket_ostream.h>
+#include <tcpsockets/NetworkStream.h>
 
 namespace cs {
 
@@ -85,7 +87,8 @@ class HttpRequest {
  public:
   HttpRequest() = default;
 
-  HttpRequest(const HttpLocation& loc) : host{loc.host}, port{loc.port} {
+  explicit HttpRequest(const HttpLocation& loc)
+      : host{loc.host}, port{loc.port} {
     SetPath(loc.path, loc.params);
     SetAuth(loc);
   }
@@ -116,13 +119,17 @@ class HttpRequest {
   void SetPath(llvm::StringRef path_, const T& params);
 
   template <typename T>
-  static llvm::StringRef GetFirst(const T& elem) { return elem.first; }
+  static llvm::StringRef GetFirst(const T& elem) {
+    return elem.first;
+  }
   template <typename T>
   static llvm::StringRef GetFirst(const llvm::StringMapEntry<T>& elem) {
     return elem.getKey();
   }
   template <typename T>
-  static llvm::StringRef GetSecond(const T& elem) { return elem.second; }
+  static llvm::StringRef GetSecond(const T& elem) {
+    return elem.second;
+  }
 };
 
 class HttpConnection {
@@ -147,4 +154,4 @@ class HttpConnection {
 
 #include "HttpUtil.inl"
 
-#endif  // CS_HTTPUTIL_H_
+#endif  // CSCORE_HTTPUTIL_H_

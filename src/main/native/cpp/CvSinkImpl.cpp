@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,16 +7,16 @@
 
 #include "CvSinkImpl.h"
 
-#include "llvm/SmallString.h"
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <llvm/SmallString.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
-#include "cscore_cpp.h"
-#include "c_util.h"
 #include "Handle.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "c_util.h"
+#include "cscore_cpp.h"
 
 using namespace cs;
 
@@ -35,8 +35,7 @@ void CvSinkImpl::Stop() {
   m_active = false;
 
   // wake up any waiters by forcing an empty frame to be sent
-  if (auto source = GetSource())
-    source->Wakeup();
+  if (auto source = GetSource()) source->Wakeup();
 
   // join thread
   if (m_thread.joinable()) m_thread.join();
@@ -225,7 +224,7 @@ uint64_t CS_GrabSinkFrameTimeout(CS_Sink sink, struct CvMat* image,
 }
 
 uint64_t CS_GrabSinkFrameCpp(CS_Sink sink, cv::Mat* image, CS_Status* status) {
-   return cs::GrabSinkFrame(sink, *image, status);
+  return cs::GrabSinkFrame(sink, *image, status);
 }
 
 uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,

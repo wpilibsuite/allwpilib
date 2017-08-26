@@ -1,17 +1,18 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2016. All Rights Reserved.                        */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_NOTIFIER_H_
-#define CS_NOTIFIER_H_
+#ifndef CSCORE_NOTIFIER_H_
+#define CSCORE_NOTIFIER_H_
 
 #include <functional>
 
-#include "support/atomic_static.h"
-#include "support/SafeThread.h"
+#include <support/SafeThread.h>
+#include <support/atomic_static.h>
+
 #include "cscore_cpp.h"
 
 namespace cs {
@@ -70,4 +71,4 @@ class Notifier {
 
 }  // namespace cs
 
-#endif  // CS_NOTIFIER_H_
+#endif  // CSCORE_NOTIFIER_H_

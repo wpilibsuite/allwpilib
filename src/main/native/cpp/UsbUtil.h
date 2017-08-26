@@ -1,15 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_USBUTIL_H_
-#define CS_USBUTIL_H_
+#ifndef CSCORE_USBUTIL_H_
+#define CSCORE_USBUTIL_H_
 
-#include "llvm/SmallVector.h"
-#include "llvm/StringRef.h"
+#include <stdint.h>
+
+#include <llvm/SmallVector.h>
+#include <llvm/StringRef.h>
 
 namespace cs {
 
@@ -18,8 +20,8 @@ namespace cs {
 llvm::StringRef GetUsbNameFromId(int vendor, int product,
                                  llvm::SmallVectorImpl<char>& buf);
 
-int CheckedIoctl(int fd, unsigned long req, void* data, const char* name,
-                 const char* file, int line, bool quiet);
+int CheckedIoctl(int fd, unsigned long req, void* data,  // NOLINT(runtime/int)
+                 const char* name, const char* file, int line, bool quiet);
 
 #define DoIoctl(fd, req, data) \
   CheckedIoctl(fd, req, data, #req, __FILE__, __LINE__, false)
@@ -30,4 +32,4 @@ int CheckedIoctl(int fd, unsigned long req, void* data, const char* name,
 
 }  // namespace cs
 
-#endif  // CS_USBUTIL_H_
+#endif  // CSCORE_USBUTIL_H_

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015-2016. All Rights Reserved.                        */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -77,7 +77,7 @@ class Notifier::Thread : public wpi::SafeThread {
              int eventMask_)
         : callback(callback_), eventMask(eventMask_) {}
 
-    explicit operator bool() const { return bool(callback); }
+    explicit operator bool() const { return static_cast<bool>(callback); }
 
     std::string prefix;
     std::function<void(const RawEvent& event)> callback;
@@ -118,7 +118,7 @@ void Notifier::Thread::Main() {
       m_notifications.pop();
 
       // Use index because iterator might get invalidated.
-      for (std::size_t i = 0; i < m_listeners.size(); ++i) {
+      for (size_t i = 0; i < m_listeners.size(); ++i) {
         if (!m_listeners[i]) continue;  // removed
 
         // Event type must be within requested set for this listener.
@@ -139,8 +139,8 @@ done:
   if (m_on_exit) m_on_exit();
 }
 
-int Notifier::AddListener(
-    std::function<void(const RawEvent& event)> callback, int eventMask) {
+int Notifier::AddListener(std::function<void(const RawEvent& event)> callback,
+                          int eventMask) {
   Start();
   auto thr = m_owner.GetThread();
   return thr->m_listeners.emplace_back(callback, eventMask);

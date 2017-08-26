@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,15 +7,15 @@
 
 #include "HttpCameraImpl.h"
 
-#include "llvm/STLExtras.h"
-#include "support/timestamp.h"
-#include "tcpsockets/TCPConnector.h"
+#include <llvm/STLExtras.h>
+#include <support/timestamp.h>
+#include <tcpsockets/TCPConnector.h>
 
-#include "c_util.h"
 #include "Handle.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "c_util.h"
 
 using namespace cs;
 
@@ -569,8 +569,7 @@ char** CS_GetHttpCameraUrls(CS_Source source, int* count, CS_Status* status) {
   auto urls = cs::GetHttpCameraUrls(source, status);
   char** out = static_cast<char**>(std::malloc(urls.size() * sizeof(char*)));
   *count = urls.size();
-  for (std::size_t i = 0; i < urls.size(); ++i)
-    out[i] = cs::ConvertToC(urls[i]);
+  for (size_t i = 0; i < urls.size(); ++i) out[i] = cs::ConvertToC(urls[i]);
   return out;
 }
 

@@ -1,10 +1,17 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <chrono>
 #include <thread>
 
-#include "cscore.h"
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
 
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
+#include "cscore.h"
 
 int main(int argc, char** argv) {
   if (argc < 2) {
@@ -25,9 +32,9 @@ int main(int argc, char** argv) {
   int arg = 2;
   llvm::StringRef propName;
   for (; arg < argc && llvm::StringRef{argv[arg]} != "--"; ++arg) {
-    if (propName.empty())
+    if (propName.empty()) {
       propName = argv[arg];
-    else {
+    } else {
       llvm::StringRef propVal{argv[arg]};
       int intVal;
       if (propVal.getAsInteger(10, intVal))
@@ -46,9 +53,9 @@ int main(int argc, char** argv) {
   // Set rest
   propName = llvm::StringRef{};
   for (; arg < argc; ++arg) {
-    if (propName.empty())
+    if (propName.empty()) {
       propName = argv[arg];
-    else {
+    } else {
       llvm::StringRef propVal{argv[arg]};
       int intVal;
       if (propVal.getAsInteger(10, intVal))
@@ -66,7 +73,8 @@ int main(int argc, char** argv) {
     llvm::outs() << "  " << prop.GetName();
     switch (prop.GetKind()) {
       case cs::VideoProperty::kBoolean:
-        llvm::outs() << " (bool): " << "value=" << prop.Get()
+        llvm::outs() << " (bool): "
+                     << "value=" << prop.Get()
                      << " default=" << prop.GetDefault();
         break;
       case cs::VideoProperty::kInteger:
@@ -79,7 +87,8 @@ int main(int argc, char** argv) {
         llvm::outs() << " (string): " << prop.GetString(buf);
         break;
       case cs::VideoProperty::kEnum: {
-        llvm::outs() << " (enum): " << "value=" << prop.Get();
+        llvm::outs() << " (enum): "
+                     << "value=" << prop.Get();
         auto choices = prop.GetChoices();
         for (size_t i = 0; i < choices.size(); ++i) {
           if (choices[i].empty()) continue;

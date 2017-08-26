@@ -1,21 +1,24 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_FRAME_H_
-#define CS_FRAME_H_
+#ifndef CSCORE_FRAME_H_
+#define CSCORE_FRAME_H_
 
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include "llvm/SmallVector.h"
+#include <llvm/SmallVector.h>
 
-#include "cscore_cpp.h"
 #include "Image.h"
+#include "cscore_cpp.h"
 
 namespace cs {
 
@@ -29,7 +32,7 @@ class Frame {
 
  private:
   struct Impl {
-    Impl(SourceImpl& source_) : source(source_) {}
+    explicit Impl(SourceImpl& source_) : source(source_) {}
 
     std::recursive_mutex mutex;
     std::atomic_int refcount{0};
@@ -95,7 +98,7 @@ class Frame {
     return m_impl->images[0]->pixelFormat;
   }
 
-  Image* GetExistingImage(std::size_t i = 0) const {
+  Image* GetExistingImage(size_t i = 0) const {
     if (!m_impl) return nullptr;
     std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
     if (i >= m_impl->images.size()) return nullptr;
@@ -156,4 +159,4 @@ class Frame {
 
 }  // namespace cs
 
-#endif  // CS_FRAME_H_
+#endif  // CSCORE_FRAME_H_

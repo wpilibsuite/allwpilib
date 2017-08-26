@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,8 +7,8 @@
 
 #include "UsbCameraProperty.h"
 
-#include "llvm/SmallString.h"
-#include "llvm/STLExtras.h"
+#include <llvm/STLExtras.h>
+#include <llvm/SmallString.h>
 
 #include "UsbUtil.h"
 
@@ -73,8 +73,7 @@ static int SetIntCtrlIoctl(int fd, unsigned id, int type, int64_t value) {
   }
 }
 
-static int GetStringCtrlIoctl(int fd, int id, int maximum,
-                              std::string* value) {
+static int GetStringCtrlIoctl(int fd, int id, int maximum, std::string* value) {
   struct v4l2_ext_control ctrl;
   struct v4l2_ext_controls ctrls;
   std::memset(&ctrl, 0, sizeof(ctrl));
@@ -120,8 +119,9 @@ static llvm::StringRef NormalizeName(llvm::StringRef name,
       if (newWord) buf.push_back('_');
       newWord = false;
       buf.push_back(std::tolower(ch));
-    } else if (!buf.empty())
+    } else if (!buf.empty()) {
       newWord = true;
+    }
   }
   return llvm::StringRef(buf.data(), buf.size());
 }
@@ -158,7 +158,7 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl)
   }
 
   // name
-  std::size_t len = 0;
+  size_t len = 0;
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
   llvm::SmallString<64> name_buf;
   name = NormalizeName(llvm::StringRef(ctrl.name, len), name_buf);
@@ -196,7 +196,7 @@ UsbCameraProperty::UsbCameraProperty(const struct v4l2_queryctrl& ctrl)
   }
 
   // name
-  std::size_t len = 0;
+  size_t len = 0;
   while (len < sizeof(ctrl.name) && ctrl.name[len] != '\0') ++len;
   llvm::SmallString<64> name_buf;
   name = NormalizeName(
@@ -316,6 +316,5 @@ bool UsbCameraProperty::DeviceSet(std::unique_lock<std::mutex>& lock, int fd,
 
   return rv >= 0;
 }
-
 
 #endif  // __linux__

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,11 +10,11 @@
 #include <cstddef>
 #include <cstdlib>
 
-#include "opencv2/core/core.hpp"
-#include "llvm/SmallString.h"
+#include <llvm/SmallString.h>
+#include <opencv2/core/core.hpp>
 
-#include "cscore_cpp.h"
 #include "c_util.h"
+#include "cscore_cpp.h"
 
 extern "C" {
 
@@ -70,7 +70,7 @@ char** CS_GetEnumPropertyChoices(CS_Property property, int* count,
   auto choices = cs::GetEnumPropertyChoices(property, status);
   char** out = static_cast<char**>(std::malloc(choices.size() * sizeof(char*)));
   *count = choices.size();
-  for (std::size_t i = 0; i < choices.size(); ++i)
+  for (size_t i = 0; i < choices.size(); ++i)
     out[i] = cs::ConvertToC(choices[i]);
   return out;
 }
@@ -123,7 +123,7 @@ void CS_GetSourceVideoMode(CS_Source source, CS_VideoMode* mode,
 }
 
 CS_Bool CS_SetSourceVideoMode(CS_Source source, const CS_VideoMode* mode,
-                           CS_Status* status) {
+                              CS_Status* status) {
   return cs::SetSourceVideoMode(
       source, static_cast<const cs::VideoMode&>(*mode), status);
 }
@@ -341,9 +341,7 @@ void CS_ReleaseEnumeratedSinks(CS_Sink* sinks, int count) {
   std::free(sinks);
 }
 
-void CS_FreeString(char* str) {
-  std::free(str);
-}
+void CS_FreeString(char* str) { std::free(str); }
 
 void CS_FreeEnumPropertyChoices(char** choices, int count) {
   if (!choices) return;
@@ -359,16 +357,14 @@ void CS_FreeEnumeratedVideoModes(CS_VideoMode* modes, int count) {
   std::free(modes);
 }
 
-char* CS_GetHostname() {
-  return cs::ConvertToC(cs::GetHostname());
-}
+char* CS_GetHostname() { return cs::ConvertToC(cs::GetHostname()); }
 
 char** CS_GetNetworkInterfaces(int* count) {
   auto interfaces = cs::GetNetworkInterfaces();
   char** out =
       static_cast<char**>(std::malloc(interfaces.size() * sizeof(char*)));
   *count = interfaces.size();
-  for (std::size_t i = 0; i < interfaces.size(); ++i)
+  for (size_t i = 0; i < interfaces.size(); ++i)
     out[i] = cs::ConvertToC(interfaces[i]);
   return out;
 }

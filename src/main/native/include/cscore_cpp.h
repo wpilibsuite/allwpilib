@@ -1,12 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CPP_H_
-#define CSCORE_CPP_H_
+#ifndef CSCORE_CSCORE_CPP_H_
+#define CSCORE_CSCORE_CPP_H_
 
 #include <stdint.h>
 
@@ -14,9 +14,9 @@
 #include <string>
 #include <vector>
 
-#include "llvm/ArrayRef.h"
-#include "llvm/SmallVector.h"
-#include "llvm/StringRef.h"
+#include <llvm/ArrayRef.h>
+#include <llvm/SmallVector.h>
+#include <llvm/StringRef.h>
 
 #include "cscore_c.h"
 
@@ -88,7 +88,7 @@ struct RawEvent {
   };
 
   RawEvent() = default;
-  RawEvent(RawEvent::Kind kind_) : kind{kind_} {}
+  explicit RawEvent(RawEvent::Kind kind_) : kind{kind_} {}
   RawEvent(llvm::StringRef name_, CS_Handle handle_, RawEvent::Kind kind_)
       : kind{kind_}, name{name_} {
     if (kind_ == kSinkCreated || kind_ == kSinkDestroyed ||
@@ -339,4 +339,4 @@ uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
 void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
 }
 
-#endif  // CSCORE_CPP_H_
+#endif  // CSCORE_CSCORE_CPP_H_

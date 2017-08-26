@@ -1,27 +1,29 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_HTTPCAMERAIMPL_H_
-#define CS_HTTPCAMERAIMPL_H_
+#ifndef CSCORE_HTTPCAMERAIMPL_H_
+#define CSCORE_HTTPCAMERAIMPL_H_
 
 #include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <initializer_list>
+#include <memory>
+#include <string>
 #include <thread>
 #include <vector>
 
-#include "llvm/SmallString.h"
-#include "llvm/StringMap.h"
-#include "support/raw_istream.h"
+#include <llvm/SmallString.h>
+#include <llvm/StringMap.h>
+#include <support/raw_istream.h>
 
-#include "cscore_cpp.h"
 #include "HttpUtil.h"
 #include "SourceImpl.h"
+#include "cscore_cpp.h"
 
 namespace cs {
 
@@ -60,7 +62,7 @@ class HttpCameraImpl : public SourceImpl {
   class PropertyData : public PropertyImpl {
    public:
     PropertyData() = default;
-    PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
+    explicit PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
     PropertyData(llvm::StringRef name_, llvm::StringRef httpParam_,
                  bool viaSettings_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
@@ -122,7 +124,7 @@ class HttpCameraImpl : public SourceImpl {
   CS_HttpCameraKind m_kind;
 
   std::vector<HttpLocation> m_locations;
-  std::size_t m_nextLocation{0};
+  size_t m_nextLocation{0};
   int m_prefLocation{-1};  // preferred location
 
   std::condition_variable m_sinkEnabledCond;
@@ -136,7 +138,8 @@ class HttpCameraImpl : public SourceImpl {
 
 class AxisCameraImpl : public HttpCameraImpl {
  public:
-  AxisCameraImpl(llvm::StringRef name) : HttpCameraImpl{name, CS_HTTP_AXIS} {}
+  explicit AxisCameraImpl(llvm::StringRef name)
+      : HttpCameraImpl{name, CS_HTTP_AXIS} {}
 #if 0
   void SetProperty(int property, int value, CS_Status* status) override;
   void SetStringProperty(int property, llvm::StringRef value,
@@ -148,4 +151,4 @@ class AxisCameraImpl : public HttpCameraImpl {
 
 }  // namespace cs
 
-#endif  // CS_HTTPCAMERAIMPL_H_
+#endif  // CSCORE_HTTPCAMERAIMPL_H_

@@ -1,0 +1,35 @@
+cppHeaderExtensions {
+  h
+  hpp
+  inc
+}
+
+cppSrcExtensions {
+  cpp
+}
+
+otherExtensions {
+  java
+}
+
+genFileExclude {
+  gmock/
+  src/arm-linux-jni/
+  src/main/native/cpp/jni/CameraServerJNI\.cpp$
+}
+
+licenseUpdateExclude {
+  src/main/native/cpp/default_init_allocator\.h$
+}
+
+includeGuardRoots {
+  src/main/native/cpp/
+  src/main/native/include/
+}
+
+includeOtherLibs {
+  ^llvm/
+  ^opencv2/
+  ^support/
+  ^tcpsockets/
+}

@@ -1,25 +1,28 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_USBCAMERAIMPL_H_
-#define CS_USBCAMERAIMPL_H_
-
-#include <atomic>
-#include <thread>
-#include <vector>
+#ifndef CSCORE_USBCAMERAIMPL_H_
+#define CSCORE_USBCAMERAIMPL_H_
 
 #ifdef __linux__
 #include <linux/videodev2.h>
 #endif
 
-#include "llvm/raw_ostream.h"
-#include "llvm/SmallVector.h"
-#include "llvm/STLExtras.h"
-#include "support/raw_istream.h"
+#include <atomic>
+#include <memory>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
+
+#include <llvm/STLExtras.h>
+#include <llvm/SmallVector.h>
+#include <llvm/raw_ostream.h>
+#include <support/raw_istream.h>
 
 #include "SourceImpl.h"
 #include "UsbCameraBuffer.h"
@@ -70,14 +73,15 @@ class UsbCameraImpl : public SourceImpl {
       kCmdSetFPS,
       kCmdSetProperty,
       kCmdSetPropertyStr,
-      kNumSinksChanged,         // no response
+      kNumSinksChanged,  // no response
       kNumSinksEnabledChanged,  // no response
       // Responses
       kOk,
       kError
     };
 
-    Message(Kind kind_) : kind(kind_), from(std::this_thread::get_id()) {}
+    explicit Message(Kind kind_)
+        : kind(kind_), from(std::this_thread::get_id()) {}
 
     Kind kind;
     int data[4];
@@ -174,4 +178,4 @@ class UsbCameraImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CS_USBCAMERAIMPL_H_
+#endif  // CSCORE_USBCAMERAIMPL_H_

@@ -1,9 +1,12 @@
-// From: http://stackoverflow.com/questions/21028299/is-this-behavior-of-vectorresizesize-type-n-under-c11-and-boost-container
+// From:
+// http://stackoverflow.com/questions/21028299/is-this-behavior-of-vectorresizesize-type-n-under-c11-and-boost-container
 // Credits: Casey and Howard Hinnant
-#ifndef DEFAULT_INIT_ALLOCATOR_H_
-#define DEFAULT_INIT_ALLOCATOR_H_
+
+#ifndef CSCORE_DEFAULT_INIT_ALLOCATOR_H_
+#define CSCORE_DEFAULT_INIT_ALLOCATOR_H_
 
 #include <memory>
+#include <utility>
 
 namespace cs {
 
@@ -35,4 +38,4 @@ class default_init_allocator : public A {
 
 }  // namespace cs
 
-#endif  // DEFAULT_INIT_ALLOCATOR_H_
+#endif  // CSCORE_DEFAULT_INIT_ALLOCATOR_H_

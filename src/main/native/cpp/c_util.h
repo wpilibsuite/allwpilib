@@ -1,12 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_C_UTIL_H_
-#define CS_C_UTIL_H_
+#ifndef CSCORE_C_UTIL_H_
+#define CSCORE_C_UTIL_H_
+
+#include <cstdlib>
+#include <cstring>
+
+#include <llvm/StringRef.h>
 
 namespace cs {
 
@@ -19,4 +24,4 @@ inline char* ConvertToC(llvm::StringRef in) {
 
 }  // namespace cs
 
-#endif  // CS_C_UTIL_H_
+#endif  // CSCORE_C_UTIL_H_

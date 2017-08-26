@@ -1,18 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_IMAGE_H_
-#define CS_IMAGE_H_
+#ifndef CSCORE_IMAGE_H_
+#define CSCORE_IMAGE_H_
 
 #include <vector>
 
-#include "llvm/StringRef.h"
-
-#include "opencv2/core/core.hpp"
+#include <llvm/StringRef.h>
+#include <opencv2/core/core.hpp>
 
 #include "cscore_cpp.h"
 #include "default_init_allocator.h"
@@ -25,13 +24,10 @@ class Image {
   friend class Frame;
 
  public:
-
 #ifndef __linux__
-  explicit Image(std::size_t capacity) {
-    m_data.reserve(capacity);
-  }
+  explicit Image(size_t capacity) { m_data.reserve(capacity); }
 #else
-  explicit Image(std::size_t capacity)
+  explicit Image(size_t capacity)
       : m_data{capacity, default_init_allocator<uchar>{}} {
     m_data.resize(0);
   }
@@ -43,18 +39,18 @@ class Image {
   // Getters
   operator llvm::StringRef() const { return str(); }
   llvm::StringRef str() const { return llvm::StringRef(data(), size()); }
-  std::size_t capacity() const { return m_data.capacity(); }
+  size_t capacity() const { return m_data.capacity(); }
   const char* data() const {
     return reinterpret_cast<const char*>(m_data.data());
   }
   char* data() { return reinterpret_cast<char*>(m_data.data()); }
-  std::size_t size() const { return m_data.size(); }
+  size_t size() const { return m_data.size(); }
 
   const std::vector<uchar>& vec() const { return m_data; }
   std::vector<uchar>& vec() { return m_data; }
 
-  void resize(std::size_t size) { m_data.resize(size); }
-  void SetSize(std::size_t size) { m_data.resize(size); }
+  void resize(size_t size) { m_data.resize(size); }
+  void SetSize(size_t size) { m_data.resize(size); }
 
   cv::Mat AsMat() {
     int type;
@@ -103,4 +99,4 @@ class Image {
 
 }  // namespace cs
 
-#endif  // CS_IMAGE_H_
+#endif  // CSCORE_IMAGE_H_

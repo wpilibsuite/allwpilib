@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,8 +28,7 @@ std::vector<VideoSink> VideoSource::EnumerateSinks() {
 
   std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());
-  for (int handle : handles)
-    sinks.emplace_back(VideoSink{handle});
+  for (int handle : handles) sinks.emplace_back(VideoSink{handle});
   return sinks;
 }
 
@@ -40,8 +39,7 @@ std::vector<VideoSource> VideoSource::EnumerateSources() {
 
   std::vector<VideoSource> sources;
   sources.reserve(handles.size());
-  for (int handle : handles)
-    sources.emplace_back(VideoSource{handle});
+  for (int handle : handles) sources.emplace_back(VideoSource{handle});
   return sources;
 }
 
@@ -52,7 +50,6 @@ std::vector<VideoSink> VideoSink::EnumerateSinks() {
 
   std::vector<VideoSink> sinks;
   sinks.reserve(handles.size());
-  for (int handle : handles)
-    sinks.emplace_back(VideoSink{handle});
+  for (int handle : handles) sinks.emplace_back(VideoSink{handle});
   return sinks;
 }

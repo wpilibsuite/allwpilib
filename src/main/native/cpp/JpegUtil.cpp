@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,7 +7,7 @@
 
 #include "JpegUtil.h"
 
-#include "support/raw_istream.h"
+#include <support/raw_istream.h>
 
 namespace cs {
 
@@ -54,8 +54,7 @@ bool IsJpeg(llvm::StringRef data) {
 
   // Check for valid SOI
   auto bytes = data.bytes_begin();
-  if (bytes[0] != 0xff || bytes[1] != 0xd8)
-    return false;
+  if (bytes[0] != 0xff || bytes[1] != 0xd8) return false;
 #if 0
   // Check for valid JPEG header (null terminated JFIF)
   if (bytes[2] == 0xff && bytes[3] == 0xe0) {
@@ -72,7 +71,7 @@ bool GetJpegSize(llvm::StringRef data, int* width, int* height) {
   auto bytes = data.bytes_begin();
   size_t blockLength = bytes[4] * 256 + bytes[5] + 4;
   for (;;) {
-    data = data.substr(blockLength);    // Get to the next block
+    data = data.substr(blockLength);  // Get to the next block
     if (data.size() < 4) return false;  // EOF
     bytes = data.bytes_begin();
     if (bytes[0] != 0xff) return false;  // not a tag
@@ -88,7 +87,7 @@ bool GetJpegSize(llvm::StringRef data, int* width, int* height) {
   }
 }
 
-bool JpegNeedsDHT(const char* data, std::size_t* size, std::size_t* locSOF) {
+bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
   llvm::StringRef sdata(data, *size);
   if (!IsJpeg(sdata)) return false;
 
@@ -98,12 +97,12 @@ bool JpegNeedsDHT(const char* data, std::size_t* size, std::size_t* locSOF) {
   auto bytes = sdata.bytes_begin();
   size_t blockLength = bytes[4] * 256 + bytes[5] + 4;
   for (;;) {
-    sdata = sdata.substr(blockLength);   // Get to the next block
+    sdata = sdata.substr(blockLength);  // Get to the next block
     if (sdata.size() < 4) return false;  // EOF
     bytes = sdata.bytes_begin();
-    if (bytes[0] != 0xff) return false;                   // not a tag
-    if (bytes[1] == 0xda) break;                          // SOS
-    if (bytes[1] == 0xc4) return false;                   // DHT
+    if (bytes[0] != 0xff) return false;  // not a tag
+    if (bytes[1] == 0xda) break;  // SOS
+    if (bytes[1] == 0xc4) return false;  // DHT
     if (bytes[1] == 0xc0) *locSOF = sdata.data() - data;  // SOF
     // Go to the next block
     blockLength = bytes[2] * 256 + bytes[3] + 2;
@@ -129,8 +128,7 @@ static inline void ReadInto(wpi::raw_istream& is, std::string& buf,
   is.read(&(*buf.begin()) + oldSize, len);
 }
 
-bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width,
-              int* height) {
+bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
   // in case we don't get a SOF
   *width = 0;
   *height = 0;
@@ -163,7 +161,7 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width,
     pos += blockLength;
 
     bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
-    if (bytes[0] != 0xff) return false;     // not a tag
+    if (bytes[0] != 0xff) return false;  // not a tag
     if (bytes[1] == 0xda) {
       // SOS: need to keep reading until we reach a normal marker.
       // Byte stuffing ensures we don't get false markers.
@@ -178,15 +176,16 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width,
               (bytes[0] < 0xd0 || bytes[0] > 0xd7))
             break;
           maybeMarker = false;
-        } else if (bytes[0] == 0xff)
+        } else if (bytes[0] == 0xff) {
           maybeMarker = true;
+        }
       }
       // Point back to the start of the block
       --pos;
       bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
     }
-    if (bytes[0] != 0xff) return false;     // not a tag
-    if (bytes[1] == 0xd9) return true;      // EOI, we're done
+    if (bytes[0] != 0xff) return false;  // not a tag
+    if (bytes[1] == 0xd9) return true;  // EOI, we're done
     if (bytes[1] == 0xc0) sofBlock = true;  // SOF
 
     // Go to the next block

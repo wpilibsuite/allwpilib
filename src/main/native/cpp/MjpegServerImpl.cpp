@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -9,22 +9,21 @@
 
 #include <chrono>
 
-#include "llvm/SmallString.h"
-#include "support/raw_socket_istream.h"
-#include "support/raw_socket_ostream.h"
-#include "tcpsockets/TCPAcceptor.h"
+#include <llvm/SmallString.h>
+#include <support/raw_socket_istream.h>
+#include <support/raw_socket_ostream.h>
+#include <tcpsockets/TCPAcceptor.h>
 
-#include "c_util.h"
-#include "cscore_cpp.h"
 #include "Handle.h"
 #include "HttpUtil.h"
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
 #include "SourceImpl.h"
+#include "c_util.h"
+#include "cscore_cpp.h"
 
 using namespace cs;
-
 
 // The boundary used for the M-JPEG stream.
 // It separates the multipart stream of pictures
@@ -38,11 +37,13 @@ static const char* emptyRootPage =
     "</body></html>";
 
 // An HTML page to be sent when a source exists
-static const char* startRootPage = "<html><head>\n"
+static const char* startRootPage =
+    "<html><head>\n"
     "<script>\n"
     "function httpGetAsync(name, val)\n"
     "{\n"
-    "    var host = location.protocol + '//' + location.host + '/?action=command&' + name + '=' + val;\n"
+    "    var host = location.protocol + '//' + location.host + "
+    "'/?action=command&' + name + '=' + val;\n"
     "    var xmlHttp = new XMLHttpRequest();\n"
     "    xmlHttp.open(\"GET\", host, true);\n"
     "    xmlHttp.send(null);\n"
@@ -69,11 +70,11 @@ static const char* startRootPage = "<html><head>\n"
     "<a href=\"/settings.json\">Settings JSON</a>\n"
     "</div>\n"
     "<div class=\"settings\">\n";
-static const char* endRootPage ="</div></body></html>";
+static const char* endRootPage = "</div></body></html>";
 
 class MjpegServerImpl::ConnThread : public wpi::SafeThread {
  public:
-  ConnThread(llvm::StringRef name) : m_name(name) {}
+  explicit ConnThread(llvm::StringRef name) : m_name(name) {}
 
   void Main();
 
@@ -372,7 +373,8 @@ void MjpegServerImpl::ConnThread::SendHTML(llvm::raw_ostream& os,
           if (choice->empty()) continue;  // skip empty choices
           // replace any non-printable characters in name with spaces
           llvm::SmallString<128> ch_name;
-          for (char ch : *choice) ch_name.push_back(isprint(ch) ? ch : ' ');
+          for (char ch : *choice)
+            ch_name.push_back(std::isprint(ch) ? ch : ' ');
           os << "<input id=\"" << name << j << "\" type=\"radio\" name=\""
              << name << "\" value=\"" << ch_name << "\" onclick=\"update('"
              << name << "', " << j << ")\"";
@@ -407,12 +409,24 @@ void MjpegServerImpl::ConnThread::SendHTML(llvm::raw_ostream& os,
   for (auto mode : source.EnumerateVideoModes(&status)) {
     os << "<tr><td>";
     switch (mode.pixelFormat) {
-      case VideoMode::kMJPEG: os << "MJPEG"; break;
-      case VideoMode::kYUYV: os << "YUYV"; break;
-      case VideoMode::kRGB565: os << "RGB565"; break;
-      case VideoMode::kBGR: os << "BGR"; break;
-      case VideoMode::kGray: os << "gray"; break;
-      default: os << "unknown"; break;
+      case VideoMode::kMJPEG:
+        os << "MJPEG";
+        break;
+      case VideoMode::kYUYV:
+        os << "YUYV";
+        break;
+      case VideoMode::kRGB565:
+        os << "RGB565";
+        break;
+      case VideoMode::kBGR:
+        os << "BGR";
+        break;
+      case VideoMode::kGray:
+        os << "gray";
+        break;
+      default:
+        os << "unknown";
+        break;
     }
     os << "</td><td>" << mode.width;
     os << "</td><td>" << mode.height;
@@ -480,7 +494,7 @@ void MjpegServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
         if (j != 0) os << ", ";
         // replace any non-printable characters in name with spaces
         llvm::SmallString<128> ch_name;
-        for (char ch : *choice) ch_name.push_back(isprint(ch) ? ch : ' ');
+        for (char ch : *choice) ch_name.push_back(std::isprint(ch) ? ch : ' ');
         os << '"' << j << "\": \"" << ch_name << '"';
       }
       os << "}\n";
@@ -497,12 +511,24 @@ void MjpegServerImpl::ConnThread::SendJSON(llvm::raw_ostream& os,
     os << '{';
     os << "\n\"pixelFormat\": \"";
     switch (mode.pixelFormat) {
-      case VideoMode::kMJPEG: os << "MJPEG"; break;
-      case VideoMode::kYUYV: os << "YUYV"; break;
-      case VideoMode::kRGB565: os << "RGB565"; break;
-      case VideoMode::kBGR: os << "BGR"; break;
-      case VideoMode::kGray: os << "gray"; break;
-      default: os << "unknown"; break;
+      case VideoMode::kMJPEG:
+        os << "MJPEG";
+        break;
+      case VideoMode::kYUYV:
+        os << "YUYV";
+        break;
+      case VideoMode::kRGB565:
+        os << "RGB565";
+        break;
+      case VideoMode::kBGR:
+        os << "BGR";
+        break;
+      case VideoMode::kGray:
+        os << "gray";
+        break;
+      default:
+        os << "unknown";
+        break;
     }
     os << "\",\n\"width\": \"" << mode.width << '"';
     os << ",\n\"height\": \"" << mode.height << '"';
@@ -550,8 +576,7 @@ void MjpegServerImpl::Stop() {
   }
 
   // wake up connection threads by forcing an empty frame to be sent
-  if (auto source = GetSource())
-    source->Wakeup();
+  if (auto source = GetSource()) source->Wakeup();
 }
 
 // Send HTTP response and a stream of JPG-frames
@@ -602,9 +627,9 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     }
 
     const char* data = image->data();
-    std::size_t size = image->size();
+    size_t size = image->size();
     bool addDHT = false;
-    std::size_t locSOF = size;
+    size_t locSOF = size;
     switch (image->pixelFormat) {
       case VideoMode::kMJPEG:
         // Determine if we need to add DHT to it, and allocate enough space
@@ -731,7 +756,8 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
         ProcessCommand(os, *source, parameters, true);
       } else {
         SendHeader(os, 200, "OK", "text/plain");
-        os << "Ignored due to no connected source." << "\r\n";
+        os << "Ignored due to no connected source."
+           << "\r\n";
         SDEBUG("Ignored due to no connected source.");
       }
       break;

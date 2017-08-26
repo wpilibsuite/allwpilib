@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,17 +7,17 @@
 
 #include "CvSourceImpl.h"
 
-#include "llvm/STLExtras.h"
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "support/timestamp.h"
+#include <llvm/STLExtras.h>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <support/timestamp.h>
 
-#include "cscore_cpp.h"
-#include "c_util.h"
 #include "Handle.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "c_util.h"
+#include "cscore_cpp.h"
 
 using namespace cs;
 
@@ -346,8 +346,7 @@ void CS_PutSourceFrame(CS_Source source, struct CvMat* image,
   return cs::PutSourceFrame(source, mat, status);
 }
 
-void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, 
-                          CS_Status* status) {
+void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status) {
   return cs::PutSourceFrame(source, *image, status);
 }
 

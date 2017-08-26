@@ -1,13 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
 #include "UsbCameraImpl.h"
-
-#include <algorithm>
 
 #ifdef __linux__
 #include <dirent.h>
@@ -24,21 +22,21 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
-
 #elif defined(_WIN32)
-
 #endif
 
-#include "llvm/raw_ostream.h"
-#include "llvm/SmallString.h"
-#include "support/timestamp.h"
+#include <algorithm>
 
-#include "cscore_cpp.h"
-#include "c_util.h"
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+#include <support/timestamp.h>
+
 #include "Handle.h"
 #include "Log.h"
 #include "Notifier.h"
 #include "UsbUtil.h"
+#include "c_util.h"
+#include "cscore_cpp.h"
 
 using namespace cs;
 
@@ -327,7 +325,7 @@ void UsbCameraImpl::CameraThreadMain() {
     DoFdSet(notify_fd, &readfds, &nfds);
 
     if (select(nfds, &readfds, nullptr, nullptr, &tv) < 0) {
-      SERROR("select(): " << strerror(errno));
+      SERROR("select(): " << std::strerror(errno));
       break;  // XXX: is this the right thing to do here?
     }
 
@@ -476,7 +474,7 @@ void UsbCameraImpl::DeviceConnect() {
     // Restore settings
     SDEBUG3("restoring settings");
     std::unique_lock<std::mutex> lock2(m_mutex);
-    for (std::size_t i = 0; i < m_propertyData.size(); ++i) {
+    for (size_t i = 0; i < m_propertyData.size(); ++i) {
       const auto prop =
           static_cast<const UsbCameraProperty*>(m_propertyData[i].get());
       if (!prop || !prop->valueSet || prop->percentage) continue;
@@ -981,11 +979,12 @@ void UsbCameraImpl::DeviceCacheProperties() {
   int fd = m_fd.load();
   if (fd < 0) return;
 
-  constexpr __u32 nextFlags = V4L2_CTRL_FLAG_NEXT_CTRL
 #ifdef V4L2_CTRL_FLAG_NEXT_COMPOUND
-                          | V4L2_CTRL_FLAG_NEXT_COMPOUND
+  constexpr __u32 nextFlags =
+      V4L2_CTRL_FLAG_NEXT_CTRL | V4L2_CTRL_FLAG_NEXT_COMPOUND;
+#else
+  constexpr __u32 nextFlags = V4L2_CTRL_FLAG_NEXT_CTRL;
 #endif
-      ;
   __u32 id = nextFlags;
 
   while (auto prop = UsbCameraProperty::DeviceQuery(fd, &id)) {
@@ -1280,7 +1279,7 @@ std::vector<UsbCameraInfo> EnumerateUsbCameras(CS_Status* status) {
     }
     closedir(dp);
   } else {
-    //*status = ;
+    // *status = ;
     ERROR("Could not open /dev");
     return retval;
   }
@@ -1316,7 +1315,7 @@ CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status) {
   CS_UsbCameraInfo* out = static_cast<CS_UsbCameraInfo*>(
       std::malloc(cameras.size() * sizeof(CS_UsbCameraInfo)));
   *count = cameras.size();
-  for (std::size_t i = 0; i < cameras.size(); ++i) {
+  for (size_t i = 0; i < cameras.size(); ++i) {
     out[i].dev = cameras[i].dev;
     out[i].path = ConvertToC(cameras[i].path);
     out[i].name = ConvertToC(cameras[i].name);
@@ -1360,10 +1359,8 @@ CS_UsbCameraInfo* CS_EnumerateUsbCameras(int* count, CS_Status* status) {
   return nullptr;
 }
 
-void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count) {
-}
+void CS_FreeEnumeratedUsbCameras(CS_UsbCameraInfo* cameras, int count) {}
 
 }  // extern "C"
 
 #endif  // __linux__
-

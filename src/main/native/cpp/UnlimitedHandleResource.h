@@ -1,21 +1,21 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_UNLIMITEDHANDLERESOURCE_H_
-#define CS_UNLIMITEDHANDLERESOURCE_H_
+#ifndef CSCORE_UNLIMITEDHANDLERESOURCE_H_
+#define CSCORE_UNLIMITEDHANDLERESOURCE_H_
 
 #include <memory>
 #include <mutex>
 #include <utility>
 #include <vector>
 
-#include "llvm/ArrayRef.h"
-#include "llvm/SmallVector.h"
-#include "support/atomic_static.h"
+#include <llvm/ArrayRef.h>
+#include <llvm/SmallVector.h>
+#include <support/atomic_static.h>
 
 namespace cs {
 
@@ -116,8 +116,7 @@ inline std::shared_ptr<TStruct> UnlimitedHandleResource<
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
   if (index < 0) return nullptr;
   std::lock_guard<TMutex> sync(m_handleMutex);
-  if (index >= static_cast<int>(m_structures.size()))
-    return nullptr;
+  if (index >= static_cast<int>(m_structures.size())) return nullptr;
   return m_structures[index];
 }
 
@@ -182,4 +181,4 @@ class StaticUnlimitedHandleResource
 
 }  // namespace cs
 
-#endif  // CS_UNLIMITEDHANDLERESOURCE_H_
+#endif  // CSCORE_UNLIMITEDHANDLERESOURCE_H_

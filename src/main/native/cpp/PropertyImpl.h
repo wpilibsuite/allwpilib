@@ -1,17 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_PROPERTYIMPL_H_
-#define CS_PROPERTYIMPL_H_
+#ifndef CSCORE_PROPERTYIMPL_H_
+#define CSCORE_PROPERTYIMPL_H_
 
 #include <string>
 #include <vector>
 
-#include "llvm/StringRef.h"
+#include <llvm/StringRef.h>
 
 #include "cscore_c.h"
 
@@ -21,7 +21,7 @@ namespace cs {
 class PropertyImpl {
  public:
   PropertyImpl() = default;
-  PropertyImpl(llvm::StringRef name_) : name{name_} {}
+  explicit PropertyImpl(llvm::StringRef name_) : name{name_} {}
   PropertyImpl(llvm::StringRef name_, CS_PropertyKind kind_, int step_,
                int defaultValue_, int value_)
       : name{name_},
@@ -73,4 +73,4 @@ class PropertyImpl {
 
 }  // namespace cs
 
-#endif  // CS_PROPERTYIMPL_H_
+#endif  // CSCORE_PROPERTYIMPL_H_

@@ -1,14 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_OO_H_
-#define CSCORE_OO_H_
+#ifndef CSCORE_CSCORE_OO_H_
+#define CSCORE_CSCORE_OO_H_
 
 #include <initializer_list>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "cscore_cpp.h"
 
@@ -416,18 +419,18 @@ class CvSource : public VideoSource {
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateIntegerProperty(llvm::StringRef name,
-                                      int minimum, int maximum, int step,
-                                      int defaultValue, int value);
+  VideoProperty CreateIntegerProperty(llvm::StringRef name, int minimum,
+                                      int maximum, int step, int defaultValue,
+                                      int value);
 
   /// Create a boolean property.
   /// @param name Property name
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateBooleanProperty(llvm::StringRef name,
-                                      bool defaultValue, bool value);
-  
+  VideoProperty CreateBooleanProperty(llvm::StringRef name, bool defaultValue,
+                                      bool value);
+
   /// Create a string property.
   /// @param name Property name
   /// @param defaultValue Default value
@@ -641,4 +644,4 @@ class VideoListener {
 
 #include "cscore_oo.inl"
 
-#endif  // CSCORE_OO_H_
+#endif  // CSCORE_CSCORE_OO_H_

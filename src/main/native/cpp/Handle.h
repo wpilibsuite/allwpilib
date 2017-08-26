@@ -1,19 +1,21 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_HANDLE_H_
-#define CS_HANDLE_H_
+#ifndef CSCORE_HANDLE_H_
+#define CSCORE_HANDLE_H_
 
 #include <atomic>
+#include <memory>
+#include <utility>
 
-#include "llvm/StringRef.h"
+#include <llvm/StringRef.h>
 
-#include "cscore_c.h"
 #include "UnlimitedHandleResource.h"
+#include "cscore_c.h"
 
 namespace cs {
 
@@ -27,16 +29,10 @@ class SourceImpl;
 
 class Handle {
  public:
-  enum Type {
-    kUndefined = 0,
-    kProperty = 0x40,
-    kSource,
-    kSink,
-    kListener
-  };
+  enum Type { kUndefined = 0, kProperty = 0x40, kSource, kSink, kListener };
   enum { kIndexMax = 0xffff };
 
-  Handle(CS_Handle handle) : m_handle(handle) {}
+  Handle(CS_Handle handle) : m_handle(handle) {}  // NOLINT
   operator CS_Handle() const { return m_handle; }
 
   Handle(int index, Type type) {
@@ -129,4 +125,4 @@ class Sinks : public UnlimitedHandleResource<Handle, SinkData, Handle::kSink> {
 
 }  // namespace cs
 
-#endif  // CS_HANDLE_H_
+#endif  // CSCORE_HANDLE_H_

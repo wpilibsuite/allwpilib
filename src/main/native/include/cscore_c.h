@@ -1,15 +1,16 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_C_H_
-#define CSCORE_C_H_
+#ifndef CSCORE_CSCORE_C_H_
+#define CSCORE_CSCORE_C_H_
 
-#include <stddef.h>
 #include <stdint.h>
+
+#include <cstddef>
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,7 +47,7 @@ typedef CS_Handle CS_Source;
 enum CS_StatusValue {
   CS_PROPERTY_WRITE_FAILED = 2000,
   CS_OK = 0,
-  CS_INVALID_HANDLE = -2000,    // handle was invalid (does not exist)
+  CS_INVALID_HANDLE = -2000,  // handle was invalid (does not exist)
   CS_WRONG_HANDLE_SUBTYPE = -2001,
   CS_INVALID_PROPERTY = -2002,
   CS_WRONG_PROPERTY_TYPE = -2003,
@@ -127,11 +128,7 @@ enum CS_HttpCameraKind {
 //
 // Sink kinds
 //
-enum CS_SinkKind {
-  CS_SINK_UNKNOWN = 0,
-  CS_SINK_MJPEG = 2,
-  CS_SINK_CV = 4
-};
+enum CS_SinkKind { CS_SINK_UNKNOWN = 0, CS_SINK_MJPEG = 2, CS_SINK_CV = 4 };
 
 //
 // Listener event kinds
@@ -165,7 +162,7 @@ struct CS_Event {
   CS_Sink sink;
 
   // Source/sink/property name
-  const char *name;
+  const char* name;
 
   // Fields for CS_SOURCE_VIDEOMODE_CHANGED event
   CS_VideoMode mode;
@@ -383,4 +380,4 @@ void CS_FreeNetworkInterfaces(char** interfaces, int count);
 }
 #endif
 
-#endif /* CSCORE_C_H_ */
+#endif  // CSCORE_CSCORE_C_H_

@@ -1,8 +1,16 @@
-#include "cscore.h"
-#include "opencv2/core/core.hpp"
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
 
+#include <cstdio>
 #include <iostream>
-#include <stdio.h>
+
+#include <opencv2/core/core.hpp>
+
+#include "cscore.h"
 
 int main() {
   cs::HttpCamera camera{"httpcam", "http://localhost:8081/?action=stream"};
@@ -21,7 +29,8 @@ int main() {
       std::cout << "error: " << cvsink.GetError() << std::endl;
       continue;
     }
-    std::cout << "got frame at time " << time << " size " << test.size() << std::endl;
+    std::cout << "got frame at time " << time << " size " << test.size()
+              << std::endl;
     cv::flip(test, flip, 0);
     cvsource.PutFrame(flip);
   }

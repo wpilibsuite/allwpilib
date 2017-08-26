@@ -1,19 +1,19 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_USBCAMERAPROPERTY_H_
-#define CS_USBCAMERAPROPERTY_H_
-
-#include <memory>
-#include <mutex>
+#ifndef CSCORE_USBCAMERAPROPERTY_H_
+#define CSCORE_USBCAMERAPROPERTY_H_
 
 #ifdef __linux__
 #include <linux/videodev2.h>
 #endif
+
+#include <memory>
+#include <mutex>
 
 #include "PropertyImpl.h"
 
@@ -23,7 +23,7 @@ namespace cs {
 class UsbCameraProperty : public PropertyImpl {
  public:
   UsbCameraProperty() = default;
-  UsbCameraProperty(llvm::StringRef name_) : PropertyImpl{name_} {}
+  explicit UsbCameraProperty(llvm::StringRef name_) : PropertyImpl{name_} {}
 
   // Normalized property constructor
   UsbCameraProperty(llvm::StringRef name_, int rawIndex_,
@@ -42,9 +42,9 @@ class UsbCameraProperty : public PropertyImpl {
 
 #ifdef __linux__
 #ifdef VIDIOC_QUERY_EXT_CTRL
-  UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl);
+  explicit UsbCameraProperty(const struct v4l2_query_ext_ctrl& ctrl);
 #endif
-  UsbCameraProperty(const struct v4l2_queryctrl& ctrl);
+  explicit UsbCameraProperty(const struct v4l2_queryctrl& ctrl);
 
   static std::unique_ptr<UsbCameraProperty> DeviceQuery(int fd, __u32* id);
 
@@ -61,9 +61,9 @@ class UsbCameraProperty : public PropertyImpl {
   int propPair{0};
 
   unsigned id{0};  // implementation-level id
-  int type{0};     // implementation type, not CS_PropertyKind!
+  int type{0};  // implementation type, not CS_PropertyKind!
 };
 
 }  // namespace cs
 
-#endif  // CS_USBCAMERAPROPERTY_H_
+#endif  // CSCORE_USBCAMERAPROPERTY_H_

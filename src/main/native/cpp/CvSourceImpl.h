@@ -1,15 +1,17 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CS_CVSOURCEIMPL_H_
-#define CS_CVSOURCEIMPL_H_
+#ifndef CSCORE_CVSOURCEIMPL_H_
+#define CSCORE_CVSOURCEIMPL_H_
 
 #include <atomic>
 #include <functional>
+#include <memory>
+#include <string>
 #include <vector>
 
 #include "SourceImpl.h"
@@ -58,7 +60,7 @@ class CvSourceImpl : public SourceImpl {
   class PropertyData : public PropertyImpl {
    public:
     PropertyData() = default;
-    PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
+    explicit PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
     PropertyData(llvm::StringRef name_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
         : PropertyImpl{name_, kind_, step_, defaultValue_, value_} {
@@ -84,4 +86,4 @@ class CvSourceImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CS_CVSOURCEIMPL_H_
+#endif  // CSCORE_CVSOURCEIMPL_H_
