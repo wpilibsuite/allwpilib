@@ -9,10 +9,11 @@
 
 #include <memory>
 
+#include <llvm/raw_ostream.h>
+
 #include "ErrorBase.h"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
-#include "llvm/raw_ostream.h"
 
 namespace frc {
 

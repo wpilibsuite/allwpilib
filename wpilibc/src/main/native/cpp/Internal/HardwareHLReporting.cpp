@@ -7,7 +7,7 @@
 
 #include "Internal/HardwareHLReporting.h"
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
 
 using namespace frc;
 

@@ -34,9 +34,12 @@ modifiableFileExclude {
 }
 
 includeOtherLibs {
-  ^HAL/
+  ^FRC_FPGA_ChipObject/
+  ^FRC_NetworkCommunication/
+  ^i2clib/
   ^llvm/
   ^opencv2/
+  ^spilib/
   ^support/
 }
 

@@ -7,8 +7,9 @@
 
 #pragma once
 
+#include <HAL/cpp/priority_mutex.h>
+
 #include "Base.h"
-#include "HAL/cpp/priority_mutex.h"
 
 namespace frc {
 

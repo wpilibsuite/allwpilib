@@ -9,8 +9,9 @@
 
 #include <mutex>
 
+#include <FRC_NetworkCommunication/AICalibration.h>
+
 #include "AnalogInternal.h"
-#include "FRC_NetworkCommunication/AICalibration.h"
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/HAL.h"
 #include "HAL/cpp/priority_mutex.h"

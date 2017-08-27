@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/cpp/priority_mutex.h"  // NOLINT(build/include_order)
+#include <HAL/cpp/priority_mutex.h>  // NOLINT(build/include_order)
 
 #include <atomic>
 #include <condition_variable>

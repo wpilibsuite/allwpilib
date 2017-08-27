@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "HAL/cpp/make_unique.h"
+#include <HAL/cpp/make_unique.h>
 
 // MSVC 2013 doesn't allow "= default" on move constructors, but since we are
 // (currently) only actually using the move constructors in non-MSVC situations

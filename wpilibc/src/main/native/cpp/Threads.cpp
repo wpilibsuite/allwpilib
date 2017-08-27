@@ -5,11 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Threads.h"
 #include "Threads.h"
 
+#include <HAL/HAL.h>
+#include <HAL/Threads.h>
+
 #include "ErrorBase.h"
-#include "HAL/HAL.h"
 
 namespace frc {
 /**

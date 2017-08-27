@@ -14,9 +14,10 @@
 #include <string>
 #include <vector>
 
+#include <HAL/cpp/priority_mutex.h>
+
 #include "Commands/Command.h"
 #include "ErrorBase.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "SmartDashboard/NamedSendable.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "networktables/NetworkTable.h"

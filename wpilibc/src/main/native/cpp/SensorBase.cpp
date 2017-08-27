@@ -7,15 +7,16 @@
 
 #include "SensorBase.h"
 
-#include "HAL/AnalogInput.h"
-#include "HAL/AnalogOutput.h"
-#include "HAL/DIO.h"
-#include "HAL/HAL.h"
-#include "HAL/PDP.h"
-#include "HAL/PWM.h"
-#include "HAL/Ports.h"
-#include "HAL/Relay.h"
-#include "HAL/Solenoid.h"
+#include <HAL/AnalogInput.h>
+#include <HAL/AnalogOutput.h>
+#include <HAL/DIO.h>
+#include <HAL/HAL.h>
+#include <HAL/PDP.h>
+#include <HAL/PWM.h>
+#include <HAL/Ports.h>
+#include <HAL/Relay.h>
+#include <HAL/Solenoid.h>
+
 #include "WPIErrors.h"
 
 using namespace frc;

@@ -10,8 +10,9 @@
 #include <chrono>
 #include <thread>
 
+#include <HAL/HAL.h>
+
 #include "DriverStation.h"
-#include "HAL/HAL.h"
 #include "Utility.h"
 
 namespace frc {

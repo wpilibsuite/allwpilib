@@ -7,10 +7,11 @@
 
 #include "CameraServer.h"
 
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 #include "ntcore_cpp.h"
 
 using namespace frc;

@@ -9,7 +9,7 @@
 
 #include <chrono>
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
 
 using namespace frc;
 

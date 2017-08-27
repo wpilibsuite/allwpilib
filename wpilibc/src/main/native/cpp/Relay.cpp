@@ -5,15 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Relay.h"
 #include "Relay.h"
 
-#include "HAL/HAL.h"
-#include "HAL/Ports.h"
+#include <HAL/HAL.h>
+#include <HAL/Ports.h>
+#include <HAL/Relay.h>
+#include <llvm/SmallString.h>
+
 #include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
 #include "WPIErrors.h"
-#include "llvm/SmallString.h"
 
 using namespace frc;
 

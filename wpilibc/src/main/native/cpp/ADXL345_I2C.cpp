@@ -7,7 +7,8 @@
 
 #include "ADXL345_I2C.h"
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
+
 #include "I2C.h"
 #include "LiveWindow/LiveWindow.h"
 

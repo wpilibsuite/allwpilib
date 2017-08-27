@@ -7,10 +7,11 @@
 
 #include "HAL/I2C.h"
 
+#include <i2clib/i2c-lib.h>
+
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
-#include "i2clib/i2c-lib.h"
 
 using namespace hal;
 

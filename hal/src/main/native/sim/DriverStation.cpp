@@ -176,16 +176,10 @@ void HAL_ObserveUserProgramTest(void) {
 static pthread_key_t lastCountKey;
 static pthread_once_t lastCountKeyOnce = PTHREAD_ONCE_INIT;
 
-static void InitLastCountKey() {
-  pthread_key_create(&lastCountKey, std::free);
-}
+static void InitLastCountKey() { pthread_key_create(&lastCountKey, std::free); }
 #endif
 
 bool HAL_IsNewControlData(void) {
-  // There is a rollover error condition here. At Packet# = n * (uintmax), this
-  // will return false when instead it should return true. However, this at a
-  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
-  // worth the cycles to check.
 #ifdef __APPLE__
   pthread_once(&lastCountKeyOnce, InitLastCountKey);
   int* lastCountPtr = static_cast<int*>(pthread_getspecific(lastCountKey));
@@ -198,6 +192,10 @@ bool HAL_IsNewControlData(void) {
 #else
   thread_local int lastCount{-1};
 #endif
+  // There is a rollover error condition here. At Packet# = n * (uintmax), this
+  // will return false when instead it should return true. However, this at a
+  // 20ms rate occurs once every 2.7 years of DS connected runtime, so not
+  // worth the cycles to check.
   int currentCount = 0;
   {
     std::unique_lock<hal::priority_mutex> lock(newDSDataAvailableMutex);

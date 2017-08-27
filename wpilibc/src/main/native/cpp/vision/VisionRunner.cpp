@@ -7,9 +7,10 @@
 
 #include "vision/VisionRunner.h"
 
+#include <opencv2/core/mat.hpp>
+
 #include "DriverStation.h"
 #include "RobotBase.h"
-#include "opencv2/core/mat.hpp"
 
 using namespace frc;
 

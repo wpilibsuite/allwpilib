@@ -7,9 +7,10 @@
 
 #include "Counter.h"
 
+#include <HAL/HAL.h>
+
 #include "AnalogTrigger.h"
 #include "DigitalInput.h"
-#include "HAL/HAL.h"
 #include "WPIErrors.h"
 
 using namespace frc;

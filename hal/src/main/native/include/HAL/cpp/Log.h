@@ -10,8 +10,8 @@
 #include <chrono>
 #include <string>
 
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
 
 inline std::string NowTime();
 

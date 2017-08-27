@@ -9,8 +9,9 @@
 
 #include <cmath>
 
+#include <HAL/HAL.h>
+
 #include "DriverStation.h"
-#include "HAL/HAL.h"
 #include "WPIErrors.h"
 
 using namespace frc;

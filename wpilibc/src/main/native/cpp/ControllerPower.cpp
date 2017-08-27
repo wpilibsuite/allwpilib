@@ -9,9 +9,10 @@
 
 #include <stdint.h>
 
+#include <HAL/HAL.h>
+#include <HAL/Power.h>
+
 #include "ErrorBase.h"
-#include "HAL/HAL.h"
-#include "HAL/Power.h"
 
 using namespace frc;
 

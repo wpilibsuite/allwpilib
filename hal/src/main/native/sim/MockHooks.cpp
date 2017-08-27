@@ -10,8 +10,9 @@
 #include <cstdio>
 #include <thread>
 
+#include <support/timestamp.h>
+
 #include "MockHooksInternal.h"
-#include "support/timestamp.h"
 
 static std::atomic<bool> programStarted{false};
 

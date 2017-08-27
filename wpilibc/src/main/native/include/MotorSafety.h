@@ -9,7 +9,7 @@
 
 #define DEFAULT_SAFETY_EXPIRATION 0.1
 
-#include "llvm/raw_ostream.h"
+#include <llvm/raw_ostream.h>
 
 namespace frc {
 

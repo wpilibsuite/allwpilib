@@ -17,9 +17,11 @@
 #include <mutex>
 #include <thread>
 
-#include "FRC_NetworkCommunication/CANSessionMux.h"
-#include "FRC_NetworkCommunication/FRCComm.h"
-#include "FRC_NetworkCommunication/LoadOut.h"
+#include <FRC_NetworkCommunication/CANSessionMux.h>
+#include <FRC_NetworkCommunication/FRCComm.h>
+#include <FRC_NetworkCommunication/LoadOut.h>
+#include <llvm/raw_ostream.h>
+
 #include "HAL/ChipObject.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
@@ -28,7 +30,6 @@
 #include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "ctre/ctre.h"
-#include "llvm/raw_ostream.h"
 #include "visa/visa.h"
 
 using namespace hal;

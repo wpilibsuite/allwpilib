@@ -7,10 +7,11 @@
 
 #include "Notifier.h"  // NOLINT(build/include_order)
 
+#include <llvm/raw_ostream.h>
+
 #include "TestBench.h"
 #include "Timer.h"
 #include "gtest/gtest.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 

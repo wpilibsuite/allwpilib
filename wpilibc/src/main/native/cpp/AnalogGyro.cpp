@@ -6,13 +6,14 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogGyro.h"
-#include "HAL/AnalogGyro.h"
 
 #include <climits>
 
+#include <HAL/AnalogGyro.h>
+#include <HAL/Errors.h>
+#include <HAL/HAL.h>
+
 #include "AnalogInput.h"
-#include "HAL/Errors.h"
-#include "HAL/HAL.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"

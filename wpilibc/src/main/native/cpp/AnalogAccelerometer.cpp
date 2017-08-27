@@ -7,7 +7,8 @@
 
 #include "AnalogAccelerometer.h"
 
-#include "HAL/HAL.h"
+#include <HAL/HAL.h>
+
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
 

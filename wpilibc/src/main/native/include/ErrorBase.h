@@ -7,10 +7,11 @@
 
 #pragma once
 
+#include <HAL/cpp/priority_mutex.h>
+#include <llvm/StringRef.h>
+
 #include "Base.h"
 #include "Error.h"
-#include "HAL/cpp/priority_mutex.h"
-#include "llvm/StringRef.h"
 
 #define wpi_setErrnoErrorWithContext(context) \
   this->SetErrnoError((context), __FILE__, __FUNCTION__, __LINE__)

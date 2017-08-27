@@ -7,13 +7,14 @@
 
 #include "DoubleSolenoid.h"
 
-#include "HAL/HAL.h"
-#include "HAL/Ports.h"
-#include "HAL/Solenoid.h"
+#include <HAL/HAL.h>
+#include <HAL/Ports.h>
+#include <HAL/Solenoid.h>
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+
 #include "LiveWindow/LiveWindow.h"
 #include "WPIErrors.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
