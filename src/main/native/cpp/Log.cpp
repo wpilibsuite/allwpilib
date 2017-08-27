@@ -7,20 +7,9 @@
 
 #include "Log.h"
 
-#include <cstdio>
-#ifdef _WIN32
-#include <cstdlib>
-#else
-#include <cstring>
-#endif
-
-#ifdef __APPLE__
-#include <libgen.h>
-#endif
-
-#ifdef __ANDROID__
-#include <libgen.h>
-#endif
+#include "llvm/Path.h"
+#include "llvm/StringRef.h"
+#include "llvm/raw_ostream.h"
 
 using namespace nt;
 
@@ -29,36 +18,21 @@ ATOMIC_STATIC_INIT(Logger)
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
   if (level == 20) {
-    std::fprintf(stderr, "NT: %s\n", msg);
+    llvm::errs() << "NT: " << msg << '\n';
     return;
   }
 
-  const char* levelmsg;
+  llvm::StringRef levelmsg;
   if (level >= 50)
-    levelmsg = "CRITICAL";
+    levelmsg = "CRITICAL: ";
   else if (level >= 40)
-    levelmsg = "ERROR";
+    levelmsg = "ERROR: ";
   else if (level >= 30)
-    levelmsg = "WARNING";
+    levelmsg = "WARNING: ";
   else
     return;
-#ifdef _WIN32
-  char fname[60];
-  char ext[10];
-  _splitpath_s(file, nullptr, 0, nullptr, 0, fname, 60, ext, 10);
-  std::fprintf(stderr, "NT: %s: %s (%s%s:%d)\n", levelmsg, msg, fname, ext,
-               line);
-#elif __APPLE__
-  int len = strlen(msg) + 1;
-  char* basestr = new char[len + 1];
-  strncpy(basestr, file, len);
-  std::fprintf(stderr, "NT: %s: %s (%s:%d)\n", levelmsg, msg, basename(basestr),
-               line);
-  delete[] basestr;
-#else
-  std::fprintf(stderr, "NT: %s: %s (%s:%d)\n", levelmsg, msg, basename(file),
-               line);
-#endif
+  llvm::errs() << "NT: " << levelmsg << msg << " ("
+               << llvm::sys::path::filename(file) << ':' << line << ")\n";
 }
 
 Logger::Logger() { SetLogger(def_log_func); }
