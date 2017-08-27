@@ -1,0 +1,32 @@
+sudo: false
+dist: trusty
+language: java
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-6
+      - python3
+      - clang-format-3.8
+
+install:
+  - pip3 install wpiformat
+  - mkdir -p $HOME/latest-gcc-symlinks  # see travis-ci/travis-ci#3668
+  - ln -s /usr/bin/g++-6 $HOME/latest-gcc-symlinks/g++
+  - ln -s /usr/bin/gcc-6 $HOME/latest-gcc-symlinks/gcc
+  - export PATH=$HOME/latest-gcc-symlinks:$PATH
+
+before_cache:
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+script:
+  - wpiformat -y 2017 -clang 3.8
+  - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
+  - ./gradlew --no-daemon --console=plain -PskipAthena :hal:halSimSharedLibrary :wpilibc:wpilibcSharedLibrary :wpilibj:wpilibJNISharedSharedLibrary :wpilibj:jar
