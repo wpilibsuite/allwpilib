@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpiutil.RuntimeDetector;
 import edu.wpi.first.wpilibj.hal.HALUtil;
-import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
 
 public class DevMain {
   /**

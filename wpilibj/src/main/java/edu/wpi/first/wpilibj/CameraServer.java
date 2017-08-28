@@ -21,9 +21,10 @@ import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.cscore.VideoProperty;
 import edu.wpi.cscore.VideoSink;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.networktables.NetworkTablesJNI;
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -59,8 +60,8 @@ public class CameraServer {
   private String m_primarySourceName;
   private final Hashtable<String, VideoSource> m_sources;
   private final Hashtable<String, VideoSink> m_sinks;
-  private final Hashtable<Integer, ITable> m_tables;  // indexed by source handle
-  private final ITable m_publishTable;
+  private final Hashtable<Integer, NetworkTable> m_tables;  // indexed by source handle
+  private final NetworkTable m_publishTable;
   private final VideoListener m_videoListener; //NOPMD
   private final int m_tableListener; //NOPMD
   private int m_nextPort;
@@ -168,7 +169,7 @@ public class CameraServer {
       if (source == 0) {
         continue;
       }
-      ITable table = m_tables.get(source);
+      NetworkTable table = m_tables.get(source);
       if (table != null) {
         // Don't set stream values if this is a HttpCamera passthrough
         if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
@@ -179,7 +180,7 @@ public class CameraServer {
         // Set table value
         String[] values = getSinkStreamValues(sink);
         if (values.length > 0) {
-          table.putStringArray("streams", values);
+          table.getEntry("streams").setStringArray(values);
         }
       }
     }
@@ -189,12 +190,12 @@ public class CameraServer {
       int source = i.getHandle();
 
       // Get the source's subtable (if none exists, we're done)
-      ITable table = m_tables.get(source);
+      NetworkTable table = m_tables.get(source);
       if (table != null) {
         // Set table value
         String[] values = getSourceStreamValues(source);
         if (values.length > 0) {
-          table.putStringArray("streams", values);
+          table.getEntry("streams").setStringArray(values);
         }
       }
     }
@@ -237,7 +238,7 @@ public class CameraServer {
   }
 
   @SuppressWarnings("JavadocMethod")
-  private static void putSourcePropertyValue(ITable table, VideoEvent event, boolean isNew) {
+  private static void putSourcePropertyValue(NetworkTable table, VideoEvent event, boolean isNew) {
     String name;
     String infoName;
     if (event.name.startsWith("raw_")) {
@@ -248,35 +249,36 @@ public class CameraServer {
       infoName = "PropertyInfo/" + event.name;
     }
 
+    NetworkTableEntry entry = table.getEntry(name);
     switch (event.propertyKind) {
       case kBoolean:
         if (isNew) {
-          table.setDefaultBoolean(name, event.value != 0);
+          entry.setDefaultBoolean(event.value != 0);
         } else {
-          table.putBoolean(name, event.value != 0);
+          entry.setBoolean(event.value != 0);
         }
         break;
       case kInteger:
       case kEnum:
         if (isNew) {
-          table.setDefaultNumber(name, event.value);
-          table.putNumber(infoName + "/min",
+          entry.setDefaultDouble(event.value);
+          table.getEntry(infoName + "/min").setDouble(
               CameraServerJNI.getPropertyMin(event.propertyHandle));
-          table.putNumber(infoName + "/max",
+          table.getEntry(infoName + "/max").setDouble(
               CameraServerJNI.getPropertyMax(event.propertyHandle));
-          table.putNumber(infoName + "/step",
+          table.getEntry(infoName + "/step").setDouble(
               CameraServerJNI.getPropertyStep(event.propertyHandle));
-          table.putNumber(infoName + "/default",
+          table.getEntry(infoName + "/default").setDouble(
               CameraServerJNI.getPropertyDefault(event.propertyHandle));
         } else {
-          table.putNumber(name, event.value);
+          entry.setDouble(event.value);
         }
         break;
       case kString:
         if (isNew) {
-          table.setDefaultString(name, event.valueStr);
+          entry.setDefaultString(event.valueStr);
         } else {
-          table.putString(name, event.valueStr);
+          entry.setString(event.valueStr);
         }
         break;
       default:
@@ -290,7 +292,7 @@ public class CameraServer {
     m_sources = new Hashtable<>();
     m_sinks = new Hashtable<>();
     m_tables = new Hashtable<>();
-    m_publishTable = NetworkTable.getTable(kPublishName);
+    m_publishTable = NetworkTableInstance.getDefault().getTable(kPublishName);
     m_nextPort = kBasePort;
     m_addresses = new String[0];
 
@@ -310,81 +312,82 @@ public class CameraServer {
       switch (event.kind) {
         case kSourceCreated: {
           // Create subtable for the camera
-          ITable table = m_publishTable.getSubTable(event.name);
+          NetworkTable table = m_publishTable.getSubTable(event.name);
           m_tables.put(event.sourceHandle, table);
-          table.putString("source", makeSourceValue(event.sourceHandle));
-          table.putString("description",
+          table.getEntry("source").setString(makeSourceValue(event.sourceHandle));
+          table.getEntry("description").setString(
               CameraServerJNI.getSourceDescription(event.sourceHandle));
-          table.putBoolean("connected", CameraServerJNI.isSourceConnected(event.sourceHandle));
-          table.putStringArray("streams", getSourceStreamValues(event.sourceHandle));
+          table.getEntry("connected").setBoolean(
+              CameraServerJNI.isSourceConnected(event.sourceHandle));
+          table.getEntry("streams").setStringArray(getSourceStreamValues(event.sourceHandle));
           try {
             VideoMode mode = CameraServerJNI.getSourceVideoMode(event.sourceHandle);
-            table.setDefaultString("mode", videoModeToString(mode));
-            table.putStringArray("modes", getSourceModeValues(event.sourceHandle));
+            table.getEntry("mode").setDefaultString(videoModeToString(mode));
+            table.getEntry("modes").setStringArray(getSourceModeValues(event.sourceHandle));
           } catch (VideoException ex) {
             // Do nothing. Let the other event handlers update this if there is an error.
           }
           break;
         }
         case kSourceDestroyed: {
-          ITable table = m_tables.get(event.sourceHandle);
+          NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
-            table.putString("source", "");
-            table.putStringArray("streams", new String[0]);
-            table.putStringArray("modes", new String[0]);
+            table.getEntry("source").setString("");
+            table.getEntry("streams").setStringArray(new String[0]);
+            table.getEntry("modes").setStringArray(new String[0]);
           }
           break;
         }
         case kSourceConnected: {
-          ITable table = m_tables.get(event.sourceHandle);
+          NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             // update the description too (as it may have changed)
-            table.putString("description",
+            table.getEntry("description").setString(
                 CameraServerJNI.getSourceDescription(event.sourceHandle));
-            table.putBoolean("connected", true);
+            table.getEntry("connected").setBoolean(true);
           }
           break;
         }
         case kSourceDisconnected: {
-          ITable table = m_tables.get(event.sourceHandle);
+          NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
-            table.putBoolean("connected", false);
+            table.getEntry("connected").setBoolean(false);
           }
           break;
         }
         case kSourceVideoModesUpdated: {
-          ITable table = m_tables.get(event.sourceHandle);
+          NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
-            table.putStringArray("modes", getSourceModeValues(event.sourceHandle));
+            table.getEntry("modes").setStringArray(getSourceModeValues(event.sourceHandle));
           }
           break;
         }
         case kSourceVideoModeChanged: {
-          ITable table = m_tables.get(event.sourceHandle);
+          NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
-            table.putString("mode", videoModeToString(event.mode));
+            table.getEntry("mode").setString(videoModeToString(event.mode));
           }
           break;
         }
         case kSourcePropertyCreated: {
-          ITable table = m_tables.get(event.sourceHandle);
+          NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             putSourcePropertyValue(table, event, true);
           }
           break;
         }
         case kSourcePropertyValueUpdated: {
-          ITable table = m_tables.get(event.sourceHandle);
+          NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             putSourcePropertyValue(table, event, false);
           }
           break;
         }
         case kSourcePropertyChoicesUpdated: {
-          ITable table = m_tables.get(event.sourceHandle);
+          NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
             String[] choices = CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
-            table.putStringArray("PropertyInfo/" + event.name + "/choices", choices);
+            table.getEntry("PropertyInfo/" + event.name + "/choices").setStringArray(choices);
           }
           break;
         }
@@ -405,9 +408,9 @@ public class CameraServer {
     // We don't currently support changing settings via NT due to
     // synchronization issues, so just update to current setting if someone
     // else tries to change it.
-    m_tableListener = NetworkTablesJNI.addEntryListener(kPublishName + "/",
-      (uid, key, eventValue, flags) -> {
-        String relativeKey = key.substring(kPublishName.length() + 1);
+    m_tableListener = NetworkTableInstance.getDefault().addEntryListener(kPublishName + "/",
+      (event) -> {
+        String relativeKey = event.name.substring(kPublishName.length() + 1);
 
         // get source (sourceName/...)
         int subKeyIndex = relativeKey.indexOf('/');
@@ -427,7 +430,7 @@ public class CameraServer {
         String propName;
         if (relativeKey.equals("mode")) {
           // reset to current mode
-          NetworkTablesJNI.putString(key, videoModeToString(source.getVideoMode()));
+          event.getEntry().setString(videoModeToString(source.getVideoMode()));
           return;
         } else if (relativeKey.startsWith("Property/")) {
           propName = relativeKey.substring(9);
@@ -444,21 +447,21 @@ public class CameraServer {
             return;
           case kBoolean:
             // reset to current setting
-            NetworkTablesJNI.putBoolean(key, property.get() != 0);
+            event.getEntry().setBoolean(property.get() != 0);
             return;
           case kInteger:
           case kEnum:
             // reset to current setting
-            NetworkTablesJNI.putDouble(key, property.get());
+            event.getEntry().setDouble(property.get());
             return;
           case kString:
             // reset to current setting
-            NetworkTablesJNI.putString(key, property.getString());
+            event.getEntry().setString(property.getString());
             return;
           default:
             return;
         }
-      }, ITable.NOTIFY_IMMEDIATE | ITable.NOTIFY_UPDATE);
+      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate);
   }
 
   /**
