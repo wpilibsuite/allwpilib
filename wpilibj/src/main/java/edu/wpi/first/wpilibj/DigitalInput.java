@@ -7,12 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Class to read a digital input. This class will read digital inputs and return the current value
@@ -105,26 +106,31 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
     return "Digital Input";
   }
 
-  private ITable m_table;
-
+  private NetworkTable m_table;
+  private NetworkTableEntry m_valueEntry;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
-  }
-
-
-  @Override
-  public void updateTable() {
     if (m_table != null) {
-      m_table.putBoolean("Value", get());
+      m_valueEntry = m_table.getEntry("Value");
+      updateTable();
+    } else {
+      m_valueEntry = null;
     }
   }
 
 
   @Override
-  public ITable getTable() {
+  public void updateTable() {
+    if (m_valueEntry != null) {
+      m_valueEntry.setBoolean(get());
+    }
+  }
+
+
+  @Override
+  public NetworkTable getTable() {
     return m_table;
   }
 

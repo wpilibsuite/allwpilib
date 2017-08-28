@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.tables.ITable;
+import edu.wpi.first.networktables.NetworkTable;
 
 
 /**
@@ -19,14 +19,14 @@ public interface Sendable {
    *
    * @param subtable The table to put the values in.
    */
-  void initTable(ITable subtable);
+  void initTable(NetworkTable subtable);
 
   /**
    * The table that is associated with this {@link Sendable}.
    *
    * @return the table that is currently associated with the {@link Sendable}.
    */
-  ITable getTable();
+  NetworkTable getTable();
 
   /**
    * The string representation of the named data type that will be used by the smart dashboard for

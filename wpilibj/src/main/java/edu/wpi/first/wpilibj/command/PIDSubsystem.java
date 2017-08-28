@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj.command;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * This class is designed to handle the case where there is a {@link Subsystem} which uses a single
@@ -284,7 +284,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   }
 
   @Override
-  public void initTable(ITable table) {
+  public void initTable(NetworkTable table) {
     m_controller.initTable(table);
     super.initTable(table);
   }

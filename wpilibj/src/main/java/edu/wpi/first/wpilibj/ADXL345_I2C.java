@@ -10,13 +10,14 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * ADXL345 I2C Accelerometer.
@@ -174,25 +175,44 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     return "3AxisAccelerometer";
   }
 
-  private ITable m_table;
+  private NetworkTable m_table;
+  @SuppressWarnings("MemberName")
+  private NetworkTableEntry m_xEntry;
+  @SuppressWarnings("MemberName")
+  private NetworkTableEntry m_yEntry;
+  @SuppressWarnings("MemberName")
+  private NetworkTableEntry m_zEntry;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
-  }
-
-  @Override
-  public void updateTable() {
     if (m_table != null) {
-      m_table.putNumber("X", getX());
-      m_table.putNumber("Y", getY());
-      m_table.putNumber("Z", getZ());
+      m_xEntry = m_table.getEntry("X");
+      m_yEntry = m_table.getEntry("Y");
+      m_zEntry = m_table.getEntry("Z");
+      updateTable();
+    } else {
+      m_xEntry = null;
+      m_yEntry = null;
+      m_zEntry = null;
     }
   }
 
   @Override
-  public ITable getTable() {
+  public void updateTable() {
+    if (m_xEntry != null) {
+      m_xEntry.setDouble(getX());
+    }
+    if (m_yEntry != null) {
+      m_yEntry.setDouble(getY());
+    }
+    if (m_zEntry != null) {
+      m_zEntry.setDouble(getZ());
+    }
+  }
+
+  @Override
+  public NetworkTable getTable() {
     return m_table;
   }
 

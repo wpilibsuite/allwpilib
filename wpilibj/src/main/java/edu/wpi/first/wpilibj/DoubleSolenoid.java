@@ -7,13 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
@@ -175,46 +176,52 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
     return "Double Solenoid";
   }
 
-  private ITable m_table;
-  private ITableListener m_tableListener;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_valueEntry;
+  private int m_valueListener;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
+    if (m_table != null) {
+      m_valueEntry = m_table.getEntry("Value");
+      updateTable();
+    } else {
+      m_valueEntry = null;
+    }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putString("Value", get().name().substring(1));
+    if (m_valueEntry != null) {
+      m_valueEntry.setString(get().name().substring(1));
     }
   }
 
   @Override
   public void startLiveWindowMode() {
     set(Value.kOff); // Stop for safety
-    m_tableListener = (source, key, value, isNew) -> {
-      if ("Reverse".equals(value.toString())) {
+    m_valueListener = m_valueEntry.addListener((event) -> {
+      String value = event.value.getString();
+      if ("Reverse".equals(value)) {
         set(Value.kReverse);
-      } else if ("Forward".equals(value.toString())) {
+      } else if ("Forward".equals(value)) {
         set(Value.kForward);
       } else {
         set(Value.kOff);
       }
-    };
-    m_table.addTableListener("Value", m_tableListener, true);
+    }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
   }
 
   @Override
   public void stopLiveWindowMode() {
     set(Value.kOff); // Stop for safety
-    // TODO: Broken, should only remove the listener from "Value" only.
-    m_table.removeTableListener(m_tableListener);
+    m_valueEntry.removeListener(m_valueListener);
+    m_valueListener = 0;
   }
 }

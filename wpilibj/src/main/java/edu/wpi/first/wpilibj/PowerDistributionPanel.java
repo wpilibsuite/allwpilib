@@ -7,9 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the Power Distribution
@@ -117,40 +118,46 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   /*
    * Live Window code, only does anything if live window is activated.
    */
-  private ITable m_table;
+  private NetworkTable m_table;
+  private NetworkTableEntry[] m_chanEntry;
+  private NetworkTableEntry m_voltageEntry;
+  private NetworkTableEntry m_totalCurrentEntry;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
+    if (m_table != null) {
+      m_chanEntry = new NetworkTableEntry[16];
+      for (int i = 0; i < m_chanEntry.length; i++) {
+        m_chanEntry[i] = m_table.getEntry("Chan" + i);
+      }
+      m_voltageEntry = m_table.getEntry("Voltage");
+      m_totalCurrentEntry = m_table.getEntry("TotalCurrent");
+      updateTable();
+    } else {
+      m_chanEntry = null;
+      m_voltageEntry = null;
+      m_totalCurrentEntry = null;
+    }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putNumber("Chan0", getCurrent(0));
-      m_table.putNumber("Chan1", getCurrent(1));
-      m_table.putNumber("Chan2", getCurrent(2));
-      m_table.putNumber("Chan3", getCurrent(3));
-      m_table.putNumber("Chan4", getCurrent(4));
-      m_table.putNumber("Chan5", getCurrent(5));
-      m_table.putNumber("Chan6", getCurrent(6));
-      m_table.putNumber("Chan7", getCurrent(7));
-      m_table.putNumber("Chan8", getCurrent(8));
-      m_table.putNumber("Chan9", getCurrent(9));
-      m_table.putNumber("Chan10", getCurrent(10));
-      m_table.putNumber("Chan11", getCurrent(11));
-      m_table.putNumber("Chan12", getCurrent(12));
-      m_table.putNumber("Chan13", getCurrent(13));
-      m_table.putNumber("Chan14", getCurrent(14));
-      m_table.putNumber("Chan15", getCurrent(15));
-      m_table.putNumber("Voltage", getVoltage());
-      m_table.putNumber("TotalCurrent", getTotalCurrent());
+    if (m_chanEntry != null) {
+      for (int i = 0; i < m_chanEntry.length; i++) {
+        m_chanEntry[i].setDouble(getCurrent(i));
+      }
+    }
+    if (m_voltageEntry != null) {
+      m_voltageEntry.setDouble(getVoltage());
+    }
+    if (m_totalCurrentEntry != null) {
+      m_totalCurrentEntry.setDouble(getTotalCurrent());
     }
   }
 

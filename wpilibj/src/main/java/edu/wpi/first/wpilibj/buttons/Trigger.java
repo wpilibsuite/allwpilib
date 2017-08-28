@@ -7,10 +7,11 @@
 
 package edu.wpi.first.wpilibj.buttons;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * This class provides an easy way to link commands to inputs.
@@ -41,7 +42,7 @@ public abstract class Trigger implements Sendable {
    */
   @SuppressWarnings("PMD.UselessParentheses")
   private boolean grab() {
-    return get() || (m_table != null && m_table.getBoolean("pressed", false));
+    return get() || (m_pressedEntry != null && m_pressedEntry.getBoolean(false));
 
   }
 
@@ -194,18 +195,22 @@ public abstract class Trigger implements Sendable {
     return "Button";
   }
 
-  private ITable m_table;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_pressedEntry;
 
   @Override
-  public void initTable(ITable table) {
+  public void initTable(NetworkTable table) {
     m_table = table;
     if (table != null) {
-      table.putBoolean("pressed", get());
+      m_pressedEntry = table.getEntry("pressed");
+      m_pressedEntry.setBoolean(get());
+    } else {
+      m_pressedEntry = null;
     }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 }

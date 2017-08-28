@@ -7,26 +7,26 @@
 
 package edu.wpi.first.wpilibj.buttons;
 
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
  * A {@link Button} that uses a {@link NetworkTable} boolean field.
  */
 public class NetworkButton extends Button {
 
-  private final NetworkTable m_table;
-  private final String m_field;
+  private final NetworkTableEntry m_entry;
 
   public NetworkButton(String table, String field) {
-    this(NetworkTable.getTable(table), field);
+    this(NetworkTableInstance.getDefault().getTable(table), field);
   }
 
   public NetworkButton(NetworkTable table, String field) {
-    m_table = table;
-    m_field = field;
+    m_entry = table.getEntry(field);
   }
 
   public boolean get() {
-    return m_table.isConnected() && m_table.getBoolean(m_field, false);
+    return m_entry.getInstance().isConnected() && m_entry.getBoolean(false);
   }
 }

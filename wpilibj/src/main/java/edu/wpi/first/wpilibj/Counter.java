@@ -10,12 +10,13 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.hal.CounterJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -556,23 +557,29 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     return "Counter";
   }
 
-  private ITable m_table;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_valueEntry;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
+    if (m_table != null) {
+      m_valueEntry = m_table.getEntry("Value");
+      updateTable();
+    } else {
+      m_valueEntry = null;
+    }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putNumber("Value", get());
+    if (m_valueEntry != null) {
+      m_valueEntry.setDouble(get());
     }
   }
 

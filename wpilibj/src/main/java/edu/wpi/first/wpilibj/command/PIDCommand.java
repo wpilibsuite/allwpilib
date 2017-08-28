@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj.command;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Sendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * This class defines a {@link Command} which interacts heavily with a PID loop.
@@ -213,7 +213,7 @@ public abstract class PIDCommand extends Command implements Sendable {
     return "PIDCommand";
   }
 
-  public void initTable(ITable table) {
+  public void initTable(NetworkTable table) {
     m_controller.initTable(table);
     super.initTable(table);
   }

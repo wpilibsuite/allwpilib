@@ -11,10 +11,11 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.HLUsageReporting;
 import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * The {@link Scheduler} is a singleton which holds the top-level running commands. It is in charge
@@ -72,7 +73,10 @@ public class Scheduler implements NamedSendable {
    * A list of all {@link Command Commands} which need to be added.
    */
   private Vector<Command> m_additions = new Vector<>();
-  private ITable m_table;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_namesEntry;
+  private NetworkTableEntry m_idsEntry;
+  private NetworkTableEntry m_cancelEntry;
   /**
    * A list of all {@link edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler Buttons}. It is
    * created lazily.
@@ -310,18 +314,26 @@ public class Scheduler implements NamedSendable {
   }
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-
-    m_table.putStringArray("Names", new String[0]);
-    m_table.putNumberArray("Ids", new double[0]);
-    m_table.putNumberArray("Cancel", new double[0]);
+    if (m_table != null) {
+      m_namesEntry = m_table.getEntry("Names");
+      m_idsEntry = m_table.getEntry("Ids");
+      m_cancelEntry = m_table.getEntry("Cancel");
+      m_namesEntry.setStringArray(new String[0]);
+      m_idsEntry.setDoubleArray(new double[0]);
+      m_cancelEntry.setDoubleArray(new double[0]);
+    } else {
+      m_namesEntry = null;
+      m_idsEntry = null;
+      m_cancelEntry = null;
+    }
   }
 
   private void updateTable() {
     if (m_table != null) {
       // Get the commands to cancel
-      double[] toCancel = m_table.getNumberArray("Cancel", new double[0]);
+      double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
       if (toCancel.length > 0) {
         for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
           for (double d : toCancel) {
@@ -330,7 +342,7 @@ public class Scheduler implements NamedSendable {
             }
           }
         }
-        m_table.putNumberArray("Cancel", new double[0]);
+        m_cancelEntry.setDoubleArray(new double[0]);
       }
 
       if (m_runningCommandsChanged) {
@@ -347,14 +359,14 @@ public class Scheduler implements NamedSendable {
           ids[number] = e.getData().hashCode();
           number++;
         }
-        m_table.putStringArray("Names", commands);
-        m_table.putNumberArray("Ids", ids);
+        m_namesEntry.setStringArray(commands);
+        m_idsEntry.setDoubleArray(ids);
       }
     }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 

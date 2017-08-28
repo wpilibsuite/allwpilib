@@ -11,9 +11,10 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 
 /**
@@ -25,8 +26,9 @@ public class LiveWindow {
   private static Vector<LiveWindowSendable> sensors = new Vector<>();
   // private static Vector actuators = new Vector();
   private static Hashtable<LiveWindowSendable, LiveWindowComponent> components = new Hashtable<>();
-  private static ITable livewindowTable;
-  private static ITable statusTable;
+  private static NetworkTable livewindowTable;
+  private static NetworkTable statusTable;
+  private static NetworkTableEntry enabledEntry;
   private static boolean liveWindowEnabled = false;
   private static boolean firstTime = true;
 
@@ -38,19 +40,20 @@ public class LiveWindow {
    */
   private static void initializeLiveWindowComponents() {
     System.out.println("Initializing the components first time");
-    livewindowTable = NetworkTable.getTable("LiveWindow");
+    livewindowTable = NetworkTableInstance.getDefault().getTable("LiveWindow");
     statusTable = livewindowTable.getSubTable("~STATUS~");
+    enabledEntry = statusTable.getEntry("LW Enabled");
     for (Enumeration e = components.keys(); e.hasMoreElements(); ) {
       LiveWindowSendable component = (LiveWindowSendable) e.nextElement();
       LiveWindowComponent liveWindowComponent = components.get(component);
       String subsystem = liveWindowComponent.getSubsystem();
       String name = liveWindowComponent.getName();
       System.out.println("Initializing table for '" + subsystem + "' '" + name + "'");
-      livewindowTable.getSubTable(subsystem).putString("~TYPE~", "LW Subsystem");
-      ITable table = livewindowTable.getSubTable(subsystem).getSubTable(name);
-      table.putString("~TYPE~", component.getSmartDashboardType());
-      table.putString("Name", name);
-      table.putString("Subsystem", subsystem);
+      livewindowTable.getSubTable(subsystem).getEntry("~TYPE~").setString("LW Subsystem");
+      NetworkTable table = livewindowTable.getSubTable(subsystem).getSubTable(name);
+      table.getEntry("~TYPE~").setString(component.getSmartDashboardType());
+      table.getEntry("Name").setString(name);
+      table.getEntry("Subsystem").setString(subsystem);
       component.initTable(table);
       if (liveWindowComponent.isSensor()) {
         sensors.addElement(component);
@@ -89,7 +92,7 @@ public class LiveWindow {
         Scheduler.getInstance().enable();
       }
       liveWindowEnabled = enabled;
-      statusTable.putBoolean("LW Enabled", enabled);
+      enabledEntry.setBoolean(enabled);
     }
   }
 

@@ -7,13 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -249,38 +250,44 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     return "Speed Controller";
   }
 
-  private ITable m_table;
-  private ITableListener m_tableListener;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_valueEntry;
+  private int m_valueListener;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
-  }
-
-  @Override
-  public void updateTable() {
     if (m_table != null) {
-      m_table.putNumber("Value", getSpeed());
+      m_valueEntry = m_table.getEntry("Value");
+      updateTable();
+    } else {
+      m_valueEntry = null;
     }
   }
 
   @Override
-  public ITable getTable() {
+  public void updateTable() {
+    if (m_valueEntry != null) {
+      m_valueEntry.setDouble(getSpeed());
+    }
+  }
+
+  @Override
+  public NetworkTable getTable() {
     return m_table;
   }
 
   @Override
   public void startLiveWindowMode() {
     setSpeed(0); // Stop for safety
-    m_tableListener = (source, key, value, isNew) -> setSpeed((double) value);
-    m_table.addTableListener("Value", m_tableListener, true);
+    m_valueListener = m_valueEntry.addListener((event) -> setSpeed(event.value.getDouble()),
+        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
   }
 
   @Override
   public void stopLiveWindowMode() {
     setSpeed(0); // Stop for safety
-    // TODO: Broken, should only remove the listener from "Value" only.
-    m_table.removeTableListener(m_tableListener);
+    m_valueEntry.removeListener(m_valueListener);
+    m_valueListener = 0;
   }
 }

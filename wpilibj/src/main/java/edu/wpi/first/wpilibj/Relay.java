@@ -7,13 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -336,37 +337,43 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
     return "Relay";
   }
 
-  private ITable m_table;
-  private ITableListener m_tableListener;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_valueEntry;
+  private int m_valueListener;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
+    if (m_table != null) {
+      m_valueEntry = m_table.getEntry("Value");
+      updateTable();
+    } else {
+      m_valueEntry = null;
+    }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putString("Value", get().getPrettyValue());
+    if (m_valueEntry != null) {
+      m_valueEntry.setString(get().getPrettyValue());
     }
   }
 
   @Override
   public void startLiveWindowMode() {
-    m_tableListener =
-        (source, key, value, isNew) -> set(Value.getValueOf((String) value).orElse(Value.kOff));
-    m_table.addTableListener("Value", m_tableListener, true);
+    m_valueListener = m_valueEntry.addListener(
+        (event) -> set(Value.getValueOf(event.value.getString()).orElse(Value.kOff)),
+        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
   }
 
   @Override
   public void stopLiveWindowMode() {
-    // TODO: Broken, should only remove the listener from "Value" only.
-    m_table.removeTableListener(m_tableListener);
+    m_valueEntry.removeListener(m_valueListener);
+    m_valueListener = 0;
   }
 }
