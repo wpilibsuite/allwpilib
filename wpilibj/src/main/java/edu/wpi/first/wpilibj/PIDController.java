@@ -11,9 +11,10 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.TimerTask;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 import static java.util.Objects.requireNonNull;
@@ -226,9 +227,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
       m_pidInput = null;
       m_controlLoop = null;
     }
-    if (m_table != null) {
-      m_table.removeTableListener(m_listener);
-    }
+    removeListeners();
   }
 
   /**
@@ -354,10 +353,14 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     m_I = i;
     m_D = d;
 
-    if (m_table != null) {
-      m_table.putNumber("p", p);
-      m_table.putNumber("i", i);
-      m_table.putNumber("d", d);
+    if (m_pEntry != null) {
+      m_pEntry.setDouble(p);
+    }
+    if (m_iEntry != null) {
+      m_iEntry.setDouble(i);
+    }
+    if (m_dEntry != null) {
+      m_dEntry.setDouble(d);
     }
   }
 
@@ -377,11 +380,17 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     m_D = d;
     m_F = f;
 
-    if (m_table != null) {
-      m_table.putNumber("p", p);
-      m_table.putNumber("i", i);
-      m_table.putNumber("d", d);
-      m_table.putNumber("f", f);
+    if (m_pEntry != null) {
+      m_pEntry.setDouble(p);
+    }
+    if (m_iEntry != null) {
+      m_iEntry.setDouble(i);
+    }
+    if (m_dEntry != null) {
+      m_dEntry.setDouble(d);
+    }
+    if (m_fEntry != null) {
+      m_fEntry.setDouble(f);
     }
   }
 
@@ -501,8 +510,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     m_buf.clear();
     m_bufTotal = 0;
 
-    if (m_table != null) {
-      m_table.putNumber("setpoint", m_setpoint);
+    if (m_setpointEntry != null) {
+      m_setpointEntry.setDouble(m_setpoint);
     }
   }
 
@@ -644,8 +653,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   public synchronized void enable() {
     m_enabled = true;
 
-    if (m_table != null) {
-      m_table.putBoolean("enabled", true);
+    if (m_enabledEntry != null) {
+      m_enabledEntry.setBoolean(true);
     }
   }
 
@@ -657,8 +666,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     m_pidOutput.pidWrite(0);
     m_enabled = false;
 
-    if (m_table != null) {
-      m_table.putBoolean("enabled", false);
+    if (m_enabledEntry != null) {
+      m_enabledEntry.setBoolean(false);
     }
   }
 
@@ -686,41 +695,115 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     return "PIDController";
   }
 
-  private final ITableListener m_listener = (table, key, value, isNew) -> {
-    if (key.equals("p") || key.equals("i") || key.equals("d") || key.equals("f")) {
-      if (getP() != table.getNumber("p", 0.0) || getI() != table.getNumber("i", 0.0)
-          || getD() != table.getNumber("d", 0.0) || getF() != table.getNumber("f", 0.0)) {
-        setPID(table.getNumber("p", 0.0), table.getNumber("i", 0.0), table.getNumber("d", 0.0),
-            table.getNumber("f", 0.0));
-      }
-    } else if (key.equals("setpoint")) {
-      if (getSetpoint() != (Double) value) {
-        setSetpoint((Double) value);
-      }
-    } else if (key.equals("enabled") && isEnabled() != (Boolean) value) {
-      if ((Boolean) value) {
-        enable();
-      } else {
-        disable();
-      }
+  private NetworkTable m_table;
+  @SuppressWarnings("MemberName")
+  private NetworkTableEntry m_pEntry;
+  @SuppressWarnings("MemberName")
+  private NetworkTableEntry m_iEntry;
+  @SuppressWarnings("MemberName")
+  private NetworkTableEntry m_dEntry;
+  @SuppressWarnings("MemberName")
+  private NetworkTableEntry m_fEntry;
+  private NetworkTableEntry m_setpointEntry;
+  private NetworkTableEntry m_enabledEntry;
+  @SuppressWarnings("MemberName")
+  private int m_pListener;
+  @SuppressWarnings("MemberName")
+  private int m_iListener;
+  @SuppressWarnings("MemberName")
+  private int m_dListener;
+  @SuppressWarnings("MemberName")
+  private int m_fListener;
+  private int m_setpointListener;
+  private int m_enabledListener;
+
+  private void removeListeners() {
+    if (m_pEntry != null) {
+      m_pEntry.removeListener(m_pListener);
     }
-  };
-  private ITable m_table;
+    if (m_iEntry != null) {
+      m_iEntry.removeListener(m_iListener);
+    }
+    if (m_dEntry != null) {
+      m_dEntry.removeListener(m_dListener);
+    }
+    if (m_fEntry != null) {
+      m_fEntry.removeListener(m_fListener);
+    }
+    if (m_setpointEntry != null) {
+      m_setpointEntry.removeListener(m_setpointListener);
+    }
+    if (m_enabledEntry != null) {
+      m_enabledEntry.removeListener(m_enabledListener);
+    }
+  }
 
   @Override
-  public void initTable(ITable table) {
-    if (this.m_table != null) {
-      m_table.removeTableListener(m_listener);
-    }
+  public void initTable(NetworkTable table) {
+    removeListeners();
     m_table = table;
     if (table != null) {
-      table.putNumber("p", getP());
-      table.putNumber("i", getI());
-      table.putNumber("d", getD());
-      table.putNumber("f", getF());
-      table.putNumber("setpoint", getSetpoint());
-      table.putBoolean("enabled", isEnabled());
-      table.addTableListener(m_listener, false);
+      m_pEntry = table.getEntry("p");
+      m_pEntry.setDouble(getP());
+      m_iEntry = table.getEntry("i");
+      m_iEntry.setDouble(getI());
+      m_dEntry = table.getEntry("d");
+      m_dEntry.setDouble(getD());
+      m_fEntry = table.getEntry("f");
+      m_fEntry.setDouble(getF());
+      m_setpointEntry = table.getEntry("setpoint");
+      m_setpointEntry.setDouble(getSetpoint());
+      m_enabledEntry = table.getEntry("enabled");
+      m_enabledEntry.setBoolean(isEnabled());
+
+      m_pListener = m_pEntry.addListener((entry) -> {
+        synchronized (this) {
+          m_P = entry.value.getDouble();
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      m_iListener = m_iEntry.addListener((entry) -> {
+        synchronized (this) {
+          m_I = entry.value.getDouble();
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      m_dListener = m_dEntry.addListener((entry) -> {
+        synchronized (this) {
+          m_D = entry.value.getDouble();
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      m_fListener = m_fEntry.addListener((entry) -> {
+        synchronized (this) {
+          m_F = entry.value.getDouble();
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      m_setpointListener = m_setpointEntry.addListener((entry) -> {
+        double val = entry.value.getDouble();
+        if (getSetpoint() != val) {
+          setSetpoint(val);
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      m_enabledListener = m_enabledEntry.addListener((entry) -> {
+        boolean val = entry.value.getBoolean();
+        if (isEnabled() != val) {
+          if (val) {
+            enable();
+          } else {
+            disable();
+          }
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    } else {
+      m_pEntry = null;
+      m_iEntry = null;
+      m_dEntry = null;
+      m_fEntry = null;
+      m_setpointEntry = null;
+      m_enabledEntry = null;
     }
   }
 
@@ -744,7 +827,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 

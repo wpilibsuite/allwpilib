@@ -7,9 +7,11 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.CompressorJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * Class for operating a compressor connected to a PCM (Pneumatic Control Module). The PCM will
@@ -189,10 +191,23 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
 
   @Override
   public void startLiveWindowMode() {
+    if (m_enabledEntry != null) {
+      m_enabledListener = m_enabledEntry.addListener((event) -> {
+        if (event.value.getBoolean()) {
+          start();
+        } else {
+          stop();
+        }
+      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }
   }
 
   @Override
   public void stopLiveWindowMode() {
+    if (m_enabledEntry != null) {
+      m_enabledEntry.removeListener(m_enabledListener);
+      m_enabledListener = 0;
+    }
   }
 
   @Override
@@ -200,24 +215,36 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
     return "Compressor";
   }
 
-  private ITable m_table;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_enabledEntry;
+  private NetworkTableEntry m_pressureSwitchEntry;
+  private int m_enabledListener;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
+    if (m_table != null) {
+      m_enabledEntry = m_table.getEntry("Enabled");
+      m_pressureSwitchEntry = m_table.getEntry("Pressure Switch");
+      updateTable();
+    } else {
+      m_enabledEntry = null;
+      m_pressureSwitchEntry = null;
+    }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putBoolean("Enabled", enabled());
-      m_table.putBoolean("Pressure Switch", getPressureSwitchValue());
+    if (m_enabledEntry != null) {
+      m_enabledEntry.setBoolean(enabled());
+    }
+    if (m_pressureSwitchEntry != null) {
+      m_pressureSwitchEntry.setBoolean(getPressureSwitchValue());
     }
   }
 }

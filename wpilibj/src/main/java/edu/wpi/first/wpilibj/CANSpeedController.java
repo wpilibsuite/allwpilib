@@ -7,9 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 
 public interface CANSpeedController extends SpeedController, PIDInterface, LiveWindowSendable {
   /**
@@ -143,19 +143,19 @@ public interface CANSpeedController extends SpeedController, PIDInterface, LiveW
 
   @Override
   default void updateTable() {
-    ITable table = getTable();
+    NetworkTable table = getTable();
     if (table != null) {
-      table.putString("~TYPE~", SMART_DASHBOARD_TYPE);
-      table.putString("Type", getClass().getSimpleName());
-      table.putNumber("Mode", getControlMode().getValue());
+      table.getEntry("~TYPE~").setString(SMART_DASHBOARD_TYPE);
+      table.getEntry("Type").setString(getClass().getSimpleName());
+      table.getEntry("Mode").setDouble(getControlMode().getValue());
       if (getControlMode().isPID()) {
-        table.putNumber("p", getP());
-        table.putNumber("i", getI());
-        table.putNumber("d", getD());
-        table.putNumber("f", getF());
+        table.getEntry("p").setDouble(getP());
+        table.getEntry("i").setDouble(getI());
+        table.getEntry("d").setDouble(getD());
+        table.getEntry("f").setDouble(getF());
       }
-      table.putBoolean("Enabled", isEnabled());
-      table.putNumber("Value", get());
+      table.getEntry("Enabled").setBoolean(isEnabled());
+      table.getEntry("Value").setDouble(get());
     }
   }
 
@@ -165,46 +165,69 @@ public interface CANSpeedController extends SpeedController, PIDInterface, LiveW
   }
 
   /**
-   * Creates an ITableListener for the LiveWindow table for this CAN speed controller.
+   * Remove table listeners.
    */
-  default ITableListener createTableListener() {
-    return (table, key, value, isNew) -> {
-      switch (key) {
-        case "Enabled":
-          if ((Boolean) value) {
-            enable();
-          } else {
-            disable();
-          }
-          break;
-        case "Value":
-          set((Double) value);
-          break;
-        case "Mode":
-          setControlMode(((Double) value).intValue());
-          break;
-        default:
-          break;
-      }
-      if (getControlMode().isPID()) {
-        switch (key) {
-          case "p":
-            setP((Double) value);
-            break;
-          case "i":
-            setI((Double) value);
-            break;
-          case "d":
-            setD((Double) value);
-            break;
-          case "f":
-            setF((Double) value);
-            break;
-          default:
-            break;
+  default void removeTableListeners(int[] listeners) {
+    NetworkTable table = getTable();
+    if (table != null) {
+      table.getEntry("Mode").removeListener(listeners[0]);
+      table.getEntry("p").removeListener(listeners[1]);
+      table.getEntry("i").removeListener(listeners[2]);
+      table.getEntry("d").removeListener(listeners[3]);
+      table.getEntry("f").removeListener(listeners[4]);
+      table.getEntry("Enabled").removeListener(listeners[5]);
+      table.getEntry("Value").removeListener(listeners[6]);
+    }
+  }
+
+  /**
+   * Create table listeners.
+   */
+  default int[] createTableListeners() {
+    int[] listeners = new int[7];
+    NetworkTable table = getTable();
+    if (table != null) {
+      listeners[0] = table.getEntry("Mode").addListener(
+          (event) -> setControlMode((int) event.value.getDouble()),
+          EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      listeners[1] = table.getEntry("p").addListener((event) -> {
+        if (getControlMode().isPID()) {
+          setP(event.value.getDouble());
         }
-      }
-    };
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      listeners[2] = table.getEntry("i").addListener((event) -> {
+        if (getControlMode().isPID()) {
+          setI(event.value.getDouble());
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      listeners[3] = table.getEntry("d").addListener((event) -> {
+        if (getControlMode().isPID()) {
+          setD(event.value.getDouble());
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      listeners[4] = table.getEntry("f").addListener((event) -> {
+        if (getControlMode().isPID()) {
+          setF(event.value.getDouble());
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      listeners[5] = table.getEntry("Enabled").addListener((event) -> {
+        if (event.value.getBoolean()) {
+          enable();
+        } else {
+          disable();
+        }
+      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+      listeners[6] = table.getEntry("Value").addListener(
+          (event) -> set(event.value.getDouble()),
+          EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }
+    return listeners;
   }
 
 

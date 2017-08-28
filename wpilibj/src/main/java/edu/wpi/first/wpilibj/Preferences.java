@@ -9,11 +9,12 @@ package edu.wpi.first.wpilibj;
 
 import java.util.Vector;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 
 import static java.util.Objects.requireNonNull;
 
@@ -44,21 +45,6 @@ public class Preferences {
    * The network table.
    */
   private final NetworkTable m_table;
-  /**
-   * Listener to set all Preferences values to persistent (for backwards compatibility with old
-   * dashboards).
-   */
-  private final ITableListener m_listener = new ITableListener() {
-    @Override
-    public void valueChanged(ITable table, String key, Object value, boolean isNew) {
-      // unused
-    }
-
-    @Override
-    public void valueChangedEx(ITable table, String key, Object value, int flags) {
-      table.setPersistent(key);
-    }
-  };
 
   /**
    * Returns the preferences instance.
@@ -76,8 +62,12 @@ public class Preferences {
    * Creates a preference class.
    */
   private Preferences() {
-    m_table = NetworkTable.getTable(TABLE_NAME);
-    m_table.addTableListenerEx(m_listener, ITable.NOTIFY_NEW | ITable.NOTIFY_IMMEDIATE);
+    m_table = NetworkTableInstance.getDefault().getTable(TABLE_NAME);
+    // Listener to set all Preferences values to persistent
+    // (for backwards compatibility with old dashboards).
+    m_table.addEntryListener(
+        (table, key, entry, value, flags) -> entry.setPersistent(),
+        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew);
     HAL.report(tResourceType.kResourceType_Preferences, 0);
   }
 
@@ -99,8 +89,9 @@ public class Preferences {
   public void putString(String key, String value) {
     requireNonNull(value, "Provided value was null");
 
-    m_table.putString(key, value);
-    m_table.setPersistent(key);
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setString(value);
+    entry.setPersistent();
   }
 
   /**
@@ -110,8 +101,9 @@ public class Preferences {
    * @param value the value
    */
   public void putInt(String key, int value) {
-    m_table.putNumber(key, value);
-    m_table.setPersistent(key);
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -121,8 +113,9 @@ public class Preferences {
    * @param value the value
    */
   public void putDouble(String key, double value) {
-    m_table.putNumber(key, value);
-    m_table.setPersistent(key);
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -132,8 +125,9 @@ public class Preferences {
    * @param value the value
    */
   public void putFloat(String key, float value) {
-    m_table.putNumber(key, value);
-    m_table.setPersistent(key);
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -143,8 +137,9 @@ public class Preferences {
    * @param value the value
    */
   public void putBoolean(String key, boolean value) {
-    m_table.putBoolean(key, value);
-    m_table.setPersistent(key);
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setBoolean(value);
+    entry.setPersistent();
   }
 
   /**
@@ -154,8 +149,9 @@ public class Preferences {
    * @param value the value
    */
   public void putLong(String key, long value) {
-    m_table.putNumber(key, value);
-    m_table.setPersistent(key);
+    NetworkTableEntry entry = m_table.getEntry(key);
+    entry.setDouble(value);
+    entry.setPersistent();
   }
 
   /**
@@ -186,7 +182,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public String getString(String key, String backup) {
-    return m_table.getString(key, backup);
+    return m_table.getEntry(key).getString(backup);
   }
 
   /**
@@ -198,7 +194,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public int getInt(String key, int backup) {
-    return (int) m_table.getNumber(key, backup);
+    return (int) m_table.getEntry(key).getDouble(backup);
   }
 
   /**
@@ -210,7 +206,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public double getDouble(String key, double backup) {
-    return m_table.getNumber(key, backup);
+    return m_table.getEntry(key).getDouble(backup);
   }
 
   /**
@@ -222,7 +218,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public boolean getBoolean(String key, boolean backup) {
-    return m_table.getBoolean(key, backup);
+    return m_table.getEntry(key).getBoolean(backup);
   }
 
   /**
@@ -234,7 +230,7 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public float getFloat(String key, float backup) {
-    return (float) m_table.getNumber(key, backup);
+    return (float) m_table.getEntry(key).getDouble(backup);
   }
 
   /**
@@ -246,6 +242,6 @@ public class Preferences {
    * @return either the value in the table, or the backup
    */
   public long getLong(String key, long backup) {
-    return (long) m_table.getNumber(key, backup);
+    return (long) m_table.getEntry(key).getDouble(backup);
   }
 }

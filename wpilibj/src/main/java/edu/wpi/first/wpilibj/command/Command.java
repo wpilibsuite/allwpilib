@@ -10,11 +10,12 @@ package edu.wpi.first.wpilibj.command;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 
 /**
  * The Command class is at the very core of the entire command framework. Every command can be
@@ -216,8 +217,8 @@ public abstract class Command implements NamedSendable {
     m_initialized = false;
     m_canceled = false;
     m_running = false;
-    if (m_table != null) {
-      m_table.putBoolean("running", false);
+    if (m_runningEntry != null) {
+      m_runningEntry.setBoolean(false);
     }
   }
 
@@ -381,8 +382,8 @@ public abstract class Command implements NamedSendable {
     }
     lockChanges();
     m_parent = parent;
-    if (m_table != null) {
-      m_table.putBoolean("isParented", true);
+    if (m_isParentedEntry != null) {
+      m_isParentedEntry.setBoolean(true);
     }
   }
 
@@ -423,8 +424,8 @@ public abstract class Command implements NamedSendable {
   synchronized void startRunning() {
     m_running = true;
     m_startTime = -1;
-    if (m_table != null) {
-      m_table.putBoolean("running", true);
+    if (m_runningEntry != null) {
+      m_runningEntry.setBoolean(true);
     }
   }
 
@@ -563,31 +564,38 @@ public abstract class Command implements NamedSendable {
     return "Command";
   }
 
-  private final ITableListener m_listener = (table1, key, value, isNew) -> {
-    if (((Boolean) value).booleanValue()) {
-      start();
-    } else {
-      cancel();
-    }
-  };
-  private ITable m_table;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_runningEntry;
+  private NetworkTableEntry m_isParentedEntry;
+  private int m_runningListener;
 
   @Override
-  public void initTable(ITable table) {
-    if (m_table != null) {
-      m_table.removeTableListener(m_listener);
+  public void initTable(NetworkTable table) {
+    if (m_runningEntry != null) {
+      m_runningEntry.removeListener(m_runningListener);
     }
     m_table = table;
     if (table != null) {
-      table.putString("name", getName());
-      table.putBoolean("running", isRunning());
-      table.putBoolean("isParented", m_parent != null);
-      table.addTableListener("running", m_listener, false);
+      m_runningEntry = table.getEntry("running");
+      m_isParentedEntry = table.getEntry("isParented");
+      table.getEntry("name").setString(getName());
+      m_runningEntry.setBoolean(isRunning());
+      m_isParentedEntry.setBoolean(m_parent != null);
+      m_runningListener = m_runningEntry.addListener((event) -> {
+        if (event.value.getBoolean()) {
+          start();
+        } else {
+          cancel();
+        }
+      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    } else {
+      m_runningEntry = null;
+      m_isParentedEntry = null;
     }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 

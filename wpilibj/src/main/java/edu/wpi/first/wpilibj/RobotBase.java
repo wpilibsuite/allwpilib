@@ -16,13 +16,13 @@ import java.util.Enumeration;
 import java.util.jar.Manifest;
 //import org.opencv.core.Core;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
 
 /**
@@ -56,12 +56,11 @@ public abstract class RobotBase {
    * to put this code into it's own task that loads on boot so ensure that it runs.
    */
   protected RobotBase() {
-    NetworkTable.setNetworkIdentity("Robot");
-    NetworkTable.setPersistentFilename("/home/lvuser/networktables.ini");
-    NetworkTable.setServerMode(); // must be before b
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    inst.setNetworkIdentity("Robot");
+    inst.startServer("/home/lvuser/networktables.ini");
     m_ds = DriverStation.getInstance();
-    NetworkTable.getTable(""); // forces network tables to initialize
-    NetworkTable.getTable("LiveWindow").getSubTable("~STATUS~").putBoolean("LW Enabled", false);
+    inst.getTable("LiveWindow").getSubTable("~STATUS~").getEntry("LW Enabled").setBoolean(false);
 
     LiveWindow.setEnabled(false);
   }

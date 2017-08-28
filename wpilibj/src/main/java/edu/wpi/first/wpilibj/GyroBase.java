@@ -7,9 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * GyroBase is the common base class for Gyro implementations such as AnalogGyro.
@@ -59,24 +60,29 @@ public abstract class GyroBase extends SensorBase implements Gyro, PIDSource, Li
     return "Gyro";
   }
 
-  private ITable m_table;
-
+  private NetworkTable m_table;
+  private NetworkTableEntry m_valueEntry;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
+    if (m_table != null) {
+      m_valueEntry = m_table.getEntry("Value");
+      updateTable();
+    } else {
+      m_valueEntry = null;
+    }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putNumber("Value", getAngle());
+    if (m_valueEntry != null) {
+      m_valueEntry.setDouble(getAngle());
     }
   }
 

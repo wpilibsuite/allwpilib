@@ -7,13 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
-import edu.wpi.first.wpilibj.tables.ITableListener;
 
 /**
  * Solenoid class for running high voltage Digital Output on the PCM.
@@ -61,8 +62,8 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
   public synchronized void free() {
     SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
     m_solenoidHandle = 0;
-    if (m_table != null) {
-      m_table.removeTableListener(m_tableListener);
+    if (m_valueEntry != null) {
+      m_valueEntry.removeListener(m_valueListener);
     }
     super.free();
   }
@@ -104,38 +105,44 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     return "Solenoid";
   }
 
-  private ITable m_table;
-  private ITableListener m_tableListener;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_valueEntry;
+  private int m_valueListener;
 
   @Override
-  public void initTable(ITable subtable) {
+  public void initTable(NetworkTable subtable) {
     m_table = subtable;
-    updateTable();
+    if (m_table != null) {
+      m_valueEntry = m_table.getEntry("Value");
+      updateTable();
+    } else {
+      m_valueEntry = null;
+    }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 
   @Override
   public void updateTable() {
-    if (m_table != null) {
-      m_table.putBoolean("Value", get());
+    if (m_valueEntry != null) {
+      m_valueEntry.setBoolean(get());
     }
   }
 
   @Override
   public void startLiveWindowMode() {
     set(false); // Stop for safety
-    m_tableListener = (source, key, value, isNew) -> set((boolean) value);
-    m_table.addTableListener("Value", m_tableListener, true);
+    m_valueListener = m_valueEntry.addListener((event) -> set(event.value.getBoolean()),
+        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
   }
 
   @Override
   public void stopLiveWindowMode() {
     set(false); // Stop for safety
-    // TODO: Broken, should only remove the listener from "Value" only.
-    m_table.removeTableListener(m_tableListener);
+    m_valueEntry.removeListener(m_valueListener);
+    m_valueListener = 0;
   }
 }

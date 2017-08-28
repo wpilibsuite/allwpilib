@@ -9,8 +9,9 @@ package edu.wpi.first.wpilibj.command;
 
 import java.util.Enumeration;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.NamedSendable;
-import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * This class defines a major component of the robot.
@@ -111,10 +112,10 @@ public abstract class Subsystem implements NamedSendable {
     }
     if (m_table != null) {
       if (m_defaultCommand != null) {
-        m_table.putBoolean("hasDefault", true);
-        m_table.putString("default", m_defaultCommand.getName());
+        m_hasDefaultEntry.setBoolean(true);
+        m_defaultEntry.setString(m_defaultCommand.getName());
       } else {
-        m_table.putBoolean("hasDefault", false);
+        m_hasDefaultEntry.setBoolean(false);
       }
     }
   }
@@ -151,10 +152,10 @@ public abstract class Subsystem implements NamedSendable {
     if (m_currentCommandChanged) {
       if (m_table != null) {
         if (m_currentCommand != null) {
-          m_table.putBoolean("hasCommand", true);
-          m_table.putString("command", m_currentCommand.getName());
+          m_hasCommandEntry.setBoolean(true);
+          m_commandEntry.setString(m_currentCommand.getName());
         } else {
-          m_table.putBoolean("hasCommand", false);
+          m_hasCommandEntry.setBoolean(false);
         }
       }
       m_currentCommandChanged = false;
@@ -190,29 +191,38 @@ public abstract class Subsystem implements NamedSendable {
     return "Subsystem";
   }
 
-  private ITable m_table;
+  private NetworkTable m_table;
+  private NetworkTableEntry m_hasDefaultEntry;
+  private NetworkTableEntry m_defaultEntry;
+  private NetworkTableEntry m_hasCommandEntry;
+  private NetworkTableEntry m_commandEntry;
 
   @Override
-  public void initTable(ITable table) {
+  public void initTable(NetworkTable table) {
     m_table = table;
     if (table != null) {
+      m_hasDefaultEntry = table.getEntry("hasDefault");
+      m_defaultEntry = table.getEntry("default");
+      m_hasCommandEntry = table.getEntry("hasCommand");
+      m_commandEntry = table.getEntry("command");
+
       if (m_defaultCommand != null) {
-        table.putBoolean("hasDefault", true);
-        table.putString("default", m_defaultCommand.getName());
+        m_hasDefaultEntry.setBoolean(true);
+        m_defaultEntry.setString(m_defaultCommand.getName());
       } else {
-        table.putBoolean("hasDefault", false);
+        m_hasDefaultEntry.setBoolean(false);
       }
       if (m_currentCommand != null) {
-        table.putBoolean("hasCommand", true);
-        table.putString("command", m_currentCommand.getName());
+        m_hasCommandEntry.setBoolean(true);
+        m_commandEntry.setString(m_currentCommand.getName());
       } else {
-        table.putBoolean("hasCommand", false);
+        m_hasCommandEntry.setBoolean(false);
       }
     }
   }
 
   @Override
-  public ITable getTable() {
+  public NetworkTable getTable() {
     return m_table;
   }
 }
