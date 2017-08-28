@@ -20,15 +20,6 @@ typedef enum {
                    // full.
 } CTR_Code;
 
-// CAN Errors
-
-#define ERR_CANSessionMux_InvalidBuffer -44086
-#define ERR_CANSessionMux_MessageNotFound -44087
-#define WARN_CANSessionMux_NoToken 44087
-#define ERR_CANSessionMux_NotAllowed -44088
-#define ERR_CANSessionMux_NotInitialized -44089
-#define ERR_CANSessionMux_SessionOverrun 44050
-
 // VISA Error
 #define _VI_ERROR (-2147483647L - 1)
 #define VI_ERROR_SYSTEM_ERROR (_VI_ERROR + 0x3FFF0000L)
