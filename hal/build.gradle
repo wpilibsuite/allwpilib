@@ -73,47 +73,30 @@ model {
         }
     }
     components {
-        halAthena(NativeLibrarySpec) {
-            baseName = 'wpiHal'
-            sources {
-                cpp {
-                    source {
-                        srcDirs = [ 'src/main/native/shared', 'src/main/native/athena' ]
-                        includes = ["**/*.cpp"]
-                    }
-                    exportedHeaders {
-                        srcDirs = ["src/main/native/include"]
-                    }
-                }
-            }
-            binaries.all { binary->
-                if (binary.targetPlatform.architecture.name != 'athena') {
-                    binary.buildable = false
-                }
-            }
-        }
-        halSim(NativeLibrarySpec) {
-            baseName = 'wpiHal'
-            sources {
-                cpp {
-                    source {
-                        srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
-                        includes = ["**/*.cpp"]
-                    }
-                    exportedHeaders {
-                        srcDirs = ["src/main/native/include"]
-                    }
-                }
-            }
-        }
-        if (project.hasProperty('buildHalStaticDeps')) {
-            halSimStaticDeps(NativeLibrarySpec) {
+        if (!project.hasProperty('skipAthena')) {
+            halAthena(NativeLibrarySpec) {
                 baseName = 'wpiHal'
-                binaries {
-                    withType(StaticLibraryBinarySpec) {
-                        buildable = false
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = [ 'src/main/native/shared', 'src/main/native/athena' ]
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/main/native/include"]
+                        }
                     }
                 }
+                binaries.all { binary->
+                    if (binary.targetPlatform.architecture.name != 'athena') {
+                        binary.buildable = false
+                    }
+                }
+            }
+        }
+        if (!project.hasProperty('onlyAthena')) {
+            halSim(NativeLibrarySpec) {
+                baseName = 'wpiHal'
                 sources {
                     cpp {
                         source {
@@ -122,6 +105,27 @@ model {
                         }
                         exportedHeaders {
                             srcDirs = ["src/main/native/include"]
+                        }
+                    }
+                }
+            }
+            if (project.hasProperty('buildHalStaticDeps')) {
+                halSimStaticDeps(NativeLibrarySpec) {
+                    baseName = 'wpiHal'
+                    binaries {
+                        withType(StaticLibraryBinarySpec) {
+                            buildable = false
+                        }
+                    }
+                    sources {
+                        cpp {
+                            source {
+                                srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
+                                includes = ["**/*.cpp"]
+                            }
+                            exportedHeaders {
+                                srcDirs = ["src/main/native/include"]
+                            }
                         }
                     }
                 }

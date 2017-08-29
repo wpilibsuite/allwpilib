@@ -131,7 +131,9 @@ model {
         // The plugin by default will rebuild the entire test source set, which increases
         // build time. By testing an empty library, and then just linking the already built component
         // into the test, we save the extra build
-        wpilibcTestingBase(NativeLibrarySpec) { }
+        if (!project.hasProperty('onlyAthena')) {
+            wpilibcTestingBase(NativeLibrarySpec) { }
+        }
         // By default, a development executable will be generated. This is to help the case of
         // testing specific functionality of the library.
         if (!project.hasProperty('skipDevExe')) {
@@ -154,10 +156,12 @@ model {
         }
     }
     testSuites {
-        wpilibcTestingBaseTest {
-            sources {
-                cpp.source.srcDir 'src/test/native/cpp'
-                cpp.exportedHeaders.srcDir 'src/test/native/include'
+        if (!project.hasProperty('onlyAthena')) {
+            wpilibcTestingBaseTest {
+                sources {
+                    cpp.source.srcDir 'src/test/native/cpp'
+                    cpp.exportedHeaders.srcDir 'src/test/native/include'
+                }
             }
         }
     }
