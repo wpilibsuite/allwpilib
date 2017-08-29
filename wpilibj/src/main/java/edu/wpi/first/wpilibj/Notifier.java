@@ -36,6 +36,8 @@ public class Notifier {
     // to complete (or the period is very short) and when everything is being
     // destructed.
     private final ReentrantLock m_handlerLock = new ReentrantLock();
+    // Whether or not the handler should be called.
+    private boolean m_running = false;
 
     public Process(Runnable run) {
       m_handler = run;
@@ -70,14 +72,23 @@ public class Notifier {
       }
 
       m_handlerLock.lock();
+      if (!m_running) {
+        m_handlerLock.unlock();
+        m_processLock.lock();
+        return;
+      }
       m_processLock.unlock();
 
-      m_handler.run();
-      m_handlerLock.unlock();
+      try {
+        m_handler.run();
+      } finally {
+        m_handlerLock.unlock();
+      }
     }
 
     public void start(double period, boolean periodic) {
       synchronized (m_processLock) {
+        m_running = true;
         m_periodic = periodic;
         m_period = period;
         m_expirationTime = Utility.getFPGATime() * 1e-6 + period;
@@ -91,6 +102,7 @@ public class Notifier {
       // Wait for a currently executing handler to complete before returning
       // from stop()
       m_handlerLock.lock();
+      m_running = false;
       m_handlerLock.unlock();
     }
   }
