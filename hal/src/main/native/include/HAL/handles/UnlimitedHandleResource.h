@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 #include <memory>
+#include <utility>
 #include <vector>
 
 #include <support/mutex.h>
@@ -44,8 +45,15 @@ class UnlimitedHandleResource : public HandleBase {
 
   THandle Allocate(std::shared_ptr<TStruct> structure);
   std::shared_ptr<TStruct> Get(THandle handle);
-  void Free(THandle handle);
+  /* Returns structure previously at that handle (or nullptr if none) */
+  std::shared_ptr<TStruct> Free(THandle handle);
   void ResetHandles() override;
+
+  /* Calls func(THandle, TStruct*) for each handle.  Note this holds the
+   * global lock for the entirety of execution.
+   */
+  template <typename Functor>
+  void ForEach(Functor func);
 
  private:
   std::vector<std::shared_ptr<TStruct>> m_structures;
@@ -81,12 +89,13 @@ UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
 }
 
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
-void UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(
-    THandle handle) {
+std::shared_ptr<TStruct>
+UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   std::lock_guard<wpi::mutex> sync(m_handleMutex);
-  if (index < 0 || index >= static_cast<int16_t>(m_structures.size())) return;
-  m_structures[index].reset();
+  if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
+    return nullptr;
+  return std::move(m_structures[index]);
 }
 
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
@@ -99,4 +108,19 @@ void UnlimitedHandleResource<THandle, TStruct, enumValue>::ResetHandles() {
   }
   HandleBase::ResetHandles();
 }
+
+template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
+template <typename Functor>
+void UnlimitedHandleResource<THandle, TStruct, enumValue>::ForEach(
+    Functor func) {
+  std::lock_guard<wpi::mutex> sync(m_handleMutex);
+  size_t i;
+  for (i = 0; i < m_structures.size(); i++) {
+    if (m_structures[i] != nullptr) {
+      func(static_cast<THandle>(createHandle(i, enumValue, m_version)),
+           m_structures[i].get());
+    }
+  }
+}
+
 }  // namespace hal

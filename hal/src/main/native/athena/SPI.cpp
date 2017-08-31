@@ -15,6 +15,7 @@
 #include <array>
 #include <atomic>
 #include <cstring>
+#include <thread>
 
 #include <llvm/raw_ostream.h>
 #include <support/mutex.h>
@@ -515,13 +516,7 @@ void HAL_SetSPIHandle(HAL_SPIPort port, int32_t handle) {
   }
 }
 
-static void spiAccumulatorProcess(uint64_t currentTime,
-                                  HAL_NotifierHandle handle) {
-  int32_t status = 0;
-  auto param = HAL_GetNotifierParam(handle, &status);
-  if (param == nullptr) return;
-  SPIAccumulator* accum = static_cast<SPIAccumulator*>(param);
-
+static void spiAccumulatorProcess(uint64_t currentTime, SPIAccumulator* accum) {
   // perform SPI transaction
   uint8_t resp_b[4];
   HAL_TransactionSPI(accum->port, accum->cmd, resp_b, accum->xferSize);
@@ -564,7 +559,7 @@ static void spiAccumulatorProcess(uint64_t currentTime,
   // handle timer slip
   if (accum->triggerTime < currentTime)
     accum->triggerTime = currentTime + accum->period;
-  status = 0;
+  int32_t status = 0;
   HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, &status);
 }
 
@@ -623,10 +618,18 @@ void HAL_InitSPIAccumulator(HAL_SPIPort port, int32_t period, int32_t cmd,
   accum->bigEndian = bigEndian;
   accum->port = port;
   if (!accum->notifier) {
-    accum->notifier =
-        HAL_InitializeNotifier(spiAccumulatorProcess, accum, status);
+    accum->notifier = HAL_InitializeNotifier(status);
     accum->triggerTime = HAL_GetFPGATime(status) + period;
     if (*status != 0) return;
+    std::thread thr([=] {
+      int32_t status2 = 0;
+      while (status2 == 0) {
+        uint64_t curTime = HAL_WaitForNotifierAlarm(accum->notifier, &status2);
+        if (curTime == 0 || status2 != 0) break;
+        spiAccumulatorProcess(curTime, accum);
+      }
+    });
+    thr.detach();
     HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, status);
   }
 }
