@@ -31,7 +31,7 @@ public class MyRobot extends IterativeRobot {
     motor = new Spark(0);
 
     autoController = new PIDController(0.5, 0, 0, 0,
-        encoder.value(), motor, USCustomary.FOOT);
+        encoder.pidGet(Units.METRE), motor);
   }
 
   /**

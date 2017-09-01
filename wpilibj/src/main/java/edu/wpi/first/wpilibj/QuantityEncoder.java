@@ -58,6 +58,31 @@ abstract class QuantityEncoder<Q extends Quantity<Q>, S extends Quantity<S>> {
   }
 
   /**
+   * Get a {@code PIDSource} that can be used in a PIDController.
+   *
+   * @param unit The unit the PIDSource should provide when pidGet() is called
+   * @return A new PIDSource
+   */
+  public PIDSource pidSpeed(Unit<S> unit) {
+    return new PIDSource() {
+      @Override
+      public void setPIDSourceType(PIDSourceType pidSource) {
+        // This is an immutable property.
+      }
+
+      @Override
+      public PIDSourceType getPIDSourceType() {
+        return PIDSourceType.kDisplacement;
+      }
+
+      @Override
+      public double pidGet() {
+        return getSpeed(unit);
+      }
+    };
+  }
+
+  /**
    * Get the value the encoder has driven.
    *
    * @return The value driven since the last reset
@@ -83,6 +108,31 @@ abstract class QuantityEncoder<Q extends Quantity<Q>, S extends Quantity<S>> {
    */
   public Supplier<Quantity<Q>> value() {
     return this::get;
+  }
+
+  /**
+   * Get a {@code PIDSource} that can be used in a PIDController.
+   *
+   * @param unit The unit the PIDSource should provide when pidGet() is called
+   * @return A new PIDSource
+   */
+  public PIDSource pidGet(Unit<Q> unit) {
+    return new PIDSource() {
+      @Override
+      public void setPIDSourceType(PIDSourceType pidSource) {
+        // This is an immutable property.
+      }
+
+      @Override
+      public PIDSourceType getPIDSourceType() {
+        return PIDSourceType.kDisplacement;
+      }
+
+      @Override
+      public double pidGet() {
+        return get(unit);
+      }
+    };
   }
 
 }

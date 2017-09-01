@@ -10,16 +10,11 @@ package edu.wpi.first.wpilibj;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.TimerTask;
-import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 import edu.wpi.first.wpilibj.tables.ITable;
 import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.BoundaryException;
-
-import javax.measure.Quantity;
-import javax.measure.Unit;
-import javax.measure.quantity.Length;
 
 import static java.util.Objects.requireNonNull;
 
@@ -219,39 +214,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
                        PIDOutput output) {
     this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
-  }
-
-  /**
-   * Work in Progress!
-   *
-   * <p>Allocate a PID object with the given constants for P, I, D, using a 50ms period.
-   *
-   * @param Kp     the proportional coefficient
-   * @param Ki     the integral coefficient
-   * @param Kd     the derivative coefficient
-   * @param Kf     the feed forward term
-   * @param source The PIDSource object that is used to get values
-   * @param output The PIDOutput object that is set to the output percentage
-   */
-  @SuppressWarnings("ParameterName")
-  public PIDController(double Kp, double Ki, double Kd, double Kf,
-                       Supplier<Quantity<Length>> source, PIDOutput output, Unit<Length> unit) {
-    this(Kp, Ki, Kd, Kf, new PIDSource() {
-      @Override
-      public void setPIDSourceType(PIDSourceType pidSource) {
-        // NO-OP
-      }
-
-      @Override
-      public PIDSourceType getPIDSourceType() {
-        return PIDSourceType.kDisplacement;
-      }
-
-      @Override
-      public double pidGet() {
-        return source.get().to(unit).getValue().doubleValue();
-      }
-    }, output);
   }
 
   /**
