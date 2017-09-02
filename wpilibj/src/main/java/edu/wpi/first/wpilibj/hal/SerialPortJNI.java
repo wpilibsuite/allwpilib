@@ -34,7 +34,7 @@ public class SerialPortJNI extends JNIWrapper {
 
   public static native void serialSetWriteBufferSize(byte port, int size);
 
-  public static native int serialGetBytesRecieved(byte port);
+  public static native int serialGetBytesReceived(byte port);
 
   public static native int serialRead(byte port, ByteBuffer buffer, int count);
 

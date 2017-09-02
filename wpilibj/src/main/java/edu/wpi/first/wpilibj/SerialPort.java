@@ -217,7 +217,7 @@ public class SerialPort {
    * @return The number of bytes available to read.
    */
   public int getBytesReceived() {
-    return SerialPortJNI.serialGetBytesRecieved(m_port);
+    return SerialPortJNI.serialGetBytesReceived(m_port);
   }
 
   /**
