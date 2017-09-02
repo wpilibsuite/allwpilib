@@ -46,13 +46,10 @@ void Trigger::ToggleWhenActive(Command* command) {
 std::string Trigger::GetSmartDashboardType() const { return "Button"; }
 
 void Trigger::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  m_table = subtable;
-  if (m_table) {
-    m_pressedEntry = m_table->GetEntry("pressed");
+  if (subtable) {
+    m_pressedEntry = subtable->GetEntry("pressed");
     m_pressedEntry.SetBoolean(Get());
   } else {
     m_pressedEntry = nt::NetworkTableEntry();
   }
 }
-
-std::shared_ptr<nt::NetworkTable> Trigger::GetTable() const { return m_table; }

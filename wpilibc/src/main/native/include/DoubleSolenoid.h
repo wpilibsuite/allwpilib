@@ -42,7 +42,6 @@ class DoubleSolenoid : public SolenoidBase, public LiveWindowSendable {
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable);
-  std::shared_ptr<nt::NetworkTable> GetTable() const;
 
  private:
   int m_forwardChannel;  ///< The forward channel on the module to control.
@@ -52,7 +51,6 @@ class DoubleSolenoid : public SolenoidBase, public LiveWindowSendable {
   HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
   HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_valueEntry;
   NT_EntryListener m_valueListener = 0;
 };

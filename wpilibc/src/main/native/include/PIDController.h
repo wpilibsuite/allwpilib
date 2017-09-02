@@ -87,7 +87,6 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   PIDSource* m_pidInput;
   PIDOutput* m_pidOutput;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_pEntry;
   nt::NetworkTableEntry m_iEntry;
   nt::NetworkTableEntry m_dEntry;
@@ -154,7 +153,6 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;
 
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;

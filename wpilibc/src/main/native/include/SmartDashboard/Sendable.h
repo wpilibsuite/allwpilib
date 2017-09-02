@@ -23,11 +23,6 @@ class Sendable {
   virtual void InitTable(std::shared_ptr<nt::NetworkTable> subtable) = 0;
 
   /**
-   * @return the table that is currently associated with the sendable
-   */
-  virtual std::shared_ptr<nt::NetworkTable> GetTable() const = 0;
-
-  /**
    * @return the string representation of the named data type that will be used
    *         by the smart dashboard for this sendable
    */

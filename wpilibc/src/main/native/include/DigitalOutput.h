@@ -48,14 +48,12 @@ class DigitalOutput : public DigitalSource, public LiveWindowSendable {
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  private:
   int m_channel;
   HAL_DigitalHandle m_handle;
   HAL_DigitalPWMHandle m_pwmGenerator;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_valueEntry;
   NT_EntryListener m_valueListener = 0;
 };

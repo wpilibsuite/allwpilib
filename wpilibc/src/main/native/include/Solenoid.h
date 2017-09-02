@@ -38,12 +38,10 @@ class Solenoid : public SolenoidBase, public LiveWindowSendable {
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable);
-  std::shared_ptr<nt::NetworkTable> GetTable() const;
 
  private:
   HAL_SolenoidHandle m_solenoidHandle = HAL_kInvalidHandle;
   int m_channel;  ///< The channel on the module to control.
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_valueEntry;
   NT_EntryListener m_valueListener = 0;
 };

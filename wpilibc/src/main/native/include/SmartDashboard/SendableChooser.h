@@ -15,6 +15,7 @@
 
 #include "SmartDashboard/SendableChooserBase.h"
 #include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -35,6 +36,7 @@ namespace frc {
 template <class T>
 class SendableChooser : public SendableChooserBase {
   llvm::StringMap<T> m_choices;
+  nt::NetworkTableEntry m_selectedEntry;
 
   template <class U>
   static U _unwrap_smart_ptr(const U& value);

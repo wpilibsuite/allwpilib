@@ -35,13 +35,11 @@ class AnalogOutput : public SensorBase, public LiveWindowSendable {
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  protected:
   int m_channel;
   HAL_AnalogOutputHandle m_port;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_valueEntry;
 };
 

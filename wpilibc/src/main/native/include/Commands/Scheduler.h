@@ -44,7 +44,6 @@ class Scheduler : public ErrorBase, public NamedSendable {
   void UpdateTable();
   std::string GetSmartDashboardType() const;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable);
-  std::shared_ptr<nt::NetworkTable> GetTable() const;
   std::string GetName() const;
   std::string GetType() const;
 
@@ -68,7 +67,6 @@ class Scheduler : public ErrorBase, public NamedSendable {
   std::vector<std::string> commands;
   std::vector<double> ids;
   std::vector<double> toCancel;
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_namesEntry;
   nt::NetworkTableEntry m_idsEntry;
   nt::NetworkTableEntry m_cancelEntry;

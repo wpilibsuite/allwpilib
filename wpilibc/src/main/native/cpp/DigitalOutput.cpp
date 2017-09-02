@@ -257,15 +257,10 @@ std::string DigitalOutput::GetSmartDashboardType() const {
 }
 
 void DigitalOutput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  m_table = subTable;
-  if (m_table != nullptr) {
-    m_valueEntry = m_table->GetEntry("Value");
+  if (subTable) {
+    m_valueEntry = subTable->GetEntry("Value");
     UpdateTable();
   } else {
     m_valueEntry = nt::NetworkTableEntry();
   }
-}
-
-std::shared_ptr<nt::NetworkTable> DigitalOutput::GetTable() const {
-  return m_table;
 }

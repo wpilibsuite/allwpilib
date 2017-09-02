@@ -341,13 +341,10 @@ void PWM::StopLiveWindowMode() {
 std::string PWM::GetSmartDashboardType() const { return "Speed Controller"; }
 
 void PWM::InitTable(std::shared_ptr<NetworkTable> subTable) {
-  m_table = subTable;
-  if (m_table) {
-    m_valueEntry = m_table->GetEntry("Value");
+  if (subTable) {
+    m_valueEntry = subTable->GetEntry("Value");
     UpdateTable();
   } else {
     m_valueEntry = nt::NetworkTableEntry();
   }
 }
-
-std::shared_ptr<NetworkTable> PWM::GetTable() const { return m_table; }

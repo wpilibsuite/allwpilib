@@ -86,11 +86,10 @@ std::string ADXL345_I2C::GetSmartDashboardType() const {
 }
 
 void ADXL345_I2C::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  m_table = subtable;
-  if (m_table) {
-    m_xEntry = m_table->GetEntry("X");
-    m_yEntry = m_table->GetEntry("Y");
-    m_zEntry = m_table->GetEntry("Z");
+  if (subtable) {
+    m_xEntry = subtable->GetEntry("X");
+    m_yEntry = subtable->GetEntry("Y");
+    m_zEntry = subtable->GetEntry("Z");
     UpdateTable();
   } else {
     m_xEntry = nt::NetworkTableEntry();
@@ -103,8 +102,4 @@ void ADXL345_I2C::UpdateTable() {
   if (m_xEntry) m_xEntry.SetDouble(GetX());
   if (m_yEntry) m_yEntry.SetDouble(GetY());
   if (m_zEntry) m_zEntry.SetDouble(GetZ());
-}
-
-std::shared_ptr<nt::NetworkTable> ADXL345_I2C::GetTable() const {
-  return m_table;
 }

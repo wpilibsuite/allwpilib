@@ -506,11 +506,10 @@ std::string Encoder::GetSmartDashboardType() const {
 }
 
 void Encoder::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  m_table = subTable;
-  if (m_table) {
-    m_speedEntry = m_table->GetEntry("Speed");
-    m_distanceEntry = m_table->GetEntry("Distance");
-    m_distancePerTickEntry = m_table->GetEntry("Distance per Tick");
+  if (subTable) {
+    m_speedEntry = subTable->GetEntry("Speed");
+    m_distanceEntry = subTable->GetEntry("Distance");
+    m_distancePerTickEntry = subTable->GetEntry("Distance per Tick");
     UpdateTable();
   } else {
     m_speedEntry = nt::NetworkTableEntry();
@@ -518,5 +517,3 @@ void Encoder::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
     m_distancePerTickEntry = nt::NetworkTableEntry();
   }
 }
-
-std::shared_ptr<nt::NetworkTable> Encoder::GetTable() const { return m_table; }

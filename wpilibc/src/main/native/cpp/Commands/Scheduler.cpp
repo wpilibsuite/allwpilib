@@ -218,7 +218,6 @@ void Scheduler::ResetAll() {
   m_buttons.clear();
   m_additions.clear();
   m_commands.clear();
-  m_table = nullptr;
   m_namesEntry = nt::NetworkTableEntry();
   m_idsEntry = nt::NetworkTableEntry();
   m_cancelEntry = nt::NetworkTableEntry();
@@ -229,7 +228,7 @@ void Scheduler::ResetAll() {
  * SmartDashboard.
  */
 void Scheduler::UpdateTable() {
-  if (m_table != nullptr) {
+  if (m_cancelEntry && m_namesEntry && m_idsEntry) {
     // Get the list of possible commands to cancel
     auto new_toCancel = m_cancelEntry.GetValue();
     if (new_toCancel)
@@ -277,11 +276,10 @@ std::string Scheduler::GetType() const { return "Scheduler"; }
 std::string Scheduler::GetSmartDashboardType() const { return "Scheduler"; }
 
 void Scheduler::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  m_table = subTable;
-  if (m_table) {
-    m_namesEntry = m_table->GetEntry("Names");
-    m_idsEntry = m_table->GetEntry("Ids");
-    m_cancelEntry = m_table->GetEntry("Cancel");
+  if (subTable) {
+    m_namesEntry = subTable->GetEntry("Names");
+    m_idsEntry = subTable->GetEntry("Ids");
+    m_cancelEntry = subTable->GetEntry("Cancel");
     m_namesEntry.SetStringArray(commands);
     m_idsEntry.SetDoubleArray(ids);
     m_cancelEntry.SetDoubleArray(toCancel);
@@ -290,8 +288,4 @@ void Scheduler::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
     m_idsEntry = nt::NetworkTableEntry();
     m_cancelEntry = nt::NetworkTableEntry();
   }
-}
-
-std::shared_ptr<nt::NetworkTable> Scheduler::GetTable() const {
-  return m_table;
 }

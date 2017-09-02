@@ -90,7 +90,6 @@ class Encoder : public SensorBase,
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
   int GetFPGAIndex() const;
 
@@ -104,7 +103,6 @@ class Encoder : public SensorBase,
   std::unique_ptr<DigitalSource> m_indexSource = nullptr;
   HAL_EncoderHandle m_encoder = HAL_kInvalidHandle;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_speedEntry;
   nt::NetworkTableEntry m_distanceEntry;
   nt::NetworkTableEntry m_distancePerTickEntry;

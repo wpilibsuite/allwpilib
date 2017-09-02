@@ -43,7 +43,6 @@ class AnalogAccelerometer : public SensorBase,
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  private:
   void InitAccelerometer();
@@ -52,7 +51,6 @@ class AnalogAccelerometer : public SensorBase,
   double m_voltsPerG = 1.0;
   double m_zeroGVoltage = 2.5;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_valueEntry;
 };
 

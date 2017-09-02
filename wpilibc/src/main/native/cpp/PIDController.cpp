@@ -562,19 +562,18 @@ std::string PIDController::GetSmartDashboardType() const {
 
 void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
   RemoveListeners();
-  m_table = subtable;
-  if (m_table) {
-    m_pEntry = m_table->GetEntry(kP);
+  if (subtable) {
+    m_pEntry = subtable->GetEntry(kP);
     m_pEntry.SetDouble(GetP());
-    m_iEntry = m_table->GetEntry(kI);
+    m_iEntry = subtable->GetEntry(kI);
     m_iEntry.SetDouble(GetI());
-    m_dEntry = m_table->GetEntry(kD);
+    m_dEntry = subtable->GetEntry(kD);
     m_dEntry.SetDouble(GetD());
-    m_fEntry = m_table->GetEntry(kF);
+    m_fEntry = subtable->GetEntry(kF);
     m_fEntry.SetDouble(GetF());
-    m_setpointEntry = m_table->GetEntry(kSetpoint);
+    m_setpointEntry = subtable->GetEntry(kSetpoint);
     m_setpointEntry.SetDouble(GetSetpoint());
-    m_enabledEntry = m_table->GetEntry(kEnabled);
+    m_enabledEntry = subtable->GetEntry(kEnabled);
     m_enabledEntry.SetBoolean(IsEnabled());
 
     m_pListener = m_pEntry.AddListener(
@@ -647,10 +646,6 @@ double PIDController::GetContinuousError(double error) const {
   }
 
   return error;
-}
-
-std::shared_ptr<nt::NetworkTable> PIDController::GetTable() const {
-  return m_table;
 }
 
 void PIDController::UpdateTable() {}
