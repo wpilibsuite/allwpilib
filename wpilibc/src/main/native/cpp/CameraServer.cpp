@@ -12,6 +12,7 @@
 
 #include "Utility.h"
 #include "WPIErrors.h"
+#include "networktables/NetworkTableInstance.h"
 #include "ntcore_cpp.h"
 
 using namespace frc;
@@ -61,7 +62,8 @@ static std::string MakeStreamValue(llvm::StringRef address, int port) {
   return rv;
 }
 
-std::shared_ptr<ITable> CameraServer::GetSourceTable(CS_Source source) {
+std::shared_ptr<nt::NetworkTable> CameraServer::GetSourceTable(
+    CS_Source source) {
   std::lock_guard<std::mutex> lock(m_mutex);
   return m_tables.lookup(source);
 }
@@ -140,7 +142,7 @@ void CameraServer::UpdateStreamValues() {
 
       // Set table value
       auto values = GetSinkStreamValues(sink);
-      if (!values.empty()) table->PutStringArray("streams", values);
+      if (!values.empty()) table->GetEntry("streams").SetStringArray(values);
     }
   }
 
@@ -153,7 +155,7 @@ void CameraServer::UpdateStreamValues() {
     if (table) {
       // Set table value
       auto values = GetSourceStreamValues(source);
-      if (!values.empty()) table->PutStringArray("streams", values);
+      if (!values.empty()) table->GetEntry("streams").SetStringArray(values);
     }
   }
 }
@@ -258,8 +260,8 @@ static inline llvm::StringRef Concatenate(llvm::StringRef lhs,
   return oss.str();
 }
 
-static void PutSourcePropertyValue(ITable* table, const cs::VideoEvent& event,
-                                   bool isNew) {
+static void PutSourcePropertyValue(nt::NetworkTable* table,
+                                   const cs::VideoEvent& event, bool isNew) {
   llvm::SmallString<64> name;
   llvm::SmallString<64> infoName;
   if (llvm::StringRef{event.name}.startswith("raw_")) {
@@ -276,34 +278,35 @@ static void PutSourcePropertyValue(ITable* table, const cs::VideoEvent& event,
 
   llvm::SmallString<64> buf;
   CS_Status status = 0;
+  nt::NetworkTableEntry entry = table->GetEntry(name);
   switch (event.propertyKind) {
     case cs::VideoProperty::kBoolean:
       if (isNew)
-        table->SetDefaultBoolean(name, event.value != 0);
+        entry.SetDefaultBoolean(event.value != 0);
       else
-        table->PutBoolean(name, event.value != 0);
+        entry.SetBoolean(event.value != 0);
       break;
     case cs::VideoProperty::kInteger:
     case cs::VideoProperty::kEnum:
       if (isNew) {
-        table->SetDefaultNumber(name, event.value);
-        table->PutNumber(Concatenate(infoName, "/min", buf),
-                         cs::GetPropertyMin(event.propertyHandle, &status));
-        table->PutNumber(Concatenate(infoName, "/max", buf),
-                         cs::GetPropertyMax(event.propertyHandle, &status));
-        table->PutNumber(Concatenate(infoName, "/step", buf),
-                         cs::GetPropertyStep(event.propertyHandle, &status));
-        table->PutNumber(Concatenate(infoName, "/default", buf),
-                         cs::GetPropertyDefault(event.propertyHandle, &status));
+        entry.SetDefaultDouble(event.value);
+        table->GetEntry(Concatenate(infoName, "/min", buf))
+            .SetDouble(cs::GetPropertyMin(event.propertyHandle, &status));
+        table->GetEntry(Concatenate(infoName, "/max", buf))
+            .SetDouble(cs::GetPropertyMax(event.propertyHandle, &status));
+        table->GetEntry(Concatenate(infoName, "/step", buf))
+            .SetDouble(cs::GetPropertyStep(event.propertyHandle, &status));
+        table->GetEntry(Concatenate(infoName, "/default", buf))
+            .SetDouble(cs::GetPropertyDefault(event.propertyHandle, &status));
       } else {
-        table->PutNumber(name, event.value);
+        entry.SetDouble(event.value);
       }
       break;
     case cs::VideoProperty::kString:
       if (isNew)
-        table->SetDefaultString(name, event.valueStr);
+        entry.SetDefaultString(event.valueStr);
       else
-        table->PutString(name, event.valueStr);
+        entry.SetString(event.valueStr);
       break;
     default:
       break;
@@ -311,7 +314,8 @@ static void PutSourcePropertyValue(ITable* table, const cs::VideoEvent& event,
 }
 
 CameraServer::CameraServer()
-    : m_publishTable{NetworkTable::GetTable(kPublishName)},
+    : m_publishTable{nt::NetworkTableInstance::GetDefault().GetTable(
+          kPublishName)},
       m_nextPort(kBasePort) {
   // We publish sources to NetworkTables using the following structure:
   // "/CameraPublisher/{Source.Name}/" - root
@@ -337,28 +341,30 @@ CameraServer::CameraServer()
               m_tables.insert(std::make_pair(event.sourceHandle, table));
             }
             llvm::SmallString<64> buf;
-            table->PutString("source",
-                             MakeSourceValue(event.sourceHandle, buf));
+            table->GetEntry("source").SetString(
+                MakeSourceValue(event.sourceHandle, buf));
             llvm::SmallString<64> descBuf;
-            table->PutString(
-                "description",
-                cs::GetSourceDescription(event.sourceHandle, descBuf, &status));
-            table->PutBoolean("connected", cs::IsSourceConnected(
-                                               event.sourceHandle, &status));
-            table->PutStringArray("streams",
-                                  GetSourceStreamValues(event.sourceHandle));
+            table->GetEntry("description")
+                .SetString(cs::GetSourceDescription(event.sourceHandle, descBuf,
+                                                    &status));
+            table->GetEntry("connected")
+                .SetBoolean(cs::IsSourceConnected(event.sourceHandle, &status));
+            table->GetEntry("streams").SetStringArray(
+                GetSourceStreamValues(event.sourceHandle));
             auto mode = cs::GetSourceVideoMode(event.sourceHandle, &status);
-            table->SetDefaultString("mode", VideoModeToString(mode));
-            table->PutStringArray("modes",
-                                  GetSourceModeValues(event.sourceHandle));
+            table->GetEntry("mode").SetDefaultString(VideoModeToString(mode));
+            table->GetEntry("modes").SetStringArray(
+                GetSourceModeValues(event.sourceHandle));
             break;
           }
           case cs::VideoEvent::kSourceDestroyed: {
             auto table = GetSourceTable(event.sourceHandle);
             if (table) {
-              table->PutString("source", "");
-              table->PutStringArray("streams", std::vector<std::string>{});
-              table->PutStringArray("modes", std::vector<std::string>{});
+              table->GetEntry("source").SetString("");
+              table->GetEntry("streams").SetStringArray(
+                  std::vector<std::string>{});
+              table->GetEntry("modes").SetStringArray(
+                  std::vector<std::string>{});
             }
             break;
           }
@@ -367,28 +373,29 @@ CameraServer::CameraServer()
             if (table) {
               // update the description too (as it may have changed)
               llvm::SmallString<64> descBuf;
-              table->PutString("description",
-                               cs::GetSourceDescription(event.sourceHandle,
-                                                        descBuf, &status));
-              table->PutBoolean("connected", true);
+              table->GetEntry("description")
+                  .SetString(cs::GetSourceDescription(event.sourceHandle,
+                                                      descBuf, &status));
+              table->GetEntry("connected").SetBoolean(true);
             }
             break;
           }
           case cs::VideoEvent::kSourceDisconnected: {
             auto table = GetSourceTable(event.sourceHandle);
-            if (table) table->PutBoolean("connected", false);
+            if (table) table->GetEntry("connected").SetBoolean(false);
             break;
           }
           case cs::VideoEvent::kSourceVideoModesUpdated: {
             auto table = GetSourceTable(event.sourceHandle);
             if (table)
-              table->PutStringArray("modes",
-                                    GetSourceModeValues(event.sourceHandle));
+              table->GetEntry("modes").SetStringArray(
+                  GetSourceModeValues(event.sourceHandle));
             break;
           }
           case cs::VideoEvent::kSourceVideoModeChanged: {
             auto table = GetSourceTable(event.sourceHandle);
-            if (table) table->PutString("mode", VideoModeToString(event.mode));
+            if (table)
+              table->GetEntry("mode").SetString(VideoModeToString(event.mode));
             break;
           }
           case cs::VideoEvent::kSourcePropertyCreated: {
@@ -409,7 +416,7 @@ CameraServer::CameraServer()
               name += "/choices";
               auto choices =
                   cs::GetEnumPropertyChoices(event.propertyHandle, &status);
-              table->PutStringArray(name, choices);
+              table->GetEntry(name).SetStringArray(choices);
             }
             break;
           }
@@ -432,12 +439,11 @@ CameraServer::CameraServer()
   // synchronization issues, so just update to current setting if someone
   // else tries to change it.
   llvm::SmallString<64> buf;
-  m_tableListener = nt::AddEntryListener(
+  m_tableListener = nt::NetworkTableInstance::GetDefault().AddEntryListener(
       Concatenate(kPublishName, "/", buf),
-      [=](unsigned int uid, llvm::StringRef key,
-          std::shared_ptr<nt::Value> value, unsigned int flags) {
+      [=](const nt::EntryNotification& event) {
         llvm::StringRef relativeKey =
-            key.substr(llvm::StringRef(kPublishName).size() + 1);
+            event.name.substr(llvm::StringRef(kPublishName).size() + 1);
 
         // get source (sourceName/...)
         auto subKeyIndex = relativeKey.find('/');
@@ -451,10 +457,10 @@ CameraServer::CameraServer()
 
         // handle standard names
         llvm::StringRef propName;
+        nt::NetworkTableEntry entry{event.entry};
         if (relativeKey == "mode") {
           // reset to current mode
-          nt::SetEntryValue(key, nt::Value::MakeString(VideoModeToString(
-                                     sourceIt->second.GetVideoMode())));
+          entry.SetString(VideoModeToString(sourceIt->second.GetVideoMode()));
           return;
         } else if (relativeKey.startswith("Property/")) {
           propName = relativeKey.substr(9);
@@ -470,14 +476,14 @@ CameraServer::CameraServer()
           case cs::VideoProperty::kNone:
             return;
           case cs::VideoProperty::kBoolean:
-            nt::SetEntryValue(key, nt::Value::MakeBoolean(property.Get() != 0));
+            entry.SetBoolean(property.Get() != 0);
             return;
           case cs::VideoProperty::kInteger:
           case cs::VideoProperty::kEnum:
-            nt::SetEntryValue(key, nt::Value::MakeDouble(property.Get()));
+            entry.SetDouble(property.Get());
             return;
           case cs::VideoProperty::kString:
-            nt::SetEntryValue(key, nt::Value::MakeString(property.GetString()));
+            entry.SetString(property.GetString());
             return;
           default:
             return;

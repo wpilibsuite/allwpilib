@@ -104,7 +104,7 @@ Relay::~Relay() {
   if (m_forwardHandle != HAL_kInvalidHandle) HAL_FreeRelayPort(m_forwardHandle);
   if (m_reverseHandle != HAL_kInvalidHandle) HAL_FreeRelayPort(m_reverseHandle);
 
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 /**
@@ -273,50 +273,55 @@ void Relay::GetDescription(llvm::raw_ostream& desc) const {
   desc << "Relay " << GetChannel();
 }
 
-void Relay::ValueChanged(ITable* source, llvm::StringRef key,
-                         std::shared_ptr<nt::Value> value, bool isNew) {
-  if (!value->IsString()) return;
-  if (value->GetString() == "Off")
-    Set(kOff);
-  else if (value->GetString() == "Forward")
-    Set(kForward);
-  else if (value->GetString() == "Reverse")
-    Set(kReverse);
-  else if (value->GetString() == "On")
-    Set(kOn);
-}
-
 void Relay::UpdateTable() {
-  if (m_table != nullptr) {
+  if (m_valueEntry) {
     if (Get() == kOn) {
-      m_table->PutString("Value", "On");
+      m_valueEntry.SetString("On");
     } else if (Get() == kForward) {
-      m_table->PutString("Value", "Forward");
+      m_valueEntry.SetString("Forward");
     } else if (Get() == kReverse) {
-      m_table->PutString("Value", "Reverse");
+      m_valueEntry.SetString("Reverse");
     } else {
-      m_table->PutString("Value", "Off");
+      m_valueEntry.SetString("Off");
     }
   }
 }
 
 void Relay::StartLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  if (m_valueEntry) {
+    m_valueListener = m_valueEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsString()) return;
+          if (event.value->GetString() == "Off")
+            Set(kOff);
+          else if (event.value->GetString() == "Forward")
+            Set(kForward);
+          else if (event.value->GetString() == "Reverse")
+            Set(kReverse);
+          else if (event.value->GetString() == "On")
+            Set(kOn);
+        },
+        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
 void Relay::StopLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) {
+    m_valueEntry.RemoveListener(m_valueListener);
+    m_valueListener = 0;
   }
 }
 
 std::string Relay::GetSmartDashboardType() const { return "Relay"; }
 
-void Relay::InitTable(std::shared_ptr<ITable> subTable) {
+void Relay::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> Relay::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> Relay::GetTable() const { return m_table; }

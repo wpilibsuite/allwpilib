@@ -11,7 +11,7 @@
 #include <string>
 
 #include "SmartDashboard/Sendable.h"
-#include "tables/ITable.h"
+#include "networktables/NetworkTable.h"
 
 namespace frc {
 
@@ -25,7 +25,7 @@ class SendableChooserBase : public Sendable {
  public:
   virtual ~SendableChooserBase() = default;
 
-  std::shared_ptr<ITable> GetTable() const override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
 
  protected:
@@ -34,7 +34,7 @@ class SendableChooserBase : public Sendable {
   static const char* kSelected;
 
   std::string m_defaultChoice;
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
 };
 
 }  // namespace frc

@@ -14,7 +14,7 @@
 
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SolenoidBase.h"
-#include "tables/ITableListener.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -25,9 +25,7 @@ namespace frc {
  * The DoubleSolenoid class is typically used for pneumatics solenoids that
  * have two positions controlled by two separate channels.
  */
-class DoubleSolenoid : public SolenoidBase,
-                       public LiveWindowSendable,
-                       public ITableListener {
+class DoubleSolenoid : public SolenoidBase, public LiveWindowSendable {
  public:
   enum Value { kOff, kForward, kReverse };
 
@@ -39,14 +37,12 @@ class DoubleSolenoid : public SolenoidBase,
   bool IsFwdSolenoidBlackListed() const;
   bool IsRevSolenoidBlackListed() const;
 
-  void ValueChanged(ITable* source, llvm::StringRef key,
-                    std::shared_ptr<nt::Value> value, bool isNew);
   void UpdateTable();
   void StartLiveWindowMode();
   void StopLiveWindowMode();
   std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<ITable> subTable);
-  std::shared_ptr<ITable> GetTable() const;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subTable);
+  std::shared_ptr<nt::NetworkTable> GetTable() const;
 
  private:
   int m_forwardChannel;  ///< The forward channel on the module to control.
@@ -56,7 +52,9 @@ class DoubleSolenoid : public SolenoidBase,
   HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
   HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
 
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_valueEntry;
+  NT_EntryListener m_valueListener = 0;
 };
 
 }  // namespace frc

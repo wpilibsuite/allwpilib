@@ -33,6 +33,13 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
 }
 
 /**
+ * Destructor.
+ */
+Compressor::~Compressor() {
+  if (m_enabledListener != 0) m_enabledEntry.RemoveListener(m_enabledListener);
+}
+
+/**
  * Starts closed-loop control. Note that closed loop control is enabled by
  * default.
  */
@@ -300,30 +307,46 @@ void Compressor::ClearAllPCMStickyFaults() {
 }
 
 void Compressor::UpdateTable() {
-  if (m_table) {
-    m_table->PutBoolean("Enabled", Enabled());
-    m_table->PutBoolean("Pressure switch", GetPressureSwitchValue());
+  if (m_enabledEntry) m_enabledEntry.SetBoolean(Enabled());
+  if (m_pressureSwitchEntry)
+    m_pressureSwitchEntry.SetBoolean(GetPressureSwitchValue());
+}
+
+void Compressor::StartLiveWindowMode() {
+  if (m_enabledEntry) {
+    m_enabledListener = m_enabledEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsBoolean()) return;
+          if (event.value->GetBoolean())
+            Start();
+          else
+            Stop();
+        },
+        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
-void Compressor::StartLiveWindowMode() {}
-
-void Compressor::StopLiveWindowMode() {}
+void Compressor::StopLiveWindowMode() {
+  if (m_enabledListener != 0) {
+    m_enabledEntry.RemoveListener(m_enabledListener);
+    m_enabledListener = 0;
+  }
+}
 
 std::string Compressor::GetSmartDashboardType() const { return "Compressor"; }
 
-void Compressor::InitTable(std::shared_ptr<ITable> subTable) {
+void Compressor::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_enabledEntry = m_table->GetEntry("Enabled");
+    m_pressureSwitchEntry = m_table->GetEntry("Pressure switch");
+    UpdateTable();
+  } else {
+    m_enabledEntry = nt::NetworkTableEntry();
+    m_pressureSwitchEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> Compressor::GetTable() const { return m_table; }
-
-void Compressor::ValueChanged(ITable* source, llvm::StringRef key,
-                              std::shared_ptr<nt::Value> value, bool isNew) {
-  if (!value->IsBoolean()) return;
-  if (value->GetBoolean())
-    Start();
-  else
-    Stop();
+std::shared_ptr<nt::NetworkTable> Compressor::GetTable() const {
+  return m_table;
 }

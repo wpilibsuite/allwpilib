@@ -14,6 +14,7 @@
 #include "PIDSource.h"
 #include "SensorBase.h"
 #include "interfaces/Gyro.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -35,11 +36,12 @@ class GyroBase : public Gyro,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  private:
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_valueEntry;
 };
 
 }  // namespace frc

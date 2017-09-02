@@ -16,7 +16,7 @@
 
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
-#include "tables/ITableListener.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -37,9 +37,7 @@ namespace frc {
  *   - 1 = minimum pulse width (currently .5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public SensorBase,
-            public ITableListener,
-            public LiveWindowSendable {
+class PWM : public SensorBase, public LiveWindowSendable {
  public:
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
@@ -80,16 +78,16 @@ class PWM : public SensorBase,
   int GetChannel() const { return m_channel; }
 
  protected:
-  void ValueChanged(ITable* source, llvm::StringRef key,
-                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_valueEntry;
+  NT_EntryListener m_valueListener = 0;
 
  private:
   int m_channel;

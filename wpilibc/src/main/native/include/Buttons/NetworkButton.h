@@ -8,23 +8,25 @@
 #pragma once
 
 #include <memory>
-#include <string>
+
+#include <llvm/StringRef.h>
 
 #include "Buttons/Button.h"
+#include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
 class NetworkButton : public Button {
  public:
-  NetworkButton(const std::string& tableName, const std::string& field);
-  NetworkButton(std::shared_ptr<ITable> table, const std::string& field);
+  NetworkButton(llvm::StringRef tableName, llvm::StringRef field);
+  NetworkButton(std::shared_ptr<nt::NetworkTable> table, llvm::StringRef field);
   virtual ~NetworkButton() = default;
 
   virtual bool Get();
 
  private:
-  std::shared_ptr<ITable> m_netTable;
-  std::string m_field;
+  nt::NetworkTableEntry m_entry;
 };
 
 }  // namespace frc

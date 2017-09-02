@@ -12,6 +12,7 @@
 
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -37,11 +38,14 @@ class PowerDistributionPanel : public SensorBase, public LiveWindowSendable {
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  private:
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_chanEntry[16];
+  nt::NetworkTableEntry m_voltageEntry;
+  nt::NetworkTableEntry m_totalCurrentEntry;
   int m_module;
 };
 

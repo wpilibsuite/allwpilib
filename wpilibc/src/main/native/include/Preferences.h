@@ -15,7 +15,6 @@
 
 #include "ErrorBase.h"
 #include "networktables/NetworkTable.h"
-#include "tables/ITableListener.h"
 
 namespace frc {
 
@@ -58,16 +57,8 @@ class Preferences : public ErrorBase {
   virtual ~Preferences() = default;
 
  private:
-  std::shared_ptr<ITable> m_table;
-  class Listener : public ITableListener {
-   public:
-    void ValueChanged(ITable* source, llvm::StringRef key,
-                      std::shared_ptr<nt::Value> value, bool isNew) override;
-    void ValueChangedEx(ITable* source, llvm::StringRef key,
-                        std::shared_ptr<nt::Value> value,
-                        uint32_t flags) override;
-  };
-  Listener m_listener;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  NT_EntryListener m_listener;
 };
 
 }  // namespace frc

@@ -172,26 +172,11 @@ void PowerDistributionPanel::ClearStickyFaults() {
 }
 
 void PowerDistributionPanel::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Chan0", GetCurrent(0));
-    m_table->PutNumber("Chan1", GetCurrent(1));
-    m_table->PutNumber("Chan2", GetCurrent(2));
-    m_table->PutNumber("Chan3", GetCurrent(3));
-    m_table->PutNumber("Chan4", GetCurrent(4));
-    m_table->PutNumber("Chan5", GetCurrent(5));
-    m_table->PutNumber("Chan6", GetCurrent(6));
-    m_table->PutNumber("Chan7", GetCurrent(7));
-    m_table->PutNumber("Chan8", GetCurrent(8));
-    m_table->PutNumber("Chan9", GetCurrent(9));
-    m_table->PutNumber("Chan10", GetCurrent(10));
-    m_table->PutNumber("Chan11", GetCurrent(11));
-    m_table->PutNumber("Chan12", GetCurrent(12));
-    m_table->PutNumber("Chan13", GetCurrent(13));
-    m_table->PutNumber("Chan14", GetCurrent(14));
-    m_table->PutNumber("Chan15", GetCurrent(15));
-    m_table->PutNumber("Voltage", GetVoltage());
-    m_table->PutNumber("TotalCurrent", GetTotalCurrent());
+  for (size_t i = 0; i < sizeof(m_chanEntry) / sizeof(m_chanEntry[0]); ++i) {
+    if (m_chanEntry[i]) m_chanEntry[i].SetDouble(GetCurrent(i));
   }
+  if (m_voltageEntry) m_voltageEntry.SetDouble(GetVoltage());
+  if (m_totalCurrentEntry) m_totalCurrentEntry.SetDouble(GetTotalCurrent());
 }
 
 void PowerDistributionPanel::StartLiveWindowMode() {}
@@ -202,11 +187,28 @@ std::string PowerDistributionPanel::GetSmartDashboardType() const {
   return "PowerDistributionPanel";
 }
 
-void PowerDistributionPanel::InitTable(std::shared_ptr<ITable> subTable) {
+void PowerDistributionPanel::InitTable(
+    std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table != nullptr) {
+    for (size_t i = 0; i < sizeof(m_chanEntry) / sizeof(m_chanEntry[0]); ++i) {
+      llvm::SmallString<32> buf;
+      llvm::raw_svector_ostream oss(buf);
+      oss << "Chan" << i;
+      m_chanEntry[i] = m_table->GetEntry(oss.str());
+    }
+    m_voltageEntry = m_table->GetEntry("Voltage");
+    m_totalCurrentEntry = m_table->GetEntry("TotalCurrent");
+    UpdateTable();
+  } else {
+    for (size_t i = 0; i < sizeof(m_chanEntry) / sizeof(m_chanEntry[0]); ++i) {
+      m_chanEntry[i] = nt::NetworkTableEntry();
+    }
+    m_voltageEntry = nt::NetworkTableEntry();
+    m_totalCurrentEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> PowerDistributionPanel::GetTable() const {
+std::shared_ptr<nt::NetworkTable> PowerDistributionPanel::GetTable() const {
   return m_table;
 }

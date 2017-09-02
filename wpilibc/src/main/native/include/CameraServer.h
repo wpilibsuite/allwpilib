@@ -293,7 +293,7 @@ class CameraServer : public ErrorBase {
  private:
   CameraServer();
 
-  std::shared_ptr<ITable> GetSourceTable(CS_Source source);
+  std::shared_ptr<nt::NetworkTable> GetSourceTable(CS_Source source);
   std::vector<std::string> GetSinkStreamValues(CS_Sink sink);
   std::vector<std::string> GetSourceStreamValues(CS_Source source);
   void UpdateStreamValues();
@@ -305,8 +305,8 @@ class CameraServer : public ErrorBase {
   std::string m_primarySourceName;
   llvm::StringMap<cs::VideoSource> m_sources;
   llvm::StringMap<cs::VideoSink> m_sinks;
-  llvm::DenseMap<CS_Source, std::shared_ptr<ITable>> m_tables;
-  std::shared_ptr<NetworkTable> m_publishTable;
+  llvm::DenseMap<CS_Source, std::shared_ptr<nt::NetworkTable>> m_tables;
+  std::shared_ptr<nt::NetworkTable> m_publishTable;
   cs::VideoListener m_videoListener;
   int m_tableListener;
   int m_nextPort;

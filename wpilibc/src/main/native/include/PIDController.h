@@ -21,6 +21,7 @@
 #include "PIDInterface.h"
 #include "PIDSource.h"
 #include "Timer.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -36,9 +37,7 @@ class PIDOutput;
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
  */
-class PIDController : public LiveWindowSendable,
-                      public PIDInterface,
-                      public ITableListener {
+class PIDController : public LiveWindowSendable, public PIDInterface {
  public:
   PIDController(double p, double i, double d, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
@@ -82,13 +81,26 @@ class PIDController : public LiveWindowSendable,
 
   void Reset() override;
 
-  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
 
  protected:
   PIDSource* m_pidInput;
   PIDOutput* m_pidOutput;
 
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_pEntry;
+  nt::NetworkTableEntry m_iEntry;
+  nt::NetworkTableEntry m_dEntry;
+  nt::NetworkTableEntry m_fEntry;
+  nt::NetworkTableEntry m_setpointEntry;
+  nt::NetworkTableEntry m_enabledEntry;
+  NT_EntryListener m_pListener = 0;
+  NT_EntryListener m_iListener = 0;
+  NT_EntryListener m_dListener = 0;
+  NT_EntryListener m_fListener = 0;
+  NT_EntryListener m_setpointListener = 0;
+  NT_EntryListener m_enabledListener = 0;
+
   virtual void Calculate();
   virtual double CalculateFeedForward();
   double GetContinuousError(double error) const;
@@ -142,13 +154,12 @@ class PIDController : public LiveWindowSendable,
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;
 
-  std::shared_ptr<ITable> GetTable() const override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
-  void ValueChanged(ITable* source, llvm::StringRef key,
-                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
+  void RemoveListeners();
 };
 
 }  // namespace frc

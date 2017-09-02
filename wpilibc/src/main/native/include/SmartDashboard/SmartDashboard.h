@@ -7,17 +7,17 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "SensorBase.h"
-#include "SmartDashboard/NamedSendable.h"
-#include "SmartDashboard/Sendable.h"
-#include "tables/ITable.h"
+#include "networktables/NetworkTableValue.h"
 
 namespace frc {
+
+class NamedSendable;
+class Sendable;
 
 class SmartDashboard : public SensorBase {
  public:
@@ -86,15 +86,6 @@ class SmartDashboard : public SensorBase {
 
  private:
   virtual ~SmartDashboard() = default;
-
-  /** The {@link NetworkTable} used by {@link SmartDashboard} */
-  static std::shared_ptr<ITable> m_table;
-
-  /**
-   * A map linking tables in the SmartDashboard to the
-   * {@link SmartDashboardData} objects they came from.
-   */
-  static std::map<std::shared_ptr<ITable>, Sendable*> m_tablesToData;
 };
 
 }  // namespace frc

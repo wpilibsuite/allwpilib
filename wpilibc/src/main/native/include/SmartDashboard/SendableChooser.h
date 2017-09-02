@@ -14,7 +14,7 @@
 #include <llvm/StringRef.h>
 
 #include "SmartDashboard/SendableChooserBase.h"
-#include "tables/ITable.h"
+#include "networktables/NetworkTable.h"
 
 namespace frc {
 
@@ -53,7 +53,7 @@ class SendableChooser : public SendableChooserBase {
 
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 
-  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
 };
 
 }  // namespace frc

@@ -242,7 +242,7 @@ double PIDSubsystem::PIDGet() { return ReturnPIDInput(); }
 
 std::string PIDSubsystem::GetSmartDashboardType() const { return "PIDCommand"; }
 
-void PIDSubsystem::InitTable(std::shared_ptr<ITable> subtable) {
+void PIDSubsystem::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
   m_controller->InitTable(subtable);
   Subsystem::InitTable(subtable);
 }

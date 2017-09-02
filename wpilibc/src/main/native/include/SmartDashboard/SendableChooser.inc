@@ -68,7 +68,7 @@ auto SendableChooser<T>::GetSelected()
 }
 
 template <class T>
-void SendableChooser<T>::InitTable(std::shared_ptr<ITable> subtable) {
+void SendableChooser<T>::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
   std::vector<std::string> keys;
   m_table = subtable;
   if (m_table != nullptr) {
@@ -79,8 +79,9 @@ void SendableChooser<T>::InitTable(std::shared_ptr<ITable> subtable) {
     // Unlike std::map, llvm::StringMap elements are not sorted
     std::sort(keys.begin(), keys.end());
 
-    m_table->PutValue(kOptions, nt::Value::MakeStringArray(std::move(keys)));
-    m_table->PutString(kDefault, m_defaultChoice);
+    m_table->GetEntry(kOptions).SetValue(
+        nt::Value::MakeStringArray(std::move(keys)));
+    m_table->GetEntry(kDefault).SetString(m_defaultChoice);
   }
 }
 

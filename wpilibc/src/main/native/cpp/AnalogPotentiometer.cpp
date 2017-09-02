@@ -86,17 +86,21 @@ std::string AnalogPotentiometer::GetSmartDashboardType() const {
 /**
  * Live Window code, only does anything if live window is activated.
  */
-void AnalogPotentiometer::InitTable(std::shared_ptr<ITable> subtable) {
+void AnalogPotentiometer::InitTable(
+    std::shared_ptr<nt::NetworkTable> subtable) {
   m_table = subtable;
-  UpdateTable();
-}
-
-void AnalogPotentiometer::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", Get());
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
   }
 }
 
-std::shared_ptr<ITable> AnalogPotentiometer::GetTable() const {
+void AnalogPotentiometer::UpdateTable() {
+  if (m_valueEntry) m_valueEntry.SetDouble(Get());
+}
+
+std::shared_ptr<nt::NetworkTable> AnalogPotentiometer::GetTable() const {
   return m_table;
 }

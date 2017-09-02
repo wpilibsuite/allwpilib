@@ -11,6 +11,7 @@
 #include <string>
 
 #include "SmartDashboard/Sendable.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -43,12 +44,13 @@ class Trigger : public Sendable {
   void CancelWhenActive(Command* command);
   void ToggleWhenActive(Command* command);
 
-  void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
 
  protected:
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_pressedEntry;
 };
 
 }  // namespace frc

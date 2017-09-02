@@ -94,9 +94,7 @@ double AnalogOutput::GetVoltage() const {
 }
 
 void AnalogOutput::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetVoltage());
-  }
+  if (m_valueEntry) m_valueEntry.SetDouble(GetVoltage());
 }
 
 void AnalogOutput::StartLiveWindowMode() {}
@@ -107,9 +105,16 @@ std::string AnalogOutput::GetSmartDashboardType() const {
   return "Analog Output";
 }
 
-void AnalogOutput::InitTable(std::shared_ptr<ITable> subTable) {
+void AnalogOutput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> AnalogOutput::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> AnalogOutput::GetTable() const {
+  return m_table;
+}

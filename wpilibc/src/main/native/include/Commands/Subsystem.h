@@ -12,6 +12,7 @@
 
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -42,12 +43,16 @@ class Subsystem : public ErrorBase, public NamedSendable {
 
  public:
   std::string GetName() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
 
  protected:
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_hasDefaultEntry;
+  nt::NetworkTableEntry m_defaultEntry;
+  nt::NetworkTableEntry m_hasCommandEntry;
+  nt::NetworkTableEntry m_commandEntry;
 };
 
 }  // namespace frc

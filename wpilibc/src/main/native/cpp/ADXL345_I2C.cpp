@@ -85,15 +85,26 @@ std::string ADXL345_I2C::GetSmartDashboardType() const {
   return "3AxisAccelerometer";
 }
 
-void ADXL345_I2C::InitTable(std::shared_ptr<ITable> subtable) {
+void ADXL345_I2C::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
   m_table = subtable;
-  UpdateTable();
+  if (m_table) {
+    m_xEntry = m_table->GetEntry("X");
+    m_yEntry = m_table->GetEntry("Y");
+    m_zEntry = m_table->GetEntry("Z");
+    UpdateTable();
+  } else {
+    m_xEntry = nt::NetworkTableEntry();
+    m_yEntry = nt::NetworkTableEntry();
+    m_zEntry = nt::NetworkTableEntry();
+  }
 }
 
 void ADXL345_I2C::UpdateTable() {
-  m_table->PutNumber("X", GetX());
-  m_table->PutNumber("Y", GetY());
-  m_table->PutNumber("Z", GetZ());
+  if (m_xEntry) m_xEntry.SetDouble(GetX());
+  if (m_yEntry) m_yEntry.SetDouble(GetY());
+  if (m_zEntry) m_zEntry.SetDouble(GetZ());
 }
 
-std::shared_ptr<ITable> ADXL345_I2C::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> ADXL345_I2C::GetTable() const {
+  return m_table;
+}

@@ -13,6 +13,7 @@
 #include <llvm/raw_ostream.h>
 
 #include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 
@@ -33,8 +34,10 @@ LiveWindow* LiveWindow::GetInstance() {
  * Allocate the necessary tables.
  */
 LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
-  m_liveWindowTable = NetworkTable::GetTable("LiveWindow");
+  m_liveWindowTable =
+      nt::NetworkTableInstance::GetDefault().GetTable("LiveWindow");
   m_statusTable = m_liveWindowTable->GetSubTable("~STATUS~");
+  m_enabledEntry = m_statusTable->GetEntry("LW Enabled");
 }
 
 /**
@@ -61,7 +64,7 @@ void LiveWindow::SetEnabled(bool enabled) {
     m_scheduler->SetEnabled(true);
   }
   m_enabled = enabled;
-  m_statusTable->PutBoolean("LW Enabled", m_enabled);
+  m_enabledEntry.SetBoolean(m_enabled);
 }
 
 /**
@@ -228,13 +231,13 @@ void LiveWindow::InitializeLiveWindowComponents() {
     LiveWindowComponent c = elem.second;
     std::string subsystem = c.subsystem;
     std::string name = c.name;
-    m_liveWindowTable->GetSubTable(subsystem)->PutString("~TYPE~",
-                                                         "LW Subsystem");
-    std::shared_ptr<ITable> table(
+    m_liveWindowTable->GetSubTable(subsystem)->GetEntry("~TYPE~").SetString(
+        "LW Subsystem");
+    std::shared_ptr<NetworkTable> table(
         m_liveWindowTable->GetSubTable(subsystem)->GetSubTable(name));
-    table->PutString("~TYPE~", component->GetSmartDashboardType());
-    table->PutString("Name", name);
-    table->PutString("Subsystem", subsystem);
+    table->GetEntry("~TYPE~").SetString(component->GetSmartDashboardType());
+    table->GetEntry("Name").SetString(name);
+    table->GetEntry("Subsystem").SetString(subsystem);
     component->InitTable(table);
     if (c.isSensor) {
       m_sensors.push_back(component);

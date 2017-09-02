@@ -99,7 +99,7 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
 DoubleSolenoid::~DoubleSolenoid() {
   HAL_FreeSolenoidPort(m_forwardHandle);
   HAL_FreeSolenoidPort(m_reverseHandle);
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 /**
@@ -181,37 +181,44 @@ bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
   return (blackList & m_reverseMask) ? 1 : 0;
 }
 
-void DoubleSolenoid::ValueChanged(ITable* source, llvm::StringRef key,
-                                  std::shared_ptr<nt::Value> value,
-                                  bool isNew) {
-  if (!value->IsString()) return;
-  Value lvalue = kOff;
-  if (value->GetString() == "Forward")
-    lvalue = kForward;
-  else if (value->GetString() == "Reverse")
-    lvalue = kReverse;
-  Set(lvalue);
-}
-
 void DoubleSolenoid::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutString(
-        "Value", (Get() == kForward ? "Forward"
-                                    : (Get() == kReverse ? "Reverse" : "Off")));
+  if (m_valueEntry) {
+    switch (Get()) {
+      case kForward:
+        m_valueEntry.SetString("Forward");
+        break;
+      case kReverse:
+        m_valueEntry.SetString("Reverse");
+        break;
+      default:
+        m_valueEntry.SetString("Off");
+        break;
+    }
   }
 }
 
 void DoubleSolenoid::StartLiveWindowMode() {
   Set(kOff);
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  if (m_valueEntry) {
+    m_valueListener = m_valueEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsString()) return;
+          Value lvalue = kOff;
+          if (event.value->GetString() == "Forward")
+            lvalue = kForward;
+          else if (event.value->GetString() == "Reverse")
+            lvalue = kReverse;
+          Set(lvalue);
+        },
+        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
 void DoubleSolenoid::StopLiveWindowMode() {
   Set(kOff);
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) {
+    m_valueEntry.RemoveListener(m_valueListener);
+    m_valueListener = 0;
   }
 }
 
@@ -219,9 +226,16 @@ std::string DoubleSolenoid::GetSmartDashboardType() const {
   return "Double Solenoid";
 }
 
-void DoubleSolenoid::InitTable(std::shared_ptr<ITable> subTable) {
+void DoubleSolenoid::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> DoubleSolenoid::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> DoubleSolenoid::GetTable() const {
+  return m_table;
+}

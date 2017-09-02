@@ -480,14 +480,14 @@ int Encoder::GetFPGAIndex() const {
 }
 
 void Encoder::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Speed", GetRate());
-    m_table->PutNumber("Distance", GetDistance());
+  if (m_speedEntry) m_speedEntry.SetDouble(GetRate());
+  if (m_distanceEntry) m_distanceEntry.SetDouble(GetDistance());
+  if (m_distancePerTickEntry) {
     int32_t status = 0;
     double distancePerPulse =
         HAL_GetEncoderDistancePerPulse(m_encoder, &status);
     wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    m_table->PutNumber("Distance per Tick", distancePerPulse);
+    m_distancePerTickEntry.SetDouble(distancePerPulse);
   }
 }
 
@@ -505,9 +505,18 @@ std::string Encoder::GetSmartDashboardType() const {
     return "Encoder";
 }
 
-void Encoder::InitTable(std::shared_ptr<ITable> subTable) {
+void Encoder::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_speedEntry = m_table->GetEntry("Speed");
+    m_distanceEntry = m_table->GetEntry("Distance");
+    m_distancePerTickEntry = m_table->GetEntry("Distance per Tick");
+    UpdateTable();
+  } else {
+    m_speedEntry = nt::NetworkTableEntry();
+    m_distanceEntry = nt::NetworkTableEntry();
+    m_distancePerTickEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> Encoder::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> Encoder::GetTable() const { return m_table; }

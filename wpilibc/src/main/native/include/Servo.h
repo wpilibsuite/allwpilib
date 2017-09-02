@@ -12,6 +12,7 @@
 
 #include "SafePWM.h"
 #include "SpeedController.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -34,16 +35,17 @@ class Servo : public SafePWM {
   static double GetMaxAngle() { return kMaxServoAngle; }
   static double GetMinAngle() { return kMinServoAngle; }
 
-  void ValueChanged(ITable* source, llvm::StringRef key,
-                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
-  std::shared_ptr<ITable> m_table;
+ protected:
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_valueEntry;
+  NT_EntryListener m_valueListener = 0;
 
  private:
   double GetServoAngleRange() const { return kMaxServoAngle - kMinServoAngle; }
