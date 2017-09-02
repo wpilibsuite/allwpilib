@@ -175,7 +175,6 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     return "3AxisAccelerometer";
   }
 
-  private NetworkTable m_table;
   @SuppressWarnings("MemberName")
   private NetworkTableEntry m_xEntry;
   @SuppressWarnings("MemberName")
@@ -185,11 +184,10 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
 
   @Override
   public void initTable(NetworkTable subtable) {
-    m_table = subtable;
-    if (m_table != null) {
-      m_xEntry = m_table.getEntry("X");
-      m_yEntry = m_table.getEntry("Y");
-      m_zEntry = m_table.getEntry("Z");
+    if (subtable != null) {
+      m_xEntry = subtable.getEntry("X");
+      m_yEntry = subtable.getEntry("Y");
+      m_zEntry = subtable.getEntry("Z");
       updateTable();
     } else {
       m_xEntry = null;
@@ -209,11 +207,6 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     if (m_zEntry != null) {
       m_zEntry.setDouble(getZ());
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 
   @Override

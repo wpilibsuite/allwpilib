@@ -70,14 +70,12 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
     return "Analog Output";
   }
 
-  private NetworkTable m_table;
   private NetworkTableEntry m_valueEntry;
 
   @Override
   public void initTable(NetworkTable subtable) {
-    m_table = subtable;
-    if (m_table != null) {
-      m_valueEntry = m_table.getEntry("Value");
+    if (subtable != null) {
+      m_valueEntry = subtable.getEntry("Value");
       updateTable();
     } else {
       m_valueEntry = null;
@@ -89,11 +87,6 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
     if (m_valueEntry != null) {
       m_valueEntry.setDouble(getVoltage());
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 
   /**

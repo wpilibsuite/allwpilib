@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 
 public interface CANSpeedController extends SpeedController, PIDInterface, LiveWindowSendable {
@@ -142,93 +140,7 @@ public interface CANSpeedController extends SpeedController, PIDInterface, LiveW
   String SMART_DASHBOARD_TYPE = "CANSpeedController";
 
   @Override
-  default void updateTable() {
-    NetworkTable table = getTable();
-    if (table != null) {
-      table.getEntry("~TYPE~").setString(SMART_DASHBOARD_TYPE);
-      table.getEntry("Type").setString(getClass().getSimpleName());
-      table.getEntry("Mode").setDouble(getControlMode().getValue());
-      if (getControlMode().isPID()) {
-        table.getEntry("p").setDouble(getP());
-        table.getEntry("i").setDouble(getI());
-        table.getEntry("d").setDouble(getD());
-        table.getEntry("f").setDouble(getF());
-      }
-      table.getEntry("Enabled").setBoolean(isEnabled());
-      table.getEntry("Value").setDouble(get());
-    }
-  }
-
-  @Override
   default String getSmartDashboardType() {
     return SMART_DASHBOARD_TYPE;
   }
-
-  /**
-   * Remove table listeners.
-   */
-  default void removeTableListeners(int[] listeners) {
-    NetworkTable table = getTable();
-    if (table != null) {
-      table.getEntry("Mode").removeListener(listeners[0]);
-      table.getEntry("p").removeListener(listeners[1]);
-      table.getEntry("i").removeListener(listeners[2]);
-      table.getEntry("d").removeListener(listeners[3]);
-      table.getEntry("f").removeListener(listeners[4]);
-      table.getEntry("Enabled").removeListener(listeners[5]);
-      table.getEntry("Value").removeListener(listeners[6]);
-    }
-  }
-
-  /**
-   * Create table listeners.
-   */
-  default int[] createTableListeners() {
-    int[] listeners = new int[7];
-    NetworkTable table = getTable();
-    if (table != null) {
-      listeners[0] = table.getEntry("Mode").addListener(
-          (event) -> setControlMode((int) event.value.getDouble()),
-          EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      listeners[1] = table.getEntry("p").addListener((event) -> {
-        if (getControlMode().isPID()) {
-          setP(event.value.getDouble());
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      listeners[2] = table.getEntry("i").addListener((event) -> {
-        if (getControlMode().isPID()) {
-          setI(event.value.getDouble());
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      listeners[3] = table.getEntry("d").addListener((event) -> {
-        if (getControlMode().isPID()) {
-          setD(event.value.getDouble());
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      listeners[4] = table.getEntry("f").addListener((event) -> {
-        if (getControlMode().isPID()) {
-          setF(event.value.getDouble());
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      listeners[5] = table.getEntry("Enabled").addListener((event) -> {
-        if (event.value.getBoolean()) {
-          enable();
-        } else {
-          disable();
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      listeners[6] = table.getEntry("Value").addListener(
-          (event) -> set(event.value.getDouble()),
-          EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-    }
-    return listeners;
-  }
-
-
 }

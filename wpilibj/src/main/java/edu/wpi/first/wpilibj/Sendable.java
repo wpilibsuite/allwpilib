@@ -22,13 +22,6 @@ public interface Sendable {
   void initTable(NetworkTable subtable);
 
   /**
-   * The table that is associated with this {@link Sendable}.
-   *
-   * @return the table that is currently associated with the {@link Sendable}.
-   */
-  NetworkTable getTable();
-
-  /**
    * The string representation of the named data type that will be used by the smart dashboard for
    * this {@link Sendable}.
    *

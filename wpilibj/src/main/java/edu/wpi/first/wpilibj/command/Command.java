@@ -564,7 +564,6 @@ public abstract class Command implements NamedSendable {
     return "Command";
   }
 
-  private NetworkTable m_table;
   private NetworkTableEntry m_runningEntry;
   private NetworkTableEntry m_isParentedEntry;
   private int m_runningListener;
@@ -574,7 +573,6 @@ public abstract class Command implements NamedSendable {
     if (m_runningEntry != null) {
       m_runningEntry.removeListener(m_runningListener);
     }
-    m_table = table;
     if (table != null) {
       m_runningEntry = table.getEntry("running");
       m_isParentedEntry = table.getEntry("isParented");
@@ -593,10 +591,4 @@ public abstract class Command implements NamedSendable {
       m_isParentedEntry = null;
     }
   }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
-  }
-
 }

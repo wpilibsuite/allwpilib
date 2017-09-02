@@ -695,7 +695,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     return "PIDController";
   }
 
-  private NetworkTable m_table;
   @SuppressWarnings("MemberName")
   private NetworkTableEntry m_pEntry;
   @SuppressWarnings("MemberName")
@@ -741,7 +740,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   @Override
   public void initTable(NetworkTable table) {
     removeListeners();
-    m_table = table;
     if (table != null) {
       m_pEntry = table.getEntry("p");
       m_pEntry.setDouble(getP());
@@ -825,12 +823,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     return error;
   }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
-  }
-
 
   @Override
   public void updateTable() {
