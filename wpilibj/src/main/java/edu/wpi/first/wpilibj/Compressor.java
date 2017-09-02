@@ -35,7 +35,6 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * @param module The PCM CAN device ID (0 - 62 inclusive)
    */
   public Compressor(int module) {
-    m_table = null;
     m_module = (byte) module;
 
     m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
@@ -215,27 +214,20 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
     return "Compressor";
   }
 
-  private NetworkTable m_table;
   private NetworkTableEntry m_enabledEntry;
   private NetworkTableEntry m_pressureSwitchEntry;
   private int m_enabledListener;
 
   @Override
   public void initTable(NetworkTable subtable) {
-    m_table = subtable;
-    if (m_table != null) {
-      m_enabledEntry = m_table.getEntry("Enabled");
-      m_pressureSwitchEntry = m_table.getEntry("Pressure Switch");
+    if (subtable != null) {
+      m_enabledEntry = subtable.getEntry("Enabled");
+      m_pressureSwitchEntry = subtable.getEntry("Pressure Switch");
       updateTable();
     } else {
       m_enabledEntry = null;
       m_pressureSwitchEntry = null;
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 
   @Override

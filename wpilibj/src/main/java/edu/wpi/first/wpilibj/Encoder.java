@@ -577,29 +577,22 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     return "Encoder";
   }
 
-  private NetworkTable m_table;
   private NetworkTableEntry m_speedEntry;
   private NetworkTableEntry m_distanceEntry;
   private NetworkTableEntry m_distancePerTickEntry;
 
   @Override
   public void initTable(NetworkTable subtable) {
-    m_table = subtable;
-    if (m_table != null) {
-      m_speedEntry = m_table.getEntry("Speed");
-      m_distanceEntry = m_table.getEntry("Distance");
-      m_distancePerTickEntry = m_table.getEntry("Distance per Tick");
+    if (subtable != null) {
+      m_speedEntry = subtable.getEntry("Speed");
+      m_distanceEntry = subtable.getEntry("Distance");
+      m_distancePerTickEntry = subtable.getEntry("Distance per Tick");
       updateTable();
     } else {
       m_speedEntry = null;
       m_distanceEntry = null;
       m_distancePerTickEntry = null;
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 
   @Override

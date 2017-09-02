@@ -103,14 +103,12 @@ public class SendableChooser<V> implements Sendable {
     return "String Chooser";
   }
 
-  private NetworkTable m_table;
   private NetworkTableEntry m_tableDefault;
   private NetworkTableEntry m_tableSelected;
   private NetworkTableEntry m_tableOptions;
 
   @Override
   public void initTable(NetworkTable table) {
-    m_table = table;
     if (table != null) {
       m_tableDefault = table.getEntry(DEFAULT);
       m_tableSelected = table.getEntry(SELECTED);
@@ -120,10 +118,5 @@ public class SendableChooser<V> implements Sendable {
         m_tableDefault.setString(m_defaultChoice);
       }
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 }

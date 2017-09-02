@@ -60,23 +60,16 @@ public abstract class GyroBase extends SensorBase implements Gyro, PIDSource, Li
     return "Gyro";
   }
 
-  private NetworkTable m_table;
   private NetworkTableEntry m_valueEntry;
 
   @Override
   public void initTable(NetworkTable subtable) {
-    m_table = subtable;
-    if (m_table != null) {
-      m_valueEntry = m_table.getEntry("Value");
+    if (subtable != null) {
+      m_valueEntry = subtable.getEntry("Value");
       updateTable();
     } else {
       m_valueEntry = null;
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 
   @Override

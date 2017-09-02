@@ -195,22 +195,15 @@ public abstract class Trigger implements Sendable {
     return "Button";
   }
 
-  private NetworkTable m_table;
   private NetworkTableEntry m_pressedEntry;
 
   @Override
   public void initTable(NetworkTable table) {
-    m_table = table;
     if (table != null) {
       m_pressedEntry = table.getEntry("pressed");
       m_pressedEntry.setBoolean(get());
     } else {
       m_pressedEntry = null;
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 }

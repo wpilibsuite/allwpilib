@@ -110,7 +110,7 @@ public abstract class Subsystem implements NamedSendable {
       }
       m_defaultCommand = command;
     }
-    if (m_table != null) {
+    if (m_hasDefaultEntry != null && m_defaultEntry != null) {
       if (m_defaultCommand != null) {
         m_hasDefaultEntry.setBoolean(true);
         m_defaultEntry.setString(m_defaultCommand.getName());
@@ -150,7 +150,7 @@ public abstract class Subsystem implements NamedSendable {
    */
   void confirmCommand() {
     if (m_currentCommandChanged) {
-      if (m_table != null) {
+      if (m_hasCommandEntry != null && m_commandEntry != null) {
         if (m_currentCommand != null) {
           m_hasCommandEntry.setBoolean(true);
           m_commandEntry.setString(m_currentCommand.getName());
@@ -191,7 +191,6 @@ public abstract class Subsystem implements NamedSendable {
     return "Subsystem";
   }
 
-  private NetworkTable m_table;
   private NetworkTableEntry m_hasDefaultEntry;
   private NetworkTableEntry m_defaultEntry;
   private NetworkTableEntry m_hasCommandEntry;
@@ -199,7 +198,6 @@ public abstract class Subsystem implements NamedSendable {
 
   @Override
   public void initTable(NetworkTable table) {
-    m_table = table;
     if (table != null) {
       m_hasDefaultEntry = table.getEntry("hasDefault");
       m_defaultEntry = table.getEntry("default");
@@ -219,10 +217,5 @@ public abstract class Subsystem implements NamedSendable {
         m_hasCommandEntry.setBoolean(false);
       }
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 }

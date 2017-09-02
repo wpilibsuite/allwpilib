@@ -73,7 +73,6 @@ public class Scheduler implements NamedSendable {
    * A list of all {@link Command Commands} which need to be added.
    */
   private Vector<Command> m_additions = new Vector<>();
-  private NetworkTable m_table;
   private NetworkTableEntry m_namesEntry;
   private NetworkTableEntry m_idsEntry;
   private NetworkTableEntry m_cancelEntry;
@@ -315,11 +314,10 @@ public class Scheduler implements NamedSendable {
 
   @Override
   public void initTable(NetworkTable subtable) {
-    m_table = subtable;
-    if (m_table != null) {
-      m_namesEntry = m_table.getEntry("Names");
-      m_idsEntry = m_table.getEntry("Ids");
-      m_cancelEntry = m_table.getEntry("Cancel");
+    if (subtable != null) {
+      m_namesEntry = subtable.getEntry("Names");
+      m_idsEntry = subtable.getEntry("Ids");
+      m_cancelEntry = subtable.getEntry("Cancel");
       m_namesEntry.setStringArray(new String[0]);
       m_idsEntry.setDoubleArray(new double[0]);
       m_cancelEntry.setDoubleArray(new double[0]);
@@ -331,7 +329,7 @@ public class Scheduler implements NamedSendable {
   }
 
   private void updateTable() {
-    if (m_table != null) {
+    if (m_namesEntry != null && m_idsEntry != null && m_cancelEntry != null) {
       // Get the commands to cancel
       double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
       if (toCancel.length > 0) {
@@ -363,11 +361,6 @@ public class Scheduler implements NamedSendable {
         m_idsEntry.setDoubleArray(ids);
       }
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 
   @Override

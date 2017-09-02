@@ -118,32 +118,25 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   /*
    * Live Window code, only does anything if live window is activated.
    */
-  private NetworkTable m_table;
   private NetworkTableEntry[] m_chanEntry;
   private NetworkTableEntry m_voltageEntry;
   private NetworkTableEntry m_totalCurrentEntry;
 
   @Override
   public void initTable(NetworkTable subtable) {
-    m_table = subtable;
-    if (m_table != null) {
+    if (subtable != null) {
       m_chanEntry = new NetworkTableEntry[16];
       for (int i = 0; i < m_chanEntry.length; i++) {
-        m_chanEntry[i] = m_table.getEntry("Chan" + i);
+        m_chanEntry[i] = subtable.getEntry("Chan" + i);
       }
-      m_voltageEntry = m_table.getEntry("Voltage");
-      m_totalCurrentEntry = m_table.getEntry("TotalCurrent");
+      m_voltageEntry = subtable.getEntry("Voltage");
+      m_totalCurrentEntry = subtable.getEntry("TotalCurrent");
       updateTable();
     } else {
       m_chanEntry = null;
       m_voltageEntry = null;
       m_totalCurrentEntry = null;
     }
-  }
-
-  @Override
-  public NetworkTable getTable() {
-    return m_table;
   }
 
   @Override
