@@ -60,11 +60,10 @@ std::string BuiltInAccelerometer::GetSmartDashboardType() const {
 
 void BuiltInAccelerometer::InitTable(
     std::shared_ptr<nt::NetworkTable> subtable) {
-  m_table = subtable;
-  if (m_table != nullptr) {
-    m_xEntry = m_table->GetEntry("X");
-    m_yEntry = m_table->GetEntry("Y");
-    m_zEntry = m_table->GetEntry("Z");
+  if (subtable != nullptr) {
+    m_xEntry = subtable->GetEntry("X");
+    m_yEntry = subtable->GetEntry("Y");
+    m_zEntry = subtable->GetEntry("Z");
     UpdateTable();
   } else {
     m_xEntry = nt::NetworkTableEntry();
@@ -77,8 +76,4 @@ void BuiltInAccelerometer::UpdateTable() {
   if (m_xEntry) m_xEntry.SetDouble(GetX());
   if (m_yEntry) m_yEntry.SetDouble(GetY());
   if (m_zEntry) m_zEntry.SetDouble(GetZ());
-}
-
-std::shared_ptr<nt::NetworkTable> BuiltInAccelerometer::GetTable() const {
-  return m_table;
 }

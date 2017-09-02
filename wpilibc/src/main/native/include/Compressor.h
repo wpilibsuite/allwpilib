@@ -61,7 +61,6 @@ class Compressor : public SensorBase, public LiveWindowSendable {
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  protected:
   HAL_CompressorHandle m_compressorHandle;
@@ -70,7 +69,6 @@ class Compressor : public SensorBase, public LiveWindowSendable {
   void SetCompressor(bool on);
   int m_module;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_enabledEntry;
   nt::NetworkTableEntry m_pressureSwitchEntry;
   NT_EntryListener m_enabledListener = 0;

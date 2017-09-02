@@ -59,7 +59,7 @@ void SendableChooser<T>::AddDefault(llvm::StringRef name, T object) {
 template <class T>
 auto SendableChooser<T>::GetSelected()
     -> decltype(_unwrap_smart_ptr(m_choices[""])) {
-  std::string selected = m_table->GetString(kSelected, m_defaultChoice);
+  std::string selected = m_selectedEntry.GetString(m_defaultChoice);
   if (selected == "") {
     return decltype(_unwrap_smart_ptr(m_choices[""])){};
   } else {
@@ -70,8 +70,8 @@ auto SendableChooser<T>::GetSelected()
 template <class T>
 void SendableChooser<T>::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
   std::vector<std::string> keys;
-  m_table = subtable;
-  if (m_table != nullptr) {
+  if (subtable) {
+    m_selectedEntry = subtable->GetEntry(kSelected);
     for (const auto& choice : m_choices) {
       keys.push_back(choice.first());
     }
@@ -79,9 +79,9 @@ void SendableChooser<T>::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
     // Unlike std::map, llvm::StringMap elements are not sorted
     std::sort(keys.begin(), keys.end());
 
-    m_table->GetEntry(kOptions).SetValue(
+    subtable->GetEntry(kOptions).SetValue(
         nt::Value::MakeStringArray(std::move(keys)));
-    m_table->GetEntry(kDefault).SetString(m_defaultChoice);
+    subtable->GetEntry(kDefault).SetString(m_defaultChoice);
   }
 }
 

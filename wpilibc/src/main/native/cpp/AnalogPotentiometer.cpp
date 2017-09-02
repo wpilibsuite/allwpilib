@@ -88,9 +88,8 @@ std::string AnalogPotentiometer::GetSmartDashboardType() const {
  */
 void AnalogPotentiometer::InitTable(
     std::shared_ptr<nt::NetworkTable> subtable) {
-  m_table = subtable;
-  if (m_table) {
-    m_valueEntry = m_table->GetEntry("Value");
+  if (subtable) {
+    m_valueEntry = subtable->GetEntry("Value");
     UpdateTable();
   } else {
     m_valueEntry = nt::NetworkTableEntry();
@@ -99,8 +98,4 @@ void AnalogPotentiometer::InitTable(
 
 void AnalogPotentiometer::UpdateTable() {
   if (m_valueEntry) m_valueEntry.SetDouble(Get());
-}
-
-std::shared_ptr<nt::NetworkTable> AnalogPotentiometer::GetTable() const {
-  return m_table;
 }

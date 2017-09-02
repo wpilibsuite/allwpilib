@@ -45,11 +45,9 @@ class Trigger : public Sendable {
   void ToggleWhenActive(Command* command);
 
   void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
 
  protected:
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_pressedEntry;
 };
 

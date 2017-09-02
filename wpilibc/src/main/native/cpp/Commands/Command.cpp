@@ -435,12 +435,11 @@ std::string Command::GetSmartDashboardType() const { return "Command"; }
 
 void Command::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
   if (m_runningListener != 0) m_runningEntry.RemoveListener(m_runningListener);
-  m_table = subtable;
-  if (m_table != nullptr) {
-    m_table->GetEntry(kName).SetString(GetName());
-    m_runningEntry = m_table->GetEntry(kRunning);
+  if (subtable) {
+    subtable->GetEntry(kName).SetString(GetName());
+    m_runningEntry = subtable->GetEntry(kRunning);
     m_runningEntry.SetBoolean(IsRunning());
-    m_isParentedEntry = m_table->GetEntry(kIsParented);
+    m_isParentedEntry = subtable->GetEntry(kIsParented);
     m_isParentedEntry.SetBoolean(m_parent != nullptr);
 
     m_runningListener = m_runningEntry.AddListener(
@@ -455,5 +454,3 @@ void Command::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
         NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
-
-std::shared_ptr<nt::NetworkTable> Command::GetTable() const { return m_table; }

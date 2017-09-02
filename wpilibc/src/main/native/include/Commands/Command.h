@@ -161,11 +161,7 @@ class Command : public ErrorBase, public NamedSendable {
  public:
   std::string GetName() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
-
- protected:
-  std::shared_ptr<nt::NetworkTable> m_table;
 
  private:
   nt::NetworkTableEntry m_runningEntry;

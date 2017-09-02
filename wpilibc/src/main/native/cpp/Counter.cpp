@@ -613,13 +613,10 @@ void Counter::StopLiveWindowMode() {}
 std::string Counter::GetSmartDashboardType() const { return "Counter"; }
 
 void Counter::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  m_table = subTable;
-  if (m_table) {
-    m_valueEntry = m_table->GetEntry("Value");
+  if (subTable) {
+    m_valueEntry = subTable->GetEntry("Value");
     UpdateTable();
   } else {
     m_valueEntry = nt::NetworkTableEntry();
   }
 }
-
-std::shared_ptr<nt::NetworkTable> Counter::GetTable() const { return m_table; }

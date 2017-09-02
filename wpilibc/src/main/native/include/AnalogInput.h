@@ -83,7 +83,6 @@ class AnalogInput : public SensorBase,
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  private:
   int m_channel;
@@ -91,7 +90,6 @@ class AnalogInput : public SensorBase,
   HAL_AnalogInputHandle m_port;
   int64_t m_accumulatorOffset;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_valueEntry;
 };
 

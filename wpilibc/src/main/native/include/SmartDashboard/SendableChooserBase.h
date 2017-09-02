@@ -25,7 +25,6 @@ class SendableChooserBase : public Sendable {
  public:
   virtual ~SendableChooserBase() = default;
 
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
 
  protected:
@@ -34,7 +33,6 @@ class SendableChooserBase : public Sendable {
   static const char* kSelected;
 
   std::string m_defaultChoice;
-  std::shared_ptr<nt::NetworkTable> m_table;
 };
 
 }  // namespace frc

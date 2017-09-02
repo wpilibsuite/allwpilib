@@ -336,17 +336,12 @@ void Compressor::StopLiveWindowMode() {
 std::string Compressor::GetSmartDashboardType() const { return "Compressor"; }
 
 void Compressor::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  m_table = subTable;
-  if (m_table) {
-    m_enabledEntry = m_table->GetEntry("Enabled");
-    m_pressureSwitchEntry = m_table->GetEntry("Pressure switch");
+  if (subTable) {
+    m_enabledEntry = subTable->GetEntry("Enabled");
+    m_pressureSwitchEntry = subTable->GetEntry("Pressure switch");
     UpdateTable();
   } else {
     m_enabledEntry = nt::NetworkTableEntry();
     m_pressureSwitchEntry = nt::NetworkTableEntry();
   }
-}
-
-std::shared_ptr<nt::NetworkTable> Compressor::GetTable() const {
-  return m_table;
 }

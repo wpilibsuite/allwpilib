@@ -55,7 +55,6 @@ class ADXL362 : public Accelerometer, public LiveWindowSendable {
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
   void UpdateTable() override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   void StartLiveWindowMode() override {}
   void StopLiveWindowMode() override {}
 
@@ -63,7 +62,6 @@ class ADXL362 : public Accelerometer, public LiveWindowSendable {
   SPI m_spi;
   double m_gsPerLSB = 0.001;
 
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_xEntry;
   nt::NetworkTableEntry m_yEntry;
   nt::NetworkTableEntry m_zEntry;

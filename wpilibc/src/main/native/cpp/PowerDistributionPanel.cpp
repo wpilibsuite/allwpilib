@@ -189,16 +189,15 @@ std::string PowerDistributionPanel::GetSmartDashboardType() const {
 
 void PowerDistributionPanel::InitTable(
     std::shared_ptr<nt::NetworkTable> subTable) {
-  m_table = subTable;
-  if (m_table != nullptr) {
+  if (subTable != nullptr) {
     for (size_t i = 0; i < sizeof(m_chanEntry) / sizeof(m_chanEntry[0]); ++i) {
       llvm::SmallString<32> buf;
       llvm::raw_svector_ostream oss(buf);
       oss << "Chan" << i;
-      m_chanEntry[i] = m_table->GetEntry(oss.str());
+      m_chanEntry[i] = subTable->GetEntry(oss.str());
     }
-    m_voltageEntry = m_table->GetEntry("Voltage");
-    m_totalCurrentEntry = m_table->GetEntry("TotalCurrent");
+    m_voltageEntry = subTable->GetEntry("Voltage");
+    m_totalCurrentEntry = subTable->GetEntry("TotalCurrent");
     UpdateTable();
   } else {
     for (size_t i = 0; i < sizeof(m_chanEntry) / sizeof(m_chanEntry[0]); ++i) {
@@ -207,8 +206,4 @@ void PowerDistributionPanel::InitTable(
     m_voltageEntry = nt::NetworkTableEntry();
     m_totalCurrentEntry = nt::NetworkTableEntry();
   }
-}
-
-std::shared_ptr<nt::NetworkTable> PowerDistributionPanel::GetTable() const {
-  return m_table;
 }

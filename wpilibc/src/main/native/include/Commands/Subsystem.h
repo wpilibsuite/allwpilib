@@ -44,11 +44,9 @@ class Subsystem : public ErrorBase, public NamedSendable {
  public:
   std::string GetName() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
 
  protected:
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_hasDefaultEntry;
   nt::NetworkTableEntry m_defaultEntry;
   nt::NetworkTableEntry m_hasCommandEntry;

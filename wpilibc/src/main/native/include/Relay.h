@@ -58,10 +58,8 @@ class Relay : public MotorSafety, public SensorBase, public LiveWindowSendable {
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  protected:
-  std::shared_ptr<nt::NetworkTable> m_table;
   nt::NetworkTableEntry m_valueEntry;
   NT_EntryListener m_valueListener = 0;
 

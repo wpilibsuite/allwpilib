@@ -331,13 +331,10 @@ void Ultrasonic::StopLiveWindowMode() {}
 std::string Ultrasonic::GetSmartDashboardType() const { return "Ultrasonic"; }
 
 void Ultrasonic::InitTable(std::shared_ptr<NetworkTable> subTable) {
-  m_table = subTable;
-  if (m_table != nullptr) {
-    m_valueEntry = m_table->GetEntry("Value");
+  if (subTable) {
+    m_valueEntry = subTable->GetEntry("Value");
     UpdateTable();
   } else {
     m_valueEntry = nt::NetworkTableEntry();
   }
 }
-
-std::shared_ptr<NetworkTable> Ultrasonic::GetTable() const { return m_table; }

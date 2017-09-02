@@ -64,7 +64,7 @@ void Subsystem::SetDefaultCommand(Command* command) {
 
     m_defaultCommand = command;
   }
-  if (m_table != nullptr) {
+  if (m_hasDefaultEntry && m_defaultEntry) {
     if (m_defaultCommand != nullptr) {
       m_hasDefaultEntry.SetBoolean(true);
       m_defaultEntry.SetString(m_defaultCommand->GetName());
@@ -119,7 +119,7 @@ void Subsystem::Periodic() {}
  */
 void Subsystem::ConfirmCommand() {
   if (m_currentCommandChanged) {
-    if (m_table != nullptr) {
+    if (m_hasCommandEntry && m_commandEntry) {
       if (m_currentCommand != nullptr) {
         m_hasCommandEntry.SetBoolean(true);
         m_commandEntry.SetString(m_currentCommand->GetName());
@@ -136,12 +136,11 @@ std::string Subsystem::GetName() const { return m_name; }
 std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
 
 void Subsystem::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  m_table = subtable;
-  if (m_table != nullptr) {
-    m_hasDefaultEntry = m_table->GetEntry("hasDefault");
-    m_defaultEntry = m_table->GetEntry("default");
-    m_hasCommandEntry = m_table->GetEntry("hasCommand");
-    m_commandEntry = m_table->GetEntry("command");
+  if (subtable != nullptr) {
+    m_hasDefaultEntry = subtable->GetEntry("hasDefault");
+    m_defaultEntry = subtable->GetEntry("default");
+    m_hasCommandEntry = subtable->GetEntry("hasCommand");
+    m_commandEntry = subtable->GetEntry("command");
 
     if (m_defaultCommand != nullptr) {
       m_hasDefaultEntry.SetBoolean(true);
@@ -156,8 +155,4 @@ void Subsystem::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
       m_hasCommandEntry.SetBoolean(false);
     }
   }
-}
-
-std::shared_ptr<nt::NetworkTable> Subsystem::GetTable() const {
-  return m_table;
 }
