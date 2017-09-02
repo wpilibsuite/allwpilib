@@ -14,7 +14,7 @@
 
 #include "DigitalSource.h"
 #include "LiveWindow/LiveWindowSendable.h"
-#include "tables/ITableListener.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -24,9 +24,7 @@ namespace frc {
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public DigitalSource,
-                      public ITableListener,
-                      public LiveWindowSendable {
+class DigitalOutput : public DigitalSource, public LiveWindowSendable {
  public:
   explicit DigitalOutput(int channel);
   virtual ~DigitalOutput();
@@ -45,21 +43,21 @@ class DigitalOutput : public DigitalSource,
   AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
   bool IsAnalogTrigger() const override;
 
-  void ValueChanged(ITable* source, llvm::StringRef key,
-                    std::shared_ptr<nt::Value> value, bool isNew) override;
   void UpdateTable() override;
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  private:
   int m_channel;
   HAL_DigitalHandle m_handle;
   HAL_DigitalPWMHandle m_pwmGenerator;
 
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_valueEntry;
+  NT_EntryListener m_valueListener = 0;
 };
 
 }  // namespace frc

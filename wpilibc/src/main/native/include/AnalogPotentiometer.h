@@ -13,6 +13,7 @@
 #include "AnalogInput.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "interfaces/Potentiometer.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -71,9 +72,9 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    * Live Window code, only does anything if live window is activated.
    */
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
   void UpdateTable() override;
-  std::shared_ptr<ITable> GetTable() const override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
   /**
    * AnalogPotentiometers don't have to do anything special when entering the
@@ -90,7 +91,8 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
  private:
   std::shared_ptr<AnalogInput> m_analog_input;
   double m_fullRange, m_offset;
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_valueEntry;
 };
 
 }  // namespace frc

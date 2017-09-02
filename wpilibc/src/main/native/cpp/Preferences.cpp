@@ -13,23 +13,20 @@
 #include <llvm/StringRef.h>
 
 #include "WPIErrors.h"
+#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 
 /** The Preferences table name */
 static llvm::StringRef kTableName{"Preferences"};
 
-void Preferences::Listener::ValueChanged(ITable* source, llvm::StringRef key,
-                                         std::shared_ptr<nt::Value> value,
-                                         bool isNew) {}
-void Preferences::Listener::ValueChangedEx(ITable* source, llvm::StringRef key,
-                                           std::shared_ptr<nt::Value> value,
-                                           uint32_t flags) {
-  source->SetPersistent(key);
-}
-
-Preferences::Preferences() : m_table(NetworkTable::GetTable(kTableName)) {
-  m_table->AddTableListenerEx(&m_listener, NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
+Preferences::Preferences()
+    : m_table(nt::NetworkTableInstance::GetDefault().GetTable(kTableName)) {
+  m_listener = m_table->AddEntryListener(
+      [=](nt::NetworkTable* table, llvm::StringRef name,
+          nt::NetworkTableEntry entry, std::shared_ptr<nt::Value> value,
+          int flags) { entry.SetPersistent(); },
+      NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE);
   HAL_Report(HALUsageReporting::kResourceType_Preferences, 0);
 }
 
@@ -133,8 +130,9 @@ int64_t Preferences::GetLong(llvm::StringRef key, int64_t defaultValue) {
  * @param value the value
  */
 void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
-  m_table->PutString(key, value);
-  m_table->SetPersistent(key);
+  auto entry = m_table->GetEntry(key);
+  entry.SetString(value);
+  entry.SetPersistent();
 }
 
 /**
@@ -146,8 +144,9 @@ void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
  * @param value the value
  */
 void Preferences::PutInt(llvm::StringRef key, int value) {
-  m_table->PutNumber(key, value);
-  m_table->SetPersistent(key);
+  auto entry = m_table->GetEntry(key);
+  entry.SetDouble(value);
+  entry.SetPersistent();
 }
 
 /**
@@ -159,8 +158,9 @@ void Preferences::PutInt(llvm::StringRef key, int value) {
  * @param value the value
  */
 void Preferences::PutDouble(llvm::StringRef key, double value) {
-  m_table->PutNumber(key, value);
-  m_table->SetPersistent(key);
+  auto entry = m_table->GetEntry(key);
+  entry.SetDouble(value);
+  entry.SetPersistent();
 }
 
 /**
@@ -172,8 +172,9 @@ void Preferences::PutDouble(llvm::StringRef key, double value) {
  * @param value the value
  */
 void Preferences::PutFloat(llvm::StringRef key, float value) {
-  m_table->PutNumber(key, value);
-  m_table->SetPersistent(key);
+  auto entry = m_table->GetEntry(key);
+  entry.SetDouble(value);
+  entry.SetPersistent();
 }
 
 /**
@@ -185,8 +186,9 @@ void Preferences::PutFloat(llvm::StringRef key, float value) {
  * @param value the value
  */
 void Preferences::PutBoolean(llvm::StringRef key, bool value) {
-  m_table->PutBoolean(key, value);
-  m_table->SetPersistent(key);
+  auto entry = m_table->GetEntry(key);
+  entry.SetBoolean(value);
+  entry.SetPersistent();
 }
 
 /**
@@ -198,8 +200,9 @@ void Preferences::PutBoolean(llvm::StringRef key, bool value) {
  * @param value the value
  */
 void Preferences::PutLong(llvm::StringRef key, int64_t value) {
-  m_table->PutNumber(key, value);
-  m_table->SetPersistent(key);
+  auto entry = m_table->GetEntry(key);
+  entry.SetDouble(value);
+  entry.SetPersistent();
 }
 
 /**

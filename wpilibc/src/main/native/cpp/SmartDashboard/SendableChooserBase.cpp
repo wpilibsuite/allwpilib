@@ -13,7 +13,7 @@ const char* SendableChooserBase::kDefault = "default";
 const char* SendableChooserBase::kOptions = "options";
 const char* SendableChooserBase::kSelected = "selected";
 
-std::shared_ptr<ITable> SendableChooserBase::GetTable() const {
+std::shared_ptr<nt::NetworkTable> SendableChooserBase::GetTable() const {
   return m_table;
 }
 

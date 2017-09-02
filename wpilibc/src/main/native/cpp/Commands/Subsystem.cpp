@@ -66,10 +66,10 @@ void Subsystem::SetDefaultCommand(Command* command) {
   }
   if (m_table != nullptr) {
     if (m_defaultCommand != nullptr) {
-      m_table->PutBoolean("hasDefault", true);
-      m_table->PutString("default", m_defaultCommand->GetName());
+      m_hasDefaultEntry.SetBoolean(true);
+      m_defaultEntry.SetString(m_defaultCommand->GetName());
     } else {
-      m_table->PutBoolean("hasDefault", false);
+      m_hasDefaultEntry.SetBoolean(false);
     }
   }
 }
@@ -121,10 +121,10 @@ void Subsystem::ConfirmCommand() {
   if (m_currentCommandChanged) {
     if (m_table != nullptr) {
       if (m_currentCommand != nullptr) {
-        m_table->PutBoolean("hasCommand", true);
-        m_table->PutString("command", m_currentCommand->GetName());
+        m_hasCommandEntry.SetBoolean(true);
+        m_commandEntry.SetString(m_currentCommand->GetName());
       } else {
-        m_table->PutBoolean("hasCommand", false);
+        m_hasCommandEntry.SetBoolean(false);
       }
     }
     m_currentCommandChanged = false;
@@ -135,22 +135,29 @@ std::string Subsystem::GetName() const { return m_name; }
 
 std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
 
-void Subsystem::InitTable(std::shared_ptr<ITable> subtable) {
+void Subsystem::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
   m_table = subtable;
   if (m_table != nullptr) {
+    m_hasDefaultEntry = m_table->GetEntry("hasDefault");
+    m_defaultEntry = m_table->GetEntry("default");
+    m_hasCommandEntry = m_table->GetEntry("hasCommand");
+    m_commandEntry = m_table->GetEntry("command");
+
     if (m_defaultCommand != nullptr) {
-      m_table->PutBoolean("hasDefault", true);
-      m_table->PutString("default", m_defaultCommand->GetName());
+      m_hasDefaultEntry.SetBoolean(true);
+      m_defaultEntry.SetString(m_defaultCommand->GetName());
     } else {
-      m_table->PutBoolean("hasDefault", false);
+      m_hasDefaultEntry.SetBoolean(false);
     }
     if (m_currentCommand != nullptr) {
-      m_table->PutBoolean("hasCommand", true);
-      m_table->PutString("command", m_currentCommand->GetName());
+      m_hasCommandEntry.SetBoolean(true);
+      m_commandEntry.SetString(m_currentCommand->GetName());
     } else {
-      m_table->PutBoolean("hasCommand", false);
+      m_hasCommandEntry.SetBoolean(false);
     }
   }
 }
 
-std::shared_ptr<ITable> Subsystem::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> Subsystem::GetTable() const {
+  return m_table;
+}

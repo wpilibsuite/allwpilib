@@ -30,9 +30,7 @@ double GyroBase::PIDGet() {
 }
 
 void GyroBase::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetAngle());
-  }
+  if (m_valueEntry) m_valueEntry.SetDouble(GetAngle());
 }
 
 void GyroBase::StartLiveWindowMode() {}
@@ -41,9 +39,14 @@ void GyroBase::StopLiveWindowMode() {}
 
 std::string GyroBase::GetSmartDashboardType() const { return "Gyro"; }
 
-void GyroBase::InitTable(std::shared_ptr<ITable> subTable) {
+void GyroBase::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> GyroBase::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> GyroBase::GetTable() const { return m_table; }

@@ -67,7 +67,7 @@ double PIDCommand::GetPosition() { return ReturnPIDInput(); }
 
 std::string PIDCommand::GetSmartDashboardType() const { return "PIDCommand"; }
 
-void PIDCommand::InitTable(std::shared_ptr<ITable> subtable) {
+void PIDCommand::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
   m_controller->InitTable(subtable);
   Command::InitTable(subtable);
 }

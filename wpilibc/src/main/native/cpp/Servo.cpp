@@ -30,9 +30,7 @@ Servo::Servo(int channel) : SafePWM(channel) {
 }
 
 Servo::~Servo() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
-  }
+  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 /**
@@ -98,35 +96,38 @@ double Servo::GetAngle() const {
   return GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-void Servo::ValueChanged(ITable* source, llvm::StringRef key,
-                         std::shared_ptr<nt::Value> value, bool isNew) {
-  if (!value->IsDouble()) return;
-  Set(value->GetDouble());
-}
-
 void Servo::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", Get());
-  }
+  if (m_valueEntry) m_valueEntry.SetDouble(Get());
 }
 
 void Servo::StartLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  if (m_valueEntry) {
+    m_valueListener = m_valueEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsDouble()) return;
+          Set(event.value->GetDouble());
+        },
+        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
 void Servo::StopLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) {
+    m_valueEntry.RemoveListener(m_valueListener);
+    m_valueListener = 0;
   }
 }
 
 std::string Servo::GetSmartDashboardType() const { return "Servo"; }
 
-void Servo::InitTable(std::shared_ptr<ITable> subTable) {
+void Servo::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> Servo::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> Servo::GetTable() const { return m_table; }

@@ -13,6 +13,7 @@
 #include "I2C.h"
 #include "LiveWindow/LiveWindowSendable.h"
 #include "interfaces/Accelerometer.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -71,9 +72,9 @@ class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
   virtual AllAxes GetAccelerations();
 
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
   void UpdateTable() override;
-  std::shared_ptr<ITable> GetTable() const override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   void StartLiveWindowMode() override {}
   void StopLiveWindowMode() override {}
 
@@ -81,7 +82,10 @@ class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
   I2C m_i2c;
 
  private:
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_xEntry;
+  nt::NetworkTableEntry m_yEntry;
+  nt::NetworkTableEntry m_zEntry;
 };
 
 }  // namespace frc

@@ -73,7 +73,7 @@ PWM::~PWM() {
   HAL_FreePWMPort(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 /**
@@ -314,37 +314,40 @@ void PWM::SetZeroLatch() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void PWM::ValueChanged(ITable* source, llvm::StringRef key,
-                       std::shared_ptr<nt::Value> value, bool isNew) {
-  if (!value->IsDouble()) return;
-  SetSpeed(value->GetDouble());
-}
-
 void PWM::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetSpeed());
-  }
+  if (m_valueEntry) m_valueEntry.SetDouble(GetSpeed());
 }
 
 void PWM::StartLiveWindowMode() {
   SetSpeed(0);
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  if (m_valueEntry) {
+    m_valueListener = m_valueEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsDouble()) return;
+          SetSpeed(event.value->GetDouble());
+        },
+        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
 void PWM::StopLiveWindowMode() {
   SetSpeed(0);
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) {
+    m_valueEntry.RemoveListener(m_valueListener);
+    m_valueListener = 0;
   }
 }
 
 std::string PWM::GetSmartDashboardType() const { return "Speed Controller"; }
 
-void PWM::InitTable(std::shared_ptr<ITable> subTable) {
+void PWM::InitTable(std::shared_ptr<NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> PWM::GetTable() const { return m_table; }
+std::shared_ptr<NetworkTable> PWM::GetTable() const { return m_table; }

@@ -419,9 +419,7 @@ double AnalogInput::PIDGet() {
 }
 
 void AnalogInput::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetAverageVoltage());
-  }
+  if (m_valueEntry) m_valueEntry.SetDouble(GetAverageVoltage());
 }
 
 void AnalogInput::StartLiveWindowMode() {}
@@ -432,9 +430,16 @@ std::string AnalogInput::GetSmartDashboardType() const {
   return "Analog Input";
 }
 
-void AnalogInput::InitTable(std::shared_ptr<ITable> subTable) {
+void AnalogInput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> AnalogInput::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> AnalogInput::GetTable() const {
+  return m_table;
+}

@@ -104,9 +104,7 @@ AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
 }
 
 void DigitalInput::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutBoolean("Value", Get());
-  }
+  if (m_valueEntry) m_valueEntry.SetBoolean(Get());
 }
 
 void DigitalInput::StartLiveWindowMode() {}
@@ -117,9 +115,16 @@ std::string DigitalInput::GetSmartDashboardType() const {
   return "DigitalInput";
 }
 
-void DigitalInput::InitTable(std::shared_ptr<ITable> subTable) {
+void DigitalInput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> DigitalInput::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> DigitalInput::GetTable() const {
+  return m_table;
+}

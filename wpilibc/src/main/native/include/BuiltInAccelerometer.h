@@ -13,6 +13,7 @@
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
 #include "interfaces/Accelerometer.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -35,14 +36,17 @@ class BuiltInAccelerometer : public Accelerometer,
   double GetZ() override;
 
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
+  void InitTable(std::shared_ptr<NetworkTable> subtable) override;
   void UpdateTable() override;
-  std::shared_ptr<ITable> GetTable() const override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   void StartLiveWindowMode() override {}
   void StopLiveWindowMode() override {}
 
  private:
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_xEntry;
+  nt::NetworkTableEntry m_yEntry;
+  nt::NetworkTableEntry m_zEntry;
 };
 
 }  // namespace frc

@@ -13,7 +13,7 @@
 
 #include "ErrorBase.h"
 #include "SmartDashboard/NamedSendable.h"
-#include "tables/ITableListener.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -49,7 +49,7 @@ class Subsystem;
  * @see CommandGroup
  * @see Subsystem
  */
-class Command : public ErrorBase, public NamedSendable, public ITableListener {
+class Command : public ErrorBase, public NamedSendable {
   friend class CommandGroup;
   friend class Scheduler;
 
@@ -160,14 +160,17 @@ class Command : public ErrorBase, public NamedSendable, public ITableListener {
 
  public:
   std::string GetName() const override;
-  void InitTable(std::shared_ptr<ITable> subtable) override;
-  std::shared_ptr<ITable> GetTable() const override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
   std::string GetSmartDashboardType() const override;
-  void ValueChanged(ITable* source, llvm::StringRef key,
-                    std::shared_ptr<nt::Value> value, bool isNew) override;
 
  protected:
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+
+ private:
+  nt::NetworkTableEntry m_runningEntry;
+  nt::NetworkTableEntry m_isParentedEntry;
+  NT_EntryListener m_runningListener = 0;
 };
 
 }  // namespace frc

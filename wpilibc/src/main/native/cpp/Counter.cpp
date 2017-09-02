@@ -603,9 +603,7 @@ void Counter::SetReverseDirection(bool reverseDirection) {
 }
 
 void Counter::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", Get());
-  }
+  if (m_valueEntry) m_valueEntry.SetDouble(Get());
 }
 
 void Counter::StartLiveWindowMode() {}
@@ -614,9 +612,14 @@ void Counter::StopLiveWindowMode() {}
 
 std::string Counter::GetSmartDashboardType() const { return "Counter"; }
 
-void Counter::InitTable(std::shared_ptr<ITable> subTable) {
+void Counter::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> Counter::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> Counter::GetTable() const { return m_table; }

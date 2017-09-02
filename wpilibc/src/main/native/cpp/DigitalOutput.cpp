@@ -57,7 +57,7 @@ DigitalOutput::DigitalOutput(int channel) {
  * Free the resources associated with a digital output.
  */
 DigitalOutput::~DigitalOutput() {
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
   if (StatusIsFatal()) return;
   // Disable the PWM in case it was running.
   DisablePWM();
@@ -232,23 +232,23 @@ AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
   return (AnalogTriggerType)0;
 }
 
-void DigitalOutput::ValueChanged(ITable* source, llvm::StringRef key,
-                                 std::shared_ptr<nt::Value> value, bool isNew) {
-  if (!value->IsBoolean()) return;
-  Set(value->GetBoolean());
-}
-
 void DigitalOutput::UpdateTable() {}
 
 void DigitalOutput::StartLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  if (m_valueEntry) {
+    m_valueListener = m_valueEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsBoolean()) return;
+          Set(event.value->GetBoolean());
+        },
+        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
 void DigitalOutput::StopLiveWindowMode() {
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) {
+    m_valueEntry.RemoveListener(m_valueListener);
+    m_valueListener = 0;
   }
 }
 
@@ -256,9 +256,16 @@ std::string DigitalOutput::GetSmartDashboardType() const {
   return "Digital Output";
 }
 
-void DigitalOutput::InitTable(std::shared_ptr<ITable> subTable) {
+void DigitalOutput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table != nullptr) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> DigitalOutput::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> DigitalOutput::GetTable() const {
+  return m_table;
+}

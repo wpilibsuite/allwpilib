@@ -68,7 +68,7 @@ Solenoid::Solenoid(int moduleNumber, int channel)
  */
 Solenoid::~Solenoid() {
   HAL_FreeSolenoidPort(m_solenoidHandle);
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 /**
@@ -111,37 +111,37 @@ bool Solenoid::IsBlackListed() const {
   return (value != 0);
 }
 
-void Solenoid::ValueChanged(ITable* source, llvm::StringRef key,
-                            std::shared_ptr<nt::Value> value, bool isNew) {
-  if (!value->IsBoolean()) return;
-  Set(value->GetBoolean());
-}
-
 void Solenoid::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutBoolean("Value", Get());
-  }
+  if (m_valueEntry) m_valueEntry.SetBoolean(Get());
 }
 
 void Solenoid::StartLiveWindowMode() {
   Set(false);
-  if (m_table != nullptr) {
-    m_table->AddTableListener("Value", this, true);
+  if (m_valueEntry) {
+    m_valueEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsBoolean()) return;
+          Set(event.value->GetBoolean());
+        },
+        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
 void Solenoid::StopLiveWindowMode() {
   Set(false);
-  if (m_table != nullptr) {
-    m_table->RemoveTableListener(this);
-  }
+  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 std::string Solenoid::GetSmartDashboardType() const { return "Solenoid"; }
 
-void Solenoid::InitTable(std::shared_ptr<ITable> subTable) {
+void Solenoid::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> Solenoid::GetTable() const { return m_table; }
+std::shared_ptr<nt::NetworkTable> Solenoid::GetTable() const { return m_table; }

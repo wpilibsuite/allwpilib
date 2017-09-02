@@ -67,7 +67,7 @@ Command::Command(const std::string& name, double timeout) {
 }
 
 Command::~Command() {
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+  if (m_runningListener != 0) m_runningEntry.RemoveListener(m_runningListener);
 }
 
 /**
@@ -146,7 +146,7 @@ void Command::Removed() {
   m_initialized = false;
   m_canceled = false;
   m_running = false;
-  if (m_table != nullptr) m_table->PutBoolean(kRunning, false);
+  if (m_runningEntry) m_runningEntry.SetBoolean(false);
 }
 
 /**
@@ -297,9 +297,7 @@ void Command::SetParent(CommandGroup* parent) {
   } else {
     LockChanges();
     m_parent = parent;
-    if (m_table != nullptr) {
-      m_table->PutBoolean(kIsParented, true);
-    }
+    if (m_isParentedEntry) m_isParentedEntry.SetBoolean(true);
   }
 }
 
@@ -325,7 +323,7 @@ void Command::ClearRequirements() { m_requirements.clear(); }
 void Command::StartRunning() {
   m_running = true;
   m_startTime = -1;
-  if (m_table != nullptr) m_table->PutBoolean(kRunning, true);
+  if (m_runningEntry) m_runningEntry.SetBoolean(true);
 }
 
 /**
@@ -435,25 +433,27 @@ std::string Command::GetName() const { return m_name; }
 
 std::string Command::GetSmartDashboardType() const { return "Command"; }
 
-void Command::InitTable(std::shared_ptr<ITable> subtable) {
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+void Command::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
+  if (m_runningListener != 0) m_runningEntry.RemoveListener(m_runningListener);
   m_table = subtable;
   if (m_table != nullptr) {
-    m_table->PutString(kName, GetName());
-    m_table->PutBoolean(kRunning, IsRunning());
-    m_table->PutBoolean(kIsParented, m_parent != nullptr);
-    m_table->AddTableListener(kRunning, this, false);
+    m_table->GetEntry(kName).SetString(GetName());
+    m_runningEntry = m_table->GetEntry(kRunning);
+    m_runningEntry.SetBoolean(IsRunning());
+    m_isParentedEntry = m_table->GetEntry(kIsParented);
+    m_isParentedEntry.SetBoolean(m_parent != nullptr);
+
+    m_runningListener = m_runningEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsBoolean()) return;
+          if (event.value->GetBoolean()) {
+            if (!IsRunning()) Start();
+          } else {
+            if (IsRunning()) Cancel();
+          }
+        },
+        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
-std::shared_ptr<ITable> Command::GetTable() const { return m_table; }
-
-void Command::ValueChanged(ITable* source, llvm::StringRef key,
-                           std::shared_ptr<nt::Value> value, bool isNew) {
-  if (!value->IsBoolean()) return;
-  if (value->GetBoolean()) {
-    if (!IsRunning()) Start();
-  } else {
-    if (IsRunning()) Cancel();
-  }
-}
+std::shared_ptr<nt::NetworkTable> Command::GetTable() const { return m_table; }

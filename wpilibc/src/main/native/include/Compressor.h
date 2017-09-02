@@ -14,7 +14,7 @@
 
 #include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
-#include "tables/ITableListener.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -31,13 +31,11 @@ namespace frc {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public SensorBase,
-                   public LiveWindowSendable,
-                   public ITableListener {
+class Compressor : public SensorBase, public LiveWindowSendable {
  public:
   // Default PCM ID is 0
   explicit Compressor(int pcmID = GetDefaultSolenoidModule());
-  virtual ~Compressor() = default;
+  virtual ~Compressor();
 
   void Start();
   void Stop();
@@ -62,10 +60,8 @@ class Compressor : public SensorBase,
   void StartLiveWindowMode() override;
   void StopLiveWindowMode() override;
   std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<ITable> subTable) override;
-  std::shared_ptr<ITable> GetTable() const override;
-  void ValueChanged(ITable* source, llvm::StringRef key,
-                    std::shared_ptr<nt::Value> value, bool isNew) override;
+  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  std::shared_ptr<nt::NetworkTable> GetTable() const override;
 
  protected:
   HAL_CompressorHandle m_compressorHandle;
@@ -74,7 +70,10 @@ class Compressor : public SensorBase,
   void SetCompressor(bool on);
   int m_module;
 
-  std::shared_ptr<ITable> m_table;
+  std::shared_ptr<nt::NetworkTable> m_table;
+  nt::NetworkTableEntry m_enabledEntry;
+  nt::NetworkTableEntry m_pressureSwitchEntry;
+  NT_EntryListener m_enabledListener = 0;
 };
 
 }  // namespace frc

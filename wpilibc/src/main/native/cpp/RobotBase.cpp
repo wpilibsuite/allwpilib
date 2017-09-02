@@ -19,7 +19,7 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include "Utility.h"
 #include "WPILibVersion.h"
-#include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 
@@ -42,8 +42,9 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   RobotState::SetImplementation(DriverStation::GetInstance());
   HLUsageReporting::SetImplementation(new HardwareHLReporting());
 
-  NetworkTable::SetNetworkIdentity("Robot");
-  NetworkTable::SetPersistentFilename("/home/lvuser/networktables.ini");
+  auto inst = nt::NetworkTableInstance::GetDefault();
+  inst.SetNetworkIdentity("Robot");
+  inst.StartServer("/home/lvuser/networktables.ini");
 
   SmartDashboard::init();
 
@@ -57,9 +58,10 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
   }
 
   // First and one-time initialization
-  NetworkTable::GetTable("LiveWindow")
+  inst.GetTable("LiveWindow")
       ->GetSubTable("~STATUS~")
-      ->PutBoolean("LW Enabled", false);
+      ->GetEntry("LW Enabled")
+      .SetBoolean(false);
 
   LiveWindow::GetInstance()->SetEnabled(false);
 }

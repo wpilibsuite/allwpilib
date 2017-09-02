@@ -14,7 +14,8 @@
 
 #include "Commands/Scheduler.h"
 #include "LiveWindow/LiveWindowSendable.h"
-#include "tables/ITable.h"
+#include "networktables/NetworkTable.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -75,8 +76,9 @@ class LiveWindow {
   std::map<std::shared_ptr<LiveWindowSendable>, LiveWindowComponent>
       m_components;
 
-  std::shared_ptr<ITable> m_liveWindowTable;
-  std::shared_ptr<ITable> m_statusTable;
+  std::shared_ptr<nt::NetworkTable> m_liveWindowTable;
+  std::shared_ptr<nt::NetworkTable> m_statusTable;
+  nt::NetworkTableEntry m_enabledEntry;
 
   Scheduler* m_scheduler;
 

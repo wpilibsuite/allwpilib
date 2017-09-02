@@ -319,8 +319,8 @@ Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits() const {
 }
 
 void Ultrasonic::UpdateTable() {
-  if (m_table != nullptr) {
-    m_table->PutNumber("Value", GetRangeInches());
+  if (m_valueEntry) {
+    m_valueEntry.SetDouble(GetRangeInches());
   }
 }
 
@@ -330,9 +330,14 @@ void Ultrasonic::StopLiveWindowMode() {}
 
 std::string Ultrasonic::GetSmartDashboardType() const { return "Ultrasonic"; }
 
-void Ultrasonic::InitTable(std::shared_ptr<ITable> subTable) {
+void Ultrasonic::InitTable(std::shared_ptr<NetworkTable> subTable) {
   m_table = subTable;
-  UpdateTable();
+  if (m_table != nullptr) {
+    m_valueEntry = m_table->GetEntry("Value");
+    UpdateTable();
+  } else {
+    m_valueEntry = nt::NetworkTableEntry();
+  }
 }
 
-std::shared_ptr<ITable> Ultrasonic::GetTable() const { return m_table; }
+std::shared_ptr<NetworkTable> Ultrasonic::GetTable() const { return m_table; }

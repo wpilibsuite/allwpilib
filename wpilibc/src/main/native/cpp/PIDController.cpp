@@ -78,7 +78,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
 PIDController::~PIDController() {
   // forcefully stopping the notifier so the callback can successfully run.
   m_controlLoop->Stop();
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+  RemoveListeners();
 }
 
 /**
@@ -204,11 +204,9 @@ void PIDController::SetPID(double p, double i, double d) {
     m_D = d;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutNumber("p", m_P);
-    m_table->PutNumber("i", m_I);
-    m_table->PutNumber("d", m_D);
-  }
+  if (m_pEntry) m_pEntry.SetDouble(m_P);
+  if (m_iEntry) m_iEntry.SetDouble(m_I);
+  if (m_dEntry) m_dEntry.SetDouble(m_D);
 }
 
 /**
@@ -230,12 +228,10 @@ void PIDController::SetPID(double p, double i, double d, double f) {
     m_F = f;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutNumber("p", m_P);
-    m_table->PutNumber("i", m_I);
-    m_table->PutNumber("d", m_D);
-    m_table->PutNumber("f", m_F);
-  }
+  if (m_pEntry) m_pEntry.SetDouble(m_P);
+  if (m_iEntry) m_iEntry.SetDouble(m_I);
+  if (m_dEntry) m_dEntry.SetDouble(m_D);
+  if (m_fEntry) m_fEntry.SetDouble(m_F);
 }
 
 /**
@@ -359,9 +355,7 @@ void PIDController::SetSetpoint(double setpoint) {
     m_bufTotal = 0;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutNumber("setpoint", m_setpoint);
-  }
+  if (m_setpointEntry) m_setpointEntry.SetDouble(m_setpoint);
 }
 
 /**
@@ -526,9 +520,7 @@ void PIDController::Enable() {
     m_enabled = true;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutBoolean("enabled", true);
-  }
+  if (m_enabledEntry) m_enabledEntry.SetBoolean(true);
 }
 
 /**
@@ -541,9 +533,7 @@ void PIDController::Disable() {
     m_enabled = false;
   }
 
-  if (m_table != nullptr) {
-    m_table->PutBoolean("enabled", false);
-  }
+  if (m_enabledEntry) m_enabledEntry.SetBoolean(false);
 }
 
 /**
@@ -570,17 +560,72 @@ std::string PIDController::GetSmartDashboardType() const {
   return "PIDController";
 }
 
-void PIDController::InitTable(std::shared_ptr<ITable> subtable) {
-  if (m_table != nullptr) m_table->RemoveTableListener(this);
+void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
+  RemoveListeners();
   m_table = subtable;
-  if (m_table != nullptr) {
-    m_table->PutNumber(kP, GetP());
-    m_table->PutNumber(kI, GetI());
-    m_table->PutNumber(kD, GetD());
-    m_table->PutNumber(kF, GetF());
-    m_table->PutNumber(kSetpoint, GetSetpoint());
-    m_table->PutBoolean(kEnabled, IsEnabled());
-    m_table->AddTableListener(this, false);
+  if (m_table) {
+    m_pEntry = m_table->GetEntry(kP);
+    m_pEntry.SetDouble(GetP());
+    m_iEntry = m_table->GetEntry(kI);
+    m_iEntry.SetDouble(GetI());
+    m_dEntry = m_table->GetEntry(kD);
+    m_dEntry.SetDouble(GetD());
+    m_fEntry = m_table->GetEntry(kF);
+    m_fEntry.SetDouble(GetF());
+    m_setpointEntry = m_table->GetEntry(kSetpoint);
+    m_setpointEntry.SetDouble(GetSetpoint());
+    m_enabledEntry = m_table->GetEntry(kEnabled);
+    m_enabledEntry.SetBoolean(IsEnabled());
+
+    m_pListener = m_pEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsDouble()) return;
+          std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
+          m_P = event.value->GetDouble();
+        },
+        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
+
+    m_iListener = m_iEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsDouble()) return;
+          std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
+          m_I = event.value->GetDouble();
+        },
+        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
+
+    m_dListener = m_dEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsDouble()) return;
+          std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
+          m_D = event.value->GetDouble();
+        },
+        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
+
+    m_fListener = m_fEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsDouble()) return;
+          std::lock_guard<hal::priority_recursive_mutex> sync(m_mutex);
+          m_F = event.value->GetDouble();
+        },
+        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
+
+    m_setpointListener = m_setpointEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsDouble()) return;
+          SetSetpoint(event.value->GetDouble());
+        },
+        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
+
+    m_enabledListener = m_enabledEntry.AddListener(
+        [=](const nt::EntryNotification& event) {
+          if (!event.value->IsBoolean()) return;
+          if (event.value->GetBoolean()) {
+            Enable();
+          } else {
+            Disable();
+          }
+        },
+        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
   }
 }
 
@@ -604,29 +649,8 @@ double PIDController::GetContinuousError(double error) const {
   return error;
 }
 
-std::shared_ptr<ITable> PIDController::GetTable() const { return m_table; }
-
-void PIDController::ValueChanged(ITable* source, llvm::StringRef key,
-                                 std::shared_ptr<nt::Value> value, bool isNew) {
-  if (key == kP || key == kI || key == kD || key == kF) {
-    if (m_P != m_table->GetNumber(kP, 0.0) ||
-        m_I != m_table->GetNumber(kI, 0.0) ||
-        m_D != m_table->GetNumber(kD, 0.0) ||
-        m_F != m_table->GetNumber(kF, 0.0)) {
-      SetPID(m_table->GetNumber(kP, 0.0), m_table->GetNumber(kI, 0.0),
-             m_table->GetNumber(kD, 0.0), m_table->GetNumber(kF, 0.0));
-    }
-  } else if (key == kSetpoint && value->IsDouble() &&
-             m_setpoint != value->GetDouble()) {
-    SetSetpoint(value->GetDouble());
-  } else if (key == kEnabled && value->IsBoolean() &&
-             m_enabled != value->GetBoolean()) {
-    if (value->GetBoolean()) {
-      Enable();
-    } else {
-      Disable();
-    }
-  }
+std::shared_ptr<nt::NetworkTable> PIDController::GetTable() const {
+  return m_table;
 }
 
 void PIDController::UpdateTable() {}
@@ -634,3 +658,30 @@ void PIDController::UpdateTable() {}
 void PIDController::StartLiveWindowMode() { Disable(); }
 
 void PIDController::StopLiveWindowMode() {}
+
+void PIDController::RemoveListeners() {
+  if (m_pListener != 0) {
+    m_pEntry.RemoveListener(m_pListener);
+    m_pListener = 0;
+  }
+  if (m_iListener != 0) {
+    m_iEntry.RemoveListener(m_iListener);
+    m_iListener = 0;
+  }
+  if (m_dListener != 0) {
+    m_dEntry.RemoveListener(m_dListener);
+    m_dListener = 0;
+  }
+  if (m_fListener != 0) {
+    m_fEntry.RemoveListener(m_fListener);
+    m_fListener = 0;
+  }
+  if (m_setpointListener != 0) {
+    m_setpointEntry.RemoveListener(m_setpointListener);
+    m_setpointListener = 0;
+  }
+  if (m_enabledListener != 0) {
+    m_enabledEntry.RemoveListener(m_enabledListener);
+    m_enabledListener = 0;
+  }
+}
