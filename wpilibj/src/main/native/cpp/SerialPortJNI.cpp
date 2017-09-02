@@ -220,11 +220,11 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialSetWriteBufferSize(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SerialPortJNI
- * Method:    serialGetBytesRecieved
+ * Method:    serialGetBytesReceived
  * Signature: (B)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialGetBytesRecieved(
+Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialGetBytesReceived(
     JNIEnv* env, jclass, jbyte port) {
   SERIALJNI_LOG(logDEBUG) << "Serial Get Bytes Received";
   int32_t status = 0;
