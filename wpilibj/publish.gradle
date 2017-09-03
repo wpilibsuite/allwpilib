@@ -51,9 +51,9 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 task javadoc(type: Javadoc, overwrite: true) {
     javadoc.options.links("http://docs.oracle.com/javase/8/docs/api/")
     options.addStringOption "tag", "pre:a:Pre-Condition"
+    options.addStringOption('Xdoclint:accessibility,syntax,html', '-quiet')
     source = sourceSets.main.allJava
-    options.addStringOption('Xdoclint:accessibility,syntax,reference,html', '-quiet')
-    failOnError = false
+    failOnError = true
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

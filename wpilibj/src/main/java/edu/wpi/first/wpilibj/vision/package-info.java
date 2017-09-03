@@ -9,7 +9,7 @@
  * Classes in the {@code edu.wpi.first.wpilibj.vision} package are designed to
  * simplify using OpenCV vision processing code from a robot program.
  *
- * <p>An example usecase for grabbing a yellow tote from 2015 in autonomous:
+ * An example usecase for grabbing a yellow tote from 2015 in autonomous:
  * <br>
  * <pre><code>
  * public class Robot extends IterativeRobot
@@ -84,6 +84,5 @@
  *
  * }
  * </code></pre>
- * </p>
  */
 package edu.wpi.first.wpilibj.vision;
