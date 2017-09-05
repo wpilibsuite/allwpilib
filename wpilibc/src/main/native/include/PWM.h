@@ -26,7 +26,7 @@ namespace frc {
  * The values supplied as arguments for PWM outputs range from -1.0 to 1.0. They
  * are mapped to the hardware dependent values, in this case 0-2000 for the
  * FPGA. Changes are immediately sent to the FPGA, and the update occurs at the
- * next FPGA cycle. There is no delay.
+ * next FPGA cycle (5.005ms). There is no delay.
  *
  * As of revision 0.1.10 of the FPGA, the FPGA interprets the 0-2000 values as
  * follows:
@@ -41,10 +41,13 @@ class PWM : public SensorBase,
             public ITableListener,
             public LiveWindowSendable {
  public:
+  /**
+   * Represents the amount to multiply the minimum servo-pulse pwm period by.
+   */
   enum PeriodMultiplier {
-    kPeriodMultiplier_1X = 1,
-    kPeriodMultiplier_2X = 2,
-    kPeriodMultiplier_4X = 4
+    kPeriodMultiplier_1X = 1, ///don't skip pulses. PWM pulses occur every 5.005 ms
+    kPeriodMultiplier_2X = 2, ///skip every other pulse. PWM pulses occur every 10.010 ms
+    kPeriodMultiplier_4X = 4  ///skip three out of four pulses. PWM pulses occur every 20.020 ms
   };
 
   explicit PWM(int channel);
