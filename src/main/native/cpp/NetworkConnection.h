@@ -14,6 +14,7 @@
 #include <thread>
 
 #include "support/ConcurrentQueue.h"
+#include "INetworkConnection.h"
 #include "Message.h"
 #include "ntcore_cpp.h"
 
@@ -26,10 +27,8 @@ namespace nt {
 
 class IConnectionNotifier;
 
-class NetworkConnection {
+class NetworkConnection : public INetworkConnection {
  public:
-  enum State { kCreated, kInit, kHandshake, kSynchronized, kActive, kDead };
-
   typedef std::function<bool(
       NetworkConnection& conn,
       std::function<std::shared_ptr<Message>()> get_msg,
@@ -56,21 +55,21 @@ class NetworkConnection {
   void Start();
   void Stop();
 
-  ConnectionInfo info() const;
+  ConnectionInfo info() const override;
 
   bool active() const { return m_active; }
   wpi::NetworkStream& stream() { return *m_stream; }
 
-  void QueueOutgoing(std::shared_ptr<Message> msg);
-  void PostOutgoing(bool keep_alive);
+  void QueueOutgoing(std::shared_ptr<Message> msg) override;
+  void PostOutgoing(bool keep_alive) override;
 
   unsigned int uid() const { return m_uid; }
 
-  unsigned int proto_rev() const { return m_proto_rev; }
-  void set_proto_rev(unsigned int proto_rev) { m_proto_rev = proto_rev; }
+  unsigned int proto_rev() const override;
+  void set_proto_rev(unsigned int proto_rev) override;
 
-  State state() const;
-  void set_state(State state);
+  State state() const override;
+  void set_state(State state) override;
 
   std::string remote_id() const;
   void set_remote_id(StringRef remote_id);

@@ -8,12 +8,13 @@
 #include "StorageTest.h"
 #include "Storage.h"
 
-#include "gtest/gtest.h"
 #include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include "llvm/raw_ostream.h"
 #include "support/raw_istream.h"
 
 #include "MessageMatcher.h"
+#include "MockNetworkConnection.h"
 #include "TestPrinters.h"
 #include "ValueMatcher.h"
 
@@ -553,7 +554,7 @@ TEST_P(StorageTestPersistent, SavePersistent) {
   llvm::raw_svector_ostream oss(buf);
   storage.SavePersistent(oss, false);
   llvm::StringRef out = oss.str();
-  //fputs(out.c_str(), stderr);
+  // fputs(out.c_str(), stderr);
   llvm::StringRef line, rem = out;
   std::tie(line, rem) = rem.split('\n');
   ASSERT_EQ("[NetworkTables Storage 3.0]", line);
@@ -650,8 +651,7 @@ TEST_P(StorageTestEmpty, LoadPersistentEmptyName) {
     warn.Warn(line, msg);
   };
 
-  wpi::raw_mem_istream iss(
-      "[NetworkTables Storage 3.0]\nboolean \"\"=true\n");
+  wpi::raw_mem_istream iss("[NetworkTables Storage 3.0]\nboolean \"\"=true\n");
   EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
@@ -873,7 +873,7 @@ TEST_P(StorageTestEmpty, LoadPersistentWarn) {
 }
 
 TEST_P(StorageTestEmpty, ProcessIncomingEntryAssign) {
-  std::shared_ptr<NetworkConnection> conn;
+  auto conn = std::make_shared<MockNetworkConnection>();
   auto value = Value::MakeDouble(1.0);
   if (GetParam()) {
     // id assign message reply generated on the server

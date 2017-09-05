@@ -15,12 +15,13 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "llvm/StringRef.h"
 
 #include "IDispatcher.h"
-#include "NetworkConnection.h"
+#include "INetworkConnection.h"
 
 namespace wpi {
 class Logger;
@@ -32,6 +33,7 @@ namespace nt {
 
 class IConnectionNotifier;
 class IStorage;
+class NetworkConnection;
 
 class DispatcherBase : public IDispatcher {
   friend class DispatcherTest;
@@ -79,8 +81,8 @@ class DispatcherBase : public IDispatcher {
 
   void ClientReconnect(unsigned int proto_rev = 0x0300);
 
-  void QueueOutgoing(std::shared_ptr<Message> msg, NetworkConnection* only,
-                     NetworkConnection* except) override;
+  void QueueOutgoing(std::shared_ptr<Message> msg, INetworkConnection* only,
+                     INetworkConnection* except) override;
 
   IStorage& m_storage;
   IConnectionNotifier& m_notifier;
@@ -96,7 +98,7 @@ class DispatcherBase : public IDispatcher {
 
   // Mutex for user-accessible items
   mutable std::mutex m_user_mutex;
-  std::vector<std::shared_ptr<NetworkConnection>> m_connections;
+  std::vector<std::shared_ptr<INetworkConnection>> m_connections;
   std::string m_identity;
 
   std::atomic_bool m_active;       // set to false to terminate threads

@@ -12,9 +12,9 @@
 #include "Handle.h"
 #include "IDispatcher.h"
 #include "IEntryNotifier.h"
+#include "INetworkConnection.h"
 #include "IRpcServer.h"
 #include "Log.h"
-#include "NetworkConnection.h"
 
 using namespace nt;
 
@@ -46,8 +46,8 @@ NT_Type Storage::GetMessageEntryType(unsigned int id) const {
 }
 
 void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
-                              NetworkConnection* conn,
-                              std::weak_ptr<NetworkConnection> conn_weak) {
+                              INetworkConnection* conn,
+                              std::weak_ptr<INetworkConnection> conn_weak) {
   switch (msg->type()) {
     case Message::kKeepAlive:
       break;  // ignore
@@ -85,7 +85,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
 }
 
 void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
-                                         NetworkConnection* conn) {
+                                         INetworkConnection* conn) {
   std::unique_lock<std::mutex> lock(m_mutex);
   unsigned int id = msg->id();
   StringRef name = msg->str();
@@ -209,7 +209,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
 }
 
 void Storage::ProcessIncomingEntryUpdate(std::shared_ptr<Message> msg,
-                                         NetworkConnection* conn) {
+                                         INetworkConnection* conn) {
   std::unique_lock<std::mutex> lock(m_mutex);
   unsigned int id = msg->id();
   if (id >= m_idmap.size() || !m_idmap[id]) {
@@ -246,7 +246,7 @@ void Storage::ProcessIncomingEntryUpdate(std::shared_ptr<Message> msg,
 }
 
 void Storage::ProcessIncomingFlagsUpdate(std::shared_ptr<Message> msg,
-                                         NetworkConnection* conn) {
+                                         INetworkConnection* conn) {
   std::unique_lock<std::mutex> lock(m_mutex);
   unsigned int id = msg->id();
   if (id >= m_idmap.size() || !m_idmap[id]) {
@@ -270,7 +270,7 @@ void Storage::ProcessIncomingFlagsUpdate(std::shared_ptr<Message> msg,
 }
 
 void Storage::ProcessIncomingEntryDelete(std::shared_ptr<Message> msg,
-                                         NetworkConnection* conn) {
+                                         INetworkConnection* conn) {
   std::unique_lock<std::mutex> lock(m_mutex);
   unsigned int id = msg->id();
   if (id >= m_idmap.size() || !m_idmap[id]) {
@@ -294,7 +294,7 @@ void Storage::ProcessIncomingEntryDelete(std::shared_ptr<Message> msg,
 }
 
 void Storage::ProcessIncomingClearEntries(std::shared_ptr<Message> msg,
-                                          NetworkConnection* conn) {
+                                          INetworkConnection* conn) {
   std::unique_lock<std::mutex> lock(m_mutex);
   // update local
   DeleteAllEntriesImpl(false);
@@ -309,8 +309,8 @@ void Storage::ProcessIncomingClearEntries(std::shared_ptr<Message> msg,
 }
 
 void Storage::ProcessIncomingExecuteRpc(
-    std::shared_ptr<Message> msg, NetworkConnection* conn,
-    std::weak_ptr<NetworkConnection> conn_weak) {
+    std::shared_ptr<Message> msg, INetworkConnection* conn,
+    std::weak_ptr<INetworkConnection> conn_weak) {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (!m_server) return;  // only process on server
   unsigned int id = msg->id();
@@ -349,7 +349,7 @@ void Storage::ProcessIncomingExecuteRpc(
 }
 
 void Storage::ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
-                                         NetworkConnection* conn) {
+                                         INetworkConnection* conn) {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_server) return;  // only process on client
   unsigned int id = msg->id();
@@ -372,9 +372,9 @@ void Storage::ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
 }
 
 void Storage::GetInitialAssignments(
-    NetworkConnection& conn, std::vector<std::shared_ptr<Message>>* msgs) {
+    INetworkConnection& conn, std::vector<std::shared_ptr<Message>>* msgs) {
   std::lock_guard<std::mutex> lock(m_mutex);
-  conn.set_state(NetworkConnection::kSynchronized);
+  conn.set_state(INetworkConnection::kSynchronized);
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
     msgs->emplace_back(Message::EntryAssign(i.getKey(), entry->id,
@@ -384,12 +384,12 @@ void Storage::GetInitialAssignments(
 }
 
 void Storage::ApplyInitialAssignments(
-    NetworkConnection& conn, llvm::ArrayRef<std::shared_ptr<Message>> msgs,
+    INetworkConnection& conn, llvm::ArrayRef<std::shared_ptr<Message>> msgs,
     bool new_server, std::vector<std::shared_ptr<Message>>* out_msgs) {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (m_server) return;  // should not do this on server
 
-  conn.set_state(NetworkConnection::kSynchronized);
+  conn.set_state(INetworkConnection::kSynchronized);
 
   std::vector<std::shared_ptr<Message>> update_msgs;
 

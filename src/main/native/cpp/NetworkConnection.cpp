@@ -97,6 +97,12 @@ ConnectionInfo NetworkConnection::info() const {
                         m_last_update, m_proto_rev};
 }
 
+unsigned int NetworkConnection::proto_rev() const { return m_proto_rev; }
+
+void NetworkConnection::set_proto_rev(unsigned int proto_rev) {
+  m_proto_rev = proto_rev;
+}
+
 NetworkConnection::State NetworkConnection::state() const {
   std::lock_guard<std::mutex> lock(m_state_mutex);
   return m_state;

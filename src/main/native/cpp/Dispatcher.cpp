@@ -16,6 +16,7 @@
 #include "IConnectionNotifier.h"
 #include "Log.h"
 #include "IStorage.h"
+#include "NetworkConnection.h"
 
 using namespace nt;
 
@@ -178,7 +179,7 @@ void DispatcherBase::Stop() {
   if (m_dispatch_thread.joinable()) m_dispatch_thread.join();
   if (m_clientserver_thread.joinable()) m_clientserver_thread.join();
 
-  std::vector<std::shared_ptr<NetworkConnection>> conns;
+  std::vector<std::shared_ptr<INetworkConnection>> conns;
   {
     std::lock_guard<std::mutex> lock(m_user_mutex);
     conns.swap(m_connections);
@@ -315,8 +316,8 @@ void DispatcherBase::DispatchThreadMain() {
 }
 
 void DispatcherBase::QueueOutgoing(std::shared_ptr<Message> msg,
-                                   NetworkConnection* only,
-                                   NetworkConnection* except) {
+                                   INetworkConnection* only,
+                                   INetworkConnection* except) {
   std::lock_guard<std::mutex> user_lock(m_user_mutex);
   for (auto& conn : m_connections) {
     if (conn.get() == except) continue;

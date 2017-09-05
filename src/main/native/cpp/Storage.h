@@ -36,6 +36,7 @@ class raw_istream;
 namespace nt {
 
 class IEntryNotifier;
+class INetworkConnection;
 class IRpcServer;
 class IStorageTest;
 
@@ -60,13 +61,13 @@ class Storage : public IStorage {
   // message itself).  Not used in wire protocol 3.0.
   NT_Type GetMessageEntryType(unsigned int id) const override;
 
-  void ProcessIncoming(std::shared_ptr<Message> msg, NetworkConnection* conn,
-                       std::weak_ptr<NetworkConnection> conn_weak) override;
+  void ProcessIncoming(std::shared_ptr<Message> msg, INetworkConnection* conn,
+                       std::weak_ptr<INetworkConnection> conn_weak) override;
   void GetInitialAssignments(
-      NetworkConnection& conn,
+      INetworkConnection& conn,
       std::vector<std::shared_ptr<Message>>* msgs) override;
   void ApplyInitialAssignments(
-      NetworkConnection& conn, llvm::ArrayRef<std::shared_ptr<Message>> msgs,
+      INetworkConnection& conn, llvm::ArrayRef<std::shared_ptr<Message>> msgs,
       bool new_server,
       std::vector<std::shared_ptr<Message>>* out_msgs) override;
 
@@ -197,20 +198,20 @@ class Storage : public IStorage {
   wpi::Logger& m_logger;
 
   void ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
-                                  NetworkConnection* conn);
+                                  INetworkConnection* conn);
   void ProcessIncomingEntryUpdate(std::shared_ptr<Message> msg,
-                                  NetworkConnection* conn);
+                                  INetworkConnection* conn);
   void ProcessIncomingFlagsUpdate(std::shared_ptr<Message> msg,
-                                  NetworkConnection* conn);
+                                  INetworkConnection* conn);
   void ProcessIncomingEntryDelete(std::shared_ptr<Message> msg,
-                                  NetworkConnection* conn);
+                                  INetworkConnection* conn);
   void ProcessIncomingClearEntries(std::shared_ptr<Message> msg,
-                                   NetworkConnection* conn);
+                                   INetworkConnection* conn);
   void ProcessIncomingExecuteRpc(std::shared_ptr<Message> msg,
-                                 NetworkConnection* conn,
-                                 std::weak_ptr<NetworkConnection> conn_weak);
+                                 INetworkConnection* conn,
+                                 std::weak_ptr<INetworkConnection> conn_weak);
   void ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
-                                  NetworkConnection* conn);
+                                  INetworkConnection* conn);
 
   bool GetPersistentEntries(
       bool periodic,

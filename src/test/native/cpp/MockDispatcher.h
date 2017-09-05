@@ -17,8 +17,8 @@ namespace nt {
 class MockDispatcher : public IDispatcher {
  public:
   MOCK_METHOD3(QueueOutgoing,
-               void(std::shared_ptr<Message> msg, NetworkConnection* only,
-                    NetworkConnection* except));
+               void(std::shared_ptr<Message> msg, INetworkConnection* only,
+                    INetworkConnection* except));
 };
 
 }  // namespace nt

@@ -14,7 +14,7 @@
 
 namespace nt {
 
-class NetworkConnection;
+class INetworkConnection;
 
 // Interface for generation of outgoing messages to break a dependency loop
 // between Storage and Dispatcher.
@@ -25,8 +25,8 @@ class IDispatcher {
   IDispatcher& operator=(const IDispatcher&) = delete;
   virtual ~IDispatcher() = default;
   virtual void QueueOutgoing(std::shared_ptr<Message> msg,
-                             NetworkConnection* only,
-                             NetworkConnection* except) = 0;
+                             INetworkConnection* only,
+                             INetworkConnection* except) = 0;
 };
 
 }  // namespace nt
