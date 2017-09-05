@@ -45,9 +45,18 @@ class PWM : public SensorBase,
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */
   enum PeriodMultiplier {
-    kPeriodMultiplier_1X = 1, ///don't skip pulses. PWM pulses occur every 5.005 ms
-    kPeriodMultiplier_2X = 2, ///skip every other pulse. PWM pulses occur every 10.010 ms
-    kPeriodMultiplier_4X = 4  ///skip three out of four pulses. PWM pulses occur every 20.020 ms
+    /**
+     * Don't skip pulses. PWM pulses occur every 5.005 ms
+     */
+    kPeriodMultiplier_1X = 1,
+    /**
+     * Skip every other pulse. PWM pulses occur every 10.010 ms
+     */
+    kPeriodMultiplier_2X = 2,
+    /**
+     * Skip three out of four pulses. PWM pulses occur every 20.020 ms
+     */
+    kPeriodMultiplier_4X = 4
   };
 
   explicit PWM(int channel);
