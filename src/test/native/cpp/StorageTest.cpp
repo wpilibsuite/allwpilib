@@ -876,7 +876,7 @@ TEST_P(StorageTestEmpty, ProcessIncomingEntryAssign) {
   auto conn = std::make_shared<MockNetworkConnection>();
   auto value = Value::MakeDouble(1.0);
   if (GetParam()) {
-    // id assign message reply generated on the server
+    // id assign message reply generated on the server; sent to everyone
     EXPECT_CALL(
         dispatcher,
         QueueOutgoing(MessageEq(Message::EntryAssign("foo", 0, 0, value, 0)),
@@ -888,6 +888,57 @@ TEST_P(StorageTestEmpty, ProcessIncomingEntryAssign) {
   storage.ProcessIncoming(
       Message::EntryAssign("foo", GetParam() ? 0xffff : 0, 0, value, 0),
       conn.get(), conn);
+}
+
+TEST_P(StorageTestPopulateOne, ProcessIncomingEntryAssign) {
+  auto conn = std::make_shared<MockNetworkConnection>();
+  auto value = Value::MakeDouble(1.0);
+  EXPECT_CALL(*conn, proto_rev()).WillRepeatedly(Return(0x0300u));
+  if (GetParam()) {
+    // server broadcasts new value to all *other* connections
+    EXPECT_CALL(
+        dispatcher,
+        QueueOutgoing(MessageEq(Message::EntryAssign("foo", 0, 1, value, 0)),
+                      IsNull(), conn.get()));
+  }
+  EXPECT_CALL(notifier, NotifyEntry(0, StringRef("foo"), ValueEq(value),
+                                    NT_NOTIFY_UPDATE, UINT_MAX));
+
+  storage.ProcessIncoming(Message::EntryAssign("foo", 0, 1, value, 0),
+                          conn.get(), conn);
+}
+
+TEST_P(StorageTestPopulateOne, ProcessIncomingEntryAssignIgnore) {
+  auto conn = std::make_shared<MockNetworkConnection>();
+  auto value = Value::MakeDouble(1.0);
+  storage.ProcessIncoming(Message::EntryAssign("foo", 0xffff, 1, value, 0),
+                          conn.get(), conn);
+}
+
+TEST_P(StorageTestPopulateOne, ProcessIncomingEntryAssignWithFlags) {
+  auto conn = std::make_shared<MockNetworkConnection>();
+  auto value = Value::MakeDouble(1.0);
+  EXPECT_CALL(*conn, proto_rev()).WillRepeatedly(Return(0x0300u));
+  if (GetParam()) {
+    // server broadcasts new value/flags to all *other* connections
+    EXPECT_CALL(
+        dispatcher,
+        QueueOutgoing(MessageEq(Message::EntryAssign("foo", 0, 1, value, 0x2)),
+                      IsNull(), conn.get()));
+    EXPECT_CALL(notifier,
+                NotifyEntry(0, StringRef("foo"), ValueEq(value),
+                            NT_NOTIFY_UPDATE | NT_NOTIFY_FLAGS, UINT_MAX));
+  } else {
+    // client forces flags back when an assign message is received for an
+    // existing entry with different flags
+    EXPECT_CALL(dispatcher, QueueOutgoing(MessageEq(Message::FlagsUpdate(0, 0)),
+                                          IsNull(), IsNull()));
+    EXPECT_CALL(notifier, NotifyEntry(0, StringRef("foo"), ValueEq(value),
+                                      NT_NOTIFY_UPDATE, UINT_MAX));
+  }
+
+  storage.ProcessIncoming(Message::EntryAssign("foo", 0, 1, value, 0x2),
+                          conn.get(), conn);
 }
 
 INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty,
