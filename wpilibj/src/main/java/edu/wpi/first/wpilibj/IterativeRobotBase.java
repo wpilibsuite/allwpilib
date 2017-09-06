@@ -54,10 +54,6 @@ public abstract class IterativeRobotBase extends RobotBase {
    * IterativeRobotBase constructor.
    */
   public IterativeRobotBase() {
-    robotInit();
-
-    // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
   }
 
   /**
