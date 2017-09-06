@@ -33,7 +33,7 @@ public class IterativeRobot extends IterativeRobotBase {
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
-    // loop forever, calling the appropriate mode-dependent function
+    // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       // Wait for new data to arrive
       m_ds.waitForData();

@@ -51,12 +51,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   private Mode m_lastMode = Mode.kNone;
 
   /**
-   * IterativeRobotBase constructor.
-   */
-  public IterativeRobotBase() {
-  }
-
-  /**
    * Provide an alternate "main loop" via startCompetition().
    */
   public abstract void startCompetition();

@@ -44,7 +44,7 @@ public class TimedRobot extends IterativeRobotBase {
     // Tell the DS that the robot is ready to be enabled
     HAL.observeUserProgramStarting();
 
-    // loop forever, calling the appropriate mode-dependent function
+    // Loop forever, calling the appropriate mode-dependent function
     m_startLoop = true;
     m_loop.startPeriodic(m_period);
     while (true) {
