@@ -55,7 +55,6 @@ class IterativeRobotBase : public RobotBase {
   virtual void TestPeriodic();
 
  protected:
-  IterativeRobotBase();
   virtual ~IterativeRobotBase() = default;
 
   void LoopFunc();

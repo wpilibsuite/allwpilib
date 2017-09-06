@@ -146,13 +146,6 @@ void IterativeRobotBase::TestPeriodic() {
   }
 }
 
-IterativeRobotBase::IterativeRobotBase() {
-  RobotInit();
-
-  // Tell the DS that the robot is ready to be enabled
-  HAL_ObserveUserProgramStarting();
-}
-
 void IterativeRobotBase::LoopFunc() {
   // Call the appropriate function depending upon the current robot mode
   if (IsDisabled()) {

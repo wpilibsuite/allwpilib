@@ -17,6 +17,11 @@ using namespace frc;
  * Provide an alternate "main loop" via StartCompetition().
  */
 void TimedRobot::StartCompetition() {
+  RobotInit();
+
+  // Tell the DS that the robot is ready to be enabled
+  HAL_ObserveUserProgramStarting();
+
   // Loop forever, calling the appropriate mode-dependent function
   m_startLoop = true;
   m_loop->StartPeriodic(m_period);
