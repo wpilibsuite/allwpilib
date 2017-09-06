@@ -28,7 +28,12 @@ public class IterativeRobot extends IterativeRobotBase {
    * Provide an alternate "main loop" via startCompetition().
    */
   public void startCompetition() {
-    // loop forever, calling the appropriate mode-dependent function
+    robotInit();
+
+    // Tell the DS that the robot is ready to be enabled
+    HAL.observeUserProgramStarting();
+
+    // Loop forever, calling the appropriate mode-dependent function
     while (true) {
       // Wait for new data to arrive
       m_ds.waitForData();

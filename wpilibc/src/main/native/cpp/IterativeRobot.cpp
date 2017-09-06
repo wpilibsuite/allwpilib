@@ -25,6 +25,11 @@ IterativeRobot::IterativeRobot() {
  * the DS packets.
  */
 void IterativeRobot::StartCompetition() {
+  RobotInit();
+
+  // Tell the DS that the robot is ready to be enabled
+  HAL_ObserveUserProgramStarting();
+
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
     // wait for driver station data so the loop doesn't hog the CPU

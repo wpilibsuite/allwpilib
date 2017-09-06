@@ -39,7 +39,12 @@ public class TimedRobot extends IterativeRobotBase {
    * Provide an alternate "main loop" via startCompetition().
    */
   public void startCompetition() {
-    // loop forever, calling the appropriate mode-dependent function
+    robotInit();
+
+    // Tell the DS that the robot is ready to be enabled
+    HAL.observeUserProgramStarting();
+
+    // Loop forever, calling the appropriate mode-dependent function
     m_startLoop = true;
     m_loop.startPeriodic(m_period);
     while (true) {

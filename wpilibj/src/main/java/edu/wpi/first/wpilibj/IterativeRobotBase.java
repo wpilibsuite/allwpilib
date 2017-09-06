@@ -51,16 +51,6 @@ public abstract class IterativeRobotBase extends RobotBase {
   private Mode m_lastMode = Mode.kNone;
 
   /**
-   * IterativeRobotBase constructor.
-   */
-  public IterativeRobotBase() {
-    robotInit();
-
-    // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
-  }
-
-  /**
    * Provide an alternate "main loop" via startCompetition().
    */
   public abstract void startCompetition();
