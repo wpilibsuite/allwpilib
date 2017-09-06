@@ -5,28 +5,63 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+import edu.wpi.first.wpilibj.DistanceEncoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedController;
+import systems.uom.common.USCustomary;
+import tec.uom.se.unit.Units;
 
 @SuppressWarnings("all")
 public class MyRobot extends IterativeRobot {
+
+  private DistanceEncoder encoder;
+  private SpeedController motor;
+
+  private PIDController autoController;
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
    */
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    encoder = new DistanceEncoder(0, 1, 2 * Math.PI, Units.METRE);
+    motor = new Spark(0);
+
+    autoController = new PIDController(0.5, 0, 0, 0,
+        encoder.pidGet(Units.METRE), motor);
+  }
 
   /**
    * This function is run once each time the robot enters autonomous mode
    */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    pidAuto();
+  }
 
   /**
    * This function is called periodically during autonomous
    */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    //basicAuto();
+  }
+
+  private void basicAuto() {
+    if (encoder.get(USCustomary.FOOT) < 12) {
+      motor.set(1.0);
+    } else {
+      motor.set(0.0);
+    }
+  }
+
+  private void pidAuto() {
+    //autoController.setSetpoint(1200, MetricPrefix.CENTI(Units.METRE));
+    autoController.enable();
+  }
 
   /**
    * This function is called once each time the robot enters tele-operated mode
