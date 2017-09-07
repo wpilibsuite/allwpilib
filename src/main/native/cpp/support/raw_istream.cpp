@@ -117,7 +117,7 @@ void raw_fd_istream::read_impl(void* data, std::size_t len) {
 #else
       ssize_t count = ::read(m_fd, m_buf, m_bufSize);
 #endif
-      if (count < 0) {
+      if (count <= 0) {
         error_detected();
         return;
       }
