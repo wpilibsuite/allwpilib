@@ -17,8 +17,11 @@ if (project.hasProperty("publishVersion")) {
 def baseArtifactId = 'wpilibj'
 def artifactGroupId = 'edu.wpi.first.wpilibj'
 
+def outputsFolder = file("$project.buildDir/outputs")
+
 task cppSourcesZip(type: Zip) {
-    destinationDir = project.buildDir
+    destinationDir = outputsFolder
+    baseName = 'wpilibJNI'
     classifier = "sources"
 
     from(licenseFile) {
@@ -59,6 +62,12 @@ task javadoc(type: Javadoc, overwrite: true) {
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
+}
+
+if (project.hasProperty('jenkinsBuild')) {
+    jar {
+        classifier = 'javaArtifact'
+    }
 }
 
 artifacts {
