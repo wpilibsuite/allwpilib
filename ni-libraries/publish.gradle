@@ -17,7 +17,6 @@ if (project.hasProperty("publishVersion")) {
 def baseArtifactId = 'ni-libraries'
 def artifactGroupId = 'edu.wpi.first.ni-libraries'
 
-
 publishing {
   publications {
     nilibraries(MavenPublication) {

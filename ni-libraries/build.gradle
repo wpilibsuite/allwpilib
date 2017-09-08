@@ -33,8 +33,11 @@ ext.addNiLibrariesToLinker = { binary->
     }
 }
 
+def outputsFolder = file("$project.buildDir/outputs")
+
 task libZip(type: Zip) {
-    destinationDir = project.buildDir
+    destinationDir = outputsFolder
+    baseName = 'nilibraries-classifier'
     classifier = "linuxathena"
 
     from('lib') {
@@ -43,13 +46,19 @@ task libZip(type: Zip) {
 }
 
 task headersZip(type: Zip) {
-    destinationDir = project.buildDir
+    destinationDir = outputsFolder
+    baseName = 'nilibraries-classifier'
     classifier = "headers"
 
     from('include') {
         into '/'
     }
 }
+
+task build() {}
+
+build.dependsOn headersZip
+build.dependsOn libZip
 
 apply from: 'publish.gradle'
 

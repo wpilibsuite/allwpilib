@@ -17,8 +17,11 @@ if (project.hasProperty("publishVersion")) {
 def baseArtifactId = 'hal'
 def artifactGroupId = 'edu.wpi.first.hal'
 
+def outputsFolder = file("$project.buildDir/outputs")
+
 task cppSourcesZip(type: Zip) {
-    destinationDir = project.buildDir
+    destinationDir = outputsFolder
+    baseName = 'hal'
     classifier = "sources"
 
     from(licenseFile) {
@@ -39,7 +42,8 @@ task cppSourcesZip(type: Zip) {
 }
 
 task cppHeadersZip(type: Zip) {
-    destinationDir = project.buildDir
+    destinationDir = outputsFolder
+    baseName = 'hal'
     classifier = "headers"
 
     from(licenseFile) {
@@ -50,6 +54,10 @@ task cppHeadersZip(type: Zip) {
         into '/'
     }
 }
+
+build.dependsOn cppHeadersZip
+build.dependsOn cppSourcesZip
+
 
 model {
     publishing {
