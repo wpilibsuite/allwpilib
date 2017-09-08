@@ -12,6 +12,7 @@
 
 #include "Timer.h"
 #include "gtest/gtest.h"
+#include "networktables/NetworkTableInstance.h"
 #include "ntcore.h"
 
 using namespace frc;
@@ -24,7 +25,8 @@ static const double kSaveTime = 1.2;
  * we get those same values back using the Preference class.
  */
 TEST(PreferencesTest, ReadPreferencesFromFile) {
-  NetworkTable::Shutdown();
+  auto inst = nt::NetworkTableInstance::GetDefault();
+  inst.StopServer();
   std::remove(kFileName);
   std::ofstream preferencesFile(kFileName);
   preferencesFile << "[NetworkTables Storage 3.0]" << std::endl;
@@ -42,7 +44,7 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
       << "double \"/Preferences/testFileGetLong\"=1000000000000000000"
       << std::endl;
   preferencesFile.close();
-  NetworkTable::Initialize();
+  inst.StartServer();
 
   Preferences* preferences = Preferences::GetInstance();
   EXPECT_EQ("Hello, preferences file",
@@ -59,16 +61,17 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
  * in networktables.ini
  */
 TEST(PreferencesTest, WritePreferencesToFile) {
-  NetworkTable::Shutdown();
-  NetworkTable::GlobalDeleteAll();
+  auto inst = nt::NetworkTableInstance::GetDefault();
+  inst.StopServer();
+  inst.DeleteAllEntries();
   // persistent keys don't get deleted normally, so make remaining keys
   // non-persistent and delete them too
-  for (const auto& info : nt::GetEntryInfo("", 0)) {
-    nt::SetEntryFlags(info.name, 0);
+  for (auto entry : inst.GetEntries("", 0)) {
+    entry.SetFlags(0);
   }
-  NetworkTable::GlobalDeleteAll();
+  inst.DeleteAllEntries();
   std::remove(kFileName);
-  NetworkTable::Initialize();
+  inst.StartServer();
   Preferences* preferences = Preferences::GetInstance();
   preferences->PutString("testFilePutString", "Hello, preferences file");
   preferences->PutInt("testFilePutInt", 1);
