@@ -1,26 +1,21 @@
-cppHeaderExtensions {
-  h
-  hpp
-  inc
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
 }
 
-cppSrcExtensions {
-  cpp
+cppSrcFileInclude {
+  \.cpp$
 }
 
-otherExtensions {
-  java
-}
-
-genFileExclude {
+generatedFileExclude {
   gmock/
-  ni-libraries/
+  ni-libraries/include/
+  ni-libraries/lib/
   hal/src/main/native/athena/ctre/
   hal/src/main/native/athena/frccansae/
   hal/src/main/native/athena/visa/
   hal/src/main/native/include/ctre/
-  simulation/JavaGazebo/build/classes/main/gazebo/msgs/
-  wpilibj/src/athena/cpp/nivision/
   UsageReporting\.h$
 }
 
