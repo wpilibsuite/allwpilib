@@ -17,6 +17,7 @@
 #include "HAL/AnalogInput.h"
 #include "HAL/AnalogOutput.h"
 #include "HAL/AnalogTrigger.h"
+#include "HAL/CAN.h"
 #include "HAL/Compressor.h"
 #include "HAL/Constants.h"
 #include "HAL/Counter.h"

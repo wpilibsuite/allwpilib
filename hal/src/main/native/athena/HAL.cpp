@@ -17,7 +17,6 @@
 #include <mutex>
 #include <thread>
 
-#include <FRC_NetworkCommunication/CANSessionMux.h>
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <llvm/raw_ostream.h>
@@ -130,15 +129,15 @@ const char* HAL_GetErrorMessage(int32_t code) {
       return PARAMETER_OUT_OF_RANGE_MESSAGE;
     case HAL_COUNTER_NOT_SUPPORTED:
       return HAL_COUNTER_NOT_SUPPORTED_MESSAGE;
-    case ERR_CANSessionMux_InvalidBuffer:
+    case HAL_ERR_CANSessionMux_InvalidBuffer:
       return ERR_CANSessionMux_InvalidBuffer_MESSAGE;
-    case ERR_CANSessionMux_MessageNotFound:
+    case HAL_ERR_CANSessionMux_MessageNotFound:
       return ERR_CANSessionMux_MessageNotFound_MESSAGE;
-    case WARN_CANSessionMux_NoToken:
+    case HAL_WARN_CANSessionMux_NoToken:
       return WARN_CANSessionMux_NoToken_MESSAGE;
-    case ERR_CANSessionMux_NotAllowed:
+    case HAL_ERR_CANSessionMux_NotAllowed:
       return ERR_CANSessionMux_NotAllowed_MESSAGE;
-    case ERR_CANSessionMux_NotInitialized:
+    case HAL_ERR_CANSessionMux_NotInitialized:
       return ERR_CANSessionMux_NotInitialized_MESSAGE;
     case VI_ERROR_SYSTEM_ERROR:
       return VI_ERROR_SYSTEM_ERROR_MESSAGE;
