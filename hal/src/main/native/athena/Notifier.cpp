@@ -27,7 +27,7 @@ using namespace hal;
 static const int32_t kTimerInterruptNumber = 28;
 
 static std::mutex notifierInterruptMutex;
-static std::recursive_mutex notifierMutex;
+static std::mutex notifierMutex;
 static std::unique_ptr<tAlarm> notifierAlarm;
 static std::unique_ptr<tInterruptManager> notifierManager;
 static uint64_t closestTrigger = UINT64_MAX;
@@ -100,12 +100,11 @@ static UnlimitedHandleResource<HAL_NotifierHandle, Notifier,
                                HAL_HandleEnum::Notifier>
     notifierHandles;
 
-// internal version of updateAlarm used during the alarmCallback when we know
-// that the pointer is a valid pointer.
+// Internal version of updateAlarm used during the alarmCallback when we know
+// that the pointer is a valid pointer. This function is synchronized by the
+// caller locking notifierMutex.
 void updateNotifierAlarmInternal(std::shared_ptr<Notifier> notifierPointer,
                                  uint64_t triggerTime, int32_t* status) {
-  std::lock_guard<std::recursive_mutex> sync(notifierMutex);
-
   auto notifier = notifierPointer;
   // no need for a null check, as this must always be a valid pointer.
   notifier->triggerTime = triggerTime;
@@ -128,7 +127,7 @@ void updateNotifierAlarmInternal(std::shared_ptr<Notifier> notifierPointer,
 }
 
 static void alarmCallback(uint32_t, void*) {
-  std::unique_lock<std::recursive_mutex> sync(notifierMutex);
+  std::unique_lock<std::mutex> sync(notifierMutex);
 
   int32_t status = 0;
   uint64_t currentTime = 0;
@@ -195,7 +194,7 @@ HAL_NotifierHandle HAL_InitializeNotifierNonThreadedUnsafe(
     if (!notifierAlarm) notifierAlarm.reset(tAlarm::create(status));
   }
 
-  std::lock_guard<std::recursive_mutex> sync(notifierMutex);
+  std::lock_guard<std::mutex> sync(notifierMutex);
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
   HAL_NotifierHandle handle = notifierHandles.Allocate(notifier);
   if (handle == HAL_kInvalidHandle) {
@@ -238,7 +237,7 @@ HAL_NotifierHandle HAL_InitializeNotifier(HAL_NotifierProcessFunction process,
 
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   {
-    std::lock_guard<std::recursive_mutex> sync(notifierMutex);
+    std::lock_guard<std::mutex> sync(notifierMutex);
     auto notifier = notifierHandles.Get(notifierHandle);
     if (!notifier) return;
 
@@ -284,7 +283,7 @@ void* HAL_GetNotifierParam(HAL_NotifierHandle notifierHandle, int32_t* status) {
 
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status) {
-  std::lock_guard<std::recursive_mutex> sync(notifierMutex);
+  std::lock_guard<std::mutex> sync(notifierMutex);
 
   auto notifier = notifierHandles.Get(notifierHandle);
   if (!notifier) return;
@@ -292,7 +291,7 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
 }
 
 void HAL_StopNotifierAlarm(HAL_NotifierHandle notifierHandle, int32_t* status) {
-  std::lock_guard<std::recursive_mutex> sync(notifierMutex);
+  std::lock_guard<std::mutex> sync(notifierMutex);
   auto notifier = notifierHandles.Get(notifierHandle);
   if (!notifier) return;
   notifier->triggerTime = UINT64_MAX;

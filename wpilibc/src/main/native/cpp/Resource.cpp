@@ -12,7 +12,7 @@
 
 using namespace frc;
 
-std::recursive_mutex Resource::m_createLock;
+std::mutex Resource::m_createMutex;
 
 /**
  * Allocate storage for a new instance of Resource.
@@ -22,7 +22,6 @@ std::recursive_mutex Resource::m_createLock;
  * elements - 1].
  */
 Resource::Resource(uint32_t elements) {
-  std::lock_guard<std::recursive_mutex> sync(m_createLock);
   m_isAllocated = std::vector<bool>(elements, false);
 }
 
@@ -37,9 +36,9 @@ Resource::Resource(uint32_t elements) {
  *                 track, that is, it will allocate resource numbers in the
  *                 range [0 .. elements - 1].
  */
-/*static*/ void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
-                                               uint32_t elements) {
-  std::lock_guard<std::recursive_mutex> sync(m_createLock);
+void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
+                                    uint32_t elements) {
+  std::lock_guard<std::mutex> sync(m_createMutex);
   if (!r) {
     r = std::make_unique<Resource>(elements);
   }
@@ -53,7 +52,7 @@ Resource::Resource(uint32_t elements) {
  * allocated.
  */
 uint32_t Resource::Allocate(const std::string& resourceDesc) {
-  std::lock_guard<std::recursive_mutex> sync(m_allocateLock);
+  std::lock_guard<std::mutex> sync(m_allocateMutex);
   for (uint32_t i = 0; i < m_isAllocated.size(); i++) {
     if (!m_isAllocated[i]) {
       m_isAllocated[i] = true;
@@ -71,7 +70,7 @@ uint32_t Resource::Allocate(const std::string& resourceDesc) {
  * verified unallocated, then returned.
  */
 uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
-  std::lock_guard<std::recursive_mutex> sync(m_allocateLock);
+  std::lock_guard<std::mutex> sync(m_allocateMutex);
   if (index >= m_isAllocated.size()) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
     return std::numeric_limits<uint32_t>::max();
@@ -92,7 +91,7 @@ uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
  * be reused somewhere else in the program.
  */
 void Resource::Free(uint32_t index) {
-  std::unique_lock<std::recursive_mutex> sync(m_allocateLock);
+  std::unique_lock<std::mutex> sync(m_allocateMutex);
   if (index == std::numeric_limits<uint32_t>::max()) return;
   if (index >= m_isAllocated.size()) {
     wpi_setWPIError(NotAllocated);

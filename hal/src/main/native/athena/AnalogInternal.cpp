@@ -16,7 +16,7 @@
 
 namespace hal {
 
-std::recursive_mutex analogRegisterWindowMutex;
+std::mutex analogRegisterWindowMutex;
 std::unique_ptr<tAI> analogInputSystem;
 std::unique_ptr<tAO> analogOutputSystem;
 
@@ -35,7 +35,7 @@ bool analogSampleRateSet = false;
  */
 void initializeAnalog(int32_t* status) {
   if (analogSystemInitialized) return;
-  std::lock_guard<std::recursive_mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<std::mutex> sync(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));

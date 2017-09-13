@@ -147,7 +147,7 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   std::queue<double> m_buf;
   double m_bufTotal = 0;
 
-  mutable std::recursive_mutex m_mutex;
+  mutable std::mutex m_mutex;
 
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;

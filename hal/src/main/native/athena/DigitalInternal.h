@@ -59,7 +59,7 @@ constexpr int32_t kDefaultPwmStepsDown = 1000;
 constexpr int32_t kPwmDisabled = 0;
 
 // Create a mutex to protect changes to the DO PWM config
-extern std::recursive_mutex digitalPwmMutex;
+extern std::mutex digitalPwmMutex;
 
 extern std::unique_ptr<tDIO> digitalSystem;
 extern std::unique_ptr<tRelay> relaySystem;

@@ -23,7 +23,7 @@
 namespace hal {
 
 // Create a mutex to protect changes to the DO PWM config
-std::recursive_mutex digitalPwmMutex;
+std::mutex digitalPwmMutex;
 
 std::unique_ptr<tDIO> digitalSystem;
 std::unique_ptr<tRelay> relaySystem;

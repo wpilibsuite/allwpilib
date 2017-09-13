@@ -27,7 +27,7 @@ static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
     relayHandles;
 
 // Create a mutex to protect changes to the relay values
-static std::recursive_mutex digitalRelayMutex;
+static std::mutex digitalRelayMutex;
 
 extern "C" {
 
@@ -92,7 +92,7 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  std::lock_guard<std::recursive_mutex> sync(digitalRelayMutex);
+  std::lock_guard<std::mutex> sync(digitalRelayMutex);
   uint8_t relays = 0;
   if (port->fwd) {
     relays = relaySystem->readValue_Forward(status);

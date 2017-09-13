@@ -27,7 +27,7 @@ static const uint32_t kAccumulatorChannels[] = {0, 1};
 
 extern std::unique_ptr<tAI> analogInputSystem;
 extern std::unique_ptr<tAO> analogOutputSystem;
-extern std::recursive_mutex analogRegisterWindowMutex;
+extern std::mutex analogRegisterWindowMutex;
 extern bool analogSampleRateSet;
 
 struct AnalogPort {

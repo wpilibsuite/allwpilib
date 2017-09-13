@@ -43,9 +43,9 @@ class Resource : public ErrorBase {
 
  private:
   std::vector<bool> m_isAllocated;
-  std::recursive_mutex m_allocateLock;
+  std::mutex m_allocateMutex;
 
-  static std::recursive_mutex m_createLock;
+  static std::mutex m_createMutex;
 };
 
 }  // namespace frc
