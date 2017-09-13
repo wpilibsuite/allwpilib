@@ -11,16 +11,16 @@
 #include <pthread.h>
 #endif
 
+#include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
 
-#include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "MockData/DriverStationDataInternal.h"
 
 static hal::priority_mutex msgMutex;
-static hal::priority_condition_variable newDSDataAvailableCond;
+static std::condition_variable_any newDSDataAvailableCond;
 static hal::priority_mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 

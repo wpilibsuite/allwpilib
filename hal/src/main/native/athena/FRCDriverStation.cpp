@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
@@ -15,7 +16,6 @@
 #include <llvm/raw_ostream.h>
 
 #include "HAL/DriverStation.h"
-#include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
@@ -27,7 +27,7 @@ struct HAL_JoystickAxesInt {
 };
 
 static hal::priority_mutex msgMutex;
-static hal::priority_condition_variable newDSDataAvailableCond;
+static std::condition_variable_any newDSDataAvailableCond;
 static hal::priority_mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 
