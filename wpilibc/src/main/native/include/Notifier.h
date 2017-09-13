@@ -11,10 +11,10 @@
 
 #include <atomic>
 #include <functional>
+#include <mutex>
 #include <utility>
 
 #include <HAL/Notifier.h>
-#include <HAL/cpp/priority_mutex.h>
 
 #include "ErrorBase.h"
 
@@ -47,9 +47,9 @@ class Notifier : public ErrorBase {
   static void Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle);
 
   // used to constrain execution between destructors and callback
-  static hal::priority_mutex m_destructorMutex;
+  static std::mutex m_destructorMutex;
   // held while updating process information
-  hal::priority_mutex m_processMutex;
+  std::mutex m_processMutex;
   // HAL handle, atomic for proper destruction
   std::atomic<HAL_NotifierHandle> m_notifier{0};
   // address of the handler

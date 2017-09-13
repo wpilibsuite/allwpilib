@@ -8,15 +8,15 @@
 #include "AnalogInternal.h"
 
 #include <atomic>
+#include <mutex>
 
 #include "HAL/AnalogInput.h"
 #include "HAL/ChipObject.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "PortsInternal.h"
 
 namespace hal {
 
-priority_recursive_mutex analogRegisterWindowMutex;
+std::recursive_mutex analogRegisterWindowMutex;
 std::unique_ptr<tAI> analogInputSystem;
 std::unique_ptr<tAO> analogOutputSystem;
 
@@ -35,7 +35,7 @@ bool analogSampleRateSet = false;
  */
 void initializeAnalog(int32_t* status) {
   if (analogSystemInitialized) return;
-  std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<std::recursive_mutex> sync(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));

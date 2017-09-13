@@ -9,10 +9,9 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <string>
-
-#include <HAL/cpp/priority_mutex.h>
 
 #include "Base.h"
 #include "Controller.h"
@@ -148,7 +147,7 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   std::queue<double> m_buf;
   double m_bufTotal = 0;
 
-  mutable hal::priority_recursive_mutex m_mutex;
+  mutable std::recursive_mutex m_mutex;
 
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;

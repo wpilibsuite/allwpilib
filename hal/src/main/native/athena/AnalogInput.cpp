@@ -14,7 +14,6 @@
 #include "AnalogInternal.h"
 #include "HAL/AnalogAccumulator.h"
 #include "HAL/HAL.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "PortsInternal.h"
 
@@ -231,7 +230,7 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
   readSelect.Channel = port->channel;
   readSelect.Averaged = false;
 
-  std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<std::recursive_mutex> sync(analogRegisterWindowMutex);
   analogInputSystem->writeReadSelect(readSelect, status);
   analogInputSystem->strobeLatchOutput(status);
   return static_cast<int16_t>(analogInputSystem->readOutput(status));
@@ -262,7 +261,7 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
   readSelect.Channel = port->channel;
   readSelect.Averaged = true;
 
-  std::lock_guard<priority_recursive_mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<std::recursive_mutex> sync(analogRegisterWindowMutex);
   analogInputSystem->writeReadSelect(readSelect, status);
   analogInputSystem->strobeLatchOutput(status);
   return static_cast<int32_t>(analogInputSystem->readOutput(status));

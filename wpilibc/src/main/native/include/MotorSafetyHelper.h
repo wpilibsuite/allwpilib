@@ -7,9 +7,8 @@
 
 #pragma once
 
+#include <mutex>
 #include <set>
-
-#include <HAL/cpp/priority_mutex.h>
 
 #include "ErrorBase.h"
 
@@ -38,13 +37,13 @@ class MotorSafetyHelper : public ErrorBase {
   // the FPGA clock value when this motor has expired
   double m_stopTime;
   // protect accesses to the state for this object
-  mutable hal::priority_recursive_mutex m_syncMutex;
+  mutable std::recursive_mutex m_syncMutex;
   // the object that is using the helper
   MotorSafety* m_safeObject;
   // List of all existing MotorSafetyHelper objects.
   static std::set<MotorSafetyHelper*> m_helperList;
   // protect accesses to the list of helpers
-  static hal::priority_recursive_mutex m_listMutex;
+  static std::recursive_mutex m_listMutex;
 };
 
 }  // namespace frc

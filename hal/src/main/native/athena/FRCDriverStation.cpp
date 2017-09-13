@@ -11,12 +11,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <limits>
+#include <mutex>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <llvm/raw_ostream.h>
 
 #include "HAL/DriverStation.h"
-#include "HAL/cpp/priority_mutex.h"
 
 static_assert(sizeof(int32_t) >= sizeof(int),
               "FRC_NetworkComm status variable is larger than 32 bits");
@@ -26,9 +26,9 @@ struct HAL_JoystickAxesInt {
   int16_t axes[HAL_kMaxJoystickAxes];
 };
 
-static hal::priority_mutex msgMutex;
-static std::condition_variable_any newDSDataAvailableCond;
-static hal::priority_mutex newDSDataAvailableMutex;
+static std::mutex msgMutex;
+static std::condition_variable newDSDataAvailableCond;
+static std::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 
 extern "C" {
@@ -44,7 +44,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard<hal::priority_mutex> lock(msgMutex);
+  std::lock_guard<std::mutex> lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -258,7 +258,7 @@ bool HAL_IsNewControlData(void) {
   thread_local int lastCount{-1};
   int currentCount = 0;
   {
-    std::unique_lock<hal::priority_mutex> lock(newDSDataAvailableMutex);
+    std::unique_lock<std::mutex> lock(newDSDataAvailableMutex);
     currentCount = newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;
@@ -280,7 +280,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<hal::priority_mutex> lock(newDSDataAvailableMutex);
+  std::unique_lock<std::mutex> lock(newDSDataAvailableMutex);
   int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
@@ -306,7 +306,7 @@ static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return 0;
-  std::lock_guard<hal::priority_mutex> lock(newDSDataAvailableMutex);
+  std::lock_guard<std::mutex> lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
   newDSDataAvailableCond.notify_all();
@@ -320,11 +320,11 @@ static int32_t newDataOccur(uint32_t refNum) {
  */
 void HAL_InitializeDriverStation(void) {
   static std::atomic_bool initialized{false};
-  static hal::priority_mutex initializeMutex;
+  static std::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<hal::priority_mutex> lock(initializeMutex);
+  std::lock_guard<std::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

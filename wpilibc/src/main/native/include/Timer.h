@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <HAL/cpp/priority_mutex.h>
+#include <mutex>
 
 #include "Base.h"
 
@@ -52,7 +52,7 @@ class Timer {
   double m_startTime = 0.0;
   double m_accumulatedTime = 0.0;
   bool m_running = false;
-  mutable hal::priority_mutex m_mutex;
+  mutable std::mutex m_mutex;
 };
 
 }  // namespace frc

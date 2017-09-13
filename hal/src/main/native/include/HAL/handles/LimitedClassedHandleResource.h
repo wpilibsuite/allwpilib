@@ -11,10 +11,10 @@
 
 #include <array>
 #include <memory>
+#include <mutex>
 
 #include "HAL/Types.h"
 #include "HAL/cpp/make_unique.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 
 namespace hal {
@@ -48,8 +48,8 @@ class LimitedClassedHandleResource : public HandleBase {
 
  private:
   std::array<std::shared_ptr<TStruct>, size> m_structures;
-  std::array<hal::priority_mutex, size> m_handleMutexes;
-  hal::priority_mutex m_allocateMutex;
+  std::array<std::mutex, size> m_handleMutexes;
+  std::mutex m_allocateMutex;
 };
 
 template <typename THandle, typename TStruct, int16_t size,
@@ -58,12 +58,12 @@ THandle
 LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     std::shared_ptr<TStruct> toSet) {
   // globally lock to loop through indices
-  std::lock_guard<hal::priority_mutex> sync(m_allocateMutex);
+  std::lock_guard<std::mutex> sync(m_allocateMutex);
   for (int16_t i = 0; i < size; i++) {
     if (m_structures[i] == nullptr) {
       // if a false index is found, grab its specific mutex
       // and allocate it.
-      std::lock_guard<hal::priority_mutex> sync(m_handleMutexes[i]);
+      std::lock_guard<std::mutex> sync(m_handleMutexes[i]);
       m_structures[i] = toSet;
       return static_cast<THandle>(createHandle(i, enumValue, m_version));
     }
@@ -80,7 +80,7 @@ std::shared_ptr<TStruct> LimitedClassedHandleResource<
   if (index < 0 || index >= size) {
     return nullptr;
   }
-  std::lock_guard<hal::priority_mutex> sync(m_handleMutexes[index]);
+  std::lock_guard<std::mutex> sync(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
   return m_structures[index];
@@ -94,8 +94,8 @@ void LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Free(
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) return;
   // lock and deallocated handle
-  std::lock_guard<hal::priority_mutex> sync(m_allocateMutex);
-  std::lock_guard<hal::priority_mutex> lock(m_handleMutexes[index]);
+  std::lock_guard<std::mutex> sync(m_allocateMutex);
+  std::lock_guard<std::mutex> lock(m_handleMutexes[index]);
   m_structures[index].reset();
 }
 
@@ -104,9 +104,9 @@ template <typename THandle, typename TStruct, int16_t size,
 void LimitedClassedHandleResource<THandle, TStruct, size,
                                   enumValue>::ResetHandles() {
   {
-    std::lock_guard<hal::priority_mutex> lock(m_allocateMutex);
+    std::lock_guard<std::mutex> lock(m_allocateMutex);
     for (int i = 0; i < size; i++) {
-      std::lock_guard<hal::priority_mutex> sync(m_handleMutexes[i]);
+      std::lock_guard<std::mutex> sync(m_handleMutexes[i]);
       m_structures[i].reset();
     }
   }

@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -16,7 +17,6 @@
 #include <llvm/SmallVector.h>
 
 #include "HAL/SerialPort.h"
-#include "HAL/cpp/priority_mutex.h"
 
 namespace hal {
 class SerialHelper {
@@ -46,7 +46,7 @@ class SerialHelper {
 
   int32_t m_resourceHandle;
 
-  static hal::priority_mutex m_nameMutex;
+  static std::mutex m_nameMutex;
   static std::string m_usbNames[2];
 };
 }  // namespace hal

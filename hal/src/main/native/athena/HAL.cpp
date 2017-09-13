@@ -26,7 +26,6 @@
 #include "HAL/Errors.h"
 #include "HAL/Notifier.h"
 #include "HAL/cpp/NotifierInternal.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "ctre/ctre.h"
 #include "visa/visa.h"
@@ -36,7 +35,7 @@ using namespace hal;
 static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
 
-static hal::priority_mutex timeMutex;
+static std::mutex timeMutex;
 static uint32_t timeEpoch = 0;
 static uint32_t prevFPGATime = 0;
 static HAL_NotifierHandle rolloverNotifier = 0;
@@ -225,7 +224,7 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-  std::lock_guard<hal::priority_mutex> lock(timeMutex);
+  std::lock_guard<std::mutex> lock(timeMutex);
   uint32_t fpgaTime = global->readLocalTime(status);
   if (*status != 0) return 0;
   // check for rollover
@@ -271,11 +270,11 @@ static void timerRollover(uint64_t currentTime, HAL_NotifierHandle handle) {
 
 void HAL_BaseInitialize(int32_t* status) {
   static std::atomic_bool initialized{false};
-  static hal::priority_mutex initializeMutex;
+  static std::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<hal::priority_mutex> lock(initializeMutex);
+  std::lock_guard<std::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
   // image 4; Fixes errors caused by multiple processes. Talk to NI about this
