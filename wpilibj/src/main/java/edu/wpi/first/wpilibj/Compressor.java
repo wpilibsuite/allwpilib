@@ -11,6 +11,8 @@ import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.CompressorJNI;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 
 /**
@@ -38,6 +40,8 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
     m_module = (byte) module;
 
     m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
+
+    HAL.report(tResourceType.kResourceType_Compressor, module);
   }
 
   /**

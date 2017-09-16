@@ -30,6 +30,8 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
     return;
   }
   SetClosedLoopControl(true);
+
+  HAL_Report(HALUsageReporting::kResourceType_Compressor, pcmID);
 }
 
 /**
