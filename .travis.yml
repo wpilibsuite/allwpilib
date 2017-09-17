@@ -9,10 +9,11 @@ addons:
     packages:
       - g++-6
       - python3
+      - python3-pip
       - clang-format-3.8
 
 install:
-  - pip3 install wpiformat
+  - pip3 install --user wpiformat
   - mkdir -p $HOME/latest-gcc-symlinks  # see travis-ci/travis-ci#3668
   - ln -s /usr/bin/g++-6 $HOME/latest-gcc-symlinks/g++
   - ln -s /usr/bin/gcc-6 $HOME/latest-gcc-symlinks/gcc
