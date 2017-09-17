@@ -25,10 +25,10 @@ Using Gradle makes building WPILib very straightforward. It only has a few depen
 
 - A C++ compiler
     - On Linux, gcc works fine
-    - On Windows, you need Visual Studio 2015 (the free community edition works fine)
+    - On Windows, you need Visual Studio 2015 (the free community edition works fine).  
       Make sure to select the C++ Programming Language for installation
 - [ARM Compiler Toolchain](http://first.wpi.edu/FRC/roborio/toolchains/)
-  * Note that for 2017-2018 and beyond, you must use a gcc 5+ version
+  * Note that for 2017-2018 and beyond, you will need version 5 or greater of gcc
 - Doxygen (Only required if you want to build the C++ documentation)
 
 ## Setup
