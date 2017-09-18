@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.fixtures;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.function.DoubleFunction;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.PIDSource;
@@ -15,11 +16,10 @@ import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
- * Represents a filterphysically connected Motor and Encoder to allow for unit tests on these
- * different pairs<br> Designed to allow the user to easily setup and tear down the fixture to allow
- * for reuse. This class should be explicitly instantiated in the TestBed class to allow any test to
- * access this fixture. This allows tests to be mailable so that you can easily reconfigure the
- * physical testbed without breaking the tests.
+ * Represents a filter to allow for unit tests on them<br> Designed to allow the user to easily
+ * setup and tear down the fixture to allow for reuse. This class should be explicitly instantiated
+ * in the TestBed class to allow any test to access this fixture. This allows tests to be mailable
+ * so that you can easily reconfigure the physical testbed without breaking the tests.
  */
 public abstract class FilterOutputFixture<T extends PIDSource> implements ITestFixture {
   private static final Logger logger = Logger.getLogger(FilterOutputFixture.class.getName());
@@ -40,24 +40,37 @@ public abstract class FilterOutputFixture<T extends PIDSource> implements ITestF
     return m_expectedOutput;
   }
 
+  public static DoubleFunction<Double> getData = new DoubleFunction<Double>() {
+    @Override
+    @SuppressWarnings("ParameterName")
+    public Double apply(double t) {
+      return 100.0 * Math.sin(2.0 * Math.PI * t) + 20.0 * Math.cos(50.0 * Math.PI * t);
+    }
+  };
+
+  public static DoubleFunction<Double> getPulseData = new DoubleFunction<Double>() {
+    @Override
+    @SuppressWarnings("ParameterName")
+    public Double apply(double t) {
+      if (Math.abs(t - 1.0) < 0.001) {
+        return 1.0;
+      } else {
+        return 0.0;
+      }
+    }
+  };
+
   /**
    * Where the implementer of this class should pass the filter constructor.
    */
-  protected abstract T giveFilter(PIDSource source);
+  protected abstract T giveFilter();
 
   private void initialize() {
     synchronized (this) {
       if (!m_initialized) {
         m_initialized = true; // This ensures it is only initialized once
 
-        m_data = new DataWrapper() {
-          @Override
-          @SuppressWarnings("ParameterName")
-          public double getData(double t) {
-            return 100.0 * Math.sin(2.0 * Math.PI * t) + 20.0 * Math.cos(50.0 * Math.PI * t);
-          }
-        };
-        m_filter = giveFilter(m_data);
+        m_filter = giveFilter();
       }
     }
   }
@@ -76,16 +89,6 @@ public abstract class FilterOutputFixture<T extends PIDSource> implements ITestF
   public T getFilter() {
     initialize();
     return m_filter;
-  }
-
-  /**
-   * Gets the data wrapper for this object.
-   *
-   * @return the data wrapper  that this object refers too
-   */
-  public DataWrapper getDataWrapper() {
-    initialize();
-    return m_data;
   }
 
   /**
@@ -122,13 +125,15 @@ public abstract class FilterOutputFixture<T extends PIDSource> implements ITestF
     return string.toString();
   }
 
-  public abstract class DataWrapper implements PIDSource {
+  public class DataWrapper implements PIDSource {
     // Make sure first call to pidGet() uses count == 0
     private double m_count = -TestBench.kFilterStep;
 
-    @SuppressWarnings("ParameterName")
-    public abstract double getData(double t);
+    private DoubleFunction<Double> m_func;
 
+    public DataWrapper(DoubleFunction<Double> func) {
+      m_func = func;
+    }
 
     @Override
     public void setPIDSourceType(PIDSourceType pidSource) {
@@ -144,7 +149,7 @@ public abstract class FilterOutputFixture<T extends PIDSource> implements ITestF
     @Override
     public double pidGet() {
       m_count += TestBench.kFilterStep;
-      return getData(m_count);
+      return m_func.apply(m_count);
     }
 
     public void reset() {

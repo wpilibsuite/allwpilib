@@ -387,8 +387,9 @@ public final class TestBench {
   public FilterOutputFixture<LinearDigitalFilter> getSinglePoleIIROutputFixture() {
     return new FilterOutputFixture<LinearDigitalFilter>(kSinglePoleIIRExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.singlePoleIIR(source,
+      protected LinearDigitalFilter giveFilter() {
+        DataWrapper data = new DataWrapper(getData);
+        return LinearDigitalFilter.singlePoleIIR(data,
             kSinglePoleIIRTimeConstant,
             kFilterStep);
       }
@@ -403,8 +404,9 @@ public final class TestBench {
   public FilterOutputFixture<LinearDigitalFilter> getHighPassOutputFixture() {
     return new FilterOutputFixture<LinearDigitalFilter>(kHighPassExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.highPass(source, kHighPassTimeConstant,
+      protected LinearDigitalFilter giveFilter() {
+        DataWrapper data = new DataWrapper(getData);
+        return LinearDigitalFilter.highPass(data, kHighPassTimeConstant,
             kFilterStep);
       }
     };
@@ -419,8 +421,25 @@ public final class TestBench {
   public FilterOutputFixture<LinearDigitalFilter> getMovAvgOutputFixture() {
     return new FilterOutputFixture<LinearDigitalFilter>(kMovAvgExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.movingAverage(source, kMovAvgTaps);
+      protected LinearDigitalFilter giveFilter() {
+        DataWrapper data = new DataWrapper(getData);
+        return LinearDigitalFilter.movingAverage(data, kMovAvgTaps);
+      }
+    };
+  }
+
+  /**
+   * Constructs a new set of objects representing a moving average filter with a repeatable data
+   * source using a linear digital filter.
+   *
+   * @return a moving average filter with a repeatable data source
+   */
+  public FilterOutputFixture<LinearDigitalFilter> getPulseFixture() {
+    return new FilterOutputFixture<LinearDigitalFilter>(0.0) {
+      @Override
+      protected LinearDigitalFilter giveFilter() {
+        DataWrapper data = new DataWrapper(getPulseData);
+        return LinearDigitalFilter.movingAverage(data, kMovAvgTaps);
       }
     };
   }
