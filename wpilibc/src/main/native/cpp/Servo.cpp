@@ -7,6 +7,8 @@
 
 #include "Servo.h"
 
+#include <HAL/HAL.h>
+
 #include "LiveWindow/LiveWindow.h"
 
 using namespace frc;
@@ -27,6 +29,8 @@ Servo::Servo(int channel) : SafePWM(channel) {
 
   // Assign defaults for period multiplier for the servo PWM control signal
   SetPeriodMultiplier(kPeriodMultiplier_4X);
+
+  HAL_Report(HALUsageReporting::kResourceType_Servo, channel);
 }
 
 Servo::~Servo() {
