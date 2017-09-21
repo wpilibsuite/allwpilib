@@ -7,6 +7,7 @@
 
 #include "PIDController.h"
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -24,6 +25,11 @@ static const std::string kD = "d";
 static const std::string kF = "f";
 static const std::string kSetpoint = "setpoint";
 static const std::string kEnabled = "enabled";
+
+template <class T>
+constexpr const T& clamp(const T& value, const T& low, const T& high) {
+  return std::max(low, std::min(value, high));
+}
 
 /**
  * Allocate a PID object with the given constants for P, I, D.
@@ -112,29 +118,15 @@ void PIDController::Calculate() {
 
     if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
       if (m_P != 0) {
-        double potentialPGain = (m_totalError + m_error) * m_P;
-        if (potentialPGain < m_maximumOutput) {
-          if (potentialPGain > m_minimumOutput)
-            m_totalError += m_error;
-          else
-            m_totalError = m_minimumOutput / m_P;
-        } else {
-          m_totalError = m_maximumOutput / m_P;
-        }
+        m_totalError = clamp(m_totalError + m_error, m_minimumOutput / m_P,
+                             m_maximumOutput / m_P);
       }
 
       m_result = m_D * m_error + m_P * m_totalError + feedForward;
     } else {
       if (m_I != 0) {
-        double potentialIGain = (m_totalError + m_error) * m_I;
-        if (potentialIGain < m_maximumOutput) {
-          if (potentialIGain > m_minimumOutput)
-            m_totalError += m_error;
-          else
-            m_totalError = m_minimumOutput / m_I;
-        } else {
-          m_totalError = m_maximumOutput / m_I;
-        }
+        m_totalError = clamp(m_totalError + m_error, m_minimumOutput / m_I,
+                             m_maximumOutput / m_I);
       }
 
       m_result = m_P * m_error + m_I * m_totalError +
@@ -142,10 +134,7 @@ void PIDController::Calculate() {
     }
     m_prevError = m_error;
 
-    if (m_result > m_maximumOutput)
-      m_result = m_maximumOutput;
-    else if (m_result < m_minimumOutput)
-      m_result = m_minimumOutput;
+    m_result = clamp(m_result, m_minimumOutput, m_maximumOutput);
 
     pidOutput = m_pidOutput;
     result = m_result;
