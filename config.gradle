@@ -212,7 +212,7 @@ if (!project.hasProperty('onlyAthena')) {
                 exclude << 'gmock'
             }
             linuxArm(BuildConfig) {
-                architecture = 'arm'
+                architecture = 'nativearm'
                 operatingSystem = 'linux'
                 compilerArgs = linuxCompilerArgs
                 linkerArgs = linuxLinkerArgs
