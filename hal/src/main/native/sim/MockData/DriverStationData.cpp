@@ -14,6 +14,18 @@ using namespace hal;
 
 DriverStationData hal::SimDriverStationData;
 
+DriverStationData::DriverStationData()
+    : m_joystickAxis(6), m_joystickPov(6), m_joystickButtons(6) {
+  std::memset(&m_joystickAxis[0], 0,
+              sizeof(m_joystickAxis[0]) * m_joystickAxis.size());
+  std::memset(&m_joystickPov[0], 0,
+              sizeof(m_joystickPov[0]) * m_joystickPov.size());
+  std::memset(&m_joystickButtons[0], 0,
+              sizeof(m_joystickButtons[0]) * m_joystickButtons.size());
+}
+
+DriverStationData::~DriverStationData() {}
+
 void DriverStationData::ResetData() {
   m_enabled = false;
   m_enabledCallbacks = nullptr;
@@ -323,32 +335,20 @@ void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
 void DriverStationData::GetJoystickAxes(int32_t joystickNum,
                                         HAL_JoystickAxes* axes) {
   std::lock_guard<std::mutex> lock(m_registerMutex);
-  if (m_joystickAxis.find(joystickNum) != m_joystickAxis.end()) {
-    std::memcpy(axes, &m_joystickAxis[joystickNum],
-                sizeof(m_joystickAxis[joystickNum]));
-  } else {
-    axes->count = 0;
-  }
+  std::memcpy(axes, &m_joystickAxis[joystickNum],
+              sizeof(m_joystickAxis[joystickNum]));
 }
 void DriverStationData::GetJoystickPOVs(int32_t joystickNum,
                                         HAL_JoystickPOVs* povs) {
   std::lock_guard<std::mutex> lock(m_registerMutex);
-  if (m_joystickPov.find(joystickNum) != m_joystickPov.end()) {
-    std::memcpy(povs, &m_joystickPov[joystickNum],
-                sizeof(m_joystickPov[joystickNum]));
-  } else {
-    povs->count = 0;
-  }
+  std::memcpy(povs, &m_joystickPov[joystickNum],
+              sizeof(m_joystickPov[joystickNum]));
 }
 void DriverStationData::GetJoystickButtons(int32_t joystickNum,
                                            HAL_JoystickButtons* buttons) {
   std::lock_guard<std::mutex> lock(m_registerMutex);
-  if (m_joystickButtons.find(joystickNum) != m_joystickButtons.end()) {
-    std::memcpy(buttons, &m_joystickButtons[joystickNum],
-                sizeof(m_joystickButtons[joystickNum]));
-  } else {
-    buttons->count = 0;
-  }
+  std::memcpy(buttons, &m_joystickButtons[joystickNum],
+              sizeof(m_joystickButtons[joystickNum]));
 }
 
 void DriverStationData::SetJoystickAxes(int32_t joystickNum,

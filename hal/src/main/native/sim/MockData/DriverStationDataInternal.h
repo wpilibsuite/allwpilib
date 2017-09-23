@@ -8,8 +8,8 @@
 #pragma once
 
 #include <atomic>
-#include <map>
 #include <memory>
+#include <vector>
 
 #include "MockData/DriverStationData.h"
 #include "MockData/NotifyListenerVector.h"
@@ -17,6 +17,9 @@
 namespace hal {
 class DriverStationData {
  public:
+  DriverStationData();
+  virtual ~DriverStationData();
+
   void ResetData();
 
   int32_t RegisterEnabledCallback(HAL_NotifyCallback callback, void* param,
@@ -107,9 +110,9 @@ class DriverStationData {
   std::atomic<double> m_matchTime{0.0};
   std::shared_ptr<NotifyListenerVector> m_matchTimeCallbacks = nullptr;
 
-  std::map<int, HAL_JoystickAxes> m_joystickAxis;
-  std::map<int, HAL_JoystickPOVs> m_joystickPov;
-  std::map<int, HAL_JoystickButtons> m_joystickButtons;
+  std::vector<HAL_JoystickAxes> m_joystickAxis;
+  std::vector<HAL_JoystickPOVs> m_joystickPov;
+  std::vector<HAL_JoystickButtons> m_joystickButtons;
 };
 extern DriverStationData SimDriverStationData;
 }  // namespace hal
