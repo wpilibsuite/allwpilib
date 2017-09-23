@@ -448,4 +448,17 @@ void HALSIM_SetDriverStationMatchTime(double matchTime) {
 void HALSIM_NotifyDriverStationNewData(void) {
   SimDriverStationData.NotifyNewData();
 }
+
+void HALSIM_RegisterDriverStationAllCallbacks(
+    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify)
+{
+	  SimDriverStationData.RegisterEnabledCallback(callback, param, initialNotify);
+	  SimDriverStationData.RegisterAutonomousCallback(callback, param, initialNotify);
+	  SimDriverStationData.RegisterTestCallback(callback, param, initialNotify);
+	  SimDriverStationData.RegisterEStopCallback(callback, param, initialNotify);
+	  SimDriverStationData.RegisterFmsAttachedCallback(callback, param, initialNotify);
+	  SimDriverStationData.RegisterDsAttachedCallback(callback, param, initialNotify);
+	  SimDriverStationData.RegisterAllianceStationIdCallback(callback, param, initialNotify);
+	  SimDriverStationData.RegisterMatchTimeCallback(callback, param, initialNotify);
+}
 }  // extern "C"

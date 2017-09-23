@@ -54,6 +54,10 @@ HALSIM_AnalogTriggerMode HALSIM_GetAnalogTriggerTriggerMode(int32_t index);
 void HALSIM_SetAnalogTriggerTriggerMode(int32_t index,
                                         HALSIM_AnalogTriggerMode triggerMode);
 
+void HALSIM_RegisterAnalogTriggerAllCallbacks(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify);
+
 #ifdef __cplusplus
 }
 #endif

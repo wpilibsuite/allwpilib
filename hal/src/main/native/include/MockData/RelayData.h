@@ -47,6 +47,11 @@ void HALSIM_CancelRelayReverseCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetRelayReverse(int32_t index);
 void HALSIM_SetRelayReverse(int32_t index, HAL_Bool reverse);
 
+void HALSIM_RegisterRelayAllCallcbaks(int32_t index,
+                                            HAL_NotifyCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify);
+
 #ifdef __cplusplus
 }
 #endif

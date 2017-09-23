@@ -550,4 +550,21 @@ void HALSIM_SetAnalogInAccumulatorDeadband(int32_t index,
                                            int32_t accumulatorDeadband) {
   SimAnalogInData[index].SetAccumulatorDeadband(accumulatorDeadband);
 }
+
+
+void HALSIM_RegisterAnalogInAllCallbacks(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify)
+{
+  SimAnalogInData[index].RegisterInitializedCallback(callback, param, initialNotify);
+  SimAnalogInData[index].RegisterAverageBitsCallback(callback, param, initialNotify);
+  SimAnalogInData[index].RegisterOversampleBitsCallback(callback, param, initialNotify);
+  SimAnalogInData[index].RegisterVoltageCallback(callback, param, initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorInitializedCallback(callback, param, initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorValueCallback(callback, param, initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorCountCallback(callback, param, initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorCenterCallback(callback, param, initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorDeadbandCallback(callback, param, initialNotify);
+}
+
 }
