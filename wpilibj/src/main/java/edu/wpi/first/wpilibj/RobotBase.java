@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.internal.HardwareHLUsageReporting;
 import edu.wpi.first.wpilibj.internal.HardwareTimer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -77,7 +78,7 @@ public abstract class RobotBase {
    * @return If the robot is running in simulation.
    */
   public static boolean isSimulation() {
-    return false;
+    return !isReal();
   }
 
   /**
@@ -86,7 +87,7 @@ public abstract class RobotBase {
    * @return If the robot is running in the real world.
    */
   public static boolean isReal() {
-    return true;
+    return HALUtil.getHALRuntimeType() == 0;
   }
 
   /**
