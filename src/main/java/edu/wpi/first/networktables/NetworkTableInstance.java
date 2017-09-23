@@ -334,7 +334,7 @@ public final class NetworkTableInstance {
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
   */
-  boolean waitForEntryListenerQueue(double timeout) {
+  public boolean waitForEntryListenerQueue(double timeout) {
     if (!NetworkTablesJNI.waitForEntryListenerQueue(m_handle, timeout)) {
       return false;
     }
@@ -464,7 +464,7 @@ public final class NetworkTableInstance {
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
    */
-  boolean waitForConnectionListenerQueue(double timeout) {
+  public boolean waitForConnectionListenerQueue(double timeout) {
     if (!NetworkTablesJNI.waitForConnectionListenerQueue(m_handle, timeout)) {
       return false;
     }
@@ -586,7 +586,7 @@ public final class NetworkTableInstance {
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
    */
-  boolean waitForRpcCallQueue(double timeout) {
+  public boolean waitForRpcCallQueue(double timeout) {
     if (!NetworkTablesJNI.waitForRpcCallQueue(m_handle, timeout)) {
       return false;
     }
@@ -1036,7 +1036,7 @@ public final class NetworkTableInstance {
    *                  or a negative value to block indefinitely
    * @return False if timed out, otherwise true.
    */
-  boolean waitForLoggerQueue(double timeout) {
+  public boolean waitForLoggerQueue(double timeout) {
     if (!NetworkTablesJNI.waitForLoggerQueue(m_handle, timeout)) {
       return false;
     }
