@@ -14,18 +14,6 @@ using namespace hal;
 
 DriverStationData hal::SimDriverStationData;
 
-DriverStationData::DriverStationData()
-    : m_joystickAxis(6), m_joystickPov(6), m_joystickButtons(6) {
-  std::memset(&m_joystickAxis[0], 0,
-              sizeof(m_joystickAxis[0]) * m_joystickAxis.size());
-  std::memset(&m_joystickPov[0], 0,
-              sizeof(m_joystickPov[0]) * m_joystickPov.size());
-  std::memset(&m_joystickButtons[0], 0,
-              sizeof(m_joystickButtons[0]) * m_joystickButtons.size());
-}
-
-DriverStationData::~DriverStationData() {}
-
 void DriverStationData::ResetData() {
   m_enabled = false;
   m_enabledCallbacks = nullptr;
@@ -39,6 +27,19 @@ void DriverStationData::ResetData() {
   m_fmsAttachedCallbacks = nullptr;
   m_dsAttached = false;
   m_dsAttachedCallbacks = nullptr;
+
+  for (int i = 0; i < 6; ++i) {
+    HAL_JoystickAxes axes;
+    HAL_JoystickPOVs povs;
+    HAL_JoystickButtons buttons;
+    std::memset(&axes, 0, sizeof(axes));
+    std::memset(&povs, 0, sizeof(povs));
+    std::memset(&buttons, 0, sizeof(buttons));
+
+    m_joystickAxis[i].exchange(axes);
+    m_joystickPov[i].exchange(povs);
+    m_joystickButtons[i].exchange(buttons);
+  }
 }
 
 int32_t DriverStationData::RegisterEnabledCallback(HAL_NotifyCallback callback,
@@ -334,37 +335,28 @@ void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
 
 void DriverStationData::GetJoystickAxes(int32_t joystickNum,
                                         HAL_JoystickAxes* axes) {
-  std::lock_guard<std::mutex> lock(m_registerMutex);
-  std::memcpy(axes, &m_joystickAxis[joystickNum],
-              sizeof(m_joystickAxis[joystickNum]));
+  *axes = m_joystickAxis[joystickNum];
 }
 void DriverStationData::GetJoystickPOVs(int32_t joystickNum,
                                         HAL_JoystickPOVs* povs) {
-  std::lock_guard<std::mutex> lock(m_registerMutex);
-  std::memcpy(povs, &m_joystickPov[joystickNum],
-              sizeof(m_joystickPov[joystickNum]));
+  *povs = m_joystickPov[joystickNum];
 }
 void DriverStationData::GetJoystickButtons(int32_t joystickNum,
                                            HAL_JoystickButtons* buttons) {
-  std::lock_guard<std::mutex> lock(m_registerMutex);
-  std::memcpy(buttons, &m_joystickButtons[joystickNum],
-              sizeof(m_joystickButtons[joystickNum]));
+  *buttons = m_joystickButtons[joystickNum];
 }
 
 void DriverStationData::SetJoystickAxes(int32_t joystickNum,
                                         const HAL_JoystickAxes& axes) {
-  std::memcpy(&m_joystickAxis[joystickNum], &axes,
-              sizeof(m_joystickAxis[joystickNum]));
+  m_joystickAxis[joystickNum].exchange(axes);
 }
 void DriverStationData::SetJoystickPOVs(int32_t joystickNum,
                                         const HAL_JoystickPOVs& povs) {
-  std::memcpy(&m_joystickPov[joystickNum], &povs,
-              sizeof(m_joystickPov[joystickNum]));
+  m_joystickPov[joystickNum].exchange(povs);
 }
 void DriverStationData::SetJoystickButtons(int32_t joystickNum,
                                            const HAL_JoystickButtons& buttons) {
-  std::memcpy(&m_joystickButtons[joystickNum], &buttons,
-              sizeof(m_joystickButtons[joystickNum]));
+  m_joystickButtons[joystickNum].exchange(buttons);
 }
 
 extern "C" {

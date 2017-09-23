@@ -17,9 +17,6 @@
 namespace hal {
 class DriverStationData {
  public:
-  DriverStationData();
-  virtual ~DriverStationData();
-
   void ResetData();
 
   int32_t RegisterEnabledCallback(HAL_NotifyCallback callback, void* param,
@@ -110,9 +107,9 @@ class DriverStationData {
   std::atomic<double> m_matchTime{0.0};
   std::shared_ptr<NotifyListenerVector> m_matchTimeCallbacks = nullptr;
 
-  std::vector<HAL_JoystickAxes> m_joystickAxis;
-  std::vector<HAL_JoystickPOVs> m_joystickPov;
-  std::vector<HAL_JoystickButtons> m_joystickButtons;
+  std::array<std::atomic<HAL_JoystickAxes>, 6> m_joystickAxis;
+  std::array<std::atomic<HAL_JoystickPOVs>, 6> m_joystickPov;
+  std::array<std::atomic<HAL_JoystickButtons>, 6> m_joystickButtons;
 };
 extern DriverStationData SimDriverStationData;
 }  // namespace hal
