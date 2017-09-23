@@ -8,6 +8,7 @@
 #pragma once
 
 #include <atomic>
+#include <map>
 #include <memory>
 
 #include "MockData/DriverStationData.h"
@@ -75,6 +76,15 @@ class DriverStationData {
   double GetMatchTime();
   void SetMatchTime(double matchTime);
 
+  void GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes);
+  void GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs);
+  void GetJoystickButtons(int32_t joystickNum, HAL_JoystickButtons* buttons);
+
+  void SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes& axes);
+  void SetJoystickPOVs(int32_t joystickNum, const HAL_JoystickPOVs& povs);
+  void SetJoystickButtons(int32_t joystickNum,
+                          const HAL_JoystickButtons& buttons);
+
   void NotifyNewData();
 
  private:
@@ -96,6 +106,10 @@ class DriverStationData {
   std::shared_ptr<NotifyListenerVector> m_allianceStationIdCallbacks = nullptr;
   std::atomic<double> m_matchTime{0.0};
   std::shared_ptr<NotifyListenerVector> m_matchTimeCallbacks = nullptr;
+
+  std::map<int, HAL_JoystickAxes> m_joystickAxis;
+  std::map<int, HAL_JoystickPOVs> m_joystickPov;
+  std::map<int, HAL_JoystickButtons> m_joystickButtons;
 };
 extern DriverStationData SimDriverStationData;
 }  // namespace hal

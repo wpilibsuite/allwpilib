@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "HAL/DriverStation.h"
 #include "HAL/HAL.h"
 #include "NotifyListener.h"
 
@@ -68,6 +69,11 @@ double HALSIM_GetDriverStationMatchTime();
 void HALSIM_SetDriverStationMatchTime(double matchTime);
 
 void HALSIM_NotifyDriverStationNewData(void);
+
+void HALSIM_SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes& axes);
+void HALSIM_SetJoystickPOVs(int32_t joystickNum, const HAL_JoystickPOVs& povs);
+void HALSIM_SetJoystickButtons(int32_t joystickNum,
+                               const HAL_JoystickButtons& buttons);
 
 #ifdef __cplusplus
 }

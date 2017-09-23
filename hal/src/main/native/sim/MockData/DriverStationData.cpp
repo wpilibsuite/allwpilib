@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cstring>
+
 #include "DriverStationDataInternal.h"
 #include "NotifyCallbackHelpers.h"
 
@@ -318,6 +320,53 @@ void DriverStationData::SetMatchTime(double matchTime) {
 
 void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
 
+void DriverStationData::GetJoystickAxes(int32_t joystickNum,
+                                        HAL_JoystickAxes* axes) {
+  std::lock_guard<std::mutex> lock(m_registerMutex);
+  if (m_joystickAxis.find(joystickNum) != m_joystickAxis.end()) {
+    std::memcpy(axes, &m_joystickAxis[joystickNum],
+                sizeof(m_joystickAxis[joystickNum]));
+  } else {
+    axes->count = 0;
+  }
+}
+void DriverStationData::GetJoystickPOVs(int32_t joystickNum,
+                                        HAL_JoystickPOVs* povs) {
+  std::lock_guard<std::mutex> lock(m_registerMutex);
+  if (m_joystickPov.find(joystickNum) != m_joystickPov.end()) {
+    std::memcpy(povs, &m_joystickPov[joystickNum],
+                sizeof(m_joystickPov[joystickNum]));
+  } else {
+    povs->count = 0;
+  }
+}
+void DriverStationData::GetJoystickButtons(int32_t joystickNum,
+                                           HAL_JoystickButtons* buttons) {
+  std::lock_guard<std::mutex> lock(m_registerMutex);
+  if (m_joystickButtons.find(joystickNum) != m_joystickButtons.end()) {
+    std::memcpy(buttons, &m_joystickButtons[joystickNum],
+                sizeof(m_joystickButtons[joystickNum]));
+  } else {
+    buttons->count = 0;
+  }
+}
+
+void DriverStationData::SetJoystickAxes(int32_t joystickNum,
+                                        const HAL_JoystickAxes& axes) {
+  std::memcpy(&m_joystickAxis[joystickNum], &axes,
+              sizeof(m_joystickAxis[joystickNum]));
+}
+void DriverStationData::SetJoystickPOVs(int32_t joystickNum,
+                                        const HAL_JoystickPOVs& povs) {
+  std::memcpy(&m_joystickPov[joystickNum], &povs,
+              sizeof(m_joystickPov[joystickNum]));
+}
+void DriverStationData::SetJoystickButtons(int32_t joystickNum,
+                                           const HAL_JoystickButtons& buttons) {
+  std::memcpy(&m_joystickButtons[joystickNum], &buttons,
+              sizeof(m_joystickButtons[joystickNum]));
+}
+
 extern "C" {
 void HALSIM_ResetDriverStationData(void) { SimDriverStationData.ResetData(); }
 
@@ -448,4 +497,16 @@ void HALSIM_SetDriverStationMatchTime(double matchTime) {
 void HALSIM_NotifyDriverStationNewData(void) {
   SimDriverStationData.NotifyNewData();
 }
+
+void HALSIM_SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes& axes) {
+  SimDriverStationData.SetJoystickAxes(joystickNum, axes);
+}
+void HALSIM_SetJoystickPOVs(int32_t joystickNum, const HAL_JoystickPOVs& povs) {
+  SimDriverStationData.SetJoystickPOVs(joystickNum, povs);
+}
+void HALSIM_SetJoystickButtons(int32_t joystickNum,
+                               const HAL_JoystickButtons& buttons) {
+  SimDriverStationData.SetJoystickButtons(joystickNum, buttons);
+}
+
 }  // extern "C"

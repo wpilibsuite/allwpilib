@@ -18,6 +18,7 @@
 #include "HAL/cpp/priority_condition_variable.h"
 #include "HAL/cpp/priority_mutex.h"
 #include "MockData/DriverStationDataInternal.h"
+#include "MockData/MockHooks.h"
 
 static hal::priority_mutex msgMutex;
 static hal::priority_condition_variable newDSDataAvailableCond;
@@ -102,15 +103,18 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
+  SimDriverStationData.GetJoystickAxes(joystickNum, axes);
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
+  SimDriverStationData.GetJoystickPOVs(joystickNum, povs);
   return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
+  SimDriverStationData.GetJoystickButtons(joystickNum, buttons);
   return 0;
 }
 /**
@@ -152,9 +156,7 @@ double HAL_GetMatchTime(int32_t* status) {
   return SimDriverStationData.GetMatchTime();
 }
 
-void HAL_ObserveUserProgramStarting(void) {
-  // TODO
-}
+void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
 
 void HAL_ObserveUserProgramDisabled(void) {
   // TODO
