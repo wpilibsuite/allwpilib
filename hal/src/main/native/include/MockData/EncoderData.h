@@ -78,9 +78,9 @@ void HALSIM_CancelEncoderSamplesToAverageCallback(int32_t index, int32_t uid);
 int32_t HALSIM_GetEncoderSamplesToAverage(int32_t index);
 void HALSIM_SetEncoderSamplesToAverage(int32_t index, int32_t samplesToAverage);
 
-void HALSIM_RegisterEncoderAllCallbacks(
-    int32_t index, HAL_NotifyCallback callback, void* param,
-    HAL_Bool initialNotify);
+void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
+                                        HAL_NotifyCallback callback,
+                                        void* param, HAL_Bool initialNotify);
 
 #ifdef __cplusplus
 }

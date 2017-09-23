@@ -55,7 +55,6 @@ void HALSIM_CancelAccelerometerZCallback(int32_t index, int32_t uid);
 double HALSIM_GetAccelerometerZ(int32_t index);
 void HALSIM_SetAccelerometerZ(int32_t index, double z);
 
-
 void HALSIM_RegisterAccelerometerAllCallbacks(int32_t index,
                                               HAL_NotifyCallback callback,
                                               void* param,

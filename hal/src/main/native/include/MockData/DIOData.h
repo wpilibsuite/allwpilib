@@ -53,10 +53,8 @@ void HALSIM_CancelDIOFilterIndexCallback(int32_t index, int32_t uid);
 int32_t HALSIM_GetDIOFilterIndex(int32_t index);
 void HALSIM_SetDIOFilterIndex(int32_t index, int32_t filterIndex);
 
-void HALSIM_RegisterDIOAllCallbacks(int32_t index,
-                                              HAL_NotifyCallback callback,
-                                              void* param,
-                                              HAL_Bool initialNotify);
+void HALSIM_RegisterDIOAllCallbacks(int32_t index, HAL_NotifyCallback callback,
+                                    void* param, HAL_Bool initialNotify);
 
 #ifdef __cplusplus
 }

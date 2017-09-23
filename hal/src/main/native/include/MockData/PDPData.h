@@ -47,8 +47,9 @@ double HALSIM_GetPDPCurrent(int32_t index, int32_t channel);
 void HALSIM_SetPDPCurrent(int32_t index, int32_t channel, double current);
 
 void HALSIM_RegisterPDPAllNonCurrentCallbacks(int32_t index, int32_t channel,
-                                          HAL_NotifyCallback callback,
-                                          void* param, HAL_Bool initialNotify);
+                                              HAL_NotifyCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify);
 
 #ifdef __cplusplus
 }

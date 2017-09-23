@@ -69,8 +69,9 @@ void HALSIM_SetDriverStationMatchTime(double matchTime);
 
 void HALSIM_NotifyDriverStationNewData(void);
 
-void HALSIM_RegisterDriverStationAllCallbacks(
-    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify);
+void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify);
 
 #ifdef __cplusplus
 }

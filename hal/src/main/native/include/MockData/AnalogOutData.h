@@ -32,9 +32,8 @@ HAL_Bool HALSIM_GetAnalogOutInitialized(int32_t index);
 void HALSIM_SetAnalogOutInitialized(int32_t index, HAL_Bool initialized);
 
 void HALSIM_RegisterAnalogOutAllCallbacks(int32_t index,
-                                                    HAL_NotifyCallback callback,
-                                                    void* param,
-                                                    HAL_Bool initialNotify);
+                                          HAL_NotifyCallback callback,
+                                          void* param, HAL_Bool initialNotify);
 
 #ifdef __cplusplus
 }

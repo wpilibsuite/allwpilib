@@ -39,9 +39,8 @@ HAL_Bool HALSIM_GetAnalogGyroInitialized(int32_t index);
 void HALSIM_SetAnalogGyroInitialized(int32_t index, HAL_Bool initialized);
 
 void HALSIM_RegisterAnalogGyroAllCallbacks(int32_t index,
-                                               HAL_NotifyCallback callback,
-                                               void* param,
-                                               HAL_Bool initialNotify);
+                                           HAL_NotifyCallback callback,
+                                           void* param, HAL_Bool initialNotify);
 
 #ifdef __cplusplus
 }

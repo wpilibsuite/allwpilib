@@ -310,12 +310,16 @@ void HALSIM_SetSPIAccelerometerZ(int32_t index, double z) {
 void HALSIM_RegisterSPIAccelerometerAllCallbcaks(int32_t index,
                                                  HAL_NotifyCallback callback,
                                                  void* param,
-                                                 HAL_Bool initialNotify)
-{
-	SimSPIAccelerometerData[index].RegisterActiveCallback(callback, param, initialNotify);
-	SimSPIAccelerometerData[index].RegisterRangeCallback(callback, param, initialNotify);
-	SimSPIAccelerometerData[index].RegisterXCallback(callback, param, initialNotify);
-	SimSPIAccelerometerData[index].RegisterYCallback(callback, param, initialNotify);
-	SimSPIAccelerometerData[index].RegisterZCallback(callback, param, initialNotify);
+                                                 HAL_Bool initialNotify) {
+  SimSPIAccelerometerData[index].RegisterActiveCallback(callback, param,
+                                                        initialNotify);
+  SimSPIAccelerometerData[index].RegisterRangeCallback(callback, param,
+                                                       initialNotify);
+  SimSPIAccelerometerData[index].RegisterXCallback(callback, param,
+                                                   initialNotify);
+  SimSPIAccelerometerData[index].RegisterYCallback(callback, param,
+                                                   initialNotify);
+  SimSPIAccelerometerData[index].RegisterZCallback(callback, param,
+                                                   initialNotify);
 }
 }

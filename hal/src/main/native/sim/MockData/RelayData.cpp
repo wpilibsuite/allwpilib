@@ -253,13 +253,13 @@ void HALSIM_SetRelayReverse(int32_t index, HAL_Bool reverse) {
 }
 
 void HALSIM_RegisterRelayAllCallcbaks(int32_t index,
-                                            HAL_NotifyCallback callback,
-                                            void* param,
-                                            HAL_Bool initialNotify)
-{
-	SimRelayData[index].RegisterInitializedForwardCallback(callback, param, initialNotify);
-	SimRelayData[index].RegisterInitializedReverseCallback(callback, param, initialNotify);
-	SimRelayData[index].RegisterForwardCallback(callback, param, initialNotify);
-	SimRelayData[index].RegisterReverseCallback(callback, param, initialNotify);
+                                      HAL_NotifyCallback callback, void* param,
+                                      HAL_Bool initialNotify) {
+  SimRelayData[index].RegisterInitializedForwardCallback(callback, param,
+                                                         initialNotify);
+  SimRelayData[index].RegisterInitializedReverseCallback(callback, param,
+                                                         initialNotify);
+  SimRelayData[index].RegisterForwardCallback(callback, param, initialNotify);
+  SimRelayData[index].RegisterReverseCallback(callback, param, initialNotify);
 }
 }

@@ -194,12 +194,13 @@ void HALSIM_SetDigitalPWMPin(int32_t index, int32_t pin) {
 }
 
 void HALSIM_RegisterDigitalPWMAllCallbacks(int32_t index,
-                                             HAL_NotifyCallback callback,
-                                             void* param,
-                                             HAL_Bool initialNotify)
-{
-  SimDigitalPWMData[index].RegisterInitializedCallback(callback, param, initialNotify);
-  SimDigitalPWMData[index].RegisterDutyCycleCallback(callback, param, initialNotify);
+                                           HAL_NotifyCallback callback,
+                                           void* param,
+                                           HAL_Bool initialNotify) {
+  SimDigitalPWMData[index].RegisterInitializedCallback(callback, param,
+                                                       initialNotify);
+  SimDigitalPWMData[index].RegisterDutyCycleCallback(callback, param,
+                                                     initialNotify);
   SimDigitalPWMData[index].RegisterPinCallback(callback, param, initialNotify);
 }
 }

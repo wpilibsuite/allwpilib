@@ -362,16 +362,13 @@ void HALSIM_SetPWMZeroLatch(int32_t index, HAL_Bool zeroLatch) {
   SimPWMData[index].SetZeroLatch(zeroLatch);
 }
 
-void HALSIM_RegisterPWMAllCallbacks(int32_t index,
-                                            HAL_NotifyCallback callback,
-                                            void* param,
-                                            HAL_Bool initialNotify)
-{
-	SimPWMData[index].RegisterInitializedCallback(callback, param, initialNotify);
-	SimPWMData[index].RegisterRawValueCallback(callback, param, initialNotify);
-	SimPWMData[index].RegisterSpeedCallback(callback, param, initialNotify);
-	SimPWMData[index].RegisterPositionCallback(callback, param, initialNotify);
-	SimPWMData[index].RegisterPeriodScaleCallback(callback, param, initialNotify);
-	SimPWMData[index].RegisterZeroLatchCallback(callback, param, initialNotify);
+void HALSIM_RegisterPWMAllCallbacks(int32_t index, HAL_NotifyCallback callback,
+                                    void* param, HAL_Bool initialNotify) {
+  SimPWMData[index].RegisterInitializedCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterRawValueCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterSpeedCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterPositionCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterPeriodScaleCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterZeroLatchCallback(callback, param, initialNotify);
 }
 }

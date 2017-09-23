@@ -94,7 +94,7 @@ typedef Log FILELog;
   if (level > FILELog::ReportingLevel()) \
     ;                                    \
   else                                   \
-  Log().Get(level)
+    Log().Get(level)
 
 inline std::string NowTime() {
   llvm::SmallString<128> buf;

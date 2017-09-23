@@ -194,13 +194,13 @@ void HALSIM_SetAnalogGyroInitialized(int32_t index, HAL_Bool initialized) {
 }
 
 void HALSIM_RegisterAnalogGyroAllCallbacks(int32_t index,
-                                               HAL_NotifyCallback callback,
-                                               void* param,
-                                               HAL_Bool initialNotify)
-{
-  SimAnalogGyroData[index].RegisterAngleCallback(callback, param, initialNotify);
+                                           HAL_NotifyCallback callback,
+                                           void* param,
+                                           HAL_Bool initialNotify) {
+  SimAnalogGyroData[index].RegisterAngleCallback(callback, param,
+                                                 initialNotify);
   SimAnalogGyroData[index].RegisterRateCallback(callback, param, initialNotify);
-  SimAnalogGyroData[index].RegisterInitializedCallback(callback, param, initialNotify);
+  SimAnalogGyroData[index].RegisterInitializedCallback(callback, param,
+                                                       initialNotify);
 }
-
 }

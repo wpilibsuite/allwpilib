@@ -486,17 +486,21 @@ void HALSIM_SetEncoderSamplesToAverage(int32_t index,
   SimEncoderData[index].SetSamplesToAverage(samplesToAverage);
 }
 
-void HALSIM_RegisterEncoderAllCallbacks(
-    int32_t index, HAL_NotifyCallback callback, void* param,
-    HAL_Bool initialNotify)
-{
-	  SimEncoderData[index].RegisterInitializedCallback(callback, param, initialNotify);
-	  SimEncoderData[index].RegisterCountCallback(callback, param, initialNotify);
-	  SimEncoderData[index].RegisterPeriodCallback(callback, param, initialNotify);
-	  SimEncoderData[index].RegisterResetCallback(callback, param, initialNotify);
-	  SimEncoderData[index].RegisterMaxPeriodCallback(callback, param, initialNotify);
-	  SimEncoderData[index].RegisterDirectionCallback(callback, param, initialNotify);
-	  SimEncoderData[index].RegisterReverseDirectionCallback(callback, param, initialNotify);
-	  SimEncoderData[index].RegisterSamplesToAverageCallback(callback, param, initialNotify);
+void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
+                                        HAL_NotifyCallback callback,
+                                        void* param, HAL_Bool initialNotify) {
+  SimEncoderData[index].RegisterInitializedCallback(callback, param,
+                                                    initialNotify);
+  SimEncoderData[index].RegisterCountCallback(callback, param, initialNotify);
+  SimEncoderData[index].RegisterPeriodCallback(callback, param, initialNotify);
+  SimEncoderData[index].RegisterResetCallback(callback, param, initialNotify);
+  SimEncoderData[index].RegisterMaxPeriodCallback(callback, param,
+                                                  initialNotify);
+  SimEncoderData[index].RegisterDirectionCallback(callback, param,
+                                                  initialNotify);
+  SimEncoderData[index].RegisterReverseDirectionCallback(callback, param,
+                                                         initialNotify);
+  SimEncoderData[index].RegisterSamplesToAverageCallback(callback, param,
+                                                         initialNotify);
 }
 }
