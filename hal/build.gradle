@@ -108,6 +108,11 @@ model {
                         }
                     }
                 }
+                binaries.all { binary ->
+  		    if (binary.targetPlatform.operatingSystem.linux) {
+                        linker.args "-ldl"
+                    }
+                }
             }
             if (project.hasProperty('buildHalStaticDeps')) {
                 halSimStaticDeps(NativeLibrarySpec) {

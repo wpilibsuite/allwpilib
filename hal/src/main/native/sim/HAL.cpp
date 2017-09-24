@@ -7,6 +7,14 @@
 
 #include "HAL/HAL.h"
 
+#include <cstring>
+
+#if defined(WIN32) || defined(_WIN32)
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
@@ -193,7 +201,68 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return false;  // Figure out if we need to detect a brownout condition
 }
 
+/* A return < 0 indicates an error that should stop the HAL.
+   0 is success, and > 0 is a non fatal error */
+typedef int halsim_init_func_t(void);
+
+int HAL_LoadExtraSimulation(const char* library) {
+  int rc = 1;  // It is expected and reasonable not to find an extra simulation
+#if defined(WIN32) || defined(_WIN32)
+  HMODULE handle = LoadLibrary(library);
+  if (!handle) {
+    std::string library_name = std::string(library) + ".dll";
+    handle = LoadLibrary(library_name.c_str());
+  }
+#else
+  void* handle = dlopen(library, RTLD_LAZY);
+  if (!handle) {
+    std::string library_name = "lib" + std::string(library) + ".so";
+    handle = dlopen(library_name.c_str(), RTLD_LAZY);
+  }
+#endif
+  if (!handle) return rc;
+
+  halsim_init_func_t* init;
+#if defined(WIN32) || defined(_WIN32)
+  init = reinterpret_cast<halsim_init_func_t*>(GetProcAddress(handle, "init"));
+#else
+  init = reinterpret_cast<halsim_init_func_t*>(dlsym(handle, "init"));
+#endif
+
+  if (init) {
+    rc = (*init)();
+  }
+  if (rc != 0) {
+#if defined(WIN32) || defined(_WIN32)
+    FreeLibrary(handle);
+#else
+    dlclose(handle);
+#endif
+  }
+  return rc;
+}
+
+/* Load any extra halsim libraries provided in the HALSIM_EXTRA_LIBRARIES
+   environment variable. */
+int HAL_LoadExtraSimulations(void) {
+#if defined(WIN32) || defined(_WIN32)
+  const char delim = ';';
+#else
+  const char delim = ':';
+#endif
+  int rc = 1;
+  for (char* p = std::getenv("HALSIM_EXTRA_LIBRARIES"); p;) {
+    char* q = std::strchr(p, delim);
+    std::string lib(p, q ? q - p : std::strlen(p));
+    rc = HAL_LoadExtraSimulation(lib.c_str());
+    if (rc < 0) break;
+    p = q ? q + 1 : q;
+  }
+  return rc;
+}
+
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  if (HAL_LoadExtraSimulations() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
   return true;  // Add initialization if we need to at a later point
