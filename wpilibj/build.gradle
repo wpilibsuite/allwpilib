@@ -242,6 +242,9 @@ model {
                     binary.lib project: ':hal', library: 'halAthena', linkage: 'static'
                 } else {
                     binary.lib project: ':hal', library: 'halSim', linkage: 'static'
+  		    if (binary.targetPlatform.operatingSystem.windows) {
+                        binary.linker.args "ws2_32.lib"
+                    }
                 }
             }
             sources {

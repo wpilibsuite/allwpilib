@@ -12,7 +12,8 @@ ext.addHalCompilerArguments = { binary->
         }
     }
     tasks.withType(CppCompile) {
-        binary.cppCompiler.args "-DNAMESPACED_PRIORITY"
+        binary.cppCompiler.args "-DNAMESPACED_PRIORITY",
+               "-I" + project(':ni-libraries').file('include').absolutePath
     }
 }
 
@@ -111,6 +112,9 @@ model {
                 binaries.all { binary ->
   		    if (binary.targetPlatform.operatingSystem.linux) {
                         linker.args "-ldl"
+                    }
+  		    if (binary.targetPlatform.operatingSystem.windows) {
+                        linker.args "ws2_32.lib"
                     }
                 }
             }
