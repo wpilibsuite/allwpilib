@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include <HAL/cpp/priority_mutex.h>
+#include <mutex>
+
 #include <llvm/StringRef.h>
 
 #include "Base.h"
@@ -114,7 +115,7 @@ class ErrorBase {
  protected:
   mutable Error m_error;
   // TODO: Replace globalError with a global list of all errors.
-  static hal::priority_mutex _globalErrorMutex;
+  static std::mutex _globalErrorMutex;
   static Error _globalError;
 };
 

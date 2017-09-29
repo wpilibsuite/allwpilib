@@ -8,7 +8,6 @@
 #include "AnalogInternal.h"
 
 #include "HAL/AnalogInput.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "PortsInternal.h"
 
 namespace hal {

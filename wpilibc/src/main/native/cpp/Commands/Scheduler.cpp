@@ -40,7 +40,7 @@ void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
  * @param command The command to be scheduled
  */
 void Scheduler::AddCommand(Command* command) {
-  std::lock_guard<hal::priority_mutex> sync(m_additionsLock);
+  std::lock_guard<std::mutex> sync(m_additionsLock);
   if (std::find(m_additions.begin(), m_additions.end(), command) !=
       m_additions.end())
     return;
@@ -48,7 +48,7 @@ void Scheduler::AddCommand(Command* command) {
 }
 
 void Scheduler::AddButton(ButtonScheduler* button) {
-  std::lock_guard<hal::priority_mutex> sync(m_buttonsLock);
+  std::lock_guard<std::mutex> sync(m_buttonsLock);
   m_buttons.push_back(button);
 }
 
@@ -114,7 +114,7 @@ void Scheduler::Run() {
   {
     if (!m_enabled) return;
 
-    std::lock_guard<hal::priority_mutex> sync(m_buttonsLock);
+    std::lock_guard<std::mutex> sync(m_buttonsLock);
     for (auto rButtonIter = m_buttons.rbegin(); rButtonIter != m_buttons.rend();
          rButtonIter++) {
       (*rButtonIter)->Execute();
@@ -144,7 +144,7 @@ void Scheduler::Run() {
 
   // Add the new things
   {
-    std::lock_guard<hal::priority_mutex> sync(m_additionsLock);
+    std::lock_guard<std::mutex> sync(m_additionsLock);
     for (auto additionsIter = m_additions.begin();
          additionsIter != m_additions.end(); additionsIter++) {
       ProcessCommandAddition(*additionsIter);

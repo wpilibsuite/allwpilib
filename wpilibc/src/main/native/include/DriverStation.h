@@ -9,11 +9,11 @@
 
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 
 #include <HAL/DriverStation.h>
-#include <HAL/cpp/priority_mutex.h>
 #include <llvm/StringRef.h>
 
 #include "RobotState.h"
@@ -116,7 +116,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   std::thread m_dsThread;
   std::atomic<bool> m_isRunning{false};
 
-  mutable hal::priority_mutex m_joystickDataMutex;
+  mutable std::mutex m_joystickDataMutex;
 
   // Robot state status variables
   bool m_userInDisabled = false;
@@ -127,7 +127,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   // Control word variables
   mutable HAL_ControlWord m_controlWordCache;
   mutable std::chrono::steady_clock::time_point m_lastControlWordUpdate;
-  mutable hal::priority_mutex m_controlWordMutex;
+  mutable std::mutex m_controlWordMutex;
 
   double m_nextMessageTime = 0;
 };
