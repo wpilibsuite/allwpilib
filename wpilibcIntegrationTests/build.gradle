@@ -14,7 +14,7 @@ if (!project.hasProperty('skipAthena')) {
                 artifactId = 'wpiutil-cpp'
                 headerClassifier = 'headers'
                 ext = 'zip'
-                version = '+'
+                version = '3.+'
                 sharedConfigs = [ wpilibcIntegrationTests: [] ]
             }
             ntcore(DependencyConfig) {
@@ -22,7 +22,7 @@ if (!project.hasProperty('skipAthena')) {
                 artifactId = 'ntcore-cpp'
                 headerClassifier = 'headers'
                 ext = 'zip'
-                version = '+'
+                version = '4.+'
                 sharedConfigs = [ wpilibcIntegrationTests: [] ]
             }
             opencv(DependencyConfig) {
@@ -38,7 +38,7 @@ if (!project.hasProperty('skipAthena')) {
                 artifactId = 'cscore-cpp'
                 headerClassifier = 'headers'
                 ext = 'zip'
-                version = '+'
+                version = '1.+'
                 sharedConfigs = [ wpilibcIntegrationTests: [] ]
             }
         }

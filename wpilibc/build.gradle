@@ -65,7 +65,7 @@ model {
             artifactId = 'wpiutil-cpp'
             headerClassifier = 'headers'
             ext = 'zip'
-            version = '+'
+            version = '3.+'
             sharedConfigs = [ wpilibc: [],
                               wpilibcTestingBaseTest: [],
                               wpilibcDev: [] ]
@@ -75,7 +75,7 @@ model {
             artifactId = 'ntcore-cpp'
             headerClassifier = 'headers'
             ext = 'zip'
-            version = '+'
+            version = '4.+'
             sharedConfigs = [ wpilibc: [],
                               wpilibcTestingBaseTest: [],
                               wpilibcDev: [] ]
@@ -95,7 +95,7 @@ model {
             artifactId = 'cscore-cpp'
             headerClassifier = 'headers'
             ext = 'zip'
-            version = '+'
+            version = '1.+'
             sharedConfigs = [ wpilibc: [],
                     wpilibcTestingBaseTest: [],
                     wpilibcDev: [] ]

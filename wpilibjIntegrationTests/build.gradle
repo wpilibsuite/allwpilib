@@ -13,10 +13,10 @@ mainClassName = 'edu.wpi.first.wpilibj.test.AntJunitLanucher'
 dependencies {
     compile project(':wpilibj')
     compile files(project(':wpilibj').sourceSets.test.output)
-    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
-    compile 'edu.wpi.first.ntcore:ntcore-java:+'
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
+    compile 'edu.wpi.first.ntcore:ntcore-java:4.+'
     compile 'org.opencv:opencv-java:3.2.0'
-    compile 'edu.wpi.first.cscore:cscore-java:+'
+    compile 'edu.wpi.first.cscore:cscore-java:1.+'
     compile 'junit:junit:4.11'
     compile 'com.googlecode.junit-toolbox:junit-toolbox:2.0'
     compile 'org.apache.ant:ant:1.9.4'
