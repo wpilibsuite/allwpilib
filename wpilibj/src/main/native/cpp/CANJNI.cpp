@@ -8,10 +8,8 @@
 #include <assert.h>
 #include <jni.h>
 
-#ifdef CONFIG_ATHENA
-#include "FRC_NetworkCommunication/CANSessionMux.h"
-#endif
 #include "HAL/cpp/Log.h"
+#include "HAL/CAN.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
 #include "llvm/SmallString.h"
@@ -41,7 +39,7 @@ extern "C" {
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
     JNIEnv *env, jclass, jint messageID, jbyteArray data, jint periodMs) {
-#ifdef CONFIG_ATHENA
+
   CANJNI_LOG(logDEBUG)
       << "Calling CANJNI FRCNetCommCANSessionMuxSendMessage";
 
@@ -70,14 +68,11 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
   CANJNI_LOG(logDEBUG) << "Period: " << periodMs;
 
   int32_t status = 0;
-  FRC_NetworkCommunication_CANSessionMux_sendMessage(
+  HAL_CAN_SendMessage(
       messageID, dataBuffer, dataSize, periodMs, &status);
 
   CANJNI_LOG(logDEBUG) << "Status: " << status;
   CheckCANStatus(env, status, messageID);
-#else
-  // Noop on other platforms
-#endif
 }
 
 /*
@@ -89,7 +84,7 @@ JNIEXPORT jbyteArray JNICALL
 Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
     JNIEnv *env, jclass, jobject messageID, jint messageIDMask,
     jobject timeStamp) {
-#ifdef CONFIG_ATHENA
+
   CANJNI_LOG(logDEBUG)
       << "Calling CANJNI FRCNetCommCANSessionMuxReceiveMessage";
 
@@ -100,7 +95,7 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   uint8_t buffer[8];
 
   int32_t status = 0;
-  FRC_NetworkCommunication_CANSessionMux_receiveMessage(
+  HAL_CAN_ReceiveMessage(
       messageIDPtr, messageIDMask, buffer, &dataSize, timeStampPtr, &status);
 
   CANJNI_LOG(logDEBUG) << "Message ID ";
@@ -128,10 +123,6 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   if (!CheckCANStatus(env, status, *messageIDPtr)) return nullptr;
   return MakeJByteArray(env, llvm::StringRef{reinterpret_cast<const char*>(buffer), 
                         static_cast<size_t>(dataSize)});
-#else
-  // Noop on other platforms. Return nullptr
-  return nullptr;
-#endif
 }
 
 }  // extern "C"
