@@ -157,6 +157,17 @@ inline const char* NetworkTableInstance::LoadPersistent(
   return ::nt::LoadPersistent(m_handle, filename, warn);
 }
 
+inline const char* NetworkTableInstance::SaveEntries(
+    StringRef filename, StringRef prefix) const {
+  return ::nt::SaveEntries(m_handle, filename, prefix);
+}
+
+inline const char* NetworkTableInstance::LoadEntries(
+    StringRef filename, StringRef prefix,
+    std::function<void(size_t line, const char* msg)> warn) {
+  return ::nt::LoadEntries(m_handle, filename, prefix, warn);
+}
+
 inline NT_Logger NetworkTableInstance::AddLogger(
     std::function<void(const LogMessage& msg)> func, unsigned int min_level,
     unsigned int max_level) {

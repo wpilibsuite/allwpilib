@@ -169,6 +169,9 @@ public final class NetworkTablesJNI {
   public static native void savePersistent(int inst, String filename) throws PersistentException;
   public static native String[] loadPersistent(int inst, String filename) throws PersistentException;  // returns warnings
 
+  public static native void saveEntries(int inst, String filename, String prefix) throws PersistentException;
+  public static native String[] loadEntries(int inst, String filename, String prefix) throws PersistentException;  // returns warnings
+
   public static native long now();
 
   public static native int createLoggerPoller(int inst);

@@ -935,6 +935,29 @@ public final class NetworkTableInstance {
     return NetworkTablesJNI.loadPersistent(m_handle, filename);
   }
 
+  /**
+   * Save table values to a file.  The file format used is identical to
+   * that used for SavePersistent.
+   * @param filename  filename
+   * @param prefix    save only keys starting with this prefix
+   * @throws PersistentException if error saving file
+   */
+  public void saveEntries(String filename, String prefix) throws PersistentException {
+    NetworkTablesJNI.saveEntries(m_handle, filename, prefix);
+  }
+
+  /**
+   * Load table values from a file.  The file format used is identical to
+   * that used for SavePersistent / LoadPersistent.
+   * @param filename  filename
+   * @param prefix    load only keys starting with this prefix
+   * @return List of warnings (errors result in an exception instead)
+   * @throws PersistentException if error saving file
+   */
+  public String[] loadEntries(String filename, String prefix) throws PersistentException {
+    return NetworkTablesJNI.loadEntries(m_handle, filename, prefix);
+  }
+
   private final ReentrantLock m_loggerLock = new ReentrantLock();
   private final Map<Integer, Consumer<LogMessage>> m_loggers = new HashMap<>();
   private Thread m_loggerThread;

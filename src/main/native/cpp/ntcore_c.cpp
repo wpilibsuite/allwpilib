@@ -633,7 +633,7 @@ struct NT_ConnectionInfo* NT_GetConnections(NT_Inst inst, size_t* count) {
 }
 
 /*
- * Persistent Functions
+ * File Save/Load Functions
  */
 
 const char* NT_SavePersistent(NT_Inst inst, const char* filename) {
@@ -643,6 +643,17 @@ const char* NT_SavePersistent(NT_Inst inst, const char* filename) {
 const char* NT_LoadPersistent(NT_Inst inst, const char* filename,
                               void (*warn)(size_t line, const char* msg)) {
   return nt::LoadPersistent(inst, filename, warn);
+}
+
+const char* NT_SaveEntries(NT_Inst inst, const char* filename,
+                           const char* prefix, size_t prefix_len) {
+  return nt::SaveEntries(inst, filename, StringRef(prefix, prefix_len));
+}
+
+const char* NT_LoadEntries(NT_Inst inst, const char* filename,
+                           const char* prefix, size_t prefix_len,
+                           void (*warn)(size_t line, const char* msg)) {
+  return nt::LoadEntries(inst, filename, StringRef(prefix, prefix_len), warn);
 }
 
 /*

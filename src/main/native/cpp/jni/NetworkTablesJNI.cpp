@@ -1606,6 +1606,59 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI
 
 /*
  * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    saveEntries
+ * Signature: (ILjava/lang/String;Ljava/lang/String;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_saveEntries
+  (JNIEnv *env, jclass, jint inst, jstring filename, jstring prefix)
+{
+  if (!filename) {
+    nullPointerEx.Throw(env, "filename cannot be null");
+    return;
+  }
+  if (!prefix) {
+    nullPointerEx.Throw(env, "prefix cannot be null");
+    return;
+  }
+  const char* err =
+      nt::SaveEntries(inst, JStringRef{env, filename}, JStringRef{env, prefix});
+  if (err) persistentEx.Throw(env, err);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
+ * Method:    loadEntries
+ * Signature: (ILjava/lang/String;Ljava/lang/String;)[Ljava/lang/String;
+ */
+JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_loadEntries
+  (JNIEnv *env, jclass, jint inst, jstring filename, jstring prefix)
+{
+  if (!filename) {
+    nullPointerEx.Throw(env, "filename cannot be null");
+    return nullptr;
+  }
+  if (!prefix) {
+    nullPointerEx.Throw(env, "prefix cannot be null");
+    return nullptr;
+  }
+  std::vector<std::string> warns;
+  const char* err =
+      nt::LoadEntries(inst, JStringRef{env, filename}, JStringRef{env, prefix},
+                      [&](size_t line, const char* msg) {
+                        llvm::SmallString<128> warn;
+                        llvm::raw_svector_ostream oss(warn);
+                        oss << line << ": " << msg;
+                        warns.emplace_back(oss.str());
+                      });
+  if (err) {
+    persistentEx.Throw(env, err);
+    return nullptr;
+  }
+  return MakeJStringArray(env, warns);
+}
+
+/*
+ * Class:     edu_wpi_first_networktables_NetworkTablesJNI
  * Method:    now
  * Signature: ()J
  */

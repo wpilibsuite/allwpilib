@@ -224,3 +224,45 @@ done:
   if (err && periodic) m_persistent_dirty = true;
   return err;
 }
+
+void Storage::SaveEntries(llvm::raw_ostream& os, StringRef prefix) const {
+  std::vector<SavePersistentImpl::Entry> entries;
+  if (!GetEntries(prefix, &entries)) return;
+  SavePersistentImpl(os).Save(entries);
+}
+
+const char* Storage::SaveEntries(StringRef filename, StringRef prefix) const {
+  llvm::SmallString<128> fn = filename;
+  llvm::SmallString<128> tmp = filename;
+  tmp += ".tmp";
+  llvm::SmallString<128> bak = filename;
+  bak += ".bak";
+
+  // Get entries before creating file
+  std::vector<SavePersistentImpl::Entry> entries;
+  if (!GetEntries(prefix, &entries)) return nullptr;
+
+  // start by writing to temporary file
+  std::error_code ec;
+  llvm::raw_fd_ostream os(tmp, ec, llvm::sys::fs::F_Text);
+  if (ec.value() != 0) {
+    return "could not open file";
+  }
+  DEBUG("saving file '" << filename << "'");
+  SavePersistentImpl(os).Save(entries);
+  os.close();
+  if (os.has_error()) {
+    std::remove(tmp.c_str());
+    return "error saving file";
+  }
+
+  // Safely move to real file.  We ignore any failures related to the backup.
+  std::remove(bak.c_str());
+  std::rename(fn.c_str(), bak.c_str());
+  if (std::rename(tmp.c_str(), fn.c_str()) != 0) {
+    std::rename(bak.c_str(), fn.c_str());  // attempt to restore backup
+    return "could not rename temp file to real file";
+  }
+
+  return nullptr;
+}

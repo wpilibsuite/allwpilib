@@ -624,14 +624,14 @@ TEST_P(StorageTestEmpty, LoadPersistentBadHeader) {
   EXPECT_CALL(
       warn,
       Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
-  EXPECT_FALSE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_FALSE(storage.LoadEntries(iss, "", true, warn_func));
 
   wpi::raw_mem_istream iss2("[NetworkTables");
   EXPECT_CALL(
       warn,
       Warn(1, llvm::StringRef("header line mismatch, ignoring rest of file")));
 
-  EXPECT_FALSE(storage.LoadPersistent(iss2, warn_func));
+  EXPECT_FALSE(storage.LoadEntries(iss2, "", true, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
 }
@@ -644,7 +644,7 @@ TEST_P(StorageTestEmpty, LoadPersistentCommentHeader) {
 
   wpi::raw_mem_istream iss(
       "\n; comment\n# comment\n[NetworkTables Storage 3.0]\n");
-  EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
 }
@@ -656,7 +656,7 @@ TEST_P(StorageTestEmpty, LoadPersistentEmptyName) {
   };
 
   wpi::raw_mem_istream iss("[NetworkTables Storage 3.0]\nboolean \"\"=true\n");
-  EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());
 }
@@ -680,7 +680,7 @@ TEST_P(StorageTestEmpty, LoadPersistentAssign) {
 
   wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\nboolean \"foo\"=true\n");
-  EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
   auto entry = GetEntry("foo");
   EXPECT_EQ(*value, *entry->value);
   EXPECT_EQ(NT_PERSISTENT, entry->flags);
@@ -705,7 +705,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateFlags) {
 
   wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=0.0\n");
-  EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
   auto entry = GetEntry("foo2");
   EXPECT_EQ(*Value::MakeDouble(0.0), *entry->value);
   EXPECT_EQ(NT_PERSISTENT, entry->flags);
@@ -734,7 +734,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValue) {
 
   wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=1.0\n");
-  EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
   auto entry = GetEntry("foo2");
   EXPECT_EQ(*value, *entry->value);
   EXPECT_EQ(NT_PERSISTENT, entry->flags);
@@ -770,7 +770,7 @@ TEST_P(StorageTestPopulated, LoadPersistentUpdateValueFlags) {
 
   wpi::raw_mem_istream iss(
       "[NetworkTables Storage 3.0]\ndouble \"foo2\"=1.0\n");
-  EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
   auto entry = GetEntry("foo2");
   EXPECT_EQ(*value, *entry->value);
   EXPECT_EQ(NT_PERSISTENT, entry->flags);
@@ -817,7 +817,7 @@ TEST_P(StorageTestEmpty, LoadPersistent) {
       .Times(22);
 
   wpi::raw_mem_istream iss(in);
-  EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
   ASSERT_EQ(22u, entries().size());
 
   EXPECT_EQ(*Value::MakeBoolean(true), *storage.GetEntryValue("boolean/true"));
@@ -870,7 +870,7 @@ TEST_P(StorageTestEmpty, LoadPersistentWarn) {
   EXPECT_CALL(
       warn, Warn(2, llvm::StringRef(
                         "unrecognized boolean value, not 'true' or 'false'")));
-  EXPECT_TRUE(storage.LoadPersistent(iss, warn_func));
+  EXPECT_TRUE(storage.LoadEntries(iss, "", true, warn_func));
 
   EXPECT_TRUE(entries().empty());
   EXPECT_TRUE(idmap().empty());

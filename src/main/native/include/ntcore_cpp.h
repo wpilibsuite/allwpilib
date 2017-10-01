@@ -1272,7 +1272,7 @@ bool IsConnected(NT_Inst inst);
 /** @} */
 
 /**
- * @defgroup PersistentFunctions Persistent Functions
+ * @defgroup FileFunctions File Save/Load Functions
  * @{
  */
 
@@ -1312,6 +1312,28 @@ const char* LoadPersistent(
 const char* LoadPersistent(
     NT_Inst inst, StringRef filename,
     std::function<void(size_t line, const char* msg)> warn);
+
+/**
+ * Save table values to a file.  The file format used is identical to
+ * that used for SavePersistent.
+ * @param inst      instance handle
+ * @param filename  filename
+ * @param prefix    save only keys starting with this prefix
+ * @return error string, or nullptr if successful
+ */
+const char* SaveEntries(NT_Inst inst, StringRef filename, StringRef prefix);
+
+/**
+ * Load table values from a file.  The file format used is identical to
+ * that used for SavePersistent / LoadPersistent.
+ * @param inst      instance handle
+ * @param filename  filename
+ * @param prefix    load only keys starting with this prefix
+ * @param warn      callback function for warnings
+ * @return error string, or nullptr if successful
+ */
+const char* LoadEntries(NT_Inst inst, StringRef filename, StringRef prefix,
+                        std::function<void(size_t line, const char* msg)> warn);
 
 /** @} */
 

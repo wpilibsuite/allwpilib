@@ -30,7 +30,7 @@ class LoadPersistentImpl {
   LoadPersistentImpl(wpi::raw_istream& is, WarnFunc warn)
       : m_is(is), m_warn(warn) {}
 
-  bool Load(std::vector<Entry>* entries);
+  bool Load(StringRef prefix, std::vector<Entry>* entries);
 
  private:
   bool ReadLine();
@@ -141,7 +141,7 @@ static llvm::StringRef UnescapeString(llvm::StringRef source,
   return llvm::StringRef{buf.data(), buf.size()};
 }
 
-bool LoadPersistentImpl::Load(std::vector<Entry>* entries) {
+bool LoadPersistentImpl::Load(StringRef prefix, std::vector<Entry>* entries) {
   if (!ReadHeader()) return false;  // header
 
   while (ReadLine()) {
@@ -155,7 +155,7 @@ bool LoadPersistentImpl::Load(std::vector<Entry>* entries) {
     // name
     llvm::SmallString<128> buf;
     llvm::StringRef name = ReadName(buf);
-    if (name.empty()) continue;
+    if (name.empty() || !name.startswith(prefix)) continue;
 
     // =
     m_line = m_line.ltrim(" \t");
@@ -361,14 +361,14 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
   return Value::MakeStringArray(std::move(m_buf_string_array));
 }
 
-bool Storage::LoadPersistent(
-    wpi::raw_istream& is,
+bool Storage::LoadEntries(
+    wpi::raw_istream& is, StringRef prefix, bool persistent,
     std::function<void(std::size_t line, const char* msg)> warn) {
   // entries to add
   std::vector<LoadPersistentImpl::Entry> entries;
 
   // load file
-  if (!LoadPersistentImpl(is, warn).Load(&entries)) return false;
+  if (!LoadPersistentImpl(is, warn).Load(prefix, &entries)) return false;
 
   // copy values into storage as quickly as possible so lock isn't held
   std::vector<std::shared_ptr<Message>> msgs;
@@ -378,7 +378,7 @@ bool Storage::LoadPersistent(
     auto old_value = entry->value;
     entry->value = i.second;
     bool was_persist = entry->IsPersistent();
-    if (!was_persist) entry->flags |= NT_PERSISTENT;
+    if (!was_persist && persistent) entry->flags |= NT_PERSISTENT;
 
     // if we're the server, assign an id if it doesn't have one
     if (m_server && entry->id == 0xffff) {
@@ -397,7 +397,7 @@ bool Storage::LoadPersistent(
         if (!was_persist) notify_flags |= NT_NOTIFY_FLAGS;
         m_notifier.NotifyEntry(entry->local_id, i.first, i.second,
                                notify_flags);
-      } else if (!was_persist) {
+      } else if (!was_persist && persistent) {
         m_notifier.NotifyEntry(entry->local_id, i.first, i.second,
                                NT_NOTIFY_FLAGS | NT_NOTIFY_LOCAL);
       }
@@ -436,6 +436,16 @@ const char* Storage::LoadPersistent(
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);
   if (ec.value() != 0) return "could not open file";
-  if (!LoadPersistent(is, warn)) return "error reading file";
+  if (!LoadEntries(is, "", true, warn)) return "error reading file";
+  return nullptr;
+}
+
+const char* Storage::LoadEntries(
+    StringRef filename, StringRef prefix,
+    std::function<void(std::size_t line, const char* msg)> warn) {
+  std::error_code ec;
+  wpi::raw_fd_istream is(filename, ec);
+  if (ec.value() != 0) return "could not open file";
+  if (!LoadEntries(is, prefix, false, warn)) return "error reading file";
   return nullptr;
 }

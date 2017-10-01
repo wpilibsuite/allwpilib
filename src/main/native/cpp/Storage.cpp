@@ -948,6 +948,31 @@ bool Storage::GetPersistentEntries(
   return true;
 }
 
+bool Storage::GetEntries(
+    StringRef prefix,
+    std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
+    const {
+  // copy values out of storage as quickly as possible so lock isn't held
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    entries->reserve(m_entries.size());
+    for (auto& i : m_entries) {
+      Entry* entry = i.getValue();
+      // only write values with given prefix
+      if (!i.getKey().startswith(prefix)) continue;
+      entries->emplace_back(i.getKey(), entry->value);
+    }
+  }
+
+  // sort in name order
+  std::sort(entries->begin(), entries->end(),
+            [](const std::pair<std::string, std::shared_ptr<Value>>& a,
+               const std::pair<std::string, std::shared_ptr<Value>>& b) {
+              return a.first < b.first;
+            });
+  return true;
+}
+
 void Storage::CreateRpc(unsigned int local_id, StringRef def,
                         unsigned int rpc_uid) {
   std::unique_lock<std::mutex> lock(m_mutex);

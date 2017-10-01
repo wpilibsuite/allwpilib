@@ -936,6 +936,22 @@ const char* LoadPersistent(
   return ii->storage.LoadPersistent(filename, warn);
 }
 
+const char* SaveEntries(NT_Inst inst, StringRef filename, StringRef prefix) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return "invalid instance handle";
+
+  return ii->storage.SaveEntries(filename, prefix);
+}
+
+const char* LoadEntries(
+    NT_Inst inst, StringRef filename, StringRef prefix,
+    std::function<void(size_t line, const char* msg)> warn) {
+  auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
+  if (!ii) return "invalid instance handle";
+
+  return ii->storage.LoadEntries(filename, prefix, warn);
+}
+
 void SetLogger(LogFunc func, unsigned int min_level) {
   auto ii = InstanceImpl::GetDefault();
   static std::mutex mutex;

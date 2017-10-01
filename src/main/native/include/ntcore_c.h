@@ -1114,7 +1114,7 @@ NT_Bool NT_IsConnected(NT_Inst inst);
 /** @} */
 
 /**
- * @defgroup PersistentFunctions Persistent Functions
+ * @defgroup FileFunctions File Save/Load Functions
  * @{
  */
 
@@ -1139,6 +1139,32 @@ const char* NT_SavePersistent(NT_Inst inst, const char* filename);
  */
 const char* NT_LoadPersistent(NT_Inst inst, const char* filename,
                               void (*warn)(size_t line, const char* msg));
+
+/**
+ * Save table values to a file.  The file format used is identical to
+ * that used for SavePersistent.
+ * @param inst        instance handle
+ * @param filename    filename
+ * @param prefix      save only keys starting with this prefix
+ * @param prefix_len  length of prefix in bytes
+ * @return error string, or nullptr if successful
+ */
+const char* NT_SaveEntries(NT_Inst inst, const char* filename,
+                           const char* prefix, size_t prefix_len);
+
+/**
+ * Load table values from a file.  The file format used is identical to
+ * that used for SavePersistent / LoadPersistent.
+ * @param inst        instance handle
+ * @param filename    filename
+ * @param prefix      load only keys starting with this prefix
+ * @param prefix_len  length of prefix in bytes
+ * @param warn        callback function for warnings
+ * @return error string, or nullptr if successful
+ */
+const char* NT_LoadEntries(NT_Inst inst, const char* filename,
+                           const char* prefix, size_t prefix_len,
+                           void (*warn)(size_t line, const char* msg));
 
 /** @} */
 

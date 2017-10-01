@@ -264,6 +264,27 @@ public final class NetworkTable {
     return path;
   }
 
+  /**
+   * Save table values to a file.  The file format used is identical to
+   * that used for SavePersistent.
+   * @param filename  filename
+   * @throws PersistentException if error saving file
+   */
+  public void saveEntries(String filename) throws PersistentException {
+    inst.saveEntries(filename, pathWithSep);
+  }
+
+  /**
+   * Load table values from a file.  The file format used is identical to
+   * that used for SavePersistent / LoadPersistent.
+   * @param filename  filename
+   * @return List of warnings (errors result in an exception instead)
+   * @throws PersistentException if error saving file
+   */
+  public String[] loadEntries(String filename) throws PersistentException {
+    return inst.loadEntries(filename, pathWithSep);
+  }
+
   @Override
   public boolean equals(Object o) {
     if (o == this) {

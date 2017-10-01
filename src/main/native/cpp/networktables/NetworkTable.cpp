@@ -460,3 +460,17 @@ std::shared_ptr<Value> NetworkTable::GetValue(StringRef key) const {
 }
 
 StringRef NetworkTable::GetPath() const { return m_path; }
+
+const char* NetworkTable::SaveEntries(StringRef filename) const {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  return nt::SaveEntries(m_inst, filename, path);
+}
+
+const char* NetworkTable::LoadEntries(
+    StringRef filename,
+    std::function<void(size_t line, const char* msg)> warn) {
+  llvm::SmallString<128> path(m_path);
+  path += PATH_SEPARATOR_CHAR;
+  return nt::LoadEntries(m_inst, filename, path, warn);
+}

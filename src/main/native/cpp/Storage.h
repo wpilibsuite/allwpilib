@@ -129,12 +129,18 @@ class Storage : public IStorage {
       StringRef filename,
       std::function<void(std::size_t line, const char* msg)> warn) override;
 
+  const char* SaveEntries(StringRef filename, StringRef prefix) const;
+  const char* LoadEntries(
+      StringRef filename, StringRef prefix,
+      std::function<void(std::size_t line, const char* msg)> warn);
+
   // Stream-based save/load functions (exposed for testing purposes).  These
   // implement the guts of the filename-based functions.
   void SavePersistent(llvm::raw_ostream& os, bool periodic) const;
-  bool LoadPersistent(
-      wpi::raw_istream& is,
-      std::function<void(std::size_t line, const char* msg)> warn);
+  bool LoadEntries(wpi::raw_istream& is, StringRef prefix, bool persistent,
+                   std::function<void(std::size_t line, const char* msg)> warn);
+
+  void SaveEntries(llvm::raw_ostream& os, StringRef prefix) const;
 
   // RPC configuration needs to come through here as RPC definitions are
   // actually special Storage value types.
@@ -231,6 +237,9 @@ class Storage : public IStorage {
       bool periodic,
       std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
       const;
+  bool GetEntries(StringRef prefix,
+                  std::vector<std::pair<std::string, std::shared_ptr<Value>>>*
+                      entries) const;
   void SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
                          std::unique_lock<std::mutex>& lock, bool local);
   void SetEntryFlagsImpl(Entry* entry, unsigned int flags,

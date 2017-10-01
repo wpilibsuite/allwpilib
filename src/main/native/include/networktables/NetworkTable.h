@@ -644,6 +644,25 @@ class NetworkTable final : public ITable {
    * @return The path (e.g "", "/foo").
    */
   StringRef GetPath() const override;
+
+  /**
+   * Save table values to a file.  The file format used is identical to
+   * that used for SavePersistent.
+   * @param filename  filename
+   * @return error string, or nullptr if successful
+   */
+  const char* SaveEntries(StringRef filename) const;
+
+  /**
+   * Load table values from a file.  The file format used is identical to
+   * that used for SavePersistent / LoadPersistent.
+   * @param filename  filename
+   * @param warn      callback function for warnings
+   * @return error string, or nullptr if successful
+   */
+  const char* LoadEntries(
+      StringRef filename,
+      std::function<void(size_t line, const char* msg)> warn);
 };
 
 #ifdef __GNUC__
