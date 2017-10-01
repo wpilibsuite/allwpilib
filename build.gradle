@@ -12,7 +12,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.edu.wpi.first:native-utils:1.2.12'
-        classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:1.6'
+        classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:2.0'
     }
 }
 
@@ -78,12 +78,12 @@ run.dependsOn nativeTestFilesJar
 build.dependsOn devClasses
 
 dependencies {
-    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
     compile 'org.opencv:opencv-java:3.2.0'
     testCompile 'junit:junit:4.12'
     testRuntime files(project(':').nativeTestFilesJar.archivePath)
     testRuntime 'org.opencv:opencv-jni:3.2.0:all'
-    devCompile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    devCompile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
     devCompile 'org.opencv:opencv-java:3.2.0'
     devCompile sourceSets.main.output
     devRuntime files(project(':').nativeTestFilesJar.archivePath)
@@ -142,7 +142,7 @@ model {
             artifactId = 'wpiutil-cpp'
             headerClassifier = 'headers'
             ext = 'zip'
-            version = '+'
+            version = '3.+'
             sharedConfigs = [ cscore: [],
                               cscoreDev: [],
                               cscoreTestingBaseTest: [] ]
