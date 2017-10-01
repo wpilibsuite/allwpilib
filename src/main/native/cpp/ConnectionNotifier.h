@@ -57,9 +57,9 @@ class ConnectionNotifier
 
   void Start();
 
-  unsigned int Add(
-      std::function<void(const ConnectionNotification& event)> callback);
-  unsigned int AddPolled(unsigned int poller_uid);
+  unsigned int Add(std::function<void(const ConnectionNotification& event)>
+                       callback) override;
+  unsigned int AddPolled(unsigned int poller_uid) override;
 
   void NotifyConnection(bool connected, const ConnectionInfo& conn_info,
                         unsigned int only_listener = UINT_MAX) override;

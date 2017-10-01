@@ -388,11 +388,7 @@ NT_ConnectionListener AddConnectionListener(
   auto ii = InstanceImpl::Get(i);
   if (!ii) return 0;
 
-  unsigned int uid = ii->connection_notifier.Add(callback);
-  if (immediate_notify) {
-    for (auto& conn : ii->dispatcher.GetConnections())
-      ii->connection_notifier.NotifyConnection(true, conn, uid);
-  }
+  unsigned int uid = ii->dispatcher.AddListener(callback, immediate_notify);
   return Handle(i, uid, Handle::kConnectionListener);
 }
 
@@ -422,12 +418,7 @@ NT_ConnectionListener AddPolledConnectionListener(
   auto ii = InstanceImpl::Get(i);
   if (id < 0 || !ii) return 0;
 
-  unsigned int uid = ii->connection_notifier.AddPolled(id);
-  // perform immediate notifications
-  if (immediate_notify) {
-    for (auto& conn : ii->dispatcher.GetConnections())
-      ii->connection_notifier.NotifyConnection(true, conn, uid);
-  }
+  unsigned int uid = ii->dispatcher.AddPolledListener(id, immediate_notify);
   return Handle(i, uid, Handle::kConnectionListener);
 }
 

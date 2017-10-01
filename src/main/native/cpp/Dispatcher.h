@@ -56,6 +56,12 @@ class DispatcherBase : public IDispatcher {
   std::vector<ConnectionInfo> GetConnections() const;
   bool IsConnected() const;
 
+  unsigned int AddListener(
+      std::function<void(const ConnectionNotification& event)> callback,
+      bool immediate_notify) const;
+  unsigned int AddPolledListener(unsigned int poller_uid,
+                                 bool immediate_notify) const;
+
   void SetConnector(Connector connector);
   void SetConnectorOverride(Connector connector);
   void ClearConnectorOverride();

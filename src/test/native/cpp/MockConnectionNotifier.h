@@ -16,6 +16,11 @@ namespace nt {
 
 class MockConnectionNotifier : public IConnectionNotifier {
  public:
+  MOCK_METHOD1(
+      Add,
+      unsigned int(
+          std::function<void(const ConnectionNotification& event)> callback));
+  MOCK_METHOD1(AddPolled, unsigned int(unsigned int poller_uid));
   MOCK_METHOD3(NotifyConnection,
                void(bool connected, const ConnectionInfo& conn_info,
                     unsigned int only_listener));

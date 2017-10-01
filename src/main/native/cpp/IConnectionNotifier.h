@@ -20,6 +20,9 @@ class IConnectionNotifier {
   IConnectionNotifier(const IConnectionNotifier&) = delete;
   IConnectionNotifier& operator=(const IConnectionNotifier&) = delete;
   virtual ~IConnectionNotifier() = default;
+  virtual unsigned int Add(
+      std::function<void(const ConnectionNotification& event)> callback) = 0;
+  virtual unsigned int AddPolled(unsigned int poller_uid) = 0;
   virtual void NotifyConnection(bool connected, const ConnectionInfo& conn_info,
                                 unsigned int only_listener = UINT_MAX) = 0;
 };

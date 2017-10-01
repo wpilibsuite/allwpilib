@@ -239,6 +239,35 @@ bool DispatcherBase::IsConnected() const {
   return false;
 }
 
+unsigned int DispatcherBase::AddListener(
+    std::function<void(const ConnectionNotification& event)> callback,
+    bool immediate_notify) const {
+  std::lock_guard<std::mutex> lock(m_user_mutex);
+  unsigned int uid = m_notifier.Add(callback);
+  // perform immediate notifications
+  if (immediate_notify) {
+    for (auto& conn : m_connections) {
+      if (conn->state() != NetworkConnection::kActive) continue;
+      m_notifier.NotifyConnection(true, conn->info(), uid);
+    }
+  }
+  return uid;
+}
+
+unsigned int DispatcherBase::AddPolledListener(unsigned int poller_uid,
+                                               bool immediate_notify) const {
+  std::lock_guard<std::mutex> lock(m_user_mutex);
+  unsigned int uid = m_notifier.AddPolled(poller_uid);
+  // perform immediate notifications
+  if (immediate_notify) {
+    for (auto& conn : m_connections) {
+      if (conn->state() != NetworkConnection::kActive) continue;
+      m_notifier.NotifyConnection(true, conn->info(), uid);
+    }
+  }
+  return uid;
+}
+
 void DispatcherBase::SetConnector(Connector connector) {
   std::lock_guard<std::mutex> lock(m_user_mutex);
   m_client_connector = std::move(connector);
