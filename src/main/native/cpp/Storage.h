@@ -221,8 +221,8 @@ class Storage : public IStorage {
                          std::unique_lock<std::mutex>& lock, bool local);
   void SetEntryFlagsImpl(Entry* entry, unsigned int flags,
                          std::unique_lock<std::mutex>& lock, bool local);
-  void DeleteEntryImpl(Entry* entry, EntriesMap::iterator it,
-                       std::unique_lock<std::mutex>& lock, bool local);
+  void DeleteEntryImpl(Entry* entry, std::unique_lock<std::mutex>& lock,
+                       bool local);
 
   // Must be called with m_mutex held
   template <typename F>

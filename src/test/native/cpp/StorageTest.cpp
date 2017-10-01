@@ -462,7 +462,10 @@ TEST_P(StorageTestPopulated, DeleteEntryExist) {
                           NT_NOTIFY_DELETE | NT_NOTIFY_LOCAL, UINT_MAX));
 
   storage.DeleteEntry("foo2");
-  EXPECT_TRUE(entries().count("foo2") == 0);
+  ASSERT_EQ(1u, entries().count("foo2"));
+  EXPECT_EQ(nullptr, entries()["foo2"]->value);
+  EXPECT_EQ(0xffffu, entries()["foo2"]->id);
+  EXPECT_FALSE(entries()["foo2"]->local_write);
   if (GetParam()) {
     ASSERT_TRUE(idmap().size() >= 2);
     EXPECT_FALSE(idmap()[1]);
@@ -482,7 +485,8 @@ TEST_P(StorageTestPopulated, DeleteAllEntries) {
       .Times(4);
 
   storage.DeleteAllEntries();
-  ASSERT_TRUE(entries().empty());
+  ASSERT_EQ(1u, entries().count("foo2"));
+  EXPECT_EQ(nullptr, entries()["foo2"]->value);
 }
 
 TEST_P(StorageTestPopulated, DeleteAllEntriesPersistent) {
@@ -495,8 +499,8 @@ TEST_P(StorageTestPopulated, DeleteAllEntriesPersistent) {
       .Times(3);
 
   storage.DeleteAllEntries();
-  ASSERT_EQ(1u, entries().size());
-  EXPECT_EQ(1u, entries().count("foo2"));
+  ASSERT_EQ(1u, entries().count("foo2"));
+  EXPECT_NE(nullptr, entries()["foo2"]->value);
 }
 
 TEST_P(StorageTestPopulated, GetEntryInfoAll) {
@@ -939,6 +943,20 @@ TEST_P(StorageTestPopulateOne, ProcessIncomingEntryAssignWithFlags) {
 
   storage.ProcessIncoming(Message::EntryAssign("foo", 0, 1, value, 0x2),
                           conn.get(), conn);
+}
+
+TEST_P(StorageTestPopulateOne, DeleteCheckHandle) {
+  EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
+  EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _)).Times(AnyNumber());
+  EXPECT_CALL(notifier, local_notifiers())
+      .Times(AnyNumber())
+      .WillRepeatedly(Return(false));
+
+  auto handle = storage.GetEntry("foo");
+  storage.DeleteEntry("foo");
+  storage.SetEntryTypeValue("foo", Value::MakeBoolean(true));
+  auto handle2 = storage.GetEntry("foo");
+  ASSERT_EQ(handle, handle2);
 }
 
 INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty,

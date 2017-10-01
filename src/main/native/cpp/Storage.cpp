@@ -282,7 +282,7 @@ void Storage::ProcessIncomingEntryDelete(std::shared_ptr<Message> msg,
   }
 
   // update local
-  DeleteEntryImpl(m_idmap[id], m_entries.end(), lock, false);
+  DeleteEntryImpl(m_idmap[id], lock, false);
 
   // broadcast to all other connections (note for client there won't
   // be any other connections, so don't bother)
@@ -669,23 +669,20 @@ void Storage::DeleteEntry(StringRef name) {
   std::unique_lock<std::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return;
-  DeleteEntryImpl(i->getValue(), i, lock, true);
+  DeleteEntryImpl(i->getValue(), lock, true);
 }
 
 void Storage::DeleteEntry(unsigned int local_id) {
   std::unique_lock<std::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return;
-  DeleteEntryImpl(m_localmap[local_id].get(), m_entries.end(), lock, true);
+  DeleteEntryImpl(m_localmap[local_id].get(), lock, true);
 }
 
-void Storage::DeleteEntryImpl(Entry* entry, EntriesMap::iterator it,
-                              std::unique_lock<std::mutex>& lock, bool local) {
+void Storage::DeleteEntryImpl(Entry* entry, std::unique_lock<std::mutex>& lock,
+                              bool local) {
   unsigned int id = entry->id;
 
-  // Erase entry from name and id mappings.
-  // Get iterator if it wasn't provided.
-  if (it == m_entries.end()) it = m_entries.find(entry->name);
-  if (it != m_entries.end()) m_entries.erase(it);
+  // Erase entry from id mapping.
   if (id < m_idmap.size()) m_idmap[id] = nullptr;
 
   // empty the value and reset id and local_write flag
@@ -721,10 +718,6 @@ void Storage::DeleteEntryImpl(Entry* entry, EntriesMap::iterator it,
 
 template <typename F>
 void Storage::DeleteAllEntriesImpl(bool local, F should_delete) {
-  if (m_entries.empty()) return;
-
-  // can't erase without invalidating iterators, so build a new map
-  EntriesMap entries;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
     if (should_delete(entry)) {
@@ -738,11 +731,7 @@ void Storage::DeleteAllEntriesImpl(bool local, F should_delete) {
       entry->value.reset();
       continue;
     }
-
-    // add it to new entries
-    entries.insert(std::make_pair(i.getKey(), std::move(i.getValue())));
   }
-  m_entries.swap(entries);
 }
 
 void Storage::DeleteAllEntriesImpl(bool local) {
