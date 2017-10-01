@@ -107,26 +107,26 @@ pmd {
 }
 
 dependencies {
-    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
-    compile 'edu.wpi.first.ntcore:ntcore-java:+'
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
+    compile 'edu.wpi.first.ntcore:ntcore-java:4.+'
     compile 'org.opencv:opencv-java:3.2.0'
-    compile 'edu.wpi.first.cscore:cscore-java:+'
+    compile 'edu.wpi.first.cscore:cscore-java:1.+'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.guava:guava:19.0'
     testRuntime files(project.nativeTestFilesJar.archivePath)
-    testRuntime 'edu.wpi.first.ntcore:ntcore-jni:+:all'
+    testRuntime 'edu.wpi.first.ntcore:ntcore-jni:4.+:all'
     testRuntime 'org.opencv:opencv-jni:3.2.0:all'
-    testRuntime 'edu.wpi.first.cscore:cscore-jni:+:all'
-    devCompile 'edu.wpi.first.wpiutil:wpiutil-java:+'
-    devCompile 'edu.wpi.first.ntcore:ntcore-java:+'
+    testRuntime 'edu.wpi.first.cscore:cscore-jni:1.+:all'
+    devCompile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
+    devCompile 'edu.wpi.first.ntcore:ntcore-java:4.+'
     devCompile 'org.opencv:opencv-java:3.2.0'
-    devCompile 'edu.wpi.first.cscore:cscore-java:+'
+    devCompile 'edu.wpi.first.cscore:cscore-java:1.+'
     devCompile sourceSets.main.output
     devRuntime files(project.nativeTestFilesJar.archivePath)
-    devRuntime 'edu.wpi.first.ntcore:ntcore-jni:+:all'
+    devRuntime 'edu.wpi.first.ntcore:ntcore-jni:4.+:all'
     devRuntime 'org.opencv:opencv-jni:3.2.0:all'
-    devRuntime 'edu.wpi.first.cscore:cscore-jni:+:all'
+    devRuntime 'edu.wpi.first.cscore:cscore-jni:1.+:all'
 }
 
 def jniClasses = [
@@ -220,7 +220,7 @@ model {
             artifactId = 'wpiutil-cpp'
             headerClassifier = 'headers'
             ext = 'zip'
-            version = '+'
+            version = '3.+'
             sharedConfigs = [ wpilibJNIShared: [] ]
             staticConfigs = [ wpilibJNIStatic: [] ]
         }
