@@ -12,7 +12,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.edu.wpi.first:native-utils:1.2.9'
-        classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:1.6'
+        classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:2.0'
     }
 }
 
@@ -78,10 +78,10 @@ build.dependsOn devClasses
 
 
 dependencies {
-    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
     testCompile 'junit:junit:4.12'
     testRuntime files(project(':').nativeTestFilesJar.archivePath)
-    devCompile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    devCompile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
     devCompile sourceSets.main.output
     devRuntime files(project(':').nativeTestFilesJar.archivePath)
 }
@@ -138,7 +138,7 @@ model {
             artifactId = 'wpiutil-cpp'
             headerClassifier = 'headers'
             ext = 'zip'
-            version = '+'
+            version = '3.+'
             sharedConfigs = [ ntcore: [],
                               ntcoreDev: [],
                               ntcoreTestingBaseTest: [] ]
