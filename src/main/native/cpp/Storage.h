@@ -100,6 +100,20 @@ class Storage : public IStorage {
   std::vector<EntryInfo> GetEntryInfo(int inst, StringRef prefix,
                                       unsigned int types);
 
+  unsigned int AddListener(
+      StringRef prefix,
+      std::function<void(const EntryNotification& event)> callback,
+      unsigned int flags) const;
+  unsigned int AddListener(
+      unsigned int local_id,
+      std::function<void(const EntryNotification& event)> callback,
+      unsigned int flags) const;
+
+  unsigned int AddPolledListener(unsigned int poller_uid, StringRef prefix,
+                                 unsigned int flags) const;
+  unsigned int AddPolledListener(unsigned int poller_uid, unsigned int local_id,
+                                 unsigned int flags) const;
+
   // Index-only
   unsigned int GetEntry(StringRef name);
   std::vector<unsigned int> GetEntries(StringRef prefix, unsigned int types);

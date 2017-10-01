@@ -17,6 +17,20 @@ namespace nt {
 class MockEntryNotifier : public IEntryNotifier {
  public:
   MOCK_CONST_METHOD0(local_notifiers, bool());
+  MOCK_METHOD3(
+      Add,
+      unsigned int(std::function<void(const EntryNotification& event)> callback,
+                   llvm::StringRef prefix, unsigned int flags));
+  MOCK_METHOD3(
+      Add,
+      unsigned int(std::function<void(const EntryNotification& event)> callback,
+                   unsigned int local_id, unsigned int flags));
+  MOCK_METHOD3(AddPolled,
+               unsigned int(unsigned int poller_uid, llvm::StringRef prefix,
+                            unsigned int flags));
+  MOCK_METHOD3(AddPolled,
+               unsigned int(unsigned int poller_uid, unsigned int local_id,
+                            unsigned int flags));
   MOCK_METHOD5(NotifyEntry,
                void(unsigned int local_id, StringRef name,
                     std::shared_ptr<Value> value, unsigned int flags,

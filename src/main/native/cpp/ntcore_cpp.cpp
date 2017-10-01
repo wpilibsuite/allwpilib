@@ -257,15 +257,7 @@ NT_EntryListener AddEntryListener(
   auto ii = InstanceImpl::Get(i);
   if (i < 0 || !ii) return 0;
 
-  unsigned int uid = ii->entry_notifier.Add(callback, prefix, flags);
-  // perform immediate notifications
-  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
-    for (auto& i : ii->storage.GetEntries(prefix, 0)) {
-      ii->entry_notifier.NotifyEntry(i, ii->storage.GetEntryName(i),
-                                     ii->storage.GetEntryValue(i),
-                                     NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
-    }
-  }
+  unsigned int uid = ii->storage.AddListener(prefix, callback, flags);
   return Handle(i, uid, Handle::kEntryListener);
 }
 
@@ -279,17 +271,7 @@ NT_EntryListener AddEntryListener(
   auto ii = InstanceImpl::Get(i);
   if (id < 0 || !ii) return 0;
 
-  unsigned int uid = ii->entry_notifier.Add(callback, id, flags);
-  // perform immediate notifications
-  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
-    auto name = ii->storage.GetEntryName(id);
-    auto value = ii->storage.GetEntryValue(id);
-    // if no name or value, don't notify
-    if (!name.empty() && value) {
-      ii->entry_notifier.NotifyEntry(id, name, value,
-                                     NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
-    }
-  }
+  unsigned int uid = ii->storage.AddListener(id, callback, flags);
   return Handle(i, uid, Handle::kEntryListener);
 }
 
@@ -319,15 +301,7 @@ NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
   auto ii = InstanceImpl::Get(i);
   if (id < 0 || !ii) return 0;
 
-  unsigned int uid = ii->entry_notifier.AddPolled(id, prefix, flags);
-  // perform immediate notifications
-  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
-    for (auto& i : ii->storage.GetEntries(prefix, 0)) {
-      ii->entry_notifier.NotifyEntry(i, ii->storage.GetEntryName(i),
-                                     ii->storage.GetEntryValue(i),
-                                     NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
-    }
-  }
+  unsigned int uid = ii->storage.AddPolledListener(id, prefix, flags);
   return Handle(i, uid, Handle::kEntryListener);
 }
 
@@ -344,17 +318,7 @@ NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
   if (p_id < 0) return 0;
   if (handle.GetInst() != phandle.GetInst()) return 0;
 
-  unsigned int uid = ii->entry_notifier.AddPolled(p_id, entry, flags);
-  // perform immediate notifications
-  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
-    auto name = ii->storage.GetEntryName(id);
-    auto value = ii->storage.GetEntryValue(id);
-    // if no name or value, don't notify
-    if (!name.empty() && value) {
-      ii->entry_notifier.NotifyEntry(id, name, value,
-                                     NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
-    }
-  }
+  unsigned int uid = ii->storage.AddPolledListener(p_id, id, flags);
   return Handle(i, uid, Handle::kEntryListener);
 }
 

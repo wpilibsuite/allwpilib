@@ -849,6 +849,77 @@ std::vector<EntryInfo> Storage::GetEntryInfo(int inst, StringRef prefix,
   return infos;
 }
 
+unsigned int Storage::AddListener(
+    StringRef prefix,
+    std::function<void(const EntryNotification& event)> callback,
+    unsigned int flags) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  unsigned int uid = m_notifier.Add(callback, prefix, flags);
+  // perform immediate notifications
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
+    for (auto& i : m_entries) {
+      if (!i.getKey().startswith(prefix)) continue;
+      Entry* entry = i.getValue();
+      m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
+                             NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
+    }
+  }
+  return uid;
+}
+
+unsigned int Storage::AddListener(
+    unsigned int local_id,
+    std::function<void(const EntryNotification& event)> callback,
+    unsigned int flags) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  unsigned int uid = m_notifier.Add(callback, local_id, flags);
+  // perform immediate notifications
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0 &&
+      local_id < m_localmap.size()) {
+    Entry* entry = m_localmap[local_id].get();
+    // if no value, don't notify
+    if (entry->value) {
+      m_notifier.NotifyEntry(local_id, entry->name, entry->value,
+                             NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
+    }
+  }
+  return uid;
+}
+
+unsigned int Storage::AddPolledListener(unsigned int poller, StringRef prefix,
+                                        unsigned int flags) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  unsigned int uid = m_notifier.AddPolled(poller, prefix, flags);
+  // perform immediate notifications
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
+    for (auto& i : m_entries) {
+      if (!i.getKey().startswith(prefix)) continue;
+      Entry* entry = i.getValue();
+      m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
+                             NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
+    }
+  }
+  return uid;
+}
+
+unsigned int Storage::AddPolledListener(unsigned int poller,
+                                        unsigned int local_id,
+                                        unsigned int flags) const {
+  std::lock_guard<std::mutex> lock(m_mutex);
+  unsigned int uid = m_notifier.AddPolled(poller, local_id, flags);
+  // perform immediate notifications
+  if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0 &&
+      local_id < m_localmap.size()) {
+    Entry* entry = m_localmap[local_id].get();
+    // if no value, don't notify
+    if (entry->value) {
+      m_notifier.NotifyEntry(local_id, entry->name, entry->value,
+                             NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
+    }
+  }
+  return uid;
+}
+
 bool Storage::GetPersistentEntries(
     bool periodic,
     std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
