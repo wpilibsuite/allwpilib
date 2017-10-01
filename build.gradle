@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath 'gradle.plugin.edu.wpi.first:native-utils:1.2.9'
-        classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:1.6'
+        classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:2.0'
     }
 }
 
