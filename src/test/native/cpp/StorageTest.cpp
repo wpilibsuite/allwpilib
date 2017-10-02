@@ -948,15 +948,53 @@ TEST_P(StorageTestPopulateOne, ProcessIncomingEntryAssignWithFlags) {
 TEST_P(StorageTestPopulateOne, DeleteCheckHandle) {
   EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
   EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _)).Times(AnyNumber());
-  EXPECT_CALL(notifier, local_notifiers())
-      .Times(AnyNumber())
-      .WillRepeatedly(Return(false));
-
   auto handle = storage.GetEntry("foo");
   storage.DeleteEntry("foo");
   storage.SetEntryTypeValue("foo", Value::MakeBoolean(true));
+  ::testing::Mock::VerifyAndClearExpectations(&dispatcher);
+  ::testing::Mock::VerifyAndClearExpectations(&notifier);
+
   auto handle2 = storage.GetEntry("foo");
   ASSERT_EQ(handle, handle2);
+}
+
+TEST_P(StorageTestPopulateOne, DeletedEntryFlags) {
+  EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
+  EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _)).Times(AnyNumber());
+  auto handle = storage.GetEntry("foo");
+  storage.SetEntryFlags("foo", 2);
+  storage.DeleteEntry("foo");
+  ::testing::Mock::VerifyAndClearExpectations(&dispatcher);
+  ::testing::Mock::VerifyAndClearExpectations(&notifier);
+
+  EXPECT_EQ(storage.GetEntryFlags("foo"), 0u);
+  EXPECT_EQ(storage.GetEntryFlags(handle), 0u);
+  storage.SetEntryFlags("foo", 4);
+  storage.SetEntryFlags(handle, 4);
+  EXPECT_EQ(storage.GetEntryFlags("foo"), 0u);
+  EXPECT_EQ(storage.GetEntryFlags(handle), 0u);
+}
+
+TEST_P(StorageTestPopulateOne, DeletedDeleteAllEntries) {
+  EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
+  EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _)).Times(AnyNumber());
+  storage.DeleteEntry("foo");
+  ::testing::Mock::VerifyAndClearExpectations(&dispatcher);
+  ::testing::Mock::VerifyAndClearExpectations(&notifier);
+
+  EXPECT_CALL(dispatcher, QueueOutgoing(MessageEq(Message::ClearEntries()),
+                                        IsNull(), IsNull()));
+  storage.DeleteAllEntries();
+}
+
+TEST_P(StorageTestPopulateOne, DeletedGetEntries) {
+  EXPECT_CALL(dispatcher, QueueOutgoing(_, _, _)).Times(AnyNumber());
+  EXPECT_CALL(notifier, NotifyEntry(_, _, _, _, _)).Times(AnyNumber());
+  storage.DeleteEntry("foo");
+  ::testing::Mock::VerifyAndClearExpectations(&dispatcher);
+  ::testing::Mock::VerifyAndClearExpectations(&notifier);
+
+  EXPECT_TRUE(storage.GetEntries("", 0).empty());
 }
 
 INSTANTIATE_TEST_CASE_P(StorageTestsEmpty, StorageTestEmpty,

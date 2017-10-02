@@ -123,11 +123,10 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
     entry = m_idmap[id];
     if (!entry) {
       // create local
-      bool is_new;
-      entry = GetOrNew(name, &is_new);
+      entry = GetOrNew(name);
       entry->id = id;
       m_idmap[id] = entry;
-      if (is_new) {
+      if (!entry->value) {
         // didn't exist at all (rather than just being a response to a
         // id assignment request)
         entry->value = msg->value();
@@ -377,6 +376,7 @@ void Storage::GetInitialAssignments(
   conn.set_state(INetworkConnection::kSynchronized);
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
+    if (!entry->value) continue;
     msgs->emplace_back(Message::EntryAssign(i.getKey(), entry->id,
                                             entry->seq_num.value(),
                                             entry->value, entry->flags));
@@ -415,9 +415,8 @@ void Storage::ApplyInitialAssignments(
     SequenceNumber seq_num(msg->seq_num_uid());
     StringRef name = msg->str();
 
-    bool is_new;
-    Entry* entry = GetOrNew(name, &is_new);
-    if (is_new) {
+    Entry* entry = GetOrNew(name);
+    if (!entry->value) {
       // doesn't currently exist
       entry->value = msg->value();
       entry->flags = msg->flags();
@@ -628,7 +627,7 @@ void Storage::SetEntryFlags(unsigned int id_local, unsigned int flags) {
 void Storage::SetEntryFlagsImpl(Entry* entry, unsigned int flags,
                                 std::unique_lock<std::mutex>& lock,
                                 bool local) {
-  if (entry->flags == flags) return;
+  if (!entry->value || entry->flags == flags) return;
 
   // update persistent dirty flag if persistent flag changed
   if ((entry->flags & NT_PERSISTENT) != (flags & NT_PERSISTENT))
@@ -700,6 +699,9 @@ void Storage::DeleteEntryImpl(Entry* entry, std::unique_lock<std::mutex>& lock,
   // update persistent dirty flag if it's a persistent value
   if (entry->IsPersistent()) m_persistent_dirty = true;
 
+  // reset flags
+  entry->flags = 0;
+
   if (!old_value) return;  // was not previously assigned
 
   // notify
@@ -720,7 +722,7 @@ template <typename F>
 void Storage::DeleteAllEntriesImpl(bool local, F should_delete) {
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
-    if (should_delete(entry)) {
+    if (entry->value && should_delete(entry)) {
       // notify it's being deleted
       m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
                              NT_NOTIFY_DELETE | (local ? NT_NOTIFY_LOCAL : 0));
@@ -753,15 +755,12 @@ void Storage::DeleteAllEntries() {
   dispatcher->QueueOutgoing(Message::ClearEntries(), nullptr, nullptr);
 }
 
-Storage::Entry* Storage::GetOrNew(StringRef name, bool* is_new) {
+Storage::Entry* Storage::GetOrNew(StringRef name) {
   auto& entry = m_entries[name];
   if (!entry) {
-    if (is_new) *is_new = true;
     m_localmap.emplace_back(new Entry(name));
     entry = m_localmap.back().get();
     entry->local_id = m_localmap.size() - 1;
-  } else {
-    if (is_new) *is_new = false;
   }
   return entry;
 }
@@ -777,10 +776,10 @@ std::vector<unsigned int> Storage::GetEntries(StringRef prefix,
   std::lock_guard<std::mutex> lock(m_mutex);
   std::vector<unsigned int> ids;
   for (auto& i : m_entries) {
-    if (!i.getKey().startswith(prefix)) continue;
     Entry* entry = i.getValue();
-    if (types != 0 && (!entry->value || (types & entry->value->type()) == 0))
-      continue;
+    auto value = entry->value.get();
+    if (!value || !i.getKey().startswith(prefix)) continue;
+    if (types != 0 && (types & value->type()) == 0) continue;
     ids.push_back(entry->local_id);
   }
   return ids;
@@ -833,10 +832,9 @@ std::vector<EntryInfo> Storage::GetEntryInfo(int inst, StringRef prefix,
   std::lock_guard<std::mutex> lock(m_mutex);
   std::vector<EntryInfo> infos;
   for (auto& i : m_entries) {
-    if (!i.getKey().startswith(prefix)) continue;
     Entry* entry = i.getValue();
-    auto value = entry->value;
-    if (!value) continue;
+    auto value = entry->value.get();
+    if (!value || !i.getKey().startswith(prefix)) continue;
     if (types != 0 && (types & value->type()) == 0) continue;
     EntryInfo info;
     info.entry = Handle(inst, entry->local_id, Handle::kEntry);
@@ -858,8 +856,8 @@ unsigned int Storage::AddListener(
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
     for (auto& i : m_entries) {
-      if (!i.getKey().startswith(prefix)) continue;
       Entry* entry = i.getValue();
+      if (!entry->value || !i.getKey().startswith(prefix)) continue;
       m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
                              NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
     }
@@ -877,7 +875,6 @@ unsigned int Storage::AddListener(
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0 &&
       local_id < m_localmap.size()) {
     Entry* entry = m_localmap[local_id].get();
-    // if no value, don't notify
     if (entry->value) {
       m_notifier.NotifyEntry(local_id, entry->name, entry->value,
                              NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
@@ -895,6 +892,7 @@ unsigned int Storage::AddPolledListener(unsigned int poller, StringRef prefix,
     for (auto& i : m_entries) {
       if (!i.getKey().startswith(prefix)) continue;
       Entry* entry = i.getValue();
+      if (!entry->value) continue;
       m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
                              NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
     }
@@ -934,7 +932,7 @@ bool Storage::GetPersistentEntries(
     for (auto& i : m_entries) {
       Entry* entry = i.getValue();
       // only write persistent-flagged values
-      if (!entry->IsPersistent()) continue;
+      if (!entry->value || !entry->IsPersistent()) continue;
       entries->emplace_back(i.getKey(), entry->value);
     }
   }
@@ -959,7 +957,7 @@ bool Storage::GetEntries(
     for (auto& i : m_entries) {
       Entry* entry = i.getValue();
       // only write values with given prefix
-      if (!i.getKey().startswith(prefix)) continue;
+      if (!entry->value || !i.getKey().startswith(prefix)) continue;
       entries->emplace_back(i.getKey(), entry->value);
     }
   }

@@ -251,7 +251,7 @@ class Storage : public IStorage {
   template <typename F>
   void DeleteAllEntriesImpl(bool local, F should_delete);
   void DeleteAllEntriesImpl(bool local);
-  Entry* GetOrNew(StringRef name, bool* is_new = nullptr);
+  Entry* GetOrNew(StringRef name);
 };
 
 }  // namespace nt
