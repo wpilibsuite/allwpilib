@@ -106,14 +106,17 @@ public class DriveTrain extends Subsystem {
 	}
 
 	/**
-	 * @param joy
-	 *            The ps3 style joystick to use to drive tank style.
+	 * Tank style driving for the DriveTrain.
+	 *
+	 * @param joy The ps3 style joystick to use to drive tank style.
 	 */
 	public void drive(Joystick joy) {
 		drive(-joy.getY(), -joy.getAxis(AxisType.kThrottle));
 	}
 
 	/**
+	 * Get the robot's heading.
+	 *
 	 * @return The robots heading in degrees.
 	 */
 	public double getHeading() {
@@ -130,6 +133,8 @@ public class DriveTrain extends Subsystem {
 	}
 
 	/**
+	 * Get the average distance of the encoders since the last reset.
+	 *
 	 * @return The distance driven (average of left and right encoders).
 	 */
 	public double getDistance() {
@@ -137,6 +142,8 @@ public class DriveTrain extends Subsystem {
 	}
 
 	/**
+	 * Get the distance to the obstacle.
+	 *
 	 * @return The distance to the obstacle detected by the rangefinder.
 	 */
 	public double getDistanceToObstacle() {
