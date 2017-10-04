@@ -394,7 +394,7 @@ bool Storage::LoadEntries(
                                NT_NOTIFY_NEW | NT_NOTIFY_LOCAL);
       } else if (*old_value != *i.second) {
         unsigned int notify_flags = NT_NOTIFY_UPDATE | NT_NOTIFY_LOCAL;
-        if (!was_persist) notify_flags |= NT_NOTIFY_FLAGS;
+        if (!was_persist && persistent) notify_flags |= NT_NOTIFY_FLAGS;
         m_notifier.NotifyEntry(entry->local_id, i.first, i.second,
                                notify_flags);
       } else if (!was_persist && persistent) {
