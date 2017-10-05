@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "TalonSRX.h"
+#include "PWMTalonSRX.h"
 
 #include <HAL/HAL.h>
 
@@ -14,17 +14,17 @@
 using namespace frc;
 
 /**
- * Construct a TalonSRX connected via PWM.
+ * Construct a PWMTalonSRX connected via PWM.
  *
- * @param channel The PWM channel that the TalonSRX is attached to. 0-9 are
+ * @param channel The PWM channel that the PWMTalonSRX is attached to. 0-9 are
  *                on-board, 10-19 are on the MXP port
  */
-TalonSRX::TalonSRX(int channel) : PWMSpeedController(channel) {
-  /* Note that the TalonSRX uses the following bounds for PWM values. These
+PWMTalonSRX::PWMTalonSRX(int channel) : PWMSpeedController(channel) {
+  /* Note that the PWMTalonSRX uses the following bounds for PWM values. These
    * values should work reasonably well for most controllers, but if users
    * experience issues such as asymmetric behavior around the deadband or
    * inability to saturate the controller in either direction, calibration is
-   * recommended. The calibration procedure can be found in the TalonSRX User
+   * recommended. The calibration procedure can be found in the PWMTalonSRX User
    * Manual available from Cross The Road Electronics.
    *   2.004ms = full "forward"
    *   1.52ms = the "high end" of the deadband range
@@ -37,6 +37,6 @@ TalonSRX::TalonSRX(int channel) : PWMSpeedController(channel) {
   SetSpeed(0.0);
   SetZeroLatch();
 
-  HAL_Report(HALUsageReporting::kResourceType_TalonSRX, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("TalonSRX", GetChannel(), this);
+  HAL_Report(HALUsageReporting::kResourceType_PWMTalonSRX, GetChannel());
+  LiveWindow::GetInstance()->AddActuator("PWMTalonSRX", GetChannel(), this);
 }

@@ -14,10 +14,10 @@ namespace frc {
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control
  */
-class TalonSRX : public PWMSpeedController {
+class PWMTalonSRX : public PWMSpeedController {
  public:
-  explicit TalonSRX(int channel);
-  virtual ~TalonSRX() = default;
+  explicit PWMTalonSRX(int channel);
+  virtual ~PWMTalonSRX() = default;
 };
 
 }  // namespace frc
