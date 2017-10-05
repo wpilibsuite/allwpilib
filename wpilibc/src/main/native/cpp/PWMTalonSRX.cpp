@@ -24,7 +24,7 @@ PWMTalonSRX::PWMTalonSRX(int channel) : PWMSpeedController(channel) {
    * values should work reasonably well for most controllers, but if users
    * experience issues such as asymmetric behavior around the deadband or
    * inability to saturate the controller in either direction, calibration is
-   * recommended. The calibration procedure can be found in the PWMTalonSRX User
+   * recommended. The calibration procedure can be found in the TalonSRX User
    * Manual available from Cross The Road Electronics.
    *   2.004ms = full "forward"
    *   1.52ms = the "high end" of the deadband range
