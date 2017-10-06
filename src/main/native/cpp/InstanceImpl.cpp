@@ -24,7 +24,9 @@ InstanceImpl::InstanceImpl(int inst)
       rpc_server(inst, logger),
       storage(entry_notifier, rpc_server, logger),
       dispatcher(storage, connection_notifier, logger),
-      ds_client(dispatcher, logger) {}
+      ds_client(dispatcher, logger) {
+  logger.set_min_level(logger_impl.GetMinLevel());
+}
 
 InstanceImpl::~InstanceImpl() { logger.SetLogger(nullptr); }
 
