@@ -6,21 +6,33 @@
 /*----------------------------------------------------------------------------*/
 
 #include "HAL/I2C.h"
+#include "MockData/I2CDataInternal.h"
+
+using namespace hal;
 
 extern "C" {
-void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {}
+void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
+  SimI2CData[port].SetInitialized(true);
+}
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
                            uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
+  SimI2CData[port].Write(deviceAddress, dataToSend, sendSize);
+  SimI2CData[port].Read(deviceAddress, dataReceived, receiveSize);
   return 0;
 }
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
                      uint8_t* dataToSend, int32_t sendSize) {
+  SimI2CData[port].Write(deviceAddress, dataToSend, sendSize);
   return 0;
 }
 int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
                     int32_t count) {
+  SimI2CData[port].Read(deviceAddress, buffer, count);
   return 0;
 }
-void HAL_CloseI2C(HAL_I2CPort port) {}
+void HAL_CloseI2C(HAL_I2CPort port) {
+  SimI2CData[port].SetInitialized(false);
+}
+
 }
