@@ -345,7 +345,11 @@ public final class NetworkTableInstance {
         NetworkTablesJNI.cancelPollEntryListener(m_entryListenerPoller);
         while (m_entryListenerWaitQueue) {
           try {
-            return m_entryListenerWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+            if (timeout < 0) {
+              m_entryListenerWaitQueueCond.await();
+            } else {
+              return m_entryListenerWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+            }
           } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             return true;
@@ -475,7 +479,11 @@ public final class NetworkTableInstance {
         NetworkTablesJNI.cancelPollConnectionListener(m_connectionListenerPoller);
         while (m_connectionListenerWaitQueue) {
           try {
-            return m_connectionListenerWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+            if (timeout < 0) {
+              m_connectionListenerWaitQueueCond.await();
+            } else {
+              return m_connectionListenerWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+            }
           } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             return true;
@@ -597,7 +605,11 @@ public final class NetworkTableInstance {
         NetworkTablesJNI.cancelPollRpc(m_rpcCallPoller);
         while (m_rpcCallWaitQueue) {
           try {
-            return m_rpcCallWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+            if (timeout < 0) {
+              m_rpcCallWaitQueueCond.await();
+            } else {
+              return m_rpcCallWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+            }
           } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             return true;
@@ -1070,7 +1082,11 @@ public final class NetworkTableInstance {
         NetworkTablesJNI.cancelPollLogger(m_loggerPoller);
         while (m_loggerWaitQueue) {
           try {
-            return m_loggerWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+            if (timeout < 0) {
+              m_loggerWaitQueueCond.await();
+            } else {
+              return m_loggerWaitQueueCond.await((long) (timeout * 1e9), TimeUnit.NANOSECONDS);
+            }
           } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             return true;
