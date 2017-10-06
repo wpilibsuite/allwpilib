@@ -286,7 +286,7 @@ std::shared_ptr<NetworkTable> NetworkTable::GetSubTable(StringRef key) const {
 }
 
 bool NetworkTable::ContainsKey(StringRef key) const {
-  return GetEntry(key).Exists();
+  return !key.empty() && GetEntry(key).Exists();
 }
 
 bool NetworkTable::ContainsSubTable(StringRef key) const {

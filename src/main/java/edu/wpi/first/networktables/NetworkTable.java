@@ -156,7 +156,7 @@ public final class NetworkTable {
    * @return true if the table as a value assigned to the given key
    */
   public boolean containsKey(String key) {
-    return getEntry(key).exists();
+    return !("".equals(key)) && getEntry(key).exists();
   }
 
   /**
