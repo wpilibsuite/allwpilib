@@ -140,7 +140,7 @@ model {
             linkscripts(MavenPublication) {
                 artifact linkScriptZip
 
-                artifactId = 'linkscripts'
+                artifactId = "${baseArtifactId}-linkscripts"
                 groupId artifactGroupId
                 version pubVersion
             }
