@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <DoubleSolenoid.h>
 #include <IterativeRobot.h>
 #include <Joystick.h>
@@ -19,7 +26,7 @@
  * Additionally, double solenoids take up two channels on your PCM whereas
  *   single solenoids only take a single channel.
  */
-class Robot: public frc::IterativeRobot {
+class Robot : public frc::IterativeRobot {
 public:
 	void TeleopPeriodic() override {
 		/* The output of GetRawButton is true/false depending on whether
@@ -28,7 +35,8 @@ public:
 		 */
 		m_solenoid.Set(m_stick.GetRawButton(kSolenoidButton));
 
-		/* In order to set the double solenoid, we will say that if neither
+		/* In order to set the double solenoid, we will say that if
+		 * neither
 		 * button is pressed, it is off, if just one button is pressed,
 		 * set the solenoid to correspond to that button, and if both
 		 * are pressed, set the solenoid to Forwards.
@@ -43,13 +51,13 @@ public:
 	}
 
 private:
-	frc::Joystick m_stick { 0 };
+	frc::Joystick m_stick{0};
 
 	// Solenoid corresponds to a single solenoid.
-	frc::Solenoid m_solenoid { 0 };
+	frc::Solenoid m_solenoid{0};
 
 	// DoubleSolenoid corresponds to a double solenoid.
-	frc::DoubleSolenoid m_doubleSolenoid { 1, 2 };
+	frc::DoubleSolenoid m_doubleSolenoid{1, 2};
 
 	static constexpr int kSolenoidButton = 1;
 	static constexpr int kDoubleSolenoidForward = 2;

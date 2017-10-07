@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <AnalogInput.h>
 #include <IterativeRobot.h>
 #include <PIDController.h>
@@ -8,33 +15,38 @@
  * This is a sample program demonstrating how to use an ultrasonic sensor and
  * proportional control to maintain a set distance from an object.
  */
-class Robot: public frc::IterativeRobot {
+class Robot : public frc::IterativeRobot {
 public:
 	/**
-	 * Drives the robot a set distance from an object using PID control and the
+	 * Drives the robot a set distance from an object using PID control and
+	 * the
 	 * ultrasonic sensor.
 	 */
 	void TeleopInit() override {
-		// Set expected range to 0-24 inches; e.g. at 24 inches from object go
+		// Set expected range to 0-24 inches; e.g. at 24 inches from
+		// object go
 		// full forward, at 0 inches from object go full backward.
 		pidController.SetInputRange(0, 24 * kValueToInches);
 		// Set setpoint of the pidController
 		pidController.SetSetpoint(kHoldDistance * kValueToInches);
-		pidController.Enable(); // begin PID control
+		pidController.Enable();  // begin PID control
 	}
 
 private:
-	// internal class to write to myRobot (a RobotDrive object) using a PIDOutput
-	class MyPIDOutput: public frc::PIDOutput {
+	// internal class to write to myRobot (a RobotDrive object) using a
+	// PIDOutput
+	class MyPIDOutput : public frc::PIDOutput {
 	public:
-		MyPIDOutput(frc::RobotDrive& r) :
-				rd(r) {
+		explicit MyPIDOutput(frc::RobotDrive& r)
+		    : rd(r) {
 			rd.SetSafetyEnabled(false);
 		}
 
 		void PIDWrite(double output) override {
-			rd.Drive(output, 0); // write to myRobot (RobotDrive) by reference
+			rd.Drive(output, 0);  // write to myRobot (RobotDrive)
+					      // by reference
 		}
+
 	private:
 		frc::RobotDrive& rd;
 	};
@@ -58,10 +70,10 @@ private:
 	static constexpr int kRightMotorPort = 1;
 	static constexpr int kUltrasonicPort = 0;
 
-	frc::AnalogInput ultrasonic { kUltrasonicPort };
-	frc::RobotDrive myRobot { kLeftMotorPort, kRightMotorPort };
-	frc::PIDController pidController { kP, kI, kD, &ultrasonic,
-			new MyPIDOutput(myRobot) };
+	frc::AnalogInput ultrasonic{kUltrasonicPort};
+	frc::RobotDrive myRobot{kLeftMotorPort, kRightMotorPort};
+	frc::PIDController pidController{
+			kP, kI, kD, &ultrasonic, new MyPIDOutput(myRobot)};
 };
 
 START_ROBOT_CLASS(Robot)

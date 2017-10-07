@@ -1,5 +1,11 @@
-#ifndef DriveTrain_H
-#define DriveTrain_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <AnalogGyro.h>
 #include <AnalogInput.h>
@@ -17,7 +23,7 @@ class Joystick;
  * the robots chassis. These include four drive motors, a left and right encoder
  * and a gyro.
  */
-class DriveTrain: public frc::Subsystem {
+class DriveTrain : public frc::Subsystem {
 public:
 	DriveTrain();
 
@@ -65,15 +71,13 @@ public:
 	double GetDistanceToObstacle();
 
 private:
-	frc::Talon frontLeft { 1 };
-	frc::Talon rearLeft { 2 };
-	frc::Talon frontRight { 3 };
-	frc::Talon rearRight { 4 };
-	frc::RobotDrive drive { frontLeft, rearLeft, frontRight, rearRight };
-	frc::Encoder leftEncoder { 1, 2 };
-	frc::Encoder rightEncoder { 3, 4 };
-	frc::AnalogInput rangefinder { 6 };
-	frc::AnalogGyro gyro { 1 };
+	frc::Talon frontLeft{1};
+	frc::Talon rearLeft{2};
+	frc::Talon frontRight{3};
+	frc::Talon rearRight{4};
+	frc::RobotDrive drive{frontLeft, rearLeft, frontRight, rearRight};
+	frc::Encoder leftEncoder{1, 2};
+	frc::Encoder rightEncoder{3, 4};
+	frc::AnalogInput rangefinder{6};
+	frc::AnalogGyro gyro{1};
 };
-
-#endif  // DriveTrain_H

@@ -1,22 +1,28 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "Pneumatics.h"
 
 #include <LiveWindow/LiveWindow.h>
 
-Pneumatics::Pneumatics() :
-		frc::Subsystem("Pneumatics") {
-	frc::LiveWindow::GetInstance()->AddSensor("Pneumatics", "Pressure Sensor",
-			pressureSensor);
+Pneumatics::Pneumatics()
+    : frc::Subsystem("Pneumatics") {
+	frc::LiveWindow::GetInstance()->AddSensor(
+			"Pneumatics", "Pressure Sensor", pressureSensor);
 }
 
 /**
  * No default command
  */
-void Pneumatics::InitDefaultCommand() {
-
-}
+void Pneumatics::InitDefaultCommand() {}
 
 /**
- * Start the compressor going. The compressor automatically starts and stops as it goes above and below maximum pressure.
+ * Start the compressor going. The compressor automatically starts and stops as
+ * it goes above and below maximum pressure.
  */
 void Pneumatics::Start() {
 #ifndef SIMULATION

@@ -1,14 +1,18 @@
-#ifndef Collect_H
-#define Collect_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <Commands/CommandGroup.h>
 
 /**
  * Get the robot set to collect balls.
  */
-class Collect: public frc::CommandGroup {
+class Collect : public frc::CommandGroup {
 public:
 	Collect();
 };
-
-#endif  // Collect_H

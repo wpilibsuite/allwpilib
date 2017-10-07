@@ -1,5 +1,11 @@
-#ifndef Wrist_H
-#define Wrist_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <AnalogPotentiometer.h>
 #include <Commands/PIDSubsystem.h>
@@ -9,7 +15,7 @@
  * The wrist subsystem is like the elevator, but with a rotational joint instead
  * of a linear joint.
  */
-class Wrist: public PIDSubsystem {
+class Wrist : public PIDSubsystem {
 public:
 	Wrist();
 
@@ -27,23 +33,23 @@ public:
 	double ReturnPIDInput() override;
 
 	/**
-	 * Use the motor as the PID output. This method is automatically called by
+	 * Use the motor as the PID output. This method is automatically called
+	 * by
 	 * the subsystem.
 	 */
 	void UsePIDOutput(double d) override;
 
 private:
-	frc::Victor motor { 6 };
+	frc::Victor motor{6};
 
-	// Conversion value of potentiometer varies between the real world and simulation
+// Conversion value of potentiometer varies between the real world and
+// simulation
 #ifndef SIMULATION
-	frc::AnalogPotentiometer pot { 3, -270.0 / 5 };
+	frc::AnalogPotentiometer pot{3, -270.0 / 5};
 #else
-	frc::AnalogPotentiometer pot { 3 }; // Defaults to degrees
+	frc::AnalogPotentiometer pot{3};  // Defaults to degrees
 #endif
 
 	static constexpr double kP_real = 1;
 	static constexpr double kP_simulation = 0.05;
 };
-
-#endif  // Wrist_H

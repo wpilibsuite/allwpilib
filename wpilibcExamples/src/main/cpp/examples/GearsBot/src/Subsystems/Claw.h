@@ -1,5 +1,11 @@
-#ifndef Claw_H
-#define Claw_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <Commands/Subsystem.h>
 #include <DigitalInput.h>
@@ -10,7 +16,7 @@
  * If using stronger motors, you should probably use a sensor so that the
  * motors don't stall.
  */
-class Claw: public frc::Subsystem {
+class Claw : public frc::Subsystem {
 public:
 	Claw();
 
@@ -40,8 +46,6 @@ public:
 	void Log();
 
 private:
-	frc::Victor motor { 7 };
-	frc::DigitalInput contact { 5 };
+	frc::Victor motor{7};
+	frc::DigitalInput contact{5};
 };
-
-#endif  // Claw_H

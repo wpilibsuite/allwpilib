@@ -1,18 +1,25 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "Shooter.h"
 
 #include <LiveWindow/LiveWindow.h>
 
-Shooter::Shooter() :
-		Subsystem("Shooter") {
+Shooter::Shooter()
+    : Subsystem("Shooter") {
 	// Put everything to the LiveWindow for testing.
-	frc::LiveWindow::GetInstance()->AddSensor("Shooter", "Hot Goal Sensor",
-			&hotGoalSensor);
+	frc::LiveWindow::GetInstance()->AddSensor(
+			"Shooter", "Hot Goal Sensor", &hotGoalSensor);
 	frc::LiveWindow::GetInstance()->AddSensor("Shooter",
 			"Piston1 Reed Switch Front ", &piston1ReedSwitchFront);
 	frc::LiveWindow::GetInstance()->AddSensor("Shooter",
 			"Piston1 Reed Switch Back ", &piston1ReedSwitchBack);
-	frc::LiveWindow::GetInstance()->AddActuator("Shooter", "Latch Piston",
-			&latchPiston);
+	frc::LiveWindow::GetInstance()->AddActuator(
+			"Shooter", "Latch Piston", &latchPiston);
 }
 
 void Shooter::InitDefaultCommand() {

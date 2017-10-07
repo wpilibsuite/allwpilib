@@ -1,10 +1,17 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <IterativeRobot.h>
 #include <Joystick.h>
 #include <LiveWindow/LiveWindow.h>
 #include <RobotDrive.h>
 #include <Timer.h>
 
-class Robot: public frc::IterativeRobot {
+class Robot : public frc::IterativeRobot {
 public:
 	Robot() {
 		myRobot.SetExpiration(0.1);
@@ -12,8 +19,8 @@ public:
 	}
 
 private:
-	frc::RobotDrive myRobot { 0, 1 };  // Robot drive system
-	frc::Joystick stick { 0 };         // Only joystick
+	frc::RobotDrive myRobot{0, 1};  // Robot drive system
+	frc::Joystick stick{0};		// Only joystick
 	frc::LiveWindow* lw = frc::LiveWindow::GetInstance();
 	frc::Timer timer;
 
@@ -31,18 +38,14 @@ private:
 		}
 	}
 
-	void TeleopInit() override {
-
-	}
+	void TeleopInit() override {}
 
 	void TeleopPeriodic() override {
 		// Drive with arcade style (use right stick)
 		myRobot.ArcadeDrive(stick);
 	}
 
-	void TestPeriodic() override {
-		lw->Run();
-	}
+	void TestPeriodic() override { lw->Run(); }
 };
 
 START_ROBOT_CLASS(Robot)

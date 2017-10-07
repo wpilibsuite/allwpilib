@@ -1,5 +1,11 @@
-#ifndef Shooter_H
-#define Shooter_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <Commands/Subsystem.h>
 #include <DigitalInput.h>
@@ -16,7 +22,7 @@
  * NOTE: Simulation currently approximates this as as single pneumatic cylinder
  * and ignores the latch.
  */
-class Shooter: public frc::Subsystem {
+class Shooter : public frc::Subsystem {
 public:
 	Shooter();
 	void InitDefaultCommand() override;
@@ -54,7 +60,8 @@ public:
 	/**
 	 * Turns off the piston1 double solenoid. This won't actuate anything
 	 * because double solenoids preserve their state when turned off. This
-	 * should be called in order to reduce the amount of time that the coils are
+	 * should be called in order to reduce the amount of time that the coils
+	 * are
 	 * powered.
 	 */
 	void Off1();
@@ -62,7 +69,8 @@ public:
 	/**
 	 * Turns off the piston1 double solenoid. This won't actuate anything
 	 * because double solenoids preserve their state when turned off. This
-	 * should be called in order to reduce the amount of time that the coils are
+	 * should be called in order to reduce the amount of time that the coils
+	 * are
 	 * powered.
 	 */
 	void Off2();
@@ -73,7 +81,8 @@ public:
 	void Unlatch();
 
 	/**
-	 * Latch so that pressure can build up and we aren't limited by air flow.
+	 * Latch so that pressure can build up and we aren't limited by air
+	 * flow.
 	 */
 	void Latch();
 
@@ -93,8 +102,10 @@ public:
 	bool Piston1IsRetracted();
 
 	/**
-	 * Turns off all double solenoids. Double solenoids hold their position when
-	 * they are turned off. We should turn them off whenever possible to extend
+	 * Turns off all double solenoids. Double solenoids hold their position
+	 * when
+	 * they are turned off. We should turn them off whenever possible to
+	 * extend
 	 * the life of the coils
 	 */
 	void OffBoth();
@@ -106,12 +117,11 @@ public:
 
 private:
 	// Devices
-	frc::DoubleSolenoid piston1 { 3, 4 };
-	frc::DoubleSolenoid piston2 { 5, 6 };
-	frc::Solenoid latchPiston { 1, 2 };
-	frc::DigitalInput piston1ReedSwitchFront { 9 };
-	frc::DigitalInput piston1ReedSwitchBack { 11 };
-	frc::DigitalInput hotGoalSensor { 7 }; // NOTE: Currently ignored in simulation
+	frc::DoubleSolenoid piston1{3, 4};
+	frc::DoubleSolenoid piston2{5, 6};
+	frc::Solenoid latchPiston{1, 2};
+	frc::DigitalInput piston1ReedSwitchFront{9};
+	frc::DigitalInput piston1ReedSwitchBack{11};
+	frc::DigitalInput hotGoalSensor{
+			7};  // NOTE: Currently ignored in simulation
 };
-
-#endif

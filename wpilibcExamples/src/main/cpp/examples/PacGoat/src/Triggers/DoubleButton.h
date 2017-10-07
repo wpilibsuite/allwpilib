@@ -1,5 +1,11 @@
-#ifndef DOUBLEBUTTON_H_
-#define DOUBLEBUTTON_H_
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <Buttons/Trigger.h>
 
@@ -7,7 +13,7 @@ namespace frc {
 class Joystick;
 }
 
-class DoubleButton: public frc::Trigger {
+class DoubleButton : public frc::Trigger {
 public:
 	DoubleButton(frc::Joystick* joy, int button1, int button2);
 
@@ -18,5 +24,3 @@ private:
 	int button1;
 	int button2;
 };
-
-#endif  // DOUBLEBUTTON_H_

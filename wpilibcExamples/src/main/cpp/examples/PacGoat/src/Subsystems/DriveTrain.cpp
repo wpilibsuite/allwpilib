@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "DriveTrain.h"
 
 #include <cmath>
@@ -7,12 +14,16 @@
 
 #include "../Commands/DriveWithJoystick.h"
 
-DriveTrain::DriveTrain() :
-		frc::Subsystem("DriveTrain") {
-	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Left CIM", &frontLeftCIM);
-	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Right CIM", &frontRightCIM);
-	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Left CIM", &backLeftCIM);
-	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Right CIM", &backRightCIM);
+DriveTrain::DriveTrain()
+    : frc::Subsystem("DriveTrain") {
+	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Left
+	// CIM", &frontLeftCIM);
+	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front
+	// Right CIM", &frontRightCIM);
+	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Left
+	// CIM", &backLeftCIM);
+	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Right
+	// CIM", &backRightCIM);
 
 	// Configure the RobotDrive to reflect the fact that all our motors are
 	// wired backwards and our drivers sensitivity preferences.
@@ -35,18 +46,20 @@ DriveTrain::DriveTrain() :
 	leftEncoder->SetDistancePerPulse(0.0785398);
 #else
 	// Convert to feet 4in diameter wheels with 360 tick simulated encoders
-	rightEncoder->SetDistancePerPulse((4.0/*in*/*M_PI)/(360.0*12.0/*in/ft*/));
-	leftEncoder->SetDistancePerPulse((4.0/*in*/*M_PI)/(360.0*12.0/*in/ft*/));
+	rightEncoder->SetDistancePerPulse(
+			(4.0 /*in*/ * M_PI) / (360.0 * 12.0 /*in/ft*/));
+	leftEncoder->SetDistancePerPulse(
+			(4.0 /*in*/ * M_PI) / (360.0 * 12.0 /*in/ft*/));
 #endif
 
-	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Right Encoder",
-			rightEncoder);
-	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Left Encoder",
-			leftEncoder);
+	LiveWindow::GetInstance()->AddSensor(
+			"DriveTrain", "Right Encoder", rightEncoder);
+	LiveWindow::GetInstance()->AddSensor(
+			"DriveTrain", "Left Encoder", leftEncoder);
 
-	// Configure gyro
+// Configure gyro
 #ifndef SIMULATION
-	gyro.SetSensitivity(0.007); // TODO: Handle more gracefully?
+	gyro.SetSensitivity(0.007);  // TODO: Handle more gracefully?
 #endif
 	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Gyro", &gyro);
 }

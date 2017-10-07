@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <IterativeRobot.h>
 #include <Joystick.h>
 #include <Relay.h>
@@ -11,7 +18,7 @@
  *   one output; pressing the button sets the output to 12V and releasing sets
  *   it to 0V.
  */
-class Robot: public frc::IterativeRobot {
+class Robot : public frc::IterativeRobot {
 public:
 	void TeleopPeriodic() override {
 		/* Retrieve the button values. GetRawButton will return
@@ -38,8 +45,8 @@ public:
 	}
 
 private:
-	frc::Joystick m_stick { 0 };
-	frc::Relay m_relay { 0 };
+	frc::Joystick m_stick{0};
+	frc::Relay m_relay{0};
 
 	static constexpr int kRelayForwardButton = 1;
 	static constexpr int kRelayReverseButton = 2;

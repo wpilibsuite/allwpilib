@@ -1,12 +1,19 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "DriveAndShootAutonomous.h"
 
+#include "../Robot.h"
 #include "CheckForHotGoal.h"
 #include "CloseClaw.h"
 #include "DriveForward.h"
 #include "SetPivotSetpoint.h"
 #include "Shoot.h"
 #include "WaitForPressure.h"
-#include "../Robot.h"
 
 DriveAndShootAutonomous::DriveAndShootAutonomous() {
 	AddSequential(new CloseClaw());

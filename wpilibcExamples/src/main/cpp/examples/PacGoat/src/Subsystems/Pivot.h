@@ -1,5 +1,11 @@
-#ifndef Pivot_H
-#define Pivot_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <AnalogPotentiometer.h>
 #include <Commands/PIDSubsystem.h>
@@ -21,11 +27,10 @@ public:
 	Pivot();
 
 	/**
-	 *  No default command, if PID is enabled, the current setpoint will be maintained.
+	 *  No default command, if PID is enabled, the current setpoint will be
+	 * maintained.
 	 */
-	void InitDefaultCommand() override {
-
-	}
+	void InitDefaultCommand() override {}
 
 	/**
 	 * @return The angle read in by the potentiometer
@@ -56,16 +61,14 @@ private:
 	// Subsystem devices
 
 	// Sensors for measuring the position of the pivot
-	frc::DigitalInput upperLimitSwitch { 13 };
-	frc::DigitalInput lowerLimitSwitch { 12 };
+	frc::DigitalInput upperLimitSwitch{13};
+	frc::DigitalInput lowerLimitSwitch{12};
 
 	/* 0 degrees is vertical facing up.
 	 * Angle increases the more forward the pivot goes.
 	 */
-	frc::AnalogPotentiometer pot { 1 };
+	frc::AnalogPotentiometer pot{1};
 
 	// Motor to move the pivot
-	frc::Victor motor { 5 };
+	frc::Victor motor{5};
 };
-
-#endif  // Pivot_H

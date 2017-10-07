@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <array>
 
 #include <AnalogInput.h>
@@ -11,18 +18,15 @@
  * PID Controller to reach and maintain position setpoints on an elevator
  * mechanism.
  */
-class Robot: public frc::IterativeRobot {
+class Robot : public frc::IterativeRobot {
 public:
-	void RobotInit() override {
-		pidController.SetInputRange(0, 5);
-	}
+	void RobotInit() override { pidController.SetInputRange(0, 5); }
 
-	void TeleopInit() override {
-		pidController.Enable();
-	}
+	void TeleopInit() override { pidController.Enable(); }
 
 	void TeleopPeriodic() override {
-		// when the button is pressed once, the selected elevator setpoint
+		// when the button is pressed once, the selected elevator
+		// setpoint
 		// is incremented
 		bool currentButtonValue = joystick.GetTrigger();
 		if (currentButtonValue && !previousButtonValue) {
@@ -40,10 +44,12 @@ private:
 	static constexpr int kJoystickChannel = 0;
 
 	// Bottom, middle, and top elevator setpoints
-	static constexpr std::array<double, 3> kSetPoints = { 1.0, 2.6, 4.3 };
+	static constexpr std::array<double, 3> kSetPoints = {1.0, 2.6, 4.3};
 
-	/* proportional, integral, and derivative speed constants; motor inverted
-	 * DANGER: when tuning PID constants, high/inappropriate values for pGain,
+	/* proportional, integral, and derivative speed constants; motor
+	 * inverted
+	 * DANGER: when tuning PID constants, high/inappropriate values for
+	 * pGain,
 	 * iGain, and dGain may cause dangerous, uncontrollable, or
 	 * undesired behavior!
 	 *
@@ -56,17 +62,19 @@ private:
 	int index = 0;
 	bool previousButtonValue = false;
 
-	frc::AnalogInput potentiometer { kPotChannel };
-	frc::Joystick joystick { kJoystickChannel };
-	frc::Spark elevatorMotor { kMotorChannel };
+	frc::AnalogInput potentiometer{kPotChannel};
+	frc::Joystick joystick{kJoystickChannel};
+	frc::Spark elevatorMotor{kMotorChannel};
 
-	/* potentiometer (AnalogInput) and elevatorMotor (Victor) can be used as a
-	 * PIDSource and PIDOutput respectively. The PIDController takes pointers
+	/* potentiometer (AnalogInput) and elevatorMotor (Victor) can be used as
+	 * a
+	 * PIDSource and PIDOutput respectively. The PIDController takes
+	 * pointers
 	 * to the PIDSource and PIDOutput, so you must use &potentiometer and
 	 * &elevatorMotor to get their pointers.
 	 */
-	frc::PIDController pidController { kP, kI, kD, &potentiometer,
-			&elevatorMotor };
+	frc::PIDController pidController{
+			kP, kI, kD, &potentiometer, &elevatorMotor};
 };
 
 constexpr std::array<double, 3> Robot::kSetPoints;

@@ -1,5 +1,11 @@
-#ifndef ROBOTMAP_H
-#define ROBOTMAP_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 /**
  * The RobotMap is a mapping from the ports sensors and actuators are wired into
@@ -17,5 +23,3 @@
 // number and the module. For example you with a rangefinder:
 // constexpr int RANGE_FINDER_PORT = 1;
 // constexpr int RANGE_FINDER_MODULE = 1;
-
-#endif  // ROBOTMAP_H

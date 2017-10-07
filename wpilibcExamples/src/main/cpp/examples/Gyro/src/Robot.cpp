@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <cmath>
 
 #include <AnalogGyro.h>
@@ -6,11 +13,13 @@
 #include <RobotDrive.h>
 
 /**
- * This is a sample program to demonstrate how to use a gyro sensor to make a robot drive
- * straight. This program uses a joystick to drive forwards and backwards while the gyro
+ * This is a sample program to demonstrate how to use a gyro sensor to make a
+ * robot drive
+ * straight. This program uses a joystick to drive forwards and backwards while
+ * the gyro
  * is used for direction keeping.
  */
-class Robot: public frc::IterativeRobot {
+class Robot : public frc::IterativeRobot {
 public:
 	void RobotInit() override {
 		gyro.SetSensitivity(kVoltsPerDegreePerSecond);
@@ -18,7 +27,8 @@ public:
 
 	/**
 	 * The motor speed is set from the joystick while the RobotDrive turning
-	 * value is assigned from the error between the setpoint and the gyro angle.
+	 * value is assigned from the error between the setpoint and the gyro
+	 * angle.
 	 */
 	void TeleopPeriodic() override {
 		double turningValue = (kAngleSetpoint - gyro.GetAngle()) * kP;
@@ -40,9 +50,9 @@ private:
 	static constexpr int kGyroPort = 0;
 	static constexpr int kJoystickPort = 0;
 
-	frc::RobotDrive myRobot { kLeftMotorPort, kRightMotorPort };
-	frc::AnalogGyro gyro { kGyroPort };
-	frc::Joystick joystick { kJoystickPort };
+	frc::RobotDrive myRobot{kLeftMotorPort, kRightMotorPort};
+	frc::AnalogGyro gyro{kGyroPort};
+	frc::Joystick joystick{kJoystickPort};
 };
 
 START_ROBOT_CLASS(Robot)

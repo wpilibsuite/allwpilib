@@ -1,5 +1,11 @@
-#ifndef SetWristSetpoint_H
-#define SetWristSetpoint_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <Commands/Command.h>
 
@@ -8,14 +14,12 @@
  * the tolerance, but leaves the PID loop running to maintain the position.
  * Other commands using the wrist should make sure they disable PID!
  */
-class SetWristSetpoint: public frc::Command {
+class SetWristSetpoint : public frc::Command {
 public:
-	SetWristSetpoint(double setpoint);
+	explicit SetWristSetpoint(double setpoint);
 	void Initialize() override;
 	bool IsFinished() override;
 
 private:
 	double setpoint;
 };
-
-#endif  // SetWristSetpoint_H

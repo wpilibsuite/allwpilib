@@ -1,9 +1,16 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "SetWristSetpoint.h"
 
 #include "../Robot.h"
 
-SetWristSetpoint::SetWristSetpoint(double setpoint) :
-		frc::Command("SetWristSetpoint") {
+SetWristSetpoint::SetWristSetpoint(double setpoint)
+    : frc::Command("SetWristSetpoint") {
 	this->setpoint = setpoint;
 	Requires(Robot::wrist.get());
 }

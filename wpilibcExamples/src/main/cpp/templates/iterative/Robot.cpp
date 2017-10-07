@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -7,7 +14,7 @@
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
 
-class Robot: public frc::IterativeRobot {
+class Robot : public frc::IterativeRobot {
 public:
 	void RobotInit() {
 		chooser.AddDefault(autoNameDefault, autoNameDefault);
@@ -16,19 +23,23 @@ public:
 	}
 
 	/*
-	 * This autonomous (along with the chooser code above) shows how to select
+	 * This autonomous (along with the chooser code above) shows how to
+	 * select
 	 * between different autonomous modes using the dashboard. The sendable
 	 * chooser code works with the Java SmartDashboard. If you prefer the
 	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
 	 * GetString line to get the auto name from the text box below the Gyro.
 	 *
-	 * You can add additional auto modes by adding additional comparisons to the
+	 * You can add additional auto modes by adding additional comparisons to
+	 * the
 	 * if-else structure below with additional strings. If using the
-	 * SendableChooser make sure to add them to the chooser code above as well.
+	 * SendableChooser make sure to add them to the chooser code above as
+	 * well.
 	 */
 	void AutonomousInit() override {
 		autoSelected = chooser.GetSelected();
-		// std::string autoSelected = SmartDashboard::GetString("Auto Selector", autoNameDefault);
+		// std::string autoSelected = SmartDashboard::GetString("Auto
+		// Selector", autoNameDefault);
 		std::cout << "Auto selected: " << autoSelected << std::endl;
 
 		if (autoSelected == autoNameCustom) {
@@ -46,17 +57,11 @@ public:
 		}
 	}
 
-	void TeleopInit() {
+	void TeleopInit() {}
 
-	}
+	void TeleopPeriodic() {}
 
-	void TeleopPeriodic() {
-
-	}
-
-	void TestPeriodic() {
-		lw->Run();
-	}
+	void TestPeriodic() { lw->Run(); }
 
 private:
 	frc::LiveWindow* lw = LiveWindow::GetInstance();

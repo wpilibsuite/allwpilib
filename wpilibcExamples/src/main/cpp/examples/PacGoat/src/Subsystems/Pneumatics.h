@@ -1,5 +1,11 @@
-#ifndef Pneumatics_H
-#define Pneumatics_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <AnalogInput.h>
 #include <Commands/Subsystem.h>
@@ -8,9 +14,10 @@
 /**
  * The Pneumatics subsystem contains the compressor and a pressure sensor.
  *
- * NOTE: The simulator currently doesn't support the compressor or pressure sensors.
+ * NOTE: The simulator currently doesn't support the compressor or pressure
+ * sensors.
  */
-class Pneumatics: public frc::Subsystem {
+class Pneumatics : public frc::Subsystem {
 public:
 	Pneumatics();
 
@@ -20,7 +27,8 @@ public:
 	void InitDefaultCommand() override;
 
 	/**
-	 * Start the compressor going. The compressor automatically starts and stops as it goes above and below maximum pressure.
+	 * Start the compressor going. The compressor automatically starts and
+	 * stops as it goes above and below maximum pressure.
 	 */
 	void Start();
 
@@ -35,13 +43,11 @@ public:
 	void WritePressure();
 
 private:
-	frc::AnalogInput pressureSensor { 3 };
+	frc::AnalogInput pressureSensor{3};
 
 #ifndef SIMULATION
-	frc::Compressor compressor { 1 };  // TODO: (1, 14, 1, 8);
+	frc::Compressor compressor{1};  // TODO: (1, 14, 1, 8);
 #endif
 
 	static constexpr double kMaxPressure = 2.55;
 };
-
-#endif  // Pneumatics_H

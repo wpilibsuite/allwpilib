@@ -1,5 +1,11 @@
-#ifndef SetDistanceToBox_H
-#define SetDistanceToBox_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <Commands/Command.h>
 #include <PIDOutput.h>
@@ -15,26 +21,25 @@ class PIDController;
  * command is running. The input is the averaged values of the left and right
  * encoders.
  */
-class SetDistanceToBox: public frc::Command {
+class SetDistanceToBox : public frc::Command {
 public:
-	SetDistanceToBox(double distance);
+	explicit SetDistanceToBox(double distance);
 	void Initialize() override;
 	bool IsFinished() override;
 	void End() override;
+
 private:
 	frc::PIDController* pid;
 };
 
-class SetDistanceToBoxPIDSource: public frc::PIDSource {
+class SetDistanceToBoxPIDSource : public frc::PIDSource {
 public:
 	virtual ~SetDistanceToBoxPIDSource() = default;
 	double PIDGet() override;
 };
 
-class SetDistanceToBoxPIDOutput: public frc::PIDOutput {
+class SetDistanceToBoxPIDOutput : public frc::PIDOutput {
 public:
 	virtual ~SetDistanceToBoxPIDOutput() = default;
 	void PIDWrite(double d) override;
 };
-
-#endif  // SetDistanceToBox_H

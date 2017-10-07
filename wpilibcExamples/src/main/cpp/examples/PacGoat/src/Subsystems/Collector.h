@@ -1,5 +1,11 @@
-#ifndef Collector_H
-#define Collector_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <Commands/Subsystem.h>
 #include <DigitalInput.h>
@@ -7,11 +13,12 @@
 #include <Victor.h>
 
 /**
- * The Collector subsystem has one motor for the rollers, a limit switch for ball
+ * The Collector subsystem has one motor for the rollers, a limit switch for
+ * ball
  * detection, a piston for opening and closing the claw, and a reed switch to
  * check if the piston is open.
  */
-class Collector: public frc::Subsystem {
+class Collector : public frc::Subsystem {
 public:
 	// Constants for some useful speeds
 	static constexpr double kForward = 1;
@@ -21,7 +28,8 @@ public:
 	Collector();
 
 	/**
-	 * NOTE: The current simulation model uses the the lower part of the claw
+	 * NOTE: The current simulation model uses the the lower part of the
+	 * claw
 	 * since the limit switch wasn't exported. At some point, this will be
 	 * updated.
 	 *
@@ -61,10 +69,8 @@ public:
 
 private:
 	// Subsystem devices
-	frc::Victor rollerMotor { 6 };
-	frc::DigitalInput ballDetector { 10 };
-	frc::Solenoid piston { 1 };
-	frc::DigitalInput openDetector { 6 };
+	frc::Victor rollerMotor{6};
+	frc::DigitalInput ballDetector{10};
+	frc::Solenoid piston{1};
+	frc::DigitalInput openDetector{6};
 };
-
-#endif  // Collector_H

@@ -1,3 +1,10 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include "DriveForward.h"
 
 #include <cmath>
@@ -30,9 +37,11 @@ void DriveForward::Initialize() {
 
 // Called repeatedly when this Command is scheduled to run
 void DriveForward::Execute() {
-	error = (distance - Robot::drivetrain->GetRightEncoder()->GetDistance());
+	error = (distance
+			- Robot::drivetrain->GetRightEncoder()->GetDistance());
 	if (driveForwardSpeed * kP * error >= driveForwardSpeed) {
-		Robot::drivetrain->TankDrive(driveForwardSpeed, driveForwardSpeed);
+		Robot::drivetrain->TankDrive(
+				driveForwardSpeed, driveForwardSpeed);
 	} else {
 		Robot::drivetrain->TankDrive(driveForwardSpeed * kP * error,
 				driveForwardSpeed * kP * error);

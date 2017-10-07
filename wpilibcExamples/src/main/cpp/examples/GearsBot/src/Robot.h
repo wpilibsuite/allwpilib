@@ -1,5 +1,11 @@
-#ifndef ROBOT_H_
-#define ROBOT_H_
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <memory>
 
@@ -14,7 +20,7 @@
 #include "Subsystems/Elevator.h"
 #include "Subsystems/Wrist.h"
 
-class Robot: public frc::IterativeRobot {
+class Robot : public frc::IterativeRobot {
 public:
 	static std::shared_ptr<DriveTrain> drivetrain;
 	static std::shared_ptr<Elevator> elevator;
@@ -33,5 +39,3 @@ private:
 	void TeleopPeriodic() override;
 	void TestPeriodic() override;
 };
-
-#endif  // ROBOT_H_

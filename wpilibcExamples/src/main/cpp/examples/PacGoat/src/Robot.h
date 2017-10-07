@@ -1,5 +1,11 @@
-#ifndef MY_ROBOT_H_
-#define MY_ROBOT_H_
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <memory>
 
@@ -16,7 +22,7 @@
 #include "Subsystems/Pneumatics.h"
 #include "Subsystems/Shooter.h"
 
-class Robot: public IterativeRobot {
+class Robot : public IterativeRobot {
 public:
 	static std::shared_ptr<DriveTrain> drivetrain;
 	static std::shared_ptr<Pivot> pivot;
@@ -27,9 +33,9 @@ public:
 
 private:
 	frc::Command* autonomousCommand = nullptr;
-	std::unique_ptr<frc::Command> driveAndShootAuto {
-		new DriveAndShootAutonomous() };
-	std::unique_ptr<frc::Command> driveForwardAuto { new DriveForward() };
+	std::unique_ptr<frc::Command> driveAndShootAuto{
+			new DriveAndShootAutonomous()};
+	std::unique_ptr<frc::Command> driveForwardAuto{new DriveForward()};
 	SendableChooser<frc::Command*> autoChooser;
 
 	void RobotInit() override;
@@ -43,5 +49,3 @@ private:
 
 	void Log();
 };
-
-#endif  // ROBOT_H_

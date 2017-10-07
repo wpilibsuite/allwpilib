@@ -1,5 +1,11 @@
-#ifndef CheckForHotGoal_H
-#define CheckForHotGoal_H
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#pragma once
 
 #include <Commands/Command.h>
 
@@ -9,10 +15,8 @@
  * points than get none. When called sequentially, this command will block until
  * the hot goal is detected or until it is timed out.
  */
-class CheckForHotGoal: public frc::Command {
+class CheckForHotGoal : public frc::Command {
 public:
-	CheckForHotGoal(double time);
+	explicit CheckForHotGoal(double time);
 	bool IsFinished() override;
 };
-
-#endif  // CheckForHotGoal_H
