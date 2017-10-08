@@ -25,23 +25,25 @@ HAL_Bool HALSIM_GetSPIInitialized(int32_t index);
 void HALSIM_SetSPIInitialized(int32_t index, HAL_Bool initialized);
 
 int32_t HALSIM_RegisterSPIReadCallback(int32_t index,
-		HAL_ReadBufferCallback callback,
-        void* param);
-void HALSIM_CancelSPIReadCallback(int32_t index,
-                                     int32_t uid);
+                                       HAL_BufferCallback callback,
+                                       void* param);
+void HALSIM_CancelSPIReadCallback(int32_t index, int32_t uid);
 
 int32_t HALSIM_RegisterSPIWriteCallback(int32_t index,
-		                                HAL_WriteBufferCallback callback,
+                                        HAL_BufferCallback callback,
                                         void* param);
-void HALSIM_CancelSPIWriteCallback(int32_t index,
-                                     int32_t uid);
+void HALSIM_CancelSPIWriteCallback(int32_t index, int32_t uid);
 
 int32_t HALSIM_RegisterSPIResetAccumulatorCallback(int32_t index,
-                                          HAL_NotifyCallback callback,
-                                          void* param, HAL_Bool initialNotify);
-void HALSIM_CancelSPIResetAccumulatorCallback(int32_t index,
-                                     int32_t uid);
+                                                   HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify);
+void HALSIM_CancelSPIResetAccumulatorCallback(int32_t index, int32_t uid);
 
+int32_t HALSIM_RegisterSPISetAccumulatorCallback(int32_t index,
+                                                 HAL_BufferCallback callback,
+                                                 void* param);
+void HALSIM_CancelSPISetAccumulatorCallback(int32_t index, int32_t uid);
 void HALSIM_SetSPISetAccumulatorValue(int32_t index, int64_t value);
 int64_t HALSIM_GetSPIGetAccumulatorValue(int32_t index);
 

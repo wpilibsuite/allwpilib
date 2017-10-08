@@ -12,18 +12,15 @@
 typedef void (*HAL_NotifyCallback)(const char* name, void* param,
                                    const struct HAL_Value* value);
 
-typedef void (*HAL_ReadBufferCallback)(const char* name, void* param,
-                                       unsigned char* buffer, unsigned int count);
-
-typedef void (*HAL_WriteBufferCallback)(const char* name, void* param,
-                                        unsigned char* buffer, unsigned int count);
+typedef void (*HAL_BufferCallback)(const char* name, void* param,
+                                   unsigned char* buffer, unsigned int count);
 
 namespace hal {
 
-template<typename CallbackFunction>
+template <typename CallbackFunction>
 struct HalCallbackListener {
-	HalCallbackListener() = default;
-	HalCallbackListener(void* param_, CallbackFunction callback_)
+  HalCallbackListener() = default;
+  HalCallbackListener(void* param_, CallbackFunction callback_)
       : callback(callback_), param(param_) {}
 
   explicit operator bool() const { return callback != nullptr; }
@@ -32,7 +29,4 @@ struct HalCallbackListener {
   void* param;
 };
 
-//typedef HalCallbackListener<HAL_NotifyCallback> NotifyListener;
-//typedef HalCallbackListener<HAL_ReadBufferCallback> ReadBufferListener;
-//typedef HalCallbackListener<HAL_WriteBufferCallback> WriteBufferListener;
 }  // namespace hal

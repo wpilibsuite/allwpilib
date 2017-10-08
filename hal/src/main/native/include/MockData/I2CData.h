@@ -16,9 +16,6 @@ extern "C" {
 
 void HALSIM_ResetI2CData(int32_t index);
 
-//////////////////////
-// Initialize
-//////////////////////
 int32_t HALSIM_RegisterI2CInitializedCallback(int32_t index,
                                               HAL_NotifyCallback callback,
                                               void* param,
@@ -28,16 +25,14 @@ HAL_Bool HALSIM_GetI2CInitialized(int32_t index);
 void HALSIM_SetI2CInitialized(int32_t index, HAL_Bool initialized);
 
 int32_t HALSIM_RegisterI2CReadCallback(int32_t index,
-		HAL_ReadBufferCallback callback,
-                                          void* param);
-void HALSIM_CancelI2CReadCallback(int32_t index,
-                                     int32_t uid);
+                                       HAL_BufferCallback callback,
+                                       void* param);
+void HALSIM_CancelI2CReadCallback(int32_t index, int32_t uid);
 
 int32_t HALSIM_RegisterI2CWriteCallback(int32_t index,
-		HAL_WriteBufferCallback callback,
-                                          void* param);
-void HALSIM_CancelI2CWriteCallback(int32_t index,
-                                     int32_t uid);
+                                        HAL_BufferCallback callback,
+                                        void* param);
+void HALSIM_CancelI2CWriteCallback(int32_t index, int32_t uid);
 
 #ifdef __cplusplus
 }

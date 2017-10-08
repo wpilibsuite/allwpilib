@@ -20,9 +20,6 @@ class I2CData {
   I2CData();
   ~I2CData();
 
-  ////////////////////////
-  // Initialize
-  ////////////////////////
   int32_t RegisterInitializedCallback(HAL_NotifyCallback callback, void* param,
                                       HAL_Bool initialNotify);
   void CancelInitializedCallback(int32_t uid);
@@ -30,10 +27,10 @@ class I2CData {
   HAL_Bool GetInitialized();
   void SetInitialized(HAL_Bool initialized);
 
-  int32_t RegisterReadCallback(HAL_ReadBufferCallback callback, void* param);
+  int32_t RegisterReadCallback(HAL_BufferCallback callback, void* param);
   void CancelReadCallback(int32_t uid);
 
-  int32_t RegisterWriteCallback(HAL_WriteBufferCallback callback, void* param);
+  int32_t RegisterWriteCallback(HAL_BufferCallback callback, void* param);
   void CancelWriteCallback(int32_t uid);
 
   void Write(int32_t deviceAddress, uint8_t* dataToSend, int32_t sendSize);
@@ -42,12 +39,12 @@ class I2CData {
   void ResetData();
 
  private:
-   std::mutex m_registerMutex;
-   std::mutex m_dataMutex;
-   std::atomic<HAL_Bool> m_initialized{false};
-   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
-   std::shared_ptr<ReadBufferListenerVector> m_readCallbacks = nullptr;
-   std::shared_ptr<WriteBufferListenerVector> m_writeCallbacks = nullptr;
+  std::mutex m_registerMutex;
+  std::mutex m_dataMutex;
+  std::atomic<HAL_Bool> m_initialized{false};
+  std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
+  std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;
+  std::shared_ptr<BufferListenerVector> m_writeCallbacks = nullptr;
 };
 extern I2CData SimI2CData[];
 }  // namespace hal

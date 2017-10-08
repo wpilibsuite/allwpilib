@@ -22,16 +22,11 @@ void SPIData::ResetData() {
   m_readCallbacks = nullptr;
   m_writeCallbacks = nullptr;
   m_resetAccumulatorCallback = nullptr;
+  m_setAccumulatorCallback = nullptr;
 }
 
-SPIData::SPIData()
-{
-
-}
-SPIData::~SPIData()
-{
-
-}
+SPIData::SPIData() {}
+SPIData::~SPIData() {}
 
 int32_t SPIData::RegisterInitializedCallback(HAL_NotifyCallback callback,
                                              void* param,
@@ -69,52 +64,53 @@ void SPIData::SetInitialized(HAL_Bool initialized) {
   }
 }
 
-int32_t SPIData::RegisterReadCallback(HAL_ReadBufferCallback callback,
-                                             void* param) {
+int32_t SPIData::RegisterReadCallback(HAL_BufferCallback callback,
+                                      void* param) {
   // Must return -1 on a null callback for error handling
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
     std::lock_guard<std::mutex> lock(m_registerMutex);
-    m_readCallbacks = RegisterCallback(
-    		m_readCallbacks, "Read", callback, param, &newUid);
+    m_readCallbacks =
+        RegisterCallback(m_readCallbacks, "Read", callback, param, &newUid);
   }
 
   return newUid;
 }
 
 void SPIData::CancelReadCallback(int32_t uid) {
-	m_readCallbacks = CancelCallback(m_readCallbacks, uid);
+  m_readCallbacks = CancelCallback(m_readCallbacks, uid);
 }
 
-int32_t SPIData::RegisterWriteCallback(HAL_WriteBufferCallback callback,
-                                             void* param) {
+int32_t SPIData::RegisterWriteCallback(HAL_BufferCallback callback,
+                                       void* param) {
   // Must return -1 on a null callback for error handling
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
     std::lock_guard<std::mutex> lock(m_registerMutex);
-    m_writeCallbacks = RegisterCallback(
-    		m_writeCallbacks, "Write", callback, param, &newUid);
+    m_writeCallbacks =
+        RegisterCallback(m_writeCallbacks, "Write", callback, param, &newUid);
   }
 
   return newUid;
 }
 
 void SPIData::CancelWriteCallback(int32_t uid) {
-	m_writeCallbacks = CancelCallback(m_writeCallbacks, uid);
+  m_writeCallbacks = CancelCallback(m_writeCallbacks, uid);
 }
 
 int32_t SPIData::RegisterResetAccumulatorCallback(HAL_NotifyCallback callback,
-                                             void* param,
-                                             HAL_Bool initialNotify) {
+                                                  void* param,
+                                                  HAL_Bool initialNotify) {
   // Must return -1 on a null callback for error handling
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
     std::lock_guard<std::mutex> lock(m_registerMutex);
-    m_resetAccumulatorCallback = RegisterCallback(
-    		m_resetAccumulatorCallback, "ResetAccumulator", callback, param, &newUid);
+    m_resetAccumulatorCallback =
+        RegisterCallback(m_resetAccumulatorCallback, "ResetAccumulator",
+                         callback, param, &newUid);
   }
   if (initialNotify) {
     // We know that the callback is not null because of earlier null check
@@ -125,60 +121,79 @@ int32_t SPIData::RegisterResetAccumulatorCallback(HAL_NotifyCallback callback,
 }
 
 void SPIData::CancelResetAccumulatorCallback(int32_t uid) {
-	m_resetAccumulatorCallback = CancelCallback(m_resetAccumulatorCallback, uid);
+  m_resetAccumulatorCallback = CancelCallback(m_resetAccumulatorCallback, uid);
 }
 
-int32_t SPIData::Read(uint8_t* buffer, int32_t count)
-{
-	std::lock_guard<std::mutex> lock(m_dataMutex);
-	InvokeReadCallback(m_readCallbacks, "Read", buffer, count);
-
-	return count;
+int32_t SPIData::RegisterAccumulatorCallback(HAL_NotifyCallback callback,
+                                             void* param,
+                                             HAL_Bool initialNotify) {
+  // Must return -1 on a null callback for error handling
+  if (callback == nullptr) return -1;
+  int32_t newUid = 0;
+  {
+    std::lock_guard<std::mutex> lock(m_registerMutex);
+    m_setAccumulatorCallback = RegisterCallback(
+        m_setAccumulatorCallback, "SetAccumulator", callback, param, &newUid);
+  }
+  if (initialNotify) {
+    // We know that the callback is not null because of earlier null check
+    HAL_Value value = MakeInt(GetAccumulatorValue());
+    callback("SetAccumulator", param, &value);
+  }
+  return newUid;
 }
 
-int32_t SPIData::Write(uint8_t* dataToSend, int32_t sendSize)
-{
-	std::lock_guard<std::mutex> lock(m_dataMutex);
-	InvokeWriteCallback(m_writeCallbacks, "Write", dataToSend, sendSize);
-
-	return sendSize;
+void SPIData::CancelAccumulatorCallback(int32_t uid) {
+  m_setAccumulatorCallback = CancelCallback(m_setAccumulatorCallback, uid);
 }
 
-int32_t SPIData::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int32_t size)
-{
-	std::lock_guard<std::mutex> lock(m_dataMutex);
-	return size;
+void SPIData::InvokeSetAccumulatorCallback(HAL_Value value) {
+  InvokeCallback(m_setAccumulatorCallback, "SetAccumulator", &value);
 }
 
-void SPIData::ResetAccumulator()
-{
-	HAL_Value value = MakeInt(0);
-	InvokeCallback(m_resetAccumulatorCallback, "ResetAccumulator", &value);
-}
-
-void SPIData::SetAccumulatorValue(int64_t value)
-{
+void SPIData::SetAccumulatorValue(int64_t value) {
   int64_t oldValue = m_accumulatorValue.exchange(value);
   if (oldValue != value) {
+    InvokeSetAccumulatorCallback(MakeLong(value));
   }
 }
 
-int64_t SPIData::GetAccumulatorValue()
-{
-  return m_accumulatorValue;
+int64_t SPIData::GetAccumulatorValue() { return m_accumulatorValue; }
+
+int32_t SPIData::Read(uint8_t* buffer, int32_t count) {
+  std::lock_guard<std::mutex> lock(m_dataMutex);
+  InvokeCallback(m_readCallbacks, "Read", buffer, count);
+
+  return count;
+}
+
+int32_t SPIData::Write(uint8_t* dataToSend, int32_t sendSize) {
+  std::lock_guard<std::mutex> lock(m_dataMutex);
+  InvokeCallback(m_writeCallbacks, "Write", dataToSend, sendSize);
+
+  return sendSize;
+}
+
+int32_t SPIData::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
+                             int32_t size) {
+  std::lock_guard<std::mutex> lock(m_dataMutex);
+  return size;
+}
+
+void SPIData::ResetAccumulator() {
+  HAL_Value value = MakeInt(0);
+  InvokeCallback(m_resetAccumulatorCallback, "ResetAccumulator", &value);
 }
 
 extern "C" {
-void HALSIM_ResetSPIData(int32_t index) {
-  SimSPIData[index].ResetData();
-}
+void HALSIM_ResetSPIData(int32_t index) { SimSPIData[index].ResetData(); }
 
 int32_t HALSIM_RegisterSPIInitializedCallback(int32_t index,
-                                                  HAL_NotifyCallback callback,
-                                                  void* param,
-                                                  HAL_Bool initialNotify) {
+                                              HAL_NotifyCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify) {
   return SimSPIData[index].RegisterInitializedCallback(callback, param,
-                                                           initialNotify);
+                                                       initialNotify);
 }
 
 void HALSIM_CancelSPIInitializedCallback(int32_t index, int32_t uid) {
@@ -194,33 +209,31 @@ void HALSIM_SetSPIInitialized(int32_t index, HAL_Bool initialized) {
 }
 
 int32_t HALSIM_RegisterSPIReadCallback(int32_t index,
-		HAL_ReadBufferCallback callback,
-                                          void* param) {
+                                       HAL_BufferCallback callback,
+                                       void* param) {
   return SimSPIData[index].RegisterReadCallback(callback, param);
 }
-void HALSIM_CancelSPIReadCallback(int32_t index,
-                                     int32_t uid) {
+void HALSIM_CancelSPIReadCallback(int32_t index, int32_t uid) {
   SimSPIData[index].CancelReadCallback(uid);
 }
 
 int32_t HALSIM_RegisterSPIWriteCallback(int32_t index,
-		HAL_WriteBufferCallback callback,
-                                          void* param) {
+                                        HAL_BufferCallback callback,
+                                        void* param) {
   return SimSPIData[index].RegisterWriteCallback(callback, param);
 }
-void HALSIM_CancelSPIWriteCallback(int32_t index,
-                                     int32_t uid) {
+void HALSIM_CancelSPIWriteCallback(int32_t index, int32_t uid) {
   SimSPIData[index].CancelWriteCallback(uid);
 }
 
 int32_t HALSIM_RegisterSPIResetAccumulatorCallback(int32_t index,
-                                          HAL_NotifyCallback callback,
-                                          void* param,
-										  HAL_Bool initialNotify) {
-  return SimSPIData[index].RegisterResetAccumulatorCallback(callback, param, initialNotify);
+                                                   HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify) {
+  return SimSPIData[index].RegisterResetAccumulatorCallback(callback, param,
+                                                            initialNotify);
 }
-void HALSIM_CancelSPIResetAccumulatorCallback(int32_t index,
-                                     int32_t uid) {
+void HALSIM_CancelSPIResetAccumulatorCallback(int32_t index, int32_t uid) {
   SimSPIData[index].CancelResetAccumulatorCallback(uid);
 }
 
@@ -231,5 +244,4 @@ int64_t HALSIM_GetSPIGetAccumulatorValue(int32_t index) {
   return SimSPIData[index].GetAccumulatorValue();
 }
 
-
-} // extern c
+}  // extern c

@@ -9,7 +9,7 @@
 
 using namespace hal;
 
-template<typename VectorType, typename CallbackType>
+template <typename VectorType, typename CallbackType>
 std::shared_ptr<VectorType> RegisterCallbackImpl(
     std::shared_ptr<VectorType> currentVector, const char* name,
     CallbackType callback, void* param, int32_t* newUid) {
@@ -24,7 +24,7 @@ std::shared_ptr<VectorType> RegisterCallbackImpl(
   return newCallbacks;
 }
 
-template<typename VectorType, typename CallbackType>
+template <typename VectorType, typename CallbackType>
 std::shared_ptr<VectorType> CancelCallbackImpl(
     std::shared_ptr<VectorType> currentVector, int32_t uid) {
   // Create a copy of the callbacks to erase from
@@ -32,37 +32,17 @@ std::shared_ptr<VectorType> CancelCallbackImpl(
   return newCallbacks;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 std::shared_ptr<NotifyListenerVector> RegisterCallback(
     std::shared_ptr<NotifyListenerVector> currentVector, const char* name,
-	HAL_NotifyCallback callback, void* param, int32_t* newUid) {
-	return RegisterCallbackImpl<NotifyListenerVector, HAL_NotifyCallback>(currentVector, name, callback, param, newUid);
+    HAL_NotifyCallback callback, void* param, int32_t* newUid) {
+  return RegisterCallbackImpl<NotifyListenerVector, HAL_NotifyCallback>(
+      currentVector, name, callback, param, newUid);
 }
 
 std::shared_ptr<NotifyListenerVector> CancelCallback(
     std::shared_ptr<NotifyListenerVector> currentVector, int32_t uid) {
-  return CancelCallbackImpl<NotifyListenerVector, HAL_NotifyCallback>(currentVector, uid);
+  return CancelCallbackImpl<NotifyListenerVector, HAL_NotifyCallback>(
+      currentVector, uid);
 }
 
 void InvokeCallback(std::shared_ptr<NotifyListenerVector> currentVector,
@@ -78,25 +58,20 @@ void InvokeCallback(std::shared_ptr<NotifyListenerVector> currentVector,
   }
 }
 
-
-
-
-
-
-
-
-std::shared_ptr<ReadBufferListenerVector> RegisterCallback(
-    std::shared_ptr<ReadBufferListenerVector> currentVector, const char* name,
-	HAL_WriteBufferCallback callback, void* param, int32_t* newUid) {
-	return RegisterCallbackImpl<ReadBufferListenerVector, HAL_ReadBufferCallback>(currentVector, name, callback, param, newUid);
+std::shared_ptr<BufferListenerVector> RegisterCallback(
+    std::shared_ptr<BufferListenerVector> currentVector, const char* name,
+    HAL_BufferCallback callback, void* param, int32_t* newUid) {
+  return RegisterCallbackImpl<BufferListenerVector, HAL_BufferCallback>(
+      currentVector, name, callback, param, newUid);
 }
 
-std::shared_ptr<ReadBufferListenerVector> CancelCallback(
-    std::shared_ptr<ReadBufferListenerVector> currentVector, int32_t uid) {
-  return CancelCallbackImpl<ReadBufferListenerVector, HAL_ReadBufferCallback>(currentVector, uid);
+std::shared_ptr<BufferListenerVector> CancelCallback(
+    std::shared_ptr<BufferListenerVector> currentVector, int32_t uid) {
+  return CancelCallbackImpl<BufferListenerVector, HAL_BufferCallback>(
+      currentVector, uid);
 }
 
-void InvokeReadCallback(std::shared_ptr<ReadBufferListenerVector> currentVector,
+void InvokeCallback(std::shared_ptr<BufferListenerVector> currentVector,
                     const char* name, uint8_t* buffer, int32_t count) {
   // Return if no callbacks are assigned
   if (currentVector == nullptr) return;
@@ -108,35 +83,3 @@ void InvokeReadCallback(std::shared_ptr<ReadBufferListenerVector> currentVector,
     listener.callback(name, listener.param, buffer, count);
   }
 }
-
-
-
-
-
-
-
-
-//std::shared_ptr<WriteBufferListenerVector> RegisterCallback(
-//    std::shared_ptr<WriteBufferListenerVector> currentVector, const char* name,
-//	HAL_WriteBufferCallback callback, void* param, int32_t* newUid) {
-//	return RegisterCallbackImpl<WriteBufferListenerVector, HAL_WriteBufferCallback>(currentVector, name, callback, param, newUid);
-//}
-//
-//std::shared_ptr<WriteBufferListenerVector> CancelCallback(
-//    std::shared_ptr<WriteBufferListenerVector> currentVector, int32_t uid) {
-//  return CancelCallbackImpl<WriteBufferListenerVector, HAL_WriteBufferCallback>(currentVector, uid);
-//}
-
-void InvokeWriteCallback(std::shared_ptr<WriteBufferListenerVector> currentVector,
-                    const char* name, uint8_t* buffer, int32_t count) {
-  // Return if no callbacks are assigned
-  if (currentVector == nullptr) return;
-  // Get a copy of the shared_ptr, then iterate and callback listeners
-  auto newCallbacks = currentVector;
-  for (size_t i = 0; i < newCallbacks->size(); ++i) {
-    if (!(*newCallbacks)[i]) continue;  // removed
-    auto listener = (*newCallbacks)[i];
-    listener.callback(name, listener.param, buffer, count);
-  }
-}
-
