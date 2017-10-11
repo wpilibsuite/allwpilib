@@ -96,13 +96,17 @@ public class FRCNetComm extends JNIWrapper {
     int kResourceType_SRF08 = 48;
     int kResourceType_AnalogOutput = 49;
     int kResourceType_VictorSP = 50;
-    int kResourceType_TalonSRX = 51;
+    int kResourceType_PWMTalonSRX = 51;
     int kResourceType_CANTalonSRX = 52;
     int kResourceType_ADXL362 = 53;
     int kResourceType_ADXRS450 = 54;
     int kResourceType_RevSPARK = 55;
     int kResourceType_MindsensorsSD540 = 56;
     int kResourceType_DigitalFilter = 57;
+    int kResourceType_ADIS16448 = 58;
+    int kResourceType_PDP = 59;
+    int kResourceType_PCM = 60;
+    int kResourceType_PigeonIMU = 61;
   }
 
   /**

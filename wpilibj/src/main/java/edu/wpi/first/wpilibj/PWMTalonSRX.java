@@ -14,12 +14,12 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control.
  */
-public class TalonSRX extends PWMSpeedController {
+public class PWMTalonSRX extends PWMSpeedController {
 
   /**
-   * Constructor for a TalonSRX connected via PWM.
+   * Constructor for a PWMTalonSRX connected via PWM.
    *
-   * <p>Note that the TalonSRX uses the following bounds for PWM values. These values should work
+   * <p>Note that the PWMTalonSRX uses the following bounds for PWM values. These values should work
    * reasonably well for most controllers, but if users experience issues such as asymmetric
    * behavior around the deadband or inability to saturate the controller in either direction,
    * calibration is recommended. The calibration procedure can be found in the TalonSRX User Manual
@@ -30,10 +30,10 @@ public class TalonSRX extends PWMSpeedController {
    * of the deadband range (off) - 1.48ms = the "low end" of the deadband range - .997ms = full
    * "reverse"
    *
-   * @param channel The PWM channel that the TalonSRX is attached to. 0-9 are on-board, 10-19 are
+   * @param channel The PWM channel that the PWMTalonSRX is attached to. 0-9 are on-board, 10-19 are
    *                on the MXP port
    */
-  public TalonSRX(final int channel) {
+  public PWMTalonSRX(final int channel) {
     super(channel);
 
     setBounds(2.004, 1.52, 1.50, 1.48, .997);
@@ -41,7 +41,7 @@ public class TalonSRX extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    LiveWindow.addActuator("TalonSRX", getChannel(), this);
-    HAL.report(tResourceType.kResourceType_TalonSRX, getChannel());
+    LiveWindow.addActuator("PWMTalonSRX", getChannel(), this);
+    HAL.report(tResourceType.kResourceType_PWMTalonSRX, getChannel());
   }
 }

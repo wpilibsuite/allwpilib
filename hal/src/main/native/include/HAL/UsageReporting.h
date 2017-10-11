@@ -71,7 +71,7 @@ namespace nUsageReporting
         kResourceType_SRF08,
         kResourceType_AnalogOutput,
         kResourceType_VictorSP, // 50
-        kResourceType_TalonSRX,
+        kResourceType_PWMTalonSRX,
         kResourceType_CANTalonSRX,
         kResourceType_ADXL362,
         kResourceType_ADXRS450,
