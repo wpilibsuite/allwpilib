@@ -127,7 +127,7 @@ void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
     return;
   }
   std::shared_ptr<nt::NetworkTable> dataTable(s_table->GetSubTable(key));
-  dataTable->GetEntry("~TYPE~").SetString(data->GetSmartDashboardType());
+  dataTable->GetEntry(".type").SetString(data->GetSmartDashboardType());
   data->InitTable(dataTable);
   s_tablesToData[dataTable] = data;
 }
