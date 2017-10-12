@@ -13,6 +13,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <HAL/HAL.h>
+
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"
 #include "llvm/SmallString.h"
@@ -22,6 +24,8 @@ using namespace frc;
 
 std::mutex ErrorBase::_globalErrorMutex;
 Error ErrorBase::_globalError;
+
+ErrorBase::ErrorBase() { HAL_Initialize(500, 0); }
 
 /**
  * @brief Retrieve the current error.
