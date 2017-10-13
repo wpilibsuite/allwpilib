@@ -96,7 +96,7 @@ task patchNiLibraries() {
             from("$rootDir/ni-libraries/include/FRC_NetworkCommunication") {
                 include 'UsageReporting.h'
             }
-            into "$rootDir/hal/src/hal/headers/HAL"
+            into "$rootDir/hal/src/main/native/include/HAL"
         }
 
         delete {

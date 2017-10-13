@@ -1,0 +1,10 @@
+libFRC_NetworkCommunication.so - \usr\local\frc\lib
+libi2c.so - \usr\local\frc\lib
+libNiFpga.so - \usr\local\natinst\lib
+libNiFpgaLv.so - \usr\local\natinst\lib
+libniriodevenum.so - \usr\local\natinst\lib
+libniriosession.so - \usr\local\natinst\lib
+libNiRioSrv.so - \usr\local\natinst\lib
+libRoboRIO_FRC_ChipObject.so - \usr\local\frc\lib
+libspi.so - \usr\local\frc\lib
+libvisa.so - \usr\local\vxipnp\linux\lib\
