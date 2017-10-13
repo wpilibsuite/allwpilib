@@ -1,0 +1,23 @@
+description = "A simulation shared object that simply prints robot behaviors"
+
+apply plugin: 'edu.wpi.first.NativeUtils'
+apply plugin: 'cpp'
+
+ext.skipAthena = true
+
+apply from: "../../config.gradle"
+
+
+model {
+    components {
+        halsim_print(NativeLibrarySpec)
+    }
+
+    binaries {
+        all {
+            project(':hal').addHalCompilerArguments(it)
+            project(':hal').addHalToLinker(it)
+        }
+    }
+}
+apply from: 'publish.gradle'

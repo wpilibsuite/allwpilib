@@ -1,0 +1,44 @@
+apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+def pubVersion = ''
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+def baseArtifactId = 'halsim_print'
+def artifactGroupId = 'edu.wpi.first.hal'
+
+
+model {
+    publishing {
+        def libSpec
+        $.components.each {
+            println it.properties
+            if (it in NativeLibrarySpec) {
+                $.binaries.each {
+                    if (it in SharedLibraryBinarySpec) {
+                        libSpec = it.sharedLibraryFile
+                    }
+                }
+            }
+        }
+
+        publications {
+            cpp(MavenPublication) {
+                artifact libSpec
+                artifactId = baseArtifactId
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}
