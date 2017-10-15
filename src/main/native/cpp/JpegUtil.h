@@ -14,7 +14,7 @@
 
 namespace wpi {
 class raw_istream;
-}
+}  // namespace wpi
 
 namespace cs {
 

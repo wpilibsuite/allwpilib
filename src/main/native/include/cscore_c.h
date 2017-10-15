@@ -377,7 +377,7 @@ char** CS_GetNetworkInterfaces(int* count);
 void CS_FreeNetworkInterfaces(char** interfaces, int count);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif
 
 #endif  // CSCORE_CSCORE_C_H_
