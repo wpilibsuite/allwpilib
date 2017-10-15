@@ -39,5 +39,5 @@ HAL_Bool HALSIM_GetAnalogGyroInitialized(int32_t index);
 void HALSIM_SetAnalogGyroInitialized(int32_t index, HAL_Bool initialized);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

@@ -14,4 +14,4 @@ namespace hal {
 IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
                       HAL_HandleEnum::AnalogInput>
     analogInputHandles;
-}
+}  // namespace hal

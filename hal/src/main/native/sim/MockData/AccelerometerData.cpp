@@ -309,4 +309,4 @@ double HALSIM_GetAccelerometerZ(int32_t index) {
 void HALSIM_SetAccelerometerZ(int32_t index, double z) {
   SimAccelerometerData[index].SetZ(z);
 }
-}
+}  // extern "C"

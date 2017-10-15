@@ -55,5 +55,5 @@ void HALSIM_SetAnalogTriggerTriggerMode(int32_t index,
                                         HALSIM_AnalogTriggerMode triggerMode);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

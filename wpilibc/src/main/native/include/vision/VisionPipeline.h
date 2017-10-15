@@ -9,7 +9,7 @@
 
 namespace cv {
 class Mat;
-}
+}  // namespace cv
 
 namespace frc {
 

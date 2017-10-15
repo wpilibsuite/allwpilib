@@ -25,4 +25,4 @@ void HAL_CAN_ReadStreamSession(uint32_t sessionHandle,
 void HAL_CAN_GetCANStatus(float* percentBusUtilization, uint32_t* busOffCount,
                           uint32_t* txFullCount, uint32_t* receiveErrorCount,
                           uint32_t* transmitErrorCount, int32_t* status) {}
-}
+}  // extern "C"

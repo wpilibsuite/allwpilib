@@ -46,5 +46,5 @@ int32_t HAL_GetAnalogLSBWeight(HAL_AnalogInputHandle analogPortHandle,
 int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

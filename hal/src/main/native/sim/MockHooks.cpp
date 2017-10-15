@@ -51,4 +51,4 @@ void HALSIM_WaitForProgramStart(void) {
 void HALSIM_SetProgramStarted(void) { SetProgramStarted(); }
 
 void HALSIM_RestartTiming(void) { RestartTiming(); }
-}
+}  // extern "C"

@@ -18,7 +18,7 @@ struct Solenoid {
   uint8_t module;
   uint8_t channel;
 };
-}
+}  // namespace
 
 using namespace hal;
 
@@ -117,4 +117,4 @@ HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status) {
   return 0;
 }
 void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status) {}
-}
+}  // extern "C"

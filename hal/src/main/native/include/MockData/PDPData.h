@@ -47,5 +47,5 @@ double HALSIM_GetPDPCurrent(int32_t index, int32_t channel);
 void HALSIM_SetPDPCurrent(int32_t index, int32_t channel, double current);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

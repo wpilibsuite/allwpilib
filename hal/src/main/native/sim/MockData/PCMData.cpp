@@ -448,4 +448,4 @@ double HALSIM_GetPCMCompressorCurrent(int32_t index) {
 void HALSIM_SetPCMCompressorCurrent(int32_t index, double compressorCurrent) {
   SimPCMData[index].SetCompressorCurrent(compressorCurrent);
 }
-}
+}  // extern "C"

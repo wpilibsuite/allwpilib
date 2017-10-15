@@ -251,4 +251,4 @@ HAL_Bool HALSIM_GetRelayReverse(int32_t index) {
 void HALSIM_SetRelayReverse(int32_t index, HAL_Bool reverse) {
   SimRelayData[index].SetReverse(reverse);
 }
-}
+}  // extern "C"

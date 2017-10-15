@@ -22,4 +22,4 @@ void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
 double HAL_GetAccelerometerX(void) { return SimAccelerometerData[0].GetX(); }
 double HAL_GetAccelerometerY(void) { return SimAccelerometerData[0].GetY(); }
 double HAL_GetAccelerometerZ(void) { return SimAccelerometerData[0].GetZ(); }
-}
+}  // extern "C"

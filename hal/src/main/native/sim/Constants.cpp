@@ -15,4 +15,4 @@ extern "C" {
 int32_t HAL_GetSystemClockTicksPerMicrosecond(void) {
   return kSystemClockTicksPerMicrosecond;
 }
-}
+}  // extern "C"
