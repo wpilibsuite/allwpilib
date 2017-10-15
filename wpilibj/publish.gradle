@@ -99,6 +99,9 @@ model {
                         task.from (binary.sharedLibraryFile) {
                             into getPlatformPath(binary) + '/shared'
                         }
+                        task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
                     }
                 }
             }
