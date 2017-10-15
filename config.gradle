@@ -175,10 +175,17 @@ if (!project.hasProperty('onlyAthena')) {
                 compilerFamily = 'Clang'
                 detectPlatform = mac64PlatformDetect
             }
-            raspbian(CrossBuildConfig) {
-                architecture = 'raspbian'
+        }
+    }
+}
+
+if (project.hasProperty('linuxCross')) {
+    model {
+        buildConfigs {
+            linuxArm(CrossBuildConfig) {
+                architecture = 'nativearm'
                 operatingSystem = 'linux'
-                toolChainPrefix = 'arm-linux-gnueabihf-'
+                toolChainPrefix = 'PLEASE_PROVIDE_A_COMPILER_NAME'
                 compilerArgs = linuxCompilerArgs
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
@@ -187,30 +194,11 @@ if (!project.hasProperty('onlyAthena')) {
                 compilerFamily = 'Gcc'
                 exclude << 'gmock'
             }
-            armhf(CrossBuildConfig) {
-                architecture = 'armhf'
-                operatingSystem = 'linux'
-                toolChainPrefix = 'arm-linux-gnueabihf-'
-                compilerArgs = linuxCompilerArgs
-                linkerArgs = linuxLinkerArgs
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                skipByDefault = true
-                compilerFamily = 'Gcc'
-                exclude << 'gmock'
-            }
-            aarch(CrossBuildConfig) {
-                architecture = 'aarch'
-                operatingSystem = 'linux'
-                toolChainPrefix = 'aarch-linux-gnu-'
-                compilerArgs = linuxCompilerArgs
-                linkerArgs = linuxLinkerArgs
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                skipByDefault = true
-                compilerFamily = 'Gcc'
-                exclude << 'gmock'
-            }
+        }
+    }
+} else {
+    model {
+        buildConfigs {
             linuxArm(BuildConfig) {
                 architecture = 'nativearm'
                 operatingSystem = 'linux'

@@ -44,14 +44,8 @@ public class RuntimeDetector {
         filePath = "/linux/x86-64/";
       } else if (isAthena()) {
         filePath = "/linux/athena/";
-      } else if (isRaspbian()) {
-        filePath = "/linux/raspbian/";
-      } else if (isArmV7()) {
-        filePath = "/linux/armhf/";
-      } else if (isAarch64()) {
-        filePath = "/linux/aarch/";
       } else {
-        filePath = "/linux/arm/";
+        filePath = "/linux/nativearm/";
       }
     } else {
       throw new RuntimeException("Failed to determine OS");
@@ -85,32 +79,6 @@ public class RuntimeDetector {
   public static boolean isAthena() {
     File runRobotFile = new File("/usr/local/frc/bin/frcRunRobot.sh");
     return runRobotFile.exists();
-  }
-
-  public static boolean isRaspbian() {
-    try {
-      Process p = Runtime.getRuntime().exec("uname -a");
-      BufferedReader in = new BufferedReader(
-                          new InputStreamReader(p.getInputStream()));
-      return in.readLine().contains("raspberrypi");
-    } catch (IOException e) {
-      return false;
-    }
-  }
-
-  public static boolean isArmV7() {
-    try {
-      Process p = Runtime.getRuntime().exec("uname -a");
-      BufferedReader in = new BufferedReader(
-                          new InputStreamReader(p.getInputStream()));
-      return in.readLine().contains("armv7");
-    } catch (IOException e) {
-      return false;
-    }
-  }
-
-  public static boolean isAarch64() {
-    return false;
   }
 
   public static boolean isLinux() {
