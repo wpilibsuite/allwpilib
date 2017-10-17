@@ -75,5 +75,5 @@ double HAL_GetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
 HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
     HAL_EncoderHandle encoderHandle, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

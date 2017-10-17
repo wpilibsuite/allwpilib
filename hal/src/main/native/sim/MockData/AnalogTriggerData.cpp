@@ -254,4 +254,4 @@ void HALSIM_SetAnalogTriggerTriggerMode(int32_t index,
                                         HALSIM_AnalogTriggerMode triggerMode) {
   SimAnalogTriggerData[index].SetTriggerMode(triggerMode);
 }
-}
+}  // extern "C"

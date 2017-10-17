@@ -32,5 +32,5 @@ int64_t HAL_GetAccumulatorCount(HAL_AnalogInputHandle analogPortHandle,
 void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analogPortHandle,
                               int64_t* value, int64_t* count, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

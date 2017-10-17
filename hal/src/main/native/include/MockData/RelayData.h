@@ -48,5 +48,5 @@ HAL_Bool HALSIM_GetRelayReverse(int32_t index);
 void HALSIM_SetRelayReverse(int32_t index, HAL_Bool reverse);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

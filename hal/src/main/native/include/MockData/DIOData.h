@@ -54,5 +54,5 @@ int32_t HALSIM_GetDIOFilterIndex(int32_t index);
 void HALSIM_SetDIOFilterIndex(int32_t index, int32_t filterIndex);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

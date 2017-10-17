@@ -54,5 +54,5 @@ double HALSIM_GetSPIAccelerometerZ(int32_t index);
 void HALSIM_SetSPIAccelerometerZ(int32_t index, double z);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

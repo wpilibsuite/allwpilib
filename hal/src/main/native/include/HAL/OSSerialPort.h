@@ -46,5 +46,5 @@ void HAL_FlushOSSerial(HAL_SerialPort port, int32_t* status);
 void HAL_ClearOSSerial(HAL_SerialPort port, int32_t* status);
 void HAL_CloseOSSerial(HAL_SerialPort port, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

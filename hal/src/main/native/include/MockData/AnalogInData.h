@@ -89,5 +89,5 @@ void HALSIM_SetAnalogInAccumulatorDeadband(int32_t index,
                                            int32_t accumulatorDeadband);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

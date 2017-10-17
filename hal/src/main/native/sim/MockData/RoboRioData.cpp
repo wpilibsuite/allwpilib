@@ -887,4 +887,4 @@ int32_t HALSIM_GetRoboRioUserFaults3V3(int32_t index) {
 void HALSIM_SetRoboRioUserFaults3V3(int32_t index, int32_t userFaults3V3) {
   SimRoboRioData[index].SetUserFaults3V3(userFaults3V3);
 }
-}
+}  // extern "C"

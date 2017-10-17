@@ -61,5 +61,5 @@ HAL_Bool HALSIM_GetPWMZeroLatch(int32_t index);
 void HALSIM_SetPWMZeroLatch(int32_t index, HAL_Bool zeroLatch);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

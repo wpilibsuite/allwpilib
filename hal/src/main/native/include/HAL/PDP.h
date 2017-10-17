@@ -28,5 +28,5 @@ double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status);
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status);
 void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

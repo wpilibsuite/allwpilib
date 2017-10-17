@@ -550,4 +550,4 @@ void HALSIM_SetAnalogInAccumulatorDeadband(int32_t index,
                                            int32_t accumulatorDeadband) {
   SimAnalogInData[index].SetAccumulatorDeadband(accumulatorDeadband);
 }
-}
+}  // extern "C"

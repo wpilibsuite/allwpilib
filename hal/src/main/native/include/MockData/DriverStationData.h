@@ -70,5 +70,5 @@ void HALSIM_SetDriverStationMatchTime(double matchTime);
 void HALSIM_NotifyDriverStationNewData(void);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

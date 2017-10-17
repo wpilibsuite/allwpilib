@@ -250,4 +250,4 @@ double HALSIM_GetPDPCurrent(int32_t index, int32_t channel) {
 void HALSIM_SetPDPCurrent(int32_t index, int32_t channel, double current) {
   SimPDPData[index].SetCurrent(channel, current);
 }
-}
+}  // extern "C"
