@@ -13,18 +13,18 @@
 class OI {
 public:
 	OI();
-	frc::Joystick* GetJoystick();
+	frc::Joystick& GetJoystick();
 
 private:
-	frc::Joystick joy{0};
+	frc::Joystick m_joy{0};
 
 	// Create some buttons
-	frc::JoystickButton d_up{&joy, 5};
-	frc::JoystickButton d_right{&joy, 6};
-	frc::JoystickButton d_down{&joy, 7};
-	frc::JoystickButton d_left{&joy, 8};
-	frc::JoystickButton l2{&joy, 9};
-	frc::JoystickButton r2{&joy, 10};
-	frc::JoystickButton l1{&joy, 11};
-	frc::JoystickButton r1{&joy, 12};
+	frc::JoystickButton m_dUp{&m_joy, 5};
+	frc::JoystickButton m_dRight{&m_joy, 6};
+	frc::JoystickButton m_dDown{&m_joy, 7};
+	frc::JoystickButton m_dLeft{&m_joy, 8};
+	frc::JoystickButton m_l2{&m_joy, 9};
+	frc::JoystickButton m_r2{&m_joy, 10};
+	frc::JoystickButton m_l1{&m_joy, 11};
+	frc::JoystickButton m_r1{&m_joy, 12};
 };

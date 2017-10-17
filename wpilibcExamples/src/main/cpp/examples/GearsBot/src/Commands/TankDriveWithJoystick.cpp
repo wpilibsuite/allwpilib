@@ -11,12 +11,13 @@
 
 TankDriveWithJoystick::TankDriveWithJoystick()
     : frc::Command("TankDriveWithJoystick") {
-	Requires(Robot::drivetrain.get());
+	Requires(&Robot::drivetrain);
 }
 
 // Called repeatedly when this Command is scheduled to run
 void TankDriveWithJoystick::Execute() {
-	Robot::drivetrain->Drive(Robot::oi->GetJoystick());
+	auto& joystick = Robot::oi.GetJoystick();
+	Robot::drivetrain.Drive(-joystick.GetY(), -joystick.GetRawAxis(4));
 }
 
 // Make this return true when this Command no longer needs to run execute()
@@ -26,5 +27,5 @@ bool TankDriveWithJoystick::IsFinished() {
 
 // Called once after isFinished returns true
 void TankDriveWithJoystick::End() {
-	Robot::drivetrain->Drive(0, 0);
+	Robot::drivetrain.Drive(0, 0);
 }

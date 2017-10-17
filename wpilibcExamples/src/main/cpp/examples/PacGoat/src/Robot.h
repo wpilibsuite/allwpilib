@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <Commands/Command.h>
 #include <IterativeRobot.h>
 #include <SmartDashboard/SendableChooser.h>
@@ -24,19 +22,18 @@
 
 class Robot : public IterativeRobot {
 public:
-	static std::shared_ptr<DriveTrain> drivetrain;
-	static std::shared_ptr<Pivot> pivot;
-	static std::shared_ptr<Collector> collector;
-	static std::shared_ptr<Shooter> shooter;
-	static std::shared_ptr<Pneumatics> pneumatics;
-	static std::unique_ptr<OI> oi;
+	static DriveTrain drivetrain;
+	static Pivot pivot;
+	static Collector collector;
+	static Shooter shooter;
+	static Pneumatics pneumatics;
+	static OI oi;
 
 private:
-	frc::Command* autonomousCommand = nullptr;
-	std::unique_ptr<frc::Command> driveAndShootAuto{
-			new DriveAndShootAutonomous()};
-	std::unique_ptr<frc::Command> driveForwardAuto{new DriveForward()};
-	SendableChooser<frc::Command*> autoChooser;
+	frc::Command* m_autonomousCommand = nullptr;
+	DriveAndShootAutonomous m_driveAndShootAuto;
+	DriveForward m_driveForwardAuto;
+	SendableChooser<frc::Command*> m_autoChooser;
 
 	void RobotInit() override;
 	void AutonomousInit() override;

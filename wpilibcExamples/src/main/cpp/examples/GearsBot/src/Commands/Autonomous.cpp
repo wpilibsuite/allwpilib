@@ -7,8 +7,6 @@
 
 #include "Autonomous.h"
 
-#include <iostream>
-
 #include "CloseClaw.h"
 #include "DriveStraight.h"
 #include "Pickup.h"

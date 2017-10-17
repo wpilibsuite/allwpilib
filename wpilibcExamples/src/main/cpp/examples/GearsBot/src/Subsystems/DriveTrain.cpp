@@ -20,36 +20,36 @@ DriveTrain::DriveTrain()
 // simulate 360 tick encoders. This if statement allows for the
 // real robot to handle this difference in devices.
 #ifndef SIMULATION
-	leftEncoder.SetDistancePerPulse(0.042);
-	rightEncoder.SetDistancePerPulse(0.042);
+	m_leftEncoder.SetDistancePerPulse(0.042);
+	m_rightEncoder.SetDistancePerPulse(0.042);
 #else
 	// Circumference in ft = 4in/12(in/ft)*PI
-	leftEncoder.SetDistancePerPulse(
+	m_leftEncoder.SetDistancePerPulse(
 			static_cast<double>(4.0 / 12.0 * M_PI) / 360.0);
-	rightEncoder.SetDistancePerPulse(
+	m_rightEncoder.SetDistancePerPulse(
 			static_cast<double>(4.0 / 12.0 * M_PI) / 360.0);
 #endif
 
 	// Let's show everything on the LiveWindow
 	// frc::LiveWindow::GetInstance()->AddActuator("Drive Train",
-	// 		"Front_Left Motor", &frontLeft);
+	// 		"Front_Left Motor", &m_frontLeft);
 	// frc::LiveWindow::GetInstance()->AddActuator("Drive Train",
-	// 		"Rear Left Motor", &rearLeft);
+	// 		"Rear Left Motor", &m_rearLeft);
 	// frc::LiveWindow::GetInstance()->AddActuator("Drive Train",
-	// 		"Front Right Motor", &frontRight);
+	// 		"Front Right Motor", &m_frontRight);
 	// frc::LiveWindow::GetInstance()->AddActuator("Drive Train",
-	// 		"Rear Right Motor", &rearRight);
+	// 		"Rear Right Motor", &m_rearRight);
 	// frc::LiveWindow::GetInstance()->AddSensor("Drive Train", "Left
 	// Encoder",
-	// 		&leftEncoder);
+	// 		&m_leftEncoder);
 	// frc::LiveWindow::GetInstance()->AddSensor("Drive Train", "Right
 	// Encoder",
-	// 		&rightEncoder);
+	// 		&m_rightEncoder);
 	// frc::LiveWindow::GetInstance()->AddSensor("Drive Train",
 	// "Rangefinder",
-	// 		&rangefinder);
+	// 		&m_rangefinder);
 	// frc::LiveWindow::GetInstance()->AddSensor("Drive Train", "Gyro",
-	// &gyro);
+	// &m_gyro);
 }
 
 /**
@@ -65,37 +65,34 @@ void DriveTrain::InitDefaultCommand() {
  */
 void DriveTrain::Log() {
 	frc::SmartDashboard::PutNumber(
-			"Left Distance", leftEncoder.GetDistance());
+			"Left Distance", m_leftEncoder.GetDistance());
 	frc::SmartDashboard::PutNumber(
-			"Right Distance", rightEncoder.GetDistance());
-	frc::SmartDashboard::PutNumber("Left Speed", leftEncoder.GetRate());
-	frc::SmartDashboard::PutNumber("Right Speed", rightEncoder.GetRate());
-	frc::SmartDashboard::PutNumber("Gyro", gyro.GetAngle());
+			"Right Distance", m_rightEncoder.GetDistance());
+	frc::SmartDashboard::PutNumber("Left Speed", m_leftEncoder.GetRate());
+	frc::SmartDashboard::PutNumber("Right Speed", m_rightEncoder.GetRate());
+	frc::SmartDashboard::PutNumber("Gyro", m_gyro.GetAngle());
 }
 
 void DriveTrain::Drive(double left, double right) {
-	drive.TankDrive(left, right);
-}
-
-void DriveTrain::Drive(frc::Joystick* joy) {
-	Drive(-joy->GetY(), -joy->GetRawAxis(4));
+	m_robotDrive.TankDrive(left, right);
 }
 
 double DriveTrain::GetHeading() {
-	return gyro.GetAngle();
+	return m_gyro.GetAngle();
 }
 
 void DriveTrain::Reset() {
-	gyro.Reset();
-	leftEncoder.Reset();
-	rightEncoder.Reset();
+	m_gyro.Reset();
+	m_leftEncoder.Reset();
+	m_rightEncoder.Reset();
 }
 
 double DriveTrain::GetDistance() {
-	return (leftEncoder.GetDistance() + rightEncoder.GetDistance()) / 2;
+	return (m_leftEncoder.GetDistance() + m_rightEncoder.GetDistance())
+	       / 2.0;
 }
 
 double DriveTrain::GetDistanceToObstacle() {
 	// Really meters in simulation since it's a rangefinder...
-	return rangefinder.GetAverageVoltage();
+	return m_rangefinder.GetAverageVoltage();
 }

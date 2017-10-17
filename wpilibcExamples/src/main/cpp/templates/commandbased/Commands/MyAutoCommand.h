@@ -9,19 +9,12 @@
 
 #include <Commands/Command.h>
 
-/**
- * Move the elevator to a given location. This command finishes when it is
- * within
- * the tolerance, but leaves the PID loop running to maintain the position.
- * Other
- * commands using the elevator should make sure they disable PID!
- */
-class SetElevatorSetpoint : public frc::Command {
+class MyAutoCommand : public frc::Command {
 public:
-	explicit SetElevatorSetpoint(double setpoint);
+	MyAutoCommand();
 	void Initialize() override;
+	void Execute() override;
 	bool IsFinished() override;
-
-private:
-	double m_setpoint;
+	void End() override;
+	void Interrupted() override;
 };

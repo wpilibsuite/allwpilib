@@ -19,8 +19,8 @@ Elevator::Elevator()
 
 	// Let's show everything on the LiveWindow
 	// frc::LiveWindow::GetInstance()->AddActuator("Elevator", "Motor",
-	// &motor);
-	// frc::LiveWindow::GetInstance()->AddSensor("Elevator", "Pot", &pot);
+	// &m_motor);
+	// frc::LiveWindow::GetInstance()->AddSensor("Elevator", "Pot", &m_pot);
 	// frc::LiveWindow::GetInstance()->AddActuator("Elevator", "PID",
 	// 		GetPIDController());
 }
@@ -28,13 +28,13 @@ Elevator::Elevator()
 void Elevator::InitDefaultCommand() {}
 
 void Elevator::Log() {
-	// frc::SmartDashboard::PutData("Wrist Pot", &pot);
+	// frc::SmartDashboard::PutData("Wrist Pot", &m_pot);
 }
 
 double Elevator::ReturnPIDInput() {
-	return pot.Get();
+	return m_pot.Get();
 }
 
 void Elevator::UsePIDOutput(double d) {
-	motor.Set(d);
+	m_motor.Set(d);
 }

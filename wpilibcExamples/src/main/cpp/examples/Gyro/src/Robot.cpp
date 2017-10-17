@@ -8,9 +8,10 @@
 #include <cmath>
 
 #include <AnalogGyro.h>
+#include <Drive/DifferentialDrive.h>
 #include <IterativeRobot.h>
 #include <Joystick.h>
-#include <RobotDrive.h>
+#include <Spark.h>
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a
@@ -22,7 +23,7 @@
 class Robot : public frc::IterativeRobot {
 public:
 	void RobotInit() override {
-		gyro.SetSensitivity(kVoltsPerDegreePerSecond);
+		m_gyro.SetSensitivity(kVoltsPerDegreePerSecond);
 	}
 
 	/**
@@ -31,10 +32,10 @@ public:
 	 * angle.
 	 */
 	void TeleopPeriodic() override {
-		double turningValue = (kAngleSetpoint - gyro.GetAngle()) * kP;
+		double turningValue = (kAngleSetpoint - m_gyro.GetAngle()) * kP;
 		// Invert the direction of the turn if we are going backwards
-		turningValue = std::copysign(turningValue, joystick.GetY());
-		myRobot.Drive(joystick.GetY(), turningValue);
+		turningValue = std::copysign(turningValue, m_joystick.GetY());
+		m_robotDrive.ArcadeDrive(m_joystick.GetY(), turningValue);
 	}
 
 private:
@@ -50,9 +51,12 @@ private:
 	static constexpr int kGyroPort = 0;
 	static constexpr int kJoystickPort = 0;
 
-	frc::RobotDrive myRobot{kLeftMotorPort, kRightMotorPort};
-	frc::AnalogGyro gyro{kGyroPort};
-	frc::Joystick joystick{kJoystickPort};
+	frc::Spark m_left{kLeftMotorPort};
+	frc::Spark m_right{kRightMotorPort};
+	frc::DifferentialDrive m_robotDrive{m_left, m_right};
+
+	frc::AnalogGyro m_gyro{kGyroPort};
+	frc::Joystick m_joystick{kJoystickPort};
 };
 
 START_ROBOT_CLASS(Robot)

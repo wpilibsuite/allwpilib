@@ -9,7 +9,7 @@
 
 #include <Commands/Subsystem.h>
 #include <DigitalInput.h>
-#include <Victor.h>
+#include <Spark.h>
 
 /**
  * The claw subsystem is a simple system with a motor for opening and closing.
@@ -46,6 +46,6 @@ public:
 	void Log();
 
 private:
-	frc::Victor motor{7};
-	frc::DigitalInput contact{5};
+	frc::Spark m_motor{7};
+	frc::DigitalInput m_contact{5};
 };

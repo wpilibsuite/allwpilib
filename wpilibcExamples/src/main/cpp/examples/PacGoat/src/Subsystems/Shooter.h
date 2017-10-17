@@ -117,11 +117,11 @@ public:
 
 private:
 	// Devices
-	frc::DoubleSolenoid piston1{3, 4};
-	frc::DoubleSolenoid piston2{5, 6};
-	frc::Solenoid latchPiston{1, 2};
-	frc::DigitalInput piston1ReedSwitchFront{9};
-	frc::DigitalInput piston1ReedSwitchBack{11};
-	frc::DigitalInput hotGoalSensor{
+	frc::DoubleSolenoid m_piston1{3, 4};
+	frc::DoubleSolenoid m_piston2{5, 6};
+	frc::Solenoid m_latchPiston{1, 2};
+	frc::DigitalInput m_piston1ReedSwitchFront{9};
+	frc::DigitalInput m_piston1ReedSwitchBack{11};
+	frc::DigitalInput m_hotGoalSensor{
 			7};  // NOTE: Currently ignored in simulation
 };

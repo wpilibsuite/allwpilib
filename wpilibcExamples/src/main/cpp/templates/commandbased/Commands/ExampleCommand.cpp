@@ -9,7 +9,7 @@
 
 ExampleCommand::ExampleCommand() {
 	// Use Requires() here to declare subsystem dependencies
-	// eg. Requires(Robot::chassis.get());
+	// eg. Requires(&Robot::chassis);
 }
 
 // Called just before this Command runs the first time

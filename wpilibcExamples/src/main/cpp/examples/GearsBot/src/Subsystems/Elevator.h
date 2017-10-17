@@ -9,7 +9,7 @@
 
 #include <AnalogPotentiometer.h>
 #include <Commands/PIDSubsystem.h>
-#include <Victor.h>
+#include <Spark.h>
 
 /**
  * The elevator subsystem uses PID to go to a given height. Unfortunately, in
@@ -42,14 +42,14 @@ public:
 	void UsePIDOutput(double d);
 
 private:
-	frc::Victor motor{5};
+	frc::Spark m_motor{5};
 
 // Conversion value of potentiometer varies between the real world and
 // simulation
 #ifndef SIMULATION
-	frc::AnalogPotentiometer pot{2, -2.0 / 5};
+	frc::AnalogPotentiometer m_pot{2, -2.0 / 5};
 #else
-	frc::AnalogPotentiometer pot{2};  // Defaults to meters
+	frc::AnalogPotentiometer m_pot{2};  // Defaults to meters
 #endif
 
 	static constexpr double kP_real = 4;

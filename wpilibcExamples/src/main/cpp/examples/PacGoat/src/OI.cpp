@@ -17,13 +17,13 @@
 #include "Subsystems/Pivot.h"
 
 OI::OI() {
-	R1.WhenPressed(new LowGoal());
-	R2.WhenPressed(new Collect());
+	m_r1.WhenPressed(new LowGoal());
+	m_r2.WhenPressed(new Collect());
 
-	L1.WhenPressed(new SetPivotSetpoint(Pivot::kShoot));
-	L2.WhenPressed(new SetPivotSetpoint(Pivot::kShootNear));
+	m_l1.WhenPressed(new SetPivotSetpoint(Pivot::kShoot));
+	m_l2.WhenPressed(new SetPivotSetpoint(Pivot::kShootNear));
 
-	sticks.WhenActive(new Shoot());
+	m_sticks.WhenActive(new Shoot());
 
 	// SmartDashboard Buttons
 	frc::SmartDashboard::PutData("Drive Forward", new DriveForward(2.25));
@@ -36,6 +36,6 @@ OI::OI() {
 			new SetCollectionSpeed(Collector::kReverse));
 }
 
-frc::Joystick* OI::GetJoystick() {
-	return &joystick;
+frc::Joystick& OI::GetJoystick() {
+	return m_joystick;
 }
