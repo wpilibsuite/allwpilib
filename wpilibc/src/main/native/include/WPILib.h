@@ -78,6 +78,7 @@
 #include "Solenoid.h"
 #include "Spark.h"
 #include "SpeedController.h"
+#include "SpeedControllerGroup.h"
 #include "Talon.h"
 #include "Threads.h"
 #include "TimedRobot.h"
