@@ -10,7 +10,8 @@ package edu.wpi.first.wpilibj.examples.gyro;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a
@@ -31,8 +32,9 @@ public class Robot extends IterativeRobot {
 	private static final int kGyroPort = 0;
 	private static final int kJoystickPort = 0;
 
-	private RobotDrive m_myRobot
-			= new RobotDrive(kLeftMotorPort, kRightMotorPort);
+	private DifferentialDrive m_myRobot
+			= new DifferentialDrive(new Spark(kLeftMotorPort),
+			new Spark(kRightMotorPort));
 	private AnalogGyro m_gyro = new AnalogGyro(kGyroPort);
 	private Joystick m_joystick = new Joystick(kJoystickPort);
 
@@ -50,6 +52,6 @@ public class Robot extends IterativeRobot {
 		double turningValue = (kAngleSetpoint - m_gyro.getAngle()) * kP;
 		// Invert the direction of the turn if we are going backwards
 		turningValue = Math.copySign(turningValue, m_joystick.getY());
-		m_myRobot.drive(m_joystick.getY(), turningValue);
+		m_myRobot.arcadeDrive(m_joystick.getY(), turningValue);
 	}
 }

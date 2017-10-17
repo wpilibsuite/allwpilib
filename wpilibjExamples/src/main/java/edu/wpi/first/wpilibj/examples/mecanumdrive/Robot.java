@@ -9,8 +9,8 @@ package edu.wpi.first.wpilibj.examples.mecanumdrive;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.RobotDrive.MotorType;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 
 /**
  * This is a demo program showing how to use Mecanum control with the RobotDrive
@@ -25,20 +25,22 @@ public class Robot extends IterativeRobot {
 
 	private static final int kJoystickChannel = 0;
 
-	private RobotDrive m_robotDrive;
+	private MecanumDrive m_robotDrive;
 	private Joystick m_stick;
 
 	@Override
 	public void robotInit() {
-		m_robotDrive = new RobotDrive(kFrontLeftChannel,
-				kRearLeftChannel,
-				kFrontRightChannel,
-				kRearRightChannel);
+		Spark frontLeft = new Spark(kFrontLeftChannel);
+		Spark rearLeft = new Spark(kRearLeftChannel);
+		Spark frontRight = new Spark(kFrontRightChannel);
+		Spark rearRight = new Spark(kRearRightChannel);
 
 		// Invert the left side motors.
 		// You may need to change or remove this to match your robot.
-		m_robotDrive.setInvertedMotor(MotorType.kFrontLeft, true);
-		m_robotDrive.setInvertedMotor(MotorType.kRearLeft, true);
+		frontLeft.setInverted(true);
+		rearLeft.setInverted(true);
+
+		m_robotDrive = new MecanumDrive(frontLeft, rearLeft, frontRight, rearRight);
 
 		m_stick = new Joystick(kJoystickChannel);
 	}
@@ -47,7 +49,7 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		// Use the joystick X axis for lateral movement, Y axis for forward
 		// movement, and Z axis for rotation.
-		m_robotDrive.mecanumDrive_Cartesian(m_stick.getX(), m_stick.getY(),
+		m_robotDrive.driveCartesian(m_stick.getX(), m_stick.getY(),
 				m_stick.getZ(), 0.0);
 	}
 }

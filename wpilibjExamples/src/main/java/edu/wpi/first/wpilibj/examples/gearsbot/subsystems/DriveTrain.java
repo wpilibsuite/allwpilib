@@ -12,10 +12,11 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Joystick.AxisType;
-import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedController;
-import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.TankDriveWithJoystick;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -28,13 +29,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class DriveTrain extends Subsystem {
 
-	private SpeedController m_frontLeftMotor = new Talon(1);
-	private SpeedController m_rearLeftMotor = new Talon(2);
-	private SpeedController m_frontRightMotor = new Talon(3);
-	private SpeedController m_rearRightMotor = new Talon(4);
+	private SpeedController m_leftMotor
+			= new SpeedControllerGroup(new Spark(0), new Spark(1));
+	private SpeedController m_rightMotor
+			= new SpeedControllerGroup(new Spark(2), new Spark(3));
 
-	private RobotDrive m_drive = new RobotDrive(m_frontLeftMotor, m_rearLeftMotor,
-			m_frontRightMotor, m_rearRightMotor);
+	private DifferentialDrive m_drive
+			= new DifferentialDrive(m_leftMotor, m_rightMotor);
 
 	private Encoder m_leftEncoder = new Encoder(1, 2);
 	private Encoder m_rightEncoder = new Encoder(3, 4);
@@ -58,15 +59,7 @@ public class DriveTrain extends Subsystem {
 			m_rightEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
 		}
 
-		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Drive Train", "Front_Left Motor",
-				(Talon) m_frontLeftMotor);
-		LiveWindow.addActuator("Drive Train", "Back Left Motor",
-				(Talon) m_rearLeftMotor);
-		LiveWindow.addActuator("Drive Train", "Front Right Motor",
-				(Talon) m_frontRightMotor);
-		LiveWindow.addActuator("Drive Train", "Back Right Motor",
-				(Talon) m_rearRightMotor);
+		// Let's show the sensors on the LiveWindow
 		LiveWindow.addSensor("Drive Train", "Left Encoder", m_leftEncoder);
 		LiveWindow.addSensor("Drive Train", "Right Encoder", m_rightEncoder);
 		LiveWindow.addSensor("Drive Train", "Rangefinder", m_rangefinder);

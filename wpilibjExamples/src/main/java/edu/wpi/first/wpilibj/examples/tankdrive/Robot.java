@@ -7,9 +7,10 @@
 
 package edu.wpi.first.wpilibj.examples.tankdrive;
 
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
  * This is a demo program showing the use of the RobotDrive class, specifically
@@ -17,19 +18,19 @@ import edu.wpi.first.wpilibj.Joystick;
  */
 public class Robot extends IterativeRobot {
 
-	private RobotDrive m_myRobot;
+	private DifferentialDrive m_myRobot;
 	private Joystick m_leftStick;
 	private Joystick m_rightStick;
 
 	@Override
 	public void robotInit() {
-		m_myRobot = new RobotDrive(0, 1);
+		m_myRobot = new DifferentialDrive(new Spark(0), new Spark(1));
 		m_leftStick = new Joystick(0);
 		m_rightStick = new Joystick(1);
 	}
 
 	@Override
 	public void teleopPeriodic() {
-		m_myRobot.tankDrive(m_leftStick, m_rightStick);
+		m_myRobot.tankDrive(m_leftStick.getY(), m_rightStick.getY());
 	}
 }

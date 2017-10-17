@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
  * This is a sample program to demonstrate the use of a PIDController with an
@@ -21,7 +22,7 @@ public class Robot extends IterativeRobot {
 	// distance in inches the robot wants to stay from an object
 	private static final double kHoldDistance = 12.0;
 
-	// maximun distance in inches we expect the robot to see
+	// maximum distance in inches we expect the robot to see
 	private static final double kMaxDistance = 24.0;
 
 	// factor to convert sensor values to a distance in inches
@@ -41,8 +42,9 @@ public class Robot extends IterativeRobot {
 	private static final int kUltrasonicPort = 0;
 
 	private AnalogInput m_ultrasonic = new AnalogInput(kUltrasonicPort);
-	private RobotDrive m_myRobot
-			= new RobotDrive(kLeftMotorPort, kRightMotorPort);
+	private DifferentialDrive m_robotDrive
+			= new DifferentialDrive(new Spark(kLeftMotorPort),
+			new Spark(kRightMotorPort));
 	private PIDController m_pidController
 			= new PIDController(kP, kI, kD, m_ultrasonic, new MyPidOutput());
 
@@ -63,7 +65,7 @@ public class Robot extends IterativeRobot {
 	private class MyPidOutput implements PIDOutput {
 		@Override
 		public void pidWrite(double output) {
-			m_myRobot.drive(output, 0);
+			m_robotDrive.arcadeDrive(output, 0);
 		}
 	}
 }

@@ -9,8 +9,9 @@ package edu.wpi.first.wpilibj.examples.gettingstarted;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
@@ -22,9 +23,10 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  */
 public class Robot extends IterativeRobot {
 
-	RobotDrive m_myRobot = new RobotDrive(0, 1);
-	Joystick m_stick = new Joystick(0);
-	Timer m_timer = new Timer();
+	private DifferentialDrive m_robotDrive
+			= new DifferentialDrive(new Spark(0), new Spark(1));
+	private Joystick m_stick = new Joystick(0);
+	private Timer m_timer = new Timer();
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -50,9 +52,9 @@ public class Robot extends IterativeRobot {
 	public void autonomousPeriodic() {
 		// Drive for 2 seconds
 		if (m_timer.get() < 2.0) {
-			m_myRobot.drive(0.5, 0.0); // drive forwards half speed
+			m_robotDrive.arcadeDrive(0.5, 0.0); // drive forwards half speed
 		} else {
-			m_myRobot.drive(0.0, 0.0); // stop robot
+			m_robotDrive.stopMotor(); // stop robot
 		}
 	}
 
@@ -68,7 +70,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void teleopPeriodic() {
-		m_myRobot.arcadeDrive(m_stick);
+		m_robotDrive.arcadeDrive(m_stick.getY(), m_stick.getX());
 	}
 
 	/**

@@ -7,10 +7,11 @@
 
 package edu.wpi.first.wpilibj.templates.sample;
 
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -36,12 +37,13 @@ public class Robot extends SampleRobot {
 	private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
 
-	private RobotDrive m_myRobot = new RobotDrive(0, 1);
+	private DifferentialDrive m_robotDrive
+			= new DifferentialDrive(new Spark(0), new Spark(1));
 	private Joystick m_stick = new Joystick(0);
 	private SendableChooser<String> m_chooser = new SendableChooser<>();
 
 	public Robot() {
-		m_myRobot.setExpiration(0.1);
+		m_robotDrive.setExpiration(0.1);
 	}
 
 	@Override
@@ -96,17 +98,17 @@ public class Robot extends SampleRobot {
 
 		switch (autoSelected) {
 			case kCustomAuto:
-				m_myRobot.setSafetyEnabled(false);
-				m_myRobot.drive(-0.5, 1.0); // spin at half speed
+				m_robotDrive.setSafetyEnabled(false);
+				m_robotDrive.arcadeDrive(-0.5, 1.0); // spin at half speed
 				Timer.delay(2.0); // for 2 seconds
-				m_myRobot.drive(0.0, 0.0); // stop robot
+				m_robotDrive.arcadeDrive(0.0, 0.0); // stop robot
 				break;
 			case kDefaultAuto:
 			default:
-				m_myRobot.setSafetyEnabled(false);
-				m_myRobot.drive(-0.5, 0.0); // drive forwards
+				m_robotDrive.setSafetyEnabled(false);
+				m_robotDrive.arcadeDrive(-0.5, 0.0); // drive forwards
 				Timer.delay(2.0); // for 2 seconds
-				m_myRobot.drive(0.0, 0.0); // stop robot
+				m_robotDrive.arcadeDrive(0.0, 0.0); // stop robot
 				break;
 		}
 	}
@@ -126,10 +128,12 @@ public class Robot extends SampleRobot {
 	 */
 	@Override
 	public void operatorControl() {
-		m_myRobot.setSafetyEnabled(true);
+		m_robotDrive.setSafetyEnabled(true);
 		while (isOperatorControl() && isEnabled()) {
-			m_myRobot.arcadeDrive(m_stick); // drive arcade style
-			Timer.delay(0.005); // wait for a motor update time
+			// drive arcade style
+			m_robotDrive.arcadeDrive(m_stick.getX(), m_stick.getY());
+			// wait for a motor update time
+			Timer.delay(0.005);
 		}
 	}
 
