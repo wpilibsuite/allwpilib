@@ -20,10 +20,6 @@
 
     <property name="severity" value="error"/>
 
-    <module name="SuppressionFilter">
-        <property name="file" value="styleguide/suppressions.xml" />
-    </module>
-
     <property name="fileExtensions" value="java, properties, xml"/>
 
     <module name="SuppressWarningsFilter" />

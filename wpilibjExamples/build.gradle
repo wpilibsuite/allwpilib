@@ -3,10 +3,11 @@ apply plugin: 'pmd'
 
 dependencies {
     compile project(':wpilibj')
-    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
-    compile 'edu.wpi.first.ntcore:ntcore-java:+'
 
-    compile 'org.opencv:opencv-java:+'
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:3.+'
+    compile 'edu.wpi.first.ntcore:ntcore-java:4.+'
+    compile 'org.opencv:opencv-java:3.2.0'
+    compile 'edu.wpi.first.cscore:cscore-java:1.+'
 }
 
 checkstyle {
@@ -18,4 +19,10 @@ pmd {
     reportsDir = file("$project.buildDir/reports/pmd")
     ruleSetFiles = files(new File(rootDir, "styleguide/pmd-ruleset.xml"))
     ruleSets = []
+}
+
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile) {
+        options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Werror"
+    }
 }
