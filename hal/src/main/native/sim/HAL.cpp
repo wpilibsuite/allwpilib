@@ -10,6 +10,7 @@
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
+#include "HAL/Extensions.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "MockData/RoboRioDataInternal.h"
 #include "MockHooksInternal.h"
@@ -203,6 +204,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   // Second check in case another thread was waiting
   if (initialized) return true;
 
+  if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
 
