@@ -1,3 +1,4 @@
+dist: trusty
 language: java
 
 matrix:
@@ -13,14 +14,20 @@ addons:
     packages:
       - g++-multilib
       - lib32stdc++6
+      - python3
+      - python3-pip
+      - clang-format-3.8
 
 before_install:
   - .travis-scripts/install.sh
 
 install:
+  - pip3 install --user wpiformat
   - ./gradlew build -PbuildAll
 
 script:
+  - wpiformat -y 2017 -clang 3.8
+  - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
   - ./gradlew build -PbuildAll
 
 before_cache:
