@@ -37,7 +37,7 @@ public class Notifier {
     // destructed.
     private final ReentrantLock m_handlerLock = new ReentrantLock();
 
-    public Process(Runnable run) {
+    Process(Runnable run) {
       m_handler = run;
       m_notifier.set(NotifierJNI.initializeNotifier(this));
     }

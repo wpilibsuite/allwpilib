@@ -33,7 +33,7 @@ public class DriverStation implements RobotState.Interface {
     public float[] m_axes;
     public short m_count;
 
-    public HALJoystickAxes(int count) {
+    HALJoystickAxes(int count) {
       m_axes = new float[count];
     }
   }
@@ -42,7 +42,7 @@ public class DriverStation implements RobotState.Interface {
     public short[] m_povs;
     public short m_count;
 
-    public HALJoystickPOVs(int count) {
+    HALJoystickPOVs(int count) {
       m_povs = new short[count];
     }
   }

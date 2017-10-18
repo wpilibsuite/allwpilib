@@ -126,7 +126,7 @@ public class AnalogTriggerOutput extends DigitalSource {
     @SuppressWarnings("MemberName")
     private final int value;
 
-    private AnalogTriggerType(int value) {
+    AnalogTriggerType(int value) {
       this.value = value;
     }
   }

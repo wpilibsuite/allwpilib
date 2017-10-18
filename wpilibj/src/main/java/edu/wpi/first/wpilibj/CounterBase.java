@@ -37,7 +37,7 @@ public interface CounterBase {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private EncodingType(int value) {
+    EncodingType(int value) {
       this.value = value;
     }
   }

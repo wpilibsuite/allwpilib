@@ -29,7 +29,7 @@ public class I2C extends SensorBase {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private Port(int value) {
+    Port(int value) {
       this.value = value;
     }
   }
