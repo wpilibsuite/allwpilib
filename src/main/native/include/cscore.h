@@ -17,4 +17,4 @@
 #include "cscore_oo.h"
 #endif /* __cplusplus */
 
-#endif /* CSCORE_CSCORE_H_ */
+#endif  // CSCORE_CSCORE_H_
