@@ -33,4 +33,4 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
   return 0;
 }
 void HAL_CloseI2C(HAL_I2CPort port) { SimI2CData[port].SetInitialized(false); }
-}
+}  // extern "C"

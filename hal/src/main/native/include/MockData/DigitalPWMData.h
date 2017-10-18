@@ -39,5 +39,5 @@ int32_t HALSIM_GetDigitalPWMPin(int32_t index);
 void HALSIM_SetDigitalPWMPin(int32_t index, int32_t pin);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

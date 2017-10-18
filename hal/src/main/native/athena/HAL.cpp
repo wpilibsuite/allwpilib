@@ -331,6 +331,15 @@ static bool killExistingProgram(int timeout, int mode) {
  * Call this to start up HAL. This is required for robot programs.
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  static std::atomic_bool initialized{false};
+  static std::mutex initializeMutex;
+  // Initial check, as if it's true initialization has finished
+  if (initialized) return true;
+
+  std::lock_guard<std::mutex> lock(initializeMutex);
+  // Second check in case another thread was waiting
+  if (initialized) return true;
+
   setlinebuf(stdin);
   setlinebuf(stdout);
 
@@ -370,6 +379,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   HAL_InitializeDriverStation();
 
+  initialized = true;
   return true;
 }
 

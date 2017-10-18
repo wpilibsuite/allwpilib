@@ -29,7 +29,7 @@ public class PIDToleranceTest {
   private class FakeInput implements PIDSource {
     public double m_val;
 
-    public FakeInput() {
+    FakeInput() {
       m_val = 0;
     }
 

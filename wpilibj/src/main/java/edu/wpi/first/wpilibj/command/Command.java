@@ -575,8 +575,8 @@ public abstract class Command implements NamedSendable {
     }
     if (table != null) {
       m_runningEntry = table.getEntry("running");
-      m_isParentedEntry = table.getEntry("isParented");
-      table.getEntry("name").setString(getName());
+      m_isParentedEntry = table.getEntry(".isParented");
+      table.getEntry(".name").setString(getName());
       m_runningEntry.setBoolean(isRunning());
       m_isParentedEntry.setBoolean(m_parent != null);
       m_runningListener = m_runningEntry.addListener((event) -> {

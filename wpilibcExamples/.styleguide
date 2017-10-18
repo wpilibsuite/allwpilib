@@ -1,0 +1,45 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  gmock/
+  ni-libraries/include/
+  ni-libraries/lib/
+  hal/src/main/native/athena/ctre/
+  hal/src/main/native/athena/frccansae/
+  hal/src/main/native/athena/visa/
+  hal/src/main/native/include/ctre/
+  UsageReporting\.h$
+}
+
+modifiableFileExclude {
+  wpilibj/src/arm-linux-jni/
+  wpilibj/src/main/native/cpp/
+  \.patch$
+  \.png$
+  \.py$
+  \.so$
+}
+
+includeGuardRoots {
+  wpilibcExamples/src/main/cpp/examples/
+  wpilibcExamples/src/main/cpp/templates/
+}
+
+includeOtherLibs {
+  ^HAL/
+  ^llvm/
+  ^opencv2/
+  ^support/
+}
+
+includeProject {
+  ^ctre/
+}

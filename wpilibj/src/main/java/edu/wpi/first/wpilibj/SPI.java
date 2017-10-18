@@ -25,7 +25,7 @@ public class SPI extends SensorBase {
     @SuppressWarnings("MemberName")
     public int value;
 
-    private Port(int value) {
+    Port(int value) {
       this.value = value;
     }
   }

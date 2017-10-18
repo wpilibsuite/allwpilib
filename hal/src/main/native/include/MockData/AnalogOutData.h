@@ -32,5 +32,5 @@ HAL_Bool HALSIM_GetAnalogOutInitialized(int32_t index);
 void HALSIM_SetAnalogOutInitialized(int32_t index, HAL_Bool initialized);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

@@ -74,7 +74,7 @@ namespace frc {
 class ErrorBase {
   // TODO: Consider initializing instance variables and cleanup in destructor
  public:
-  ErrorBase() = default;
+  ErrorBase();
   virtual ~ErrorBase() = default;
 
   ErrorBase(const ErrorBase&) = delete;

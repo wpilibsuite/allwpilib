@@ -56,7 +56,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private Mode(int value) {
+    Mode(int value) {
       this.value = value;
     }
   }

@@ -79,5 +79,5 @@ int32_t HALSIM_GetEncoderSamplesToAverage(int32_t index);
 void HALSIM_SetEncoderSamplesToAverage(int32_t index, int32_t samplesToAverage);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

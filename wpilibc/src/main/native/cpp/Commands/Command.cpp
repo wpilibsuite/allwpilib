@@ -17,9 +17,9 @@
 
 using namespace frc;
 
-static const std::string kName = "name";
+static const std::string kName = ".name";
 static const std::string kRunning = "running";
-static const std::string kIsParented = "isParented";
+static const std::string kIsParented = ".isParented";
 
 int Command::m_commandCounter = 0;
 

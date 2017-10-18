@@ -65,7 +65,7 @@ public class HardwareTimer implements Timer.StaticInterface {
      * Create a new timer object. Create a new timer object and reset the time to zero. The timer is
      * initially not running and must be started.
      */
-    public TimerImpl() {
+    TimerImpl() {
       reset();
     }
 

@@ -15,9 +15,6 @@ class LinkedListElement {
   private LinkedListElement m_previous;
   private Command m_data;
 
-  public LinkedListElement() {
-  }
-
   public void setData(Command newData) {
     m_data = newData;
   }

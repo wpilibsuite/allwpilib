@@ -485,4 +485,4 @@ void HALSIM_SetEncoderSamplesToAverage(int32_t index,
                                        int32_t samplesToAverage) {
   SimEncoderData[index].SetSamplesToAverage(samplesToAverage);
 }
-}
+}  // extern "C"

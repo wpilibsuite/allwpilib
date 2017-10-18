@@ -36,7 +36,7 @@ LiveWindow* LiveWindow::GetInstance() {
 LiveWindow::LiveWindow() : m_scheduler(Scheduler::GetInstance()) {
   m_liveWindowTable =
       nt::NetworkTableInstance::GetDefault().GetTable("LiveWindow");
-  m_statusTable = m_liveWindowTable->GetSubTable("~STATUS~");
+  m_statusTable = m_liveWindowTable->GetSubTable(".status");
   m_enabledEntry = m_statusTable->GetEntry("LW Enabled");
 }
 
@@ -231,12 +231,12 @@ void LiveWindow::InitializeLiveWindowComponents() {
     LiveWindowComponent c = elem.second;
     std::string subsystem = c.subsystem;
     std::string name = c.name;
-    m_liveWindowTable->GetSubTable(subsystem)->GetEntry("~TYPE~").SetString(
+    m_liveWindowTable->GetSubTable(subsystem)->GetEntry(".type").SetString(
         "LW Subsystem");
     std::shared_ptr<NetworkTable> table(
         m_liveWindowTable->GetSubTable(subsystem)->GetSubTable(name));
-    table->GetEntry("~TYPE~").SetString(component->GetSmartDashboardType());
-    table->GetEntry("Name").SetString(name);
+    table->GetEntry(".type").SetString(component->GetSmartDashboardType());
+    table->GetEntry(".name").SetString(name);
     table->GetEntry("Subsystem").SetString(subsystem);
     component->InitTable(table);
     if (c.isSensor) {

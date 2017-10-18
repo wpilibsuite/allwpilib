@@ -134,5 +134,5 @@ int32_t HALSIM_GetRoboRioUserFaults3V3(int32_t index);
 void HALSIM_SetRoboRioUserFaults3V3(int32_t index, int32_t userFaults3V3);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

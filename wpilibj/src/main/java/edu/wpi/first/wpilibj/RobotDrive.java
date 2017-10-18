@@ -37,7 +37,7 @@ public class RobotDrive implements MotorSafety {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private MotorType(int value) {
+    MotorType(int value) {
       this.value = value;
     }
   }

@@ -41,7 +41,7 @@ public class LiveWindow {
   private static void initializeLiveWindowComponents() {
     System.out.println("Initializing the components first time");
     livewindowTable = NetworkTableInstance.getDefault().getTable("LiveWindow");
-    statusTable = livewindowTable.getSubTable("~STATUS~");
+    statusTable = livewindowTable.getSubTable(".status");
     enabledEntry = statusTable.getEntry("LW Enabled");
     for (Enumeration e = components.keys(); e.hasMoreElements(); ) {
       LiveWindowSendable component = (LiveWindowSendable) e.nextElement();
@@ -49,11 +49,11 @@ public class LiveWindow {
       String subsystem = liveWindowComponent.getSubsystem();
       String name = liveWindowComponent.getName();
       System.out.println("Initializing table for '" + subsystem + "' '" + name + "'");
-      livewindowTable.getSubTable(subsystem).getEntry("~TYPE~").setString("LW Subsystem");
+      livewindowTable.getSubTable(subsystem).getEntry(".type").setString("LW Subsystem");
       NetworkTable table = livewindowTable.getSubTable(subsystem).getSubTable(name);
-      table.getEntry("~TYPE~").setString(component.getSmartDashboardType());
-      table.getEntry("Name").setString(name);
-      table.getEntry("Subsystem").setString(subsystem);
+      table.getEntry(".type").setString(component.getSmartDashboardType());
+      table.getEntry(".name").setString(name);
+      table.getEntry(".subsystem").setString(subsystem);
       component.initTable(table);
       if (liveWindowComponent.isSensor()) {
         sensors.addElement(component);

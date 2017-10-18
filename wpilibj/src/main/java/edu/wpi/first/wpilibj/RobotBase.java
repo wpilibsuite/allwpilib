@@ -61,7 +61,7 @@ public abstract class RobotBase {
     inst.setNetworkIdentity("Robot");
     inst.startServer("/home/lvuser/networktables.ini");
     m_ds = DriverStation.getInstance();
-    inst.getTable("LiveWindow").getSubTable("~STATUS~").getEntry("LW Enabled").setBoolean(false);
+    inst.getTable("LiveWindow").getSubTable(".status").getEntry("LW Enabled").setBoolean(false);
 
     LiveWindow.setEnabled(false);
   }

@@ -41,5 +41,5 @@ int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status);
 void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status);
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif
