@@ -342,6 +342,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   setlinebuf(stdin);
   setlinebuf(stdout);
+  llvm::outs().SetUnbuffered();
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
