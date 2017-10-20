@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "../PortsInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 #include "SPIDataInternal.h"
 
 using namespace hal;
