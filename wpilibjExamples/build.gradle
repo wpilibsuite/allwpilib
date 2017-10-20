@@ -26,3 +26,5 @@ gradle.projectsEvaluated {
         options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation" << "-Werror"
     }
 }
+
+apply from: 'publish.gradle'
