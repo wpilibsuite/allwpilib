@@ -5,6 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cstring>
+
 #include "DriverStationDataInternal.h"
 #include "NotifyCallbackHelpers.h"
 
@@ -25,6 +27,19 @@ void DriverStationData::ResetData() {
   m_fmsAttachedCallbacks = nullptr;
   m_dsAttached = false;
   m_dsAttachedCallbacks = nullptr;
+
+  for (int i = 0; i < 6; ++i) {
+    HAL_JoystickAxes axes;
+    HAL_JoystickPOVs povs;
+    HAL_JoystickButtons buttons;
+    std::memset(&axes, 0, sizeof(axes));
+    std::memset(&povs, 0, sizeof(povs));
+    std::memset(&buttons, 0, sizeof(buttons));
+
+    m_joystickAxis[i].exchange(axes);
+    m_joystickPov[i].exchange(povs);
+    m_joystickButtons[i].exchange(buttons);
+  }
 }
 
 int32_t DriverStationData::RegisterEnabledCallback(HAL_NotifyCallback callback,
@@ -318,6 +333,32 @@ void DriverStationData::SetMatchTime(double matchTime) {
 
 void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
 
+void DriverStationData::GetJoystickAxes(int32_t joystickNum,
+                                        HAL_JoystickAxes* axes) {
+  *axes = m_joystickAxis[joystickNum];
+}
+void DriverStationData::GetJoystickPOVs(int32_t joystickNum,
+                                        HAL_JoystickPOVs* povs) {
+  *povs = m_joystickPov[joystickNum];
+}
+void DriverStationData::GetJoystickButtons(int32_t joystickNum,
+                                           HAL_JoystickButtons* buttons) {
+  *buttons = m_joystickButtons[joystickNum];
+}
+
+void DriverStationData::SetJoystickAxes(int32_t joystickNum,
+                                        const HAL_JoystickAxes& axes) {
+  m_joystickAxis[joystickNum].exchange(axes);
+}
+void DriverStationData::SetJoystickPOVs(int32_t joystickNum,
+                                        const HAL_JoystickPOVs& povs) {
+  m_joystickPov[joystickNum].exchange(povs);
+}
+void DriverStationData::SetJoystickButtons(int32_t joystickNum,
+                                           const HAL_JoystickButtons& buttons) {
+  m_joystickButtons[joystickNum].exchange(buttons);
+}
+
 extern "C" {
 void HALSIM_ResetDriverStationData(void) { SimDriverStationData.ResetData(); }
 
@@ -448,4 +489,16 @@ void HALSIM_SetDriverStationMatchTime(double matchTime) {
 void HALSIM_NotifyDriverStationNewData(void) {
   SimDriverStationData.NotifyNewData();
 }
+
+void HALSIM_SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes& axes) {
+  SimDriverStationData.SetJoystickAxes(joystickNum, axes);
+}
+void HALSIM_SetJoystickPOVs(int32_t joystickNum, const HAL_JoystickPOVs& povs) {
+  SimDriverStationData.SetJoystickPOVs(joystickNum, povs);
+}
+void HALSIM_SetJoystickButtons(int32_t joystickNum,
+                               const HAL_JoystickButtons& buttons) {
+  SimDriverStationData.SetJoystickButtons(joystickNum, buttons);
+}
+
 }  // extern "C"
