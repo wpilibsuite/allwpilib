@@ -21,7 +21,7 @@ Vector2d::Vector2d(double x, double y) {
 /**
  * Rotate a vector in Cartesian space.
  *
- * @param angle angle by which to rotate vector counter-clockwise.
+ * @param angle angle in degrees by which to rotate vector counter-clockwise.
  */
 void Vector2d::Rotate(double angle) {
   double cosA = std::cos(angle * (kPi / 180.0));
