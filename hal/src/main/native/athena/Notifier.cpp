@@ -7,12 +7,12 @@
 
 #include "HAL/Notifier.h"
 
-// For std::atexit()
-#include <cstdlib>
-
 #include <atomic>
+#include <cstdlib>  // For std::atexit()
 #include <memory>
 #include <mutex>
+
+#include <support/SafeThread.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
@@ -20,7 +20,6 @@
 #include "HAL/cpp/NotifierInternal.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/handles/UnlimitedHandleResource.h"
-#include "support/SafeThread.h"
 
 using namespace hal;
 
