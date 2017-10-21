@@ -333,4 +333,4 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
   return 0;  // TODO(Thad) figure this out
 }
-}
+}  // extern "C"

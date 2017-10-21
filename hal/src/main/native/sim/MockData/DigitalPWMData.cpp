@@ -203,4 +203,4 @@ void HALSIM_RegisterDigitalPWMAllCallbacks(int32_t index,
                                                      initialNotify);
   SimDigitalPWMData[index].RegisterPinCallback(callback, param, initialNotify);
 }
-}
+}  // extern "C"

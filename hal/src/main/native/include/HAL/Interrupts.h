@@ -46,5 +46,5 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

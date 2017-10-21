@@ -10,10 +10,9 @@
 #include <stdint.h>
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
-
-#include <HAL/cpp/priority_mutex.h>
 
 #include "ErrorBase.h"
 
@@ -44,9 +43,9 @@ class Resource : public ErrorBase {
 
  private:
   std::vector<bool> m_isAllocated;
-  hal::priority_recursive_mutex m_allocateLock;
+  std::mutex m_allocateMutex;
 
-  static hal::priority_recursive_mutex m_createLock;
+  static std::mutex m_createMutex;
 };
 
 }  // namespace frc

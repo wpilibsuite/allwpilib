@@ -46,4 +46,4 @@ void HAL_CAN_GetCANStatus(float* percentBusUtilization, uint32_t* busOffCount,
       percentBusUtilization, busOffCount, txFullCount, receiveErrorCount,
       transmitErrorCount, status);
 }
-}
+}  // extern "C"

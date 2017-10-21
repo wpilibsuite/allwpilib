@@ -25,7 +25,7 @@ struct Encoder {
   uint8_t index;
 };
 struct Empty {};
-}
+}  // namespace
 
 static LimitedHandleResource<HAL_EncoderHandle, Encoder,
                              kNumEncoders + kNumCounters,

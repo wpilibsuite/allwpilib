@@ -18,13 +18,12 @@
 #include "HAL/ChipObject.h"
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "PortsInternal.h"
 
 namespace hal {
 
 // Create a mutex to protect changes to the DO PWM config
-priority_recursive_mutex digitalPwmMutex;
+std::mutex digitalPwmMutex;
 
 std::unique_ptr<tDIO> digitalSystem;
 std::unique_ptr<tRelay> relaySystem;
@@ -32,7 +31,7 @@ std::unique_ptr<tPWM> pwmSystem;
 std::unique_ptr<tSPI> spiSystem;
 
 static std::atomic<bool> digitalSystemsInitialized{false};
-static hal::priority_mutex initializeMutex;
+static std::mutex initializeMutex;
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalChannels + kNumPWMHeaders>
@@ -45,7 +44,7 @@ void initializeDigital(int32_t* status) {
   // Initial check, as if it's true initialization has finished
   if (digitalSystemsInitialized) return;
 
-  std::lock_guard<hal::priority_mutex> lock(initializeMutex);
+  std::lock_guard<std::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (digitalSystemsInitialized) return;
 

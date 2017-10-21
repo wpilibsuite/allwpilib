@@ -52,5 +52,5 @@ void HALSIM_RegisterPDPAllNonCurrentCallbacks(int32_t index, int32_t channel,
                                               HAL_Bool initialNotify);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

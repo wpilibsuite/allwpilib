@@ -59,7 +59,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   // First and one-time initialization
   inst.GetTable("LiveWindow")
-      ->GetSubTable("~STATUS~")
+      ->GetSubTable(".status")
       ->GetEntry("LW Enabled")
       .SetBoolean(false);
 

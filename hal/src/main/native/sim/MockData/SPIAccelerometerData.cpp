@@ -322,4 +322,4 @@ void HALSIM_RegisterSPIAccelerometerAllCallbcaks(int32_t index,
   SimSPIAccelerometerData[index].RegisterZCallback(callback, param,
                                                    initialNotify);
 }
-}
+}  // extern "C"

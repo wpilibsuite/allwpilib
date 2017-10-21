@@ -12,15 +12,21 @@
 typedef void (*HAL_NotifyCallback)(const char* name, void* param,
                                    const struct HAL_Value* value);
 
+typedef void (*HAL_BufferCallback)(const char* name, void* param,
+                                   unsigned char* buffer, unsigned int count);
+
 namespace hal {
-struct NotifyListener {
-  NotifyListener() = default;
-  NotifyListener(void* param_, HAL_NotifyCallback callback_)
+
+template <typename CallbackFunction>
+struct HalCallbackListener {
+  HalCallbackListener() = default;
+  HalCallbackListener(void* param_, CallbackFunction callback_)
       : callback(callback_), param(param_) {}
 
   explicit operator bool() const { return callback != nullptr; }
 
-  HAL_NotifyCallback callback;
+  CallbackFunction callback;
   void* param;
 };
+
 }  // namespace hal

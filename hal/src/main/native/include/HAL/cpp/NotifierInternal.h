@@ -12,4 +12,4 @@
 extern "C" {
 HAL_NotifierHandle HAL_InitializeNotifierNonThreadedUnsafe(
     HAL_NotifierProcessFunction process, void* param, int32_t* status);
-}
+}  // extern "C"

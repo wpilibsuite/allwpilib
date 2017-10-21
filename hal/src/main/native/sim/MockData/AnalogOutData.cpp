@@ -144,4 +144,4 @@ void HALSIM_RegisterAnalogOutAllCallbacks(int32_t index,
   SimAnalogOutData[index].RegisterInitializedCallback(callback, param,
                                                       initialNotify);
 }
-}
+}  // extern "C"

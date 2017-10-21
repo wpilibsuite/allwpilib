@@ -118,7 +118,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     private PIDController m_controller;
 
-    public PIDTask(PIDController controller) {
+    PIDTask(PIDController controller) {
       requireNonNull(controller, "Given PIDController was null");
 
       m_controller = controller;

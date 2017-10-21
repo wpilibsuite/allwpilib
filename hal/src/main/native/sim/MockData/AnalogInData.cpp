@@ -573,4 +573,4 @@ void HALSIM_RegisterAnalogInAllCallbacks(int32_t index,
   SimAnalogInData[index].RegisterAccumulatorDeadbandCallback(callback, param,
                                                              initialNotify);
 }
-}
+}  // extern "C"

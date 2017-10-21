@@ -259,4 +259,4 @@ void HALSIM_RegisterPDPAllNonCurrentCallbacks(int32_t index, int32_t channel,
   SimPDPData[index].RegisterTemperatureCallback(callback, param, initialNotify);
   SimPDPData[index].RegisterVoltageCallback(callback, param, initialNotify);
 }
-}
+}  // extern "C"

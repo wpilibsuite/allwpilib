@@ -36,5 +36,5 @@ void HALSIM_RegisterAnalogOutAllCallbacks(int32_t index,
                                           void* param, HAL_Bool initialNotify);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

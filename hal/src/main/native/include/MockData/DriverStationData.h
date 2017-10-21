@@ -74,5 +74,5 @@ void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               HAL_Bool initialNotify);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

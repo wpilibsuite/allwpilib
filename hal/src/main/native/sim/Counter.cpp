@@ -18,7 +18,7 @@ namespace hal {
 LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
                       HAL_HandleEnum::Counter>
     counterHandles;
-}
+}  // namespace hal
 
 extern "C" {
 HAL_CounterHandle HAL_InitializeCounter(HAL_Counter_Mode mode, int32_t* index,
@@ -83,4 +83,4 @@ HAL_Bool HAL_GetCounterDirection(HAL_CounterHandle counterHandle,
 void HAL_SetCounterReverseDirection(HAL_CounterHandle counterHandle,
                                     HAL_Bool reverseDirection,
                                     int32_t* status) {}
-}
+}  // extern "C"

@@ -35,7 +35,7 @@ public class Joystick extends JoystickBase {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private AxisType(int value) {
+    AxisType(int value) {
       this.value = value;
     }
   }
@@ -49,7 +49,7 @@ public class Joystick extends JoystickBase {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private ButtonType(int value) {
+    ButtonType(int value) {
       this.value = value;
     }
   }

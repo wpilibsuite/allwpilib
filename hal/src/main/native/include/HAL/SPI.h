@@ -55,5 +55,5 @@ double HAL_GetSPIAccumulatorAverage(HAL_SPIPort port, int32_t* status);
 void HAL_GetSPIAccumulatorOutput(HAL_SPIPort port, int64_t* value,
                                  int64_t* count, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

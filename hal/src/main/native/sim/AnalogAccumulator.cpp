@@ -103,4 +103,4 @@ void HAL_GetAccumulatorOutput(HAL_AnalogInputHandle analogPortHandle,
   *count = SimAnalogInData[port->channel].GetAccumulatorCount();
   *value = SimAnalogInData[port->channel].GetAccumulatorValue();
 }
-}
+}  // extern "C"

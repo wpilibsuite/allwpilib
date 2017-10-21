@@ -37,7 +37,7 @@
 namespace std {
 template <class T>
 using decay_t = typename decay<T>::type;
-}
+}  // namespace std
 #endif
 #endif
 

@@ -57,5 +57,5 @@ void HALSIM_RegisterDIOAllCallbacks(int32_t index, HAL_NotifyCallback callback,
                                     void* param, HAL_Bool initialNotify);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

@@ -11,7 +11,6 @@
 #include "HAL/AnalogTrigger.h"
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "PortsInternal.h"
 
 namespace hal {

@@ -52,5 +52,5 @@ void HALSIM_RegisterRelayAllCallcbaks(int32_t index,
                                       HAL_Bool initialNotify);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

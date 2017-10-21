@@ -20,7 +20,10 @@ import static java.util.Objects.requireNonNull;
  * Motor channel numbers are supplied on creation of the class. Those are used for either the drive
  * function (intended for hand created drive code, such as autonomous) or with the Tank/Arcade
  * functions intended to be used for Operator Control driving.
+ *
+ * @deprecated Use DifferentialDrive or MecanumDrive classes instead.
  */
+@Deprecated
 public class RobotDrive implements MotorSafety {
 
   protected MotorSafetyHelper m_safetyHelper;
@@ -34,7 +37,7 @@ public class RobotDrive implements MotorSafety {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private MotorType(int value) {
+    MotorType(int value) {
       this.value = value;
     }
   }

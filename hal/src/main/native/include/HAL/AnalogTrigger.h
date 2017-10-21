@@ -43,5 +43,5 @@ HAL_Bool HAL_GetAnalogTriggerOutput(HAL_AnalogTriggerHandle analogTriggerHandle,
                                     HAL_AnalogTriggerType type,
                                     int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

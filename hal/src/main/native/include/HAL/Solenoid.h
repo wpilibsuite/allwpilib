@@ -31,5 +31,5 @@ HAL_Bool HAL_GetPCMSolenoidVoltageStickyFault(int32_t module, int32_t* status);
 HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status);
 void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

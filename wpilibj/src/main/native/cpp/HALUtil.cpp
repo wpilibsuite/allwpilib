@@ -15,9 +15,7 @@
 #include <cstring>
 #include <string>
 
-#ifdef CONFIG_ATHENA
-#include "FRC_NetworkCommunication/CANSessionMux.h"
-#endif
+#include "HAL/CAN.h"
 #include "HAL/HAL.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
@@ -57,6 +55,7 @@ static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
 static JClass pwmConfigDataResultCls;
+static JClass canStatusCls;
 
 namespace frc {
 
@@ -122,9 +121,7 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
     case kRioStatusSuccess:
       // Everything is ok... don't throw.
       break;
-#ifdef CONFIG_ATHENA
-    case ERR_CANSessionMux_InvalidBuffer:
-#endif
+    case HAL_ERR_CANSessionMux_InvalidBuffer:
     case kRIOStatusBufferInvalidSize: {
       static jmethodID invalidBufConstruct = nullptr;
       if (!invalidBufConstruct)
@@ -135,9 +132,7 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
       env->Throw(static_cast<jthrowable>(exception));
       break;
     }
-#ifdef CONFIG_ATHENA
-    case ERR_CANSessionMux_MessageNotFound:
-#endif
+    case HAL_ERR_CANSessionMux_MessageNotFound:
     case kRIOStatusOperationTimedOut: {
       static jmethodID messageNotFoundConstruct = nullptr;
       if (!messageNotFoundConstruct)
@@ -148,9 +143,7 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
       env->Throw(static_cast<jthrowable>(exception));
       break;
     }
-#ifdef CONFIG_ATHENA
-    case ERR_CANSessionMux_NotAllowed:
-#endif
+    case HAL_ERR_CANSessionMux_NotAllowed:
     case kRIOStatusFeatureNotSupported: {
       llvm::SmallString<100> buf;
       llvm::raw_svector_ostream oss(buf);
@@ -158,9 +151,7 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
       canMessageNotAllowedExCls.Throw(env, buf.c_str());
       break;
     }
-#ifdef CONFIG_ATHENA
-    case ERR_CANSessionMux_NotInitialized:
-#endif
+    case HAL_ERR_CANSessionMux_NotInitialized:
     case kRIOStatusResourceNotInitialized: {
       static jmethodID notInitConstruct = nullptr;
       if (!notInitConstruct)
@@ -217,6 +208,18 @@ jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
                         minPwm);
 }
 
+void SetCanStatusObject(JNIEnv *env, jobject canStatus, 
+                        float percentBusUtilization,
+                        uint32_t busOffCount, uint32_t txFullCount, 
+                        uint32_t receiveErrorCount, 
+                        uint32_t transmitErrorCount) {
+    static jmethodID func = env->GetMethodID(canStatusCls, "setStatus", 
+                                             "(DIIII)V");
+    env->CallObjectMethod(canStatus, func, (jdouble)percentBusUtilization, 
+                          (jint)busOffCount, (jint)txFullCount, 
+                          (jint)receiveErrorCount, (jint)transmitErrorCount);
+  }
+
 }  // namespace frc
 
 using namespace frc;
@@ -269,6 +272,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   pwmConfigDataResultCls = JClass(env, "edu/wpi/first/wpilibj/PWMConfigDataResult");
   if (!pwmConfigDataResultCls) return JNI_ERR;
 
+  canStatusCls = JClass(env, "edu/wpi/first/wpilibj/can/CANStatus");
+  if (!canStatusCls) return JNI_ERR;
+
   return JNI_VERSION_1_6;
 }
 
@@ -288,6 +294,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   canNotInitializedExCls.free(env);
   uncleanStatusExCls.free(env);
   pwmConfigDataResultCls.free(env);
+  canStatusCls.free(env);
   jvm = nullptr;
 }
 

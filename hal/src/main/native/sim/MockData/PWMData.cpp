@@ -371,4 +371,4 @@ void HALSIM_RegisterPWMAllCallbacks(int32_t index, HAL_NotifyCallback callback,
   SimPWMData[index].RegisterPeriodScaleCallback(callback, param, initialNotify);
   SimPWMData[index].RegisterZeroLatchCallback(callback, param, initialNotify);
 }
-}
+}  // extern "C"

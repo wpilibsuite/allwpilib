@@ -10,11 +10,10 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
-
-#include <HAL/cpp/priority_mutex.h>
 
 #include "Commands/Command.h"
 #include "ErrorBase.h"
@@ -54,11 +53,11 @@ class Scheduler : public ErrorBase, public NamedSendable {
   void ProcessCommandAddition(Command* command);
 
   Command::SubsystemSet m_subsystems;
-  hal::priority_mutex m_buttonsLock;
+  std::mutex m_buttonsLock;
   typedef std::vector<ButtonScheduler*> ButtonVector;
   ButtonVector m_buttons;
   typedef std::vector<Command*> CommandVector;
-  hal::priority_mutex m_additionsLock;
+  std::mutex m_additionsLock;
   CommandVector m_additions;
   typedef std::set<Command*> CommandSet;
   CommandSet m_commands;

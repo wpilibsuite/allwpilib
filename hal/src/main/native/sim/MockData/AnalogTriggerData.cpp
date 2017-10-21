@@ -268,4 +268,4 @@ void HALSIM_RegisterAnalogTriggerAllCallbacks(int32_t index,
   SimAnalogTriggerData[index].RegisterTriggerModeCallback(callback, param,
                                                           initialNotify);
 }
-}
+}  // extern "C"

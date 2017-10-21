@@ -10,10 +10,10 @@
 #include <stdint.h>
 
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "HAL/Types.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 
 namespace hal {
@@ -48,13 +48,13 @@ class UnlimitedHandleResource : public HandleBase {
 
  private:
   std::vector<std::shared_ptr<TStruct>> m_structures;
-  hal::priority_mutex m_handleMutex;
+  std::mutex m_handleMutex;
 };
 
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
     std::shared_ptr<TStruct> structure) {
-  std::lock_guard<hal::priority_mutex> sync(m_handleMutex);
+  std::lock_guard<std::mutex> sync(m_handleMutex);
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
@@ -73,7 +73,7 @@ template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 std::shared_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
-  std::lock_guard<hal::priority_mutex> sync(m_handleMutex);
+  std::lock_guard<std::mutex> sync(m_handleMutex);
   if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
     return nullptr;
   return m_structures[index];
@@ -83,7 +83,7 @@ template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 void UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(
     THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
-  std::lock_guard<hal::priority_mutex> sync(m_handleMutex);
+  std::lock_guard<std::mutex> sync(m_handleMutex);
   if (index < 0 || index >= static_cast<int16_t>(m_structures.size())) return;
   m_structures[index].reset();
 }
@@ -91,7 +91,7 @@ void UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 void UnlimitedHandleResource<THandle, TStruct, enumValue>::ResetHandles() {
   {
-    std::lock_guard<hal::priority_mutex> lock(m_handleMutex);
+    std::lock_guard<std::mutex> lock(m_handleMutex);
     for (size_t i = 0; i < m_structures.size(); i++) {
       m_structures[i].reset();
     }

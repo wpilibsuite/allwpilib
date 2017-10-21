@@ -203,4 +203,4 @@ void HALSIM_RegisterAnalogGyroAllCallbacks(int32_t index,
   SimAnalogGyroData[index].RegisterInitializedCallback(callback, param,
                                                        initialNotify);
 }
-}
+}  // extern "C"

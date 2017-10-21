@@ -922,4 +922,4 @@ void HALSIM_RegisterRoboRioAllCallbacks(int32_t index,
   SimRoboRioData[index].RegisterUserFaults3V3Callback(callback, param,
                                                       initialNotify);
 }
-}
+}  // extern "C"

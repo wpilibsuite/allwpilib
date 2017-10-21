@@ -50,7 +50,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     @SuppressWarnings("MemberName")
     public final byte value;
 
-    private Axes(byte value) {
+    Axes(byte value) {
       this.value = value;
     }
   }

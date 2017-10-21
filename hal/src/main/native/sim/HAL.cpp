@@ -10,6 +10,7 @@
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
+#include "HAL/Extensions.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "MockData/RoboRioDataInternal.h"
 #include "MockHooksInternal.h"
@@ -194,8 +195,20 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
 }
 
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  static std::atomic_bool initialized{false};
+  static std::mutex initializeMutex;
+  // Initial check, as if it's true initialization has finished
+  if (initialized) return true;
+
+  std::lock_guard<std::mutex> lock(initializeMutex);
+  // Second check in case another thread was waiting
+  if (initialized) return true;
+
+  if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
+
+  initialized = true;
   return true;  // Add initialization if we need to at a later point
 }
 

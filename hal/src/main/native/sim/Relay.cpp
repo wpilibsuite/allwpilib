@@ -18,7 +18,7 @@ struct Relay {
   uint8_t channel;
   bool fwd;
 };
-}
+}  // namespace
 
 static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
                              HAL_HandleEnum::Relay>

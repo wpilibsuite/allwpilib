@@ -262,4 +262,4 @@ void HALSIM_RegisterRelayAllCallcbaks(int32_t index,
   SimRelayData[index].RegisterForwardCallback(callback, param, initialNotify);
   SimRelayData[index].RegisterReverseCallback(callback, param, initialNotify);
 }
-}
+}  // extern "C"

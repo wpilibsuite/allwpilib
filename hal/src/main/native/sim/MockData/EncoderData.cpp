@@ -503,4 +503,4 @@ void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
   SimEncoderData[index].RegisterSamplesToAverageCallback(callback, param,
                                                          initialNotify);
 }
-}
+}  // extern "C"

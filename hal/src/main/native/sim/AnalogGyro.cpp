@@ -21,7 +21,7 @@ struct AnalogGyro {
   HAL_AnalogInputHandle handle;
   uint8_t index;
 };
-}
+}  // namespace
 
 using namespace hal;
 
@@ -132,4 +132,4 @@ double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status) {
 int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status) {
   return 0;
 }
-}
+}  // extern "C"

@@ -474,4 +474,4 @@ void HALSIM_RegisterPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
   SimPCMData[index].RegisterSolenoidOutputCallback(channel, callback, param,
                                                    initialNotify);
 }
-}
+}  // extern "C"

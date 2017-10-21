@@ -322,4 +322,4 @@ void HALSIM_RegisterAccelerometerAllCallbacks(int32_t index,
   SimAccelerometerData[index].RegisterYCallback(callback, param, initialNotify);
   SimAccelerometerData[index].RegisterZCallback(callback, param, initialNotify);
 }
-}
+}  // extern "C"

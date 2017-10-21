@@ -19,4 +19,4 @@ int64_t GetFPGATime();
 double GetFPGATimestamp();
 
 void SetProgramStarted();
-}
+}  // namespace hal

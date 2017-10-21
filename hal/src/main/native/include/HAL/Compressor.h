@@ -44,5 +44,5 @@ HAL_Bool HAL_GetCompressorNotConnectedStickyFault(
 HAL_Bool HAL_GetCompressorNotConnectedFault(
     HAL_CompressorHandle compressorHandle, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

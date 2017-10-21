@@ -312,4 +312,4 @@ void HALSIM_RegisterDIOAllCallbacks(int32_t index, HAL_NotifyCallback callback,
   SimDIOData[index].RegisterIsInputCallback(callback, param, initialNotify);
   SimDIOData[index].RegisterFilterIndexCallback(callback, param, initialNotify);
 }
-}
+}  // extern "C"
