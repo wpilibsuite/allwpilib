@@ -55,6 +55,7 @@ static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
 static JClass pwmConfigDataResultCls;
+static JClass canStatusCls;
 
 namespace frc {
 
@@ -207,6 +208,18 @@ jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
                         minPwm);
 }
 
+void SetCanStatusObject(JNIEnv *env, jobject canStatus, 
+                        float percentBusUtilization,
+                        uint32_t busOffCount, uint32_t txFullCount, 
+                        uint32_t receiveErrorCount, 
+                        uint32_t transmitErrorCount) {
+    static jmethodID func = env->GetMethodID(canStatusCls, "setStatus", 
+                                             "(DIIII)V");
+    env->CallObjectMethod(canStatus, func, (jdouble)percentBusUtilization, 
+                          (jint)busOffCount, (jint)txFullCount, 
+                          (jint)receiveErrorCount, (jint)transmitErrorCount);
+  }
+
 }  // namespace frc
 
 using namespace frc;
@@ -259,6 +272,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   pwmConfigDataResultCls = JClass(env, "edu/wpi/first/wpilibj/PWMConfigDataResult");
   if (!pwmConfigDataResultCls) return JNI_ERR;
 
+  canStatusCls = JClass(env, "edu/wpi/first/wpilibj/can/CANStatus");
+  if (!canStatusCls) return JNI_ERR;
+
   return JNI_VERSION_1_6;
 }
 
@@ -278,6 +294,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   canNotInitializedExCls.free(env);
   uncleanStatusExCls.free(env);
   pwmConfigDataResultCls.free(env);
+  canStatusCls.free(env);
   jvm = nullptr;
 }
 

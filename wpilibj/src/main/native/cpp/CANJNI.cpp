@@ -125,4 +125,29 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
                         static_cast<size_t>(dataSize)});
 }
 
+/*
+ * Class:     edu_wpi_first_wpilibj_can_CANJNI
+ * Method:    GetCANStatus
+ * Signature: (Ledu/wpi/first/wpilibj/can/CANStatus;)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_GetCANStatus
+(JNIEnv *env, jclass, jobject canStatus) {
+  CANJNI_LOG(logDEBUG)
+  << "Calling CANJNI HAL_CAN_GetCANStatus";
+
+  float percentBusUtilization = 0;
+  uint32_t busOffCount = 0;
+  uint32_t txFullCount = 0;
+  uint32_t receiveErrorCount = 0;
+  uint32_t transmitErrorCount = 0;
+  int32_t status = 0;
+  HAL_CAN_GetCANStatus(&percentBusUtilization, &busOffCount, &txFullCount,
+                       &receiveErrorCount, &transmitErrorCount, &status);
+  
+  if (!CheckStatus(env, status)) return;
+
+  SetCanStatusObject(env, canStatus, percentBusUtilization, busOffCount,
+                     txFullCount, receiveErrorCount, transmitErrorCount);
+}
+
 }  // extern "C"
