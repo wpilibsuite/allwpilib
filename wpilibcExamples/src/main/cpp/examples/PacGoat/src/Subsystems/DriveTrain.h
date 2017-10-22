@@ -17,7 +17,7 @@
 
 namespace frc {
 class Joystick;
-}
+}  // namespace frc
 
 /**
  * The DriveTrain subsystem controls the robot's chassis and reads in

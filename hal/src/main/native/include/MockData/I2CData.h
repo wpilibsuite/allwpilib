@@ -35,5 +35,5 @@ int32_t HALSIM_RegisterI2CWriteCallback(int32_t index,
 void HALSIM_CancelI2CWriteCallback(int32_t index, int32_t uid);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

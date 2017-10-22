@@ -244,4 +244,4 @@ int64_t HALSIM_GetSPIGetAccumulatorValue(int32_t index) {
   return SimSPIData[index].GetAccumulatorValue();
 }
 
-}  // extern c
+}  // extern "C"

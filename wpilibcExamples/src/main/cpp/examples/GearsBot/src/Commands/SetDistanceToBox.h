@@ -13,7 +13,7 @@
 
 namespace frc {
 class PIDController;
-}
+}  // namespace frc
 
 /**
  * Drive until the robot is the given distance away from the box. Uses a local
