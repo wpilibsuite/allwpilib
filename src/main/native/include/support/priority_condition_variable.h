@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <condition_variable>
-#include <memory>
-#include <utility>
-
 #ifdef __linux__
 #include <pthread.h>
 #endif
+
+#include <condition_variable>
+#include <memory>
+#include <utility>
 
 #include "priority_mutex.h"
 
@@ -36,13 +36,9 @@ class priority_condition_variable {
   priority_condition_variable& operator=(const priority_condition_variable&) =
       delete;
 
-  void notify_one() noexcept {
-    pthread_cond_signal(&m_cond);
-  }
+  void notify_one() noexcept { pthread_cond_signal(&m_cond); }
 
-  void notify_all() noexcept {
-    pthread_cond_broadcast(&m_cond);
-  }
+  void notify_all() noexcept { pthread_cond_broadcast(&m_cond); }
 
   void wait(std::unique_lock<priority_mutex>& lock) noexcept {
     int e = pthread_cond_wait(&m_cond, lock.mutex()->native_handle());
@@ -113,7 +109,7 @@ class priority_condition_variable {
 
     struct timespec ts = {
         static_cast<std::time_t>(s.time_since_epoch().count()),
-        static_cast<long>(ns.count())};
+        static_cast<long>(ns.count())};  // NOLINT(runtime/int)
 
     pthread_cond_timedwait(&m_cond, lock.mutex()->native_handle(), &ts);
 

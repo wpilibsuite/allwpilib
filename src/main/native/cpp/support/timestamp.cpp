@@ -1,17 +1,19 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
+
 #include "support/timestamp.h"
 
 #include <atomic>
 
 #ifdef _WIN32
+#include <windows.h>
+
 #include <cassert>
 #include <exception>
-#include <windows.h>
 #else
 #include <chrono>
 #endif
@@ -34,10 +36,9 @@ static uint64_t zerotime() {
   tmpres -= deltaepoch;
   return tmpres;
 #else
-  // 100-ns intervals
-  using namespace std::chrono;
-  return duration_cast<microseconds>(
-             high_resolution_clock::now().time_since_epoch())
+  // 1-us intervals
+  return std::chrono::duration_cast<std::chrono::microseconds>(
+             std::chrono::high_resolution_clock::now().time_since_epoch())
       .count();
 #endif
 }
@@ -51,8 +52,8 @@ static uint64_t timestamp() {
   return static_cast<uint64_t>(li.QuadPart);
 #else
   // 1-us intervals
-  using namespace std::chrono;
-  return duration_cast<microseconds>(steady_clock::now().time_since_epoch())
+  return std::chrono::duration_cast<std::chrono::microseconds>(
+             std::chrono::steady_clock::now().time_since_epoch())
       .count();
 #endif
 }

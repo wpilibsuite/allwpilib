@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -33,7 +33,7 @@ namespace detail {
 // Non-template proxy base class for common proxy code.
 class SafeThreadProxyBase {
  public:
-  SafeThreadProxyBase(SafeThread* thr) : m_thread(thr) {
+  explicit SafeThreadProxyBase(SafeThread* thr) : m_thread(thr) {
     if (!m_thread) return;
     m_lock = std::unique_lock<wpi::mutex>(m_thread->m_mutex);
     if (!m_thread->m_active) {
@@ -55,7 +55,7 @@ class SafeThreadProxyBase {
 template <typename T>
 class SafeThreadProxy : public SafeThreadProxyBase {
  public:
-  SafeThreadProxy(SafeThread* thr) : SafeThreadProxyBase(thr) {}
+  explicit SafeThreadProxy(SafeThread* thr) : SafeThreadProxyBase(thr) {}
   T& operator*() const { return *static_cast<T*>(m_thread); }
   T* operator->() const { return static_cast<T*>(m_thread); }
 };

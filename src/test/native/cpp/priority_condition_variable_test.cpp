@@ -5,14 +5,14 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <support/priority_condition_variable.h>
+#include <support/priority_mutex.h>
+
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
 #include <thread>
-
-#include <support/priority_condition_variable.h>
-#include <support/priority_mutex.h>
 
 #include "gtest/gtest.h"
 

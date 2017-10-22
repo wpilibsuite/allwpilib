@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,7 +29,7 @@ class raw_socket_ostream : public llvm::raw_ostream {
   void error_detected() { m_error = true; }
 
  private:
-  void write_impl(const char* data, std::size_t len) override;
+  void write_impl(const char* data, size_t len) override;
   uint64_t current_pos() const override;
 
   NetworkStream& m_stream;

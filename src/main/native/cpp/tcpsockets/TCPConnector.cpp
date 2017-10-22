@@ -6,7 +6,7 @@
 
    ------------------------------------------
 
-   Copyright © 2013 [Vic Hargrave - http://vichargrave.com]
+   Copyright (c) 2013 [Vic Hargrave - http://vichargrave.com]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,26 +23,27 @@
 
 #include "tcpsockets/TCPConnector.h"
 
-#include <errno.h>
 #include <fcntl.h>
+
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
+
 #ifdef _WIN32
-#include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <WinSock2.h>
 #else
-#include <netdb.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <sys/select.h>
 #include <unistd.h>
 #endif
 
-#include "tcpsockets/TCPStream.h"
-
 #include "llvm/SmallString.h"
 #include "support/Logger.h"
 #include "tcpsockets/SocketError.h"
+#include "tcpsockets/TCPStream.h"
 
 using namespace wpi;
 
@@ -60,8 +61,9 @@ static int ResolveHostName(const char* hostname, struct in_addr* addr) {
   hints.ai_next = nullptr;
   int result = getaddrinfo(hostname, nullptr, &hints, &res);
   if (result == 0) {
-    std::memcpy(addr, &((struct sockaddr_in*)res->ai_addr)->sin_addr,
-                sizeof(struct in_addr));
+    std::memcpy(
+        addr, &(reinterpret_cast<struct sockaddr_in*>(res->ai_addr)->sin_addr),
+        sizeof(struct in_addr));
     freeaddrinfo(res);
   }
   return result;
@@ -107,7 +109,8 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
       return nullptr;
     }
     if (::connect(sd, (struct sockaddr*)&address, sizeof(address)) != 0) {
-      WPI_ERROR(logger, "connect() to " << server << " port " << port << " failed: " << SocketStrerror());
+      WPI_ERROR(logger, "connect() to " << server << " port " << port
+                                        << " failed: " << SocketStrerror());
 #ifdef _WIN32
       closesocket(sd);
 #else
@@ -127,14 +130,14 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
     return nullptr;
   }
 
-  // Set socket to non-blocking
+// Set socket to non-blocking
 #ifdef _WIN32
   u_long mode = 1;
   if (ioctlsocket(sd, FIONBIO, &mode) == SOCKET_ERROR)
     WPI_WARNING(logger,
                 "could not set socket to non-blocking: " << SocketStrerror());
 #else
-  long arg;
+  int arg;
   arg = fcntl(sd, F_GETFL, nullptr);
   if (arg < 0) {
     WPI_WARNING(logger,
@@ -162,20 +165,28 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
       FD_SET(sd, &sdset);
       if (select(sd + 1, nullptr, &sdset, nullptr, &tv) > 0) {
         len = sizeof(int);
-        getsockopt(sd, SOL_SOCKET, SO_ERROR, (char*)(&valopt), &len);
+        getsockopt(sd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&valopt),
+                   &len);
         if (valopt) {
-          WPI_ERROR(logger, "select() to " << server << " port " << port << " error " << valopt << " - " << SocketStrerror(valopt));
+          WPI_ERROR(logger, "select() to " << server << " port " << port
+                                           << " error " << valopt << " - "
+                                           << SocketStrerror(valopt));
         }
         // connection established
         else
           result = 0;
-      } else
-        WPI_INFO(logger, "connect() to " << server << " port " << port << " timed out");
-    } else
-      WPI_ERROR(logger, "connect() to " << server << " port " << port << " error " << SocketErrno() << " - " << SocketStrerror());
+      } else {
+        WPI_INFO(logger,
+                 "connect() to " << server << " port " << port << " timed out");
+      }
+    } else {
+      WPI_ERROR(logger, "connect() to " << server << " port " << port
+                                        << " error " << SocketErrno() << " - "
+                                        << SocketStrerror());
+    }
   }
 
-  // Return socket to blocking mode
+// Return socket to blocking mode
 #ifdef _WIN32
   mode = 0;
   if (ioctlsocket(sd, FIONBIO, &mode) == SOCKET_ERROR)
@@ -197,9 +208,9 @@ std::unique_ptr<NetworkStream> TCPConnector::connect(const char* server,
   // Create stream object if connected, close if not.
   if (result == -1) {
 #ifdef _WIN32
-      closesocket(sd);
+    closesocket(sd);
 #else
-      ::close(sd);
+    ::close(sd);
 #endif
     return nullptr;
   }

@@ -8,11 +8,11 @@
 #pragma once
 
 // Allows usage with std::lock_guard without including <mutex> separately
-#include <mutex>
-
 #ifdef __linux__
 #include <pthread.h>
 #endif
+
+#include <mutex>
 
 namespace wpi {
 

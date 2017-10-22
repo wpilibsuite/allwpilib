@@ -6,7 +6,7 @@
 
    ------------------------------------------
 
-   Copyright © 2013 [Vic Hargrave - http://vichargrave.com]
+   Copyright (c) 2013 [Vic Hargrave - http://vichargrave.com]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -45,9 +45,9 @@ class TCPStream : public NetworkStream {
 
   ~TCPStream();
 
-  std::size_t send(const char* buffer, std::size_t len, Error* err) override;
-  std::size_t receive(char* buffer, std::size_t len, Error* err,
-                      int timeout = 0) override;
+  size_t send(const char* buffer, size_t len, Error* err) override;
+  size_t receive(char* buffer, size_t len, Error* err,
+                 int timeout = 0) override;
   void close() override;
 
   llvm::StringRef getPeerIP() const override;
@@ -58,6 +58,7 @@ class TCPStream : public NetworkStream {
 
   TCPStream(const TCPStream& stream) = delete;
   TCPStream& operator=(const TCPStream&) = delete;
+
  private:
   bool WaitForReadEvent(int timeout);
 
@@ -67,4 +68,4 @@ class TCPStream : public NetworkStream {
 
 }  // namespace wpi
 
-#endif
+#endif  // WPIUTIL_TCPSOCKETS_TCPSTREAM_H_

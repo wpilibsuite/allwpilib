@@ -17,39 +17,40 @@
         -- Eugene Hopkinson <slowriot at voxelstorm dot com>
 */
 
-#ifndef SHA1_HPP
-#define SHA1_HPP
+#ifndef WPIUTIL_SUPPORT_SHA1_H_
+#define WPIUTIL_SUPPORT_SHA1_H_
 
+#include <stdint.h>
 
-#include <cstdint>
 #include <string>
+
 #include "llvm/StringRef.h"
 
 namespace llvm {
-template <typename T> class SmallVectorImpl;
-}
+template <typename T>
+class SmallVectorImpl;
+}  // namespace llvm
 
 namespace wpi {
 
 class raw_istream;
 
-class SHA1
-{
-public:
-    SHA1();
-    void Update(llvm::StringRef s);
-    void Update(raw_istream &is);
-    std::string Final();
-    llvm::StringRef Final(llvm::SmallVectorImpl<char>& buf);
-    static std::string FromFile(llvm::StringRef filename);
+class SHA1 {
+ public:
+  SHA1();
+  void Update(llvm::StringRef s);
+  void Update(raw_istream& is);
+  std::string Final();
+  llvm::StringRef Final(llvm::SmallVectorImpl<char>& buf);
+  static std::string FromFile(llvm::StringRef filename);
 
-private:
-    uint32_t digest[5];
-    unsigned char buffer[64];
-    size_t buf_size;
-    uint64_t transforms;
+ private:
+  uint32_t digest[5];
+  unsigned char buffer[64];
+  size_t buf_size;
+  uint64_t transforms;
 };
 
 }  // namespace wpi
 
-#endif /* SHA1_HPP */
+#endif  // WPIUTIL_SUPPORT_SHA1_H_

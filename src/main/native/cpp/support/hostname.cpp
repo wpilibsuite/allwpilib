@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -15,6 +15,7 @@
 #endif
 
 #include <string>
+
 #include "llvm/SmallVector.h"
 #include "llvm/StringRef.h"
 
@@ -27,7 +28,6 @@ struct WSAHelper {
   }
   ~WSAHelper() { WSACleanup(); }
 };
-
 static WSAHelper& GetWSAHelper() {
   static WSAHelper helper;
   return helper;
@@ -40,7 +40,8 @@ static bool GetHostnameImpl(char* name, size_t name_len) {
   GetWSAHelper();
 #endif
   if (::gethostname(name, name_len) != 0) return false;
-  name[name_len - 1] = '\0'; // Per POSIX, may not be null terminated if too long
+  name[name_len - 1] =
+      '\0';  // Per POSIX, may not be null terminated if too long
   return true;
 }
 

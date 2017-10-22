@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,7 +14,6 @@
 #include "llvm/StringRef.h"
 #include "support/mutex.h"
 
-
 namespace wpi {
 
 class Logger;
@@ -24,7 +23,7 @@ class UDPClient {
   std::string m_address;
   Logger& m_logger;
 
-public:
+ public:
   explicit UDPClient(Logger& logger);
   UDPClient(llvm::StringRef address, Logger& logger);
   UDPClient(const UDPClient& other) = delete;

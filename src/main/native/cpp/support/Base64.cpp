@@ -1,10 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 /* ====================================================================
  * Copyright (c) 1995-1999 The Apache Group.  All rights reserved.
  *
@@ -70,34 +63,30 @@
 namespace wpi {
 
 // aaaack but it's fast and const should make it shared text page.
-static const unsigned char pr2six[256] =
-{
+static const unsigned char pr2six[256] = {
     // ASCII table
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
-    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 64, 64, 64, 64, 64,
-    64,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 64,
-    64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64
-};
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 62, 64, 64, 64, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+    61, 64, 64, 64, 64, 64, 64, 64, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10,
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64,
+    64, 64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,
+    43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+    64, 64, 64, 64, 64, 64, 64, 64, 64};
 
-std::size_t Base64Decode(llvm::raw_ostream& os, llvm::StringRef encoded) {
-  const unsigned char *end = encoded.bytes_begin();
+size_t Base64Decode(llvm::raw_ostream& os, llvm::StringRef encoded) {
+  const unsigned char* end = encoded.bytes_begin();
   while (pr2six[*end] <= 63 && end != encoded.bytes_end()) ++end;
-  std::size_t nprbytes = end - encoded.bytes_begin();
+  size_t nprbytes = end - encoded.bytes_begin();
   if (nprbytes == 0) return 0;
 
-  const unsigned char *cur = encoded.bytes_begin();
+  const unsigned char* cur = encoded.bytes_begin();
 
   while (nprbytes > 4) {
     os << static_cast<unsigned char>(pr2six[cur[0]] << 2 | pr2six[cur[1]] >> 4);
@@ -118,15 +107,15 @@ std::size_t Base64Decode(llvm::raw_ostream& os, llvm::StringRef encoded) {
   return (end - encoded.bytes_begin()) + ((4 - nprbytes) & 3);
 }
 
-std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain) {
+size_t Base64Decode(llvm::StringRef encoded, std::string* plain) {
   plain->resize(0);
   llvm::raw_string_ostream os(*plain);
-  std::size_t rv = Base64Decode(os, encoded);
+  size_t rv = Base64Decode(os, encoded);
   os.flush();
   return rv;
 }
 
-llvm::StringRef Base64Decode(llvm::StringRef encoded, std::size_t* num_read,
+llvm::StringRef Base64Decode(llvm::StringRef encoded, size_t* num_read,
                              llvm::SmallVectorImpl<char>& buf) {
   buf.clear();
   llvm::raw_svector_ostream os(buf);
@@ -139,14 +128,15 @@ static const char basis_64[] =
 
 void Base64Encode(llvm::raw_ostream& os, llvm::StringRef plain) {
   if (plain.empty()) return;
-  std::size_t len = plain.size();
+  size_t len = plain.size();
 
-  std::size_t i;
+  size_t i;
   for (i = 0; (i + 2) < len; i += 3) {
     os << basis_64[(plain[i] >> 2) & 0x3F];
-    os << basis_64[((plain[i] & 0x3) << 4) | ((int)(plain[i + 1] & 0xF0) >> 4)];
+    os << basis_64[((plain[i] & 0x3) << 4) |
+                   (static_cast<int>(plain[i + 1] & 0xF0) >> 4)];
     os << basis_64[((plain[i + 1] & 0xF) << 2) |
-                   ((int)(plain[i + 2] & 0xC0) >> 6)];
+                   (static_cast<int>(plain[i + 2] & 0xC0) >> 6)];
     os << basis_64[plain[i + 2] & 0x3F];
   }
   if (i < len) {
@@ -156,7 +146,7 @@ void Base64Encode(llvm::raw_ostream& os, llvm::StringRef plain) {
       os << '=';
     } else {
       os << basis_64[((plain[i] & 0x3) << 4) |
-                     ((int)(plain[i + 1] & 0xF0) >> 4)];
+                     (static_cast<int>(plain[i + 1] & 0xF0) >> 4)];
       os << basis_64[((plain[i + 1] & 0xF) << 2)];
     }
     os << '=';

@@ -4,14 +4,15 @@
 // - see < http://opensource.org/licenses/BSD-2-Clause>
 //
 
-#ifndef WPIUTIL_SUPPORT_CONCURRENT_QUEUE_H_
-#define WPIUTIL_SUPPORT_CONCURRENT_QUEUE_H_
+#ifndef WPIUTIL_SUPPORT_CONCURRENTQUEUE_H_
+#define WPIUTIL_SUPPORT_CONCURRENTQUEUE_H_
 
 #include <queue>
 #include <thread>
+#include <utility>
 
-#include "support/mutex.h"
 #include "support/condition_variable.h"
+#include "support/mutex.h"
 
 namespace wpi {
 
@@ -81,4 +82,4 @@ class ConcurrentQueue {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_CONCURRENT_QUEUE_H_
+#endif  // WPIUTIL_SUPPORT_CONCURRENTQUEUE_H_

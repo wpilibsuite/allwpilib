@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -14,28 +14,26 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "support/leb128.h"
+#include <stdint.h>
 
-#include "gtest/gtest.h"
-
-#include <cstdint>
 #include <string>
 
+#include "gtest/gtest.h"
 #include "llvm/SmallString.h"
 #include "llvm/StringRef.h"
-
+#include "support/leb128.h"
 #include "support/raw_istream.h"
 
 namespace wpi {
 
 TEST(LEB128Test, WriteUleb128) {
-#define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD) \
-  do { \
-    llvm::StringRef expected(EXPECTED, sizeof(EXPECTED)-1); \
-    llvm::SmallString<32> buf; \
-    std::size_t size = WriteUleb128(buf, VALUE); \
-    EXPECT_EQ(size, buf.size()); \
-    EXPECT_EQ(expected, buf.str()); \
+#define EXPECT_ULEB128_EQ(EXPECTED, VALUE, PAD)               \
+  do {                                                        \
+    llvm::StringRef expected(EXPECTED, sizeof(EXPECTED) - 1); \
+    llvm::SmallString<32> buf;                                \
+    size_t size = WriteUleb128(buf, VALUE);                   \
+    EXPECT_EQ(size, buf.size());                              \
+    EXPECT_EQ(expected, buf.str());                           \
   } while (0)
 
   // Write ULEB128
@@ -56,11 +54,11 @@ TEST(LEB128Test, WriteUleb128) {
 
 TEST(LEB128Test, ReadUleb128) {
 #define EXPECT_READ_ULEB128_EQ(EXPECTED, VALUE) \
-  do { \
-    unsigned long val = 0; \
-    std::size_t size = ReadUleb128(VALUE, &val); \
-    EXPECT_EQ(sizeof(VALUE) - 1, size); \
-    EXPECT_EQ(EXPECTED, val); \
+  do {                                          \
+    uint64_t val = 0;                           \
+    size_t size = ReadUleb128(VALUE, &val);     \
+    EXPECT_EQ(sizeof(VALUE) - 1, size);         \
+    EXPECT_EQ(EXPECTED, val);                   \
   } while (0)
 
   // Read ULEB128
@@ -86,7 +84,7 @@ TEST(LEB128Test, SizeUleb128) {
   // (2) 128 ^ n * 64 ....... need (n+1) bytes
   // (3) 128 ^ (n+1) - 1 .... need (n+1) bytes
 
-  EXPECT_EQ(1u, SizeUleb128(0)); // special case
+  EXPECT_EQ(1u, SizeUleb128(0));  // special case
 
   EXPECT_EQ(1u, SizeUleb128(0x1UL));
   EXPECT_EQ(1u, SizeUleb128(0x40UL));

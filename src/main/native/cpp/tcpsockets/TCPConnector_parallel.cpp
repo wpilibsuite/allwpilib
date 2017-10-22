@@ -1,11 +1,11 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "tcpsockets/TCPConnector.h"
+#include "tcpsockets/TCPConnector.h"  // NOLINT(build/include_order)
 
 #include <atomic>
 #include <chrono>
@@ -107,7 +107,8 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
       }
       ++result->count;
       result->cv.notify_all();
-    }).detach();
+    })
+        .detach();
   }
 
   // wait for a result, timeout, or all finished

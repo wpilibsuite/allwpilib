@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,8 +10,8 @@
 
 #include <functional>
 
-#include "llvm/raw_ostream.h"
 #include "llvm/SmallString.h"
+#include "llvm/raw_ostream.h"
 
 namespace wpi {
 
@@ -30,7 +30,8 @@ enum LogLevel {
 class Logger {
  public:
   typedef std::function<void(unsigned int level, const char* file,
-                             unsigned int line, const char* msg)> LogFunc;
+                             unsigned int line, const char* msg)>
+      LogFunc;
 
   Logger() = default;
   explicit Logger(const LogFunc& func) : m_func(func) {}
@@ -71,11 +72,21 @@ class Logger {
 #define WPI_INFO(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_INFO, x)
 
 #ifdef NDEBUG
-#define WPI_DEBUG(inst, x) do {} while (0)
-#define WPI_DEBUG1(inst, x) do {} while (0)
-#define WPI_DEBUG2(inst, x) do {} while (0)
-#define WPI_DEBUG3(inst, x) do {} while (0)
-#define WPI_DEBUG4(inst, x) do {} while (0)
+#define WPI_DEBUG(inst, x) \
+  do {                     \
+  } while (0)
+#define WPI_DEBUG1(inst, x) \
+  do {                      \
+  } while (0)
+#define WPI_DEBUG2(inst, x) \
+  do {                      \
+  } while (0)
+#define WPI_DEBUG3(inst, x) \
+  do {                      \
+  } while (0)
+#define WPI_DEBUG4(inst, x) \
+  do {                      \
+  } while (0)
 #else
 #define WPI_DEBUG(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG, x)
 #define WPI_DEBUG1(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG1, x)
@@ -84,6 +95,6 @@ class Logger {
 #define WPI_DEBUG4(inst, x) WPI_LOG(inst, ::wpi::WPI_LOG_DEBUG4, x)
 #endif
 
-} // namespace wpi
+}  // namespace wpi
 
 #endif  // WPIUTIL_SUPPORT_LOGGER_H_

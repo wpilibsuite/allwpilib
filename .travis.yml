@@ -1,3 +1,4 @@
+sudo: true
 language: java
 
 matrix:
@@ -10,9 +11,12 @@ matrix:
 
 addons:
   apt:
+    sources:
+      - deadsnakes
     packages:
       - g++-multilib
       - lib32stdc++6
+      - python3.5
 
 before_install:
   - .travis-scripts/install.sh
@@ -21,6 +25,7 @@ install:
   - ./gradlew assemble -PbuildAll
 
 script:
+  - .travis-scripts/wpiformat.sh
   - ./gradlew build -PbuildAll
 
 before_cache:

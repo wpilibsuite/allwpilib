@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,14 +7,14 @@
 
 #include "support/raw_istream.h"
 
-#include <cstdlib>
-#include <cstring>
-
 #ifdef _WIN32
 #include <io.h>
 #else
 #include <unistd.h>
 #endif
+
+#include <cstdlib>
+#include <cstring>
 
 #include "llvm/FileSystem.h"
 #include "llvm/SmallVector.h"
@@ -22,13 +22,13 @@
 
 #if defined(_MSC_VER)
 #ifndef STDIN_FILENO
-# define STDIN_FILENO 0
+#define STDIN_FILENO 0
 #endif
 #ifndef STDOUT_FILENO
-# define STDOUT_FILENO 1
+#define STDOUT_FILENO 1
 #endif
 #ifndef STDERR_FILENO
-# define STDERR_FILENO 2
+#define STDERR_FILENO 2
 #endif
 #endif
 
@@ -53,9 +53,9 @@ raw_mem_istream::raw_mem_istream(llvm::StringRef mem)
 
 void raw_mem_istream::close() {}
 
-std::size_t raw_mem_istream::in_avail() const { return m_left; }
+size_t raw_mem_istream::in_avail() const { return m_left; }
 
-void raw_mem_istream::read_impl(void* data, std::size_t len) {
+void raw_mem_istream::read_impl(void* data, size_t len) {
   if (len > m_left) {
     error_detected();
     return;
@@ -65,7 +65,7 @@ void raw_mem_istream::read_impl(void* data, std::size_t len) {
   m_left -= len;
 }
 
-static int getFD(const llvm::Twine& Filename, std::error_code &EC) {
+static int getFD(const llvm::Twine& Filename, std::error_code& EC) {
   // Handle "-" as stdin. Note that when we do this, we consider ourself
   // the owner of stdin. This means that we can do things like close the
   // file descriptor when we're done and set the "binary" flag globally.
@@ -77,18 +77,17 @@ static int getFD(const llvm::Twine& Filename, std::error_code &EC) {
   int FD;
 
   EC = llvm::sys::fs::openFileForRead(Filename, FD);
-  if (EC)
-    return -1;
+  if (EC) return -1;
 
   EC = std::error_code();
   return FD;
 }
 
 raw_fd_istream::raw_fd_istream(const llvm::Twine& filename, std::error_code& ec,
-                               std::size_t bufSize)
+                               size_t bufSize)
     : raw_fd_istream(getFD(filename, ec), true, bufSize) {}
 
-raw_fd_istream::raw_fd_istream(int fd, bool shouldClose, std::size_t bufSize)
+raw_fd_istream::raw_fd_istream(int fd, bool shouldClose, size_t bufSize)
     : m_bufSize(bufSize), m_fd(fd), m_shouldClose(shouldClose) {
   m_cur = m_end = m_buf = static_cast<char*>(std::malloc(bufSize));
 }
@@ -105,10 +104,10 @@ void raw_fd_istream::close() {
   }
 }
 
-std::size_t raw_fd_istream::in_avail() const { return m_end - m_cur; }
+size_t raw_fd_istream::in_avail() const { return m_end - m_cur; }
 
-void raw_fd_istream::read_impl(void* data, std::size_t len) {
-  std::size_t left = m_end - m_cur;
+void raw_fd_istream::read_impl(void* data, size_t len) {
+  size_t left = m_end - m_cur;
   if (left < len) {
     // not enough data
     if (m_cur == m_end) {

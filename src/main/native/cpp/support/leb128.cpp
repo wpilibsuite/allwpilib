@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -20,8 +20,8 @@ namespace wpi {
  * on the encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes required.
  */
-std::size_t SizeUleb128(unsigned long val) {
-  std::size_t count = 0;
+uint64_t SizeUleb128(uint64_t val) {
+  size_t count = 0;
   do {
     val >>= 7;
     ++count;
@@ -39,8 +39,8 @@ std::size_t SizeUleb128(unsigned long val) {
  * encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes written.
  */
-std::size_t WriteUleb128(llvm::SmallVectorImpl<char>& dest, unsigned long val) {
-  std::size_t count = 0;
+uint64_t WriteUleb128(llvm::SmallVectorImpl<char>& dest, uint64_t val) {
+  size_t count = 0;
 
   do {
     unsigned char byte = val & 0x7f;
@@ -66,10 +66,10 @@ std::size_t WriteUleb128(llvm::SmallVectorImpl<char>& dest, unsigned long val) {
  * encodings refer to section "7.6 - Variable Length Data". Return
  * the number of bytes read.
  */
-std::size_t ReadUleb128(const char* addr, unsigned long* ret) {
-  unsigned long result = 0;
+uint64_t ReadUleb128(const char* addr, uint64_t* ret) {
+  uint32_t result = 0;
   int shift = 0;
-  std::size_t count = 0;
+  size_t count = 0;
 
   while (1) {
     unsigned char byte = *reinterpret_cast<const unsigned char*>(addr);
@@ -97,13 +97,13 @@ std::size_t ReadUleb128(const char* addr, unsigned long* ret) {
  * encodings refer to section "7.6 - Variable Length Data". Return
  * false on stream error, true on success.
  */
-bool ReadUleb128(raw_istream& is, unsigned long* ret) {
-  unsigned long result = 0;
+bool ReadUleb128(raw_istream& is, uint64_t* ret) {
+  uint32_t result = 0;
   int shift = 0;
 
   while (1) {
     unsigned char byte;
-    is.read((char*)&byte, 1);
+    is.read(reinterpret_cast<char*>(&byte), 1);
     if (is.has_error()) return false;
 
     result |= (byte & 0x7f) << shift;

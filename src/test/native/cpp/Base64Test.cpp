@@ -1,14 +1,13 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "support/Base64.h"
-
 #include "gtest/gtest.h"
 #include "llvm/SmallString.h"
+#include "support/Base64.h"
 
 namespace wpi {
 
@@ -66,7 +65,7 @@ TEST_P(Base64Test, DecodeStdString) {
 TEST_P(Base64Test, DecodeSmallString) {
   llvm::SmallString<128> buf;
   llvm::StringRef encoded = GetParam().encoded;
-  std::size_t len;
+  size_t len;
   llvm::StringRef plain = Base64Decode(encoded, &len, buf);
   EXPECT_EQ(encoded.size(), len);
   ASSERT_EQ(GetPlain(), plain);
@@ -86,7 +85,8 @@ static Base64TestParam sample[] = {
      "mQgc28gb24uLi4K"},
 };
 
-INSTANTIATE_TEST_CASE_P(Base64Sample, Base64Test, ::testing::ValuesIn(sample),);
+INSTANTIATE_TEST_CASE_P(Base64Sample, Base64Test,
+                        ::testing::ValuesIn(sample), );
 
 static Base64TestParam standard[] = {
     {0, "", ""},

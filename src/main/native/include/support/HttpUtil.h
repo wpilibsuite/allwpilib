@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -10,6 +10,8 @@
 
 #include <memory>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "llvm/ArrayRef.h"
 #include "llvm/SmallString.h"
@@ -64,8 +66,8 @@ class HttpLocation {
   HttpLocation() = default;
   HttpLocation(const llvm::Twine& url_, bool* error, std::string* errorMsg);
 
-  std::string url;  // retain copy
-  std::string user;  // unescaped
+  std::string url;       // retain copy
+  std::string user;      // unescaped
   std::string password;  // unescaped
   std::string host;
   int port;
@@ -78,7 +80,8 @@ class HttpRequest {
  public:
   HttpRequest() = default;
 
-  HttpRequest(const HttpLocation& loc) : host{loc.host}, port{loc.port} {
+  explicit HttpRequest(const HttpLocation& loc)
+      : host{loc.host}, port{loc.port} {
     SetPath(loc.path, loc.params);
     SetAuth(loc);
   }
@@ -109,13 +112,17 @@ class HttpRequest {
   void SetPath(llvm::StringRef path_, const T& params);
 
   template <typename T>
-  static llvm::StringRef GetFirst(const T& elem) { return elem.first; }
+  static llvm::StringRef GetFirst(const T& elem) {
+    return elem.first;
+  }
   template <typename T>
   static llvm::StringRef GetFirst(const llvm::StringMapEntry<T>& elem) {
     return elem.getKey();
   }
   template <typename T>
-  static llvm::StringRef GetSecond(const T& elem) { return elem.second; }
+  static llvm::StringRef GetSecond(const T& elem) {
+    return elem.second;
+  }
 };
 
 class HttpConnection {
@@ -136,7 +143,7 @@ class HttpConnection {
   explicit operator bool() const { return stream && !is.has_error(); }
 };
 
-}  // namespace wpi 
+}  // namespace wpi
 
 #include "HttpUtil.inl"
 

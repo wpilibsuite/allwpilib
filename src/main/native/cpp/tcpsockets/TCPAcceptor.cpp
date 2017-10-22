@@ -6,7 +6,7 @@
 
    ------------------------------------------
 
-   Copyright © 2013 [Vic Hargrave - http://vichargrave.com]
+   Copyright (c) 2013 [Vic Hargrave - http://vichargrave.com]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -25,15 +25,16 @@
 
 #include <cstdio>
 #include <cstring>
+
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 #pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <fcntl.h>
 #endif
 
 #include "llvm/SmallString.h"
@@ -101,23 +102,26 @@ int TCPAcceptor::start() {
 
 #ifdef _WIN32
   int optval = 1;
-  setsockopt(m_lsd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (char*)&optval, sizeof optval);
+  setsockopt(m_lsd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+             reinterpret_cast<char*>(&optval), sizeof optval);
 #else
   int optval = 1;
-  setsockopt(m_lsd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof optval);
+  setsockopt(m_lsd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&optval),
+             sizeof optval);
 #endif
 
-  int result = bind(m_lsd, (struct sockaddr*)&address, sizeof(address));
+  int result = bind(m_lsd, reinterpret_cast<struct sockaddr*>(&address),
+                    sizeof(address));
   if (result != 0) {
-    WPI_ERROR(m_logger, "bind() to port " << m_port
-                                          << " failed: " << SocketStrerror());
+    WPI_ERROR(m_logger,
+              "bind() to port " << m_port << " failed: " << SocketStrerror());
     return result;
   }
 
   result = listen(m_lsd, 5);
   if (result != 0) {
-    WPI_ERROR(m_logger, "listen() on port " << m_port
-                                            << " failed: " << SocketStrerror());
+    WPI_ERROR(m_logger,
+              "listen() on port " << m_port << " failed: " << SocketStrerror());
     return result;
   }
   m_listening = true;

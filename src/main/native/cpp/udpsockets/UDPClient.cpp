@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017. All Rights Reserved.                             */
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,24 +13,20 @@
 #pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <fcntl.h>
 #endif
 
 #include "support/Logger.h"
 #include "tcpsockets/SocketError.h"
 
-
 using namespace wpi;
 
-UDPClient::UDPClient(Logger& logger)
-    : UDPClient("", logger) {}
+UDPClient::UDPClient(Logger& logger) : UDPClient("", logger) {}
 
 UDPClient::UDPClient(llvm::StringRef address, Logger& logger)
-    : m_lsd(0),
-      m_address(address),
-      m_logger(logger) {}
+    : m_lsd(0), m_address(address), m_logger(logger) {}
 
 UDPClient::UDPClient(UDPClient&& other)
     : m_lsd(other.m_lsd),
@@ -113,8 +109,8 @@ void UDPClient::shutdown() {
   }
 }
 
-int UDPClient::send(llvm::ArrayRef<uint8_t> data,
-                    llvm::StringRef server, int port) {
+int UDPClient::send(llvm::ArrayRef<uint8_t> data, llvm::StringRef server,
+                    int port) {
   // server must be a resolvable IP address
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));
@@ -138,14 +134,13 @@ int UDPClient::send(llvm::ArrayRef<uint8_t> data,
   addr.sin_port = htons(port);
 
   // sendto should not block
-  int result = sendto(m_lsd, reinterpret_cast<const char*>(data.data()),
-                      data.size(), 0, reinterpret_cast<sockaddr*>(&addr),
-                      sizeof(addr));
+  int result =
+      sendto(m_lsd, reinterpret_cast<const char*>(data.data()), data.size(), 0,
+             reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
   return result;
 }
 
-int UDPClient::send(llvm::StringRef data,
-                    llvm::StringRef server, int port) {
+int UDPClient::send(llvm::StringRef data, llvm::StringRef server, int port) {
   // server must be a resolvable IP address
   struct sockaddr_in addr;
   std::memset(&addr, 0, sizeof(addr));

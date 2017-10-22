@@ -1,6 +1,6 @@
 # wpiutil
 
-wpiutil is a utility library designed for making C++ interfacing easier. 
+wpiutil is a utility library designed for making C++ interfacing easier.
 
 ## Build Requirements
 To build wpiutil, a few requirements must be met:
@@ -69,5 +69,4 @@ The `wpiutil-java` artifact will contain a jar with no classifiers. This is the 
 
 All of these artifacts by default are published to `~/releases/maven/development`. To switch to the release repository (`~/release/maven/release`), use the flag `-PreleaseType=OFFICIAL`.
 
-All downstream projects are configured to use the individual classifier artifacts. The previouse `desktop` classifier does not exist anymore. 
-
+All downstream projects are configured to use the individual classifier artifacts. The previouse `desktop` classifier does not exist anymore.

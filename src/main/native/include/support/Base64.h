@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,15 +17,15 @@ namespace llvm {
 template <typename T>
 class SmallVectorImpl;
 class raw_ostream;
-}
+}  // namespace llvm
 
 namespace wpi {
 
-std::size_t Base64Decode(llvm::raw_ostream& os, llvm::StringRef encoded);
+size_t Base64Decode(llvm::raw_ostream& os, llvm::StringRef encoded);
 
-std::size_t Base64Decode(llvm::StringRef encoded, std::string* plain);
+size_t Base64Decode(llvm::StringRef encoded, std::string* plain);
 
-llvm::StringRef Base64Decode(llvm::StringRef encoded, std::size_t* num_read,
+llvm::StringRef Base64Decode(llvm::StringRef encoded, size_t* num_read,
                              llvm::SmallVectorImpl<char>& buf);
 
 void Base64Encode(llvm::raw_ostream& os, llvm::StringRef plain);

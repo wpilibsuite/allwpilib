@@ -6,7 +6,7 @@
 
    ------------------------------------------
 
-   Copyright © 2013 [Vic Hargrave - http://vichargrave.com]
+   Copyright (c) 2013 [Vic Hargrave - http://vichargrave.com]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "tcpsockets/TCPStream.h"
 
 #include <fcntl.h>
+
 #ifdef _WIN32
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
@@ -41,12 +42,13 @@ TCPStream::TCPStream(int sd, sockaddr_in* address)
 #ifdef _WIN32
   InetNtop(PF_INET, &(address->sin_addr.s_addr), ip, sizeof(ip) - 1);
 #else
-  inet_ntop(PF_INET, (in_addr*)&(address->sin_addr.s_addr), ip,
-            sizeof(ip) - 1);
+  inet_ntop(PF_INET, reinterpret_cast<in_addr*>(&(address->sin_addr.s_addr)),
+            ip, sizeof(ip) - 1);
 #ifdef SO_NOSIGPIPE
   // disable SIGPIPE on Mac OS X
   int set = 1;
-  setsockopt(m_sd, SOL_SOCKET, SO_NOSIGPIPE, (char*)&set, sizeof set);
+  setsockopt(m_sd, SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<char*>(&set),
+             sizeof set);
 #endif
 #endif
   m_peerIP = ip;
@@ -55,7 +57,7 @@ TCPStream::TCPStream(int sd, sockaddr_in* address)
 
 TCPStream::~TCPStream() { close(); }
 
-std::size_t TCPStream::send(const char* buffer, std::size_t len, Error* err) {
+size_t TCPStream::send(const char* buffer, size_t len, Error* err) {
   if (m_sd < 0) {
     *err = kConnectionClosed;
     return 0;
@@ -82,7 +84,8 @@ std::size_t TCPStream::send(const char* buffer, std::size_t len, Error* err) {
 #ifdef _MSC_VER
     sprintf_s(Buffer, "Send() failed: WSA error=%d\n", WSAGetLastError());
 #else
-    std::snprintf(Buffer, 128, "Send() failed: WSA error=%d\n", WSAGetLastError());
+    std::snprintf(Buffer, sizeof(Buffer), "Send() failed: WSA error=%d\n",
+                  WSAGetLastError());
 #endif
     OutputDebugStringA(Buffer);
     *err = kConnectionReset;
@@ -103,11 +106,10 @@ std::size_t TCPStream::send(const char* buffer, std::size_t len, Error* err) {
     return 0;
   }
 #endif
-  return static_cast<std::size_t>(rv);
+  return static_cast<size_t>(rv);
 }
 
-std::size_t TCPStream::receive(char* buffer, std::size_t len, Error* err,
-                               int timeout) {
+size_t TCPStream::receive(char* buffer, size_t len, Error* err, int timeout) {
   if (m_sd < 0) {
     *err = kConnectionClosed;
     return 0;
@@ -123,8 +125,7 @@ std::size_t TCPStream::receive(char* buffer, std::size_t len, Error* err,
 #else
     rv = read(m_sd, buffer, len);
 #endif
-  }
-  else if (WaitForReadEvent(timeout)) {
+  } else if (WaitForReadEvent(timeout)) {
 #ifdef _WIN32
     rv = recv(m_sd, buffer, len, 0);
 #else
@@ -145,7 +146,7 @@ std::size_t TCPStream::receive(char* buffer, std::size_t len, Error* err,
       *err = kConnectionReset;
     return 0;
   }
-  return static_cast<std::size_t>(rv);
+  return static_cast<size_t>(rv);
 }
 
 void TCPStream::close() {
@@ -168,7 +169,8 @@ int TCPStream::getPeerPort() const { return m_peerPort; }
 void TCPStream::setNoDelay() {
   if (m_sd < 0) return;
   int optval = 1;
-  setsockopt(m_sd, IPPROTO_TCP, TCP_NODELAY, (char*)&optval, sizeof optval);
+  setsockopt(m_sd, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char*>(&optval),
+             sizeof optval);
 }
 
 bool TCPStream::setBlocking(bool enabled) {
@@ -177,7 +179,7 @@ bool TCPStream::setBlocking(bool enabled) {
   u_long mode = enabled ? 0 : 1;
   if (ioctlsocket(m_sd, FIONBIO, &mode) == SOCKET_ERROR) return false;
 #else
-  long flags = fcntl(m_sd, F_GETFL, nullptr);
+  int flags = fcntl(m_sd, F_GETFL, nullptr);
   if (flags < 0) return false;
   if (enabled)
     flags &= ~O_NONBLOCK;
@@ -188,9 +190,7 @@ bool TCPStream::setBlocking(bool enabled) {
   return true;
 }
 
-int TCPStream::getNativeHandle() const {
-  return m_sd;
-}
+int TCPStream::getNativeHandle() const { return m_sd; }
 
 bool TCPStream::WaitForReadEvent(int timeout) {
   fd_set sdset;

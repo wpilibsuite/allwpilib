@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -38,17 +38,17 @@ class raw_istream {
     return *this;
   }
 
-  raw_istream& read(void* data, std::size_t len) {
+  raw_istream& read(void* data, size_t len) {
     read_impl(data, len);
     return *this;
   }
 
-  std::size_t readsome(void* data, std::size_t len) {
-    std::size_t readlen = std::min(in_avail(), len);
+  size_t readsome(void* data, size_t len) {
+    size_t readlen = std::min(in_avail(), len);
     if (readlen == 0) return 0;
     read_impl(data, readlen);
     return readlen;
-  };
+  }
 
   // Read a line from an input stream (up to a maximum length).
   // The returned buffer will contain the trailing \n (unless the maximum length
@@ -59,7 +59,7 @@ class raw_istream {
   llvm::StringRef getline(llvm::SmallVectorImpl<char>& buf, int maxLen);
 
   virtual void close() = 0;
-  virtual std::size_t in_avail() const = 0;
+  virtual size_t in_avail() const = 0;
 
   bool has_error() const { return m_error; }
   void clear_error() { m_error = false; }
@@ -71,41 +71,41 @@ class raw_istream {
   void error_detected() { m_error = true; }
 
  private:
-  virtual void read_impl(void* data, std::size_t len) = 0;
+  virtual void read_impl(void* data, size_t len) = 0;
 
   bool m_error = false;
 };
 
 class raw_mem_istream : public raw_istream {
  public:
-  raw_mem_istream(llvm::StringRef mem);
-  raw_mem_istream(const char* mem, std::size_t len) : m_cur(mem), m_left(len) {}
+  explicit raw_mem_istream(llvm::StringRef mem);
+  raw_mem_istream(const char* mem, size_t len) : m_cur(mem), m_left(len) {}
   void close() override;
-  std::size_t in_avail() const override;
+  size_t in_avail() const override;
 
  private:
-  void read_impl(void* data, std::size_t len) override;
+  void read_impl(void* data, size_t len) override;
 
   const char* m_cur;
-  std::size_t m_left;
+  size_t m_left;
 };
 
 class raw_fd_istream : public raw_istream {
  public:
   raw_fd_istream(const llvm::Twine& filename, std::error_code& ec,
-                 std::size_t bufSize = 4096);
-  raw_fd_istream(int fd, bool shouldClose, std::size_t bufSize = 4096);
+                 size_t bufSize = 4096);
+  raw_fd_istream(int fd, bool shouldClose, size_t bufSize = 4096);
   ~raw_fd_istream() override;
   void close() override;
-  std::size_t in_avail() const override;
+  size_t in_avail() const override;
 
  private:
-  void read_impl(void* data, std::size_t len) override;
+  void read_impl(void* data, size_t len) override;
 
   char* m_buf;
   char* m_cur;
   char* m_end;
-  std::size_t m_bufSize;
+  size_t m_bufSize;
   int m_fd;
   bool m_shouldClose;
 };

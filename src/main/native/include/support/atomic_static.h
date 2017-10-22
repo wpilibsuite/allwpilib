@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2015. All Rights Reserved.                             */
+/* Copyright (c) 2015-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -24,25 +24,25 @@
 #include <atomic>
 #include <mutex>
 
-#define ATOMIC_STATIC(cls, inst) \
-    cls* inst##tmp = m_instance.load(std::memory_order_acquire); \
-    if (inst##tmp == nullptr) { \
-      std::lock_guard<std::mutex> lock(m_instance_mutex); \
-      inst##tmp = m_instance.load(std::memory_order_relaxed); \
-      if (inst##tmp == nullptr) { \
-        inst##tmp = new cls; \
-        m_instance.store(inst##tmp, std::memory_order_release); \
-      } \
-    } \
-    cls& inst = *inst##tmp
+#define ATOMIC_STATIC(cls, inst)                               \
+  cls* inst##tmp = m_instance.load(std::memory_order_acquire); \
+  if (inst##tmp == nullptr) {                                  \
+    std::lock_guard<std::mutex> lock(m_instance_mutex);        \
+    inst##tmp = m_instance.load(std::memory_order_relaxed);    \
+    if (inst##tmp == nullptr) {                                \
+      inst##tmp = new cls;                                     \
+      m_instance.store(inst##tmp, std::memory_order_release);  \
+    }                                                          \
+  }                                                            \
+  cls& inst = *inst##tmp
 
-#define ATOMIC_STATIC_DECL(cls) \
-    static std::atomic<cls*> m_instance; \
-    static std::mutex m_instance_mutex;
+#define ATOMIC_STATIC_DECL(cls)        \
+  static std::atomic<cls*> m_instance; \
+  static std::mutex m_instance_mutex;
 
-#define ATOMIC_STATIC_INIT(cls) \
-    std::atomic<cls*> cls::m_instance; \
-    std::mutex cls::m_instance_mutex;
+#define ATOMIC_STATIC_INIT(cls)      \
+  std::atomic<cls*> cls::m_instance; \
+  std::mutex cls::m_instance_mutex;
 
 #endif
 
