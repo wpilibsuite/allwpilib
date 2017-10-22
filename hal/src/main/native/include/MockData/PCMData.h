@@ -74,6 +74,16 @@ void HALSIM_CancelPCMCompressorCurrentCallback(int32_t index, int32_t uid);
 double HALSIM_GetPCMCompressorCurrent(int32_t index);
 void HALSIM_SetPCMCompressorCurrent(int32_t index, double compressorCurrent);
 
+void HALSIM_RegisterPCMAllNonSolenoidCallbacks(int32_t index,
+                                               HAL_NotifyCallback callback,
+                                               void* param,
+                                               HAL_Bool initialNotify);
+
+void HALSIM_RegisterPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
+                                            HAL_NotifyCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

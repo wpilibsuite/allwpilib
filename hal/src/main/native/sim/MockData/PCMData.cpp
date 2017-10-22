@@ -448,4 +448,30 @@ double HALSIM_GetPCMCompressorCurrent(int32_t index) {
 void HALSIM_SetPCMCompressorCurrent(int32_t index, double compressorCurrent) {
   SimPCMData[index].SetCompressorCurrent(compressorCurrent);
 }
+
+void HALSIM_RegisterPCMAllNonSolenoidCallbacks(int32_t index,
+                                               HAL_NotifyCallback callback,
+                                               void* param,
+                                               HAL_Bool initialNotify) {
+  SimPCMData[index].RegisterCompressorInitializedCallback(callback, param,
+                                                          initialNotify);
+  SimPCMData[index].RegisterCompressorOnCallback(callback, param,
+                                                 initialNotify);
+  SimPCMData[index].RegisterClosedLoopEnabledCallback(callback, param,
+                                                      initialNotify);
+  SimPCMData[index].RegisterPressureSwitchCallback(callback, param,
+                                                   initialNotify);
+  SimPCMData[index].RegisterCompressorCurrentCallback(callback, param,
+                                                      initialNotify);
+}
+
+void HALSIM_RegisterPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
+                                            HAL_NotifyCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify) {
+  SimPCMData[index].RegisterSolenoidInitializedCallback(channel, callback,
+                                                        param, initialNotify);
+  SimPCMData[index].RegisterSolenoidOutputCallback(channel, callback, param,
+                                                   initialNotify);
+}
 }  // extern "C"

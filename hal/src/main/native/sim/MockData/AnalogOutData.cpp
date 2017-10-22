@@ -135,4 +135,13 @@ HAL_Bool HALSIM_GetAnalogOutInitialized(int32_t index) {
 void HALSIM_SetAnalogOutInitialized(int32_t index, HAL_Bool initialized) {
   SimAnalogOutData[index].SetInitialized(initialized);
 }
+
+void HALSIM_RegisterAnalogOutAllCallbacks(int32_t index,
+                                          HAL_NotifyCallback callback,
+                                          void* param, HAL_Bool initialNotify) {
+  SimAnalogOutData[index].RegisterVoltageCallback(callback, param,
+                                                  initialNotify);
+  SimAnalogOutData[index].RegisterInitializedCallback(callback, param,
+                                                      initialNotify);
+}
 }  // extern "C"

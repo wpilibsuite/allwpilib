@@ -887,4 +887,39 @@ int32_t HALSIM_GetRoboRioUserFaults3V3(int32_t index) {
 void HALSIM_SetRoboRioUserFaults3V3(int32_t index, int32_t userFaults3V3) {
   SimRoboRioData[index].SetUserFaults3V3(userFaults3V3);
 }
+
+void HALSIM_RegisterRoboRioAllCallbacks(int32_t index,
+                                        HAL_NotifyCallback callback,
+                                        void* param, HAL_Bool initialNotify) {
+  SimRoboRioData[index].RegisterFPGAButtonCallback(callback, param,
+                                                   initialNotify);
+  SimRoboRioData[index].RegisterVInVoltageCallback(callback, param,
+                                                   initialNotify);
+  SimRoboRioData[index].RegisterVInCurrentCallback(callback, param,
+                                                   initialNotify);
+  SimRoboRioData[index].RegisterUserVoltage6VCallback(callback, param,
+                                                      initialNotify);
+  SimRoboRioData[index].RegisterUserCurrent6VCallback(callback, param,
+                                                      initialNotify);
+  SimRoboRioData[index].RegisterUserActive6VCallback(callback, param,
+                                                     initialNotify);
+  SimRoboRioData[index].RegisterUserVoltage5VCallback(callback, param,
+                                                      initialNotify);
+  SimRoboRioData[index].RegisterUserCurrent5VCallback(callback, param,
+                                                      initialNotify);
+  SimRoboRioData[index].RegisterUserActive5VCallback(callback, param,
+                                                     initialNotify);
+  SimRoboRioData[index].RegisterUserVoltage3V3Callback(callback, param,
+                                                       initialNotify);
+  SimRoboRioData[index].RegisterUserCurrent3V3Callback(callback, param,
+                                                       initialNotify);
+  SimRoboRioData[index].RegisterUserActive3V3Callback(callback, param,
+                                                      initialNotify);
+  SimRoboRioData[index].RegisterUserFaults6VCallback(callback, param,
+                                                     initialNotify);
+  SimRoboRioData[index].RegisterUserFaults5VCallback(callback, param,
+                                                     initialNotify);
+  SimRoboRioData[index].RegisterUserFaults3V3Callback(callback, param,
+                                                      initialNotify);
+}
 }  // extern "C"
