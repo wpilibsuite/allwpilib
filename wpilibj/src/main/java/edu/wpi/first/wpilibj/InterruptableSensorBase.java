@@ -10,10 +10,9 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.hal.InterruptJNI;
 import edu.wpi.first.wpilibj.util.AllocationException;
 
+
 /**
  * Base for sensors to be used with interrupts.
- *
- * @deprecated Use {@code InterruptibleSensorBase} instead
  */
 public abstract class InterruptableSensorBase extends SensorBase {
 
@@ -79,7 +78,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-                                   getAnalogTriggerTypeForRouting());
+        getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
     InterruptJNI.attachInterruptHandler(m_interrupt, handler.m_function,
         handler.overridableParameter());
@@ -100,7 +99,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-                                   getAnalogTriggerTypeForRouting());
+        getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
 
   }
@@ -225,4 +224,18 @@ public abstract class InterruptableSensorBase extends SensorBase {
     return InterruptJNI.readInterruptFallingTimestamp(m_interrupt);
   }
 
+  /**
+   * Set which edge to trigger interrupts on.
+   *
+   * @param risingEdge  true to interrupt on rising edge
+   * @param fallingEdge true to interrupt on falling edge
+   */
+  public void setUpSourceEdge(boolean risingEdge, boolean fallingEdge) {
+    if (m_interrupt != 0) {
+      InterruptJNI.setInterruptUpSourceEdge(m_interrupt, risingEdge,
+          fallingEdge);
+    } else {
+      throw new IllegalArgumentException("You must call RequestInterrupts before setUpSourceEdge");
+    }
+  }
 }
