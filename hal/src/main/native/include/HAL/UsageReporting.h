@@ -82,6 +82,7 @@ namespace nUsageReporting
         kResourceType_PDP,
         kResourceType_PCM, // 60
         kResourceType_PigeonIMU,
+        kResourceType_NidecBrushless,
     } tResourceType;
 
     typedef enum
