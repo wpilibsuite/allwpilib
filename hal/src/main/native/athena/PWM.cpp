@@ -450,4 +450,24 @@ int32_t HAL_GetLoopTiming(int32_t* status) {
   return pwmSystem->readLoopTiming(status);
 }
 
+/**
+ * Get the pwm starting cycle time
+ *
+ * @return The pwm cycle start time.
+ */
+uint64_t HAL_GetCycleStartTime(int32_t* status) {
+  initializeDigital(status);
+  if (*status != 0) return 0;
+  uint64_t upper1 = pwmSystem->readCycleStartTimeUpper(status);
+  uint32_t lower = pwmSystem->readCycleStartTime(status);
+  uint64_t upper2 = pwmSystem->readCycleStartTimeUpper(status);
+  if (*status != 0) return 0;
+  if (upper1 != upper2) {
+    // Rolled over between the lower call, reread lower
+    lower = pwmSystem->readCycleStartTime(status);
+    if (*status != 0) return 0;
+  }
+  return (upper2 << 32) + lower;
+}
+
 }  // extern "C"
