@@ -13,7 +13,7 @@
 
 namespace frc {
 class PIDController;
-}
+}  // namespace frc
 
 /**
  * Drive the given distance straight (negative values go backwards).

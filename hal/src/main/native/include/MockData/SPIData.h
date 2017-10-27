@@ -48,5 +48,5 @@ void HALSIM_SetSPISetAccumulatorValue(int32_t index, int64_t value);
 int64_t HALSIM_GetSPIGetAccumulatorValue(int32_t index);
 
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

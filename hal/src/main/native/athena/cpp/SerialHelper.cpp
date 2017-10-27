@@ -226,7 +226,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     // Using std::string because this is guarenteed to be large
     std::string output = "";
 
-    std::shared_ptr<FILE> pipe(popen(val.c_str(), "r"), pclose);
+    std::shared_ptr<std::FILE> pipe(popen(val.c_str(), "r"), pclose);
     // Just check the next item on a pipe failure
     if (!pipe) continue;
     while (!feof(pipe.get())) {

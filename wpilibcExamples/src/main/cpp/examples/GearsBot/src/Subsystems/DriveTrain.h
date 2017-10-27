@@ -16,7 +16,7 @@
 
 namespace frc {
 class Joystick;
-}
+}  // namespace frc
 
 /**
  * The DriveTrain subsystem incorporates the sensors and actuators attached to
