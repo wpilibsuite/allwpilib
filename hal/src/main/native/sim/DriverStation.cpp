@@ -14,6 +14,7 @@
 #include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <mutex>
 #include <string>
 
@@ -151,6 +152,23 @@ int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
 
 double HAL_GetMatchTime(int32_t* status) {
   return SimDriverStationData.GetMatchTime();
+}
+
+int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+  info->eventName = static_cast<char*>(std::malloc(1));
+  info->eventName[0] = '\0';
+  info->matchNumber = 0;
+  info->replayNumber = 0;
+  info->gameSpecificMessage = static_cast<char*>(std::malloc(1));
+  info->gameSpecificMessage[0] = '\0';
+  return 0;
+}
+
+void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
+  std::free(info->eventName);
+  std::free(info->gameSpecificMessage);
+  info->eventName = nullptr;
+  info->gameSpecificMessage = nullptr;
 }
 
 void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
