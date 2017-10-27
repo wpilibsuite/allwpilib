@@ -9,16 +9,40 @@ apply from: "../../config.gradle"
 
 
 model {
-    components {
-        halsim_adx_gyro_accelerometer(NativeLibrarySpec) {
-            sources {
-                cpp {
-                    source {
-                        srcDirs = [ 'src/main/native/cpp' ]
-                        includes = ["**/*.cpp"]
+    exportsConfigs {
+        halsim_adx_gyro_accelerometer(ExportsConfig) {
+            x86SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('ADX_')) {
+                        retList << symbol
                     }
-                    exportedHeaders {
-                        srcDirs = ["src/main/native/include"]
+                }
+                return retList
+            }
+            x64SymbolFilter = { symbols->
+                def retList = []
+                symbols.each { symbol->
+                    if (symbol.startsWith('ADX_')) {
+                        retList << symbol
+                    }
+                }
+                return retList
+            }
+        }
+    }
+    components {
+        if (!project.hasProperty('onlyAthena')) {
+            halsim_adx_gyro_accelerometer(NativeLibrarySpec) {
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = [ 'src/main/native/cpp' ]
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/main/native/include"]
+                        }
                     }
                 }
             }
