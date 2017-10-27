@@ -5,11 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "ADXRS450_SpiGyroWrapperData.h"
+
 #include <cstring>
 
-#include "ADXRS450_SpiGyroWrapperData.h"
-#include "MockData/SPIData.h"
 #include "MockData/NotifyCallbackHelpers.h"
+#include "MockData/SPIData.h"
 
 using namespace hal;
 
@@ -67,6 +68,6 @@ void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
     InvokeAngleCallback(MakeDouble(angle));
 
     long accumValue = angle * ANGLE_LSB;
-    HALSIM_SetSPISetAccumulatorValue(m_port,accumValue);
+    HALSIM_SetSPISetAccumulatorValue(m_port, accumValue);
   }
 }

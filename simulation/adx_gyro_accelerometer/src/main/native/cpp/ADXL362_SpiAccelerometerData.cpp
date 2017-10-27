@@ -5,9 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "ADXL362_SpiAccelerometerData.h"
+
 #include <cstring>
 
-#include "ADXL362_SpiAccelerometerData.h"
 #include "MockData/SPIData.h"
 
 using namespace hal;
@@ -38,17 +39,14 @@ void ADXL362_SpiAccelerometer::HandleWrite(uint8_t* buffer, uint32_t count) {
 }
 
 void ADXL362_SpiAccelerometer::HandleRead(uint8_t* buffer, uint32_t count) {
-
   // Init check
-  if(m_lastWriteAddress == 0x02)
-  {
-      uint32_t numToPut = 0xF20000;
-      std::memcpy(&buffer[0], &numToPut, sizeof(numToPut));
+  if (m_lastWriteAddress == 0x02) {
+    uint32_t numToPut = 0xF20000;
+    std::memcpy(&buffer[0], &numToPut, sizeof(numToPut));
   }
 
   // Get Accelerations
-  else
-  {
+  else {
     bool writeAll = count == 8;
     int byteIndex = 2;
 

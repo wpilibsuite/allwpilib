@@ -5,9 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "ADXL345_SpiAccelerometerData.h"
+
 #include <cstring>
 
-#include "ADXL345_SpiAccelerometerData.h"
 #include "MockData/SPIData.h"
 
 using namespace hal;

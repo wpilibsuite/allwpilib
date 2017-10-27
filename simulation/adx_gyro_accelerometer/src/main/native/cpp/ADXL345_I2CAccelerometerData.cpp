@@ -5,9 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "ADXL345_I2CAccelerometerData.h"
+
 #include <cstring>
 
-#include "ADXL345_I2CAccelerometerData.h"
 #include "MockData/I2CData.h"
 
 using namespace hal;
