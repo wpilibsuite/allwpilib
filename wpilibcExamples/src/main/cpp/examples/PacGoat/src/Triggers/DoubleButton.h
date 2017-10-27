@@ -11,7 +11,7 @@
 
 namespace frc {
 class Joystick;
-}
+}  // namespace frc
 
 class DoubleButton : public frc::Trigger {
 public:

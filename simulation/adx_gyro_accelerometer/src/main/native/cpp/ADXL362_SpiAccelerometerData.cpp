@@ -43,10 +43,8 @@ void ADXL362_SpiAccelerometer::HandleRead(uint8_t* buffer, uint32_t count) {
   if (m_lastWriteAddress == 0x02) {
     uint32_t numToPut = 0xF20000;
     std::memcpy(&buffer[0], &numToPut, sizeof(numToPut));
-  }
-
-  // Get Accelerations
-  else {
+  } else {
+    // Get Accelerations
     bool writeAll = count == 8;
     int byteIndex = 2;
 

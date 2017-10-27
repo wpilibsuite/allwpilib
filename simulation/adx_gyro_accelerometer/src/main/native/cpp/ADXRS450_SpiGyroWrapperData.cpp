@@ -67,7 +67,7 @@ void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
   if (oldValue != angle) {
     InvokeAngleCallback(MakeDouble(angle));
 
-    long accumValue = angle * ANGLE_LSB;
+    int64_t accumValue = angle * ANGLE_LSB;
     HALSIM_SetSPISetAccumulatorValue(m_port, accumValue);
   }
 }

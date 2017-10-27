@@ -148,4 +148,4 @@ void HALSIM_CancelI2CWriteCallback(int32_t index, int32_t uid) {
   SimI2CData[index].CancelWriteCallback(uid);
 }
 
-}  // extern c
+}  // extern "C"
