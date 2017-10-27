@@ -309,4 +309,17 @@ double HALSIM_GetAccelerometerZ(int32_t index) {
 void HALSIM_SetAccelerometerZ(int32_t index, double z) {
   SimAccelerometerData[index].SetZ(z);
 }
+
+void HALSIM_RegisterAccelerometerAllCallbacks(int32_t index,
+                                              HAL_NotifyCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify) {
+  SimAccelerometerData[index].RegisterActiveCallback(callback, param,
+                                                     initialNotify);
+  SimAccelerometerData[index].RegisterRangeCallback(callback, param,
+                                                    initialNotify);
+  SimAccelerometerData[index].RegisterXCallback(callback, param, initialNotify);
+  SimAccelerometerData[index].RegisterYCallback(callback, param, initialNotify);
+  SimAccelerometerData[index].RegisterZCallback(callback, param, initialNotify);
+}
 }  // extern "C"

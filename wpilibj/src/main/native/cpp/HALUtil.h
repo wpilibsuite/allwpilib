@@ -51,6 +51,12 @@ void ThrowBoundaryException(JNIEnv *env, double value, double lower,
 jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
                   int32_t deadbandMaxPwm, int32_t centerPwm,
                   int32_t deadbandMinPwm, int32_t minPwm);
+
+void SetCanStatusObject(JNIEnv *env, jobject canStatus, 
+                        float percentBusUtilization,
+                        uint32_t busOffCount, uint32_t txFullCount, 
+                        uint32_t receiveErrorCount, 
+                        uint32_t transmitErrorCount);
                   
 }  // namespace frc
 

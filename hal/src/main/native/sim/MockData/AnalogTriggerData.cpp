@@ -254,4 +254,18 @@ void HALSIM_SetAnalogTriggerTriggerMode(int32_t index,
                                         HALSIM_AnalogTriggerMode triggerMode) {
   SimAnalogTriggerData[index].SetTriggerMode(triggerMode);
 }
+
+void HALSIM_RegisterAnalogTriggerAllCallbacks(int32_t index,
+                                              HAL_NotifyCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify) {
+  SimAnalogTriggerData[index].RegisterInitializedCallback(callback, param,
+                                                          initialNotify);
+  SimAnalogTriggerData[index].RegisterTriggerLowerBoundCallback(callback, param,
+                                                                initialNotify);
+  SimAnalogTriggerData[index].RegisterTriggerUpperBoundCallback(callback, param,
+                                                                initialNotify);
+  SimAnalogTriggerData[index].RegisterTriggerModeCallback(callback, param,
+                                                          initialNotify);
+}
 }  // extern "C"

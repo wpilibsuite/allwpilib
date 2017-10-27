@@ -26,7 +26,7 @@ public class Vector2d {
   /**
    * Rotate a vector in Cartesian space.
    *
-   * @param angle angle by which to rotate vector counter-clockwise.
+   * @param angle angle in degrees by which to rotate vector counter-clockwise.
    */
   public void rotate(double angle) {
     double cosA = Math.cos(angle * (Math.PI / 180.0));
