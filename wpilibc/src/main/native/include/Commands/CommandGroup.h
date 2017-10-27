@@ -58,6 +58,8 @@ class CommandGroup : public Command {
   virtual void _Execute();
   virtual void _End();
 
+  virtual void SetCommands(std::vector<CommandGroupEntry> cmds);
+
  private:
   void CancelConflicts(Command* command);
 

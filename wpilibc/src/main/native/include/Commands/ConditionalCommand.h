@@ -7,10 +7,11 @@
 
 #pragma once
 
+#include <vector>
+
 #include <llvm/Twine.h>
 
-#include "Commands/Command.h"
-#include "Commands/InstantCommand.h"
+#include "Commands/CommandGroup.h"
 
 namespace frc {
 
@@ -30,7 +31,7 @@ namespace frc {
  * @see Command
  * @see Scheduler
  */
-class ConditionalCommand : public Command {
+class ConditionalCommand : public CommandGroup {
  public:
   explicit ConditionalCommand(Command* onTrue, Command* onFalse = nullptr);
   ConditionalCommand(const llvm::Twine& name, Command* onTrue,
@@ -46,19 +47,15 @@ class ConditionalCommand : public Command {
   virtual bool Condition() = 0;
 
   void _Initialize() override;
-  void _Cancel() override;
-  bool IsFinished() override;
-  void Interrupted() override;
 
  private:
-  // The Command to execute if Condition() returns true
-  Command* m_onTrue;
+  // Commands to execute if Condition() returns true
+  std::vector<CommandGroupEntry> m_onTrue;
 
-  // The Command to execute if Condition() returns false
-  Command* m_onFalse;
+  // Commands to execute if Condition() returns false
+  std::vector<CommandGroupEntry> m_onFalse;
 
-  // Stores command chosen by condition
-  Command* m_chosenCommand = nullptr;
+  std::vector<CommandGroupEntry> ProcessCommand(Command* cmd);
 };
 
 }  // namespace frc

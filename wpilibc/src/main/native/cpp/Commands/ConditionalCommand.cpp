@@ -11,17 +11,6 @@
 
 using namespace frc;
 
-static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
-  if (onTrue != nullptr) {
-    for (auto requirement : onTrue->GetRequirements())
-      command.Requires(requirement);
-  }
-  if (onFalse != nullptr) {
-    for (auto requirement : onFalse->GetRequirements())
-      command.Requires(requirement);
-  }
-}
-
 /**
  * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
  *
@@ -29,10 +18,8 @@ static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
  * @param onFalse The Command to execute if Condition() returns false
  */
 ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
-  m_onTrue = onTrue;
-  m_onFalse = onFalse;
-
-  RequireAll(*this, onTrue, onFalse);
+  m_onTrue = ProcessCommand(onTrue);
+  m_onFalse = ProcessCommand(onFalse);
 }
 
 /**
@@ -44,46 +31,36 @@ ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
  */
 ConditionalCommand::ConditionalCommand(const llvm::Twine& name, Command* onTrue,
                                        Command* onFalse)
-    : Command(name) {
-  m_onTrue = onTrue;
-  m_onFalse = onFalse;
-
-  RequireAll(*this, onTrue, onFalse);
+    : CommandGroup(name) {
+  m_onTrue = ProcessCommand(onTrue);
+  m_onFalse = ProcessCommand(onFalse);
 }
 
 void ConditionalCommand::_Initialize() {
+  CommandGroup::_Initialize();
+
   if (Condition()) {
-    m_chosenCommand = m_onTrue;
+    SetCommands(m_onTrue);
   } else {
-    m_chosenCommand = m_onFalse;
-  }
-
-  if (m_chosenCommand != nullptr) {
-    // This is a hack to make cancelling the chosen command inside a
-    // CommandGroup work properly
-    m_chosenCommand->ClearRequirements();
-
-    m_chosenCommand->Start();
+    SetCommands(m_onFalse);
   }
 }
 
-void ConditionalCommand::_Cancel() {
-  if (m_chosenCommand != nullptr && m_chosenCommand->IsRunning()) {
-    m_chosenCommand->Cancel();
+std::vector<CommandGroupEntry> ConditionalCommand::ProcessCommand(
+    Command* cmd) {
+  std::vector<CommandGroupEntry> list;
+  if (cmd == nullptr) {
+    return list;
   }
 
-  Command::_Cancel();
-}
+  if (!AssertUnlocked("Cannot add conditions to conditional command"))
+    return list;
 
-bool ConditionalCommand::IsFinished() {
-  return m_chosenCommand != nullptr && m_chosenCommand->IsRunning() &&
-         m_chosenCommand->IsFinished();
-}
+  for (auto requirement : cmd->GetRequirements()) Requires(requirement);
 
-void ConditionalCommand::Interrupted() {
-  if (m_chosenCommand != nullptr && m_chosenCommand->IsRunning()) {
-    m_chosenCommand->Cancel();
-  }
+  cmd->SetParent(this);
+  list.push_back(
+      CommandGroupEntry(cmd, CommandGroupEntry::kSequence_InSequence));
 
-  Command::Interrupted();
+  return list;
 }
