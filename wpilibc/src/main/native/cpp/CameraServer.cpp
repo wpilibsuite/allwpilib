@@ -7,10 +7,10 @@
 
 #include "CameraServer.h"
 
+#include <HAL/HAL.h>
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
-#include "HAL/HAL.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 #include "networktables/NetworkTableInstance.h"
@@ -495,7 +495,8 @@ CameraServer::CameraServer()
 #ifdef __linux__
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
   cs::UsbCamera camera = StartAutomaticCapture(m_defaultUsbDevice++);
-  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, camera.GetHandle());
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 
@@ -506,7 +507,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
 
   cs::UsbCamera camera{name.str(), dev};
   StartAutomaticCapture(camera);
-  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, camera.GetHandle());
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 
@@ -514,7 +516,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
                                                   int dev) {
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
-  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, camera.GetHandle());
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 
@@ -522,7 +525,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
                                                   llvm::StringRef path) {
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
-  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, camera.GetHandle());
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 #endif
