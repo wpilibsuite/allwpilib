@@ -127,7 +127,7 @@ public class AnalogTrigger {
    * point average rejection filter. This is designed to help with 360 degree pot applications for
    * the period where the pot crosses through zero.
    *
-   * @param useFilteredValue true to use a filterd value, false otherwise
+   * @param useFilteredValue true to use a filtered value, false otherwise
    */
   public void setFiltered(boolean useFilteredValue) {
     AnalogJNI.setAnalogTriggerFiltered(m_port, useFilteredValue);

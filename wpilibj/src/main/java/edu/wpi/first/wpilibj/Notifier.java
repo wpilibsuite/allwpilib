@@ -130,9 +130,9 @@ public class Notifier {
   }
 
   /**
-   * Stop timer events from occuring. Stop any repeating timer events from occuring. This will also
-   * remove any single notification events from the queue. If a timer-based call to the registered
-   * handler is in progress, this function will block until the handler call is complete.
+   * Stop timer events from occurring. Stop any repeating timer events from occurring. This will
+   * also remove any single notification events from the queue. If a timer-based call to the
+   * registered handler is in progress, this function will block until the handler call is complete.
    */
   public void stop() {
     m_process.stop();

@@ -130,7 +130,7 @@ public interface CANSpeedController extends SpeedController, PIDInterface, LiveW
   /**
    * Set the maximum rate of change of the output voltage.
    *
-   * @param rampRate the maximum rate of change of the votlage, in Volts / sec.
+   * @param rampRate the maximum rate of change of the voltage, in Volts / sec.
    */
   void setVoltageRampRate(double rampRate);
 

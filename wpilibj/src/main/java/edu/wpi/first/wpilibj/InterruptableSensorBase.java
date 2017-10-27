@@ -78,7 +78,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-                                   getAnalogTriggerTypeForRouting());
+        getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
     InterruptJNI.attachInterruptHandler(m_interrupt, handler.m_function,
         handler.overridableParameter());
@@ -99,7 +99,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-                                   getAnalogTriggerTypeForRouting());
+        getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
 
   }

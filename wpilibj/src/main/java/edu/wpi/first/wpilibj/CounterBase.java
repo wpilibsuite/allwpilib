@@ -57,7 +57,7 @@ public interface CounterBase {
   /**
    * Get the time between the last two edges counted.
    *
-   * @return the time beteween the last two ticks in seconds
+   * @return the time between the last two ticks in seconds
    */
   double getPeriod();
 

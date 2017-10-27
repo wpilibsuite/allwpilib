@@ -107,7 +107,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    *
    * <p>The valid range is from 0.6 Hz to 19 kHz. The frequency resolution is logarithmic.
    *
-   * <p>There is only one PWM frequency for all channnels.
+   * <p>There is only one PWM frequency for all channels.
    *
    * @param rate The frequency to output all digital output PWM signals.
    */
