@@ -132,8 +132,8 @@ public class DriverStation implements RobotState.Interface {
       m_joystickAxesCache[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
       m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
 
-      m_joystickButtonsPressed[i].m_buttons = 0;
-      m_joystickButtonsReleased[i].m_buttons = 0;
+      m_joystickButtonsPressed[i] = new HALJoystickButtons();
+      m_joystickButtonsReleased[i] = new HALJoystickButtons();
     }
 
     m_controlWordMutex = new Object();
