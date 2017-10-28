@@ -3,36 +3,37 @@ description = "A simulation library for the ADXL345 I2C and SPI Accelerometer, A
 apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: 'cpp'
 
-ext.skipAthena = true
 
-apply from: "../../config.gradle"
-
-
-model {
-    exportsConfigs {
-        halsim_adx_gyro_accelerometer(ExportsConfig) {
-            x86SymbolFilter = { symbols->
-                def retList = []
-                symbols.each { symbol->
-                    if (symbol.startsWith('ADX_')) {
-                        retList << symbol
+if (!project.hasProperty('onlyAthena')) {
+    ext.skipAthena = true
+    
+    apply from: "../../config.gradle"
+    
+    
+    model {
+        exportsConfigs {
+            halsim_adx_gyro_accelerometer(ExportsConfig) {
+                x86SymbolFilter = { symbols->
+                    def retList = []
+                    symbols.each { symbol->
+                        if (symbol.startsWith('ADX_')) {
+                            retList << symbol
+                        }
                     }
+                    return retList
                 }
-                return retList
-            }
-            x64SymbolFilter = { symbols->
-                def retList = []
-                symbols.each { symbol->
-                    if (symbol.startsWith('ADX_')) {
-                        retList << symbol
+                x64SymbolFilter = { symbols->
+                    def retList = []
+                    symbols.each { symbol->
+                        if (symbol.startsWith('ADX_')) {
+                            retList << symbol
+                        }
                     }
+                    return retList
                 }
-                return retList
             }
         }
-    }
-    components {
-        if (!project.hasProperty('onlyAthena')) {
+        components {
             halsim_adx_gyro_accelerometer(NativeLibrarySpec) {
                 sources {
                     cpp {
@@ -47,16 +48,16 @@ model {
                 }
             }
         }
-    }
-
-    binaries {
-        all {
-            project(':hal').addHalCompilerArguments(it)
-            project(':hal').addHalToLinker(it)
+    
+        binaries {
+            all {
+                project(':hal').addHalCompilerArguments(it)
+                project(':hal').addHalToLinker(it)
+            }
+            withType(StaticLibraryBinarySpec) {
+                //it.buildable = false
+            }
         }
-        withType(StaticLibraryBinarySpec) {
-            //it.buildable = false
-        }
     }
+    apply from: 'publish.gradle'
 }
-apply from: 'publish.gradle'
