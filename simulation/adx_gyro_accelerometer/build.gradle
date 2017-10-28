@@ -6,31 +6,21 @@ apply plugin: 'cpp'
 
 if (!project.hasProperty('onlyAthena')) {
     ext.skipAthena = true
-    
+
     apply from: "../../config.gradle"
-    
-    
+
+
     model {
         exportsConfigs {
             halsim_adx_gyro_accelerometer(ExportsConfig) {
-                x86SymbolFilter = { symbols->
-                    def retList = []
-                    symbols.each { symbol->
-                        if (symbol.startsWith('ADX_')) {
-                            retList << symbol
-                        }
-                    }
-                    return retList
-                }
-                x64SymbolFilter = { symbols->
-                    def retList = []
-                    symbols.each { symbol->
-                        if (symbol.startsWith('ADX_')) {
-                            retList << symbol
-                        }
-                    }
-                    return retList
-                }
+                x86ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                      '_CT??_R0?AVbad_cast',
+                                      '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                      '_TI5?AVfailure' ]
+                x64ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                      '_CT??_R0?AVbad_cast',
+                                      '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                      '_TI5?AVfailure' ]
             }
         }
         components {
@@ -48,7 +38,7 @@ if (!project.hasProperty('onlyAthena')) {
                 }
             }
         }
-    
+
         binaries {
             all {
                 project(':hal').addHalCompilerArguments(it)
