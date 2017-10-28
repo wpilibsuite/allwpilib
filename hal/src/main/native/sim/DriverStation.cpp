@@ -18,6 +18,7 @@
 #include <string>
 
 #include "MockData/DriverStationDataInternal.h"
+#include "MockData/MockHooks.h"
 
 static std::mutex msgMutex;
 static std::condition_variable newDSDataAvailableCond;
