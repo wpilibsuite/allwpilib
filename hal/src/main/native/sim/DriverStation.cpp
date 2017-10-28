@@ -152,9 +152,7 @@ double HAL_GetMatchTime(int32_t* status) {
   return SimDriverStationData.GetMatchTime();
 }
 
-void HAL_ObserveUserProgramStarting(void) {
-  // TODO
-}
+void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
 
 void HAL_ObserveUserProgramDisabled(void) {
   // TODO
