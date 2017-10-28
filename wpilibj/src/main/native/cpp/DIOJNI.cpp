@@ -183,7 +183,7 @@ JNIEXPORT jshort JNICALL
 Java_edu_wpi_first_wpilibj_hal_DIOJNI_getLoopTiming(JNIEnv *env, jclass) {
   DIOJNI_LOG(logDEBUG) << "Calling DIOJNI getLoopTimeing";
   int32_t status = 0;
-  jshort returnValue = HAL_GetLoopTiming(&status);
+  jshort returnValue = HAL_GetPWMLoopTiming(&status);
   DIOJNI_LOG(logDEBUG) << "Status = " << status;
   DIOJNI_LOG(logDEBUG) << "LoopTiming = " << returnValue;
   CheckStatus(env, status);
