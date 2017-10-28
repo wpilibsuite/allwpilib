@@ -93,8 +93,8 @@ static int GetStringCtrlIoctl(int fd, int id, int maximum, std::string* value) {
 
 static int SetStringCtrlIoctl(int fd, int id, int maximum,
                               llvm::StringRef value) {
-  llvm::SmallString<64> str{value.substr(
-      0, std::min(value.size(), static_cast<std::size_t>(maximum)))};
+  llvm::SmallString<64> str{
+      value.substr(0, std::min(value.size(), static_cast<size_t>(maximum)))};
 
   struct v4l2_ext_control ctrl;
   struct v4l2_ext_controls ctrls;

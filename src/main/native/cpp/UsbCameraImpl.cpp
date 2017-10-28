@@ -402,7 +402,7 @@ void UsbCameraImpl::CameraThreadMain() {
                  m_mode.width, m_mode.height,
                  llvm::StringRef(
                      static_cast<const char*>(m_buffers[buf.index].m_data),
-                     static_cast<std::size_t>(buf.bytesused)),
+                     static_cast<size_t>(buf.bytesused)),
                  wpi::Now());  // TODO: time
       }
 
