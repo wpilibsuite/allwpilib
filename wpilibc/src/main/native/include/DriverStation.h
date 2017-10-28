@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <array>
 #include <atomic>
 #include <memory>
 #include <mutex>
@@ -38,10 +39,13 @@ class DriverStation : public SensorBase, public RobotStateInterface {
 
   static const int kJoystickPorts = 6;
 
+  bool GetStickButton(int stick, int button);
+  bool GetStickButtonPressed(int stick, int button);
+  bool GetStickButtonReleased(int stick, int button);
+
   double GetStickAxis(int stick, int axis);
   int GetStickPOV(int stick, int pov);
   int GetStickButtons(int stick) const;
-  bool GetStickButton(int stick, int button);
 
   int GetStickAxisCount(int stick) const;
   int GetStickPOVCount(int stick) const;
@@ -111,6 +115,10 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVsCache;
   std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtonsCache;
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptorCache;
+
+  // Joystick button rising/falling edge flags
+  std::array<uint32_t, kJoystickPorts> m_joystickButtonsPressed;
+  std::array<uint32_t, kJoystickPorts> m_joystickButtonsReleased;
 
   // Internal Driver Station thread
   std::thread m_dsThread;

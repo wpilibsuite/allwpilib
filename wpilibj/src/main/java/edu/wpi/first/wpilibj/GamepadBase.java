@@ -9,7 +9,10 @@ package edu.wpi.first.wpilibj;
 
 /**
  * Gamepad Interface.
+ *
+ * @deprecated Inherit directly from GenericHID instead.
  */
+@Deprecated
 public abstract class GamepadBase extends GenericHID {
   public GamepadBase(int port) {
     super(port);

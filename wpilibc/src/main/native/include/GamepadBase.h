@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <support/deprecated.h>
+
 #include "GenericHID.h"
 
 namespace frc {
@@ -14,7 +16,8 @@ namespace frc {
 /**
  * Gamepad Interface.
  */
-class GamepadBase : public GenericHID {
+class WPI_DEPRECATED("Inherit directly from GenericHID instead.") GamepadBase
+    : public GenericHID {
  public:
   explicit GamepadBase(int port);
   virtual ~GamepadBase() = default;

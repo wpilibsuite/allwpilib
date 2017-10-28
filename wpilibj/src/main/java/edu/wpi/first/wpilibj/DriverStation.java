@@ -81,6 +81,11 @@ public class DriverStation implements RobotState.Interface {
   private HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[kJoystickPorts];
   private HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
   private HALJoystickButtons[] m_joystickButtonsCache = new HALJoystickButtons[kJoystickPorts];
+
+  // Joystick button rising/falling edge flags
+  HALJoystickButtons[] m_joystickButtonsPressed = new HALJoystickButtons[kJoystickPorts];
+  HALJoystickButtons[] m_joystickButtonsReleased = new HALJoystickButtons[kJoystickPorts];
+
   // preallocated byte buffer for button count
   private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
 
@@ -126,6 +131,9 @@ public class DriverStation implements RobotState.Interface {
       m_joystickButtonsCache[i] = new HALJoystickButtons();
       m_joystickAxesCache[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
       m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
+
+      m_joystickButtonsPressed[i].m_buttons = 0;
+      m_joystickButtonsReleased[i].m_buttons = 0;
     }
 
     m_controlWordMutex = new Object();
@@ -186,6 +194,89 @@ public class DriverStation implements RobotState.Interface {
       }
     }
     HAL.sendError(isError, code, false, error, locString, printTrace ? traceString : "", true);
+  }
+
+  /**
+   * The state of one joystick button. Button indexes begin at 1.
+   *
+   * @param stick  The joystick to read.
+   * @param button The button index, beginning at 1.
+   * @return The state of the joystick button.
+   */
+  public boolean getStickButton(final int stick, final int button) {
+    if (button <= 0) {
+      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
+      return false;
+    }
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+    }
+    boolean error = false;
+    boolean retVal = false;
+    synchronized (m_joystickMutex) {
+      if (button > m_joystickButtons[stick].m_count) {
+        error = true;
+        retVal = false;
+      } else {
+        retVal = (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
+      }
+    }
+    if (error) {
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
+    }
+    return retVal;
+  }
+
+  /**
+   * Whether one joystick button was pressed since the last check. Button indexes begin at 1.
+   *
+   * @param stick  The joystick to read.
+   * @param button The button index, beginning at 1.
+   * @return Whether the joystick button was pressed since the last check.
+   */
+  boolean getStickButtonPressed(final int stick, final int button) {
+    if (button <= 0) {
+      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
+      return false;
+    }
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+    }
+
+    // If button was pressed, clear flag and return true
+    if ((m_joystickButtonsPressed[stick].m_buttons & 1 << (button - 1)) != 0) {
+      m_joystickButtonsPressed[stick].m_buttons &= ~(1 << (button - 1));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Whether one joystick button was released since the last check. Button indexes
+   * begin at 1.
+   *
+   * @param stick  The joystick to read.
+   * @param button The button index, beginning at 1.
+   * @return Whether the joystick button was released since the last check.
+   */
+  boolean getStickButtonReleased(final int stick, final int button) {
+    if (button <= 0) {
+      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
+      return false;
+    }
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+    }
+
+    // If button was released, clear flag and return true
+    if ((m_joystickButtonsReleased[stick].m_buttons & 1 << (button - 1)) != 0) {
+      m_joystickButtonsReleased[stick].m_buttons &= ~(1 << (button - 1));
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -264,38 +355,6 @@ public class DriverStation implements RobotState.Interface {
     synchronized (m_joystickMutex) {
       return m_joystickButtons[stick].m_buttons;
     }
-  }
-
-  /**
-   * The state of one joystick button. Button indexes begin at 1.
-   *
-   * @param stick  The joystick to read.
-   * @param button The button index, beginning at 1.
-   * @return The state of the joystick button.
-   */
-  public boolean getStickButton(final int stick, byte button) {
-    if (button <= 0) {
-      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
-      return false;
-    }
-    if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
-    }
-    boolean error = false;
-    boolean retVal = false;
-    synchronized (m_joystickMutex) {
-      if (button > m_joystickButtons[stick].m_count) {
-        error = true;
-        retVal = false;
-      } else {
-        retVal = ((0x1 << (button - 1)) & m_joystickButtons[stick].m_buttons) != 0;
-      }
-    }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
   }
 
   /**
@@ -717,6 +776,16 @@ public class DriverStation implements RobotState.Interface {
 
     // lock joystick mutex to swap cache data
     synchronized (m_joystickMutex) {
+      for (int i = 0; i < kJoystickPorts; i++) {
+        // If buttons weren't pressed and are now, set flags in m_buttonsPressed
+        m_joystickButtonsPressed[i].m_buttons |=
+            ~m_joystickButtons[i].m_buttons & m_joystickButtonsCache[i].m_buttons;
+
+        // If buttons were pressed and aren't now, set flags in m_buttonsReleased
+        m_joystickButtonsReleased[i].m_buttons |=
+            m_joystickButtons[i].m_buttons & ~m_joystickButtonsCache[i].m_buttons;
+      }
+
       // move cache to actual data
       HALJoystickAxes[] currentAxes = m_joystickAxes;
       m_joystickAxes = m_joystickAxesCache;

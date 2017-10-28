@@ -17,11 +17,29 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * requested the most recent value is returned. There is a single class instance for each controller
  * and the mapping of ports to hardware buttons depends on the code in the Driver Station.
  */
-public class XboxController extends GamepadBase {
-  private DriverStation m_ds;
-  private int m_outputs;
-  private short m_leftRumble;
-  private short m_rightRumble;
+public class XboxController extends GenericHID {
+  /**
+   * Represents a digital button on an XboxController.
+   */
+  private enum Button {
+    kBumperLeft(5),
+    kBumperRight(6),
+    kStickLeft(9),
+    kStickRight(10),
+    kA(1),
+    kB(2),
+    kX(3),
+    kY(4),
+    kBack(7),
+    kStart(8);
+
+    @SuppressWarnings("MemberName")
+    private int value;
+
+    Button(int value) {
+      this.value = value;
+    }
+  }
 
   /**
    * Construct an instance of a joystick. The joystick index is the USB port on the drivers
@@ -31,7 +49,6 @@ public class XboxController extends GamepadBase {
    */
   public XboxController(final int port) {
     super(port);
-    m_ds = DriverStation.getInstance();
 
     // HAL.report(tResourceType.kResourceType_XboxController, port);
     HAL.report(tResourceType.kResourceType_Joystick, port);
@@ -68,69 +85,6 @@ public class XboxController extends GamepadBase {
   }
 
   /**
-   * Get the value of the axis.
-   *
-   * @param axis The axis to read, starting at 0.
-   * @return The value of the axis.
-   */
-  public double getRawAxis(final int axis) {
-    return m_ds.getStickAxis(getPort(), axis);
-  }
-
-  /**
-   * Read the value of the bumper button on the controller.
-   *
-   * @param hand Side of controller whose value should be returned.
-   * @return The state of the button.
-   */
-  @Override
-  public boolean getBumper(Hand hand) {
-    if (hand.equals(Hand.kLeft)) {
-      return getRawButton(5);
-    } else {
-      return getRawButton(6);
-    }
-  }
-
-  /**
-   * This is not supported for the XboxController. This method is only here to complete the
-   * GenericHID interface.
-   *
-   * @param hand This parameter is ignored for the Joystick class and is only here to complete the
-   *             GenericHID interface.
-   * @return The state of the trigger (always false)
-   */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
-  public boolean getTrigger(Hand hand) {
-    return false;
-  }
-
-  /**
-   * This is not supported for the XboxController. This method is only here to complete the
-   * GenericHID interface.
-   *
-   * @param hand This parameter is ignored for the Joystick class and is only here to complete the
-   *             GenericHID interface.
-   * @return The state of the top button (always false)
-   */
-  @SuppressWarnings("PMD.UnusedFormalParameter")
-  public boolean getTop(Hand hand) {
-    return false;
-  }
-
-  /**
-   * Get the button value (starting at button 1).
-   *
-   * <p>The appropriate button is returned as a boolean value.
-   *
-   * @param button The button number to be read (starting at 1).
-   * @return The state of the button.
-   */
-  public boolean getRawButton(final int button) {
-    return m_ds.getStickButton(getPort(), (byte) button);
-  }
-
-  /**
    * Get the trigger axis value of the controller.
    *
    * @param hand Side of controller whose value should be returned.
@@ -145,39 +99,45 @@ public class XboxController extends GamepadBase {
   }
 
   /**
-   * Read the value of the A button on the controller.
+   * Read the value of the bumper button on the controller.
    *
+   * @param hand Side of controller whose value should be returned.
    * @return The state of the button.
    */
-  public boolean getAButton() {
-    return getRawButton(1);
+  public boolean getBumper(Hand hand) {
+    if (hand.equals(Hand.kLeft)) {
+      return getRawButton(Button.kBumperLeft.value);
+    } else {
+      return getRawButton(Button.kBumperRight.value);
+    }
   }
 
   /**
-   * Read the value of the B button on the controller.
+   * Whether the bumper was pressed since the last check.
    *
-   * @return The state of the button.
+   * @param hand Side of controller whose value should be returned.
+   * @return Whether the button was pressed since the last check.
    */
-  public boolean getBButton() {
-    return getRawButton(2);
+  public boolean getBumperPressed(Hand hand) {
+    if (hand == Hand.kLeft) {
+      return getRawButtonPressed(Button.kBumperLeft.value);
+    } else {
+      return getRawButtonPressed(Button.kBumperRight.value);
+    }
   }
 
   /**
-   * Read the value of the X button on the controller.
+   * Whether the bumper was released since the last check.
    *
-   * @return The state of the button.
+   * @param hand Side of controller whose value should be returned.
+   * @return Whether the button was released since the last check.
    */
-  public boolean getXButton() {
-    return getRawButton(3);
-  }
-
-  /**
-   * Read the value of the Y button on the controller.
-   *
-   * @return The state of the button.
-   */
-  public boolean getYButton() {
-    return getRawButton(4);
+  public boolean getBumperReleased(Hand hand) {
+    if (hand == Hand.kLeft) {
+      return getRawButtonReleased(Button.kBumperLeft.value);
+    } else {
+      return getRawButtonReleased(Button.kBumperRight.value);
+    }
   }
 
   /**
@@ -186,13 +146,148 @@ public class XboxController extends GamepadBase {
    * @param hand Side of controller whose value should be returned.
    * @return The state of the button.
    */
-  @Override
   public boolean getStickButton(Hand hand) {
     if (hand.equals(Hand.kLeft)) {
-      return getRawButton(9);
+      return getRawButton(Button.kStickLeft.value);
     } else {
-      return getRawButton(10);
+      return getRawButton(Button.kStickRight.value);
     }
+  }
+
+  /**
+   * Whether the stick button was pressed since the last check.
+   *
+   * @param hand Side of controller whose value should be returned.
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getStickButtonPressed(Hand hand) {
+    if (hand == Hand.kLeft) {
+      return getRawButtonPressed(Button.kStickLeft.value);
+    } else {
+      return getRawButtonPressed(Button.kStickRight.value);
+    }
+  }
+
+  /**
+   * Whether the stick button was released since the last check.
+   *
+   * @param hand Side of controller whose value should be returned.
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getStickButtonReleased(Hand hand) {
+    if (hand == Hand.kLeft) {
+      return getRawButtonReleased(Button.kStickLeft.value);
+    } else {
+      return getRawButtonReleased(Button.kStickRight.value);
+    }
+  }
+
+  /**
+   * Read the value of the A button on the controller.
+   *
+   * @return The state of the button.
+   */
+  public boolean getAButton() {
+    return getRawButton(Button.kA.value);
+  }
+
+  /**
+   * Whether the A button was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getAButtonPressed() {
+    return getRawButtonPressed(Button.kA.value);
+  }
+
+  /**
+   * Whether the A button was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getAButtonReleased() {
+    return getRawButtonReleased(Button.kA.value);
+  }
+
+  /**
+   * Read the value of the B button on the controller.
+   *
+   * @return The state of the button.
+   */
+  public boolean getBButton() {
+    return getRawButton(Button.kB.value);
+  }
+
+  /**
+   * Whether the B button was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getBButtonPressed() {
+    return getRawButtonPressed(Button.kB.value);
+  }
+
+  /**
+   * Whether the B button was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getBButtonReleased() {
+    return getRawButtonReleased(Button.kB.value);
+  }
+
+  /**
+   * Read the value of the X button on the controller.
+   *
+   * @return The state of the button.
+   */
+  public boolean getXButton() {
+    return getRawButton(Button.kX.value);
+  }
+
+  /**
+   * Whether the X button was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getXButtonPressed() {
+    return getRawButtonPressed(Button.kX.value);
+  }
+
+  /**
+   * Whether the X button was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getXButtonReleased() {
+    return getRawButtonReleased(Button.kX.value);
+  }
+
+  /**
+   * Read the value of the Y button on the controller.
+   *
+   * @return The state of the button.
+   */
+  public boolean getYButton() {
+    return getRawButton(Button.kY.value);
+  }
+
+  /**
+   * Whether the Y button was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getYButtonPressed() {
+    return getRawButtonPressed(Button.kY.value);
+  }
+
+  /**
+   * Whether the Y button was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getYButtonReleased() {
+    return getRawButtonReleased(Button.kY.value);
   }
 
   /**
@@ -201,7 +296,25 @@ public class XboxController extends GamepadBase {
    * @return The state of the button.
    */
   public boolean getBackButton() {
-    return getRawButton(7);
+    return getRawButton(Button.kBack.value);
+  }
+
+  /**
+   * Whether the back button was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getBackButtonPressed() {
+    return getRawButtonPressed(Button.kBack.value);
+  }
+
+  /**
+   * Whether the back button was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getBackButtonReleased() {
+    return getRawButtonReleased(Button.kBack.value);
   }
 
   /**
@@ -210,53 +323,24 @@ public class XboxController extends GamepadBase {
    * @return The state of the button.
    */
   public boolean getStartButton() {
-    return getRawButton(8);
+    return getRawButton(Button.kStart.value);
   }
 
-  @Override
-  public int getPOV(int pov) {
-    return m_ds.getStickPOV(getPort(), pov);
+  /**
+   * Whether the start button was pressed since the last check.
+   *
+   * @return Whether the button was pressed since the last check.
+   */
+  public boolean getStartButtonPressed() {
+    return getRawButtonPressed(Button.kStart.value);
   }
 
-  @Override
-  public int getPOVCount() {
-    return m_ds.getStickPOVCount(getPort());
-  }
-
-  @Override
-  public HIDType getType() {
-    return HIDType.values()[m_ds.getJoystickType(getPort())];
-  }
-
-  @Override
-  public String getName() {
-    return m_ds.getJoystickName(getPort());
-  }
-
-  @Override
-  public void setOutput(int outputNumber, boolean value) {
-    m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
-    HAL.setJoystickOutputs((byte) getPort(), m_outputs, m_leftRumble, m_rightRumble);
-  }
-
-  @Override
-  public void setOutputs(int value) {
-    m_outputs = value;
-    HAL.setJoystickOutputs((byte) getPort(), m_outputs, m_leftRumble, m_rightRumble);
-  }
-
-  @Override
-  public void setRumble(RumbleType type, double value) {
-    if (value < 0) {
-      value = 0;
-    } else if (value > 1) {
-      value = 1;
-    }
-    if (type == RumbleType.kLeftRumble) {
-      m_leftRumble = (short) (value * 65535);
-    } else {
-      m_rightRumble = (short) (value * 65535);
-    }
-    HAL.setJoystickOutputs((byte) getPort(), m_outputs, m_leftRumble, m_rightRumble);
+  /**
+   * Whether the start button was released since the last check.
+   *
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getStartButtonReleased() {
+    return getRawButtonReleased(Button.kStart.value);
   }
 }
