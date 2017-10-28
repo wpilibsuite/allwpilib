@@ -35,11 +35,6 @@ using namespace hal;
 static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
 
-static std::mutex timeMutex;
-static uint32_t timeEpoch = 0;
-static uint32_t prevFPGATime = 0;
-static HAL_NotifierHandle rolloverNotifier = 0;
-
 using namespace hal;
 
 extern "C" {
@@ -224,14 +219,16 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-  std::lock_guard<std::mutex> lock(timeMutex);
-  uint32_t fpgaTime = global->readLocalTime(status);
+  uint64_t upper1 = global->readLocalTimeUpper(status);
+  uint32_t lower = global->readLocalTime(status);
+  uint64_t upper2 = global->readLocalTimeUpper(status);
   if (*status != 0) return 0;
-  // check for rollover
-  if (fpgaTime < prevFPGATime) ++timeEpoch;
-  prevFPGATime = fpgaTime;
-  return static_cast<uint64_t>(timeEpoch) << 32 |
-         static_cast<uint64_t>(fpgaTime);
+  if (upper1 != upper2) {
+    // Rolled over between the lower call, reread lower
+    lower = global->readLocalTime(status);
+    if (*status != 0) return 0;
+  }
+  return (upper2 << 32) + lower;
 }
 
 /**
@@ -260,12 +257,6 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
     return false;
   }
   return !(watchdog->readStatus_PowerAlive(status));
-}
-
-static void timerRollover(uint64_t currentTime, HAL_NotifierHandle handle) {
-  // reschedule timer for next rollover
-  int32_t status = 0;
-  HAL_UpdateNotifierAlarm(handle, currentTime + 0x80000000ULL, &status);
 }
 
 void HAL_BaseInitialize(int32_t* status) {
@@ -360,23 +351,6 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   int32_t status = 0;
   HAL_BaseInitialize(&status);
-
-  if (!rolloverNotifier)
-    rolloverNotifier = HAL_InitializeNotifierNonThreadedUnsafe(
-        timerRollover, nullptr, &status);
-  if (status == 0) {
-    uint64_t curTime = HAL_GetFPGATime(&status);
-    if (status == 0) {
-      HAL_UpdateNotifierAlarm(rolloverNotifier, curTime + 0x80000000ULL,
-                              &status);
-    } else {
-      // return false if status failed.
-      return false;
-    }
-  } else {
-    // return false if status failed.
-    return false;
-  }
 
   HAL_InitializeDriverStation();
 
