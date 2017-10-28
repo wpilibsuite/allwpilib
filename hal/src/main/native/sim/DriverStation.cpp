@@ -18,6 +18,7 @@
 #include <string>
 
 #include "MockData/DriverStationDataInternal.h"
+#include "MockData/MockHooks.h"
 
 static std::mutex msgMutex;
 static std::condition_variable newDSDataAvailableCond;
@@ -152,9 +153,7 @@ double HAL_GetMatchTime(int32_t* status) {
   return SimDriverStationData.GetMatchTime();
 }
 
-void HAL_ObserveUserProgramStarting(void) {
-  // TODO
-}
+void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
 
 void HAL_ObserveUserProgramDisabled(void) {
   // TODO
