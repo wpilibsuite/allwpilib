@@ -91,6 +91,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
   StringRef name = msg->str();
   Entry* entry;
   bool may_need_update = false;
+  SequenceNumber seq_num(msg->seq_num_uid());
   if (m_server) {
     // if we're a server, id=0xffff requests are requests for an id
     // to be assigned, and we need to send the new assignment back to
@@ -101,6 +102,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
       if (entry->id != 0xffff) return;
 
       entry->flags = msg->flags();
+      entry->seq_num = seq_num;
       SetEntryValueImpl(entry, msg->value(), lock, false);
       return;
     }
@@ -131,6 +133,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
         // id assignment request)
         entry->value = msg->value();
         entry->flags = msg->flags();
+        entry->seq_num = seq_num;
 
         // notify
         m_notifier.NotifyEntry(entry->local_id, name, entry->value,
@@ -154,7 +157,6 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
   // common client and server handling
 
   // already exists; ignore if sequence number not higher than local
-  SequenceNumber seq_num(msg->seq_num_uid());
   if (seq_num < entry->seq_num) {
     if (may_need_update) {
       auto dispatcher = m_dispatcher;
