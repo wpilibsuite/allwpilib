@@ -209,7 +209,7 @@ public class RobotDrive implements MotorSafety {
     requireNonNull(leftStick, "Provided left stick was null");
     requireNonNull(rightStick, "Provided right stick was null");
 
-    tankDrive(leftStick.getY(), rightStick.getY(), true);
+    tankDrive(-leftStick.getY(), -rightStick.getY(), true);
   }
 
   /**
@@ -224,7 +224,7 @@ public class RobotDrive implements MotorSafety {
     requireNonNull(leftStick, "Provided left stick was null");
     requireNonNull(rightStick, "Provided right stick was null");
 
-    tankDrive(leftStick.getY(), rightStick.getY(), squaredInputs);
+    tankDrive(-leftStick.getY(), -rightStick.getY(), squaredInputs);
   }
 
   /**
@@ -313,7 +313,7 @@ public class RobotDrive implements MotorSafety {
    */
   public void arcadeDrive(GenericHID stick, boolean squaredInputs) {
     // simply call the full-featured arcadeDrive with the appropriate values
-    arcadeDrive(stick.getY(), stick.getX(), squaredInputs);
+    arcadeDrive(-stick.getY(), stick.getX(), squaredInputs);
   }
 
   /**
