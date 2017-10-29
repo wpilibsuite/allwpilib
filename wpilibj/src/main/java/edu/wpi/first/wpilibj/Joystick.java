@@ -23,7 +23,7 @@ public class Joystick extends GenericHID {
   static final byte kDefaultZAxis = 2;
   static final byte kDefaultTwistAxis = 2;
   static final byte kDefaultThrottleAxis = 3;
-  static final byte kMinNumAxes = 4;
+  static final byte kMinNumAxes = 5;
 
   /**
    * Represents an analog axis on a joystick.

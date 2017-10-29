@@ -30,7 +30,7 @@ class Joystick : public GenericHID {
   static constexpr int kDefaultZAxis = 2;
   static constexpr int kDefaultTwistAxis = 2;
   static constexpr int kDefaultThrottleAxis = 3;
-  static constexpr int kMinNumAxes = 4;
+  static constexpr int kMinNumAxes = 5;
 
   enum AxisType { kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis };
   enum ButtonType { kTriggerButton, kTopButton };
