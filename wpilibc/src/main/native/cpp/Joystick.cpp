@@ -7,8 +7,6 @@
 
 #include "Joystick.h"
 
-#include <algorithm>
-#include <array>
 #include <cmath>
 
 #include <HAL/HAL.h>
@@ -17,8 +15,6 @@
 #include "WPIErrors.h"
 
 using namespace frc;
-
-constexpr int Joystick::kMinNumAxes;
 
 constexpr double kPi = 3.14159265358979323846;
 
@@ -30,13 +26,12 @@ constexpr double kPi = 3.14159265358979323846;
  * @param port The port on the Driver Station that the joystick is plugged into
  *             (0-5).
  */
-Joystick::Joystick(int port)
-    : GenericHID(port), m_axes(std::max(GetAxisCount(), kMinNumAxes)) {
-  m_axes[static_cast<int>(Axis::kX)] = kDefaultXAxis;
-  m_axes[static_cast<int>(Axis::kY)] = kDefaultYAxis;
-  m_axes[static_cast<int>(Axis::kZ)] = kDefaultZAxis;
-  m_axes[static_cast<int>(Axis::kTwist)] = kDefaultTwistAxis;
-  m_axes[static_cast<int>(Axis::kThrottle)] = kDefaultThrottleAxis;
+Joystick::Joystick(int port) : GenericHID(port) {
+  m_axes[Axis::kX] = kDefaultXAxis;
+  m_axes[Axis::kY] = kDefaultYAxis;
+  m_axes[Axis::kZ] = kDefaultZAxis;
+  m_axes[Axis::kTwist] = kDefaultTwistAxis;
+  m_axes[Axis::kThrottle] = kDefaultThrottleAxis;
 
   HAL_Report(HALUsageReporting::kResourceType_Joystick, port);
 }
@@ -56,9 +51,7 @@ void Joystick::SetAxisChannel(AxisType axis, int channel) {
  *
  * @param channel The channel to set the axis to.
  */
-void Joystick::SetXChannel(int channel) {
-  m_axes[static_cast<int>(Axis::kX)] = channel;
-}
+void Joystick::SetXChannel(int channel) { m_axes[Axis::kX] = channel; }
 
 /**
  * Set the channel associated with the Y axis.
@@ -66,9 +59,7 @@ void Joystick::SetXChannel(int channel) {
  * @param axis    The axis to set the channel for.
  * @param channel The channel to set the axis to.
  */
-void Joystick::SetYChannel(int channel) {
-  m_axes[static_cast<int>(Axis::kY)] = channel;
-}
+void Joystick::SetYChannel(int channel) { m_axes[Axis::kY] = channel; }
 
 /**
  * Set the channel associated with the Z axis.
@@ -76,9 +67,7 @@ void Joystick::SetYChannel(int channel) {
  * @param axis    The axis to set the channel for.
  * @param channel The channel to set the axis to.
  */
-void Joystick::SetZChannel(int channel) {
-  m_axes[static_cast<int>(Axis::kZ)] = channel;
-}
+void Joystick::SetZChannel(int channel) { m_axes[Axis::kZ] = channel; }
 
 /**
  * Set the channel associated with the twist axis.
@@ -86,9 +75,7 @@ void Joystick::SetZChannel(int channel) {
  * @param axis    The axis to set the channel for.
  * @param channel The channel to set the axis to.
  */
-void Joystick::SetTwistChannel(int channel) {
-  m_axes[static_cast<int>(Axis::kTwist)] = channel;
-}
+void Joystick::SetTwistChannel(int channel) { m_axes[Axis::kTwist] = channel; }
 
 /**
  * Set the channel associated with the throttle axis.
@@ -97,7 +84,7 @@ void Joystick::SetTwistChannel(int channel) {
  * @param channel The channel to set the axis to.
  */
 void Joystick::SetThrottleChannel(int channel) {
-  m_axes[static_cast<int>(Axis::kThrottle)] = channel;
+  m_axes[Axis::kThrottle] = channel;
 }
 
 /**
@@ -105,39 +92,35 @@ void Joystick::SetThrottleChannel(int channel) {
  *
  * @return The channel for the axis.
  */
-int Joystick::GetXChannel() const { return m_axes[static_cast<int>(Axis::kX)]; }
+int Joystick::GetXChannel() const { return m_axes[Axis::kX]; }
 
 /**
  * Get the channel currently associated with the Y axis.
  *
  * @return The channel for the axis.
  */
-int Joystick::GetYChannel() const { return m_axes[static_cast<int>(Axis::kY)]; }
+int Joystick::GetYChannel() const { return m_axes[Axis::kY]; }
 
 /**
  * Get the channel currently associated with the Z axis.
  *
  * @return The channel for the axis.
  */
-int Joystick::GetZChannel() const { return m_axes[static_cast<int>(Axis::kZ)]; }
+int Joystick::GetZChannel() const { return m_axes[Axis::kZ]; }
 
 /**
  * Get the channel currently associated with the twist axis.
  *
  * @return The channel for the axis.
  */
-int Joystick::GetTwistChannel() const {
-  return m_axes[static_cast<int>(Axis::kTwist)];
-}
+int Joystick::GetTwistChannel() const { return m_axes[Axis::kTwist]; }
 
 /**
  * Get the channel currently associated with the throttle axis.
  *
  * @return The channel for the axis.
  */
-int Joystick::GetThrottleChannel() const {
-  return m_axes[static_cast<int>(Axis::kThrottle)];
-}
+int Joystick::GetThrottleChannel() const { return m_axes[Axis::kThrottle]; }
 
 /**
  * Get the X value of the joystick.
@@ -223,9 +206,7 @@ double Joystick::GetAxis(AxisType axis) const {
  *
  * @return The state of the trigger.
  */
-bool Joystick::GetTrigger() const {
-  return GetRawButton(static_cast<int>(Button::kTrigger));
-}
+bool Joystick::GetTrigger() const { return GetRawButton(Button::kTrigger); }
 
 /**
  * Whether the trigger was pressed since the last check.
@@ -233,7 +214,7 @@ bool Joystick::GetTrigger() const {
  * @return Whether the button was pressed since the last check.
  */
 bool Joystick::GetTriggerPressed() {
-  return GetRawButtonPressed(static_cast<int>(Button::kTrigger));
+  return GetRawButtonPressed(Button::kTrigger);
 }
 
 /**
@@ -242,7 +223,7 @@ bool Joystick::GetTriggerPressed() {
  * @return Whether the button was released since the last check.
  */
 bool Joystick::GetTriggerReleased() {
-  return GetRawButtonReleased(static_cast<int>(Button::kTrigger));
+  return GetRawButtonReleased(Button::kTrigger);
 }
 
 /**
@@ -252,27 +233,21 @@ bool Joystick::GetTriggerReleased() {
  *
  * @return The state of the top button.
  */
-bool Joystick::GetTop() const {
-  return GetRawButton(static_cast<int>(Button::kTop));
-}
+bool Joystick::GetTop() const { return GetRawButton(Button::kTop); }
 
 /**
  * Whether the top button was pressed since the last check.
  *
  * @return Whether the button was pressed since the last check.
  */
-bool Joystick::GetTopPressed() {
-  return GetRawButtonPressed(static_cast<int>(Button::kTop));
-}
+bool Joystick::GetTopPressed() { return GetRawButtonPressed(Button::kTop); }
 
 /**
  * Whether the top button was released since the last check.
  *
  * @return Whether the button was released since the last check.
  */
-bool Joystick::GetTopReleased() {
-  return GetRawButtonReleased(static_cast<int>(Button::kTop));
-}
+bool Joystick::GetTopReleased() { return GetRawButtonReleased(Button::kTop); }
 
 Joystick* Joystick::GetStickForPort(int port) {
   static std::array<std::unique_ptr<Joystick>, DriverStation::kJoystickPorts>
@@ -295,7 +270,7 @@ Joystick* Joystick::GetStickForPort(int port) {
  */
 bool Joystick::GetButton(ButtonType button) const {
   int temp = button;
-  return GetRawButton(static_cast<int>(static_cast<Button>(temp)));
+  return GetRawButton(static_cast<Button>(temp));
 }
 
 /**
