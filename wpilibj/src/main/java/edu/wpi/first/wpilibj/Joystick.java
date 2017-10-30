@@ -23,7 +23,6 @@ public class Joystick extends GenericHID {
   static final byte kDefaultZAxis = 2;
   static final byte kDefaultTwistAxis = 2;
   static final byte kDefaultThrottleAxis = 3;
-  static final byte kMinNumAxes = 4;
 
   /**
    * Represents an analog axis on a joystick.
@@ -71,7 +70,7 @@ public class Joystick extends GenericHID {
    * Represents an analog axis on a joystick.
    */
   private enum Axis {
-    kX(0), kY(1), kZ(2), kTwist(3), kThrottle(4);
+    kX(0), kY(1), kZ(2), kTwist(3), kThrottle(4), kNumAxes(5);
 
     @SuppressWarnings("MemberName")
     public final int value;
@@ -81,7 +80,7 @@ public class Joystick extends GenericHID {
     }
   }
 
-  private final byte[] m_axes;
+  private final byte[] m_axes = new byte[Axis.kNumAxes.value];
 
   /**
    * Construct an instance of a joystick. The joystick index is the USB port on the drivers
@@ -91,8 +90,6 @@ public class Joystick extends GenericHID {
    */
   public Joystick(final int port) {
     super(port);
-
-    m_axes = new byte[Math.max(getAxisCount(), kMinNumAxes)];
 
     m_axes[Axis.kX.value] = kDefaultXAxis;
     m_axes[Axis.kY.value] = kDefaultYAxis;

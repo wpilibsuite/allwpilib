@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <vector>
+#include <array>
 
 #include <support/deprecated.h>
 
@@ -30,7 +30,6 @@ class Joystick : public GenericHID {
   static constexpr int kDefaultZAxis = 2;
   static constexpr int kDefaultTwistAxis = 2;
   static constexpr int kDefaultThrottleAxis = 3;
-  static constexpr int kMinNumAxes = 4;
 
   enum AxisType { kXAxis, kYAxis, kZAxis, kTwistAxis, kThrottleAxis };
   enum ButtonType { kTriggerButton, kTopButton };
@@ -87,10 +86,10 @@ class Joystick : public GenericHID {
   double GetDirectionDegrees() const;
 
  private:
-  enum class Axis { kX, kY, kZ, kTwist, kThrottle };
-  enum class Button { kTrigger = 1, kTop = 2 };
+  enum Axis { kX, kY, kZ, kTwist, kThrottle, kNumAxes };
+  enum Button { kTrigger = 1, kTop = 2 };
 
-  std::vector<int> m_axes;
+  std::array<int, Axis::kNumAxes> m_axes;
 };
 
 }  // namespace frc
