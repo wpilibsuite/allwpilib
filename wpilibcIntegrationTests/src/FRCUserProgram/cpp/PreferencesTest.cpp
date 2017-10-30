@@ -62,17 +62,17 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
  */
 TEST(PreferencesTest, WritePreferencesToFile) {
   auto inst = nt::NetworkTableInstance::GetDefault();
-  inst.StopServer();
-  inst.DeleteAllEntries();
-  // persistent keys don't get deleted normally, so make remaining keys
-  // non-persistent and delete them too
-  for (auto entry : inst.GetEntries("", 0)) {
-    entry.SetFlags(0);
-  }
-  inst.DeleteAllEntries();
-  std::remove(kFileName);
   inst.StartServer();
   Preferences* preferences = Preferences::GetInstance();
+  preferences->Remove("testFileGetString");
+  preferences->Remove("testFileGetInt");
+  preferences->Remove("testFileGetDouble");
+  preferences->Remove("testFileGetFloat");
+  preferences->Remove("testFileGetBoolean");
+  preferences->Remove("testFileGetLong");
+
+  Wait(kSaveTime);
+
   preferences->PutString("testFilePutString", "Hello, preferences file");
   preferences->PutInt("testFilePutInt", 1);
   preferences->PutDouble("testFilePutDouble", 0.5);
