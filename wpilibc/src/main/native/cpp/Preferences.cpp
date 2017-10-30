@@ -22,6 +22,7 @@ static llvm::StringRef kTableName{"Preferences"};
 
 Preferences::Preferences()
     : m_table(nt::NetworkTableInstance::GetDefault().GetTable(kTableName)) {
+  m_table->GetEntry(".type").SetString("RobotPreferences");
   m_listener = m_table->AddEntryListener(
       [=](nt::NetworkTable* table, llvm::StringRef name,
           nt::NetworkTableEntry entry, std::shared_ptr<nt::Value> value,
