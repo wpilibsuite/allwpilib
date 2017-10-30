@@ -154,7 +154,7 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
-   * Report error to Driver Station. Also prints error to System.err Optionally appends Stack trace
+   * Report error to Driver Station. Optionally appends Stack trace
    * to error message.
    *
    * @param printTrace If true, append stack trace to error string
@@ -164,7 +164,17 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
-   * Report warning to Driver Station. Also prints error to System.err Optionally appends Stack
+   * Report error to Driver Station. Appends provided stack trace
+   * to error message.
+   *
+   * @param stackTrace The stack trace to append
+   */
+  public static void reportError(String error, StackTraceElement[] stackTrace) {
+    reportErrorImpl(true, 1, error, stackTrace);
+  }
+
+  /**
+   * Report warning to Driver Station. Optionally appends Stack
    * trace to warning message.
    *
    * @param printTrace If true, append stack trace to warning string
@@ -173,27 +183,46 @@ public class DriverStation implements RobotState.Interface {
     reportErrorImpl(false, 1, error, printTrace);
   }
 
+  /**
+   * Report warning to Driver Station. Appends provided stack
+   * trace to warning message.
+   *
+   * @param stackTrace The stack trace to append
+   */
+  public static void reportWarning(String error, StackTraceElement[] stackTrace) {
+    reportErrorImpl(false, 1, error, stackTrace);
+  }
+
   private static void reportErrorImpl(boolean isError, int code, String error, boolean
       printTrace) {
-    StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+    reportErrorImpl(isError, code, error, printTrace, Thread.currentThread().getStackTrace(), 3);
+  }
+
+  private static void reportErrorImpl(boolean isError, int code, String error,
+      StackTraceElement[] stackTrace) {
+    reportErrorImpl(isError, code, error, true, stackTrace, 0);
+  }
+
+  private static void reportErrorImpl(boolean isError, int code, String error,
+      boolean printTrace, StackTraceElement[] stackTrace, int stackTraceFirst) {
     String locString;
-    if (traces.length > 3) {
-      locString = traces[3].toString();
+    if (stackTrace.length >= stackTraceFirst + 1) {
+      locString = stackTrace[stackTraceFirst].toString();
     } else {
       locString = "";
     }
     boolean haveLoc = false;
-    String traceString = " at ";
-    for (int i = 3; i < traces.length; i++) {
-      String loc = traces[i].toString();
-      traceString += loc + "\n";
+    String traceString = "";
+    for (int i = stackTraceFirst; i < stackTrace.length; i++) {
+      String loc = stackTrace[i].toString();
+      traceString += "\tat " + loc + "\n";
       // get first user function
-      if (!haveLoc && !loc.startsWith("edu.wpi.first.wpilibj")) {
+      if (!haveLoc && !loc.startsWith("edu.wpi.first")) {
         locString = loc;
         haveLoc = true;
       }
     }
-    HAL.sendError(isError, code, false, error, locString, printTrace ? traceString : "", true);
+    HAL.sendError(isError, code, false, error, locString, printTrace ? traceString : "", false);
   }
 
   /**
