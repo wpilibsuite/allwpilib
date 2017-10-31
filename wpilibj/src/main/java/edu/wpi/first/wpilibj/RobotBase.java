@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
 //import org.opencv.core.Core;
@@ -223,10 +222,14 @@ public abstract class RobotBase {
     try {
       robot = (RobotBase) Class.forName(robotName).newInstance();
     } catch (Throwable throwable) {
-      DriverStation.reportError("ERROR Unhandled exception instantiating robot " + robotName + " "
-          + throwable.toString() + " at " + Arrays.toString(throwable.getStackTrace()), false);
-      System.err.println("WARNING: Robots don't quit!");
-      System.err.println("ERROR: Could not instantiate robot " + robotName + "!");
+      Throwable cause = throwable.getCause();
+      if (cause != null) {
+        throwable = cause;
+      }
+      DriverStation.reportError("Unhandled exception instantiating robot " + robotName + " "
+          + throwable.toString(), throwable.getStackTrace());
+      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+      DriverStation.reportError("Could not instantiate robot " + robotName + "!", false);
       System.exit(1);
       return;
     }
@@ -253,19 +256,22 @@ public abstract class RobotBase {
     try {
       robot.startCompetition();
     } catch (Throwable throwable) {
-      DriverStation.reportError(
-          "ERROR Unhandled exception: " + throwable.toString() + " at "
-              + Arrays.toString(throwable.getStackTrace()), false);
+      Throwable cause = throwable.getCause();
+      if (cause != null) {
+        throwable = cause;
+      }
+      DriverStation.reportError("Unhandled exception: " + throwable.toString(),
+          throwable.getStackTrace());
       errorOnExit = true;
     } finally {
       // startCompetition never returns unless exception occurs....
-      System.err.println("WARNING: Robots don't quit!");
+      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
       if (errorOnExit) {
-        System.err
-            .println("---> The startCompetition() method (or methods called by it) should have "
-                + "handled the exception above.");
+        DriverStation.reportError(
+            "The startCompetition() method (or methods called by it) should have "
+                + "handled the exception above.", false);
       } else {
-        System.err.println("---> Unexpected return from startCompetition() method.");
+        DriverStation.reportError("Unexpected return from startCompetition() method.", false);
       }
     }
     System.exit(1);
