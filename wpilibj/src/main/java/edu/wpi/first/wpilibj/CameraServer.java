@@ -21,6 +21,8 @@ import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.cscore.VideoProperty;
 import edu.wpi.cscore.VideoSink;
 import edu.wpi.cscore.VideoSource;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -477,7 +479,9 @@ public class CameraServer {
    * (e.g. 1, 2, etc).
    */
   public UsbCamera startAutomaticCapture() {
-    return startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
+    UsbCamera camera = startAutomaticCapture(m_defaultUsbDevice.getAndIncrement());
+    HAL.report(tResourceType.kResourceType_PCVideoServer, camera.getHandle());
+    return camera;
   }
 
   /**
@@ -491,6 +495,7 @@ public class CameraServer {
   public UsbCamera startAutomaticCapture(int dev) {
     UsbCamera camera = new UsbCamera("USB Camera " + dev, dev);
     startAutomaticCapture(camera);
+    HAL.report(tResourceType.kResourceType_PCVideoServer, camera.getHandle());
     return camera;
   }
 
@@ -503,6 +508,7 @@ public class CameraServer {
   public UsbCamera startAutomaticCapture(String name, int dev) {
     UsbCamera camera = new UsbCamera(name, dev);
     startAutomaticCapture(camera);
+    HAL.report(tResourceType.kResourceType_PCVideoServer, camera.getHandle());
     return camera;
   }
 
@@ -515,6 +521,7 @@ public class CameraServer {
   public UsbCamera startAutomaticCapture(String name, String path) {
     UsbCamera camera = new UsbCamera(name, path);
     startAutomaticCapture(camera);
+    HAL.report(tResourceType.kResourceType_PCVideoServer, camera.getHandle());
     return camera;
   }
 
@@ -564,6 +571,7 @@ public class CameraServer {
     AxisCamera camera = new AxisCamera(name, host);
     // Create a passthrough MJPEG server for USB access
     startAutomaticCapture(camera);
+    HAL.report(tResourceType.kResourceType_AxisCamera, camera.getHandle());
     return camera;
   }
 
@@ -577,6 +585,7 @@ public class CameraServer {
     AxisCamera camera = new AxisCamera(name, hosts);
     // Create a passthrough MJPEG server for USB access
     startAutomaticCapture(camera);
+    HAL.report(tResourceType.kResourceType_AxisCamera, camera.getHandle());
     return camera;
   }
 

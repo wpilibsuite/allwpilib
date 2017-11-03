@@ -14,10 +14,12 @@
 #include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <mutex>
 #include <string>
 
 #include "MockData/DriverStationDataInternal.h"
+#include "MockData/MockHooks.h"
 
 static std::mutex msgMutex;
 static std::condition_variable newDSDataAvailableCond;
@@ -152,9 +154,24 @@ double HAL_GetMatchTime(int32_t* status) {
   return SimDriverStationData.GetMatchTime();
 }
 
-void HAL_ObserveUserProgramStarting(void) {
-  // TODO
+int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+  info->eventName = static_cast<char*>(std::malloc(1));
+  info->eventName[0] = '\0';
+  info->matchNumber = 0;
+  info->replayNumber = 0;
+  info->gameSpecificMessage = static_cast<char*>(std::malloc(1));
+  info->gameSpecificMessage[0] = '\0';
+  return 0;
 }
+
+void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
+  std::free(info->eventName);
+  std::free(info->gameSpecificMessage);
+  info->eventName = nullptr;
+  info->gameSpecificMessage = nullptr;
+}
+
+void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
 
 void HAL_ObserveUserProgramDisabled(void) {
   // TODO

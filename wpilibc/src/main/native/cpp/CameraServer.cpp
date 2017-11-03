@@ -7,6 +7,7 @@
 
 #include "CameraServer.h"
 
+#include <HAL/HAL.h>
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
@@ -493,7 +494,10 @@ CameraServer::CameraServer()
 }
 #ifdef __linux__
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
-  return StartAutomaticCapture(m_defaultUsbDevice++);
+  cs::UsbCamera camera = StartAutomaticCapture(m_defaultUsbDevice++);
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
+  return camera;
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
@@ -503,6 +507,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
 
   cs::UsbCamera camera{name.str(), dev};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 
@@ -510,6 +516,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
                                                   int dev) {
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 
@@ -517,6 +525,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
                                                   llvm::StringRef path) {
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 #endif
@@ -541,6 +551,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            llvm::StringRef host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_AxisCamera, camera.GetHandle());
   return camera;
 }
 
@@ -548,6 +559,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            const char* host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_AxisCamera, camera.GetHandle());
   return camera;
 }
 
@@ -555,6 +567,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            const std::string& host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_AxisCamera, camera.GetHandle());
   return camera;
 }
 
@@ -562,6 +575,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            llvm::ArrayRef<std::string> hosts) {
   cs::AxisCamera camera{name, hosts};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_AxisCamera, camera.GetHandle());
   return camera;
 }
 

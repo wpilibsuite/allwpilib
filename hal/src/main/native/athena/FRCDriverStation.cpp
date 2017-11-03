@@ -230,6 +230,67 @@ double HAL_GetMatchTime(int32_t* status) {
   return matchTime;
 }
 
+int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+  uint16_t gameSpecificMessageSize = 0;
+  int status = FRC_NetworkCommunication_getMatchInfo(
+      nullptr, nullptr, nullptr, nullptr, nullptr, &gameSpecificMessageSize);
+  if (status < 0) {
+    info->eventName = nullptr;
+    info->gameSpecificMessage = nullptr;
+    return status;
+  }
+  info->eventName = static_cast<char*>(std::malloc(256));
+  gameSpecificMessageSize = ((gameSpecificMessageSize + 1023) / 1024) * 1024;
+  uint16_t originalGameSpecificSize = gameSpecificMessageSize;
+  uint8_t* gameSpecificMessage =
+      static_cast<uint8_t*>(std::malloc(gameSpecificMessageSize));
+  MatchType_t matchType = MatchType_t::kMatchType_none;
+  uint16_t matchNumber = 0;
+  uint8_t replayNumber = 0;
+  status = FRC_NetworkCommunication_getMatchInfo(
+      info->eventName, &matchType, &matchNumber, &replayNumber,
+      gameSpecificMessage, &gameSpecificMessageSize);
+  if (status < 0) {
+    std::free(info->eventName);
+    std::free(gameSpecificMessage);
+    info->eventName = nullptr;
+    info->gameSpecificMessage = nullptr;
+    return status;
+  }
+  if (gameSpecificMessageSize >= originalGameSpecificSize) {
+    // Data has updated between size and read calls. Retry.
+    // Unless large lag, this call will be right.
+    std::free(gameSpecificMessage);
+    gameSpecificMessageSize = ((gameSpecificMessageSize + 1023) / 1024) * 1024;
+    gameSpecificMessage =
+        static_cast<uint8_t*>(std::malloc(gameSpecificMessageSize));
+    int status = FRC_NetworkCommunication_getMatchInfo(
+        nullptr, nullptr, nullptr, nullptr, gameSpecificMessage,
+        &gameSpecificMessageSize);
+    if (status < 0) {
+      std::free(info->eventName);
+      std::free(gameSpecificMessage);
+      info->eventName = nullptr;
+      info->gameSpecificMessage = nullptr;
+      return status;
+    }
+  }
+  info->eventName[255] = '\0';
+  info->matchType = static_cast<HAL_MatchType>(matchType);
+  info->matchNumber = matchNumber;
+  info->replayNumber = replayNumber;
+  info->gameSpecificMessage = reinterpret_cast<char*>(gameSpecificMessage);
+  info->gameSpecificMessage[gameSpecificMessageSize] = '\0';
+  return status;
+}
+
+void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
+  std::free(info->eventName);
+  std::free(info->gameSpecificMessage);
+  info->eventName = nullptr;
+  info->gameSpecificMessage = nullptr;
+}
+
 void HAL_ObserveUserProgramStarting(void) {
   FRC_NetworkCommunication_observeUserProgramStarting();
 }

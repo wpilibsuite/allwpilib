@@ -118,7 +118,7 @@ void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max,
 
   // calculate the loop time in milliseconds
   double loopTime =
-      HAL_GetLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
+      HAL_GetPWMLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
   if (*status != 0) return;
 
   int32_t maxPwm = static_cast<int32_t>((max - kDefaultPwmCenter) / loopTime +
@@ -444,10 +444,30 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
  *
  * @return The loop time
  */
-int32_t HAL_GetLoopTiming(int32_t* status) {
+int32_t HAL_GetPWMLoopTiming(int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return 0;
   return pwmSystem->readLoopTiming(status);
+}
+
+/**
+ * Get the pwm starting cycle time
+ *
+ * @return The pwm cycle start time.
+ */
+uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
+  initializeDigital(status);
+  if (*status != 0) return 0;
+  uint64_t upper1 = pwmSystem->readCycleStartTimeUpper(status);
+  uint32_t lower = pwmSystem->readCycleStartTime(status);
+  uint64_t upper2 = pwmSystem->readCycleStartTimeUpper(status);
+  if (*status != 0) return 0;
+  if (upper1 != upper2) {
+    // Rolled over between the lower call, reread lower
+    lower = pwmSystem->readCycleStartTime(status);
+    if (*status != 0) return 0;
+  }
+  return (upper2 << 32) + lower;
 }
 
 }  // extern "C"

@@ -420,7 +420,7 @@ public class RobotDrive implements MotorSafety {
    * Arcade drive implements single stick driving. This function lets you directly provide
    * joystick values from any source.
    *
-   * @param moveValue   The value to use for fowards/backwards
+   * @param moveValue   The value to use for forwards/backwards
    * @param rotateValue The value to use for the rotate right/left
    */
   public void arcadeDrive(double moveValue, double rotateValue) {
@@ -457,7 +457,7 @@ public class RobotDrive implements MotorSafety {
     double yIn = y;
     // Negate y for the joystick.
     yIn = -yIn;
-    // Compenstate for gyro angle.
+    // Compensate for gyro angle.
     double[] rotated = rotateVector(xIn, yIn, gyroAngle);
     xIn = rotated[0];
     yIn = rotated[1];
@@ -487,10 +487,10 @@ public class RobotDrive implements MotorSafety {
    * top, the roller axles should form an X across the robot.
    *
    * @param magnitude The speed that the robot should drive in a given direction.
-   * @param direction The direction the robot should drive in degrees. The direction and maginitute
+   * @param direction The direction the robot should drive in degrees. The direction and magnitude
    *                  are independent of the rotation rate.
    * @param rotation  The rate of rotation for the robot that is completely independent of the
-   *                  magnitute or direction. [-1.0..1.0]
+   *                  magnitude or direction. [-1.0..1.0]
    */
   public void mecanumDrive_Polar(double magnitude, double direction, double rotation) {
     if (!kMecanumPolar_Reported) {
@@ -526,7 +526,7 @@ public class RobotDrive implements MotorSafety {
   /**
    * Holonomic Drive method for Mecanum wheeled robots.
    *
-   * <p>This is an alias to mecanumDrive_Polar() for backward compatability
+   * <p>This is an alias to mecanumDrive_Polar() for backward compatibility
    *
    * @param magnitude The speed that the robot should drive in a given direction. [-1.0..1.0]
    * @param direction The direction the robot should drive. The direction and maginitute are

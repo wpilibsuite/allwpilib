@@ -9,20 +9,17 @@
 
 #include <HAL/HAL.h>
 
-#include "DriverStation.h"
-
 using namespace frc;
 
 /**
  * Construct an instance of an Xbox controller.
  *
- * The joystick index is the USB port on the Driver Station.
+ * The controller index is the USB port on the Driver Station.
  *
- * @param port The port on the Driver Station that the joystick is plugged into
- *             (0-5).
+ * @param port The port on the Driver Station that the controller is plugged
+ *             into (0-5).
  */
-XboxController::XboxController(int port)
-    : GamepadBase(port), m_ds(DriverStation::GetInstance()) {
+XboxController::XboxController(int port) : GenericHID(port) {
   // HAL_Report(HALUsageReporting::kResourceType_XboxController, port);
   HAL_Report(HALUsageReporting::kResourceType_Joystick, port);
 }
@@ -54,33 +51,6 @@ double XboxController::GetY(JoystickHand hand) const {
 }
 
 /**
- * Read the value of the bumper button on the controller.
- *
- * @param hand Side of controller whose value should be returned.
- */
-bool XboxController::GetBumper(JoystickHand hand) const {
-  if (hand == kLeftHand) {
-    return GetRawButton(5);
-  } else {
-    return GetRawButton(6);
-  }
-}
-
-/**
- * Read the value of the stick button on the controller.
- *
- * @param hand Side of controller whose value should be returned.
- * @return The state of the button.
- */
-bool XboxController::GetStickButton(JoystickHand hand) const {
-  if (hand == kLeftHand) {
-    return GetRawButton(9);
-  } else {
-    return GetRawButton(10);
-  }
-}
-
-/**
  * Get the trigger axis value of the controller.
  *
  * @param hand Side of controller whose value should be returned.
@@ -94,36 +64,195 @@ double XboxController::GetTriggerAxis(JoystickHand hand) const {
 }
 
 /**
- * Read the value of the A button on the controller.
+ * Read the value of the bumper button on the controller.
+ *
+ * @param hand Side of controller whose value should be returned.
+ */
+bool XboxController::GetBumper(JoystickHand hand) const {
+  if (hand == kLeftHand) {
+    return GetRawButton(static_cast<int>(Button::kBumperLeft));
+  } else {
+    return GetRawButton(static_cast<int>(Button::kBumperRight));
+  }
+}
+
+/**
+ * Whether the bumper was pressed since the last check.
+ *
+ * @param hand Side of controller whose value should be returned.
+ * @return Whether the button was pressed since the last check.
+ */
+bool XboxController::GetBumperPressed(JoystickHand hand) {
+  if (hand == kLeftHand) {
+    return GetRawButtonPressed(static_cast<int>(Button::kBumperLeft));
+  } else {
+    return GetRawButtonPressed(static_cast<int>(Button::kBumperRight));
+  }
+}
+
+/**
+ * Whether the bumper was released since the last check.
+ *
+ * @param hand Side of controller whose value should be returned.
+ * @return Whether the button was released since the last check.
+ */
+bool XboxController::GetBumperReleased(JoystickHand hand) {
+  if (hand == kLeftHand) {
+    return GetRawButtonReleased(static_cast<int>(Button::kBumperLeft));
+  } else {
+    return GetRawButtonReleased(static_cast<int>(Button::kBumperRight));
+  }
+}
+
+/**
+ * Read the value of the stick button on the controller.
  *
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetAButton() const { return GetRawButton(1); }
+bool XboxController::GetStickButton(JoystickHand hand) const {
+  if (hand == kLeftHand) {
+    return GetRawButton(static_cast<int>(Button::kStickLeft));
+  } else {
+    return GetRawButton(static_cast<int>(Button::kStickRight));
+  }
+}
+
+/**
+ * Whether the stick button was pressed since the last check.
+ *
+ * @param hand Side of controller whose value should be returned.
+ * @return Whether the button was pressed since the last check.
+ */
+bool XboxController::GetStickButtonPressed(JoystickHand hand) {
+  if (hand == kLeftHand) {
+    return GetRawButtonPressed(static_cast<int>(Button::kStickLeft));
+  } else {
+    return GetRawButtonPressed(static_cast<int>(Button::kStickRight));
+  }
+}
+
+/**
+ * Whether the stick button was released since the last check.
+ *
+ * @param hand Side of controller whose value should be returned.
+ * @return Whether the button was released since the last check.
+ */
+bool XboxController::GetStickButtonReleased(JoystickHand hand) {
+  if (hand == kLeftHand) {
+    return GetRawButtonReleased(static_cast<int>(Button::kStickLeft));
+  } else {
+    return GetRawButtonReleased(static_cast<int>(Button::kStickRight));
+  }
+}
+
+/**
+ * Read the value of the A button on the controller.
+ *
+ * @return The state of the button.
+ */
+bool XboxController::GetAButton() const {
+  return GetRawButton(static_cast<int>(Button::kA));
+}
+
+/**
+ * Whether the A button was pressed since the last check.
+ *
+ * @return Whether the button was pressed since the last check.
+ */
+bool XboxController::GetAButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kA));
+}
+
+/**
+ * Whether the A button was released since the last check.
+ *
+ * @return Whether the button was released since the last check.
+ */
+bool XboxController::GetAButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kA));
+}
 
 /**
  * Read the value of the B button on the controller.
  *
- * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetBButton() const { return GetRawButton(2); }
+bool XboxController::GetBButton() const {
+  return GetRawButton(static_cast<int>(Button::kB));
+}
+
+/**
+ * Whether the B button was pressed since the last check.
+ *
+ * @return Whether the button was pressed since the last check.
+ */
+bool XboxController::GetBButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kB));
+}
+
+/**
+ * Whether the B button was released since the last check.
+ *
+ * @return Whether the button was released since the last check.
+ */
+bool XboxController::GetBButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kB));
+}
 
 /**
  * Read the value of the X button on the controller.
  *
- * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetXButton() const { return GetRawButton(3); }
+bool XboxController::GetXButton() const {
+  return GetRawButton(static_cast<int>(Button::kX));
+}
+
+/**
+ * Whether the X button was pressed since the last check.
+ *
+ * @return Whether the button was pressed since the last check.
+ */
+bool XboxController::GetXButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kX));
+}
+
+/**
+ * Whether the X button was released since the last check.
+ *
+ * @return Whether the button was released since the last check.
+ */
+bool XboxController::GetXButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kX));
+}
 
 /**
  * Read the value of the Y button on the controller.
  *
- * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetYButton() const { return GetRawButton(4); }
+bool XboxController::GetYButton() const {
+  return GetRawButton(static_cast<int>(Button::kY));
+}
+
+/**
+ * Whether the Y button was pressed since the last check.
+ *
+ * @return Whether the button was pressed since the last check.
+ */
+bool XboxController::GetYButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kY));
+}
+
+/**
+ * Whether the Y button was released since the last check.
+ *
+ * @return Whether the button was released since the last check.
+ */
+bool XboxController::GetYButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kY));
+}
 
 /**
  * Read the value of the back button on the controller.
@@ -131,7 +260,27 @@ bool XboxController::GetYButton() const { return GetRawButton(4); }
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetBackButton() const { return GetRawButton(7); }
+bool XboxController::GetBackButton() const {
+  return GetRawButton(static_cast<int>(Button::kBack));
+}
+
+/**
+ * Whether the back button was pressed since the last check.
+ *
+ * @return Whether the button was pressed since the last check.
+ */
+bool XboxController::GetBackButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kBack));
+}
+
+/**
+ * Whether the back button was released since the last check.
+ *
+ * @return Whether the button was released since the last check.
+ */
+bool XboxController::GetBackButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kBack));
+}
 
 /**
  * Read the value of the start button on the controller.
@@ -139,4 +288,24 @@ bool XboxController::GetBackButton() const { return GetRawButton(7); }
  * @param hand Side of controller whose value should be returned.
  * @return The state of the button.
  */
-bool XboxController::GetStartButton() const { return GetRawButton(8); }
+bool XboxController::GetStartButton() const {
+  return GetRawButton(static_cast<int>(Button::kStart));
+}
+
+/**
+ * Whether the start button was pressed since the last check.
+ *
+ * @return Whether the button was pressed since the last check.
+ */
+bool XboxController::GetStartButtonPressed() {
+  return GetRawButtonPressed(static_cast<int>(Button::kStart));
+}
+
+/**
+ * Whether the start button was released since the last check.
+ *
+ * @return Whether the button was released since the last check.
+ */
+bool XboxController::GetStartButtonReleased() {
+  return GetRawButtonReleased(static_cast<int>(Button::kStart));
+}

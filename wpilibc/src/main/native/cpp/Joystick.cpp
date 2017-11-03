@@ -16,15 +16,7 @@
 
 using namespace frc;
 
-const int Joystick::kDefaultXAxis;
-const int Joystick::kDefaultYAxis;
-const int Joystick::kDefaultZAxis;
-const int Joystick::kDefaultTwistAxis;
-const int Joystick::kDefaultThrottleAxis;
-const int Joystick::kDefaultTriggerButton;
-const int Joystick::kDefaultTopButton;
-static Joystick* joysticks[DriverStation::kJoystickPorts];
-static bool joySticksInitialized = false;
+constexpr double kPi = 3.14159265358979323846;
 
 /**
  * Construct an instance of a joystick.
@@ -34,54 +26,101 @@ static bool joySticksInitialized = false;
  * @param port The port on the Driver Station that the joystick is plugged into
  *             (0-5).
  */
-Joystick::Joystick(int port) : Joystick(port, kNumAxisTypes, kNumButtonTypes) {
-  m_axes[kXAxis] = kDefaultXAxis;
-  m_axes[kYAxis] = kDefaultYAxis;
-  m_axes[kZAxis] = kDefaultZAxis;
-  m_axes[kTwistAxis] = kDefaultTwistAxis;
-  m_axes[kThrottleAxis] = kDefaultThrottleAxis;
-
-  m_buttons[kTriggerButton] = kDefaultTriggerButton;
-  m_buttons[kTopButton] = kDefaultTopButton;
+Joystick::Joystick(int port) : GenericHID(port) {
+  m_axes[Axis::kX] = kDefaultXAxis;
+  m_axes[Axis::kY] = kDefaultYAxis;
+  m_axes[Axis::kZ] = kDefaultZAxis;
+  m_axes[Axis::kTwist] = kDefaultTwistAxis;
+  m_axes[Axis::kThrottle] = kDefaultThrottleAxis;
 
   HAL_Report(HALUsageReporting::kResourceType_Joystick, port);
 }
 
 /**
- * Version of the constructor to be called by sub-classes.
+ * Set the channel associated with a specified axis.
  *
- * This constructor allows the subclass to configure the number of constants
- * for axes and buttons.
- *
- * @param port           The port on the Driver Station that the joystick is
- *                       plugged into.
- * @param numAxisTypes   The number of axis types in the enum.
- * @param numButtonTypes The number of button types in the enum.
+ * @param axis    The axis to set the channel for.
+ * @param channel The channel to set the axis to.
  */
-Joystick::Joystick(int port, int numAxisTypes, int numButtonTypes)
-    : JoystickBase(port),
-      m_ds(DriverStation::GetInstance()),
-      m_axes(numAxisTypes),
-      m_buttons(numButtonTypes) {
-  if (!joySticksInitialized) {
-    for (auto& joystick : joysticks) joystick = nullptr;
-    joySticksInitialized = true;
-  }
-  if (GetPort() >= DriverStation::kJoystickPorts) {
-    wpi_setWPIError(BadJoystickIndex);
-  } else {
-    joysticks[GetPort()] = this;
-  }
+void Joystick::SetAxisChannel(AxisType axis, int channel) {
+  m_axes[axis] = channel;
 }
 
-Joystick* Joystick::GetStickForPort(int port) {
-  Joystick* stick = joysticks[port];
-  if (stick == nullptr) {
-    stick = new Joystick(port);
-    joysticks[port] = stick;
-  }
-  return stick;
+/**
+ * Set the channel associated with the X axis.
+ *
+ * @param channel The channel to set the axis to.
+ */
+void Joystick::SetXChannel(int channel) { m_axes[Axis::kX] = channel; }
+
+/**
+ * Set the channel associated with the Y axis.
+ *
+ * @param axis    The axis to set the channel for.
+ * @param channel The channel to set the axis to.
+ */
+void Joystick::SetYChannel(int channel) { m_axes[Axis::kY] = channel; }
+
+/**
+ * Set the channel associated with the Z axis.
+ *
+ * @param axis    The axis to set the channel for.
+ * @param channel The channel to set the axis to.
+ */
+void Joystick::SetZChannel(int channel) { m_axes[Axis::kZ] = channel; }
+
+/**
+ * Set the channel associated with the twist axis.
+ *
+ * @param axis    The axis to set the channel for.
+ * @param channel The channel to set the axis to.
+ */
+void Joystick::SetTwistChannel(int channel) { m_axes[Axis::kTwist] = channel; }
+
+/**
+ * Set the channel associated with the throttle axis.
+ *
+ * @param axis    The axis to set the channel for.
+ * @param channel The channel to set the axis to.
+ */
+void Joystick::SetThrottleChannel(int channel) {
+  m_axes[Axis::kThrottle] = channel;
 }
+
+/**
+ * Get the channel currently associated with the X axis.
+ *
+ * @return The channel for the axis.
+ */
+int Joystick::GetXChannel() const { return m_axes[Axis::kX]; }
+
+/**
+ * Get the channel currently associated with the Y axis.
+ *
+ * @return The channel for the axis.
+ */
+int Joystick::GetYChannel() const { return m_axes[Axis::kY]; }
+
+/**
+ * Get the channel currently associated with the Z axis.
+ *
+ * @return The channel for the axis.
+ */
+int Joystick::GetZChannel() const { return m_axes[Axis::kZ]; }
+
+/**
+ * Get the channel currently associated with the twist axis.
+ *
+ * @return The channel for the axis.
+ */
+int Joystick::GetTwistChannel() const { return m_axes[Axis::kTwist]; }
+
+/**
+ * Get the channel currently associated with the throttle axis.
+ *
+ * @return The channel for the axis.
+ */
+int Joystick::GetThrottleChannel() const { return m_axes[Axis::kThrottle]; }
 
 /**
  * Get the X value of the joystick.
@@ -92,7 +131,7 @@ Joystick* Joystick::GetStickForPort(int port) {
  *             here to complete the GenericHID interface.
  */
 double Joystick::GetX(JoystickHand hand) const {
-  return GetRawAxis(m_axes[kXAxis]);
+  return GetRawAxis(m_axes[kDefaultXAxis]);
 }
 
 /**
@@ -104,7 +143,7 @@ double Joystick::GetX(JoystickHand hand) const {
  *             here to complete the GenericHID interface.
  */
 double Joystick::GetY(JoystickHand hand) const {
-  return GetRawAxis(m_axes[kYAxis]);
+  return GetRawAxis(m_axes[kDefaultYAxis]);
 }
 
 /**
@@ -112,16 +151,16 @@ double Joystick::GetY(JoystickHand hand) const {
  *
  * This depends on the mapping of the joystick connected to the current port.
  */
-double Joystick::GetZ(JoystickHand hand) const {
-  return GetRawAxis(m_axes[kZAxis]);
-}
+double Joystick::GetZ() const { return GetRawAxis(m_axes[kDefaultZAxis]); }
 
 /**
  * Get the twist value of the current joystick.
  *
  * This depends on the mapping of the joystick connected to the current port.
  */
-double Joystick::GetTwist() const { return GetRawAxis(m_axes[kTwistAxis]); }
+double Joystick::GetTwist() const {
+  return GetRawAxis(m_axes[kDefaultTwistAxis]);
+}
 
 /**
  * Get the throttle value of the current joystick.
@@ -129,7 +168,7 @@ double Joystick::GetTwist() const { return GetRawAxis(m_axes[kTwistAxis]); }
  * This depends on the mapping of the joystick connected to the current port.
  */
 double Joystick::GetThrottle() const {
-  return GetRawAxis(m_axes[kThrottleAxis]);
+  return GetRawAxis(m_axes[kDefaultThrottleAxis]);
 }
 
 /**
@@ -145,15 +184,15 @@ double Joystick::GetThrottle() const {
 double Joystick::GetAxis(AxisType axis) const {
   switch (axis) {
     case kXAxis:
-      return this->GetX();
+      return GetX();
     case kYAxis:
-      return this->GetY();
+      return GetY();
     case kZAxis:
-      return this->GetZ();
+      return GetZ();
     case kTwistAxis:
-      return this->GetTwist();
+      return GetTwist();
     case kThrottleAxis:
-      return this->GetThrottle();
+      return GetThrottle();
     default:
       wpi_setWPIError(BadJoystickAxis);
       return 0.0;
@@ -165,12 +204,26 @@ double Joystick::GetAxis(AxisType axis) const {
  *
  * Look up which button has been assigned to the trigger and read its state.
  *
- * @param hand This parameter is ignored for the Joystick class and is only
- *             here to complete the GenericHID interface.
  * @return The state of the trigger.
  */
-bool Joystick::GetTrigger(JoystickHand hand) const {
-  return GetRawButton(m_buttons[kTriggerButton]);
+bool Joystick::GetTrigger() const { return GetRawButton(Button::kTrigger); }
+
+/**
+ * Whether the trigger was pressed since the last check.
+ *
+ * @return Whether the button was pressed since the last check.
+ */
+bool Joystick::GetTriggerPressed() {
+  return GetRawButtonPressed(Button::kTrigger);
+}
+
+/**
+ * Whether the trigger was released since the last check.
+ *
+ * @return Whether the button was released since the last check.
+ */
+bool Joystick::GetTriggerReleased() {
+  return GetRawButtonReleased(Button::kTrigger);
 }
 
 /**
@@ -178,12 +231,33 @@ bool Joystick::GetTrigger(JoystickHand hand) const {
  *
  * Look up which button has been assigned to the top and read its state.
  *
- * @param hand This parameter is ignored for the Joystick class and is only
- *             here to complete the GenericHID interface.
  * @return The state of the top button.
  */
-bool Joystick::GetTop(JoystickHand hand) const {
-  return GetRawButton(m_buttons[kTopButton]);
+bool Joystick::GetTop() const { return GetRawButton(Button::kTop); }
+
+/**
+ * Whether the top button was pressed since the last check.
+ *
+ * @return Whether the button was pressed since the last check.
+ */
+bool Joystick::GetTopPressed() { return GetRawButtonPressed(Button::kTop); }
+
+/**
+ * Whether the top button was released since the last check.
+ *
+ * @return Whether the button was released since the last check.
+ */
+bool Joystick::GetTopReleased() { return GetRawButtonReleased(Button::kTop); }
+
+Joystick* Joystick::GetStickForPort(int port) {
+  static std::array<std::unique_ptr<Joystick>, DriverStation::kJoystickPorts>
+      joysticks{};
+  auto stick = joysticks[port].get();
+  if (stick == nullptr) {
+    joysticks[port] = std::make_unique<Joystick>(port);
+    stick = joysticks[port].get();
+  }
+  return stick;
 }
 
 /**
@@ -195,57 +269,8 @@ bool Joystick::GetTop(JoystickHand hand) const {
  * @return The state of the button.
  */
 bool Joystick::GetButton(ButtonType button) const {
-  switch (button) {
-    case kTriggerButton:
-      return GetTrigger();
-    case kTopButton:
-      return GetTop();
-    default:
-      return false;
-  }
-}
-
-/**
- * Get the number of axis for a joystick
- *
- * @return the number of axis for the current joystick
- */
-int Joystick::GetAxisCount() const { return m_ds.GetStickAxisCount(GetPort()); }
-
-/**
- * Get the axis type of a joystick axis.
- *
- * @return the axis type of a joystick axis.
- */
-int Joystick::GetAxisType(int axis) const {
-  return m_ds.GetJoystickAxisType(GetPort(), axis);
-}
-
-/**
- * Get the number of buttons for a joystick.
- *
- * @return the number of buttons on the current joystick
- */
-int Joystick::GetButtonCount() const {
-  return m_ds.GetStickButtonCount(GetPort());
-}
-
-/**
- * Get the channel currently associated with the specified axis.
- *
- * @param axis The axis to look up the channel for.
- * @return The channel fr the axis.
- */
-int Joystick::GetAxisChannel(AxisType axis) const { return m_axes[axis]; }
-
-/**
- * Set the channel associated with a specified axis.
- *
- * @param axis    The axis to set the channel for.
- * @param channel The channel to set the axis to.
- */
-void Joystick::SetAxisChannel(AxisType axis, int channel) {
-  m_axes[axis] = channel;
+  int temp = button;
+  return GetRawButton(static_cast<Button>(temp));
 }
 
 /**
@@ -278,5 +303,5 @@ double Joystick::GetDirectionRadians() const {
  * @return The direction of the vector in degrees
  */
 double Joystick::GetDirectionDegrees() const {
-  return (180 / std::acos(-1)) * GetDirectionRadians();
+  return (180 / kPi) * GetDirectionRadians();
 }

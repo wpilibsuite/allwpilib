@@ -81,6 +81,11 @@ public class DriverStation implements RobotState.Interface {
   private HALJoystickAxes[] m_joystickAxesCache = new HALJoystickAxes[kJoystickPorts];
   private HALJoystickPOVs[] m_joystickPOVsCache = new HALJoystickPOVs[kJoystickPorts];
   private HALJoystickButtons[] m_joystickButtonsCache = new HALJoystickButtons[kJoystickPorts];
+
+  // Joystick button rising/falling edge flags
+  HALJoystickButtons[] m_joystickButtonsPressed = new HALJoystickButtons[kJoystickPorts];
+  HALJoystickButtons[] m_joystickButtonsReleased = new HALJoystickButtons[kJoystickPorts];
+
   // preallocated byte buffer for button count
   private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
 
@@ -126,6 +131,9 @@ public class DriverStation implements RobotState.Interface {
       m_joystickButtonsCache[i] = new HALJoystickButtons();
       m_joystickAxesCache[i] = new HALJoystickAxes(HAL.kMaxJoystickAxes);
       m_joystickPOVsCache[i] = new HALJoystickPOVs(HAL.kMaxJoystickPOVs);
+
+      m_joystickButtonsPressed[i] = new HALJoystickButtons();
+      m_joystickButtonsReleased[i] = new HALJoystickButtons();
     }
 
     m_controlWordMutex = new Object();
@@ -146,7 +154,7 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
-   * Report error to Driver Station. Also prints error to System.err Optionally appends Stack trace
+   * Report error to Driver Station. Optionally appends Stack trace
    * to error message.
    *
    * @param printTrace If true, append stack trace to error string
@@ -156,7 +164,17 @@ public class DriverStation implements RobotState.Interface {
   }
 
   /**
-   * Report warning to Driver Station. Also prints error to System.err Optionally appends Stack
+   * Report error to Driver Station. Appends provided stack trace
+   * to error message.
+   *
+   * @param stackTrace The stack trace to append
+   */
+  public static void reportError(String error, StackTraceElement[] stackTrace) {
+    reportErrorImpl(true, 1, error, stackTrace);
+  }
+
+  /**
+   * Report warning to Driver Station. Optionally appends Stack
    * trace to warning message.
    *
    * @param printTrace If true, append stack trace to warning string
@@ -165,27 +183,129 @@ public class DriverStation implements RobotState.Interface {
     reportErrorImpl(false, 1, error, printTrace);
   }
 
+  /**
+   * Report warning to Driver Station. Appends provided stack
+   * trace to warning message.
+   *
+   * @param stackTrace The stack trace to append
+   */
+  public static void reportWarning(String error, StackTraceElement[] stackTrace) {
+    reportErrorImpl(false, 1, error, stackTrace);
+  }
+
   private static void reportErrorImpl(boolean isError, int code, String error, boolean
       printTrace) {
-    StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+    reportErrorImpl(isError, code, error, printTrace, Thread.currentThread().getStackTrace(), 3);
+  }
+
+  private static void reportErrorImpl(boolean isError, int code, String error,
+      StackTraceElement[] stackTrace) {
+    reportErrorImpl(isError, code, error, true, stackTrace, 0);
+  }
+
+  private static void reportErrorImpl(boolean isError, int code, String error,
+      boolean printTrace, StackTraceElement[] stackTrace, int stackTraceFirst) {
     String locString;
-    if (traces.length > 3) {
-      locString = traces[3].toString();
+    if (stackTrace.length >= stackTraceFirst + 1) {
+      locString = stackTrace[stackTraceFirst].toString();
     } else {
       locString = "";
     }
     boolean haveLoc = false;
-    String traceString = " at ";
-    for (int i = 3; i < traces.length; i++) {
-      String loc = traces[i].toString();
-      traceString += loc + "\n";
+    String traceString = "";
+    for (int i = stackTraceFirst; i < stackTrace.length; i++) {
+      String loc = stackTrace[i].toString();
+      traceString += "\tat " + loc + "\n";
       // get first user function
-      if (!haveLoc && !loc.startsWith("edu.wpi.first.wpilibj")) {
+      if (!haveLoc && !loc.startsWith("edu.wpi.first")) {
         locString = loc;
         haveLoc = true;
       }
     }
-    HAL.sendError(isError, code, false, error, locString, printTrace ? traceString : "", true);
+    HAL.sendError(isError, code, false, error, locString, printTrace ? traceString : "", false);
+  }
+
+  /**
+   * The state of one joystick button. Button indexes begin at 1.
+   *
+   * @param stick  The joystick to read.
+   * @param button The button index, beginning at 1.
+   * @return The state of the joystick button.
+   */
+  public boolean getStickButton(final int stick, final int button) {
+    if (button <= 0) {
+      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
+      return false;
+    }
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+    }
+    boolean error = false;
+    boolean retVal = false;
+    synchronized (m_joystickMutex) {
+      if (button > m_joystickButtons[stick].m_count) {
+        error = true;
+        retVal = false;
+      } else {
+        retVal = (m_joystickButtons[stick].m_buttons & 1 << (button - 1)) != 0;
+      }
+    }
+    if (error) {
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
+    }
+    return retVal;
+  }
+
+  /**
+   * Whether one joystick button was pressed since the last check. Button indexes begin at 1.
+   *
+   * @param stick  The joystick to read.
+   * @param button The button index, beginning at 1.
+   * @return Whether the joystick button was pressed since the last check.
+   */
+  boolean getStickButtonPressed(final int stick, final int button) {
+    if (button <= 0) {
+      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
+      return false;
+    }
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+    }
+
+    // If button was pressed, clear flag and return true
+    if ((m_joystickButtonsPressed[stick].m_buttons & 1 << (button - 1)) != 0) {
+      m_joystickButtonsPressed[stick].m_buttons &= ~(1 << (button - 1));
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Whether one joystick button was released since the last check. Button indexes
+   * begin at 1.
+   *
+   * @param stick  The joystick to read.
+   * @param button The button index, beginning at 1.
+   * @return Whether the joystick button was released since the last check.
+   */
+  boolean getStickButtonReleased(final int stick, final int button) {
+    if (button <= 0) {
+      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
+      return false;
+    }
+    if (stick < 0 || stick >= kJoystickPorts) {
+      throw new RuntimeException("Joystick index is out of range, should be 0-3");
+    }
+
+    // If button was released, clear flag and return true
+    if ((m_joystickButtonsReleased[stick].m_buttons & 1 << (button - 1)) != 0) {
+      m_joystickButtonsReleased[stick].m_buttons &= ~(1 << (button - 1));
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -264,38 +384,6 @@ public class DriverStation implements RobotState.Interface {
     synchronized (m_joystickMutex) {
       return m_joystickButtons[stick].m_buttons;
     }
-  }
-
-  /**
-   * The state of one joystick button. Button indexes begin at 1.
-   *
-   * @param stick  The joystick to read.
-   * @param button The button index, beginning at 1.
-   * @return The state of the joystick button.
-   */
-  public boolean getStickButton(final int stick, byte button) {
-    if (button <= 0) {
-      reportJoystickUnpluggedError("Button indexes begin at 1 in WPILib for C++ and Java\n");
-      return false;
-    }
-    if (stick < 0 || stick >= kJoystickPorts) {
-      throw new RuntimeException("Joystick index is out of range, should be 0-3");
-    }
-    boolean error = false;
-    boolean retVal = false;
-    synchronized (m_joystickMutex) {
-      if (button > m_joystickButtons[stick].m_count) {
-        error = true;
-        retVal = false;
-      } else {
-        retVal = ((0x1 << (button - 1)) & m_joystickButtons[stick].m_buttons) != 0;
-      }
-    }
-    if (error) {
-      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
-          + " not available, check if controller is plugged in");
-    }
-    return retVal;
   }
 
   /**
@@ -542,7 +630,7 @@ public class DriverStation implements RobotState.Interface {
 
   /**
    * Gets a value indicating whether the FPGA outputs are enabled. The outputs may be disabled if
-   * the robot is disabled or e-stopped, the watdhog has expired, or if the roboRIO browns out.
+   * the robot is disabled or e-stopped, the watchdog has expired, or if the roboRIO browns out.
    *
    * @return True if the FPGA outputs are enabled.
    */
@@ -717,6 +805,16 @@ public class DriverStation implements RobotState.Interface {
 
     // lock joystick mutex to swap cache data
     synchronized (m_joystickMutex) {
+      for (int i = 0; i < kJoystickPorts; i++) {
+        // If buttons weren't pressed and are now, set flags in m_buttonsPressed
+        m_joystickButtonsPressed[i].m_buttons |=
+            ~m_joystickButtons[i].m_buttons & m_joystickButtonsCache[i].m_buttons;
+
+        // If buttons were pressed and aren't now, set flags in m_buttonsReleased
+        m_joystickButtonsReleased[i].m_buttons |=
+            m_joystickButtons[i].m_buttons & ~m_joystickButtonsCache[i].m_buttons;
+      }
+
       // move cache to actual data
       HALJoystickAxes[] currentAxes = m_joystickAxes;
       m_joystickAxes = m_joystickAxesCache;

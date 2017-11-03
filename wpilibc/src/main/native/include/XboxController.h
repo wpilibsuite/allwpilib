@@ -7,23 +7,20 @@
 
 #pragma once
 
-#include "ErrorBase.h"
-#include "GamepadBase.h"
+#include "GenericHID.h"
 
 namespace frc {
-
-class DriverStation;
 
 /**
  * Handle input from Xbox 360 or Xbox One controllers connected to the Driver
  * Station.
  *
  * This class handles Xbox input that comes from the Driver Station. Each time a
- * value is requested the most recent value is returend. There is a single class
+ * value is requested the most recent value is returned. There is a single class
  * instance for each controller and the mapping of ports to hardware buttons
  * depends on the code in the Driver Station.
  */
-class XboxController : public GamepadBase, public ErrorBase {
+class XboxController : public GenericHID {
  public:
   explicit XboxController(int port);
   virtual ~XboxController() = default;
@@ -33,21 +30,53 @@ class XboxController : public GamepadBase, public ErrorBase {
 
   double GetX(JoystickHand hand) const override;
   double GetY(JoystickHand hand) const override;
+  double GetTriggerAxis(JoystickHand hand) const;
 
-  bool GetBumper(JoystickHand hand) const override;
-  bool GetStickButton(JoystickHand hand) const override;
+  bool GetBumper(JoystickHand hand) const;
+  bool GetBumperPressed(JoystickHand hand);
+  bool GetBumperReleased(JoystickHand hand);
 
-  virtual double GetTriggerAxis(JoystickHand hand) const;
+  bool GetStickButton(JoystickHand hand) const;
+  bool GetStickButtonPressed(JoystickHand hand);
+  bool GetStickButtonReleased(JoystickHand hand);
 
   bool GetAButton() const;
+  bool GetAButtonPressed();
+  bool GetAButtonReleased();
+
   bool GetBButton() const;
+  bool GetBButtonPressed();
+  bool GetBButtonReleased();
+
   bool GetXButton() const;
+  bool GetXButtonPressed();
+  bool GetXButtonReleased();
+
   bool GetYButton() const;
+  bool GetYButtonPressed();
+  bool GetYButtonReleased();
+
   bool GetBackButton() const;
+  bool GetBackButtonPressed();
+  bool GetBackButtonReleased();
+
   bool GetStartButton() const;
+  bool GetStartButtonPressed();
+  bool GetStartButtonReleased();
 
  private:
-  DriverStation& m_ds;
+  enum class Button {
+    kBumperLeft = 5,
+    kBumperRight = 6,
+    kStickLeft = 9,
+    kStickRight = 10,
+    kA = 1,
+    kB = 2,
+    kX = 3,
+    kY = 4,
+    kBack = 7,
+    kStart = 8
+  };
 };
 
 }  // namespace frc
