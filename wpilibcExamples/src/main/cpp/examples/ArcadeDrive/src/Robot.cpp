@@ -12,12 +12,15 @@
  * Runs the motors with arcade steering.
  */
 class Robot : public frc::IterativeRobot {
-	frc::RobotDrive myRobot{0, 1};
-	frc::Joystick stick{0};
+	frc::Spark m_left{0};
+	frc::Spark m_right{1};
+	frc::RobotDrive m_robotDrive{m_left, m_right};
+	frc::Joystick m_stick{0};
 
 public:
 	void TeleopPeriodic() {
-		myRobot.ArcadeDrive(stick);  // drive with arcade style
+		// drive with arcade style
+		m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
 	}
 };
 

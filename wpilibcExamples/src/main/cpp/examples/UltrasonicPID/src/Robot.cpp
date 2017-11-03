@@ -6,10 +6,11 @@
 /*----------------------------------------------------------------------------*/
 
 #include <AnalogInput.h>
+#include <Drive/DifferentialDrive.h>
 #include <IterativeRobot.h>
 #include <PIDController.h>
 #include <PIDOutput.h>
-#include <RobotDrive.h>
+#include <Spark.h>
 
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and
@@ -26,29 +27,31 @@ public:
 		// Set expected range to 0-24 inches; e.g. at 24 inches from
 		// object go
 		// full forward, at 0 inches from object go full backward.
-		pidController.SetInputRange(0, 24 * kValueToInches);
+		m_pidController.SetInputRange(0, 24 * kValueToInches);
+
 		// Set setpoint of the pidController
-		pidController.SetSetpoint(kHoldDistance * kValueToInches);
-		pidController.Enable();  // begin PID control
+		m_pidController.SetSetpoint(kHoldDistance * kValueToInches);
+
+		// Begin PID control
+		m_pidController.Enable();
 	}
 
 private:
-	// internal class to write to myRobot (a RobotDrive object) using a
-	// PIDOutput
+	// Internal class to write to robot drive using a PIDOutput
 	class MyPIDOutput : public frc::PIDOutput {
 	public:
-		explicit MyPIDOutput(frc::RobotDrive& r)
-		    : rd(r) {
-			rd.SetSafetyEnabled(false);
+		explicit MyPIDOutput(frc::DifferentialDrive& r)
+		    : m_rd(r) {
+			m_rd.SetSafetyEnabled(false);
 		}
 
 		void PIDWrite(double output) override {
-			rd.Drive(output, 0);  // write to myRobot (RobotDrive)
-					      // by reference
+			// Write to robot drive by reference
+			m_rd.ArcadeDrive(output, 0);
 		}
 
 	private:
-		frc::RobotDrive& rd;
+		frc::DifferentialDrive& m_rd;
 	};
 
 	// Distance in inches the robot wants to stay from an object
@@ -70,10 +73,14 @@ private:
 	static constexpr int kRightMotorPort = 1;
 	static constexpr int kUltrasonicPort = 0;
 
-	frc::AnalogInput ultrasonic{kUltrasonicPort};
-	frc::RobotDrive myRobot{kLeftMotorPort, kRightMotorPort};
-	frc::PIDController pidController{
-			kP, kI, kD, &ultrasonic, new MyPIDOutput(myRobot)};
+	frc::AnalogInput m_ultrasonic{kUltrasonicPort};
+
+	frc::Spark m_left{kLeftMotorPort};
+	frc::Spark m_right{kRightMotorPort};
+	frc::DifferentialDrive m_robotDrive{m_left, m_right};
+
+	frc::PIDController m_pidController{kP, kI, kD, &m_ultrasonic,
+			new MyPIDOutput(m_robotDrive)};
 };
 
 START_ROBOT_CLASS(Robot)

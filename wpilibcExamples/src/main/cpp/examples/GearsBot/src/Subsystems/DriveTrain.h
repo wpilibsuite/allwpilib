@@ -10,9 +10,10 @@
 #include <AnalogGyro.h>
 #include <AnalogInput.h>
 #include <Commands/Subsystem.h>
+#include <Drive/DifferentialDrive.h>
 #include <Encoder.h>
-#include <RobotDrive.h>
-#include <Talon.h>
+#include <Spark.h>
+#include <SpeedControllerGroup.h>
 
 namespace frc {
 class Joystick;
@@ -46,11 +47,6 @@ public:
 	void Drive(double left, double right);
 
 	/**
-	 * @param joy The ps3 style joystick to use to drive tank style.
-	 */
-	void Drive(frc::Joystick* joy);
-
-	/**
 	 * @return The robots heading in degrees.
 	 */
 	double GetHeading();
@@ -71,13 +67,18 @@ public:
 	double GetDistanceToObstacle();
 
 private:
-	frc::Talon frontLeft{1};
-	frc::Talon rearLeft{2};
-	frc::Talon frontRight{3};
-	frc::Talon rearRight{4};
-	frc::RobotDrive drive{frontLeft, rearLeft, frontRight, rearRight};
-	frc::Encoder leftEncoder{1, 2};
-	frc::Encoder rightEncoder{3, 4};
-	frc::AnalogInput rangefinder{6};
-	frc::AnalogGyro gyro{1};
+	frc::Spark m_frontLeft{1};
+	frc::Spark m_rearLeft{2};
+	frc::SpeedControllerGroup m_left{m_frontLeft, m_rearLeft};
+
+	frc::Spark m_frontRight{3};
+	frc::Spark m_rearRight{4};
+	frc::SpeedControllerGroup m_right{m_frontRight, m_rearRight};
+
+	frc::DifferentialDrive m_robotDrive{m_left, m_right};
+
+	frc::Encoder m_leftEncoder{1, 2};
+	frc::Encoder m_rightEncoder{3, 4};
+	frc::AnalogInput m_rangefinder{6};
+	frc::AnalogGyro m_gyro{1};
 };

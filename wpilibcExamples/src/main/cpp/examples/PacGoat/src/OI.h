@@ -15,15 +15,15 @@
 class OI {
 public:
 	OI();
-	frc::Joystick* GetJoystick();
+	frc::Joystick& GetJoystick();
 
 private:
-	frc::Joystick joystick{0};
+	frc::Joystick m_joystick{0};
 
-	frc::JoystickButton L1{&joystick, 11};
-	frc::JoystickButton L2{&joystick, 9};
-	frc::JoystickButton R1{&joystick, 12};
-	frc::JoystickButton R2{&joystick, 10};
+	frc::JoystickButton m_l1{&m_joystick, 11};
+	frc::JoystickButton m_l2{&m_joystick, 9};
+	frc::JoystickButton m_r1{&m_joystick, 12};
+	frc::JoystickButton m_r2{&m_joystick, 10};
 
-	DoubleButton sticks{&joystick, 2, 3};
+	DoubleButton m_sticks{&m_joystick, 2, 3};
 };

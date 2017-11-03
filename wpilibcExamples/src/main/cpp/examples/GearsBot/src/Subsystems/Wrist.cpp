@@ -28,13 +28,13 @@ Wrist::Wrist()
 void Wrist::InitDefaultCommand() {}
 
 void Wrist::Log() {
-	// frc::SmartDashboard::PutData("Wrist Angle", &pot);
+	// frc::SmartDashboard::PutData("Wrist Angle", &m_pot);
 }
 
 double Wrist::ReturnPIDInput() {
-	return pot.Get();
+	return m_pot.Get();
 }
 
 void Wrist::UsePIDOutput(double d) {
-	motor.Set(d);
+	m_motor.Set(d);
 }

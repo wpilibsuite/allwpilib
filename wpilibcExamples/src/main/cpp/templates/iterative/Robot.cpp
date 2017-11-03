@@ -6,7 +6,6 @@
 /*----------------------------------------------------------------------------*/
 
 #include <iostream>
-#include <memory>
 #include <string>
 
 #include <IterativeRobot.h>
@@ -17,9 +16,9 @@
 class Robot : public frc::IterativeRobot {
 public:
 	void RobotInit() {
-		chooser.AddDefault(autoNameDefault, autoNameDefault);
-		chooser.AddObject(autoNameCustom, autoNameCustom);
-		frc::SmartDashboard::PutData("Auto Modes", &chooser);
+		m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
+		m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
+		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 	}
 
 	/*
@@ -37,12 +36,12 @@ public:
 	 * well.
 	 */
 	void AutonomousInit() override {
-		autoSelected = chooser.GetSelected();
-		// std::string autoSelected = SmartDashboard::GetString("Auto
-		// Selector", autoNameDefault);
-		std::cout << "Auto selected: " << autoSelected << std::endl;
+		m_autoSelected = m_chooser.GetSelected();
+		// m_autoSelected = SmartDashboard::GetString(
+		// 		"Auto Selector", kAutoNameDefault);
+		std::cout << "Auto selected: " << m_autoSelected << std::endl;
 
-		if (autoSelected == autoNameCustom) {
+		if (m_autoSelected == kAutoNameCustom) {
 			// Custom Auto goes here
 		} else {
 			// Default Auto goes here
@@ -50,7 +49,7 @@ public:
 	}
 
 	void AutonomousPeriodic() {
-		if (autoSelected == autoNameCustom) {
+		if (m_autoSelected == kAutoNameCustom) {
 			// Custom Auto goes here
 		} else {
 			// Default Auto goes here
@@ -61,14 +60,14 @@ public:
 
 	void TeleopPeriodic() {}
 
-	void TestPeriodic() { lw->Run(); }
+	void TestPeriodic() { m_lw.Run(); }
 
 private:
-	frc::LiveWindow* lw = LiveWindow::GetInstance();
-	frc::SendableChooser<std::string> chooser;
-	const std::string autoNameDefault = "Default";
-	const std::string autoNameCustom = "My Auto";
-	std::string autoSelected;
+	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();
+	frc::SendableChooser<std::string> m_chooser;
+	const std::string kAutoNameDefault = "Default";
+	const std::string kAutoNameCustom = "My Auto";
+	std::string m_autoSelected;
 };
 
 START_ROBOT_CLASS(Robot)

@@ -7,13 +7,12 @@
 
 #pragma once
 
-#include <memory>
-
 #include <AnalogGyro.h>
 #include <Commands/Subsystem.h>
+#include <Drive/DifferentialDrive.h>
 #include <Encoder.h>
-#include <RobotDrive.h>
-#include <Victor.h>
+#include <Spark.h>
+#include <SpeedControllerGroup.h>
 
 namespace frc {
 class Joystick;
@@ -35,11 +34,6 @@ public:
 	void InitDefaultCommand();
 
 	/**
-	 * @param joy PS3 style joystick to use as the input for tank drive.
-	 */
-	void TankDrive(frc::Joystick* joy);
-
-	/**
 	 * @param leftAxis Left sides value
 	 * @param rightAxis Right sides value
 	 */
@@ -54,13 +48,13 @@ public:
 	 * @return The encoder getting the distance and speed of left side of
 	 * the drivetrain.
 	 */
-	std::shared_ptr<Encoder> GetLeftEncoder();
+	Encoder& GetLeftEncoder();
 
 	/**
 	 * @return The encoder getting the distance and speed of right side of
 	 * the drivetrain.
 	 */
-	std::shared_ptr<Encoder> GetRightEncoder();
+	Encoder& GetRightEncoder();
 
 	/**
 	 * @return The current angle of the drivetrain.
@@ -69,17 +63,17 @@ public:
 
 private:
 	// Subsystem devices
-	frc::Victor frontLeftCIM{1};
-	frc::Victor rearLeftCIM{2};
-	frc::Victor frontRightCIM{3};
-	frc::Victor rearRightCIM{4};
-	frc::RobotDrive drive{frontRightCIM, rearLeftCIM, frontRightCIM,
-			rearRightCIM};
-	std::shared_ptr<frc::Encoder> rightEncoder =
-			std::make_shared<frc::Encoder>(
-					1, 2, true, Encoder::k4X);
-	std::shared_ptr<frc::Encoder> leftEncoder =
-			std::make_shared<frc::Encoder>(
-					3, 4, false, Encoder::k4X);
-	frc::AnalogGyro gyro{0};
+	frc::Spark m_frontLeftCIM{1};
+	frc::Spark m_rearLeftCIM{2};
+	frc::SpeedControllerGroup m_leftCIMs{m_frontLeftCIM, m_rearLeftCIM};
+
+	frc::Spark m_frontRightCIM{3};
+	frc::Spark m_rearRightCIM{4};
+	frc::SpeedControllerGroup m_rightCIMs{m_frontRightCIM, m_rearRightCIM};
+
+	frc::DifferentialDrive m_robotDrive{m_leftCIMs, m_rightCIMs};
+
+	frc::Encoder m_rightEncoder{1, 2, true, Encoder::k4X};
+	frc::Encoder m_leftEncoder{3, 4, false, Encoder::k4X};
+	frc::AnalogGyro m_gyro{0};
 };

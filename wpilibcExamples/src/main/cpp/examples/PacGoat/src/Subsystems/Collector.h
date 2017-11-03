@@ -10,7 +10,7 @@
 #include <Commands/Subsystem.h>
 #include <DigitalInput.h>
 #include <Solenoid.h>
-#include <Victor.h>
+#include <Spark.h>
 
 /**
  * The Collector subsystem has one motor for the rollers, a limit switch for
@@ -69,8 +69,8 @@ public:
 
 private:
 	// Subsystem devices
-	frc::Victor rollerMotor{6};
-	frc::DigitalInput ballDetector{10};
-	frc::Solenoid piston{1};
-	frc::DigitalInput openDetector{6};
+	frc::Spark m_rollerMotor{6};
+	frc::DigitalInput m_ballDetector{10};
+	frc::Solenoid m_piston{1};
+	frc::DigitalInput m_openDetector{6};
 };

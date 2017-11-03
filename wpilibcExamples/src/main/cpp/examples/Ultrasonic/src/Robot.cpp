@@ -6,8 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include <AnalogInput.h>
+#include <Drive/DifferentialDrive.h>
 #include <IterativeRobot.h>
-#include <RobotDrive.h>
+#include <Spark.h>
 
 /**
  * This is a sample program demonstrating how to use an ultrasonic sensor and
@@ -21,11 +22,12 @@ public:
 	 */
 	void TeleopPeriodic() override {
 		// sensor returns a value from 0-4095 that is scaled to inches
-		double currentDistance = ultrasonic.GetValue() * kValueToInches;
+		double currentDistance =
+				m_ultrasonic.GetValue() * kValueToInches;
 		// convert distance error to a motor speed
 		double currentSpeed = (kHoldDistance - currentDistance) * kP;
 		// drive robot
-		myRobot.Drive(currentSpeed, 0);
+		m_robotDrive.ArcadeDrive(currentSpeed, 0);
 	}
 
 private:
@@ -42,8 +44,11 @@ private:
 	static constexpr int kRightMotorPort = 1;
 	static constexpr int kUltrasonicPort = 0;
 
-	frc::AnalogInput ultrasonic{kUltrasonicPort};
-	frc::RobotDrive myRobot{kLeftMotorPort, kRightMotorPort};
+	frc::AnalogInput m_ultrasonic{kUltrasonicPort};
+
+	frc::Spark m_left{kLeftMotorPort};
+	frc::Spark m_right{kRightMotorPort};
+	frc::DifferentialDrive m_robotDrive{m_left, m_right};
 };
 
 START_ROBOT_CLASS(Robot)

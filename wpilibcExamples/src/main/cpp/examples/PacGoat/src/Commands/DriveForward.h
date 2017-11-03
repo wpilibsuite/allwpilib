@@ -24,9 +24,9 @@ public:
 	void End() override;
 
 private:
-	double driveForwardSpeed;
-	double distance;
-	double error = 0;
+	double m_driveForwardSpeed;
+	double m_distance;
+	double m_error = 0;
 	static constexpr double kTolerance = 0.1;
 	static constexpr double kP = -1.0 / 5.0;
 

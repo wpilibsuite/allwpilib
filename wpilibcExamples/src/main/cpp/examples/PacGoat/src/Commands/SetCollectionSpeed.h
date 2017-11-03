@@ -20,5 +20,5 @@ public:
 	void Initialize() override;
 
 private:
-	double speed;
+	double m_speed;
 };

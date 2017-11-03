@@ -6,14 +6,14 @@
 /*----------------------------------------------------------------------------*/
 
 #include <iostream>
-#include <memory>
 #include <string>
 
+#include <Drive/DifferentialDrive.h>
 #include <Joystick.h>
-#include <RobotDrive.h>
 #include <SampleRobot.h>
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
+#include <Spark.h>
 #include <Timer.h>
 
 /**
@@ -29,23 +29,17 @@
  * instead if you're new.
  */
 class Robot : public frc::SampleRobot {
-	frc::RobotDrive myRobot{0, 1};  // robot drive system
-	frc::Joystick stick{0};		// only joystick
-	frc::SendableChooser<std::string> chooser;
-	const std::string autoNameDefault = "Default";
-	const std::string autoNameCustom = "My Auto";
-
 public:
 	Robot() {
 		// Note SmartDashboard is not initialized here, wait until
 		// RobotInit to make SmartDashboard calls
-		myRobot.SetExpiration(0.1);
+		m_robotDrive.SetExpiration(0.1);
 	}
 
 	void RobotInit() {
-		chooser.AddDefault(autoNameDefault, autoNameDefault);
-		chooser.AddObject(autoNameCustom, autoNameCustom);
-		frc::SmartDashboard::PutData("Auto Modes", &chooser);
+		m_chooser.AddDefault(kAutoNameDefault, kAutoNameDefault);
+		m_chooser.AddObject(kAutoNameCustom, kAutoNameCustom);
+		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 	}
 
 	/*
@@ -63,26 +57,32 @@ public:
 	 * well.
 	 */
 	void Autonomous() {
-		auto autoSelected = chooser.GetSelected();
-		// std::string autoSelected =
-		// frc::SmartDashboard::GetString("Auto Selector",
-		// autoNameDefault);
+		std::string autoSelected = frc::SmartDashboard::GetString(
+				"Auto Selector", kAutoNameDefault);
 		std::cout << "Auto selected: " << autoSelected << std::endl;
 
-		if (autoSelected == autoNameCustom) {
+		if (autoSelected == kAutoNameCustom) {
 			// Custom Auto goes here
 			std::cout << "Running custom Autonomous" << std::endl;
-			myRobot.SetSafetyEnabled(false);
-			myRobot.Drive(-0.5, 1.0);  // spin at half speed
-			frc::Wait(2.0);		   // for 2 seconds
-			myRobot.Drive(0.0, 0.0);   // stop robot
+			m_robotDrive.SetSafetyEnabled(false);
+
+			// spin at half speed for two seconds
+			m_robotDrive.ArcadeDrive(0.0, 1.0);
+			frc::Wait(2.0);
+
+			// stop robot
+			m_robotDrive.ArcadeDrive(0.0, 0.0);
 		} else {
 			// Default Auto goes here
 			std::cout << "Running default Autonomous" << std::endl;
-			myRobot.SetSafetyEnabled(false);
-			myRobot.Drive(-0.5, 0.0);  // drive forwards half speed
-			frc::Wait(2.0);		   // for 2 seconds
-			myRobot.Drive(0.0, 0.0);   // stop robot
+			m_robotDrive.SetSafetyEnabled(false);
+
+			// drive forwards at half speed for two seconds
+			m_robotDrive.ArcadeDrive(-0.5, 0.0);
+			frc::Wait(2.0);
+
+			// stop robot
+			m_robotDrive.ArcadeDrive(0.0, 0.0);
 		}
 	}
 
@@ -90,10 +90,11 @@ public:
 	 * Runs the motors with arcade steering.
 	 */
 	void OperatorControl() override {
-		myRobot.SetSafetyEnabled(true);
+		m_robotDrive.SetSafetyEnabled(true);
 		while (IsOperatorControl() && IsEnabled()) {
 			// drive with arcade style (use right stick)
-			myRobot.ArcadeDrive(stick);
+			m_robotDrive.ArcadeDrive(
+					m_stick.GetY(), m_stick.GetX());
 
 			// wait for a motor update time
 			frc::Wait(0.005);
@@ -104,6 +105,18 @@ public:
 	 * Runs during test mode
 	 */
 	void Test() override {}
+
+private:
+	// Robot drive system
+	frc::Spark m_leftMotor{0};
+	frc::Spark m_rightMotor{1};
+	frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
+
+	frc::Joystick m_stick{0};
+
+	frc::SendableChooser<std::string> m_chooser;
+	const std::string kAutoNameDefault = "Default";
+	const std::string kAutoNameCustom = "My Auto";
 };
 
 START_ROBOT_CLASS(Robot)

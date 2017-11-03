@@ -21,12 +21,13 @@ Pivot::Pivot()
 
 	// Put everything to the LiveWindow for testing.
 	frc::LiveWindow::GetInstance()->AddSensor(
-			"Pivot", "Upper Limit Switch", &upperLimitSwitch);
+			"Pivot", "Upper Limit Switch", &m_upperLimitSwitch);
 	frc::LiveWindow::GetInstance()->AddSensor(
-			"Pivot", "Lower Limit Switch", &lowerLimitSwitch);
-	// XXX: frc::LiveWindow::GetInstance()->AddSensor("Pivot", "Pot", &pot);
+			"Pivot", "Lower Limit Switch", &m_lowerLimitSwitch);
+	// XXX: frc::LiveWindow::GetInstance()->AddSensor("Pivot", "Pot",
+	// &m_pot);
 	// XXX: frc::LiveWindow::GetInstance()->AddActuator("Pivot", "Motor",
-	// &motor);
+	// &m_motor);
 	frc::LiveWindow::GetInstance()->AddActuator(
 			"Pivot", "PIDSubsystem Controller", GetPIDController());
 }
@@ -34,23 +35,23 @@ Pivot::Pivot()
 void InitDefaultCommand() {}
 
 double Pivot::ReturnPIDInput() {
-	return pot.Get();
+	return m_pot.Get();
 }
 
 void Pivot::UsePIDOutput(double output) {
-	motor.PIDWrite(output);
+	m_motor.PIDWrite(output);
 }
 
 bool Pivot::IsAtUpperLimit() {
-	return upperLimitSwitch.Get();  // TODO: inverted from real robot
-					// (prefix with !)
+	return m_upperLimitSwitch.Get();  // TODO: inverted from real robot
+					  // (prefix with !)
 }
 
 bool Pivot::IsAtLowerLimit() {
-	return lowerLimitSwitch.Get();  // TODO: inverted from real robot
-					// (prefix with !)
+	return m_lowerLimitSwitch.Get();  // TODO: inverted from real robot
+					  // (prefix with !)
 }
 
 double Pivot::GetAngle() {
-	return pot.Get();
+	return m_pot.Get();
 }
