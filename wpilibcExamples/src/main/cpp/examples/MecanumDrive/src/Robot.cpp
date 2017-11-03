@@ -11,8 +11,8 @@
 #include <Spark.h>
 
 /**
- * This is a demo program showing how to use Mecanum control with the RobotDrive
- * class.
+ * This is a demo program showing how to use Mecanum control with the
+ * MecanumDrive class.
  */
 class Robot : public frc::IterativeRobot {
 public:
