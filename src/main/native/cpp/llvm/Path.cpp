@@ -657,6 +657,143 @@ bool remove_dots(SmallVectorImpl<char> &path, bool remove_dot_dot) {
 }
 
 } // end namespace path
+
+namespace fs {
+
+std::error_code getUniqueID(const Twine Path, UniqueID &Result) {
+  file_status Status;
+  std::error_code EC = status(Path, Status);
+  if (EC)
+    return EC;
+  Result = Status.getUniqueID();
+  return std::error_code();
+}
+
+static std::error_code make_absolute(const Twine &current_directory,
+                                     SmallVectorImpl<char> &path,
+                                     bool use_current_directory) {
+  StringRef p(path.data(), path.size());
+
+  bool rootDirectory = path::has_root_directory(p),
+#ifdef _WIN32
+       rootName = path::has_root_name(p);
+#else
+       rootName = true;
+#endif
+
+  // Already absolute.
+  if (rootName && rootDirectory)
+    return std::error_code();
+
+  // All of the following conditions will need the current directory.
+  SmallString<128> current_dir;
+  if (use_current_directory)
+    current_directory.toVector(current_dir);
+  else if (std::error_code ec = current_path(current_dir))
+    return ec;
+
+  // Relative path. Prepend the current directory.
+  if (!rootName && !rootDirectory) {
+    // Append path to the current directory.
+    path::append(current_dir, p);
+    // Set path to the result.
+    path.swap(current_dir);
+    return std::error_code();
+  }
+
+  if (!rootName && rootDirectory) {
+    StringRef cdrn = path::root_name(current_dir);
+    SmallString<128> curDirRootName(cdrn.begin(), cdrn.end());
+    path::append(curDirRootName, p);
+    // Set path to the result.
+    path.swap(curDirRootName);
+    return std::error_code();
+  }
+
+  if (rootName && !rootDirectory) {
+    StringRef pRootName      = path::root_name(p);
+    StringRef bRootDirectory = path::root_directory(current_dir);
+    StringRef bRelativePath  = path::relative_path(current_dir);
+    StringRef pRelativePath  = path::relative_path(p);
+
+    SmallString<128> res;
+    path::append(res, pRootName, bRootDirectory, bRelativePath, pRelativePath);
+    path.swap(res);
+    return std::error_code();
+  }
+
+  assert(false && "All rootName and rootDirectory combinations should have "
+                   "occurred above!");
+  return std::error_code();
+}
+
+std::error_code make_absolute(const Twine &current_directory,
+                              SmallVectorImpl<char> &path) {
+  return make_absolute(current_directory, path, true);
+}
+
+std::error_code make_absolute(SmallVectorImpl<char> &path) {
+  return make_absolute(Twine(), path, false);
+}
+
+bool exists(file_status status) {
+  return status_known(status) && status.type() != file_type::file_not_found;
+}
+
+bool status_known(file_status s) {
+  return s.type() != file_type::status_error;
+}
+
+bool is_directory(file_status status) {
+  return status.type() == file_type::directory_file;
+}
+
+std::error_code is_directory(const Twine &path, bool &result) {
+  file_status st;
+  if (std::error_code ec = status(path, st))
+    return ec;
+  result = is_directory(st);
+  return std::error_code();
+}
+
+bool is_regular_file(file_status status) {
+  return status.type() == file_type::regular_file;
+}
+
+std::error_code is_regular_file(const Twine &path, bool &result) {
+  file_status st;
+  if (std::error_code ec = status(path, st))
+    return ec;
+  result = is_regular_file(st);
+  return std::error_code();
+}
+
+bool is_other(file_status status) {
+  return exists(status) &&
+         !is_regular_file(status) &&
+         !is_directory(status);
+}
+
+std::error_code is_other(const Twine &Path, bool &Result) {
+  file_status FileStatus;
+  if (std::error_code EC = status(Path, FileStatus))
+    return EC;
+  Result = is_other(FileStatus);
+  return std::error_code();
+}
+
+void directory_entry::replace_filename(const Twine &filename, file_status st) {
+  SmallString<128> path = path::parent_path(Path);
+  path::append(path, filename);
+  Path = path.str();
+  Status = st;
+}
+
+std::error_code directory_entry::status(file_status &result) const {
+  return fs::status(Path, result);
+}
+
+} // end namespace fs
 } // end namespace sys
 } // end namespace llvm
 
