@@ -37,7 +37,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   static DriverStation& GetInstance();
   static void ReportError(llvm::StringRef error);
   static void ReportWarning(llvm::StringRef error);
-  static void ReportError(bool is_error, int code, llvm::StringRef error,
+  static void ReportError(bool isError, int code, llvm::StringRef error,
                           llvm::StringRef location, llvm::StringRef stack);
 
   static constexpr int kJoystickPorts = 6;

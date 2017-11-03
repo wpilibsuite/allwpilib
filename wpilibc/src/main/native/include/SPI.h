@@ -53,9 +53,9 @@ class SPI : public SensorBase {
   virtual int Read(bool initiate, uint8_t* dataReceived, int size);
   virtual int Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size);
 
-  void InitAccumulator(double period, int cmd, int xfer_size, int valid_mask,
-                       int valid_value, int data_shift, int data_size,
-                       bool is_signed, bool big_endian);
+  void InitAccumulator(double period, int cmd, int xferSize, int validMask,
+                       int validValue, int dataShift, int dataSize,
+                       bool isSigned, bool bigEndian);
   void FreeAccumulator();
   void ResetAccumulator();
   void SetAccumulatorCenter(int center);

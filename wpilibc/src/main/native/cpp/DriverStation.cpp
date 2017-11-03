@@ -74,13 +74,13 @@ void DriverStation::ReportWarning(llvm::StringRef error) {
  *
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(bool is_error, int32_t code,
+void DriverStation::ReportError(bool isError, int32_t code,
                                 llvm::StringRef error, llvm::StringRef location,
                                 llvm::StringRef stack) {
   llvm::SmallString<128> errorTemp;
   llvm::SmallString<128> locationTemp;
   llvm::SmallString<128> stackTemp;
-  HAL_SendError(is_error, code, 0, error.c_str(errorTemp),
+  HAL_SendError(isError, code, 0, error.c_str(errorTemp),
                 location.c_str(locationTemp), stack.c_str(stackTemp), 1);
 }
 
