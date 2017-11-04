@@ -31,6 +31,10 @@ task javaExamplesZip(type: Zip) {
     from('src/main/java/edu/wpi/first/wpilibj/examples') {
         into 'examples'
     }
+
+    from ('examples.xml') {
+        into 'examples'
+    }
 }
 
 task javaTemplatesZip(type: Zip) {
