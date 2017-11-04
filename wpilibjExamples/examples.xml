@@ -85,7 +85,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/GettingStarted/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/gettingstarted/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -102,7 +102,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/TankDrive/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/tankdrive/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -119,7 +119,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/MecanumDrive/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/mecanumdrive/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -134,7 +134,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/Ultrasonic/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/ultrasonic/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -150,7 +150,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/UltrasonicPID/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/ultrasonicpid/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -167,7 +167,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/PotentiometerPID/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/potentiometerpid/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -183,7 +183,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/Gyro/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/gyro/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -200,7 +200,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/GyroMecanum/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/gyromecanum/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -215,7 +215,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/MotorControl/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/motorcontrol/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -232,23 +232,23 @@
             <package>src/$package-dir/subsystems</package>
         </packages>
         <files>
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/OI.java" destination="src/$package-dir/OI.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/Autonomous.java" destination="src/$package-dir/commands/Autonomous.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/CloseClaw.java" destination="src/$package-dir/commands/CloseClaw.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/DriveStraight.java" destination="src/$package-dir/commands/DriveStraight.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/OpenClaw.java" destination="src/$package-dir/commands/OpenClaw.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/Pickup.java" destination="src/$package-dir/commands/Pickup.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/Place.java" destination="src/$package-dir/commands/Place.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/PrepareToPickup.java" destination="src/$package-dir/commands/PrepareToPickup.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/SetDistanceToBox.java" destination="src/$package-dir/commands/SetDistanceToBox.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/SetElevatorSetpoint.java" destination="src/$package-dir/commands/SetElevatorSetpoint.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/SetWristSetpoint.java" destination="src/$package-dir/commands/SetWristSetpoint.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/commands/TankDriveWithJoystick.java" destination="src/$package-dir/commands/TankDriveWithJoystick.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/Claw.java" destination="src/$package-dir/subsystems/Claw.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/DriveTrain.java" destination="src/$package-dir/subsystems/DriveTrain.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/Elevator.java" destination="src/$package-dir/subsystems/Elevator.java" />
-            <file source="examples/GearsBot/src/org/usfirst/frc/team190/robot/subsystems/Wrist.java" destination="src/$package-dir/subsystems/Wrist.java" />
+            <file source="examples/gearsbot/OI.java" destination="src/$package-dir/OI.java" />
+            <file source="examples/gearsbot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/gearsbot/commands/Autonomous.java" destination="src/$package-dir/commands/Autonomous.java" />
+            <file source="examples/gearsbot/commands/CloseClaw.java" destination="src/$package-dir/commands/CloseClaw.java" />
+            <file source="examples/gearsbot/commands/DriveStraight.java" destination="src/$package-dir/commands/DriveStraight.java" />
+            <file source="examples/gearsbot/commands/OpenClaw.java" destination="src/$package-dir/commands/OpenClaw.java" />
+            <file source="examples/gearsbot/commands/Pickup.java" destination="src/$package-dir/commands/Pickup.java" />
+            <file source="examples/gearsbot/commands/Place.java" destination="src/$package-dir/commands/Place.java" />
+            <file source="examples/gearsbot/commands/PrepareToPickup.java" destination="src/$package-dir/commands/PrepareToPickup.java" />
+            <file source="examples/gearsbot/commands/SetDistanceToBox.java" destination="src/$package-dir/commands/SetDistanceToBox.java" />
+            <file source="examples/gearsbot/commands/SetElevatorSetpoint.java" destination="src/$package-dir/commands/SetElevatorSetpoint.java" />
+            <file source="examples/gearsbot/commands/SetWristSetpoint.java" destination="src/$package-dir/commands/SetWristSetpoint.java" />
+            <file source="examples/gearsbot/commands/TankDriveWithJoystick.java" destination="src/$package-dir/commands/TankDriveWithJoystick.java" />
+            <file source="examples/gearsbot/subsystems/Claw.java" destination="src/$package-dir/subsystems/Claw.java" />
+            <file source="examples/gearsbot/subsystems/DriveTrain.java" destination="src/$package-dir/subsystems/DriveTrain.java" />
+            <file source="examples/gearsbot/subsystems/Elevator.java" destination="src/$package-dir/subsystems/Elevator.java" />
+            <file source="examples/gearsbot/subsystems/Wrist.java" destination="src/$package-dir/subsystems/Wrist.java" />
         </files>
     </example>
     <example>
@@ -263,7 +263,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/QuickVision/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/quickvision/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -278,7 +278,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/IntermediateVision/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/intermediatevision/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
     <example>
@@ -295,7 +295,7 @@
             <package>src/$package-dir</package>
         </packages>
         <files>
-            <file source="examples/AxisCameraSample/src/org/usfirst/frc/team190/robot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/axiscamera/Robot.java" destination="src/$package-dir/Robot.java" />
         </files>
     </example>
 </examples>
