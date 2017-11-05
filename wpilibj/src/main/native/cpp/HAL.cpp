@@ -360,22 +360,6 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getBrownedOut(JNIEnv* env, jclass) {
 
 /*
  * Class: edu_wpi_first_wpilibj_hal_HAL
- * Method:    HAL_SetErrorData
- * Signature: (Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HAL_setErrorData(JNIEnv* env, jclass,
-                                                jstring error) {
-  JStringRef errorStr{env, error};
-
-  NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr.c_str();
-  NETCOMM_LOG(logDEBUG) << "Length: " << errorStr.size();
-  jint returnValue = HAL_SetErrorData(errorStr.c_str(), (int32_t)errorStr.size(), 0);
-  return returnValue;
-}
-
-/*
- * Class: edu_wpi_first_wpilibj_hal_HAL
  * Method:    HAL_SendError
  * Signature: (ZIZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
  */

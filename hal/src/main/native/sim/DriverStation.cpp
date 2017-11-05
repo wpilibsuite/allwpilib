@@ -29,11 +29,6 @@ static int newDSDataAvailableCounter{0};
 using namespace hal;
 
 extern "C" {
-int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
-                         int32_t waitMs) {
-  return 0;
-}
-
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
