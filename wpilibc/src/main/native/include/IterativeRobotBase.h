@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "RobotBase.h"
 #include "IterativeBase.h"
+#include "RobotBase.h"
 
 namespace frc {
 
@@ -24,36 +24,22 @@ namespace frc {
  *
  * RobotInit() -- provide for initialization at robot power-on
  *
- * Init() functions -- each of the following functions is called once when the
- *                     appropriate mode is entered:
- *   - DisabledInit()   -- called only when first disabled
- *   - AutonomousInit() -- called each and every time autonomous is entered from
- *                         another mode
- *   - TeleopInit()     -- called each and every time teleop is entered from
- *                         another mode
- *   - TestInit()       -- called each and every time test is entered from
- *                         another mode
- *
- * Periodic() functions -- each of these functions is called on an interval:
- *   - RobotPeriodic()
- *   - DisabledPeriodic()
- *   - AutonomousPeriodic()
- *   - TeleopPeriodic()
- *   - TestPeriodic()
+ * Init() and Periodic() functions are implemented from, and documented within,
+ * IterativeBase.
  */
 class IterativeRobotBase : public RobotBase, public IterativeBase {
  public:
-  virtual void RobotInit();
-  virtual void DisabledInit();
-  virtual void AutonomousInit();
-  virtual void TeleopInit();
-  virtual void TestInit();
+  void RobotInit() override;
+  void DisabledInit() override;
+  void AutonomousInit() override;
+  void TeleopInit() override;
+  void TestInit() override;
 
-  virtual void RobotPeriodic();
-  virtual void DisabledPeriodic();
-  virtual void AutonomousPeriodic();
-  virtual void TeleopPeriodic();
-  virtual void TestPeriodic();
+  void RobotPeriodic() override;
+  void DisabledPeriodic() override;
+  void AutonomousPeriodic() override;
+  void TeleopPeriodic() override;
+  void TestPeriodic() override;
 
  protected:
   virtual ~IterativeRobotBase() = default;

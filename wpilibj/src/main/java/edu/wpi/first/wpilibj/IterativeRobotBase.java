@@ -77,6 +77,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
    * <p>Users should override this method for initialization code which will be called each time the
    * robot enters disabled mode.
    */
+  @Override
   public void disabledInit() {
     System.out.println("Default disabledInit() method... Overload me!");
   }
@@ -87,6 +88,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
    * <p>Users should override this method for initialization code which will be called each time the
    * robot enters autonomous mode.
    */
+  @Override
   public void autonomousInit() {
     System.out.println("Default autonomousInit() method... Overload me!");
   }
@@ -97,6 +99,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
    * <p>Users should override this method for initialization code which will be called each time the
    * robot enters teleop mode.
    */
+  @Override
   public void teleopInit() {
     System.out.println("Default teleopInit() method... Overload me!");
   }
@@ -108,6 +111,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
    * robot enters test mode.
    */
   @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
+  @Override
   public void testInit() {
     System.out.println("Default testInit() method... Overload me!");
   }
@@ -119,6 +123,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
   /**
    * Periodic code for all robot modes should go here.
    */
+  @Override
   public void robotPeriodic() {
     if (m_rpFirstRun) {
       System.out.println("Default robotPeriodic() method... Overload me!");
@@ -131,6 +136,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
   /**
    * Periodic code for disabled mode should go here.
    */
+  @Override
   public void disabledPeriodic() {
     if (m_dpFirstRun) {
       System.out.println("Default disabledPeriodic() method... Overload me!");
@@ -143,6 +149,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
   /**
    * Periodic code for autonomous mode should go here.
    */
+  @Override
   public void autonomousPeriodic() {
     if (m_apFirstRun) {
       System.out.println("Default autonomousPeriodic() method... Overload me!");
@@ -155,6 +162,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
   /**
    * Periodic code for teleop mode should go here.
    */
+  @Override
   public void teleopPeriodic() {
     if (m_tpFirstRun) {
       System.out.println("Default teleopPeriodic() method... Overload me!");
@@ -168,6 +176,7 @@ public abstract class IterativeRobotBase extends RobotBase implements IterativeB
    * Periodic code for test mode should go here.
    */
   @SuppressWarnings("PMD.JUnit4TestShouldUseTestAnnotation")
+  @Override
   public void testPeriodic() {
     if (m_tmpFirstRun) {
       System.out.println("Default testPeriodic() method... Overload me!");
