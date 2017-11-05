@@ -8,6 +8,7 @@
 #pragma once
 
 #include "RobotBase.h"
+#include "IterativeBase.h"
 
 namespace frc {
 
@@ -40,7 +41,7 @@ namespace frc {
  *   - TeleopPeriodic()
  *   - TestPeriodic()
  */
-class IterativeRobotBase : public RobotBase {
+class IterativeRobotBase : public RobotBase, public IterativeBase {
  public:
   virtual void RobotInit();
   virtual void DisabledInit();

@@ -39,7 +39,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  *   - teleopPeriodic()
  *   - testPeriodic()
  */
-public abstract class IterativeRobotBase extends RobotBase {
+public abstract class IterativeRobotBase extends RobotBase implements IterativeBase {
   private enum Mode {
     kNone,
     kDisabled,
