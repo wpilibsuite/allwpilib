@@ -25,8 +25,8 @@ DriveTrain::DriveTrain()
 	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Right
 	// CIM", &m_backRightCIM);
 
-	// Configure the RobotDrive to reflect the fact that all our motors are
-	// wired backwards and our drivers sensitivity preferences.
+	// Configure the DifferentialDrive to reflect the fact that all our
+	// motors are wired backwards and our drivers sensitivity preferences.
 	m_robotDrive.SetSafetyEnabled(false);
 	m_robotDrive.SetExpiration(0.1);
 	m_robotDrive.SetMaxOutput(1.0);

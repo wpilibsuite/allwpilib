@@ -184,7 +184,7 @@
     </example>
     <example>
         <name>Arcade Drive</name>
-        <description>An example program which demonstrates the use of Arcade Drive with the RobotDrive class</description>
+        <description>An example program which demonstrates the use of Arcade Drive with the DifferentialDrive class</description>
         <tags>
             <tag>Getting Started with C++</tag>
             <tag>Robot and Motor</tag>
@@ -200,7 +200,7 @@
     </example>
     <example>
         <name>Mecanum Drive</name>
-        <description>An example program which demonstrates the use of Mecanum Drive with the RobotDrive class</description>
+        <description>An example program which demonstrates the use of Mecanum Drive with the MecanumDrive class</description>
         <tags>
             <tag>Getting Started with C++</tag>
             <tag>Robot and Motor</tag>

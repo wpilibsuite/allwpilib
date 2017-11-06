@@ -15,10 +15,8 @@
 
 /**
  * This is a sample program to demonstrate how to use a gyro sensor to make a
- * robot drive
- * straight. This program uses a joystick to drive forwards and backwards while
- * the gyro
- * is used for direction keeping.
+ * robot drive straight. This program uses a joystick to drive forwards and
+ * backwards while the gyro is used for direction keeping.
  */
 class Robot : public frc::IterativeRobot {
 public:
@@ -27,9 +25,9 @@ public:
 	}
 
 	/**
-	 * The motor speed is set from the joystick while the RobotDrive turning
-	 * value is assigned from the error between the setpoint and the gyro
-	 * angle.
+	 * The motor speed is set from the joystick while the DifferentialDrive
+	 * turning value is assigned from the error between the setpoint and the
+	 * gyro angle.
 	 */
 	void TeleopPeriodic() override {
 		double turningValue = (kAngleSetpoint - m_gyro.GetAngle()) * kP;

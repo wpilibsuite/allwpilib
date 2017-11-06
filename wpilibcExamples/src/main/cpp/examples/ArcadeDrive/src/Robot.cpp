@@ -5,16 +5,19 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <WPILib.h>
+#include <Drive/DifferentialDrive.h>
+#include <IterativeRobot.h>
+#include <Joystick.h>
+#include <Spark.h>
 
 /**
- * This is a demo program showing the use of the RobotDrive class.
+ * This is a demo program showing the use of the DifferentialDrive class.
  * Runs the motors with arcade steering.
  */
 class Robot : public frc::IterativeRobot {
-	frc::Spark m_left{0};
-	frc::Spark m_right{1};
-	frc::RobotDrive m_robotDrive{m_left, m_right};
+	frc::Spark m_leftMotor{0};
+	frc::Spark m_rightMotor{1};
+	frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
 	frc::Joystick m_stick{0};
 
 public:
