@@ -69,7 +69,7 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
 
   virtual double GetError() const;
 
-  WPI_DEPRECATED("Use GetError() instead, which is now already filtered.")
+  WPI_DEPRECATED("Use a LinearDigitalFilter as the input and GetError().")
   virtual double GetAvgError() const;
 
   virtual void SetPIDSourceType(PIDSourceType pidSource);
@@ -79,7 +79,10 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   virtual void SetTolerance(double percent);
   virtual void SetAbsoluteTolerance(double absValue);
   virtual void SetPercentTolerance(double percentValue);
+
+  WPI_DEPRECATED("Use a LinearDigitalFilter as the input.")
   virtual void SetToleranceBuffer(int buf = 1);
+
   virtual bool OnTarget() const;
 
   void Enable() override;

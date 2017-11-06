@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Encoder.h"
+#include "Filters/LinearDigitalFilter.h"
 #include "Jaguar.h"
 #include "PIDController.h"
 #include "Talon.h"
@@ -44,6 +45,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
   SpeedController* m_speedController;
   Encoder* m_encoder;
+  LinearDigitalFilter* m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
@@ -65,16 +67,20 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
                                 TestBench::kTalonEncoderChannelB);
         break;
     }
+    m_filter = new LinearDigitalFilter(LinearDigitalFilter::MovingAverage(
+        std::shared_ptr<PIDSource>(m_encoder, NullDeleter<PIDSource>()), 50));
   }
 
   void TearDown() override {
     delete m_speedController;
     delete m_encoder;
+    delete m_filter;
   }
 
   void Reset() {
     m_speedController->Set(0.0);
     m_encoder->Reset();
+    m_filter->Reset();
   }
 };
 
@@ -158,9 +164,8 @@ TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
   m_encoder->SetPIDSourceType(PIDSourceType::kRate);
-  PIDController pid(1e-5, 0.0, 3e-5, 8e-5, m_encoder, m_speedController);
+  PIDController pid(1e-5, 0.0, 3e-5, 8e-5, m_filter, m_speedController);
   pid.SetAbsoluteTolerance(200.0);
-  pid.SetToleranceBuffer(50);
   pid.SetOutputRange(-0.3, 0.3);
   pid.SetSetpoint(600);
 

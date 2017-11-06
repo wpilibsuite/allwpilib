@@ -589,8 +589,10 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * erroneous measurements when the mechanism is on target. However, the mechanism will not
    * register as on target for at least the specified bufLength cycles.
    *
+   * @deprecated      Use a LinearDigitalFilter as the input.
    * @param bufLength Number of previous cycles to average.
    */
+  @Deprecated
   public synchronized void setToleranceBuffer(int bufLength) {
     m_filter = LinearDigitalFilter.movingAverage(m_origSource, bufLength);
     m_pidInput = m_filter;

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -194,10 +195,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Test
   public void testVelocityPIDController() {
     me.getEncoder().setPIDSourceType(PIDSourceType.kRate);
+    LinearDigitalFilter filter = LinearDigitalFilter.movingAverage(me.getEncoder(), 50);
     PIDController pid =
-        new PIDController(1e-5, 0.0, 3e-5, 8e-5, me.getEncoder(), me.getMotor());
+        new PIDController(1e-5, 0.0, 3e-5, 8e-5, filter, me.getMotor());
     pid.setAbsoluteTolerance(200);
-    pid.setToleranceBuffer(50);
     pid.setOutputRange(-0.3, 0.3);
     pid.setSetpoint(600);
 
