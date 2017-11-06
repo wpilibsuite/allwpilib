@@ -69,11 +69,18 @@ namespace frc {
  */
 class LinearDigitalFilter : public Filter {
  public:
+  LinearDigitalFilter(PIDSource& source, llvm::ArrayRef<double> ffGains,
+                      llvm::ArrayRef<double> fbGains);
   LinearDigitalFilter(std::shared_ptr<PIDSource> source,
                       llvm::ArrayRef<double> ffGains,
                       llvm::ArrayRef<double> fbGains);
 
   // Static methods to create commonly used filters
+  static LinearDigitalFilter SinglePoleIIR(PIDSource& source,
+                                           double timeConstant, double period);
+  static LinearDigitalFilter HighPass(PIDSource& source, double timeConstant,
+                                      double period);
+  static LinearDigitalFilter MovingAverage(PIDSource& source, int taps);
   static LinearDigitalFilter SinglePoleIIR(std::shared_ptr<PIDSource> source,
                                            double timeConstant, double period);
   static LinearDigitalFilter HighPass(std::shared_ptr<PIDSource> source,

@@ -18,6 +18,7 @@ namespace frc {
  */
 class Filter : public PIDSource {
  public:
+  explicit Filter(PIDSource& source);
   explicit Filter(std::shared_ptr<PIDSource> source);
   virtual ~Filter() = default;
 
