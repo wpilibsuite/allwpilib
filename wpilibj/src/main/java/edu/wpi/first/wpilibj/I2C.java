@@ -83,7 +83,7 @@ public class I2C extends SensorBase {
     status = I2CJNI.i2CTransaction(m_port, (byte) m_deviceAddress, dataToSendBuffer,
                                    (byte) sendSize, dataReceivedBuffer, (byte) receiveSize);
     if (receiveSize > 0 && dataReceived != null) {
-      dataReceivedBuffer.get(dataReceived);
+      dataReceivedBuffer.get(dataReceived, 0, receiveSize);
     }
     return status < 0;
   }
