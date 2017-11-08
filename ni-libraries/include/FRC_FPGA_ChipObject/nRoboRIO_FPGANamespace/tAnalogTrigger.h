@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2018_18_0_4_AnalogTrigger_h__
-#define __nFRC_2018_18_0_4_AnalogTrigger_h__
+#ifndef __nFRC_2018_18_0_5_AnalogTrigger_h__
+#define __nFRC_2018_18_0_5_AnalogTrigger_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2018_18_0_4
+namespace nFRC_2018_18_0_5
 {
 
 class tAnalogTrigger
@@ -127,4 +127,4 @@ private:
 }
 }
 
-#endif // __nFRC_2018_18_0_4_AnalogTrigger_h__
+#endif // __nFRC_2018_18_0_5_AnalogTrigger_h__

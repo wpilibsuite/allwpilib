@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2018_18_0_4_SPI_h__
-#define __nFRC_2018_18_0_4_SPI_h__
+#ifndef __nFRC_2018_18_0_5_SPI_h__
+#define __nFRC_2018_18_0_5_SPI_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2018_18_0_4
+namespace nFRC_2018_18_0_5
 {
 
 class tSPI
@@ -35,7 +35,9 @@ public:
          unsigned ExternalClockSource_AnalogTrigger : 1;
          unsigned RisingEdge : 1;
          unsigned FallingEdge : 1;
+         unsigned ExternalClock : 1;
 #else
+         unsigned ExternalClock : 1;
          unsigned FallingEdge : 1;
          unsigned RisingEdge : 1;
          unsigned ExternalClockSource_AnalogTrigger : 1;
@@ -44,7 +46,7 @@ public:
 #endif
       };
       struct{
-         unsigned value : 8;
+         unsigned value : 9;
       };
    } tAutoTriggerConfig;
    typedef
@@ -89,12 +91,14 @@ public:
    virtual void writeAutoTriggerConfig_ExternalClockSource_AnalogTrigger(bool value, tRioStatusCode *status) = 0;
    virtual void writeAutoTriggerConfig_RisingEdge(bool value, tRioStatusCode *status) = 0;
    virtual void writeAutoTriggerConfig_FallingEdge(bool value, tRioStatusCode *status) = 0;
+   virtual void writeAutoTriggerConfig_ExternalClock(bool value, tRioStatusCode *status) = 0;
    virtual tAutoTriggerConfig readAutoTriggerConfig(tRioStatusCode *status) = 0;
    virtual unsigned char readAutoTriggerConfig_ExternalClockSource_Channel(tRioStatusCode *status) = 0;
    virtual unsigned char readAutoTriggerConfig_ExternalClockSource_Module(tRioStatusCode *status) = 0;
    virtual bool readAutoTriggerConfig_ExternalClockSource_AnalogTrigger(tRioStatusCode *status) = 0;
    virtual bool readAutoTriggerConfig_RisingEdge(tRioStatusCode *status) = 0;
    virtual bool readAutoTriggerConfig_FallingEdge(tRioStatusCode *status) = 0;
+   virtual bool readAutoTriggerConfig_ExternalClock(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -103,13 +107,6 @@ public:
 
    virtual void writeAutoChipSelect(unsigned char value, tRioStatusCode *status) = 0;
    virtual unsigned char readAutoChipSelect(tRioStatusCode *status) = 0;
-
-
-   typedef enum
-   {
-   } tAutoForceGo_IfaceConstants;
-
-   virtual void strobeAutoForceGo(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -158,6 +155,14 @@ public:
 
    typedef enum
    {
+   } tAutoRate_IfaceConstants;
+
+   virtual void writeAutoRate(unsigned int value, tRioStatusCode *status) = 0;
+   virtual unsigned int readAutoRate(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
    } tEnableDIO_IfaceConstants;
 
    virtual void writeEnableDIO(unsigned char value, tRioStatusCode *status) = 0;
@@ -174,6 +179,13 @@ public:
    virtual tChipSelectActiveHigh readChipSelectActiveHigh(tRioStatusCode *status) = 0;
    virtual unsigned char readChipSelectActiveHigh_Hdr(tRioStatusCode *status) = 0;
    virtual unsigned char readChipSelectActiveHigh_MXP(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tAutoForceOne_IfaceConstants;
+
+   virtual void strobeAutoForceOne(tRioStatusCode *status) = 0;
 
 
 
@@ -196,4 +208,4 @@ private:
 }
 }
 
-#endif // __nFRC_2018_18_0_4_SPI_h__
+#endif // __nFRC_2018_18_0_5_SPI_h__
