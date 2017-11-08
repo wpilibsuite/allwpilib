@@ -271,10 +271,10 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
             } else {
               m_totalError = m_maximumOutput / m_P;
             }
-
-            m_result = m_P * m_totalError + m_D * m_error
-                + calculateFeedForward();
           }
+
+          m_result = m_P * m_totalError + m_D * m_error
+              + calculateFeedForward();
         } else {
           if (m_I != 0) {
             double potentialIGain = (m_totalError + m_error) * m_I;
