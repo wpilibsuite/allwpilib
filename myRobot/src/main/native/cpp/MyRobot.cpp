@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "WPILib.h"
+#include "IterativeRobot.h"
 
 class MyRobot : public IterativeRobot {
   /**
