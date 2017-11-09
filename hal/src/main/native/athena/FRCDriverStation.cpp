@@ -14,6 +14,7 @@
 #include <mutex>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
+#include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
 #include <llvm/raw_ostream.h>
 
 #include "HAL/DriverStation.h"
@@ -351,22 +352,17 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   return true;
 }
 
-// Internal NetComm function to set new packet callback
-extern int NetCommRPCProxy_SetOccurFuncPointer(
-    int32_t (*occurFunc)(uint32_t refNum));
-
 // Constant number to be used for our occur handle
 constexpr int32_t refNumber = 42;
 
-static int32_t newDataOccur(uint32_t refNum) {
+static void newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
-  if (refNum != refNumber) return 0;
+  if (refNum != refNumber) return;
   std::lock_guard<std::mutex> lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
   newDSDataAvailableCond.notify_all();
-  return 0;
 }
 
 /*
