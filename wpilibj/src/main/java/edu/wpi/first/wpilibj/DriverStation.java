@@ -211,18 +211,20 @@ public class DriverStation implements RobotState.Interface {
     } else {
       locString = "";
     }
-    boolean haveLoc = false;
     String traceString = "";
-    for (int i = stackTraceFirst; i < stackTrace.length; i++) {
-      String loc = stackTrace[i].toString();
-      traceString += "\tat " + loc + "\n";
-      // get first user function
-      if (!haveLoc && !loc.startsWith("edu.wpi.first")) {
-        locString = loc;
-        haveLoc = true;
+    if (printTrace) {
+      boolean haveLoc = false;
+      for (int i = stackTraceFirst; i < stackTrace.length; i++) {
+        String loc = stackTrace[i].toString();
+        traceString += "\tat " + loc + "\n";
+        // get first user function
+        if (!haveLoc && !loc.startsWith("edu.wpi.first")) {
+          locString = loc;
+          haveLoc = true;
+        }
       }
     }
-    HAL.sendError(isError, code, false, error, locString, printTrace ? traceString : "", false);
+    HAL.sendError(isError, code, false, error, locString, traceString, true);
   }
 
   /**
