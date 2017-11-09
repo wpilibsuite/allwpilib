@@ -107,6 +107,7 @@ public class FRCNetComm extends JNIWrapper {
     int kResourceType_PDP = 59;
     int kResourceType_PCM = 60;
     int kResourceType_PigeonIMU = 61;
+    int kResourceType_NidecBrushless = 62;
   }
 
   /**
