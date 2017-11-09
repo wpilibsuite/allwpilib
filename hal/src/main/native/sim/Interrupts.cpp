@@ -97,8 +97,8 @@ void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status) {
 static void ProcessInterruptDigitalSynchronous(const char* name, void* param,
                                                const struct HAL_Value* value) {
   // void* is a SynchronousWaitDataHandle.
-  // convert to intptr_t first, then to handle
-  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  // convert to uintptr_t first, then to handle
+  uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   SynchronousWaitDataHandle handle =
       static_cast<SynchronousWaitDataHandle>(handleTmp);
   auto interruptData = synchronousInterruptHandles.Get(handle);
@@ -130,8 +130,8 @@ static double GetAnalogTriggerValue(HAL_Handle triggerHandle,
 static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
                                               const struct HAL_Value* value) {
   // void* is a SynchronousWaitDataHandle.
-  // convert to intptr_t first, then to handle
-  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  // convert to uintptr_t first, then to handle
+  uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   SynchronousWaitDataHandle handle =
       static_cast<SynchronousWaitDataHandle>(handleTmp);
   auto interruptData = synchronousInterruptHandles.Get(handle);
@@ -186,8 +186,8 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
   interrupt->previousState = SimDIOData[digitalIndex].GetValue();
 
   int32_t uid = SimDIOData[digitalIndex].RegisterValueCallback(
-      &ProcessInterruptDigitalSynchronous, reinterpret_cast<void*>(dataHandle),
-      false);
+      &ProcessInterruptDigitalSynchronous,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(dataHandle)), false);
 
   bool timedOut = false;
 
@@ -256,8 +256,8 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
   if (status != 0) return WaitResult::Timeout;
 
   int32_t uid = SimAnalogInData[analogIndex].RegisterVoltageCallback(
-      &ProcessInterruptAnalogSynchronous, reinterpret_cast<void*>(dataHandle),
-      false);
+      &ProcessInterruptAnalogSynchronous,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(dataHandle)), false);
 
   bool timedOut = false;
 
@@ -327,8 +327,8 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
 static void ProcessInterruptDigitalAsynchronous(const char* name, void* param,
                                                 const struct HAL_Value* value) {
   // void* is a HAL handle
-  // convert to intptr_t first, then to handle
-  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  // convert to uintptr_t first, then to handle
+  uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   HAL_InterruptHandle handle = static_cast<HAL_InterruptHandle>(handleTmp);
   auto interrupt = interruptHandles.Get(handle);
   if (interrupt == nullptr) return;
@@ -360,7 +360,7 @@ static void ProcessInterruptAnalogAsynchronous(const char* name, void* param,
                                                const struct HAL_Value* value) {
   // void* is a HAL handle
   // convert to intptr_t first, then to handle
-  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   HAL_InterruptHandle handle = static_cast<HAL_InterruptHandle>(handleTmp);
   auto interrupt = interruptHandles.Get(handle);
   if (interrupt == nullptr) return;
@@ -400,8 +400,8 @@ static void EnableInterruptsDigital(HAL_InterruptHandle handle,
   interrupt->previousState = SimDIOData[digitalIndex].GetValue();
 
   int32_t uid = SimDIOData[digitalIndex].RegisterValueCallback(
-      &ProcessInterruptDigitalAsynchronous, reinterpret_cast<void*>(handle),
-      false);
+      &ProcessInterruptDigitalAsynchronous,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(handle)), false);
   interrupt->callbackId = uid;
 }
 
@@ -418,8 +418,8 @@ static void EnableInterruptsAnalog(HAL_InterruptHandle handle,
   if (status != 0) return;
 
   int32_t uid = SimAnalogInData[analogIndex].RegisterVoltageCallback(
-      &ProcessInterruptAnalogAsynchronous, reinterpret_cast<void*>(handle),
-      false);
+      &ProcessInterruptAnalogAsynchronous,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(handle)), false);
   interrupt->callbackId = uid;
 }
 
