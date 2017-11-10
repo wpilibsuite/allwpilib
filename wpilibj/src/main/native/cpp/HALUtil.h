@@ -14,11 +14,13 @@
 
 extern JavaVM *jvm;
 
+struct HAL_MatchInfo;
+
 namespace frc {
 
 void ReportError(JNIEnv *env, int32_t status, bool doThrow = true);
-                 
-void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange, 
+
+void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange,
                 int32_t requestedValue);
 
 inline bool CheckStatus(JNIEnv *env, int32_t status, bool doThrow = true) {
@@ -26,7 +28,7 @@ inline bool CheckStatus(JNIEnv *env, int32_t status, bool doThrow = true) {
   return status == 0;
 }
 
-inline bool CheckStatusRange(JNIEnv *env, int32_t status, int32_t minRange, 
+inline bool CheckStatusRange(JNIEnv *env, int32_t status, int32_t minRange,
                              int32_t maxRange, int32_t requestedValue) {
   if (status != 0) ThrowError(env, status, minRange, maxRange, requestedValue);
   return status == 0;
@@ -47,17 +49,20 @@ inline bool CheckCANStatus(JNIEnv *env, int32_t status, int32_t message_id) {
 void ThrowIllegalArgumentException(JNIEnv *env, const char *msg);
 void ThrowBoundaryException(JNIEnv *env, double value, double lower,
                             double upper);
-                            
+
 jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
                   int32_t deadbandMaxPwm, int32_t centerPwm,
                   int32_t deadbandMinPwm, int32_t minPwm);
 
-void SetCanStatusObject(JNIEnv *env, jobject canStatus, 
+void SetCanStatusObject(JNIEnv *env, jobject canStatus,
                         float percentBusUtilization,
-                        uint32_t busOffCount, uint32_t txFullCount, 
-                        uint32_t receiveErrorCount, 
+                        uint32_t busOffCount, uint32_t txFullCount,
+                        uint32_t receiveErrorCount,
                         uint32_t transmitErrorCount);
-                  
+
+void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
+                        const HAL_MatchInfo& matchInfo);
+
 }  // namespace frc
 
 #endif  // HALUTIL_H

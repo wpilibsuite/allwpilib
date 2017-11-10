@@ -22,6 +22,8 @@
 
 namespace frc {
 
+struct MatchInfoData;
+
 /**
  * Provide access to the network communication data to / from the Driver
  * Station.
@@ -29,6 +31,7 @@ namespace frc {
 class DriverStation : public SensorBase, public RobotStateInterface {
  public:
   enum Alliance { kRed, kBlue, kInvalid };
+  enum MatchType { kNone, kPractice, kQualification, kElimination };
 
   virtual ~DriverStation();
   static DriverStation& GetInstance();
@@ -66,6 +69,12 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   bool IsFMSAttached() const;
   bool IsSysActive() const;
   bool IsBrownedOut() const;
+
+  std::string GetGameSpecificMessage() const;
+  std::string GetEventName() const;
+  MatchType GetMatchType() const;
+  int GetMatchNumber() const;
+  int GetReplayNumber() const;
 
   Alliance GetAlliance() const;
   int GetLocation() const;
@@ -109,12 +118,14 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVs;
   std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtons;
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptor;
+  std::unique_ptr<MatchInfoData> m_matchInfo;
 
   // Joystick Cached Data
   std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxesCache;
   std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVsCache;
   std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtonsCache;
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptorCache;
+  std::unique_ptr<MatchInfoData> m_matchInfoCache;
 
   // Joystick button rising/falling edge flags
   std::array<uint32_t, kJoystickPorts> m_joystickButtonsPressed;
@@ -124,7 +135,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   std::thread m_dsThread;
   std::atomic<bool> m_isRunning{false};
 
-  mutable std::mutex m_joystickDataMutex;
+  mutable std::mutex m_cacheDataMutex;
 
   // Robot state status variables
   bool m_userInDisabled = false;
