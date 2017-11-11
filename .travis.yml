@@ -35,4 +35,4 @@ cache:
 script:
   - wpiformat -y 2017 -clang 5.0
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
-  - ./gradlew --no-daemon --console=plain -PskipAthena :hal:halSimSharedLibrary :wpilibc:wpilibcSharedLibrary :wpilibj:wpilibJNISharedSharedLibrary :wpilibj:jar
+  - ./gradlew --no-daemon --console=plain -PskipAthena :hal:halSharedLibrary :wpilibc:wpilibcSharedLibrary :wpilibj:wpilibJNISharedSharedLibrary :wpilibj:jar
