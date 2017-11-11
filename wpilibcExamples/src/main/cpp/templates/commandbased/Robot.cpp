@@ -7,10 +7,10 @@
 
 #include <Commands/Command.h>
 #include <Commands/Scheduler.h>
-#include <TimedRobot.h>
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
+#include <TimedRobot.h>
 
 #include "Commands/ExampleCommand.h"
 #include "Commands/MyAutoCommand.h"
