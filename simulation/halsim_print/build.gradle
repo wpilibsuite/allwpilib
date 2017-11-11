@@ -11,7 +11,19 @@ if (!project.hasProperty('onlyAthena')) {
 
     model {
         components {
-            halsim_print(NativeLibrarySpec)
+            halsim_print(NativeLibrarySpec) {
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = [ 'src/main/native/cpp' ]
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["src/main/native/include"]
+                        }
+                    }
+                }
+            }
         }
 
         binaries {
