@@ -168,7 +168,7 @@ double InterruptableSensorBase::ReadRisingTimestamp() {
  * {@link #DigitalInput.SetUpSourceEdge}
  *
  * @return Timestamp in seconds since boot.
-*/
+ */
 double InterruptableSensorBase::ReadFallingTimestamp() {
   if (StatusIsFatal()) return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);

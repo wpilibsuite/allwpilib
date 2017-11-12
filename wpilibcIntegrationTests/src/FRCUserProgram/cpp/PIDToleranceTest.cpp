@@ -86,9 +86,9 @@ TEST_F(PIDToleranceTest, Percent) {
       << "Error was in tolerance when it should not have been. Error was "
       << pid->GetAvgError();
 
-  inp.val = setpoint +
-            (tolerance) / 200 *
-                range;  // half of percent tolerance away from setpoint
+  inp.val =
+      setpoint + (tolerance) / 200 *
+                     range;  // half of percent tolerance away from setpoint
   Wait(1.0);
 
   EXPECT_TRUE(pid->OnTarget())

@@ -120,8 +120,8 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
 void PIDSubsystem::Enable() { m_controller->Enable(); }
 
 /**
-  * Disables the internal {@link PIDController}.
-  */
+ * Disables the internal {@link PIDController}.
+ */
 void PIDSubsystem::Disable() { m_controller->Disable(); }
 
 /**

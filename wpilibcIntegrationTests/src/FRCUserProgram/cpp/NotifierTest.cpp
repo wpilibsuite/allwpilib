@@ -34,8 +34,8 @@ TEST(NotifierTest, DISABLED_TestTimerNotifications) {
   Wait(10.5);
   llvm::outs() << "...Wait\n";
 
-  EXPECT_EQ(10u, notifierCounter) << "Received " << notifierCounter
-                                  << " notifications in 10.5 seconds";
+  EXPECT_EQ(10u, notifierCounter)
+      << "Received " << notifierCounter << " notifications in 10.5 seconds";
   llvm::outs() << "Received " << notifierCounter
                << " notifications in 10.5 seconds";
 
