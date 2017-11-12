@@ -99,8 +99,13 @@ int TCPAcceptor::start() {
   }
   address.sin_port = htons(m_port);
 
+#ifdef _WIN32
+  int optval = 1;
+  setsockopt(m_lsd, SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (char*)&optval, sizeof optval);
+#else
   int optval = 1;
   setsockopt(m_lsd, SOL_SOCKET, SO_REUSEADDR, (char*)&optval, sizeof optval);
+#endif
 
   int result = bind(m_lsd, (struct sockaddr*)&address, sizeof(address));
   if (result != 0) {
