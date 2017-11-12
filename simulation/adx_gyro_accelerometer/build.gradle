@@ -44,9 +44,6 @@ if (!project.hasProperty('onlyAthena')) {
                 project(':hal').addHalCompilerArguments(it)
                 project(':hal').addHalToLinker(it)
             }
-            withType(StaticLibraryBinarySpec) {
-                //it.buildable = false
-            }
         }
     }
     apply from: 'publish.gradle'

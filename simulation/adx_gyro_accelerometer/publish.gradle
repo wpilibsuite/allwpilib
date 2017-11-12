@@ -49,24 +49,17 @@ task cppSourcesZip(type: Zip) {
 
 model {
     publishing {
-        def libSpec
-        $.components.each {
-            if (it in NativeLibrarySpec) {
-                $.binaries.each {
-                    if (it in SharedLibraryBinarySpec) {
-                        libSpec = it.sharedLibraryFile
-                    }
-                }
-            }
-        }
+        def libSpec = createComponentZipTasks($.components, 'halsim_adx_gyro_accelerometer', 'zipcpp', Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {
-                artifact libSpec
                 artifactId = baseArtifactId
                 groupId artifactGroupId
                 version pubVersion
 
+                libSpec.each {
+                    artifact it
+                }
                 artifact cppHeadersZip
                 artifact cppSourcesZip
             }
