@@ -219,6 +219,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     for (auto p = llvm::sys::fs::recursive_directory_iterator(
              "/sys/devices/soc0", ec);
          p != llvm::sys::fs::recursive_directory_iterator(); p.increment(ec)) {
+      if (ec) break;
       llvm::StringRef path{p->path()};
       if (path.find("amba") == llvm::StringRef::npos) continue;
       if (path.find("usb") == llvm::StringRef::npos) continue;
