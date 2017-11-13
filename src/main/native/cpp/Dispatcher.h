@@ -10,15 +10,15 @@
 
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <functional>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
 
 #include "llvm/StringRef.h"
+#include "support/condition_variable.h"
+#include "support/mutex.h"
 
 #include "IDispatcher.h"
 #include "INetworkConnection.h"
@@ -103,7 +103,7 @@ class DispatcherBase : public IDispatcher {
   uint8_t m_connections_uid = 0;
 
   // Mutex for user-accessible items
-  mutable std::mutex m_user_mutex;
+  mutable wpi::mutex m_user_mutex;
   std::vector<std::shared_ptr<INetworkConnection>> m_connections;
   std::string m_identity;
 
@@ -111,13 +111,13 @@ class DispatcherBase : public IDispatcher {
   std::atomic_uint m_update_rate;  // periodic dispatch update rate, in ms
 
   // Condition variable for forced dispatch wakeup (flush)
-  std::mutex m_flush_mutex;
-  std::condition_variable m_flush_cv;
+  wpi::mutex m_flush_mutex;
+  wpi::condition_variable m_flush_cv;
   std::chrono::steady_clock::time_point m_last_flush;
   bool m_do_flush = false;
 
   // Condition variable for client reconnect (uses user mutex)
-  std::condition_variable m_reconnect_cv;
+  wpi::condition_variable m_reconnect_cv;
   unsigned int m_reconnect_proto_rev = 0x0300;
   bool m_do_reconnect = true;
 

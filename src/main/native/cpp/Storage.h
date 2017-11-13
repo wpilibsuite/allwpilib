@@ -9,15 +9,15 @@
 #define NT_STORAGE_H_
 
 #include <atomic>
-#include <condition_variable>
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <mutex>
 
 #include "llvm/DenseMap.h"
 #include "llvm/SmallSet.h"
 #include "llvm/StringMap.h"
+#include "support/condition_variable.h"
+#include "support/mutex.h"
 #include "Message.h"
 #include "ntcore_cpp.h"
 #include "SequenceNumber.h"
@@ -196,7 +196,7 @@ class Storage : public IStorage {
   typedef llvm::DenseMap<RpcIdPair, std::string> RpcResultMap;
   typedef llvm::SmallSet<RpcIdPair, 12> RpcBlockingCallSet;
 
-  mutable std::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
   EntriesMap m_entries;
   IdMap m_idmap;
   LocalMap m_localmap;
@@ -207,7 +207,7 @@ class Storage : public IStorage {
 
   // condition variable and termination flag for blocking on a RPC result
   std::atomic_bool m_terminating;
-  std::condition_variable m_rpc_results_cond;
+  wpi::condition_variable m_rpc_results_cond;
 
   // configured by dispatcher at startup
   IDispatcher* m_dispatcher = nullptr;
@@ -241,10 +241,10 @@ class Storage : public IStorage {
                   std::vector<std::pair<std::string, std::shared_ptr<Value>>>*
                       entries) const;
   void SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
-                         std::unique_lock<std::mutex>& lock, bool local);
+                         std::unique_lock<wpi::mutex>& lock, bool local);
   void SetEntryFlagsImpl(Entry* entry, unsigned int flags,
-                         std::unique_lock<std::mutex>& lock, bool local);
-  void DeleteEntryImpl(Entry* entry, std::unique_lock<std::mutex>& lock,
+                         std::unique_lock<wpi::mutex>& lock, bool local);
+  void DeleteEntryImpl(Entry* entry, std::unique_lock<wpi::mutex>& lock,
                        bool local);
 
   // Must be called with m_mutex held

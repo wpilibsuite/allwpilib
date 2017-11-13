@@ -30,7 +30,7 @@ Storage::~Storage() {
 }
 
 void Storage::SetDispatcher(IDispatcher* dispatcher, bool server) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   m_dispatcher = dispatcher;
   m_server = server;
 }
@@ -38,7 +38,7 @@ void Storage::SetDispatcher(IDispatcher* dispatcher, bool server) {
 void Storage::ClearDispatcher() { m_dispatcher = nullptr; }
 
 NT_Type Storage::GetMessageEntryType(unsigned int id) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   if (id >= m_idmap.size()) return NT_UNASSIGNED;
   Entry* entry = m_idmap[id];
   if (!entry || !entry->value) return NT_UNASSIGNED;
@@ -86,7 +86,7 @@ void Storage::ProcessIncoming(std::shared_ptr<Message> msg,
 
 void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
                                          INetworkConnection* conn) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   unsigned int id = msg->id();
   StringRef name = msg->str();
   Entry* entry;
@@ -211,7 +211,7 @@ void Storage::ProcessIncomingEntryAssign(std::shared_ptr<Message> msg,
 
 void Storage::ProcessIncomingEntryUpdate(std::shared_ptr<Message> msg,
                                          INetworkConnection* conn) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   unsigned int id = msg->id();
   if (id >= m_idmap.size() || !m_idmap[id]) {
     // ignore arbitrary entry updates;
@@ -248,7 +248,7 @@ void Storage::ProcessIncomingEntryUpdate(std::shared_ptr<Message> msg,
 
 void Storage::ProcessIncomingFlagsUpdate(std::shared_ptr<Message> msg,
                                          INetworkConnection* conn) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   unsigned int id = msg->id();
   if (id >= m_idmap.size() || !m_idmap[id]) {
     // ignore arbitrary entry updates;
@@ -272,7 +272,7 @@ void Storage::ProcessIncomingFlagsUpdate(std::shared_ptr<Message> msg,
 
 void Storage::ProcessIncomingEntryDelete(std::shared_ptr<Message> msg,
                                          INetworkConnection* conn) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   unsigned int id = msg->id();
   if (id >= m_idmap.size() || !m_idmap[id]) {
     // ignore arbitrary entry updates;
@@ -296,7 +296,7 @@ void Storage::ProcessIncomingEntryDelete(std::shared_ptr<Message> msg,
 
 void Storage::ProcessIncomingClearEntries(std::shared_ptr<Message> msg,
                                           INetworkConnection* conn) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   // update local
   DeleteAllEntriesImpl(false);
 
@@ -312,7 +312,7 @@ void Storage::ProcessIncomingClearEntries(std::shared_ptr<Message> msg,
 void Storage::ProcessIncomingExecuteRpc(
     std::shared_ptr<Message> msg, INetworkConnection* conn,
     std::weak_ptr<INetworkConnection> conn_weak) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (!m_server) return;  // only process on server
   unsigned int id = msg->id();
   if (id >= m_idmap.size() || !m_idmap[id]) {
@@ -351,7 +351,7 @@ void Storage::ProcessIncomingExecuteRpc(
 
 void Storage::ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
                                          INetworkConnection* conn) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (m_server) return;  // only process on client
   unsigned int id = msg->id();
   if (id >= m_idmap.size() || !m_idmap[id]) {
@@ -374,7 +374,7 @@ void Storage::ProcessIncomingRpcResponse(std::shared_ptr<Message> msg,
 
 void Storage::GetInitialAssignments(
     INetworkConnection& conn, std::vector<std::shared_ptr<Message>>* msgs) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   conn.set_state(INetworkConnection::kSynchronized);
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
@@ -388,7 +388,7 @@ void Storage::GetInitialAssignments(
 void Storage::ApplyInitialAssignments(
     INetworkConnection& conn, llvm::ArrayRef<std::shared_ptr<Message>> msgs,
     bool new_server, std::vector<std::shared_ptr<Message>>* out_msgs) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (m_server) return;  // should not do this on server
 
   conn.set_state(INetworkConnection::kSynchronized);
@@ -476,14 +476,14 @@ void Storage::ApplyInitialAssignments(
 }
 
 std::shared_ptr<Value> Storage::GetEntryValue(StringRef name) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return nullptr;
   return i->getValue()->value;
 }
 
 std::shared_ptr<Value> Storage::GetEntryValue(unsigned int local_id) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return nullptr;
   return m_localmap[local_id]->value;
 }
@@ -492,7 +492,7 @@ bool Storage::SetDefaultEntryValue(StringRef name,
                                    std::shared_ptr<Value> value) {
   if (name.empty()) return false;
   if (!value) return false;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   Entry* entry = GetOrNew(name);
 
   // we return early if value already exists; if types match return true
@@ -505,7 +505,7 @@ bool Storage::SetDefaultEntryValue(StringRef name,
 bool Storage::SetDefaultEntryValue(unsigned int local_id,
                                    std::shared_ptr<Value> value) {
   if (!value) return false;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return false;
   Entry* entry = m_localmap[local_id].get();
 
@@ -519,7 +519,7 @@ bool Storage::SetDefaultEntryValue(unsigned int local_id,
 bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
   if (name.empty()) return true;
   if (!value) return true;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   Entry* entry = GetOrNew(name);
 
   if (entry->value && entry->value->type() != value->type())
@@ -532,7 +532,7 @@ bool Storage::SetEntryValue(StringRef name, std::shared_ptr<Value> value) {
 bool Storage::SetEntryValue(unsigned int local_id,
                             std::shared_ptr<Value> value) {
   if (!value) return true;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return true;
   Entry* entry = m_localmap[local_id].get();
 
@@ -544,7 +544,7 @@ bool Storage::SetEntryValue(unsigned int local_id,
 }
 
 void Storage::SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
-                                std::unique_lock<std::mutex>& lock,
+                                std::unique_lock<wpi::mutex>& lock,
                                 bool local) {
   if (!value) return;
   auto old_value = entry->value;
@@ -595,7 +595,7 @@ void Storage::SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
 void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
   if (name.empty()) return;
   if (!value) return;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   Entry* entry = GetOrNew(name);
 
   SetEntryValueImpl(entry, value, lock, true);
@@ -604,7 +604,7 @@ void Storage::SetEntryTypeValue(StringRef name, std::shared_ptr<Value> value) {
 void Storage::SetEntryTypeValue(unsigned int local_id,
                                 std::shared_ptr<Value> value) {
   if (!value) return;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return;
   Entry* entry = m_localmap[local_id].get();
   if (!entry) return;
@@ -614,20 +614,20 @@ void Storage::SetEntryTypeValue(unsigned int local_id,
 
 void Storage::SetEntryFlags(StringRef name, unsigned int flags) {
   if (name.empty()) return;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return;
   SetEntryFlagsImpl(i->getValue(), flags, lock, true);
 }
 
 void Storage::SetEntryFlags(unsigned int id_local, unsigned int flags) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (id_local >= m_localmap.size()) return;
   SetEntryFlagsImpl(m_localmap[id_local].get(), flags, lock, true);
 }
 
 void Storage::SetEntryFlagsImpl(Entry* entry, unsigned int flags,
-                                std::unique_lock<std::mutex>& lock,
+                                std::unique_lock<wpi::mutex>& lock,
                                 bool local) {
   if (!entry->value || entry->flags == flags) return;
 
@@ -654,32 +654,32 @@ void Storage::SetEntryFlagsImpl(Entry* entry, unsigned int flags,
 }
 
 unsigned int Storage::GetEntryFlags(StringRef name) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return 0;
   return i->getValue()->flags;
 }
 
 unsigned int Storage::GetEntryFlags(unsigned int local_id) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return 0;
   return m_localmap[local_id]->flags;
 }
 
 void Storage::DeleteEntry(StringRef name) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   auto i = m_entries.find(name);
   if (i == m_entries.end()) return;
   DeleteEntryImpl(i->getValue(), lock, true);
 }
 
 void Storage::DeleteEntry(unsigned int local_id) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return;
   DeleteEntryImpl(m_localmap[local_id].get(), lock, true);
 }
 
-void Storage::DeleteEntryImpl(Entry* entry, std::unique_lock<std::mutex>& lock,
+void Storage::DeleteEntryImpl(Entry* entry, std::unique_lock<wpi::mutex>& lock,
                               bool local) {
   unsigned int id = entry->id;
 
@@ -745,7 +745,7 @@ void Storage::DeleteAllEntriesImpl(bool local) {
 }
 
 void Storage::DeleteAllEntries() {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (m_entries.empty()) return;
 
   DeleteAllEntriesImpl(true);
@@ -769,13 +769,13 @@ Storage::Entry* Storage::GetOrNew(StringRef name) {
 
 unsigned int Storage::GetEntry(StringRef name) {
   if (name.empty()) return UINT_MAX;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   return GetOrNew(name)->local_id;
 }
 
 std::vector<unsigned int> Storage::GetEntries(StringRef prefix,
                                               unsigned int types) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   std::vector<unsigned int> ids;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
@@ -794,7 +794,7 @@ EntryInfo Storage::GetEntryInfo(int inst, unsigned int local_id) const {
   info.flags = 0;
   info.last_change = 0;
 
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return info;
   Entry* entry = m_localmap[local_id].get();
   if (!entry->value) return info;
@@ -808,13 +808,13 @@ EntryInfo Storage::GetEntryInfo(int inst, unsigned int local_id) const {
 }
 
 std::string Storage::GetEntryName(unsigned int local_id) const {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return std::string{};
   return m_localmap[local_id]->name;
 }
 
 NT_Type Storage::GetEntryType(unsigned int local_id) const {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return NT_UNASSIGNED;
   Entry* entry = m_localmap[local_id].get();
   if (!entry->value) return NT_UNASSIGNED;
@@ -822,7 +822,7 @@ NT_Type Storage::GetEntryType(unsigned int local_id) const {
 }
 
 unsigned long long Storage::GetEntryLastChange(unsigned int local_id) const {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return 0;
   Entry* entry = m_localmap[local_id].get();
   if (!entry->value) return 0;
@@ -831,7 +831,7 @@ unsigned long long Storage::GetEntryLastChange(unsigned int local_id) const {
 
 std::vector<EntryInfo> Storage::GetEntryInfo(int inst, StringRef prefix,
                                              unsigned int types) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   std::vector<EntryInfo> infos;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
@@ -853,7 +853,7 @@ unsigned int Storage::AddListener(
     StringRef prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   unsigned int uid = m_notifier.Add(callback, prefix, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
@@ -871,7 +871,7 @@ unsigned int Storage::AddListener(
     unsigned int local_id,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   unsigned int uid = m_notifier.Add(callback, local_id, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0 &&
@@ -887,7 +887,7 @@ unsigned int Storage::AddListener(
 
 unsigned int Storage::AddPolledListener(unsigned int poller, StringRef prefix,
                                         unsigned int flags) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   unsigned int uid = m_notifier.AddPolled(poller, prefix, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
@@ -905,7 +905,7 @@ unsigned int Storage::AddPolledListener(unsigned int poller, StringRef prefix,
 unsigned int Storage::AddPolledListener(unsigned int poller,
                                         unsigned int local_id,
                                         unsigned int flags) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   unsigned int uid = m_notifier.AddPolled(poller, local_id, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0 &&
@@ -926,7 +926,7 @@ bool Storage::GetPersistentEntries(
     const {
   // copy values out of storage as quickly as possible so lock isn't held
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     // for periodic, don't re-save unless something has changed
     if (periodic && !m_persistent_dirty) return false;
     m_persistent_dirty = false;
@@ -954,7 +954,7 @@ bool Storage::GetEntries(
     const {
   // copy values out of storage as quickly as possible so lock isn't held
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     entries->reserve(m_entries.size());
     for (auto& i : m_entries) {
       Entry* entry = i.getValue();
@@ -975,7 +975,7 @@ bool Storage::GetEntries(
 
 void Storage::CreateRpc(unsigned int local_id, StringRef def,
                         unsigned int rpc_uid) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return;
   Entry* entry = m_localmap[local_id].get();
 
@@ -1013,7 +1013,7 @@ void Storage::CreateRpc(unsigned int local_id, StringRef def,
 }
 
 unsigned int Storage::CallRpc(unsigned int local_id, StringRef params) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   if (local_id >= m_localmap.size()) return 0;
   Entry* entry = m_localmap[local_id].get();
 
@@ -1040,7 +1040,7 @@ unsigned int Storage::CallRpc(unsigned int local_id, StringRef params) {
     unsigned int call_uid = msg->seq_num_uid();
     m_rpc_server.ProcessRpc(local_id, call_uid, name, msg->str(), conn_info,
                             [=](StringRef result) {
-                              std::lock_guard<std::mutex> lock(m_mutex);
+                              std::lock_guard<wpi::mutex> lock(m_mutex);
                               m_rpc_results.insert(std::make_pair(
                                   RpcIdPair{local_id, call_uid}, result));
                               m_rpc_results_cond.notify_all();
@@ -1063,7 +1063,7 @@ bool Storage::GetRpcResult(unsigned int local_id, unsigned int call_uid,
 bool Storage::GetRpcResult(unsigned int local_id, unsigned int call_uid,
                            std::string* result, double timeout,
                            bool* timed_out) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
 
   RpcIdPair call_pair{local_id, call_uid};
 
@@ -1115,7 +1115,7 @@ bool Storage::GetRpcResult(unsigned int local_id, unsigned int call_uid,
 }
 
 void Storage::CancelRpcResult(unsigned int local_id, unsigned int call_uid) {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   // safe to erase even if id does not exist
   m_rpc_blocking_calls.erase(RpcIdPair{local_id, call_uid});
   m_rpc_results_cond.notify_all();

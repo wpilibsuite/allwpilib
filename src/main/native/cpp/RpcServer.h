@@ -9,6 +9,7 @@
 #define NT_RPCSERVER_H_
 
 #include "llvm/DenseMap.h"
+#include "support/mutex.h"
 
 #include "CallbackManager.h"
 #include "Handle.h"
@@ -60,7 +61,7 @@ class RpcServerThread
     RpcIdPair lookup_uid{local_id, call_uid};
     callback(data);
     {
-      std::lock_guard<std::mutex> lock(m_mutex);
+      std::lock_guard<wpi::mutex> lock(m_mutex);
       auto i = m_response_map.find(lookup_uid);
       if (i != m_response_map.end()) {
         // post an empty response and erase it

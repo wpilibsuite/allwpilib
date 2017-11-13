@@ -10,13 +10,13 @@
 
 #include <atomic>
 #include <climits>
-#include <condition_variable>
 #include <functional>
-#include <mutex>
 #include <queue>
 #include <utility>
 
 #include "llvm/raw_ostream.h"
+#include "support/condition_variable.h"
+#include "support/mutex.h"
 #include "support/SafeThread.h"
 #include "support/UidVector.h"
 
@@ -67,19 +67,19 @@ class CallbackThread : public wpi::SafeThread {
   wpi::UidVector<ListenerData, 64> m_listeners;
 
   std::queue<std::pair<unsigned int, NotifierData>> m_queue;
-  std::condition_variable m_queue_empty;
+  wpi::condition_variable m_queue_empty;
 
   struct Poller {
     void Terminate() {
       {
-        std::lock_guard<std::mutex> lock(poll_mutex);
+        std::lock_guard<wpi::mutex> lock(poll_mutex);
         terminating = true;
       }
       poll_cond.notify_all();
     }
     std::queue<NotifierData> poll_queue;
-    std::mutex poll_mutex;
-    std::condition_variable poll_cond;
+    wpi::mutex poll_mutex;
+    wpi::condition_variable poll_cond;
     bool terminating = false;
     bool cancelling = false;
   };
@@ -92,7 +92,7 @@ class CallbackThread : public wpi::SafeThread {
     auto poller = m_pollers[poller_uid];
     if (!poller) return;
     {
-      std::lock_guard<std::mutex> lock(poller->poll_mutex);
+      std::lock_guard<wpi::mutex> lock(poller->poll_mutex);
       poller->poll_queue.emplace(std::forward<Args>(args)...);
     }
     poller->poll_cond.notify_one();
@@ -102,7 +102,7 @@ class CallbackThread : public wpi::SafeThread {
 template <typename Derived, typename TUserInfo, typename TListenerData,
           typename TNotifierData>
 void CallbackThread<Derived, TUserInfo, TListenerData, TNotifierData>::Main() {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   while (m_active) {
     while (m_queue.empty()) {
       m_cond.wait(lock);
@@ -244,7 +244,7 @@ class CallbackManager {
       if (!poller) return infos;
     }
 
-    std::unique_lock<std::mutex> lock(poller->poll_mutex);
+    std::unique_lock<wpi::mutex> lock(poller->poll_mutex);
 #if defined(_MSC_VER) && _MSC_VER < 1900
     auto timeout_time = std::chrono::steady_clock::now() +
                         std::chrono::duration<int64_t, std::nano>(
@@ -295,7 +295,7 @@ class CallbackManager {
     }
 
     {
-      std::lock_guard<std::mutex> lock(poller->poll_mutex);
+      std::lock_guard<wpi::mutex> lock(poller->poll_mutex);
       poller->cancelling = true;
     }
     poller->poll_cond.notify_one();

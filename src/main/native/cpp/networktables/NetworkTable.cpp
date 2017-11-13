@@ -136,7 +136,7 @@ NetworkTableInstance NetworkTable::GetInstance() const {
 }
 
 NetworkTableEntry NetworkTable::GetEntry(llvm::StringRef key) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   NT_Entry& entry = m_entries[key];
   if (entry == 0) {
     llvm::SmallString<128> path(m_path);
@@ -194,7 +194,7 @@ void NetworkTable::AddTableListener(ITableListener* listener,
 
 void NetworkTable::AddTableListenerEx(ITableListener* listener,
                                       unsigned int flags) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   std::size_t prefix_len = path.size();
@@ -218,7 +218,7 @@ void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
 
 void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
                                       unsigned int flags) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   std::size_t prefix_len = path.size();
@@ -240,7 +240,7 @@ void NetworkTable::AddSubTableListener(ITableListener* listener) {
 
 void NetworkTable::AddSubTableListener(ITableListener* listener,
                                        bool localNotify) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   std::size_t prefix_len = path.size();
@@ -268,7 +268,7 @@ void NetworkTable::AddSubTableListener(ITableListener* listener,
 }
 
 void NetworkTable::RemoveTableListener(ITableListener* listener) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto matches_begin =
       std::remove_if(m_listeners.begin(), m_listeners.end(),
                      [=](const Listener& x) { return x.first == listener; });
@@ -302,7 +302,7 @@ std::vector<std::string> NetworkTable::GetKeys(int types) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   auto infos = GetEntryInfo(m_inst, path, types);
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   for (auto& info : infos) {
     auto relative_key = StringRef(info.name).substr(path.size());
     if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) continue;

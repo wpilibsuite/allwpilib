@@ -63,7 +63,7 @@ void DsClient::Thread::Main() {
         std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
     unsigned int port;
     {
-      std::unique_lock<std::mutex> lock(m_mutex);
+      std::unique_lock<wpi::mutex> lock(m_mutex);
       m_cond.wait_until(lock, timeout_time, [&] { return !m_active; });
       port = m_port;
     }

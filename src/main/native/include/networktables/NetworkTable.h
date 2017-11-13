@@ -9,13 +9,13 @@
 #define NETWORKTABLE_H_
 
 #include <functional>
-#include <mutex>
 #include <vector>
 
 #include "llvm/StringMap.h"
 #include "networktables/NetworkTableEntry.h"
 #include "networktables/TableEntryListener.h"
 #include "networktables/TableListener.h"
+#include "support/mutex.h"
 #include "ntcore_c.h"
 #include "tables/ITable.h"
 
@@ -38,7 +38,7 @@ class NetworkTable final : public ITable {
  private:
   NT_Inst m_inst;
   std::string m_path;
-  mutable std::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
   mutable llvm::StringMap<NT_Entry> m_entries;
   typedef std::pair<ITableListener*, NT_EntryListener> Listener;
   std::vector<Listener> m_listeners;

@@ -13,6 +13,8 @@
 #include <memory>
 #include <thread>
 
+#include "support/condition_variable.h"
+#include "support/mutex.h"
 #include "support/ConcurrentQueue.h"
 #include "INetworkConnection.h"
 #include "Message.h"
@@ -95,21 +97,21 @@ class NetworkConnection : public INetworkConnection {
   std::thread m_write_thread;
   std::atomic_bool m_active;
   std::atomic_uint m_proto_rev;
-  mutable std::mutex m_state_mutex;
+  mutable wpi::mutex m_state_mutex;
   State m_state;
-  mutable std::mutex m_remote_id_mutex;
+  mutable wpi::mutex m_remote_id_mutex;
   std::string m_remote_id;
   std::atomic_ullong m_last_update;
   std::chrono::steady_clock::time_point m_last_post;
 
-  std::mutex m_pending_mutex;
+  wpi::mutex m_pending_mutex;
   Outgoing m_pending_outgoing;
   std::vector<std::pair<std::size_t, std::size_t>> m_pending_update;
 
   // Condition variables for shutdown
-  std::mutex m_shutdown_mutex;
-  std::condition_variable m_read_shutdown_cv;
-  std::condition_variable m_write_shutdown_cv;
+  wpi::mutex m_shutdown_mutex;
+  wpi::condition_variable m_read_shutdown_cv;
+  wpi::condition_variable m_write_shutdown_cv;
   bool m_read_shutdown = false;
   bool m_write_shutdown = false;
 };

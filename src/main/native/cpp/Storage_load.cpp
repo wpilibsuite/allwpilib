@@ -372,7 +372,7 @@ bool Storage::LoadEntries(
 
   // copy values into storage as quickly as possible so lock isn't held
   std::vector<std::shared_ptr<Message>> msgs;
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   for (auto& i : entries) {
     Entry* entry = GetOrNew(i.first);
     auto old_value = entry->value;

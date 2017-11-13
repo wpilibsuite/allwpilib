@@ -954,9 +954,9 @@ const char* LoadEntries(
 
 void SetLogger(LogFunc func, unsigned int min_level) {
   auto ii = InstanceImpl::GetDefault();
-  static std::mutex mutex;
+  static wpi::mutex mutex;
   static unsigned int logger = 0;
-  std::lock_guard<std::mutex> lock(mutex);
+  std::lock_guard<wpi::mutex> lock(mutex);
   if (logger != 0) ii->logger_impl.Remove(logger);
   logger = ii->logger_impl.Add(
       [=](const LogMessage& msg) {
