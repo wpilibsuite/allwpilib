@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/AnalogTriggerData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -49,7 +51,7 @@ class AnalogTriggerData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_initialized{0};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::atomic<double> m_triggerLowerBound{0};

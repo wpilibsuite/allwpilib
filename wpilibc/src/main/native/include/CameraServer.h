@@ -11,13 +11,13 @@
 
 #include <atomic>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <vector>
 
 #include <llvm/DenseMap.h>
 #include <llvm/StringMap.h>
 #include <llvm/StringRef.h>
+#include <support/mutex.h>
 
 #include "ErrorBase.h"
 #include "cscore.h"
@@ -300,7 +300,7 @@ class CameraServer : public ErrorBase {
 
   static constexpr char const* kPublishName = "/CameraPublisher";
 
-  std::mutex m_mutex;
+  wpi::mutex m_mutex;
   std::atomic<int> m_defaultUsbDevice;
   std::string m_primarySourceName;
   llvm::StringMap<cs::VideoSource> m_sources;

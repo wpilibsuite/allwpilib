@@ -34,7 +34,7 @@ int32_t I2CData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -69,7 +69,7 @@ int32_t I2CData::RegisterReadCallback(HAL_BufferCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_readCallbacks =
         RegisterCallback(m_readCallbacks, "Read", callback, param, &newUid);
   }
@@ -86,7 +86,7 @@ int32_t I2CData::RegisterWriteCallback(HAL_BufferCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_writeCallbacks =
         RegisterCallback(m_writeCallbacks, "Write", callback, param, &newUid);
   }
@@ -99,11 +99,11 @@ void I2CData::CancelWriteCallback(int32_t uid) {
 
 void I2CData::Write(int32_t deviceAddress, uint8_t* dataToSend,
                     int32_t sendSize) {
-  std::lock_guard<std::mutex> lock(m_dataMutex);
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
   InvokeCallback(m_writeCallbacks, "Write", dataToSend, sendSize);
 }
 void I2CData::Read(int32_t deviceAddress, uint8_t* buffer, int32_t count) {
-  std::lock_guard<std::mutex> lock(m_dataMutex);
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
   InvokeCallback(m_readCallbacks, "Read", buffer, count);
 }
 

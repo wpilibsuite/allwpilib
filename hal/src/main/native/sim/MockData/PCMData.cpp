@@ -38,7 +38,7 @@ int32_t PCMData::RegisterSolenoidInitializedCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_solenoidInitializedCallbacks[channel] =
         RegisterCallback(m_solenoidInitializedCallbacks[channel],
                          "SolenoidInitialized", callback, param, &newUid);
@@ -84,7 +84,7 @@ int32_t PCMData::RegisterSolenoidOutputCallback(int32_t channel,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_solenoidOutputCallbacks[channel] =
         RegisterCallback(m_solenoidOutputCallbacks[channel], "SolenoidOutput",
                          callback, param, &newUid);
@@ -123,7 +123,7 @@ int32_t PCMData::RegisterCompressorInitializedCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_compressorInitializedCallbacks =
         RegisterCallback(m_compressorInitializedCallbacks,
                          "CompressorInitialized", callback, param, &newUid);
@@ -162,7 +162,7 @@ int32_t PCMData::RegisterCompressorOnCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_compressorOnCallbacks = RegisterCallback(
         m_compressorOnCallbacks, "CompressorOn", callback, param, &newUid);
   }
@@ -198,7 +198,7 @@ int32_t PCMData::RegisterClosedLoopEnabledCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_closedLoopEnabledCallbacks =
         RegisterCallback(m_closedLoopEnabledCallbacks, "ClosedLoopEnabled",
                          callback, param, &newUid);
@@ -236,7 +236,7 @@ int32_t PCMData::RegisterPressureSwitchCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_pressureSwitchCallbacks = RegisterCallback(
         m_pressureSwitchCallbacks, "PressureSwitch", callback, param, &newUid);
   }
@@ -272,7 +272,7 @@ int32_t PCMData::RegisterCompressorCurrentCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_compressorCurrentCallbacks =
         RegisterCallback(m_compressorCurrentCallbacks, "CompressorCurrent",
                          callback, param, &newUid);

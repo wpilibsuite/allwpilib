@@ -10,7 +10,8 @@
 #include <stdint.h>
 
 #include <memory>
-#include <mutex>
+
+#include <support/mutex.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/Ports.h"
@@ -27,7 +28,7 @@ static const uint32_t kAccumulatorChannels[] = {0, 1};
 
 extern std::unique_ptr<tAI> analogInputSystem;
 extern std::unique_ptr<tAO> analogOutputSystem;
-extern std::mutex analogRegisterWindowMutex;
+extern wpi::mutex analogRegisterWindowMutex;
 extern bool analogSampleRateSet;
 
 struct AnalogPort {

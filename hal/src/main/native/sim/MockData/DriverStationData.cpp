@@ -49,7 +49,7 @@ void DriverStationData::ResetData() {
   m_dsAttachedCallbacks = nullptr;
 
   {
-    std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+    std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
     m_joystickAxes = std::make_unique<HAL_JoystickAxes[]>(6);
     m_joystickPOVs = std::make_unique<HAL_JoystickPOVs[]>(6);
     m_joystickButtons = std::make_unique<HAL_JoystickButtons[]>(6);
@@ -66,7 +66,7 @@ void DriverStationData::ResetData() {
     }
   }
   {
-    std::lock_guard<std::mutex> lock(m_matchInfoMutex);
+    std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
 
     m_matchInfo = std::make_unique<MatchInfoDataStore>();
   }
@@ -79,7 +79,7 @@ int32_t DriverStationData::RegisterEnabledCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_enabledCallbacks = RegisterCallback(m_enabledCallbacks, "Enabled",
                                           callback, param, &newUid);
   }
@@ -114,7 +114,7 @@ int32_t DriverStationData::RegisterAutonomousCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_autonomousCallbacks = RegisterCallback(
         m_autonomousCallbacks, "Autonomous", callback, param, &newUid);
   }
@@ -150,7 +150,7 @@ int32_t DriverStationData::RegisterTestCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_testCallbacks =
         RegisterCallback(m_testCallbacks, "Test", callback, param, &newUid);
   }
@@ -186,7 +186,7 @@ int32_t DriverStationData::RegisterEStopCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_eStopCallbacks =
         RegisterCallback(m_eStopCallbacks, "EStop", callback, param, &newUid);
   }
@@ -221,7 +221,7 @@ int32_t DriverStationData::RegisterFmsAttachedCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_fmsAttachedCallbacks = RegisterCallback(
         m_fmsAttachedCallbacks, "FmsAttached", callback, param, &newUid);
   }
@@ -256,7 +256,7 @@ int32_t DriverStationData::RegisterDsAttachedCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_dsAttachedCallbacks = RegisterCallback(
         m_dsAttachedCallbacks, "DsAttached", callback, param, &newUid);
   }
@@ -291,7 +291,7 @@ int32_t DriverStationData::RegisterAllianceStationIdCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_allianceStationIdCallbacks =
         RegisterCallback(m_allianceStationIdCallbacks, "AllianceStationId",
                          callback, param, &newUid);
@@ -332,7 +332,7 @@ int32_t DriverStationData::RegisterMatchTimeCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_matchTimeCallbacks = RegisterCallback(m_matchTimeCallbacks, "MatchTime",
                                             callback, param, &newUid);
   }
@@ -363,22 +363,22 @@ void DriverStationData::SetMatchTime(double matchTime) {
 
 void DriverStationData::GetJoystickAxes(int32_t joystickNum,
                                         HAL_JoystickAxes* axes) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   *axes = m_joystickAxes[joystickNum];
 }
 void DriverStationData::GetJoystickPOVs(int32_t joystickNum,
                                         HAL_JoystickPOVs* povs) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   *povs = m_joystickPOVs[joystickNum];
 }
 void DriverStationData::GetJoystickButtons(int32_t joystickNum,
                                            HAL_JoystickButtons* buttons) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   *buttons = m_joystickButtons[joystickNum];
 }
 void DriverStationData::GetJoystickDescriptor(
     int32_t joystickNum, HAL_JoystickDescriptor* descriptor) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   *descriptor = m_joystickDescriptor[joystickNum];
   // Always ensure name is null terminated
   descriptor->name[255] = '\0';
@@ -387,13 +387,13 @@ void DriverStationData::GetJoystickOutputs(int32_t joystickNum,
                                            int64_t* outputs,
                                            int32_t* leftRumble,
                                            int32_t* rightRumble) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   *leftRumble = m_joystickOutputs[joystickNum].leftRumble;
   *outputs = m_joystickOutputs[joystickNum].outputs;
   *rightRumble = m_joystickOutputs[joystickNum].rightRumble;
 }
 void DriverStationData::GetMatchInfo(HAL_MatchInfo* info) {
-  std::lock_guard<std::mutex> lock(m_matchInfoMutex);
+  std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
   auto eventLen = m_matchInfo->eventName.size();
   info->eventName = static_cast<char*>(std::malloc(eventLen + 1));
   std::memcpy(info->eventName, m_matchInfo->eventName.c_str(), eventLen);
@@ -414,37 +414,37 @@ void DriverStationData::FreeMatchInfo(const HAL_MatchInfo* info) {
 
 void DriverStationData::SetJoystickAxes(int32_t joystickNum,
                                         const HAL_JoystickAxes* axes) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   m_joystickAxes[joystickNum] = *axes;
 }
 void DriverStationData::SetJoystickPOVs(int32_t joystickNum,
                                         const HAL_JoystickPOVs* povs) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   m_joystickPOVs[joystickNum] = *povs;
 }
 void DriverStationData::SetJoystickButtons(int32_t joystickNum,
                                            const HAL_JoystickButtons* buttons) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   m_joystickButtons[joystickNum] = *buttons;
 }
 
 void DriverStationData::SetJoystickDescriptor(
     int32_t joystickNum, const HAL_JoystickDescriptor* descriptor) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   m_joystickDescriptor[joystickNum] = *descriptor;
 }
 
 void DriverStationData::SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                            int32_t leftRumble,
                                            int32_t rightRumble) {
-  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_joystickDataMutex);
   m_joystickOutputs[joystickNum].leftRumble = leftRumble;
   m_joystickOutputs[joystickNum].outputs = outputs;
   m_joystickOutputs[joystickNum].rightRumble = rightRumble;
 }
 
 void DriverStationData::SetMatchInfo(const HAL_MatchInfo* info) {
-  std::lock_guard<std::mutex> lock(m_matchInfoMutex);
+  std::lock_guard<wpi::mutex> lock(m_matchInfoMutex);
   m_matchInfo->eventName = info->eventName;
   m_matchInfo->gameSpecificMessage = info->gameSpecificMessage;
   m_matchInfo->matchNumber = info->matchNumber;

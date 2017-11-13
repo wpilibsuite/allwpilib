@@ -10,9 +10,10 @@
 #include <stdint.h>
 
 #include <memory>
-#include <mutex>
 #include <string>
 #include <vector>
+
+#include <support/mutex.h>
 
 #include "ErrorBase.h"
 
@@ -43,9 +44,9 @@ class Resource : public ErrorBase {
 
  private:
   std::vector<bool> m_isAllocated;
-  std::mutex m_allocateMutex;
+  wpi::mutex m_allocateMutex;
 
-  static std::mutex m_createMutex;
+  static wpi::mutex m_createMutex;
 };
 
 }  // namespace frc

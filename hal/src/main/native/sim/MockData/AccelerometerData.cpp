@@ -32,7 +32,7 @@ int32_t AccelerometerData::RegisterActiveCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_activeCallbacks =
         RegisterCallback(m_activeCallbacks, "Active", callback, param, &newUid);
   }
@@ -68,7 +68,7 @@ int32_t AccelerometerData::RegisterRangeCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_rangeCallbacks =
         RegisterCallback(m_rangeCallbacks, "Range", callback, param, &newUid);
   }
@@ -104,7 +104,7 @@ int32_t AccelerometerData::RegisterXCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_xCallbacks =
         RegisterCallback(m_xCallbacks, "X", callback, param, &newUid);
   }
@@ -140,7 +140,7 @@ int32_t AccelerometerData::RegisterYCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_yCallbacks =
         RegisterCallback(m_yCallbacks, "Y", callback, param, &newUid);
   }
@@ -176,7 +176,7 @@ int32_t AccelerometerData::RegisterZCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_zCallbacks =
         RegisterCallback(m_zCallbacks, "Z", callback, param, &newUid);
   }

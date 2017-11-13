@@ -28,7 +28,7 @@ int32_t DigitalPWMData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -64,7 +64,7 @@ int32_t DigitalPWMData::RegisterDutyCycleCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_dutyCycleCallbacks = RegisterCallback(m_dutyCycleCallbacks, "DutyCycle",
                                             callback, param, &newUid);
   }
@@ -100,7 +100,7 @@ int32_t DigitalPWMData::RegisterPinCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_pinCallbacks =
         RegisterCallback(m_pinCallbacks, "Pin", callback, param, &newUid);
   }

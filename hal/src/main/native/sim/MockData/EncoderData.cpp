@@ -38,7 +38,7 @@ int32_t EncoderData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -74,7 +74,7 @@ int32_t EncoderData::RegisterCountCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_countCallbacks =
         RegisterCallback(m_countCallbacks, "Count", callback, param, &newUid);
   }
@@ -110,7 +110,7 @@ int32_t EncoderData::RegisterPeriodCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_periodCallbacks =
         RegisterCallback(m_periodCallbacks, "Period", callback, param, &newUid);
   }
@@ -146,7 +146,7 @@ int32_t EncoderData::RegisterResetCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_resetCallbacks =
         RegisterCallback(m_resetCallbacks, "Reset", callback, param, &newUid);
   }
@@ -182,7 +182,7 @@ int32_t EncoderData::RegisterMaxPeriodCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_maxPeriodCallbacks = RegisterCallback(m_maxPeriodCallbacks, "MaxPeriod",
                                             callback, param, &newUid);
   }
@@ -218,7 +218,7 @@ int32_t EncoderData::RegisterDirectionCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_directionCallbacks = RegisterCallback(m_directionCallbacks, "Direction",
                                             callback, param, &newUid);
   }
@@ -253,7 +253,7 @@ int32_t EncoderData::RegisterReverseDirectionCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_reverseDirectionCallbacks =
         RegisterCallback(m_reverseDirectionCallbacks, "ReverseDirection",
                          callback, param, &newUid);
@@ -290,7 +290,7 @@ int32_t EncoderData::RegisterSamplesToAverageCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_samplesToAverageCallbacks =
         RegisterCallback(m_samplesToAverageCallbacks, "SamplesToAverage",
                          callback, param, &newUid);

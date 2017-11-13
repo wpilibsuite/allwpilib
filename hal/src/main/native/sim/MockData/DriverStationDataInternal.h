@@ -11,6 +11,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/DriverStationData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -103,7 +105,7 @@ class DriverStationData {
   void NotifyNewData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_enabled{false};
   std::shared_ptr<NotifyListenerVector> m_enabledCallbacks = nullptr;
   std::atomic<HAL_Bool> m_autonomous{false};
@@ -122,8 +124,8 @@ class DriverStationData {
   std::atomic<double> m_matchTime{0.0};
   std::shared_ptr<NotifyListenerVector> m_matchTimeCallbacks = nullptr;
 
-  std::mutex m_joystickDataMutex;
-  std::mutex m_matchInfoMutex;
+  wpi::mutex m_joystickDataMutex;
+  wpi::mutex m_matchInfoMutex;
 
   std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxes;
   std::unique_ptr<HAL_JoystickPOVs[]> m_joystickPOVs;
