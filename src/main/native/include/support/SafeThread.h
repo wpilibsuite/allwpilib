@@ -34,7 +34,7 @@ class SafeThreadProxyBase {
  public:
   SafeThreadProxyBase(SafeThread* thr) : m_thread(thr) {
     if (!m_thread) return;
-    std::unique_lock<std::mutex>(m_thread->m_mutex).swap(m_lock);
+    m_lock = std::unique_lock<std::mutex>(m_thread->m_mutex);
     if (!m_thread->m_active) {
       m_lock.unlock();
       m_thread = nullptr;
