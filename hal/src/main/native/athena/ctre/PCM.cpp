@@ -1,6 +1,6 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 
-#include "ctre/PCM.h"
+#include "PCM.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
 /* This can be a constant, as long as nobody needs to update solenoids within
