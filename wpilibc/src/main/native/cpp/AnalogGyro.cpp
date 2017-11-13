@@ -20,12 +20,6 @@
 
 using namespace frc;
 
-const int AnalogGyro::kOversampleBits;
-const int AnalogGyro::kAverageBits;
-constexpr double AnalogGyro::kSamplesPerSecond;
-constexpr double AnalogGyro::kCalibrationSampleTime;
-constexpr double AnalogGyro::kDefaultVoltsPerDegreePerSecond;
-
 /**
  * Gyro constructor using the Analog Input channel number.
  *

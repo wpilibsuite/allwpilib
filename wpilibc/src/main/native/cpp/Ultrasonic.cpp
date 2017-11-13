@@ -19,17 +19,7 @@
 
 using namespace frc;
 
-// Time (sec) for the ping trigger pulse.
-constexpr double Ultrasonic::kPingTime;
-
-// Priority that the ultrasonic round robin task runs.
-const int Ultrasonic::kPriority;
-
-// Max time (ms) between readings.
-constexpr double Ultrasonic::kMaxUltrasonicTime;
-constexpr double Ultrasonic::kSpeedOfSoundInchesPerSec;
-
-// Automatic round robin mode.
+// Automatic round robin mode
 std::atomic<bool> Ultrasonic::m_automaticEnabled{false};
 
 std::set<Ultrasonic*> Ultrasonic::m_sensors;

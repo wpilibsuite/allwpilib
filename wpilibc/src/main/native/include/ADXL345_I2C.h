@@ -59,10 +59,10 @@ class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
  protected:
   I2C m_i2c;
 
-  static const int kAddress = 0x1D;
-  static const int kPowerCtlRegister = 0x2D;
-  static const int kDataFormatRegister = 0x31;
-  static const int kDataRegister = 0x32;
+  static constexpr int kAddress = 0x1D;
+  static constexpr int kPowerCtlRegister = 0x2D;
+  static constexpr int kDataFormatRegister = 0x31;
+  static constexpr int kDataRegister = 0x32;
   static constexpr double kGsPerLSB = 0.00390625;
 
   enum PowerCtlFields {

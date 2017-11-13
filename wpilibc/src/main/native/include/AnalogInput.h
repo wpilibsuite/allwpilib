@@ -40,9 +40,9 @@ class AnalogInput : public SensorBase,
   friend class AnalogGyro;
 
  public:
-  static const int kAccumulatorModuleNumber = 1;
-  static const int kAccumulatorNumChannels = 2;
-  static const int kAccumulatorChannels[kAccumulatorNumChannels];
+  static constexpr int kAccumulatorModuleNumber = 1;
+  static constexpr int kAccumulatorNumChannels = 2;
+  static constexpr int kAccumulatorChannels[kAccumulatorNumChannels] = {0, 1};
 
   explicit AnalogInput(int channel);
   virtual ~AnalogInput();

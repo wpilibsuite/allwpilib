@@ -32,9 +32,7 @@ struct MatchInfoData {
 
 using namespace frc;
 
-const double JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL = 1.0;
-
-const int DriverStation::kJoystickPorts;
+static constexpr double kJoystickUnpluggedMessageInterval = 1.0;
 
 DriverStation::~DriverStation() {
   m_isRunning = false;
@@ -721,7 +719,7 @@ void DriverStation::ReportJoystickUnpluggedError(llvm::StringRef message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportError(message);
-    m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+    m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
   }
 }
 
@@ -734,7 +732,7 @@ void DriverStation::ReportJoystickUnpluggedWarning(llvm::StringRef message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportWarning(message);
-    m_nextMessageTime = currentTime + JOYSTICK_UNPLUGGED_MESSAGE_INTERVAL;
+    m_nextMessageTime = currentTime + kJoystickUnpluggedMessageInterval;
   }
 }
 

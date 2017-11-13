@@ -80,7 +80,7 @@ class Ultrasonic : public SensorBase,
   static constexpr double kPingTime = 10 * 1e-6;
 
   // Priority that the ultrasonic round robin task runs.
-  static const int kPriority = 64;
+  static constexpr int kPriority = 64;
 
   // Max time (ms) between readings.
   static constexpr double kMaxUltrasonicTime = 0.1;

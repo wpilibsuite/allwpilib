@@ -32,8 +32,8 @@ class AnalogInput;
  */
 class AnalogGyro : public GyroBase {
  public:
-  static const int kOversampleBits = 10;
-  static const int kAverageBits = 0;
+  static constexpr int kOversampleBits = 10;
+  static constexpr int kAverageBits = 0;
   static constexpr double kSamplesPerSecond = 50.0;
   static constexpr double kCalibrationSampleTime = 5.0;
   static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
