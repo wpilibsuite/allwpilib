@@ -5,12 +5,34 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <cstdlib>
+#include <cstring>
+#include <string>
+
 #include "DriverStationDataInternal.h"
+#include "HAL/cpp/make_unique.h"
 #include "MockData/NotifyCallbackHelpers.h"
+
+namespace hal {
+struct JoystickOutputStore {
+  int64_t outputs = 0;
+  int32_t leftRumble = 0;
+  int32_t rightRumble = 0;
+};
+struct MatchInfoDataStore {
+  std::string eventName;
+  std::string gameSpecificMessage;
+  int32_t replayNumber = 0;
+  int32_t matchNumber = 0;
+  HAL_MatchType matchType = HAL_MatchType::HAL_kMatchType_none;
+};
+}  // namespace hal
 
 using namespace hal;
 
 DriverStationData hal::SimDriverStationData;
+
+DriverStationData::DriverStationData() { ResetData(); }
 
 void DriverStationData::ResetData() {
   m_enabled = false;
@@ -25,6 +47,29 @@ void DriverStationData::ResetData() {
   m_fmsAttachedCallbacks = nullptr;
   m_dsAttached = false;
   m_dsAttachedCallbacks = nullptr;
+
+  {
+    std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+    m_joystickAxes = std::make_unique<HAL_JoystickAxes[]>(6);
+    m_joystickPOVs = std::make_unique<HAL_JoystickPOVs[]>(6);
+    m_joystickButtons = std::make_unique<HAL_JoystickButtons[]>(6);
+    m_joystickOutputs = std::make_unique<JoystickOutputStore[]>(6);
+    m_joystickDescriptor = std::make_unique<HAL_JoystickDescriptor[]>(6);
+
+    for (int i = 0; i < 6; i++) {
+      m_joystickAxes[i].count = 0;
+      m_joystickPOVs[i].count = 0;
+      m_joystickButtons[i].count = 0;
+      m_joystickDescriptor[i].isXbox = 0;
+      m_joystickDescriptor[i].type = -1;
+      m_joystickDescriptor[i].name[0] = '\0';
+    }
+  }
+  {
+    std::lock_guard<std::mutex> lock(m_matchInfoMutex);
+
+    m_matchInfo = std::make_unique<MatchInfoDataStore>();
+  }
 }
 
 int32_t DriverStationData::RegisterEnabledCallback(HAL_NotifyCallback callback,
@@ -316,6 +361,97 @@ void DriverStationData::SetMatchTime(double matchTime) {
   }
 }
 
+void DriverStationData::GetJoystickAxes(int32_t joystickNum,
+                                        HAL_JoystickAxes* axes) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  *axes = m_joystickAxes[joystickNum];
+}
+void DriverStationData::GetJoystickPOVs(int32_t joystickNum,
+                                        HAL_JoystickPOVs* povs) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  *povs = m_joystickPOVs[joystickNum];
+}
+void DriverStationData::GetJoystickButtons(int32_t joystickNum,
+                                           HAL_JoystickButtons* buttons) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  *buttons = m_joystickButtons[joystickNum];
+}
+void DriverStationData::GetJoystickDescriptor(
+    int32_t joystickNum, HAL_JoystickDescriptor* descriptor) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  *descriptor = m_joystickDescriptor[joystickNum];
+  // Always ensure name is null terminated
+  descriptor->name[255] = '\0';
+}
+void DriverStationData::GetJoystickOutputs(int32_t joystickNum,
+                                           int64_t* outputs,
+                                           int32_t* leftRumble,
+                                           int32_t* rightRumble) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  *leftRumble = m_joystickOutputs[joystickNum].leftRumble;
+  *outputs = m_joystickOutputs[joystickNum].outputs;
+  *rightRumble = m_joystickOutputs[joystickNum].rightRumble;
+}
+void DriverStationData::GetMatchInfo(HAL_MatchInfo* info) {
+  std::lock_guard<std::mutex> lock(m_matchInfoMutex);
+  auto eventLen = m_matchInfo->eventName.size();
+  info->eventName = static_cast<char*>(std::malloc(eventLen + 1));
+  std::memcpy(info->eventName, m_matchInfo->eventName.c_str(), eventLen);
+  auto gameLen = m_matchInfo->gameSpecificMessage.size();
+  info->gameSpecificMessage = static_cast<char*>(std::malloc(gameLen + 1));
+  std::memcpy(info->gameSpecificMessage,
+              m_matchInfo->gameSpecificMessage.c_str(), gameLen);
+  info->gameSpecificMessage[gameLen] = '\0';
+  info->eventName[eventLen] = '\0';
+  info->matchNumber = m_matchInfo->matchNumber;
+  info->replayNumber = m_matchInfo->replayNumber;
+  info->matchType = m_matchInfo->matchType;
+}
+void DriverStationData::FreeMatchInfo(const HAL_MatchInfo* info) {
+  std::free(info->eventName);
+  std::free(info->gameSpecificMessage);
+}
+
+void DriverStationData::SetJoystickAxes(int32_t joystickNum,
+                                        const HAL_JoystickAxes* axes) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  m_joystickAxes[joystickNum] = *axes;
+}
+void DriverStationData::SetJoystickPOVs(int32_t joystickNum,
+                                        const HAL_JoystickPOVs* povs) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  m_joystickPOVs[joystickNum] = *povs;
+}
+void DriverStationData::SetJoystickButtons(int32_t joystickNum,
+                                           const HAL_JoystickButtons* buttons) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  m_joystickButtons[joystickNum] = *buttons;
+}
+
+void DriverStationData::SetJoystickDescriptor(
+    int32_t joystickNum, const HAL_JoystickDescriptor* descriptor) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  m_joystickDescriptor[joystickNum] = *descriptor;
+}
+
+void DriverStationData::SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
+                                           int32_t leftRumble,
+                                           int32_t rightRumble) {
+  std::lock_guard<std::mutex> lock(m_joystickDataMutex);
+  m_joystickOutputs[joystickNum].leftRumble = leftRumble;
+  m_joystickOutputs[joystickNum].outputs = outputs;
+  m_joystickOutputs[joystickNum].rightRumble = rightRumble;
+}
+
+void DriverStationData::SetMatchInfo(const HAL_MatchInfo* info) {
+  std::lock_guard<std::mutex> lock(m_matchInfoMutex);
+  m_matchInfo->eventName = info->eventName;
+  m_matchInfo->gameSpecificMessage = info->gameSpecificMessage;
+  m_matchInfo->matchNumber = info->matchNumber;
+  m_matchInfo->matchType = info->matchType;
+  m_matchInfo->replayNumber = info->replayNumber;
+}
+
 void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
 
 extern "C" {
@@ -443,6 +579,33 @@ double HALSIM_GetDriverStationMatchTime() {
 }
 void HALSIM_SetDriverStationMatchTime(double matchTime) {
   SimDriverStationData.SetMatchTime(matchTime);
+}
+
+void HALSIM_SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes* axes) {
+  SimDriverStationData.SetJoystickAxes(joystickNum, axes);
+}
+
+void HALSIM_SetJoystickPOVs(int32_t joystickNum, const HAL_JoystickPOVs* povs) {
+  SimDriverStationData.SetJoystickPOVs(joystickNum, povs);
+}
+
+void HALSIM_SetJoystickButtons(int32_t joystickNum,
+                               const HAL_JoystickButtons* buttons) {
+  SimDriverStationData.SetJoystickButtons(joystickNum, buttons);
+}
+void HALSIM_SetJoystickDescriptor(int32_t joystickNum,
+                                  const HAL_JoystickDescriptor* descriptor) {
+  SimDriverStationData.SetJoystickDescriptor(joystickNum, descriptor);
+}
+
+void HALSIM_GetJoystickOutputs(int32_t joystickNum, int64_t* outputs,
+                               int32_t* leftRumble, int32_t* rightRumble) {
+  SimDriverStationData.GetJoystickOutputs(joystickNum, outputs, leftRumble,
+                                          rightRumble);
+}
+
+void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {
+  SimDriverStationData.SetMatchInfo(info);
 }
 
 void HALSIM_NotifyDriverStationNewData(void) {

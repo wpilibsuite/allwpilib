@@ -12,6 +12,8 @@ test-reports
 
 # IntelliJ
 *.iml
+*.ipr
+*.iws
 .idea/
 
 # Created by http://www.gitignore.io

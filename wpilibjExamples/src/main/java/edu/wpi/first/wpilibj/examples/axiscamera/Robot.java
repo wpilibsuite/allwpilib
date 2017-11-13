@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.vision.axiscamera;
+package edu.wpi.first.wpilibj.examples.axiscamera;
 
 import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CvSink;

@@ -10,10 +10,10 @@
 #include "../Robot.h"
 
 CloseClaw::CloseClaw() {
-	Requires(Robot::collector.get());
+	Requires(&Robot::collector);
 }
 
 // Called just before this Command runs the first time
 void CloseClaw::Initialize() {
-	Robot::collector->Close();
+	Robot::collector.Close();
 }

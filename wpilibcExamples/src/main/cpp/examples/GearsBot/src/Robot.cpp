@@ -9,22 +9,22 @@
 
 #include <iostream>
 
-std::shared_ptr<DriveTrain> Robot::drivetrain = std::make_shared<DriveTrain>();
-std::shared_ptr<Elevator> Robot::elevator = std::make_shared<Elevator>();
-std::shared_ptr<Wrist> Robot::wrist = std::make_shared<Wrist>();
-std::shared_ptr<Claw> Robot::claw = std::make_shared<Claw>();
-std::unique_ptr<OI> Robot::oi = std::make_unique<OI>();
+DriveTrain Robot::drivetrain;
+Elevator Robot::elevator;
+Wrist Robot::wrist;
+Claw Robot::claw;
+OI Robot::oi;
 
 void Robot::RobotInit() {
 	// Show what command your subsystem is running on the SmartDashboard
-	frc::SmartDashboard::PutData(drivetrain.get());
-	frc::SmartDashboard::PutData(elevator.get());
-	frc::SmartDashboard::PutData(wrist.get());
-	frc::SmartDashboard::PutData(claw.get());
+	frc::SmartDashboard::PutData(&drivetrain);
+	frc::SmartDashboard::PutData(&elevator);
+	frc::SmartDashboard::PutData(&wrist);
+	frc::SmartDashboard::PutData(&claw);
 }
 
 void Robot::AutonomousInit() {
-	autonomousCommand.Start();
+	m_autonomousCommand.Start();
 	std::cout << "Starting Auto" << std::endl;
 }
 
@@ -37,7 +37,7 @@ void Robot::TeleopInit() {
 	// teleop starts running. If you want the autonomous to
 	// continue until interrupted by another command, remove
 	// this line or comment it out.
-	autonomousCommand.Cancel();
+	m_autonomousCommand.Cancel();
 	std::cout << "Starting Teleop" << std::endl;
 }
 
@@ -46,7 +46,7 @@ void Robot::TeleopPeriodic() {
 }
 
 void Robot::TestPeriodic() {
-	lw->Run();
+	m_lw.Run();
 }
 
 START_ROBOT_CLASS(Robot)

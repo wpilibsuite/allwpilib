@@ -154,6 +154,7 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
   if (valueReverse) return kReverse;
   return kOff;
 }
+
 /**
  * Check if the forward solenoid is blacklisted.
  *
@@ -165,8 +166,9 @@ DoubleSolenoid::Value DoubleSolenoid::Get() const {
  */
 bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
   int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
-  return (blackList & m_forwardMask) ? 1 : 0;
+  return (blackList & m_forwardMask) != 0;
 }
+
 /**
  * Check if the reverse solenoid is blacklisted.
  *
@@ -178,7 +180,7 @@ bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
  */
 bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
   int blackList = GetPCMSolenoidBlackList(m_moduleNumber);
-  return (blackList & m_reverseMask) ? 1 : 0;
+  return (blackList & m_reverseMask) != 0;
 }
 
 void DoubleSolenoid::UpdateTable() {

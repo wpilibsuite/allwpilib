@@ -22,7 +22,7 @@ def outputsFolder = file("$project.buildDir/outputs")
 
 task cppExamplesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'examples'
+    baseName = 'wpilibc-examples'
 
     from(licenseFile) {
         into '/'
@@ -31,11 +31,15 @@ task cppExamplesZip(type: Zip) {
     from('src/main/cpp/examples') {
         into 'examples'
     }
+
+    from ('examples.xml') {
+        into 'examples'
+    }
 }
 
 task cppTemplatesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'templates'
+    baseName = 'wpilibc-templates'
 
     from(licenseFile) {
         into '/'

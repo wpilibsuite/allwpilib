@@ -1,4 +1,4 @@
-sudo: false
+sudo: true
 dist: trusty
 language: java
 
@@ -10,7 +10,12 @@ addons:
       - g++-6
       - python3
       - python3-pip
-      - clang-format-3.8
+
+before_install:
+  - sudo sh -c 'echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" > /etc/apt/sources.list.d/llvm.list'
+  - wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+  - sudo apt-get update -q || true
+  - sudo apt-get install clang-format-5.0 -y
 
 install:
   - pip3 install --user wpiformat
@@ -28,6 +33,6 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - wpiformat -y 2017 -clang 3.8
+  - wpiformat -y 2017 -clang 5.0
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
   - ./gradlew --no-daemon --console=plain -PskipAthena :hal:halSimSharedLibrary :wpilibc:wpilibcSharedLibrary :wpilibj:wpilibJNISharedSharedLibrary :wpilibj:jar

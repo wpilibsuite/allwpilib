@@ -43,10 +43,10 @@ public:
 	void WritePressure();
 
 private:
-	frc::AnalogInput pressureSensor{3};
+	frc::AnalogInput m_pressureSensor{3};
 
 #ifndef SIMULATION
-	frc::Compressor compressor{1};  // TODO: (1, 14, 1, 8);
+	frc::Compressor m_compressor{1};  // TODO: (1, 14, 1, 8);
 #endif
 
 	static constexpr double kMaxPressure = 2.55;

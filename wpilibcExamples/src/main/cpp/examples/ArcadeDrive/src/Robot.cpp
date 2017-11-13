@@ -5,19 +5,25 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <WPILib.h>
+#include <Drive/DifferentialDrive.h>
+#include <IterativeRobot.h>
+#include <Joystick.h>
+#include <Spark.h>
 
 /**
- * This is a demo program showing the use of the RobotDrive class.
+ * This is a demo program showing the use of the DifferentialDrive class.
  * Runs the motors with arcade steering.
  */
 class Robot : public frc::IterativeRobot {
-	frc::RobotDrive myRobot{0, 1};
-	frc::Joystick stick{0};
+	frc::Spark m_leftMotor{0};
+	frc::Spark m_rightMotor{1};
+	frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
+	frc::Joystick m_stick{0};
 
 public:
 	void TeleopPeriodic() {
-		myRobot.ArcadeDrive(stick);  // drive with arcade style
+		// drive with arcade style
+		m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
 	}
 };
 

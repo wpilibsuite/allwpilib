@@ -5,25 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <memory>
-
 #include <Commands/Command.h>
 #include <Commands/Scheduler.h>
-#include <IterativeRobot.h>
 #include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SendableChooser.h>
 #include <SmartDashboard/SmartDashboard.h>
+#include <TimedRobot.h>
 
 #include "Commands/ExampleCommand.h"
+#include "Commands/MyAutoCommand.h"
 
-class Robot : public frc::IterativeRobot {
+class Robot : public frc::TimedRobot {
 public:
 	void RobotInit() override {
-		defaultAuto.reset(new ExampleCommand());
-		chooser.AddDefault("Default Auto", defaultAuto.get());
-		// myAuto.reset(new MyAutoCommand());
-		// chooser.AddObject("My Auto", myAuto.get());
-		frc::SmartDashboard::PutData("Auto Modes", &chooser);
+		m_chooser.AddDefault("Default Auto", &m_defaultAuto);
+		m_chooser.AddObject("My Auto", &m_myAuto);
+		frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
 	}
 
 	/**
@@ -54,19 +51,18 @@ public:
 	 * to the if-else structure below with additional strings & commands.
 	 */
 	void AutonomousInit() override {
-		/* std::string autoSelected =
-		frc::SmartDashboard::GetString("Auto Selector", "Default");
+		std::string autoSelected = frc::SmartDashboard::GetString(
+				"Auto Selector", "Default");
 		if (autoSelected == "My Auto") {
-			autonomousCommand.reset(new MyAutoCommand());
+			m_autonomousCommand = &m_myAuto;
+		} else {
+			m_autonomousCommand = &m_defaultAuto;
 		}
-		else {
-			autonomousCommand.reset(new ExampleCommand());
-		} */
 
-		autonomousCommand = chooser.GetSelected();
+		m_autonomousCommand = m_chooser.GetSelected();
 
-		if (autonomousCommand != nullptr) {
-			autonomousCommand->Start();
+		if (m_autonomousCommand != nullptr) {
+			m_autonomousCommand->Start();
 		}
 	}
 
@@ -79,9 +75,9 @@ public:
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
 		// this line or comment it out.
-		if (autonomousCommand != nullptr) {
-			autonomousCommand->Cancel();
-			autonomousCommand = nullptr;
+		if (m_autonomousCommand != nullptr) {
+			m_autonomousCommand->Cancel();
+			m_autonomousCommand = nullptr;
 		}
 	}
 
@@ -92,10 +88,10 @@ public:
 private:
 	// Have it null by default so that if testing teleop it
 	// doesn't have undefined behavior and potentially crash.
-	frc::Command* autonomousCommand = nullptr;
-	std::unique_ptr<frc::Command> defaultAuto;
-	// std::unique_ptr<frc::Command> myAuto;
-	frc::SendableChooser<frc::Command*> chooser;
+	frc::Command* m_autonomousCommand = nullptr;
+	ExampleCommand m_defaultAuto;
+	MyAutoCommand m_myAuto;
+	frc::SendableChooser<frc::Command*> m_chooser;
 };
 
 START_ROBOT_CLASS(Robot)

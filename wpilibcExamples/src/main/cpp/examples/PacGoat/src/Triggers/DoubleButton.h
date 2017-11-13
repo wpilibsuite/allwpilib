@@ -20,7 +20,7 @@ public:
 	bool Get();
 
 private:
-	frc::Joystick* joy;
-	int button1;
-	int button2;
+	frc::Joystick& m_joy;
+	int m_button1;
+	int m_button2;
 };

@@ -19,24 +19,39 @@ using namespace hal;
 static inline int32_t GetMaxPositivePwm(DigitalPort* port) {
   return port->maxPwm;
 }
+
 static inline int32_t GetMinPositivePwm(DigitalPort* port) {
-  return port->eliminateDeadband ? port->deadbandMaxPwm : port->centerPwm + 1;
+  if (port->eliminateDeadband) {
+    return port->deadbandMaxPwm;
+  } else {
+    return port->centerPwm + 1;
+  }
 }
+
 static inline int32_t GetCenterPwm(DigitalPort* port) {
   return port->centerPwm;
 }
+
 static inline int32_t GetMaxNegativePwm(DigitalPort* port) {
-  return port->eliminateDeadband ? port->deadbandMinPwm : port->centerPwm - 1;
+  if (port->eliminateDeadband) {
+    return port->deadbandMinPwm;
+  } else {
+    return port->centerPwm - 1;
+  }
 }
+
 static inline int32_t GetMinNegativePwm(DigitalPort* port) {
   return port->minPwm;
 }
+
 static inline int32_t GetPositiveScaleFactor(DigitalPort* port) {
   return GetMaxPositivePwm(port) - GetMinPositivePwm(port);
 }  ///< The scale for positive speeds.
+
 static inline int32_t GetNegativeScaleFactor(DigitalPort* port) {
   return GetMaxNegativePwm(port) - GetMinNegativePwm(port);
 }  ///< The scale for negative speeds.
+
 static inline int32_t GetFullRangeScaleFactor(DigitalPort* port) {
   return GetMaxPositivePwm(port) - GetMinNegativePwm(port);
 }  ///< The scale for positions.

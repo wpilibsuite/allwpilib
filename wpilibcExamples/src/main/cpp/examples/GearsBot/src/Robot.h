@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <Commands/Command.h>
 #include <IterativeRobot.h>
 #include <LiveWindow/LiveWindow.h>
@@ -22,15 +20,15 @@
 
 class Robot : public frc::IterativeRobot {
 public:
-	static std::shared_ptr<DriveTrain> drivetrain;
-	static std::shared_ptr<Elevator> elevator;
-	static std::shared_ptr<Wrist> wrist;
-	static std::shared_ptr<Claw> claw;
-	static std::unique_ptr<OI> oi;
+	static DriveTrain drivetrain;
+	static Elevator elevator;
+	static Wrist wrist;
+	static Claw claw;
+	static OI oi;
 
 private:
-	Autonomous autonomousCommand;
-	frc::LiveWindow* lw = frc::LiveWindow::GetInstance();
+	Autonomous m_autonomousCommand;
+	frc::LiveWindow& m_lw = *frc::LiveWindow::GetInstance();
 
 	void RobotInit() override;
 	void AutonomousInit() override;

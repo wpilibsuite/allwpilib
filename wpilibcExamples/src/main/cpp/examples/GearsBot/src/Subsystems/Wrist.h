@@ -9,7 +9,7 @@
 
 #include <AnalogPotentiometer.h>
 #include <Commands/PIDSubsystem.h>
-#include <Victor.h>
+#include <Spark.h>
 
 /**
  * The wrist subsystem is like the elevator, but with a rotational joint instead
@@ -40,14 +40,14 @@ public:
 	void UsePIDOutput(double d) override;
 
 private:
-	frc::Victor motor{6};
+	frc::Spark m_motor{6};
 
 // Conversion value of potentiometer varies between the real world and
 // simulation
 #ifndef SIMULATION
-	frc::AnalogPotentiometer pot{3, -270.0 / 5};
+	frc::AnalogPotentiometer m_pot{3, -270.0 / 5};
 #else
-	frc::AnalogPotentiometer pot{3};  // Defaults to degrees
+	frc::AnalogPotentiometer m_pot{3};  // Defaults to degrees
 #endif
 
 	static constexpr double kP_real = 1;

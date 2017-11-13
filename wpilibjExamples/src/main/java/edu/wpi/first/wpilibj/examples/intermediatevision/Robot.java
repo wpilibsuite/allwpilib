@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj.examples.vision.intermediatevision;
+package edu.wpi.first.wpilibj.examples.intermediatevision;
 
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.CvSource;

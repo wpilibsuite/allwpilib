@@ -31,9 +31,7 @@ class GenericHID;
  * function (intended for hand created drive code, such as autonomous) or with
  * the Tank/Arcade functions intended to be used for Operator Control driving.
  */
-class WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
-    RobotDrive : public MotorSafety,
-                 public ErrorBase {
+class RobotDrive : public MotorSafety, public ErrorBase {
  public:
   enum MotorType {
     kFrontLeftMotor = 0,
@@ -42,17 +40,25 @@ class WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
     kRearRightMotor = 3
   };
 
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(int leftMotorChannel, int rightMotorChannel);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(int frontLeftMotorChannel, int rearLeftMotorChannel,
              int frontRightMotorChannel, int rearRightMotorChannel);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(SpeedController* leftMotor, SpeedController* rightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(SpeedController& leftMotor, SpeedController& rightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(std::shared_ptr<SpeedController> leftMotor,
              std::shared_ptr<SpeedController> rightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(SpeedController* frontLeftMotor, SpeedController* rearLeftMotor,
              SpeedController* frontRightMotor, SpeedController* rearRightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(SpeedController& frontLeftMotor, SpeedController& rearLeftMotor,
              SpeedController& frontRightMotor, SpeedController& rearRightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,
              std::shared_ptr<SpeedController> rearLeftMotor,
              std::shared_ptr<SpeedController> frontRightMotor,

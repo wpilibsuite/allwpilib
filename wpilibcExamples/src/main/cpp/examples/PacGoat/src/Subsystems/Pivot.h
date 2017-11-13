@@ -10,7 +10,7 @@
 #include <AnalogPotentiometer.h>
 #include <Commands/PIDSubsystem.h>
 #include <DigitalInput.h>
-#include <Victor.h>
+#include <Spark.h>
 
 /**
  * The Pivot subsystem contains the Van-door motor and the pot for PID control
@@ -61,14 +61,14 @@ private:
 	// Subsystem devices
 
 	// Sensors for measuring the position of the pivot
-	frc::DigitalInput upperLimitSwitch{13};
-	frc::DigitalInput lowerLimitSwitch{12};
+	frc::DigitalInput m_upperLimitSwitch{13};
+	frc::DigitalInput m_lowerLimitSwitch{12};
 
 	/* 0 degrees is vertical facing up.
 	 * Angle increases the more forward the pivot goes.
 	 */
-	frc::AnalogPotentiometer pot{1};
+	frc::AnalogPotentiometer m_pot{1};
 
 	// Motor to move the pivot
-	frc::Victor motor{5};
+	frc::Spark m_motor{5};
 };

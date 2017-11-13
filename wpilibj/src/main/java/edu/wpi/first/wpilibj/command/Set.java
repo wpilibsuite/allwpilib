@@ -34,6 +34,10 @@ class Set {
     }
   }
 
+  public void clear() {
+      m_set.clear();
+  }
+
   public boolean contains(Object o) {
     return m_set.contains(o);
   }

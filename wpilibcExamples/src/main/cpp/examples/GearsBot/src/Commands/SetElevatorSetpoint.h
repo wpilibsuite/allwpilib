@@ -23,5 +23,5 @@ public:
 	bool IsFinished() override;
 
 private:
-	double setpoint;
+	double m_setpoint;
 };

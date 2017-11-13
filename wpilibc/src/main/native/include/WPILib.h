@@ -55,6 +55,7 @@
 #include "IterativeRobot.h"
 #include "Jaguar.h"
 #include "Joystick.h"
+#include "NidecBrushless.h"
 #include "Notifier.h"
 #include "PIDController.h"
 #include "PIDOutput.h"

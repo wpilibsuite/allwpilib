@@ -29,11 +29,6 @@ static int newDSDataAvailableCounter{0};
 using namespace hal;
 
 extern "C" {
-int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
-                         int32_t waitMs) {
-  return 0;
-}
-
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
@@ -104,15 +99,18 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
+  SimDriverStationData.GetJoystickAxes(joystickNum, axes);
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
+  SimDriverStationData.GetJoystickPOVs(joystickNum, povs);
   return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
+  SimDriverStationData.GetJoystickButtons(joystickNum, buttons);
   return 0;
 }
 /**
@@ -128,16 +126,29 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
  */
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
+  SimDriverStationData.GetJoystickDescriptor(joystickNum, desc);
   return 0;
 }
 
-HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) { return false; }
+HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
+  HAL_JoystickDescriptor desc;
+  SimDriverStationData.GetJoystickDescriptor(joystickNum, &desc);
+  return desc.isXbox;
+}
 
-int32_t HAL_GetJoystickType(int32_t joystickNum) { return 0; }
+int32_t HAL_GetJoystickType(int32_t joystickNum) {
+  HAL_JoystickDescriptor desc;
+  SimDriverStationData.GetJoystickDescriptor(joystickNum, &desc);
+  return desc.type;
+}
 
 char* HAL_GetJoystickName(int32_t joystickNum) {
-  char* name = static_cast<char*>(std::malloc(1));
-  name[0] = '\0';
+  HAL_JoystickDescriptor desc;
+  SimDriverStationData.GetJoystickDescriptor(joystickNum, &desc);
+  size_t len = std::strlen(desc.name);
+  char* name = static_cast<char*>(std::malloc(len + 1));
+  std::strncpy(name, desc.name, len);
+  name[len] = '\0';
   return name;
 }
 
@@ -147,6 +158,8 @@ int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) { return 0; }
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble) {
+  SimDriverStationData.SetJoystickOutputs(joystickNum, outputs, leftRumble,
+                                          rightRumble);
   return 0;
 }
 
@@ -155,20 +168,12 @@ double HAL_GetMatchTime(int32_t* status) {
 }
 
 int HAL_GetMatchInfo(HAL_MatchInfo* info) {
-  info->eventName = static_cast<char*>(std::malloc(1));
-  info->eventName[0] = '\0';
-  info->matchNumber = 0;
-  info->replayNumber = 0;
-  info->gameSpecificMessage = static_cast<char*>(std::malloc(1));
-  info->gameSpecificMessage[0] = '\0';
+  SimDriverStationData.GetMatchInfo(info);
   return 0;
 }
 
 void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
-  std::free(info->eventName);
-  std::free(info->gameSpecificMessage);
-  info->eventName = nullptr;
-  info->gameSpecificMessage = nullptr;
+  SimDriverStationData.FreeMatchInfo(info);
 }
 
 void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }

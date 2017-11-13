@@ -17,77 +17,70 @@
 DriveTrain::DriveTrain()
     : frc::Subsystem("DriveTrain") {
 	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Left
-	// CIM", &frontLeftCIM);
+	// CIM", &m_frontLeftCIM);
 	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front
-	// Right CIM", &frontRightCIM);
+	// Right CIM", &m_frontRightCIM);
 	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Left
-	// CIM", &backLeftCIM);
+	// CIM", &m_backLeftCIM);
 	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Right
-	// CIM", &backRightCIM);
+	// CIM", &m_backRightCIM);
 
-	// Configure the RobotDrive to reflect the fact that all our motors are
-	// wired backwards and our drivers sensitivity preferences.
-	drive.SetSafetyEnabled(false);
-	drive.SetExpiration(0.1);
-	drive.SetSensitivity(0.5);
-	drive.SetMaxOutput(1.0);
-	drive.SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
-	drive.SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
-	drive.SetInvertedMotor(RobotDrive::kFrontRightMotor, true);
-	drive.SetInvertedMotor(RobotDrive::kRearRightMotor, true);
+	// Configure the DifferentialDrive to reflect the fact that all our
+	// motors are wired backwards and our drivers sensitivity preferences.
+	m_robotDrive.SetSafetyEnabled(false);
+	m_robotDrive.SetExpiration(0.1);
+	m_robotDrive.SetMaxOutput(1.0);
+	m_leftCIMs.SetInverted(true);
+	m_rightCIMs.SetInverted(true);
 
 	// Configure encoders
-	rightEncoder->SetPIDSourceType(PIDSourceType::kDisplacement);
-	leftEncoder->SetPIDSourceType(PIDSourceType::kDisplacement);
+	m_rightEncoder.SetPIDSourceType(PIDSourceType::kDisplacement);
+	m_leftEncoder.SetPIDSourceType(PIDSourceType::kDisplacement);
 
 #ifndef SIMULATION
 	// Converts to feet
-	rightEncoder->SetDistancePerPulse(0.0785398);
-	leftEncoder->SetDistancePerPulse(0.0785398);
+	m_rightEncoder.SetDistancePerPulse(0.0785398);
+	m_leftEncoder.SetDistancePerPulse(0.0785398);
 #else
 	// Convert to feet 4in diameter wheels with 360 tick simulated encoders
-	rightEncoder->SetDistancePerPulse(
+	m_rightEncoder.SetDistancePerPulse(
 			(4.0 /*in*/ * M_PI) / (360.0 * 12.0 /*in/ft*/));
-	leftEncoder->SetDistancePerPulse(
+	m_leftEncoder.SetDistancePerPulse(
 			(4.0 /*in*/ * M_PI) / (360.0 * 12.0 /*in/ft*/));
 #endif
 
 	LiveWindow::GetInstance()->AddSensor(
-			"DriveTrain", "Right Encoder", rightEncoder);
+			"DriveTrain", "Right Encoder", m_rightEncoder);
 	LiveWindow::GetInstance()->AddSensor(
-			"DriveTrain", "Left Encoder", leftEncoder);
+			"DriveTrain", "Left Encoder", m_leftEncoder);
 
 // Configure gyro
 #ifndef SIMULATION
-	gyro.SetSensitivity(0.007);  // TODO: Handle more gracefully?
+	m_gyro.SetSensitivity(0.007);  // TODO: Handle more gracefully?
 #endif
-	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Gyro", &gyro);
+	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Gyro", &m_gyro);
 }
 
 void DriveTrain::InitDefaultCommand() {
 	SetDefaultCommand(new DriveWithJoystick());
 }
 
-void DriveTrain::TankDrive(Joystick* joy) {
-	drive.TankDrive(joy->GetY(), joy->GetRawAxis(4));
-}
-
 void DriveTrain::TankDrive(double leftAxis, double rightAxis) {
-	drive.TankDrive(leftAxis, rightAxis);
+	m_robotDrive.TankDrive(leftAxis, rightAxis);
 }
 
 void DriveTrain::Stop() {
-	drive.TankDrive(0.0, 0.0);
+	m_robotDrive.TankDrive(0.0, 0.0);
 }
 
-std::shared_ptr<Encoder> DriveTrain::GetLeftEncoder() {
-	return leftEncoder;
+Encoder& DriveTrain::GetLeftEncoder() {
+	return m_leftEncoder;
 }
 
-std::shared_ptr<Encoder> DriveTrain::GetRightEncoder() {
-	return rightEncoder;
+Encoder& DriveTrain::GetRightEncoder() {
+	return m_rightEncoder;
 }
 
 double DriveTrain::GetAngle() {
-	return gyro.GetAngle();
+	return m_gyro.GetAngle();
 }

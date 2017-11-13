@@ -18,19 +18,19 @@ Claw::Claw()
 void Claw::InitDefaultCommand() {}
 
 void Claw::Open() {
-	motor.Set(-1);
+	m_motor.Set(-1);
 }
 
 void Claw::Close() {
-	motor.Set(1);
+	m_motor.Set(1);
 }
 
 void Claw::Stop() {
-	motor.Set(0);
+	m_motor.Set(0);
 }
 
 bool Claw::IsGripping() {
-	return contact.Get();
+	return m_contact.Get();
 }
 
 void Claw::Log() {}

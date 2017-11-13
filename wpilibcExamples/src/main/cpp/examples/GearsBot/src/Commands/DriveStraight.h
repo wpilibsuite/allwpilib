@@ -8,12 +8,9 @@
 #pragma once
 
 #include <Commands/Command.h>
+#include <PIDController.h>
 #include <PIDOutput.h>
 #include <PIDSource.h>
-
-namespace frc {
-class PIDController;
-}  // namespace frc
 
 /**
  * Drive the given distance straight (negative values go backwards).
@@ -28,18 +25,20 @@ public:
 	bool IsFinished() override;
 	void End() override;
 
+	class DriveStraightPIDSource : public frc::PIDSource {
+	public:
+		virtual ~DriveStraightPIDSource() = default;
+		double PIDGet() override;
+	};
+
+	class DriveStraightPIDOutput : public frc::PIDOutput {
+	public:
+		virtual ~DriveStraightPIDOutput() = default;
+		void PIDWrite(double d) override;
+	};
+
 private:
-	frc::PIDController* pid;
-};
-
-class DriveStraightPIDSource : public PIDSource {
-public:
-	virtual ~DriveStraightPIDSource() = default;
-	double PIDGet() override;
-};
-
-class DriveStraightPIDOutput : public PIDOutput {
-public:
-	virtual ~DriveStraightPIDOutput() = default;
-	void PIDWrite(double d) override;
+	DriveStraightPIDSource m_source;
+	DriveStraightPIDOutput m_output;
+	frc::PIDController m_pid{4, 0, 0, &m_source, &m_output};
 };

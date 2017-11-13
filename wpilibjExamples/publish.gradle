@@ -22,7 +22,7 @@ def outputsFolder = file("$project.buildDir/outputs")
 
 task javaExamplesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'examples'
+    baseName = 'wpilibj-examples'
 
     from(licenseFile) {
         into '/'
@@ -31,11 +31,15 @@ task javaExamplesZip(type: Zip) {
     from('src/main/java/edu/wpi/first/wpilibj/examples') {
         into 'examples'
     }
+
+    from ('examples.xml') {
+        into 'examples'
+    }
 }
 
 task javaTemplatesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'templates'
+    baseName = 'wpilibj-templates'
 
     from(licenseFile) {
         into '/'

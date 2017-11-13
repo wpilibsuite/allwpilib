@@ -27,11 +27,11 @@ void SmartDashboard::init() {
 }
 
 /**
-   * Determines whether the given key is in this table.
-   *
-   * @param key the key to search for
-   * @return true if the table as a value assigned to the given key
-   */
+ * Determines whether the given key is in this table.
+ *
+ * @param key the key to search for
+ * @return true if the table as a value assigned to the given key
+ */
 bool SmartDashboard::ContainsKey(llvm::StringRef key) {
   return s_table->ContainsKey(key);
 }
@@ -182,11 +182,11 @@ bool SmartDashboard::PutValue(llvm::StringRef keyName,
 }
 
 /**
-   * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
-   */
+ * Gets the current value in the table, setting it if it does not exist.
+ * @param key the key
+ * @param defaultValue the default value to set if key doesn't exist.
+ * @returns False if the table key exists with a different type
+ */
 bool SmartDashboard::SetDefaultValue(llvm::StringRef key,
                                      std::shared_ptr<nt::Value> defaultValue) {
   return s_table->GetEntry(key).SetDefaultValue(defaultValue);
@@ -218,11 +218,11 @@ bool SmartDashboard::PutBoolean(llvm::StringRef keyName, bool value) {
 }
 
 /**
-   * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
-   */
+ * Gets the current value in the table, setting it if it does not exist.
+ * @param key the key
+ * @param defaultValue the default value to set if key doesn't exist.
+ * @returns False if the table key exists with a different type
+ */
 bool SmartDashboard::SetDefaultBoolean(llvm::StringRef key, bool defaultValue) {
   return s_table->GetEntry(key).SetDefaultBoolean(defaultValue);
 }
@@ -254,11 +254,11 @@ bool SmartDashboard::PutNumber(llvm::StringRef keyName, double value) {
 }
 
 /**
-   * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
-   */
+ * Gets the current value in the table, setting it if it does not exist.
+ * @param key the key
+ * @param defaultValue the default value to set if key doesn't exist.
+ * @returns False if the table key exists with a different type
+ */
 bool SmartDashboard::SetDefaultNumber(llvm::StringRef key,
                                       double defaultValue) {
   return s_table->GetEntry(key).SetDefaultDouble(defaultValue);
@@ -315,15 +315,15 @@ std::string SmartDashboard::GetString(llvm::StringRef keyName,
 }
 
 /**
-   * Put a boolean array in the table
-   * @param key the key to be assigned to
-   * @param value the value that will be assigned
-   * @return False if the table key already exists with a different type
-   *
-   * @note The array must be of int's rather than of bool's because
-   *       std::vector<bool> is special-cased in C++.  0 is false, any
-   *       non-zero value is true.
-   */
+ * Put a boolean array in the table
+ * @param key the key to be assigned to
+ * @param value the value that will be assigned
+ * @return False if the table key already exists with a different type
+ *
+ * @note The array must be of int's rather than of bool's because
+ *       std::vector<bool> is special-cased in C++.  0 is false, any
+ *       non-zero value is true.
+ */
 bool SmartDashboard::PutBooleanArray(llvm::StringRef key,
                                      llvm::ArrayRef<int> value) {
   return s_table->GetEntry(key).SetBooleanArray(value);

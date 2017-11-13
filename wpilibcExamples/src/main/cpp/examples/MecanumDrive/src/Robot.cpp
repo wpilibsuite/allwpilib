@@ -5,21 +5,22 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include <Drive/MecanumDrive.h>
 #include <IterativeRobot.h>
 #include <Joystick.h>
-#include <RobotDrive.h>
+#include <Spark.h>
 
 /**
- * This is a demo program showing how to use Mecanum control with the RobotDrive
- * class.
+ * This is a demo program showing how to use Mecanum control with the
+ * MecanumDrive class.
  */
 class Robot : public frc::IterativeRobot {
 public:
 	void RobotInit() {
 		// Invert the left side motors
 		// You may need to change or remove this to match your robot
-		robotDrive.SetInvertedMotor(RobotDrive::kFrontLeftMotor, true);
-		robotDrive.SetInvertedMotor(RobotDrive::kRearLeftMotor, true);
+		m_frontLeft.SetInverted(true);
+		m_rearLeft.SetInverted(true);
 	}
 
 	void TeleopPeriodic() override {
@@ -27,22 +28,26 @@ public:
 		 * forward
 		 * movement, and Z axis for rotation.
 		 */
-		robotDrive.MecanumDrive_Cartesian(
-				stick.GetX(), stick.GetY(), stick.GetZ());
+		m_robotDrive.DriveCartesian(
+				m_stick.GetX(), m_stick.GetY(), m_stick.GetZ());
 	}
 
 private:
-	static constexpr int kFrontLeftChannel = 2;
-	static constexpr int kRearLeftChannel = 3;
-	static constexpr int kFrontRightChannel = 1;
-	static constexpr int kRearRightChannel = 0;
+	static constexpr int kFrontLeftChannel = 0;
+	static constexpr int kRearLeftChannel = 1;
+	static constexpr int kFrontRightChannel = 2;
+	static constexpr int kRearRightChannel = 3;
 
 	static constexpr int kJoystickChannel = 0;
 
-	frc::RobotDrive robotDrive{kFrontLeftChannel, kRearLeftChannel,
-			kFrontRightChannel, kRearRightChannel};
+	frc::Spark m_frontLeft{kFrontLeftChannel};
+	frc::Spark m_rearLeft{kRearLeftChannel};
+	frc::Spark m_frontRight{kFrontRightChannel};
+	frc::Spark m_rearRight{kRearRightChannel};
+	frc::MecanumDrive m_robotDrive{
+			m_frontLeft, m_rearLeft, m_frontRight, m_rearRight};
 
-	frc::Joystick stick{kJoystickChannel};
+	frc::Joystick m_stick{kJoystickChannel};
 };
 
 START_ROBOT_CLASS(Robot)

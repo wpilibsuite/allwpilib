@@ -20,22 +20,22 @@
  */
 class Robot : public frc::IterativeRobot {
 public:
-	void RobotInit() override { pidController.SetInputRange(0, 5); }
+	void RobotInit() override { m_pidController.SetInputRange(0, 5); }
 
-	void TeleopInit() override { pidController.Enable(); }
+	void TeleopInit() override { m_pidController.Enable(); }
 
 	void TeleopPeriodic() override {
 		// when the button is pressed once, the selected elevator
 		// setpoint
 		// is incremented
-		bool currentButtonValue = joystick.GetTrigger();
-		if (currentButtonValue && !previousButtonValue) {
+		bool currentButtonValue = m_joystick.GetTrigger();
+		if (currentButtonValue && !m_previousButtonValue) {
 			// index of the elevator setpoint wraps around.
-			index = (index + 1) % (sizeof(kSetPoints) / 8);
+			m_index = (m_index + 1) % (sizeof(kSetPoints) / 8);
 		}
-		previousButtonValue = currentButtonValue;
+		m_previousButtonValue = currentButtonValue;
 
-		pidController.SetSetpoint(kSetPoints[index]);
+		m_pidController.SetSetpoint(kSetPoints[m_index]);
 	}
 
 private:
@@ -59,12 +59,12 @@ private:
 	static constexpr double kI = -0.02;
 	static constexpr double kD = -2.0;
 
-	int index = 0;
-	bool previousButtonValue = false;
+	int m_index = 0;
+	bool m_previousButtonValue = false;
 
-	frc::AnalogInput potentiometer{kPotChannel};
-	frc::Joystick joystick{kJoystickChannel};
-	frc::Spark elevatorMotor{kMotorChannel};
+	frc::AnalogInput m_potentiometer{kPotChannel};
+	frc::Joystick m_joystick{kJoystickChannel};
+	frc::Spark m_elevatorMotor{kMotorChannel};
 
 	/* potentiometer (AnalogInput) and elevatorMotor (Victor) can be used as
 	 * a
@@ -73,8 +73,8 @@ private:
 	 * to the PIDSource and PIDOutput, so you must use &potentiometer and
 	 * &elevatorMotor to get their pointers.
 	 */
-	frc::PIDController pidController{
-			kP, kI, kD, &potentiometer, &elevatorMotor};
+	frc::PIDController m_pidController{
+			kP, kI, kD, &m_potentiometer, &m_elevatorMotor};
 };
 
 constexpr std::array<double, 3> Robot::kSetPoints;
