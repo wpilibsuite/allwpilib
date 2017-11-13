@@ -19,7 +19,6 @@ if (!project.hasProperty('onlyAthena')) {
                 ext = 'zip'
                 version = '3.+'
                 sharedConfigs = [ halsim_adx_gyro_accelerometer: [] ]
-                staticConfigs = [ halsim_adx_gyro_accelerometerStaticDeps: [] ]
             }
         }
         exportsConfigs {
