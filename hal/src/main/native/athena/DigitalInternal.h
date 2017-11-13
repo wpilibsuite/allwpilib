@@ -10,7 +10,8 @@
 #include <stdint.h>
 
 #include <memory>
-#include <mutex>
+
+#include <support/mutex.h>
 
 #include "HAL/AnalogTrigger.h"
 #include "HAL/ChipObject.h"
@@ -59,7 +60,7 @@ constexpr int32_t kDefaultPwmStepsDown = 1000;
 constexpr int32_t kPwmDisabled = 0;
 
 // Create a mutex to protect changes to the DO PWM config
-extern std::mutex digitalPwmMutex;
+extern wpi::mutex digitalPwmMutex;
 
 extern std::unique_ptr<tDIO> digitalSystem;
 extern std::unique_ptr<tRelay> relaySystem;

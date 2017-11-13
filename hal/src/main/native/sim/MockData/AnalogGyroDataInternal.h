@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/AnalogGyroData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -40,7 +42,7 @@ class AnalogGyroData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<double> m_angle{0.0};
   std::shared_ptr<NotifyListenerVector> m_angleCallbacks = nullptr;
   std::atomic<double> m_rate{0.0};

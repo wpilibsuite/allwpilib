@@ -29,7 +29,7 @@ int32_t RelayData::RegisterInitializedForwardCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedForwardCallbacks =
         RegisterCallback(m_initializedForwardCallbacks, "InitializedForward",
                          callback, param, &newUid);
@@ -66,7 +66,7 @@ int32_t RelayData::RegisterInitializedReverseCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedReverseCallbacks =
         RegisterCallback(m_initializedReverseCallbacks, "InitializedReverse",
                          callback, param, &newUid);
@@ -104,7 +104,7 @@ int32_t RelayData::RegisterForwardCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_forwardCallbacks = RegisterCallback(m_forwardCallbacks, "Forward",
                                           callback, param, &newUid);
   }
@@ -140,7 +140,7 @@ int32_t RelayData::RegisterReverseCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_reverseCallbacks = RegisterCallback(m_reverseCallbacks, "Reverse",
                                           callback, param, &newUid);
   }

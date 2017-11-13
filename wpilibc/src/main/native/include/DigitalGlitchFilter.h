@@ -10,7 +10,8 @@
 #include <stdint.h>
 
 #include <array>
-#include <mutex>
+
+#include <support/mutex.h>
 
 #include "DigitalSource.h"
 
@@ -51,7 +52,7 @@ class DigitalGlitchFilter : public SensorBase {
   void DoAdd(DigitalSource* input, int requested_index);
 
   int m_channelIndex = -1;
-  static std::mutex m_mutex;
+  static wpi::mutex m_mutex;
   static std::array<bool, 3> m_filterAllocated;
 };
 

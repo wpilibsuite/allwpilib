@@ -8,19 +8,19 @@
 #include "HAL/handles/HandlesInternal.h"
 
 #include <algorithm>
-#include <mutex>
 
 #include <llvm/SmallVector.h>
+#include <support/mutex.h>
 
 namespace hal {
 static llvm::SmallVector<HandleBase*, 32> globalHandles;
-static std::mutex& GetGlobalHandleMutex() {
-  static std::mutex globalHandleMutex;
+static wpi::mutex& GetGlobalHandleMutex() {
+  static wpi::mutex globalHandleMutex;
   return globalHandleMutex;
 }
 
 HandleBase::HandleBase() {
-  std::lock_guard<std::mutex> lock(GetGlobalHandleMutex());
+  std::lock_guard<wpi::mutex> lock(GetGlobalHandleMutex());
   auto index = std::find(globalHandles.begin(), globalHandles.end(), this);
   if (index == globalHandles.end()) {
     globalHandles.push_back(this);
@@ -30,7 +30,7 @@ HandleBase::HandleBase() {
 }
 
 HandleBase::~HandleBase() {
-  std::lock_guard<std::mutex> lock(GetGlobalHandleMutex());
+  std::lock_guard<wpi::mutex> lock(GetGlobalHandleMutex());
   auto index = std::find(globalHandles.begin(), globalHandles.end(), this);
   if (index != globalHandles.end()) {
     *index = nullptr;
@@ -45,7 +45,7 @@ void HandleBase::ResetHandles() {
 }
 
 void HandleBase::ResetGlobalHandles() {
-  std::unique_lock<std::mutex> lock(GetGlobalHandleMutex());
+  std::unique_lock<wpi::mutex> lock(GetGlobalHandleMutex());
   for (auto&& i : globalHandles) {
     if (i != nullptr) {
       lock.unlock();

@@ -198,11 +198,11 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
 
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
-  static std::mutex initializeMutex;
+  static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return true;
 
-  std::lock_guard<std::mutex> lock(initializeMutex);
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
 

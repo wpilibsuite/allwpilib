@@ -23,7 +23,7 @@ class NotifierThread : public wpi::SafeThread {
  public:
   void Main() {
     int32_t status = 0;
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::unique_lock<wpi::mutex> lock(m_mutex);
     while (m_active) {
     startNotifierLoop:
       double waitTime = m_waitTime * 1e-6;

@@ -7,8 +7,9 @@
 
 #pragma once
 
-#include <mutex>
 #include <set>
+
+#include <support/mutex.h>
 
 #include "ErrorBase.h"
 
@@ -37,13 +38,13 @@ class MotorSafetyHelper : public ErrorBase {
   // the FPGA clock value when this motor has expired
   double m_stopTime;
   // protect accesses to the state for this object
-  mutable std::mutex m_syncMutex;
+  mutable wpi::mutex m_syncMutex;
   // the object that is using the helper
   MotorSafety* m_safeObject;
   // List of all existing MotorSafetyHelper objects.
   static std::set<MotorSafetyHelper*> m_helperList;
   // protect accesses to the list of helpers
-  static std::mutex m_listMutex;
+  static wpi::mutex m_listMutex;
 };
 
 }  // namespace frc

@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <mutex>
-
 #include <llvm/StringRef.h>
+#include <support/mutex.h>
 
 #include "Base.h"
 #include "Error.h"
@@ -115,7 +114,7 @@ class ErrorBase {
  protected:
   mutable Error m_error;
   // TODO: Replace globalError with a global list of all errors.
-  static std::mutex _globalErrorMutex;
+  static wpi::mutex _globalErrorMutex;
   static Error _globalError;
 };
 

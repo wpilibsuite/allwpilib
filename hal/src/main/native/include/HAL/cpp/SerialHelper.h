@@ -9,12 +9,12 @@
 
 #include <stdint.h>
 
-#include <mutex>
 #include <string>
 #include <vector>
 
 #include <llvm/SmallString.h>
 #include <llvm/SmallVector.h>
+#include <support/mutex.h>
 
 #include "HAL/SerialPort.h"
 
@@ -46,7 +46,7 @@ class SerialHelper {
 
   int32_t m_resourceHandle;
 
-  static std::mutex m_nameMutex;
+  static wpi::mutex m_nameMutex;
   static std::string m_usbNames[2];
 };
 }  // namespace hal
