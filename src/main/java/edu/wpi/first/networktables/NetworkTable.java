@@ -28,7 +28,10 @@ public final class NetworkTable {
   private final String pathWithSep;
   private final NetworkTableInstance inst;
 
-  public NetworkTable(NetworkTableInstance inst, String path) {
+  /**
+   * Constructor.  Use NetworkTableInstance.getTable() or getSubTable() instead.
+   */
+  NetworkTable(NetworkTableInstance inst, String path) {
     this.path = path;
     this.pathWithSep = path + PATH_SEPARATOR;
     this.inst = inst;

@@ -50,8 +50,15 @@ class NetworkTable final : public ITable {
   static bool s_running;
   static unsigned int s_port;
 
+  struct private_init {};
+  friend class NetworkTableInstance;
+
  public:
-  NetworkTable(NT_Inst inst, StringRef path);
+  /**
+   * Constructor.  Use NetworkTableInstance::GetTable() or GetSubTable()
+   * instead.
+   */
+  NetworkTable(NT_Inst inst, StringRef path, const private_init&);
   virtual ~NetworkTable();
 
   /**

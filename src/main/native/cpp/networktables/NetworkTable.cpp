@@ -124,7 +124,7 @@ std::shared_ptr<NetworkTable> NetworkTable::GetTable(StringRef key) {
   return NetworkTableInstance::GetDefault().GetTable(key);
 }
 
-NetworkTable::NetworkTable(NT_Inst inst, StringRef path)
+NetworkTable::NetworkTable(NT_Inst inst, StringRef path, const private_init&)
     : m_inst(inst), m_path(path) {}
 
 NetworkTable::~NetworkTable() {
@@ -282,7 +282,7 @@ std::shared_ptr<NetworkTable> NetworkTable::GetSubTable(StringRef key) const {
   llvm::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   path += key;
-  return std::make_shared<NetworkTable>(m_inst, path);
+  return std::make_shared<NetworkTable>(m_inst, path, private_init{});
 }
 
 bool NetworkTable::ContainsKey(StringRef key) const {

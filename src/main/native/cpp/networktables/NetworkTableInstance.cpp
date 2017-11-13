@@ -13,14 +13,17 @@ using namespace nt;
 std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
     StringRef key) const {
   if (key.empty() || key == "/") {
-    return std::make_shared<NetworkTable>(m_handle, "");
+    return std::make_shared<NetworkTable>(m_handle, "",
+                                          NetworkTable::private_init{});
   } else if (key[0] == NetworkTable::PATH_SEPARATOR_CHAR) {
-    return std::make_shared<NetworkTable>(m_handle, key);
+    return std::make_shared<NetworkTable>(m_handle, key,
+                                          NetworkTable::private_init{});
   } else {
     llvm::SmallString<128> path;
     path += NetworkTable::PATH_SEPARATOR_CHAR;
     path += key;
-    return std::make_shared<NetworkTable>(m_handle, path);
+    return std::make_shared<NetworkTable>(m_handle, path,
+                                          NetworkTable::private_init{});
   }
 }
 
