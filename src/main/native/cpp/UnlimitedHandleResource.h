@@ -9,13 +9,13 @@
 #define CSCORE_UNLIMITEDHANDLERESOURCE_H_
 
 #include <memory>
-#include <mutex>
 #include <utility>
 #include <vector>
 
 #include <llvm/ArrayRef.h>
 #include <llvm/SmallVector.h>
 #include <support/atomic_static.h>
+#include <support/mutex.h>
 
 namespace cs {
 
@@ -38,7 +38,7 @@ namespace cs {
 // @tparam typeValue The type value stored in the handle
 // @tparam TMutex The mutex type to use
 template <typename THandle, typename TStruct, int typeValue,
-          typename TMutex = std::mutex>
+          typename TMutex = wpi::mutex>
 class UnlimitedHandleResource {
  public:
   UnlimitedHandleResource(const UnlimitedHandleResource&) = delete;
@@ -164,7 +164,7 @@ UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::FindIf(F func) {
 }
 
 template <typename THandle, typename TStruct, int typeValue,
-          typename TMutex = std::mutex>
+          typename TMutex = wpi::mutex>
 class StaticUnlimitedHandleResource
     : public UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex> {
  public:

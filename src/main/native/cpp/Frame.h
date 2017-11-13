@@ -10,12 +10,12 @@
 
 #include <atomic>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <llvm/SmallVector.h>
+#include <support/mutex.h>
 
 #include "Image.h"
 #include "cscore_cpp.h"
@@ -34,7 +34,7 @@ class Frame {
   struct Impl {
     explicit Impl(SourceImpl& source_) : source(source_) {}
 
-    std::recursive_mutex mutex;
+    wpi::recursive_mutex mutex;
     std::atomic_int refcount{0};
     Time time{0};
     SourceImpl& source;
@@ -79,35 +79,35 @@ class Frame {
 
   int GetOriginalWidth() const {
     if (!m_impl) return 0;
-    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
     if (m_impl->images.empty()) return 0;
     return m_impl->images[0]->width;
   }
 
   int GetOriginalHeight() const {
     if (!m_impl) return 0;
-    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
     if (m_impl->images.empty()) return 0;
     return m_impl->images[0]->height;
   }
 
   int GetOriginalPixelFormat() const {
     if (!m_impl) return 0;
-    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
     if (m_impl->images.empty()) return 0;
     return m_impl->images[0]->pixelFormat;
   }
 
   Image* GetExistingImage(size_t i = 0) const {
     if (!m_impl) return nullptr;
-    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
     if (i >= m_impl->images.size()) return nullptr;
     return m_impl->images[i];
   }
 
   Image* GetExistingImage(int width, int height) const {
     if (!m_impl) return nullptr;
-    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
     for (auto i : m_impl->images) {
       if (i->Is(width, height)) return i;
     }
@@ -117,7 +117,7 @@ class Frame {
   Image* GetExistingImage(int width, int height,
                           VideoMode::PixelFormat pixelFormat) const {
     if (!m_impl) return nullptr;
-    std::lock_guard<std::recursive_mutex> lock(m_impl->mutex);
+    std::lock_guard<wpi::recursive_mutex> lock(m_impl->mutex);
     for (auto i : m_impl->images) {
       if (i->Is(width, height, pixelFormat)) return i;
     }

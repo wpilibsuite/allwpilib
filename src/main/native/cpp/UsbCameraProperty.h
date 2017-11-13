@@ -13,7 +13,8 @@
 #endif
 
 #include <memory>
-#include <mutex>
+
+#include <support/mutex.h>
 
 #include "PropertyImpl.h"
 
@@ -48,9 +49,9 @@ class UsbCameraProperty : public PropertyImpl {
 
   static std::unique_ptr<UsbCameraProperty> DeviceQuery(int fd, __u32* id);
 
-  bool DeviceGet(std::unique_lock<std::mutex>& lock, int fd);
-  bool DeviceSet(std::unique_lock<std::mutex>& lock, int fd) const;
-  bool DeviceSet(std::unique_lock<std::mutex>& lock, int fd, int newValue,
+  bool DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd);
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd) const;
+  bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd, int newValue,
                  llvm::StringRef newValueStr) const;
 #endif
 

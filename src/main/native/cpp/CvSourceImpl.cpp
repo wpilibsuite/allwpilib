@@ -43,7 +43,7 @@ bool CvSourceImpl::CacheProperties(CS_Status* status) const {
 }
 
 void CvSourceImpl::SetProperty(int property, int value, CS_Status* status) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = static_cast<PropertyData*>(GetProperty(property));
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -64,7 +64,7 @@ void CvSourceImpl::SetProperty(int property, int value, CS_Status* status) {
 
 void CvSourceImpl::SetStringProperty(int property, llvm::StringRef value,
                                      CS_Status* status) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = static_cast<PropertyData*>(GetProperty(property));
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -170,7 +170,7 @@ void CvSourceImpl::NotifyError(llvm::StringRef msg) {
 int CvSourceImpl::CreateProperty(llvm::StringRef name, CS_PropertyKind kind,
                                  int minimum, int maximum, int step,
                                  int defaultValue, int value) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   int& ndx = m_properties[name];
   if (ndx == 0) {
     // create a new index
@@ -204,7 +204,7 @@ int CvSourceImpl::CreateProperty(
 void CvSourceImpl::SetEnumPropertyChoices(int property,
                                           llvm::ArrayRef<std::string> choices,
                                           CS_Status* status) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;

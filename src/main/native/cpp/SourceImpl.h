@@ -9,16 +9,16 @@
 #define CSCORE_SOURCEIMPL_H_
 
 #include <atomic>
-#include <condition_variable>
 #include <cstddef>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <vector>
 
 #include <llvm/ArrayRef.h>
 #include <llvm/StringMap.h>
 #include <llvm/StringRef.h>
+#include <support/condition_variable.h>
+#include <support/mutex.h>
 
 #include "Frame.h"
 #include "Image.h"
@@ -189,7 +189,7 @@ class SourceImpl {
   // should not be called again)
   mutable std::atomic_bool m_properties_cached{false};
 
-  mutable std::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
 
  private:
   void ReleaseImage(std::unique_ptr<Image> image);
@@ -199,13 +199,13 @@ class SourceImpl {
   std::string m_name;
   std::string m_description;
 
-  std::mutex m_frameMutex;
-  std::condition_variable m_frameCv;
+  wpi::mutex m_frameMutex;
+  wpi::condition_variable m_frameCv;
 
   bool m_destroyFrames{false};
 
   // Pool of frames/images to reduce malloc traffic.
-  std::mutex m_poolMutex;
+  wpi::mutex m_poolMutex;
   std::vector<std::unique_ptr<Frame::Impl>> m_framesAvail;
   std::vector<std::unique_ptr<Image>> m_imagesAvail;
 

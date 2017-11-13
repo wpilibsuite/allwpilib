@@ -38,13 +38,13 @@ SourceImpl::~SourceImpl() {
 }
 
 void SourceImpl::SetDescription(llvm::StringRef description) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   m_description = description;
 }
 
 llvm::StringRef SourceImpl::GetDescription(
     llvm::SmallVectorImpl<char>& buf) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return llvm::StringRef{buf.data(), buf.size()};
 }
@@ -58,24 +58,24 @@ void SourceImpl::SetConnected(bool connected) {
 }
 
 uint64_t SourceImpl::GetCurFrameTime() {
-  std::unique_lock<std::mutex> lock{m_frameMutex};
+  std::unique_lock<wpi::mutex> lock{m_frameMutex};
   return m_frame.GetTime();
 }
 
 Frame SourceImpl::GetCurFrame() {
-  std::unique_lock<std::mutex> lock{m_frameMutex};
+  std::unique_lock<wpi::mutex> lock{m_frameMutex};
   return m_frame;
 }
 
 Frame SourceImpl::GetNextFrame() {
-  std::unique_lock<std::mutex> lock{m_frameMutex};
+  std::unique_lock<wpi::mutex> lock{m_frameMutex};
   auto oldTime = m_frame.GetTime();
   m_frameCv.wait(lock, [=] { return m_frame.GetTime() != oldTime; });
   return m_frame;
 }
 
 Frame SourceImpl::GetNextFrame(double timeout) {
-  std::unique_lock<std::mutex> lock{m_frameMutex};
+  std::unique_lock<wpi::mutex> lock{m_frameMutex};
   auto oldTime = m_frame.GetTime();
   if (!m_frameCv.wait_for(
           lock, std::chrono::milliseconds(static_cast<int>(timeout * 1000)),
@@ -87,7 +87,7 @@ Frame SourceImpl::GetNextFrame(double timeout) {
 
 void SourceImpl::Wakeup() {
   {
-    std::lock_guard<std::mutex> lock{m_frameMutex};
+    std::lock_guard<wpi::mutex> lock{m_frameMutex};
     m_frame = Frame{*this, llvm::StringRef{}, 0};
   }
   m_frameCv.notify_all();
@@ -97,7 +97,7 @@ int SourceImpl::GetPropertyIndex(llvm::StringRef name) const {
   // We can't fail, so instead we create a new index if caching fails.
   CS_Status status = 0;
   if (!m_properties_cached) CacheProperties(&status);
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   int& ndx = m_properties[name];
   if (ndx == 0) {
     // create a new index
@@ -111,7 +111,7 @@ llvm::ArrayRef<int> SourceImpl::EnumerateProperties(
     llvm::SmallVectorImpl<int>& vec, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return llvm::ArrayRef<int>{};
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   for (int i = 0; i < static_cast<int>(m_propertyData.size()); ++i) {
     if (m_propertyData[i]) vec.push_back(i + 1);
   }
@@ -121,7 +121,7 @@ llvm::ArrayRef<int> SourceImpl::EnumerateProperties(
 CS_PropertyKind SourceImpl::GetPropertyKind(int property) const {
   CS_Status status = 0;
   if (!m_properties_cached && !CacheProperties(&status)) return CS_PROP_NONE;
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) return CS_PROP_NONE;
   return prop->propKind;
@@ -132,7 +132,7 @@ llvm::StringRef SourceImpl::GetPropertyName(int property,
                                             CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return llvm::StringRef{};
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -144,7 +144,7 @@ llvm::StringRef SourceImpl::GetPropertyName(int property,
 
 int SourceImpl::GetProperty(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -160,7 +160,7 @@ int SourceImpl::GetProperty(int property, CS_Status* status) const {
 
 int SourceImpl::GetPropertyMin(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -171,7 +171,7 @@ int SourceImpl::GetPropertyMin(int property, CS_Status* status) const {
 
 int SourceImpl::GetPropertyMax(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -182,7 +182,7 @@ int SourceImpl::GetPropertyMax(int property, CS_Status* status) const {
 
 int SourceImpl::GetPropertyStep(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -193,7 +193,7 @@ int SourceImpl::GetPropertyStep(int property, CS_Status* status) const {
 
 int SourceImpl::GetPropertyDefault(int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return 0;
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -207,7 +207,7 @@ llvm::StringRef SourceImpl::GetStringProperty(int property,
                                               CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return llvm::StringRef{};
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -226,7 +226,7 @@ std::vector<std::string> SourceImpl::GetEnumPropertyChoices(
     int property, CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return std::vector<std::string>{};
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto prop = GetProperty(property);
   if (!prop) {
     *status = CS_INVALID_PROPERTY;
@@ -241,7 +241,7 @@ std::vector<std::string> SourceImpl::GetEnumPropertyChoices(
 
 VideoMode SourceImpl::GetVideoMode(CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status)) return VideoMode{};
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   return m_mode;
 }
 
@@ -272,7 +272,7 @@ std::vector<VideoMode> SourceImpl::EnumerateVideoModes(
     CS_Status* status) const {
   if (!m_properties_cached && !CacheProperties(status))
     return std::vector<VideoMode>{};
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   return m_videoModes;
 }
 
@@ -280,7 +280,7 @@ std::unique_ptr<Image> SourceImpl::AllocImage(
     VideoMode::PixelFormat pixelFormat, int width, int height, size_t size) {
   std::unique_ptr<Image> image;
   {
-    std::lock_guard<std::mutex> lock{m_poolMutex};
+    std::lock_guard<wpi::mutex> lock{m_poolMutex};
     // find the smallest existing frame that is at least big enough.
     int found = -1;
     for (size_t i = 0; i < m_imagesAvail.size(); ++i) {
@@ -328,7 +328,7 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
 void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
   // Update frame
   {
-    std::lock_guard<std::mutex> lock{m_frameMutex};
+    std::lock_guard<wpi::mutex> lock{m_frameMutex};
     m_frame = Frame{*this, std::move(image), time};
   }
 
@@ -339,7 +339,7 @@ void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
 void SourceImpl::PutError(llvm::StringRef msg, Frame::Time time) {
   // Update frame
   {
-    std::lock_guard<std::mutex> lock{m_frameMutex};
+    std::lock_guard<wpi::mutex> lock{m_frameMutex};
     m_frame = Frame{*this, msg, time};
   }
 
@@ -377,7 +377,7 @@ void SourceImpl::UpdatePropertyValue(int property, bool setString, int value,
 }
 
 void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
-  std::lock_guard<std::mutex> lock{m_poolMutex};
+  std::lock_guard<wpi::mutex> lock{m_poolMutex};
   if (m_destroyFrames) return;
   // Return the frame to the pool.  First try to find an empty slot, otherwise
   // add it to the end.
@@ -399,7 +399,7 @@ void SourceImpl::ReleaseImage(std::unique_ptr<Image> image) {
 }
 
 std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
-  std::lock_guard<std::mutex> lock{m_poolMutex};
+  std::lock_guard<wpi::mutex> lock{m_poolMutex};
 
   if (m_framesAvail.empty()) return llvm::make_unique<Frame::Impl>(*this);
 
@@ -409,7 +409,7 @@ std::unique_ptr<Frame::Impl> SourceImpl::AllocFrameImpl() {
 }
 
 void SourceImpl::ReleaseFrameImpl(std::unique_ptr<Frame::Impl> impl) {
-  std::lock_guard<std::mutex> lock{m_poolMutex};
+  std::lock_guard<wpi::mutex> lock{m_poolMutex};
   if (m_destroyFrames) return;
   m_framesAvail.push_back(std::move(impl));
 }

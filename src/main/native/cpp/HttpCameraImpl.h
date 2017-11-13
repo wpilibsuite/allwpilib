@@ -9,7 +9,6 @@
 #define CSCORE_HTTPCAMERAIMPL_H_
 
 #include <atomic>
-#include <condition_variable>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -20,6 +19,7 @@
 #include <llvm/SmallString.h>
 #include <llvm/StringMap.h>
 #include <support/HttpUtil.h>
+#include <support/condition_variable.h>
 #include <support/raw_istream.h>
 
 #include "SourceImpl.h"
@@ -128,10 +128,10 @@ class HttpCameraImpl : public SourceImpl {
   size_t m_nextLocation{0};
   int m_prefLocation{-1};  // preferred location
 
-  std::condition_variable m_sinkEnabledCond;
+  wpi::condition_variable m_sinkEnabledCond;
 
   llvm::StringMap<llvm::SmallString<16>> m_settings;
-  std::condition_variable m_settingsCond;
+  wpi::condition_variable m_settingsCond;
 
   llvm::StringMap<llvm::SmallString<16>> m_streamSettings;
   std::atomic_bool m_streamSettingsUpdated{false};

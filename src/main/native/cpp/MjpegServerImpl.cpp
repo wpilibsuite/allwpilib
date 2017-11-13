@@ -96,18 +96,18 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   llvm::StringRef GetName() { return m_name; }
 
   std::shared_ptr<SourceImpl> GetSource() {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     return m_source;
   }
 
   void StartStream() {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     m_source->EnableSink();
     m_streaming = true;
   }
 
   void StopStream() {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     m_source->DisableSink();
     m_streaming = false;
   }
@@ -783,7 +783,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
 
 // worker thread for clients that connected to this server
 void MjpegServerImpl::ConnThread::Main() {
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   while (m_active) {
     while (!m_stream) {
       m_cond.wait(lock);
@@ -816,7 +816,7 @@ void MjpegServerImpl::ServerThreadMain() {
 
     auto source = GetSource();
 
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     // Find unoccupied worker thread, or create one if necessary
     auto it = std::find_if(m_connThreads.begin(), m_connThreads.end(),
                            [](const wpi::SafeThreadOwner<ConnThread>& owner) {
@@ -853,7 +853,7 @@ void MjpegServerImpl::ServerThreadMain() {
 }
 
 void MjpegServerImpl::SetSourceImpl(std::shared_ptr<SourceImpl> source) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   for (auto& connThread : m_connThreads) {
     if (auto thr = connThread.GetThread()) {
       if (thr->m_source != source) {

@@ -9,10 +9,10 @@
 #define CSCORE_SINKIMPL_H_
 
 #include <memory>
-#include <mutex>
 #include <string>
 
 #include <llvm/StringRef.h>
+#include <support/mutex.h>
 
 #include "SourceImpl.h"
 
@@ -39,7 +39,7 @@ class SinkImpl {
   void SetSource(std::shared_ptr<SourceImpl> source);
 
   std::shared_ptr<SourceImpl> GetSource() const {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     return m_source;
   }
 
@@ -49,7 +49,7 @@ class SinkImpl {
  protected:
   virtual void SetSourceImpl(std::shared_ptr<SourceImpl> source);
 
-  mutable std::mutex m_mutex;
+  mutable wpi::mutex m_mutex;
 
  private:
   std::string m_name;

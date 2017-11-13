@@ -22,6 +22,8 @@
 #include <llvm/STLExtras.h>
 #include <llvm/SmallVector.h>
 #include <llvm/raw_ostream.h>
+#include <support/condition_variable.h>
+#include <support/mutex.h>
 #include <support/raw_istream.h>
 
 #include "SourceImpl.h"
@@ -121,11 +123,11 @@ class UsbCameraImpl : public SourceImpl {
   void DeviceCacheVideoModes();
 
   // Command helper functions
-  CS_StatusValue DeviceProcessCommand(std::unique_lock<std::mutex>& lock,
+  CS_StatusValue DeviceProcessCommand(std::unique_lock<wpi::mutex>& lock,
                                       const Message& msg);
-  CS_StatusValue DeviceCmdSetMode(std::unique_lock<std::mutex>& lock,
+  CS_StatusValue DeviceCmdSetMode(std::unique_lock<wpi::mutex>& lock,
                                   const Message& msg);
-  CS_StatusValue DeviceCmdSetProperty(std::unique_lock<std::mutex>& lock,
+  CS_StatusValue DeviceCmdSetProperty(std::unique_lock<wpi::mutex>& lock,
                                       const Message& msg);
 
   // Property helper functions
@@ -173,7 +175,7 @@ class UsbCameraImpl : public SourceImpl {
   // Message queues
   mutable std::vector<Message> m_commands;
   mutable std::vector<std::pair<std::thread::id, CS_StatusValue>> m_responses;
-  mutable std::condition_variable m_responseCv;
+  mutable wpi::condition_variable m_responseCv;
 };
 
 }  // namespace cs

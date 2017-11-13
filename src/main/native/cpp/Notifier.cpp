@@ -105,7 +105,7 @@ void Notifier::Stop() { m_owner.Stop(); }
 void Notifier::Thread::Main() {
   if (m_on_start) m_on_start();
 
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   while (m_active) {
     while (m_notifications.empty()) {
       m_cond.wait(lock);

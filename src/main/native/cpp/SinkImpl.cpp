@@ -22,19 +22,19 @@ SinkImpl::~SinkImpl() {
 }
 
 void SinkImpl::SetDescription(llvm::StringRef description) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   m_description = description;
 }
 
 llvm::StringRef SinkImpl::GetDescription(
     llvm::SmallVectorImpl<char>& buf) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   buf.append(m_description.begin(), m_description.end());
   return llvm::StringRef{buf.data(), buf.size()};
 }
 
 void SinkImpl::Enable() {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   ++m_enabledCount;
   if (m_enabledCount == 1) {
     if (m_source) m_source->EnableSink();
@@ -43,7 +43,7 @@ void SinkImpl::Enable() {
 }
 
 void SinkImpl::Disable() {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   --m_enabledCount;
   if (m_enabledCount == 0) {
     if (m_source) m_source->DisableSink();
@@ -52,7 +52,7 @@ void SinkImpl::Disable() {
 }
 
 void SinkImpl::SetEnabled(bool enabled) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   if (enabled && m_enabledCount == 0) {
     if (m_source) m_source->EnableSink();
     m_enabledCount = 1;
@@ -66,7 +66,7 @@ void SinkImpl::SetEnabled(bool enabled) {
 
 void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     if (m_source == source) return;
     if (m_source) {
       if (m_enabledCount > 0) m_source->DisableSink();
@@ -82,13 +82,13 @@ void SinkImpl::SetSource(std::shared_ptr<SourceImpl> source) {
 }
 
 std::string SinkImpl::GetError() const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   if (!m_source) return "no source connected";
   return m_source->GetCurFrame().GetError();
 }
 
 llvm::StringRef SinkImpl::GetError(llvm::SmallVectorImpl<char>& buf) const {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   if (!m_source) return "no source connected";
   // Make a copy as it's shared data
   llvm::StringRef error = m_source->GetCurFrame().GetError();

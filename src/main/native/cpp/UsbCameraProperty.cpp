@@ -246,7 +246,7 @@ std::unique_ptr<UsbCameraProperty> UsbCameraProperty::DeviceQuery(int fd,
   return prop;
 }
 
-bool UsbCameraProperty::DeviceGet(std::unique_lock<std::mutex>& lock, int fd) {
+bool UsbCameraProperty::DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd) {
   if (fd < 0) return true;
   unsigned idCopy = id;
   int rv = 0;
@@ -279,14 +279,14 @@ bool UsbCameraProperty::DeviceGet(std::unique_lock<std::mutex>& lock, int fd) {
   return rv >= 0;
 }
 
-bool UsbCameraProperty::DeviceSet(std::unique_lock<std::mutex>& lock,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock,
                                   int fd) const {
   // Make a copy of the string as we're about to release the lock
   llvm::SmallString<128> valueStrCopy{valueStr};
   return DeviceSet(lock, fd, value, valueStrCopy);
 }
 
-bool UsbCameraProperty::DeviceSet(std::unique_lock<std::mutex>& lock, int fd,
+bool UsbCameraProperty::DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd,
                                   int newValue,
                                   llvm::StringRef newValueStr) const {
   if (fd < 0) return true;
