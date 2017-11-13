@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/NotifyListenerVector.h"
 
 namespace hal {
@@ -42,7 +44,7 @@ class ThreeAxisAccelerometerData {
   virtual void ResetData();
 
  protected:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<double> m_x{0.0};
   std::shared_ptr<NotifyListenerVector> m_xCallbacks = nullptr;
   std::atomic<double> m_y{0.0};

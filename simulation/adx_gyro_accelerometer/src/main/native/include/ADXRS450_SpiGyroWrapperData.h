@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/NotifyListenerVector.h"
 
 namespace hal {
@@ -32,7 +34,7 @@ class ADXRS450_SpiGyroWrapper {
  private:
   const int m_port;
 
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<double> m_angle{0.0};
   std::shared_ptr<NotifyListenerVector> m_angleCallbacks = nullptr;
 

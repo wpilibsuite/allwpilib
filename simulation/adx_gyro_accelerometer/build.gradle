@@ -11,6 +11,17 @@ if (!project.hasProperty('onlyAthena')) {
 
 
     model {
+        dependencyConfigs {
+            wpiutil(DependencyConfig) {
+                groupId = 'edu.wpi.first.wpiutil'
+                artifactId = 'wpiutil-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '3.+'
+                sharedConfigs = [ halsim_adx_gyro_accelerometer: [] ]
+                staticConfigs = [ halsim_adx_gyro_accelerometerStaticDeps: [] ]
+            }
+        }
         exportsConfigs {
             halsim_adx_gyro_accelerometer(ExportsConfig) {
                 x86ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
