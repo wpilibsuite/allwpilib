@@ -65,7 +65,7 @@ class priority_condition_variable {
 
   template <typename Clock, typename Duration>
   std::cv_status wait_until(
-      std::unique_ptr<priority_mutex>& lock,
+      std::unique_lock<priority_mutex>& lock,
       const std::chrono::time_point<Clock, Duration>& atime) {
     const typename Clock::time_point c_entry = Clock::now();
     const clock::time_point s_entry = clock::now();
