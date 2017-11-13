@@ -10,10 +10,11 @@
 #include <list>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
+
+#include <support/mutex.h>
 
 #include "Commands/Command.h"
 #include "ErrorBase.h"
@@ -53,11 +54,11 @@ class Scheduler : public ErrorBase, public NamedSendable {
   void ProcessCommandAddition(Command* command);
 
   Command::SubsystemSet m_subsystems;
-  std::mutex m_buttonsLock;
+  wpi::mutex m_buttonsLock;
   typedef std::vector<ButtonScheduler*> ButtonVector;
   ButtonVector m_buttons;
   typedef std::vector<Command*> CommandVector;
-  std::mutex m_additionsLock;
+  wpi::mutex m_additionsLock;
   CommandVector m_additions;
   typedef std::set<Command*> CommandSet;
   CommandSet m_commands;

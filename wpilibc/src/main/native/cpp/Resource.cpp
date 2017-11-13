@@ -12,7 +12,7 @@
 
 using namespace frc;
 
-std::mutex Resource::m_createMutex;
+wpi::mutex Resource::m_createMutex;
 
 /**
  * Allocate storage for a new instance of Resource.
@@ -38,7 +38,7 @@ Resource::Resource(uint32_t elements) {
  */
 void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
                                     uint32_t elements) {
-  std::lock_guard<std::mutex> sync(m_createMutex);
+  std::lock_guard<wpi::mutex> sync(m_createMutex);
   if (!r) {
     r = std::make_unique<Resource>(elements);
   }
@@ -52,7 +52,7 @@ void Resource::CreateResourceObject(std::unique_ptr<Resource>& r,
  * allocated.
  */
 uint32_t Resource::Allocate(const std::string& resourceDesc) {
-  std::lock_guard<std::mutex> sync(m_allocateMutex);
+  std::lock_guard<wpi::mutex> sync(m_allocateMutex);
   for (uint32_t i = 0; i < m_isAllocated.size(); i++) {
     if (!m_isAllocated[i]) {
       m_isAllocated[i] = true;
@@ -70,7 +70,7 @@ uint32_t Resource::Allocate(const std::string& resourceDesc) {
  * verified unallocated, then returned.
  */
 uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
-  std::lock_guard<std::mutex> sync(m_allocateMutex);
+  std::lock_guard<wpi::mutex> sync(m_allocateMutex);
   if (index >= m_isAllocated.size()) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, resourceDesc);
     return std::numeric_limits<uint32_t>::max();
@@ -91,7 +91,7 @@ uint32_t Resource::Allocate(uint32_t index, const std::string& resourceDesc) {
  * be reused somewhere else in the program.
  */
 void Resource::Free(uint32_t index) {
-  std::unique_lock<std::mutex> sync(m_allocateMutex);
+  std::unique_lock<wpi::mutex> sync(m_allocateMutex);
   if (index == std::numeric_limits<uint32_t>::max()) return;
   if (index >= m_isAllocated.size()) {
     wpi_setWPIError(NotAllocated);

@@ -35,7 +35,7 @@ int32_t SPIData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -70,7 +70,7 @@ int32_t SPIData::RegisterReadCallback(HAL_BufferCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_readCallbacks =
         RegisterCallback(m_readCallbacks, "Read", callback, param, &newUid);
   }
@@ -88,7 +88,7 @@ int32_t SPIData::RegisterWriteCallback(HAL_BufferCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_writeCallbacks =
         RegisterCallback(m_writeCallbacks, "Write", callback, param, &newUid);
   }
@@ -107,7 +107,7 @@ int32_t SPIData::RegisterResetAccumulatorCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_resetAccumulatorCallback =
         RegisterCallback(m_resetAccumulatorCallback, "ResetAccumulator",
                          callback, param, &newUid);
@@ -131,7 +131,7 @@ int32_t SPIData::RegisterAccumulatorCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_setAccumulatorCallback = RegisterCallback(
         m_setAccumulatorCallback, "SetAccumulator", callback, param, &newUid);
   }
@@ -161,14 +161,14 @@ void SPIData::SetAccumulatorValue(int64_t value) {
 int64_t SPIData::GetAccumulatorValue() { return m_accumulatorValue; }
 
 int32_t SPIData::Read(uint8_t* buffer, int32_t count) {
-  std::lock_guard<std::mutex> lock(m_dataMutex);
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
   InvokeCallback(m_readCallbacks, "Read", buffer, count);
 
   return count;
 }
 
 int32_t SPIData::Write(uint8_t* dataToSend, int32_t sendSize) {
-  std::lock_guard<std::mutex> lock(m_dataMutex);
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
   InvokeCallback(m_writeCallbacks, "Write", dataToSend, sendSize);
 
   return sendSize;
@@ -176,7 +176,7 @@ int32_t SPIData::Write(uint8_t* dataToSend, int32_t sendSize) {
 
 int32_t SPIData::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
                              int32_t size) {
-  std::lock_guard<std::mutex> lock(m_dataMutex);
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
   return size;
 }
 

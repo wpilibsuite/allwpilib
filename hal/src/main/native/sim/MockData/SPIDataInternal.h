@@ -11,6 +11,8 @@
 #include <limits>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/NotifyListenerVector.h"
 #include "MockData/SPIData.h"
 
@@ -52,8 +54,8 @@ class SPIData {
   void ResetData();
 
  private:
-  std::mutex m_registerMutex;
-  std::mutex m_dataMutex;
+  wpi::mutex m_registerMutex;
+  wpi::mutex m_dataMutex;
   std::atomic<HAL_Bool> m_initialized{false};
   std::atomic<int64_t> m_accumulatorValue{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;

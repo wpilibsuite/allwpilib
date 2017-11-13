@@ -27,7 +27,7 @@ namespace hal {
 
 std::string SerialHelper::m_usbNames[2]{"", ""};
 
-std::mutex SerialHelper::m_nameMutex;
+wpi::mutex SerialHelper::m_nameMutex;
 
 SerialHelper::SerialHelper() {
   viOpenDefaultRM(reinterpret_cast<ViSession*>(&m_resourceHandle));
@@ -273,7 +273,7 @@ done:
 
 int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
   // Hold lock whenever we're using the names array
-  std::lock_guard<std::mutex> lock(m_nameMutex);
+  std::lock_guard<wpi::mutex> lock(m_nameMutex);
 
   std::string portString = m_usbNames[port - 2];
 

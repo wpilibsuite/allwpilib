@@ -32,7 +32,7 @@ int32_t PDPData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -68,7 +68,7 @@ int32_t PDPData::RegisterTemperatureCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_temperatureCallbacks = RegisterCallback(
         m_temperatureCallbacks, "Temperature", callback, param, &newUid);
   }
@@ -103,7 +103,7 @@ int32_t PDPData::RegisterVoltageCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_voltageCallbacks = RegisterCallback(m_voltageCallbacks, "Voltage",
                                           callback, param, &newUid);
   }
@@ -139,7 +139,7 @@ int32_t PDPData::RegisterCurrentCallback(int32_t channel,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_currentCallbacks[channel] = RegisterCallback(
         m_currentCallbacks[channel], "Current", callback, param, &newUid);
   }

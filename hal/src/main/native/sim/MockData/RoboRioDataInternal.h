@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/NotifyListenerVector.h"
 #include "MockData/RoboRioData.h"
 
@@ -124,7 +126,7 @@ class RoboRioData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_fPGAButton{false};
   std::shared_ptr<NotifyListenerVector> m_fPGAButtonCallbacks = nullptr;
   std::atomic<double> m_vInVoltage{0.0};

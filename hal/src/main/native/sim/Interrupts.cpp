@@ -7,8 +7,9 @@
 
 #include "HAL/Interrupts.h"
 
-#include <condition_variable>
 #include <memory>
+
+#include <support/condition_variable.h>
 
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"
@@ -53,7 +54,7 @@ struct Interrupt {
 
 struct SynchronousWaitData {
   HAL_InterruptHandle interruptHandle;
-  std::condition_variable waitCond;
+  wpi::condition_variable waitCond;
   HAL_Bool waitPredicate;
 };
 }  // namespace
@@ -191,7 +192,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 
   bool timedOut = false;
 
-  std::mutex waitMutex;
+  wpi::mutex waitMutex;
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
   auto timeoutTime = std::chrono::steady_clock::now() +
@@ -203,7 +204,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 #endif
 
   {
-    std::unique_lock<std::mutex> lock(waitMutex);
+    std::unique_lock<wpi::mutex> lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {
@@ -261,7 +262,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 
   bool timedOut = false;
 
-  std::mutex waitMutex;
+  wpi::mutex waitMutex;
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
   auto timeoutTime = std::chrono::steady_clock::now() +
@@ -273,7 +274,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 #endif
 
   {
-    std::unique_lock<std::mutex> lock(waitMutex);
+    std::unique_lock<wpi::mutex> lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {

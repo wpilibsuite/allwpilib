@@ -91,7 +91,7 @@ void PIDController::Calculate() {
   PIDOutput* pidOutput;
 
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     pidInput = m_pidInput;
     pidOutput = m_pidOutput;
     enabled = m_enabled;
@@ -103,7 +103,7 @@ void PIDController::Calculate() {
   if (enabled) {
     double feedForward = CalculateFeedForward();
 
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     double input = pidInput->PIDGet();
     double result;
     PIDOutput* pidOutput;
@@ -200,7 +200,7 @@ double PIDController::CalculateFeedForward() {
  */
 void PIDController::SetPID(double p, double i, double d) {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     m_P = p;
     m_I = i;
     m_D = d;
@@ -223,7 +223,7 @@ void PIDController::SetPID(double p, double i, double d) {
  */
 void PIDController::SetPID(double p, double i, double d, double f) {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     m_P = p;
     m_I = i;
     m_D = d;
@@ -242,7 +242,7 @@ void PIDController::SetPID(double p, double i, double d, double f) {
  * @return proportional coefficient
  */
 double PIDController::GetP() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   return m_P;
 }
 
@@ -252,7 +252,7 @@ double PIDController::GetP() const {
  * @return integral coefficient
  */
 double PIDController::GetI() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   return m_I;
 }
 
@@ -262,7 +262,7 @@ double PIDController::GetI() const {
  * @return differential coefficient
  */
 double PIDController::GetD() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   return m_D;
 }
 
@@ -272,7 +272,7 @@ double PIDController::GetD() const {
  * @return Feed forward coefficient
  */
 double PIDController::GetF() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   return m_F;
 }
 
@@ -284,7 +284,7 @@ double PIDController::GetF() const {
  * @return the latest calculated output
  */
 double PIDController::Get() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   return m_result;
 }
 
@@ -298,7 +298,7 @@ double PIDController::Get() const {
  * @param continuous true turns on continuous, false turns off continuous
  */
 void PIDController::SetContinuous(bool continuous) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   m_continuous = continuous;
 }
 
@@ -310,7 +310,7 @@ void PIDController::SetContinuous(bool continuous) {
  */
 void PIDController::SetInputRange(double minimumInput, double maximumInput) {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
   }
@@ -325,7 +325,7 @@ void PIDController::SetInputRange(double minimumInput, double maximumInput) {
  * @param maximumOutput the maximum value to write to the output
  */
 void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   m_minimumOutput = minimumOutput;
   m_maximumOutput = maximumOutput;
 }
@@ -339,7 +339,7 @@ void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
  */
 void PIDController::SetSetpoint(double setpoint) {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
 
     if (m_maximumInput > m_minimumInput) {
       if (setpoint > m_maximumInput)
@@ -366,7 +366,7 @@ void PIDController::SetSetpoint(double setpoint) {
  * @return the current setpoint
  */
 double PIDController::GetSetpoint() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   return m_setpoint;
 }
 
@@ -376,7 +376,7 @@ double PIDController::GetSetpoint() const {
  * @return the change in setpoint over time
  */
 double PIDController::GetDeltaSetpoint() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
 }
 
@@ -388,7 +388,7 @@ double PIDController::GetDeltaSetpoint() const {
 double PIDController::GetError() const {
   double setpoint = GetSetpoint();
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     return GetContinuousError(setpoint - m_pidInput->PIDGet());
   }
 }
@@ -419,7 +419,7 @@ PIDSourceType PIDController::GetPIDSourceType() const {
 double PIDController::GetAvgError() const {
   double avgError = 0;
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     // Don't divide by zero.
     if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
   }
@@ -433,7 +433,7 @@ double PIDController::GetAvgError() const {
  * @param percentage error which is tolerable
  */
 void PIDController::SetTolerance(double percent) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   m_toleranceType = kPercentTolerance;
   m_tolerance = percent;
 }
@@ -445,7 +445,7 @@ void PIDController::SetTolerance(double percent) {
  * @param percentage error which is tolerable
  */
 void PIDController::SetAbsoluteTolerance(double absTolerance) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   m_toleranceType = kAbsoluteTolerance;
   m_tolerance = absTolerance;
 }
@@ -457,7 +457,7 @@ void PIDController::SetAbsoluteTolerance(double absTolerance) {
  * @param percentage error which is tolerable
  */
 void PIDController::SetPercentTolerance(double percent) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   m_toleranceType = kPercentTolerance;
   m_tolerance = percent;
 }
@@ -473,7 +473,7 @@ void PIDController::SetPercentTolerance(double percent) {
  * @param bufLength Number of previous cycles to average. Defaults to 1.
  */
 void PIDController::SetToleranceBuffer(int bufLength) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   m_bufLength = bufLength;
 
   // Cut the buffer down to size if needed.
@@ -496,13 +496,13 @@ void PIDController::SetToleranceBuffer(int bufLength) {
  */
 bool PIDController::OnTarget() const {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     if (m_buf.size() == 0) return false;
   }
 
   double error = GetAvgError();
 
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   switch (m_toleranceType) {
     case kPercentTolerance:
       return std::fabs(error) <
@@ -523,7 +523,7 @@ bool PIDController::OnTarget() const {
  */
 void PIDController::Enable() {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     m_enabled = true;
   }
 
@@ -535,7 +535,7 @@ void PIDController::Enable() {
  */
 void PIDController::Disable() {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     m_pidOutput->PIDWrite(0);
     m_enabled = false;
   }
@@ -547,7 +547,7 @@ void PIDController::Disable() {
  * Return true if PIDController is enabled.
  */
 bool PIDController::IsEnabled() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   return m_enabled;
 }
 
@@ -557,7 +557,7 @@ bool PIDController::IsEnabled() const {
 void PIDController::Reset() {
   Disable();
 
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   m_prevError = 0;
   m_totalError = 0;
   m_result = 0;
@@ -586,7 +586,7 @@ void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
     m_pListener = m_pEntry.AddListener(
         [=](const nt::EntryNotification& event) {
           if (!event.value->IsDouble()) return;
-          std::lock_guard<std::mutex> sync(m_mutex);
+          std::lock_guard<wpi::mutex> sync(m_mutex);
           m_P = event.value->GetDouble();
         },
         NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
@@ -594,7 +594,7 @@ void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
     m_iListener = m_iEntry.AddListener(
         [=](const nt::EntryNotification& event) {
           if (!event.value->IsDouble()) return;
-          std::lock_guard<std::mutex> sync(m_mutex);
+          std::lock_guard<wpi::mutex> sync(m_mutex);
           m_I = event.value->GetDouble();
         },
         NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
@@ -602,7 +602,7 @@ void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
     m_dListener = m_dEntry.AddListener(
         [=](const nt::EntryNotification& event) {
           if (!event.value->IsDouble()) return;
-          std::lock_guard<std::mutex> sync(m_mutex);
+          std::lock_guard<wpi::mutex> sync(m_mutex);
           m_D = event.value->GetDouble();
         },
         NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
@@ -610,7 +610,7 @@ void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
     m_fListener = m_fEntry.AddListener(
         [=](const nt::EntryNotification& event) {
           if (!event.value->IsDouble()) return;
-          std::lock_guard<std::mutex> sync(m_mutex);
+          std::lock_guard<wpi::mutex> sync(m_mutex);
           m_F = event.value->GetDouble();
         },
         NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);

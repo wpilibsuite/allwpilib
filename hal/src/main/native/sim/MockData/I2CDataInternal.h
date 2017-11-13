@@ -11,6 +11,8 @@
 #include <limits>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/I2CData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -39,8 +41,8 @@ class I2CData {
   void ResetData();
 
  private:
-  std::mutex m_registerMutex;
-  std::mutex m_dataMutex;
+  wpi::mutex m_registerMutex;
+  wpi::mutex m_dataMutex;
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;

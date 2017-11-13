@@ -32,7 +32,7 @@ int32_t DIOData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -67,7 +67,7 @@ int32_t DIOData::RegisterValueCallback(HAL_NotifyCallback callback, void* param,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_valueCallbacks =
         RegisterCallback(m_valueCallbacks, "Value", callback, param, &newUid);
   }
@@ -103,7 +103,7 @@ int32_t DIOData::RegisterPulseLengthCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_pulseLengthCallbacks = RegisterCallback(
         m_pulseLengthCallbacks, "PulseLength", callback, param, &newUid);
   }
@@ -138,7 +138,7 @@ int32_t DIOData::RegisterIsInputCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_isInputCallbacks = RegisterCallback(m_isInputCallbacks, "IsInput",
                                           callback, param, &newUid);
   }
@@ -174,7 +174,7 @@ int32_t DIOData::RegisterFilterIndexCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_filterIndexCallbacks = RegisterCallback(
         m_filterIndexCallbacks, "FilterIndex", callback, param, &newUid);
   }

@@ -34,7 +34,7 @@ int32_t PWMData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -69,7 +69,7 @@ int32_t PWMData::RegisterRawValueCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_rawValueCallbacks = RegisterCallback(m_rawValueCallbacks, "RawValue",
                                            callback, param, &newUid);
   }
@@ -104,7 +104,7 @@ int32_t PWMData::RegisterSpeedCallback(HAL_NotifyCallback callback, void* param,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_speedCallbacks =
         RegisterCallback(m_speedCallbacks, "Speed", callback, param, &newUid);
   }
@@ -139,7 +139,7 @@ int32_t PWMData::RegisterPositionCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_positionCallbacks = RegisterCallback(m_positionCallbacks, "Position",
                                            callback, param, &newUid);
   }
@@ -175,7 +175,7 @@ int32_t PWMData::RegisterPeriodScaleCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_periodScaleCallbacks = RegisterCallback(
         m_periodScaleCallbacks, "PeriodScale", callback, param, &newUid);
   }
@@ -211,7 +211,7 @@ int32_t PWMData::RegisterZeroLatchCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_zeroLatchCallbacks = RegisterCallback(m_zeroLatchCallbacks, "ZeroLatch",
                                             callback, param, &newUid);
   }

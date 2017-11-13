@@ -103,7 +103,7 @@ bool DriverStation::GetStickButton(int stick, int button) {
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
-  std::unique_lock<std::mutex> lock(m_cacheDataMutex);
+  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
@@ -134,7 +134,7 @@ bool DriverStation::GetStickButtonPressed(int stick, int button) {
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
-  std::unique_lock<std::mutex> lock(m_cacheDataMutex);
+  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
@@ -171,7 +171,7 @@ bool DriverStation::GetStickButtonReleased(int stick, int button) {
         "ERROR: Button indexes begin at 1 in WPILib for C++ and Java");
     return false;
   }
-  std::unique_lock<std::mutex> lock(m_cacheDataMutex);
+  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (button > m_joystickButtons[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
@@ -204,7 +204,7 @@ double DriverStation::GetStickAxis(int stick, int axis) {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::unique_lock<std::mutex> lock(m_cacheDataMutex);
+  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (axis >= m_joystickAxes[stick].count) {
     // Unlock early so error printing isn't locked.
     m_cacheDataMutex.unlock();
@@ -230,7 +230,7 @@ int DriverStation::GetStickPOV(int stick, int pov) {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
-  std::unique_lock<std::mutex> lock(m_cacheDataMutex);
+  std::unique_lock<wpi::mutex> lock(m_cacheDataMutex);
   if (pov >= m_joystickPOVs[stick].count) {
     // Unlock early so error printing isn't locked.
     lock.unlock();
@@ -256,7 +256,7 @@ int DriverStation::GetStickButtons(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickButtons[stick].buttons;
 }
 
@@ -271,7 +271,7 @@ int DriverStation::GetStickAxisCount(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickAxes[stick].count;
 }
 
@@ -286,7 +286,7 @@ int DriverStation::GetStickPOVCount(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickPOVs[stick].count;
 }
 
@@ -301,7 +301,7 @@ int DriverStation::GetStickButtonCount(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return 0;
   }
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickButtons[stick].count;
 }
 
@@ -316,7 +316,7 @@ bool DriverStation::GetJoystickIsXbox(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return false;
   }
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return static_cast<bool>(m_joystickDescriptor[stick].isXbox);
 }
 
@@ -331,7 +331,7 @@ int DriverStation::GetJoystickType(int stick) const {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return static_cast<int>(m_joystickDescriptor[stick].type);
 }
 
@@ -345,7 +345,7 @@ std::string DriverStation::GetJoystickName(int stick) const {
   if (stick >= kJoystickPorts) {
     wpi_setWPIError(BadJoystickIndex);
   }
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   std::string retVal(m_joystickDescriptor[stick].name);
   return retVal;
 }
@@ -361,7 +361,7 @@ int DriverStation::GetJoystickAxisType(int stick, int axis) const {
     wpi_setWPIError(BadJoystickIndex);
     return -1;
   }
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_joystickDescriptor[stick].axisTypes[axis];
 }
 
@@ -482,27 +482,27 @@ bool DriverStation::IsBrownedOut() const {
 }
 
 std::string DriverStation::GetGameSpecificMessage() const {
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_matchInfo->gameSpecificMessage;
 }
 
 std::string DriverStation::GetEventName() const {
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_matchInfo->eventName;
 }
 
 DriverStation::MatchType DriverStation::GetMatchType() const {
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_matchInfo->matchType;
 }
 
 int DriverStation::GetMatchNumber() const {
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_matchInfo->matchNumber;
 }
 
 int DriverStation::GetReplayNumber() const {
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
   return m_matchInfo->replayNumber;
 }
 
@@ -650,7 +650,7 @@ void DriverStation::GetData() {
   UpdateControlWord(true, controlWord);
   // Obtain a write lock on the data, swap the cached data into the
   // main data arrays
-  std::lock_guard<std::mutex> lock(m_cacheDataMutex);
+  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
 
   for (int32_t i = 0; i < kJoystickPorts; i++) {
     // If buttons weren't pressed and are now, set flags in m_buttonsPressed
@@ -768,7 +768,7 @@ void DriverStation::Run() {
 void DriverStation::UpdateControlWord(bool force,
                                       HAL_ControlWord& controlWord) const {
   auto now = std::chrono::steady_clock::now();
-  std::lock_guard<std::mutex> lock(m_controlWordMutex);
+  std::lock_guard<wpi::mutex> lock(m_controlWordMutex);
   // Update every 50 ms or on force.
   if ((now - m_lastControlWordUpdate > std::chrono::milliseconds(50)) ||
       force) {

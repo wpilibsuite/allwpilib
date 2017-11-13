@@ -14,12 +14,12 @@
 #include <atomic>
 #include <cstdlib>
 #include <fstream>
-#include <mutex>
 #include <thread>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <llvm/raw_ostream.h>
+#include <support/mutex.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/DriverStation.h"
@@ -261,11 +261,11 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
 
 void HAL_BaseInitialize(int32_t* status) {
   static std::atomic_bool initialized{false};
-  static std::mutex initializeMutex;
+  static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<std::mutex> lock(initializeMutex);
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
   // image 4; Fixes errors caused by multiple processes. Talk to NI about this
@@ -323,11 +323,11 @@ static bool killExistingProgram(int timeout, int mode) {
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   static std::atomic_bool initialized{false};
-  static std::mutex initializeMutex;
+  static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return true;
 
-  std::lock_guard<std::mutex> lock(initializeMutex);
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
 

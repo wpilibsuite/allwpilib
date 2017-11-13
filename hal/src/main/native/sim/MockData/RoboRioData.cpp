@@ -52,7 +52,7 @@ int32_t RoboRioData::RegisterFPGAButtonCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_fPGAButtonCallbacks = RegisterCallback(
         m_fPGAButtonCallbacks, "FPGAButton", callback, param, &newUid);
   }
@@ -88,7 +88,7 @@ int32_t RoboRioData::RegisterVInVoltageCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_vInVoltageCallbacks = RegisterCallback(
         m_vInVoltageCallbacks, "VInVoltage", callback, param, &newUid);
   }
@@ -124,7 +124,7 @@ int32_t RoboRioData::RegisterVInCurrentCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_vInCurrentCallbacks = RegisterCallback(
         m_vInCurrentCallbacks, "VInCurrent", callback, param, &newUid);
   }
@@ -160,7 +160,7 @@ int32_t RoboRioData::RegisterUserVoltage6VCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userVoltage6VCallbacks = RegisterCallback(
         m_userVoltage6VCallbacks, "UserVoltage6V", callback, param, &newUid);
   }
@@ -196,7 +196,7 @@ int32_t RoboRioData::RegisterUserCurrent6VCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userCurrent6VCallbacks = RegisterCallback(
         m_userCurrent6VCallbacks, "UserCurrent6V", callback, param, &newUid);
   }
@@ -232,7 +232,7 @@ int32_t RoboRioData::RegisterUserActive6VCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userActive6VCallbacks = RegisterCallback(
         m_userActive6VCallbacks, "UserActive6V", callback, param, &newUid);
   }
@@ -268,7 +268,7 @@ int32_t RoboRioData::RegisterUserVoltage5VCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userVoltage5VCallbacks = RegisterCallback(
         m_userVoltage5VCallbacks, "UserVoltage5V", callback, param, &newUid);
   }
@@ -304,7 +304,7 @@ int32_t RoboRioData::RegisterUserCurrent5VCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userCurrent5VCallbacks = RegisterCallback(
         m_userCurrent5VCallbacks, "UserCurrent5V", callback, param, &newUid);
   }
@@ -340,7 +340,7 @@ int32_t RoboRioData::RegisterUserActive5VCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userActive5VCallbacks = RegisterCallback(
         m_userActive5VCallbacks, "UserActive5V", callback, param, &newUid);
   }
@@ -376,7 +376,7 @@ int32_t RoboRioData::RegisterUserVoltage3V3Callback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userVoltage3V3Callbacks = RegisterCallback(
         m_userVoltage3V3Callbacks, "UserVoltage3V3", callback, param, &newUid);
   }
@@ -412,7 +412,7 @@ int32_t RoboRioData::RegisterUserCurrent3V3Callback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userCurrent3V3Callbacks = RegisterCallback(
         m_userCurrent3V3Callbacks, "UserCurrent3V3", callback, param, &newUid);
   }
@@ -448,7 +448,7 @@ int32_t RoboRioData::RegisterUserActive3V3Callback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userActive3V3Callbacks = RegisterCallback(
         m_userActive3V3Callbacks, "UserActive3V3", callback, param, &newUid);
   }
@@ -484,7 +484,7 @@ int32_t RoboRioData::RegisterUserFaults6VCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userFaults6VCallbacks = RegisterCallback(
         m_userFaults6VCallbacks, "UserFaults6V", callback, param, &newUid);
   }
@@ -520,7 +520,7 @@ int32_t RoboRioData::RegisterUserFaults5VCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userFaults5VCallbacks = RegisterCallback(
         m_userFaults5VCallbacks, "UserFaults5V", callback, param, &newUid);
   }
@@ -556,7 +556,7 @@ int32_t RoboRioData::RegisterUserFaults3V3Callback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_userFaults3V3Callbacks = RegisterCallback(
         m_userFaults3V3Callbacks, "UserFaults3V3", callback, param, &newUid);
   }
