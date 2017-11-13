@@ -9,12 +9,12 @@
 
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
-#include <mutex>
 #include <thread>
 #include <tuple>
 
 #include "llvm/SmallSet.h"
+#include "support/condition_variable.h"
+#include "support/mutex.h"
 
 using namespace wpi;
 
@@ -33,7 +33,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
 
   // structure to make sure we don't start duplicate workers
   struct GlobalState {
-    std::mutex mutex;
+    wpi::mutex mtx;
 #ifdef HAVE_THREAD_LOCAL
     llvm::SmallSet<std::pair<std::string, int>, 16> active;
 #else
@@ -50,8 +50,8 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
 
   // structure shared between threads and this function
   struct Result {
-    std::mutex mutex;
-    std::condition_variable cv;
+    wpi::mutex mtx;
+    wpi::condition_variable cv;
     std::unique_ptr<NetworkStream> stream;
     std::atomic<unsigned int> count{0};
     std::atomic<bool> done{false};
@@ -74,7 +74,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
     // don't start a new worker if we had a previously still-active connection
     // attempt to the same server
     {
-      std::lock_guard<std::mutex> lock(local->mutex);
+      std::lock_guard<wpi::mutex> lock(local->mtx);
       if (local->active.count(active_tracker) > 0) continue;  // already in set
     }
 
@@ -85,7 +85,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
       if (!result->done) {
         // add to global state
         {
-          std::lock_guard<std::mutex> lock(local->mutex);
+          std::lock_guard<wpi::mutex> lock(local->mtx);
           local->active.insert(active_tracker);
         }
 
@@ -95,13 +95,13 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
 
         // remove from global state
         {
-          std::lock_guard<std::mutex> lock(local->mutex);
+          std::lock_guard<wpi::mutex> lock(local->mtx);
           local->active.erase(active_tracker);
         }
 
         // successful connection
         if (stream) {
-          std::lock_guard<std::mutex> lock(result->mutex);
+          std::lock_guard<wpi::mutex> lock(result->mtx);
           if (!result->done.exchange(true)) result->stream = std::move(stream);
         }
       }
@@ -111,7 +111,7 @@ std::unique_ptr<NetworkStream> TCPConnector::connect_parallel(
   }
 
   // wait for a result, timeout, or all finished
-  std::unique_lock<std::mutex> lock(result->mutex);
+  std::unique_lock<wpi::mutex> lock(result->mtx);
   if (timeout == 0) {
     result->cv.wait(
         lock, [&] { return result->stream || result->count >= num_workers; });

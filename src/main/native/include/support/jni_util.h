@@ -8,7 +8,6 @@
 #ifndef WPIUTIL_SUPPORT_JNI_UTIL_H_
 #define WPIUTIL_SUPPORT_JNI_UTIL_H_
 
-#include <mutex>
 #include <string>
 #include <type_traits>
 #include <queue>
@@ -24,6 +23,7 @@
 #include "llvm/StringRef.h"
 #include "support/atomic_static.h"
 #include "support/deprecated.h"
+#include "support/mutex.h"
 #include "support/SafeThread.h"
 
 namespace wpi {
@@ -473,7 +473,7 @@ void JCallbackThread<T>::Main() {
   jint rs = T::GetJVM()->AttachCurrentThreadAsDaemon((void**)&env, &args);
   if (rs != JNI_OK) return;
 
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   while (m_active) {
     m_cond.wait(lock, [&] { return !(m_active && m_queue.empty()); });
     if (!m_active) break;

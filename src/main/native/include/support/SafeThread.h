@@ -9,9 +9,10 @@
 #define WPIUTIL_SUPPORT_SAFETHREAD_H_
 
 #include <atomic>
-#include <condition_variable>
-#include <mutex>
 #include <thread>
+
+#include "support/condition_variable.h"
+#include "support/mutex.h"
 
 namespace wpi {
 
@@ -22,9 +23,9 @@ class SafeThread {
   virtual ~SafeThread() = default;
   virtual void Main() = 0;
 
-  std::mutex m_mutex;
+  wpi::mutex m_mutex;
   std::atomic_bool m_active;
-  std::condition_variable m_cond;
+  wpi::condition_variable m_cond;
 };
 
 namespace detail {
@@ -42,11 +43,11 @@ class SafeThreadProxyBase {
     }
   }
   explicit operator bool() const { return m_thread != nullptr; }
-  std::unique_lock<std::mutex>& GetLock() { return m_lock; }
+  std::unique_lock<wpi::mutex>& GetLock() { return m_lock; }
 
  protected:
   SafeThread* m_thread;
-  std::unique_lock<std::mutex> m_lock;
+  std::unique_lock<wpi::mutex> m_lock;
 };
 
 // A proxy for SafeThread.
