@@ -47,8 +47,9 @@ class SPIData {
   int64_t GetAccumulatorValue();
 
   int32_t Read(uint8_t* buffer, int32_t count);
-  int32_t Write(uint8_t* dataToSend, int32_t sendSize);
-  int32_t Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int32_t size);
+  int32_t Write(const uint8_t* dataToSend, int32_t sendSize);
+  int32_t Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
+                      int32_t size);
   void ResetAccumulator();
 
   void ResetData();

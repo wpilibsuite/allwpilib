@@ -260,7 +260,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
  * @param size Number of bytes to transfer. [0..7]
  * @return Number of bytes transferred, -1 for error
  */
-int32_t HAL_TransactionSPI(HAL_SPIPort port, uint8_t* dataToSend,
+int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size) {
   if (port < 0 || port >= kSpiMaxHandles) {
     return -1;
@@ -286,7 +286,8 @@ int32_t HAL_TransactionSPI(HAL_SPIPort port, uint8_t* dataToSend,
  * @param sendSize The number of bytes to be written
  * @return The number of bytes written. -1 for an error
  */
-int32_t HAL_WriteSPI(HAL_SPIPort port, uint8_t* dataToSend, int32_t sendSize) {
+int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
+                     int32_t sendSize) {
   if (port < 0 || port >= kSpiMaxHandles) {
     return -1;
   }

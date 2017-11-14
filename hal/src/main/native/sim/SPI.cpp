@@ -14,11 +14,12 @@ using namespace hal;
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
   SimSPIData[port].SetInitialized(true);
 }
-int32_t HAL_TransactionSPI(HAL_SPIPort port, uint8_t* dataToSend,
+int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size) {
   return SimSPIData[port].Transaction(dataToSend, dataReceived, size);
 }
-int32_t HAL_WriteSPI(HAL_SPIPort port, uint8_t* dataToSend, int32_t sendSize) {
+int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
+                     int32_t sendSize) {
   return SimSPIData[port].Write(dataToSend, sendSize);
 }
 int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count) {

@@ -63,6 +63,9 @@ void SetCanStatusObject(JNIEnv *env, jobject canStatus,
 void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
                         const HAL_MatchInfo& matchInfo);
 
+void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
+                                int64_t value, int64_t count);
+
 }  // namespace frc
 
 #endif  // HALUTIL_H
