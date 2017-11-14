@@ -57,6 +57,7 @@ static JException uncleanStatusExCls;
 static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
+static JClass accumulatorResultCls;
 
 namespace frc {
 
@@ -234,6 +235,14 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
       (jint)matchInfo.matchType);
 }
 
+void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
+                                int64_t value, int64_t count) {
+  static jmethodID func = env->GetMethodID(accumulatorResultCls, "set",
+      "(JJ)V");
+
+  env->CallObjectMethod(accumulatorResult, func, (jlong)value, (jlong)count);
+}
+
 }  // namespace frc
 
 using namespace frc;
@@ -291,6 +300,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
 
   matchInfoDataCls = JClass(env, "edu/wpi/first/wpilibj/hal/MatchInfoData");
   if (!matchInfoDataCls) return JNI_ERR;
+
+  accumulatorResultCls = JClass(env, "edu/wpi/first/wpilibj/AccumulatorResult");
+  if (!accumulatorResultCls) return JNI_ERR;
 
   return JNI_VERSION_1_6;
 }

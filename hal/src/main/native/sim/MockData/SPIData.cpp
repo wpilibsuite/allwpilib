@@ -167,14 +167,15 @@ int32_t SPIData::Read(uint8_t* buffer, int32_t count) {
   return count;
 }
 
-int32_t SPIData::Write(uint8_t* dataToSend, int32_t sendSize) {
+int32_t SPIData::Write(const uint8_t* dataToSend, int32_t sendSize) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
-  InvokeCallback(m_writeCallbacks, "Write", dataToSend, sendSize);
+  InvokeCallback(m_writeCallbacks, "Write", const_cast<uint8_t*>(dataToSend),
+                 sendSize);
 
   return sendSize;
 }
 
-int32_t SPIData::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
+int32_t SPIData::Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
                              int32_t size) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
   return size;
