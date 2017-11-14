@@ -18,7 +18,8 @@ import edu.wpi.first.wpilibj.hal.HAL;
  *
  * <p>These drive bases typically have drop-center / skid-steer with two or more wheels per side
  * (e.g., 6WD or 8WD). This class takes a SpeedController per side. For four and
- * six motor drivetrains, construct and pass in {@link SpeedControllerGroup} instances as follows.
+ * six motor drivetrains, construct and pass in {@link edu.wpi.first.wpilibj.SpeedControllerGroup}
+ * instances as follows.
  *
  * <p>Four motor drivetrain:
  * <pre><code>
@@ -73,6 +74,20 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * <p>The positive X axis points ahead, the positive Y axis points right, and the positive Z axis
  * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
  * positive.
+ *
+ * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
+ * be set to 0, and larger values will be scaled so that the full range is still used. This
+ * deadband value can be changed with {@link #setDeadband}.
+ *
+ * <p>RobotDrive porting guide:
+ * <br>{@link #tankDrive(double, double)} is equivalent to
+ * {@link edu.wpi.first.wpilibj.RobotDrive#tankDrive(double, double)} if a deadband of 0 is used.
+ * <br>{@link #arcadeDrive(double, double)} is equivalent to
+ * {@link edu.wpi.first.wpilibj.RobotDrive#arcadeDrive(double, double)} if a deadband of 0 is used
+ * and the the rotation input is inverted eg arcadeDrive(y, -rotation)
+ * <br>{@link #curvatureDrive(double, double, boolean)} is similar in concept to
+ * {@link edu.wpi.first.wpilibj.RobotDrive#drive(double, double)} with the addition of a quick turn
+ * mode. However, it is not designed to give exactly the same response.
  */
 public class DifferentialDrive extends RobotDriveBase {
   public static final double kDefaultQuickStopThreshold = 0.2;
@@ -99,6 +114,7 @@ public class DifferentialDrive extends RobotDriveBase {
 
   /**
    * Arcade drive method for differential drive platform.
+   * The calculated values will be squared to decrease sensitivity at low speeds.
    *
    * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
    * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
@@ -246,6 +262,7 @@ public class DifferentialDrive extends RobotDriveBase {
 
   /**
    * Tank drive method for differential drive platform.
+   * The calculated values will be squared to decrease sensitivity at low speeds.
    *
    * @param leftSpeed  The robot's left side speed along the X axis [-1.0..1.0]. Forward is
    *                   positive.

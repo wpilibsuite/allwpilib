@@ -39,6 +39,21 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * <p>The positive X axis points ahead, the positive Y axis points right, and the positive Z axis
  * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
  * positive.
+ *
+ * <p>Inputs smaller then {@value edu.wpi.first.wpilibj.drive.RobotDriveBase#kDefaultDeadband} will
+ * be set to 0, and larger values will be scaled so that the full range is still used. This
+ * deadband value can be changed with {@link #setDeadband}.
+ *
+ * <p>RobotDrive porting guide:
+ * <br>In MecanumDrive, the right side speed controllers are automatically inverted, while in
+ * RobotDrive, no speed controllers are automatically inverted.
+ * <br>{@link #driveCartesian(double, double, double, double)} is equivalent to
+ * {@link edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Cartesian(double, double, double, double)}
+ * if a deadband of 0 is used, and the ySpeed and gyroAngle values are inverted compared to
+ * RobotDrive (eg driveCartesian(xSpeed, -ySpeed, zRotation, -gyroAngle).
+ * <br>{@link #drivePolar(double, double, double)} is equivalent to
+ * {@link edu.wpi.first.wpilibj.RobotDrive#mecanumDrive_Polar(double, double, double)} if a
+ * deadband of 0 is used.
  */
 public class MecanumDrive extends RobotDriveBase {
   private SpeedController m_frontLeftMotor;
