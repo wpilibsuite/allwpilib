@@ -177,64 +177,7 @@ static std::string PixelFormatToString(int pixelFormat) {
       return "Unknown";
   }
 }
-#if 0
-static cs::VideoMode::PixelFormat PixelFormatFromString(llvm::StringRef str) {
-  if (str == "MJPEG" || str == "mjpeg" || str == "JPEG" || str == "jpeg")
-    return cs::VideoMode::PixelFormat::kMJPEG;
-  if (str == "YUYV" || str == "yuyv") return cs::VideoMode::PixelFormat::kYUYV;
-  if (str == "RGB565" || str == "rgb565")
-    return cs::VideoMode::PixelFormat::kRGB565;
-  if (str == "BGR" || str == "bgr") return cs::VideoMode::PixelFormat::kBGR;
-  if (str == "GRAY" || str == "Gray" || str == "gray")
-    return cs::VideoMode::PixelFormat::kGray;
-  return cs::VideoMode::PixelFormat::kUnknown;
-}
 
-static cs::VideoMode VideoModeFromString(llvm::StringRef modeStr) {
-  cs::VideoMode mode;
-  size_t pos;
-
-  // width: [0-9]+
-  pos = modeStr.find_first_not_of("0123456789");
-  llvm::StringRef widthStr = modeStr.slice(0, pos);
-  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
-
-  // 'x'
-  if (modeStr.empty() || modeStr[0] != 'x') return mode;
-  modeStr = modeStr.drop_front(1).ltrim();  // drop whitespace too
-
-  // height: [0-9]+
-  pos = modeStr.find_first_not_of("0123456789");
-  llvm::StringRef heightStr = modeStr.slice(0, pos);
-  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
-
-  // format: all characters until whitespace
-  pos = modeStr.find_first_of(" \t\n\v\f\r");
-  llvm::StringRef formatStr = modeStr.slice(0, pos);
-  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
-
-  // fps: [0-9.]+
-  pos = modeStr.find_first_not_of("0123456789.");
-  llvm::StringRef fpsStr = modeStr.slice(0, pos);
-  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
-
-  // "fps"
-  if (!modeStr.startswith("fps")) return mode;
-
-  // make fps an integer string by dropping after the decimal
-  fpsStr = fpsStr.slice(0, fpsStr.find('.'));
-
-  // convert width, height, and fps to integers
-  if (widthStr.getAsInteger(10, mode.width)) return mode;
-  if (heightStr.getAsInteger(10, mode.height)) return mode;
-  if (fpsStr.getAsInteger(10, mode.fps)) return mode;
-
-  // convert format to enum value
-  mode.pixelFormat = PixelFormatFromString(formatStr);
-
-  return mode;
-}
-#endif
 static std::string VideoModeToString(const cs::VideoMode& mode) {
   std::string rv;
   llvm::raw_string_ostream oss{rv};

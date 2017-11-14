@@ -17,9 +17,9 @@ using namespace frc;
  * Constructor.
  *
  * @param pwmChannel The PWM channel that the Nidec Brushless controller is
- *                   attached to.  0-9 are on-board, 10-19 are on the MXP port
+ *                   attached to. 0-9 are on-board, 10-19 are on the MXP port.
  * @param dioChannel The DIO channel that the Nidec Brushless controller is
- *                   attached to.  0-9 are on-board, 10-25 are on the MXP port
+ *                   attached to. 0-9 are on-board, 10-25 are on the MXP port.
  */
 NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
     : m_safetyHelper(this), m_dio(dioChannel), m_pwm(pwmChannel) {
@@ -40,8 +40,8 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
 /**
  * Set the PWM value.
  *
- * <p>The PWM value is set using a range of -1.0 to 1.0, appropriately scaling
- * the value for the FPGA.
+ * The PWM value is set using a range of -1.0 to 1.0, appropriately scaling the
+ * value for the FPGA.
  *
  * @param speed The speed value between -1.0 and 1.0 to set.
  */
@@ -91,13 +91,13 @@ double NidecBrushless::GetExpiration() const {
  * Check if the motor is currently alive or stopped due to a timeout.
  *
  * @return a bool value that is true if the motor has NOT timed out and should
- * still be running.
+ *         still be running.
  */
 bool NidecBrushless::IsAlive() const { return m_safetyHelper.IsAlive(); }
 
 /**
- * Stop the motor. This is called by the MotorSafetyHelper object
- * when it has a timeout for this PWM and needs to stop it from running.
+ * Stop the motor. This is called by the MotorSafetyHelper object when it has a
+ * timeout for this PWM and needs to stop it from running.
  */
 void NidecBrushless::StopMotor() { Disable(); }
 

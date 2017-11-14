@@ -29,6 +29,7 @@ ErrorBase::ErrorBase() { HAL_Initialize(500, 0); }
 
 /**
  * @brief Retrieve the current error.
+ *
  * Get the current error information associated with this sensor.
  */
 Error& ErrorBase::GetError() { return m_error; }
@@ -42,7 +43,7 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
 
 /**
  * @brief Set error information associated with a C library call that set an
- * error to the "errno" global variable.
+ *        error to the "errno" global variable.
  *
  * @param contextMessage A custom message from the code that set the error.
  * @param filename       Filename of the error source
@@ -76,7 +77,7 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
 
 /**
  * @brief Set the current error information associated from the nivision Imaq
- * API.
+ *        API.
  *
  * @param success        The return from the function
  * @param contextMessage A custom message from the code that set the error.

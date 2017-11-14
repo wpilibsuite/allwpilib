@@ -179,7 +179,7 @@ void Relay::Set(Relay::Value value) {
  * Gets the current state of the relay.
  *
  * When set to kForwardOnly or kReverseOnly, value is returned as kOn/kOff not
- * kForward/kReverse (per the recommendation in Set)
+ * kForward/kReverse (per the recommendation in Set).
  *
  * @return The current state of the relay as a Relay::Value
  */
@@ -220,7 +220,8 @@ Relay::Value Relay::Get() const {
 int Relay::GetChannel() const { return m_channel; }
 
 /**
- * Set the expiration time for the Relay object
+ * Set the expiration time for the Relay object.
+ *
  * @param timeout The timeout (in seconds) for this relay object
  */
 void Relay::SetExpiration(double timeout) {
@@ -229,6 +230,7 @@ void Relay::SetExpiration(double timeout) {
 
 /**
  * Return the expiration time for the relay object.
+ *
  * @return The expiration time value.
  */
 double Relay::GetExpiration() const { return m_safetyHelper->GetExpiration(); }

@@ -17,21 +17,18 @@
 namespace frc {
 
 /**
- * A {@link CommandGroup} is a list of commands which are executed in sequence.
+ * A CommandGroup is a list of commands which are executed in sequence.
  *
- * <p>Commands in a {@link CommandGroup} are added using the {@link
- * CommandGroup#AddSequential(Command) AddSequential(...)} method and are
- * called sequentially. {@link CommandGroup CommandGroups} are themselves
- * {@link Command Commands} and can be given to other
- * {@link CommandGroup CommandGroups}.</p>
+ * Commands in a CommandGroup are added using the AddSequential() method and are
+ * called sequentially. CommandGroups are themselves Commands and can be given
+ * to other CommandGroups.
  *
- * <p>{@link CommandGroup CommandGroups} will carry all of the requirements of
- * their {@link Command subcommands}.  Additional requirements can be specified
- * by calling {@link CommandGroup#Requires(Subsystem) Requires(...)} normally
- * in the constructor.</P>
+ * CommandGroups will carry all of the requirements of their Command
+ * subcommands. Additional requirements can be specified by calling Requires()
+ * normally in the constructor.
  *
- * <p>CommandGroups can also execute commands in parallel, simply by adding them
- * using {@link CommandGroup#AddParallel(Command) AddParallel(...)}.</p>
+ * CommandGroups can also execute commands in parallel, simply by adding them
+ * using AddParallel().
  *
  * @see Command
  * @see Subsystem
@@ -63,13 +60,13 @@ class CommandGroup : public Command {
  private:
   void CancelConflicts(Command* command);
 
-  /** The commands in this group (stored in entries) */
+  // The commands in this group (stored in entries)
   std::vector<CommandGroupEntry> m_commands;
 
-  /** The active children in this group (stored in entries) */
+  // The active children in this group (stored in entries)
   std::list<CommandGroupEntry> m_children;
 
-  /** The current command, -1 signifies that none have been run */
+  // The current command, -1 signifies that none have been run
   int m_currentCommandIndex = -1;
 };
 

@@ -22,29 +22,24 @@ class Subsystem;
 
 /**
  * The Command class is at the very core of the entire command framework.
- * Every command can be started with a call to {@link Command#Start() Start()}.
- * Once a command is started it will call {@link Command#Initialize()
- * Initialize()}, and then will repeatedly call
- * {@link Command#Execute() Execute()} until the
- * {@link Command#IsFinished() IsFinished()} returns true.  Once it does,
- * {@link Command#End() End()} will be called.
  *
- * <p>However, if at any point while it is running {@link Command#Cancel()
- * Cancel()} is called, then the command will be stopped and
- * {@link Command#Interrupted() Interrupted()} will be called.</p>
+ * Every command can be started with a call to Start(). Once a command is
+ * started it will call Initialize(), and then will repeatedly call Execute()
+ * until the IsFinished() returns true. Once it does,End() will be called.
  *
- * <p>If a command uses a {@link Subsystem}, then it should specify that it does
- * so by calling the {@link Command#Requires(Subsystem) Requires(...)} method
- * in its constructor. Note that a Command may have multiple requirements, and
- * {@link Command#Requires(Subsystem) Requires(...)} should be called for each
- * one.</p>
+ * However, if at any point while it is running Cancel() is called, then the
+ * command will be stopped and Interrupted() will be called.
  *
- * <p>If a command is running and a new command with shared requirements is
- * started, then one of two things will happen.  If the active command is
- * interruptible, then {@link Command#Cancel() Cancel()} will be called and the
- * command will be removed to make way for the new one.  If the active command
- * is not interruptible, the other one will not even be started, and the active
- * one will continue functioning.</p>
+ * If a command uses a Subsystem, then it should specify that it does so by
+ * calling the Requires() method in its constructor. Note that a Command may
+ * have multiple requirements, and Requires() should be called for each one.
+ *
+ * If a command is running and a new command with shared requirements is
+ * started, then one of two things will happen. If the active command is
+ * interruptible, then Cancel() will be called and the command will be removed
+ * to make way for the new one. If the active command is not interruptible, the
+ * other one will not even be started, and the active one will continue
+ * functioning.
  *
  * @see CommandGroup
  * @see Subsystem
@@ -88,19 +83,19 @@ class Command : public ErrorBase, public NamedSendable {
 
   /**
    * Returns whether this command is finished.
-   * If it is, then the command will be removed and {@link Command#end() end()}
-   * will be called.
    *
-   * <p>It may be useful for a team to reference the {@link Command#isTimedOut()
-   * isTimedOut()} method for time-sensitive commands.</p>
+   * If it is, then the command will be removed and End() will be called.
    *
-   * <p>Returning false will result in the command never ending automatically.
+   * It may be useful for a team to reference the IsTimedOut() method for
+   * time-sensitive commands.
+   *
+   * Returning false will result in the command never ending automatically.
    * It may still be cancelled manually or interrupted by another command.
    * Returning true will result in the command executing once and finishing
-   * immediately. We recommend using {@link InstantCommand} for this.</p>
+   * immediately. We recommend using InstantCommand for this.
    *
-   * @return whether this command is finished.
-   * @see Command#isTimedOut() isTimedOut()
+   * @return Whether this command is finished.
+   * @see IsTimedOut()
    */
   virtual bool IsFinished() = 0;
 
@@ -117,42 +112,41 @@ class Command : public ErrorBase, public NamedSendable {
 
  private:
   void LockChanges();
-  /*synchronized*/ void Removed();
+  void Removed();
   void StartRunning();
   void StartTiming();
 
-  /** The name of this command */
+  // The name of this command
   std::string m_name;
 
-  /** The time since this command was initialized */
+  // The time since this command was initialized
   double m_startTime = -1;
 
-  /** The time (in seconds) before this command "times out" (or -1 if no
-   * timeout) */
+  // The time (in seconds) before this command "times out" (-1 if no timeout)
   double m_timeout;
 
-  /** Whether or not this command has been initialized */
+  // Whether or not this command has been initialized
   bool m_initialized = false;
 
-  /** The requirements (or null if no requirements) */
+  // The requirements (or null if no requirements)
   SubsystemSet m_requirements;
 
-  /** Whether or not it is running */
+  // Whether or not it is running
   bool m_running = false;
 
-  /** Whether or not it is interruptible*/
+  // Whether or not it is interruptible
   bool m_interruptible = true;
 
-  /** Whether or not it has been canceled */
+  // Whether or not it has been canceled
   bool m_canceled = false;
 
-  /** Whether or not it has been locked */
+  // Whether or not it has been locked
   bool m_locked = false;
 
-  /** Whether this command should run when the robot is disabled */
+  // Whether this command should run when the robot is disabled
   bool m_runWhenDisabled = false;
 
-  /** The {@link CommandGroup} this is in */
+  // The CommandGroup this is in
   CommandGroup* m_parent = nullptr;
 
   int m_commandID = m_commandCounter++;

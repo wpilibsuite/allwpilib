@@ -28,6 +28,7 @@ class DigitalInput;
 class SPI : public SensorBase {
  public:
   enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
+
   explicit SPI(Port port);
   virtual ~SPI();
 
@@ -67,9 +68,9 @@ class SPI : public SensorBase {
 
  protected:
   HAL_SPIPort m_port;
-  bool m_msbFirst = false;          // default little-endian
-  bool m_sampleOnTrailing = false;  // default data updated on falling edge
-  bool m_clk_idle_high = false;     // default clock active high
+  bool m_msbFirst = false;          // Default little-endian
+  bool m_sampleOnTrailing = false;  // Default data updated on falling edge
+  bool m_clk_idle_high = false;     // Default clock active high
 
  private:
   void Init();

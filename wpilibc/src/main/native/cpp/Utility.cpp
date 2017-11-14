@@ -26,9 +26,9 @@ using namespace frc;
 
 /**
  * Assert implementation.
- * This allows breakpoints to be set on an assert.
- * The users don't call this, but instead use the wpi_assert macros in
- * Utility.h.
+ *
+ * This allows breakpoints to be set on an assert. The users don't call this,
+ * but instead use the wpi_assert macros in Utility.h.
  */
 bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
                      llvm::StringRef message, llvm::StringRef fileName,
@@ -79,7 +79,8 @@ bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
 }
 
 /**
- * Common error routines for wpi_assertEqual_impl and wpi_assertNotEqual_impl
+ * Common error routines for wpi_assertEqual_impl and wpi_assertNotEqual_impl.
+ *
  * This should not be called directly; it should only be used by
  * wpi_assertEqual_impl and wpi_assertNotEqual_impl.
  */
@@ -132,10 +133,10 @@ void wpi_assertEqual_common_impl(llvm::StringRef valueA, llvm::StringRef valueB,
 
 /**
  * Assert equal implementation.
- * This determines whether the two given integers are equal. If not,
- * the value of each is printed along with an optional message string.
- * The users don't call this, but instead use the wpi_assertEqual macros in
- * Utility.h.
+ *
+ * This determines whether the two given integers are equal. If not, the value
+ * of each is printed along with an optional message string. The users don't
+ * call this, but instead use the wpi_assertEqual macros in Utility.h.
  */
 bool wpi_assertEqual_impl(int valueA, int valueB, llvm::StringRef valueAString,
                           llvm::StringRef valueBString, llvm::StringRef message,
@@ -150,10 +151,10 @@ bool wpi_assertEqual_impl(int valueA, int valueB, llvm::StringRef valueAString,
 
 /**
  * Assert not equal implementation.
- * This determines whether the two given integers are equal. If so,
- * the value of each is printed along with an optional message string.
- * The users don't call this, but instead use the wpi_assertNotEqual macros in
- * Utility.h.
+ *
+ * This determines whether the two given integers are equal. If so, the value of
+ * each is printed along with an optional message string. The users don't call
+ * this, but instead use the wpi_assertNotEqual macros in Utility.h.
  */
 bool wpi_assertNotEqual_impl(int valueA, int valueB,
                              llvm::StringRef valueAString,
@@ -173,6 +174,7 @@ namespace frc {
  * Return the FPGA Version number.
  *
  * For now, expect this to be competition year.
+ *
  * @return FPGA Version number.
  */
 int GetFPGAVersion() {
@@ -184,10 +186,11 @@ int GetFPGAVersion() {
 
 /**
  * Return the FPGA Revision number.
- * The format of the revision is 3 numbers.
- * The 12 most significant bits are the Major Revision.
- * the next 8 bits are the Minor Revision.
- * The 12 least significant bits are the Build Number.
+ *
+ * The format of the revision is 3 numbers. The 12 most significant bits are the
+ * Major Revision. The next 8 bits are the Minor Revision. The 12 least
+ * significant bits are the Build Number.
+ *
  * @return FPGA Revision number.
  */
 int64_t GetFPGARevision() {
@@ -251,6 +254,7 @@ static std::string demangle(char const* mangledSymbol) {
 
 /**
  * Get a stack trace, ignoring the first "offset" symbols.
+ *
  * @param offset The number of symbols at the top of the stack to ignore
  */
 std::string GetStackTrace(int offset) {

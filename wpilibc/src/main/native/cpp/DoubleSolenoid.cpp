@@ -174,8 +174,8 @@ bool DoubleSolenoid::IsFwdSolenoidBlackListed() const {
  *
  * If a solenoid is shorted, it is added to the blacklist and
  * disabled until power cycle, or until faults are cleared.
- * @see ClearAllPCMStickyFaults()
  *
+ * @see ClearAllPCMStickyFaults()
  * @return If solenoid is disabled due to short.
  */
 bool DoubleSolenoid::IsRevSolenoidBlackListed() const {

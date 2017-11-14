@@ -13,6 +13,7 @@ enum class PIDSourceType { kDisplacement, kRate };
 
 /**
  * PIDSource interface is a generic sensor source for the PID class.
+ *
  * All sensors that can be used with the PID class will implement the PIDSource
  * that returns a standard value that will be used in the PID code.
  */

@@ -20,9 +20,9 @@ using namespace frc;
 Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
 
 /**
- * Returns the {@link Scheduler}, creating it if one does not exist.
+ * Returns the Scheduler, creating it if one does not exist.
  *
- * @return the {@link Scheduler}
+ * @return the Scheduler
  */
 Scheduler* Scheduler::GetInstance() {
   static Scheduler instance;
@@ -99,14 +99,14 @@ void Scheduler::ProcessCommandAddition(Command* command) {
  * Runs a single iteration of the loop.
  *
  * This method should be called often in order to have a functioning
- * {@link Command} system.  The loop has five stages:
+ * Command system. The loop has five stages:
  *
  * <ol>
- * <li> Poll the Buttons </li>
- * <li> Execute/Remove the Commands </li>
- * <li> Send values to SmartDashboard </li>
- * <li> Add Commands </li>
- * <li> Add Defaults </li>
+ *   <li>Poll the Buttons</li>
+ *   <li>Execute/Remove the Commands</li>
+ *   <li>Send values to SmartDashboard</li>
+ *   <li>Add Commands</li>
+ *   <li>Add Defaults</li>
  * </ol>
  */
 void Scheduler::Run() {
@@ -166,10 +166,10 @@ void Scheduler::Run() {
 }
 
 /**
- * Registers a {@link Subsystem} to this {@link Scheduler}, so that the {@link
- * Scheduler} might know if a default {@link Command} needs to be run.
+ * Registers a Subsystem to this Scheduler, so that the Scheduler might know if
+ * a default Command needs to be run.
  *
- * All {@link Subsystem Subsystems} should call this.
+ * All Subsystems should call this.
  *
  * @param system the system
  */
@@ -182,7 +182,7 @@ void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
 }
 
 /**
- * Removes the {@link Command} from the {@link Scheduler}.
+ * Removes the Command from the Scheduler.
  *
  * @param command the command to remove
  */
@@ -235,10 +235,8 @@ void Scheduler::UpdateTable() {
       toCancel = new_toCancel->GetDoubleArray();
     else
       toCancel.resize(0);
-    // m_table->RetrieveValue("Ids", *ids);
 
-    // cancel commands that have had the cancel buttons pressed
-    // on the SmartDashboad
+    // Cancel commands whose cancel buttons were pressed on the SmartDashboard
     if (!toCancel.empty()) {
       for (auto commandIter = m_commands.begin();
            commandIter != m_commands.end(); ++commandIter) {

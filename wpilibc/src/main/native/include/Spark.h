@@ -12,7 +12,7 @@
 namespace frc {
 
 /**
- * REV Robotics Speed Controller
+ * REV Robotics Speed Controller.
  */
 class Spark : public PWMSpeedController {
  public:

@@ -16,7 +16,7 @@
 namespace frc {
 
 /**
- * This class is a non-template base class for {@link SendableChooser}.
+ * This class is a non-template base class for SendableChooser.
  *
  * It contains static, non-templated variables to avoid their duplication in the
  * template class.

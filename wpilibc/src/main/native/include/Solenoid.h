@@ -41,7 +41,7 @@ class Solenoid : public SolenoidBase, public LiveWindowSendable {
 
  private:
   HAL_SolenoidHandle m_solenoidHandle = HAL_kInvalidHandle;
-  int m_channel;  ///< The channel on the module to control.
+  int m_channel;  // The channel on the module to control
   nt::NetworkTableEntry m_valueEntry;
   NT_EntryListener m_valueListener = 0;
 };

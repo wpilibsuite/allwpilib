@@ -297,9 +297,6 @@ double Joystick::GetDirectionRadians() const {
  * Get the direction of the vector formed by the joystick and its origin
  * in degrees.
  *
- * uses std::acos(-1) to represent Pi due to absence of readily accessible Pi
- * constant in C++
- *
  * @return The direction of the vector in degrees
  */
 double Joystick::GetDirectionDegrees() const {
