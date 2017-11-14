@@ -52,6 +52,4 @@ typedef enum {
 		CTR_BufferFull,			//!< Caller attempted to insert data into a buffer that is full.
 }CTR_Code;
 
-#include "ctre_frames.h"
-
 #endif /* CTRE_H */
