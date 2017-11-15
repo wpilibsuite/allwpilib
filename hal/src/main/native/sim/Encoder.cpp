@@ -323,4 +323,4 @@ HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
 
   return encoder->encodingType;
 }
-}
+}  // extern "C"

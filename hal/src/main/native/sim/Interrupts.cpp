@@ -553,4 +553,4 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
   interrupt->fireOnDown = fallingEdge;
   interrupt->fireOnUp = risingEdge;
 }
-}
+}  // extern "C"
