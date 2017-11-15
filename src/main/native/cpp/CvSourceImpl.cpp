@@ -118,8 +118,13 @@ void CvSourceImpl::SetExposureManual(int value, CS_Status* status) {
 }
 
 bool CvSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
-  // can't set video mode on OpenCV source
-  return false;
+  {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_mode = mode;
+    m_videoModes[0] = mode;
+  }
+  Notifier::GetInstance().NotifySourceVideoMode(*this, mode);
+  return true;
 }
 
 void CvSourceImpl::NumSinksChanged() {
