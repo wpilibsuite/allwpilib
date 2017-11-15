@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.Manifest;
-//import org.opencv.core.Core;
 
+import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
@@ -179,16 +179,9 @@ public abstract class RobotBase {
     HLUsageReporting.SetImplementation(new HardwareHLUsageReporting());
     RobotState.SetImplementation(DriverStation.getInstance());
 
-    // Load opencv
-    /* TODO (after opencv is added again)
-    try {
-      System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    } catch (UnsatisfiedLinkError ex) {
-      System.out.println("OpenCV Native Libraries could not be loaded.");
-      System.out.println("Please try redeploying, or reimage your roboRIO and try again.");
-      ex.printStackTrace();
-    }
-    */
+    // Call a CameraServer JNI function to force OpenCV native library loading
+    // Needed because all the OpenCV JNI functions don't have built in loading
+    CameraServerJNI.enumerateSinks();
   }
 
   /**
