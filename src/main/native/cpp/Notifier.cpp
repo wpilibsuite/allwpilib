@@ -62,7 +62,7 @@ class UidVector {
   std::vector<unsigned int> m_free;
 };
 
-}  // anonymous namespace
+}  // namespace
 
 class Notifier::Thread : public wpi::SafeThread {
  public:
