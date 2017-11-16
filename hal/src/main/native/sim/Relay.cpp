@@ -106,4 +106,4 @@ HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
   else
     return SimRelayData[port->channel].GetReverse();
 }
-}
+}  // extern "C"

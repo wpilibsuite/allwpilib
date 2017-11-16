@@ -168,4 +168,4 @@ int32_t HAL_GetAnalogOffset(HAL_AnalogInputHandle analogPortHandle,
                             int32_t* status) {
   return 0;
 }
-}
+}  // extern "C"
