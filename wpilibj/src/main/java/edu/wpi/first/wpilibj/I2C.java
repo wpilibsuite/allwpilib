@@ -72,20 +72,15 @@ public class I2C extends SensorBase {
    */
   public synchronized boolean transaction(byte[] dataToSend, int sendSize,
                                           byte[] dataReceived, int receiveSize) {
-    final int status;
-
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(sendSize);
-    if (sendSize > 0 && dataToSend != null) {
-      dataToSendBuffer.put(dataToSend);
+    if (dataToSend.length < sendSize) {
+      throw new IllegalArgumentException("dataToSend is too small, must be at least " + sendSize);
     }
-    ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(receiveSize);
-
-    status = I2CJNI.i2CTransaction(m_port, (byte) m_deviceAddress, dataToSendBuffer,
-                                   (byte) sendSize, dataReceivedBuffer, (byte) receiveSize);
-    if (receiveSize > 0 && dataReceived != null) {
-      dataReceivedBuffer.get(dataReceived, 0, receiveSize);
+    if (dataReceived.length < receiveSize) {
+      throw new IllegalArgumentException(
+          "dataReceived is too small, must be at least " + receiveSize);
     }
-    return status < 0;
+    return I2CJNI.i2CTransactionB(m_port, (byte) m_deviceAddress, dataToSend,
+                                  (byte) sendSize, dataReceived, (byte) receiveSize) < 0;
   }
 
   /**
@@ -94,16 +89,17 @@ public class I2C extends SensorBase {
    * <p>This is a lower-level interface to the I2C hardware giving you more control over each
    * transaction.
    *
-   * @param dataToSend   Buffer of data to send as part of the transaction. Must be allocated using
-   *                     ByteBuffer.allocateDirect().
+   * @param dataToSend   Buffer of data to send as part of the transaction.
    * @param sendSize     Number of bytes to send as part of the transaction.
-   * @param dataReceived Buffer to read data into. Must be allocated using {@link
-   *                     ByteBuffer#allocateDirect(int)}.
+   * @param dataReceived Buffer to read data into.
    * @param receiveSize  Number of bytes to read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public synchronized boolean transaction(ByteBuffer dataToSend, int sendSize,
                                           ByteBuffer dataReceived, int receiveSize) {
+    if (dataToSend.hasArray() && dataReceived.hasArray()) {
+      return transaction(dataToSend.array(), sendSize, dataReceived.array(), receiveSize);
+    }
     if (!dataToSend.isDirect()) {
       throw new IllegalArgumentException("dataToSend must be a direct buffer");
     }
@@ -131,7 +127,7 @@ public class I2C extends SensorBase {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean addressOnly() {
-    return transaction((byte[]) null, (byte) 0, null, (byte) 0);
+    return transaction(new byte[0], (byte) 0, new byte[0], (byte) 0);
   }
 
   /**
@@ -147,12 +143,8 @@ public class I2C extends SensorBase {
     byte[] buffer = new byte[2];
     buffer[0] = (byte) registerAddress;
     buffer[1] = (byte) data;
-
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(2);
-    dataToSendBuffer.put(buffer);
-
-    return I2CJNI.i2CWrite(m_port, (byte) m_deviceAddress, dataToSendBuffer,
-                           (byte) buffer.length) < 0;
+    return I2CJNI.i2CWriteB(m_port, (byte) m_deviceAddress, buffer,
+                            (byte) buffer.length) < 0;
   }
 
   /**
@@ -164,11 +156,7 @@ public class I2C extends SensorBase {
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public synchronized boolean writeBulk(byte[] data) {
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(data.length);
-    dataToSendBuffer.put(data);
-
-    return I2CJNI.i2CWrite(m_port, (byte) m_deviceAddress, dataToSendBuffer,
-                           (byte) data.length) < 0;
+    return writeBulk(data, data.length);
   }
 
   /**
@@ -176,10 +164,31 @@ public class I2C extends SensorBase {
    *
    * <p>Write multiple bytes to a register on a device and wait until the transaction is complete.
    *
-   * @param data The data to write to the device. Must be created using ByteBuffer.allocateDirect().
+   * @param data The data to write to the device.
+   * @param size The number of data bytes to write.
+   * @return Transfer Aborted... false for success, true for aborted.
+   */
+  public synchronized boolean writeBulk(byte[] data, int size) {
+    if (data.length < size) {
+      throw new IllegalArgumentException(
+          "buffer is too small, must be at least " + size);
+    }
+    return I2CJNI.i2CWriteB(m_port, (byte) m_deviceAddress, data, (byte) size) < 0;
+  }
+
+  /**
+   * Execute a write transaction with the device.
+   *
+   * <p>Write multiple bytes to a register on a device and wait until the transaction is complete.
+   *
+   * @param data The data to write to the device.
+   * @param size The number of data bytes to write.
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public synchronized boolean writeBulk(ByteBuffer data, int size) {
+    if (data.hasArray()) {
+      return writeBulk(data.array(), size);
+    }
     if (!data.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
@@ -208,12 +217,17 @@ public class I2C extends SensorBase {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
     }
+    if (buffer.length < count) {
+      throw new IllegalArgumentException("buffer is too small, must be at least " + count);
+    }
 
     byte[] registerAddressArray = new byte[1];
     registerAddressArray[0] = (byte) registerAddress;
 
     return transaction(registerAddressArray, registerAddressArray.length, buffer, count);
   }
+
+  private ByteBuffer m_readDataToSendBuffer = null;
 
   /**
    * Execute a read transaction with the device.
@@ -223,13 +237,16 @@ public class I2C extends SensorBase {
    *
    * @param registerAddress The register to read first in the transaction.
    * @param count           The number of bytes to read in the transaction.
-   * @param buffer          A buffer to store the data read from the device. Must be created using
-   *                        ByteBuffer.allocateDirect().
+   * @param buffer          A buffer to store the data read from the device.
    * @return Transfer Aborted... false for success, true for aborted.
    */
   public boolean read(int registerAddress, int count, ByteBuffer buffer) {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
+    }
+
+    if (buffer.hasArray()) {
+      return read(registerAddress, count, buffer.array());
     }
 
     if (!buffer.isDirect()) {
@@ -239,10 +256,14 @@ public class I2C extends SensorBase {
       throw new IllegalArgumentException("buffer is too small, must be at least " + count);
     }
 
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(1);
-    dataToSendBuffer.put(0, (byte) registerAddress);
+    synchronized (this) {
+      if (m_readDataToSendBuffer == null) {
+        m_readDataToSendBuffer = ByteBuffer.allocateDirect(1);
+      }
+      m_readDataToSendBuffer.put(0, (byte) registerAddress);
 
-    return transaction(dataToSendBuffer, 1, buffer, count);
+      return transaction(m_readDataToSendBuffer, 1, buffer, count);
+    }
   }
 
   /**
@@ -259,13 +280,12 @@ public class I2C extends SensorBase {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count + " given");
     }
+    if (buffer.length < count) {
+      throw new IllegalArgumentException("buffer is too small, must be at least " + count);
+    }
 
-    ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
-
-    int retVal = I2CJNI.i2CRead(m_port, (byte) m_deviceAddress, dataReceivedBuffer,
-                                (byte) count);
-    dataReceivedBuffer.get(buffer);
-    return retVal < 0;
+    return I2CJNI.i2CReadB(m_port, (byte) m_deviceAddress, buffer,
+                           (byte) count) < 0;
   }
 
   /**
@@ -273,8 +293,7 @@ public class I2C extends SensorBase {
    *
    * <p>Read bytes from a device. This method does not write any data to prompt the device.
    *
-   * @param buffer A pointer to the array of bytes to store the data read from the device. Must be
-   *               created using ByteBuffer.allocateDirect().
+   * @param buffer A pointer to the array of bytes to store the data read from the device.
    * @param count  The number of bytes to read in the transaction.
    * @return Transfer Aborted... false for success, true for aborted.
    */
@@ -282,6 +301,10 @@ public class I2C extends SensorBase {
     if (count < 1) {
       throw new BoundaryException("Value must be at least 1, " + count
           + " given");
+    }
+
+    if (buffer.hasArray()) {
+      return readOnly(buffer.array(), count);
     }
 
     if (!buffer.isDirect()) {
@@ -322,21 +345,21 @@ public class I2C extends SensorBase {
   public boolean verifySensor(int registerAddress, int count,
                               byte[] expected) {
     // TODO: Make use of all 7 read bytes
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(1);
+    byte[] dataToSend = new byte[1];
 
-    ByteBuffer deviceData = ByteBuffer.allocateDirect(4);
+    byte[] deviceData = new byte[4];
     for (int i = 0, curRegisterAddress = registerAddress;
          i < count; i += 4, curRegisterAddress += 4) {
       int toRead = count - i < 4 ? count - i : 4;
       // Read the chunk of data. Return false if the sensor does not
       // respond.
-      dataToSendBuffer.put(0, (byte) curRegisterAddress);
-      if (transaction(dataToSendBuffer, 1, deviceData, toRead)) {
+      dataToSend[0] = (byte) curRegisterAddress;
+      if (transaction(dataToSend, 1, deviceData, toRead)) {
         return false;
       }
 
       for (byte j = 0; j < toRead; j++) {
-        if (deviceData.get(j) != expected[i + j]) {
+        if (deviceData[j] != expected[i + j]) {
           return false;
         }
       }

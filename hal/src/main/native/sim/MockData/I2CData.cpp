@@ -97,10 +97,11 @@ void I2CData::CancelWriteCallback(int32_t uid) {
   m_writeCallbacks = CancelCallback(m_writeCallbacks, uid);
 }
 
-void I2CData::Write(int32_t deviceAddress, uint8_t* dataToSend,
+void I2CData::Write(int32_t deviceAddress, const uint8_t* dataToSend,
                     int32_t sendSize) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
-  InvokeCallback(m_writeCallbacks, "Write", dataToSend, sendSize);
+  InvokeCallback(m_writeCallbacks, "Write", const_cast<uint8_t*>(dataToSend),
+                 sendSize);
 }
 void I2CData::Read(int32_t deviceAddress, uint8_t* buffer, int32_t count) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
