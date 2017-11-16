@@ -473,6 +473,10 @@ int32_t HAL_GetPWMLoopTiming(int32_t* status) {
 uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return 0;
+  // Because of a bug in FPGA image 10, just return the lower 32 bits of cycle
+  // time.
+  return pwmSystem->readCycleStartTime(status);
+
   uint64_t upper1 = pwmSystem->readCycleStartTimeUpper(status);
   uint32_t lower = pwmSystem->readCycleStartTime(status);
   uint64_t upper2 = pwmSystem->readCycleStartTimeUpper(status);
