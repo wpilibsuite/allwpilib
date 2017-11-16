@@ -500,22 +500,19 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorCount(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_AnalogJNI
  * Method:    getAccumulatorOutput
- * Signature: (ILjava/nio/LongBuffer;Ljava/nio/LongBuffer;)V
+ * Signature: (ILedu/wpi/first/wpilibj/AccumulatorResult;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_AnalogJNI_getAccumulatorOutput(
-    JNIEnv *env, jclass, jint id, jobject value, jobject count) {
+    JNIEnv *env, jclass, jint id, jobject accumulatorResult) {
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << (HAL_AnalogInputHandle)id;
   int32_t status = 0;
-  jlong *valuePtr = (jlong *)env->GetDirectBufferAddress(value);
-  jlong *countPtr = (jlong *)env->GetDirectBufferAddress(count);
-  int64_t valueInt64;
-  int64_t countInt64;
-  HAL_GetAccumulatorOutput((HAL_AnalogInputHandle)id, &valueInt64, &countInt64, &status);
-  *valuePtr = valueInt64;
-  *countPtr = countInt64;
-  ANALOGJNI_LOG(logDEBUG) << "Value = " << *valuePtr;
-  ANALOGJNI_LOG(logDEBUG) << "Count = " << *countPtr;
+  int64_t value = 0;
+  int64_t count = 0;
+  HAL_GetAccumulatorOutput((HAL_AnalogInputHandle)id, &value, &count, &status);
+  SetAccumulatorResultObject(env, accumulatorResult, value, count);
+  ANALOGJNI_LOG(logDEBUG) << "Value = " << value;
+  ANALOGJNI_LOG(logDEBUG) << "Count = " << count;
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
 }
