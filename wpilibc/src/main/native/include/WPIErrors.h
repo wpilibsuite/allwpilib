@@ -19,9 +19,7 @@
   const int wpi_error_value_##label = offset
 #endif
 
-/*
- * Fatal errors
- */
+// Fatal errors
 S(ModuleIndexOutOfRange, -1,
   "Allocating module that is out of range or not found");
 S(ChannelIndexOutOfRange, -1, "Allocating channel that is out of range");
@@ -78,9 +76,7 @@ S(CommandIllegalUse, -50, "Illegal use of Command");
 S(UnsupportedInSimulation, -80, "Unsupported in simulation");
 S(CameraServerError, -90, "CameraServer error");
 
-/*
- * Warnings
- */
+// Warnings
 S(SampleRateTooHigh, 1, "Analog module sample rate is too high");
 S(VoltageOutOfRange, 2,
   "Voltage to convert to raw value is out of range [-10; 10]");

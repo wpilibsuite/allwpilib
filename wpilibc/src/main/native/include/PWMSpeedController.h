@@ -13,7 +13,7 @@
 namespace frc {
 
 /**
- * Common base class for all PWM Speed Controllers
+ * Common base class for all PWM Speed Controllers.
  */
 class PWMSpeedController : public SafePWM, public SpeedController {
  public:

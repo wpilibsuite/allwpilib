@@ -54,10 +54,10 @@ void DigitalGlitchFilter::Add(DigitalSource* input) {
 }
 
 void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requested_index) {
-  // Some sources from Counters and Encoders are null.  By pushing the check
+  // Some sources from Counters and Encoders are null. By pushing the check
   // here, we catch the issue more generally.
   if (input) {
-    // we don't support GlitchFilters on AnalogTriggers.
+    // We don't support GlitchFilters on AnalogTriggers.
     if (input->IsAnalogTrigger()) {
       wpi_setErrorWithContext(
           -1, "Analog Triggers not supported for DigitalGlitchFilters");

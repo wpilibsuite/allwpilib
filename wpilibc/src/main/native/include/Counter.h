@@ -43,6 +43,7 @@ class Counter : public SensorBase,
     kPulseLength = 2,
     kExternalDirection = 3
   };
+
   explicit Counter(Mode mode = kTwoPulse);
   explicit Counter(int channel);
   explicit Counter(DigitalSource* source);
@@ -104,13 +105,15 @@ class Counter : public SensorBase,
  protected:
   // Makes the counter count up.
   std::shared_ptr<DigitalSource> m_upSource;
+
   // Makes the counter count down.
   std::shared_ptr<DigitalSource> m_downSource;
+
   // The FPGA counter object
   HAL_CounterHandle m_counter = HAL_kInvalidHandle;
 
  private:
-  int m_index = 0;  ///< The index of this counter.
+  int m_index = 0;  // The index of this counter.
 
   nt::NetworkTableEntry m_valueEntry;
   friend class DigitalGlitchFilter;

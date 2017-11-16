@@ -24,6 +24,7 @@ class GenericHID;
 /**
  * Utility class for handling Robot drive based on a definition of the motor
  * configuration.
+ *
  * The robot drive class handles basic driving for a robot. Currently, 2 and 4
  * motor tank and mecanum drive trains are supported. In the future other drive
  * types like swerve might be implemented. Motor channel numbers are passed
@@ -115,6 +116,7 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   static const int kMaxNumberOfMotors = 4;
   double m_sensitivity = 0.5;
   double m_maxOutput = 1.0;
+
   std::shared_ptr<SpeedController> m_frontLeftMotor;
   std::shared_ptr<SpeedController> m_frontRightMotor;
   std::shared_ptr<SpeedController> m_rearLeftMotor;

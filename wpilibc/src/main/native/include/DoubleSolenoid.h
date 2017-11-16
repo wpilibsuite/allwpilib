@@ -44,10 +44,10 @@ class DoubleSolenoid : public SolenoidBase, public LiveWindowSendable {
   void InitTable(std::shared_ptr<nt::NetworkTable> subTable);
 
  private:
-  int m_forwardChannel;  ///< The forward channel on the module to control.
-  int m_reverseChannel;  ///< The reverse channel on the module to control.
-  int m_forwardMask;     ///< The mask for the forward channel.
-  int m_reverseMask;     ///< The mask for the reverse channel.
+  int m_forwardChannel;  // The forward channel on the module to control.
+  int m_reverseChannel;  // The reverse channel on the module to control.
+  int m_forwardMask;     // The mask for the forward channel.
+  int m_reverseMask;     // The mask for the reverse channel.
   HAL_SolenoidHandle m_forwardHandle = HAL_kInvalidHandle;
   HAL_SolenoidHandle m_reverseHandle = HAL_kInvalidHandle;
 

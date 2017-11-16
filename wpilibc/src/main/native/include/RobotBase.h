@@ -33,6 +33,7 @@ class DriverStation;
 
 /**
  * Implement a Robot Program framework.
+ *
  * The RobotBase class is intended to be subclassed by a user creating a robot
  * program. Overridden Autonomous() and OperatorControl() methods are called at
  * the appropriate time as the match proceeds. In the current implementation,

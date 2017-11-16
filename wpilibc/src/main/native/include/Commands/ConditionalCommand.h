@@ -15,25 +15,17 @@
 namespace frc {
 
 /**
- * A {@link ConditionalCommand} is a {@link Command} that starts one of two
- * commands.
+ * A ConditionalCommand is a Command that starts one of two commands.
  *
- * <p>
- * A {@link ConditionalCommand} uses m_condition to determine whether it should
- * run m_onTrue or m_onFalse.
- * </p>
+ * A ConditionalCommand uses m_condition to determine whether it should run
+ * m_onTrue or m_onFalse.
  *
- * <p>
- * A {@link ConditionalCommand} adds the proper {@link Command} to the {@link
- * Scheduler} during {@link ConditionalCommand#initialize()} and then {@link
- * ConditionalCommand#isFinished()} will return true once that {@link Command}
- * has finished executing.
- * </p>
+ * A ConditionalCommand adds the proper Command to the Scheduler during
+ * Initialize() and then IsFinished() will return true once that Command has
+ * finished executing.
  *
- * <p>
- * If no {@link Command} is specified for m_onFalse, the occurrence of that
- * condition will be a no-op.
- * </p>
+ * If no Command is specified for m_onFalse, the occurrence of that condition
+ * will be a no-op.
  *
  * @see Command
  * @see Scheduler
@@ -59,21 +51,13 @@ class ConditionalCommand : public Command {
   void Interrupted() override;
 
  private:
-  /**
-   * The Command to execute if {@link ConditionalCommand#Condition()} returns
-   * true
-   */
+  // The Command to execute if Condition() returns true
   Command* m_onTrue;
 
-  /**
-   * The Command to execute if {@link ConditionalCommand#Condition()} returns
-   * false
-   */
+  // The Command to execute if Condition() returns false
   Command* m_onFalse;
 
-  /**
-   * Stores command chosen by condition
-   */
+  // Stores command chosen by condition
   Command* m_chosenCommand = nullptr;
 };
 
