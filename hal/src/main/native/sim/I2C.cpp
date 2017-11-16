@@ -16,14 +16,14 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   SimI2CData[port].SetInitialized(true);
 }
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
-                           uint8_t* dataToSend, int32_t sendSize,
+                           const uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
   SimI2CData[port].Write(deviceAddress, dataToSend, sendSize);
   SimI2CData[port].Read(deviceAddress, dataReceived, receiveSize);
   return 0;
 }
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
-                     uint8_t* dataToSend, int32_t sendSize) {
+                     const uint8_t* dataToSend, int32_t sendSize) {
   SimI2CData[port].Write(deviceAddress, dataToSend, sendSize);
   return 0;
 }

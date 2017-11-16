@@ -95,7 +95,7 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
  * @return >= 0 on success or -1 on transfer abort.
  */
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
-                           uint8_t* dataToSend, int32_t sendSize,
+                           const uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
   if (port > 1) {
     // Set port out of range error here
@@ -106,7 +106,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
   msgs[0].addr = deviceAddress;
   msgs[0].flags = 0;
   msgs[0].len = sendSize;
-  msgs[0].buf = dataToSend;
+  msgs[0].buf = const_cast<uint8_t*>(dataToSend);
   msgs[1].addr = deviceAddress;
   msgs[1].flags = I2C_M_RD;
   msgs[1].len = receiveSize;
@@ -137,7 +137,7 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
  * @return >= 0 on success or -1 on transfer abort.
  */
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
-                     uint8_t* dataToSend, int32_t sendSize) {
+                     const uint8_t* dataToSend, int32_t sendSize) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
@@ -147,7 +147,7 @@ int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
   msg.addr = deviceAddress;
   msg.flags = 0;
   msg.len = sendSize;
-  msg.buf = dataToSend;
+  msg.buf = const_cast<uint8_t*>(dataToSend);
 
   struct i2c_rdwr_ioctl_data rdwr;
   rdwr.msgs = &msg;

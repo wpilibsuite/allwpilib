@@ -35,7 +35,8 @@ class I2CData {
   int32_t RegisterWriteCallback(HAL_BufferCallback callback, void* param);
   void CancelWriteCallback(int32_t uid);
 
-  void Write(int32_t deviceAddress, uint8_t* dataToSend, int32_t sendSize);
+  void Write(int32_t deviceAddress, const uint8_t* dataToSend,
+             int32_t sendSize);
   void Read(int32_t deviceAddress, uint8_t* buffer, int32_t count);
 
   void ResetData();
