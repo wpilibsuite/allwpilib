@@ -80,7 +80,7 @@ void I2CData::CancelReadCallback(int32_t uid) {
   m_readCallbacks = CancelCallback(m_readCallbacks, uid);
 }
 
-int32_t I2CData::RegisterWriteCallback(HAL_BufferCallback callback,
+int32_t I2CData::RegisterWriteCallback(HAL_ConstBufferCallback callback,
                                        void* param) {
   // Must return -1 on a null callback for error handling
   if (callback == nullptr) return -1;
@@ -141,7 +141,7 @@ void HALSIM_CancelI2CReadCallback(int32_t index, int32_t uid) {
 }
 
 int32_t HALSIM_RegisterI2CWriteCallback(int32_t index,
-                                        HAL_BufferCallback callback,
+                                        HAL_ConstBufferCallback callback,
                                         void* param) {
   return SimI2CData[index].RegisterWriteCallback(callback, param);
 }

@@ -132,5 +132,7 @@ void HalCallbackListenerVectorImpl<ListenerType>::erase_impl(unsigned int uid) {
 
 typedef HalCallbackListenerVectorImpl<HAL_NotifyCallback> NotifyListenerVector;
 typedef HalCallbackListenerVectorImpl<HAL_BufferCallback> BufferListenerVector;
+typedef HalCallbackListenerVectorImpl<HAL_ConstBufferCallback>
+    ConstBufferListenerVector;
 
 }  // namespace hal

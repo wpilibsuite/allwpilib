@@ -32,7 +32,7 @@ class I2CData {
   int32_t RegisterReadCallback(HAL_BufferCallback callback, void* param);
   void CancelReadCallback(int32_t uid);
 
-  int32_t RegisterWriteCallback(HAL_BufferCallback callback, void* param);
+  int32_t RegisterWriteCallback(HAL_ConstBufferCallback callback, void* param);
   void CancelWriteCallback(int32_t uid);
 
   void Write(int32_t deviceAddress, const uint8_t* dataToSend,
@@ -47,7 +47,7 @@ class I2CData {
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;
-  std::shared_ptr<BufferListenerVector> m_writeCallbacks = nullptr;
+  std::shared_ptr<ConstBufferListenerVector> m_writeCallbacks = nullptr;
 };
 extern I2CData SimI2CData[];
 }  // namespace hal

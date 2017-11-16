@@ -82,7 +82,7 @@ void SPIData::CancelReadCallback(int32_t uid) {
   m_readCallbacks = CancelCallback(m_readCallbacks, uid);
 }
 
-int32_t SPIData::RegisterWriteCallback(HAL_BufferCallback callback,
+int32_t SPIData::RegisterWriteCallback(HAL_ConstBufferCallback callback,
                                        void* param) {
   // Must return -1 on a null callback for error handling
   if (callback == nullptr) return -1;
@@ -219,7 +219,7 @@ void HALSIM_CancelSPIReadCallback(int32_t index, int32_t uid) {
 }
 
 int32_t HALSIM_RegisterSPIWriteCallback(int32_t index,
-                                        HAL_BufferCallback callback,
+                                        HAL_ConstBufferCallback callback,
                                         void* param) {
   return SimSPIData[index].RegisterWriteCallback(callback, param);
 }

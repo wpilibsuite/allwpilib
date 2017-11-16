@@ -32,7 +32,7 @@ class SPIData {
   int32_t RegisterReadCallback(HAL_BufferCallback callback, void* param);
   void CancelReadCallback(int32_t uid);
 
-  int32_t RegisterWriteCallback(HAL_BufferCallback callback, void* param);
+  int32_t RegisterWriteCallback(HAL_ConstBufferCallback callback, void* param);
   void CancelWriteCallback(int32_t uid);
 
   int32_t RegisterResetAccumulatorCallback(HAL_NotifyCallback callback,
@@ -61,7 +61,7 @@ class SPIData {
   std::atomic<int64_t> m_accumulatorValue{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;
-  std::shared_ptr<BufferListenerVector> m_writeCallbacks = nullptr;
+  std::shared_ptr<ConstBufferListenerVector> m_writeCallbacks = nullptr;
   std::shared_ptr<NotifyListenerVector> m_resetAccumulatorCallback = nullptr;
   std::shared_ptr<NotifyListenerVector> m_setAccumulatorCallback = nullptr;
 };
