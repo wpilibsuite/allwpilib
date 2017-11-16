@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -252,10 +251,13 @@ public class SerialPort {
    * @return An array of the read bytes
    */
   public byte[] read(final int count) {
-    ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
+    byte[] dataReceivedBuffer = new byte[count];
     int gotten = SerialPortJNI.serialRead(m_port, dataReceivedBuffer, count);
+    if (gotten == count) {
+      return dataReceivedBuffer;
+    }
     byte[] retVal = new byte[gotten];
-    dataReceivedBuffer.get(retVal);
+    System.arraycopy(dataReceivedBuffer, 0, retVal, 0, gotten);
     return retVal;
   }
 
@@ -267,9 +269,10 @@ public class SerialPort {
    * @return The number of bytes actually written into the port.
    */
   public int write(byte[] buffer, int count) {
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(count);
-    dataToSendBuffer.put(buffer, 0, count);
-    return SerialPortJNI.serialWrite(m_port, dataToSendBuffer, count);
+    if (buffer.length < count) {
+      throw new IllegalArgumentException("buffer is too small, must be at least " + count);
+    }
+    return SerialPortJNI.serialWrite(m_port, buffer, count);
   }
 
   /**
