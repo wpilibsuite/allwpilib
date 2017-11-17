@@ -30,3 +30,15 @@ std::shared_ptr<hal::BufferListenerVector> CancelCallback(
 
 void InvokeCallback(std::shared_ptr<hal::BufferListenerVector> currentVector,
                     const char* name, uint8_t* buffer, int32_t count);
+
+std::shared_ptr<hal::ConstBufferListenerVector> RegisterCallback(
+    std::shared_ptr<hal::ConstBufferListenerVector> currentVector,
+    const char* name, HAL_ConstBufferCallback callback, void* param,
+    int32_t* newUid);
+
+std::shared_ptr<hal::ConstBufferListenerVector> CancelCallback(
+    std::shared_ptr<hal::ConstBufferListenerVector> currentVector, int32_t uid);
+
+void InvokeCallback(
+    std::shared_ptr<hal::ConstBufferListenerVector> currentVector,
+    const char* name, const uint8_t* buffer, int32_t count);

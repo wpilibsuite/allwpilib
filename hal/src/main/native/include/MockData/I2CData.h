@@ -30,7 +30,7 @@ int32_t HALSIM_RegisterI2CReadCallback(int32_t index,
 void HALSIM_CancelI2CReadCallback(int32_t index, int32_t uid);
 
 int32_t HALSIM_RegisterI2CWriteCallback(int32_t index,
-                                        HAL_BufferCallback callback,
+                                        HAL_ConstBufferCallback callback,
                                         void* param);
 void HALSIM_CancelI2CWriteCallback(int32_t index, int32_t uid);
 
