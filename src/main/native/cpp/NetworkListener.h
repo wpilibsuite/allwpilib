@@ -9,14 +9,13 @@
 #define CSCORE_NETWORKLISTENER_H_
 
 #include <support/SafeThread.h>
-#include <support/atomic_static.h>
 
 namespace cs {
 
 class NetworkListener {
  public:
   static NetworkListener& GetInstance() {
-    ATOMIC_STATIC(NetworkListener, instance);
+    static NetworkListener instance;
     return instance;
   }
   ~NetworkListener();
@@ -29,8 +28,6 @@ class NetworkListener {
 
   class Thread;
   wpi::SafeThreadOwner<Thread> m_owner;
-
-  ATOMIC_STATIC_DECL(NetworkListener)
 };
 
 }  // namespace cs

@@ -14,8 +14,6 @@
 
 using namespace cs;
 
-ATOMIC_STATIC_INIT(Logger)
-
 static void def_log_func(unsigned int level, const char* file,
                          unsigned int line, const char* msg) {
   llvm::SmallString<128> buf;

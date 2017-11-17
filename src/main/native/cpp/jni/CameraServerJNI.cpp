@@ -1482,8 +1482,6 @@ typedef JSingletonCallbackManager<LogMessage> LoggerJNI;
 
 }  // anonymous namespace
 
-ATOMIC_STATIC_INIT(LoggerJNI)
-
 extern "C" {
 
 /*

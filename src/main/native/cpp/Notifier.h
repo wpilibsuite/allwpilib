@@ -11,7 +11,6 @@
 #include <functional>
 
 #include <support/SafeThread.h>
-#include <support/atomic_static.h>
 
 #include "cscore_cpp.h"
 
@@ -25,7 +24,7 @@ class Notifier {
 
  public:
   static Notifier& GetInstance() {
-    ATOMIC_STATIC(Notifier, instance);
+    static Notifier instance;
     return instance;
   }
   ~Notifier();
@@ -64,8 +63,6 @@ class Notifier {
 
   std::function<void()> m_on_start;
   std::function<void()> m_on_exit;
-
-  ATOMIC_STATIC_DECL(Notifier)
   static bool s_destroyed;
 };
 

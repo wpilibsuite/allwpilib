@@ -25,8 +25,6 @@
 
 using namespace cs;
 
-ATOMIC_STATIC_INIT(NetworkListener)
-
 class NetworkListener::Thread : public wpi::SafeThread {
  public:
   void Main();

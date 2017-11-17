@@ -9,14 +9,13 @@
 #define CSCORE_LOG_H_
 
 #include <support/Logger.h>
-#include <support/atomic_static.h>
 
 namespace cs {
 
 class Logger : public wpi::Logger {
  public:
   static Logger& GetInstance() {
-    ATOMIC_STATIC(Logger, instance);
+    static Logger instance;
     return instance;
   }
   ~Logger();
@@ -25,8 +24,6 @@ class Logger : public wpi::Logger {
 
  private:
   Logger();
-
-  ATOMIC_STATIC_DECL(Logger)
 };
 
 #define LOG(level, x) WPI_LOG(cs::Logger::GetInstance(), level, x)

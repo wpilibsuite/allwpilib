@@ -14,7 +14,6 @@
 
 #include <llvm/ArrayRef.h>
 #include <llvm/SmallVector.h>
-#include <support/atomic_static.h>
 #include <support/mutex.h>
 
 namespace cs {
@@ -169,14 +168,12 @@ class StaticUnlimitedHandleResource
     : public UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex> {
  public:
   static StaticUnlimitedHandleResource& GetInstance() {
-    ATOMIC_STATIC(StaticUnlimitedHandleResource, instance);
+    static StaticUnlimitedHandleResource instance;
     return instance;
   }
 
  private:
   StaticUnlimitedHandleResource() = default;
-
-  ATOMIC_STATIC_DECL(StaticUnlimitedHandleResource)
 };
 
 }  // namespace cs

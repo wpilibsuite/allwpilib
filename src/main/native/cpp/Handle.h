@@ -79,7 +79,7 @@ class Sources
     : public UnlimitedHandleResource<Handle, SourceData, Handle::kSource> {
  public:
   static Sources& GetInstance() {
-    ATOMIC_STATIC(Sources, instance);
+    static Sources instance;
     return instance;
   }
 
@@ -91,8 +91,6 @@ class Sources
 
  private:
   Sources() = default;
-
-  ATOMIC_STATIC_DECL(Sources)
 };
 
 struct SinkData {
@@ -108,7 +106,7 @@ struct SinkData {
 class Sinks : public UnlimitedHandleResource<Handle, SinkData, Handle::kSink> {
  public:
   static Sinks& GetInstance() {
-    ATOMIC_STATIC(Sinks, instance);
+    static Sinks instance;
     return instance;
   }
 
@@ -119,8 +117,6 @@ class Sinks : public UnlimitedHandleResource<Handle, SinkData, Handle::kSink> {
 
  private:
   Sinks() = default;
-
-  ATOMIC_STATIC_DECL(Sinks)
 };
 
 }  // namespace cs

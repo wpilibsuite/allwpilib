@@ -16,7 +16,6 @@
 
 using namespace cs;
 
-ATOMIC_STATIC_INIT(Notifier)
 bool Notifier::s_destroyed = false;
 
 namespace {
