@@ -8,7 +8,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.3.0'
+        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.5.0'
         classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:2.0'
     }
 }
@@ -61,6 +61,12 @@ model {
                                   '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
                                   '_TI5?AVfailure', '_CT??_R0?AVout_of_range', '_CTA3?AVout_of_range',
                                   '_TI3?AVout_of_range' ]
+        }
+    }
+    jniConfigs {
+        wpiutilTestingBaseTest(JNIConfig) {
+            jniArmHeaderLocations = [ all: file("${rootDir}/src/arm-linux-jni") ]
+            onlyIncludeSystemHeaders = true
         }
     }
     components {
