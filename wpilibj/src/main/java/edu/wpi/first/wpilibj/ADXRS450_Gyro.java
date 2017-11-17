@@ -111,7 +111,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     int cmdhi = 0x8000 | (reg << 1);
     boolean parity = calcParity(cmdhi);
 
-    ByteBuffer buf = ByteBuffer.allocateDirect(4);
+    ByteBuffer buf = ByteBuffer.allocate(4);
     buf.order(ByteOrder.BIG_ENDIAN);
     buf.put(0, (byte) (cmdhi >> 8));
     buf.put(1, (byte) (cmdhi & 0xff));
