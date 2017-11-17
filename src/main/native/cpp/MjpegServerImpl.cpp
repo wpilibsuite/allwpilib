@@ -31,14 +31,13 @@ using namespace cs;
 
 // A bare-bones HTML webpage for user friendliness.
 static const char* emptyRootPage =
-    "<html><head><title>CameraServer</title></head><body>"
+    "</head><body>"
     "<img src=\"/stream.mjpg\" /><p />"
     "<a href=\"/settings.json\">Settings JSON</a>"
     "</body></html>";
 
 // An HTML page to be sent when a source exists
 static const char* startRootPage =
-    "<html><head>\n"
     "<script>\n"
     "function httpGetAsync(name, val)\n"
     "{\n"
@@ -64,7 +63,7 @@ static const char* startRootPage =
     ".settings { float: left; }\n"
     ".stream { display: inline-block; margin-left: 10px; }\n"
     "</style>\n"
-    "<title>CameraServer</title></head><body>\n"
+    "</head><body>\n"
     "<div class=\"stream\">\n"
     "<img src=\"/stream.mjpg\" /><p />\n"
     "<a href=\"/settings.json\">Settings JSON</a>\n"
@@ -81,6 +80,7 @@ class MjpegServerImpl::ConnThread : public wpi::SafeThread {
   bool ProcessCommand(llvm::raw_ostream& os, SourceImpl& source,
                       llvm::StringRef parameters, bool respond);
   void SendJSON(llvm::raw_ostream& os, SourceImpl& source, bool header);
+  void SendHTMLHeadTitle(llvm::raw_ostream& os) const;
   void SendHTML(llvm::raw_ostream& os, SourceImpl& source, bool header);
   void SendStream(wpi::raw_socket_ostream& os);
   void ProcessRequest();
@@ -326,11 +326,17 @@ bool MjpegServerImpl::ConnThread::ProcessCommand(llvm::raw_ostream& os,
   return true;
 }
 
+void MjpegServerImpl::ConnThread::SendHTMLHeadTitle(
+    llvm::raw_ostream& os) const {
+  os << "<html><head><title>" << m_name << " CameraServer</title>";
+}
+
 // Send the root html file with controls for all the settable properties.
 void MjpegServerImpl::ConnThread::SendHTML(llvm::raw_ostream& os,
                                            SourceImpl& source, bool header) {
   if (header) SendHeader(os, 200, "OK", "application/x-javascript");
 
+  SendHTMLHeadTitle(os);
   os << startRootPage;
   llvm::SmallVector<int, 32> properties_vec;
   CS_Status status = 0;
@@ -773,6 +779,7 @@ void MjpegServerImpl::ConnThread::ProcessRequest() {
       if (auto source = GetSource()) {
         SendHTML(os, *source, false);
       } else {
+        SendHTMLHeadTitle(os);
         os << emptyRootPage << "\r\n";
       }
       break;
