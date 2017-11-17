@@ -166,7 +166,7 @@ class UsbCameraImpl : public SourceImpl {
   std::thread m_cameraThread;
 
   // Quirks
-  bool m_hd3000{false};  // Microsoft LifeCam HD-3000
+  bool m_lifecam_exposure{false};  // Microsoft LifeCam exposure
 
   //
   // Variables protected by m_mutex

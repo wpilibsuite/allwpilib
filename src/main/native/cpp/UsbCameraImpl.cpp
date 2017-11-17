@@ -108,8 +108,8 @@ static constexpr const int quirkLifeCamHd3000[] = {
 
 int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
                                    int rawValue) {
-  // LifeCam HD-3000 exposure setting quirk
-  if (m_hd3000 && rawProp.name == "raw_exposure_absolute" &&
+  // LifeCam exposure setting quirk
+  if (m_lifecam_exposure && rawProp.name == "raw_exposure_absolute" &&
       rawProp.minimum == 5 && rawProp.maximum == 20000) {
     int nelems = llvm::array_lengthof(quirkLifeCamHd3000);
     for (int i = 0; i < nelems; ++i) {
@@ -123,8 +123,8 @@ int UsbCameraImpl::RawToPercentage(const UsbCameraProperty& rawProp,
 
 int UsbCameraImpl::PercentageToRaw(const UsbCameraProperty& rawProp,
                                    int percentValue) {
-  // LifeCam HD-3000 exposure setting quirk
-  if (m_hd3000 && rawProp.name == "raw_exposure_absolute" &&
+  // LifeCam exposure setting quirk
+  if (m_lifecam_exposure && rawProp.name == "raw_exposure_absolute" &&
       rawProp.minimum == 5 && rawProp.maximum == 20000) {
     int nelems = llvm::array_lengthof(quirkLifeCamHd3000);
     int ndx = nelems * percentValue / 100.0;
@@ -1123,8 +1123,10 @@ bool UsbCameraImpl::CacheProperties(CS_Status* status) const {
 }
 
 void UsbCameraImpl::SetQuirks() {
-  llvm::SmallString<128> desc;
-  m_hd3000 = GetDescription(desc).endswith("LifeCam HD-3000");
+  llvm::SmallString<128> descbuf;
+  llvm::StringRef desc = GetDescription(descbuf);
+  m_lifecam_exposure =
+      desc.endswith("LifeCam HD-3000") || desc.endswith("LifeCam Cinema (TM)");
 }
 
 void UsbCameraImpl::SetProperty(int property, int value, CS_Status* status) {
