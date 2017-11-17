@@ -89,7 +89,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     m_spi.setChipSelectActiveLow();
 
     // Validate the part ID
-    ByteBuffer transferBuffer = ByteBuffer.allocateDirect(3);
+    ByteBuffer transferBuffer = ByteBuffer.allocate(3);
     transferBuffer.put(0, kRegRead);
     transferBuffer.put(1, kPartIdRegister);
     m_spi.transaction(transferBuffer, transferBuffer, 3);
@@ -171,7 +171,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     if (m_spi == null) {
       return 0.0;
     }
-    ByteBuffer transferBuffer = ByteBuffer.allocateDirect(4);
+    ByteBuffer transferBuffer = ByteBuffer.allocate(4);
     transferBuffer.put(0, kRegRead);
     transferBuffer.put(1, (byte) (kDataRegister + axis.value));
     m_spi.transaction(transferBuffer, transferBuffer, 4);
@@ -189,7 +189,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
   public ADXL362.AllAxes getAccelerations() {
     ADXL362.AllAxes data = new ADXL362.AllAxes();
     if (m_spi != null) {
-      ByteBuffer dataBuffer = ByteBuffer.allocateDirect(8);
+      ByteBuffer dataBuffer = ByteBuffer.allocate(8);
       // Select the data address.
       dataBuffer.put(0, kRegRead);
       dataBuffer.put(1, kDataRegister);
