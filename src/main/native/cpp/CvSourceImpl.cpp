@@ -119,7 +119,7 @@ void CvSourceImpl::SetExposureManual(int value, CS_Status* status) {
 
 bool CvSourceImpl::SetVideoMode(const VideoMode& mode, CS_Status* status) {
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     m_mode = mode;
     m_videoModes[0] = mode;
   }
