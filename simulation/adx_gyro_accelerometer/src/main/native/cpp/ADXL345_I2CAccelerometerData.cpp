@@ -22,7 +22,8 @@ static void ADXL345I2C_ReadBufferCallback(const char* name, void* param,
 }
 
 static void ADXL345I2C_WriteBufferCallback(const char* name, void* param,
-                                           const uint8_t* buffer, uint32_t count) {
+                                           const uint8_t* buffer,
+										   uint32_t count) {
   ADXL345_I2CData* sim = static_cast<ADXL345_I2CData*>(param);
   sim->HandleWrite(buffer, count);
 }
