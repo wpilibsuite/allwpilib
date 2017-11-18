@@ -22,7 +22,7 @@ static void ADXL345I2C_ReadBufferCallback(const char* name, void* param,
 }
 
 static void ADXL345I2C_WriteBufferCallback(const char* name, void* param,
-                                           uint8_t* buffer, uint32_t count) {
+                                           const uint8_t* buffer, uint32_t count) {
   ADXL345_I2CData* sim = static_cast<ADXL345_I2CData*>(param);
   sim->HandleWrite(buffer, count);
 }
@@ -34,7 +34,7 @@ ADXL345_I2CData::ADXL345_I2CData(int port) {
 
 ADXL345_I2CData::~ADXL345_I2CData() {}
 
-void ADXL345_I2CData::ADXL345_I2CData::HandleWrite(uint8_t* buffer,
+void ADXL345_I2CData::ADXL345_I2CData::HandleWrite(const uint8_t* buffer,
                                                    uint32_t count) {
   m_lastWriteAddress = buffer[0];
 }

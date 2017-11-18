@@ -22,7 +22,7 @@ static void ADXL362SPI_ReadBufferCallback(const char* name, void* param,
 }
 
 static void ADXL362SPI_WriteBufferCallback(const char* name, void* param,
-                                           uint8_t* buffer, uint32_t count) {
+                                           const uint8_t* buffer, uint32_t count) {
   ADXL362_SpiAccelerometer* sim = static_cast<ADXL362_SpiAccelerometer*>(param);
   sim->HandleWrite(buffer, count);
 }
@@ -34,7 +34,7 @@ ADXL362_SpiAccelerometer::ADXL362_SpiAccelerometer(int port) {
 
 ADXL362_SpiAccelerometer::~ADXL362_SpiAccelerometer() {}
 
-void ADXL362_SpiAccelerometer::HandleWrite(uint8_t* buffer, uint32_t count) {
+void ADXL362_SpiAccelerometer::HandleWrite(const uint8_t* buffer, uint32_t count) {
   m_lastWriteAddress = buffer[1];
 }
 
