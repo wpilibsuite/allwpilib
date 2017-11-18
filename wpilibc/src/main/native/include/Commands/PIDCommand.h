@@ -50,7 +50,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   virtual void UsePIDOutput(double output) = 0;
 
  private:
-  /** The internal {@link PIDController} */
+  // The internal PIDController
   std::shared_ptr<PIDController> m_controller;
 
  public:

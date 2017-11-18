@@ -12,7 +12,7 @@
 namespace frc {
 
 /**
- * Luminary Micro / Vex Robotics Jaguar Speed Controller with PWM control
+ * Luminary Micro / Vex Robotics Jaguar Speed Controller with PWM control.
  */
 class Jaguar : public PWMSpeedController {
  public:

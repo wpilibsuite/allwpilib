@@ -23,7 +23,6 @@
 
 namespace frc {
 
-//  Forward declarations
 class ErrorBase;
 
 /**

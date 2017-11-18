@@ -83,3 +83,30 @@ void InvokeCallback(std::shared_ptr<BufferListenerVector> currentVector,
     listener.callback(name, listener.param, buffer, count);
   }
 }
+
+std::shared_ptr<ConstBufferListenerVector> RegisterCallback(
+    std::shared_ptr<ConstBufferListenerVector> currentVector, const char* name,
+    HAL_ConstBufferCallback callback, void* param, int32_t* newUid) {
+  return RegisterCallbackImpl<ConstBufferListenerVector,
+                              HAL_ConstBufferCallback>(currentVector, name,
+                                                       callback, param, newUid);
+}
+
+std::shared_ptr<ConstBufferListenerVector> CancelCallback(
+    std::shared_ptr<ConstBufferListenerVector> currentVector, int32_t uid) {
+  return CancelCallbackImpl<ConstBufferListenerVector, HAL_ConstBufferCallback>(
+      currentVector, uid);
+}
+
+void InvokeCallback(std::shared_ptr<ConstBufferListenerVector> currentVector,
+                    const char* name, const uint8_t* buffer, int32_t count) {
+  // Return if no callbacks are assigned
+  if (currentVector == nullptr) return;
+  // Get a copy of the shared_ptr, then iterate and callback listeners
+  auto newCallbacks = currentVector;
+  for (size_t i = 0; i < newCallbacks->size(); ++i) {
+    if (!(*newCallbacks)[i]) continue;  // removed
+    auto listener = (*newCallbacks)[i];
+    listener.callback(name, listener.param, buffer, count);
+  }
+}

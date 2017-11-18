@@ -82,7 +82,7 @@ void SPIData::CancelReadCallback(int32_t uid) {
   m_readCallbacks = CancelCallback(m_readCallbacks, uid);
 }
 
-int32_t SPIData::RegisterWriteCallback(HAL_BufferCallback callback,
+int32_t SPIData::RegisterWriteCallback(HAL_ConstBufferCallback callback,
                                        void* param) {
   // Must return -1 on a null callback for error handling
   if (callback == nullptr) return -1;
@@ -167,14 +167,15 @@ int32_t SPIData::Read(uint8_t* buffer, int32_t count) {
   return count;
 }
 
-int32_t SPIData::Write(uint8_t* dataToSend, int32_t sendSize) {
+int32_t SPIData::Write(const uint8_t* dataToSend, int32_t sendSize) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
-  InvokeCallback(m_writeCallbacks, "Write", dataToSend, sendSize);
+  InvokeCallback(m_writeCallbacks, "Write", const_cast<uint8_t*>(dataToSend),
+                 sendSize);
 
   return sendSize;
 }
 
-int32_t SPIData::Transaction(uint8_t* dataToSend, uint8_t* dataReceived,
+int32_t SPIData::Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
                              int32_t size) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
   InvokeCallback(m_writeCallbacks, "Write", dataToSend, size);
@@ -221,7 +222,7 @@ void HALSIM_CancelSPIReadCallback(int32_t index, int32_t uid) {
 }
 
 int32_t HALSIM_RegisterSPIWriteCallback(int32_t index,
-                                        HAL_BufferCallback callback,
+                                        HAL_ConstBufferCallback callback,
                                         void* param) {
   return SimSPIData[index].RegisterWriteCallback(callback, param);
 }

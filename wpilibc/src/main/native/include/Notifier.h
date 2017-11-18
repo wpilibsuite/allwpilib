@@ -41,24 +41,31 @@ class Notifier : public ErrorBase {
   void Stop();
 
  private:
-  // update the HAL alarm
+  // Update the HAL alarm
   void UpdateAlarm();
+
   // HAL callback
   static void Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle);
 
-  // used to constrain execution between destructors and callback
+  // Used to constrain execution between destructors and callback
   static wpi::mutex m_destructorMutex;
-  // held while updating process information
+
+  // Held while updating process information
   wpi::mutex m_processMutex;
+
   // HAL handle, atomic for proper destruction
   std::atomic<HAL_NotifierHandle> m_notifier{0};
-  // address of the handler
+
+  // Address of the handler
   TimerEventHandler m_handler;
-  // the absolute expiration time
+
+  // The absolute expiration time
   double m_expirationTime = 0;
-  // the relative time (either periodic or single)
+
+  // The relative time (either periodic or single)
   double m_period = 0;
-  // true if this is a periodic event
+
+  // True if this is a periodic event
   bool m_periodic = false;
 };
 

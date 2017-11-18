@@ -21,12 +21,13 @@ namespace frc {
 
 /**
  * The Resource class is a convenient way to track allocated resources.
- * It tracks them as indicies in the range [0 .. elements - 1].
- * E.g. the library uses this to track hardware channel allocation.
+ *
+ * It tracks them as indicies in the range [0 .. elements - 1]. E.g. the library
+ * uses this to track hardware channel allocation.
  *
  * The Resource class does not allocate the hardware channels or other
- * resources; it just tracks which indices were marked in use by
- * Allocate and not yet freed by Free.
+ * resources; it just tracks which indices were marked in use by Allocate and
+ * not yet freed by Free.
  */
 class Resource : public ErrorBase {
  public:

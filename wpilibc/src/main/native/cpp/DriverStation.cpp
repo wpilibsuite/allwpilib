@@ -762,7 +762,7 @@ void DriverStation::Run() {
  * copied from the cache.
  *
  * @param force True to force an update to the cache, otherwise update if 50ms
- * have passed.
+ *              have passed.
  * @param controlWord Structure to put the return control word data into.
  */
 void DriverStation::UpdateControlWord(bool force,

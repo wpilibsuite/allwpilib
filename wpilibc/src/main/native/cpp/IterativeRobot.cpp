@@ -32,7 +32,7 @@ void IterativeRobot::StartCompetition() {
 
   // Loop forever, calling the appropriate mode-dependent function
   while (true) {
-    // wait for driver station data so the loop doesn't hog the CPU
+    // Wait for driver station data so the loop doesn't hog the CPU
     DriverStation::GetInstance().WaitForData();
 
     LoopFunc();

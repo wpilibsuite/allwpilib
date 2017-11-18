@@ -98,8 +98,8 @@ class Encoder : public SensorBase,
 
   double DecodingScaleFactor() const;
 
-  std::shared_ptr<DigitalSource> m_aSource;  // the A phase of the quad encoder
-  std::shared_ptr<DigitalSource> m_bSource;  // the B phase of the quad encoder
+  std::shared_ptr<DigitalSource> m_aSource;  // The A phase of the quad encoder
+  std::shared_ptr<DigitalSource> m_bSource;  // The B phase of the quad encoder
   std::unique_ptr<DigitalSource> m_indexSource = nullptr;
   HAL_EncoderHandle m_encoder = HAL_kInvalidHandle;
 

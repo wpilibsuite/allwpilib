@@ -38,8 +38,8 @@ void Subsystem::InitDefaultCommand() {}
  * Sets the default command.  If this is not called or is called with null,
  * then there will be no default command for the subsystem.
  *
- * <p><b>WARNING:</b> This should <b>NOT</b> be called in a constructor if the
- * subsystem is a singleton.</p>
+ * <b>WARNING:</b> This should <b>NOT</b> be called in a constructor if the
+ * subsystem is a singleton.
  *
  * @param command the default command (or null if there should be none)
  */
@@ -113,9 +113,9 @@ void Subsystem::Periodic() {}
  * Call this to alert Subsystem that the current command is actually the
  * command.
  *
- * Sometimes, the {@link Subsystem} is told that it has no command while the
- * {@link Scheduler} is going through the loop, only to be soon after given a
- * new one.  This will avoid that situation.
+ * Sometimes, the Subsystem is told that it has no command while the Scheduler
+ * is going through the loop, only to be soon after given a new one. This will
+ * avoid that situation.
  */
 void Subsystem::ConfirmCommand() {
   if (m_currentCommandChanged) {

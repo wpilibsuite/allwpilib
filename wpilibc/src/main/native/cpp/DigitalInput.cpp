@@ -61,7 +61,7 @@ DigitalInput::~DigitalInput() {
   if (m_interrupt != HAL_kInvalidHandle) {
     int32_t status = 0;
     HAL_CleanInterrupts(m_interrupt, &status);
-    // ignore status, as an invalid handle just needs to be ignored.
+    // Ignore status, as an invalid handle just needs to be ignored.
     m_interrupt = HAL_kInvalidHandle;
   }
 

@@ -149,8 +149,8 @@ void IterativeRobotBase::TestPeriodic() {
 void IterativeRobotBase::LoopFunc() {
   // Call the appropriate function depending upon the current robot mode
   if (IsDisabled()) {
-    // call DisabledInit() if we are now just entering disabled mode from
-    // either a different mode or from power-on
+    // Call DisabledInit() if we are now just entering disabled mode from
+    // either a different mode or from power-on.
     if (m_lastMode != Mode::kDisabled) {
       LiveWindow::GetInstance()->SetEnabled(false);
       DisabledInit();
@@ -159,8 +159,8 @@ void IterativeRobotBase::LoopFunc() {
     HAL_ObserveUserProgramDisabled();
     DisabledPeriodic();
   } else if (IsAutonomous()) {
-    // call AutonomousInit() if we are now just entering autonomous mode from
-    // either a different mode or from power-on
+    // Call AutonomousInit() if we are now just entering autonomous mode from
+    // either a different mode or from power-on.
     if (m_lastMode != Mode::kAutonomous) {
       LiveWindow::GetInstance()->SetEnabled(false);
       AutonomousInit();
@@ -169,8 +169,8 @@ void IterativeRobotBase::LoopFunc() {
     HAL_ObserveUserProgramAutonomous();
     AutonomousPeriodic();
   } else if (IsOperatorControl()) {
-    // call TeleopInit() if we are now just entering teleop mode from
-    // either a different mode or from power-on
+    // Call TeleopInit() if we are now just entering teleop mode from
+    // either a different mode or from power-on.
     if (m_lastMode != Mode::kTeleop) {
       LiveWindow::GetInstance()->SetEnabled(false);
       TeleopInit();
@@ -180,8 +180,8 @@ void IterativeRobotBase::LoopFunc() {
     HAL_ObserveUserProgramTeleop();
     TeleopPeriodic();
   } else {
-    // call TestInit() if we are now just entering test mode from
-    // either a different mode or from power-on
+    // Call TestInit() if we are now just entering test mode from
+    // either a different mode or from power-on.
     if (m_lastMode != Mode::kTest) {
       LiveWindow::GetInstance()->SetEnabled(true);
       TestInit();

@@ -10,7 +10,7 @@
 namespace frc {
 
 /**
- * Interface for yaw rate gyros
+ * Interface for yaw rate gyros.
  */
 class Gyro {
  public:
@@ -48,9 +48,9 @@ class Gyro {
   virtual double GetAngle() const = 0;
 
   /**
-   * Return the rate of rotation of the gyro
+   * Return the rate of rotation of the gyro.
    *
-   * The rate is based on the most recent reading of the gyro analog value
+   * The rate is based on the most recent reading of the gyro analog value.
    *
    * @return the current rate in degrees per second
    */

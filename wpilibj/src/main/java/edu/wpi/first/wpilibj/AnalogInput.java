@@ -7,9 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
@@ -289,15 +286,8 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
       throw new IllegalArgumentException(
           "Channel " + m_channel + " is not an accumulator channel.");
     }
-    ByteBuffer value = ByteBuffer.allocateDirect(8);
-    // set the byte order
-    value.order(ByteOrder.LITTLE_ENDIAN);
-    ByteBuffer count = ByteBuffer.allocateDirect(8);
-    // set the byte order
-    count.order(ByteOrder.LITTLE_ENDIAN);
-    AnalogJNI.getAccumulatorOutput(m_port, value.asLongBuffer(), count.asLongBuffer());
-    result.value = value.asLongBuffer().get(0) + m_accumulatorOffset;
-    result.count = count.asLongBuffer().get(0);
+    AnalogJNI.getAccumulatorOutput(m_port, result);
+    result.value += m_accumulatorOffset;
   }
 
   /**

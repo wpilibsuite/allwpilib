@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj.hal;
 
+import edu.wpi.first.wpilibj.AccumulatorResult;
 import java.nio.IntBuffer;
-import java.nio.LongBuffer;
 
 public class AnalogJNI extends JNIWrapper {
   /**
@@ -91,8 +91,7 @@ public class AnalogJNI extends JNIWrapper {
 
   public static native int getAccumulatorCount(int analogPortHandle);
 
-  public static native void getAccumulatorOutput(int analogPortHandle, LongBuffer value,
-                                                 LongBuffer count);
+  public static native void getAccumulatorOutput(int analogPortHandle, AccumulatorResult result);
 
   public static native int initializeAnalogTrigger(int analogInputHandle, IntBuffer index);
 

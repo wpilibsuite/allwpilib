@@ -84,6 +84,7 @@ TEST(PreferencesTest, WritePreferencesToFile) {
 
   static char const* kExpectedFileContents[] = {
       "[NetworkTables Storage 3.0]",
+      "string \"/Preferences/.type\"=\"RobotPreferences\"",
       "boolean \"/Preferences/testFilePutBoolean\"=true",
       "double \"/Preferences/testFilePutDouble\"=0.5",
       "double \"/Preferences/testFilePutFloat\"=0.25",

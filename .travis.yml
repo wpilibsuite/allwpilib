@@ -5,11 +5,11 @@ language: java
 addons:
   apt:
     sources:
+      - deadsnakes
       - ubuntu-toolchain-r-test
     packages:
       - g++-6
-      - python3
-      - python3-pip
+      - python3.5
 
 before_install:
   - sudo sh -c 'echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" > /etc/apt/sources.list.d/llvm.list'
@@ -18,7 +18,9 @@ before_install:
   - sudo apt-get install clang-format-5.0 -y
 
 install:
-  - pip3 install --user wpiformat
+  - wget https://bootstrap.pypa.io/get-pip.py
+  - sudo python3.5 get-pip.py
+  - python3.5 -m pip install --user wpiformat
   - mkdir -p $HOME/latest-gcc-symlinks  # see travis-ci/travis-ci#3668
   - ln -s /usr/bin/g++-6 $HOME/latest-gcc-symlinks/g++
   - ln -s /usr/bin/gcc-6 $HOME/latest-gcc-symlinks/gcc
@@ -33,6 +35,6 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - wpiformat -y 2017 -clang 5.0
+  - python3.5 -m wpiformat -y 2017 -clang 5.0
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
   - ./gradlew --no-daemon --console=plain -PskipAthena :hal:halSimSharedLibrary :wpilibc:wpilibcSharedLibrary :wpilibj:wpilibJNISharedSharedLibrary :wpilibj:jar

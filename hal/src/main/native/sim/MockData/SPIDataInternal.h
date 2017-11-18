@@ -32,7 +32,7 @@ class SPIData {
   int32_t RegisterReadCallback(HAL_BufferCallback callback, void* param);
   void CancelReadCallback(int32_t uid);
 
-  int32_t RegisterWriteCallback(HAL_BufferCallback callback, void* param);
+  int32_t RegisterWriteCallback(HAL_ConstBufferCallback callback, void* param);
   void CancelWriteCallback(int32_t uid);
 
   int32_t RegisterResetAccumulatorCallback(HAL_NotifyCallback callback,
@@ -47,8 +47,9 @@ class SPIData {
   int64_t GetAccumulatorValue();
 
   int32_t Read(uint8_t* buffer, int32_t count);
-  int32_t Write(uint8_t* dataToSend, int32_t sendSize);
-  int32_t Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int32_t size);
+  int32_t Write(const uint8_t* dataToSend, int32_t sendSize);
+  int32_t Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
+                      int32_t size);
   void ResetAccumulator();
 
   void ResetData();
@@ -60,7 +61,7 @@ class SPIData {
   std::atomic<int64_t> m_accumulatorValue{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;
-  std::shared_ptr<BufferListenerVector> m_writeCallbacks = nullptr;
+  std::shared_ptr<ConstBufferListenerVector> m_writeCallbacks = nullptr;
   std::shared_ptr<NotifyListenerVector> m_resetAccumulatorCallback = nullptr;
   std::shared_ptr<NotifyListenerVector> m_setAccumulatorCallback = nullptr;
 };

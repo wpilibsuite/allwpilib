@@ -348,4 +348,4 @@ int32_t HAL_GetPWMLoopTiming(int32_t* status) { return kExpectedLoopTiming; }
  * @return The pwm cycle start time.
  */
 uint64_t HAL_GetPWMCycleStartTime(int32_t* status) { return 0; }
-}
+}  // extern "C"

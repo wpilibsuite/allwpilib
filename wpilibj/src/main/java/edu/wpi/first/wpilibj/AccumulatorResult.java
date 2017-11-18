@@ -22,4 +22,12 @@ public class AccumulatorResult {
    */
   @SuppressWarnings("MemberName")
   public long count;
+
+  /**
+   * Set the value and count.
+   */
+  public void set(long value, long count) {
+    this.value = value;
+    this.count = count;
+  }
 }

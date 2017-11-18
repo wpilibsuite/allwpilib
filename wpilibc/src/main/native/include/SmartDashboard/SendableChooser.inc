@@ -18,8 +18,8 @@ namespace frc {
 /**
  * Adds the given object to the list of options.
  *
- * On the {@link SmartDashboard} on the desktop, the object will appear as the
- * given name.
+ * On the SmartDashboard on the desktop, the object will appear as the given
+ * name.
  *
  * @param name   the name of the option
  * @param object the option
@@ -32,9 +32,8 @@ void SendableChooser<T>::AddObject(llvm::StringRef name, T object) {
 /**
  * Add the given object to the list of options and marks it as the default.
  *
- * Functionally, this is very close to {@link SendableChooser#AddObject(const
- * char *name, void *object) AddObject(...)} except that it will use this as
- * the default option if none other is explicitly selected.
+ * Functionally, this is very close to AddObject() except that it will use this
+ * as the default option if none other is explicitly selected.
  *
  * @param name   the name of the option
  * @param object the option
@@ -49,12 +48,12 @@ void SendableChooser<T>::AddDefault(llvm::StringRef name, T object) {
  * Returns a copy of the selected option (a raw pointer U* if T =
  * std::unique_ptr<U> or a std::weak_ptr<U> if T = std::shared_ptr<U>).
  *
- * If there is none selected, it will return the default.  If there is none
+ * If there is none selected, it will return the default. If there is none
  * selected and no default, then it will return a value-initialized instance.
  * For integer types, this is 0. For container types like std::string, this is
  * an empty string.
  *
- * @return the option selected
+ * @return The option selected
  */
 template <class T>
 auto SendableChooser<T>::GetSelected()

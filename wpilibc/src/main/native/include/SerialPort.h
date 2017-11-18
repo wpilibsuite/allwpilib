@@ -36,18 +36,22 @@ class SerialPort : public ErrorBase {
     kParity_Mark = 3,
     kParity_Space = 4
   };
+
   enum StopBits {
     kStopBits_One = 10,
     kStopBits_OnePointFive = 15,
     kStopBits_Two = 20
   };
+
   enum FlowControl {
     kFlowControl_None = 0,
     kFlowControl_XonXoff = 1,
     kFlowControl_RtsCts = 2,
     kFlowControl_DtrDsr = 4
   };
+
   enum WriteBufferMode { kFlushOnAccess = 1, kFlushWhenFull = 2 };
+
   enum Port { kOnboard = 0, kMXP = 1, kUSB = 2, kUSB1 = 2, kUSB2 = 3 };
 
   SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,

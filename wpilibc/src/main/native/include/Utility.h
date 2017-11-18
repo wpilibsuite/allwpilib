@@ -7,8 +7,8 @@
 
 #pragma once
 
-/** @file
- * Contains global utility functions
+/**
+ * @file Contains global utility functions
  */
 
 #include <stdint.h>

@@ -30,7 +30,7 @@ int32_t HALSIM_RegisterSPIReadCallback(int32_t index,
 void HALSIM_CancelSPIReadCallback(int32_t index, int32_t uid);
 
 int32_t HALSIM_RegisterSPIWriteCallback(int32_t index,
-                                        HAL_BufferCallback callback,
+                                        HAL_ConstBufferCallback callback,
                                         void* param);
 void HALSIM_CancelSPIWriteCallback(int32_t index, int32_t uid);
 

@@ -65,10 +65,10 @@ namespace frc {
 
 /**
  * Base class for most objects.
+ *
  * ErrorBase is the base class for most objects since it holds the generated
- * error
- * for that object. In addition, there is a single instance of a global error
- * object
+ * error for that object. In addition, there is a single instance of a global
+ * error object.
  */
 class ErrorBase {
   // TODO: Consider initializing instance variables and cleanup in destructor
@@ -113,6 +113,7 @@ class ErrorBase {
 
  protected:
   mutable Error m_error;
+
   // TODO: Replace globalError with a global list of all errors.
   static wpi::mutex _globalErrorMutex;
   static Error _globalError;

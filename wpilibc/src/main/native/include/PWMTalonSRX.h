@@ -12,7 +12,8 @@
 namespace frc {
 
 /**
- * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control
+ * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM
+ * control.
  */
 class PWMTalonSRX : public PWMSpeedController {
  public:
