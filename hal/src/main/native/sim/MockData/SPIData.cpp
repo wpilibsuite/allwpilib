@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "../PortsInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 #include "SPIDataInternal.h"
 
 using namespace hal;
@@ -178,6 +178,9 @@ int32_t SPIData::Write(const uint8_t* dataToSend, int32_t sendSize) {
 int32_t SPIData::Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
                              int32_t size) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
+  InvokeCallback(m_writeCallbacks, "Write", dataToSend, size);
+  InvokeCallback(m_readCallbacks, "Read", dataReceived, size);
+
   return size;
 }
 
