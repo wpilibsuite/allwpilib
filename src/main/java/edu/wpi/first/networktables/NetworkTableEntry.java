@@ -225,29 +225,53 @@ public final class NetworkTableEntry {
    * Sets the entry's value if it does not exist.
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
+   * @throws IllegalArgumentException if the value is not a known type
    */
-  public boolean setDefaultValue(NetworkTableValue defaultValue) {
-    long time = defaultValue.getTime();
-    Object o = defaultValue.getValue();
-    switch (defaultValue.getType()) {
-      case kBoolean:
-        return NetworkTablesJNI.setDefaultBoolean(m_handle, time, ((Boolean)o).booleanValue());
-      case kDouble:
-        return NetworkTablesJNI.setDefaultDouble(m_handle, time, ((Number)o).doubleValue());
-      case kString:
-        return NetworkTablesJNI.setDefaultString(m_handle, time, (String)o);
-      case kRaw:
-        return NetworkTablesJNI.setDefaultRaw(m_handle, time, (byte[])o);
-      case kBooleanArray:
-        return NetworkTablesJNI.setDefaultBooleanArray(m_handle, time, (boolean[])o);
-      case kDoubleArray:
-        return NetworkTablesJNI.setDefaultDoubleArray(m_handle, time, (double[])o);
-      case kStringArray:
-        return NetworkTablesJNI.setDefaultStringArray(m_handle, time, (String[])o);
-      case kRpc:
-        // TODO
-      default:
-        return true;
+  public boolean setDefaultValue(Object defaultValue) {
+    if (defaultValue instanceof NetworkTableValue) {
+      long time = ((NetworkTableValue)defaultValue).getTime();
+      Object o = ((NetworkTableValue)defaultValue).getValue();
+      switch (((NetworkTableValue)defaultValue).getType()) {
+        case kBoolean:
+          return NetworkTablesJNI.setDefaultBoolean(m_handle, time, ((Boolean)o).booleanValue());
+        case kDouble:
+          return NetworkTablesJNI.setDefaultDouble(m_handle, time, ((Number)o).doubleValue());
+        case kString:
+          return NetworkTablesJNI.setDefaultString(m_handle, time, (String)o);
+        case kRaw:
+          return NetworkTablesJNI.setDefaultRaw(m_handle, time, (byte[])o);
+        case kBooleanArray:
+          return NetworkTablesJNI.setDefaultBooleanArray(m_handle, time, (boolean[])o);
+        case kDoubleArray:
+          return NetworkTablesJNI.setDefaultDoubleArray(m_handle, time, (double[])o);
+        case kStringArray:
+          return NetworkTablesJNI.setDefaultStringArray(m_handle, time, (String[])o);
+        case kRpc:
+          // TODO
+        default:
+          return true;
+      }
+    } else if (defaultValue instanceof Boolean) {
+      return setDefaultBoolean((Boolean)defaultValue);
+    } else if (defaultValue instanceof Number) {
+      return setDefaultNumber((Number)defaultValue);
+    } else if (defaultValue instanceof String) {
+      return setDefaultString((String)defaultValue);
+    } else if (defaultValue instanceof byte[]) {
+      return setDefaultRaw((byte[])defaultValue);
+    } else if (defaultValue instanceof boolean[]) {
+      return setDefaultBooleanArray((boolean[])defaultValue);
+    } else if (defaultValue instanceof double[]) {
+      return setDefaultDoubleArray((double[])defaultValue);
+    } else if (defaultValue instanceof Boolean[]) {
+      return setDefaultBooleanArray((Boolean[])defaultValue);
+    } else if (defaultValue instanceof Number[]) {
+      return setDefaultNumberArray((Number[])defaultValue);
+    } else if (defaultValue instanceof String[]) {
+      return setDefaultStringArray((String[])defaultValue);
+    } else {
+      throw new IllegalArgumentException("Value of type " + defaultValue.getClass().getName()
+        + " cannot be put into a table");
     }
   }
 
@@ -345,29 +369,53 @@ public final class NetworkTableEntry {
    * Sets the entry's value
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
+   * @throws IllegalArgumentException if the value is not a known type
    */
-  public boolean setValue(NetworkTableValue value) {
-    long time = value.getTime();
-    Object o = value.getValue();
-    switch (value.getType()) {
-      case kBoolean:
-        return NetworkTablesJNI.setBoolean(m_handle, time, ((Boolean)o).booleanValue(), false);
-      case kDouble:
-        return NetworkTablesJNI.setDouble(m_handle, time, ((Number)o).doubleValue(), false);
-      case kString:
-        return NetworkTablesJNI.setString(m_handle, time, (String)o, false);
-      case kRaw:
-        return NetworkTablesJNI.setRaw(m_handle, time, (byte[])o, false);
-      case kBooleanArray:
-        return NetworkTablesJNI.setBooleanArray(m_handle, time, (boolean[])o, false);
-      case kDoubleArray:
-        return NetworkTablesJNI.setDoubleArray(m_handle, time, (double[])o, false);
-      case kStringArray:
-        return NetworkTablesJNI.setStringArray(m_handle, time, (String[])o, false);
-      case kRpc:
-        // TODO
-      default:
-        return true;
+  public boolean setValue(Object value) {
+    if (value instanceof NetworkTableValue) {
+      long time = ((NetworkTableValue)value).getTime();
+      Object o = ((NetworkTableValue)value).getValue();
+      switch (((NetworkTableValue)value).getType()) {
+        case kBoolean:
+          return NetworkTablesJNI.setBoolean(m_handle, time, ((Boolean)o).booleanValue(), false);
+        case kDouble:
+          return NetworkTablesJNI.setDouble(m_handle, time, ((Number)o).doubleValue(), false);
+        case kString:
+          return NetworkTablesJNI.setString(m_handle, time, (String)o, false);
+        case kRaw:
+          return NetworkTablesJNI.setRaw(m_handle, time, (byte[])o, false);
+        case kBooleanArray:
+          return NetworkTablesJNI.setBooleanArray(m_handle, time, (boolean[])o, false);
+        case kDoubleArray:
+          return NetworkTablesJNI.setDoubleArray(m_handle, time, (double[])o, false);
+        case kStringArray:
+          return NetworkTablesJNI.setStringArray(m_handle, time, (String[])o, false);
+        case kRpc:
+          // TODO
+        default:
+          return true;
+      }
+    } else if (value instanceof Boolean) {
+      return setBoolean((Boolean)value);
+    } else if (value instanceof Number) {
+      return setNumber((Number)value);
+    } else if (value instanceof String) {
+      return setString((String)value);
+    } else if (value instanceof byte[]) {
+      return setRaw((byte[])value);
+    } else if (value instanceof boolean[]) {
+      return setBooleanArray((boolean[])value);
+    } else if (value instanceof double[]) {
+      return setDoubleArray((double[])value);
+    } else if (value instanceof Boolean[]) {
+      return setBooleanArray((Boolean[])value);
+    } else if (value instanceof Number[]) {
+      return setNumberArray((Number[])value);
+    } else if (value instanceof String[]) {
+      return setStringArray((String[])value);
+    } else {
+      throw new IllegalArgumentException("Value of type " + value.getClass().getName()
+        + " cannot be put into a table");
     }
   }
 
@@ -479,36 +527,60 @@ public final class NetworkTableEntry {
    * Sets the entry's value.  If the value is of different type, the type is
    * changed to match the new value.
    * @param value the value to set
+   * @throws IllegalArgumentException if the value is not a known type
    */
-  public void forceSetValue(NetworkTableValue value) {
-    long time = value.getTime();
-    Object o = value.getValue();
-    switch (value.getType()) {
-      case kBoolean:
-        NetworkTablesJNI.setBoolean(m_handle, time, ((Boolean)o).booleanValue(), true);
-        return;
-      case kDouble:
-        NetworkTablesJNI.setDouble(m_handle, time, ((Number)o).doubleValue(), true);
-        return;
-      case kString:
-        NetworkTablesJNI.setString(m_handle, time, (String)o, true);
-        return;
-      case kRaw:
-        NetworkTablesJNI.setRaw(m_handle, time, (byte[])o, true);
-        return;
-      case kBooleanArray:
-        NetworkTablesJNI.setBooleanArray(m_handle, time, (boolean[])o, true);
-        return;
-      case kDoubleArray:
-        NetworkTablesJNI.setDoubleArray(m_handle, time, (double[])o, true);
-        return;
-      case kStringArray:
-        NetworkTablesJNI.setStringArray(m_handle, time, (String[])o, true);
-        return;
-      case kRpc:
-        // TODO
-      default:
-        return;
+  public void forceSetValue(Object value) {
+    if (value instanceof NetworkTableValue) {
+      long time = ((NetworkTableValue)value).getTime();
+      Object o = ((NetworkTableValue)value).getValue();
+      switch (((NetworkTableValue)value).getType()) {
+        case kBoolean:
+          NetworkTablesJNI.setBoolean(m_handle, time, ((Boolean)o).booleanValue(), true);
+          return;
+        case kDouble:
+          NetworkTablesJNI.setDouble(m_handle, time, ((Number)o).doubleValue(), true);
+          return;
+        case kString:
+          NetworkTablesJNI.setString(m_handle, time, (String)o, true);
+          return;
+        case kRaw:
+          NetworkTablesJNI.setRaw(m_handle, time, (byte[])o, true);
+          return;
+        case kBooleanArray:
+          NetworkTablesJNI.setBooleanArray(m_handle, time, (boolean[])o, true);
+          return;
+        case kDoubleArray:
+          NetworkTablesJNI.setDoubleArray(m_handle, time, (double[])o, true);
+          return;
+        case kStringArray:
+          NetworkTablesJNI.setStringArray(m_handle, time, (String[])o, true);
+          return;
+        case kRpc:
+          // TODO
+        default:
+          return;
+      }
+    } else if (value instanceof Boolean) {
+      forceSetBoolean((Boolean)value);
+    } else if (value instanceof Number) {
+      forceSetNumber((Number)value);
+    } else if (value instanceof String) {
+      forceSetString((String)value);
+    } else if (value instanceof byte[]) {
+      forceSetRaw((byte[])value);
+    } else if (value instanceof boolean[]) {
+      forceSetBooleanArray((boolean[])value);
+    } else if (value instanceof double[]) {
+      forceSetDoubleArray((double[])value);
+    } else if (value instanceof Boolean[]) {
+      forceSetBooleanArray((Boolean[])value);
+    } else if (value instanceof Number[]) {
+      forceSetNumberArray((Number[])value);
+    } else if (value instanceof String[]) {
+      forceSetStringArray((String[])value);
+    } else {
+      throw new IllegalArgumentException("Value of type " + value.getClass().getName()
+        + " cannot be put into a table");
     }
   }
 

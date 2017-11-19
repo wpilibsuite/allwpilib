@@ -951,8 +951,9 @@ public class NetworkTable implements ITable, IRemote {
 
   /**
    * {@inheritDoc}
-   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTableEntry#setValue(NetworkTableValue)}
+   * @deprecated Use {@link edu.wpi.first.networktables.NetworkTableEntry#setValue(Object)}
    * instead, e.g. `NetworkTable.getEntry(key).setValue(NetworkTableEntry.makeBoolean(false));`
+   * or `NetworkTable.getEntry(key).setValue(new Boolean(false));`
    */
   @Deprecated
   public boolean putValue(String key, Object value) throws IllegalArgumentException {
