@@ -20,6 +20,7 @@
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <llvm/raw_ostream.h>
 #include <support/mutex.h>
+#include <support/timestamp.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/DriverStation.h"
@@ -356,6 +357,20 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   HAL_BaseInitialize(&status);
 
   HAL_InitializeDriverStation();
+
+  // Set WPI_Now to use FPGA timestamp
+  wpi::SetNowImpl([]() -> uint64_t {
+    int32_t status = 0;
+    uint64_t rv = HAL_GetFPGATime(&status);
+    if (status != 0) {
+      llvm::errs()
+          << "Call to HAL_GetFPGATime failed."
+          << "Initialization might have failed. Time will not be correct\n";
+      llvm::errs().flush();
+      return 0u;
+    }
+    return rv;
+  });
 
   initialized = true;
   return true;
