@@ -60,7 +60,7 @@ public class CvSink extends VideoSink {
    * Times out (returning 0) after timeout seconds.
    * The provided image will have three 3-bit channels stored in BGR order.
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message)
+   *         message); the frame time is in 1 us increments.
    */
   public long grabFrame(Mat image, double timeout) {
     return CameraServerJNI.grabSinkFrameTimeout(m_handle, image.nativeObj, timeout);
@@ -70,7 +70,7 @@ public class CvSink extends VideoSink {
    * Wait for the next frame and get the image.  May block forever.
    * The provided image will have three 3-bit channels stored in BGR order.
    * @return Frame time, or 0 on error (call GetError() to obtain the error
-   *         message)
+   *         message); the frame time is in 1 us increments.
    */
   public long grabFrameNoTimeout(Mat image) {
     return CameraServerJNI.grabSinkFrame(m_handle, image.nativeObj);

@@ -655,7 +655,7 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
     // with firefox
-    double timestamp = frame.GetTime() / 10000000.0;
+    double timestamp = frame.GetTime() / 1000000.0;
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n"
         << "Content-Type: image/jpeg\r\n"
