@@ -6,6 +6,8 @@
 /*----------------------------------------------------------------------------*/
 #include "support/timestamp.h"
 
+#include <atomic>
+
 #ifdef _WIN32
 #include <cassert>
 #include <exception>
@@ -15,75 +17,91 @@
 #endif
 
 // offset in microseconds
-static unsigned long long zerotime() {
+static uint64_t zerotime() {
 #ifdef _WIN32
   FILETIME ft;
-  unsigned long long tmpres = 0;
+  uint64_t tmpres = 0;
   // 100-nanosecond intervals since January 1, 1601 (UTC)
   // which means 0.1 us
   GetSystemTimeAsFileTime(&ft);
   tmpres |= ft.dwHighDateTime;
   tmpres <<= 32;
   tmpres |= ft.dwLowDateTime;
+  tmpres /= 10u;  // convert to us
   // January 1st, 1970 - January 1st, 1601 UTC ~ 369 years
-  // or 116444736000000000 us
-  static const unsigned long long deltaepoch = 116444736000000000ull;
+  // or 11644473600000000 us
+  static const uint64_t deltaepoch = 11644473600000000ull;
   tmpres -= deltaepoch;
   return tmpres;
 #else
   // 100-ns intervals
   using namespace std::chrono;
-  return duration_cast<nanoseconds>(
-    high_resolution_clock::now().time_since_epoch()).count() / 100u;
+  return duration_cast<microseconds>(
+             high_resolution_clock::now().time_since_epoch())
+      .count();
 #endif
 }
 
-static unsigned long long timestamp() {
+static uint64_t timestamp() {
 #ifdef _WIN32
   LARGE_INTEGER li;
   QueryPerformanceCounter(&li);
   // there is an imprecision with the initial value,
   // but what matters is that timestamps are monotonic and consistent
-  return static_cast<unsigned long long>(li.QuadPart);
+  return static_cast<uint64_t>(li.QuadPart);
 #else
-  // 100-ns intervals
+  // 1-us intervals
   using namespace std::chrono;
-  return duration_cast<nanoseconds>(
-    steady_clock::now().time_since_epoch()).count() / 100u;
+  return duration_cast<microseconds>(steady_clock::now().time_since_epoch())
+      .count();
 #endif
 }
 
 #ifdef _WIN32
-static unsigned long long update_frequency() {
+static uint64_t update_frequency() {
   LARGE_INTEGER li;
   if (!QueryPerformanceFrequency(&li) || !li.QuadPart) {
     // log something
     std::terminate();
   }
-  return static_cast<unsigned long long>(li.QuadPart);
+  return static_cast<uint64_t>(li.QuadPart);
 }
 #endif
 
-static const unsigned long long zerotime_val = zerotime();
-static const unsigned long long offset_val = timestamp();
+static const uint64_t zerotime_val = zerotime();
+static const uint64_t offset_val = timestamp();
 #ifdef _WIN32
-static const unsigned long long frequency_val = update_frequency();
+static const uint64_t frequency_val = update_frequency();
 #endif
 
-unsigned long long wpi::Now() {
+uint64_t wpi::NowDefault() {
 #ifdef _WIN32
   assert(offset_val > 0u);
   assert(frequency_val > 0u);
-  unsigned long long delta = timestamp() - offset_val;
+  uint64_t delta = timestamp() - offset_val;
   // because the frequency is in update per seconds, we have to multiply the
-  // delta by 10,000,000
-  unsigned long long delta_in_us = delta * 10000000ull / frequency_val;
+  // delta by 1,000,000
+  uint64_t delta_in_us = delta * 1000000ull / frequency_val;
   return delta_in_us + zerotime_val;
 #else
   return zerotime_val + timestamp() - offset_val;
 #endif
 }
 
-unsigned long long WPI_Now() {
-  return wpi::Now();
+static std::atomic<uint64_t (*)()> now_impl{wpi::NowDefault};
+
+void wpi::SetNowImpl(uint64_t (*func)(void)) {
+  now_impl = func ? func : NowDefault;
 }
+
+uint64_t wpi::Now() { return (now_impl.load())(); }
+
+extern "C" {
+
+uint64_t WPI_NowDefault(void) { return wpi::NowDefault(); }
+
+void WPI_SetNowImpl(uint64_t (*func)(void)) { wpi::SetNowImpl(func); }
+
+uint64_t WPI_Now(void) { return wpi::Now(); }
+
+}  // extern "C"
