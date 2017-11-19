@@ -61,25 +61,11 @@ build.dependsOn cppSourcesZip
 
 model {
     publishing {
-        def halAthenaTaskList  = []
-        if (!project.hasProperty('skipAthena')) {
-            halAthenaTaskList = createComponentZipTasks($.components, 'halAthena', 'zipcpp', Zip, project, includeStandardZipFormat)
-        }
-        def halSimTaskList = []
-        if (!project.hasProperty('onlyAthena')) {
-            halSimTaskList = createComponentZipTasks($.components, 'halSim', 'zipcpp', Zip, project, includeStandardZipFormat)
-        }
+        def halTaskList = createComponentZipTasks($.components, 'hal', 'zipcpp', Zip, project, includeStandardZipFormat)
 
         def allTask
         if (!project.hasProperty('jenkinsBuild')) {
-            def combinedList = []
-            halAthenaTaskList.each {
-                combinedList.add(it)
-            }
-            halSimTaskList.each {
-                combinedList.add(it)
-            }
-            allTask = createAllCombined(combinedList, 'hal', 'zipcpp', Zip, project)
+            allTask = createAllCombined(halTaskList, 'hal', 'zipcpp', Zip, project)
         }
 
         def halSimStaticDepsTaskList = []
@@ -93,10 +79,7 @@ model {
 
         publications {
             cpp(MavenPublication) {
-                halAthenaTaskList.each {
-                    artifact it
-                }
-                halSimTaskList.each {
+                halTaskList.each {
                     artifact it
                 }
                 if (!project.hasProperty('jenkinsBuild')) {

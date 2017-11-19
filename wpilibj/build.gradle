@@ -229,11 +229,7 @@ model {
         wpilibJNIStatic(NativeLibrarySpec) {
             baseName = 'wpilibJNI'
             binaries.withType(NativeBinarySpec) { binary ->
-                if (binary.targetPlatform.architecture.name == 'athena') {
-                    binary.lib project: ':hal', library: 'halAthena', linkage: 'static'
-                } else {
-                    binary.lib project: ':hal', library: 'halSim', linkage: 'static'
-                }
+                project(':hal').addHalToLinkerStatic(binary)
             }
             sources {
                 cpp {
@@ -247,11 +243,7 @@ model {
         wpilibJNIShared(NativeLibrarySpec) {
             baseName = 'wpilibJNI'
             binaries.withType(NativeBinarySpec) { binary ->
-                if (binary.targetPlatform.architecture.name == 'athena') {
-                    binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
-                } else {
-                    binary.lib project: ':hal', library: 'halSim', linkage: 'shared'
-                }
+                project(':hal').addHalToLinker(binary)
             }
             sources {
                 cpp {

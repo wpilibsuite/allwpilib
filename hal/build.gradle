@@ -17,11 +17,11 @@ ext.addHalCompilerArguments = { binary->
 }
 
 ext.addHalToLinker = { binary->
-    if (binary.targetPlatform.architecture.name == 'athena') {
-        binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
-    } else {
-        binary.lib project: ':hal', library: 'halSim', linkage: 'shared'
-    }
+    binary.lib project: ':hal', library: 'hal', linkage: 'shared'
+}
+
+ext.addHalToLinkerStatic = { binary->
+    binary.lib project: ':hal', library: 'hal', linkage: 'static'
 }
 
 model {
@@ -32,7 +32,7 @@ model {
             headerClassifier = 'headers'
             ext = 'zip'
             version = '3.+'
-            sharedConfigs = [ halAthena: [], halSim: [], halDev: [], halSimTestingBaseTest: [] ]
+            sharedConfigs = [ hal: [], halDev: [], halSimTestingBaseTest: [] ]
             staticConfigs = [ halSimStaticDeps: [] ]
         }
     }
@@ -41,7 +41,7 @@ model {
     // where some extra symbols are added that cannot be resolved at link time. This configuration
     // lets you specify specific symbols to exlude from exporting.
     exportsConfigs {
-        halSim(ExportsConfig) {
+        hal(ExportsConfig) {
             x86ExcludeSymbols = [ '_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
                                   '_CT??_R0?AVbad_cast',
                                   '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
@@ -73,30 +73,50 @@ model {
         }
     }
     components {
-        if (!project.hasProperty('skipAthena')) {
-            halAthena(NativeLibrarySpec) {
-                baseName = 'wpiHal'
-                sources {
-                    cpp {
-                        source {
-                            srcDirs = [ 'src/main/native/shared', 'src/main/native/athena' ]
-                            includes = ["**/*.cpp"]
-                        }
-                        exportedHeaders {
-                            srcDirs = ["src/main/native/include"]
-                        }
+        hal(NativeLibrarySpec) {
+            baseName = 'wpiHal'
+            sources {
+                cpp {
+                    source {
+                        srcDirs = [ 'src/main/native/shared' ]
+                        includes = ["**/*.cpp"]
                     }
-                }
-                binaries.all { binary->
-                    if (binary.targetPlatform.architecture.name != 'athena') {
-                        binary.buildable = false
+                    exportedHeaders {
+                        srcDirs = ["src/main/native/include"]
                     }
                 }
             }
+            binaries.all {
+                if (it.targetPlatform.architecture.name == 'athena') {
+                    sources {
+                        athenaCpp(CppSourceSet) {
+                            source.srcDir 'src/main/native/athena'
+                            source.include '**/*.cpp'
+                            exportedHeaders.srcDir "src/main/native/include"
+                        }
+                    }
+                } else {
+                    sources {
+                        simCpp(CppSourceSet) {
+                            source.srcDir 'src/main/native/sim'
+                            source.include '**/*.cpp'
+                            exportedHeaders.srcDir "src/main/native/include"
+                        }
+                    }
+                }
+                if (it.targetPlatform.operatingSystem.linux) {
+                    linker.args "-ldl"
+                }
+            }
         }
-        if (!project.hasProperty('onlyAthena')) {
-            halSim(NativeLibrarySpec) {
+        if (project.hasProperty('buildHalStaticDeps')) {
+            halSimStaticDeps(NativeLibrarySpec) {
                 baseName = 'wpiHal'
+                binaries {
+                    withType(StaticLibraryBinarySpec) {
+                        buildable = false
+                    }
+                }
                 sources {
                     cpp {
                         source {
@@ -105,32 +125,6 @@ model {
                         }
                         exportedHeaders {
                             srcDirs = ["src/main/native/include"]
-                        }
-                    }
-                }
-                binaries.all { binary ->
-                    if (binary.targetPlatform.operatingSystem.linux) {
-                        linker.args "-ldl"
-                    }
-                }
-            }
-            if (project.hasProperty('buildHalStaticDeps')) {
-                halSimStaticDeps(NativeLibrarySpec) {
-                    baseName = 'wpiHal'
-                    binaries {
-                        withType(StaticLibraryBinarySpec) {
-                            buildable = false
-                        }
-                    }
-                    sources {
-                        cpp {
-                            source {
-                                srcDirs = [ 'src/main/native/shared', 'src/main/native/sim' ]
-                                includes = ["**/*.cpp"]
-                            }
-                            exportedHeaders {
-                                srcDirs = ["src/main/native/include"]
-                            }
                         }
                     }
                 }
@@ -205,7 +199,7 @@ model {
         getHeaders(Task) {
             def list = []
             $.components.each {
-                if (it in NativeLibrarySpec && (it.name == 'halAthena' || it.name == 'halSim')) {
+                if (it in NativeLibrarySpec && (it.name == 'hal')) {
                     it.sources.each {
                         it.exportedHeaders.srcDirs.each {
                             list.add(it)
