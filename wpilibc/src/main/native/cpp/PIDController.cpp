@@ -81,6 +81,39 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
 }
 
+/**
+ * Allocate a PID object with the given constants for P, I, D.
+ *
+ * @param Kp     the proportional coefficient
+ * @param Ki     the integral coefficient
+ * @param Kd     the derivative coefficient
+ * @param source The PIDSource object that is used to get values
+ * @param output The PIDOutput object that is set to the output value
+ * @param period the loop time for doing calculations. This particularly
+ *               effects calculations of the integral and differental terms.
+ *               The default is 50ms.
+ */
+PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource& source,
+                             PIDOutput& output, double period)
+    : PIDController(Kp, Ki, Kd, 0.0, &source, &output, period) {}
+
+/**
+ * Allocate a PID object with the given constants for P, I, D.
+ *
+ * @param Kp     the proportional coefficient
+ * @param Ki     the integral coefficient
+ * @param Kd     the derivative coefficient
+ * @param source The PIDSource object that is used to get values
+ * @param output The PIDOutput object that is set to the output value
+ * @param period the loop time for doing calculations. This particularly
+ *               effects calculations of the integral and differental terms.
+ *               The default is 50ms.
+ */
+PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
+                             PIDSource& source, PIDOutput& output,
+                             double period)
+    : PIDController(Kp, Ki, Kd, Kf, &source, &output, period) {}
+
 PIDController::~PIDController() {
   // forcefully stopping the notifier so the callback can successfully run.
   m_controlLoop->Stop();

@@ -43,6 +43,10 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
                 PIDOutput* output, double period = 0.05);
   PIDController(double p, double i, double d, double f, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
+  PIDController(double p, double i, double d, PIDSource& source,
+                PIDOutput& output, double period = 0.05);
+  PIDController(double p, double i, double d, double f, PIDSource& source,
+                PIDOutput& output, double period = 0.05);
   virtual ~PIDController();
 
   PIDController(const PIDController&) = delete;
