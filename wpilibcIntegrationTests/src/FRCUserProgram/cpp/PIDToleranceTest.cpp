@@ -58,21 +58,21 @@ TEST_F(PIDToleranceTest, Absolute) {
 
   EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 
   inp.val = setpoint + tolerance / 2;
   Wait(1.0);
 
   EXPECT_TRUE(pid->OnTarget())
       << "Error was not in tolerance when it should have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 
   inp.val = setpoint + 10 * tolerance;
   Wait(1.0);
 
   EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 }
 
 TEST_F(PIDToleranceTest, Percent) {
@@ -84,7 +84,7 @@ TEST_F(PIDToleranceTest, Percent) {
 
   EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 
   inp.val =
       setpoint + (tolerance) / 200 *
@@ -93,7 +93,7 @@ TEST_F(PIDToleranceTest, Percent) {
 
   EXPECT_TRUE(pid->OnTarget())
       << "Error was not in tolerance when it should have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 
   inp.val =
       setpoint +
@@ -103,5 +103,5 @@ TEST_F(PIDToleranceTest, Percent) {
 
   EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 }

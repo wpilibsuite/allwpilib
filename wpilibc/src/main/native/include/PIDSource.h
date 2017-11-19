@@ -20,7 +20,7 @@ enum class PIDSourceType { kDisplacement, kRate };
 class PIDSource {
  public:
   virtual void SetPIDSourceType(PIDSourceType pidSource);
-  PIDSourceType GetPIDSourceType() const;
+  virtual PIDSourceType GetPIDSourceType() const;
   virtual double PIDGet() = 0;
 
  protected:

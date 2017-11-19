@@ -69,7 +69,13 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
   m_D = Kd;
   m_F = Kf;
 
-  m_pidInput = source;
+  // Save original source
+  m_origSource = std::shared_ptr<PIDSource>(source, NullDeleter<PIDSource>());
+
+  // Create LinearDigitalFilter with original source as its source argument
+  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, 1);
+  m_pidInput = &m_filter;
+
   m_pidOutput = output;
   m_period = period;
 
@@ -140,15 +146,6 @@ void PIDController::Calculate() {
     result = m_result;
 
     pidOutput->PIDWrite(result);
-
-    // Update the buffer.
-    m_buf.push(m_error);
-    m_bufTotal += m_error;
-    // Remove old elements when buffer is full.
-    if (m_buf.size() > m_bufLength) {
-      m_bufTotal -= m_buf.front();
-      m_buf.pop();
-    }
   }
 }
 
@@ -322,8 +319,6 @@ void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
 /**
  * Set the setpoint for the PIDController.
  *
- * Clears the queue for GetAvgError().
- *
  * @param setpoint the desired setpoint
  */
 void PIDController::SetSetpoint(double setpoint) {
@@ -340,10 +335,6 @@ void PIDController::SetSetpoint(double setpoint) {
     } else {
       m_setpoint = setpoint;
     }
-
-    // Clear m_buf.
-    m_buf = std::queue<double>();
-    m_bufTotal = 0;
   }
 
   if (m_setpointEntry) m_setpointEntry.SetDouble(m_setpoint);
@@ -397,24 +388,6 @@ PIDSourceType PIDController::GetPIDSourceType() const {
   return m_pidInput->GetPIDSourceType();
 }
 
-/**
- * Returns the current average of the error over the past few iterations.
- *
- * You can specify the number of iterations to average with SetToleranceBuffer()
- * (defaults to 1). This is the same value that is used for OnTarget().
- *
- * @return the average error
- */
-double PIDController::GetAvgError() const {
-  double avgError = 0;
-  {
-    std::lock_guard<wpi::mutex> sync(m_mutex);
-    // Don't divide by zero.
-    if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
-  }
-  return avgError;
-}
-
 /*
  * Set the percentage error which is considered tolerable for use with
  * OnTarget.
@@ -463,13 +436,10 @@ void PIDController::SetPercentTolerance(double percent) {
  */
 void PIDController::SetToleranceBuffer(int bufLength) {
   std::lock_guard<wpi::mutex> sync(m_mutex);
-  m_bufLength = bufLength;
 
-  // Cut the buffer down to size if needed.
-  while (m_buf.size() > static_cast<uint32_t>(bufLength)) {
-    m_bufTotal -= m_buf.front();
-    m_buf.pop();
-  }
+  // Create LinearDigitalFilter with original source as its source argument
+  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, bufLength);
+  m_pidInput = &m_filter;
 }
 
 /*
@@ -484,12 +454,7 @@ void PIDController::SetToleranceBuffer(int bufLength) {
  * This will return false until at least one input value has been computed.
  */
 bool PIDController::OnTarget() const {
-  {
-    std::lock_guard<wpi::mutex> sync(m_mutex);
-    if (m_buf.size() == 0) return false;
-  }
-
-  double error = GetAvgError();
+  double error = GetError();
 
   std::lock_guard<wpi::mutex> sync(m_mutex);
   switch (m_toleranceType) {
