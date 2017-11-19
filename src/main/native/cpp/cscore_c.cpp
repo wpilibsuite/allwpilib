@@ -133,9 +133,10 @@ CS_Bool CS_SetSourceVideoModeDiscrete(CS_Source source,
                                       int width, int height, int fps,
                                       CS_Status* status) {
   return cs::SetSourceVideoMode(
-      source, cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(
-                                static_cast<int>(pixelFormat)),
-                            width, height, fps},
+      source,
+      cs::VideoMode{static_cast<cs::VideoMode::PixelFormat>(
+                        static_cast<int>(pixelFormat)),
+                    width, height, fps},
       status);
 }
 

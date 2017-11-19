@@ -109,8 +109,9 @@ THandle UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Allocate(
 }
 
 template <typename THandle, typename TStruct, int typeValue, typename TMutex>
-inline std::shared_ptr<TStruct> UnlimitedHandleResource<
-    THandle, TStruct, typeValue, TMutex>::Get(THandle handle) {
+inline std::shared_ptr<TStruct>
+UnlimitedHandleResource<THandle, TStruct, typeValue, TMutex>::Get(
+    THandle handle) {
   auto index =
       handle.GetTypedIndex(static_cast<typename THandle::Type>(typeValue));
   if (index < 0) return nullptr;
