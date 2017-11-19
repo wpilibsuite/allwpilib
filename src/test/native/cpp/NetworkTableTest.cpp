@@ -13,6 +13,54 @@
 
 class NetworkTableTest : public ::testing::Test {};
 
+TEST_F(NetworkTableTest, BasenameKey) {
+  EXPECT_EQ("simple", NetworkTable::BasenameKey("simple"));
+  EXPECT_EQ("simple", NetworkTable::BasenameKey("one/two/many/simple"));
+  EXPECT_EQ("simple",
+            NetworkTable::BasenameKey("//////an/////awful/key////simple"));
+}
+
+TEST_F(NetworkTableTest, NormalizeKeySlash) {
+  EXPECT_EQ("/", NetworkTable::NormalizeKey("///"));
+  EXPECT_EQ("/no/normal/req", NetworkTable::NormalizeKey("/no/normal/req"));
+  EXPECT_EQ("/no/leading/slash",
+            NetworkTable::NormalizeKey("no/leading/slash"));
+  EXPECT_EQ("/what/an/awful/key/",
+            NetworkTable::NormalizeKey("//////what////an/awful/////key///"));
+}
+
+TEST_F(NetworkTableTest, NormalizeKeyNoSlash) {
+  EXPECT_EQ("a", NetworkTable::NormalizeKey("a", false));
+  EXPECT_EQ("a", NetworkTable::NormalizeKey("///a", false));
+  EXPECT_EQ("leading/slash",
+            NetworkTable::NormalizeKey("/leading/slash", false));
+  EXPECT_EQ("no/leading/slash",
+            NetworkTable::NormalizeKey("no/leading/slash", false));
+  EXPECT_EQ(
+      "what/an/awful/key/",
+      NetworkTable::NormalizeKey("//////what////an/awful/////key///", false));
+}
+
+TEST_F(NetworkTableTest, GetHierarchyEmpty) {
+  std::vector<std::string> expected{"/"};
+  ASSERT_EQ(expected, NetworkTable::GetHierarchy(""));
+}
+
+TEST_F(NetworkTableTest, GetHierarchyRoot) {
+  std::vector<std::string> expected{"/"};
+  ASSERT_EQ(expected, NetworkTable::GetHierarchy("/"));
+}
+
+TEST_F(NetworkTableTest, GetHierarchyNormal) {
+  std::vector<std::string> expected{"/", "/foo", "/foo/bar", "/foo/bar/baz"};
+  ASSERT_EQ(expected, NetworkTable::GetHierarchy("/foo/bar/baz"));
+}
+
+TEST_F(NetworkTableTest, GetHierarchyTrailingSlash) {
+  std::vector<std::string> expected{"/", "/foo", "/foo/bar", "/foo/bar/"};
+  ASSERT_EQ(expected, NetworkTable::GetHierarchy("/foo/bar/"));
+}
+
 TEST_F(NetworkTableTest, ContainsKey) {
   auto inst = nt::NetworkTableInstance::Create();
   auto nt = inst.GetTable("containskey");

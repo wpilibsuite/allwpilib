@@ -11,6 +11,7 @@
 #include <functional>
 #include <vector>
 
+#include "llvm/ArrayRef.h"
 #include "llvm/StringMap.h"
 #include "networktables/NetworkTableEntry.h"
 #include "networktables/TableEntryListener.h"
@@ -54,6 +55,44 @@ class NetworkTable final : public ITable {
   friend class NetworkTableInstance;
 
  public:
+  /**
+   * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar".
+   * If the key has a trailing slash, returns an empty string.
+   * @param key key
+   * @return base name
+   */
+  static StringRef BasenameKey(StringRef key);
+
+  /**
+   * Normalizes an network table key to contain no consecutive slashes and
+   * optionally start with a leading slash. For example:
+   *
+   * <pre><code>
+   * normalizeKey("/foo/bar", true)  == "/foo/bar"
+   * normalizeKey("foo/bar", true)   == "/foo/bar"
+   * normalizeKey("/foo/bar", false) == "foo/bar"
+   * normalizeKey("foo//bar", false) == "foo/bar"
+   * </code></pre>
+   *
+   * @param key              the key to normalize
+   * @param withLeadingSlash whether or not the normalized key should begin
+   *                         with a leading slash
+   * @return normalized key
+   */
+  static std::string NormalizeKey(StringRef key, bool withLeadingSlash = true);
+
+  static StringRef NormalizeKey(StringRef key, llvm::SmallVectorImpl<char>& buf,
+                                bool withLeadingSlash = true);
+
+  /**
+   * Gets a list of the names of all the super tables of a given key. For
+   * example, the key "/foo/bar/baz" has a hierarchy of "/", "/foo",
+   * "/foo/bar", and "/foo/bar/baz".
+   * @param key the key
+   * @return List of super tables
+   */
+  static std::vector<std::string> GetHierarchy(StringRef key);
+
   /**
    * Constructor.  Use NetworkTableInstance::GetTable() or GetSubTable()
    * instead.

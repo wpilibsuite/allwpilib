@@ -22,6 +22,56 @@ bool NetworkTable::s_enable_ds = true;
 bool NetworkTable::s_running = false;
 unsigned int NetworkTable::s_port = NT_DEFAULT_PORT;
 
+StringRef NetworkTable::BasenameKey(StringRef key) {
+  size_t slash = key.rfind(PATH_SEPARATOR_CHAR);
+  if (slash == StringRef::npos) return key;
+  return key.substr(slash + 1);
+}
+
+std::string NetworkTable::NormalizeKey(StringRef key, bool withLeadingSlash) {
+  llvm::SmallString<128> buf;
+  return NormalizeKey(key, buf, withLeadingSlash);
+}
+
+StringRef NetworkTable::NormalizeKey(StringRef key,
+                                     llvm::SmallVectorImpl<char>& buf,
+                                     bool withLeadingSlash) {
+  buf.clear();
+  if (withLeadingSlash) buf.push_back(PATH_SEPARATOR_CHAR);
+  // for each path element, add it with a slash following
+  llvm::SmallVector<StringRef, 16> parts;
+  key.split(parts, PATH_SEPARATOR_CHAR, -1, false);
+  for (auto i = parts.begin(); i != parts.end(); ++i) {
+    buf.append(i->begin(), i->end());
+    buf.push_back(PATH_SEPARATOR_CHAR);
+  }
+  // remove trailing slash if the input key didn't have one
+  if (!key.empty() && key.back() != PATH_SEPARATOR_CHAR) buf.pop_back();
+  return StringRef(buf.data(), buf.size());
+}
+
+std::vector<std::string> NetworkTable::GetHierarchy(StringRef key) {
+  std::vector<std::string> hierarchy;
+  hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
+  // for each path element, add it to the end of what we built previously
+  llvm::SmallString<128> path;
+  llvm::SmallVector<StringRef, 16> parts;
+  key.split(parts, PATH_SEPARATOR_CHAR, -1, false);
+  if (!parts.empty()) {
+    for (auto i = parts.begin(); i != parts.end(); ++i) {
+      path += PATH_SEPARATOR_CHAR;
+      path += *i;
+      hierarchy.emplace_back(path.str());
+    }
+    // handle trailing slash
+    if (key.back() == PATH_SEPARATOR_CHAR) {
+      path += PATH_SEPARATOR_CHAR;
+      hierarchy.emplace_back(path.str());
+    }
+  }
+  return hierarchy;
+}
+
 void NetworkTable::Initialize() {
   if (s_running) Shutdown();
   auto inst = NetworkTableInstance::GetDefault();

@@ -7,7 +7,9 @@
 
 package edu.wpi.first.networktables;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +29,93 @@ public final class NetworkTable {
   private final String path;
   private final String pathWithSep;
   private final NetworkTableInstance inst;
+
+  /**
+   * Gets the "base name" of a key. For example, "/foo/bar" becomes "bar".
+   * If the key has a trailing slash, returns an empty string.
+   * @param key key
+   * @return base name
+   */
+  public static String basenameKey(String key) {
+    final int slash = key.lastIndexOf(PATH_SEPARATOR);
+    if (slash == -1) {
+      return key;
+    }
+    return key.substring(slash + 1);
+  }
+
+  /**
+   * Normalizes an network table key to contain no consecutive slashes and
+   * optionally start with a leading slash. For example:
+   *
+   * <pre><code>
+   * normalizeKey("/foo/bar", true)  == "/foo/bar"
+   * normalizeKey("foo/bar", true)   == "/foo/bar"
+   * normalizeKey("/foo/bar", false) == "foo/bar"
+   * normalizeKey("foo//bar", false) == "foo/bar"
+   * </code></pre>
+   *
+   * @param key              the key to normalize
+   * @param withLeadingSlash whether or not the normalized key should begin
+   *                         with a leading slash
+   * @return normalized key
+   */
+  public static String normalizeKey(String key, boolean withLeadingSlash) {
+    String normalized;
+    if (withLeadingSlash) {
+      normalized = PATH_SEPARATOR + key;
+    } else {
+      normalized = key;
+    }
+    normalized = normalized.replaceAll(PATH_SEPARATOR + "{2,}", String.valueOf(PATH_SEPARATOR));
+
+    if (!withLeadingSlash && normalized.charAt(0) == PATH_SEPARATOR) {
+      // remove leading slash, if present
+      normalized = normalized.substring(1);
+    }
+    return normalized;
+  }
+
+  /**
+   * Normalizes a network table key to start with exactly one leading slash
+   * ("/") and contain no consecutive slashes. For example,
+   * {@code "//foo/bar/"} becomes {@code "/foo/bar/"} and
+   * {@code "///a/b/c"} becomes {@code "/a/b/c"}.
+   *
+   * <p>This is equivalent to {@code normalizeKey(key, true)}
+   *
+   * @param key the key to normalize
+   * @return normalized key
+   */
+  public static String normalizeKey(String key) {
+    return normalizeKey(key, true);
+  }
+
+  /**
+   * Gets a list of the names of all the super tables of a given key. For
+   * example, the key "/foo/bar/baz" has a hierarchy of "/", "/foo",
+   * "/foo/bar", and "/foo/bar/baz".
+   * @param key the key
+   * @return List of super tables
+   */
+  public static List<String> getHierarchy(String key) {
+    final String normal = normalizeKey(key, true);
+    List<String> hierarchy = new ArrayList<>();
+    if (normal.length() == 1) {
+      hierarchy.add(normal);
+      return hierarchy;
+    }
+    for (int i = 1; ; i = normal.indexOf(PATH_SEPARATOR, i + 1)) {
+      if (i == -1) {
+        // add the full key
+        hierarchy.add(normal);
+        break;
+      } else {
+        hierarchy.add(normal.substring(0, i));
+      }
+    }
+    return hierarchy;
+  }
 
   /**
    * Constructor.  Use NetworkTableInstance.getTable() or getSubTable() instead.
