@@ -1287,7 +1287,7 @@ void NT_DisposeLogMessageArray(struct NT_LogMessage* arr, size_t count);
 void NT_DisposeLogMessage(struct NT_LogMessage* info);
 
 /**
- * Returns monotonic current time in 100 ns increments.
+ * Returns monotonic current time in 1 us increments.
  * This is the same time base used for entry and connection timestamps.
  * This function is a compatibility wrapper around WPI_Now().
  * @return Timestamp

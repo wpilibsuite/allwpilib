@@ -1343,7 +1343,7 @@ const char* LoadEntries(NT_Inst inst, StringRef filename, StringRef prefix,
  */
 
 /**
- * Returns monotonic current time in 100 ns increments.
+ * Returns monotonic current time in 1 us increments.
  * This is the same time base used for entry and connection timestamps.
  * This function is a compatibility wrapper around wpi::Now().
  * @return Timestamp
