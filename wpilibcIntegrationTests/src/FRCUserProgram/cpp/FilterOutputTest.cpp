@@ -19,7 +19,12 @@
 
 using namespace frc;
 
-enum FilterOutputTestType { TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS, TEST_MOVAVG };
+enum FilterOutputTestType {
+  TEST_SINGLE_POLE_IIR,
+  TEST_HIGH_PASS,
+  TEST_MOVAVG,
+  TEST_PULSE
+};
 
 std::ostream& operator<<(std::ostream& os, const FilterOutputTestType& type) {
   switch (type) {
@@ -31,6 +36,9 @@ std::ostream& operator<<(std::ostream& os, const FilterOutputTestType& type) {
       break;
     case TEST_MOVAVG:
       os << "LinearDigitalFilter MovingAverage";
+      break;
+    case TEST_PULSE:
+      os << "LinearDigitalFilter Pulse";
       break;
   }
 
@@ -70,11 +78,18 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
     return 100.0 * std::sin(2.0 * M_PI * t) + 20.0 * std::cos(50.0 * M_PI * t);
   }
 
-  void SetUp() override {
-    m_data = std::make_shared<DataWrapper>(GetData);
+  static double GetPulseData(double t) {
+    if (std::abs(t - 1.0) < 0.001) {
+      return 1.0;
+    } else {
+      return 0.0;
+    }
+  }
 
+  void SetUp() override {
     switch (GetParam()) {
       case TEST_SINGLE_POLE_IIR: {
+        m_data = std::make_shared<DataWrapper>(GetData);
         m_filter = std::make_unique<LinearDigitalFilter>(
             LinearDigitalFilter::SinglePoleIIR(
                 m_data, TestBench::kSinglePoleIIRTimeConstant,
@@ -84,6 +99,7 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
       }
 
       case TEST_HIGH_PASS: {
+        m_data = std::make_shared<DataWrapper>(GetData);
         m_filter =
             std::make_unique<LinearDigitalFilter>(LinearDigitalFilter::HighPass(
                 m_data, TestBench::kHighPassTimeConstant,
@@ -93,9 +109,18 @@ class FilterOutputTest : public testing::TestWithParam<FilterOutputTestType> {
       }
 
       case TEST_MOVAVG: {
+        m_data = std::make_shared<DataWrapper>(GetData);
         m_filter = std::make_unique<LinearDigitalFilter>(
             LinearDigitalFilter::MovingAverage(m_data, TestBench::kMovAvgTaps));
         m_expectedOutput = TestBench::kMovAvgExpectedOutput;
+        break;
+      }
+
+      case TEST_PULSE: {
+        m_data = std::make_shared<DataWrapper>(GetPulseData);
+        m_filter = std::make_unique<LinearDigitalFilter>(
+            LinearDigitalFilter::MovingAverage(m_data, TestBench::kMovAvgTaps));
+        m_expectedOutput = 0.0;
         break;
       }
     }
@@ -122,4 +147,4 @@ TEST_P(FilterOutputTest, FilterOutput) {
 
 INSTANTIATE_TEST_CASE_P(Test, FilterOutputTest,
                         testing::Values(TEST_SINGLE_POLE_IIR, TEST_HIGH_PASS,
-                                        TEST_MOVAVG));
+                                        TEST_MOVAVG, TEST_PULSE));
