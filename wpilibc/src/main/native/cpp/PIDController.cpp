@@ -374,6 +374,16 @@ double PIDController::GetError() const {
 }
 
 /**
+ * Returns the current average of the error over the past few iterations.
+ *
+ * You can specify the number of iterations to average with SetToleranceBuffer()
+ * (defaults to 1). This is the same value that is used for OnTarget().
+ *
+ * @return the average error
+ */
+double PIDController::GetAvgError() const { return GetError(); }
+
+/**
  * Sets what type of input the PID controller will use.
  */
 void PIDController::SetPIDSourceType(PIDSourceType pidSource) {

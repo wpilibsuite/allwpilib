@@ -516,6 +516,19 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
+   * Returns the current difference of the error over the past few iterations. You can specify the
+   * number of iterations to average with setToleranceBuffer() (defaults to 1). getAvgError() is
+   * used for the onTarget() function.
+   *
+   * @deprecated Use getError(), which is now already filtered.
+   * @return     the current average of the error
+   */
+  @Deprecated
+  public synchronized double getAvgError() {
+    return getError();
+  }
+
+  /**
    * Sets what type of input the PID controller will use.
    *
    * @param pidSource the type of input
