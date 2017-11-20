@@ -40,7 +40,7 @@ class DriverStation : public SensorBase, public RobotStateInterface {
   static void ReportError(bool is_error, int code, llvm::StringRef error,
                           llvm::StringRef location, llvm::StringRef stack);
 
-  static const int kJoystickPorts = 6;
+  static constexpr int kJoystickPorts = 6;
 
   bool GetStickButton(int stick, int button);
   bool GetStickButtonPressed(int stick, int button);

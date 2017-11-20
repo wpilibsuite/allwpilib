@@ -32,8 +32,10 @@ class SolenoidBase : public SensorBase {
 
  protected:
   explicit SolenoidBase(int pcmID);
-  static const int m_maxModules = 63;
-  static const int m_maxPorts = 8;
+
+  static constexpr int m_maxModules = 63;
+  static constexpr int m_maxPorts = 8;
+
   int m_moduleNumber;  // PCM module number
 };
 

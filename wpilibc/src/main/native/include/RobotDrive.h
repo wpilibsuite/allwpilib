@@ -113,7 +113,8 @@ class RobotDrive : public MotorSafety, public ErrorBase {
   void Normalize(double* wheelSpeeds);
   void RotateVector(double& x, double& y, double angle);
 
-  static const int kMaxNumberOfMotors = 4;
+  static constexpr int kMaxNumberOfMotors = 4;
+
   double m_sensitivity = 0.5;
   double m_maxOutput = 1.0;
 

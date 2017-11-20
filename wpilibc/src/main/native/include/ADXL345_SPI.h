@@ -37,7 +37,6 @@ class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
     double ZAxis;
   };
 
- public:
   explicit ADXL345_SPI(SPI::Port port, Range range = kRange_2G);
   virtual ~ADXL345_SPI() = default;
 
@@ -62,9 +61,9 @@ class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
  protected:
   SPI m_spi;
 
-  static const int kPowerCtlRegister = 0x2D;
-  static const int kDataFormatRegister = 0x31;
-  static const int kDataRegister = 0x32;
+  static constexpr int kPowerCtlRegister = 0x2D;
+  static constexpr int kDataFormatRegister = 0x31;
+  static constexpr int kDataRegister = 0x32;
   static constexpr double kGsPerLSB = 0.00390625;
 
   enum SPIAddressFields { kAddress_Read = 0x80, kAddress_MultiByte = 0x40 };
