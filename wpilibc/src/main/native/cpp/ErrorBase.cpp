@@ -10,13 +10,12 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
-#include <iomanip>
-#include <sstream>
 
 #include <HAL/HAL.h>
 
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"
+#include "llvm/Format.h"
 #include "llvm/SmallString.h"
 #include "llvm/raw_ostream.h"
 
@@ -53,20 +52,18 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
 void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
                               llvm::StringRef filename,
                               llvm::StringRef function, int lineNumber) const {
-  std::string err;
+  llvm::SmallString<128> buf;
+  llvm::raw_svector_ostream err(buf);
   int errNo = errno;
   if (errNo == 0) {
-    err = "OK: ";
-    err += contextMessage;
+    err << "OK: " << contextMessage;
   } else {
-    std::ostringstream oss;
-    oss << std::strerror(errNo) << " (0x" << std::setfill('0') << std::hex
-        << std::uppercase << std::setw(8) << errNo << "): " << contextMessage;
-    err = oss.str();
+    err << std::strerror(errNo) << " (" << llvm::format_hex(errNo, 10, true)
+        << "): " << contextMessage;
   }
 
   // Set the current error information for this object.
-  m_error.Set(-1, err, filename, function, lineNumber, this);
+  m_error.Set(-1, err.str(), filename, function, lineNumber, this);
 
   // Update the global error if there is not one already set.
   std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
