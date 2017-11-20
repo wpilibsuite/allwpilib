@@ -26,7 +26,6 @@
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
 #include "HAL/Notifier.h"
-#include "HAL/cpp/NotifierInternal.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "ctre/ctre.h"
 #include "visa/visa.h"
@@ -355,6 +354,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   int32_t status = 0;
   HAL_BaseInitialize(&status);
+  if (status != 0) return false;
 
   HAL_InitializeDriverStation();
 

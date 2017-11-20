@@ -11,6 +11,7 @@
 
 #include <atomic>
 #include <functional>
+#include <thread>
 #include <utility>
 
 #include <HAL/Notifier.h>
@@ -36,23 +37,18 @@ class Notifier : public ErrorBase {
   Notifier(const Notifier&) = delete;
   Notifier& operator=(const Notifier&) = delete;
 
+  void SetHandler(TimerEventHandler handler);
   void StartSingle(double delay);
   void StartPeriodic(double period);
   void Stop();
 
  private:
-  // Update the HAL alarm
+  // update the HAL alarm
   void UpdateAlarm();
-
-  // HAL callback
-  static void Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle);
-
-  // Used to constrain execution between destructors and callback
-  static wpi::mutex m_destructorMutex;
-
-  // Held while updating process information
+  // the thread waiting on the HAL alarm
+  std::thread m_thread;
+  // held while updating process information
   wpi::mutex m_processMutex;
-
   // HAL handle, atomic for proper destruction
   std::atomic<HAL_NotifierHandle> m_notifier{0};
 
