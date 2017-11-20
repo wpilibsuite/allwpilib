@@ -65,6 +65,9 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
 
   virtual double GetError() const;
 
+  WPI_DEPRECATED("Use GetError() instead, which is now already filtered.")
+  virtual double GetAvgError() const;
+
   virtual void SetPIDSourceType(PIDSourceType pidSource);
   virtual PIDSourceType GetPIDSourceType() const;
 
