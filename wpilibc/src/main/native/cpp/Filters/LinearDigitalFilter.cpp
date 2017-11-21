@@ -20,56 +20,8 @@ using namespace frc;
  * @param fbGains The "feed back" or IIR gains
  */
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         std::initializer_list<double> ffGains,
-                                         std::initializer_list<double> fbGains)
-    : Filter(source),
-      m_inputs(ffGains.size()),
-      m_outputs(fbGains.size()),
-      m_inputGains(ffGains),
-      m_outputGains(fbGains) {}
-
-/**
- * Create a linear FIR or IIR filter.
- *
- * @param source  The PIDSource object that is used to get values
- * @param ffGains The "feed forward" or FIR gains
- * @param fbGains The "feed back" or IIR gains
- */
-LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         std::initializer_list<double> ffGains,
-                                         const std::vector<double>& fbGains)
-    : Filter(source),
-      m_inputs(ffGains.size()),
-      m_outputs(fbGains.size()),
-      m_inputGains(ffGains),
-      m_outputGains(fbGains) {}
-
-/**
- * Create a linear FIR or IIR filter.
- *
- * @param source  The PIDSource object that is used to get values
- * @param ffGains The "feed forward" or FIR gains
- * @param fbGains The "feed back" or IIR gains
- */
-LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         const std::vector<double>& ffGains,
-                                         std::initializer_list<double> fbGains)
-    : Filter(source),
-      m_inputs(ffGains.size()),
-      m_outputs(fbGains.size()),
-      m_inputGains(ffGains),
-      m_outputGains(fbGains) {}
-
-/**
- * Create a linear FIR or IIR filter.
- *
- * @param source  The PIDSource object that is used to get values
- * @param ffGains The "feed forward" or FIR gains
- * @param fbGains The "feed back" or IIR gains
- */
-LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         const std::vector<double>& ffGains,
-                                         const std::vector<double>& fbGains)
+                                         llvm::ArrayRef<double> ffGains,
+                                         llvm::ArrayRef<double> fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
