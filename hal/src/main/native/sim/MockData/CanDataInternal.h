@@ -14,6 +14,7 @@
 #include <support/mutex.h>
 
 #include "MockData/CanData.h"
+#include "MockData/NotifyCallbackHelpers.h"
 #include "MockData/NotifyListenerVector.h"
 
 namespace hal {
@@ -83,7 +84,7 @@ class CanData {
     if (callback == nullptr) return -1;
     int32_t newUid = 0;
     {
-      std::lock_guard<std::mutex> lock(m_registerMutex);
+      std::lock_guard<wpi::mutex> lock(m_registerMutex);
       callbackVector = RegisterCallbackImpl(callbackVector, callbackName,
                                             callback, param, &newUid);
     }
