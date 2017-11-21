@@ -13,6 +13,8 @@
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
+#include "SensorBase.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "Utility.h"
 #include "WPIErrors.h"
 
@@ -32,7 +34,7 @@ PWM::PWM(int channel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
 
-  if (!CheckPWMChannel(channel)) {
+  if (!SensorBase::CheckPWMChannel(channel)) {
     buf << "PWM Channel " << channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
@@ -57,6 +59,7 @@ PWM::PWM(int channel) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   HAL_Report(HALUsageReporting::kResourceType_PWM, channel);
+  SetName("PWM", channel);
 }
 
 /**
@@ -72,8 +75,6 @@ PWM::~PWM() {
 
   HAL_FreePWMPort(m_handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 /**
@@ -314,37 +315,9 @@ void PWM::SetZeroLatch() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void PWM::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetDouble(GetSpeed());
-}
-
-void PWM::StartLiveWindowMode() {
-  SetSpeed(0);
-  if (m_valueEntry) {
-    m_valueListener = m_valueEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          SetSpeed(event.value->GetDouble());
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
-}
-
-void PWM::StopLiveWindowMode() {
-  SetSpeed(0);
-  if (m_valueListener != 0) {
-    m_valueEntry.RemoveListener(m_valueListener);
-    m_valueListener = 0;
-  }
-}
-
-std::string PWM::GetSmartDashboardType() const { return "Speed Controller"; }
-
-void PWM::InitTable(std::shared_ptr<NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void PWM::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Speed Controller");
+  builder.SetSafeState([=]() { SetDisabled(); });
+  builder.AddDoubleProperty("Value", [=]() { return GetSpeed(); },
+                            [=](double value) { SetSpeed(value); });
 }

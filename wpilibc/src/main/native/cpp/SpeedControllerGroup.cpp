@@ -7,6 +7,8 @@
 
 #include "SpeedControllerGroup.h"
 
+#include "SmartDashboard/SendableBuilder.h"
+
 using namespace frc;
 
 void SpeedControllerGroup::Set(double speed) {
@@ -44,4 +46,11 @@ void SpeedControllerGroup::PIDWrite(double output) {
   for (auto speedController : m_speedControllers) {
     speedController.get().PIDWrite(output);
   }
+}
+
+void SpeedControllerGroup::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Speed Controller");
+  builder.SetSafeState([=]() { StopMotor(); });
+  builder.AddDoubleProperty("Value", [=]() { return Get(); },
+                            [=](double value) { Set(value); });
 }

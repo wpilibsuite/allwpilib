@@ -11,12 +11,11 @@
 #include "Buttons/PressedButtonScheduler.h"
 #include "Buttons/ReleasedButtonScheduler.h"
 #include "Buttons/ToggleButtonScheduler.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
 
-bool Trigger::Grab() {
-  return Get() || (m_pressedEntry && m_pressedEntry.GetBoolean(false));
-}
+bool Trigger::Grab() { return Get() || m_sendablePressed; }
 
 void Trigger::WhenActive(Command* command) {
   auto pbs = new PressedButtonScheduler(Grab(), this, command);
@@ -43,13 +42,9 @@ void Trigger::ToggleWhenActive(Command* command) {
   tbs->Start();
 }
 
-std::string Trigger::GetSmartDashboardType() const { return "Button"; }
-
-void Trigger::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  if (subtable) {
-    m_pressedEntry = subtable->GetEntry("pressed");
-    m_pressedEntry.SetBoolean(Get());
-  } else {
-    m_pressedEntry = nt::NetworkTableEntry();
-  }
+void Trigger::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Button");
+  builder.SetSafeState([=]() { m_sendablePressed = false; });
+  builder.AddBooleanProperty("pressed", [=]() { return Grab(); },
+                             [=](bool value) { m_sendablePressed = value; });
 }

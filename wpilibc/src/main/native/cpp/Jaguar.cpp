@@ -9,8 +9,6 @@
 
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
-
 using namespace frc;
 
 /**
@@ -35,5 +33,5 @@ Jaguar::Jaguar(int channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_Jaguar, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("Jaguar", GetChannel(), this);
+  SetName("Jaguar", GetChannel());
 }

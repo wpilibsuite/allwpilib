@@ -13,6 +13,7 @@
 #include <HAL/HAL.h>
 
 #include "Drive/Vector2d.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "SpeedController.h"
 
 using namespace frc;
@@ -31,7 +32,15 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
     : m_frontLeftMotor(frontLeftMotor),
       m_rearLeftMotor(rearLeftMotor),
       m_frontRightMotor(frontRightMotor),
-      m_rearRightMotor(rearRightMotor) {}
+      m_rearRightMotor(rearRightMotor) {
+  AddChild(&m_frontLeftMotor);
+  AddChild(&m_rearLeftMotor);
+  AddChild(&m_frontRightMotor);
+  AddChild(&m_rearRightMotor);
+  static int instances = 0;
+  ++instances;
+  SetName("MecanumDrive", instances);
+}
 
 /**
  * Drive method for Mecanum platform.
@@ -117,4 +126,20 @@ void MecanumDrive::StopMotor() {
 
 void MecanumDrive::GetDescription(llvm::raw_ostream& desc) const {
   desc << "MecanumDrive";
+}
+
+void MecanumDrive::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("MecanumDrive");
+  builder.AddDoubleProperty("Front Left Motor Speed",
+                            [=]() { return m_frontLeftMotor.Get(); },
+                            [=](double value) { m_frontLeftMotor.Set(value); });
+  builder.AddDoubleProperty(
+      "Front Right Motor Speed", [=]() { return m_frontRightMotor.Get(); },
+      [=](double value) { m_frontRightMotor.Set(value); });
+  builder.AddDoubleProperty("Rear Left Motor Speed",
+                            [=]() { return m_rearLeftMotor.Get(); },
+                            [=](double value) { m_rearLeftMotor.Set(value); });
+  builder.AddDoubleProperty("Rear Right Motor Speed",
+                            [=]() { return m_rearRightMotor.Get(); },
+                            [=](double value) { m_rearRightMotor.Set(value); });
 }

@@ -9,7 +9,7 @@
 
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -20,8 +20,7 @@ using namespace frc;
 void AnalogAccelerometer::InitAccelerometer() {
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer,
              m_analogInput->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("Accelerometer",
-                                       m_analogInput->GetChannel(), this);
+  SetName("Accelerometer", m_analogInput->GetChannel());
 }
 
 /**
@@ -32,9 +31,9 @@ void AnalogAccelerometer::InitAccelerometer() {
  * @param channel The channel number for the analog input the accelerometer is
  *                connected to
  */
-AnalogAccelerometer::AnalogAccelerometer(int channel) {
-  m_analogInput = std::make_shared<AnalogInput>(channel);
-  InitAccelerometer();
+AnalogAccelerometer::AnalogAccelerometer(int channel)
+    : AnalogAccelerometer(std::make_shared<AnalogInput>(channel)) {
+  AddChild(m_analogInput);
 }
 
 /**
@@ -116,24 +115,8 @@ void AnalogAccelerometer::SetZero(double zero) { m_zeroGVoltage = zero; }
  */
 double AnalogAccelerometer::PIDGet() { return GetAcceleration(); }
 
-void AnalogAccelerometer::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetDouble(GetAcceleration());
-}
-
-void AnalogAccelerometer::StartLiveWindowMode() {}
-
-void AnalogAccelerometer::StopLiveWindowMode() {}
-
-std::string AnalogAccelerometer::GetSmartDashboardType() const {
-  return "Accelerometer";
-}
-
-void AnalogAccelerometer::InitTable(
-    std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void AnalogAccelerometer::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Accelerometer");
+  builder.AddDoubleProperty("Value", [=]() { return GetAcceleration(); },
+                            nullptr);
 }

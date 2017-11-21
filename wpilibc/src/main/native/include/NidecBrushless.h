@@ -8,28 +8,27 @@
 #pragma once
 
 #include <atomic>
-#include <memory>
-#include <string>
 
 #include "DigitalOutput.h"
-#include "LiveWindow/LiveWindowSendable.h"
+#include "ErrorBase.h"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
 #include "PWM.h"
+#include "SmartDashboard/SendableBase.h"
 #include "SpeedController.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
 /**
  * Nidec Brushless Motor.
  */
-class NidecBrushless : public SpeedController,
-                       public MotorSafety,
-                       public LiveWindowSendable {
+class NidecBrushless : public ErrorBase,
+                       public SendableBase,
+                       public SpeedController,
+                       public MotorSafety {
  public:
   NidecBrushless(int pwmChannel, int dioChannel);
-  ~NidecBrushless() = default;
+  ~NidecBrushless() override = default;
 
   // SpeedController interface
   void Set(double speed) override;
@@ -55,13 +54,7 @@ class NidecBrushless : public SpeedController,
   int GetChannel() const;
 
   // Sendable interface
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::string GetSmartDashboardType() const override;
-
-  // LiveWindowSendable interface
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   MotorSafetyHelper m_safetyHelper;
@@ -70,8 +63,6 @@ class NidecBrushless : public SpeedController,
   DigitalOutput m_dio;
   PWM m_pwm;
   double m_speed = 0.0;
-  nt::NetworkTableEntry m_valueEntry;
-  int m_valueListener;
 };
 
 }  // namespace frc

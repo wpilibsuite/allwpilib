@@ -10,13 +10,11 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.hal.CounterJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static java.util.Objects.requireNonNull;
 
@@ -30,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All counters will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Counter extends SensorBase implements CounterBase, LiveWindowSendable, PIDSource {
+public class Counter extends SensorBase implements CounterBase, Sendable, PIDSource {
 
   /**
    * Mode determines how and what the counter counts.
@@ -88,6 +86,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     setMaxPeriod(.5);
 
     HAL.report(tResourceType.kResourceType_Counter, m_index, mode.value);
+    setName("Counter", m_index);
   }
 
   /**
@@ -183,6 +182,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
 
   @Override
   public void free() {
+    super.free();
     setUpdateWhenEmpty(true);
 
     clearUpSource();
@@ -213,6 +213,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   public void setUpSource(int channel) {
     setUpSource(new DigitalInput(channel));
     m_allocatedUpSource = true;
+    addChild(m_upSource);
   }
 
   /**
@@ -279,6 +280,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   public void setDownSource(int channel) {
     setDownSource(new DigitalInput(channel));
     m_allocatedDownSource = true;
+    addChild(m_downSource);
   }
 
   /**
@@ -553,34 +555,8 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "Counter";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(get());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Counter");
+    builder.addDoubleProperty("Value", this::get, null);
   }
 }

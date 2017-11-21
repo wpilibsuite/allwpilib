@@ -9,7 +9,7 @@
 
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -31,10 +31,7 @@ Servo::Servo(int channel) : SafePWM(channel) {
   SetPeriodMultiplier(kPeriodMultiplier_4X);
 
   HAL_Report(HALUsageReporting::kResourceType_Servo, channel);
-}
-
-Servo::~Servo() {
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
+  SetName("Servo", channel);
 }
 
 /**
@@ -100,35 +97,8 @@ double Servo::GetAngle() const {
   return GetPosition() * GetServoAngleRange() + kMinServoAngle;
 }
 
-void Servo::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetDouble(Get());
-}
-
-void Servo::StartLiveWindowMode() {
-  if (m_valueEntry) {
-    m_valueListener = m_valueEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          Set(event.value->GetDouble());
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
-}
-
-void Servo::StopLiveWindowMode() {
-  if (m_valueListener != 0) {
-    m_valueEntry.RemoveListener(m_valueListener);
-    m_valueListener = 0;
-  }
-}
-
-std::string Servo::GetSmartDashboardType() const { return "Servo"; }
-
-void Servo::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void Servo::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Servo");
+  builder.AddDoubleProperty("Value", [=]() { return Get(); },
+                            [=](double value) { Set(value); });
 }

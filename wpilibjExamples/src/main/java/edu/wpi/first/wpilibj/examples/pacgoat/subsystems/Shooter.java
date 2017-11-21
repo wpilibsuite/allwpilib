@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * The Shooter subsystem handles shooting. The mechanism for shooting is
@@ -35,12 +34,10 @@ public class Shooter extends Subsystem {
 
 	public Shooter() {
 		// Put everything to the LiveWindow for testing.
-		LiveWindow.addSensor("Shooter", "Hot Goal Sensor", m_hotGoalSensor);
-		LiveWindow.addSensor("Shooter", "Piston1 Reed Switch Front ",
-				m_piston1ReedSwitchFront);
-		LiveWindow.addSensor("Shooter", "Piston1 Reed Switch Back ",
-				m_piston1ReedSwitchBack);
-		LiveWindow.addActuator("Shooter", "Latch Piston", m_latchPiston);
+		addChild("Hot Goal Sensor", m_hotGoalSensor);
+		addChild("Piston1 Reed Switch Front ", m_piston1ReedSwitchFront);
+		addChild("Piston1 Reed Switch Back ", m_piston1ReedSwitchBack);
+		addChild("Latch Piston", m_latchPiston);
 	}
 
 	/**

@@ -50,7 +50,7 @@ class AnalogTriggerOutput : public DigitalSource {
   friend class AnalogTrigger;
 
  public:
-  virtual ~AnalogTriggerOutput();
+  ~AnalogTriggerOutput() override;
   bool Get() const;
 
   // DigitalSource interface
@@ -58,6 +58,8 @@ class AnalogTriggerOutput : public DigitalSource {
   AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
   bool IsAnalogTrigger() const override;
   int GetChannel() const override;
+
+  void InitSendable(SendableBuilder& builder) override;
 
  protected:
   AnalogTriggerOutput(const AnalogTrigger& trigger,

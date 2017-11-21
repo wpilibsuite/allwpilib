@@ -16,7 +16,6 @@
 
 namespace frc {
 
-class NamedSendable;
 class Sendable;
 
 class SmartDashboard : public SensorBase {
@@ -38,7 +37,7 @@ class SmartDashboard : public SensorBase {
   static void Delete(llvm::StringRef key);
 
   static void PutData(llvm::StringRef key, Sendable* data);
-  static void PutData(NamedSendable* value);
+  static void PutData(Sendable* value);
   static Sendable* GetData(llvm::StringRef keyName);
 
   static bool PutBoolean(llvm::StringRef keyName, bool value);

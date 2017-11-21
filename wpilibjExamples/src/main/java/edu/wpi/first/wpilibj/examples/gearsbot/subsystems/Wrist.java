@@ -8,12 +8,9 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -22,8 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Wrist extends PIDSubsystem {
 
-	private SpeedController m_motor;
-	private Potentiometer m_pot;
+	private Victor m_motor;
+	private AnalogPotentiometer m_pot;
 
 	private static final double kP_real = 1;
 	private static final double kP_simulation = 0.05;
@@ -45,10 +42,9 @@ public class Wrist extends PIDSubsystem {
 			m_pot = new AnalogPotentiometer(3); // Defaults to degrees
 		}
 
-		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Wrist", "Motor", (Victor) m_motor);
-		LiveWindow.addSensor("Wrist", "Pot", (AnalogPotentiometer) m_pot);
-		LiveWindow.addActuator("Wrist", "PID", getPIDController());
+		// Let's name everything on the LiveWindow
+		addChild("Motor", m_motor);
+		addChild("Pot", m_pot);
 	}
 
 	@Override

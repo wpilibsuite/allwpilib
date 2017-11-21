@@ -10,11 +10,8 @@ package edu.wpi.first.wpilibj;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 import static java.util.Objects.requireNonNull;
@@ -29,7 +26,7 @@ import static java.util.Objects.requireNonNull;
  * and derivative calculations. Therefore, the sample rate affects the controller's behavior for a
  * given set of PID constants.
  */
-public class PIDController implements PIDInterface, LiveWindowSendable, Controller {
+public class PIDController extends SendableBase implements PIDInterface, Sendable, Controller {
 
   public static final double kDefaultPeriod = .05;
   private static int instances = 0;
@@ -153,6 +150,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   @SuppressWarnings("ParameterName")
   public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
                        PIDOutput output, double period) {
+    super(false);
     requireNonNull(source, "Null PIDSource was given");
     requireNonNull(output, "Null PIDOutput was given");
 
@@ -180,6 +178,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     instances++;
     HLUsageReporting.reportPIDController(instances);
     m_tolerance = new NullTolerance();
+    setName("PIDController", instances);
   }
 
   /**
@@ -232,7 +231,9 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   /**
    * Free the PID object.
    */
+  @Override
   public void free() {
+    super.free();
     m_controlLoop.cancel();
     m_thisMutex.lock();
     try {
@@ -242,7 +243,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     } finally {
       m_thisMutex.unlock();
     }
-    removeListeners();
   }
 
   /**
@@ -395,16 +395,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     } finally {
       m_thisMutex.unlock();
     }
-
-    if (m_pEntry != null) {
-      m_pEntry.setDouble(p);
-    }
-    if (m_iEntry != null) {
-      m_iEntry.setDouble(i);
-    }
-    if (m_dEntry != null) {
-      m_dEntry.setDouble(d);
-    }
   }
 
   /**
@@ -427,18 +417,65 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     } finally {
       m_thisMutex.unlock();
     }
+  }
 
-    if (m_pEntry != null) {
-      m_pEntry.setDouble(p);
+  /**
+   * Set the Proportional coefficient of the PID controller gain.
+   *
+   * @param p Proportional coefficient
+   */
+  @SuppressWarnings("ParameterName")
+  public void setP(double p) {
+    m_thisMutex.lock();
+    try {
+      m_P = p;
+    } finally {
+      m_thisMutex.unlock();
     }
-    if (m_iEntry != null) {
-      m_iEntry.setDouble(i);
+  }
+
+  /**
+   * Set the Integral coefficient of the PID controller gain.
+   *
+   * @param i Integral coefficient
+   */
+  @SuppressWarnings("ParameterName")
+  public void setI(double i) {
+    m_thisMutex.lock();
+    try {
+      m_I = i;
+    } finally {
+      m_thisMutex.unlock();
     }
-    if (m_dEntry != null) {
-      m_dEntry.setDouble(d);
+  }
+
+  /**
+   * Set the Differential coefficient of the PID controller gain.
+   *
+   * @param d differential coefficient
+   */
+  @SuppressWarnings("ParameterName")
+  public void setD(double d) {
+    m_thisMutex.lock();
+    try {
+      m_D = d;
+    } finally {
+      m_thisMutex.unlock();
     }
-    if (m_fEntry != null) {
-      m_fEntry.setDouble(f);
+  }
+
+  /**
+   * Set the Feed forward coefficient of the PID controller gain.
+   *
+   * @param f feed forward coefficient
+   */
+  @SuppressWarnings("ParameterName")
+  public void setF(double f) {
+    m_thisMutex.lock();
+    try {
+      m_F = f;
+    } finally {
+      m_thisMutex.unlock();
     }
   }
 
@@ -600,10 +637,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
       }
     } finally {
       m_thisMutex.unlock();
-    }
-
-    if (m_setpointEntry != null) {
-      m_setpointEntry.setDouble(m_setpoint);
     }
   }
 
@@ -776,10 +809,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     } finally {
       m_thisMutex.unlock();
     }
-
-    if (m_enabledEntry != null) {
-      m_enabledEntry.setBoolean(true);
-    }
   }
 
   /**
@@ -801,9 +830,16 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     } finally {
       m_pidWriteMutex.unlock();
     }
+  }
 
-    if (m_enabledEntry != null) {
-      m_enabledEntry.setBoolean(false);
+  /**
+   * Set the enabled state of the PIDController.
+   */
+  public void setEnabled(boolean enable) {
+    if (enable) {
+      enable();
+    } else {
+      disable();
     }
   }
 
@@ -824,7 +860,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * Reset the previous error,, the integral term, and disable the controller.
    */
   @Override
-  public synchronized void reset() {
+  public void reset() {
     disable();
 
     m_thisMutex.lock();
@@ -838,130 +874,15 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "PIDController";
-  }
-
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_pEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_iEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_dEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_fEntry;
-  private NetworkTableEntry m_setpointEntry;
-  private NetworkTableEntry m_enabledEntry;
-  @SuppressWarnings("MemberName")
-  private int m_pListener;
-  @SuppressWarnings("MemberName")
-  private int m_iListener;
-  @SuppressWarnings("MemberName")
-  private int m_dListener;
-  @SuppressWarnings("MemberName")
-  private int m_fListener;
-  private int m_setpointListener;
-  private int m_enabledListener;
-
-  private void removeListeners() {
-    if (m_pEntry != null) {
-      m_pEntry.removeListener(m_pListener);
-    }
-    if (m_iEntry != null) {
-      m_iEntry.removeListener(m_iListener);
-    }
-    if (m_dEntry != null) {
-      m_dEntry.removeListener(m_dListener);
-    }
-    if (m_fEntry != null) {
-      m_fEntry.removeListener(m_fListener);
-    }
-    if (m_setpointEntry != null) {
-      m_setpointEntry.removeListener(m_setpointListener);
-    }
-    if (m_enabledEntry != null) {
-      m_enabledEntry.removeListener(m_enabledListener);
-    }
-  }
-
-  @Override
-  public void initTable(NetworkTable table) {
-    removeListeners();
-    if (table != null) {
-      m_pEntry = table.getEntry("p");
-      m_pEntry.setDouble(getP());
-      m_iEntry = table.getEntry("i");
-      m_iEntry.setDouble(getI());
-      m_dEntry = table.getEntry("d");
-      m_dEntry.setDouble(getD());
-      m_fEntry = table.getEntry("f");
-      m_fEntry.setDouble(getF());
-      m_setpointEntry = table.getEntry("setpoint");
-      m_setpointEntry.setDouble(getSetpoint());
-      m_enabledEntry = table.getEntry("enabled");
-      m_enabledEntry.setBoolean(isEnabled());
-
-      m_pListener = m_pEntry.addListener((entry) -> {
-        m_thisMutex.lock();
-        try {
-          m_P = entry.value.getDouble();
-        } finally {
-          m_thisMutex.unlock();
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      m_iListener = m_iEntry.addListener((entry) -> {
-        m_thisMutex.lock();
-        try {
-          m_I = entry.value.getDouble();
-        } finally {
-          m_thisMutex.unlock();
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      m_dListener = m_dEntry.addListener((entry) -> {
-        m_thisMutex.lock();
-        try {
-          m_D = entry.value.getDouble();
-        } finally {
-          m_thisMutex.unlock();
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      m_fListener = m_fEntry.addListener((entry) -> {
-        m_thisMutex.lock();
-        try {
-          m_F = entry.value.getDouble();
-        } finally {
-          m_thisMutex.unlock();
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      m_setpointListener = m_setpointEntry.addListener((entry) -> {
-        double val = entry.value.getDouble();
-        if (getSetpoint() != val) {
-          setSetpoint(val);
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-      m_enabledListener = m_enabledEntry.addListener((entry) -> {
-        boolean val = entry.value.getBoolean();
-        if (isEnabled() != val) {
-          if (val) {
-            enable();
-          } else {
-            disable();
-          }
-        }
-      }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-    } else {
-      m_pEntry = null;
-      m_iEntry = null;
-      m_dEntry = null;
-      m_fEntry = null;
-      m_setpointEntry = null;
-      m_enabledEntry = null;
-    }
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("PIDController");
+    builder.setSafeState(this::reset);
+    builder.addDoubleProperty("p", this::getP, this::setP);
+    builder.addDoubleProperty("i", this::getI, this::setI);
+    builder.addDoubleProperty("d", this::getD, this::setD);
+    builder.addDoubleProperty("f", this::getF, this::setF);
+    builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
+    builder.addBooleanProperty("enabled", this::isEnabled, this::setEnabled);
   }
 
   /**
@@ -984,21 +905,6 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     }
 
     return error;
-  }
-
-  @Override
-  public void updateTable() {
-  }
-
-
-  @Override
-  public void startLiveWindowMode() {
-    disable();
-  }
-
-
-  @Override
-  public void stopLiveWindowMode() {
   }
 
   private static double clamp(double value, double low, double high) {

@@ -9,8 +9,6 @@
 
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
-
 using namespace frc;
 
 /**
@@ -41,5 +39,5 @@ SD540::SD540(int channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_MindsensorsSD540, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("SD540", GetChannel(), this);
+  SetName("SD540", GetChannel());
 }

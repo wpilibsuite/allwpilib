@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 // import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 // import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 // import edu.wpi.first.wpilibj.hal.HAL;
@@ -40,6 +41,8 @@ public class KilloughDrive extends RobotDriveBase {
   public static final double kDefaultLeftMotorAngle = 60.0;
   public static final double kDefaultRightMotorAngle = 120.0;
   public static final double kDefaultBackMotorAngle = 270.0;
+
+  private static int instances = 0;
 
   private SpeedController m_leftMotor;
   private SpeedController m_rightMotor;
@@ -93,6 +96,11 @@ public class KilloughDrive extends RobotDriveBase {
                               Math.sin(rightMotorAngle * (Math.PI / 180.0)));
     m_backVec = new Vector2d(Math.cos(backMotorAngle * (Math.PI / 180.0)),
                              Math.sin(backMotorAngle * (Math.PI / 180.0)));
+    addChild(m_leftMotor);
+    addChild(m_rightMotor);
+    addChild(m_backMotor);
+    instances++;
+    setName("KilloughDrive", instances);
   }
 
   /**
@@ -191,5 +199,13 @@ public class KilloughDrive extends RobotDriveBase {
   @Override
   public String getDescription() {
     return "KilloughDrive";
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("KilloughDrive");
+    builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
+    builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
+    builder.addDoubleProperty("Back Motor Speed", m_backMotor::get, m_backMotor::set);
   }
 }

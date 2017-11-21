@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * The Collector subsystem has one motor for the rollers, a limit switch for
@@ -33,10 +32,10 @@ public class Collector extends Subsystem {
 
 	public Collector() {
 		// Put everything to the LiveWindow for testing.
-		LiveWindow.addActuator("Collector", "Roller Motor", (Victor) m_rollerMotor);
-		LiveWindow.addSensor("Collector", "Ball Detector", m_ballDetector);
-		LiveWindow.addSensor("Collector", "Claw Open Detector", m_openDetector);
-		LiveWindow.addActuator("Collector", "Piston", m_piston);
+		addChild("Roller Motor", (Victor) m_rollerMotor);
+		addChild("Ball Detector", m_ballDetector);
+		addChild("Claw Open Detector", m_openDetector);
+		addChild("Piston", m_piston);
 	}
 
 	/**

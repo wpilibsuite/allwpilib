@@ -13,7 +13,8 @@
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SensorBase.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -27,7 +28,7 @@ using namespace frc;
  * @param reverseChannel The reverse channel number on the PCM (0..7).
  */
 DoubleSolenoid::DoubleSolenoid(int forwardChannel, int reverseChannel)
-    : DoubleSolenoid(GetDefaultSolenoidModule(), forwardChannel,
+    : DoubleSolenoid(SensorBase::GetDefaultSolenoidModule(), forwardChannel,
                      reverseChannel) {}
 
 /**
@@ -44,17 +45,17 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
       m_reverseChannel(reverseChannel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
-  if (!CheckSolenoidModule(m_moduleNumber)) {
+  if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
     buf << "Solenoid Module " << m_moduleNumber;
     wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf.str());
     return;
   }
-  if (!CheckSolenoidChannel(m_forwardChannel)) {
+  if (!SensorBase::CheckSolenoidChannel(m_forwardChannel)) {
     buf << "Solenoid Module " << m_forwardChannel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
   }
-  if (!CheckSolenoidChannel(m_reverseChannel)) {
+  if (!SensorBase::CheckSolenoidChannel(m_reverseChannel)) {
     buf << "Solenoid Module " << m_reverseChannel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
@@ -89,8 +90,7 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
              m_moduleNumber);
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_reverseChannel,
              m_moduleNumber);
-  LiveWindow::GetInstance()->AddActuator("DoubleSolenoid", m_moduleNumber,
-                                         m_forwardChannel, this);
+  SetName("DoubleSolenoid", m_moduleNumber, m_forwardChannel);
 }
 
 /**
@@ -99,7 +99,6 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
 DoubleSolenoid::~DoubleSolenoid() {
   HAL_FreeSolenoidPort(m_forwardHandle);
   HAL_FreeSolenoidPort(m_reverseHandle);
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 /**
@@ -183,56 +182,27 @@ bool DoubleSolenoid::IsRevSolenoidBlackListed() const {
   return (blackList & m_reverseMask) != 0;
 }
 
-void DoubleSolenoid::UpdateTable() {
-  if (m_valueEntry) {
-    switch (Get()) {
-      case kForward:
-        m_valueEntry.SetString("Forward");
-        break;
-      case kReverse:
-        m_valueEntry.SetString("Reverse");
-        break;
-      default:
-        m_valueEntry.SetString("Off");
-        break;
-    }
-  }
-}
-
-void DoubleSolenoid::StartLiveWindowMode() {
-  Set(kOff);
-  if (m_valueEntry) {
-    m_valueListener = m_valueEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsString()) return;
-          Value lvalue = kOff;
-          if (event.value->GetString() == "Forward")
-            lvalue = kForward;
-          else if (event.value->GetString() == "Reverse")
-            lvalue = kReverse;
-          Set(lvalue);
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
-}
-
-void DoubleSolenoid::StopLiveWindowMode() {
-  Set(kOff);
-  if (m_valueListener != 0) {
-    m_valueEntry.RemoveListener(m_valueListener);
-    m_valueListener = 0;
-  }
-}
-
-std::string DoubleSolenoid::GetSmartDashboardType() const {
-  return "Double Solenoid";
-}
-
-void DoubleSolenoid::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void DoubleSolenoid::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Double Solenoid");
+  builder.SetSafeState([=]() { Set(kOff); });
+  builder.AddSmallStringProperty(
+      "Value",
+      [=](llvm::SmallVectorImpl<char>& buf) -> llvm::StringRef {
+        switch (Get()) {
+          case kForward:
+            return "Forward";
+          case kReverse:
+            return "Reverse";
+          default:
+            return "Off";
+        }
+      },
+      [=](llvm::StringRef value) {
+        Value lvalue = kOff;
+        if (value == "Forward")
+          lvalue = kForward;
+        else if (value == "Reverse")
+          lvalue = kReverse;
+        Set(lvalue);
+      });
 }

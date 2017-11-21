@@ -9,14 +9,11 @@
 
 #include <stdint.h>
 
-#include "SensorBase.h"
+#include "ErrorBase.h"
 
 enum HAL_SPIPort : int32_t;
 
 namespace frc {
-
-class DigitalOutput;
-class DigitalInput;
 
 /**
  * SPI bus interface class.
@@ -25,12 +22,12 @@ class DigitalInput;
  * It probably should not be used directly.
  *
  */
-class SPI : public SensorBase {
+class SPI : public ErrorBase {
  public:
   enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
 
   explicit SPI(Port port);
-  virtual ~SPI();
+  ~SPI() override;
 
   SPI(const SPI&) = delete;
   SPI& operator=(const SPI&) = delete;

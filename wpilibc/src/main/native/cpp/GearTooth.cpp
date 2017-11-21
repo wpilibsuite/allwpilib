@@ -7,7 +7,7 @@
 
 #include "GearTooth.h"
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -32,7 +32,7 @@ void GearTooth::EnableDirectionSensing(bool directionSensitive) {
  */
 GearTooth::GearTooth(int channel, bool directionSensitive) : Counter(channel) {
   EnableDirectionSensing(directionSensitive);
-  LiveWindow::GetInstance()->AddSensor("GearTooth", channel, this);
+  SetName("GearTooth", channel);
 }
 
 /**
@@ -48,6 +48,7 @@ GearTooth::GearTooth(int channel, bool directionSensitive) : Counter(channel) {
 GearTooth::GearTooth(DigitalSource* source, bool directionSensitive)
     : Counter(source) {
   EnableDirectionSensing(directionSensitive);
+  SetName("GearTooth", source->GetChannel());
 }
 
 /**
@@ -64,6 +65,10 @@ GearTooth::GearTooth(std::shared_ptr<DigitalSource> source,
                      bool directionSensitive)
     : Counter(source) {
   EnableDirectionSensing(directionSensitive);
+  SetName("GearTooth", source->GetChannel());
 }
 
-std::string GearTooth::GetSmartDashboardType() const { return "GearTooth"; }
+void GearTooth::InitSendable(SendableBuilder& builder) {
+  Counter::InitSendable(builder);
+  builder.SetSmartDashboardType("Gear Tooth");
+}

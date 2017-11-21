@@ -9,8 +9,6 @@
 
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
-
 using namespace frc;
 
 /**
@@ -41,5 +39,5 @@ Spark::Spark(int channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_RevSPARK, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("Spark", GetChannel(), this);
+  SetName("Spark", GetChannel());
 }

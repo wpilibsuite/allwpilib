@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
@@ -62,6 +61,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   public PIDSubsystem(String name, double p, double i, double d) {
     super(name);
     m_controller = new PIDController(p, i, d, m_source, m_output);
+    addChild("PIDController", m_controller);
   }
 
   /**
@@ -77,6 +77,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   public PIDSubsystem(String name, double p, double i, double d, double f) {
     super(name);
     m_controller = new PIDController(p, i, d, f, m_source, m_output);
+    addChild("PIDController", m_controller);
   }
 
   /**
@@ -93,6 +94,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   public PIDSubsystem(String name, double p, double i, double d, double f, double period) {
     super(name);
     m_controller = new PIDController(p, i, d, f, m_source, m_output, period);
+    addChild("PIDController", m_controller);
   }
 
   /**
@@ -106,6 +108,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   @SuppressWarnings("ParameterName")
   public PIDSubsystem(double p, double i, double d) {
     m_controller = new PIDController(p, i, d, m_source, m_output);
+    addChild("PIDController", m_controller);
   }
 
   /**
@@ -122,6 +125,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   @SuppressWarnings("ParameterName")
   public PIDSubsystem(double p, double i, double d, double period, double f) {
     m_controller = new PIDController(p, i, d, f, m_source, m_output, period);
+    addChild("PIDController", m_controller);
   }
 
   /**
@@ -137,6 +141,7 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   @SuppressWarnings("ParameterName")
   public PIDSubsystem(double p, double i, double d, double period) {
     m_controller = new PIDController(p, i, d, m_source, m_output, period);
+    addChild("PIDController", m_controller);
   }
 
   /**
@@ -276,16 +281,5 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
    */
   public void disable() {
     m_controller.disable();
-  }
-
-  @Override
-  public String getSmartDashboardType() {
-    return "PIDSubsystem";
-  }
-
-  @Override
-  public void initTable(NetworkTable table) {
-    m_controller.initTable(table);
-    super.initTable(table);
   }
 }

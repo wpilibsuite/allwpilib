@@ -15,7 +15,7 @@
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -49,8 +49,8 @@ DigitalInput::DigitalInput(int channel) {
     return;
   }
 
-  LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
   HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel);
+  SetName("DigitalInput", channel);
 }
 
 /**
@@ -103,23 +103,7 @@ AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
   return (AnalogTriggerType)0;
 }
 
-void DigitalInput::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetBoolean(Get());
-}
-
-void DigitalInput::StartLiveWindowMode() {}
-
-void DigitalInput::StopLiveWindowMode() {}
-
-std::string DigitalInput::GetSmartDashboardType() const {
-  return "DigitalInput";
-}
-
-void DigitalInput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void DigitalInput::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Digital Input");
+  builder.AddBooleanProperty("Value", [=]() { return Get(); }, nullptr);
 }

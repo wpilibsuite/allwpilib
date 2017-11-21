@@ -7,12 +7,7 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include "DigitalSource.h"
-#include "LiveWindow/LiveWindowSendable.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -27,10 +22,10 @@ class DigitalGlitchFilter;
  * as required. This class is only for devices like switches etc. that aren't
  * implemented anywhere else.
  */
-class DigitalInput : public DigitalSource, public LiveWindowSendable {
+class DigitalInput : public DigitalSource {
  public:
   explicit DigitalInput(int channel);
-  virtual ~DigitalInput();
+  ~DigitalInput() override;
   bool Get() const;
   int GetChannel() const override;
 
@@ -39,17 +34,12 @@ class DigitalInput : public DigitalSource, public LiveWindowSendable {
   AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
   bool IsAnalogTrigger() const override;
 
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   int m_channel;
   HAL_DigitalHandle m_handle;
 
-  nt::NetworkTableEntry m_valueEntry;
   friend class DigitalGlitchFilter;
 };
 

@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
@@ -43,6 +44,7 @@ import static org.junit.Assert.assertTrue;
 public class PIDTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(PIDTest.class.getName());
   private NetworkTable m_table;
+  private SendableBuilderImpl m_builder;
 
   private static final double absoluteTolerance = 50;
   private static final double outputRange = 0.25;
@@ -104,8 +106,10 @@ public class PIDTest extends AbstractComsSetup {
     logger.fine("Setup: " + me.getType());
     me.setup();
     m_table = NetworkTableInstance.getDefault().getTable("TEST_PID");
+    m_builder = new SendableBuilderImpl();
+    m_builder.setTable(m_table);
     m_controller = new PIDController(k_p, k_i, k_d, me.getEncoder(), me.getMotor());
-    m_controller.initTable(m_table);
+    m_controller.initSendable(m_builder);
   }
 
   @After
@@ -134,6 +138,7 @@ public class PIDTest extends AbstractComsSetup {
     assertFalse("PID did not begin disabled", m_controller.isEnabled());
     assertEquals("PID.getError() did not start at " + setpoint, setpoint,
         m_controller.getError(), 0);
+    m_builder.updateTable();
     assertEquals(k_p, m_table.getEntry("p").getDouble(9999999), 0);
     assertEquals(k_i, m_table.getEntry("i").getDouble(9999999), 0);
     assertEquals(k_d, m_table.getEntry("d").getDouble(9999999), 0);
@@ -148,11 +153,12 @@ public class PIDTest extends AbstractComsSetup {
     double setpoint = 2500.0;
     m_controller.setSetpoint(setpoint);
     m_controller.enable();
-    Timer.delay(.5);
+    m_builder.updateTable();
     assertTrue(m_table.getEntry("enabled").getBoolean(false));
     assertTrue(m_controller.isEnabled());
     assertThat(0.0, is(not(me.getMotor().get())));
     m_controller.reset();
+    m_builder.updateTable();
     assertFalse(m_table.getEntry("enabled").getBoolean(true));
     assertFalse(m_controller.isEnabled());
     assertEquals(0, me.getMotor().get(), 0);

@@ -13,7 +13,7 @@
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -32,6 +32,7 @@ PowerDistributionPanel::PowerDistributionPanel(int module) : m_module(module) {
     m_module = -1;
     return;
   }
+  SetName("PowerDistributionPanel", module);
 }
 
 /**
@@ -171,39 +172,13 @@ void PowerDistributionPanel::ClearStickyFaults() {
   }
 }
 
-void PowerDistributionPanel::UpdateTable() {
-  for (size_t i = 0; i < sizeof(m_chanEntry) / sizeof(m_chanEntry[0]); ++i) {
-    if (m_chanEntry[i]) m_chanEntry[i].SetDouble(GetCurrent(i));
+void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("PowerDistributionPanel");
+  for (int i = 0; i < kPDPChannels; ++i) {
+    builder.AddDoubleProperty("Chan" + llvm::Twine(i),
+                              [=]() { return GetCurrent(i); }, nullptr);
   }
-  if (m_voltageEntry) m_voltageEntry.SetDouble(GetVoltage());
-  if (m_totalCurrentEntry) m_totalCurrentEntry.SetDouble(GetTotalCurrent());
-}
-
-void PowerDistributionPanel::StartLiveWindowMode() {}
-
-void PowerDistributionPanel::StopLiveWindowMode() {}
-
-std::string PowerDistributionPanel::GetSmartDashboardType() const {
-  return "PowerDistributionPanel";
-}
-
-void PowerDistributionPanel::InitTable(
-    std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable != nullptr) {
-    for (size_t i = 0; i < sizeof(m_chanEntry) / sizeof(m_chanEntry[0]); ++i) {
-      llvm::SmallString<32> buf;
-      llvm::raw_svector_ostream oss(buf);
-      oss << "Chan" << i;
-      m_chanEntry[i] = subTable->GetEntry(oss.str());
-    }
-    m_voltageEntry = subTable->GetEntry("Voltage");
-    m_totalCurrentEntry = subTable->GetEntry("TotalCurrent");
-    UpdateTable();
-  } else {
-    for (size_t i = 0; i < sizeof(m_chanEntry) / sizeof(m_chanEntry[0]); ++i) {
-      m_chanEntry[i] = nt::NetworkTableEntry();
-    }
-    m_voltageEntry = nt::NetworkTableEntry();
-    m_totalCurrentEntry = nt::NetworkTableEntry();
-  }
+  builder.AddDoubleProperty("Voltage", [=]() { return GetVoltage(); }, nullptr);
+  builder.AddDoubleProperty("TotalCurrent", [=]() { return GetTotalCurrent(); },
+                            nullptr);
 }

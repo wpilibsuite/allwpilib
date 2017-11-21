@@ -7,20 +7,13 @@
 
 #include "Shooter.h"
 
-#include <LiveWindow/LiveWindow.h>
-
 Shooter::Shooter()
     : Subsystem("Shooter") {
 	// Put everything to the LiveWindow for testing.
-	frc::LiveWindow::GetInstance()->AddSensor(
-			"Shooter", "Hot Goal Sensor", &m_hotGoalSensor);
-	frc::LiveWindow::GetInstance()->AddSensor("Shooter",
-			"Piston1 Reed Switch Front ",
-			&m_piston1ReedSwitchFront);
-	frc::LiveWindow::GetInstance()->AddSensor("Shooter",
-			"Piston1 Reed Switch Back ", &m_piston1ReedSwitchBack);
-	frc::LiveWindow::GetInstance()->AddActuator(
-			"Shooter", "Latch Piston", &m_latchPiston);
+	AddChild("Hot Goal Sensor", m_hotGoalSensor);
+	AddChild("Piston1 Reed Switch Front ", m_piston1ReedSwitchFront);
+	AddChild("Piston1 Reed Switch Back ", m_piston1ReedSwitchBack);
+	AddChild("Latch Piston", m_latchPiston);
 }
 
 void Shooter::InitDefaultCommand() {

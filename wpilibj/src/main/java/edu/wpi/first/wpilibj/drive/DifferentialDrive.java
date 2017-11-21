@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * A class for driving differential drive/skid-steer drive platforms such as the Kit of Parts drive
@@ -93,6 +94,8 @@ public class DifferentialDrive extends RobotDriveBase {
   public static final double kDefaultQuickStopThreshold = 0.2;
   public static final double kDefaultQuickStopAlpha = 0.1;
 
+  private static int instances = 0;
+
   private SpeedController m_leftMotor;
   private SpeedController m_rightMotor;
 
@@ -110,6 +113,10 @@ public class DifferentialDrive extends RobotDriveBase {
   public DifferentialDrive(SpeedController leftMotor, SpeedController rightMotor) {
     m_leftMotor = leftMotor;
     m_rightMotor = rightMotor;
+    addChild(m_leftMotor);
+    addChild(m_rightMotor);
+    instances++;
+    setName("DifferentialDrive", instances);
   }
 
   /**
@@ -348,5 +355,12 @@ public class DifferentialDrive extends RobotDriveBase {
   @Override
   public String getDescription() {
     return "DifferentialDrive";
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("DifferentialDrive");
+    builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
+    builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
   }
 }

@@ -23,6 +23,7 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
                            double d)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
+  AddChild("PIDController", m_controller);
 }
 
 /**
@@ -38,6 +39,7 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
                            double d, double f)
     : Subsystem(name) {
   m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
+  AddChild("PIDController", m_controller);
 }
 
 /**
@@ -58,6 +60,7 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
     : Subsystem(name) {
   m_controller =
       std::make_shared<PIDController>(p, i, d, f, this, this, period);
+  AddChild("PIDController", m_controller);
 }
 
 /**
@@ -72,6 +75,7 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
 PIDSubsystem::PIDSubsystem(double p, double i, double d)
     : Subsystem("PIDSubsystem") {
   m_controller = std::make_shared<PIDController>(p, i, d, this, this);
+  AddChild("PIDController", m_controller);
 }
 
 /**
@@ -87,6 +91,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d)
 PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
     : Subsystem("PIDSubsystem") {
   m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
+  AddChild("PIDController", m_controller);
 }
 
 /**
@@ -106,6 +111,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
     : Subsystem("PIDSubsystem") {
   m_controller =
       std::make_shared<PIDController>(p, i, d, f, this, this, period);
+  AddChild("PIDController", m_controller);
 }
 
 /**
@@ -233,10 +239,3 @@ double PIDSubsystem::GetRate() { return ReturnPIDInput(); }
 void PIDSubsystem::PIDWrite(double output) { UsePIDOutput(output); }
 
 double PIDSubsystem::PIDGet() { return ReturnPIDInput(); }
-
-std::string PIDSubsystem::GetSmartDashboardType() const { return "PIDCommand"; }
-
-void PIDSubsystem::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  m_controller->InitTable(subtable);
-  Subsystem::InitTable(subtable);
-}

@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * VEX Robotics Victor 888 Speed Controller The Vex Robotics Victor 884 Speed Controller can also
@@ -42,7 +41,7 @@ public class Victor extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    LiveWindow.addActuator("Victor", getChannel(), this);
     HAL.report(tResourceType.kResourceType_Victor, getChannel());
+    setName("Victor", getChannel());
   }
 }

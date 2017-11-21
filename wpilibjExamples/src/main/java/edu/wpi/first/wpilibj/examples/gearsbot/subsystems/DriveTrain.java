@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
 import edu.wpi.first.wpilibj.examples.gearsbot.commands.TankDriveWithJoystick;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -58,11 +57,12 @@ public class DriveTrain extends Subsystem {
 			m_rightEncoder.setDistancePerPulse((4.0 / 12.0 * Math.PI) / 360.0);
 		}
 
-		// Let's show the sensors on the LiveWindow
-		LiveWindow.addSensor("Drive Train", "Left Encoder", m_leftEncoder);
-		LiveWindow.addSensor("Drive Train", "Right Encoder", m_rightEncoder);
-		LiveWindow.addSensor("Drive Train", "Rangefinder", m_rangefinder);
-		LiveWindow.addSensor("Drive Train", "Gyro", m_gyro);
+		// Let's name the sensors on the LiveWindow
+		addChild("Drive", m_drive);
+		addChild("Left Encoder", m_leftEncoder);
+		addChild("Right Encoder", m_rightEncoder);
+		addChild("Rangefinder", m_rangefinder);
+		addChild("Gyro", m_gyro);
 	}
 
 	/**

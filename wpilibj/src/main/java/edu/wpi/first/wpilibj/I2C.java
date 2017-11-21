@@ -22,7 +22,7 @@ import static java.util.Objects.requireNonNull;
  * <p>This class is intended to be used by sensor (and other I2C device) drivers. It probably should
  * not be used directly.
  */
-public class I2C extends SensorBase {
+public class I2C {
   public enum Port {
     kOnboard(0), kMXP(1);
 
@@ -56,6 +56,7 @@ public class I2C extends SensorBase {
    * Destructor.
    */
   public void free() {
+    I2CJNI.i2CClose(m_port);
   }
 
   /**

@@ -35,7 +35,7 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   PIDSubsystem(double p, double i, double d);
   PIDSubsystem(double p, double i, double d, double f);
   PIDSubsystem(double p, double i, double d, double f, double period);
-  virtual ~PIDSubsystem() = default;
+  ~PIDSubsystem() override = default;
 
   void Enable();
   void Disable();
@@ -66,10 +66,6 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
  private:
   // The internal PIDController
   std::shared_ptr<PIDController> m_controller;
-
- public:
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::string GetSmartDashboardType() const override;
 };
 
 }  // namespace frc

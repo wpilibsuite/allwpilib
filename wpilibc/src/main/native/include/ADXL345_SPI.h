@@ -7,19 +7,11 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "LiveWindow/LiveWindowSendable.h"
 #include "SPI.h"
 #include "SensorBase.h"
 #include "interfaces/Accelerometer.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
-
-class DigitalInput;
-class DigitalOutput;
 
 /**
  * ADXL345 Accelerometer on SPI.
@@ -27,7 +19,7 @@ class DigitalOutput;
  * This class allows access to an Analog Devices ADXL345 3-axis accelerometer
  * via SPI. This class assumes the sensor is wired in 4-wire SPI mode.
  */
-class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
+class ADXL345_SPI : public SensorBase, public Accelerometer {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 
@@ -38,7 +30,7 @@ class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
   };
 
   explicit ADXL345_SPI(SPI::Port port, Range range = kRange_2G);
-  virtual ~ADXL345_SPI() = default;
+  ~ADXL345_SPI() override = default;
 
   ADXL345_SPI(const ADXL345_SPI&) = delete;
   ADXL345_SPI& operator=(const ADXL345_SPI&) = delete;
@@ -52,11 +44,7 @@ class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
   virtual double GetAcceleration(Axes axis);
   virtual AllAxes GetAccelerations();
 
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  void UpdateTable() override;
-  void StartLiveWindowMode() override {}
-  void StopLiveWindowMode() override {}
+  void InitSendable(SendableBuilder& builder) override;
 
  protected:
   SPI m_spi;
@@ -82,11 +70,6 @@ class ADXL345_SPI : public Accelerometer, public LiveWindowSendable {
     kDataFormat_FullRes = 0x08,
     kDataFormat_Justify = 0x04
   };
-
- private:
-  nt::NetworkTableEntry m_xEntry;
-  nt::NetworkTableEntry m_yEntry;
-  nt::NetworkTableEntry m_zEntry;
 };
 
 }  // namespace frc

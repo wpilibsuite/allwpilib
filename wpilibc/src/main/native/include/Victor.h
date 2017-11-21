@@ -20,7 +20,6 @@ namespace frc {
 class Victor : public PWMSpeedController {
  public:
   explicit Victor(int channel);
-  virtual ~Victor() = default;
 };
 
 }  // namespace frc

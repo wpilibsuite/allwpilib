@@ -8,16 +8,13 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include <HAL/Encoder.h>
 
 #include "Counter.h"
 #include "CounterBase.h"
-#include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -39,10 +36,7 @@ class DigitalGlitchFilter;
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public SensorBase,
-                public CounterBase,
-                public PIDSource,
-                public LiveWindowSendable {
+class Encoder : public SensorBase, public CounterBase, public PIDSource {
  public:
   enum IndexingType {
     kResetWhileHigh,
@@ -60,7 +54,7 @@ class Encoder : public SensorBase,
           bool reverseDirection = false, EncodingType encodingType = k4X);
   Encoder(DigitalSource& aSource, DigitalSource& bSource,
           bool reverseDirection = false, EncodingType encodingType = k4X);
-  virtual ~Encoder();
+  ~Encoder() override;
 
   // CounterBase interface
   int Get() const override;
@@ -76,6 +70,7 @@ class Encoder : public SensorBase,
   double GetRate() const;
   void SetMinRate(double minRate);
   void SetDistancePerPulse(double distancePerPulse);
+  double GetDistancePerPulse() const;
   void SetReverseDirection(bool reverseDirection);
   void SetSamplesToAverage(int samplesToAverage);
   int GetSamplesToAverage() const;
@@ -85,11 +80,7 @@ class Encoder : public SensorBase,
   void SetIndexSource(const DigitalSource& source,
                       IndexingType type = kResetOnRisingEdge);
 
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  void InitSendable(SendableBuilder& builder) override;
 
   int GetFPGAIndex() const;
 
@@ -103,9 +94,6 @@ class Encoder : public SensorBase,
   std::unique_ptr<DigitalSource> m_indexSource = nullptr;
   HAL_EncoderHandle m_encoder = HAL_kInvalidHandle;
 
-  nt::NetworkTableEntry m_speedEntry;
-  nt::NetworkTableEntry m_distanceEntry;
-  nt::NetworkTableEntry m_distancePerTickEntry;
   friend class DigitalGlitchFilter;
 };
 

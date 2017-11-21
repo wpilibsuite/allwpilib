@@ -7,13 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.util.AllocationException;
 
 /**
@@ -28,7 +25,7 @@ import edu.wpi.first.wpilibj.util.AllocationException;
  * accumulated effectively increasing the resolution, while the averaged samples are divided by the
  * number of samples to retain the resolution, but get more stable values.
  */
-public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSendable {
+public class AnalogInput extends SensorBase implements PIDSource, Sendable {
 
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
@@ -49,14 +46,16 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
-    LiveWindow.addSensor("AnalogInput", channel, this);
     HAL.report(tResourceType.kResourceType_AnalogChannel, channel);
+    setName("AnalogInput", channel);
   }
 
   /**
    * Channel destructor.
    */
+  @Override
   public void free() {
+    super.free();
     AnalogJNI.freeAnalogInputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -347,44 +346,9 @@ public class AnalogInput extends SensorBase implements PIDSource, LiveWindowSend
     return getAverageVoltage();
   }
 
-  /**
-   * Live Window code, only does anything if live window is activated.
-   */
   @Override
-  public String getSmartDashboardType() {
-    return "Analog Input";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(getAverageVoltage());
-    }
-  }
-
-  /**
-   * Analog Channels don't have to do anything special when entering the LiveWindow. {@inheritDoc}
-   */
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  /**
-   * Analog Channels don't have to do anything special when exiting the LiveWindow. {@inheritDoc}
-   */
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Analog Input");
+    builder.addDoubleProperty("Value", this::getAverageVoltage, null);
   }
 }

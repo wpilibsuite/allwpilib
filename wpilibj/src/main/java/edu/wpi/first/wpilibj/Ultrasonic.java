@@ -7,12 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static java.util.Objects.requireNonNull;
 
@@ -25,7 +22,7 @@ import static java.util.Objects.requireNonNull;
  * echo is received. The time that the line is high determines the round trip distance (time of
  * flight).
  */
-public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSendable {
+public class Ultrasonic extends SensorBase implements PIDSource, Sendable {
 
   /**
    * The units to return when PIDGet is called.
@@ -107,6 +104,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
     m_firstSensor = this;
 
     m_counter = new Counter(m_echoChannel); // set up counter for this
+    addChild(m_counter);
     // sensor
     m_counter.setMaxPeriod(1.0);
     m_counter.setSemiPeriodMode(true);
@@ -116,7 +114,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
 
     m_instances++;
     HAL.report(tResourceType.kResourceType_Ultrasonic, m_instances);
-    LiveWindow.addSensor("Ultrasonic", m_echoChannel.getChannel(), this);
+    setName("Ultrasonic", m_echoChannel.getChannel());
   }
 
   /**
@@ -133,6 +131,8 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
   public Ultrasonic(final int pingChannel, final int echoChannel, Unit units) {
     m_pingChannel = new DigitalOutput(pingChannel);
     m_echoChannel = new DigitalInput(echoChannel);
+    addChild(m_pingChannel);
+    addChild(m_echoChannel);
     m_allocatedChannels = true;
     m_units = units;
     initialize();
@@ -194,6 +194,7 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
    */
   @Override
   public synchronized void free() {
+    super.free();
     final boolean wasAutomaticMode = m_automaticEnabled;
     setAutomaticMode(false);
     if (m_allocatedChannels) {
@@ -391,38 +392,9 @@ public class Ultrasonic extends SensorBase implements PIDSource, LiveWindowSenda
     m_enabled = enable;
   }
 
-  /**
-   * Live Window code, only does anything if live window is activated.
-   */
   @Override
-  public String getSmartDashboardType() {
-    return "Ultrasonic";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(getRangeInches());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Ultrasonic");
+    builder.addDoubleProperty("Value", this::getRangeInches, null);
   }
 }

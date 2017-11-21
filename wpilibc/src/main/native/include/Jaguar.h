@@ -17,7 +17,6 @@ namespace frc {
 class Jaguar : public PWMSpeedController {
  public:
   explicit Jaguar(int channel);
-  virtual ~Jaguar() = default;
 };
 
 }  // namespace frc

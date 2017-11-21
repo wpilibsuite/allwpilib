@@ -10,13 +10,11 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * ADXL362 SPI Accelerometer.
@@ -24,7 +22,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * <p>This class allows access to an Analog Devices ADXL362 3-axis accelerometer.
  */
 @SuppressWarnings("PMD.UnusedPrivateField")
-public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSendable {
+public class ADXL362 extends SensorBase implements Accelerometer, Sendable {
   private static final byte kRegWrite = 0x0A;
   private static final byte kRegRead = 0x0B;
 
@@ -82,6 +80,7 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
    */
   public ADXL362(SPI.Port port, Range range) {
     m_spi = new SPI(port);
+
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
     m_spi.setSampleDataOnFalling();
@@ -109,17 +108,25 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
     m_spi.write(transferBuffer, 3);
 
     HAL.report(tResourceType.kResourceType_ADXL362, port.value);
-    LiveWindow.addSensor("ADXL362", port.value, this);
+    setName("ADXL362", port.value);
   }
 
+  @Override
   public void free() {
-    m_spi.free();
+    super.free();
+    if (m_spi != null) {
+      m_spi.free();
+      m_spi = null;
+    }
   }
 
   @Override
   public void setRange(Range range) {
-    final byte value;
+    if (m_spi == null) {
+      return;
+    }
 
+    final byte value;
     switch (range) {
       case k2G:
         value = kFilterCtl_Range2G;
@@ -205,49 +212,16 @@ public class ADXL362 extends SensorBase implements Accelerometer, LiveWindowSend
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "3AxisAccelerometer";
-  }
-
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_xEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_yEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_zEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_xEntry = subtable.getEntry("X");
-      m_yEntry = subtable.getEntry("Y");
-      m_zEntry = subtable.getEntry("Z");
-      updateTable();
-    } else {
-      m_xEntry = null;
-      m_yEntry = null;
-      m_zEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_xEntry != null) {
-      m_xEntry.setDouble(getX());
-    }
-    if (m_yEntry != null) {
-      m_yEntry.setDouble(getY());
-    }
-    if (m_zEntry != null) {
-      m_zEntry.setDouble(getZ());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("3AxisAccelerometer");
+    NetworkTableEntry entryX = builder.getEntry("X");
+    NetworkTableEntry entryY = builder.getEntry("Y");
+    NetworkTableEntry entryZ = builder.getEntry("Z");
+    builder.setUpdateTable(() -> {
+      AllAxes data = getAccelerations();
+      entryX.setDouble(data.XAxis);
+      entryY.setDouble(data.YAxis);
+      entryZ.setDouble(data.ZAxis);
+    });
   }
 }

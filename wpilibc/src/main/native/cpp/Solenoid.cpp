@@ -13,7 +13,8 @@
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SensorBase.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -24,7 +25,7 @@ using namespace frc;
  * @param channel The channel on the PCM to control (0..7).
  */
 Solenoid::Solenoid(int channel)
-    : Solenoid(GetDefaultSolenoidModule(), channel) {}
+    : Solenoid(SensorBase::GetDefaultSolenoidModule(), channel) {}
 
 /**
  * Constructor.
@@ -36,12 +37,12 @@ Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
   llvm::SmallString<32> str;
   llvm::raw_svector_ostream buf(str);
-  if (!CheckSolenoidModule(m_moduleNumber)) {
+  if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
     buf << "Solenoid Module " << m_moduleNumber;
     wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf.str());
     return;
   }
-  if (!CheckSolenoidChannel(m_channel)) {
+  if (!SensorBase::CheckSolenoidChannel(m_channel)) {
     buf << "Solenoid Module " << m_channel;
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
     return;
@@ -57,19 +58,15 @@ Solenoid::Solenoid(int moduleNumber, int channel)
     return;
   }
 
-  LiveWindow::GetInstance()->AddActuator("Solenoid", m_moduleNumber, m_channel,
-                                         this);
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel,
              m_moduleNumber);
+  SetName("Solenoid", m_moduleNumber, m_channel);
 }
 
 /**
  * Destructor.
  */
-Solenoid::~Solenoid() {
-  HAL_FreeSolenoidPort(m_solenoidHandle);
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
-}
+Solenoid::~Solenoid() { HAL_FreeSolenoidPort(m_solenoidHandle); }
 
 /**
  * Set the value of a solenoid.
@@ -141,34 +138,9 @@ void Solenoid::StartPulse() {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void Solenoid::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetBoolean(Get());
-}
-
-void Solenoid::StartLiveWindowMode() {
-  Set(false);
-  if (m_valueEntry) {
-    m_valueEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsBoolean()) return;
-          Set(event.value->GetBoolean());
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
-}
-
-void Solenoid::StopLiveWindowMode() {
-  Set(false);
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
-}
-
-std::string Solenoid::GetSmartDashboardType() const { return "Solenoid"; }
-
-void Solenoid::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void Solenoid::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Solenoid");
+  builder.SetSafeState([=]() { Set(false); });
+  builder.AddBooleanProperty("Value", [=]() { return Get(); },
+                             [=](bool value) { Set(value); });
 }

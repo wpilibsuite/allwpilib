@@ -14,6 +14,7 @@
 #include <support/mutex.h>
 
 #include "DigitalSource.h"
+#include "SensorBase.h"
 
 namespace frc {
 
@@ -30,7 +31,7 @@ class Counter;
 class DigitalGlitchFilter : public SensorBase {
  public:
   DigitalGlitchFilter();
-  ~DigitalGlitchFilter();
+  ~DigitalGlitchFilter() override;
 
   void Add(DigitalSource* input);
   void Add(Encoder* input);
@@ -45,6 +46,8 @@ class DigitalGlitchFilter : public SensorBase {
 
   int GetPeriodCycles();
   uint64_t GetPeriodNanoSeconds();
+
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   // Sets the filter for the input to be the requested index. A value of 0

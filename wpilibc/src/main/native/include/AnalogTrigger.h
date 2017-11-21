@@ -24,7 +24,7 @@ class AnalogTrigger : public SensorBase {
  public:
   explicit AnalogTrigger(int channel);
   explicit AnalogTrigger(AnalogInput* channel);
-  virtual ~AnalogTrigger();
+  ~AnalogTrigger() override;
 
   void SetLimitsVoltage(double lower, double upper);
   void SetLimitsRaw(int lower, int upper);
@@ -35,6 +35,8 @@ class AnalogTrigger : public SensorBase {
   bool GetTriggerState();
   std::shared_ptr<AnalogTriggerOutput> CreateOutput(
       AnalogTriggerType type) const;
+
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   int m_index;

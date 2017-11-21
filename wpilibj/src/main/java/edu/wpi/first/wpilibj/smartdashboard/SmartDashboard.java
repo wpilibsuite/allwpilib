@@ -8,14 +8,14 @@
 package edu.wpi.first.wpilibj.smartdashboard;
 
 import java.nio.ByteBuffer;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.HLUsageReporting;
-import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.Sendable;
 
 /**
@@ -31,11 +31,17 @@ public class SmartDashboard {
    */
   private static final NetworkTable table =
       NetworkTableInstance.getDefault().getTable("SmartDashboard");
+
+  private static class Data {
+    Sendable m_sendable;
+    final SendableBuilderImpl m_builder = new SendableBuilderImpl();
+  }
+
   /**
    * A table linking tables in the SmartDashboard to the {@link Sendable} objects they
    * came from.
    */
-  private static final Hashtable<NetworkTable, Sendable> tablesToData = new Hashtable<>();
+  private static final Map<String, Data> tablesToData = new HashMap<>();
 
   static {
     HLUsageReporting.reportSmartDashboard();
@@ -49,25 +55,29 @@ public class SmartDashboard {
    * @param data the value
    * @throws IllegalArgumentException If key is null
    */
-  public static void putData(String key, Sendable data) {
-    NetworkTable dataTable = table.getSubTable(key);
-    dataTable.getEntry(".type").setString(data.getSmartDashboardType());
-    data.initTable(dataTable);
-    tablesToData.put(dataTable, data);
+  public static synchronized void putData(String key, Sendable data) {
+    Data sddata = tablesToData.get(key);
+    if (sddata == null) {
+      sddata = new Data();
+      tablesToData.put(key, sddata);
+    }
+    if (sddata.m_sendable == null || sddata.m_sendable != data) {
+      sddata.m_sendable = data;
+      sddata.m_builder.setTable(table.getSubTable(key));
+      data.initSendable(sddata.m_builder);
+    }
+    sddata.m_builder.updateTable();
   }
-
-
-  // TODO should we reimplement NamedSendable?
 
   /**
    * Maps the specified key (where the key is the name of the {@link NamedSendable}
-   * SmartDashboardNamedData to the specified value in this table. The value can be retrieved by
+   * to the specified value in this table. The value can be retrieved by
    * calling the get method with a key that is equal to the original key.
    *
    * @param value the value
    * @throws IllegalArgumentException If key is null
    */
-  public static void putData(NamedSendable value) {
+  public static void putData(Sendable value) {
     putData(value.getName(), value);
   }
 
@@ -78,13 +88,12 @@ public class SmartDashboard {
    * @return the value
    * @throws IllegalArgumentException  if the key is null
    */
-  public static Sendable getData(String key) {
-    NetworkTable subtable = table.getSubTable(key);
-    Sendable data = tablesToData.get(subtable);
+  public static synchronized Sendable getData(String key) {
+    Data data = tablesToData.get(key);
     if (data == null) {
       throw new IllegalArgumentException("SmartDashboard data does not exist: " + key);
     } else {
-      return data;
+      return data.m_sendable;
     }
   }
 

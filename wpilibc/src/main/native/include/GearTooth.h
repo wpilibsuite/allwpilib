@@ -30,11 +30,10 @@ class GearTooth : public Counter {
   explicit GearTooth(DigitalSource* source, bool directionSensitive = false);
   explicit GearTooth(std::shared_ptr<DigitalSource> source,
                      bool directionSensitive = false);
-  virtual ~GearTooth() = default;
 
   void EnableDirectionSensing(bool directionSensitive);
 
-  std::string GetSmartDashboardType() const override;
+  void InitSendable(SendableBuilder& builder) override;
 };
 
 }  // namespace frc

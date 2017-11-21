@@ -7,8 +7,12 @@
 
 #pragma once
 
+#include <memory>
+
 #include "Base.h"
 #include "ErrorBase.h"
+#include "SmartDashboard/Sendable.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -18,10 +22,9 @@ namespace frc {
  * Stores most recent status information as well as containing utility functions
  * for checking channels and error processing.
  */
-class SensorBase : public ErrorBase {
+class SensorBase : public ErrorBase, public SendableBase {
  public:
   SensorBase() = default;
-  virtual ~SensorBase() = default;
 
   SensorBase(const SensorBase&) = delete;
   SensorBase& operator=(const SensorBase&) = delete;

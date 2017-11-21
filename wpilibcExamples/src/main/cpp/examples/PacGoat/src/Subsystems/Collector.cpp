@@ -12,14 +12,10 @@
 Collector::Collector()
     : frc::Subsystem("Collector") {
 	// Put everything to the LiveWindow for testing.
-	// XXX: LiveWindow::GetInstance()->AddActuator("Collector", "Roller
-	// Motor", &m_rollerMotor);
-	LiveWindow::GetInstance()->AddSensor(
-			"Collector", "Ball Detector", &m_ballDetector);
-	LiveWindow::GetInstance()->AddSensor(
-			"Collector", "Claw Open Detector", &m_openDetector);
-	LiveWindow::GetInstance()->AddActuator(
-			"Collector", "Piston", &m_piston);
+	AddChild("Roller Motor", m_rollerMotor);
+	AddChild("Ball Detector", m_ballDetector);
+	AddChild("Claw Open Detector", m_openDetector);
+	AddChild("Piston", m_piston);
 }
 
 bool Collector::HasBall() {

@@ -7,18 +7,15 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Analog output class.
  */
-public class AnalogOutput extends SensorBase implements LiveWindowSendable {
+public class AnalogOutput extends SendableBase implements Sendable {
   private int m_port;
   private int m_channel;
 
@@ -28,20 +25,22 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
    * @param channel The channel number to represent.
    */
   public AnalogOutput(final int channel) {
-    checkAnalogOutputChannel(channel);
+    SensorBase.checkAnalogOutputChannel(channel);
     m_channel = channel;
 
     final int portHandle = AnalogJNI.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);
 
-    LiveWindow.addSensor("AnalogOutput", channel, this);
     HAL.report(tResourceType.kResourceType_AnalogOutput, channel);
+    setName("AnalogOutput", channel);
   }
 
   /**
    * Channel destructor.
    */
+  @Override
   public void free() {
+    super.free();
     AnalogJNI.freeAnalogOutputPort(m_port);
     m_port = 0;
     m_channel = 0;
@@ -62,44 +61,9 @@ public class AnalogOutput extends SensorBase implements LiveWindowSendable {
     return AnalogJNI.getAnalogOutput(m_port);
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
   @Override
-  public String getSmartDashboardType() {
-    return "Analog Output";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(getVoltage());
-    }
-  }
-
-  /**
-   * Analog Channels don't have to do anything special when entering the LiveWindow. {@inheritDoc}
-   */
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  /**
-   * Analog Channels don't have to do anything special when exiting the LiveWindow. {@inheritDoc}
-   */
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Analog Output");
+    builder.addDoubleProperty("Value", this::getVoltage, this::setVoltage);
   }
 }

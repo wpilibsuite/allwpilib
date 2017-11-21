@@ -9,15 +9,12 @@
 
 #include <atomic>
 #include <memory>
-#include <string>
 #include <thread>
 #include <vector>
 
 #include "Counter.h"
-#include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -36,9 +33,7 @@ class DigitalOutput;
  * received. The time that the line is high determines the round trip distance
  * (time of flight).
  */
-class Ultrasonic : public SensorBase,
-                   public PIDSource,
-                   public LiveWindowSendable {
+class Ultrasonic : public SensorBase, public PIDSource {
  public:
   enum DistanceUnit { kInches = 0, kMilliMeters = 1 };
 
@@ -50,7 +45,7 @@ class Ultrasonic : public SensorBase,
              std::shared_ptr<DigitalInput> echoChannel,
              DistanceUnit units = kInches);
   Ultrasonic(int pingChannel, int echoChannel, DistanceUnit units = kInches);
-  virtual ~Ultrasonic();
+  ~Ultrasonic() override;
 
   void Ping();
   bool IsRangeValid() const;
@@ -65,11 +60,7 @@ class Ultrasonic : public SensorBase,
   void SetDistanceUnits(DistanceUnit units);
   DistanceUnit GetDistanceUnits() const;
 
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   void Initialize();
@@ -100,8 +91,6 @@ class Ultrasonic : public SensorBase,
   bool m_enabled = false;
   Counter m_counter;
   DistanceUnit m_units;
-
-  nt::NetworkTableEntry m_valueEntry;
 };
 
 }  // namespace frc

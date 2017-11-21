@@ -7,12 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static java.util.Objects.requireNonNull;
 
@@ -21,7 +18,7 @@ import static java.util.Objects.requireNonNull;
  * through the sensor. Many sensors have multiple axis and can be treated as multiple devices. Each
  * is calibrated by finding the center value over a period of time.
  */
-public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWindowSendable {
+public class AnalogAccelerometer extends SensorBase implements PIDSource, Sendable {
 
   private AnalogInput m_analogChannel;
   private double m_voltsPerG = 1.0;
@@ -35,7 +32,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   private void initAccelerometer() {
     HAL.report(tResourceType.kResourceType_Accelerometer,
                                    m_analogChannel.getChannel());
-    LiveWindow.addSensor("Accelerometer", m_analogChannel.getChannel(), this);
+    setName("Accelerometer", m_analogChannel.getChannel());
   }
 
   /**
@@ -46,9 +43,9 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    * @param channel The channel number for the analog input the accelerometer is connected to
    */
   public AnalogAccelerometer(final int channel) {
-    m_analogChannel = new AnalogInput(channel);
+    this(new AnalogInput(channel));
     m_allocatedChannel = true;
-    initAccelerometer();
+    addChild(m_analogChannel);
   }
 
   /**
@@ -72,6 +69,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    */
   @Override
   public void free() {
+    super.free();
     if (m_analogChannel != null && m_allocatedChannel) {
       m_analogChannel.free();
     }
@@ -86,6 +84,9 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
    * @return The current acceleration of the sensor in Gs.
    */
   public double getAcceleration() {
+    if (m_analogChannel == null) {
+      return 0.0;
+    }
     return (m_analogChannel.getAverageVoltage() - m_zeroGVoltage) / m_voltsPerG;
   }
 
@@ -134,43 +135,8 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, LiveWi
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "Accelerometer";
-  }
-
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  private NetworkTableEntry m_valueEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(getAcceleration());
-    }
-  }
-
-  /**
-   * Analog Channels don't have to do anything special when entering the LiveWindow. {@inheritDoc}
-   */
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  /**
-   * Analog Channels don't have to do anything special when exiting the LiveWindow. {@inheritDoc}
-   */
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Accelerometer");
+    builder.addDoubleProperty("Value", this::getAcceleration, null);
   }
 }

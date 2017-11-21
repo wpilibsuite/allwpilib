@@ -8,8 +8,10 @@
 #pragma once
 
 #include <Commands/Command.h>
+#include <Commands/Scheduler.h>
 #include <IterativeRobot.h>
 #include <LiveWindow/LiveWindow.h>
+#include <SmartDashboard/SmartDashboard.h>
 
 #include "Commands/Autonomous.h"
 #include "OI.h"

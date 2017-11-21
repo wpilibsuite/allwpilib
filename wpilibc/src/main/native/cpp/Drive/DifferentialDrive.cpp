@@ -11,6 +11,7 @@
 
 #include <HAL/HAL.h>
 
+#include "SmartDashboard/SendableBuilder.h"
 #include "SpeedController.h"
 
 using namespace frc;
@@ -23,7 +24,13 @@ using namespace frc;
  */
 DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
                                      SpeedController& rightMotor)
-    : m_leftMotor(leftMotor), m_rightMotor(rightMotor) {}
+    : m_leftMotor(leftMotor), m_rightMotor(rightMotor) {
+  AddChild(&m_leftMotor);
+  AddChild(&m_rightMotor);
+  static int instances = 0;
+  ++instances;
+  SetName("DifferentialDrive", instances);
+}
 
 /**
  * Arcade drive method for differential drive platform.
@@ -248,4 +255,14 @@ void DifferentialDrive::StopMotor() {
 
 void DifferentialDrive::GetDescription(llvm::raw_ostream& desc) const {
   desc << "DifferentialDrive";
+}
+
+void DifferentialDrive::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("DifferentialDrive");
+  builder.AddDoubleProperty("Left Motor Speed",
+                            [=]() { return m_leftMotor.Get(); },
+                            [=](double value) { m_leftMotor.Set(value); });
+  builder.AddDoubleProperty("Right Motor Speed",
+                            [=]() { return m_rightMotor.Get(); },
+                            [=](double value) { m_rightMotor.Set(value); });
 }

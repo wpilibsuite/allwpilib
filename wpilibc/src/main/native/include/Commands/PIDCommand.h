@@ -54,8 +54,7 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   std::shared_ptr<PIDController> m_controller;
 
  public:
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::string GetSmartDashboardType() const override;
+  void InitSendable(SendableBuilder& builder) override;
 };
 
 }  // namespace frc

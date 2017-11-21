@@ -9,8 +9,6 @@
 
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
-
 using namespace frc;
 
 /**
@@ -38,5 +36,5 @@ PWMTalonSRX::PWMTalonSRX(int channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_PWMTalonSRX, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("PWMTalonSRX", GetChannel(), this);
+  SetName("PWMTalonSRX", GetChannel());
 }

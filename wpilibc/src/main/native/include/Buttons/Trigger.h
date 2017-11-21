@@ -7,11 +7,9 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
+#include <atomic>
 
-#include "SmartDashboard/Sendable.h"
-#include "networktables/NetworkTableEntry.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -30,10 +28,10 @@ class Command;
  * only have to write the {@link Trigger#Get()} method to get the full
  * functionality of the Trigger class.
  */
-class Trigger : public Sendable {
+class Trigger : public SendableBase {
  public:
   Trigger() = default;
-  virtual ~Trigger() = default;
+  ~Trigger() override = default;
   bool Grab();
   virtual bool Get() = 0;
   void WhenActive(Command* command);
@@ -42,11 +40,10 @@ class Trigger : public Sendable {
   void CancelWhenActive(Command* command);
   void ToggleWhenActive(Command* command);
 
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::string GetSmartDashboardType() const override;
+  void InitSendable(SendableBuilder& builder) override;
 
- protected:
-  nt::NetworkTableEntry m_pressedEntry;
+ private:
+  std::atomic_bool m_sendablePressed{false};
 };
 
 }  // namespace frc

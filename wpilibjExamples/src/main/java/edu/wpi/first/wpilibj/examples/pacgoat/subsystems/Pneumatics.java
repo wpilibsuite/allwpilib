@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj.examples.pacgoat.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
@@ -26,7 +25,7 @@ public class Pneumatics extends Subsystem {
 	private static final double kMaxPressure = 2.55;
 
 	public Pneumatics() {
-		LiveWindow.addSensor("Pneumatics", "Pressure Sensor", m_pressureSensor);
+		addChild("Pressure Sensor", m_pressureSensor);
 	}
 
 	/**

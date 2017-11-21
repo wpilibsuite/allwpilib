@@ -13,8 +13,6 @@ import java.nio.ByteOrder;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 
 /**
  * Use a rate gyro to return the robots heading relative to a starting position. The Gyro class
@@ -26,7 +24,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * <p>This class is for the digital ADXRS450 gyro sensor that connects via SPI.
  */
 @SuppressWarnings({"TypeName", "AbbreviationAsWordInName", "PMD.UnusedPrivateField"})
-public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
+public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable {
   private static final double kSamplePeriod = 0.001;
   private static final double kCalibrationSampleTime = 5.0;
   private static final double kDegreePerSecondPerLSB = 0.0125;
@@ -57,6 +55,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
    */
   public ADXRS450_Gyro(SPI.Port port) {
     m_spi = new SPI(port);
+
     m_spi.setClockRate(3000000);
     m_spi.setMSBFirst();
     m_spi.setSampleDataOnRising();
@@ -78,7 +77,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
     calibrate();
 
     HAL.report(tResourceType.kResourceType_ADXRS450, port.value);
-    LiveWindow.addSensor("ADXRS450_Gyro", port.value, this);
+    setName("ADXRS450_Gyro", port.value);
   }
 
   @Override
@@ -137,6 +136,7 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, LiveWind
    */
   @Override
   public void free() {
+    super.free();
     if (m_spi != null) {
       m_spi.free();
       m_spi = null;

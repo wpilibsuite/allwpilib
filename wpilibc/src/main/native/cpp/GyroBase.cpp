@@ -7,7 +7,7 @@
 
 #include "GyroBase.h"
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -29,21 +29,7 @@ double GyroBase::PIDGet() {
   }
 }
 
-void GyroBase::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetDouble(GetAngle());
-}
-
-void GyroBase::StartLiveWindowMode() {}
-
-void GyroBase::StopLiveWindowMode() {}
-
-std::string GyroBase::GetSmartDashboardType() const { return "Gyro"; }
-
-void GyroBase::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void GyroBase::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Gyro");
+  builder.AddDoubleProperty("Value", [=]() { return GetAngle(); }, nullptr);
 }

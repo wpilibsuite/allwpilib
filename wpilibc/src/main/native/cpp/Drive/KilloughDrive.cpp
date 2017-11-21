@@ -12,6 +12,7 @@
 
 #include <HAL/HAL.h>
 
+#include "SmartDashboard/SendableBuilder.h"
 #include "SpeedController.h"
 
 using namespace frc;
@@ -62,6 +63,12 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                 std::sin(rightMotorAngle * (kPi / 180.0))};
   m_backVec = {std::cos(backMotorAngle * (kPi / 180.0)),
                std::sin(backMotorAngle * (kPi / 180.0))};
+  AddChild(&m_leftMotor);
+  AddChild(&m_rightMotor);
+  AddChild(&m_backMotor);
+  static int instances = 0;
+  ++instances;
+  SetName("KilloughDrive", instances);
 }
 
 /**
@@ -145,4 +152,17 @@ void KilloughDrive::StopMotor() {
 
 void KilloughDrive::GetDescription(llvm::raw_ostream& desc) const {
   desc << "KilloughDrive";
+}
+
+void KilloughDrive::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("KilloughDrive");
+  builder.AddDoubleProperty("Left Motor Speed",
+                            [=]() { return m_leftMotor.Get(); },
+                            [=](double value) { m_leftMotor.Set(value); });
+  builder.AddDoubleProperty("Right Motor Speed",
+                            [=]() { return m_rightMotor.Get(); },
+                            [=](double value) { m_rightMotor.Set(value); });
+  builder.AddDoubleProperty("Back Motor Speed",
+                            [=]() { return m_backMotor.Get(); },
+                            [=](double value) { m_backMotor.Set(value); });
 }

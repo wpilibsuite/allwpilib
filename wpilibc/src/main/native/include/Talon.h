@@ -17,7 +17,6 @@ namespace frc {
 class Talon : public PWMSpeedController {
  public:
   explicit Talon(int channel);
-  virtual ~Talon() = default;
 };
 
 }  // namespace frc

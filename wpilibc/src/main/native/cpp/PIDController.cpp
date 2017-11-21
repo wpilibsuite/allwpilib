@@ -16,15 +16,9 @@
 #include "Notifier.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
-
-static const std::string kP = "p";
-static const std::string kI = "i";
-static const std::string kD = "d";
-static const std::string kF = "f";
-static const std::string kSetpoint = "setpoint";
-static const std::string kEnabled = "enabled";
 
 template <class T>
 constexpr const T& clamp(const T& value, const T& low, const T& high) {
@@ -61,7 +55,8 @@ PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource* source,
  */
 PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
                              PIDSource* source, PIDOutput* output,
-                             double period) {
+                             double period)
+    : SendableBase(false) {
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
 
   m_P = Kp;
@@ -85,6 +80,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
+  SetName("PIDController", instances);
 }
 
 /**
@@ -123,7 +119,6 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
 PIDController::~PIDController() {
   // forcefully stopping the notifier so the callback can successfully run.
   m_controlLoop->Stop();
-  RemoveListeners();
 }
 
 /**
@@ -257,10 +252,6 @@ void PIDController::SetPID(double p, double i, double d) {
     m_I = i;
     m_D = d;
   }
-
-  if (m_pEntry) m_pEntry.SetDouble(m_P);
-  if (m_iEntry) m_iEntry.SetDouble(m_I);
-  if (m_dEntry) m_dEntry.SetDouble(m_D);
 }
 
 /**
@@ -274,18 +265,51 @@ void PIDController::SetPID(double p, double i, double d) {
  * @param f Feed forward coefficient
  */
 void PIDController::SetPID(double p, double i, double d, double f) {
-  {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
-    m_P = p;
-    m_I = i;
-    m_D = d;
-    m_F = f;
-  }
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_P = p;
+  m_I = i;
+  m_D = d;
+  m_F = f;
+}
 
-  if (m_pEntry) m_pEntry.SetDouble(m_P);
-  if (m_iEntry) m_iEntry.SetDouble(m_I);
-  if (m_dEntry) m_dEntry.SetDouble(m_D);
-  if (m_fEntry) m_fEntry.SetDouble(m_F);
+/**
+ * Set the Proportional coefficient of the PID controller gain.
+ *
+ * @param p proportional coefficient
+ */
+void PIDController::SetP(double p) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_P = p;
+}
+
+/**
+ * Set the Integral coefficient of the PID controller gain.
+ *
+ * @param i integral coefficient
+ */
+void PIDController::SetI(double i) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_I = i;
+}
+
+/**
+ * Set the Differential coefficient of the PID controller gain.
+ *
+ * @param d differential coefficient
+ */
+void PIDController::SetD(double d) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_D = d;
+}
+
+/**
+ * Get the Feed forward coefficient of the PID controller gain.
+ *
+ * @param f Feed forward coefficient
+ */
+void PIDController::SetF(double f) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_F = f;
 }
 
 /**
@@ -403,8 +427,6 @@ void PIDController::SetSetpoint(double setpoint) {
       m_setpoint = setpoint;
     }
   }
-
-  if (m_setpointEntry) m_setpointEntry.SetDouble(m_setpoint);
 }
 
 /**
@@ -556,8 +578,6 @@ void PIDController::Enable() {
     std::lock_guard<wpi::mutex> lock(m_thisMutex);
     m_enabled = true;
   }
-
-  if (m_enabledEntry) m_enabledEntry.SetBoolean(true);
 }
 
 /**
@@ -574,8 +594,17 @@ void PIDController::Disable() {
 
     m_pidOutput->PIDWrite(0);
   }
+}
 
-  if (m_enabledEntry) m_enabledEntry.SetBoolean(false);
+/**
+ * Set the enabled state of the PIDController.
+ */
+void PIDController::SetEnabled(bool enable) {
+  if (enable) {
+    Enable();
+  } else {
+    Disable();
+  }
 }
 
 /**
@@ -598,76 +627,21 @@ void PIDController::Reset() {
   m_result = 0;
 }
 
-std::string PIDController::GetSmartDashboardType() const {
-  return "PIDController";
-}
-
-void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  RemoveListeners();
-  if (subtable) {
-    m_pEntry = subtable->GetEntry(kP);
-    m_pEntry.SetDouble(GetP());
-    m_iEntry = subtable->GetEntry(kI);
-    m_iEntry.SetDouble(GetI());
-    m_dEntry = subtable->GetEntry(kD);
-    m_dEntry.SetDouble(GetD());
-    m_fEntry = subtable->GetEntry(kF);
-    m_fEntry.SetDouble(GetF());
-    m_setpointEntry = subtable->GetEntry(kSetpoint);
-    m_setpointEntry.SetDouble(GetSetpoint());
-    m_enabledEntry = subtable->GetEntry(kEnabled);
-    m_enabledEntry.SetBoolean(IsEnabled());
-
-    m_pListener = m_pEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          std::lock_guard<wpi::mutex> lock(m_thisMutex);
-          m_P = event.value->GetDouble();
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_iListener = m_iEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          std::lock_guard<wpi::mutex> lock(m_thisMutex);
-          m_I = event.value->GetDouble();
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_dListener = m_dEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          std::lock_guard<wpi::mutex> lock(m_thisMutex);
-          m_D = event.value->GetDouble();
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_fListener = m_fEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          std::lock_guard<wpi::mutex> lock(m_thisMutex);
-          m_F = event.value->GetDouble();
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_setpointListener = m_setpointEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          SetSetpoint(event.value->GetDouble());
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_enabledListener = m_enabledEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsBoolean()) return;
-          if (event.value->GetBoolean()) {
-            Enable();
-          } else {
-            Disable();
-          }
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
+void PIDController::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("PIDController");
+  builder.SetSafeState([=]() { Reset(); });
+  builder.AddDoubleProperty("p", [=]() { return GetP(); },
+                            [=](bool value) { SetP(value); });
+  builder.AddDoubleProperty("i", [=]() { return GetI(); },
+                            [=](bool value) { SetI(value); });
+  builder.AddDoubleProperty("d", [=]() { return GetD(); },
+                            [=](bool value) { SetD(value); });
+  builder.AddDoubleProperty("f", [=]() { return GetF(); },
+                            [=](bool value) { SetF(value); });
+  builder.AddDoubleProperty("setpoint", [=]() { return GetSetpoint(); },
+                            [=](bool value) { SetSetpoint(value); });
+  builder.AddBooleanProperty("enabled", [=]() { return IsEnabled(); },
+                             [=](bool value) { SetEnabled(value); });
 }
 
 /**
@@ -690,37 +664,4 @@ double PIDController::GetContinuousError(double error) const {
   }
 
   return error;
-}
-
-void PIDController::UpdateTable() {}
-
-void PIDController::StartLiveWindowMode() { Disable(); }
-
-void PIDController::StopLiveWindowMode() {}
-
-void PIDController::RemoveListeners() {
-  if (m_pListener != 0) {
-    m_pEntry.RemoveListener(m_pListener);
-    m_pListener = 0;
-  }
-  if (m_iListener != 0) {
-    m_iEntry.RemoveListener(m_iListener);
-    m_iListener = 0;
-  }
-  if (m_dListener != 0) {
-    m_dEntry.RemoveListener(m_dListener);
-    m_dListener = 0;
-  }
-  if (m_fListener != 0) {
-    m_fEntry.RemoveListener(m_fListener);
-    m_fListener = 0;
-  }
-  if (m_setpointListener != 0) {
-    m_setpointEntry.RemoveListener(m_setpointListener);
-    m_setpointListener = 0;
-  }
-  if (m_enabledListener != 0) {
-    m_enabledEntry.RemoveListener(m_enabledListener);
-    m_enabledListener = 0;
-  }
 }

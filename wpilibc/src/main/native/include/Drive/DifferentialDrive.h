@@ -102,7 +102,7 @@ class DifferentialDrive : public RobotDriveBase {
   static constexpr double kDefaultQuickStopAlpha = 0.1;
 
   DifferentialDrive(SpeedController& leftMotor, SpeedController& rightMotor);
-  virtual ~DifferentialDrive() = default;
+  ~DifferentialDrive() override = default;
 
   DifferentialDrive(const DifferentialDrive&) = delete;
   DifferentialDrive& operator=(const DifferentialDrive&) = delete;
@@ -117,6 +117,8 @@ class DifferentialDrive : public RobotDriveBase {
 
   void StopMotor() override;
   void GetDescription(llvm::raw_ostream& desc) const override;
+
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   SpeedController& m_leftMotor;

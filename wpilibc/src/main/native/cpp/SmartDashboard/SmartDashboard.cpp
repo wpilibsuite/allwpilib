@@ -7,18 +7,28 @@
 
 #include "SmartDashboard/SmartDashboard.h"
 
-#include <map>
+#include <llvm/StringMap.h>
+#include <support/mutex.h>
 
 #include "HLUsageReporting.h"
-#include "SmartDashboard/NamedSendable.h"
+#include "SmartDashboard/Sendable.h"
+#include "SmartDashboard/SendableBuilderImpl.h"
 #include "WPIErrors.h"
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 
+namespace {
+struct SmartDashboardData {
+  Sendable* sendable = nullptr;
+  SendableBuilderImpl builder;
+};
+}  // namespace
+
 static std::shared_ptr<nt::NetworkTable> s_table;
-static std::map<std::shared_ptr<nt::NetworkTable>, Sendable*> s_tablesToData;
+static llvm::StringMap<SmartDashboardData> s_tablesToData;
+static wpi::mutex s_tablesToDataMutex;
 
 void SmartDashboard::init() {
   s_table = nt::NetworkTableInstance::GetDefault().GetTable("SmartDashboard");
@@ -126,22 +136,26 @@ void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
   }
-  std::shared_ptr<nt::NetworkTable> dataTable(s_table->GetSubTable(key));
-  dataTable->GetEntry(".type").SetString(data->GetSmartDashboardType());
-  data->InitTable(dataTable);
-  s_tablesToData[dataTable] = data;
+  std::lock_guard<wpi::mutex> lock(s_tablesToDataMutex);
+  auto& sddata = s_tablesToData[key];
+  if (!sddata.sendable || sddata.sendable != data) {
+    sddata.sendable = data;
+    sddata.builder.SetTable(s_table->GetSubTable(key));
+    data->InitSendable(sddata.builder);
+  }
+  sddata.builder.UpdateTable();
 }
 
 /**
- * Maps the specified key (where the key is the name of the
- * {@link SmartDashboardNamedData} to the specified value in this table.
+ * Maps the specified key (where the key is the name of the Sendable)
+ * to the specified value in this table.
  *
  * The value can be retrieved by calling the get method with a key that is equal
  * to the original key.
  *
  * @param value the value
  */
-void SmartDashboard::PutData(NamedSendable* value) {
+void SmartDashboard::PutData(Sendable* value) {
   if (value == nullptr) {
     wpi_setGlobalWPIErrorWithContext(NullParameter, "value");
     return;
@@ -156,13 +170,13 @@ void SmartDashboard::PutData(NamedSendable* value) {
  * @return the value
  */
 Sendable* SmartDashboard::GetData(llvm::StringRef key) {
-  std::shared_ptr<nt::NetworkTable> subtable(s_table->GetSubTable(key));
-  Sendable* data = s_tablesToData[subtable];
-  if (data == nullptr) {
+  std::lock_guard<wpi::mutex> lock(s_tablesToDataMutex);
+  auto data = s_tablesToData.find(key);
+  if (data == s_tablesToData.end()) {
     wpi_setGlobalWPIErrorWithContext(SmartDashboardMissingKey, key);
     return nullptr;
   }
-  return data;
+  return data->getValue().sendable;
 }
 
 /**

@@ -18,11 +18,8 @@ Elevator::Elevator()
 	SetAbsoluteTolerance(0.005);
 
 	// Let's show everything on the LiveWindow
-	// frc::LiveWindow::GetInstance()->AddActuator("Elevator", "Motor",
-	// &m_motor);
-	// frc::LiveWindow::GetInstance()->AddSensor("Elevator", "Pot", &m_pot);
-	// frc::LiveWindow::GetInstance()->AddActuator("Elevator", "PID",
-	// 		GetPIDController());
+	AddChild("Motor", m_motor);
+	AddChild("Pot", &m_pot);
 }
 
 void Elevator::InitDefaultCommand() {}

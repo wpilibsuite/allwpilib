@@ -17,8 +17,8 @@
 #include <llvm/StringRef.h>
 #include <support/mutex.h>
 
+#include "ErrorBase.h"
 #include "RobotState.h"
-#include "SensorBase.h"
 
 namespace frc {
 
@@ -28,12 +28,12 @@ struct MatchInfoData;
  * Provide access to the network communication data to / from the Driver
  * Station.
  */
-class DriverStation : public SensorBase, public RobotStateInterface {
+class DriverStation : public ErrorBase, public RobotStateInterface {
  public:
   enum Alliance { kRed, kBlue, kInvalid };
   enum MatchType { kNone, kPractice, kQualification, kElimination };
 
-  virtual ~DriverStation();
+  ~DriverStation() override;
   static DriverStation& GetInstance();
   static void ReportError(llvm::StringRef error);
   static void ReportWarning(llvm::StringRef error);

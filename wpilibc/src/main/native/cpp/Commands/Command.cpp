@@ -11,15 +11,13 @@
 
 #include "Commands/CommandGroup.h"
 #include "Commands/Scheduler.h"
+#include "LiveWindow/LiveWindow.h"
 #include "RobotState.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 
 using namespace frc;
-
-static const std::string kName = ".name";
-static const std::string kRunning = "running";
-static const std::string kIsParented = ".isParented";
 
 int Command::m_commandCounter = 0;
 
@@ -35,7 +33,7 @@ Command::Command() : Command("", -1.0) {}
  *
  * @param name the name for this command
  */
-Command::Command(const std::string& name) : Command(name, -1.0) {}
+Command::Command(const llvm::Twine& name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
@@ -52,7 +50,8 @@ Command::Command(double timeout) : Command("", timeout) {}
  * @param timeout the time (in seconds) before this command "times out"
  * @see IsTimedOut()
  */
-Command::Command(const std::string& name, double timeout) {
+Command::Command(const llvm::Twine& name, double timeout)
+    : SendableBase(false) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
@@ -60,15 +59,12 @@ Command::Command(const std::string& name, double timeout) {
   m_timeout = timeout;
 
   // If name contains an empty string
-  if (name.length() == 0) {
-    m_name = std::string("Command_") + std::string(typeid(*this).name());
+  if (name.isTriviallyEmpty() ||
+      (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
+    SetName("Command_" + llvm::Twine(typeid(*this).name()));
   } else {
-    m_name = name;
+    SetName(name);
   }
-}
-
-Command::~Command() {
-  if (m_runningListener != 0) m_runningEntry.RemoveListener(m_runningListener);
 }
 
 /**
@@ -144,7 +140,6 @@ void Command::Removed() {
   m_initialized = false;
   m_canceled = false;
   m_running = false;
-  if (m_runningEntry) m_runningEntry.SetBoolean(false);
 }
 
 /**
@@ -291,9 +286,15 @@ void Command::SetParent(CommandGroup* parent) {
   } else {
     LockChanges();
     m_parent = parent;
-    if (m_isParentedEntry) m_isParentedEntry.SetBoolean(true);
   }
 }
+
+/**
+ * Returns whether the command has a parent.
+ *
+ * @param True if the command has a parent.
+ */
+bool Command::IsParented() const { return m_parent != nullptr; }
 
 /**
  * Clears list of subsystem requirements.
@@ -317,7 +318,6 @@ void Command::ClearRequirements() { m_requirements.clear(); }
 void Command::StartRunning() {
   m_running = true;
   m_startTime = -1;
-  if (m_runningEntry) m_runningEntry.SetBoolean(true);
 }
 
 /**
@@ -422,28 +422,17 @@ void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
  */
 bool Command::WillRunWhenDisabled() const { return m_runWhenDisabled; }
 
-std::string Command::GetName() const { return m_name; }
-
-std::string Command::GetSmartDashboardType() const { return "Command"; }
-
-void Command::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  if (m_runningListener != 0) m_runningEntry.RemoveListener(m_runningListener);
-  if (subtable) {
-    subtable->GetEntry(kName).SetString(GetName());
-    m_runningEntry = subtable->GetEntry(kRunning);
-    m_runningEntry.SetBoolean(IsRunning());
-    m_isParentedEntry = subtable->GetEntry(kIsParented);
-    m_isParentedEntry.SetBoolean(m_parent != nullptr);
-
-    m_runningListener = m_runningEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsBoolean()) return;
-          if (event.value->GetBoolean()) {
-            if (!IsRunning()) Start();
-          } else {
-            if (IsRunning()) Cancel();
-          }
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
+void Command::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Command");
+  builder.AddStringProperty(".name", [=]() { return GetName(); }, nullptr);
+  builder.AddBooleanProperty("running", [=]() { return IsRunning(); },
+                             [=](bool value) {
+                               if (value) {
+                                 if (!IsRunning()) Start();
+                               } else {
+                                 if (IsRunning()) Cancel();
+                               }
+                             });
+  builder.AddBooleanProperty(".isParented", [=]() { return IsParented(); },
+                             nullptr);
 }

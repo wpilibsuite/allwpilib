@@ -8,10 +8,8 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * The claw subsystem is a simple system with a motor for opening and closing.
@@ -20,15 +18,15 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  */
 public class Claw extends Subsystem {
 
-	private SpeedController m_motor = new Victor(7);
+	private Victor m_motor = new Victor(7);
 	private DigitalInput m_contact = new DigitalInput(5);
 
 	public Claw() {
 		super();
 
-		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Claw", "Motor", (Victor) m_motor);
-		LiveWindow.addActuator("Claw", "Limit Switch", m_contact);
+		// Let's name everything on the LiveWindow
+		addChild("Motor", m_motor);
+		addChild("Limit Switch", m_contact);
 	}
 
 	@Override

@@ -10,6 +10,7 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import static java.util.Objects.requireNonNull;
 
@@ -78,15 +79,6 @@ public class AnalogTriggerOutput extends DigitalSource {
   }
 
   /**
-   * Frees the resources for this output.
-   */
-  public void free() {
-    if (m_interrupt != 0) {
-      cancelInterrupts();
-    }
-  }
-
-  /**
    * Get the state of the analog trigger output.
    *
    * @return The state of the analog trigger output.
@@ -129,5 +121,9 @@ public class AnalogTriggerOutput extends DigitalSource {
     AnalogTriggerType(int value) {
       this.value = value;
     }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
   }
 }

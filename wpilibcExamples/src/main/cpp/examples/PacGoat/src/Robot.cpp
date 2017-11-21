@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+#include <Commands/Scheduler.h>
+#include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SmartDashboard.h>
 
 DriveTrain Robot::drivetrain;
@@ -60,9 +62,7 @@ void Robot::TeleopPeriodic() {
 	Log();
 }
 
-void Robot::TestPeriodic() {
-	frc::LiveWindow::GetInstance()->Run();
-}
+void Robot::TestPeriodic() {}
 
 void Robot::DisabledInit() {
 	shooter.Unlatch();

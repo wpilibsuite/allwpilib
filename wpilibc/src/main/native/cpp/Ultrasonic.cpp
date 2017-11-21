@@ -12,7 +12,7 @@
 #include "Counter.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIErrors.h"
@@ -72,8 +72,7 @@ void Ultrasonic::Initialize() {
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_Ultrasonic, instances);
-  LiveWindow::GetInstance()->AddSensor("Ultrasonic",
-                                       m_echoChannel->GetChannel(), this);
+  SetName("Ultrasonic", m_echoChannel->GetChannel());
 }
 
 /**
@@ -94,6 +93,8 @@ Ultrasonic::Ultrasonic(int pingChannel, int echoChannel, DistanceUnit units)
       m_counter(m_echoChannel) {
   m_units = units;
   Initialize();
+  AddChild(m_pingChannel);
+  AddChild(m_echoChannel);
 }
 
 /**
@@ -314,23 +315,8 @@ Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits() const {
   return m_units;
 }
 
-void Ultrasonic::UpdateTable() {
-  if (m_valueEntry) {
-    m_valueEntry.SetDouble(GetRangeInches());
-  }
-}
-
-void Ultrasonic::StartLiveWindowMode() {}
-
-void Ultrasonic::StopLiveWindowMode() {}
-
-std::string Ultrasonic::GetSmartDashboardType() const { return "Ultrasonic"; }
-
-void Ultrasonic::InitTable(std::shared_ptr<NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void Ultrasonic::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Ultrasonic");
+  builder.AddDoubleProperty("Value", [=]() { return GetRangeInches(); },
+                            nullptr);
 }

@@ -9,9 +9,9 @@ package edu.wpi.first.wpilibj.smartdashboard;
 
 import java.util.LinkedHashMap;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
 
 import static java.util.Objects.requireNonNull;
@@ -28,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <V> The type of the values to be stored
  */
-public class SendableChooser<V> implements Sendable {
+public class SendableChooser<V> extends SendableBase implements Sendable {
 
   /**
    * The key for the default value.
@@ -46,7 +46,7 @@ public class SendableChooser<V> implements Sendable {
    * A map linking strings to the objects the represent.
    */
   private final LinkedHashMap<String, V> m_map = new LinkedHashMap<>();
-  private String m_defaultChoice = null;
+  private String m_defaultChoice = "";
 
   /**
    * Instantiates a {@link SendableChooser}.
@@ -63,10 +63,6 @@ public class SendableChooser<V> implements Sendable {
    */
   public void addObject(String name, V object) {
     m_map.put(name, object);
-
-    if (m_tableOptions != null) {
-      m_tableOptions.setStringArray(m_map.keySet().toArray(new String[0]));
-    }
   }
 
   /**
@@ -81,9 +77,6 @@ public class SendableChooser<V> implements Sendable {
     requireNonNull(name, "Provided name was null");
 
     m_defaultChoice = name;
-    if (m_tableDefault != null) {
-      m_tableDefault.setString(m_defaultChoice);
-    }
     addObject(name, object);
   }
 
@@ -94,29 +87,24 @@ public class SendableChooser<V> implements Sendable {
    * @return the option selected
    */
   public V getSelected() {
-    String selected = m_tableSelected.getString(null);
-    return m_map.getOrDefault(selected, m_map.get(m_defaultChoice));
-  }
-
-  @Override
-  public String getSmartDashboardType() {
-    return "String Chooser";
-  }
-
-  private NetworkTableEntry m_tableDefault;
-  private NetworkTableEntry m_tableSelected;
-  private NetworkTableEntry m_tableOptions;
-
-  @Override
-  public void initTable(NetworkTable table) {
-    if (table != null) {
-      m_tableDefault = table.getEntry(DEFAULT);
-      m_tableSelected = table.getEntry(SELECTED);
-      m_tableOptions = table.getEntry(OPTIONS);
-      m_tableOptions.setStringArray(m_map.keySet().toArray(new String[0]));
-      if (m_defaultChoice != null) {
-        m_tableDefault.setString(m_defaultChoice);
-      }
+    String selected = m_defaultChoice;
+    if (m_tableSelected != null) {
+      selected = m_tableSelected.getString(m_defaultChoice);
     }
+    return m_map.get(selected);
+  }
+
+  private NetworkTableEntry m_tableSelected;
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("String Chooser");
+    builder.addStringProperty(DEFAULT, () -> {
+      return m_defaultChoice;
+    }, null);
+    builder.addStringArrayProperty(OPTIONS, () -> {
+      return m_map.keySet().toArray(new String[0]);
+    }, null);
+    m_tableSelected = builder.getEntry(SELECTED);
   }
 }

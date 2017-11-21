@@ -7,7 +7,6 @@
 
 #include "Wrist.h"
 
-#include <LiveWindow/LiveWindow.h>
 #include <SmartDashboard/SmartDashboard.h>
 
 Wrist::Wrist()
@@ -18,11 +17,8 @@ Wrist::Wrist()
 	SetAbsoluteTolerance(2.5);
 
 	// Let's show everything on the LiveWindow
-	// frc::LiveWindow::GetInstance()->AddActuator("Wrist", "Motor",
-	// &motor);
-	// frc::LiveWindow::GetInstance()->AddSensor("Wrist", "Pot", &pot);
-	frc::LiveWindow::GetInstance()->AddActuator(
-			"Wrist", "PID", GetPIDController());
+	AddChild("Motor", m_motor);
+	AddChild("Pot", m_pot);
 }
 
 void Wrist::InitDefaultCommand() {}

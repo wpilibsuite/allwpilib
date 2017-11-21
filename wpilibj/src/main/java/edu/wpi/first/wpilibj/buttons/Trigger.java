@@ -7,11 +7,10 @@
 
 package edu.wpi.first.wpilibj.buttons;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * This class provides an easy way to link commands to inputs.
@@ -24,7 +23,9 @@ import edu.wpi.first.wpilibj.command.Scheduler;
  * certain sensor input). For this, they only have to write the {@link Trigger#get()} method to get
  * the full functionality of the Trigger class.
  */
-public abstract class Trigger implements Sendable {
+public abstract class Trigger extends SendableBase {
+
+  private volatile boolean m_sendablePressed = false;
 
   /**
    * Returns whether or not the trigger is active.
@@ -42,8 +43,7 @@ public abstract class Trigger implements Sendable {
    */
   @SuppressWarnings("PMD.UselessParentheses")
   private boolean grab() {
-    return get() || (m_pressedEntry != null && m_pressedEntry.getBoolean(false));
-
+    return get() || m_sendablePressed;
   }
 
   /**
@@ -186,24 +186,14 @@ public abstract class Trigger implements Sendable {
     }
   }
 
-  /**
-   * These methods continue to return the "Button" SmartDashboard type until we decided to create a
-   * Trigger widget type for the dashboard.
-   */
   @Override
-  public String getSmartDashboardType() {
-    return "Button";
-  }
-
-  private NetworkTableEntry m_pressedEntry;
-
-  @Override
-  public void initTable(NetworkTable table) {
-    if (table != null) {
-      m_pressedEntry = table.getEntry("pressed");
-      m_pressedEntry.setBoolean(get());
-    } else {
-      m_pressedEntry = null;
-    }
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Button");
+    builder.setSafeState(() -> {
+      m_sendablePressed = false;
+    });
+    builder.addBooleanProperty("pressed", this::grab, (value) -> {
+      m_sendablePressed = value;
+    });
   }
 }

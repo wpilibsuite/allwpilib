@@ -7,13 +7,16 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+
 /**
  * Allows multiple {@link SpeedController} objects to be linked together.
  */
-public class SpeedControllerGroup implements SpeedController {
+public class SpeedControllerGroup extends SendableBase implements SpeedController {
 
   private boolean m_isInverted = false;
   private final SpeedController[] m_speedControllers;
+  private static int instances = 0;
 
   /**
    * Create a new SpeedControllerGroup with the provided SpeedControllers.
@@ -24,9 +27,13 @@ public class SpeedControllerGroup implements SpeedController {
                               SpeedController... speedControllers) {
     m_speedControllers = new SpeedController[speedControllers.length + 1];
     m_speedControllers[0] = speedController;
+    addChild(speedController);
     for (int i = 0; i < speedControllers.length; i++) {
       m_speedControllers[i + 1] = speedControllers[i];
+      addChild(speedControllers[i]);
     }
+    instances++;
+    setName("SpeedControllerGroup", instances);
   }
 
   @Override
@@ -73,5 +80,12 @@ public class SpeedControllerGroup implements SpeedController {
     for (SpeedController speedController : m_speedControllers) {
       speedController.pidWrite(output);
     }
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Speed Controller");
+    builder.setSafeState(this::stopMotor);
+    builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

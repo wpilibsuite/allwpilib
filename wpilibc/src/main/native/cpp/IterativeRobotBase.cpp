@@ -12,6 +12,7 @@
 #include <HAL/HAL.h>
 #include <llvm/raw_ostream.h>
 
+#include "Commands/Scheduler.h"
 #include "LiveWindow/LiveWindow.h"
 
 using namespace frc;
@@ -191,4 +192,5 @@ void IterativeRobotBase::LoopFunc() {
     TestPeriodic();
   }
   RobotPeriodic();
+  LiveWindow::GetInstance()->UpdateValues();
 }

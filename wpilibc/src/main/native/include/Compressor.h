@@ -7,14 +7,11 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include <HAL/Types.h>
 
-#include "LiveWindow/LiveWindowSendable.h"
+#include "ErrorBase.h"
 #include "SensorBase.h"
-#include "networktables/NetworkTableEntry.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -33,11 +30,11 @@ namespace frc {
  * loop control. You can only turn off closed loop control, thereby stopping
  * the compressor from operating.
  */
-class Compressor : public SensorBase, public LiveWindowSendable {
+class Compressor : public ErrorBase, public SendableBase {
  public:
   // Default PCM ID is 0
-  explicit Compressor(int pcmID = GetDefaultSolenoidModule());
-  virtual ~Compressor();
+  explicit Compressor(int pcmID = SensorBase::GetDefaultSolenoidModule());
+  ~Compressor() override = default;
 
   void Start();
   void Stop();
@@ -58,11 +55,7 @@ class Compressor : public SensorBase, public LiveWindowSendable {
   bool GetCompressorNotConnectedFault() const;
   void ClearAllPCMStickyFaults();
 
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  void InitSendable(SendableBuilder& builder) override;
 
  protected:
   HAL_CompressorHandle m_compressorHandle;
@@ -70,10 +63,6 @@ class Compressor : public SensorBase, public LiveWindowSendable {
  private:
   void SetCompressor(bool on);
   int m_module;
-
-  nt::NetworkTableEntry m_enabledEntry;
-  nt::NetworkTableEntry m_pressureSwitchEntry;
-  NT_EntryListener m_enabledListener = 0;
 };
 
 }  // namespace frc
