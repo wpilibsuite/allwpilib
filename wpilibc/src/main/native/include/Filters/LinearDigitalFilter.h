@@ -7,9 +7,10 @@
 
 #pragma once
 
-#include <initializer_list>
 #include <memory>
 #include <vector>
+
+#include <llvm/ArrayRef.h>
 
 #include "CircularBuffer.h"
 #include "Filter.h"
@@ -69,17 +70,8 @@ namespace frc {
 class LinearDigitalFilter : public Filter {
  public:
   LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      std::initializer_list<double> ffGains,
-                      std::initializer_list<double> fbGains);
-  LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      std::initializer_list<double> ffGains,
-                      const std::vector<double>& fbGains);
-  LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      const std::vector<double>& ffGains,
-                      std::initializer_list<double> fbGains);
-  LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      const std::vector<double>& ffGains,
-                      const std::vector<double>& fbGains);
+                      llvm::ArrayRef<double> ffGains,
+                      llvm::ArrayRef<double> fbGains);
 
   // Static methods to create commonly used filters
   static LinearDigitalFilter SinglePoleIIR(std::shared_ptr<PIDSource> source,
