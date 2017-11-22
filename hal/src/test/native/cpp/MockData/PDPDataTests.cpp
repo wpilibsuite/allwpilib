@@ -48,7 +48,7 @@ TEST(PdpSimTests, TestPdpInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestPdpCallbackName = "Unset";
   pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0x900001F, pdpHandle);
+  EXPECT_EQ(0xF00000E, pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 
@@ -71,7 +71,7 @@ TEST(PdpSimTests, TestPdpInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestPdpCallbackName = "Unset";
   pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0x901001F, pdpHandle);
+  EXPECT_EQ(0xF01000E, pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 }

@@ -48,7 +48,7 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestSolenoidCallbackName = "Unset";
   solenoidHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0x900001F, solenoidHandle);
+  EXPECT_EQ(0xF02000E, solenoidHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
 
@@ -72,7 +72,7 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestSolenoidCallbackName = "Unset";
   solenoidHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0x901001F, solenoidHandle);
+  EXPECT_EQ(0xF02000E, solenoidHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
 }
