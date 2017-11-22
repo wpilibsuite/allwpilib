@@ -43,6 +43,8 @@ typedef void (*HAL_CAN_GetCANStatusCallback)(
 extern "C" {
 #endif
 
+void HALSIM_ResetCanData();
+
 int32_t HALSIM_RegisterCanSendMessageCallback(
     HAL_CAN_SendMessageCallback callback, void* param);
 void HALSIM_CancelCanSendMessageCallback(int32_t uid);

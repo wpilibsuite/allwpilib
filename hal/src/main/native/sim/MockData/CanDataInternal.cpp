@@ -107,6 +107,16 @@ void InvokeCallback(
   }
 }
 
+void CanData::ResetData()
+{
+	  m_sendMessageCallback = nullptr;
+	  m_receiveMessageCallback = nullptr;
+	  m_openStreamSessionCallback = nullptr;
+	  m_closeStreamSessionCallback = nullptr;
+	  m_readStreamSessionCallback = nullptr;
+	  m_getCanStatusCallback = nullptr;
+}
+
 void CanData::SendMessage(uint32_t messageID, const uint8_t* data,
                           uint8_t dataSize, int32_t periodMs, int32_t* status) {
   InvokeCallback(m_sendMessageCallback, "SendMessage", messageID, data,
@@ -223,6 +233,12 @@ void CanData::CancelGetCANStatusCallback(int32_t uid) {
 }
 
 extern "C" {
+
+
+void HALSIM_ResetCanData()
+{
+	SimCanData.ResetData();
+}
 
 int32_t HALSIM_RegisterCanSendMessageCallback(
     HAL_CAN_SendMessageCallback callback, void* param) {
