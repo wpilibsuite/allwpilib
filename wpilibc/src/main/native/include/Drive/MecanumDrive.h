@@ -36,6 +36,14 @@ class SpeedController;
  * Each Drive() function provides different inverse kinematic relations for a
  * Mecanum drive robot. Motor outputs for the right side are negated, so motor
  * direction inversion by the user is usually unnecessary.
+ *
+ * This library uses the NED axes convention (North-East-Down as external
+ * reference in the world frame):
+ * http://www.nuclearprojects.com/ins/images/axis_big.png.
+ *
+ * The positive X axis points ahead, the positive Y axis points to the right,
+ * and the positive Z axis points down. Rotations follow the right-hand rule, so
+ * clockwise rotation around the Z axis is positive.
  */
 class MecanumDrive : public RobotDriveBase {
  public:

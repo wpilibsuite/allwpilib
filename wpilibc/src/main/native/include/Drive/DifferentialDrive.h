@@ -73,18 +73,33 @@ class SpeedController;
  * Each Drive() function provides different inverse kinematic relations for a
  * differential drive robot. Motor outputs for the right side are negated, so
  * motor direction inversion by the user is usually unnecessary.
+ *
+ * This library uses the NED axes convention (North-East-Down as external
+ * reference in the world frame):
+ * http://www.nuclearprojects.com/ins/images/axis_big.png.
+ *
+ * The positive X axis points ahead, the positive Y axis points to the right,
+ * and the positive Z axis points down. Rotations follow the right-hand rule, so
+ * clockwise rotation around the Z axis is positive.
  */
 class DifferentialDrive : public RobotDriveBase {
  public:
+  static constexpr double kDefaultQuickStopThreshold = 0.2;
+  static constexpr double kDefaultQuickStopAlpha = 0.1;
+
   DifferentialDrive(SpeedController& leftMotor, SpeedController& rightMotor);
   virtual ~DifferentialDrive() = default;
 
   DifferentialDrive(const DifferentialDrive&) = delete;
   DifferentialDrive& operator=(const DifferentialDrive&) = delete;
 
-  void ArcadeDrive(double y, double rotation, bool squaredInputs = true);
-  void CurvatureDrive(double y, double rotation, bool isQuickTurn);
-  void TankDrive(double left, double right, bool squaredInputs = true);
+  void ArcadeDrive(double xSpeed, double zRotation, bool squaredInputs = true);
+  void CurvatureDrive(double xSpeed, double zRotation, bool isQuickTurn);
+  void TankDrive(double leftSpeed, double rightSpeed,
+                 bool squaredInputs = true);
+
+  void SetQuickStopThreshold(double threshold);
+  void SetQuickStopAlpha(double alpha);
 
   void StopMotor() override;
   void GetDescription(llvm::raw_ostream& desc) const override;
@@ -93,6 +108,8 @@ class DifferentialDrive : public RobotDriveBase {
   SpeedController& m_leftMotor;
   SpeedController& m_rightMotor;
 
+  double m_quickStopThreshold = kDefaultQuickStopThreshold;
+  double m_quickStopAlpha = kDefaultQuickStopAlpha;
   double m_quickStopAccumulator = 0.0;
 };
 

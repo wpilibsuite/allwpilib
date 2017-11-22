@@ -66,11 +66,23 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * <p>Each drive() function provides different inverse kinematic relations for a differential drive
  * robot. Motor outputs for the right side are negated, so motor direction inversion by the user is
  * usually unnecessary.
+ *
+ * <p>This library uses the NED axes convention (North-East-Down as external reference in the world
+ * frame): http://www.nuclearprojects.com/ins/images/axis_big.png.
+ *
+ * <p>The positive X axis points ahead, the positive Y axis points right, and the positive Z axis
+ * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
+ * positive.
  */
 public class DifferentialDrive extends RobotDriveBase {
+  public static final double kDefaultQuickStopThreshold = 0.2;
+  public static final double kDefaultQuickStopAlpha = 0.1;
+
   private SpeedController m_leftMotor;
   private SpeedController m_rightMotor;
 
+  private double m_quickStopThreshold = kDefaultQuickStopThreshold;
+  private double m_quickStopAlpha = kDefaultQuickStopAlpha;
   private double m_quickStopAccumulator = 0.0;
   private boolean m_reported = false;
 
@@ -88,63 +100,65 @@ public class DifferentialDrive extends RobotDriveBase {
   /**
    * Arcade drive method for differential drive platform.
    *
-   * @param y             The value to use for forwards/backwards. [-1.0..1.0]
-   * @param rotation      The value to use for the rotation right/left. [-1.0..1.0]
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *                  positive.
    */
   @SuppressWarnings("ParameterName")
-  public void arcadeDrive(double y, double rotation) {
-    arcadeDrive(y, rotation, true);
+  public void arcadeDrive(double xSpeed, double zRotation) {
+    arcadeDrive(xSpeed, zRotation, true);
   }
 
   /**
    * Arcade drive method for differential drive platform.
    *
-   * @param y             The value to use for forwards/backwards. [-1.0..1.0]
-   * @param rotation      The value to use for the rotation right/left [-1.0..1.0]
+   * @param xSpeed        The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation     The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *                      positive.
    * @param squaredInputs If set, decreases the input sensitivity at low speeds.
    */
   @SuppressWarnings("ParameterName")
-  public void arcadeDrive(double y, double rotation, boolean squaredInputs) {
+  public void arcadeDrive(double xSpeed, double zRotation, boolean squaredInputs) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_ArcadeStandard);
       m_reported = true;
     }
 
-    y = limit(y);
-    y = applyDeadband(y, m_deadband);
+    xSpeed = limit(xSpeed);
+    xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    rotation = limit(rotation);
-    rotation = applyDeadband(rotation, m_deadband);
+    zRotation = limit(zRotation);
+    zRotation = applyDeadband(zRotation, m_deadband);
 
-    // square the inputs (while preserving the sign) to increase fine control
-    // while permitting full power
+    // Square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power.
     if (squaredInputs) {
-      y = Math.copySign(y * y, y);
-      rotation = Math.copySign(rotation * rotation, rotation);
+      xSpeed = Math.copySign(xSpeed * xSpeed, xSpeed);
+      zRotation = Math.copySign(zRotation * zRotation, zRotation);
     }
 
     double leftMotorOutput;
     double rightMotorOutput;
 
-    double maxInput = Math.copySign(Math.max(Math.abs(y), Math.abs(rotation)), y);
+    double maxInput = Math.copySign(Math.max(Math.abs(xSpeed), Math.abs(zRotation)), xSpeed);
 
-    if (y > 0.0) {
+    if (xSpeed >= 0.0) {
       // First quadrant, else second quadrant
-      if (rotation > 0.0) {
+      if (zRotation >= 0.0) {
         leftMotorOutput = maxInput;
-        rightMotorOutput = y - rotation;
+        rightMotorOutput = xSpeed - zRotation;
       } else {
-        leftMotorOutput = y + rotation;
+        leftMotorOutput = xSpeed + zRotation;
         rightMotorOutput = maxInput;
       }
     } else {
       // Third quadrant, else fourth quadrant
-      if (rotation > 0.0) {
-        leftMotorOutput = y + rotation;
+      if (zRotation >= 0.0) {
+        leftMotorOutput = xSpeed + zRotation;
         rightMotorOutput = maxInput;
       } else {
         leftMotorOutput = maxInput;
-        rightMotorOutput = y - rotation;
+        rightMotorOutput = xSpeed - zRotation;
       }
     }
 
@@ -162,38 +176,38 @@ public class DifferentialDrive extends RobotDriveBase {
    * robot's quick turn functionality - "quick turn" overrides constant-curvature turning for
    * turn-in-place maneuvers.
    *
-   * @param y           The value to use for forwards/backwards. [-1.0..1.0]
-   * @param rotation    The value to use for the rotation right/left. [-1.0..1.0]
+   * @param xSpeed      The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation   The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *                    positive.
    * @param isQuickTurn If set, overrides constant-curvature turning for
    *                    turn-in-place maneuvers.
    */
   @SuppressWarnings("ParameterName")
-  public void curvatureDrive(double y, double rotation, boolean isQuickTurn) {
+  public void curvatureDrive(double xSpeed, double zRotation, boolean isQuickTurn) {
     if (!m_reported) {
       // HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_Curvature);
       m_reported = true;
     }
 
-    y = limit(y);
-    y = applyDeadband(y, m_deadband);
+    xSpeed = limit(xSpeed);
+    xSpeed = applyDeadband(xSpeed, m_deadband);
 
-    rotation = limit(rotation);
-    rotation = applyDeadband(rotation, m_deadband);
+    zRotation = limit(zRotation);
+    zRotation = applyDeadband(zRotation, m_deadband);
 
     double angularPower;
     boolean overPower;
 
     if (isQuickTurn) {
-      if (Math.abs(y) < 0.2) {
-        final double alpha = 0.1;
-        m_quickStopAccumulator =
-            (1 - alpha) * m_quickStopAccumulator + alpha * limit(rotation) * 2;
+      if (Math.abs(xSpeed) < m_quickStopThreshold) {
+        m_quickStopAccumulator = (1 - m_quickStopAlpha) * m_quickStopAccumulator
+            + m_quickStopAlpha * limit(zRotation) * 2;
       }
       overPower = true;
-      angularPower = rotation;
+      angularPower = zRotation;
     } else {
       overPower = false;
-      angularPower = Math.abs(y) * rotation - m_quickStopAccumulator;
+      angularPower = Math.abs(xSpeed) * zRotation - m_quickStopAccumulator;
 
       if (m_quickStopAccumulator > 1) {
         m_quickStopAccumulator -= 1;
@@ -204,8 +218,8 @@ public class DifferentialDrive extends RobotDriveBase {
       }
     }
 
-    double leftMotorOutput = y + angularPower;
-    double rightMotorOutput = y - angularPower;
+    double leftMotorOutput = xSpeed + angularPower;
+    double rightMotorOutput = xSpeed - angularPower;
 
     // If rotation is overpowered, reduce both outputs to within acceptable range
     if (overPower) {
@@ -233,43 +247,78 @@ public class DifferentialDrive extends RobotDriveBase {
   /**
    * Tank drive method for differential drive platform.
    *
-   * @param left  The value to use for left side motors. [-1.0..1.0]
-   * @param right The value to use for right side motors. [-1.0..1.0]
+   * @param leftSpeed  The robot's left side speed along the X axis [-1.0..1.0]. Forward is
+   *                   positive.
+   * @param rightSpeed The robot's right side speed along the X axis [-1.0..1.0]. Forward is
+   *                   positive.
    */
-  public void tankDrive(double left, double right) {
-    tankDrive(left, right, true);
+  public void tankDrive(double leftSpeed, double rightSpeed) {
+    tankDrive(leftSpeed, rightSpeed, true);
   }
 
   /**
    * Tank drive method for differential drive platform.
    *
-   * @param left  The value to use for left side motors. [-1.0..1.0]
-   * @param right The value to use for right side motors. [-1.0..1.0]
+   * @param leftSpeed     The robot left side's speed along the X axis [-1.0..1.0]. Forward is
+   *                      positive.
+   * @param rightSpeed    The robot right side's speed along the X axis [-1.0..1.0]. Forward is
+   *                      positive.
    * @param squaredInputs If set, decreases the input sensitivity at low speeds.
    */
-  public void tankDrive(double left, double right, boolean squaredInputs) {
+  public void tankDrive(double leftSpeed, double rightSpeed, boolean squaredInputs) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, 2, tInstances.kRobotDrive_Tank);
       m_reported = true;
     }
 
-    left = limit(left);
-    left = applyDeadband(left, m_deadband);
+    leftSpeed = limit(leftSpeed);
+    leftSpeed = applyDeadband(leftSpeed, m_deadband);
 
-    right = limit(right);
-    right = applyDeadband(right, m_deadband);
+    rightSpeed = limit(rightSpeed);
+    rightSpeed = applyDeadband(rightSpeed, m_deadband);
 
-    // square the inputs (while preserving the sign) to increase fine control
-    // while permitting full power
+    // Square the inputs (while preserving the sign) to increase fine control
+    // while permitting full power.
     if (squaredInputs) {
-      left = Math.copySign(left * left, left);
-      right = Math.copySign(right * right, right);
+      leftSpeed = Math.copySign(leftSpeed * leftSpeed, leftSpeed);
+      rightSpeed = Math.copySign(rightSpeed * rightSpeed, rightSpeed);
     }
 
-    m_leftMotor.set(left * m_maxOutput);
-    m_rightMotor.set(-right * m_maxOutput);
+    m_leftMotor.set(leftSpeed * m_maxOutput);
+    m_rightMotor.set(-rightSpeed * m_maxOutput);
 
     m_safetyHelper.feed();
+  }
+
+  /**
+   * Sets the QuickStop speed threshold in curvature drive.
+   *
+   * <p>QuickStop compensates for the robot's moment of inertia when stopping after a QuickTurn.
+   *
+   * <p>While QuickTurn is enabled, the QuickStop accumulator takes on the rotation rate value
+   * outputted by the low-pass filter when the robot's speed along the X axis is below the
+   * threshold. When QuickTurn is disabled, the accumulator's value is applied against the computed
+   * angular power request to slow the robot's rotation.
+   *
+   * @param threshold X speed below which quick stop accumulator will receive rotation rate values
+   *                  [0..1.0].
+   */
+  public void setQuickStopThreshold(double threshold) {
+    m_quickStopThreshold = threshold;
+  }
+
+  /**
+   * Sets the low-pass filter gain for QuickStop in curvature drive.
+   *
+   * <p>The low-pass filter filters incoming rotation rate commands to smooth out high frequency
+   * changes.
+   *
+   * @param alpha Low-pass filter gain [0.0..2.0]. Smaller values result in slower output changes.
+   *              Values between 1.0 and 2.0 result in output oscillation. Values below 0.0 and
+   *              above 2.0 are unstable.
+   */
+  public void setQuickStopAlpha(double alpha) {
+    m_quickStopAlpha = alpha;
   }
 
   @Override
