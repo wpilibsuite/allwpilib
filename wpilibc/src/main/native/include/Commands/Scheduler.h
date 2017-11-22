@@ -54,11 +54,11 @@ class Scheduler : public ErrorBase, public NamedSendable {
   void ProcessCommandAddition(Command* command);
 
   Command::SubsystemSet m_subsystems;
-  wpi::mutex m_buttonsLock;
+  wpi::mutex m_buttonsMutex;
   typedef std::vector<ButtonScheduler*> ButtonVector;
   ButtonVector m_buttons;
   typedef std::vector<Command*> CommandVector;
-  wpi::mutex m_additionsLock;
+  wpi::mutex m_additionsMutex;
   CommandVector m_additions;
   typedef std::set<Command*> CommandSet;
   CommandSet m_commands;

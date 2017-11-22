@@ -66,7 +66,7 @@ class NotifierHandleContainer
 static NotifierHandleContainer notifierHandles;
 
 static void alarmCallback(uint32_t, void*) {
-  std::lock_guard<wpi::mutex> sync(notifierMutex);
+  std::lock_guard<wpi::mutex> lock(notifierMutex);
   int32_t status = 0;
   uint64_t currentTime = 0;
 
@@ -109,7 +109,7 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
     std::atexit(cleanupNotifierAtExit);
 
   if (notifierRefCount.fetch_add(1) == 0) {
-    std::lock_guard<wpi::mutex> sync(notifierMutex);
+    std::lock_guard<wpi::mutex> lock(notifierMutex);
     // create manager and alarm if not already created
     if (!notifierManager) {
       notifierManager = std::make_unique<tInterruptManager>(
@@ -156,7 +156,7 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   notifier->cond.notify_all();
 
   if (notifierRefCount.fetch_sub(1) == 1) {
-    std::lock_guard<wpi::mutex> sync(notifierMutex);
+    std::lock_guard<wpi::mutex> lock(notifierMutex);
     // if this was the last notifier, clean up alarm and manager
     if (notifierAlarm) {
       notifierAlarm->writeEnable(false, status);
@@ -181,7 +181,7 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
     notifier->triggeredTime = UINT64_MAX;
   }
 
-  std::lock_guard<wpi::mutex> sync(notifierMutex);
+  std::lock_guard<wpi::mutex> lock(notifierMutex);
   // Update alarm time if closer than current.
   if (triggerTime < closestTrigger) {
     bool wasActive = (closestTrigger != UINT64_MAX);

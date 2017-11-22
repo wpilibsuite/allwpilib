@@ -62,7 +62,7 @@ THandle IndexedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
-  std::lock_guard<wpi::mutex> sync(m_handleMutexes[index]);
+  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     *status = RESOURCE_IS_ALLOCATED;
@@ -81,7 +81,7 @@ IndexedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
   if (index < 0 || index >= size) {
     return nullptr;
   }
-  std::lock_guard<wpi::mutex> sync(m_handleMutexes[index]);
+  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
   return m_structures[index];
@@ -95,7 +95,7 @@ void IndexedHandleResource<THandle, TStruct, size, enumValue>::Free(
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) return;
   // lock and deallocated handle
-  std::lock_guard<wpi::mutex> sync(m_handleMutexes[index]);
+  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   m_structures[index].reset();
 }
 
@@ -103,7 +103,7 @@ template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
 void IndexedHandleResource<THandle, TStruct, size, enumValue>::ResetHandles() {
   for (int i = 0; i < size; i++) {
-    std::lock_guard<wpi::mutex> sync(m_handleMutexes[i]);
+    std::lock_guard<wpi::mutex> lock(m_handleMutexes[i]);
     m_structures[i].reset();
   }
   HandleBase::ResetHandles();

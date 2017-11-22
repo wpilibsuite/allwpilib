@@ -39,7 +39,7 @@ Notifier::Notifier(TimerEventHandler handler) {
 
       TimerEventHandler handler;
       {
-        std::lock_guard<wpi::mutex> sync(m_processMutex);
+        std::lock_guard<wpi::mutex> lock(m_processMutex);
         handler = m_handler;
         if (m_periodic) {
           m_expirationTime += m_period;
@@ -88,7 +88,7 @@ void Notifier::UpdateAlarm() {
  * @param handler Handler
  */
 void Notifier::SetHandler(TimerEventHandler handler) {
-  std::lock_guard<wpi::mutex> sync(m_processMutex);
+  std::lock_guard<wpi::mutex> lock(m_processMutex);
   m_handler = handler;
 }
 
@@ -100,7 +100,7 @@ void Notifier::SetHandler(TimerEventHandler handler) {
  * @param delay Seconds to wait before the handler is called.
  */
 void Notifier::StartSingle(double delay) {
-  std::lock_guard<wpi::mutex> sync(m_processMutex);
+  std::lock_guard<wpi::mutex> lock(m_processMutex);
   m_periodic = false;
   m_period = delay;
   m_expirationTime = GetClock() + m_period;
@@ -118,7 +118,7 @@ void Notifier::StartSingle(double delay) {
  *               after the call to this method.
  */
 void Notifier::StartPeriodic(double period) {
-  std::lock_guard<wpi::mutex> sync(m_processMutex);
+  std::lock_guard<wpi::mutex> lock(m_processMutex);
   m_periodic = true;
   m_period = period;
   m_expirationTime = GetClock() + m_period;

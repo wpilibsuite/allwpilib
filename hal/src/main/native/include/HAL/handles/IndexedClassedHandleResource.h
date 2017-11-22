@@ -17,7 +17,6 @@
 #include "HAL/Errors.h"
 #include "HAL/Types.h"
 #include "HAL/cpp/make_unique.h"
-#include "HAL/cpp/priority_mutex.h"
 #include "HAL/handles/HandlesInternal.h"
 
 namespace hal {
@@ -74,7 +73,7 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
     *status = RESOURCE_OUT_OF_RANGE;
     return HAL_kInvalidHandle;
   }
-  std::lock_guard<wpi::mutex> sync(m_handleMutexes[index]);
+  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   // check for allocation, otherwise allocate and return a valid handle
   if (m_structures[index] != nullptr) {
     *status = RESOURCE_IS_ALLOCATED;
@@ -94,7 +93,7 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
   if (index < 0 || index >= size) {
     return nullptr;
   }
-  std::lock_guard<wpi::mutex> sync(m_handleMutexes[index]);
+  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
   return m_structures[index];
@@ -108,7 +107,7 @@ void IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Free(
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) return;
   // lock and deallocated handle
-  std::lock_guard<wpi::mutex> sync(m_handleMutexes[index]);
+  std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   m_structures[index].reset();
 }
 
@@ -117,7 +116,7 @@ template <typename THandle, typename TStruct, int16_t size,
 void IndexedClassedHandleResource<THandle, TStruct, size,
                                   enumValue>::ResetHandles() {
   for (int i = 0; i < size; i++) {
-    std::lock_guard<wpi::mutex> sync(m_handleMutexes[i]);
+    std::lock_guard<wpi::mutex> lock(m_handleMutexes[i]);
     m_structures[i].reset();
   }
   HandleBase::ResetHandles();
