@@ -12,12 +12,9 @@
 #include <cstddef>
 #include <system_error>
 
-namespace llvm {
-template <typename T>
-class SmallVectorImpl;
-class StringRef;
-class Twine;
-}
+#include "llvm/SmallVector.h"
+#include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 
 namespace wpi {
 
