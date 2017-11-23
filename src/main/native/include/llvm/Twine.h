@@ -409,6 +409,7 @@ namespace llvm {
       case StdStringKind:
       case StringRefKind:
       case SmallStringKind:
+      case CharKind:
         return true;
       default:
         return false;
@@ -445,6 +446,7 @@ namespace llvm {
       case StringRefKind:  return *LHS.stringRef;
       case SmallStringKind:
         return StringRef(LHS.smallString->data(), LHS.smallString->size());
+      case CharKind:       return StringRef(&LHS.character, 1);
       }
     }
 
