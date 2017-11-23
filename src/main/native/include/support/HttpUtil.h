@@ -16,6 +16,7 @@
 #include "llvm/SmallVector.h"
 #include "llvm/StringMap.h"
 #include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 #include "support/raw_istream.h"
 #include "support/raw_socket_istream.h"
 #include "support/raw_socket_ostream.h"
@@ -27,14 +28,15 @@ namespace wpi {
 // @param buf Buffer for output
 // @param error Set to true if an error occurred
 // @return Escaped string
-llvm::StringRef UnescapeURI(llvm::StringRef str,
+llvm::StringRef UnescapeURI(const llvm::Twine& str,
                             llvm::SmallVectorImpl<char>& buf, bool* error);
 
 // Escape a string with %xx-encoding.
 // @param buf Buffer for output
 // @param spacePlus If true, encodes spaces to '+' rather than "%20"
 // @return Escaped string
-llvm::StringRef EscapeURI(llvm::StringRef str, llvm::SmallVectorImpl<char>& buf,
+llvm::StringRef EscapeURI(const llvm::Twine& str,
+                          llvm::SmallVectorImpl<char>& buf,
                           bool spacePlus = true);
 
 // Parse a set of HTTP headers.  Saves just the Content-Type and Content-Length
@@ -60,7 +62,7 @@ bool FindMultipartBoundary(wpi::raw_istream& is, llvm::StringRef boundary,
 class HttpLocation {
  public:
   HttpLocation() = default;
-  HttpLocation(llvm::StringRef url_, bool* error, std::string* errorMsg);
+  HttpLocation(const llvm::Twine& url_, bool* error, std::string* errorMsg);
 
   std::string url;  // retain copy
   std::string user;  // unescaped

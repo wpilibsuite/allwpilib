@@ -65,11 +65,11 @@ void raw_mem_istream::read_impl(void* data, std::size_t len) {
   m_left -= len;
 }
 
-static int getFD(llvm::StringRef Filename, std::error_code &EC) {
+static int getFD(const llvm::Twine& Filename, std::error_code &EC) {
   // Handle "-" as stdin. Note that when we do this, we consider ourself
   // the owner of stdin. This means that we can do things like close the
   // file descriptor when we're done and set the "binary" flag globally.
-  if (Filename == "-") {
+  if (Filename.isSingleStringRef() && Filename.getSingleStringRef() == "-") {
     EC = std::error_code();
     return STDIN_FILENO;
   }
@@ -84,7 +84,7 @@ static int getFD(llvm::StringRef Filename, std::error_code &EC) {
   return FD;
 }
 
-raw_fd_istream::raw_fd_istream(llvm::StringRef filename, std::error_code& ec,
+raw_fd_istream::raw_fd_istream(const llvm::Twine& filename, std::error_code& ec,
                                std::size_t bufSize)
     : raw_fd_istream(getFD(filename, ec), true, bufSize) {}
 

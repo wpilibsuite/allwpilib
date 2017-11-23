@@ -16,6 +16,7 @@ namespace llvm {
 template <typename T>
 class SmallVectorImpl;
 class StringRef;
+class Twine;
 }
 
 namespace wpi {
@@ -94,7 +95,7 @@ class raw_mem_istream : public raw_istream {
 
 class raw_fd_istream : public raw_istream {
  public:
-  raw_fd_istream(llvm::StringRef filename, std::error_code& ec,
+  raw_fd_istream(const llvm::Twine& filename, std::error_code& ec,
                  std::size_t bufSize = 4096);
   raw_fd_istream(int fd, bool shouldClose, std::size_t bufSize = 4096);
   ~raw_fd_istream() override;

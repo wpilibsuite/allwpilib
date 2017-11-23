@@ -17,10 +17,12 @@
 
 namespace wpi {
 
-llvm::StringRef UnescapeURI(llvm::StringRef str,
+llvm::StringRef UnescapeURI(const llvm::Twine& str,
                             llvm::SmallVectorImpl<char>& buf, bool* error) {
+  llvm::SmallString<128> strBuf;
+  llvm::StringRef strStr = str.toStringRef(strBuf);
   buf.clear();
-  for (auto i = str.begin(), end = str.end(); i != end; ++i) {
+  for (auto i = strStr.begin(), end = strStr.end(); i != end; ++i) {
     // pass non-escaped characters to output
     if (*i != '%') {
       // decode + to space
@@ -55,12 +57,14 @@ llvm::StringRef UnescapeURI(llvm::StringRef str,
   return llvm::StringRef{buf.data(), buf.size()};
 }
 
-llvm::StringRef EscapeURI(llvm::StringRef str, llvm::SmallVectorImpl<char>& buf,
-                          bool spacePlus) {
+llvm::StringRef EscapeURI(const llvm::Twine& str,
+                          llvm::SmallVectorImpl<char>& buf, bool spacePlus) {
   static const char *const hexLut = "0123456789ABCDEF";
 
+  llvm::SmallString<128> strBuf;
+  llvm::StringRef strStr = str.toStringRef(strBuf);
   buf.clear();
-  for (auto i = str.begin(), end = str.end(); i != end; ++i) {
+  for (auto i = strStr.begin(), end = strStr.end(); i != end; ++i) {
     // pass unreserved characters to output
     if (std::isalnum(*i) || *i == '-' || *i == '_' || *i == '.' || *i == '~') {
       buf.push_back(*i);
@@ -168,11 +172,11 @@ bool FindMultipartBoundary(raw_istream& is, llvm::StringRef boundary,
   }
 }
 
-HttpLocation::HttpLocation(llvm::StringRef url_, bool* error,
+HttpLocation::HttpLocation(const llvm::Twine& url_, bool* error,
                            std::string* errorMsg)
-    : url{url_} {
+    : url{url_.str()} {
   // Split apart into components
-  llvm::StringRef query{url_};
+  llvm::StringRef query{url};
 
   // scheme:
   llvm::StringRef scheme;
