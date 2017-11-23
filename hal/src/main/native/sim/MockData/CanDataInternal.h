@@ -34,8 +34,7 @@ typedef HalCallbackListenerVectorImpl<HAL_CAN_GetCANStatusCallback>
 
 class CanData {
  public:
-
-	void ResetData();
+  void ResetData();
 
   void SendMessage(uint32_t messageID, const uint8_t* data, uint8_t dataSize,
                    int32_t periodMs, int32_t* status);
