@@ -75,6 +75,7 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   virtual void SetPIDSourceType(PIDSourceType pidSource);
   virtual PIDSourceType GetPIDSourceType() const;
 
+  WPI_DEPRECATED("Use SetPercentTolerance() instead.")
   virtual void SetTolerance(double percent);
   virtual void SetAbsoluteTolerance(double absValue);
   virtual void SetPercentTolerance(double percentValue);
