@@ -96,11 +96,19 @@ bool MotorSafetyHelper::IsAlive() const {
  * shut down until its value is updated again.
  */
 void MotorSafetyHelper::Check() {
-  DriverStation& ds = DriverStation::GetInstance();
-  if (!m_enabled || ds.IsDisabled() || ds.IsTest()) return;
+  bool enabled;
+  double stopTime;
 
-  std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  if (m_stopTime < Timer::GetFPGATimestamp()) {
+  {
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
+    enabled = m_enabled;
+    stopTime = m_stopTime;
+  }
+
+  DriverStation& ds = DriverStation::GetInstance();
+  if (!enabled || ds.IsDisabled() || ds.IsTest()) return;
+
+  if (stopTime < Timer::GetFPGATimestamp()) {
     llvm::SmallString<128> buf;
     llvm::raw_svector_ostream desc(buf);
     m_safeObject->GetDescription(desc);
