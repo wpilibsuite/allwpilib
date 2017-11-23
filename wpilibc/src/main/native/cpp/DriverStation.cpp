@@ -738,14 +738,16 @@ void DriverStation::ReportJoystickUnpluggedWarning(llvm::StringRef message) {
 
 void DriverStation::Run() {
   m_isRunning = true;
-  int period = 0;
+  int safetyCounter = 0;
   while (m_isRunning) {
     HAL_WaitForDSData();
     GetData();
 
-    if (++period >= 4) {
+    if (IsDisabled()) safetyCounter = 0;
+
+    if (++safetyCounter >= 4) {
       MotorSafetyHelper::CheckMotors();
-      period = 0;
+      safetyCounter = 0;
     }
     if (m_userInDisabled) HAL_ObserveUserProgramDisabled();
     if (m_userInAutonomous) HAL_ObserveUserProgramAutonomous();
