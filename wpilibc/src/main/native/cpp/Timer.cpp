@@ -174,16 +174,19 @@ double Timer::GetFPGATimestamp() {
 }
 
 /**
- * Return the approximate match time The FMS does not currently send the
- * official match time to the robots This returns the time since the enable
- * signal sent from the Driver Station At the beginning of autonomous, the time
- * is reset to 0.0 seconds At the beginning of teleop, the time is reset to
- * +15.0 seconds If the robot is disabled, this returns 0.0 seconds.
+ * Return the approximate match time.
  *
- * Warning: This is not an official time (so it cannot be used to argue with
- * referees).
+ * The FMS does not send an official match time to the robots, but does send an
+ * approximate match time.  The value will count down the time remaining in the
+ * current period (auto or teleop).
  *
- * @return Match time in seconds since the beginning of autonomous
+ * Warning: This is not an official time (so it cannot be used to dispute ref
+ * calls or guarantee that a function will trigger before the match ends).
+ *
+ * The Practice Match function of the DS approximates the behaviour seen on the
+ * field.
+ *
+ * @return Time remaining in current match period (auto or teleop)
  */
 double Timer::GetMatchTime() {
   return DriverStation::GetInstance().GetMatchTime();
