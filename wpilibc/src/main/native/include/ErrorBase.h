@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include <mutex>
-
 #include <llvm/StringRef.h>
+#include <support/mutex.h>
 
 #include "Base.h"
 #include "Error.h"
@@ -66,15 +65,15 @@ namespace frc {
 
 /**
  * Base class for most objects.
+ *
  * ErrorBase is the base class for most objects since it holds the generated
- * error
- * for that object. In addition, there is a single instance of a global error
- * object
+ * error for that object. In addition, there is a single instance of a global
+ * error object.
  */
 class ErrorBase {
   // TODO: Consider initializing instance variables and cleanup in destructor
  public:
-  ErrorBase() = default;
+  ErrorBase();
   virtual ~ErrorBase() = default;
 
   ErrorBase(const ErrorBase&) = delete;
@@ -114,8 +113,9 @@ class ErrorBase {
 
  protected:
   mutable Error m_error;
+
   // TODO: Replace globalError with a global list of all errors.
-  static std::mutex _globalErrorMutex;
+  static wpi::mutex _globalErrorMutex;
   static Error _globalError;
 };
 

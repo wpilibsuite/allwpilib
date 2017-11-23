@@ -32,7 +32,7 @@ struct Interrupt {
 class InterruptThread : public wpi::SafeThread {
  public:
   void Main() {
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::unique_lock<wpi::mutex> lock(m_mutex);
     while (m_active) {
       m_cond.wait(lock, [&] { return !m_active || m_notify; });
       if (!m_active) break;
@@ -178,10 +178,10 @@ double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
 }
 
 /**
-* Return the timestamp for the falling interrupt that occurred most recently.
-* This is in the same time domain as GetClock().
-* @return Timestamp in seconds since boot.
-*/
+ * Return the timestamp for the falling interrupt that occurred most recently.
+ * This is in the same time domain as GetClock().
+ * @return Timestamp in seconds since boot.
+ */
 double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
                                          int32_t* status) {
   auto anInterrupt = interruptHandles.Get(interruptHandle);

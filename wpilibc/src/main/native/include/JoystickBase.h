@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <support/deprecated.h>
+
 #include "GenericHID.h"
 
 namespace frc {
@@ -14,7 +16,8 @@ namespace frc {
 /**
  * Joystick Interface.
  */
-class JoystickBase : public GenericHID {
+class WPI_DEPRECATED("Inherit directly from GenericHID instead.") JoystickBase
+    : public GenericHID {
  public:
   explicit JoystickBase(int port);
   virtual ~JoystickBase() = default;
@@ -22,9 +25,6 @@ class JoystickBase : public GenericHID {
   virtual double GetZ(JoystickHand hand = kRightHand) const = 0;
   virtual double GetTwist() const = 0;
   virtual double GetThrottle() const = 0;
-
-  virtual bool GetTrigger(JoystickHand hand = kRightHand) const = 0;
-  virtual bool GetTop(JoystickHand hand = kRightHand) const = 0;
 };
 
 }  // namespace frc

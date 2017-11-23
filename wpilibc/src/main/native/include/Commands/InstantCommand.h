@@ -16,8 +16,7 @@ namespace frc {
 /**
  * This command will execute once, then finish immediately afterward.
  *
- * <p>Subclassing {@link InstantCommand} is shorthand for returning true from
- * {@link Command isFinished}.
+ * Subclassing InstantCommand is shorthand for returning true from IsFinished().
  */
 class InstantCommand : public Command {
  public:

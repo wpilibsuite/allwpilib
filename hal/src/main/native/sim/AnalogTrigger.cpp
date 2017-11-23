@@ -22,7 +22,7 @@ struct AnalogTrigger {
   uint8_t index;
   HAL_Bool trigState;
 };
-}
+}  // namespace
 
 using namespace hal;
 

@@ -58,7 +58,8 @@ public class FilterOutputTest extends AbstractComsSetup {
     return Arrays.asList(new FilterOutputFixture<?>[][]{
         {TestBench.getInstance().getSinglePoleIIROutputFixture()},
         {TestBench.getInstance().getHighPassOutputFixture()},
-        {TestBench.getInstance().getMovAvgOutputFixture()}});
+        {TestBench.getInstance().getMovAvgOutputFixture()},
+        {TestBench.getInstance().getPulseFixture()}});
   }
 
   @Before

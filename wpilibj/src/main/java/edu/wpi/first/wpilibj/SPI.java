@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -25,7 +24,7 @@ public class SPI extends SensorBase {
     @SuppressWarnings("MemberName")
     public int value;
 
-    private Port(int value) {
+    Port(int value) {
       this.value = value;
     }
   }
@@ -141,9 +140,10 @@ public class SPI extends SensorBase {
    * the transfer into the receive FIFO.
    */
   public int write(byte[] dataToSend, int size) {
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
-    dataToSendBuffer.put(dataToSend);
-    return SPIJNI.spiWrite(m_port, dataToSendBuffer, (byte) size);
+    if (dataToSend.length < size) {
+      throw new IllegalArgumentException("buffer is too small, must be at least " + size);
+    }
+    return SPIJNI.spiWriteB(m_port, dataToSend, (byte) size);
   }
 
   /**
@@ -152,10 +152,12 @@ public class SPI extends SensorBase {
    * <p>If not running in output only mode, also saves the data received on the MISO input during
    * the transfer into the receive FIFO.
    *
-   * @param dataToSend The buffer containing the data to send. Must be created using
-   *                   ByteBuffer.allocateDirect().
+   * @param dataToSend The buffer containing the data to send.
    */
   public int write(ByteBuffer dataToSend, int size) {
+    if (dataToSend.hasArray()) {
+      return write(dataToSend.array(), size);
+    }
     if (!dataToSend.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
@@ -177,16 +179,10 @@ public class SPI extends SensorBase {
    *                 FIFO from a previous write.
    */
   public int read(boolean initiate, byte[] dataReceived, int size) {
-    final int retVal;
-    ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(size);
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
-    if (initiate) {
-      retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
-    } else {
-      retVal = SPIJNI.spiRead(m_port, dataReceivedBuffer, (byte) size);
+    if (dataReceived.length < size) {
+      throw new IllegalArgumentException("buffer is too small, must be at least " + size);
     }
-    dataReceivedBuffer.get(dataReceived);
-    return retVal;
+    return SPIJNI.spiReadB(m_port, initiate, dataReceived, (byte) size);
   }
 
   /**
@@ -199,22 +195,20 @@ public class SPI extends SensorBase {
    * @param initiate     If true, this function pushes "0" into the transmit buffer and initiates
    *                     a transfer. If false, this function assumes that data is already in the
    *                     receive FIFO from a previous write.
-   * @param dataReceived The buffer to be filled with the received data. Must be created using
-   *                     ByteBuffer.allocateDirect().
+   * @param dataReceived The buffer to be filled with the received data.
    * @param size         The length of the transaction, in bytes
    */
   public int read(boolean initiate, ByteBuffer dataReceived, int size) {
+    if (dataReceived.hasArray()) {
+      return read(initiate, dataReceived.array(), size);
+    }
     if (!dataReceived.isDirect()) {
       throw new IllegalArgumentException("must be a direct buffer");
     }
     if (dataReceived.capacity() < size) {
       throw new IllegalArgumentException("buffer is too small, must be at least " + size);
     }
-    if (initiate) {
-      ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
-      return SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceived, (byte) size);
-    }
-    return SPIJNI.spiRead(m_port, dataReceived, (byte) size);
+    return SPIJNI.spiRead(m_port, initiate, dataReceived, (byte) size);
   }
 
   /**
@@ -225,24 +219,26 @@ public class SPI extends SensorBase {
    * @param size         The length of the transaction, in bytes
    */
   public int transaction(byte[] dataToSend, byte[] dataReceived, int size) {
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(size);
-    dataToSendBuffer.put(dataToSend);
-    ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(size);
-    int retVal = SPIJNI.spiTransaction(m_port, dataToSendBuffer, dataReceivedBuffer, (byte) size);
-    dataReceivedBuffer.get(dataReceived);
-    return retVal;
+    if (dataToSend.length < size) {
+      throw new IllegalArgumentException("dataToSend is too small, must be at least " + size);
+    }
+    if (dataReceived.length < size) {
+      throw new IllegalArgumentException("dataReceived is too small, must be at least " + size);
+    }
+    return SPIJNI.spiTransactionB(m_port, dataToSend, dataReceived, (byte) size);
   }
 
   /**
    * Perform a simultaneous read/write transaction with the device.
    *
-   * @param dataToSend   The data to be written out to the device. Must be created using
-   *                     ByteBuffer.allocateDirect().
-   * @param dataReceived Buffer to receive data from the device. Must be created using
-   *                     ByteBuffer.allocateDirect().
+   * @param dataToSend   The data to be written out to the device.
+   * @param dataReceived Buffer to receive data from the device.
    * @param size         The length of the transaction, in bytes
    */
   public int transaction(ByteBuffer dataToSend, ByteBuffer dataReceived, int size) {
+    if (dataToSend.hasArray() && dataReceived.hasArray()) {
+      return transaction(dataToSend.array(), dataReceived.array(), size);
+    }
     if (!dataToSend.isDirect()) {
       throw new IllegalArgumentException("dataToSend must be a direct buffer");
     }
@@ -359,14 +355,6 @@ public class SPI extends SensorBase {
     if (result == null) {
       throw new IllegalArgumentException("Null parameter `result'");
     }
-    ByteBuffer value = ByteBuffer.allocateDirect(8);
-    // set the byte order
-    value.order(ByteOrder.LITTLE_ENDIAN);
-    ByteBuffer count = ByteBuffer.allocateDirect(8);
-    // set the byte order
-    count.order(ByteOrder.LITTLE_ENDIAN);
-    SPIJNI.spiGetAccumulatorOutput(m_port, value.asLongBuffer(), count.asLongBuffer());
-    result.value = value.asLongBuffer().get(0);
-    result.count = count.asLongBuffer().get(0);
+    SPIJNI.spiGetAccumulatorOutput(m_port, result);
   }
 }

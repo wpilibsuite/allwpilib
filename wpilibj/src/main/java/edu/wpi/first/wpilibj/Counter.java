@@ -56,7 +56,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private Mode(int value) {
+    Mode(int value) {
       this.value = value;
     }
   }
@@ -148,7 +148,7 @@ public class Counter extends SensorBase implements CounterBase, LiveWindowSendab
     requireNonNull(downSource, "Down Source given was null");
 
     if (encodingType != EncodingType.k1X && encodingType != EncodingType.k2X) {
-      throw new RuntimeException("Counters only support 1X and 2X quadreature decoding!");
+      throw new RuntimeException("Counters only support 1X and 2X quadrature decoding!");
     }
 
     setUpSource(upSource);

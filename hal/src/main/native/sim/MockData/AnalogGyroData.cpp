@@ -7,7 +7,7 @@
 
 #include "../PortsInternal.h"
 #include "AnalogGyroDataInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 
 using namespace hal;
 
@@ -28,7 +28,7 @@ int32_t AnalogGyroData::RegisterAngleCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_angleCallbacks =
         RegisterCallback(m_angleCallbacks, "Angle", callback, param, &newUid);
   }
@@ -64,7 +64,7 @@ int32_t AnalogGyroData::RegisterRateCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_rateCallbacks =
         RegisterCallback(m_rateCallbacks, "Rate", callback, param, &newUid);
   }
@@ -100,7 +100,7 @@ int32_t AnalogGyroData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -192,4 +192,15 @@ HAL_Bool HALSIM_GetAnalogGyroInitialized(int32_t index) {
 void HALSIM_SetAnalogGyroInitialized(int32_t index, HAL_Bool initialized) {
   SimAnalogGyroData[index].SetInitialized(initialized);
 }
+
+void HALSIM_RegisterAnalogGyroAllCallbacks(int32_t index,
+                                           HAL_NotifyCallback callback,
+                                           void* param,
+                                           HAL_Bool initialNotify) {
+  SimAnalogGyroData[index].RegisterAngleCallback(callback, param,
+                                                 initialNotify);
+  SimAnalogGyroData[index].RegisterRateCallback(callback, param, initialNotify);
+  SimAnalogGyroData[index].RegisterInitializedCallback(callback, param,
+                                                       initialNotify);
 }
+}  // extern "C"

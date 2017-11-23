@@ -12,7 +12,7 @@
 namespace frc {
 
 /**
- * Mindsensors SD540 Speed Controller
+ * Mindsensors SD540 Speed Controller.
  */
 class SD540 : public PWMSpeedController {
  public:

@@ -17,20 +17,18 @@ namespace frc {
 class LiveWindowSendable : public Sendable {
  public:
   /**
-   * Update the table for this sendable object with the latest
-   * values.
+   * Update the table for this sendable object with the latest values.
    */
   virtual void UpdateTable() = 0;
 
   /**
-   * Start having this sendable object automatically respond to
-   * value changes reflect the value on the table.
+   * Start having this sendable object automatically respond to value changes
+   * reflect the value on the table.
    */
   virtual void StartLiveWindowMode() = 0;
 
   /**
-   * Stop having this sendable object automatically respond to value
-   * changes.
+   * Stop having this sendable object automatically respond to value changes.
    */
   virtual void StopLiveWindowMode() = 0;
 };

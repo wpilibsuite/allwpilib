@@ -7,7 +7,7 @@
 
 #include "../PortsInternal.h"
 #include "AnalogOutDataInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 
 using namespace hal;
 
@@ -26,7 +26,7 @@ int32_t AnalogOutData::RegisterVoltageCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_voltageCallbacks = RegisterCallback(m_voltageCallbacks, "Voltage",
                                           callback, param, &newUid);
   }
@@ -62,7 +62,7 @@ int32_t AnalogOutData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -135,4 +135,13 @@ HAL_Bool HALSIM_GetAnalogOutInitialized(int32_t index) {
 void HALSIM_SetAnalogOutInitialized(int32_t index, HAL_Bool initialized) {
   SimAnalogOutData[index].SetInitialized(initialized);
 }
+
+void HALSIM_RegisterAnalogOutAllCallbacks(int32_t index,
+                                          HAL_NotifyCallback callback,
+                                          void* param, HAL_Bool initialNotify) {
+  SimAnalogOutData[index].RegisterVoltageCallback(callback, param,
+                                                  initialNotify);
+  SimAnalogOutData[index].RegisterInitializedCallback(callback, param,
+                                                      initialNotify);
 }
+}  // extern "C"

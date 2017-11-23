@@ -8,10 +8,10 @@
 #include "DigitalInternal.h"
 
 #include <atomic>
-#include <mutex>
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>
+#include <support/mutex.h>
 
 #include "ConstantsInternal.h"
 #include "HAL/AnalogTrigger.h"
@@ -23,7 +23,7 @@
 namespace hal {
 
 // Create a mutex to protect changes to the DO PWM config
-std::mutex digitalPwmMutex;
+wpi::mutex digitalPwmMutex;
 
 std::unique_ptr<tDIO> digitalSystem;
 std::unique_ptr<tRelay> relaySystem;
@@ -31,7 +31,7 @@ std::unique_ptr<tPWM> pwmSystem;
 std::unique_ptr<tSPI> spiSystem;
 
 static std::atomic<bool> digitalSystemsInitialized{false};
-static std::mutex initializeMutex;
+static wpi::mutex initializeMutex;
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalChannels + kNumPWMHeaders>
@@ -44,7 +44,7 @@ void initializeDigital(int32_t* status) {
   // Initial check, as if it's true initialization has finished
   if (digitalSystemsInitialized) return;
 
-  std::lock_guard<std::mutex> lock(initializeMutex);
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (digitalSystemsInitialized) return;
 

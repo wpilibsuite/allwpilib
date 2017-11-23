@@ -7,7 +7,7 @@
 
 #include "../PortsInternal.h"
 #include "AnalogInDataInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 
 using namespace hal;
 
@@ -40,7 +40,7 @@ int32_t AnalogInData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -76,7 +76,7 @@ int32_t AnalogInData::RegisterAverageBitsCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_averageBitsCallbacks = RegisterCallback(
         m_averageBitsCallbacks, "AverageBits", callback, param, &newUid);
   }
@@ -111,7 +111,7 @@ int32_t AnalogInData::RegisterOversampleBitsCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_oversampleBitsCallbacks = RegisterCallback(
         m_oversampleBitsCallbacks, "OversampleBits", callback, param, &newUid);
   }
@@ -147,7 +147,7 @@ int32_t AnalogInData::RegisterVoltageCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_voltageCallbacks = RegisterCallback(m_voltageCallbacks, "Voltage",
                                           callback, param, &newUid);
   }
@@ -182,7 +182,7 @@ int32_t AnalogInData::RegisterAccumulatorInitializedCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_accumulatorInitializedCallbacks =
         RegisterCallback(m_accumulatorInitializedCallbacks,
                          "AccumulatorInitialized", callback, param, &newUid);
@@ -222,7 +222,7 @@ int32_t AnalogInData::RegisterAccumulatorValueCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_accumulatorValueCallbacks =
         RegisterCallback(m_accumulatorValueCallbacks, "AccumulatorValue",
                          callback, param, &newUid);
@@ -259,7 +259,7 @@ int32_t AnalogInData::RegisterAccumulatorCountCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_accumulatorCountCallbacks =
         RegisterCallback(m_accumulatorCountCallbacks, "AccumulatorCount",
                          callback, param, &newUid);
@@ -296,7 +296,7 @@ int32_t AnalogInData::RegisterAccumulatorCenterCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_accumulatorCenterCallbacks =
         RegisterCallback(m_accumulatorCenterCallbacks, "AccumulatorCenter",
                          callback, param, &newUid);
@@ -333,7 +333,7 @@ int32_t AnalogInData::RegisterAccumulatorDeadbandCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_accumulatorDeadbandCallbacks =
         RegisterCallback(m_accumulatorDeadbandCallbacks, "AccumulatorDeadband",
                          callback, param, &newUid);
@@ -550,4 +550,27 @@ void HALSIM_SetAnalogInAccumulatorDeadband(int32_t index,
                                            int32_t accumulatorDeadband) {
   SimAnalogInData[index].SetAccumulatorDeadband(accumulatorDeadband);
 }
+
+void HALSIM_RegisterAnalogInAllCallbacks(int32_t index,
+                                         HAL_NotifyCallback callback,
+                                         void* param, HAL_Bool initialNotify) {
+  SimAnalogInData[index].RegisterInitializedCallback(callback, param,
+                                                     initialNotify);
+  SimAnalogInData[index].RegisterAverageBitsCallback(callback, param,
+                                                     initialNotify);
+  SimAnalogInData[index].RegisterOversampleBitsCallback(callback, param,
+                                                        initialNotify);
+  SimAnalogInData[index].RegisterVoltageCallback(callback, param,
+                                                 initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorInitializedCallback(callback, param,
+                                                                initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorValueCallback(callback, param,
+                                                          initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorCountCallback(callback, param,
+                                                          initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorCenterCallback(callback, param,
+                                                           initialNotify);
+  SimAnalogInData[index].RegisterAccumulatorDeadbandCallback(callback, param,
+                                                             initialNotify);
 }
+}  // extern "C"

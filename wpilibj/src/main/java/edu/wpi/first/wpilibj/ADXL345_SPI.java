@@ -54,7 +54,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
     @SuppressWarnings("MemberName")
     public final byte value;
 
-    private Axes(byte value) {
+    Axes(byte value) {
       this.value = value;
     }
   }
@@ -156,7 +156,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
    * @return Acceleration of the ADXL345 in Gs.
    */
   public double getAcceleration(ADXL345_SPI.Axes axis) {
-    ByteBuffer transferBuffer = ByteBuffer.allocateDirect(3);
+    ByteBuffer transferBuffer = ByteBuffer.allocate(3);
     transferBuffer.put(0,
         (byte) ((kAddress_Read | kAddress_MultiByte | kDataRegister) + axis.value));
     m_spi.transaction(transferBuffer, transferBuffer, 3);
@@ -174,7 +174,7 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   public ADXL345_SPI.AllAxes getAccelerations() {
     ADXL345_SPI.AllAxes data = new ADXL345_SPI.AllAxes();
     if (m_spi != null) {
-      ByteBuffer dataBuffer = ByteBuffer.allocateDirect(7);
+      ByteBuffer dataBuffer = ByteBuffer.allocate(7);
       // Select the data address.
       dataBuffer.put(0, (byte) (kAddress_Read | kAddress_MultiByte | kDataRegister));
       m_spi.transaction(dataBuffer, dataBuffer, 7);

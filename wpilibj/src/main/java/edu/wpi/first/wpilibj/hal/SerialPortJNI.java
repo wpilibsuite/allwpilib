@@ -7,8 +7,6 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import java.nio.ByteBuffer;
-
 public class SerialPortJNI extends JNIWrapper {
   public static native void serialInitializePort(byte port);
 
@@ -36,9 +34,9 @@ public class SerialPortJNI extends JNIWrapper {
 
   public static native int serialGetBytesReceived(byte port);
 
-  public static native int serialRead(byte port, ByteBuffer buffer, int count);
+  public static native int serialRead(byte port, byte[] buffer, int count);
 
-  public static native int serialWrite(byte port, ByteBuffer buffer, int count);
+  public static native int serialWrite(byte port, byte[] buffer, int count);
 
   public static native void serialFlush(byte port);
 

@@ -88,6 +88,10 @@ int32_t HALSIM_GetAnalogInAccumulatorDeadband(int32_t index);
 void HALSIM_SetAnalogInAccumulatorDeadband(int32_t index,
                                            int32_t accumulatorDeadband);
 
+void HALSIM_RegisterAnalogInAllCallbacks(int32_t index,
+                                         HAL_NotifyCallback callback,
+                                         void* param, HAL_Bool initialNotify);
+
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

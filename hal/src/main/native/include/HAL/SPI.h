@@ -24,9 +24,10 @@ extern "C" {
 #endif
 
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status);
-int32_t HAL_TransactionSPI(HAL_SPIPort port, uint8_t* dataToSend,
+int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size);
-int32_t HAL_WriteSPI(HAL_SPIPort port, uint8_t* dataToSend, int32_t sendSize);
+int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
+                     int32_t sendSize);
 int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count);
 void HAL_CloseSPI(HAL_SPIPort port);
 void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed);
@@ -55,5 +56,5 @@ double HAL_GetSPIAccumulatorAverage(HAL_SPIPort port, int32_t* status);
 void HAL_GetSPIAccumulatorOutput(HAL_SPIPort port, int64_t* value,
                                  int64_t* count, int32_t* status);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

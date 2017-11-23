@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
@@ -43,47 +42,56 @@ import edu.wpi.first.wpilibj.Timer;
  * @see IllegalUseOfCommandException
  */
 public abstract class Command implements NamedSendable {
-
   /**
    * The name of this command.
    */
   private String m_name;
+
   /**
    * The time since this command was initialized.
    */
   private double m_startTime = -1;
+
   /**
    * The time (in seconds) before this command "times out" (or -1 if no timeout).
    */
   private double m_timeout = -1;
+
   /**
    * Whether or not this command has been initialized.
    */
   private boolean m_initialized = false;
+
   /**
-   * The requirements (or null if no requirements).
+   * The required subsystems.
    */
-  private Set m_requirements;
+  private final Set m_requirements = new Set();
+
   /**
    * Whether or not it is running.
    */
   private boolean m_running = false;
+
   /**
    * Whether or not it is interruptible.
    */
   private boolean m_interruptible = true;
+
   /**
    * Whether or not it has been canceled.
    */
   private boolean m_canceled = false;
+
   /**
    * Whether or not it has been locked.
    */
   private boolean m_locked = false;
+
   /**
    * Whether this command should run when the robot is disabled.
    */
   private boolean m_runWhenDisabled = false;
+
   /**
    * The {@link CommandGroup} this is in.
    */
@@ -191,9 +199,6 @@ public abstract class Command implements NamedSendable {
   protected synchronized void requires(Subsystem subsystem) {
     validate("Can not add new requirement to command");
     if (subsystem != null) {
-      if (m_requirements == null) {
-        m_requirements = new Set();
-      }
       m_requirements.add(subsystem);
     } else {
       throw new IllegalArgumentException("Subsystem must not be null.");
@@ -347,7 +352,7 @@ public abstract class Command implements NamedSendable {
    * Subsystems}) of this command
    */
   synchronized Enumeration getRequirements() {
-    return m_requirements == null ? emptyEnumeration : m_requirements.getElements();
+    return m_requirements.getElements();
   }
 
   /**
@@ -393,7 +398,7 @@ public abstract class Command implements NamedSendable {
    * in {@link CommandGroup}.
    */
   protected void clearRequirements() {
-    m_requirements = new Set();
+    m_requirements.clear();
   }
 
   /**
@@ -501,7 +506,7 @@ public abstract class Command implements NamedSendable {
    * @return whether or not the subsystem is required, or false if given null
    */
   public synchronized boolean doesRequire(Subsystem system) {
-    return m_requirements != null && m_requirements.contains(system);
+    return m_requirements.contains(system);
   }
 
   /**
@@ -536,20 +541,6 @@ public abstract class Command implements NamedSendable {
   }
 
   /**
-   * An empty enumeration given whenever there are no requirements.
-   */
-  private static Enumeration emptyEnumeration = new Enumeration() {
-
-    public boolean hasMoreElements() {
-      return false;
-    }
-
-    public Object nextElement() {
-      throw new NoSuchElementException();
-    }
-  };
-
-  /**
    * The string representation for a {@link Command} is by default its name.
    *
    * @return the string representation of this object
@@ -575,8 +566,8 @@ public abstract class Command implements NamedSendable {
     }
     if (table != null) {
       m_runningEntry = table.getEntry("running");
-      m_isParentedEntry = table.getEntry("isParented");
-      table.getEntry("name").setString(getName());
+      m_isParentedEntry = table.getEntry(".isParented");
+      table.getEntry(".name").setString(getName());
       m_runningEntry.setBoolean(isRunning());
       m_isParentedEntry.setBoolean(m_parent != null);
       m_runningListener = m_runningEntry.addListener((event) -> {

@@ -19,15 +19,9 @@
 
 using namespace frc;
 
-// Time (sec) for the ping trigger pulse.
-constexpr double Ultrasonic::kPingTime;
-// Priority that the ultrasonic round robin task runs.
-const int Ultrasonic::kPriority;
-// Max time (ms) between readings.
-constexpr double Ultrasonic::kMaxUltrasonicTime;
-constexpr double Ultrasonic::kSpeedOfSoundInchesPerSec;
-// automatic round robin mode
+// Automatic round robin mode
 std::atomic<bool> Ultrasonic::m_automaticEnabled{false};
+
 std::set<Ultrasonic*> Ultrasonic::m_sensors;
 std::thread Ultrasonic::m_thread;
 
@@ -60,19 +54,19 @@ void Ultrasonic::UltrasonicChecker() {
  *
  * This is the common code that initializes the ultrasonic sensor given that
  * there are two digital I/O channels allocated. If the system was running in
- * automatic mode (round robin) when the new sensor is added, it is stopped,
- * the sensor is added, then automatic mode is restored.
+ * automatic mode (round robin) when the new sensor is added, it is stopped, the
+ * sensor is added, then automatic mode is restored.
  */
 void Ultrasonic::Initialize() {
   bool originalMode = m_automaticEnabled;
-  SetAutomaticMode(false);  // kill task when adding a new sensor
-  // link this instance on the list
+  SetAutomaticMode(false);  // Kill task when adding a new sensor
+  // Link this instance on the list
   m_sensors.insert(this);
 
   m_counter.SetMaxPeriod(1.0);
   m_counter.SetSemiPeriodMode(true);
   m_counter.Reset();
-  m_enabled = true;  // make it available for round robin scheduling
+  m_enabled = true;  // Make it available for round robin scheduling
   SetAutomaticMode(originalMode);
 
   static int instances = 0;
@@ -85,8 +79,7 @@ void Ultrasonic::Initialize() {
 /**
  * Create an instance of the Ultrasonic Sensor.
  *
- * This is designed to support the Daventech SRF04 and Vex ultrasonic
- * sensors.
+ * This is designed to support the Daventech SRF04 and Vex ultrasonic sensors.
  *
  * @param pingChannel The digital output channel that sends the pulse to
  *                    initiate the sensor sending the ping.
@@ -222,10 +215,9 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
     // Wait for background task to stop running
     m_thread.join();
 
-    /* Clear all the counters (data now invalid) since automatic mode is
-     * disabled. No synchronization is needed because the background task is
-     * stopped.
-     */
+    // Clear all the counters (data now invalid) since automatic mode is
+    // disabled. No synchronization is needed because the background task is
+    // stopped.
     for (auto& sensor : m_sensors) {
       sensor->m_counter.Reset();
     }
@@ -242,9 +234,12 @@ void Ultrasonic::SetAutomaticMode(bool enabling) {
  */
 void Ultrasonic::Ping() {
   wpi_assert(!m_automaticEnabled);
-  m_counter.Reset();  // reset the counter to zero (invalid data now)
-  m_pingChannel->Pulse(
-      kPingTime);  // do the ping to start getting a single range
+
+  // Reset the counter to zero (invalid data now)
+  m_counter.Reset();
+
+  // Do the ping to start getting a single range
+  m_pingChannel->Pulse(kPingTime);
 }
 
 /**
@@ -259,9 +254,9 @@ bool Ultrasonic::IsRangeValid() const { return m_counter.Get() > 1; }
 /**
  * Get the range in inches from the ultrasonic sensor.
  *
- * @return double Range in inches of the target returned from the ultrasonic
- *         sensor. If there is no valid value yet, i.e. at least one
- *         measurement hasn't completed, then return 0.
+ * @return Range in inches of the target returned from the ultrasonic sensor. If
+ *         there is no valid value yet, i.e. at least one measurement hasn't
+ *         completed, then return 0.
  */
 double Ultrasonic::GetRangeInches() const {
   if (IsRangeValid())
@@ -273,9 +268,9 @@ double Ultrasonic::GetRangeInches() const {
 /**
  * Get the range in millimeters from the ultrasonic sensor.
  *
- * @return double Range in millimeters of the target returned by the ultrasonic
- *         sensor. If there is no valid value yet, i.e. at least one
- *         measurement hasn't completed, then return 0.
+ * @return Range in millimeters of the target returned by the ultrasonic sensor.
+ *         If there is no valid value yet, i.e. at least one measurement hasn't
+ *         completed, then return 0.
  */
 double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
 

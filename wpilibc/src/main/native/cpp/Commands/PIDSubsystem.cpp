@@ -12,8 +12,7 @@
 using namespace frc;
 
 /**
- * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
- * values.
+ * Instantiates a PIDSubsystem that will use the given P, I, and D values.
  *
  * @param name the name
  * @param p    the proportional value
@@ -27,8 +26,7 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
 }
 
 /**
- * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
- * values.
+ * Instantiates a PIDSubsystem that will use the given P, I, and D values.
  *
  * @param name the name
  * @param p    the proportional value
@@ -43,8 +41,7 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
 }
 
 /**
- * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
- * values.
+ * Instantiates a PIDSubsystem that will use the given P, I, and D values.
  *
  * It will also space the time between PID loop calculations to be equal to the
  * given period.
@@ -64,8 +61,7 @@ PIDSubsystem::PIDSubsystem(const std::string& name, double p, double i,
 }
 
 /**
- * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
- * values.
+ * Instantiates a PIDSubsystem that will use the given P, I, and D values.
  *
  * It will use the class name as its name.
  *
@@ -79,8 +75,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d)
 }
 
 /**
- * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
- * values.
+ * Instantiates a PIDSubsystem that will use the given P, I, and D values.
  *
  * It will use the class name as its name.
  *
@@ -95,8 +90,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
 }
 
 /**
- * Instantiates a {@link PIDSubsystem} that will use the given p, i and d
- * values.
+ * Instantiates a PIDSubsystem that will use the given P, I, and D values.
  *
  * It will use the class name as its name. It will also space the time
  * between PID loop calculations to be equal to the given period.
@@ -115,21 +109,21 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
 }
 
 /**
- * Enables the internal {@link PIDController}.
+ * Enables the internal PIDController.
  */
 void PIDSubsystem::Enable() { m_controller->Enable(); }
 
 /**
-  * Disables the internal {@link PIDController}.
-  */
+ * Disables the internal PIDController.
+ */
 void PIDSubsystem::Disable() { m_controller->Disable(); }
 
 /**
- * Returns the {@link PIDController} used by this {@link PIDSubsystem}.
+ * Returns the PIDController used by this PIDSubsystem.
  *
- * Use this if you would like to fine tune the pid loop.
+ * Use this if you would like to fine tune the PID loop.
  *
- * @return the {@link PIDController} used by this {@link PIDSubsystem}
+ * @return The PIDController used by this PIDSubsystem
  */
 std::shared_ptr<PIDController> PIDSubsystem::GetPIDController() {
   return m_controller;
@@ -138,8 +132,8 @@ std::shared_ptr<PIDController> PIDSubsystem::GetPIDController() {
 /**
  * Sets the setpoint to the given value.
  *
- * If {@link PIDCommand#SetRange(double, double) SetRange(...)} was called,
- * then the given setpoint will be trimmed to fit within the range.
+ * If SetRange() was called, then the given setpoint will be trimmed to fit
+ * within the range.
  *
  * @param setpoint the new setpoint
  */
@@ -150,8 +144,7 @@ void PIDSubsystem::SetSetpoint(double setpoint) {
 /**
  * Adds the given value to the setpoint.
  *
- * If {@link PIDCommand#SetRange(double, double) SetRange(...)} was used,
- * then the bounds will still be honored by this method.
+ * If SetRange() was used, then the bounds will still be honored by this method.
  *
  * @param deltaSetpoint the change in the setpoint
  */
@@ -197,7 +190,8 @@ void PIDSubsystem::SetAbsoluteTolerance(double absValue) {
 }
 
 /**
- * Set the percentage error which is considered tolerable for use with OnTarget.
+ * Set the percentage error which is considered tolerable for use with
+ * OnTarget().
  *
  * @param percent percentage error which is tolerable
  */
@@ -207,9 +201,9 @@ void PIDSubsystem::SetPercentTolerance(double percent) {
 
 /**
  * Return true if the error is within the percentage of the total input range,
- * determined by SetTolerance.
+ * determined by SetTolerance().
  *
- * This asssumes that the maximum and minimum input were set using SetInput.
+ * This asssumes that the maximum and minimum input were set using SetInput().
  * Use OnTarget() in the IsFinished() method of commands that use this
  * subsystem.
  *
@@ -217,7 +211,7 @@ void PIDSubsystem::SetPercentTolerance(double percent) {
  * setpoint. Ideally it should be based on being within the tolerance for some
  * period of time.
  *
- * @return true if the error is within the percentage tolerance of the input
+ * @return True if the error is within the percentage tolerance of the input
  *         range
  */
 bool PIDSubsystem::OnTarget() const { return m_controller->OnTarget(); }

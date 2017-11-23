@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/AccelerometerData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -54,7 +56,7 @@ class AccelerometerData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_active{false};
   std::shared_ptr<NotifyListenerVector> m_activeCallbacks = nullptr;
   std::atomic<HAL_AccelerometerRange> m_range{

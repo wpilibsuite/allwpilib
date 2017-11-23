@@ -36,7 +36,7 @@ class CANSpeedController : public SpeedController {
     kTemperatureFault = 2,
     kBusVoltageFault = 4,
     kGateDriverFault = 8,
-    /* SRX extensions */
+    // SRX extensions
     kFwdLimitSwitch = 0x10,
     kRevLimitSwitch = 0x20,
     kFwdSoftLimit = 0x40,
@@ -46,22 +46,34 @@ class CANSpeedController : public SpeedController {
   enum Limits { kForwardLimit = 1, kReverseLimit = 2 };
 
   enum NeutralMode {
-    /** Use the NeutralMode that is set by the jumper wire on the CAN device */
+    /**
+     * Use the NeutralMode that is set by the jumper wire on the CAN device
+     */
     kNeutralMode_Jumper = 0,
-    /** Stop the motor's rotation by applying a force. */
+    /**
+     * Stop the motor's rotation by applying a force.
+     */
     kNeutralMode_Brake = 1,
-    /** Do not attempt to stop the motor. Instead allow it to coast to a stop
-       without applying resistance. */
+    /**
+     * Do not attempt to stop the motor. Instead allow it to coast to a stop
+     * without applying resistance.
+     */
     kNeutralMode_Coast = 2
   };
 
   enum LimitMode {
-    /** Only use switches for limits */
+    /**
+     * Only use switches for limits
+     */
     kLimitMode_SwitchInputsOnly = 0,
-    /** Use both switches and soft limits */
+    /**
+     * Use both switches and soft limits
+     */
     kLimitMode_SoftPositionLimits = 1,
-    /* SRX extensions */
-    /** Disable switches and disable soft limits */
+    // SRX extensions
+    /**
+     * Disable switches and disable soft limits
+     */
     kLimitMode_SrxDisableSwitchInputs = 2,
   };
 
@@ -98,9 +110,6 @@ class CANSpeedController : public SpeedController {
   virtual void ConfigReverseLimit(double reverseLimitPosition) = 0;
   virtual void ConfigMaxOutputVoltage(double voltage) = 0;
   virtual void ConfigFaultTime(double faultTime) = 0;
-  // Hold off on interface until we figure out ControlMode enums.
-  // virtual void SetControlMode(ControlMode mode) = 0;
-  // virtual ControlMode GetControlMode() const = 0;
 };
 
 }  // namespace frc

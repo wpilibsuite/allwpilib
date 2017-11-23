@@ -52,7 +52,9 @@ inline Log::Log() {}
 inline llvm::raw_ostream& Log::Get(TLogLevel level) {
   oss << "- " << NowTime();
   oss << " " << ToString(level) << ": ";
-  oss << std::string(level > logDEBUG ? level - logDEBUG : 0, '\t');
+  if (level > logDEBUG) {
+    oss << std::string(level - logDEBUG, '\t');
+  }
   return oss;
 }
 
@@ -94,7 +96,7 @@ typedef Log FILELog;
   if (level > FILELog::ReportingLevel()) \
     ;                                    \
   else                                   \
-  Log().Get(level)
+    Log().Get(level)
 
 inline std::string NowTime() {
   llvm::SmallString<128> buf;

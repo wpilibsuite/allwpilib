@@ -18,7 +18,7 @@ struct Relay {
   uint8_t channel;
   bool fwd;
 };
-}
+}  // namespace
 
 static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
                              HAL_HandleEnum::Relay>
@@ -106,4 +106,4 @@ HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
   else
     return SimRelayData[port->channel].GetReverse();
 }
-}
+}  // extern "C"

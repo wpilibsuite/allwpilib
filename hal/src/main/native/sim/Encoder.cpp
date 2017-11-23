@@ -25,7 +25,7 @@ struct Encoder {
   uint8_t index;
 };
 struct Empty {};
-}
+}  // namespace
 
 static LimitedHandleResource<HAL_EncoderHandle, Encoder,
                              kNumEncoders + kNumCounters,
@@ -323,4 +323,4 @@ HAL_EncoderEncodingType HAL_GetEncoderEncodingType(
 
   return encoder->encodingType;
 }
-}
+}  // extern "C"

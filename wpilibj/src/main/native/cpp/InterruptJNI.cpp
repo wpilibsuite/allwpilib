@@ -8,9 +8,10 @@
 #include <assert.h>
 #include <jni.h>
 #include <atomic>
-#include <condition_variable>
-#include <mutex>
 #include <thread>
+
+#include <support/mutex.h>
+
 #include "HAL/cpp/Log.h"
 
 #include "HAL/Interrupts.h"
@@ -87,7 +88,7 @@ void InterruptThreadJNI::Main() {
                                              &args);
   if (rs != JNI_OK) return;
 
-  std::unique_lock<std::mutex> lock(m_mutex);
+  std::unique_lock<wpi::mutex> lock(m_mutex);
   while (m_active) {
     m_cond.wait(lock, [&] { return !m_active || m_notify; });
     if (!m_active) break;

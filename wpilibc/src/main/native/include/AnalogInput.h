@@ -26,8 +26,8 @@ namespace frc {
  *
  * Connected to each analog channel is an averaging and oversampling engine.
  * This engine accumulates the specified ( by SetAverageBits() and
- * SetOversampleBits() ) number of samples before returning a new value.  This
- * is not a sliding window average.  The only difference between the oversampled
+ * SetOversampleBits() ) number of samples before returning a new value. This is
+ * not a sliding window average. The only difference between the oversampled
  * samples and the averaged samples is that the oversampled samples are simply
  * accumulated effectively increasing the resolution, while the averaged samples
  * are divided by the number of samples to retain the resolution, but get more
@@ -40,9 +40,9 @@ class AnalogInput : public SensorBase,
   friend class AnalogGyro;
 
  public:
-  static const int kAccumulatorModuleNumber = 1;
-  static const int kAccumulatorNumChannels = 2;
-  static const int kAccumulatorChannels[kAccumulatorNumChannels];
+  static constexpr int kAccumulatorModuleNumber = 1;
+  static constexpr int kAccumulatorNumChannels = 2;
+  static constexpr int kAccumulatorChannels[kAccumulatorNumChannels] = {0, 1};
 
   explicit AnalogInput(int channel);
   virtual ~AnalogInput();

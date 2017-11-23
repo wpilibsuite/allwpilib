@@ -20,10 +20,6 @@
 
 using namespace frc;
 
-const int AnalogInput::kAccumulatorModuleNumber;
-const int AnalogInput::kAccumulatorNumChannels;
-const int AnalogInput::kAccumulatorChannels[] = {0, 1};
-
 /**
  * Construct an analog input.
  *

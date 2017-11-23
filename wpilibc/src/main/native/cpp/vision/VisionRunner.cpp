@@ -61,8 +61,7 @@ void VisionRunnerBase::RunOnce() {
  * must be run in a dedicated thread, and cannot be used in the main robot
  * thread because it will freeze the robot program.
  *
- * <p><strong>Do not call this method directly from the main
- * thread.</strong></p>
+ * <strong>Do not call this method directly from the main thread.</strong>
  */
 void VisionRunnerBase::RunForever() {
   if (std::this_thread::get_id() == RobotBase::GetThreadId()) {

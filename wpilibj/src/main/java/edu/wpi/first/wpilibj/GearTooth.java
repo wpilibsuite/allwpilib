@@ -73,12 +73,12 @@ public class GearTooth extends Counter {
   }
 
   /**
-   * Construct a GearTooth sensor given a digital input. This should be used when sharing digial
+   * Construct a GearTooth sensor given a digital input. This should be used when sharing digital
    * inputs.
    *
    * <p>No direction sensing is assumed.
    *
-   * @param source An object that fully descibes the input that the sensor is connected to.
+   * @param source An object that fully describes the input that the sensor is connected to.
    */
   public GearTooth(DigitalSource source) {
     this(source, false);

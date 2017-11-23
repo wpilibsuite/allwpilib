@@ -116,8 +116,9 @@ Counter::Counter(const AnalogTrigger& trigger) : Counter(kTwoPulse) {
  */
 Counter::Counter(EncodingType encodingType, DigitalSource* upSource,
                  DigitalSource* downSource, bool inverted)
-    : Counter(encodingType, std::shared_ptr<DigitalSource>(
-                                upSource, NullDeleter<DigitalSource>()),
+    : Counter(encodingType,
+              std::shared_ptr<DigitalSource>(upSource,
+                                             NullDeleter<DigitalSource>()),
               std::shared_ptr<DigitalSource>(downSource,
                                              NullDeleter<DigitalSource>()),
               inverted) {}

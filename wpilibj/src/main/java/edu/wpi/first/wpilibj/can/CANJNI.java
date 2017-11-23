@@ -29,4 +29,8 @@ public class CANJNI extends JNIWrapper {
   @SuppressWarnings("MethodName")
   public static native byte[] FRCNetCommCANSessionMuxReceiveMessage(
       IntBuffer messageID, int messageIDMask, ByteBuffer timeStamp);
+
+
+  @SuppressWarnings("MethodName")
+  public static native void GetCANStatus(CANStatus status);
 }

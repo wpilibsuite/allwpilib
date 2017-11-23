@@ -23,10 +23,10 @@ using namespace frc;
 
 std::array<bool, 3> DigitalGlitchFilter::m_filterAllocated = {
     {false, false, false}};
-std::mutex DigitalGlitchFilter::m_mutex;
+wpi::mutex DigitalGlitchFilter::m_mutex;
 
 DigitalGlitchFilter::DigitalGlitchFilter() {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   auto index =
       std::find(m_filterAllocated.begin(), m_filterAllocated.end(), false);
   wpi_assert(index != m_filterAllocated.end());
@@ -39,7 +39,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
   if (m_channelIndex >= 0) {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     m_filterAllocated[m_channelIndex] = false;
   }
 }
@@ -54,10 +54,10 @@ void DigitalGlitchFilter::Add(DigitalSource* input) {
 }
 
 void DigitalGlitchFilter::DoAdd(DigitalSource* input, int requested_index) {
-  // Some sources from Counters and Encoders are null.  By pushing the check
+  // Some sources from Counters and Encoders are null. By pushing the check
   // here, we catch the issue more generally.
   if (input) {
-    // we don't support GlitchFilters on AnalogTriggers.
+    // We don't support GlitchFilters on AnalogTriggers.
     if (input->IsAnalogTrigger()) {
       wpi_setErrorWithContext(
           -1, "Analog Triggers not supported for DigitalGlitchFilters");

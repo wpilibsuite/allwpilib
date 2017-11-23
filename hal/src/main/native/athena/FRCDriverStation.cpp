@@ -7,14 +7,15 @@
 
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <cstdlib>
 #include <cstring>
 #include <limits>
-#include <mutex>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
+#include <FRC_NetworkCommunication/NetCommRPCProxy_Occur.h>
 #include <llvm/raw_ostream.h>
+#include <support/condition_variable.h>
+#include <support/mutex.h>
 
 #include "HAL/DriverStation.h"
 
@@ -26,17 +27,12 @@ struct HAL_JoystickAxesInt {
   int16_t axes[HAL_kMaxJoystickAxes];
 };
 
-static std::mutex msgMutex;
-static std::condition_variable newDSDataAvailableCond;
-static std::mutex newDSDataAvailableMutex;
+static wpi::mutex msgMutex;
+static wpi::condition_variable newDSDataAvailableCond;
+static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 
 extern "C" {
-
-int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
-                         int32_t waitMs) {
-  return setErrorData(errors, errorsLength, waitMs);
-}
 
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
@@ -44,7 +40,7 @@ int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard<std::mutex> lock(msgMutex);
+  std::lock_guard<wpi::mutex> lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -230,6 +226,67 @@ double HAL_GetMatchTime(int32_t* status) {
   return matchTime;
 }
 
+int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+  uint16_t gameSpecificMessageSize = 0;
+  int status = FRC_NetworkCommunication_getMatchInfo(
+      nullptr, nullptr, nullptr, nullptr, nullptr, &gameSpecificMessageSize);
+  if (status < 0) {
+    info->eventName = nullptr;
+    info->gameSpecificMessage = nullptr;
+    return status;
+  }
+  info->eventName = static_cast<char*>(std::malloc(256));
+  gameSpecificMessageSize = ((gameSpecificMessageSize + 1023) / 1024) * 1024;
+  uint16_t originalGameSpecificSize = gameSpecificMessageSize;
+  uint8_t* gameSpecificMessage =
+      static_cast<uint8_t*>(std::malloc(gameSpecificMessageSize));
+  MatchType_t matchType = MatchType_t::kMatchType_none;
+  uint16_t matchNumber = 0;
+  uint8_t replayNumber = 0;
+  status = FRC_NetworkCommunication_getMatchInfo(
+      info->eventName, &matchType, &matchNumber, &replayNumber,
+      gameSpecificMessage, &gameSpecificMessageSize);
+  if (status < 0) {
+    std::free(info->eventName);
+    std::free(gameSpecificMessage);
+    info->eventName = nullptr;
+    info->gameSpecificMessage = nullptr;
+    return status;
+  }
+  if (gameSpecificMessageSize >= originalGameSpecificSize) {
+    // Data has updated between size and read calls. Retry.
+    // Unless large lag, this call will be right.
+    std::free(gameSpecificMessage);
+    gameSpecificMessageSize = ((gameSpecificMessageSize + 1023) / 1024) * 1024;
+    gameSpecificMessage =
+        static_cast<uint8_t*>(std::malloc(gameSpecificMessageSize));
+    int status = FRC_NetworkCommunication_getMatchInfo(
+        nullptr, nullptr, nullptr, nullptr, gameSpecificMessage,
+        &gameSpecificMessageSize);
+    if (status < 0) {
+      std::free(info->eventName);
+      std::free(gameSpecificMessage);
+      info->eventName = nullptr;
+      info->gameSpecificMessage = nullptr;
+      return status;
+    }
+  }
+  info->eventName[255] = '\0';
+  info->matchType = static_cast<HAL_MatchType>(matchType);
+  info->matchNumber = matchNumber;
+  info->replayNumber = replayNumber;
+  info->gameSpecificMessage = reinterpret_cast<char*>(gameSpecificMessage);
+  info->gameSpecificMessage[gameSpecificMessageSize] = '\0';
+  return status;
+}
+
+void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
+  std::free(info->eventName);
+  std::free(info->gameSpecificMessage);
+  info->eventName = nullptr;
+  info->gameSpecificMessage = nullptr;
+}
+
 void HAL_ObserveUserProgramStarting(void) {
   FRC_NetworkCommunication_observeUserProgramStarting();
 }
@@ -258,7 +315,7 @@ bool HAL_IsNewControlData(void) {
   thread_local int lastCount{-1};
   int currentCount = 0;
   {
-    std::unique_lock<std::mutex> lock(newDSDataAvailableMutex);
+    std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
     currentCount = newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;
@@ -280,7 +337,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<std::mutex> lock(newDSDataAvailableMutex);
+  std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
   int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
@@ -295,22 +352,17 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   return true;
 }
 
-// Internal NetComm function to set new packet callback
-extern int NetCommRPCProxy_SetOccurFuncPointer(
-    int32_t (*occurFunc)(uint32_t refNum));
-
 // Constant number to be used for our occur handle
 constexpr int32_t refNumber = 42;
 
-static int32_t newDataOccur(uint32_t refNum) {
+static void newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
-  if (refNum != refNumber) return 0;
-  std::lock_guard<std::mutex> lock(newDSDataAvailableMutex);
+  if (refNum != refNumber) return;
+  std::lock_guard<wpi::mutex> lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
   newDSDataAvailableCond.notify_all();
-  return 0;
 }
 
 /*
@@ -320,11 +372,11 @@ static int32_t newDataOccur(uint32_t refNum) {
  */
 void HAL_InitializeDriverStation(void) {
   static std::atomic_bool initialized{false};
-  static std::mutex initializeMutex;
+  static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<std::mutex> lock(initializeMutex);
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

@@ -15,11 +15,6 @@
 
 using namespace frc;
 
-const int ADXL345_SPI::kPowerCtlRegister;
-const int ADXL345_SPI::kDataFormatRegister;
-const int ADXL345_SPI::kDataRegister;
-constexpr double ADXL345_SPI::kGsPerLSB;
-
 /**
  * Constructor.
  *

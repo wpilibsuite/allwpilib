@@ -59,7 +59,7 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   // First and one-time initialization
   inst.GetTable("LiveWindow")
-      ->GetSubTable("~STATUS~")
+      ->GetSubTable(".status")
       ->GetEntry("LW Enabled")
       .SetBoolean(false);
 
@@ -68,45 +68,51 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
 /**
  * Determine if the Robot is currently enabled.
+ *
  * @return True if the Robot is currently enabled by the field controls.
  */
 bool RobotBase::IsEnabled() const { return m_ds.IsEnabled(); }
 
 /**
  * Determine if the Robot is currently disabled.
+ *
  * @return True if the Robot is currently disabled by the field controls.
  */
 bool RobotBase::IsDisabled() const { return m_ds.IsDisabled(); }
 
 /**
  * Determine if the robot is currently in Autonomous mode.
+ *
  * @return True if the robot is currently operating Autonomously as determined
- * by the field controls.
+ *         by the field controls.
  */
 bool RobotBase::IsAutonomous() const { return m_ds.IsAutonomous(); }
 
 /**
  * Determine if the robot is currently in Operator Control mode.
+ *
  * @return True if the robot is currently operating in Tele-Op mode as
- * determined by the field controls.
+ *         determined by the field controls.
  */
 bool RobotBase::IsOperatorControl() const { return m_ds.IsOperatorControl(); }
 
 /**
  * Determine if the robot is currently in Test mode.
+ *
  * @return True if the robot is currently running tests as determined by the
- * field controls.
+ *         field controls.
  */
 bool RobotBase::IsTest() const { return m_ds.IsTest(); }
 
 /**
  * Indicates if new data is available from the driver station.
+ *
  * @return Has new data arrived over the network since the last time this
- * function was called?
+ *         function was called?
  */
 bool RobotBase::IsNewDataAvailable() const { return m_ds.IsNewControlData(); }
 
 /**
- * Gets the ID of the main robot thread
+ * Gets the ID of the main robot thread.
  */
 std::thread::id RobotBase::GetThreadId() { return m_threadId; }

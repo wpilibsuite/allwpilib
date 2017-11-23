@@ -14,8 +14,9 @@
 namespace frc {
 
 /**
- * A {@link TimedCommand} will wait for a timeout before finishing.
- * {@link TimedCommand} is used to execute a command for a given amount of time.
+ * A TimedCommand will wait for a timeout before finishing.
+ *
+ * TimedCommand is used to execute a command for a given amount of time.
  */
 class TimedCommand : public Command {
  public:

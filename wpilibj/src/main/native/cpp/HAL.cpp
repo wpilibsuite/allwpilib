@@ -120,7 +120,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_report(
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_nativeGetControlWord(JNIEnv*, jclass) {
   NETCOMM_LOG(logDEBUG) << "Calling HAL Control Word";
-  static_assert(sizeof(HAL_ControlWord) == sizeof(jint), 
+  static_assert(sizeof(HAL_ControlWord) == sizeof(jint),
       "Java int must match the size of control word");
   HAL_ControlWord controlWord;
   std::memset(&controlWord, 0, sizeof(HAL_ControlWord));
@@ -285,7 +285,7 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getJoystickAxisType(JNIEnv*, jclass,
  * Method:    isNewControlData
  * Signature: ()Z
  */
-JNIEXPORT jboolean JNICALL 
+JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_hal_HAL_isNewControlData(JNIEnv *, jclass) {
   return static_cast<jboolean>(HAL_IsNewControlData());
 }
@@ -315,8 +315,8 @@ Java_edu_wpi_first_wpilibj_hal_HAL_releaseDSMutex(JNIEnv* env, jclass) {
  * Method:    waitForDSDataTimeout
  * Signature: (D)Z
  */
-JNIEXPORT jboolean JNICALL 
-Java_edu_wpi_first_wpilibj_hal_HAL_waitForDSDataTimeout(JNIEnv *, jclass, 
+JNIEXPORT jboolean JNICALL
+Java_edu_wpi_first_wpilibj_hal_HAL_waitForDSDataTimeout(JNIEnv *, jclass,
                                                         jdouble timeout) {
   return static_cast<jboolean>(HAL_WaitForDSDataTimeout(timeout));
 }
@@ -359,19 +359,20 @@ Java_edu_wpi_first_wpilibj_hal_HAL_getBrownedOut(JNIEnv* env, jclass) {
 }
 
 /*
- * Class: edu_wpi_first_wpilibj_hal_HAL
- * Method:    HAL_SetErrorData
- * Signature: (Ljava/lang/String;)I
+ * Class:     edu_wpi_first_wpilibj_hal_HAL
+ * Method:    getMatchInfo
+ * Signature: (Ledu/wpi/first/wpilibj/hal/MatchInfoData;)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_HAL_setErrorData(JNIEnv* env, jclass,
-                                                jstring error) {
-  JStringRef errorStr{env, error};
-
-  NETCOMM_LOG(logDEBUG) << "Set Error: " << errorStr.c_str();
-  NETCOMM_LOG(logDEBUG) << "Length: " << errorStr.size();
-  jint returnValue = HAL_SetErrorData(errorStr.c_str(), (int32_t)errorStr.size(), 0);
-  return returnValue;
+Java_edu_wpi_first_wpilibj_hal_HAL_getMatchInfo
+(JNIEnv * env, jclass, jobject info) {
+  HAL_MatchInfo matchInfo;
+  auto status = HAL_GetMatchInfo(&matchInfo);
+  if (status == 0) {
+    SetMatchInfoObject(env, info, matchInfo);
+  }
+  HAL_FreeMatchInfo(&matchInfo);
+  return status;
 }
 
 /*

@@ -11,34 +11,32 @@
 #include <pthread.h>
 #endif
 
-#include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
-#include <mutex>
+#include <cstring>
 #include <string>
 
-#include "MockData/DriverStationDataInternal.h"
+#include <support/condition_variable.h>
+#include <support/mutex.h>
 
-static std::mutex msgMutex;
-static std::condition_variable newDSDataAvailableCond;
-static std::mutex newDSDataAvailableMutex;
+#include "MockData/DriverStationDataInternal.h"
+#include "MockData/MockHooks.h"
+
+static wpi::mutex msgMutex;
+static wpi::condition_variable newDSDataAvailableCond;
+static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
 
 using namespace hal;
 
 extern "C" {
-int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
-                         int32_t waitMs) {
-  return 0;
-}
-
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg) {
   // Avoid flooding console by keeping track of previous 5 error
   // messages and only printing again if they're longer than 1 second old.
   static constexpr int KEEP_MSGS = 5;
-  std::lock_guard<std::mutex> lock(msgMutex);
+  std::lock_guard<wpi::mutex> lock(msgMutex);
   static std::string prevMsg[KEEP_MSGS];
   static std::chrono::time_point<std::chrono::steady_clock>
       prevMsgTime[KEEP_MSGS];
@@ -102,15 +100,18 @@ HAL_AllianceStationID HAL_GetAllianceStation(int32_t* status) {
 }
 
 int32_t HAL_GetJoystickAxes(int32_t joystickNum, HAL_JoystickAxes* axes) {
+  SimDriverStationData.GetJoystickAxes(joystickNum, axes);
   return 0;
 }
 
 int32_t HAL_GetJoystickPOVs(int32_t joystickNum, HAL_JoystickPOVs* povs) {
+  SimDriverStationData.GetJoystickPOVs(joystickNum, povs);
   return 0;
 }
 
 int32_t HAL_GetJoystickButtons(int32_t joystickNum,
                                HAL_JoystickButtons* buttons) {
+  SimDriverStationData.GetJoystickButtons(joystickNum, buttons);
   return 0;
 }
 /**
@@ -126,16 +127,29 @@ int32_t HAL_GetJoystickButtons(int32_t joystickNum,
  */
 int32_t HAL_GetJoystickDescriptor(int32_t joystickNum,
                                   HAL_JoystickDescriptor* desc) {
+  SimDriverStationData.GetJoystickDescriptor(joystickNum, desc);
   return 0;
 }
 
-HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) { return false; }
+HAL_Bool HAL_GetJoystickIsXbox(int32_t joystickNum) {
+  HAL_JoystickDescriptor desc;
+  SimDriverStationData.GetJoystickDescriptor(joystickNum, &desc);
+  return desc.isXbox;
+}
 
-int32_t HAL_GetJoystickType(int32_t joystickNum) { return 0; }
+int32_t HAL_GetJoystickType(int32_t joystickNum) {
+  HAL_JoystickDescriptor desc;
+  SimDriverStationData.GetJoystickDescriptor(joystickNum, &desc);
+  return desc.type;
+}
 
 char* HAL_GetJoystickName(int32_t joystickNum) {
-  char* name = static_cast<char*>(std::malloc(1));
-  name[0] = '\0';
+  HAL_JoystickDescriptor desc;
+  SimDriverStationData.GetJoystickDescriptor(joystickNum, &desc);
+  size_t len = std::strlen(desc.name);
+  char* name = static_cast<char*>(std::malloc(len + 1));
+  std::strncpy(name, desc.name, len);
+  name[len] = '\0';
   return name;
 }
 
@@ -145,6 +159,8 @@ int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis) { return 0; }
 
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble) {
+  SimDriverStationData.SetJoystickOutputs(joystickNum, outputs, leftRumble,
+                                          rightRumble);
   return 0;
 }
 
@@ -152,9 +168,16 @@ double HAL_GetMatchTime(int32_t* status) {
   return SimDriverStationData.GetMatchTime();
 }
 
-void HAL_ObserveUserProgramStarting(void) {
-  // TODO
+int HAL_GetMatchInfo(HAL_MatchInfo* info) {
+  SimDriverStationData.GetMatchInfo(info);
+  return 0;
 }
+
+void HAL_FreeMatchInfo(HAL_MatchInfo* info) {
+  SimDriverStationData.FreeMatchInfo(info);
+}
+
+void HAL_ObserveUserProgramStarting(void) { HALSIM_SetProgramStarted(); }
 
 void HAL_ObserveUserProgramDisabled(void) {
   // TODO
@@ -198,7 +221,7 @@ bool HAL_IsNewControlData(void) {
   // worth the cycles to check.
   int currentCount = 0;
   {
-    std::unique_lock<std::mutex> lock(newDSDataAvailableMutex);
+    std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
     currentCount = newDSDataAvailableCounter;
   }
   if (lastCount == currentCount) return false;
@@ -220,7 +243,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   auto timeoutTime =
       std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
 
-  std::unique_lock<std::mutex> lock(newDSDataAvailableMutex);
+  std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
   int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
@@ -242,7 +265,7 @@ static int32_t newDataOccur(uint32_t refNum) {
   // Since we could get other values, require our specific handle
   // to signal our threads
   if (refNum != refNumber) return 0;
-  std::lock_guard<std::mutex> lock(newDSDataAvailableMutex);
+  std::lock_guard<wpi::mutex> lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
   newDSDataAvailableCond.notify_all();
@@ -256,11 +279,11 @@ static int32_t newDataOccur(uint32_t refNum) {
  */
 void HAL_InitializeDriverStation(void) {
   static std::atomic_bool initialized{false};
-  static std::mutex initializeMutex;
+  static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<std::mutex> lock(initializeMutex);
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
 

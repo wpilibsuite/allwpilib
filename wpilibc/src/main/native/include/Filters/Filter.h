@@ -23,7 +23,7 @@ class Filter : public PIDSource {
 
   // PIDSource interface
   void SetPIDSourceType(PIDSourceType pidSource) override;
-  PIDSourceType GetPIDSourceType() const;
+  PIDSourceType GetPIDSourceType() const override;
   double PIDGet() override = 0;
 
   /**

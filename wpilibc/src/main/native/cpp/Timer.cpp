@@ -22,8 +22,8 @@ namespace frc {
  *
  * Pause the execution of the program for a specified period of time given in
  * seconds. Motors will continue to run at their last assigned values, and
- * sensors will continue to update. Only the task containing the wait will
- * pause until the wait time is expired.
+ * sensors will continue to update. Only the task containing the wait will pause
+ * until the wait time is expired.
  *
  * @param seconds Length of time to pause, in seconds.
  */
@@ -34,13 +34,15 @@ void Wait(double seconds) {
 
 /**
  * Return the FPGA system clock time in seconds.
+ *
  * This is deprecated and just forwards to Timer::GetFPGATimestamp().
+ *
  * @return Robot running time in seconds.
  */
 double GetClock() { return Timer::GetFPGATimestamp(); }
 
 /**
- * @brief Gives real-time clock system time with nanosecond resolution
+ * @brief  Gives real-time clock system time with nanosecond resolution
  * @return The time, just in case you want the robot to start autonomous at 8pm
  *         on Saturday.
  */
@@ -63,14 +65,9 @@ const double Timer::kRolloverTime = (1ll << 32) / 1e6;
  * Create a new timer object.
  *
  * Create a new timer object and reset the time to zero. The timer is initially
- * not running and
- * must be started.
+ * not running and must be started.
  */
-Timer::Timer() {
-  // Creates a semaphore to control access to critical regions.
-  // Initially 'open'
-  Reset();
-}
+Timer::Timer() { Reset(); }
 
 /**
  * Get the current time from the timer. If the clock is running it is derived
@@ -83,11 +80,11 @@ double Timer::Get() const {
   double result;
   double currentTime = GetFPGATimestamp();
 
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   if (m_running) {
-    // If the current time is before the start time, then the FPGA clock
-    // rolled over.  Compensate by adding the ~71 minutes that it takes
-    // to roll over to the current time.
+    // If the current time is before the start time, then the FPGA clock rolled
+    // over. Compensate by adding the ~71 minutes that it takes to roll over to
+    // the current time.
     if (currentTime < m_startTime) {
       currentTime += kRolloverTime;
     }
@@ -107,7 +104,7 @@ double Timer::Get() const {
  * now.
  */
 void Timer::Reset() {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   m_accumulatedTime = 0;
   m_startTime = GetFPGATimestamp();
 }
@@ -119,7 +116,7 @@ void Timer::Reset() {
  * relative to the system clock.
  */
 void Timer::Start() {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   if (!m_running) {
     m_startTime = GetFPGATimestamp();
     m_running = true;
@@ -136,7 +133,7 @@ void Timer::Start() {
 void Timer::Stop() {
   double temp = Get();
 
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> sync(m_mutex);
   if (m_running) {
     m_accumulatedTime = temp;
     m_running = false;
@@ -149,11 +146,11 @@ void Timer::Stop() {
  * work without drifting later by the time it took to get around to checking.
  *
  * @param period The period to check for (in seconds).
- * @return True if the period has passed.
+ * @return       True if the period has passed.
  */
 bool Timer::HasPeriodPassed(double period) {
   if (Get() > period) {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> sync(m_mutex);
     // Advance the start time by the period.
     m_startTime += period;
     // Don't set it to the current time... we want to avoid drift.
@@ -178,14 +175,13 @@ double Timer::GetFPGATimestamp() {
 
 /**
  * Return the approximate match time The FMS does not currently send the
- * official match time to
- * the robots This returns the time since the enable signal sent from the Driver
- * Station At the
- * beginning of autonomous, the time is reset to 0.0 seconds At the beginning of
- * teleop, the time
- * is reset to +15.0 seconds If the robot is disabled, this returns 0.0 seconds
- * Warning: This is
- * not an official time (so it cannot be used to argue with referees).
+ * official match time to the robots This returns the time since the enable
+ * signal sent from the Driver Station At the beginning of autonomous, the time
+ * is reset to 0.0 seconds At the beginning of teleop, the time is reset to
+ * +15.0 seconds If the robot is disabled, this returns 0.0 seconds.
+ *
+ * Warning: This is not an official time (so it cannot be used to argue with
+ * referees).
  *
  * @return Match time in seconds since the beginning of autonomous
  */

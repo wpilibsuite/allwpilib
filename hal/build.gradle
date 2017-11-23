@@ -108,6 +108,11 @@ model {
                         }
                     }
                 }
+                binaries.all { binary ->
+                    if (binary.targetPlatform.operatingSystem.linux) {
+                        linker.args "-ldl"
+                    }
+                }
             }
             if (project.hasProperty('buildHalStaticDeps')) {
                 halSimStaticDeps(NativeLibrarySpec) {
@@ -194,6 +199,32 @@ model {
                             }
                         }
                     }
+                }
+            }
+        }
+        getHeaders(Task) {
+            def list = []
+            $.components.each {
+                if (it in NativeLibrarySpec && (it.name == 'halAthena' || it.name == 'halSim')) {
+                    it.sources.each {
+                        it.exportedHeaders.srcDirs.each {
+                            list.add(it)
+                        }
+                    }
+                    it.binaries.each {
+                        it.libs.each {
+                            it.includeRoots.each {
+                                list.add(it)
+                            }
+                        }
+                    }
+                }
+            }
+            list = list.unique(false)
+            doLast {
+                list.each {
+                    print "WPIHEADER: "
+                    println it
                 }
             }
         }

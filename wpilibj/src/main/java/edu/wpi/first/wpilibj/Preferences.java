@@ -63,6 +63,7 @@ public class Preferences {
    */
   private Preferences() {
     m_table = NetworkTableInstance.getDefault().getTable(TABLE_NAME);
+    m_table.getEntry(".type").setString("RobotPreferences");
     // Listener to set all Preferences values to persistent
     // (for backwards compatibility with old dashboards).
     m_table.addEntryListener(

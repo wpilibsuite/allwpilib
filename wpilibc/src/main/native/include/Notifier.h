@@ -11,10 +11,11 @@
 
 #include <atomic>
 #include <functional>
-#include <mutex>
+#include <thread>
 #include <utility>
 
 #include <HAL/Notifier.h>
+#include <support/mutex.h>
 
 #include "ErrorBase.h"
 
@@ -36,6 +37,7 @@ class Notifier : public ErrorBase {
   Notifier(const Notifier&) = delete;
   Notifier& operator=(const Notifier&) = delete;
 
+  void SetHandler(TimerEventHandler handler);
   void StartSingle(double delay);
   void StartPeriodic(double period);
   void Stop();
@@ -43,22 +45,23 @@ class Notifier : public ErrorBase {
  private:
   // update the HAL alarm
   void UpdateAlarm();
-  // HAL callback
-  static void Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle);
-
-  // used to constrain execution between destructors and callback
-  static std::mutex m_destructorMutex;
+  // the thread waiting on the HAL alarm
+  std::thread m_thread;
   // held while updating process information
-  std::mutex m_processMutex;
+  wpi::mutex m_processMutex;
   // HAL handle, atomic for proper destruction
   std::atomic<HAL_NotifierHandle> m_notifier{0};
-  // address of the handler
+
+  // Address of the handler
   TimerEventHandler m_handler;
-  // the absolute expiration time
+
+  // The absolute expiration time
   double m_expirationTime = 0;
-  // the relative time (either periodic or single)
+
+  // The relative time (either periodic or single)
   double m_period = 0;
-  // true if this is a periodic event
+
+  // True if this is a periodic event
   bool m_periodic = false;
 };
 

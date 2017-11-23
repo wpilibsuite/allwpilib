@@ -14,88 +14,52 @@ import edu.wpi.first.wpilibj.hal.NotifierJNI;
 
 public class Notifier {
 
-  private static class Process implements NotifierJNI.NotifierJNIHandlerFunction {
-    // The lock for the process information.
-    private final ReentrantLock m_processLock = new ReentrantLock();
-    // The C pointer to the notifier object. We don't use it directly, it is
-    // just passed to the JNI bindings.
-    AtomicInteger m_notifier = new AtomicInteger();
-    // The time, in microseconds, at which the corresponding handler should be
-    // called. Has the same zero as Utility.getFPGATime().
-    private double m_expirationTime = 0;
-    // The handler passed in by the user which should be called at the
-    // appropriate interval.
-    private Runnable m_handler;
-    // Whether we are calling the handler just once or periodically.
-    private boolean m_periodic = false;
-    // If periodic, the period of the calling; if just once, stores how long it
-    // is until we call the handler.
-    private double m_period = 0;
-    // Lock on the handler so that the handler is not called before it has
-    // completed. This is only relevant if the handler takes a very long time
-    // to complete (or the period is very short) and when everything is being
-    // destructed.
-    private final ReentrantLock m_handlerLock = new ReentrantLock();
+  // The thread waiting on the HAL alarm.
+  private final Thread m_thread;
+  // The lock for the process information.
+  private final ReentrantLock m_processLock = new ReentrantLock();
+  // The C pointer to the notifier object. We don't use it directly, it is
+  // just passed to the JNI bindings.
+  private final AtomicInteger m_notifier = new AtomicInteger();
+  // The time, in microseconds, at which the corresponding handler should be
+  // called. Has the same zero as Utility.getFPGATime().
+  private double m_expirationTime = 0;
+  // The handler passed in by the user which should be called at the
+  // appropriate interval.
+  private Runnable m_handler;
+  // Whether we are calling the handler just once or periodically.
+  private boolean m_periodic = false;
+  // If periodic, the period of the calling; if just once, stores how long it
+  // is until we call the handler.
+  private double m_period = 0;
 
-    public Process(Runnable run) {
-      m_handler = run;
-      m_notifier.set(NotifierJNI.initializeNotifier(this));
-    }
-
-    @Override
-    @SuppressWarnings("NoFinalizer")
-    protected void finalize() {
-      int handle = m_notifier.getAndSet(0);
-      NotifierJNI.cleanNotifier(handle);
-      m_handlerLock.lock();
-    }
-
-    /**
-     * Update the alarm hardware to reflect the next alarm.
-     */
-    private void updateAlarm() {
-      NotifierJNI.updateNotifierAlarm(m_notifier.get(), (long) (m_expirationTime * 1e6));
-    }
-
-    /**
-     * Handler which is called by the HAL library; it handles the subsequent calling of the user
-     * handler.
-     */
-    @Override
-    public void apply(long time) {
-      m_processLock.lock();
-      if (m_periodic) {
-        m_expirationTime += m_period;
-        updateAlarm();
-      }
-
-      m_handlerLock.lock();
-      m_processLock.unlock();
-
-      m_handler.run();
-      m_handlerLock.unlock();
-    }
-
-    public void start(double period, boolean periodic) {
-      synchronized (m_processLock) {
-        m_periodic = periodic;
-        m_period = period;
-        m_expirationTime = Utility.getFPGATime() * 1e-6 + period;
-        updateAlarm();
+  @Override
+  @SuppressWarnings("NoFinalizer")
+  protected void finalize() {
+    int handle = m_notifier.getAndSet(0);
+    NotifierJNI.stopNotifier(handle);
+    // Join the thread to ensure the handler has exited.
+    if (m_thread.isAlive()) {
+      try {
+        m_thread.interrupt();
+        m_thread.join();
+      } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
       }
     }
-
-    public void stop() {
-      NotifierJNI.stopNotifierAlarm(m_notifier.get());
-
-      // Wait for a currently executing handler to complete before returning
-      // from stop()
-      m_handlerLock.lock();
-      m_handlerLock.unlock();
-    }
+    NotifierJNI.cleanNotifier(handle);
   }
 
-  private Process m_process;
+  /**
+   * Update the alarm hardware to reflect the next alarm.
+   */
+  private void updateAlarm() {
+    int notifier = m_notifier.get();
+    if (notifier == 0) {
+      return;
+    }
+    NotifierJNI.updateNotifierAlarm(notifier, (long) (m_expirationTime * 1e6));
+  }
 
   /**
    * Create a Notifier for timer event notification.
@@ -104,7 +68,53 @@ public class Notifier {
    *            or StartPeriodic.
    */
   public Notifier(Runnable run) {
-    m_process = new Process(run);
+    m_handler = run;
+    m_notifier.set(NotifierJNI.initializeNotifier());
+
+    m_thread = new Thread(() -> {
+      while (!Thread.interrupted()) {
+        int notifier = m_notifier.get();
+        if (notifier == 0) {
+          break;
+        }
+        long curTime = NotifierJNI.waitForNotifierAlarm(notifier);
+        if (curTime == 0) {
+          break;
+        }
+
+        Runnable handler = null;
+        m_processLock.lock();
+        try {
+          handler = m_handler;
+          if (m_periodic) {
+            m_expirationTime += m_period;
+            updateAlarm();
+          }
+        } finally {
+          m_processLock.unlock();
+        }
+
+        if (handler != null) {
+          handler.run();
+        }
+      }
+    });
+    m_thread.setDaemon(true);
+    m_thread.start();
+  }
+
+  /**
+   * Change the handler function.
+   *
+   * @param handler Handler
+   */
+  public void setHandler(Runnable handler) {
+    m_processLock.lock();
+    try {
+      m_handler = handler;
+    } finally {
+      m_processLock.unlock();
+    }
   }
 
   /**
@@ -114,7 +124,15 @@ public class Notifier {
    * @param delay Seconds to wait before the handler is called.
    */
   public void startSingle(double delay) {
-    m_process.start(delay, false);
+    m_processLock.lock();
+    try {
+      m_periodic = false;
+      m_period = delay;
+      m_expirationTime = Utility.getFPGATime() * 1e-6 + delay;
+      updateAlarm();
+    } finally {
+      m_processLock.unlock();
+    }
   }
 
   /**
@@ -126,15 +144,23 @@ public class Notifier {
    *               method.
    */
   public void startPeriodic(double period) {
-    m_process.start(period, true);
+    m_processLock.lock();
+    try {
+      m_periodic = true;
+      m_period = period;
+      m_expirationTime = Utility.getFPGATime() * 1e-6 + period;
+      updateAlarm();
+    } finally {
+      m_processLock.unlock();
+    }
   }
 
   /**
-   * Stop timer events from occuring. Stop any repeating timer events from occuring. This will also
-   * remove any single notification events from the queue. If a timer-based call to the registered
-   * handler is in progress, this function will block until the handler call is complete.
+   * Stop timer events from occurring. Stop any repeating timer events from occurring. This will
+   * also remove any single notification events from the queue. If a timer-based call to the
+   * registered handler is in progress, this function will block until the handler call is complete.
    */
   public void stop() {
-    m_process.stop();
+    NotifierJNI.cancelNotifierAlarm(m_notifier.get());
   }
 }

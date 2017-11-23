@@ -52,7 +52,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     @SuppressWarnings("MemberName")
     public final byte value;
 
-    private Axes(byte value) {
+    Axes(byte value) {
       this.value = value;
     }
   }
@@ -144,7 +144,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
    * @return Acceleration of the ADXL345 in Gs.
    */
   public double getAcceleration(Axes axis) {
-    ByteBuffer rawAccel = ByteBuffer.allocateDirect(2);
+    ByteBuffer rawAccel = ByteBuffer.allocate(2);
     m_i2c.read(kDataRegister + axis.value, 2, rawAccel);
 
     // Sensor is little endian... swap bytes
@@ -159,7 +159,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
    */
   public AllAxes getAccelerations() {
     AllAxes data = new AllAxes();
-    ByteBuffer rawData = ByteBuffer.allocateDirect(6);
+    ByteBuffer rawData = ByteBuffer.allocate(6);
     m_i2c.read(kDataRegister, 6, rawData);
 
     // Sensor is little endian... swap bytes

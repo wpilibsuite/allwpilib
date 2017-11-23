@@ -224,15 +224,6 @@ model {
             sharedConfigs = [ wpilibJNIShared: [] ]
             staticConfigs = [ wpilibJNIStatic: [] ]
         }
-        opencv(DependencyConfig) {
-            groupId = 'org.opencv'
-            artifactId = 'opencv-cpp'
-            headerClassifier = 'headers'
-            ext = 'zip'
-            version = '3.2.0'
-            sharedConfigs = [ wpilibJNIShared: [] ]
-            staticConfigs = [ wpilibJNIStatic: [] ]
-        }
     }
     components {
         wpilibJNIStatic(NativeLibrarySpec) {
@@ -280,6 +271,36 @@ model {
         }
         withType(StaticLibraryBinarySpec) {
             it.buildable = false
+        }
+    }
+    tasks {
+        getHeaders(Task) {
+            def list = []
+            $.components.each {
+                if (it in NativeLibrarySpec && it.name == 'wpilibJNIStatic') {
+                    it.sources.each {
+                        it.exportedHeaders.srcDirs.each {
+                            list.add(it)
+                        }
+                    }
+                    it.binaries.each {
+                        it.libs.each {
+                            it.includeRoots.each {
+                                list.add(it)
+                            }
+                        }
+                    }
+                }
+            }
+            // use file to normalize this dir
+            list.add(file("$buildDir/wpilibJNIStatic/jniinclude"))
+            list = list.unique(false)
+            doLast {
+                list.each {
+                    print "WPIHEADER: "
+                    println it
+                }
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ public class SmartDashboard {
    */
   public static void putData(String key, Sendable data) {
     NetworkTable dataTable = table.getSubTable(key);
-    dataTable.getEntry("~TYPE~").setString(data.getSmartDashboardType());
+    dataTable.getEntry(".type").setString(data.getSmartDashboardType());
     data.initTable(dataTable);
     tablesToData.put(dataTable, data);
   }

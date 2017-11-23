@@ -14,12 +14,6 @@
 
 using namespace frc;
 
-const int ADXL345_I2C::kAddress;
-const int ADXL345_I2C::kPowerCtlRegister;
-const int ADXL345_I2C::kDataFormatRegister;
-const int ADXL345_I2C::kDataRegister;
-constexpr double ADXL345_I2C::kGsPerLSB;
-
 /**
  * Constructs the ADXL345 Accelerometer over I2C.
  *

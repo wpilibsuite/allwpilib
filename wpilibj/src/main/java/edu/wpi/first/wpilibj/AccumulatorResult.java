@@ -18,8 +18,16 @@ public class AccumulatorResult {
   @SuppressWarnings("MemberName")
   public long value;
   /**
-   * The number of sample vaule was accumulated over.
+   * The number of sample value was accumulated over.
    */
   @SuppressWarnings("MemberName")
   public long count;
+
+  /**
+   * Set the value and count.
+   */
+  public void set(long value, long count) {
+    this.value = value;
+    this.count = count;
+  }
 }

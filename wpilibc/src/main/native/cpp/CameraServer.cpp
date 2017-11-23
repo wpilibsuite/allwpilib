@@ -7,6 +7,7 @@
 
 #include "CameraServer.h"
 
+#include <HAL/HAL.h>
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
@@ -64,7 +65,7 @@ static std::string MakeStreamValue(llvm::StringRef address, int port) {
 
 std::shared_ptr<nt::NetworkTable> CameraServer::GetSourceTable(
     CS_Source source) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   return m_tables.lookup(source);
 }
 
@@ -126,7 +127,7 @@ std::vector<std::string> CameraServer::GetSourceStreamValues(CS_Source source) {
 }
 
 void CameraServer::UpdateStreamValues() {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   // Over all the sinks...
   for (const auto& i : m_sinks) {
     CS_Status status = 0;
@@ -176,64 +177,7 @@ static std::string PixelFormatToString(int pixelFormat) {
       return "Unknown";
   }
 }
-#if 0
-static cs::VideoMode::PixelFormat PixelFormatFromString(llvm::StringRef str) {
-  if (str == "MJPEG" || str == "mjpeg" || str == "JPEG" || str == "jpeg")
-    return cs::VideoMode::PixelFormat::kMJPEG;
-  if (str == "YUYV" || str == "yuyv") return cs::VideoMode::PixelFormat::kYUYV;
-  if (str == "RGB565" || str == "rgb565")
-    return cs::VideoMode::PixelFormat::kRGB565;
-  if (str == "BGR" || str == "bgr") return cs::VideoMode::PixelFormat::kBGR;
-  if (str == "GRAY" || str == "Gray" || str == "gray")
-    return cs::VideoMode::PixelFormat::kGray;
-  return cs::VideoMode::PixelFormat::kUnknown;
-}
 
-static cs::VideoMode VideoModeFromString(llvm::StringRef modeStr) {
-  cs::VideoMode mode;
-  size_t pos;
-
-  // width: [0-9]+
-  pos = modeStr.find_first_not_of("0123456789");
-  llvm::StringRef widthStr = modeStr.slice(0, pos);
-  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
-
-  // 'x'
-  if (modeStr.empty() || modeStr[0] != 'x') return mode;
-  modeStr = modeStr.drop_front(1).ltrim();  // drop whitespace too
-
-  // height: [0-9]+
-  pos = modeStr.find_first_not_of("0123456789");
-  llvm::StringRef heightStr = modeStr.slice(0, pos);
-  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
-
-  // format: all characters until whitespace
-  pos = modeStr.find_first_of(" \t\n\v\f\r");
-  llvm::StringRef formatStr = modeStr.slice(0, pos);
-  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
-
-  // fps: [0-9.]+
-  pos = modeStr.find_first_not_of("0123456789.");
-  llvm::StringRef fpsStr = modeStr.slice(0, pos);
-  modeStr = modeStr.drop_front(pos).ltrim();  // drop whitespace too
-
-  // "fps"
-  if (!modeStr.startswith("fps")) return mode;
-
-  // make fps an integer string by dropping after the decimal
-  fpsStr = fpsStr.slice(0, fpsStr.find('.'));
-
-  // convert width, height, and fps to integers
-  if (widthStr.getAsInteger(10, mode.width)) return mode;
-  if (heightStr.getAsInteger(10, mode.height)) return mode;
-  if (fpsStr.getAsInteger(10, mode.fps)) return mode;
-
-  // convert format to enum value
-  mode.pixelFormat = PixelFormatFromString(formatStr);
-
-  return mode;
-}
-#endif
 static std::string VideoModeToString(const cs::VideoMode& mode) {
   std::string rv;
   llvm::raw_string_ostream oss{rv};
@@ -337,7 +281,7 @@ CameraServer::CameraServer()
             // Create subtable for the camera
             auto table = m_publishTable->GetSubTable(event.name);
             {
-              std::lock_guard<std::mutex> lock(m_mutex);
+              std::lock_guard<wpi::mutex> lock(m_mutex);
               m_tables.insert(std::make_pair(event.sourceHandle, table));
             }
             llvm::SmallString<64> buf;
@@ -493,7 +437,10 @@ CameraServer::CameraServer()
 }
 #ifdef __linux__
 cs::UsbCamera CameraServer::StartAutomaticCapture() {
-  return StartAutomaticCapture(m_defaultUsbDevice++);
+  cs::UsbCamera camera = StartAutomaticCapture(m_defaultUsbDevice++);
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
+  return camera;
 }
 
 cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
@@ -503,6 +450,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(int dev) {
 
   cs::UsbCamera camera{name.str(), dev};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 
@@ -510,6 +459,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
                                                   int dev) {
   cs::UsbCamera camera{name, dev};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 
@@ -517,6 +468,8 @@ cs::UsbCamera CameraServer::StartAutomaticCapture(llvm::StringRef name,
                                                   llvm::StringRef path) {
   cs::UsbCamera camera{name, path};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_PCVideoServer,
+             camera.GetHandle());
   return camera;
 }
 #endif
@@ -541,6 +494,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            llvm::StringRef host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_AxisCamera, camera.GetHandle());
   return camera;
 }
 
@@ -548,6 +502,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            const char* host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_AxisCamera, camera.GetHandle());
   return camera;
 }
 
@@ -555,6 +510,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            const std::string& host) {
   cs::AxisCamera camera{name, host};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_AxisCamera, camera.GetHandle());
   return camera;
 }
 
@@ -562,6 +518,7 @@ cs::AxisCamera CameraServer::AddAxisCamera(llvm::StringRef name,
                                            llvm::ArrayRef<std::string> hosts) {
   cs::AxisCamera camera{name, hosts};
   StartAutomaticCapture(camera);
+  HAL_Report(HALUsageReporting::kResourceType_AxisCamera, camera.GetHandle());
   return camera;
 }
 
@@ -577,7 +534,7 @@ void CameraServer::StartAutomaticCapture(const cs::VideoSource& camera) {
 cs::CvSink CameraServer::GetVideo() {
   cs::VideoSource source;
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     if (m_primarySourceName.empty()) {
       wpi_setWPIErrorWithContext(CameraServerError, "no camera available");
       return cs::CvSink{};
@@ -597,7 +554,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
   name += camera.GetName();
 
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     auto it = m_sinks.find(name);
     if (it != m_sinks.end()) {
       auto kind = it->second.GetKind();
@@ -621,7 +578,7 @@ cs::CvSink CameraServer::GetVideo(const cs::VideoSource& camera) {
 cs::CvSink CameraServer::GetVideo(llvm::StringRef name) {
   cs::VideoSource source;
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     auto it = m_sources.find(name);
     if (it == m_sources.end()) {
       llvm::SmallString<64> buf;
@@ -645,7 +602,7 @@ cs::CvSource CameraServer::PutVideo(llvm::StringRef name, int width,
 cs::MjpegServer CameraServer::AddServer(llvm::StringRef name) {
   int port;
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     port = m_nextPort++;
   }
   return AddServer(name, port);
@@ -658,19 +615,19 @@ cs::MjpegServer CameraServer::AddServer(llvm::StringRef name, int port) {
 }
 
 void CameraServer::AddServer(const cs::VideoSink& server) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   m_sinks.emplace_second(server.GetName(), server);
 }
 
 void CameraServer::RemoveServer(llvm::StringRef name) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   m_sinks.erase(name);
 }
 
 cs::VideoSink CameraServer::GetServer() {
   llvm::SmallString<64> name;
   {
-    std::lock_guard<std::mutex> lock(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_mutex);
     if (m_primarySourceName.empty()) {
       wpi_setWPIErrorWithContext(CameraServerError, "no camera available");
       return cs::VideoSink{};
@@ -682,7 +639,7 @@ cs::VideoSink CameraServer::GetServer() {
 }
 
 cs::VideoSink CameraServer::GetServer(llvm::StringRef name) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   auto it = m_sinks.find(name);
   if (it == m_sinks.end()) {
     llvm::SmallString<64> buf;
@@ -696,18 +653,18 @@ cs::VideoSink CameraServer::GetServer(llvm::StringRef name) {
 
 void CameraServer::AddCamera(const cs::VideoSource& camera) {
   std::string name = camera.GetName();
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   if (m_primarySourceName.empty()) m_primarySourceName = name;
   m_sources.emplace_second(name, camera);
 }
 
 void CameraServer::RemoveCamera(llvm::StringRef name) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   m_sources.erase(name);
 }
 
 void CameraServer::SetSize(int size) {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_mutex);
   if (m_primarySourceName.empty()) return;
   auto it = m_sources.find(m_primarySourceName);
   if (it == m_sources.end()) return;

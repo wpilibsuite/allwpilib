@@ -20,9 +20,9 @@ using namespace frc;
 Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
 
 /**
- * Returns the {@link Scheduler}, creating it if one does not exist.
+ * Returns the Scheduler, creating it if one does not exist.
  *
- * @return the {@link Scheduler}
+ * @return the Scheduler
  */
 Scheduler* Scheduler::GetInstance() {
   static Scheduler instance;
@@ -40,7 +40,7 @@ void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
  * @param command The command to be scheduled
  */
 void Scheduler::AddCommand(Command* command) {
-  std::lock_guard<std::mutex> sync(m_additionsLock);
+  std::lock_guard<wpi::mutex> sync(m_additionsLock);
   if (std::find(m_additions.begin(), m_additions.end(), command) !=
       m_additions.end())
     return;
@@ -48,7 +48,7 @@ void Scheduler::AddCommand(Command* command) {
 }
 
 void Scheduler::AddButton(ButtonScheduler* button) {
-  std::lock_guard<std::mutex> sync(m_buttonsLock);
+  std::lock_guard<wpi::mutex> sync(m_buttonsLock);
   m_buttons.push_back(button);
 }
 
@@ -99,14 +99,14 @@ void Scheduler::ProcessCommandAddition(Command* command) {
  * Runs a single iteration of the loop.
  *
  * This method should be called often in order to have a functioning
- * {@link Command} system.  The loop has five stages:
+ * Command system. The loop has five stages:
  *
  * <ol>
- * <li> Poll the Buttons </li>
- * <li> Execute/Remove the Commands </li>
- * <li> Send values to SmartDashboard </li>
- * <li> Add Commands </li>
- * <li> Add Defaults </li>
+ *   <li>Poll the Buttons</li>
+ *   <li>Execute/Remove the Commands</li>
+ *   <li>Send values to SmartDashboard</li>
+ *   <li>Add Commands</li>
+ *   <li>Add Defaults</li>
  * </ol>
  */
 void Scheduler::Run() {
@@ -114,7 +114,7 @@ void Scheduler::Run() {
   {
     if (!m_enabled) return;
 
-    std::lock_guard<std::mutex> sync(m_buttonsLock);
+    std::lock_guard<wpi::mutex> sync(m_buttonsLock);
     for (auto rButtonIter = m_buttons.rbegin(); rButtonIter != m_buttons.rend();
          rButtonIter++) {
       (*rButtonIter)->Execute();
@@ -144,7 +144,7 @@ void Scheduler::Run() {
 
   // Add the new things
   {
-    std::lock_guard<std::mutex> sync(m_additionsLock);
+    std::lock_guard<wpi::mutex> sync(m_additionsLock);
     for (auto additionsIter = m_additions.begin();
          additionsIter != m_additions.end(); additionsIter++) {
       ProcessCommandAddition(*additionsIter);
@@ -166,10 +166,10 @@ void Scheduler::Run() {
 }
 
 /**
- * Registers a {@link Subsystem} to this {@link Scheduler}, so that the {@link
- * Scheduler} might know if a default {@link Command} needs to be run.
+ * Registers a Subsystem to this Scheduler, so that the Scheduler might know if
+ * a default Command needs to be run.
  *
- * All {@link Subsystem Subsystems} should call this.
+ * All Subsystems should call this.
  *
  * @param system the system
  */
@@ -182,7 +182,7 @@ void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
 }
 
 /**
- * Removes the {@link Command} from the {@link Scheduler}.
+ * Removes the Command from the Scheduler.
  *
  * @param command the command to remove
  */
@@ -235,10 +235,8 @@ void Scheduler::UpdateTable() {
       toCancel = new_toCancel->GetDoubleArray();
     else
       toCancel.resize(0);
-    // m_table->RetrieveValue("Ids", *ids);
 
-    // cancel commands that have had the cancel buttons pressed
-    // on the SmartDashboad
+    // Cancel commands whose cancel buttons were pressed on the SmartDashboard
     if (!toCancel.empty()) {
       for (auto commandIter = m_commands.begin();
            commandIter != m_commands.end(); ++commandIter) {

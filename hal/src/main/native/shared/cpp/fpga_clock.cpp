@@ -22,7 +22,7 @@ fpga_clock::time_point fpga_clock::now() noexcept {
   if (status != 0) {
     llvm::errs()
         << "Call to HAL_GetFPGATime failed."
-        << "Initialization might have failed. Time will not be correct";
+        << "Initialization might have failed. Time will not be correct\n";
     llvm::errs().flush();
     return epoch();
   }

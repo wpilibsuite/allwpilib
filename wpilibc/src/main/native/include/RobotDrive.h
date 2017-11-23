@@ -24,6 +24,7 @@ class GenericHID;
 /**
  * Utility class for handling Robot drive based on a definition of the motor
  * configuration.
+ *
  * The robot drive class handles basic driving for a robot. Currently, 2 and 4
  * motor tank and mecanum drive trains are supported. In the future other drive
  * types like swerve might be implemented. Motor channel numbers are passed
@@ -31,9 +32,7 @@ class GenericHID;
  * function (intended for hand created drive code, such as autonomous) or with
  * the Tank/Arcade functions intended to be used for Operator Control driving.
  */
-class WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
-    RobotDrive : public MotorSafety,
-                 public ErrorBase {
+class RobotDrive : public MotorSafety, public ErrorBase {
  public:
   enum MotorType {
     kFrontLeftMotor = 0,
@@ -42,17 +41,25 @@ class WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
     kRearRightMotor = 3
   };
 
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(int leftMotorChannel, int rightMotorChannel);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(int frontLeftMotorChannel, int rearLeftMotorChannel,
              int frontRightMotorChannel, int rearRightMotorChannel);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(SpeedController* leftMotor, SpeedController* rightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(SpeedController& leftMotor, SpeedController& rightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(std::shared_ptr<SpeedController> leftMotor,
              std::shared_ptr<SpeedController> rightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(SpeedController* frontLeftMotor, SpeedController* rearLeftMotor,
              SpeedController* frontRightMotor, SpeedController* rearRightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(SpeedController& frontLeftMotor, SpeedController& rearLeftMotor,
              SpeedController& frontRightMotor, SpeedController& rearRightMotor);
+  WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   RobotDrive(std::shared_ptr<SpeedController> frontLeftMotor,
              std::shared_ptr<SpeedController> rearLeftMotor,
              std::shared_ptr<SpeedController> frontRightMotor,
@@ -106,9 +113,11 @@ class WPI_DEPRECATED("Use DifferentialDrive or MecanumDrive classes instead.")
   void Normalize(double* wheelSpeeds);
   void RotateVector(double& x, double& y, double angle);
 
-  static const int kMaxNumberOfMotors = 4;
+  static constexpr int kMaxNumberOfMotors = 4;
+
   double m_sensitivity = 0.5;
   double m_maxOutput = 1.0;
+
   std::shared_ptr<SpeedController> m_frontLeftMotor;
   std::shared_ptr<SpeedController> m_frontRightMotor;
   std::shared_ptr<SpeedController> m_rearLeftMotor;

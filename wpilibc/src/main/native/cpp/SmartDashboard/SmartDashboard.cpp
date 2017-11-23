@@ -27,11 +27,11 @@ void SmartDashboard::init() {
 }
 
 /**
-   * Determines whether the given key is in this table.
-   *
-   * @param key the key to search for
-   * @return true if the table as a value assigned to the given key
-   */
+ * Determines whether the given key is in this table.
+ *
+ * @param key the key to search for
+ * @return true if the table as a value assigned to the given key
+ */
 bool SmartDashboard::ContainsKey(llvm::StringRef key) {
   return s_table->ContainsKey(key);
 }
@@ -127,7 +127,7 @@ void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
     return;
   }
   std::shared_ptr<nt::NetworkTable> dataTable(s_table->GetSubTable(key));
-  dataTable->GetEntry("~TYPE~").SetString(data->GetSmartDashboardType());
+  dataTable->GetEntry(".type").SetString(data->GetSmartDashboardType());
   data->InitTable(dataTable);
   s_tablesToData[dataTable] = data;
 }
@@ -182,11 +182,12 @@ bool SmartDashboard::PutValue(llvm::StringRef keyName,
 }
 
 /**
-   * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
-   */
+ * Gets the current value in the table, setting it if it does not exist.
+ *
+ * @param key the key
+ * @param defaultValue The default value to set if key doesn't exist.
+ * @returns False if the table key exists with a different type
+ */
 bool SmartDashboard::SetDefaultValue(llvm::StringRef key,
                                      std::shared_ptr<nt::Value> defaultValue) {
   return s_table->GetEntry(key).SetDefaultValue(defaultValue);
@@ -218,11 +219,11 @@ bool SmartDashboard::PutBoolean(llvm::StringRef keyName, bool value) {
 }
 
 /**
-   * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
-   */
+ * Gets the current value in the table, setting it if it does not exist.
+ * @param key the key
+ * @param defaultValue the default value to set if key doesn't exist.
+ * @returns False if the table key exists with a different type
+ */
 bool SmartDashboard::SetDefaultBoolean(llvm::StringRef key, bool defaultValue) {
   return s_table->GetEntry(key).SetDefaultBoolean(defaultValue);
 }
@@ -254,11 +255,12 @@ bool SmartDashboard::PutNumber(llvm::StringRef keyName, double value) {
 }
 
 /**
-   * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
-   * @param defaultValue the default value to set if key doesn't exist.
-   * @returns False if the table key exists with a different type
-   */
+ * Gets the current value in the table, setting it if it does not exist.
+ *
+ * @param key          The key.
+ * @param defaultValue The default value to set if key doesn't exist.
+ * @returns False if the table key exists with a different type
+ */
 bool SmartDashboard::SetDefaultNumber(llvm::StringRef key,
                                       double defaultValue) {
   return s_table->GetEntry(key).SetDefaultDouble(defaultValue);
@@ -315,15 +317,16 @@ std::string SmartDashboard::GetString(llvm::StringRef keyName,
 }
 
 /**
-   * Put a boolean array in the table
-   * @param key the key to be assigned to
-   * @param value the value that will be assigned
-   * @return False if the table key already exists with a different type
-   *
-   * @note The array must be of int's rather than of bool's because
-   *       std::vector<bool> is special-cased in C++.  0 is false, any
-   *       non-zero value is true.
-   */
+ * Put a boolean array in the table.
+ *
+ * @param key the key to be assigned to
+ * @param value the value that will be assigned
+ * @return False if the table key already exists with a different type
+ *
+ * @note The array must be of int's rather than of bool's because
+ *       std::vector<bool> is special-cased in C++. 0 is false, any
+ *       non-zero value is true.
+ */
 bool SmartDashboard::PutBooleanArray(llvm::StringRef key,
                                      llvm::ArrayRef<int> value) {
   return s_table->GetEntry(key).SetBooleanArray(value);
@@ -331,6 +334,7 @@ bool SmartDashboard::PutBooleanArray(llvm::StringRef key,
 
 /**
  * Gets the current value in the table, setting it if it does not exist.
+ *
  * @param key the key
  * @param defaultValue the default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
@@ -341,18 +345,21 @@ bool SmartDashboard::SetDefaultBooleanArray(llvm::StringRef key,
 }
 
 /**
- * Returns the boolean array the key maps to. If the key does not exist or is
- * of different type, it will return the default value.
- * @param key the key to look up
- * @param defaultValue the value to be returned if no value is found
- * @return the value associated with the given key or the given default value
- * if there is no value associated with the key
+ * Returns the boolean array the key maps to.
  *
- * @note This makes a copy of the array.  If the overhead of this is a
- *       concern, use GetValue() instead.
+ * If the key does not exist or is of different type, it will return the default
+ * value.
+ *
+ * @param key          The key to look up.
+ * @param defaultValue The value to be returned if no value is found.
+ * @return the value associated with the given key or the given default value
+ *         if there is no value associated with the key
+ *
+ * @note This makes a copy of the array. If the overhead of this is a concern,
+ *       use GetValue() instead.
  *
  * @note The returned array is std::vector<int> instead of std::vector<bool>
- *       because std::vector<bool> is special-cased in C++.  0 is false, any
+ *       because std::vector<bool> is special-cased in C++. 0 is false, any
  *       non-zero value is true.
  */
 std::vector<int> SmartDashboard::GetBooleanArray(
@@ -361,9 +368,10 @@ std::vector<int> SmartDashboard::GetBooleanArray(
 }
 
 /**
- * Put a number array in the table
- * @param key the key to be assigned to
- * @param value the value that will be assigned
+ * Put a number array in the table.
+ *
+ * @param key   The key to be assigned to.
+ * @param value The value that will be assigned.
  * @return False if the table key already exists with a different type
  */
 bool SmartDashboard::PutNumberArray(llvm::StringRef key,
@@ -373,8 +381,9 @@ bool SmartDashboard::PutNumberArray(llvm::StringRef key,
 
 /**
  * Gets the current value in the table, setting it if it does not exist.
- * @param key the key
- * @param defaultValue the default value to set if key doesn't exist.
+ *
+ * @param key          The key.
+ * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
 bool SmartDashboard::SetDefaultNumberArray(
@@ -383,15 +392,18 @@ bool SmartDashboard::SetDefaultNumberArray(
 }
 
 /**
- * Returns the number array the key maps to. If the key does not exist or is
- * of different type, it will return the default value.
- * @param key the key to look up
- * @param defaultValue the value to be returned if no value is found
+ * Returns the number array the key maps to.
+ *
+ * If the key does not exist or is of different type, it will return the default
+ * value.
+ *
+ * @param key The key to look up.
+ * @param defaultValue The value to be returned if no value is found.
  * @return the value associated with the given key or the given default value
  * if there is no value associated with the key
  *
- * @note This makes a copy of the array.  If the overhead of this is a
- *       concern, use GetValue() instead.
+ * @note This makes a copy of the array. If the overhead of this is a concern,
+ *       use GetValue() instead.
  */
 std::vector<double> SmartDashboard::GetNumberArray(
     llvm::StringRef key, llvm::ArrayRef<double> defaultValue) {
@@ -399,9 +411,10 @@ std::vector<double> SmartDashboard::GetNumberArray(
 }
 
 /**
- * Put a string array in the table
- * @param key the key to be assigned to
- * @param value the value that will be assigned
+ * Put a string array in the table.
+ *
+ * @param key   The key to be assigned to.
+ * @param value The value that will be assigned.
  * @return False if the table key already exists with a different type
  */
 bool SmartDashboard::PutStringArray(llvm::StringRef key,
@@ -411,8 +424,9 @@ bool SmartDashboard::PutStringArray(llvm::StringRef key,
 
 /**
  * Gets the current value in the table, setting it if it does not exist.
- * @param key the key
- * @param defaultValue the default value to set if key doesn't exist.
+ *
+ * @param key          The key.
+ * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
 bool SmartDashboard::SetDefaultStringArray(
@@ -421,15 +435,18 @@ bool SmartDashboard::SetDefaultStringArray(
 }
 
 /**
- * Returns the string array the key maps to. If the key does not exist or is
- * of different type, it will return the default value.
- * @param key the key to look up
- * @param defaultValue the value to be returned if no value is found
+ * Returns the string array the key maps to.
+ *
+ * If the key does not exist or is of different type, it will return the default
+ * value.
+ *
+ * @param key          The key to look up.
+ * @param defaultValue The value to be returned if no value is found.
  * @return the value associated with the given key or the given default value
  * if there is no value associated with the key
  *
- * @note This makes a copy of the array.  If the overhead of this is a
- *       concern, use GetValue() instead.
+ * @note This makes a copy of the array. If the overhead of this is a concern,
+ *       use GetValue() instead.
  */
 std::vector<std::string> SmartDashboard::GetStringArray(
     llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) {
@@ -437,9 +454,10 @@ std::vector<std::string> SmartDashboard::GetStringArray(
 }
 
 /**
- * Put a raw value (byte array) in the table
- * @param key the key to be assigned to
- * @param value the value that will be assigned
+ * Put a raw value (byte array) in the table.
+ *
+ * @param key   The key to be assigned to.
+ * @param value The value that will be assigned.
  * @return False if the table key already exists with a different type
  */
 bool SmartDashboard::PutRaw(llvm::StringRef key, llvm::StringRef value) {
@@ -448,8 +466,9 @@ bool SmartDashboard::PutRaw(llvm::StringRef key, llvm::StringRef value) {
 
 /**
  * Gets the current value in the table, setting it if it does not exist.
- * @param key the key
- * @param defaultValue the default value to set if key doesn't exist.
+ *
+ * @param key          The key.
+ * @param defaultValue The default value to set if key doesn't exist.
  * @returns False if the table key exists with a different type
  */
 bool SmartDashboard::SetDefaultRaw(llvm::StringRef key,
@@ -458,14 +477,17 @@ bool SmartDashboard::SetDefaultRaw(llvm::StringRef key,
 }
 
 /**
- * Returns the raw value (byte array) the key maps to. If the key does not
- * exist or is of different type, it will return the default value.
- * @param key the key to look up
- * @param defaultValue the value to be returned if no value is found
+ * Returns the raw value (byte array) the key maps to.
+ *
+ * If the key does not exist or is of different type, it will return the default
+ * value.
+ *
+ * @param key          The key to look up.
+ * @param defaultValue The value to be returned if no value is found.
  * @return the value associated with the given key or the given default value
  * if there is no value associated with the key
  *
- * @note This makes a copy of the raw contents.  If the overhead of this is a
+ * @note This makes a copy of the raw contents. If the overhead of this is a
  *       concern, use GetValue() instead.
  */
 std::string SmartDashboard::GetRaw(llvm::StringRef key,

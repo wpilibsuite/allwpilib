@@ -19,24 +19,39 @@ using namespace hal;
 static inline int32_t GetMaxPositivePwm(DigitalPort* port) {
   return port->maxPwm;
 }
+
 static inline int32_t GetMinPositivePwm(DigitalPort* port) {
-  return port->eliminateDeadband ? port->deadbandMaxPwm : port->centerPwm + 1;
+  if (port->eliminateDeadband) {
+    return port->deadbandMaxPwm;
+  } else {
+    return port->centerPwm + 1;
+  }
 }
+
 static inline int32_t GetCenterPwm(DigitalPort* port) {
   return port->centerPwm;
 }
+
 static inline int32_t GetMaxNegativePwm(DigitalPort* port) {
-  return port->eliminateDeadband ? port->deadbandMinPwm : port->centerPwm - 1;
+  if (port->eliminateDeadband) {
+    return port->deadbandMinPwm;
+  } else {
+    return port->centerPwm - 1;
+  }
 }
+
 static inline int32_t GetMinNegativePwm(DigitalPort* port) {
   return port->minPwm;
 }
+
 static inline int32_t GetPositiveScaleFactor(DigitalPort* port) {
   return GetMaxPositivePwm(port) - GetMinPositivePwm(port);
 }  ///< The scale for positive speeds.
+
 static inline int32_t GetNegativeScaleFactor(DigitalPort* port) {
   return GetMaxNegativePwm(port) - GetMinNegativePwm(port);
 }  ///< The scale for negative speeds.
+
 static inline int32_t GetFullRangeScaleFactor(DigitalPort* port) {
   return GetMaxPositivePwm(port) - GetMinNegativePwm(port);
 }  ///< The scale for positions.
@@ -118,7 +133,7 @@ void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max,
 
   // calculate the loop time in milliseconds
   double loopTime =
-      HAL_GetLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
+      HAL_GetPWMLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
   if (*status != 0) return;
 
   int32_t maxPwm = static_cast<int32_t>((max - kDefaultPwmCenter) / loopTime +
@@ -444,10 +459,34 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
  *
  * @return The loop time
  */
-int32_t HAL_GetLoopTiming(int32_t* status) {
+int32_t HAL_GetPWMLoopTiming(int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return 0;
   return pwmSystem->readLoopTiming(status);
+}
+
+/**
+ * Get the pwm starting cycle time
+ *
+ * @return The pwm cycle start time.
+ */
+uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
+  initializeDigital(status);
+  if (*status != 0) return 0;
+  // Because of a bug in FPGA image 10, just return the lower 32 bits of cycle
+  // time.
+  return pwmSystem->readCycleStartTime(status);
+
+  uint64_t upper1 = pwmSystem->readCycleStartTimeUpper(status);
+  uint32_t lower = pwmSystem->readCycleStartTime(status);
+  uint64_t upper2 = pwmSystem->readCycleStartTimeUpper(status);
+  if (*status != 0) return 0;
+  if (upper1 != upper2) {
+    // Rolled over between the lower call, reread lower
+    lower = pwmSystem->readCycleStartTime(status);
+    if (*status != 0) return 0;
+  }
+  return (upper2 << 32) + lower;
 }
 
 }  // extern "C"

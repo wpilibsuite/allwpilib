@@ -71,7 +71,7 @@ public class Timer {
 
     double getMatchTime();
 
-    void delay(final double seconds);
+    void delay(double seconds);
 
     @SuppressWarnings("JavadocMethod")
     Interface newTimer();
