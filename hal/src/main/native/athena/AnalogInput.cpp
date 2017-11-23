@@ -229,7 +229,7 @@ int32_t HAL_GetAnalogValue(HAL_AnalogInputHandle analogPortHandle,
   readSelect.Channel = port->channel;
   readSelect.Averaged = false;
 
-  std::lock_guard<wpi::mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
   analogInputSystem->writeReadSelect(readSelect, status);
   analogInputSystem->strobeLatchOutput(status);
   return static_cast<int16_t>(analogInputSystem->readOutput(status));
@@ -260,7 +260,7 @@ int32_t HAL_GetAnalogAverageValue(HAL_AnalogInputHandle analogPortHandle,
   readSelect.Channel = port->channel;
   readSelect.Averaged = true;
 
-  std::lock_guard<wpi::mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
   analogInputSystem->writeReadSelect(readSelect, status);
   analogInputSystem->strobeLatchOutput(status);
   return static_cast<int32_t>(analogInputSystem->readOutput(status));

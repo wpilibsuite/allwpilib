@@ -11,6 +11,29 @@
 
 #include "MockData/NotifyListenerVector.h"
 
+template <typename VectorType, typename CallbackType>
+std::shared_ptr<VectorType> RegisterCallbackImpl(
+    std::shared_ptr<VectorType> currentVector, const char* name,
+    CallbackType callback, void* param, int32_t* newUid) {
+  std::shared_ptr<VectorType> newCallbacks;
+  if (currentVector == nullptr) {
+    newCallbacks = std::make_shared<VectorType>(
+        param, callback, reinterpret_cast<unsigned int*>(newUid));
+  } else {
+    newCallbacks = currentVector->emplace_back(
+        param, callback, reinterpret_cast<unsigned int*>(newUid));
+  }
+  return newCallbacks;
+}
+
+template <typename VectorType, typename CallbackType>
+std::shared_ptr<VectorType> CancelCallbackImpl(
+    std::shared_ptr<VectorType> currentVector, int32_t uid) {
+  // Create a copy of the callbacks to erase from
+  auto newCallbacks = currentVector->erase(uid);
+  return newCallbacks;
+}
+
 std::shared_ptr<hal::NotifyListenerVector> RegisterCallback(
     std::shared_ptr<hal::NotifyListenerVector> currentVector, const char* name,
     HAL_NotifyCallback callback, void* param, int32_t* newUid);

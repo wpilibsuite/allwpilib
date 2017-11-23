@@ -12,8 +12,8 @@
 
 #include <llvm/ArrayRef.h>
 
-#include "CircularBuffer.h"
 #include "Filter.h"
+#include "circular_buffer.h"
 
 namespace frc {
 
@@ -89,8 +89,8 @@ class LinearDigitalFilter : public Filter {
   double PIDGet() override;
 
  private:
-  CircularBuffer<double> m_inputs;
-  CircularBuffer<double> m_outputs;
+  circular_buffer<double> m_inputs;
+  circular_buffer<double> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };

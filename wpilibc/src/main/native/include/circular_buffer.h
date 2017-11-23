@@ -17,16 +17,29 @@ namespace frc {
  * old values.
  */
 template <class T>
-class CircularBuffer {
+class circular_buffer {
  public:
-  explicit CircularBuffer(size_t size);
+  explicit circular_buffer(size_t size);
 
-  void PushFront(T value);
-  void PushBack(T value);
-  T PopFront();
-  T PopBack();
-  void Resize(size_t size);
-  void Reset();
+  typedef T value_type;
+  typedef value_type& reference;
+  typedef const value_type& const_reference;
+  typedef value_type* pointer;
+  typedef size_t size_type;
+  typedef std::forward_iterator_tag iterator_category;
+  typedef std::ptrdiff_t difference_type;
+
+  size_type size() const;
+  T& front();
+  const T& front() const;
+  T& back();
+  const T& back() const;
+  void push_front(T value);
+  void push_back(T value);
+  T pop_front();
+  T pop_back();
+  void resize(size_t size);
+  void reset();
 
   T& operator[](size_t index);
   const T& operator[](size_t index) const;
@@ -46,4 +59,4 @@ class CircularBuffer {
 
 }  // namespace frc
 
-#include "CircularBuffer.inc"
+#include "circular_buffer.inc"

@@ -41,7 +41,7 @@ class MotorSafetyHelper : public ErrorBase {
   double m_stopTime;
 
   // Protect accesses to the state for this object
-  mutable wpi::mutex m_syncMutex;
+  mutable wpi::mutex m_thisMutex;
 
   // The object that is using the helper
   MotorSafety* m_safeObject;

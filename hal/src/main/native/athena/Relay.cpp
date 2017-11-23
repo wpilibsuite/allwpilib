@@ -92,7 +92,7 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  std::lock_guard<wpi::mutex> sync(digitalRelayMutex);
+  std::lock_guard<wpi::mutex> lock(digitalRelayMutex);
   uint8_t relays = 0;
   if (port->fwd) {
     relays = relaySystem->readValue_Forward(status);
