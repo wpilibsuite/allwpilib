@@ -131,54 +131,77 @@ PIDController::~PIDController() {
  * This should only be called by the Notifier.
  */
 void PIDController::Calculate() {
-  bool enabled;
-  PIDSource* pidInput;
-  PIDOutput* pidOutput;
+  if (m_origSource == nullptr || m_pidOutput == nullptr) return;
 
+  bool enabled;
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
-    pidInput = m_pidInput;
-    pidOutput = m_pidOutput;
     enabled = m_enabled;
   }
 
-  if (pidInput == nullptr) return;
-  if (pidOutput == nullptr) return;
-
   if (enabled) {
+    double input;
+
+    // Storage for function inputs
+    PIDSourceType pidSourceType;
+    double P;
+    double I;
+    double D;
     double feedForward = CalculateFeedForward();
+    double minimumOutput;
+    double maximumOutput;
+
+    // Storage for function input-outputs
+    double prevError;
+    double error;
+    double totalError;
+
+    {
+      std::lock_guard<wpi::mutex> lock(m_mutex);
+
+      input = m_pidInput->PIDGet();
+
+      pidSourceType = m_pidInput->GetPIDSourceType();
+      P = m_P;
+      I = m_I;
+      D = m_D;
+      minimumOutput = m_minimumOutput;
+      maximumOutput = m_maximumOutput;
+
+      prevError = m_prevError;
+      error = GetContinuousError(m_setpoint - input);
+      totalError = m_totalError;
+    }
+
+    // Storage for function outputs
+    double result;
+
+    if (pidSourceType == PIDSourceType::kRate) {
+      if (P != 0) {
+        totalError =
+            clamp(totalError + error, minimumOutput / P, maximumOutput / P);
+      }
+
+      result = D * error + P * totalError + feedForward;
+    } else {
+      if (I != 0) {
+        totalError =
+            clamp(totalError + error, minimumOutput / I, maximumOutput / I);
+      }
+
+      result =
+          P * error + I * totalError + D * (error - prevError) + feedForward;
+    }
+
+    result = clamp(result, minimumOutput, maximumOutput);
+
+    m_pidOutput->PIDWrite(result);
 
     std::lock_guard<wpi::mutex> lock(m_mutex);
-    double input = pidInput->PIDGet();
-    double result;
-    PIDOutput* pidOutput;
-
-    m_error = GetContinuousError(m_setpoint - input);
-
-    if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
-      if (m_P != 0) {
-        m_totalError = clamp(m_totalError + m_error, m_minimumOutput / m_P,
-                             m_maximumOutput / m_P);
-      }
-
-      m_result = m_D * m_error + m_P * m_totalError + feedForward;
-    } else {
-      if (m_I != 0) {
-        m_totalError = clamp(m_totalError + m_error, m_minimumOutput / m_I,
-                             m_maximumOutput / m_I);
-      }
-
-      m_result = m_P * m_error + m_I * m_totalError +
-                 m_D * (m_error - m_prevError) + feedForward;
-    }
     m_prevError = m_error;
-
-    m_result = clamp(m_result, m_minimumOutput, m_maximumOutput);
-
-    pidOutput = m_pidOutput;
-    result = m_result;
-
-    pidOutput->PIDWrite(result);
+    m_error = error;
+    m_totalError = totalError;
+    m_result = result;
   }
 }
 
