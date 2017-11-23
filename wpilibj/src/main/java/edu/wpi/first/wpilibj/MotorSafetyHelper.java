@@ -7,6 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * The MotorSafetyHelper object is constructed for every object that wants to implement the Motor
  * Safety protocol. The helper object has the code to actually do the timing and call the motors
@@ -18,9 +21,10 @@ public final class MotorSafetyHelper {
   private double m_expiration;
   private boolean m_enabled;
   private double m_stopTime;
+  private final Object m_thisMutex = new Object();
   private final MotorSafety m_safeObject;
-  private final MotorSafetyHelper m_nextHelper;
-  private static MotorSafetyHelper headHelper = null;
+  private static final Set<MotorSafetyHelper> m_helperList = new LinkedHashSet<>();
+  private static final Object m_listMutex = new Object();
 
   /**
    * The constructor for a MotorSafetyHelper object. The helper object is constructed for every
@@ -36,15 +40,19 @@ public final class MotorSafetyHelper {
     m_enabled = false;
     m_expiration = MotorSafety.DEFAULT_SAFETY_EXPIRATION;
     m_stopTime = Timer.getFPGATimestamp();
-    m_nextHelper = headHelper;
-    headHelper = this;
+
+    synchronized (m_listMutex) {
+      m_helperList.add(this);
+    }
   }
 
   /**
    * Feed the motor safety object. Resets the timer on this object that is used to do the timeouts.
    */
   public void feed() {
-    m_stopTime = Timer.getFPGATimestamp() + m_expiration;
+    synchronized (m_thisMutex) {
+      m_stopTime = Timer.getFPGATimestamp() + m_expiration;
+    }
   }
 
   /**
@@ -53,7 +61,9 @@ public final class MotorSafetyHelper {
    * @param expirationTime The timeout value in seconds.
    */
   public void setExpiration(double expirationTime) {
-    m_expiration = expirationTime;
+    synchronized (m_thisMutex) {
+      m_expiration = expirationTime;
+    }
   }
 
   /**
@@ -62,7 +72,9 @@ public final class MotorSafetyHelper {
    * @return the timeout value in seconds.
    */
   public double getExpiration() {
-    return m_expiration;
+    synchronized (m_thisMutex) {
+      return m_expiration;
+    }
   }
 
   /**
@@ -71,7 +83,9 @@ public final class MotorSafetyHelper {
    * @return a true value if the motor is still operating normally and hasn't timed out.
    */
   public boolean isAlive() {
-    return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
+    synchronized (m_thisMutex) {
+      return !m_enabled || m_stopTime > Timer.getFPGATimestamp();
+    }
   }
 
   /**
@@ -80,10 +94,18 @@ public final class MotorSafetyHelper {
    * motor is shut down until its value is updated again.
    */
   public void check() {
-    if (!m_enabled || RobotState.isDisabled() || RobotState.isTest()) {
+    boolean enabled;
+    double stopTime;
+
+    synchronized (m_thisMutex) {
+      enabled = m_enabled;
+      stopTime = m_stopTime;
+    }
+
+    if (!enabled || RobotState.isDisabled() || RobotState.isTest()) {
       return;
     }
-    if (m_stopTime < Timer.getFPGATimestamp()) {
+    if (stopTime < Timer.getFPGATimestamp()) {
       DriverStation.reportError(m_safeObject.getDescription() + "... Output not updated often "
           + "enough.", false);
 
@@ -98,7 +120,9 @@ public final class MotorSafetyHelper {
    * @param enabled True if motor safety is enforced for this object
    */
   public void setSafetyEnabled(boolean enabled) {
-    m_enabled = enabled;
+    synchronized (m_thisMutex) {
+      m_enabled = enabled;
+    }
   }
 
   /**
@@ -108,18 +132,20 @@ public final class MotorSafetyHelper {
    * @return True if motor safety is enforced for this device
    */
   public boolean isSafetyEnabled() {
-    return m_enabled;
+    synchronized (m_thisMutex) {
+      return m_enabled;
+    }
   }
 
   /**
    * Check the motors to see if any have timed out. This static method is called periodically to
    * poll all the motors and stop any that have timed out.
    */
-  // TODO: these should be synchronized with the setting methods in case it's
-  // called from a different thread
   public static void checkMotors() {
-    for (MotorSafetyHelper msh = headHelper; msh != null; msh = msh.m_nextHelper) {
-      msh.check();
+    synchronized (m_listMutex) {
+      for (MotorSafetyHelper elem : m_helperList) {
+        elem.check();
+      }
     }
   }
 }

@@ -945,6 +945,10 @@ public class DriverStation implements RobotState.Interface {
       HAL.waitForDSData();
       getData();
 
+      if (isDisabled()) {
+        safetyCounter = 0;
+      }
+
       if (++safetyCounter >= 4) {
         MotorSafetyHelper.checkMotors();
         safetyCounter = 0;
