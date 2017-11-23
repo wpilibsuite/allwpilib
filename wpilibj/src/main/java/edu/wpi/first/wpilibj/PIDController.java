@@ -56,6 +56,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   private Tolerance m_tolerance;
   private double m_setpoint = 0.0;
   private double m_prevSetpoint = 0.0;
+  @SuppressWarnings("PMD.UnusedPrivateField")
   private double m_error = 0.0;
   private double m_result = 0.0;
   private double m_period = kDefaultPeriod;
@@ -238,57 +239,80 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * Read the input, calculate the output accordingly, and write to the output. This should only be
    * called by the PIDTask and is created during initialization.
    */
+  @SuppressWarnings("LocalVariableName")
   protected void calculate() {
+    if (m_origSource == null || m_pidOutput == null) {
+      return;
+    }
+
     boolean enabled;
-    PIDSource pidInput;
 
     synchronized (this) {
-      if (m_pidInput == null) {
-        return;
-      }
-      if (m_pidOutput == null) {
-        return;
-      }
-      enabled = m_enabled; // take snapshot of these values...
-      pidInput = m_pidInput;
+      enabled = m_enabled;
     }
 
     if (enabled) {
       double input;
+
+      // Storage for function inputs
+      PIDSourceType pidSourceType;
+      double P;
+      double I;
+      double D;
+      double feedForward = calculateFeedForward();
+      double minimumOutput;
+      double maximumOutput;
+
+      // Storage for function input-outputs
+      double prevError;
+      double error;
+      double totalError;
+
+      synchronized (this) {
+        input = m_pidInput.pidGet();
+
+        pidSourceType = m_pidInput.getPIDSourceType();
+        P = m_P;
+        I = m_I;
+        D = m_D;
+        minimumOutput = m_minimumOutput;
+        maximumOutput = m_maximumOutput;
+
+        prevError = m_prevError;
+        error = getContinuousError(m_setpoint - input);
+        totalError = m_totalError;
+      }
+
+      // Storage for function outputs
       double result;
-      final PIDOutput pidOutput;
-      synchronized (this) {
-        input = pidInput.pidGet();
-      }
-      synchronized (this) {
-        m_error = getContinuousError(m_setpoint - input);
 
-        if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {
-          if (m_P != 0) {
-            m_totalError = clamp(m_totalError + m_error, m_minimumOutput / m_P,
-                m_maximumOutput / m_P);
-          }
-
-          m_result = m_P * m_totalError + m_D * m_error
-              + calculateFeedForward();
-        } else {
-          if (m_I != 0) {
-            m_totalError = clamp(m_totalError + m_error, m_minimumOutput / m_I,
-                m_maximumOutput / m_I);
-          }
-
-          m_result = m_P * m_error + m_I * m_totalError
-              + m_D * (m_error - m_prevError) + calculateFeedForward();
+      if (pidSourceType.equals(PIDSourceType.kRate)) {
+        if (P != 0) {
+          totalError = clamp(totalError + error, minimumOutput / P,
+              maximumOutput / P);
         }
-        m_prevError = m_error;
 
-        m_result = clamp(m_result, m_minimumOutput, m_maximumOutput);
+        result = P * totalError + D * error + feedForward;
+      } else {
+        if (I != 0) {
+          totalError = clamp(totalError + error, minimumOutput / I,
+              maximumOutput / I);
+        }
 
-        pidOutput = m_pidOutput;
-        result = m_result;
+        result = P * error + I * totalError + D * (error - prevError)
+            + feedForward;
       }
 
-      pidOutput.pidWrite(result);
+      result = clamp(result, minimumOutput, maximumOutput);
+
+      m_pidOutput.pidWrite(result);
+
+      synchronized (this) {
+        m_prevError = error;
+        m_error = error;
+        m_totalError = totalError;
+        m_result = result;
+      }
     }
   }
 
