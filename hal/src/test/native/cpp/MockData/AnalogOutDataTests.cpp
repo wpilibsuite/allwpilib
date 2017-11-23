@@ -23,7 +23,7 @@ void TestAnalogOutInitializationCallback(const char *name, void *param,
 }
 
 TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
-  const int INDEX_TO_TEST = 2;
+  const int INDEX_TO_TEST = 1;
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterAnalogOutInitializedCallback(
@@ -49,7 +49,7 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogOutCallbackName = "Unset";
   analogOutHandle = HAL_InitializeAnalogOutputPort(portHandle, &status);
-  EXPECT_EQ(0x900001F, analogOutHandle);
+  EXPECT_EQ(0x5010001, analogOutHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogOutCallbackName.c_str());
 
@@ -73,7 +73,7 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogOutCallbackName = "Unset";
   analogOutHandle = HAL_InitializeAnalogOutputPort(portHandle, &status);
-  EXPECT_EQ(0x901001F, analogOutHandle);
+  EXPECT_EQ(0x5020001, analogOutHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogOutCallbackName.c_str());
 }

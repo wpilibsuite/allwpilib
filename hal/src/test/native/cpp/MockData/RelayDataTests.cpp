@@ -23,7 +23,7 @@ void TestRelayInitializationCallback(const char *name, void *param,
 }
 
 TEST(RelaySimTests, TestRelayInitialization) {
-  const int INDEX_TO_TEST = 8;
+  const int INDEX_TO_TEST = 3;
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterRelayInitializedForwardCallback(
@@ -38,7 +38,7 @@ TEST(RelaySimTests, TestRelayInitialization) {
   status = 0;
   portHandle = 8000;
   gTestRelayCallbackName = "Unset";
-  pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
+  pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pdpHandle);
   EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
   EXPECT_STREQ("Unset", gTestRelayCallbackName.c_str());
@@ -47,16 +47,16 @@ TEST(RelaySimTests, TestRelayInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestRelayCallbackName = "Unset";
-  pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0x900001F, pdpHandle);
+  pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
+  EXPECT_EQ(0x8040003, pdpHandle);
   EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestRelayCallbackName.c_str());
+  EXPECT_STREQ("InitializedForward", gTestRelayCallbackName.c_str());
 
   // Double initialize... should fail
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestRelayCallbackName = "Unset";
-  pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
+  pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pdpHandle);
   EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
   EXPECT_STREQ("Unset", gTestRelayCallbackName.c_str());
@@ -70,10 +70,10 @@ TEST(RelaySimTests, TestRelayInitialization) {
   status = 0;
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestRelayCallbackName = "Unset";
-  pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0x901001F, pdpHandle);
+  pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
+  EXPECT_EQ(0x8050003, pdpHandle);
   EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestRelayCallbackName.c_str());
+  EXPECT_STREQ("InitializedForward", gTestRelayCallbackName.c_str());
 }
 
 }  // namespace hal

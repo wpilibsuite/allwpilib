@@ -23,7 +23,7 @@ void TestPdpInitializationCallback(const char *name, void *param,
 }
 
 TEST(PdpSimTests, TestPdpInitialization) {
-  const int INDEX_TO_TEST = 6;
+  const int INDEX_TO_TEST = 1;
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterPDPInitializedCallback(
@@ -31,49 +31,22 @@ TEST(PdpSimTests, TestPdpInitialization) {
   ASSERT_TRUE(0 != callbackId);
 
   int32_t status;
-  HAL_PortHandle portHandle;
-  HAL_DigitalHandle pdpHandle;
 
   // Use out of range index
   status = 0;
-  portHandle = 8000;
   gTestPdpCallbackName = "Unset";
-  pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, pdpHandle);
-  EXPECT_EQ(HAL_HANDLE_ERROR, status);
-  EXPECT_STREQ("Unset", gTestPdpCallbackName.c_str());
-
-  // Successful setup
-  status = 0;
-  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
-  gTestPdpCallbackName = "Unset";
-  pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0xF000006, pdpHandle);
+  HAL_InitializePDP(INDEX_TO_TEST, &status);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 
-  // Double initialize... should fail
-  status = 0;
-  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
-  gTestPdpCallbackName = "Unset";
-  pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(HAL_kInvalidHandle, pdpHandle);
-  EXPECT_EQ(NO_AVAILABLE_RESOURCES, status);
-  EXPECT_STREQ("Unset", gTestPdpCallbackName.c_str());
-
-  // Reset, should allow you to re-register
-  hal::HandleBase::ResetGlobalHandles();
-  HALSIM_ResetPDPData(INDEX_TO_TEST);
-  callbackId = HALSIM_RegisterPDPInitializedCallback(
-      INDEX_TO_TEST, &TestPdpInitializationCallback, &callbackParam, false);
-
-  status = 0;
-  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
-  gTestPdpCallbackName = "Unset";
-  pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0xF010006, pdpHandle);
-  EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
+//  // Successful setup
+//  status = 0;
+//  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
+//  gTestPdpCallbackName = "Unset";
+//  pdpHandle = HAL_InitializePDP(portHandle, &status);
+//  EXPECT_EQ(0xF000006, pdpHandle);
+//  EXPECT_EQ(0, status);
+//  EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 }
 
 }  // namespace hal
