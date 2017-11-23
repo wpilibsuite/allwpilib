@@ -6,7 +6,7 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 apply from: '../config.gradle'
 
 ext.addWpilibCCompilerArguments = { binary->
-	if (binary.targetPlatform.architecture.name == 'athena') {
+    if (binary.targetPlatform.architecture.name == 'athena') {
         tasks.withType(CppCompile) {
             binary.cppCompiler.args "-DCONFIG_ATHENA"
         }
