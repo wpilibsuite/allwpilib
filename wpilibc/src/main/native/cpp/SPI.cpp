@@ -173,25 +173,25 @@ int SPI::Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size) {
 /**
  * Initialize the accumulator.
  *
- * @param period     Time between reads
- * @param cmd        SPI command to send to request data
- * @param xfer_size  SPI transfer size, in bytes
- * @param valid_mask Mask to apply to received data for validity checking
- * @param valid_data After valid_mask is applied, required matching value for
- *                   validity checking
- * @param data_shift Bit shift to apply to received data to get actual data
- *                   value
- * @param data_size  Size (in bits) of data field
- * @param is_signed  Is data field signed?
- * @param big_endian Is device big endian?
+ * @param period    Time between reads
+ * @param cmd       SPI command to send to request data
+ * @param xferSize  SPI transfer size, in bytes
+ * @param validMask Mask to apply to received data for validity checking
+ * @param validData After valid_mask is applied, required matching value for
+ *                  validity checking
+ * @param dataShift Bit shift to apply to received data to get actual data
+ *                  value
+ * @param dataSize  Size (in bits) of data field
+ * @param isSigned  Is data field signed?
+ * @param bigEndian Is device big endian?
  */
-void SPI::InitAccumulator(double period, int cmd, int xfer_size, int valid_mask,
-                          int valid_value, int data_shift, int data_size,
-                          bool is_signed, bool big_endian) {
+void SPI::InitAccumulator(double period, int cmd, int xferSize, int validMask,
+                          int validValue, int dataShift, int dataSize,
+                          bool isSigned, bool bigEndian) {
   int32_t status = 0;
   HAL_InitSPIAccumulator(m_port, static_cast<int32_t>(period * 1e6), cmd,
-                         xfer_size, valid_mask, valid_value, data_shift,
-                         data_size, is_signed, big_endian, &status);
+                         xferSize, validMask, validValue, dataShift, dataSize,
+                         isSigned, bigEndian, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
