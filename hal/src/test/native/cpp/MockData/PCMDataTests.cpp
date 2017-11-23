@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "MockData/PCMData.h"
 #include "HAL/HAL.h"
 #include "HAL/Solenoid.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "MockData/PCMData.h"
 #include "gtest/gtest.h"
 
 namespace hal {
@@ -23,11 +23,11 @@ void TestSolenoidInitializationCallback(const char *name, void *param,
 }
 
 TEST(SolenoidSimTests, TestSolenoidInitialization) {
-  const int INDEX_TO_TEST = 6;
+  const int INDEX_TO_TEST = 3;
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterPCMSolenoidInitializedCallback(
-      0, 5, &TestSolenoidInitializationCallback, &callbackParam, false);
+      0, INDEX_TO_TEST, &TestSolenoidInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
   int32_t status;
@@ -40,25 +40,25 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
   gTestSolenoidCallbackName = "Unset";
   solenoidHandle = HAL_InitializeSolenoidPort(portHandle, &status);
   EXPECT_EQ(HAL_kInvalidHandle, solenoidHandle);
-  EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_HANDLE_ERROR, status);
   EXPECT_STREQ("Unset", gTestSolenoidCallbackName.c_str());
 
   // Successful setup
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
   gTestSolenoidCallbackName = "Unset";
   solenoidHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0xF02000E, solenoidHandle);
+  EXPECT_EQ(0xF010003, solenoidHandle);
   EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
+  EXPECT_STREQ("SolenoidInitialized", gTestSolenoidCallbackName.c_str());
 
   // Double initialize... should fail
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
   gTestSolenoidCallbackName = "Unset";
   solenoidHandle = HAL_InitializeSolenoidPort(portHandle, &status);
   EXPECT_EQ(HAL_kInvalidHandle, solenoidHandle);
-  EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
+  EXPECT_EQ(NO_AVAILABLE_RESOURCES, status);
   EXPECT_STREQ("Unset", gTestSolenoidCallbackName.c_str());
 
   // Reset, should allow you to re-register
@@ -69,12 +69,12 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
       false);
 
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
   gTestSolenoidCallbackName = "Unset";
   solenoidHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0xF02000E, solenoidHandle);
+  EXPECT_EQ(0xF020003, solenoidHandle);
   EXPECT_EQ(0, status);
-  EXPECT_STREQ("Initialized", gTestSolenoidCallbackName.c_str());
+  EXPECT_STREQ("SolenoidInitialized", gTestSolenoidCallbackName.c_str());
 }
 
-} // namespace hal
+}  // namespace hal

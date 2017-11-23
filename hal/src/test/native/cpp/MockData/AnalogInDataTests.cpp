@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "MockData/AnalogInData.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/HAL.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "MockData/AnalogInData.h"
 #include "gtest/gtest.h"
 
 namespace hal {
@@ -78,4 +78,4 @@ TEST(AnalogInSimTests, TestAnalogInInitialization) {
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
 }
-} // namespace hal
+}  // namespace hal

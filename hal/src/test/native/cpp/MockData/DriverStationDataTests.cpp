@@ -136,4 +136,4 @@ TEST(DriverStationTests, EventInfoTest) {
   HAL_FreeMatchInfo(&dataBack);
 }
 
-} // namespace hal
+}  // namespace hal

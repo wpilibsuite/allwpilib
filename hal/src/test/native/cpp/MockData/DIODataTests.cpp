@@ -78,4 +78,4 @@ TEST(DigitalIoSimTests, TestDigitalIoInitialization) {
   EXPECT_STREQ("Initialized", gTestDigitalIoCallbackName.c_str());
 }
 
-} // namespace hal
+}  // namespace hal

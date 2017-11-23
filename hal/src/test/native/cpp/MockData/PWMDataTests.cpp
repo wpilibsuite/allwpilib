@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PWM.h"
 #include "HAL/HAL.h"
+#include "HAL/PWM.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "MockData/PWMData.h"
 #include "gtest/gtest.h"
@@ -75,4 +75,4 @@ TEST(PWMSimTests, TestPwmInitialization) {
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());
 }
-} // namespace hal
+}  // namespace hal

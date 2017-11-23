@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/PDP.h"
 #include "HAL/HAL.h"
+#include "HAL/PDP.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "MockData/PDPData.h"
 #include "gtest/gtest.h"
@@ -40,25 +40,25 @@ TEST(PdpSimTests, TestPdpInitialization) {
   gTestPdpCallbackName = "Unset";
   pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pdpHandle);
-  EXPECT_EQ(PARAMETER_OUT_OF_RANGE, status);
+  EXPECT_EQ(HAL_HANDLE_ERROR, status);
   EXPECT_STREQ("Unset", gTestPdpCallbackName.c_str());
 
   // Successful setup
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
   gTestPdpCallbackName = "Unset";
   pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0xF00000E, pdpHandle);
+  EXPECT_EQ(0xF000006, pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 
   // Double initialize... should fail
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
   gTestPdpCallbackName = "Unset";
   pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
   EXPECT_EQ(HAL_kInvalidHandle, pdpHandle);
-  EXPECT_EQ(RESOURCE_IS_ALLOCATED, status);
+  EXPECT_EQ(NO_AVAILABLE_RESOURCES, status);
   EXPECT_STREQ("Unset", gTestPdpCallbackName.c_str());
 
   // Reset, should allow you to re-register
@@ -68,12 +68,12 @@ TEST(PdpSimTests, TestPdpInitialization) {
       INDEX_TO_TEST, &TestPdpInitializationCallback, &callbackParam, false);
 
   status = 0;
-  portHandle = HAL_GetPort(INDEX_TO_TEST);
+  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
   gTestPdpCallbackName = "Unset";
   pdpHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0xF01000E, pdpHandle);
+  EXPECT_EQ(0xF010006, pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 }
 
-} // namespace hal
+}  // namespace hal

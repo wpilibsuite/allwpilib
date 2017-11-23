@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/Relay.h"
 #include "HAL/HAL.h"
+#include "HAL/Relay.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "MockData/RelayData.h"
 #include "gtest/gtest.h"
@@ -76,4 +76,4 @@ TEST(RelaySimTests, TestRelayInitialization) {
   EXPECT_STREQ("Initialized", gTestRelayCallbackName.c_str());
 }
 
-} // namespace hal
+}  // namespace hal
