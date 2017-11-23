@@ -44,6 +44,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   private double m_minimumOutput = -1.0; // |minimum output|
   private double m_maximumInput = 0.0; // maximum input - limit setpoint to this
   private double m_minimumInput = 0.0; // minimum input - limit setpoint to this
+  private double m_inputRange = 0.0; // input range - difference between maximum and minimum
   // do the endpoints wrap around? eg. Absolute encoder
   private boolean m_continuous = false;
   private boolean m_enabled = false; // is the pid controller enabled
@@ -96,7 +97,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     @Override
     public boolean onTarget() {
-      return Math.abs(getError()) < m_percentage / 100 * (m_maximumInput - m_minimumInput);
+      return Math.abs(getError()) < m_percentage / 100 * m_inputRange;
     }
   }
 
@@ -448,6 +449,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
     }
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
+    m_inputRange = maximumInput - minimumInput;
     setSetpoint(m_setpoint);
   }
 
@@ -769,11 +771,11 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @return Error for continuous inputs.
    */
   protected double getContinuousError(double error) {
-    if (m_continuous && Math.abs(error) > (m_maximumInput - m_minimumInput) / 2) {
+    if (m_continuous && Math.abs(error) > m_inputRange / 2) {
       if (error > 0) {
-        return error - (m_maximumInput - m_minimumInput);
+        return error - m_inputRange;
       } else {
-        return error + (m_maximumInput - m_minimumInput);
+        return error + m_inputRange;
       }
     }
 
