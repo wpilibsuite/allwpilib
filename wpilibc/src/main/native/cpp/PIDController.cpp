@@ -640,11 +640,14 @@ void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
  * @return Error for continuous inputs.
  */
 double PIDController::GetContinuousError(double error) const {
-  if (m_continuous && std::fabs(error) > m_inputRange / 2) {
-    if (error > 0) {
-      return error - m_inputRange;
-    } else {
-      return error + m_inputRange;
+  if (m_continuous) {
+    error = std::fmod(error, m_inputRange);
+    if (std::fabs(error) > m_inputRange / 2) {
+      if (error > 0) {
+        return error - m_inputRange;
+      } else {
+        return error + m_inputRange;
+      }
     }
   }
 
