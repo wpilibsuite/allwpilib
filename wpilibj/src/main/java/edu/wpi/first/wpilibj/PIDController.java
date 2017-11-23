@@ -554,9 +554,11 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * object. Use it by creating the type of tolerance that you want to use: setTolerance(new
    * PIDController.AbsoluteTolerance(0.1))
    *
-   * @param tolerance a tolerance object of the right type, e.g. PercentTolerance or
+   * @deprecated      Use setPercentTolerance() instead.
+   * @param tolerance A tolerance object of the right type, e.g. PercentTolerance or
    *                  AbsoluteTolerance
    */
+  @Deprecated
   public void setTolerance(Tolerance tolerance) {
     m_tolerance = tolerance;
   }
