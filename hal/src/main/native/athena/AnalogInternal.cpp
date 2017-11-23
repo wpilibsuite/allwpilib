@@ -36,7 +36,7 @@ bool analogSampleRateSet = false;
  */
 void initializeAnalog(int32_t* status) {
   if (analogSystemInitialized) return;
-  std::lock_guard<wpi::mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));
