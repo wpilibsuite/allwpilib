@@ -99,7 +99,7 @@ public class Robot extends SampleRobot {
 		switch (autoSelected) {
 			case kCustomAuto:
 				m_robotDrive.setSafetyEnabled(false);
-				m_robotDrive.arcadeDrive(-0.5, 1.0); // spin at half speed
+				m_robotDrive.arcadeDrive(0.0, 0.5); // spin at half speed
 				Timer.delay(2.0); // for 2 seconds
 				m_robotDrive.arcadeDrive(0.0, 0.0); // stop robot
 				break;
