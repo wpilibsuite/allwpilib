@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj;
 
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
@@ -63,6 +64,12 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
   PIDSource m_origSource;
   LinearDigitalFilter m_filter;
+
+  ReentrantLock m_thisMutex = new ReentrantLock();
+
+  // Ensures when disable() is called, pidWrite() won't run if calculate()
+  // is already running at that time.
+  ReentrantLock m_pidWriteMutex = new ReentrantLock();
 
   protected PIDSource m_pidInput;
   protected PIDOutput m_pidOutput;
@@ -227,10 +234,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    */
   public void free() {
     m_controlLoop.cancel();
-    synchronized (this) {
+    m_thisMutex.lock();
+    try {
       m_pidOutput = null;
       m_pidInput = null;
       m_controlLoop = null;
+    } finally {
+      m_thisMutex.unlock();
     }
     removeListeners();
   }
@@ -247,8 +257,11 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
     boolean enabled;
 
-    synchronized (this) {
+    m_thisMutex.lock();
+    try {
       enabled = m_enabled;
+    } finally {
+      m_thisMutex.unlock();
     }
 
     if (enabled) {
@@ -268,7 +281,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
       double error;
       double totalError;
 
-      synchronized (this) {
+      m_thisMutex.lock();
+      try {
         input = m_pidInput.pidGet();
 
         pidSourceType = m_pidInput.getPIDSourceType();
@@ -281,6 +295,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
         prevError = m_prevError;
         error = getContinuousError(m_setpoint - input);
         totalError = m_totalError;
+      } finally {
+        m_thisMutex.unlock();
       }
 
       // Storage for function outputs
@@ -305,13 +321,34 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
 
       result = clamp(result, minimumOutput, maximumOutput);
 
-      m_pidOutput.pidWrite(result);
+      // Ensures m_enabled check and pidWrite() call occur atomically
+      m_pidWriteMutex.lock();
+      try {
+        m_thisMutex.lock();
+        try {
+          if (m_enabled) {
+            // Don't block other PIDController operations on pidWrite()
+            m_thisMutex.unlock();
 
-      synchronized (this) {
+            m_pidOutput.pidWrite(result);
+          }
+        } finally {
+          if (m_thisMutex.isHeldByCurrentThread()) {
+            m_thisMutex.unlock();
+          }
+        }
+      } finally {
+        m_pidWriteMutex.unlock();
+      }
+
+      m_thisMutex.lock();
+      try {
         m_prevError = error;
         m_error = error;
         m_totalError = totalError;
         m_result = result;
+      } finally {
+        m_thisMutex.unlock();
       }
     }
   }
@@ -349,10 +386,15 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @param d Differential coefficient
    */
   @SuppressWarnings("ParameterName")
-  public synchronized void setPID(double p, double i, double d) {
-    m_P = p;
-    m_I = i;
-    m_D = d;
+  public void setPID(double p, double i, double d) {
+    m_thisMutex.lock();
+    try {
+      m_P = p;
+      m_I = i;
+      m_D = d;
+    } finally {
+      m_thisMutex.unlock();
+    }
 
     if (m_pEntry != null) {
       m_pEntry.setDouble(p);
@@ -375,11 +417,16 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @param f Feed forward coefficient
    */
   @SuppressWarnings("ParameterName")
-  public synchronized void setPID(double p, double i, double d, double f) {
-    m_P = p;
-    m_I = i;
-    m_D = d;
-    m_F = f;
+  public void setPID(double p, double i, double d, double f) {
+    m_thisMutex.lock();
+    try {
+      m_P = p;
+      m_I = i;
+      m_D = d;
+      m_F = f;
+    } finally {
+      m_thisMutex.unlock();
+    }
 
     if (m_pEntry != null) {
       m_pEntry.setDouble(p);
@@ -400,8 +447,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return proportional coefficient
    */
-  public synchronized double getP() {
-    return m_P;
+  public double getP() {
+    m_thisMutex.lock();
+    try {
+      return m_P;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -409,8 +461,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return integral coefficient
    */
-  public synchronized double getI() {
-    return m_I;
+  public double getI() {
+    m_thisMutex.lock();
+    try {
+      return m_I;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -418,8 +475,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return differential coefficient
    */
-  public synchronized double getD() {
-    return m_D;
+  public double getD() {
+    m_thisMutex.lock();
+    try {
+      return m_D;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -427,8 +489,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return feed forward coefficient
    */
-  public synchronized double getF() {
-    return m_F;
+  public double getF() {
+    m_thisMutex.lock();
+    try {
+      return m_F;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -437,8 +504,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return the latest calculated output
    */
-  public synchronized double get() {
-    return m_result;
+  public double get() {
+    m_thisMutex.lock();
+    try {
+      return m_result;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -448,8 +520,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @param continuous Set to true turns on continuous, false turns off continuous
    */
-  public synchronized void setContinuous(boolean continuous) {
-    m_continuous = continuous;
+  public void setContinuous(boolean continuous) {
+    m_thisMutex.lock();
+    try {
+      m_continuous = continuous;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -457,7 +534,7 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * min in as constraints, it considers them to be the same point and automatically calculates the
    * shortest route to the setpoint.
    */
-  public synchronized void setContinuous() {
+  public void setContinuous() {
     setContinuous(true);
   }
 
@@ -467,13 +544,19 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @param minimumInput the minimum value expected from the input
    * @param maximumInput the maximum value expected from the input
    */
-  public synchronized void setInputRange(double minimumInput, double maximumInput) {
-    if (minimumInput > maximumInput) {
-      throw new BoundaryException("Lower bound is greater than upper bound");
+  public void setInputRange(double minimumInput, double maximumInput) {
+    m_thisMutex.lock();
+    try {
+      if (minimumInput > maximumInput) {
+        throw new BoundaryException("Lower bound is greater than upper bound");
+      }
+      m_minimumInput = minimumInput;
+      m_maximumInput = maximumInput;
+      m_inputRange = maximumInput - minimumInput;
+    } finally {
+      m_thisMutex.unlock();
     }
-    m_minimumInput = minimumInput;
-    m_maximumInput = maximumInput;
-    m_inputRange = maximumInput - minimumInput;
+
     setSetpoint(m_setpoint);
   }
 
@@ -483,12 +566,17 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @param minimumOutput the minimum percentage to write to the output
    * @param maximumOutput the maximum percentage to write to the output
    */
-  public synchronized void setOutputRange(double minimumOutput, double maximumOutput) {
-    if (minimumOutput > maximumOutput) {
-      throw new BoundaryException("Lower bound is greater than upper bound");
+  public void setOutputRange(double minimumOutput, double maximumOutput) {
+    m_thisMutex.lock();
+    try {
+      if (minimumOutput > maximumOutput) {
+        throw new BoundaryException("Lower bound is greater than upper bound");
+      }
+      m_minimumOutput = minimumOutput;
+      m_maximumOutput = maximumOutput;
+    } finally {
+      m_thisMutex.unlock();
     }
-    m_minimumOutput = minimumOutput;
-    m_maximumOutput = maximumOutput;
   }
 
   /**
@@ -496,17 +584,22 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @param setpoint the desired setpoint
    */
-  public synchronized void setSetpoint(double setpoint) {
-    if (m_maximumInput > m_minimumInput) {
-      if (setpoint > m_maximumInput) {
-        m_setpoint = m_maximumInput;
-      } else if (setpoint < m_minimumInput) {
-        m_setpoint = m_minimumInput;
+  public void setSetpoint(double setpoint) {
+    m_thisMutex.lock();
+    try {
+      if (m_maximumInput > m_minimumInput) {
+        if (setpoint > m_maximumInput) {
+          m_setpoint = m_maximumInput;
+        } else if (setpoint < m_minimumInput) {
+          m_setpoint = m_minimumInput;
+        } else {
+          m_setpoint = setpoint;
+        }
       } else {
         m_setpoint = setpoint;
       }
-    } else {
-      m_setpoint = setpoint;
+    } finally {
+      m_thisMutex.unlock();
     }
 
     if (m_setpointEntry != null) {
@@ -519,8 +612,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return the current setpoint
    */
-  public synchronized double getSetpoint() {
-    return m_setpoint;
+  public double getSetpoint() {
+    m_thisMutex.lock();
+    try {
+      return m_setpoint;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -528,8 +626,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return the change in setpoint over time
    */
-  public synchronized double getDeltaSetpoint() {
-    return (m_setpoint - m_prevSetpoint) / m_setpointTimer.get();
+  public double getDeltaSetpoint() {
+    m_thisMutex.lock();
+    try {
+      return (m_setpoint - m_prevSetpoint) / m_setpointTimer.get();
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -537,8 +640,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return the current error
    */
-  public synchronized double getError() {
-    return getContinuousError(getSetpoint() - m_pidInput.pidGet());
+  public double getError() {
+    m_thisMutex.lock();
+    try {
+      return getContinuousError(getSetpoint() - m_pidInput.pidGet());
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -550,8 +658,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @return     the current average of the error
    */
   @Deprecated
-  public synchronized double getAvgError() {
-    return getError();
+  public double getAvgError() {
+    m_thisMutex.lock();
+    try {
+      return getError();
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -592,8 +705,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @param absvalue absolute error which is tolerable in the units of the input object
    */
-  public synchronized void setAbsoluteTolerance(double absvalue) {
-    m_tolerance = new AbsoluteTolerance(absvalue);
+  public void setAbsoluteTolerance(double absvalue) {
+    m_thisMutex.lock();
+    try {
+      m_tolerance = new AbsoluteTolerance(absvalue);
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -602,8 +720,13 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @param percentage percent error which is tolerable
    */
-  public synchronized void setPercentTolerance(double percentage) {
-    m_tolerance = new PercentageTolerance(percentage);
+  public void setPercentTolerance(double percentage) {
+    m_thisMutex.lock();
+    try {
+      m_tolerance = new PercentageTolerance(percentage);
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -617,9 +740,14 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @param bufLength Number of previous cycles to average.
    */
   @Deprecated
-  public synchronized void setToleranceBuffer(int bufLength) {
-    m_filter = LinearDigitalFilter.movingAverage(m_origSource, bufLength);
-    m_pidInput = m_filter;
+  public void setToleranceBuffer(int bufLength) {
+    m_thisMutex.lock();
+    try {
+      m_filter = LinearDigitalFilter.movingAverage(m_origSource, bufLength);
+      m_pidInput = m_filter;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -628,16 +756,26 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    *
    * @return true if the error is less than the tolerance
    */
-  public synchronized boolean onTarget() {
-    return m_tolerance.onTarget();
+  public boolean onTarget() {
+    m_thisMutex.lock();
+    try {
+      return m_tolerance.onTarget();
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
    * Begin running the PIDController.
    */
   @Override
-  public synchronized void enable() {
-    m_enabled = true;
+  public void enable() {
+    m_thisMutex.lock();
+    try {
+      m_enabled = true;
+    } finally {
+      m_thisMutex.unlock();
+    }
 
     if (m_enabledEntry != null) {
       m_enabledEntry.setBoolean(true);
@@ -648,9 +786,21 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * Stop running the PIDController, this sets the output to zero before stopping.
    */
   @Override
-  public synchronized void disable() {
-    m_pidOutput.pidWrite(0);
-    m_enabled = false;
+  public void disable() {
+    // Ensures m_enabled check and pidWrite() call occur atomically
+    m_pidWriteMutex.lock();
+    try {
+      m_thisMutex.lock();
+      try {
+        m_enabled = false;
+      } finally {
+        m_thisMutex.unlock();
+      }
+
+      m_pidOutput.pidWrite(0);
+    } finally {
+      m_pidWriteMutex.unlock();
+    }
 
     if (m_enabledEntry != null) {
       m_enabledEntry.setBoolean(false);
@@ -662,7 +812,12 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    */
   @Override
   public boolean isEnabled() {
-    return m_enabled;
+    m_thisMutex.lock();
+    try {
+      return m_enabled;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   /**
@@ -671,9 +826,15 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   @Override
   public synchronized void reset() {
     disable();
-    m_prevError = 0;
-    m_totalError = 0;
-    m_result = 0;
+
+    m_thisMutex.lock();
+    try {
+      m_prevError = 0;
+      m_totalError = 0;
+      m_result = 0;
+    } finally {
+      m_thisMutex.unlock();
+    }
   }
 
   @Override
@@ -741,26 +902,38 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
       m_enabledEntry.setBoolean(isEnabled());
 
       m_pListener = m_pEntry.addListener((entry) -> {
-        synchronized (this) {
+        m_thisMutex.lock();
+        try {
           m_P = entry.value.getDouble();
+        } finally {
+          m_thisMutex.unlock();
         }
       }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
       m_iListener = m_iEntry.addListener((entry) -> {
-        synchronized (this) {
+        m_thisMutex.lock();
+        try {
           m_I = entry.value.getDouble();
+        } finally {
+          m_thisMutex.unlock();
         }
       }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
       m_dListener = m_dEntry.addListener((entry) -> {
-        synchronized (this) {
+        m_thisMutex.lock();
+        try {
           m_D = entry.value.getDouble();
+        } finally {
+          m_thisMutex.unlock();
         }
       }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
       m_fListener = m_fEntry.addListener((entry) -> {
-        synchronized (this) {
+        m_thisMutex.lock();
+        try {
           m_F = entry.value.getDouble();
+        } finally {
+          m_thisMutex.unlock();
         }
       }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 

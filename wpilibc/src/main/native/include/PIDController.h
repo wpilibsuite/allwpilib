@@ -172,7 +172,11 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   std::shared_ptr<PIDSource> m_origSource;
   LinearDigitalFilter m_filter{nullptr, {}, {}};
 
-  mutable wpi::mutex m_mutex;
+  mutable wpi::mutex m_thisMutex;
+
+  // Ensures when Disable() is called, PIDWrite() won't run if Calculate()
+  // is already running at that time.
+  mutable wpi::mutex m_pidWriteMutex;
 
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;
