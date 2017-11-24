@@ -9,9 +9,9 @@
 
 #include <atomic>
 #include <memory>
-#include <set>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "Counter.h"
 #include "LiveWindow/LiveWindowSendable.h"
@@ -90,7 +90,7 @@ class Ultrasonic : public SensorBase,
   static std::thread m_thread;
 
   // Ultrasonic sensors
-  static std::set<Ultrasonic*> m_sensors;
+  static std::vector<Ultrasonic*> m_sensors;
 
   // Automatic round-robin mode
   static std::atomic<bool> m_automaticEnabled;

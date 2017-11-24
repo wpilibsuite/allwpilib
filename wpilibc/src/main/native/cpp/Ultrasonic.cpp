@@ -22,7 +22,7 @@ using namespace frc;
 // Automatic round robin mode
 std::atomic<bool> Ultrasonic::m_automaticEnabled{false};
 
-std::set<Ultrasonic*> Ultrasonic::m_sensors;
+std::vector<Ultrasonic*> Ultrasonic::m_sensors;
 std::thread Ultrasonic::m_thread;
 
 /**
@@ -61,7 +61,7 @@ void Ultrasonic::Initialize() {
   bool originalMode = m_automaticEnabled;
   SetAutomaticMode(false);  // Kill task when adding a new sensor
   // Link this instance on the list
-  m_sensors.insert(this);
+  m_sensors.emplace_back(this);
 
   m_counter.SetMaxPeriod(1.0);
   m_counter.SetSemiPeriodMode(true);
@@ -172,7 +172,8 @@ Ultrasonic::~Ultrasonic() {
   SetAutomaticMode(false);
 
   // No synchronization needed because the background task is stopped.
-  m_sensors.erase(this);
+  m_sensors.erase(std::remove(m_sensors.begin(), m_sensors.end(), this),
+                  m_sensors.end());
 
   if (!m_sensors.empty() && wasAutomaticMode) {
     SetAutomaticMode(true);
