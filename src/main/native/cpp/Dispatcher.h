@@ -17,6 +17,7 @@
 #include <vector>
 
 #include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 #include "support/condition_variable.h"
 #include "support/mutex.h"
 
@@ -46,12 +47,12 @@ class DispatcherBase : public IDispatcher {
   virtual ~DispatcherBase();
 
   unsigned int GetNetworkMode() const;
-  void StartServer(llvm::StringRef persist_filename,
+  void StartServer(const Twine& persist_filename,
                    std::unique_ptr<wpi::NetworkAcceptor> acceptor);
   void StartClient();
   void Stop();
   void SetUpdateRate(double interval);
-  void SetIdentity(llvm::StringRef name);
+  void SetIdentity(const Twine& name);
   void Flush();
   std::vector<ConnectionInfo> GetConnections() const;
   bool IsConnected() const;
@@ -133,7 +134,7 @@ class Dispatcher : public DispatcherBase {
              wpi::Logger& logger)
       : DispatcherBase(storage, notifier, logger) {}
 
-  void StartServer(StringRef persist_filename, const char* listen_address,
+  void StartServer(const Twine& persist_filename, const char* listen_address,
                    unsigned int port);
 
   void SetServer(const char* server_name, unsigned int port);

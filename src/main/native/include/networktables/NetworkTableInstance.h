@@ -15,6 +15,7 @@
 
 #include "llvm/ArrayRef.h"
 #include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 
 #include "networktables/NetworkTable.h"
 #include "networktables/NetworkTableEntry.h"
@@ -37,6 +38,7 @@ namespace nt {
 
 using llvm::ArrayRef;
 using llvm::StringRef;
+using llvm::Twine;
 
 /** NetworkTables Instance.
  *
@@ -136,7 +138,7 @@ class NetworkTableInstance final {
    * @param name Key
    * @return Network table entry.
    */
-  NetworkTableEntry GetEntry(StringRef name);
+  NetworkTableEntry GetEntry(const Twine& name);
 
   /**
    * Get entries starting with the given prefix.
@@ -148,7 +150,7 @@ class NetworkTableInstance final {
    * @param types bitmask of types; 0 is treated as a "don't care"
    * @return Array of entries.
    */
-  std::vector<NetworkTableEntry> GetEntries(StringRef prefix,
+  std::vector<NetworkTableEntry> GetEntries(const Twine& prefix,
                                             unsigned int types);
 
   /**
@@ -161,7 +163,7 @@ class NetworkTableInstance final {
    * @param types bitmask of types; 0 is treated as a "don't care"
    * @return Array of entry information.
    */
-  std::vector<EntryInfo> GetEntryInfo(StringRef prefix,
+  std::vector<EntryInfo> GetEntryInfo(const Twine& prefix,
                                       unsigned int types) const;
 
   /**
@@ -170,7 +172,7 @@ class NetworkTableInstance final {
    * @param key the key name
    * @return The network table
    */
-  std::shared_ptr<NetworkTable> GetTable(StringRef key) const;
+  std::shared_ptr<NetworkTable> GetTable(const Twine& key) const;
 
   /**
    * Deletes ALL keys in ALL subtables (except persistent values).
@@ -192,7 +194,7 @@ class NetworkTableInstance final {
    * @return Listener handle
    */
   NT_EntryListener AddEntryListener(
-      StringRef prefix,
+      const Twine& prefix,
       std::function<void(const EntryNotification& event)> callback,
       unsigned int flags) const;
 
@@ -279,7 +281,7 @@ class NetworkTableInstance final {
    * visible through ConnectionInfo on the remote node.
    * @param name      identity to advertise
    */
-  void SetNetworkIdentity(StringRef name);
+  void SetNetworkIdentity(const Twine& name);
 
   /**
    * Get the current network mode.
@@ -296,7 +298,7 @@ class NetworkTableInstance final {
    *                          address (UTF-8 string, null terminated)
    * @param port              port to communicate over
    */
-  void StartServer(StringRef persist_filename = "networktables.ini",
+  void StartServer(const Twine& persist_filename = "networktables.ini",
                    const char* listen_address = "",
                    unsigned int port = kDefaultPort);
 
@@ -441,7 +443,7 @@ class NetworkTableInstance final {
    * @param filename  filename
    * @return error string, or nullptr if successful
    */
-  const char* SavePersistent(StringRef filename) const;
+  const char* SavePersistent(const Twine& filename) const;
 
   /**
    * Load persistent values from a file.  The server automatically does this
@@ -452,7 +454,7 @@ class NetworkTableInstance final {
    * @return error string, or nullptr if successful
    */
   const char* LoadPersistent(
-      StringRef filename,
+      const Twine& filename,
       std::function<void(size_t line, const char* msg)> warn);
 
   /**
@@ -462,7 +464,7 @@ class NetworkTableInstance final {
    * @param prefix    save only keys starting with this prefix
    * @return error string, or nullptr if successful
    */
-  const char* SaveEntries(StringRef filename, StringRef prefix) const;
+  const char* SaveEntries(const Twine& filename, const Twine& prefix) const;
 
   /**
    * Load table values from a file.  The file format used is identical to
@@ -473,7 +475,7 @@ class NetworkTableInstance final {
    * @return error string, or nullptr if successful
    */
   const char* LoadEntries(
-      StringRef filename, StringRef prefix,
+      const Twine& filename, const Twine& prefix,
       std::function<void(size_t line, const char* msg)> warn);
 
   /** @} */

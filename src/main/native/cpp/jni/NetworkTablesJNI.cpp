@@ -387,7 +387,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_getEntr
     nullPointerEx.Throw(env, "key cannot be null");
     return false;
   }
-  return nt::GetEntry(inst, JStringRef{env, key});
+  return nt::GetEntry(inst, JStringRef{env, key}.str());
 }
 
 /*
@@ -402,8 +402,8 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_ge
     nullPointerEx.Throw(env, "prefix cannot be null");
     return nullptr;
   }
-  return MakeJIntArray(env,
-                       nt::GetEntries(inst, JStringRef{env, prefix}, types));
+  return MakeJIntArray(
+      env, nt::GetEntries(inst, JStringRef{env, prefix}.str(), types));
 }
 
 /*
@@ -484,12 +484,12 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_set
     return false;
   }
   if (force) {
-    nt::SetEntryTypeValue(entry,
-                          nt::Value::MakeString(JStringRef{env, value}, time));
+    nt::SetEntryTypeValue(
+        entry, nt::Value::MakeString(JStringRef{env, value}.str(), time));
     return JNI_TRUE;
   }
-  return nt::SetEntryValue(entry,
-                           nt::Value::MakeString(JStringRef{env, value}, time));
+  return nt::SetEntryValue(
+      entry, nt::Value::MakeString(JStringRef{env, value}.str(), time));
 }
 
 /*
@@ -737,7 +737,7 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_set
     return false;
   }
   return nt::SetDefaultEntryValue(
-      entry, nt::Value::MakeString(JStringRef{env, defaultValue}, time));
+      entry, nt::Value::MakeString(JStringRef{env, defaultValue}.str(), time));
 }
 
 /*
@@ -871,7 +871,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI
     nullPointerEx.Throw(env, "prefix cannot be null");
     return nullptr;
   }
-  auto arr = nt::GetEntryInfo(inst, JStringRef{env, prefix}, types);
+  auto arr = nt::GetEntryInfo(inst, JStringRef{env, prefix}.str(), types);
   jobjectArray jarr = env->NewObjectArray(arr.size(), entryInfoCls, nullptr);
   if (!jarr) return nullptr;
   for (size_t i = 0; i < arr.size(); ++i) {
@@ -915,7 +915,8 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_addPoll
     nullPointerEx.Throw(env, "prefix cannot be null");
     return 0;
   }
-  return nt::AddPolledEntryListener(poller, JStringRef{env, prefix}, flags);
+  return nt::AddPolledEntryListener(poller, JStringRef{env, prefix}.str(),
+                                    flags);
 }
 
 /*
@@ -1280,7 +1281,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_setNetw
     nullPointerEx.Throw(env, "name cannot be null");
     return;
   }
-  nt::SetNetworkIdentity(inst, JStringRef{env, name});
+  nt::SetNetworkIdentity(inst, JStringRef{env, name}.str());
 }
 
 /*
@@ -1310,7 +1311,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_startSe
     nullPointerEx.Throw(env, "listenAddress cannot be null");
     return;
   }
-  nt::StartServer(inst, JStringRef{env, persistFilename},
+  nt::StartServer(inst, JStringRef{env, persistFilename}.str(),
                   JStringRef{env, listenAddress}.c_str(), port);
 }
 
@@ -1573,7 +1574,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_savePer
     nullPointerEx.Throw(env, "filename cannot be null");
     return;
   }
-  const char *err = nt::SavePersistent(inst, JStringRef{env, filename});
+  const char *err = nt::SavePersistent(inst, JStringRef{env, filename}.str());
   if (err) persistentEx.Throw(env, err);
 }
 
@@ -1590,7 +1591,7 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI
     return nullptr;
   }
   std::vector<std::string> warns;
-  const char* err = nt::LoadPersistent(inst, JStringRef{env, filename},
+  const char* err = nt::LoadPersistent(inst, JStringRef{env, filename}.str(),
                                        [&](size_t line, const char* msg) {
                                          llvm::SmallString<128> warn;
                                          llvm::raw_svector_ostream oss(warn);
@@ -1620,8 +1621,8 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI_saveEnt
     nullPointerEx.Throw(env, "prefix cannot be null");
     return;
   }
-  const char* err =
-      nt::SaveEntries(inst, JStringRef{env, filename}, JStringRef{env, prefix});
+  const char* err = nt::SaveEntries(inst, JStringRef{env, filename}.str(),
+                                    JStringRef{env, prefix}.str());
   if (err) persistentEx.Throw(env, err);
 }
 
@@ -1642,14 +1643,14 @@ JNIEXPORT jobjectArray JNICALL Java_edu_wpi_first_networktables_NetworkTablesJNI
     return nullptr;
   }
   std::vector<std::string> warns;
-  const char* err =
-      nt::LoadEntries(inst, JStringRef{env, filename}, JStringRef{env, prefix},
-                      [&](size_t line, const char* msg) {
-                        llvm::SmallString<128> warn;
-                        llvm::raw_svector_ostream oss(warn);
-                        oss << line << ": " << msg;
-                        warns.emplace_back(oss.str());
-                      });
+  const char* err = nt::LoadEntries(inst, JStringRef{env, filename}.str(),
+                                    JStringRef{env, prefix}.str(),
+                                    [&](size_t line, const char* msg) {
+                                      llvm::SmallString<128> warn;
+                                      llvm::raw_svector_ostream oss(warn);
+                                      oss << line << ": " << msg;
+                                      warns.emplace_back(oss.str());
+                                    });
   if (err) {
     persistentEx.Throw(env, err);
     return nullptr;

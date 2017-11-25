@@ -102,7 +102,7 @@ inline bool NetworkTableEntry::SetDefaultDouble(double defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeDouble(defaultValue));
 }
 
-inline bool NetworkTableEntry::SetDefaultString(StringRef defaultValue) {
+inline bool NetworkTableEntry::SetDefaultString(const Twine& defaultValue) {
   return SetDefaultEntryValue(m_handle, Value::MakeString(defaultValue));
 }
 
@@ -137,7 +137,7 @@ inline bool NetworkTableEntry::SetDouble(double value) {
   return SetEntryValue(m_handle, Value::MakeDouble(value));
 }
 
-inline bool NetworkTableEntry::SetString(StringRef value) {
+inline bool NetworkTableEntry::SetString(const Twine& value) {
   return SetEntryValue(m_handle, Value::MakeString(value));
 }
 
@@ -169,7 +169,7 @@ inline void NetworkTableEntry::ForceSetDouble(double value) {
   SetEntryTypeValue(m_handle, Value::MakeDouble(value));
 }
 
-inline void NetworkTableEntry::ForceSetString(StringRef value) {
+inline void NetworkTableEntry::ForceSetString(const Twine& value) {
   SetEntryTypeValue(m_handle, Value::MakeString(value));
 }
 

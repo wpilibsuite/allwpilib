@@ -17,6 +17,7 @@
 
 #include "llvm/ArrayRef.h"
 #include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 #include "support/deprecated.h"
 
 #include "networktables/NetworkTableValue.h"
@@ -25,6 +26,7 @@ namespace nt {
 
 using llvm::ArrayRef;
 using llvm::StringRef;
+using llvm::Twine;
 
 /** NetworkTables Entry Information */
 struct EntryInfo {
@@ -166,7 +168,7 @@ class EntryNotification {
  public:
   EntryNotification() : listener(0), entry(0) {}
   EntryNotification(NT_EntryListener listener_, NT_Entry entry_,
-                    llvm::StringRef name_, std::shared_ptr<Value> value_,
+                    StringRef name_, std::shared_ptr<Value> value_,
                     unsigned int flags_)
       : listener(listener_),
         entry(entry_),
@@ -233,7 +235,7 @@ class LogMessage {
  public:
   LogMessage() : logger(0), level(0), filename(""), line(0) {}
   LogMessage(NT_Logger logger_, unsigned int level_, const char* filename_,
-             unsigned int line_, llvm::StringRef message_)
+             unsigned int line_, StringRef message_)
       : logger(logger_),
         level(level_),
         filename(filename_),
@@ -310,7 +312,7 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle);
  * @param name      entry name (UTF-8 string)
  * @return entry handle
  */
-NT_Entry GetEntry(NT_Inst inst, StringRef name);
+NT_Entry GetEntry(NT_Inst inst, const Twine& name);
 
 /**
  * Get Entry Handles.
@@ -325,7 +327,7 @@ NT_Entry GetEntry(NT_Inst inst, StringRef name);
  *                      as a "don't care"
  * @return Array of entry handles.
  */
-std::vector<NT_Entry> GetEntries(NT_Inst inst, StringRef prefix,
+std::vector<NT_Entry> GetEntries(NT_Inst inst, const Twine& prefix,
                                  unsigned int types);
 
 /**
@@ -549,7 +551,7 @@ std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types);
  *
  * @param inst    instance handle
  */
-std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, StringRef prefix,
+std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, const Twine& prefix,
                                     unsigned int types);
 
 /**
@@ -602,7 +604,7 @@ NT_EntryListener AddEntryListener(StringRef prefix,
  * @param inst              instance handle
  */
 NT_EntryListener AddEntryListener(
-    NT_Inst inst, StringRef prefix,
+    NT_Inst inst, const Twine& prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags);
 
@@ -646,7 +648,8 @@ void DestroyEntryListenerPoller(NT_EntryListenerPoller poller);
  * @return Listener handle
  */
 NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        StringRef prefix, unsigned int flags);
+                                        const Twine& prefix,
+                                        unsigned int flags);
 
 /**
  * Create a polled entry listener.
@@ -1028,7 +1031,7 @@ void SetNetworkIdentity(StringRef name);
  * @copydoc SetNetworkIdentity(StringRef)
  * @param inst      instance handle
  */
-void SetNetworkIdentity(NT_Inst inst, StringRef name);
+void SetNetworkIdentity(NT_Inst inst, const Twine& name);
 
 /**
  * Get the current network mode.
@@ -1061,7 +1064,7 @@ void StartServer(StringRef persist_filename, const char* listen_address,
  * @copydoc StartServer(StringRef, const char*, unsigned int)
  * @param inst              instance handle
  */
-void StartServer(NT_Inst inst, StringRef persist_filename,
+void StartServer(NT_Inst inst, const Twine& persist_filename,
                  const char* listen_address, unsigned int port);
 
 /**
@@ -1290,7 +1293,7 @@ const char* SavePersistent(StringRef filename);
  * @copydoc SavePersistent(StringRef)
  * @param inst      instance handle
  */
-const char* SavePersistent(NT_Inst inst, StringRef filename);
+const char* SavePersistent(NT_Inst inst, const Twine& filename);
 
 /**
  * Load persistent values from a file.  The server automatically does this
@@ -1310,7 +1313,7 @@ const char* LoadPersistent(
  * @param inst      instance handle
  */
 const char* LoadPersistent(
-    NT_Inst inst, StringRef filename,
+    NT_Inst inst, const Twine& filename,
     std::function<void(size_t line, const char* msg)> warn);
 
 /**
@@ -1321,7 +1324,8 @@ const char* LoadPersistent(
  * @param prefix    save only keys starting with this prefix
  * @return error string, or nullptr if successful
  */
-const char* SaveEntries(NT_Inst inst, StringRef filename, StringRef prefix);
+const char* SaveEntries(NT_Inst inst, const Twine& filename,
+                        const Twine& prefix);
 
 /**
  * Load table values from a file.  The file format used is identical to
@@ -1332,7 +1336,8 @@ const char* SaveEntries(NT_Inst inst, StringRef filename, StringRef prefix);
  * @param warn      callback function for warnings
  * @return error string, or nullptr if successful
  */
-const char* LoadEntries(NT_Inst inst, StringRef filename, StringRef prefix,
+const char* LoadEntries(NT_Inst inst, const Twine& filename,
+                        const Twine& prefix,
                         std::function<void(size_t line, const char* msg)> warn);
 
 /** @} */

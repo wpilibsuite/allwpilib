@@ -757,30 +757,36 @@ void Storage::DeleteAllEntries() {
   dispatcher->QueueOutgoing(Message::ClearEntries(), nullptr, nullptr);
 }
 
-Storage::Entry* Storage::GetOrNew(StringRef name) {
-  auto& entry = m_entries[name];
+Storage::Entry* Storage::GetOrNew(const Twine& name) {
+  llvm::SmallString<128> nameBuf;
+  StringRef nameStr = name.toStringRef(nameBuf);
+  auto& entry = m_entries[nameStr];
   if (!entry) {
-    m_localmap.emplace_back(new Entry(name));
+    m_localmap.emplace_back(new Entry(nameStr));
     entry = m_localmap.back().get();
     entry->local_id = m_localmap.size() - 1;
   }
   return entry;
 }
 
-unsigned int Storage::GetEntry(StringRef name) {
-  if (name.empty()) return UINT_MAX;
+unsigned int Storage::GetEntry(const Twine& name) {
+  if (name.isTriviallyEmpty() ||
+      (name.isSingleStringRef() && name.getSingleStringRef().empty()))
+    return UINT_MAX;
   std::unique_lock<wpi::mutex> lock(m_mutex);
   return GetOrNew(name)->local_id;
 }
 
-std::vector<unsigned int> Storage::GetEntries(StringRef prefix,
+std::vector<unsigned int> Storage::GetEntries(const Twine& prefix,
                                               unsigned int types) {
+  llvm::SmallString<128> prefixBuf;
+  StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
   std::vector<unsigned int> ids;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
     auto value = entry->value.get();
-    if (!value || !i.getKey().startswith(prefix)) continue;
+    if (!value || !i.getKey().startswith(prefixStr)) continue;
     if (types != 0 && (types & value->type()) == 0) continue;
     ids.push_back(entry->local_id);
   }
@@ -829,14 +835,16 @@ unsigned long long Storage::GetEntryLastChange(unsigned int local_id) const {
   return entry->value->last_change();
 }
 
-std::vector<EntryInfo> Storage::GetEntryInfo(int inst, StringRef prefix,
+std::vector<EntryInfo> Storage::GetEntryInfo(int inst, const Twine& prefix,
                                              unsigned int types) {
+  llvm::SmallString<128> prefixBuf;
+  StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
   std::vector<EntryInfo> infos;
   for (auto& i : m_entries) {
     Entry* entry = i.getValue();
     auto value = entry->value.get();
-    if (!value || !i.getKey().startswith(prefix)) continue;
+    if (!value || !i.getKey().startswith(prefixStr)) continue;
     if (types != 0 && (types & value->type()) == 0) continue;
     EntryInfo info;
     info.entry = Handle(inst, entry->local_id, Handle::kEntry);
@@ -850,16 +858,18 @@ std::vector<EntryInfo> Storage::GetEntryInfo(int inst, StringRef prefix,
 }
 
 unsigned int Storage::AddListener(
-    StringRef prefix,
+    const Twine& prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) const {
+  llvm::SmallString<128> prefixBuf;
+  StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  unsigned int uid = m_notifier.Add(callback, prefix, flags);
+  unsigned int uid = m_notifier.Add(callback, prefixStr, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
     for (auto& i : m_entries) {
       Entry* entry = i.getValue();
-      if (!entry->value || !i.getKey().startswith(prefix)) continue;
+      if (!entry->value || !i.getKey().startswith(prefixStr)) continue;
       m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
                              NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW, uid);
     }
@@ -885,14 +895,17 @@ unsigned int Storage::AddListener(
   return uid;
 }
 
-unsigned int Storage::AddPolledListener(unsigned int poller, StringRef prefix,
+unsigned int Storage::AddPolledListener(unsigned int poller,
+                                        const Twine& prefix,
                                         unsigned int flags) const {
+  llvm::SmallString<128> prefixBuf;
+  StringRef prefixStr = prefix.toStringRef(prefixBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  unsigned int uid = m_notifier.AddPolled(poller, prefix, flags);
+  unsigned int uid = m_notifier.AddPolled(poller, prefixStr, flags);
   // perform immediate notifications
   if ((flags & NT_NOTIFY_IMMEDIATE) != 0 && (flags & NT_NOTIFY_NEW) != 0) {
     for (auto& i : m_entries) {
-      if (!i.getKey().startswith(prefix)) continue;
+      if (!i.getKey().startswith(prefixStr)) continue;
       Entry* entry = i.getValue();
       if (!entry->value) continue;
       m_notifier.NotifyEntry(entry->local_id, i.getKey(), entry->value,
@@ -949,9 +962,11 @@ bool Storage::GetPersistentEntries(
 }
 
 bool Storage::GetEntries(
-    StringRef prefix,
+    const Twine& prefix,
     std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
     const {
+  llvm::SmallString<128> prefixBuf;
+  StringRef prefixStr = prefix.toStringRef(prefixBuf);
   // copy values out of storage as quickly as possible so lock isn't held
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
@@ -959,7 +974,7 @@ bool Storage::GetEntries(
     for (auto& i : m_entries) {
       Entry* entry = i.getValue();
       // only write values with given prefix
-      if (!entry->value || !i.getKey().startswith(prefix)) continue;
+      if (!entry->value || !i.getKey().startswith(prefixStr)) continue;
       entries->emplace_back(i.getKey(), entry->value);
     }
   }

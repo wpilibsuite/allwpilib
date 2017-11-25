@@ -13,7 +13,7 @@
 #include <vector>
 
 #include "llvm/ArrayRef.h"
-#include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 
 #include "Message.h"
 #include "ntcore_cpp.h"
@@ -53,10 +53,10 @@ class IStorage {
 
   // Filename-based save/load functions.  Used both by periodic saves and
   // accessible directly via the user API.
-  virtual const char* SavePersistent(StringRef filename,
+  virtual const char* SavePersistent(const Twine& filename,
                                      bool periodic) const = 0;
   virtual const char* LoadPersistent(
-      StringRef filename,
+      const Twine& filename,
       std::function<void(std::size_t line, const char* msg)> warn) = 0;
 };
 

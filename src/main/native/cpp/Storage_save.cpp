@@ -181,11 +181,13 @@ void Storage::SavePersistent(llvm::raw_ostream& os, bool periodic) const {
   SavePersistentImpl(os).Save(entries);
 }
 
-const char* Storage::SavePersistent(StringRef filename, bool periodic) const {
-  llvm::SmallString<128> fn = filename;
-  llvm::SmallString<128> tmp = filename;
+const char* Storage::SavePersistent(const Twine& filename,
+                                    bool periodic) const {
+  llvm::SmallString<128> fn;
+  filename.toVector(fn);
+  llvm::SmallString<128> tmp = fn;
   tmp += ".tmp";
-  llvm::SmallString<128> bak = filename;
+  llvm::SmallString<128> bak = fn;
   bak += ".bak";
 
   // Get entries before creating file
@@ -225,17 +227,19 @@ done:
   return err;
 }
 
-void Storage::SaveEntries(llvm::raw_ostream& os, StringRef prefix) const {
+void Storage::SaveEntries(llvm::raw_ostream& os, const Twine& prefix) const {
   std::vector<SavePersistentImpl::Entry> entries;
   if (!GetEntries(prefix, &entries)) return;
   SavePersistentImpl(os).Save(entries);
 }
 
-const char* Storage::SaveEntries(StringRef filename, StringRef prefix) const {
-  llvm::SmallString<128> fn = filename;
-  llvm::SmallString<128> tmp = filename;
+const char* Storage::SaveEntries(const Twine& filename,
+                                 const Twine& prefix) const {
+  llvm::SmallString<128> fn;
+  filename.toVector(fn);
+  llvm::SmallString<128> tmp = fn;
   tmp += ".tmp";
-  llvm::SmallString<128> bak = filename;
+  llvm::SmallString<128> bak = fn;
   bak += ".bak";
 
   // Get entries before creating file

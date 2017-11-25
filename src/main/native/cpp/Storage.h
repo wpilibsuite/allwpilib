@@ -97,11 +97,11 @@ class Storage : public IStorage {
 
   void DeleteAllEntries();
 
-  std::vector<EntryInfo> GetEntryInfo(int inst, StringRef prefix,
+  std::vector<EntryInfo> GetEntryInfo(int inst, const Twine& prefix,
                                       unsigned int types);
 
   unsigned int AddListener(
-      StringRef prefix,
+      const Twine& prefix,
       std::function<void(const EntryNotification& event)> callback,
       unsigned int flags) const;
   unsigned int AddListener(
@@ -109,14 +109,14 @@ class Storage : public IStorage {
       std::function<void(const EntryNotification& event)> callback,
       unsigned int flags) const;
 
-  unsigned int AddPolledListener(unsigned int poller_uid, StringRef prefix,
+  unsigned int AddPolledListener(unsigned int poller_uid, const Twine& prefix,
                                  unsigned int flags) const;
   unsigned int AddPolledListener(unsigned int poller_uid, unsigned int local_id,
                                  unsigned int flags) const;
 
   // Index-only
-  unsigned int GetEntry(StringRef name);
-  std::vector<unsigned int> GetEntries(StringRef prefix, unsigned int types);
+  unsigned int GetEntry(const Twine& name);
+  std::vector<unsigned int> GetEntries(const Twine& prefix, unsigned int types);
   EntryInfo GetEntryInfo(int inst, unsigned int local_id) const;
   std::string GetEntryName(unsigned int local_id) const;
   NT_Type GetEntryType(unsigned int local_id) const;
@@ -124,23 +124,24 @@ class Storage : public IStorage {
 
   // Filename-based save/load functions.  Used both by periodic saves and
   // accessible directly via the user API.
-  const char* SavePersistent(StringRef filename, bool periodic) const override;
+  const char* SavePersistent(const Twine& filename,
+                             bool periodic) const override;
   const char* LoadPersistent(
-      StringRef filename,
+      const Twine& filename,
       std::function<void(std::size_t line, const char* msg)> warn) override;
 
-  const char* SaveEntries(StringRef filename, StringRef prefix) const;
+  const char* SaveEntries(const Twine& filename, const Twine& prefix) const;
   const char* LoadEntries(
-      StringRef filename, StringRef prefix,
+      const Twine& filename, const Twine& prefix,
       std::function<void(std::size_t line, const char* msg)> warn);
 
   // Stream-based save/load functions (exposed for testing purposes).  These
   // implement the guts of the filename-based functions.
   void SavePersistent(llvm::raw_ostream& os, bool periodic) const;
-  bool LoadEntries(wpi::raw_istream& is, StringRef prefix, bool persistent,
+  bool LoadEntries(wpi::raw_istream& is, const Twine& prefix, bool persistent,
                    std::function<void(std::size_t line, const char* msg)> warn);
 
-  void SaveEntries(llvm::raw_ostream& os, StringRef prefix) const;
+  void SaveEntries(llvm::raw_ostream& os, const Twine& prefix) const;
 
   // RPC configuration needs to come through here as RPC definitions are
   // actually special Storage value types.
@@ -237,7 +238,7 @@ class Storage : public IStorage {
       bool periodic,
       std::vector<std::pair<std::string, std::shared_ptr<Value>>>* entries)
       const;
-  bool GetEntries(StringRef prefix,
+  bool GetEntries(const Twine& prefix,
                   std::vector<std::pair<std::string, std::shared_ptr<Value>>>*
                       entries) const;
   void SetEntryValueImpl(Entry* entry, std::shared_ptr<Value> value,
@@ -251,7 +252,7 @@ class Storage : public IStorage {
   template <typename F>
   void DeleteAllEntriesImpl(bool local, F should_delete);
   void DeleteAllEntriesImpl(bool local);
-  Entry* GetOrNew(StringRef name);
+  Entry* GetOrNew(const Twine& name);
 };
 
 }  // namespace nt

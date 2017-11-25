@@ -20,7 +20,7 @@
 
 using namespace nt;
 
-void Dispatcher::StartServer(llvm::StringRef persist_filename,
+void Dispatcher::StartServer(const Twine& persist_filename,
                              const char* listen_address, unsigned int port) {
   DispatcherBase::StartServer(
       persist_filename,
@@ -115,7 +115,7 @@ DispatcherBase::~DispatcherBase() { Stop(); }
 unsigned int DispatcherBase::GetNetworkMode() const { return m_networkMode; }
 
 void DispatcherBase::StartServer(
-    StringRef persist_filename,
+    const Twine& persist_filename,
     std::unique_ptr<wpi::NetworkAcceptor> acceptor) {
   {
     std::lock_guard<wpi::mutex> lock(m_user_mutex);
@@ -123,11 +123,13 @@ void DispatcherBase::StartServer(
     m_active = true;
   }
   m_networkMode = NT_NET_MODE_SERVER | NT_NET_MODE_STARTING;
-  m_persist_filename = persist_filename;
+  m_persist_filename = persist_filename.str();
   m_server_acceptor = std::move(acceptor);
 
   // Load persistent file.  Ignore errors, but pass along warnings.
-  if (!persist_filename.empty()) {
+  if (!persist_filename.isTriviallyEmpty() &&
+      (!persist_filename.isSingleStringRef() ||
+       !persist_filename.getSingleStringRef().empty())) {
     bool first = true;
     m_storage.LoadPersistent(
         persist_filename, [&](std::size_t line, const char* msg) {
@@ -198,9 +200,9 @@ void DispatcherBase::SetUpdateRate(double interval) {
   m_update_rate = static_cast<unsigned int>(interval * 1000);
 }
 
-void DispatcherBase::SetIdentity(llvm::StringRef name) {
+void DispatcherBase::SetIdentity(const Twine& name) {
   std::lock_guard<wpi::mutex> lock(m_user_mutex);
-  m_identity = name;
+  m_identity = name.str();
 }
 
 void DispatcherBase::Flush() {

@@ -362,13 +362,16 @@ std::shared_ptr<Value> LoadPersistentImpl::ReadStringArrayValue() {
 }
 
 bool Storage::LoadEntries(
-    wpi::raw_istream& is, StringRef prefix, bool persistent,
+    wpi::raw_istream& is, const Twine& prefix, bool persistent,
     std::function<void(std::size_t line, const char* msg)> warn) {
+  llvm::SmallString<128> prefixBuf;
+  StringRef prefixStr = prefix.toStringRef(prefixBuf);
+
   // entries to add
   std::vector<LoadPersistentImpl::Entry> entries;
 
   // load file
-  if (!LoadPersistentImpl(is, warn).Load(prefix, &entries)) return false;
+  if (!LoadPersistentImpl(is, warn).Load(prefixStr, &entries)) return false;
 
   // copy values into storage as quickly as possible so lock isn't held
   std::vector<std::shared_ptr<Message>> msgs;
@@ -431,7 +434,7 @@ bool Storage::LoadEntries(
 }
 
 const char* Storage::LoadPersistent(
-    StringRef filename,
+    const Twine& filename,
     std::function<void(std::size_t line, const char* msg)> warn) {
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);
@@ -441,7 +444,7 @@ const char* Storage::LoadPersistent(
 }
 
 const char* Storage::LoadEntries(
-    StringRef filename, StringRef prefix,
+    const Twine& filename, const Twine& prefix,
     std::function<void(std::size_t line, const char* msg)> warn) {
   std::error_code ec;
   wpi::raw_fd_istream is(filename, ec);

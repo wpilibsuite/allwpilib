@@ -11,19 +11,20 @@
 using namespace nt;
 
 std::shared_ptr<NetworkTable> NetworkTableInstance::GetTable(
-    StringRef key) const {
-  if (key.empty() || key == "/") {
+    const Twine& key) const {
+  StringRef simple;
+  bool isSimple = key.isSingleStringRef();
+  if (isSimple) simple = key.getSingleStringRef();
+  if (isSimple && (simple.empty() || simple == "/")) {
     return std::make_shared<NetworkTable>(m_handle, "",
                                           NetworkTable::private_init{});
-  } else if (key[0] == NetworkTable::PATH_SEPARATOR_CHAR) {
+  } else if (isSimple && simple[0] == NetworkTable::PATH_SEPARATOR_CHAR) {
     return std::make_shared<NetworkTable>(m_handle, key,
                                           NetworkTable::private_init{});
   } else {
-    llvm::SmallString<128> path;
-    path += NetworkTable::PATH_SEPARATOR_CHAR;
-    path += key;
-    return std::make_shared<NetworkTable>(m_handle, path,
-                                          NetworkTable::private_init{});
+    return std::make_shared<NetworkTable>(
+        m_handle, Twine(NetworkTable::PATH_SEPARATOR_CHAR) + key,
+        NetworkTable::private_init{});
   }
 }
 
@@ -44,7 +45,7 @@ void NetworkTableInstance::SetServer(ArrayRef<StringRef> servers,
 }
 
 NT_EntryListener NetworkTableInstance::AddEntryListener(
-    StringRef prefix,
+    const Twine& prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) const {
   return ::nt::AddEntryListener(m_handle, prefix, callback, flags);

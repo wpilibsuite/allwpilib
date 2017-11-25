@@ -11,6 +11,7 @@
 #include <memory>
 
 #include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 #include "networktables/NetworkTableValue.h"
 #include "support/deprecated.h"
 
@@ -31,7 +32,7 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
    * @param key the key to search for
    * @return true if the table as a value assigned to the given key
    */
-  virtual bool ContainsKey(llvm::StringRef key) const = 0;
+  virtual bool ContainsKey(const llvm::Twine& key) const = 0;
 
   /**
    * Determines whether there exists a non-empty subtable for this key
@@ -41,7 +42,7 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
    * @return true if there is a subtable with the key which contains at least
    * one key/subtable of its own
    */
-  virtual bool ContainsSubTable(llvm::StringRef key) const = 0;
+  virtual bool ContainsSubTable(const llvm::Twine& key) const = 0;
 
   /**
    * Gets the subtable in this table for the given name.
@@ -49,7 +50,8 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
    * @param key the name of the table relative to this one
    * @return a sub table relative to this one
    */
-  virtual std::shared_ptr<nt::NetworkTable> GetSubTable(llvm::StringRef key) const = 0;
+  virtual std::shared_ptr<nt::NetworkTable> GetSubTable(
+      const llvm::Twine& key) const = 0;
 
   /**
    * @param types bitmask of types; 0 is treated as a "don't care".
@@ -116,7 +118,7 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
    *
    * @param key the key name
    */
-  virtual void Delete(llvm::StringRef key) = 0;
+  virtual void Delete(const llvm::Twine& key) = 0;
 
   /**
    * Gets the value associated with a key as an object
@@ -125,7 +127,7 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
    * @return the value associated with the given key, or nullptr if the key
    * does not exist
    */
-  virtual std::shared_ptr<nt::Value> GetValue(llvm::StringRef key) const = 0;
+  virtual std::shared_ptr<nt::Value> GetValue(const llvm::Twine& key) const = 0;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -133,7 +135,7 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  virtual bool SetDefaultValue(llvm::StringRef key,
+  virtual bool SetDefaultValue(const llvm::Twine& key,
                                std::shared_ptr<nt::Value> defaultValue) = 0;
 
   /**
@@ -143,7 +145,7 @@ class WPI_DEPRECATED("Use NetworkTable directly") ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  virtual bool PutValue(llvm::StringRef key,
+  virtual bool PutValue(const llvm::Twine& key,
                         std::shared_ptr<nt::Value> value) = 0;
 
   /**

@@ -12,6 +12,7 @@
 #include <string>
 
 #include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 
 #include "networktables/NetworkTableType.h"
 #include "networktables/NetworkTableValue.h"
@@ -23,6 +24,7 @@ namespace nt {
 
 using llvm::ArrayRef;
 using llvm::StringRef;
+using llvm::Twine;
 
 class NetworkTableInstance;
 
@@ -206,7 +208,7 @@ class NetworkTableEntry final {
    * @param defaultValue the default value to set
    * @return False if the entry exists with a different type
    */
-  bool SetDefaultString(StringRef defaultValue);
+  bool SetDefaultString(const Twine& defaultValue);
 
   /**
    * Sets the entry's value if it does not exist.
@@ -262,7 +264,7 @@ class NetworkTableEntry final {
    * @param value the value to set
    * @return False if the entry exists with a different type
    */
-  bool SetString(StringRef value);
+  bool SetString(const Twine& value);
 
   /**
    * Sets the entry's value.
@@ -318,7 +320,7 @@ class NetworkTableEntry final {
    * changed to match the new value.
    * @param value the value to set
    */
-  void ForceSetString(StringRef value);
+  void ForceSetString(const Twine& value);
 
   /**
    * Sets the entry's value.  If the value is of different type, the type is

@@ -52,7 +52,7 @@ NT_Inst GetInstanceFromHandle(NT_Handle handle) {
  * Table Functions
  */
 
-NT_Entry GetEntry(NT_Inst inst, StringRef name) {
+NT_Entry GetEntry(NT_Inst inst, const Twine& name) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
   auto ii = InstanceImpl::Get(i);
   if (!ii) return 0;
@@ -62,7 +62,7 @@ NT_Entry GetEntry(NT_Inst inst, StringRef name) {
   return Handle(i, id, Handle::kEntry);
 }
 
-std::vector<NT_Entry> GetEntries(NT_Inst inst, StringRef prefix,
+std::vector<NT_Entry> GetEntries(NT_Inst inst, const Twine& prefix,
                                  unsigned int types) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
   auto ii = InstanceImpl::Get(i);
@@ -208,7 +208,7 @@ std::vector<EntryInfo> GetEntryInfo(StringRef prefix, unsigned int types) {
   return InstanceImpl::GetDefault()->storage.GetEntryInfo(0, prefix, types);
 }
 
-std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, StringRef prefix,
+std::vector<EntryInfo> GetEntryInfo(NT_Inst inst, const Twine& prefix,
                                     unsigned int types) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
   auto ii = InstanceImpl::Get(i);
@@ -250,7 +250,7 @@ NT_EntryListener AddEntryListener(StringRef prefix,
 }
 
 NT_EntryListener AddEntryListener(
-    NT_Inst inst, StringRef prefix,
+    NT_Inst inst, const Twine& prefix,
     std::function<void(const EntryNotification& event)> callback,
     unsigned int flags) {
   int i = Handle{inst}.GetTypedInst(Handle::kInstance);
@@ -294,7 +294,8 @@ void DestroyEntryListenerPoller(NT_EntryListenerPoller poller) {
 }
 
 NT_EntryListener AddPolledEntryListener(NT_EntryListenerPoller poller,
-                                        StringRef prefix, unsigned int flags) {
+                                        const Twine& prefix,
+                                        unsigned int flags) {
   Handle handle{poller};
   int id = handle.GetTypedIndex(Handle::kEntryListenerPoller);
   int i = handle.GetInst();
@@ -722,7 +723,7 @@ void SetNetworkIdentity(StringRef name) {
   InstanceImpl::GetDefault()->dispatcher.SetIdentity(name);
 }
 
-void SetNetworkIdentity(NT_Inst inst, StringRef name) {
+void SetNetworkIdentity(NT_Inst inst, const Twine& name) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) return;
 
@@ -746,7 +747,7 @@ void StartServer(StringRef persist_filename, const char* listen_address,
   ii->dispatcher.StartServer(persist_filename, listen_address, port);
 }
 
-void StartServer(NT_Inst inst, StringRef persist_filename,
+void StartServer(NT_Inst inst, const Twine& persist_filename,
                  const char* listen_address, unsigned int port) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) return;
@@ -914,7 +915,7 @@ const char* SavePersistent(StringRef filename) {
   return InstanceImpl::GetDefault()->storage.SavePersistent(filename, false);
 }
 
-const char* SavePersistent(NT_Inst inst, StringRef filename) {
+const char* SavePersistent(NT_Inst inst, const Twine& filename) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) return "invalid instance handle";
 
@@ -928,7 +929,7 @@ const char* LoadPersistent(
 }
 
 const char* LoadPersistent(
-    NT_Inst inst, StringRef filename,
+    NT_Inst inst, const Twine& filename,
     std::function<void(size_t line, const char* msg)> warn) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) return "invalid instance handle";
@@ -936,7 +937,8 @@ const char* LoadPersistent(
   return ii->storage.LoadPersistent(filename, warn);
 }
 
-const char* SaveEntries(NT_Inst inst, StringRef filename, StringRef prefix) {
+const char* SaveEntries(NT_Inst inst, const Twine& filename,
+                        const Twine& prefix) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) return "invalid instance handle";
 
@@ -944,7 +946,7 @@ const char* SaveEntries(NT_Inst inst, StringRef filename, StringRef prefix) {
 }
 
 const char* LoadEntries(
-    NT_Inst inst, StringRef filename, StringRef prefix,
+    NT_Inst inst, const Twine& filename, const Twine& prefix,
     std::function<void(size_t line, const char* msg)> warn) {
   auto ii = InstanceImpl::Get(Handle{inst}.GetTypedInst(Handle::kInstance));
   if (!ii) return "invalid instance handle";

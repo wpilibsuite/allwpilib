@@ -28,35 +28,40 @@ StringRef NetworkTable::BasenameKey(StringRef key) {
   return key.substr(slash + 1);
 }
 
-std::string NetworkTable::NormalizeKey(StringRef key, bool withLeadingSlash) {
+std::string NetworkTable::NormalizeKey(const Twine& key,
+                                       bool withLeadingSlash) {
   llvm::SmallString<128> buf;
   return NormalizeKey(key, buf, withLeadingSlash);
 }
 
-StringRef NetworkTable::NormalizeKey(StringRef key,
+StringRef NetworkTable::NormalizeKey(const Twine& key,
                                      llvm::SmallVectorImpl<char>& buf,
                                      bool withLeadingSlash) {
   buf.clear();
   if (withLeadingSlash) buf.push_back(PATH_SEPARATOR_CHAR);
   // for each path element, add it with a slash following
+  llvm::SmallString<128> keyBuf;
+  StringRef keyStr = key.toStringRef(keyBuf);
   llvm::SmallVector<StringRef, 16> parts;
-  key.split(parts, PATH_SEPARATOR_CHAR, -1, false);
+  keyStr.split(parts, PATH_SEPARATOR_CHAR, -1, false);
   for (auto i = parts.begin(); i != parts.end(); ++i) {
     buf.append(i->begin(), i->end());
     buf.push_back(PATH_SEPARATOR_CHAR);
   }
   // remove trailing slash if the input key didn't have one
-  if (!key.empty() && key.back() != PATH_SEPARATOR_CHAR) buf.pop_back();
+  if (!keyStr.empty() && keyStr.back() != PATH_SEPARATOR_CHAR) buf.pop_back();
   return StringRef(buf.data(), buf.size());
 }
 
-std::vector<std::string> NetworkTable::GetHierarchy(StringRef key) {
+std::vector<std::string> NetworkTable::GetHierarchy(const Twine& key) {
   std::vector<std::string> hierarchy;
   hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
   // for each path element, add it to the end of what we built previously
+  llvm::SmallString<128> keyBuf;
+  StringRef keyStr = key.toStringRef(keyBuf);
   llvm::SmallString<128> path;
   llvm::SmallVector<StringRef, 16> parts;
-  key.split(parts, PATH_SEPARATOR_CHAR, -1, false);
+  keyStr.split(parts, PATH_SEPARATOR_CHAR, -1, false);
   if (!parts.empty()) {
     for (auto i = parts.begin(); i != parts.end(); ++i) {
       path += PATH_SEPARATOR_CHAR;
@@ -64,7 +69,7 @@ std::vector<std::string> NetworkTable::GetHierarchy(StringRef key) {
       hierarchy.emplace_back(path.str());
     }
     // handle trailing slash
-    if (key.back() == PATH_SEPARATOR_CHAR) {
+    if (keyStr.back() == PATH_SEPARATOR_CHAR) {
       path += PATH_SEPARATOR_CHAR;
       hierarchy.emplace_back(path.str());
     }
@@ -116,7 +121,7 @@ void NetworkTable::SetIPAddress(StringRef address) {
     inst.StartDSClient(s_port);
 }
 
-void NetworkTable::SetIPAddress(llvm::ArrayRef<std::string> addresses) {
+void NetworkTable::SetIPAddress(ArrayRef<std::string> addresses) {
   auto inst = NetworkTableInstance::GetDefault();
   llvm::SmallVector<StringRef, 8> servers;
   for (const auto& ip_address : addresses) servers.emplace_back(ip_address);
@@ -159,12 +164,12 @@ void NetworkTable::SetUpdateRate(double interval) {
   NetworkTableInstance::GetDefault().SetUpdateRate(interval);
 }
 
-const char* NetworkTable::SavePersistent(llvm::StringRef filename) {
+const char* NetworkTable::SavePersistent(StringRef filename) {
   return NetworkTableInstance::GetDefault().SavePersistent(filename);
 }
 
 const char* NetworkTable::LoadPersistent(
-    llvm::StringRef filename,
+    StringRef filename,
     std::function<void(size_t line, const char* msg)> warn) {
   return NetworkTableInstance::GetDefault().LoadPersistent(filename, warn);
 }
@@ -174,8 +179,8 @@ std::shared_ptr<NetworkTable> NetworkTable::GetTable(StringRef key) {
   return NetworkTableInstance::GetDefault().GetTable(key);
 }
 
-NetworkTable::NetworkTable(NT_Inst inst, StringRef path, const private_init&)
-    : m_inst(inst), m_path(path) {}
+NetworkTable::NetworkTable(NT_Inst inst, const Twine& path, const private_init&)
+    : m_inst(inst), m_path(path.str()) {}
 
 NetworkTable::~NetworkTable() {
   for (auto& i : m_listeners) RemoveEntryListener(i.second);
@@ -185,25 +190,22 @@ NetworkTableInstance NetworkTable::GetInstance() const {
   return NetworkTableInstance{m_inst};
 }
 
-NetworkTableEntry NetworkTable::GetEntry(llvm::StringRef key) const {
+NetworkTableEntry NetworkTable::GetEntry(const Twine& key) const {
+  llvm::SmallString<128> keyBuf;
+  StringRef keyStr = key.toStringRef(keyBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  NT_Entry& entry = m_entries[key];
+  NT_Entry& entry = m_entries[keyStr];
   if (entry == 0) {
-    llvm::SmallString<128> path(m_path);
-    path += PATH_SEPARATOR_CHAR;
-    path += key;
-    entry = nt::GetEntry(m_inst, path);
+    entry = nt::GetEntry(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR) + keyStr);
   }
   return NetworkTableEntry{entry};
 }
 
 NT_EntryListener NetworkTable::AddEntryListener(TableEntryListener listener,
                                                 unsigned int flags) const {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  std::size_t prefix_len = path.size();
+  std::size_t prefix_len = m_path.size() + 1;
   return nt::AddEntryListener(
-      m_inst, path,
+      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
       [=](const EntryNotification& event) {
         StringRef relative_key = event.name.substr(prefix_len);
         if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) return;
@@ -213,7 +215,7 @@ NT_EntryListener NetworkTable::AddEntryListener(TableEntryListener listener,
       flags);
 }
 
-NT_EntryListener NetworkTable::AddEntryListener(StringRef key,
+NT_EntryListener NetworkTable::AddEntryListener(const Twine& key,
                                                 TableEntryListener listener,
                                                 unsigned int flags) const {
   std::size_t prefix_len = m_path.size() + 1;
@@ -269,14 +271,11 @@ void NetworkTable::AddTableListener(StringRef key, ITableListener* listener,
 void NetworkTable::AddTableListenerEx(StringRef key, ITableListener* listener,
                                       unsigned int flags) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  std::size_t prefix_len = path.size();
-  path += key;
+  std::size_t prefix_len = m_path.size() + 1;
+  auto entry = GetEntry(key);
   NT_EntryListener id = nt::AddEntryListener(
-      m_inst, path,
+      entry.GetHandle(),
       [=](const EntryNotification& event) {
-        if (event.name != path) return;
         listener->ValueChangedEx(this, event.name.substr(prefix_len),
                                  event.value, event.flags);
       },
@@ -291,9 +290,7 @@ void NetworkTable::AddSubTableListener(ITableListener* listener) {
 void NetworkTable::AddSubTableListener(ITableListener* listener,
                                        bool localNotify) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  std::size_t prefix_len = path.size();
+  std::size_t prefix_len = m_path.size() + 1;
 
   // The lambda needs to be copyable, but StringMap is not, so use
   // a shared_ptr to it.
@@ -302,7 +299,7 @@ void NetworkTable::AddSubTableListener(ITableListener* listener,
   unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE;
   if (localNotify) flags |= NT_NOTIFY_LOCAL;
   NT_EntryListener id = nt::AddEntryListener(
-      m_inst, path,
+      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR),
       [=](const EntryNotification& event) {
         StringRef relative_key = event.name.substr(prefix_len);
         auto end_sub_table = relative_key.find(PATH_SEPARATOR_CHAR);
@@ -328,33 +325,34 @@ void NetworkTable::RemoveTableListener(ITableListener* listener) {
   m_listeners.erase(matches_begin, m_listeners.end());
 }
 
-std::shared_ptr<NetworkTable> NetworkTable::GetSubTable(StringRef key) const {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  path += key;
-  return std::make_shared<NetworkTable>(m_inst, path, private_init{});
+std::shared_ptr<NetworkTable> NetworkTable::GetSubTable(
+    const Twine& key) const {
+  return std::make_shared<NetworkTable>(
+      m_inst, m_path + Twine(PATH_SEPARATOR_CHAR) + key, private_init{});
 }
 
-bool NetworkTable::ContainsKey(StringRef key) const {
-  return !key.empty() && GetEntry(key).Exists();
+bool NetworkTable::ContainsKey(const Twine& key) const {
+  if (key.isTriviallyEmpty() ||
+      (key.isSingleStringRef() && key.getSingleStringRef().empty()))
+    return false;
+  return GetEntry(key).Exists();
 }
 
-bool NetworkTable::ContainsSubTable(StringRef key) const {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  path += key;
-  path += PATH_SEPARATOR_CHAR;
-  return !GetEntryInfo(m_inst, path, 0).empty();
+bool NetworkTable::ContainsSubTable(const Twine& key) const {
+  return !GetEntryInfo(m_inst,
+                       m_path + Twine(PATH_SEPARATOR_CHAR) + key +
+                           Twine(PATH_SEPARATOR_CHAR),
+                       0)
+              .empty();
 }
 
 std::vector<std::string> NetworkTable::GetKeys(int types) const {
   std::vector<std::string> keys;
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  auto infos = GetEntryInfo(m_inst, path, types);
+  size_t prefix_len = m_path.size() + 1;
+  auto infos = GetEntryInfo(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR), types);
   std::lock_guard<wpi::mutex> lock(m_mutex);
   for (auto& info : infos) {
-    auto relative_key = StringRef(info.name).substr(path.size());
+    auto relative_key = StringRef(info.name).substr(prefix_len);
     if (relative_key.find(PATH_SEPARATOR_CHAR) != StringRef::npos) continue;
     keys.push_back(relative_key);
     m_entries[relative_key] = info.entry;
@@ -364,10 +362,10 @@ std::vector<std::string> NetworkTable::GetKeys(int types) const {
 
 std::vector<std::string> NetworkTable::GetSubTables() const {
   std::vector<std::string> keys;
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  for (auto& entry : GetEntryInfo(m_inst, path, 0)) {
-    auto relative_key = StringRef(entry.name).substr(path.size());
+  size_t prefix_len = m_path.size() + 1;
+  for (auto& entry :
+       GetEntryInfo(m_inst, m_path + Twine(PATH_SEPARATOR_CHAR), 0)) {
+    auto relative_key = StringRef(entry.name).substr(prefix_len);
     std::size_t end_subtable = relative_key.find(PATH_SEPARATOR_CHAR);
     if (end_subtable == StringRef::npos) continue;
     keys.push_back(relative_key.substr(0, end_subtable));
@@ -399,7 +397,7 @@ unsigned int NetworkTable::GetFlags(StringRef key) const {
   return GetEntry(key).GetFlags();
 }
 
-void NetworkTable::Delete(StringRef key) { GetEntry(key).Delete(); }
+void NetworkTable::Delete(const Twine& key) { GetEntry(key).Delete(); }
 
 bool NetworkTable::PutNumber(StringRef key, double value) {
   return GetEntry(key).SetDouble(value);
@@ -438,52 +436,49 @@ bool NetworkTable::GetBoolean(StringRef key, bool defaultValue) const {
   return GetEntry(key).GetBoolean(defaultValue);
 }
 
-bool NetworkTable::PutBooleanArray(llvm::StringRef key,
-                                   llvm::ArrayRef<int> value) {
+bool NetworkTable::PutBooleanArray(StringRef key, ArrayRef<int> value) {
   return GetEntry(key).SetBooleanArray(value);
 }
 
 bool NetworkTable::SetDefaultBooleanArray(StringRef key,
-                                          llvm::ArrayRef<int> defaultValue) {
+                                          ArrayRef<int> defaultValue) {
   return GetEntry(key).SetDefaultBooleanArray(defaultValue);
 }
 
 std::vector<int> NetworkTable::GetBooleanArray(
-    llvm::StringRef key, llvm::ArrayRef<int> defaultValue) const {
+    StringRef key, ArrayRef<int> defaultValue) const {
   return GetEntry(key).GetBooleanArray(defaultValue);
 }
 
-bool NetworkTable::PutNumberArray(llvm::StringRef key,
-                                  llvm::ArrayRef<double> value) {
+bool NetworkTable::PutNumberArray(StringRef key, ArrayRef<double> value) {
   return GetEntry(key).SetDoubleArray(value);
 }
 
 bool NetworkTable::SetDefaultNumberArray(StringRef key,
-                                         llvm::ArrayRef<double> defaultValue) {
+                                         ArrayRef<double> defaultValue) {
   return GetEntry(key).SetDefaultDoubleArray(defaultValue);
 }
 
 std::vector<double> NetworkTable::GetNumberArray(
-    llvm::StringRef key, llvm::ArrayRef<double> defaultValue) const {
+    StringRef key, ArrayRef<double> defaultValue) const {
   return GetEntry(key).GetDoubleArray(defaultValue);
 }
 
-bool NetworkTable::PutStringArray(llvm::StringRef key,
-                                  llvm::ArrayRef<std::string> value) {
+bool NetworkTable::PutStringArray(StringRef key, ArrayRef<std::string> value) {
   return GetEntry(key).SetStringArray(value);
 }
 
 bool NetworkTable::SetDefaultStringArray(
-    StringRef key, llvm::ArrayRef<std::string> defaultValue) {
+    StringRef key, ArrayRef<std::string> defaultValue) {
   return GetEntry(key).SetDefaultStringArray(defaultValue);
 }
 
 std::vector<std::string> NetworkTable::GetStringArray(
-    llvm::StringRef key, llvm::ArrayRef<std::string> defaultValue) const {
+    StringRef key, ArrayRef<std::string> defaultValue) const {
   return GetEntry(key).GetStringArray(defaultValue);
 }
 
-bool NetworkTable::PutRaw(llvm::StringRef key, llvm::StringRef value) {
+bool NetworkTable::PutRaw(StringRef key, StringRef value) {
   return GetEntry(key).SetRaw(value);
 }
 
@@ -491,36 +486,32 @@ bool NetworkTable::SetDefaultRaw(StringRef key, StringRef defaultValue) {
   return GetEntry(key).SetDefaultRaw(defaultValue);
 }
 
-std::string NetworkTable::GetRaw(llvm::StringRef key,
-                                 llvm::StringRef defaultValue) const {
+std::string NetworkTable::GetRaw(StringRef key, StringRef defaultValue) const {
   return GetEntry(key).GetRaw(defaultValue);
 }
 
-bool NetworkTable::PutValue(StringRef key, std::shared_ptr<Value> value) {
+bool NetworkTable::PutValue(const Twine& key, std::shared_ptr<Value> value) {
   return GetEntry(key).SetValue(value);
 }
 
-bool NetworkTable::SetDefaultValue(StringRef key,
+bool NetworkTable::SetDefaultValue(const Twine& key,
                                    std::shared_ptr<Value> defaultValue) {
   return GetEntry(key).SetDefaultValue(defaultValue);
 }
 
-std::shared_ptr<Value> NetworkTable::GetValue(StringRef key) const {
+std::shared_ptr<Value> NetworkTable::GetValue(const Twine& key) const {
   return GetEntry(key).GetValue();
 }
 
 StringRef NetworkTable::GetPath() const { return m_path; }
 
-const char* NetworkTable::SaveEntries(StringRef filename) const {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  return nt::SaveEntries(m_inst, filename, path);
+const char* NetworkTable::SaveEntries(const Twine& filename) const {
+  return nt::SaveEntries(m_inst, filename, m_path + Twine(PATH_SEPARATOR_CHAR));
 }
 
 const char* NetworkTable::LoadEntries(
-    StringRef filename,
+    const Twine& filename,
     std::function<void(size_t line, const char* msg)> warn) {
-  llvm::SmallString<128> path(m_path);
-  path += PATH_SEPARATOR_CHAR;
-  return nt::LoadEntries(m_inst, filename, path, warn);
+  return nt::LoadEntries(m_inst, filename, m_path + Twine(PATH_SEPARATOR_CHAR),
+                         warn);
 }

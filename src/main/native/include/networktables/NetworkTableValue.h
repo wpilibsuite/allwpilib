@@ -16,6 +16,7 @@
 
 #include "llvm/ArrayRef.h"
 #include "llvm/StringRef.h"
+#include "llvm/Twine.h"
 
 #include "ntcore_c.h"
 
@@ -23,6 +24,7 @@ namespace nt {
 
 using llvm::ArrayRef;
 using llvm::StringRef;
+using llvm::Twine;
 
 /**
  * A network table entry value.
@@ -241,10 +243,10 @@ class Value final {
    *             time)
    * @return The entry value
    */
-  static std::shared_ptr<Value> MakeString(StringRef value,
+  static std::shared_ptr<Value> MakeString(const Twine& value,
                                            unsigned long long time = 0) {
     auto val = std::make_shared<Value>(NT_STRING, time, private_init());
-    val->m_string = value;
+    val->m_string = value.str();
     val->m_val.data.v_string.str = const_cast<char*>(val->m_string.c_str());
     val->m_val.data.v_string.len = val->m_string.size();
     return val;

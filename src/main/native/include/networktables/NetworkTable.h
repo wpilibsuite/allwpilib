@@ -13,6 +13,7 @@
 
 #include "llvm/ArrayRef.h"
 #include "llvm/StringMap.h"
+#include "llvm/Twine.h"
 #include "networktables/NetworkTableEntry.h"
 #include "networktables/TableEntryListener.h"
 #include "networktables/TableListener.h"
@@ -24,6 +25,7 @@ namespace nt {
 
 using llvm::ArrayRef;
 using llvm::StringRef;
+using llvm::Twine;
 
 class NetworkTableInstance;
 
@@ -79,9 +81,11 @@ class NetworkTable final : public ITable {
    *                         with a leading slash
    * @return normalized key
    */
-  static std::string NormalizeKey(StringRef key, bool withLeadingSlash = true);
+  static std::string NormalizeKey(const Twine& key,
+                                  bool withLeadingSlash = true);
 
-  static StringRef NormalizeKey(StringRef key, llvm::SmallVectorImpl<char>& buf,
+  static StringRef NormalizeKey(const Twine& key,
+                                llvm::SmallVectorImpl<char>& buf,
                                 bool withLeadingSlash = true);
 
   /**
@@ -91,13 +95,13 @@ class NetworkTable final : public ITable {
    * @param key the key
    * @return List of super tables
    */
-  static std::vector<std::string> GetHierarchy(StringRef key);
+  static std::vector<std::string> GetHierarchy(const Twine& key);
 
   /**
    * Constructor.  Use NetworkTableInstance::GetTable() or GetSubTable()
    * instead.
    */
-  NetworkTable(NT_Inst inst, StringRef path, const private_init&);
+  NetworkTable(NT_Inst inst, const Twine& path, const private_init&);
   virtual ~NetworkTable();
 
   /**
@@ -273,7 +277,7 @@ class NetworkTable final : public ITable {
    * @param key the key name
    * @return Network table entry.
    */
-  NetworkTableEntry GetEntry(StringRef key) const;
+  NetworkTableEntry GetEntry(const Twine& key) const;
 
   /**
    * Listen to keys only within this table.
@@ -291,7 +295,8 @@ class NetworkTable final : public ITable {
    * @param flags       EntryListenerFlags bitmask
    * @return Listener handle
    */
-  NT_EntryListener AddEntryListener(StringRef key, TableEntryListener listener,
+  NT_EntryListener AddEntryListener(const Twine& key,
+                                    TableEntryListener listener,
                                     unsigned int flags) const;
 
   /**
@@ -356,7 +361,7 @@ class NetworkTable final : public ITable {
    * @param key the key name
    * @return the networktable to be returned
    */
-  std::shared_ptr<NetworkTable> GetSubTable(StringRef key) const override;
+  std::shared_ptr<NetworkTable> GetSubTable(const Twine& key) const override;
 
   /**
    * Determines whether the given key is in this table.
@@ -364,7 +369,7 @@ class NetworkTable final : public ITable {
    * @param key the key to search for
    * @return true if the table as a value assigned to the given key
    */
-  bool ContainsKey(StringRef key) const override;
+  bool ContainsKey(const Twine& key) const override;
 
   /**
    * Determines whether there exists a non-empty subtable for this key
@@ -374,7 +379,7 @@ class NetworkTable final : public ITable {
    * @return true if there is a subtable with the key which contains at least
    * one key/subtable of its own
    */
-  bool ContainsSubTable(StringRef key) const override;
+  bool ContainsSubTable(const Twine& key) const override;
 
   /**
    * Gets all keys in the table (not including sub-tables).
@@ -443,7 +448,7 @@ class NetworkTable final : public ITable {
    *
    * @param key the key name
    */
-  void Delete(StringRef key) override;
+  void Delete(const Twine& key) override;
 
   /**
    * Put a number in the table
@@ -665,7 +670,7 @@ class NetworkTable final : public ITable {
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
-  bool PutValue(StringRef key, std::shared_ptr<Value> value) override;
+  bool PutValue(const Twine& key, std::shared_ptr<Value> value) override;
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
@@ -673,7 +678,7 @@ class NetworkTable final : public ITable {
    * @param defaultValue the default value to set if key doesn't exist.
    * @returns False if the table key exists with a different type
    */
-  bool SetDefaultValue(StringRef key,
+  bool SetDefaultValue(const Twine& key,
                        std::shared_ptr<Value> defaultValue) override;
 
   /**
@@ -683,7 +688,7 @@ class NetworkTable final : public ITable {
    * @return the value associated with the given key, or nullptr if the key
    * does not exist
    */
-  std::shared_ptr<Value> GetValue(StringRef key) const override;
+  std::shared_ptr<Value> GetValue(const Twine& key) const override;
 
   /**
    * Gets the full path of this table.  Does not include the trailing "/".
@@ -697,7 +702,7 @@ class NetworkTable final : public ITable {
    * @param filename  filename
    * @return error string, or nullptr if successful
    */
-  const char* SaveEntries(StringRef filename) const;
+  const char* SaveEntries(const Twine& filename) const;
 
   /**
    * Load table values from a file.  The file format used is identical to
@@ -707,7 +712,7 @@ class NetworkTable final : public ITable {
    * @return error string, or nullptr if successful
    */
   const char* LoadEntries(
-      StringRef filename,
+      const Twine& filename,
       std::function<void(size_t line, const char* msg)> warn);
 };
 
