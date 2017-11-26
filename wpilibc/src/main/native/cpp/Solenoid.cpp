@@ -134,7 +134,7 @@ void Solenoid::SetPulseDuration(double durationSeconds) {
  *
  * @see setPulseDuration()
  */
-void Solenoid::StartPulse() const {
+void Solenoid::StartPulse() {
   if (StatusIsFatal()) return;
   int32_t status = 0;
   HAL_FireOneShot(m_solenoidHandle, &status);

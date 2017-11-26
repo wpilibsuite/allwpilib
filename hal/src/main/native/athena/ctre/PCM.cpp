@@ -214,7 +214,8 @@ CTR_Code PCM::FireOneShotSolenoid(UINT8 idx)
 }
 /* Configure the pulse width of a solenoid channel for one-shot pulse.
  * Preprogrammed pulsewidth is 10ms resolution and can be between 10ms and
-  2.55s.
+ * 2.55s.
+ *
  * @Return	-	CTR_Code	-	Error code (if any)
  * @Param	-	idx			-	ID of solenoid [0,7] to configure.
  * @Param	-	durMs		-	pulse width in ms.
