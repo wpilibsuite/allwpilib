@@ -15,6 +15,7 @@
 
 #include "Base.h"
 #include "Controller.h"
+#include "ErrorBase.h"
 #include "Filters/LinearDigitalFilter.h"
 #include "LiveWindow/LiveWindow.h"
 #include "Notifier.h"
@@ -37,7 +38,9 @@ class PIDOutput;
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
  */
-class PIDController : public LiveWindowSendable, public PIDInterface {
+class PIDController : public LiveWindowSendable,
+                      public PIDInterface,
+                      public ErrorBase {
  public:
   PIDController(double p, double i, double d, PIDSource* source,
                 PIDOutput* output, double period = 0.05);

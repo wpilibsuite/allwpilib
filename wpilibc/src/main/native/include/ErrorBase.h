@@ -79,8 +79,8 @@ class ErrorBase {
   ErrorBase(const ErrorBase&) = delete;
   ErrorBase& operator=(const ErrorBase&) = delete;
 
-  virtual Error& GetError();
-  virtual const Error& GetError() const;
+  virtual Error& GetErr();
+  virtual const Error& GetErr() const;
   virtual void SetErrnoError(llvm::StringRef contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
                              int lineNumber) const;

@@ -16,6 +16,7 @@
 #include "Notifier.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
+#include "WPIErrors.h"
 
 using namespace frc;
 
@@ -131,6 +132,8 @@ PIDController::~PIDController() {
  * This should only be called by the Notifier.
  */
 void PIDController::Calculate() {
+  if (StatusIsFatal()) return;
+
   bool enabled;
   PIDSource* pidInput;
   PIDOutput* pidOutput;
@@ -328,6 +331,15 @@ void PIDController::SetContinuous(bool continuous) {
  * @param maximumInput the maximum value expected from the output
  */
 void PIDController::SetInputRange(double minimumInput, double maximumInput) {
+  if (minimumInput > maximumInput) {
+    wpi_setWPIErrorWithContext(
+        ParameterOutOfRange,
+        "Minimum Input Cannot Be Greater Than Maximum Input");
+    return;
+  } else if (GetErr().GetCode() == wpi_error_value_ParameterOutOfRange) {
+    GetErr().Clear();
+  }
+
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
     m_minimumInput = minimumInput;
@@ -345,6 +357,15 @@ void PIDController::SetInputRange(double minimumInput, double maximumInput) {
  * @param maximumOutput the maximum value to write to the output
  */
 void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
+  if (minimumOutput > maximumOutput) {
+    wpi_setWPIErrorWithContext(
+        ParameterOutOfRange,
+        "Minimum Output Cannot Be Greater Than Maximum Output");
+    return;
+  } else if (GetErr().GetCode() == wpi_error_value_ParameterOutOfRange) {
+    GetErr().Clear();
+  }
+
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_minimumOutput = minimumOutput;
   m_maximumOutput = maximumOutput;
@@ -356,6 +377,8 @@ void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
  * @param setpoint the desired setpoint
  */
 void PIDController::SetSetpoint(double setpoint) {
+  if (StatusIsFatal()) return;
+
   {
     std::lock_guard<wpi::mutex> lock(m_mutex);
 
@@ -498,6 +521,8 @@ void PIDController::SetToleranceBuffer(int bufLength) {
  * This will return false until at least one input value has been computed.
  */
 bool PIDController::OnTarget() const {
+  if (StatusIsFatal()) return false;
+
   double error = GetError();
 
   std::lock_guard<wpi::mutex> lock(m_mutex);
@@ -640,6 +665,8 @@ void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
  * @return Error for continuous inputs.
  */
 double PIDController::GetContinuousError(double error) const {
+  if (StatusIsFatal()) return 0;
+
   if (m_continuous) {
     error = std::fmod(error, m_inputRange);
     if (std::fabs(error) > m_inputRange / 2) {

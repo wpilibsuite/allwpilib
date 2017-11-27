@@ -31,9 +31,9 @@ ErrorBase::ErrorBase() { HAL_Initialize(500, 0); }
  *
  * Get the current error information associated with this sensor.
  */
-Error& ErrorBase::GetError() { return m_error; }
+Error& ErrorBase::GetErr() { return m_error; }
 
-const Error& ErrorBase::GetError() const { return m_error; }
+const Error& ErrorBase::GetErr() const { return m_error; }
 
 /**
  * @brief Clear the current error information associated with this sensor.
@@ -191,7 +191,7 @@ void ErrorBase::SetWPIError(llvm::StringRef errorMessage, Error::Code code,
 }
 
 void ErrorBase::CloneError(const ErrorBase& rhs) const {
-  m_error.Clone(rhs.GetError());
+  m_error.Clone(rhs.GetErr());
 }
 
 /**
