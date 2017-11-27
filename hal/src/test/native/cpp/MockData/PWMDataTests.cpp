@@ -16,8 +16,8 @@ namespace hal {
 std::string gTestPwmCallbackName;
 HAL_Value gTestPwmCallbackValue;
 
-void TestPwmInitializationCallback(const char *name, void *param,
-                                   const struct HAL_Value *value) {
+void TestPwmInitializationCallback(const char* name, void* param,
+                                   const struct HAL_Value* value) {
   gTestPwmCallbackName = name;
   gTestPwmCallbackValue = *value;
 }

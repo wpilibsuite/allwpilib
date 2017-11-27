@@ -16,8 +16,8 @@ namespace hal {
 std::string gTestPdpCallbackName;
 HAL_Value gTestPdpCallbackValue;
 
-void TestPdpInitializationCallback(const char *name, void *param,
-                                   const struct HAL_Value *value) {
+void TestPdpInitializationCallback(const char* name, void* param,
+                                   const struct HAL_Value* value) {
   gTestPdpCallbackName = name;
   gTestPdpCallbackValue = *value;
 }

@@ -16,8 +16,8 @@ namespace hal {
 std::string gTestRelayCallbackName;
 HAL_Value gTestRelayCallbackValue;
 
-void TestRelayInitializationCallback(const char *name, void *param,
-                                     const struct HAL_Value *value) {
+void TestRelayInitializationCallback(const char* name, void* param,
+                                     const struct HAL_Value* value) {
   gTestRelayCallbackName = name;
   gTestRelayCallbackValue = *value;
 }

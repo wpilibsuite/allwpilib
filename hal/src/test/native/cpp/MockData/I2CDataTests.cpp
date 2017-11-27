@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "HAL/I2C.h"
 #include "HAL/HAL.h"
+#include "HAL/I2C.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "MockData/I2CData.h"
 #include "gtest/gtest.h"
@@ -16,14 +16,13 @@ namespace hal {
 std::string gTestI2CCallbackName;
 HAL_Value gTestI2CCallbackValue;
 
-void TestI2CInitializationCallback(const char *name, void *param,
-                                        const struct HAL_Value *value) {
+void TestI2CInitializationCallback(const char* name, void* param,
+                                   const struct HAL_Value* value) {
   gTestI2CCallbackName = name;
   gTestI2CCallbackValue = *value;
 }
 
 TEST(I2CSimTests, TestI2CInitialization) {
-
   const int INDEX_TO_TEST = 1;
 
   int32_t status;
@@ -31,8 +30,7 @@ TEST(I2CSimTests, TestI2CInitialization) {
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterI2CInitializedCallback(
-      INDEX_TO_TEST, &TestI2CInitializationCallback, &callbackParam,
-      false);
+      INDEX_TO_TEST, &TestI2CInitializationCallback, &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
   status = 0;
@@ -42,5 +40,4 @@ TEST(I2CSimTests, TestI2CInitialization) {
   EXPECT_STREQ("Initialized", gTestI2CCallbackName.c_str());
 }
 
-
-}
+}  // namespace hal

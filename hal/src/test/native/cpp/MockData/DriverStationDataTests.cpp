@@ -76,17 +76,17 @@ TEST(DriverStationTests, JoystickTests) {
   EXPECT_NEAR(0.250, axes.axes[2], 0.000001);
   EXPECT_NEAR(0.375, axes.axes[3], 0.000001);
   EXPECT_NEAR(0.500, axes.axes[4], 0.000001);
-  EXPECT_NEAR(0, axes.axes[5], 0.000001); // Should not have been set, still 0
-  EXPECT_NEAR(0, axes.axes[6], 0.000001); // Should not have been set, still 0
+  EXPECT_NEAR(0, axes.axes[5], 0.000001);  // Should not have been set, still 0
+  EXPECT_NEAR(0, axes.axes[6], 0.000001);  // Should not have been set, still 0
 
   EXPECT_EQ(3, povs.count);
   EXPECT_EQ(12, povs.povs[0]);
   EXPECT_EQ(27, povs.povs[1]);
   EXPECT_EQ(42, povs.povs[2]);
-  EXPECT_EQ(0, povs.povs[3]); // Should not have been set, still 0
-  EXPECT_EQ(0, povs.povs[4]); // Should not have been set, still 0
-  EXPECT_EQ(0, povs.povs[5]); // Should not have been set, still 0
-  EXPECT_EQ(0, povs.povs[6]); // Should not have been set, still 0
+  EXPECT_EQ(0, povs.povs[3]);  // Should not have been set, still 0
+  EXPECT_EQ(0, povs.povs[4]);  // Should not have been set, still 0
+  EXPECT_EQ(0, povs.povs[5]);  // Should not have been set, still 0
+  EXPECT_EQ(0, povs.povs[6]);  // Should not have been set, still 0
 
   EXPECT_EQ(8, buttons.count);
   EXPECT_EQ(0xDEADBEEFu, buttons.buttons);
@@ -117,8 +117,8 @@ TEST(DriverStationTests, EventInfoTest) {
   std::string eventName = "UnitTest";
   std::string gameData = "Insert game specific info here :D";
   HAL_MatchInfo info;
-  info.eventName = const_cast<char *>(eventName.c_str());
-  info.gameSpecificMessage = const_cast<char *>(gameData.c_str());
+  info.eventName = const_cast<char*>(eventName.c_str());
+  info.gameSpecificMessage = const_cast<char*>(gameData.c_str());
   info.matchNumber = 5;
   info.matchType = HAL_MatchType::HAL_kMatchType_qualification;
   info.replayNumber = 42;

@@ -16,14 +16,13 @@ namespace hal {
 std::string gTestAnalogInCallbackName;
 HAL_Value gTestAnalogInCallbackValue;
 
-void TestAnalogInInitializationCallback(const char *name, void *param,
-                                        const struct HAL_Value *value) {
+void TestAnalogInInitializationCallback(const char* name, void* param,
+                                        const struct HAL_Value* value) {
   gTestAnalogInCallbackName = name;
   gTestAnalogInCallbackValue = *value;
 }
 
 TEST(AnalogInSimTests, TestAnalogInInitialization) {
-
   const int INDEX_TO_TEST = 1;
 
   int callbackParam = 0;

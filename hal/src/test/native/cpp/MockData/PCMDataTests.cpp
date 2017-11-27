@@ -16,8 +16,8 @@ namespace hal {
 std::string gTestSolenoidCallbackName;
 HAL_Value gTestSolenoidCallbackValue;
 
-void TestSolenoidInitializationCallback(const char *name, void *param,
-                                        const struct HAL_Value *value) {
+void TestSolenoidInitializationCallback(const char* name, void* param,
+                                        const struct HAL_Value* value) {
   gTestSolenoidCallbackName = name;
   gTestSolenoidCallbackValue = *value;
 }
@@ -28,7 +28,8 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
 
   int callbackParam = 0;
   int callbackId = HALSIM_RegisterPCMSolenoidInitializedCallback(
-		  MODULE_TO_TEST, CHANNEL_TO_TEST, &TestSolenoidInitializationCallback, &callbackParam, false);
+      MODULE_TO_TEST, CHANNEL_TO_TEST, &TestSolenoidInitializationCallback,
+      &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
   int32_t status;
@@ -66,8 +67,8 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
   hal::HandleBase::ResetGlobalHandles();
   HALSIM_ResetPCMData(MODULE_TO_TEST);
   callbackId = HALSIM_RegisterPCMSolenoidInitializedCallback(
-		  MODULE_TO_TEST, CHANNEL_TO_TEST, &TestSolenoidInitializationCallback, &callbackParam,
-      false);
+      MODULE_TO_TEST, CHANNEL_TO_TEST, &TestSolenoidInitializationCallback,
+      &callbackParam, false);
   ASSERT_TRUE(0 != callbackId);
 
   status = 0;

@@ -16,8 +16,8 @@ namespace hal {
 std::string gTestAnalogOutCallbackName;
 HAL_Value gTestAnalogOutCallbackValue;
 
-void TestAnalogOutInitializationCallback(const char *name, void *param,
-                                         const struct HAL_Value *value) {
+void TestAnalogOutInitializationCallback(const char* name, void* param,
+                                         const struct HAL_Value* value) {
   gTestAnalogOutCallbackName = name;
   gTestAnalogOutCallbackValue = *value;
 }
