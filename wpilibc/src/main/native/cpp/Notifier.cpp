@@ -103,7 +103,7 @@ void Notifier::StartSingle(double delay) {
   std::lock_guard<wpi::mutex> lock(m_processMutex);
   m_periodic = false;
   m_period = delay;
-  m_expirationTime = GetClock() + m_period;
+  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 }
 
@@ -121,7 +121,7 @@ void Notifier::StartPeriodic(double period) {
   std::lock_guard<wpi::mutex> lock(m_processMutex);
   m_periodic = true;
   m_period = period;
-  m_expirationTime = GetClock() + m_period;
+  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 }
 
