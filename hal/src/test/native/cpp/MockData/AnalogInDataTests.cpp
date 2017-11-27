@@ -50,7 +50,7 @@ TEST(AnalogInSimTests, TestAnalogInInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(portHandle, &status);
-  EXPECT_EQ(0x6020001, analogInHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != analogInHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
 
@@ -74,7 +74,7 @@ TEST(AnalogInSimTests, TestAnalogInInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogInCallbackName = "Unset";
   analogInHandle = HAL_InitializeAnalogInputPort(portHandle, &status);
-  EXPECT_EQ(0x6030001, analogInHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != analogInHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogInCallbackName.c_str());
 }

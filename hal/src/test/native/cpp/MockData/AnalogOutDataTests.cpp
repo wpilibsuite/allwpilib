@@ -49,7 +49,7 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogOutCallbackName = "Unset";
   analogOutHandle = HAL_InitializeAnalogOutputPort(portHandle, &status);
-  EXPECT_EQ(0x5010001, analogOutHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != analogOutHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogOutCallbackName.c_str());
 
@@ -73,7 +73,7 @@ TEST(AnalogOutSimTests, TestAnalogOutInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestAnalogOutCallbackName = "Unset";
   analogOutHandle = HAL_InitializeAnalogOutputPort(portHandle, &status);
-  EXPECT_EQ(0x5020001, analogOutHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != analogOutHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestAnalogOutCallbackName.c_str());
 }

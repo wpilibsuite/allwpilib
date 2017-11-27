@@ -48,7 +48,7 @@ TEST(RelaySimTests, TestRelayInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestRelayCallbackName = "Unset";
   pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
-  EXPECT_EQ(0x8040003, pdpHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("InitializedForward", gTestRelayCallbackName.c_str());
 
@@ -71,7 +71,7 @@ TEST(RelaySimTests, TestRelayInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestRelayCallbackName = "Unset";
   pdpHandle = HAL_InitializeRelayPort(portHandle, true, &status);
-  EXPECT_EQ(0x8050003, pdpHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != pdpHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("InitializedForward", gTestRelayCallbackName.c_str());
 }

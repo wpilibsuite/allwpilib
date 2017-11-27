@@ -48,7 +48,7 @@ TEST(PWMSimTests, TestPwmInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestPwmCallbackName = "Unset";
   pwmHandle = HAL_InitializePWMPort(portHandle, &status);
-  EXPECT_EQ(0x9050021, pwmHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != pwmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());
 
@@ -71,7 +71,7 @@ TEST(PWMSimTests, TestPwmInitialization) {
   portHandle = HAL_GetPort(INDEX_TO_TEST);
   gTestPwmCallbackName = "Unset";
   pwmHandle = HAL_InitializePWMPort(portHandle, &status);
-  EXPECT_EQ(0x9060021, pwmHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != pwmHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPwmCallbackName.c_str());
 }

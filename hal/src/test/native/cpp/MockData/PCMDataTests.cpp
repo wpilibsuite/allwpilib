@@ -49,7 +49,7 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
   portHandle = HAL_GetPortWithModule(MODULE_TO_TEST, CHANNEL_TO_TEST);
   gTestSolenoidCallbackName = "Unset";
   solenoidHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0xF000013, solenoidHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != solenoidHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("SolenoidInitialized", gTestSolenoidCallbackName.c_str());
 
@@ -70,12 +70,11 @@ TEST(SolenoidSimTests, TestSolenoidInitialization) {
       false);
   ASSERT_TRUE(0 != callbackId);
 
-  std::cout << "Second initialize... " << std::endl;
   status = 0;
   portHandle = HAL_GetPortWithModule(MODULE_TO_TEST, CHANNEL_TO_TEST);
   gTestSolenoidCallbackName = "Unset";
   solenoidHandle = HAL_InitializeSolenoidPort(portHandle, &status);
-  EXPECT_EQ(0xF010013, solenoidHandle);
+  EXPECT_TRUE(HAL_kInvalidHandle != solenoidHandle);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("SolenoidInitialized", gTestSolenoidCallbackName.c_str());
 }

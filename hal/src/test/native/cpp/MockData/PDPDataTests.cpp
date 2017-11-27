@@ -38,15 +38,6 @@ TEST(PdpSimTests, TestPdpInitialization) {
   HAL_InitializePDP(INDEX_TO_TEST, &status);
   EXPECT_EQ(0, status);
   EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
-
-//  // Successful setup
-//  status = 0;
-//  portHandle = HAL_GetPortWithModule(0, INDEX_TO_TEST);
-//  gTestPdpCallbackName = "Unset";
-//  pdpHandle = HAL_InitializePDP(portHandle, &status);
-//  EXPECT_EQ(0xF000006, pdpHandle);
-//  EXPECT_EQ(0, status);
-//  EXPECT_STREQ("Initialized", gTestPdpCallbackName.c_str());
 }
 
 }  // namespace hal
