@@ -773,11 +773,14 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
    * @return Error for continuous inputs.
    */
   protected double getContinuousError(double error) {
-    if (m_continuous && Math.abs(error) > m_inputRange / 2) {
-      if (error > 0) {
-        return error - m_inputRange;
-      } else {
-        return error + m_inputRange;
+    if (m_continuous) {
+      error %= m_inputRange;
+      if (Math.abs(error) > m_inputRange / 2) {
+        if (error > 0) {
+          return error - m_inputRange;
+        } else {
+          return error + m_inputRange;
+        }
       }
     }
 

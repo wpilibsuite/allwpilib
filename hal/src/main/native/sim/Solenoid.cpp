@@ -117,4 +117,7 @@ HAL_Bool HAL_GetPCMSolenoidVoltageFault(int32_t module, int32_t* status) {
   return 0;
 }
 void HAL_ClearAllPCMStickyFaults(int32_t module, int32_t* status) {}
+void HAL_SetOneShotDuration(HAL_SolenoidHandle solenoidPortHandle,
+                            int32_t durMS, int32_t* status) {}
+void HAL_FireOneShot(HAL_SolenoidHandle solenoidPortHandle, int32_t* status) {}
 }  // extern "C"
