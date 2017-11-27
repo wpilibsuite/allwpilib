@@ -13,7 +13,9 @@
 
 using namespace frc;
 
-IterativeRobot::IterativeRobot() {
+static constexpr double kPacketPeriod = 0.02;
+
+IterativeRobot::IterativeRobot() : IterativeRobotBase(kPacketPeriod) {
   HAL_Report(HALUsageReporting::kResourceType_Framework,
              HALUsageReporting::kFramework_Iterative);
 }

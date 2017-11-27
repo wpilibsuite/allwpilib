@@ -10,13 +10,20 @@
 #include <cstdio>
 
 #include <HAL/HAL.h>
+#include <wpi/SmallString.h>
 #include <wpi/raw_ostream.h>
 
 #include "Commands/Scheduler.h"
+#include "DriverStation.h"
 #include "LiveWindow/LiveWindow.h"
 #include "SmartDashboard/SmartDashboard.h"
+#include "Timer.h"
 
 using namespace frc;
+
+IterativeRobotBase::IterativeRobotBase(double period)
+    : m_period(period),
+      m_watchdog(period, [&] { PrintLoopOverrunMessage(); }) {}
 
 void IterativeRobotBase::RobotInit() {
   wpi::outs() << "Default " << __FUNCTION__ << "() method... Overload me!\n";
@@ -79,6 +86,8 @@ void IterativeRobotBase::TestPeriodic() {
 }
 
 void IterativeRobotBase::LoopFunc() {
+  m_watchdog.Reset();
+
   // Call the appropriate function depending upon the current robot mode
   if (IsDisabled()) {
     // Call DisabledInit() if we are now just entering disabled mode from
@@ -86,43 +95,73 @@ void IterativeRobotBase::LoopFunc() {
     if (m_lastMode != Mode::kDisabled) {
       LiveWindow::GetInstance()->SetEnabled(false);
       DisabledInit();
+      m_watchdog.AddEpoch("DisabledInit()");
       m_lastMode = Mode::kDisabled;
     }
+
     HAL_ObserveUserProgramDisabled();
     DisabledPeriodic();
+    m_watchdog.AddEpoch("DisabledPeriodic()");
   } else if (IsAutonomous()) {
     // Call AutonomousInit() if we are now just entering autonomous mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kAutonomous) {
       LiveWindow::GetInstance()->SetEnabled(false);
       AutonomousInit();
+      m_watchdog.AddEpoch("AutonomousInit()");
       m_lastMode = Mode::kAutonomous;
     }
+
     HAL_ObserveUserProgramAutonomous();
     AutonomousPeriodic();
+    m_watchdog.AddEpoch("AutonomousPeriodic()");
   } else if (IsOperatorControl()) {
     // Call TeleopInit() if we are now just entering teleop mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kTeleop) {
       LiveWindow::GetInstance()->SetEnabled(false);
       TeleopInit();
+      m_watchdog.AddEpoch("TeleopInit()");
       m_lastMode = Mode::kTeleop;
       Scheduler::GetInstance()->SetEnabled(true);
     }
+
     HAL_ObserveUserProgramTeleop();
     TeleopPeriodic();
+    m_watchdog.AddEpoch("TeleopPeriodic()");
   } else {
     // Call TestInit() if we are now just entering test mode from
     // either a different mode or from power-on.
     if (m_lastMode != Mode::kTest) {
       LiveWindow::GetInstance()->SetEnabled(true);
       TestInit();
+      m_watchdog.AddEpoch("TestInit()");
       m_lastMode = Mode::kTest;
     }
+
     HAL_ObserveUserProgramTest();
     TestPeriodic();
+    m_watchdog.AddEpoch("TestPeriodic()");
   }
+
   RobotPeriodic();
+  m_watchdog.AddEpoch("RobotPeriodic()");
+  m_watchdog.Disable();
   SmartDashboard::UpdateValues();
+
   LiveWindow::GetInstance()->UpdateValues();
+
+  // Warn on loop time overruns
+  if (m_watchdog.IsExpired()) {
+    m_watchdog.PrintEpochs();
+  }
+}
+
+void IterativeRobotBase::PrintLoopOverrunMessage() {
+  wpi::SmallString<128> str;
+  wpi::raw_svector_ostream buf(str);
+
+  buf << "Loop time of " << m_period << "s overrun\n";
+
+  DriverStation::ReportWarning(str);
 }

@@ -8,6 +8,7 @@
 #pragma once
 
 #include "RobotBase.h"
+#include "Watchdog.h"
 
 namespace frc {
 
@@ -134,14 +135,26 @@ class IterativeRobotBase : public RobotBase {
   virtual void TestPeriodic();
 
  protected:
+  /**
+   * Constructor for IterativeRobotBase.
+   *
+   * @param period Period in seconds.
+   */
+  explicit IterativeRobotBase(double period);
+
   virtual ~IterativeRobotBase() = default;
 
   void LoopFunc();
+
+  double m_period;
 
  private:
   enum class Mode { kNone, kDisabled, kAutonomous, kTeleop, kTest };
 
   Mode m_lastMode = Mode::kNone;
+  Watchdog m_watchdog;
+
+  void PrintLoopOverrunMessage();
 };
 
 }  // namespace frc
