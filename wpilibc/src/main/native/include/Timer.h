@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <support/deprecated.h>
 #include <support/mutex.h>
 
 #include "Base.h"
@@ -16,6 +17,7 @@ namespace frc {
 typedef void (*TimerInterruptHandler)(void* param);
 
 void Wait(double seconds);
+WPI_DEPRECATED("Use Timer::GetFPGATimestamp() instead.")
 double GetClock();
 double GetTime();
 
@@ -43,7 +45,6 @@ class Timer {
   bool HasPeriodPassed(double period);
 
   static double GetFPGATimestamp();
-  static double GetPPCTimestamp();
   static double GetMatchTime();
 
   // The time, in seconds, at which the 32-bit FPGA timestamp rolls over to 0
