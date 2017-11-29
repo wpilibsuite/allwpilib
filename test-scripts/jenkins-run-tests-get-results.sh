@@ -14,9 +14,8 @@ source config.sh
 printf "Getting exclusive lock for RIO execution...\n"
 flock -x 200 || exit 1
 
-# To work around memory leak, kill NetComm and restart the teststand
-# (the teststand dies when NetComm is killed)
-SSH_RESTART_NETCOMM="ssh -t ${ROBOT_ADDRESS} sh -c 'killall FRC_NetCommDaemon; sleep 1; /etc/init.d/teststand stop; /etc/init.d/teststand start; sleep 1'"
+# To work around memory leak, kill NetComm and ensure the teststand is dead too
+SSH_RESTART_NETCOMM="ssh -t ${ROBOT_ADDRESS} sh -c '/etc/init.d/teststand stop; sleep 1; killall FRC_NetCommDaemon; sleep 1'"
 if [ $(which sshpass) ]; then
 	sshpass -p "" ${SSH_RESTART_NETCOMM}
 else

@@ -52,7 +52,7 @@ if (!project.hasProperty('skipAthena')) {
                     cpp {
                         source {
                             srcDirs = ["${rootDir}/gmock/gtest/src", 'src/FRCUserProgram/cpp']
-                            includes = ['*-all.cc', '*_main.cc', '*.cpp']
+                            includes = ['*-all.cc', '*_main.cc', '**/*.cpp']
                         }
                         exportedHeaders {
                             srcDirs = ["${rootDir}/gmock/gtest/include", "${rootDir}/gmock/gtest", 'src/FRCUserProgram/headers']
