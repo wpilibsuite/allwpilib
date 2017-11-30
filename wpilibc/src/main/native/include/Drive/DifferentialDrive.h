@@ -81,6 +81,20 @@ class SpeedController;
  * The positive X axis points ahead, the positive Y axis points to the right,
  * and the positive Z axis points down. Rotations follow the right-hand rule, so
  * clockwise rotation around the Z axis is positive.
+ *
+ * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
+ * so that the full range is still used. This deadband value can be changed
+ * with SetDeadband().
+ *
+ * <p>RobotDrive porting guide:
+ * <br>TankDrive(double, double, bool) is equivalent to
+ * RobotDrive#TankDrive(double, double, bool) if a deadband of 0 is used.
+ * <br>ArcadeDrive(double, double, bool) is equivalent to
+ * RobotDrive#ArcadeDrive(double, double, bool) if a deadband of 0 is used
+ * and the the rotation input is inverted eg ArcadeDrive(y, -rotation, false)
+ * <br>CurvatureDrive(double, double, bool) is similar in concept to
+ * RobotDrive#Drive(double, double) with the addition of a quick turn
+ * mode. However, it is not designed to give exactly the same response.
  */
 class DifferentialDrive : public RobotDriveBase {
  public:

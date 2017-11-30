@@ -44,6 +44,23 @@ class SpeedController;
  * The positive X axis points ahead, the positive Y axis points to the right,
  * and the positive Z axis points down. Rotations follow the right-hand rule, so
  * clockwise rotation around the Z axis is positive.
+ *
+ * Inputs smaller then 0.02 will be set to 0, and larger values will be scaled
+ * so that the full range is still used. This deadband value can be changed
+ * with SetDeadband().
+ *
+ * RobotDrive porting guide:
+ * <br>In MecanumDrive, the right side speed controllers are automatically
+ * inverted, while in RobotDrive, no speed controllers are automatically
+ * inverted.
+ * <br>DriveCartesian(double, double, double, double) is equivalent to
+ * RobotDrive#MecanumDrive_Cartesian(double, double, double, double)
+ * if a deadband of 0 is used, and the ySpeed and gyroAngle values are inverted
+ * compared to RobotDrive (eg DriveCartesian(xSpeed, -ySpeed, zRotation,
+ * -gyroAngle).
+ * <br>DrivePolar(double, double, double) is equivalent to
+ * RobotDrive#MecanumDrive_Polar(double, double, double) if a
+ * deadband of 0 is used.
  */
 class MecanumDrive : public RobotDriveBase {
  public:
