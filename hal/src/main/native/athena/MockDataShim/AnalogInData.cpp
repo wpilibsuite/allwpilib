@@ -1,0 +1,114 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
+#include "MockData/AnalogInData.h"
+
+extern "C" {
+
+void HALSIM_ResetAnalogInData(int32_t index) {}
+int32_t HALSIM_RegisterAnalogInInitializedCallback(int32_t index,
+                                                   HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInInitializedCallback(int32_t index, int32_t uid) {}
+HAL_Bool HALSIM_GetAnalogInInitialized(int32_t index) { return false; }
+void HALSIM_SetAnalogInInitialized(int32_t index, HAL_Bool initialized) {}
+
+int32_t HALSIM_RegisterAnalogInAverageBitsCallback(int32_t index,
+                                                   HAL_NotifyCallback callback,
+                                                   void* param,
+                                                   HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInAverageBitsCallback(int32_t index, int32_t uid) {}
+int32_t HALSIM_GetAnalogInAverageBits(int32_t index) { return 0; }
+void HALSIM_SetAnalogInAverageBits(int32_t index, int32_t averageBits) {}
+
+int32_t HALSIM_RegisterAnalogInOversampleBitsCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInOversampleBitsCallback(int32_t index, int32_t uid) {}
+int32_t HALSIM_GetAnalogInOversampleBits(int32_t index) { return 0; }
+void HALSIM_SetAnalogInOversampleBits(int32_t index, int32_t oversampleBits) {}
+
+int32_t HALSIM_RegisterAnalogInVoltageCallback(int32_t index,
+                                               HAL_NotifyCallback callback,
+                                               void* param,
+                                               HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInVoltageCallback(int32_t index, int32_t uid) {}
+double HALSIM_GetAnalogInVoltage(int32_t index) { return 0; }
+void HALSIM_SetAnalogInVoltage(int32_t index, double voltage) {}
+
+int32_t HALSIM_RegisterAnalogInAccumulatorInitializedCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInAccumulatorInitializedCallback(int32_t index,
+                                                         int32_t uid) {}
+HAL_Bool HALSIM_GetAnalogInAccumulatorInitialized(int32_t index) {
+  return false;
+}
+void HALSIM_SetAnalogInAccumulatorInitialized(int32_t index,
+                                              HAL_Bool accumulatorInitialized) {
+}
+
+int32_t HALSIM_RegisterAnalogInAccumulatorValueCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInAccumulatorValueCallback(int32_t index, int32_t uid) {
+}
+int64_t HALSIM_GetAnalogInAccumulatorValue(int32_t index) { return 0; }
+void HALSIM_SetAnalogInAccumulatorValue(int32_t index,
+                                        int64_t accumulatorValue) {}
+
+int32_t HALSIM_RegisterAnalogInAccumulatorCountCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInAccumulatorCountCallback(int32_t index, int32_t uid) {
+}
+int64_t HALSIM_GetAnalogInAccumulatorCount(int32_t index) { return 0; }
+void HALSIM_SetAnalogInAccumulatorCount(int32_t index,
+                                        int64_t accumulatorCount) {}
+
+int32_t HALSIM_RegisterAnalogInAccumulatorCenterCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInAccumulatorCenterCallback(int32_t index,
+                                                    int32_t uid) {}
+int32_t HALSIM_GetAnalogInAccumulatorCenter(int32_t index) { return 0; }
+void HALSIM_SetAnalogInAccumulatorCenter(int32_t index,
+                                         int32_t accumulatorCenter) {}
+
+int32_t HALSIM_RegisterAnalogInAccumulatorDeadbandCallback(
+    int32_t index, HAL_NotifyCallback callback, void* param,
+    HAL_Bool initialNotify) {
+  return 0;
+}
+void HALSIM_CancelAnalogInAccumulatorDeadbandCallback(int32_t index,
+                                                      int32_t uid) {}
+int32_t HALSIM_GetAnalogInAccumulatorDeadband(int32_t index) { return 0; }
+void HALSIM_SetAnalogInAccumulatorDeadband(int32_t index,
+                                           int32_t accumulatorDeadband) {}
+
+void HALSIM_RegisterAnalogInAllCallbacks(int32_t index,
+                                         HAL_NotifyCallback callback,
+                                         void* param, HAL_Bool initialNotify) {}
+
+}  // extern "C"
