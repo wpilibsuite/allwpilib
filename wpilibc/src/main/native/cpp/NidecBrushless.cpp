@@ -30,9 +30,6 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   m_dio.SetPWMRate(15625);
   m_dio.EnablePWM(0.5);
 
-  // the pwm enables the controller
-  m_pwm.SetRaw(0xffff);
-
   LiveWindow::GetInstance()->AddActuator("Nidec Brushless", pwmChannel, this);
   HAL_Report(HALUsageReporting::kResourceType_NidecBrushless, pwmChannel);
 }
@@ -46,8 +43,11 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
  * @param speed The speed value between -1.0 and 1.0 to set.
  */
 void NidecBrushless::Set(double speed) {
-  m_speed = speed;
-  m_dio.UpdateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
+  if (!m_disabled) {
+    m_speed = speed;
+    m_dio.UpdateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
+    m_pwm.SetRaw(0xffff);
+  }
   m_safetyHelper.Feed();
 }
 
@@ -97,9 +97,13 @@ bool NidecBrushless::IsAlive() const { return m_safetyHelper.IsAlive(); }
 
 /**
  * Stop the motor. This is called by the MotorSafetyHelper object when it has a
- * timeout for this PWM and needs to stop it from running.
+ * timeout for this PWM and needs to stop it from running. Calling Set() will
+ * re-enable the motor.
  */
-void NidecBrushless::StopMotor() { Disable(); }
+void NidecBrushless::StopMotor() {
+  m_dio.UpdateDutyCycle(0.5);
+  m_pwm.SetDisabled();
+}
 
 /**
  * Check if motor safety is enabled.
@@ -118,7 +122,21 @@ void NidecBrushless::GetDescription(llvm::raw_ostream& desc) const {
   desc << "Nidec " << GetChannel();
 }
 
-void NidecBrushless::Disable() { m_dio.UpdateDutyCycle(0.5); }
+/**
+ * Disable the motor.  The Enable() function must be called to re-enable
+ * the motor.
+ */
+void NidecBrushless::Disable() {
+  m_disabled = true;
+  m_dio.UpdateDutyCycle(0.5);
+  m_pwm.SetDisabled();
+}
+
+/**
+ * Re-enable the motor after Disable() has been called.  The Set()
+ * function must be called to set a new motor speed.
+ */
+void NidecBrushless::Enable() { m_disabled = false; }
 
 /**
  * Gets the channel number associated with the object.

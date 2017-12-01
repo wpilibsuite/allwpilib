@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -38,6 +39,8 @@ class NidecBrushless : public SpeedController,
   void Disable() override;
   void StopMotor() override;
 
+  void Enable();
+
   // PIDOutput interface
   void PIDWrite(double output) override;
 
@@ -63,6 +66,7 @@ class NidecBrushless : public SpeedController,
  private:
   MotorSafetyHelper m_safetyHelper;
   bool m_isInverted = false;
+  std::atomic_bool m_disabled{false};
   DigitalOutput m_dio;
   PWM m_pwm;
   double m_speed = 0.0;
