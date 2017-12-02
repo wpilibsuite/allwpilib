@@ -10,7 +10,7 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 #include <HAL/Relay.h>
-#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
 
 #include "MotorSafetyHelper.h"
 #include "SensorBase.h"
@@ -30,11 +30,9 @@ using namespace frc;
  */
 Relay::Relay(int channel, Relay::Direction direction)
     : m_channel(channel), m_direction(direction) {
-  llvm::SmallString<128> str;
-  llvm::raw_svector_ostream buf(str);
   if (!SensorBase::CheckRelayChannel(m_channel)) {
-    buf << "Relay Channel " << m_channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "Relay Channel " + llvm::Twine(m_channel));
     return;
   }
 

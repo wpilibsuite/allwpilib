@@ -10,8 +10,6 @@
 #include <HAL/HAL.h>
 #include <HAL/PWM.h>
 #include <HAL/Ports.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
 #include "SensorBase.h"
 #include "SmartDashboard/SendableBuilder.h"
@@ -31,12 +29,9 @@ using namespace frc;
  *                MXP port
  */
 PWM::PWM(int channel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
-
   if (!SensorBase::CheckPWMChannel(channel)) {
-    buf << "PWM Channel " << channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "PWM Channel " + llvm::Twine(channel));
     return;
   }
 

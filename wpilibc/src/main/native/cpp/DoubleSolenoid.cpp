@@ -10,8 +10,6 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 #include <HAL/Solenoid.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
 #include "SensorBase.h"
 #include "SmartDashboard/SendableBuilder.h"
@@ -43,21 +41,22 @@ DoubleSolenoid::DoubleSolenoid(int moduleNumber, int forwardChannel,
     : SolenoidBase(moduleNumber),
       m_forwardChannel(forwardChannel),
       m_reverseChannel(reverseChannel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
   if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
-    buf << "Solenoid Module " << m_moduleNumber;
-    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(
+        ModuleIndexOutOfRange,
+        "Solenoid Module " + llvm::Twine(m_moduleNumber));
     return;
   }
   if (!SensorBase::CheckSolenoidChannel(m_forwardChannel)) {
-    buf << "Solenoid Module " << m_forwardChannel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(
+        ChannelIndexOutOfRange,
+        "Solenoid Channel " + llvm::Twine(m_forwardChannel));
     return;
   }
   if (!SensorBase::CheckSolenoidChannel(m_reverseChannel)) {
-    buf << "Solenoid Module " << m_reverseChannel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(
+        ChannelIndexOutOfRange,
+        "Solenoid Channel " + llvm::Twine(m_reverseChannel));
     return;
   }
   int32_t status = 0;
