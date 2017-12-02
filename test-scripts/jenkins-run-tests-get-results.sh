@@ -51,6 +51,8 @@ else
 	eval ${SCP_GET_CPP_TEST_RESULT}
 fi
 
+sleep 10
+
 # Run the Java Tests
 ./deploy-and-run-test-on-robot.sh java
 
