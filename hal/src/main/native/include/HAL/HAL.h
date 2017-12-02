@@ -54,7 +54,7 @@ const char* HAL_GetErrorMessage(int32_t code);
 int32_t HAL_GetFPGAVersion(int32_t* status);
 int64_t HAL_GetFPGARevision(int32_t* status);
 
-HAL_RuntimeType HAL_GetRuntimeType();
+HAL_RuntimeType HAL_GetRuntimeType(void);
 HAL_Bool HAL_GetFPGAButton(int32_t* status);
 
 HAL_Bool HAL_GetSystemActive(int32_t* status);
