@@ -11,8 +11,6 @@
 
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
 #include "SensorBase.h"
 #include "SmartDashboard/SendableBuilder.h"
@@ -28,12 +26,9 @@ using namespace frc;
  * @param channel The channel number on the roboRIO to represent.
  */
 AnalogOutput::AnalogOutput(int channel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
-  buf << "analog output " << channel;
-
   if (!SensorBase::CheckAnalogOutputChannel(channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "analog output " + llvm::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     m_port = HAL_kInvalidHandle;
     return;

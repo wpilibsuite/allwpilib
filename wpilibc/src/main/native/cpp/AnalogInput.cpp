@@ -11,8 +11,6 @@
 #include <HAL/AnalogInput.h>
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
 #include "SmartDashboard/SendableBuilder.h"
 #include "Timer.h"
@@ -27,12 +25,9 @@ using namespace frc;
  *                on-board 4-7 are on the MXP port.
  */
 AnalogInput::AnalogInput(int channel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
-  buf << "Analog Input " << channel;
-
   if (!SensorBase::CheckAnalogInputChannel(channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "Analog Input " + llvm::Twine(channel));
     return;
   }
 

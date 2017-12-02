@@ -10,8 +10,6 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 #include <HAL/Solenoid.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
 #include "SensorBase.h"
 #include "SmartDashboard/SendableBuilder.h"
@@ -35,16 +33,15 @@ Solenoid::Solenoid(int channel)
  */
 Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
   if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
-    buf << "Solenoid Module " << m_moduleNumber;
-    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(
+        ModuleIndexOutOfRange,
+        "Solenoid Module " + llvm::Twine(m_moduleNumber));
     return;
   }
   if (!SensorBase::CheckSolenoidChannel(m_channel)) {
-    buf << "Solenoid Module " << m_channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "Solenoid Channel " + llvm::Twine(m_channel));
     return;
   }
 
