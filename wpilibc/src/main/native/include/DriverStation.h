@@ -14,7 +14,7 @@
 #include <thread>
 
 #include <HAL/DriverStation.h>
-#include <llvm/StringRef.h>
+#include <llvm/Twine.h>
 #include <support/mutex.h>
 
 #include "ErrorBase.h"
@@ -35,10 +35,11 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
 
   ~DriverStation() override;
   static DriverStation& GetInstance();
-  static void ReportError(llvm::StringRef error);
-  static void ReportWarning(llvm::StringRef error);
-  static void ReportError(bool isError, int code, llvm::StringRef error,
-                          llvm::StringRef location, llvm::StringRef stack);
+  static void ReportError(const llvm::Twine& error);
+  static void ReportWarning(const llvm::Twine& error);
+  static void ReportError(bool isError, int code, const llvm::Twine& error,
+                          const llvm::Twine& location,
+                          const llvm::Twine& stack);
 
   static constexpr int kJoystickPorts = 6;
 
@@ -124,8 +125,8 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
  private:
   DriverStation();
 
-  void ReportJoystickUnpluggedError(llvm::StringRef message);
-  void ReportJoystickUnpluggedWarning(llvm::StringRef message);
+  void ReportJoystickUnpluggedError(const llvm::Twine& message);
+  void ReportJoystickUnpluggedWarning(const llvm::Twine& message);
   void Run();
   void UpdateControlWord(bool force, HAL_ControlWord& controlWord) const;
 

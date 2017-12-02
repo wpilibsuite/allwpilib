@@ -56,9 +56,10 @@ DriverStation& DriverStation::GetInstance() {
  *
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(llvm::StringRef error) {
+void DriverStation::ReportError(const llvm::Twine& error) {
   llvm::SmallString<128> temp;
-  HAL_SendError(1, 1, 0, error.c_str(temp), "", "", 1);
+  HAL_SendError(1, 1, 0, error.toNullTerminatedStringRef(temp).data(), "", "",
+                1);
 }
 
 /**
@@ -66,9 +67,10 @@ void DriverStation::ReportError(llvm::StringRef error) {
  *
  * The warning is also printed to the program console.
  */
-void DriverStation::ReportWarning(llvm::StringRef error) {
+void DriverStation::ReportWarning(const llvm::Twine& error) {
   llvm::SmallString<128> temp;
-  HAL_SendError(0, 1, 0, error.c_str(temp), "", "", 1);
+  HAL_SendError(0, 1, 0, error.toNullTerminatedStringRef(temp).data(), "", "",
+                1);
 }
 
 /**
@@ -77,13 +79,16 @@ void DriverStation::ReportWarning(llvm::StringRef error) {
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(bool isError, int32_t code,
-                                llvm::StringRef error, llvm::StringRef location,
-                                llvm::StringRef stack) {
+                                const llvm::Twine& error,
+                                const llvm::Twine& location,
+                                const llvm::Twine& stack) {
   llvm::SmallString<128> errorTemp;
   llvm::SmallString<128> locationTemp;
   llvm::SmallString<128> stackTemp;
-  HAL_SendError(isError, code, 0, error.c_str(errorTemp),
-                location.c_str(locationTemp), stack.c_str(stackTemp), 1);
+  HAL_SendError(isError, code, 0,
+                error.toNullTerminatedStringRef(errorTemp).data(),
+                location.toNullTerminatedStringRef(locationTemp).data(),
+                stack.toNullTerminatedStringRef(stackTemp).data(), 1);
 }
 
 /**
@@ -717,7 +722,7 @@ DriverStation::DriverStation() {
  * Reports errors related to unplugged joysticks
  * Throttles the errors so that they don't overwhelm the DS
  */
-void DriverStation::ReportJoystickUnpluggedError(llvm::StringRef message) {
+void DriverStation::ReportJoystickUnpluggedError(const llvm::Twine& message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportError(message);
@@ -730,7 +735,7 @@ void DriverStation::ReportJoystickUnpluggedError(llvm::StringRef message) {
  *
  * Throttles the errors so that they don't overwhelm the DS.
  */
-void DriverStation::ReportJoystickUnpluggedWarning(llvm::StringRef message) {
+void DriverStation::ReportJoystickUnpluggedWarning(const llvm::Twine& message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportWarning(message);

@@ -49,21 +49,22 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
+void ErrorBase::SetErrnoError(const llvm::Twine& contextMessage,
                               llvm::StringRef filename,
                               llvm::StringRef function, int lineNumber) const {
   llvm::SmallString<128> buf;
   llvm::raw_svector_ostream err(buf);
   int errNo = errno;
   if (errNo == 0) {
-    err << "OK: " << contextMessage;
+    err << "OK: ";
   } else {
     err << std::strerror(errNo) << " (" << llvm::format_hex(errNo, 10, true)
-        << "): " << contextMessage;
+        << "): ";
   }
 
   // Set the current error information for this object.
-  m_error.Set(-1, err.str(), filename, function, lineNumber, this);
+  m_error.Set(-1, err.str() + contextMessage, filename, function, lineNumber,
+              this);
 
   // Update the global error if there is not one already set.
   std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
@@ -82,17 +83,14 @@ void ErrorBase::SetErrnoError(llvm::StringRef contextMessage,
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
+void ErrorBase::SetImaqError(int success, const llvm::Twine& contextMessage,
                              llvm::StringRef filename, llvm::StringRef function,
                              int lineNumber) const {
   // If there was an error
   if (success <= 0) {
-    llvm::SmallString<128> buf;
-    llvm::raw_svector_ostream err(buf);
-    err << success << ": " << contextMessage;
-
     // Set the current error information for this object.
-    m_error.Set(success, err.str(), filename, function, lineNumber, this);
+    m_error.Set(success, llvm::Twine(success) + ": " + contextMessage, filename,
+                function, lineNumber, this);
 
     // Update the global error if there is not one already set.
     std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
@@ -111,7 +109,7 @@ void ErrorBase::SetImaqError(int success, llvm::StringRef contextMessage,
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetError(Error::Code code, llvm::StringRef contextMessage,
+void ErrorBase::SetError(Error::Code code, const llvm::Twine& contextMessage,
                          llvm::StringRef filename, llvm::StringRef function,
                          int lineNumber) const {
   //  If there was an error
@@ -142,20 +140,17 @@ void ErrorBase::SetError(Error::Code code, llvm::StringRef contextMessage,
  */
 void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
                               int32_t maxRange, int32_t requestedValue,
-                              llvm::StringRef contextMessage,
+                              const llvm::Twine& contextMessage,
                               llvm::StringRef filename,
                               llvm::StringRef function, int lineNumber) const {
   //  If there was an error
   if (code != 0) {
-    size_t size = contextMessage.size() + 100;
-    char* buf = new char[size];
-    std::snprintf(
-        buf, size,
-        "%s, Minimum Value: %d, Maximum Value: %d, Requested Value: %d",
-        contextMessage.data(), minRange, maxRange, requestedValue);
     //  Set the current error information for this object.
-    m_error.Set(code, buf, filename, function, lineNumber, this);
-    delete[] buf;
+    m_error.Set(code,
+                contextMessage + ", Minimum Value: " + llvm::Twine(minRange) +
+                    ", MaximumValue: " + llvm::Twine(maxRange) +
+                    ", Requested Value: " + llvm::Twine(requestedValue),
+                filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
     std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
@@ -174,14 +169,13 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetWPIError(llvm::StringRef errorMessage, Error::Code code,
-                            llvm::StringRef contextMessage,
+void ErrorBase::SetWPIError(const llvm::Twine& errorMessage, Error::Code code,
+                            const llvm::Twine& contextMessage,
                             llvm::StringRef filename, llvm::StringRef function,
                             int lineNumber) const {
-  std::string err = errorMessage.str() + ": " + contextMessage.str();
-
   //  Set the current error information for this object.
-  m_error.Set(code, err, filename, function, lineNumber, this);
+  m_error.Set(code, errorMessage + ": " + contextMessage, filename, function,
+              lineNumber, this);
 
   // Update the global error if there is not one already set.
   std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
@@ -201,7 +195,8 @@ void ErrorBase::CloneError(const ErrorBase& rhs) const {
  */
 bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
 
-void ErrorBase::SetGlobalError(Error::Code code, llvm::StringRef contextMessage,
+void ErrorBase::SetGlobalError(Error::Code code,
+                               const llvm::Twine& contextMessage,
                                llvm::StringRef filename,
                                llvm::StringRef function, int lineNumber) {
   // If there was an error
@@ -214,17 +209,16 @@ void ErrorBase::SetGlobalError(Error::Code code, llvm::StringRef contextMessage,
   }
 }
 
-void ErrorBase::SetGlobalWPIError(llvm::StringRef errorMessage,
-                                  llvm::StringRef contextMessage,
+void ErrorBase::SetGlobalWPIError(const llvm::Twine& errorMessage,
+                                  const llvm::Twine& contextMessage,
                                   llvm::StringRef filename,
                                   llvm::StringRef function, int lineNumber) {
-  std::string err = errorMessage.str() + ": " + contextMessage.str();
-
   std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() != 0) {
     _globalError.Clear();
   }
-  _globalError.Set(-1, err, filename, function, lineNumber, nullptr);
+  _globalError.Set(-1, errorMessage + ": " + contextMessage, filename, function,
+                   lineNumber, nullptr);
 }
 
 /**
