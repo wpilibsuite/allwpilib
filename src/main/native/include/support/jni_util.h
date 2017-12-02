@@ -187,6 +187,7 @@ class JArrayRefBase : public JArrayRefInner<JArrayRefBase<T>, T> {
     this->m_elements = oth.m_elements;
     oth.m_jarr = nullptr;
     oth.m_elements = nullptr;
+    return *this;
   }
 
  protected:
