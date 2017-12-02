@@ -27,10 +27,13 @@ class NetworkButton : public Button {
   NetworkButton(NetworkButton&&) = default;
   NetworkButton& operator=(NetworkButton&&) = default;
 
-  virtual bool Get();
+  bool Get() override;
+  bool GetPressed() override;
+  bool GetReleased() override;
 
  private:
   nt::NetworkTableEntry m_entry;
+  bool m_lastState = false;
 };
 
 }  // namespace frc

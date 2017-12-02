@@ -24,3 +24,29 @@ NetworkButton::NetworkButton(std::shared_ptr<nt::NetworkTable> table,
 bool NetworkButton::Get() {
   return m_entry.GetInstance().IsConnected() && m_entry.GetBoolean(false);
 }
+
+bool NetworkButton::GetPressed() {
+  if (m_entry.GetInstance().IsConnected()) {
+    bool currentState = m_entry.GetBoolean(false);
+    bool pressed = !m_lastState && currentState;
+
+    m_lastState = currentState;
+
+    return pressed;
+  } else {
+    return false;
+  }
+}
+
+bool NetworkButton::GetReleased() {
+  if (m_entry.GetInstance().IsConnected()) {
+    bool currentState = m_entry.GetBoolean(false);
+    bool released = m_lastState && !currentState;
+
+    m_lastState = currentState;
+
+    return released;
+  } else {
+    return false;
+  }
+}

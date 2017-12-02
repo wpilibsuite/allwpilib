@@ -10,10 +10,41 @@
 using namespace frc;
 
 InternalButton::InternalButton(bool inverted)
-    : m_pressed(inverted), m_inverted(inverted) {}
+    : m_state(inverted), m_lastState(inverted), m_inverted(inverted) {}
 
 void InternalButton::SetInverted(bool inverted) { m_inverted = inverted; }
 
-void InternalButton::SetPressed(bool pressed) { m_pressed = pressed; }
+void InternalButton::SetPressed(bool pressed) {
+  m_lastState = m_state;
+  m_state = pressed;
+  m_pressed |= !(m_lastState ^ m_inverted) && (m_state ^ m_inverted);
+  m_released |= (m_lastState ^ m_inverted) && !(m_state ^ m_inverted);
+}
 
-bool InternalButton::Get() { return m_pressed ^ m_inverted; }
+bool InternalButton::Get() { return m_state ^ m_inverted; }
+
+bool InternalButton::GetPressed() {
+  m_pressed |= !(m_lastState ^ m_inverted) && (m_state ^ m_inverted);
+  m_released |= (m_lastState ^ m_inverted) && !(m_state ^ m_inverted);
+  m_lastState = m_state;
+
+  if (m_pressed) {
+    m_pressed = false;
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool InternalButton::GetReleased() {
+  m_pressed |= !(m_lastState ^ m_inverted) && (m_state ^ m_inverted);
+  m_released |= (m_lastState ^ m_inverted) && !(m_state ^ m_inverted);
+  m_lastState = m_state;
+
+  if (m_released) {
+    m_released = false;
+    return true;
+  } else {
+    return false;
+  }
+}

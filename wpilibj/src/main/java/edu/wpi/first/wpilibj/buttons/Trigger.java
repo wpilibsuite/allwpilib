@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * the full functionality of the Trigger class.
  */
 public abstract class Trigger extends SendableBase {
-  private volatile boolean m_sendablePressed;
+  private volatile boolean m_sendableState;
 
   /**
    * Returns whether or not the trigger is active.
@@ -35,14 +35,18 @@ public abstract class Trigger extends SendableBase {
    */
   public abstract boolean get();
 
+  public abstract boolean getPressed();
+
+  public abstract boolean getReleased();
+
   /**
    * Returns whether get() return true or the internal table for SmartDashboard use is pressed.
    *
    * @return whether get() return true or the internal table for SmartDashboard use is pressed.
    */
   @SuppressWarnings("PMD.UselessParentheses")
-  private boolean grab() {
-    return get() || m_sendablePressed;
+  private boolean getSendableState() {
+    return m_sendableState;
   }
 
   /**
@@ -52,18 +56,21 @@ public abstract class Trigger extends SendableBase {
    */
   public void whenActive(final Command command) {
     new ButtonScheduler() {
-      private boolean m_pressedLast = grab();
+      private boolean m_lastState = getSendableState();
 
       @Override
       public void execute() {
-        if (grab()) {
-          if (!m_pressedLast) {
-            m_pressedLast = true;
-            command.start();
-          }
-        } else {
-          m_pressedLast = false;
+        boolean state = getSendableState();
+
+        if (!m_lastState && state) {
+          // If sendable button wasn't pressed and is now, start command
+          command.start();
+        } else if (getPressed()) {
+          // Otherwise, check whether the normal button has been pressed
+          command.start();
         }
+
+        m_lastState = state;
       }
     }.start();
   }
@@ -78,19 +85,27 @@ public abstract class Trigger extends SendableBase {
    */
   public void whileActive(final Command command) {
     new ButtonScheduler() {
-      private boolean m_pressedLast = grab();
+      private boolean m_lastState = getSendableState();
 
       @Override
       public void execute() {
-        if (grab()) {
-          m_pressedLast = true;
+        boolean state = getSendableState();
+
+        if (!m_lastState && state) {
+          // If sendable button wasn't pressed and is now, start command
           command.start();
-        } else {
-          if (m_pressedLast) {
-            m_pressedLast = false;
-            command.cancel();
-          }
+        } else if (getPressed()) {
+          // Otherwise, check whether the normal button was pressed
+          command.start();
+        } else if (m_lastState && !state) {
+          // If sendable button was pressed and isn't now, stop command
+          command.cancel();
+        } else if (getReleased()) {
+          // Otherwise, check whether the normal button was released
+          command.cancel();
         }
+
+        m_lastState = state;
       }
     }.start();
   }
@@ -102,18 +117,21 @@ public abstract class Trigger extends SendableBase {
    */
   public void whenInactive(final Command command) {
     new ButtonScheduler() {
-      private boolean m_pressedLast = grab();
+      private boolean m_lastState = getSendableState();
 
       @Override
       public void execute() {
-        if (grab()) {
-          m_pressedLast = true;
-        } else {
-          if (m_pressedLast) {
-            m_pressedLast = false;
-            command.start();
-          }
+        boolean state = getSendableState();
+
+        if (m_lastState && !state) {
+          // If sendable button was pressed and isn't now, start command
+          command.start();
+        } else if (getReleased()) {
+          // Otherwise, check whether the normal button has been released
+          command.start();
         }
+
+        m_lastState = state;
       }
     }.start();
   }
@@ -125,22 +143,29 @@ public abstract class Trigger extends SendableBase {
    */
   public void toggleWhenActive(final Command command) {
     new ButtonScheduler() {
-      private boolean m_pressedLast = grab();
+      private boolean m_lastState = getSendableState();
 
       @Override
       public void execute() {
-        if (grab()) {
-          if (!m_pressedLast) {
-            m_pressedLast = true;
-            if (command.isRunning()) {
-              command.cancel();
-            } else {
-              command.start();
-            }
+        boolean state = getSendableState();
+
+        if (!m_lastState && state) {
+          // If sendable button wasn't pressed and is now, start command
+          if (command.isRunning()) {
+            command.cancel();
+          } else {
+            command.start();
           }
-        } else {
-          m_pressedLast = false;
+        } else if (getPressed()) {
+          // Otherwise, check whether the normal button has been pressed
+          if (command.isRunning()) {
+            command.cancel();
+          } else {
+            command.start();
+          }
         }
+
+        m_lastState = state;
       }
     }.start();
   }
@@ -152,18 +177,21 @@ public abstract class Trigger extends SendableBase {
    */
   public void cancelWhenActive(final Command command) {
     new ButtonScheduler() {
-      private boolean m_pressedLast = grab();
+      private boolean m_lastState = getSendableState();
 
       @Override
       public void execute() {
-        if (grab()) {
-          if (!m_pressedLast) {
-            m_pressedLast = true;
-            command.cancel();
-          }
-        } else {
-          m_pressedLast = false;
+        boolean state = getSendableState();
+
+        if (!m_lastState && state) {
+          // If sendable button wasn't pressed and is now, cancel command
+          command.cancel();
+        } else if (getPressed()) {
+          // Otherwise, check whether the normal button has been pressed
+          command.cancel();
         }
+
+        m_lastState = state;
       }
     }.start();
   }
@@ -183,7 +211,7 @@ public abstract class Trigger extends SendableBase {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Button");
-    builder.setSafeState(() -> m_sendablePressed = false);
-    builder.addBooleanProperty("pressed", this::grab, value -> m_sendablePressed = value);
+    builder.setSafeState(() -> m_sendableState = false);
+    builder.addBooleanProperty("pressed", this::getSendableState, value -> m_sendableState = value);
   }
 }

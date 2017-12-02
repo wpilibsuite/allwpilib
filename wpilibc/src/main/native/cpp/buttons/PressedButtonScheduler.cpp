@@ -17,12 +17,15 @@ PressedButtonScheduler::PressedButtonScheduler(bool last, Trigger* button,
     : ButtonScheduler(last, button, orders) {}
 
 void PressedButtonScheduler::Execute() {
-  if (m_button->Grab()) {
-    if (!m_pressedLast) {
-      m_pressedLast = true;
-      m_command->Start();
-    }
-  } else {
-    m_pressedLast = false;
+  bool state = m_button->GetSendableState();
+
+  if (!m_lastState && state) {
+    // If sendable button wasn't pressed and is now, start command
+    m_command->Start();
+  } else if (m_button->GetPressed()) {
+    // Otherwise, check whether the normal button has been pressed
+    m_command->Start();
   }
+
+  m_lastState = state;
 }

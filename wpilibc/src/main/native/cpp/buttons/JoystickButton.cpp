@@ -13,3 +13,11 @@ JoystickButton::JoystickButton(GenericHID* joystick, int buttonNumber)
     : m_joystick(joystick), m_buttonNumber(buttonNumber) {}
 
 bool JoystickButton::Get() { return m_joystick->GetRawButton(m_buttonNumber); }
+
+bool JoystickButton::GetPressed() {
+  return m_joystick->GetRawButtonPressed(m_buttonNumber);
+}
+
+bool JoystickButton::GetReleased() {
+  return m_joystick->GetRawButtonReleased(m_buttonNumber);
+}

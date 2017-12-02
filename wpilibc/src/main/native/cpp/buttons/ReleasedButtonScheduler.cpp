@@ -17,12 +17,15 @@ ReleasedButtonScheduler::ReleasedButtonScheduler(bool last, Trigger* button,
     : ButtonScheduler(last, button, orders) {}
 
 void ReleasedButtonScheduler::Execute() {
-  if (m_button->Grab()) {
-    m_pressedLast = true;
-  } else {
-    if (m_pressedLast) {
-      m_pressedLast = false;
-      m_command->Start();
-    }
+  bool state = m_button->GetSendableState();
+
+  if (m_lastState && !state) {
+    // If sendable button was pressed and isn't now, start command
+    m_command->Start();
+  } else if (m_button->GetReleased()) {
+    // Otherwise, check whether the normal button has been released
+    m_command->Start();
   }
+
+  m_lastState = state;
 }

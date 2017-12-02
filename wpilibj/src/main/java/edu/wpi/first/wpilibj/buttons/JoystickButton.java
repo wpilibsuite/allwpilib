@@ -37,4 +37,14 @@ public class JoystickButton extends Button {
   public boolean get() {
     return m_joystick.getRawButton(m_buttonNumber);
   }
+
+  @Override
+  public boolean getPressed() {
+    return m_joystick.getRawButtonPressed(m_buttonNumber);
+  }
+
+  @Override
+  public boolean getReleased() {
+    return m_joystick.getRawButtonPressed(m_buttonNumber);
+  }
 }

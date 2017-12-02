@@ -36,8 +36,11 @@ class Trigger : public SendableBase {
   Trigger(Trigger&&) = default;
   Trigger& operator=(Trigger&&) = default;
 
-  bool Grab();
+  bool GetSendableState() const;
+
   virtual bool Get() = 0;
+  virtual bool GetPressed() = 0;
+  virtual bool GetReleased() = 0;
   void WhenActive(Command* command);
   void WhileActive(Command* command);
   void WhenInactive(Command* command);
@@ -47,7 +50,7 @@ class Trigger : public SendableBase {
   void InitSendable(SendableBuilder& builder) override;
 
  private:
-  std::atomic_bool m_sendablePressed{false};
+  std::atomic_bool m_sendableState{false};
 };
 
 }  // namespace frc

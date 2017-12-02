@@ -12,5 +12,8 @@
 class ReplaceMeTrigger : public frc::Trigger {
  public:
   ReplaceMeTrigger();
+
   bool Get() override;
+  bool GetPressed() override;
+  bool GetReleased() override;
 };

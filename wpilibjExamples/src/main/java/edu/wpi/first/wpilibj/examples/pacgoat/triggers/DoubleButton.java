@@ -18,6 +18,10 @@ public class DoubleButton extends Trigger {
   private final Joystick m_joy;
   private final int m_button1;
   private final int m_button2;
+  private boolean m_button1Pressed;
+  private boolean m_button2Pressed;
+  private boolean m_button1Released;
+  private boolean m_button2Released;
 
   /**
    * Create a new double button trigger.
@@ -34,5 +38,31 @@ public class DoubleButton extends Trigger {
   @Override
   public boolean get() {
     return m_joy.getRawButton(m_button1) && m_joy.getRawButton(m_button2);
+  }
+
+  @Override
+  public boolean getPressed() {
+    m_button1Pressed |= m_joy.getRawButtonPressed(m_button1);
+    m_button2Pressed |= m_joy.getRawButtonPressed(m_button2);
+    if (m_button1Pressed && m_button2Pressed) {
+      m_button1Pressed = false;
+      m_button2Pressed = false;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean getReleased() {
+    m_button1Released |= m_joy.getRawButtonReleased(m_button1);
+    m_button2Released |= m_joy.getRawButtonReleased(m_button2);
+    if (m_button1Released && m_button2Released) {
+      m_button1Released = false;
+      m_button2Released = false;
+      return true;
+    } else {
+      return false;
+    }
   }
 }

@@ -15,36 +15,36 @@
 
 using namespace frc;
 
-bool Trigger::Grab() { return Get() || m_sendablePressed; }
+bool Trigger::GetSendableState() const { return m_sendableState; }
 
 void Trigger::WhenActive(Command* command) {
-  auto pbs = new PressedButtonScheduler(Grab(), this, command);
+  auto pbs = new PressedButtonScheduler(GetSendableState(), this, command);
   pbs->Start();
 }
 
 void Trigger::WhileActive(Command* command) {
-  auto hbs = new HeldButtonScheduler(Grab(), this, command);
+  auto hbs = new HeldButtonScheduler(GetSendableState(), this, command);
   hbs->Start();
 }
 
 void Trigger::WhenInactive(Command* command) {
-  auto rbs = new ReleasedButtonScheduler(Grab(), this, command);
+  auto rbs = new ReleasedButtonScheduler(GetSendableState(), this, command);
   rbs->Start();
 }
 
 void Trigger::CancelWhenActive(Command* command) {
-  auto cbs = new CancelButtonScheduler(Grab(), this, command);
+  auto cbs = new CancelButtonScheduler(GetSendableState(), this, command);
   cbs->Start();
 }
 
 void Trigger::ToggleWhenActive(Command* command) {
-  auto tbs = new ToggleButtonScheduler(Grab(), this, command);
+  auto tbs = new ToggleButtonScheduler(GetSendableState(), this, command);
   tbs->Start();
 }
 
 void Trigger::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Button");
-  builder.SetSafeState([=]() { m_sendablePressed = false; });
-  builder.AddBooleanProperty("pressed", [=]() { return Grab(); },
-                             [=](bool value) { m_sendablePressed = value; });
+  builder.SetSafeState([=] { m_sendableState = false; });
+  builder.AddBooleanProperty("pressed", [=] { return GetSendableState(); },
+                             [=](bool value) { m_sendableState = value; });
 }

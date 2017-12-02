@@ -16,6 +16,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  */
 public class NetworkButton extends Button {
   private final NetworkTableEntry m_entry;
+  boolean m_lastState;
 
   public NetworkButton(String table, String field) {
     this(NetworkTableInstance.getDefault().getTable(table), field);
@@ -28,5 +29,33 @@ public class NetworkButton extends Button {
   @Override
   public boolean get() {
     return m_entry.getInstance().isConnected() && m_entry.getBoolean(false);
+  }
+
+  @Override
+  public boolean getPressed() {
+    if (m_entry.getInstance().isConnected()) {
+      boolean currentState = m_entry.getBoolean(false);
+      boolean pressed = !m_lastState && currentState;
+
+      m_lastState = currentState;
+
+      return pressed;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean getReleased() {
+    if (m_entry.getInstance().isConnected()) {
+      boolean currentState = m_entry.getBoolean(false);
+      boolean released = m_lastState && !currentState;
+
+      m_lastState = currentState;
+
+      return released;
+    } else {
+      return false;
+    }
   }
 }
