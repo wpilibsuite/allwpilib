@@ -46,16 +46,22 @@ public abstract class AbstractComsSetup {
    */
   static {
     if (!initialized) {
-      // Set some implementations so that the static methods work properly
-      RobotBase.initializeHardwareConfiguration();
-      HAL.observeUserProgramStarting();
-      DriverStation.getInstance().getAlliance();
+      try {
+        // Set some implementations so that the static methods work properly
+        RobotBase.initializeHardwareConfiguration();
+        HAL.observeUserProgramStarting();
+        DriverStation.getInstance().getAlliance();
 
-      ds = new MockDS();
-      ds.start();
+        ds = new MockDS();
+        ds.start();
 
-      LiveWindow.setEnabled(false);
-      TestBench.out().println("Started coms");
+        LiveWindow.setEnabled(false);
+        TestBench.out().println("Started coms");
+      } catch (Exception ex) {
+        TestBench.out().println("Exception during AbstractComsSetup initialization: " + ex);
+        ex.printStackTrace(TestBench.out());
+        throw ex;
+      }
 
       // Wait until the robot is enabled before starting the tests
       int enableCounter = 0;
