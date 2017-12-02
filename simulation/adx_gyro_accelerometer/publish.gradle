@@ -47,6 +47,9 @@ task cppSourcesZip(type: Zip) {
     }
 }
 
+build.dependsOn cppSourcesZip
+build.dependsOn cppHeadersZip
+
 model {
     publishing {
         def libSpec = createComponentZipTasks($.components, 'halsim_adx_gyro_accelerometer', 'zipcpp', Zip, project, includeStandardZipFormat)

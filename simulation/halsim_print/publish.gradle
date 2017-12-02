@@ -47,6 +47,9 @@ task cppHeadersZip(type: Zip) {
     }
 }
 
+build.dependsOn cppSourcesZip
+build.dependsOn cppHeadersZip
+
 
 model {
     publishing {
