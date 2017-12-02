@@ -23,5 +23,5 @@ WaitCommand::WaitCommand(double timeout)
  *
  * @param timeout the time (in seconds) before this command "times out"
  */
-WaitCommand::WaitCommand(const std::string& name, double timeout)
+WaitCommand::WaitCommand(const llvm::Twine& name, double timeout)
     : TimedCommand(name, timeout) {}

@@ -8,7 +8,8 @@
 #pragma once
 
 #include <memory>
-#include <string>
+
+#include <llvm/Twine.h>
 
 #include "Commands/Command.h"
 #include "PIDController.h"
@@ -19,10 +20,10 @@ namespace frc {
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:
-  PIDCommand(const std::string& name, double p, double i, double d);
-  PIDCommand(const std::string& name, double p, double i, double d,
+  PIDCommand(const llvm::Twine& name, double p, double i, double d);
+  PIDCommand(const llvm::Twine& name, double p, double i, double d,
              double period);
-  PIDCommand(const std::string& name, double p, double i, double d, double f,
+  PIDCommand(const llvm::Twine& name, double p, double i, double d, double f,
              double period);
   PIDCommand(double p, double i, double d);
   PIDCommand(double p, double i, double d, double period);

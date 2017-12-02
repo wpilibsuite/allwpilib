@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <string>
+#include <llvm/Twine.h>
 
 #include "Commands/Command.h"
 #include "Commands/InstantCommand.h"
@@ -33,7 +33,7 @@ namespace frc {
 class ConditionalCommand : public Command {
  public:
   explicit ConditionalCommand(Command* onTrue, Command* onFalse = nullptr);
-  ConditionalCommand(const std::string& name, Command* onTrue,
+  ConditionalCommand(const llvm::Twine& name, Command* onTrue,
                      Command* onFalse = nullptr);
   virtual ~ConditionalCommand() = default;
 
