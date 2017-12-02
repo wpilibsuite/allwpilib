@@ -219,7 +219,7 @@ void HAL_SetAccelerometerRange(HAL_AccelerometerRange range) {
  *
  * This is a floating point value in units of 1 g-force
  */
-double HAL_GetAccelerometerX() {
+double HAL_GetAccelerometerX(void) {
   initializeAccelerometer();
 
   int32_t raw =
@@ -232,7 +232,7 @@ double HAL_GetAccelerometerX() {
  *
  * This is a floating point value in units of 1 g-force
  */
-double HAL_GetAccelerometerY() {
+double HAL_GetAccelerometerY(void) {
   initializeAccelerometer();
 
   int32_t raw =
@@ -245,7 +245,7 @@ double HAL_GetAccelerometerY() {
  *
  * This is a floating point value in units of 1 g-force
  */
-double HAL_GetAccelerometerZ() {
+double HAL_GetAccelerometerZ(void) {
   initializeAccelerometer();
 
   int32_t raw =

@@ -199,7 +199,9 @@ void HAL_ObserveUserProgramTest(void) {
 static pthread_key_t lastCountKey;
 static pthread_once_t lastCountKeyOnce = PTHREAD_ONCE_INIT;
 
-static void InitLastCountKey() { pthread_key_create(&lastCountKey, std::free); }
+static void InitLastCountKey(void) {
+  pthread_key_create(&lastCountKey, std::free);
+}
 #endif
 
 bool HAL_IsNewControlData(void) {

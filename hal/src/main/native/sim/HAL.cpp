@@ -149,7 +149,7 @@ const char* HAL_GetErrorMessage(int32_t code) {
 /**
  * Returns the runtime type of this HAL
  */
-HAL_RuntimeType HAL_GetRuntimeType() { return HAL_Mock; }
+HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Mock; }
 
 /**
  * Return the FPGA Version number.
