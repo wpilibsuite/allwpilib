@@ -200,7 +200,8 @@ public class RobotDrive implements MotorSafety {
 
   /**
    * Provide tank steering using the stored robot configuration. drive the robot using two joystick
-   * inputs. The Y-axis will be selected from each Joystick object.
+   * inputs. The Y-axis will be selected from each Joystick object. The calculated values will be
+   * squared to decrease sensitivity at low speeds.
    *
    * @param leftStick  The joystick to control the left side of the robot.
    * @param rightStick The joystick to control the right side of the robot.
@@ -229,7 +230,8 @@ public class RobotDrive implements MotorSafety {
 
   /**
    * Provide tank steering using the stored robot configuration. This function lets you pick the
-   * axis to be used on each Joystick object for the left and right sides of the robot.
+   * axis to be used on each Joystick object for the left and right sides of the robot. The
+   * calculated values will be squared to decrease sensitivity at low speeds.
    *
    * @param leftStick  The Joystick object to use for the left side of the robot.
    * @param leftAxis   The axis to select on the left side Joystick object.
@@ -292,7 +294,8 @@ public class RobotDrive implements MotorSafety {
 
   /**
    * Provide tank steering using the stored robot configuration. This function lets you directly
-   * provide joystick values from any source.
+   * provide joystick values from any source. The calculated values will be squared to decrease
+   * sensitivity at low speeds.
    *
    * @param leftValue  The value of the left stick.
    * @param rightValue The value of the right stick.
@@ -304,7 +307,8 @@ public class RobotDrive implements MotorSafety {
   /**
    * Arcade drive implements single stick driving. Given a single Joystick, the class assumes the Y
    * axis for the move value and the X axis for the rotate value. (Should add more information here
-   * regarding the way that arcade drive works.)
+   * regarding the way that arcade drive works.) The calculated values will be squared to decrease
+   * sensitivity at low speeds.
    *
    * @param stick         The joystick to use for Arcade single-stick driving. The Y-axis will be
    *                      selected for forwards/backwards and the X-axis will be selected for
@@ -319,7 +323,8 @@ public class RobotDrive implements MotorSafety {
   /**
    * Arcade drive implements single stick driving. Given a single Joystick, the class assumes the Y
    * axis for the move value and the X axis for the rotate value. (Should add more information here
-   * regarding the way that arcade drive works.)
+   * regarding the way that arcade drive works.) The calculated values will be squared to decrease
+   * sensitivity at low speeds.
    *
    * @param stick The joystick to use for Arcade single-stick driving. The Y-axis will be selected
    *              for forwards/backwards and the X-axis will be selected for rotation rate.
@@ -350,7 +355,8 @@ public class RobotDrive implements MotorSafety {
 
   /**
    * Arcade drive implements single stick driving. Given two joystick instances and two axis,
-   * compute the values to send to either two or four motors.
+   * compute the values to send to either two or four motors. The calculated values will be
+   * squared to decrease sensitivity at low speeds.
    *
    * @param moveStick   The Joystick object that represents the forward/backward direction
    * @param moveAxis    The axis on the moveStick object to use for forwards/backwards (typically
@@ -418,7 +424,8 @@ public class RobotDrive implements MotorSafety {
 
   /**
    * Arcade drive implements single stick driving. This function lets you directly provide
-   * joystick values from any source.
+   * joystick values from any source. The calculated values will be squared to decrease
+   * sensitivity at low speeds.
    *
    * @param moveValue   The value to use for forwards/backwards
    * @param rotateValue The value to use for the rotate right/left
@@ -486,9 +493,9 @@ public class RobotDrive implements MotorSafety {
    * so that the front and back wheels are toed in 45 degrees. When looking at the wheels from the
    * top, the roller axles should form an X across the robot.
    *
-   * @param magnitude The speed that the robot should drive in a given direction.
-   * @param direction The direction the robot should drive in degrees. The direction and magnitude
-   *                  are independent of the rotation rate.
+   * @param magnitude The speed that the robot should drive in a given direction. [-1.0..1.0]
+   * @param direction The angle the robot should drive in degrees. The direction and magnitude
+   *                  are independent of the rotation rate. [-180.0..180.0]
    * @param rotation  The rate of rotation for the robot that is completely independent of the
    *                  magnitude or direction. [-1.0..1.0]
    */
@@ -501,7 +508,7 @@ public class RobotDrive implements MotorSafety {
     // Normalized for full power along the Cartesian axes.
     magnitude = limit(magnitude) * Math.sqrt(2.0);
     // The rollers are at 45 degree angles.
-    double dirInRad = (direction + 45.0) * 3.14159 / 180.0;
+    double dirInRad = (direction + 45.0) * Math.PI / 180.0;
     double cosD = Math.cos(dirInRad);
     double sinD = Math.sin(dirInRad);
 
@@ -529,7 +536,7 @@ public class RobotDrive implements MotorSafety {
    * <p>This is an alias to mecanumDrive_Polar() for backward compatibility
    *
    * @param magnitude The speed that the robot should drive in a given direction. [-1.0..1.0]
-   * @param direction The direction the robot should drive. The direction and maginitute are
+   * @param direction The direction the robot should drive. The direction and maginitude are
    *                  independent of the rotation rate.
    * @param rotation  The rate of rotation for the robot that is completely independent of the
    *                  magnitute or direction. [-1.0..1.0]
@@ -601,8 +608,8 @@ public class RobotDrive implements MotorSafety {
    */
   @SuppressWarnings("ParameterName")
   protected static double[] rotateVector(double x, double y, double angle) {
-    double cosA = Math.cos(angle * (3.14159 / 180.0));
-    double sinA = Math.sin(angle * (3.14159 / 180.0));
+    double cosA = Math.cos(angle * (Math.PI / 180.0));
+    double sinA = Math.sin(angle * (Math.PI / 180.0));
     double[] out = new double[2];
     out[0] = x * cosA - y * sinA;
     out[1] = x * sinA + y * cosA;

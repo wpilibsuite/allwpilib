@@ -36,6 +36,8 @@ static constexpr double kJoystickUnpluggedMessageInterval = 1.0;
 
 DriverStation::~DriverStation() {
   m_isRunning = false;
+  // Trigger a DS mutex release in case there is no driver station running.
+  HAL_ReleaseDSMutex();
   m_dsThread.join();
 }
 

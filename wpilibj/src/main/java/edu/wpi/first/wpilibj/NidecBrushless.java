@@ -24,6 +24,7 @@ public class NidecBrushless implements SpeedController, MotorSafety, LiveWindowS
   private DigitalOutput m_dio;
   private PWM m_pwm;
   private volatile double m_speed = 0.0;
+  private volatile boolean m_disabled = false;
 
   /**
    * Constructor.
@@ -45,7 +46,6 @@ public class NidecBrushless implements SpeedController, MotorSafety, LiveWindowS
 
     // the pwm enables the controller
     m_pwm = new PWM(pwmChannel);
-    m_pwm.setRaw(0xffff);
 
     LiveWindow.addActuator("Nidec Brushless", pwmChannel, this);
     HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel);
@@ -61,8 +61,11 @@ public class NidecBrushless implements SpeedController, MotorSafety, LiveWindowS
    */
   @Override
   public void set(double speed) {
-    m_speed = speed;
-    m_dio.updateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
+    if (!m_disabled) {
+      m_speed = speed;
+      m_dio.updateDutyCycle(0.5 + 0.5 * (m_isInverted ? -speed : speed));
+      m_pwm.setRaw(0xffff);
+    }
     m_safetyHelper.feed();
   }
 
@@ -129,10 +132,12 @@ public class NidecBrushless implements SpeedController, MotorSafety, LiveWindowS
   /**
    * Stop the motor. This is called by the MotorSafetyHelper object
    * when it has a timeout for this PWM and needs to stop it from running.
+   * Calling set() will re-enable the motor.
    */
   @Override
   public void stopMotor() {
-    disable();
+    m_dio.updateDutyCycle(0.5);
+    m_pwm.setDisabled();
   }
 
   /**
@@ -155,9 +160,23 @@ public class NidecBrushless implements SpeedController, MotorSafety, LiveWindowS
     return "Nidec " + getChannel();
   }
 
+  /**
+   * Disable the motor.  The enable() function must be called to re-enable
+   * the motor.
+   */
   @Override
   public void disable() {
+    m_disabled = true;
     m_dio.updateDutyCycle(0.5);
+    m_pwm.setDisabled();
+  }
+
+  /**
+   * Re-enable the motor after disable() has been called.  The set()
+   * function must be called to set a new motor speed.
+   */
+  public void enable() {
+    m_disabled = false;
   }
 
   /**

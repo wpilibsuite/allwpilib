@@ -388,8 +388,8 @@ public final class TestBench {
     return new FilterOutputFixture<LinearDigitalFilter>(kSinglePoleIIRExpectedOutput) {
       @Override
       protected LinearDigitalFilter giveFilter() {
-        DataWrapper data = new DataWrapper(getData);
-        return LinearDigitalFilter.singlePoleIIR(data,
+        m_data = new DataWrapper(getData);
+        return LinearDigitalFilter.singlePoleIIR(m_data,
             kSinglePoleIIRTimeConstant,
             kFilterStep);
       }
@@ -405,8 +405,8 @@ public final class TestBench {
     return new FilterOutputFixture<LinearDigitalFilter>(kHighPassExpectedOutput) {
       @Override
       protected LinearDigitalFilter giveFilter() {
-        DataWrapper data = new DataWrapper(getData);
-        return LinearDigitalFilter.highPass(data, kHighPassTimeConstant,
+        m_data = new DataWrapper(getData);
+        return LinearDigitalFilter.highPass(m_data, kHighPassTimeConstant,
             kFilterStep);
       }
     };
@@ -422,8 +422,8 @@ public final class TestBench {
     return new FilterOutputFixture<LinearDigitalFilter>(kMovAvgExpectedOutput) {
       @Override
       protected LinearDigitalFilter giveFilter() {
-        DataWrapper data = new DataWrapper(getData);
-        return LinearDigitalFilter.movingAverage(data, kMovAvgTaps);
+        m_data = new DataWrapper(getData);
+        return LinearDigitalFilter.movingAverage(m_data, kMovAvgTaps);
       }
     };
   }
@@ -438,8 +438,8 @@ public final class TestBench {
     return new FilterOutputFixture<LinearDigitalFilter>(0.0) {
       @Override
       protected LinearDigitalFilter giveFilter() {
-        DataWrapper data = new DataWrapper(getPulseData);
-        return LinearDigitalFilter.movingAverage(data, kMovAvgTaps);
+        m_data = new DataWrapper(getPulseData);
+        return LinearDigitalFilter.movingAverage(m_data, kMovAvgTaps);
       }
     };
   }

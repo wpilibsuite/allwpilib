@@ -26,7 +26,7 @@ public abstract class FilterOutputFixture<T extends PIDSource> implements ITestF
   private boolean m_initialized = false;
   private boolean m_tornDown = false;
   protected T m_filter;
-  private DataWrapper m_data;
+  protected DataWrapper m_data;
   private double m_expectedOutput;
 
   public FilterOutputFixture(double expectedOutput) {
