@@ -23,7 +23,7 @@ WaitUntilCommand::WaitUntilCommand(double time)
   m_time = time;
 }
 
-WaitUntilCommand::WaitUntilCommand(const std::string& name, double time)
+WaitUntilCommand::WaitUntilCommand(const llvm::Twine& name, double time)
     : Command(name, time) {
   m_time = time;
 }

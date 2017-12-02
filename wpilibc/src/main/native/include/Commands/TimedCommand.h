@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <string>
+#include <llvm/Twine.h>
 
 #include "Commands/Command.h"
 
@@ -20,7 +20,7 @@ namespace frc {
  */
 class TimedCommand : public Command {
  public:
-  TimedCommand(const std::string& name, double timeout);
+  TimedCommand(const llvm::Twine& name, double timeout);
   explicit TimedCommand(double timeout);
   virtual ~TimedCommand() = default;
 

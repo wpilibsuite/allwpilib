@@ -8,8 +8,9 @@
 #pragma once
 
 #include <list>
-#include <string>
 #include <vector>
+
+#include <llvm/Twine.h>
 
 #include "Commands/Command.h"
 #include "Commands/CommandGroupEntry.h"
@@ -36,7 +37,7 @@ namespace frc {
 class CommandGroup : public Command {
  public:
   CommandGroup() = default;
-  explicit CommandGroup(const std::string& name);
+  explicit CommandGroup(const llvm::Twine& name);
   virtual ~CommandGroup() = default;
 
   void AddSequential(Command* command);

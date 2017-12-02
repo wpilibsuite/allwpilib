@@ -14,6 +14,6 @@ using namespace frc;
  *
  * @param name The name for this command
  */
-InstantCommand::InstantCommand(const std::string& name) : Command(name) {}
+InstantCommand::InstantCommand(const llvm::Twine& name) : Command(name) {}
 
 bool InstantCommand::IsFinished() { return true; }

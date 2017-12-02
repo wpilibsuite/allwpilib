@@ -14,7 +14,7 @@ using namespace frc;
 WaitForChildren::WaitForChildren(double timeout)
     : Command("WaitForChildren", timeout) {}
 
-WaitForChildren::WaitForChildren(const std::string& name, double timeout)
+WaitForChildren::WaitForChildren(const llvm::Twine& name, double timeout)
     : Command(name, timeout) {}
 
 bool WaitForChildren::IsFinished() {

@@ -11,9 +11,9 @@
 
 using namespace frc;
 
-PrintCommand::PrintCommand(const std::string& message)
-    : InstantCommand("Print \"" + message + "\"") {
-  m_message = message;
+PrintCommand::PrintCommand(const llvm::Twine& message)
+    : InstantCommand("Print \"" + message + llvm::Twine('"')) {
+  m_message = message.str();
 }
 
-void PrintCommand::Initialize() { llvm::outs() << m_message << "\n"; }
+void PrintCommand::Initialize() { llvm::outs() << m_message << '\n'; }

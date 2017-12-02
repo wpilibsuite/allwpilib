@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <llvm/StringRef.h>
+#include <llvm/Twine.h>
 
 #include "Buttons/Button.h"
 #include "networktables/NetworkTable.h"
@@ -19,8 +19,9 @@ namespace frc {
 
 class NetworkButton : public Button {
  public:
-  NetworkButton(llvm::StringRef tableName, llvm::StringRef field);
-  NetworkButton(std::shared_ptr<nt::NetworkTable> table, llvm::StringRef field);
+  NetworkButton(const llvm::Twine& tableName, const llvm::Twine& field);
+  NetworkButton(std::shared_ptr<nt::NetworkTable> table,
+                const llvm::Twine& field);
   virtual ~NetworkButton() = default;
 
   virtual bool Get();
