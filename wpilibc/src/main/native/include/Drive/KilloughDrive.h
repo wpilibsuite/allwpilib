@@ -35,9 +35,21 @@ class SpeedController;
  * Killough drive. The default wheel vectors are parallel to their respective
  * opposite sides, but can be overridden. See the constructor for more
  * information.
+ *
+ * This library uses the NED axes convention (North-East-Down as external
+ * reference in the world frame):
+ * http://www.nuclearprojects.com/ins/images/axis_big.png.
+ *
+ * The positive X axis points ahead, the positive Y axis points right, and the
+ * and the positive Z axis points down. Rotations follow the right-hand rule, so
+ * clockwise rotation around the Z axis is positive.
  */
 class KilloughDrive : public RobotDriveBase {
  public:
+  static constexpr double kDefaultLeftMotorAngle = 60.0;
+  static constexpr double kDefaultRightMotorAngle = 120.0;
+  static constexpr double kDefaultBackMotorAngle = 270.0;
+
   KilloughDrive(SpeedController& leftMotor, SpeedController& rightMotor,
                 SpeedController& backMotor);
   KilloughDrive(SpeedController& leftMotor, SpeedController& rightMotor,
@@ -48,9 +60,9 @@ class KilloughDrive : public RobotDriveBase {
   KilloughDrive(const KilloughDrive&) = delete;
   KilloughDrive& operator=(const KilloughDrive&) = delete;
 
-  void DriveCartesian(double x, double y, double rotation,
+  void DriveCartesian(double ySpeed, double xSpeed, double zRotation,
                       double gyroAngle = 0.0);
-  void DrivePolar(double magnitude, double angle, double rotation);
+  void DrivePolar(double magnitude, double angle, double zRotation);
 
   void StopMotor() override;
   void GetDescription(llvm::raw_ostream& desc) const override;

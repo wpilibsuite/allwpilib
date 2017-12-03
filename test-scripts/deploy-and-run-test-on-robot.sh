@@ -17,12 +17,11 @@ DEFAULT_DESTINATION_CPP_TEST_FILE=${DEFAULT_TEST_SCP_DIR}/${DEFAULT_CPP_TEST_NAM
 
 DEFAULT_DESTINATION_RUN_TEST_SCRIPT=${DEFAULT_DESTINATION_DIR}/${DEFAULT_LOCAL_RUN_TEST_SCRIPT}
 
-usage="$(basename "$0") [-h] (java|cpp) [-m] [-A] [arg] [arg]...
+usage="$(basename "$0") [-h] (java|cpp) [-A] [arg] [arg]...
 A script designed to run the integration tests.
 This script should only be run on the roborio.
 Where:
     -h    Show this help text.
-    -m    The driver station mutex will be handled manually.
     -A    Disable language recomended arguments.
     arg   Additional arguments to be passed to test."
 
@@ -62,20 +61,14 @@ if [[ ! -e ${LOCAL_TEST_FILE} ]]; then
 	exit 1
 fi
 
-MUTEX_OVERRIDE_PARAM_TEXT=""
-if [[ "$2" = "-m" ]]; then
-	MUTEX_OVERRIDE_PARAM_TEXT="-m "
-	TEST_RUN_ARGS="${@:3}"
-else
-	TEST_RUN_ARGS="${@:2}"
-fi
+TEST_RUN_ARGS="${@:2}"
 
 shopt -s huponexit
 
 SCP_TEST_SCRIPT="scp config.sh ${DEFAULT_LOCAL_RUN_TEST_SCRIPT} ${ROBOT_ADDRESS}:/${DEFAULT_DESTINATION_DIR}"
 SSH_CHMOD_AND_MAKE_TEMP_TEST_DIR="ssh -t ${ROBOT_ADDRESS} \"chmod a+x ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT}; mkdir ${DEFAULT_TEST_SCP_DIR}; touch ${DESTINATION_TEST_FILE}\""
 SCP_TEST_PROGRAM="scp ${LOCAL_TEST_FILE} ${ROBOT_ADDRESS}:${DESTINATION_TEST_FILE}"
-SSH_RUN_TESTS="ssh -t ${ROBOT_ADDRESS} ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT} ${LANGUAGE} $(whoami) ${MUTEX_OVERRIDE_PARAM_TEXT}-d ${DEFAULT_TEST_SCP_DIR} ${TEST_RUN_ARGS}"
+SSH_RUN_TESTS="ssh -t ${ROBOT_ADDRESS} ${DEFAULT_DESTINATION_RUN_TEST_SCRIPT} ${LANGUAGE} $(whoami) -d ${DEFAULT_TEST_SCP_DIR} ${TEST_RUN_ARGS}"
 SCP_NATIVE_LIBRARIES="scp ${DEFAULT_LIBRARY_NATIVE_FILES}/* ${ROBOT_ADDRESS}:${DEFAULT_LIBRARY_NATIVE_DESTINATION}"
 CONFIG_NATIVE_LIBRARIES="ssh -t ${ADMIN_ROBOT_ADDRESS} ldconfig"
 

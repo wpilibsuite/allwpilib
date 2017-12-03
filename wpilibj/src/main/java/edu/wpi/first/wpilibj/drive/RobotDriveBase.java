@@ -14,8 +14,11 @@ import edu.wpi.first.wpilibj.MotorSafetyHelper;
  * Common base class for drive platforms.
  */
 public abstract class RobotDriveBase implements MotorSafety {
-  protected double m_deadband = 0.02;
-  protected double m_maxOutput = 1.0;
+  public static final double kDefaultDeadband = 0.02;
+  public static final double kDefaultMaxOutput = 1.0;
+
+  protected double m_deadband = kDefaultDeadband;
+  protected double m_maxOutput = kDefaultMaxOutput;
   protected MotorSafetyHelper m_safetyHelper = new MotorSafetyHelper(this);
 
   /**
@@ -37,13 +40,22 @@ public abstract class RobotDriveBase implements MotorSafety {
     m_safetyHelper.setSafetyEnabled(true);
   }
 
+  /**
+   * Change the default value for deadband scaling. The default value is
+   * {@value #kDefaultDeadband}. Values smaller then the deadband are set to 0, while values
+   * larger then the deadband are scaled from 0.0 to 1.0. See {@link #applyDeadband}.
+   *
+   * @param deadband The deadband to set.
+   */
   public void setDeadband(double deadband) {
     m_deadband = deadband;
   }
 
   /**
-   * Configure the scaling factor for using RobotDrive with motor controllers in a mode other than
-   * PercentVbus.
+   * Configure the scaling factor for using drive methods with motor controllers in a mode other
+   * than PercentVbus or to limit the maximum output.
+   *
+   * <p>The default value is {@value #kDefaultMaxOutput}.
    *
    * @param maxOutput Multiplied with the output percentage computed by the drive functions.
    */

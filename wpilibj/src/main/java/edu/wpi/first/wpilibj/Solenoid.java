@@ -116,7 +116,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * Trigger the PCM to generate a pulse of the duration set in
    * setPulseDuration.
    *
-   * @see #setPulseDuration()
+   * @see #setPulseDuration(double)
    */
   public void startPulse() {
     SolenoidJNI.fireOneShot(m_solenoidHandle);

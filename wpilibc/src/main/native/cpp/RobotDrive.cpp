@@ -250,6 +250,8 @@ void RobotDrive::Drive(double outputMagnitude, double curve) {
  *
  * @param leftStick  The joystick to control the left side of the robot.
  * @param rightStick The joystick to control the right side of the robot.
+ * @param squaredInputs If true, the sensitivity will be decreased for small
+ *                      values
  */
 void RobotDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
                            bool squaredInputs) {
@@ -260,6 +262,17 @@ void RobotDrive::TankDrive(GenericHID* leftStick, GenericHID* rightStick,
   TankDrive(leftStick->GetY(), rightStick->GetY(), squaredInputs);
 }
 
+/**
+ * Provide tank steering using the stored robot configuration.
+ *
+ * Drive the robot using two joystick inputs. The Y-axis will be selected from
+ * each Joystick object.
+ *
+ * @param leftStick  The joystick to control the left side of the robot.
+ * @param rightStick The joystick to control the right side of the robot.
+ * @param squaredInputs If true, the sensitivity will be decreased for small
+ *                      values
+ */
 void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
                            bool squaredInputs) {
   TankDrive(leftStick.GetY(), rightStick.GetY(), squaredInputs);
@@ -276,6 +289,8 @@ void RobotDrive::TankDrive(GenericHID& leftStick, GenericHID& rightStick,
  * @param rightStick The Joystick object to use for the right side of the
  *                   robot.
  * @param rightAxis  The axis to select on the right side Joystick object.
+ * @param squaredInputs If true, the sensitivity will be decreased for small
+ *                      values
  */
 void RobotDrive::TankDrive(GenericHID* leftStick, int leftAxis,
                            GenericHID* rightStick, int rightAxis,
@@ -302,6 +317,8 @@ void RobotDrive::TankDrive(GenericHID& leftStick, int leftAxis,
  *
  * @param leftValue  The value of the left stick.
  * @param rightValue The value of the right stick.
+ * @param squaredInputs If true, the sensitivity will be decreased for small
+ *                      values
  */
 void RobotDrive::TankDrive(double leftValue, double rightValue,
                            bool squaredInputs) {
@@ -335,7 +352,7 @@ void RobotDrive::TankDrive(double leftValue, double rightValue,
  * @param stick         The joystick to use for Arcade single-stick driving.
  *                      The Y-axis will be selected for forwards/backwards and
  *                      the X-axis will be selected for rotation rate.
- * @param squaredInputs If true, the sensitivity will be increased for small
+ * @param squaredInputs If true, the sensitivity will be decreased for small
  *                      values
  */
 void RobotDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs) {
@@ -353,7 +370,7 @@ void RobotDrive::ArcadeDrive(GenericHID* stick, bool squaredInputs) {
  * @param stick         The joystick to use for Arcade single-stick driving.
  *                      The Y-axis will be selected for forwards/backwards and
  *                      the X-axis will be selected for rotation rate.
- * @param squaredInputs If true, the sensitivity will be increased for small
+ * @param squaredInputs If true, the sensitivity will be decreased for small
  *                      values
  */
 void RobotDrive::ArcadeDrive(GenericHID& stick, bool squaredInputs) {

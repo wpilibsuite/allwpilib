@@ -88,7 +88,7 @@ static void alarmCallback(uint32_t, void*) {
     }
   });
 
-  if (closestTrigger != UINT64_MAX) {
+  if (notifierAlarm && closestTrigger != UINT64_MAX) {
     // Simply truncate the hardware trigger time to 32-bit.
     notifierAlarm->writeTriggerTime(static_cast<uint32_t>(closestTrigger),
                                     &status);
@@ -156,16 +156,16 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
   notifier->cond.notify_all();
 
   if (notifierRefCount.fetch_sub(1) == 1) {
-    std::lock_guard<wpi::mutex> lock(notifierMutex);
     // if this was the last notifier, clean up alarm and manager
-    if (notifierAlarm) {
-      notifierAlarm->writeEnable(false, status);
-      notifierAlarm = nullptr;
-    }
-    if (notifierManager) {
-      notifierManager->disable(status);
-      notifierManager = nullptr;
-    }
+    // the notifier can call back into our callback, so don't hold the lock
+    // here (the atomic fetch_sub will prevent multiple parallel entries
+    // into this function)
+    if (notifierAlarm) notifierAlarm->writeEnable(false, status);
+    if (notifierManager) notifierManager->disable(status);
+
+    std::lock_guard<wpi::mutex> lock(notifierMutex);
+    notifierAlarm = nullptr;
+    notifierManager = nullptr;
     closestTrigger = UINT64_MAX;
   }
 }
