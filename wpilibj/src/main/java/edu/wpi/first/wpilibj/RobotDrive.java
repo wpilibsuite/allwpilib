@@ -307,8 +307,7 @@ public class RobotDrive implements MotorSafety {
   /**
    * Arcade drive implements single stick driving. Given a single Joystick, the class assumes the Y
    * axis for the move value and the X axis for the rotate value. (Should add more information here
-   * regarding the way that arcade drive works.) The calculated values will be squared to decrease
-   * sensitivity at low speeds.
+   * regarding the way that arcade drive works.)
    *
    * @param stick         The joystick to use for Arcade single-stick driving. The Y-axis will be
    *                      selected for forwards/backwards and the X-axis will be selected for
