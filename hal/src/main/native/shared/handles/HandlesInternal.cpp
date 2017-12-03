@@ -13,7 +13,11 @@
 #include <support/mutex.h>
 
 namespace hal {
-static llvm::SmallVector<HandleBase*, 32> globalHandles;
+static llvm::SmallVector<HandleBase*, 32>& GetGlobalHandles() {
+  static llvm::SmallVector<HandleBase*, 32> globalHandles;
+  return globalHandles;
+}
+
 static wpi::mutex& GetGlobalHandleMutex() {
   static wpi::mutex globalHandleMutex;
   return globalHandleMutex;
@@ -21,6 +25,7 @@ static wpi::mutex& GetGlobalHandleMutex() {
 
 HandleBase::HandleBase() {
   std::lock_guard<wpi::mutex> lock(GetGlobalHandleMutex());
+  auto& globalHandles = GetGlobalHandles();
   auto index = std::find(globalHandles.begin(), globalHandles.end(), this);
   if (index == globalHandles.end()) {
     globalHandles.push_back(this);
@@ -31,6 +36,7 @@ HandleBase::HandleBase() {
 
 HandleBase::~HandleBase() {
   std::lock_guard<wpi::mutex> lock(GetGlobalHandleMutex());
+  auto& globalHandles = GetGlobalHandles();
   auto index = std::find(globalHandles.begin(), globalHandles.end(), this);
   if (index != globalHandles.end()) {
     *index = nullptr;
@@ -46,6 +52,7 @@ void HandleBase::ResetHandles() {
 
 void HandleBase::ResetGlobalHandles() {
   std::unique_lock<wpi::mutex> lock(GetGlobalHandleMutex());
+  auto& globalHandles = GetGlobalHandles();
   for (auto&& i : globalHandles) {
     if (i != nullptr) {
       lock.unlock();
