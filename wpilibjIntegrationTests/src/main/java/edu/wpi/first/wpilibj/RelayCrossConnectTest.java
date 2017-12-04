@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -13,11 +13,12 @@ import org.junit.Test;
 
 import java.util.logging.Logger;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Relay.Direction;
 import edu.wpi.first.wpilibj.Relay.InvalidValueException;
 import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.fixtures.RelayCrossConnectFixture;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
@@ -30,7 +31,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class RelayCrossConnectTest extends AbstractComsSetup {
   private static final Logger logger = Logger.getLogger(RelayCrossConnectTest.class.getName());
-  private static final NetworkTable table = NetworkTable.getTable("_RELAY_CROSS_CONNECT_TEST_");
+  private static final NetworkTable table =
+      NetworkTableInstance.getDefault().getTable("_RELAY_CROSS_CONNECT_TEST_");
   private RelayCrossConnectFixture m_relayFixture;
 
 
@@ -56,7 +58,8 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
         .get());
     assertTrue("Input two was not high when relay set both high", m_relayFixture.getInputTwo()
         .get());
-    assertEquals("On", table.getString("Value"));
+    assertEquals(Value.kOn, m_relayFixture.getRelay().get());
+    assertEquals("On", table.getEntry("Value").getString(""));
   }
 
   @Test
@@ -69,7 +72,8 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     assertTrue("Input two was not high when relay set Value.kForward", m_relayFixture
         .getInputTwo()
         .get());
-    assertEquals("Forward", table.getString("Value"));
+    assertEquals(Value.kForward, m_relayFixture.getRelay().get());
+    assertEquals("Forward", table.getEntry("Value").getString(""));
   }
 
   @Test
@@ -82,7 +86,34 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     assertFalse("Input two was not low when relay set Value.kReverse", m_relayFixture
         .getInputTwo()
         .get());
-    assertEquals("Reverse", table.getString("Value"));
+    assertEquals(Value.kReverse, m_relayFixture.getRelay().get());
+    assertEquals("Reverse", table.getEntry("Value").getString(""));
+  }
+
+  @Test
+  public void testForwardDirection() {
+    m_relayFixture.getRelay().setDirection(Direction.kForward);
+    m_relayFixture.getRelay().set(Value.kOn);
+    m_relayFixture.getRelay().updateTable();
+    assertFalse("Input one was not low when relay set Value.kOn in kForward Direction",
+        m_relayFixture.getInputOne().get());
+    assertTrue("Input two was not high when relay set Value.kOn in kForward Direction",
+        m_relayFixture.getInputTwo().get());
+    assertEquals(Value.kOn, m_relayFixture.getRelay().get());
+    assertEquals("On", table.getEntry("Value").getString(""));
+  }
+
+  @Test
+  public void testReverseDirection() {
+    m_relayFixture.getRelay().setDirection(Direction.kReverse);
+    m_relayFixture.getRelay().set(Value.kOn);
+    m_relayFixture.getRelay().updateTable();
+    assertTrue("Input one was not high when relay set Value.kOn in kReverse Direction",
+        m_relayFixture.getInputOne().get());
+    assertFalse("Input two was not low when relay set Value.kOn in kReverse Direction",
+        m_relayFixture.getInputTwo().get());
+    assertEquals(Value.kOn, m_relayFixture.getRelay().get());
+    assertEquals("On", table.getEntry("Value").getString(""));
   }
 
   @Test(expected = InvalidValueException.class)
@@ -103,7 +134,7 @@ public class RelayCrossConnectTest extends AbstractComsSetup {
     // Initially both outputs should be off
     assertFalse(m_relayFixture.getInputOne().get());
     assertFalse(m_relayFixture.getInputTwo().get());
-    assertEquals("Off", table.getString("Value"));
+    assertEquals("Off", table.getEntry("Value").getString(""));
   }
 
   @Override

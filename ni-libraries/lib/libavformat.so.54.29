@@ -1,2 +1,0 @@
-OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( libavformat.so.54.29.104 )

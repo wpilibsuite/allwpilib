@@ -21,7 +21,7 @@ DEFAULT_DESTINATION_TEST_RESULTS_DIR=${DEFAULT_DESTINATION_DIR}/testResults
 # C++ test variables
 DEFAULT_CPP_TEST_NAME=FRCUserProgram
 DEFAULT_CPP_TEST_ARGS="--gtest_color=yes"
-DEFAULT_LOCAL_CPP_TEST_FILE=../wpilibcIntegrationTests/build/exe/fRCUserProgram/FRCUserProgram
+DEFAULT_LOCAL_CPP_TEST_FILE=../build/integrationTestFiles/cpp/FRCUserProgram
 
 CPP_REPORT=cppreport.xml
 DEFAULT_LOCAL_CPP_TEST_RESULT=${DEFAULT_LOCAL_TEST_RESULTS_DIR}/${CPP_REPORT}
@@ -31,10 +31,10 @@ DEFAULT_DESTINATION_CPP_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/${C
 DEFAULT_JAVA_TEST_NAME=FRCUserProgram.jar
 DEFAULT_JAVA_TEST_ARGS=""
 
-DEFAULT_LOCAL_JAVA_TEST_FILE=../wpilibjIntegrationTests/build/libs/wpilibjIntegrationTests-all.jar
+DEFAULT_LOCAL_JAVA_TEST_FILE=../build/integrationTestFiles/java/wpilibjIntegrationTests-all.jar
 
 JAVA_REPORT=javareport.xml
-DEFAULT_LIBRARY_NATIVE_FILES=../wpilibjIntegrationTests/build/nativelibraries
+DEFAULT_LIBRARY_NATIVE_FILES=../build/integrationTestFiles/libs
 DEFAULT_LIBRARY_NATIVE_DESTINATION=/usr/local/frc/lib
 DEFAULT_LOCAL_JAVA_TEST_RESULT=${DEFAULT_LOCAL_TEST_RESULTS_DIR}/${JAVA_REPORT}
 DEFAULT_DESTINATION_JAVA_TEST_RESULTS=${DEFAULT_DESTINATION_TEST_RESULTS_DIR}/AntReports/TEST-edu.wpi.first.wpilibj.test.TestSuite.xml

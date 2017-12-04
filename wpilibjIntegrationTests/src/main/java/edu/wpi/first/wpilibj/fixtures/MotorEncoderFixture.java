@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -70,7 +70,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    */
   protected abstract DigitalInput giveDigitalInputB();
 
-  private final void initialize() {
+  private void initialize() {
     synchronized (this) {
       if (!m_initialized) {
         m_initialized = true; // This ensures it is only initialized once
@@ -139,7 +139,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    */
   public boolean isMotorSpeedWithinRange(double value, double accuracy) {
     initialize();
-    return Math.abs((Math.abs(m_motor.get()) - Math.abs(value))) < Math.abs(accuracy);
+    return Math.abs(Math.abs(m_motor.get()) - Math.abs(value)) < Math.abs(accuracy);
   }
 
   @Override
@@ -170,6 +170,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    * deallocated.
    */
   @Override
+  @SuppressWarnings("Regexp")
   public boolean teardown() {
     String type;
     if (m_motor != null) {

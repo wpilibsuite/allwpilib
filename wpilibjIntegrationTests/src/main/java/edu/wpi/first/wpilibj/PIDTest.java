@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -21,8 +21,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
 
@@ -102,7 +103,7 @@ public class PIDTest extends AbstractComsSetup {
   public void setUp() throws Exception {
     logger.fine("Setup: " + me.getType());
     me.setup();
-    m_table = NetworkTable.getTable("TEST_PID");
+    m_table = NetworkTableInstance.getDefault().getTable("TEST_PID");
     m_controller = new PIDController(k_p, k_i, k_d, me.getEncoder(), me.getMotor());
     m_controller.initTable(m_table);
   }
@@ -130,14 +131,14 @@ public class PIDTest extends AbstractComsSetup {
     setupOutputRange();
     double setpoint = 2500.0;
     m_controller.setSetpoint(setpoint);
-    assertFalse("PID did not begin disabled", m_controller.isEnable());
+    assertFalse("PID did not begin disabled", m_controller.isEnabled());
     assertEquals("PID.getError() did not start at " + setpoint, setpoint,
         m_controller.getError(), 0);
-    assertEquals(k_p, m_table.getNumber("p"), 0);
-    assertEquals(k_i, m_table.getNumber("i"), 0);
-    assertEquals(k_d, m_table.getNumber("d"), 0);
-    assertEquals(setpoint, m_table.getNumber("setpoint"), 0);
-    assertFalse(m_table.getBoolean("enabled"));
+    assertEquals(k_p, m_table.getEntry("p").getDouble(9999999), 0);
+    assertEquals(k_i, m_table.getEntry("i").getDouble(9999999), 0);
+    assertEquals(k_d, m_table.getEntry("d").getDouble(9999999), 0);
+    assertEquals(setpoint, m_table.getEntry("setpoint").getDouble(9999999), 0);
+    assertFalse(m_table.getEntry("enabled").getBoolean(true));
   }
 
   @Test
@@ -148,12 +149,12 @@ public class PIDTest extends AbstractComsSetup {
     m_controller.setSetpoint(setpoint);
     m_controller.enable();
     Timer.delay(.5);
-    assertTrue(m_table.getBoolean("enabled"));
-    assertTrue(m_controller.isEnable());
+    assertTrue(m_table.getEntry("enabled").getBoolean(false));
+    assertTrue(m_controller.isEnabled());
     assertThat(0.0, is(not(me.getMotor().get())));
     m_controller.reset();
-    assertFalse(m_table.getBoolean("enabled"));
-    assertFalse(m_controller.isEnable());
+    assertFalse(m_table.getEntry("enabled").getBoolean(true));
+    assertFalse(m_controller.isEnabled());
     assertEquals(0, me.getMotor().get(), 0);
   }
 

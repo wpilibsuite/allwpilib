@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2014-2017. All Rights Reserved.                        */
+/* Copyright (c) 2014-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -83,7 +83,7 @@ public class PCMTest extends AbstractComsSetup {
    */
   @Test
   public void testPressureSwitch() throws Exception {
-    final double range = 0.1;
+    final double range = 0.5;
     reset();
     compressor.setClosedLoopControl(true);
 
@@ -161,23 +161,112 @@ public class PCMTest extends AbstractComsSetup {
     Timer.delay(kSolenoidDelayTime);
     assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
     assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report off", (solenoid.get() == DoubleSolenoid.Value.kOff));
+    assertTrue("DoubleSolenoid did not report off", solenoid.get() == DoubleSolenoid.Value.kOff);
 
     solenoid.set(DoubleSolenoid.Value.kForward);
     Timer.delay(kSolenoidDelayTime);
     assertFalse("Solenoid #1 did not turn on", fakeSolenoid1.get());
     assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report Forward", (solenoid.get() == DoubleSolenoid.Value
-        .kForward));
+    assertTrue("DoubleSolenoid did not report Forward", solenoid.get() == DoubleSolenoid.Value
+        .kForward);
 
     solenoid.set(DoubleSolenoid.Value.kReverse);
     Timer.delay(kSolenoidDelayTime);
     assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
     assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
-    assertTrue("DoubleSolenoid did not report Reverse", (solenoid.get() == DoubleSolenoid.Value
-        .kReverse));
+    assertTrue("DoubleSolenoid did not report Reverse", solenoid.get() == DoubleSolenoid.Value
+        .kReverse);
 
     solenoid.free();
+  }
+
+  /**
+   * Test if the correct solenoids turn on and off when they should.
+   */
+  @Test
+  public void testOneShot() throws Exception {
+    reset();
+
+    Solenoid solenoid1 = new Solenoid(0);
+    Solenoid solenoid2 = new Solenoid(1);
+
+    solenoid1.set(false);
+    solenoid2.set(false);
+    Timer.delay(kSolenoidDelayTime);
+    assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+    assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
+    assertFalse("Solenoid #1 did not report off", solenoid1.get());
+    assertFalse("Solenoid #2 did not report off", solenoid2.get());
+
+    // Pulse Solenoid #1 on, and turn Solenoid #2 off
+    solenoid1.setPulseDuration(2 * kSolenoidDelayTime);
+    solenoid1.startPulse();
+    solenoid2.set(false);
+    Timer.delay(kSolenoidDelayTime);
+    assertFalse("Solenoid #1 did not turn on", fakeSolenoid1.get());
+    assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
+    assertTrue("Solenoid #1 did not report on", solenoid1.get());
+    assertFalse("Solenoid #2 did not report off", solenoid2.get());
+    Timer.delay(2 * kSolenoidDelayTime);
+    assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+    assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
+    assertFalse("Solenoid #1 did not report off", solenoid1.get());
+    assertFalse("Solenoid #2 did not report off", solenoid2.get());
+
+    // Turn Solenoid #1 off, and pulse Solenoid #2 on
+    solenoid1.set(false);
+    solenoid2.setPulseDuration(2 * kSolenoidDelayTime);
+    solenoid2.startPulse();
+    Timer.delay(kSolenoidDelayTime);
+    assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+    assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
+    assertFalse("Solenoid #1 did not report off", solenoid1.get());
+    assertTrue("Solenoid #2 did not report on", solenoid2.get());
+    Timer.delay(2 * kSolenoidDelayTime);
+    assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+    assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
+    assertFalse("Solenoid #1 did not report off", solenoid1.get());
+    assertFalse("Solenoid #2 did not report off", solenoid2.get());
+
+    // Pulse both Solenoids on
+    solenoid1.setPulseDuration(2 * kSolenoidDelayTime);
+    solenoid2.setPulseDuration(2 * kSolenoidDelayTime);
+    solenoid1.startPulse();
+    solenoid2.startPulse();
+    Timer.delay(kSolenoidDelayTime);
+    assertFalse("Solenoid #1 did not turn on", fakeSolenoid1.get());
+    assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
+    assertTrue("Solenoid #1 did not report on", solenoid1.get());
+    assertTrue("Solenoid #2 did not report on", solenoid2.get());
+    Timer.delay(2 * kSolenoidDelayTime);
+    assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+    assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
+    assertFalse("Solenoid #1 did not report off", solenoid1.get());
+    assertFalse("Solenoid #2 did not report off", solenoid2.get());
+
+    // Pulse both Solenoids on with different durations
+    solenoid1.setPulseDuration(1.5 * kSolenoidDelayTime);
+    solenoid2.setPulseDuration(2.5 * kSolenoidDelayTime);
+    solenoid1.startPulse();
+    solenoid2.startPulse();
+    Timer.delay(kSolenoidDelayTime);
+    assertFalse("Solenoid #1 did not turn on", fakeSolenoid1.get());
+    assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
+    assertTrue("Solenoid #1 did not report on", solenoid1.get());
+    assertTrue("Solenoid #2 did not report on", solenoid2.get());
+    Timer.delay(kSolenoidDelayTime);
+    assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+    assertFalse("Solenoid #2 did not turn on", fakeSolenoid2.get());
+    assertFalse("Solenoid #1 did not report off", solenoid1.get());
+    assertTrue("Solenoid #2 did not report on", solenoid2.get());
+    Timer.delay(kSolenoidDelayTime);
+    assertTrue("Solenoid #1 did not turn off", fakeSolenoid1.get());
+    assertTrue("Solenoid #2 did not turn off", fakeSolenoid2.get());
+    assertFalse("Solenoid #1 did not report off", solenoid1.get());
+    assertFalse("Solenoid #2 did not report off", solenoid2.get());
+
+    solenoid1.free();
+    solenoid2.free();
   }
 
   protected Logger getClassLogger() {

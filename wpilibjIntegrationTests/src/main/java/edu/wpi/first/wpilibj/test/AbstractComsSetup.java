@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.MockDS;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -34,6 +35,9 @@ public abstract class AbstractComsSetup {
    */
   private static boolean initialized = false;
 
+  // We have no way to stop the MockDS, so its thread is daemon.
+  private static  MockDS ds;
+
   /**
    * This sets up the network communications library to enable the driver
    * station. After starting network coms, it will loop until the driver station
@@ -42,12 +46,22 @@ public abstract class AbstractComsSetup {
    */
   static {
     if (!initialized) {
-      // Set some implementations so that the static methods work properly
-      RobotBase.initializeHardwareConfiguration();
-      HAL.observeUserProgramStarting();
+      try {
+        // Set some implementations so that the static methods work properly
+        RobotBase.initializeHardwareConfiguration();
+        HAL.observeUserProgramStarting();
+        DriverStation.getInstance().getAlliance();
 
-      LiveWindow.setEnabled(false);
-      TestBench.out().println("Started coms");
+        ds = new MockDS();
+        ds.start();
+
+        LiveWindow.setEnabled(false);
+        TestBench.out().println("Started coms");
+      } catch (Exception ex) {
+        TestBench.out().println("Exception during AbstractComsSetup initialization: " + ex);
+        ex.printStackTrace(TestBench.out());
+        throw ex;
+      }
 
       // Wait until the robot is enabled before starting the tests
       int enableCounter = 0;
@@ -57,8 +71,7 @@ public abstract class AbstractComsSetup {
         } catch (InterruptedException ex) {
           ex.printStackTrace();
         }
-        // Prints the message on one line overwriting itself each time
-        TestBench.out().print("\rWaiting for enable: " + enableCounter++);
+        TestBench.out().println("Waiting for enable: " + enableCounter++);
       }
       TestBench.out().println();
 

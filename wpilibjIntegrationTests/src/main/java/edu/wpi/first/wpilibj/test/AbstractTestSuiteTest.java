@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,6 +28,7 @@ import static org.junit.Assert.assertEquals;
  * Yes, this is the test system testing itself. Functionally, this is making sure that all tests get
  * run correctly when you use parametrized arguments.
  */
+@SuppressWarnings("MultipleTopLevelClasses")
 public class AbstractTestSuiteTest {
 
   @Ignore("Prevents ANT from trying to run these as tests")
