@@ -253,7 +253,7 @@
     </example>
     <example>
         <name>PacGoat</name>
-        <description>A fully functional example CommandBased program for FRC Team 190&amp;#39;s 2014
+        <description>A fully functional example CommandBased program for FRC Team 190's 2014
             robot. This code can run on your computer if it supports simulation.</description>
         <tags>
             <tag>Complete Robot</tag>
