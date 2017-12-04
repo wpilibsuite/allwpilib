@@ -167,7 +167,7 @@ void PIDController::Calculate() {
         m_totalError = 0.0;
       } else if (m_I != 0) {
         m_totalError = clamp(m_totalError + m_error, m_minimumOutput / m_I,
-                       m_maximumOutput / m_I);
+                             m_maximumOutput / m_I);
       }
 
       m_result = m_P * m_error + m_I * m_totalError +
@@ -353,12 +353,8 @@ void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
 }
 
 /**
- * Set the maximum error value that will cause the accumulated integral to be
- * calculated. If the error term is large, it can potentially accumulate to have
- * a huge effect on the output of the PID calculation. Any time the error is
- * larger than the value specified in this function, the running integral will
- * be set to zero causing it to not effect the output until the error is closer
- * to the setpoint.
+ * Set maximum magnitude of error for which integration should occur. Values
+ * above this will reset the current total.
  *
  * <p>The default maximum error to integrate is positive infinity.
  *
@@ -373,7 +369,7 @@ void PIDController::SetMaxErrorToIntegrate(double maximumErrorToIntegrate) {
  *
  * @see #SetMaxErrorToIntegrate(double)
  *
- * @return the max error to integrate
+ * @return max value of error for which integration should occur
  */
 double PIDController::GetMaxErrorToIntegrate() const {
   return m_maxErrorToIntegrate;

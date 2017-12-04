@@ -473,11 +473,8 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Set the maximum error value that will cause the accumulated integral to be calculated. If the
-   * error term is large, it can potentially accumulate to have a huge effect on the output
-   * of the PID calculation. Any time the error is larger than the value specified in this function,
-   * the running integral will be set to zero causing it to not effect the output until the error
-   * is closer to the setpoint.
+   * Set maximum magnitude of error for which integration should occur. Values
+   * above this will reset the current total.
    *
    * <p>The default maximum error to integrate is {@link Double#POSITIVE_INFINITY}.
    *
@@ -488,11 +485,11 @@ public class PIDController implements PIDInterface, LiveWindowSendable, Controll
   }
 
   /**
-   * Get the max error to integrate.
+   * Get the maximum magnitude of error for which integration should occur.
    *
    * @see #setMaxErrorToIntegrate(double)
    *
-   * @return the max error to integrate
+   * @return the maximum error where integration will occur
    */
   public synchronized double getMaxErrorToIntegrate() {
     return m_maxErrorToIntegrate;
