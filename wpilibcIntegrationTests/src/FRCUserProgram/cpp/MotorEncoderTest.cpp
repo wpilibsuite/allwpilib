@@ -67,8 +67,8 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
                                 TestBench::kTalonEncoderChannelB);
         break;
     }
-    m_filter = new LinearDigitalFilter(LinearDigitalFilter::MovingAverage(
-        std::shared_ptr<PIDSource>(m_encoder, NullDeleter<PIDSource>()), 50));
+    m_filter = new LinearDigitalFilter(
+        LinearDigitalFilter::MovingAverage(*m_encoder, 50));
   }
 
   void TearDown() override {
