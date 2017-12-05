@@ -66,6 +66,12 @@ public abstract class AbstractComsSetup {
       // Wait until the robot is enabled before starting the tests
       int enableCounter = 0;
       while (!DriverStation.getInstance().isEnabled()) {
+        if (enableCounter > 50) {
+          // Robot did not enable properly after 5 seconds.
+          // Force exit
+          TestBench.err().println("Failed to enable. Aborting");
+          System.exit(1);
+        }
         try {
           Thread.sleep(100);
         } catch (InterruptedException ex) {

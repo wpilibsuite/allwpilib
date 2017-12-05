@@ -43,10 +43,20 @@ class TestEnvironment : public testing::Environment {
     HAL_ObserveUserProgramStarting();
     LiveWindow::GetInstance()->SetEnabled(false);
 
-    llvm::outs() << "Waiting for enable\n";
+    llvm::outs() << "Started coms\n";
 
+    int enableCounter = 0;
     while (!DriverStation::GetInstance().IsEnabled()) {
+      if (enableCounter > 50) {
+        // Robot did not enable properly after 5 seconds.
+        // Force exit
+        llvm::errs() << " Failed to enable. Aborting\n";
+        std::terminate();
+      }
+
       Wait(0.1);
+
+      llvm::outs() << "Waiting for enable: " << enableCounter++ << "\n";
     }
   }
 
