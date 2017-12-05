@@ -177,7 +177,7 @@ const char* HAL_GetErrorMessage(int32_t code) {
 /**
  * Returns the runtime type of this HAL
  */
-HAL_RuntimeType HAL_GetRuntimeType() { return HAL_Athena; }
+HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Athena; }
 
 /**
  * Return the FPGA Version number.
@@ -388,8 +388,8 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
 
 // TODO: HACKS
 // No need for header definitions, as we should not run from user code.
-void NumericArrayResize() {}
-void RTSetCleanupProc() {}
-void EDVR_CreateReference() {}
+void NumericArrayResize(void) {}
+void RTSetCleanupProc(void) {}
+void EDVR_CreateReference(void) {}
 
 }  // extern "C"

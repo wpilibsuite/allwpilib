@@ -98,7 +98,7 @@ static void CommonSPIPortInit(int32_t* status) {
   }
 }
 
-static void CommonSPIPortFree() {
+static void CommonSPIPortFree(void) {
   if (spiPortCount.fetch_sub(1) == 1) {
     // Clean up SPI Handles
     HAL_FreeDIOPort(digitalHandles[3]);

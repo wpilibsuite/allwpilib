@@ -233,7 +233,7 @@ void CanData::CancelGetCANStatusCallback(int32_t uid) {
 
 extern "C" {
 
-void HALSIM_ResetCanData() { SimCanData.ResetData(); }
+void HALSIM_ResetCanData(void) { SimCanData.ResetData(); }
 
 int32_t HALSIM_RegisterCanSendMessageCallback(
     HAL_CAN_SendMessageCallback callback, void* param) {

@@ -466,7 +466,7 @@ int32_t HALSIM_RegisterDriverStationEnabledCallback(HAL_NotifyCallback callback,
 void HALSIM_CancelDriverStationEnabledCallback(int32_t uid) {
   SimDriverStationData.CancelEnabledCallback(uid);
 }
-HAL_Bool HALSIM_GetDriverStationEnabled() {
+HAL_Bool HALSIM_GetDriverStationEnabled(void) {
   return SimDriverStationData.GetEnabled();
 }
 void HALSIM_SetDriverStationEnabled(HAL_Bool enabled) {
@@ -481,7 +481,7 @@ int32_t HALSIM_RegisterDriverStationAutonomousCallback(
 void HALSIM_CancelDriverStationAutonomousCallback(int32_t uid) {
   SimDriverStationData.CancelAutonomousCallback(uid);
 }
-HAL_Bool HALSIM_GetDriverStationAutonomous() {
+HAL_Bool HALSIM_GetDriverStationAutonomous(void) {
   return SimDriverStationData.GetAutonomous();
 }
 void HALSIM_SetDriverStationAutonomous(HAL_Bool autonomous) {
@@ -497,7 +497,7 @@ int32_t HALSIM_RegisterDriverStationTestCallback(HAL_NotifyCallback callback,
 void HALSIM_CancelDriverStationTestCallback(int32_t uid) {
   SimDriverStationData.CancelTestCallback(uid);
 }
-HAL_Bool HALSIM_GetDriverStationTest() {
+HAL_Bool HALSIM_GetDriverStationTest(void) {
   return SimDriverStationData.GetTest();
 }
 void HALSIM_SetDriverStationTest(HAL_Bool test) {
@@ -513,7 +513,7 @@ int32_t HALSIM_RegisterDriverStationEStopCallback(HAL_NotifyCallback callback,
 void HALSIM_CancelDriverStationEStopCallback(int32_t uid) {
   SimDriverStationData.CancelEStopCallback(uid);
 }
-HAL_Bool HALSIM_GetDriverStationEStop() {
+HAL_Bool HALSIM_GetDriverStationEStop(void) {
   return SimDriverStationData.GetEStop();
 }
 void HALSIM_SetDriverStationEStop(HAL_Bool eStop) {
@@ -528,7 +528,7 @@ int32_t HALSIM_RegisterDriverStationFmsAttachedCallback(
 void HALSIM_CancelDriverStationFmsAttachedCallback(int32_t uid) {
   SimDriverStationData.CancelFmsAttachedCallback(uid);
 }
-HAL_Bool HALSIM_GetDriverStationFmsAttached() {
+HAL_Bool HALSIM_GetDriverStationFmsAttached(void) {
   return SimDriverStationData.GetFmsAttached();
 }
 void HALSIM_SetDriverStationFmsAttached(HAL_Bool fmsAttached) {
@@ -543,7 +543,7 @@ int32_t HALSIM_RegisterDriverStationDsAttachedCallback(
 void HALSIM_CancelDriverStationDsAttachedCallback(int32_t uid) {
   SimDriverStationData.CancelDsAttachedCallback(uid);
 }
-HAL_Bool HALSIM_GetDriverStationDsAttached() {
+HAL_Bool HALSIM_GetDriverStationDsAttached(void) {
   return SimDriverStationData.GetDsAttached();
 }
 void HALSIM_SetDriverStationDsAttached(HAL_Bool dsAttached) {
@@ -558,7 +558,7 @@ int32_t HALSIM_RegisterDriverStationAllianceStationIdCallback(
 void HALSIM_CancelDriverStationAllianceStationIdCallback(int32_t uid) {
   SimDriverStationData.CancelAllianceStationIdCallback(uid);
 }
-HAL_AllianceStationID HALSIM_GetDriverStationAllianceStationId() {
+HAL_AllianceStationID HALSIM_GetDriverStationAllianceStationId(void) {
   return SimDriverStationData.GetAllianceStationId();
 }
 void HALSIM_SetDriverStationAllianceStationId(
@@ -574,7 +574,7 @@ int32_t HALSIM_RegisterDriverStationMatchTimeCallback(
 void HALSIM_CancelDriverStationMatchTimeCallback(int32_t uid) {
   SimDriverStationData.CancelMatchTimeCallback(uid);
 }
-double HALSIM_GetDriverStationMatchTime() {
+double HALSIM_GetDriverStationMatchTime(void) {
   return SimDriverStationData.GetMatchTime();
 }
 void HALSIM_SetDriverStationMatchTime(double matchTime) {
