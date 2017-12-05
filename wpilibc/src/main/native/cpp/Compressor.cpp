@@ -12,6 +12,7 @@
 #include <HAL/Ports.h>
 #include <HAL/Solenoid.h>
 
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -32,13 +33,7 @@ Compressor::Compressor(int pcmID) : m_module(pcmID) {
   SetClosedLoopControl(true);
 
   HAL_Report(HALUsageReporting::kResourceType_Compressor, pcmID);
-}
-
-/**
- * Destructor.
- */
-Compressor::~Compressor() {
-  if (m_enabledListener != 0) m_enabledEntry.RemoveListener(m_enabledListener);
+  SetName("Compressor", pcmID);
 }
 
 /**
@@ -308,42 +303,15 @@ void Compressor::ClearAllPCMStickyFaults() {
   }
 }
 
-void Compressor::UpdateTable() {
-  if (m_enabledEntry) m_enabledEntry.SetBoolean(Enabled());
-  if (m_pressureSwitchEntry)
-    m_pressureSwitchEntry.SetBoolean(GetPressureSwitchValue());
-}
-
-void Compressor::StartLiveWindowMode() {
-  if (m_enabledEntry) {
-    m_enabledListener = m_enabledEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsBoolean()) return;
-          if (event.value->GetBoolean())
-            Start();
-          else
-            Stop();
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
-}
-
-void Compressor::StopLiveWindowMode() {
-  if (m_enabledListener != 0) {
-    m_enabledEntry.RemoveListener(m_enabledListener);
-    m_enabledListener = 0;
-  }
-}
-
-std::string Compressor::GetSmartDashboardType() const { return "Compressor"; }
-
-void Compressor::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_enabledEntry = subTable->GetEntry("Enabled");
-    m_pressureSwitchEntry = subTable->GetEntry("Pressure switch");
-    UpdateTable();
-  } else {
-    m_enabledEntry = nt::NetworkTableEntry();
-    m_pressureSwitchEntry = nt::NetworkTableEntry();
-  }
+void Compressor::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Compressor");
+  builder.AddBooleanProperty("Enabled", [=]() { return Enabled(); },
+                             [=](bool value) {
+                               if (value)
+                                 Start();
+                               else
+                                 Stop();
+                             });
+  builder.AddBooleanProperty(
+      "Pressure switch", [=]() { return GetPressureSwitchValue(); }, nullptr);
 }

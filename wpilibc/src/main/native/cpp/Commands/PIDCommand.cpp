@@ -7,6 +7,8 @@
 
 #include "Commands/PIDCommand.h"
 
+#include "SmartDashboard/SendableBuilder.h"
+
 using namespace frc;
 
 PIDCommand::PIDCommand(const std::string& name, double p, double i, double d,
@@ -65,9 +67,8 @@ double PIDCommand::GetSetpoint() const { return m_controller->GetSetpoint(); }
 
 double PIDCommand::GetPosition() { return ReturnPIDInput(); }
 
-std::string PIDCommand::GetSmartDashboardType() const { return "PIDCommand"; }
-
-void PIDCommand::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  m_controller->InitTable(subtable);
-  Command::InitTable(subtable);
+void PIDCommand::InitSendable(SendableBuilder& builder) {
+  m_controller->InitSendable(builder);
+  Command::InitSendable(builder);
+  builder.SetSmartDashboardType("PIDCommand");
 }

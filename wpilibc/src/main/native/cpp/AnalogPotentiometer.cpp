@@ -8,6 +8,7 @@
 #include "AnalogPotentiometer.h"
 
 #include "ControllerPower.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -23,9 +24,11 @@ using namespace frc;
  */
 AnalogPotentiometer::AnalogPotentiometer(int channel, double fullRange,
                                          double offset)
-    : m_analog_input(std::make_unique<AnalogInput>(channel)),
+    : m_analog_input(std::make_shared<AnalogInput>(channel)),
       m_fullRange(fullRange),
-      m_offset(offset) {}
+      m_offset(offset) {
+  AddChild(m_analog_input);
+}
 
 /**
  * Construct an Analog Potentiometer object from an existing Analog Input
@@ -77,25 +80,8 @@ double AnalogPotentiometer::Get() const {
 double AnalogPotentiometer::PIDGet() { return Get(); }
 
 /**
- * @return the Smart Dashboard Type
- */
-std::string AnalogPotentiometer::GetSmartDashboardType() const {
-  return "Analog Input";
-}
-
-/**
  * Live Window code, only does anything if live window is activated.
  */
-void AnalogPotentiometer::InitTable(
-    std::shared_ptr<nt::NetworkTable> subtable) {
-  if (subtable) {
-    m_valueEntry = subtable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
-}
-
-void AnalogPotentiometer::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetDouble(Get());
+void AnalogPotentiometer::InitSendable(SendableBuilder& builder) {
+  m_analog_input->InitSendable(builder);
 }

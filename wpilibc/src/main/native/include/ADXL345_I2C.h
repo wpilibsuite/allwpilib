@@ -7,13 +7,9 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include "I2C.h"
-#include "LiveWindow/LiveWindowSendable.h"
+#include "SensorBase.h"
 #include "interfaces/Accelerometer.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -24,7 +20,7 @@ namespace frc {
  * an I2C bus. This class assumes the default (not alternate) sensor address of
  * 0x1D (7-bit address).
  */
-class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
+class ADXL345_I2C : public SensorBase, public Accelerometer {
  public:
   enum Axes { kAxis_X = 0x00, kAxis_Y = 0x02, kAxis_Z = 0x04 };
 
@@ -36,7 +32,7 @@ class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
 
   explicit ADXL345_I2C(I2C::Port port, Range range = kRange_2G,
                        int deviceAddress = kAddress);
-  virtual ~ADXL345_I2C() = default;
+  ~ADXL345_I2C() override = default;
 
   ADXL345_I2C(const ADXL345_I2C&) = delete;
   ADXL345_I2C& operator=(const ADXL345_I2C&) = delete;
@@ -50,11 +46,7 @@ class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
   virtual double GetAcceleration(Axes axis);
   virtual AllAxes GetAccelerations();
 
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  void UpdateTable() override;
-  void StartLiveWindowMode() override {}
-  void StopLiveWindowMode() override {}
+  void InitSendable(SendableBuilder& builder) override;
 
  protected:
   I2C m_i2c;
@@ -79,11 +71,6 @@ class ADXL345_I2C : public Accelerometer, public LiveWindowSendable {
     kDataFormat_FullRes = 0x08,
     kDataFormat_Justify = 0x04
   };
-
- private:
-  nt::NetworkTableEntry m_xEntry;
-  nt::NetworkTableEntry m_yEntry;
-  nt::NetworkTableEntry m_zEntry;
 };
 
 }  // namespace frc

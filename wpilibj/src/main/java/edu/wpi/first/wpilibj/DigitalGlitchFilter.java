@@ -12,6 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.wpilibj.hal.DigitalGlitchFilterJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
@@ -35,6 +36,7 @@ public class DigitalGlitchFilter extends SensorBase {
         m_filterAllocated[index] = true;
         HAL.report(tResourceType.kResourceType_DigitalFilter,
             m_channelIndex, 0);
+        setName("DigitalGlitchFilter", index);
       }
     }
   }
@@ -43,6 +45,7 @@ public class DigitalGlitchFilter extends SensorBase {
    * Free the resources used by this object.
    */
   public void free() {
+    super.free();
     if (m_channelIndex >= 0) {
       synchronized (m_mutex) {
         m_filterAllocated[m_channelIndex] = false;
@@ -168,6 +171,10 @@ public class DigitalGlitchFilter extends SensorBase {
 
     return (long) fpgaCycles * 1000L
         / (long) (kSystemClockTicksPerMicrosecond / 4);
+  }
+
+  @SuppressWarnings("PMD.UnusedFormalParameter")
+  public void initSendable(SendableBuilder builder) {
   }
 
   private int m_channelIndex = -1;

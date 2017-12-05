@@ -67,7 +67,7 @@ class MecanumDrive : public RobotDriveBase {
   MecanumDrive(SpeedController& frontLeftMotor, SpeedController& rearLeftMotor,
                SpeedController& frontRightMotor,
                SpeedController& rearRightMotor);
-  virtual ~MecanumDrive() = default;
+  ~MecanumDrive() override = default;
 
   MecanumDrive(const MecanumDrive&) = delete;
   MecanumDrive& operator=(const MecanumDrive&) = delete;
@@ -78,6 +78,8 @@ class MecanumDrive : public RobotDriveBase {
 
   void StopMotor() override;
   void GetDescription(llvm::raw_ostream& desc) const override;
+
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   SpeedController& m_frontLeftMotor;

@@ -35,6 +35,7 @@ DigitalGlitchFilter::DigitalGlitchFilter() {
   *index = true;
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalFilter, m_channelIndex);
+  SetName("DigitalGlitchFilter", m_channelIndex);
 }
 
 DigitalGlitchFilter::~DigitalGlitchFilter() {
@@ -199,3 +200,5 @@ uint64_t DigitalGlitchFilter::GetPeriodNanoSeconds() {
   return static_cast<uint64_t>(fpgaCycles) * 1000L /
          static_cast<uint64_t>(HAL_GetSystemClockTicksPerMicrosecond() / 4);
 }
+
+void DigitalGlitchFilter::InitSendable(SendableBuilder&) {}

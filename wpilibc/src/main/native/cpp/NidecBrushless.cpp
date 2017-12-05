@@ -9,7 +9,7 @@
 
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -23,6 +23,8 @@ using namespace frc;
  */
 NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
     : m_safetyHelper(this), m_dio(dioChannel), m_pwm(pwmChannel) {
+  AddChild(&m_dio);
+  AddChild(&m_pwm);
   m_safetyHelper.SetExpiration(0.0);
   m_safetyHelper.SetSafetyEnabled(false);
 
@@ -30,8 +32,8 @@ NidecBrushless::NidecBrushless(int pwmChannel, int dioChannel)
   m_dio.SetPWMRate(15625);
   m_dio.EnablePWM(0.5);
 
-  LiveWindow::GetInstance()->AddActuator("Nidec Brushless", pwmChannel, this);
   HAL_Report(HALUsageReporting::kResourceType_NidecBrushless, pwmChannel);
+  SetName("Nidec Brushless", pwmChannel);
 }
 
 /**
@@ -145,44 +147,9 @@ void NidecBrushless::Enable() { m_disabled = false; }
  */
 int NidecBrushless::GetChannel() const { return m_pwm.GetChannel(); }
 
-/*
- * Live Window code, only does anything if live window is activated.
- */
-std::string NidecBrushless::GetSmartDashboardType() const {
-  return "Nidec Brushless";
-}
-
-void NidecBrushless::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  if (subtable) {
-    m_valueEntry = subtable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
-}
-
-void NidecBrushless::UpdateTable() {
-  if (m_valueEntry) {
-    m_valueEntry.SetDouble(Get());
-  }
-}
-
-void NidecBrushless::StartLiveWindowMode() {
-  Set(0);  // Stop for safety
-  if (m_valueEntry) {
-    m_valueListener = m_valueEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          Set(event.value->GetDouble());
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
-}
-
-void NidecBrushless::StopLiveWindowMode() {
-  Set(0);  // Stop for safety
-  if (m_valueListener != 0) {
-    m_valueEntry.RemoveListener(m_valueListener);
-    m_valueListener = 0;
-  }
+void NidecBrushless::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Nidec Brushless");
+  builder.SetSafeState([=]() { StopMotor(); });
+  builder.AddDoubleProperty("Value", [=]() { return Get(); },
+                            [=](double value) { Set(value); });
 }

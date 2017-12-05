@@ -59,7 +59,7 @@ public:
 
 	void TeleopPeriodic() {}
 
-	void TestPeriodic() { m_lw.Run(); }
+	void TestPeriodic() {}
 
 private:
 	frc::LiveWindow& m_lw = *LiveWindow::GetInstance();

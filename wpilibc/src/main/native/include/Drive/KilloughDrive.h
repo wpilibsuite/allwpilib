@@ -55,7 +55,7 @@ class KilloughDrive : public RobotDriveBase {
   KilloughDrive(SpeedController& leftMotor, SpeedController& rightMotor,
                 SpeedController& backMotor, double leftMotorAngle,
                 double rightMotorAngle, double backMotorAngle);
-  virtual ~KilloughDrive() = default;
+  ~KilloughDrive() override = default;
 
   KilloughDrive(const KilloughDrive&) = delete;
   KilloughDrive& operator=(const KilloughDrive&) = delete;
@@ -66,6 +66,8 @@ class KilloughDrive : public RobotDriveBase {
 
   void StopMotor() override;
   void GetDescription(llvm::raw_ostream& desc) const override;
+
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   SpeedController& m_leftMotor;

@@ -10,7 +10,7 @@
 #include <HAL/HAL.h>
 
 #include "DigitalInput.h"
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -45,8 +45,7 @@ void Encoder::InitEncoder(bool reverseDirection, EncodingType encodingType) {
 
   HAL_Report(HALUsageReporting::kResourceType_Encoder, GetFPGAIndex(),
              encodingType);
-  LiveWindow::GetInstance()->AddSensor("Encoder", m_aSource->GetChannel(),
-                                       this);
+  SetName("Encoder", m_aSource->GetChannel());
 }
 
 /**
@@ -77,6 +76,8 @@ Encoder::Encoder(int aChannel, int bChannel, bool reverseDirection,
   m_aSource = std::make_shared<DigitalInput>(aChannel);
   m_bSource = std::make_shared<DigitalInput>(bChannel);
   InitEncoder(reverseDirection, encodingType);
+  AddChild(m_aSource);
+  AddChild(m_bSource);
 }
 
 /**
@@ -372,6 +373,19 @@ void Encoder::SetDistancePerPulse(double distancePerPulse) {
 }
 
 /**
+ * Get the distance per pulse for this encoder.
+ *
+ * @return The scale factor that will be used to convert pulses to useful units.
+ */
+double Encoder::GetDistancePerPulse() const {
+  if (StatusIsFatal()) return 0.0;
+  int32_t status = 0;
+  double distancePerPulse = HAL_GetEncoderDistancePerPulse(m_encoder, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  return distancePerPulse;
+}
+
+/**
  * Set the direction sensing for this encoder.
  *
  * This sets the direction sensing on the encoder so that it could count in the
@@ -479,41 +493,18 @@ int Encoder::GetFPGAIndex() const {
   return val;
 }
 
-void Encoder::UpdateTable() {
-  if (m_speedEntry) m_speedEntry.SetDouble(GetRate());
-  if (m_distanceEntry) m_distanceEntry.SetDouble(GetDistance());
-  if (m_distancePerTickEntry) {
-    int32_t status = 0;
-    double distancePerPulse =
-        HAL_GetEncoderDistancePerPulse(m_encoder, &status);
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    m_distancePerTickEntry.SetDouble(distancePerPulse);
-  }
-}
-
-void Encoder::StartLiveWindowMode() {}
-
-void Encoder::StopLiveWindowMode() {}
-
-std::string Encoder::GetSmartDashboardType() const {
+void Encoder::InitSendable(SendableBuilder& builder) {
   int32_t status = 0;
   HAL_EncoderEncodingType type = HAL_GetEncoderEncodingType(m_encoder, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
   if (type == HAL_EncoderEncodingType::HAL_Encoder_k4X)
-    return "Quadrature Encoder";
+    builder.SetSmartDashboardType("Quadrature Encoder");
   else
-    return "Encoder";
-}
+    builder.SetSmartDashboardType("Encoder");
 
-void Encoder::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_speedEntry = subTable->GetEntry("Speed");
-    m_distanceEntry = subTable->GetEntry("Distance");
-    m_distancePerTickEntry = subTable->GetEntry("Distance per Tick");
-    UpdateTable();
-  } else {
-    m_speedEntry = nt::NetworkTableEntry();
-    m_distanceEntry = nt::NetworkTableEntry();
-    m_distancePerTickEntry = nt::NetworkTableEntry();
-  }
+  builder.AddDoubleProperty("Speed", [=]() { return GetRate(); }, nullptr);
+  builder.AddDoubleProperty("Distance", [=]() { return GetDistance(); },
+                            nullptr);
+  builder.AddDoubleProperty("Distance per Tick",
+                            [=]() { return GetDistancePerPulse(); }, nullptr);
 }

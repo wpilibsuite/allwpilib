@@ -45,8 +45,6 @@ void Robot::TeleopPeriodic() {
 	frc::Scheduler::GetInstance()->Run();
 }
 
-void Robot::TestPeriodic() {
-	m_lw.Run();
-}
+void Robot::TestPeriodic() {}
 
 START_ROBOT_CLASS(Robot)

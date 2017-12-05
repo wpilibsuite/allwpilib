@@ -46,6 +46,17 @@ public abstract class InterruptableSensorBase extends SensorBase {
   }
 
   /**
+   * Frees the resources for this output.
+   */
+  @Override
+  public void free() {
+    super.free();
+    if (m_interrupt != 0) {
+      cancelInterrupts();
+    }
+  }
+
+  /**
    * If this is an analog trigger.
    *
    * @return true if this is an analog trigger.

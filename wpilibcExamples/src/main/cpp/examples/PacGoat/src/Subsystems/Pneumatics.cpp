@@ -7,12 +7,11 @@
 
 #include "Pneumatics.h"
 
-#include <LiveWindow/LiveWindow.h>
+#include <SmartDashboard/SmartDashboard.h>
 
 Pneumatics::Pneumatics()
     : frc::Subsystem("Pneumatics") {
-	frc::LiveWindow::GetInstance()->AddSensor(
-			"Pneumatics", "Pressure Sensor", m_pressureSensor);
+	AddChild("Pressure Sensor", m_pressureSensor);
 }
 
 /**

@@ -25,6 +25,7 @@ using namespace frc;
 AnalogTrigger::AnalogTrigger(int channel)
     : AnalogTrigger(new AnalogInput(channel)) {
   m_ownsAnalog = true;
+  AddChild(m_analogInput);
 }
 
 /**
@@ -49,6 +50,7 @@ AnalogTrigger::AnalogTrigger(AnalogInput* input) {
   m_index = index;
 
   HAL_Report(HALUsageReporting::kResourceType_AnalogTrigger, input->m_channel);
+  SetName("AnalogTrigger", input->GetChannel());
 }
 
 AnalogTrigger::~AnalogTrigger() {
@@ -183,4 +185,8 @@ std::shared_ptr<AnalogTriggerOutput> AnalogTrigger::CreateOutput(
   if (StatusIsFatal()) return nullptr;
   return std::shared_ptr<AnalogTriggerOutput>(
       new AnalogTriggerOutput(*this, type), NullDeleter<AnalogTriggerOutput>());
+}
+
+void AnalogTrigger::InitSendable(SendableBuilder& builder) {
+  if (m_ownsAnalog) m_analogInput->InitSendable(builder);
 }

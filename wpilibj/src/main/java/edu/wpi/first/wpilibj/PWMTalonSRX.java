@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control.
@@ -41,7 +40,7 @@ public class PWMTalonSRX extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    LiveWindow.addActuator("PWMTalonSRX", getChannel(), this);
     HAL.report(tResourceType.kResourceType_PWMTalonSRX, getChannel());
+    setName("PWMTalonSRX", getChannel());
   }
 }

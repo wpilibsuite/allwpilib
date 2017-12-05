@@ -16,9 +16,7 @@
 
 #include "Commands/Command.h"
 #include "ErrorBase.h"
-#include "SmartDashboard/NamedSendable.h"
-#include "SmartDashboard/SmartDashboard.h"
-#include "networktables/NetworkTable.h"
+#include "SmartDashboard/SendableBase.h"
 #include "networktables/NetworkTableEntry.h"
 
 namespace frc {
@@ -26,7 +24,7 @@ namespace frc {
 class ButtonScheduler;
 class Subsystem;
 
-class Scheduler : public ErrorBase, public NamedSendable {
+class Scheduler : public ErrorBase, public SendableBase {
  public:
   static Scheduler* GetInstance();
 
@@ -39,15 +37,11 @@ class Scheduler : public ErrorBase, public NamedSendable {
   void ResetAll();
   void SetEnabled(bool enabled);
 
-  void UpdateTable();
-  std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable);
-  std::string GetName() const;
-  std::string GetType() const;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   Scheduler();
-  virtual ~Scheduler() = default;
+  ~Scheduler() override = default;
 
   void ProcessCommandAddition(Command* command);
 

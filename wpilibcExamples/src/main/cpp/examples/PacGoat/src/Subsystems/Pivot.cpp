@@ -7,8 +7,6 @@
 
 #include "Pivot.h"
 
-#include <LiveWindow/LiveWindow.h>
-
 Pivot::Pivot()
     : frc::PIDSubsystem("Pivot", 7.0, 0.0, 8.0) {
 	SetAbsoluteTolerance(0.005);
@@ -20,16 +18,10 @@ Pivot::Pivot()
 #endif
 
 	// Put everything to the LiveWindow for testing.
-	frc::LiveWindow::GetInstance()->AddSensor(
-			"Pivot", "Upper Limit Switch", &m_upperLimitSwitch);
-	frc::LiveWindow::GetInstance()->AddSensor(
-			"Pivot", "Lower Limit Switch", &m_lowerLimitSwitch);
-	// XXX: frc::LiveWindow::GetInstance()->AddSensor("Pivot", "Pot",
-	// &m_pot);
-	// XXX: frc::LiveWindow::GetInstance()->AddActuator("Pivot", "Motor",
-	// &m_motor);
-	frc::LiveWindow::GetInstance()->AddActuator(
-			"Pivot", "PIDSubsystem Controller", GetPIDController());
+	AddChild("Upper Limit Switch", m_upperLimitSwitch);
+	AddChild("Lower Limit Switch", m_lowerLimitSwitch);
+	AddChild("Pot", m_pot);
+	AddChild("Motor", m_motor);
 }
 
 void InitDefaultCommand() {}

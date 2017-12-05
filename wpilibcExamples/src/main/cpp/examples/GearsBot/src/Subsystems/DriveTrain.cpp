@@ -8,7 +8,7 @@
 #include "DriveTrain.h"
 
 #include <Joystick.h>
-#include <LiveWindow/LiveWindow.h>
+#include <SmartDashboard/SmartDashboard.h>
 
 #include "../Commands/TankDriveWithJoystick.h"
 
@@ -31,25 +31,14 @@ DriveTrain::DriveTrain()
 #endif
 
 	// Let's show everything on the LiveWindow
-	// frc::LiveWindow::GetInstance()->AddActuator("Drive Train",
-	// 		"Front_Left Motor", &m_frontLeft);
-	// frc::LiveWindow::GetInstance()->AddActuator("Drive Train",
-	// 		"Rear Left Motor", &m_rearLeft);
-	// frc::LiveWindow::GetInstance()->AddActuator("Drive Train",
-	// 		"Front Right Motor", &m_frontRight);
-	// frc::LiveWindow::GetInstance()->AddActuator("Drive Train",
-	// 		"Rear Right Motor", &m_rearRight);
-	// frc::LiveWindow::GetInstance()->AddSensor("Drive Train", "Left
-	// Encoder",
-	// 		&m_leftEncoder);
-	// frc::LiveWindow::GetInstance()->AddSensor("Drive Train", "Right
-	// Encoder",
-	// 		&m_rightEncoder);
-	// frc::LiveWindow::GetInstance()->AddSensor("Drive Train",
-	// "Rangefinder",
-	// 		&m_rangefinder);
-	// frc::LiveWindow::GetInstance()->AddSensor("Drive Train", "Gyro",
-	// &m_gyro);
+	// AddChild("Front_Left Motor", m_frontLeft);
+	// AddChild("Rear Left Motor", m_rearLeft);
+	// AddChild("Front Right Motor", m_frontRight);
+	// AddChild("Rear Right Motor", m_rearRight);
+	AddChild("Left Encoder", m_leftEncoder);
+	AddChild("Right Encoder", m_rightEncoder);
+	AddChild("Rangefinder", m_rangefinder);
+	AddChild("Gyro", m_gyro);
 }
 
 /**

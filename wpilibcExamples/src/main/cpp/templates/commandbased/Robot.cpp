@@ -83,7 +83,7 @@ public:
 
 	void TeleopPeriodic() override { frc::Scheduler::GetInstance()->Run(); }
 
-	void TestPeriodic() override { frc::LiveWindow::GetInstance()->Run(); }
+	void TestPeriodic() override {}
 
 private:
 	// Have it null by default so that if testing teleop it

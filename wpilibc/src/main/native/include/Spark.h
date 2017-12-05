@@ -17,7 +17,6 @@ namespace frc {
 class Spark : public PWMSpeedController {
  public:
   explicit Spark(int channel);
-  virtual ~Spark() = default;
 };
 
 }  // namespace frc

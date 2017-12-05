@@ -7,16 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Class for getting voltage, current, temperature, power and energy from the Power Distribution
  * Panel over CAN.
  */
-public class PowerDistributionPanel extends SensorBase implements LiveWindowSendable {
+public class PowerDistributionPanel extends SensorBase implements Sendable {
 
   private final int m_module;
 
@@ -29,6 +27,7 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
     m_module = module;
     checkPDPModule(module);
     PDPJNI.initializePDP(module);
+    setName("PowerDistributionPanel", module);
   }
 
   /**
@@ -111,61 +110,13 @@ public class PowerDistributionPanel extends SensorBase implements LiveWindowSend
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "PowerDistributionPanel";
-  }
-
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  private NetworkTableEntry[] m_chanEntry;
-  private NetworkTableEntry m_voltageEntry;
-  private NetworkTableEntry m_totalCurrentEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_chanEntry = new NetworkTableEntry[16];
-      for (int i = 0; i < m_chanEntry.length; i++) {
-        m_chanEntry[i] = subtable.getEntry("Chan" + i);
-      }
-      m_voltageEntry = subtable.getEntry("Voltage");
-      m_totalCurrentEntry = subtable.getEntry("TotalCurrent");
-      updateTable();
-    } else {
-      m_chanEntry = null;
-      m_voltageEntry = null;
-      m_totalCurrentEntry = null;
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("PowerDistributionPanel");
+    for (int i = 0; i < kPDPChannels; ++i) {
+      final int chan = i;
+      builder.addDoubleProperty("Chan" + i, () -> getCurrent(chan), null);
     }
+    builder.addDoubleProperty("Voltage", this::getVoltage, null);
+    builder.addDoubleProperty("TotalCurrent", this::getTotalCurrent, null);
   }
-
-  @Override
-  public void updateTable() {
-    if (m_chanEntry != null) {
-      for (int i = 0; i < m_chanEntry.length; i++) {
-        m_chanEntry[i].setDouble(getCurrent(i));
-      }
-    }
-    if (m_voltageEntry != null) {
-      m_voltageEntry.setDouble(getVoltage());
-    }
-    if (m_totalCurrentEntry != null) {
-      m_totalCurrentEntry.setDouble(getTotalCurrent());
-    }
-  }
-
-  /**
-   * PDP doesn't have to do anything special when entering the LiveWindow. {@inheritDoc}
-   */
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  /**
-   * PDP doesn't have to do anything special when exiting the LiveWindow. {@inheritDoc}
-   */
-  @Override
-  public void stopLiveWindowMode() {
-  }
-
 }

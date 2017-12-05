@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * A class for driving Mecanum drive platforms.
@@ -56,6 +57,8 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * deadband of 0 is used.
  */
 public class MecanumDrive extends RobotDriveBase {
+  private static int instances = 0;
+
   private SpeedController m_frontLeftMotor;
   private SpeedController m_rearLeftMotor;
   private SpeedController m_frontRightMotor;
@@ -74,6 +77,12 @@ public class MecanumDrive extends RobotDriveBase {
     m_rearLeftMotor = rearLeftMotor;
     m_frontRightMotor = frontRightMotor;
     m_rearRightMotor = rearRightMotor;
+    addChild(m_frontLeftMotor);
+    addChild(m_rearLeftMotor);
+    addChild(m_frontRightMotor);
+    addChild(m_rearRightMotor);
+    instances++;
+    setName("MecanumDrive", instances);
   }
 
   /**
@@ -173,5 +182,18 @@ public class MecanumDrive extends RobotDriveBase {
   @Override
   public String getDescription() {
     return "MecanumDrive";
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("MecanumDrive");
+    builder.addDoubleProperty("Front Left Motor Speed", m_frontLeftMotor::get,
+        m_frontLeftMotor::set);
+    builder.addDoubleProperty("Front Right Motor Speed", m_frontRightMotor::get,
+        m_frontRightMotor::set);
+    builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get,
+        m_rearLeftMotor::set);
+    builder.addDoubleProperty("Rear Right Motor Speed", m_rearRightMotor::get,
+        m_rearRightMotor::set);
   }
 }

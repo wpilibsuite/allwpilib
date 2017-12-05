@@ -7,18 +7,14 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Nidec Brushless Motor.
  */
-public class NidecBrushless implements SpeedController, MotorSafety, LiveWindowSendable {
+public class NidecBrushless extends SendableBase implements SpeedController, MotorSafety, Sendable {
   private final MotorSafetyHelper m_safetyHelper;
   private boolean m_isInverted = false;
   private DigitalOutput m_dio;
@@ -41,14 +37,26 @@ public class NidecBrushless implements SpeedController, MotorSafety, LiveWindowS
 
     // the dio controls the output (in PWM mode)
     m_dio = new DigitalOutput(dioChannel);
+    addChild(m_dio);
     m_dio.setPWMRate(15625);
     m_dio.enablePWM(0.5);
 
     // the pwm enables the controller
     m_pwm = new PWM(pwmChannel);
+    addChild(m_pwm);
 
-    LiveWindow.addActuator("Nidec Brushless", pwmChannel, this);
     HAL.report(tResourceType.kResourceType_NidecBrushless, pwmChannel);
+    setName("Nidec Brushless", pwmChannel);
+  }
+
+  /**
+   * Free the resources used by this object.
+   */
+  @Override
+  public void free() {
+    super.free();
+    m_dio.free();
+    m_pwm.free();
   }
 
   /**
@@ -188,45 +196,10 @@ public class NidecBrushless implements SpeedController, MotorSafety, LiveWindowS
     return m_pwm.getChannel();
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
   @Override
-  public String getSmartDashboardType() {
-    return "Nidec Brushless";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-  private int m_valueListener;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(get());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-    set(0); // Stop for safety
-    m_valueListener = m_valueEntry.addListener((event) -> set(event.value.getDouble()),
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
-    set(0); // Stop for safety
-    m_valueEntry.removeListener(m_valueListener);
-    m_valueListener = 0;
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Nidec Brushless");
+    builder.setSafeState(this::stopMotor);
+    builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

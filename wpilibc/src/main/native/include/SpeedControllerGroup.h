@@ -10,15 +10,17 @@
 #include <functional>
 #include <vector>
 
+#include "SmartDashboard/SendableBase.h"
 #include "SpeedController.h"
 
 namespace frc {
 
-class SpeedControllerGroup : public SpeedController {
+class SpeedControllerGroup : public SendableBase, public SpeedController {
  public:
   template <class... SpeedControllers>
   explicit SpeedControllerGroup(SpeedController& speedController,
                                 SpeedControllers&... speedControllers);
+  ~SpeedControllerGroup() override = default;
 
   void Set(double speed) override;
   double Get() const override;
@@ -27,6 +29,8 @@ class SpeedControllerGroup : public SpeedController {
   void Disable() override;
   void StopMotor() override;
   void PIDWrite(double output) override;
+
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   bool m_isInverted = false;

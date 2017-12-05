@@ -7,15 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * GyroBase is the common base class for Gyro implementations such as AnalogGyro.
  */
-public abstract class GyroBase extends SensorBase implements Gyro, PIDSource, LiveWindowSendable {
+public abstract class GyroBase extends SensorBase implements Gyro, PIDSource, Sendable {
   private PIDSourceType m_pidSource = PIDSourceType.kDisplacement;
 
   /**
@@ -52,38 +50,9 @@ public abstract class GyroBase extends SensorBase implements Gyro, PIDSource, Li
     }
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
   @Override
-  public String getSmartDashboardType() {
-    return "Gyro";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(getAngle());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Gyro");
+    builder.addDoubleProperty("Value", this::getAngle, null);
   }
 }

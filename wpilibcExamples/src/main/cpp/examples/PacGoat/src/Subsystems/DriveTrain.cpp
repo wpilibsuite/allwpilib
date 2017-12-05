@@ -10,20 +10,15 @@
 #include <cmath>
 
 #include <Joystick.h>
-#include <LiveWindow/LiveWindow.h>
 
 #include "../Commands/DriveWithJoystick.h"
 
 DriveTrain::DriveTrain()
     : frc::Subsystem("DriveTrain") {
-	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front Left
-	// CIM", &m_frontLeftCIM);
-	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Front
-	// Right CIM", &m_frontRightCIM);
-	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Left
-	// CIM", &m_backLeftCIM);
-	// frc::LiveWindow::GetInstance()->AddActuator("DriveTrain", "Back Right
-	// CIM", &m_backRightCIM);
+	// AddChild("Front Left CIM", m_frontLeftCIM);
+	// AddChild("Front Right CIM", m_frontRightCIM);
+	// AddChild("Back Left CIM", m_backLeftCIM);
+	// AddChild("Back Right CIM", m_backRightCIM);
 
 	// Configure the DifferentialDrive to reflect the fact that all our
 	// motors are wired backwards and our drivers sensitivity preferences.
@@ -49,16 +44,14 @@ DriveTrain::DriveTrain()
 			(4.0 /*in*/ * M_PI) / (360.0 * 12.0 /*in/ft*/));
 #endif
 
-	LiveWindow::GetInstance()->AddSensor(
-			"DriveTrain", "Right Encoder", m_rightEncoder);
-	LiveWindow::GetInstance()->AddSensor(
-			"DriveTrain", "Left Encoder", m_leftEncoder);
+	AddChild("Right Encoder", m_rightEncoder);
+	AddChild("Left Encoder", m_leftEncoder);
 
 // Configure gyro
 #ifndef SIMULATION
 	m_gyro.SetSensitivity(0.007);  // TODO: Handle more gracefully?
 #endif
-	LiveWindow::GetInstance()->AddSensor("DriveTrain", "Gyro", &m_gyro);
+	AddChild("Gyro", m_gyro);
 }
 
 void DriveTrain::InitDefaultCommand() {

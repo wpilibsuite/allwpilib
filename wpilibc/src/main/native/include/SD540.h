@@ -17,7 +17,6 @@ namespace frc {
 class SD540 : public PWMSpeedController {
  public:
   explicit SD540(int channel);
-  virtual ~SD540() = default;
 };
 
 }  // namespace frc

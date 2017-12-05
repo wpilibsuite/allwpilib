@@ -9,12 +9,11 @@ package edu.wpi.first.wpilibj.command;
 
 import java.util.Enumeration;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * The Command class is at the very core of the entire command framework. Every command can be
@@ -41,12 +40,7 @@ import edu.wpi.first.wpilibj.Timer;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
-public abstract class Command implements NamedSendable {
-  /**
-   * The name of this command.
-   */
-  private String m_name;
-
+public abstract class Command extends SendableBase implements Sendable {
   /**
    * The time since this command was initialized.
    */
@@ -101,8 +95,9 @@ public abstract class Command implements NamedSendable {
    * Creates a new command. The name of this command will be set to its class name.
    */
   public Command() {
-    m_name = getClass().getName();
-    m_name = m_name.substring(m_name.lastIndexOf('.') + 1);
+    super(false);
+    String name = getClass().getName();
+    setName(name.substring(name.lastIndexOf('.') + 1));
   }
 
   /**
@@ -112,10 +107,11 @@ public abstract class Command implements NamedSendable {
    * @throws IllegalArgumentException if name is null
    */
   public Command(String name) {
+    super(false);
     if (name == null) {
       throw new IllegalArgumentException("Name must not be null.");
     }
-    m_name = name;
+    setName(name);
   }
 
   /**
@@ -148,16 +144,6 @@ public abstract class Command implements NamedSendable {
       throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
     }
     m_timeout = timeout;
-  }
-
-  /**
-   * Returns the name of this command. If no name was specified in the constructor, then the default
-   * is the name of the class.
-   *
-   * @return the name of this command
-   */
-  public String getName() {
-    return m_name;
   }
 
   /**
@@ -222,9 +208,6 @@ public abstract class Command implements NamedSendable {
     m_initialized = false;
     m_canceled = false;
     m_running = false;
-    if (m_runningEntry != null) {
-      m_runningEntry.setBoolean(false);
-    }
   }
 
   /**
@@ -387,9 +370,15 @@ public abstract class Command implements NamedSendable {
     }
     lockChanges();
     m_parent = parent;
-    if (m_isParentedEntry != null) {
-      m_isParentedEntry.setBoolean(true);
-    }
+  }
+
+  /**
+   * Returns whether the command has a parent.
+   *
+   * @param True if the command has a parent.
+   */
+  synchronized boolean isParented() {
+    return m_parent != null;
   }
 
   /**
@@ -429,9 +418,6 @@ public abstract class Command implements NamedSendable {
   synchronized void startRunning() {
     m_running = true;
     m_startTime = -1;
-    if (m_runningEntry != null) {
-      m_runningEntry.setBoolean(true);
-    }
   }
 
   /**
@@ -550,36 +536,21 @@ public abstract class Command implements NamedSendable {
     return getName();
   }
 
-
-  public String getSmartDashboardType() {
-    return "Command";
-  }
-
-  private NetworkTableEntry m_runningEntry;
-  private NetworkTableEntry m_isParentedEntry;
-  private int m_runningListener;
-
   @Override
-  public void initTable(NetworkTable table) {
-    if (m_runningEntry != null) {
-      m_runningEntry.removeListener(m_runningListener);
-    }
-    if (table != null) {
-      m_runningEntry = table.getEntry("running");
-      m_isParentedEntry = table.getEntry(".isParented");
-      table.getEntry(".name").setString(getName());
-      m_runningEntry.setBoolean(isRunning());
-      m_isParentedEntry.setBoolean(m_parent != null);
-      m_runningListener = m_runningEntry.addListener((event) -> {
-        if (event.value.getBoolean()) {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Command");
+    builder.addStringProperty(".name", this::getName, null);
+    builder.addBooleanProperty("running", this::isRunning, (value) -> {
+      if (value) {
+        if (!isRunning()) {
           start();
-        } else {
+        }
+      } else {
+        if (isRunning()) {
           cancel();
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-    } else {
-      m_runningEntry = null;
-      m_isParentedEntry = null;
-    }
+      }
+    });
+    builder.addBooleanProperty(".isParented", this::isParented, null);
   }
 }

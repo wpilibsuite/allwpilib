@@ -9,29 +9,27 @@
 
 #include <HAL/HAL.h>
 
-#include "DigitalInput.h"
-#include "DigitalOutput.h"
 #include "DriverStation.h"
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
 
-static int kRegWrite = 0x0A;
-static int kRegRead = 0x0B;
+static constexpr int kRegWrite = 0x0A;
+static constexpr int kRegRead = 0x0B;
 
-static int kPartIdRegister = 0x02;
-static int kDataRegister = 0x0E;
-static int kFilterCtlRegister = 0x2C;
-static int kPowerCtlRegister = 0x2D;
+static constexpr int kPartIdRegister = 0x02;
+static constexpr int kDataRegister = 0x0E;
+static constexpr int kFilterCtlRegister = 0x2C;
+static constexpr int kPowerCtlRegister = 0x2D;
 
-// static int kFilterCtl_Range2G = 0x00;
-// static int kFilterCtl_Range4G = 0x40;
-// static int kFilterCtl_Range8G = 0x80;
-static int kFilterCtl_ODR_100Hz = 0x03;
+// static constexpr int kFilterCtl_Range2G = 0x00;
+// static constexpr int kFilterCtl_Range4G = 0x40;
+// static constexpr int kFilterCtl_Range8G = 0x80;
+static constexpr int kFilterCtl_ODR_100Hz = 0x03;
 
-static int kPowerCtl_UltraLowNoise = 0x20;
-// static int kPowerCtl_AutoSleep = 0x04;
-static int kPowerCtl_Measure = 0x02;
+static constexpr int kPowerCtl_UltraLowNoise = 0x20;
+// static constexpr int kPowerCtl_AutoSleep = 0x04;
+static constexpr int kPowerCtl_Measure = 0x02;
 
 /**
  * Constructor.  Uses the onboard CS1.
@@ -75,7 +73,7 @@ ADXL362::ADXL362(SPI::Port port, Range range) : m_spi(port) {
 
   HAL_Report(HALUsageReporting::kResourceType_ADXL362, port);
 
-  LiveWindow::GetInstance()->AddSensor("ADXL362", port, this);
+  SetName("ADXL362", port);
 }
 
 void ADXL362::SetRange(Range range) {
@@ -163,25 +161,15 @@ ADXL362::AllAxes ADXL362::GetAccelerations() {
   return data;
 }
 
-std::string ADXL362::GetSmartDashboardType() const {
-  return "3AxisAccelerometer";
-}
-
-void ADXL362::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  if (subtable) {
-    m_xEntry = subtable->GetEntry("X");
-    m_yEntry = subtable->GetEntry("Y");
-    m_zEntry = subtable->GetEntry("Z");
-    UpdateTable();
-  } else {
-    m_xEntry = nt::NetworkTableEntry();
-    m_yEntry = nt::NetworkTableEntry();
-    m_zEntry = nt::NetworkTableEntry();
-  }
-}
-
-void ADXL362::UpdateTable() {
-  if (m_xEntry) m_xEntry.SetDouble(GetX());
-  if (m_yEntry) m_yEntry.SetDouble(GetY());
-  if (m_zEntry) m_zEntry.SetDouble(GetZ());
+void ADXL362::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("3AxisAccelerometer");
+  auto x = builder.GetEntry("X").GetHandle();
+  auto y = builder.GetEntry("Y").GetHandle();
+  auto z = builder.GetEntry("Z").GetHandle();
+  builder.SetUpdateTable([=]() {
+    auto data = GetAccelerations();
+    nt::NetworkTableEntry(x).SetDouble(data.XAxis);
+    nt::NetworkTableEntry(y).SetDouble(data.YAxis);
+    nt::NetworkTableEntry(z).SetDouble(data.ZAxis);
+  });
 }

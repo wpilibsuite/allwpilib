@@ -7,19 +7,16 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Class to write digital outputs. This class will write digital outputs. Other devices that are
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
-public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
+public class DigitalOutput extends SendableBase implements Sendable {
 
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
@@ -35,12 +32,13 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    *                the MXP
    */
   public DigitalOutput(int channel) {
-    checkDigitalChannel(channel);
+    SensorBase.checkDigitalChannel(channel);
     m_channel = channel;
 
     m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), false);
 
     HAL.report(tResourceType.kResourceType_DigitalOutput, channel);
+    setName("DigitalOutput", channel);
   }
 
   /**
@@ -48,6 +46,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    */
   @Override
   public void free() {
+    super.free();
     // disable the pwm only if we have allocated it
     if (m_pwmGenerator != invalidPwmGenerator) {
       disablePWM();
@@ -79,7 +78,6 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
    *
    * @return The GPIO channel number.
    */
-  @Override
   public int getChannel() {
     return m_channel;
   }
@@ -146,7 +144,7 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
       return;
     }
     // Disable the output by routing to a dead bit.
-    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, kDigitalChannels);
+    DIOJNI.setDigitalPWMOutputChannel(m_pwmGenerator, SensorBase.kDigitalChannels);
     DIOJNI.freeDigitalPWM(m_pwmGenerator);
     m_pwmGenerator = invalidPwmGenerator;
   }
@@ -167,76 +165,9 @@ public class DigitalOutput extends DigitalSource implements LiveWindowSendable {
     DIOJNI.setDigitalPWMDutyCycle(m_pwmGenerator, dutyCycle);
   }
 
-  /**
-   * Get the analog trigger type.
-   *
-   * @return false
-   */
   @Override
-  public int getAnalogTriggerTypeForRouting() {
-    return 0;
-  }
-
-  /**
-   * Is this an analog trigger.
-   *
-   * @return true if this is an analog trigger
-   */
-  @Override
-  public boolean isAnalogTrigger() {
-    return false;
-  }
-
-  /**
-   * Get the HAL Port Handle.
-   *
-   * @return The HAL Handle to the specified source.
-   */
-  @Override
-  public int getPortHandleForRouting() {
-    return m_handle;
-  }
-
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  @Override
-  public String getSmartDashboardType() {
-    return "Digital Output";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-  private int m_valueListener;
-
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-
-  @Override
-  public void updateTable() {
-    // TODO: Put current value.
-  }
-
-
-  @Override
-  public void startLiveWindowMode() {
-    m_valueListener = m_valueEntry.addListener((event) -> set(event.value.getBoolean()),
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-
-  }
-
-
-  @Override
-  public void stopLiveWindowMode() {
-    m_valueEntry.removeListener(m_valueListener);
-    m_valueListener = 0;
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Digital Output");
+    builder.addBooleanProperty("Value", this::get, this::set);
   }
 }

@@ -8,12 +8,10 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include "AnalogInput.h"
-#include "LiveWindow/LiveWindowSendable.h"
+#include "SensorBase.h"
 #include "interfaces/Potentiometer.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -23,7 +21,7 @@ namespace frc {
  * units you choose, by way of the scaling and offset constants passed to the
  * constructor.
  */
-class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
+class AnalogPotentiometer : public SensorBase, public Potentiometer {
  public:
   /**
    * AnalogPotentiometer constructor.
@@ -52,7 +50,7 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
   explicit AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
                                double fullRange = 1.0, double offset = 0.0);
 
-  virtual ~AnalogPotentiometer() = default;
+  ~AnalogPotentiometer() override = default;
 
   /**
    * Get the current reading of the potentiomer.
@@ -68,29 +66,11 @@ class AnalogPotentiometer : public Potentiometer, public LiveWindowSendable {
    */
   double PIDGet() override;
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  void UpdateTable() override;
-
-  /**
-   * AnalogPotentiometers don't have to do anything special when entering the
-   * LiveWindow.
-   */
-  void StartLiveWindowMode() override {}
-
-  /**
-   * AnalogPotentiometers don't have to do anything special when exiting the
-   * LiveWindow.
-   */
-  void StopLiveWindowMode() override {}
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   std::shared_ptr<AnalogInput> m_analog_input;
   double m_fullRange, m_offset;
-  nt::NetworkTableEntry m_valueEntry;
 };
 
 }  // namespace frc

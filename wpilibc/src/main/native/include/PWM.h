@@ -9,14 +9,10 @@
 
 #include <stdint.h>
 
-#include <memory>
-#include <string>
-
 #include <HAL/Types.h>
 
-#include "LiveWindow/LiveWindowSendable.h"
-#include "SensorBase.h"
-#include "networktables/NetworkTableEntry.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -37,7 +33,7 @@ namespace frc {
  *   - 1 = minimum pulse width (currently .5ms)
  *   - 0 = disabled (i.e. PWM output is held low)
  */
-class PWM : public SensorBase, public LiveWindowSendable {
+class PWM : public ErrorBase, public SendableBase {
  public:
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
@@ -58,7 +54,7 @@ class PWM : public SensorBase, public LiveWindowSendable {
   };
 
   explicit PWM(int channel);
-  virtual ~PWM();
+  ~PWM() override;
   virtual void SetRaw(uint16_t value);
   virtual uint16_t GetRaw() const;
   virtual void SetPosition(double pos);
@@ -78,14 +74,7 @@ class PWM : public SensorBase, public LiveWindowSendable {
   int GetChannel() const { return m_channel; }
 
  protected:
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-
-  nt::NetworkTableEntry m_valueEntry;
-  NT_EntryListener m_valueListener = 0;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   int m_channel;

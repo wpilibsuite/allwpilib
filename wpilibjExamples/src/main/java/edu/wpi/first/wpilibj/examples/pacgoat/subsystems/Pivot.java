@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.interfaces.Potentiometer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 
@@ -49,12 +48,11 @@ public class Pivot extends PIDSubsystem {
 		}
 
 		// Put everything to the LiveWindow for testing.
-		LiveWindow.addSensor("Pivot", "Upper Limit Switch", m_upperLimitSwitch);
-		LiveWindow.addSensor("Pivot", "Lower Limit Switch", m_lowerLimitSwitch);
-		LiveWindow.addSensor("Pivot", "Pot", (AnalogPotentiometer) m_pot);
-		LiveWindow.addActuator("Pivot", "Motor", (Victor) m_motor);
-		LiveWindow.addActuator("Pivot", "PIDSubsystem Controller",
-				getPIDController());
+		addChild("Upper Limit Switch", m_upperLimitSwitch);
+		addChild("Lower Limit Switch", m_lowerLimitSwitch);
+		addChild("Pot", (AnalogPotentiometer) m_pot);
+		addChild("Motor", (Victor) m_motor);
+		addChild("PIDSubsystem Controller", getPIDController());
 	}
 
 	/**

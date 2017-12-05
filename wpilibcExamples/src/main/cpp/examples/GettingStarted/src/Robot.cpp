@@ -42,7 +42,7 @@ public:
 		m_robotDrive.ArcadeDrive(m_stick.GetY(), m_stick.GetX());
 	}
 
-	void TestPeriodic() override { m_lw.Run(); }
+	void TestPeriodic() override {}
 
 private:
 	// Robot drive system

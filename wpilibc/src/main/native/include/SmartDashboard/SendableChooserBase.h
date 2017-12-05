@@ -7,11 +7,10 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 
-#include "SmartDashboard/Sendable.h"
-#include "networktables/NetworkTable.h"
+#include "SmartDashboard/SendableBase.h"
+#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -21,11 +20,9 @@ namespace frc {
  * It contains static, non-templated variables to avoid their duplication in the
  * template class.
  */
-class SendableChooserBase : public Sendable {
+class SendableChooserBase : public SendableBase {
  public:
-  virtual ~SendableChooserBase() = default;
-
-  std::string GetSmartDashboardType() const override;
+  ~SendableChooserBase() override = default;
 
  protected:
   static const char* kDefault;
@@ -33,6 +30,7 @@ class SendableChooserBase : public Sendable {
   static const char* kSelected;
 
   std::string m_defaultChoice;
+  nt::NetworkTableEntry m_selectedEntry;
 };
 
 }  // namespace frc

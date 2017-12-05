@@ -8,14 +8,11 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include <llvm/StringMap.h>
 #include <llvm/StringRef.h>
 
 #include "SmartDashboard/SendableChooserBase.h"
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -35,7 +32,6 @@ namespace frc {
 template <class T>
 class SendableChooser : public SendableChooserBase {
   llvm::StringMap<T> m_choices;
-  nt::NetworkTableEntry m_selectedEntry;
 
   template <class U>
   static U _unwrap_smart_ptr(const U& value);
@@ -47,14 +43,14 @@ class SendableChooser : public SendableChooserBase {
   static std::weak_ptr<U> _unwrap_smart_ptr(const std::shared_ptr<U>& value);
 
  public:
-  virtual ~SendableChooser() = default;
+  ~SendableChooser() override = default;
 
   void AddObject(llvm::StringRef name, T object);
   void AddDefault(llvm::StringRef name, T object);
 
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
+  void InitSendable(SendableBuilder& builder) override;
 };
 
 }  // namespace frc

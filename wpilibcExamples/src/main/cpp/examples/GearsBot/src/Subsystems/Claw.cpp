@@ -7,12 +7,10 @@
 
 #include "Claw.h"
 
-#include <LiveWindow/LiveWindow.h>
-
 Claw::Claw()
     : frc::Subsystem("Claw") {
 	// Let's show everything on the LiveWindow
-	// frc::LiveWindow::GetInstance()->AddActuator("Claw", "Motor", &motor);
+	AddChild("Motor", m_motor);
 }
 
 void Claw::InitDefaultCommand() {}

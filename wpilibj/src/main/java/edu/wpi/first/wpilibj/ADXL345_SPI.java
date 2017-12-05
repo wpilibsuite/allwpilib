@@ -10,20 +10,18 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * ADXL345 SPI Accelerometer.
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindowSendable {
+public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
   private static final int kPowerCtlRegister = 0x2D;
   private static final int kDataFormatRegister = 0x31;
   private static final int kDataRegister = 0x32;
@@ -78,10 +76,12 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   public ADXL345_SPI(SPI.Port port, Range range) {
     m_spi = new SPI(port);
     init(range);
-    LiveWindow.addSensor("ADXL345_SPI", port.value, this);
+    setName("ADXL345_SPI", port.value);
   }
 
+  @Override
   public void free() {
+    super.free();
     m_spi.free();
   }
 
@@ -189,49 +189,16 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, LiveWindow
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "3AxisAccelerometer";
-  }
-
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_xEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_yEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_zEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_xEntry = subtable.getEntry("X");
-      m_yEntry = subtable.getEntry("Y");
-      m_zEntry = subtable.getEntry("Z");
-      updateTable();
-    } else {
-      m_xEntry = null;
-      m_yEntry = null;
-      m_zEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_xEntry != null) {
-      m_xEntry.setDouble(getX());
-    }
-    if (m_yEntry != null) {
-      m_yEntry.setDouble(getY());
-    }
-    if (m_zEntry != null) {
-      m_zEntry.setDouble(getZ());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("3AxisAccelerometer");
+    NetworkTableEntry entryX = builder.getEntry("X");
+    NetworkTableEntry entryY = builder.getEntry("Y");
+    NetworkTableEntry entryZ = builder.getEntry("Z");
+    builder.setUpdateTable(() -> {
+      AllAxes data = getAccelerations();
+      entryX.setDouble(data.XAxis);
+      entryY.setDouble(data.YAxis);
+      entryZ.setDouble(data.ZAxis);
+    });
   }
 }

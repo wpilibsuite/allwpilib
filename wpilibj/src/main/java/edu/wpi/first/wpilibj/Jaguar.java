@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * Texas Instruments / Vex Robotics Jaguar Speed Controller as a PWM device.
@@ -39,6 +38,6 @@ public class Jaguar extends PWMSpeedController {
     setZeroLatch();
 
     HAL.report(tResourceType.kResourceType_Jaguar, getChannel());
-    LiveWindow.addActuator("Jaguar", getChannel(), this);
+    setName("Jaguar", getChannel());
   }
 }

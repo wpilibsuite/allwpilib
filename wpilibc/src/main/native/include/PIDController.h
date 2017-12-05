@@ -7,21 +7,20 @@
 
 #pragma once
 
-#include <atomic>
 #include <memory>
 #include <string>
 
+#include <support/deprecated.h>
 #include <support/mutex.h>
 
 #include "Base.h"
 #include "Controller.h"
 #include "Filters/LinearDigitalFilter.h"
-#include "LiveWindow/LiveWindow.h"
 #include "Notifier.h"
 #include "PIDInterface.h"
 #include "PIDSource.h"
+#include "SmartDashboard/SendableBase.h"
 #include "Timer.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -37,7 +36,7 @@ class PIDOutput;
  * in the integral and derivative calculations. Therefore, the sample rate
  * affects the controller's behavior for a given set of PID constants.
  */
-class PIDController : public LiveWindowSendable, public PIDInterface {
+class PIDController : public SendableBase, public PIDInterface {
  public:
   PIDController(double p, double i, double d, PIDSource* source,
                 PIDOutput* output, double period = 0.05);
@@ -47,7 +46,7 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
                 PIDOutput& output, double period = 0.05);
   PIDController(double p, double i, double d, double f, PIDSource& source,
                 PIDOutput& output, double period = 0.05);
-  virtual ~PIDController();
+  ~PIDController() override;
 
   PIDController(const PIDController&) = delete;
   PIDController& operator=(const PIDController) = delete;
@@ -58,6 +57,10 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
   virtual void SetOutputRange(double minimumOutput, double maximumOutput);
   void SetPID(double p, double i, double d) override;
   virtual void SetPID(double p, double i, double d, double f);
+  void SetP(double p);
+  void SetI(double i);
+  void SetD(double d);
+  void SetF(double f);
   double GetP() const override;
   double GetI() const override;
   double GetD() const override;
@@ -87,28 +90,16 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
 
   void Enable() override;
   void Disable() override;
+  void SetEnabled(bool enable);
   bool IsEnabled() const override;
 
   void Reset() override;
 
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
+  void InitSendable(SendableBuilder& builder) override;
 
  protected:
   PIDSource* m_pidInput;
   PIDOutput* m_pidOutput;
-
-  nt::NetworkTableEntry m_pEntry;
-  nt::NetworkTableEntry m_iEntry;
-  nt::NetworkTableEntry m_dEntry;
-  nt::NetworkTableEntry m_fEntry;
-  nt::NetworkTableEntry m_setpointEntry;
-  nt::NetworkTableEntry m_enabledEntry;
-  NT_EntryListener m_pListener = 0;
-  NT_EntryListener m_iListener = 0;
-  NT_EntryListener m_dListener = 0;
-  NT_EntryListener m_fListener = 0;
-  NT_EntryListener m_setpointListener = 0;
-  NT_EntryListener m_enabledListener = 0;
 
   virtual void Calculate();
   virtual double CalculateFeedForward();
@@ -180,12 +171,6 @@ class PIDController : public LiveWindowSendable, public PIDInterface {
 
   std::unique_ptr<Notifier> m_controlLoop;
   Timer m_setpointTimer;
-
-  std::string GetSmartDashboardType() const override;
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  void RemoveListeners();
 };
 
 }  // namespace frc

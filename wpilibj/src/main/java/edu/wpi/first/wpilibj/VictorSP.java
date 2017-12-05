@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * VEX Robotics Victor SP Speed Controller.
@@ -40,7 +39,7 @@ public class VictorSP extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    LiveWindow.addActuator("VictorSP", getChannel(), this);
     HAL.report(tResourceType.kResourceType_VictorSP, getChannel());
+    setName("VictorSP", getChannel());
   }
 }

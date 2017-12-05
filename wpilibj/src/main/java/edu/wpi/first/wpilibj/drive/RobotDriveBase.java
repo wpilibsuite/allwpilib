@@ -9,11 +9,12 @@ package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.MotorSafety;
 import edu.wpi.first.wpilibj.MotorSafetyHelper;
+import edu.wpi.first.wpilibj.SendableBase;
 
 /**
  * Common base class for drive platforms.
  */
-public abstract class RobotDriveBase implements MotorSafety {
+public abstract class RobotDriveBase extends SendableBase implements MotorSafety {
   public static final double kDefaultDeadband = 0.02;
   public static final double kDefaultMaxOutput = 1.0;
 
@@ -38,6 +39,7 @@ public abstract class RobotDriveBase implements MotorSafety {
 
   public RobotDriveBase() {
     m_safetyHelper.setSafetyEnabled(true);
+    setName("RobotDriveBase");
   }
 
   /**

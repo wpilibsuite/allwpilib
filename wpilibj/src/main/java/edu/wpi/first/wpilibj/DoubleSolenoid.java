@@ -7,14 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * DoubleSolenoid class for running 2 channels of high voltage Digital Output on the PCM.
@@ -22,7 +18,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * <p>The DoubleSolenoid class is typically used for pneumatics solenoids that have two positions
  * controlled by two separate channels.
  */
-public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
+public class DoubleSolenoid extends SolenoidBase implements Sendable {
 
   /**
    * Possible values for a DoubleSolenoid.
@@ -45,7 +41,7 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
    * @param reverseChannel The reverse channel number on the PCM (0..7).
    */
   public DoubleSolenoid(final int forwardChannel, final int reverseChannel) {
-    this(getDefaultSolenoidModule(), forwardChannel, reverseChannel);
+    this(SensorBase.getDefaultSolenoidModule(), forwardChannel, reverseChannel);
   }
 
   /**
@@ -59,9 +55,9 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
                         final int reverseChannel) {
     super(moduleNumber);
 
-    checkSolenoidModule(m_moduleNumber);
-    checkSolenoidChannel(forwardChannel);
-    checkSolenoidChannel(reverseChannel);
+    SensorBase.checkSolenoidModule(m_moduleNumber);
+    SensorBase.checkSolenoidChannel(forwardChannel);
+    SensorBase.checkSolenoidChannel(reverseChannel);
 
     int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
     m_forwardHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
@@ -84,13 +80,15 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
                                    m_moduleNumber);
     HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel,
                                    m_moduleNumber);
-    LiveWindow.addActuator("DoubleSolenoid", m_moduleNumber, forwardChannel, this);
+    setName("DoubleSolenoid", m_moduleNumber, forwardChannel);
   }
 
   /**
    * Destructor.
    */
+  @Override
   public synchronized void free() {
+    super.free();
     SolenoidJNI.freeSolenoidPort(m_forwardHandle);
     SolenoidJNI.freeSolenoidPort(m_reverseHandle);
     super.free();
@@ -169,52 +167,18 @@ public class DoubleSolenoid extends SolenoidBase implements LiveWindowSendable {
     return (blackList & m_reverseMask) != 0;
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  public String getSmartDashboardType() {
-    return "Double Solenoid";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-  private int m_valueListener;
-
   @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setString(get().name().substring(1));
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-    set(Value.kOff); // Stop for safety
-    m_valueListener = m_valueEntry.addListener((event) -> {
-      String value = event.value.getString();
-      if ("Reverse".equals(value)) {
-        set(Value.kReverse);
-      } else if ("Forward".equals(value)) {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Double Solenoid");
+    builder.setSafeState(() -> set(Value.kOff));
+    builder.addStringProperty("Value", () -> get().name().substring(1), (value) -> {
+      if ("Forward".equals(value)) {
         set(Value.kForward);
+      } else if ("Reverse".equals(value)) {
+        set(Value.kReverse);
       } else {
         set(Value.kOff);
       }
-    }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
-    set(Value.kOff); // Stop for safety
-    m_valueEntry.removeListener(m_valueListener);
-    m_valueListener = 0;
+    });
   }
 }

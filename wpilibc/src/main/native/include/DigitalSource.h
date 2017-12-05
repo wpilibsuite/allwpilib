@@ -24,7 +24,6 @@ namespace frc {
  */
 class DigitalSource : public InterruptableSensorBase {
  public:
-  virtual ~DigitalSource() = default;
   virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;
   virtual bool IsAnalogTrigger() const = 0;

@@ -17,7 +17,6 @@ namespace frc {
  */
 class PWMSpeedController : public SafePWM, public SpeedController {
  public:
-  virtual ~PWMSpeedController() = default;
   void Set(double value) override;
   double Get() const override;
   void SetInverted(bool isInverted) override;

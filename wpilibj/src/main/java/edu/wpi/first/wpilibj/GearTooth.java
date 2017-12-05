@@ -9,7 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Alias for counter class. Implement the gear tooth sensor supplied by FIRST. Currently there is no
@@ -56,7 +56,7 @@ public class GearTooth extends Counter {
     } else {
       HAL.report(tResourceType.kResourceType_GearTooth, channel, 0);
     }
-    LiveWindow.addSensor("GearTooth", channel, this);
+    setName("GearTooth", channel);
   }
 
   /**
@@ -70,6 +70,12 @@ public class GearTooth extends Counter {
   public GearTooth(DigitalSource source, boolean directionSensitive) {
     super(source);
     enableDirectionSensing(directionSensitive);
+    if (directionSensitive) {
+      HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel(), 0, "D");
+    } else {
+      HAL.report(tResourceType.kResourceType_GearTooth, source.getChannel(), 0);
+    }
+    setName("GearTooth", source.getChannel());
   }
 
   /**
@@ -84,10 +90,9 @@ public class GearTooth extends Counter {
     this(source, false);
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  public String getSmartDashboardType() {
-    return "Gear Tooth";
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.setSmartDashboardType("Gear Tooth");
   }
 }

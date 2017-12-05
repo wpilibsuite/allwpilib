@@ -8,12 +8,9 @@
 package edu.wpi.first.wpilibj.examples.gearsbot.subsystems;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
-import edu.wpi.first.wpilibj.interfaces.Potentiometer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -23,8 +20,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Elevator extends PIDSubsystem {
 
-	private SpeedController m_motor;
-	private Potentiometer m_pot;
+	private Victor m_motor;
+	private AnalogPotentiometer m_pot;
 
 	private static final double kP_real = 4;
 	private static final double kI_real = 0.07;
@@ -48,10 +45,9 @@ public class Elevator extends PIDSubsystem {
 			m_pot = new AnalogPotentiometer(2); // Defaults to meters
 		}
 
-		// Let's show everything on the LiveWindow
-		LiveWindow.addActuator("Elevator", "Motor", (Victor) m_motor);
-		LiveWindow.addSensor("Elevator", "Pot", (AnalogPotentiometer) m_pot);
-		LiveWindow.addActuator("Elevator", "PID", getPIDController());
+		// Let's name everything on the LiveWindow
+		addChild("Motor", m_motor);
+		addChild("Pot", m_pot);
 	}
 
 	@Override
@@ -62,7 +58,7 @@ public class Elevator extends PIDSubsystem {
 	 * The log method puts interesting information to the SmartDashboard.
 	 */
 	public void log() {
-		SmartDashboard.putData("Wrist Pot", (AnalogPotentiometer) m_pot);
+		SmartDashboard.putData("Elevator Pot", (AnalogPotentiometer) m_pot);
 	}
 
 	/**

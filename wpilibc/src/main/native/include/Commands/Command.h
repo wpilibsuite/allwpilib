@@ -11,9 +11,10 @@
 #include <set>
 #include <string>
 
+#include <llvm/Twine.h>
+
 #include "ErrorBase.h"
-#include "SmartDashboard/NamedSendable.h"
-#include "networktables/NetworkTableEntry.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -44,16 +45,16 @@ class Subsystem;
  * @see CommandGroup
  * @see Subsystem
  */
-class Command : public ErrorBase, public NamedSendable {
+class Command : public ErrorBase, public SendableBase {
   friend class CommandGroup;
   friend class Scheduler;
 
  public:
   Command();
-  explicit Command(const std::string& name);
+  explicit Command(const llvm::Twine& name);
   explicit Command(double timeout);
-  Command(const std::string& name, double timeout);
-  virtual ~Command();
+  Command(const llvm::Twine& name, double timeout);
+  ~Command() override = default;
   double TimeSinceInitialized() const;
   void Requires(Subsystem* s);
   bool IsCanceled() const;
@@ -76,6 +77,7 @@ class Command : public ErrorBase, public NamedSendable {
   bool IsTimedOut() const;
   bool AssertUnlocked(const std::string& message);
   void SetParent(CommandGroup* parent);
+  bool IsParented() const;
   void ClearRequirements();
 
   virtual void Initialize();
@@ -116,9 +118,6 @@ class Command : public ErrorBase, public NamedSendable {
   void StartRunning();
   void StartTiming();
 
-  // The name of this command
-  std::string m_name;
-
   // The time since this command was initialized
   double m_startTime = -1;
 
@@ -153,14 +152,7 @@ class Command : public ErrorBase, public NamedSendable {
   static int m_commandCounter;
 
  public:
-  std::string GetName() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::string GetSmartDashboardType() const override;
-
- private:
-  nt::NetworkTableEntry m_runningEntry;
-  nt::NetworkTableEntry m_isParentedEntry;
-  NT_EntryListener m_runningListener = 0;
+  void InitSendable(SendableBuilder& builder) override;
 };
 
 }  // namespace frc

@@ -14,7 +14,6 @@
 #include <HAL/HAL.h>
 
 #include "AnalogInput.h"
-#include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 
@@ -27,7 +26,9 @@ using namespace frc;
  *                be used on on-board Analog Inputs 0-1.
  */
 AnalogGyro::AnalogGyro(int channel)
-    : AnalogGyro(std::make_shared<AnalogInput>(channel)) {}
+    : AnalogGyro(std::make_shared<AnalogInput>(channel)) {
+  AddChild(m_analog);
+}
 
 /**
  * Gyro constructor with a precreated AnalogInput object.
@@ -75,18 +76,9 @@ AnalogGyro::AnalogGyro(std::shared_ptr<AnalogInput> channel)
  *                value.
  * @param offset  Preset uncalibrated value to use as the gyro offset.
  */
-AnalogGyro::AnalogGyro(int channel, int center, double offset) {
-  m_analog = std::make_shared<AnalogInput>(channel);
-  InitGyro();
-  int32_t status = 0;
-  HAL_SetAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
-                              offset, center, &status);
-  if (status != 0) {
-    wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-    m_gyroHandle = HAL_kInvalidHandle;
-    return;
-  }
-  Reset();
+AnalogGyro::AnalogGyro(int channel, int center, double offset)
+    : AnalogGyro(std::make_shared<AnalogInput>(channel), center, offset) {
+  AddChild(m_analog);
 }
 
 /**
@@ -172,8 +164,7 @@ void AnalogGyro::InitGyro() {
   }
 
   HAL_Report(HALUsageReporting::kResourceType_Gyro, m_analog->GetChannel());
-  LiveWindow::GetInstance()->AddSensor("AnalogGyro", m_analog->GetChannel(),
-                                       this);
+  SetName("AnalogGyro", m_analog->GetChannel());
 }
 
 void AnalogGyro::Calibrate() {

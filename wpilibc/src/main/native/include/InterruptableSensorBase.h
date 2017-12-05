@@ -24,7 +24,6 @@ class InterruptableSensorBase : public SensorBase {
   };
 
   InterruptableSensorBase() = default;
-  virtual ~InterruptableSensorBase() = default;
 
   virtual HAL_Handle GetPortHandleForRouting() const = 0;
   virtual AnalogTriggerType GetAnalogTriggerTypeForRouting() const = 0;

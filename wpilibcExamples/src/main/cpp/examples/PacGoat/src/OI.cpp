@@ -13,6 +13,7 @@
 #include "Commands/SetCollectionSpeed.h"
 #include "Commands/SetPivotSetpoint.h"
 #include "Commands/Shoot.h"
+#include "SmartDashboard/SmartDashboard.h"
 #include "Subsystems/Collector.h"
 #include "Subsystems/Pivot.h"
 

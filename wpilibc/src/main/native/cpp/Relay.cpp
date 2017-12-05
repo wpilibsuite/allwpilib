@@ -12,8 +12,9 @@
 #include <HAL/Relay.h>
 #include <llvm/SmallString.h>
 
-#include "LiveWindow/LiveWindow.h"
 #include "MotorSafetyHelper.h"
+#include "SensorBase.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -88,7 +89,7 @@ Relay::Relay(int channel, Relay::Direction direction)
   m_safetyHelper = std::make_unique<MotorSafetyHelper>(this);
   m_safetyHelper->SetSafetyEnabled(false);
 
-  LiveWindow::GetInstance()->AddActuator("Relay", 1, m_channel, this);
+  SetName("Relay", m_channel);
 }
 
 /**
@@ -103,8 +104,6 @@ Relay::~Relay() {
   // ignore errors, as we want to make sure a free happens.
   if (m_forwardHandle != HAL_kInvalidHandle) HAL_FreeRelayPort(m_forwardHandle);
   if (m_reverseHandle != HAL_kInvalidHandle) HAL_FreeRelayPort(m_reverseHandle);
-
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
 }
 
 /**
@@ -275,52 +274,31 @@ void Relay::GetDescription(llvm::raw_ostream& desc) const {
   desc << "Relay " << GetChannel();
 }
 
-void Relay::UpdateTable() {
-  if (m_valueEntry) {
-    if (Get() == kOn) {
-      m_valueEntry.SetString("On");
-    } else if (Get() == kForward) {
-      m_valueEntry.SetString("Forward");
-    } else if (Get() == kReverse) {
-      m_valueEntry.SetString("Reverse");
-    } else {
-      m_valueEntry.SetString("Off");
-    }
-  }
-}
-
-void Relay::StartLiveWindowMode() {
-  if (m_valueEntry) {
-    m_valueListener = m_valueEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsString()) return;
-          if (event.value->GetString() == "Off")
-            Set(kOff);
-          else if (event.value->GetString() == "Forward")
-            Set(kForward);
-          else if (event.value->GetString() == "Reverse")
-            Set(kReverse);
-          else if (event.value->GetString() == "On")
-            Set(kOn);
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
-}
-
-void Relay::StopLiveWindowMode() {
-  if (m_valueListener != 0) {
-    m_valueEntry.RemoveListener(m_valueListener);
-    m_valueListener = 0;
-  }
-}
-
-std::string Relay::GetSmartDashboardType() const { return "Relay"; }
-
-void Relay::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void Relay::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Relay");
+  builder.SetSafeState([=]() { Set(kOff); });
+  builder.AddSmallStringProperty(
+      "Value",
+      [=](llvm::SmallVectorImpl<char>& buf) -> llvm::StringRef {
+        switch (Get()) {
+          case kOn:
+            return "On";
+          case kForward:
+            return "Forward";
+          case kReverse:
+            return "Reverse";
+          default:
+            return "Off";
+        }
+      },
+      [=](llvm::StringRef value) {
+        if (value == "Off")
+          Set(kOff);
+        else if (value == "Forward")
+          Set(kForward);
+        else if (value == "Reverse")
+          Set(kReverse);
+        else if (value == "On")
+          Set(kOn);
+      });
 }

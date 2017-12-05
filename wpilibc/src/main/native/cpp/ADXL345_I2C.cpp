@@ -9,8 +9,7 @@
 
 #include <HAL/HAL.h>
 
-#include "I2C.h"
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
 
@@ -30,7 +29,7 @@ ADXL345_I2C::ADXL345_I2C(I2C::Port port, Range range, int deviceAddress)
 
   HAL_Report(HALUsageReporting::kResourceType_ADXL345,
              HALUsageReporting::kADXL345_I2C, 0);
-  LiveWindow::GetInstance()->AddSensor("ADXL345_I2C", port, this);
+  SetName("ADXL345_I2C", port);
 }
 
 void ADXL345_I2C::SetRange(Range range) {
@@ -75,25 +74,15 @@ ADXL345_I2C::AllAxes ADXL345_I2C::GetAccelerations() {
   return data;
 }
 
-std::string ADXL345_I2C::GetSmartDashboardType() const {
-  return "3AxisAccelerometer";
-}
-
-void ADXL345_I2C::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  if (subtable) {
-    m_xEntry = subtable->GetEntry("X");
-    m_yEntry = subtable->GetEntry("Y");
-    m_zEntry = subtable->GetEntry("Z");
-    UpdateTable();
-  } else {
-    m_xEntry = nt::NetworkTableEntry();
-    m_yEntry = nt::NetworkTableEntry();
-    m_zEntry = nt::NetworkTableEntry();
-  }
-}
-
-void ADXL345_I2C::UpdateTable() {
-  if (m_xEntry) m_xEntry.SetDouble(GetX());
-  if (m_yEntry) m_yEntry.SetDouble(GetY());
-  if (m_zEntry) m_zEntry.SetDouble(GetZ());
+void ADXL345_I2C::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("3AxisAccelerometer");
+  auto x = builder.GetEntry("X").GetHandle();
+  auto y = builder.GetEntry("Y").GetHandle();
+  auto z = builder.GetEntry("Z").GetHandle();
+  builder.SetUpdateTable([=]() {
+    auto data = GetAccelerations();
+    nt::NetworkTableEntry(x).SetDouble(data.XAxis);
+    nt::NetworkTableEntry(y).SetDouble(data.YAxis);
+    nt::NetworkTableEntry(z).SetDouble(data.ZAxis);
+  });
 }

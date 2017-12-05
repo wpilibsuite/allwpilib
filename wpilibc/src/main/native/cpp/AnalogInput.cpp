@@ -14,7 +14,7 @@
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 
@@ -49,8 +49,8 @@ AnalogInput::AnalogInput(int channel) {
     return;
   }
 
-  LiveWindow::GetInstance()->AddSensor("AnalogInput", channel, this);
   HAL_Report(HALUsageReporting::kResourceType_AnalogChannel, channel);
+  SetName("AnalogInput", channel);
 }
 
 /**
@@ -414,23 +414,8 @@ double AnalogInput::PIDGet() {
   return GetAverageVoltage();
 }
 
-void AnalogInput::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetDouble(GetAverageVoltage());
-}
-
-void AnalogInput::StartLiveWindowMode() {}
-
-void AnalogInput::StopLiveWindowMode() {}
-
-std::string AnalogInput::GetSmartDashboardType() const {
-  return "Analog Input";
-}
-
-void AnalogInput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void AnalogInput::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Analog Input");
+  builder.AddDoubleProperty("Value", [=]() { return GetAverageVoltage(); },
+                            nullptr);
 }

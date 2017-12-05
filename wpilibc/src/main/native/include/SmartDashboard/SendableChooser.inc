@@ -13,6 +13,10 @@
 #include <utility>
 #include <vector>
 
+#include <llvm/StringRef.h>
+
+#include "SendableBuilder.h"
+
 namespace frc {
 
 /**
@@ -58,8 +62,11 @@ void SendableChooser<T>::AddDefault(llvm::StringRef name, T object) {
 template <class T>
 auto SendableChooser<T>::GetSelected()
     -> decltype(_unwrap_smart_ptr(m_choices[""])) {
-  std::string selected = m_selectedEntry.GetString(m_defaultChoice);
-  if (selected == "") {
+  llvm::StringRef selected = m_defaultChoice;
+  if (m_selectedEntry) {
+    selected = m_selectedEntry.GetString(m_defaultChoice);
+  }
+  if (selected.empty()) {
     return decltype(_unwrap_smart_ptr(m_choices[""])){};
   } else {
     return _unwrap_smart_ptr(m_choices[selected]);
@@ -67,21 +74,29 @@ auto SendableChooser<T>::GetSelected()
 }
 
 template <class T>
-void SendableChooser<T>::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  std::vector<std::string> keys;
-  if (subtable) {
-    m_selectedEntry = subtable->GetEntry(kSelected);
-    for (const auto& choice : m_choices) {
-      keys.push_back(choice.first());
-    }
+void SendableChooser<T>::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("String Chooser");
+  builder.AddStringArrayProperty(kOptions,
+                                 [=]() {
+                                   std::vector<std::string> keys;
+                                   for (const auto& choice : m_choices) {
+                                     keys.push_back(choice.first());
+                                   }
 
-    // Unlike std::map, llvm::StringMap elements are not sorted
-    std::sort(keys.begin(), keys.end());
+                                   // Unlike std::map, llvm::StringMap elements
+                                   // are not sorted
+                                   std::sort(keys.begin(), keys.end());
 
-    subtable->GetEntry(kOptions).SetValue(
-        nt::Value::MakeStringArray(std::move(keys)));
-    subtable->GetEntry(kDefault).SetString(m_defaultChoice);
-  }
+                                   return keys;
+                                 },
+                                 nullptr);
+  builder.AddSmallStringProperty(
+      kDefault,
+      [=](const llvm::SmallVectorImpl<char>&) -> llvm::StringRef {
+        return m_defaultChoice;
+      },
+      nullptr);
+  m_selectedEntry = builder.GetEntry(kSelected);
 }
 
 template <class T>

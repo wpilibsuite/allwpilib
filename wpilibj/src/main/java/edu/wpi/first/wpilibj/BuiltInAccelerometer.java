@@ -7,21 +7,18 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.AccelerometerJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Built-in accelerometer.
  *
  * <p>This class allows access to the roboRIO's internal accelerometer.
  */
-public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable {
+public class BuiltInAccelerometer extends SensorBase implements Accelerometer, Sendable {
   /**
    * Constructor.
    *
@@ -30,7 +27,7 @@ public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable {
   public BuiltInAccelerometer(Range range) {
     setRange(range);
     HAL.report(tResourceType.kResourceType_Accelerometer, 0, 0, "Built-in accelerometer");
-    LiveWindow.addSensor("BuiltInAccel", 0, this);
+    setName("BuiltInAccel", 0);
   }
 
   /**
@@ -94,49 +91,10 @@ public class BuiltInAccelerometer implements Accelerometer, LiveWindowSendable {
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "3AxisAccelerometer";
-  }
-
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_xEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_yEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_zEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_xEntry = subtable.getEntry("X");
-      m_yEntry = subtable.getEntry("Y");
-      m_zEntry = subtable.getEntry("Z");
-      updateTable();
-    } else {
-      m_xEntry = null;
-      m_yEntry = null;
-      m_zEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_xEntry != null) {
-      m_xEntry.setDouble(getX());
-    }
-    if (m_yEntry != null) {
-      m_yEntry.setDouble(getY());
-    }
-    if (m_zEntry != null) {
-      m_zEntry.setDouble(getZ());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("3AxisAccelerometer");
+    builder.addDoubleProperty("X", this::getX, null);
+    builder.addDoubleProperty("Y", this::getY, null);
+    builder.addDoubleProperty("Z", this::getZ, null);
   }
 }

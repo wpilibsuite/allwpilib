@@ -11,6 +11,7 @@
 
 #include "AnalogTrigger.h"
 #include "DigitalInput.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -36,6 +37,7 @@ Counter::Counter(Mode mode) {
   SetMaxPeriod(.5);
 
   HAL_Report(HALUsageReporting::kResourceType_Counter, m_index, mode);
+  SetName("Counter", m_index);
 }
 
 /**
@@ -181,6 +183,7 @@ Counter::~Counter() {
 void Counter::SetUpSource(int channel) {
   if (StatusIsFatal()) return;
   SetUpSource(std::make_shared<DigitalInput>(channel));
+  AddChild(m_upSource);
 }
 
 /**
@@ -287,6 +290,7 @@ void Counter::ClearUpSource() {
 void Counter::SetDownSource(int channel) {
   if (StatusIsFatal()) return;
   SetDownSource(std::make_shared<DigitalInput>(channel));
+  AddChild(m_downSource);
 }
 
 /**
@@ -603,21 +607,7 @@ void Counter::SetReverseDirection(bool reverseDirection) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void Counter::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetDouble(Get());
-}
-
-void Counter::StartLiveWindowMode() {}
-
-void Counter::StopLiveWindowMode() {}
-
-std::string Counter::GetSmartDashboardType() const { return "Counter"; }
-
-void Counter::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void Counter::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Counter");
+  builder.AddDoubleProperty("Value", [=]() { return Get(); }, nullptr);
 }

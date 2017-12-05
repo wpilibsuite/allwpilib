@@ -8,15 +8,13 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include <HAL/Types.h>
 #include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindowSendable.h"
+#include "ErrorBase.h"
 #include "MotorSafety.h"
-#include "SensorBase.h"
-#include "networktables/NetworkTableEntry.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -34,13 +32,13 @@ class MotorSafetyHelper;
  * independently for something that does not care about voltage polarity (like
  * a solenoid).
  */
-class Relay : public MotorSafety, public SensorBase, public LiveWindowSendable {
+class Relay : public MotorSafety, public ErrorBase, public SendableBase {
  public:
   enum Value { kOff, kOn, kForward, kReverse };
   enum Direction { kBothDirections, kForwardOnly, kReverseOnly };
 
   explicit Relay(int channel, Direction direction = kBothDirections);
-  virtual ~Relay();
+  ~Relay() override;
 
   void Set(Value value);
   Value Get() const;
@@ -54,15 +52,7 @@ class Relay : public MotorSafety, public SensorBase, public LiveWindowSendable {
   void SetSafetyEnabled(bool enabled) override;
   void GetDescription(llvm::raw_ostream& desc) const override;
 
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-
- protected:
-  nt::NetworkTableEntry m_valueEntry;
-  NT_EntryListener m_valueListener = 0;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   int m_channel;

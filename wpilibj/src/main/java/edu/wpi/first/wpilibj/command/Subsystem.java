@@ -9,9 +9,10 @@ package edu.wpi.first.wpilibj.command;
 
 import java.util.Enumeration;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.NamedSendable;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SendableBase;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * This class defines a major component of the robot.
@@ -27,7 +28,7 @@ import edu.wpi.first.wpilibj.NamedSendable;
  *
  * @see Command
  */
-public abstract class Subsystem implements NamedSendable {
+public abstract class Subsystem extends SendableBase implements Sendable {
 
   /**
    * Whether or not getDefaultCommand() was called.
@@ -43,10 +44,6 @@ public abstract class Subsystem implements NamedSendable {
    * The default command.
    */
   private Command m_defaultCommand;
-  /**
-   * The name.
-   */
-  private String m_name;
 
   /**
    * Creates a subsystem with the given name.
@@ -54,7 +51,7 @@ public abstract class Subsystem implements NamedSendable {
    * @param name the name of the subsystem
    */
   public Subsystem(String name) {
-    m_name = name;
+    setName(name, name);
     Scheduler.getInstance().registerSubsystem(this);
   }
 
@@ -62,7 +59,9 @@ public abstract class Subsystem implements NamedSendable {
    * Creates a subsystem. This will set the name to the name of the class.
    */
   public Subsystem() {
-    m_name = getClass().getName().substring(getClass().getName().lastIndexOf('.') + 1);
+    String name = getClass().getName();
+    name = name.substring(name.lastIndexOf('.') + 1);
+    setName(name, name);
     Scheduler.getInstance().registerSubsystem(this);
     m_currentCommandChanged = true;
   }
@@ -110,14 +109,6 @@ public abstract class Subsystem implements NamedSendable {
       }
       m_defaultCommand = command;
     }
-    if (m_hasDefaultEntry != null && m_defaultEntry != null) {
-      if (m_defaultCommand != null) {
-        m_hasDefaultEntry.setBoolean(true);
-        m_defaultEntry.setString(m_defaultCommand.getName());
-      } else {
-        m_hasDefaultEntry.setBoolean(false);
-      }
-    }
   }
 
   /**
@@ -125,12 +116,26 @@ public abstract class Subsystem implements NamedSendable {
    *
    * @return the default command
    */
-  protected Command getDefaultCommand() {
+  public Command getDefaultCommand() {
     if (!m_initializedDefaultCommand) {
       m_initializedDefaultCommand = true;
       initDefaultCommand();
     }
     return m_defaultCommand;
+  }
+
+  /**
+   * Returns the default command name, or empty string is there is none.
+   *
+   * @return the default command name
+   */
+  public String getDefaultCommandName() {
+    Command defaultCommand = getDefaultCommand();
+    if (defaultCommand != null) {
+      return defaultCommand.getName();
+    } else {
+      return "";
+    }
   }
 
   /**
@@ -150,14 +155,6 @@ public abstract class Subsystem implements NamedSendable {
    */
   void confirmCommand() {
     if (m_currentCommandChanged) {
-      if (m_hasCommandEntry != null && m_commandEntry != null) {
-        if (m_currentCommand != null) {
-          m_hasCommandEntry.setBoolean(true);
-          m_commandEntry.setString(m_currentCommand.getName());
-        } else {
-          m_hasCommandEntry.setBoolean(false);
-        }
-      }
       m_currentCommandChanged = false;
     }
   }
@@ -171,51 +168,54 @@ public abstract class Subsystem implements NamedSendable {
     return m_currentCommand;
   }
 
-  @Override
-  public String toString() {
-    return getName();
+  /**
+   * Returns the current command name, or empty string if no current command.
+   *
+   * @return the current command name
+   */
+  public String getCurrentCommandName() {
+    Command currentCommand = getCurrentCommand();
+    if (currentCommand != null) {
+      return currentCommand.getName();
+    } else {
+      return "";
+    }
   }
 
   /**
-   * Returns the name of this subsystem, which is by default the class name.
+   * Associate a {@link Sendable} with this Subsystem.
+   * Also update the child's name.
    *
-   * @return the name of this subsystem
+   * @param name name to give child
+   * @param child sendable
    */
-  @Override
-  public String getName() {
-    return m_name;
+  public void addChild(String name, Sendable child) {
+    child.setName(getSubsystem(), name);
+    LiveWindow.add(child);
+  }
+
+  /**
+   * Associate a {@link Sendable} with this Subsystem.
+   *
+   * @param child sendable
+   */
+  public void addChild(Sendable child) {
+    child.setSubsystem(getSubsystem());
+    LiveWindow.add(child);
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "Subsystem";
+  public String toString() {
+    return getSubsystem();
   }
 
-  private NetworkTableEntry m_hasDefaultEntry;
-  private NetworkTableEntry m_defaultEntry;
-  private NetworkTableEntry m_hasCommandEntry;
-  private NetworkTableEntry m_commandEntry;
-
   @Override
-  public void initTable(NetworkTable table) {
-    if (table != null) {
-      m_hasDefaultEntry = table.getEntry("hasDefault");
-      m_defaultEntry = table.getEntry("default");
-      m_hasCommandEntry = table.getEntry("hasCommand");
-      m_commandEntry = table.getEntry("command");
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Subsystem");
 
-      if (m_defaultCommand != null) {
-        m_hasDefaultEntry.setBoolean(true);
-        m_defaultEntry.setString(m_defaultCommand.getName());
-      } else {
-        m_hasDefaultEntry.setBoolean(false);
-      }
-      if (m_currentCommand != null) {
-        m_hasCommandEntry.setBoolean(true);
-        m_commandEntry.setString(m_currentCommand.getName());
-      } else {
-        m_hasCommandEntry.setBoolean(false);
-      }
-    }
+    builder.addBooleanProperty("hasDefault", () -> m_defaultCommand != null, null);
+    builder.addStringProperty("default", this::getDefaultCommandName, null);
+    builder.addBooleanProperty("hasCommand", () -> m_currentCommand != null, null);
+    builder.addStringProperty("command", this::getCurrentCommandName, null);
   }
 }

@@ -9,8 +9,6 @@
 
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
-
 using namespace frc;
 
 /**
@@ -40,5 +38,5 @@ VictorSP::VictorSP(int channel) : PWMSpeedController(channel) {
   SetZeroLatch();
 
   HAL_Report(HALUsageReporting::kResourceType_VictorSP, GetChannel());
-  LiveWindow::GetInstance()->AddActuator("VictorSP", GetChannel(), this);
+  SetName("VictorSP", GetChannel());
 }

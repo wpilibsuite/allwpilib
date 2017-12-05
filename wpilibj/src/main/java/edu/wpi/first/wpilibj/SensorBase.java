@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.hal.SolenoidJNI;
  * Base class for all sensors. Stores most recent status information as well as containing utility
  * functions for checking channels and error processing.
  */
-public abstract class SensorBase {
+public abstract class SensorBase extends SendableBase {
   /**
    * Ticks per microsecond.
    */
@@ -66,12 +66,6 @@ public abstract class SensorBase {
   private static int m_defaultSolenoidModule = 0;
 
   /**
-   * Creates an instance of the sensor base and gets an FPGA handle.
-   */
-  public SensorBase() {
-  }
-
-  /**
    * Set the default location for the Solenoid module.
    *
    * @param moduleNumber The number of the solenoid module to use.
@@ -86,7 +80,7 @@ public abstract class SensorBase {
    *
    * @param moduleNumber The solenoid module module number to check.
    */
-  protected static void checkSolenoidModule(final int moduleNumber) {
+  public static void checkSolenoidModule(final int moduleNumber) {
     if (!SolenoidJNI.checkSolenoidModule(moduleNumber)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested solenoid module is out of range. Minimum: 0, Maximum: ")
@@ -103,7 +97,7 @@ public abstract class SensorBase {
    *
    * @param channel The channel number to check.
    */
-  protected static void checkDigitalChannel(final int channel) {
+  public static void checkDigitalChannel(final int channel) {
     if (!DIOJNI.checkDIOChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested DIO channel is out of range. Minimum: 0, Maximum: ")
@@ -120,7 +114,7 @@ public abstract class SensorBase {
    *
    * @param channel The channel number to check.
    */
-  protected static void checkRelayChannel(final int channel) {
+  public static void checkRelayChannel(final int channel) {
     if (!RelayJNI.checkRelayChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested relay channel is out of range. Minimum: 0, Maximum: ")
@@ -137,7 +131,7 @@ public abstract class SensorBase {
    *
    * @param channel The channel number to check.
    */
-  protected static void checkPWMChannel(final int channel) {
+  public static void checkPWMChannel(final int channel) {
     if (!PWMJNI.checkPWMChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested PWM channel is out of range. Minimum: 0, Maximum: ")
@@ -154,7 +148,7 @@ public abstract class SensorBase {
    *
    * @param channel The channel number to check.
    */
-  protected static void checkAnalogInputChannel(final int channel) {
+  public static void checkAnalogInputChannel(final int channel) {
     if (!AnalogJNI.checkAnalogInputChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested analog input channel is out of range. Minimum: 0, Maximum: ")
@@ -171,7 +165,7 @@ public abstract class SensorBase {
    *
    * @param channel The channel number to check.
    */
-  protected static void checkAnalogOutputChannel(final int channel) {
+  public static void checkAnalogOutputChannel(final int channel) {
     if (!AnalogJNI.checkAnalogOutputChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested analog output channel is out of range. Minimum: 0, Maximum: ")
@@ -187,7 +181,7 @@ public abstract class SensorBase {
    *
    * @param channel The channel number to check.
    */
-  protected static void checkSolenoidChannel(final int channel) {
+  public static void checkSolenoidChannel(final int channel) {
     if (!SolenoidJNI.checkSolenoidChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested solenoid channel is out of range. Minimum: 0, Maximum: ")
@@ -204,7 +198,7 @@ public abstract class SensorBase {
    *
    * @param channel The channel number to check.
    */
-  protected static void checkPDPChannel(final int channel) {
+  public static void checkPDPChannel(final int channel) {
     if (!PDPJNI.checkPDPChannel(channel)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested PDP channel is out of range. Minimum: 0, Maximum: ")
@@ -220,7 +214,7 @@ public abstract class SensorBase {
    *
    * @param module The module number to check.
    */
-  protected static void checkPDPModule(final int module) {
+  public static void checkPDPModule(final int module) {
     if (!PDPJNI.checkPDPModule(module)) {
       StringBuilder buf = new StringBuilder();
       buf.append("Requested PDP module is out of range. Minimum: 0, Maximum: ")
@@ -238,11 +232,5 @@ public abstract class SensorBase {
    */
   public static int getDefaultSolenoidModule() {
     return SensorBase.m_defaultSolenoidModule;
-  }
-
-  /**
-   * Free the resources used by this object.
-   */
-  public void free() {
   }
 }

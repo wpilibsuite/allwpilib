@@ -10,7 +10,6 @@
 #include <HAL/HAL.h>
 
 #include "DriverStation.h"
-#include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 
 using namespace frc;
@@ -81,7 +80,7 @@ ADXRS450_Gyro::ADXRS450_Gyro(SPI::Port port) : m_spi(port) {
   Calibrate();
 
   HAL_Report(HALUsageReporting::kResourceType_ADXRS450, port);
-  LiveWindow::GetInstance()->AddSensor("ADXRS450_Gyro", port, this);
+  SetName("ADXRS450_Gyro", port);
 }
 
 static bool CalcParity(int v) {

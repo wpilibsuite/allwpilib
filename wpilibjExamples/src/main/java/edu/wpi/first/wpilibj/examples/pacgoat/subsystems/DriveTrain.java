@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
 import edu.wpi.first.wpilibj.examples.pacgoat.commands.DriveWithJoystick;
@@ -43,14 +42,10 @@ public class DriveTrain extends Subsystem {
 
 	public DriveTrain() {
 		// Configure drive motors
-		LiveWindow.addActuator("DriveTrain", "Front Left CIM",
-				(Victor) m_frontLeftCIM);
-		LiveWindow.addActuator("DriveTrain", "Front Right CIM",
-				(Victor) m_frontRightCIM);
-		LiveWindow.addActuator("DriveTrain", "Back Left CIM",
-				(Victor) m_rearLeftCIM);
-		LiveWindow.addActuator("DriveTrain", "Back Right CIM",
-				(Victor) m_rearRightCIM);
+		addChild("Front Left CIM", (Victor) m_frontLeftCIM);
+		addChild("Front Right CIM", (Victor) m_frontRightCIM);
+		addChild("Back Left CIM", (Victor) m_rearLeftCIM);
+		addChild("Back Right CIM", (Victor) m_rearRightCIM);
 
 		// Configure the DifferentialDrive to reflect the fact that all motors
 		// are wired backwards (right is inverted in DifferentialDrive).
@@ -75,14 +70,14 @@ public class DriveTrain extends Subsystem {
 					(4.0/* in */ * Math.PI) / (360.0 * 12.0/* in/ft */));
 		}
 
-		LiveWindow.addSensor("DriveTrain", "Right Encoder", m_rightEncoder);
-		LiveWindow.addSensor("DriveTrain", "Left Encoder", m_leftEncoder);
+		addChild("Right Encoder", m_rightEncoder);
+		addChild("Left Encoder", m_leftEncoder);
 
 		// Configure gyro
 		if (Robot.isReal()) {
 			m_gyro.setSensitivity(0.007); // TODO: Handle more gracefully?
 		}
-		LiveWindow.addSensor("DriveTrain", "Gyro", m_gyro);
+		addChild("Gyro", m_gyro);
 	}
 
 	/**

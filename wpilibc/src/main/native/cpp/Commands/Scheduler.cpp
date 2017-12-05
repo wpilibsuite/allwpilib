@@ -13,11 +13,15 @@
 #include "Buttons/ButtonScheduler.h"
 #include "Commands/Subsystem.h"
 #include "HLUsageReporting.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
 
-Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
+Scheduler::Scheduler() {
+  HLUsageReporting::ReportScheduler();
+  SetName("Scheduler");
+}
 
 /**
  * Returns the Scheduler, creating it if one does not exist.
@@ -161,8 +165,6 @@ void Scheduler::Run() {
     }
     lock->ConfirmCommand();
   }
-
-  UpdateTable();
 }
 
 /**
@@ -223,12 +225,12 @@ void Scheduler::ResetAll() {
   m_cancelEntry = nt::NetworkTableEntry();
 }
 
-/**
- * Update the network tables associated with the Scheduler object on the
- * SmartDashboard.
- */
-void Scheduler::UpdateTable() {
-  if (m_cancelEntry && m_namesEntry && m_idsEntry) {
+void Scheduler::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Scheduler");
+  m_namesEntry = builder.GetEntry("Names");
+  m_idsEntry = builder.GetEntry("Ids");
+  m_cancelEntry = builder.GetEntry("Cancel");
+  builder.SetUpdateTable([=]() {
     // Get the list of possible commands to cancel
     auto new_toCancel = m_cancelEntry.GetValue();
     if (new_toCancel)
@@ -264,26 +266,5 @@ void Scheduler::UpdateTable() {
       m_namesEntry.SetStringArray(commands);
       m_idsEntry.SetDoubleArray(ids);
     }
-  }
-}
-
-std::string Scheduler::GetName() const { return "Scheduler"; }
-
-std::string Scheduler::GetType() const { return "Scheduler"; }
-
-std::string Scheduler::GetSmartDashboardType() const { return "Scheduler"; }
-
-void Scheduler::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_namesEntry = subTable->GetEntry("Names");
-    m_idsEntry = subTable->GetEntry("Ids");
-    m_cancelEntry = subTable->GetEntry("Cancel");
-    m_namesEntry.SetStringArray(commands);
-    m_idsEntry.SetDoubleArray(ids);
-    m_cancelEntry.SetDoubleArray(toCancel);
-  } else {
-    m_namesEntry = nt::NetworkTableEntry();
-    m_idsEntry = nt::NetworkTableEntry();
-    m_cancelEntry = nt::NetworkTableEntry();
-  }
+  });
 }

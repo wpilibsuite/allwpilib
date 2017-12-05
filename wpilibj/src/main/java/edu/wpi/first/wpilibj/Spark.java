@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * REV Robotics SPARK Speed Controller.
@@ -35,8 +34,8 @@ public class Spark extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    LiveWindow.addActuator("Spark", getChannel(), this);
     HAL.report(tResourceType.kResourceType_RevSPARK, getChannel());
+    setName("Spark", getChannel());
   }
 
   /**

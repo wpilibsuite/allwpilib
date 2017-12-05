@@ -7,14 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -30,7 +26,7 @@ import static java.util.Objects.requireNonNull;
  * channels (forward and reverse) to be used independently for something that does not care about
  * voltage polarity (like a solenoid).
  */
-public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable {
+public class Relay extends SendableBase implements MotorSafety, Sendable {
   private MotorSafetyHelper m_safetyHelper;
 
   /**
@@ -120,7 +116,7 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
     m_safetyHelper = new MotorSafetyHelper(this);
     m_safetyHelper.setSafetyEnabled(false);
 
-    LiveWindow.addActuator("Relay", m_channel, this);
+    setName("Relay", m_channel);
   }
 
   /**
@@ -147,6 +143,11 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
 
   @Override
   public void free() {
+    super.free();
+    freeRelay();
+  }
+
+  private void freeRelay() {
     try {
       RelayJNI.setRelay(m_forwardHandle, false);
     } catch (RuntimeException ex) {
@@ -324,49 +325,16 @@ public class Relay extends SensorBase implements MotorSafety, LiveWindowSendable
       return;
     }
 
-    free();
+    freeRelay();
     m_direction = direction;
     initRelay();
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
   @Override
-  public String getSmartDashboardType() {
-    return "Relay";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-  private int m_valueListener;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setString(get().getPrettyValue());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-    m_valueListener = m_valueEntry.addListener(
-        (event) -> set(Value.getValueOf(event.value.getString()).orElse(Value.kOff)),
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
-    m_valueEntry.removeListener(m_valueListener);
-    m_valueListener = 0;
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Relay");
+    builder.setSafeState(() -> set(Value.kOff));
+    builder.addStringProperty("Value", () -> get().getPrettyValue(),
+        (value) -> set(Value.getValueOf(value).orElse(Value.kOff)));
   }
 }

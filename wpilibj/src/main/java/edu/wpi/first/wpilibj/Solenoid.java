@@ -7,14 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.SolenoidJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Solenoid class for running high voltage Digital Output on the PCM.
@@ -22,7 +18,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * <p>The Solenoid class is typically used for pneumatic solenoids, but could be used for any
  * device within the current spec of the PCM.
  */
-public class Solenoid extends SolenoidBase implements LiveWindowSendable {
+public class Solenoid extends SolenoidBase implements Sendable {
 
   private final int m_channel; // The channel to control.
   private int m_solenoidHandle;
@@ -33,7 +29,7 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
    * @param channel The channel on the PCM to control (0..7).
    */
   public Solenoid(final int channel) {
-    this(getDefaultSolenoidModule(), channel);
+    this(SensorBase.getDefaultSolenoidModule(), channel);
   }
 
   /**
@@ -46,26 +42,24 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     super(moduleNumber);
     m_channel = channel;
 
-    checkSolenoidModule(m_moduleNumber);
-    checkSolenoidChannel(m_channel);
+    SensorBase.checkSolenoidModule(m_moduleNumber);
+    SensorBase.checkSolenoidChannel(m_channel);
 
     int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
     m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
-    LiveWindow.addActuator("Solenoid", m_moduleNumber, m_channel, this);
     HAL.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);
+    setName("Solenoid", m_moduleNumber, m_channel);
   }
 
   /**
    * Destructor.
    */
+  @Override
   public synchronized void free() {
+    super.free();
     SolenoidJNI.freeSolenoidPort(m_solenoidHandle);
     m_solenoidHandle = 0;
-    if (m_valueEntry != null) {
-      m_valueEntry.removeListener(m_valueListener);
-    }
-    super.free();
   }
 
   /**
@@ -122,44 +116,10 @@ public class Solenoid extends SolenoidBase implements LiveWindowSendable {
     SolenoidJNI.fireOneShot(m_solenoidHandle);
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  public String getSmartDashboardType() {
-    return "Solenoid";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-  private int m_valueListener;
-
   @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setBoolean(get());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-    set(false); // Stop for safety
-    m_valueListener = m_valueEntry.addListener((event) -> set(event.value.getBoolean()),
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
-    set(false); // Stop for safety
-    m_valueEntry.removeListener(m_valueListener);
-    m_valueListener = 0;
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Solenoid");
+    builder.setSafeState(() -> set(false));
+    builder.addBooleanProperty("Value", this::get, this::set);
   }
 }
