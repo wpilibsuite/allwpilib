@@ -60,45 +60,91 @@ public class XboxControllerButton extends Button {
   }
 
   /**
-   * TODO: Finish javadocs.
-   * TODO: Use Hand for left/right, possibly.
+   * Create an Xbox Controller button on the left bumper.
+   *
+   * @param controller The XboxController object that has the button
    */
   public static XboxControllerButton getBumperLeftButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kBumperLeft);
   }
 
+  /**
+   * Create an Xbox Controller button on the right bumper.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getBumperRightButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kBumperRight);
   }
 
+  /**
+   * Create an Xbox Controller button on the left stick.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getStickLeftButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kStickLeft);
   }
 
+  /**
+   * Create an Xbox Controller button on the right stick.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getStickRightButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kStickRight);
   }
 
+  /**
+   * Create an Xbox Controller button on the A button.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getAButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kA);
   }
 
+  /**
+   * Create an Xbox Controller button on the B button.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getBButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kB);
   }
 
+  /**
+   * Create an Xbox Controller button on the X button.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getXButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kX);
   }
 
+  /**
+   * Create an Xbox Controller button on the Y button.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getYButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kY);
   }
 
+  /**
+   * Create an Xbox Controller button on the Back button.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getBackButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kBack);
   }
 
+  /**
+   * Create an Xbox Controller button on the Start button.
+   *
+   * @param controller The XboxController object that has the button
+   */
   public static XboxControllerButton getStartButton(XboxController controller) {
     return new XboxControllerButton(controller, Button.kStart);
   }
