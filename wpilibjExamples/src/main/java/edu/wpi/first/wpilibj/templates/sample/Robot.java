@@ -96,19 +96,28 @@ public class Robot extends SampleRobot {
 		// defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
 
+		// MotorSafety improves safety when motors are updated in loops
+		// but is disabled here because motor updates are not looped in
+		// this autonomous mode.
+		m_robotDrive.setSafetyEnabled(false);
+
 		switch (autoSelected) {
 			case kCustomAuto:
-				m_robotDrive.setSafetyEnabled(false);
-				m_robotDrive.arcadeDrive(0.0, 0.5); // spin at half speed
-				Timer.delay(2.0); // for 2 seconds
-				m_robotDrive.arcadeDrive(0.0, 0.0); // stop robot
+				// Spin at half speed for two seconds
+				m_robotDrive.arcadeDrive(0.0, 0.5);
+				Timer.delay(2.0);
+
+				// Stop robot
+				m_robotDrive.arcadeDrive(0.0, 0.0);
 				break;
 			case kDefaultAuto:
 			default:
-				m_robotDrive.setSafetyEnabled(false);
-				m_robotDrive.arcadeDrive(-0.5, 0.0); // drive forwards
-				Timer.delay(2.0); // for 2 seconds
-				m_robotDrive.arcadeDrive(0.0, 0.0); // stop robot
+				// Drive forwards for two seconds
+				m_robotDrive.arcadeDrive(-0.5, 0.0);
+				Timer.delay(2.0);
+
+				// Stop robot
+				m_robotDrive.arcadeDrive(0.0, 0.0);
 				break;
 		}
 	}
@@ -130,9 +139,10 @@ public class Robot extends SampleRobot {
 	public void operatorControl() {
 		m_robotDrive.setSafetyEnabled(true);
 		while (isOperatorControl() && isEnabled()) {
-			// drive arcade style
-			m_robotDrive.arcadeDrive(m_stick.getX(), m_stick.getY());
-			// wait for a motor update time
+			// Drive arcade style
+			m_robotDrive.arcadeDrive(-m_stick.getY(), m_stick.getX());
+
+			// The motors will be updated every 5ms
 			Timer.delay(0.005);
 		}
 	}

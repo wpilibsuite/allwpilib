@@ -61,27 +61,30 @@ public:
 		// "Auto Selector", kAutoNameDefault);
 		std::cout << "Auto selected: " << autoSelected << std::endl;
 
+		// MotorSafety improves safety when motors are updated in loops
+		// but is disabled here because motor updates are not looped in
+		// this autonomous mode.
+		m_robotDrive.SetSafetyEnabled(false);
+
 		if (autoSelected == kAutoNameCustom) {
 			// Custom Auto goes here
 			std::cout << "Running custom Autonomous" << std::endl;
-			m_robotDrive.SetSafetyEnabled(false);
 
-			// spin at half speed for two seconds
+			// Spin at half speed for two seconds
 			m_robotDrive.ArcadeDrive(0.0, 0.5);
 			frc::Wait(2.0);
 
-			// stop robot
+			// Stop robot
 			m_robotDrive.ArcadeDrive(0.0, 0.0);
 		} else {
 			// Default Auto goes here
 			std::cout << "Running default Autonomous" << std::endl;
-			m_robotDrive.SetSafetyEnabled(false);
 
-			// drive forwards at half speed for two seconds
+			// Drive forwards at half speed for two seconds
 			m_robotDrive.ArcadeDrive(-0.5, 0.0);
 			frc::Wait(2.0);
 
-			// stop robot
+			// Stop robot
 			m_robotDrive.ArcadeDrive(0.0, 0.0);
 		}
 	}
@@ -92,11 +95,11 @@ public:
 	void OperatorControl() override {
 		m_robotDrive.SetSafetyEnabled(true);
 		while (IsOperatorControl() && IsEnabled()) {
-			// drive with arcade style (use right stick)
+			// Drive with arcade style (use right stick)
 			m_robotDrive.ArcadeDrive(
-					m_stick.GetY(), m_stick.GetX());
+					-m_stick.GetY(), m_stick.GetX());
 
-			// wait for a motor update time
+			// The motors will be updated every 5ms
 			frc::Wait(0.005);
 		}
 	}
