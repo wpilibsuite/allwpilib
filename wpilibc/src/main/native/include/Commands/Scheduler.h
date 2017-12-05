@@ -12,12 +12,12 @@
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTableEntry.h>
 #include <support/mutex.h>
 
 #include "Commands/Command.h"
 #include "ErrorBase.h"
 #include "SmartDashboard/SendableBase.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 

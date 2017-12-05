@@ -10,6 +10,7 @@
 #include <cstdio>
 
 #include <HAL/HAL.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "DriverStation.h"
 #include "HLUsageReporting.h"
@@ -19,7 +20,6 @@
 #include "SmartDashboard/SmartDashboard.h"
 #include "Utility.h"
 #include "WPILibVersion.h"
-#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 

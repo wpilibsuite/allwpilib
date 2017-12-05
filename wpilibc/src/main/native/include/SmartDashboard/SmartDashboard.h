@@ -11,8 +11,9 @@
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTableValue.h>
+
 #include "SensorBase.h"
-#include "networktables/NetworkTableValue.h"
 
 namespace frc {
 

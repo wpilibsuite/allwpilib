@@ -9,8 +9,9 @@
 
 #include <string>
 
+#include <networktables/NetworkTableEntry.h>
+
 #include "SmartDashboard/SendableBase.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 

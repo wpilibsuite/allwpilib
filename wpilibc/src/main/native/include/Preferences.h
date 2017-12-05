@@ -13,8 +13,9 @@
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTable.h>
+
 #include "ErrorBase.h"
-#include "networktables/NetworkTable.h"
 
 namespace frc {
 

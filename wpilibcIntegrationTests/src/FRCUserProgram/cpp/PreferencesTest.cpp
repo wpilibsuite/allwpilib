@@ -10,9 +10,10 @@
 #include <cstdio>
 #include <fstream>
 
+#include <networktables/NetworkTableInstance.h>
+
 #include "Timer.h"
 #include "gtest/gtest.h"
-#include "networktables/NetworkTableInstance.h"
 #include "ntcore.h"
 
 using namespace frc;
