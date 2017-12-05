@@ -16,7 +16,7 @@ public class XboxControllerButton extends Button {
   /**
    * Represents a digital button on an XboxController.
    */
-  public enum Button {
+  private enum Button {
     kBumperLeft(5),
     kBumperRight(6),
     kStickLeft(9),
@@ -45,7 +45,7 @@ public class XboxControllerButton extends Button {
    * @param controller   The XboxController object that has the button
    * @param button       The button to use (see {@link XboxControllerButton.Button}
    */
-  public XboxControllerButton(XboxController controller, XboxControllerButton.Button button) {
+  private XboxControllerButton(XboxController controller, XboxControllerButton.Button button) {
     m_controller = controller;
     m_buttonNumber = button.value;
   }
@@ -57,5 +57,49 @@ public class XboxControllerButton extends Button {
    */
   public boolean get() {
     return m_controller.getRawButton(m_buttonNumber);
+  }
+
+  /**
+   * TODO: Finish javadocs.
+   * TODO: Use Hand for left/right, possibly.
+   */
+  public static XboxControllerButton getBumperLeftButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kBumperLeft);
+  }
+
+  public static XboxControllerButton getBumperRightButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kBumperRight);
+  }
+
+  public static XboxControllerButton getStickLeftButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kStickLeft);
+  }
+
+  public static XboxControllerButton getStickRightButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kStickRight);
+  }
+
+  public static XboxControllerButton getAButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kA);
+  }
+
+  public static XboxControllerButton getBButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kB);
+  }
+
+  public static XboxControllerButton getXButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kX);
+  }
+
+  public static XboxControllerButton getYButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kY);
+  }
+
+  public static XboxControllerButton getBackButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kBack);
+  }
+
+  public static XboxControllerButton getStartButton(XboxController controller) {
+    return new XboxControllerButton(controller, Button.kStart);
   }
 }
