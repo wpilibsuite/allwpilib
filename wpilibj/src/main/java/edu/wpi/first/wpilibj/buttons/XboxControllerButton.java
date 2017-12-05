@@ -36,26 +36,26 @@ public class XboxControllerButton extends Button {
     }
   }
 
-  private final XboxController m_joystick;
+  private final XboxController m_controller;
   private final int m_buttonNumber;
 
   /**
-   * Create a joystick button for triggering commands.
+   * Create an Xbox Controller button for triggering commands.
    *
-   * @param joystick     The XboxController object that has the button
-   * @param button The button to use (see {@link XboxControllerButton.Button}
+   * @param controller   The XboxController object that has the button
+   * @param button       The button to use (see {@link XboxControllerButton.Button}
    */
-  public XboxControllerButton(XboxController joystick, XboxControllerButton.Button button) {
-    m_joystick = joystick;
+  public XboxControllerButton(XboxController controller, XboxControllerButton.Button button) {
+    m_controller = controller;
     m_buttonNumber = button.value;
   }
 
   /**
-   * Gets the value of the joystick button.
+   * Gets the value of the controller button.
    *
-   * @return The value of the joystick button
+   * @return The value of the controller button
    */
   public boolean get() {
-    return m_joystick.getRawButton(m_buttonNumber);
+    return m_controller.getRawButton(m_buttonNumber);
   }
 }
