@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "Base.h"
 #include "Controller.h"
 
 namespace frc {

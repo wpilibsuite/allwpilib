@@ -17,6 +17,7 @@ namespace frc {
 class SpeedController : public PIDOutput {
  public:
   virtual ~SpeedController() = default;
+
   /**
    * Common interface for setting the speed of a speed controller.
    *
