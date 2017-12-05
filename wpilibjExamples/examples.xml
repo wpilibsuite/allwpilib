@@ -252,6 +252,45 @@
         </files>
     </example>
     <example>
+        <name>PacGoat</name>
+        <description>A fully functional example CommandBased program for FRC Team 190's 2014
+            robot. This code can run on your computer if it supports simulation.</description>
+        <tags>
+            <tag>Complete Robot</tag>
+        </tags>
+        <world>/usr/share/frcsim/worlds/PacGoat2014.world</world>
+        <packages>
+            <package>src/$package-dir</package>
+            <package>src/$package-dir/commands</package>
+            <package>src/$package-dir/subsystems</package>
+            <package>src/$package-dir/triggers</package>
+        </packages>
+        <files>
+            <file source="examples/pacgoat/OI.java" destination="src/$package-dir/OI.java" />
+            <file source="examples/pacgoat/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/pacgoat/commands/CheckForHotGoal.java" destination="src/$package-dir/commands/CheckForHotGoal.java" />
+            <file source="examples/pacgoat/commands/CloseClaw.java" destination="src/$package-dir/commands/CloseClaw.java" />
+            <file source="examples/pacgoat/commands/Collect.java" destination="src/$package-dir/commands/Collect.java" />
+            <file source="examples/pacgoat/commands/DriveAndShootAutonomous.java" destination="src/$package-dir/commands/DriveAndShootAutonomous.java" />
+            <file source="examples/pacgoat/commands/DriveForward.java" destination="src/$package-dir/commands/DriveForward.java" />
+            <file source="examples/pacgoat/commands/DriveWithJoystick.java" destination="src/$package-dir/commands/DriveWithJoystick.java" />
+            <file source="examples/pacgoat/commands/ExtendShooter.java" destination="src/$package-dir/commands/ExtendShooter.java" />
+            <file source="examples/pacgoat/commands/LowGoal.java" destination="src/$package-dir/commands/LowGoal.java" />
+            <file source="examples/pacgoat/commands/OpenClaw.java" destination="src/$package-dir/commands/OpenClaw.java" />
+            <file source="examples/pacgoat/commands/SetCollectionSpeed.java" destination="src/$package-dir/commands/SetCollectionSpeed.java" />
+            <file source="examples/pacgoat/commands/SetPivotSetpoint.java" destination="src/$package-dir/commands/SetPivotSetpoint.java" />
+            <file source="examples/pacgoat/commands/Shoot.java" destination="src/$package-dir/commands/Shoot.java" />
+            <file source="examples/pacgoat/commands/WaitForBall.java" destination="src/$package-dir/commands/WaitForBall.java" />
+            <file source="examples/pacgoat/commands/WaitForPressure.java" destination="src/$package-dir/commands/WaitForPressure.java" />
+            <file source="examples/pacgoat/subsystems/Collector.java" destination="src/$package-dir/subsystems/Collector.java" />
+            <file source="examples/pacgoat/subsystems/DriveTrain.java" destination="src/$package-dir/subsystems/DriveTrain.java" />
+            <file source="examples/pacgoat/subsystems/Pivot.java" destination="src/$package-dir/subsystems/Pivot.java" />
+            <file source="examples/pacgoat/subsystems/Pneumatics.java" destination="src/$package-dir/subsystems/Pneumatics.java" />
+            <file source="examples/pacgoat/subsystems/Shooter.java" destination="src/$package-dir/subsystems/Shooter.java" />
+            <file source="examples/pacgoat/triggers/DoubleButton.java" destination="src/$package-dir/triggers/DoubleButton.java" />
+        </files>
+    </example>
+    <example>
         <name>Simple Vision</name>
         <description>Demonstrate the use of the CameraServer class to stream from a USB Webcam
             without processing the images.</description>
