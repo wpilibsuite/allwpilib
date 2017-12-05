@@ -7,9 +7,15 @@
 
 #include "Filters/Filter.h"
 
+#include "Base.h"
+
 using namespace frc;
 
-Filter::Filter(std::shared_ptr<PIDSource> source) { m_source = source; }
+Filter::Filter(PIDSource& source)
+    : m_source(std::shared_ptr<PIDSource>(&source, NullDeleter<PIDSource>())) {}
+
+Filter::Filter(std::shared_ptr<PIDSource> source)
+    : m_source(std::move(source)) {}
 
 void Filter::SetPIDSourceType(PIDSourceType pidSource) {
   m_source->SetPIDSourceType(pidSource);
