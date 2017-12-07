@@ -83,6 +83,14 @@ namespace nUsageReporting
         kResourceType_PCM, // 60
         kResourceType_PigeonIMU,
         kResourceType_NidecBrushless,
+        kResourceType_CANifier,
+        kResourceType_CTRE_future0,
+        kResourceType_CTRE_future1,
+        kResourceType_CTRE_future2,
+        kResourceType_CTRE_future3,
+        kResourceType_CTRE_future4,
+        kResourceType_CTRE_future5,
+        kResourceType_CTRE_future6, // 70
     } tResourceType;
 
     typedef enum

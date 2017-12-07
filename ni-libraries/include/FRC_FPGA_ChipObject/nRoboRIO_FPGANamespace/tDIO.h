@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2018_18_0_5_DIO_h__
-#define __nFRC_2018_18_0_5_DIO_h__
+#ifndef __nFRC_2018_18_0_7_DIO_h__
+#define __nFRC_2018_18_0_7_DIO_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2018_18_0_5
+namespace nFRC_2018_18_0_7
 {
 
 class tDIO
@@ -261,4 +261,4 @@ private:
 }
 }
 
-#endif // __nFRC_2018_18_0_5_DIO_h__
+#endif // __nFRC_2018_18_0_7_DIO_h__
