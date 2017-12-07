@@ -9,11 +9,17 @@
 
 #include <stdint.h>
 
+#include <memory>
+
+#include <llvm/ArrayRef.h>
+
 #include "ErrorBase.h"
 
 enum HAL_SPIPort : int32_t;
 
 namespace frc {
+
+class DigitalSource;
 
 /**
  * SPI bus interface class.
@@ -50,6 +56,16 @@ class SPI : public ErrorBase {
   virtual int Read(bool initiate, uint8_t* dataReceived, int size);
   virtual int Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size);
 
+  void InitAuto(int bufferSize);
+  void FreeAuto();
+  void SetAutoTransmitData(llvm::ArrayRef<uint8_t> dataToSend, int zeroSize);
+  void StartAutoRate(double period);
+  void StartAutoTrigger(DigitalSource& source, bool rising, bool falling);
+  void StopAuto();
+  void ForceAutoRead();
+  int ReadAutoReceivedData(uint8_t* buffer, int numToRead, double timeout);
+  int GetAutoDroppedCount();
+
   void InitAccumulator(double period, int cmd, int xferSize, int validMask,
                        int validValue, int dataShift, int dataSize,
                        bool isSigned, bool bigEndian);
@@ -71,6 +87,9 @@ class SPI : public ErrorBase {
 
  private:
   void Init();
+
+  class Accumulator;
+  std::unique_ptr<Accumulator> m_accum;
 };
 
 }  // namespace frc

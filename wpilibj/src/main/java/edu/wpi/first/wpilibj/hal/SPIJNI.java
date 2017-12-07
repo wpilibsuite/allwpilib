@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import edu.wpi.first.wpilibj.AccumulatorResult;
 import java.nio.ByteBuffer;
 
 @SuppressWarnings("AbbreviationAsWordInName")
@@ -39,25 +38,27 @@ public class SPIJNI extends JNIWrapper {
 
   public static native void spiSetChipSelectActiveLow(int port);
 
-  public static native void spiInitAccumulator(int port, int period, int cmd, byte xferSize,
-                                               int validMask, int validValue, byte dataShift,
-                                               byte dataSize, boolean isSigned, boolean bigEndian);
+  public static native void spiInitAuto(int port, int bufferSize);
 
-  public static native void spiFreeAccumulator(int port);
+  public static native void spiFreeAuto(int port);
 
-  public static native void spiResetAccumulator(int port);
+  public static native void spiStartAutoRate(int port, double period);
 
-  public static native void spiSetAccumulatorCenter(int port, int center);
+  public static native void spiStartAutoTrigger(int port, int digitalSourceHandle,
+                                                int analogTriggerType, boolean triggerRising,
+                                                boolean triggerFalling);
 
-  public static native void spiSetAccumulatorDeadband(int port, int deadband);
+  public static native void spiStopAuto(int port);
 
-  public static native int spiGetAccumulatorLastValue(int port);
+  public static native void spiSetAutoTransmitData(int port, byte[] dataToSend, int zeroSize);
 
-  public static native long spiGetAccumulatorValue(int port);
+  public static native void spiForceAutoRead(int port);
 
-  public static native int spiGetAccumulatorCount(int port);
+  public static native int spiReadAutoReceivedData(int port, ByteBuffer buffer, int numToRead,
+                                                   double timeout);
 
-  public static native double spiGetAccumulatorAverage(int port);
+  public static native int spiReadAutoReceivedData(int port, byte[] buffer, int numToRead,
+                                                   double timeout);
 
-  public static native void spiGetAccumulatorOutput(int port, AccumulatorResult result);
+  public static native int spiGetAutoDroppedCount(int port);
 }

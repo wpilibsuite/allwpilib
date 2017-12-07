@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 
+#include "HAL/AnalogTrigger.h"
 #include "HAL/Types.h"
 
 enum HAL_SPIPort : int32_t {
@@ -38,23 +39,23 @@ void HAL_SetSPIChipSelectActiveLow(HAL_SPIPort port, int32_t* status);
 int32_t HAL_GetSPIHandle(HAL_SPIPort port);
 void HAL_SetSPIHandle(HAL_SPIPort port, int32_t handle);
 
-void HAL_InitSPIAccumulator(HAL_SPIPort port, int32_t period, int32_t cmd,
-                            int32_t xferSize, int32_t validMask,
-                            int32_t validValue, int32_t dataShift,
-                            int32_t dataSize, HAL_Bool isSigned,
-                            HAL_Bool bigEndian, int32_t* status);
-void HAL_FreeSPIAccumulator(HAL_SPIPort port, int32_t* status);
-void HAL_ResetSPIAccumulator(HAL_SPIPort port, int32_t* status);
-void HAL_SetSPIAccumulatorCenter(HAL_SPIPort port, int32_t center,
-                                 int32_t* status);
-void HAL_SetSPIAccumulatorDeadband(HAL_SPIPort port, int32_t deadband,
-                                   int32_t* status);
-int32_t HAL_GetSPIAccumulatorLastValue(HAL_SPIPort port, int32_t* status);
-int64_t HAL_GetSPIAccumulatorValue(HAL_SPIPort port, int32_t* status);
-int64_t HAL_GetSPIAccumulatorCount(HAL_SPIPort port, int32_t* status);
-double HAL_GetSPIAccumulatorAverage(HAL_SPIPort port, int32_t* status);
-void HAL_GetSPIAccumulatorOutput(HAL_SPIPort port, int64_t* value,
-                                 int64_t* count, int32_t* status);
+void HAL_InitSPIAuto(HAL_SPIPort port, int32_t bufferSize, int32_t* status);
+void HAL_FreeSPIAuto(HAL_SPIPort port, int32_t* status);
+void HAL_StartSPIAutoRate(HAL_SPIPort port, double period, int32_t* status);
+void HAL_StartSPIAutoTrigger(HAL_SPIPort port, HAL_Handle digitalSourceHandle,
+                             HAL_AnalogTriggerType analogTriggerType,
+                             HAL_Bool triggerRising, HAL_Bool triggerFalling,
+                             int32_t* status);
+void HAL_StopSPIAuto(HAL_SPIPort port, int32_t* status);
+void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
+                                int32_t dataSize, int32_t zeroSize,
+                                int32_t* status);
+void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status);
+int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
+                                    int32_t numToRead, double timeout,
+                                    int32_t* status);
+int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
