@@ -219,8 +219,6 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-  // Because of a bug in FPGA image 10, just return the lower 32 bits of time.
-  return global->readLocalTime(status);
 
   uint64_t upper1 = global->readLocalTimeUpper(status);
   uint32_t lower = global->readLocalTime(status);
