@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2018_18_0_5_SPI_h__
-#define __nFRC_2018_18_0_5_SPI_h__
+#ifndef __nFRC_2018_18_0_7_SPI_h__
+#define __nFRC_2018_18_0_7_SPI_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2018_18_0_5
+namespace nFRC_2018_18_0_7
 {
 
 class tSPI
@@ -49,6 +49,21 @@ public:
          unsigned value : 9;
       };
    } tAutoTriggerConfig;
+   typedef
+   union{
+      struct{
+#ifdef __vxworks
+         unsigned TxByteCount : 4;
+         unsigned ZeroByteCount : 7;
+#else
+         unsigned ZeroByteCount : 7;
+         unsigned TxByteCount : 4;
+#endif
+      };
+      struct{
+         unsigned value : 11;
+      };
+   } tAutoByteCount;
    typedef
    union{
       struct{
@@ -118,10 +133,21 @@ public:
 
    typedef enum
    {
+   } tTransferSkippedFullCount_IfaceConstants;
+
+   virtual unsigned int readTransferSkippedFullCount(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
    } tAutoByteCount_IfaceConstants;
 
-   virtual void writeAutoByteCount(unsigned char value, tRioStatusCode *status) = 0;
-   virtual unsigned char readAutoByteCount(tRioStatusCode *status) = 0;
+   virtual void writeAutoByteCount(tAutoByteCount value, tRioStatusCode *status) = 0;
+   virtual void writeAutoByteCount_TxByteCount(unsigned char value, tRioStatusCode *status) = 0;
+   virtual void writeAutoByteCount_ZeroByteCount(unsigned char value, tRioStatusCode *status) = 0;
+   virtual tAutoByteCount readAutoByteCount(tRioStatusCode *status) = 0;
+   virtual unsigned char readAutoByteCount_TxByteCount(tRioStatusCode *status) = 0;
+   virtual unsigned char readAutoByteCount_ZeroByteCount(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -208,4 +234,4 @@ private:
 }
 }
 
-#endif // __nFRC_2018_18_0_5_SPI_h__
+#endif // __nFRC_2018_18_0_7_SPI_h__
