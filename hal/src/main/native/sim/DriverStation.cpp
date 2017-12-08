@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <thread>
 
 #include <support/condition_variable.h>
 #include <support/mutex.h>
@@ -257,6 +258,7 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   std::unique_lock<wpi::mutex> lock(newDSDataAvailableMutex);
   int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
     if (timeout > 0) {
       auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
       if (timedOut == std::cv_status::timeout) {
