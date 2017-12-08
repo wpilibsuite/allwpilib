@@ -12,13 +12,13 @@
 #include <llvm/DenseMap.h>
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
 #include <support/mutex.h>
 
 #include "Commands/Scheduler.h"
 #include "SmartDashboard/SendableBuilderImpl.h"
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableEntry.h"
-#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 

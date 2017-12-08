@@ -10,10 +10,10 @@
 #include <memory>
 
 #include <llvm/Twine.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
 
 #include "Buttons/Button.h"
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 

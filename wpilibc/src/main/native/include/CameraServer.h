@@ -17,11 +17,11 @@
 #include <llvm/DenseMap.h>
 #include <llvm/StringMap.h>
 #include <llvm/StringRef.h>
+#include <networktables/NetworkTable.h>
 #include <support/mutex.h>
 
 #include "ErrorBase.h"
 #include "cscore.h"
-#include "networktables/NetworkTable.h"
 
 namespace frc {
 

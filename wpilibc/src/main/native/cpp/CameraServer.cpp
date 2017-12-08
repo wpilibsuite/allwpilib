@@ -10,10 +10,10 @@
 #include <HAL/HAL.h>
 #include <llvm/SmallString.h>
 #include <llvm/raw_ostream.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "Utility.h"
 #include "WPIErrors.h"
-#include "networktables/NetworkTableInstance.h"
 #include "ntcore_cpp.h"
 
 using namespace frc;

@@ -7,8 +7,8 @@
 
 #include "Buttons/NetworkButton.h"
 
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableInstance.h"
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 
 using namespace frc;
 

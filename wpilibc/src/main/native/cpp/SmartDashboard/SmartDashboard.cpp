@@ -8,14 +8,14 @@
 #include "SmartDashboard/SmartDashboard.h"
 
 #include <llvm/StringMap.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 #include <support/mutex.h>
 
 #include "HLUsageReporting.h"
 #include "SmartDashboard/Sendable.h"
 #include "SmartDashboard/SendableBuilderImpl.h"
 #include "WPIErrors.h"
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 

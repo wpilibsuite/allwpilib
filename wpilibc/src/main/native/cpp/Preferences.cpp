@@ -11,9 +11,9 @@
 
 #include <HAL/HAL.h>
 #include <llvm/StringRef.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "WPIErrors.h"
-#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 

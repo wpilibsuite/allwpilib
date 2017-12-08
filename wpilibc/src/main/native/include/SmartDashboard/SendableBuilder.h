@@ -15,9 +15,8 @@
 #include <llvm/ArrayRef.h>
 #include <llvm/SmallVector.h>
 #include <llvm/Twine.h>
-
-#include "networktables/NetworkTableEntry.h"
-#include "networktables/NetworkTableValue.h"
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableValue.h>
 
 namespace frc {
 

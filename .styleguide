@@ -31,6 +31,7 @@ modifiableFileExclude {
 includeOtherLibs {
   ^HAL/
   ^llvm/
+  ^networktables/
   ^opencv2/
   ^support/
 }
