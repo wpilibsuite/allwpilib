@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "NTProvider_DIO.h"
+
 #include <HAL/Ports.h>
 #include <MockData/DIOData.h>
-
-#include <NTProvider_DIO.h>
 
 void HALSimNTProviderDIO::Initialize() {
     InitializeDefault(HAL_GetNumDigitalChannels(), HALSIM_RegisterDIOAllCallbacks);

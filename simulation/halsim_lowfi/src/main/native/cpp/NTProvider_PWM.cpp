@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "NTProvider_PWM.h"
+
 #include <HAL/Ports.h>
 #include <MockData/PWMData.h>
-
-#include <NTProvider_PWM.h>
 
 void HALSimNTProviderPWM::Initialize() {
     InitializeDefault(HAL_GetNumPWMChannels(), HALSIM_RegisterPWMAllCallbacks);

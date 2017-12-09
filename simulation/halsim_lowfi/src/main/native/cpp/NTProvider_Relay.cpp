@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "NTProvider_Relay.h"
+
 #include <HAL/Ports.h>
 #include <MockData/RelayData.h>
-
-#include <NTProvider_Relay.h>
 
 void HALSimNTProviderRelay::Initialize() {
     InitializeDefault(HAL_GetNumRelayHeaders(), HALSIM_RegisterRelayAllCallbacks);

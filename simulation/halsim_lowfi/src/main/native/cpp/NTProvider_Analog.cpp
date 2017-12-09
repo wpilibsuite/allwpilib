@@ -5,11 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "NTProvider_Analog.h"
+
 #include <HAL/Ports.h>
 #include <MockData/AnalogInData.h>
 #include <MockData/AnalogOutData.h>
-
-#include <NTProvider_Analog.h>
 
 void HALSimNTProviderAnalogIn::Initialize() {
     InitializeDefault(HAL_GetNumAnalogInputs(), HALSIM_RegisterAnalogInAllCallbacks);

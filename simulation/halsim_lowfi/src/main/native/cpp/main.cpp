@@ -8,14 +8,14 @@
 #include <iostream>
 
 #include <HALSimLowFi.h>
-#include <NTProvider_PWM.h>
-#include <NTProvider_dPWM.h>
-#include <NTProvider_DIO.h>
 #include <NTProvider_Analog.h>
+#include <NTProvider_DIO.h>
 #include <NTProvider_DriverStation.h>
 #include <NTProvider_Encoder.h>
+#include <NTProvider_PWM.h>
 #include <NTProvider_Relay.h>
 #include <NTProvider_RoboRIO.h>
+#include <NTProvider_dPWM.h>
 
 static HALSimLowFi halsim_lowfi;
 

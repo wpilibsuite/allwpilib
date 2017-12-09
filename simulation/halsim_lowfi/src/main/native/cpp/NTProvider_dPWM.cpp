@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "NTProvider_dPWM.h"
+
 #include <HAL/Ports.h>
 #include <MockData/DigitalPWMData.h>
-
-#include <NTProvider_dPWM.h>
 
 void HALSimNTProviderDigitalPWM::Initialize() {
     InitializeDefault(HAL_GetNumDigitalPWMOutputs(), HALSIM_RegisterDigitalPWMAllCallbacks);

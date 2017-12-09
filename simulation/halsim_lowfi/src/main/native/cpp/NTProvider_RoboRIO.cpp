@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "NTProvider_RoboRIO.h"
+
 #include <HAL/Ports.h>
 #include <MockData/RoboRioData.h>
-
-#include <NTProvider_RoboRIO.h>
 
 void HALSimNTProviderRoboRIO::Initialize() {
     InitializeDefault(1, HALSIM_RegisterRoboRioAllCallbacks);

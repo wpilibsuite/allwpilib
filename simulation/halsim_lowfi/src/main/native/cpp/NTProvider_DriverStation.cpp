@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "NTProvider_DriverStation.h"
+
 #include <HAL/Ports.h>
 #include <MockData/DriverStationData.h>
-
-#include <NTProvider_DriverStation.h>
 
 void HALSimNTProviderDriverStation::Initialize() {
     InitializeDefaultSingle(HALSIM_RegisterDriverStationAllCallbacks);
@@ -41,7 +41,7 @@ void HALSimNTProviderDriverStation::OnCallback(uint32_t chan, std::shared_ptr<nt
     int station = 0;
 
     switch (allianceValue) {
-    case HAL_AllianceStationID_kRed1: 
+    case HAL_AllianceStationID_kRed1:
     case HAL_AllianceStationID_kBlue1:
         station = 1;
         break;

@@ -5,10 +5,10 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "NTProvider_Encoder.h"
+
 #include <HAL/Ports.h>
 #include <MockData/EncoderData.h>
-
-#include <NTProvider_Encoder.h>
 
 void HALSimNTProviderEncoder::Initialize() {
     InitializeDefault(HAL_GetNumEncoders(), HALSIM_RegisterEncoderAllCallbacks);
@@ -29,7 +29,7 @@ void HALSimNTProviderEncoder::OnCallback(uint32_t chan, std::shared_ptr<nt::Netw
 
 void HALSimNTProviderEncoder::OnInitializedChannel(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
     table->GetEntry("count").AddListener([chan, table](const nt::EntryNotification &ev) -> void {
-        HALSIM_SetEncoderCount(chan, (int32_t) ev.value->GetDouble());
+        HALSIM_SetEncoderCount(chan, static_cast<int32_t>(ev.value->GetDouble()));
     }, NT_NotifyKind::NT_NOTIFY_UPDATE);
 
     table->GetEntry("direction").AddListener([chan, table](const nt::EntryNotification &ev) -> void {

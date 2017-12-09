@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <HALSimLowFi.h>
+#include "HALSimLowFi.h"
 
 void HALSimLowFi::Initialize() {
     table = nt::NetworkTableInstance::GetDefault().GetTable("sim");
@@ -21,7 +21,7 @@ void HALSimNTProvider::Inject(std::shared_ptr<HALSimLowFi> parentArg, std::strin
 
 void NTProviderBaseCallback(const char *name, void *param, const struct HAL_Value *value) {
     auto info = static_cast<struct HALSimNTProvider::NTProviderCallbackInfo *>(param);
-    uint32_t chan = (uint32_t)info->channel;
+    uint32_t chan = static_cast<uint32_t>(info->channel);
     auto provider = info->provider;
     auto table = info->table;
     provider->OnCallback(chan, table);

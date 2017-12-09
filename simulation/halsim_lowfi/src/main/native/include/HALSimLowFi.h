@@ -9,8 +9,11 @@
 
 #include <networktables/NetworkTableInstance.h>
 
-#include <vector>
 #include <cinttypes>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include <MockData/NotifyListener.h>
 
 class HALSimLowFi {
