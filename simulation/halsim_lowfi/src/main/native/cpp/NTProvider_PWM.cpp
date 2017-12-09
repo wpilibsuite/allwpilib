@@ -11,16 +11,16 @@
 #include <MockData/PWMData.h>
 
 void HALSimNTProviderPWM::Initialize() {
-    InitializeDefault(HAL_GetNumPWMChannels(), HALSIM_RegisterPWMAllCallbacks);
+  InitializeDefault(HAL_GetNumPWMChannels(), HALSIM_RegisterPWMAllCallbacks);
 }
 
 void HALSimNTProviderPWM::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init?").SetBoolean(HALSIM_GetPWMInitialized(chan));
-    table->GetEntry("speed").SetDouble(HALSIM_GetPWMSpeed(chan));
-    table->GetEntry("position").SetDouble(HALSIM_GetPWMPosition(chan));
-    table->GetEntry("raw").SetDouble(HALSIM_GetPWMRawValue(chan));
-    table->GetEntry("period_scale").SetDouble(HALSIM_GetPWMPeriodScale(chan));
-    table->GetEntry("zero_latch?").SetBoolean(HALSIM_GetPWMZeroLatch(chan));
+  table->GetEntry("init?").SetBoolean(HALSIM_GetPWMInitialized(chan));
+  table->GetEntry("speed").SetDouble(HALSIM_GetPWMSpeed(chan));
+  table->GetEntry("position").SetDouble(HALSIM_GetPWMPosition(chan));
+  table->GetEntry("raw").SetDouble(HALSIM_GetPWMRawValue(chan));
+  table->GetEntry("period_scale").SetDouble(HALSIM_GetPWMPeriodScale(chan));
+  table->GetEntry("zero_latch?").SetBoolean(HALSIM_GetPWMZeroLatch(chan));
 
-    table->GetInstance().Flush();
+  table->GetInstance().Flush();
 }

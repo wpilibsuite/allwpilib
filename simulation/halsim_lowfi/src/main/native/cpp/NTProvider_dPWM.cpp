@@ -11,13 +11,13 @@
 #include <MockData/DigitalPWMData.h>
 
 void HALSimNTProviderDigitalPWM::Initialize() {
-    InitializeDefault(HAL_GetNumDigitalPWMOutputs(), HALSIM_RegisterDigitalPWMAllCallbacks);
+  InitializeDefault(HAL_GetNumDigitalPWMOutputs(), HALSIM_RegisterDigitalPWMAllCallbacks);
 }
 
 void HALSimNTProviderDigitalPWM::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init?").SetBoolean(HALSIM_GetDigitalPWMInitialized(chan));
-    table->GetEntry("dio_pin").SetDouble(HALSIM_GetDigitalPWMPin(chan));
-    table->GetEntry("duty_cycle").SetDouble(HALSIM_GetDigitalPWMDutyCycle(chan));
+  table->GetEntry("init?").SetBoolean(HALSIM_GetDigitalPWMInitialized(chan));
+  table->GetEntry("dio_pin").SetDouble(HALSIM_GetDigitalPWMPin(chan));
+  table->GetEntry("duty_cycle").SetDouble(HALSIM_GetDigitalPWMDutyCycle(chan));
 
-    table->GetInstance().Flush();
+  table->GetInstance().Flush();
 }

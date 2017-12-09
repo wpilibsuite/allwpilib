@@ -11,6 +11,6 @@
 
 class HALSimNTProviderDigitalPWM : public HALSimNTProvider {
 public:
-    void Initialize() override;
-    void OnCallback(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
+  void Initialize() override;
+  void OnCallback(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
 };

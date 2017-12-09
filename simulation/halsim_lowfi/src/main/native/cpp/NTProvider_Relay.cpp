@@ -11,14 +11,14 @@
 #include <MockData/RelayData.h>
 
 void HALSimNTProviderRelay::Initialize() {
-    InitializeDefault(HAL_GetNumRelayHeaders(), HALSIM_RegisterRelayAllCallbacks);
+  InitializeDefault(HAL_GetNumRelayHeaders(), HALSIM_RegisterRelayAllCallbacks);
 }
 
 void HALSimNTProviderRelay::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init_fwd?").SetBoolean(HALSIM_GetRelayInitializedForward(chan));
-    table->GetEntry("init_rvs?").SetBoolean(HALSIM_GetRelayInitializedReverse(chan));
-    table->GetEntry("fwd?").SetBoolean(HALSIM_GetRelayForward(chan));
-    table->GetEntry("rvs?").SetBoolean(HALSIM_GetRelayReverse(chan));
+  table->GetEntry("init_fwd?").SetBoolean(HALSIM_GetRelayInitializedForward(chan));
+  table->GetEntry("init_rvs?").SetBoolean(HALSIM_GetRelayInitializedReverse(chan));
+  table->GetEntry("fwd?").SetBoolean(HALSIM_GetRelayForward(chan));
+  table->GetEntry("rvs?").SetBoolean(HALSIM_GetRelayReverse(chan));
 
-    table->GetInstance().Flush();
+  table->GetInstance().Flush();
 }

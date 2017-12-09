@@ -12,37 +12,37 @@
 #include <MockData/AnalogOutData.h>
 
 void HALSimNTProviderAnalogIn::Initialize() {
-    InitializeDefault(HAL_GetNumAnalogInputs(), HALSIM_RegisterAnalogInAllCallbacks);
+  InitializeDefault(HAL_GetNumAnalogInputs(), HALSIM_RegisterAnalogInAllCallbacks);
 }
 
 void HALSimNTProviderAnalogIn::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init?").SetBoolean(HALSIM_GetAnalogInInitialized(chan));
-    table->GetEntry("avg_bits").SetDouble(HALSIM_GetAnalogInAverageBits(chan));
-    table->GetEntry("oversample_bits").SetDouble(HALSIM_GetAnalogInOversampleBits(chan));
-    table->GetEntry("voltage").SetDouble(HALSIM_GetAnalogInVoltage(chan));
+  table->GetEntry("init?").SetBoolean(HALSIM_GetAnalogInInitialized(chan));
+  table->GetEntry("avg_bits").SetDouble(HALSIM_GetAnalogInAverageBits(chan));
+  table->GetEntry("oversample_bits").SetDouble(HALSIM_GetAnalogInOversampleBits(chan));
+  table->GetEntry("voltage").SetDouble(HALSIM_GetAnalogInVoltage(chan));
 
-    auto accum = table->GetSubTable("accum");
-    accum->GetEntry("init?").SetBoolean(HALSIM_GetAnalogInAccumulatorInitialized(chan));
-    accum->GetEntry("value").SetDouble(HALSIM_GetAnalogInAccumulatorValue(chan));
-    accum->GetEntry("count").SetDouble(HALSIM_GetAnalogInAccumulatorCount(chan));
-    accum->GetEntry("center").SetDouble(HALSIM_GetAnalogInAccumulatorCenter(chan));
-    accum->GetEntry("deadband").SetDouble(HALSIM_GetAnalogInAccumulatorDeadband(chan));
+  auto accum = table->GetSubTable("accum");
+  accum->GetEntry("init?").SetBoolean(HALSIM_GetAnalogInAccumulatorInitialized(chan));
+  accum->GetEntry("value").SetDouble(HALSIM_GetAnalogInAccumulatorValue(chan));
+  accum->GetEntry("count").SetDouble(HALSIM_GetAnalogInAccumulatorCount(chan));
+  accum->GetEntry("center").SetDouble(HALSIM_GetAnalogInAccumulatorCenter(chan));
+  accum->GetEntry("deadband").SetDouble(HALSIM_GetAnalogInAccumulatorDeadband(chan));
 
-    table->GetInstance().Flush();
+  table->GetInstance().Flush();
 }
 
 void HALSimNTProviderAnalogIn::OnInitializedChannel(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("voltage").AddListener([chan, table](const nt::EntryNotification &ev) -> void {
-        HALSIM_SetAnalogInVoltage(chan, ev.value->GetDouble());
-    }, NT_NotifyKind::NT_NOTIFY_UPDATE);
+  table->GetEntry("voltage").AddListener([chan, table](const nt::EntryNotification &ev) -> void {
+    HALSIM_SetAnalogInVoltage(chan, ev.value->GetDouble());
+  }, NT_NotifyKind::NT_NOTIFY_UPDATE);
 }
 
 
 void HALSimNTProviderAnalogOut::Initialize() {
-    InitializeDefault(HAL_GetNumAnalogOutputs(), HALSIM_RegisterAnalogOutAllCallbacks);
+  InitializeDefault(HAL_GetNumAnalogOutputs(), HALSIM_RegisterAnalogOutAllCallbacks);
 }
 
 void HALSimNTProviderAnalogOut::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init?").SetBoolean(HALSIM_GetAnalogOutInitialized(chan));
-    table->GetEntry("voltage").SetDouble(HALSIM_GetAnalogOutVoltage(chan));
+  table->GetEntry("init?").SetBoolean(HALSIM_GetAnalogOutInitialized(chan));
+  table->GetEntry("voltage").SetDouble(HALSIM_GetAnalogOutVoltage(chan));
 }

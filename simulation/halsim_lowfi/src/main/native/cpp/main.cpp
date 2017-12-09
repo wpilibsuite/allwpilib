@@ -33,23 +33,23 @@ extern "C" {
 #if defined(WIN32) || defined(_WIN32)
 __declspec(dllexport)
 #endif
-    int HALSIM_InitExtension(void) {
-        std::cout << "NetworkTables LowFi Simulator Initializing." << std::endl;
-        halsim_lowfi.Initialize();
-        halsim_lowfi.table->GetInstance().StartServer("networktables.ini");
-        auto lowfi = std::make_shared<HALSimLowFi>(halsim_lowfi);
+  int HALSIM_InitExtension(void) {
+    std::cout << "NetworkTables LowFi Simulator Initializing." << std::endl;
+    halsim_lowfi.Initialize();
+    halsim_lowfi.table->GetInstance().StartServer("networktables.ini");
+    auto lowfi = std::make_shared<HALSimLowFi>(halsim_lowfi);
 
-        pwm_provider.Inject(lowfi, "PWM");
-        dpwm_provider.Inject(lowfi, "dPWM");
-        dio_provider.Inject(lowfi, "DIO");
-        ai_provider.Inject(lowfi, "AI");
-        ao_provider.Inject(lowfi, "AO");
-        ds_provider.Inject(lowfi, "DriverStation");
-        encoder_provider.Inject(lowfi, "Encoder");
-        relay_provider.Inject(lowfi, "Relay");
-        roborio_provider.Inject(lowfi, "RoboRIO");
+    pwm_provider.Inject(lowfi, "PWM");
+    dpwm_provider.Inject(lowfi, "dPWM");
+    dio_provider.Inject(lowfi, "DIO");
+    ai_provider.Inject(lowfi, "AI");
+    ao_provider.Inject(lowfi, "AO");
+    ds_provider.Inject(lowfi, "DriverStation");
+    encoder_provider.Inject(lowfi, "Encoder");
+    relay_provider.Inject(lowfi, "Relay");
+    roborio_provider.Inject(lowfi, "RoboRIO");
 
-        std::cout << "NetworkTables LowFi Simulator Initialized!" << std::endl;
-        return 0;
-    }
+    std::cout << "NetworkTables LowFi Simulator Initialized!" << std::endl;
+    return 0;
+  }
 }  // extern "C"
