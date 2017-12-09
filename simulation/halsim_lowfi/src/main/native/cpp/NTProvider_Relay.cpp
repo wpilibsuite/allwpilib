@@ -11,8 +11,7 @@
 #include <NTProvider_Relay.h>
 
 void HALSimNTProviderRelay::Initialize() {
-    // Relay channels are double counted (one for fwd, one for rvs)
-    InitializeDefault(HAL_GetNumRelayChannels() / 2, HALSIM_RegisterRelayAllCallbacks);
+    InitializeDefault(HAL_GetNumRelayHeaders(), HALSIM_RegisterRelayAllCallbacks);
 }
 
 void HALSimNTProviderRelay::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
