@@ -13,6 +13,7 @@
 #include <NTProvider_DIO.h>
 #include <NTProvider_Analog.h>
 #include <NTProvider_DriverStation.h>
+#include <NTProvider_Encoder.h>
 
 static HALSimLowFi halsim_lowfi;
 
@@ -22,6 +23,7 @@ static HALSimNTProviderDIO dio_provider;
 static HALSimNTProviderAnalogIn ai_provider;
 static HALSimNTProviderAnalogOut ao_provider;
 static HALSimNTProviderDriverStation ds_provider;
+static HALSimNTProviderEncoder encoder_provider;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -39,6 +41,7 @@ __declspec(dllexport)
         ai_provider.Inject(lowfi, "AI");
         ao_provider.Inject(lowfi, "AO");
         ds_provider.Inject(lowfi, "DriverStation");
+        encoder_provider.Inject(lowfi, "Encoders");
         return 0;
     }
 }  // extern "C"
