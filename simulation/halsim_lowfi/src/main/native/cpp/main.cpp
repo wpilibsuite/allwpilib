@@ -14,6 +14,7 @@
 #include <NTProvider_Analog.h>
 #include <NTProvider_DriverStation.h>
 #include <NTProvider_Encoder.h>
+#include <NTProvider_Relay.h>
 
 static HALSimLowFi halsim_lowfi;
 
@@ -24,6 +25,7 @@ static HALSimNTProviderAnalogIn ai_provider;
 static HALSimNTProviderAnalogOut ao_provider;
 static HALSimNTProviderDriverStation ds_provider;
 static HALSimNTProviderEncoder encoder_provider;
+static HALSimNTProviderRelay relay_provider;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -41,7 +43,8 @@ __declspec(dllexport)
         ai_provider.Inject(lowfi, "AI");
         ao_provider.Inject(lowfi, "AO");
         ds_provider.Inject(lowfi, "DriverStation");
-        encoder_provider.Inject(lowfi, "Encoders");
+        encoder_provider.Inject(lowfi, "Encoder");
+        relay_provider.Inject(lowfi, "Relay");
         return 0;
     }
 }  // extern "C"
