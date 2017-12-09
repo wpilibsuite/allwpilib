@@ -9,11 +9,17 @@
 
 #include <HALSimLowFi.h>
 #include <NTProvider_PWM.h>
+#include <NTProvider_dPWM.h>
 #include <NTProvider_DIO.h>
+#include <NTProvider_Analog.h>
 
 static HALSimLowFi halsim_lowfi;
+
 static HALSimNTProviderPWM pwm_provider;
+static HALSimNTProviderDigitalPWM dpwm_provider;
 static HALSimNTProviderDIO dio_provider;
+static HALSimNTProviderAnalogIn ai_provider;
+static HALSimNTProviderAnalogOut ao_provider;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -26,7 +32,10 @@ __declspec(dllexport)
         auto lowfi = std::make_shared<HALSimLowFi>(halsim_lowfi);
 
         pwm_provider.Inject(lowfi, "PWM");
+        dpwm_provider.Inject(lowfi, "dPWM");
         dio_provider.Inject(lowfi, "DIO");
+        ai_provider.Inject(lowfi, "AI");
+        ao_provider.Inject(lowfi, "AO");
         return 0;
     }
 }  // extern "C"
