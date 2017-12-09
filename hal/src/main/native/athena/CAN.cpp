@@ -9,6 +9,12 @@
 
 #include <FRC_NetworkCommunication/CANSessionMux.h>
 
+namespace hal {
+namespace init {
+void InitializeCAN() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 
 void HAL_CAN_SendMessage(uint32_t messageID, const uint8_t* data,

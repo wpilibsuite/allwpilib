@@ -22,31 +22,36 @@
 
 namespace hal {
 
-// Create a mutex to protect changes to the DO PWM config
-wpi::mutex digitalPwmMutex;
-
 std::unique_ptr<tDIO> digitalSystem;
 std::unique_ptr<tRelay> relaySystem;
 std::unique_ptr<tPWM> pwmSystem;
 std::unique_ptr<tSPI> spiSystem;
 
-static std::atomic<bool> digitalSystemsInitialized{false};
-static wpi::mutex initializeMutex;
-
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                      kNumDigitalChannels + kNumPWMHeaders>
+                      kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
+
+namespace init {
+void InitializeDigitalInternal() {
+  static DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
+                               kNumDigitalChannels + kNumPWMHeaders>
+      dcH;
+  digitalChannelHandles = &dcH;
+}
+}  // namespace init
 
 /**
  * Initialize the digital system.
  */
 void initializeDigital(int32_t* status) {
+  static std::atomic_bool initialized{false};
+  static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (digitalSystemsInitialized) return;
+  if (initialized) return;
 
   std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (digitalSystemsInitialized) return;
+  if (initialized) return;
 
   digitalSystem.reset(tDIO::create(status));
 
@@ -108,7 +113,7 @@ void initializeDigital(int32_t* status) {
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
   spiSystem->writeAutoSPI1Select(existingSelect, status);
 
-  digitalSystemsInitialized = true;
+  initialized = true;
 }
 
 /**

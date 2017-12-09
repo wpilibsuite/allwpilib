@@ -22,12 +22,12 @@
 
 using namespace hal;
 
-static const int32_t kTimerInterruptNumber = 28;
+static constexpr int32_t kTimerInterruptNumber = 28;
 
 static wpi::mutex notifierMutex;
 static std::unique_ptr<tAlarm> notifierAlarm;
 static std::unique_ptr<tInterruptManager> notifierManager;
-static uint64_t closestTrigger = UINT64_MAX;
+static uint64_t closestTrigger{UINT64_MAX};
 
 namespace {
 
@@ -41,7 +41,7 @@ struct Notifier {
 
 }  // namespace
 
-static std::atomic_flag notifierAtexitRegistered = ATOMIC_FLAG_INIT;
+static std::atomic_flag notifierAtexitRegistered{ATOMIC_FLAG_INIT};
 static std::atomic_int notifierRefCount{0};
 
 using namespace hal;
@@ -63,7 +63,7 @@ class NotifierHandleContainer
   }
 };
 
-static NotifierHandleContainer notifierHandles;
+static NotifierHandleContainer* notifierHandles;
 
 static void alarmCallback(uint32_t, void*) {
   std::lock_guard<wpi::mutex> lock(notifierMutex);
@@ -74,7 +74,7 @@ static void alarmCallback(uint32_t, void*) {
   closestTrigger = UINT64_MAX;
 
   // process all notifiers
-  notifierHandles.ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
+  notifierHandles->ForEach([&](HAL_NotifierHandle handle, Notifier* notifier) {
     if (notifier->triggerTime == UINT64_MAX) return;
     if (currentTime == 0) currentTime = HAL_GetFPGATime(&status);
     std::unique_lock<wpi::mutex> lock(notifier->mutex);
@@ -102,6 +102,15 @@ static void cleanupNotifierAtExit() {
   notifierManager = nullptr;
 }
 
+namespace hal {
+namespace init {
+void InitializeNotifier() {
+  static NotifierHandleContainer nH;
+  notifierHandles = &nH;
+}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 
 HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
@@ -121,7 +130,7 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
   }
 
   std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
-  HAL_NotifierHandle handle = notifierHandles.Allocate(notifier);
+  HAL_NotifierHandle handle = notifierHandles->Allocate(notifier);
   if (handle == HAL_kInvalidHandle) {
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -130,7 +139,7 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
 }
 
 void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
-  auto notifier = notifierHandles.Get(notifierHandle);
+  auto notifier = notifierHandles->Get(notifierHandle);
   if (!notifier) return;
 
   {
@@ -143,7 +152,7 @@ void HAL_StopNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 }
 
 void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
-  auto notifier = notifierHandles.Free(notifierHandle);
+  auto notifier = notifierHandles->Free(notifierHandle);
   if (!notifier) return;
 
   // Just in case HAL_StopNotifier() wasn't called...
@@ -172,7 +181,7 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
 
 void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              uint64_t triggerTime, int32_t* status) {
-  auto notifier = notifierHandles.Get(notifierHandle);
+  auto notifier = notifierHandles->Get(notifierHandle);
   if (!notifier) return;
 
   {
@@ -196,7 +205,7 @@ void HAL_UpdateNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
 void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
                              int32_t* status) {
-  auto notifier = notifierHandles.Get(notifierHandle);
+  auto notifier = notifierHandles->Get(notifierHandle);
   if (!notifier) return;
 
   {
@@ -207,7 +216,7 @@ void HAL_CancelNotifierAlarm(HAL_NotifierHandle notifierHandle,
 
 uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
                                   int32_t* status) {
-  auto notifier = notifierHandles.Get(notifierHandle);
+  auto notifier = notifierHandles->Get(notifierHandle);
   if (!notifier) return 0;
   std::unique_lock<wpi::mutex> lock(notifier->mutex);
   notifier->cond.wait(lock, [&] {

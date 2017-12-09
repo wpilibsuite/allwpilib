@@ -59,9 +59,6 @@ constexpr double kDefaultPwmCenter = 1.5;
 constexpr int32_t kDefaultPwmStepsDown = 1000;
 constexpr int32_t kPwmDisabled = 0;
 
-// Create a mutex to protect changes to the DO PWM config
-extern wpi::mutex digitalPwmMutex;
-
 extern std::unique_ptr<tDIO> digitalSystem;
 extern std::unique_ptr<tRelay> relaySystem;
 extern std::unique_ptr<tPWM> pwmSystem;
@@ -79,7 +76,7 @@ struct DigitalPort {
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                             kNumDigitalChannels + kNumPWMHeaders>
+                             kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
 
 void initializeDigital(int32_t* status);

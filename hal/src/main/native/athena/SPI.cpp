@@ -29,11 +29,11 @@
 
 using namespace hal;
 
-static int32_t m_spiCS0Handle = 0;
-static int32_t m_spiCS1Handle = 0;
-static int32_t m_spiCS2Handle = 0;
-static int32_t m_spiCS3Handle = 0;
-static int32_t m_spiMXPHandle = 0;
+static int32_t m_spiCS0Handle{0};
+static int32_t m_spiCS1Handle{0};
+static int32_t m_spiCS2Handle{0};
+static int32_t m_spiCS3Handle{0};
+static int32_t m_spiMXPHandle{0};
 
 static constexpr int32_t kSpiMaxHandles = 5;
 
@@ -46,8 +46,6 @@ static std::array<wpi::mutex, kSpiMaxHandles> spiAccumulatorMutexes;
 std::atomic<int32_t> spiPortCount{0};
 
 static HAL_DigitalHandle digitalHandles[9]{HAL_kInvalidHandle};
-
-extern "C" {
 
 struct SPIAccumulator {
   std::atomic<HAL_NotifierHandle> notifier{0};
@@ -73,6 +71,14 @@ struct SPIAccumulator {
   bool bigEndian;  // is response big endian?
 };
 std::unique_ptr<SPIAccumulator> spiAccumulators[5];
+
+namespace hal {
+namespace init {
+void InitializeSPI() {}
+}  // namespace init
+}  // namespace hal
+
+extern "C" {
 
 static void CommonSPIPortInit(int32_t* status) {
   // All false cases will set

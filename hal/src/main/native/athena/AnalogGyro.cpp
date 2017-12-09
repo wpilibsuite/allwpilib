@@ -34,8 +34,18 @@ static constexpr double kDefaultVoltsPerDegreePerSecond = 0.007;
 using namespace hal;
 
 static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
-                             HAL_HandleEnum::AnalogGyro>
-    analogGyroHandles;
+                             HAL_HandleEnum::AnalogGyro>* analogGyroHandles;
+
+namespace hal {
+namespace init {
+void InitializeAnalogGyro() {
+  static IndexedHandleResource<HAL_GyroHandle, AnalogGyro, kNumAccumulators,
+                               HAL_HandleEnum::AnalogGyro>
+      agHandles;
+  analogGyroHandles = &agHandles;
+}
+}  // namespace init
+}  // namespace hal
 
 static void Wait(double seconds) {
   if (seconds < 0.0) return;
@@ -56,13 +66,13 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
   // handle known to be correct, so no need to type check
   int16_t channel = getHandleIndex(analogHandle);
 
-  auto handle = analogGyroHandles.Allocate(channel, status);
+  auto handle = analogGyroHandles->Allocate(channel, status);
 
   if (*status != 0)
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
   // Initialize port structure
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {  // would only error on thread issue
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -77,7 +87,7 @@ HAL_GyroHandle HAL_InitializeAnalogGyro(HAL_AnalogInputHandle analogHandle,
 }
 
 void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -100,13 +110,13 @@ void HAL_SetupAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
 }
 
 void HAL_FreeAnalogGyro(HAL_GyroHandle handle) {
-  analogGyroHandles.Free(handle);
+  analogGyroHandles->Free(handle);
 }
 
 void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle,
                                  double voltsPerDegreePerSecond, double offset,
                                  int32_t center, int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -121,7 +131,7 @@ void HAL_SetAnalogGyroParameters(HAL_GyroHandle handle,
 void HAL_SetAnalogGyroVoltsPerDegreePerSecond(HAL_GyroHandle handle,
                                               double voltsPerDegreePerSecond,
                                               int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -131,7 +141,7 @@ void HAL_SetAnalogGyroVoltsPerDegreePerSecond(HAL_GyroHandle handle,
 }
 
 void HAL_ResetAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -149,7 +159,7 @@ void HAL_ResetAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
 }
 
 void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -176,7 +186,7 @@ void HAL_CalibrateAnalogGyro(HAL_GyroHandle handle, int32_t* status) {
 
 void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts,
                                int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -189,7 +199,7 @@ void HAL_SetAnalogGyroDeadband(HAL_GyroHandle handle, double volts,
 }
 
 double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -211,7 +221,7 @@ double HAL_GetAnalogGyroAngle(HAL_GyroHandle handle, int32_t* status) {
 }
 
 double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -225,7 +235,7 @@ double HAL_GetAnalogGyroRate(HAL_GyroHandle handle, int32_t* status) {
 }
 
 double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -234,7 +244,7 @@ double HAL_GetAnalogGyroOffset(HAL_GyroHandle handle, int32_t* status) {
 }
 
 int32_t HAL_GetAnalogGyroCenter(HAL_GyroHandle handle, int32_t* status) {
-  auto gyro = analogGyroHandles.Get(handle);
+  auto gyro = analogGyroHandles->Get(handle);
   if (gyro == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
