@@ -8,11 +8,18 @@
 #pragma once
 
 #include <networktables/NetworkTableInstance.h>
+#include <vector>
 
 class HALSimLowFi {
 public:
     std::shared_ptr<nt::NetworkTable> table;
     void Initialize();
+};
+
+struct NTProviderCallbackInfo {
+    void *provider;
+    std::string table_name;
+    int channel;
 };
 
 class HALSimNTProvider {
@@ -23,4 +30,5 @@ public:
 
     std::shared_ptr<HALSimLowFi> parent;
     std::shared_ptr<nt::NetworkTable> table;
+    std::vector<NTProviderCallbackInfo> cbInfos;
 };

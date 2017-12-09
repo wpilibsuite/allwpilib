@@ -9,7 +9,7 @@
 
 #include <HALSimLowFi.h>
 
-class HALSimNTProviderPWM : public HALSimNTProvider {
+class HALSimNTProviderDIO : public HALSimNTProvider {
 public:
     virtual void Initialize() override;
 private:

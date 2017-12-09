@@ -9,9 +9,11 @@
 
 #include <HALSimLowFi.h>
 #include <NTProvider_PWM.h>
+#include <NTProvider_DIO.h>
 
 static HALSimLowFi halsim_lowfi;
 static HALSimNTProviderPWM pwm_provider;
+static HALSimNTProviderDIO dio_provider;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -21,8 +23,10 @@ __declspec(dllexport)
         std::cout << "NetworkTables LowFi Simulator Initializing." << std::endl;
         halsim_lowfi.Initialize();
         halsim_lowfi.table->GetInstance().StartServer("networktables.ini");
+        auto shd = std::make_shared<HALSimLowFi>(halsim_lowfi);
 
-        pwm_provider.Inject(std::make_shared<HALSimLowFi>(halsim_lowfi), "PWM");
+        pwm_provider.Inject(shd, "PWM");
+        dio_provider.Inject(shd, "DIO");
         return 0;
     }
 }  // extern "C"
