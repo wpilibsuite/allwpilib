@@ -266,7 +266,6 @@ model {
     }
     binaries {
         withType(NativeBinarySpec) {
-            project(':hal').addHalCompilerArguments(it)
             project(':ni-libraries').addNiLibrariesToLinker(it)
         }
         withType(StaticLibraryBinarySpec) {

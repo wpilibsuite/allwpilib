@@ -7,7 +7,7 @@
 
 #include "IterativeRobot.h"
 
-class MyRobot : public IterativeRobot {
+class MyRobot : public frc::IterativeRobot {
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.

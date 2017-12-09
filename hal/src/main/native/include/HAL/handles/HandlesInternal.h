@@ -77,7 +77,7 @@ static inline int16_t getHandleTypedIndex(HAL_Handle handle,
                                           HAL_HandleEnum enumType,
                                           int16_t version) {
   if (!isHandleType(handle, enumType)) return InvalidHandleIndex;
-#if !defined(CONFIG_ATHENA)
+#if !defined(__FRC_ROBORIO__)
   if (!isHandleCorrectVersion(handle, version)) return InvalidHandleIndex;
 #endif
   return getHandleIndex(handle);

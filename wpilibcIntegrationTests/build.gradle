@@ -68,7 +68,6 @@ if (!project.hasProperty('skipAthena')) {
                             cppCompiler.args "-Wno-error=deprecated-declarations"
                         }
                         project(':ni-libraries').addNiLibrariesToLinker(binary)
-                        project(':hal').addHalCompilerArguments(binary)
                         project(':hal').addHalToLinker(binary)
                         project(':wpilibc').addWpilibCCompilerArguments(binary)
                         project(':wpilibc').addWpilibCToLinker(binary)
