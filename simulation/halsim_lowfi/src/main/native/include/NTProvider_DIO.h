@@ -12,6 +12,5 @@
 class HALSimNTProviderDIO : public HALSimNTProvider {
 public:
     virtual void Initialize() override;
-private:
-    int numChannels;
+    virtual void OnCallback(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
 };

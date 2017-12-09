@@ -23,10 +23,10 @@ __declspec(dllexport)
         std::cout << "NetworkTables LowFi Simulator Initializing." << std::endl;
         halsim_lowfi.Initialize();
         halsim_lowfi.table->GetInstance().StartServer("networktables.ini");
-        auto shd = std::make_shared<HALSimLowFi>(halsim_lowfi);
+        auto lowfi = std::make_shared<HALSimLowFi>(halsim_lowfi);
 
-        pwm_provider.Inject(shd, "PWM");
-        dio_provider.Inject(shd, "DIO");
+        pwm_provider.Inject(lowfi, "PWM");
+        dio_provider.Inject(lowfi, "DIO");
         return 0;
     }
 }  // extern "C"

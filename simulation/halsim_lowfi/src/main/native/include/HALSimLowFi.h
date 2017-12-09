@@ -8,7 +8,10 @@
 #pragma once
 
 #include <networktables/NetworkTableInstance.h>
+
 #include <vector>
+#include <cinttypes>
+#include <MockData/NotifyListener.h>
 
 class HALSimLowFi {
 public:
@@ -16,17 +19,26 @@ public:
     void Initialize();
 };
 
-struct NTProviderCallbackInfo {
-    void *provider;
-    std::string table_name;
-    int channel;
-};
+typedef void (*HALCbRegisterFunc)(int32_t index, HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify);
+
+void NTProviderBaseCallback(const char *name, void *param, const struct HAL_Value *value);
 
 class HALSimNTProvider {
 public:
+    struct NTProviderCallbackInfo {
+        HALSimNTProvider *provider;
+        std::string table_name;
+        int channel;
+    };
+
     void Inject(std::shared_ptr<HALSimLowFi> parent, std::string table);
     // Initialize is called by inject.
     virtual void Initialize() = 0;
+    virtual void InitializeDefault(int numChannels, HALCbRegisterFunc registerFunc);
+    virtual void OnCallback(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) = 0;
+
+    int numChannels;
+    std::string tableName;
 
     std::shared_ptr<HALSimLowFi> parent;
     std::shared_ptr<nt::NetworkTable> table;
