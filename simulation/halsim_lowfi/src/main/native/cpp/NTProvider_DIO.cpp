@@ -15,8 +15,8 @@ void HALSimNTProviderDIO::Initialize() {
 }
 
 void HALSimNTProviderDIO::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init?").SetBoolean(HALSIM_GetDIOInitialized(chan) != 0);
-    table->GetEntry("value").SetBoolean(HALSIM_GetDIOValue(chan) != 0);
+    table->GetEntry("init?").SetBoolean(HALSIM_GetDIOInitialized(chan));
+    table->GetEntry("value").SetBoolean(HALSIM_GetDIOValue(chan));
     table->GetEntry("pulse_length").SetDouble(HALSIM_GetDIOPulseLength(chan));
-    table->GetEntry("input?").SetBoolean(HALSIM_GetDIOIsInput(chan) != 0);
+    table->GetEntry("input?").SetBoolean(HALSIM_GetDIOIsInput(chan));
 }

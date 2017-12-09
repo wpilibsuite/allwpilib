@@ -23,19 +23,28 @@ void NTProviderBaseCallback(const char *name, void *param, const struct HAL_Valu
     auto info = static_cast<struct HALSimNTProvider::NTProviderCallbackInfo *>(param);
     uint32_t chan = (uint32_t)info->channel;
     auto provider = info->provider;
-    auto table = provider->table->GetSubTable(info->table_name);
+    auto table = info->table;
     provider->OnCallback(chan, table);
 }
 
-void HALSimNTProvider::InitializeDefault(int numChannels, HALCbRegisterFunc registerFunc) {
+void HALSimNTProvider::InitializeDefault(int numChannels, HALCbRegisterIndexedFunc registerFunc) {
     this->numChannels = numChannels;
     cbInfos.reserve(numChannels);
     for (int i = 0; i < numChannels; i++) {
-        struct NTProviderCallbackInfo info = { this, tableName + std::to_string(i), i };
+        struct NTProviderCallbackInfo info = { this, table->GetSubTable(tableName + std::to_string(i)), i };
         cbInfos.push_back(info);
     }
 
     for (auto &info : cbInfos) {
         registerFunc(info.channel, NTProviderBaseCallback, &info, true);
+    }
+}
+
+void HALSimNTProvider::InitializeDefaultSingle(HALCbRegisterSingleFunc registerFunc) {
+    struct NTProviderCallbackInfo info = { this, table, 0 };
+    cbInfos.push_back(info);
+
+    for (auto &info : cbInfos) {
+        registerFunc(NTProviderBaseCallback, &info, true);
     }
 }

@@ -15,10 +15,10 @@ void HALSimNTProviderPWM::Initialize() {
 }
 
 void HALSimNTProviderPWM::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init?").SetBoolean(HALSIM_GetPWMInitialized(chan) != 0);
+    table->GetEntry("init?").SetBoolean(HALSIM_GetPWMInitialized(chan));
     table->GetEntry("speed").SetDouble(HALSIM_GetPWMSpeed(chan));
     table->GetEntry("position").SetDouble(HALSIM_GetPWMPosition(chan));
     table->GetEntry("raw").SetDouble(HALSIM_GetPWMRawValue(chan));
     table->GetEntry("period_scale").SetDouble(HALSIM_GetPWMPeriodScale(chan));
-    table->GetEntry("zero_latch?").SetBoolean(HALSIM_GetPWMZeroLatch(chan) != 0);
+    table->GetEntry("zero_latch?").SetBoolean(HALSIM_GetPWMZeroLatch(chan));
 }

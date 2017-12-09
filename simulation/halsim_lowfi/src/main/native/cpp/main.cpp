@@ -12,6 +12,7 @@
 #include <NTProvider_dPWM.h>
 #include <NTProvider_DIO.h>
 #include <NTProvider_Analog.h>
+#include <NTProvider_DriverStation.h>
 
 static HALSimLowFi halsim_lowfi;
 
@@ -20,6 +21,7 @@ static HALSimNTProviderDigitalPWM dpwm_provider;
 static HALSimNTProviderDIO dio_provider;
 static HALSimNTProviderAnalogIn ai_provider;
 static HALSimNTProviderAnalogOut ao_provider;
+static HALSimNTProviderDriverStation ds_provider;
 
 extern "C" {
 #if defined(WIN32) || defined(_WIN32)
@@ -36,6 +38,7 @@ __declspec(dllexport)
         dio_provider.Inject(lowfi, "DIO");
         ai_provider.Inject(lowfi, "AI");
         ao_provider.Inject(lowfi, "AO");
+        ds_provider.Inject(lowfi, "DriverStation");
         return 0;
     }
 }  // extern "C"

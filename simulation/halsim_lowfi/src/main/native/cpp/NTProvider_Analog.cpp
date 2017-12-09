@@ -16,13 +16,13 @@ void HALSimNTProviderAnalogIn::Initialize() {
 }
 
 void HALSimNTProviderAnalogIn::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init?").SetBoolean(HALSIM_GetAnalogInInitialized(chan) != 0);
+    table->GetEntry("init?").SetBoolean(HALSIM_GetAnalogInInitialized(chan));
     table->GetEntry("avg_bits").SetDouble(HALSIM_GetAnalogInAverageBits(chan));
     table->GetEntry("oversample_bits").SetDouble(HALSIM_GetAnalogInOversampleBits(chan));
     table->GetEntry("voltage").SetDouble(HALSIM_GetAnalogInVoltage(chan));
 
     auto accum = table->GetSubTable("accum");
-    accum->GetEntry("init?").SetBoolean(HALSIM_GetAnalogInAccumulatorInitialized(chan) != 0);
+    accum->GetEntry("init?").SetBoolean(HALSIM_GetAnalogInAccumulatorInitialized(chan));
     accum->GetEntry("value").SetDouble(HALSIM_GetAnalogInAccumulatorValue(chan));
     accum->GetEntry("count").SetDouble(HALSIM_GetAnalogInAccumulatorCount(chan));
     accum->GetEntry("center").SetDouble(HALSIM_GetAnalogInAccumulatorCenter(chan));
@@ -34,6 +34,6 @@ void HALSimNTProviderAnalogOut::Initialize() {
 }
 
 void HALSimNTProviderAnalogOut::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("init?").SetBoolean(HALSIM_GetAnalogOutInitialized(chan) != 0);
+    table->GetEntry("init?").SetBoolean(HALSIM_GetAnalogOutInitialized(chan));
     table->GetEntry("voltage").SetDouble(HALSIM_GetAnalogOutVoltage(chan));
 }
