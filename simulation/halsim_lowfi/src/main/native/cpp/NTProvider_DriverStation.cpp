@@ -15,9 +15,16 @@ void HALSimNTProviderDriverStation::Initialize() {
 }
 
 void HALSimNTProviderDriverStation::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-    table->GetEntry("enabled?").SetBoolean(HALSIM_GetDriverStationEnabled());
-    table->GetEntry("autonomous?").SetBoolean(HALSIM_GetDriverStationAutonomous());
-    table->GetEntry("test?").SetBoolean(HALSIM_GetDriverStationTest());
+    bool    auton = HALSIM_GetDriverStationAutonomous(),
+            test = HALSIM_GetDriverStationTest(),
+            enabled = HALSIM_GetDriverStationEnabled();
+
+    bool teleop = (!auton && !test && enabled);
+
+    table->GetEntry("enabled?").SetBoolean(enabled);
+    table->GetEntry("autonomous?").SetBoolean(auton);
+    table->GetEntry("test?").SetBoolean(test);
+    table->GetEntry("teleop?").SetBoolean(teleop);
     table->GetEntry("estop?").SetBoolean(HALSIM_GetDriverStationEStop());
     table->GetEntry("fms?").SetBoolean(HALSIM_GetDriverStationFmsAttached());
     table->GetEntry("ds?").SetBoolean(HALSIM_GetDriverStationDsAttached());
