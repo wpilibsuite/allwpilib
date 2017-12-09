@@ -55,4 +55,6 @@ void HALSimNTProviderDriverStation::OnCallback(uint32_t chan, std::shared_ptr<nt
         break;
     }
     alliance->GetEntry("station").SetDouble(station);
+
+    table->GetInstance().Flush();
 }

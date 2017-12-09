@@ -27,7 +27,16 @@ void HALSimNTProviderAnalogIn::OnCallback(uint32_t chan, std::shared_ptr<nt::Net
     accum->GetEntry("count").SetDouble(HALSIM_GetAnalogInAccumulatorCount(chan));
     accum->GetEntry("center").SetDouble(HALSIM_GetAnalogInAccumulatorCenter(chan));
     accum->GetEntry("deadband").SetDouble(HALSIM_GetAnalogInAccumulatorDeadband(chan));
+
+    table->GetInstance().Flush();
 }
+
+void HALSimNTProviderAnalogIn::OnInitializedChannel(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
+    table->GetEntry("voltage").AddListener([chan, table](const nt::EntryNotification &ev) -> void {
+        HALSIM_SetAnalogInVoltage(chan, ev.value->GetDouble());
+    }, NT_NotifyKind::NT_NOTIFY_UPDATE);
+}
+
 
 void HALSimNTProviderAnalogOut::Initialize() {
     InitializeDefault(HAL_GetNumAnalogOutputs(), HALSIM_RegisterAnalogOutAllCallbacks);

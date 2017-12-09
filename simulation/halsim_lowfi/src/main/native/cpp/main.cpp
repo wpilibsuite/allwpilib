@@ -48,6 +48,8 @@ __declspec(dllexport)
         encoder_provider.Inject(lowfi, "Encoder");
         relay_provider.Inject(lowfi, "Relay");
         roborio_provider.Inject(lowfi, "RoboRIO");
+
+        std::cout << "NetworkTables LowFi Simulator Initialized!" << std::endl;
         return 0;
     }
 }  // extern "C"

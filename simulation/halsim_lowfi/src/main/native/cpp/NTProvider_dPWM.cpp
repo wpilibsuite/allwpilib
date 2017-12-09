@@ -18,4 +18,6 @@ void HALSimNTProviderDigitalPWM::OnCallback(uint32_t chan, std::shared_ptr<nt::N
     table->GetEntry("init?").SetBoolean(HALSIM_GetDigitalPWMInitialized(chan));
     table->GetEntry("dio_pin").SetDouble(HALSIM_GetDigitalPWMPin(chan));
     table->GetEntry("duty_cycle").SetDouble(HALSIM_GetDigitalPWMDutyCycle(chan));
+
+    table->GetInstance().Flush();
 }

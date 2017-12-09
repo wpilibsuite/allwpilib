@@ -19,4 +19,6 @@ void HALSimNTProviderRelay::OnCallback(uint32_t chan, std::shared_ptr<nt::Networ
     table->GetEntry("init_rvs?").SetBoolean(HALSIM_GetRelayInitializedReverse(chan));
     table->GetEntry("fwd?").SetBoolean(HALSIM_GetRelayForward(chan));
     table->GetEntry("rvs?").SetBoolean(HALSIM_GetRelayReverse(chan));
+
+    table->GetInstance().Flush();
 }

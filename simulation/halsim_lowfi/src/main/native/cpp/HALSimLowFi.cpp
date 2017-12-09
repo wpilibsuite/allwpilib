@@ -37,6 +37,7 @@ void HALSimNTProvider::InitializeDefault(int numChannels, HALCbRegisterIndexedFu
 
     for (auto &info : cbInfos) {
         registerFunc(info.channel, NTProviderBaseCallback, &info, true);
+        OnInitializedChannel(info.channel, info.table);
     }
 }
 
@@ -48,3 +49,5 @@ void HALSimNTProvider::InitializeDefaultSingle(HALCbRegisterSingleFunc registerF
         registerFunc(NTProviderBaseCallback, &info, true);
     }
 }
+
+void HALSimNTProvider::OnInitializedChannel(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) { }

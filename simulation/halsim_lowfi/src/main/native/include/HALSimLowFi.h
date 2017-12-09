@@ -39,6 +39,7 @@ public:
     virtual void InitializeDefault(int numChannels, HALCbRegisterIndexedFunc registerFunc);
     virtual void InitializeDefaultSingle(HALCbRegisterSingleFunc registerFunc);
     virtual void OnCallback(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) = 0;
+    virtual void OnInitializedChannel(uint32_t channel, std::shared_ptr<nt::NetworkTable> table);
 
     int numChannels;
     std::string tableName;

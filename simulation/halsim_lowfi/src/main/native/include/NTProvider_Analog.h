@@ -13,6 +13,8 @@ class HALSimNTProviderAnalogIn : public HALSimNTProvider {
 public:
     virtual void Initialize() override;
     virtual void OnCallback(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
+
+    virtual void OnInitializedChannel(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
 };
 
 class HALSimNTProviderAnalogOut : public HALSimNTProvider {
