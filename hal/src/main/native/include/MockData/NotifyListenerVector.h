@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include <memory>
 #include <queue>
 #include <vector>
@@ -136,3 +138,5 @@ typedef HalCallbackListenerVectorImpl<HAL_ConstBufferCallback>
     ConstBufferListenerVector;
 
 }  // namespace hal
+
+#endif

@@ -7,8 +7,12 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 extern "C" {
 void HALSIM_WaitForProgramStart(void);
 void HALSIM_SetProgramStarted(void);
 void HALSIM_RestartTiming(void);
 }  // extern "C"
+
+#endif

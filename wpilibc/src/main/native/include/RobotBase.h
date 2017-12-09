@@ -52,6 +52,16 @@ class RobotBase {
   static std::thread::id GetThreadId();
   virtual void StartCompetition() = 0;
 
+  static constexpr bool IsReal() {
+#ifdef __FRC_ROBORIO__
+    return true;
+#else
+    return false;
+#endif
+  }
+
+  static constexpr bool IsSimulation() { return !IsReal(); }
+
  protected:
   RobotBase();
   virtual ~RobotBase() = default;

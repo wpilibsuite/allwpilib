@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include "HAL/HAL.h"
 #include "HAL_Value.h"
 #include "NotifyListener.h"
@@ -71,4 +73,6 @@ void HALSIM_CancelCanGetCANStatusCallback(int32_t uid);
 
 #ifdef __cplusplus
 }  // extern "C"
+#endif
+
 #endif
