@@ -14,25 +14,35 @@ void HALSimNTProviderEncoder::Initialize() {
   InitializeDefault(HAL_GetNumEncoders(), HALSIM_RegisterEncoderAllCallbacks);
 }
 
-void HALSimNTProviderEncoder::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
+void HALSimNTProviderEncoder::OnCallback(
+    uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
   table->GetEntry("init?").SetBoolean(HALSIM_GetEncoderInitialized(chan));
   table->GetEntry("count").SetDouble(HALSIM_GetEncoderCount(chan));
   table->GetEntry("period").SetDouble(HALSIM_GetEncoderPeriod(chan));
   table->GetEntry("reset?").SetBoolean(HALSIM_GetEncoderReset(chan));
   table->GetEntry("max_period").SetDouble(HALSIM_GetEncoderMaxPeriod(chan));
   table->GetEntry("direction").SetBoolean(HALSIM_GetEncoderDirection(chan));
-  table->GetEntry("reverse_direction?").SetBoolean(HALSIM_GetEncoderReverseDirection(chan));
-  table->GetEntry("samples_to_avg").SetDouble(HALSIM_GetEncoderSamplesToAverage(chan));
+  table->GetEntry("reverse_direction?")
+      .SetBoolean(HALSIM_GetEncoderReverseDirection(chan));
+  table->GetEntry("samples_to_avg")
+      .SetDouble(HALSIM_GetEncoderSamplesToAverage(chan));
 
   table->GetInstance().Flush();
 }
 
-void HALSimNTProviderEncoder::OnInitializedChannel(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-  table->GetEntry("count").AddListener([chan, table](const nt::EntryNotification &ev) -> void {
-    HALSIM_SetEncoderCount(chan, static_cast<int32_t>(ev.value->GetDouble()));
-  }, NT_NotifyKind::NT_NOTIFY_UPDATE);
+void HALSimNTProviderEncoder::OnInitializedChannel(
+    uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
+  table->GetEntry("count").AddListener(
+      [chan, table](const nt::EntryNotification& ev) -> void {
+        HALSIM_SetEncoderCount(chan,
+                               static_cast<int32_t>(ev.value->GetDouble()));
+      },
+      NT_NotifyKind::NT_NOTIFY_UPDATE);
 
-  table->GetEntry("direction").AddListener([chan, table](const nt::EntryNotification &ev) -> void {
-    HALSIM_SetEncoderDirection(chan, ev.value->GetBoolean());
-  }, NT_NotifyKind::NT_NOTIFY_UPDATE);
+  table->GetEntry("direction")
+      .AddListener(
+          [chan, table](const nt::EntryNotification& ev) -> void {
+            HALSIM_SetEncoderDirection(chan, ev.value->GetBoolean());
+          },
+          NT_NotifyKind::NT_NOTIFY_UPDATE);
 }

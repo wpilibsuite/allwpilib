@@ -10,7 +10,8 @@
 #include <HALSimLowFi.h>
 
 class HALSimNTProviderRelay : public HALSimNTProvider {
-public:
-    void Initialize() override;
-    void OnCallback(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
+ public:
+  void Initialize() override;
+  void OnCallback(uint32_t channel,
+                  std::shared_ptr<nt::NetworkTable> table) override;
 };

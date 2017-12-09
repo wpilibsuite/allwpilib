@@ -14,7 +14,8 @@ void HALSimNTProviderRoboRIO::Initialize() {
   InitializeDefault(1, HALSIM_RegisterRoboRioAllCallbacks);
 }
 
-void HALSimNTProviderRoboRIO::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
+void HALSimNTProviderRoboRIO::OnCallback(
+    uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
   table->GetEntry("fpga_button?").SetBoolean(HALSIM_GetRoboRioFPGAButton(chan));
 
   table->GetEntry("vin_voltage").SetDouble(HALSIM_GetRoboRioVInVoltage(chan));
@@ -41,8 +42,12 @@ void HALSimNTProviderRoboRIO::OnCallback(uint32_t chan, std::shared_ptr<nt::Netw
   table->GetInstance().Flush();
 }
 
-void HALSimNTProviderRoboRIO::OnInitializedChannel(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
-  table->GetEntry("fpga_button?").AddListener([chan, table](const nt::EntryNotification &ev) -> void {
-    HALSIM_SetRoboRioFPGAButton(chan, ev.value->GetBoolean());
-  }, NT_NotifyKind::NT_NOTIFY_UPDATE);
+void HALSimNTProviderRoboRIO::OnInitializedChannel(
+    uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
+  table->GetEntry("fpga_button?")
+      .AddListener(
+          [chan, table](const nt::EntryNotification& ev) -> void {
+            HALSIM_SetRoboRioFPGAButton(chan, ev.value->GetBoolean());
+          },
+          NT_NotifyKind::NT_NOTIFY_UPDATE);
 }

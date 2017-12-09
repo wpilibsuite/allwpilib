@@ -14,7 +14,8 @@ void HALSimNTProviderDriverStation::Initialize() {
   InitializeDefaultSingle(HALSIM_RegisterDriverStationAllCallbacks);
 }
 
-void HALSimNTProviderDriverStation::OnCallback(uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
+void HALSimNTProviderDriverStation::OnCallback(
+    uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
   bool auton = HALSIM_GetDriverStationAutonomous(),
        test = HALSIM_GetDriverStationTest(),
        enabled = HALSIM_GetDriverStationEnabled();
@@ -35,24 +36,26 @@ void HALSimNTProviderDriverStation::OnCallback(uint32_t chan, std::shared_ptr<nt
   auto alliance = table->GetSubTable("alliance");
   auto allianceValue = HALSIM_GetDriverStationAllianceStationId();
   alliance->GetEntry("color").SetString(
-    (allianceValue == HAL_AllianceStationID_kRed1 || allianceValue == HAL_AllianceStationID_kRed2 || allianceValue == HAL_AllianceStationID_kRed3) ?
-    "red" : "blue"
-  );
+      (allianceValue == HAL_AllianceStationID_kRed1 ||
+       allianceValue == HAL_AllianceStationID_kRed2 ||
+       allianceValue == HAL_AllianceStationID_kRed3)
+          ? "red"
+          : "blue");
   int station = 0;
 
   switch (allianceValue) {
-  case HAL_AllianceStationID_kRed1:
-  case HAL_AllianceStationID_kBlue1:
-    station = 1;
-    break;
-  case HAL_AllianceStationID_kRed2:
-  case HAL_AllianceStationID_kBlue2:
-    station = 2;
-    break;
-  case HAL_AllianceStationID_kRed3:
-  case HAL_AllianceStationID_kBlue3:
-    station = 3;
-    break;
+    case HAL_AllianceStationID_kRed1:
+    case HAL_AllianceStationID_kBlue1:
+      station = 1;
+      break;
+    case HAL_AllianceStationID_kRed2:
+    case HAL_AllianceStationID_kBlue2:
+      station = 2;
+      break;
+    case HAL_AllianceStationID_kRed3:
+    case HAL_AllianceStationID_kBlue3:
+      station = 3;
+      break;
   }
   alliance->GetEntry("station").SetDouble(station);
 

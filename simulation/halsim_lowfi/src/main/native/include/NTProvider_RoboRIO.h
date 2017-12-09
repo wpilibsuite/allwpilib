@@ -10,8 +10,10 @@
 #include <HALSimLowFi.h>
 
 class HALSimNTProviderRoboRIO : public HALSimNTProvider {
-public:
+ public:
   virtual void Initialize() override;
-  virtual void OnCallback(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
-  virtual void OnInitializedChannel(uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
+  virtual void OnCallback(uint32_t channel,
+                          std::shared_ptr<nt::NetworkTable> table) override;
+  virtual void OnInitializedChannel(
+      uint32_t channel, std::shared_ptr<nt::NetworkTable> table) override;
 };
