@@ -7,6 +7,12 @@
 
 #pragma once
 
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ < 5
+static_assert(0,
+              "GCC must be 5 or greater. If building for the roboRIO, please "
+              "update to the 2018 toolchains.");
+#endif
+
 #include <HAL/cpp/make_unique.h>
 
 // MSVC 2013 doesn't allow "= default" on move constructors, but since we are
