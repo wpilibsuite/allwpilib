@@ -69,5 +69,5 @@ class AccelerometerData {
   std::atomic<double> m_z{0.0};
   std::shared_ptr<NotifyListenerVector> m_zCallbacks = nullptr;
 };
-extern AccelerometerData SimAccelerometerData[];
+extern AccelerometerData* SimAccelerometerData;
 }  // namespace hal

@@ -96,5 +96,5 @@ class PCMData {
   std::atomic<double> m_compressorCurrent{0.0};
   std::shared_ptr<NotifyListenerVector> m_compressorCurrentCallbacks = nullptr;
 };
-extern PCMData SimPCMData[];
+extern PCMData* SimPCMData;
 }  // namespace hal

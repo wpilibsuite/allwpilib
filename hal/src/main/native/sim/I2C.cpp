@@ -11,6 +11,12 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializeI2C() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
   SimI2CData[port].SetInitialized(true);

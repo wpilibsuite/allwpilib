@@ -13,8 +13,16 @@
 
 using namespace hal;
 
-SPIData hal::SimSPIData[5];
+namespace hal {
+namespace init {
+void InitializeSPIData() {
+  static SPIData ssd[5];
+  ::hal::SimSPIData = ssd;
+}
+}  // namespace init
+}  // namespace hal
 
+SPIData* hal::SimSPIData;
 void SPIData::ResetData() {
   m_initialized = false;
   m_accumulatorValue = 0;

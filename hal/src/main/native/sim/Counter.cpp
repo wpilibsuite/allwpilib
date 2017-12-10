@@ -16,8 +16,18 @@
 namespace hal {
 
 LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
-                      HAL_HandleEnum::Counter>
-    counterHandles;
+                      HAL_HandleEnum::Counter>* counterHandles;
+}  // namespace hal
+
+namespace hal {
+namespace init {
+void InitializeCounter() {
+  static LimitedHandleResource<HAL_CounterHandle, Counter, kNumCounters,
+                               HAL_HandleEnum::Counter>
+      cH;
+  counterHandles = &cH;
+}
+}  // namespace init
 }  // namespace hal
 
 extern "C" {

@@ -11,6 +11,12 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializeAccelerometer() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 void HAL_SetAccelerometerActive(HAL_Bool active) {
   SimAccelerometerData[0].SetActive(active);

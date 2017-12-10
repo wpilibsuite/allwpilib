@@ -106,6 +106,6 @@ class CanData {
   std::shared_ptr<CanGetCANStatusListenerVector> m_getCanStatusCallback;
 };
 
-extern CanData SimCanData;
+extern CanData* SimCanData;
 
 }  // namespace hal

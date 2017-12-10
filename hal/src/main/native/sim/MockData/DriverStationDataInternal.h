@@ -135,5 +135,5 @@ class DriverStationData {
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptor;
   std::unique_ptr<MatchInfoDataStore> m_matchInfo;
 };
-extern DriverStationData SimDriverStationData;
+extern DriverStationData* SimDriverStationData;
 }  // namespace hal

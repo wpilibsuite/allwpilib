@@ -62,5 +62,5 @@ class AnalogTriggerData {
       static_cast<HALSIM_AnalogTriggerMode>(0)};
   std::shared_ptr<NotifyListenerVector> m_triggerModeCallbacks = nullptr;
 };
-extern AnalogTriggerData SimAnalogTriggerData[];
+extern AnalogTriggerData* SimAnalogTriggerData;
 }  // namespace hal

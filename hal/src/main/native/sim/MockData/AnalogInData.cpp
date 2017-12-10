@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-AnalogInData hal::SimAnalogInData[kNumAnalogInputs];
+namespace hal {
+namespace init {
+void InitializeAnalogInData() {
+  static AnalogInData sind[kNumAnalogInputs];
+  ::hal::SimAnalogInData = sind;
+}
+}  // namespace init
+}  // namespace hal
+
+AnalogInData* hal::SimAnalogInData;
 void AnalogInData::ResetData() {
   m_initialized = false;
   m_initializedCallbacks = nullptr;

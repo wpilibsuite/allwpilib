@@ -9,9 +9,12 @@ package edu.wpi.first.wpilibj.can;
 
 import org.junit.Test;
 
+import edu.wpi.first.wpilibj.hal.HAL;
+
 public class CANStatusTest {
   @Test
   public void canStatusGetDoesntThrow() {
+    HAL.initialize(500, 0);
     CANStatus status = new CANStatus();
     CANJNI.GetCANStatus(status);
     // Nothing we can assert, so just make sure it didn't throw.

@@ -11,6 +11,16 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializeCanData() {
+  static CanData scd;
+  ::hal::SimCanData = &scd;
+}
+}  // namespace init
+}  // namespace hal
+
+CanData* hal::SimCanData;
 void InvokeCallback(std::shared_ptr<CanSendMessageListenerVector> currentVector,
                     const char* name, uint32_t messageID, const uint8_t* data,
                     uint8_t dataSize, int32_t periodMs, int32_t* status) {
@@ -233,54 +243,54 @@ void CanData::CancelGetCANStatusCallback(int32_t uid) {
 
 extern "C" {
 
-void HALSIM_ResetCanData(void) { SimCanData.ResetData(); }
+void HALSIM_ResetCanData(void) { SimCanData->ResetData(); }
 
 int32_t HALSIM_RegisterCanSendMessageCallback(
     HAL_CAN_SendMessageCallback callback, void* param) {
-  return SimCanData.RegisterSendMessageCallback(callback, param);
+  return SimCanData->RegisterSendMessageCallback(callback, param);
 }
 void HALSIM_CancelCanSendMessageCallback(int32_t uid) {
-  SimCanData.CancelSendMessageCallback(uid);
+  SimCanData->CancelSendMessageCallback(uid);
 }
 
 int32_t HALSIM_RegisterCanReceiveMessageCallback(
     HAL_CAN_ReceiveMessageCallback callback, void* param) {
-  return SimCanData.RegisterReceiveMessageCallback(callback, param);
+  return SimCanData->RegisterReceiveMessageCallback(callback, param);
 }
 void HALSIM_CancelCanReceiveMessageCallback(int32_t uid) {
-  SimCanData.CancelReceiveMessageCallback(uid);
+  SimCanData->CancelReceiveMessageCallback(uid);
 }
 
 int32_t HALSIM_RegisterCanOpenStreamCallback(
     HAL_CAN_OpenStreamSessionCallback callback, void* param) {
-  return SimCanData.RegisterOpenStreamCallback(callback, param);
+  return SimCanData->RegisterOpenStreamCallback(callback, param);
 }
 void HALSIM_CancelCanOpenStreamCallback(int32_t uid) {
-  SimCanData.CancelOpenStreamCallback(uid);
+  SimCanData->CancelOpenStreamCallback(uid);
 }
 
 int32_t HALSIM_RegisterCanCloseStreamCallback(
     HAL_CAN_CloseStreamSessionCallback callback, void* param) {
-  return SimCanData.RegisterCloseStreamCallback(callback, param);
+  return SimCanData->RegisterCloseStreamCallback(callback, param);
 }
 void HALSIM_CancelCanCloseStreamCallback(int32_t uid) {
-  SimCanData.CancelCloseStreamCallback(uid);
+  SimCanData->CancelCloseStreamCallback(uid);
 }
 
 int32_t HALSIM_RegisterCanReadStreamCallback(
     HAL_CAN_ReadStreamSessionCallback callback, void* param) {
-  return SimCanData.RegisterReadStreamCallback(callback, param);
+  return SimCanData->RegisterReadStreamCallback(callback, param);
 }
 void HALSIM_CancelCanReadStreamCallback(int32_t uid) {
-  SimCanData.CancelReadStreamCallback(uid);
+  SimCanData->CancelReadStreamCallback(uid);
 }
 
 int32_t HALSIM_RegisterCanGetCANStatusCallback(
     HAL_CAN_GetCANStatusCallback callback, void* param) {
-  return SimCanData.RegisterGetCANStatusCallback(callback, param);
+  return SimCanData->RegisterGetCANStatusCallback(callback, param);
 }
 void HALSIM_CancelCanGetCANStatusCallback(int32_t uid) {
-  SimCanData.CancelGetCANStatusCallback(uid);
+  SimCanData->CancelGetCANStatusCallback(uid);
 }
 
 }  // extern "C"

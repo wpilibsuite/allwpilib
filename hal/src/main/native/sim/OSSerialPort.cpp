@@ -7,6 +7,12 @@
 
 #include "HAL/SerialPort.h"
 
+namespace hal {
+namespace init {
+void InitializeOSSerialPort() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 void HAL_InitializeOSSerialPort(HAL_SerialPort port, int32_t* status) {}
 void HAL_SetOSSerialBaudRate(HAL_SerialPort port, int32_t baud,

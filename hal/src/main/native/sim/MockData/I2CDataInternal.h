@@ -49,5 +49,5 @@ class I2CData {
   std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;
   std::shared_ptr<ConstBufferListenerVector> m_writeCallbacks = nullptr;
 };
-extern I2CData SimI2CData[];
+extern I2CData* SimI2CData;
 }  // namespace hal

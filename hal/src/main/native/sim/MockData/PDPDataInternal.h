@@ -60,5 +60,5 @@ class PDPData {
   std::atomic<double> m_current[kNumPDPChannels];
   std::shared_ptr<NotifyListenerVector> m_currentCallbacks[kNumPDPChannels];
 };
-extern PDPData SimPDPData[];
+extern PDPData* SimPDPData;
 }  // namespace hal

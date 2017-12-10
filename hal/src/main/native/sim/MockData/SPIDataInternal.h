@@ -65,5 +65,5 @@ class SPIData {
   std::shared_ptr<NotifyListenerVector> m_resetAccumulatorCallback = nullptr;
   std::shared_ptr<NotifyListenerVector> m_setAccumulatorCallback = nullptr;
 };
-extern SPIData SimSPIData[];
+extern SPIData* SimSPIData;
 }  // namespace hal

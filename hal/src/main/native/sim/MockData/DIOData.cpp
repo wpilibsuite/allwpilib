@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-DIOData hal::SimDIOData[kNumDigitalChannels];
+namespace hal {
+namespace init {
+void InitializeDIOData() {
+  static DIOData sdd[kNumDigitalChannels];
+  ::hal::SimDIOData = sdd;
+}
+}  // namespace init
+}  // namespace hal
+
+DIOData* hal::SimDIOData;
 void DIOData::ResetData() {
   m_initialized = false;
   m_initializedCallbacks = nullptr;

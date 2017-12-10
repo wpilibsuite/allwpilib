@@ -12,6 +12,12 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializePDP() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 void HAL_InitializePDP(int32_t module, int32_t* status) {
   SimPDPData[module].SetInitialized(true);
