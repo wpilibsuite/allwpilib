@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <HALSimLowFi.h>
 
 class HALSimNTProviderRoboRIO : public HALSimNTProvider {
