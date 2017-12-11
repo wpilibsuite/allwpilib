@@ -14,6 +14,7 @@ void HALSimDSNT::Initialize() {
                           // HALSim LowFi
 
   // LOOP TIMING //
+
   auto timinghz = rootTable->GetEntry("timing_hz");
   timinghz.ForceSetDouble(50);
   timinghz.AddListener(
