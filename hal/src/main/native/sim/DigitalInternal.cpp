@@ -15,11 +15,18 @@
 
 namespace hal {
 
-bool digitalSystemsInitialized = false;
-
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                      kNumDigitalChannels + kNumPWMHeaders>
+                      kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
+
+namespace init {
+void InitializeDigitalInternal() {
+  static DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
+                               kNumDigitalChannels + kNumPWMHeaders>
+      dcH;
+  digitalChannelHandles = &dcH;
+}
+}  // namespace init
 
 /**
  * Map DIO channel numbers from their physical number (10 to 26) to their
@@ -69,7 +76,7 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
 }
 
 int32_t GetDigitalInputChannel(HAL_DigitalHandle handle, int32_t* status) {
-  auto digital = digitalChannelHandles.Get(handle, HAL_HandleEnum::DIO);
+  auto digital = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
   if (digital == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return -1;

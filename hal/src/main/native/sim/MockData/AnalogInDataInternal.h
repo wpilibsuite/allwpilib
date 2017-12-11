@@ -109,5 +109,5 @@ class AnalogInData {
   std::shared_ptr<NotifyListenerVector> m_accumulatorDeadbandCallbacks =
       nullptr;
 };
-extern AnalogInData SimAnalogInData[];
+extern AnalogInData* SimAnalogInData;
 }  // namespace hal

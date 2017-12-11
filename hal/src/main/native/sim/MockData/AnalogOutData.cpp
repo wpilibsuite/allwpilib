@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-AnalogOutData hal::SimAnalogOutData[kNumAnalogOutputs];
+namespace hal {
+namespace init {
+void InitializeAnalogOutData() {
+  static AnalogOutData siod[kNumAnalogOutputs];
+  ::hal::SimAnalogOutData = siod;
+}
+}  // namespace init
+}  // namespace hal
+
+AnalogOutData* hal::SimAnalogOutData;
 void AnalogOutData::ResetData() {
   m_voltage = 0.0;
   m_voltageCallbacks = nullptr;

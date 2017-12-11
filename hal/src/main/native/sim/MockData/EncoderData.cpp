@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-EncoderData hal::SimEncoderData[kNumEncoders];
+namespace hal {
+namespace init {
+void InitializeEncoderData() {
+  static EncoderData sed[kNumEncoders];
+  ::hal::SimEncoderData = sed;
+}
+}  // namespace init
+}  // namespace hal
+
+EncoderData* hal::SimEncoderData;
 void EncoderData::ResetData() {
   m_initialized = false;
   m_initializedCallbacks = nullptr;

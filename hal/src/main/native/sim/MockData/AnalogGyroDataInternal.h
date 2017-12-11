@@ -50,5 +50,5 @@ class AnalogGyroData {
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
 };
-extern AnalogGyroData SimAnalogGyroData[];
+extern AnalogGyroData* SimAnalogGyroData;
 }  // namespace hal

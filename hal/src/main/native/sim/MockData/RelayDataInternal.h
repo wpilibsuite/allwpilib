@@ -61,5 +61,5 @@ class RelayData {
   std::atomic<HAL_Bool> m_reverse{false};
   std::shared_ptr<NotifyListenerVector> m_reverseCallbacks = nullptr;
 };
-extern RelayData SimRelayData[];
+extern RelayData* SimRelayData;
 }  // namespace hal

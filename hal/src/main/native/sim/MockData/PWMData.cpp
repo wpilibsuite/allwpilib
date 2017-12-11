@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-PWMData hal::SimPWMData[kNumPWMChannels];
+namespace hal {
+namespace init {
+void InitializePWMData() {
+  static PWMData spd[kNumPWMChannels];
+  ::hal::SimPWMData = spd;
+}
+}  // namespace init
+}  // namespace hal
+
+PWMData* hal::SimPWMData;
 void PWMData::ResetData() {
   m_initialized = false;
   m_initializedCallbacks = nullptr;

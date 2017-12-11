@@ -12,6 +12,7 @@ import org.junit.Test;
 public class MatchInfoDataTest {
   @Test
   public void matchInfoDataDoesNotThrow() {
+    HAL.initialize(500, 0);
     MatchInfoData data = new MatchInfoData();
     HAL.getMatchInfo(data);
     // Nothing we can assert, so just make sure it didn't throw.

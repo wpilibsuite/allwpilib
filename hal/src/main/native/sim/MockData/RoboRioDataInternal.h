@@ -158,5 +158,5 @@ class RoboRioData {
   std::atomic<int32_t> m_userFaults3V3{0};
   std::shared_ptr<NotifyListenerVector> m_userFaults3V3Callbacks = nullptr;
 };
-extern RoboRioData SimRoboRioData[];
+extern RoboRioData* SimRoboRioData;
 }  // namespace hal

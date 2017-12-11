@@ -50,5 +50,5 @@ class DigitalPWMData {
   std::atomic<int32_t> m_pin{0};
   std::shared_ptr<NotifyListenerVector> m_pinCallbacks = nullptr;
 };
-extern DigitalPWMData SimDigitalPWMData[];
+extern DigitalPWMData* SimDigitalPWMData;
 }  // namespace hal

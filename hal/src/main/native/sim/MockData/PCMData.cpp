@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-PCMData hal::SimPCMData[kNumPCMModules];
+namespace hal {
+namespace init {
+void InitializePCMData() {
+  static PCMData spd[kNumPCMModules];
+  ::hal::SimPCMData = spd;
+}
+}  // namespace init
+}  // namespace hal
+
+PCMData* hal::SimPCMData;
 void PCMData::ResetData() {
   for (int i = 0; i < kNumSolenoidChannels; i++) {
     m_solenoidInitialized[i] = false;

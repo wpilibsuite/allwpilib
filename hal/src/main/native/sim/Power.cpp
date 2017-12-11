@@ -11,6 +11,12 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializePower() {}
+}  // namespace init
+}  // namespace hal
+
 // TODO: Fix the naming in here
 extern "C" {
 double HAL_GetVinVoltage(int32_t* status) {

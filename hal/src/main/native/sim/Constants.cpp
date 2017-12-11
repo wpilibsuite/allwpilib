@@ -11,6 +11,12 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializeConstants() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 int32_t HAL_GetSystemClockTicksPerMicrosecond(void) {
   return kSystemClockTicksPerMicrosecond;

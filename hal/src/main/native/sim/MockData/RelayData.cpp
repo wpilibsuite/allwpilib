@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-RelayData hal::SimRelayData[kNumRelayHeaders];
+namespace hal {
+namespace init {
+void InitializeRelayData() {
+  static RelayData srd[kNumRelayHeaders];
+  ::hal::SimRelayData = srd;
+}
+}  // namespace init
+}  // namespace hal
+
+RelayData* hal::SimRelayData;
 void RelayData::ResetData() {
   m_initializedForward = false;
   m_initializedForwardCallbacks = nullptr;

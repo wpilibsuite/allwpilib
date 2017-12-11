@@ -96,5 +96,5 @@ class EncoderData {
   std::atomic<int32_t> m_samplesToAverage{0};
   std::shared_ptr<NotifyListenerVector> m_samplesToAverageCallbacks = nullptr;
 };
-extern EncoderData SimEncoderData[];
+extern EncoderData* SimEncoderData;
 }  // namespace hal

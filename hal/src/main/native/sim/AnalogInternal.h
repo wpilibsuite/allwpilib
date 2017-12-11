@@ -20,7 +20,7 @@ constexpr int32_t kTimebase = 40000000;  ///< 40 MHz clock
 constexpr int32_t kDefaultOversampleBits = 0;
 constexpr int32_t kDefaultAverageBits = 7;
 constexpr double kDefaultSampleRate = 50000.0;
-static const uint32_t kAccumulatorChannels[] = {0, 1};
+static constexpr uint32_t kAccumulatorChannels[] = {0, 1};
 
 struct AnalogPort {
   uint8_t channel;
@@ -28,7 +28,7 @@ struct AnalogPort {
 };
 
 extern IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort,
-                             kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
+                             kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
     analogInputHandles;
 
 int32_t GetAnalogTriggerInputIndex(HAL_AnalogTriggerHandle handle,

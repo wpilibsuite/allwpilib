@@ -67,7 +67,7 @@ struct DigitalPort {
 };
 
 extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                             kNumDigitalChannels + kNumPWMHeaders>
+                             kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
 
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,

@@ -24,8 +24,19 @@ using namespace hal;
 
 static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
                              kNumPCMModules * kNumSolenoidChannels,
-                             HAL_HandleEnum::Solenoid>
-    solenoidHandles;
+                             HAL_HandleEnum::Solenoid>* solenoidHandles;
+
+namespace hal {
+namespace init {
+void InitializeSolenoid() {
+  static IndexedHandleResource<HAL_SolenoidHandle, Solenoid,
+                               kNumPCMModules * kNumSolenoidChannels,
+                               HAL_HandleEnum::Solenoid>
+      sH;
+  solenoidHandles = &sH;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
@@ -47,13 +58,13 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
     return HAL_kInvalidHandle;
   }
 
-  auto handle =
-      solenoidHandles.Allocate(module * kNumSolenoidChannels + channel, status);
+  auto handle = solenoidHandles->Allocate(
+      module * kNumSolenoidChannels + channel, status);
   if (handle == HAL_kInvalidHandle) {  // out of resources
     *status = NO_AVAILABLE_RESOURCES;
     return HAL_kInvalidHandle;
   }
-  auto solenoidPort = solenoidHandles.Get(handle);
+  auto solenoidPort = solenoidHandles->Get(handle);
   if (solenoidPort == nullptr) {  // would only occur on thread issues
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -66,9 +77,9 @@ HAL_SolenoidHandle HAL_InitializeSolenoidPort(HAL_PortHandle portHandle,
   return handle;
 }
 void HAL_FreeSolenoidPort(HAL_SolenoidHandle solenoidPortHandle) {
-  auto port = solenoidHandles.Get(solenoidPortHandle);
+  auto port = solenoidHandles->Get(solenoidPortHandle);
   if (port == nullptr) return;
-  solenoidHandles.Free(solenoidPortHandle);
+  solenoidHandles->Free(solenoidPortHandle);
   HALSIM_SetPCMSolenoidInitialized(port->module, port->channel, false);
 }
 HAL_Bool HAL_CheckSolenoidModule(int32_t module) {
@@ -80,7 +91,7 @@ HAL_Bool HAL_CheckSolenoidChannel(int32_t channel) {
 }
 HAL_Bool HAL_GetSolenoid(HAL_SolenoidHandle solenoidPortHandle,
                          int32_t* status) {
-  auto port = solenoidHandles.Get(solenoidPortHandle);
+  auto port = solenoidHandles->Get(solenoidPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -99,7 +110,7 @@ int32_t HAL_GetAllSolenoids(int32_t module, int32_t* status) {
 }
 void HAL_SetSolenoid(HAL_SolenoidHandle solenoidPortHandle, HAL_Bool value,
                      int32_t* status) {
-  auto port = solenoidHandles.Get(solenoidPortHandle);
+  auto port = solenoidHandles->Get(solenoidPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
