@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <memory>
 
@@ -31,12 +32,15 @@ class VisionRunnerBase : public ErrorBase {
 
   void RunForever();
 
+  void Stop();
+
  protected:
   virtual void DoProcess(cv::Mat& image) = 0;
 
  private:
   std::unique_ptr<cv::Mat> m_image;
   cs::CvSink m_cvSink;
+  std::atomic_bool m_enabled;
 };
 
 /**
