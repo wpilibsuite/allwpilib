@@ -28,9 +28,18 @@ struct HAL_JoystickAxesInt {
 };
 
 static wpi::mutex msgMutex;
-static wpi::condition_variable newDSDataAvailableCond;
+static wpi::condition_variable* newDSDataAvailableCond;
 static wpi::mutex newDSDataAvailableMutex;
 static int newDSDataAvailableCounter{0};
+
+namespace hal {
+namespace init {
+void InitializeFRCDriverStation() {
+  static wpi::condition_variable nddaC;
+  newDSDataAvailableCond = &nddaC;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -341,12 +350,12 @@ HAL_Bool HAL_WaitForDSDataTimeout(double timeout) {
   int currentCount = newDSDataAvailableCounter;
   while (newDSDataAvailableCounter == currentCount) {
     if (timeout > 0) {
-      auto timedOut = newDSDataAvailableCond.wait_until(lock, timeoutTime);
+      auto timedOut = newDSDataAvailableCond->wait_until(lock, timeoutTime);
       if (timedOut == std::cv_status::timeout) {
         return false;
       }
     } else {
-      newDSDataAvailableCond.wait(lock);
+      newDSDataAvailableCond->wait(lock);
     }
   }
   return true;
@@ -362,7 +371,7 @@ static void newDataOccur(uint32_t refNum) {
   std::lock_guard<wpi::mutex> lock(newDSDataAvailableMutex);
   // Nofify all threads
   newDSDataAvailableCounter++;
-  newDSDataAvailableCond.notify_all();
+  newDSDataAvailableCond->notify_all();
 }
 
 /*

@@ -19,14 +19,14 @@
 using namespace hal;
 
 // The 7-bit I2C address with a 0 "send" bit
-static const uint8_t kSendAddress = (0x1c << 1) | 0;
+static constexpr uint8_t kSendAddress = (0x1c << 1) | 0;
 
 // The 7-bit I2C address with a 1 "receive" bit
-static const uint8_t kReceiveAddress = (0x1c << 1) | 1;
+static constexpr uint8_t kReceiveAddress = (0x1c << 1) | 1;
 
-static const uint8_t kControlTxRx = 1;
-static const uint8_t kControlStart = 2;
-static const uint8_t kControlStop = 4;
+static constexpr uint8_t kControlTxRx = 1;
+static constexpr uint8_t kControlStart = 2;
+static constexpr uint8_t kControlStop = 4;
 
 static std::unique_ptr<tAccel> accel;
 static HAL_AccelerometerRange accelerometerRange;
@@ -78,6 +78,12 @@ enum Register {
 };
 
 namespace hal {
+namespace init {
+void InitializeAccelerometer() {}
+}  // namespace init
+}  // namespace hal
+
+namespace hal {
 
 static void writeRegister(Register reg, uint8_t data);
 static uint8_t readRegister(Register reg);
@@ -90,6 +96,8 @@ static void initializeAccelerometer() {
 
   if (!accel) {
     accel.reset(tAccel::create(&status));
+
+    accelerometerRange = HAL_AccelerometerRange::HAL_AccelerometerRange_k2G;
 
     // Enable I2C
     accel->writeCNFG(1, &status);

@@ -24,6 +24,17 @@ static std::chrono::milliseconds portTimeouts[4]{
     std::chrono::milliseconds(0), std::chrono::milliseconds(0),
     std::chrono::milliseconds(0), std::chrono::milliseconds(0)};
 
+namespace hal {
+namespace init {
+void InitializeOSSerialPort() {
+  for (int i = 0; i < 4; i++) {
+    portHandles[i] = -1;
+    portTimeouts[i] = std::chrono::milliseconds(0);
+  }
+}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 
 void HAL_InitializeOSSerialPort(HAL_SerialPort port, int32_t* status) {

@@ -21,8 +21,8 @@ wpi::mutex analogRegisterWindowMutex;
 std::unique_ptr<tAI> analogInputSystem;
 std::unique_ptr<tAO> analogOutputSystem;
 
-IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
-                      HAL_HandleEnum::AnalogInput>
+IndexedHandleResource<HAL_AnalogInputHandle, ::hal::AnalogPort,
+                      kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
     analogInputHandles;
 
 static int32_t analogNumChannelsToActivate = 0;
@@ -30,6 +30,15 @@ static int32_t analogNumChannelsToActivate = 0;
 static std::atomic<bool> analogSystemInitialized{false};
 
 bool analogSampleRateSet = false;
+
+namespace init {
+void InitializeAnalogInternal() {
+  static IndexedHandleResource<HAL_AnalogInputHandle, ::hal::AnalogPort,
+                               kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
+      alH;
+  analogInputHandles = &alH;
+}
+}  // namespace init
 
 /**
  * Initialize the analog System.

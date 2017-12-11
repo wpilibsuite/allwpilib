@@ -27,6 +27,7 @@
 #include "HAL/Errors.h"
 #include "HAL/Notifier.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "ctre/ctre.h"
 #include "visa/visa.h"
 
@@ -36,6 +37,44 @@ static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
 
 using namespace hal;
+
+namespace hal {
+namespace init {
+void InitializeHAL() {
+  InitializeHandlesInternal();
+  InitializeAccelerometer();
+  InitializeAnalogAccumulator();
+  InitializeAnalogGyro();
+  InitializeAnalogInput();
+  InitializeAnalogInternal();
+  InitializeAnalogOutput();
+  InitializeAnalogTrigger();
+  InitializeCAN();
+  InitializeCompressor();
+  InitializeConstants();
+  InitializeCounter();
+  InitializeDigitalInternal();
+  InitializeDIO();
+  InitializeEncoder();
+  InitializeFPGAEncoder();
+  InitializeFRCDriverStation();
+  InitializeI2C();
+  InitialzeInterrupts();
+  InitializeNotifier();
+  InitializeOSSerialPort();
+  InitializePCMInternal();
+  InitializePDP();
+  InitializePorts();
+  InitializePower();
+  InitializePWM();
+  InitializeRelay();
+  InitializeSerialPort();
+  InitializeSolenoid();
+  InitializeSPI();
+  InitializeThreads();
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -331,6 +370,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
+
+  hal::init::InitializeHAL();
 
   setlinebuf(stdin);
   setlinebuf(stdout);

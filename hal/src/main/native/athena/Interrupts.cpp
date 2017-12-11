@@ -77,19 +77,29 @@ static void threadedInterruptHandler(uint32_t mask, void* param) {
 }
 
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
-                             HAL_HandleEnum::Interrupt>
-    interruptHandles;
+                             HAL_HandleEnum::Interrupt>* interruptHandles;
+
+namespace hal {
+namespace init {
+void InitialzeInterrupts() {
+  static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
+                               HAL_HandleEnum::Interrupt>
+      iH;
+  interruptHandles = &iH;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
 HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
                                              int32_t* status) {
-  HAL_InterruptHandle handle = interruptHandles.Allocate();
+  HAL_InterruptHandle handle = interruptHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
     return HAL_kInvalidHandle;
   }
-  auto anInterrupt = interruptHandles.Get(handle);
+  auto anInterrupt = interruptHandles->Get(handle);
   uint32_t interruptIndex = static_cast<uint32_t>(getHandleIndex(handle));
   // Expects the calling leaf class to allocate an interrupt index.
   anInterrupt->anInterrupt.reset(tInterrupt::create(interruptIndex, status));
@@ -100,7 +110,7 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
 }
 
 void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status) {
-  interruptHandles.Free(interruptHandle);
+  interruptHandles->Free(interruptHandle);
 }
 
 /**
@@ -114,7 +124,7 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              double timeout, HAL_Bool ignorePrevious,
                              int32_t* status) {
   uint32_t result;
-  auto anInterrupt = interruptHandles.Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -140,7 +150,7 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
  */
 void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
                           int32_t* status) {
-  auto anInterrupt = interruptHandles.Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -153,7 +163,7 @@ void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
  */
 void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
                            int32_t* status) {
-  auto anInterrupt = interruptHandles.Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -168,7 +178,7 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
  */
 double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
                                         int32_t* status) {
-  auto anInterrupt = interruptHandles.Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -184,7 +194,7 @@ double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
  */
 double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
                                          int32_t* status) {
-  auto anInterrupt = interruptHandles.Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -197,7 +207,7 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
                            HAL_Handle digitalSourceHandle,
                            HAL_AnalogTriggerType analogTriggerType,
                            int32_t* status) {
-  auto anInterrupt = interruptHandles.Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -222,7 +232,7 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
 void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
                                 HAL_InterruptHandlerFunction handler,
                                 void* param, int32_t* status) {
-  auto anInterrupt = interruptHandles.Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -248,7 +258,7 @@ void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interrupt_handle,
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status) {
-  auto anInterrupt = interruptHandles.Get(interruptHandle);
+  auto anInterrupt = interruptHandles->Get(interruptHandle);
   if (anInterrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
