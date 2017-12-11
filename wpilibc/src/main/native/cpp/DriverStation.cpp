@@ -466,6 +466,7 @@ bool DriverStation::IsFMSAttached() const {
  * watchdog has expired, or if the roboRIO browns out.
  *
  * @return True if the FPGA outputs are enabled.
+ * @deprecated Use RobotController static class method
  */
 bool DriverStation::IsSysActive() const {
   int32_t status = 0;
@@ -478,6 +479,7 @@ bool DriverStation::IsSysActive() const {
  * Check if the system is browned out.
  *
  * @return True if the system is browned out
+ * @deprecated Use RobotController static class method
  */
 bool DriverStation::IsBrownedOut() const {
   int32_t status = 0;

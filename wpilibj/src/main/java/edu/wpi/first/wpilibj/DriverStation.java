@@ -642,7 +642,9 @@ public class DriverStation implements RobotState.Interface {
    * the robot is disabled or e-stopped, the watchdog has expired, or if the roboRIO browns out.
    *
    * @return True if the FPGA outputs are enabled.
+   * @deprecated Use RobotController.isSysActive()
    */
+  @Deprecated
   public boolean isSysActive() {
     return HAL.getSystemActive();
   }
@@ -651,7 +653,9 @@ public class DriverStation implements RobotState.Interface {
    * Check if the system is browned out.
    *
    * @return True if the system is browned out
+   * @deprecated Use RobotController.isBrownedOut()
    */
+  @Deprecated
   public boolean isBrownedOut() {
     return HAL.getBrownedOut();
   }
@@ -812,7 +816,9 @@ public class DriverStation implements RobotState.Interface {
    * Read the battery voltage.
    *
    * @return The battery voltage in Volts.
+   * @deprecated Use RobotController.getBatteryVoltage
    */
+  @Deprecated
   public double getBatteryVoltage() {
     return PowerJNI.getVinVoltage();
   }

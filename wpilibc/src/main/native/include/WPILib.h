@@ -67,6 +67,7 @@
 #include "Preferences.h"
 #include "Relay.h"
 #include "RobotBase.h"
+#include "RobotController.h"
 #include "RobotDrive.h"
 #include "SD540.h"
 #include "SPI.h"
