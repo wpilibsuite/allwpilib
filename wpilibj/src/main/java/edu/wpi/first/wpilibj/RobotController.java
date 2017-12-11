@@ -76,7 +76,7 @@ public final class RobotController {
    *
    * @return True if the FPGA outputs are enabled.
    */
-  public boolean isSysActive() {
+  public static boolean isSysActive() {
     return HAL.getSystemActive();
   }
 
@@ -85,7 +85,7 @@ public final class RobotController {
    *
    * @return True if the system is browned out
    */
-  public boolean isBrownedOut() {
+  public static boolean isBrownedOut() {
     return HAL.getBrownedOut();
   }
 
