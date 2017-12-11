@@ -7,21 +7,18 @@
 
 #pragma once
 
-#include <memory>
 #include <atomic>
+#include <memory>
 #include <thread>
-
-#include <support/mutex.h>
 
 #include <MockData/DriverStationData.h>
 #include <networktables/NetworkTableInstance.h>
+#include <support/mutex.h>
 
-enum HALSimDSNT_Mode {
-  teleop, auton, test
-};
+enum HALSimDSNT_Mode { teleop, auton, test };
 
 class HALSimDSNT {
-public:
+ public:
   std::shared_ptr<nt::NetworkTable> rootTable, modeTable, allianceTable;
   enum HALSimDSNT_Mode currentMode;
   bool isEnabled, lastIsEnabled, isEstop;
