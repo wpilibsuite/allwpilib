@@ -28,13 +28,13 @@ public class DriverStationTest extends AbstractComsSetup {
 
   @Test
   public void waitForDataTest() {
-    long startTime = Utility.getFPGATime();
+    long startTime = RobotController.getFPGATime();
 
     // Wait for data 50 times
     for (int i = 0; i < 50; i++) {
       DriverStation.getInstance().waitForData();
     }
-    long endTime = Utility.getFPGATime();
+    long endTime = RobotController.getFPGATime();
     long difference = endTime - startTime;
 
     assertEquals("DriverStation waitForData did not wait long enough", TIMER_RUNTIME, difference,

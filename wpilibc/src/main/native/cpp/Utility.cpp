@@ -145,6 +145,7 @@ namespace frc {
  * For now, expect this to be competition year.
  *
  * @return FPGA Version number.
+ * @deprecated Use RobotController static class method
  */
 int GetFPGAVersion() {
   int32_t status = 0;
@@ -161,6 +162,7 @@ int GetFPGAVersion() {
  * significant bits are the Build Number.
  *
  * @return FPGA Revision number.
+ * @deprecated Use RobotController static class method
  */
 int64_t GetFPGARevision() {
   int32_t status = 0;
@@ -174,6 +176,7 @@ int64_t GetFPGARevision() {
  *
  * @return The current time in microseconds according to the FPGA (since FPGA
  *         reset).
+ * @deprecated Use RobotController static class method
  */
 uint64_t GetFPGATime() {
   int32_t status = 0;
@@ -186,6 +189,7 @@ uint64_t GetFPGATime() {
  * Get the state of the "USER" button on the roboRIO.
  *
  * @return True if the button is currently pressed down
+ * @deprecated Use RobotController static class method
  */
 bool GetUserButton() {
   int32_t status = 0;

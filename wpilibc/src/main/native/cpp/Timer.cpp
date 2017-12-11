@@ -13,7 +13,7 @@
 #include <HAL/HAL.h>
 
 #include "DriverStation.h"
-#include "Utility.h"
+#include "RobotController.h"
 
 namespace frc {
 
@@ -168,8 +168,7 @@ bool Timer::HasPeriodPassed(double period) {
  */
 double Timer::GetFPGATimestamp() {
   // FPGA returns the timestamp in microseconds
-  // Call the helper GetFPGATime() in Utility.cpp
-  return GetFPGATime() * 1.0e-6;
+  return RobotController::GetFPGATime() * 1.0e-6;
 }
 
 /**

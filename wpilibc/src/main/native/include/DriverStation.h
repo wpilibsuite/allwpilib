@@ -15,6 +15,7 @@
 
 #include <HAL/DriverStation.h>
 #include <llvm/Twine.h>
+#include <support/deprecated.h>
 #include <support/mutex.h>
 
 #include "ErrorBase.h"
@@ -68,7 +69,9 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   bool IsDSAttached() const;
   bool IsNewControlData() const;
   bool IsFMSAttached() const;
+  WPI_DEPRECATED("Use RobotController static class method")
   bool IsSysActive() const;
+  WPI_DEPRECATED("Use RobotController static class method")
   bool IsBrownedOut() const;
 
   std::string GetGameSpecificMessage() const;

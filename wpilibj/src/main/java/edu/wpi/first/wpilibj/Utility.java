@@ -11,7 +11,9 @@ import edu.wpi.first.wpilibj.hal.HALUtil;
 
 /**
  * Contains global utility functions.
+ * @deprecated Use RobotController class instead
  */
+@Deprecated
 public final class Utility {
 
   private Utility() {
@@ -21,8 +23,10 @@ public final class Utility {
    * Return the FPGA Version number. For now, expect this to be 2009.
    *
    * @return FPGA Version number.
+   * @deprecated Use RobotController.getFPGAVersion()
    */
   @SuppressWarnings("AbbreviationAsWordInName")
+  @Deprecated
   int getFPGAVersion() {
     return HALUtil.getFPGAVersion();
   }
@@ -33,8 +37,10 @@ public final class Utility {
    * significant bits are the Build Number.
    *
    * @return FPGA Revision number.
+   * @deprecated Use RobotController.getFPGARevision()
    */
   @SuppressWarnings("AbbreviationAsWordInName")
+  @Deprecated
   long getFPGARevision() {
     return (long) HALUtil.getFPGARevision();
   }
@@ -43,7 +49,10 @@ public final class Utility {
    * Read the microsecond timer from the FPGA.
    *
    * @return The current time in microseconds according to the FPGA.
+   * @deprecated Use RobotController.getFPGATime()
    */
+  @Deprecated
+  @SuppressWarnings("AbbreviationAsWordInName")
   public static long getFPGATime() {
     return HALUtil.getFPGATime();
   }
@@ -52,7 +61,9 @@ public final class Utility {
    * Get the state of the "USER" button on the roboRIO.
    *
    * @return true if the button is currently pressed down
+   * @deprecated Use RobotController.getUserButton()
    */
+  @Deprecated
   public static boolean getUserButton() {
     return HALUtil.getFPGAButton();
   }

@@ -7,7 +7,7 @@
 
 #include "AnalogPotentiometer.h"
 
-#include "ControllerPower.h"
+#include "RobotController.h"
 #include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
@@ -67,7 +67,7 @@ AnalogPotentiometer::AnalogPotentiometer(std::shared_ptr<AnalogInput> input,
  *         fullRange and offset).
  */
 double AnalogPotentiometer::Get() const {
-  return (m_analog_input->GetVoltage() / ControllerPower::GetVoltage5V()) *
+  return (m_analog_input->GetVoltage() / RobotController::GetVoltage5V()) *
              m_fullRange +
          m_offset;
 }
