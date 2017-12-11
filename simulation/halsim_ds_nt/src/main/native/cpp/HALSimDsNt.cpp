@@ -73,8 +73,8 @@ void HALSimDSNT::Initialize() {
         } else {
           this->isEnabled = false;
         }
-        this->UpdateModeButtons();
         this->DoModeUpdate();
+        this->UpdateModeButtons();
       },
       NT_NotifyKind::NT_NOTIFY_UPDATE);
 
@@ -84,9 +84,9 @@ void HALSimDSNT::Initialize() {
         this->isEstop = ev.value->GetBoolean();
         if (this->isEstop) {
           this->isEnabled = false;
-          this->UpdateModeButtons();
         }
         this->DoModeUpdate();
+        this->UpdateModeButtons();
       },
       NT_NotifyKind::NT_NOTIFY_UPDATE);
 
@@ -167,7 +167,7 @@ void HALSimDSNT::DoModeUpdate() {
   lastIsEnabled = isEnabled;
   HALSIM_SetDriverStationEStop(isEstop);
   HALSIM_SetDriverStationFmsAttached(false);
-  HALSIM_SetDriverStationDsAttached(false);
+  HALSIM_SetDriverStationDsAttached(true);
   HALSIM_NotifyDriverStationNewData();
 }
 
