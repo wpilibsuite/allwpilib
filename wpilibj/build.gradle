@@ -12,6 +12,7 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 apply plugin: 'java'
 apply plugin: 'net.ltgt.errorprone'
 apply plugin: 'pmd'
+apply plugin: TestingModelBasePlugin
 
 configurations.errorprone {
     resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
