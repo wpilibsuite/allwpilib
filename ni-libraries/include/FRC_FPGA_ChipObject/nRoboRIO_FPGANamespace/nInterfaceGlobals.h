@@ -1,12 +1,12 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2018_18_0_7_nInterfaceGlobals_h__
-#define __nFRC_2018_18_0_7_nInterfaceGlobals_h__
+#ifndef __nFRC_2018_18_0_8_nInterfaceGlobals_h__
+#define __nFRC_2018_18_0_8_nInterfaceGlobals_h__
 
 namespace nFPGA
 {
-namespace nFRC_2018_18_0_7
+namespace nFRC_2018_18_0_8
 {
    extern unsigned int g_currentTargetClass;
 
@@ -15,4 +15,4 @@ namespace nFRC_2018_18_0_7
 }
 }
 
-#endif // __nFRC_2018_18_0_7_nInterfaceGlobals_h__
+#endif // __nFRC_2018_18_0_8_nInterfaceGlobals_h__
