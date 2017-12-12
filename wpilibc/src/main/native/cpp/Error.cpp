@@ -8,8 +8,6 @@
 #include "Error.h"
 
 #include <llvm/Path.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
 #include "DriverStation.h"
 #include "Timer.h"
@@ -43,7 +41,7 @@ const ErrorBase* Error::GetOriginatingObject() const {
 
 double Error::GetTimestamp() const { return m_timestamp; }
 
-void Error::Set(Code code, llvm::StringRef contextMessage,
+void Error::Set(Code code, const llvm::Twine& contextMessage,
                 llvm::StringRef filename, llvm::StringRef function,
                 int lineNumber, const ErrorBase* originatingObject) {
   bool report = true;
@@ -53,7 +51,7 @@ void Error::Set(Code code, llvm::StringRef contextMessage,
   }
 
   m_code = code;
-  m_message = contextMessage;
+  m_message = contextMessage.str();
   m_filename = filename;
   m_function = function;
   m_lineNumber = lineNumber;
@@ -66,13 +64,11 @@ void Error::Set(Code code, llvm::StringRef contextMessage,
 }
 
 void Error::Report() {
-  llvm::SmallString<128> buf;
-  llvm::raw_svector_ostream locStream(buf);
-  locStream << m_function << " [" << llvm::sys::path::filename(m_filename);
-  locStream << ":" << m_lineNumber << "]";
-
-  DriverStation::ReportError(true, m_code, m_message, locStream.str(),
-                             GetStackTrace(4));
+  DriverStation::ReportError(
+      true, m_code, m_message,
+      m_function + llvm::Twine(" [") + llvm::sys::path::filename(m_filename) +
+          llvm::Twine(':') + llvm::Twine(m_lineNumber) + llvm::Twine(']'),
+      GetStackTrace(4));
 }
 
 void Error::Clear() {

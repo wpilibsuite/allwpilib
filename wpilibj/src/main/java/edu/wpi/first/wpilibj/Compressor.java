@@ -7,13 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.CompressorJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Class for operating a compressor connected to a PCM (Pneumatic Control Module). The PCM will
@@ -26,7 +23,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * the safety provided by using the pressure switch and closed loop control. You can only turn off
  * closed loop control, thereby stopping the compressor from operating.
  */
-public class Compressor extends SensorBase implements LiveWindowSendable {
+public class Compressor extends SendableBase implements Sendable {
   private int m_compressorHandle;
   private byte m_module;
 
@@ -42,6 +39,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
     m_compressorHandle = CompressorJNI.initializeCompressor((byte) module);
 
     HAL.report(tResourceType.kResourceType_Compressor, module);
+    setName("Compressor", module);
   }
 
   /**
@@ -51,7 +49,7 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
    * specifying the CAN ID.}
    */
   public Compressor() {
-    this(getDefaultSolenoidModule());
+    this(SensorBase.getDefaultSolenoidModule());
   }
 
   /**
@@ -193,54 +191,15 @@ public class Compressor extends SensorBase implements LiveWindowSendable {
   }
 
   @Override
-  public void startLiveWindowMode() {
-    if (m_enabledEntry != null) {
-      m_enabledListener = m_enabledEntry.addListener((event) -> {
-        if (event.value.getBoolean()) {
-          start();
-        } else {
-          stop();
-        }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-    }
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
-    if (m_enabledEntry != null) {
-      m_enabledEntry.removeListener(m_enabledListener);
-      m_enabledListener = 0;
-    }
-  }
-
-  @Override
-  public String getSmartDashboardType() {
-    return "Compressor";
-  }
-
-  private NetworkTableEntry m_enabledEntry;
-  private NetworkTableEntry m_pressureSwitchEntry;
-  private int m_enabledListener;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_enabledEntry = subtable.getEntry("Enabled");
-      m_pressureSwitchEntry = subtable.getEntry("Pressure Switch");
-      updateTable();
-    } else {
-      m_enabledEntry = null;
-      m_pressureSwitchEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_enabledEntry != null) {
-      m_enabledEntry.setBoolean(enabled());
-    }
-    if (m_pressureSwitchEntry != null) {
-      m_pressureSwitchEntry.setBoolean(getPressureSwitchValue());
-    }
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Compressor");
+    builder.addBooleanProperty("Enabled", this::enabled, (value) -> {
+      if (value) {
+        start();
+      } else {
+        stop();
+      }
+    });
+    builder.addBooleanProperty("Pressure switch", this::getPressureSwitchValue, null);
   }
 }

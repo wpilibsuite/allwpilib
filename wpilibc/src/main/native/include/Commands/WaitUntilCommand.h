@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <string>
+#include <llvm/Twine.h>
 
 #include "Commands/Command.h"
 
@@ -16,7 +16,7 @@ namespace frc {
 class WaitUntilCommand : public Command {
  public:
   explicit WaitUntilCommand(double time);
-  WaitUntilCommand(const std::string& name, double time);
+  WaitUntilCommand(const llvm::Twine& name, double time);
   virtual ~WaitUntilCommand() = default;
 
  protected:

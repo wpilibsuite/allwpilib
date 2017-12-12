@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <string>
+#include <llvm/Twine.h>
 
 #include "Commands/Command.h"
 
@@ -16,12 +16,11 @@ namespace frc {
 /**
  * This command will execute once, then finish immediately afterward.
  *
- * <p>Subclassing {@link InstantCommand} is shorthand for returning true from
- * {@link Command isFinished}.
+ * Subclassing InstantCommand is shorthand for returning true from IsFinished().
  */
 class InstantCommand : public Command {
  public:
-  explicit InstantCommand(const std::string& name);
+  explicit InstantCommand(const llvm::Twine& name);
   InstantCommand() = default;
   virtual ~InstantCommand() = default;
 

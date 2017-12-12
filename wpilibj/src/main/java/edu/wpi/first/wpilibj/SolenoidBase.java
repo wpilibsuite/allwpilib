@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.hal.SolenoidJNI;
  * SolenoidBase class is the common base class for the {@link Solenoid} and {@link DoubleSolenoid}
  * classes.
  */
-public abstract class SolenoidBase extends SensorBase {
+public abstract class SolenoidBase extends SendableBase {
 
   protected final int m_moduleNumber; // The number of the solenoid module being used.
 

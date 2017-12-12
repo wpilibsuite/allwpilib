@@ -14,19 +14,20 @@
 #include <atomic>
 #include <cstdlib>
 #include <fstream>
-#include <mutex>
 #include <thread>
 
 #include <FRC_NetworkCommunication/FRCComm.h>
 #include <FRC_NetworkCommunication/LoadOut.h>
 #include <llvm/raw_ostream.h>
+#include <support/mutex.h>
+#include <support/timestamp.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
 #include "HAL/Notifier.h"
-#include "HAL/cpp/NotifierInternal.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "ctre/ctre.h"
 #include "visa/visa.h"
 
@@ -35,12 +36,45 @@ using namespace hal;
 static std::unique_ptr<tGlobal> global;
 static std::unique_ptr<tSysWatchdog> watchdog;
 
-static std::mutex timeMutex;
-static uint32_t timeEpoch = 0;
-static uint32_t prevFPGATime = 0;
-static HAL_NotifierHandle rolloverNotifier = 0;
-
 using namespace hal;
+
+namespace hal {
+namespace init {
+void InitializeHAL() {
+  InitializeHandlesInternal();
+  InitializeAccelerometer();
+  InitializeAnalogAccumulator();
+  InitializeAnalogGyro();
+  InitializeAnalogInput();
+  InitializeAnalogInternal();
+  InitializeAnalogOutput();
+  InitializeAnalogTrigger();
+  InitializeCAN();
+  InitializeCompressor();
+  InitializeConstants();
+  InitializeCounter();
+  InitializeDigitalInternal();
+  InitializeDIO();
+  InitializeEncoder();
+  InitializeFPGAEncoder();
+  InitializeFRCDriverStation();
+  InitializeI2C();
+  InitialzeInterrupts();
+  InitializeNotifier();
+  InitializeOSSerialPort();
+  InitializePCMInternal();
+  InitializePDP();
+  InitializePorts();
+  InitializePower();
+  InitializePWM();
+  InitializeRelay();
+  InitializeSerialPort();
+  InitializeSolenoid();
+  InitializeSPI();
+  InitializeThreads();
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -182,7 +216,7 @@ const char* HAL_GetErrorMessage(int32_t code) {
 /**
  * Returns the runtime type of this HAL
  */
-HAL_RuntimeType HAL_GetRuntimeType() { return HAL_Athena; }
+HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Athena; }
 
 /**
  * Return the FPGA Version number.
@@ -224,14 +258,17 @@ uint64_t HAL_GetFPGATime(int32_t* status) {
     *status = NiFpga_Status_ResourceNotInitialized;
     return 0;
   }
-  std::lock_guard<std::mutex> lock(timeMutex);
-  uint32_t fpgaTime = global->readLocalTime(status);
+
+  uint64_t upper1 = global->readLocalTimeUpper(status);
+  uint32_t lower = global->readLocalTime(status);
+  uint64_t upper2 = global->readLocalTimeUpper(status);
   if (*status != 0) return 0;
-  // check for rollover
-  if (fpgaTime < prevFPGATime) ++timeEpoch;
-  prevFPGATime = fpgaTime;
-  return static_cast<uint64_t>(timeEpoch) << 32 |
-         static_cast<uint64_t>(fpgaTime);
+  if (upper1 != upper2) {
+    // Rolled over between the lower call, reread lower
+    lower = global->readLocalTime(status);
+    if (*status != 0) return 0;
+  }
+  return (upper2 << 32) + lower;
 }
 
 /**
@@ -262,19 +299,13 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
   return !(watchdog->readStatus_PowerAlive(status));
 }
 
-static void timerRollover(uint64_t currentTime, HAL_NotifierHandle handle) {
-  // reschedule timer for next rollover
-  int32_t status = 0;
-  HAL_UpdateNotifierAlarm(handle, currentTime + 0x80000000ULL, &status);
-}
-
 void HAL_BaseInitialize(int32_t* status) {
   static std::atomic_bool initialized{false};
-  static std::mutex initializeMutex;
+  static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
   if (initialized) return;
 
-  std::lock_guard<std::mutex> lock(initializeMutex);
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return;
   // image 4; Fixes errors caused by multiple processes. Talk to NI about this
@@ -331,8 +362,20 @@ static bool killExistingProgram(int timeout, int mode) {
  * Call this to start up HAL. This is required for robot programs.
  */
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  static std::atomic_bool initialized{false};
+  static wpi::mutex initializeMutex;
+  // Initial check, as if it's true initialization has finished
+  if (initialized) return true;
+
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  // Second check in case another thread was waiting
+  if (initialized) return true;
+
+  hal::init::InitializeHAL();
+
   setlinebuf(stdin);
   setlinebuf(stdout);
+  llvm::outs().SetUnbuffered();
 
   prctl(PR_SET_PDEATHSIG, SIGTERM);
 
@@ -350,26 +393,25 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   int32_t status = 0;
   HAL_BaseInitialize(&status);
-
-  if (!rolloverNotifier)
-    rolloverNotifier = HAL_InitializeNotifierNonThreadedUnsafe(
-        timerRollover, nullptr, &status);
-  if (status == 0) {
-    uint64_t curTime = HAL_GetFPGATime(&status);
-    if (status == 0) {
-      HAL_UpdateNotifierAlarm(rolloverNotifier, curTime + 0x80000000ULL,
-                              &status);
-    } else {
-      // return false if status failed.
-      return false;
-    }
-  } else {
-    // return false if status failed.
-    return false;
-  }
+  if (status != 0) return false;
 
   HAL_InitializeDriverStation();
 
+  // Set WPI_Now to use FPGA timestamp
+  wpi::SetNowImpl([]() -> uint64_t {
+    int32_t status = 0;
+    uint64_t rv = HAL_GetFPGATime(&status);
+    if (status != 0) {
+      llvm::errs()
+          << "Call to HAL_GetFPGATime failed."
+          << "Initialization might have failed. Time will not be correct\n";
+      llvm::errs().flush();
+      return 0u;
+    }
+    return rv;
+  });
+
+  initialized = true;
   return true;
 }
 
@@ -385,8 +427,8 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
 
 // TODO: HACKS
 // No need for header definitions, as we should not run from user code.
-void NumericArrayResize() {}
-void RTSetCleanupProc() {}
-void EDVR_CreateReference() {}
+void NumericArrayResize(void) {}
+void RTSetCleanupProc(void) {}
+void EDVR_CreateReference(void) {}
 
 }  // extern "C"

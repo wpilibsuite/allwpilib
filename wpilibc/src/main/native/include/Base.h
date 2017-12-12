@@ -7,39 +7,19 @@
 
 #pragma once
 
+#if !defined(__clang__) && defined(__GNUC__) && __GNUC__ < 5
+static_assert(0,
+              "GCC must be 5 or greater. If building for the roboRIO, please "
+              "update to the 2018 toolchains.");
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER < 1900
+static_assert(0, "Visual Studio 2015 or greater required.");
+#endif
+
 #include <HAL/cpp/make_unique.h>
 
-// MSVC 2013 doesn't allow "= default" on move constructors, but since we are
-// (currently) only actually using the move constructors in non-MSVC situations
-// (ie, wpilibC++Devices), we can just ignore it in MSVC.
-#if defined(_MSC_VER) && _MSC_VER < 1900
-#define DEFAULT_MOVE_CONSTRUCTOR(ClassName)
-#else
 #define DEFAULT_MOVE_CONSTRUCTOR(ClassName) ClassName(ClassName&&) = default
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER < 1900
-#define constexpr const
-#endif
-
-#if (__cplusplus < 201103L) && !defined(_MSC_VER)
-#define nullptr NULL
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER < 1900
-#define noexcept throw()
-#endif
-
-// Provide std::decay_t when using GCC < 4.9
-#if defined(__GNUC__)
-#if __GNUC__ == 4 && __GNUC_MINOR__ < 9
-#include <type_traits>
-namespace std {
-template <class T>
-using decay_t = typename decay<T>::type;
-}
-#endif
-#endif
 
 namespace frc {
 

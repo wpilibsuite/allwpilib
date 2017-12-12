@@ -14,6 +14,12 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializeCompressor() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 
 HAL_CompressorHandle HAL_InitializeCompressor(int32_t module, int32_t* status) {

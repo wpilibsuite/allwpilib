@@ -31,6 +31,16 @@ static inline bool checkPDPInit(int32_t module, int32_t* status) {
   return true;
 }
 
+namespace hal {
+namespace init {
+void InitializePDP() {
+  for (int i = 0; i < kNumPDPModules; i++) {
+    pdp[i] = nullptr;
+  }
+}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 
 void HAL_InitializePDP(int32_t module, int32_t* status) {

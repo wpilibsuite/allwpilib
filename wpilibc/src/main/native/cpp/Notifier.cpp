@@ -15,8 +15,6 @@
 
 using namespace frc;
 
-std::mutex Notifier::m_destructorMutex;
-
 /**
  * Create a Notifier for timer event notification.
  *
@@ -28,8 +26,31 @@ Notifier::Notifier(TimerEventHandler handler) {
     wpi_setWPIErrorWithContext(NullParameter, "handler must not be nullptr");
   m_handler = handler;
   int32_t status = 0;
-  m_notifier = HAL_InitializeNotifier(&Notifier::Notify, this, &status);
+  m_notifier = HAL_InitializeNotifier(&status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+
+  m_thread = std::thread([=] {
+    for (;;) {
+      int32_t status = 0;
+      HAL_NotifierHandle notifier = m_notifier.load();
+      if (notifier == 0) break;
+      uint64_t curTime = HAL_WaitForNotifierAlarm(notifier, &status);
+      if (curTime == 0 || status != 0) break;
+
+      TimerEventHandler handler;
+      {
+        std::lock_guard<wpi::mutex> lock(m_processMutex);
+        handler = m_handler;
+        if (m_periodic) {
+          m_expirationTime += m_period;
+          UpdateAlarm();
+        }
+      }
+
+      // call callback
+      if (handler) handler();
+    }
+  });
 }
 
 /**
@@ -39,14 +60,13 @@ Notifier::~Notifier() {
   int32_t status = 0;
   // atomically set handle to 0, then clean
   HAL_NotifierHandle handle = m_notifier.exchange(0);
-  HAL_CleanNotifier(handle, &status);
+  HAL_StopNotifier(handle, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
-  /* Acquire the mutex; this makes certain that the handler is not being
-   * executed by the interrupt manager.
-   */
-  std::lock_guard<std::mutex> lockStatic(Notifier::m_destructorMutex);
-  std::lock_guard<std::mutex> lock(m_processMutex);
+  // Join the thread to ensure the handler has exited.
+  if (m_thread.joinable()) m_thread.join();
+
+  HAL_CleanNotifier(handle, &status);
 }
 
 /**
@@ -55,37 +75,21 @@ Notifier::~Notifier() {
 void Notifier::UpdateAlarm() {
   int32_t status = 0;
   // Return if we are being destructed, or were not created successfully
-  if (m_notifier == 0) return;
+  auto notifier = m_notifier.load();
+  if (notifier == 0) return;
   HAL_UpdateNotifierAlarm(
-      m_notifier, static_cast<uint64_t>(m_expirationTime * 1e6), &status);
+      notifier, static_cast<uint64_t>(m_expirationTime * 1e6), &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
 /**
- * Notify is called by the HAL layer.  We simply need to pass it through to
- * the user handler.
+ * Change the handler function.
+ *
+ * @param handler Handler
  */
-void Notifier::Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
-  Notifier* notifier;
-  {
-    // Lock static mutex to grab the notifier param
-    std::lock_guard<std::mutex> lock(Notifier::m_destructorMutex);
-    int32_t status = 0;
-    auto notifierPointer = HAL_GetNotifierParam(handle, &status);
-    if (notifierPointer == nullptr) return;
-    notifier = static_cast<Notifier*>(notifierPointer);
-    notifier->m_processMutex.lock();
-  }
-
-  if (notifier->m_periodic) {
-    notifier->m_expirationTime += notifier->m_period;
-    notifier->UpdateAlarm();
-  }
-
-  auto handler = notifier->m_handler;
-
-  if (handler) handler();
-  notifier->m_processMutex.unlock();
+void Notifier::SetHandler(TimerEventHandler handler) {
+  std::lock_guard<wpi::mutex> lock(m_processMutex);
+  m_handler = handler;
 }
 
 /**
@@ -96,10 +100,10 @@ void Notifier::Notify(uint64_t currentTimeInt, HAL_NotifierHandle handle) {
  * @param delay Seconds to wait before the handler is called.
  */
 void Notifier::StartSingle(double delay) {
-  std::lock_guard<std::mutex> sync(m_processMutex);
+  std::lock_guard<wpi::mutex> lock(m_processMutex);
   m_periodic = false;
   m_period = delay;
-  m_expirationTime = GetClock() + m_period;
+  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 }
 
@@ -114,10 +118,10 @@ void Notifier::StartSingle(double delay) {
  *               after the call to this method.
  */
 void Notifier::StartPeriodic(double period) {
-  std::lock_guard<std::mutex> sync(m_processMutex);
+  std::lock_guard<wpi::mutex> lock(m_processMutex);
   m_periodic = true;
   m_period = period;
-  m_expirationTime = GetClock() + m_period;
+  m_expirationTime = Timer::GetFPGATimestamp() + m_period;
   UpdateAlarm();
 }
 
@@ -132,11 +136,6 @@ void Notifier::StartPeriodic(double period) {
  */
 void Notifier::Stop() {
   int32_t status = 0;
-  HAL_StopNotifierAlarm(m_notifier, &status);
+  HAL_CancelNotifierAlarm(m_notifier, &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
-
-  // Wait for a currently executing handler to complete before returning from
-  // Stop()
-  std::lock_guard<std::mutex> lockStatic(Notifier::m_destructorMutex);
-  std::lock_guard<std::mutex> lock(m_processMutex);
 }

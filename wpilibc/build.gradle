@@ -6,8 +6,8 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 apply from: '../config.gradle'
 
 ext.addWpilibCCompilerArguments = { binary->
-    tasks.withType(CppCompile) {
-        binary.cppCompiler.args "-DNAMESPACED_WPILib"
+    binary.tasks.withType(CppCompile) {
+        binary.cppCompiler.args "-DNAMESPACED_WPILIB"
     }
 }
 
@@ -170,7 +170,6 @@ model {
             tasks.withType(CppCompile) {
                 dependsOn generateCppVersion
             }
-            project(':hal').addHalCompilerArguments(it)
             project(':ni-libraries').addNiLibrariesToLinker(it)
             project(':hal').addHalToLinker(it)
             project.addWpilibCCompilerArguments(it)
@@ -199,6 +198,32 @@ model {
                             }
                         }
                     }
+                }
+            }
+        }
+        getHeaders(Task) {
+            def list = []
+            $.components.each {
+                if (it in NativeLibrarySpec && it.name == 'wpilibc') {
+                    it.sources.each {
+                        it.exportedHeaders.srcDirs.each {
+                            list.add(it)
+                        }
+                    }
+                    it.binaries.each {
+                        it.libs.each {
+                            it.includeRoots.each {
+                                list.add(it)
+                            }
+                        }
+                    }
+                }
+            }
+            list = list.unique(false)
+            doLast {
+                list.each {
+                    print "WPIHEADER: "
+                    println it
                 }
             }
         }

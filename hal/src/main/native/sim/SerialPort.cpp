@@ -7,6 +7,12 @@
 
 #include "HAL/SerialPort.h"
 
+namespace hal {
+namespace init {
+void InitializeSerialPort() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {}
 
@@ -61,4 +67,4 @@ void HAL_FlushSerial(HAL_SerialPort port, int32_t* status) {}
 void HAL_ClearSerial(HAL_SerialPort port, int32_t* status) {}
 
 void HAL_CloseSerial(HAL_SerialPort port, int32_t* status) {}
-}
+}  // extern "C"

@@ -13,8 +13,9 @@
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTable.h>
+
 #include "ErrorBase.h"
-#include "networktables/NetworkTable.h"
 
 namespace frc {
 
@@ -22,15 +23,15 @@ namespace frc {
  * The preferences class provides a relatively simple way to save important
  * values to the roboRIO to access the next time the roboRIO is booted.
  *
- * <p>This class loads and saves from a file inside the roboRIO.  The user can
- * not access the file directly, but may modify values at specific fields which
- * will then be automatically periodically saved to the file by the NetworkTable
- * server.</p>
+ * This class loads and saves from a file inside the roboRIO.  The user cannot
+ * access the file directly, but may modify values at specific fields which will
+ * then be automatically periodically saved to the file by the NetworkTable
+ * server.
  *
- * <p>This class is thread safe.</p>
+ * This class is thread safe.
  *
- * <p>This will also interact with {@link NetworkTable} by creating a table
- * called "Preferences" with all the key-value pairs.</p>
+ * This will also interact with {@link NetworkTable} by creating a table called
+ * "Preferences" with all the key-value pairs.
  */
 class Preferences : public ErrorBase {
  public:

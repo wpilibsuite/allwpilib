@@ -12,6 +12,12 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializePDP() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 void HAL_InitializePDP(int32_t module, int32_t* status) {
   SimPDPData[module].SetInitialized(true);
@@ -38,4 +44,4 @@ double HAL_GetPDPTotalPower(int32_t module, int32_t* status) { return 0.0; }
 double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) { return 0.0; }
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status) {}
 void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status) {}
-}
+}  // extern "C"

@@ -13,16 +13,20 @@
 #include "Buttons/ButtonScheduler.h"
 #include "Commands/Subsystem.h"
 #include "HLUsageReporting.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
 
-Scheduler::Scheduler() { HLUsageReporting::ReportScheduler(); }
+Scheduler::Scheduler() {
+  HLUsageReporting::ReportScheduler();
+  SetName("Scheduler");
+}
 
 /**
- * Returns the {@link Scheduler}, creating it if one does not exist.
+ * Returns the Scheduler, creating it if one does not exist.
  *
- * @return the {@link Scheduler}
+ * @return the Scheduler
  */
 Scheduler* Scheduler::GetInstance() {
   static Scheduler instance;
@@ -40,7 +44,7 @@ void Scheduler::SetEnabled(bool enabled) { m_enabled = enabled; }
  * @param command The command to be scheduled
  */
 void Scheduler::AddCommand(Command* command) {
-  std::lock_guard<std::mutex> sync(m_additionsLock);
+  std::lock_guard<wpi::mutex> lock(m_additionsMutex);
   if (std::find(m_additions.begin(), m_additions.end(), command) !=
       m_additions.end())
     return;
@@ -48,7 +52,7 @@ void Scheduler::AddCommand(Command* command) {
 }
 
 void Scheduler::AddButton(ButtonScheduler* button) {
-  std::lock_guard<std::mutex> sync(m_buttonsLock);
+  std::lock_guard<wpi::mutex> lock(m_buttonsMutex);
   m_buttons.push_back(button);
 }
 
@@ -99,14 +103,14 @@ void Scheduler::ProcessCommandAddition(Command* command) {
  * Runs a single iteration of the loop.
  *
  * This method should be called often in order to have a functioning
- * {@link Command} system.  The loop has five stages:
+ * Command system. The loop has five stages:
  *
  * <ol>
- * <li> Poll the Buttons </li>
- * <li> Execute/Remove the Commands </li>
- * <li> Send values to SmartDashboard </li>
- * <li> Add Commands </li>
- * <li> Add Defaults </li>
+ *   <li>Poll the Buttons</li>
+ *   <li>Execute/Remove the Commands</li>
+ *   <li>Send values to SmartDashboard</li>
+ *   <li>Add Commands</li>
+ *   <li>Add Defaults</li>
  * </ol>
  */
 void Scheduler::Run() {
@@ -114,7 +118,7 @@ void Scheduler::Run() {
   {
     if (!m_enabled) return;
 
-    std::lock_guard<std::mutex> sync(m_buttonsLock);
+    std::lock_guard<wpi::mutex> lock(m_buttonsMutex);
     for (auto rButtonIter = m_buttons.rbegin(); rButtonIter != m_buttons.rend();
          rButtonIter++) {
       (*rButtonIter)->Execute();
@@ -144,7 +148,7 @@ void Scheduler::Run() {
 
   // Add the new things
   {
-    std::lock_guard<std::mutex> sync(m_additionsLock);
+    std::lock_guard<wpi::mutex> lock(m_additionsMutex);
     for (auto additionsIter = m_additions.begin();
          additionsIter != m_additions.end(); additionsIter++) {
       ProcessCommandAddition(*additionsIter);
@@ -161,15 +165,13 @@ void Scheduler::Run() {
     }
     lock->ConfirmCommand();
   }
-
-  UpdateTable();
 }
 
 /**
- * Registers a {@link Subsystem} to this {@link Scheduler}, so that the {@link
- * Scheduler} might know if a default {@link Command} needs to be run.
+ * Registers a Subsystem to this Scheduler, so that the Scheduler might know if
+ * a default Command needs to be run.
  *
- * All {@link Subsystem Subsystems} should call this.
+ * All Subsystems should call this.
  *
  * @param system the system
  */
@@ -182,7 +184,7 @@ void Scheduler::RegisterSubsystem(Subsystem* subsystem) {
 }
 
 /**
- * Removes the {@link Command} from the {@link Scheduler}.
+ * Removes the Command from the Scheduler.
  *
  * @param command the command to remove
  */
@@ -223,22 +225,20 @@ void Scheduler::ResetAll() {
   m_cancelEntry = nt::NetworkTableEntry();
 }
 
-/**
- * Update the network tables associated with the Scheduler object on the
- * SmartDashboard.
- */
-void Scheduler::UpdateTable() {
-  if (m_cancelEntry && m_namesEntry && m_idsEntry) {
+void Scheduler::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Scheduler");
+  m_namesEntry = builder.GetEntry("Names");
+  m_idsEntry = builder.GetEntry("Ids");
+  m_cancelEntry = builder.GetEntry("Cancel");
+  builder.SetUpdateTable([=]() {
     // Get the list of possible commands to cancel
     auto new_toCancel = m_cancelEntry.GetValue();
     if (new_toCancel)
       toCancel = new_toCancel->GetDoubleArray();
     else
       toCancel.resize(0);
-    // m_table->RetrieveValue("Ids", *ids);
 
-    // cancel commands that have had the cancel buttons pressed
-    // on the SmartDashboad
+    // Cancel commands whose cancel buttons were pressed on the SmartDashboard
     if (!toCancel.empty()) {
       for (auto commandIter = m_commands.begin();
            commandIter != m_commands.end(); ++commandIter) {
@@ -266,26 +266,5 @@ void Scheduler::UpdateTable() {
       m_namesEntry.SetStringArray(commands);
       m_idsEntry.SetDoubleArray(ids);
     }
-  }
-}
-
-std::string Scheduler::GetName() const { return "Scheduler"; }
-
-std::string Scheduler::GetType() const { return "Scheduler"; }
-
-std::string Scheduler::GetSmartDashboardType() const { return "Scheduler"; }
-
-void Scheduler::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_namesEntry = subTable->GetEntry("Names");
-    m_idsEntry = subTable->GetEntry("Ids");
-    m_cancelEntry = subTable->GetEntry("Cancel");
-    m_namesEntry.SetStringArray(commands);
-    m_idsEntry.SetDoubleArray(ids);
-    m_cancelEntry.SetDoubleArray(toCancel);
-  } else {
-    m_namesEntry = nt::NetworkTableEntry();
-    m_idsEntry = nt::NetworkTableEntry();
-    m_cancelEntry = nt::NetworkTableEntry();
-  }
+  });
 }

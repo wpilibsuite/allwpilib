@@ -7,14 +7,72 @@
 
 #include "HAL/HAL.h"
 
+#include <llvm/raw_ostream.h>
+
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
+#include "HAL/Extensions.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "MockData/RoboRioDataInternal.h"
 #include "MockHooksInternal.h"
 
 using namespace hal;
+
+namespace hal {
+namespace init {
+void InitializeHAL() {
+  InitializeHandlesInternal();
+  InitializeAccelerometerData();
+  InitializeAnalogGyroData();
+  InitializeAnalogInData();
+  InitializeAnalogOutData();
+  InitializeAnalogTriggerData();
+  InitializeCanData();
+  InitializeDigitalPWMData();
+  InitializeDIOData();
+  InitializeDriverStationData();
+  InitializeEncoderData();
+  InitializeI2CData();
+  InitializePCMData();
+  InitializePDPData();
+  InitializePWMData();
+  InitializeRelayData();
+  InitializeRoboRioData();
+  InitializeSPIAccelerometerData();
+  InitializeSPIData();
+  InitializeAccelerometer();
+  InitializeAnalogAccumulator();
+  InitializeAnalogGyro();
+  InitializeAnalogInput();
+  InitializeAnalogInternal();
+  InitializeAnalogOutput();
+  InitializeCAN();
+  InitializeCompressor();
+  InitializeConstants();
+  InitializeCounter();
+  InitializeDigitalInternal();
+  InitializeDIO();
+  InitializeDriverStation();
+  InitializeExtensions();
+  InitializeI2C();
+  InitializeInterrupts();
+  InitializeMockHooks();
+  InitializeNotifier();
+  InitializeOSSerialPort();
+  InitializePDP();
+  InitializePorts();
+  InitializePower();
+  InitializePWM();
+  InitializeRelay();
+  InitializeSerialPort();
+  InitializeSolenoid();
+  InitializeSPI();
+  InitializeThreads();
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -146,7 +204,7 @@ const char* HAL_GetErrorMessage(int32_t code) {
 /**
  * Returns the runtime type of this HAL
  */
-HAL_RuntimeType HAL_GetRuntimeType() { return HAL_Mock; }
+HAL_RuntimeType HAL_GetRuntimeType(void) { return HAL_Mock; }
 
 /**
  * Return the FPGA Version number.
@@ -194,8 +252,23 @@ HAL_Bool HAL_GetBrownedOut(int32_t* status) {
 }
 
 HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
+  static std::atomic_bool initialized{false};
+  static wpi::mutex initializeMutex;
+  // Initial check, as if it's true initialization has finished
+  if (initialized) return true;
+
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
+  // Second check in case another thread was waiting
+  if (initialized) return true;
+
+  hal::init::InitializeHAL();
+
+  llvm::outs().SetUnbuffered();
+  if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();
+
+  initialized = true;
   return true;  // Add initialization if we need to at a later point
 }
 

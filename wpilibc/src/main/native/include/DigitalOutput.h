@@ -7,30 +7,27 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include <HAL/Types.h>
 
-#include "DigitalSource.h"
-#include "LiveWindow/LiveWindowSendable.h"
-#include "networktables/NetworkTableEntry.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
 /**
  * Class to write to digital outputs.
+ *
  * Write values to the digital output channels. Other devices implemented
  * elsewhere will allocate channels automatically so for those devices it
  * shouldn't be done here.
  */
-class DigitalOutput : public DigitalSource, public LiveWindowSendable {
+class DigitalOutput : public ErrorBase, public SendableBase {
  public:
   explicit DigitalOutput(int channel);
-  virtual ~DigitalOutput();
+  ~DigitalOutput() override;
   void Set(bool value);
   bool Get() const;
-  int GetChannel() const override;
+  int GetChannel() const;
   void Pulse(double length);
   bool IsPulsing() const;
   void SetPWMRate(double rate);
@@ -38,24 +35,12 @@ class DigitalOutput : public DigitalSource, public LiveWindowSendable {
   void DisablePWM();
   void UpdateDutyCycle(double dutyCycle);
 
-  // Digital Source Interface
-  HAL_Handle GetPortHandleForRouting() const override;
-  AnalogTriggerType GetAnalogTriggerTypeForRouting() const override;
-  bool IsAnalogTrigger() const override;
-
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   int m_channel;
   HAL_DigitalHandle m_handle;
   HAL_DigitalPWMHandle m_pwmGenerator;
-
-  nt::NetworkTableEntry m_valueEntry;
-  NT_EntryListener m_valueListener = 0;
 };
 
 }  // namespace frc

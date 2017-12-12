@@ -52,7 +52,7 @@ if (!project.hasProperty('skipAthena')) {
                     cpp {
                         source {
                             srcDirs = ["${rootDir}/gmock/gtest/src", 'src/FRCUserProgram/cpp']
-                            includes = ['*-all.cc', '*_main.cc', '*.cpp']
+                            includes = ['*-all.cc', '*_main.cc', '**/*.cpp']
                         }
                         exportedHeaders {
                             srcDirs = ["${rootDir}/gmock/gtest/include", "${rootDir}/gmock/gtest", 'src/FRCUserProgram/headers']
@@ -65,9 +65,9 @@ if (!project.hasProperty('skipAthena')) {
                         binary.tasks.withType(CppCompile) {
                             cppCompiler.args "-Wno-missing-field-initializers"
                             cppCompiler.args "-Wno-unused-variable"
+                            cppCompiler.args "-Wno-error=deprecated-declarations"
                         }
                         project(':ni-libraries').addNiLibrariesToLinker(binary)
-                        project(':hal').addHalCompilerArguments(binary)
                         project(':hal').addHalToLinker(binary)
                         project(':wpilibc').addWpilibCCompilerArguments(binary)
                         project(':wpilibc').addWpilibCToLinker(binary)

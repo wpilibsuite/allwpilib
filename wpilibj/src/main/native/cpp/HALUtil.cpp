@@ -55,6 +55,9 @@ static JException canMessageNotAllowedExCls;
 static JException canNotInitializedExCls;
 static JException uncleanStatusExCls;
 static JClass pwmConfigDataResultCls;
+static JClass canStatusCls;
+static JClass matchInfoDataCls;
+static JClass accumulatorResultCls;
 
 namespace frc {
 
@@ -207,6 +210,39 @@ jobject CreatePWMConfigDataResult(JNIEnv *env, int32_t maxPwm,
                         minPwm);
 }
 
+void SetCanStatusObject(JNIEnv *env, jobject canStatus,
+                        float percentBusUtilization,
+                        uint32_t busOffCount, uint32_t txFullCount,
+                        uint32_t receiveErrorCount,
+                        uint32_t transmitErrorCount) {
+  static jmethodID func = env->GetMethodID(canStatusCls, "setStatus",
+                                           "(DIIII)V");
+  env->CallObjectMethod(canStatus, func, (jdouble)percentBusUtilization,
+                        (jint)busOffCount, (jint)txFullCount,
+                        (jint)receiveErrorCount, (jint)transmitErrorCount);
+}
+
+void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
+                        const HAL_MatchInfo& matchInfo) {
+  static jmethodID func = env->GetMethodID(matchInfoDataCls, "setData",
+      "(Ljava/lang/String;Ljava/lang/String;III)V");
+
+  env->CallObjectMethod(matchStatus, func,
+      MakeJString(env, matchInfo.eventName),
+      MakeJString(env, matchInfo.gameSpecificMessage),
+      (jint)matchInfo.matchNumber,
+      (jint)matchInfo.replayNumber,
+      (jint)matchInfo.matchType);
+}
+
+void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
+                                int64_t value, int64_t count) {
+  static jmethodID func = env->GetMethodID(accumulatorResultCls, "set",
+      "(JJ)V");
+
+  env->CallObjectMethod(accumulatorResult, func, (jlong)value, (jlong)count);
+}
+
 }  // namespace frc
 
 using namespace frc;
@@ -259,6 +295,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   pwmConfigDataResultCls = JClass(env, "edu/wpi/first/wpilibj/PWMConfigDataResult");
   if (!pwmConfigDataResultCls) return JNI_ERR;
 
+  canStatusCls = JClass(env, "edu/wpi/first/wpilibj/can/CANStatus");
+  if (!canStatusCls) return JNI_ERR;
+
+  matchInfoDataCls = JClass(env, "edu/wpi/first/wpilibj/hal/MatchInfoData");
+  if (!matchInfoDataCls) return JNI_ERR;
+
+  accumulatorResultCls = JClass(env, "edu/wpi/first/wpilibj/AccumulatorResult");
+  if (!accumulatorResultCls) return JNI_ERR;
+
   return JNI_VERSION_1_6;
 }
 
@@ -278,6 +323,8 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   canNotInitializedExCls.free(env);
   uncleanStatusExCls.free(env);
   pwmConfigDataResultCls.free(env);
+  canStatusCls.free(env);
+  matchInfoDataCls.free(env);
   jvm = nullptr;
 }
 

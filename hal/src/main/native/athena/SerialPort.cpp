@@ -12,8 +12,14 @@
 #include "HAL/cpp/SerialHelper.h"
 #include "visa/visa.h"
 
-static int32_t resourceManagerHandle;
+static int32_t resourceManagerHandle{0};
 static HAL_SerialPort portHandles[4];
+
+namespace hal {
+namespace init {
+void InitializeSerialPort() {}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 

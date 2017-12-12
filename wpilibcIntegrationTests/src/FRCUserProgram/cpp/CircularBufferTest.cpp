@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "CircularBuffer.h"  // NOLINT(build/include_order)
+#include "circular_buffer.h"  // NOLINT(build/include_order)
 
 #include <array>
 
@@ -24,10 +24,10 @@ static const std::array<double, 8> pushBackOut = {
     342.657, 234.252, 716.126, 132.344, 445.697, 22.727, 421.125, 799.913};
 
 TEST(CircularBufferTest, PushFrontTest) {
-  CircularBuffer<double> queue(8);
+  circular_buffer<double> queue(8);
 
   for (auto& value : values) {
-    queue.PushFront(value);
+    queue.push_front(value);
   }
 
   for (size_t i = 0; i < pushFrontOut.size(); i++) {
@@ -36,10 +36,10 @@ TEST(CircularBufferTest, PushFrontTest) {
 }
 
 TEST(CircularBufferTest, PushBackTest) {
-  CircularBuffer<double> queue(8);
+  circular_buffer<double> queue(8);
 
   for (auto& value : values) {
-    queue.PushBack(value);
+    queue.push_back(value);
   }
 
   for (size_t i = 0; i < pushBackOut.size(); i++) {
@@ -48,12 +48,12 @@ TEST(CircularBufferTest, PushBackTest) {
 }
 
 TEST(CircularBufferTest, PushPopTest) {
-  CircularBuffer<double> queue(3);
+  circular_buffer<double> queue(3);
 
   // Insert three elements into the buffer
-  queue.PushBack(1.0);
-  queue.PushBack(2.0);
-  queue.PushBack(3.0);
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
 
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
@@ -64,40 +64,40 @@ TEST(CircularBufferTest, PushPopTest) {
    * front-most elements.
    */
 
-  queue.PushBack(4.0);  // Overwrite 1 with 4
+  queue.push_back(4.0);  // Overwrite 1 with 4
 
   // The buffer now contains 2, 3 and 4
   EXPECT_EQ(2.0, queue[0]);
   EXPECT_EQ(3.0, queue[1]);
   EXPECT_EQ(4.0, queue[2]);
 
-  queue.PushBack(5.0);  // Overwrite 2 with 5
+  queue.push_back(5.0);  // Overwrite 2 with 5
 
   // The buffer now contains 3, 4 and 5
   EXPECT_EQ(3.0, queue[0]);
   EXPECT_EQ(4.0, queue[1]);
   EXPECT_EQ(5.0, queue[2]);
 
-  EXPECT_EQ(5.0, queue.PopBack());  // 5 is removed
+  EXPECT_EQ(5.0, queue.pop_back());  // 5 is removed
 
   // The buffer now contains 3 and 4
   EXPECT_EQ(3.0, queue[0]);
   EXPECT_EQ(4.0, queue[1]);
 
-  EXPECT_EQ(3.0, queue.PopFront());  // 3 is removed
+  EXPECT_EQ(3.0, queue.pop_front());  // 3 is removed
 
   // Leaving only one element with value == 4
   EXPECT_EQ(4.0, queue[0]);
 }
 
 TEST(CircularBufferTest, ResetTest) {
-  CircularBuffer<double> queue(5);
+  circular_buffer<double> queue(5);
 
   for (size_t i = 1; i < 6; i++) {
-    queue.PushBack(i);
+    queue.push_back(i);
   }
 
-  queue.Reset();
+  queue.reset();
 
   for (size_t i = 0; i < 5; i++) {
     EXPECT_EQ(0.0, queue[i]);
@@ -105,105 +105,105 @@ TEST(CircularBufferTest, ResetTest) {
 }
 
 TEST(CircularBufferTest, ResizeTest) {
-  CircularBuffer<double> queue(5);
+  circular_buffer<double> queue(5);
 
   /* Buffer contains {1, 2, 3, _, _}
    *                  ^ front
    */
-  queue.PushBack(1.0);
-  queue.PushBack(2.0);
-  queue.PushBack(3.0);
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
 
-  queue.Resize(2);
+  queue.resize(2);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Resize(5);
+  queue.resize(5);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Reset();
+  queue.reset();
 
   /* Buffer contains {_, 1, 2, 3, _}
    *                     ^ front
    */
-  queue.PushBack(0.0);
-  queue.PushBack(1.0);
-  queue.PushBack(2.0);
-  queue.PushBack(3.0);
-  queue.PopFront();
+  queue.push_back(0.0);
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.pop_front();
 
-  queue.Resize(2);
+  queue.resize(2);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Resize(5);
+  queue.resize(5);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Reset();
+  queue.reset();
 
   /* Buffer contains {_, _, 1, 2, 3}
    *                        ^ front
    */
-  queue.PushBack(0.0);
-  queue.PushBack(0.0);
-  queue.PushBack(1.0);
-  queue.PushBack(2.0);
-  queue.PushBack(3.0);
-  queue.PopFront();
-  queue.PopFront();
+  queue.push_back(0.0);
+  queue.push_back(0.0);
+  queue.push_back(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.pop_front();
+  queue.pop_front();
 
-  queue.Resize(2);
+  queue.resize(2);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Resize(5);
+  queue.resize(5);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Reset();
+  queue.reset();
 
   /* Buffer contains {3, _, _, 1, 2}
    *                           ^ front
    */
-  queue.PushBack(3.0);
-  queue.PushFront(2.0);
-  queue.PushFront(1.0);
+  queue.push_back(3.0);
+  queue.push_front(2.0);
+  queue.push_front(1.0);
 
-  queue.Resize(2);
+  queue.resize(2);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Resize(5);
+  queue.resize(5);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Reset();
+  queue.reset();
 
   /* Buffer contains {2, 3, _, _, 1}
    *                              ^ front
    */
-  queue.PushBack(2.0);
-  queue.PushBack(3.0);
-  queue.PushFront(1.0);
+  queue.push_back(2.0);
+  queue.push_back(3.0);
+  queue.push_front(1.0);
 
-  queue.Resize(2);
+  queue.resize(2);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  queue.Resize(5);
+  queue.resize(5);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
 
-  // Test PushBack() after resize
-  queue.PushBack(3.0);
+  // Test push_back() after resize
+  queue.push_back(3.0);
   EXPECT_EQ(1.0, queue[0]);
   EXPECT_EQ(2.0, queue[1]);
   EXPECT_EQ(3.0, queue[2]);
 
-  // Test PushFront() after resize
-  queue.PushFront(4.0);
+  // Test push_front() after resize
+  queue.push_front(4.0);
   EXPECT_EQ(4.0, queue[0]);
   EXPECT_EQ(1.0, queue[1]);
   EXPECT_EQ(2.0, queue[2]);

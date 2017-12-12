@@ -8,7 +8,8 @@
 #pragma once
 
 #include <memory>
-#include <string>
+
+#include <llvm/Twine.h>
 
 #include "Commands/Subsystem.h"
 #include "PIDController.h"
@@ -18,25 +19,24 @@
 namespace frc {
 
 /**
- * This class is designed to handle the case where there is a {@link Subsystem}
- * which uses a single {@link PIDController} almost constantly (for instance,
- * an elevator which attempts to stay at a constant height).
+ * This class is designed to handle the case where there is a Subsystem which
+ * uses a single PIDController almost constantly (for instance, an elevator
+ * which attempts to stay at a constant height).
  *
- * <p>It provides some convenience methods to run an internal {@link
- * PIDController}. It also allows access to the internal {@link PIDController}
- * in order to give total control to the programmer.</p>
- *
+ * It provides some convenience methods to run an internal PIDController. It
+ * also allows access to the internal PIDController in order to give total
+ * control to the programmer.
  */
 class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
  public:
-  PIDSubsystem(const std::string& name, double p, double i, double d);
-  PIDSubsystem(const std::string& name, double p, double i, double d, double f);
-  PIDSubsystem(const std::string& name, double p, double i, double d, double f,
+  PIDSubsystem(const llvm::Twine& name, double p, double i, double d);
+  PIDSubsystem(const llvm::Twine& name, double p, double i, double d, double f);
+  PIDSubsystem(const llvm::Twine& name, double p, double i, double d, double f,
                double period);
   PIDSubsystem(double p, double i, double d);
   PIDSubsystem(double p, double i, double d, double f);
   PIDSubsystem(double p, double i, double d, double f, double period);
-  virtual ~PIDSubsystem() = default;
+  ~PIDSubsystem() override = default;
 
   void Enable();
   void Disable();
@@ -65,12 +65,8 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   virtual void UsePIDOutput(double output) = 0;
 
  private:
-  /** The internal {@link PIDController} */
+  // The internal PIDController
   std::shared_ptr<PIDController> m_controller;
-
- public:
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::string GetSmartDashboardType() const override;
 };
 
 }  // namespace frc

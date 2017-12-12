@@ -10,10 +10,9 @@
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
 #include <HAL/Solenoid.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SensorBase.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -24,7 +23,7 @@ using namespace frc;
  * @param channel The channel on the PCM to control (0..7).
  */
 Solenoid::Solenoid(int channel)
-    : Solenoid(GetDefaultSolenoidModule(), channel) {}
+    : Solenoid(SensorBase::GetDefaultSolenoidModule(), channel) {}
 
 /**
  * Constructor.
@@ -34,16 +33,15 @@ Solenoid::Solenoid(int channel)
  */
 Solenoid::Solenoid(int moduleNumber, int channel)
     : SolenoidBase(moduleNumber), m_channel(channel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
-  if (!CheckSolenoidModule(m_moduleNumber)) {
-    buf << "Solenoid Module " << m_moduleNumber;
-    wpi_setWPIErrorWithContext(ModuleIndexOutOfRange, buf.str());
+  if (!SensorBase::CheckSolenoidModule(m_moduleNumber)) {
+    wpi_setWPIErrorWithContext(
+        ModuleIndexOutOfRange,
+        "Solenoid Module " + llvm::Twine(m_moduleNumber));
     return;
   }
-  if (!CheckSolenoidChannel(m_channel)) {
-    buf << "Solenoid Module " << m_channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+  if (!SensorBase::CheckSolenoidChannel(m_channel)) {
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "Solenoid Channel " + llvm::Twine(m_channel));
     return;
   }
 
@@ -57,19 +55,15 @@ Solenoid::Solenoid(int moduleNumber, int channel)
     return;
   }
 
-  LiveWindow::GetInstance()->AddActuator("Solenoid", m_moduleNumber, m_channel,
-                                         this);
   HAL_Report(HALUsageReporting::kResourceType_Solenoid, m_channel,
              m_moduleNumber);
+  SetName("Solenoid", m_moduleNumber, m_channel);
 }
 
 /**
  * Destructor.
  */
-Solenoid::~Solenoid() {
-  HAL_FreeSolenoidPort(m_solenoidHandle);
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
-}
+Solenoid::~Solenoid() { HAL_FreeSolenoidPort(m_solenoidHandle); }
 
 /**
  * Set the value of a solenoid.
@@ -111,34 +105,39 @@ bool Solenoid::IsBlackListed() const {
   return (value != 0);
 }
 
-void Solenoid::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetBoolean(Get());
+/**
+ * Set the pulse duration in the PCM. This is used in conjunction with
+ * the startPulse method to allow the PCM to control the timing of a pulse.
+ * The timing can be controlled in 0.01 second increments.
+ *
+ * @param durationSeconds The duration of the pulse, from 0.01 to 2.55 seconds.
+ *
+ * @see startPulse()
+ */
+void Solenoid::SetPulseDuration(double durationSeconds) {
+  int32_t durationMS = durationSeconds * 1000;
+  if (StatusIsFatal()) return;
+  int32_t status = 0;
+  HAL_SetOneShotDuration(m_solenoidHandle, durationMS, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void Solenoid::StartLiveWindowMode() {
-  Set(false);
-  if (m_valueEntry) {
-    m_valueEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsBoolean()) return;
-          Set(event.value->GetBoolean());
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
+/**
+ * Trigger the PCM to generate a pulse of the duration set in
+ * setPulseDuration.
+ *
+ * @see setPulseDuration()
+ */
+void Solenoid::StartPulse() {
+  if (StatusIsFatal()) return;
+  int32_t status = 0;
+  HAL_FireOneShot(m_solenoidHandle, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-void Solenoid::StopLiveWindowMode() {
-  Set(false);
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
-}
-
-std::string Solenoid::GetSmartDashboardType() const { return "Solenoid"; }
-
-void Solenoid::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void Solenoid::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Solenoid");
+  builder.SetSafeState([=]() { Set(false); });
+  builder.AddBooleanProperty("Value", [=]() { return Get(); },
+                             [=](bool value) { Set(value); });
 }

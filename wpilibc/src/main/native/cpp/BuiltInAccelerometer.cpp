@@ -10,7 +10,7 @@
 #include <HAL/Accelerometer.h>
 #include <HAL/HAL.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -25,7 +25,7 @@ BuiltInAccelerometer::BuiltInAccelerometer(Range range) {
 
   HAL_Report(HALUsageReporting::kResourceType_Accelerometer, 0, 0,
              "Built-in accelerometer");
-  LiveWindow::GetInstance()->AddSensor((std::string) "BuiltInAccel", 0, this);
+  SetName("BuiltInAccel", 0);
 }
 
 void BuiltInAccelerometer::SetRange(Range range) {
@@ -54,26 +54,9 @@ double BuiltInAccelerometer::GetY() { return HAL_GetAccelerometerY(); }
  */
 double BuiltInAccelerometer::GetZ() { return HAL_GetAccelerometerZ(); }
 
-std::string BuiltInAccelerometer::GetSmartDashboardType() const {
-  return "3AxisAccelerometer";
-}
-
-void BuiltInAccelerometer::InitTable(
-    std::shared_ptr<nt::NetworkTable> subtable) {
-  if (subtable != nullptr) {
-    m_xEntry = subtable->GetEntry("X");
-    m_yEntry = subtable->GetEntry("Y");
-    m_zEntry = subtable->GetEntry("Z");
-    UpdateTable();
-  } else {
-    m_xEntry = nt::NetworkTableEntry();
-    m_yEntry = nt::NetworkTableEntry();
-    m_zEntry = nt::NetworkTableEntry();
-  }
-}
-
-void BuiltInAccelerometer::UpdateTable() {
-  if (m_xEntry) m_xEntry.SetDouble(GetX());
-  if (m_yEntry) m_yEntry.SetDouble(GetY());
-  if (m_zEntry) m_zEntry.SetDouble(GetZ());
+void BuiltInAccelerometer::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("3AxisAccelerometer");
+  builder.AddDoubleProperty("X", [=]() { return GetX(); }, nullptr);
+  builder.AddDoubleProperty("Y", [=]() { return GetY(); }, nullptr);
+  builder.AddDoubleProperty("Z", [=]() { return GetZ(); }, nullptr);
 }

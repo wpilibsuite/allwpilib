@@ -6,12 +6,21 @@
 /*----------------------------------------------------------------------------*/
 
 #include "../PortsInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 #include "PCMDataInternal.h"
 
 using namespace hal;
 
-PCMData hal::SimPCMData[kNumPCMModules];
+namespace hal {
+namespace init {
+void InitializePCMData() {
+  static PCMData spd[kNumPCMModules];
+  ::hal::SimPCMData = spd;
+}
+}  // namespace init
+}  // namespace hal
+
+PCMData* hal::SimPCMData;
 void PCMData::ResetData() {
   for (int i = 0; i < kNumSolenoidChannels; i++) {
     m_solenoidInitialized[i] = false;
@@ -38,7 +47,7 @@ int32_t PCMData::RegisterSolenoidInitializedCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_solenoidInitializedCallbacks[channel] =
         RegisterCallback(m_solenoidInitializedCallbacks[channel],
                          "SolenoidInitialized", callback, param, &newUid);
@@ -84,7 +93,7 @@ int32_t PCMData::RegisterSolenoidOutputCallback(int32_t channel,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_solenoidOutputCallbacks[channel] =
         RegisterCallback(m_solenoidOutputCallbacks[channel], "SolenoidOutput",
                          callback, param, &newUid);
@@ -123,7 +132,7 @@ int32_t PCMData::RegisterCompressorInitializedCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_compressorInitializedCallbacks =
         RegisterCallback(m_compressorInitializedCallbacks,
                          "CompressorInitialized", callback, param, &newUid);
@@ -162,7 +171,7 @@ int32_t PCMData::RegisterCompressorOnCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_compressorOnCallbacks = RegisterCallback(
         m_compressorOnCallbacks, "CompressorOn", callback, param, &newUid);
   }
@@ -198,7 +207,7 @@ int32_t PCMData::RegisterClosedLoopEnabledCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_closedLoopEnabledCallbacks =
         RegisterCallback(m_closedLoopEnabledCallbacks, "ClosedLoopEnabled",
                          callback, param, &newUid);
@@ -236,7 +245,7 @@ int32_t PCMData::RegisterPressureSwitchCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_pressureSwitchCallbacks = RegisterCallback(
         m_pressureSwitchCallbacks, "PressureSwitch", callback, param, &newUid);
   }
@@ -272,7 +281,7 @@ int32_t PCMData::RegisterCompressorCurrentCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_compressorCurrentCallbacks =
         RegisterCallback(m_compressorCurrentCallbacks, "CompressorCurrent",
                          callback, param, &newUid);
@@ -448,4 +457,30 @@ double HALSIM_GetPCMCompressorCurrent(int32_t index) {
 void HALSIM_SetPCMCompressorCurrent(int32_t index, double compressorCurrent) {
   SimPCMData[index].SetCompressorCurrent(compressorCurrent);
 }
+
+void HALSIM_RegisterPCMAllNonSolenoidCallbacks(int32_t index,
+                                               HAL_NotifyCallback callback,
+                                               void* param,
+                                               HAL_Bool initialNotify) {
+  SimPCMData[index].RegisterCompressorInitializedCallback(callback, param,
+                                                          initialNotify);
+  SimPCMData[index].RegisterCompressorOnCallback(callback, param,
+                                                 initialNotify);
+  SimPCMData[index].RegisterClosedLoopEnabledCallback(callback, param,
+                                                      initialNotify);
+  SimPCMData[index].RegisterPressureSwitchCallback(callback, param,
+                                                   initialNotify);
+  SimPCMData[index].RegisterCompressorCurrentCallback(callback, param,
+                                                      initialNotify);
 }
+
+void HALSIM_RegisterPCMAllSolenoidCallbacks(int32_t index, int32_t channel,
+                                            HAL_NotifyCallback callback,
+                                            void* param,
+                                            HAL_Bool initialNotify) {
+  SimPCMData[index].RegisterSolenoidInitializedCallback(channel, callback,
+                                                        param, initialNotify);
+  SimPCMData[index].RegisterSolenoidOutputCallback(channel, callback, param,
+                                                   initialNotify);
+}
+}  // extern "C"

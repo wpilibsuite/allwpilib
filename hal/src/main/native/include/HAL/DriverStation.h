@@ -47,6 +47,13 @@ enum HAL_AllianceStationID : int32_t {
   HAL_AllianceStationID_kBlue3,
 };
 
+enum HAL_MatchType {
+  HAL_kMatchType_none,
+  HAL_kMatchType_practice,
+  HAL_kMatchType_qualification,
+  HAL_kMatchType_elimination,
+};
+
 /* The maximum number of axes that will be stored in a single HALJoystickAxes
  * struct. This is used for allocating buffers, not bounds checking, since
  * there are usually less axes in practice.
@@ -79,11 +86,18 @@ struct HAL_JoystickDescriptor {
   uint8_t povCount;
 };
 
+struct HAL_MatchInfo {
+  char* eventName;
+  HAL_MatchType matchType;
+  uint16_t matchNumber;
+  uint8_t replayNumber;
+  char* gameSpecificMessage;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-int32_t HAL_SetErrorData(const char* errors, int32_t errorsLength,
-                         int32_t waitMs);
+
 int32_t HAL_SendError(HAL_Bool isError, int32_t errorCode, HAL_Bool isLVCode,
                       const char* details, const char* location,
                       const char* callStack, HAL_Bool printMsg);
@@ -104,6 +118,9 @@ int32_t HAL_GetJoystickAxisType(int32_t joystickNum, int32_t axis);
 int32_t HAL_SetJoystickOutputs(int32_t joystickNum, int64_t outputs,
                                int32_t leftRumble, int32_t rightRumble);
 double HAL_GetMatchTime(int32_t* status);
+
+int HAL_GetMatchInfo(HAL_MatchInfo* info);
+void HAL_FreeMatchInfo(HAL_MatchInfo* info);
 
 #ifndef HAL_USE_LABVIEW
 

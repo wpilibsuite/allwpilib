@@ -9,16 +9,9 @@
 
 #include <HAL/HAL.h>
 
-#include "DigitalInput.h"
-#include "DigitalOutput.h"
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
-
-const int ADXL345_SPI::kPowerCtlRegister;
-const int ADXL345_SPI::kDataFormatRegister;
-const int ADXL345_SPI::kDataRegister;
-constexpr double ADXL345_SPI::kGsPerLSB;
 
 /**
  * Constructor.
@@ -45,7 +38,7 @@ ADXL345_SPI::ADXL345_SPI(SPI::Port port, ADXL345_SPI::Range range)
   HAL_Report(HALUsageReporting::kResourceType_ADXL345,
              HALUsageReporting::kADXL345_SPI);
 
-  LiveWindow::GetInstance()->AddSensor("ADXL345_SPI", port, this);
+  SetName("ADXL345_SPI", port);
 }
 
 void ADXL345_SPI::SetRange(Range range) {
@@ -108,25 +101,15 @@ ADXL345_SPI::AllAxes ADXL345_SPI::GetAccelerations() {
   return data;
 }
 
-std::string ADXL345_SPI::GetSmartDashboardType() const {
-  return "3AxisAccelerometer";
-}
-
-void ADXL345_SPI::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  if (subtable) {
-    m_xEntry = subtable->GetEntry("X");
-    m_yEntry = subtable->GetEntry("Y");
-    m_zEntry = subtable->GetEntry("Z");
-    UpdateTable();
-  } else {
-    m_xEntry = nt::NetworkTableEntry();
-    m_yEntry = nt::NetworkTableEntry();
-    m_zEntry = nt::NetworkTableEntry();
-  }
-}
-
-void ADXL345_SPI::UpdateTable() {
-  if (m_xEntry) m_xEntry.SetDouble(GetX());
-  if (m_yEntry) m_yEntry.SetDouble(GetY());
-  if (m_zEntry) m_zEntry.SetDouble(GetZ());
+void ADXL345_SPI::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("3AxisAccelerometer");
+  auto x = builder.GetEntry("X").GetHandle();
+  auto y = builder.GetEntry("Y").GetHandle();
+  auto z = builder.GetEntry("Z").GetHandle();
+  builder.SetUpdateTable([=]() {
+    auto data = GetAccelerations();
+    nt::NetworkTableEntry(x).SetDouble(data.XAxis);
+    nt::NetworkTableEntry(y).SetDouble(data.YAxis);
+    nt::NetworkTableEntry(z).SetDouble(data.ZAxis);
+  });
 }

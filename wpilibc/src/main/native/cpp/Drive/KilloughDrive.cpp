@@ -12,6 +12,7 @@
 
 #include <HAL/HAL.h>
 
+#include "SmartDashboard/SendableBuilder.h"
 #include "SpeedController.h"
 
 using namespace frc;
@@ -21,9 +22,8 @@ constexpr double kPi = 3.14159265358979323846;
 /**
  * Construct a Killough drive with the given motors and default motor angles.
  *
- * The default motor angles are 120, 60, and 270 degrees for the left, right,
- * and back motors respectively, which make the wheels on each corner parallel
- * to their respective opposite sides.
+ * The default motor angles make the wheels on each corner parallel to their
+ * respective opposite sides.
  *
  * If a motor needs to be inverted, do so before passing it in.
  *
@@ -34,13 +34,13 @@ constexpr double kPi = 3.14159265358979323846;
 KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                              SpeedController& rightMotor,
                              SpeedController& backMotor)
-    : KilloughDrive(leftMotor, rightMotor, backMotor, 120.0, 60.0, 270.0) {}
+    : KilloughDrive(leftMotor, rightMotor, backMotor, kDefaultLeftMotorAngle,
+                    kDefaultRightMotorAngle, kDefaultBackMotorAngle) {}
 
 /**
  * Construct a Killough drive with the given motors.
  *
- * Angles are measured in counter-clockwise degrees where zero degrees is
- * straight ahead.
+ * Angles are measured in degrees clockwise from the positive X axis.
  *
  * @param leftMotor       The motor on the left corner.
  * @param rightMotor      The motor on the right corner.
@@ -63,42 +63,51 @@ KilloughDrive::KilloughDrive(SpeedController& leftMotor,
                 std::sin(rightMotorAngle * (kPi / 180.0))};
   m_backVec = {std::cos(backMotorAngle * (kPi / 180.0)),
                std::sin(backMotorAngle * (kPi / 180.0))};
+  AddChild(&m_leftMotor);
+  AddChild(&m_rightMotor);
+  AddChild(&m_backMotor);
+  static int instances = 0;
+  ++instances;
+  SetName("KilloughDrive", instances);
 }
 
 /**
  * Drive method for Killough platform.
  *
- * @param x         The speed that the robot should drive in the X direction.
- *                  [-1.0..1.0]
- * @param y         The speed that the robot should drive in the Y direction.
- *                  [-1.0..1.0]
- * @param rotation  The rate of rotation for the robot that is completely
- *                  independent of the translation. [-1.0..1.0]
- * @param gyroAngle The current angle reading from the gyro.  Use this to
- *                  implement field-oriented controls.
+ * Angles are measured clockwise from the positive X axis. The robot's speed is
+ * independent from its angle or rotation rate.
+ *
+ * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
+ *                  positive.
+ * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+ *                  positive.
+ * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
+ *                  Clockwise is positive.
+ * @param gyroAngle The current angle reading from the gyro in degrees around
+ *                  the Z axis. Use this to implement field-oriented controls.
  */
-void KilloughDrive::DriveCartesian(double x, double y, double rotation,
-                                   double gyroAngle) {
+void KilloughDrive::DriveCartesian(double ySpeed, double xSpeed,
+                                   double zRotation, double gyroAngle) {
   if (!reported) {
     // HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 3,
     //            HALUsageReporting::kRobotDrive_KilloughCartesian);
     reported = true;
   }
 
-  x = Limit(x);
-  x = ApplyDeadband(x, m_deadband);
+  ySpeed = Limit(ySpeed);
+  ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
-  y = Limit(y);
-  y = ApplyDeadband(y, m_deadband);
+  xSpeed = Limit(xSpeed);
+  xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
   // Compensate for gyro angle.
-  Vector2d input{x, y};
-  input.Rotate(gyroAngle);
+  Vector2d input{ySpeed, xSpeed};
+  input.Rotate(-gyroAngle);
 
   double wheelSpeeds[3];
-  wheelSpeeds[kLeft] = input.ScalarProject(m_leftVec) + rotation;
-  wheelSpeeds[kRight] = input.ScalarProject(m_rightVec) + rotation;
-  wheelSpeeds[kBack] = input.ScalarProject(m_backVec) + rotation;
+  wheelSpeeds[kLeft] = input.ScalarProject(m_leftVec) + zRotation;
+  wheelSpeeds[kRight] = input.ScalarProject(m_rightVec) + zRotation;
+  wheelSpeeds[kBack] = input.ScalarProject(m_backVec) + zRotation;
 
   Normalize(wheelSpeeds);
 
@@ -112,13 +121,15 @@ void KilloughDrive::DriveCartesian(double x, double y, double rotation,
 /**
  * Drive method for Killough platform.
  *
- * @param magnitude The speed that the robot should drive in a given direction.
- *                  [-1.0..1.0]
- * @param angle     The direction the robot should drive in degrees. 0.0 is
- *                  straight ahead. The direction and maginitude are independent
- *                  of the rotation rate.
- * @param rotation  The rate of rotation for the robot that is completely
- *                  independent of the magnitude or direction. [-1.0..1.0]
+ * Angles are measured clockwise from the positive X axis. The robot's speed is
+ * independent from its angle or rotation rate.
+ *
+ * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is
+ *                  positive.
+ * @param angle     The angle around the Z axis at which the robot drives in
+ *                  degrees [-180..180].
+ * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
+ *                  Clockwise is positive.
  */
 void KilloughDrive::DrivePolar(double magnitude, double angle,
                                double rotation) {
@@ -128,11 +139,8 @@ void KilloughDrive::DrivePolar(double magnitude, double angle,
     reported = true;
   }
 
-  // Normalized for full power along the Cartesian axes.
-  magnitude = Limit(magnitude) * std::sqrt(2.0);
-
-  DriveCartesian(magnitude * std::cos(angle * (kPi / 180.0)),
-                 magnitude * std::sin(angle * (kPi / 180.0)), rotation, 0.0);
+  DriveCartesian(magnitude * std::sin(angle * (kPi / 180.0)),
+                 magnitude * std::cos(angle * (kPi / 180.0)), rotation, 0.0);
 }
 
 void KilloughDrive::StopMotor() {
@@ -144,4 +152,17 @@ void KilloughDrive::StopMotor() {
 
 void KilloughDrive::GetDescription(llvm::raw_ostream& desc) const {
   desc << "KilloughDrive";
+}
+
+void KilloughDrive::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("KilloughDrive");
+  builder.AddDoubleProperty("Left Motor Speed",
+                            [=]() { return m_leftMotor.Get(); },
+                            [=](double value) { m_leftMotor.Set(value); });
+  builder.AddDoubleProperty("Right Motor Speed",
+                            [=]() { return m_rightMotor.Get(); },
+                            [=](double value) { m_rightMotor.Set(value); });
+  builder.AddDoubleProperty("Back Motor Speed",
+                            [=]() { return m_backMotor.Get(); },
+                            [=](double value) { m_backMotor.Set(value); });
 }

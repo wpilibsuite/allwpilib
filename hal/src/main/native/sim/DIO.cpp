@@ -19,8 +19,20 @@
 using namespace hal;
 
 static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
-                             kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>
+                             kNumDigitalPWMOutputs, HAL_HandleEnum::DigitalPWM>*
     digitalPWMHandles;
+
+namespace hal {
+namespace init {
+void InitializeDIO() {
+  static LimitedHandleResource<HAL_DigitalPWMHandle, uint8_t,
+                               kNumDigitalPWMOutputs,
+                               HAL_HandleEnum::DigitalPWM>
+      dpH;
+  digitalPWMHandles = &dpH;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -38,12 +50,12 @@ HAL_DigitalHandle HAL_InitializeDIOPort(HAL_PortHandle portHandle,
   }
 
   auto handle =
-      digitalChannelHandles.Allocate(channel, HAL_HandleEnum::DIO, status);
+      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::DIO, status);
 
   if (*status != 0)
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
-  auto port = digitalChannelHandles.Get(handle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
   if (port == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -63,9 +75,9 @@ HAL_Bool HAL_CheckDIOChannel(int32_t channel) {
 }
 
 void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   // no status, so no need to check for a proper free.
-  digitalChannelHandles.Free(dioPortHandle, HAL_HandleEnum::DIO);
+  digitalChannelHandles->Free(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) return;
   SimDIOData[port->channel].SetInitialized(true);
 }
@@ -77,13 +89,13 @@ void HAL_FreeDIOPort(HAL_DigitalHandle dioPortHandle) {
  * @return PWM Generator handle
  */
 HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
-  auto handle = digitalPWMHandles.Allocate();
+  auto handle = digitalPWMHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
     return HAL_kInvalidHandle;
   }
 
-  auto id = digitalPWMHandles.Get(handle);
+  auto id = digitalPWMHandles->Get(handle);
   if (id == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -102,8 +114,8 @@ HAL_DigitalPWMHandle HAL_AllocateDigitalPWM(int32_t* status) {
  * allocateDigitalPWM()
  */
 void HAL_FreeDigitalPWM(HAL_DigitalPWMHandle pwmGenerator, int32_t* status) {
-  auto port = digitalPWMHandles.Get(pwmGenerator);
-  digitalPWMHandles.Free(pwmGenerator);
+  auto port = digitalPWMHandles->Get(pwmGenerator);
+  digitalPWMHandles->Free(pwmGenerator);
   if (port == nullptr) return;
   int32_t id = *port;
   SimDigitalPWMData[id].SetInitialized(false);
@@ -137,7 +149,7 @@ void HAL_SetDigitalPWMRate(double rate, int32_t* status) {
  */
 void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
                                 double dutyCycle, int32_t* status) {
-  auto port = digitalPWMHandles.Get(pwmGenerator);
+  auto port = digitalPWMHandles->Get(pwmGenerator);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -156,7 +168,7 @@ void HAL_SetDigitalPWMDutyCycle(HAL_DigitalPWMHandle pwmGenerator,
  */
 void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
                                     int32_t channel, int32_t* status) {
-  auto port = digitalPWMHandles.Get(pwmGenerator);
+  auto port = digitalPWMHandles->Get(pwmGenerator);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -175,7 +187,7 @@ void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
  */
 void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
                 int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -194,7 +206,7 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
  * @return The state of the specified channel
  */
 HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -213,7 +225,7 @@ HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status) {
  * @return The direction of the specified channel
  */
 HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -234,7 +246,7 @@ HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status) {
  */
 void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
                int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -248,7 +260,7 @@ void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
  * @return A pulse is in progress
  */
 HAL_Bool HAL_IsPulsing(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -276,7 +288,7 @@ HAL_Bool HAL_IsAnyPulsing(int32_t* status) {
  */
 void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
                          int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -294,7 +306,7 @@ void HAL_SetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t filterIndex,
  * where 0 means "none" and 1 - 3 means filter # filterIndex - 1.
  */
 int32_t HAL_GetFilterSelect(HAL_DigitalHandle dioPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(dioPortHandle, HAL_HandleEnum::DIO);
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -333,4 +345,4 @@ void HAL_SetFilterPeriod(int32_t filterIndex, int64_t value, int32_t* status) {
 int64_t HAL_GetFilterPeriod(int32_t filterIndex, int32_t* status) {
   return 0;  // TODO(Thad) figure this out
 }
-}
+}  // extern "C"

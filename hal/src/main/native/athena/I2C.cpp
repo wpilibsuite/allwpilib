@@ -7,7 +7,13 @@
 
 #include "HAL/I2C.h"
 
-#include <i2clib/i2c-lib.h>
+#include <fcntl.h>
+#include <linux/i2c-dev.h>
+#include <linux/i2c.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
+#include <cstring>
 
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
@@ -15,16 +21,22 @@
 
 using namespace hal;
 
-static std::mutex digitalI2COnBoardMutex;
-static std::mutex digitalI2CMXPMutex;
+static wpi::mutex digitalI2COnBoardMutex;
+static wpi::mutex digitalI2CMXPMutex;
 
-static uint8_t i2COnboardObjCount = 0;
-static uint8_t i2CMXPObjCount = 0;
-static uint8_t i2COnBoardHandle = 0;
-static uint8_t i2CMXPHandle = 0;
+static uint8_t i2COnboardObjCount{0};
+static uint8_t i2CMXPObjCount{0};
+static int i2COnBoardHandle{-1};
+static int i2CMXPHandle{-1};
 
-static HAL_DigitalHandle i2CMXPDigitalHandle1 = HAL_kInvalidHandle;
-static HAL_DigitalHandle i2CMXPDigitalHandle2 = HAL_kInvalidHandle;
+static HAL_DigitalHandle i2CMXPDigitalHandle1{HAL_kInvalidHandle};
+static HAL_DigitalHandle i2CMXPDigitalHandle2{HAL_kInvalidHandle};
+
+namespace hal {
+namespace init {
+void InitializeI2C() {}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -42,30 +54,37 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
     return;
   }
 
-  std::mutex& lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
-  {
-    std::lock_guard<std::mutex> sync(lock);
-    if (port == 0) {
-      i2COnboardObjCount++;
-      if (i2COnBoardHandle > 0) return;
-      i2COnBoardHandle = i2clib_open("/dev/i2c-2");
-    } else if (port == 1) {
-      i2CMXPObjCount++;
-      if (i2CMXPHandle > 0) return;
-      if ((i2CMXPDigitalHandle1 = HAL_InitializeDIOPort(
-               HAL_GetPort(24), false, status)) == HAL_kInvalidHandle) {
-        return;
-      }
-      if ((i2CMXPDigitalHandle2 = HAL_InitializeDIOPort(
-               HAL_GetPort(25), false, status)) == HAL_kInvalidHandle) {
-        HAL_FreeDIOPort(i2CMXPDigitalHandle1);  // free the first port allocated
-        return;
-      }
-      digitalSystem->writeEnableMXPSpecialFunction(
-          digitalSystem->readEnableMXPSpecialFunction(status) | 0xC000, status);
-      i2CMXPHandle = i2clib_open("/dev/i2c-1");
+  if (port == 0) {
+    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    i2COnboardObjCount++;
+    if (i2COnboardObjCount > 1) return;
+    int handle = open("/dev/i2c-2", O_RDWR);
+    if (handle < 0) {
+      std::printf("Failed to open onboard i2c bus: %s\n", std::strerror(errno));
+      return;
     }
-    return;
+    i2COnBoardHandle = handle;
+  } else {
+    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    i2CMXPObjCount++;
+    if (i2CMXPObjCount > 1) return;
+    if ((i2CMXPDigitalHandle1 = HAL_InitializeDIOPort(
+             HAL_GetPort(24), false, status)) == HAL_kInvalidHandle) {
+      return;
+    }
+    if ((i2CMXPDigitalHandle2 = HAL_InitializeDIOPort(
+             HAL_GetPort(25), false, status)) == HAL_kInvalidHandle) {
+      HAL_FreeDIOPort(i2CMXPDigitalHandle1);  // free the first port allocated
+      return;
+    }
+    digitalSystem->writeEnableMXPSpecialFunction(
+        digitalSystem->readEnableMXPSpecialFunction(status) | 0xC000, status);
+    int handle = open("/dev/i2c-1", O_RDWR);
+    if (handle < 0) {
+      std::printf("Failed to open MXP i2c bus: %s\n", std::strerror(errno));
+      return;
+    }
+    i2CMXPHandle = handle;
   }
 }
 
@@ -82,22 +101,33 @@ void HAL_InitializeI2C(HAL_I2CPort port, int32_t* status) {
  * @return >= 0 on success or -1 on transfer abort.
  */
 int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
-                           uint8_t* dataToSend, int32_t sendSize,
+                           const uint8_t* dataToSend, int32_t sendSize,
                            uint8_t* dataReceived, int32_t receiveSize) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
   }
 
-  int32_t handle = port == 0 ? i2COnBoardHandle : i2CMXPHandle;
-  std::mutex& lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
+  struct i2c_msg msgs[2];
+  msgs[0].addr = deviceAddress;
+  msgs[0].flags = 0;
+  msgs[0].len = sendSize;
+  msgs[0].buf = const_cast<uint8_t*>(dataToSend);
+  msgs[1].addr = deviceAddress;
+  msgs[1].flags = I2C_M_RD;
+  msgs[1].len = receiveSize;
+  msgs[1].buf = dataReceived;
 
-  {
-    std::lock_guard<std::mutex> sync(lock);
-    return i2clib_writeread(
-        handle, deviceAddress, reinterpret_cast<const char*>(dataToSend),
-        static_cast<int32_t>(sendSize), reinterpret_cast<char*>(dataReceived),
-        static_cast<int32_t>(receiveSize));
+  struct i2c_rdwr_ioctl_data rdwr;
+  rdwr.msgs = msgs;
+  rdwr.nmsgs = 2;
+
+  if (port == 0) {
+    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
+  } else {
+    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    return ioctl(i2CMXPHandle, I2C_RDWR, &rdwr);
   }
 }
 
@@ -113,18 +143,28 @@ int32_t HAL_TransactionI2C(HAL_I2CPort port, int32_t deviceAddress,
  * @return >= 0 on success or -1 on transfer abort.
  */
 int32_t HAL_WriteI2C(HAL_I2CPort port, int32_t deviceAddress,
-                     uint8_t* dataToSend, int32_t sendSize) {
+                     const uint8_t* dataToSend, int32_t sendSize) {
   if (port > 1) {
     // Set port out of range error here
     return -1;
   }
 
-  int32_t handle = port == 0 ? i2COnBoardHandle : i2CMXPHandle;
-  std::mutex& lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
-  {
-    std::lock_guard<std::mutex> sync(lock);
-    return i2clib_write(handle, deviceAddress,
-                        reinterpret_cast<const char*>(dataToSend), sendSize);
+  struct i2c_msg msg;
+  msg.addr = deviceAddress;
+  msg.flags = 0;
+  msg.len = sendSize;
+  msg.buf = const_cast<uint8_t*>(dataToSend);
+
+  struct i2c_rdwr_ioctl_data rdwr;
+  rdwr.msgs = &msg;
+  rdwr.nmsgs = 1;
+
+  if (port == 0) {
+    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
+  } else {
+    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    return ioctl(i2CMXPHandle, I2C_RDWR, &rdwr);
   }
 }
 
@@ -148,12 +188,22 @@ int32_t HAL_ReadI2C(HAL_I2CPort port, int32_t deviceAddress, uint8_t* buffer,
     return -1;
   }
 
-  int32_t handle = port == 0 ? i2COnBoardHandle : i2CMXPHandle;
-  std::mutex& lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
-  {
-    std::lock_guard<std::mutex> sync(lock);
-    return i2clib_read(handle, deviceAddress, reinterpret_cast<char*>(buffer),
-                       static_cast<int32_t>(count));
+  struct i2c_msg msg;
+  msg.addr = deviceAddress;
+  msg.flags = I2C_M_RD;
+  msg.len = count;
+  msg.buf = buffer;
+
+  struct i2c_rdwr_ioctl_data rdwr;
+  rdwr.msgs = &msg;
+  rdwr.nmsgs = 1;
+
+  if (port == 0) {
+    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    return ioctl(i2COnBoardHandle, I2C_RDWR, &rdwr);
+  } else {
+    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    return ioctl(i2CMXPHandle, I2C_RDWR, &rdwr);
   }
 }
 
@@ -162,20 +212,20 @@ void HAL_CloseI2C(HAL_I2CPort port) {
     // Set port out of range error here
     return;
   }
-  std::mutex& lock = port == 0 ? digitalI2COnBoardMutex : digitalI2CMXPMutex;
-  {
-    std::lock_guard<std::mutex> sync(lock);
-    if ((port == 0 ? i2COnboardObjCount-- : i2CMXPObjCount--) == 0) {
-      int32_t handle = port == 0 ? i2COnBoardHandle : i2CMXPHandle;
-      i2clib_close(handle);
-    }
-  }
 
-  if (port == 1) {
+  if (port == 0) {
+    std::lock_guard<wpi::mutex> lock(digitalI2COnBoardMutex);
+    if (i2COnboardObjCount-- == 0) {
+      close(i2COnBoardHandle);
+    }
+  } else {
+    std::lock_guard<wpi::mutex> lock(digitalI2CMXPMutex);
+    if (i2CMXPObjCount-- == 0) {
+      close(i2CMXPHandle);
+    }
     HAL_FreeDIOPort(i2CMXPDigitalHandle1);
     HAL_FreeDIOPort(i2CMXPDigitalHandle2);
   }
-  return;
 }
 
 }  // extern "C"

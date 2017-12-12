@@ -7,14 +7,11 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Class implements the PWM generation in the FPGA.
@@ -28,7 +25,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * center value - 999 to 2 = linear scaling from "center" to "full reverse" - 1 = minimum pulse
  * width (currently .5ms) - 0 = disabled (i.e. PWM output is held low)
  */
-public class PWM extends SensorBase implements LiveWindowSendable {
+public class PWM extends SendableBase implements Sendable {
   /**
    * Represents the amount to multiply the minimum servo-pulse pwm period by.
    */
@@ -56,7 +53,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    * @param channel The PWM channel number. 0-9 are on-board, 10-19 are on the MXP port
    */
   public PWM(final int channel) {
-    checkPWMChannel(channel);
+    SensorBase.checkPWMChannel(channel);
     m_channel = channel;
 
     m_handle = PWMJNI.initializePWMPort(DIOJNI.getPort((byte) channel));
@@ -66,6 +63,7 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     PWMJNI.setPWMEliminateDeadband(m_handle, false);
 
     HAL.report(tResourceType.kResourceType_PWM, channel);
+    setName("PWM", channel);
   }
 
   /**
@@ -73,7 +71,9 @@ public class PWM extends SensorBase implements LiveWindowSendable {
    *
    * <p>Free the resource associated with the PWM channel and set the value to 0.
    */
+  @Override
   public void free() {
+    super.free();
     if (m_handle == 0) {
       return;
     }
@@ -242,45 +242,10 @@ public class PWM extends SensorBase implements LiveWindowSendable {
     PWMJNI.latchPWMZero(m_handle);
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
   @Override
-  public String getSmartDashboardType() {
-    return "Speed Controller";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-  private int m_valueListener;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(getSpeed());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-    setSpeed(0); // Stop for safety
-    m_valueListener = m_valueEntry.addListener((event) -> setSpeed(event.value.getDouble()),
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
-    setSpeed(0); // Stop for safety
-    m_valueEntry.removeListener(m_valueListener);
-    m_valueListener = 0;
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Speed Controller");
+    builder.setSafeState(this::setDisabled);
+    builder.addDoubleProperty("Value", this::getSpeed, this::setSpeed);
   }
 }

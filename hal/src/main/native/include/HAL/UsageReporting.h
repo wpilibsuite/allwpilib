@@ -71,7 +71,7 @@ namespace nUsageReporting
         kResourceType_SRF08,
         kResourceType_AnalogOutput,
         kResourceType_VictorSP, // 50
-        kResourceType_TalonSRX,
+        kResourceType_PWMTalonSRX,
         kResourceType_CANTalonSRX,
         kResourceType_ADXL362,
         kResourceType_ADXRS450,
@@ -82,6 +82,15 @@ namespace nUsageReporting
         kResourceType_PDP,
         kResourceType_PCM, // 60
         kResourceType_PigeonIMU,
+        kResourceType_NidecBrushless,
+        kResourceType_CANifier,
+        kResourceType_CTRE_future0,
+        kResourceType_CTRE_future1,
+        kResourceType_CTRE_future2,
+        kResourceType_CTRE_future3,
+        kResourceType_CTRE_future4,
+        kResourceType_CTRE_future5,
+        kResourceType_CTRE_future6, // 70
     } tResourceType;
 
     typedef enum
@@ -132,7 +141,7 @@ namespace nUsageReporting
 
     /**
      * Report the usage of a resource of interest.
-     * 
+     *
      * @param resource one of the values in the tResourceType above (max value 51).
      * @param instanceNumber an index that identifies the resource instance.
      * @param context an optional additional context number for some cases (such as module number).  Set to 0 to omit.

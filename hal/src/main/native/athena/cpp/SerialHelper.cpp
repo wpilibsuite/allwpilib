@@ -11,6 +11,7 @@
 #include <cstdio>
 #include <cstring>
 
+#include <llvm/FileSystem.h>
 #include <llvm/StringRef.h>
 
 #include "../visa/visa.h"
@@ -26,7 +27,7 @@ namespace hal {
 
 std::string SerialHelper::m_usbNames[2]{"", ""};
 
-std::mutex SerialHelper::m_nameMutex;
+wpi::mutex SerialHelper::m_nameMutex;
 
 SerialHelper::SerialHelper() {
   viOpenDefaultRM(reinterpret_cast<ViSession*>(&m_resourceHandle));
@@ -178,9 +179,8 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
   // Status might be positive, so reset it to 0
   *status = 0;
 
-  // Storage buffers for Visa calls and system exec calls
+  // Storage buffer for Visa call
   char osName[256];
-  char execBuffer[128];
 
   // Loop through all returned VISA objects.
   // Increment the internal VISA ptr every loop
@@ -214,45 +214,30 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
     llvm::StringRef matchString = devNameRef.split(')').first;
     if (matchString.equals(devNameRef)) continue;
 
-    // Run find using pipe to get a list of system accessors
-    llvm::SmallString<128> val(
-        "sh -c \"find /sys/devices/soc0 | grep amba | grep usb | grep ");
-    val += matchString;
-    val += "\"";
+    // Search directories to get a list of system accessors
+    std::error_code ec;
+    for (auto p = llvm::sys::fs::recursive_directory_iterator(
+             "/sys/devices/soc0", ec);
+         p != llvm::sys::fs::recursive_directory_iterator(); p.increment(ec)) {
+      if (ec) break;
+      llvm::StringRef path{p->path()};
+      if (path.find("amba") == llvm::StringRef::npos) continue;
+      if (path.find("usb") == llvm::StringRef::npos) continue;
+      if (path.find(matchString) == llvm::StringRef::npos) continue;
 
-    // Pipe code found on StackOverflow
-    // http://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c-using-posix
-
-    // Using std::string because this is guarenteed to be large
-    std::string output = "";
-
-    std::shared_ptr<FILE> pipe(popen(val.c_str(), "r"), pclose);
-    // Just check the next item on a pipe failure
-    if (!pipe) continue;
-    while (!feof(pipe.get())) {
-      if (std::fgets(execBuffer, 128, pipe.get()) != 0) output += execBuffer;
-    }
-
-    if (!output.empty()) {
       llvm::SmallVector<llvm::StringRef, 16> pathSplitVec;
-      // Split output by line, grab first line, and split it into
-      // individual directories
-      llvm::StringRef{output}.split('\n').first.split(pathSplitVec, '/', -1,
-                                                      false);
+      // Split path into individual directories
+      path.split(pathSplitVec, '/', -1, false);
 
       // Find each individual item index
-
-      const char* usb1 = "usb1";
-      const char* tty = "tty";
-
       int findusb = -1;
       int findtty = -1;
       int findregex = -1;
       for (size_t i = 0; i < pathSplitVec.size(); i++) {
-        if (findusb == -1 && pathSplitVec[i].equals(usb1)) {
+        if (findusb == -1 && pathSplitVec[i].equals("usb1")) {
           findusb = i;
         }
-        if (findtty == -1 && pathSplitVec[i].equals(tty)) {
+        if (findtty == -1 && pathSplitVec[i].equals("tty")) {
           findtty = i;
         }
         if (findregex == -1 && pathSplitVec[i].equals(matchString)) {
@@ -274,6 +259,7 @@ void SerialHelper::QueryHubPaths(int32_t* status) {
       m_visaResource.emplace_back(desc);
       m_osResource.emplace_back(
           llvm::StringRef{osName}.split("(").second.split(")").first);
+      break;
     }
   }
 
@@ -287,7 +273,7 @@ done:
 
 int32_t SerialHelper::GetIndexForPort(HAL_SerialPort port, int32_t* status) {
   // Hold lock whenever we're using the names array
-  std::lock_guard<std::mutex> lock(m_nameMutex);
+  std::lock_guard<wpi::mutex> lock(m_nameMutex);
 
   std::string portString = m_usbNames[port - 2];
 

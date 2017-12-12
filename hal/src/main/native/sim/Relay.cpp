@@ -18,11 +18,21 @@ struct Relay {
   uint8_t channel;
   bool fwd;
 };
-}
+}  // namespace
 
 static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
-                             HAL_HandleEnum::Relay>
-    relayHandles;
+                             HAL_HandleEnum::Relay>* relayHandles;
+
+namespace hal {
+namespace init {
+void InitializeRelay() {
+  static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
+                               HAL_HandleEnum::Relay>
+      rH;
+  relayHandles = &rH;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
@@ -37,12 +47,12 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 
   if (!fwd) channel += kNumRelayHeaders;  // add 4 to reverse channels
 
-  auto handle = relayHandles.Allocate(channel, status);
+  auto handle = relayHandles->Allocate(channel, status);
 
   if (*status != 0)
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
-  auto port = relayHandles.Get(handle);
+  auto port = relayHandles->Get(handle);
   if (port == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -66,8 +76,8 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 }
 
 void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle) {
-  auto port = relayHandles.Get(relayPortHandle);
-  relayHandles.Free(relayPortHandle);
+  auto port = relayHandles->Get(relayPortHandle);
+  relayHandles->Free(relayPortHandle);
   if (port == nullptr) return;
   if (port->fwd)
     SimRelayData[port->channel].SetInitializedForward(false);
@@ -84,7 +94,7 @@ HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
 
 void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
                   int32_t* status) {
-  auto port = relayHandles.Get(relayPortHandle);
+  auto port = relayHandles->Get(relayPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -96,7 +106,7 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
 }
 
 HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
-  auto port = relayHandles.Get(relayPortHandle);
+  auto port = relayHandles->Get(relayPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -106,4 +116,4 @@ HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
   else
     return SimRelayData[port->channel].GetReverse();
 }
-}
+}  // extern "C"

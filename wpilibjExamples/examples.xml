@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<examples>
+    <!-- Tags -->
+    <!-- Getting Started should be first and then alphabetical.  Complete Example should be last -->
+    <tagDescription>
+        <name>Getting Started with Java</name>
+        <description>Examples for getting started with FRC Java</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Actuators</name>
+        <description>Example programs that demonstrate the use of various actuators</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Analog</name>
+        <description>Examples programs that show different uses of analog inputs,
+            outputs and various analog sensors</description>
+    </tagDescription>
+    <tagDescription>
+        <name>CAN</name>
+        <description>Example programs that demonstrate the use of the CAN components in the control
+            system</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Digital</name>
+        <description>Example programs that demonstrate the sensors that use the digital I/O ports</description>
+    </tagDescription>
+    <tagDescription>
+        <name>I2C</name>
+        <description>Example programs that demonstrate the use of I2C and various sensors that use
+            it</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Joystick</name>
+        <description>Example programs that demonstate different uses of joysticks for robot
+            driving</description>
+    </tagDescription>
+    <tagDescription>
+        <name>NetworkTables</name>
+        <description>Examples of how to use NetworkTables to accomplish a
+            variety of tasks such as sending and receiving values to both
+            dashboards and co-processors.</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Pneumatics</name>
+        <description>Example programs that demonstrate the use of the compressor and solenoids</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Robot and Motor</name>
+        <description>Example programs that demonstrate driving a robot and motors including safety,
+            servos, etc.</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Safety</name>
+        <description>Example programs that demonstate the motor safety classes and how to use them
+            with your programs</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Sensors</name>
+        <description>Example programs that demonstrate the use of the various commonly used sensors
+            on FRC robots</description>
+    </tagDescription>
+    <tagDescription>
+        <name>SPI</name>
+        <description>Example programs that demonstrate the use of the SPI bus and sensors that
+            connect to it</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Vision</name>
+        <description>Example programs that demonstrate the use of cameras and image processing</description>
+    </tagDescription>
+    <tagDescription>
+        <name>Complete Robot</name>
+        <description>Complete Robot example programs</description>
+    </tagDescription>
+
+    <!-- Examples -->
+    <example>
+        <name>Getting Started</name>
+        <description>An example program which demonstrates the simplest autonomous and
+            teleoperated routines.</description>
+        <tags>
+            <tag>Getting Started with Java</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/gettingstarted/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Tank Drive</name>
+        <description>Demonstrate the use of the RobotDrive class doing teleop driving with tank
+            steering</description>
+        <tags>
+            <tag>Actuators</tag>
+            <tag>Joystick</tag>
+            <tag>Robot and Motor</tag>
+            <tag>Safety</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/tankdrive/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Mecanum Drive</name>
+        <description>Demonstrate the use of the RobotDrive class doing teleop driving with Mecanum
+            steering</description>
+        <tags>
+            <tag>Actuators</tag>
+            <tag>Joystick</tag>
+            <tag>Robot and Motor</tag>
+            <tag>Safety</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/mecanumdrive/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Ultrasonic</name>
+        <description>Demonstrate maintaining a set distance using an ultrasonic sensor.</description>
+        <tags>
+            <tag>Sensors</tag>
+            <tag>Robot and Motor</tag>
+            <tag>Analog</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/ultrasonic/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Ultrasonic PID</name>
+        <description>Demonstrate maintaining a set distance using an ultrasonic sensor and PID
+            Control.</description>
+        <tags>
+            <tag>Sensors</tag>
+            <tag>Robot and Motor</tag>
+            <tag>Analog</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/ultrasonicpid/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Potentiometer PID</name>
+        <description>An example to demonstrate the use of a potentiometer and PID control to reach
+            elevator position setpoints.</description>
+        <tags>
+            <tag>Sensors</tag>
+            <tag>Actuators</tag>
+            <tag>Analog</tag>
+            <tag>Joystick</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/potentiometerpid/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Gyro</name>
+        <description>An example program showing how to drive straight with using a gyro sensor.</description>
+        <tags>
+            <tag>Sensors</tag>
+            <tag>Robot and Motor</tag>
+            <tag>Analog</tag>
+            <tag>Joystick</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/gyro/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Gyro Mecanum</name>
+        <description>An example program showing how to perform mecanum drive with field oriented
+            controls.</description>
+        <tags>
+            <tag>Sensors</tag>
+            <tag>Robot and Motor</tag>
+            <tag>Analog</tag>
+            <tag>Joystick</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/gyromecanum/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Motor Controller</name>
+        <description>Demonstrate controlling a single motor with a joystick</description>
+        <tags>
+            <tag>Actuators</tag>
+            <tag>Joystick</tag>
+            <tag>Robot and Motor</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/motorcontrol/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>GearsBot</name>
+        <description>A fully functional example CommandBased program for WPIs GearsBot robot. This
+            code can run on your computer if it supports simulation.</description>
+        <tags>
+            <tag>Complete Robot</tag>
+        </tags>
+        <world>/usr/share/frcsim/worlds/GearsBotDemo.world</world>
+        <packages>
+            <package>src/$package-dir</package>
+            <package>src/$package-dir/commands</package>
+            <package>src/$package-dir/subsystems</package>
+        </packages>
+        <files>
+            <file source="examples/gearsbot/OI.java" destination="src/$package-dir/OI.java" />
+            <file source="examples/gearsbot/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/gearsbot/commands/Autonomous.java" destination="src/$package-dir/commands/Autonomous.java" />
+            <file source="examples/gearsbot/commands/CloseClaw.java" destination="src/$package-dir/commands/CloseClaw.java" />
+            <file source="examples/gearsbot/commands/DriveStraight.java" destination="src/$package-dir/commands/DriveStraight.java" />
+            <file source="examples/gearsbot/commands/OpenClaw.java" destination="src/$package-dir/commands/OpenClaw.java" />
+            <file source="examples/gearsbot/commands/Pickup.java" destination="src/$package-dir/commands/Pickup.java" />
+            <file source="examples/gearsbot/commands/Place.java" destination="src/$package-dir/commands/Place.java" />
+            <file source="examples/gearsbot/commands/PrepareToPickup.java" destination="src/$package-dir/commands/PrepareToPickup.java" />
+            <file source="examples/gearsbot/commands/SetDistanceToBox.java" destination="src/$package-dir/commands/SetDistanceToBox.java" />
+            <file source="examples/gearsbot/commands/SetElevatorSetpoint.java" destination="src/$package-dir/commands/SetElevatorSetpoint.java" />
+            <file source="examples/gearsbot/commands/SetWristSetpoint.java" destination="src/$package-dir/commands/SetWristSetpoint.java" />
+            <file source="examples/gearsbot/commands/TankDriveWithJoystick.java" destination="src/$package-dir/commands/TankDriveWithJoystick.java" />
+            <file source="examples/gearsbot/subsystems/Claw.java" destination="src/$package-dir/subsystems/Claw.java" />
+            <file source="examples/gearsbot/subsystems/DriveTrain.java" destination="src/$package-dir/subsystems/DriveTrain.java" />
+            <file source="examples/gearsbot/subsystems/Elevator.java" destination="src/$package-dir/subsystems/Elevator.java" />
+            <file source="examples/gearsbot/subsystems/Wrist.java" destination="src/$package-dir/subsystems/Wrist.java" />
+        </files>
+    </example>
+    <example>
+        <name>PacGoat</name>
+        <description>A fully functional example CommandBased program for FRC Team 190's 2014
+            robot. This code can run on your computer if it supports simulation.</description>
+        <tags>
+            <tag>Complete Robot</tag>
+        </tags>
+        <world>/usr/share/frcsim/worlds/PacGoat2014.world</world>
+        <packages>
+            <package>src/$package-dir</package>
+            <package>src/$package-dir/commands</package>
+            <package>src/$package-dir/subsystems</package>
+            <package>src/$package-dir/triggers</package>
+        </packages>
+        <files>
+            <file source="examples/pacgoat/OI.java" destination="src/$package-dir/OI.java" />
+            <file source="examples/pacgoat/Robot.java" destination="src/$package-dir/Robot.java" />
+            <file source="examples/pacgoat/commands/CheckForHotGoal.java" destination="src/$package-dir/commands/CheckForHotGoal.java" />
+            <file source="examples/pacgoat/commands/CloseClaw.java" destination="src/$package-dir/commands/CloseClaw.java" />
+            <file source="examples/pacgoat/commands/Collect.java" destination="src/$package-dir/commands/Collect.java" />
+            <file source="examples/pacgoat/commands/DriveAndShootAutonomous.java" destination="src/$package-dir/commands/DriveAndShootAutonomous.java" />
+            <file source="examples/pacgoat/commands/DriveForward.java" destination="src/$package-dir/commands/DriveForward.java" />
+            <file source="examples/pacgoat/commands/DriveWithJoystick.java" destination="src/$package-dir/commands/DriveWithJoystick.java" />
+            <file source="examples/pacgoat/commands/ExtendShooter.java" destination="src/$package-dir/commands/ExtendShooter.java" />
+            <file source="examples/pacgoat/commands/LowGoal.java" destination="src/$package-dir/commands/LowGoal.java" />
+            <file source="examples/pacgoat/commands/OpenClaw.java" destination="src/$package-dir/commands/OpenClaw.java" />
+            <file source="examples/pacgoat/commands/SetCollectionSpeed.java" destination="src/$package-dir/commands/SetCollectionSpeed.java" />
+            <file source="examples/pacgoat/commands/SetPivotSetpoint.java" destination="src/$package-dir/commands/SetPivotSetpoint.java" />
+            <file source="examples/pacgoat/commands/Shoot.java" destination="src/$package-dir/commands/Shoot.java" />
+            <file source="examples/pacgoat/commands/WaitForBall.java" destination="src/$package-dir/commands/WaitForBall.java" />
+            <file source="examples/pacgoat/commands/WaitForPressure.java" destination="src/$package-dir/commands/WaitForPressure.java" />
+            <file source="examples/pacgoat/subsystems/Collector.java" destination="src/$package-dir/subsystems/Collector.java" />
+            <file source="examples/pacgoat/subsystems/DriveTrain.java" destination="src/$package-dir/subsystems/DriveTrain.java" />
+            <file source="examples/pacgoat/subsystems/Pivot.java" destination="src/$package-dir/subsystems/Pivot.java" />
+            <file source="examples/pacgoat/subsystems/Pneumatics.java" destination="src/$package-dir/subsystems/Pneumatics.java" />
+            <file source="examples/pacgoat/subsystems/Shooter.java" destination="src/$package-dir/subsystems/Shooter.java" />
+            <file source="examples/pacgoat/triggers/DoubleButton.java" destination="src/$package-dir/triggers/DoubleButton.java" />
+        </files>
+    </example>
+    <example>
+        <name>Simple Vision</name>
+        <description>Demonstrate the use of the CameraServer class to stream from a USB Webcam
+            without processing the images.</description>
+        <tags>
+            <tag>Vision</tag>
+            <tag>Complete List</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/quickvision/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Intermediate Vision</name>
+        <description>Demonstrate the use of the NIVision class to capture image from a Webcam,
+            process them, and then send them to the dashboard.</description>
+        <tags>
+            <tag>Vision</tag>
+            <tag>Complete List</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/intermediatevision/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+    <example>
+        <name>Axis Camera Sample</name>
+        <description>An example program that acquires images from an Axis network camera and adds
+            some
+            annotation to the image as you might do for showing operators the result of some image
+            recognition, and sends it to the dashboard for display. This demonstrates the use of the
+            AxisCamera class.</description>
+        <tags>
+            <tag>Vision</tag>
+        </tags>
+        <packages>
+            <package>src/$package-dir</package>
+        </packages>
+        <files>
+            <file source="examples/axiscamera/Robot.java" destination="src/$package-dir/Robot.java" />
+        </files>
+    </example>
+</examples>

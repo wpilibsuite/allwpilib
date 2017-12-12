@@ -6,12 +6,21 @@
 /*----------------------------------------------------------------------------*/
 
 #include "../PortsInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 #include "SPIAccelerometerDataInternal.h"
 
 using namespace hal;
 
-SPIAccelerometerData hal::SimSPIAccelerometerData[5];
+namespace hal {
+namespace init {
+void InitializeSPIAccelerometerData() {
+  static SPIAccelerometerData ssad[5];
+  ::hal::SimSPIAccelerometerData = ssad;
+}
+}  // namespace init
+}  // namespace hal
+
+SPIAccelerometerData* hal::SimSPIAccelerometerData;
 void SPIAccelerometerData::ResetData() {
   m_active = false;
   m_activeCallbacks = nullptr;
@@ -31,7 +40,7 @@ int32_t SPIAccelerometerData::RegisterActiveCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_activeCallbacks =
         RegisterCallback(m_activeCallbacks, "Active", callback, param, &newUid);
   }
@@ -67,7 +76,7 @@ int32_t SPIAccelerometerData::RegisterRangeCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_rangeCallbacks =
         RegisterCallback(m_rangeCallbacks, "Range", callback, param, &newUid);
   }
@@ -103,7 +112,7 @@ int32_t SPIAccelerometerData::RegisterXCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_xCallbacks =
         RegisterCallback(m_xCallbacks, "X", callback, param, &newUid);
   }
@@ -139,7 +148,7 @@ int32_t SPIAccelerometerData::RegisterYCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_yCallbacks =
         RegisterCallback(m_yCallbacks, "Y", callback, param, &newUid);
   }
@@ -175,7 +184,7 @@ int32_t SPIAccelerometerData::RegisterZCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_zCallbacks =
         RegisterCallback(m_zCallbacks, "Z", callback, param, &newUid);
   }
@@ -306,4 +315,20 @@ double HALSIM_GetSPIAccelerometerZ(int32_t index) {
 void HALSIM_SetSPIAccelerometerZ(int32_t index, double z) {
   SimSPIAccelerometerData[index].SetZ(z);
 }
+
+void HALSIM_RegisterSPIAccelerometerAllCallbcaks(int32_t index,
+                                                 HAL_NotifyCallback callback,
+                                                 void* param,
+                                                 HAL_Bool initialNotify) {
+  SimSPIAccelerometerData[index].RegisterActiveCallback(callback, param,
+                                                        initialNotify);
+  SimSPIAccelerometerData[index].RegisterRangeCallback(callback, param,
+                                                       initialNotify);
+  SimSPIAccelerometerData[index].RegisterXCallback(callback, param,
+                                                   initialNotify);
+  SimSPIAccelerometerData[index].RegisterYCallback(callback, param,
+                                                   initialNotify);
+  SimSPIAccelerometerData[index].RegisterZCallback(callback, param,
+                                                   initialNotify);
 }
+}  // extern "C"

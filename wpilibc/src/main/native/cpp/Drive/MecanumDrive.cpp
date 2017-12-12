@@ -13,6 +13,7 @@
 #include <HAL/HAL.h>
 
 #include "Drive/Vector2d.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "SpeedController.h"
 
 using namespace frc;
@@ -31,43 +32,54 @@ MecanumDrive::MecanumDrive(SpeedController& frontLeftMotor,
     : m_frontLeftMotor(frontLeftMotor),
       m_rearLeftMotor(rearLeftMotor),
       m_frontRightMotor(frontRightMotor),
-      m_rearRightMotor(rearRightMotor) {}
+      m_rearRightMotor(rearRightMotor) {
+  AddChild(&m_frontLeftMotor);
+  AddChild(&m_rearLeftMotor);
+  AddChild(&m_frontRightMotor);
+  AddChild(&m_rearRightMotor);
+  static int instances = 0;
+  ++instances;
+  SetName("MecanumDrive", instances);
+}
 
 /**
  * Drive method for Mecanum platform.
  *
- * @param x         The speed that the robot should drive in the X direction.
- *                  [-1.0..1.0]
- * @param y         The speed that the robot should drive in the Y direction.
- *                  [-1.0..1.0]
- * @param rotation  The rate of rotation for the robot that is completely
- *                  independent of the translation. [-1.0..1.0]
- * @param gyroAngle The current angle reading from the gyro. Use this to
- *                  implement field-oriented controls.
+ * Angles are measured clockwise from the positive X axis. The robot's speed is
+ * independent from its angle or rotation rate.
+ *
+ * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is
+ *                  positive.
+ * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is
+ *                  positive.
+ * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
+ *                  Clockwise is positive.
+ * @param gyroAngle The current angle reading from the gyro in degrees around
+ *                  the Z axis. Use this to implement field-oriented controls.
  */
-void MecanumDrive::DriveCartesian(double x, double y, double rotation,
-                                  double gyroAngle) {
+void MecanumDrive::DriveCartesian(double ySpeed, double xSpeed,
+                                  double zRotation, double gyroAngle) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 4,
                HALUsageReporting::kRobotDrive_MecanumCartesian);
     reported = true;
   }
 
-  x = Limit(x);
-  x = ApplyDeadband(x, m_deadband);
+  ySpeed = Limit(ySpeed);
+  ySpeed = ApplyDeadband(ySpeed, m_deadband);
 
-  y = Limit(y);
-  y = ApplyDeadband(y, m_deadband);
+  xSpeed = Limit(xSpeed);
+  xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
   // Compensate for gyro angle.
-  Vector2d input{x, y};
-  input.Rotate(gyroAngle);
+  Vector2d input{ySpeed, xSpeed};
+  input.Rotate(-gyroAngle);
 
   double wheelSpeeds[4];
-  wheelSpeeds[kFrontLeft] = input.x + input.y + rotation;
-  wheelSpeeds[kFrontRight] = input.x - input.y + rotation;
-  wheelSpeeds[kRearLeft] = -input.x + input.y + rotation;
-  wheelSpeeds[kRearRight] = -input.x - input.y + rotation;
+  wheelSpeeds[kFrontLeft] = input.x + input.y + zRotation;
+  wheelSpeeds[kFrontRight] = input.x - input.y + zRotation;
+  wheelSpeeds[kRearLeft] = -input.x + input.y + zRotation;
+  wheelSpeeds[kRearRight] = -input.x - input.y + zRotation;
 
   Normalize(wheelSpeeds);
 
@@ -82,26 +94,26 @@ void MecanumDrive::DriveCartesian(double x, double y, double rotation,
 /**
  * Drive method for Mecanum platform.
  *
- * @param magnitude The speed that the robot should drive in a given direction.
- *                  [-1.0..1.0]
- * @param angle     The direction the robot should drive in degrees. 0.0 is
- *                  straight ahead. The direction and maginitude are independent
- *                  of the rotation rate.
- * @param rotation  The rate of rotation for the robot that is completely
- *                  independent of the magnitude or direction. [-1.0..1.0]
+ * Angles are measured clockwise from the positive X axis. The robot's speed is
+ * independent from its angle or rotation rate.
+ *
+ * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is
+ *                  positive.
+ * @param angle     The angle around the Z axis at which the robot drives in
+ *                  degrees [-180..180].
+ * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0].
+ *                  Clockwise is positive.
  */
-void MecanumDrive::DrivePolar(double magnitude, double angle, double rotation) {
+void MecanumDrive::DrivePolar(double magnitude, double angle,
+                              double zRotation) {
   if (!reported) {
     HAL_Report(HALUsageReporting::kResourceType_RobotDrive, 4,
                HALUsageReporting::kRobotDrive_MecanumPolar);
     reported = true;
   }
 
-  // Normalized for full power along the Cartesian axes.
-  magnitude = Limit(magnitude) * std::sqrt(2.0);
-
-  DriveCartesian(magnitude * std::cos(angle * (kPi / 180.0)),
-                 magnitude * std::sin(angle * (kPi / 180.0)), rotation, 0.0);
+  DriveCartesian(magnitude * std::sin(angle * (kPi / 180.0)),
+                 magnitude * std::cos(angle * (kPi / 180.0)), zRotation, 0.0);
 }
 
 void MecanumDrive::StopMotor() {
@@ -114,4 +126,20 @@ void MecanumDrive::StopMotor() {
 
 void MecanumDrive::GetDescription(llvm::raw_ostream& desc) const {
   desc << "MecanumDrive";
+}
+
+void MecanumDrive::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("MecanumDrive");
+  builder.AddDoubleProperty("Front Left Motor Speed",
+                            [=]() { return m_frontLeftMotor.Get(); },
+                            [=](double value) { m_frontLeftMotor.Set(value); });
+  builder.AddDoubleProperty(
+      "Front Right Motor Speed", [=]() { return m_frontRightMotor.Get(); },
+      [=](double value) { m_frontRightMotor.Set(value); });
+  builder.AddDoubleProperty("Rear Left Motor Speed",
+                            [=]() { return m_rearLeftMotor.Get(); },
+                            [=](double value) { m_rearLeftMotor.Set(value); });
+  builder.AddDoubleProperty("Rear Right Motor Speed",
+                            [=]() { return m_rearRightMotor.Get(); },
+                            [=](double value) { m_rearRightMotor.Set(value); });
 }

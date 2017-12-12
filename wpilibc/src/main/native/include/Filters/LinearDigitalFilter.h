@@ -7,12 +7,13 @@
 
 #pragma once
 
-#include <initializer_list>
 #include <memory>
 #include <vector>
 
-#include "CircularBuffer.h"
+#include <llvm/ArrayRef.h>
+
 #include "Filter.h"
+#include "circular_buffer.h"
 
 namespace frc {
 
@@ -68,20 +69,18 @@ namespace frc {
  */
 class LinearDigitalFilter : public Filter {
  public:
+  LinearDigitalFilter(PIDSource& source, llvm::ArrayRef<double> ffGains,
+                      llvm::ArrayRef<double> fbGains);
   LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      std::initializer_list<double> ffGains,
-                      std::initializer_list<double> fbGains);
-  LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      std::initializer_list<double> ffGains,
-                      const std::vector<double>& fbGains);
-  LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      const std::vector<double>& ffGains,
-                      std::initializer_list<double> fbGains);
-  LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                      const std::vector<double>& ffGains,
-                      const std::vector<double>& fbGains);
+                      llvm::ArrayRef<double> ffGains,
+                      llvm::ArrayRef<double> fbGains);
 
   // Static methods to create commonly used filters
+  static LinearDigitalFilter SinglePoleIIR(PIDSource& source,
+                                           double timeConstant, double period);
+  static LinearDigitalFilter HighPass(PIDSource& source, double timeConstant,
+                                      double period);
+  static LinearDigitalFilter MovingAverage(PIDSource& source, int taps);
   static LinearDigitalFilter SinglePoleIIR(std::shared_ptr<PIDSource> source,
                                            double timeConstant, double period);
   static LinearDigitalFilter HighPass(std::shared_ptr<PIDSource> source,
@@ -97,8 +96,8 @@ class LinearDigitalFilter : public Filter {
   double PIDGet() override;
 
  private:
-  CircularBuffer<double> m_inputs;
-  CircularBuffer<double> m_outputs;
+  circular_buffer<double> m_inputs;
+  circular_buffer<double> m_outputs;
   std::vector<double> m_inputGains;
   std::vector<double> m_outputGains;
 };

@@ -61,7 +61,7 @@ task linkScriptZip(type: Zip) {
         into '/'
     }
     from (linkFile) {
-        into '/linux/athena/'
+        into '/linux/athena/shared'
     }
 }
 
@@ -109,7 +109,6 @@ model {
                             out.println 'OUTPUT_FORMAT(elf32-littlearm)'
                             out.print 'GROUP ( AS_NEEDED ( '
                             libs.each {
-                                out.print '-l'
                                 out.print it
                                 out.print ' '
                             }

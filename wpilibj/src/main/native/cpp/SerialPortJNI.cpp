@@ -13,8 +13,10 @@
 
 #include "HAL/SerialPort.h"
 #include "HALUtil.h"
+#include "support/jni_util.h"
 
 using namespace frc;
+using namespace wpi::java;
 
 // set the logging level
 TLogLevel serialJNILogLevel = logWARNING;
@@ -237,16 +239,18 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialGetBytesReceived(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SerialPortJNI
  * Method:    serialRead
- * Signature: (BLjava/nio/ByteBuffer;I)I
+ * Signature: (B[BI)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialRead(
-    JNIEnv* env, jclass, jbyte port, jobject dataReceived, jint size) {
+    JNIEnv* env, jclass, jbyte port, jbyteArray dataReceived, jint size) {
   SERIALJNI_LOG(logDEBUG) << "Serial Read";
-  jbyte* dataReceivedPtr = nullptr;
-  dataReceivedPtr = (jbyte*)env->GetDirectBufferAddress(dataReceived);
+  llvm::SmallVector<char, 128> recvBuf;
+  recvBuf.resize(size);
   int32_t status = 0;
-  jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPort>(port), reinterpret_cast<char*>(dataReceivedPtr), 
+  jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPort>(port), recvBuf.data(), 
                                size, &status);
+  env->SetByteArrayRegion(dataReceived, 0, size,
+                          reinterpret_cast<const jbyte *>(recvBuf.data()));
   SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -256,18 +260,17 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialRead(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SerialPortJNI
  * Method:    serialWrite
- * Signature: (BLjava/nio/ByteBuffer;I)I
+ * Signature: (B[BI)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialWrite(
-    JNIEnv* env, jclass, jbyte port, jobject dataToSend, jint size) {
+    JNIEnv* env, jclass, jbyte port, jbyteArray dataToSend, jint size) {
   SERIALJNI_LOG(logDEBUG) << "Serial Write";
-  jbyte* dataToSendPtr = nullptr;
-  if (dataToSend != 0) {
-    dataToSendPtr = (jbyte*)env->GetDirectBufferAddress(dataToSend);
-  }
   int32_t status = 0;
-  jint retVal = HAL_WriteSerial(static_cast<HAL_SerialPort>(port), reinterpret_cast<char*>(dataToSendPtr), 
-                                size, &status);
+  jint retVal =
+      HAL_WriteSerial(static_cast<HAL_SerialPort>(port),
+                      reinterpret_cast<const char *>(
+                          JByteArrayRef(env, dataToSend).array().data()),
+                      size, &status);
   SERIALJNI_LOG(logDEBUG) << "ReturnValue = " << retVal;
   SERIALJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);

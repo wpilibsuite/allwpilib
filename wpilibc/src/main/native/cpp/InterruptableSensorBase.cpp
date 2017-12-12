@@ -81,7 +81,7 @@ void InterruptableSensorBase::CancelInterrupts() {
   wpi_assert(m_interrupt != HAL_kInvalidHandle);
   int32_t status = 0;
   HAL_CleanInterrupts(m_interrupt, &status);
-  // ignore status, as an invalid handle just needs to be ignored.
+  // Ignore status, as an invalid handle just needs to be ignored.
   m_interrupt = HAL_kInvalidHandle;
 }
 
@@ -168,7 +168,7 @@ double InterruptableSensorBase::ReadRisingTimestamp() {
  * {@link #DigitalInput.SetUpSourceEdge}
  *
  * @return Timestamp in seconds since boot.
-*/
+ */
 double InterruptableSensorBase::ReadFallingTimestamp() {
   if (StatusIsFatal()) return 0.0;
   wpi_assert(m_interrupt != HAL_kInvalidHandle);

@@ -7,12 +7,12 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * This class defines a {@link Command} which interacts heavily with a PID loop.
@@ -209,12 +209,10 @@ public abstract class PIDCommand extends Command implements Sendable {
    */
   protected abstract void usePIDOutput(double output);
 
-  public String getSmartDashboardType() {
-    return "PIDCommand";
-  }
-
-  public void initTable(NetworkTable table) {
-    m_controller.initTable(table);
-    super.initTable(table);
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    m_controller.initSendable(builder);
+    super.initSendable(builder);
+    builder.setSmartDashboardType("PIDCommand");
   }
 }

@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/AnalogInData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -85,7 +87,7 @@ class AnalogInData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::atomic<int32_t> m_averageBits{7};
@@ -107,5 +109,5 @@ class AnalogInData {
   std::shared_ptr<NotifyListenerVector> m_accumulatorDeadbandCallbacks =
       nullptr;
 };
-extern AnalogInData SimAnalogInData[];
+extern AnalogInData* SimAnalogInData;
 }  // namespace hal

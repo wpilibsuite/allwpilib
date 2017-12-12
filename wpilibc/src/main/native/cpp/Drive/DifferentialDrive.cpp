@@ -11,6 +11,7 @@
 
 #include <HAL/HAL.h>
 
+#include "SmartDashboard/SendableBuilder.h"
 #include "SpeedController.h"
 
 using namespace frc;
@@ -23,7 +24,13 @@ using namespace frc;
  */
 DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
                                      SpeedController& rightMotor)
-    : m_leftMotor(leftMotor), m_rightMotor(rightMotor) {}
+    : m_leftMotor(leftMotor), m_rightMotor(rightMotor) {
+  AddChild(&m_leftMotor);
+  AddChild(&m_rightMotor);
+  static int instances = 0;
+  ++instances;
+  SetName("DifferentialDrive", instances);
+}
 
 /**
  * Arcade drive method for differential drive platform.
@@ -31,12 +38,13 @@ DifferentialDrive::DifferentialDrive(SpeedController& leftMotor,
  * Note: Some drivers may prefer inverted rotation controls. This can be done by
  * negating the value passed for rotation.
  *
- * @param y             The value to use for forwards/backwards. [-1.0..1.0]
- * @param rotation      The value to use for the rotation right/left.
- *                      [-1.0..1.0]
+ * @param xSpeed        The speed at which the robot should drive along the X
+ *                      axis [-1.0..1.0]. Forward is negative.
+ * @param zRotation     The rotation rate of the robot around the Z axis
+ *                      [-1.0..1.0]. Clockwise is positive.
  * @param squaredInputs If set, decreases the input sensitivity at low speeds.
  */
-void DifferentialDrive::ArcadeDrive(double y, double rotation,
+void DifferentialDrive::ArcadeDrive(double xSpeed, double zRotation,
                                     bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
@@ -45,41 +53,42 @@ void DifferentialDrive::ArcadeDrive(double y, double rotation,
     reported = true;
   }
 
-  y = Limit(y);
-  y = ApplyDeadband(y, m_deadband);
+  xSpeed = Limit(xSpeed);
+  xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
-  rotation = Limit(rotation);
-  rotation = ApplyDeadband(rotation, m_deadband);
+  zRotation = Limit(zRotation);
+  zRotation = ApplyDeadband(zRotation, m_deadband);
 
-  // square the inputs (while preserving the sign) to increase fine control
-  // while permitting full power
+  // Square the inputs (while preserving the sign) to increase fine control
+  // while permitting full power.
   if (squaredInputs) {
-    y = std::copysign(y * y, y);
-    rotation = std::copysign(rotation * rotation, rotation);
+    xSpeed = std::copysign(xSpeed * xSpeed, xSpeed);
+    zRotation = std::copysign(zRotation * zRotation, zRotation);
   }
 
   double leftMotorOutput;
   double rightMotorOutput;
 
-  double maxInput = std::copysign(std::max(std::abs(y), std::abs(rotation)), y);
+  double maxInput =
+      std::copysign(std::max(std::abs(xSpeed), std::abs(zRotation)), xSpeed);
 
-  if (y > 0.0) {
+  if (xSpeed >= 0.0) {
     // First quadrant, else second quadrant
-    if (rotation > 0.0) {
+    if (zRotation >= 0.0) {
       leftMotorOutput = maxInput;
-      rightMotorOutput = y - rotation;
+      rightMotorOutput = xSpeed - zRotation;
     } else {
-      leftMotorOutput = y + rotation;
+      leftMotorOutput = xSpeed + zRotation;
       rightMotorOutput = maxInput;
     }
   } else {
     // Third quadrant, else fourth quadrant
-    if (rotation > 0.0) {
-      leftMotorOutput = y + rotation;
+    if (zRotation >= 0.0) {
+      leftMotorOutput = xSpeed + zRotation;
       rightMotorOutput = maxInput;
     } else {
       leftMotorOutput = maxInput;
-      rightMotorOutput = y - rotation;
+      rightMotorOutput = xSpeed - zRotation;
     }
   }
 
@@ -97,12 +106,14 @@ void DifferentialDrive::ArcadeDrive(double y, double rotation,
  * speeds. Also handles the robot's quick turn functionality - "quick turn"
  * overrides constant-curvature turning for turn-in-place maneuvers.
  *
- * @param y           The value to use for forwards/backwards. [-1.0..1.0]
- * @param rotation    The value to use for the rotation right/left. [-1.0..1.0]
+ * @param xSpeed      The robot's speed along the X axis [-1.0..1.0]. Forward is
+ *                    positive.
+ * @param zRotation   The robot's rotation rate around the Z axis [-1.0..1.0].
+ *                    Clockwise is positive.
  * @param isQuickTurn If set, overrides constant-curvature turning for
  *                    turn-in-place maneuvers.
  */
-void DifferentialDrive::CurvatureDrive(double y, double rotation,
+void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
                                        bool isQuickTurn) {
   static bool reported = false;
   if (!reported) {
@@ -111,26 +122,25 @@ void DifferentialDrive::CurvatureDrive(double y, double rotation,
     reported = true;
   }
 
-  y = Limit(y);
-  y = ApplyDeadband(y, m_deadband);
+  xSpeed = Limit(xSpeed);
+  xSpeed = ApplyDeadband(xSpeed, m_deadband);
 
-  rotation = Limit(rotation);
-  rotation = ApplyDeadband(rotation, m_deadband);
+  zRotation = Limit(zRotation);
+  zRotation = ApplyDeadband(zRotation, m_deadband);
 
   double angularPower;
   bool overPower;
 
   if (isQuickTurn) {
-    if (std::abs(y) < 0.2) {
-      constexpr double alpha = 0.1;
-      m_quickStopAccumulator =
-          (1 - alpha) * m_quickStopAccumulator + alpha * Limit(rotation) * 2;
+    if (std::abs(xSpeed) < m_quickStopThreshold) {
+      m_quickStopAccumulator = (1 - m_quickStopAlpha) * m_quickStopAccumulator +
+                               m_quickStopAlpha * Limit(zRotation) * 2;
     }
     overPower = true;
-    angularPower = rotation;
+    angularPower = zRotation;
   } else {
     overPower = false;
-    angularPower = std::abs(y) * rotation - m_quickStopAccumulator;
+    angularPower = std::abs(xSpeed) * zRotation - m_quickStopAccumulator;
 
     if (m_quickStopAccumulator > 1) {
       m_quickStopAccumulator -= 1;
@@ -141,8 +151,8 @@ void DifferentialDrive::CurvatureDrive(double y, double rotation,
     }
   }
 
-  double leftMotorOutput = y + angularPower;
-  double rightMotorOutput = y - angularPower;
+  double leftMotorOutput = xSpeed + angularPower;
+  double rightMotorOutput = xSpeed - angularPower;
 
   // If rotation is overpowered, reduce both outputs to within acceptable range
   if (overPower) {
@@ -170,11 +180,13 @@ void DifferentialDrive::CurvatureDrive(double y, double rotation,
 /**
  * Tank drive method for differential drive platform.
  *
- * @param left  The value to use for left side motors. [-1.0..1.0]
- * @param right The value to use for right side motors. [-1.0..1.0]
+ * @param leftSpeed     The robot left side's speed along the X axis
+ *                      [-1.0..1.0]. Forward is positive.
+ * @param rightSpeed    The robot right side's speed along the X axis
+ *                      [-1.0..1.0]. Forward is positive.
  * @param squaredInputs If set, decreases the input sensitivity at low speeds.
  */
-void DifferentialDrive::TankDrive(double left, double right,
+void DifferentialDrive::TankDrive(double leftSpeed, double rightSpeed,
                                   bool squaredInputs) {
   static bool reported = false;
   if (!reported) {
@@ -183,23 +195,56 @@ void DifferentialDrive::TankDrive(double left, double right,
     reported = true;
   }
 
-  left = Limit(left);
-  left = ApplyDeadband(left, m_deadband);
+  leftSpeed = Limit(leftSpeed);
+  leftSpeed = ApplyDeadband(leftSpeed, m_deadband);
 
-  right = Limit(right);
-  right = ApplyDeadband(right, m_deadband);
+  rightSpeed = Limit(rightSpeed);
+  rightSpeed = ApplyDeadband(rightSpeed, m_deadband);
 
-  // square the inputs (while preserving the sign) to increase fine control
-  // while permitting full power
+  // Square the inputs (while preserving the sign) to increase fine control
+  // while permitting full power.
   if (squaredInputs) {
-    left = std::copysign(left * left, left);
-    right = std::copysign(right * right, right);
+    leftSpeed = std::copysign(leftSpeed * leftSpeed, leftSpeed);
+    rightSpeed = std::copysign(rightSpeed * rightSpeed, rightSpeed);
   }
 
-  m_leftMotor.Set(left * m_maxOutput);
-  m_rightMotor.Set(-right * m_maxOutput);
+  m_leftMotor.Set(leftSpeed * m_maxOutput);
+  m_rightMotor.Set(-rightSpeed * m_maxOutput);
 
   m_safetyHelper.Feed();
+}
+
+/**
+ * Sets the QuickStop speed threshold in curvature drive.
+ *
+ * QuickStop compensates for the robot's moment of inertia when stopping after a
+ * QuickTurn.
+ *
+ * While QuickTurn is enabled, the QuickStop accumulator takes on the rotation
+ * rate value outputted by the low-pass filter when the robot's speed along the
+ * X axis is below the threshold. When QuickTurn is disabled, the accumulator's
+ * value is applied against the computed angular power request to slow the
+ * robot's rotation.
+ *
+ * @param threshold X speed below which quick stop accumulator will receive
+ *                  rotation rate values [0..1.0].
+ */
+void DifferentialDrive::SetQuickStopThreshold(double threshold) {
+  m_quickStopThreshold = threshold;
+}
+
+/**
+ * Sets the low-pass filter gain for QuickStop in curvature drive.
+ *
+ * The low-pass filter filters incoming rotation rate commands to smooth out
+ * high frequency changes.
+ *
+ * @param alpha Low-pass filter gain [0.0..2.0]. Smaller values result in slower
+ *              output changes. Values between 1.0 and 2.0 result in output
+ *              oscillation. Values below 0.0 and above 2.0 are unstable.
+ */
+void DifferentialDrive::SetQuickStopAlpha(double alpha) {
+  m_quickStopAlpha = alpha;
 }
 
 void DifferentialDrive::StopMotor() {
@@ -210,4 +255,14 @@ void DifferentialDrive::StopMotor() {
 
 void DifferentialDrive::GetDescription(llvm::raw_ostream& desc) const {
   desc << "DifferentialDrive";
+}
+
+void DifferentialDrive::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("DifferentialDrive");
+  builder.AddDoubleProperty("Left Motor Speed",
+                            [=]() { return m_leftMotor.Get(); },
+                            [=](double value) { m_leftMotor.Set(value); });
+  builder.AddDoubleProperty("Right Motor Speed",
+                            [=]() { return m_rightMotor.Get(); },
+                            [=](double value) { m_rightMotor.Set(value); });
 }

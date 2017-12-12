@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.hal.AnalogGyroJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -25,7 +23,7 @@ import static java.util.Objects.requireNonNull;
  *
  * <p>This class is for gyro sensors that connect to an analog input.
  */
-public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowSendable {
+public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
 
   private static final double kDefaultVoltsPerDegreePerSecond = 0.007;
   protected AnalogInput m_analog;
@@ -44,7 +42,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
     AnalogGyroJNI.setupAnalogGyro(m_gyroHandle);
 
     HAL.report(tResourceType.kResourceType_Gyro, m_analog.getChannel());
-    LiveWindow.addSensor("AnalogGyro", m_analog.getChannel(), this);
+    setName("AnalogGyro", m_analog.getChannel());
   }
 
   @Override
@@ -61,6 +59,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   public AnalogGyro(int channel) {
     this(new AnalogInput(channel));
     m_channelAllocated = true;
+    addChild(m_analog);
   }
 
   /**
@@ -90,6 +89,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
   public AnalogGyro(int channel, int center, double offset) {
     this(new AnalogInput(channel), center, offset);
     m_channelAllocated = true;
+    addChild(m_analog);
   }
 
   /**
@@ -121,6 +121,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, LiveWindowS
    */
   @Override
   public void free() {
+    super.free();
     if (m_analog != null && m_channelAllocated) {
       m_analog.free();
     }

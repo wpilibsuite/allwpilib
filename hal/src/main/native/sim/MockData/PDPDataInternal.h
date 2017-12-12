@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "../PortsInternal.h"
 #include "MockData/NotifyListenerVector.h"
 #include "MockData/PDPData.h"
@@ -48,7 +50,7 @@ class PDPData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::atomic<double> m_temperature{0.0};
@@ -58,5 +60,5 @@ class PDPData {
   std::atomic<double> m_current[kNumPDPChannels];
   std::shared_ptr<NotifyListenerVector> m_currentCallbacks[kNumPDPChannels];
 };
-extern PDPData SimPDPData[];
+extern PDPData* SimPDPData;
 }  // namespace hal

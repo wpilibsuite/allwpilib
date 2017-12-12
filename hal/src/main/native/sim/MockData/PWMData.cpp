@@ -6,12 +6,21 @@
 /*----------------------------------------------------------------------------*/
 
 #include "../PortsInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 #include "PWMDataInternal.h"
 
 using namespace hal;
 
-PWMData hal::SimPWMData[kNumPWMChannels];
+namespace hal {
+namespace init {
+void InitializePWMData() {
+  static PWMData spd[kNumPWMChannels];
+  ::hal::SimPWMData = spd;
+}
+}  // namespace init
+}  // namespace hal
+
+PWMData* hal::SimPWMData;
 void PWMData::ResetData() {
   m_initialized = false;
   m_initializedCallbacks = nullptr;
@@ -34,7 +43,7 @@ int32_t PWMData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -69,7 +78,7 @@ int32_t PWMData::RegisterRawValueCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_rawValueCallbacks = RegisterCallback(m_rawValueCallbacks, "RawValue",
                                            callback, param, &newUid);
   }
@@ -104,7 +113,7 @@ int32_t PWMData::RegisterSpeedCallback(HAL_NotifyCallback callback, void* param,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_speedCallbacks =
         RegisterCallback(m_speedCallbacks, "Speed", callback, param, &newUid);
   }
@@ -139,7 +148,7 @@ int32_t PWMData::RegisterPositionCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_positionCallbacks = RegisterCallback(m_positionCallbacks, "Position",
                                            callback, param, &newUid);
   }
@@ -175,7 +184,7 @@ int32_t PWMData::RegisterPeriodScaleCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_periodScaleCallbacks = RegisterCallback(
         m_periodScaleCallbacks, "PeriodScale", callback, param, &newUid);
   }
@@ -211,7 +220,7 @@ int32_t PWMData::RegisterZeroLatchCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_zeroLatchCallbacks = RegisterCallback(m_zeroLatchCallbacks, "ZeroLatch",
                                             callback, param, &newUid);
   }
@@ -361,4 +370,14 @@ HAL_Bool HALSIM_GetPWMZeroLatch(int32_t index) {
 void HALSIM_SetPWMZeroLatch(int32_t index, HAL_Bool zeroLatch) {
   SimPWMData[index].SetZeroLatch(zeroLatch);
 }
+
+void HALSIM_RegisterPWMAllCallbacks(int32_t index, HAL_NotifyCallback callback,
+                                    void* param, HAL_Bool initialNotify) {
+  SimPWMData[index].RegisterInitializedCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterRawValueCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterSpeedCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterPositionCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterPeriodScaleCallback(callback, param, initialNotify);
+  SimPWMData[index].RegisterZeroLatchCallback(callback, param, initialNotify);
 }
+}  // extern "C"

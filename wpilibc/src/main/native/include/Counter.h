@@ -8,16 +8,13 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include <HAL/Counter.h>
 #include <HAL/Types.h>
 
 #include "AnalogTrigger.h"
 #include "CounterBase.h"
-#include "LiveWindow/LiveWindowSendable.h"
 #include "SensorBase.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -33,9 +30,7 @@ class DigitalGlitchFilter;
  * All counters will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Counter : public SensorBase,
-                public CounterBase,
-                public LiveWindowSendable {
+class Counter : public SensorBase, public CounterBase {
  public:
   enum Mode {
     kTwoPulse = 0,
@@ -43,6 +38,7 @@ class Counter : public SensorBase,
     kPulseLength = 2,
     kExternalDirection = 3
   };
+
   explicit Counter(Mode mode = kTwoPulse);
   explicit Counter(int channel);
   explicit Counter(DigitalSource* source);
@@ -52,7 +48,7 @@ class Counter : public SensorBase,
           DigitalSource* downSource, bool inverted);
   Counter(EncodingType encodingType, std::shared_ptr<DigitalSource> upSource,
           std::shared_ptr<DigitalSource> downSource, bool inverted);
-  virtual ~Counter();
+  ~Counter() override;
 
   void SetUpSource(int channel);
   void SetUpSource(AnalogTrigger* analogTrigger, AnalogTriggerType triggerType);
@@ -95,24 +91,21 @@ class Counter : public SensorBase,
   int GetSamplesToAverage() const;
   int GetFPGAIndex() const { return m_index; }
 
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  void InitSendable(SendableBuilder& builder) override;
 
  protected:
   // Makes the counter count up.
   std::shared_ptr<DigitalSource> m_upSource;
+
   // Makes the counter count down.
   std::shared_ptr<DigitalSource> m_downSource;
+
   // The FPGA counter object
   HAL_CounterHandle m_counter = HAL_kInvalidHandle;
 
  private:
-  int m_index = 0;  ///< The index of this counter.
+  int m_index = 0;  // The index of this counter.
 
-  nt::NetworkTableEntry m_valueEntry;
   friend class DigitalGlitchFilter;
 };
 

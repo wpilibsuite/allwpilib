@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/NotifyListenerVector.h"
 #include "MockData/PWMData.h"
 
@@ -61,7 +63,7 @@ class PWMData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::atomic<int32_t> m_rawValue{0};
@@ -75,5 +77,5 @@ class PWMData {
   std::atomic<HAL_Bool> m_zeroLatch{false};
   std::shared_ptr<NotifyListenerVector> m_zeroLatchCallbacks = nullptr;
 };
-extern PWMData SimPWMData[];
+extern PWMData* SimPWMData;
 }  // namespace hal

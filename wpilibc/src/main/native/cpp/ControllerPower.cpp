@@ -20,6 +20,7 @@ using namespace frc;
  * Get the input voltage to the robot controller.
  *
  * @return The controller input voltage value in Volts
+ * @deprecated Use RobotController static class method
  */
 double ControllerPower::GetInputVoltage() {
   int32_t status = 0;
@@ -32,6 +33,7 @@ double ControllerPower::GetInputVoltage() {
  * Get the input current to the robot controller.
  *
  * @return The controller input current value in Amps
+ * @deprecated Use RobotController static class method
  */
 double ControllerPower::GetInputCurrent() {
   int32_t status = 0;
@@ -44,6 +46,7 @@ double ControllerPower::GetInputCurrent() {
  * Get the voltage of the 6V rail.
  *
  * @return The controller 6V rail voltage value in Volts
+ * @deprecated Use RobotController static class method
  */
 double ControllerPower::GetVoltage6V() {
   int32_t status = 0;
@@ -56,6 +59,7 @@ double ControllerPower::GetVoltage6V() {
  * Get the current output of the 6V rail.
  *
  * @return The controller 6V rail output current value in Amps
+ * @deprecated Use RobotController static class method
  */
 double ControllerPower::GetCurrent6V() {
   int32_t status = 0;
@@ -69,6 +73,7 @@ double ControllerPower::GetCurrent6V() {
  * controller brownout, a short circuit on the rail, or controller over-voltage.
  *
  * @return The controller 6V rail enabled value. True for enabled.
+ * @deprecated Use RobotController static class method
  */
 bool ControllerPower::GetEnabled6V() {
   int32_t status = 0;
@@ -82,6 +87,7 @@ bool ControllerPower::GetEnabled6V() {
  * has booted.
  *
  * @return The number of faults.
+ * @deprecated Use RobotController static class method
  */
 int ControllerPower::GetFaultCount6V() {
   int32_t status = 0;
@@ -94,6 +100,7 @@ int ControllerPower::GetFaultCount6V() {
  * Get the voltage of the 5V rail.
  *
  * @return The controller 5V rail voltage value in Volts
+ * @deprecated Use RobotController static class method
  */
 double ControllerPower::GetVoltage5V() {
   int32_t status = 0;
@@ -106,6 +113,7 @@ double ControllerPower::GetVoltage5V() {
  * Get the current output of the 5V rail.
  *
  * @return The controller 5V rail output current value in Amps
+ * @deprecated Use RobotController static class method
  */
 double ControllerPower::GetCurrent5V() {
   int32_t status = 0;
@@ -119,6 +127,7 @@ double ControllerPower::GetCurrent5V() {
  * controller brownout, a short circuit on the rail, or controller over-voltage.
  *
  * @return The controller 5V rail enabled value. True for enabled.
+ * @deprecated Use RobotController static class method
  */
 bool ControllerPower::GetEnabled5V() {
   int32_t status = 0;
@@ -132,6 +141,7 @@ bool ControllerPower::GetEnabled5V() {
  * has booted.
  *
  * @return The number of faults
+ * @deprecated Use RobotController static class method
  */
 int ControllerPower::GetFaultCount5V() {
   int32_t status = 0;
@@ -144,6 +154,7 @@ int ControllerPower::GetFaultCount5V() {
  * Get the voltage of the 3.3V rail.
  *
  * @return The controller 3.3V rail voltage value in Volts
+ * @deprecated Use RobotController static class method
  */
 double ControllerPower::GetVoltage3V3() {
   int32_t status = 0;
@@ -156,6 +167,7 @@ double ControllerPower::GetVoltage3V3() {
  * Get the current output of the 3.3V rail.
  *
  * @return The controller 3.3V rail output current value in Amps
+ * @deprecated Use RobotController static class method
  */
 double ControllerPower::GetCurrent3V3() {
   int32_t status = 0;
@@ -169,6 +181,7 @@ double ControllerPower::GetCurrent3V3() {
  * controller brownout, a short circuit on the rail, or controller over-voltage.
  *
  * @return The controller 3.3V rail enabled value. True for enabled.
+ * @deprecated Use RobotController static class method
  */
 bool ControllerPower::GetEnabled3V3() {
   int32_t status = 0;
@@ -182,6 +195,7 @@ bool ControllerPower::GetEnabled3V3() {
  * controller has booted.
  *
  * @return The number of faults
+ * @deprecated Use RobotController static class method
  */
 int ControllerPower::GetFaultCount3V3() {
   int32_t status = 0;

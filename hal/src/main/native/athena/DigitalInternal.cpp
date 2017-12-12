@@ -8,10 +8,10 @@
 #include "DigitalInternal.h"
 
 #include <atomic>
-#include <mutex>
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>
+#include <support/mutex.h>
 
 #include "ConstantsInternal.h"
 #include "HAL/AnalogTrigger.h"
@@ -22,31 +22,36 @@
 
 namespace hal {
 
-// Create a mutex to protect changes to the DO PWM config
-std::mutex digitalPwmMutex;
-
 std::unique_ptr<tDIO> digitalSystem;
 std::unique_ptr<tRelay> relaySystem;
 std::unique_ptr<tPWM> pwmSystem;
 std::unique_ptr<tSPI> spiSystem;
 
-static std::atomic<bool> digitalSystemsInitialized{false};
-static std::mutex initializeMutex;
-
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
-                      kNumDigitalChannels + kNumPWMHeaders>
+                      kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
+
+namespace init {
+void InitializeDigitalInternal() {
+  static DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
+                               kNumDigitalChannels + kNumPWMHeaders>
+      dcH;
+  digitalChannelHandles = &dcH;
+}
+}  // namespace init
 
 /**
  * Initialize the digital system.
  */
 void initializeDigital(int32_t* status) {
+  static std::atomic_bool initialized{false};
+  static wpi::mutex initializeMutex;
   // Initial check, as if it's true initialization has finished
-  if (digitalSystemsInitialized) return;
+  if (initialized) return;
 
-  std::lock_guard<std::mutex> lock(initializeMutex);
+  std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
-  if (digitalSystemsInitialized) return;
+  if (initialized) return;
 
   digitalSystem.reset(tDIO::create(status));
 
@@ -99,7 +104,16 @@ void initializeDigital(int32_t* status) {
   // SPI setup
   spiSystem.reset(tSPI::create(status));
 
-  digitalSystemsInitialized = true;
+  // Image 13 requires a SPI select and a strobe to enable SPI CS on MXP.
+  // Switch to SPI 1, strobe the signal, and then switch back to previous.
+  bool existingSelect = spiSystem->readAutoSPI1Select(status);
+  spiSystem->writeAutoSPI1Select(true, status);
+  spiSystem->strobeAutoForceOne(status);
+  // Delay enough time to actually trigger strobe
+  std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  spiSystem->writeAutoSPI1Select(existingSelect, status);
+
+  initialized = true;
 }
 
 /**

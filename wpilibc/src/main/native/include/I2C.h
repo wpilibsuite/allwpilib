@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-#include "SensorBase.h"
+#include "ErrorBase.h"
 
 enum HAL_I2CPort : int32_t;
 
@@ -20,14 +20,13 @@ namespace frc {
  *
  * This class is intended to be used by sensor (and other I2C device) drivers.
  * It probably should not be used directly.
- *
  */
-class I2C : SensorBase {
+class I2C : public ErrorBase {
  public:
   enum Port { kOnboard = 0, kMXP };
 
   I2C(Port port, int deviceAddress);
-  virtual ~I2C();
+  ~I2C() override;
 
   I2C(const I2C&) = delete;
   I2C& operator=(const I2C&) = delete;
@@ -39,7 +38,6 @@ class I2C : SensorBase {
   bool WriteBulk(uint8_t* data, int count);
   bool Read(int registerAddress, int count, uint8_t* data);
   bool ReadOnly(int count, uint8_t* buffer);
-  // void Broadcast(int registerAddress, uint8_t data);
   bool VerifySensor(int registerAddress, int count, const uint8_t* expected);
 
  private:

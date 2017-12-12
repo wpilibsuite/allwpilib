@@ -8,27 +8,23 @@
 #pragma once
 
 #include <memory>
-#include <string>
 
 #include <llvm/StringMap.h>
 #include <llvm/StringRef.h>
 
 #include "SmartDashboard/SendableChooserBase.h"
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
 /**
- * The {@link SendableChooser} class is a useful tool for presenting a selection
- * of options to the {@link SmartDashboard}.
+ * The SendableChooser class is a useful tool for presenting a selection of
+ * options to the SmartDashboard.
  *
- * <p>For instance, you may wish to be able to select between multiple
- * autonomous modes. You can do this by putting every possible {@link Command}
- * you want to run as an autonomous into a {@link SendableChooser} and then put
- * it into the {@link SmartDashboard} to have a list of options appear on the
- * laptop.  Once autonomous starts, simply ask the {@link SendableChooser} what
- * the selected value is.</p>
+ * For instance, you may wish to be able to select between multiple autonomous
+ * modes. You can do this by putting every possible Command you want to run as
+ * an autonomous into a SendableChooser and then put it into the SmartDashboard
+ * to have a list of options appear on the laptop. Once autonomous starts,
+ * simply ask the SendableChooser what the selected value is.
  *
  * @tparam T The type of values to be stored
  * @see SmartDashboard
@@ -36,7 +32,6 @@ namespace frc {
 template <class T>
 class SendableChooser : public SendableChooserBase {
   llvm::StringMap<T> m_choices;
-  nt::NetworkTableEntry m_selectedEntry;
 
   template <class U>
   static U _unwrap_smart_ptr(const U& value);
@@ -48,14 +43,14 @@ class SendableChooser : public SendableChooserBase {
   static std::weak_ptr<U> _unwrap_smart_ptr(const std::shared_ptr<U>& value);
 
  public:
-  virtual ~SendableChooser() = default;
+  ~SendableChooser() override = default;
 
   void AddObject(llvm::StringRef name, T object);
   void AddDefault(llvm::StringRef name, T object);
 
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
+  void InitSendable(SendableBuilder& builder) override;
 };
 
 }  // namespace frc

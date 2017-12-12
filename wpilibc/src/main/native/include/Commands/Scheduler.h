@@ -7,27 +7,24 @@
 
 #pragma once
 
-#include <list>
-#include <map>
 #include <memory>
-#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
 
+#include <networktables/NetworkTableEntry.h>
+#include <support/mutex.h>
+
 #include "Commands/Command.h"
 #include "ErrorBase.h"
-#include "SmartDashboard/NamedSendable.h"
-#include "SmartDashboard/SmartDashboard.h"
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableEntry.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
 class ButtonScheduler;
 class Subsystem;
 
-class Scheduler : public ErrorBase, public NamedSendable {
+class Scheduler : public ErrorBase, public SendableBase {
  public:
   static Scheduler* GetInstance();
 
@@ -40,24 +37,20 @@ class Scheduler : public ErrorBase, public NamedSendable {
   void ResetAll();
   void SetEnabled(bool enabled);
 
-  void UpdateTable();
-  std::string GetSmartDashboardType() const;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable);
-  std::string GetName() const;
-  std::string GetType() const;
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   Scheduler();
-  virtual ~Scheduler() = default;
+  ~Scheduler() override = default;
 
   void ProcessCommandAddition(Command* command);
 
   Command::SubsystemSet m_subsystems;
-  std::mutex m_buttonsLock;
+  wpi::mutex m_buttonsMutex;
   typedef std::vector<ButtonScheduler*> ButtonVector;
   ButtonVector m_buttons;
   typedef std::vector<Command*> CommandVector;
-  std::mutex m_additionsLock;
+  wpi::mutex m_additionsMutex;
   CommandVector m_additions;
   typedef std::set<Command*> CommandSet;
   CommandSet m_commands;

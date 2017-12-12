@@ -7,6 +7,7 @@
 
 #include "PIDController.h"
 
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -15,15 +16,14 @@
 #include "Notifier.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
+#include "SmartDashboard/SendableBuilder.h"
 
 using namespace frc;
 
-static const std::string kP = "p";
-static const std::string kI = "i";
-static const std::string kD = "d";
-static const std::string kF = "f";
-static const std::string kSetpoint = "setpoint";
-static const std::string kEnabled = "enabled";
+template <class T>
+constexpr const T& clamp(const T& value, const T& low, const T& high) {
+  return std::max(low, std::min(value, high));
+}
 
 /**
  * Allocate a PID object with the given constants for P, I, D.
@@ -55,7 +55,8 @@ PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource* source,
  */
 PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
                              PIDSource* source, PIDOutput* output,
-                             double period) {
+                             double period)
+    : SendableBase(false) {
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
 
   m_P = Kp;
@@ -63,7 +64,13 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
   m_D = Kd;
   m_F = Kf;
 
-  m_pidInput = source;
+  // Save original source
+  m_origSource = std::shared_ptr<PIDSource>(source, NullDeleter<PIDSource>());
+
+  // Create LinearDigitalFilter with original source as its source argument
+  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, 1);
+  m_pidInput = &m_filter;
+
   m_pidOutput = output;
   m_period = period;
 
@@ -73,12 +80,45 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
   static int instances = 0;
   instances++;
   HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
+  SetName("PIDController", instances);
 }
+
+/**
+ * Allocate a PID object with the given constants for P, I, D.
+ *
+ * @param Kp     the proportional coefficient
+ * @param Ki     the integral coefficient
+ * @param Kd     the derivative coefficient
+ * @param source The PIDSource object that is used to get values
+ * @param output The PIDOutput object that is set to the output value
+ * @param period the loop time for doing calculations. This particularly
+ *               effects calculations of the integral and differental terms.
+ *               The default is 50ms.
+ */
+PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource& source,
+                             PIDOutput& output, double period)
+    : PIDController(Kp, Ki, Kd, 0.0, &source, &output, period) {}
+
+/**
+ * Allocate a PID object with the given constants for P, I, D.
+ *
+ * @param Kp     the proportional coefficient
+ * @param Ki     the integral coefficient
+ * @param Kd     the derivative coefficient
+ * @param source The PIDSource object that is used to get values
+ * @param output The PIDOutput object that is set to the output value
+ * @param period the loop time for doing calculations. This particularly
+ *               effects calculations of the integral and differental terms.
+ *               The default is 50ms.
+ */
+PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
+                             PIDSource& source, PIDOutput& output,
+                             double period)
+    : PIDController(Kp, Ki, Kd, Kf, &source, &output, period) {}
 
 PIDController::~PIDController() {
   // forcefully stopping the notifier so the callback can successfully run.
   m_controlLoop->Stop();
-  RemoveListeners();
 }
 
 /**
@@ -86,80 +126,87 @@ PIDController::~PIDController() {
  * This should only be called by the Notifier.
  */
 void PIDController::Calculate() {
-  bool enabled;
-  PIDSource* pidInput;
-  PIDOutput* pidOutput;
+  if (m_origSource == nullptr || m_pidOutput == nullptr) return;
 
+  bool enabled;
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
-    pidInput = m_pidInput;
-    pidOutput = m_pidOutput;
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
     enabled = m_enabled;
   }
 
-  if (pidInput == nullptr) return;
-  if (pidOutput == nullptr) return;
-
   if (enabled) {
+    double input;
+
+    // Storage for function inputs
+    PIDSourceType pidSourceType;
+    double P;
+    double I;
+    double D;
     double feedForward = CalculateFeedForward();
+    double minimumOutput;
+    double maximumOutput;
 
-    std::lock_guard<std::mutex> sync(m_mutex);
-    double input = pidInput->PIDGet();
+    // Storage for function input-outputs
+    double prevError;
+    double error;
+    double totalError;
+
+    {
+      std::lock_guard<wpi::mutex> lock(m_thisMutex);
+
+      input = m_pidInput->PIDGet();
+
+      pidSourceType = m_pidInput->GetPIDSourceType();
+      P = m_P;
+      I = m_I;
+      D = m_D;
+      minimumOutput = m_minimumOutput;
+      maximumOutput = m_maximumOutput;
+
+      prevError = m_prevError;
+      error = GetContinuousError(m_setpoint - input);
+      totalError = m_totalError;
+    }
+
+    // Storage for function outputs
     double result;
-    PIDOutput* pidOutput;
 
-    m_error = GetContinuousError(m_setpoint - input);
-
-    if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
-      if (m_P != 0) {
-        double potentialPGain = (m_totalError + m_error) * m_P;
-        if (potentialPGain < m_maximumOutput) {
-          if (potentialPGain > m_minimumOutput)
-            m_totalError += m_error;
-          else
-            m_totalError = m_minimumOutput / m_P;
-        } else {
-          m_totalError = m_maximumOutput / m_P;
-        }
+    if (pidSourceType == PIDSourceType::kRate) {
+      if (P != 0) {
+        totalError =
+            clamp(totalError + error, minimumOutput / P, maximumOutput / P);
       }
 
-      m_result = m_D * m_error + m_P * m_totalError + feedForward;
+      result = D * error + P * totalError + feedForward;
     } else {
-      if (m_I != 0) {
-        double potentialIGain = (m_totalError + m_error) * m_I;
-        if (potentialIGain < m_maximumOutput) {
-          if (potentialIGain > m_minimumOutput)
-            m_totalError += m_error;
-          else
-            m_totalError = m_minimumOutput / m_I;
-        } else {
-          m_totalError = m_maximumOutput / m_I;
-        }
+      if (I != 0) {
+        totalError =
+            clamp(totalError + error, minimumOutput / I, maximumOutput / I);
       }
 
-      m_result = m_P * m_error + m_I * m_totalError +
-                 m_D * (m_error - m_prevError) + feedForward;
+      result =
+          P * error + I * totalError + D * (error - prevError) + feedForward;
     }
+
+    result = clamp(result, minimumOutput, maximumOutput);
+
+    {
+      // Ensures m_enabled check and PIDWrite() call occur atomically
+      std::lock_guard<wpi::mutex> pidWriteLock(m_pidWriteMutex);
+      std::unique_lock<wpi::mutex> mainLock(m_thisMutex);
+      if (m_enabled) {
+        // Don't block other PIDController operations on PIDWrite()
+        mainLock.unlock();
+
+        m_pidOutput->PIDWrite(result);
+      }
+    }
+
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
     m_prevError = m_error;
-
-    if (m_result > m_maximumOutput)
-      m_result = m_maximumOutput;
-    else if (m_result < m_minimumOutput)
-      m_result = m_minimumOutput;
-
-    pidOutput = m_pidOutput;
-    result = m_result;
-
-    pidOutput->PIDWrite(result);
-
-    // Update the buffer.
-    m_buf.push(m_error);
-    m_bufTotal += m_error;
-    // Remove old elements when buffer is full.
-    if (m_buf.size() > m_bufLength) {
-      m_bufTotal -= m_buf.front();
-      m_buf.pop();
-    }
+    m_error = error;
+    m_totalError = totalError;
+    m_result = result;
   }
 }
 
@@ -200,15 +247,11 @@ double PIDController::CalculateFeedForward() {
  */
 void PIDController::SetPID(double p, double i, double d) {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
     m_P = p;
     m_I = i;
     m_D = d;
   }
-
-  if (m_pEntry) m_pEntry.SetDouble(m_P);
-  if (m_iEntry) m_iEntry.SetDouble(m_I);
-  if (m_dEntry) m_dEntry.SetDouble(m_D);
 }
 
 /**
@@ -222,18 +265,51 @@ void PIDController::SetPID(double p, double i, double d) {
  * @param f Feed forward coefficient
  */
 void PIDController::SetPID(double p, double i, double d, double f) {
-  {
-    std::lock_guard<std::mutex> sync(m_mutex);
-    m_P = p;
-    m_I = i;
-    m_D = d;
-    m_F = f;
-  }
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_P = p;
+  m_I = i;
+  m_D = d;
+  m_F = f;
+}
 
-  if (m_pEntry) m_pEntry.SetDouble(m_P);
-  if (m_iEntry) m_iEntry.SetDouble(m_I);
-  if (m_dEntry) m_dEntry.SetDouble(m_D);
-  if (m_fEntry) m_fEntry.SetDouble(m_F);
+/**
+ * Set the Proportional coefficient of the PID controller gain.
+ *
+ * @param p proportional coefficient
+ */
+void PIDController::SetP(double p) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_P = p;
+}
+
+/**
+ * Set the Integral coefficient of the PID controller gain.
+ *
+ * @param i integral coefficient
+ */
+void PIDController::SetI(double i) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_I = i;
+}
+
+/**
+ * Set the Differential coefficient of the PID controller gain.
+ *
+ * @param d differential coefficient
+ */
+void PIDController::SetD(double d) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_D = d;
+}
+
+/**
+ * Get the Feed forward coefficient of the PID controller gain.
+ *
+ * @param f Feed forward coefficient
+ */
+void PIDController::SetF(double f) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_F = f;
 }
 
 /**
@@ -242,7 +318,7 @@ void PIDController::SetPID(double p, double i, double d, double f) {
  * @return proportional coefficient
  */
 double PIDController::GetP() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_P;
 }
 
@@ -252,7 +328,7 @@ double PIDController::GetP() const {
  * @return integral coefficient
  */
 double PIDController::GetI() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_I;
 }
 
@@ -262,7 +338,7 @@ double PIDController::GetI() const {
  * @return differential coefficient
  */
 double PIDController::GetD() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_D;
 }
 
@@ -272,7 +348,7 @@ double PIDController::GetD() const {
  * @return Feed forward coefficient
  */
 double PIDController::GetF() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_F;
 }
 
@@ -284,7 +360,7 @@ double PIDController::GetF() const {
  * @return the latest calculated output
  */
 double PIDController::Get() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_result;
 }
 
@@ -298,7 +374,7 @@ double PIDController::Get() const {
  * @param continuous true turns on continuous, false turns off continuous
  */
 void PIDController::SetContinuous(bool continuous) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_continuous = continuous;
 }
 
@@ -310,9 +386,10 @@ void PIDController::SetContinuous(bool continuous) {
  */
 void PIDController::SetInputRange(double minimumInput, double maximumInput) {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
     m_minimumInput = minimumInput;
     m_maximumInput = maximumInput;
+    m_inputRange = maximumInput - minimumInput;
   }
 
   SetSetpoint(m_setpoint);
@@ -325,7 +402,7 @@ void PIDController::SetInputRange(double minimumInput, double maximumInput) {
  * @param maximumOutput the maximum value to write to the output
  */
 void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_minimumOutput = minimumOutput;
   m_maximumOutput = maximumOutput;
 }
@@ -333,13 +410,11 @@ void PIDController::SetOutputRange(double minimumOutput, double maximumOutput) {
 /**
  * Set the setpoint for the PIDController.
  *
- * Clears the queue for GetAvgError().
- *
  * @param setpoint the desired setpoint
  */
 void PIDController::SetSetpoint(double setpoint) {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
 
     if (m_maximumInput > m_minimumInput) {
       if (setpoint > m_maximumInput)
@@ -351,13 +426,7 @@ void PIDController::SetSetpoint(double setpoint) {
     } else {
       m_setpoint = setpoint;
     }
-
-    // Clear m_buf.
-    m_buf = std::queue<double>();
-    m_bufTotal = 0;
   }
-
-  if (m_setpointEntry) m_setpointEntry.SetDouble(m_setpoint);
 }
 
 /**
@@ -366,7 +435,7 @@ void PIDController::SetSetpoint(double setpoint) {
  * @return the current setpoint
  */
 double PIDController::GetSetpoint() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_setpoint;
 }
 
@@ -376,7 +445,7 @@ double PIDController::GetSetpoint() const {
  * @return the change in setpoint over time
  */
 double PIDController::GetDeltaSetpoint() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
 }
 
@@ -388,10 +457,20 @@ double PIDController::GetDeltaSetpoint() const {
 double PIDController::GetError() const {
   double setpoint = GetSetpoint();
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
     return GetContinuousError(setpoint - m_pidInput->PIDGet());
   }
 }
+
+/**
+ * Returns the current average of the error over the past few iterations.
+ *
+ * You can specify the number of iterations to average with SetToleranceBuffer()
+ * (defaults to 1). This is the same value that is used for OnTarget().
+ *
+ * @return the average error
+ */
+double PIDController::GetAvgError() const { return GetError(); }
 
 /**
  * Sets what type of input the PID controller will use.
@@ -408,24 +487,6 @@ PIDSourceType PIDController::GetPIDSourceType() const {
   return m_pidInput->GetPIDSourceType();
 }
 
-/**
- * Returns the current average of the error over the past few iterations.
- *
- * You can specify the number of iterations to average with SetToleranceBuffer()
- * (defaults to 1). This is the same value that is used for OnTarget().
- *
- * @return the average error
- */
-double PIDController::GetAvgError() const {
-  double avgError = 0;
-  {
-    std::lock_guard<std::mutex> sync(m_mutex);
-    // Don't divide by zero.
-    if (m_buf.size()) avgError = m_bufTotal / m_buf.size();
-  }
-  return avgError;
-}
-
 /*
  * Set the percentage error which is considered tolerable for use with
  * OnTarget.
@@ -433,7 +494,7 @@ double PIDController::GetAvgError() const {
  * @param percentage error which is tolerable
  */
 void PIDController::SetTolerance(double percent) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_toleranceType = kPercentTolerance;
   m_tolerance = percent;
 }
@@ -445,7 +506,7 @@ void PIDController::SetTolerance(double percent) {
  * @param percentage error which is tolerable
  */
 void PIDController::SetAbsoluteTolerance(double absTolerance) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_toleranceType = kAbsoluteTolerance;
   m_tolerance = absTolerance;
 }
@@ -457,7 +518,7 @@ void PIDController::SetAbsoluteTolerance(double absTolerance) {
  * @param percentage error which is tolerable
  */
 void PIDController::SetPercentTolerance(double percent) {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_toleranceType = kPercentTolerance;
   m_tolerance = percent;
 }
@@ -473,14 +534,11 @@ void PIDController::SetPercentTolerance(double percent) {
  * @param bufLength Number of previous cycles to average. Defaults to 1.
  */
 void PIDController::SetToleranceBuffer(int bufLength) {
-  std::lock_guard<std::mutex> sync(m_mutex);
-  m_bufLength = bufLength;
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
 
-  // Cut the buffer down to size if needed.
-  while (m_buf.size() > static_cast<uint32_t>(bufLength)) {
-    m_bufTotal -= m_buf.front();
-    m_buf.pop();
-  }
+  // Create LinearDigitalFilter with original source as its source argument
+  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, bufLength);
+  m_pidInput = &m_filter;
 }
 
 /*
@@ -495,18 +553,12 @@ void PIDController::SetToleranceBuffer(int bufLength) {
  * This will return false until at least one input value has been computed.
  */
 bool PIDController::OnTarget() const {
-  {
-    std::lock_guard<std::mutex> sync(m_mutex);
-    if (m_buf.size() == 0) return false;
-  }
+  double error = GetError();
 
-  double error = GetAvgError();
-
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   switch (m_toleranceType) {
     case kPercentTolerance:
-      return std::fabs(error) <
-             m_tolerance / 100 * (m_maximumInput - m_minimumInput);
+      return std::fabs(error) < m_tolerance / 100 * m_inputRange;
       break;
     case kAbsoluteTolerance:
       return std::fabs(error) < m_tolerance;
@@ -523,11 +575,9 @@ bool PIDController::OnTarget() const {
  */
 void PIDController::Enable() {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
+    std::lock_guard<wpi::mutex> lock(m_thisMutex);
     m_enabled = true;
   }
-
-  if (m_enabledEntry) m_enabledEntry.SetBoolean(true);
 }
 
 /**
@@ -535,19 +585,33 @@ void PIDController::Enable() {
  */
 void PIDController::Disable() {
   {
-    std::lock_guard<std::mutex> sync(m_mutex);
-    m_pidOutput->PIDWrite(0);
-    m_enabled = false;
-  }
+    // Ensures m_enabled modification and PIDWrite() call occur atomically
+    std::lock_guard<wpi::mutex> pidWriteLock(m_pidWriteMutex);
+    {
+      std::lock_guard<wpi::mutex> mainLock(m_thisMutex);
+      m_enabled = false;
+    }
 
-  if (m_enabledEntry) m_enabledEntry.SetBoolean(false);
+    m_pidOutput->PIDWrite(0);
+  }
+}
+
+/**
+ * Set the enabled state of the PIDController.
+ */
+void PIDController::SetEnabled(bool enable) {
+  if (enable) {
+    Enable();
+  } else {
+    Disable();
+  }
 }
 
 /**
  * Return true if PIDController is enabled.
  */
 bool PIDController::IsEnabled() const {
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_enabled;
 }
 
@@ -557,82 +621,27 @@ bool PIDController::IsEnabled() const {
 void PIDController::Reset() {
   Disable();
 
-  std::lock_guard<std::mutex> sync(m_mutex);
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_prevError = 0;
   m_totalError = 0;
   m_result = 0;
 }
 
-std::string PIDController::GetSmartDashboardType() const {
-  return "PIDController";
-}
-
-void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  RemoveListeners();
-  if (subtable) {
-    m_pEntry = subtable->GetEntry(kP);
-    m_pEntry.SetDouble(GetP());
-    m_iEntry = subtable->GetEntry(kI);
-    m_iEntry.SetDouble(GetI());
-    m_dEntry = subtable->GetEntry(kD);
-    m_dEntry.SetDouble(GetD());
-    m_fEntry = subtable->GetEntry(kF);
-    m_fEntry.SetDouble(GetF());
-    m_setpointEntry = subtable->GetEntry(kSetpoint);
-    m_setpointEntry.SetDouble(GetSetpoint());
-    m_enabledEntry = subtable->GetEntry(kEnabled);
-    m_enabledEntry.SetBoolean(IsEnabled());
-
-    m_pListener = m_pEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          std::lock_guard<std::mutex> sync(m_mutex);
-          m_P = event.value->GetDouble();
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_iListener = m_iEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          std::lock_guard<std::mutex> sync(m_mutex);
-          m_I = event.value->GetDouble();
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_dListener = m_dEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          std::lock_guard<std::mutex> sync(m_mutex);
-          m_D = event.value->GetDouble();
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_fListener = m_fEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          std::lock_guard<std::mutex> sync(m_mutex);
-          m_F = event.value->GetDouble();
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_setpointListener = m_setpointEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsDouble()) return;
-          SetSetpoint(event.value->GetDouble());
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-
-    m_enabledListener = m_enabledEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsBoolean()) return;
-          if (event.value->GetBoolean()) {
-            Enable();
-          } else {
-            Disable();
-          }
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
+void PIDController::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("PIDController");
+  builder.SetSafeState([=]() { Reset(); });
+  builder.AddDoubleProperty("p", [=]() { return GetP(); },
+                            [=](double value) { SetP(value); });
+  builder.AddDoubleProperty("i", [=]() { return GetI(); },
+                            [=](double value) { SetI(value); });
+  builder.AddDoubleProperty("d", [=]() { return GetD(); },
+                            [=](double value) { SetD(value); });
+  builder.AddDoubleProperty("f", [=]() { return GetF(); },
+                            [=](double value) { SetF(value); });
+  builder.AddDoubleProperty("setpoint", [=]() { return GetSetpoint(); },
+                            [=](double value) { SetSetpoint(value); });
+  builder.AddBooleanProperty("enabled", [=]() { return IsEnabled(); },
+                             [=](bool value) { SetEnabled(value); });
 }
 
 /**
@@ -643,47 +652,16 @@ void PIDController::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
  * @return Error for continuous inputs.
  */
 double PIDController::GetContinuousError(double error) const {
-  if (m_continuous &&
-      std::fabs(error) > (m_maximumInput - m_minimumInput) / 2) {
-    if (error > 0) {
-      return error - (m_maximumInput - m_minimumInput);
-    } else {
-      return error + (m_maximumInput - m_minimumInput);
+  if (m_continuous) {
+    error = std::fmod(error, m_inputRange);
+    if (std::fabs(error) > m_inputRange / 2) {
+      if (error > 0) {
+        return error - m_inputRange;
+      } else {
+        return error + m_inputRange;
+      }
     }
   }
 
   return error;
-}
-
-void PIDController::UpdateTable() {}
-
-void PIDController::StartLiveWindowMode() { Disable(); }
-
-void PIDController::StopLiveWindowMode() {}
-
-void PIDController::RemoveListeners() {
-  if (m_pListener != 0) {
-    m_pEntry.RemoveListener(m_pListener);
-    m_pListener = 0;
-  }
-  if (m_iListener != 0) {
-    m_iEntry.RemoveListener(m_iListener);
-    m_iListener = 0;
-  }
-  if (m_dListener != 0) {
-    m_dEntry.RemoveListener(m_dListener);
-    m_dListener = 0;
-  }
-  if (m_fListener != 0) {
-    m_fEntry.RemoveListener(m_fListener);
-    m_fListener = 0;
-  }
-  if (m_setpointListener != 0) {
-    m_setpointEntry.RemoveListener(m_setpointListener);
-    m_setpointListener = 0;
-  }
-  if (m_enabledListener != 0) {
-    m_enabledEntry.RemoveListener(m_enabledListener);
-    m_enabledListener = 0;
-  }
 }

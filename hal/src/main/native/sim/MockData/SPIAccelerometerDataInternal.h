@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/NotifyListenerVector.h"
 #include "MockData/SPIAccelerometerData.h"
 
@@ -54,7 +56,7 @@ class SPIAccelerometerData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_active{false};
   std::shared_ptr<NotifyListenerVector> m_activeCallbacks = nullptr;
   std::atomic<int32_t> m_range{0};
@@ -66,5 +68,5 @@ class SPIAccelerometerData {
   std::atomic<double> m_z{0.0};
   std::shared_ptr<NotifyListenerVector> m_zCallbacks = nullptr;
 };
-extern SPIAccelerometerData SimSPIAccelerometerData[];
+extern SPIAccelerometerData* SimSPIAccelerometerData;
 }  // namespace hal

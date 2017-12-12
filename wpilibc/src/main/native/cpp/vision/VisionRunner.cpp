@@ -21,7 +21,9 @@ using namespace frc;
  * @param videoSource the video source to use to supply images for the pipeline
  */
 VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
-    : m_image(std::make_unique<cv::Mat>()), m_cvSink("VisionRunner CvSink") {
+    : m_image(std::make_unique<cv::Mat>()),
+      m_cvSink("VisionRunner CvSink"),
+      m_enabled(true) {
   m_cvSink.SetSource(videoSource);
 }
 
@@ -61,8 +63,7 @@ void VisionRunnerBase::RunOnce() {
  * must be run in a dedicated thread, and cannot be used in the main robot
  * thread because it will freeze the robot program.
  *
- * <p><strong>Do not call this method directly from the main
- * thread.</strong></p>
+ * <strong>Do not call this method directly from the main thread.</strong>
  */
 void VisionRunnerBase::RunForever() {
   if (std::this_thread::get_id() == RobotBase::GetThreadId()) {
@@ -71,7 +72,12 @@ void VisionRunnerBase::RunForever() {
         "thread");
     return;
   }
-  while (true) {
+  while (m_enabled) {
     RunOnce();
   }
 }
+
+/**
+ * Stop a RunForever() loop.
+ */
+void VisionRunnerBase::Stop() { m_enabled = false; }

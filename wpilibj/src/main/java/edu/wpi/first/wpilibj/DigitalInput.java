@@ -7,13 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Class to read a digital input. This class will read digital inputs and return the current value
@@ -21,7 +18,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
  * elsewhere will automatically allocate digital inputs and outputs as required. This class is only
  * for devices like switches etc. that aren't implemented anywhere else.
  */
-public class DigitalInput extends DigitalSource implements LiveWindowSendable {
+public class DigitalInput extends DigitalSource implements Sendable {
   private int m_channel = 0;
   private int m_handle = 0;
 
@@ -36,14 +33,15 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
 
     m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), true);
 
-    LiveWindow.addSensor("DigitalInput", channel, this);
     HAL.report(tResourceType.kResourceType_DigitalInput, channel);
+    setName("DigitalInput", channel);
   }
 
   /**
    * Frees the resources for this output.
    */
   public void free() {
+    super.free();
     if (m_interrupt != 0) {
       cancelInterrupts();
     }
@@ -102,37 +100,8 @@ public class DigitalInput extends DigitalSource implements LiveWindowSendable {
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "Digital Input";
-  }
-
-  private NetworkTableEntry m_valueEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_valueEntry = subtable.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setBoolean(get());
-    }
-  }
-
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Digital Input");
+    builder.addBooleanProperty("Value", this::get, null);
   }
 }

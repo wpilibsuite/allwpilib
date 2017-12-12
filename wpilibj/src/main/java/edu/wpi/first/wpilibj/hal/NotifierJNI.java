@@ -15,16 +15,15 @@ package edu.wpi.first.wpilibj.hal;
  */
 public class NotifierJNI extends JNIWrapper {
   /**
-   * Callback function.
-   */
-  public interface NotifierJNIHandlerFunction {
-    void apply(long curTime);
-  }
-
-  /**
    * Initializes the notifier.
    */
-  public static native int initializeNotifier(NotifierJNIHandlerFunction func);
+  public static native int initializeNotifier();
+
+  /**
+   * Wakes up the waiter with time=0.  Note: after this function is called, all
+   * calls to waitForNotifierAlarm() will immediately start returning 0.
+   */
+  public static native void stopNotifier(int notifierHandle);
 
   /**
    * Deletes the notifier object when we are done with it.
@@ -32,12 +31,19 @@ public class NotifierJNI extends JNIWrapper {
   public static native void cleanNotifier(int notifierHandle);
 
   /**
-   * Sets the notifier to call the callback in another triggerTime microseconds.
+   * Sets the notifier to wakeup the waiter in another triggerTime microseconds.
    */
   public static native void updateNotifierAlarm(int notifierHandle, long triggerTime);
 
   /**
-   * Tells the notifier to stop calling the callback.
+   * Cancels any pending wakeups set by updateNotifierAlarm().  Does NOT wake
+   * up any waiters.
    */
-  public static native void stopNotifierAlarm(int notifierHandle);
+  public static native void cancelNotifierAlarm(int notifierHandle);
+
+  /**
+   * Block until woken up by an alarm (or stop).
+   * @return Time when woken up.
+   */
+  public static native long waitForNotifierAlarm(int notifierHandle);
 }

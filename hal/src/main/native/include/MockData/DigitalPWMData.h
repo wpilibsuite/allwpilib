@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include "HAL/HAL.h"
 #include "NotifyListener.h"
 
@@ -38,6 +40,12 @@ void HALSIM_CancelDigitalPWMPinCallback(int32_t index, int32_t uid);
 int32_t HALSIM_GetDigitalPWMPin(int32_t index);
 void HALSIM_SetDigitalPWMPin(int32_t index, int32_t pin);
 
+void HALSIM_RegisterDigitalPWMAllCallbacks(int32_t index,
+                                           HAL_NotifyCallback callback,
+                                           void* param, HAL_Bool initialNotify);
+
 #ifdef __cplusplus
-}
+}  // extern "C"
+#endif
+
 #endif

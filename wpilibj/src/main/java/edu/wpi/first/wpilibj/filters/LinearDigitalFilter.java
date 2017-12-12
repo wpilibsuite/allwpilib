@@ -151,8 +151,8 @@ public class LinearDigitalFilter extends Filter {
 
   @Override
   public void reset() {
-    m_inputs.reset();
-    m_outputs.reset();
+    m_inputs.clear();
+    m_outputs.clear();
   }
 
   /**
@@ -165,7 +165,7 @@ public class LinearDigitalFilter extends Filter {
     double retVal = 0.0;
 
     // Rotate the inputs
-    m_inputs.pushFront(pidGetSource());
+    m_inputs.addFirst(pidGetSource());
 
     // Calculate the new value
     for (int i = 0; i < m_inputGains.length; i++) {
@@ -176,7 +176,7 @@ public class LinearDigitalFilter extends Filter {
     }
 
     // Rotate the outputs
-    m_outputs.pushFront(retVal);
+    m_outputs.addFirst(retVal);
 
     return retVal;
   }

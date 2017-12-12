@@ -7,40 +7,30 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include <HAL/AnalogOutput.h>
 
-#include "LiveWindow/LiveWindowSendable.h"
-#include "SensorBase.h"
-#include "networktables/NetworkTableEntry.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
 /**
  * MXP analog output class.
  */
-class AnalogOutput : public SensorBase, public LiveWindowSendable {
+class AnalogOutput : public ErrorBase, public SendableBase {
  public:
   explicit AnalogOutput(int channel);
-  virtual ~AnalogOutput();
+  ~AnalogOutput() override;
 
   void SetVoltage(double voltage);
   double GetVoltage() const;
   int GetChannel();
 
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
+  void InitSendable(SendableBuilder& builder) override;
 
  protected:
   int m_channel;
   HAL_AnalogOutputHandle m_port;
-
-  nt::NetworkTableEntry m_valueEntry;
 };
 
 }  // namespace frc

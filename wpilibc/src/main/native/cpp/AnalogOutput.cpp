@@ -11,10 +11,9 @@
 
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SensorBase.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -27,12 +26,9 @@ using namespace frc;
  * @param channel The channel number on the roboRIO to represent.
  */
 AnalogOutput::AnalogOutput(int channel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
-  buf << "analog output " << channel;
-
   if (!SensorBase::CheckAnalogOutputChannel(channel)) {
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "analog output " + llvm::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     m_port = HAL_kInvalidHandle;
     return;
@@ -51,8 +47,8 @@ AnalogOutput::AnalogOutput(int channel) {
     return;
   }
 
-  LiveWindow::GetInstance()->AddActuator("AnalogOutput", m_channel, this);
   HAL_Report(HALUsageReporting::kResourceType_AnalogOutput, m_channel);
+  SetName("AnalogOutput", m_channel);
 }
 
 /**
@@ -93,23 +89,8 @@ double AnalogOutput::GetVoltage() const {
   return voltage;
 }
 
-void AnalogOutput::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetDouble(GetVoltage());
-}
-
-void AnalogOutput::StartLiveWindowMode() {}
-
-void AnalogOutput::StopLiveWindowMode() {}
-
-std::string AnalogOutput::GetSmartDashboardType() const {
-  return "Analog Output";
-}
-
-void AnalogOutput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void AnalogOutput::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Analog Output");
+  builder.AddDoubleProperty("Value", [=]() { return GetVoltage(); },
+                            [=](double value) { SetVoltage(value); });
 }

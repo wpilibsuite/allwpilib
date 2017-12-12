@@ -12,9 +12,9 @@
 #include <llvm/ArrayRef.h>
 #include <llvm/raw_ostream.h>
 
-#include "ErrorBase.h"
 #include "MotorSafety.h"
 #include "MotorSafetyHelper.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -23,7 +23,7 @@ class SpeedController;
 /**
  * Common base class for drive platforms.
  */
-class RobotDriveBase : public MotorSafety, public ErrorBase {
+class RobotDriveBase : public MotorSafety, public SendableBase {
  public:
   /**
    * The location of a motor on the robot for the purpose of driving.
@@ -39,7 +39,7 @@ class RobotDriveBase : public MotorSafety, public ErrorBase {
   };
 
   RobotDriveBase();
-  virtual ~RobotDriveBase() = default;
+  ~RobotDriveBase() override = default;
 
   RobotDriveBase(const RobotDriveBase&) = delete;
   RobotDriveBase& operator=(const RobotDriveBase&) = delete;

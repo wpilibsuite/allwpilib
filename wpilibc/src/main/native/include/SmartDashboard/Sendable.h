@@ -7,26 +7,63 @@
 
 #pragma once
 
-#include <memory>
 #include <string>
 
-#include "networktables/NetworkTable.h"
+#include <llvm/Twine.h>
 
 namespace frc {
 
+class SendableBuilder;
+
 class Sendable {
  public:
-  /**
-   * Initializes a table for this sendable object.
-   * @param subtable The table to put the values in.
-   */
-  virtual void InitTable(std::shared_ptr<nt::NetworkTable> subtable) = 0;
+  virtual ~Sendable() = default;
 
   /**
-   * @return the string representation of the named data type that will be used
-   *         by the smart dashboard for this sendable
+   * Gets the name of this Sendable object.
+   *
+   * @return Name
    */
-  virtual std::string GetSmartDashboardType() const = 0;
+  virtual std::string GetName() const = 0;
+
+  /**
+   * Sets the name of this Sendable object.
+   *
+   * @param name name
+   */
+  virtual void SetName(const llvm::Twine& name) = 0;
+
+  /**
+   * Sets both the subsystem name and device name of this Sendable object.
+   *
+   * @param subsystem subsystem name
+   * @param name device name
+   */
+  void SetName(const llvm::Twine& subsystem, const llvm::Twine& name) {
+    SetSubsystem(subsystem);
+    SetName(name);
+  }
+
+  /**
+   * Gets the subsystem name of this Sendable object.
+   *
+   * @return Subsystem name
+   */
+  virtual std::string GetSubsystem() const = 0;
+
+  /**
+   * Sets the subsystem name of this Sendable object.
+   *
+   * @param subsystem subsystem name
+   */
+  virtual void SetSubsystem(const llvm::Twine& subsystem) = 0;
+
+  /**
+   * Initializes this Sendable object.
+   *
+   * @param builder sendable builder
+   */
+  virtual void InitSendable(SendableBuilder& builder) = 0;
 };
 
 }  // namespace frc

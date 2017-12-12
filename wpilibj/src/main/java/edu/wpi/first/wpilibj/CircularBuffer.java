@@ -32,10 +32,42 @@ public class CircularBuffer {
   }
 
   /**
+   * Returns number of elements in buffer.
+   *
+   * @return number of elements in buffer
+   */
+  double size() {
+    return m_length;
+  }
+
+  /**
+   * Get value at front of buffer.
+   *
+   * @return value at front of buffer
+   */
+  double getFirst() {
+    return m_data[m_front];
+  }
+
+  /**
+   * Get value at back of buffer.
+   *
+   * @return value at back of buffer
+   */
+  double getLast() {
+    // If there are no elements in the buffer, do nothing
+    if (m_length == 0) {
+      return 0.0;
+    }
+
+    return m_data[(m_front + m_length - 1) % m_data.length];
+  }
+
+  /**
    * Push new value onto front of the buffer. The value at the back is overwritten if the buffer is
    * full.
    */
-  public void pushFront(double value) {
+  public void addFirst(double value) {
     if (m_data.length == 0) {
       return;
     }
@@ -53,7 +85,7 @@ public class CircularBuffer {
    * Push new value onto back of the buffer. The value at the front is overwritten if the buffer is
    * full.
    */
-  public void pushBack(double value) {
+  public void addLast(double value) {
     if (m_data.length == 0) {
       return;
     }
@@ -73,7 +105,7 @@ public class CircularBuffer {
    *
    * @return value at front of buffer
    */
-  public double popFront() {
+  public double removeFirst() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
       return 0.0;
@@ -89,7 +121,7 @@ public class CircularBuffer {
   /**
    * Pop value at back of buffer.
    */
-  public double popBack() {
+  public double removeLast() {
     // If there are no elements in the buffer, do nothing
     if (m_length == 0) {
       return 0.0;
@@ -117,7 +149,7 @@ public class CircularBuffer {
   /**
    * Sets internal buffer contents to zero.
    */
-  public void reset() {
+  public void clear() {
     for (int i = 0; i < m_data.length; i++) {
       m_data[i] = 0.0;
     }

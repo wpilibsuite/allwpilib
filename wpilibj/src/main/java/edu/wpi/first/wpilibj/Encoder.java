@@ -7,13 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.EncoderJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.util.AllocationException;
 
 import static java.util.Objects.requireNonNull;
@@ -31,7 +28,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveWindowSendable {
+public class Encoder extends SensorBase implements CounterBase, PIDSource, Sendable {
 
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
@@ -81,8 +78,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
 
     m_pidSource = PIDSourceType.kDisplacement;
 
-    HAL.report(tResourceType.kResourceType_Encoder, getFPGAIndex(), type.value);
-    LiveWindow.addSensor("Encoder", m_aSource.getChannel(), this);
+    int fpgaIndex = getFPGAIndex();
+    HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex, type.value);
+    setName("Encoder", fpgaIndex);
   }
 
   /**
@@ -96,12 +94,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *                         if necessary so forward represents positive values.
    */
   public Encoder(final int channelA, final int channelB, boolean reverseDirection) {
-    m_allocatedA = true;
-    m_allocatedB = true;
-    m_allocatedI = false;
-    m_aSource = new DigitalInput(channelA);
-    m_bSource = new DigitalInput(channelB);
-    initEncoder(reverseDirection, EncodingType.k4X);
+    this(channelA, channelB, reverseDirection, EncodingType.k4X);
   }
 
   /**
@@ -141,6 +134,8 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
     m_allocatedI = false;
     m_aSource = new DigitalInput(channelA);
     m_bSource = new DigitalInput(channelB);
+    addChild(m_aSource);
+    addChild(m_bSource);
     initEncoder(reverseDirection, encodingType);
   }
 
@@ -158,13 +153,10 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   public Encoder(final int channelA, final int channelB, final int indexChannel,
                  boolean reverseDirection) {
-    m_allocatedA = true;
-    m_allocatedB = true;
+    this(channelA, channelB, reverseDirection);
     m_allocatedI = true;
-    m_aSource = new DigitalInput(channelA);
-    m_bSource = new DigitalInput(channelB);
     m_indexSource = new DigitalInput(indexChannel);
-    initEncoder(reverseDirection, EncodingType.k4X);
+    addChild(m_indexSource);
     setIndexSource(m_indexSource);
   }
 
@@ -195,15 +187,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    *                         if necessary so forward represents positive values.
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, boolean reverseDirection) {
-    requireNonNull(sourceA, "Digital Source A was null");
-    requireNonNull(sourceB, "Digital Source B was null");
-
-    m_allocatedA = false;
-    m_allocatedB = false;
-    m_allocatedI = false;
-    m_aSource = sourceA;
-    m_bSource = sourceB;
-    initEncoder(reverseDirection, EncodingType.k4X);
+    this(sourceA, sourceB, reverseDirection, EncodingType.k4X);
   }
 
   /**
@@ -267,16 +251,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
    */
   public Encoder(DigitalSource sourceA, DigitalSource sourceB, DigitalSource indexSource,
                  boolean reverseDirection) {
-    requireNonNull(sourceA, "Digital Source A was null");
-    requireNonNull(sourceB, "Digital Source B was null");
-
-    m_allocatedA = false;
-    m_allocatedB = false;
+    this(sourceA, sourceB, reverseDirection);
     m_allocatedI = false;
-    m_aSource = sourceA;
-    m_bSource = sourceB;
     m_indexSource = indexSource;
-    initEncoder(reverseDirection, EncodingType.k4X);
     setIndexSource(indexSource);
   }
 
@@ -317,7 +294,9 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
   /**
    * Free the resources used by this object.
    */
+  @Override
   public void free() {
+    super.free();
     if (m_aSource != null && m_allocatedA) {
       m_aSource.free();
       m_allocatedA = false;
@@ -457,6 +436,15 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
   }
 
   /**
+   * Get the distance per pulse for this encoder.
+   *
+   * @return The scale factor that will be used to convert pulses to useful units.
+   */
+  public double getDistancePerPulse() {
+    return EncoderJNI.getEncoderDistancePerPulse(m_encoder);
+  }
+
+  /**
    * Set the direction sensing for this encoder. This sets the direction sensing on the encoder so
    * that it could count in the correct software direction regardless of the mounting.
    *
@@ -567,52 +555,16 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, LiveW
         source.getAnalogTriggerTypeForRouting(), type.value);
   }
 
-  /**
-   * Live Window code, only does anything if live window is activated.
-   */
-  public String getSmartDashboardType() {
+  @Override
+  public void initSendable(SendableBuilder builder) {
     if (EncoderJNI.getEncoderEncodingType(m_encoder) == EncodingType.k4X.value) {
-      return "Quadrature Encoder";
-    }
-    return "Encoder";
-  }
-
-  private NetworkTableEntry m_speedEntry;
-  private NetworkTableEntry m_distanceEntry;
-  private NetworkTableEntry m_distancePerTickEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_speedEntry = subtable.getEntry("Speed");
-      m_distanceEntry = subtable.getEntry("Distance");
-      m_distancePerTickEntry = subtable.getEntry("Distance per Tick");
-      updateTable();
+      builder.setSmartDashboardType("Quadrature Encoder");
     } else {
-      m_speedEntry = null;
-      m_distanceEntry = null;
-      m_distancePerTickEntry = null;
+      builder.setSmartDashboardType("Encoder");
     }
-  }
 
-  @Override
-  public void updateTable() {
-    if (m_speedEntry != null) {
-      m_speedEntry.setDouble(getRate());
-    }
-    if (m_distanceEntry != null) {
-      m_distanceEntry.setDouble(getDistance());
-    }
-    if (m_distancePerTickEntry != null) {
-      m_distancePerTickEntry.setDouble(EncoderJNI.getEncoderDistancePerPulse(m_encoder));
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
+    builder.addDoubleProperty("Speed", this::getRate, null);
+    builder.addDoubleProperty("Distance", this::getDistance, null);
+    builder.addDoubleProperty("Distance per Tick", this::getDistancePerPulse, null);
   }
 }

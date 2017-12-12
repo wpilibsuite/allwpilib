@@ -13,11 +13,10 @@
 namespace frc {
 
 /**
- * Common base class for all PWM Speed Controllers
+ * Common base class for all PWM Speed Controllers.
  */
 class PWMSpeedController : public SafePWM, public SpeedController {
  public:
-  virtual ~PWMSpeedController() = default;
   void Set(double value) override;
   double Get() const override;
   void SetInverted(bool isInverted) override;

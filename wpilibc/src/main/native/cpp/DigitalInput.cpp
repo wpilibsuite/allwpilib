@@ -12,10 +12,8 @@
 #include <HAL/DIO.h>
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
-#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -28,12 +26,9 @@ using namespace frc;
  * @param channel The DIO channel 0-9 are on-board, 10-25 are on the MXP port
  */
 DigitalInput::DigitalInput(int channel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
-
   if (!CheckDigitalChannel(channel)) {
-    buf << "Digital Channel " << channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "Digital Channel " + llvm::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     return;
   }
@@ -49,8 +44,8 @@ DigitalInput::DigitalInput(int channel) {
     return;
   }
 
-  LiveWindow::GetInstance()->AddSensor("DigitalInput", channel, this);
   HAL_Report(HALUsageReporting::kResourceType_DigitalInput, channel);
+  SetName("DigitalInput", channel);
 }
 
 /**
@@ -61,7 +56,7 @@ DigitalInput::~DigitalInput() {
   if (m_interrupt != HAL_kInvalidHandle) {
     int32_t status = 0;
     HAL_CleanInterrupts(m_interrupt, &status);
-    // ignore status, as an invalid handle just needs to be ignored.
+    // Ignore status, as an invalid handle just needs to be ignored.
     m_interrupt = HAL_kInvalidHandle;
   }
 
@@ -103,23 +98,7 @@ AnalogTriggerType DigitalInput::GetAnalogTriggerTypeForRouting() const {
   return (AnalogTriggerType)0;
 }
 
-void DigitalInput::UpdateTable() {
-  if (m_valueEntry) m_valueEntry.SetBoolean(Get());
-}
-
-void DigitalInput::StartLiveWindowMode() {}
-
-void DigitalInput::StopLiveWindowMode() {}
-
-std::string DigitalInput::GetSmartDashboardType() const {
-  return "DigitalInput";
-}
-
-void DigitalInput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void DigitalInput::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Digital Input");
+  builder.AddBooleanProperty("Value", [=]() { return Get(); }, nullptr);
 }

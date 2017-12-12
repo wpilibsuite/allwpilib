@@ -9,14 +9,11 @@
 
 #include <stdint.h>
 
-#include "SensorBase.h"
+#include "ErrorBase.h"
 
 enum HAL_SPIPort : int32_t;
 
 namespace frc {
-
-class DigitalOutput;
-class DigitalInput;
 
 /**
  * SPI bus interface class.
@@ -25,11 +22,12 @@ class DigitalInput;
  * It probably should not be used directly.
  *
  */
-class SPI : public SensorBase {
+class SPI : public ErrorBase {
  public:
   enum Port { kOnboardCS0 = 0, kOnboardCS1, kOnboardCS2, kOnboardCS3, kMXP };
+
   explicit SPI(Port port);
-  virtual ~SPI();
+  ~SPI() override;
 
   SPI(const SPI&) = delete;
   SPI& operator=(const SPI&) = delete;
@@ -52,9 +50,9 @@ class SPI : public SensorBase {
   virtual int Read(bool initiate, uint8_t* dataReceived, int size);
   virtual int Transaction(uint8_t* dataToSend, uint8_t* dataReceived, int size);
 
-  void InitAccumulator(double period, int cmd, int xfer_size, int valid_mask,
-                       int valid_value, int data_shift, int data_size,
-                       bool is_signed, bool big_endian);
+  void InitAccumulator(double period, int cmd, int xferSize, int validMask,
+                       int validValue, int dataShift, int dataSize,
+                       bool isSigned, bool bigEndian);
   void FreeAccumulator();
   void ResetAccumulator();
   void SetAccumulatorCenter(int center);
@@ -67,9 +65,9 @@ class SPI : public SensorBase {
 
  protected:
   HAL_SPIPort m_port;
-  bool m_msbFirst = false;          // default little-endian
-  bool m_sampleOnTrailing = false;  // default data updated on falling edge
-  bool m_clk_idle_high = false;     // default clock active high
+  bool m_msbFirst = false;          // Default little-endian
+  bool m_sampleOnTrailing = false;  // Default data updated on falling edge
+  bool m_clk_idle_high = false;     // Default clock active high
 
  private:
   void Init();

@@ -9,12 +9,18 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.PowerJNI;
 
+/**
+ * Old Controller PR class.
+ * @deprecated Use RobotController class instead
+ */
+@Deprecated
 public class ControllerPower {
   /**
    * Get the input voltage to the robot controller.
    *
    * @return The controller input voltage value in Volts
    */
+  @Deprecated
   public static double getInputVoltage() {
     return PowerJNI.getVinVoltage();
   }
@@ -24,6 +30,7 @@ public class ControllerPower {
    *
    * @return The controller input current value in Amps
    */
+  @Deprecated
   public static double getInputCurrent() {
     return PowerJNI.getVinCurrent();
   }
@@ -33,6 +40,7 @@ public class ControllerPower {
    *
    * @return The controller 3.3V rail voltage value in Volts
    */
+  @Deprecated
   public static double getVoltage3V3() {
     return PowerJNI.getUserVoltage3V3();
   }
@@ -42,6 +50,7 @@ public class ControllerPower {
    *
    * @return The controller 3.3V rail output current value in Volts
    */
+  @Deprecated
   public static double getCurrent3V3() {
     return PowerJNI.getUserCurrent3V3();
   }
@@ -52,6 +61,7 @@ public class ControllerPower {
    *
    * @return The controller 3.3V rail enabled value
    */
+  @Deprecated
   public static boolean getEnabled3V3() {
     return PowerJNI.getUserActive3V3();
   }
@@ -61,6 +71,7 @@ public class ControllerPower {
    *
    * @return The number of faults
    */
+  @Deprecated
   public static int getFaultCount3V3() {
     return PowerJNI.getUserCurrentFaults3V3();
   }
@@ -70,6 +81,7 @@ public class ControllerPower {
    *
    * @return The controller 5V rail voltage value in Volts
    */
+  @Deprecated
   public static double getVoltage5V() {
     return PowerJNI.getUserVoltage5V();
   }
@@ -79,6 +91,7 @@ public class ControllerPower {
    *
    * @return The controller 5V rail output current value in Amps
    */
+  @Deprecated
   public static double getCurrent5V() {
     return PowerJNI.getUserCurrent5V();
   }
@@ -89,6 +102,7 @@ public class ControllerPower {
    *
    * @return The controller 5V rail enabled value
    */
+  @Deprecated
   public static boolean getEnabled5V() {
     return PowerJNI.getUserActive5V();
   }
@@ -98,6 +112,7 @@ public class ControllerPower {
    *
    * @return The number of faults
    */
+  @Deprecated
   public static int getFaultCount5V() {
     return PowerJNI.getUserCurrentFaults5V();
   }
@@ -107,6 +122,7 @@ public class ControllerPower {
    *
    * @return The controller 6V rail voltage value in Volts
    */
+  @Deprecated
   public static double getVoltage6V() {
     return PowerJNI.getUserVoltage6V();
   }
@@ -116,6 +132,7 @@ public class ControllerPower {
    *
    * @return The controller 6V rail output current value in Amps
    */
+  @Deprecated
   public static double getCurrent6V() {
     return PowerJNI.getUserCurrent6V();
   }
@@ -126,6 +143,7 @@ public class ControllerPower {
    *
    * @return The controller 6V rail enabled value
    */
+  @Deprecated
   public static boolean getEnabled6V() {
     return PowerJNI.getUserActive6V();
   }
@@ -135,6 +153,7 @@ public class ControllerPower {
    *
    * @return The number of faults
    */
+  @Deprecated
   public static int getFaultCount6V() {
     return PowerJNI.getUserCurrentFaults6V();
   }

@@ -8,8 +8,8 @@
 package edu.wpi.first.wpilibj.internal;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Utility;
 
 /**
  * Timer objects measure accumulated time in milliseconds. The timer object functions like a
@@ -43,7 +43,7 @@ public class HardwareTimer implements Timer.StaticInterface {
    */
   @Override
   public double getFPGATimestamp() {
-    return Utility.getFPGATime() / 1000000.0;
+    return RobotController.getFPGATime() / 1000000.0;
   }
 
   @Override
@@ -65,12 +65,12 @@ public class HardwareTimer implements Timer.StaticInterface {
      * Create a new timer object. Create a new timer object and reset the time to zero. The timer is
      * initially not running and must be started.
      */
-    public TimerImpl() {
+    TimerImpl() {
       reset();
     }
 
     private double getMsClock() {
-      return Utility.getFPGATime() / 1000.0;
+      return RobotController.getFPGATime() / 1000.0;
     }
 
     /**

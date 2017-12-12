@@ -11,11 +11,12 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.HLUsageReporting;
-import edu.wpi.first.wpilibj.NamedSendable;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * The {@link Scheduler} is a singleton which holds the top-level running commands. It is in charge
@@ -29,7 +30,7 @@ import edu.wpi.first.wpilibj.buttons.Trigger.ButtonScheduler;
  *
  * @see Command
  */
-public class Scheduler implements NamedSendable {
+public class Scheduler extends SendableBase implements Sendable {
 
   /**
    * The Singleton Instance.
@@ -42,7 +43,10 @@ public class Scheduler implements NamedSendable {
    * @return the {@link Scheduler}
    */
   public static synchronized Scheduler getInstance() {
-    return instance == null ? instance = new Scheduler() : instance;
+    if (instance == null) {
+      instance = new Scheduler();
+    }
+    return instance;
   }
 
   /**
@@ -88,6 +92,7 @@ public class Scheduler implements NamedSendable {
    */
   private Scheduler() {
     HLUsageReporting.reportScheduler();
+    setName("Scheduler");
   }
 
   /**
@@ -234,8 +239,6 @@ public class Scheduler implements NamedSendable {
       }
       lock.confirmCommand();
     }
-
-    updateTable();
   }
 
   /**
@@ -304,67 +307,44 @@ public class Scheduler implements NamedSendable {
   }
 
   @Override
-  public String getName() {
-    return "Scheduler";
-  }
-
-  public String getType() {
-    return "Scheduler";
-  }
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_namesEntry = subtable.getEntry("Names");
-      m_idsEntry = subtable.getEntry("Ids");
-      m_cancelEntry = subtable.getEntry("Cancel");
-      m_namesEntry.setStringArray(new String[0]);
-      m_idsEntry.setDoubleArray(new double[0]);
-      m_cancelEntry.setDoubleArray(new double[0]);
-    } else {
-      m_namesEntry = null;
-      m_idsEntry = null;
-      m_cancelEntry = null;
-    }
-  }
-
-  private void updateTable() {
-    if (m_namesEntry != null && m_idsEntry != null && m_cancelEntry != null) {
-      // Get the commands to cancel
-      double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
-      if (toCancel.length > 0) {
-        for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-          for (double d : toCancel) {
-            if (e.getData().hashCode() == d) {
-              e.getData().cancel();
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Scheduler");
+    m_namesEntry = builder.getEntry("Names");
+    m_idsEntry = builder.getEntry("Ids");
+    m_cancelEntry = builder.getEntry("Cancel");
+    builder.setUpdateTable(() -> {
+      if (m_namesEntry != null && m_idsEntry != null && m_cancelEntry != null) {
+        // Get the commands to cancel
+        double[] toCancel = m_cancelEntry.getDoubleArray(new double[0]);
+        if (toCancel.length > 0) {
+          for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
+            for (double d : toCancel) {
+              if (e.getData().hashCode() == d) {
+                e.getData().cancel();
+              }
             }
           }
+          m_cancelEntry.setDoubleArray(new double[0]);
         }
-        m_cancelEntry.setDoubleArray(new double[0]);
-      }
 
-      if (m_runningCommandsChanged) {
-        // Set the the running commands
-        int number = 0;
-        for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-          number++;
+        if (m_runningCommandsChanged) {
+          // Set the the running commands
+          int number = 0;
+          for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
+            number++;
+          }
+          String[] commands = new String[number];
+          double[] ids = new double[number];
+          number = 0;
+          for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
+            commands[number] = e.getData().getName();
+            ids[number] = e.getData().hashCode();
+            number++;
+          }
+          m_namesEntry.setStringArray(commands);
+          m_idsEntry.setDoubleArray(ids);
         }
-        String[] commands = new String[number];
-        double[] ids = new double[number];
-        number = 0;
-        for (LinkedListElement e = m_firstCommand; e != null; e = e.getNext()) {
-          commands[number] = e.getData().getName();
-          ids[number] = e.getData().hashCode();
-          number++;
-        }
-        m_namesEntry.setStringArray(commands);
-        m_idsEntry.setDoubleArray(ids);
       }
-    }
-  }
-
-  @Override
-  public String getSmartDashboardType() {
-    return "Scheduler";
+    });
   }
 }

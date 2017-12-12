@@ -222,5 +222,6 @@ public abstract class IterativeRobotBase extends RobotBase {
       testPeriodic();
     }
     robotPeriodic();
+    LiveWindow.updateValues();
   }
 }

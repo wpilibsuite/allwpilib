@@ -25,10 +25,8 @@ static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
 /**
  * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
  *
- * @param onTrue The Command to execute if {@link
- * ConditionalCommand#Condition()} returns true
- * @param onFalse The Command to execute if {@link
- * ConditionalCommand#Condition()} returns false
+ * @param onTrue  The Command to execute if Condition() returns true
+ * @param onFalse The Command to execute if Condition() returns false
  */
 ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
   m_onTrue = onTrue;
@@ -40,13 +38,11 @@ ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
 /**
  * Creates a new ConditionalCommand with given onTrue and onFalse Commands.
  *
- * @param name the name for this command group
- * @param onTrue The Command to execute if {@link
- * ConditionalCommand#Condition()} returns true
- * @param onFalse The Command to execute if {@link
- * ConditionalCommand#Condition()} returns false
+ * @param name    The name for this command group
+ * @param onTrue  The Command to execute if Condition() returns true
+ * @param onFalse The Command to execute if Condition() returns false
  */
-ConditionalCommand::ConditionalCommand(const std::string& name, Command* onTrue,
+ConditionalCommand::ConditionalCommand(const llvm::Twine& name, Command* onTrue,
                                        Command* onFalse)
     : Command(name) {
   m_onTrue = onTrue;
@@ -63,10 +59,8 @@ void ConditionalCommand::_Initialize() {
   }
 
   if (m_chosenCommand != nullptr) {
-    /*
-     * This is a hack to make cancelling the chosen command inside a
-     * CommandGroup work properly
-     */
+    // This is a hack to make cancelling the chosen command inside a
+    // CommandGroup work properly
     m_chosenCommand->ClearRequirements();
 
     m_chosenCommand->Start();

@@ -11,17 +11,18 @@
 
 #include <HAL/HAL.h>
 #include <llvm/StringRef.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "WPIErrors.h"
-#include "networktables/NetworkTableInstance.h"
 
 using namespace frc;
 
-/** The Preferences table name */
+// The Preferences table name
 static llvm::StringRef kTableName{"Preferences"};
 
 Preferences::Preferences()
     : m_table(nt::NetworkTableInstance::GetDefault().GetTable(kTableName)) {
+  m_table->GetEntry(".type").SetString("RobotPreferences");
   m_listener = m_table->AddEntryListener(
       [=](nt::NetworkTable* table, llvm::StringRef name,
           nt::NetworkTableEntry entry, std::shared_ptr<nt::Value> value,
@@ -123,8 +124,8 @@ int64_t Preferences::GetLong(llvm::StringRef key, int64_t defaultValue) {
 /**
  * Puts the given string into the preferences table.
  *
- * <p>The value may not have quotation marks, nor may the key
- * have any whitespace nor an equals sign</p>
+ * The value may not have quotation marks, nor may the key have any whitespace
+ * nor an equals sign.
  *
  * @param key   the key
  * @param value the value
@@ -138,7 +139,7 @@ void Preferences::PutString(llvm::StringRef key, llvm::StringRef value) {
 /**
  * Puts the given int into the preferences table.
  *
- * <p>The key may not have any whitespace nor an equals sign</p>
+ * The key may not have any whitespace nor an equals sign.
  *
  * @param key   the key
  * @param value the value
@@ -152,7 +153,7 @@ void Preferences::PutInt(llvm::StringRef key, int value) {
 /**
  * Puts the given double into the preferences table.
  *
- * <p>The key may not have any whitespace nor an equals sign</p>
+ * The key may not have any whitespace nor an equals sign.
  *
  * @param key   the key
  * @param value the value
@@ -166,7 +167,7 @@ void Preferences::PutDouble(llvm::StringRef key, double value) {
 /**
  * Puts the given float into the preferences table.
  *
- * <p>The key may not have any whitespace nor an equals sign</p>
+ * The key may not have any whitespace nor an equals sign.
  *
  * @param key   the key
  * @param value the value
@@ -180,7 +181,7 @@ void Preferences::PutFloat(llvm::StringRef key, float value) {
 /**
  * Puts the given boolean into the preferences table.
  *
- * <p>The key may not have any whitespace nor an equals sign</p>
+ * The key may not have any whitespace nor an equals sign.
  *
  * @param key   the key
  * @param value the value
@@ -194,7 +195,7 @@ void Preferences::PutBoolean(llvm::StringRef key, bool value) {
 /**
  * Puts the given long (int64_t) into the preferences table.
  *
- * <p>The key may not have any whitespace nor an equals sign</p>
+ * The key may not have any whitespace nor an equals sign.
  *
  * @param key   the key
  * @param value the value

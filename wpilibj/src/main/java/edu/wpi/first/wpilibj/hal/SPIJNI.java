@@ -7,8 +7,8 @@
 
 package edu.wpi.first.wpilibj.hal;
 
+import edu.wpi.first.wpilibj.AccumulatorResult;
 import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
 
 @SuppressWarnings("AbbreviationAsWordInName")
 public class SPIJNI extends JNIWrapper {
@@ -17,9 +17,16 @@ public class SPIJNI extends JNIWrapper {
   public static native int spiTransaction(int port, ByteBuffer dataToSend,
                                           ByteBuffer dataReceived, byte size);
 
+  public static native int spiTransactionB(int port, byte[] dataToSend,
+                                           byte[] dataReceived, byte size);
+
   public static native int spiWrite(int port, ByteBuffer dataToSend, byte sendSize);
 
-  public static native int spiRead(int port, ByteBuffer dataReceived, byte size);
+  public static native int spiWriteB(int port, byte[] dataToSend, byte sendSize);
+
+  public static native int spiRead(int port, boolean initiate, ByteBuffer dataReceived, byte size);
+
+  public static native int spiReadB(int port, boolean initiate, byte[] dataReceived, byte size);
 
   public static native void spiClose(int port);
 
@@ -52,6 +59,5 @@ public class SPIJNI extends JNIWrapper {
 
   public static native double spiGetAccumulatorAverage(int port);
 
-  public static native void spiGetAccumulatorOutput(int port, LongBuffer value,
-                                                    LongBuffer count);
+  public static native void spiGetAccumulatorOutput(int port, AccumulatorResult result);
 }

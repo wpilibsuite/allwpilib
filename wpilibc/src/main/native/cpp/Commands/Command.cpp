@@ -11,20 +11,19 @@
 
 #include "Commands/CommandGroup.h"
 #include "Commands/Scheduler.h"
+#include "LiveWindow/LiveWindow.h"
 #include "RobotState.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "Timer.h"
 #include "WPIErrors.h"
 
 using namespace frc;
 
-static const std::string kName = "name";
-static const std::string kRunning = "running";
-static const std::string kIsParented = "isParented";
-
 int Command::m_commandCounter = 0;
 
 /**
  * Creates a new command.
+ *
  * The name of this command will be default.
  */
 Command::Command() : Command("", -1.0) {}
@@ -34,13 +33,13 @@ Command::Command() : Command("", -1.0) {}
  *
  * @param name the name for this command
  */
-Command::Command(const std::string& name) : Command(name, -1.0) {}
+Command::Command(const llvm::Twine& name) : Command(name, -1.0) {}
 
 /**
  * Creates a new command with the given timeout and a default name.
  *
  * @param timeout the time (in seconds) before this command "times out"
- * @see Command#isTimedOut() isTimedOut()
+ * @see IsTimedOut()
  */
 Command::Command(double timeout) : Command("", timeout) {}
 
@@ -49,9 +48,10 @@ Command::Command(double timeout) : Command("", timeout) {}
  *
  * @param name    the name of the command
  * @param timeout the time (in seconds) before this command "times out"
- * @see Command#isTimedOut() isTimedOut()
+ * @see IsTimedOut()
  */
-Command::Command(const std::string& name, double timeout) {
+Command::Command(const llvm::Twine& name, double timeout)
+    : SendableBase(false) {
   // We use -1.0 to indicate no timeout.
   if (timeout < 0.0 && timeout != -1.0)
     wpi_setWPIErrorWithContext(ParameterOutOfRange, "timeout < 0.0");
@@ -59,15 +59,12 @@ Command::Command(const std::string& name, double timeout) {
   m_timeout = timeout;
 
   // If name contains an empty string
-  if (name.length() == 0) {
-    m_name = std::string("Command_") + std::string(typeid(*this).name());
+  if (name.isTriviallyEmpty() ||
+      (name.isSingleStringRef() && name.getSingleStringRef().empty())) {
+    SetName("Command_" + llvm::Twine(typeid(*this).name()));
   } else {
-    m_name = name;
+    SetName(name);
   }
-}
-
-Command::~Command() {
-  if (m_runningListener != 0) m_runningEntry.RemoveListener(m_runningListener);
 }
 
 /**
@@ -75,7 +72,7 @@ Command::~Command() {
  *
  * The ID is a unique sequence number that is incremented for each command.
  *
- * @return the ID of this command
+ * @return The ID of this command
  */
 int Command::GetID() const { return m_commandID; }
 
@@ -83,7 +80,7 @@ int Command::GetID() const { return m_commandID; }
  * Sets the timeout of this command.
  *
  * @param timeout the timeout (in seconds)
- * @see Command#isTimedOut() isTimedOut()
+ * @see IsTimedOut()
  */
 void Command::SetTimeout(double timeout) {
   if (timeout < 0.0)
@@ -107,15 +104,13 @@ double Command::TimeSinceInitialized() const {
 }
 
 /**
- * This method specifies that the given {@link Subsystem} is used by this
- * command.
+ * This method specifies that the given Subsystem is used by this command.
  *
  * This method is crucial to the functioning of the Command System in general.
  *
- * <p>Note that the recommended way to call this method is in the
- * constructor.</p>
+ * Note that the recommended way to call this method is in the constructor.
  *
- * @param subsystem the {@link Subsystem} required
+ * @param subsystem The Subsystem required
  * @see Subsystem
  */
 void Command::Requires(Subsystem* subsystem) {
@@ -130,8 +125,7 @@ void Command::Requires(Subsystem* subsystem) {
 /**
  * Called when the command has been removed.
  *
- * This will call {@link Command#interrupted() interrupted()} or
- * {@link Command#end() end()}.
+ * This will call Interrupted() or End().
  */
 void Command::Removed() {
   if (m_initialized) {
@@ -146,15 +140,14 @@ void Command::Removed() {
   m_initialized = false;
   m_canceled = false;
   m_running = false;
-  if (m_runningEntry) m_runningEntry.SetBoolean(false);
 }
 
 /**
- * Starts up the command.  Gets the command ready to start.
+ * Starts up the command. Gets the command ready to start.
  *
- * <p>Note that the command will eventually start, however it will not
- * necessarily do so immediately, and may in fact be canceled before initialize
- * is even called.</p>
+ * Note that the command will eventually start, however it will not necessarily
+ * do so immediately, and may in fact be canceled before initialize is even
+ * called.
  */
 void Command::Start() {
   LockChanges();
@@ -169,7 +162,7 @@ void Command::Start() {
 /**
  * The run method is used internally to actually run the commands.
  *
- * @return whether or not the command should stay within the {@link Scheduler}.
+ * @return Whether or not the command should stay within the Scheduler.
  */
 bool Command::Run() {
   if (!m_runWhenDisabled && m_parent == nullptr && RobotState::IsDisabled())
@@ -201,22 +194,20 @@ void Command::Initialize() {}
 void Command::Execute() {}
 
 /**
- * Called when the command ended peacefully.  This is where you may want
- * to wrap up loose ends, like shutting off a motor that was being used
- * in the command.
+ * Called when the command ended peacefully. This is where you may want to wrap
+ * up loose ends, like shutting off a motor that was being used in the command.
  */
 void Command::End() {}
 
 /**
- * Called when the command ends because somebody called
- * {@link Command#cancel() cancel()} or another command shared the same
- * requirements as this one, and booted it out.
+ * Called when the command ends because somebody called Cancel() or another
+ * command shared the same requirements as this one, and booted it out.
  *
- * <p>This is where you may want to wrap up loose ends, like shutting off a
- * motor that was being used in the command.</p>
+ * This is where you may want to wrap up loose ends, like shutting off a motor
+ * that was being used in the command.
  *
- * <p>Generally, it is useful to simply call the {@link Command#end() end()}
- * method within this method, as done here.</p>
+ * Generally, it is useful to simply call the End() method within this method,
+ * as done here.
  */
 void Command::Interrupted() { End(); }
 
@@ -231,15 +222,13 @@ void Command::_End() {}
 /**
  * Called to indicate that the timer should start.
  *
- * This is called right before {@link Command#initialize() initialize()} is,
- * inside the {@link Command#run() run()} method.
+ * This is called right before Initialize() is, inside the Run() method.
  */
 void Command::StartTiming() { m_startTime = Timer::GetFPGATimestamp(); }
 
 /**
- * Returns whether or not the
- * {@link Command#timeSinceInitialized() timeSinceInitialized()} method returns
- * a number which is greater than or equal to the timeout for the command.
+ * Returns whether or not the TimeSinceInitialized() method returns a number
+ * which is greater than or equal to the timeout for the command.
  *
  * If there is no timeout, this will always return false.
  *
@@ -250,11 +239,11 @@ bool Command::IsTimedOut() const {
 }
 
 /**
- * Returns the requirements (as an std::set of {@link Subsystem Subsystems}
- * pointers) of this command.
+ * Returns the requirements (as an std::set of Subsystem pointers) of this
+ * command.
  *
- * @return the requirements (as an std::set of {@link Subsystem Subsystems}
- *         pointers) of this command
+ * @return The requirements (as an std::set of Subsystem pointers) of this
+ *         command
  */
 Command::SubsystemSet Command::GetRequirements() const {
   return m_requirements;
@@ -268,9 +257,9 @@ void Command::LockChanges() { m_locked = true; }
 /**
  * If changes are locked, then this will generate a CommandIllegalUse error.
  *
- * @param message the message to report on error (it is appended by a default
+ * @param message The message to report on error (it is appended by a default
  *                message)
- * @return true if assert passed, false if assert failed
+ * @return True if assert passed, false if assert failed.
  */
 bool Command::AssertUnlocked(const std::string& message) {
   if (m_locked) {
@@ -283,7 +272,7 @@ bool Command::AssertUnlocked(const std::string& message) {
 }
 
 /**
- * Sets the parent of this command.  No actual change is made to the group.
+ * Sets the parent of this command. No actual change is made to the group.
  *
  * @param parent the parent
  */
@@ -297,14 +286,21 @@ void Command::SetParent(CommandGroup* parent) {
   } else {
     LockChanges();
     m_parent = parent;
-    if (m_isParentedEntry) m_isParentedEntry.SetBoolean(true);
   }
 }
 
 /**
- * Clears list of subsystem requirements. This is only used by
- * {@link ConditionalCommand} so cancelling the chosen command works properly in
- * {@link CommandGroup}.
+ * Returns whether the command has a parent.
+ *
+ * @param True if the command has a parent.
+ */
+bool Command::IsParented() const { return m_parent != nullptr; }
+
+/**
+ * Clears list of subsystem requirements.
+ *
+ * This is only used by ConditionalCommand so cancelling the chosen command
+ * works properly in CommandGroup.
  */
 void Command::ClearRequirements() { m_requirements.clear(); }
 
@@ -313,24 +309,22 @@ void Command::ClearRequirements() { m_requirements.clear(); }
  *
  * The lifecycle of a command is:
  *
- * startRunning() is called.
- * run() is called (multiple times potentially)
- * removed() is called
+ * StartRunning() is called. Run() is called (multiple times potentially).
+ * Removed() is called.
  *
- * It is very important that startRunning and removed be called in order or some
- * assumptions of the code will be broken.
+ * It is very important that StartRunning() and Removed() be called in order or
+ * some assumptions of the code will be broken.
  */
 void Command::StartRunning() {
   m_running = true;
   m_startTime = -1;
-  if (m_runningEntry) m_runningEntry.SetBoolean(true);
 }
 
 /**
  * Returns whether or not the command is running.
  *
  * This may return true even if the command has just been canceled, as it may
- * not have yet called {@link Command#interrupted()}.
+ * not have yet called Interrupted().
  *
  * @return whether or not the command is running
  */
@@ -339,13 +333,13 @@ bool Command::IsRunning() const { return m_running; }
 /**
  * This will cancel the current command.
  *
- * <p>This will cancel the current command eventually.  It can be called
- * multiple times. And it can be called when the command is not running.  If
- * the command is running though, then the command will be marked as canceled
- * and eventually removed.</p>
+ * This will cancel the current command eventually. It can be called multiple
+ * times. And it can be called when the command is not running. If the command
+ * is running though, then the command will be marked as canceled and eventually
+ * removed.
  *
- * <p>A command can not be canceled if it is a part of a command group, you
- * must cancel the command group instead.</p>
+ * A command can not be canceled if it is a part of a command group, you must
+ * cancel the command group instead.
  */
 void Command::Cancel() {
   if (m_parent != nullptr)
@@ -357,7 +351,7 @@ void Command::Cancel() {
 }
 
 /**
- * This works like cancel(), except that it doesn't throw an exception if it is
+ * This works like Cancel(), except that it doesn't throw an exception if it is
  * a part of a command group.
  *
  * Should only be called by the parent command group.
@@ -390,7 +384,7 @@ void Command::SetInterruptible(bool interruptible) {
 }
 
 /**
- * Checks if the command requires the given {@link Subsystem}.
+ * Checks if the command requires the given Subsystem.
  *
  * @param system the system
  * @return whether or not the subsystem is required (false if given nullptr)
@@ -400,57 +394,45 @@ bool Command::DoesRequire(Subsystem* system) const {
 }
 
 /**
- * Returns the {@link CommandGroup} that this command is a part of.
+ * Returns the CommandGroup that this command is a part of.
  *
- * Will return null if this {@link Command} is not in a group.
+ * Will return null if this Command is not in a group.
  *
- * @return the {@link CommandGroup} that this command is a part of (or null if
- *         not in group)
+ * @return The CommandGroup that this command is a part of (or null if not in
+ *         group)
  */
 CommandGroup* Command::GetGroup() const { return m_parent; }
 
 /**
- * Sets whether or not this {@link Command} should run when the robot is
- * disabled.
+ * Sets whether or not this Command should run when the robot is disabled.
  *
- * <p>By default a command will not run when the robot is disabled, and will in
- * fact be canceled.</p>
+ * By default a command will not run when the robot is disabled, and will in
+ * fact be canceled.
  *
- * @param run whether or not this command should run when the robot is disabled
+ * @param run Whether this command should run when the robot is disabled.
  */
 void Command::SetRunWhenDisabled(bool run) { m_runWhenDisabled = run; }
 
 /**
- * Returns whether or not this {@link Command} will run when the robot is
- * disabled, or if it will cancel itself.
+ * Returns whether or not this Command will run when the robot is disabled, or
+ * if it will cancel itself.
  *
- * @return whether or not this {@link Command} will run when the robot is
- *         disabled, or if it will cancel itself
+ * @return Whether this Command will run when the robot is disabled, or if it
+ * will cancel itself.
  */
 bool Command::WillRunWhenDisabled() const { return m_runWhenDisabled; }
 
-std::string Command::GetName() const { return m_name; }
-
-std::string Command::GetSmartDashboardType() const { return "Command"; }
-
-void Command::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  if (m_runningListener != 0) m_runningEntry.RemoveListener(m_runningListener);
-  if (subtable) {
-    subtable->GetEntry(kName).SetString(GetName());
-    m_runningEntry = subtable->GetEntry(kRunning);
-    m_runningEntry.SetBoolean(IsRunning());
-    m_isParentedEntry = subtable->GetEntry(kIsParented);
-    m_isParentedEntry.SetBoolean(m_parent != nullptr);
-
-    m_runningListener = m_runningEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsBoolean()) return;
-          if (event.value->GetBoolean()) {
-            if (!IsRunning()) Start();
-          } else {
-            if (IsRunning()) Cancel();
-          }
-        },
-        NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
+void Command::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Command");
+  builder.AddStringProperty(".name", [=]() { return GetName(); }, nullptr);
+  builder.AddBooleanProperty("running", [=]() { return IsRunning(); },
+                             [=](bool value) {
+                               if (value) {
+                                 if (!IsRunning()) Start();
+                               } else {
+                                 if (IsRunning()) Cancel();
+                               }
+                             });
+  builder.AddBooleanProperty(".isParented", [=]() { return IsParented(); },
+                             nullptr);
 }

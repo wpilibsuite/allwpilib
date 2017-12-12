@@ -14,12 +14,13 @@ import edu.wpi.first.wpilibj.AnalogTriggerOutput.AnalogTriggerType;
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
  * Class for creating and configuring Analog Triggers.
  */
-public class AnalogTrigger {
+public class AnalogTrigger extends SensorBase implements Sendable {
 
   /**
    * Exceptions dealing with improper operation of the Analog trigger.
@@ -53,6 +54,7 @@ public class AnalogTrigger {
   public AnalogTrigger(final int channel) {
     this(new AnalogInput(channel));
     m_ownsAnalog = true;
+    addChild(m_analogInput);
   }
 
   /**
@@ -71,12 +73,15 @@ public class AnalogTrigger {
     m_index = index.asIntBuffer().get(0);
 
     HAL.report(tResourceType.kResourceType_AnalogTrigger, channel.getChannel());
+    setName("AnalogTrigger", channel.getChannel());
   }
 
   /**
    * Release the resources used by this object.
    */
+  @Override
   public void free() {
+    super.free();
     AnalogJNI.cleanAnalogTrigger(m_port);
     m_port = 0;
     if (m_ownsAnalog && m_analogInput != null) {
@@ -127,7 +132,7 @@ public class AnalogTrigger {
    * point average rejection filter. This is designed to help with 360 degree pot applications for
    * the period where the pot crosses through zero.
    *
-   * @param useFilteredValue true to use a filterd value, false otherwise
+   * @param useFilteredValue true to use a filtered value, false otherwise
    */
   public void setFiltered(boolean useFilteredValue) {
     AnalogJNI.setAnalogTriggerFiltered(m_port, useFilteredValue);
@@ -172,5 +177,12 @@ public class AnalogTrigger {
    */
   public AnalogTriggerOutput createOutput(AnalogTriggerType type) {
     return new AnalogTriggerOutput(this, type);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    if (m_ownsAnalog) {
+      m_analogInput.initSendable(builder);
+    }
   }
 }

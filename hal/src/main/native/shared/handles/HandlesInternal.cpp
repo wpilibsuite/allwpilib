@@ -8,45 +8,44 @@
 #include "HAL/handles/HandlesInternal.h"
 
 #include <algorithm>
-#include <mutex>
 
 #include <llvm/SmallVector.h>
+#include <support/mutex.h>
 
 namespace hal {
-static llvm::SmallVector<HandleBase*, 32> globalHandles;
-static std::mutex& GetGlobalHandleMutex() {
-  static std::mutex globalHandleMutex;
-  return globalHandleMutex;
+static llvm::SmallVector<HandleBase*, 32>* globalHandles;
+static wpi::mutex globalHandleMutex;
+namespace init {
+void InitializeHandlesInternal() {
+  static llvm::SmallVector<HandleBase*, 32> gH;
+  globalHandles = &gH;
 }
-
+}  // namespace init
 HandleBase::HandleBase() {
-  std::lock_guard<std::mutex> lock(GetGlobalHandleMutex());
-  auto index = std::find(globalHandles.begin(), globalHandles.end(), this);
-  if (index == globalHandles.end()) {
-    globalHandles.push_back(this);
+  std::lock_guard<wpi::mutex> lock(globalHandleMutex);
+  auto index = std::find(globalHandles->begin(), globalHandles->end(), this);
+  if (index == globalHandles->end()) {
+    globalHandles->push_back(this);
   } else {
     *index = this;
   }
 }
-
 HandleBase::~HandleBase() {
-  std::lock_guard<std::mutex> lock(GetGlobalHandleMutex());
-  auto index = std::find(globalHandles.begin(), globalHandles.end(), this);
-  if (index != globalHandles.end()) {
+  std::lock_guard<wpi::mutex> lock(globalHandleMutex);
+  auto index = std::find(globalHandles->begin(), globalHandles->end(), this);
+  if (index != globalHandles->end()) {
     *index = nullptr;
   }
 }
-
 void HandleBase::ResetHandles() {
   m_version++;
   if (m_version > 255) {
     m_version = 0;
   }
 }
-
 void HandleBase::ResetGlobalHandles() {
-  std::unique_lock<std::mutex> lock(GetGlobalHandleMutex());
-  for (auto&& i : globalHandles) {
+  std::unique_lock<wpi::mutex> lock(globalHandleMutex);
+  for (auto&& i : *globalHandles) {
     if (i != nullptr) {
       lock.unlock();
       i->ResetHandles();
@@ -54,7 +53,6 @@ void HandleBase::ResetGlobalHandles() {
     }
   }
 }
-
 HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module) {
   // set last 8 bits, then shift to first 8 bits
   HAL_PortHandle handle = static_cast<HAL_PortHandle>(HAL_HandleEnum::Port);
@@ -67,7 +65,6 @@ HAL_PortHandle createPortHandle(uint8_t channel, uint8_t module) {
   handle += channel;
   return handle;
 }
-
 HAL_PortHandle createPortHandleForSPI(uint8_t channel) {
   // set last 8 bits, then shift to first 8 bits
   HAL_PortHandle handle = static_cast<HAL_PortHandle>(HAL_HandleEnum::Port);
@@ -82,7 +79,6 @@ HAL_PortHandle createPortHandleForSPI(uint8_t channel) {
   handle += channel;
   return handle;
 }
-
 HAL_Handle createHandle(int16_t index, HAL_HandleEnum handleType,
                         int16_t version) {
   if (index < 0) return HAL_kInvalidHandle;

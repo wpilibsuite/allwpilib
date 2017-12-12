@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
 
 /**
  * Track resources in the program. The Resource class is a convenient way of keeping track of
- * allocated arbitrary resources in the program. Resources are just indicies that have an lower and
+ * allocated arbitrary resources in the program. Resources are just indices that have an lower and
  * upper bound that are tracked by this class. In the library they are used for tracking allocation
  * of hardware channels but this is purely arbitrary. The resource class does not do any actual
  * allocation, but simply tracks if a given index is currently in use.
@@ -43,7 +43,7 @@ public final class Resource {
 
   /**
    * Allocate storage for a new instance of Resource. Allocate a bool array of values that will get
-   * initialized to indicate that no resources have been allocated yet. The indicies of the
+   * initialized to indicate that no resources have been allocated yet. The indices of the
    * resources are 0..size-1.
    *
    * @param size The number of blocks to allocate

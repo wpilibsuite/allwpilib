@@ -10,9 +10,10 @@
 #include <cstdio>
 #include <fstream>
 
+#include <networktables/NetworkTableInstance.h>
+
 #include "Timer.h"
 #include "gtest/gtest.h"
-#include "networktables/NetworkTableInstance.h"
 #include "ntcore.h"
 
 using namespace frc;
@@ -62,17 +63,17 @@ TEST(PreferencesTest, ReadPreferencesFromFile) {
  */
 TEST(PreferencesTest, WritePreferencesToFile) {
   auto inst = nt::NetworkTableInstance::GetDefault();
-  inst.StopServer();
-  inst.DeleteAllEntries();
-  // persistent keys don't get deleted normally, so make remaining keys
-  // non-persistent and delete them too
-  for (auto entry : inst.GetEntries("", 0)) {
-    entry.SetFlags(0);
-  }
-  inst.DeleteAllEntries();
-  std::remove(kFileName);
   inst.StartServer();
   Preferences* preferences = Preferences::GetInstance();
+  preferences->Remove("testFileGetString");
+  preferences->Remove("testFileGetInt");
+  preferences->Remove("testFileGetDouble");
+  preferences->Remove("testFileGetFloat");
+  preferences->Remove("testFileGetBoolean");
+  preferences->Remove("testFileGetLong");
+
+  Wait(kSaveTime);
+
   preferences->PutString("testFilePutString", "Hello, preferences file");
   preferences->PutInt("testFilePutInt", 1);
   preferences->PutDouble("testFilePutDouble", 0.5);
@@ -84,6 +85,7 @@ TEST(PreferencesTest, WritePreferencesToFile) {
 
   static char const* kExpectedFileContents[] = {
       "[NetworkTables Storage 3.0]",
+      "string \"/Preferences/.type\"=\"RobotPreferences\"",
       "boolean \"/Preferences/testFilePutBoolean\"=true",
       "double \"/Preferences/testFilePutDouble\"=0.5",
       "double \"/Preferences/testFilePutFloat\"=0.25",

@@ -23,7 +23,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private WaitResult(int value) {
+    WaitResult(int value) {
       this.value = value;
     }
   }
@@ -43,6 +43,17 @@ public abstract class InterruptableSensorBase extends SensorBase {
    */
   public InterruptableSensorBase() {
     m_interrupt = 0;
+  }
+
+  /**
+   * Frees the resources for this output.
+   */
+  @Override
+  public void free() {
+    super.free();
+    if (m_interrupt != 0) {
+      cancelInterrupts();
+    }
   }
 
   /**
@@ -78,7 +89,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-                                   getAnalogTriggerTypeForRouting());
+        getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
     InterruptJNI.attachInterruptHandler(m_interrupt, handler.m_function,
         handler.overridableParameter());
@@ -99,7 +110,7 @@ public abstract class InterruptableSensorBase extends SensorBase {
     assert m_interrupt != 0;
 
     InterruptJNI.requestInterrupts(m_interrupt, getPortHandleForRouting(),
-                                   getAnalogTriggerTypeForRouting());
+        getAnalogTriggerTypeForRouting());
     setUpSourceEdge(true, false);
 
   }

@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/NotifyListenerVector.h"
 #include "MockData/RelayData.h"
 
@@ -49,7 +51,7 @@ class RelayData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_initializedForward{false};
   std::shared_ptr<NotifyListenerVector> m_initializedForwardCallbacks = nullptr;
   std::atomic<HAL_Bool> m_initializedReverse{false};
@@ -59,5 +61,5 @@ class RelayData {
   std::atomic<HAL_Bool> m_reverse{false};
   std::shared_ptr<NotifyListenerVector> m_reverseCallbacks = nullptr;
 };
-extern RelayData SimRelayData[];
+extern RelayData* SimRelayData;
 }  // namespace hal

@@ -7,7 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 
 /**
@@ -15,17 +15,48 @@ import edu.wpi.first.networktables.NetworkTable;
  */
 public interface Sendable {
   /**
-   * Initializes a table for this {@link Sendable} object.
+   * Gets the name of this {@link Sendable} object.
    *
-   * @param subtable The table to put the values in.
+   * @return Name
    */
-  void initTable(NetworkTable subtable);
+  String getName();
 
   /**
-   * The string representation of the named data type that will be used by the smart dashboard for
-   * this {@link Sendable}.
+   * Sets the name of this {@link Sendable} object.
    *
-   * @return The type of this {@link Sendable}.
+   * @param name name
    */
-  String getSmartDashboardType();
+  void setName(String name);
+
+  /**
+   * Sets both the subsystem name and device name of this {@link Sendable} object.
+   *
+   * @param subsystem subsystem name
+   * @param name device name
+   */
+  default void setName(String subsystem, String name) {
+    setSubsystem(subsystem);
+    setName(name);
+  }
+
+  /**
+   * Gets the subsystem name of this {@link Sendable} object.
+   *
+   * @return Subsystem name
+   */
+  String getSubsystem();
+
+  /**
+   * Sets the subsystem name of this {@link Sendable} object.
+   *
+   * @param subsystem subsystem name
+   */
+  void setSubsystem(String subsystem);
+
+  /**
+   * Initializes this {@link Sendable} object.
+   *
+   * @param builder sendable builder
+   */
+  void initSendable(SendableBuilder builder);
 }

@@ -103,10 +103,10 @@ void TiltPanCameraTest::GyroAngle() {
 }
 
 /**
-  * Gets calibrated parameters from previously calibrated gyro, allocates a new
-  * gyro with the given parameters for center and offset, and re-runs tests on
-  * the new gyro.
-  */
+ * Gets calibrated parameters from previously calibrated gyro, allocates a new
+ * gyro with the given parameters for center and offset, and re-runs tests on
+ * the new gyro.
+ */
 void TiltPanCameraTest::GyroCalibratedParameters() {
   uint32_t cCenter = m_gyro->GetCenter();
   double cOffset = m_gyro->GetOffset();

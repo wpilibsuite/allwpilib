@@ -7,12 +7,18 @@
 
 #include "HAL/SPI.h"
 
+#include <fcntl.h>
+#include <linux/spi/spidev.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
 #include <array>
 #include <atomic>
-#include <mutex>
+#include <cstring>
+#include <thread>
 
 #include <llvm/raw_ostream.h>
-#include <spilib/spi-lib.h>
+#include <support/mutex.h>
 
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
@@ -23,25 +29,23 @@
 
 using namespace hal;
 
-static int32_t m_spiCS0Handle = 0;
-static int32_t m_spiCS1Handle = 0;
-static int32_t m_spiCS2Handle = 0;
-static int32_t m_spiCS3Handle = 0;
-static int32_t m_spiMXPHandle = 0;
+static int32_t m_spiCS0Handle{0};
+static int32_t m_spiCS1Handle{0};
+static int32_t m_spiCS2Handle{0};
+static int32_t m_spiCS3Handle{0};
+static int32_t m_spiMXPHandle{0};
 
 static constexpr int32_t kSpiMaxHandles = 5;
 
 // Indices 0-3 are for onboard CS0-CS2. Index 4 is for MXP.
-static std::array<std::mutex, kSpiMaxHandles> spiHandleMutexes;
-static std::array<std::mutex, kSpiMaxHandles> spiApiMutexes;
-static std::array<std::mutex, kSpiMaxHandles> spiAccumulatorMutexes;
+static std::array<wpi::mutex, kSpiMaxHandles> spiHandleMutexes;
+static std::array<wpi::mutex, kSpiMaxHandles> spiApiMutexes;
+static std::array<wpi::mutex, kSpiMaxHandles> spiAccumulatorMutexes;
 
 // MXP SPI does not count towards this
 std::atomic<int32_t> spiPortCount{0};
 
 static HAL_DigitalHandle digitalHandles[9]{HAL_kInvalidHandle};
-
-extern "C" {
 
 struct SPIAccumulator {
   std::atomic<HAL_NotifierHandle> notifier{0};
@@ -68,6 +72,14 @@ struct SPIAccumulator {
 };
 std::unique_ptr<SPIAccumulator> spiAccumulators[5];
 
+namespace hal {
+namespace init {
+void InitializeSPI() {}
+}  // namespace init
+}  // namespace hal
+
+extern "C" {
+
 static void CommonSPIPortInit(int32_t* status) {
   // All false cases will set
   if (spiPortCount.fetch_add(1) == 0) {
@@ -92,7 +104,7 @@ static void CommonSPIPortInit(int32_t* status) {
   }
 }
 
-static void CommonSPIPortFree() {
+static void CommonSPIPortFree(void) {
   if (spiPortCount.fetch_sub(1) == 1) {
     // Clean up SPI Handles
     HAL_FreeDIOPort(digitalHandles[3]);
@@ -111,13 +123,21 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
     return;
   }
 
+  int handle;
   if (HAL_GetSPIHandle(port) != 0) return;
   switch (port) {
     case 0:
       CommonSPIPortInit(status);
       if (*status != 0) return;
       // CS0 is not a DIO port, so nothing to allocate
-      HAL_SetSPIHandle(HAL_SPI_kOnboardCS0, spilib_open("/dev/spidev0.0"));
+      handle = open("/dev/spidev0.0", O_RDWR);
+      if (handle < 0) {
+        std::printf("Failed to open SPI port %d: %s\n", port,
+                    std::strerror(errno));
+        CommonSPIPortFree();
+        return;
+      }
+      HAL_SetSPIHandle(HAL_SPI_kOnboardCS0, handle);
       break;
     case 1:
       CommonSPIPortInit(status);
@@ -130,7 +150,15 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
         CommonSPIPortFree();
         return;
       }
-      HAL_SetSPIHandle(HAL_SPI_kOnboardCS1, spilib_open("/dev/spidev0.1"));
+      handle = open("/dev/spidev0.1", O_RDWR);
+      if (handle < 0) {
+        std::printf("Failed to open SPI port %d: %s\n", port,
+                    std::strerror(errno));
+        CommonSPIPortFree();
+        HAL_FreeDIOPort(digitalHandles[0]);
+        return;
+      }
+      HAL_SetSPIHandle(HAL_SPI_kOnboardCS1, handle);
       break;
     case 2:
       CommonSPIPortInit(status);
@@ -143,7 +171,15 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
         CommonSPIPortFree();
         return;
       }
-      HAL_SetSPIHandle(HAL_SPI_kOnboardCS2, spilib_open("/dev/spidev0.2"));
+      handle = open("/dev/spidev0.2", O_RDWR);
+      if (handle < 0) {
+        std::printf("Failed to open SPI port %d: %s\n", port,
+                    std::strerror(errno));
+        CommonSPIPortFree();
+        HAL_FreeDIOPort(digitalHandles[1]);
+        return;
+      }
+      HAL_SetSPIHandle(HAL_SPI_kOnboardCS2, handle);
       break;
     case 3:
       CommonSPIPortInit(status);
@@ -156,7 +192,15 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
         CommonSPIPortFree();
         return;
       }
-      HAL_SetSPIHandle(HAL_SPI_kOnboardCS3, spilib_open("/dev/spidev0.3"));
+      handle = open("/dev/spidev0.3", O_RDWR);
+      if (handle < 0) {
+        std::printf("Failed to open SPI port %d: %s\n", port,
+                    std::strerror(errno));
+        CommonSPIPortFree();
+        HAL_FreeDIOPort(digitalHandles[2]);
+        return;
+      }
+      HAL_SetSPIHandle(HAL_SPI_kOnboardCS3, handle);
       break;
     case 4:
       initializeDigital(status);
@@ -193,13 +237,22 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       }
       digitalSystem->writeEnableMXPSpecialFunction(
           digitalSystem->readEnableMXPSpecialFunction(status) | 0x00F0, status);
-      HAL_SetSPIHandle(HAL_SPI_kMXP, spilib_open("/dev/spidev1.0"));
+      handle = open("/dev/spidev1.0", O_RDWR);
+      if (handle < 0) {
+        std::printf("Failed to open SPI port %d: %s\n", port,
+                    std::strerror(errno));
+        HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
+        HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated
+        HAL_FreeDIOPort(digitalHandles[7]);  // free the third port allocated
+        HAL_FreeDIOPort(digitalHandles[8]);  // free the fourth port allocated
+        return;
+      }
+      HAL_SetSPIHandle(HAL_SPI_kMXP, handle);
       break;
     default:
       *status = PARAMETER_OUT_OF_RANGE;
       break;
   }
-  return;
 }
 
 /**
@@ -214,16 +267,20 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
  * @param size Number of bytes to transfer. [0..7]
  * @return Number of bytes transferred, -1 for error
  */
-int32_t HAL_TransactionSPI(HAL_SPIPort port, uint8_t* dataToSend,
+int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
                            uint8_t* dataReceived, int32_t size) {
   if (port < 0 || port >= kSpiMaxHandles) {
     return -1;
   }
 
-  std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
-  return spilib_writeread(
-      HAL_GetSPIHandle(port), reinterpret_cast<const char*>(dataToSend),
-      reinterpret_cast<char*>(dataReceived), static_cast<int32_t>(size));
+  struct spi_ioc_transfer xfer;
+  std::memset(&xfer, 0, sizeof(xfer));
+  xfer.tx_buf = (__u64)dataToSend;
+  xfer.rx_buf = (__u64)dataReceived;
+  xfer.len = size;
+
+  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
+  return ioctl(HAL_GetSPIHandle(port), SPI_IOC_MESSAGE(1), &xfer);
 }
 
 /**
@@ -236,15 +293,19 @@ int32_t HAL_TransactionSPI(HAL_SPIPort port, uint8_t* dataToSend,
  * @param sendSize The number of bytes to be written
  * @return The number of bytes written. -1 for an error
  */
-int32_t HAL_WriteSPI(HAL_SPIPort port, uint8_t* dataToSend, int32_t sendSize) {
+int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
+                     int32_t sendSize) {
   if (port < 0 || port >= kSpiMaxHandles) {
     return -1;
   }
 
-  std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
-  return spilib_write(HAL_GetSPIHandle(port),
-                      reinterpret_cast<const char*>(dataToSend),
-                      static_cast<int32_t>(sendSize));
+  struct spi_ioc_transfer xfer;
+  std::memset(&xfer, 0, sizeof(xfer));
+  xfer.tx_buf = (__u64)dataToSend;
+  xfer.len = sendSize;
+
+  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
+  return ioctl(HAL_GetSPIHandle(port), SPI_IOC_MESSAGE(1), &xfer);
 }
 
 /**
@@ -265,9 +326,13 @@ int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count) {
     return -1;
   }
 
-  std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
-  return spilib_read(HAL_GetSPIHandle(port), reinterpret_cast<char*>(buffer),
-                     static_cast<int32_t>(count));
+  struct spi_ioc_transfer xfer;
+  std::memset(&xfer, 0, sizeof(xfer));
+  xfer.rx_buf = (__u64)buffer;
+  xfer.len = count;
+
+  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
+  return ioctl(HAL_GetSPIHandle(port), SPI_IOC_MESSAGE(1), &xfer);
 }
 
 /**
@@ -284,8 +349,8 @@ void HAL_CloseSPI(HAL_SPIPort port) {
   HAL_FreeSPIAccumulator(port, &status);
 
   {
-    std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
-    spilib_close(HAL_GetSPIHandle(port));
+    std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
+    close(HAL_GetSPIHandle(port));
   }
 
   HAL_SetSPIHandle(port, 0);
@@ -326,8 +391,8 @@ void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed) {
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
-  spilib_setspeed(HAL_GetSPIHandle(port), speed);
+  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
+  ioctl(HAL_GetSPIHandle(port), SPI_IOC_WR_MAX_SPEED_HZ, &speed);
 }
 
 /**
@@ -346,9 +411,13 @@ void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
-  spilib_setopts(HAL_GetSPIHandle(port), msbFirst, sampleOnTrailing,
-                 clkIdleHigh);
+  uint8_t mode = 0;
+  mode |= (!msbFirst ? 8 : 0);
+  mode |= (clkIdleHigh ? 2 : 0);
+  mode |= (sampleOnTrailing ? 1 : 0);
+
+  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
+  ioctl(HAL_GetSPIHandle(port), SPI_IOC_WR_MODE, &mode);
 }
 
 /**
@@ -362,7 +431,7 @@ void HAL_SetSPIChipSelectActiveHigh(HAL_SPIPort port, int32_t* status) {
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
   if (port < 4) {
     spiSystem->writeChipSelectActiveHigh_Hdr(
         spiSystem->readChipSelectActiveHigh_Hdr(status) | (1 << port), status);
@@ -382,7 +451,7 @@ void HAL_SetSPIChipSelectActiveLow(HAL_SPIPort port, int32_t* status) {
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
   if (port < 4) {
     spiSystem->writeChipSelectActiveHigh_Hdr(
         spiSystem->readChipSelectActiveHigh_Hdr(status) & ~(1 << port), status);
@@ -402,7 +471,7 @@ int32_t HAL_GetSPIHandle(HAL_SPIPort port) {
     return 0;
   }
 
-  std::lock_guard<std::mutex> sync(spiHandleMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiHandleMutexes[port]);
   switch (port) {
     case 0:
       return m_spiCS0Handle;
@@ -431,7 +500,7 @@ void HAL_SetSPIHandle(HAL_SPIPort port, int32_t handle) {
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiHandleMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiHandleMutexes[port]);
   switch (port) {
     case 0:
       m_spiCS0Handle = handle;
@@ -453,22 +522,10 @@ void HAL_SetSPIHandle(HAL_SPIPort port, int32_t handle) {
   }
 }
 
-static void spiAccumulatorProcess(uint64_t currentTime,
-                                  HAL_NotifierHandle handle) {
-  int32_t status = 0;
-  auto param = HAL_GetNotifierParam(handle, &status);
-  if (param == nullptr) return;
-  SPIAccumulator* accum = static_cast<SPIAccumulator*>(param);
-
+static void spiAccumulatorProcess(uint64_t currentTime, SPIAccumulator* accum) {
   // perform SPI transaction
   uint8_t resp_b[4];
-  {
-    std::lock_guard<std::mutex> sync(spiApiMutexes[accum->port]);
-    spilib_writeread(HAL_GetSPIHandle(accum->port),
-                     reinterpret_cast<const char*>(accum->cmd),
-                     reinterpret_cast<char*>(resp_b),
-                     static_cast<int32_t>(accum->xferSize));
-  }
+  HAL_TransactionSPI(accum->port, accum->cmd, resp_b, accum->xferSize);
 
   // convert from bytes
   uint32_t resp = 0;
@@ -508,7 +565,7 @@ static void spiAccumulatorProcess(uint64_t currentTime,
   // handle timer slip
   if (accum->triggerTime < currentTime)
     accum->triggerTime = currentTime + accum->period;
-  status = 0;
+  int32_t status = 0;
   HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, &status);
 }
 
@@ -538,7 +595,7 @@ void HAL_InitSPIAccumulator(HAL_SPIPort port, int32_t period, int32_t cmd,
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiAccumulatorMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
   if (!spiAccumulators[port])
     spiAccumulators[port] = std::make_unique<SPIAccumulator>();
   SPIAccumulator* accum = spiAccumulators[port].get();
@@ -567,10 +624,18 @@ void HAL_InitSPIAccumulator(HAL_SPIPort port, int32_t period, int32_t cmd,
   accum->bigEndian = bigEndian;
   accum->port = port;
   if (!accum->notifier) {
-    accum->notifier =
-        HAL_InitializeNotifier(spiAccumulatorProcess, accum, status);
+    accum->notifier = HAL_InitializeNotifier(status);
     accum->triggerTime = HAL_GetFPGATime(status) + period;
     if (*status != 0) return;
+    std::thread thr([=] {
+      int32_t status2 = 0;
+      while (status2 == 0) {
+        uint64_t curTime = HAL_WaitForNotifierAlarm(accum->notifier, &status2);
+        if (curTime == 0 || status2 != 0) break;
+        spiAccumulatorProcess(curTime, accum);
+      }
+    });
+    thr.detach();
     HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, status);
   }
 }
@@ -584,7 +649,7 @@ void HAL_FreeSPIAccumulator(HAL_SPIPort port, int32_t* status) {
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiAccumulatorMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
@@ -604,7 +669,7 @@ void HAL_ResetSPIAccumulator(HAL_SPIPort port, int32_t* status) {
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiApiMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
@@ -631,7 +696,7 @@ void HAL_SetSPIAccumulatorCenter(HAL_SPIPort port, int32_t center,
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiAccumulatorMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
@@ -650,7 +715,7 @@ void HAL_SetSPIAccumulatorDeadband(HAL_SPIPort port, int32_t deadband,
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiAccumulatorMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
@@ -668,7 +733,7 @@ int32_t HAL_GetSPIAccumulatorLastValue(HAL_SPIPort port, int32_t* status) {
     return 0;
   }
 
-  std::lock_guard<std::mutex> sync(spiAccumulatorMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
@@ -688,7 +753,7 @@ int64_t HAL_GetSPIAccumulatorValue(HAL_SPIPort port, int32_t* status) {
     return 0;
   }
 
-  std::lock_guard<std::mutex> sync(spiAccumulatorMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
@@ -711,7 +776,7 @@ int64_t HAL_GetSPIAccumulatorCount(HAL_SPIPort port, int32_t* status) {
     return 0;
   }
 
-  std::lock_guard<std::mutex> sync(spiAccumulatorMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;
@@ -754,7 +819,7 @@ void HAL_GetSPIAccumulatorOutput(HAL_SPIPort port, int64_t* value,
     return;
   }
 
-  std::lock_guard<std::mutex> sync(spiAccumulatorMutexes[port]);
+  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
   SPIAccumulator* accum = spiAccumulators[port].get();
   if (!accum) {
     *status = NULL_PARAMETER;

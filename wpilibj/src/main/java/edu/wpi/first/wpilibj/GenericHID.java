@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.hal.HAL;
+
 /**
  * GenericHID Interface.
  */
@@ -40,7 +42,7 @@ public abstract class GenericHID {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private HIDType(int value) {
+    HIDType(int value) {
       this.value = value;
     }
   }
@@ -54,14 +56,19 @@ public abstract class GenericHID {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private Hand(int value) {
+    Hand(int value) {
       this.value = value;
     }
   }
 
+  private DriverStation m_ds;
   private final int m_port;
+  private int m_outputs;
+  private short m_leftRumble;
+  private short m_rightRumble;
 
   public GenericHID(int port) {
+    m_ds = DriverStation.getInstance();
     m_port = port;
   }
 
@@ -100,20 +107,49 @@ public abstract class GenericHID {
   public abstract double getY(Hand hand);
 
   /**
-   * Get the raw axis.
+   * Get the button value (starting at button 1).
    *
-   * @param which index of the axis
-   * @return the raw value of the selected axis
+   * <p>The buttons are returned in a single 16 bit value with one bit representing the state of
+   * each button. The appropriate button is returned as a boolean value.
+   *
+   * @param button The button number to be read (starting at 1)
+   * @return The state of the button.
    */
-  public abstract double getRawAxis(int which);
+  public boolean getRawButton(int button) {
+    return m_ds.getStickButton(m_port, (byte) button);
+  }
 
   /**
-   * Is the given button pressed.
+   * Whether the button was pressed since the last check. Button indexes begin at
+   * 1.
    *
-   * @param button which button number
-   * @return true if the button is pressed
+   * @param button The button index, beginning at 1.
+   * @return Whether the button was pressed since the last check.
    */
-  public abstract boolean getRawButton(int button);
+  public boolean getRawButtonPressed(int button) {
+    return m_ds.getStickButtonPressed(m_port, (byte) button);
+  }
+
+  /**
+   * Whether the button was released since the last check. Button indexes begin at
+   * 1.
+   *
+   * @param button The button index, beginning at 1.
+   * @return Whether the button was released since the last check.
+   */
+  public boolean getRawButtonReleased(int button) {
+    return m_ds.getStickButtonReleased(m_port, button);
+  }
+
+  /**
+   * Get the value of the axis.
+   *
+   * @param axis The axis to read, starting at 0.
+   * @return The value of the axis.
+   */
+  public double getRawAxis(int axis) {
+    return m_ds.getStickAxis(m_port, axis);
+  }
 
   /**
    * Get the angle in degrees of a POV on the HID.
@@ -124,16 +160,63 @@ public abstract class GenericHID {
    * @param pov The index of the POV to read (starting at 0)
    * @return the angle of the POV in degrees, or -1 if the POV is not pressed.
    */
-  public abstract int getPOV(int pov);
+  public int getPOV(int pov) {
+    return m_ds.getStickPOV(m_port, pov);
+  }
 
   public int getPOV() {
     return getPOV(0);
   }
 
   /**
+   * Get the number of axes for the HID.
+   *
+   * @return the number of axis for the current HID
+   */
+  public int getAxisCount() {
+    return m_ds.getStickAxisCount(m_port);
+  }
+
+  /**
    * For the current HID, return the number of POVs.
    */
-  public abstract int getPOVCount();
+  public int getPOVCount() {
+    return m_ds.getStickPOVCount(m_port);
+  }
+
+  /**
+   * For the current HID, return the number of buttons.
+   */
+  public int getButtonCount() {
+    return m_ds.getStickButtonCount(m_port);
+  }
+
+  /**
+   * Get the type of the HID.
+   *
+   * @return the type of the HID.
+   */
+  public HIDType getType() {
+    return HIDType.values()[m_ds.getJoystickType(m_port)];
+  }
+
+  /**
+   * Get the name of the HID.
+   *
+   * @return the name of the HID.
+   */
+  public String getName() {
+    return m_ds.getJoystickName(m_port);
+  }
+
+  /**
+   * Get the axis type of a joystick axis.
+   *
+   * @return the axis type of a joystick axis.
+   */
+  public int getAxisType(int axis) {
+    return m_ds.getJoystickAxisType(m_port, axis);
+  }
 
   /**
    * Get the port number of the HID.
@@ -145,33 +228,25 @@ public abstract class GenericHID {
   }
 
   /**
-   * Get the type of the HID.
-   *
-   * @return the type of the HID.
-   */
-  public abstract HIDType getType();
-
-  /**
-   * Get the name of the HID.
-   *
-   * @return the name of the HID.
-   */
-  public abstract String getName();
-
-  /**
    * Set a single HID output value for the HID.
    *
    * @param outputNumber The index of the output to set (1-32)
    * @param value        The value to set the output to
    */
-  public abstract void setOutput(int outputNumber, boolean value);
+  public void setOutput(int outputNumber, boolean value) {
+    m_outputs = (m_outputs & ~(1 << (outputNumber - 1))) | ((value ? 1 : 0) << (outputNumber - 1));
+    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+  }
 
   /**
    * Set all HID output values for the HID.
    *
    * @param value The 32 bit output value (1 bit for each output)
    */
-  public abstract void setOutputs(int value);
+  public void setOutputs(int value) {
+    m_outputs = value;
+    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+  }
 
   /**
    * Set the rumble output for the HID. The DS currently supports 2 rumble values, left rumble and
@@ -180,5 +255,17 @@ public abstract class GenericHID {
    * @param type  Which rumble value to set
    * @param value The normalized value (0 to 1) to set the rumble to
    */
-  public abstract void setRumble(RumbleType type, double value);
+  public void setRumble(RumbleType type, double value) {
+    if (value < 0) {
+      value = 0;
+    } else if (value > 1) {
+      value = 1;
+    }
+    if (type == RumbleType.kLeftRumble) {
+      m_leftRumble = (short) (value * 65535);
+    } else {
+      m_rightRumble = (short) (value * 65535);
+    }
+    HAL.setJoystickOutputs((byte) m_port, m_outputs, m_leftRumble, m_rightRumble);
+  }
 }

@@ -7,12 +7,9 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Standard hobby style servo.
@@ -42,8 +39,8 @@ public class Servo extends PWM {
     setBounds(kDefaultMaxServoPWM, 0, 0, 0, kDefaultMinServoPWM);
     setPeriodMultiplier(PeriodMultiplier.k4X);
 
-    LiveWindow.addActuator("Servo", getChannel(), this);
     HAL.report(tResourceType.kResourceType_Servo, getChannel());
+    setName("Servo", getChannel());
   }
 
 
@@ -108,44 +105,9 @@ public class Servo extends PWM {
     return kMaxServoAngle - kMinServoAngle;
   }
 
-  /*
-   * Live Window code, only does anything if live window is activated.
-   */
-  public String getSmartDashboardType() {
-    return "Servo";
-  }
-
-  private NetworkTable m_table;
-  private NetworkTableEntry m_valueEntry;
-  private int m_valueListener;
-
   @Override
-  public void initTable(NetworkTable subtable) {
-    m_table = subtable;
-    if (m_table != null) {
-      m_valueEntry = m_table.getEntry("Value");
-      updateTable();
-    } else {
-      m_valueEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_valueEntry != null) {
-      m_valueEntry.setDouble(get());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-    m_valueListener = m_valueEntry.addListener((event) -> set(event.value.getDouble()),
-        EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
-    m_valueEntry.removeListener(m_valueListener);
-    m_valueListener = 0;
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Servo");
+    builder.addDoubleProperty("Value", this::get, this::set);
   }
 }

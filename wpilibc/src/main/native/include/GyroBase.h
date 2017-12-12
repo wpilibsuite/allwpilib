@@ -7,14 +7,9 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-#include "LiveWindow/LiveWindowSendable.h"
 #include "PIDSource.h"
 #include "SensorBase.h"
 #include "interfaces/Gyro.h"
-#include "networktables/NetworkTableEntry.h"
 
 namespace frc {
 
@@ -22,24 +17,12 @@ namespace frc {
  * GyroBase is the common base class for Gyro implementations such as
  * AnalogGyro.
  */
-class GyroBase : public Gyro,
-                 public SensorBase,
-                 public PIDSource,
-                 public LiveWindowSendable {
+class GyroBase : public Gyro, public SensorBase, public PIDSource {
  public:
-  virtual ~GyroBase() = default;
-
   // PIDSource interface
   double PIDGet() override;
 
-  void UpdateTable() override;
-  void StartLiveWindowMode() override;
-  void StopLiveWindowMode() override;
-  std::string GetSmartDashboardType() const override;
-  void InitTable(std::shared_ptr<nt::NetworkTable> subTable) override;
-
- private:
-  nt::NetworkTableEntry m_valueEntry;
+  void InitSendable(SendableBuilder& builder) override;
 };
 
 }  // namespace frc

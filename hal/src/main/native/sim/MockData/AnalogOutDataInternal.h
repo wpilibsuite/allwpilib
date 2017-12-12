@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/AnalogOutData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -33,11 +35,11 @@ class AnalogOutData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<double> m_voltage{0.0};
   std::shared_ptr<NotifyListenerVector> m_voltageCallbacks = nullptr;
   std::atomic<HAL_Bool> m_initialized{0};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
 };
-extern AnalogOutData SimAnalogOutData[];
+extern AnalogOutData* SimAnalogOutData;
 }  // namespace hal

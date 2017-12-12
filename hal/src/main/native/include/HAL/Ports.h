@@ -32,5 +32,5 @@ int32_t HAL_GetNumSolenoidChannels(void);
 int32_t HAL_GetNumPDPModules(void);
 int32_t HAL_GetNumPDPChannels(void);
 #ifdef __cplusplus
-}
+}  // extern "C"
 #endif

@@ -20,11 +20,18 @@ using namespace frc;
 
 RobotDriveBase::RobotDriveBase() { m_safetyHelper.SetSafetyEnabled(true); }
 
+/**
+ * Change the default value for deadband scaling. The default value is
+ * 0.02. Values smaller then the deadband are set to 0, while values
+ * larger then the deadband are scaled from 0.0 to 1.0. See ApplyDeadband().
+ *
+ * @param deadband The deadband to set.
+ */
 void RobotDriveBase::SetDeadband(double deadband) { m_deadband = deadband; }
 
 /**
  * Configure the scaling factor for using RobotDrive with motor controllers in a
- * mode other than PercentVbus.
+ * mode other than PercentVbus or to limit the maximum output.
  *
  * @param maxOutput Multiplied with the output percentage computed by the drive
  *                  functions.

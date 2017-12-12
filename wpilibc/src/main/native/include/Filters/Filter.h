@@ -18,12 +18,13 @@ namespace frc {
  */
 class Filter : public PIDSource {
  public:
+  explicit Filter(PIDSource& source);
   explicit Filter(std::shared_ptr<PIDSource> source);
   virtual ~Filter() = default;
 
   // PIDSource interface
   void SetPIDSourceType(PIDSourceType pidSource) override;
-  PIDSourceType GetPIDSourceType() const;
+  PIDSourceType GetPIDSourceType() const override;
   double PIDGet() override = 0;
 
   /**

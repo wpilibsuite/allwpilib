@@ -11,6 +11,8 @@
 #include <limits>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/EncoderData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -76,7 +78,7 @@ class EncoderData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::atomic<int32_t> m_count{0};
@@ -94,5 +96,5 @@ class EncoderData {
   std::atomic<int32_t> m_samplesToAverage{0};
   std::shared_ptr<NotifyListenerVector> m_samplesToAverageCallbacks = nullptr;
 };
-extern EncoderData SimEncoderData[];
+extern EncoderData* SimEncoderData;
 }  // namespace hal

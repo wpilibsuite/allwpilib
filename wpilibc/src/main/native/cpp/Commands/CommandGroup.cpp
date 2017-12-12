@@ -12,22 +12,23 @@
 using namespace frc;
 
 /**
- * Creates a new {@link CommandGroup CommandGroup} with the given name.
- * @param name the name for this command group
+ * Creates a new CommandGroup with the given name.
+ *
+ * @param name The name for this command group
  */
-CommandGroup::CommandGroup(const std::string& name) : Command(name) {}
+CommandGroup::CommandGroup(const llvm::Twine& name) : Command(name) {}
 
 /**
- * Adds a new {@link Command Command} to the group.  The {@link Command Command}
- * will be started after all the previously added {@link Command Commands}.
+ * Adds a new Command to the group. The Command will be started after all the
+ * previously added Commands.
  *
- * <p>Note that any requirements the given {@link Command Command} has will be
- * added to the group.  For this reason, a {@link Command Command's}
- * requirements can not be changed after being added to a group.</p>
+ * Note that any requirements the given Command has will be added to the group.
+ * For this reason, a Command's requirements can not be changed after being
+ * added to a group.
  *
- * <p>It is recommended that this method be called in the constructor.</p>
+ * It is recommended that this method be called in the constructor.
  *
- * @param command The {@link Command Command} to be added
+ * @param command The Command to be added
  */
 void CommandGroup::AddSequential(Command* command) {
   if (command == nullptr) {
@@ -48,21 +49,20 @@ void CommandGroup::AddSequential(Command* command) {
 }
 
 /**
- * Adds a new {@link Command Command} to the group with a given timeout.
- * The {@link Command Command} will be started after all the previously added
- * commands.
+ * Adds a new Command to the group with a given timeout. The Command will be
+ * started after all the previously added commands.
  *
- * <p>Once the {@link Command Command} is started, it will be run until it
- * finishes or the time expires, whichever is sooner.  Note that the given
- * {@link Command Command} will have no knowledge that it is on a timer.</p>
+ * Once the Command is started, it will be run until it finishes or the time
+ * expires, whichever is sooner.  Note that the given Command will have no
+ * knowledge that it is on a timer.
  *
- * <p>Note that any requirements the given {@link Command Command} has will be
- * added to the group.  For this reason, a {@link Command Command's}
- * requirements can not be changed after being added to a group.</p>
+ * Note that any requirements the given Command has will be added to the group.
+ * For this reason, a Command's requirements can not be changed after being
+ * added to a group.
  *
- * <p>It is recommended that this method be called in the constructor.</p>
+ * It is recommended that this method be called in the constructor.
  *
- * @param command The {@link Command Command} to be added
+ * @param command The Command to be added
  * @param timeout The timeout (in seconds)
  */
 void CommandGroup::AddSequential(Command* command, double timeout) {
@@ -88,21 +88,20 @@ void CommandGroup::AddSequential(Command* command, double timeout) {
 }
 
 /**
- * Adds a new child {@link Command} to the group.  The {@link Command} will be
- * started after all the previously added {@link Command Commands}.
+ * Adds a new child Command to the group. The Command will be started after all
+ * the previously added Commands.
  *
- * <p>Instead of waiting for the child to finish, a {@link CommandGroup} will
- * have it run at the same time as the subsequent {@link Command Commands}.
- * The child will run until either it finishes, a new child with conflicting
- * requirements is started, or the main sequence runs a {@link Command} with
- * conflicting requirements.  In the latter two cases, the child will be
- * canceled even if it says it can't be interrupted.</p>
+ * Instead of waiting for the child to finish, a CommandGroup will have it run
+ * at the same time as the subsequent Commands. The child will run until either
+ * it finishes, a new child with conflicting requirements is started, or the
+ * main sequence runs a Command with conflicting requirements. In the latter two
+ * cases, the child will be canceled even if it says it can't be interrupted.
  *
- * <p>Note that any requirements the given {@link Command Command} has will be
- * added to the group.  For this reason, a {@link Command Command's}
- * requirements can not be changed after being added to a group.</p>
+ * Note that any requirements the given Command has will be added to the group.
+ * For this reason, a Command's requirements can not be changed after being
+ * added to a group.
  *
- * <p>It is recommended that this method be called in the constructor.</p>
+ * It is recommended that this method be called in the constructor.
  *
  * @param command The command to be added
  */
@@ -125,27 +124,25 @@ void CommandGroup::AddParallel(Command* command) {
 }
 
 /**
- * Adds a new child {@link Command} to the group with the given timeout.  The
- * {@link Command} will be started after all the previously added
- * {@link Command Commands}.
+ * Adds a new child Command to the group with the given timeout. The Command
+ * will be started after all the previously added Commands.
  *
- * <p>Once the {@link Command Command} is started, it will run until it
- * finishes, is interrupted, or the time expires, whichever is sooner.  Note
- * that the given {@link Command Command} will have no knowledge that it is on
- * a timer.</p>
+ * Once the Command is started, it will run until it finishes, is interrupted,
+ * or the time expires, whichever is sooner. Note that the given Command will
+ * have no knowledge that it is on a timer.
  *
- * <p>Instead of waiting for the child to finish, a {@link CommandGroup} will
- * have it run at the same time as the subsequent {@link Command Commands}.
- * The child will run until either it finishes, the timeout expires, a new
- * child with conflicting requirements is started, or the main sequence runs a
- * {@link Command} with conflicting requirements.  In the latter two cases, the
- * child will be canceled even if it says it can't be interrupted.</p>
+ * Instead of waiting for the child to finish, a CommandGroup will have it run
+ * at the same time as the subsequent Commands. The child will run until either
+ * it finishes, the timeout expires, a new child with conflicting requirements
+ * is started, or the main sequence runs a Command with conflicting
+ * requirements. In the latter two cases, the child will be canceled even if it
+ * says it can't be interrupted.
  *
- * <p>Note that any requirements the given {@link Command Command} has will be
- * added to the group.  For this reason, a {@link Command Command's}
- * requirements can not be changed after being added to a group.</p>
+ * Note that any requirements the given Command has will be added to the group.
+ * For this reason, a Command's requirements can not be changed after being
+ * added to a group.
  *
- * <p>It is recommended that this method be called in the constructor.</p>
+ * It is recommended that this method be called in the constructor.
  *
  * @param command The command to be added
  * @param timeout The timeout (in seconds)

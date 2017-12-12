@@ -8,7 +8,8 @@
 #include "AnalogInternal.h"
 
 #include <atomic>
-#include <mutex>
+
+#include <support/mutex.h>
 
 #include "HAL/AnalogInput.h"
 #include "HAL/ChipObject.h"
@@ -16,12 +17,12 @@
 
 namespace hal {
 
-std::mutex analogRegisterWindowMutex;
+wpi::mutex analogRegisterWindowMutex;
 std::unique_ptr<tAI> analogInputSystem;
 std::unique_ptr<tAO> analogOutputSystem;
 
-IndexedHandleResource<HAL_AnalogInputHandle, hal::AnalogPort, kNumAnalogInputs,
-                      HAL_HandleEnum::AnalogInput>
+IndexedHandleResource<HAL_AnalogInputHandle, ::hal::AnalogPort,
+                      kNumAnalogInputs, HAL_HandleEnum::AnalogInput>*
     analogInputHandles;
 
 static int32_t analogNumChannelsToActivate = 0;
@@ -30,12 +31,21 @@ static std::atomic<bool> analogSystemInitialized{false};
 
 bool analogSampleRateSet = false;
 
+namespace init {
+void InitializeAnalogInternal() {
+  static IndexedHandleResource<HAL_AnalogInputHandle, ::hal::AnalogPort,
+                               kNumAnalogInputs, HAL_HandleEnum::AnalogInput>
+      alH;
+  analogInputHandles = &alH;
+}
+}  // namespace init
+
 /**
  * Initialize the analog System.
  */
 void initializeAnalog(int32_t* status) {
   if (analogSystemInitialized) return;
-  std::lock_guard<std::mutex> sync(analogRegisterWindowMutex);
+  std::lock_guard<wpi::mutex> lock(analogRegisterWindowMutex);
   if (analogSystemInitialized) return;
   analogInputSystem.reset(tAI::create(status));
   analogOutputSystem.reset(tAO::create(status));

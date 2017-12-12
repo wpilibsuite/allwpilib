@@ -9,16 +9,17 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.2.12'
+        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.5.1'
     }
 }
 
 plugins {
     id 'net.ltgt.errorprone' version '0.0.10'
     id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.0'
+    id 'idea'
 }
 
-ext.licenseFile = file("$rootDir/license.txt")
+ext.licenseFile = file("$rootDir/LICENSE.txt")
 
 ext.getJNIHeadersClass = {
     return JNIHeaders
@@ -173,6 +174,10 @@ subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'checkstyle'
+
+    repositories {
+        mavenCentral()
+    }
 
     checkstyle {
         toolVersion = "8.1"

@@ -23,11 +23,21 @@ struct Relay {
 }  // namespace
 
 static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
-                             HAL_HandleEnum::Relay>
-    relayHandles;
+                             HAL_HandleEnum::Relay>* relayHandles;
 
 // Create a mutex to protect changes to the relay values
-static std::mutex digitalRelayMutex;
+static wpi::mutex digitalRelayMutex;
+
+namespace hal {
+namespace init {
+void InitializeRelay() {
+  static IndexedHandleResource<HAL_RelayHandle, Relay, kNumRelayChannels,
+                               HAL_HandleEnum::Relay>
+      rH;
+  relayHandles = &rH;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -45,12 +55,12 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 
   if (!fwd) channel += kNumRelayHeaders;  // add 4 to reverse channels
 
-  auto handle = relayHandles.Allocate(channel, status);
+  auto handle = relayHandles->Allocate(channel, status);
 
   if (*status != 0)
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
-  auto port = relayHandles.Get(handle);
+  auto port = relayHandles->Get(handle);
   if (port == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -71,7 +81,7 @@ HAL_RelayHandle HAL_InitializeRelayPort(HAL_PortHandle portHandle, HAL_Bool fwd,
 
 void HAL_FreeRelayPort(HAL_RelayHandle relayPortHandle) {
   // no status, so no need to check for a proper free.
-  relayHandles.Free(relayPortHandle);
+  relayHandles->Free(relayPortHandle);
 }
 
 HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
@@ -87,12 +97,12 @@ HAL_Bool HAL_CheckRelayChannel(int32_t channel) {
  */
 void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
                   int32_t* status) {
-  auto port = relayHandles.Get(relayPortHandle);
+  auto port = relayHandles->Get(relayPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  std::lock_guard<std::mutex> sync(digitalRelayMutex);
+  std::lock_guard<wpi::mutex> lock(digitalRelayMutex);
   uint8_t relays = 0;
   if (port->fwd) {
     relays = relaySystem->readValue_Forward(status);
@@ -119,7 +129,7 @@ void HAL_SetRelay(HAL_RelayHandle relayPortHandle, HAL_Bool on,
  * Get the current state of the relay channel
  */
 HAL_Bool HAL_GetRelay(HAL_RelayHandle relayPortHandle, int32_t* status) {
-  auto port = relayHandles.Get(relayPortHandle);
+  auto port = relayHandles->Get(relayPortHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;

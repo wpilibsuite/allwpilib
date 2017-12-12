@@ -14,11 +14,13 @@
 #include "LiveWindow/LiveWindow.h"
 #include "Timer.h"
 #include "gtest/gtest.h"
+#include "mockds/MockDS.h"
 
 using namespace frc;
 
 class TestEnvironment : public testing::Environment {
   bool m_alreadySetUp = false;
+  MockDS m_mockDS;
 
  public:
   void SetUp() override {
@@ -32,6 +34,8 @@ class TestEnvironment : public testing::Environment {
       std::exit(-1);
     }
 
+    m_mockDS.start();
+
     /* This sets up the network communications library to enable the driver
             station. After starting network coms, it will loop until the driver
             station returns that the robot is enabled, to ensure that tests
@@ -39,14 +43,24 @@ class TestEnvironment : public testing::Environment {
     HAL_ObserveUserProgramStarting();
     LiveWindow::GetInstance()->SetEnabled(false);
 
-    llvm::outs() << "Waiting for enable\n";
+    llvm::outs() << "Started coms\n";
 
+    int enableCounter = 0;
     while (!DriverStation::GetInstance().IsEnabled()) {
+      if (enableCounter > 50) {
+        // Robot did not enable properly after 5 seconds.
+        // Force exit
+        llvm::errs() << " Failed to enable. Aborting\n";
+        std::terminate();
+      }
+
       Wait(0.1);
+
+      llvm::outs() << "Waiting for enable: " << enableCounter++ << "\n";
     }
   }
 
-  void TearDown() override {}
+  void TearDown() override { m_mockDS.stop(); }
 };
 
 testing::Environment* const environment =

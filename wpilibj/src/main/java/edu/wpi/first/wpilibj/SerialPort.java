@@ -8,7 +8,6 @@
 package edu.wpi.first.wpilibj;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -35,7 +34,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public int value;
 
-    private Port(int value) {
+    Port(int value) {
       this.value = value;
     }
   }
@@ -49,7 +48,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private Parity(int value) {
+    Parity(int value) {
       this.value = value;
     }
   }
@@ -63,7 +62,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private StopBits(int value) {
+    StopBits(int value) {
       this.value = value;
     }
   }
@@ -77,7 +76,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private FlowControl(int value) {
+    FlowControl(int value) {
       this.value = value;
     }
   }
@@ -91,7 +90,7 @@ public class SerialPort {
     @SuppressWarnings("MemberName")
     public final int value;
 
-    private WriteBufferMode(int value) {
+    WriteBufferMode(int value) {
       this.value = value;
     }
   }
@@ -252,10 +251,13 @@ public class SerialPort {
    * @return An array of the read bytes
    */
   public byte[] read(final int count) {
-    ByteBuffer dataReceivedBuffer = ByteBuffer.allocateDirect(count);
+    byte[] dataReceivedBuffer = new byte[count];
     int gotten = SerialPortJNI.serialRead(m_port, dataReceivedBuffer, count);
+    if (gotten == count) {
+      return dataReceivedBuffer;
+    }
     byte[] retVal = new byte[gotten];
-    dataReceivedBuffer.get(retVal);
+    System.arraycopy(dataReceivedBuffer, 0, retVal, 0, gotten);
     return retVal;
   }
 
@@ -267,9 +269,10 @@ public class SerialPort {
    * @return The number of bytes actually written into the port.
    */
   public int write(byte[] buffer, int count) {
-    ByteBuffer dataToSendBuffer = ByteBuffer.allocateDirect(count);
-    dataToSendBuffer.put(buffer, 0, count);
-    return SerialPortJNI.serialWrite(m_port, dataToSendBuffer, count);
+    if (buffer.length < count) {
+      throw new IllegalArgumentException("buffer is too small, must be at least " + count);
+    }
+    return SerialPortJNI.serialWrite(m_port, buffer, count);
   }
 
   /**

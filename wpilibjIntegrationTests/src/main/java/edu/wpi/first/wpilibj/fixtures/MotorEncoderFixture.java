@@ -70,7 +70,7 @@ public abstract class MotorEncoderFixture<T extends SpeedController> implements 
    */
   protected abstract DigitalInput giveDigitalInputB();
 
-  private final void initialize() {
+  private void initialize() {
     synchronized (this) {
       if (!m_initialized) {
         m_initialized = true; // This ensures it is only initialized once

@@ -37,11 +37,6 @@ public class SampleRobot extends RobotBase {
    * Create a new SampleRobot.
    */
   public SampleRobot() {
-    robotInit();
-
-    // Tell the DS that the robot is ready to be enabled
-    HAL.observeUserProgramStarting();
-
     HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Simple);
   }
 
@@ -121,7 +116,13 @@ public class SampleRobot extends RobotBase {
    * for the robot to be enabled again.
    */
   public void startCompetition() {
+    robotInit();
+
+    // Tell the DS that the robot is ready to be enabled
+    HAL.observeUserProgramStarting();
+
     robotMain();
+
     if (!m_robotMainOverridden) {
       while (true) {
         if (isDisabled()) {

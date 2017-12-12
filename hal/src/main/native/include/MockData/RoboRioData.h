@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include "HAL/HAL.h"
 #include "NotifyListener.h"
 
@@ -133,6 +135,12 @@ void HALSIM_CancelRoboRioUserFaults3V3Callback(int32_t index, int32_t uid);
 int32_t HALSIM_GetRoboRioUserFaults3V3(int32_t index);
 void HALSIM_SetRoboRioUserFaults3V3(int32_t index, int32_t userFaults3V3);
 
+void HALSIM_RegisterRoboRioAllCallbacks(int32_t index,
+                                        HAL_NotifyCallback callback,
+                                        void* param, HAL_Bool initialNotify);
+
 #ifdef __cplusplus
-}
+}  // extern "C"
+#endif
+
 #endif

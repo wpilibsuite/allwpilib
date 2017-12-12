@@ -15,7 +15,7 @@ using namespace hal;
 
 namespace hal {
 
-static std::unique_ptr<tPower> power;
+static std::unique_ptr<tPower> power{nullptr};
 
 static void initializePower(int32_t* status) {
   if (power == nullptr) {
@@ -23,6 +23,12 @@ static void initializePower(int32_t* status) {
   }
 }
 
+}  // namespace hal
+
+namespace hal {
+namespace init {
+void InitializePower() {}
+}  // namespace init
 }  // namespace hal
 
 extern "C" {

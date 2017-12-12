@@ -7,18 +7,31 @@
 
 #include "HAL/SPI.h"
 
-void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {}
-int32_t HAL_TransactionSPI(HAL_SPIPort port, uint8_t* dataToSend,
-                           uint8_t* dataReceived, int32_t size) {
-  return 0;
+#include "MockData/SPIDataInternal.h"
+
+using namespace hal;
+
+namespace hal {
+namespace init {
+void InitializeSPI() {}
+}  // namespace init
+}  // namespace hal
+
+void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
+  SimSPIData[port].SetInitialized(true);
 }
-int32_t HAL_WriteSPI(HAL_SPIPort port, uint8_t* dataToSend, int32_t sendSize) {
-  return 0;
+int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
+                           uint8_t* dataReceived, int32_t size) {
+  return SimSPIData[port].Transaction(dataToSend, dataReceived, size);
+}
+int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
+                     int32_t sendSize) {
+  return SimSPIData[port].Write(dataToSend, sendSize);
 }
 int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count) {
-  return 0;
+  return SimSPIData[port].Read(buffer, count);
 }
-void HAL_CloseSPI(HAL_SPIPort port) {}
+void HAL_CloseSPI(HAL_SPIPort port) { SimSPIData[port].SetInitialized(false); }
 void HAL_SetSPISpeed(HAL_SPIPort port, int32_t speed) {}
 void HAL_SetSPIOpts(HAL_SPIPort port, HAL_Bool msbFirst,
                     HAL_Bool sampleOnTrailing, HAL_Bool clkIdleHigh) {}
@@ -33,7 +46,9 @@ void HAL_InitSPIAccumulator(HAL_SPIPort port, int32_t period, int32_t cmd,
                             int32_t dataSize, HAL_Bool isSigned,
                             HAL_Bool bigEndian, int32_t* status) {}
 void HAL_FreeSPIAccumulator(HAL_SPIPort port, int32_t* status) {}
-void HAL_ResetSPIAccumulator(HAL_SPIPort port, int32_t* status) {}
+void HAL_ResetSPIAccumulator(HAL_SPIPort port, int32_t* status) {
+  SimSPIData[port].ResetAccumulator();
+}
 void HAL_SetSPIAccumulatorCenter(HAL_SPIPort port, int32_t center,
                                  int32_t* status) {}
 void HAL_SetSPIAccumulatorDeadband(HAL_SPIPort port, int32_t deadband,
@@ -42,7 +57,7 @@ int32_t HAL_GetSPIAccumulatorLastValue(HAL_SPIPort port, int32_t* status) {
   return 0;
 }
 int64_t HAL_GetSPIAccumulatorValue(HAL_SPIPort port, int32_t* status) {
-  return 0;
+  return SimSPIData[port].GetAccumulatorValue();
 }
 int64_t HAL_GetSPIAccumulatorCount(HAL_SPIPort port, int32_t* status) {
   return 0;

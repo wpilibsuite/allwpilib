@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "../PortsInternal.h"
 #include "MockData/NotifyListenerVector.h"
 #include "MockData/PCMData.h"
@@ -75,7 +77,7 @@ class PCMData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_solenoidInitialized[kNumSolenoidChannels];
   std::shared_ptr<NotifyListenerVector>
       m_solenoidInitializedCallbacks[kNumSolenoidChannels];
@@ -94,5 +96,5 @@ class PCMData {
   std::atomic<double> m_compressorCurrent{0.0};
   std::shared_ptr<NotifyListenerVector> m_compressorCurrentCallbacks = nullptr;
 };
-extern PCMData SimPCMData[];
+extern PCMData* SimPCMData;
 }  // namespace hal

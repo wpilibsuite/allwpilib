@@ -8,7 +8,8 @@
 #pragma once
 
 #include <memory>
-#include <string>
+
+#include <llvm/Twine.h>
 
 #include "Commands/Command.h"
 #include "PIDController.h"
@@ -19,10 +20,10 @@ namespace frc {
 
 class PIDCommand : public Command, public PIDOutput, public PIDSource {
  public:
-  PIDCommand(const std::string& name, double p, double i, double d);
-  PIDCommand(const std::string& name, double p, double i, double d,
+  PIDCommand(const llvm::Twine& name, double p, double i, double d);
+  PIDCommand(const llvm::Twine& name, double p, double i, double d,
              double period);
-  PIDCommand(const std::string& name, double p, double i, double d, double f,
+  PIDCommand(const llvm::Twine& name, double p, double i, double d, double f,
              double period);
   PIDCommand(double p, double i, double d);
   PIDCommand(double p, double i, double d, double period);
@@ -50,12 +51,11 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   virtual void UsePIDOutput(double output) = 0;
 
  private:
-  /** The internal {@link PIDController} */
+  // The internal PIDController
   std::shared_ptr<PIDController> m_controller;
 
  public:
-  void InitTable(std::shared_ptr<nt::NetworkTable> subtable) override;
-  std::string GetSmartDashboardType() const override;
+  void InitSendable(SendableBuilder& builder) override;
 };
 
 }  // namespace frc

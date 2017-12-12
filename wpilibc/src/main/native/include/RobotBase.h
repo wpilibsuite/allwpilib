@@ -33,6 +33,7 @@ class DriverStation;
 
 /**
  * Implement a Robot Program framework.
+ *
  * The RobotBase class is intended to be subclassed by a user creating a robot
  * program. Overridden Autonomous() and OperatorControl() methods are called at
  * the appropriate time as the match proceeds. In the current implementation,
@@ -50,6 +51,16 @@ class RobotBase {
   bool IsNewDataAvailable() const;
   static std::thread::id GetThreadId();
   virtual void StartCompetition() = 0;
+
+  static constexpr bool IsReal() {
+#ifdef __FRC_ROBORIO__
+    return true;
+#else
+    return false;
+#endif
+  }
+
+  static constexpr bool IsSimulation() { return !IsReal(); }
 
  protected:
   RobotBase();

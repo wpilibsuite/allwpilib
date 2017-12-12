@@ -19,27 +19,48 @@ using namespace hal;
 static inline int32_t GetMaxPositivePwm(DigitalPort* port) {
   return port->maxPwm;
 }
+
 static inline int32_t GetMinPositivePwm(DigitalPort* port) {
-  return port->eliminateDeadband ? port->deadbandMaxPwm : port->centerPwm + 1;
+  if (port->eliminateDeadband) {
+    return port->deadbandMaxPwm;
+  } else {
+    return port->centerPwm + 1;
+  }
 }
+
 static inline int32_t GetCenterPwm(DigitalPort* port) {
   return port->centerPwm;
 }
+
 static inline int32_t GetMaxNegativePwm(DigitalPort* port) {
-  return port->eliminateDeadband ? port->deadbandMinPwm : port->centerPwm - 1;
+  if (port->eliminateDeadband) {
+    return port->deadbandMinPwm;
+  } else {
+    return port->centerPwm - 1;
+  }
 }
+
 static inline int32_t GetMinNegativePwm(DigitalPort* port) {
   return port->minPwm;
 }
+
 static inline int32_t GetPositiveScaleFactor(DigitalPort* port) {
   return GetMaxPositivePwm(port) - GetMinPositivePwm(port);
 }  ///< The scale for positive speeds.
+
 static inline int32_t GetNegativeScaleFactor(DigitalPort* port) {
   return GetMaxNegativePwm(port) - GetMinNegativePwm(port);
 }  ///< The scale for negative speeds.
+
 static inline int32_t GetFullRangeScaleFactor(DigitalPort* port) {
   return GetMaxPositivePwm(port) - GetMinNegativePwm(port);
 }  ///< The scale for positions.
+
+namespace hal {
+namespace init {
+void InitializePWM() {}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -64,12 +85,12 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   }
 
   auto handle =
-      digitalChannelHandles.Allocate(channel, HAL_HandleEnum::PWM, status);
+      digitalChannelHandles->Allocate(channel, HAL_HandleEnum::PWM, status);
 
   if (*status != 0)
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
-  auto port = digitalChannelHandles.Get(handle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::PWM);
   if (port == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -86,7 +107,7 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
   return handle;
 }
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -100,7 +121,7 @@ void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
                                                  status);
   }
 
-  digitalChannelHandles.Free(pwmPortHandle, HAL_HandleEnum::PWM);
+  digitalChannelHandles->Free(pwmPortHandle, HAL_HandleEnum::PWM);
 }
 
 HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
@@ -110,7 +131,7 @@ HAL_Bool HAL_CheckPWMChannel(int32_t channel) {
 void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max,
                       double deadbandMax, double center, double deadbandMin,
                       double min, int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -118,7 +139,7 @@ void HAL_SetPWMConfig(HAL_DigitalHandle pwmPortHandle, double max,
 
   // calculate the loop time in milliseconds
   double loopTime =
-      HAL_GetLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
+      HAL_GetPWMLoopTiming(status) / (kSystemClockTicksPerMicrosecond * 1e3);
   if (*status != 0) return;
 
   int32_t maxPwm = static_cast<int32_t>((max - kDefaultPwmCenter) / loopTime +
@@ -144,7 +165,7 @@ void HAL_SetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t maxPwm,
                          int32_t deadbandMaxPwm, int32_t centerPwm,
                          int32_t deadbandMinPwm, int32_t minPwm,
                          int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -161,7 +182,7 @@ void HAL_GetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t* maxPwm,
                          int32_t* deadbandMaxPwm, int32_t* centerPwm,
                          int32_t* deadbandMinPwm, int32_t* minPwm,
                          int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -175,7 +196,7 @@ void HAL_GetPWMConfigRaw(HAL_DigitalHandle pwmPortHandle, int32_t* maxPwm,
 
 void HAL_SetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
                                  HAL_Bool eliminateDeadband, int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -185,7 +206,7 @@ void HAL_SetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
 
 HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
                                      int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return false;
@@ -203,7 +224,7 @@ HAL_Bool HAL_GetPWMEliminateDeadband(HAL_DigitalHandle pwmPortHandle,
  */
 void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
                    int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -227,7 +248,7 @@ void HAL_SetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t value,
  */
 void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
                      int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -282,7 +303,7 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
  */
 void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
                         int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -324,7 +345,7 @@ void HAL_SetPWMDisabled(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
  * @return The raw PWM value.
  */
 int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -344,7 +365,7 @@ int32_t HAL_GetPWMRaw(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
  * @return The scaled PWM value.
  */
 double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -382,7 +403,7 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
  * @return The scaled PWM value.
  */
 double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -407,7 +428,7 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
 }
 
 void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -425,7 +446,7 @@ void HAL_LatchPWMZero(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
  */
 void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
                            int32_t* status) {
-  auto port = digitalChannelHandles.Get(pwmPortHandle, HAL_HandleEnum::PWM);
+  auto port = digitalChannelHandles->Get(pwmPortHandle, HAL_HandleEnum::PWM);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -444,10 +465,31 @@ void HAL_SetPWMPeriodScale(HAL_DigitalHandle pwmPortHandle, int32_t squelchMask,
  *
  * @return The loop time
  */
-int32_t HAL_GetLoopTiming(int32_t* status) {
+int32_t HAL_GetPWMLoopTiming(int32_t* status) {
   initializeDigital(status);
   if (*status != 0) return 0;
   return pwmSystem->readLoopTiming(status);
+}
+
+/**
+ * Get the pwm starting cycle time
+ *
+ * @return The pwm cycle start time.
+ */
+uint64_t HAL_GetPWMCycleStartTime(int32_t* status) {
+  initializeDigital(status);
+  if (*status != 0) return 0;
+
+  uint64_t upper1 = pwmSystem->readCycleStartTimeUpper(status);
+  uint32_t lower = pwmSystem->readCycleStartTime(status);
+  uint64_t upper2 = pwmSystem->readCycleStartTimeUpper(status);
+  if (*status != 0) return 0;
+  if (upper1 != upper2) {
+    // Rolled over between the lower call, reread lower
+    lower = pwmSystem->readCycleStartTime(status);
+    if (*status != 0) return 0;
+  }
+  return (upper2 << 32) + lower;
 }
 
 }  // extern "C"

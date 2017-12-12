@@ -7,8 +7,8 @@
 
 #pragma once
 
-/** @file
- * Contains global utility functions
+/**
+ * @file Contains global utility functions
  */
 
 #include <stdint.h>
@@ -16,6 +16,8 @@
 #include <string>
 
 #include <llvm/StringRef.h>
+#include <llvm/Twine.h>
+#include <support/deprecated.h>
 
 #define wpi_assert(condition) \
   wpi_assert_impl(condition, #condition, "", __FILE__, __LINE__, __FUNCTION__)
@@ -34,26 +36,32 @@
   wpi_assertNotEqual_impl(a, b, #a, #b, message, __FILE__, __LINE__, \
                           __FUNCTION__)
 
-bool wpi_assert_impl(bool conditionValue, llvm::StringRef conditionText,
-                     llvm::StringRef message, llvm::StringRef fileName,
+bool wpi_assert_impl(bool conditionValue, const llvm::Twine& conditionText,
+                     const llvm::Twine& message, llvm::StringRef fileName,
                      int lineNumber, llvm::StringRef funcName);
-bool wpi_assertEqual_impl(int valueA, int valueB, llvm::StringRef valueAString,
-                          llvm::StringRef valueBString, llvm::StringRef message,
-                          llvm::StringRef fileName, int lineNumber,
-                          llvm::StringRef funcName);
+bool wpi_assertEqual_impl(int valueA, int valueB,
+                          const llvm::Twine& valueAString,
+                          const llvm::Twine& valueBString,
+                          const llvm::Twine& message, llvm::StringRef fileName,
+                          int lineNumber, llvm::StringRef funcName);
 bool wpi_assertNotEqual_impl(int valueA, int valueB,
-                             llvm::StringRef valueAString,
-                             llvm::StringRef valueBString,
-                             llvm::StringRef message, llvm::StringRef fileName,
-                             int lineNumber, llvm::StringRef funcName);
+                             const llvm::Twine& valueAString,
+                             const llvm::Twine& valueBString,
+                             const llvm::Twine& message,
+                             llvm::StringRef fileName, int lineNumber,
+                             llvm::StringRef funcName);
 
 void wpi_suspendOnAssertEnabled(bool enabled);
 
 namespace frc {
 
+WPI_DEPRECATED("Use RobotController static class method")
 int GetFPGAVersion();
+WPI_DEPRECATED("Use RobotController static class method")
 int64_t GetFPGARevision();
+WPI_DEPRECATED("Use RobotController static class method")
 uint64_t GetFPGATime();
+WPI_DEPRECATED("Use RobotController static class method")
 bool GetUserButton();
 std::string GetStackTrace(int offset);
 

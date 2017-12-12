@@ -9,6 +9,8 @@
 
 #include "Commands/Command.h"
 #include "Commands/Scheduler.h"
+#include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -18,10 +20,11 @@ using namespace frc;
  *
  * @param name the name of the subsystem
  */
-Subsystem::Subsystem(const std::string& name) {
-  m_name = name;
+Subsystem::Subsystem(const llvm::Twine& name) {
+  SetName(name, name);
   Scheduler::GetInstance()->RegisterSubsystem(this);
 }
+
 /**
  * Initialize the default command for this subsystem.
  *
@@ -38,8 +41,8 @@ void Subsystem::InitDefaultCommand() {}
  * Sets the default command.  If this is not called or is called with null,
  * then there will be no default command for the subsystem.
  *
- * <p><b>WARNING:</b> This should <b>NOT</b> be called in a constructor if the
- * subsystem is a singleton.</p>
+ * <b>WARNING:</b> This should <b>NOT</b> be called in a constructor if the
+ * subsystem is a singleton.
  *
  * @param command the default command (or null if there should be none)
  */
@@ -64,14 +67,6 @@ void Subsystem::SetDefaultCommand(Command* command) {
 
     m_defaultCommand = command;
   }
-  if (m_hasDefaultEntry && m_defaultEntry) {
-    if (m_defaultCommand != nullptr) {
-      m_hasDefaultEntry.SetBoolean(true);
-      m_defaultEntry.SetString(m_defaultCommand->GetName());
-    } else {
-      m_hasDefaultEntry.SetBoolean(false);
-    }
-  }
 }
 
 /**
@@ -85,6 +80,20 @@ Command* Subsystem::GetDefaultCommand() {
     InitDefaultCommand();
   }
   return m_defaultCommand;
+}
+
+/**
+ * Returns the default command name, or empty string is there is none.
+ *
+ * @return the default command name
+ */
+llvm::StringRef Subsystem::GetDefaultCommandName() {
+  Command* defaultCommand = GetDefaultCommand();
+  if (defaultCommand) {
+    return defaultCommand->GetName();
+  } else {
+    return llvm::StringRef();
+  }
 }
 
 /**
@@ -105,6 +114,20 @@ void Subsystem::SetCurrentCommand(Command* command) {
 Command* Subsystem::GetCurrentCommand() const { return m_currentCommand; }
 
 /**
+ * Returns the current command name, or empty string if no current command.
+ *
+ * @return the current command name
+ */
+llvm::StringRef Subsystem::GetCurrentCommandName() const {
+  Command* currentCommand = GetCurrentCommand();
+  if (currentCommand) {
+    return currentCommand->GetName();
+  } else {
+    return llvm::StringRef();
+  }
+}
+
+/**
  * When the run method of the scheduler is called this method will be called.
  */
 void Subsystem::Periodic() {}
@@ -113,46 +136,83 @@ void Subsystem::Periodic() {}
  * Call this to alert Subsystem that the current command is actually the
  * command.
  *
- * Sometimes, the {@link Subsystem} is told that it has no command while the
- * {@link Scheduler} is going through the loop, only to be soon after given a
- * new one.  This will avoid that situation.
+ * Sometimes, the Subsystem is told that it has no command while the Scheduler
+ * is going through the loop, only to be soon after given a new one. This will
+ * avoid that situation.
  */
 void Subsystem::ConfirmCommand() {
-  if (m_currentCommandChanged) {
-    if (m_hasCommandEntry && m_commandEntry) {
-      if (m_currentCommand != nullptr) {
-        m_hasCommandEntry.SetBoolean(true);
-        m_commandEntry.SetString(m_currentCommand->GetName());
-      } else {
-        m_hasCommandEntry.SetBoolean(false);
-      }
-    }
-    m_currentCommandChanged = false;
-  }
+  if (m_currentCommandChanged) m_currentCommandChanged = false;
 }
 
-std::string Subsystem::GetName() const { return m_name; }
+/**
+ * Associate a Sendable with this Subsystem.
+ * Also update the child's name.
+ *
+ * @param name name to give child
+ * @param child sendable
+ */
+void Subsystem::AddChild(const llvm::Twine& name,
+                         std::shared_ptr<Sendable> child) {
+  AddChild(name, *child);
+}
 
-std::string Subsystem::GetSmartDashboardType() const { return "Subsystem"; }
+/**
+ * Associate a Sendable with this Subsystem.
+ * Also update the child's name.
+ *
+ * @param name name to give child
+ * @param child sendable
+ */
+void Subsystem::AddChild(const llvm::Twine& name, Sendable* child) {
+  AddChild(name, *child);
+}
 
-void Subsystem::InitTable(std::shared_ptr<nt::NetworkTable> subtable) {
-  if (subtable != nullptr) {
-    m_hasDefaultEntry = subtable->GetEntry("hasDefault");
-    m_defaultEntry = subtable->GetEntry("default");
-    m_hasCommandEntry = subtable->GetEntry("hasCommand");
-    m_commandEntry = subtable->GetEntry("command");
+/**
+ * Associate a Sendable with this Subsystem.
+ * Also update the child's name.
+ *
+ * @param name name to give child
+ * @param child sendable
+ */
+void Subsystem::AddChild(const llvm::Twine& name, Sendable& child) {
+  child.SetName(GetSubsystem(), name);
+  LiveWindow::GetInstance()->Add(&child);
+}
 
-    if (m_defaultCommand != nullptr) {
-      m_hasDefaultEntry.SetBoolean(true);
-      m_defaultEntry.SetString(m_defaultCommand->GetName());
-    } else {
-      m_hasDefaultEntry.SetBoolean(false);
-    }
-    if (m_currentCommand != nullptr) {
-      m_hasCommandEntry.SetBoolean(true);
-      m_commandEntry.SetString(m_currentCommand->GetName());
-    } else {
-      m_hasCommandEntry.SetBoolean(false);
-    }
-  }
+/**
+ * Associate a {@link Sendable} with this Subsystem.
+ *
+ * @param child sendable
+ */
+void Subsystem::AddChild(std::shared_ptr<Sendable> child) { AddChild(*child); }
+
+/**
+ * Associate a {@link Sendable} with this Subsystem.
+ *
+ * @param child sendable
+ */
+void Subsystem::AddChild(Sendable* child) { AddChild(*child); }
+
+/**
+ * Associate a {@link Sendable} with this Subsystem.
+ *
+ * @param child sendable
+ */
+void Subsystem::AddChild(Sendable& child) {
+  child.SetSubsystem(GetSubsystem());
+  LiveWindow::GetInstance()->Add(&child);
+}
+
+void Subsystem::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Subsystem");
+
+  builder.AddBooleanProperty(
+      "hasDefault", [=]() { return m_defaultCommand != nullptr; }, nullptr);
+  builder.AddStringProperty("default",
+                            [=]() { return GetDefaultCommandName(); }, nullptr);
+
+  builder.AddBooleanProperty(
+      "hasCommand", [=]() { return m_currentCommand != nullptr; }, nullptr);
+  builder.AddStringProperty("command",
+                            [=]() { return GetCurrentCommandName(); }, nullptr);
 }

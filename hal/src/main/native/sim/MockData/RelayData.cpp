@@ -6,12 +6,21 @@
 /*----------------------------------------------------------------------------*/
 
 #include "../PortsInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 #include "RelayDataInternal.h"
 
 using namespace hal;
 
-RelayData hal::SimRelayData[kNumRelayHeaders];
+namespace hal {
+namespace init {
+void InitializeRelayData() {
+  static RelayData srd[kNumRelayHeaders];
+  ::hal::SimRelayData = srd;
+}
+}  // namespace init
+}  // namespace hal
+
+RelayData* hal::SimRelayData;
 void RelayData::ResetData() {
   m_initializedForward = false;
   m_initializedForwardCallbacks = nullptr;
@@ -29,7 +38,7 @@ int32_t RelayData::RegisterInitializedForwardCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedForwardCallbacks =
         RegisterCallback(m_initializedForwardCallbacks, "InitializedForward",
                          callback, param, &newUid);
@@ -66,7 +75,7 @@ int32_t RelayData::RegisterInitializedReverseCallback(
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedReverseCallbacks =
         RegisterCallback(m_initializedReverseCallbacks, "InitializedReverse",
                          callback, param, &newUid);
@@ -104,7 +113,7 @@ int32_t RelayData::RegisterForwardCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_forwardCallbacks = RegisterCallback(m_forwardCallbacks, "Forward",
                                           callback, param, &newUid);
   }
@@ -140,7 +149,7 @@ int32_t RelayData::RegisterReverseCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_reverseCallbacks = RegisterCallback(m_reverseCallbacks, "Reverse",
                                           callback, param, &newUid);
   }
@@ -251,4 +260,15 @@ HAL_Bool HALSIM_GetRelayReverse(int32_t index) {
 void HALSIM_SetRelayReverse(int32_t index, HAL_Bool reverse) {
   SimRelayData[index].SetReverse(reverse);
 }
+
+void HALSIM_RegisterRelayAllCallcbaks(int32_t index,
+                                      HAL_NotifyCallback callback, void* param,
+                                      HAL_Bool initialNotify) {
+  SimRelayData[index].RegisterInitializedForwardCallback(callback, param,
+                                                         initialNotify);
+  SimRelayData[index].RegisterInitializedReverseCallback(callback, param,
+                                                         initialNotify);
+  SimRelayData[index].RegisterForwardCallback(callback, param, initialNotify);
+  SimRelayData[index].RegisterReverseCallback(callback, param, initialNotify);
 }
+}  // extern "C"

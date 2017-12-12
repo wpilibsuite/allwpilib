@@ -8,6 +8,7 @@
 package edu.wpi.first.wpilibj.drive;
 
 import edu.wpi.first.wpilibj.SpeedController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 // import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 // import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 // import edu.wpi.first.wpilibj.hal.HAL;
@@ -28,8 +29,21 @@ import edu.wpi.first.wpilibj.SpeedController;
  * <p>Each drive() function provides different inverse kinematic relations for a Killough drive. The
  * default wheel vectors are parallel to their respective opposite sides, but can be overridden. See
  * the constructor for more information.
+ *
+ * <p>This library uses the NED axes convention (North-East-Down as external reference in the world
+ * frame): http://www.nuclearprojects.com/ins/images/axis_big.png.
+ *
+ * <p>The positive X axis points ahead, the positive Y axis points right, and the positive Z axis
+ * points down. Rotations follow the right-hand rule, so clockwise rotation around the Z axis is
+ * positive.
  */
 public class KilloughDrive extends RobotDriveBase {
+  public static final double kDefaultLeftMotorAngle = 60.0;
+  public static final double kDefaultRightMotorAngle = 120.0;
+  public static final double kDefaultBackMotorAngle = 270.0;
+
+  private static int instances = 0;
+
   private SpeedController m_leftMotor;
   private SpeedController m_rightMotor;
   private SpeedController m_backMotor;
@@ -43,8 +57,8 @@ public class KilloughDrive extends RobotDriveBase {
   /**
    * Construct a Killough drive with the given motors and default motor angles.
    *
-   * <p>The default motor angles are 120, 60, and 270 degrees for the left, right, and back motors
-   * respectively, which make the wheels on each corner parallel to their respective opposite sides.
+   * <p>The default motor angles make the wheels on each corner parallel to their respective
+   * opposite sides.
    *
    * <p>If a motor needs to be inverted, do so before passing it in.
    *
@@ -54,13 +68,14 @@ public class KilloughDrive extends RobotDriveBase {
    */
   public KilloughDrive(SpeedController leftMotor, SpeedController rightMotor,
                        SpeedController backMotor) {
-    this(leftMotor, rightMotor, backMotor, 120.0, 60.0, 270.0);
+    this(leftMotor, rightMotor, backMotor, kDefaultLeftMotorAngle, kDefaultRightMotorAngle,
+        kDefaultBackMotorAngle);
   }
 
   /**
    * Construct a Killough drive with the given motors.
    *
-   * <p>Angles are measured in counter-clockwise degrees where zero degrees is straight ahead.
+   * <p>Angles are measured in degrees clockwise from the positive X axis.
    *
    * @param leftMotor       The motor on the left corner.
    * @param rightMotor      The motor on the right corner.
@@ -81,58 +96,65 @@ public class KilloughDrive extends RobotDriveBase {
                               Math.sin(rightMotorAngle * (Math.PI / 180.0)));
     m_backVec = new Vector2d(Math.cos(backMotorAngle * (Math.PI / 180.0)),
                              Math.sin(backMotorAngle * (Math.PI / 180.0)));
+    addChild(m_leftMotor);
+    addChild(m_rightMotor);
+    addChild(m_backMotor);
+    instances++;
+    setName("KilloughDrive", instances);
   }
 
   /**
    * Drive method for Killough platform.
    *
-   * @param x         The speed that the robot should drive in the X direction.
-   *                  [-1.0..1.0]
-   * @param y         The speed that the robot should drive in the Y direction.
-   *                  [-1.0..1.0]
-   * @param rotation  The rate of rotation for the robot that is completely independent of the
-   *                  translation. [-1.0..1.0]
+   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
+   * from its angle or rotation rate.
+   *
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *                  positive.
    */
   @SuppressWarnings("ParameterName")
-  public void driveCartesian(double x, double y, double rotation) {
-    driveCartesian(x, y, rotation, 0.0);
+  public void driveCartesian(double ySpeed, double xSpeed, double zRotation) {
+    driveCartesian(ySpeed, xSpeed, zRotation, 0.0);
   }
 
   /**
    * Drive method for Killough platform.
    *
-   * @param x         The speed that the robot should drive in the X direction.
-   *                  [-1.0..1.0]
-   * @param y         The speed that the robot should drive in the Y direction.
-   *                  [-1.0..1.0]
-   * @param rotation  The rate of rotation for the robot that is completely independent of the
-   *                  translation. [-1.0..1.0]
-   * @param gyroAngle The current angle reading from the gyro.  Use this to implement
-   *                  field-oriented controls.
+   * <p>Angles are measured clockwise from the positive X axis. The robot's speed is independent
+   * from its angle or rotation rate.
+   *
+   * @param ySpeed    The robot's speed along the Y axis [-1.0..1.0]. Right is positive.
+   * @param xSpeed    The robot's speed along the X axis [-1.0..1.0]. Forward is positive.
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *                  positive.
+   * @param gyroAngle The current angle reading from the gyro in degrees around the Z axis. Use
+   *                  this to implement field-oriented controls.
    */
   @SuppressWarnings("ParameterName")
-  public void driveCartesian(double x, double y, double rotation,
-                       double gyroAngle) {
+  public void driveCartesian(double ySpeed, double xSpeed, double zRotation,
+                             double gyroAngle) {
     if (!m_reported) {
       // HAL.report(tResourceType.kResourceType_RobotDrive, 3,
       //            tInstances.kRobotDrive_KilloughCartesian);
       m_reported = true;
     }
 
-    x = limit(x);
-    x = applyDeadband(x, m_deadband);
+    ySpeed = limit(ySpeed);
+    ySpeed = applyDeadband(ySpeed, m_deadband);
 
-    y = limit(y);
-    y = applyDeadband(y, m_deadband);
+    xSpeed = limit(xSpeed);
+    xSpeed = applyDeadband(xSpeed, m_deadband);
 
     // Compensate for gyro angle.
-    Vector2d input = new Vector2d(x, y);
-    input.rotate(gyroAngle);
+    Vector2d input = new Vector2d(ySpeed, xSpeed);
+    input.rotate(-gyroAngle);
 
     double[] wheelSpeeds = new double[3];
-    wheelSpeeds[MotorType.kLeft.value] = input.scalarProject(m_leftVec) + rotation;
-    wheelSpeeds[MotorType.kRight.value] = input.scalarProject(m_rightVec) + rotation;
-    wheelSpeeds[MotorType.kBack.value] = input.scalarProject(m_backVec) + rotation;
+    wheelSpeeds[MotorType.kLeft.value] = input.scalarProject(m_leftVec) + zRotation;
+    wheelSpeeds[MotorType.kRight.value] = input.scalarProject(m_rightVec) + zRotation;
+    wheelSpeeds[MotorType.kBack.value] = input.scalarProject(m_backVec) + zRotation;
 
     normalize(wheelSpeeds);
 
@@ -146,24 +168,24 @@ public class KilloughDrive extends RobotDriveBase {
   /**
    * Drive method for Killough platform.
    *
-   * @param magnitude The speed that the robot should drive in a given direction. [-1.0..1.0]
-   * @param angle     The direction the robot should drive in degrees. 0.0 is straight ahead. The
-   *                  direction and maginitude are independent of the rotation rate.
-   * @param rotation  The rate of rotation for the robot that is completely independent of the
-   *                  magnitude or direction. [-1.0..1.0]
+   * <p>Angles are measured counter-clockwise from straight ahead. The speed at which the robot
+   * drives (translation) is independent from its angle or rotation rate.
+   *
+   * @param magnitude The robot's speed at a given angle [-1.0..1.0]. Forward is positive.
+   * @param angle     The angle around the Z axis at which the robot drives in degrees [-180..180].
+   * @param zRotation The robot's rotation rate around the Z axis [-1.0..1.0]. Clockwise is
+   *                  positive.
    */
-  public void drivePolar(double magnitude, double angle, double rotation) {
+  @SuppressWarnings("ParameterName")
+  public void drivePolar(double magnitude, double angle, double zRotation) {
     if (!m_reported) {
       // HAL.report(tResourceType.kResourceType_RobotDrive, 3,
       //            tInstances.kRobotDrive_KilloughPolar);
       m_reported = true;
     }
 
-    // Normalized for full power along the Cartesian axes.
-    magnitude = limit(magnitude) * Math.sqrt(2.0);
-
-    driveCartesian(magnitude * Math.cos(angle * (Math.PI / 180.0)),
-                    magnitude * Math.sin(angle * (Math.PI / 180.0)), rotation, 0.0);
+    driveCartesian(magnitude * Math.sin(angle * (Math.PI / 180.0)),
+                   magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
   }
 
   @Override
@@ -177,5 +199,13 @@ public class KilloughDrive extends RobotDriveBase {
   @Override
   public String getDescription() {
     return "KilloughDrive";
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("KilloughDrive");
+    builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
+    builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
+    builder.addDoubleProperty("Back Motor Speed", m_backMotor::get, m_backMotor::set);
   }
 }

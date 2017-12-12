@@ -10,20 +10,18 @@ package edu.wpi.first.wpilibj;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tInstances;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.livewindow.LiveWindowSendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * ADXL345 I2C Accelerometer.
  */
 @SuppressWarnings({"TypeName", "PMD.UnusedPrivateField"})
-public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindowSendable {
+public class ADXL345_I2C extends SensorBase implements Accelerometer, Sendable {
 
   private static final byte kAddress = 0x1D;
   private static final byte kPowerCtlRegister = 0x2D;
@@ -52,7 +50,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     @SuppressWarnings("MemberName")
     public final byte value;
 
-    private Axes(byte value) {
+    Axes(byte value) {
       this.value = value;
     }
   }
@@ -93,9 +91,14 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
     setRange(range);
 
     HAL.report(tResourceType.kResourceType_ADXL345, tInstances.kADXL345_I2C);
-    LiveWindow.addSensor("ADXL345_I2C", port.value, this);
+    setName("ADXL345_I2C", port.value);
   }
 
+  @Override
+  public void free() {
+    super.free();
+    m_i2c.free();
+  }
 
   @Override
   public void setRange(Range range) {
@@ -144,7 +147,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
    * @return Acceleration of the ADXL345 in Gs.
    */
   public double getAcceleration(Axes axis) {
-    ByteBuffer rawAccel = ByteBuffer.allocateDirect(2);
+    ByteBuffer rawAccel = ByteBuffer.allocate(2);
     m_i2c.read(kDataRegister + axis.value, 2, rawAccel);
 
     // Sensor is little endian... swap bytes
@@ -159,7 +162,7 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
    */
   public AllAxes getAccelerations() {
     AllAxes data = new AllAxes();
-    ByteBuffer rawData = ByteBuffer.allocateDirect(6);
+    ByteBuffer rawData = ByteBuffer.allocate(6);
     m_i2c.read(kDataRegister, 6, rawData);
 
     // Sensor is little endian... swap bytes
@@ -171,49 +174,16 @@ public class ADXL345_I2C extends SensorBase implements Accelerometer, LiveWindow
   }
 
   @Override
-  public String getSmartDashboardType() {
-    return "3AxisAccelerometer";
-  }
-
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_xEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_yEntry;
-  @SuppressWarnings("MemberName")
-  private NetworkTableEntry m_zEntry;
-
-  @Override
-  public void initTable(NetworkTable subtable) {
-    if (subtable != null) {
-      m_xEntry = subtable.getEntry("X");
-      m_yEntry = subtable.getEntry("Y");
-      m_zEntry = subtable.getEntry("Z");
-      updateTable();
-    } else {
-      m_xEntry = null;
-      m_yEntry = null;
-      m_zEntry = null;
-    }
-  }
-
-  @Override
-  public void updateTable() {
-    if (m_xEntry != null) {
-      m_xEntry.setDouble(getX());
-    }
-    if (m_yEntry != null) {
-      m_yEntry.setDouble(getY());
-    }
-    if (m_zEntry != null) {
-      m_zEntry.setDouble(getZ());
-    }
-  }
-
-  @Override
-  public void startLiveWindowMode() {
-  }
-
-  @Override
-  public void stopLiveWindowMode() {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("3AxisAccelerometer");
+    NetworkTableEntry entryX = builder.getEntry("X");
+    NetworkTableEntry entryY = builder.getEntry("Y");
+    NetworkTableEntry entryZ = builder.getEntry("Z");
+    builder.setUpdateTable(() -> {
+      AllAxes data = getAccelerations();
+      entryX.setDouble(data.XAxis);
+      entryY.setDouble(data.YAxis);
+      entryZ.setDouble(data.ZAxis);
+    });
   }
 }

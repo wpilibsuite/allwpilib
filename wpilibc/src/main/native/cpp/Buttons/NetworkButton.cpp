@@ -7,17 +7,18 @@
 
 #include "Buttons/NetworkButton.h"
 
-#include "networktables/NetworkTable.h"
-#include "networktables/NetworkTableInstance.h"
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableInstance.h>
 
 using namespace frc;
 
-NetworkButton::NetworkButton(llvm::StringRef tableName, llvm::StringRef field)
+NetworkButton::NetworkButton(const llvm::Twine& tableName,
+                             const llvm::Twine& field)
     : NetworkButton(nt::NetworkTableInstance::GetDefault().GetTable(tableName),
                     field) {}
 
 NetworkButton::NetworkButton(std::shared_ptr<nt::NetworkTable> table,
-                             llvm::StringRef field)
+                             const llvm::Twine& field)
     : m_entry(table->GetEntry(field)) {}
 
 bool NetworkButton::Get() {

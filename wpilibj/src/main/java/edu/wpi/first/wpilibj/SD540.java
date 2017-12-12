@@ -9,7 +9,6 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
 /**
  * Mindsensors SD540 Speed Controller.
@@ -35,8 +34,8 @@ public class SD540 extends PWMSpeedController {
     setSpeed(0.0);
     setZeroLatch();
 
-    LiveWindow.addActuator("SD540", getChannel(), this);
     HAL.report(tResourceType.kResourceType_MindsensorsSD540, getChannel());
+    setName("SD540", getChannel());
   }
 
   /**

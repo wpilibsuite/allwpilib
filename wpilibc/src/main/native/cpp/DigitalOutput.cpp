@@ -12,9 +12,9 @@
 #include <HAL/DIO.h>
 #include <HAL/HAL.h>
 #include <HAL/Ports.h>
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
 
+#include "SensorBase.h"
+#include "SmartDashboard/SendableBuilder.h"
 #include "WPIErrors.h"
 
 using namespace frc;
@@ -28,13 +28,10 @@ using namespace frc;
  *                port
  */
 DigitalOutput::DigitalOutput(int channel) {
-  llvm::SmallString<32> str;
-  llvm::raw_svector_ostream buf(str);
-
   m_pwmGenerator = HAL_kInvalidHandle;
-  if (!CheckDigitalChannel(channel)) {
-    buf << "Digital Channel " << channel;
-    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange, buf.str());
+  if (!SensorBase::CheckDigitalChannel(channel)) {
+    wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
+                               "Digital Channel " + llvm::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     return;
   }
@@ -51,13 +48,13 @@ DigitalOutput::DigitalOutput(int channel) {
   }
 
   HAL_Report(HALUsageReporting::kResourceType_DigitalOutput, channel);
+  SetName("DigitalOutput", channel);
 }
 
 /**
  * Free the resources associated with a digital output.
  */
 DigitalOutput::~DigitalOutput() {
-  if (m_valueListener != 0) m_valueEntry.RemoveListener(m_valueListener);
   if (StatusIsFatal()) return;
   // Disable the PWM in case it was running.
   DisablePWM();
@@ -81,10 +78,10 @@ void DigitalOutput::Set(bool value) {
 }
 
 /**
-   * Gets the value being output from the Digital Output.
-   *
-   * @return the state of the digital output.
-   */
+ * Gets the value being output from the Digital Output.
+ *
+ * @return the state of the digital output.
+ */
 bool DigitalOutput::Get() const {
   if (StatusIsFatal()) return false;
 
@@ -190,7 +187,8 @@ void DigitalOutput::DisablePWM() {
   int32_t status = 0;
 
   // Disable the output by routing to a dead bit.
-  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, kDigitalChannels, &status);
+  HAL_SetDigitalPWMOutputChannel(m_pwmGenerator, SensorBase::kDigitalChannels,
+                                 &status);
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 
   HAL_FreeDigitalPWM(m_pwmGenerator, &status);
@@ -215,52 +213,8 @@ void DigitalOutput::UpdateDutyCycle(double dutyCycle) {
   wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
 }
 
-/**
- * @return The HAL Handle to the specified source.
- */
-HAL_Handle DigitalOutput::GetPortHandleForRouting() const { return m_handle; }
-
-/**
- * Is source an AnalogTrigger
- */
-bool DigitalOutput::IsAnalogTrigger() const { return false; }
-
-/**
- * @return The type of analog trigger output to be used. 0 for Digitals
- */
-AnalogTriggerType DigitalOutput::GetAnalogTriggerTypeForRouting() const {
-  return (AnalogTriggerType)0;
-}
-
-void DigitalOutput::UpdateTable() {}
-
-void DigitalOutput::StartLiveWindowMode() {
-  if (m_valueEntry) {
-    m_valueListener = m_valueEntry.AddListener(
-        [=](const nt::EntryNotification& event) {
-          if (!event.value->IsBoolean()) return;
-          Set(event.value->GetBoolean());
-        },
-        NT_NOTIFY_IMMEDIATE | NT_NOTIFY_NEW | NT_NOTIFY_UPDATE);
-  }
-}
-
-void DigitalOutput::StopLiveWindowMode() {
-  if (m_valueListener != 0) {
-    m_valueEntry.RemoveListener(m_valueListener);
-    m_valueListener = 0;
-  }
-}
-
-std::string DigitalOutput::GetSmartDashboardType() const {
-  return "Digital Output";
-}
-
-void DigitalOutput::InitTable(std::shared_ptr<nt::NetworkTable> subTable) {
-  if (subTable) {
-    m_valueEntry = subTable->GetEntry("Value");
-    UpdateTable();
-  } else {
-    m_valueEntry = nt::NetworkTableEntry();
-  }
+void DigitalOutput::InitSendable(SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Digital Output");
+  builder.AddBooleanProperty("Value", [=]() { return Get(); },
+                             [=](bool value) { Set(value); });
 }

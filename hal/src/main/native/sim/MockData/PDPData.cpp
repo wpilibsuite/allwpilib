@@ -6,12 +6,21 @@
 /*----------------------------------------------------------------------------*/
 
 #include "../PortsInternal.h"
-#include "NotifyCallbackHelpers.h"
+#include "MockData/NotifyCallbackHelpers.h"
 #include "PDPDataInternal.h"
 
 using namespace hal;
 
-PDPData hal::SimPDPData[kNumPDPModules];
+namespace hal {
+namespace init {
+void InitializePDPData() {
+  static PDPData spd[kNumPDPModules];
+  ::hal::SimPDPData = spd;
+}
+}  // namespace init
+}  // namespace hal
+
+PDPData* hal::SimPDPData;
 void PDPData::ResetData() {
   m_initialized = false;
   m_initializedCallbacks = nullptr;
@@ -32,7 +41,7 @@ int32_t PDPData::RegisterInitializedCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_initializedCallbacks = RegisterCallback(
         m_initializedCallbacks, "Initialized", callback, param, &newUid);
   }
@@ -68,7 +77,7 @@ int32_t PDPData::RegisterTemperatureCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_temperatureCallbacks = RegisterCallback(
         m_temperatureCallbacks, "Temperature", callback, param, &newUid);
   }
@@ -103,7 +112,7 @@ int32_t PDPData::RegisterVoltageCallback(HAL_NotifyCallback callback,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_voltageCallbacks = RegisterCallback(m_voltageCallbacks, "Voltage",
                                           callback, param, &newUid);
   }
@@ -139,7 +148,7 @@ int32_t PDPData::RegisterCurrentCallback(int32_t channel,
   if (callback == nullptr) return -1;
   int32_t newUid = 0;
   {
-    std::lock_guard<std::mutex> lock(m_registerMutex);
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
     m_currentCallbacks[channel] = RegisterCallback(
         m_currentCallbacks[channel], "Current", callback, param, &newUid);
   }
@@ -250,4 +259,13 @@ double HALSIM_GetPDPCurrent(int32_t index, int32_t channel) {
 void HALSIM_SetPDPCurrent(int32_t index, int32_t channel, double current) {
   SimPDPData[index].SetCurrent(channel, current);
 }
+
+void HALSIM_RegisterPDPAllNonCurrentCallbacks(int32_t index, int32_t channel,
+                                              HAL_NotifyCallback callback,
+                                              void* param,
+                                              HAL_Bool initialNotify) {
+  SimPDPData[index].RegisterInitializedCallback(callback, param, initialNotify);
+  SimPDPData[index].RegisterTemperatureCallback(callback, param, initialNotify);
+  SimPDPData[index].RegisterVoltageCallback(callback, param, initialNotify);
 }
+}  // extern "C"

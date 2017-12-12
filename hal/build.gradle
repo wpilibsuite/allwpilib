@@ -5,17 +5,6 @@ apply plugin: 'edu.wpi.first.NativeUtils'
 
 apply from: '../config.gradle'
 
-ext.addHalCompilerArguments = { binary->
-    if (binary.targetPlatform.architecture.name == 'athena') {
-        tasks.withType(CppCompile) {
-            binary.cppCompiler.args "-DCONFIG_ATHENA"
-        }
-    }
-    tasks.withType(CppCompile) {
-        binary.cppCompiler.args "-DNAMESPACED_PRIORITY"
-    }
-}
-
 ext.addHalToLinker = { binary->
     if (binary.targetPlatform.architecture.name == 'athena') {
         binary.lib project: ':hal', library: 'halAthena', linkage: 'shared'
@@ -108,6 +97,11 @@ model {
                         }
                     }
                 }
+                binaries.all { binary ->
+                    if (binary.targetPlatform.operatingSystem.linux) {
+                        linker.args "-ldl"
+                    }
+                }
             }
             if (project.hasProperty('buildHalStaticDeps')) {
                 halSimStaticDeps(NativeLibrarySpec) {
@@ -167,7 +161,6 @@ model {
     }
     binaries {
         all {
-            project.addHalCompilerArguments(it)
             project(':ni-libraries').addNiLibrariesToLinker(it)
         }
         withType(GoogleTestTestSuiteBinarySpec) {
@@ -194,6 +187,32 @@ model {
                             }
                         }
                     }
+                }
+            }
+        }
+        getHeaders(Task) {
+            def list = []
+            $.components.each {
+                if (it in NativeLibrarySpec && (it.name == 'halAthena' || it.name == 'halSim')) {
+                    it.sources.each {
+                        it.exportedHeaders.srcDirs.each {
+                            list.add(it)
+                        }
+                    }
+                    it.binaries.each {
+                        it.libs.each {
+                            it.includeRoots.each {
+                                list.add(it)
+                            }
+                        }
+                    }
+                }
+            }
+            list = list.unique(false)
+            doLast {
+                list.each {
+                    print "WPIHEADER: "
+                    println it
                 }
             }
         }

@@ -13,8 +13,10 @@
 
 #include "HAL/SPI.h"
 #include "HALUtil.h"
+#include "support/jni_util.h"
 
 using namespace frc;
+using namespace wpi::java;
 
 // set the logging level
 TLogLevel spiJNILogLevel = logWARNING;
@@ -68,6 +70,30 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransaction(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiTransactionB
+ * Signature: (I[B[BB)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiTransactionB(
+    JNIEnv *env, jclass, jint port, jbyteArray dataToSend, jbyteArray dataReceived,
+    jbyte size) {
+  SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiTransactionB";
+  SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
+  SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
+  llvm::SmallVector<uint8_t, 128> recvBuf;
+  recvBuf.resize(size);
+  jint retVal =
+      HAL_TransactionSPI(static_cast<HAL_SPIPort>(port),
+                         reinterpret_cast<const uint8_t *>(
+                             JByteArrayRef(env, dataToSend).array().data()),
+                         recvBuf.data(), size);
+  env->SetByteArrayRegion(dataReceived, 0, size,
+                          reinterpret_cast<const jbyte *>(recvBuf.data()));
+  SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
+  return retVal;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
  * Method:    spiWrite
  * Signature: (ILjava/nio/ByteBuffer;B)I
  */
@@ -88,18 +114,71 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWrite(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiWriteB
+ * Signature: (I[BB)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiWriteB(
+    JNIEnv *env, jclass, jint port, jbyteArray dataToSend, jbyte size) {
+  SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiWriteB";
+  SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
+  SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
+  jint retVal = HAL_WriteSPI(static_cast<HAL_SPIPort>(port),
+                             reinterpret_cast<const uint8_t *>(
+                                 JByteArrayRef(env, dataToSend).array().data()),
+                             size);
+  SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
+  return retVal;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
  * Method:    spiRead
- * Signature: (ILjava/nio/ByteBuffer;B)I
+ * Signature: (IZLjava/nio/ByteBuffer;B)I
  */
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiRead(
-    JNIEnv *env, jclass, jint port, jobject dataReceived, jbyte size) {
+    JNIEnv *env, jclass, jint port, jboolean initiate, jobject dataReceived, jbyte size) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiRead";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
+  SPIJNI_LOG(logDEBUG) << "Initiate = " << (jboolean)initiate;
   uint8_t *dataReceivedPtr =
       (uint8_t *)env->GetDirectBufferAddress(dataReceived);
   SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
   SPIJNI_LOG(logDEBUG) << "DataReceivedPtr = " << dataReceivedPtr;
-  jint retVal = HAL_ReadSPI(static_cast<HAL_SPIPort>(port), (uint8_t *)dataReceivedPtr, size);
+  jint retVal;
+  if (initiate) {
+    llvm::SmallVector<uint8_t, 128> sendBuf;
+    sendBuf.resize(size);
+    retVal = HAL_TransactionSPI(static_cast<HAL_SPIPort>(port), sendBuf.data(), dataReceivedPtr, size);
+  } else {
+    retVal = HAL_ReadSPI(static_cast<HAL_SPIPort>(port), (uint8_t *)dataReceivedPtr, size);
+  }
+  SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
+  return retVal;
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
+ * Method:    spiReadB
+ * Signature: (IZ[BB)I
+ */
+JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiReadB(
+    JNIEnv *env, jclass, jint port, jboolean initiate, jbyteArray dataReceived, jbyte size) {
+  SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiReadB";
+  SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
+  SPIJNI_LOG(logDEBUG) << "Initiate = " << (jboolean)initiate;
+  SPIJNI_LOG(logDEBUG) << "Size = " << (jint)size;
+  jint retVal;
+  llvm::SmallVector<uint8_t, 128> recvBuf;
+  recvBuf.resize(size);
+  if (initiate) {
+    llvm::SmallVector<uint8_t, 128> sendBuf;
+    sendBuf.resize(size);
+    retVal = HAL_TransactionSPI(static_cast<HAL_SPIPort>(port), sendBuf.data(), recvBuf.data(), size);
+  } else {
+    retVal = HAL_ReadSPI(static_cast<HAL_SPIPort>(port), recvBuf.data(), size);
+  }
+  env->SetByteArrayRegion(dataReceived, 0, size,
+                          reinterpret_cast<const jbyte *>(recvBuf.data()));
   SPIJNI_LOG(logDEBUG) << "ReturnValue = " << (jint)retVal;
   return retVal;
 }
@@ -344,29 +423,23 @@ Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorAverage(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SPIJNI
  * Method:    spiGetAccumulatorOutput
- * Signature: (ILjava/nio/LongBuffer;Ljava/nio/LongBuffer;)V
+ * Signature: (ILedu/wpi/first/wpilibj/AccumulatorResult;)V
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_SPIJNI_spiGetAccumulatorOutput(
-    JNIEnv *env, jclass, jint port, jobject value, jobject count) {
+    JNIEnv *env, jclass, jint port, jobject accumulatorResult) {
   SPIJNI_LOG(logDEBUG) << "Calling SPIJNI spiGetAccumulatorOutput";
   SPIJNI_LOG(logDEBUG) << "Port = " << (jint)port;
   int32_t status = 0;
+  int64_t value = 0;
+  int64_t count = 0;
+  HAL_GetSPIAccumulatorOutput(static_cast<HAL_SPIPort>(port), &value, &count, &status);
 
-  jlong *valuePtr = (jlong *)env->GetDirectBufferAddress(value);
-  jlong *countPtr = (jlong *)env->GetDirectBufferAddress(count);
-
-  int64_t valueInt64;
-  int64_t countInt64;
-
-  HAL_GetSPIAccumulatorOutput(static_cast<HAL_SPIPort>(port), &valueInt64, &countInt64, &status);
-
-  *valuePtr = valueInt64;
-  *countPtr = countInt64;
+  SetAccumulatorResultObject(env, accumulatorResult, value, count);
 
   SPIJNI_LOG(logDEBUG) << "Status = " << status;
-  SPIJNI_LOG(logDEBUG) << "Value = " << *valuePtr;
-  SPIJNI_LOG(logDEBUG) << "Count = " << *countPtr;
+  SPIJNI_LOG(logDEBUG) << "Value = " << value;
+  SPIJNI_LOG(logDEBUG) << "Count = " << count;
   CheckStatus(env, status);
 }
 

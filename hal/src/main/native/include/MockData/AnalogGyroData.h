@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include "HAL/HAL.h"
 #include "NotifyListener.h"
 
@@ -38,6 +40,12 @@ void HALSIM_CancelAnalogGyroInitializedCallback(int32_t index, int32_t uid);
 HAL_Bool HALSIM_GetAnalogGyroInitialized(int32_t index);
 void HALSIM_SetAnalogGyroInitialized(int32_t index, HAL_Bool initialized);
 
+void HALSIM_RegisterAnalogGyroAllCallbacks(int32_t index,
+                                           HAL_NotifyCallback callback,
+                                           void* param, HAL_Bool initialNotify);
+
 #ifdef __cplusplus
-}
+}  // extern "C"
+#endif
+
 #endif

@@ -8,14 +8,12 @@
 package edu.wpi.first.wpilibj.command;
 
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.NamedSendable;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * The Command class is at the very core of the entire command framework. Every command can be
@@ -42,48 +40,52 @@ import edu.wpi.first.wpilibj.Timer;
  * @see CommandGroup
  * @see IllegalUseOfCommandException
  */
-public abstract class Command implements NamedSendable {
-
-  /**
-   * The name of this command.
-   */
-  private String m_name;
+public abstract class Command extends SendableBase implements Sendable {
   /**
    * The time since this command was initialized.
    */
   private double m_startTime = -1;
+
   /**
    * The time (in seconds) before this command "times out" (or -1 if no timeout).
    */
   private double m_timeout = -1;
+
   /**
    * Whether or not this command has been initialized.
    */
   private boolean m_initialized = false;
+
   /**
-   * The requirements (or null if no requirements).
+   * The required subsystems.
    */
-  private Set m_requirements;
+  private final Set m_requirements = new Set();
+
   /**
    * Whether or not it is running.
    */
   private boolean m_running = false;
+
   /**
    * Whether or not it is interruptible.
    */
   private boolean m_interruptible = true;
+
   /**
    * Whether or not it has been canceled.
    */
   private boolean m_canceled = false;
+
   /**
    * Whether or not it has been locked.
    */
   private boolean m_locked = false;
+
   /**
    * Whether this command should run when the robot is disabled.
    */
   private boolean m_runWhenDisabled = false;
+
   /**
    * The {@link CommandGroup} this is in.
    */
@@ -93,8 +95,9 @@ public abstract class Command implements NamedSendable {
    * Creates a new command. The name of this command will be set to its class name.
    */
   public Command() {
-    m_name = getClass().getName();
-    m_name = m_name.substring(m_name.lastIndexOf('.') + 1);
+    super(false);
+    String name = getClass().getName();
+    setName(name.substring(name.lastIndexOf('.') + 1));
   }
 
   /**
@@ -104,10 +107,11 @@ public abstract class Command implements NamedSendable {
    * @throws IllegalArgumentException if name is null
    */
   public Command(String name) {
+    super(false);
     if (name == null) {
       throw new IllegalArgumentException("Name must not be null.");
     }
-    m_name = name;
+    setName(name);
   }
 
   /**
@@ -140,16 +144,6 @@ public abstract class Command implements NamedSendable {
       throw new IllegalArgumentException("Timeout must not be negative.  Given:" + timeout);
     }
     m_timeout = timeout;
-  }
-
-  /**
-   * Returns the name of this command. If no name was specified in the constructor, then the default
-   * is the name of the class.
-   *
-   * @return the name of this command
-   */
-  public String getName() {
-    return m_name;
   }
 
   /**
@@ -191,9 +185,6 @@ public abstract class Command implements NamedSendable {
   protected synchronized void requires(Subsystem subsystem) {
     validate("Can not add new requirement to command");
     if (subsystem != null) {
-      if (m_requirements == null) {
-        m_requirements = new Set();
-      }
       m_requirements.add(subsystem);
     } else {
       throw new IllegalArgumentException("Subsystem must not be null.");
@@ -217,9 +208,6 @@ public abstract class Command implements NamedSendable {
     m_initialized = false;
     m_canceled = false;
     m_running = false;
-    if (m_runningEntry != null) {
-      m_runningEntry.setBoolean(false);
-    }
   }
 
   /**
@@ -347,7 +335,7 @@ public abstract class Command implements NamedSendable {
    * Subsystems}) of this command
    */
   synchronized Enumeration getRequirements() {
-    return m_requirements == null ? emptyEnumeration : m_requirements.getElements();
+    return m_requirements.getElements();
   }
 
   /**
@@ -382,9 +370,15 @@ public abstract class Command implements NamedSendable {
     }
     lockChanges();
     m_parent = parent;
-    if (m_isParentedEntry != null) {
-      m_isParentedEntry.setBoolean(true);
-    }
+  }
+
+  /**
+   * Returns whether the command has a parent.
+   *
+   * @param True if the command has a parent.
+   */
+  synchronized boolean isParented() {
+    return m_parent != null;
   }
 
   /**
@@ -393,7 +387,7 @@ public abstract class Command implements NamedSendable {
    * in {@link CommandGroup}.
    */
   protected void clearRequirements() {
-    m_requirements = new Set();
+    m_requirements.clear();
   }
 
   /**
@@ -424,9 +418,6 @@ public abstract class Command implements NamedSendable {
   synchronized void startRunning() {
     m_running = true;
     m_startTime = -1;
-    if (m_runningEntry != null) {
-      m_runningEntry.setBoolean(true);
-    }
   }
 
   /**
@@ -501,7 +492,7 @@ public abstract class Command implements NamedSendable {
    * @return whether or not the subsystem is required, or false if given null
    */
   public synchronized boolean doesRequire(Subsystem system) {
-    return m_requirements != null && m_requirements.contains(system);
+    return m_requirements.contains(system);
   }
 
   /**
@@ -536,20 +527,6 @@ public abstract class Command implements NamedSendable {
   }
 
   /**
-   * An empty enumeration given whenever there are no requirements.
-   */
-  private static Enumeration emptyEnumeration = new Enumeration() {
-
-    public boolean hasMoreElements() {
-      return false;
-    }
-
-    public Object nextElement() {
-      throw new NoSuchElementException();
-    }
-  };
-
-  /**
    * The string representation for a {@link Command} is by default its name.
    *
    * @return the string representation of this object
@@ -559,36 +536,21 @@ public abstract class Command implements NamedSendable {
     return getName();
   }
 
-
-  public String getSmartDashboardType() {
-    return "Command";
-  }
-
-  private NetworkTableEntry m_runningEntry;
-  private NetworkTableEntry m_isParentedEntry;
-  private int m_runningListener;
-
   @Override
-  public void initTable(NetworkTable table) {
-    if (m_runningEntry != null) {
-      m_runningEntry.removeListener(m_runningListener);
-    }
-    if (table != null) {
-      m_runningEntry = table.getEntry("running");
-      m_isParentedEntry = table.getEntry("isParented");
-      table.getEntry("name").setString(getName());
-      m_runningEntry.setBoolean(isRunning());
-      m_isParentedEntry.setBoolean(m_parent != null);
-      m_runningListener = m_runningEntry.addListener((event) -> {
-        if (event.value.getBoolean()) {
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Command");
+    builder.addStringProperty(".name", this::getName, null);
+    builder.addBooleanProperty("running", this::isRunning, (value) -> {
+      if (value) {
+        if (!isRunning()) {
           start();
-        } else {
+        }
+      } else {
+        if (isRunning()) {
           cancel();
         }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-    } else {
-      m_runningEntry = null;
-      m_isParentedEntry = null;
-    }
+      }
+    });
+    builder.addBooleanProperty(".isParented", this::isParented, null);
   }
 }

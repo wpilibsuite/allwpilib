@@ -10,6 +10,8 @@
 #include <atomic>
 #include <memory>
 
+#include <support/mutex.h>
+
 #include "MockData/DIOData.h"
 #include "MockData/NotifyListenerVector.h"
 
@@ -54,7 +56,7 @@ class DIOData {
   virtual void ResetData();
 
  private:
-  std::mutex m_registerMutex;
+  wpi::mutex m_registerMutex;
   std::atomic<HAL_Bool> m_initialized{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::atomic<HAL_Bool> m_value{true};
@@ -66,5 +68,5 @@ class DIOData {
   std::atomic<int32_t> m_filterIndex{-1};
   std::shared_ptr<NotifyListenerVector> m_filterIndexCallbacks = nullptr;
 };
-extern DIOData SimDIOData[];
+extern DIOData* SimDIOData;
 }  // namespace hal

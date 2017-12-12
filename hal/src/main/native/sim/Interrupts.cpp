@@ -7,8 +7,9 @@
 
 #include "HAL/Interrupts.h"
 
-#include <condition_variable>
 #include <memory>
+
+#include <support/condition_variable.h>
 
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"
@@ -53,29 +54,43 @@ struct Interrupt {
 
 struct SynchronousWaitData {
   HAL_InterruptHandle interruptHandle;
-  std::condition_variable waitCond;
+  wpi::condition_variable waitCond;
   HAL_Bool waitPredicate;
 };
 }  // namespace
 
 static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
-                             HAL_HandleEnum::Interrupt>
-    interruptHandles;
+                             HAL_HandleEnum::Interrupt>* interruptHandles;
 
 typedef HAL_Handle SynchronousWaitDataHandle;
 static UnlimitedHandleResource<SynchronousWaitDataHandle, SynchronousWaitData,
-                               HAL_HandleEnum::Vendor>
+                               HAL_HandleEnum::Vendor>*
     synchronousInterruptHandles;
+
+namespace hal {
+namespace init {
+void InitializeInterrupts() {
+  static LimitedHandleResource<HAL_InterruptHandle, Interrupt, kNumInterrupts,
+                               HAL_HandleEnum::Interrupt>
+      iH;
+  interruptHandles = &iH;
+  static UnlimitedHandleResource<SynchronousWaitDataHandle, SynchronousWaitData,
+                                 HAL_HandleEnum::Vendor>
+      siH;
+  synchronousInterruptHandles = &siH;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
                                              int32_t* status) {
-  HAL_InterruptHandle handle = interruptHandles.Allocate();
+  HAL_InterruptHandle handle = interruptHandles->Allocate();
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
     return HAL_kInvalidHandle;
   }
-  auto anInterrupt = interruptHandles.Get(handle);
+  auto anInterrupt = interruptHandles->Get(handle);
   if (anInterrupt == nullptr) {  // would only occur on thread issue.
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -90,20 +105,20 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
 }
 void HAL_CleanInterrupts(HAL_InterruptHandle interruptHandle, int32_t* status) {
   HAL_DisableInterrupts(interruptHandle, status);
-  auto interrupt = interruptHandles.Get(interruptHandle);
-  interruptHandles.Free(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
+  interruptHandles->Free(interruptHandle);
 }
 
 static void ProcessInterruptDigitalSynchronous(const char* name, void* param,
                                                const struct HAL_Value* value) {
   // void* is a SynchronousWaitDataHandle.
-  // convert to intptr_t first, then to handle
-  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  // convert to uintptr_t first, then to handle
+  uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   SynchronousWaitDataHandle handle =
       static_cast<SynchronousWaitDataHandle>(handleTmp);
-  auto interruptData = synchronousInterruptHandles.Get(handle);
+  auto interruptData = synchronousInterruptHandles->Get(handle);
   if (interruptData == nullptr) return;
-  auto interrupt = interruptHandles.Get(interruptData->interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptData->interruptHandle);
   if (interrupt == nullptr) return;
   // Have a valid interrupt
   if (value->type != HAL_Type::HAL_BOOLEAN) return;
@@ -130,13 +145,13 @@ static double GetAnalogTriggerValue(HAL_Handle triggerHandle,
 static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
                                               const struct HAL_Value* value) {
   // void* is a SynchronousWaitDataHandle.
-  // convert to intptr_t first, then to handle
-  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  // convert to uintptr_t first, then to handle
+  uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   SynchronousWaitDataHandle handle =
       static_cast<SynchronousWaitDataHandle>(handleTmp);
-  auto interruptData = synchronousInterruptHandles.Get(handle);
+  auto interruptData = synchronousInterruptHandles->Get(handle);
   if (interruptData == nullptr) return;
-  auto interrupt = interruptHandles.Get(interruptData->interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptData->interruptHandle);
   if (interrupt == nullptr) return;
   // Have a valid interrupt
   if (value->type != HAL_Type::HAL_DOUBLE) return;
@@ -167,13 +182,13 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
                                        bool ignorePrevious) {
   auto data = std::make_shared<SynchronousWaitData>();
 
-  auto dataHandle = synchronousInterruptHandles.Allocate(data);
+  auto dataHandle = synchronousInterruptHandles->Allocate(data);
   if (dataHandle == HAL_kInvalidHandle) {
     // Error allocating data
     return WaitResult::Timeout;
   }
 
-  // auto data = synchronousInterruptHandles.Get(dataHandle);
+  // auto data = synchronousInterruptHandles->Get(dataHandle);
   data->waitPredicate = false;
   data->interruptHandle = handle;
 
@@ -186,12 +201,12 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
   interrupt->previousState = SimDIOData[digitalIndex].GetValue();
 
   int32_t uid = SimDIOData[digitalIndex].RegisterValueCallback(
-      &ProcessInterruptDigitalSynchronous, reinterpret_cast<void*>(dataHandle),
-      false);
+      &ProcessInterruptDigitalSynchronous,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(dataHandle)), false);
 
   bool timedOut = false;
 
-  std::mutex waitMutex;
+  wpi::mutex waitMutex;
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
   auto timeoutTime = std::chrono::steady_clock::now() +
@@ -203,7 +218,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 #endif
 
   {
-    std::unique_lock<std::mutex> lock(waitMutex);
+    std::unique_lock<wpi::mutex> lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {
@@ -215,7 +230,7 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 
   // Cancel our callback
   SimDIOData[digitalIndex].CancelValueCallback(uid);
-  synchronousInterruptHandles.Free(dataHandle);
+  synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
   if (timedOut) return WaitResult::Timeout;
@@ -235,7 +250,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
                                       bool ignorePrevious) {
   auto data = std::make_shared<SynchronousWaitData>();
 
-  auto dataHandle = synchronousInterruptHandles.Allocate(data);
+  auto dataHandle = synchronousInterruptHandles->Allocate(data);
   if (dataHandle == HAL_kInvalidHandle) {
     // Error allocating data
     return WaitResult::Timeout;
@@ -256,12 +271,12 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
   if (status != 0) return WaitResult::Timeout;
 
   int32_t uid = SimAnalogInData[analogIndex].RegisterVoltageCallback(
-      &ProcessInterruptAnalogSynchronous, reinterpret_cast<void*>(dataHandle),
-      false);
+      &ProcessInterruptAnalogSynchronous,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(dataHandle)), false);
 
   bool timedOut = false;
 
-  std::mutex waitMutex;
+  wpi::mutex waitMutex;
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
   auto timeoutTime = std::chrono::steady_clock::now() +
@@ -273,7 +288,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 #endif
 
   {
-    std::unique_lock<std::mutex> lock(waitMutex);
+    std::unique_lock<wpi::mutex> lock(waitMutex);
     while (!data->waitPredicate) {
       if (data->waitCond.wait_until(lock, timeoutTime) ==
           std::cv_status::timeout) {
@@ -285,7 +300,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 
   // Cancel our callback
   SimAnalogInData[analogIndex].CancelVoltageCallback(uid);
-  synchronousInterruptHandles.Free(dataHandle);
+  synchronousInterruptHandles->Free(dataHandle);
 
   // Check for what to return
   if (timedOut) return WaitResult::Timeout;
@@ -303,7 +318,7 @@ static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
 int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
                              double timeout, HAL_Bool ignorePrevious,
                              int32_t* status) {
-  auto interrupt = interruptHandles.Get(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return WaitResult::Timeout;
@@ -327,10 +342,10 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
 static void ProcessInterruptDigitalAsynchronous(const char* name, void* param,
                                                 const struct HAL_Value* value) {
   // void* is a HAL handle
-  // convert to intptr_t first, then to handle
-  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  // convert to uintptr_t first, then to handle
+  uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   HAL_InterruptHandle handle = static_cast<HAL_InterruptHandle>(handleTmp);
-  auto interrupt = interruptHandles.Get(handle);
+  auto interrupt = interruptHandles->Get(handle);
   if (interrupt == nullptr) return;
   // Have a valid interrupt
   if (value->type != HAL_Type::HAL_BOOLEAN) return;
@@ -360,9 +375,9 @@ static void ProcessInterruptAnalogAsynchronous(const char* name, void* param,
                                                const struct HAL_Value* value) {
   // void* is a HAL handle
   // convert to intptr_t first, then to handle
-  intptr_t handleTmp = reinterpret_cast<intptr_t>(param);
+  uintptr_t handleTmp = reinterpret_cast<uintptr_t>(param);
   HAL_InterruptHandle handle = static_cast<HAL_InterruptHandle>(handleTmp);
-  auto interrupt = interruptHandles.Get(handle);
+  auto interrupt = interruptHandles->Get(handle);
   if (interrupt == nullptr) return;
   // Have a valid interrupt
   if (value->type != HAL_Type::HAL_DOUBLE) return;
@@ -400,8 +415,8 @@ static void EnableInterruptsDigital(HAL_InterruptHandle handle,
   interrupt->previousState = SimDIOData[digitalIndex].GetValue();
 
   int32_t uid = SimDIOData[digitalIndex].RegisterValueCallback(
-      &ProcessInterruptDigitalAsynchronous, reinterpret_cast<void*>(handle),
-      false);
+      &ProcessInterruptDigitalAsynchronous,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(handle)), false);
   interrupt->callbackId = uid;
 }
 
@@ -418,14 +433,14 @@ static void EnableInterruptsAnalog(HAL_InterruptHandle handle,
   if (status != 0) return;
 
   int32_t uid = SimAnalogInData[analogIndex].RegisterVoltageCallback(
-      &ProcessInterruptAnalogAsynchronous, reinterpret_cast<void*>(handle),
-      false);
+      &ProcessInterruptAnalogAsynchronous,
+      reinterpret_cast<void*>(static_cast<uintptr_t>(handle)), false);
   interrupt->callbackId = uid;
 }
 
 void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
                           int32_t* status) {
-  auto interrupt = interruptHandles.Get(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -451,7 +466,7 @@ void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
 }
 void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
                            int32_t* status) {
-  auto interrupt = interruptHandles.Get(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -478,7 +493,7 @@ void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
 }
 double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
                                         int32_t* status) {
-  auto interrupt = interruptHandles.Get(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -488,7 +503,7 @@ double HAL_ReadInterruptRisingTimestamp(HAL_InterruptHandle interruptHandle,
 }
 double HAL_ReadInterruptFallingTimestamp(HAL_InterruptHandle interruptHandle,
                                          int32_t* status) {
-  auto interrupt = interruptHandles.Get(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0;
@@ -500,7 +515,7 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
                            HAL_Handle digitalSourceHandle,
                            HAL_AnalogTriggerType analogTriggerType,
                            int32_t* status) {
-  auto interrupt = interruptHandles.Get(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -524,7 +539,7 @@ void HAL_RequestInterrupts(HAL_InterruptHandle interruptHandle,
 void HAL_AttachInterruptHandler(HAL_InterruptHandle interruptHandle,
                                 HAL_InterruptHandlerFunction handler,
                                 void* param, int32_t* status) {
-  auto interrupt = interruptHandles.Get(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -543,7 +558,7 @@ void HAL_AttachInterruptHandlerThreaded(HAL_InterruptHandle interruptHandle,
 void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
                                   HAL_Bool risingEdge, HAL_Bool fallingEdge,
                                   int32_t* status) {
-  auto interrupt = interruptHandles.Get(interruptHandle);
+  auto interrupt = interruptHandles->Get(interruptHandle);
   if (interrupt == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -552,4 +567,4 @@ void HAL_SetInterruptUpSourceEdge(HAL_InterruptHandle interruptHandle,
   interrupt->fireOnDown = fallingEdge;
   interrupt->fireOnUp = risingEdge;
 }
-}
+}  // extern "C"

@@ -78,3 +78,5 @@ AnalogTriggerType AnalogTriggerOutput::GetAnalogTriggerTypeForRouting() const {
  * @return The channel of the source.
  */
 int AnalogTriggerOutput::GetChannel() const { return m_trigger.m_index; }
+
+void AnalogTriggerOutput::InitSendable(SendableBuilder&) {}

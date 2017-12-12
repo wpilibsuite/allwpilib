@@ -118,7 +118,7 @@ public class HAL extends JNIWrapper {
 
   public static native boolean getBrownedOut();
 
-  public static native int setErrorData(String error);
+  public static native int getMatchInfo(MatchInfoData info);
 
   public static native int sendError(boolean isError, int errorCode, boolean isLVCode,
                                      String details, String location, String callStack,

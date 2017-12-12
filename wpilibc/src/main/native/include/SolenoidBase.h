@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "SensorBase.h"
+#include "ErrorBase.h"
+#include "SmartDashboard/SendableBase.h"
 
 namespace frc {
 
@@ -15,9 +16,8 @@ namespace frc {
  * SolenoidBase class is the common base class for the Solenoid and
  * DoubleSolenoid classes.
  */
-class SolenoidBase : public SensorBase {
+class SolenoidBase : public ErrorBase, public SendableBase {
  public:
-  virtual ~SolenoidBase() = default;
   static int GetAll(int module);
   int GetAll() const;
 
@@ -32,8 +32,10 @@ class SolenoidBase : public SensorBase {
 
  protected:
   explicit SolenoidBase(int pcmID);
-  static const int m_maxModules = 63;
-  static const int m_maxPorts = 8;
+
+  static constexpr int m_maxModules = 63;
+  static constexpr int m_maxPorts = 8;
+
   int m_moduleNumber;  // PCM module number
 };
 

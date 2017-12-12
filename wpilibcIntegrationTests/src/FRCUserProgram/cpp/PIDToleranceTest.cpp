@@ -20,7 +20,7 @@ class PIDToleranceTest : public testing::Test {
   const double range = 200;
   const double tolerance = 10.0;
 
-  class fakeInput : public PIDSource {
+  class FakeInput : public PIDSource {
    public:
     double val = 0;
 
@@ -31,12 +31,12 @@ class PIDToleranceTest : public testing::Test {
     double PIDGet() { return val; }
   };
 
-  class fakeOutput : public PIDOutput {
+  class FakeOutput : public PIDOutput {
     void PIDWrite(double output) {}
   };
 
-  fakeInput inp;
-  fakeOutput out;
+  FakeInput inp;
+  FakeOutput out;
   PIDController* pid;
 
   void SetUp() override {
@@ -58,21 +58,21 @@ TEST_F(PIDToleranceTest, Absolute) {
 
   EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 
   inp.val = setpoint + tolerance / 2;
   Wait(1.0);
 
   EXPECT_TRUE(pid->OnTarget())
       << "Error was not in tolerance when it should have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 
   inp.val = setpoint + 10 * tolerance;
   Wait(1.0);
 
   EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 }
 
 TEST_F(PIDToleranceTest, Percent) {
@@ -84,16 +84,16 @@ TEST_F(PIDToleranceTest, Percent) {
 
   EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 
-  inp.val = setpoint +
-            (tolerance) / 200 *
-                range;  // half of percent tolerance away from setpoint
+  inp.val =
+      setpoint + (tolerance) / 200 *
+                     range;  // half of percent tolerance away from setpoint
   Wait(1.0);
 
   EXPECT_TRUE(pid->OnTarget())
       << "Error was not in tolerance when it should have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 
   inp.val =
       setpoint +
@@ -103,5 +103,5 @@ TEST_F(PIDToleranceTest, Percent) {
 
   EXPECT_FALSE(pid->OnTarget())
       << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetAvgError();
+      << pid->GetError();
 }
