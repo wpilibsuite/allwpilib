@@ -7,11 +7,17 @@
 
 #pragma once
 
+#include <support/deprecated.h>
+
 #include "RobotBase.h"
 
 namespace frc {
 
-class SampleRobot : public RobotBase {
+class WPI_DEPRECATED(
+    "WARNING: While it may look like a good choice to use for your code if "
+    "you're inexperienced, don't. Unless you know what you are doing, complex "
+    "code will be much more difficult under this system. Use TimedRobot or "
+    "Command-Based instead.") SampleRobot : public RobotBase {
  public:
   void StartCompetition() override;
 
