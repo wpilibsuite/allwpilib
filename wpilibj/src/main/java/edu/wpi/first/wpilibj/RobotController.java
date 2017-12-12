@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2008-2017 FIRST. All Rights Reserved.                        */
+/* Copyright (c) 2017 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,20 +7,93 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.can.CANJNI;
+import edu.wpi.first.wpilibj.can.CANStatus;
+import edu.wpi.first.wpilibj.hal.HAL;
+import edu.wpi.first.wpilibj.hal.HALUtil;
 import edu.wpi.first.wpilibj.hal.PowerJNI;
 
 /**
- * Old Controller PR class.
- * @deprecated Use RobotController class instead
+ * Contains functions for roboRIO functionality.
  */
-@Deprecated
-public class ControllerPower {
+public final class RobotController {
+  private RobotController() {
+  }
+
+  /**
+   * Return the FPGA Version number. For now, expect this to be the current
+   * year.
+   *
+   * @return FPGA Version number.
+   */
+  @SuppressWarnings("AbbreviationAsWordInName")
+  int getFPGAVersion() {
+    return HALUtil.getFPGAVersion();
+  }
+
+  /**
+   * Return the FPGA Revision number. The format of the revision is 3 numbers. The 12 most
+   * significant bits are the Major Revision. the next 8 bits are the Minor Revision. The 12 least
+   * significant bits are the Build Number.
+   *
+   * @return FPGA Revision number.
+   */
+  @SuppressWarnings("AbbreviationAsWordInName")
+  long getFPGARevision() {
+    return (long) HALUtil.getFPGARevision();
+  }
+
+  /**
+   * Read the microsecond timer from the FPGA.
+   *
+   * @return The current time in microseconds according to the FPGA.
+   */
+  public static long getFPGATime() {
+    return HALUtil.getFPGATime();
+  }
+
+  /**
+   * Get the state of the "USER" button on the roboRIO.
+   *
+   * @return true if the button is currently pressed down
+   */
+  public static boolean getUserButton() {
+    return HALUtil.getFPGAButton();
+  }
+
+  /**
+   * Read the battery voltage.
+   *
+   * @return The battery voltage in Volts.
+   */
+  public double getBatteryVoltage() {
+    return PowerJNI.getVinVoltage();
+  }
+
+  /**
+   * Gets a value indicating whether the FPGA outputs are enabled. The outputs may be disabled if
+   * the robot is disabled or e-stopped, the watchdog has expired, or if the roboRIO browns out.
+   *
+   * @return True if the FPGA outputs are enabled.
+   */
+  public static boolean isSysActive() {
+    return HAL.getSystemActive();
+  }
+
+  /**
+   * Check if the system is browned out.
+   *
+   * @return True if the system is browned out
+   */
+  public static boolean isBrownedOut() {
+    return HAL.getBrownedOut();
+  }
+
   /**
    * Get the input voltage to the robot controller.
    *
    * @return The controller input voltage value in Volts
    */
-  @Deprecated
   public static double getInputVoltage() {
     return PowerJNI.getVinVoltage();
   }
@@ -30,7 +103,6 @@ public class ControllerPower {
    *
    * @return The controller input current value in Amps
    */
-  @Deprecated
   public static double getInputCurrent() {
     return PowerJNI.getVinCurrent();
   }
@@ -40,7 +112,6 @@ public class ControllerPower {
    *
    * @return The controller 3.3V rail voltage value in Volts
    */
-  @Deprecated
   public static double getVoltage3V3() {
     return PowerJNI.getUserVoltage3V3();
   }
@@ -50,7 +121,6 @@ public class ControllerPower {
    *
    * @return The controller 3.3V rail output current value in Volts
    */
-  @Deprecated
   public static double getCurrent3V3() {
     return PowerJNI.getUserCurrent3V3();
   }
@@ -61,7 +131,6 @@ public class ControllerPower {
    *
    * @return The controller 3.3V rail enabled value
    */
-  @Deprecated
   public static boolean getEnabled3V3() {
     return PowerJNI.getUserActive3V3();
   }
@@ -71,7 +140,6 @@ public class ControllerPower {
    *
    * @return The number of faults
    */
-  @Deprecated
   public static int getFaultCount3V3() {
     return PowerJNI.getUserCurrentFaults3V3();
   }
@@ -81,7 +149,6 @@ public class ControllerPower {
    *
    * @return The controller 5V rail voltage value in Volts
    */
-  @Deprecated
   public static double getVoltage5V() {
     return PowerJNI.getUserVoltage5V();
   }
@@ -91,7 +158,6 @@ public class ControllerPower {
    *
    * @return The controller 5V rail output current value in Amps
    */
-  @Deprecated
   public static double getCurrent5V() {
     return PowerJNI.getUserCurrent5V();
   }
@@ -102,7 +168,6 @@ public class ControllerPower {
    *
    * @return The controller 5V rail enabled value
    */
-  @Deprecated
   public static boolean getEnabled5V() {
     return PowerJNI.getUserActive5V();
   }
@@ -112,7 +177,6 @@ public class ControllerPower {
    *
    * @return The number of faults
    */
-  @Deprecated
   public static int getFaultCount5V() {
     return PowerJNI.getUserCurrentFaults5V();
   }
@@ -122,7 +186,6 @@ public class ControllerPower {
    *
    * @return The controller 6V rail voltage value in Volts
    */
-  @Deprecated
   public static double getVoltage6V() {
     return PowerJNI.getUserVoltage6V();
   }
@@ -132,7 +195,6 @@ public class ControllerPower {
    *
    * @return The controller 6V rail output current value in Amps
    */
-  @Deprecated
   public static double getCurrent6V() {
     return PowerJNI.getUserCurrent6V();
   }
@@ -143,7 +205,6 @@ public class ControllerPower {
    *
    * @return The controller 6V rail enabled value
    */
-  @Deprecated
   public static boolean getEnabled6V() {
     return PowerJNI.getUserActive6V();
   }
@@ -153,8 +214,18 @@ public class ControllerPower {
    *
    * @return The number of faults
    */
-  @Deprecated
   public static int getFaultCount6V() {
     return PowerJNI.getUserCurrentFaults6V();
+  }
+
+  /**
+   * Get the current status of the CAN bus.
+   *
+   * @return The status of the CAN bus
+   */
+  public static CANStatus getCANStatus() {
+    CANStatus status = new CANStatus();
+    CANJNI.GetCANStatus(status);
+    return status;
   }
 }

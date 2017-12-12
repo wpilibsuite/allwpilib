@@ -99,7 +99,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
     @Override
     public void interruptFired(int interruptAssertedMask, InterruptCounter param) {
-      m_interruptFireTime.set(Utility.getFPGATime());
+      m_interruptFireTime.set(RobotController.getFPGATime());
       m_counter.increment();
       try {
         // This won't cause the test to fail
@@ -132,7 +132,7 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
     Timer.delay(0.01);
     // Note: Utility.getFPGATime() is used because double values can turn over
     // after the robot has been running for a long time
-    final long interruptTriggerTime = Utility.getFPGATime();
+    final long interruptTriggerTime = RobotController.getFPGATime();
     setInterruptHigh();
 
     // Delay until the interrupt is complete
@@ -205,11 +205,11 @@ public abstract class AbstractInterruptTest extends AbstractComsSetup {
 
     // Note: the long time value is used because doubles can flip if the robot
     // is left running for long enough
-    final long startTimeStamp = Utility.getFPGATime();
+    final long startTimeStamp = RobotController.getFPGATime();
     new Thread(runnable).start();
     // Delay for twice as long as the timeout so the test should fail first
     getInterruptable().waitForInterrupt(synchronousTimeout * 2);
-    final long stopTimeStamp = Utility.getFPGATime();
+    final long stopTimeStamp = RobotController.getFPGATime();
 
     // Then
     // The test will not have timed out and:

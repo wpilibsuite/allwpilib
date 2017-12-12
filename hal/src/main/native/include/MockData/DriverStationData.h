@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include "HAL/DriverStation.h"
 #include "HAL/HAL.h"
 #include "NotifyListener.h"
@@ -92,4 +94,6 @@ void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
 
 #ifdef __cplusplus
 }  // extern "C"
+#endif
+
 #endif

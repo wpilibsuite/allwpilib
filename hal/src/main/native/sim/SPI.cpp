@@ -11,6 +11,12 @@
 
 using namespace hal;
 
+namespace hal {
+namespace init {
+void InitializeSPI() {}
+}  // namespace init
+}  // namespace hal
+
 void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
   SimSPIData[port].SetInitialized(true);
 }

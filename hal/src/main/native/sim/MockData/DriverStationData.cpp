@@ -30,7 +30,16 @@ struct MatchInfoDataStore {
 
 using namespace hal;
 
-DriverStationData hal::SimDriverStationData;
+namespace hal {
+namespace init {
+void InitializeDriverStationData() {
+  static DriverStationData dsd;
+  ::hal::SimDriverStationData = &dsd;
+}
+}  // namespace init
+}  // namespace hal
+
+DriverStationData* hal::SimDriverStationData;
 
 DriverStationData::DriverStationData() { ResetData(); }
 
@@ -455,178 +464,178 @@ void DriverStationData::SetMatchInfo(const HAL_MatchInfo* info) {
 void DriverStationData::NotifyNewData() { HAL_ReleaseDSMutex(); }
 
 extern "C" {
-void HALSIM_ResetDriverStationData(void) { SimDriverStationData.ResetData(); }
+void HALSIM_ResetDriverStationData(void) { SimDriverStationData->ResetData(); }
 
 int32_t HALSIM_RegisterDriverStationEnabledCallback(HAL_NotifyCallback callback,
                                                     void* param,
                                                     HAL_Bool initialNotify) {
-  return SimDriverStationData.RegisterEnabledCallback(callback, param,
-                                                      initialNotify);
+  return SimDriverStationData->RegisterEnabledCallback(callback, param,
+                                                       initialNotify);
 }
 void HALSIM_CancelDriverStationEnabledCallback(int32_t uid) {
-  SimDriverStationData.CancelEnabledCallback(uid);
+  SimDriverStationData->CancelEnabledCallback(uid);
 }
 HAL_Bool HALSIM_GetDriverStationEnabled(void) {
-  return SimDriverStationData.GetEnabled();
+  return SimDriverStationData->GetEnabled();
 }
 void HALSIM_SetDriverStationEnabled(HAL_Bool enabled) {
-  SimDriverStationData.SetEnabled(enabled);
+  SimDriverStationData->SetEnabled(enabled);
 }
 
 int32_t HALSIM_RegisterDriverStationAutonomousCallback(
     HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData.RegisterAutonomousCallback(callback, param,
-                                                         initialNotify);
+  return SimDriverStationData->RegisterAutonomousCallback(callback, param,
+                                                          initialNotify);
 }
 void HALSIM_CancelDriverStationAutonomousCallback(int32_t uid) {
-  SimDriverStationData.CancelAutonomousCallback(uid);
+  SimDriverStationData->CancelAutonomousCallback(uid);
 }
 HAL_Bool HALSIM_GetDriverStationAutonomous(void) {
-  return SimDriverStationData.GetAutonomous();
+  return SimDriverStationData->GetAutonomous();
 }
 void HALSIM_SetDriverStationAutonomous(HAL_Bool autonomous) {
-  SimDriverStationData.SetAutonomous(autonomous);
+  SimDriverStationData->SetAutonomous(autonomous);
 }
 
 int32_t HALSIM_RegisterDriverStationTestCallback(HAL_NotifyCallback callback,
                                                  void* param,
                                                  HAL_Bool initialNotify) {
-  return SimDriverStationData.RegisterTestCallback(callback, param,
-                                                   initialNotify);
+  return SimDriverStationData->RegisterTestCallback(callback, param,
+                                                    initialNotify);
 }
 void HALSIM_CancelDriverStationTestCallback(int32_t uid) {
-  SimDriverStationData.CancelTestCallback(uid);
+  SimDriverStationData->CancelTestCallback(uid);
 }
 HAL_Bool HALSIM_GetDriverStationTest(void) {
-  return SimDriverStationData.GetTest();
+  return SimDriverStationData->GetTest();
 }
 void HALSIM_SetDriverStationTest(HAL_Bool test) {
-  SimDriverStationData.SetTest(test);
+  SimDriverStationData->SetTest(test);
 }
 
 int32_t HALSIM_RegisterDriverStationEStopCallback(HAL_NotifyCallback callback,
                                                   void* param,
                                                   HAL_Bool initialNotify) {
-  return SimDriverStationData.RegisterEStopCallback(callback, param,
-                                                    initialNotify);
+  return SimDriverStationData->RegisterEStopCallback(callback, param,
+                                                     initialNotify);
 }
 void HALSIM_CancelDriverStationEStopCallback(int32_t uid) {
-  SimDriverStationData.CancelEStopCallback(uid);
+  SimDriverStationData->CancelEStopCallback(uid);
 }
 HAL_Bool HALSIM_GetDriverStationEStop(void) {
-  return SimDriverStationData.GetEStop();
+  return SimDriverStationData->GetEStop();
 }
 void HALSIM_SetDriverStationEStop(HAL_Bool eStop) {
-  SimDriverStationData.SetEStop(eStop);
+  SimDriverStationData->SetEStop(eStop);
 }
 
 int32_t HALSIM_RegisterDriverStationFmsAttachedCallback(
     HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData.RegisterFmsAttachedCallback(callback, param,
-                                                          initialNotify);
+  return SimDriverStationData->RegisterFmsAttachedCallback(callback, param,
+                                                           initialNotify);
 }
 void HALSIM_CancelDriverStationFmsAttachedCallback(int32_t uid) {
-  SimDriverStationData.CancelFmsAttachedCallback(uid);
+  SimDriverStationData->CancelFmsAttachedCallback(uid);
 }
 HAL_Bool HALSIM_GetDriverStationFmsAttached(void) {
-  return SimDriverStationData.GetFmsAttached();
+  return SimDriverStationData->GetFmsAttached();
 }
 void HALSIM_SetDriverStationFmsAttached(HAL_Bool fmsAttached) {
-  SimDriverStationData.SetFmsAttached(fmsAttached);
+  SimDriverStationData->SetFmsAttached(fmsAttached);
 }
 
 int32_t HALSIM_RegisterDriverStationDsAttachedCallback(
     HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData.RegisterDsAttachedCallback(callback, param,
-                                                         initialNotify);
+  return SimDriverStationData->RegisterDsAttachedCallback(callback, param,
+                                                          initialNotify);
 }
 void HALSIM_CancelDriverStationDsAttachedCallback(int32_t uid) {
-  SimDriverStationData.CancelDsAttachedCallback(uid);
+  SimDriverStationData->CancelDsAttachedCallback(uid);
 }
 HAL_Bool HALSIM_GetDriverStationDsAttached(void) {
-  return SimDriverStationData.GetDsAttached();
+  return SimDriverStationData->GetDsAttached();
 }
 void HALSIM_SetDriverStationDsAttached(HAL_Bool dsAttached) {
-  SimDriverStationData.SetDsAttached(dsAttached);
+  SimDriverStationData->SetDsAttached(dsAttached);
 }
 
 int32_t HALSIM_RegisterDriverStationAllianceStationIdCallback(
     HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData.RegisterAllianceStationIdCallback(callback, param,
-                                                                initialNotify);
+  return SimDriverStationData->RegisterAllianceStationIdCallback(
+      callback, param, initialNotify);
 }
 void HALSIM_CancelDriverStationAllianceStationIdCallback(int32_t uid) {
-  SimDriverStationData.CancelAllianceStationIdCallback(uid);
+  SimDriverStationData->CancelAllianceStationIdCallback(uid);
 }
 HAL_AllianceStationID HALSIM_GetDriverStationAllianceStationId(void) {
-  return SimDriverStationData.GetAllianceStationId();
+  return SimDriverStationData->GetAllianceStationId();
 }
 void HALSIM_SetDriverStationAllianceStationId(
     HAL_AllianceStationID allianceStationId) {
-  SimDriverStationData.SetAllianceStationId(allianceStationId);
+  SimDriverStationData->SetAllianceStationId(allianceStationId);
 }
 
 int32_t HALSIM_RegisterDriverStationMatchTimeCallback(
     HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
-  return SimDriverStationData.RegisterMatchTimeCallback(callback, param,
-                                                        initialNotify);
+  return SimDriverStationData->RegisterMatchTimeCallback(callback, param,
+                                                         initialNotify);
 }
 void HALSIM_CancelDriverStationMatchTimeCallback(int32_t uid) {
-  SimDriverStationData.CancelMatchTimeCallback(uid);
+  SimDriverStationData->CancelMatchTimeCallback(uid);
 }
 double HALSIM_GetDriverStationMatchTime(void) {
-  return SimDriverStationData.GetMatchTime();
+  return SimDriverStationData->GetMatchTime();
 }
 void HALSIM_SetDriverStationMatchTime(double matchTime) {
-  SimDriverStationData.SetMatchTime(matchTime);
+  SimDriverStationData->SetMatchTime(matchTime);
 }
 
 void HALSIM_SetJoystickAxes(int32_t joystickNum, const HAL_JoystickAxes* axes) {
-  SimDriverStationData.SetJoystickAxes(joystickNum, axes);
+  SimDriverStationData->SetJoystickAxes(joystickNum, axes);
 }
 
 void HALSIM_SetJoystickPOVs(int32_t joystickNum, const HAL_JoystickPOVs* povs) {
-  SimDriverStationData.SetJoystickPOVs(joystickNum, povs);
+  SimDriverStationData->SetJoystickPOVs(joystickNum, povs);
 }
 
 void HALSIM_SetJoystickButtons(int32_t joystickNum,
                                const HAL_JoystickButtons* buttons) {
-  SimDriverStationData.SetJoystickButtons(joystickNum, buttons);
+  SimDriverStationData->SetJoystickButtons(joystickNum, buttons);
 }
 void HALSIM_SetJoystickDescriptor(int32_t joystickNum,
                                   const HAL_JoystickDescriptor* descriptor) {
-  SimDriverStationData.SetJoystickDescriptor(joystickNum, descriptor);
+  SimDriverStationData->SetJoystickDescriptor(joystickNum, descriptor);
 }
 
 void HALSIM_GetJoystickOutputs(int32_t joystickNum, int64_t* outputs,
                                int32_t* leftRumble, int32_t* rightRumble) {
-  SimDriverStationData.GetJoystickOutputs(joystickNum, outputs, leftRumble,
-                                          rightRumble);
+  SimDriverStationData->GetJoystickOutputs(joystickNum, outputs, leftRumble,
+                                           rightRumble);
 }
 
 void HALSIM_SetMatchInfo(const HAL_MatchInfo* info) {
-  SimDriverStationData.SetMatchInfo(info);
+  SimDriverStationData->SetMatchInfo(info);
 }
 
 void HALSIM_NotifyDriverStationNewData(void) {
-  SimDriverStationData.NotifyNewData();
+  SimDriverStationData->NotifyNewData();
 }
 
 void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
                                               void* param,
                                               HAL_Bool initialNotify) {
-  SimDriverStationData.RegisterEnabledCallback(callback, param, initialNotify);
-  SimDriverStationData.RegisterAutonomousCallback(callback, param,
-                                                  initialNotify);
-  SimDriverStationData.RegisterTestCallback(callback, param, initialNotify);
-  SimDriverStationData.RegisterEStopCallback(callback, param, initialNotify);
-  SimDriverStationData.RegisterFmsAttachedCallback(callback, param,
+  SimDriverStationData->RegisterEnabledCallback(callback, param, initialNotify);
+  SimDriverStationData->RegisterAutonomousCallback(callback, param,
                                                    initialNotify);
-  SimDriverStationData.RegisterDsAttachedCallback(callback, param,
+  SimDriverStationData->RegisterTestCallback(callback, param, initialNotify);
+  SimDriverStationData->RegisterEStopCallback(callback, param, initialNotify);
+  SimDriverStationData->RegisterFmsAttachedCallback(callback, param,
+                                                    initialNotify);
+  SimDriverStationData->RegisterDsAttachedCallback(callback, param,
+                                                   initialNotify);
+  SimDriverStationData->RegisterAllianceStationIdCallback(callback, param,
+                                                          initialNotify);
+  SimDriverStationData->RegisterMatchTimeCallback(callback, param,
                                                   initialNotify);
-  SimDriverStationData.RegisterAllianceStationIdCallback(callback, param,
-                                                         initialNotify);
-  SimDriverStationData.RegisterMatchTimeCallback(callback, param,
-                                                 initialNotify);
 }
 }  // extern "C"

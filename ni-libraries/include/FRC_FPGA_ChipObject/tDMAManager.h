@@ -29,6 +29,18 @@ public:
       uint32_t       timeout,
       size_t*        remaining,
       tRioStatusCode *status);
+   void read(
+      uint8_t*       buf,
+      size_t         num,
+      uint32_t       timeout,
+      size_t*        remaining,
+      tRioStatusCode *status);
+   void write(
+      uint8_t*       buf,
+      size_t         num,
+      uint32_t       timeout,
+      size_t*        remaining,
+      tRioStatusCode *status);
 private:
    bool _started;
    uint32_t _dmaChannel;

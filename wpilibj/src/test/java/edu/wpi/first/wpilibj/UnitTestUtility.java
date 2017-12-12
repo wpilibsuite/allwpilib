@@ -11,6 +11,7 @@ import com.google.common.base.Stopwatch;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
 
 /**
@@ -25,6 +26,7 @@ public final class UnitTestUtility {
    * Sets up the base system WPILib so that it does not rely on hardware.
    */
   public static void setupMockBase() {
+    HAL.initialize(500, 0);
     try {
       // Check to see if this has been setup
       Timer.getFPGATimestamp();

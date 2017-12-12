@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-SPIAccelerometerData hal::SimSPIAccelerometerData[5];
+namespace hal {
+namespace init {
+void InitializeSPIAccelerometerData() {
+  static SPIAccelerometerData ssad[5];
+  ::hal::SimSPIAccelerometerData = ssad;
+}
+}  // namespace init
+}  // namespace hal
+
+SPIAccelerometerData* hal::SimSPIAccelerometerData;
 void SPIAccelerometerData::ResetData() {
   m_active = false;
   m_activeCallbacks = nullptr;

@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-AccelerometerData hal::SimAccelerometerData[1];
+namespace hal {
+namespace init {
+void InitializeAccelerometerData() {
+  static AccelerometerData sad[1];
+  ::hal::SimAccelerometerData = sad;
+}
+}  // namespace init
+}  // namespace hal
+
+AccelerometerData* hal::SimAccelerometerData;
 void AccelerometerData::ResetData() {
   m_active = false;
   m_activeCallbacks = nullptr;

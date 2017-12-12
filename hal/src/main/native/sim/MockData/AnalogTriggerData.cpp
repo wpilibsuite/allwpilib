@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-AnalogTriggerData hal::SimAnalogTriggerData[kNumAnalogTriggers];
+namespace hal {
+namespace init {
+void InitializeAnalogTriggerData() {
+  static AnalogTriggerData satd[kNumAnalogTriggers];
+  ::hal::SimAnalogTriggerData = satd;
+}
+}  // namespace init
+}  // namespace hal
+
+AnalogTriggerData* hal::SimAnalogTriggerData;
 void AnalogTriggerData::ResetData() {
   m_initialized = 0;
   m_initializedCallbacks = nullptr;

@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-DigitalPWMData hal::SimDigitalPWMData[kNumDigitalPWMOutputs];
+namespace hal {
+namespace init {
+void InitializeDigitalPWMData() {
+  static DigitalPWMData sdpd[kNumDigitalPWMOutputs];
+  ::hal::SimDigitalPWMData = sdpd;
+}
+}  // namespace init
+}  // namespace hal
+
+DigitalPWMData* hal::SimDigitalPWMData;
 void DigitalPWMData::ResetData() {
   m_initialized = false;
   m_initializedCallbacks = nullptr;

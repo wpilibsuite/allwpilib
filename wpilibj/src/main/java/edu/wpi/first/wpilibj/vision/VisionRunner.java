@@ -28,6 +28,7 @@ public class VisionRunner<P extends VisionPipeline> {
   private final P m_pipeline;
   private final Mat m_image = new Mat();
   private final Listener<? super P> m_listener;
+  private volatile boolean m_enabled = true;
 
   /**
    * Listener interface for a callback that should run after a pipeline has processed its input.
@@ -107,9 +108,15 @@ public class VisionRunner<P extends VisionPipeline> {
       throw new IllegalStateException(
           "VisionRunner.runForever() cannot be called from the main robot thread");
     }
-    while (!Thread.interrupted()) {
+    while (m_enabled && !Thread.interrupted()) {
       runOnce();
     }
   }
 
+  /**
+   * Stop a RunForever() loop.
+   */
+  public void stop() {
+    m_enabled = false;
+  }
 }

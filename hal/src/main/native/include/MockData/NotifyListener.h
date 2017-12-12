@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include "HAL_Value.h"
 
 typedef void (*HAL_NotifyCallback)(const char* name, void* param,
@@ -34,3 +36,5 @@ struct HalCallbackListener {
 };
 
 }  // namespace hal
+
+#endif

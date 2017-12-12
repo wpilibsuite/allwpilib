@@ -128,7 +128,7 @@ public class Notifier {
     try {
       m_periodic = false;
       m_period = delay;
-      m_expirationTime = Utility.getFPGATime() * 1e-6 + delay;
+      m_expirationTime = RobotController.getFPGATime() * 1e-6 + delay;
       updateAlarm();
     } finally {
       m_processLock.unlock();
@@ -148,7 +148,7 @@ public class Notifier {
     try {
       m_periodic = true;
       m_period = period;
-      m_expirationTime = Utility.getFPGATime() * 1e-6 + period;
+      m_expirationTime = RobotController.getFPGATime() * 1e-6 + period;
       updateAlarm();
     } finally {
       m_processLock.unlock();

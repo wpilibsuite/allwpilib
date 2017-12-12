@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-AnalogGyroData hal::SimAnalogGyroData[kNumAccumulators];
+namespace hal {
+namespace init {
+void InitializeAnalogGyroData() {
+  static AnalogGyroData agd[kNumAccumulators];
+  ::hal::SimAnalogGyroData = agd;
+}
+}  // namespace init
+}  // namespace hal
+
+AnalogGyroData* hal::SimAnalogGyroData;
 void AnalogGyroData::ResetData() {
   m_angle = 0.0;
   m_angleCallbacks = nullptr;

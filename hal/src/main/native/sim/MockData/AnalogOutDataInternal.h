@@ -41,5 +41,5 @@ class AnalogOutData {
   std::atomic<HAL_Bool> m_initialized{0};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
 };
-extern AnalogOutData SimAnalogOutData[];
+extern AnalogOutData* SimAnalogOutData;
 }  // namespace hal

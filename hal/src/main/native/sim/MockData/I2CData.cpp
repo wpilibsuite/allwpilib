@@ -13,7 +13,16 @@
 
 using namespace hal;
 
-I2CData hal::SimI2CData[2];
+namespace hal {
+namespace init {
+void InitializeI2CData() {
+  static I2CData sid[2];
+  ::hal::SimI2CData = sid;
+}
+}  // namespace init
+}  // namespace hal
+
+I2CData* hal::SimI2CData;
 
 void I2CData::ResetData() {
   m_initialized = false;

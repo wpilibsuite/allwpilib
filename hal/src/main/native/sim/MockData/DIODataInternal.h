@@ -68,5 +68,5 @@ class DIOData {
   std::atomic<int32_t> m_filterIndex{-1};
   std::shared_ptr<NotifyListenerVector> m_filterIndexCallbacks = nullptr;
 };
-extern DIOData SimDIOData[];
+extern DIOData* SimDIOData;
 }  // namespace hal

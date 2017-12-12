@@ -24,13 +24,19 @@ using namespace hal;
 static wpi::mutex digitalI2COnBoardMutex;
 static wpi::mutex digitalI2CMXPMutex;
 
-static uint8_t i2COnboardObjCount = 0;
-static uint8_t i2CMXPObjCount = 0;
-static int i2COnBoardHandle = -1;
-static int i2CMXPHandle = -1;
+static uint8_t i2COnboardObjCount{0};
+static uint8_t i2CMXPObjCount{0};
+static int i2COnBoardHandle{-1};
+static int i2CMXPHandle{-1};
 
-static HAL_DigitalHandle i2CMXPDigitalHandle1 = HAL_kInvalidHandle;
-static HAL_DigitalHandle i2CMXPDigitalHandle2 = HAL_kInvalidHandle;
+static HAL_DigitalHandle i2CMXPDigitalHandle1{HAL_kInvalidHandle};
+static HAL_DigitalHandle i2CMXPDigitalHandle2{HAL_kInvalidHandle};
+
+namespace hal {
+namespace init {
+void InitializeI2C() {}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 

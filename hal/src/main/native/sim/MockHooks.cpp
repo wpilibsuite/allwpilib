@@ -19,6 +19,12 @@ static std::atomic<bool> programStarted{false};
 static std::atomic<uint64_t> programStartTime{0};
 
 namespace hal {
+namespace init {
+void InitializeMockHooks() {}
+}  // namespace init
+}  // namespace hal
+
+namespace hal {
 void RestartTiming() { programStartTime = wpi::Now(); }
 
 int64_t GetFPGATime() {

@@ -14,10 +14,65 @@
 #include "HAL/Errors.h"
 #include "HAL/Extensions.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALInitializer.h"
 #include "MockData/RoboRioDataInternal.h"
 #include "MockHooksInternal.h"
 
 using namespace hal;
+
+namespace hal {
+namespace init {
+void InitializeHAL() {
+  InitializeHandlesInternal();
+  InitializeAccelerometerData();
+  InitializeAnalogGyroData();
+  InitializeAnalogInData();
+  InitializeAnalogOutData();
+  InitializeAnalogTriggerData();
+  InitializeCanData();
+  InitializeDigitalPWMData();
+  InitializeDIOData();
+  InitializeDriverStationData();
+  InitializeEncoderData();
+  InitializeI2CData();
+  InitializePCMData();
+  InitializePDPData();
+  InitializePWMData();
+  InitializeRelayData();
+  InitializeRoboRioData();
+  InitializeSPIAccelerometerData();
+  InitializeSPIData();
+  InitializeAccelerometer();
+  InitializeAnalogAccumulator();
+  InitializeAnalogGyro();
+  InitializeAnalogInput();
+  InitializeAnalogInternal();
+  InitializeAnalogOutput();
+  InitializeCAN();
+  InitializeCompressor();
+  InitializeConstants();
+  InitializeCounter();
+  InitializeDigitalInternal();
+  InitializeDIO();
+  InitializeDriverStation();
+  InitializeExtensions();
+  InitializeI2C();
+  InitializeInterrupts();
+  InitializeMockHooks();
+  InitializeNotifier();
+  InitializeOSSerialPort();
+  InitializePDP();
+  InitializePorts();
+  InitializePower();
+  InitializePWM();
+  InitializeRelay();
+  InitializeSerialPort();
+  InitializeSolenoid();
+  InitializeSPI();
+  InitializeThreads();
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 
@@ -205,6 +260,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
   std::lock_guard<wpi::mutex> lock(initializeMutex);
   // Second check in case another thread was waiting
   if (initialized) return true;
+
+  hal::init::InitializeHAL();
 
   llvm::outs().SetUnbuffered();
   if (HAL_LoadExtensions() < 0) return false;

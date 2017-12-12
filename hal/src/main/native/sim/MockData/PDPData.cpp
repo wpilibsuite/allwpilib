@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-PDPData hal::SimPDPData[kNumPDPModules];
+namespace hal {
+namespace init {
+void InitializePDPData() {
+  static PDPData spd[kNumPDPModules];
+  ::hal::SimPDPData = spd;
+}
+}  // namespace init
+}  // namespace hal
+
+PDPData* hal::SimPDPData;
 void PDPData::ResetData() {
   m_initialized = false;
   m_initializedCallbacks = nullptr;

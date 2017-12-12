@@ -631,15 +631,15 @@ void PIDController::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PIDController");
   builder.SetSafeState([=]() { Reset(); });
   builder.AddDoubleProperty("p", [=]() { return GetP(); },
-                            [=](bool value) { SetP(value); });
+                            [=](double value) { SetP(value); });
   builder.AddDoubleProperty("i", [=]() { return GetI(); },
-                            [=](bool value) { SetI(value); });
+                            [=](double value) { SetI(value); });
   builder.AddDoubleProperty("d", [=]() { return GetD(); },
-                            [=](bool value) { SetD(value); });
+                            [=](double value) { SetD(value); });
   builder.AddDoubleProperty("f", [=]() { return GetF(); },
-                            [=](bool value) { SetF(value); });
+                            [=](double value) { SetF(value); });
   builder.AddDoubleProperty("setpoint", [=]() { return GetSetpoint(); },
-                            [=](bool value) { SetSetpoint(value); });
+                            [=](double value) { SetSetpoint(value); });
   builder.AddBooleanProperty("enabled", [=]() { return IsEnabled(); },
                              [=](bool value) { SetEnabled(value); });
 }

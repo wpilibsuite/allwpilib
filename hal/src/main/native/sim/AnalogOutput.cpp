@@ -22,8 +22,19 @@ struct AnalogOutput {
 }  // namespace
 
 static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
-                             kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>
+                             kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>*
     analogOutputHandles;
+
+namespace hal {
+namespace init {
+void InitializeAnalogOutput() {
+  static IndexedHandleResource<HAL_AnalogOutputHandle, AnalogOutput,
+                               kNumAnalogOutputs, HAL_HandleEnum::AnalogOutput>
+      aoH;
+  analogOutputHandles = &aoH;
+}
+}  // namespace init
+}  // namespace hal
 
 extern "C" {
 HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
@@ -34,12 +45,13 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
     return HAL_kInvalidHandle;
   }
 
-  HAL_AnalogOutputHandle handle = analogOutputHandles.Allocate(channel, status);
+  HAL_AnalogOutputHandle handle =
+      analogOutputHandles->Allocate(channel, status);
 
   if (*status != 0)
     return HAL_kInvalidHandle;  // failed to allocate. Pass error back.
 
-  auto port = analogOutputHandles.Get(handle);
+  auto port = analogOutputHandles->Get(handle);
   if (port == nullptr) {  // would only error on thread issue
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
@@ -54,9 +66,9 @@ HAL_AnalogOutputHandle HAL_InitializeAnalogOutputPort(HAL_PortHandle portHandle,
 
 void HAL_FreeAnalogOutputPort(HAL_AnalogOutputHandle analogOutputHandle) {
   // no status, so no need to check for a proper free.
-  auto port = analogOutputHandles.Get(analogOutputHandle);
+  auto port = analogOutputHandles->Get(analogOutputHandle);
   if (port == nullptr) return;
-  analogOutputHandles.Free(analogOutputHandle);
+  analogOutputHandles->Free(analogOutputHandle);
   SimAnalogOutData[port->channel].SetInitialized(false);
 }
 
@@ -66,7 +78,7 @@ HAL_Bool HAL_CheckAnalogOutputChannel(int32_t channel) {
 
 void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                          double voltage, int32_t* status) {
-  auto port = analogOutputHandles.Get(analogOutputHandle);
+  auto port = analogOutputHandles->Get(analogOutputHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return;
@@ -77,7 +89,7 @@ void HAL_SetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
 
 double HAL_GetAnalogOutput(HAL_AnalogOutputHandle analogOutputHandle,
                            int32_t* status) {
-  auto port = analogOutputHandles.Get(analogOutputHandle);
+  auto port = analogOutputHandles->Get(analogOutputHandle);
   if (port == nullptr) {
     *status = HAL_HANDLE_ERROR;
     return 0.0;

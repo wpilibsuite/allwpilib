@@ -121,7 +121,7 @@ public class AnalogPotentiometer extends SensorBase implements Potentiometer, Se
     if (m_analogInput == null) {
       return m_offset;
     }
-    return (m_analogInput.getVoltage() / ControllerPower.getVoltage5V()) * m_fullRange + m_offset;
+    return (m_analogInput.getVoltage() / RobotController.getVoltage5V()) * m_fullRange + m_offset;
   }
 
   @Override

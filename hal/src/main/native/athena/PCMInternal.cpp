@@ -16,6 +16,14 @@ namespace hal {
 
 std::unique_ptr<PCM> PCM_modules[kNumPCMModules];
 
+namespace init {
+void InitializePCMInternal() {
+  for (int i = 0; i < kNumPCMModules; i++) {
+    PCM_modules[i] = nullptr;
+  }
+}
+}  // namespace init
+
 void initializePCM(int32_t module, int32_t* status) {
   if (!HAL_CheckSolenoidModule(module)) {
     *status = RESOURCE_OUT_OF_RANGE;

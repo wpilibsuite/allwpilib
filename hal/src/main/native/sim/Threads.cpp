@@ -7,6 +7,12 @@
 
 #include "HAL/Threads.h"
 
+namespace hal {
+namespace init {
+void InitializeThreads() {}
+}  // namespace init
+}  // namespace hal
+
 int32_t HAL_GetThreadPriority(NativeThreadHandle handle, HAL_Bool* isRealTime,
                               int32_t* status) {
   return 0;

@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include <memory>
 
 #include "MockData/NotifyListenerVector.h"
@@ -65,3 +67,5 @@ std::shared_ptr<hal::ConstBufferListenerVector> CancelCallback(
 void InvokeCallback(
     std::shared_ptr<hal::ConstBufferListenerVector> currentVector,
     const char* name, const uint8_t* buffer, int32_t count);
+
+#endif

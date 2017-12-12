@@ -7,6 +7,8 @@
 
 #pragma once
 
+#ifndef __FRC_ROBORIO__
+
 #include "HAL/HAL.h"
 #include "NotifyListener.h"
 
@@ -53,4 +55,6 @@ void HALSIM_RegisterPDPAllNonCurrentCallbacks(int32_t index, int32_t channel,
 
 #ifdef __cplusplus
 }  // extern "C"
+#endif
+
 #endif

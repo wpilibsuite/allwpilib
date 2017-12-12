@@ -21,7 +21,9 @@ using namespace frc;
  * @param videoSource the video source to use to supply images for the pipeline
  */
 VisionRunnerBase::VisionRunnerBase(cs::VideoSource videoSource)
-    : m_image(std::make_unique<cv::Mat>()), m_cvSink("VisionRunner CvSink") {
+    : m_image(std::make_unique<cv::Mat>()),
+      m_cvSink("VisionRunner CvSink"),
+      m_enabled(true) {
   m_cvSink.SetSource(videoSource);
 }
 
@@ -70,7 +72,12 @@ void VisionRunnerBase::RunForever() {
         "thread");
     return;
   }
-  while (true) {
+  while (m_enabled) {
     RunOnce();
   }
 }
+
+/**
+ * Stop a RunForever() loop.
+ */
+void VisionRunnerBase::Stop() { m_enabled = false; }

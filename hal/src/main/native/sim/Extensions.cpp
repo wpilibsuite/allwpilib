@@ -33,6 +33,12 @@
 #define DLCLOSE dlclose
 #endif
 
+namespace hal {
+namespace init {
+void InitializeExtensions() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 
 int HAL_LoadOneExtension(const char* library) {

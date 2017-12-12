@@ -77,5 +77,5 @@ class PWMData {
   std::atomic<HAL_Bool> m_zeroLatch{false};
   std::shared_ptr<NotifyListenerVector> m_zeroLatchCallbacks = nullptr;
 };
-extern PWMData SimPWMData[];
+extern PWMData* SimPWMData;
 }  // namespace hal

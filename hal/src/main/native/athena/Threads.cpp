@@ -12,6 +12,12 @@
 
 #include "HAL/Errors.h"
 
+namespace hal {
+namespace init {
+void InitializeThreads() {}
+}  // namespace init
+}  // namespace hal
+
 extern "C" {
 
 /**

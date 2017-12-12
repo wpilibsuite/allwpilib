@@ -17,6 +17,7 @@
 
 #include <llvm/StringRef.h>
 #include <llvm/Twine.h>
+#include <support/deprecated.h>
 
 #define wpi_assert(condition) \
   wpi_assert_impl(condition, #condition, "", __FILE__, __LINE__, __FUNCTION__)
@@ -54,9 +55,13 @@ void wpi_suspendOnAssertEnabled(bool enabled);
 
 namespace frc {
 
+WPI_DEPRECATED("Use RobotController static class method")
 int GetFPGAVersion();
+WPI_DEPRECATED("Use RobotController static class method")
 int64_t GetFPGARevision();
+WPI_DEPRECATED("Use RobotController static class method")
 uint64_t GetFPGATime();
+WPI_DEPRECATED("Use RobotController static class method")
 bool GetUserButton();
 std::string GetStackTrace(int offset);
 

@@ -19,6 +19,7 @@ public class JNITest {
 
   @Test
   public void jniHalLinkTest() {
+    HAL.initialize(500, 0);
     // Test to verify that the JNI test link works correctly.
     HALUtil.getHALRuntimeType();
   }

@@ -11,7 +11,16 @@
 
 using namespace hal;
 
-RoboRioData hal::SimRoboRioData[1];
+namespace hal {
+namespace init {
+void InitializeRoboRioData() {
+  static RoboRioData srrd[1];
+  ::hal::SimRoboRioData = srrd;
+}
+}  // namespace init
+}  // namespace hal
+
+RoboRioData* hal::SimRoboRioData;
 void RoboRioData::ResetData() {
   m_fPGAButton = false;
   m_fPGAButtonCallbacks = nullptr;
