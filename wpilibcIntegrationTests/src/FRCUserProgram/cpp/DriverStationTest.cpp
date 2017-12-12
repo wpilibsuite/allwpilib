@@ -7,8 +7,8 @@
 
 #include "DriverStation.h"  // NOLINT(build/include_order)
 
+#include "RobotController.h"
 #include "TestBench.h"
-#include "Utility.h"
 #include "gtest/gtest.h"
 
 using namespace frc;
@@ -22,13 +22,13 @@ class DriverStationTest : public testing::Test {};
  * Test if the WaitForData function works
  */
 TEST_F(DriverStationTest, WaitForData) {
-  uint64_t initialTime = GetFPGATime();
+  uint64_t initialTime = RobotController::GetFPGATime();
 
   for (int i = 0; i < 50; i++) {
     DriverStation::GetInstance().WaitForData();
   }
 
-  uint64_t finalTime = GetFPGATime();
+  uint64_t finalTime = RobotController::GetFPGATime();
 
   EXPECT_NEAR(TIMER_RUNTIME, finalTime - initialTime,
               TIMER_TOLERANCE * TIMER_RUNTIME);
