@@ -104,15 +104,6 @@ void initializeDigital(int32_t* status) {
   // SPI setup
   spiSystem.reset(tSPI::create(status));
 
-  // Image 13 requires a SPI select and a strobe to enable SPI CS on MXP.
-  // Switch to SPI 1, strobe the signal, and then switch back to previous.
-  bool existingSelect = spiSystem->readAutoSPI1Select(status);
-  spiSystem->writeAutoSPI1Select(true, status);
-  spiSystem->strobeAutoForceOne(status);
-  // Delay enough time to actually trigger strobe
-  std::this_thread::sleep_for(std::chrono::milliseconds(50));
-  spiSystem->writeAutoSPI1Select(existingSelect, status);
-
   initialized = true;
 }
 
