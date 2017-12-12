@@ -8,7 +8,7 @@
 #include "AnalogPotentiometer.h"  // NOLINT(build/include_order)
 
 #include "AnalogOutput.h"
-#include "ControllerPower.h"
+#include "RobotController.h"
 #include "TestBench.h"
 #include "Timer.h"
 #include "gtest/gtest.h"
@@ -43,7 +43,7 @@ TEST_F(AnalogPotentiometerTest, TestInitialSettings) {
 }
 
 TEST_F(AnalogPotentiometerTest, TestRangeValues) {
-  m_fakePot->SetVoltage(kAngle / kScale * ControllerPower::GetVoltage5V());
+  m_fakePot->SetVoltage(kAngle / kScale * RobotController::GetVoltage5V());
   Wait(0.1);
   EXPECT_NEAR(kAngle, m_pot->Get(), 2.0)
       << "The potentiometer did not measure the correct angle.";
