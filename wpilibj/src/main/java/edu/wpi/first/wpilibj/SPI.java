@@ -54,6 +54,10 @@ public class SPI {
    * Free the resources used by this object.
    */
   public void free() {
+    if (m_accum != null) {
+      m_accum.free();
+      m_accum = null;
+    }
     SPIJNI.spiClose(m_port);
   }
 
@@ -255,6 +259,247 @@ public class SPI {
   }
 
   /**
+   * Initialize automatic SPI transfer engine.
+   *
+   * <p>Only a single engine is available, and use of it blocks use of all other
+   * chip select usage on the same physical SPI port while it is running.
+   *
+   * @param bufferSize buffer size in bytes
+   */
+  public void initAuto(int bufferSize) {
+    SPIJNI.spiInitAuto(m_port, bufferSize);
+  }
+
+  /**
+   * Frees the automatic SPI transfer engine.
+   */
+  public void freeAuto() {
+    SPIJNI.spiFreeAuto(m_port);
+  }
+
+  /**
+   * Set the data to be transmitted by the engine.
+   *
+   * <p>Up to 16 bytes are configurable, and may be followed by up to 127 zero
+   * bytes.
+   *
+   * @param dataToSend data to send (maximum 16 bytes)
+   * @param zeroSize number of zeros to send after the data
+   */
+  public void setAutoTransmitData(byte[] dataToSend, int zeroSize) {
+    SPIJNI.spiSetAutoTransmitData(m_port, dataToSend, zeroSize);
+  }
+
+  /**
+   * Start running the automatic SPI transfer engine at a periodic rate.
+   *
+   * <p>{@link #initAuto(int)} and {@link #setAutoTransmitData(byte[], int)} must
+   * be called before calling this function.
+   *
+   * @param period period between transfers, in seconds (us resolution)
+   */
+  public void startAutoRate(double period) {
+    SPIJNI.spiStartAutoRate(m_port, period);
+  }
+
+  /**
+   * Start running the automatic SPI transfer engine when a trigger occurs.
+   *
+   * <p>{@link #initAuto(int)} and {@link #setAutoTransmitData(byte[], int)} must
+   * be called before calling this function.
+   *
+   * @param source digital source for the trigger (may be an analog trigger)
+   * @param rising trigger on the rising edge
+   * @param falling trigger on the falling edge
+   */
+  public void startAutoTrigger(DigitalSource source, boolean rising, boolean falling) {
+    SPIJNI.spiStartAutoTrigger(m_port, source.getPortHandleForRouting(),
+                               source.getAnalogTriggerTypeForRouting(), rising, falling);
+  }
+
+  /**
+   * Stop running the automatic SPI transfer engine.
+   */
+  public void stopAuto() {
+    SPIJNI.spiStopAuto(m_port);
+  }
+
+  /**
+   * Force the engine to make a single transfer.
+   */
+  public void forceAutoRead() {
+    SPIJNI.spiForceAutoRead(m_port);
+  }
+
+  /**
+   * Read data that has been transferred by the automatic SPI transfer engine.
+   *
+   * <p>Transfers may be made a byte at a time, so it's necessary for the caller
+   * to handle cases where an entire transfer has not been completed.
+   *
+   * <p>Blocks until numToRead bytes have been read or timeout expires.
+   * May be called with numToRead=0 to retrieve how many bytes are available.
+   *
+   * @param buffer buffer where read bytes are stored
+   * @param numToRead number of bytes to read
+   * @param timeout timeout in seconds (ms resolution)
+   * @return Number of bytes remaining to be read
+   */
+  public int readAutoReceivedData(ByteBuffer buffer, int numToRead, double timeout) {
+    if (buffer.hasArray()) {
+      return readAutoReceivedData(buffer.array(), numToRead, timeout);
+    }
+    if (!buffer.isDirect()) {
+      throw new IllegalArgumentException("must be a direct buffer");
+    }
+    if (buffer.capacity() < numToRead) {
+      throw new IllegalArgumentException("buffer is too small, must be at least " + numToRead);
+    }
+    return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeout);
+  }
+
+  /**
+   * Read data that has been transferred by the automatic SPI transfer engine.
+   *
+   * <p>Transfers may be made a byte at a time, so it's necessary for the caller
+   * to handle cases where an entire transfer has not been completed.
+   *
+   * <p>Blocks until numToRead bytes have been read or timeout expires.
+   * May be called with numToRead=0 to retrieve how many bytes are available.
+   *
+   * @param buffer array where read bytes are stored
+   * @param numToRead number of bytes to read
+   * @param timeout timeout in seconds (ms resolution)
+   * @return Number of bytes remaining to be read
+   */
+  public int readAutoReceivedData(byte[] buffer, int numToRead, double timeout) {
+    if (buffer.length < numToRead) {
+      throw new IllegalArgumentException("buffer is too small, must be at least " + numToRead);
+    }
+    return SPIJNI.spiReadAutoReceivedData(m_port, buffer, numToRead, timeout);
+  }
+
+  /**
+   * Get the number of bytes dropped by the automatic SPI transfer engine due
+   * to the receive buffer being full.
+   *
+   * @return Number of bytes dropped
+   */
+  public int getAutoDroppedCount() {
+    return SPIJNI.spiGetAutoDroppedCount(m_port);
+  }
+
+  private static final int kAccumulateDepth = 2048;
+
+  private static class Accumulator {
+    Accumulator(int port, int xferSize, int validMask, int validValue, int dataShift,
+                int dataSize, boolean isSigned, boolean bigEndian) {
+      m_notifier = new Notifier(this::update);
+      m_buf = ByteBuffer.allocateDirect(xferSize * kAccumulateDepth);
+      m_xferSize = xferSize;
+      m_validMask = validMask;
+      m_validValue = validValue;
+      m_dataShift = dataShift;
+      m_dataMax = 1 << dataSize;
+      m_dataMsbMask = 1 << (dataSize - 1);
+      m_isSigned = isSigned;
+      m_bigEndian = bigEndian;
+      m_port = port;
+    }
+
+    void free() {
+      m_notifier.stop();
+    }
+
+    final Notifier m_notifier;
+    final ByteBuffer m_buf;
+    final Object m_mutex = new Object();
+
+    long m_value;
+    int m_count;
+    int m_lastValue;
+
+    int m_center;
+    int m_deadband;
+
+    final int m_validMask;
+    final int m_validValue;
+    final int m_dataMax;        // one more than max data value
+    final int m_dataMsbMask;    // data field MSB mask (for signed)
+    final int m_dataShift;      // data field shift right amount, in bits
+    final int m_xferSize;       // SPI transfer size, in bytes
+    final boolean m_isSigned;   // is data field signed?
+    final boolean m_bigEndian;  // is response big endian?
+    final int m_port;
+
+    void update() {
+      synchronized (m_mutex) {
+        boolean done = false;
+        while (!done) {
+          done = true;
+
+          // get amount of data available
+          int numToRead = SPIJNI.spiReadAutoReceivedData(m_port, m_buf, 0, 0);
+
+          // only get whole responses
+          numToRead -= numToRead % m_xferSize;
+          if (numToRead > m_xferSize * kAccumulateDepth) {
+            numToRead = m_xferSize * kAccumulateDepth;
+            done = false;
+          }
+          if (numToRead == 0) {
+            return;  // no samples
+          }
+
+          // read buffered data
+          SPIJNI.spiReadAutoReceivedData(m_port, m_buf, numToRead, 0);
+
+          // loop over all responses
+          for (int off = 0; off < numToRead; off += m_xferSize) {
+            // convert from bytes
+            int resp = 0;
+            if (m_bigEndian) {
+              for (int i = 0; i < m_xferSize; ++i) {
+                resp <<= 8;
+                resp |= ((int) m_buf.get(off + i)) & 0xff;
+              }
+            } else {
+              for (int i = m_xferSize - 1; i >= 0; --i) {
+                resp <<= 8;
+                resp |= ((int) m_buf.get(off + i)) & 0xff;
+              }
+            }
+
+            // process response
+            if ((resp & m_validMask) == m_validValue) {
+              // valid sensor data; extract data field
+              int data = resp >> m_dataShift;
+              data &= m_dataMax - 1;
+              // 2s complement conversion if signed MSB is set
+              if (m_isSigned && (data & m_dataMsbMask) != 0) {
+                data -= m_dataMax;
+              }
+              // center offset
+              data -= m_center;
+              // only accumulate if outside deadband
+              if (data < -m_deadband || data > m_deadband) {
+                m_value += data;
+              }
+              ++m_count;
+              m_lastValue = data;
+            } else {
+              // no data from the sensor; just clear the last value
+              m_lastValue = 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private Accumulator m_accum = null;
+
+  /**
    * Initialize the accumulator.
    *
    * @param period     Time between reads
@@ -271,23 +516,51 @@ public class SPI {
                               int validMask, int validValue,
                               int dataShift, int dataSize,
                               boolean isSigned, boolean bigEndian) {
-    SPIJNI.spiInitAccumulator(m_port, (int) (period * 1.0e6), cmd,
-        (byte) xferSize, validMask, validValue, (byte) dataShift,
-        (byte) dataSize, isSigned, bigEndian);
+    initAuto(xferSize * 2048);
+    byte[] cmdBytes = new byte[] {0, 0, 0, 0};
+    if (bigEndian) {
+      for (int i = xferSize - 1; i >= 0; --i) {
+        cmdBytes[i] = (byte) (cmd & 0xff);
+        cmd >>= 8;
+      }
+    } else {
+      cmdBytes[0] = (byte) (cmd & 0xff);
+      cmd >>= 8;
+      cmdBytes[1] = (byte) (cmd & 0xff);
+      cmd >>= 8;
+      cmdBytes[2] = (byte) (cmd & 0xff);
+      cmd >>= 8;
+      cmdBytes[3] = (byte) (cmd & 0xff);
+    }
+    setAutoTransmitData(cmdBytes, xferSize - 4);
+    startAutoRate(period);
+
+    m_accum = new Accumulator(m_port, xferSize, validMask, validValue, dataShift, dataSize,
+                              isSigned, bigEndian);
+    m_accum.m_notifier.startPeriodic(period * 1024);
   }
 
   /**
    * Frees the accumulator.
    */
   public void freeAccumulator() {
-    SPIJNI.spiFreeAccumulator(m_port);
+    m_accum.free();
+    m_accum = null;
+    freeAuto();
   }
 
   /**
    * Resets the accumulator to zero.
    */
   public void resetAccumulator() {
-    SPIJNI.spiResetAccumulator(m_port);
+    if (m_accum == null) {
+      return;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.m_value = 0;
+      m_accum.m_count = 0;
+      m_accum.m_lastValue = 0;
+    }
   }
 
   /**
@@ -298,21 +571,37 @@ public class SPI {
    * and to take the device offset into account when integrating.
    */
   public void setAccumulatorCenter(int center) {
-    SPIJNI.spiSetAccumulatorCenter(m_port, center);
+    if (m_accum == null) {
+      return;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.m_center = center;
+    }
   }
 
   /**
    * Set the accumulator's deadband.
    */
   public void setAccumulatorDeadband(int deadband) {
-    SPIJNI.spiSetAccumulatorDeadband(m_port, deadband);
+    if (m_accum == null) {
+      return;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.m_deadband = deadband;
+    }
   }
 
   /**
    * Read the last value read by the accumulator engine.
    */
   public int getAccumulatorLastValue() {
-    return SPIJNI.spiGetAccumulatorLastValue(m_port);
+    if (m_accum == null) {
+      return 0;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      return m_accum.m_lastValue;
+    }
   }
 
   /**
@@ -321,7 +610,13 @@ public class SPI {
    * @return The 64-bit value accumulated since the last Reset().
    */
   public long getAccumulatorValue() {
-    return SPIJNI.spiGetAccumulatorValue(m_port);
+    if (m_accum == null) {
+      return 0;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      return m_accum.m_value;
+    }
   }
 
   /**
@@ -332,7 +627,13 @@ public class SPI {
    * @return The number of times samples from the channel were accumulated.
    */
   public int getAccumulatorCount() {
-    return SPIJNI.spiGetAccumulatorCount(m_port);
+    if (m_accum == null) {
+      return 0;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      return m_accum.m_count;
+    }
   }
 
   /**
@@ -341,7 +642,16 @@ public class SPI {
    * @return The accumulated average value (value / count).
    */
   public double getAccumulatorAverage() {
-    return SPIJNI.spiGetAccumulatorAverage(m_port);
+    if (m_accum == null) {
+      return 0;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      if (m_accum.m_count == 0) {
+        return 0.0;
+      }
+      return ((double) m_accum.m_value) / m_accum.m_count;
+    }
   }
 
   /**
@@ -355,6 +665,15 @@ public class SPI {
     if (result == null) {
       throw new IllegalArgumentException("Null parameter `result'");
     }
-    SPIJNI.spiGetAccumulatorOutput(m_port, result);
+    if (m_accum == null) {
+      result.value = 0;
+      result.count = 0;
+      return;
+    }
+    synchronized (m_accum.m_mutex) {
+      m_accum.update();
+      result.value = m_accum.m_value;
+      result.count = m_accum.m_count;
+    }
   }
 }

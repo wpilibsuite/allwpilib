@@ -15,7 +15,6 @@
 #include <array>
 #include <atomic>
 #include <cstring>
-#include <thread>
 
 #include <llvm/raw_ostream.h>
 #include <support/mutex.h>
@@ -23,7 +22,6 @@
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
-#include "HAL/Notifier.h"
 #include "HAL/cpp/make_unique.h"
 #include "HAL/handles/HandlesInternal.h"
 
@@ -43,34 +41,24 @@ static std::array<wpi::mutex, kSpiMaxHandles> spiApiMutexes;
 static std::array<wpi::mutex, kSpiMaxHandles> spiAccumulatorMutexes;
 
 // MXP SPI does not count towards this
-std::atomic<int32_t> spiPortCount{0};
+static std::atomic<int32_t> spiPortCount{0};
 
 static HAL_DigitalHandle digitalHandles[9]{HAL_kInvalidHandle};
 
-struct SPIAccumulator {
-  std::atomic<HAL_NotifierHandle> notifier{0};
-  uint64_t triggerTime;
-  int32_t period;
+static wpi::mutex spiAutoMutex;
+static int32_t spiAutoPort = kSpiMaxHandles;
+static std::atomic_bool spiAutoRunning{false};
+static std::unique_ptr<tDMAManager> spiAutoDMA;
 
-  int64_t value = 0;
-  uint32_t count = 0;
-  int32_t lastValue = 0;
-
-  int32_t center = 0;
-  int32_t deadband = 0;
-
-  uint8_t cmd[4];  // command to send (up to 4 bytes)
-  int32_t validMask;
-  int32_t validValue;
-  int32_t dataMax;      // one more than max data value
-  int32_t dataMsbMask;  // data field MSB mask (for signed)
-  uint8_t dataShift;    // data field shift right amount, in bits
-  uint8_t xferSize;     // SPI transfer size, in bytes (up to 4)
-  HAL_SPIPort port;
-  bool isSigned;   // is data field signed?
-  bool bigEndian;  // is response big endian?
-};
-std::unique_ptr<SPIAccumulator> spiAccumulators[5];
+static bool SPIInUseByAuto(HAL_SPIPort port) {
+  // SPI engine conflicts with any other chip selects on the same SPI device.
+  // There are two SPI devices: one for ports 0-3 (onboard), the other for port
+  // 4 (MXP).
+  if (!spiAutoRunning) return false;
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  return (spiAutoPort >= 0 && spiAutoPort <= 3 && port >= 0 && port <= 3) ||
+         (spiAutoPort == 4 && port == 4);
+}
 
 namespace hal {
 namespace init {
@@ -273,6 +261,8 @@ int32_t HAL_TransactionSPI(HAL_SPIPort port, const uint8_t* dataToSend,
     return -1;
   }
 
+  if (SPIInUseByAuto(port)) return -1;
+
   struct spi_ioc_transfer xfer;
   std::memset(&xfer, 0, sizeof(xfer));
   xfer.tx_buf = (__u64)dataToSend;
@@ -298,6 +288,8 @@ int32_t HAL_WriteSPI(HAL_SPIPort port, const uint8_t* dataToSend,
   if (port < 0 || port >= kSpiMaxHandles) {
     return -1;
   }
+
+  if (SPIInUseByAuto(port)) return -1;
 
   struct spi_ioc_transfer xfer;
   std::memset(&xfer, 0, sizeof(xfer));
@@ -326,6 +318,8 @@ int32_t HAL_ReadSPI(HAL_SPIPort port, uint8_t* buffer, int32_t count) {
     return -1;
   }
 
+  if (SPIInUseByAuto(port)) return -1;
+
   struct spi_ioc_transfer xfer;
   std::memset(&xfer, 0, sizeof(xfer));
   xfer.rx_buf = (__u64)buffer;
@@ -346,7 +340,7 @@ void HAL_CloseSPI(HAL_SPIPort port) {
   }
 
   int32_t status = 0;
-  HAL_FreeSPIAccumulator(port, &status);
+  HAL_FreeSPIAuto(port, &status);
 
   {
     std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
@@ -522,313 +516,202 @@ void HAL_SetSPIHandle(HAL_SPIPort port, int32_t handle) {
   }
 }
 
-static void spiAccumulatorProcess(uint64_t currentTime, SPIAccumulator* accum) {
-  // perform SPI transaction
-  uint8_t resp_b[4];
-  HAL_TransactionSPI(accum->port, accum->cmd, resp_b, accum->xferSize);
+void HAL_InitSPIAuto(HAL_SPIPort port, int32_t bufferSize, int32_t* status) {
+  if (port < 0 || port >= kSpiMaxHandles) {
+    *status = PARAMETER_OUT_OF_RANGE;
+    return;
+  }
 
-  // convert from bytes
-  uint32_t resp = 0;
-  if (accum->bigEndian) {
-    for (int32_t i = 0; i < accum->xferSize; ++i) {
-      resp <<= 8;
-      resp |= resp_b[i] & 0xff;
-    }
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (spiAutoPort != kSpiMaxHandles) {
+    *status = RESOURCE_IS_ALLOCATED;
+    return;
+  }
+
+  // remember the initialized port for other entry points
+  spiAutoPort = port;
+
+  // configure the correct chip select
+  if (port < 4) {
+    spiSystem->writeAutoSPI1Select(false, status);
+    spiSystem->writeAutoChipSelect(port, status);
   } else {
-    for (int32_t i = accum->xferSize - 1; i >= 0; --i) {
-      resp <<= 8;
-      resp |= resp_b[i] & 0xff;
-    }
+    spiSystem->writeAutoSPI1Select(true, status);
+    spiSystem->writeAutoChipSelect(0, status);
   }
 
-  // process response
-  if ((resp & accum->validMask) == static_cast<uint32_t>(accum->validValue)) {
-    // valid sensor data; extract data field
-    int32_t data = static_cast<int32_t>(resp >> accum->dataShift);
-    data &= accum->dataMax - 1;
-    // 2s complement conversion if signed MSB is set
-    if (accum->isSigned && (data & accum->dataMsbMask) != 0)
-      data -= accum->dataMax;
-    // center offset
-    data -= accum->center;
-    // only accumulate if outside deadband
-    if (data < -accum->deadband || data > accum->deadband) accum->value += data;
-    ++accum->count;
-    accum->lastValue = data;
-  } else {
-    // no data from the sensor; just clear the last value
-    accum->lastValue = 0;
-  }
-
-  // reschedule timer
-  accum->triggerTime += accum->period;
-  // handle timer slip
-  if (accum->triggerTime < currentTime)
-    accum->triggerTime = currentTime + accum->period;
-  int32_t status = 0;
-  HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, &status);
+  // configure DMA
+  tDMAChannelDescriptor desc;
+  spiSystem->getSystemInterface()->getDmaDescriptor(g_SpiAutoData_index, &desc);
+  spiAutoDMA = std::make_unique<tDMAManager>(desc.channel, bufferSize, status);
 }
 
-/**
- * Initialize a SPI accumulator.
- *
- * @param port SPI port
- * @param period Time between reads, in us
- * @param cmd SPI command to send to request data
- * @param xferSize SPI transfer size, in bytes
- * @param validMask Mask to apply to received data for validity checking
- * @param valid_data After validMask is applied, required matching value for
- *                   validity checking
- * @param dataShift Bit shift to apply to received data to get actual data
- *                   value
- * @param dataSize Size (in bits) of data field
- * @param isSigned Is data field signed?
- * @param bigEndian Is device big endian?
- */
-void HAL_InitSPIAccumulator(HAL_SPIPort port, int32_t period, int32_t cmd,
-                            int32_t xferSize, int32_t validMask,
-                            int32_t validValue, int32_t dataShift,
-                            int32_t dataSize, HAL_Bool isSigned,
-                            HAL_Bool bigEndian, int32_t* status) {
+void HAL_FreeSPIAuto(HAL_SPIPort port, int32_t* status) {
   if (port < 0 || port >= kSpiMaxHandles) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
-  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
-  if (!spiAccumulators[port])
-    spiAccumulators[port] = std::make_unique<SPIAccumulator>();
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (bigEndian) {
-    for (int32_t i = xferSize - 1; i >= 0; --i) {
-      accum->cmd[i] = cmd & 0xff;
-      cmd >>= 8;
-    }
-  } else {
-    accum->cmd[0] = cmd & 0xff;
-    cmd >>= 8;
-    accum->cmd[1] = cmd & 0xff;
-    cmd >>= 8;
-    accum->cmd[2] = cmd & 0xff;
-    cmd >>= 8;
-    accum->cmd[3] = cmd & 0xff;
-  }
-  accum->period = period;
-  accum->xferSize = xferSize;
-  accum->validMask = validMask;
-  accum->validValue = validValue;
-  accum->dataShift = dataShift;
-  accum->dataMax = (1 << dataSize);
-  accum->dataMsbMask = (1 << (dataSize - 1));
-  accum->isSigned = isSigned;
-  accum->bigEndian = bigEndian;
-  accum->port = port;
-  if (!accum->notifier) {
-    accum->notifier = HAL_InitializeNotifier(status);
-    accum->triggerTime = HAL_GetFPGATime(status) + period;
-    if (*status != 0) return;
-    std::thread thr([=] {
-      int32_t status2 = 0;
-      while (status2 == 0) {
-        uint64_t curTime = HAL_WaitForNotifierAlarm(accum->notifier, &status2);
-        if (curTime == 0 || status2 != 0) break;
-        spiAccumulatorProcess(curTime, accum);
-      }
-    });
-    thr.detach();
-    HAL_UpdateNotifierAlarm(accum->notifier, accum->triggerTime, status);
-  }
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  if (spiAutoPort != port) return;
+  spiAutoPort = kSpiMaxHandles;
+
+  // disable by setting to internal clock and setting rate=0
+  spiSystem->writeAutoRate(0, status);
+  spiSystem->writeAutoTriggerConfig_ExternalClock(false, status);
+
+  // stop the DMA
+  spiAutoDMA->stop(status);
+
+  spiAutoDMA.reset(nullptr);
+
+  spiAutoRunning = false;
 }
 
-/**
- * Frees a SPI accumulator.
- */
-void HAL_FreeSPIAccumulator(HAL_SPIPort port, int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
+void HAL_StartSPIAutoRate(HAL_SPIPort port, double period, int32_t* status) {
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (port != spiAutoPort) {
+    *status = INCOMPATIBLE_STATE;
+    return;
+  }
+
+  spiAutoRunning = true;
+
+  // start the DMA
+  spiAutoDMA->start(status);
+
+  // auto rate is in microseconds
+  spiSystem->writeAutoRate(period * 1000000, status);
+
+  // disable the external clock
+  spiSystem->writeAutoTriggerConfig_ExternalClock(false, status);
+}
+
+void HAL_StartSPIAutoTrigger(HAL_SPIPort port, HAL_Handle digitalSourceHandle,
+                             HAL_AnalogTriggerType analogTriggerType,
+                             HAL_Bool triggerRising, HAL_Bool triggerFalling,
+                             int32_t* status) {
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (port != spiAutoPort) {
+    *status = INCOMPATIBLE_STATE;
+    return;
+  }
+
+  spiAutoRunning = true;
+
+  // start the DMA
+  spiAutoDMA->start(status);
+
+  // get channel routing
+  bool routingAnalogTrigger = false;
+  uint8_t routingChannel = 0;
+  uint8_t routingModule = 0;
+  if (!remapDigitalSource(digitalSourceHandle, analogTriggerType,
+                          routingChannel, routingModule,
+                          routingAnalogTrigger)) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  // configure external trigger and enable it
+  tSPI::tAutoTriggerConfig config;
+  config.ExternalClock = 1;
+  config.FallingEdge = triggerFalling ? 1 : 0;
+  config.RisingEdge = triggerRising ? 1 : 0;
+  config.ExternalClockSource_AnalogTrigger = routingAnalogTrigger ? 1 : 0;
+  config.ExternalClockSource_Module = routingModule;
+  config.ExternalClockSource_Channel = routingChannel;
+  spiSystem->writeAutoTriggerConfig(config, status);
+}
+
+void HAL_StopSPIAuto(HAL_SPIPort port, int32_t* status) {
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (port != spiAutoPort) {
+    *status = INCOMPATIBLE_STATE;
+    return;
+  }
+
+  // disable by setting to internal clock and setting rate=0
+  spiSystem->writeAutoRate(0, status);
+  spiSystem->writeAutoTriggerConfig_ExternalClock(false, status);
+
+  // stop the DMA
+  spiAutoDMA->stop(status);
+
+  spiAutoRunning = false;
+}
+
+void HAL_SetSPIAutoTransmitData(HAL_SPIPort port, const uint8_t* dataToSend,
+                                int32_t dataSize, int32_t zeroSize,
+                                int32_t* status) {
+  if (dataSize < 0 || dataSize > 16) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
-  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (!accum) {
-    *status = NULL_PARAMETER;
-    return;
-  }
-  HAL_NotifierHandle handle = accum->notifier.exchange(0);
-  HAL_CleanNotifier(handle, status);
-  spiAccumulators[port] = nullptr;
-}
-
-/**
- * Resets the accumulator to zero.
- */
-void HAL_ResetSPIAccumulator(HAL_SPIPort port, int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
+  if (zeroSize < 0 || zeroSize > 127) {
     *status = PARAMETER_OUT_OF_RANGE;
     return;
   }
 
-  std::lock_guard<wpi::mutex> lock(spiApiMutexes[port]);
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (!accum) {
-    *status = NULL_PARAMETER;
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (port != spiAutoPort) {
+    *status = INCOMPATIBLE_STATE;
     return;
   }
-  accum->value = 0;
-  accum->count = 0;
-  accum->lastValue = 0;
+
+  // set tx data registers
+  for (int32_t i = 0; i < dataSize; ++i)
+    spiSystem->writeAutoTx(i >> 2, i & 3, dataToSend[i], status);
+
+  // set byte counts
+  tSPI::tAutoByteCount config;
+  config.ZeroByteCount = static_cast<unsigned>(zeroSize) & 0x7f;
+  config.TxByteCount = static_cast<unsigned>(dataSize) & 0xf;
+  spiSystem->writeAutoByteCount(config, status);
 }
 
-/**
- * Set the center value of the accumulator.
- *
- * The center value is subtracted from each value before it is added to the
- * accumulator. This
- * is used for the center value of devices like gyros and accelerometers to make
- * integration work
- * and to take the device offset into account when integrating.
- */
-void HAL_SetSPIAccumulatorCenter(HAL_SPIPort port, int32_t center,
-                                 int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
-    *status = PARAMETER_OUT_OF_RANGE;
+void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status) {
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (port != spiAutoPort) {
+    *status = INCOMPATIBLE_STATE;
     return;
   }
 
-  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (!accum) {
-    *status = NULL_PARAMETER;
-    return;
-  }
-  accum->center = center;
+  spiSystem->strobeAutoForceOne(status);
 }
 
-/**
- * Set the accumulator's deadband.
- */
-void HAL_SetSPIAccumulatorDeadband(HAL_SPIPort port, int32_t deadband,
-                                   int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return;
-  }
-
-  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (!accum) {
-    *status = NULL_PARAMETER;
-    return;
-  }
-  accum->deadband = deadband;
-}
-
-/**
- * Read the last value read by the accumulator engine.
- */
-int32_t HAL_GetSPIAccumulatorLastValue(HAL_SPIPort port, int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
-    *status = PARAMETER_OUT_OF_RANGE;
+int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
+                                    int32_t numToRead, double timeout,
+                                    int32_t* status) {
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (port != spiAutoPort) {
+    *status = INCOMPATIBLE_STATE;
     return 0;
   }
 
-  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (!accum) {
-    *status = NULL_PARAMETER;
-    return 0;
-  }
-  return accum->lastValue;
+  size_t numRemaining = 0;
+  // timeout is in ms
+  spiAutoDMA->read(buffer, numToRead, timeout * 1000, &numRemaining, status);
+  return numRemaining;
 }
 
-/**
- * Read the accumulated value.
- *
- * @return The 64-bit value accumulated since the last Reset().
- */
-int64_t HAL_GetSPIAccumulatorValue(HAL_SPIPort port, int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
-    *status = PARAMETER_OUT_OF_RANGE;
+int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {
+  std::lock_guard<wpi::mutex> lock(spiAutoMutex);
+  // FPGA only has one auto SPI engine
+  if (port != spiAutoPort) {
+    *status = INCOMPATIBLE_STATE;
     return 0;
   }
 
-  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (!accum) {
-    *status = NULL_PARAMETER;
-    return 0;
-  }
-  return accum->value;
-}
-
-/**
- * Read the number of accumulated values.
- *
- * Read the count of the accumulated values since the accumulator was last
- * Reset().
- *
- * @return The number of times samples from the channel were accumulated.
- */
-int64_t HAL_GetSPIAccumulatorCount(HAL_SPIPort port, int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return 0;
-  }
-
-  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (!accum) {
-    *status = NULL_PARAMETER;
-    return 0;
-  }
-  return accum->count;
-}
-
-/**
- * Read the average of the accumulated value.
- *
- * @return The accumulated average value (value / count).
- */
-double HAL_GetSPIAccumulatorAverage(HAL_SPIPort port, int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return 0.0;
-  }
-
-  int64_t value;
-  int64_t count;
-  HAL_GetSPIAccumulatorOutput(port, &value, &count, status);
-  if (count == 0) return 0.0;
-  return static_cast<double>(value) / count;
-}
-
-/**
- * Read the accumulated value and the number of accumulated values atomically.
- *
- * This function reads the value and count atomically.
- * This can be used for averaging.
- *
- * @param value Pointer to the 64-bit accumulated output.
- * @param count Pointer to the number of accumulation cycles.
- */
-void HAL_GetSPIAccumulatorOutput(HAL_SPIPort port, int64_t* value,
-                                 int64_t* count, int32_t* status) {
-  if (port < 0 || port >= kSpiMaxHandles) {
-    *status = PARAMETER_OUT_OF_RANGE;
-    return;
-  }
-
-  std::lock_guard<wpi::mutex> lock(spiAccumulatorMutexes[port]);
-  SPIAccumulator* accum = spiAccumulators[port].get();
-  if (!accum) {
-    *status = NULL_PARAMETER;
-    *value = 0;
-    *count = 0;
-    return;
-  }
-  *value = accum->value;
-  *count = accum->count;
+  return spiSystem->readTransferSkippedFullCount(status);
 }
 
 }  // extern "C"

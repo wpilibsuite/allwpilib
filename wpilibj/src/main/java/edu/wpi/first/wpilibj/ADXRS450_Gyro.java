@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
  */
 @SuppressWarnings({"TypeName", "AbbreviationAsWordInName", "PMD.UnusedPrivateField"})
 public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable {
-  private static final double kSamplePeriod = 0.001;
+  private static final double kSamplePeriod = 0.0005;
   private static final double kCalibrationSampleTime = 5.0;
   private static final double kDegreePerSecondPerLSB = 0.0125;
 
