@@ -63,7 +63,7 @@ void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,
     *status = HAL_HANDLE_ERROR;
     return;
   }
-  wpi::mutex& dioMutex = detail::UsafeGetDIOMutex();
+  wpi::mutex& dioMutex = detail::UnsafeGetDIOMutex();
   tDIO* dSys = detail::UnsafeGetDigialSystem();
   auto mask = detail::ComputeDigitalMask(handle, status);
   if (status != 0) return;
