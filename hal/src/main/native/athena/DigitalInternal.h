@@ -79,6 +79,8 @@ extern DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                              kNumDigitalChannels + kNumPWMHeaders>*
     digitalChannelHandles;
 
+extern wpi::mutex digitalDIOMutex;
+
 void initializeDigital(int32_t* status);
 bool remapDigitalSource(HAL_Handle digitalSourceHandle,
                         HAL_AnalogTriggerType analogTriggerType,

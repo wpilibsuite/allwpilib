@@ -18,6 +18,7 @@
 #include "HAL/ChipObject.h"
 #include "HAL/HAL.h"
 #include "HAL/Ports.h"
+#include "HAL/cpp/UnsafeDIO.h"
 #include "PortsInternal.h"
 
 namespace hal {
@@ -26,6 +27,9 @@ std::unique_ptr<tDIO> digitalSystem;
 std::unique_ptr<tRelay> relaySystem;
 std::unique_ptr<tPWM> pwmSystem;
 std::unique_ptr<tSPI> spiSystem;
+
+// Create a mutex to protect changes to the digital output values
+wpi::mutex digitalDIOMutex;
 
 DigitalHandleResource<HAL_DigitalHandle, DigitalPort,
                       kNumDigitalChannels + kNumPWMHeaders>*
@@ -39,6 +43,28 @@ void InitializeDigitalInternal() {
   digitalChannelHandles = &dcH;
 }
 }  // namespace init
+
+namespace detail {
+wpi::mutex& UnsafeGetDIOMutex() { return digitalDIOMutex; }
+tDIO* UnsafeGetDigialSystem() { return digitalSystem.get(); }
+int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status) {
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
+  tDIO::tDO output;
+  output.value = 0;
+  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+    output.SPIPort = (1u << remapSPIChannel(port->channel));
+  } else if (port->channel < kNumDigitalHeaders) {
+    output.Headers = (1u << port->channel);
+  } else {
+    output.MXP = (1u << remapMXPChannel(port->channel));
+  }
+  return output.value;
+}
+}  // namespace detail
 
 /**
  * Initialize the digital system.
@@ -165,3 +191,8 @@ bool remapDigitalSource(HAL_Handle digitalSourceHandle,
 }
 
 }  // namespace hal
+
+// Unused function here to test template compile.
+__attribute__((unused)) static void CompileFunctorTest() {
+  hal::UnsafeManipulateDIO(0, nullptr, [](hal::DIOSetProxy& proxy) {});
+}

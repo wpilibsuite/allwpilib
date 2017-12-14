@@ -16,9 +16,6 @@
 
 using namespace hal;
 
-// Create a mutex to protect changes to the digital output values
-static wpi::mutex digitalDIOMutex;
-
 // Create a mutex to protect changes to the DO PWM config
 static wpi::mutex digitalPwmMutex;
 
@@ -305,6 +302,50 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
       }
     }
     digitalSystem->writeDO(currentDIO, status);
+  }
+}
+
+/**
+ * Set direction of a DIO channel.
+ *
+ * @param channel The Digital I/O channel
+ * @param input true to set input, false for output
+ */
+void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
+                         int32_t* status) {
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+  {
+    std::lock_guard<wpi::mutex> lock(digitalDIOMutex);
+    tDIO::tOutputEnable currentDIO = digitalSystem->readOutputEnable(status);
+
+    if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+      if (input) {
+        currentDIO.SPIPort =
+            currentDIO.SPIPort & ~(1u << remapSPIChannel(port->channel));
+      } else {
+        currentDIO.SPIPort =
+            currentDIO.SPIPort | (1u << remapSPIChannel(port->channel));
+      }
+    } else if (port->channel < kNumDigitalHeaders) {
+      if (input) {
+        currentDIO.Headers = currentDIO.Headers & ~(1u << port->channel);
+      } else {
+        currentDIO.Headers = currentDIO.Headers | (1u << port->channel);
+      }
+    } else {
+      if (input) {
+        currentDIO.MXP =
+            currentDIO.MXP & ~(1u << remapMXPChannel(port->channel));
+      } else {
+        currentDIO.MXP =
+            currentDIO.MXP | (1u << remapMXPChannel(port->channel));
+      }
+    }
+    digitalSystem->writeOutputEnable(currentDIO, status);
   }
 }
 
