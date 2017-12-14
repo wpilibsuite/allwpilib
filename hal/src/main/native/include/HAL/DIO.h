@@ -28,6 +28,8 @@ void HAL_SetDigitalPWMOutputChannel(HAL_DigitalPWMHandle pwmGenerator,
                                     int32_t channel, int32_t* status);
 void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
                 int32_t* status);
+void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
+                         int32_t* status);
 HAL_Bool HAL_GetDIO(HAL_DigitalHandle dioPortHandle, int32_t* status);
 HAL_Bool HAL_GetDIODirection(HAL_DigitalHandle dioPortHandle, int32_t* status);
 void HAL_Pulse(HAL_DigitalHandle dioPortHandle, double pulseLength,
