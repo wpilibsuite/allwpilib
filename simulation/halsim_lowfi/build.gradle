@@ -47,7 +47,6 @@ if (!project.hasProperty('onlyAthena')) {
 
         binaries {
             all {
-                project(':hal').addHalCompilerArguments(it)
                 project(':hal').addHalToLinker(it)
             }
             withType(StaticLibraryBinarySpec) {
