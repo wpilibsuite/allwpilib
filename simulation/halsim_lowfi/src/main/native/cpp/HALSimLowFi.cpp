@@ -37,7 +37,8 @@ void HALSimNTProvider::InitializeDefault(
   this->numChannels = numChannels;
   cbInfos.reserve(numChannels);
   for (int i = 0; i < numChannels; i++) {
-    struct NTProviderCallbackInfo info = { this, table->GetSubTable(tableName + llvm::Twine(i)), i };
+    struct NTProviderCallbackInfo info = {
+        this, table->GetSubTable(tableName + llvm::Twine(i)), i};
     cbInfos.emplace_back(info);
   }
 

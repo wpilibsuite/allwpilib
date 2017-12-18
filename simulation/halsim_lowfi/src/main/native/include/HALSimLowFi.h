@@ -7,13 +7,14 @@
 
 #pragma once
 
+#include <networktables/NetworkTableInstance.h>
+
 #include <cinttypes>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <MockData/NotifyListener.h>
-#include <networktables/NetworkTableInstance.h>
 
 class HALSimLowFi {
  public:

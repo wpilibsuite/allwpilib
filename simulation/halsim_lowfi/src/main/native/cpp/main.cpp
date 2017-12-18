@@ -37,6 +37,7 @@ __declspec(dllexport)
   std::cout << "NetworkTables LowFi Simulator Initializing." << std::endl;
   halsim_lowfi.Initialize();
   halsim_lowfi.table->GetInstance().StartServer("networktables.ini");
+  halsim_lowfi.table->GetInstance().SetUpdateRate(0.05);
   auto lowfi = std::make_shared<HALSimLowFi>(halsim_lowfi);
 
   pwm_provider.Inject(lowfi, "PWM");
