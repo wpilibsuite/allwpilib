@@ -33,7 +33,7 @@ void HALSimNTProviderEncoder::OnCallback(
 void HALSimNTProviderEncoder::OnInitializedChannel(
     uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
   table->GetEntry("count").AddListener(
-      [chan, table](const nt::EntryNotification& ev) -> void {
+      [=](const nt::EntryNotification& ev) -> void {
         HALSIM_SetEncoderCount(chan,
                                static_cast<int32_t>(ev.value->GetDouble()));
       },
@@ -41,7 +41,7 @@ void HALSimNTProviderEncoder::OnInitializedChannel(
 
   table->GetEntry("direction")
       .AddListener(
-          [chan, table](const nt::EntryNotification& ev) -> void {
+          [=](const nt::EntryNotification& ev) -> void {
             HALSIM_SetEncoderDirection(chan, ev.value->GetBoolean());
           },
           NT_NotifyKind::NT_NOTIFY_UPDATE);

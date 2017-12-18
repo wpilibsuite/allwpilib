@@ -7,6 +7,8 @@
 
 #include "HALSimLowFi.h"
 
+#include <llvm/Twine.h>
+
 void HALSimLowFi::Initialize() {
   table = nt::NetworkTableInstance::GetDefault().GetTable("sim");
 }
@@ -14,7 +16,7 @@ void HALSimLowFi::Initialize() {
 void HALSimNTProvider::Inject(std::shared_ptr<HALSimLowFi> parentArg,
                               std::string tableNameArg) {
   parent = parentArg;
-  tableName = tableNameArg;
+  tableName = std::move(tableNameArg);
   table = parent->table->GetSubTable(tableName);
 
   this->Initialize();
@@ -35,9 +37,8 @@ void HALSimNTProvider::InitializeDefault(
   this->numChannels = numChannels;
   cbInfos.reserve(numChannels);
   for (int i = 0; i < numChannels; i++) {
-    struct NTProviderCallbackInfo info = {
-        this, table->GetSubTable(tableName + std::to_string(i)), i};
-    cbInfos.push_back(info);
+    struct NTProviderCallbackInfo info = { this, table->GetSubTable(tableName + llvm::Twine(i)), i };
+    cbInfos.emplace_back(info);
   }
 
   for (auto& info : cbInfos) {

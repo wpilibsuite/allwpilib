@@ -46,7 +46,7 @@ void HALSimNTProviderRoboRIO::OnInitializedChannel(
     uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
   table->GetEntry("fpga_button?")
       .AddListener(
-          [chan, table](const nt::EntryNotification& ev) -> void {
+          [=](const nt::EntryNotification& ev) -> void {
             HALSIM_SetRoboRioFPGAButton(chan, ev.value->GetBoolean());
           },
           NT_NotifyKind::NT_NOTIFY_UPDATE);

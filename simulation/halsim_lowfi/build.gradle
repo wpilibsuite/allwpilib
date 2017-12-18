@@ -20,7 +20,7 @@ if (!project.hasProperty('onlyAthena')) {
                 version = '4.+'
                 sharedConfigs = [ halsim_lowfi: [] ]
             }
-			wpiutil(DependencyConfig) {
+        wpiutil(DependencyConfig) {
                 groupId = 'edu.wpi.first.wpiutil'
                 artifactId = 'wpiutil-cpp'
                 headerClassifier = 'headers'

@@ -40,7 +40,7 @@ void HALSimNTProviderAnalogIn::OnCallback(
 void HALSimNTProviderAnalogIn::OnInitializedChannel(
     uint32_t chan, std::shared_ptr<nt::NetworkTable> table) {
   table->GetEntry("voltage").AddListener(
-      [chan, table](const nt::EntryNotification& ev) -> void {
+      [=](const nt::EntryNotification& ev) -> void {
         HALSIM_SetAnalogInVoltage(chan, ev.value->GetDouble());
       },
       NT_NotifyKind::NT_NOTIFY_UPDATE);
