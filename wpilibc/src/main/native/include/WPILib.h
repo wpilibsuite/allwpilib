@@ -63,6 +63,7 @@
 #include "PWM.h"
 #include "PWMSpeedController.h"
 #include "PWMTalonSRX.h"
+#include "PWMVictorSPX.h"
 #include "PowerDistributionPanel.h"
 #include "Preferences.h"
 #include "Relay.h"
