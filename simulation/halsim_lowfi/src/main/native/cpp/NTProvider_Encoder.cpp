@@ -26,8 +26,6 @@ void HALSimNTProviderEncoder::OnCallback(
       .SetBoolean(HALSIM_GetEncoderReverseDirection(chan));
   table->GetEntry("samples_to_avg")
       .SetDouble(HALSIM_GetEncoderSamplesToAverage(chan));
-
-  table->GetInstance().Flush();
 }
 
 void HALSimNTProviderEncoder::OnInitializedChannel(

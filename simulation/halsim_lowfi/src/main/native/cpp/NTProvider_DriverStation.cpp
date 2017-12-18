@@ -58,6 +58,4 @@ void HALSimNTProviderDriverStation::OnCallback(
       break;
   }
   alliance->GetEntry("station").SetDouble(station);
-
-  table->GetInstance().Flush();
 }

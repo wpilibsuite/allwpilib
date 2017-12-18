@@ -33,8 +33,6 @@ void HALSimNTProviderAnalogIn::OnCallback(
       HALSIM_GetAnalogInAccumulatorCenter(chan));
   accum->GetEntry("deadband")
       .SetDouble(HALSIM_GetAnalogInAccumulatorDeadband(chan));
-
-  table->GetInstance().Flush();
 }
 
 void HALSimNTProviderAnalogIn::OnInitializedChannel(

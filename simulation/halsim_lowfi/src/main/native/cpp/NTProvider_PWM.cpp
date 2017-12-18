@@ -22,6 +22,4 @@ void HALSimNTProviderPWM::OnCallback(uint32_t chan,
   table->GetEntry("raw").SetDouble(HALSIM_GetPWMRawValue(chan));
   table->GetEntry("period_scale").SetDouble(HALSIM_GetPWMPeriodScale(chan));
   table->GetEntry("zero_latch?").SetBoolean(HALSIM_GetPWMZeroLatch(chan));
-
-  table->GetInstance().Flush();
 }

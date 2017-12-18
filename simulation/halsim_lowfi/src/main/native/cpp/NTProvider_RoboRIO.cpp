@@ -38,8 +38,6 @@ void HALSimNTProviderRoboRIO::OnCallback(
   t3v3->GetEntry("current").SetDouble(HALSIM_GetRoboRioUserCurrent3V3(chan));
   t3v3->GetEntry("active?").SetBoolean(HALSIM_GetRoboRioUserActive3V3(chan));
   t3v3->GetEntry("faults").SetDouble(HALSIM_GetRoboRioUserFaults3V3(chan));
-
-  table->GetInstance().Flush();
 }
 
 void HALSimNTProviderRoboRIO::OnInitializedChannel(

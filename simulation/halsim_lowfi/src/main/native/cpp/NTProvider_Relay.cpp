@@ -22,6 +22,4 @@ void HALSimNTProviderRelay::OnCallback(
       .SetBoolean(HALSIM_GetRelayInitializedReverse(chan));
   table->GetEntry("fwd?").SetBoolean(HALSIM_GetRelayForward(chan));
   table->GetEntry("rvs?").SetBoolean(HALSIM_GetRelayReverse(chan));
-
-  table->GetInstance().Flush();
 }
