@@ -167,7 +167,7 @@ model {
     }
     binaries {
         all {
-            tasks.withType(CppCompile) {
+            tasks.withType(AbstractNativeSourceCompileTask) {
                 dependsOn generateCppVersion
             }
             project(':ni-libraries').addNiLibrariesToLinker(it)
@@ -184,6 +184,15 @@ model {
         }
     }
     tasks {
+        compileCpp(Task) {
+            $.binaries.each { binary ->
+                if (binary in NativeBinarySpec && binary.buildable) {
+                    binary.tasks.withType(AbstractNativeSourceCompileTask) { task->
+                        it.dependsOn task
+                    }
+                }
+            }
+        }
         runCpp(Exec) {
             def found = false
             $.components.each {

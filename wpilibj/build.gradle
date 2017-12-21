@@ -274,6 +274,15 @@ model {
         }
     }
     tasks {
+        compileCpp(Task) {
+            $.binaries.each { binary ->
+                if (binary in NativeBinarySpec && binary.buildable) {
+                    binary.tasks.withType(AbstractNativeSourceCompileTask) { task->
+                        it.dependsOn task
+                    }
+                }
+            }
+        }
         getHeaders(Task) {
             def list = []
             $.components.each {
