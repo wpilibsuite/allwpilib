@@ -40,8 +40,8 @@ public class Robot extends IterativeRobot {
 		/*
 		 * Depending on the button values, we want to use one of
 		 * kOn, kOff, kForward, or kReverse. kOn sets both outputs to 12V,
-		 *  kOff sets both to 0V, kForward sets forward to 12V
-		 *  and reverse to 0V, and kReverse sets reverse to 12V and forward to 0V.
+		 * kOff sets both to 0V, kForward sets forward to 12V
+		 * and reverse to 0V, and kReverse sets reverse to 12V and forward to 0V.
 		 */
 		if (forward && reverse) {
 			m_relay.set(Relay.Value.kOn);

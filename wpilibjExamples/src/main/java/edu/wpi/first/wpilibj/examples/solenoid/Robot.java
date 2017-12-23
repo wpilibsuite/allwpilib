@@ -56,8 +56,14 @@ public class Robot extends IterativeRobot {
 		 */
 		if (m_stick.getRawButton(kDoubleSolenoidForward)) {
 			m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+
 		} else if (m_stick.getRawButton(kDoubleSolenoidReverse)) {
 			m_doubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+
+		} else if (m_stick.getRawButton(kDoubleSolenoidForward)
+				&& m_stick.getRawButton(kDoubleSolenoidReverse)) {
+			m_doubleSolenoid.set(DoubleSolenoid.Value.kForward);
+
 		} else {
 			m_doubleSolenoid.set(DoubleSolenoid.Value.kOff);
 		}
