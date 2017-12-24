@@ -544,8 +544,10 @@ public class SPI {
    * Frees the accumulator.
    */
   public void freeAccumulator() {
-    m_accum.free();
-    m_accum = null;
+    if (m_accum != null) {
+      m_accum.free();
+      m_accum = null;
+    }
     freeAuto();
   }
 
