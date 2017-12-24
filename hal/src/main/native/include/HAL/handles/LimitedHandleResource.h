@@ -41,12 +41,12 @@ class LimitedHandleResource : public HandleBase {
   LimitedHandleResource& operator=(const LimitedHandleResource&) = delete;
 
   THandle Allocate();
-  std::shared_ptr<TStruct> Get(THandle handle);
+  TStruct* Get(THandle handle);
   void Free(THandle handle);
   void ResetHandles() override;
 
  private:
-  std::array<std::shared_ptr<TStruct>, size> m_structures;
+  std::array<std::unique_ptr<TStruct>, size> m_structures;
   std::array<wpi::mutex, size> m_handleMutexes;
   wpi::mutex m_allocateMutex;
 };
@@ -61,7 +61,7 @@ THandle LimitedHandleResource<THandle, TStruct, size, enumValue>::Allocate() {
       // if a false index is found, grab its specific mutex
       // and allocate it.
       std::lock_guard<wpi::mutex> lock(m_handleMutexes[i]);
-      m_structures[i] = std::make_shared<TStruct>();
+      m_structures[i] = std::make_unique<TStruct>();
       return static_cast<THandle>(createHandle(i, enumValue, m_version));
     }
   }
@@ -70,8 +70,8 @@ THandle LimitedHandleResource<THandle, TStruct, size, enumValue>::Allocate() {
 
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
-std::shared_ptr<TStruct>
-LimitedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
+TStruct* LimitedHandleResource<THandle, TStruct, size, enumValue>::Get(
+    THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   if (index < 0 || index >= size) {
@@ -80,7 +80,7 @@ LimitedHandleResource<THandle, TStruct, size, enumValue>::Get(THandle handle) {
   std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
-  return m_structures[index];
+  return m_structures[index].get();
 }
 
 template <typename THandle, typename TStruct, int16_t size,

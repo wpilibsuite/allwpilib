@@ -45,13 +45,13 @@ class IndexedClassedHandleResource : public HandleBase {
   IndexedClassedHandleResource& operator=(const IndexedClassedHandleResource&) =
       delete;
 
-  THandle Allocate(int16_t index, std::shared_ptr<TStruct> toSet,
+  THandle Allocate(int16_t index, std::unique_ptr<TStruct> toSet,
                    int32_t* status);
-  std::shared_ptr<TStruct> Get(THandle handle);
+  TStruct* Get(THandle handle);
   void Free(THandle handle);
 
  private:
-  std::array<std::shared_ptr<TStruct>[], size> m_structures;
+  std::array<std::unique_ptr<TStruct>[], size> m_structures;
   std::array<wpi::mutex[], size> m_handleMutexes;
 };
 
@@ -59,7 +59,7 @@ template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
 IndexedClassedHandleResource<THandle, TStruct, size,
                              enumValue>::IndexedClassedHandleResource() {
-  m_structures = std::make_unique<std::shared_ptr<TStruct>[]>(size);
+  m_structures = std::make_unique<std::unique_ptr<TStruct>[]>(size);
   m_handleMutexes = std::make_unique<wpi::mutex[]>(size);
 }
 
@@ -67,7 +67,7 @@ template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
 THandle
 IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
-    int16_t index, std::shared_ptr<TStruct> toSet, int32_t* status) {
+    int16_t index, std::unique_ptr<TStruct> toSet, int32_t* status) {
   // don't aquire the lock if we can fail early.
   if (index < 0 || index >= size) {
     *status = RESOURCE_OUT_OF_RANGE;
@@ -85,8 +85,7 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
 
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
-std::shared_ptr<TStruct>
-IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
+TStruct* IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
@@ -96,7 +95,7 @@ IndexedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
   std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
-  return m_structures[index];
+  return m_structures[index].get();
 }
 
 template <typename THandle, typename TStruct, int16_t size,

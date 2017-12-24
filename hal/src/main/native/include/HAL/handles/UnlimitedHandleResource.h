@@ -43,10 +43,10 @@ class UnlimitedHandleResource : public HandleBase {
   UnlimitedHandleResource(const UnlimitedHandleResource&) = delete;
   UnlimitedHandleResource& operator=(const UnlimitedHandleResource&) = delete;
 
-  THandle Allocate(std::shared_ptr<TStruct> structure);
-  std::shared_ptr<TStruct> Get(THandle handle);
+  THandle Allocate(std::unique_ptr<TStruct> structure);
+  TStruct* Get(THandle handle);
   /* Returns structure previously at that handle (or nullptr if none) */
-  std::shared_ptr<TStruct> Free(THandle handle);
+  std::unique_ptr<TStruct> Free(THandle handle);
   void ResetHandles() override;
 
   /* Calls func(THandle, TStruct*) for each handle.  Note this holds the
@@ -56,40 +56,40 @@ class UnlimitedHandleResource : public HandleBase {
   void ForEach(Functor func);
 
  private:
-  std::vector<std::shared_ptr<TStruct>> m_structures;
+  std::vector<std::unique_ptr<TStruct>> m_structures;
   wpi::mutex m_handleMutex;
 };
 
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
 THandle UnlimitedHandleResource<THandle, TStruct, enumValue>::Allocate(
-    std::shared_ptr<TStruct> structure) {
+    std::unique_ptr<TStruct> structure) {
   std::lock_guard<wpi::mutex> lock(m_handleMutex);
   size_t i;
   for (i = 0; i < m_structures.size(); i++) {
     if (m_structures[i] == nullptr) {
-      m_structures[i] = structure;
+      m_structures[i] = std::move(structure);
       return static_cast<THandle>(createHandle(i, enumValue, m_version));
     }
   }
   if (i >= INT16_MAX) return HAL_kInvalidHandle;
 
-  m_structures.push_back(structure);
+  m_structures.push_back(std::move(structure));
   return static_cast<THandle>(
       createHandle(static_cast<int16_t>(i), enumValue, m_version));
 }
 
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
-std::shared_ptr<TStruct>
-UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(THandle handle) {
+TStruct* UnlimitedHandleResource<THandle, TStruct, enumValue>::Get(
+    THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   std::lock_guard<wpi::mutex> lock(m_handleMutex);
   if (index < 0 || index >= static_cast<int16_t>(m_structures.size()))
     return nullptr;
-  return m_structures[index];
+  return m_structures[index].get();
 }
 
 template <typename THandle, typename TStruct, HAL_HandleEnum enumValue>
-std::shared_ptr<TStruct>
+std::unique_ptr<TStruct>
 UnlimitedHandleResource<THandle, TStruct, enumValue>::Free(THandle handle) {
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
   std::lock_guard<wpi::mutex> lock(m_handleMutex);

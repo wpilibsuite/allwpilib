@@ -258,8 +258,6 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
     return;
   }
 
-  DigitalPort* dPort = port.get();
-
   if (speed < -1.0) {
     speed = -1.0;
   } else if (speed > 1.0) {
@@ -271,19 +269,19 @@ void HAL_SetPWMSpeed(HAL_DigitalHandle pwmPortHandle, double speed,
   // calculate the desired output pwm value by scaling the speed appropriately
   int32_t rawValue;
   if (speed == 0.0) {
-    rawValue = GetCenterPwm(dPort);
+    rawValue = GetCenterPwm(port);
   } else if (speed > 0.0) {
     rawValue = static_cast<int32_t>(
-        speed * static_cast<double>(GetPositiveScaleFactor(dPort)) +
-        static_cast<double>(GetMinPositivePwm(dPort)) + 0.5);
+        speed * static_cast<double>(GetPositiveScaleFactor(port)) +
+        static_cast<double>(GetMinPositivePwm(port)) + 0.5);
   } else {
     rawValue = static_cast<int32_t>(
-        speed * static_cast<double>(GetNegativeScaleFactor(dPort)) +
-        static_cast<double>(GetMaxNegativePwm(dPort)) + 0.5);
+        speed * static_cast<double>(GetNegativeScaleFactor(port)) +
+        static_cast<double>(GetMaxNegativePwm(port)) + 0.5);
   }
 
-  if (!((rawValue >= GetMinNegativePwm(dPort)) &&
-        (rawValue <= GetMaxPositivePwm(dPort))) ||
+  if (!((rawValue >= GetMinNegativePwm(port)) &&
+        (rawValue <= GetMaxPositivePwm(port))) ||
       rawValue == kPwmDisabled) {
     *status = HAL_PWM_SCALE_ERROR;
     return;
@@ -312,7 +310,6 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
     *status = INCOMPATIBLE_STATE;
     return;
   }
-  DigitalPort* dPort = port.get();
 
   if (pos < 0.0) {
     pos = 0.0;
@@ -323,8 +320,8 @@ void HAL_SetPWMPosition(HAL_DigitalHandle pwmPortHandle, double pos,
   // note, need to perform the multiplication below as floating point before
   // converting to int
   int32_t rawValue = static_cast<int32_t>(
-      (pos * static_cast<double>(GetFullRangeScaleFactor(dPort))) +
-      GetMinNegativePwm(dPort));
+      (pos * static_cast<double>(GetFullRangeScaleFactor(port))) +
+      GetMinNegativePwm(port));
 
   if (rawValue == kPwmDisabled) {
     *status = HAL_PWM_SCALE_ERROR;
@@ -377,20 +374,19 @@ double HAL_GetPWMSpeed(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
 
   int32_t value = HAL_GetPWMRaw(pwmPortHandle, status);
   if (*status != 0) return 0;
-  DigitalPort* dPort = port.get();
 
   if (value == kPwmDisabled) {
     return 0.0;
-  } else if (value > GetMaxPositivePwm(dPort)) {
+  } else if (value > GetMaxPositivePwm(port)) {
     return 1.0;
-  } else if (value < GetMinNegativePwm(dPort)) {
+  } else if (value < GetMinNegativePwm(port)) {
     return -1.0;
-  } else if (value > GetMinPositivePwm(dPort)) {
-    return static_cast<double>(value - GetMinPositivePwm(dPort)) /
-           static_cast<double>(GetPositiveScaleFactor(dPort));
-  } else if (value < GetMaxNegativePwm(dPort)) {
-    return static_cast<double>(value - GetMaxNegativePwm(dPort)) /
-           static_cast<double>(GetNegativeScaleFactor(dPort));
+  } else if (value > GetMinPositivePwm(port)) {
+    return static_cast<double>(value - GetMinPositivePwm(port)) /
+           static_cast<double>(GetPositiveScaleFactor(port));
+  } else if (value < GetMaxNegativePwm(port)) {
+    return static_cast<double>(value - GetMaxNegativePwm(port)) /
+           static_cast<double>(GetNegativeScaleFactor(port));
   } else {
     return 0.0;
   }
@@ -415,15 +411,14 @@ double HAL_GetPWMPosition(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
 
   int32_t value = HAL_GetPWMRaw(pwmPortHandle, status);
   if (*status != 0) return 0;
-  DigitalPort* dPort = port.get();
 
-  if (value < GetMinNegativePwm(dPort)) {
+  if (value < GetMinNegativePwm(port)) {
     return 0.0;
-  } else if (value > GetMaxPositivePwm(dPort)) {
+  } else if (value > GetMaxPositivePwm(port)) {
     return 1.0;
   } else {
-    return static_cast<double>(value - GetMinNegativePwm(dPort)) /
-           static_cast<double>(GetFullRangeScaleFactor(dPort));
+    return static_cast<double>(value - GetMinNegativePwm(port)) /
+           static_cast<double>(GetFullRangeScaleFactor(port));
   }
 }
 

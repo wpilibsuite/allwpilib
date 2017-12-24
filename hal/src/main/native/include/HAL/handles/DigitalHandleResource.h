@@ -43,12 +43,12 @@ class DigitalHandleResource : public HandleBase {
   DigitalHandleResource& operator=(const DigitalHandleResource&) = delete;
 
   THandle Allocate(int16_t index, HAL_HandleEnum enumValue, int32_t* status);
-  std::shared_ptr<TStruct> Get(THandle handle, HAL_HandleEnum enumValue);
+  TStruct* Get(THandle handle, HAL_HandleEnum enumValue);
   void Free(THandle handle, HAL_HandleEnum enumValue);
   void ResetHandles() override;
 
  private:
-  std::array<std::shared_ptr<TStruct>, size> m_structures;
+  std::array<std::unique_ptr<TStruct>, size> m_structures;
   std::array<wpi::mutex, size> m_handleMutexes;
 };
 
@@ -66,12 +66,12 @@ THandle DigitalHandleResource<THandle, TStruct, size>::Allocate(
     *status = RESOURCE_IS_ALLOCATED;
     return HAL_kInvalidHandle;
   }
-  m_structures[index] = std::make_shared<TStruct>();
+  m_structures[index] = std::make_unique<TStruct>();
   return static_cast<THandle>(hal::createHandle(index, enumValue, m_version));
 }
 
 template <typename THandle, typename TStruct, int16_t size>
-std::shared_ptr<TStruct> DigitalHandleResource<THandle, TStruct, size>::Get(
+TStruct* DigitalHandleResource<THandle, TStruct, size>::Get(
     THandle handle, HAL_HandleEnum enumValue) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
@@ -81,7 +81,7 @@ std::shared_ptr<TStruct> DigitalHandleResource<THandle, TStruct, size>::Get(
   std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
-  return m_structures[index];
+  return m_structures[index].get();
 }
 
 template <typename THandle, typename TStruct, int16_t size>

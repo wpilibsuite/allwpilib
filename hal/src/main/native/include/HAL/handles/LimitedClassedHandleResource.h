@@ -42,13 +42,13 @@ class LimitedClassedHandleResource : public HandleBase {
   LimitedClassedHandleResource& operator=(const LimitedClassedHandleResource&) =
       delete;
 
-  THandle Allocate(std::shared_ptr<TStruct> toSet);
-  std::shared_ptr<TStruct> Get(THandle handle);
+  THandle Allocate(std::unique_ptr<TStruct> toSet);
+  TStruct* Get(THandle handle);
   void Free(THandle handle);
   void ResetHandles() override;
 
  private:
-  std::array<std::shared_ptr<TStruct>, size> m_structures;
+  std::array<std::unique_ptr<TStruct>, size> m_structures;
   std::array<wpi::mutex, size> m_handleMutexes;
   wpi::mutex m_allocateMutex;
 };
@@ -57,7 +57,7 @@ template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
 THandle
 LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
-    std::shared_ptr<TStruct> toSet) {
+    std::unique_ptr<TStruct> toSet) {
   // globally lock to loop through indices
   std::lock_guard<wpi::mutex> lock(m_allocateMutex);
   for (int16_t i = 0; i < size; i++) {
@@ -65,7 +65,7 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
       // if a false index is found, grab its specific mutex
       // and allocate it.
       std::lock_guard<wpi::mutex> lock(m_handleMutexes[i]);
-      m_structures[i] = toSet;
+      m_structures[i] = std::move(toSet);
       return static_cast<THandle>(createHandle(i, enumValue, m_version));
     }
   }
@@ -74,8 +74,7 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Allocate(
 
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
-std::shared_ptr<TStruct>
-LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
+TStruct* LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
     THandle handle) {
   // get handle index, and fail early if index out of range or wrong handle
   int16_t index = getHandleTypedIndex(handle, enumValue, m_version);
@@ -85,7 +84,7 @@ LimitedClassedHandleResource<THandle, TStruct, size, enumValue>::Get(
   std::lock_guard<wpi::mutex> lock(m_handleMutexes[index]);
   // return structure. Null will propogate correctly, so no need to manually
   // check.
-  return m_structures[index];
+  return m_structures[index].get();
 }
 
 template <typename THandle, typename TStruct, int16_t size,

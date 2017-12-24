@@ -129,8 +129,8 @@ HAL_NotifierHandle HAL_InitializeNotifier(int32_t* status) {
     if (!notifierAlarm) notifierAlarm.reset(tAlarm::create(status));
   }
 
-  std::shared_ptr<Notifier> notifier = std::make_shared<Notifier>();
-  HAL_NotifierHandle handle = notifierHandles->Allocate(notifier);
+  HAL_NotifierHandle handle =
+      notifierHandles->Allocate(std::make_unique<Notifier>());
   if (handle == HAL_kInvalidHandle) {
     *status = HAL_HANDLE_ERROR;
     return HAL_kInvalidHandle;
