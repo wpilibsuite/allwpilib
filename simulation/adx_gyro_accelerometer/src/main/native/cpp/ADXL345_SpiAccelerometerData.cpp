@@ -28,12 +28,17 @@ static void ADXL345SPI_WriteBufferCallback(const char* name, void* param,
   sim->HandleWrite(buffer, count);
 }
 
-ADXL345_SpiAccelerometer::ADXL345_SpiAccelerometer(int port) {
-  HALSIM_RegisterSPIReadCallback(port, ADXL345SPI_ReadBufferCallback, this);
-  HALSIM_RegisterSPIWriteCallback(port, ADXL345SPI_WriteBufferCallback, this);
+ADXL345_SpiAccelerometer::ADXL345_SpiAccelerometer(int port) : m_port(port) {
+  m_readCallbackId =
+      HALSIM_RegisterSPIReadCallback(port, ADXL345SPI_ReadBufferCallback, this);
+  m_writeCallbackId = HALSIM_RegisterSPIWriteCallback(
+      port, ADXL345SPI_WriteBufferCallback, this);
 }
 
-ADXL345_SpiAccelerometer::~ADXL345_SpiAccelerometer() {}
+ADXL345_SpiAccelerometer::~ADXL345_SpiAccelerometer() {
+  HALSIM_CancelSPIReadCallback(m_port, m_readCallbackId);
+  HALSIM_CancelSPIWriteCallback(m_port, m_writeCallbackId);
+}
 
 void ADXL345_SpiAccelerometer::HandleWrite(const uint8_t* buffer,
                                            uint32_t count) {

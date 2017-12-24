@@ -17,6 +17,10 @@
 #include "MockData/SPIData.h"
 
 namespace hal {
+
+typedef HalCallbackListenerVectorImpl<HAL_SpiReadAutoReceiveBufferCallback>
+    SpiAutoReceiveDataListenerVector;
+
 class SPIData {
  public:
   SPIData();
@@ -35,22 +39,17 @@ class SPIData {
   int32_t RegisterWriteCallback(HAL_ConstBufferCallback callback, void* param);
   void CancelWriteCallback(int32_t uid);
 
-  int32_t RegisterResetAccumulatorCallback(HAL_NotifyCallback callback,
-                                           void* param, HAL_Bool initialNotify);
-  void CancelResetAccumulatorCallback(int32_t uid);
-
-  int32_t RegisterAccumulatorCallback(HAL_NotifyCallback callback, void* param,
-                                      HAL_Bool initialNotify);
-  void CancelAccumulatorCallback(int32_t uid);
-  void InvokeSetAccumulatorCallback(HAL_Value value);
-  void SetAccumulatorValue(int64_t value);
-  int64_t GetAccumulatorValue();
+  int32_t RegisterReadAutoReceivedDataCallback(
+      HAL_SpiReadAutoReceiveBufferCallback callback, void* param);
+  void CancelReadAutoReceivedDataCallback(int32_t uid);
 
   int32_t Read(uint8_t* buffer, int32_t count);
   int32_t Write(const uint8_t* dataToSend, int32_t sendSize);
   int32_t Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
                       int32_t size);
-  void ResetAccumulator();
+
+  int32_t ReadAutoReceivedData(uint8_t* buffer, int32_t numToRead,
+                               double timeout, int32_t* status);
 
   void ResetData();
 
@@ -58,12 +57,11 @@ class SPIData {
   wpi::mutex m_registerMutex;
   wpi::mutex m_dataMutex;
   std::atomic<HAL_Bool> m_initialized{false};
-  std::atomic<int64_t> m_accumulatorValue{false};
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;
   std::shared_ptr<ConstBufferListenerVector> m_writeCallbacks = nullptr;
-  std::shared_ptr<NotifyListenerVector> m_resetAccumulatorCallback = nullptr;
-  std::shared_ptr<NotifyListenerVector> m_setAccumulatorCallback = nullptr;
+  std::shared_ptr<SpiAutoReceiveDataListenerVector>
+      m_autoRecceiveDataCallbacks = nullptr;
 };
 extern SPIData* SimSPIData;
 }  // namespace hal

@@ -8,13 +8,23 @@
 #include "ADXRS450_SpiGyroWrapperData.h"
 
 #include <cstring>
+#include <iostream>
 
 #include "MockData/NotifyCallbackHelpers.h"
 #include "MockData/SPIData.h"
 
+#ifdef _WIN32
+#include "Winsock2.h"
+#pragma comment(lib, "ws2_32.lib")
+#else
+#endif
+
 using namespace hal;
 
-const double ADXRS450_SpiGyroWrapper::ANGLE_LSB = 1 / 0.0125 / 0.001;
+const double ADXRS450_SpiGyroWrapper::ANGLE_LSB = 1 / 0.0125 / 0.0005;
+const double ADXRS450_SpiGyroWrapper::MAX_ANGLE_DELTA_PER_MESSAGE =
+    0.1875;  // Close to saturating available bits, but not totally
+const int ADXRS450_SpiGyroWrapper::PACKET_SIZE = 4;
 
 static void ADXRS450SPI_ReadBufferCallback(const char* name, void* param,
                                            uint8_t* buffer, uint32_t count) {
@@ -22,11 +32,25 @@ static void ADXRS450SPI_ReadBufferCallback(const char* name, void* param,
   sim->HandleRead(buffer, count);
 }
 
-ADXRS450_SpiGyroWrapper::ADXRS450_SpiGyroWrapper(int port) : m_port(port) {
-  HALSIM_RegisterSPIReadCallback(port, ADXRS450SPI_ReadBufferCallback, this);
+static void ADXRS450SPI_ReadAutoReceivedData(const char* name, void* param,
+                                             uint8_t* buffer, int32_t numToRead,
+                                             int32_t* outputCount) {
+  ADXRS450_SpiGyroWrapper* sim = static_cast<ADXRS450_SpiGyroWrapper*>(param);
+  sim->HandleAutoReceiveData(buffer, numToRead, *outputCount);
 }
 
-ADXRS450_SpiGyroWrapper::~ADXRS450_SpiGyroWrapper() {}
+ADXRS450_SpiGyroWrapper::ADXRS450_SpiGyroWrapper(int port) : m_port(port) {
+  m_readCallbackId = HALSIM_RegisterSPIReadCallback(
+      port, ADXRS450SPI_ReadBufferCallback, this);
+  m_autoReceiveReadCallbackId = HALSIM_RegisterSPIReadAutoReceivedDataCallback(
+      port, ADXRS450SPI_ReadAutoReceivedData, this);
+}
+
+ADXRS450_SpiGyroWrapper::~ADXRS450_SpiGyroWrapper() {
+  HALSIM_CancelSPIReadCallback(m_port, m_readCallbackId);
+  HALSIM_CancelSPIReadAutoReceivedDataCallback(m_port,
+                                               m_autoReceiveReadCallbackId);
+}
 
 void ADXRS450_SpiGyroWrapper::ResetData() {
   m_angle = 0;
@@ -36,6 +60,49 @@ void ADXRS450_SpiGyroWrapper::ResetData() {
 void ADXRS450_SpiGyroWrapper::HandleRead(uint8_t* buffer, uint32_t count) {
   int returnCode = 0x00400AE0;
   std::memcpy(&buffer[0], &returnCode, sizeof(returnCode));
+}
+
+void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
+                                                    int32_t numToRead,
+                                                    int32_t& outputCount) {
+  double diff = m_angle_diff;
+  int32_t messagesToSend =
+      std::abs(diff > 0 ? std::ceil(diff / MAX_ANGLE_DELTA_PER_MESSAGE)
+                        : std::floor(diff / MAX_ANGLE_DELTA_PER_MESSAGE));
+
+  // Zero gets passed in during the "How much data do I need to read" step.
+  // Else it is actually reading the accumulator
+  if (numToRead == 0) {
+    outputCount = messagesToSend * PACKET_SIZE;
+    return;
+  }
+
+  int valuesToRead = numToRead / PACKET_SIZE;
+  std::memset(&buffer[0], 0, numToRead);
+
+  int msgCtr = 0;
+
+  while (msgCtr < valuesToRead) {
+
+    double cappedDiff = diff;
+    if (cappedDiff > MAX_ANGLE_DELTA_PER_MESSAGE) {
+      cappedDiff = MAX_ANGLE_DELTA_PER_MESSAGE;
+    } else if (cappedDiff < -MAX_ANGLE_DELTA_PER_MESSAGE) {
+      cappedDiff = -MAX_ANGLE_DELTA_PER_MESSAGE;
+    }
+
+    int32_t valueToSend =
+        (static_cast<int32_t>(cappedDiff * ANGLE_LSB) << 10) & (~0x0C00000E) |
+        0x04000000;
+    valueToSend = ntohl(valueToSend);
+
+    std::memcpy(&buffer[msgCtr * PACKET_SIZE], &valueToSend,
+                sizeof(valueToSend));
+
+    diff -= cappedDiff;
+    msgCtr += 1;
+  }
+  m_angle_diff.exchange(diff);
 }
 
 int32_t ADXRS450_SpiGyroWrapper::RegisterAngleCallback(
@@ -63,11 +130,11 @@ void ADXRS450_SpiGyroWrapper::InvokeAngleCallback(HAL_Value value) {
 }
 double ADXRS450_SpiGyroWrapper::GetAngle() { return m_angle; }
 void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
-  int32_t oldValue = m_angle.exchange(angle);
+  double oldValue = m_angle.exchange(angle);
   if (oldValue != angle) {
     InvokeAngleCallback(MakeDouble(angle));
 
-    int64_t accumValue = angle * ANGLE_LSB;
-    HALSIM_SetSPISetAccumulatorValue(m_port, accumValue);
+    double diff = (angle - oldValue) - m_angle_diff;
+    m_angle_diff.exchange(diff);
   }
 }

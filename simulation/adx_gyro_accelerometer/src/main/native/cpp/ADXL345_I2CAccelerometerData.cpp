@@ -28,12 +28,17 @@ static void ADXL345I2C_WriteBufferCallback(const char* name, void* param,
   sim->HandleWrite(buffer, count);
 }
 
-ADXL345_I2CData::ADXL345_I2CData(int port) {
-  HALSIM_RegisterI2CReadCallback(port, ADXL345I2C_ReadBufferCallback, this);
-  HALSIM_RegisterI2CWriteCallback(port, ADXL345I2C_WriteBufferCallback, this);
+ADXL345_I2CData::ADXL345_I2CData(int port) : m_port(port) {
+  m_readCallbackId =
+      HALSIM_RegisterI2CReadCallback(port, ADXL345I2C_ReadBufferCallback, this);
+  m_writeCallbackId = HALSIM_RegisterI2CWriteCallback(
+      port, ADXL345I2C_WriteBufferCallback, this);
 }
 
-ADXL345_I2CData::~ADXL345_I2CData() {}
+ADXL345_I2CData::~ADXL345_I2CData() {
+  HALSIM_CancelI2CReadCallback(m_port, m_readCallbackId);
+  HALSIM_CancelI2CWriteCallback(m_port, m_writeCallbackId);
+}
 
 void ADXL345_I2CData::ADXL345_I2CData::HandleWrite(const uint8_t* buffer,
                                                    uint32_t count) {
