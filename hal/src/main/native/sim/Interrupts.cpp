@@ -180,15 +180,14 @@ static void ProcessInterruptAnalogSynchronous(const char* name, void* param,
 static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
                                        Interrupt* interrupt, double timeout,
                                        bool ignorePrevious) {
-  auto data = std::make_shared<SynchronousWaitData>();
-
-  auto dataHandle = synchronousInterruptHandles->Allocate(data);
+  auto dataHandle = synchronousInterruptHandles->Allocate(
+      std::make_unique<SynchronousWaitData>());
   if (dataHandle == HAL_kInvalidHandle) {
     // Error allocating data
     return WaitResult::Timeout;
   }
 
-  // auto data = synchronousInterruptHandles->Get(dataHandle);
+  auto data = synchronousInterruptHandles->Get(dataHandle);
   data->waitPredicate = false;
   data->interruptHandle = handle;
 
@@ -248,14 +247,14 @@ static int64_t WaitForInterruptDigital(HAL_InterruptHandle handle,
 static int64_t WaitForInterruptAnalog(HAL_InterruptHandle handle,
                                       Interrupt* interrupt, double timeout,
                                       bool ignorePrevious) {
-  auto data = std::make_shared<SynchronousWaitData>();
-
-  auto dataHandle = synchronousInterruptHandles->Allocate(data);
+  auto dataHandle = synchronousInterruptHandles->Allocate(
+      std::make_unique<SynchronousWaitData>());
   if (dataHandle == HAL_kInvalidHandle) {
     // Error allocating data
     return WaitResult::Timeout;
   }
 
+  auto data = synchronousInterruptHandles->Get(dataHandle);
   data->waitPredicate = false;
   data->interruptHandle = handle;
 
@@ -331,10 +330,10 @@ int64_t HAL_WaitForInterrupt(HAL_InterruptHandle interruptHandle,
   }
 
   if (interrupt->isAnalog) {
-    return WaitForInterruptAnalog(interruptHandle, interrupt.get(), timeout,
+    return WaitForInterruptAnalog(interruptHandle, interrupt, timeout,
                                   ignorePrevious);
   } else {
-    return WaitForInterruptDigital(interruptHandle, interrupt.get(), timeout,
+    return WaitForInterruptDigital(interruptHandle, interrupt, timeout,
                                    ignorePrevious);
   }
 }
@@ -459,9 +458,9 @@ void HAL_EnableInterrupts(HAL_InterruptHandle interruptHandle,
   }
 
   if (interrupt->isAnalog) {
-    EnableInterruptsAnalog(interruptHandle, interrupt.get());
+    EnableInterruptsAnalog(interruptHandle, interrupt);
   } else {
-    EnableInterruptsDigital(interruptHandle, interrupt.get());
+    EnableInterruptsDigital(interruptHandle, interrupt);
   }
 }
 void HAL_DisableInterrupts(HAL_InterruptHandle interruptHandle,
