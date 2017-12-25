@@ -84,6 +84,8 @@ class SmartDashboard : public SensorBase {
                               std::shared_ptr<nt::Value> defaultValue);
   static std::shared_ptr<nt::Value> GetValue(llvm::StringRef keyName);
 
+  static void UpdateValues();
+
  private:
   virtual ~SmartDashboard() = default;
 };

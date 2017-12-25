@@ -14,6 +14,7 @@
 
 #include "Commands/Scheduler.h"
 #include "LiveWindow/LiveWindow.h"
+#include "SmartDashboard/SmartDashboard.h"
 
 using namespace frc;
 
@@ -192,5 +193,6 @@ void IterativeRobotBase::LoopFunc() {
     TestPeriodic();
   }
   RobotPeriodic();
+  SmartDashboard::UpdateValues();
   LiveWindow::GetInstance()->UpdateValues();
 }

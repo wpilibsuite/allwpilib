@@ -160,8 +160,9 @@ void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
     sddata.sendable = data;
     sddata.builder.SetTable(inst.table->GetSubTable(key));
     data->InitSendable(sddata.builder);
+    sddata.builder.UpdateTable();
+    sddata.builder.StartListeners();
   }
-  sddata.builder.UpdateTable();
 }
 
 /**
@@ -540,4 +541,15 @@ bool SmartDashboard::SetDefaultRaw(llvm::StringRef key,
 std::string SmartDashboard::GetRaw(llvm::StringRef key,
                                    llvm::StringRef defaultValue) {
   return Singleton::GetInstance().table->GetEntry(key).GetRaw(defaultValue);
+}
+
+/**
+ * Puts all sendable data to the dashboard.
+ */
+void SmartDashboard::UpdateValues() {
+  auto& inst = Singleton::GetInstance();
+  std::lock_guard<wpi::mutex> lock(inst.tablesToDataMutex);
+  for (auto& i : inst.tablesToData) {
+    i.getValue().builder.UpdateTable();
+  }
 }

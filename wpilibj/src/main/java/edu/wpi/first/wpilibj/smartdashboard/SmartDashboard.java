@@ -65,8 +65,9 @@ public class SmartDashboard {
       sddata.m_sendable = data;
       sddata.m_builder.setTable(table.getSubTable(key));
       data.initSendable(sddata.m_builder);
+      sddata.m_builder.updateTable();
+      sddata.m_builder.startListeners();
     }
-    sddata.m_builder.updateTable();
   }
 
   /**
@@ -505,5 +506,14 @@ public class SmartDashboard {
    */
   public static byte[] getRaw(String key, byte[] defaultValue) {
     return getEntry(key).getRaw(defaultValue);
+  }
+
+  /**
+   * Puts all sendable data to the dashboard.
+   */
+  public static synchronized void updateValues() {
+    for (Data data : tablesToData.values()) {
+      data.m_builder.updateTable();
+    }
   }
 }

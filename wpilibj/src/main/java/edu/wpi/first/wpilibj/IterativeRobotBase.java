@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * IterativeRobotBase implements a specific type of robot program framework, extending the RobotBase
@@ -222,6 +223,7 @@ public abstract class IterativeRobotBase extends RobotBase {
       testPeriodic();
     }
     robotPeriodic();
+    SmartDashboard.updateValues();
     LiveWindow.updateValues();
   }
 }

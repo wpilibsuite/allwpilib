@@ -88,26 +88,42 @@ public class SendableBuilderImpl implements SendableBuilder {
   }
 
   /**
-   * Start LiveWindow mode by hooking the setters for all properties.
+   * Hook setters for all properties.
    */
-  public void startLiveWindowMode() {
-    if (m_safeState != null) {
-      m_safeState.run();
-    }
+  public void startListeners() {
     for (Property property : m_properties) {
       property.startListener();
     }
   }
 
   /**
-   * Stop LiveWindow mode by unhooking the setters for all properties.
+   * Unhook setters for all properties.
    */
-  public void stopLiveWindowMode() {
+  public void stopListeners() {
+    for (Property property : m_properties) {
+      property.stopListener();
+    }
+  }
+
+  /**
+   * Start LiveWindow mode by hooking the setters for all properties.  Also
+   * calls the safeState function if one was provided.
+   */
+  public void startLiveWindowMode() {
     if (m_safeState != null) {
       m_safeState.run();
     }
-    for (Property property : m_properties) {
-      property.stopListener();
+    startListeners();
+  }
+
+  /**
+   * Stop LiveWindow mode by unhooking the setters for all properties.  Also
+   * calls the safeState function if one was provided.
+   */
+  public void stopLiveWindowMode() {
+    stopListeners();
+    if (m_safeState != null) {
+      m_safeState.run();
     }
   }
 

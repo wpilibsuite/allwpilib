@@ -29,14 +29,22 @@ void SendableBuilderImpl::UpdateTable() {
   if (m_updateTable) m_updateTable();
 }
 
-void SendableBuilderImpl::StartLiveWindowMode() {
-  if (m_safeState) m_safeState();
+void SendableBuilderImpl::StartListeners() {
   for (auto& property : m_properties) property.StartListener();
 }
 
-void SendableBuilderImpl::StopLiveWindowMode() {
-  if (m_safeState) m_safeState();
+void SendableBuilderImpl::StopListeners() {
   for (auto& property : m_properties) property.StopListener();
+}
+
+void SendableBuilderImpl::StartLiveWindowMode() {
+  if (m_safeState) m_safeState();
+  StartListeners();
+}
+
+void SendableBuilderImpl::StopLiveWindowMode() {
+  StopListeners();
+  if (m_safeState) m_safeState();
 }
 
 void SendableBuilderImpl::SetSmartDashboardType(const llvm::Twine& type) {
