@@ -52,12 +52,24 @@ class SendableBuilderImpl : public SendableBuilder {
   void UpdateTable();
 
   /**
-   * Start LiveWindow mode by hooking the setters for all properties.
+   * Hook setters for all properties.
+   */
+  void StartListeners();
+
+  /**
+   * Unhook setters for all properties.
+   */
+  void StopListeners();
+
+  /**
+   * Start LiveWindow mode by hooking the setters for all properties.  Also
+   * calls the SafeState function if one was provided.
    */
   void StartLiveWindowMode();
 
   /**
-   * Stop LiveWindow mode by unhooking the setters for all properties.
+   * Stop LiveWindow mode by unhooking the setters for all properties.  Also
+   * calls the SafeState function if one was provided.
    */
   void StopLiveWindowMode();
 
