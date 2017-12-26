@@ -83,7 +83,6 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
   int msgCtr = 0;
 
   while (msgCtr < valuesToRead) {
-
     double cappedDiff = diff;
     if (cappedDiff > MAX_ANGLE_DELTA_PER_MESSAGE) {
       cappedDiff = MAX_ANGLE_DELTA_PER_MESSAGE;
