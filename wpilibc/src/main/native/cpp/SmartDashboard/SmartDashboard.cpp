@@ -20,7 +20,11 @@
 using namespace frc;
 
 namespace {
-struct SmartDashboardData {
+class SmartDashboardData {
+ public:
+  SmartDashboardData() = default;
+  explicit SmartDashboardData(Sendable* sendable_) : sendable(sendable_) {}
+
   Sendable* sendable = nullptr;
   SendableBuilderImpl builder;
 };
@@ -157,7 +161,7 @@ void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
   std::lock_guard<wpi::mutex> lock(inst.tablesToDataMutex);
   auto& sddata = inst.tablesToData[key];
   if (!sddata.sendable || sddata.sendable != data) {
-    sddata.sendable = data;
+    sddata = SmartDashboardData(data);
     sddata.builder.SetTable(inst.table->GetSubTable(key));
     data->InitSendable(sddata.builder);
     sddata.builder.UpdateTable();

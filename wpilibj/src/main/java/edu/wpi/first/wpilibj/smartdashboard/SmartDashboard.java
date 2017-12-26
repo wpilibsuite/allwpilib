@@ -33,7 +33,11 @@ public class SmartDashboard {
       NetworkTableInstance.getDefault().getTable("SmartDashboard");
 
   private static class Data {
-    Sendable m_sendable;
+    Data(Sendable sendable) {
+      m_sendable = sendable;
+    }
+
+    final Sendable m_sendable;
     final SendableBuilderImpl m_builder = new SendableBuilderImpl();
   }
 
@@ -57,12 +61,12 @@ public class SmartDashboard {
    */
   public static synchronized void putData(String key, Sendable data) {
     Data sddata = tablesToData.get(key);
-    if (sddata == null) {
-      sddata = new Data();
+    if (sddata == null || sddata.m_sendable != data) {
+      if (sddata != null) {
+        sddata.m_builder.stopListeners();
+      }
+      sddata = new Data(data);
       tablesToData.put(key, sddata);
-    }
-    if (sddata.m_sendable == null || sddata.m_sendable != data) {
-      sddata.m_sendable = data;
       sddata.m_builder.setTable(table.getSubTable(key));
       data.initSendable(sddata.m_builder);
       sddata.m_builder.updateTable();
