@@ -7,8 +7,8 @@
 
 #include "ADXRS450_SpiGyroWrapperData.h"
 
+#include <cmath>
 #include <cstring>
-#include <iostream>
 
 #include "MockData/NotifyCallbackHelpers.h"
 #include "MockData/SPIData.h"
@@ -17,14 +17,15 @@
 #include "Winsock2.h"
 #pragma comment(lib, "ws2_32.lib")
 #else
+#include <arpa/inet.h>
 #endif
 
 using namespace hal;
 
-const double ADXRS450_SpiGyroWrapper::ANGLE_LSB = 1 / 0.0125 / 0.0005;
-const double ADXRS450_SpiGyroWrapper::MAX_ANGLE_DELTA_PER_MESSAGE =
+const double ADXRS450_SpiGyroWrapper::kAngleLsb = 1 / 0.0125 / 0.0005;
+const double ADXRS450_SpiGyroWrapper::kMaxAngleDeltaPerMessage =
     0.1875;  // Close to saturating available bits, but not totally
-const int ADXRS450_SpiGyroWrapper::PACKET_SIZE = 4;
+const int ADXRS450_SpiGyroWrapper::kPacketSize = 4;
 
 static void ADXRS450SPI_ReadBufferCallback(const char* name, void* param,
                                            uint8_t* buffer, uint32_t count) {
@@ -67,35 +68,35 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
                                                     int32_t& outputCount) {
   double diff = m_angle_diff;
   int32_t messagesToSend =
-      std::abs(diff > 0 ? std::ceil(diff / MAX_ANGLE_DELTA_PER_MESSAGE)
-                        : std::floor(diff / MAX_ANGLE_DELTA_PER_MESSAGE));
+      std::abs(diff > 0 ? std::ceil(diff / kMaxAngleDeltaPerMessage)
+                        : std::floor(diff / kMaxAngleDeltaPerMessage));
 
   // Zero gets passed in during the "How much data do I need to read" step.
   // Else it is actually reading the accumulator
   if (numToRead == 0) {
-    outputCount = messagesToSend * PACKET_SIZE;
+    outputCount = messagesToSend * kPacketSize;
     return;
   }
 
-  int valuesToRead = numToRead / PACKET_SIZE;
+  int valuesToRead = numToRead / kPacketSize;
   std::memset(&buffer[0], 0, numToRead);
 
   int msgCtr = 0;
 
   while (msgCtr < valuesToRead) {
     double cappedDiff = diff;
-    if (cappedDiff > MAX_ANGLE_DELTA_PER_MESSAGE) {
-      cappedDiff = MAX_ANGLE_DELTA_PER_MESSAGE;
-    } else if (cappedDiff < -MAX_ANGLE_DELTA_PER_MESSAGE) {
-      cappedDiff = -MAX_ANGLE_DELTA_PER_MESSAGE;
+    if (cappedDiff > kMaxAngleDeltaPerMessage) {
+      cappedDiff = kMaxAngleDeltaPerMessage;
+    } else if (cappedDiff < -kMaxAngleDeltaPerMessage) {
+      cappedDiff = -kMaxAngleDeltaPerMessage;
     }
 
     int32_t valueToSend =
-        (static_cast<int32_t>(cappedDiff * ANGLE_LSB) << 10) & (~0x0C00000E) |
+        ((static_cast<int32_t>(cappedDiff * kAngleLsb) << 10) & (~0x0C00000E)) |
         0x04000000;
     valueToSend = ntohl(valueToSend);
 
-    std::memcpy(&buffer[msgCtr * PACKET_SIZE], &valueToSend,
+    std::memcpy(&buffer[msgCtr * kPacketSize], &valueToSend,
                 sizeof(valueToSend));
 
     diff -= cappedDiff;

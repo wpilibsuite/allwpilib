@@ -43,8 +43,8 @@ class ADXRS450_SpiGyroWrapper {
   std::atomic<double> m_angle_diff{0.0};
   std::shared_ptr<NotifyListenerVector> m_angleCallbacks = nullptr;
 
-  static const double ANGLE_LSB;
-  static const double MAX_ANGLE_DELTA_PER_MESSAGE;
-  static const int PACKET_SIZE;
+  static const double kAngleLsb;
+  static const double kMaxAngleDeltaPerMessage;
+  static const int kPacketSize;
 };
 }  // namespace hal
