@@ -66,7 +66,7 @@ void ADXRS450_SpiGyroWrapper::HandleRead(uint8_t* buffer, uint32_t count) {
 void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
                                                     int32_t numToRead,
                                                     int32_t& outputCount) {
-  double diff = m_angle_diff;
+  double diff = m_angleDiff;
   int32_t messagesToSend =
       std::abs(diff > 0 ? std::ceil(diff / kMaxAngleDeltaPerMessage)
                         : std::floor(diff / kMaxAngleDeltaPerMessage));
@@ -102,7 +102,7 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
     diff -= cappedDiff;
     msgCtr += 1;
   }
-  m_angle_diff.exchange(diff);
+  m_angleDiff.exchange(diff);
 }
 
 int32_t ADXRS450_SpiGyroWrapper::RegisterAngleCallback(
@@ -134,7 +134,7 @@ void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
   if (oldValue != angle) {
     InvokeAngleCallback(MakeDouble(angle));
 
-    double diff = (angle - oldValue) - m_angle_diff;
-    m_angle_diff.exchange(diff);
+    double diff = (angle - oldValue) - m_angleDiff;
+    m_angleDiff.exchange(diff);
   }
 }
