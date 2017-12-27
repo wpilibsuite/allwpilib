@@ -90,7 +90,7 @@ public abstract class Subsystem extends SendableBase implements Sendable {
    * @param command the default command (or null if there should be none)
    * @throws IllegalUseOfCommandException if the command does not require the subsystem
    */
-  protected void setDefaultCommand(Command command) {
+  public void setDefaultCommand(Command command) {
     if (command == null) {
       m_defaultCommand = null;
     } else {
