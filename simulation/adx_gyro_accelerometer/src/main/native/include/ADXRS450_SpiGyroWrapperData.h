@@ -40,8 +40,8 @@ class ADXRS450_SpiGyroWrapper {
 
   wpi::mutex m_registerMutex;
   wpi::mutex m_dataMutex;
-  double m_angle{0.0};
-  double m_angleDiff{0.0};
+  double m_angle = 0.0;
+  double m_angleDiff = 0.0;
   std::shared_ptr<NotifyListenerVector> m_angleCallbacks = nullptr;
 
   static const double kAngleLsb;

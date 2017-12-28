@@ -24,9 +24,14 @@
 using namespace hal;
 
 const double ADXRS450_SpiGyroWrapper::kAngleLsb = 1 / 0.0125 / 0.0005;
-// The maximum difference that can fit inside of the shifted and masked packet
+// The maximum difference that can fit inside of the shifted and masked data field, per transaction
 const double ADXRS450_SpiGyroWrapper::kMaxAngleDeltaPerMessage = 0.1875;
 const int ADXRS450_SpiGyroWrapper::kPacketSize = 4;
+
+template <class T>
+constexpr const T& clamp(const T& value, const T& low, const T& high) {
+  return std::max(low, std::min(value, high));
+}
 
 static void ADXRS450SPI_ReadBufferCallback(const char* name, void* param,
                                            uint8_t* buffer, uint32_t count) {
@@ -88,11 +93,7 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
   int msgCtr = 0;
 
   while (msgCtr < valuesToRead) {
-    double cappedDiff = diff;
-
-    // Clamp the value to the max you can send in one packet
-    cappedDiff = std::max(cappedDiff, -kMaxAngleDeltaPerMessage);
-    cappedDiff = std::min(cappedDiff, kMaxAngleDeltaPerMessage);
+    double cappedDiff = clamp(diff, -kMaxAngleDeltaPerMessage, kMaxAngleDeltaPerMessage);
 
     int32_t valueToSend =
         ((static_cast<int32_t>(cappedDiff * kAngleLsb) << 10) & (~0x0C00000E)) |
