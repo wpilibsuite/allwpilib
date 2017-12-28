@@ -40,6 +40,7 @@
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
 #include "DigitalSource.h"
+#include "DMC60.h"
 #include "DoubleSolenoid.h"
 #include "Drive/DifferentialDrive.h"
 #include "Drive/KilloughDrive.h"
