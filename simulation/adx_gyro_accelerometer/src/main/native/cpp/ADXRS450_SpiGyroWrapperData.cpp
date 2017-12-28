@@ -7,6 +7,7 @@
 
 #include "ADXRS450_SpiGyroWrapperData.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 
@@ -23,8 +24,8 @@
 using namespace hal;
 
 const double ADXRS450_SpiGyroWrapper::kAngleLsb = 1 / 0.0125 / 0.0005;
-const double ADXRS450_SpiGyroWrapper::kMaxAngleDeltaPerMessage =
-    0.1875;  // Close to saturating available bits, but not totally
+// The maximum difference that can fit inside of the shifted and masked packet
+const double ADXRS450_SpiGyroWrapper::kMaxAngleDeltaPerMessage = 0.1875;
 const int ADXRS450_SpiGyroWrapper::kPacketSize = 4;
 
 static void ADXRS450SPI_ReadBufferCallback(const char* name, void* param,
@@ -54,7 +55,9 @@ ADXRS450_SpiGyroWrapper::~ADXRS450_SpiGyroWrapper() {
 }
 
 void ADXRS450_SpiGyroWrapper::ResetData() {
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
   m_angle = 0;
+  m_angleDiff = 0;
   m_angleCallbacks = nullptr;
 }
 
@@ -66,6 +69,7 @@ void ADXRS450_SpiGyroWrapper::HandleRead(uint8_t* buffer, uint32_t count) {
 void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
                                                     int32_t numToRead,
                                                     int32_t& outputCount) {
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
   double diff = m_angleDiff;
   int32_t messagesToSend =
       std::abs(diff > 0 ? std::ceil(diff / kMaxAngleDeltaPerMessage)
@@ -85,11 +89,10 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
 
   while (msgCtr < valuesToRead) {
     double cappedDiff = diff;
-    if (cappedDiff > kMaxAngleDeltaPerMessage) {
-      cappedDiff = kMaxAngleDeltaPerMessage;
-    } else if (cappedDiff < -kMaxAngleDeltaPerMessage) {
-      cappedDiff = -kMaxAngleDeltaPerMessage;
-    }
+
+    // Clamp the value to the max you can send in one packet
+    cappedDiff = std::max(cappedDiff, -kMaxAngleDeltaPerMessage);
+    cappedDiff = std::min(cappedDiff, kMaxAngleDeltaPerMessage);
 
     int32_t valueToSend =
         ((static_cast<int32_t>(cappedDiff * kAngleLsb) << 10) & (~0x0C00000E)) |
@@ -102,7 +105,7 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
     diff -= cappedDiff;
     msgCtr += 1;
   }
-  m_angleDiff.exchange(diff);
+  m_angleDiff = diff;
 }
 
 int32_t ADXRS450_SpiGyroWrapper::RegisterAngleCallback(
@@ -128,13 +131,16 @@ void ADXRS450_SpiGyroWrapper::CancelAngleCallback(int32_t uid) {
 void ADXRS450_SpiGyroWrapper::InvokeAngleCallback(HAL_Value value) {
   InvokeCallback(m_angleCallbacks, "Angle", &value);
 }
-double ADXRS450_SpiGyroWrapper::GetAngle() { return m_angle; }
+double ADXRS450_SpiGyroWrapper::GetAngle() {
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
+  return m_angle;
+}
 void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
-  double oldValue = m_angle.exchange(angle);
-  if (oldValue != angle) {
+  std::lock_guard<wpi::mutex> lock(m_dataMutex);
+  if (m_angle != angle) {
     InvokeAngleCallback(MakeDouble(angle));
 
-    double diff = (angle - oldValue) - m_angleDiff;
-    m_angleDiff.exchange(diff);
+    m_angleDiff += (angle - m_angle);
+    m_angle = angle;
   }
 }
