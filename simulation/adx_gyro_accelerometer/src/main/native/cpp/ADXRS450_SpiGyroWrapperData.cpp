@@ -120,22 +120,26 @@ int32_t ADXRS450_SpiGyroWrapper::RegisterAngleCallback(
   }
   return newUid;
 }
+
 void ADXRS450_SpiGyroWrapper::CancelAngleCallback(int32_t uid) {
   m_angleCallbacks = CancelCallback(m_angleCallbacks, uid);
 }
+
 void ADXRS450_SpiGyroWrapper::InvokeAngleCallback(HAL_Value value) {
   InvokeCallback(m_angleCallbacks, "Angle", &value);
 }
+
 double ADXRS450_SpiGyroWrapper::GetAngle() {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
   return m_angle;
 }
+
 void ADXRS450_SpiGyroWrapper::SetAngle(double angle) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
   if (m_angle != angle) {
     InvokeAngleCallback(MakeDouble(angle));
 
-    m_angleDiff += (angle - m_angle);
+    m_angleDiff += angle - m_angle;
     m_angle = angle;
   }
 }
