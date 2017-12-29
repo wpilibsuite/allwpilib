@@ -281,14 +281,27 @@ public class DriverStation implements RobotState.Interface {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-3");
     }
-
-    // If button was pressed, clear flag and return true
-    if ((m_joystickButtonsPressed[stick].m_buttons & 1 << (button - 1)) != 0) {
-      m_joystickButtonsPressed[stick].m_buttons &= ~(1 << (button - 1));
-      return true;
-    } else {
-      return false;
+    boolean error = false;
+    boolean retVal = false;
+    synchronized (m_cacheDataMutex) {
+      if (button > m_joystickButtons[stick].m_count) {
+        error = true;
+        retVal = false;
+      } else {
+        // If button was pressed, clear flag and return true
+        if ((m_joystickButtonsPressed[stick].m_buttons & 1 << (button - 1)) != 0) {
+          m_joystickButtonsPressed[stick].m_buttons &= ~(1 << (button - 1));
+          retVal = true;
+        } else {
+          retVal = false;
+        }
+      }
     }
+    if (error) {
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
+    }
+    return retVal;
   }
 
   /**
@@ -307,14 +320,27 @@ public class DriverStation implements RobotState.Interface {
     if (stick < 0 || stick >= kJoystickPorts) {
       throw new RuntimeException("Joystick index is out of range, should be 0-3");
     }
-
-    // If button was released, clear flag and return true
-    if ((m_joystickButtonsReleased[stick].m_buttons & 1 << (button - 1)) != 0) {
-      m_joystickButtonsReleased[stick].m_buttons &= ~(1 << (button - 1));
-      return true;
-    } else {
-      return false;
+    boolean error = false;
+    boolean retVal = false;
+    synchronized (m_cacheDataMutex) {
+      if (button > m_joystickButtons[stick].m_count) {
+        error = true;
+        retVal = false;
+      } else {
+        // If button was released, clear flag and return true
+        if ((m_joystickButtonsReleased[stick].m_buttons & 1 << (button - 1)) != 0) {
+          m_joystickButtonsReleased[stick].m_buttons &= ~(1 << (button - 1));
+          retVal = true;
+        } else {
+          retVal = false;
+        }
+      }
     }
+    if (error) {
+      reportJoystickUnpluggedWarning("Joystick Button " + button + " on port " + stick
+          + " not available, check if controller is plugged in");
+    }
+    return retVal;
   }
 
   /**
