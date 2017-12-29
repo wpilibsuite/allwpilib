@@ -60,8 +60,8 @@ class SPIData {
   std::shared_ptr<NotifyListenerVector> m_initializedCallbacks = nullptr;
   std::shared_ptr<BufferListenerVector> m_readCallbacks = nullptr;
   std::shared_ptr<ConstBufferListenerVector> m_writeCallbacks = nullptr;
-  std::shared_ptr<SpiAutoReceiveDataListenerVector>
-      m_autoRecceiveDataCallbacks = nullptr;
+  std::shared_ptr<SpiAutoReceiveDataListenerVector> m_autoReceiveDataCallbacks =
+      nullptr;
 };
 extern SPIData* SimSPIData;
 }  // namespace hal

@@ -22,7 +22,7 @@ void InvokeCallback(
   // Get a copy of the shared_ptr, then iterate and callback listeners
   auto newCallbacks = currentVector;
   for (size_t i = 0; i < newCallbacks->size(); ++i) {
-    if (!(*newCallbacks)[i]) continue;  // removed
+    if (!(*newCallbacks)[i]) continue;  // callback was removed
     auto listener = (*newCallbacks)[i];
     listener.callback(name, listener.param, buffer, numToRead, outputCount);
   }
@@ -43,7 +43,7 @@ void SPIData::ResetData() {
   m_initializedCallbacks = nullptr;
   m_readCallbacks = nullptr;
   m_writeCallbacks = nullptr;
-  m_autoRecceiveDataCallbacks = nullptr;
+  m_autoReceiveDataCallbacks = nullptr;
 }
 
 SPIData::SPIData() {}
@@ -128,17 +128,17 @@ int32_t SPIData::RegisterReadAutoReceivedDataCallback(
   int32_t newUid = 0;
   {
     std::lock_guard<wpi::mutex> lock(m_registerMutex);
-    m_autoRecceiveDataCallbacks = RegisterCallbackImpl(
-        m_autoRecceiveDataCallbacks, "AutoReceive", callback, param, &newUid);
+    m_autoReceiveDataCallbacks = RegisterCallbackImpl(
+        m_autoReceiveDataCallbacks, "AutoReceive", callback, param, &newUid);
   }
   return newUid;
 }
 
 void SPIData::CancelReadAutoReceivedDataCallback(int32_t uid) {
-  m_autoRecceiveDataCallbacks =
+  m_autoReceiveDataCallbacks =
       CancelCallbackImpl<SpiAutoReceiveDataListenerVector,
                          HAL_SpiReadAutoReceiveBufferCallback>(
-          m_autoRecceiveDataCallbacks, uid);
+          m_autoReceiveDataCallbacks, uid);
 }
 
 int32_t SPIData::Read(uint8_t* buffer, int32_t count) {
@@ -168,7 +168,7 @@ int32_t SPIData::Transaction(const uint8_t* dataToSend, uint8_t* dataReceived,
 int32_t SPIData::ReadAutoReceivedData(uint8_t* buffer, int32_t numToRead,
                                       double timeout, int32_t* status) {
   int32_t outputCount = 0;
-  InvokeCallback(m_autoRecceiveDataCallbacks, "AutoReceive",
+  InvokeCallback(m_autoReceiveDataCallbacks, "AutoReceive",
                  const_cast<uint8_t*>(buffer), numToRead, &outputCount);
 
   return outputCount;
