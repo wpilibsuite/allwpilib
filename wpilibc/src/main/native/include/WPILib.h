@@ -37,6 +37,7 @@
 #include "Compressor.h"
 #include "ControllerPower.h"
 #include "Counter.h"
+#include "DMC60.h"
 #include "DigitalInput.h"
 #include "DigitalOutput.h"
 #include "DigitalSource.h"
