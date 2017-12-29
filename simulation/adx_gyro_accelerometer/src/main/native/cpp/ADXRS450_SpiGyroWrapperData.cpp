@@ -23,12 +23,6 @@
 
 using namespace hal;
 
-const double ADXRS450_SpiGyroWrapper::kAngleLsb = 1 / 0.0125 / 0.0005;
-// The maximum difference that can fit inside of the shifted and masked data
-// field, per transaction
-const double ADXRS450_SpiGyroWrapper::kMaxAngleDeltaPerMessage = 0.1875;
-const int ADXRS450_SpiGyroWrapper::kPacketSize = 4;
-
 template <class T>
 constexpr const T& clamp(const T& value, const T& low, const T& high) {
   return std::max(low, std::min(value, high));
@@ -36,14 +30,14 @@ constexpr const T& clamp(const T& value, const T& low, const T& high) {
 
 static void ADXRS450SPI_ReadBufferCallback(const char* name, void* param,
                                            uint8_t* buffer, uint32_t count) {
-  ADXRS450_SpiGyroWrapper* sim = static_cast<ADXRS450_SpiGyroWrapper*>(param);
+  auto sim = static_cast<ADXRS450_SpiGyroWrapper*>(param);
   sim->HandleRead(buffer, count);
 }
 
 static void ADXRS450SPI_ReadAutoReceivedData(const char* name, void* param,
                                              uint8_t* buffer, int32_t numToRead,
                                              int32_t* outputCount) {
-  ADXRS450_SpiGyroWrapper* sim = static_cast<ADXRS450_SpiGyroWrapper*>(param);
+  auto sim = static_cast<ADXRS450_SpiGyroWrapper*>(param);
   sim->HandleAutoReceiveData(buffer, numToRead, *outputCount);
 }
 
@@ -76,10 +70,9 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
                                                     int32_t numToRead,
                                                     int32_t& outputCount) {
   std::lock_guard<wpi::mutex> lock(m_dataMutex);
-  double diff = m_angleDiff;
-  int32_t messagesToSend =
-      std::abs(diff > 0 ? std::ceil(diff / kMaxAngleDeltaPerMessage)
-                        : std::floor(diff / kMaxAngleDeltaPerMessage));
+  int32_t messagesToSend = std::abs(
+      m_angleDiff > 0 ? std::ceil(m_angleDiff / kMaxAngleDeltaPerMessage)
+                      : std::floor(m_angleDiff / kMaxAngleDeltaPerMessage));
 
   // Zero gets passed in during the "How much data do I need to read" step.
   // Else it is actually reading the accumulator
@@ -95,7 +88,7 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
 
   while (msgCtr < valuesToRead) {
     double cappedDiff =
-        clamp(diff, -kMaxAngleDeltaPerMessage, kMaxAngleDeltaPerMessage);
+        clamp(m_angleDiff, -kMaxAngleDeltaPerMessage, kMaxAngleDeltaPerMessage);
 
     int32_t valueToSend =
         ((static_cast<int32_t>(cappedDiff * kAngleLsb) << 10) & (~0x0C00000E)) |
@@ -105,10 +98,9 @@ void ADXRS450_SpiGyroWrapper::HandleAutoReceiveData(uint8_t* buffer,
     std::memcpy(&buffer[msgCtr * kPacketSize], &valueToSend,
                 sizeof(valueToSend));
 
-    diff -= cappedDiff;
+    m_angleDiff -= cappedDiff;
     msgCtr += 1;
   }
-  m_angleDiff = diff;
 }
 
 int32_t ADXRS450_SpiGyroWrapper::RegisterAngleCallback(
