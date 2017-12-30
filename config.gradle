@@ -1,8 +1,7 @@
 import edu.wpi.first.nativeutils.*
 import org.gradle.internal.os.OperatingSystem
 
-def windowsCompilerArgs = ['/EHsc', '/DNOMINMAX', '/D_SCL_SECURE_NO_WARNINGS', '/D_WINSOCK_DEPRECATED_NO_WARNINGS',
-                           '/Zi', '/FS', '/Zc:inline', '/MT']
+def windowsCompilerArgs = ['/EHsc', '/DNOMINMAX', '/Zi', '/FS', '/Zc:inline', '/MT']
 def windowsReleaseCompilerArgs = ['/O2']
 def windowsLinkerArgs = [ '/DEBUG:FULL' ]
 def windowsReleaseLinkerArgs = [ '/OPT:REF', '/OPT:ICF' ]
@@ -10,7 +9,7 @@ def windowsReleaseLinkerArgs = [ '/OPT:REF', '/OPT:ICF' ]
 def linuxCompilerArgs = ['-std=c++11', '-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
                          '-Wno-unused-parameter', '-fPIC', '-rdynamic', '-Wno-error=deprecated-declarations', '-pthread']
 def linuxLinkerArgs = ['-rdynamic', '-pthread']
-def linuxReleaseCompilerArgs = ['-O2']
+def linuxReleaseCompilerArgs = ['-Og']
 def linuxDebugCompilerArgs = ['-O0']
 def linux32BitArg = '-m32'
 
@@ -142,6 +141,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs << linux32BitArg
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Gcc'
                 detectPlatform = linux32IntelPlatformDetect
             }
@@ -152,6 +152,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Gcc'
                 detectPlatform = linux64IntelPlatformDetect
             }
@@ -165,6 +166,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs << mac32BitArg
                 debugCompilerArgs = macDebugCompilerArgs
                 releaseCompilerArgs = macReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Clang'
                 detectPlatform = mac32PlatformDetect
             }
@@ -175,52 +177,43 @@ if (!project.hasProperty('onlyAthena')) {
                 compilerArgs = macCompilerArgs
                 debugCompilerArgs = macDebugCompilerArgs
                 releaseCompilerArgs = macReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Clang'
                 detectPlatform = mac64PlatformDetect
             }
-            raspbian(CrossBuildConfig) {
-                architecture = 'raspbian'
+        }
+    }
+}
+
+if (project.hasProperty('linuxCross')) {
+    model {
+        buildConfigs {
+            linuxArm(CrossBuildConfig) {
+                architecture = 'nativearm'
                 operatingSystem = 'linux'
-                toolChainPrefix = 'arm-linux-gnueabihf-'
+                toolChainPrefix = 'PLEASE_PROVIDE_A_COMPILER_NAME'
                 compilerArgs = linuxCompilerArgs
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
+                releaseStripBinaries = true
                 skipByDefault = true
                 compilerFamily = 'Gcc'
                 exclude << 'gmock'
             }
-            armhf(CrossBuildConfig) {
-                architecture = 'armhf'
-                operatingSystem = 'linux'
-                toolChainPrefix = 'arm-linux-gnueabihf-'
-                compilerArgs = linuxCompilerArgs
-                linkerArgs = linuxLinkerArgs
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                skipByDefault = true
-                compilerFamily = 'Gcc'
-                exclude << 'gmock'
-            }
-            aarch(CrossBuildConfig) {
-                architecture = 'aarch'
-                operatingSystem = 'linux'
-                toolChainPrefix = 'aarch-linux-gnu-'
-                compilerArgs = linuxCompilerArgs
-                linkerArgs = linuxLinkerArgs
-                debugCompilerArgs = linuxDebugCompilerArgs
-                releaseCompilerArgs = linuxReleaseCompilerArgs
-                skipByDefault = true
-                compilerFamily = 'Gcc'
-                exclude << 'gmock'
-            }
+        }
+    }
+} else {
+    model {
+        buildConfigs {
             linuxArm(BuildConfig) {
-                architecture = 'arm'
+                architecture = 'nativearm'
                 operatingSystem = 'linux'
                 compilerArgs = linuxCompilerArgs
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Gcc'
                 detectPlatform = linuxArmPlatformDetect
             }
