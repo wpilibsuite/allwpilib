@@ -29,7 +29,6 @@ import static java.util.Objects.requireNonNull;
  * before use.
  */
 public class Encoder extends SensorBase implements CounterBase, PIDSource, Sendable {
-
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
 

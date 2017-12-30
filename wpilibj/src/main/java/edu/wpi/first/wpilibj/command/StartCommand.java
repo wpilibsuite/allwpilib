@@ -12,7 +12,6 @@ package edu.wpi.first.wpilibj.command;
  * when it is initialized and will finish immediately.
  */
 public class StartCommand extends InstantCommand {
-
   /**
    * The command to fork.
    */

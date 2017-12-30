@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  * don't stall.
  */
 public class Claw extends Subsystem {
-
 	private Victor m_motor = new Victor(7);
 	private DigitalInput m_contact = new DigitalInput(5);
 

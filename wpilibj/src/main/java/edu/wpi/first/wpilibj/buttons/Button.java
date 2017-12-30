@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.command.Command;
  * wrapper around Trigger with the method names renamed to fit the Button object use.
  */
 public abstract class Button extends Trigger {
-
   /**
    * Starts the given command whenever the button is newly pressed.
    *

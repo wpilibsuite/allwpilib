@@ -23,7 +23,6 @@ import org.opencv.core.Mat;
  * @see edu.wpi.first.wpilibj.vision
  */
 public class VisionRunner<P extends VisionPipeline> {
-
   private final CvSink m_cvSink = new CvSink("VisionRunner CvSink");
   private final P m_pipeline;
   private final Mat m_image = new Mat();

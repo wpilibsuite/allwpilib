@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * Cross the Road Electronics (CTRE) Talon SRX Speed Controller with PWM control.
  */
 public class PWMTalonSRX extends PWMSpeedController {
-
   /**
    * Constructor for a PWMTalonSRX connected via PWM.
    *

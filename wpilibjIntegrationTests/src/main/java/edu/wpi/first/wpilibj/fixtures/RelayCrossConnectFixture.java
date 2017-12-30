@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.Relay;
  * A connection between a {@link Relay} and two {@link DigitalInput DigitalInputs}.
  */
 public abstract class RelayCrossConnectFixture implements ITestFixture {
-
   private DigitalInput m_inputOne;
   private DigitalInput m_inputTwo;
   private Relay m_relay;

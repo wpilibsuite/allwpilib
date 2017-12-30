@@ -10,7 +10,6 @@ package edu.wpi.first.wpilibj;
 import edu.wpi.first.wpilibj.hal.ThreadsJNI;
 
 public class Threads {
-
   /**
   * Get the thread priority for the current thread.
   * @return The current thread priority. Scaled 1-99.

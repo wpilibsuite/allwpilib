@@ -29,7 +29,6 @@ import static java.util.Objects.requireNonNull;
  * before use.
  */
 public class Counter extends SensorBase implements CounterBase, Sendable, PIDSource {
-
   /**
    * Mode determines how and what the counter counts.
    */

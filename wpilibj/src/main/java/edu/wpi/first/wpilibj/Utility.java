@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.hal.HALUtil;
  */
 @Deprecated
 public final class Utility {
-
   private Utility() {
   }
 

@@ -16,7 +16,6 @@ package edu.wpi.first.wpilibj.command;
  * to finish, before continuing in the main {@link CommandGroup} sequence.
  */
 public class WaitForChildren extends Command {
-
   protected boolean isFinished() {
     return getGroup() == null || getGroup().m_children.isEmpty();
   }

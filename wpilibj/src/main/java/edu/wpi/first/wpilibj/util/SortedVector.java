@@ -13,7 +13,6 @@ import java.util.Vector;
  * A vector that is sorted.
  */
 public class SortedVector<E> extends Vector<E> {
-
   /**
    * Interface used to determine the order to place sorted objects.
    */

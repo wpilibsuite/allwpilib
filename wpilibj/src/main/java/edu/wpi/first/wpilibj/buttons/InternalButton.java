@@ -12,7 +12,6 @@ package edu.wpi.first.wpilibj.buttons;
  * Also includes a setting for whether or not it should invert its value.
  */
 public class InternalButton extends Button {
-
   private boolean m_pressed;
   private boolean m_inverted;
 

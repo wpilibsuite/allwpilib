@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * REV Robotics SPARK Speed Controller.
  */
 public class Spark extends PWMSpeedController {
-
   /**
    * Common initialization code called by all constructors.
    *

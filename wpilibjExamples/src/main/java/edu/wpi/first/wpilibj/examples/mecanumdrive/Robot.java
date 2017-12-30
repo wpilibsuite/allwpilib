@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.drive.MecanumDrive;
  * class.
  */
 public class Robot extends IterativeRobot {
-
 	private static final int kFrontLeftChannel = 2;
 	private static final int kRearLeftChannel = 3;
 	private static final int kFrontRightChannel = 1;

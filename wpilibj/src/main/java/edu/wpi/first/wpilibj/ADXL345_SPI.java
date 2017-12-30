@@ -59,7 +59,6 @@ public class ADXL345_SPI extends SensorBase implements Accelerometer, Sendable {
 
   @SuppressWarnings("MemberName")
   public static class AllAxes {
-
     public double XAxis;
     public double YAxis;
     public double ZAxis;

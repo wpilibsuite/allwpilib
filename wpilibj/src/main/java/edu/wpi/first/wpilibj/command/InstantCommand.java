@@ -14,7 +14,6 @@ package edu.wpi.first.wpilibj.command;
  * {@link Command isFinished}.
  */
 public class InstantCommand extends Command {
-
   public InstantCommand() {
   }
 

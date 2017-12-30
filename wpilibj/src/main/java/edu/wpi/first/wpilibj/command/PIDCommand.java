@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * ended/interrupted. </p>
  */
 public abstract class PIDCommand extends Command implements Sendable {
-
   /**
    * The internal {@link PIDController}.
    */

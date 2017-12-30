@@ -25,7 +25,6 @@ import static java.util.Objects.requireNonNull;
  */
 @Deprecated
 public class RobotDrive implements MotorSafety {
-
   protected MotorSafetyHelper m_safetyHelper;
 
   /**

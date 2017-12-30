@@ -32,7 +32,6 @@ import static java.util.Objects.requireNonNull;
  * with all the key-value pairs. </p>
  */
 public class Preferences {
-
   /**
    * The Preferences table name.
    */

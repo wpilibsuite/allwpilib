@@ -34,7 +34,6 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
    * which the relay is set.
    */
   public class InvalidValueException extends RuntimeException {
-
     /**
      * Create a new exception with the given message.
      *

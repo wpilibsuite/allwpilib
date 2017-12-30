@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  * backwards while the gyro is used for direction keeping.
  */
 public class Robot extends IterativeRobot {
-
 	private static final double kAngleSetpoint = 0.0;
 	private static final double kP = 0.005; // propotional turning constant
 

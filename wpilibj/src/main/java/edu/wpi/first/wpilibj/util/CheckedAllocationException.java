@@ -12,7 +12,6 @@ package edu.wpi.first.wpilibj.util;
  * resource class.
  */
 public class CheckedAllocationException extends Exception {
-
   /**
    * Create a new CheckedAllocationException.
    *

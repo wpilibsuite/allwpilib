@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * VEX Robotics Victor SP Speed Controller.
  */
 public class VictorSP extends PWMSpeedController {
-
   /**
    * Constructor.
    *

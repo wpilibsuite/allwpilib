@@ -32,7 +32,6 @@ import static java.util.Objects.requireNonNull;
  * @see IllegalUseOfCommandException
  */
 public class CommandGroup extends Command {
-
   /**
    * The commands in this group (stored in entries).
    */
@@ -380,7 +379,6 @@ public class CommandGroup extends Command {
   }
 
   private static class Entry {
-
     private static final int IN_SEQUENCE = 0;
     private static final int BRANCH_PEER = 1;
     private static final int BRANCH_CHILD = 2;

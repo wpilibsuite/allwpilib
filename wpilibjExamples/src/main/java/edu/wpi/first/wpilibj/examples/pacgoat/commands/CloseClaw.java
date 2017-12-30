@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * detect that.
  */
 public class CloseClaw extends InstantCommand {
-
 	public CloseClaw() {
 		requires(Robot.collector);
 	}

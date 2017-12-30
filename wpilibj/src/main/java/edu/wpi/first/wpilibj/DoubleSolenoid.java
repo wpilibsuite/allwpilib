@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * controlled by two separate channels.
  */
 public class DoubleSolenoid extends SolenoidBase implements Sendable {
-
   /**
    * Possible values for a DoubleSolenoid.
    */

@@ -19,7 +19,6 @@ import static java.util.Objects.requireNonNull;
  * is calibrated by finding the center value over a period of time.
  */
 public class AnalogAccelerometer extends SensorBase implements PIDSource, Sendable {
-
   private AnalogInput m_analogChannel;
   private double m_voltsPerG = 1.0;
   private double m_zeroGVoltage = 2.5;

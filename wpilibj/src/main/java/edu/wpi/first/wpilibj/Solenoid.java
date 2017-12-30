@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * device within the current spec of the PCM.
  */
 public class Solenoid extends SolenoidBase implements Sendable {
-
   private final int m_channel; // The channel to control.
   private int m_solenoidHandle;
 

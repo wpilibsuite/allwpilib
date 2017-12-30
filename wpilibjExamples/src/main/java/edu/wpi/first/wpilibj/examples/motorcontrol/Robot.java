@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.Spark;
  * range from -1 to 1 making it easy to work together.
  */
 public class Robot extends IterativeRobot {
-
 	private static final int kMotorPort = 0;
 	private static final int kJoystickPort = 0;
 

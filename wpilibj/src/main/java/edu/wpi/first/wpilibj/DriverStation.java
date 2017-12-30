@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
  * Provide access to the network communication data to / from the Driver Station.
  */
 public class DriverStation implements RobotState.Interface {
-
   /**
    * Number of Joystick Ports.
    */
@@ -63,7 +62,6 @@ public class DriverStation implements RobotState.Interface {
   private double m_nextMessageTime = 0.0;
 
   private static class DriverStationTask implements Runnable {
-
     private DriverStation m_ds;
 
     DriverStationTask(DriverStation ds) {

@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * and a gyro.
  */
 public class DriveTrain extends Subsystem {
-
 	private SpeedController m_leftMotor
 			= new SpeedControllerGroup(new Spark(0), new Spark(1));
 	private SpeedController m_rightMotor

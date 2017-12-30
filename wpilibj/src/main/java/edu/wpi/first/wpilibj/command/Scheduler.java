@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see Command
  */
 public class Scheduler extends SendableBase implements Sendable {
-
   /**
    * The Singleton Instance.
    */

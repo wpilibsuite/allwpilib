@@ -11,7 +11,6 @@ package edu.wpi.first.wpilibj.util;
  * Exception for bad status codes from the chip object.
  */
 public final class UncleanStatusException extends IllegalStateException {
-
   private final int m_statusCode;
 
   /**

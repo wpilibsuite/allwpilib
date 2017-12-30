@@ -11,7 +11,6 @@ package edu.wpi.first.wpilibj;
  * Structure for holding the config data result for PWM.
  */
 public class PWMConfigDataResult {
-
   PWMConfigDataResult(int max, int deadbandMax, int center, int deadbandMin, int min) {
     this.max = max;
     this.deadbandMax = deadbandMax;

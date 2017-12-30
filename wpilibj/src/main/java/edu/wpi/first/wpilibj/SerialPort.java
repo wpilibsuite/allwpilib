@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.hal.SerialPortJNI;
  * http://www.ni.com/pdf/manuals/370132c.pdf
  */
 public class SerialPort {
-
   private byte m_port;
 
   public enum Port {

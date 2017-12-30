@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.util.CheckedAllocationException;
  * unload/reload.
  */
 public final class Resource {
-
   private static Resource resourceList = null;
   private final boolean[] m_numAllocated;
   private final int m_size;

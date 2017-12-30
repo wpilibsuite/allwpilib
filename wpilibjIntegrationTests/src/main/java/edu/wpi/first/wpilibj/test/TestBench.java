@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
  * TestBench}.
  */
 public final class TestBench {
-
   /**
    * The time that it takes to have a motor go from rotating at full speed to completely stopped.
    */

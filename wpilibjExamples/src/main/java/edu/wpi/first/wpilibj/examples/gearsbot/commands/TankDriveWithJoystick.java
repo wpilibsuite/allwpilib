@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * Have the robot drive tank style using the PS3 Joystick until interrupted.
  */
 public class TankDriveWithJoystick extends Command {
-
 	public TankDriveWithJoystick() {
 		requires(Robot.m_drivetrain);
 	}

@@ -17,7 +17,6 @@ import java.util.Set;
  * whenever the motors value is updated.
  */
 public final class MotorSafetyHelper {
-
   private double m_expiration;
   private boolean m_enabled;
   private double m_stopTime;

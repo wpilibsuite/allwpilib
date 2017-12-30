@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * Panel over CAN.
  */
 public class PowerDistributionPanel extends SensorBase implements Sendable {
-
   private final int m_module;
 
   /**

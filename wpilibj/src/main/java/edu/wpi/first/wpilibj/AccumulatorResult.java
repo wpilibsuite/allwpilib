@@ -11,7 +11,6 @@ package edu.wpi.first.wpilibj;
  * Structure for holding the values stored in an accumulator.
  */
 public class AccumulatorResult {
-
   /**
    * The total value accumulated.
    */
