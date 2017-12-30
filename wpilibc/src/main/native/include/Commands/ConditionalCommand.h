@@ -31,6 +31,8 @@ namespace frc {
  * @see Scheduler
  */
 class ConditionalCommand : public Command {
+  friend class MockConditionalCommand;
+
  public:
   explicit ConditionalCommand(Command* onTrue, Command* onFalse = nullptr);
   ConditionalCommand(const llvm::Twine& name, Command* onTrue,

@@ -7,14 +7,55 @@
 
 #include "command/MockConditionalCommand.h"
 
+#include <iostream>
+
 using namespace frc;
 
 MockConditionalCommand::MockConditionalCommand(MockCommand* onTrue,
                                                MockCommand* onFalse)
-    : ConditionalCommand(onTrue, onFalse) {}
+    : ConditionalCommand(onTrue, onFalse) {
+  m_initializeCount = 0;
+  m_executeCount = 0;
+  m_isFinishedCount = 0;
+  m_endCount = 0;
+  m_interruptedCount = 0;
+}
 
 void MockConditionalCommand::SetCondition(bool condition) {
   m_condition = condition;
 }
 
 bool MockConditionalCommand::Condition() { return m_condition; }
+
+bool MockConditionalCommand::HasInitialized() {
+  return GetInitializeCount() > 0;
+}
+
+bool MockConditionalCommand::HasEnd() { return GetEndCount() > 0; }
+
+bool MockConditionalCommand::HasInterrupted() {
+  return GetInterruptedCount() > 0;
+}
+
+void MockConditionalCommand::Initialize() { ++m_initializeCount; }
+
+void MockConditionalCommand::Execute() { ++m_executeCount; }
+
+bool MockConditionalCommand::IsFinished() {
+  ++m_isFinishedCount;
+  std::cerr << "Command: " << m_chosenCommand->GetName()
+            << " Running: " << m_chosenCommand->IsRunning()
+            << " Finished: " << m_chosenCommand->IsFinished()
+            << " ConditionalCommand Finished: "
+            << ConditionalCommand::IsFinished() << "isStarted: " << m_isStarted
+            << std::endl
+            << std::flush;
+  return ConditionalCommand::IsFinished();
+}
+
+void MockConditionalCommand::End() {
+  ++m_endCount;
+  std::cerr << "MockConditionalCommand End" << std::endl << std::flush;
+}
+
+void MockConditionalCommand::Interrupted() { ++m_interruptedCount; }
