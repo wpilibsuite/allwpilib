@@ -540,6 +540,7 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
     }
     m_indexSource = new DigitalInput(channel);
     m_allocatedI = true;
+    addChild(m_indexSource);
     setIndexSource(m_indexSource, type);
   }
 

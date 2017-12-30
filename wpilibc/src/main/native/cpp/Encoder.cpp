@@ -464,7 +464,8 @@ double Encoder::PIDGet() {
  */
 void Encoder::SetIndexSource(int channel, Encoder::IndexingType type) {
   // Force digital input if just given an index
-  m_indexSource = std::make_unique<DigitalInput>(channel);
+  m_indexSource = std::make_shared<DigitalInput>(channel);
+  AddChild(m_indexSource);
   SetIndexSource(*m_indexSource.get(), type);
 }
 
