@@ -17,7 +17,7 @@ using namespace nt;
 
 std::shared_ptr<Message> Message::Read(WireDecoder& decoder,
                                        GetEntryTypeFunc get_entry_type) {
-  unsigned int msg_type;
+  unsigned int msg_type = 0;
   if (!decoder.Read8(&msg_type)) return nullptr;
   auto msg =
       std::make_shared<Message>(static_cast<MsgType>(msg_type), private_init());

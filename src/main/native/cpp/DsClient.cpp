@@ -121,7 +121,7 @@ void DsClient::Thread::Main() {
       DEBUG3("found robotIP=" << json.slice(pos + 1, endpos));
 
       // Parse into number
-      unsigned int ip;
+      unsigned int ip = 0;
       if (json.slice(pos + 1, endpos).getAsInteger(10, ip)) continue;  // error
 
       // If zero, clear the server override
