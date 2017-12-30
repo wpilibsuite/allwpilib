@@ -9,7 +9,7 @@ def windowsReleaseLinkerArgs = [ '/OPT:REF', '/OPT:ICF' ]
 def linuxCompilerArgs = ['-std=c++11', '-Wformat=2', '-Wall', '-Wextra', '-Werror', '-pedantic', '-Wno-psabi', '-g',
                          '-Wno-unused-parameter', '-fPIC', '-rdynamic', '-Wno-error=deprecated-declarations', '-pthread']
 def linuxLinkerArgs = ['-rdynamic', '-pthread']
-def linuxReleaseCompilerArgs = ['-O2']
+def linuxReleaseCompilerArgs = ['-Og']
 def linuxDebugCompilerArgs = ['-O0']
 def linux32BitArg = '-m32'
 
@@ -141,6 +141,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs << linux32BitArg
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Gcc'
                 detectPlatform = linux32IntelPlatformDetect
             }
@@ -151,6 +152,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Gcc'
                 detectPlatform = linux64IntelPlatformDetect
             }
@@ -162,6 +164,7 @@ if (!project.hasProperty('onlyAthena')) {
                 linkerArgs << mac32BitArg
                 debugCompilerArgs = macDebugCompilerArgs
                 releaseCompilerArgs = macReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Clang'
                 detectPlatform = mac32PlatformDetect
             }
@@ -171,6 +174,7 @@ if (!project.hasProperty('onlyAthena')) {
                 compilerArgs = macCompilerArgs
                 debugCompilerArgs = macDebugCompilerArgs
                 releaseCompilerArgs = macReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Clang'
                 detectPlatform = mac64PlatformDetect
             }
@@ -189,6 +193,7 @@ if (project.hasProperty('linuxCross')) {
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
+                releaseStripBinaries = true
                 skipByDefault = true
                 compilerFamily = 'Gcc'
                 exclude << 'gmock'
@@ -205,6 +210,7 @@ if (project.hasProperty('linuxCross')) {
                 linkerArgs = linuxLinkerArgs
                 debugCompilerArgs = linuxDebugCompilerArgs
                 releaseCompilerArgs = linuxReleaseCompilerArgs
+                releaseStripBinaries = true
                 compilerFamily = 'Gcc'
                 detectPlatform = linuxArmPlatformDetect
             }
