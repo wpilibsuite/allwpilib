@@ -19,6 +19,10 @@ class ADXL362_SpiAccelerometer : public ThreeAxisAccelerometerData {
   void HandleRead(uint8_t* buffer, uint32_t count);
 
  private:
+  int m_port;
+  int m_writeCallbackId;
+  int m_readCallbackId;
+
   int m_lastWriteAddress;
 
   static const double LSB;

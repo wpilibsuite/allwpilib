@@ -55,7 +55,8 @@ void HAL_ForceSPIAutoRead(HAL_SPIPort port, int32_t* status) {}
 int32_t HAL_ReadSPIAutoReceivedData(HAL_SPIPort port, uint8_t* buffer,
                                     int32_t numToRead, double timeout,
                                     int32_t* status) {
-  return 0;
+  return SimSPIData[port].ReadAutoReceivedData(buffer, numToRead, timeout,
+                                               status);
 }
 int32_t HAL_GetSPIAutoDroppedCount(HAL_SPIPort port, int32_t* status) {
   return 0;

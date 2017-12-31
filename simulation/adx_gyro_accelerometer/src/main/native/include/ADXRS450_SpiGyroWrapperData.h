@@ -21,6 +21,8 @@ class ADXRS450_SpiGyroWrapper {
   virtual ~ADXRS450_SpiGyroWrapper();
 
   void HandleRead(uint8_t* buffer, uint32_t count);
+  void HandleAutoReceiveData(uint8_t* buffer, int32_t numToRead,
+                             int32_t& outputCount);
 
   virtual void ResetData();
 
@@ -32,12 +34,20 @@ class ADXRS450_SpiGyroWrapper {
   void SetAngle(double angle);
 
  private:
-  const int m_port;
+  int m_port;
+  int m_readCallbackId;
+  int m_autoReceiveReadCallbackId;
 
   wpi::mutex m_registerMutex;
-  std::atomic<double> m_angle{0.0};
+  wpi::mutex m_dataMutex;
+  double m_angle = 0.0;
+  double m_angleDiff = 0.0;
   std::shared_ptr<NotifyListenerVector> m_angleCallbacks = nullptr;
 
-  static const double ANGLE_LSB;
+  static const double kAngleLsb;
+  // The maximum difference that can fit inside of the shifted and masked data
+  // field, per transaction
+  static const double kMaxAngleDeltaPerMessage;
+  static const int kPacketSize;
 };
 }  // namespace hal

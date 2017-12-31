@@ -55,6 +55,7 @@ void InitializeHAL() {
   InitializeDigitalInternal();
   InitializeDIO();
   InitializeDriverStation();
+  InitializeEncoder();
   InitializeExtensions();
   InitializeI2C();
   InitializeInterrupts();
