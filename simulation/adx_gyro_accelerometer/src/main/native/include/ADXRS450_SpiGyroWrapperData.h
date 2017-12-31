@@ -44,10 +44,10 @@ class ADXRS450_SpiGyroWrapper {
   double m_angleDiff = 0.0;
   std::shared_ptr<NotifyListenerVector> m_angleCallbacks = nullptr;
 
-  static constexpr double kAngleLsb = 1 / 0.0125 / 0.0005;
+  static const double kAngleLsb;
   // The maximum difference that can fit inside of the shifted and masked data
   // field, per transaction
-  static constexpr double kMaxAngleDeltaPerMessage = 0.1875;
-  static constexpr int kPacketSize = 4;
+  static const double kMaxAngleDeltaPerMessage;
+  static const int kPacketSize;
 };
 }  // namespace hal

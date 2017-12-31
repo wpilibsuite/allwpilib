@@ -23,6 +23,10 @@
 
 using namespace hal;
 
+const double ADXRS450_SpiGyroWrapper::kAngleLsb = 1 / 0.0125 / 0.0005;
+const double ADXRS450_SpiGyroWrapper::kMaxAngleDeltaPerMessage = 0.1875;
+const int ADXRS450_SpiGyroWrapper::kPacketSize = 4;
+
 template <class T>
 constexpr const T& clamp(const T& value, const T& low, const T& high) {
   return std::max(low, std::min(value, high));
