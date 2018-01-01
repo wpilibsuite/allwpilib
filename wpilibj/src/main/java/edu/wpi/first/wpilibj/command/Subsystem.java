@@ -213,9 +213,9 @@ public abstract class Subsystem extends SendableBase implements Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Subsystem");
 
-    builder.addBooleanProperty("hasDefault", () -> m_defaultCommand != null, null);
-    builder.addStringProperty("default", this::getDefaultCommandName, null);
-    builder.addBooleanProperty("hasCommand", () -> m_currentCommand != null, null);
-    builder.addStringProperty("command", this::getCurrentCommandName, null);
+    builder.addBooleanProperty(".hasDefault", () -> m_defaultCommand != null, null);
+    builder.addStringProperty(".default", this::getDefaultCommandName, null);
+    builder.addBooleanProperty(".hasCommand", () -> m_currentCommand != null, null);
+    builder.addStringProperty(".command", this::getCurrentCommandName, null);
   }
 }
