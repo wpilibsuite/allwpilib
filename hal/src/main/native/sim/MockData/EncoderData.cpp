@@ -38,6 +38,8 @@ void EncoderData::ResetData() {
   m_reverseDirectionCallbacks = nullptr;
   m_samplesToAverage = 0;
   m_samplesToAverageCallbacks = nullptr;
+  m_distancePerPulse = 0;
+  m_distancePerPulseCallbacks = nullptr;
 }
 
 int32_t EncoderData::RegisterInitializedCallback(HAL_NotifyCallback callback,
@@ -327,6 +329,42 @@ void EncoderData::SetSamplesToAverage(int32_t samplesToAverage) {
   int32_t oldValue = m_samplesToAverage.exchange(samplesToAverage);
   if (oldValue != samplesToAverage) {
     InvokeSamplesToAverageCallback(MakeInt(samplesToAverage));
+  }
+}
+
+int32_t EncoderData::RegisterDistancePerPulseCallback(
+    HAL_NotifyCallback callback, void* param, HAL_Bool initialNotify) {
+  // Must return -1 on a null callback for error handling
+  if (callback == nullptr) return -1;
+  int32_t newUid = 0;
+  {
+    std::lock_guard<wpi::mutex> lock(m_registerMutex);
+    m_distancePerPulseCallbacks =
+        RegisterCallback(m_distancePerPulseCallbacks, "DistancePerPulse",
+                         callback, param, &newUid);
+  }
+  if (initialNotify) {
+    // We know that the callback is not null because of earlier null check
+    HAL_Value value = MakeDouble(GetDistancePerPulse());
+    callback("DistancePerPulse", param, &value);
+  }
+  return newUid;
+}
+void EncoderData::CancelDistancePerPulseCallback(int32_t uid) {
+  m_distancePerPulseCallbacks =
+      CancelCallback(m_distancePerPulseCallbacks, uid);
+}
+
+void EncoderData::InvokeDistancePerPulseCallback(HAL_Value value) {
+  InvokeCallback(m_distancePerPulseCallbacks, "DistancePerPulse", &value);
+}
+
+double EncoderData::GetDistancePerPulse() { return m_distancePerPulse; }
+
+void EncoderData::SetDistancePerPulse(double distancePerPulse) {
+  double oldValue = m_distancePerPulse.exchange(distancePerPulse);
+  if (oldValue != distancePerPulse) {
+    InvokeDistancePerPulseCallback(MakeDouble(distancePerPulse));
   }
 }
 
