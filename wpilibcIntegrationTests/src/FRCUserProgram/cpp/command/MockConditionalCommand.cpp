@@ -43,19 +43,20 @@ void MockConditionalCommand::Execute() { ++m_executeCount; }
 
 bool MockConditionalCommand::IsFinished() {
   ++m_isFinishedCount;
-  std::cerr << "Command: " << m_chosenCommand->GetName()
-            << " Running: " << m_chosenCommand->IsRunning()
-            << " Finished: " << m_chosenCommand->IsFinished()
-            << " ConditionalCommand Finished: "
-            << ConditionalCommand::IsFinished() << "isStarted: " << m_isStarted
-            << std::endl
-            << std::flush;
+  //  std::cerr << "Command: " << m_chosenCommand->GetName()
+  //            << " Running: " << m_chosenCommand->IsRunning()
+  //            << " Finished: " << m_chosenCommand->IsFinished()
+  //            << " ConditionalCommand Finished: "
+  //            << ConditionalCommand::IsFinished() << " isStarted: " <<
+  //            m_isStarted
+  //            << std::endl
+  //            << std::flush;
   return ConditionalCommand::IsFinished();
 }
 
 void MockConditionalCommand::End() {
   ++m_endCount;
-  std::cerr << "MockConditionalCommand End" << std::endl << std::flush;
+  //  std::cerr << "MockConditionalCommand End" << std::endl << std::flush;
 }
 
 void MockConditionalCommand::Interrupted() { ++m_interruptedCount; }

@@ -50,7 +50,8 @@ class ConditionalCommand : public Command {
   void _Initialize() override;
   void _Cancel() override;
   bool IsFinished() override;
-  void Interrupted() override;
+  void _Interrupted() override;
+  void _Execute() override;
 
  private:
   // The Command to execute if Condition() returns true
@@ -61,6 +62,8 @@ class ConditionalCommand : public Command {
 
   // Stores command chosen by condition
   Command* m_chosenCommand = nullptr;
+
+  bool m_isStarted = false;
 };
 
 }  // namespace frc

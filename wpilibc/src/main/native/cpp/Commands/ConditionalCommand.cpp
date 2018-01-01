@@ -65,6 +65,14 @@ void ConditionalCommand::_Initialize() {
 
     m_chosenCommand->Start();
   }
+  m_isStarted = false;
+  Command::_Initialize();
+}
+
+void ConditionalCommand::_Execute() {
+  Command::_Execute();
+  if (m_chosenCommand != nullptr && !m_isStarted)
+    m_isStarted = m_chosenCommand->IsRunning();
 }
 
 void ConditionalCommand::_Cancel() {
@@ -76,14 +84,14 @@ void ConditionalCommand::_Cancel() {
 }
 
 bool ConditionalCommand::IsFinished() {
-  return m_chosenCommand != nullptr && m_chosenCommand->IsRunning() &&
-         m_chosenCommand->IsFinished();
+  return m_chosenCommand != nullptr && !m_chosenCommand->IsRunning() &&
+         m_isStarted;
 }
 
-void ConditionalCommand::Interrupted() {
+void ConditionalCommand::_Interrupted() {
   if (m_chosenCommand != nullptr && m_chosenCommand->IsRunning()) {
     m_chosenCommand->Cancel();
   }
 
-  Command::Interrupted();
+  Command::_Interrupted();
 }
