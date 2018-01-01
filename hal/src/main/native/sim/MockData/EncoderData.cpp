@@ -549,5 +549,7 @@ void HALSIM_RegisterEncoderAllCallbacks(int32_t index,
                                                          initialNotify);
   SimEncoderData[index].RegisterSamplesToAverageCallback(callback, param,
                                                          initialNotify);
+  SimEncoderData[index].RegisterDistancePerPulseCallback(callback, param,
+                                                         initialNotify);
 }
 }  // extern "C"
