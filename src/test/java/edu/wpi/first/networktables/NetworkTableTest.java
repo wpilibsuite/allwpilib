@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 public class NetworkTableTest extends TestCase {
-
   public void testBasenameKey() {
     assertEquals("simple", NetworkTable.basenameKey("simple"));
     assertEquals("simple", NetworkTable.basenameKey("one/two/many/simple"));

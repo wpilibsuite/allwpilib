@@ -14,7 +14,6 @@ import java.io.IOException;
  * 
  */
 public final class PersistentException extends IOException {
-
   public static final long serialVersionUID = 0;
 
   /**

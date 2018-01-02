@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 public class ConnectionListenerTest extends TestCase {
-
   NetworkTableInstance serverInst;
   NetworkTableInstance clientInst;
 

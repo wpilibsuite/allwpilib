@@ -5,7 +5,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 public class EntryListenerTest extends TestCase {
-
   NetworkTableInstance serverInst;
   NetworkTableInstance clientInst;
 
