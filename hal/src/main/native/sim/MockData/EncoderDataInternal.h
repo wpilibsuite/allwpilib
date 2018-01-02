@@ -75,6 +75,13 @@ class EncoderData {
   int32_t GetSamplesToAverage();
   void SetSamplesToAverage(int32_t samplesToAverage);
 
+  int32_t RegisterDistancePerPulseCallback(HAL_NotifyCallback callback,
+                                           void* param, HAL_Bool initialNotify);
+  void CancelDistancePerPulseCallback(int32_t uid);
+  void InvokeDistancePerPulseCallback(HAL_Value value);
+  double GetDistancePerPulse();
+  void SetDistancePerPulse(double distancePerPulse);
+
   virtual void ResetData();
 
  private:
@@ -95,6 +102,8 @@ class EncoderData {
   std::shared_ptr<NotifyListenerVector> m_reverseDirectionCallbacks = nullptr;
   std::atomic<int32_t> m_samplesToAverage{0};
   std::shared_ptr<NotifyListenerVector> m_samplesToAverageCallbacks = nullptr;
+  std::atomic<double> m_distancePerPulse{0};
+  std::shared_ptr<NotifyListenerVector> m_distancePerPulseCallbacks = nullptr;
 };
 extern EncoderData* SimEncoderData;
 }  // namespace hal

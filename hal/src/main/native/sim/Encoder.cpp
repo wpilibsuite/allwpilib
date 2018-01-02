@@ -254,6 +254,7 @@ void HAL_SetEncoderDistancePerPulse(HAL_EncoderHandle encoderHandle,
     return;
   }
   encoder->distancePerPulse = distancePerPulse;
+  SimEncoderData[encoder->index].SetDistancePerPulse(distancePerPulse);
 }
 void HAL_SetEncoderReverseDirection(HAL_EncoderHandle encoderHandle,
                                     HAL_Bool reverseDirection,
