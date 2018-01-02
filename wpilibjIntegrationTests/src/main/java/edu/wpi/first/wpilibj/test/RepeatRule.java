@@ -36,7 +36,6 @@ public class RepeatRule implements TestRule {
 
 
   private static class RepeatStatement extends Statement {
-
     private final int m_times;
     private final Statement m_statement;
 

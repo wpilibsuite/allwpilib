@@ -11,7 +11,6 @@ package edu.wpi.first.wpilibj.can;
  * Structure for holding the result of a CAN Status request.
  */
 public class CANStatus {
-
   /**
    * The utilization of the CAN Bus.
    */

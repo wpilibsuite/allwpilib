@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.Sendable;
  * LiveWindow.
  */
 public class LiveWindow {
-
   private static class Component {
     Component(Sendable sendable, Sendable parent) {
       m_sendable = sendable;

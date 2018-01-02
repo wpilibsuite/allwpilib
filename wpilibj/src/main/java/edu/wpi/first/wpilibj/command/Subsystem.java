@@ -29,7 +29,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * @see Command
  */
 public abstract class Subsystem extends SendableBase implements Sendable {
-
   /**
    * Whether or not getDefaultCommand() was called.
    */

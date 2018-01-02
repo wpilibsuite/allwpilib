@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * that an input must remain high or low before it is classified as high or low.
  */
 public class DigitalGlitchFilter extends SensorBase {
-
   /**
    * Configures the Digital Glitch Filter to its default settings.
    */

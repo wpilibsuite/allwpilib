@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * Mindsensors SD540 Speed Controller.
  */
 public class SD540 extends PWMSpeedController {
-
   /**
    * Common initialization code called by all constructors.
    *

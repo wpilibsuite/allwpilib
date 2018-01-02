@@ -23,7 +23,6 @@ import static java.util.Objects.requireNonNull;
  * flight).
  */
 public class Ultrasonic extends SensorBase implements PIDSource, Sendable {
-
   /**
    * The units to return when PIDGet is called.
    */
@@ -67,7 +66,6 @@ public class Ultrasonic extends SensorBase implements PIDSource, Sendable {
    * sensors!!
    */
   private class UltrasonicChecker extends Thread {
-
     @Override
     public synchronized void run() {
       Ultrasonic ultrasonic = null;

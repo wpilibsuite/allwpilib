@@ -24,7 +24,6 @@ import org.opencv.imgproc.Imgproc;
  * processing.
  */
 public class Robot extends IterativeRobot {
-
 	Thread m_visionThread;
 
 	@Override

@@ -19,7 +19,6 @@ package edu.wpi.first.wpilibj.command;
  * a new child. </p>
  */
 public class IllegalUseOfCommandException extends RuntimeException {
-
   /**
    * Instantiates an {@link IllegalUseOfCommandException}.
    */

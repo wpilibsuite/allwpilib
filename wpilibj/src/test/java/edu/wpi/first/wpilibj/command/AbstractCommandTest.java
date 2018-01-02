@@ -18,7 +18,6 @@ import static org.junit.Assert.fail;
  * The basic test for all {@link Command} tests.
  */
 public abstract class AbstractCommandTest {
-
   @Before
   public void commandSetup() {
     UnitTestUtility.setupMockBase();

@@ -14,7 +14,6 @@ package edu.wpi.first.wpilibj.command;
  * @see CommandGroup
  */
 public class WaitCommand extends TimedCommand {
-
   /**
    * Instantiates a {@link WaitCommand} with the given timeout.
    *

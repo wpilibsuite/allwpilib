@@ -27,7 +27,6 @@ import static java.util.Objects.requireNonNull;
  * given set of PID constants.
  */
 public class PIDController extends SendableBase implements PIDInterface, Sendable, Controller {
-
   public static final double kDefaultPeriod = .05;
   private static int instances = 0;
   @SuppressWarnings("MemberName")
@@ -120,7 +119,6 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
   }
 
   private class PIDTask extends TimerTask {
-
     private PIDController m_controller;
 
     PIDTask(PIDController controller) {

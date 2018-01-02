@@ -21,7 +21,6 @@ import java.io.File;
  * results for Jenkins.
  */
 public class AntJunitLanucher {
-
   /**
    * Main entry point for jenkins.
    *

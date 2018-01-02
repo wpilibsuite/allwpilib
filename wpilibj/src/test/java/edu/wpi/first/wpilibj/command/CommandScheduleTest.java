@@ -13,7 +13,6 @@ import org.junit.Test;
  * Ported from the old CrioTest Classes.
  */
 public class CommandScheduleTest extends AbstractCommandTest {
-
   /**
    * Simple scheduling of a command and making sure the command is run and successfully terminates.
    */

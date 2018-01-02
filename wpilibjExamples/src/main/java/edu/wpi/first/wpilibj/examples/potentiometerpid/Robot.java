@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.Joystick;
  * mechanism.
  */
 public class Robot extends IterativeRobot {
-
 	private static final int kPotChannel = 1;
 	private static final int kMotorChannel = 7;
 	private static final int kJoystickChannel = 0;

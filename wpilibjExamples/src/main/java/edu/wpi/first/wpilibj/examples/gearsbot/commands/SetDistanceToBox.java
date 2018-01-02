@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.examples.gearsbot.Robot;
  * encoders.
  */
 public class SetDistanceToBox extends Command {
-
 	private PIDController m_pid;
 
 	public SetDistanceToBox(double distance) {

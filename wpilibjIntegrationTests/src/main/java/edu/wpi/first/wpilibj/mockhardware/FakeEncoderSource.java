@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.Timer;
  * Emulates a quadrature encoder.
  */
 public class FakeEncoderSource {
-
   private Thread m_task;
   private int m_count;
   private int m_milliSec;
@@ -27,7 +26,6 @@ public class FakeEncoderSource {
    * Thread object that allows emulation of a quadrature encoder.
    */
   private class QuadEncoderThread extends Thread {
-
     FakeEncoderSource m_encoder;
 
     QuadEncoderThread(FakeEncoderSource encode) {

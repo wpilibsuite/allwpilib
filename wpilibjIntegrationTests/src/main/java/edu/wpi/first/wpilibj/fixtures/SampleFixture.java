@@ -13,7 +13,6 @@ package edu.wpi.first.wpilibj.fixtures;
  * test.
  */
 public class SampleFixture implements ITestFixture {
-
   @Override
   public boolean setup() {
     /*

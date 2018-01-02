@@ -41,7 +41,6 @@ import static java.util.Objects.requireNonNull;
  * limited.
  */
 public class AnalogTriggerOutput extends DigitalSource {
-
   /**
    * Exceptions dealing with improper operation of the Analog trigger output.
    */

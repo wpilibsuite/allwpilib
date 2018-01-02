@@ -23,7 +23,6 @@ import static org.junit.Assert.assertEquals;
  * Tests that the {@link TiltPanCameraFixture}.
  */
 public class GyroTest extends AbstractComsSetup {
-
   private static final Logger logger = Logger.getLogger(GyroTest.class.getName());
 
   public static final double TEST_ANGLE = 90.0;

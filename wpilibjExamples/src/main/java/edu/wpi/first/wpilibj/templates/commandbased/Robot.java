@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.templates.commandbased.subsystems.ExampleSubsystem;
  * project.
  */
 public class Robot extends TimedRobot {
-
 	public static final ExampleSubsystem kExampleSubsystem
 			= new ExampleSubsystem();
 	public static OI m_oi;

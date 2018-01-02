@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj.Sendable;
  * programmer.
  */
 public abstract class PIDSubsystem extends Subsystem implements Sendable {
-
   /**
    * The internal {@link PIDController}.
    */

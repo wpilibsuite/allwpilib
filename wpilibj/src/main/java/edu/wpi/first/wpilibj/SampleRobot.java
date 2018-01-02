@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  */
 @Deprecated
 public class SampleRobot extends RobotBase {
-
   private boolean m_robotMainOverridden = true;
 
   /**

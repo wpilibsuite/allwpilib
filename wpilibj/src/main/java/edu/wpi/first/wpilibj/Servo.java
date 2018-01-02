@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * in the FIRST Kit of Parts in 2008.
  */
 public class Servo extends PWM {
-
   private static final double kMaxServoAngle = 180.0;
   private static final double kMinServoAngle = 0.0;
 

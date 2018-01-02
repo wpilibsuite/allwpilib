@@ -14,7 +14,6 @@ package edu.wpi.first.wpilibj;
  * Digilent DMC 60 Speed Controller.
  */
 public class DMC60 extends PWMSpeedController {
-
   /**
    * Constructor.
    *

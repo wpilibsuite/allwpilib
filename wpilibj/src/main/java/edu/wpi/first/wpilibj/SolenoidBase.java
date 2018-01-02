@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.hal.SolenoidJNI;
  * classes.
  */
 public abstract class SolenoidBase extends SendableBase {
-
   protected final int m_moduleNumber; // The number of the solenoid module being used.
 
   /**

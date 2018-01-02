@@ -13,7 +13,6 @@ import org.junit.Test;
  * Ported from the old CrioTest Classes.
  */
 public class CommandParallelGroupTest extends AbstractCommandTest {
-
   /**
    * Simple Parallel Command Group With 2 commands one command terminates first.
    */

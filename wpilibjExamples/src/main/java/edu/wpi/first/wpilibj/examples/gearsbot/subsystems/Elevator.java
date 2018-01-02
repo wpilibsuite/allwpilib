@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * world do to minor differences.
  */
 public class Elevator extends PIDSubsystem {
-
 	private Victor m_motor;
 	private AnalogPotentiometer m_pot;
 

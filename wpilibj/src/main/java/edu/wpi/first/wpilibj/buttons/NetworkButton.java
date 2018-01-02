@@ -15,7 +15,6 @@ import edu.wpi.first.networktables.NetworkTableInstance;
  * A {@link Button} that uses a {@link NetworkTable} boolean field.
  */
 public class NetworkButton extends Button {
-
   private final NetworkTableEntry m_entry;
 
   public NetworkButton(String table, String field) {

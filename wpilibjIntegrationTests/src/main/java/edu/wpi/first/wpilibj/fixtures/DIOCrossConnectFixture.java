@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.DigitalOutput;
  * Connects a digital input to a digital output.
  */
 public class DIOCrossConnectFixture implements ITestFixture {
-
   private static final Logger logger = Logger.getLogger(DIOCrossConnectFixture.class.getName());
 
   private final DigitalInput m_input;

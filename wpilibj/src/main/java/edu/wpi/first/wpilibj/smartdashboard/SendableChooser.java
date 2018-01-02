@@ -29,7 +29,6 @@ import static java.util.Objects.requireNonNull;
  * @param <V> The type of the values to be stored
  */
 public class SendableChooser<V> extends SendableBase implements Sendable {
-
   /**
    * The key for the default value.
    */

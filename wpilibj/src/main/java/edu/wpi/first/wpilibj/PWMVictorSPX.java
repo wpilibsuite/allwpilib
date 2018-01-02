@@ -14,7 +14,6 @@ package edu.wpi.first.wpilibj;
  * Cross the Road Electronics (CTRE) Victor SPX Speed Controller with PWM control.
  */
 public class PWMVictorSPX extends PWMSpeedController {
-
   /**
    * Constructor for a PWMVictorSPX connected via PWM.
    *

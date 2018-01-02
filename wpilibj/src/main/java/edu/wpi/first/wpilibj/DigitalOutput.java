@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * implemented elsewhere will automatically allocate digital inputs and outputs as required.
  */
 public class DigitalOutput extends SendableBase implements Sendable {
-
   private static final int invalidPwmGenerator = 0;
   private int m_pwmGenerator = invalidPwmGenerator;
 

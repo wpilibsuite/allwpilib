@@ -30,7 +30,6 @@ import static org.junit.Assert.assertEquals;
  */
 @SuppressWarnings("MultipleTopLevelClasses")
 public class AbstractTestSuiteTest {
-
   @Ignore("Prevents ANT from trying to run these as tests")
   @RunWith(Suite.class)
   @SuiteClasses({FirstSampleTest.class, SecondSampleTest.class, ThirdSampleTest.class,

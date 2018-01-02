@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * of a linear joint.
  */
 public class Wrist extends PIDSubsystem {
-
 	private Victor m_motor;
 	private AnalogPotentiometer m_pot;
 

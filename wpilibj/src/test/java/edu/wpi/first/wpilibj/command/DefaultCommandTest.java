@@ -13,8 +13,6 @@ import org.junit.Test;
  * Tests the {@link Command} library.
  */
 public class DefaultCommandTest extends AbstractCommandTest {
-
-
   /**
    * Testing of default commands where the interrupting command ends itself.
    */

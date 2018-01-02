@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * timing in the FPGA to sense direction.
  */
 public class GearTooth extends Counter {
-
   private static final double kGearToothThreshold = 55e-6;
 
   /**

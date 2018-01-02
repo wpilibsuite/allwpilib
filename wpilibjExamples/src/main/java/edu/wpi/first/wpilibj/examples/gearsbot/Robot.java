@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.examples.gearsbot.subsystems.Wrist;
  * directory.
  */
 public class Robot extends IterativeRobot {
-
 	Command m_autonomousCommand;
 
 	public static DriveTrain m_drivetrain;

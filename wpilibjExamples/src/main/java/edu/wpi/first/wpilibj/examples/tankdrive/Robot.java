@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  * it contains the code necessary to operate a robot with tank drive.
  */
 public class Robot extends IterativeRobot {
-
 	private DifferentialDrive m_myRobot;
 	private Joystick m_leftStick;
 	private Joystick m_rightStick;

@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj.util.AllocationException;
  * number of samples to retain the resolution, but get more stable values.
  */
 public class AnalogInput extends SensorBase implements PIDSource, Sendable {
-
   private static final int kAccumulatorSlot = 1;
   int m_port; // explicit no modifier, private and package accessible.
   private int m_channel;

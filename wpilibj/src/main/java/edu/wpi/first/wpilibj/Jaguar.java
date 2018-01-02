@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * Texas Instruments / Vex Robotics Jaguar Speed Controller as a PWM device.
  */
 public class Jaguar extends PWMSpeedController {
-
   /**
    * Constructor.
    *

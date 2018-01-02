@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  * directory.
  */
 public class Robot extends IterativeRobot {
-
 	private DifferentialDrive m_robotDrive
 			= new DifferentialDrive(new Spark(0), new Spark(1));
 	private Joystick m_stick = new Joystick(0);

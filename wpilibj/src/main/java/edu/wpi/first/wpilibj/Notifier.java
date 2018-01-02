@@ -13,7 +13,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import edu.wpi.first.wpilibj.hal.NotifierJNI;
 
 public class Notifier {
-
   // The thread waiting on the HAL alarm.
   private final Thread m_thread;
   // The lock for the process information.

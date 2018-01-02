@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * be used with this class but may need to be calibrated per the Victor 884 user manual.
  */
 public class Victor extends PWMSpeedController {
-
   /**
    * Constructor.
    *

@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * Command-Based instead if you're new.
  */
 public class Robot extends SampleRobot {
-
 	private static final String kDefaultAuto = "Default";
 	private static final String kCustomAuto = "My Auto";
 

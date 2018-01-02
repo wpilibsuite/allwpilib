@@ -21,5 +21,4 @@ import edu.wpi.first.wpilibj.test.AbstractTestSuite;
     CommandSequentialGroupTest.class, CommandSupersedeTest.class, CommandTimeoutTest.class,
     ConditionalCommandTest.class, DefaultCommandTest.class})
 public class CommandTestSuite extends AbstractTestSuite {
-
 }

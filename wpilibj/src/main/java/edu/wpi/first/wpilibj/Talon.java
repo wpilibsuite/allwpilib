@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.hal.HAL;
  * Cross the Road Electronics (CTRE) Talon and Talon SR Speed Controller.
  */
 public class Talon extends PWMSpeedController {
-
   /**
    * Constructor for a Talon (original or Talon SR).
    *

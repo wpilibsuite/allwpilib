@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.examples.pacgoat.subsystems.Shooter;
  * directory.
  */
 public class Robot extends IterativeRobot {
-
 	Command m_autonomousCommand;
 	public static OI oi;
 
