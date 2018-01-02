@@ -35,6 +35,6 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - python3.5 -m wpiformat -y 2017 -clang 5.0
+  - python3.5 -m wpiformat -y 2018 -clang 5.0
   - git --no-pager diff --exit-code HEAD  # Ensure formatter made no changes
   - ./gradlew --no-daemon --console=plain -PskipAthena :hal:halSimSharedLibrary :wpilibc:wpilibcSharedLibrary :wpilibj:wpilibJNISharedSharedLibrary :wpilibj:jar
