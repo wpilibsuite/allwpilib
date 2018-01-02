@@ -67,10 +67,12 @@ public class SmartDashboard {
       }
       sddata = new Data(data);
       tablesToData.put(key, sddata);
-      sddata.m_builder.setTable(table.getSubTable(key));
+      NetworkTable dataTable = table.getSubTable(key);
+      sddata.m_builder.setTable(dataTable);
       data.initSendable(sddata.m_builder);
       sddata.m_builder.updateTable();
       sddata.m_builder.startListeners();
+      dataTable.getEntry(".name").setString(key);
     }
   }
 

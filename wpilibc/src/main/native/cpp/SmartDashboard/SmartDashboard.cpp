@@ -162,10 +162,12 @@ void SmartDashboard::PutData(llvm::StringRef key, Sendable* data) {
   auto& sddata = inst.tablesToData[key];
   if (!sddata.sendable || sddata.sendable != data) {
     sddata = SmartDashboardData(data);
-    sddata.builder.SetTable(inst.table->GetSubTable(key));
+    auto dataTable = inst.table->GetSubTable(key);
+    sddata.builder.SetTable(dataTable);
     data->InitSendable(sddata.builder);
     sddata.builder.UpdateTable();
     sddata.builder.StartListeners();
+    dataTable->GetEntry(".name").SetString(key);
   }
 }
 
