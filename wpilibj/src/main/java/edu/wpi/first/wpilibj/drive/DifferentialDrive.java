@@ -361,6 +361,9 @@ public class DifferentialDrive extends RobotDriveBase {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("DifferentialDrive");
     builder.addDoubleProperty("Left Motor Speed", m_leftMotor::get, m_leftMotor::set);
-    builder.addDoubleProperty("Right Motor Speed", m_rightMotor::get, m_rightMotor::set);
+    builder.addDoubleProperty(
+        "Right Motor Speed",
+        () -> -m_rightMotor.get(),
+        x -> m_rightMotor.set(-x));
   }
 }

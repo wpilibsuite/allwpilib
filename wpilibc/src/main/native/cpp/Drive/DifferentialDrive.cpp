@@ -263,6 +263,6 @@ void DifferentialDrive::InitSendable(SendableBuilder& builder) {
                             [=]() { return m_leftMotor.Get(); },
                             [=](double value) { m_leftMotor.Set(value); });
   builder.AddDoubleProperty("Right Motor Speed",
-                            [=]() { return m_rightMotor.Get(); },
-                            [=](double value) { m_rightMotor.Set(value); });
+                            [=]() { return -m_rightMotor.Get(); },
+                            [=](double value) { m_rightMotor.Set(-value); });
 }
