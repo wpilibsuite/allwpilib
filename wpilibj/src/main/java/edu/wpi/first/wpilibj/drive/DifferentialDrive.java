@@ -25,12 +25,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>Four motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Talon m_frontLeft = new Talon(1);
- *   Talon m_rearLeft = new Talon(2);
+ *   Spark m_frontLeft = new Spark(1);
+ *   Spark m_rearLeft = new Spark(2);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_rearLeft);
  *
- *   Talon m_frontRight = new Talon(3);
- *   Talon m_rearRight = new Talon(4);
+ *   Spark m_frontRight = new Spark(3);
+ *   Spark m_rearRight = new Spark(4);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
@@ -40,14 +40,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  * <p>Six motor drivetrain:
  * <pre><code>
  * public class Robot {
- *   Talon m_frontLeft = new Talon(1);
- *   Talon m_midLeft = new Talon(2);
- *   Talon m_rearLeft = new Talon(3);
+ *   Spark m_frontLeft = new Spark(1);
+ *   Spark m_midLeft = new Spark(2);
+ *   Spark m_rearLeft = new Spark(3);
  *   SpeedControllerGroup m_left = new SpeedControllerGroup(m_frontLeft, m_midLeft, m_rearLeft);
  *
- *   Talon m_frontRight = new Talon(4);
- *   Talon m_midRight = new Talon(5);
- *   Talon m_rearRight = new Talon(6);
+ *   Spark m_frontRight = new Spark(4);
+ *   Spark m_midRight = new Spark(5);
+ *   Spark m_rearRight = new Spark(6);
  *   SpeedControllerGroup m_right = new SpeedControllerGroup(m_frontRight, m_midRight, m_rearRight);
  *
  *   DifferentialDrive m_drive = new DifferentialDrive(m_left, m_right);
