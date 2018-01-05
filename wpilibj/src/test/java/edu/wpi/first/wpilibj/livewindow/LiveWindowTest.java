@@ -5,10 +5,12 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package edu.wpi.first.wpilibj;
+package edu.wpi.first.wpilibj.livewindow;
 
-public class RobotControllerTest extends UtilityClassTest {
-  public RobotControllerTest() {
-    super(RobotController.class);
+import edu.wpi.first.wpilibj.UtilityClassTest;
+
+public class LiveWindowTest extends UtilityClassTest {
+  public LiveWindowTest() {
+    super(LiveWindow.class);
   }
 }

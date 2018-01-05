@@ -51,6 +51,10 @@ public class SmartDashboard {
     HLUsageReporting.reportSmartDashboard();
   }
 
+  private SmartDashboard() {
+    throw new UnsupportedOperationException("This is a utility class!");
+  }
+
   /**
    * Maps the specified key to the specified value in this table. The key can not be null. The value
    * can be retrieved by calling the get method with a key that is equal to the original key.

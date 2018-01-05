@@ -24,7 +24,7 @@ import org.junit.Test;
 public abstract class UtilityClassTest {
   private final Class m_clazz;
 
-  UtilityClassTest(Class clazz) {
+  protected UtilityClassTest(Class clazz) {
     m_clazz = clazz;
   }
 
