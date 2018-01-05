@@ -66,7 +66,7 @@ public final class RobotController {
    *
    * @return The battery voltage in Volts.
    */
-  public double getBatteryVoltage() {
+  public static double getBatteryVoltage() {
     return PowerJNI.getVinVoltage();
   }
 
