@@ -172,8 +172,11 @@ public abstract class ConditionalCommand extends Command {
 
   @Override
   protected boolean isFinished() {
-    return m_chosenCommand != null && !m_chosenCommand.isRunning()
-        && m_isStarted;
+    if (m_chosenCommand != null) {
+      return !m_chosenCommand.isRunning() && m_isStarted;
+    } else {
+      return true;
+    }
   }
 
   @Override

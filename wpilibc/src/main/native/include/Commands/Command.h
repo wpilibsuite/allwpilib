@@ -48,7 +48,6 @@ class Subsystem;
 class Command : public ErrorBase, public SendableBase {
   friend class CommandGroup;
   friend class Scheduler;
-  friend class MockConditionalCommand;
 
  public:
   Command();

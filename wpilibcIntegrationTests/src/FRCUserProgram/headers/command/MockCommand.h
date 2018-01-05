@@ -13,6 +13,7 @@ namespace frc {
 
 class MockCommand : public Command {
  public:
+  explicit MockCommand(Subsystem*);
   MockCommand();
   int32_t GetInitializeCount() { return m_initializeCount; }
   bool HasInitialized();
@@ -26,6 +27,7 @@ class MockCommand : public Command {
 
   int32_t GetInterruptedCount() { return m_interruptedCount; }
   bool HasInterrupted();
+  void ResetCounters();
 
  protected:
   void Initialize() override;

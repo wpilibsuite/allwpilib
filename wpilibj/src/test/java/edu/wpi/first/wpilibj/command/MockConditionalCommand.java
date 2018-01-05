@@ -105,4 +105,16 @@ public class MockConditionalCommand extends ConditionalCommand {
   public boolean hasInterrupted() {
     return getInterruptedCount() > 0;
   }
+
+  /**
+   * Reset internal counters.
+   */
+  public void resetCounters() {
+    m_condition = false;
+    m_initializeCount = 0;
+    m_executeCount = 0;
+    m_isFinishedCount = 0;
+    m_endCount = 0;
+    m_interruptedCount = 0;
+  }
 }

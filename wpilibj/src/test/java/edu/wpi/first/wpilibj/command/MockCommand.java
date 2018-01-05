@@ -124,4 +124,16 @@ public class MockCommand extends Command {
     return getInterruptedCount() > 0;
   }
 
+  /**
+   * Reset internal counters.
+   */
+  public void resetCounters() {
+    m_initializeCount = 0;
+    m_executeCount = 0;
+    m_isFinishedCount = 0;
+    m_hasFinished = false;
+    m_endCount = 0;
+    m_interruptedCount = 0;
+  }
+
 }

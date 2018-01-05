@@ -26,6 +26,7 @@ class MockConditionalCommand : public ConditionalCommand {
 
   int32_t GetInterruptedCount() { return m_interruptedCount; }
   bool HasInterrupted();
+  void ResetCounters();
 
  protected:
   bool Condition() override;
