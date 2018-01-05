@@ -22,7 +22,6 @@ import org.junit.Test;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class UtilityClassTest {
-
   private final Class m_clazz;
 
   UtilityClassTest(Class clazz) {
