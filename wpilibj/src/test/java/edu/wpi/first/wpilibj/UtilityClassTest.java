@@ -1,5 +1,13 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 package edu.wpi.first.wpilibj;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
@@ -15,22 +23,28 @@ import org.junit.Test;
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class UtilityClassTest {
 
-  private final Class clazz;
+  private final Class m_clazz;
 
   UtilityClassTest(Class clazz) {
-    this.clazz = clazz;
+    m_clazz = clazz;
+  }
+
+  @Test
+  public void testSingleConstructor() {
+    assertEquals("More than one constructor defined", 1,
+        m_clazz.getDeclaredConstructors().length);
   }
 
   @Test
   public void testConstructorPrivate() {
-    Constructor constructor = clazz.getDeclaredConstructors()[0];
+    Constructor constructor = m_clazz.getDeclaredConstructors()[0];
 
-    assertFalse(constructor.isAccessible());
+    assertFalse("Constructor is not private", constructor.isAccessible());
   }
 
   @Test(expected = InvocationTargetException.class)
   public void testConstructorReflection() throws Throwable {
-    Constructor constructor = clazz.getDeclaredConstructors()[0];
+    Constructor constructor = m_clazz.getDeclaredConstructors()[0];
     constructor.setAccessible(true);
     constructor.newInstance();
   }
@@ -38,7 +52,7 @@ public abstract class UtilityClassTest {
   @Test
   public void testPublicMethodsStatic() {
     List<String> failures = new ArrayList<>();
-    for (Method method : clazz.getDeclaredMethods()) {
+    for (Method method : m_clazz.getDeclaredMethods()) {
       int modifiers = method.getModifiers();
       if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
         failures.add(method.toString());
