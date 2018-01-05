@@ -13,9 +13,9 @@ import java.util.Map;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
-import edu.wpi.first.wpilibj.Sendable;
 
 
 /**
@@ -79,6 +79,7 @@ public class LiveWindow {
 
   /**
    * The run method is called repeatedly to keep the values refreshed on the screen in test mode.
+   *
    * @deprecated No longer required
    */
   @Deprecated
@@ -174,7 +175,7 @@ public class LiveWindow {
    * Add a child component to a component.
    *
    * @param parent parent component
-   * @param child child component
+   * @param child  child component
    */
   public static synchronized void addChild(Sendable parent, Object child) {
     Component component = components.get(child);

@@ -27,7 +27,7 @@ public class SpeedControllerGroupTest {
    */
   @Parameterized.Parameters
   public static Collection<Object[][]> data() {
-    return Arrays.asList((Object[][][]) new SpeedController[][][] {
+    return Arrays.asList((Object[][][]) new SpeedController[][][]{
         {{new MockSpeedController()}},
         {{new MockSpeedController(),
             new MockSpeedController()}},

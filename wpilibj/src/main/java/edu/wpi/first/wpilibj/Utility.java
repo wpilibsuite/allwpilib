@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.hal.HALUtil;
 
 /**
  * Contains global utility functions.
+ *
  * @deprecated Use RobotController class instead
  */
 @Deprecated

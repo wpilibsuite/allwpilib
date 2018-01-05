@@ -106,7 +106,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
     m_analog = channel;
     initGyro();
     AnalogGyroJNI.setAnalogGyroParameters(m_gyroHandle, kDefaultVoltsPerDegreePerSecond,
-                                          offset, center);
+        offset, center);
     reset();
   }
 
@@ -173,7 +173,7 @@ public class AnalogGyro extends GyroBase implements Gyro, PIDSource, Sendable {
    */
   public void setSensitivity(double voltsPerDegreePerSecond) {
     AnalogGyroJNI.setAnalogGyroVoltsPerDegreePerSecond(m_gyroHandle,
-                                                       voltsPerDegreePerSecond);
+        voltsPerDegreePerSecond);
   }
 
   /**

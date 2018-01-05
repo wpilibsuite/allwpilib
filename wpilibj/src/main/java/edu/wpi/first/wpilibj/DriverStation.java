@@ -204,12 +204,12 @@ public class DriverStation implements RobotState.Interface {
   }
 
   private static void reportErrorImpl(boolean isError, int code, String error,
-      StackTraceElement[] stackTrace) {
+                                      StackTraceElement[] stackTrace) {
     reportErrorImpl(isError, code, error, true, stackTrace, 0);
   }
 
   private static void reportErrorImpl(boolean isError, int code, String error,
-      boolean printTrace, StackTraceElement[] stackTrace, int stackTraceFirst) {
+                                      boolean printTrace, StackTraceElement[] stackTrace, int stackTraceFirst) {
     String locString;
     if (stackTrace.length >= stackTraceFirst + 1) {
       locString = stackTrace[stackTraceFirst].toString();
@@ -339,7 +339,7 @@ public class DriverStation implements RobotState.Interface {
         error = true;
         retVal = 0.0;
       } else {
-        retVal =  m_joystickAxes[stick].m_axes[axis];
+        retVal = m_joystickAxes[stick].m_axes[axis];
       }
     }
     if (error) {
@@ -529,7 +529,7 @@ public class DriverStation implements RobotState.Interface {
    * Returns the types of Axes on a given joystick port.
    *
    * @param stick The joystick port number
-   * @param axis The target axis
+   * @param axis  The target axis
    * @return What type of axis the axis is reporting to be
    */
   public int getJoystickAxisType(int stick, int axis) {

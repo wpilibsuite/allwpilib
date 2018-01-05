@@ -7,11 +7,12 @@
 
 package edu.wpi.first.wpilibj.vision;
 
+import org.opencv.core.Mat;
+
 import edu.wpi.cscore.CvSink;
 import edu.wpi.cscore.VideoSource;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
-import org.opencv.core.Mat;
 
 /**
  * A vision runner is a convenient wrapper object to make it easy to run vision pipelines

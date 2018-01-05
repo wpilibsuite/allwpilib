@@ -91,11 +91,11 @@ public class KilloughDrive extends RobotDriveBase {
     m_rightMotor = rightMotor;
     m_backMotor = backMotor;
     m_leftVec = new Vector2d(Math.cos(leftMotorAngle * (Math.PI / 180.0)),
-                             Math.sin(leftMotorAngle * (Math.PI / 180.0)));
+        Math.sin(leftMotorAngle * (Math.PI / 180.0)));
     m_rightVec = new Vector2d(Math.cos(rightMotorAngle * (Math.PI / 180.0)),
-                              Math.sin(rightMotorAngle * (Math.PI / 180.0)));
+        Math.sin(rightMotorAngle * (Math.PI / 180.0)));
     m_backVec = new Vector2d(Math.cos(backMotorAngle * (Math.PI / 180.0)),
-                             Math.sin(backMotorAngle * (Math.PI / 180.0)));
+        Math.sin(backMotorAngle * (Math.PI / 180.0)));
     addChild(m_leftMotor);
     addChild(m_rightMotor);
     addChild(m_backMotor);
@@ -185,7 +185,7 @@ public class KilloughDrive extends RobotDriveBase {
     }
 
     driveCartesian(magnitude * Math.sin(angle * (Math.PI / 180.0)),
-                   magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
+        magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
   }
 
   @Override

@@ -43,6 +43,7 @@ public class NotifierJNI extends JNIWrapper {
 
   /**
    * Block until woken up by an alarm (or stop).
+   *
    * @return Time when woken up.
    */
   public static native long waitForNotifierAlarm(int notifierHandle);

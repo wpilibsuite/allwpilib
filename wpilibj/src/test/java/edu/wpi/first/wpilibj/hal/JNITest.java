@@ -7,8 +7,9 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import edu.wpi.first.networktables.NetworkTablesJNI;
 import org.junit.Test;
+
+import edu.wpi.first.networktables.NetworkTablesJNI;
 
 public class JNITest {
   @Test

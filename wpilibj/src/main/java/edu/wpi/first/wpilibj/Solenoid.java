@@ -97,7 +97,6 @@ public class Solenoid extends SolenoidBase implements Sendable {
    * The timing can be controlled in 0.01 second increments.
    *
    * @param durationSeconds The duration of the pulse, from 0.01 to 2.55 seconds.
-   *
    * @see #startPulse()
    */
   public void setPulseDuration(double durationSeconds) {

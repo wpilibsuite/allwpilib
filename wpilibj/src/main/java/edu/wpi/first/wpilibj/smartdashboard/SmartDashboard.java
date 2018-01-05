@@ -93,7 +93,7 @@ public class SmartDashboard {
    *
    * @param key the key
    * @return the value
-   * @throws IllegalArgumentException  if the key is null
+   * @throws IllegalArgumentException if the key is null
    */
   public static synchronized Sendable getData(String key) {
     Data data = tablesToData.get(key);
@@ -106,6 +106,7 @@ public class SmartDashboard {
 
   /**
    * Gets the entry for the specified key.
+   *
    * @param key the key name
    * @return Network table entry.
    */
@@ -177,7 +178,7 @@ public class SmartDashboard {
    * Sets flags on the specified key in this table. The key can
    * not be null.
    *
-   * @param key the key name
+   * @param key   the key name
    * @param flags the flags to set (bitmask)
    */
   public static void setFlags(String key, int flags) {
@@ -188,7 +189,7 @@ public class SmartDashboard {
    * Clears flags on the specified key in this table. The key can
    * not be null.
    *
-   * @param key the key name
+   * @param key   the key name
    * @param flags the flags to clear (bitmask)
    */
   public static void clearFlags(String key, int flags) {
@@ -217,7 +218,8 @@ public class SmartDashboard {
 
   /**
    * Put a boolean in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -227,7 +229,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -237,11 +240,12 @@ public class SmartDashboard {
 
   /**
    * Returns the boolean the key maps to. If the key does not exist or is of
-   *     different type, it will return the default value.
-   * @param key the key to look up
+   * different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static boolean getBoolean(String key, boolean defaultValue) {
     return getEntry(key).getBoolean(defaultValue);
@@ -249,7 +253,8 @@ public class SmartDashboard {
 
   /**
    * Put a number in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -259,7 +264,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -269,11 +275,12 @@ public class SmartDashboard {
 
   /**
    * Returns the number the key maps to. If the key does not exist or is of
-   *     different type, it will return the default value.
-   * @param key the key to look up
+   * different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static double getNumber(String key, double defaultValue) {
     return getEntry(key).getDouble(defaultValue);
@@ -281,7 +288,8 @@ public class SmartDashboard {
 
   /**
    * Put a string in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -291,7 +299,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -301,11 +310,12 @@ public class SmartDashboard {
 
   /**
    * Returns the string the key maps to. If the key does not exist or is of
-   *     different type, it will return the default value.
-   * @param key the key to look up
+   * different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static String getString(String key, String defaultValue) {
     return getEntry(key).getString(defaultValue);
@@ -313,7 +323,8 @@ public class SmartDashboard {
 
   /**
    * Put a boolean array in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -323,7 +334,8 @@ public class SmartDashboard {
 
   /**
    * Put a boolean array in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -333,7 +345,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -343,7 +356,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -353,11 +367,12 @@ public class SmartDashboard {
 
   /**
    * Returns the boolean array the key maps to. If the key does not exist or is
-   *     of different type, it will return the default value.
-   * @param key the key to look up
+   * of different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static boolean[] getBooleanArray(String key, boolean[] defaultValue) {
     return getEntry(key).getBooleanArray(defaultValue);
@@ -365,11 +380,12 @@ public class SmartDashboard {
 
   /**
    * Returns the boolean array the key maps to. If the key does not exist or is
-   *     of different type, it will return the default value.
-   * @param key the key to look up
+   * of different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static Boolean[] getBooleanArray(String key, Boolean[] defaultValue) {
     return getEntry(key).getBooleanArray(defaultValue);
@@ -377,7 +393,8 @@ public class SmartDashboard {
 
   /**
    * Put a number array in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -387,7 +404,8 @@ public class SmartDashboard {
 
   /**
    * Put a number array in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -397,7 +415,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -407,7 +426,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -417,11 +437,12 @@ public class SmartDashboard {
 
   /**
    * Returns the number array the key maps to. If the key does not exist or is
-   *     of different type, it will return the default value.
-   * @param key the key to look up
+   * of different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static double[] getNumberArray(String key, double[] defaultValue) {
     return getEntry(key).getDoubleArray(defaultValue);
@@ -429,11 +450,12 @@ public class SmartDashboard {
 
   /**
    * Returns the number array the key maps to. If the key does not exist or is
-   *     of different type, it will return the default value.
-   * @param key the key to look up
+   * of different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static Double[] getNumberArray(String key, Double[] defaultValue) {
     return getEntry(key).getDoubleArray(defaultValue);
@@ -441,7 +463,8 @@ public class SmartDashboard {
 
   /**
    * Put a string array in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -451,7 +474,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -461,11 +485,12 @@ public class SmartDashboard {
 
   /**
    * Returns the string array the key maps to. If the key does not exist or is
-   *     of different type, it will return the default value.
-   * @param key the key to look up
+   * of different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static String[] getStringArray(String key, String[] defaultValue) {
     return getEntry(key).getStringArray(defaultValue);
@@ -473,7 +498,8 @@ public class SmartDashboard {
 
   /**
    * Put a raw value (byte array) in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
    * @return False if the table key already exists with a different type
    */
@@ -483,9 +509,10 @@ public class SmartDashboard {
 
   /**
    * Put a raw value (bytes from a byte buffer) in the table.
-   * @param key the key to be assigned to
+   *
+   * @param key   the key to be assigned to
    * @param value the value that will be assigned
-   * @param len the length of the value
+   * @param len   the length of the value
    * @return False if the table key already exists with a different type
    */
   public static boolean putRaw(String key, ByteBuffer value, int len) {
@@ -494,7 +521,8 @@ public class SmartDashboard {
 
   /**
    * Gets the current value in the table, setting it if it does not exist.
-   * @param key the key
+   *
+   * @param key          the key
    * @param defaultValue the default value to set if key does not exist.
    * @return False if the table key exists with a different type
    */
@@ -504,11 +532,12 @@ public class SmartDashboard {
 
   /**
    * Returns the raw value (byte array) the key maps to. If the key does not
-   *     exist or is of different type, it will return the default value.
-   * @param key the key to look up
+   * exist or is of different type, it will return the default value.
+   *
+   * @param key          the key to look up
    * @param defaultValue the value to be returned if no value is found
    * @return the value associated with the given key or the given default value
-   *     if there is no value associated with the key
+   * if there is no value associated with the key
    */
   public static byte[] getRaw(String key, byte[] defaultValue) {
     return getEntry(key).getRaw(defaultValue);

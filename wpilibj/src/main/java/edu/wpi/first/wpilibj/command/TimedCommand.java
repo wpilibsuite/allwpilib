@@ -15,7 +15,7 @@ public class TimedCommand extends Command {
   /**
    * Instantiates a TimedCommand with the given name and timeout.
    *
-   * @param name the name of the command
+   * @param name    the name of the command
    * @param timeout the time the command takes to run (seconds)
    */
   public TimedCommand(String name, double timeout) {
@@ -32,8 +32,8 @@ public class TimedCommand extends Command {
   }
 
   /**
-  * Ends command when timed out.
-  */
+   * Ends command when timed out.
+   */
   protected boolean isFinished() {
     return isTimedOut();
   }

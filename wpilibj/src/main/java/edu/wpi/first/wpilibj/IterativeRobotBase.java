@@ -25,20 +25,20 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *
  * <p>init() functions -- each of the following functions is called once when the
  * appropriate mode is entered:
- *   - disabledInit()   -- called only when first disabled
- *   - autonomousInit() -- called each and every time autonomous is entered from
- *                         another mode
- *   - teleopInit()     -- called each and every time teleop is entered from
- *                         another mode
- *   - testInit()       -- called each and every time test is entered from
- *                         another mode
+ * - disabledInit()   -- called only when first disabled
+ * - autonomousInit() -- called each and every time autonomous is entered from
+ * another mode
+ * - teleopInit()     -- called each and every time teleop is entered from
+ * another mode
+ * - testInit()       -- called each and every time test is entered from
+ * another mode
  *
  * <p>periodic() functions -- each of these functions is called on an interval:
- *   - robotPeriodic()
- *   - disabledPeriodic()
- *   - autonomousPeriodic()
- *   - teleopPeriodic()
- *   - testPeriodic()
+ * - robotPeriodic()
+ * - disabledPeriodic()
+ * - autonomousPeriodic()
+ * - teleopPeriodic()
+ * - testPeriodic()
  */
 public abstract class IterativeRobotBase extends RobotBase {
   private enum Mode {

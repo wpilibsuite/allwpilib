@@ -283,7 +283,7 @@ public class SPI {
    * bytes.
    *
    * @param dataToSend data to send (maximum 16 bytes)
-   * @param zeroSize number of zeros to send after the data
+   * @param zeroSize   number of zeros to send after the data
    */
   public void setAutoTransmitData(byte[] dataToSend, int zeroSize) {
     SPIJNI.spiSetAutoTransmitData(m_port, dataToSend, zeroSize);
@@ -307,13 +307,13 @@ public class SPI {
    * <p>{@link #initAuto(int)} and {@link #setAutoTransmitData(byte[], int)} must
    * be called before calling this function.
    *
-   * @param source digital source for the trigger (may be an analog trigger)
-   * @param rising trigger on the rising edge
+   * @param source  digital source for the trigger (may be an analog trigger)
+   * @param rising  trigger on the rising edge
    * @param falling trigger on the falling edge
    */
   public void startAutoTrigger(DigitalSource source, boolean rising, boolean falling) {
     SPIJNI.spiStartAutoTrigger(m_port, source.getPortHandleForRouting(),
-                               source.getAnalogTriggerTypeForRouting(), rising, falling);
+        source.getAnalogTriggerTypeForRouting(), rising, falling);
   }
 
   /**
@@ -339,9 +339,9 @@ public class SPI {
    * <p>Blocks until numToRead bytes have been read or timeout expires.
    * May be called with numToRead=0 to retrieve how many bytes are available.
    *
-   * @param buffer buffer where read bytes are stored
+   * @param buffer    buffer where read bytes are stored
    * @param numToRead number of bytes to read
-   * @param timeout timeout in seconds (ms resolution)
+   * @param timeout   timeout in seconds (ms resolution)
    * @return Number of bytes remaining to be read
    */
   public int readAutoReceivedData(ByteBuffer buffer, int numToRead, double timeout) {
@@ -366,9 +366,9 @@ public class SPI {
    * <p>Blocks until numToRead bytes have been read or timeout expires.
    * May be called with numToRead=0 to retrieve how many bytes are available.
    *
-   * @param buffer array where read bytes are stored
+   * @param buffer    array where read bytes are stored
    * @param numToRead number of bytes to read
-   * @param timeout timeout in seconds (ms resolution)
+   * @param timeout   timeout in seconds (ms resolution)
    * @return Number of bytes remaining to be read
    */
   public int readAutoReceivedData(byte[] buffer, int numToRead, double timeout) {
@@ -516,7 +516,7 @@ public class SPI {
                               int dataShift, int dataSize,
                               boolean isSigned, boolean bigEndian) {
     initAuto(xferSize * 2048);
-    byte[] cmdBytes = new byte[] {0, 0, 0, 0};
+    byte[] cmdBytes = new byte[]{0, 0, 0, 0};
     if (bigEndian) {
       for (int i = xferSize - 1; i >= 0; --i) {
         cmdBytes[i] = (byte) (cmd & 0xff);
@@ -535,7 +535,7 @@ public class SPI {
     startAutoRate(period);
 
     m_accum = new Accumulator(m_port, xferSize, validMask, validValue, dataShift, dataSize,
-                              isSigned, bigEndian);
+        isSigned, bigEndian);
     m_accum.m_notifier.startPeriodic(period * 1024);
   }
 

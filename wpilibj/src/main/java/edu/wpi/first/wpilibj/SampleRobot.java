@@ -24,9 +24,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  * yourself.
  *
  * @deprecated WARNING: While it may look like a good choice to use for your code if you're
- *     inexperienced, don't. Unless you know what you are doing, complex code will
- *     be much more difficult under this system. Use TimedRobot or Command-Based
- *     instead.
+ * inexperienced, don't. Unless you know what you are doing, complex code will
+ * be much more difficult under this system. Use TimedRobot or Command-Based
+ * instead.
  */
 @Deprecated
 public class SampleRobot extends RobotBase {

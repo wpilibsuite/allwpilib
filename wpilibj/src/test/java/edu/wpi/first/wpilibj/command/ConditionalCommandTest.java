@@ -7,10 +7,10 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 public class ConditionalCommandTest extends AbstractCommandTest {
   MockConditionalCommand m_command;

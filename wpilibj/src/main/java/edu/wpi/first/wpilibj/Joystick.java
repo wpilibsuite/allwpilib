@@ -148,9 +148,9 @@ public class Joystick extends GenericHID {
   /**
    * Set the channel associated with a specified axis.
    *
-   * @deprecated    Use the more specific axis channel setter functions.
    * @param axis    The axis to set the channel for.
    * @param channel The channel to set the axis to.
+   * @deprecated Use the more specific axis channel setter functions.
    */
   @Deprecated
   public void setAxisChannel(AxisType axis, int channel) {
@@ -205,9 +205,9 @@ public class Joystick extends GenericHID {
   /**
    * Get the channel currently associated with the specified axis.
    *
-   * @deprecated Use the more specific axis channel getter functions.
    * @param axis The axis to look up the channel for.
    * @return The channel for the axis.
+   * @deprecated Use the more specific axis channel getter functions.
    */
   @Deprecated
   public int getAxisChannel(AxisType axis) {
@@ -273,9 +273,9 @@ public class Joystick extends GenericHID {
    * <p>This is for cases where the joystick axis is returned programmatically, otherwise one of the
    * previous functions would be preferable (for example getX()).
    *
-   * @deprecated Use the more specific axis getter functions.
    * @param axis The axis to read.
    * @return The value of the axis.
+   * @deprecated Use the more specific axis getter functions.
    */
   @Deprecated
   public double getAxis(final AxisType axis) {
@@ -354,9 +354,9 @@ public class Joystick extends GenericHID {
    *
    * <p>The button type will be looked up in the list of buttons and then read.
    *
-   * @deprecated Use Button enum values instead of ButtonType.
    * @param button The type of button to read.
    * @return The state of the button.
+   * @deprecated Use Button enum values instead of ButtonType.
    */
   @Deprecated
   public boolean getButton(ButtonType button) {

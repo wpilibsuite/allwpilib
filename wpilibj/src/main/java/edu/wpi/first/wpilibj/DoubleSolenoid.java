@@ -76,9 +76,9 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
     m_reverseMask = (byte) (1 << reverseChannel);
 
     HAL.report(tResourceType.kResourceType_Solenoid, forwardChannel,
-                                   m_moduleNumber);
+        m_moduleNumber);
     HAL.report(tResourceType.kResourceType_Solenoid, reverseChannel,
-                                   m_moduleNumber);
+        m_moduleNumber);
     setName("DoubleSolenoid", m_moduleNumber, forwardChannel);
   }
 

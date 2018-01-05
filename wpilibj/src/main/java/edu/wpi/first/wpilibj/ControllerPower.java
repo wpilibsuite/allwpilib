@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.hal.PowerJNI;
 
 /**
  * Old Controller PR class.
+ *
  * @deprecated Use RobotController class instead
  */
 @Deprecated

@@ -77,7 +77,7 @@ public abstract class ConditionalCommand extends Command {
    *
    * <p>Users of this constructor should also override condition().
    *
-   * @param onTrue The Command to execute if {@link ConditionalCommand#condition()} returns true
+   * @param onTrue  The Command to execute if {@link ConditionalCommand#condition()} returns true
    * @param onFalse The Command to execute if {@link ConditionalCommand#condition()} returns false
    */
   public ConditionalCommand(Command onTrue, Command onFalse) {
@@ -92,7 +92,7 @@ public abstract class ConditionalCommand extends Command {
    *
    * <p>Users of this constructor should also override condition().
    *
-   * @param name the name for this command group
+   * @param name   the name for this command group
    * @param onTrue The Command to execute if {@link ConditionalCommand#condition()} returns true
    */
   public ConditionalCommand(String name, Command onTrue) {
@@ -104,8 +104,8 @@ public abstract class ConditionalCommand extends Command {
    *
    * <p>Users of this constructor should also override condition().
    *
-   * @param name the name for this command group
-   * @param onTrue The Command to execute if {@link ConditionalCommand#condition()} returns true
+   * @param name    the name for this command group
+   * @param onTrue  The Command to execute if {@link ConditionalCommand#condition()} returns true
    * @param onFalse The Command to execute if {@link ConditionalCommand#condition()} returns false
    */
   public ConditionalCommand(String name, Command onTrue, Command onFalse) {

@@ -7,12 +7,13 @@
 
 package edu.wpi.first.wpilibj.hal;
 
-import edu.wpi.first.wpiutil.RuntimeDetector;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import edu.wpi.first.wpiutil.RuntimeDetector;
 
 /**
  * Base class for all JNI wrappers.

@@ -73,6 +73,7 @@ public class Preferences {
 
   /**
    * Gets the vector of keys.
+   *
    * @return a vector of the keys
    */
   public Vector<String> getKeys() {

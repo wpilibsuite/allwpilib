@@ -43,7 +43,7 @@ public class PWMJNI extends DIOJNI {
 
   public static native double getPWMPosition(int pwmPortHandle);
 
-  public static native  void setPWMDisabled(int pwmPortHandle);
+  public static native void setPWMDisabled(int pwmPortHandle);
 
   public static native void latchPWMZero(int pwmPortHandle);
 

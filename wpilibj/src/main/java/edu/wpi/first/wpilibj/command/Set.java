@@ -35,7 +35,7 @@ class Set {
   }
 
   public void clear() {
-      m_set.clear();
+    m_set.clear();
   }
 
   public boolean contains(Object o) {

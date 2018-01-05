@@ -7,20 +7,21 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
+
 public interface SendableBuilder {
   /**
    * Set the string representation of the named data type that will be used
    * by the smart dashboard for this sendable.
    *
-   * @param type    data type
+   * @param type data type
    */
   void setSmartDashboardType(String type);
 
@@ -28,7 +29,7 @@ public interface SendableBuilder {
    * Set the function that should be called to set the Sendable into a safe
    * state.  This is called when entering and exiting Live Window mode.
    *
-   * @param func    function
+   * @param func function
    */
   void setSafeState(Runnable func);
 
@@ -38,7 +39,7 @@ public interface SendableBuilder {
    * the network table object; instead it should use the entry handles
    * returned by getEntry().
    *
-   * @param func    function
+   * @param func function
    */
   void setUpdateTable(Runnable func);
 
@@ -46,7 +47,7 @@ public interface SendableBuilder {
    * Add a property without getters or setters.  This can be used to get
    * entry handles for the function called by setUpdateTable().
    *
-   * @param key   property name
+   * @param key property name
    * @return Network table entry
    */
   NetworkTableEntry getEntry(String key);
@@ -63,6 +64,7 @@ public interface SendableBuilder {
   interface BooleanConsumer {
     /**
      * Performs the operation on the given value.
+     *
      * @param value the value
      */
     void accept(boolean value);
@@ -71,72 +73,72 @@ public interface SendableBuilder {
   /**
    * Add a boolean property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter);
 
   /**
    * Add a double property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter);
 
   /**
    * Add a string property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter);
 
   /**
    * Add a boolean array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addBooleanArrayProperty(String key, Supplier<boolean[]> getter, Consumer<boolean[]> setter);
 
   /**
    * Add a double array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addDoubleArrayProperty(String key, Supplier<double[]> getter, Consumer<double[]> setter);
 
   /**
    * Add a string array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addStringArrayProperty(String key, Supplier<String[]> getter, Consumer<String[]> setter);
 
   /**
    * Add a raw property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter);
 
   /**
    * Add a NetworkTableValue property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   void addValueProperty(String key, Supplier<NetworkTableValue> getter,
                         Consumer<NetworkTableValue> setter);

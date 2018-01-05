@@ -28,7 +28,7 @@ public class DMC60 extends PWMSpeedController {
    * full "reverse"
    *
    * @param channel The PWM channel that the DMC60 is attached to. 0-9 are
-   *        on-board, 10-19 are on the MXP port
+   *                on-board, 10-19 are on the MXP port
    */
   public DMC60(final int channel) {
     super(channel);

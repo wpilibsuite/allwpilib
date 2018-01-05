@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 /**
  * The interface for sendable objects that gives the sendable a default name in the Smart
  * Dashboard.
+ *
  * @deprecated Use Sendable directly instead
  */
 @Deprecated

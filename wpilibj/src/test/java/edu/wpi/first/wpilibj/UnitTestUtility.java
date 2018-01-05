@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
  */
 public final class UnitTestUtility {
   private UnitTestUtility() {
-        /* no-op */
+    /* no-op */
   }
 
   /**

@@ -118,7 +118,7 @@ public class MecanumDrive extends RobotDriveBase {
   public void driveCartesian(double ySpeed, double xSpeed, double zRotation, double gyroAngle) {
     if (!m_reported) {
       HAL.report(tResourceType.kResourceType_RobotDrive, 4,
-                 tInstances.kRobotDrive_MecanumCartesian);
+          tInstances.kRobotDrive_MecanumCartesian);
       m_reported = true;
     }
 
@@ -167,7 +167,7 @@ public class MecanumDrive extends RobotDriveBase {
     }
 
     driveCartesian(magnitude * Math.sin(angle * (Math.PI / 180.0)),
-                   magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
+        magnitude * Math.cos(angle * (Math.PI / 180.0)), zRotation, 0.0);
   }
 
   @Override

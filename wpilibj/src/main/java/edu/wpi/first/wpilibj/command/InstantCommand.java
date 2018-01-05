@@ -19,6 +19,7 @@ public class InstantCommand extends Command {
 
   /**
    * Creates a new {@link InstantCommand InstantCommand} with the given name.
+   *
    * @param name the name for this command
    */
   public InstantCommand(String name) {

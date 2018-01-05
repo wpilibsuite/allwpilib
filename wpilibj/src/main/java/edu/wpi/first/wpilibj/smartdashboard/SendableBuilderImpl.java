@@ -7,18 +7,19 @@
 
 package edu.wpi.first.wpilibj.smartdashboard;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableValue;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.ArrayList;
-import java.util.List;
+
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableValue;
 
 public class SendableBuilderImpl implements SendableBuilder {
   private static class Property {
@@ -59,6 +60,7 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Set the network table.  Must be called prior to any Add* functions being
    * called.
+   *
    * @param table Network table
    */
   public void setTable(NetworkTable table) {
@@ -67,6 +69,7 @@ public class SendableBuilderImpl implements SendableBuilder {
 
   /**
    * Get the network table.
+   *
    * @return The network table
    */
   public NetworkTable getTable() {
@@ -131,7 +134,7 @@ public class SendableBuilderImpl implements SendableBuilder {
    * Set the string representation of the named data type that will be used
    * by the smart dashboard for this sendable.
    *
-   * @param type    data type
+   * @param type data type
    */
   @Override
   public void setSmartDashboardType(String type) {
@@ -142,7 +145,7 @@ public class SendableBuilderImpl implements SendableBuilder {
    * Set the function that should be called to set the Sendable into a safe
    * state.  This is called when entering and exiting Live Window mode.
    *
-   * @param func    function
+   * @param func function
    */
   @Override
   public void setSafeState(Runnable func) {
@@ -155,7 +158,7 @@ public class SendableBuilderImpl implements SendableBuilder {
    * the network table object; instead it should use the entry handles
    * returned by getEntry().
    *
-   * @param func    function
+   * @param func function
    */
   @Override
   public void setUpdateTable(Runnable func) {
@@ -166,7 +169,7 @@ public class SendableBuilderImpl implements SendableBuilder {
    * Add a property without getters or setters.  This can be used to get
    * entry handles for the function called by setUpdateTable().
    *
-   * @param key   property name
+   * @param key property name
    * @return Network table entry
    */
   @Override
@@ -177,9 +180,9 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Add a boolean property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   @Override
   public void addBooleanProperty(String key, BooleanSupplier getter, BooleanConsumer setter) {
@@ -200,9 +203,9 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Add a double property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   @Override
   public void addDoubleProperty(String key, DoubleSupplier getter, DoubleConsumer setter) {
@@ -223,9 +226,9 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Add a string property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   @Override
   public void addStringProperty(String key, Supplier<String> getter, Consumer<String> setter) {
@@ -246,9 +249,9 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Add a boolean array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   @Override
   public void addBooleanArrayProperty(String key, Supplier<boolean[]> getter,
@@ -270,9 +273,9 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Add a double array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   @Override
   public void addDoubleArrayProperty(String key, Supplier<double[]> getter,
@@ -294,9 +297,9 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Add a string array property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   @Override
   public void addStringArrayProperty(String key, Supplier<String[]> getter,
@@ -318,9 +321,9 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Add a raw property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   @Override
   public void addRawProperty(String key, Supplier<byte[]> getter, Consumer<byte[]> setter) {
@@ -341,9 +344,9 @@ public class SendableBuilderImpl implements SendableBuilder {
   /**
    * Add a NetworkTableValue property.
    *
-   * @param key     property name
-   * @param getter  getter function (returns current value)
-   * @param setter  setter function (sets new value)
+   * @param key    property name
+   * @param getter getter function (returns current value)
+   * @param setter setter function (sets new value)
    */
   @Override
   public void addValueProperty(String key, Supplier<NetworkTableValue> getter,

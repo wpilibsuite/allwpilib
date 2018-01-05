@@ -105,7 +105,7 @@ public class PWM extends SendableBase implements Sendable {
    * @param min         The minimum pulse width in ms
    */
   public void setBounds(double max, double deadbandMax, double center, double deadbandMin,
-                           double min) {
+                        double min) {
     PWMJNI.setPWMConfig(m_handle, max, deadbandMax, center, deadbandMin, min);
   }
 

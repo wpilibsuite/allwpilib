@@ -30,7 +30,7 @@ public class AnalogAccelerometer extends SensorBase implements PIDSource, Sendab
    */
   private void initAccelerometer() {
     HAL.report(tResourceType.kResourceType_Accelerometer,
-                                   m_analogChannel.getChannel());
+        m_analogChannel.getChannel());
     setName("Accelerometer", m_analogChannel.getChannel());
   }
 

@@ -18,7 +18,7 @@ public class PWMVictorSPX extends PWMSpeedController {
    * Constructor for a PWMVictorSPX connected via PWM.
    *
    * <p>Note that the PWMVictorSPX uses the following bounds for PWM values. These values should
-   *  work reasonably well for most controllers, but if users experience issues such as asymmetric
+   * work reasonably well for most controllers, but if users experience issues such as asymmetric
    * behavior around the deadband or inability to saturate the controller in either direction,
    * calibration is recommended. The calibration procedure can be found in the VictorSPX User
    * Manual available from CTRE.

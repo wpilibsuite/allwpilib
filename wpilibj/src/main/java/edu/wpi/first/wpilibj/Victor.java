@@ -30,7 +30,7 @@ public class Victor extends PWMSpeedController {
    * full "reverse"
    *
    * @param channel The PWM channel that the Victor is attached to. 0-9 are
-   *        on-board, 10-19 are on the MXP port
+   *                on-board, 10-19 are on the MXP port
    */
   public Victor(final int channel) {
     super(channel);

@@ -32,7 +32,7 @@ public interface Sendable {
    * Sets both the subsystem name and device name of this {@link Sendable} object.
    *
    * @param subsystem subsystem name
-   * @param name device name
+   * @param name      device name
    */
   default void setName(String subsystem, String name) {
     setSubsystem(subsystem);

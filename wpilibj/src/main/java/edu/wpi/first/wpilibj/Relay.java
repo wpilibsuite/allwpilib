@@ -7,13 +7,13 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.RelayJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
-
-import java.util.Arrays;
-import java.util.Optional;
 
 import static java.util.Objects.requireNonNull;
 
@@ -121,7 +121,7 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
   /**
    * Relay constructor given a channel.
    *
-   * @param channel The channel number for this relay (0 - 3).
+   * @param channel   The channel number for this relay (0 - 3).
    * @param direction The direction that the Relay object will control.
    */
   public Relay(final int channel, Direction direction) {

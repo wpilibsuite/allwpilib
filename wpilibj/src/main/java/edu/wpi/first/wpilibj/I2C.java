@@ -81,7 +81,7 @@ public class I2C {
           "dataReceived is too small, must be at least " + receiveSize);
     }
     return I2CJNI.i2CTransactionB(m_port, (byte) m_deviceAddress, dataToSend,
-                                  (byte) sendSize, dataReceived, (byte) receiveSize) < 0;
+        (byte) sendSize, dataReceived, (byte) receiveSize) < 0;
   }
 
   /**
@@ -116,7 +116,7 @@ public class I2C {
     }
 
     return I2CJNI.i2CTransaction(m_port, (byte) m_deviceAddress, dataToSend,
-                                 (byte) sendSize, dataReceived, (byte) receiveSize) < 0;
+        (byte) sendSize, dataReceived, (byte) receiveSize) < 0;
   }
 
   /**
@@ -145,7 +145,7 @@ public class I2C {
     buffer[0] = (byte) registerAddress;
     buffer[1] = (byte) data;
     return I2CJNI.i2CWriteB(m_port, (byte) m_deviceAddress, buffer,
-                            (byte) buffer.length) < 0;
+        (byte) buffer.length) < 0;
   }
 
   /**
@@ -286,7 +286,7 @@ public class I2C {
     }
 
     return I2CJNI.i2CReadB(m_port, (byte) m_deviceAddress, buffer,
-                           (byte) count) < 0;
+        (byte) count) < 0;
   }
 
   /**

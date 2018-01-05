@@ -7,6 +7,10 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import edu.wpi.cscore.AxisCamera;
 import edu.wpi.cscore.CameraServerJNI;
 import edu.wpi.cscore.CvSink;
@@ -21,15 +25,12 @@ import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.cscore.VideoProperty;
 import edu.wpi.cscore.VideoSink;
 import edu.wpi.cscore.VideoSource;
-import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.ArrayList;
-import java.util.Hashtable;
+import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.hal.HAL;
 
 /**
  * Singleton class for creating and keeping camera servers.
@@ -130,7 +131,7 @@ public class CameraServer {
   private synchronized String[] getSourceStreamValues(int source) {
     // Ignore all but HttpCamera
     if (VideoSource.getKindFromInt(CameraServerJNI.getSourceKind(source))
-            != VideoSource.Kind.kHttp) {
+        != VideoSource.Kind.kHttp) {
       return new String[0];
     }
 
@@ -411,59 +412,59 @@ public class CameraServer {
     // synchronization issues, so just update to current setting if someone
     // else tries to change it.
     m_tableListener = NetworkTableInstance.getDefault().addEntryListener(kPublishName + "/",
-      (event) -> {
-        String relativeKey = event.name.substring(kPublishName.length() + 1);
+        (event) -> {
+          String relativeKey = event.name.substring(kPublishName.length() + 1);
 
-        // get source (sourceName/...)
-        int subKeyIndex = relativeKey.indexOf('/');
-        if (subKeyIndex == -1) {
-          return;
-        }
-        String sourceName = relativeKey.substring(0, subKeyIndex);
-        VideoSource source = m_sources.get(sourceName);
-        if (source == null) {
-          return;
-        }
+          // get source (sourceName/...)
+          int subKeyIndex = relativeKey.indexOf('/');
+          if (subKeyIndex == -1) {
+            return;
+          }
+          String sourceName = relativeKey.substring(0, subKeyIndex);
+          VideoSource source = m_sources.get(sourceName);
+          if (source == null) {
+            return;
+          }
 
-        // get subkey
-        relativeKey = relativeKey.substring(subKeyIndex + 1);
+          // get subkey
+          relativeKey = relativeKey.substring(subKeyIndex + 1);
 
-        // handle standard names
-        String propName;
-        if (relativeKey.equals("mode")) {
-          // reset to current mode
-          event.getEntry().setString(videoModeToString(source.getVideoMode()));
-          return;
-        } else if (relativeKey.startsWith("Property/")) {
-          propName = relativeKey.substring(9);
-        } else if (relativeKey.startsWith("RawProperty/")) {
-          propName = relativeKey.substring(12);
-        } else {
-          return;  // ignore
-        }
+          // handle standard names
+          String propName;
+          if (relativeKey.equals("mode")) {
+            // reset to current mode
+            event.getEntry().setString(videoModeToString(source.getVideoMode()));
+            return;
+          } else if (relativeKey.startsWith("Property/")) {
+            propName = relativeKey.substring(9);
+          } else if (relativeKey.startsWith("RawProperty/")) {
+            propName = relativeKey.substring(12);
+          } else {
+            return;  // ignore
+          }
 
-        // everything else is a property
-        VideoProperty property = source.getProperty(propName);
-        switch (property.getKind()) {
-          case kNone:
-            return;
-          case kBoolean:
-            // reset to current setting
-            event.getEntry().setBoolean(property.get() != 0);
-            return;
-          case kInteger:
-          case kEnum:
-            // reset to current setting
-            event.getEntry().setDouble(property.get());
-            return;
-          case kString:
-            // reset to current setting
-            event.getEntry().setString(property.getString());
-            return;
-          default:
-            return;
-        }
-      }, EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate);
+          // everything else is a property
+          VideoProperty property = source.getProperty(propName);
+          switch (property.getKind()) {
+            case kNone:
+              return;
+            case kBoolean:
+              // reset to current setting
+              event.getEntry().setBoolean(property.get() != 0);
+              return;
+            case kInteger:
+            case kEnum:
+              // reset to current setting
+              event.getEntry().setDouble(property.get());
+              return;
+            case kString:
+              // reset to current setting
+              event.getEntry().setString(property.getString());
+              return;
+            default:
+              return;
+          }
+        }, EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate);
   }
 
   /**
@@ -503,7 +504,7 @@ public class CameraServer {
    * Start automatically capturing images to send to the dashboard.
    *
    * @param name The name to give the camera
-   * @param dev The device number of the camera interface
+   * @param dev  The device number of the camera interface
    */
   public UsbCamera startAutomaticCapture(String name, int dev) {
     UsbCamera camera = new UsbCamera(name, dev);
@@ -578,7 +579,7 @@ public class CameraServer {
   /**
    * Adds an Axis IP camera.
    *
-   * @param name The name to give the camera
+   * @param name  The name to give the camera
    * @param hosts Array of Camera host IPs/DNS names
    */
   public AxisCamera addAxisCamera(String name, String[] hosts) {
@@ -657,8 +658,8 @@ public class CameraServer {
    * Create a MJPEG stream with OpenCV input. This can be called to pass custom
    * annotated images to the dashboard.
    *
-   * @param name Name to give the stream
-   * @param width Width of the image being sent
+   * @param name   Name to give the stream
+   * @param width  Width of the image being sent
    * @param height Height of the image being sent
    */
   public CvSource putVideo(String name, int width, int height) {
