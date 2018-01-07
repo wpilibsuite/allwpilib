@@ -52,7 +52,7 @@ public class HAL extends JNIWrapper {
    */
   public static native int report(int resource, int instanceNumber, int context, String feature);
 
-  private static native int nativeGetControlWord();
+  public static native int nativeGetControlWord();
 
   @SuppressWarnings("JavadocMethod")
   public static void getControlWord(ControlWord controlWord) {
