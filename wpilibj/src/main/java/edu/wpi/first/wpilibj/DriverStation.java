@@ -8,6 +8,10 @@
 package edu.wpi.first.wpilibj;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import edu.wpi.first.wpilibj.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.hal.ControlWord;
@@ -100,6 +104,10 @@ public class DriverStation implements RobotState.Interface {
 
   private final Object m_cacheDataMutex;
 
+  private final Lock m_waitForDataMutex;
+  private final Condition m_waitForDataCond;
+  private int m_waitForDataCount;
+
   // Robot state status variables
   private boolean m_userInDisabled = false;
   private boolean m_userInAutonomous = false;
@@ -127,6 +135,10 @@ public class DriverStation implements RobotState.Interface {
    * variable.
    */
   private DriverStation() {
+    m_waitForDataCount = 0;
+    m_waitForDataMutex = new ReentrantLock();
+    m_waitForDataCond = m_waitForDataMutex.newCondition();
+
     m_cacheDataMutex = new Object();
     for (int i = 0; i < kJoystickPorts; i++) {
       m_joystickButtons[i] = new HALJoystickButtons();
@@ -794,7 +806,40 @@ public class DriverStation implements RobotState.Interface {
    * @return true if there is new data, otherwise false
    */
   public boolean waitForData(double timeout) {
-    return HAL.waitForDSDataTimeout(timeout);
+    long startTime = RobotController.getFPGATime();
+    long timeoutMicros = (long) (timeout * 1000000);
+    m_waitForDataMutex.lock();
+    try {
+      try {
+        int currentCount = m_waitForDataCount;
+        while (m_waitForDataCount == currentCount) {
+          if (timeout > 0) {
+            long now = RobotController.getFPGATime();
+            if (now < startTime + timeoutMicros) {
+              // We still have time to wait
+              boolean signaled = m_waitForDataCond.await(startTime + timeoutMicros - now,
+                                                  TimeUnit.MICROSECONDS);
+              if (!signaled) {
+                // Return false if a timeout happened
+                return false;
+              }
+            } else {
+              // Time has elapsed.
+              return false;
+            }
+          } else {
+            m_waitForDataCond.await();
+          }
+        }
+        // Return true if we have received a proper signal
+        return true;
+      } catch (InterruptedException ex) {
+        // return false on a thread interrupt
+        return false;
+      }
+    } finally {
+      m_waitForDataMutex.unlock();
+    }
   }
 
   /**
@@ -914,6 +959,11 @@ public class DriverStation implements RobotState.Interface {
       m_matchInfo = m_matchInfoCache;
       m_matchInfoCache = currentInfo;
     }
+
+    m_waitForDataMutex.lock();
+    m_waitForDataCount++;
+    m_waitForDataCond.signalAll();
+    m_waitForDataMutex.unlock();
   }
 
   /**
