@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.hal.NotifierJNI;
  * <p>periodic() functions from the base class are called on an interval by a Notifier instance.
  */
 public class TimedRobot extends IterativeRobotBase {
-  public static final double DEFAULT_PERIOD = 0.02;
+  public static final double kDefaultPeriod = 0.02;
 
   // Prevents loop from starting if user calls setPeriod() in robotInit()
   private boolean m_startLoop = false;
@@ -32,7 +32,7 @@ public class TimedRobot extends IterativeRobotBase {
   // The absolute expiration time
   private double m_expirationTime = 0;
 
-  private double m_period = DEFAULT_PERIOD;
+  private double m_period = kDefaultPeriod;
 
   public TimedRobot() {
     // HAL.report(tResourceType.kResourceType_Framework, tInstances.kFramework_Periodic);
