@@ -360,17 +360,12 @@ TEST_F(ConditionalCommandTest, OnTrueInstantTest) {
   Scheduler::GetInstance()->Run();
   AssertCommandState(*m_onTrue, 1, 1, 1, 1, 0);
   AssertCommandState(*m_onFalse, 0, 0, 0, 0, 0);
-  AssertConditionalCommandState(*m_command, 1, 2, 2, 0, 0);
+  AssertConditionalCommandState(*m_command, 1, 2, 2, 1, 0);
   SCOPED_TRACE("5");
   Scheduler::GetInstance()->Run();
   AssertCommandState(*m_onTrue, 1, 1, 1, 1, 0);
   AssertCommandState(*m_onFalse, 0, 0, 0, 0, 0);
-  AssertConditionalCommandState(*m_command, 1, 3, 3, 0, 0);
-  SCOPED_TRACE("6");
-  Scheduler::GetInstance()->Run();
-  AssertCommandState(*m_onTrue, 1, 1, 1, 1, 0);
-  AssertCommandState(*m_onFalse, 0, 0, 0, 0, 0);
-  AssertConditionalCommandState(*m_command, 1, 4, 4, 1, 0);
+  AssertConditionalCommandState(*m_command, 1, 2, 2, 1, 0);
 
   TeardownScheduler();
 }

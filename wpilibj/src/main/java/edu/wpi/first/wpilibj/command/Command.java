@@ -87,6 +87,11 @@ public abstract class Command extends SendableBase implements Sendable {
   private boolean m_runWhenDisabled = false;
 
   /**
+   * Whether or not this command has completed running.
+   */
+  private boolean m_completed = false;
+
+  /**
    * The {@link CommandGroup} this is in.
    */
   private CommandGroup m_parent;
@@ -208,6 +213,7 @@ public abstract class Command extends SendableBase implements Sendable {
     m_initialized = false;
     m_canceled = false;
     m_running = false;
+    m_completed = true;
   }
 
   /**
@@ -404,6 +410,7 @@ public abstract class Command extends SendableBase implements Sendable {
           "Can not start a command that is a part of a command group");
     }
     Scheduler.getInstance().add(this);
+    m_completed = false;
   }
 
   /**
@@ -465,6 +472,15 @@ public abstract class Command extends SendableBase implements Sendable {
    */
   public synchronized boolean isCanceled() {
     return m_canceled;
+  }
+
+  /**
+   * Whether or not this command has completed running.
+   *
+   * @return whether or not this command has completed running.
+   */
+  public synchronized boolean isCompleted() {
+    return m_completed;
   }
 
   /**

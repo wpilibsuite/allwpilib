@@ -47,11 +47,6 @@ public abstract class ConditionalCommand extends Command {
    */
   private Command m_chosenCommand = null;
 
-  /**
-   * Whether the chosen command has started.
-   */
-  private boolean m_isStarted = false;
-
   private void requireAll() {
     if (m_onTrue != null) {
       for (Enumeration e = m_onTrue.getRequirements(); e.hasMoreElements(); ) {
@@ -88,7 +83,6 @@ public abstract class ConditionalCommand extends Command {
   public ConditionalCommand(Command onTrue, Command onFalse) {
     m_onTrue = onTrue;
     m_onFalse = onFalse;
-    m_isStarted = false;
 
     requireAll();
   }
@@ -118,7 +112,6 @@ public abstract class ConditionalCommand extends Command {
     super(name);
     m_onTrue = onTrue;
     m_onFalse = onFalse;
-    m_isStarted = false;
 
     requireAll();
   }
@@ -150,16 +143,7 @@ public abstract class ConditionalCommand extends Command {
 
       m_chosenCommand.start();
     }
-    m_isStarted = false;
     super._initialize();
-  }
-
-  @Override
-  protected void _execute() {
-    if (m_chosenCommand != null && !m_isStarted) {
-      m_isStarted = m_chosenCommand.isRunning();
-    }
-    super._execute();
   }
 
   @Override
@@ -167,13 +151,14 @@ public abstract class ConditionalCommand extends Command {
     if (m_chosenCommand != null && m_chosenCommand.isRunning()) {
       m_chosenCommand.cancel();
     }
+
     super._cancel();
   }
 
   @Override
   protected boolean isFinished() {
     if (m_chosenCommand != null) {
-      return !m_chosenCommand.isRunning() && m_isStarted;
+      return m_chosenCommand.isCompleted();
     } else {
       return true;
     }

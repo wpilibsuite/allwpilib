@@ -7,6 +7,8 @@
 
 #include "Commands/ConditionalCommand.h"
 
+#include <iostream>
+
 #include "Commands/Scheduler.h"
 
 using namespace frc;
@@ -31,7 +33,6 @@ static void RequireAll(Command& command, Command* onTrue, Command* onFalse) {
 ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
   m_onTrue = onTrue;
   m_onFalse = onFalse;
-  m_isStarted = false;
 
   RequireAll(*this, onTrue, onFalse);
 }
@@ -48,7 +49,6 @@ ConditionalCommand::ConditionalCommand(const llvm::Twine& name, Command* onTrue,
     : Command(name) {
   m_onTrue = onTrue;
   m_onFalse = onFalse;
-  m_isStarted = false;
 
   RequireAll(*this, onTrue, onFalse);
 }
@@ -67,15 +67,7 @@ void ConditionalCommand::_Initialize() {
 
     m_chosenCommand->Start();
   }
-  m_isStarted = false;
   Command::_Initialize();
-}
-
-void ConditionalCommand::_Execute() {
-  if (m_chosenCommand != nullptr && !m_isStarted)
-    m_isStarted = m_chosenCommand->IsRunning();
-
-  Command::_Execute();
 }
 
 void ConditionalCommand::_Cancel() {
@@ -88,7 +80,7 @@ void ConditionalCommand::_Cancel() {
 
 bool ConditionalCommand::IsFinished() {
   if (m_chosenCommand != nullptr) {
-    return !m_chosenCommand->IsRunning() && m_isStarted;
+    return m_chosenCommand->IsCompleted();
   } else {
     return true;
   }
