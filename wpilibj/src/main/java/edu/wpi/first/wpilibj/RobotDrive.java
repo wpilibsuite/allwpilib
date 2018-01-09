@@ -21,7 +21,8 @@ import static java.util.Objects.requireNonNull;
  * function (intended for hand created drive code, such as autonomous) or with the Tank/Arcade
  * functions intended to be used for Operator Control driving.
  *
- * @deprecated Use {@link edu.wpi.first.wpilibj.drive.DifferentialDrive} or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
+ * @deprecated Use {@link edu.wpi.first.wpilibj.drive.DifferentialDrive}
+ *             or {@link edu.wpi.first.wpilibj.drive.MecanumDrive} classes instead.
  */
 @Deprecated
 public class RobotDrive implements MotorSafety {
