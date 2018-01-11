@@ -550,12 +550,15 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
 
   /**
    * Set the PID controller to consider the input to be continuous, Rather then using the max and
-   * min in as constraints, it considers them to be the same point and automatically calculates the
-   * shortest route to the setpoint.
+   * min input range as constraints, it considers them to be the same point and automatically
+   * calculates the shortest route to the setpoint.
    *
    * @param continuous Set to true turns on continuous, false turns off continuous
    */
   public void setContinuous(boolean continuous) {
+    if (m_inputRange <= 0) {
+      throw new RuntimeException("No input range set when calling setContinuous().");
+    }
     m_thisMutex.lock();
     try {
       m_continuous = continuous;
@@ -566,8 +569,8 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
 
   /**
    * Set the PID controller to consider the input to be continuous, Rather then using the max and
-   * min in as constraints, it considers them to be the same point and automatically calculates the
-   * shortest route to the setpoint.
+   * min input range as constraints, it considers them to be the same point and automatically
+   * calculates the shortest route to the setpoint.
    */
   public void setContinuous() {
     setContinuous(true);
@@ -891,7 +894,7 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
    * @return Error for continuous inputs.
    */
   protected double getContinuousError(double error) {
-    if (m_continuous) {
+    if (m_continuous && m_inputRange > 0) {
       error %= m_inputRange;
       if (Math.abs(error) > m_inputRange / 2) {
         if (error > 0) {
