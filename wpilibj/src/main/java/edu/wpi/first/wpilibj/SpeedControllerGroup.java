@@ -45,7 +45,7 @@ public class SpeedControllerGroup extends SendableBase implements SpeedControlle
   @Override
   public double get() {
     if (m_speedControllers.length > 0) {
-      return m_speedControllers[0].get();
+      return m_speedControllers[0].get() * (m_isInverted ? -1 : 1);
     }
     return 0.0;
   }
