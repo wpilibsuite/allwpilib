@@ -311,4 +311,19 @@ void CommandGroup::CancelConflicts(Command* command) {
   }
 }
 
+void CommandGroup::SetCommands(std::vector<CommandGroupEntry> cmds) {
+  for (auto& entry : cmds) {
+    auto requirements = entry.m_command->GetRequirements();
+    for (auto subsystem : requirements) {
+      if (!DoesRequire(subsystem)) {
+        wpi_setWPIErrorWithContext(
+            CommandIllegalUse,
+            "Command set does not match CommandGroup requirements");
+        return;
+      }
+    }
+    m_commands = cmds;
+  }
+}
+
 int CommandGroup::GetSize() const { return m_children.size(); }
