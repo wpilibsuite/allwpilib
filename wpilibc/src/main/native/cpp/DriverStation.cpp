@@ -728,8 +728,12 @@ void DriverStation::SendMatchData() {
   m_matchDataSender->matchType.SetDouble(
       static_cast<int>(tmpDataStore.matchType));
 
-  // Valid, as in other places we guarentee ctlWord >= int32
-  auto ctlWord = m_controlWordCache;
+  HAL_ControlWord ctlWord;
+  {
+    // Valid, as in other places we guarentee ctlWord >= int32
+    std::lock_guard<wpi::mutex> lock(m_controlWordMutex);
+    ctlWord = m_controlWordCache;
+  }
   int32_t wordInt = 0;
   std::memcpy(&wordInt, &ctlWord, sizeof(wordInt));
   m_matchDataSender->controlWord.SetDouble(wordInt);
