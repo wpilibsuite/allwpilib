@@ -62,6 +62,8 @@ class Command : public ErrorBase, public SendableBase {
   bool Run();
   void Cancel();
   bool IsRunning() const;
+  bool IsInitialized() const;
+  bool IsCompleted() const;
   bool IsInterruptible() const;
   void SetInterruptible(bool interruptible);
   bool DoesRequire(Subsystem* subsystem) const;
@@ -147,6 +149,9 @@ class Command : public ErrorBase, public SendableBase {
 
   // The CommandGroup this is in
   CommandGroup* m_parent = nullptr;
+
+  // Whether or not this command has completed running
+  bool m_completed = false;
 
   int m_commandID = m_commandCounter++;
   static int m_commandCounter;

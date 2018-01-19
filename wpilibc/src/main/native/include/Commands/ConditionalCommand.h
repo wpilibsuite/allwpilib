@@ -10,22 +10,24 @@
 #include <llvm/Twine.h>
 
 #include "Commands/Command.h"
-#include "Commands/InstantCommand.h"
 
 namespace frc {
 
 /**
  * A ConditionalCommand is a Command that starts one of two commands.
  *
- * A ConditionalCommand uses m_condition to determine whether it should run
- * m_onTrue or m_onFalse.
+ * A ConditionalCommand uses the Condition method to determine whether it should
+ * run onTrue or onFalse.
  *
  * A ConditionalCommand adds the proper Command to the Scheduler during
  * Initialize() and then IsFinished() will return true once that Command has
  * finished executing.
  *
- * If no Command is specified for m_onFalse, the occurrence of that condition
+ * If no Command is specified for onFalse, the occurrence of that condition
  * will be a no-op.
+ *
+ * A CondtionalCommand will require the superset of subsystems of the onTrue
+ * and onFalse commands.
  *
  * @see Command
  * @see Scheduler
@@ -48,7 +50,7 @@ class ConditionalCommand : public Command {
   void _Initialize() override;
   void _Cancel() override;
   bool IsFinished() override;
-  void Interrupted() override;
+  void _Interrupted() override;
 
  private:
   // The Command to execute if Condition() returns true

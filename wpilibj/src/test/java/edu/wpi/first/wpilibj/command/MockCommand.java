@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.command;
 
 /**
- * A class to simulate a simple command The command keeps track of how many times each method was
+ * A class to simulate a simple command. The command keeps track of how many times each method was
  * called.
  */
 public class MockCommand extends Command {
@@ -18,6 +18,15 @@ public class MockCommand extends Command {
   private boolean m_hasFinished = false;
   private int m_endCount = 0;
   private int m_interruptedCount = 0;
+
+  public MockCommand(Subsystem subsys) {
+    super();
+    requires(subsys);
+  }
+
+  public MockCommand() {
+    super();
+  }
 
   protected void initialize() {
     ++m_initializeCount;
@@ -113,6 +122,18 @@ public class MockCommand extends Command {
    */
   public boolean hasInterrupted() {
     return getInterruptedCount() > 0;
+  }
+
+  /**
+   * Reset internal counters.
+   */
+  public void resetCounters() {
+    m_initializeCount = 0;
+    m_executeCount = 0;
+    m_isFinishedCount = 0;
+    m_hasFinished = false;
+    m_endCount = 0;
+    m_interruptedCount = 0;
   }
 
 }
