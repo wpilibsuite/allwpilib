@@ -788,14 +788,6 @@ void DriverStation::GetData() {
     m_matchInfo.swap(m_matchInfoCache);
   }
 
-  
-  
-  m_joystickAxes.swap(m_joystickAxesCache);
-  m_joystickPOVs.swap(m_joystickPOVsCache);
-  m_joystickButtons.swap(m_joystickButtonsCache);
-  m_joystickDescriptor.swap(m_joystickDescriptorCache);
-  m_matchInfo.swap(m_matchInfoCache);
-
   {
     std::lock_guard<wpi::mutex> waitLock(m_waitForDataMutex);
     // Nofify all threads
