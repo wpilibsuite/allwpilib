@@ -7,6 +7,8 @@
 
 #include "Commands/ConditionalCommand.h"
 
+#include <iostream>
+
 #include "Commands/Scheduler.h"
 
 using namespace frc;
@@ -65,6 +67,7 @@ void ConditionalCommand::_Initialize() {
 
     m_chosenCommand->Start();
   }
+  Command::_Initialize();
 }
 
 void ConditionalCommand::_Cancel() {
@@ -76,14 +79,17 @@ void ConditionalCommand::_Cancel() {
 }
 
 bool ConditionalCommand::IsFinished() {
-  return m_chosenCommand != nullptr && m_chosenCommand->IsRunning() &&
-         m_chosenCommand->IsFinished();
+  if (m_chosenCommand != nullptr) {
+    return m_chosenCommand->IsCompleted();
+  } else {
+    return true;
+  }
 }
 
-void ConditionalCommand::Interrupted() {
+void ConditionalCommand::_Interrupted() {
   if (m_chosenCommand != nullptr && m_chosenCommand->IsRunning()) {
     m_chosenCommand->Cancel();
   }
 
-  Command::Interrupted();
+  Command::_Interrupted();
 }

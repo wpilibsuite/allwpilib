@@ -9,6 +9,10 @@
 
 using namespace frc;
 
+MockCommand::MockCommand(Subsystem* subsys) : MockCommand() {
+  Requires(subsys);
+}
+
 MockCommand::MockCommand() {
   m_initializeCount = 0;
   m_executeCount = 0;
@@ -36,3 +40,12 @@ bool MockCommand::IsFinished() {
 void MockCommand::End() { ++m_endCount; }
 
 void MockCommand::Interrupted() { ++m_interruptedCount; }
+
+void MockCommand::ResetCounters() {
+  m_initializeCount = 0;
+  m_executeCount = 0;
+  m_isFinishedCount = 0;
+  m_hasFinished = false;
+  m_endCount = 0;
+  m_interruptedCount = 0;
+}

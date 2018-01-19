@@ -55,9 +55,9 @@ class MatchDataSender {
     eventName = table->GetEntry("EventName");
     eventName.ForceSetString("");
     matchNumber = table->GetEntry("MatchNumber");
-    matchNumber.ForceSetDouble(1);
+    matchNumber.ForceSetDouble(0);
     replayNumber = table->GetEntry("ReplayNumber");
-    replayNumber.ForceSetDouble(1);
+    replayNumber.ForceSetDouble(0);
     matchType = table->GetEntry("MatchType");
     matchType.ForceSetDouble(0);
     alliance = table->GetEntry("IsRedAlliance");
@@ -629,7 +629,22 @@ void DriverStation::WaitForData() { WaitForData(0); }
  * @return true if new data, otherwise false
  */
 bool DriverStation::WaitForData(double timeout) {
-  return static_cast<bool>(HAL_WaitForDSDataTimeout(timeout));
+  auto timeoutTime =
+      std::chrono::steady_clock::now() + std::chrono::duration<double>(timeout);
+
+  std::unique_lock<wpi::mutex> lock(m_waitForDataMutex);
+  int currentCount = m_waitForDataCounter;
+  while (m_waitForDataCounter == currentCount) {
+    if (timeout > 0) {
+      auto timedOut = m_waitForDataCond.wait_until(lock, timeoutTime);
+      if (timedOut == std::cv_status::timeout) {
+        return false;
+      }
+    } else {
+      m_waitForDataCond.wait(lock);
+    }
+  }
+  return true;
 }
 
 /**
@@ -773,6 +788,21 @@ void DriverStation::GetData() {
     m_matchInfo.swap(m_matchInfoCache);
   }
 
+  
+  
+  m_joystickAxes.swap(m_joystickAxesCache);
+  m_joystickPOVs.swap(m_joystickPOVsCache);
+  m_joystickButtons.swap(m_joystickButtonsCache);
+  m_joystickDescriptor.swap(m_joystickDescriptorCache);
+  m_matchInfo.swap(m_matchInfoCache);
+
+  {
+    std::lock_guard<wpi::mutex> waitLock(m_waitForDataMutex);
+    // Nofify all threads
+    m_waitForDataCounter++;
+    m_waitForDataCond.notify_all();
+  }
+  
   SendMatchData();
 }
 
@@ -782,6 +812,7 @@ void DriverStation::GetData() {
  * This is only called once the first time GetInstance() is called
  */
 DriverStation::DriverStation() {
+  m_waitForDataCounter = 0;
   m_joystickAxes = std::make_unique<HAL_JoystickAxes[]>(kJoystickPorts);
   m_joystickPOVs = std::make_unique<HAL_JoystickPOVs[]>(kJoystickPorts);
   m_joystickButtons = std::make_unique<HAL_JoystickButtons[]>(kJoystickPorts);

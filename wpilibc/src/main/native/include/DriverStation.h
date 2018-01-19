@@ -15,6 +15,7 @@
 
 #include <HAL/DriverStation.h>
 #include <llvm/Twine.h>
+#include <support/condition_variable.h>
 #include <support/deprecated.h>
 #include <support/mutex.h>
 
@@ -158,6 +159,10 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   // Internal Driver Station thread
   std::thread m_dsThread;
   std::atomic<bool> m_isRunning{false};
+
+  wpi::mutex m_waitForDataMutex;
+  wpi::condition_variable m_waitForDataCond;
+  int m_waitForDataCounter;
 
   mutable wpi::mutex m_cacheDataMutex;
 

@@ -140,6 +140,7 @@ void Command::Removed() {
   m_initialized = false;
   m_canceled = false;
   m_running = false;
+  m_completed = true;
 }
 
 /**
@@ -156,6 +157,7 @@ void Command::Start() {
         CommandIllegalUse,
         "Can not start a command that is part of a command group");
 
+  m_completed = false;
   Scheduler::GetInstance()->AddCommand(this);
 }
 
@@ -211,13 +213,13 @@ void Command::End() {}
  */
 void Command::Interrupted() { End(); }
 
-void Command::_Initialize() {}
+void Command::_Initialize() { m_completed = false; }
 
-void Command::_Interrupted() {}
+void Command::_Interrupted() { m_completed = true; }
 
 void Command::_Execute() {}
 
-void Command::_End() {}
+void Command::_End() { m_completed = true; }
 
 /**
  * Called to indicate that the timer should start.
@@ -318,6 +320,7 @@ void Command::ClearRequirements() { m_requirements.clear(); }
 void Command::StartRunning() {
   m_running = true;
   m_startTime = -1;
+  m_completed = false;
 }
 
 /**
@@ -329,6 +332,20 @@ void Command::StartRunning() {
  * @return whether or not the command is running
  */
 bool Command::IsRunning() const { return m_running; }
+
+/**
+ * Returns whether or not the command has been initialized.
+ *
+ * @return whether or not the command has been initialized.
+ */
+bool Command::IsInitialized() const { return m_initialized; }
+
+/**
+ * Returns whether or not the command has completed running.
+ *
+ * @return whether or not the command has completed running.
+ */
+bool Command::IsCompleted() const { return m_completed; }
 
 /**
  * This will cancel the current command.
