@@ -1069,7 +1069,7 @@ public class DriverStation implements RobotState.Interface {
     m_waitForDataCount++;
     m_waitForDataCond.signalAll();
     m_waitForDataMutex.unlock();
-    
+
     sendMatchData();
   }
 

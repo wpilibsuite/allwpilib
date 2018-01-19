@@ -798,7 +798,7 @@ void DriverStation::GetData() {
     m_waitForDataCounter++;
     m_waitForDataCond.notify_all();
   }
-  
+
   SendMatchData();
 }
 
