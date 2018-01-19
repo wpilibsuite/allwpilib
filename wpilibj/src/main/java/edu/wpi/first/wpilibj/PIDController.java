@@ -556,7 +556,7 @@ public class PIDController extends SendableBase implements PIDInterface, Sendabl
    * @param continuous Set to true turns on continuous, false turns off continuous
    */
   public void setContinuous(boolean continuous) {
-    if (m_inputRange <= 0) {
+    if (continuous && m_inputRange <= 0) {
       throw new RuntimeException("No input range set when calling setContinuous().");
     }
     m_thisMutex.lock();
