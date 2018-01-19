@@ -13,6 +13,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.hal.AllianceStationID;
 import edu.wpi.first.wpilibj.hal.ControlWord;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -77,6 +80,51 @@ public class DriverStation implements RobotState.Interface {
     }
   } /* DriverStationTask */
 
+  private static class MatchDataSender {
+    @SuppressWarnings("MemberName")
+    NetworkTable table;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry typeMetadata;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry gameSpecificMessage;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry eventName;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry matchNumber;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry replayNumber;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry matchType;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry alliance;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry station;
+    @SuppressWarnings("MemberName")
+    NetworkTableEntry controlWord;
+
+    MatchDataSender() {
+      table = NetworkTableInstance.getDefault().getTable("FMSInfo");
+      typeMetadata = table.getEntry(".type");
+      typeMetadata.forceSetString("FMSInfo");
+      gameSpecificMessage = table.getEntry("GameSpecificMessage");
+      gameSpecificMessage.forceSetString("");
+      eventName = table.getEntry("EventName");
+      eventName.forceSetString("");
+      matchNumber = table.getEntry("MatchNumber");
+      matchNumber.forceSetDouble(0);
+      replayNumber = table.getEntry("ReplayNumber");
+      replayNumber.forceSetDouble(0);
+      matchType = table.getEntry("MatchType");
+      matchType.forceSetDouble(0);
+      alliance = table.getEntry("IsRedAlliance");
+      alliance.forceSetBoolean(true);
+      station = table.getEntry("StationNumber");
+      station.forceSetDouble(1);
+      controlWord = table.getEntry("FMSControlData");
+      controlWord.forceSetDouble(0);
+    }
+  }
+
   private static DriverStation instance = new DriverStation();
 
   // Joystick User Data
@@ -97,6 +145,8 @@ public class DriverStation implements RobotState.Interface {
 
   // preallocated byte buffer for button count
   private ByteBuffer m_buttonCountBuffer = ByteBuffer.allocateDirect(1);
+
+  private MatchDataSender m_matchDataSender;
 
   // Internal Driver Station thread
   private Thread m_thread;
@@ -156,6 +206,8 @@ public class DriverStation implements RobotState.Interface {
     m_controlWordMutex = new Object();
     m_controlWordCache = new ControlWord();
     m_lastControlWordUpdate = 0;
+
+    m_matchDataSender = new MatchDataSender();
 
     m_thread = new Thread(new DriverStationTask(this), "FRCDriverStation");
     m_thread.setPriority((Thread.NORM_PRIORITY + Thread.MAX_PRIORITY) / 2);
@@ -908,6 +960,61 @@ public class DriverStation implements RobotState.Interface {
     m_userInTest = entering;
   }
 
+  private void sendMatchData() {
+    AllianceStationID alliance = HAL.getAllianceStation();
+    boolean isRedAlliance = false;
+    int stationNumber = 1;
+    switch (alliance) {
+      case Blue1:
+        isRedAlliance = false;
+        stationNumber = 1;
+        break;
+      case Blue2:
+        isRedAlliance = false;
+        stationNumber = 2;
+        break;
+      case Blue3:
+        isRedAlliance = false;
+        stationNumber = 3;
+        break;
+      case Red1:
+        isRedAlliance = true;
+        stationNumber = 1;
+        break;
+      case Red2:
+        isRedAlliance = true;
+        stationNumber = 2;
+        break;
+      default:
+        isRedAlliance = true;
+        stationNumber = 3;
+        break;
+    }
+
+
+    String eventName;
+    String gameSpecificMessage;
+    int matchNumber;
+    int replayNumber;
+    int matchType;
+    synchronized (m_cacheDataMutex) {
+      eventName = m_matchInfo.eventName;
+      gameSpecificMessage = m_matchInfo.gameSpecificMessage;
+      matchNumber = m_matchInfo.matchNumber;
+      replayNumber = m_matchInfo.replayNumber;
+      matchType = m_matchInfo.matchType;
+    }
+
+    m_matchDataSender.alliance.setBoolean(isRedAlliance);
+    m_matchDataSender.station.setDouble(stationNumber);
+    m_matchDataSender.eventName.setString(eventName);
+    m_matchDataSender.gameSpecificMessage.setString(gameSpecificMessage);
+    m_matchDataSender.matchNumber.setDouble(matchNumber);
+    m_matchDataSender.replayNumber.setDouble(replayNumber);
+    m_matchDataSender.matchType.setDouble(matchType);
+    m_matchDataSender.controlWord.setDouble(HAL.nativeGetControlWord());
+  }
+
   /**
    * Copy data from the DS task for the user. If no new data exists, it will just be returned,
    * otherwise the data will be copied from the DS polling loop.
@@ -962,6 +1069,8 @@ public class DriverStation implements RobotState.Interface {
     m_waitForDataCount++;
     m_waitForDataCond.signalAll();
     m_waitForDataMutex.unlock();
+
+    sendMatchData();
   }
 
   /**

@@ -25,6 +25,7 @@
 namespace frc {
 
 struct MatchInfoData;
+class MatchDataSender;
 
 /**
  * Provide access to the network communication data to / from the Driver
@@ -133,6 +134,7 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   void ReportJoystickUnpluggedWarning(const llvm::Twine& message);
   void Run();
   void UpdateControlWord(bool force, HAL_ControlWord& controlWord) const;
+  void SendMatchData();
 
   // Joystick User Data
   std::unique_ptr<HAL_JoystickAxes[]> m_joystickAxes;
@@ -147,6 +149,8 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   std::unique_ptr<HAL_JoystickButtons[]> m_joystickButtonsCache;
   std::unique_ptr<HAL_JoystickDescriptor[]> m_joystickDescriptorCache;
   std::unique_ptr<MatchInfoData> m_matchInfoCache;
+
+  std::unique_ptr<MatchDataSender> m_matchDataSender;
 
   // Joystick button rising/falling edge flags
   std::array<uint32_t, kJoystickPorts> m_joystickButtonsPressed;

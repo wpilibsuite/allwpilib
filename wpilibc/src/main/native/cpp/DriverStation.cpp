@@ -13,6 +13,10 @@
 #include <HAL/Power.h>
 #include <HAL/cpp/Log.h>
 #include <llvm/SmallString.h>
+#include <llvm/StringRef.h>
+#include <networktables/NetworkTable.h>
+#include <networktables/NetworkTableEntry.h>
+#include <networktables/NetworkTableInstance.h>
 
 #include "AnalogInput.h"
 #include "MotorSafetyHelper.h"
@@ -27,6 +31,42 @@ struct MatchInfoData {
   int matchNumber = 0;
   int replayNumber = 0;
   DriverStation::MatchType matchType = DriverStation::MatchType::kNone;
+};
+
+class MatchDataSender {
+ public:
+  std::shared_ptr<nt::NetworkTable> table;
+  nt::NetworkTableEntry typeMetadata;
+  nt::NetworkTableEntry gameSpecificMessage;
+  nt::NetworkTableEntry eventName;
+  nt::NetworkTableEntry matchNumber;
+  nt::NetworkTableEntry replayNumber;
+  nt::NetworkTableEntry matchType;
+  nt::NetworkTableEntry alliance;
+  nt::NetworkTableEntry station;
+  nt::NetworkTableEntry controlWord;
+
+  MatchDataSender() {
+    table = nt::NetworkTableInstance::GetDefault().GetTable("FMSInfo");
+    typeMetadata = table->GetEntry(".type");
+    typeMetadata.ForceSetString("FMSInfo");
+    gameSpecificMessage = table->GetEntry("GameSpecificMessage");
+    gameSpecificMessage.ForceSetString("");
+    eventName = table->GetEntry("EventName");
+    eventName.ForceSetString("");
+    matchNumber = table->GetEntry("MatchNumber");
+    matchNumber.ForceSetDouble(0);
+    replayNumber = table->GetEntry("ReplayNumber");
+    replayNumber.ForceSetDouble(0);
+    matchType = table->GetEntry("MatchType");
+    matchType.ForceSetDouble(0);
+    alliance = table->GetEntry("IsRedAlliance");
+    alliance.ForceSetBoolean(true);
+    station = table->GetEntry("StationNumber");
+    station.ForceSetDouble(1);
+    controlWord = table->GetEntry("FMSControlData");
+    controlWord.ForceSetDouble(0);
+  }
 };
 }  // namespace frc
 
@@ -640,6 +680,65 @@ double DriverStation::GetBatteryVoltage() const {
   return voltage;
 }
 
+void DriverStation::SendMatchData() {
+  int32_t status = 0;
+  HAL_AllianceStationID alliance = HAL_GetAllianceStation(&status);
+  bool isRedAlliance = false;
+  int stationNumber = 1;
+  switch (alliance) {
+    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue1:
+      isRedAlliance = false;
+      stationNumber = 1;
+      break;
+    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue2:
+      isRedAlliance = false;
+      stationNumber = 2;
+      break;
+    case HAL_AllianceStationID::HAL_AllianceStationID_kBlue3:
+      isRedAlliance = false;
+      stationNumber = 3;
+      break;
+    case HAL_AllianceStationID::HAL_AllianceStationID_kRed1:
+      isRedAlliance = true;
+      stationNumber = 1;
+      break;
+    case HAL_AllianceStationID::HAL_AllianceStationID_kRed2:
+      isRedAlliance = true;
+      stationNumber = 2;
+      break;
+    default:
+      isRedAlliance = true;
+      stationNumber = 3;
+      break;
+  }
+
+  MatchInfoData tmpDataStore;
+  {
+    std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
+    tmpDataStore = *m_matchInfo;
+  }
+
+  m_matchDataSender->alliance.SetBoolean(isRedAlliance);
+  m_matchDataSender->station.SetDouble(stationNumber);
+  m_matchDataSender->eventName.SetString(tmpDataStore.eventName);
+  m_matchDataSender->gameSpecificMessage.SetString(
+      tmpDataStore.gameSpecificMessage);
+  m_matchDataSender->matchNumber.SetDouble(tmpDataStore.matchNumber);
+  m_matchDataSender->replayNumber.SetDouble(tmpDataStore.replayNumber);
+  m_matchDataSender->matchType.SetDouble(
+      static_cast<int>(tmpDataStore.matchType));
+
+  HAL_ControlWord ctlWord;
+  {
+    // Valid, as in other places we guarentee ctlWord >= int32
+    std::lock_guard<wpi::mutex> lock(m_controlWordMutex);
+    ctlWord = m_controlWordCache;
+  }
+  int32_t wordInt = 0;
+  std::memcpy(&wordInt, &ctlWord, sizeof(wordInt));
+  m_matchDataSender->controlWord.SetDouble(wordInt);
+}
+
 /**
  * Copy data from the DS task for the user.
  *
@@ -670,30 +769,37 @@ void DriverStation::GetData() {
   // Force a control word update, to make sure the data is the newest.
   HAL_ControlWord controlWord;
   UpdateControlWord(true, controlWord);
-  // Obtain a write lock on the data, swap the cached data into the
-  // main data arrays
-  std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
 
-  for (int32_t i = 0; i < kJoystickPorts; i++) {
-    // If buttons weren't pressed and are now, set flags in m_buttonsPressed
-    m_joystickButtonsPressed[i] |=
-        ~m_joystickButtons[i].buttons & m_joystickButtonsCache[i].buttons;
+  {
+    // Obtain a write lock on the data, swap the cached data into the
+    // main data arrays
+    std::lock_guard<wpi::mutex> lock(m_cacheDataMutex);
 
-    // If buttons were pressed and aren't now, set flags in m_buttonsReleased
-    m_joystickButtonsReleased[i] |=
-        m_joystickButtons[i].buttons & ~m_joystickButtonsCache[i].buttons;
+    for (int32_t i = 0; i < kJoystickPorts; i++) {
+      // If buttons weren't pressed and are now, set flags in m_buttonsPressed
+      m_joystickButtonsPressed[i] |=
+          ~m_joystickButtons[i].buttons & m_joystickButtonsCache[i].buttons;
+
+      // If buttons were pressed and aren't now, set flags in m_buttonsReleased
+      m_joystickButtonsReleased[i] |=
+          m_joystickButtons[i].buttons & ~m_joystickButtonsCache[i].buttons;
+    }
+
+    m_joystickAxes.swap(m_joystickAxesCache);
+    m_joystickPOVs.swap(m_joystickPOVsCache);
+    m_joystickButtons.swap(m_joystickButtonsCache);
+    m_joystickDescriptor.swap(m_joystickDescriptorCache);
+    m_matchInfo.swap(m_matchInfoCache);
   }
 
-  m_joystickAxes.swap(m_joystickAxesCache);
-  m_joystickPOVs.swap(m_joystickPOVsCache);
-  m_joystickButtons.swap(m_joystickButtonsCache);
-  m_joystickDescriptor.swap(m_joystickDescriptorCache);
-  m_matchInfo.swap(m_matchInfoCache);
+  {
+    std::lock_guard<wpi::mutex> waitLock(m_waitForDataMutex);
+    // Nofify all threads
+    m_waitForDataCounter++;
+    m_waitForDataCond.notify_all();
+  }
 
-  std::lock_guard<wpi::mutex> waitLock(m_waitForDataMutex);
-  // Nofify all threads
-  m_waitForDataCounter++;
-  m_waitForDataCond.notify_all();
+  SendMatchData();
 }
 
 /**
@@ -716,6 +822,8 @@ DriverStation::DriverStation() {
   m_joystickDescriptorCache =
       std::make_unique<HAL_JoystickDescriptor[]>(kJoystickPorts);
   m_matchInfoCache = std::make_unique<MatchInfoData>();
+
+  m_matchDataSender = std::make_unique<MatchDataSender>();
 
   // All joysticks should default to having zero axes, povs and buttons, so
   // uninitialized memory doesn't get sent to speed controllers.
