@@ -76,9 +76,7 @@ public class SpeedControllerGroup extends SendableBase implements SpeedControlle
 
   @Override
   public void pidWrite(double output) {
-    for (SpeedController speedController : m_speedControllers) {
-      speedController.pidWrite(output);
-    }
+    set(output);
   }
 
   @Override

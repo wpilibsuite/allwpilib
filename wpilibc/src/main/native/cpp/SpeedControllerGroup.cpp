@@ -42,11 +42,7 @@ void SpeedControllerGroup::StopMotor() {
   }
 }
 
-void SpeedControllerGroup::PIDWrite(double output) {
-  for (auto speedController : m_speedControllers) {
-    speedController.get().PIDWrite(output);
-  }
-}
+void SpeedControllerGroup::PIDWrite(double output) { Set(output); }
 
 void SpeedControllerGroup::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("Speed Controller");
