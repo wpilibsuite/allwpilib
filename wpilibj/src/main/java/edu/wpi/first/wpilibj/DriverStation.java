@@ -810,33 +810,31 @@ public class DriverStation implements RobotState.Interface {
     long timeoutMicros = (long) (timeout * 1000000);
     m_waitForDataMutex.lock();
     try {
-      try {
-        int currentCount = m_waitForDataCount;
-        while (m_waitForDataCount == currentCount) {
-          if (timeout > 0) {
-            long now = RobotController.getFPGATime();
-            if (now < startTime + timeoutMicros) {
-              // We still have time to wait
-              boolean signaled = m_waitForDataCond.await(startTime + timeoutMicros - now,
-                                                  TimeUnit.MICROSECONDS);
-              if (!signaled) {
-                // Return false if a timeout happened
-                return false;
-              }
-            } else {
-              // Time has elapsed.
+      int currentCount = m_waitForDataCount;
+      while (m_waitForDataCount == currentCount) {
+        if (timeout > 0) {
+          long now = RobotController.getFPGATime();
+          if (now < startTime + timeoutMicros) {
+            // We still have time to wait
+            boolean signaled = m_waitForDataCond.await(startTime + timeoutMicros - now,
+                                                TimeUnit.MICROSECONDS);
+            if (!signaled) {
+              // Return false if a timeout happened
               return false;
             }
           } else {
-            m_waitForDataCond.await();
+            // Time has elapsed.
+            return false;
           }
+        } else {
+          m_waitForDataCond.await();
         }
-        // Return true if we have received a proper signal
-        return true;
-      } catch (InterruptedException ex) {
-        // return false on a thread interrupt
-        return false;
       }
+      // Return true if we have received a proper signal
+      return true;
+    } catch (InterruptedException ex) {
+      // return false on a thread interrupt
+      return false;
     } finally {
       m_waitForDataMutex.unlock();
     }
