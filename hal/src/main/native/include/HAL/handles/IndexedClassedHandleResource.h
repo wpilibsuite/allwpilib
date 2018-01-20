@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 
+#include <array>
 #include <memory>
 #include <vector>
 
@@ -40,7 +41,7 @@ class IndexedClassedHandleResource : public HandleBase {
   friend class IndexedClassedHandleResourceTest;
 
  public:
-  IndexedClassedHandleResource();
+  IndexedClassedHandleResource() = default;
   IndexedClassedHandleResource(const IndexedClassedHandleResource&) = delete;
   IndexedClassedHandleResource& operator=(const IndexedClassedHandleResource&) =
       delete;
@@ -49,19 +50,12 @@ class IndexedClassedHandleResource : public HandleBase {
                    int32_t* status);
   std::shared_ptr<TStruct> Get(THandle handle);
   void Free(THandle handle);
+  void ResetHandles();
 
  private:
-  std::array<std::shared_ptr<TStruct>[], size> m_structures;
-  std::array<wpi::mutex[], size> m_handleMutexes;
+  std::array<std::shared_ptr<TStruct>, size> m_structures;
+  std::array<wpi::mutex, size> m_handleMutexes;
 };
-
-template <typename THandle, typename TStruct, int16_t size,
-          HAL_HandleEnum enumValue>
-IndexedClassedHandleResource<THandle, TStruct, size,
-                             enumValue>::IndexedClassedHandleResource() {
-  m_structures = std::make_unique<std::shared_ptr<TStruct>[]>(size);
-  m_handleMutexes = std::make_unique<wpi::mutex[]>(size);
-}
 
 template <typename THandle, typename TStruct, int16_t size,
           HAL_HandleEnum enumValue>
