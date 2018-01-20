@@ -15,13 +15,13 @@ public class MatchInfoData {
    * Stores the event name.
    */
   @SuppressWarnings("MemberName")
-  public String eventName;
+  public String eventName = "";
 
   /**
    * Stores the game specific message.
    */
   @SuppressWarnings("MemberName")
-  public String gameSpecificMessage;
+  public String gameSpecificMessage = "";
 
   /**
    * Stores the match number.
