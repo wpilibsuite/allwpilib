@@ -64,12 +64,10 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
   m_D = Kd;
   m_F = Kf;
 
-  // Save original source
-  m_origSource = std::shared_ptr<PIDSource>(source, NullDeleter<PIDSource>());
+  m_pidInput = source;
 
   // Create LinearDigitalFilter with original source as its source argument
-  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, 1);
-  m_pidInput = &m_filter;
+  m_filter = LinearDigitalFilter::MovingAverage(*m_pidInput, 1);
 
   m_pidOutput = output;
   m_period = period;
@@ -126,7 +124,7 @@ PIDController::~PIDController() {
  * This should only be called by the Notifier.
  */
 void PIDController::Calculate() {
-  if (m_origSource == nullptr || m_pidOutput == nullptr) return;
+  if (m_pidInput == nullptr || m_pidOutput == nullptr) return;
 
   bool enabled;
   {
@@ -207,6 +205,7 @@ void PIDController::Calculate() {
     m_error = error;
     m_totalError = totalError;
     m_result = result;
+    m_filter.PIDGet();
   }
 }
 
@@ -470,7 +469,7 @@ double PIDController::GetError() const {
  *
  * @return the average error
  */
-double PIDController::GetAvgError() const { return GetError(); }
+double PIDController::GetAvgError() const { return m_filter.Get(); }
 
 /**
  * Sets what type of input the PID controller will use.
@@ -537,8 +536,7 @@ void PIDController::SetToleranceBuffer(int bufLength) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
 
   // Create LinearDigitalFilter with original source as its source argument
-  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, bufLength);
-  m_pidInput = &m_filter;
+  m_filter = LinearDigitalFilter::MovingAverage(*m_pidInput, bufLength);
 }
 
 /*

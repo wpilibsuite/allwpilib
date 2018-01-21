@@ -160,7 +160,6 @@ class PIDController : public SendableBase, public PIDInterface {
   double m_result = 0;
   double m_period;
 
-  std::shared_ptr<PIDSource> m_origSource;
   LinearDigitalFilter m_filter{nullptr, {}, {}};
 
   mutable wpi::mutex m_thisMutex;
