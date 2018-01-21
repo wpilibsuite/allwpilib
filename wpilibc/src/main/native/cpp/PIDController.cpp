@@ -22,7 +22,7 @@ using namespace frc;
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly
- *               effects calculations of the integral and differental terms.
+ *               affects calculations of the integral and differental terms.
  *               The default is 50ms.
  */
 PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource* source,
@@ -38,7 +38,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource* source,
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly
- *               effects calculations of the integral and differental terms.
+ *               affects calculations of the integral and differental terms.
  *               The default is 50ms.
  */
 PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
@@ -55,7 +55,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly
- *               effects calculations of the integral and differental terms.
+ *               affects calculations of the integral and differental terms.
  *               The default is 50ms.
  */
 PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource& source,
@@ -71,13 +71,13 @@ PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource& source,
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly
- *               effects calculations of the integral and differental terms.
+ *               affects calculations of the integral and differental terms.
  *               The default is 50ms.
  */
 PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
                              PIDSource& source, PIDOutput& output,
                              double period)
-    : PIDBase(Kp, Ki, Kd, Kf, source, output) {
+    : PIDBase(Kp, Ki, Kd, Kf, source, output, period) {
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
   m_controlLoop->StartPeriodic(period);
 }

@@ -20,9 +20,9 @@ namespace frc {
 class SynchronousPID : public PIDBase {
  public:
   SynchronousPID(double Kp, double Ki, double Kd, PIDSource& source,
-                 PIDOutput& output);
+                 PIDOutput& output, double period = 0.05);
   SynchronousPID(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
-                 PIDOutput& output);
+                 PIDOutput& output, double period = 0.05);
 
   SynchronousPID(const SynchronousPID&) = delete;
   SynchronousPID& operator=(const SynchronousPID) = delete;

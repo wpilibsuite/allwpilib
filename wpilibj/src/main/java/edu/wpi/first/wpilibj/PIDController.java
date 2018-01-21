@@ -31,13 +31,13 @@ public class PIDController extends PIDBase implements Controller {
    * @param Kf     the feed forward term
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
-   * @param period the loop time for doing calculations. This particularly effects calculations of
+   * @param period The loop time for doing calculations. This particularly affects calculations of
    *               the integral and differential terms. The default is 50ms.
    */
   @SuppressWarnings("ParameterName")
   public PIDController(double Kp, double Ki, double Kd, double Kf, PIDSource source,
                        PIDOutput output, double period) {
-    super(Kp, Ki, Kd, Kf, source, output);
+    super(Kp, Ki, Kd, Kf, source, output, period);
     m_controlLoop.startPeriodic(period);
   }
 
@@ -49,7 +49,7 @@ public class PIDController extends PIDBase implements Controller {
    * @param Kd     the derivative coefficient
    * @param source the PIDSource object that is used to get values
    * @param output the PIDOutput object that is set to the output percentage
-   * @param period the loop time for doing calculations. This particularly effects calculations of
+   * @param period The loop time for doing calculations. This particularly affects calculations of
    *               the integral and differential terms. The default is 50ms.
    */
   @SuppressWarnings("ParameterName")

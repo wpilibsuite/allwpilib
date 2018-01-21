@@ -92,7 +92,7 @@ public class PIDBase extends SendableBase implements PIDInterface {
 
   protected PIDSource m_pidInput;
   protected PIDOutput m_pidOutput;
-  protected Timer m_setpointTimer;
+  protected double m_period;
 
   /**
    * Tolerance is the type of tolerance used to specify if the PID controller is on target.
@@ -116,27 +116,32 @@ public class PIDBase extends SendableBase implements PIDInterface {
 
   public class PercentageTolerance implements Tolerance {
     private final double m_percentage;
+    private final double m_deltaPercentage;
 
-    PercentageTolerance(double value) {
+    PercentageTolerance(double value, double deltaValue) {
       m_percentage = value;
+      m_deltaPercentage = deltaValue;
     }
 
     @Override
     public boolean onTarget() {
-      return Math.abs(getError()) < m_percentage / 100 * m_inputRange;
+      return Math.abs(getError()) < m_percentage / 100 * m_inputRange && Math.abs(getDeltaError())
+          < m_deltaPercentage / 100 * m_inputRange;
     }
   }
 
   public class AbsoluteTolerance implements Tolerance {
     private final double m_value;
+    private final double m_deltaValue;
 
-    AbsoluteTolerance(double value) {
+    AbsoluteTolerance(double value, double deltaValue) {
       m_value = value;
+      m_deltaValue = deltaValue;
     }
 
     @Override
     public boolean onTarget() {
-      return Math.abs(getError()) < m_value;
+      return Math.abs(getError()) < m_value && Math.abs(getDeltaError()) < m_deltaValue;
     }
   }
 
@@ -149,16 +154,15 @@ public class PIDBase extends SendableBase implements PIDInterface {
    * @param Kf     the feed forward term
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
+   * @param period The loop time for doing calculations. This particularly affects calculations of
+   *               the integral and differential terms. The default is 50ms.
    */
   @SuppressWarnings("ParameterName")
-  public PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource source,
-                 PIDOutput output) {
+  public PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource source, PIDOutput output,
+                 double period) {
     super(false);
     requireNonNull(source, "Null PIDSource was given");
     requireNonNull(output, "Null PIDOutput was given");
-
-    m_setpointTimer = new Timer();
-    m_setpointTimer.start();
 
     m_P = Kp;
     m_I = Ki;
@@ -173,6 +177,7 @@ public class PIDBase extends SendableBase implements PIDInterface {
     m_pidInput = m_filter;
 
     m_pidOutput = output;
+    m_period = period;
 
     instances++;
     HLUsageReporting.reportPIDController(instances);
@@ -188,10 +193,13 @@ public class PIDBase extends SendableBase implements PIDInterface {
    * @param Kd     the derivative coefficient
    * @param source the PIDSource object that is used to get values
    * @param output the PIDOutput object that is set to the output percentage
+   * @param period The loop time for doing calculations. This particularly affects calculations of
+   *               the integral and differential terms. The default is 50ms.
    */
   @SuppressWarnings("ParameterName")
-  public PIDBase(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output) {
-    this(Kp, Ki, Kd, 0.0, source, output);
+  public PIDBase(double Kp, double Ki, double Kd, PIDSource source, PIDOutput output,
+                 double period) {
+    this(Kp, Ki, Kd, 0.0, source, output, period);
   }
 
   /**
@@ -321,7 +329,6 @@ public class PIDBase extends SendableBase implements PIDInterface {
     } else {
       double temp = m_F * getDeltaSetpoint();
       m_prevSetpoint = m_setpoint;
-      m_setpointTimer.reset();
       return temp;
     }
   }
@@ -614,7 +621,7 @@ public class PIDBase extends SendableBase implements PIDInterface {
   public double getDeltaSetpoint() {
     m_thisMutex.lock();
     try {
-      return (m_setpoint - m_prevSetpoint) / m_setpointTimer.get();
+      return (m_setpoint - m_prevSetpoint) / m_period;
     } finally {
       m_thisMutex.unlock();
     }
@@ -688,12 +695,22 @@ public class PIDBase extends SendableBase implements PIDInterface {
   /**
    * Set the absolute error which is considered tolerable for use with OnTarget.
    *
-   * @param absvalue absolute error which is tolerable in the units of the input object
+   * @param tolerance error which is tolerable
    */
-  public void setAbsoluteTolerance(double absvalue) {
+  public void setAbsoluteTolerance(double tolerance) {
+    setAbsoluteTolerance(tolerance, Double.POSITIVE_INFINITY);
+  }
+
+  /**
+   * Set the absolute error which is considered tolerable for use with OnTarget.
+   *
+   * @param tolerance      error which is tolerable
+   * @param deltaTolerance change in error per second which is tolerable
+   */
+  public void setAbsoluteTolerance(double tolerance, double deltaTolerance) {
     m_thisMutex.lock();
     try {
-      m_tolerance = new AbsoluteTolerance(absvalue);
+      m_tolerance = new AbsoluteTolerance(tolerance, deltaTolerance);
     } finally {
       m_thisMutex.unlock();
     }
@@ -703,12 +720,23 @@ public class PIDBase extends SendableBase implements PIDInterface {
    * Set the percentage error which is considered tolerable for use with OnTarget. (Input of 15.0 =
    * 15 percent)
    *
-   * @param percentage percent error which is tolerable
+   * @param tolerance percent error which is tolerable
    */
-  public void setPercentTolerance(double percentage) {
+  public void setPercentTolerance(double tolerance) {
+    setPercentTolerance(tolerance, Double.POSITIVE_INFINITY);
+  }
+
+  /**
+   * Set the percentage error which is considered tolerable for use with OnTarget. (Input of 15.0 =
+   * 15 percent)
+   *
+   * @param tolerance      percent error which is tolerable
+   * @param deltaTolerance change in percent error per second which is tolerable
+   */
+  public void setPercentTolerance(double tolerance, double deltaTolerance) {
     m_thisMutex.lock();
     try {
-      m_tolerance = new PercentageTolerance(percentage);
+      m_tolerance = new PercentageTolerance(tolerance, deltaTolerance);
     } finally {
       m_thisMutex.unlock();
     }
@@ -730,6 +758,22 @@ public class PIDBase extends SendableBase implements PIDInterface {
     try {
       m_filter = LinearDigitalFilter.movingAverage(m_origSource, bufLength);
       m_pidInput = m_filter;
+    } finally {
+      m_thisMutex.unlock();
+    }
+  }
+
+  /**
+   * Returns the change in error per second of the PIDController.
+   *
+   * @return the change in error per second
+   */
+  public double getDeltaError() {
+    double error = getError();
+
+    m_thisMutex.lock();
+    try {
+      return (error - m_prevError) / m_period;
     } finally {
       m_thisMutex.unlock();
     }

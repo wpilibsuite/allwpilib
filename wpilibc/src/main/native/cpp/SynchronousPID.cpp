@@ -17,10 +17,14 @@ using namespace frc;
  * @param Kd     the derivative coefficient
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output percentage
+ * @param period The loop time for doing calculations. This particularly
+ *               affects calculations of the integral and differential terms.
+ *               The default is 50ms.
  */
 SynchronousPID::SynchronousPID(double Kp, double Ki, double Kd,
-                               PIDSource& source, PIDOutput& output)
-    : SynchronousPID(Kp, Ki, Kd, 0.0, source, output) {}
+                               PIDSource& source, PIDOutput& output,
+                               double period)
+    : SynchronousPID(Kp, Ki, Kd, 0.0, source, output, period) {}
 
 /**
  * Allocate a PID object with the given constants for P, I, and D.
@@ -31,10 +35,14 @@ SynchronousPID::SynchronousPID(double Kp, double Ki, double Kd,
  * @param Kf     the feed forward term
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output percentage
+ * @param period The loop time for doing calculations. This particularly
+ *               affects calculations of the integral and differential terms.
+ *               The default is 50ms.
  */
 SynchronousPID::SynchronousPID(double Kp, double Ki, double Kd, double Kf,
-                               PIDSource& source, PIDOutput& output)
-    : PIDBase(Kp, Ki, Kd, Kf, source, output) {
+                               PIDSource& source, PIDOutput& output,
+                               double period)
+    : PIDBase(Kp, Ki, Kd, Kf, source, output, period) {
   m_enabled = true;
 }
 

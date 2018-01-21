@@ -30,10 +30,13 @@ constexpr const T& clamp(const T& value, const T& low, const T& high) {
  * @param Kd     the derivative coefficient
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
+ * @param period The loop time for doing calculations. This particularly
+ *               affects calculations of the integral and differential terms.
+ *               The default is 50ms.
  */
 PIDBase::PIDBase(double Kp, double Ki, double Kd, PIDSource& source,
-                 PIDOutput& output)
-    : PIDBase(Kp, Ki, Kd, 0.0, source, output) {}
+                 PIDOutput& output, double period)
+    : PIDBase(Kp, Ki, Kd, 0.0, source, output, period) {}
 
 /**
  * Allocate a PID object with the given constants for P, I, D.
@@ -43,9 +46,12 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, PIDSource& source,
  * @param Kd     the derivative coefficient
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
+ * @param period The loop time for doing calculations. This particularly
+ *               affects calculations of the integral and differential terms.
+ *               The default is 50ms.
  */
 PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
-                 PIDOutput& output)
+                 PIDOutput& output, double period)
     : SendableBase(false) {
   m_P = Kp;
   m_I = Ki;
@@ -60,8 +66,7 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
   m_pidInput = &m_filter;
 
   m_pidOutput = &output;
-
-  m_setpointTimer.Start();
+  m_period = period;
 
   static int instances = 0;
   instances++;
@@ -179,7 +184,6 @@ double PIDBase::CalculateFeedForward() {
   } else {
     double temp = m_F * GetDeltaSetpoint();
     m_prevSetpoint = m_setpoint;
-    m_setpointTimer.Reset();
     return temp;
   }
 }
@@ -394,7 +398,7 @@ double PIDBase::GetSetpoint() const {
  */
 double PIDBase::GetDeltaSetpoint() const {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return (m_setpoint - m_prevSetpoint) / m_setpointTimer.Get();
+  return (m_setpoint - m_prevSetpoint) / m_period;
 }
 
 /**
@@ -404,10 +408,21 @@ double PIDBase::GetDeltaSetpoint() const {
  */
 double PIDBase::GetError() const {
   double setpoint = GetSetpoint();
-  {
-    std::lock_guard<wpi::mutex> lock(m_thisMutex);
-    return GetContinuousError(setpoint - m_pidInput->PIDGet());
-  }
+
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return GetContinuousError(setpoint - m_pidInput->PIDGet());
+}
+
+/**
+ * Returns the change in error per second of the PIDController.
+ *
+ * @return the change in error per second
+ */
+double PIDBase::GetDeltaError() const {
+  double error = GetError();
+
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return (error - m_prevError) / m_period;
 }
 
 /**
@@ -439,36 +454,42 @@ PIDSourceType PIDBase::GetPIDSourceType() const {
  * Set the percentage error which is considered tolerable for use with
  * OnTarget.
  *
- * @param percentage error which is tolerable
+ * @param tolerance      error which is tolerable
+ * @param deltaTolerance change in percent error per second which is tolerable
  */
-void PIDBase::SetTolerance(double percent) {
+void PIDBase::SetTolerance(double tolerance, double deltaTolerance) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_toleranceType = kPercentTolerance;
-  m_tolerance = percent;
+  m_tolerance = tolerance;
+  m_deltaTolerance = deltaTolerance;
 }
 
 /*
  * Set the absolute error which is considered tolerable for use with
  * OnTarget.
  *
- * @param percentage error which is tolerable
+ * @param percentage     error which is tolerable
+ * @param deltaTolerance change in error per second which is tolerable
  */
-void PIDBase::SetAbsoluteTolerance(double absTolerance) {
+void PIDBase::SetAbsoluteTolerance(double tolerance, double deltaTolerance) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_toleranceType = kAbsoluteTolerance;
-  m_tolerance = absTolerance;
+  m_tolerance = tolerance;
+  m_deltaTolerance = deltaTolerance;
 }
 
 /*
  * Set the percentage error which is considered tolerable for use with
  * OnTarget.
  *
- * @param percentage error which is tolerable
+ * @param tolerance      percent error which is tolerable
+ * @param deltaTolerance change in percent error per second which is tolerable
  */
-void PIDBase::SetPercentTolerance(double percent) {
+void PIDBase::SetPercentTolerance(double tolerance, double deltaTolerance) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   m_toleranceType = kPercentTolerance;
-  m_tolerance = percent;
+  m_tolerance = tolerance;
+  m_deltaTolerance = deltaTolerance;
 }
 
 /*
@@ -502,14 +523,17 @@ void PIDBase::SetToleranceBuffer(int bufLength) {
  */
 bool PIDBase::OnTarget() const {
   double error = GetError();
+  double deltaError = GetDeltaError();
 
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   switch (m_toleranceType) {
     case kPercentTolerance:
-      return std::fabs(error) < m_tolerance / 100 * m_inputRange;
+      return std::abs(error) < m_tolerance / 100 * m_inputRange &&
+             std::abs(deltaError) < m_deltaTolerance / 100 * m_inputRange;
       break;
     case kAbsoluteTolerance:
-      return std::fabs(error) < m_tolerance;
+      return std::abs(error) < m_tolerance &&
+             std::abs(deltaError) < m_deltaTolerance;
       break;
     case kNoTolerance:
       // TODO: this case needs an error
