@@ -25,6 +25,9 @@ double HAL_GetPDPChannelCurrent(int32_t module, int32_t channel,
 double HAL_GetPDPTotalCurrent(int32_t module, int32_t* status);
 double HAL_GetPDPTotalPower(int32_t module, int32_t* status);
 double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status);
+void HAL_GetAllPDPData(int32_t module, double* voltage, double* currents,
+                       double* temp, double* totalCurrent, double* power,
+                       double* energy, int32_t* status);
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status);
 void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status);
 #ifdef __cplusplus

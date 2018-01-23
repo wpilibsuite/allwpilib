@@ -84,6 +84,69 @@ PDP::~PDP()
 {
 }
 
+CTR_Code PDP::GetAllData(double* voltage, double* currents, double* temp,
+										double* totalCurrent, double* power, double* energy) {
+	{
+		GET_STATUS1();
+		if (rx.err != CTR_OKAY) return rx.err;
+		currents[0] = (((uint32_t)rx->chan1_h8 << 2) | rx->chan1_l2) * 0.125;
+		currents[1] = (((uint32_t)rx->chan2_h6 << 4) | rx->chan2_l4) * 0.125;
+		currents[2] = (((uint32_t)rx->chan3_h4 << 6) | rx->chan3_l6) * 0.125;
+		currents[3] = (((uint32_t)rx->chan4_h2 << 8) | rx->chan4_l8) * 0.125;
+		currents[4] = (((uint32_t)rx->chan5_h8 << 2) | rx->chan5_l2) * 0.125;
+		currents[5] = (((uint32_t)rx->chan6_h6 << 4) | rx->chan6_l4) * 0.125;
+	}
+	{
+		GET_STATUS2();
+		if (rx.err != CTR_OKAY) return rx.err;
+		currents[6] = (((uint32_t)rx->chan7_h8  << 2) | rx->chan7_l2) * 0.125;
+		currents[7] = (((uint32_t)rx->chan8_h6  << 4) | rx->chan8_l4) * 0.125;
+		currents[8] = (((uint32_t)rx->chan9_h4  << 6) | rx->chan9_l6) * 0.125;
+		currents[9] = (((uint32_t)rx->chan10_h2 << 8) | rx->chan10_l8) * 0.125;
+		currents[10]  = (((uint32_t)rx->chan11_h8 << 2) | rx->chan11_l2) * 0.125;
+		currents[11] = (((uint32_t)rx->chan12_h6 << 4) | rx->chan12_l4) * 0.125;
+	}
+	{
+		GET_STATUS3();
+		if (rx.err != CTR_OKAY) return rx.err;
+		currents[12] = (((uint32_t)rx->chan13_h8  << 2) | rx->chan13_l2) * 0.125;
+		currents[13] = (((uint32_t)rx->chan14_h6  << 4) | rx->chan14_l4) * 0.125;
+		currents[14] = (((uint32_t)rx->chan15_h4  << 6) | rx->chan15_l6) * 0.125;
+		currents[15] = (((uint32_t)rx->chan16_h2  << 8) | rx->chan16_l8) * 0.125;
+		*voltage = rx->busVoltage * 0.05 + 4.0;
+		*temp = rx->temp * 1.03250836957542 - 67.8564500484966;
+	}
+	{
+		GET_STATUS_ENERGY();
+		if (rx.err != CTR_OKAY) return rx.err;
+		uint32_t raw;
+		raw = rx->TotalCurrent_125mAperunit_h8;
+		raw <<= 4;
+		raw |=  rx->TotalCurrent_125mAperunit_l4;
+		*totalCurrent = 0.125 * raw;
+
+		raw = rx->Power_125mWperunit_h4;
+		raw <<= 8;
+		raw |=  rx->Power_125mWperunit_m8;
+		raw <<= 4;
+		raw |=  rx->Power_125mWperunit_l4;
+		*power = 0.125 * raw;
+
+		raw = rx->Energy_125mWPerUnitXTmeas_h4;
+		raw <<= 8;
+		raw |=  rx->Energy_125mWPerUnitXTmeas_mh8;
+		raw <<= 8;
+		raw |=  rx->Energy_125mWPerUnitXTmeas_ml8;
+		raw <<= 8;
+		raw |=  rx->Energy_125mWPerUnitXTmeas_l8;
+		*energy = 0.125 * raw; 						/* mW integrated every TmeasMs */
+		*energy *= 0.001;								/* convert from mW to W */
+		*energy *= rx->TmeasMs_likelywillbe20ms_;		/* multiplied by TmeasMs = joules */
+	}
+
+	return CTR_OKAY;
+}
+
 CTR_Code PDP::GetChannelCurrent(UINT8 idx, double &current)
 {
 	CTR_Code retval = CTR_InvalidParamValue;
