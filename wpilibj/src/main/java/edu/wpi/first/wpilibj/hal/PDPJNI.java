@@ -30,4 +30,6 @@ public class PDPJNI extends JNIWrapper {
   public static native void resetPDPTotalEnergy(int module);
 
   public static native void clearPDPStickyFaults(int module);
+
+  public static native void getAllPDPData(int module, PDPData data);
 }

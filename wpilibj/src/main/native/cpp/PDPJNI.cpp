@@ -155,4 +155,27 @@ Java_edu_wpi_first_wpilibj_hal_PDPJNI_clearPDPStickyFaults(
   CheckStatus(env, status, false);
 }
 
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_PDPJNI
+ * Method:    getAllPDPData
+ * Signature: (ILedu/wpi/first/wpilibj/hal/PDPData;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_PDPJNI_getAllPDPData(
+    JNIEnv * env, jclass, jint module, jobject data) {
+  double voltage;
+  double currents[16];
+  double temp;
+  double totalCurrent;
+  double power;
+  double energy;
+  int32_t status = 0;
+  HAL_GetAllPDPData(module, &voltage, currents, &temp, &totalCurrent,
+                    &power, &energy, &status);
+  CheckStatus(env, status, false);
+  SetPDPDataObject(env, data, voltage, currents, temp, totalCurrent,
+                   power, energy);
+}
+
+
 }  // extern "C"

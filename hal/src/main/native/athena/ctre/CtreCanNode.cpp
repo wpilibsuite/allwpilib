@@ -3,6 +3,7 @@
 #include "CtreCanNode.h"
 #include "FRC_NetworkCommunication/CANSessionMux.h"
 #include <string.h> // memset
+#include "HAL/cpp/fpga_clock.h"
 
 static const UINT32 kFullMessageIDMask = 0x1fffffff;
 
@@ -69,12 +70,11 @@ void CtreCanNode::UnregisterTx(uint32_t arbId)
 	}
 }
 static int64_t GetTimeMs() {
-	std::chrono::time_point < std::chrono::system_clock > now;
-	now = std::chrono::system_clock::now();
+	auto now = hal::fpga_clock::now();
 	auto duration = now.time_since_epoch();
 	auto millis = std::chrono::duration_cast < std::chrono::milliseconds
 					> (duration).count();
-	return (int64_t) millis;
+	return static_cast<int64_t>(millis);
 }
 CTR_Code CtreCanNode::GetRx(uint32_t arbId,uint8_t * dataBytes, uint32_t timeoutMs)
 {

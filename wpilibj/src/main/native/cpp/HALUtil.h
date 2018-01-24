@@ -66,6 +66,10 @@ void SetMatchInfoObject(JNIEnv* env, jobject matchStatus,
 void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
                                 int64_t value, int64_t count);
 
+void SetPDPDataObject(JNIEnv* env, jobject pdpData, double voltage,
+                      double* currents, double temp, double totalCurrent,
+                      double power, double energy);
+
 }  // namespace frc
 
 #endif  // HALUTIL_H

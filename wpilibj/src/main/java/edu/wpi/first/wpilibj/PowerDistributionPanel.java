@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.hal.PDPData;
 import edu.wpi.first.wpilibj.hal.PDPJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -111,11 +113,30 @@ public class PowerDistributionPanel extends SensorBase implements Sendable {
   @Override
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("PowerDistributionPanel");
-    for (int i = 0; i < kPDPChannels; ++i) {
-      final int chan = i;
-      builder.addDoubleProperty("Chan" + i, () -> getCurrent(chan), null);
+
+    NetworkTableEntry[] currents = new NetworkTableEntry[16];
+    NetworkTableEntry voltage = builder.getEntry("Voltage");
+    NetworkTableEntry totalCurrent = builder.getEntry("TotalCurrent");
+    NetworkTableEntry temperature = builder.getEntry("Temperature");
+    NetworkTableEntry power = builder.getEntry("TotalPower");
+    NetworkTableEntry energy = builder.getEntry("TotalEnergy");
+
+    for (int i = 0; i < 16; i++) {
+      currents[i] = builder.getEntry("Chan" + i);
     }
-    builder.addDoubleProperty("Voltage", this::getVoltage, null);
-    builder.addDoubleProperty("TotalCurrent", this::getTotalCurrent, null);
+
+    builder.setUpdateTable(() -> {
+      PDPData data = new PDPData();
+      PDPJNI.getAllPDPData(m_module, data);
+      voltage.setDouble(data.voltage);
+      totalCurrent.setDouble(data.totalCurrent);
+      temperature.setDouble(data.temperature);
+      power.setDouble(data.power);
+      energy.setDouble(data.energy);
+
+      for (int i = 0; i < 16; i++) {
+        currents[i].setDouble(data.currents[i]);
+      }
+    });
   }
 }
