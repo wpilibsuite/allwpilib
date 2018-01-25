@@ -230,11 +230,15 @@ public class CommandGroup extends Command {
         if (entry.isTimedOut()) {
           cmd._cancel();
         }
-        if (!cmd.run()) {
+        if (cmd.run()) {
+          break;
+        } else {
           cmd.removed();
           m_currentCommandIndex++;
+          firstRun = true;
+          cmd = null;
+          continue;
         }
-        break;
       }
 
       entry = (Entry) m_commands.elementAt(m_currentCommandIndex);
