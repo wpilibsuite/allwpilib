@@ -1,2 +1,0 @@
-OUTPUT_FORMAT(elf32-littlearm)
-GROUP ( libNiFpgaLv.so.16.0.0 )

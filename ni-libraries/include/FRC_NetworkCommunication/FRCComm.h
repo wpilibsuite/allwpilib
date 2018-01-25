@@ -142,6 +142,8 @@ extern "C" {
 
 	int EXPORT_FUNC FRC_NetworkCommunication_getControlWord(struct ControlWord_t *controlWord);
 	int EXPORT_FUNC FRC_NetworkCommunication_getAllianceStation(enum AllianceStationID_t *allianceStation);
+	int EXPORT_FUNC FRC_NetworkCommunication_getMatchInfo(char *eventName, enum MatchType_t *matchType, uint16_t *matchNumber, uint8_t *replayNumber,
+		uint8_t *gameSpecificMessage, uint16_t *gameSpecificMessageSize);
 	int EXPORT_FUNC FRC_NetworkCommunication_getMatchTime(float *matchTime);
 	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickAxes(uint8_t joystickNum, struct JoystickAxes_t *axes, uint8_t maxAxes);
 	int EXPORT_FUNC FRC_NetworkCommunication_getJoystickButtons(uint8_t joystickNum, uint32_t *buttons, uint8_t *count);

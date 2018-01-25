@@ -1,6 +1,131 @@
+import edu.wpi.first.nativeutils.NativeUtils
+import edu.wpi.first.nativeutils.tasks.JNIHeaders
+
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.5.1'
+    }
+}
+
 plugins {
-    id 'net.ltgt.errorprone' version '0.0.8'
-    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '1.6'
+    id 'net.ltgt.errorprone' version '0.0.10'
+    id 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin' version '2.0'
+    id 'idea'
+}
+
+ext.licenseFile = file("$rootDir/LICENSE.txt")
+
+ext.getJNIHeadersClass = {
+    return JNIHeaders
+}
+
+ext.getClassifier = { binary->
+    return NativeUtils.getClassifier(binary)
+}
+
+ext.getPlatformPath = { binary->
+    return NativeUtils.getPlatformPath(binary)
+}
+
+ext.createComponentZipTasks = { components, name, base, type, project, func ->
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && it.name == name) {
+            it.binaries.each {
+                def target = getClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
+                }
+            }
+        }
+    }
+    def taskList = []
+    def outputsFolder = file("$project.buildDir/outputs")
+    def baseN = base + name
+    configMap.each { key, value ->
+        def task = project.tasks.create(baseN + "-${key}", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDir =  outputsFolder
+            classifier = key
+            baseName = baseN + '-classifier'
+            duplicatesStrategy = 'exclude'
+
+            from(licenseFile) {
+                into '/'
+            }
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            task
+        }
+    }
+    return taskList
+}
+
+ext.createAllCombined = { list, name, base, type, project ->
+    def outputsFolder = file("$project.buildDir/outputs")
+    def baseN = base + name
+    def task = project.tasks.create(baseN + '-all', type) {
+        description = 'Creates component archive for all classifiers'
+        destinationDir = outputsFolder
+        classifier = 'all'
+        baseName = baseN + '-classifier'
+        duplicatesStrategy = 'exclude'
+
+        list.each {
+            it.outputs.files.each {
+                from project.zipTree(it)
+            }
+            dependsOn it
+        }
+    }
+
+    project.build.dependsOn task
+
+    project.artifacts {
+        task
+    }
+
+    return task
+
+}
+
+ext.includeStandardZipFormat = { task, value ->
+    value.each { binary->
+        if (binary.buildable) {
+            if (binary instanceof SharedLibraryBinarySpec) {
+                task.dependsOn binary.buildTask
+                task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                    into getPlatformPath(binary) + '/shared'
+                }
+                task.from (binary.sharedLibraryFile) {
+                    into getPlatformPath(binary) + '/shared'
+                }
+                task.from (binary.sharedLibraryLinkFile) {
+                    into getPlatformPath(binary) + '/shared'
+                }
+            } else if (binary instanceof StaticLibraryBinarySpec) {
+                task.dependsOn binary.buildTask
+                task.from (binary.staticLibraryFile) {
+                    into getPlatformPath(binary) + '/static'
+                }
+            }
+        }
+    }
 }
 
 // Ensure that the WPILibVersioningPlugin is setup by setting the release type, if releaseType wasn't
@@ -11,28 +136,38 @@ if (!hasProperty('releaseType')) {
     }
 }
 
-def enableSimulation = hasProperty('makeSim')
+def pubVersion
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
 
-ext.simulationInstallDir = "$rootDir/build/install/simulation"
+def outputsFolder = file("$buildDir/outputs")
 
-allprojects {
-    ext.enableSimulation = enableSimulation
+def versionFile = file("$outputsFolder/version.txt")
 
-    repositories {
-        mavenCentral()
+task outputVersions() {
+    description = 'Prints the versions of wpilib to a file for use by the downstream packaging project'
+    group = 'Build'
+    outputs.files(versionFile)
+
+    doFirst {
+        buildDir.mkdir()
+        outputsFolder.mkdir()
     }
 
-    ext.ntcoreDep = { lang, classifier, extension = null ->
-        return "edu.wpi.first.wpilib.networktables.$lang:NetworkTables:+:$classifier${extension == null ? '' : '@' + extension}"
+    doLast {
+        versionFile.write pubVersion
     }
+}
 
-    ext.cscoreDep = { lang, classifier, extension = null ->
-        return "edu.wpi.cscore.$lang:cscore:+:$classifier${extension == null ? '' : '@' + extension}"
-    }
+task build() {}
 
-    ext.wpiUtilDep = { classifier ->
-        return "edu.wpi.first.wpilib:wpiutil:+:$classifier@zip"
-    }
+build.dependsOn outputVersions
+
+task clean(type: Delete) {
+    delete buildDir
 }
 
 subprojects {
@@ -40,12 +175,14 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'checkstyle'
 
-    checkstyle {
-        toolVersion = "6.18"
-        configFile = new File(rootDir, "styleguide/checkstyle.xml")
+    repositories {
+        mavenCentral()
     }
 
-    ext.armBuild = true
+    checkstyle {
+        toolVersion = "8.1"
+        configFile = new File(rootDir, "styleguide/checkstyle.xml")
+    }
 
     // Disables doclint in java 8.
     if (JavaVersion.current().isJava8Compatible()) {
@@ -60,10 +197,6 @@ subprojects {
     }
 }
 
-apply from: 'cppSettings.gradle'
-
-apply from: 'ni-libraries/ni-libraries.gradle'
-
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.3'
+    gradleVersion = '4.1'
 }

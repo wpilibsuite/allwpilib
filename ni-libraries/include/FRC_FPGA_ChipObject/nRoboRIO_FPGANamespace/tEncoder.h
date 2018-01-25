@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2017_17_0_2_Encoder_h__
-#define __nFRC_2017_17_0_2_Encoder_h__
+#ifndef __nFRC_2018_18_0_8_Encoder_h__
+#define __nFRC_2018_18_0_8_Encoder_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2017_17_0_2
+namespace nFRC_2018_18_0_8
 {
 
 class tEncoder
@@ -197,4 +197,4 @@ private:
 }
 }
 
-#endif // __nFRC_2017_17_0_2_Encoder_h__
+#endif // __nFRC_2018_18_0_8_Encoder_h__

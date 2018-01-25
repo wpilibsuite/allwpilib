@@ -1,51 +1,125 @@
-apply plugin: 'cpp'
+import org.gradle.language.base.internal.ProjectLayout
 
-defineNetworkTablesProperties()
-defineWpiUtilProperties()
-defineCsCoreProperties()
+if (!project.hasProperty('skipAthena')) {
+    apply plugin: 'cpp'
+    apply plugin: 'visual-studio'
+    apply plugin: 'edu.wpi.first.NativeUtils'
 
-ext.shared = "${project(':wpilibc').projectDir.getAbsolutePath()}/shared"
-ext.athena = "${project(':wpilibc').projectDir.getAbsolutePath()}/athena"
-ext.hal = project(':hal').projectDir.getAbsolutePath()
+    apply from: '../config.gradle'
 
-model {
-    components {
-        FRCUserProgram(NativeExecutableSpec) {
-            targetPlatform 'roborio-arm'
-            binaries.all {
-                tasks.withType(CppCompile) {
-                    cppCompiler.args "-DNAMESPACED_WPILIB"
-                    addNiLibraryLinks(linker, targetPlatform)
-                    addNetworkTablesLibraryLinks(it, linker, targetPlatform)
-                    addCsCoreLibraryLinks(it, linker, targetPlatform)
-                }
-
-                cppCompiler.args '-pthread', '-Wno-unused-variable'
-                linker.args '-pthread', '-Wno-unused-variable', '-Wl,-rpath,/opt/GenICam_v3_0_NI/bin/Linux32_ARM'
+    model {
+        dependencyConfigs {
+            wpiutil(DependencyConfig) {
+                groupId = 'edu.wpi.first.wpiutil'
+                artifactId = 'wpiutil-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '3.+'
+                sharedConfigs = [ wpilibcIntegrationTests: [] ]
             }
-            sources {
-                cpp {
-                    def dir = 'wpilibC++IntegrationTests'
-                    source {
-                        srcDir 'src'
-                        include '**/*.cpp'
-                    }
-                    source {
-                        srcDir 'gtest/src'
-                        include 'gtest-all.cc', 'gtest_main.cc'
-                    }
-                    exportedHeaders {
-                        srcDirs = ['include', 'gtest', 'gtest/include',
-                                   "${project.athena}/include", "${project.shared}/include",
-                                   "${project.hal}/include/HAL", netTablesInclude, wpiUtilInclude, csCoreInclude]
-                        include '**/*.h'
-                    }
+            ntcore(DependencyConfig) {
+                groupId = 'edu.wpi.first.ntcore'
+                artifactId = 'ntcore-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '4.+'
+                sharedConfigs = [ wpilibcIntegrationTests: [] ]
+            }
+            opencv(DependencyConfig) {
+                groupId = 'org.opencv'
+                artifactId = 'opencv-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '3.2.0'
+                sharedConfigs = [ wpilibcIntegrationTests: [] ]
+            }
+            cscore(DependencyConfig) {
+                groupId = 'edu.wpi.first.cscore'
+                artifactId = 'cscore-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '1.+'
+                sharedConfigs = [ wpilibcIntegrationTests: [] ]
+            }
+        }
+    }
 
-                    lib project: ':wpilibc', library: 'wpilibc', linkage: 'shared'
-                    lib project: ':hal', library: 'HALAthena', linkage: 'shared'
+    model {
+        components {
+            wpilibcIntegrationTests(NativeExecutableSpec) {
+                baseName = 'FRCUserProgram'
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ["${rootDir}/gmock/gtest/src", 'src/FRCUserProgram/cpp']
+                            includes = ['*-all.cc', '*_main.cc', '**/*.cpp']
+                        }
+                        exportedHeaders {
+                            srcDirs = ["${rootDir}/gmock/gtest/include", "${rootDir}/gmock/gtest", 'src/FRCUserProgram/headers']
+                            includes = ['**/*.h', '**/*.cc']
+                        }
+                    }
+                }
+                binaries.all { binary->
+                    if (binary.targetPlatform.architecture.name == 'athena') {
+                        binary.tasks.withType(CppCompile) {
+                            cppCompiler.args "-Wno-missing-field-initializers"
+                            cppCompiler.args "-Wno-unused-variable"
+                            cppCompiler.args "-Wno-error=deprecated-declarations"
+                        }
+                        project(':ni-libraries').addNiLibrariesToLinker(binary)
+                        project(':hal').addHalToLinker(binary)
+                        project(':wpilibc').addWpilibCCompilerArguments(binary)
+                        project(':wpilibc').addWpilibCToLinker(binary)
+                    } else {
+                        binary.buildable = false
+                    }
                 }
             }
         }
+    }
+}
 
+def testOutputFolder = file("${project(':').buildDir}/integrationTestFiles")
+
+
+model {
+    tasks {
+        copyWpilibCTestLibrariesToOutput(Task) {
+            $.binaries.each {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
+                    def spec = it
+                    dependsOn spec.buildTask
+                }
+            }
+            outputs.file testOutputFolder
+            outputs.upToDateWhen { false }
+
+            def bin = $.binaries
+            doLast {
+                bin.each {
+                    if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
+                        def spec = it
+                        spec.libs.each {
+                            it.runtimeFiles.each { f ->
+                                copy {
+                                    from file(f)
+                                    into testOutputFolder.toString() + '/libs'
+                                }
+                            }
+                        }
+                        copy {
+                            from spec.executable.file
+                            into testOutputFolder.toString() + '/cpp'
+                        }
+                    }
+                }
+            }
+        }
+        // This is in a separate if statement because of what I would assume is a bug in grade.
+        // Will file an issue on their side.
+        if (!project.hasProperty('skipAthena')) {
+            build.dependsOn copyWpilibCTestLibrariesToOutput
+        }
     }
 }

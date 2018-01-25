@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -43,9 +44,7 @@ public class TestSuite extends AbstractTestSuite {
     // Sets up the logging output
     final InputStream inputStream = TestSuite.class.getResourceAsStream("/logging.properties");
     try {
-      if (inputStream == null) {
-        throw new NullPointerException("./logging.properties was not loaded");
-      }
+      Objects.requireNonNull(inputStream, "./logging.properties was not loaded");
       LogManager.getLogManager().readConfiguration(inputStream);
       Logger.getAnonymousLogger().info("Loaded");
     } catch (final IOException | NullPointerException ex) {
@@ -154,7 +153,7 @@ public class TestSuite extends AbstractTestSuite {
 
   /**
    * Parses the arguments passed at runtime and runs the appropriate tests based upon these
-   * arguments
+   * arguments.
    *
    * @param args the args passed into the program at runtime
    * @return the restults of the tests that have run. If no tests were run then null is returned.

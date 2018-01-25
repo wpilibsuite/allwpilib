@@ -1,5 +1,0 @@
-plugins/
-build/
-docs/
-# don't commit the generated protobuff files
-msgs/src/msgs

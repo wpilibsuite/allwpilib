@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2017_17_0_2_Accel_h__
-#define __nFRC_2017_17_0_2_Accel_h__
+#ifndef __nFRC_2018_18_0_8_Accel_h__
+#define __nFRC_2018_18_0_8_Accel_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2017_17_0_2
+namespace nFRC_2018_18_0_8
 {
 
 class tAccel
@@ -38,18 +38,18 @@ public:
 
    typedef enum
    {
-   } tCNTR_IfaceConstants;
-
-   virtual void writeCNTR(unsigned char value, tRioStatusCode *status) = 0;
-   virtual unsigned char readCNTR(tRioStatusCode *status) = 0;
-
-
-   typedef enum
-   {
    } tDATO_IfaceConstants;
 
    virtual void writeDATO(unsigned char value, tRioStatusCode *status) = 0;
    virtual unsigned char readDATO(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tCNTR_IfaceConstants;
+
+   virtual void writeCNTR(unsigned char value, tRioStatusCode *status) = 0;
+   virtual unsigned char readCNTR(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -100,4 +100,4 @@ private:
 }
 }
 
-#endif // __nFRC_2017_17_0_2_Accel_h__
+#endif // __nFRC_2018_18_0_8_Accel_h__

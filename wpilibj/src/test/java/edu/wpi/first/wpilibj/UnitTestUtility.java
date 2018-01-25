@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016-2017. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -11,6 +11,7 @@ import com.google.common.base.Stopwatch;
 
 import java.util.concurrent.TimeUnit;
 
+import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.util.BaseSystemNotInitializedException;
 
 /**
@@ -25,6 +26,7 @@ public final class UnitTestUtility {
    * Sets up the base system WPILib so that it does not rely on hardware.
    */
   public static void setupMockBase() {
+    HAL.initialize(500, 0);
     try {
       // Check to see if this has been setup
       Timer.getFPGATimestamp();

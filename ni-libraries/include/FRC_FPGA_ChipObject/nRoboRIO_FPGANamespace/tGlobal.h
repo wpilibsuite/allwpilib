@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2017_17_0_2_Global_h__
-#define __nFRC_2017_17_0_2_Global_h__
+#ifndef __nFRC_2018_18_0_8_Global_h__
+#define __nFRC_2018_18_0_8_Global_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2017_17_0_2
+namespace nFRC_2018_18_0_8
 {
 
 class tGlobal
@@ -62,6 +62,13 @@ public:
 
    typedef enum
    {
+   } tLocalTimeUpper_IfaceConstants;
+
+   virtual unsigned int readLocalTimeUpper(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
    } tVersion_IfaceConstants;
 
    virtual unsigned short readVersion(tRioStatusCode *status) = 0;
@@ -98,4 +105,4 @@ private:
 }
 }
 
-#endif // __nFRC_2017_17_0_2_Global_h__
+#endif // __nFRC_2018_18_0_8_Global_h__

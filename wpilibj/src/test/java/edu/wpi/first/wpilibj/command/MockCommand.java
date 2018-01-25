@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016-2017. All Rights Reserved.                        */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -8,7 +8,7 @@
 package edu.wpi.first.wpilibj.command;
 
 /**
- * A class to simulate a simple command The command keeps track of how many times each method was
+ * A class to simulate a simple command. The command keeps track of how many times each method was
  * called.
  */
 public class MockCommand extends Command {
@@ -18,6 +18,15 @@ public class MockCommand extends Command {
   private boolean m_hasFinished = false;
   private int m_endCount = 0;
   private int m_interruptedCount = 0;
+
+  public MockCommand(Subsystem subsys) {
+    super();
+    requires(subsys);
+  }
+
+  public MockCommand() {
+    super();
+  }
 
   protected void initialize() {
     ++m_initializeCount;
@@ -70,6 +79,8 @@ public class MockCommand extends Command {
   }
 
   /**
+   * Get what value the isFinished method will return.
+   *
    * @return what value the isFinished method will return.
    */
   public boolean isHasFinished() {
@@ -77,6 +88,8 @@ public class MockCommand extends Command {
   }
 
   /**
+   * Set what value the isFinished method will return.
+   *
    * @param hasFinished set what value the isFinished method will return.
    */
   public void setHasFinished(boolean hasFinished) {
@@ -109,6 +122,18 @@ public class MockCommand extends Command {
    */
   public boolean hasInterrupted() {
     return getInterruptedCount() > 0;
+  }
+
+  /**
+   * Reset internal counters.
+   */
+  public void resetCounters() {
+    m_initializeCount = 0;
+    m_executeCount = 0;
+    m_isFinishedCount = 0;
+    m_hasFinished = false;
+    m_endCount = 0;
+    m_interruptedCount = 0;
   }
 
 }

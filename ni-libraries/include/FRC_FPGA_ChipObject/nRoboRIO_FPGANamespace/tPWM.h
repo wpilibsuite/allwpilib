@@ -1,15 +1,15 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __nFRC_2017_17_0_2_PWM_h__
-#define __nFRC_2017_17_0_2_PWM_h__
+#ifndef __nFRC_2018_18_0_8_PWM_h__
+#define __nFRC_2018_18_0_8_PWM_h__
 
 #include "../tSystem.h"
 #include "../tSystemInterface.h"
 
 namespace nFPGA
 {
-namespace nFRC_2017_17_0_2
+namespace nFRC_2018_18_0_8
 {
 
 class tPWM
@@ -46,6 +46,13 @@ public:
 
    typedef enum
    {
+   } tCycleStartTime_IfaceConstants;
+
+   virtual unsigned int readCycleStartTime(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
    } tConfig_IfaceConstants;
 
    virtual void writeConfig(tConfig value, tRioStatusCode *status) = 0;
@@ -54,6 +61,13 @@ public:
    virtual tConfig readConfig(tRioStatusCode *status) = 0;
    virtual unsigned short readConfig_Period(tRioStatusCode *status) = 0;
    virtual unsigned short readConfig_MinHigh(tRioStatusCode *status) = 0;
+
+
+   typedef enum
+   {
+   } tCycleStartTimeUpper_IfaceConstants;
+
+   virtual unsigned int readCycleStartTimeUpper(tRioStatusCode *status) = 0;
 
 
    typedef enum
@@ -118,4 +132,4 @@ private:
 }
 }
 
-#endif // __nFRC_2017_17_0_2_PWM_h__
+#endif // __nFRC_2018_18_0_8_PWM_h__

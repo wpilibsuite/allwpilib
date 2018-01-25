@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -28,13 +28,13 @@ public class DriverStationTest extends AbstractComsSetup {
 
   @Test
   public void waitForDataTest() {
-    long startTime = Utility.getFPGATime();
+    long startTime = RobotController.getFPGATime();
 
     // Wait for data 50 times
     for (int i = 0; i < 50; i++) {
       DriverStation.getInstance().waitForData();
     }
-    long endTime = Utility.getFPGATime();
+    long endTime = RobotController.getFPGATime();
     long difference = endTime - startTime;
 
     assertEquals("DriverStation waitForData did not wait long enough", TIMER_RUNTIME, difference,

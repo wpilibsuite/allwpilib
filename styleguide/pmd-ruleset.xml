@@ -25,4 +25,37 @@
             <property name="checkAll" value="true"/>
         </properties>
     </rule>
+
+    <!-- Custom Rules -->
+
+    <rule name="UseRequireNonNull"
+          message="Use Objects.requireNonNull() instead of throwing a NullPointerException yourself."
+          language="java"
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+           Use Objects.requireNonNull() instead of throwing a NullPointerException yourself.
+        </description>
+        <properties>
+            <property name="xpath">
+                <value>
+                    <![CDATA[
+                        //IfStatement[child::Expression//NullLiteral]/Statement//ThrowStatement/Expression/PrimaryExpression/PrimaryPrefix/AllocationExpression/ClassOrInterfaceType[@Image='NullPointerException']
+                    ]]>
+                </value>
+            </property>
+        </properties>
+        <priority>3</priority>
+        <example>
+            <![CDATA[
+                public class Example {
+	                public Example(Object example) {
+		                if (example == null) {
+			                throw new NullPointerException();
+		                }
+	                }
+                }
+            ]]>
+        </example>
+    </rule>
+
 </ruleset>

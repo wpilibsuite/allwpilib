@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj.fixtures.TiltPanCameraFixture;
  * TestBench}.
  */
 public final class TestBench {
-
   /**
    * The time that it takes to have a motor go from rotating at full speed to completely stopped.
    */
@@ -343,7 +342,7 @@ public final class TestBench {
         false));
     encoderPortPairs.addAll(getPairArray(getDIOCrossConnect().get(1), getDIOCrossConnect().get(0),
         false));
-    assert (encoderPortPairs.size() == 8);
+    assert encoderPortPairs.size() == 8;
     return encoderPortPairs;
   }
 
@@ -387,8 +386,9 @@ public final class TestBench {
   public FilterOutputFixture<LinearDigitalFilter> getSinglePoleIIROutputFixture() {
     return new FilterOutputFixture<LinearDigitalFilter>(kSinglePoleIIRExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.singlePoleIIR(source,
+      protected LinearDigitalFilter giveFilter() {
+        m_data = new DataWrapper(getData);
+        return LinearDigitalFilter.singlePoleIIR(m_data,
             kSinglePoleIIRTimeConstant,
             kFilterStep);
       }
@@ -403,8 +403,9 @@ public final class TestBench {
   public FilterOutputFixture<LinearDigitalFilter> getHighPassOutputFixture() {
     return new FilterOutputFixture<LinearDigitalFilter>(kHighPassExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.highPass(source, kHighPassTimeConstant,
+      protected LinearDigitalFilter giveFilter() {
+        m_data = new DataWrapper(getData);
+        return LinearDigitalFilter.highPass(m_data, kHighPassTimeConstant,
             kFilterStep);
       }
     };
@@ -419,8 +420,25 @@ public final class TestBench {
   public FilterOutputFixture<LinearDigitalFilter> getMovAvgOutputFixture() {
     return new FilterOutputFixture<LinearDigitalFilter>(kMovAvgExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.movingAverage(source, kMovAvgTaps);
+      protected LinearDigitalFilter giveFilter() {
+        m_data = new DataWrapper(getData);
+        return LinearDigitalFilter.movingAverage(m_data, kMovAvgTaps);
+      }
+    };
+  }
+
+  /**
+   * Constructs a new set of objects representing a moving average filter with a repeatable data
+   * source using a linear digital filter.
+   *
+   * @return a moving average filter with a repeatable data source
+   */
+  public FilterOutputFixture<LinearDigitalFilter> getPulseFixture() {
+    return new FilterOutputFixture<LinearDigitalFilter>(0.0) {
+      @Override
+      protected LinearDigitalFilter giveFilter() {
+        m_data = new DataWrapper(getPulseData);
+        return LinearDigitalFilter.movingAverage(m_data, kMovAvgTaps);
       }
     };
   }

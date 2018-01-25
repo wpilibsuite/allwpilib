@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
 import edu.wpi.first.wpilibj.fixtures.MotorEncoderFixture;
 import edu.wpi.first.wpilibj.test.AbstractComsSetup;
 import edu.wpi.first.wpilibj.test.TestBench;
@@ -44,7 +45,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
   }
 
   /**
-   * Constructs the test
+   * Constructs the test.
    *
    * @param mef The fixture under test.
    */
@@ -185,8 +186,8 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pid.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The average error was: " + pid
-            .getAvgError() + "The current error was" + pid.getError(), pid.onTarget());
+        "PID loop did not reach setpoint within 10 seconds. The current error was" + pid
+            .getError(), pid.onTarget());
 
     pid.free();
   }
@@ -194,10 +195,10 @@ public class MotorEncoderTest extends AbstractComsSetup {
   @Test
   public void testVelocityPIDController() {
     me.getEncoder().setPIDSourceType(PIDSourceType.kRate);
+    LinearDigitalFilter filter = LinearDigitalFilter.movingAverage(me.getEncoder(), 50);
     PIDController pid =
-        new PIDController(1e-5, 0.0, 3e-5, 8e-5, me.getEncoder(), me.getMotor());
+        new PIDController(1e-5, 0.0, 3e-5, 8e-5, filter, me.getMotor());
     pid.setAbsoluteTolerance(200);
-    pid.setToleranceBuffer(50);
     pid.setOutputRange(-0.3, 0.3);
     pid.setSetpoint(600);
 
@@ -206,7 +207,7 @@ public class MotorEncoderTest extends AbstractComsSetup {
     pid.disable();
 
     assertTrue(
-        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getAvgError(),
+        "PID loop did not reach setpoint within 10 seconds. The error was: " + pid.getError(),
         pid.onTarget());
 
     pid.free();

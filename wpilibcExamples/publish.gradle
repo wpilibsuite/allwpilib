@@ -1,0 +1,74 @@
+apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+def pubVersion
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+def baseExamplesArtifactId = 'examples'
+def baseTemplatesArtifactId = 'templates'
+def artifactGroupId = 'edu.wpi.first.wpilibc'
+
+def outputsFolder = file("$project.buildDir/outputs")
+
+task cppExamplesZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = 'wpilibc-examples'
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/cpp/examples') {
+        into 'examples'
+    }
+
+    from ('examples.xml') {
+        into 'examples'
+    }
+}
+
+task cppTemplatesZip(type: Zip) {
+    destinationDir = outputsFolder
+    baseName = 'wpilibc-templates'
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/cpp/templates') {
+        into 'templates'
+    }
+}
+
+build.dependsOn cppTemplatesZip
+build.dependsOn cppExamplesZip
+
+publishing {
+    publications {
+        examples(MavenPublication) {
+            artifact cppExamplesZip
+
+            artifactId = baseExamplesArtifactId
+            groupId artifactGroupId
+            version pubVersion
+        }
+
+        templates(MavenPublication) {
+            artifact cppTemplatesZip
+
+            artifactId = baseTemplatesArtifactId
+            groupId artifactGroupId
+            version pubVersion
+        }
+    }
+}

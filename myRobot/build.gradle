@@ -1,92 +1,101 @@
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
+import org.gradle.language.base.internal.ProjectLayout
 
-evaluationDependsOn(':wpilibj')
-
-mainClassName = 'edu.wpi.first.wpilibj.RobotBase'
-
-buildscript {
-    repositories { jcenter() }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
-    }
+repositories {
+    mavenCentral()
 }
 
-def wpilibj = project(':wpilibj')
+apply plugin: 'cpp'
+apply plugin: 'java'
+apply plugin: 'visual-studio'
+apply plugin: 'edu.wpi.first.NativeUtils'
+
+apply from: '../config.gradle'
 
 dependencies {
-    compile wpilibj
-    compile files(wpilibj.sourceSets.test.output.classesDir)
-    compile ntcoreDep('java', 'arm')
-    compile cscoreDep('java', 'arm')
-    compile 'org.opencv:opencv-java:+'
+    compile project(':wpilibj')
+    compile 'edu.wpi.first.wpiutil:wpiutil-java:+'
+    compile 'edu.wpi.first.ntcore:ntcore-java:+'
 }
 
-def nativeDirectory = "$buildDir/output"
-
-clean {
-    delete nativeDirectory
-}
-
-task copyRobotLibraries(type: Copy) {
-    description = 'Copies all native libraries to an easy to find folder'
-    group = 'WPILib'
-    destinationDir = file(nativeDirectory)
-    dependsOn shadowJar
-    dependsOn ':hal:build'
-    dependsOn ':wpilibj:build'
-
-    from (shadowJar) {
-        into '/'
+model {
+    dependencyConfigs {
+        wpiutil(DependencyConfig) {
+            groupId = 'edu.wpi.first.wpiutil'
+            artifactId = 'wpiutil-cpp'
+            headerClassifier = 'headers'
+            ext = 'zip'
+            version = '+'
+            sharedConfigs = [ FRCUserProgram: [] ]
+        }
+        ntcore(DependencyConfig) {
+            groupId = 'edu.wpi.first.ntcore'
+            artifactId = 'ntcore-cpp'
+            headerClassifier = 'headers'
+            ext = 'zip'
+            version = '+'
+            sharedConfigs = [ FRCUserProgram: [] ]
+        }
+        cscore(DependencyConfig) {
+            groupId = 'edu.wpi.first.cscore'
+            artifactId = 'cscore-cpp'
+            headerClassifier = 'headers'
+            ext = 'zip'
+            version = '+'
+            sharedConfigs = [ FRCUserProgram: [] ]
+        }
+        opencv(DependencyConfig) {
+            groupId = 'org.opencv'
+            artifactId = 'opencv-cpp'
+            headerClassifier = 'headers'
+            ext = 'zip'
+            version = '3.2.0'
+            sharedConfigs = [ FRCUserProgram: [] ]
+        }
     }
-
-    project(':wpilibj').model {
-        binaries {
-            withType(SharedLibraryBinarySpec) { spec ->
-                from(spec.sharedLibraryFile) {
-                    into '/'
+    components {
+        FRCUserProgram(NativeExecutableSpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/main/native/cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['src/main/native/headers']
+                    }
+                }
+            }
+            binaries.all { binary->
+                project(':ni-libraries').addNiLibrariesToLinker(binary)
+                project(':hal').addHalToLinker(binary)
+                project(':wpilibc').addWpilibCCompilerArguments(binary)
+                project(':wpilibc').addWpilibCToLinker(binary)
+            }
+        }
+    }
+    tasks {
+        runCpp(Exec) {
+            def found = false
+            $.components.each {
+                if (it in NativeExecutableSpec && it.name == 'FRCUserProgram') {
+                    it.binaries.each {
+                        if (!found) {
+                            def arch = it.targetPlatform.architecture.name
+                            if (arch == 'x86-64' || arch == 'x86') {
+                                dependsOn it.tasks.install
+                                commandLine it.tasks.install.runScript
+                                found = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        installAthena(Task) {
+            $.binaries.each {
+                if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
+                    dependsOn it.tasks.install
                 }
             }
         }
     }
-
-    project(':hal').model {
-        binaries {
-            withType(SharedLibraryBinarySpec) { spec ->
-                from(spec.sharedLibraryFile) {
-                    into '/'
-                }
-            }
-        }
-    }
-
-    defineNetworkTablesProperties()
-    defineWpiUtilProperties()
-    defineCsCoreProperties()
-
-    from (file(netSharedLib)) {
-        into '/'
-    }
-
-    from (file(wpiUtilSharedLib)) {
-        into '/'
-    }
-
-    from (file(csLibArmLocation).path) {
-        include '**/*so.3.1'
-        include '**/libcscore.so'
-        include '**/libopencv_java310.so'
-        into '/'
-    }
-
 }
-
-
-build.dependsOn copyRobotLibraries
-
-jar {
-    manifest { attributes 'Robot-Class': 'MyRobot' }
-}
-
-jar.dependsOn ':wpilibj:build'

@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -29,11 +29,11 @@ public class TimerTest extends AbstractComsSetup {
   @Test
   public void delayTest() {
     // Given
-    long startTime = Utility.getFPGATime();
+    long startTime = RobotController.getFPGATime();
 
     // When
     Timer.delay(TIMER_RUNTIME / 1000000);
-    long endTime = Utility.getFPGATime();
+    long endTime = RobotController.getFPGATime();
     long difference = endTime - startTime;
 
     // Then

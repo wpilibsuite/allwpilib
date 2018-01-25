@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2008-2017. All Rights Reserved.                        */
+/* Copyright (c) 2008-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.DigitalOutput;
  * Connects a digital input to a digital output.
  */
 public class DIOCrossConnectFixture implements ITestFixture {
-
   private static final Logger logger = Logger.getLogger(DIOCrossConnectFixture.class.getName());
 
   private final DigitalInput m_input;
