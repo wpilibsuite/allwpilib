@@ -43,9 +43,14 @@ void TimedRobot::SetPeriod(double period) {
   m_period = period;
 
   if (m_startLoop) {
-    m_loop->StartPeriodic(m_period);
+    m_loop->StartPeriodic(period);
   }
 }
+
+/**
+ * Get time period between calls to Periodic() functions.
+ */
+double TimedRobot::GetPeriod() const { return m_period; }
 
 TimedRobot::TimedRobot() {
   m_loop = std::make_unique<Notifier>(&TimedRobot::LoopFunc, this);

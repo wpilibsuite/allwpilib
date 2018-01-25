@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.hal.HAL;
 public class TimedRobot extends IterativeRobotBase {
   public static final double DEFAULT_PERIOD = 0.02;
 
-  private double m_period = DEFAULT_PERIOD;
+  private volatile double m_period = DEFAULT_PERIOD;
 
   // Prevents loop from starting if user calls setPeriod() in robotInit()
   private boolean m_startLoop = false;
@@ -67,5 +67,12 @@ public class TimedRobot extends IterativeRobotBase {
     if (m_startLoop) {
       m_loop.startPeriodic(m_period);
     }
+  }
+
+  /**
+   * Get time period between calls to Periodic() functions.
+   */
+  public double getPeriod() {
+    return m_period;
   }
 }
