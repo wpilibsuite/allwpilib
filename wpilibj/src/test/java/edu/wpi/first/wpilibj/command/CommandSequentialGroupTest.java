@@ -73,7 +73,8 @@ public class CommandSequentialGroupTest extends AbstractCommandTest {
     Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
     assertCommandState(command2, 0, 0, 0, 0, 0);
-    assertCommandState(command3, 0, 0, 0, 0, 0);    Scheduler.getInstance().run();
+    assertCommandState(command3, 0, 0, 0, 0, 0);
+    Scheduler.getInstance().run();
     assertCommandState(command1, 1, 1, 1, 0, 1);
     assertCommandState(command2, 1, 1, 1, 0, 0);
     assertCommandState(command3, 0, 0, 0, 0, 0);
