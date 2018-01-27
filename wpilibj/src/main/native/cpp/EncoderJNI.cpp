@@ -36,7 +36,7 @@ extern "C" {
 JNIEXPORT jint JNICALL
 Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEncoder(
     JNIEnv* env, jclass, jint digitalSourceHandleA, jint analogTriggerTypeA,
-    jint digitalSourceHandleB, jint analogTriggerTypeB, jboolean reverseDirection, 
+    jint digitalSourceHandleB, jint analogTriggerTypeB, jboolean reverseDirection,
     jint encodingType) {
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI initializeEncoder";
   ENCODERJNI_LOG(logDEBUG) << "Source Handle A = " << digitalSourceHandleA;
@@ -49,10 +49,10 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_initializeEncoder(
   ENCODERJNI_LOG(logDEBUG) << "EncodingType = " << encodingType;
   int32_t status = 0;
   auto encoder = HAL_InitializeEncoder(
-      (HAL_Handle)digitalSourceHandleA, (HAL_AnalogTriggerType)analogTriggerTypeA, 
+      (HAL_Handle)digitalSourceHandleA, (HAL_AnalogTriggerType)analogTriggerTypeA,
       (HAL_Handle)digitalSourceHandleB, (HAL_AnalogTriggerType)analogTriggerTypeB,
       reverseDirection, (HAL_EncoderEncodingType)encodingType, &status);
-      
+
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "ENCODER Handle = " << encoder;
   CheckStatusForceThrow(env, status);
@@ -340,7 +340,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderSamplesToAverage(
  */
 JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderIndexSource(
-    JNIEnv* env, jclass, jint id, jint digitalSourceHandle, 
+    JNIEnv* env, jclass, jint id, jint digitalSourceHandle,
     jint analogTriggerType, jint type) {
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI setEncoderIndexSource";
   ENCODERJNI_LOG(logDEBUG) << "Encoder Handle = " << (HAL_EncoderHandle)id;
@@ -349,8 +349,8 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_setEncoderIndexSource(
                            << analogTriggerType;
   ENCODERJNI_LOG(logDEBUG) << "IndexingType = " << type;
   int32_t status = 0;
-  HAL_SetEncoderIndexSource((HAL_EncoderHandle)id, (HAL_Handle)digitalSourceHandle, 
-                            (HAL_AnalogTriggerType)analogTriggerType, 
+  HAL_SetEncoderIndexSource((HAL_EncoderHandle)id, (HAL_Handle)digitalSourceHandle,
+                            (HAL_AnalogTriggerType)analogTriggerType,
                             (HAL_EncoderIndexingType)type, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -405,7 +405,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDecodingScaleFactor(
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderSamplesToAverage";
   ENCODERJNI_LOG(logDEBUG) << "Encoder Handle = " << (HAL_EncoderHandle)id;
   int32_t status = 0;
-  jint returnValue = HAL_GetEncoderDecodingScaleFactor((HAL_EncoderHandle)id, &status);
+  jdouble returnValue = HAL_GetEncoderDecodingScaleFactor((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = "
                            << returnValue;
@@ -424,7 +424,7 @@ Java_edu_wpi_first_wpilibj_hal_EncoderJNI_getEncoderDistancePerPulse(
   ENCODERJNI_LOG(logDEBUG) << "Calling ENCODERJNI getEncoderSamplesToAverage";
   ENCODERJNI_LOG(logDEBUG) << "Encoder Handle = " << (HAL_EncoderHandle)id;
   int32_t status = 0;
-  jint returnValue = HAL_GetEncoderDistancePerPulse((HAL_EncoderHandle)id, &status);
+  jdouble returnValue = HAL_GetEncoderDistancePerPulse((HAL_EncoderHandle)id, &status);
   ENCODERJNI_LOG(logDEBUG) << "Status = " << status;
   ENCODERJNI_LOG(logDEBUG) << "getEncoderSamplesToAverageResult = "
                            << returnValue;
