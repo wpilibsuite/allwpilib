@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <memory>
 
 #include "IterativeRobotBase.h"
@@ -30,13 +31,14 @@ class TimedRobot : public IterativeRobotBase {
   void StartCompetition() override;
 
   void SetPeriod(double seconds);
+  double GetPeriod() const;
 
  protected:
   TimedRobot();
   virtual ~TimedRobot();
 
  private:
-  double m_period = kDefaultPeriod;
+  std::atomic<double> m_period{kDefaultPeriod};
 
   // Prevents loop from starting if user calls SetPeriod() in RobotInit()
   bool m_startLoop = false;
