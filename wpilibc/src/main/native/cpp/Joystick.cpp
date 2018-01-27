@@ -131,7 +131,7 @@ int Joystick::GetThrottleChannel() const { return m_axes[Axis::kThrottle]; }
  *             here to complete the GenericHID interface.
  */
 double Joystick::GetX(JoystickHand hand) const {
-  return GetRawAxis(m_axes[kDefaultXAxis]);
+  return GetRawAxis(m_axes[Axis::kX]);
 }
 
 /**
@@ -143,7 +143,7 @@ double Joystick::GetX(JoystickHand hand) const {
  *             here to complete the GenericHID interface.
  */
 double Joystick::GetY(JoystickHand hand) const {
-  return GetRawAxis(m_axes[kDefaultYAxis]);
+  return GetRawAxis(m_axes[Axis::kY]);
 }
 
 /**
@@ -151,16 +151,14 @@ double Joystick::GetY(JoystickHand hand) const {
  *
  * This depends on the mapping of the joystick connected to the current port.
  */
-double Joystick::GetZ() const { return GetRawAxis(m_axes[kDefaultZAxis]); }
+double Joystick::GetZ() const { return GetRawAxis(m_axes[Axis::kZ]); }
 
 /**
  * Get the twist value of the current joystick.
  *
  * This depends on the mapping of the joystick connected to the current port.
  */
-double Joystick::GetTwist() const {
-  return GetRawAxis(m_axes[kDefaultTwistAxis]);
-}
+double Joystick::GetTwist() const { return GetRawAxis(m_axes[Axis::kTwist]); }
 
 /**
  * Get the throttle value of the current joystick.
@@ -168,7 +166,7 @@ double Joystick::GetTwist() const {
  * This depends on the mapping of the joystick connected to the current port.
  */
 double Joystick::GetThrottle() const {
-  return GetRawAxis(m_axes[kDefaultThrottleAxis]);
+  return GetRawAxis(m_axes[Axis::kThrottle]);
 }
 
 /**
