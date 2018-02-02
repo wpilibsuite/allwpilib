@@ -261,6 +261,13 @@ public class DifferentialDrive extends RobotDriveBase {
       }
     }
 
+    // Normalize the wheel speeds
+    double maxMagnitude = Math.max(Math.abs(leftMotorOutput), Math.abs(rightMotorOutput));
+    if (maxMagnitude > 1.0) {
+      leftMotorOutput /= maxMagnitude;
+      rightMotorOutput /= maxMagnitude;
+    }
+
     m_leftMotor.set(leftMotorOutput * m_maxOutput);
     m_rightMotor.set(-rightMotorOutput * m_maxOutput);
 

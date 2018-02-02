@@ -7,6 +7,7 @@
 
 #include "Drive/DifferentialDrive.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include <HAL/HAL.h>
@@ -169,6 +170,14 @@ void DifferentialDrive::CurvatureDrive(double xSpeed, double zRotation,
       leftMotorOutput -= rightMotorOutput + 1.0;
       rightMotorOutput = -1.0;
     }
+  }
+
+  // Normalize the wheel speeds
+  double maxMagnitude =
+      std::max(std::abs(leftMotorOutput), std::abs(rightMotorOutput));
+  if (maxMagnitude > 1.0) {
+    leftMotorOutput /= maxMagnitude;
+    rightMotorOutput /= maxMagnitude;
   }
 
   m_leftMotor.Set(leftMotorOutput * m_maxOutput);
