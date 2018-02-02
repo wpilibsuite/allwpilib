@@ -99,6 +99,18 @@ public class Notifier {
       }
     });
     m_thread.setDaemon(true);
+    m_thread.setUncaughtExceptionHandler((thread, error) -> {
+      Throwable cause = error.getCause();
+      if (cause != null) {
+        error = cause;
+      }
+      DriverStation.reportError("Unhandled exception: " + error.toString(), error.getStackTrace());
+      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
+      DriverStation.reportError(
+          "The loopFunc() method (or methods called by it) should have handled "
+              + "the exception above.", false);
+      System.exit(1);
+    });
     m_thread.start();
   }
 
