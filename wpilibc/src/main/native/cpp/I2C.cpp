@@ -38,7 +38,9 @@ I2C::~I2C() { HAL_CloseI2C(m_port); }
  * Generic transaction.
  *
  * This is a lower-level interface to the I2C hardware giving you more control
- * over each transaction.
+ * over each transaction. If you intend to write multiple bytes in the same
+ * transaction and do not plan to receive anything back, use writeBulk()
+ * instead. Calling this with a receiveSize of 0 will result in an error.
  *
  * @param dataToSend   Buffer of data to send as part of the transaction.
  * @param sendSize     Number of bytes to send as part of the transaction.
