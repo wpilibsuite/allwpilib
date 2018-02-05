@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.5.1'
+        classpath 'gradle.plugin.edu.wpi.first:native-utils:1.5.2'
         classpath 'gradle.plugin.edu.wpi.first.wpilib.versioning:wpilib-version-plugin:2.0'
     }
 }
@@ -232,6 +232,16 @@ model {
         }
     }
     tasks {
+        compileCpp(Task) {
+            $.binaries.each { binary ->
+                if (binary in NativeBinarySpec && binary.buildable) {
+                    binary.tasks.withType(AbstractNativeSourceCompileTask) { task->
+                        it.dependsOn task
+                    }
+                }
+            }
+        }
+
         def c = $.components
         project.tasks.create('runCpp', Exec) {
             def found = false
