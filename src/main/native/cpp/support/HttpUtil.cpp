@@ -106,9 +106,9 @@ bool ParseHttpHeaders(raw_istream& is, llvm::SmallVectorImpl<char>* contentType,
       llvm::StringRef field;
       std::tie(field, line) = line.split(':');
       field = field.rtrim();
-      if (field == "Content-Type")
+      if (field.equals_lower("content-type"))
         inContentType = true;
-      else if (field == "Content-Length")
+      else if (field.equals_lower("content-length"))
         inContentLength = true;
       else
         continue;  // ignore other fields
