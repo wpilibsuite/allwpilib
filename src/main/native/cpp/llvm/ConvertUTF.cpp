@@ -272,9 +272,9 @@ ConversionResult ConvertUTF16toUTF8 (
             target -= bytesToWrite; result = targetExhausted; break;
         }
         switch (bytesToWrite) { /* note: everything falls through. */
-            case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-            case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-            case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+            case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
+            case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
+            case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
             case 1: *--target =  (UTF8)(ch | firstByteMark[bytesToWrite]);
         }
         target += bytesToWrite;
@@ -325,9 +325,9 @@ ConversionResult ConvertUTF32toUTF8 (
             target -= bytesToWrite; result = targetExhausted; break;
         }
         switch (bytesToWrite) { /* note: everything falls through. */
-            case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-            case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
-            case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
+            case 4: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
+            case 3: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
+            case 2: *--target = (UTF8)((ch | byteMark) & byteMask); ch >>= 6; /* FALLTHRU */
             case 1: *--target = (UTF8) (ch | firstByteMark[bytesToWrite]);
         }
         target += bytesToWrite;
@@ -356,8 +356,8 @@ static Boolean isLegalUTF8(const UTF8 *source, int length) {
     switch (length) {
     default: return false;
         /* Everything else falls through when "true"... */
-    case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
-    case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
+    case 4: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false; /* FALLTHRU */
+    case 3: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false; /* FALLTHRU */
     case 2: if ((a = (*--srcptr)) < 0x80 || a > 0xBF) return false;
 
         switch (*source) {
@@ -368,6 +368,7 @@ static Boolean isLegalUTF8(const UTF8 *source, int length) {
             case 0xF4: if (a > 0x8F) return false; break;
             default:   if (a < 0x80) return false;
         }
+        /* FALLTHRU */
 
     case 1: if (*source >= 0x80 && *source < 0xC2) return false;
     }
@@ -531,11 +532,11 @@ ConversionResult ConvertUTF8toUTF16 (
          * The cases all fall through. See "Note A" below.
          */
         switch (extraBytesToRead) {
-            case 5: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
-            case 4: ch += *source++; ch <<= 6; /* remember, illegal UTF-8 */
-            case 3: ch += *source++; ch <<= 6;
-            case 2: ch += *source++; ch <<= 6;
-            case 1: ch += *source++; ch <<= 6;
+            case 5: ch += *source++; ch <<= 6; /* FALLTHRU */ /* remember, illegal UTF-8 */
+            case 4: ch += *source++; ch <<= 6; /* FALLTHRU */ /* remember, illegal UTF-8 */
+            case 3: ch += *source++; ch <<= 6; /* FALLTHRU */
+            case 2: ch += *source++; ch <<= 6; /* FALLTHRU */
+            case 1: ch += *source++; ch <<= 6; /* FALLTHRU */
             case 0: ch += *source++;
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
@@ -635,11 +636,11 @@ static ConversionResult ConvertUTF8toUTF32Impl(
          * The cases all fall through. See "Note A" below.
          */
         switch (extraBytesToRead) {
-            case 5: ch += *source++; ch <<= 6;
-            case 4: ch += *source++; ch <<= 6;
-            case 3: ch += *source++; ch <<= 6;
-            case 2: ch += *source++; ch <<= 6;
-            case 1: ch += *source++; ch <<= 6;
+            case 5: ch += *source++; ch <<= 6; /* FALLTHRU */
+            case 4: ch += *source++; ch <<= 6; /* FALLTHRU */
+            case 3: ch += *source++; ch <<= 6; /* FALLTHRU */
+            case 2: ch += *source++; ch <<= 6; /* FALLTHRU */
+            case 1: ch += *source++; ch <<= 6; /* FALLTHRU */
             case 0: ch += *source++;
         }
         ch -= offsetsFromUTF8[extraBytesToRead];
