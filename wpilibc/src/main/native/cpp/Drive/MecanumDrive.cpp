@@ -134,12 +134,12 @@ void MecanumDrive::InitSendable(SendableBuilder& builder) {
                             [=]() { return m_frontLeftMotor.Get(); },
                             [=](double value) { m_frontLeftMotor.Set(value); });
   builder.AddDoubleProperty(
-      "Front Right Motor Speed", [=]() { return m_frontRightMotor.Get(); },
-      [=](double value) { m_frontRightMotor.Set(value); });
+      "Front Right Motor Speed", [=]() { return -m_frontRightMotor.Get(); },
+      [=](double value) { m_frontRightMotor.Set(-value); });
   builder.AddDoubleProperty("Rear Left Motor Speed",
                             [=]() { return m_rearLeftMotor.Get(); },
                             [=](double value) { m_rearLeftMotor.Set(value); });
-  builder.AddDoubleProperty("Rear Right Motor Speed",
-                            [=]() { return m_rearRightMotor.Get(); },
-                            [=](double value) { m_rearRightMotor.Set(value); });
+  builder.AddDoubleProperty(
+      "Rear Right Motor Speed", [=]() { return -m_rearRightMotor.Get(); },
+      [=](double value) { m_rearRightMotor.Set(-value); });
 }

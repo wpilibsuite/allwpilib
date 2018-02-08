@@ -189,11 +189,11 @@ public class MecanumDrive extends RobotDriveBase {
     builder.setSmartDashboardType("MecanumDrive");
     builder.addDoubleProperty("Front Left Motor Speed", m_frontLeftMotor::get,
         m_frontLeftMotor::set);
-    builder.addDoubleProperty("Front Right Motor Speed", m_frontRightMotor::get,
-        m_frontRightMotor::set);
+    builder.addDoubleProperty("Front Right Motor Speed", () -> -m_frontRightMotor.get(),
+        value -> m_frontRightMotor.set(-value));
     builder.addDoubleProperty("Rear Left Motor Speed", m_rearLeftMotor::get,
         m_rearLeftMotor::set);
-    builder.addDoubleProperty("Rear Right Motor Speed", m_rearRightMotor::get,
-        m_rearRightMotor::set);
+    builder.addDoubleProperty("Rear Right Motor Speed", () -> -m_rearRightMotor.get(),
+        value -> m_rearRightMotor.set(-value));
   }
 }
