@@ -133,43 +133,31 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
   *width = 0;
   *height = 0;
 
-  // read the header
-  buf.resize(4 + 7);
-  is.read(&(*buf.begin()), 4 + 7);
+  // read SOI and first marker
+  buf.resize(4);
+  is.read(&(*buf.begin()), 4);
   if (is.has_error()) return false;
-  if (!IsJpeg(buf)) return false;
 
+  // Check for valid SOI
   auto bytes = reinterpret_cast<const unsigned char*>(buf.data());
-  size_t pos = 4;
-  size_t blockLength = bytes[4] * 256 + bytes[5];
-  bool sofBlock = false;
+  if (bytes[0] != 0xff || bytes[1] != 0xd8) return false;
+  size_t pos = 2;  // point to first marker
   for (;;) {
-    // Read to the next block + marker
-    ReadInto(is, buf, blockLength + 2);
-    if (is.has_error()) return false;
-
-    // Process any blocks we just read
-    if (sofBlock) {
-      // SOF contains the file size; make sure we actually read enough bytes
-      if (blockLength >= 7) {
-        *height = bytes[5] * 256 + bytes[6];
-        *width = bytes[7] * 256 + bytes[8];
-      }
-      sofBlock = false;
-    }
-
-    pos += blockLength;
-
     bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
-    if (bytes[0] != 0xff) return false;  // not a tag
-    if (bytes[1] == 0xda) {
+    if (bytes[0] != 0xff) return false;  // not a marker
+    unsigned char marker = bytes[1];
+
+    if (marker == 0xd9) return true;  // EOI, we're done
+
+    if (marker == 0xda) {
       // SOS: need to keep reading until we reach a normal marker.
       // Byte stuffing ensures we don't get false markers.
+      // Have to read a byte at a time as we don't want to overread.
+      pos += 2;  // point after SOS marker
       bool maybeMarker = false;
       for (;;) {
         ReadInto(is, buf, 1);
         if (is.has_error()) return false;
-        ++pos;
         bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
         if (maybeMarker) {
           if (bytes[0] != 0x00 && bytes[0] != 0xff &&
@@ -179,20 +167,37 @@ bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height) {
         } else if (bytes[0] == 0xff) {
           maybeMarker = true;
         }
+        ++pos;  // point after byte we finished reading
       }
-      // Point back to the start of the block
-      --pos;
-      bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
+      --pos;  // point back to start of marker
+      continue;
     }
-    if (bytes[0] != 0xff) return false;  // not a tag
-    if (bytes[1] == 0xd9) return true;  // EOI, we're done
-    if (bytes[1] == 0xc0) sofBlock = true;  // SOF
 
-    // Go to the next block
+    // A normal block. Read the length
     ReadInto(is, buf, 2);  // read length
     if (is.has_error()) return false;
+
+    // Point to length
     pos += 2;
-    blockLength = bytes[2] * 256 + bytes[3];
+    bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
+
+    // Read the block and the next marker
+    size_t blockLength = bytes[0] * 256 + bytes[1];
+    ReadInto(is, buf, blockLength);
+    if (is.has_error()) return false;
+    bytes = reinterpret_cast<const unsigned char*>(buf.data() + pos);
+
+    // Special block processing
+    if (marker == 0xc0) {
+      // SOF: contains the file size; make sure we actually read enough bytes
+      if (blockLength >= 7) {
+        *height = bytes[3] * 256 + bytes[4];
+        *width = bytes[5] * 256 + bytes[6];
+      }
+    }
+
+    // Point to next marker
+    pos += blockLength;
   }
 }
 
