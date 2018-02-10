@@ -95,7 +95,6 @@ public final class TestBench {
    * @return a freshly allocated Talon, Encoder pair
    */
   public MotorEncoderFixture<Talon> getTalonPair() {
-
     MotorEncoderFixture<Talon> talonPair = new MotorEncoderFixture<Talon>() {
       @Override
       protected Talon giveSpeedController() {
@@ -127,7 +126,6 @@ public final class TestBench {
    * @return a freshly allocated Victor, Encoder pair
    */
   public MotorEncoderFixture<Victor> getVictorPair() {
-
     MotorEncoderFixture<Victor> vicPair = new MotorEncoderFixture<Victor>() {
       @Override
       protected Victor giveSpeedController() {
@@ -262,7 +260,6 @@ public final class TestBench {
   @SuppressWarnings("JavadocMethod")
   public static RelayCrossConnectFixture getRelayCrossConnectFixture() {
     RelayCrossConnectFixture relay = new RelayCrossConnectFixture() {
-
       @Override
       protected Relay giveRelay() {
         return new Relay(0);

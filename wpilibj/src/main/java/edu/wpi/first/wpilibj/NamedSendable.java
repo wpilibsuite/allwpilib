@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
  */
 @Deprecated
 public interface NamedSendable extends Sendable {
-
   /**
    * The name of the subtable.
    *

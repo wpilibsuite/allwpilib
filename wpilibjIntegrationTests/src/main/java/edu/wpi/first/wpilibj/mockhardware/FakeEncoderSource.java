@@ -33,7 +33,6 @@ public class FakeEncoderSource {
     }
 
     public void run() {
-
       final DigitalOutput lead;
       final DigitalOutput lag;
 

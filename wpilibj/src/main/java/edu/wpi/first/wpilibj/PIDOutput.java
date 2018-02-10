@@ -12,7 +12,6 @@ package edu.wpi.first.wpilibj;
  */
 @FunctionalInterface
 public interface PIDOutput {
-
   /**
    * Set the output to the value calculated by PIDController.
    *

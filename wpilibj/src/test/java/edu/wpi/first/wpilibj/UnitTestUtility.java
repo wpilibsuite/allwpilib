@@ -36,7 +36,6 @@ public final class UnitTestUtility {
       HLUsageReporting.SetImplementation(new HLUsageReporting.Null());
       RobotState.SetImplementation(new MockRobotStateInterface());
       Timer.SetImplementation(new Timer.StaticInterface() {
-
         @Override
         public double getFPGATimestamp() {
           return System.currentTimeMillis() / 1000.0;

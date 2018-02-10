@@ -17,7 +17,6 @@ import org.opencv.core.Mat;
  * @see VisionThread
  */
 public interface VisionPipeline {
-
   /**
    * Processes the image input and sets the result objects.
    * Implementations should make these objects accessible.

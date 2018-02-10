@@ -38,7 +38,6 @@ public class VisionRunner<P extends VisionPipeline> {
    */
   @FunctionalInterface
   public interface Listener<P extends VisionPipeline> {
-
     /**
      * Called when the pipeline has run. This shouldn't take much time to run because it will delay
      * later calls to the pipeline's {@link VisionPipeline#process process} method. Copying the
