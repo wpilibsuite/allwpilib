@@ -60,6 +60,17 @@ public abstract class Button extends Trigger {
   }
 
   /**
+   * Toggles between two commands whenever the button is pressed (i.e. starts the first command
+   * and cancels the second, then cancels the first and starts the second).
+   *
+   * @param commandOne the first command
+   * @param commandTwo the second command
+   */
+  public void toggleBetweenWhenPressed(final Command commandOne, final Command commandTwo) {
+    toggleBetweenWhenActive(commandOne, commandTwo);
+  }
+
+  /**
    * Cancel the command when the button is pressed.
    *
    * @param command the command to start

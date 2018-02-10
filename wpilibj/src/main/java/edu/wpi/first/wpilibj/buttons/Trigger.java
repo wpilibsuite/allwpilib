@@ -150,6 +150,37 @@ public abstract class Trigger extends SendableBase {
   }
 
   /**
+   * Toggles between two commands when the trigger becomes active.
+   *
+   * @param commandOne the first command to toggle between
+   * @param commandTwo the second command to toggle between
+   */
+  public void toggleBetweenWhenActive(final Command commandOne, final Command commandTwo) {
+    new ButtonScheduler() {
+
+    private boolean m_pressedLast = grab();
+
+      @Override
+      public void execute() {
+        if (grab()) {
+          if (!m_pressedLast) {
+            m_pressedLast = true;
+            if (commandOne.isRunning()) {
+              commandOne.cancel();
+              commandTwo.start();
+            } else { // either Two is running, or neither are running (initial press)
+              commandOne.start();
+              commandTwo.cancel();
+            }
+          }
+        } else {
+          m_pressedLast = false;
+        }
+      }
+    }.start();
+  }
+
+  /**
    * Cancels a command when the trigger becomes active.
    *
    * @param command the command to cancel
