@@ -15,7 +15,10 @@ public class DIOJNI extends JNIWrapper {
 
   public static native void freeDIOPort(int dioPortHandle);
 
+  // TODO(Thad): Switch this to use boolean
   public static native void setDIO(int dioPortHandle, short value);
+
+  public static native void setDIODirection(int dioPortHandle, boolean input);
 
   public static native boolean getDIO(int dioPortHandle);
 

@@ -92,6 +92,22 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDIO(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
+ * Method:    setDIODirection
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_DIOJNI_setDIODirection(
+  JNIEnv *env, jclass, jint id, jboolean input) {
+  // DIOJNI_LOG(logDEBUG) << "Calling DIOJNI setDIO";
+  // DIOJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_DigitalHandle)id;
+  // DIOJNI_LOG(logDEBUG) << "IsInput = " << input;
+  int32_t status = 0;
+  HAL_SetDIODirection((HAL_DigitalHandle)id, input, &status);
+  // DIOJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatus(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_DIOJNI
  * Method:    getDIO
  * Signature: (J)Z
  */

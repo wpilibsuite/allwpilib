@@ -199,6 +199,23 @@ void HAL_SetDIO(HAL_DigitalHandle dioPortHandle, HAL_Bool value,
 }
 
 /**
+ * Set direction of a DIO channel.
+ *
+ * @param channel The Digital I/O channel
+ * @param input true to set input, false for output
+ */
+void HAL_SetDIODirection(HAL_DigitalHandle dioPortHandle, HAL_Bool input,
+                         int32_t* status) {
+  auto port = digitalChannelHandles->Get(dioPortHandle, HAL_HandleEnum::DIO);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return;
+  }
+
+  SimDIOData[port->channel].SetIsInput(input);
+}
+
+/**
  * Read a digital I/O bit from the FPGA.
  * Get a single value from a digital I/O channel.
  *
