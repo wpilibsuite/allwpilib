@@ -105,11 +105,9 @@ public class Notifier {
         error = cause;
       }
       DriverStation.reportError("Unhandled exception: " + error.toString(), error.getStackTrace());
-      DriverStation.reportWarning("Robots should not quit, but yours did!", false);
       DriverStation.reportError(
           "The loopFunc() method (or methods called by it) should have handled "
               + "the exception above.", false);
-      System.exit(1);
     });
     m_thread.start();
   }
