@@ -137,6 +137,9 @@ uint64_t HAL_WaitForNotifierAlarm(HAL_NotifierHandle notifierHandle,
       waitTime = notifier->waitTime * 1e-6;
     }
 
+    // Don't wait twice
+    notifier->updatedAlarm = false;
+
     auto timeoutTime =
         hal::fpga_clock::epoch() + std::chrono::duration<double>(waitTime);
     notifier->cond.wait_until(lock, timeoutTime);
