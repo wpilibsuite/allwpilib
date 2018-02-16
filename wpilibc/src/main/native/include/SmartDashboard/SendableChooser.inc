@@ -62,7 +62,7 @@ void SendableChooser<T>::AddDefault(llvm::StringRef name, T object) {
 template <class T>
 auto SendableChooser<T>::GetSelected()
     -> decltype(_unwrap_smart_ptr(m_choices[""])) {
-  llvm::StringRef selected = m_defaultChoice;
+  std::string selected = m_defaultChoice;
   if (m_selectedEntry) {
     selected = m_selectedEntry.GetString(m_defaultChoice);
   }
