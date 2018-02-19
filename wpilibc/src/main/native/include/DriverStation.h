@@ -64,6 +64,7 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
   int GetJoystickAxisType(int stick, int axis) const;
 
   bool IsEnabled() const override;
+  bool IsEStopped() const override;
   bool IsDisabled() const override;
   bool IsAutonomous() const override;
   bool IsOperatorControl() const override;
