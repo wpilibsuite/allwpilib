@@ -31,6 +31,7 @@ class RobotState {
   static void SetImplementation(std::shared_ptr<RobotStateInterface> i);
   static bool IsDisabled();
   static bool IsEnabled();
+  static bool IsEStopped();
   static bool IsOperatorControl();
   static bool IsAutonomous();
   static bool IsTest();
