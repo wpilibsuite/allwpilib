@@ -36,6 +36,13 @@ bool RobotState::IsEnabled() {
   return false;
 }
 
+bool RobotState::IsEStopped() {
+  if (impl != nullptr) {
+    return impl->IsEStopped();
+  }
+  return false;
+}
+
 bool RobotState::IsOperatorControl() {
   if (impl != nullptr) {
     return impl->IsOperatorControl();
