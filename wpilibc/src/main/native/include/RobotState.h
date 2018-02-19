@@ -16,6 +16,7 @@ class RobotStateInterface {
   virtual ~RobotStateInterface() = default;
   virtual bool IsDisabled() const = 0;
   virtual bool IsEnabled() const = 0;
+  virtual bool IsEStopped() const = 0;
   virtual bool IsOperatorControl() const = 0;
   virtual bool IsAutonomous() const = 0;
   virtual bool IsTest() const = 0;
