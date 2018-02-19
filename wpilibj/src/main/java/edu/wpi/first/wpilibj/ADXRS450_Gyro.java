@@ -80,6 +80,10 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
     setName("ADXRS450_Gyro", port.value);
   }
 
+  public boolean isConnected() {
+    return m_spi != null;
+  }
+
   @Override
   public void calibrate() {
     if (m_spi == null) {
@@ -128,7 +132,9 @@ public class ADXRS450_Gyro extends GyroBase implements Gyro, PIDSource, Sendable
 
   @Override
   public void reset() {
-    m_spi.resetAccumulator();
+    if (m_spi != null) {
+      m_spi.resetAccumulator();
+    }
   }
 
   /**
