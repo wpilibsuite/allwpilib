@@ -32,8 +32,10 @@ extern "C" {
  * Method:    initializeAnalogGyro
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_initializeAnalogGyro(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_initializeAnalogGyro
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI initializeAnalogGyro";
   ANALOGGYROJNI_LOG(logDEBUG) << "Analog Input Handle = " << (HAL_AnalogInputHandle)id;
   int32_t status = 0;
@@ -50,8 +52,10 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_initializeAn
  * Method:    setupAnalogGyro
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setupAnalogGyro(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setupAnalogGyro
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI setupAnalogGyro";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;
@@ -65,8 +69,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setupAnalogG
  * Method:    freeAnalogGyro
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_freeAnalogGyro(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_freeAnalogGyro
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI freeAnalogGyro";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   HAL_FreeAnalogGyro((HAL_GyroHandle)id);
@@ -77,8 +83,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_freeAnalogGy
  * Method:    setAnalogGyroParameters
  * Signature: (IDDI)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyroParameters(
-    JNIEnv* env, jclass, jint id, jdouble vPDPS, jdouble offset, jint center) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyroParameters
+  (JNIEnv* env, jclass, jint id, jdouble vPDPS, jdouble offset, jint center)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI setAnalogGyroParameters";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;
@@ -92,8 +100,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyr
  * Method:    setAnalogGyroVoltsPerDegreePerSecond
  * Signature: (ID)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyroVoltsPerDegreePerSecond(
-    JNIEnv* env, jclass, jint id, jdouble vPDPS) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyroVoltsPerDegreePerSecond
+  (JNIEnv* env, jclass, jint id, jdouble vPDPS)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI setAnalogGyroVoltsPerDegreePerSecond";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   ANALOGGYROJNI_LOG(logDEBUG) << "vPDPS = " << vPDPS;
@@ -108,8 +118,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyr
  * Method:    resetAnalogGyro
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_resetAnalogGyro(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_resetAnalogGyro
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI resetAnalogGyro";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;
@@ -123,8 +135,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_resetAnalogG
  * Method:    calibrateAnalogGyro
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_calibrateAnalogGyro(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_calibrateAnalogGyro
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI calibrateAnalogGyro";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;
@@ -138,8 +152,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_calibrateAna
  * Method:    setAnalogGyroDeadband
  * Signature: (ID)V
  */
-JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyroDeadband(
-    JNIEnv* env, jclass, jint id, jdouble deadband) {
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyroDeadband
+  (JNIEnv* env, jclass, jint id, jdouble deadband)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI setAnalogGyroDeadband";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;
@@ -153,8 +169,10 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_setAnalogGyr
  * Method:    getAnalogGyroAngle
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyroAngle(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyroAngle
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI getAnalogGyroAngle";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;
@@ -170,8 +188,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalog
  * Method:    getAnalogGyroRate
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyroRate(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyroRate
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI getAnalogGyroRate";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;
@@ -187,8 +207,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalog
  * Method:    getAnalogGyroOffset
  * Signature: (I)D
  */
-JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyroOffset(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT jdouble JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyroOffset
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI getAnalogGyroOffset";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;
@@ -204,8 +226,10 @@ JNIEXPORT jdouble JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalog
  * Method:    getAnalogGyroCenter
  * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyroCenter(
-    JNIEnv* env, jclass, jint id) {
+JNIEXPORT jint JNICALL
+Java_edu_wpi_first_wpilibj_hal_AnalogGyroJNI_getAnalogGyroCenter
+  (JNIEnv* env, jclass, jint id)
+{
   ANALOGGYROJNI_LOG(logDEBUG) << "Calling ANALOGGYROJNI getAnalogGyroCenter";
   ANALOGGYROJNI_LOG(logDEBUG) << "Gyro Handle = " << (HAL_GyroHandle)id;
   int32_t status = 0;

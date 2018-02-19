@@ -16,10 +16,12 @@ using namespace frc;
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    setFilterSelect
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect(
-    JNIEnv* env, jclass, jint id, jint filter_index) {
+Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect
+  (JNIEnv* env, jclass, jint id, jint filter_index)
+{
   int32_t status = 0;
 
   HAL_SetFilterSelect(static_cast<HAL_DigitalHandle>(id), filter_index,
@@ -30,10 +32,12 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterSelect(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    getFilterSelect
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect(
-    JNIEnv* env, jclass, jint id) {
+Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect
+  (JNIEnv* env, jclass, jint id)
+{
   int32_t status = 0;
 
   jint result =
@@ -45,10 +49,12 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterSelect(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    setFilterPeriod
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterPeriod(
-    JNIEnv* env, jclass, jint filter_index, jint fpga_cycles) {
+Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterPeriod
+  (JNIEnv* env, jclass, jint filter_index, jint fpga_cycles)
+{
   int32_t status = 0;
 
   HAL_SetFilterPeriod(filter_index, fpga_cycles, &status);
@@ -58,10 +64,12 @@ Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_setFilterPeriod(
 /*
  * Class:     edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI
  * Method:    getFilterPeriod
+ * Signature: (I)I
  */
 JNIEXPORT jint JNICALL
-Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterPeriod(
-    JNIEnv* env, jclass, jint filter_index) {
+Java_edu_wpi_first_wpilibj_hal_DigitalGlitchFilterJNI_getFilterPeriod
+  (JNIEnv* env, jclass, jint filter_index)
+{
   int32_t status = 0;
 
   jint result = HAL_GetFilterPeriod(filter_index, &status);
