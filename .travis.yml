@@ -9,7 +9,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-6
-      - python3.5
+      - python3.5-dev
 
 before_install:
   - sudo sh -c 'echo "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-5.0 main" > /etc/apt/sources.list.d/llvm.list'
