@@ -16,7 +16,7 @@ addons:
     packages:
       - g++-multilib
       - lib32stdc++6
-      - python3.5
+      - python3.5-dev
 
 before_install:
   - .travis-scripts/install.sh
