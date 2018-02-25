@@ -99,6 +99,42 @@ public class SerialPort {
    *
    * @param baudRate The baud rate to configure the serial port.
    * @param port     The Serial port to use
+   * @param portName The direct portName to use
+   * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
+   * @param parity   Select the type of parity checking to use.
+   * @param stopBits The number of stop bits to use as defined by the enum StopBits.
+   * @deprecated     Will be removed for 2019
+   */
+  @Deprecated
+  public SerialPort(final int baudRate, String portName, Port port, final int dataBits,
+                    Parity parity, StopBits stopBits) {
+    m_port = (byte) port.value;
+
+    SerialPortJNI.serialInitializePortDirect(m_port, portName);
+    SerialPortJNI.serialSetBaudRate(m_port, baudRate);
+    SerialPortJNI.serialSetDataBits(m_port, (byte) dataBits);
+    SerialPortJNI.serialSetParity(m_port, (byte) parity.value);
+    SerialPortJNI.serialSetStopBits(m_port, (byte) stopBits.value);
+
+    // Set the default read buffer size to 1 to return bytes immediately
+    setReadBufferSize(1);
+
+    // Set the default timeout to 5 seconds.
+    setTimeout(5.0);
+
+    // Don't wait until the buffer is full to transmit.
+    setWriteBufferMode(WriteBufferMode.kFlushOnAccess);
+
+    disableTermination();
+
+    HAL.report(tResourceType.kResourceType_SerialPort, 0);
+  }
+
+  /**
+   * Create an instance of a Serial Port class.
+   *
+   * @param baudRate The baud rate to configure the serial port.
+   * @param port     The Serial port to use
    * @param dataBits The number of data bits per transfer. Valid values are between 5 and 8 bits.
    * @param parity   Select the type of parity checking to use.
    * @param stopBits The number of stop bits to use as defined by the enum StopBits.

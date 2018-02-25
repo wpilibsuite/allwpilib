@@ -10,6 +10,7 @@
 #include <string>
 
 #include <llvm/StringRef.h>
+#include <support/deprecated.h>
 
 #include "ErrorBase.h"
 
@@ -56,6 +57,10 @@ class SerialPort : public ErrorBase {
 
   SerialPort(int baudRate, Port port = kOnboard, int dataBits = 8,
              Parity parity = kParity_None, StopBits stopBits = kStopBits_One);
+  WPI_DEPRECATED("Will be removed for 2019")
+  SerialPort(int baudRate, llvm::StringRef portName, Port port = kOnboard,
+             int dataBits = 8, Parity parity = kParity_None,
+             StopBits stopBits = kStopBits_One);
   ~SerialPort();
 
   SerialPort(const SerialPort&) = delete;

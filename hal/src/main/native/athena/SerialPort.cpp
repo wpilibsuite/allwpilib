@@ -43,6 +43,13 @@ void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {
   if (*status > 0) *status = 0;
 }
 
+void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
+                                    int32_t* status) {
+  *status = viOpen(resourceManagerHandle, const_cast<char*>(portName), VI_NULL,
+                   VI_NULL, reinterpret_cast<ViSession*>(&portHandles[port]));
+  if (*status > 0) *status = 0;
+}
+
 void HAL_SetSerialBaudRate(HAL_SerialPort port, int32_t baud, int32_t* status) {
   *status = viSetAttribute(portHandles[port], VI_ATTR_ASRL_BAUD, baud);
   if (*status > 0) *status = 0;

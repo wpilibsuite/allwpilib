@@ -16,6 +16,9 @@ void InitializeSerialPort() {}
 extern "C" {
 void HAL_InitializeSerialPort(HAL_SerialPort port, int32_t* status) {}
 
+void HAL_InitializeSerialPortDirect(HAL_SerialPort port, const char* portName,
+                                    int32_t* status) {}
+
 void HAL_SetSerialBaudRate(HAL_SerialPort port, int32_t baud, int32_t* status) {
 }
 

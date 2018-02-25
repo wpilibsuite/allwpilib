@@ -62,6 +62,57 @@ SerialPort::SerialPort(int baudRate, Port port, int dataBits,
 }
 
 /**
+ * Create an instance of a Serial Port class.
+ *
+ * @param baudRate The baud rate to configure the serial port.
+ * @param port     The physical port to use
+ * @param portName The direct port name to use
+ * @param dataBits The number of data bits per transfer.  Valid values are
+ *                 between 5 and 8 bits.
+ * @param parity   Select the type of parity checking to use.
+ * @param stopBits The number of stop bits to use as defined by the enum
+ *                 StopBits.
+ */
+SerialPort::SerialPort(int baudRate, llvm::StringRef portName, Port port,
+                       int dataBits, SerialPort::Parity parity,
+                       SerialPort::StopBits stopBits) {
+  int32_t status = 0;
+
+  m_port = port;
+
+  llvm::SmallVector<char, 64> buf;
+  const char* portNameC = portName.c_str(buf);
+
+  HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port), portNameC,
+                                 &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  // Don't continue if initialization failed
+  if (status < 0) return;
+  HAL_SetSerialBaudRate(static_cast<HAL_SerialPort>(port), baudRate, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  HAL_SetSerialDataBits(static_cast<HAL_SerialPort>(port), dataBits, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  HAL_SetSerialParity(static_cast<HAL_SerialPort>(port), parity, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+  HAL_SetSerialStopBits(static_cast<HAL_SerialPort>(port), stopBits, &status);
+  wpi_setErrorWithContext(status, HAL_GetErrorMessage(status));
+
+  // Set the default timeout to 5 seconds.
+  SetTimeout(5.0);
+
+  // Don't wait until the buffer is full to transmit.
+  SetWriteBufferMode(kFlushOnAccess);
+
+  EnableTermination();
+
+  // viInstallHandler(m_portHandle, VI_EVENT_IO_COMPLETION, ioCompleteHandler,
+  // this);
+  // viEnableEvent(m_portHandle, VI_EVENT_IO_COMPLETION, VI_HNDLR, VI_NULL);
+
+  HAL_Report(HALUsageReporting::kResourceType_SerialPort, 0);
+}
+
+/**
  * Destructor.
  */
 SerialPort::~SerialPort() {
