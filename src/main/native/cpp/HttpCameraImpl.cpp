@@ -319,6 +319,7 @@ bool HttpCameraImpl::SetUrls(llvm::ArrayRef<std::string> urls,
   std::lock_guard<wpi::mutex> lock(m_mutex);
   m_locations.swap(locations);
   m_nextLocation = 0;
+  m_streamSettingsUpdated = true;
   return true;
 }
 
