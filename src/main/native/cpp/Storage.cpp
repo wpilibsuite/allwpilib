@@ -418,11 +418,12 @@ void Storage::ApplyInitialAssignments(
     StringRef name = msg->str();
 
     Entry* entry = GetOrNew(name);
+    entry->seq_num = seq_num;
+    entry->id = id;
     if (!entry->value) {
       // doesn't currently exist
       entry->value = msg->value();
       entry->flags = msg->flags();
-      entry->seq_num = seq_num;
       // notify
       m_notifier.NotifyEntry(entry->local_id, name, entry->value,
                              NT_NOTIFY_NEW);
@@ -431,11 +432,11 @@ void Storage::ApplyInitialAssignments(
       // then we don't update the local value and instead send it back to the
       // server as an update message
       if (entry->local_write && !entry->IsPersistent()) {
+        ++entry->seq_num;
         update_msgs.emplace_back(Message::EntryUpdate(
             entry->id, entry->seq_num.value(), entry->value));
       } else {
         entry->value = msg->value();
-        entry->seq_num = seq_num;
         unsigned int notify_flags = NT_NOTIFY_UPDATE;
         // don't update flags from a <3.0 remote (not part of message)
         if (conn.proto_rev() >= 0x0300) {
@@ -448,8 +449,7 @@ void Storage::ApplyInitialAssignments(
       }
     }
 
-    // set id and save to idmap
-    entry->id = id;
+    // save to idmap
     if (id >= m_idmap.size()) m_idmap.resize(id + 1);
     m_idmap[id] = entry;
   }
