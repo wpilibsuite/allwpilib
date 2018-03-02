@@ -169,13 +169,17 @@ void HAL_CleanNotifier(HAL_NotifierHandle notifierHandle, int32_t* status) {
     // the notifier can call back into our callback, so don't hold the lock
     // here (the atomic fetch_sub will prevent multiple parallel entries
     // into this function)
-    if (notifierAlarm) notifierAlarm->writeEnable(false, status);
-    if (notifierManager) notifierManager->disable(status);
 
-    std::lock_guard<wpi::mutex> lock(notifierMutex);
-    notifierAlarm = nullptr;
-    notifierManager = nullptr;
-    closestTrigger = UINT64_MAX;
+    // Cleaning up the manager takes up to a second to complete, so don't do
+    // that here. Fix it more permanently in 2019...
+
+    // if (notifierAlarm) notifierAlarm->writeEnable(false, status);
+    // if (notifierManager) notifierManager->disable(status);
+
+    // std::lock_guard<wpi::mutex> lock(notifierMutex);
+    // notifierAlarm = nullptr;
+    // notifierManager = nullptr;
+    // closestTrigger = UINT64_MAX;
   }
 }
 
