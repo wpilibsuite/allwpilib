@@ -603,6 +603,12 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
 
   SDEBUG("Headers send, sending stream now");
 
+  Frame::Time lastFrameTime = 0;
+  Frame::Time timePerFrame = 0;
+  if (m_fps != 0) timePerFrame = 1000000.0 / m_fps;
+  // Allow fudge factor of 1 ms in frame rate
+  if (timePerFrame >= 1000) timePerFrame -= 1000;
+
   StartStream();
   while (m_active && !os.has_error()) {
     auto source = GetSource();
@@ -619,6 +625,12 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
       // Bad frame; sleep for 20 ms so we don't consume all processor time.
       os << "\r\n";  // Keep connection alive
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
+      continue;
+    }
+
+    if (frame.GetTime() < (lastFrameTime + timePerFrame)) {
+      // Limit FPS; sleep for 10 ms so we don't consume all processor time
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
       continue;
     }
 
@@ -655,7 +667,8 @@ void MjpegServerImpl::ConnThread::SendStream(wpi::raw_socket_ostream& os) {
     // print the individual mimetype and the length
     // sending the content-length fixes random stream disruption observed
     // with firefox
-    double timestamp = frame.GetTime() / 1000000.0;
+    lastFrameTime = frame.GetTime();
+    double timestamp = lastFrameTime / 1000000.0;
     header.clear();
     oss << "\r\n--" BOUNDARY "\r\n"
         << "Content-Type: image/jpeg\r\n"
