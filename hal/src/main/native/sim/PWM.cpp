@@ -57,6 +57,9 @@ HAL_DigitalHandle HAL_InitializePWMPort(HAL_PortHandle portHandle,
 
   SimPWMData[origChannel].SetInitialized(true);
 
+  // Defaults to allow an always valid config.
+  HAL_SetPWMConfig(handle, 2.0, 1.501, 1.5, 1.499, 1.0, status);
+
   return handle;
 }
 void HAL_FreePWMPort(HAL_DigitalHandle pwmPortHandle, int32_t* status) {
