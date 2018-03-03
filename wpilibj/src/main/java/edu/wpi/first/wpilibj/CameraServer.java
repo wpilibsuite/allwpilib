@@ -252,39 +252,43 @@ public class CameraServer {
     }
 
     NetworkTableEntry entry = table.getEntry(name);
-    switch (event.propertyKind) {
-      case kBoolean:
-        if (isNew) {
-          entry.setDefaultBoolean(event.value != 0);
-        } else {
-          entry.setBoolean(event.value != 0);
-        }
-        break;
-      case kInteger:
-      case kEnum:
-        if (isNew) {
-          entry.setDefaultDouble(event.value);
-          table.getEntry(infoName + "/min").setDouble(
-              CameraServerJNI.getPropertyMin(event.propertyHandle));
-          table.getEntry(infoName + "/max").setDouble(
-              CameraServerJNI.getPropertyMax(event.propertyHandle));
-          table.getEntry(infoName + "/step").setDouble(
-              CameraServerJNI.getPropertyStep(event.propertyHandle));
-          table.getEntry(infoName + "/default").setDouble(
-              CameraServerJNI.getPropertyDefault(event.propertyHandle));
-        } else {
-          entry.setDouble(event.value);
-        }
-        break;
-      case kString:
-        if (isNew) {
-          entry.setDefaultString(event.valueStr);
-        } else {
-          entry.setString(event.valueStr);
-        }
-        break;
-      default:
-        break;
+    try {
+      switch (event.propertyKind) {
+        case kBoolean:
+          if (isNew) {
+            entry.setDefaultBoolean(event.value != 0);
+          } else {
+            entry.setBoolean(event.value != 0);
+          }
+          break;
+        case kInteger:
+        case kEnum:
+          if (isNew) {
+            entry.setDefaultDouble(event.value);
+            table.getEntry(infoName + "/min").setDouble(
+                CameraServerJNI.getPropertyMin(event.propertyHandle));
+            table.getEntry(infoName + "/max").setDouble(
+                CameraServerJNI.getPropertyMax(event.propertyHandle));
+            table.getEntry(infoName + "/step").setDouble(
+                CameraServerJNI.getPropertyStep(event.propertyHandle));
+            table.getEntry(infoName + "/default").setDouble(
+                CameraServerJNI.getPropertyDefault(event.propertyHandle));
+          } else {
+            entry.setDouble(event.value);
+          }
+          break;
+        case kString:
+          if (isNew) {
+            entry.setDefaultString(event.valueStr);
+          } else {
+            entry.setString(event.valueStr);
+          }
+          break;
+        default:
+          break;
+      }
+    } catch (VideoException ex) {
+      // ignore
     }
   }
 
@@ -388,8 +392,12 @@ public class CameraServer {
         case kSourcePropertyChoicesUpdated: {
           NetworkTable table = m_tables.get(event.sourceHandle);
           if (table != null) {
-            String[] choices = CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
-            table.getEntry("PropertyInfo/" + event.name + "/choices").setStringArray(choices);
+            try {
+              String[] choices = CameraServerJNI.getEnumPropertyChoices(event.propertyHandle);
+              table.getEntry("PropertyInfo/" + event.name + "/choices").setStringArray(choices);
+            } catch (VideoException ex) {
+              // ignore
+            }
           }
           break;
         }
