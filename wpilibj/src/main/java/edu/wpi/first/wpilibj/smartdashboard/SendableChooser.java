@@ -51,6 +51,7 @@ public class SendableChooser<V> extends SendableBase implements Sendable {
    * Instantiates a {@link SendableChooser}.
    */
   public SendableChooser() {
+    super(false);
   }
 
   /**
