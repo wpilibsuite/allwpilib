@@ -244,8 +244,8 @@ public class PWM extends SendableBase implements Sendable {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    builder.setSmartDashboardType("Speed Controller");
+    builder.setSmartDashboardType("PWM");
     builder.setSafeState(this::setDisabled);
-    builder.addDoubleProperty("Value", this::getSpeed, this::setSpeed);
+    builder.addDoubleProperty("Value", this::getRaw, value -> setRaw((int) value));
   }
 }

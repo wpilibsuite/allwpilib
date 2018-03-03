@@ -7,6 +7,8 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+
 /**
  * Common base class for all PWM Speed Controllers.
  */
@@ -65,5 +67,12 @@ public abstract class PWMSpeedController extends SafePWM implements SpeedControl
   @Override
   public void pidWrite(double output) {
     set(output);
+  }
+
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Speed Controller");
+    builder.setSafeState(this::setDisabled);
+    builder.addDoubleProperty("Value", this::getSpeed, this::setSpeed);
   }
 }
