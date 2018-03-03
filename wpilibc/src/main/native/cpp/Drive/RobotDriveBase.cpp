@@ -21,9 +21,11 @@ using namespace frc;
 RobotDriveBase::RobotDriveBase() { m_safetyHelper.SetSafetyEnabled(true); }
 
 /**
- * Change the default value for deadband scaling. The default value is
- * 0.02. Values smaller then the deadband are set to 0, while values
- * larger then the deadband are scaled from 0.0 to 1.0. See ApplyDeadband().
+ * Sets the deadband applied to the drive inputs (e.g., joystick values).
+ *
+ * The default value is 0.02. Inputs smaller than the deadband are set to 0.0
+ * while inputs larger than the deadband are scaled from 0.0 to 1.0. See
+ * ApplyDeadband().
  *
  * @param deadband The deadband to set.
  */
