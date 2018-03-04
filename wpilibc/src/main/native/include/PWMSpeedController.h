@@ -28,6 +28,7 @@ class PWMSpeedController : public SafePWM, public SpeedController {
 
  protected:
   explicit PWMSpeedController(int channel);
+  void InitSendable(SendableBuilder& builder) override;
 
  private:
   bool m_isInverted = false;

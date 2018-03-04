@@ -311,8 +311,8 @@ void PWM::SetZeroLatch() {
 }
 
 void PWM::InitSendable(SendableBuilder& builder) {
-  builder.SetSmartDashboardType("Speed Controller");
+  builder.SetSmartDashboardType("PWM");
   builder.SetSafeState([=]() { SetDisabled(); });
-  builder.AddDoubleProperty("Value", [=]() { return GetSpeed(); },
-                            [=](double value) { SetSpeed(value); });
+  builder.AddDoubleProperty("Value", [=]() { return GetRaw(); },
+                            [=](double value) { SetRaw(value); });
 }
