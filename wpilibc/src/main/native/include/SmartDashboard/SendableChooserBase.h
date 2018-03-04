@@ -23,6 +23,7 @@ namespace frc {
  */
 class SendableChooserBase : public SendableBase {
  public:
+  SendableChooserBase();
   ~SendableChooserBase() override = default;
 
  protected:
