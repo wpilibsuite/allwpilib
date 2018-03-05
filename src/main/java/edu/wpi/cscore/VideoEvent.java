@@ -27,7 +27,8 @@ public class VideoEvent {
     kSinkDestroyed(0x0800),
     kSinkEnabled(0x1000),
     kSinkDisabled(0x2000),
-    kNetworkInterfacesChanged(0x4000);
+    kNetworkInterfacesChanged(0x4000),
+    kTelemetryUpdated(0x8000);
 
     private int value;
 

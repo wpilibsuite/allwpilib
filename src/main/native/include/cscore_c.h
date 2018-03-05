@@ -54,7 +54,8 @@ enum CS_StatusValue {
   CS_READ_FAILED = -2004,
   CS_SOURCE_IS_DISCONNECTED = -2005,
   CS_EMPTY_VALUE = -2006,
-  CS_BAD_URL = -2007
+  CS_BAD_URL = -2007,
+  CS_TELEMETRY_NOT_ENABLED = -2008
 };
 
 //
@@ -148,7 +149,16 @@ enum CS_EventKind {
   CS_SINK_DESTROYED = 0x0800,
   CS_SINK_ENABLED = 0x1000,
   CS_SINK_DISABLED = 0x2000,
-  CS_NETWORK_INTERFACES_CHANGED = 0x4000
+  CS_NETWORK_INTERFACES_CHANGED = 0x4000,
+  CS_TELEMETRY_UPDATED = 0x8000
+};
+
+//
+// Telemetry kinds
+//
+enum CS_TelemetryKind {
+  CS_SOURCE_BYTES_RECEIVED = 1,
+  CS_SOURCE_FRAMES_RECEIVED = 2
 };
 
 //
@@ -337,6 +347,16 @@ CS_Listener CS_AddListener(void* data,
 void CS_RemoveListener(CS_Listener handle, CS_Status* status);
 
 int CS_NotifierDestroyed(void);
+
+//
+// Telemetry Functions
+//
+void CS_SetTelemetryPeriod(double seconds);
+double CS_GetTelemetryElapsedTime();
+int64_t CS_GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
+                             CS_Status* status);
+double CS_GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
+                                   CS_Status* status);
 
 //
 // Logging Functions

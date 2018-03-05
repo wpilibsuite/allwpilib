@@ -15,6 +15,7 @@
 #include "JpegUtil.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "Telemetry.h"
 #include "c_util.h"
 
 using namespace cs;

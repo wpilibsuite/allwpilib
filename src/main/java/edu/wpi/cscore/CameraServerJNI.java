@@ -232,6 +232,34 @@ public class CameraServerJNI {
   public static native void removeListener(int handle);
 
   //
+  // Telemetry Functions
+  //
+  public enum TelemetryKind {
+    kSourceBytesReceived(1),
+    kSourceFramesReceived(2);
+
+    private int value;
+
+    private TelemetryKind(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
+    }
+  }
+  public static native void setTelemetryPeriod(double seconds);
+  public static native double getTelemetryElapsedTime();
+  public static native long getTelemetryValue(int handle, int kind);
+  public static long getTelemetryValue(int handle, TelemetryKind kind) {
+    return getTelemetryValue(handle, kind.getValue());
+  }
+  public static native double getTelemetryAverageValue(int handle, int kind);
+  public static double getTelemetryAverageValue(int handle, TelemetryKind kind) {
+    return getTelemetryAverageValue(handle, kind.getValue());
+  }
+
+  //
   // Logging Functions
   //
   @FunctionalInterface

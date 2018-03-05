@@ -15,6 +15,7 @@
 
 #include "Log.h"
 #include "Notifier.h"
+#include "Telemetry.h"
 
 using namespace cs;
 
@@ -326,6 +327,11 @@ void SourceImpl::PutFrame(VideoMode::PixelFormat pixelFormat, int width,
 }
 
 void SourceImpl::PutFrame(std::unique_ptr<Image> image, Frame::Time time) {
+  // Update telemetry
+  Telemetry::GetInstance().RecordSourceFrames(*this, 1);
+  Telemetry::GetInstance().RecordSourceBytes(*this,
+                                             static_cast<int>(image->size()));
+
   // Update frame
   {
     std::lock_guard<wpi::mutex> lock{m_frameMutex};

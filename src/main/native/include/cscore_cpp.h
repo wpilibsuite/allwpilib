@@ -84,7 +84,8 @@ struct RawEvent {
     kSinkDestroyed = CS_SINK_DESTROYED,
     kSinkEnabled = CS_SINK_ENABLED,
     kSinkDisabled = CS_SINK_DISABLED,
-    kNetworkInterfacesChanged = CS_NETWORK_INTERFACES_CHANGED
+    kNetworkInterfacesChanged = CS_NETWORK_INTERFACES_CHANGED,
+    kTelemetryUpdated = CS_TELEMETRY_UPDATED
   };
 
   RawEvent() = default;
@@ -305,6 +306,16 @@ CS_Listener AddListener(std::function<void(const RawEvent& event)> callback,
 void RemoveListener(CS_Listener handle, CS_Status* status);
 
 bool NotifierDestroyed();
+
+//
+// Telemetry Functions
+//
+void SetTelemetryPeriod(double seconds);
+double GetTelemetryElapsedTime();
+int64_t GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
+                          CS_Status* status);
+double GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
+                                CS_Status* status);
 
 //
 // Logging Functions

@@ -224,3 +224,11 @@ void Notifier::NotifyNetworkInterfacesChanged() {
   thr->m_notifications.emplace(RawEvent::kNetworkInterfacesChanged);
   thr->m_cond.notify_one();
 }
+
+void Notifier::NotifyTelemetryUpdated() {
+  auto thr = m_owner.GetThread();
+  if (!thr) return;
+
+  thr->m_notifications.emplace(RawEvent::kTelemetryUpdated);
+  thr->m_cond.notify_one();
+}

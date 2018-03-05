@@ -170,6 +170,16 @@ class VideoSource {
   /// @return True if set successfully
   bool SetFPS(int fps);
 
+  /// Get the actual FPS.
+  /// SetTelemetryPeriod() must be called for this to be valid.
+  /// @return Actual FPS averaged over the telemetry period.
+  double GetActualFPS() const;
+
+  /// Get the data rate (in bytes per second).
+  /// SetTelemetryPeriod() must be called for this to be valid.
+  /// @return Data rate averaged over the telemetry period.
+  double GetActualDataRate() const;
+
   /// Enumerate all known video modes for this source.
   std::vector<VideoMode> EnumerateVideoModes() const;
 

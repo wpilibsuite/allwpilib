@@ -34,6 +34,7 @@
 #include "Handle.h"
 #include "Log.h"
 #include "Notifier.h"
+#include "Telemetry.h"
 #include "UsbUtil.h"
 #include "c_util.h"
 #include "cscore_cpp.h"

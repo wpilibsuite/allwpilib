@@ -54,6 +54,7 @@ class Notifier {
   void NotifySinkSourceChanged(llvm::StringRef name, CS_Sink sink,
                                CS_Source source);
   void NotifyNetworkInterfacesChanged();
+  void NotifyTelemetryUpdated();
 
  private:
   Notifier();

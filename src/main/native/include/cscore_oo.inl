@@ -158,6 +158,18 @@ inline bool VideoSource::SetFPS(int fps) {
   return SetSourceFPS(m_handle, fps, &m_status);
 }
 
+inline double VideoSource::GetActualFPS() const {
+  m_status = 0;
+  return cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_FRAMES_RECEIVED,
+                                      &m_status);
+}
+
+inline double VideoSource::GetActualDataRate() const {
+  m_status = 0;
+  return cs::GetTelemetryAverageValue(m_handle, CS_SOURCE_BYTES_RECEIVED,
+                                      &m_status);
+}
+
 inline std::vector<VideoMode> VideoSource::EnumerateVideoModes() const {
   CS_Status status = 0;
   return EnumerateSourceVideoModes(m_handle, &status);

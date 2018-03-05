@@ -22,6 +22,7 @@
 #include "Notifier.h"
 #include "SinkImpl.h"
 #include "SourceImpl.h"
+#include "Telemetry.h"
 
 using namespace cs;
 
@@ -582,6 +583,28 @@ void RemoveListener(CS_Listener handle, CS_Status* status) {
 }
 
 bool NotifierDestroyed() { return Notifier::destroyed(); }
+
+//
+// Telemetry Functions
+//
+void SetTelemetryPeriod(double seconds) {
+  Telemetry::GetInstance().Start();
+  Telemetry::GetInstance().SetPeriod(seconds);
+}
+
+double GetTelemetryElapsedTime() {
+  return Telemetry::GetInstance().GetElapsedTime();
+}
+
+int64_t GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
+                          CS_Status* status) {
+  return Telemetry::GetInstance().GetValue(handle, kind, status);
+}
+
+double GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
+                                CS_Status* status) {
+  return Telemetry::GetInstance().GetAverageValue(handle, kind, status);
+}
 
 //
 // Logging Functions

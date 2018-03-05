@@ -296,6 +296,20 @@ void CS_RemoveListener(CS_Listener handle, CS_Status* status) {
 
 int CS_NotifierDestroyed(void) { return cs::NotifierDestroyed(); }
 
+void CS_SetTelemetryPeriod(double seconds) { cs::SetTelemetryPeriod(seconds); }
+
+double CS_GetTelemetryElapsedTime() { return cs::GetTelemetryElapsedTime(); }
+
+int64_t CS_GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
+                             CS_Status* status) {
+  return cs::GetTelemetryValue(handle, kind, status);
+}
+
+double CS_GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,
+                                   CS_Status* status) {
+  return cs::GetTelemetryAverageValue(handle, kind, status);
+}
+
 void CS_SetLogger(CS_LogFunc func, unsigned int min_level) {
   cs::SetLogger(func, min_level);
 }
