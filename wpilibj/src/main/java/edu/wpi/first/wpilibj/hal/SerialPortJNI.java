@@ -10,6 +10,8 @@ package edu.wpi.first.wpilibj.hal;
 public class SerialPortJNI extends JNIWrapper {
   public static native void serialInitializePort(byte port);
 
+  public static native void serialInitializePortDirect(byte port, String portName);
+
   public static native void serialSetBaudRate(byte port, int baud);
 
   public static native void serialSetDataBits(byte port, byte bits);

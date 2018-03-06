@@ -47,6 +47,25 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialInitializePort(
 
 /*
  * Class:     edu_wpi_first_wpilibj_hal_SerialPortJNI
+ * Method:    serialInitializePortDirect
+ * Signature: (BLjava/lang/String;)V
+ */
+JNIEXPORT void JNICALL
+Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialInitializePortDirect(
+    JNIEnv* env, jclass, jbyte port, jstring portName) {
+  SERIALJNI_LOG(logDEBUG) << "Calling Serial Initialize Direct";
+  SERIALJNI_LOG(logDEBUG) << "Port = " << (jint)port;
+  JStringRef portNameRef{env, portName};
+  SERIALJNI_LOG(logDEBUG) << "PortName = " << portNameRef.c_str();
+  int32_t status = 0;
+  HAL_InitializeSerialPortDirect(static_cast<HAL_SerialPort>(port),
+                                 portNameRef.c_str(), &status);
+  SERIALJNI_LOG(logDEBUG) << "Status = " << status;
+  CheckStatusForceThrow(env, status);
+}
+
+/*
+ * Class:     edu_wpi_first_wpilibj_hal_SerialPortJNI
  * Method:    serialSetBaudRate
  * Signature: (BI)V
  */
@@ -247,7 +266,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialRead(
   llvm::SmallVector<char, 128> recvBuf;
   recvBuf.resize(size);
   int32_t status = 0;
-  jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPort>(port), recvBuf.data(), 
+  jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPort>(port), recvBuf.data(),
                                size, &status);
   env->SetByteArrayRegion(dataReceived, 0, size,
                           reinterpret_cast<const jbyte *>(recvBuf.data()));
