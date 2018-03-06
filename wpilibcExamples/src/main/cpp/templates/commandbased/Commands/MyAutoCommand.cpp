@@ -7,9 +7,11 @@
 
 #include "MyAutoCommand.h"
 
+#include "../Robot.h"
+
 MyAutoCommand::MyAutoCommand() {
 	// Use Requires() here to declare subsystem dependencies
-	// eg. Requires(&Robot::chassis);
+	Requires(&Robot::m_subsystem);
 }
 
 // Called just before this Command runs the first time
