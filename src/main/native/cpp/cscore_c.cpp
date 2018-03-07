@@ -298,7 +298,9 @@ int CS_NotifierDestroyed(void) { return cs::NotifierDestroyed(); }
 
 void CS_SetTelemetryPeriod(double seconds) { cs::SetTelemetryPeriod(seconds); }
 
-double CS_GetTelemetryElapsedTime() { return cs::GetTelemetryElapsedTime(); }
+double CS_GetTelemetryElapsedTime(void) {
+  return cs::GetTelemetryElapsedTime();
+}
 
 int64_t CS_GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
                              CS_Status* status) {

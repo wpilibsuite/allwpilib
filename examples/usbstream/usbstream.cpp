@@ -22,11 +22,13 @@ int main() {
   mjpegServer.SetSource(camera);
 
   CS_Status status = 0;
-  cs::AddListener([&](const cs::RawEvent& event) {
-                  llvm::outs() << "FPS=" << camera.GetActualFPS()
-                               << " MBPS=" << (camera.GetActualDataRate() /
-                                               1000000.0) << '\n';
-                  }, cs::RawEvent::kTelemetryUpdated, false, &status);
+  cs::AddListener(
+      [&](const cs::RawEvent& event) {
+        llvm::outs() << "FPS=" << camera.GetActualFPS()
+                     << " MBPS=" << (camera.GetActualDataRate() / 1000000.0)
+                     << '\n';
+      },
+      cs::RawEvent::kTelemetryUpdated, false, &status);
   cs::SetTelemetryPeriod(1.0);
 
   std::getchar();

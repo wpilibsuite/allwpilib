@@ -352,7 +352,7 @@ int CS_NotifierDestroyed(void);
 // Telemetry Functions
 //
 void CS_SetTelemetryPeriod(double seconds);
-double CS_GetTelemetryElapsedTime();
+double CS_GetTelemetryElapsedTime(void);
 int64_t CS_GetTelemetryValue(CS_Handle handle, CS_TelemetryKind kind,
                              CS_Status* status);
 double CS_GetTelemetryAverageValue(CS_Handle handle, CS_TelemetryKind kind,

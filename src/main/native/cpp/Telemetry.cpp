@@ -15,7 +15,6 @@
 
 #include "Handle.h"
 #include "Notifier.h"
-#include "Telemetry.h"
 #include "cscore_cpp.h"
 
 using namespace cs;
@@ -123,8 +122,8 @@ void Telemetry::RecordSourceBytes(const SourceImpl& source, int quantity) {
   if (!thr) return;
   auto handleData = Sources::GetInstance().Find(source);
   thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
-                                static_cast<int>(CS_SOURCE_BYTES_RECEIVED))]
-      += quantity;
+                                static_cast<int>(CS_SOURCE_BYTES_RECEIVED))] +=
+      quantity;
 }
 
 void Telemetry::RecordSourceFrames(const SourceImpl& source, int quantity) {
@@ -132,6 +131,6 @@ void Telemetry::RecordSourceFrames(const SourceImpl& source, int quantity) {
   if (!thr) return;
   auto handleData = Sources::GetInstance().Find(source);
   thr->m_current[std::make_pair(Handle{handleData.first, Handle::kSource},
-                                static_cast<int>(CS_SOURCE_FRAMES_RECEIVED))]
-      += quantity;
+                                static_cast<int>(CS_SOURCE_FRAMES_RECEIVED))] +=
+      quantity;
 }
