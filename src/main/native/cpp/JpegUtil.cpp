@@ -55,26 +55,20 @@ bool IsJpeg(llvm::StringRef data) {
   // Check for valid SOI
   auto bytes = data.bytes_begin();
   if (bytes[0] != 0xff || bytes[1] != 0xd8) return false;
-#if 0
-  // Check for valid JPEG header (null terminated JFIF)
-  if (bytes[2] == 0xff && bytes[3] == 0xe0) {
-    if (data.substr(6, 4) != "JFIF" || bytes[10] != 0x00)
-    return false;
-  }
-#endif
   return true;
 }
 
 bool GetJpegSize(llvm::StringRef data, int* width, int* height) {
   if (!IsJpeg(data)) return false;
 
+  data = data.substr(2);  // Get to the first block
   auto bytes = data.bytes_begin();
-  size_t blockLength = bytes[4] * 256 + bytes[5] + 4;
   for (;;) {
-    data = data.substr(blockLength);  // Get to the next block
     if (data.size() < 4) return false;  // EOF
     bytes = data.bytes_begin();
     if (bytes[0] != 0xff) return false;  // not a tag
+    if (bytes[1] == 0xd9) return false;  // EOI without finding SOF?
+    if (bytes[1] == 0xda) return false;  // SOS without finding SOF?
     if (bytes[1] == 0xc0) {
       // SOF contains the file size
       if (data.size() < 9) return false;
@@ -83,7 +77,7 @@ bool GetJpegSize(llvm::StringRef data, int* width, int* height) {
       return true;
     }
     // Go to the next block
-    blockLength = bytes[2] * 256 + bytes[3] + 2;
+    data = data.substr(bytes[2] * 256 + bytes[3] + 2);
   }
 }
 
@@ -94,10 +88,9 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
   *locSOF = *size;
 
   // Search until SOS for DHT tag
+  sdata = sdata.substr(2);  // Get to the first block
   auto bytes = sdata.bytes_begin();
-  size_t blockLength = bytes[4] * 256 + bytes[5] + 4;
   for (;;) {
-    sdata = sdata.substr(blockLength);  // Get to the next block
     if (sdata.size() < 4) return false;  // EOF
     bytes = sdata.bytes_begin();
     if (bytes[0] != 0xff) return false;  // not a tag
@@ -105,7 +98,7 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
     if (bytes[1] == 0xc4) return false;  // DHT
     if (bytes[1] == 0xc0) *locSOF = sdata.data() - data;  // SOF
     // Go to the next block
-    blockLength = bytes[2] * 256 + bytes[3] + 2;
+    sdata = sdata.substr(bytes[2] * 256 + bytes[3] + 2);
   }
 
   // Only add DHT if we also found SOF (insertion point)
