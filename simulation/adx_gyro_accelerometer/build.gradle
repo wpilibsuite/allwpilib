@@ -57,3 +57,17 @@ if (!project.hasProperty('onlyAthena')) {
     }
     apply from: 'publish.gradle'
 }
+
+model {
+    tasks {
+        compileCpp(Task) {
+            $.binaries.each { binary ->
+                if (binary in NativeBinarySpec && binary.buildable) {
+                    binary.tasks.withType(AbstractNativeSourceCompileTask) { task->
+                        it.dependsOn task
+                    }
+                }
+            }
+        }
+    }
+}

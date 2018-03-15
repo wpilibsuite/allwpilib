@@ -85,6 +85,15 @@ def testOutputFolder = file("${project(':').buildDir}/integrationTestFiles")
 
 model {
     tasks {
+        compileCpp(Task) {
+            $.binaries.each { binary ->
+                if (binary in NativeBinarySpec && binary.buildable) {
+                    binary.tasks.withType(AbstractNativeSourceCompileTask) { task->
+                        it.dependsOn task
+                    }
+                }
+            }
+        }
         copyWpilibCTestLibrariesToOutput(Task) {
             $.binaries.each {
                 if (it in NativeExecutableBinarySpec && it.targetPlatform.architecture.name == 'athena') {
