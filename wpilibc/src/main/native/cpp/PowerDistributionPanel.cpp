@@ -174,11 +174,41 @@ void PowerDistributionPanel::ClearStickyFaults() {
 
 void PowerDistributionPanel::InitSendable(SendableBuilder& builder) {
   builder.SetSmartDashboardType("PowerDistributionPanel");
-  for (int i = 0; i < kPDPChannels; ++i) {
-    builder.AddDoubleProperty("Chan" + llvm::Twine(i),
-                              [=]() { return GetCurrent(i); }, nullptr);
+
+  llvm::SmallVector<NT_Entry, 16> cEntry;
+  auto vEntry = builder.GetEntry("Voltage").GetHandle();
+  auto tcEntry = builder.GetEntry("TotalCurrent").GetHandle();
+  auto tmpEntry = builder.GetEntry("Temperature").GetHandle();
+  auto pEntry = builder.GetEntry("TotalPower").GetHandle();
+  auto eEntry = builder.GetEntry("TotalEnergy").GetHandle();
+
+  for (int i = 0; i < 16; i++) {
+    cEntry.emplace_back(builder.GetEntry("Chan" + llvm::Twine(i)).GetHandle());
   }
-  builder.AddDoubleProperty("Voltage", [=]() { return GetVoltage(); }, nullptr);
-  builder.AddDoubleProperty("TotalCurrent", [=]() { return GetTotalCurrent(); },
-                            nullptr);
+
+  builder.SetUpdateTable([=]() {
+    double voltage;
+    double currents[16];
+    double temp;
+    double totalCurrent;
+    double power;
+    double energy;
+    int32_t status = 0;
+    HAL_GetAllPDPData(m_module, &voltage, currents, &temp, &totalCurrent,
+                      &power, &energy, &status);
+    if (status) {
+      wpi_setWPIErrorWithContext(Timeout, "");
+      return;
+    }
+
+    nt::NetworkTableEntry(vEntry).SetDouble(voltage);
+    nt::NetworkTableEntry(tcEntry).SetDouble(totalCurrent);
+    nt::NetworkTableEntry(tmpEntry).SetDouble(temp);
+    nt::NetworkTableEntry(pEntry).SetDouble(power);
+    nt::NetworkTableEntry(eEntry).SetDouble(energy);
+
+    for (int i = 0; i < 16; i++) {
+      nt::NetworkTableEntry(cEntry[i]).SetDouble(currents[i]);
+    }
+  });
 }

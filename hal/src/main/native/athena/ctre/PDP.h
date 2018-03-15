@@ -11,6 +11,9 @@ public:
      */
     PDP(UINT8 deviceNumber=0);
     ~PDP();
+
+    CTR_Code GetAllData(double* voltage, double* currents, double* temp,
+                        double* totalCurrent, double* power, double* energy);
     /* Get PDP Channel Current
      *
      * @Return	-	CTR_Code	-	Error code (if any)

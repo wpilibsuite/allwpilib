@@ -44,4 +44,16 @@ double HAL_GetPDPTotalPower(int32_t module, int32_t* status) { return 0.0; }
 double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) { return 0.0; }
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status) {}
 void HAL_ClearPDPStickyFaults(int32_t module, int32_t* status) {}
+void HAL_GetAllPDPData(int32_t module, double* voltage, double* currents,
+                       double* temp, double* totalCurrent, double* power,
+                       double* energy, int32_t* status) {
+  *voltage = 0;
+  for (int i = 0; i < 16; i++) {
+    currents[i] = 0;
+  }
+  *temp = 0;
+  *totalCurrent = 0;
+  *power = 0;
+  *energy = 0;
+}
 }  // extern "C"

@@ -122,6 +122,15 @@ double HAL_GetPDPTotalEnergy(int32_t module, int32_t* status) {
   return energy;
 }
 
+void HAL_GetAllPDPData(int32_t module, double* voltage, double* currents,
+                       double* temp, double* totalCurrent, double* power,
+                       double* energy, int32_t* status) {
+  if (!checkPDPInit(module, status)) return;
+
+  *status = pdp[module]->GetAllData(voltage, currents, temp, totalCurrent,
+                                    power, energy);
+}
+
 void HAL_ResetPDPTotalEnergy(int32_t module, int32_t* status) {
   if (!checkPDPInit(module, status)) return;
 

@@ -58,6 +58,7 @@ static JClass pwmConfigDataResultCls;
 static JClass canStatusCls;
 static JClass matchInfoDataCls;
 static JClass accumulatorResultCls;
+static JClass pdpDataCls;
 
 namespace frc {
 
@@ -243,6 +244,19 @@ void SetAccumulatorResultObject(JNIEnv* env, jobject accumulatorResult,
   env->CallObjectMethod(accumulatorResult, func, (jlong)value, (jlong)count);
 }
 
+void SetPDPDataObject(JNIEnv* env, jobject pdpData, double voltage,
+                      double* currents, double temp, double totalCurrent,
+                      double power, double energy) {
+  static jmethodID func = env->GetMethodID(pdpDataCls, "setData", "(DDDDD)[D");
+
+  auto rv = env->CallObjectMethod(pdpData, func, (jdouble) voltage,
+                                 (jdouble) temp, (jdouble) totalCurrent,
+                                 (jdouble) power, (jdouble) energy);
+  auto arr = reinterpret_cast<jdoubleArray>(rv);
+  if (env->GetArrayLength(arr) < 16) return;
+  env->SetDoubleArrayRegion(arr, 0, 16, currents);
+}
+
 }  // namespace frc
 
 using namespace frc;
@@ -304,6 +318,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
   accumulatorResultCls = JClass(env, "edu/wpi/first/wpilibj/AccumulatorResult");
   if (!accumulatorResultCls) return JNI_ERR;
 
+  pdpDataCls = JClass(env, "edu/wpi/first/wpilibj/hal/PDPData");
+  if (!pdpDataCls) return JNI_ERR;
+
   return JNI_VERSION_1_6;
 }
 
@@ -325,6 +342,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
   pwmConfigDataResultCls.free(env);
   canStatusCls.free(env);
   matchInfoDataCls.free(env);
+  pdpDataCls.free(env);
   jvm = nullptr;
 }
 
