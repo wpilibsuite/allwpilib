@@ -52,6 +52,6 @@ struct HasBeenMoved {
 }  // namespace frc
 
 // For backwards compatibility
-#ifndef NAMESPACED_WPILIB
+#ifdef NO_NAMESPACED_WPILIB
 using namespace frc;  // NOLINT
 #endif

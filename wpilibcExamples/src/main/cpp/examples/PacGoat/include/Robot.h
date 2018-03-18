@@ -20,7 +20,7 @@
 #include "Subsystems/Pneumatics.h"
 #include "Subsystems/Shooter.h"
 
-class Robot : public IterativeRobot {
+class Robot : public frc::IterativeRobot {
  public:
   static DriveTrain drivetrain;
   static Pivot pivot;
@@ -33,7 +33,7 @@ class Robot : public IterativeRobot {
   frc::Command* m_autonomousCommand = nullptr;
   DriveAndShootAutonomous m_driveAndShootAuto;
   DriveForward m_driveForwardAuto;
-  SendableChooser<frc::Command*> m_autoChooser;
+  frc::SendableChooser<frc::Command*> m_autoChooser;
 
   void RobotInit() override;
   void AutonomousInit() override;

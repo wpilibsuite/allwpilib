@@ -37,13 +37,13 @@ class Robot : public frc::IterativeRobot {
      * kReverse sets reverse to 12V and forward to 0V.
      */
     if (forward && reverse) {
-      m_relay.Set(Relay::kOn);
+      m_relay.Set(frc::Relay::kOn);
     } else if (forward) {
-      m_relay.Set(Relay::kForward);
+      m_relay.Set(frc::Relay::kForward);
     } else if (reverse) {
-      m_relay.Set(Relay::kReverse);
+      m_relay.Set(frc::Relay::kReverse);
     } else {
-      m_relay.Set(Relay::kOff);
+      m_relay.Set(frc::Relay::kOff);
     }
   }
 
