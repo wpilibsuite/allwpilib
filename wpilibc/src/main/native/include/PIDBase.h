@@ -36,9 +36,12 @@ class PIDOutput;
  */
 class PIDBase : public SendableBase, public PIDInterface {
  public:
-  PIDBase(double p, double i, double d, PIDSource& source, PIDOutput& output);
-  PIDBase(double p, double i, double d, double f, PIDSource& source,
+  PIDBase(double Kp, double Ki, double Kd, PIDSource& source,
           PIDOutput& output);
+  PIDBase(double Kp, double Ki, double Kd, double Kv, PIDSource& source,
+          PIDOutput& output);
+  PIDBase(double Kp, double Ki, double Kd, double Kv, double Ka,
+          PIDSource& source, PIDOutput& output);
   ~PIDBase() override = default;
 
   PIDBase(const PIDBase&) = delete;
@@ -48,16 +51,18 @@ class PIDBase : public SendableBase, public PIDInterface {
   virtual void SetContinuous(bool continuous = true);
   virtual void SetInputRange(double minimumInput, double maximumInput);
   virtual void SetOutputRange(double minimumOutput, double maximumOutput);
-  void SetPID(double p, double i, double d) override;
-  virtual void SetPID(double p, double i, double d, double f);
-  void SetP(double p);
-  void SetI(double i);
-  void SetD(double d);
-  void SetF(double f);
+  void SetPID(double Kp, double Ki, double Kd) override;
+  void SetPID(double Kp, double Ki, double Kd, double Kv, double Ka = 0.0);
+  void SetP(double Kp);
+  void SetI(double Ki);
+  void SetD(double Kd);
+  void SetV(double Kv);
+  void SetA(double Ka);
   double GetP() const override;
   double GetI() const override;
   double GetD() const override;
-  virtual double GetF() const;
+  virtual double GetV() const;
+  virtual double GetA() const;
 
   void SetSetpoint(double setpoint) override;
   double GetSetpoint() const override;
@@ -97,6 +102,8 @@ class PIDBase : public SendableBase, public PIDInterface {
 
   PIDSource* m_pidInput;
   PIDOutput* m_pidOutput;
+  double m_prevSetpoint = 0;
+  double m_prevDeltaSetpoint = 0;
   Timer m_setpointTimer;
 
   virtual void Calculate();
@@ -113,8 +120,11 @@ class PIDBase : public SendableBase, public PIDInterface {
   // Factor for "derivative" control
   double m_D;
 
-  // Factor for "feed forward" control
-  double m_F;
+  // Factor for "velocity feedforward" control
+  double m_V;
+
+  // Factor for "acceleration feedforward" control
+  double m_A;
 
   // |maximum output|
   double m_maximumOutput = 1.0;
@@ -150,7 +160,6 @@ class PIDBase : public SendableBase, public PIDInterface {
   double m_tolerance = 0.05;
 
   double m_setpoint = 0;
-  double m_prevSetpoint = 0;
   double m_error = 0;
   double m_result = 0;
 

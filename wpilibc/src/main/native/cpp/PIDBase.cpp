@@ -23,7 +23,7 @@ constexpr const T& clamp(const T& value, const T& low, const T& high) {
 }
 
 /**
- * Allocate a PID object with the given constants for P, I, D.
+ * Allocate a PID object with the given constants for Kp, Ki, and Kd.
  *
  * @param Kp     the proportional coefficient
  * @param Ki     the integral coefficient
@@ -36,21 +36,59 @@ PIDBase::PIDBase(double Kp, double Ki, double Kd, PIDSource& source,
     : PIDBase(Kp, Ki, Kd, 0.0, source, output) {}
 
 /**
- * Allocate a PID object with the given constants for P, I, D.
+ * Allocate a PID object with the given constants for Kp, Ki, Kd, and Kv.
  *
  * @param Kp     the proportional coefficient
  * @param Ki     the integral coefficient
  * @param Kd     the derivative coefficient
+ * @param Kv     the velocity feedforward coefficient
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  */
-PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource& source,
+PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kv, PIDSource& source,
                  PIDOutput& output)
     : SendableBase(false) {
   m_P = Kp;
   m_I = Ki;
   m_D = Kd;
-  m_F = Kf;
+  m_V = Kv;
+
+  // Save original source
+  m_origSource = std::shared_ptr<PIDSource>(&source, NullDeleter<PIDSource>());
+
+  // Create LinearDigitalFilter with original source as its source argument
+  m_filter = LinearDigitalFilter::MovingAverage(m_origSource, 1);
+  m_pidInput = &m_filter;
+
+  m_pidOutput = &output;
+
+  m_setpointTimer.Start();
+
+  static int instances = 0;
+  instances++;
+  HAL_Report(HALUsageReporting::kResourceType_PIDController, instances);
+  SetName("PIDController", instances);
+}
+
+/**
+ * Allocate a PID object with the given constants for Kp, Ki, Kd, Kv, and Ka.
+ *
+ * @param Kp     the proportional coefficient
+ * @param Ki     the integral coefficient
+ * @param Kd     the derivative coefficient
+ * @param Kv     the velocity feedforward coefficient
+ * @param Ka     the acceleration feedforward coefficient
+ * @param source The PIDSource object that is used to get values
+ * @param output The PIDOutput object that is set to the output value
+ */
+PIDBase::PIDBase(double Kp, double Ki, double Kd, double Kv, double Ka,
+                 PIDSource& source, PIDOutput& output)
+    : SendableBase(false) {
+  m_P = Kp;
+  m_I = Ki;
+  m_D = Kd;
+  m_V = Kv;
+  m_A = Ka;
 
   // Save original source
   m_origSource = std::shared_ptr<PIDSource>(&source, NullDeleter<PIDSource>());
@@ -167,20 +205,21 @@ void PIDBase::Calculate() {
  * synchronization because the PIDBase class only calls it in synchronized
  * code, so be careful if calling it oneself.
  *
- * If a velocity PID controller is being used, the F term should be set to 1
+ * If a velocity PID controller is being used, the Kv term should be set to 1
  * over the maximum setpoint for the output. If a position PID controller is
- * being used, the F term should be set to 1 over the maximum speed for the
- * output measured in setpoint units per this controller's update period (see
- * the default period in this class's constructor).
+ * being used, the Kv term should be set to 1 over the maximum speed for the
+ * output measured in setpoint units per this controller's update period.
  */
 double PIDBase::CalculateFeedForward() {
   if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
-    return m_F * GetSetpoint();
+    return m_V * GetSetpoint() + m_A * GetDeltaSetpoint();
   } else {
-    double temp = m_F * GetDeltaSetpoint();
+    const double deltaSetpoint = GetDeltaSetpoint();
+    const double output =
+        m_V * deltaSetpoint + m_A * (deltaSetpoint - m_prevDeltaSetpoint);
     m_prevSetpoint = m_setpoint;
-    m_setpointTimer.Reset();
-    return temp;
+    m_prevDeltaSetpoint = deltaSetpoint;
+    return output;
   }
 }
 
@@ -189,16 +228,16 @@ double PIDBase::CalculateFeedForward() {
  *
  * Set the proportional, integral, and differential coefficients.
  *
- * @param p Proportional coefficient
- * @param i Integral coefficient
- * @param d Differential coefficient
+ * @param Kp Proportional coefficient
+ * @param Ki Integral coefficient
+ * @param Kd Differential coefficient
  */
-void PIDBase::SetPID(double p, double i, double d) {
+void PIDBase::SetPID(double Kp, double Ki, double Kd) {
   {
     std::lock_guard<wpi::mutex> lock(m_thisMutex);
-    m_P = p;
-    m_I = i;
-    m_D = d;
+    m_P = Kp;
+    m_I = Ki;
+    m_D = Kd;
   }
 }
 
@@ -207,17 +246,19 @@ void PIDBase::SetPID(double p, double i, double d) {
  *
  * Set the proportional, integral, and differential coefficients.
  *
- * @param p Proportional coefficient
- * @param i Integral coefficient
- * @param d Differential coefficient
- * @param f Feed forward coefficient
+ * @param Kp Proportional coefficient
+ * @param Ki Integral coefficient
+ * @param Kd Differential coefficient
+ * @param Kv Velocity feedforward coefficient
+ * @param Ka Acceleration feedforward coefficient
  */
-void PIDBase::SetPID(double p, double i, double d, double f) {
+void PIDBase::SetPID(double Kp, double Ki, double Kd, double Kv, double Ka) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_P = p;
-  m_I = i;
-  m_D = d;
-  m_F = f;
+  m_P = Kp;
+  m_I = Ki;
+  m_D = Kd;
+  m_V = Kv;
+  m_A = Ka;
 }
 
 /**
@@ -251,13 +292,23 @@ void PIDBase::SetD(double d) {
 }
 
 /**
- * Get the Feed forward coefficient of the PID controller gain.
+ * Set the velocity feedforward coefficient of the PID controller gain.
  *
- * @param f Feed forward coefficient
+ * @param Kv Velocity feedforward coefficient
  */
-void PIDBase::SetF(double f) {
+void PIDBase::SetV(double Kv) {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  m_F = f;
+  m_V = Kv;
+}
+
+/**
+ * Set the velocity feedforward coefficient of the PID controller gain.
+ *
+ * @param Kv Velocity feedforward coefficient
+ */
+void PIDBase::SetA(double Ka) {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  m_A = Ka;
 }
 
 /**
@@ -291,13 +342,23 @@ double PIDBase::GetD() const {
 }
 
 /**
- * Get the Feed forward coefficient.
+ * Get the velocity feedforward coefficient.
  *
- * @return Feed forward coefficient
+ * @return Velocity feedforward coefficient
  */
-double PIDBase::GetF() const {
+double PIDBase::GetV() const {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
-  return m_F;
+  return m_V;
+}
+
+/**
+ * Get the acceleration feedforward coefficient.
+ *
+ * @return Acceleration feedforward coefficient
+ */
+double PIDBase::GetA() const {
+  std::lock_guard<wpi::mutex> lock(m_thisMutex);
+  return m_A;
 }
 
 /**
@@ -537,8 +598,10 @@ void PIDBase::InitSendable(SendableBuilder& builder) {
                             [=](double value) { SetI(value); });
   builder.AddDoubleProperty("d", [=]() { return GetD(); },
                             [=](double value) { SetD(value); });
-  builder.AddDoubleProperty("f", [=]() { return GetF(); },
-                            [=](double value) { SetF(value); });
+  builder.AddDoubleProperty("v", [=]() { return GetV(); },
+                            [=](double value) { SetV(value); });
+  builder.AddDoubleProperty("a", [=]() { return GetA(); },
+                            [=](double value) { SetA(value); });
   builder.AddDoubleProperty("setpoint", [=]() { return GetSetpoint(); },
                             [=](double value) { SetSetpoint(value); });
 }

@@ -14,7 +14,7 @@
 using namespace frc;
 
 /**
- * Allocate a PID object with the given constants for P, I, D.
+ * Allocate a PID object with the given constants for Kp, Ki, and Kd.
  *
  * @param Kp     the proportional coefficient
  * @param Ki     the integral coefficient
@@ -27,27 +27,28 @@ using namespace frc;
  */
 PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource* source,
                              PIDOutput* output, double period)
-    : PIDController(Kp, Ki, Kd, 0.0, *source, *output, period) {}
+    : PIDController(Kp, Ki, Kd, 0.0, 0.0, *source, *output, period) {}
 
 /**
- * Allocate a PID object with the given constants for P, I, D.
+ * Allocate a PID object with the given constants for Kp, Ki, Kd, and Kv.
  *
  * @param Kp     the proportional coefficient
  * @param Ki     the integral coefficient
  * @param Kd     the derivative coefficient
+ * @param Kv     the velocity feedforward coefficient
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly
  *               effects calculations of the integral and differental terms.
  *               The default is 50ms.
  */
-PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
+PIDController::PIDController(double Kp, double Ki, double Kd, double Kv,
                              PIDSource* source, PIDOutput* output,
                              double period)
-    : PIDController(Kp, Ki, Kd, Kf, *source, *output, period) {}
+    : PIDController(Kp, Ki, Kd, Kv, 0.0, *source, *output, period) {}
 
 /**
- * Allocate a PID object with the given constants for P, I, D.
+ * Allocate a PID object with the given constants for Kp, Ki, and Kd.
  *
  * @param Kp     the proportional coefficient
  * @param Ki     the integral coefficient
@@ -60,26 +61,47 @@ PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
  */
 PIDController::PIDController(double Kp, double Ki, double Kd, PIDSource& source,
                              PIDOutput& output, double period)
-    : PIDController(Kp, Ki, Kd, 0.0, source, output, period) {}
+    : PIDController(Kp, Ki, Kd, 0.0, 0.0, source, output, period) {}
 
 /**
- * Allocate a PID object with the given constants for P, I, D.
+ * Allocate a PID object with the given constants for Kp, Ki, Kd, and Kv.
  *
  * @param Kp     the proportional coefficient
  * @param Ki     the integral coefficient
  * @param Kd     the derivative coefficient
+ * @param Kv     the velocity feedforward coefficient
  * @param source The PIDSource object that is used to get values
  * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly
  *               effects calculations of the integral and differental terms.
  *               The default is 50ms.
  */
-PIDController::PIDController(double Kp, double Ki, double Kd, double Kf,
+PIDController::PIDController(double Kp, double Ki, double Kd, double Kv,
                              PIDSource& source, PIDOutput& output,
                              double period)
-    : PIDBase(Kp, Ki, Kd, Kf, source, output) {
+    : PIDController(Kp, Ki, Kd, Kv, 0.0, source, output, period) {}
+
+/**
+ * Allocate a PID object with the given constants for Kp, Ki, Kd, Kv, and Ka.
+ *
+ * @param Kp     the proportional coefficient
+ * @param Ki     the integral coefficient
+ * @param Kd     the derivative coefficient
+ * @param Kv     the velocity feedforward coefficient
+ * @param Ka     the acceleration feedforward coefficient
+ * @param source The PIDSource object that is used to get values
+ * @param output The PIDOutput object that is set to the output value
+ * @param period the loop time for doing calculations. This particularly
+ *               effects calculations of the integral and differental terms.
+ *               The default is 50ms.
+ */
+PIDController::PIDController(double Kp, double Ki, double Kd, double Kv,
+                             double Ka, PIDSource& source, PIDOutput& output,
+                             double period)
+    : PIDBase(Kp, Ki, Kd, Kv, Ka, source, output) {
   m_controlLoop = std::make_unique<Notifier>(&PIDController::Calculate, this);
   m_controlLoop->StartPeriodic(period);
+  m_period = period;
 }
 
 PIDController::~PIDController() {
@@ -130,6 +152,34 @@ void PIDController::SetEnabled(bool enable) {
 bool PIDController::IsEnabled() const {
   std::lock_guard<wpi::mutex> lock(m_thisMutex);
   return m_enabled;
+}
+
+/**
+ * Calculate the feed forward term.
+ *
+ * Both of the provided feed forward calculations are velocity feed forwards.
+ * If a different feed forward calculation is desired, the user can override
+ * this function and provide his or her own. This function does no
+ * synchronization because the PIDBase class only calls it in synchronized
+ * code, so be careful if calling it oneself.
+ *
+ * If a velocity PID controller is being used, the Kv term should be set to 1
+ * over the maximum setpoint for the output. If a position PID controller is
+ * being used, the Kv term should be set to 1 over the maximum speed for the
+ * output measured in setpoint units per second.
+ */
+double PIDController::CalculateFeedForward() {
+  if (m_pidInput->GetPIDSourceType() == PIDSourceType::kRate) {
+    return (GetV() * GetSetpoint() + GetA() * GetDeltaSetpoint()) * m_period;
+  } else {
+    const double deltaSetpoint = GetDeltaSetpoint();
+    const double output =
+        GetV() * deltaSetpoint + GetA() * (deltaSetpoint - m_prevDeltaSetpoint);
+    m_prevSetpoint = GetSetpoint();
+    m_prevDeltaSetpoint = deltaSetpoint;
+    m_setpointTimer.Reset();
+    return output * m_period;
+  }
 }
 
 /**

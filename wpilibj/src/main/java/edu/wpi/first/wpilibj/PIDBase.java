@@ -41,9 +41,13 @@ public class PIDBase extends SendableBase implements PIDInterface {
   @SuppressWarnings("MemberName")
   private double m_D;
 
-  // Factor for "feed forward" control
+  // Factor for "velocity feedforward" control
   @SuppressWarnings("MemberName")
-  private double m_F;
+  private double m_V;
+
+  // Factor for "acceleration feedforward" control
+  @SuppressWarnings("MemberName")
+  private double m_A;
 
   // |maximum output|
   private double m_maximumOutput = 1.0;
@@ -76,7 +80,6 @@ public class PIDBase extends SendableBase implements PIDInterface {
   private Tolerance m_tolerance;
 
   private double m_setpoint = 0.0;
-  private double m_prevSetpoint = 0.0;
   @SuppressWarnings("PMD.UnusedPrivateField")
   private double m_error = 0.0;
   private double m_result = 0.0;
@@ -92,6 +95,8 @@ public class PIDBase extends SendableBase implements PIDInterface {
 
   protected PIDSource m_pidInput;
   protected PIDOutput m_pidOutput;
+  protected double m_prevSetpoint = 0.0;
+  protected double m_prevDeltaSetpoint = 0.0;
   protected Timer m_setpointTimer;
 
   /**
@@ -141,17 +146,18 @@ public class PIDBase extends SendableBase implements PIDInterface {
   }
 
   /**
-   * Allocate a PID object with the given constants for P, I, D, and F.
+   * Allocate a PID object with the given constants for Kp, Ki, Kd, Kv, and Ka.
    *
    * @param Kp     the proportional coefficient
    * @param Ki     the integral coefficient
    * @param Kd     the derivative coefficient
-   * @param Kf     the feed forward term
+   * @param Kv     the velocity feedforward term
+   * @param Ka     the acceleration feedforward term
    * @param source The PIDSource object that is used to get values
    * @param output The PIDOutput object that is set to the output percentage
    */
   @SuppressWarnings("ParameterName")
-  public PIDBase(double Kp, double Ki, double Kd, double Kf, PIDSource source,
+  public PIDBase(double Kp, double Ki, double Kd, double Kv, double Ka, PIDSource source,
                  PIDOutput output) {
     super(false);
     requireNonNull(source, "Null PIDSource was given");
@@ -163,7 +169,8 @@ public class PIDBase extends SendableBase implements PIDInterface {
     m_P = Kp;
     m_I = Ki;
     m_D = Kd;
-    m_F = Kf;
+    m_V = Kv;
+    m_A = Ka;
 
     // Save original source
     m_origSource = source;
@@ -181,7 +188,23 @@ public class PIDBase extends SendableBase implements PIDInterface {
   }
 
   /**
-   * Allocate a PID object with the given constants for P, I, and D.
+   * Allocate a PID object with the given constants for Kp, Ki, Kd, and Kv.
+   *
+   * @param Kp     the proportional coefficient
+   * @param Ki     the integral coefficient
+   * @param Kd     the derivative coefficient
+   * @param Kv     the velocity feedforward term
+   * @param source The PIDSource object that is used to get values
+   * @param output The PIDOutput object that is set to the output percentage
+   */
+  @SuppressWarnings("ParameterName")
+  public PIDBase(double Kp, double Ki, double Kd, double Kv, PIDSource source,
+                 PIDOutput output) {
+    this(Kp, Ki, Kd, Kv, 0.0, source, output);
+  }
+
+  /**
+   * Allocate a PID object with the given constants for Kp, Ki, and Kd.
    *
    * @param Kp     the proportional coefficient
    * @param Ki     the integral coefficient
@@ -310,19 +333,20 @@ public class PIDBase extends SendableBase implements PIDInterface {
    * her own. This function  does no synchronization because the PIDController class only calls it
    * in synchronized code, so be careful if calling it oneself.
    *
-   * <p>If a velocity PID controller is being used, the F term should be set to 1 over the maximum
-   * setpoint for the output. If a position PID controller is being used, the F term should be set
+   * <p>If a velocity PID controller is being used, the Kv term should be set to 1 over the maximum
+   * setpoint for the output. If a position PID controller is being used, the Kv term should be set
    * to 1 over the maximum speed for the output measured in setpoint units per this controller's
-   * update period (see the default period in this class's constructor).
+   * update period.
    */
   protected double calculateFeedForward() {
     if (m_pidInput.getPIDSourceType().equals(PIDSourceType.kRate)) {
-      return m_F * getSetpoint();
+      return m_V * getSetpoint() + m_A * getDeltaSetpoint();
     } else {
-      double temp = m_F * getDeltaSetpoint();
+      final double deltaSetpoint = getDeltaSetpoint();
+      final double output = m_V * deltaSetpoint + m_A * (deltaSetpoint - m_prevDeltaSetpoint);
       m_prevSetpoint = m_setpoint;
-      m_setpointTimer.reset();
-      return temp;
+      m_prevDeltaSetpoint = deltaSetpoint;
+      return output;
     }
   }
 
@@ -330,17 +354,17 @@ public class PIDBase extends SendableBase implements PIDInterface {
    * Set the PID Controller gain parameters. Set the proportional, integral, and differential
    * coefficients.
    *
-   * @param p Proportional coefficient
-   * @param i Integral coefficient
-   * @param d Differential coefficient
+   * @param Kp Proportional coefficient
+   * @param Ki Integral coefficient
+   * @param Kd Differential coefficient
    */
   @SuppressWarnings("ParameterName")
-  public void setPID(double p, double i, double d) {
+  public void setPID(double Kp, double Ki, double Kd) {
     m_thisMutex.lock();
     try {
-      m_P = p;
-      m_I = i;
-      m_D = d;
+      m_P = Kp;
+      m_I = Ki;
+      m_D = Kd;
     } finally {
       m_thisMutex.unlock();
     }
@@ -350,19 +374,35 @@ public class PIDBase extends SendableBase implements PIDInterface {
    * Set the PID Controller gain parameters. Set the proportional, integral, and differential
    * coefficients.
    *
-   * @param p Proportional coefficient
-   * @param i Integral coefficient
-   * @param d Differential coefficient
-   * @param f Feed forward coefficient
+   * @param Kp Proportional coefficient
+   * @param Ki Integral coefficient
+   * @param Kd Differential coefficient
+   * @param Kv Velocity feedforward coefficient
    */
   @SuppressWarnings("ParameterName")
-  public void setPID(double p, double i, double d, double f) {
+  public void setPID(double Kp, double Ki, double Kd, double Kv) {
+    setPID(Kp, Ki, Kd, Kv, 0.0);
+  }
+
+  /**
+   * Set the PID Controller gain parameters. Set the proportional, integral, and differential
+   * coefficients.
+   *
+   * @param Kp Proportional coefficient
+   * @param Ki Integral coefficient
+   * @param Kd Differential coefficient
+   * @param Kv Velocity feedforward coefficient
+   * @param Ka Acceleration feedforward coefficient
+   */
+  @SuppressWarnings("ParameterName")
+  public void setPID(double Kp, double Ki, double Kd, double Kv, double Ka) {
     m_thisMutex.lock();
     try {
-      m_P = p;
-      m_I = i;
-      m_D = d;
-      m_F = f;
+      m_P = Kp;
+      m_I = Ki;
+      m_D = Kd;
+      m_V = Kv;
+      m_A = Ka;
     } finally {
       m_thisMutex.unlock();
     }
@@ -414,15 +454,30 @@ public class PIDBase extends SendableBase implements PIDInterface {
   }
 
   /**
-   * Set the Feed forward coefficient of the PID controller gain.
+   * Set the velocity feedforward coefficient of the PID controller gain.
    *
-   * @param f feed forward coefficient
+   * @param Kv Velocity feedforward coefficient
    */
   @SuppressWarnings("ParameterName")
-  public void setF(double f) {
+  public void setV(double Kv) {
     m_thisMutex.lock();
     try {
-      m_F = f;
+      m_V = Kv;
+    } finally {
+      m_thisMutex.unlock();
+    }
+  }
+
+  /**
+   * Set the acceleration feedforward coefficient of the PID controller gain.
+   *
+   * @param Ka Acceleration feedforward coefficient
+   */
+  @SuppressWarnings("ParameterName")
+  public void setA(double Ka) {
+    m_thisMutex.lock();
+    try {
+      m_A = Ka;
     } finally {
       m_thisMutex.unlock();
     }
@@ -471,14 +526,28 @@ public class PIDBase extends SendableBase implements PIDInterface {
   }
 
   /**
-   * Get the Feed forward coefficient.
+   * Get the velocity feedforward coefficient.
    *
-   * @return feed forward coefficient
+   * @return Velocity feedforward coefficient
    */
-  public double getF() {
+  public double getV() {
     m_thisMutex.lock();
     try {
-      return m_F;
+      return m_V;
+    } finally {
+      m_thisMutex.unlock();
+    }
+  }
+
+  /**
+   * Get the acceleration feedforward coefficient.
+   *
+   * @return Acceleration feedforward coefficient
+   */
+  public double getA() {
+    m_thisMutex.lock();
+    try {
+      return m_A;
     } finally {
       m_thisMutex.unlock();
     }
@@ -772,7 +841,8 @@ public class PIDBase extends SendableBase implements PIDInterface {
     builder.addDoubleProperty("p", this::getP, this::setP);
     builder.addDoubleProperty("i", this::getI, this::setI);
     builder.addDoubleProperty("d", this::getD, this::setD);
-    builder.addDoubleProperty("f", this::getF, this::setF);
+    builder.addDoubleProperty("v", this::getV, this::setV);
+    builder.addDoubleProperty("a", this::getA, this::setA);
     builder.addDoubleProperty("setpoint", this::getSetpoint, this::setSetpoint);
   }
 
