@@ -18,12 +18,12 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.AnalogOutput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Jaguar;
-import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Victor;
-import edu.wpi.first.wpilibj.filters.LinearDigitalFilter;
+import edu.wpi.first.wpilibj.ctrlsys.INode;
+import edu.wpi.first.wpilibj.ctrlsys.LinearFilter;
 import edu.wpi.first.wpilibj.fixtures.AnalogCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.DIOCrossConnectFixture;
 import edu.wpi.first.wpilibj.fixtures.FilterNoiseFixture;
@@ -351,11 +351,11 @@ public final class TestBench {
    *
    * @return a single-pole IIR filter with a noisy data source
    */
-  public FilterNoiseFixture<LinearDigitalFilter> getSinglePoleIIRNoiseFixture() {
-    return new FilterNoiseFixture<LinearDigitalFilter>() {
+  public FilterNoiseFixture<LinearFilter> getSinglePoleIIRNoiseFixture() {
+    return new FilterNoiseFixture<LinearFilter>() {
       @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.singlePoleIIR(source,
+      protected LinearFilter giveFilter(INode source) {
+        return LinearFilter.singlePoleIIR(source,
             kSinglePoleIIRTimeConstant,
             kFilterStep);
       }
@@ -368,11 +368,11 @@ public final class TestBench {
    *
    * @return a moving average filter with a noisy data source
    */
-  public FilterNoiseFixture<LinearDigitalFilter> getMovAvgNoiseFixture() {
-    return new FilterNoiseFixture<LinearDigitalFilter>() {
+  public FilterNoiseFixture<LinearFilter> getMovAvgNoiseFixture() {
+    return new FilterNoiseFixture<LinearFilter>() {
       @Override
-      protected LinearDigitalFilter giveFilter(PIDSource source) {
-        return LinearDigitalFilter.movingAverage(source, kMovAvgTaps);
+      protected LinearFilter giveFilter(INode source) {
+        return LinearFilter.movingAverage(source, kMovAvgTaps);
       }
     };
   }
@@ -383,12 +383,12 @@ public final class TestBench {
    *
    * @return a single-pole IIR filter with a repeatable data source
    */
-  public FilterOutputFixture<LinearDigitalFilter> getSinglePoleIIROutputFixture() {
-    return new FilterOutputFixture<LinearDigitalFilter>(kSinglePoleIIRExpectedOutput) {
+  public FilterOutputFixture<LinearFilter> getSinglePoleIIROutputFixture() {
+    return new FilterOutputFixture<LinearFilter>(kSinglePoleIIRExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter() {
+      protected LinearFilter giveFilter() {
         m_data = new DataWrapper(getData);
-        return LinearDigitalFilter.singlePoleIIR(m_data,
+        return LinearFilter.singlePoleIIR(m_data,
             kSinglePoleIIRTimeConstant,
             kFilterStep);
       }
@@ -400,12 +400,12 @@ public final class TestBench {
    *
    * @return a high-pass filter with a repeatable data source
    */
-  public FilterOutputFixture<LinearDigitalFilter> getHighPassOutputFixture() {
-    return new FilterOutputFixture<LinearDigitalFilter>(kHighPassExpectedOutput) {
+  public FilterOutputFixture<LinearFilter> getHighPassOutputFixture() {
+    return new FilterOutputFixture<LinearFilter>(kHighPassExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter() {
+      protected LinearFilter giveFilter() {
         m_data = new DataWrapper(getData);
-        return LinearDigitalFilter.highPass(m_data, kHighPassTimeConstant,
+        return LinearFilter.highPass(m_data, kHighPassTimeConstant,
             kFilterStep);
       }
     };
@@ -417,12 +417,12 @@ public final class TestBench {
    *
    * @return a moving average filter with a repeatable data source
    */
-  public FilterOutputFixture<LinearDigitalFilter> getMovAvgOutputFixture() {
-    return new FilterOutputFixture<LinearDigitalFilter>(kMovAvgExpectedOutput) {
+  public FilterOutputFixture<LinearFilter> getMovAvgOutputFixture() {
+    return new FilterOutputFixture<LinearFilter>(kMovAvgExpectedOutput) {
       @Override
-      protected LinearDigitalFilter giveFilter() {
+      protected LinearFilter giveFilter() {
         m_data = new DataWrapper(getData);
-        return LinearDigitalFilter.movingAverage(m_data, kMovAvgTaps);
+        return LinearFilter.movingAverage(m_data, kMovAvgTaps);
       }
     };
   }
@@ -433,12 +433,12 @@ public final class TestBench {
    *
    * @return a moving average filter with a repeatable data source
    */
-  public FilterOutputFixture<LinearDigitalFilter> getPulseFixture() {
-    return new FilterOutputFixture<LinearDigitalFilter>(0.0) {
+  public FilterOutputFixture<LinearFilter> getPulseFixture() {
+    return new FilterOutputFixture<LinearFilter>(0.0) {
       @Override
-      protected LinearDigitalFilter giveFilter() {
+      protected LinearFilter giveFilter() {
         m_data = new DataWrapper(getPulseData);
-        return LinearDigitalFilter.movingAverage(m_data, kMovAvgTaps);
+        return LinearFilter.movingAverage(m_data, kMovAvgTaps);
       }
     };
   }

@@ -7,8 +7,6 @@
 
 #include "Commands/PIDSubsystem.h"
 
-#include "PIDController.h"
-
 using namespace frc;
 
 /**
@@ -22,7 +20,7 @@ using namespace frc;
 PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
                            double d)
     : Subsystem(name) {
-  m_controller = std::make_shared<PIDController>(p, i, d, this, this);
+  m_controller = std::make_shared<PIDController>(p, i, d, *this, *this);
   AddChild("PIDController", m_controller);
 }
 
@@ -38,7 +36,7 @@ PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
 PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
                            double d, double f)
     : Subsystem(name) {
-  m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
+  m_controller = std::make_shared<PIDController>(p, i, d, f, *this, *this);
   AddChild("PIDController", m_controller);
 }
 
@@ -59,7 +57,7 @@ PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
                            double d, double f, double period)
     : Subsystem(name) {
   m_controller =
-      std::make_shared<PIDController>(p, i, d, f, this, this, period);
+      std::make_shared<PIDController>(p, i, d, f, *this, *this, period);
   AddChild("PIDController", m_controller);
 }
 
@@ -74,7 +72,7 @@ PIDSubsystem::PIDSubsystem(const llvm::Twine& name, double p, double i,
  */
 PIDSubsystem::PIDSubsystem(double p, double i, double d)
     : Subsystem("PIDSubsystem") {
-  m_controller = std::make_shared<PIDController>(p, i, d, this, this);
+  m_controller = std::make_shared<PIDController>(p, i, d, *this, *this);
   AddChild("PIDController", m_controller);
 }
 
@@ -90,7 +88,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d)
  */
 PIDSubsystem::PIDSubsystem(double p, double i, double d, double f)
     : Subsystem("PIDSubsystem") {
-  m_controller = std::make_shared<PIDController>(p, i, d, f, this, this);
+  m_controller = std::make_shared<PIDController>(p, i, d, f, *this, *this);
   AddChild("PIDController", m_controller);
 }
 
@@ -110,7 +108,7 @@ PIDSubsystem::PIDSubsystem(double p, double i, double d, double f,
                            double period)
     : Subsystem("PIDSubsystem") {
   m_controller =
-      std::make_shared<PIDController>(p, i, d, f, this, this, period);
+      std::make_shared<PIDController>(p, i, d, f, *this, *this, period);
   AddChild("PIDController", m_controller);
 }
 
@@ -196,16 +194,6 @@ void PIDSubsystem::SetAbsoluteTolerance(double absValue) {
 }
 
 /**
- * Set the percentage error which is considered tolerable for use with
- * OnTarget().
- *
- * @param percent percentage error which is tolerable
- */
-void PIDSubsystem::SetPercentTolerance(double percent) {
-  m_controller->SetPercentTolerance(percent);
-}
-
-/**
  * Return true if the error is within the percentage of the total input range,
  * determined by SetTolerance().
  *
@@ -238,4 +226,4 @@ double PIDSubsystem::GetRate() { return ReturnPIDInput(); }
 
 void PIDSubsystem::PIDWrite(double output) { UsePIDOutput(output); }
 
-double PIDSubsystem::PIDGet() { return ReturnPIDInput(); }
+double PIDSubsystem::GetOutput() { return ReturnPIDInput(); }

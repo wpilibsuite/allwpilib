@@ -5,10 +5,11 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+#include "CtrlSys/FuncNode.h"
+#include "CtrlSys/LinearFilter.h"
+#include "CtrlSys/PIDController.h"
 #include "Encoder.h"
-#include "Filters/LinearDigitalFilter.h"
 #include "Jaguar.h"
-#include "PIDController.h"
 #include "Talon.h"
 #include "TestBench.h"
 #include "Timer.h"
@@ -45,7 +46,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
  protected:
   SpeedController* m_speedController;
   Encoder* m_encoder;
-  LinearDigitalFilter* m_filter;
+  LinearFilter* m_filter;
 
   void SetUp() override {
     switch (GetParam()) {
@@ -67,8 +68,7 @@ class MotorEncoderTest : public testing::TestWithParam<MotorEncoderTestType> {
                                 TestBench::kTalonEncoderChannelB);
         break;
     }
-    m_filter = new LinearDigitalFilter(
-        LinearDigitalFilter::MovingAverage(*m_encoder, 50));
+    m_filter = new LinearFilter(kMovingAverage, *m_encoder, 50);
   }
 
   void TearDown() override {
@@ -139,8 +139,7 @@ TEST_P(MotorEncoderTest, ClampSpeed) {
 TEST_P(MotorEncoderTest, PositionPIDController) {
   Reset();
   double goal = 1000;
-  m_encoder->SetPIDSourceType(PIDSourceType::kDisplacement);
-  PIDController pid(0.001, 0.0005, 0.0, m_encoder, m_speedController);
+  PIDController pid(0.001, 0.0005, 0.0, *m_encoder, *m_speedController);
   pid.SetAbsoluteTolerance(50.0);
   pid.SetOutputRange(-0.2, 0.2);
   pid.SetSetpoint(goal);
@@ -163,8 +162,9 @@ TEST_P(MotorEncoderTest, PositionPIDController) {
 TEST_P(MotorEncoderTest, VelocityPIDController) {
   Reset();
 
-  m_encoder->SetPIDSourceType(PIDSourceType::kRate);
-  PIDController pid(1e-5, 0.0, 3e-5, 8e-5, m_filter, m_speedController);
+  FuncNode rate([&] { return m_encoder->GetRate(); });
+  auto filter = LinearFilter(kMovingAverage, rate, 50);
+  PIDController pid(3e-5, 1e-5, 0.0, 8e-5, filter, *m_speedController);
   pid.SetAbsoluteTolerance(200.0);
   pid.SetOutputRange(-0.3, 0.3);
   pid.SetSetpoint(600);

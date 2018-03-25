@@ -6,9 +6,9 @@
 /*----------------------------------------------------------------------------*/
 
 #include <AnalogInput.h>
+#include <CtrlSys/PIDController.h>
 #include <Drive/DifferentialDrive.h>
 #include <IterativeRobot.h>
-#include <PIDController.h>
 #include <PIDOutput.h>
 #include <Spark.h>
 
@@ -79,8 +79,8 @@ private:
 	frc::Spark m_right{kRightMotorPort};
 	frc::DifferentialDrive m_robotDrive{m_left, m_right};
 
-	frc::PIDController m_pidController{kP, kI, kD, &m_ultrasonic,
-			new MyPIDOutput(m_robotDrive)};
+	MyPIDOutput m_output{m_robotDrive};
+	frc::PIDController m_pidController{kP, kI, kD, m_ultrasonic, m_output};
 };
 
 START_ROBOT_CLASS(Robot)

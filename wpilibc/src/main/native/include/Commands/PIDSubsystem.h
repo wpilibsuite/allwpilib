@@ -12,9 +12,9 @@
 #include <llvm/Twine.h>
 
 #include "Commands/Subsystem.h"
-#include "PIDController.h"
+#include "CtrlSys/INode.h"
+#include "CtrlSys/PIDController.h"
 #include "PIDOutput.h"
-#include "PIDSource.h"
 
 namespace frc {
 
@@ -27,7 +27,7 @@ namespace frc {
  * also allows access to the internal PIDController in order to give total
  * control to the programmer.
  */
-class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
+class PIDSubsystem : public Subsystem, public PIDOutput, public INode {
  public:
   PIDSubsystem(const llvm::Twine& name, double p, double i, double d);
   PIDSubsystem(const llvm::Twine& name, double p, double i, double d, double f);
@@ -44,8 +44,9 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   // PIDOutput interface
   void PIDWrite(double output) override;
 
-  // PIDSource interface
-  double PIDGet() override;
+  // INode interface
+  double GetOutput() override;
+
   void SetSetpoint(double setpoint);
   void SetSetpointRelative(double deltaSetpoint);
   void SetInputRange(double minimumInput, double maximumInput);
@@ -55,7 +56,6 @@ class PIDSubsystem : public Subsystem, public PIDOutput, public PIDSource {
   double GetRate();
 
   virtual void SetAbsoluteTolerance(double absValue);
-  virtual void SetPercentTolerance(double percent);
   virtual bool OnTarget() const;
 
  protected:

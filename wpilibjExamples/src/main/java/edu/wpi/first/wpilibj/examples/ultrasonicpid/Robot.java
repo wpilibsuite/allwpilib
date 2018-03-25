@@ -9,9 +9,9 @@ package edu.wpi.first.wpilibj.examples.ultrasonicpid;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.ctrlsys.PIDController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**

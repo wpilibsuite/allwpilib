@@ -7,11 +7,10 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.ctrlsys.INode;
+import edu.wpi.first.wpilibj.ctrlsys.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
@@ -33,15 +32,8 @@ public abstract class PIDCommand extends Command implements Sendable {
   /**
    * A source which calls {@link PIDCommand#returnPIDInput()}.
    */
-  private final PIDSource m_source = new PIDSource() {
-    public void setPIDSourceType(PIDSourceType pidSource) {
-    }
-
-    public PIDSourceType getPIDSourceType() {
-      return PIDSourceType.kDisplacement;
-    }
-
-    public double pidGet() {
+  private final INode m_source = new INode() {
+    public double getOutput() {
       return returnPIDInput();
     }
   };

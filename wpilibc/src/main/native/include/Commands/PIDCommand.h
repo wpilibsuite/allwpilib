@@ -12,13 +12,13 @@
 #include <llvm/Twine.h>
 
 #include "Commands/Command.h"
-#include "PIDController.h"
+#include "CtrlSys/INode.h"
+#include "CtrlSys/PIDController.h"
 #include "PIDOutput.h"
-#include "PIDSource.h"
 
 namespace frc {
 
-class PIDCommand : public Command, public PIDOutput, public PIDSource {
+class PIDCommand : public Command, public PIDOutput, public INode {
  public:
   PIDCommand(const llvm::Twine& name, double p, double i, double d);
   PIDCommand(const llvm::Twine& name, double p, double i, double d,
@@ -35,8 +35,8 @@ class PIDCommand : public Command, public PIDOutput, public PIDSource {
   // PIDOutput interface
   void PIDWrite(double output) override;
 
-  // PIDSource interface
-  double PIDGet() override;
+  // INode interface
+  double GetOutput() override;
 
  protected:
   std::shared_ptr<PIDController> GetPIDController() const;

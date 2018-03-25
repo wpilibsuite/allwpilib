@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "PIDController.h"
+#include "CtrlSys/INode.h"
+#include "CtrlSys/PIDController.h"
 #include "PIDOutput.h"
-#include "PIDSource.h"
 #include "TestBench.h"
 #include "Timer.h"
 #include "gtest/gtest.h"
@@ -20,15 +20,11 @@ class PIDToleranceTest : public testing::Test {
   const double range = 200;
   const double tolerance = 10.0;
 
-  class FakeInput : public PIDSource {
+  class FakeInput : public INode {
    public:
     double val = 0;
 
-    void SetPIDSourceType(PIDSourceType pidSource) {}
-
-    PIDSourceType GetPIDSourceType() { return PIDSourceType::kDisplacement; }
-
-    double PIDGet() { return val; }
+    double GetOutput() { return val; }
   };
 
   class FakeOutput : public PIDOutput {
@@ -40,7 +36,7 @@ class PIDToleranceTest : public testing::Test {
   PIDController* pid;
 
   void SetUp() override {
-    pid = new PIDController(0.5, 0.0, 0.0, &inp, &out);
+    pid = new PIDController(0.5, 0.0, 0.0, inp, out);
     pid->SetInputRange(-range / 2, range / 2);
   }
 
@@ -68,37 +64,6 @@ TEST_F(PIDToleranceTest, Absolute) {
       << pid->GetError();
 
   inp.val = setpoint + 10 * tolerance;
-  Wait(1.0);
-
-  EXPECT_FALSE(pid->OnTarget())
-      << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetError();
-}
-
-TEST_F(PIDToleranceTest, Percent) {
-  Reset();
-
-  pid->SetPercentTolerance(tolerance);
-  pid->SetSetpoint(setpoint);
-  pid->Enable();
-
-  EXPECT_FALSE(pid->OnTarget())
-      << "Error was in tolerance when it should not have been. Error was "
-      << pid->GetError();
-
-  inp.val =
-      setpoint + (tolerance) / 200 *
-                     range;  // half of percent tolerance away from setpoint
-  Wait(1.0);
-
-  EXPECT_TRUE(pid->OnTarget())
-      << "Error was not in tolerance when it should have been. Error was "
-      << pid->GetError();
-
-  inp.val =
-      setpoint +
-      (tolerance) / 50 * range;  // double percent tolerance away from setPoint
-
   Wait(1.0);
 
   EXPECT_FALSE(pid->OnTarget())

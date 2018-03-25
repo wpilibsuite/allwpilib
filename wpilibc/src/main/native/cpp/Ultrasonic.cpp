@@ -281,7 +281,7 @@ double Ultrasonic::GetRangeMM() const { return GetRangeInches() * 25.4; }
  *
  * @return The range in DistanceUnit
  */
-double Ultrasonic::PIDGet() {
+double Ultrasonic::GetOutput() {
   switch (m_units) {
     case Ultrasonic::kInches:
       return GetRangeInches();
@@ -289,12 +289,6 @@ double Ultrasonic::PIDGet() {
       return GetRangeMM();
     default:
       return 0.0;
-  }
-}
-
-void Ultrasonic::SetPIDSourceType(PIDSourceType pidSource) {
-  if (wpi_assert(pidSource == PIDSourceType::kDisplacement)) {
-    m_pidSource = pidSource;
   }
 }
 

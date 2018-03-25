@@ -28,10 +28,6 @@ DriveTrain::DriveTrain()
 	m_leftCIMs.SetInverted(true);
 	m_rightCIMs.SetInverted(true);
 
-	// Configure encoders
-	m_rightEncoder.SetPIDSourceType(PIDSourceType::kDisplacement);
-	m_leftEncoder.SetPIDSourceType(PIDSourceType::kDisplacement);
-
 #ifndef SIMULATION
 	// Converts to feet
 	m_rightEncoder.SetDistancePerPulse(0.0785398);

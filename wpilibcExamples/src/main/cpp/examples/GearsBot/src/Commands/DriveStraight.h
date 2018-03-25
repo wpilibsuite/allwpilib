@@ -8,9 +8,9 @@
 #pragma once
 
 #include <Commands/Command.h>
-#include <PIDController.h>
+#include <CtrlSys/INode.h>
+#include <CtrlSys/PIDController.h>
 #include <PIDOutput.h>
-#include <PIDSource.h>
 
 /**
  * Drive the given distance straight (negative values go backwards).
@@ -25,10 +25,10 @@ public:
 	bool IsFinished() override;
 	void End() override;
 
-	class DriveStraightPIDSource : public frc::PIDSource {
+	class DriveStraightPIDSource : public frc::INode {
 	public:
 		virtual ~DriveStraightPIDSource() = default;
-		double PIDGet() override;
+		double GetOutput() override;
 	};
 
 	class DriveStraightPIDOutput : public frc::PIDOutput {
@@ -40,5 +40,5 @@ public:
 private:
 	DriveStraightPIDSource m_source;
 	DriveStraightPIDOutput m_output;
-	frc::PIDController m_pid{4, 0, 0, &m_source, &m_output};
+	frc::PIDController m_pid{4, 0, 0, m_source, m_output};
 };

@@ -13,7 +13,7 @@
 
 #include "Counter.h"
 #include "CounterBase.h"
-#include "PIDSource.h"
+#include "CtrlSys/INode.h"
 #include "SensorBase.h"
 
 namespace frc {
@@ -36,7 +36,7 @@ class DigitalGlitchFilter;
  * All encoders will immediately start counting - Reset() them if you need them
  * to be zeroed before use.
  */
-class Encoder : public SensorBase, public CounterBase, public PIDSource {
+class Encoder : public SensorBase, public CounterBase, public INode {
  public:
   enum IndexingType {
     kResetWhileHigh,
@@ -74,7 +74,7 @@ class Encoder : public SensorBase, public CounterBase, public PIDSource {
   void SetReverseDirection(bool reverseDirection);
   void SetSamplesToAverage(int samplesToAverage);
   int GetSamplesToAverage() const;
-  double PIDGet() override;
+  double GetOutput() override;
 
   void SetIndexSource(int channel, IndexingType type = kResetOnRisingEdge);
   void SetIndexSource(const DigitalSource& source,

@@ -8,9 +8,9 @@
 #pragma once
 
 #include <Commands/Command.h>
-#include <PIDController.h>
+#include <CtrlSys/INode.h>
+#include <CtrlSys/PIDController.h>
 #include <PIDOutput.h>
-#include <PIDSource.h>
 
 /**
  * Drive until the robot is the given distance away from the box. Uses a local
@@ -25,10 +25,10 @@ public:
 	bool IsFinished() override;
 	void End() override;
 
-	class SetDistanceToBoxPIDSource : public frc::PIDSource {
+	class SetDistanceToBoxPIDSource : public frc::INode {
 	public:
 		virtual ~SetDistanceToBoxPIDSource() = default;
-		double PIDGet() override;
+		double GetOutput() override;
 	};
 
 	class SetDistanceToBoxPIDOutput : public frc::PIDOutput {
@@ -40,5 +40,5 @@ public:
 private:
 	SetDistanceToBoxPIDSource m_source;
 	SetDistanceToBoxPIDOutput m_output;
-	frc::PIDController m_pid{-2, 0, 0, &m_source, &m_output};
+	frc::PIDController m_pid{-2, 0, 0, m_source, m_output};
 };

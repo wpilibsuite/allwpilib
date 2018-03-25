@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.ctrlsys.INode;
 import edu.wpi.first.wpilibj.hal.EncoderJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
@@ -28,7 +29,7 @@ import static java.util.Objects.requireNonNull;
  * <p>All encoders will immediately start counting - reset() them if you need them to be zeroed
  * before use.
  */
-public class Encoder extends SensorBase implements CounterBase, PIDSource, Sendable {
+public class Encoder extends SensorBase implements CounterBase, INode, Sendable {
   public enum IndexingType {
     kResetWhileHigh(0), kResetWhileLow(1), kResetOnFallingEdge(2), kResetOnRisingEdge(3);
 
@@ -57,7 +58,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
   private boolean m_allocatedA;
   private boolean m_allocatedB;
   private boolean m_allocatedI;
-  private PIDSourceType m_pidSource;
 
   private int m_encoder; // the HAL encoder object
 
@@ -74,8 +74,6 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
     m_encoder = EncoderJNI.initializeEncoder(m_aSource.getPortHandleForRouting(),
         m_aSource.getAnalogTriggerTypeForRouting(), m_bSource.getPortHandleForRouting(),
         m_bSource.getAnalogTriggerTypeForRouting(), reverseDirection, type.value);
-
-    m_pidSource = PIDSourceType.kDisplacement;
 
     int fpgaIndex = getFPGAIndex();
     HAL.report(tResourceType.kResourceType_Encoder, fpgaIndex, type.value);
@@ -476,34 +474,13 @@ public class Encoder extends SensorBase implements CounterBase, PIDSource, Senda
   }
 
   /**
-   * Set which parameter of the encoder you are using as a process control variable. The encoder
-   * class supports the rate and distance parameters.
-   *
-   * @param pidSource An enum to select the parameter.
-   */
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
-  /**
-   * Implement the PIDSource interface.
+   * Implement the INode interface.
    *
    * @return The current value of the selected source parameter.
    */
-  public double pidGet() {
-    switch (m_pidSource) {
-      case kDisplacement:
-        return getDistance();
-      case kRate:
-        return getRate();
-      default:
-        return 0.0;
-    }
+  @Override
+  public double getOutput() {
+    return getDistance();
   }
 
   /**

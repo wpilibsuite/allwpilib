@@ -12,6 +12,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import edu.wpi.first.wpilibj.ctrlsys.INode;
+import edu.wpi.first.wpilibj.ctrlsys.PIDController;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -26,7 +29,7 @@ public class PIDToleranceTest {
     UnitTestUtility.setupMockBase();
   }
 
-  private class FakeInput implements PIDSource {
+  private class FakeInput implements INode {
     public double m_val;
 
     FakeInput() {
@@ -34,17 +37,8 @@ public class PIDToleranceTest {
     }
 
     @Override
-    public PIDSourceType getPIDSourceType() {
-      return PIDSourceType.kDisplacement;
-    }
-
-    @Override
-    public double pidGet() {
+    public double getOutput() {
       return m_val;
-    }
-
-    @Override
-    public void setPIDSourceType(PIDSourceType arg0) {
     }
   }
 
@@ -83,25 +77,6 @@ public class PIDToleranceTest {
     assertTrue("Error was not in tolerance when it should have been. Error was "
         + m_pid.getError(), m_pid.onTarget());
     m_inp.m_val = m_setPoint + 10 * m_tolerance;
-    Timer.delay(1.0);
-    assertFalse("Error was in tolerance when it should not have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
-  }
-
-  @Test
-  public void testPercentTolerance() {
-    m_pid.setPercentTolerance(m_tolerance);
-    m_pid.setSetpoint(m_setPoint);
-    m_pid.enable();
-    assertFalse("Error was in tolerance when it should not have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
-    //half of percent tolerance away from setPoint
-    m_inp.m_val = m_setPoint + m_tolerance / 200 * m_range;
-    Timer.delay(1.0);
-    assertTrue("Error was not in tolerance when it should have been. Error was "
-        + m_pid.getError(), m_pid.onTarget());
-    //double percent tolerance away from setPoint
-    m_inp.m_val = m_setPoint + m_tolerance / 50 * m_range;
     Timer.delay(1.0);
     assertFalse("Error was in tolerance when it should not have been. Error was "
         + m_pid.getError(), m_pid.onTarget());

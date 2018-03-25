@@ -11,8 +11,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.function.DoubleFunction;
 import java.util.logging.Logger;
 
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
+import edu.wpi.first.wpilibj.ctrlsys.INode;
 import edu.wpi.first.wpilibj.test.TestBench;
 
 /**
@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj.test.TestBench;
  * in the TestBed class to allow any test to access this fixture. This allows tests to be mailable
  * so that you can easily reconfigure the physical testbed without breaking the tests.
  */
-public abstract class FilterOutputFixture<T extends PIDSource> implements ITestFixture {
+public abstract class FilterOutputFixture<T extends INode> implements ITestFixture {
   private static final Logger logger = Logger.getLogger(FilterOutputFixture.class.getName());
   private boolean m_initialized = false;
   private boolean m_tornDown = false;
@@ -125,7 +124,7 @@ public abstract class FilterOutputFixture<T extends PIDSource> implements ITestF
     return string.toString();
   }
 
-  public class DataWrapper implements PIDSource {
+  public class DataWrapper implements INode {
     // Make sure first call to pidGet() uses count == 0
     private double m_count = -TestBench.kFilterStep;
 
@@ -136,18 +135,7 @@ public abstract class FilterOutputFixture<T extends PIDSource> implements ITestF
     }
 
     @Override
-    public void setPIDSourceType(PIDSourceType pidSource) {
-    }
-
-
-    @Override
-    public PIDSourceType getPIDSourceType() {
-      return PIDSourceType.kDisplacement;
-    }
-
-
-    @Override
-    public double pidGet() {
+    public double getOutput() {
       m_count += TestBench.kFilterStep;
       return m_func.apply(m_count);
     }

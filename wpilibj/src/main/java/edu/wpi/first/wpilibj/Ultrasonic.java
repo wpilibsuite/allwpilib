@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import edu.wpi.first.wpilibj.ctrlsys.INode;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
@@ -22,7 +23,7 @@ import static java.util.Objects.requireNonNull;
  * echo is received. The time that the line is high determines the round trip distance (time of
  * flight).
  */
-public class Ultrasonic extends SensorBase implements PIDSource, Sendable {
+public class Ultrasonic extends SensorBase implements INode, Sendable {
   /**
    * The units to return when PIDGet is called.
    */
@@ -324,26 +325,13 @@ public class Ultrasonic extends SensorBase implements PIDSource, Sendable {
     return getRangeInches() * 25.4;
   }
 
-  @Override
-  public void setPIDSourceType(PIDSourceType pidSource) {
-    if (!pidSource.equals(PIDSourceType.kDisplacement)) {
-      throw new IllegalArgumentException("Only displacement PID is allowed for ultrasonics.");
-    }
-    m_pidSource = pidSource;
-  }
-
-  @Override
-  public PIDSourceType getPIDSourceType() {
-    return m_pidSource;
-  }
-
   /**
    * Get the range in the current DistanceUnit for the PIDSource base object.
    *
    * @return The range in DistanceUnit
    */
   @Override
-  public double pidGet() {
+  public double getOutput() {
     switch (m_units) {
       case kInches:
         return getRangeInches();

@@ -7,11 +7,10 @@
 
 package edu.wpi.first.wpilibj.command;
 
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDOutput;
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.ctrlsys.INode;
+import edu.wpi.first.wpilibj.ctrlsys.PIDController;
 
 /**
  * This class is designed to handle the case where there is a {@link Subsystem} which uses a single
@@ -35,15 +34,8 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   /**
    * A source which calls {@link PIDCommand#returnPIDInput()}.
    */
-  private final PIDSource m_source = new PIDSource() {
-    public void setPIDSourceType(PIDSourceType pidSource) {
-    }
-
-    public PIDSourceType getPIDSourceType() {
-      return PIDSourceType.kDisplacement;
-    }
-
-    public double pidGet() {
+  private final INode m_source = new INode() {
+    public double getOutput() {
       return returnPIDInput();
     }
   };
@@ -222,17 +214,6 @@ public abstract class PIDSubsystem extends Subsystem implements Sendable {
   @SuppressWarnings("ParameterName")
   public void setAbsoluteTolerance(double t) {
     m_controller.setAbsoluteTolerance(t);
-  }
-
-  /**
-   * Set the percentage error which is considered tolerable for use with OnTarget. (Value of 15.0 ==
-   * 15 percent).
-   *
-   * @param p the percent tolerance
-   */
-  @SuppressWarnings("ParameterName")
-  public void setPercentTolerance(double p) {
-    m_controller.setPercentTolerance(p);
   }
 
   /**

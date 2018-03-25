@@ -35,7 +35,7 @@ void DriveStraight::End() {
 	Robot::drivetrain.Drive(0, 0);
 }
 
-double DriveStraight::DriveStraightPIDSource::PIDGet() {
+double DriveStraight::DriveStraightPIDSource::GetOutput() {
 	return Robot::drivetrain.GetDistance();
 }
 

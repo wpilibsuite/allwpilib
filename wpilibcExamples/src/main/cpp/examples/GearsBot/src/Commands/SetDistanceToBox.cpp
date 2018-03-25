@@ -7,8 +7,6 @@
 
 #include "SetDistanceToBox.h"
 
-#include <PIDController.h>
-
 #include "../Robot.h"
 
 SetDistanceToBox::SetDistanceToBox(double distance) {
@@ -37,7 +35,7 @@ void SetDistanceToBox::End() {
 	Robot::drivetrain.Drive(0, 0);
 }
 
-double SetDistanceToBox::SetDistanceToBoxPIDSource::PIDGet() {
+double SetDistanceToBox::SetDistanceToBoxPIDSource::GetOutput() {
 	return Robot::drivetrain.GetDistanceToObstacle();
 }
 

@@ -404,7 +404,7 @@ double AnalogInput::GetSampleRate() {
  *
  * @return The average voltage.
  */
-double AnalogInput::PIDGet() {
+double AnalogInput::GetOutput() {
   if (StatusIsFatal()) return 0.0;
   return GetAverageVoltage();
 }
