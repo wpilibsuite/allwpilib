@@ -7,6 +7,7 @@
 
 package edu.wpi.first.wpilibj;
 
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -94,13 +95,17 @@ public class PreferencesTest extends AbstractComsSetup {
   @Test
   public void testRemove() {
     remove();
-    assertTrue(m_pref.getKeys().isEmpty());
+    assertTrue("Preferences was not empty!  Preferences in table: "
+        + Arrays.toString(m_pref.getKeys().toArray()),
+        m_pref.getKeys().isEmpty());
   }
 
   @Test
   public void testRemoveAll() {
     m_pref.removeAll();
-    assertTrue(m_pref.getKeys().isEmpty());
+    assertTrue("Preferences was not empty!  Preferences in table: "
+        + Arrays.toString(m_pref.getKeys().toArray()),
+        m_pref.getKeys().isEmpty());
   }
 
   @Test
