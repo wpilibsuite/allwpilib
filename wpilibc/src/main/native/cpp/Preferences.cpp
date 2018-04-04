@@ -222,3 +222,12 @@ bool Preferences::ContainsKey(wpi::StringRef key) {
  * @param key the key
  */
 void Preferences::Remove(wpi::StringRef key) { m_table->Delete(key); }
+
+/**
+ * Remove all preferences.
+ */
+void Preferences::RemoveAll() {
+  for (auto preference : GetKeys()) {
+    Remove(preference);
+  }
+}

@@ -52,6 +52,7 @@ class Preferences : public ErrorBase {
   void PutLong(wpi::StringRef key, int64_t value);
   bool ContainsKey(wpi::StringRef key);
   void Remove(wpi::StringRef key);
+  void RemoveAll();
 
  protected:
   Preferences();

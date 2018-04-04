@@ -88,6 +88,21 @@ public class PreferencesTest extends AbstractComsSetup {
     m_pref.putBoolean("checkedValueBoolean", true);
   }
 
+  /**
+   * Just checking to make sure our helper method works.
+   */
+  @Test
+  public void testRemove() {
+    remove();
+    assertTrue(m_pref.getKeys().isEmpty());
+  }
+
+  @Test
+  public void testRemoveAll() {
+    m_pref.removeAll();
+    assertTrue(m_pref.getKeys().isEmpty());
+  }
+
   @Test
   public void testAddRemoveSave() {
     assertEquals(m_pref.getLong("checkedValueLong", 0), 172L);

@@ -174,6 +174,13 @@ public class Preferences {
   }
 
   /**
+   * Remove all preferences.
+   */
+  public void removeAll() {
+    m_table.getKeys().forEach(this::remove);
+  }
+
+  /**
    * Returns the string at the given key. If this table does not have a value for that position,
    * then the given backup value will be returned.
    *
