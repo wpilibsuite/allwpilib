@@ -15,6 +15,7 @@ test-reports
 *.ipr
 *.iws
 .idea/
+out/
 
 # Created by http://www.gitignore.io
 
