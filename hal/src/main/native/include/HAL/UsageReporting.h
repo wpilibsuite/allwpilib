@@ -100,6 +100,7 @@ namespace nUsageReporting
         kLanguage_Java = 3,
         kLanguage_Python = 4,
         kLanguage_DotNet = 5,
+        kLanguage_ROS = 900,
 
         kCANPlugin_BlackJagBridge = 1,
         kCANPlugin_2CAN = 2,
@@ -107,6 +108,7 @@ namespace nUsageReporting
         kFramework_Iterative = 1,
         kFramework_Simple = 2,
         kFramework_CommandControl = 3,
+        kFramework_ROS = 900,
 
         kRobotDrive_ArcadeStandard = 1,
         kRobotDrive_ArcadeButtonSpin = 2,
