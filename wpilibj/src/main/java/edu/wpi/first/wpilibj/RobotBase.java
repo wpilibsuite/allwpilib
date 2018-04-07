@@ -34,11 +34,6 @@ import edu.wpi.first.wpilibj.util.WPILibVersion;
  */
 public abstract class RobotBase {
   /**
-   * The VxWorks priority that robot code should work at (so Java code should run at).
-   */
-  public static final int ROBOT_TASK_PRIORITY = 101;
-
-  /**
    * The ID of the main Java thread.
    */
   // This is usually 1, but it is best to make sure
