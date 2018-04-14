@@ -1,0 +1,27 @@
+description = "A plugin that listens on a socket so that you can use the real Driver Station software to connect to the simulation"
+
+ext {
+    includeWpiutil = true
+    pluginName = 'halsim_ds_socket'
+}
+
+ext.cppfrccomm = { binary->
+    binary.tasks.withType(CppCompile) {
+            binary.cppCompiler.args "-I" + project(':ni-libraries').file('include').absolutePath
+    }
+    if (binary.targetPlatform.operatingSystem.windows) {
+        binary.linker.args "ws2_32.lib"
+    }
+}
+
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+
+if (!project.hasProperty('onlyAthena')) {
+    model {
+        binaries {
+            all {
+                project.cppfrccomm(it)
+            }
+        }
+    }
+}
