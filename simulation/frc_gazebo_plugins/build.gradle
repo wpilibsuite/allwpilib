@@ -49,6 +49,7 @@ model {
         pneumatic_piston(NativeLibrarySpec)
         rangefinder(NativeLibrarySpec)
         servo(NativeLibrarySpec)
+        drive_motor(NativeLibrarySpec)
         all { component ->
             sources {
                 cpp.lib library:  "${component.name}", linkage: "static"
