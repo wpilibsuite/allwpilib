@@ -81,6 +81,8 @@ HAL_EncoderHandle HAL_InitializeEncoder(
     return HAL_kInvalidHandle;
   }
   int16_t index = getHandleIndex(handle);
+  SimEncoderData[index].SetDigitalChannelA(
+      getHandleIndex(digitalSourceHandleA));
   SimEncoderData[index].SetInitialized(true);
   // TODO: Add encoding type to Sim data
   encoder->index = index;

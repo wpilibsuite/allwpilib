@@ -17,6 +17,7 @@ extern "C" {
 #endif
 
 void HALSIM_ResetEncoderData(int32_t index);
+int16_t HALSIM_GetDigitalChannelA(int index);
 int32_t HALSIM_RegisterEncoderInitializedCallback(int32_t index,
                                                   HAL_NotifyCallback callback,
                                                   void* param,

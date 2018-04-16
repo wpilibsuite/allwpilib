@@ -22,6 +22,7 @@ void InitializeEncoderData() {
 
 EncoderData* hal::SimEncoderData;
 void EncoderData::ResetData() {
+  m_digitalChannelA = 0;
   m_initialized = false;
   m_initializedCallbacks = nullptr;
   m_count = 0;
@@ -41,6 +42,12 @@ void EncoderData::ResetData() {
   m_distancePerPulse = 0;
   m_distancePerPulseCallbacks = nullptr;
 }
+
+void EncoderData::SetDigitalChannelA(int16_t channel) {
+  m_digitalChannelA = channel;
+}
+
+int16_t EncoderData::GetDigitalChannelA() { return m_digitalChannelA; }
 
 int32_t EncoderData::RegisterInitializedCallback(HAL_NotifyCallback callback,
                                                  void* param,
@@ -371,6 +378,10 @@ void EncoderData::SetDistancePerPulse(double distancePerPulse) {
 extern "C" {
 void HALSIM_ResetEncoderData(int32_t index) {
   SimEncoderData[index].ResetData();
+}
+
+int16_t HALSIM_GetDigitalChannelA(int index) {
+  return SimEncoderData[index].GetDigitalChannelA();
 }
 
 int32_t HALSIM_RegisterEncoderInitializedCallback(int32_t index,
