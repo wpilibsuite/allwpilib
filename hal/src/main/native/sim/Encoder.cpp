@@ -84,6 +84,7 @@ HAL_EncoderHandle HAL_InitializeEncoder(
   SimEncoderData[index].SetDigitalChannelA(
       getHandleIndex(digitalSourceHandleA));
   SimEncoderData[index].SetInitialized(true);
+  SimEncoderData[index].SetReverseDirection(reverseDirection);
   // TODO: Add encoding type to Sim data
   encoder->index = index;
   encoder->nativeHandle = nativeHandle;
