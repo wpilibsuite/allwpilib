@@ -1,0 +1,276 @@
+<robot
+  name="frc_2014_field">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.069834 0.89354 0.25445"
+        rpy="0 0 0" />
+      <mass
+        value="455.59" />
+      <inertia
+        ixx="21044"
+        ixy="-24.831"
+        ixz="230.5"
+        iyy="25083"
+        iyz="18.626"
+        izz="4574.6" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/base_link_col.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="White_zone">
+    <inertial>
+      <origin
+        xyz="0 0.009525 -0.0163956999984019"
+        rpy="0 0 0" />
+      <mass
+        value="13.121810401488" />
+      <inertia
+        ixx="78.8770251386208"
+        ixy="0"
+        ixz="-8.15158311221845E-14"
+        iyy="172.254067260159"
+        iyz="-2.10669517132047E-18"
+        izz="93.3771303055716" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/White_zone.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/White_zone.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="White_zone_fix"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="White_zone" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Blue_zone">
+    <inertial>
+      <origin
+        xyz="-0.163169003062132 0.871785175886823 -5.16270364515671"
+        rpy="0 0 0" />
+      <mass
+        value="188.209895789408" />
+      <inertia
+        ixx="13754.0318439735"
+        ixy="24.7855254618397"
+        ixz="-399.568011299058"
+        iyy="14229.1175500156"
+        iyz="-107.653712175495"
+        izz="653.151428711642" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/Blue_zone.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/Blue_zone_col.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Blue_zone_fix"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Blue_zone" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Red_Zone">
+    <inertial>
+      <origin
+        xyz="0.16317059903516 0.871785175886823 5.16270364515671"
+        rpy="0 0 0" />
+      <mass
+        value="188.209895789408" />
+      <inertia
+        ixx="13754.0318439736"
+        ixy="-24.7855254618398"
+        ixz="-399.568011299057"
+        iyy="14229.1175500156"
+        iyz="107.653712175495"
+        izz="653.151428711642" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/Red_Zone.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/Red_Zone_col.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Red_zone_fix"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Red_Zone" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="Carpet">
+    <inertial>
+      <origin
+        xyz="0 0.003175 0"
+        rpy="0 0 0" />
+      <mass
+        value="1309.7" />
+      <inertia
+        ixx="55522"
+        ixy="0"
+        ixz="0"
+        iyy="64648"
+        iyz="0"
+        izz="9125.3" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/Carpet.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://frc_2014_field/meshes/Carpet.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Carpet_fix"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="Carpet" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+<gazebo reference="base_link">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+<gazebo reference="Carpet">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+
+<gazebo reference="White_zone">
+    <material>Gazebo/White</material>
+  </gazebo>
+
+<gazebo reference="Red_Zone">
+    <material>Gazebo/Red</material>
+  </gazebo>
+
+<gazebo reference="Blue_zone">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+</robot>

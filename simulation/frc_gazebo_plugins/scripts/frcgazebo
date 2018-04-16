@@ -1,0 +1,54 @@
+#!/bin/bash
+#---------------------------------------------------------------------------
+# Copyright (c) 2018 FIRST. All Rights Reserved.
+# Open Source Software - may be modified and shared by FRC teams. The code
+# must be accompanied by the FIRST BSD license file in the root directory of
+# the project.
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+#  Invoke gazebo, giving it the environment variables
+#   it needs to find the FRC plugins and models.
+#----------------------------------------------------------------------------
+usage() {
+    echo $1:  Invoke Gazebo for FRC
+    echo Usage:
+    echo "  $1 name-of-world-file"
+}
+
+d=`dirname "$0"`
+fulldir=`(cd "$d"; pwd)`
+sharedir=/usr/share/frcgazebo
+if [ -d "$fulldir/../share" ] ; then
+    sharedir=`(cd "$fulldir/../share/frcgazebo"; pwd)`
+fi
+libsdir=/invalid/directory
+if [ -d "$fulldir/../libs" ] ; then
+    libsdir=`(cd "$fulldir/../libs"; pwd)`
+fi
+
+#  Use exactly the file they gave us, or find it in ../share/frcgazebo/worlds,
+#    or find it there by adding a .world extension
+world="$1"
+if [ ! -f "$world" ] ; then
+    world="$sharedir/worlds/$1"
+fi
+if [ ! -f "$world" ] ; then
+    world="$sharedir/worlds/$1.world"
+fi
+
+if [ $# -ne 1 -o "x${1:0:1}" = "x-" ] ; then
+    usage `basename $0`
+    exit 1
+fi
+if [ ! -f "$world" ] ; then
+    echo Could not find $1 directly or in $sharedir/worlds
+    exit 2
+fi
+
+export GAZEBO_MODEL_PATH="$sharedir/models":$GAZEBO_MODEL_PATH
+for x in `find "$libsdir" -type d -name shared` ; do
+    export GAZEBO_PLUGIN_PATH="$x:$GAZEBO_PLUGIN_PATH"
+done
+
+gazebo "$world"

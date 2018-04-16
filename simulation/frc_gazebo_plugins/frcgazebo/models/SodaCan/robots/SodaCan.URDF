@@ -1,0 +1,57 @@
+<robot
+  name="SodaCan">
+  <link
+    name="SodaCan">
+    <inertial>
+      <origin
+        xyz="6.3803E-07 -0.00040069 0.057905"
+        rpy="0 0 0" />
+      <mass
+        value="0.01075796" />
+        <!-- value="0.0025" /> -->
+      <inertia
+        ixx="2.26033614774976E-05"
+        ixy="-9.98652849003266E-11"
+        ixz="3.65766043484588E-10"
+        iyy="2.25577441097444E-05"
+        iyz="-2.29442115120678E-07"
+        izz="9.46402094536517E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://SodaCan/meshes/SodaCan.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.86667 0.9098 1 1" />
+      </material>
+    </visual>
+    <collision name="sodaCollision">
+      <origin
+        xyz="0 0 0.05778"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://SodaCan/meshes/SodaCollision.stl" />
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="SodaCan">
+    <mu1>1</mu1>
+    <mu2>1</mu2>
+    <!-- <kp>1000000.0</kp> -->
+    <!-- <kd>1.0</kd> -->
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <!-- <gazebo reference="sodaCollision"> -->
+  <!--     <max_contacts>1</max_contacts> -->
+  <!--     <max_vel>0.001</max_vel> -->
+  <!--     <min_depth>0.25</min_depth> -->
+  <!-- </gazebo> -->
+</robot>

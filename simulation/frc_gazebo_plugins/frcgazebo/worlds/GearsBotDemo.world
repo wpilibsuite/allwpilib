@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+	<include>
+      <uri>model://asphalt_plane</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <!-- Robot -->
+    <include>
+      <uri>model://GearsBot</uri>
+      <pose>0.2011 -0.5111 0.2275 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://Box</uri>
+      <pose>0 0.7 0.05 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://SodaCan</uri>
+      <pose>0 0.038 0.08 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://SodaCan</uri>
+      <pose>0 -1.0 -0.08 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://SodaCan</uri>
+      <pose>0.1 -1.1 -0.08 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://SodaCan</uri>
+      <pose>-0.1 -1.1 -0.08 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

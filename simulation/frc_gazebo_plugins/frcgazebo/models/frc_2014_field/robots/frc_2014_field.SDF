@@ -1,0 +1,297 @@
+<sdf version='1.4'>
+  <model name='frc_2014_field'>
+    <static>1</static>
+    <link name='base_link'>
+      <pose>0 0 0 -1.57 -3.14159 0</pose>
+      <inertial>
+        <pose>0.0147649 0.343195 0.0536978 0 -0 0</pose>
+        <mass>2154.83</mass>
+        <inertia>
+          <ixx>114605</ixx>
+          <ixy>-42.3407</ixy>
+          <ixz>-892.118</ixz>
+          <iyy>128429</iyy>
+          <iyz>-45.2444</iyz>
+          <izz>15507.4</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/base_link_col.STL</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0.6</restitution_coefficient>
+            <threshold>0</threshold>
+          </bounce>
+          <contact>
+            <ode>
+              <max_vel>1000</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <collision name='base_link_collision_Blue_zone'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/Blue_zone_col.STL</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0.6</restitution_coefficient>
+            <threshold>0</threshold>
+          </bounce>
+          <contact>
+            <ode>
+              <max_vel>1000</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0.6</restitution_coefficient>
+            <threshold>0</threshold>
+          </bounce>
+          <contact>
+            <ode>
+              <max_vel>1000</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <collision name='base_link_collision_Carpet'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/Carpet.STL</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0.6</restitution_coefficient>
+            <threshold>0</threshold>
+          </bounce>
+          <contact>
+            <ode>
+              <max_vel>1000</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0.6</restitution_coefficient>
+            <threshold>0</threshold>
+          </bounce>
+          <contact>
+            <ode>
+              <max_vel>1000</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <collision name='base_link_collision_Red_Zone'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/Red_Zone_col.STL</uri>
+          </mesh>
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0.6</restitution_coefficient>
+            <threshold>0</threshold>
+          </bounce>
+          <contact>
+            <ode>
+              <max_vel>1000</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0.6</restitution_coefficient>
+            <threshold>0</threshold>
+          </bounce>
+          <contact>
+            <ode>
+              <max_vel>1000</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <!-- <collision name='base_link_collision_White_zone'> -->
+      <!--   <pose>0 0 0 0 -0 0</pose> -->
+      <!--   <geometry> -->
+      <!--     <mesh> -->
+      <!--       <scale>1 1 1</scale> -->
+      <!--       <uri>model://frc_2014_field/meshes/White_zone.STL</uri> -->
+      <!--     </mesh> -->
+      <!--   </geometry> -->
+      <!--   <surface> -->
+      <!--     <bounce> -->
+      <!--       <restitution_coefficient>0.6</restitution_coefficient> -->
+      <!--       <threshold>0</threshold> -->
+      <!--     </bounce> -->
+      <!--     <contact> -->
+      <!--       <ode> -->
+      <!--         <max_vel>1000</max_vel> -->
+      <!--         <min_depth>0</min_depth> -->
+      <!--       </ode> -->
+      <!--     </contact> -->
+      <!--     <friction> -->
+      <!--       <ode/> -->
+      <!--     </friction> -->
+      <!--   </surface> -->
+      <!--   <surface> -->
+      <!--     <bounce> -->
+      <!--       <restitution_coefficient>0.6</restitution_coefficient> -->
+      <!--       <threshold>0</threshold> -->
+      <!--     </bounce> -->
+      <!--     <contact> -->
+      <!--       <ode> -->
+      <!--         <max_vel>1000</max_vel> -->
+      <!--         <min_depth>0</min_depth> -->
+      <!--       </ode> -->
+      <!--     </contact> -->
+      <!--     <friction> -->
+      <!--       <ode/> -->
+      <!--     </friction> -->
+      <!--   </surface> -->
+      <!-- </collision> -->
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Grey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='base_link_visual_Blue_zone'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/Blue_zone.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Blue</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='base_link_visual_Carpet'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/Carpet.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Grey</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='base_link_visual_Red_Zone'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/Red_Zone.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/Red</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <visual name='base_link_visual_White_zone'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://frc_2014_field/meshes/White_zone.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/White</name>
+            <uri>__default__</uri>
+          </script>
+        </material>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+      <gravity>0</gravity>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+      <self_collide>0</self_collide>
+    </link>
+  </model>
+</sdf>

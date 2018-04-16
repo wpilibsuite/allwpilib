@@ -1,0 +1,55 @@
+<sdf version='1.5'>
+  <world name='default'>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://ground_plane</uri>
+      <pose> 0 0 -0.05 0 0 0 </pose>
+    </include>
+
+    <include>
+      <name>tote0</name>
+      <uri>model://grey_tote</uri>
+      <pose>-7.22 -.342 .02 0 0 1.5707</pose>
+    </include>
+    <include>
+      <name>bin0</name>
+      <uri>model://first_2015_trash_can</uri>
+      <pose>-7.22 .25 .02 0 0 1.5707</pose>
+    </include>
+
+    <include>
+      <name>tote1</name>
+      <uri>model://grey_tote</uri>
+      <pose>-7.22 1.178 .02 0 0 1.5707</pose>
+    </include>
+    <include>
+      <name>bin1</name>
+      <uri>model://first_2015_trash_can</uri>
+      <pose>-7.22 1.83 .02 0 0 1.5707</pose>
+    </include>
+
+    <include>
+      <name>tote2</name>
+      <uri>model://grey_tote</uri>
+      <pose>-7.22 -1.862 .02 0 0 1.5707</pose>
+    </include>
+    <include>
+      <name>bin2</name>
+      <uri>model://first_2015_trash_can</uri>
+      <pose>-7.22 -1.27 .02 0 0 1.5707</pose>
+    </include>
+
+    <include>
+      <uri>model://TheKraken</uri>
+      <pose>-7.22 2.8 0.05 0 0 3.141</pose>
+    </include>
+
+    <include>
+      <name>field</name>
+      <uri>model://frc_field_2015</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

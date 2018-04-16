@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <!-- Put a camera in the driverstation -->
+    <gui>
+      <camera name="user_camera">
+        <pose>0.0 9.0 1.31 0 0 -1.57</pose>
+      </camera>
+    </gui>
+
+    <!-- Make the world faster! -->
+    <physics type="ode">
+      <max_step_size>0.002</max_step_size>
+      <real_time_update_rate>500</real_time_update_rate>
+    </physics>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- Field -->
+    <include>
+      <uri>model://frc_2014_field</uri>
+      <pose>0 0 0 0 0 0</pose>
+    </include>
+    <!-- Robot -->
+    <include>
+      <uri>model://PacGoat</uri>
+      <pose>1.5 -2.15 0.1 1.57 0 0</pose>
+    </include>
+    <!-- Balls -->
+    <include>
+      <uri>model://frc_2014_ball_red</uri>
+         <!-- Relative to: <pose>0.0 -0.5111 0.0875 1.57 0 0</pose> -->
+         <!--   <pose>0.29 -0.45 1.05 0 0 0</pose> -->
+         <pose>1.79 -2.0889 1.125 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://frc_2014_ball_red</uri>
+         <pose>-1.79 -2.0889 0.32 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://frc_2014_ball_blue</uri>
+         <pose>1.79 2.0889 0.31 0 0 0</pose>
+    </include>
+    <include>
+      <uri>model://frc_2014_ball_blue</uri>
+         <pose>-1.79 2.0889 0.31 0 0 0</pose>
+    </include>
+  </world>
+</sdf>

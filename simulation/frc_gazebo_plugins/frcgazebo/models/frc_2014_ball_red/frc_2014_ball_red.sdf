@@ -1,0 +1,58 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="frc_2014_ball_red">
+    <pose>0 0 0.5 0 0 0</pose>
+    <link name="ball">
+      <inertial>
+        <!-- rough estimate: 1.5 kg spherical shell, radius 30 cm -->
+        <mass>1.3671</mass>
+        <inertia>
+          <!-- xx = yy = zz = 2/5 * mass * radius^2 -->
+          <ixx>0.00508</ixx>
+          <ixy>0.00</ixy>
+          <ixz>0.00</ixz>
+          <iyy>0.00508</iyy>
+          <iyz>0.00</iyz>
+          <izz>0.00508</izz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <sphere>
+            <radius>0.3048</radius>
+          </sphere>
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>0.8</restitution_coefficient>
+            <threshold>0</threshold>
+          </bounce>
+          <contact>
+            <ode>
+              <max_vel>1000</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+            <radius>0.3048</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+      <!-- this is a minimalist way to model the ball's rolling friction -->
+      <velocity_decay>
+        <linear>0.0</linear>
+        <angular>0.01</angular>
+      </velocity_decay>
+    </link>
+  </model>
+</sdf>

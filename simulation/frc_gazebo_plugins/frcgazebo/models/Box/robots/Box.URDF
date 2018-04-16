@@ -1,0 +1,47 @@
+<robot
+  name="Box">
+  <link
+    name="Box">
+    <inertial>
+      <origin
+        xyz="6.4481E-18 -3.03799997225823E-17 0.1016"
+        rpy="0 0 0" />
+      <mass
+        value="52.439" />
+      <inertia
+        ixx="1.30814322388036"
+        ixy="2.93746508598739E-17"
+        ixz="2.40727860045808E-16"
+        iyy="1.37899672694495E-16"
+        iyz="-1.30814322388036"
+        izz="8.02983959093201E-17" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Box/meshes/Box.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="1.5707963267949 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Box/meshes/Box.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="Box">
+    <material>Gazebo/WoodPallet</material>
+  </gazebo>
+</robot>
