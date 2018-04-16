@@ -10,11 +10,14 @@
 #include "GazeboNode.h"
 
 class GazeboPWM;
+class GazeboPCM;
 
 class HALSimGazebo {
  public:
   static const int kPWMCount = 20;
+  static const int kPCMCount = 8;
 
   GazeboNode node;
   GazeboPWM* pwms[kPWMCount];
+  GazeboPCM* pcms[kPCMCount];
 };

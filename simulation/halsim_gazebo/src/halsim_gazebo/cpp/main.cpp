@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include "GazeboPCM.h"
 #include "GazeboPWM.h"
 #include "HALSimGazebo.h"
 
@@ -27,6 +28,10 @@ int HALSIM_InitExtension(void) {
 
   for (int i = 0; i < HALSimGazebo::kPWMCount; i++)
     halsim.pwms[i] = new GazeboPWM(i, &halsim);
+
+  for (int i = 0; i < HALSimGazebo::kPCMCount; i++)
+    halsim.pcms[i] = new GazeboPCM(0, i, &halsim);
+  GazeboPCM_SetPressureSwitch(0, true);
 
   return 0;
 }

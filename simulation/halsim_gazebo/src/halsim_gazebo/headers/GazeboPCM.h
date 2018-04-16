@@ -9,16 +9,21 @@
 
 #include "HALSimGazebo.h"
 
-class GazeboPWM {
+class GazeboPCM {
  public:
-  GazeboPWM(int port, HALSimGazebo* halsim);
+  GazeboPCM(int index, int channel, HALSimGazebo* halsim);
+  void Publish(bool value);
   void SetInitialized(bool value) { m_initialized = value; }
   bool IsInitialized(void) { return m_initialized; }
-  void Publish(double value);
 
  private:
   HALSimGazebo* m_halsim;
-  gazebo::transport::PublisherPtr m_pub;
+  int m_index;
+  int m_channel;
+
   bool m_initialized;
-  int m_port;
+
+  gazebo::transport::PublisherPtr m_pub;
 };
+
+void GazeboPCM_SetPressureSwitch(int index, bool value);
