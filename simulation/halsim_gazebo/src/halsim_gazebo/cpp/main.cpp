@@ -7,6 +7,9 @@
 
 #include <iostream>
 
+#include <HAL/Ports.h>
+
+#include "GazeboAnalogIn.h"
 #include "GazeboEncoder.h"
 #include "GazeboPCM.h"
 #include "GazeboPWM.h"
@@ -36,6 +39,10 @@ int HALSIM_InitExtension(void) {
 
   for (int i = 0; i < HALSimGazebo::kEncoderCount; i++)
     halsim.encoders[i] = new GazeboEncoder(i, &halsim);
+
+  int analog_in_count = HAL_GetNumAnalogInputs();
+  for (int i = 0; i < analog_in_count; i++)
+    halsim.analog_inputs.push_back(new GazeboAnalogIn(i, &halsim));
 
   return 0;
 }
