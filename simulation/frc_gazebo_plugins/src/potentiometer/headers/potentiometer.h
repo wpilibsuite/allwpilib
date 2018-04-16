@@ -30,6 +30,12 @@
  *
  * - `joint`: Name of the joint this potentiometer is attached to.
  * - `topic`: Optional. Message will be published as a gazebo.msgs.Float64.
+ *            The default topic name will be the plugin name.
+ *            Recommended topic names are of the form:
+ *              /gazebo/frc/simulator/analog/n
+ *            where n is the analog channel for the pot.
+ * - `multiplier`: Optional.  Amount to multiply output with.
+ *            Useful when a rotary pot returns something other than an angle
  * - `units`: Optional. Defaults to radians.
  */
 class Potentiometer : public gazebo::ModelPlugin {
@@ -46,6 +52,9 @@ class Potentiometer : public gazebo::ModelPlugin {
 
   /// \brief Whether or not this potentiometer measures radians or degrees.
   bool radians;
+
+  /// \brief A scaling factor to apply to this potentiometer.
+  double multiplier;
 
   /// \brief The joint that this potentiometer measures
   gazebo::physics::JointPtr joint;

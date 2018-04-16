@@ -36,8 +36,13 @@ void Potentiometer::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
     radians = true;
   }
 
+  multiplier = 1.0;
+  if (sdf->HasElement("multiplier"))
+    multiplier = sdf->Get<double>("multiplier");
+
   gzmsg << "Initializing potentiometer: " << topic
-        << " joint=" << joint->GetName() << " radians=" << radians << std::endl;
+        << " joint=" << joint->GetName() << " radians=" << radians
+        << " multiplier=" << multiplier << std::endl;
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
@@ -57,9 +62,9 @@ void Potentiometer::Update(const gazebo::common::UpdateInfo& info) {
   joint->GetAngle(0).Normalize();
   gazebo::msgs::Float64 msg;
   if (radians) {
-    msg.set_data(joint->GetAngle(0).Radian());
+    msg.set_data(joint->GetAngle(0).Radian() * multiplier);
   } else {
-    msg.set_data(joint->GetAngle(0).Degree());
+    msg.set_data(joint->GetAngle(0).Degree() * multiplier);
   }
   pub->Publish(msg);
 }
