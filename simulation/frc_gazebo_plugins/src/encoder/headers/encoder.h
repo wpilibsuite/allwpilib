@@ -34,6 +34,7 @@
  *       <joint>Joint Name</joint>
  *       <topic>~/my/topic</topic>
  *       <units>{degrees, radians}</units>
+ *       <multiplier>Number</multiplier>
  *     </plugin>
  *
  * - `joint`: Name of the joint this encoder is attached to.
@@ -41,7 +42,17 @@
  * (gazebo.msgs.Float64),
  *            `topic`/velocity (gazebo.msgs.Float64), `topic`/control
  * (gazebo.msgs.String)
+ *    The suggested value for topic is of the form
+ *       ~/simulator/encoder/dio/<n>
+ *    where <n> is the number of the first digital input channel
+ *    used to formulate the encoder
+ *
  * - `units`: Optional. Defaults to radians.
+ * - `multiplier`: Optional. Defaults to 1.
+ *     This can be used to make the simulated encoder
+ *     return a comparable number of ticks to a 'real' encoder
+ *     Useful facts:  A 'degrees' encoder will report 360 ticks/revolution.
+ *     The k4X encoder type can add another multiple of 4 into the mix.
  */
 class Encoder : public gazebo::ModelPlugin {
  public:
@@ -57,6 +68,9 @@ class Encoder : public gazebo::ModelPlugin {
 
   /// \brief Whether or not this encoder measures radians or degrees.
   bool radians;
+
+  /// \brief A factor to mulitply this output by.
+  double multiplier;
 
   /// \brief Whether or not the encoder has been stopped.
   bool stopped;

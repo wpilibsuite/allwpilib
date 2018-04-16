@@ -27,12 +27,17 @@ void Encoder::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   } else {
     radians = true;
   }
+  multiplier = 1.0;
   zero = GetAngle();
   stopped = true;
   stop_value = 0;
 
+  if (sdf->HasElement("multiplier"))
+    multiplier = sdf->Get<double>("multiplier");
+
   gzmsg << "Initializing encoder: " << topic << " joint=" << joint->GetName()
-        << " radians=" << radians << std::endl;
+        << " radians=" << radians
+        << " multiplier=" << multiplier << std::endl;
 
   // Connect to Gazebo transport for messaging
   std::string scoped_name =
@@ -53,14 +58,14 @@ void Encoder::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 void Encoder::Update(const gazebo::common::UpdateInfo& info) {
   gazebo::msgs::Float64 pos_msg, vel_msg;
   if (stopped) {
-    pos_msg.set_data(stop_value);
+    pos_msg.set_data(stop_value * multiplier);
     pos_pub->Publish(pos_msg);
     vel_msg.set_data(0);
     vel_pub->Publish(vel_msg);
   } else {
-    pos_msg.set_data(GetAngle() - zero);
+    pos_msg.set_data((GetAngle() - zero) * multiplier);
     pos_pub->Publish(pos_msg);
-    vel_msg.set_data(GetVelocity());
+    vel_msg.set_data(GetVelocity() * multiplier);
     vel_pub->Publish(vel_msg);
   }
 }
