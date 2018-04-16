@@ -7,24 +7,20 @@
 
 #pragma once
 
-#include "GazeboNode.h"
+#include "HALSimGazebo.h"
+#include "simulation/gz_msgs/msgs.h"
 
-class GazeboPWM;
-class GazeboPCM;
-class GazeboEncoder;
-class GazeboAnalogIn;
-class GazeboDIO;
-
-class HALSimGazebo {
+class GazeboDIO {
  public:
-  static const int kPWMCount = 20;
-  static const int kPCMCount = 8;
-  static const int kEncoderCount = 8;
+  GazeboDIO(int index, HALSimGazebo* halsim);
+  void SetInitialized(bool value) { m_initialized = value; }
+  bool IsInitialized(void) { return m_initialized; }
+  void Listen(void);
 
-  GazeboNode node;
-  GazeboPWM* pwms[kPWMCount];
-  GazeboPCM* pcms[kPCMCount];
-  GazeboEncoder* encoders[kEncoderCount];
-  std::vector<GazeboAnalogIn *> analog_inputs;
-  std::vector<GazeboDIO*> dios;
+ private:
+  HALSimGazebo* m_halsim;
+  int m_index;
+  bool m_initialized;
+  void Callback(const gazebo::msgs::ConstBoolPtr& msg);
+  gazebo::transport::SubscriberPtr m_sub;
 };
