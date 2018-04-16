@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include "GazeboEncoder.h"
 #include "GazeboPCM.h"
 #include "GazeboPWM.h"
 #include "HALSimGazebo.h"
@@ -32,6 +33,9 @@ int HALSIM_InitExtension(void) {
   for (int i = 0; i < HALSimGazebo::kPCMCount; i++)
     halsim.pcms[i] = new GazeboPCM(0, i, &halsim);
   GazeboPCM_SetPressureSwitch(0, true);
+
+  for (int i = 0; i < HALSimGazebo::kEncoderCount; i++)
+    halsim.encoders[i] = new GazeboEncoder(i, &halsim);
 
   return 0;
 }
