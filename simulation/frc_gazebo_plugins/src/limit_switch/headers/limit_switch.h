@@ -52,8 +52,11 @@
  *     </plugin>
  *
  * Common:
- * - `topic`: Optional. Message will be published as a gazebo.msgs.Float64.
+ * - `topic`: Optional. Message will be published as a gazebo.msgs.Bool.
+ *            Recommended values are of the form:
+ *              /gazebo/frc/simulator/dio/n
  * - `type`: Required. The type of limit switch that this is
+ * - `invert`: Optional. If given, the output meaning will be inverted
  *
  * Internal
  * - `joint`: Name of the joint this potentiometer is attached to.
@@ -78,6 +81,9 @@ class LimitSwitch : public gazebo::ModelPlugin {
 
   /// \brief LimitSwitch object, currently internal or external.
   Switch* ls;
+
+  /// \brief Indicate if we should invert the output
+  bool invert;
 
   /// \brief The model to which this is attached.
   gazebo::physics::ModelPtr model;

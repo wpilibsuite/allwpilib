@@ -20,6 +20,7 @@ void LimitSwitch::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
   } else {
     topic = "~/" + sdf->GetAttribute("name")->GetAsString();
   }
+  invert = sdf->HasElement("invert");
   std::string type = sdf->Get<std::string>("type");
 
   gzmsg << "Initializing limit switch: " << topic << " type=" << type
@@ -48,6 +49,9 @@ void LimitSwitch::Load(gazebo::physics::ModelPtr model, sdf::ElementPtr sdf) {
 
 void LimitSwitch::Update(const gazebo::common::UpdateInfo& info) {
   gazebo::msgs::Bool msg;
-  msg.set_data(ls->Get());
+  if (invert)
+    msg.set_data(!ls->Get());
+  else
+    msg.set_data(ls->Get());
   pub->Publish(msg);
 }
