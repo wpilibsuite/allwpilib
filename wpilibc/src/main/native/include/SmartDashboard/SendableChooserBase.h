@@ -27,9 +27,9 @@ class SendableChooserBase : public SendableBase {
   ~SendableChooserBase() override = default;
 
  protected:
-  static const char* kDefault;
-  static const char* kOptions;
-  static const char* kSelected;
+  static constexpr const char* kDefault = "default";
+  static constexpr const char* kOptions = "options";
+  static constexpr const char* kSelected = "selected";
 
   std::string m_defaultChoice;
   nt::NetworkTableEntry m_selectedEntry;
