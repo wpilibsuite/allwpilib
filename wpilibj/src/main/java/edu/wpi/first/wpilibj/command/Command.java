@@ -381,7 +381,7 @@ public abstract class Command extends SendableBase implements Sendable {
   /**
    * Returns whether the command has a parent.
    *
-   * @param True if the command has a parent.
+   * @return true if the command has a parent.
    */
   synchronized boolean isParented() {
     return m_parent != null;
