@@ -11,7 +11,7 @@
 
 #include "HAL/Types.h"
 
-enum HAL_CANDeviceType : int32_t {
+HAL_ENUM_I32_START(HAL_CANDeviceType) {
   HAL_CAN_Dev_kBroadcast = 0,
   HAL_CAN_Dev_kRobotController = 1,
   HAL_CAN_Dev_kMotorController = 2,
@@ -24,9 +24,9 @@ enum HAL_CANDeviceType : int32_t {
   HAL_CAN_Dev_kPneumatics = 9,
   HAL_CAN_Dev_kMiscellaneous = 10,
   HAL_CAN_Dev_kFirmwareUpdate = 31
-};
+} HAL_ENUM_I32_END(HAL_CANDeviceType)
 
-enum HAL_CANManufacturer : int32_t {
+HAL_ENUM_I32_START(HAL_CANManufacturer) {
   HAL_CAN_Man_kBroadcast = 0,
   HAL_CAN_Man_kNI = 1,
   HAL_CAN_Man_kLM = 2,
@@ -34,7 +34,7 @@ enum HAL_CANManufacturer : int32_t {
   HAL_CAN_Man_kCTRE = 4,
   HAL_CAN_Man_kMS = 7,
   HAL_CAN_Man_kTeamUse = 8,
-};
+} HAL_ENUM_I32_END(HAL_CANManufacturer)
 
 #ifdef __cplusplus
 extern "C" {

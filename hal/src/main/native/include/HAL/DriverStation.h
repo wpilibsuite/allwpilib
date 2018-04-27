@@ -9,7 +9,10 @@
 
 #include <stdint.h>
 
-#include <cstddef>
+#include <stddef.h>
+
+//maybe ifndef __cplusplus
+#include <stdbool.h>
 
 #include "HAL/Types.h"
 
@@ -37,15 +40,17 @@ struct HAL_ControlWord {
   uint32_t dsAttached : 1;
   uint32_t control_reserved : 26;
 };
+typedef struct HAL_ControlWord HAL_ControlWord;
 
-enum HAL_AllianceStationID : int32_t {
+HAL_ENUM_I32_START(HAL_AllianceStationID) {
   HAL_AllianceStationID_kRed1,
   HAL_AllianceStationID_kRed2,
   HAL_AllianceStationID_kRed3,
   HAL_AllianceStationID_kBlue1,
   HAL_AllianceStationID_kBlue2,
   HAL_AllianceStationID_kBlue3,
-};
+}
+HAL_ENUM_I32_END(HAL_AllianceStationID)
 
 enum HAL_MatchType {
   HAL_kMatchType_none,
@@ -53,6 +58,7 @@ enum HAL_MatchType {
   HAL_kMatchType_qualification,
   HAL_kMatchType_elimination,
 };
+typedef enum HAL_MatchType HAL_MatchType;
 
 /* The maximum number of axes that will be stored in a single HALJoystickAxes
  * struct. This is used for allocating buffers, not bounds checking, since
@@ -65,16 +71,19 @@ struct HAL_JoystickAxes {
   int16_t count;
   float axes[HAL_kMaxJoystickAxes];
 };
+typedef struct HAL_JoystickAxes HAL_JoystickAxes;
 
 struct HAL_JoystickPOVs {
   int16_t count;
   int16_t povs[HAL_kMaxJoystickPOVs];
 };
+typedef struct HAL_JoystickPOVs HAL_JoystickPOVs;
 
 struct HAL_JoystickButtons {
   uint32_t buttons;
   uint8_t count;
 };
+typedef struct HAL_JoystickButtons HAL_JoystickButtons;
 
 struct HAL_JoystickDescriptor {
   uint8_t isXbox;
@@ -85,6 +94,7 @@ struct HAL_JoystickDescriptor {
   uint8_t buttonCount;
   uint8_t povCount;
 };
+typedef struct HAL_JoystickDescriptor HAL_JoystickDescriptor;
 
 struct HAL_MatchInfo {
   char* eventName;
@@ -93,6 +103,7 @@ struct HAL_MatchInfo {
   uint8_t replayNumber;
   char* gameSpecificMessage;
 };
+typedef struct HAL_MatchInfo HAL_MatchInfo;
 
 #ifdef __cplusplus
 extern "C" {

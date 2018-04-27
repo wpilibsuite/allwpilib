@@ -33,6 +33,7 @@ struct HAL_CANStreamMessage {
   uint8_t data[8];
   uint8_t dataSize;
 };
+typedef struct HAL_CANStreamMessage HAL_CANStreamMessage;
 
 #ifdef __cplusplus
 extern "C" {

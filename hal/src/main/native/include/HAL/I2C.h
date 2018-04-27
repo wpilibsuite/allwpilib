@@ -8,8 +8,13 @@
 #pragma once
 
 #include <stdint.h>
+#include <HAL/Types.h>
 
-enum HAL_I2CPort : int32_t { HAL_I2C_kOnboard = 0, HAL_I2C_kMXP };
+HAL_ENUM_I32_START(HAL_I2CPort) {
+    HAL_I2C_kOnboard = 0,
+    HAL_I2C_kMXP
+}
+HAL_ENUM_I32_END(HAL_I2CPort)
 
 #ifdef __cplusplus
 extern "C" {

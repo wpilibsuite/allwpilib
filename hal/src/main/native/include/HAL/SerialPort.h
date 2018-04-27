@@ -8,13 +8,15 @@
 #pragma once
 
 #include <stdint.h>
+#include "HAL/Types.h"
 
-enum HAL_SerialPort : int32_t {
+HAL_ENUM_I32_START(HAL_SerialPort) {
   HAL_SerialPort_Onboard = 0,
   HAL_SerialPort_MXP = 1,
   HAL_SerialPort_USB1 = 2,
   HAL_SerialPort_USB2 = 3
-};
+}
+HAL_ENUM_I32_END(HAL_SerialPort)
 
 #ifdef __cplusplus
 extern "C" {

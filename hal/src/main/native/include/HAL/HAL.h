@@ -18,6 +18,7 @@
 #include "HAL/AnalogOutput.h"
 #include "HAL/AnalogTrigger.h"
 #include "HAL/CAN.h"
+#include "HAL/CANAPI.h"
 #include "HAL/Compressor.h"
 #include "HAL/Constants.h"
 #include "HAL/Counter.h"
@@ -41,9 +42,14 @@
 #include "HAL/Types.h"
 #include "UsageReporting.h"
 
+#ifdef __cplusplus
 namespace HALUsageReporting = nUsageReporting;
+#endif
 
-enum HAL_RuntimeType : int32_t { HAL_Athena, HAL_Mock };
+HAL_ENUM_I32_START(HAL_RuntimeType) {
+    HAL_Athena, HAL_Mock
+}
+HAL_ENUM_I32_END(HAL_RuntimeType)
 
 #ifdef __cplusplus
 extern "C" {
