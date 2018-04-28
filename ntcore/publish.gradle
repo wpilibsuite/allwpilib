@@ -1,0 +1,268 @@
+apply plugin: 'maven-publish'
+apply plugin: 'edu.wpi.first.wpilib.versioning.WPILibVersioningPlugin'
+
+if (!hasProperty('releaseType')) {
+    WPILibVersion {
+        releaseType = 'dev'
+    }
+}
+
+def pubVersion
+if (project.hasProperty("publishVersion")) {
+    pubVersion = project.publishVersion
+} else {
+    pubVersion = WPILibVersion.version
+}
+
+def outputsFolder = file("$buildDir/outputs")
+
+def versionFile = file("$outputsFolder/version.txt")
+
+task outputVersions() {
+    description = 'Prints the versions of ntcore to a file for use by the downstream packaging project'
+    group = 'Build'
+    outputs.files(versionFile)
+
+    doFirst {
+        outputsFolder.mkdir()
+    }
+
+    doLast {
+        versionFile.write pubVersion
+    }
+}
+
+build.dependsOn outputVersions
+
+def baseArtifactId = 'ntcore'
+def artifactGroupId = 'edu.wpi.first.ntcore'
+
+def licenseFile = file("$rootDir/license.txt")
+
+task cppSourcesZip(type: Zip) {
+    destinationDir = outputsFolder
+    classifier = "sources"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/cpp') {
+        into '/'
+    }
+
+    model {
+        tasks {
+            it.each {
+                if (it in getJNIHeadersClass()) {
+                    from (it.outputs.files) {
+                        into '/'
+                    }
+                    dependsOn it
+                }
+            }
+        }
+    }
+}
+
+task cppHeadersZip(type: Zip) {
+    destinationDir = outputsFolder
+    classifier = "headers"
+
+    from(licenseFile) {
+        into '/'
+    }
+
+    from('src/main/native/include') {
+        into '/'
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+if (project.hasProperty('jenkinsBuild')) {
+    jar {
+        classifier = 'javaArtifact'
+    }
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    archives cppHeadersZip
+    archives cppSourcesZip
+}
+
+def createComponentZipTasks = { components, name, base, type, project, func ->
+    def configMap = [:]
+    components.each {
+        if (it in NativeLibrarySpec && it.name == name) {
+            it.binaries.each {
+                def target = getClassifier(it)
+                if (configMap.containsKey(target)) {
+                    configMap.get(target).add(it)
+                } else {
+                    configMap.put(target, [])
+                    configMap.get(target).add(it)
+                }
+            }
+        }
+    }
+    def taskList = []
+    configMap.each { key, value ->
+        def baseN = base + name
+        def task = project.tasks.create(baseN + "-${key}", type) {
+            description = 'Creates component archive for platform ' + key
+            destinationDir =  outputsFolder
+            classifier = key
+            baseName = baseN + '-classifier'
+            duplicatesStrategy = 'exclude'
+
+            from(licenseFile) {
+                into '/'
+            }
+
+            func(it, value)
+        }
+        taskList.add(task)
+
+        project.build.dependsOn task
+
+        project.artifacts {
+            task
+        }
+    }
+    return taskList
+}
+
+model {
+    publishing {
+        def ntcoreTaskList = createComponentZipTasks($.components, 'ntcore', 'zipcppntcore', Zip, project, { task, value ->
+            value.each { binary->
+                if (binary.buildable) {
+                    if (binary instanceof SharedLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from(new File(binary.sharedLibraryFile.absolutePath + ".debug")) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                        task.from (binary.sharedLibraryFile) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                        task.from (binary.sharedLibraryLinkFile) {
+                            into getPlatformPath(binary) + '/shared'
+                        }
+                    } else if (binary instanceof StaticLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from (binary.staticLibraryFile) {
+                            into getPlatformPath(binary) + '/static'
+                        }
+                    }
+                }
+            }
+        })
+
+        def ntcoreJNITaskList = createComponentZipTasks($.components, 'ntcoreJNI', 'jnijnintcore', Jar, project, { task, value ->
+            value.each { binary->
+                if (binary.buildable) {
+                    if (binary instanceof SharedLibraryBinarySpec) {
+                        task.dependsOn binary.buildTask
+                        task.from (binary.sharedLibraryFile) {
+                            into getPlatformPath(binary)
+                        }
+                    }
+                }
+            }
+        })
+
+        def allJniTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allJniTask = project.tasks.create("ntcoreJNIAllJar", Jar) {
+                description = 'Creates a jar with all JNI artifacts'
+                classifier = 'all'
+                baseName = 'jnijnintcorentcoreJNI'
+                destinationDir = outputsFolder
+                duplicatesStrategy = 'exclude'
+
+                ntcoreJNITaskList.each {
+                    it.outputs.files.each {
+                        from project.zipTree(it)
+                    }
+                    dependsOn it
+                }
+            }
+            project.build.dependsOn allJniTask
+        }
+
+        def allCppTask
+        if (!project.hasProperty('jenkinsBuild')) {
+            allCppTask = project.tasks.create("ntcoreAllZip", Zip) {
+                description = 'Creates a zip with all Cpp artifacts'
+                classifier = 'all'
+                baseName = 'zipcppntcorentcore'
+                destinationDir = outputsFolder
+                duplicatesStrategy = 'exclude'
+
+                ntcoreTaskList.each {
+                    it.outputs.files.each {
+                        from project.zipTree(it)
+                    }
+                    dependsOn it
+                }
+            }
+            project.build.dependsOn allCppTask
+        }
+
+        publications {
+            cpp(MavenPublication) {
+                ntcoreTaskList.each {
+                    artifact it
+                }
+                artifact cppHeadersZip
+                artifact cppSourcesZip
+
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allCppTask
+                }
+
+                artifactId = "${baseArtifactId}-cpp"
+                groupId artifactGroupId
+                version pubVersion
+            }
+            jni(MavenPublication) {
+                ntcoreJNITaskList.each {
+                    artifact it
+                }
+
+                if (!project.hasProperty('jenkinsBuild')) {
+                    artifact allJniTask
+                }
+
+                artifactId = "${baseArtifactId}-jni"
+                groupId artifactGroupId
+                version pubVersion
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        java(MavenPublication) {
+            artifact jar
+            artifact sourcesJar
+            artifact javadocJar
+
+            artifactId = "${baseArtifactId}-java"
+            groupId artifactGroupId
+            version pubVersion
+        }
+    }
+}

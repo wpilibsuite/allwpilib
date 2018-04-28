@@ -1,0 +1,838 @@
+= Network Tables Protocol Specification, Version 3.0
+Protocol Revision 3.0 (0x0300), 6/12/2015
+:toc:
+:toc-placement: preamble
+:sectanchors:
+
+This document defines a network protocol for a key-value store that may be read
+from and written to by multiple remote clients. A central server, most often
+running on a FIRST FRC robot controller, is responsible for providing
+information consistency and for facilitating communication between clients.
+
+Information consistency is guaranteed through the use of a sequence number
+associated with each key-value pair. An update of a key-value pair increments
+the associated sequence number, and this update information is shared with all
+participating clients. The central server only applies and redistributes
+updates which have a larger sequence number than its own, which guarantees that
+a client must have received a server's most recent state before it can replace
+it with a new value.
+
+This is a backwards-compatible update of <<networktables2,version 2.0>> of the
+Network Tables network protocol. The protocol is designed such that 3.0 clients
+and servers can interoperate with 2.0 clients and servers with the only loss of
+functionality being the extended features introduced in 3.0.
+
+This document conforms to <<rfc2119>> - Key words for use in RFCs to Indicate
+Requirement Levels.
+
+== Summary of Changes from 2.0 to 3.0
+
+3 way connection handshake:: When a Client establishes a connection, after
+receiving the <<msg-server-hello-complete>> message and sending its local
+entries, it finishes with a <<msg-client-hello-complete>> message to the
+server. This enables the Server to be aware of when the Client is fully
+synchronized.
+
+String length encoding:: String length is now encoded as unsigned <<leb128>>
+rather than as a 2-byte unsigned integer. This both allows string lengths
+longer than 64K and is more space efficient for the common case of short
+strings (<128 byte strings only require a single byte for length).
+
+Entry deletion:: Entries may now be deleted by any member of the Network using
+the <<msg-delete>> and <<msg-clear-all>> messages. Note that in a Network
+consisting of mixed 2.0 and 3.0 Clients, deletion may be ineffective because
+the deletion message will not be propagated to the 2.0 Clients.
+
+// TODO: needs more description in the text of how these messages are
+// propagated
+
+Remote procedure call:: The Server may create specially-typed entries that
+inform Clients of remotely callable functions on the Server. Clients can then
+execute these functions via the Network Tables protocol. See <<rpc-operation>>.
+
+Raw data type:: An arbitrary data type has been added. While string could be
+used to encode raw data, the reason for a different data type is so that
+dashboards can choose not to display the raw data (or display it in a different
+format).
+
+Client and server self-identification:: Clients self-identify with a
+user-defined string name when connecting to the Server (this is part of the new
+<<msg-client-hello-complete>> message). This provides a more reliable method
+than simply the remote IP address for determining on the Server side whether or
+not a particular Client is connected.  While Clients are less likely to care
+what Server they are connected to, for completeness a similar Server
+self-identification string has been added to the Server Hello Complete message.
+Note that Server connection information is not provided from the Server to
+Clients (at least in a way built into the protocol), so it is not possible for
+a Client to determine what other Clients are connected to the Server.
+
+Server reboot detection:: The Server keeps an internal list of all Client
+identity strings that have ever connected to it (this list is always empty at
+Server start). During the initial connection process, the Server sends the
+Client a flag (as part of the new <<msg-server-hello>> message) that indicates
+whether or not the Client was already on this list. Clients use this flag to
+determine whether the Server has rebooted since the previous connection.
+
+Entry flags:: Each Entry now has an 8-bit flags value associated with it (see
+<<entry-flags>>). The initial value of the flags are provided as part of the
+<<msg-assign>> message. The value of the flags may be updated by any member of
+the Network via use of the <<msg-flags-update>> message.
+
+Entry persistence:: The Server is required to provide a feature to
+automatically save entries (including their last known values) across Server
+restarts. By default, no values are automatically saved in this manner, but
+any member of the Network may set the “Persistent” Entry Flag on an Entry to
+indicate to the server that the Entry must be persisted by the Server. The
+Server must periodically save such flagged Entries to a file; on Server start,
+the Server reads the file to create the initial set of Server Entries.
+
+More robust Entry Update message encoding:: The entry type has been added to
+the <<msg-update>> message. This is used only to specify the length of value
+encoded in the Entry Update message, and has no effect on the Client or Server
+handling of Entry Updates. Clients and Servers must ignore Entry Update
+messages with mismatching type to their currently stored value. This increases
+robustness of Entry Updates in the presence of Entry Assignments with varying
+type (which should be uncommon, but this fixes a weakness in the 2.0 protocol).
+
+////
+TODO
+
+Synchronization on reconnect:: The approach to how Clients should handle
+conflicting values when reconnecting to a Server has been clarified.
+
+////
+
+[[references]]
+== References
+
+[[networktables2]]
+* <<networktables2.adoc#,Network Tables Protocol Specification, Protocol
+Revision 2.0 (0x0200)>>, dated 1/8/2013.
+
+[[leb128,LEB128]]
+* LEB128 definition in DWARF Specification 3.0
+(http://dwarfstd.org/doc/Dwarf3.pdf, section 7.6 and Appendix C, also explained
+in http://en.wikipedia.org/wiki/LEB128)
+
+[[rfc1982,RFC1982]]
+* RFC 1982, Serial Number Arithmetic, http://tools.ietf.org/html/rfc1982
+
+[[rfc2119,RFC2119]]
+* RFC 2119, Key words for use in RFCs to Indicate Requirement Levels,
+http://tools.ietf.org/html/rfc2119
+
+[[definitions]]
+== Definitions
+
+[[def-client]]
+Client:: An implementation of this protocol running in client configuration.
+Any number of Clients may exist for a given Network.
+
+[[def-entry]]
+Entry:: A data value identified by a string name.
+
+[[def-entry-id]]
+Entry ID:: An unsigned 2-byte ID by which the Server and Clients refer to an
+Entry across the network instead of using the full string key for the Entry.
+Entry IDs range from 0x0000 to 0xFFFE (0xFFFF is reserved for an Entry
+Assignment issued by a Client).
+
+[[def-server]]
+Server:: An implementation of this protocol running in server configuration.
+One and only one Server must exist for a given Network.
+
+[[def-network]]
+Network:: One or more Client nodes connected to a Server.
+
+[[def-user-code]]
+User Code:: User-supplied code which may interact with a Client or Server. User
+Code should be executed on the same computer as the Client or Server instance
+it interacts with.
+
+[[def-sequence-number]]
+Sequence Number:: An unsigned number which allows the Server to resolve update
+conflicts between Clients and/or the Server. Sequence numbers may overflow.
+Sequential arithmetic comparisons, which must be used with Sequence Numbers,
+are defined by <<rfc1982>>.
+
+[[def-protocol-revision]]
+Protocol Revision:: A 16-bit unsigned integer which indicates the version of
+the network tables protocol that a client wishes to use. The protocol revision
+assigned to this version of the network tables specification is listed at the
+top of this document. This number is listed in dot-decimal notation as well as
+its equivalent hexadecimal value.
+
+== Transport Layer
+
+Conventional implementations of this protocol should use TCP for reliable
+communication; the Server should listen on TCP port 1735 for incoming
+connections.
+
+== Example Exchanges
+
+[[exchange-connect]]
+=== Client Connects to the Server
+
+Directly after client establishes a connection with the Server, the following
+procedure must be followed:
+
+. The Client sends a <<msg-client-hello>> message to the Server
+
+. The Server sends a <<msg-server-hello>> message.
+
+. The Server sends one <<msg-assign>> for every field it currently recognizes.
+
+. The Server sends a <<msg-server-hello-complete>> message.
+
+. For all Entries the Client recognizes that the Server did not identify with a
+Entry Assignment, the client follows the <<exchange-client-creates-entry>>
+protocol.
+
+. The Client sends a <<msg-client-hello-complete>> message.
+
+In the event that the Server does not support the protocol revision that the
+Client has requested in a Client Hello message, the Server must instead issue a
+<<msg-protocol-unsupported>> message to the joining client and close the
+connection.
+
+[[exchange-client-creates-entry]]
+=== Client Creates an Entry
+
+When User Code on a Client assigns a value to an Entry that the Server has not
+yet issued a Entry Assignment for, the following procedure must be followed:
+
+. The Client sends an <<msg-assign>> with an Entry ID of 0xFFFF.
+
+. The Server issues an <<msg-assign>> to all Clients (including the sender) for
+the new field containing a real Entry ID and Sequence Number for the new field.
+
+In the event that User Code on the Client updates the value of the
+to-be-announced field again before the expected Entry Assignment is received,
+then the Client must save the new value and take no other action (the most
+recent value of the field should be issued when the Entry Assignment arrives,
+if it differs from the value contained in the received Entry Assignment).
+
+In the event that the Client receives a Entry Assignment from the Server for
+the Entry that it intended to issue an Entry Assignment for, before it issued
+its own Entry Assignment, the procedure may end early.
+
+In the event that the Server receives a duplicate Entry Assignment from a
+Client (likely due to the client having not yet received the Server's Entry
+Assignment), the Server should ignore the duplicate Entry Assignment.
+
+[[exchange-client-updates-entry]]
+=== Client Updates an Entry
+
+When User Code on a Client updates the value of an Entry, the Client must send
+an <<msg-update>> message to the Server. The Sequence Number included in the
+Entry Update message must be the most recently received Sequence Number for the
+Entry to be updated incremented by one.
+
+.Example:
+
+. Client receives Entry Assignment message for Entry "a" with integer value 1,
+Entry ID of 0, and Sequence Number 1.
+
+. User Code on Client updates value of Entry "a" to 16 (arbitrary).
+
+. Client sends Entry Update message to Server for Entry 0 with a Sequence
+Number of 2 and a value of 16.
+
+When the Server receives an Entry Update message, it first checks the Sequence
+Number in the message against the Server's value for the Sequence Number
+associated with the Entry to be updated. If the received Sequence Number is
+strictly greater than (aside: see definition of "greater than" under the
+definition of Sequence Number) the Server's Sequence Number for the Entry to be
+updated, the Server must apply the new value for the indicated Entry and repeat
+the Entry Update message to all other connected Clients.
+
+If the received Sequence Number is less than or equal (see definition of "less
+than or equal" in RFC 1982) to the Server's Sequence Number for the Entry to be
+updated, this implies that the Client which issued the Entry Update message has
+not yet received one or more Entry Update message(s) that the Server recently
+sent to it; therefore, the Server must ignore the received Entry Update
+message. In the event that comparison between two Sequence Numbers is undefined
+(see RFC 1982), then the Server must always win (it ignores the Entry Update
+message under consideration).
+
+[[update-rate]]
+NOTE: If User Code modifies the value of an Entry too quickly, 1) users may not
+see every value appear on remote machines, and 2) the consistency protection
+offered by the Entry's Sequence Number may be lost (by overflowing before
+remote devices hear recent values). It is recommended that implementations
+detect when user code updates an Entry more frequently than once every 5
+milliseconds and print a warning message to the user (and/or offer some other
+means of informing User Code of this condition).
+
+[[exchange-client-updates-flags]]
+=== Client Updates an Entry's Flags
+
+When User Code on a Client updates an Entry's flags, the Client must apply the
+new flags to the Entry immediately, and send an <<msg-flags-update>> message to
+the Server.
+
+When the Server receives an Entry Flags Update message, it must apply the new
+flags to the indicated Entry and repeat the Entry Flags Update message to all
+other connected Clients.
+
+[[exchange-client-deletes-entry]]
+=== Client Deletes an Entry
+
+When User Code on a Client deletes an Entry, the Client must immediately delete
+the Entry, and send an <<msg-delete>> message to the Server.
+
+When the Server receives an Entry Delete message, it must delete the indicated
+Entry and repeat the Entry Delete message to all other connected Clients.
+
+[[exchange-server-creates-entry]]
+=== Server Creates an Entry
+
+When User Code on the Server assigns a value to a Entry which does not exist,
+the Server must issue an <<msg-assign>> message to all connected clients.
+
+[[exchange-server-updates-entry]]
+=== Server Updates an Entry
+
+When User Code on the Server updates the value of an Entry, the Server must
+apply the new value to the Entry immediately, increment the associated Entry's
+Sequence Number, and issue a <<msg-update>> message containing the new value
+and Sequence Number of the associated Entry to all connected Clients.
+
+NOTE: See <<update-rate,Note>> under <<exchange-client-updates-entry>>.
+
+[[exchange-server-updates-flags]]
+=== Server Updates an Entry's Flags
+
+When User Code on the Server updates an Entry's flags, the Server must apply
+the new flags to the Entry immediately, and issue a <<msg-flags-update>>
+message containing the new flags value to all connected Clients.
+
+[[exchange-server-deletes-entry]]
+=== Server Deletes an Entry
+
+When User Code on the Server deletes an Entry, the Server must immediately
+delete the Entry, and issue a <<msg-delete>> message to all connected Clients.
+
+[[exchange-keep-alive]]
+=== Keep Alive
+
+To maintain a connection and prove a socket is still open, a Client or Server
+may issue <<msg-keep-alive>> messages. Clients and the Server should ignore
+incoming Keep Alive messages.
+
+The intent is that by writing a Keep Alive to a socket, a Client forces its
+network layer (TCP) to reevaluate the state of the network connection as it
+attempts to deliver the Keep Alive message. In the event that a connection is
+no longer usable, a Client's network layer should inform the Client that it is
+no longer usable within a few attempts to send a Keep Alive message.
+
+To provide timely connection status information, Clients should send a Keep
+Alive message to the Server after every 1 second period of connection
+inactivity (i.e. no information is being sent to the Server). Clients should
+not send Keep Alive messages more frequently than once every 100 milliseconds.
+
+Since the Server does not require as timely information about the status of a
+connection, it is not required to send Keep Alive messages during a period of
+inactivity.
+
+[[bandwidth]]
+== Bandwidth and Latency Considerations
+
+To reduce unnecessary bandwidth usage, implementations of this protocol should:
+
+* Send an Entry Update if and only if the value of an Entry is changed to a
+value that is different from its prior value.
+
+* Buffer messages and transmit them in groups, when possible, to reduce
+transport protocol overhead.
+
+* Only send the most recent value of an Entry. When User Code updates the value
+of an Entry more than once before the new value is transmitted, only the latest
+value of the Entry should be sent.
+
+It is important to note that these behaviors will increase the latency between
+when a Client or Server updates the value of an Entry and when all Clients
+reflect the new value. The exact behavior of this buffering is left to
+implementations to determine, although the chosen scheme should reflect the
+needs of User Code. Implementations may include a method by which User Code can
+specify the maximum tolerable send latency.
+
+[[entry-types]]
+== Entry Types
+
+Entry Type must assume one the following values:
+
+[cols="1,3"]
+|===
+|Numeric Value |Type
+
+|0x00
+|Boolean
+
+|0x01
+|Double
+
+|0x02
+|String
+
+|0x03
+|Raw Data
+
+|0x10
+|Boolean Array
+
+|0x11
+|Double Array
+
+|0x12
+|String Array
+
+|0x20
+|Remote Procedure Call Definition
+|===
+
+[[entry-values]]
+== Entry Values
+
+Entry Value must assume the following structure as indicated by Entry Type:
+
+[cols="1,3"]
+|===
+|Entry Type |Entry Value Format
+
+|[[entry-value-boolean]]Boolean
+|1 byte, unsigned; True = 0x01, False = 0x00
+
+|[[entry-value-double]]Double
+|8 bytes, IEEE 754 floating-point "double format" bit layout; (big endian)
+
+|[[entry-value-string]]String
+|N bytes, unsigned <<leb128>> encoded length of the number of raw bytes to
+follow, followed by the string encoded in UTF-8
+
+|[[entry-value-raw]]Raw Data
+|N bytes, unsigned LEB128 encoded length of the number of raw bytes to follow,
+followed by the raw bytes.
+
+While the raw data definition is unspecified, it's recommended that users use
+the first byte of the raw data to "tag" the type of data actually being stored.
+
+|[[entry-value-boolean-array]]Boolean Array
+|1 byte, unsigned, number of elements within the array to follow
+
+N bytes - The raw bytes representing each Boolean element contained within the
+array, beginning with the item at index 0 within the array.
+
+|[[entry-value-double-array]]Double Array
+|1 byte, unsigned, number of elements within the array to follow
+
+N bytes - The raw bytes representing each Double element contained within the
+array, beginning with the item at index 0 within the array.
+
+|[[entry-value-string-array]]String Array
+|1 byte, unsigned, number of elements within the array to follow
+
+N bytes - The raw bytes representing each String element contained within the
+array, beginning with the item at index 0 within the array.
+
+|[[entry-value-rpc]]Remote Procedure Call Definition
+|N bytes, unsigned LEB128 encoded length of the number of raw bytes to follow.
+
+N bytes - data as defined in Remote Procedure Call Definition Data
+|===
+
+[[entry-flags]]
+== Entry Flags
+
+Entry Flags are as follows:
+
+[cols="1,3"]
+|===
+|Bit Mask |Bit Value Meaning
+
+|[[entry-flag-persistent]]0x01 (least significant bit) - Persistent
+
+|0x00: Entry is not persistent. The entry and its value will not be retained
+across a server restart.
+
+0x01: Entry is persistent. Updates to the value are automatically saved and
+the entry will be automatically created and the last known value restored when
+the server starts.
+
+|0xFE
+|Reserved
+|===
+
+== Message Structures
+
+All messages are of the following format:
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|Message Type
+|1 byte, unsigned
+
+|Message Data
+|N bytes (length determined by Message Type)
+|===
+
+[[msg-keep-alive]]
+=== Keep Alive
+
+Indicates that the remote party is checking the status of a network connection.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x00 - Keep Alive
+|1 byte, unsigned; Message Type
+|===
+
+[[msg-client-hello]]
+=== Client Hello
+
+A Client issues a Client Hello message when first establishing a connection.
+The Client Protocol Revision field specifies the Network Table protocol
+revision that the Client would like to use.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x01 - Client Hello
+|1 byte, unsigned; Message Type
+
+|Client Protocol Revision
+|2 bytes, Unsigned 16-bit integer (big-endian). See
+<<def-protocol-revision,Protocol Revision>>.
+
+|Client identity (name)
+|<<entry-value-string,String>>
+|===
+
+[[msg-protocol-unsupported]]
+=== Protocol Version Unsupported
+
+A Server issues a Protocol Version Unsupported message to a Client to inform it
+that the requested protocol revision is not supported. It also includes the
+most recent protocol revision which it supports, such that a Client may
+reconnect under a prior protocol revision if able.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x02 - Protocol Version Unsupported
+|1 byte, unsigned; Message Type
+
+|Server Supported Protocol Revision
+|2 bytes, Unsigned 16-bit integer (big-endian). See
+<<def-protocol-revision,Protocol Revision>>.
+|===
+
+[[msg-server-hello-complete]]
+=== Server Hello Complete
+
+A Server issues a Server Hello Complete message when it has finished informing
+a newly-connected client of all of the fields it currently recognizes.
+Following the receipt of this message, a Client should inform the Server of
+any/all additional fields that it recognizes that the Server did not announce.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x03 - Server Hello Complete
+|1 byte, unsigned; Message Type
+|===
+
+[[msg-server-hello]]
+=== Server Hello
+
+A Server issues a Server Hello message in response to a Client Hello message,
+immediately prior to informing a newly-connected client of all of the fields it
+currently recognizes.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x04 - Server Hello
+|1 byte, unsigned; Message Type
+
+|Flags
+a|1 byte, unsigned.
+
+Least Significant Bit (bit 0): reconnect flag
+
+* 0 if this is the first time (since server start) the server has seen the
+client
+
+* 1 if the server has previously seen (since server start) the client (as
+identified in the <<msg-client-hello,Client Hello>> message)
+
+Bits 1-7: Reserved, set to 0.
+
+|Server identity (name)
+|<<entry-value-string,String>>
+|===
+
+[[msg-client-hello-complete]]
+=== Client Hello Complete
+
+A Client issues a Client Hello Complete message when it has finished informing
+the Server of any/all of the additional fields it recognizes that the Server
+did not announce.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x05 - Client Hello Complete
+|1 byte, unsigned; Message Type
+|===
+
+[[msg-assign]]
+=== Entry Assignment
+
+A Entry Assignment message informs the remote party of a new Entry. An Entry
+Assignment's value field must be the most recent value of the field being
+assigned at the time that the Entry Assignment is sent.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x10 - Entry Assignment
+|1 byte, unsigned; Message Type
+
+|Entry Name
+|<<entry-value-string,String>>
+
+|Entry Type
+|1 byte, unsigned; see <<entry-types,Entry Types>>
+
+|Entry ID
+|2 bytes, unsigned
+
+|Entry Sequence Number
+|2 bytes, unsigned
+
+|Entry Flags
+|1 byte, unsigned; see <<entry-flags,Entry Flags>>
+
+|Entry Value
+|N bytes, length depends on Entry Type
+|===
+
+If the Entry ID is 0xFFFF, then this assignment represents a request from a
+Client to the Server. In this event, the Entry ID field and the Entry Sequence
+Number field must not be stored or relied upon as they otherwise would be.
+
+[[msg-update]]
+=== Entry Update
+
+An Entry Update message informs a remote party of a new value for an Entry.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x11 - Entry Update
+|1 byte, unsigned; Message Type
+
+|Entry ID
+|2 bytes, unsigned
+
+|Entry Sequence Number
+|2 bytes, unsigned
+
+|Entry Type
+|1 byte, unsigned; see <<entry-types,Entry Types>>.
+
+Note this type is only used to determine the length of the entry value, and
+does NOT change the stored entry type if it is different (due to an intervening
+Entry Assignment); Clients and Servers must ignore Entry Update messages with
+mismatching entry type.
+
+|Entry Value
+|N bytes, length dependent on value type
+|===
+
+[[msg-flags-update]]
+=== Entry Flags Update
+
+An Entry Flags Update message informs a remote party of new flags for an Entry.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x12 - Entry Flags Update
+|1 byte, unsigned; Message Type
+
+|Entry ID
+|2 bytes, unsigned
+
+|Entry Flags
+|1 byte, unsigned; see <<entry-flags,Entry Flags>>
+|===
+
+Entries may be globally deleted using the following messages. These messages
+must be rebroadcast by the server in the same fashion as the Entry Update
+message. Clients and servers must remove the requested entry/entries from
+their local tables. Update messages received after the Entry Delete message
+for the deleted Entry ID must be ignored by Clients and Servers until a new
+Assignment message for that Entry ID is issued.
+
+[[msg-delete]]
+=== Entry Delete
+
+Deletes a single entry or procedure.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x13 - Entry Delete
+|1 byte, unsigned; message type
+
+|Entry ID
+|2 bytes, unsigned
+|===
+
+[[msg-clear-all]]
+=== Clear All Entries
+
+Deletes all entries. The magic value is required to be exactly this value
+(this is to avoid accidental misinterpretation of the message).
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x14 - Clear All Entries
+|1 byte, unsigned; message type
+
+|Magic Value (0xD06CB27A)
+|4 bytes; exact value required (big endian)
+|===
+
+[[msg-rpc-execute]]
+=== Remote Procedure Call (RPC) Execute
+
+Executes a remote procedure. Intended for client to server use only.
+
+The client shall provide a value for every RPC parameter specified in the
+corresponding RPC entry definition.
+
+The server shall ignore any Execute RPC message whose decoding does not match
+the parameters defined in the corresponding RPC entry definition.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x20 - Execute RPC
+|1 byte, unsigned; message type
+
+|RPC Definition Entry ID
+|2 bytes, unsigned
+
+|Unique ID
+|2 bytes, unsigned; incremented value for matching return values to call.
+
+|Parameter Value Length
+|N bytes, unsigned <<leb128>> encoded length of total number of bytes of
+parameter values in this message
+
+|Parameter Value(s)
+|Array of values; N bytes for each parameter (length dependent on the parameter
+type defined in the <<rpc-definition,RPC entry definition>>)
+|===
+
+[[msg-rpc-response]]
+=== RPC Response
+
+Return responses from a remote procedure call. Even calls with zero outputs
+will respond.
+
+[cols="1,3"]
+|===
+|Field Name |Field Type
+
+|0x21 - RPC Response
+|1 byte, unsigned; message type
+
+|RPC Definition Entry ID
+|2 bytes, unsigned
+
+|Unique ID
+|2 bytes, unsigned; matching ID from <<msg-rpc-execute,RPC Execute>> message
+
+|Result Value Length
+|N bytes, unsigned <<leb128>> encoded length of total number of bytes of result
+values in this message
+
+|Result Value(s)
+|Array of values; N bytes for each result (length dependent on the result type
+defined in the <<rpc-definition,RPC entry definition>>)
+|===
+
+[[rpc-operation]]
+== Remote Procedure Call (RPC) Operation
+
+Remote procedure call entries shall only be assigned by the server.
+
+Remote procedure call execute messages will result in asynchronous execution of
+the corresponding function on the server.
+
+Client implementations shall not transmit an Execute RPC message and return an
+error to user code that attempts to call an undefined RPC, call one with
+incorrectly typed parameters, or attempts to make a call when the Client is not
+connected to a Server.
+
+Remote procedure calls cannot be persisted.
+
+[[rpc-definition]]
+=== Remote Procedure Call Definition Data
+
+The data provided in the RPC definition entry consists of:
+
+[cols="1,3"]
+|===
+|RPC Definition Version
+|1 byte, unsigned; always set to 1 for this version of the protocol.
+
+|Procedure (Entry) Name
+|<<entry-value-string,String>>
+
+|Number of Parameters
+|1 byte, unsigned (may be 0)
+
+2+s|Parameter Specification (one set per input parameter)
+
+|Parameter Type
+|1 byte, unsigned; <<entry-types,Entry Type>> for parameter value
+
+|Parameter Name
+|<<entry-value-string,String>>
+
+|Parameter Default Value
+|N bytes; length based on parameter type (encoded consistent with corresponding
+<<entry-values,Entry Value>> definition)
+
+|Number of Output Results
+|1 byte, unsigned (may be 0)
+
+2+s|Result Specification (one set per output)
+
+|Result Type
+|1 byte, unsigned; <<entry-types,Entry Type>> for value
+
+|Result Name
+|<<entry-value-string,String>>
+|===
