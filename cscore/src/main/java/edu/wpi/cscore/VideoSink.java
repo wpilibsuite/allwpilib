@@ -54,9 +54,15 @@ public class VideoSink {
   }
 
   public boolean equals(Object other) {
-    if (this == other) return true;
-    if (other == null) return false;
-    if (getClass() != other.getClass()) return false;
+    if (this == other) {
+      return true;
+    }
+    if (other == null) {
+      return false;
+    }
+    if (getClass() != other.getClass()) {
+      return false;
+    }
     VideoSink sink = (VideoSink) other;
     return m_handle == sink.m_handle;
   }

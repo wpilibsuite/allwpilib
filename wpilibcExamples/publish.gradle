@@ -32,7 +32,7 @@ task cppExamplesZip(type: Zip) {
         into 'examples'
     }
 
-    from ('examples.xml') {
+    from('examples.xml') {
         into 'examples'
     }
 }

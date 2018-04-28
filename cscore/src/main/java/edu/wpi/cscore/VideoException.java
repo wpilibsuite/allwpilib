@@ -11,6 +11,8 @@ package edu.wpi.cscore;
  * An exception raised by the camera server.
  */
 public class VideoException extends RuntimeException {
+  private static final long serialVersionUID = -9155939328084105145L;
+
   public VideoException(String msg) {
     super(msg);
   }

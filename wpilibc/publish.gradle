@@ -16,12 +16,13 @@ if (project.hasProperty("publishVersion")) {
 
 def baseArtifactId = 'wpilibc'
 def artifactGroupId = 'edu.wpi.first.wpilibc'
+def zipBaseName = '_GROUP_edu_wpi_first_wpilibc_ID_wpilibc_CLS'
 
 def outputsFolder = file("$project.buildDir/outputs")
 
 task cppSourcesZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc'
+    baseName = zipBaseName
     classifier = "sources"
 
     from(licenseFile) {
@@ -31,11 +32,16 @@ task cppSourcesZip(type: Zip) {
     from('src/main/native/cpp') {
         into '/'
     }
+    from("$buildDir/generated/cpp") {
+        into '/'
+    }
 }
+
+cppSourcesZip.dependsOn generateCppVersion
 
 task cppHeadersZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibc'
+    baseName = zipBaseName
     classifier = "headers"
 
     from(licenseFile) {
@@ -54,25 +60,29 @@ def linkFile = project.file("${buildDir}/libwpi.so")
 
 task linkScriptZip(type: Zip) {
     destinationDir = outputsFolder
-    baseName = 'wpilibclinkscript-classifier'
+    baseName = '_GROUP_edu_wpi_first_wpilibc_ID_wpilibc-linkscripts_CLS'
     classifier = "linuxathena"
 
     from(licenseFile) {
         into '/'
     }
-    from (linkFile) {
+    from(linkFile) {
         into '/linux/athena/shared'
     }
 }
 
 build.dependsOn linkScriptZip
 
+addTaskToCopyAllOutputs(cppHeadersZip)
+addTaskToCopyAllOutputs(cppSourcesZip)
+addTaskToCopyAllOutputs(linkScriptZip)
+
 model {
     publishing {
-        def wpilibCTaskList = createComponentZipTasks($.components, 'wpilibc', 'zipcpp', Zip, project, includeStandardZipFormat)
+        def wpilibCTaskList = createComponentZipTasks($.components, 'wpilibc', zipBaseName, Zip, project, includeStandardZipFormat)
         def allTask
         if (!project.hasProperty('jenkinsBuild')) {
-            allTask = createAllCombined(wpilibCTaskList, 'wpilibc', 'zipcpp', Zip, project)
+            allTask = createAllCombined(wpilibCTaskList, 'wpilibc', zipBaseName, Zip, project)
         }
 
         $.components.each {

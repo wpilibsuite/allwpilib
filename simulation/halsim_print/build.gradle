@@ -1,39 +1,7 @@
 description = "A simulation shared object that simply prints robot behaviors"
 
-apply plugin: 'edu.wpi.first.NativeUtils'
-apply plugin: 'cpp'
-
-if (!project.hasProperty('onlyAthena')) {
-    ext.skipAthena = true
-
-    apply from: "../../config.gradle"
-
-
-    model {
-        components {
-            halsim_print(NativeLibrarySpec) {
-                sources {
-                    cpp {
-                        source {
-                            srcDirs = [ 'src/main/native/cpp' ]
-                            includes = ["**/*.cpp"]
-                        }
-                        exportedHeaders {
-                            srcDirs = ["src/main/native/include"]
-                        }
-                    }
-                }
-            }
-        }
-
-        binaries {
-            all {
-                project(':hal').addHalToLinker(it)
-            }
-            withType(StaticLibraryBinarySpec) {
-                it.buildable = false
-            }
-        }
-    }
-    apply from: 'publish.gradle'
+ext {
+    pluginName = 'halsim_print'
 }
+
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"

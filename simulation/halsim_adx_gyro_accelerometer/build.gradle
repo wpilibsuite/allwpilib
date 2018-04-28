@@ -1,0 +1,26 @@
+description = "A simulation library for the ADXL345 I2C and SPI Accelerometer, ADXL362 SPI Accelerometer, and ADXRS450 SPI Gyro"
+
+ext {
+    includeWpiutil = true
+    pluginName = 'halsim_adx_gyro_accelerometer'
+}
+
+apply from: "${rootDir}/shared/plugins/setupBuild.gradle"
+
+
+if (!project.hasProperty('onlyAthena')) {
+    model {
+        exportsConfigs {
+            halsim_adx_gyro_accelerometer(ExportsConfig) {
+                x86ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                     '_CT??_R0?AVbad_cast',
+                                     '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                     '_TI5?AVfailure']
+                x64ExcludeSymbols = ['_CT??_R0?AV_System_error', '_CT??_R0?AVexception', '_CT??_R0?AVfailure',
+                                     '_CT??_R0?AVbad_cast',
+                                     '_CT??_R0?AVruntime_error', '_CT??_R0?AVsystem_error', '_CTA5?AVfailure',
+                                     '_TI5?AVfailure']
+            }
+        }
+    }
+}

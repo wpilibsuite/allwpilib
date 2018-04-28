@@ -12,6 +12,7 @@
 #include <HAL/HAL.h>
 #include <networktables/NetworkTableInstance.h>
 
+#include "CameraServerShared.h"
 #include "DriverStation.h"
 #include "HLUsageReporting.h"
 #include "Internal/HardwareHLReporting.h"
@@ -19,11 +20,43 @@
 #include "RobotState.h"
 #include "SmartDashboard/SmartDashboard.h"
 #include "Utility.h"
+#include "WPIErrors.h"
 #include "WPILibVersion.h"
 
 using namespace frc;
 
 std::thread::id RobotBase::m_threadId;
+
+namespace {
+class WPILibCameraServerShared : public frc::CameraServerShared {
+ public:
+  void ReportUsbCamera(int id) override {
+    HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
+  }
+  void ReportAxisCamera(int id) override {
+    HAL_Report(HALUsageReporting::kResourceType_AxisCamera, id);
+  }
+  void ReportVideoServer(int id) override {
+    HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
+  }
+  void SetCameraServerError(llvm::StringRef error) override {
+    wpi_setGlobalWPIErrorWithContext(CameraServerError, error);
+  }
+  void SetVisionRunnerError(llvm::StringRef error) override {
+    wpi_setGlobalErrorWithContext(-1, error);
+  }
+  void ReportDriverStationError(llvm::StringRef error) override {
+    DriverStation::ReportError(error);
+  }
+  std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {
+    return std::make_pair(RobotBase::GetThreadId(), true);
+  }
+};
+}  // namespace
+
+static void SetupCameraServerShared() {
+  SetCameraServerShared(std::make_unique<WPILibCameraServerShared>());
+}
 
 /**
  * Constructor for a generic robot program.
@@ -41,6 +74,8 @@ RobotBase::RobotBase() : m_ds(DriverStation::GetInstance()) {
 
   RobotState::SetImplementation(DriverStation::GetInstance());
   HLUsageReporting::SetImplementation(new HardwareHLReporting());
+
+  SetupCameraServerShared();
 
   auto inst = nt::NetworkTableInstance::GetDefault();
   inst.SetNetworkIdentity("Robot");

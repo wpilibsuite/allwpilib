@@ -1,0 +1,27 @@
+if (project.hasProperty('useCpp') && project.useCpp) {
+    model {
+        dependencyConfigs {
+            opencv(DependencyConfig) {
+                groupId = 'org.opencv'
+                artifactId = 'opencv-cpp'
+                headerClassifier = 'headers'
+                ext = 'zip'
+                version = '3.2.0'
+                sharedConfigs = project.sharedCvConfigs
+                staticConfigs = project.staticCvConfigs
+            }
+        }
+    }
+}
+
+if (project.hasProperty('useJava') && project.useJava) {
+    dependencies {
+        compile 'org.opencv:opencv-java:3.2.0'
+        if (!project.hasProperty('skipDev') || !project.skipDev) {
+            devCompile 'org.opencv:opencv-java:3.2.0'
+        }
+        if (project.hasProperty('useDocumentation') && project.useDocumentation) {
+            javaSource 'org.opencv:opencv-java:3.2.0:sources'
+        }
+    }
+}

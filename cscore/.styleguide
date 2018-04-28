@@ -1,0 +1,31 @@
+cppHeaderFileInclude {
+  \.h$
+  \.hpp$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  gmock/
+  src/arm-linux-jni/
+  src/main/native/cpp/jni/CameraServerJNI\.cpp$
+}
+
+licenseUpdateExclude {
+  src/main/native/cpp/default_init_allocator\.h$
+}
+
+includeGuardRoots {
+  cscore/src/main/native/cpp/
+  cscore/src/main/native/include/
+}
+
+includeOtherLibs {
+  ^llvm/
+  ^opencv2/
+  ^support/
+  ^tcpsockets/
+}

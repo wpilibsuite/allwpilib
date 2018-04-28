@@ -46,6 +46,8 @@ std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
       excludeFuncPrefix == nullptr ? llvm::StringRef() : excludeFuncPrefix);
 }
 
+
+
 // Finds a class and keep it as a global reference.
 // Use with caution, as the destructor does NOT call DeleteGlobalRef due
 // to potential shutdown issues with doing so.
@@ -71,6 +73,28 @@ class JClass {
 
  protected:
   jclass m_cls = nullptr;
+};
+
+template<typename T>
+class JGlobal {
+ public:
+  JGlobal() = default;
+
+  JGlobal(JNIEnv* env, T obj) {
+    m_cls = static_cast<T>(env->NewGlobalRef(obj));
+  }
+
+  void free(JNIEnv* env) {
+    if (m_cls) env->DeleteGlobalRef(m_cls);
+    m_cls = nullptr;
+  }
+
+  explicit operator bool() const { return m_cls; }
+
+  operator T() const { return m_cls; }
+
+ protected:
+  T m_cls = nullptr;
 };
 
 // Container class for cleaning up Java local references.

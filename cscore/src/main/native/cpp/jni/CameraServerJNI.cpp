@@ -104,10 +104,10 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved) {
 // Helper class to create and clean up a global reference
 //
 template <typename T>
-class JGlobal {
+class JCSGlobal {
  public:
-  JGlobal(JNIEnv* env, T obj) : m_obj(static_cast<T>(env->NewGlobalRef(obj))) {}
-  ~JGlobal() {
+  JCSGlobal(JNIEnv* env, T obj) : m_obj(static_cast<T>(env->NewGlobalRef(obj))) {}
+  ~JCSGlobal() {
     if (!jvm || cs::NotifierDestroyed()) return;
     JNIEnv* env;
     bool attached = false;
@@ -1324,7 +1324,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_addListener
   }
   // the shared pointer to the weak global will keep it around until the
   // entry listener is destroyed
-  auto listener_global = std::make_shared<JGlobal<jobject>>(envouter, listener);
+  auto listener_global = std::make_shared<JCSGlobal<jobject>>(envouter, listener);
 
   // cls is a temporary here; cannot be used within callback functor
   jclass cls = envouter->GetObjectClass(listener);

@@ -44,7 +44,7 @@ private:
 	static constexpr int kJoystickChannel = 0;
 
 	// Bottom, middle, and top elevator setpoints
-	static constexpr std::array<double, 3> kSetPoints = {1.0, 2.6, 4.3};
+	static constexpr std::array<double, 3> kSetPoints = {{1.0, 2.6, 4.3}};
 
 	/* proportional, integral, and derivative speed constants; motor
 	 * inverted

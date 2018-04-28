@@ -16,7 +16,7 @@
  */
 class Robot : public frc::IterativeRobot {
 public:
-	void RobotInit() {
+	void RobotInit() override {
 		// Invert the left side motors
 		// You may need to change or remove this to match your robot
 		m_frontLeft.SetInverted(true);

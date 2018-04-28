@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.function.Consumer;
 import org.opencv.core.Core;
 import edu.wpi.first.wpiutil.RuntimeDetector;
@@ -32,12 +31,13 @@ public class CameraServerJNI {
           InputStream is = CameraServerJNI.class.getResourceAsStream(resname);
           if (is != null) {
             // create temporary file
-            if (System.getProperty("os.name").startsWith("Windows"))
+            if (System.getProperty("os.name").startsWith("Windows")) {
               jniLibrary = File.createTempFile("CameraServerJNI", ".dll");
-            else if (System.getProperty("os.name").startsWith("Mac"))
+            } else if (System.getProperty("os.name").startsWith("Mac")) {
               jniLibrary = File.createTempFile("libCameraServerJNI", ".dylib");
-            else
+            } else {
               jniLibrary = File.createTempFile("libCameraServerJNI", ".so");
+            }
             // flag for delete on exit
             jniLibrary.deleteOnExit();
             OutputStream os = new FileOutputStream(jniLibrary);
@@ -75,12 +75,13 @@ public class CameraServerJNI {
           InputStream is = CameraServerJNI.class.getResourceAsStream(resname);
           if (is != null) {
             // create temporary file
-            if (System.getProperty("os.name").startsWith("Windows"))
+            if (System.getProperty("os.name").startsWith("Windows")) {
               cvJniLibrary = File.createTempFile("OpenCVJNI", ".dll");
-            else if (System.getProperty("os.name").startsWith("Mac"))
+            } else if (System.getProperty("os.name").startsWith("Mac")) {
               cvJniLibrary = File.createTempFile("libOpenCVJNI", ".dylib");
-            else
+            } else {
               cvJniLibrary = File.createTempFile("libOpenCVJNI", ".so");
+            }
             // flag for delete on exit
             cvJniLibrary.deleteOnExit();
             OutputStream os = new FileOutputStream(cvJniLibrary);

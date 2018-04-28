@@ -55,9 +55,15 @@ public class VideoSource {
   }
 
   public boolean equals(Object other) {
-    if (this == other) return true;
-    if (other == null) return false;
-    if (getClass() != other.getClass()) return false;
+    if (this == other) {
+      return true;
+    }
+    if (other == null) {
+      return false;
+    }
+    if (getClass() != other.getClass()) {
+      return false;
+    }
     VideoSource source = (VideoSource) other;
     return m_handle == source.m_handle;
   }

@@ -8,9 +8,6 @@
 package edu.wpi.first.wpiutil;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 public class RuntimeDetector {
   private static String filePrefix;
@@ -80,7 +77,8 @@ public class RuntimeDetector {
   public static synchronized String getLibraryResource(String libName) {
     computePlatform();
 
-    return filePath + filePrefix + libName + fileExtension;
+    String toReturn = filePath + filePrefix + libName + fileExtension;
+    return toReturn;
   }
 
   public static boolean isAthena() {

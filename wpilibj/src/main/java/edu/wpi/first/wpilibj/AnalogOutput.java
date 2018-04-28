@@ -28,7 +28,7 @@ public class AnalogOutput extends SendableBase implements Sendable {
     SensorBase.checkAnalogOutputChannel(channel);
     m_channel = channel;
 
-    final int portHandle = AnalogJNI.getPort((byte) channel);
+    final int portHandle = HAL.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogOutputPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_AnalogOutput, channel);

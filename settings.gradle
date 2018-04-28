@@ -1,14 +1,24 @@
-include 'gmock'
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
+include 'gtest'
 include 'ni-libraries'
+include 'wpiutil'
+include 'ntcore'
 include 'hal'
+include 'cscore'
 include 'wpilibc'
-include 'wpilibcIntegrationTests'
 include 'wpilibcExamples'
-include 'wpilibj'
-include 'wpilibjIntegrationTests'
+include 'wpilibcIntegrationTests'
 include 'wpilibjExamples'
-include 'myRobot'
+include 'wpilibjIntegrationTests'
+include 'wpilibj'
 include 'simulation:halsim_print'
 include 'simulation:halsim_lowfi'
-include 'simulation:adx_gyro_accelerometer'
+include 'simulation:halsim_adx_gyro_accelerometer'
 include 'simulation:halsim_ds_nt'
+include 'cameraserver'

@@ -34,7 +34,7 @@ public class DigitalOutput extends SendableBase implements Sendable {
     SensorBase.checkDigitalChannel(channel);
     m_channel = channel;
 
-    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), false);
+    m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), false);
 
     HAL.report(tResourceType.kResourceType_DigitalOutput, channel);
     setName("DigitalOutput", channel);
