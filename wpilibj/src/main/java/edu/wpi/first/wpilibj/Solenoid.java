@@ -44,7 +44,7 @@ public class Solenoid extends SolenoidBase implements Sendable {
     SensorBase.checkSolenoidModule(m_moduleNumber);
     SensorBase.checkSolenoidChannel(m_channel);
 
-    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
+    int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) m_channel);
     m_solenoidHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_Solenoid, m_channel, m_moduleNumber);

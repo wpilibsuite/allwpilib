@@ -58,11 +58,11 @@ public class DoubleSolenoid extends SolenoidBase implements Sendable {
     SensorBase.checkSolenoidChannel(forwardChannel);
     SensorBase.checkSolenoidChannel(reverseChannel);
 
-    int portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
+    int portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) forwardChannel);
     m_forwardHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
 
     try {
-      portHandle = SolenoidJNI.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
+      portHandle = HAL.getPortWithModule((byte) m_moduleNumber, (byte) reverseChannel);
       m_reverseHandle = SolenoidJNI.initializeSolenoidPort(portHandle);
     } catch (RuntimeException ex) {
       // free the forward handle on exception, then rethrow

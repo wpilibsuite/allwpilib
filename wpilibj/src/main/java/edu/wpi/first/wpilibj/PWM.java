@@ -7,7 +7,6 @@
 
 package edu.wpi.first.wpilibj;
 
-import edu.wpi.first.wpilibj.hal.DIOJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.hal.PWMJNI;
@@ -56,7 +55,7 @@ public class PWM extends SendableBase implements Sendable {
     SensorBase.checkPWMChannel(channel);
     m_channel = channel;
 
-    m_handle = PWMJNI.initializePWMPort(DIOJNI.getPort((byte) channel));
+    m_handle = PWMJNI.initializePWMPort(HAL.getPort((byte) channel));
 
     setDisabled();
 

@@ -23,7 +23,6 @@ using namespace hal;
 namespace hal {
 namespace init {
 void InitializeHAL() {
-  InitializeHandlesInternal();
   InitializeAccelerometerData();
   InitializeAnalogGyroData();
   InitializeAnalogInData();

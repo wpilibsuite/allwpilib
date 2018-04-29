@@ -31,7 +31,7 @@ public class DigitalInput extends DigitalSource implements Sendable {
     checkDigitalChannel(channel);
     m_channel = channel;
 
-    m_handle = DIOJNI.initializeDIOPort(DIOJNI.getPort((byte) channel), true);
+    m_handle = DIOJNI.initializeDIOPort(HAL.getPort((byte) channel), true);
 
     HAL.report(tResourceType.kResourceType_DigitalInput, channel);
     setName("DigitalInput", channel);

@@ -9,7 +9,6 @@
 
 namespace hal {
 namespace init {
-extern void InitializeHandlesInternal();
 extern void InitializeAccelerometerData();
 extern void InitializeAnalogGyroData();
 extern void InitializeAnalogInData();

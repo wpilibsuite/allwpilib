@@ -42,7 +42,7 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
     checkAnalogInputChannel(channel);
     m_channel = channel;
 
-    final int portHandle = AnalogJNI.getPort((byte) channel);
+    final int portHandle = HAL.getPort((byte) channel);
     m_port = AnalogJNI.initializeAnalogInputPort(portHandle);
 
     HAL.report(tResourceType.kResourceType_AnalogChannel, channel);

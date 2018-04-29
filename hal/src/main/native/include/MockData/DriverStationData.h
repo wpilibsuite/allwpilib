@@ -88,10 +88,6 @@ void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
 
 void HALSIM_NotifyDriverStationNewData(void);
 
-void HALSIM_RegisterDriverStationAllCallbacks(HAL_NotifyCallback callback,
-                                              void* param,
-                                              HAL_Bool initialNotify);
-
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -9,7 +9,7 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gmock/
+  gtest/
   ni-libraries/include/
   ni-libraries/lib/
   hal/src/main/native/athena/ctre/
@@ -20,8 +20,7 @@ generatedFileExclude {
 }
 
 modifiableFileExclude {
-  wpilibj/src/arm-linux-jni/
-  wpilibj/src/main/native/cpp/
+  src/main/native/cpp/jni/
   \.patch$
   \.png$
   \.py$

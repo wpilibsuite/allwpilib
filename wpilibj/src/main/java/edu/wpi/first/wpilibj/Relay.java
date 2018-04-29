@@ -102,7 +102,7 @@ public class Relay extends SendableBase implements MotorSafety, Sendable {
   private void initRelay() {
     SensorBase.checkRelayChannel(m_channel);
 
-    int portHandle = RelayJNI.getPort((byte) m_channel);
+    int portHandle = HAL.getPort((byte) m_channel);
     if (m_direction == Direction.kBoth || m_direction == Direction.kForward) {
       m_forwardHandle = RelayJNI.initializeRelayPort(portHandle, true);
       HAL.report(tResourceType.kResourceType_Relay, m_channel);

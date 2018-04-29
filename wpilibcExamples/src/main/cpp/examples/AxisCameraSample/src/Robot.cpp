@@ -57,7 +57,7 @@ private:
 		}
 	}
 
-	void RobotInit() {
+	void RobotInit() override {
 		// We need to run our vision program in a separate Thread.
 		// If not, our robot program will not run
 		std::thread visionThread(VisionThread);
