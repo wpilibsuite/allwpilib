@@ -9,19 +9,37 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gmock/
+  gtest/
+  llvm/
+  ntcore/doc/
   ni-libraries/include/
   ni-libraries/lib/
   hal/src/main/native/athena/ctre/
   hal/src/main/native/athena/frccansae/
   hal/src/main/native/athena/visa/
   hal/src/main/native/include/ctre/
+  wpiutil/src/main/native/cpp/support/json
+  wpiutil/src/main/native/include/support/json
+  wpiutil/src/test/native/cpp/json/
   UsageReporting\.h$
 }
 
+licenseUpdateExclude {
+  wpiutil/src/main/native/cpp/support/Base64\.cpp$
+  wpiutil/src/main/native/cpp/support/sha1\.cpp$
+  wpiutil/src/main/native/cpp/tcpsockets/TCPAcceptor\.cpp$
+  wpiutil/src/main/native/cpp/tcpsockets/TCPConnector\.cpp$
+  wpiutil/src/main/native/cpp/tcpsockets/TCPStream\.cpp$
+  wpiutil/src/main/native/include/support/ConcurrentQueue\.h$
+  wpiutil/src/main/native/include/support/sha1\.h$
+  wpiutil/src/main/native/include/tcpsockets/TCPAcceptor\.h$
+  wpiutil/src/main/native/include/tcpsockets/TCPConnector\.h$
+  wpiutil/src/main/native/include/tcpsockets/TCPStream\.h$
+}
+
 modifiableFileExclude {
-  wpilibj/src/arm-linux-jni/
-  wpilibj/src/main/native/cpp/
+  shared/arm-linux-jni/
+  hal/src/main/native/cpp/jni/
   \.patch$
   \.png$
   \.py$
@@ -38,4 +56,16 @@ includeOtherLibs {
 
 includeProject {
   ^ctre/
+}
+
+includeGuardRoots {
+  wpiutil/src/main/native/cpp/
+  wpiutil/src/main/native/include/
+  wpiutil/src/test/native/cpp/
+  cscore/src/main/native/cpp/
+  cscore/src/main/native/include/
+  cscore/src/test/native/cpp/
+  ntcore/src/main/native/cpp/
+  ntcore/src/main/native/include/
+  ntcore/src/test/native/cpp/
 }

@@ -1,0 +1,25 @@
+cppHeaderFileInclude {
+  \.h$
+  \.inc$
+}
+
+cppSrcFileInclude {
+  \.cpp$
+}
+
+generatedFileExclude {
+  gmock/
+  llvm/
+  ntcore/doc/
+}
+
+includeOtherLibs {
+  ^llvm/
+  ^support/
+}
+
+includeGuardRoots {
+  ntcore/src/main/native/cpp/
+  ntcore/src/main/native/include/
+  ntcore/src/test/native/cpp/
+}

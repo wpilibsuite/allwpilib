@@ -9,7 +9,6 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gtest/
   ni-libraries/include/
   ni-libraries/lib/
   hal/src/main/native/athena/ctre/
@@ -20,7 +19,6 @@ generatedFileExclude {
 }
 
 modifiableFileExclude {
-  src/main/native/cpp/jni/
   \.patch$
   \.png$
   \.py$
