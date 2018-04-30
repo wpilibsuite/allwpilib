@@ -47,20 +47,24 @@ void InitializeDigitalInternal() {
 namespace detail {
 wpi::mutex& UnsafeGetDIOMutex() { return digitalDIOMutex; }
 tDIO* UnsafeGetDigialSystem() { return digitalSystem.get(); }
-}  // namespace detail
-
-int32_t ComputeDigitalMask(uint8_t channel) {
+int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status) {
+  auto port = digitalChannelHandles->Get(handle, HAL_HandleEnum::DIO);
+  if (port == nullptr) {
+    *status = HAL_HANDLE_ERROR;
+    return 0;
+  }
   tDIO::tDO output;
   output.value = 0;
-  if (channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
-    output.SPIPort = (1u << remapSPIChannel(channel));
-  } else if (channel < kNumDigitalHeaders) {
-    output.Headers = (1u << channel);
+  if (port->channel >= kNumDigitalHeaders + kNumDigitalMXPChannels) {
+    output.SPIPort = (1u << remapSPIChannel(port->channel));
+  } else if (port->channel < kNumDigitalHeaders) {
+    output.Headers = (1u << port->channel);
   } else {
-    output.MXP = (1u << remapMXPChannel(channel));
+    output.MXP = (1u << remapMXPChannel(port->channel));
   }
   return output.value;
 }
+}  // namespace detail
 
 /**
  * Initialize the digital system.
