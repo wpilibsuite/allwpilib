@@ -22,7 +22,6 @@
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
 #include "HAL/HAL.h"
-#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/HandlesInternal.h"
 
 using namespace hal;

@@ -10,7 +10,6 @@
 #include <string>
 
 #include "DriverStationDataInternal.h"
-#include "HAL/cpp/make_unique.h"
 #include "MockData/NotifyCallbackHelpers.h"
 
 namespace hal {

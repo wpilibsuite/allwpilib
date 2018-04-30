@@ -11,7 +11,6 @@
 
 #include "HAL/Errors.h"
 #include "HAL/Ports.h"
-#include "HAL/cpp/make_unique.h"
 #include "PortsInternal.h"
 #include "ctre/PDP.h"
 

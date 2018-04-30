@@ -14,7 +14,6 @@
 #include "DigitalInternal.h"
 #include "HAL/ChipObject.h"
 #include "HAL/Errors.h"
-#include "HAL/cpp/make_unique.h"
 #include "HAL/handles/HandlesInternal.h"
 #include "HAL/handles/LimitedHandleResource.h"
 #include "PortsInternal.h"
