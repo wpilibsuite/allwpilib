@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_USBCAMERAPROPERTY_H_
-#define CSCORE_USBCAMERAPROPERTY_H_
+#ifndef ALLWPILIB_USBCAMERAPROPERTY_H_
+#define ALLWPILIB_USBCAMERAPROPERTY_H_
 
 #ifdef __linux__
 #include <linux/videodev2.h>
@@ -67,4 +67,4 @@ class UsbCameraProperty : public PropertyImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_USBCAMERAPROPERTY_H_
+#endif  // ALLWPILIB_USBCAMERAPROPERTY_H_

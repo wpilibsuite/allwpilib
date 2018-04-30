@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CSCORE_CPP_H_
-#define CSCORE_CSCORE_CPP_H_
+#ifndef ALLWPILIB_CSCORE_CPP_H_
+#define ALLWPILIB_CSCORE_CPP_H_
 
 #include <stdint.h>
 
@@ -350,4 +350,4 @@ uint64_t CS_GrabSinkFrameTimeoutCpp(CS_Sink sink, cv::Mat* image,
 void CS_PutSourceFrameCpp(CS_Source source, cv::Mat* image, CS_Status* status);
 }  // extern "C"
 
-#endif  // CSCORE_CSCORE_CPP_H_
+#endif  // ALLWPILIB_CSCORE_CPP_H_

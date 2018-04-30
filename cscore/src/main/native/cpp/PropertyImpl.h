@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_PROPERTYIMPL_H_
-#define CSCORE_PROPERTYIMPL_H_
+#ifndef ALLWPILIB_PROPERTYIMPL_H_
+#define ALLWPILIB_PROPERTYIMPL_H_
 
 #include <string>
 #include <vector>
@@ -73,4 +73,4 @@ class PropertyImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_PROPERTYIMPL_H_
+#endif  // ALLWPILIB_PROPERTYIMPL_H_

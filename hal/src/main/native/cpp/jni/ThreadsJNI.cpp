@@ -1,18 +1,18 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <jni.h>
-#include "HAL/cpp/Log.h"
 
-#include "edu_wpi_first_wpilibj_hal_ThreadsJNI.h"
+#include <cassert>
 
 #include "HAL/Threads.h"
+#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
+#include "edu_wpi_first_wpilibj_hal_ThreadsJNI.h"
 
 using namespace frc;
 
@@ -70,4 +70,4 @@ JNIEXPORT jboolean JNICALL Java_edu_wpi_first_wpilibj_hal_ThreadsJNI_setCurrentT
   return (jboolean)ret;
 }
 
-}
+}  // extern "C"

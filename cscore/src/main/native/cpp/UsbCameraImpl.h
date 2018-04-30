@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_USBCAMERAIMPL_H_
-#define CSCORE_USBCAMERAIMPL_H_
+#ifndef ALLWPILIB_USBCAMERAIMPL_H_
+#define ALLWPILIB_USBCAMERAIMPL_H_
 
 #ifdef __linux__
 #include <linux/videodev2.h>
@@ -180,4 +180,4 @@ class UsbCameraImpl : public SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_USBCAMERAIMPL_H_
+#endif  // ALLWPILIB_USBCAMERAIMPL_H_

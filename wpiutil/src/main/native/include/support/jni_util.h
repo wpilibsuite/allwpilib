@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_JNI_UTIL_H_
-#define WPIUTIL_SUPPORT_JNI_UTIL_H_
+#ifndef ALLWPILIB_SUPPORT_JNI_UTIL_H_
+#define ALLWPILIB_SUPPORT_JNI_UTIL_H_
 
 #include <jni.h>
 
@@ -636,4 +636,4 @@ class JException : public JClass {
 }  // namespace java
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_JNI_UTIL_H_
+#endif  // ALLWPILIB_SUPPORT_JNI_UTIL_H_

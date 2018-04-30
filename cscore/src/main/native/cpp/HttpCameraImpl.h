@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_HTTPCAMERAIMPL_H_
-#define CSCORE_HTTPCAMERAIMPL_H_
+#ifndef ALLWPILIB_HTTPCAMERAIMPL_H_
+#define ALLWPILIB_HTTPCAMERAIMPL_H_
 
 #include <atomic>
 #include <functional>
@@ -152,4 +152,4 @@ class AxisCameraImpl : public HttpCameraImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_HTTPCAMERAIMPL_H_
+#endif  // ALLWPILIB_HTTPCAMERAIMPL_H_

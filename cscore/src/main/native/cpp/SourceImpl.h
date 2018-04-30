@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_SOURCEIMPL_H_
-#define CSCORE_SOURCEIMPL_H_
+#ifndef ALLWPILIB_SOURCEIMPL_H_
+#define ALLWPILIB_SOURCEIMPL_H_
 
 #include <atomic>
 #include <cstddef>
@@ -220,4 +220,4 @@ class SourceImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_SOURCEIMPL_H_
+#endif  // ALLWPILIB_SOURCEIMPL_H_

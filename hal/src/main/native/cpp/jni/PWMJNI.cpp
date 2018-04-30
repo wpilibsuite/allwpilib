@@ -1,21 +1,21 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <jni.h>
-#include "HAL/cpp/Log.h"
 
-#include "edu_wpi_first_wpilibj_hal_PWMJNI.h"
+#include <cassert>
 
 #include "HAL/DIO.h"
 #include "HAL/PWM.h"
 #include "HAL/Ports.h"
-#include "HALUtil.h"
+#include "HAL/cpp/Log.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALUtil.h"
+#include "edu_wpi_first_wpilibj_hal_PWMJNI.h"
 
 using namespace frc;
 
@@ -81,12 +81,12 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_freePWMPort(
 * Signature: (IIIIII)V;
 */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfigRaw(
-    JNIEnv *env, jclass, jint id, jint maxPwm, jint deadbandMaxPwm, 
+    JNIEnv *env, jclass, jint id, jint maxPwm, jint deadbandMaxPwm,
     jint centerPwm, jint deadbandMinPwm, jint minPwm) {
   PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMConfigRaw";
   PWMJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_DigitalHandle)id;
   int32_t status = 0;
-  HAL_SetPWMConfigRaw((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm, 
+  HAL_SetPWMConfigRaw((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm,
                deadbandMinPwm, minPwm, &status);
   CheckStatus(env, status);
 }
@@ -97,12 +97,12 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfigRaw(
 * Signature: (IDDDDD)V;
 */
 JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_setPWMConfig(
-    JNIEnv *env, jclass, jint id, jdouble maxPwm, jdouble deadbandMaxPwm, 
+    JNIEnv *env, jclass, jint id, jdouble maxPwm, jdouble deadbandMaxPwm,
     jdouble centerPwm, jdouble deadbandMinPwm, jdouble minPwm) {
   PWMJNI_LOG(logDEBUG) << "Calling PWMJNI setPWMConfig";
   PWMJNI_LOG(logDEBUG) << "Port Handle = " << (HAL_DigitalHandle)id;
   int32_t status = 0;
-  HAL_SetPWMConfig((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm, 
+  HAL_SetPWMConfig((HAL_DigitalHandle)id, maxPwm, deadbandMaxPwm, centerPwm,
                deadbandMinPwm, minPwm, &status);
   CheckStatus(env, status);
 }
@@ -122,7 +122,7 @@ JNIEXPORT jobject JNICALL Java_edu_wpi_first_wpilibj_hal_PWMJNI_getPWMConfigRaw(
   int32_t centerPwm = 0;
   int32_t deadbandMinPwm = 0;
   int32_t minPwm = 0;
-  HAL_GetPWMConfigRaw((HAL_DigitalHandle)id, &maxPwm, &deadbandMaxPwm, &centerPwm, 
+  HAL_GetPWMConfigRaw((HAL_DigitalHandle)id, &maxPwm, &deadbandMaxPwm, &centerPwm,
                &deadbandMinPwm, &minPwm, &status);
   CheckStatus(env, status);
   return CreatePWMConfigDataResult(env, maxPwm, deadbandMaxPwm, centerPwm,

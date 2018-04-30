@@ -1,12 +1,21 @@
+/*----------------------------------------------------------------------------*/
+/* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
+/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* must be accompanied by the FIRST BSD license file in the root directory of */
+/* the project.                                                               */
+/*----------------------------------------------------------------------------*/
+
 #include <jni.h>
+
 #include <cassert>
+
+#include <llvm/ConvertUTF.h>
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+#include <support/jni_util.h>
 
 #include "edu_wpi_first_networktables_NetworkTablesJNI.h"
 #include "ntcore.h"
-#include "support/jni_util.h"
-#include "llvm/ConvertUTF.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 
 using namespace wpi::java;
 

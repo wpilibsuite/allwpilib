@@ -1,19 +1,19 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <jni.h>
-#include "HAL/cpp/Log.h"
 
-#include "edu_wpi_first_wpilibj_hal_CounterJNI.h"
+#include <cassert>
 
 #include "HAL/Counter.h"
 #include "HAL/Errors.h"
+#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
+#include "edu_wpi_first_wpilibj_hal_CounterJNI.h"
 
 using namespace frc;
 
@@ -95,7 +95,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterUpSource(
   COUNTERJNI_LOG(logDEBUG) << "digitalSourceHandle = " << digitalSourceHandle;
   COUNTERJNI_LOG(logDEBUG) << "analogTriggerType = " << analogTriggerType;
   int32_t status = 0;
-  HAL_SetCounterUpSource((HAL_CounterHandle)id, (HAL_Handle)digitalSourceHandle, 
+  HAL_SetCounterUpSource((HAL_CounterHandle)id, (HAL_Handle)digitalSourceHandle,
                      (HAL_AnalogTriggerType)analogTriggerType, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   CheckStatus(env, status);
@@ -149,7 +149,7 @@ Java_edu_wpi_first_wpilibj_hal_CounterJNI_setCounterDownSource(
   COUNTERJNI_LOG(logDEBUG) << "digitalSourceHandle = " << digitalSourceHandle;
   COUNTERJNI_LOG(logDEBUG) << "analogTriggerType = " << analogTriggerType;
   int32_t status = 0;
-  HAL_SetCounterDownSource((HAL_CounterHandle)id, (HAL_Handle)digitalSourceHandle, 
+  HAL_SetCounterDownSource((HAL_CounterHandle)id, (HAL_Handle)digitalSourceHandle,
                        (HAL_AnalogTriggerType)analogTriggerType, &status);
   COUNTERJNI_LOG(logDEBUG) << "Status = " << status;
   if (status == PARAMETER_OUT_OF_RANGE) {

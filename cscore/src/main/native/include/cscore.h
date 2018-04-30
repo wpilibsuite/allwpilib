@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CSCORE_H_
-#define CSCORE_CSCORE_H_
+#ifndef ALLWPILIB_CSCORE_H_
+#define ALLWPILIB_CSCORE_H_
 
 /* C API */
 #include "cscore_c.h"
@@ -17,4 +17,4 @@
 #include "cscore_oo.h"
 #endif /* __cplusplus */
 
-#endif  // CSCORE_CSCORE_H_
+#endif  // ALLWPILIB_CSCORE_H_

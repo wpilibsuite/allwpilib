@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CSCORE_OO_H_
-#define CSCORE_CSCORE_OO_H_
+#ifndef ALLWPILIB_CSCORE_OO_H_
+#define ALLWPILIB_CSCORE_OO_H_
 
 #include <initializer_list>
 #include <string>
@@ -658,4 +658,4 @@ class VideoListener {
 
 #include "cscore_oo.inl"
 
-#endif  // CSCORE_CSCORE_OO_H_
+#endif  // ALLWPILIB_CSCORE_OO_H_

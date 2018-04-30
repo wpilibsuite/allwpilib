@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_NOTIFIER_H_
-#define CSCORE_NOTIFIER_H_
+#ifndef ALLWPILIB_NOTIFIER_H_
+#define ALLWPILIB_NOTIFIER_H_
 
 #include <functional>
 
@@ -69,4 +69,4 @@ class Notifier {
 
 }  // namespace cs
 
-#endif  // CSCORE_NOTIFIER_H_
+#endif  // ALLWPILIB_NOTIFIER_H_

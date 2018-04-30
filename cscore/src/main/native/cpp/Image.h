@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_IMAGE_H_
-#define CSCORE_IMAGE_H_
+#ifndef ALLWPILIB_IMAGE_H_
+#define ALLWPILIB_IMAGE_H_
 
 #include <vector>
 
@@ -99,4 +99,4 @@ class Image {
 
 }  // namespace cs
 
-#endif  // CSCORE_IMAGE_H_
+#endif  // ALLWPILIB_IMAGE_H_

@@ -8,7 +8,6 @@ cppSrcFileInclude {
 }
 
 generatedFileExclude {
-  gmock/
   llvm/
   src/main/native/cpp/support/json
   src/main/native/include/support/json
