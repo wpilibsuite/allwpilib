@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_MJPEGSERVERIMPL_H_
-#define CSCORE_MJPEGSERVERIMPL_H_
+#ifndef ALLWPILIB_MJPEGSERVERIMPL_H_
+#define ALLWPILIB_MJPEGSERVERIMPL_H_
 
 #include <atomic>
 #include <memory>
@@ -59,4 +59,4 @@ class MjpegServerImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_MJPEGSERVERIMPL_H_
+#endif  // ALLWPILIB_MJPEGSERVERIMPL_H_

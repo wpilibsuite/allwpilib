@@ -17,8 +17,8 @@
         -- Eugene Hopkinson <slowriot at voxelstorm dot com>
 */
 
-#ifndef WPIUTIL_SUPPORT_SHA1_H_
-#define WPIUTIL_SUPPORT_SHA1_H_
+#ifndef ALLWPILIB_SUPPORT_SHA1_H_
+#define ALLWPILIB_SUPPORT_SHA1_H_
 
 #include <stdint.h>
 
@@ -53,4 +53,4 @@ class SHA1 {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_SHA1_H_
+#endif  // ALLWPILIB_SUPPORT_SHA1_H_

@@ -1,20 +1,22 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <jni.h>
 
-#include "HAL/cpp/Log.h"
+#include <cassert>
+
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+#include <support/jni_util.h>
+
 #include "HAL/CAN.h"
+#include "HAL/cpp/Log.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
-#include "support/jni_util.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -121,7 +123,7 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   CANJNI_LOG(logDEBUG) << "Status: " << status;
 
   if (!CheckCANStatus(env, status, *messageIDPtr)) return nullptr;
-  return MakeJByteArray(env, llvm::StringRef{reinterpret_cast<const char*>(buffer), 
+  return MakeJByteArray(env, llvm::StringRef{reinterpret_cast<const char*>(buffer),
                         static_cast<size_t>(dataSize)});
 }
 
@@ -143,7 +145,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_first_wpilibj_can_CANJNI_GetCANStatus
   int32_t status = 0;
   HAL_CAN_GetCANStatus(&percentBusUtilization, &busOffCount, &txFullCount,
                        &receiveErrorCount, &transmitErrorCount, &status);
-  
+
   if (!CheckStatus(env, status)) return;
 
   SetCanStatusObject(env, canStatus, percentBusUtilization, busOffCount,

@@ -1,23 +1,23 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <jni.h>
-#include "HAL/cpp/Log.h"
 
-#include "edu_wpi_first_wpilibj_hal_AnalogJNI.h"
+#include <cassert>
 
+#include "HAL/AnalogAccumulator.h"
 #include "HAL/AnalogInput.h"
 #include "HAL/AnalogOutput.h"
-#include "HAL/AnalogAccumulator.h"
 #include "HAL/AnalogTrigger.h"
 #include "HAL/Ports.h"
-#include "HALUtil.h"
+#include "HAL/cpp/Log.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALUtil.h"
+#include "edu_wpi_first_wpilibj_hal_AnalogJNI.h"
 
 using namespace frc;
 
@@ -45,7 +45,7 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogInputPort(
   auto analog = HAL_InitializeAnalogInputPort((HAL_PortHandle)id, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << analog;
-  CheckStatusRange(env, status, 0, HAL_GetNumAnalogInputs(), 
+  CheckStatusRange(env, status, 0, HAL_GetNumAnalogInputs(),
                    hal::getPortHandleChannel((HAL_PortHandle)id));
   return (jint)analog;
 }
@@ -75,7 +75,7 @@ Java_edu_wpi_first_wpilibj_hal_AnalogJNI_initializeAnalogOutputPort(
   HAL_AnalogOutputHandle analog = HAL_InitializeAnalogOutputPort((HAL_PortHandle)id, &status);
   ANALOGJNI_LOG(logDEBUG) << "Status = " << status;
   ANALOGJNI_LOG(logDEBUG) << "Analog Handle = " << analog;
-  CheckStatusRange(env, status, 0, HAL_GetNumAnalogOutputs(), 
+  CheckStatusRange(env, status, 0, HAL_GetNumAnalogOutputs(),
                    hal::getPortHandleChannel((HAL_PortHandle)id));
   return (jlong)analog;
 }

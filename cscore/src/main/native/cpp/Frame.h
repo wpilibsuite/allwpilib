@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_FRAME_H_
-#define CSCORE_FRAME_H_
+#ifndef ALLWPILIB_FRAME_H_
+#define ALLWPILIB_FRAME_H_
 
 #include <atomic>
 #include <memory>
@@ -159,4 +159,4 @@ class Frame {
 
 }  // namespace cs
 
-#endif  // CSCORE_FRAME_H_
+#endif  // ALLWPILIB_FRAME_H_

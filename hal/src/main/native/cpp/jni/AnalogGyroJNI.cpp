@@ -1,19 +1,19 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <assert.h>
 #include <jni.h>
-#include "HAL/cpp/Log.h"
 
-#include "edu_wpi_first_wpilibj_hal_AnalogGyroJNI.h"
+#include <cassert>
 
 #include "HAL/AnalogGyro.h"
-#include "HALUtil.h"
+#include "HAL/cpp/Log.h"
 #include "HAL/handles/HandlesInternal.h"
+#include "HALUtil.h"
+#include "edu_wpi_first_wpilibj_hal_AnalogGyroJNI.h"
 
 using namespace frc;
 

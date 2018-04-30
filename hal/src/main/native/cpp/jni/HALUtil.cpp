@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2016. All Rights Reserved.                             */
+/* Copyright (c) 2016-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
@@ -7,23 +7,24 @@
 
 #include "HALUtil.h"
 
-#include <assert.h>
-#include <errno.h>
 #include <jni.h>
 
+#include <cassert>
+#include <cerrno>
 #include <cstdio>
 #include <cstring>
 #include <string>
 
+#include <llvm/SmallString.h>
+#include <llvm/raw_ostream.h>
+#include <support/jni_util.h>
+
 #include "HAL/CAN.h"
-#include "HAL/HAL.h"
 #include "HAL/DriverStation.h"
 #include "HAL/Errors.h"
+#include "HAL/HAL.h"
 #include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
-#include "support/jni_util.h"
 
 using namespace wpi::java;
 
@@ -252,7 +253,7 @@ JavaVM* GetJVM() {
 namespace sim {
   jint SimOnLoad(JavaVM* vm, void* reserved);
   void SimOnUnload(JavaVM* vm, void* reserved);
-}
+}  // namespace sim
 
 using namespace frc;
 
@@ -447,7 +448,7 @@ Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALErrno(JNIEnv *, jclass) {
  */
 JNIEXPORT jstring JNICALL Java_edu_wpi_first_wpilibj_hal_HALUtil_getHALstrerror(
     JNIEnv *env, jclass, jint errorCode) {
-  const char *msg = strerror(errno);
+  const char *msg = std::strerror(errno);
   HALUTIL_LOG(logDEBUG) << "Calling HALUtil getHALstrerror errorCode="
                         << errorCode << " msg=" << msg;
   return MakeJString(env, msg);

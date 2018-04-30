@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_DEPRECATED_H_
-#define WPIUTIL_SUPPORT_DEPRECATED_H_
+#ifndef ALLWPILIB_SUPPORT_DEPRECATED_H_
+#define ALLWPILIB_SUPPORT_DEPRECATED_H_
 
 // [[deprecated(msg)]] is a C++14 feature not supported by MSVC or GCC < 4.9.
 // We provide an equivalent warning implementation for those compilers here.
@@ -30,4 +30,4 @@
 #endif
 #endif
 
-#endif  // WPIUTIL_SUPPORT_DEPRECATED_H_
+#endif  // ALLWPILIB_SUPPORT_DEPRECATED_H_

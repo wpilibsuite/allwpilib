@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_C_UTIL_H_
-#define CSCORE_C_UTIL_H_
+#ifndef ALLWPILIB_C_UTIL_H_
+#define ALLWPILIB_C_UTIL_H_
 
 #include <cstdlib>
 #include <cstring>
@@ -24,4 +24,4 @@ inline char* ConvertToC(llvm::StringRef in) {
 
 }  // namespace cs
 
-#endif  // CSCORE_C_UTIL_H_
+#endif  // ALLWPILIB_C_UTIL_H_

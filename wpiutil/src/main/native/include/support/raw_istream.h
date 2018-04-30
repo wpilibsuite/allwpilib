@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_RAW_ISTREAM_H_
-#define WPIUTIL_SUPPORT_RAW_ISTREAM_H_
+#ifndef ALLWPILIB_SUPPORT_RAW_ISTREAM_H_
+#define ALLWPILIB_SUPPORT_RAW_ISTREAM_H_
 
 #include <algorithm>
 #include <cstddef>
@@ -112,4 +112,4 @@ class raw_fd_istream : public raw_istream {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_RAW_ISTREAM_H_
+#endif  // ALLWPILIB_SUPPORT_RAW_ISTREAM_H_
