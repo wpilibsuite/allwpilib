@@ -10,24 +10,23 @@
 #include <stdint.h>
 
 #include <HAL/cpp/fpga_clock.h>
-#include <llvm/SmallString.h>
-#include <llvm/SmallVector.h>
-#include <llvm/raw_ostream.h>
-#include <support/Logger.h>
-
-#include "udpsockets/UDPClient.h"
+#include <wpi/Logger.h>
+#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
+#include <wpi/UDPClient.h>
+#include <wpi/raw_ostream.h>
 
 static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
                        const char* msg) {
-  llvm::SmallString<128> buf;
-  llvm::raw_svector_ostream oss(buf);
+  wpi::SmallString<128> buf;
+  wpi::raw_svector_ostream oss(buf);
   if (level == 20) {
     oss << "DS: " << msg << '\n';
-    llvm::errs() << oss.str();
+    wpi::errs() << oss.str();
     return;
   }
 
-  llvm::StringRef levelmsg;
+  wpi::StringRef levelmsg;
   if (level >= 50)
     levelmsg = "CRITICAL: ";
   else if (level >= 40)
@@ -37,10 +36,10 @@ static void LoggerFunc(unsigned int level, const char* file, unsigned int line,
   else
     return;
   oss << "DS: " << levelmsg << msg << " (" << file << ':' << line << ")\n";
-  llvm::errs() << oss.str();
+  wpi::errs() << oss.str();
 }
 
-static void generateEnabledDsPacket(llvm::SmallVectorImpl<uint8_t>& data,
+static void generateEnabledDsPacket(wpi::SmallVectorImpl<uint8_t>& data,
                                     uint16_t sendCount) {
   data.clear();
   data.push_back(sendCount >> 8);
@@ -63,7 +62,7 @@ void MockDS::start() {
     auto timeout_time = hal::fpga_clock::now();
     int initCount = 0;
     uint16_t sendCount = 0;
-    llvm::SmallVector<uint8_t, 8> data;
+    wpi::SmallVector<uint8_t, 8> data;
     while (m_active) {
       // Keep 20ms intervals, and increase time to next interval
       auto current = hal::fpga_clock::now();

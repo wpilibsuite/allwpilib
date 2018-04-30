@@ -14,7 +14,7 @@
 #include <unistd.h>
 #endif
 
-#include <llvm/SmallString.h>
+#include <wpi/SmallString.h>
 
 #include "Handle.h"
 #include "Log.h"
@@ -58,19 +58,19 @@ CS_PropertyKind GetPropertyKind(CS_Property property, CS_Status* status) {
 }
 
 std::string GetPropertyName(CS_Property property, CS_Status* status) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return std::string{};
   return source->GetPropertyName(propertyIndex, buf, status);
 }
 
-llvm::StringRef GetPropertyName(CS_Property property,
-                                llvm::SmallVectorImpl<char>& buf,
-                                CS_Status* status) {
+wpi::StringRef GetPropertyName(CS_Property property,
+                               wpi::SmallVectorImpl<char>& buf,
+                               CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return llvm::StringRef{};
+  if (!source) return wpi::StringRef{};
   return source->GetPropertyName(propertyIndex, buf, status);
 }
 
@@ -117,23 +117,23 @@ int GetPropertyDefault(CS_Property property, CS_Status* status) {
 }
 
 std::string GetStringProperty(CS_Property property, CS_Status* status) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
   if (!source) return std::string{};
   return source->GetStringProperty(propertyIndex, buf, status);
 }
 
-llvm::StringRef GetStringProperty(CS_Property property,
-                                  llvm::SmallVectorImpl<char>& buf,
-                                  CS_Status* status) {
+wpi::StringRef GetStringProperty(CS_Property property,
+                                 wpi::SmallVectorImpl<char>& buf,
+                                 CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
-  if (!source) return llvm::StringRef{};
+  if (!source) return wpi::StringRef{};
   return source->GetStringProperty(propertyIndex, buf, status);
 }
 
-void SetStringProperty(CS_Property property, llvm::StringRef value,
+void SetStringProperty(CS_Property property, wpi::StringRef value,
                        CS_Status* status) {
   int propertyIndex;
   auto source = GetPropertySource(property, &propertyIndex, status);
@@ -171,13 +171,13 @@ std::string GetSourceName(CS_Source source, CS_Status* status) {
   return data->source->GetName();
 }
 
-llvm::StringRef GetSourceName(CS_Source source,
-                              llvm::SmallVectorImpl<char>& buf,
-                              CS_Status* status) {
+wpi::StringRef GetSourceName(CS_Source source,
+                             wpi::SmallVectorImpl<char>& buf,
+                             CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   return data->source->GetName();
 }
@@ -188,17 +188,17 @@ std::string GetSourceDescription(CS_Source source, CS_Status* status) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
   }
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   return data->source->GetDescription(buf);
 }
 
-llvm::StringRef GetSourceDescription(CS_Source source,
-                                     llvm::SmallVectorImpl<char>& buf,
-                                     CS_Status* status) {
+wpi::StringRef GetSourceDescription(CS_Source source,
+                                    wpi::SmallVectorImpl<char>& buf,
+                                    CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   return data->source->GetDescription(buf);
 }
@@ -221,7 +221,7 @@ bool IsSourceConnected(CS_Source source, CS_Status* status) {
   return data->source->IsConnected();
 }
 
-CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
+CS_Property GetSourceProperty(CS_Source source, wpi::StringRef name,
                               CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
@@ -236,15 +236,15 @@ CS_Property GetSourceProperty(CS_Source source, llvm::StringRef name,
   return Handle{source, property, Handle::kProperty};
 }
 
-llvm::ArrayRef<CS_Property> EnumerateSourceProperties(
-    CS_Source source, llvm::SmallVectorImpl<CS_Property>& vec,
+wpi::ArrayRef<CS_Property> EnumerateSourceProperties(
+    CS_Source source, wpi::SmallVectorImpl<CS_Property>& vec,
     CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
     return 0;
   }
-  llvm::SmallVector<int, 32> properties_buf;
+  wpi::SmallVector<int, 32> properties_buf;
   for (auto property :
        data->source->EnumerateProperties(properties_buf, status))
     vec.push_back(Handle{source, property, Handle::kProperty});
@@ -309,12 +309,12 @@ std::vector<VideoMode> EnumerateSourceVideoModes(CS_Source source,
   return data->source->EnumerateVideoModes(status);
 }
 
-llvm::ArrayRef<CS_Sink> EnumerateSourceSinks(
-    CS_Source source, llvm::SmallVectorImpl<CS_Sink>& vec, CS_Status* status) {
+wpi::ArrayRef<CS_Sink> EnumerateSourceSinks(
+    CS_Source source, wpi::SmallVectorImpl<CS_Sink>& vec, CS_Status* status) {
   auto data = Sources::GetInstance().Get(source);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return llvm::ArrayRef<CS_Sink>{};
+    return wpi::ArrayRef<CS_Sink>{};
   }
   vec.clear();
   Sinks::GetInstance().ForEach([&](CS_Sink sinkHandle, const SinkData& data) {
@@ -448,12 +448,12 @@ std::string GetSinkName(CS_Sink sink, CS_Status* status) {
   return data->sink->GetName();
 }
 
-llvm::StringRef GetSinkName(CS_Sink sink, llvm::SmallVectorImpl<char>& buf,
-                            CS_Status* status) {
+wpi::StringRef GetSinkName(CS_Sink sink, wpi::SmallVectorImpl<char>& buf,
+                           CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   return data->sink->GetName();
 }
@@ -464,17 +464,17 @@ std::string GetSinkDescription(CS_Sink sink, CS_Status* status) {
     *status = CS_INVALID_HANDLE;
     return std::string{};
   }
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   return data->sink->GetDescription(buf);
 }
 
-llvm::StringRef GetSinkDescription(CS_Sink sink,
-                                   llvm::SmallVectorImpl<char>& buf,
-                                   CS_Status* status) {
+wpi::StringRef GetSinkDescription(CS_Sink sink,
+                                  wpi::SmallVectorImpl<char>& buf,
+                                  CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data) {
     *status = CS_INVALID_HANDLE;
-    return llvm::StringRef{};
+    return wpi::StringRef{};
   }
   return data->sink->GetDescription(buf);
 }
@@ -509,7 +509,7 @@ CS_Source GetSinkSource(CS_Sink sink, CS_Status* status) {
   return data->sourceHandle.load();
 }
 
-CS_Property GetSinkSourceProperty(CS_Sink sink, llvm::StringRef name,
+CS_Property GetSinkSourceProperty(CS_Sink sink, wpi::StringRef name,
                                   CS_Status* status) {
   auto data = Sinks::GetInstance().Get(sink);
   if (!data) {
@@ -625,13 +625,13 @@ void SetDefaultLogger(unsigned int min_level) {
 // Utility Functions
 //
 
-llvm::ArrayRef<CS_Source> EnumerateSourceHandles(
-    llvm::SmallVectorImpl<CS_Source>& vec, CS_Status* status) {
+wpi::ArrayRef<CS_Source> EnumerateSourceHandles(
+    wpi::SmallVectorImpl<CS_Source>& vec, CS_Status* status) {
   return Sources::GetInstance().GetAll(vec);
 }
 
-llvm::ArrayRef<CS_Sink> EnumerateSinkHandles(
-    llvm::SmallVectorImpl<CS_Sink>& vec, CS_Status* status) {
+wpi::ArrayRef<CS_Sink> EnumerateSinkHandles(
+    wpi::SmallVectorImpl<CS_Sink>& vec, CS_Status* status) {
   return Sinks::GetInstance().GetAll(vec);
 }
 

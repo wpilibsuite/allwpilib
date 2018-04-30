@@ -15,7 +15,7 @@ using namespace frc;
  * @param name    the name of the command
  * @param timeout the time (in seconds) before this command "times out"
  */
-TimedCommand::TimedCommand(const llvm::Twine& name, double timeout)
+TimedCommand::TimedCommand(const wpi::Twine& name, double timeout)
     : Command(name, timeout) {}
 
 /**

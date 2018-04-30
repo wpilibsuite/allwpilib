@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <support/deprecated.h>
+#include <wpi/deprecated.h>
 
 #include "RobotBase.h"
 

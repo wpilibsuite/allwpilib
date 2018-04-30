@@ -47,7 +47,7 @@
 ------------------------------------------------------------------------ */
 
 
-#include "llvm/ConvertUTF.h"
+#include "wpi/ConvertUTF.h"
 #ifdef CVTUTF_DEBUG
 #include <stdio.h>
 #endif

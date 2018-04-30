@@ -28,7 +28,7 @@ using namespace frc;
 DigitalInput::DigitalInput(int channel) {
   if (!CheckDigitalChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "Digital Channel " + llvm::Twine(channel));
+                               "Digital Channel " + wpi::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     return;
   }

@@ -15,7 +15,7 @@
 #include "HAL/DriverStation.h"
 #include "edu_wpi_first_wpilibj_hal_HAL.h"
 #include "HALUtil.h"
-#include "support/jni_util.h"
+#include "wpi/jni_util.h"
 
 using namespace frc;
 using namespace wpi::java;

@@ -10,14 +10,14 @@
 #include <atomic>
 #include <thread>
 
-#include <support/mutex.h>
+#include <wpi/SafeThread.h>
+#include <wpi/mutex.h>
 
 #include "HAL/cpp/Log.h"
 
 #include "HAL/Interrupts.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_hal_InterruptJNI.h"
-#include "support/SafeThread.h"
 
 using namespace frc;
 

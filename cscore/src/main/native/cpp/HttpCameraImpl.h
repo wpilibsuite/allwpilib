@@ -16,11 +16,11 @@
 #include <thread>
 #include <vector>
 
-#include <llvm/SmallString.h>
-#include <llvm/StringMap.h>
-#include <support/HttpUtil.h>
-#include <support/condition_variable.h>
-#include <support/raw_istream.h>
+#include <wpi/HttpUtil.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringMap.h>
+#include <wpi/condition_variable.h>
+#include <wpi/raw_istream.h>
 
 #include "SourceImpl.h"
 #include "cscore_cpp.h"
@@ -29,14 +29,14 @@ namespace cs {
 
 class HttpCameraImpl : public SourceImpl {
  public:
-  HttpCameraImpl(llvm::StringRef name, CS_HttpCameraKind kind);
+  HttpCameraImpl(wpi::StringRef name, CS_HttpCameraKind kind);
   ~HttpCameraImpl() override;
 
   void Start();
 
   // Property functions
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, llvm::StringRef value,
+  void SetStringProperty(int property, wpi::StringRef value,
                          CS_Status* status) override;
 
   // Standard common camera properties
@@ -55,15 +55,15 @@ class HttpCameraImpl : public SourceImpl {
   void NumSinksEnabledChanged() override;
 
   CS_HttpCameraKind GetKind() const;
-  bool SetUrls(llvm::ArrayRef<std::string> urls, CS_Status* status);
+  bool SetUrls(wpi::ArrayRef<std::string> urls, CS_Status* status);
   std::vector<std::string> GetUrls() const;
 
   // Property data
   class PropertyData : public PropertyImpl {
    public:
     PropertyData() = default;
-    explicit PropertyData(llvm::StringRef name_) : PropertyImpl{name_} {}
-    PropertyData(llvm::StringRef name_, llvm::StringRef httpParam_,
+    explicit PropertyData(wpi::StringRef name_) : PropertyImpl{name_} {}
+    PropertyData(wpi::StringRef name_, wpi::StringRef httpParam_,
                  bool viaSettings_, CS_PropertyKind kind_, int minimum_,
                  int maximum_, int step_, int defaultValue_, int value_)
         : PropertyImpl(name_, kind_, step_, defaultValue_, value_),
@@ -82,16 +82,16 @@ class HttpCameraImpl : public SourceImpl {
 
  protected:
   std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      llvm::StringRef name) const override;
+      wpi::StringRef name) const override;
 
   bool CacheProperties(CS_Status* status) const override;
 
-  void CreateProperty(llvm::StringRef name, llvm::StringRef httpParam,
+  void CreateProperty(wpi::StringRef name, wpi::StringRef httpParam,
                       bool viaSettings, CS_PropertyKind kind, int minimum,
                       int maximum, int step, int defaultValue, int value) const;
 
   template <typename T>
-  void CreateEnumProperty(llvm::StringRef name, llvm::StringRef httpParam,
+  void CreateEnumProperty(wpi::StringRef name, wpi::StringRef httpParam,
                           bool viaSettings, int defaultValue, int value,
                           std::initializer_list<T> choices) const;
 
@@ -101,8 +101,8 @@ class HttpCameraImpl : public SourceImpl {
 
   // Functions used by StreamThreadMain()
   wpi::HttpConnection* DeviceStreamConnect(
-      llvm::SmallVectorImpl<char>& boundary);
-  void DeviceStream(wpi::raw_istream& is, llvm::StringRef boundary);
+      wpi::SmallVectorImpl<char>& boundary);
+  void DeviceStream(wpi::raw_istream& is, wpi::StringRef boundary);
   bool DeviceStreamFrame(wpi::raw_istream& is, std::string& imageBuf);
 
   // The camera settings thread
@@ -130,20 +130,20 @@ class HttpCameraImpl : public SourceImpl {
 
   wpi::condition_variable m_sinkEnabledCond;
 
-  llvm::StringMap<llvm::SmallString<16>> m_settings;
+  wpi::StringMap<wpi::SmallString<16>> m_settings;
   wpi::condition_variable m_settingsCond;
 
-  llvm::StringMap<llvm::SmallString<16>> m_streamSettings;
+  wpi::StringMap<wpi::SmallString<16>> m_streamSettings;
   std::atomic_bool m_streamSettingsUpdated{false};
 };
 
 class AxisCameraImpl : public HttpCameraImpl {
  public:
-  explicit AxisCameraImpl(llvm::StringRef name)
+  explicit AxisCameraImpl(wpi::StringRef name)
       : HttpCameraImpl{name, CS_HTTP_AXIS} {}
 #if 0
   void SetProperty(int property, int value, CS_Status* status) override;
-  void SetStringProperty(int property, llvm::StringRef value,
+  void SetStringProperty(int property, wpi::StringRef value,
                          CS_Status* status) override;
 #endif
  protected:

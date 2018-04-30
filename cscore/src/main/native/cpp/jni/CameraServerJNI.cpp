@@ -5,9 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <llvm/SmallString.h>
-#include <llvm/raw_ostream.h>
-#include <support/jni_util.h>
+#include <wpi/SmallString.h>
+#include <wpi/jni_util.h>
+#include <wpi/raw_ostream.h>
 
 #include "cscore_cpp.h"
 #include "edu_wpi_cscore_CameraServerJNI.h"
@@ -132,7 +132,7 @@ class JCSGlobal {
 
 static void ReportError(JNIEnv* env, CS_Status status) {
   if (status == CS_OK) return;
-  llvm::SmallString<64> msg;
+  wpi::SmallString<64> msg;
   switch (status) {
     case CS_PROPERTY_WRITE_FAILED:
       msg = "property write failed";
@@ -165,7 +165,7 @@ static void ReportError(JNIEnv* env, CS_Status status) {
       msg = "telemetry not enabled";
       break;
     default: {
-      llvm::raw_svector_ostream oss{msg};
+      wpi::raw_svector_ostream oss{msg};
       oss << "unknown error code=" << status;
       break;
     }
@@ -248,7 +248,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getPropertyName
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetPropertyName(property, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
@@ -346,7 +346,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getStringProperty
   (JNIEnv* env, jclass, jint property)
 {
   CS_Status status = 0;
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetStringProperty(property, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
@@ -475,7 +475,7 @@ JNIEXPORT jint JNICALL Java_edu_wpi_cscore_CameraServerJNI_createHttpCameraMulti
     return 0;
   }
   size_t len = env->GetArrayLength(urls);
-  llvm::SmallVector<std::string, 8> vec;
+  wpi::SmallVector<std::string, 8> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -541,7 +541,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSourceName
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
@@ -556,7 +556,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSourceDescripti
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSourceDescription(source, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
@@ -617,7 +617,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceP
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  llvm::SmallVector<CS_Property, 32> buf;
+  wpi::SmallVector<CS_Property, 32> buf;
   auto arr = cs::EnumerateSourceProperties(source, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
@@ -728,7 +728,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateSourceS
   (JNIEnv* env, jclass, jint source)
 {
   CS_Status status = 0;
-  llvm::SmallVector<CS_Sink, 16> buf;
+  wpi::SmallVector<CS_Sink, 16> buf;
   auto arr = cs::EnumerateSourceSinks(source, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
@@ -912,7 +912,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setHttpCameraUrls
     return;
   }
   size_t len = env->GetArrayLength(urls);
-  llvm::SmallVector<std::string, 8> vec;
+  wpi::SmallVector<std::string, 8> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -1033,7 +1033,7 @@ JNIEXPORT void JNICALL Java_edu_wpi_cscore_CameraServerJNI_setSourceEnumProperty
     return;
   }
   size_t len = env->GetArrayLength(choices);
-  llvm::SmallVector<std::string, 8> vec;
+  wpi::SmallVector<std::string, 8> vec;
   vec.reserve(len);
   for (size_t i = 0; i < len; ++i) {
     JLocal<jstring> elem{
@@ -1113,7 +1113,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSinkName
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
@@ -1128,7 +1128,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSinkDescription
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSinkDescription(sink, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
@@ -1290,7 +1290,7 @@ JNIEXPORT jstring JNICALL Java_edu_wpi_cscore_CameraServerJNI_getSinkError
   (JNIEnv* env, jclass, jint sink)
 {
   CS_Status status = 0;
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSinkError(sink, buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJString(env, str);
@@ -1464,7 +1464,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateSources
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
-  llvm::SmallVector<CS_Source, 16> buf;
+  wpi::SmallVector<CS_Source, 16> buf;
   auto arr = cs::EnumerateSourceHandles(buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);
@@ -1479,7 +1479,7 @@ JNIEXPORT jintArray JNICALL Java_edu_wpi_cscore_CameraServerJNI_enumerateSinks
   (JNIEnv* env, jclass)
 {
   CS_Status status = 0;
-  llvm::SmallVector<CS_Sink, 16> buf;
+  wpi::SmallVector<CS_Sink, 16> buf;
   auto arr = cs::EnumerateSinkHandles(buf, &status);
   if (!CheckStatus(env, status)) return nullptr;
   return MakeJIntArray(env, arr);

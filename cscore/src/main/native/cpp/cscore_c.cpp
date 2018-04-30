@@ -10,8 +10,8 @@
 #include <cstddef>
 #include <cstdlib>
 
-#include <llvm/SmallString.h>
 #include <opencv2/core/core.hpp>
+#include <wpi/SmallString.h>
 
 #include "c_util.h"
 #include "cscore_cpp.h"
@@ -23,7 +23,7 @@ CS_PropertyKind CS_GetPropertyKind(CS_Property property, CS_Status* status) {
 }
 
 char* CS_GetPropertyName(CS_Property property, CS_Status* status) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetPropertyName(property, buf, status);
   if (*status != 0) return nullptr;
   return cs::ConvertToC(str);
@@ -54,7 +54,7 @@ int CS_GetPropertyDefault(CS_Property property, CS_Status* status) {
 }
 
 char* CS_GetStringProperty(CS_Property property, CS_Status* status) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetStringProperty(property, buf, status);
   if (*status != 0) return nullptr;
   return cs::ConvertToC(str);
@@ -80,14 +80,14 @@ CS_SourceKind CS_GetSourceKind(CS_Source source, CS_Status* status) {
 }
 
 char* CS_GetSourceName(CS_Source source, CS_Status* status) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSourceName(source, buf, status);
   if (*status != 0) return nullptr;
   return cs::ConvertToC(str);
 }
 
 char* CS_GetSourceDescription(CS_Source source, CS_Status* status) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSourceDescription(source, buf, status);
   if (*status != 0) return nullptr;
   return cs::ConvertToC(str);
@@ -108,7 +108,7 @@ CS_Property CS_GetSourceProperty(CS_Source source, const char* name,
 
 CS_Property* CS_EnumerateSourceProperties(CS_Source source, int* count,
                                           CS_Status* status) {
-  llvm::SmallVector<CS_Property, 32> buf;
+  wpi::SmallVector<CS_Property, 32> buf;
   auto vec = cs::EnumerateSourceProperties(source, buf, status);
   CS_Property* out =
       static_cast<CS_Property*>(std::malloc(vec.size() * sizeof(CS_Property)));
@@ -170,7 +170,7 @@ CS_VideoMode* CS_EnumerateSourceVideoModes(CS_Source source, int* count,
 
 CS_Sink* CS_EnumerateSourceSinks(CS_Source source, int* count,
                                  CS_Status* status) {
-  llvm::SmallVector<CS_Sink, 32> buf;
+  wpi::SmallVector<CS_Sink, 32> buf;
   auto handles = cs::EnumerateSourceSinks(source, buf, status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(std::malloc(handles.size() * sizeof(CS_Sink)));
@@ -227,14 +227,14 @@ CS_SinkKind CS_GetSinkKind(CS_Sink sink, CS_Status* status) {
 }
 
 char* CS_GetSinkName(CS_Sink sink, CS_Status* status) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSinkName(sink, buf, status);
   if (*status != 0) return nullptr;
   return cs::ConvertToC(str);
 }
 
 char* CS_GetSinkDescription(CS_Sink sink, CS_Status* status) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   auto str = cs::GetSinkDescription(sink, buf, status);
   if (*status != 0) return nullptr;
   return cs::ConvertToC(str);
@@ -321,7 +321,7 @@ void CS_SetDefaultLogger(unsigned int min_level) {
 }
 
 CS_Source* CS_EnumerateSources(int* count, CS_Status* status) {
-  llvm::SmallVector<CS_Source, 32> buf;
+  wpi::SmallVector<CS_Source, 32> buf;
   auto handles = cs::EnumerateSourceHandles(buf, status);
   CS_Source* sources =
       static_cast<CS_Source*>(std::malloc(handles.size() * sizeof(CS_Source)));
@@ -340,7 +340,7 @@ void CS_ReleaseEnumeratedSources(CS_Source* sources, int count) {
 }
 
 CS_Sink* CS_EnumerateSinks(int* count, CS_Status* status) {
-  llvm::SmallVector<CS_Sink, 32> buf;
+  wpi::SmallVector<CS_Sink, 32> buf;
   auto handles = cs::EnumerateSinkHandles(buf, status);
   CS_Sink* sinks =
       static_cast<CS_Sink*>(std::malloc(handles.size() * sizeof(CS_Sink)));

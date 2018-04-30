@@ -262,7 +262,7 @@ void DifferentialDrive::StopMotor() {
   m_safetyHelper.Feed();
 }
 
-void DifferentialDrive::GetDescription(llvm::raw_ostream& desc) const {
+void DifferentialDrive::GetDescription(wpi::raw_ostream& desc) const {
   desc << "DifferentialDrive";
 }
 

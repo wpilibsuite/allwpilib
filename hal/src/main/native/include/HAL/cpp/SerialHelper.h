@@ -12,9 +12,9 @@
 #include <string>
 #include <vector>
 
-#include <llvm/SmallString.h>
-#include <llvm/SmallVector.h>
-#include <support/mutex.h>
+#include <wpi/SmallString.h>
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 
 #include "HAL/SerialPort.h"
 
@@ -31,7 +31,7 @@ class SerialHelper {
 
  private:
   void SortHubPathVector();
-  void CoiteratedSort(llvm::SmallVectorImpl<llvm::SmallString<16>>& vec);
+  void CoiteratedSort(wpi::SmallVectorImpl<wpi::SmallString<16>>& vec);
   void QueryHubPaths(int32_t* status);
 
   int32_t GetIndexForPort(HAL_SerialPort port, int32_t* status);
@@ -39,10 +39,10 @@ class SerialHelper {
   // Vectors to hold data before sorting.
   // Note we will most likely have at max 2 instances, and the longest string
   // is around 12, so these should never touch the heap;
-  llvm::SmallVector<llvm::SmallString<16>, 4> m_visaResource;
-  llvm::SmallVector<llvm::SmallString<16>, 4> m_osResource;
-  llvm::SmallVector<llvm::SmallString<16>, 4> m_unsortedHubPath;
-  llvm::SmallVector<llvm::SmallString<16>, 4> m_sortedHubPath;
+  wpi::SmallVector<wpi::SmallString<16>, 4> m_visaResource;
+  wpi::SmallVector<wpi::SmallString<16>, 4> m_osResource;
+  wpi::SmallVector<wpi::SmallString<16>, 4> m_unsortedHubPath;
+  wpi::SmallVector<wpi::SmallString<16>, 4> m_sortedHubPath;
 
   int32_t m_resourceHandle;
 

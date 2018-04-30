@@ -44,7 +44,7 @@ ConditionalCommand::ConditionalCommand(Command* onTrue, Command* onFalse) {
  * @param onTrue  The Command to execute if Condition() returns true
  * @param onFalse The Command to execute if Condition() returns false
  */
-ConditionalCommand::ConditionalCommand(const llvm::Twine& name, Command* onTrue,
+ConditionalCommand::ConditionalCommand(const wpi::Twine& name, Command* onTrue,
                                        Command* onFalse)
     : Command(name) {
   m_onTrue = onTrue;

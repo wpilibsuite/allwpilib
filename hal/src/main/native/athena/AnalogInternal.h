@@ -11,7 +11,7 @@
 
 #include <memory>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "HAL/ChipObject.h"
 #include "HAL/Ports.h"

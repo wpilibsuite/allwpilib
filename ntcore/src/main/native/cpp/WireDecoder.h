@@ -14,8 +14,8 @@
 #include <memory>
 #include <string>
 
-#include <support/leb128.h>
-#include <support/raw_istream.h>
+#include <wpi/leb128.h>
+#include <wpi/raw_istream.h>
 
 #include "Log.h"
 #include "networktables/NetworkTableValue.h"

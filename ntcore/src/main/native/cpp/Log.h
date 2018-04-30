@@ -8,7 +8,7 @@
 #ifndef NTCORE_LOG_H_
 #define NTCORE_LOG_H_
 
-#include <support/Logger.h>
+#include <wpi/Logger.h>
 
 #define LOG(level, x) WPI_LOG(m_logger, level, x)
 

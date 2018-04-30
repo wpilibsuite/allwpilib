@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 namespace wpi {
 class raw_istream;
@@ -18,13 +18,13 @@ class raw_istream;
 
 namespace cs {
 
-bool IsJpeg(llvm::StringRef data);
+bool IsJpeg(wpi::StringRef data);
 
-bool GetJpegSize(llvm::StringRef data, int* width, int* height);
+bool GetJpegSize(wpi::StringRef data, int* width, int* height);
 
 bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF);
 
-llvm::StringRef JpegGetDHT();
+wpi::StringRef JpegGetDHT();
 
 bool ReadJpeg(wpi::raw_istream& is, std::string& buf, int* width, int* height);
 

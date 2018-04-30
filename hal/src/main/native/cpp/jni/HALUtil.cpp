@@ -21,9 +21,9 @@
 #include "HAL/Errors.h"
 #include "HAL/cpp/Log.h"
 #include "edu_wpi_first_wpilibj_hal_HALUtil.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
-#include "support/jni_util.h"
+#include "wpi/SmallString.h"
+#include "wpi/jni_util.h"
+#include "wpi/raw_ostream.h"
 
 using namespace wpi::java;
 
@@ -64,8 +64,8 @@ namespace frc {
 void ThrowAllocationException(JNIEnv *env, int32_t minRange, int32_t maxRange,
     int32_t requestedValue, int32_t status) {
   const char *message = HAL_GetErrorMessage(status);
-  llvm::SmallString<1024> buf;
-  llvm::raw_svector_ostream oss(buf);
+  wpi::SmallString<1024> buf;
+  wpi::raw_svector_ostream oss(buf);
   oss << " Code: " << status << ". " << message << ", Minimum Value: "
       << minRange << ", Maximum Value: " << maxRange << ", Requested Value: "
       << requestedValue;
@@ -75,8 +75,8 @@ void ThrowAllocationException(JNIEnv *env, int32_t minRange, int32_t maxRange,
 
 void ThrowHalHandleException(JNIEnv *env, int32_t status) {
   const char *message = HAL_GetErrorMessage(status);
-  llvm::SmallString<1024> buf;
-  llvm::raw_svector_ostream oss(buf);
+  wpi::SmallString<1024> buf;
+  wpi::raw_svector_ostream oss(buf);
   oss << " Code: " << status << ". " << message;
   halHandleExCls.Throw(env, buf.c_str());
 }
@@ -88,8 +88,8 @@ void ReportError(JNIEnv *env, int32_t status, bool doThrow) {
   }
   const char *message = HAL_GetErrorMessage(status);
   if (doThrow && status < 0) {
-    llvm::SmallString<1024> buf;
-    llvm::raw_svector_ostream oss(buf);
+    wpi::SmallString<1024> buf;
+    wpi::raw_svector_ostream oss(buf);
     oss << " Code: " << status << ". " << message;
     runtimeExCls.Throw(env, buf.c_str());
   } else {
@@ -111,8 +111,8 @@ void ThrowError(JNIEnv *env, int32_t status, int32_t minRange, int32_t maxRange,
     ThrowHalHandleException(env, status);
   }
   const char *message = HAL_GetErrorMessage(status);
-  llvm::SmallString<1024> buf;
-  llvm::raw_svector_ostream oss(buf);
+  wpi::SmallString<1024> buf;
+  wpi::raw_svector_ostream oss(buf);
   oss << " Code: " << status << ". " << message;
   runtimeExCls.Throw(env, buf.c_str());
 }
@@ -147,8 +147,8 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
     }
     case HAL_ERR_CANSessionMux_NotAllowed:
     case kRIOStatusFeatureNotSupported: {
-      llvm::SmallString<100> buf;
-      llvm::raw_svector_ostream oss(buf);
+      wpi::SmallString<100> buf;
+      wpi::raw_svector_ostream oss(buf);
       oss << "MessageID = " << message_id;
       canMessageNotAllowedExCls.Throw(env, buf.c_str());
       break;
@@ -165,8 +165,8 @@ void ReportCANError(JNIEnv *env, int32_t status, int message_id) {
       break;
     }
     default: {
-      llvm::SmallString<100> buf;
-      llvm::raw_svector_ostream oss(buf);
+      wpi::SmallString<100> buf;
+      wpi::raw_svector_ostream oss(buf);
       oss << "Fatal status code detected: " << status;
       uncleanStatusExCls.Throw(env, buf.c_str());
       break;

@@ -7,7 +7,7 @@
 
 #include "HAL/HAL.h"
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "ErrorsInternal.h"
 #include "HAL/DriverStation.h"
@@ -263,7 +263,7 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
 
   hal::init::InitializeHAL();
 
-  llvm::outs().SetUnbuffered();
+  wpi::outs().SetUnbuffered();
   if (HAL_LoadExtensions() < 0) return false;
   hal::RestartTiming();
   HAL_InitializeDriverStation();

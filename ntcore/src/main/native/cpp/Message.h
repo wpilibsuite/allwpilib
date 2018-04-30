@@ -50,7 +50,7 @@ class Message {
 
   // Message data accessors.  Callers are responsible for knowing what data is
   // actually provided for a particular message.
-  llvm::StringRef str() const { return m_str; }
+  wpi::StringRef str() const { return m_str; }
   std::shared_ptr<Value> value() const { return m_value; }
   unsigned int id() const { return m_id; }
   unsigned int flags() const { return m_flags; }
@@ -79,10 +79,10 @@ class Message {
   }
 
   // Create messages with data
-  static std::shared_ptr<Message> ClientHello(llvm::StringRef self_id);
+  static std::shared_ptr<Message> ClientHello(wpi::StringRef self_id);
   static std::shared_ptr<Message> ServerHello(unsigned int flags,
-                                              llvm::StringRef self_id);
-  static std::shared_ptr<Message> EntryAssign(llvm::StringRef name,
+                                              wpi::StringRef self_id);
+  static std::shared_ptr<Message> EntryAssign(wpi::StringRef name,
                                               unsigned int id,
                                               unsigned int seq_num,
                                               std::shared_ptr<Value> value,
@@ -94,9 +94,9 @@ class Message {
                                               unsigned int flags);
   static std::shared_ptr<Message> EntryDelete(unsigned int id);
   static std::shared_ptr<Message> ExecuteRpc(unsigned int id, unsigned int uid,
-                                             llvm::StringRef params);
+                                             wpi::StringRef params);
   static std::shared_ptr<Message> RpcResponse(unsigned int id, unsigned int uid,
-                                              llvm::StringRef result);
+                                              wpi::StringRef result);
 
   Message(const Message&) = delete;
   Message& operator=(const Message&) = delete;

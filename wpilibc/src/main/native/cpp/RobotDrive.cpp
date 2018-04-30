@@ -735,7 +735,7 @@ void RobotDrive::SetSafetyEnabled(bool enabled) {
   m_safetyHelper->SetSafetyEnabled(enabled);
 }
 
-void RobotDrive::GetDescription(llvm::raw_ostream& desc) const {
+void RobotDrive::GetDescription(wpi::raw_ostream& desc) const {
   desc << "RobotDrive";
 }
 

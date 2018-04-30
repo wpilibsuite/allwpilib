@@ -12,7 +12,7 @@
 #include <array>
 #include <memory>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "HAL/Types.h"
 #include "HAL/cpp/make_unique.h"

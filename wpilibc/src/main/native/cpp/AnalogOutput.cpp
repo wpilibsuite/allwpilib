@@ -28,7 +28,7 @@ using namespace frc;
 AnalogOutput::AnalogOutput(int channel) {
   if (!SensorBase::CheckAnalogOutputChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "analog output " + llvm::Twine(channel));
+                               "analog output " + wpi::Twine(channel));
     m_channel = std::numeric_limits<int>::max();
     m_port = HAL_kInvalidHandle;
     return;

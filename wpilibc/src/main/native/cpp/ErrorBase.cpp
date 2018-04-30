@@ -12,12 +12,12 @@
 #include <cstring>
 
 #include <HAL/HAL.h>
+#include <wpi/Format.h>
+#include <wpi/SmallString.h>
+#include <wpi/raw_ostream.h>
 
 #define WPI_ERRORS_DEFINE_STRINGS
 #include "WPIErrors.h"
-#include "llvm/Format.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
 
 using namespace frc;
 
@@ -49,16 +49,16 @@ void ErrorBase::ClearError() const { m_error.Clear(); }
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetErrnoError(const llvm::Twine& contextMessage,
-                              llvm::StringRef filename,
-                              llvm::StringRef function, int lineNumber) const {
-  llvm::SmallString<128> buf;
-  llvm::raw_svector_ostream err(buf);
+void ErrorBase::SetErrnoError(const wpi::Twine& contextMessage,
+                              wpi::StringRef filename,
+                              wpi::StringRef function, int lineNumber) const {
+  wpi::SmallString<128> buf;
+  wpi::raw_svector_ostream err(buf);
   int errNo = errno;
   if (errNo == 0) {
     err << "OK: ";
   } else {
-    err << std::strerror(errNo) << " (" << llvm::format_hex(errNo, 10, true)
+    err << std::strerror(errNo) << " (" << wpi::format_hex(errNo, 10, true)
         << "): ";
   }
 
@@ -83,13 +83,13 @@ void ErrorBase::SetErrnoError(const llvm::Twine& contextMessage,
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetImaqError(int success, const llvm::Twine& contextMessage,
-                             llvm::StringRef filename, llvm::StringRef function,
+void ErrorBase::SetImaqError(int success, const wpi::Twine& contextMessage,
+                             wpi::StringRef filename, wpi::StringRef function,
                              int lineNumber) const {
   // If there was an error
   if (success <= 0) {
     // Set the current error information for this object.
-    m_error.Set(success, llvm::Twine(success) + ": " + contextMessage, filename,
+    m_error.Set(success, wpi::Twine(success) + ": " + contextMessage, filename,
                 function, lineNumber, this);
 
     // Update the global error if there is not one already set.
@@ -109,8 +109,8 @@ void ErrorBase::SetImaqError(int success, const llvm::Twine& contextMessage,
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetError(Error::Code code, const llvm::Twine& contextMessage,
-                         llvm::StringRef filename, llvm::StringRef function,
+void ErrorBase::SetError(Error::Code code, const wpi::Twine& contextMessage,
+                         wpi::StringRef filename, wpi::StringRef function,
                          int lineNumber) const {
   //  If there was an error
   if (code != 0) {
@@ -140,16 +140,16 @@ void ErrorBase::SetError(Error::Code code, const llvm::Twine& contextMessage,
  */
 void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
                               int32_t maxRange, int32_t requestedValue,
-                              const llvm::Twine& contextMessage,
-                              llvm::StringRef filename,
-                              llvm::StringRef function, int lineNumber) const {
+                              const wpi::Twine& contextMessage,
+                              wpi::StringRef filename,
+                              wpi::StringRef function, int lineNumber) const {
   //  If there was an error
   if (code != 0) {
     //  Set the current error information for this object.
     m_error.Set(code,
-                contextMessage + ", Minimum Value: " + llvm::Twine(minRange) +
-                    ", MaximumValue: " + llvm::Twine(maxRange) +
-                    ", Requested Value: " + llvm::Twine(requestedValue),
+                contextMessage + ", Minimum Value: " + wpi::Twine(minRange) +
+                    ", MaximumValue: " + wpi::Twine(maxRange) +
+                    ", Requested Value: " + wpi::Twine(requestedValue),
                 filename, function, lineNumber, this);
 
     // Update the global error if there is not one already set.
@@ -169,9 +169,9 @@ void ErrorBase::SetErrorRange(Error::Code code, int32_t minRange,
  * @param function       Function of the error source
  * @param lineNumber     Line number of the error source
  */
-void ErrorBase::SetWPIError(const llvm::Twine& errorMessage, Error::Code code,
-                            const llvm::Twine& contextMessage,
-                            llvm::StringRef filename, llvm::StringRef function,
+void ErrorBase::SetWPIError(const wpi::Twine& errorMessage, Error::Code code,
+                            const wpi::Twine& contextMessage,
+                            wpi::StringRef filename, wpi::StringRef function,
                             int lineNumber) const {
   //  Set the current error information for this object.
   m_error.Set(code, errorMessage + ": " + contextMessage, filename, function,
@@ -196,9 +196,9 @@ void ErrorBase::CloneError(const ErrorBase& rhs) const {
 bool ErrorBase::StatusIsFatal() const { return m_error.GetCode() < 0; }
 
 void ErrorBase::SetGlobalError(Error::Code code,
-                               const llvm::Twine& contextMessage,
-                               llvm::StringRef filename,
-                               llvm::StringRef function, int lineNumber) {
+                               const wpi::Twine& contextMessage,
+                               wpi::StringRef filename,
+                               wpi::StringRef function, int lineNumber) {
   // If there was an error
   if (code != 0) {
     std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
@@ -209,10 +209,10 @@ void ErrorBase::SetGlobalError(Error::Code code,
   }
 }
 
-void ErrorBase::SetGlobalWPIError(const llvm::Twine& errorMessage,
-                                  const llvm::Twine& contextMessage,
-                                  llvm::StringRef filename,
-                                  llvm::StringRef function, int lineNumber) {
+void ErrorBase::SetGlobalWPIError(const wpi::Twine& errorMessage,
+                                  const wpi::Twine& contextMessage,
+                                  wpi::StringRef filename,
+                                  wpi::StringRef function, int lineNumber) {
   std::lock_guard<wpi::mutex> mutex(_globalErrorMutex);
   if (_globalError.GetCode() != 0) {
     _globalError.Clear();

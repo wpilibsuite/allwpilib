@@ -9,9 +9,9 @@
 
 #include <memory>
 
-#include <llvm/Twine.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
+#include <wpi/Twine.h>
 
 #include "Buttons/Button.h"
 
@@ -19,9 +19,9 @@ namespace frc {
 
 class NetworkButton : public Button {
  public:
-  NetworkButton(const llvm::Twine& tableName, const llvm::Twine& field);
+  NetworkButton(const wpi::Twine& tableName, const wpi::Twine& field);
   NetworkButton(std::shared_ptr<nt::NetworkTable> table,
-                const llvm::Twine& field);
+                const wpi::Twine& field);
   virtual ~NetworkButton() = default;
 
   virtual bool Get();

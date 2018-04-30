@@ -12,7 +12,7 @@
 #include <memory>
 #include <utility>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 #include "UnlimitedHandleResource.h"
 #include "cscore_c.h"

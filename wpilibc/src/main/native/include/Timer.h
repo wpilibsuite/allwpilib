@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <support/deprecated.h>
-#include <support/mutex.h>
+#include <wpi/deprecated.h>
+#include <wpi/mutex.h>
 
 #include "Base.h"
 

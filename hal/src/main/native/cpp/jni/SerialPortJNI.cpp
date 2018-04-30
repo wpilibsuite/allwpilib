@@ -13,7 +13,7 @@
 
 #include "HAL/SerialPort.h"
 #include "HALUtil.h"
-#include "support/jni_util.h"
+#include "wpi/jni_util.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -263,7 +263,7 @@ Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialGetBytesReceived(
 JNIEXPORT jint JNICALL Java_edu_wpi_first_wpilibj_hal_SerialPortJNI_serialRead(
     JNIEnv* env, jclass, jbyte port, jbyteArray dataReceived, jint size) {
   SERIALJNI_LOG(logDEBUG) << "Serial Read";
-  llvm::SmallVector<char, 128> recvBuf;
+  wpi::SmallVector<char, 128> recvBuf;
   recvBuf.resize(size);
   int32_t status = 0;
   jint retVal = HAL_ReadSerial(static_cast<HAL_SerialPort>(port), recvBuf.data(),

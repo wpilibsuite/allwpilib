@@ -7,7 +7,7 @@
 
 #include "HALSimLowFi.h"
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 void HALSimLowFi::Initialize() {
   table = nt::NetworkTableInstance::GetDefault().GetTable("sim");
@@ -38,7 +38,7 @@ void HALSimNTProvider::InitializeDefault(
   cbInfos.reserve(numChannels);
   for (int i = 0; i < numChannels; i++) {
     struct NTProviderCallbackInfo info = {
-        this, table->GetSubTable(tableName + llvm::Twine(i)), i};
+        this, table->GetSubTable(tableName + wpi::Twine(i)), i};
     cbInfos.emplace_back(info);
   }
 

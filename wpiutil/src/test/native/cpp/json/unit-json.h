@@ -8,7 +8,7 @@
 
 #include <ostream>
 
-#include "support/json.h"
+#include "wpi/json.h"
 
 namespace wpi {
 

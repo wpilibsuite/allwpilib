@@ -35,7 +35,7 @@ SOFTWARE.
 #include "gtest/gtest.h"
 
 #include "unit-json.h"
-#include "support/raw_istream.h"
+#include "wpi/raw_istream.h"
 using wpi::json;
 
 #include <valarray>

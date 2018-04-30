@@ -10,12 +10,13 @@
 #include <algorithm>
 #include <iterator>
 
+#include <wpi/TCPAcceptor.h>
+#include <wpi/TCPConnector.h>
+
 #include "IConnectionNotifier.h"
 #include "IStorage.h"
 #include "Log.h"
 #include "NetworkConnection.h"
-#include "tcpsockets/TCPAcceptor.h"
-#include "tcpsockets/TCPConnector.h"
 
 using namespace nt;
 
@@ -37,13 +38,13 @@ void Dispatcher::SetServer(const char* server_name, unsigned int port) {
 
 void Dispatcher::SetServer(
     ArrayRef<std::pair<StringRef, unsigned int>> servers) {
-  llvm::SmallVector<std::pair<std::string, int>, 16> servers_copy;
+  wpi::SmallVector<std::pair<std::string, int>, 16> servers_copy;
   for (const auto& server : servers)
     servers_copy.emplace_back(std::string{server.first},
                               static_cast<int>(server.second));
 
   SetConnector([=]() -> std::unique_ptr<wpi::NetworkStream> {
-    llvm::SmallVector<std::pair<const char*, int>, 16> servers_copy2;
+    wpi::SmallVector<std::pair<const char*, int>, 16> servers_copy2;
     for (const auto& server : servers_copy)
       servers_copy2.emplace_back(server.first.c_str(), server.second);
     return wpi::TCPConnector::connect_parallel(servers_copy2, m_logger, 1);
@@ -54,9 +55,9 @@ void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
   std::pair<StringRef, unsigned int> servers[5];
 
   // 10.te.am.2
-  llvm::SmallString<32> fixed;
+  wpi::SmallString<32> fixed;
   {
-    llvm::raw_svector_ostream oss{fixed};
+    wpi::raw_svector_ostream oss{fixed};
     oss << "10." << static_cast<int>(team / 100) << '.'
         << static_cast<int>(team % 100) << ".2";
     servers[0] = std::make_pair(oss.str(), port);
@@ -66,25 +67,25 @@ void Dispatcher::SetServerTeam(unsigned int team, unsigned int port) {
   servers[1] = std::make_pair("172.22.11.2", port);
 
   // roboRIO-<team>-FRC.local
-  llvm::SmallString<32> mdns;
+  wpi::SmallString<32> mdns;
   {
-    llvm::raw_svector_ostream oss{mdns};
+    wpi::raw_svector_ostream oss{mdns};
     oss << "roboRIO-" << team << "-FRC.local";
     servers[2] = std::make_pair(oss.str(), port);
   }
 
   // roboRIO-<team>-FRC.lan
-  llvm::SmallString<32> mdns_lan;
+  wpi::SmallString<32> mdns_lan;
   {
-    llvm::raw_svector_ostream oss{mdns_lan};
+    wpi::raw_svector_ostream oss{mdns_lan};
     oss << "roboRIO-" << team << "-FRC.lan";
     servers[3] = std::make_pair(oss.str(), port);
   }
 
   // roboRIO-<team>-FRC.frc-field.local
-  llvm::SmallString<64> field_local;
+  wpi::SmallString<64> field_local;
   {
-    llvm::raw_svector_ostream oss{field_local};
+    wpi::raw_svector_ostream oss{field_local};
     oss << "roboRIO-" << team << "-FRC.frc-field.local";
     servers[4] = std::make_pair(oss.str(), port);
   }
@@ -463,7 +464,7 @@ void DispatcherBase::ClientThreadMain() {
 
 bool DispatcherBase::ClientHandshake(
     NetworkConnection& conn, std::function<std::shared_ptr<Message>()> get_msg,
-    std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
+    std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
   // get identity
   std::string self_id;
   {
@@ -543,7 +544,7 @@ bool DispatcherBase::ClientHandshake(
 
 bool DispatcherBase::ServerHandshake(
     NetworkConnection& conn, std::function<std::shared_ptr<Message>()> get_msg,
-    std::function<void(llvm::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
+    std::function<void(wpi::ArrayRef<std::shared_ptr<Message>>)> send_msgs) {
   // Wait for the client to send us a hello.
   auto msg = get_msg();
   if (!msg) {

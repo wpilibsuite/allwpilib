@@ -4,7 +4,7 @@
 #include <map>
 #include <string.h> // memcpy
 #include <sys/time.h>
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 class CtreCanNode
 {
 public:

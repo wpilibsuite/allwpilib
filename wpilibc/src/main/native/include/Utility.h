@@ -15,9 +15,9 @@
 
 #include <string>
 
-#include <llvm/StringRef.h>
-#include <llvm/Twine.h>
-#include <support/deprecated.h>
+#include <wpi/StringRef.h>
+#include <wpi/Twine.h>
+#include <wpi/deprecated.h>
 
 #define wpi_assert(condition) \
   wpi_assert_impl(condition, #condition, "", __FILE__, __LINE__, __FUNCTION__)
@@ -36,20 +36,20 @@
   wpi_assertNotEqual_impl(a, b, #a, #b, message, __FILE__, __LINE__, \
                           __FUNCTION__)
 
-bool wpi_assert_impl(bool conditionValue, const llvm::Twine& conditionText,
-                     const llvm::Twine& message, llvm::StringRef fileName,
-                     int lineNumber, llvm::StringRef funcName);
+bool wpi_assert_impl(bool conditionValue, const wpi::Twine& conditionText,
+                     const wpi::Twine& message, wpi::StringRef fileName,
+                     int lineNumber, wpi::StringRef funcName);
 bool wpi_assertEqual_impl(int valueA, int valueB,
-                          const llvm::Twine& valueAString,
-                          const llvm::Twine& valueBString,
-                          const llvm::Twine& message, llvm::StringRef fileName,
-                          int lineNumber, llvm::StringRef funcName);
+                          const wpi::Twine& valueAString,
+                          const wpi::Twine& valueBString,
+                          const wpi::Twine& message, wpi::StringRef fileName,
+                          int lineNumber, wpi::StringRef funcName);
 bool wpi_assertNotEqual_impl(int valueA, int valueB,
-                             const llvm::Twine& valueAString,
-                             const llvm::Twine& valueBString,
-                             const llvm::Twine& message,
-                             llvm::StringRef fileName, int lineNumber,
-                             llvm::StringRef funcName);
+                             const wpi::Twine& valueAString,
+                             const wpi::Twine& valueBString,
+                             const wpi::Twine& message,
+                             wpi::StringRef fileName, int lineNumber,
+                             wpi::StringRef funcName);
 
 void wpi_suspendOnAssertEnabled(bool enabled);
 

@@ -9,8 +9,8 @@
 
 #include <memory>
 
-#include <llvm/StringMap.h>
-#include <llvm/StringRef.h>
+#include <wpi/StringMap.h>
+#include <wpi/StringRef.h>
 
 #include "SmartDashboard/SendableChooserBase.h"
 
@@ -31,7 +31,7 @@ namespace frc {
  */
 template <class T>
 class SendableChooser : public SendableChooserBase {
-  llvm::StringMap<T> m_choices;
+  wpi::StringMap<T> m_choices;
 
   template <class U>
   static U _unwrap_smart_ptr(const U& value);
@@ -45,8 +45,8 @@ class SendableChooser : public SendableChooserBase {
  public:
   ~SendableChooser() override = default;
 
-  void AddObject(llvm::StringRef name, T object);
-  void AddDefault(llvm::StringRef name, T object);
+  void AddObject(wpi::StringRef name, T object);
+  void AddDefault(wpi::StringRef name, T object);
 
   auto GetSelected() -> decltype(_unwrap_smart_ptr(m_choices[""]));
 

@@ -7,8 +7,8 @@
 
 #include "HAL/Extensions.h"
 
-#include <llvm/SmallString.h>
-#include <llvm/StringRef.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringRef.h>
 
 #include "HAL/HAL.h"
 
@@ -46,7 +46,7 @@ int HAL_LoadOneExtension(const char* library) {
   HTYPE handle = DLOPEN(library);
 #if !defined(WIN32) && !defined(_WIN32)
   if (!handle) {
-    llvm::SmallString<128> libraryName("lib");
+    wpi::SmallString<128> libraryName("lib");
     libraryName += library;
 #if defined(__APPLE__)
     libraryName += ".dylib";
@@ -73,13 +73,13 @@ int HAL_LoadOneExtension(const char* library) {
  */
 int HAL_LoadExtensions(void) {
   int rc = 1;
-  llvm::SmallVector<llvm::StringRef, 2> libraries;
+  wpi::SmallVector<wpi::StringRef, 2> libraries;
   const char* e = std::getenv("HALSIM_EXTENSIONS");
   if (!e) return rc;
-  llvm::StringRef env{e};
+  wpi::StringRef env{e};
   env.split(libraries, DELIM, -1, false);
   for (auto& libref : libraries) {
-    llvm::SmallString<128> library(libref);
+    wpi::SmallString<128> library(libref);
     rc = HAL_LoadOneExtension(library.c_str());
     if (rc < 0) break;
   }

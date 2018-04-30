@@ -120,7 +120,7 @@ void NidecBrushless::SetSafetyEnabled(bool enabled) {
   m_safetyHelper.SetSafetyEnabled(enabled);
 }
 
-void NidecBrushless::GetDescription(llvm::raw_ostream& desc) const {
+void NidecBrushless::GetDescription(wpi::raw_ostream& desc) const {
   desc << "Nidec " << GetChannel();
 }
 

@@ -11,7 +11,7 @@
 #include <thread>
 
 #include <FRC_NetworkCommunication/LoadOut.h>
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "ConstantsInternal.h"
 #include "HAL/AnalogTrigger.h"

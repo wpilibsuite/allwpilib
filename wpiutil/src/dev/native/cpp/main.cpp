@@ -7,11 +7,11 @@
 
 #include <iostream>
 
-#include "llvm/SmallVector.h"
-#include "llvm/StringRef.h"
-#include "support/hostname.h"
+#include "wpi/SmallVector.h"
+#include "wpi/StringRef.h"
+#include "wpi/hostname.h"
 
 int main() {
-  llvm::StringRef v1("Hello");
+  wpi::StringRef v1("Hello");
   std::cout << v1.lower() << std::endl;
 }

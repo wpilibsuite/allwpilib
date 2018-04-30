@@ -8,7 +8,7 @@
 #ifndef CSCORE_NETWORKLISTENER_H_
 #define CSCORE_NETWORKLISTENER_H_
 
-#include <support/SafeThread.h>
+#include <wpi/SafeThread.h>
 
 namespace cs {
 

@@ -31,7 +31,7 @@ public class CvSink extends VideoSink {
   ///        time=0 if an error occurred.  processFrame should call GetImage()
   ///        or GetError() as needed, but should not call (except in very
   ///        unusual circumstances) WaitForImage().
-  //public CvSink(llvm::StringRef name,
+  //public CvSink(wpi::StringRef name,
   //       std::function<void(uint64_t time)> processFrame) {
   //  super(CameraServerJNI.createCvSinkCallback(name, processFrame));
   //}

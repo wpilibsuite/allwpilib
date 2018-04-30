@@ -39,13 +39,13 @@ class WPILibCameraServerShared : public frc::CameraServerShared {
   void ReportVideoServer(int id) override {
     HAL_Report(HALUsageReporting::kResourceType_PCVideoServer, id);
   }
-  void SetCameraServerError(llvm::StringRef error) override {
+  void SetCameraServerError(wpi::StringRef error) override {
     wpi_setGlobalWPIErrorWithContext(CameraServerError, error);
   }
-  void SetVisionRunnerError(llvm::StringRef error) override {
+  void SetVisionRunnerError(wpi::StringRef error) override {
     wpi_setGlobalErrorWithContext(-1, error);
   }
-  void ReportDriverStationError(llvm::StringRef error) override {
+  void ReportDriverStationError(wpi::StringRef error) override {
     DriverStation::ReportError(error);
   }
   std::pair<std::thread::id, bool> GetRobotMainThreadId() const override {

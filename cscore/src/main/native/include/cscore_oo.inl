@@ -50,13 +50,13 @@ inline std::string VideoProperty::GetString() const {
   return GetStringProperty(m_handle, &m_status);
 }
 
-inline llvm::StringRef VideoProperty::GetString(
-    llvm::SmallVectorImpl<char>& buf) const {
+inline wpi::StringRef VideoProperty::GetString(
+    wpi::SmallVectorImpl<char>& buf) const {
   m_status = 0;
   return GetStringProperty(m_handle, buf, &m_status);
 }
 
-inline void VideoProperty::SetString(llvm::StringRef value) {
+inline void VideoProperty::SetString(wpi::StringRef value) {
   m_status = 0;
   SetStringProperty(m_handle, value, &m_status);
 }
@@ -121,7 +121,7 @@ inline bool VideoSource::IsConnected() const {
   return IsSourceConnected(m_handle, &m_status);
 }
 
-inline VideoProperty VideoSource::GetProperty(llvm::StringRef name) {
+inline VideoProperty VideoSource::GetProperty(wpi::StringRef name) {
   m_status = 0;
   return VideoProperty{GetSourceProperty(m_handle, name, &m_status)};
 }
@@ -215,11 +215,11 @@ inline void VideoCamera::SetExposureManual(int value) {
   SetCameraExposureManual(m_handle, value, &m_status);
 }
 
-inline UsbCamera::UsbCamera(llvm::StringRef name, int dev) {
+inline UsbCamera::UsbCamera(wpi::StringRef name, int dev) {
   m_handle = CreateUsbCameraDev(name, dev, &m_status);
 }
 
-inline UsbCamera::UsbCamera(llvm::StringRef name, llvm::StringRef path) {
+inline UsbCamera::UsbCamera(wpi::StringRef name, wpi::StringRef path) {
   m_handle = CreateUsbCameraPath(name, path, &m_status);
 }
 
@@ -233,26 +233,26 @@ inline std::string UsbCamera::GetPath() const {
   return ::cs::GetUsbCameraPath(m_handle, &m_status);
 }
 
-inline HttpCamera::HttpCamera(llvm::StringRef name, llvm::StringRef url,
+inline HttpCamera::HttpCamera(wpi::StringRef name, wpi::StringRef url,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
-inline HttpCamera::HttpCamera(llvm::StringRef name, const char* url,
+inline HttpCamera::HttpCamera(wpi::StringRef name, const char* url,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, url, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
       &m_status);
 }
 
-inline HttpCamera::HttpCamera(llvm::StringRef name, const std::string& url,
+inline HttpCamera::HttpCamera(wpi::StringRef name, const std::string& url,
                               HttpCameraKind kind)
-    : HttpCamera(name, llvm::StringRef{url}, kind) {}
+    : HttpCamera(name, wpi::StringRef{url}, kind) {}
 
-inline HttpCamera::HttpCamera(llvm::StringRef name,
-                              llvm::ArrayRef<std::string> urls,
+inline HttpCamera::HttpCamera(wpi::StringRef name,
+                              wpi::ArrayRef<std::string> urls,
                               HttpCameraKind kind) {
   m_handle = CreateHttpCamera(
       name, urls, static_cast<CS_HttpCameraKind>(static_cast<int>(kind)),
@@ -260,7 +260,7 @@ inline HttpCamera::HttpCamera(llvm::StringRef name,
 }
 
 template <typename T>
-inline HttpCamera::HttpCamera(llvm::StringRef name,
+inline HttpCamera::HttpCamera(wpi::StringRef name,
                               std::initializer_list<T> urls,
                               HttpCameraKind kind) {
   std::vector<std::string> vec;
@@ -277,7 +277,7 @@ inline HttpCamera::HttpCameraKind HttpCamera::GetHttpCameraKind() const {
       static_cast<int>(::cs::GetHttpCameraKind(m_handle, &m_status)));
 }
 
-inline void HttpCamera::SetUrls(llvm::ArrayRef<std::string> urls) {
+inline void HttpCamera::SetUrls(wpi::ArrayRef<std::string> urls) {
   m_status = 0;
   ::cs::SetHttpCameraUrls(m_handle, urls, &m_status);
 }
@@ -296,7 +296,7 @@ inline std::vector<std::string> HttpCamera::GetUrls() const {
   return ::cs::GetHttpCameraUrls(m_handle, &m_status);
 }
 
-inline std::string AxisCamera::HostToUrl(llvm::StringRef host) {
+inline std::string AxisCamera::HostToUrl(wpi::StringRef host) {
   std::string rv{"http://"};
   rv += host;
   rv += "/mjpg/video.mjpg";
@@ -304,11 +304,11 @@ inline std::string AxisCamera::HostToUrl(llvm::StringRef host) {
 }
 
 inline std::vector<std::string> AxisCamera::HostToUrl(
-    llvm::ArrayRef<std::string> hosts) {
+    wpi::ArrayRef<std::string> hosts) {
   std::vector<std::string> rv;
   rv.reserve(hosts.size());
   for (const auto& host : hosts)
-    rv.emplace_back(HostToUrl(llvm::StringRef{host}));
+    rv.emplace_back(HostToUrl(wpi::StringRef{host}));
   return rv;
 }
 
@@ -318,33 +318,33 @@ inline std::vector<std::string> AxisCamera::HostToUrl(
   std::vector<std::string> rv;
   rv.reserve(hosts.size());
   for (const auto& host : hosts)
-    rv.emplace_back(HostToUrl(llvm::StringRef{host}));
+    rv.emplace_back(HostToUrl(wpi::StringRef{host}));
   return rv;
 }
 
-inline AxisCamera::AxisCamera(llvm::StringRef name, llvm::StringRef host)
+inline AxisCamera::AxisCamera(wpi::StringRef name, wpi::StringRef host)
     : HttpCamera(name, HostToUrl(host), kAxis) {}
 
-inline AxisCamera::AxisCamera(llvm::StringRef name, const char* host)
+inline AxisCamera::AxisCamera(wpi::StringRef name, const char* host)
     : HttpCamera(name, HostToUrl(host), kAxis) {}
 
-inline AxisCamera::AxisCamera(llvm::StringRef name, const std::string& host)
-    : HttpCamera(name, HostToUrl(llvm::StringRef{host}), kAxis) {}
+inline AxisCamera::AxisCamera(wpi::StringRef name, const std::string& host)
+    : HttpCamera(name, HostToUrl(wpi::StringRef{host}), kAxis) {}
 
-inline AxisCamera::AxisCamera(llvm::StringRef name,
-                              llvm::ArrayRef<std::string> hosts)
+inline AxisCamera::AxisCamera(wpi::StringRef name,
+                              wpi::ArrayRef<std::string> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
 template <typename T>
-inline AxisCamera::AxisCamera(llvm::StringRef name,
+inline AxisCamera::AxisCamera(wpi::StringRef name,
                               std::initializer_list<T> hosts)
     : HttpCamera(name, HostToUrl(hosts), kAxis) {}
 
-inline CvSource::CvSource(llvm::StringRef name, const VideoMode& mode) {
+inline CvSource::CvSource(wpi::StringRef name, const VideoMode& mode) {
   m_handle = CreateCvSource(name, mode, &m_status);
 }
 
-inline CvSource::CvSource(llvm::StringRef name, VideoMode::PixelFormat format,
+inline CvSource::CvSource(wpi::StringRef name, VideoMode::PixelFormat format,
                           int width, int height, int fps) {
   m_handle =
       CreateCvSource(name, VideoMode{format, width, height, fps}, &m_status);
@@ -355,7 +355,7 @@ inline void CvSource::PutFrame(cv::Mat& image) {
   PutSourceFrame(m_handle, image, &m_status);
 }
 
-inline void CvSource::NotifyError(llvm::StringRef msg) {
+inline void CvSource::NotifyError(wpi::StringRef msg) {
   m_status = 0;
   NotifySourceError(m_handle, msg, &m_status);
 }
@@ -365,12 +365,12 @@ inline void CvSource::SetConnected(bool connected) {
   SetSourceConnected(m_handle, connected, &m_status);
 }
 
-inline void CvSource::SetDescription(llvm::StringRef description) {
+inline void CvSource::SetDescription(wpi::StringRef description) {
   m_status = 0;
   SetSourceDescription(m_handle, description, &m_status);
 }
 
-inline VideoProperty CvSource::CreateProperty(llvm::StringRef name,
+inline VideoProperty CvSource::CreateProperty(wpi::StringRef name,
                                               VideoProperty::Kind kind,
                                               int minimum, int maximum,
                                               int step, int defaultValue,
@@ -381,7 +381,7 @@ inline VideoProperty CvSource::CreateProperty(llvm::StringRef name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateIntegerProperty(llvm::StringRef name,
+inline VideoProperty CvSource::CreateIntegerProperty(wpi::StringRef name,
                                                     int minimum, int maximum,
                                                     int step, int defaultValue,
                                                     int value) {
@@ -391,7 +391,7 @@ inline VideoProperty CvSource::CreateIntegerProperty(llvm::StringRef name,
       minimum, maximum, step, defaultValue, value, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateBooleanProperty(llvm::StringRef name,
+inline VideoProperty CvSource::CreateBooleanProperty(wpi::StringRef name,
                                                      bool defaultValue,
                                                      bool value) {
   m_status = 0;
@@ -400,8 +400,8 @@ inline VideoProperty CvSource::CreateBooleanProperty(llvm::StringRef name,
       0, 1, 1, defaultValue ? 1 : 0, value ? 1 : 0, &m_status)};
 }
 
-inline VideoProperty CvSource::CreateStringProperty(llvm::StringRef name,
-                                                    llvm::StringRef value) {
+inline VideoProperty CvSource::CreateStringProperty(wpi::StringRef name,
+                                                    wpi::StringRef value) {
   m_status = 0;
   auto prop = VideoProperty{CreateSourceProperty(
       m_handle, name, static_cast<CS_PropertyKind>(static_cast<int>(VideoProperty::Kind::kString)),
@@ -412,7 +412,7 @@ inline VideoProperty CvSource::CreateStringProperty(llvm::StringRef name,
 
 
 inline void CvSource::SetEnumPropertyChoices(
-    const VideoProperty& property, llvm::ArrayRef<std::string> choices) {
+    const VideoProperty& property, wpi::ArrayRef<std::string> choices) {
   m_status = 0;
   SetSourceEnumPropertyChoices(m_handle, property.m_handle, choices, &m_status);
 }
@@ -473,13 +473,13 @@ inline VideoSource VideoSink::GetSource() const {
   return VideoSource{handle == 0 ? 0 : CopySource(handle, &m_status)};
 }
 
-inline VideoProperty VideoSink::GetSourceProperty(llvm::StringRef name) {
+inline VideoProperty VideoSink::GetSourceProperty(wpi::StringRef name) {
   m_status = 0;
   return VideoProperty{GetSinkSourceProperty(m_handle, name, &m_status)};
 }
 
-inline MjpegServer::MjpegServer(llvm::StringRef name,
-                                llvm::StringRef listenAddress, int port) {
+inline MjpegServer::MjpegServer(wpi::StringRef name,
+                                wpi::StringRef listenAddress, int port) {
   m_handle = CreateMjpegServer(name, listenAddress, port, &m_status);
 }
 
@@ -493,16 +493,16 @@ inline int MjpegServer::GetPort() const {
   return cs::GetMjpegServerPort(m_handle, &m_status);
 }
 
-inline CvSink::CvSink(llvm::StringRef name) {
+inline CvSink::CvSink(wpi::StringRef name) {
   m_handle = CreateCvSink(name, &m_status);
 }
 
-inline CvSink::CvSink(llvm::StringRef name,
+inline CvSink::CvSink(wpi::StringRef name,
                       std::function<void(uint64_t time)> processFrame) {
   m_handle = CreateCvSinkCallback(name, processFrame, &m_status);
 }
 
-inline void CvSink::SetDescription(llvm::StringRef description) {
+inline void CvSink::SetDescription(wpi::StringRef description) {
   m_status = 0;
   SetSinkDescription(m_handle, description, &m_status);
 }

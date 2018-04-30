@@ -36,7 +36,7 @@ void RpcServer::ProcessRpc(unsigned int local_id, unsigned int call_uid,
 }
 
 void RpcServer::PostRpcResponse(unsigned int local_id, unsigned int call_uid,
-                                llvm::StringRef result) {
+                                wpi::StringRef result) {
   auto thr = GetThread();
   auto i = thr->m_response_map.find(impl::RpcIdPair{local_id, call_uid});
   if (i == thr->m_response_map.end()) {

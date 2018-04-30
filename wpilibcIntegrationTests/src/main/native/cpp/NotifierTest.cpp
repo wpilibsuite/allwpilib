@@ -7,7 +7,7 @@
 
 #include "Notifier.h"  // NOLINT(build/include_order)
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "TestBench.h"
 #include "Timer.h"
@@ -23,21 +23,21 @@ void notifierHandler(void*) { notifierCounter++; }
  * Test if the Wait function works
  */
 TEST(NotifierTest, DISABLED_TestTimerNotifications) {
-  llvm::outs() << "NotifierTest...\n";
+  wpi::outs() << "NotifierTest...\n";
   notifierCounter = 0;
-  llvm::outs() << "notifier(notifierHandler, nullptr)...\n";
+  wpi::outs() << "notifier(notifierHandler, nullptr)...\n";
   Notifier notifier(notifierHandler, nullptr);
-  llvm::outs() << "Start Periodic...\n";
+  wpi::outs() << "Start Periodic...\n";
   notifier.StartPeriodic(1.0);
 
-  llvm::outs() << "Wait...\n";
+  wpi::outs() << "Wait...\n";
   Wait(10.5);
-  llvm::outs() << "...Wait\n";
+  wpi::outs() << "...Wait\n";
 
   EXPECT_EQ(10u, notifierCounter)
       << "Received " << notifierCounter << " notifications in 10.5 seconds";
-  llvm::outs() << "Received " << notifierCounter
-               << " notifications in 10.5 seconds";
+  wpi::outs() << "Received " << notifierCounter
+              << " notifications in 10.5 seconds";
 
-  llvm::outs() << "...NotifierTest\n";
+  wpi::outs() << "...NotifierTest\n";
 }

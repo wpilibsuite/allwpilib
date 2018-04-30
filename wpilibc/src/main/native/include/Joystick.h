@@ -9,7 +9,7 @@
 
 #include <array>
 
-#include <support/deprecated.h>
+#include <wpi/deprecated.h>
 
 #include "GenericHID.h"
 

@@ -25,12 +25,12 @@ class IEntryNotifier {
 
   virtual unsigned int Add(
       std::function<void(const EntryNotification& event)> callback,
-      llvm::StringRef prefix, unsigned int flags) = 0;
+      wpi::StringRef prefix, unsigned int flags) = 0;
   virtual unsigned int Add(
       std::function<void(const EntryNotification& event)> callback,
       unsigned int local_id, unsigned int flags) = 0;
   virtual unsigned int AddPolled(unsigned int poller_uid,
-                                 llvm::StringRef prefix,
+                                 wpi::StringRef prefix,
                                  unsigned int flags) = 0;
   virtual unsigned int AddPolled(unsigned int poller_uid, unsigned int local_id,
                                  unsigned int flags) = 0;

@@ -5,16 +5,16 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include "support/hostname.h"
+#include "wpi/hostname.h"
 
 #include "gtest/gtest.h"
-#include "llvm/SmallString.h"
-#include "llvm/SmallVector.h"
+#include "wpi/SmallString.h"
+#include "wpi/SmallVector.h"
 
 namespace wpi {
-TEST(HostNameTest, HostNameNotEmpty) { ASSERT_NE(wpi::GetHostname(), ""); }
+TEST(HostNameTest, HostNameNotEmpty) { ASSERT_NE(GetHostname(), ""); }
 TEST(HostNameTest, HostNameNotEmptySmallVector) {
-  llvm::SmallVector<char, 256> name;
-  ASSERT_NE(wpi::GetHostname(name), "");
+  SmallVector<char, 256> name;
+  ASSERT_NE(GetHostname(name), "");
 }
 }  // namespace wpi

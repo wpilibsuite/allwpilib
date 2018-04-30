@@ -49,7 +49,7 @@ class NidecBrushless : public ErrorBase,
   bool IsAlive() const override;
   void SetSafetyEnabled(bool enabled) override;
   bool IsSafetyEnabled() const override;
-  void GetDescription(llvm::raw_ostream& desc) const override;
+  void GetDescription(wpi::raw_ostream& desc) const override;
 
   int GetChannel() const;
 

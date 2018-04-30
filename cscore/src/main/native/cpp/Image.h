@@ -10,8 +10,8 @@
 
 #include <vector>
 
-#include <llvm/StringRef.h>
 #include <opencv2/core/core.hpp>
+#include <wpi/StringRef.h>
 
 #include "cscore_cpp.h"
 #include "default_init_allocator.h"
@@ -37,8 +37,8 @@ class Image {
   Image& operator=(const Image&) = delete;
 
   // Getters
-  operator llvm::StringRef() const { return str(); }
-  llvm::StringRef str() const { return llvm::StringRef(data(), size()); }
+  operator wpi::StringRef() const { return str(); }
+  wpi::StringRef str() const { return wpi::StringRef(data(), size()); }
   size_t capacity() const { return m_data.capacity(); }
   const char* data() const {
     return reinterpret_cast<const char*>(m_data.data());

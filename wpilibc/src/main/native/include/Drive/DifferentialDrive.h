@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <llvm/raw_ostream.h>
+#include <wpi/raw_ostream.h>
 
 #include "Drive/RobotDriveBase.h"
 
@@ -116,7 +116,7 @@ class DifferentialDrive : public RobotDriveBase {
   void SetQuickStopAlpha(double alpha);
 
   void StopMotor() override;
-  void GetDescription(llvm::raw_ostream& desc) const override;
+  void GetDescription(wpi::raw_ostream& desc) const override;
 
   void InitSendable(SendableBuilder& builder) override;
 

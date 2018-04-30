@@ -8,11 +8,11 @@
 #include <cctype>
 #include <string>
 
-#include <llvm/Format.h>
-#include <llvm/SmallString.h>
-#include <llvm/StringExtras.h>
-#include <llvm/raw_ostream.h>
-#include <support/Base64.h>
+#include <wpi/Base64.h>
+#include <wpi/Format.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringExtras.h>
+#include <wpi/raw_ostream.h>
 
 #include "Log.h"
 #include "Storage.h"
@@ -25,25 +25,25 @@ class SavePersistentImpl {
  public:
   typedef std::pair<std::string, std::shared_ptr<Value>> Entry;
 
-  explicit SavePersistentImpl(llvm::raw_ostream& os) : m_os(os) {}
+  explicit SavePersistentImpl(wpi::raw_ostream& os) : m_os(os) {}
 
-  void Save(llvm::ArrayRef<Entry> entries);
+  void Save(wpi::ArrayRef<Entry> entries);
 
  private:
-  void WriteString(llvm::StringRef str);
+  void WriteString(wpi::StringRef str);
   void WriteHeader();
-  void WriteEntries(llvm::ArrayRef<Entry> entries);
-  void WriteEntry(llvm::StringRef name, const Value& value);
+  void WriteEntries(wpi::ArrayRef<Entry> entries);
+  void WriteEntry(wpi::StringRef name, const Value& value);
   bool WriteType(NT_Type type);
   void WriteValue(const Value& value);
 
-  llvm::raw_ostream& m_os;
+  wpi::raw_ostream& m_os;
 };
 
 }  // namespace
 
 /* Escapes and writes a string, including start and end double quotes */
-void SavePersistentImpl::WriteString(llvm::StringRef str) {
+void SavePersistentImpl::WriteString(wpi::StringRef str) {
   m_os << '"';
   for (auto c : str) {
     switch (c) {
@@ -67,14 +67,14 @@ void SavePersistentImpl::WriteString(llvm::StringRef str) {
 
         // Write out the escaped representation.
         m_os << "\\x";
-        m_os << llvm::hexdigit((c >> 4) & 0xF);
-        m_os << llvm::hexdigit((c >> 0) & 0xF);
+        m_os << wpi::hexdigit((c >> 4) & 0xF);
+        m_os << wpi::hexdigit((c >> 0) & 0xF);
     }
   }
   m_os << '"';
 }
 
-void SavePersistentImpl::Save(llvm::ArrayRef<Entry> entries) {
+void SavePersistentImpl::Save(wpi::ArrayRef<Entry> entries) {
   WriteHeader();
   WriteEntries(entries);
 }
@@ -83,14 +83,14 @@ void SavePersistentImpl::WriteHeader() {
   m_os << "[NetworkTables Storage 3.0]\n";
 }
 
-void SavePersistentImpl::WriteEntries(llvm::ArrayRef<Entry> entries) {
+void SavePersistentImpl::WriteEntries(wpi::ArrayRef<Entry> entries) {
   for (auto& i : entries) {
     if (!i.second) continue;
     WriteEntry(i.first, *i.second);
   }
 }
 
-void SavePersistentImpl::WriteEntry(llvm::StringRef name, const Value& value) {
+void SavePersistentImpl::WriteEntry(wpi::StringRef name, const Value& value) {
   if (!WriteType(value.type())) return;  // type
   WriteString(name);                     // name
   m_os << '=';                           // '='
@@ -133,7 +133,7 @@ void SavePersistentImpl::WriteValue(const Value& value) {
       m_os << (value.GetBoolean() ? "true" : "false");
       break;
     case NT_DOUBLE:
-      m_os << llvm::format("%g", value.GetDouble());
+      m_os << wpi::format("%g", value.GetDouble());
       break;
     case NT_STRING:
       WriteString(value.GetString());
@@ -156,7 +156,7 @@ void SavePersistentImpl::WriteValue(const Value& value) {
       for (auto elem : value.GetDoubleArray()) {
         if (!first) m_os << ',';
         first = false;
-        m_os << llvm::format("%g", elem);
+        m_os << wpi::format("%g", elem);
       }
       break;
     }
@@ -174,7 +174,7 @@ void SavePersistentImpl::WriteValue(const Value& value) {
   }
 }
 
-void Storage::SavePersistent(llvm::raw_ostream& os, bool periodic) const {
+void Storage::SavePersistent(wpi::raw_ostream& os, bool periodic) const {
   std::vector<SavePersistentImpl::Entry> entries;
   if (!GetPersistentEntries(periodic, &entries)) return;
   SavePersistentImpl(os).Save(entries);
@@ -182,11 +182,11 @@ void Storage::SavePersistent(llvm::raw_ostream& os, bool periodic) const {
 
 const char* Storage::SavePersistent(const Twine& filename,
                                     bool periodic) const {
-  llvm::SmallString<128> fn;
+  wpi::SmallString<128> fn;
   filename.toVector(fn);
-  llvm::SmallString<128> tmp = fn;
+  wpi::SmallString<128> tmp = fn;
   tmp += ".tmp";
-  llvm::SmallString<128> bak = fn;
+  wpi::SmallString<128> bak = fn;
   bak += ".bak";
 
   // Get entries before creating file
@@ -197,7 +197,7 @@ const char* Storage::SavePersistent(const Twine& filename,
 
   // start by writing to temporary file
   std::error_code ec;
-  llvm::raw_fd_ostream os(tmp, ec, llvm::sys::fs::F_Text);
+  wpi::raw_fd_ostream os(tmp, ec, wpi::sys::fs::F_Text);
   if (ec.value() != 0) {
     err = "could not open file";
     goto done;
@@ -226,7 +226,7 @@ done:
   return err;
 }
 
-void Storage::SaveEntries(llvm::raw_ostream& os, const Twine& prefix) const {
+void Storage::SaveEntries(wpi::raw_ostream& os, const Twine& prefix) const {
   std::vector<SavePersistentImpl::Entry> entries;
   if (!GetEntries(prefix, &entries)) return;
   SavePersistentImpl(os).Save(entries);
@@ -234,11 +234,11 @@ void Storage::SaveEntries(llvm::raw_ostream& os, const Twine& prefix) const {
 
 const char* Storage::SaveEntries(const Twine& filename,
                                  const Twine& prefix) const {
-  llvm::SmallString<128> fn;
+  wpi::SmallString<128> fn;
   filename.toVector(fn);
-  llvm::SmallString<128> tmp = fn;
+  wpi::SmallString<128> tmp = fn;
   tmp += ".tmp";
-  llvm::SmallString<128> bak = fn;
+  wpi::SmallString<128> bak = fn;
   bak += ".bak";
 
   // Get entries before creating file
@@ -247,7 +247,7 @@ const char* Storage::SaveEntries(const Twine& filename,
 
   // start by writing to temporary file
   std::error_code ec;
-  llvm::raw_fd_ostream os(tmp, ec, llvm::sys::fs::F_Text);
+  wpi::raw_fd_ostream os(tmp, ec, wpi::sys::fs::F_Text);
   if (ec.value() != 0) {
     return "could not open file";
   }

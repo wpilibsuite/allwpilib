@@ -13,8 +13,8 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <llvm/MathExtras.h>
-#include <support/leb128.h>
+#include <wpi/MathExtras.h>
+#include <wpi/leb128.h>
 
 using namespace nt;
 
@@ -43,7 +43,7 @@ static double ReadDouble(const char*& buf) {
   val <<= 8;
   val |= (*reinterpret_cast<const unsigned char*>(buf)) & 0xff;
   ++buf;
-  return llvm::BitsToDouble(val);
+  return wpi::BitsToDouble(val);
 }
 
 WireDecoder::WireDecoder(wpi::raw_istream& is, unsigned int proto_rev,
@@ -202,6 +202,6 @@ bool WireDecoder::ReadString(std::string* str) {
   }
   const char* buf;
   if (!Read(&buf, len)) return false;
-  *str = llvm::StringRef(buf, len);
+  *str = wpi::StringRef(buf, len);
   return true;
 }

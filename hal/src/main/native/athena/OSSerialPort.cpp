@@ -217,9 +217,9 @@ int32_t HAL_ReadOSSerial(HAL_SerialPort port, char* buffer, int32_t count,
     std::memcpy(&buffer[bytesRead], buf, rx);
     bytesRead += rx;
     if (bytesRead >= count) break;
-    llvm::StringRef tmp(buffer, bytesRead);
+    wpi::StringRef tmp(buffer, bytesRead);
     auto loc = tmp.find('\n');
-    if (loc != llvm::StringRef::npos) {
+    if (loc != wpi::StringRef::npos) {
       bytesRead = loc;
       break;
     }

@@ -8,7 +8,7 @@
 #ifndef CSCORE_TELEMETRY_H_
 #define CSCORE_TELEMETRY_H_
 
-#include <support/SafeThread.h>
+#include <wpi/SafeThread.h>
 
 #include "cscore_cpp.h"
 

@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 #include "Commands/InstantCommand.h"
 
@@ -17,7 +17,7 @@ namespace frc {
 
 class PrintCommand : public InstantCommand {
  public:
-  explicit PrintCommand(const llvm::Twine& message);
+  explicit PrintCommand(const wpi::Twine& message);
   virtual ~PrintCommand() = default;
 
  protected:

@@ -11,7 +11,7 @@
 #include <set>
 #include <string>
 
-#include <llvm/Twine.h>
+#include <wpi/Twine.h>
 
 #include "ErrorBase.h"
 #include "SmartDashboard/SendableBase.h"
@@ -51,9 +51,9 @@ class Command : public ErrorBase, public SendableBase {
 
  public:
   Command();
-  explicit Command(const llvm::Twine& name);
+  explicit Command(const wpi::Twine& name);
   explicit Command(double timeout);
-  Command(const llvm::Twine& name, double timeout);
+  Command(const wpi::Twine& name, double timeout);
   ~Command() override = default;
   double TimeSinceInitialized() const;
   void Requires(Subsystem* s);

@@ -13,7 +13,7 @@
 #include <vector>
 
 #include <networktables/NetworkTableEntry.h>
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "Commands/Command.h"
 #include "ErrorBase.h"

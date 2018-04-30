@@ -86,10 +86,10 @@ class EntryNotifier
   bool local_notifiers() const override;
 
   unsigned int Add(std::function<void(const EntryNotification& event)> callback,
-                   llvm::StringRef prefix, unsigned int flags) override;
+                   wpi::StringRef prefix, unsigned int flags) override;
   unsigned int Add(std::function<void(const EntryNotification& event)> callback,
                    unsigned int local_id, unsigned int flags) override;
-  unsigned int AddPolled(unsigned int poller_uid, llvm::StringRef prefix,
+  unsigned int AddPolled(unsigned int poller_uid, wpi::StringRef prefix,
                          unsigned int flags) override;
   unsigned int AddPolled(unsigned int poller_uid, unsigned int local_id,
                          unsigned int flags) override;

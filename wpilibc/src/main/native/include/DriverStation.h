@@ -14,10 +14,10 @@
 #include <thread>
 
 #include <HAL/DriverStation.h>
-#include <llvm/Twine.h>
-#include <support/condition_variable.h>
-#include <support/deprecated.h>
-#include <support/mutex.h>
+#include <wpi/Twine.h>
+#include <wpi/condition_variable.h>
+#include <wpi/deprecated.h>
+#include <wpi/mutex.h>
 
 #include "ErrorBase.h"
 #include "RobotState.h"
@@ -38,11 +38,11 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
 
   ~DriverStation() override;
   static DriverStation& GetInstance();
-  static void ReportError(const llvm::Twine& error);
-  static void ReportWarning(const llvm::Twine& error);
-  static void ReportError(bool isError, int code, const llvm::Twine& error,
-                          const llvm::Twine& location,
-                          const llvm::Twine& stack);
+  static void ReportError(const wpi::Twine& error);
+  static void ReportWarning(const wpi::Twine& error);
+  static void ReportError(bool isError, int code, const wpi::Twine& error,
+                          const wpi::Twine& location,
+                          const wpi::Twine& stack);
 
   static constexpr int kJoystickPorts = 6;
 
@@ -130,8 +130,8 @@ class DriverStation : public ErrorBase, public RobotStateInterface {
  private:
   DriverStation();
 
-  void ReportJoystickUnpluggedError(const llvm::Twine& message);
-  void ReportJoystickUnpluggedWarning(const llvm::Twine& message);
+  void ReportJoystickUnpluggedError(const wpi::Twine& message);
+  void ReportJoystickUnpluggedWarning(const wpi::Twine& message);
   void Run();
   void UpdateControlWord(bool force, HAL_ControlWord& controlWord) const;
   void SendMatchData();

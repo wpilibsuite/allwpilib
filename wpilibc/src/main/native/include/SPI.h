@@ -11,7 +11,7 @@
 
 #include <memory>
 
-#include <llvm/ArrayRef.h>
+#include <wpi/ArrayRef.h>
 
 #include "ErrorBase.h"
 
@@ -58,7 +58,7 @@ class SPI : public ErrorBase {
 
   void InitAuto(int bufferSize);
   void FreeAuto();
-  void SetAutoTransmitData(llvm::ArrayRef<uint8_t> dataToSend, int zeroSize);
+  void SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend, int zeroSize);
   void StartAutoRate(double period);
   void StartAutoTrigger(DigitalSource& source, bool rising, bool falling);
   void StopAuto();

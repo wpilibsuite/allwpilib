@@ -12,9 +12,9 @@
 #include "HAL/CAN.h"
 #include "HALUtil.h"
 #include "edu_wpi_first_wpilibj_can_CANJNI.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
-#include "support/jni_util.h"
+#include "wpi/SmallString.h"
+#include "wpi/jni_util.h"
+#include "wpi/raw_ostream.h"
 
 using namespace frc;
 using namespace wpi::java;
@@ -53,8 +53,8 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxSendMessage(
 
   if (logDEBUG <= canJNILogLevel) {
     if (dataBuffer) {
-      llvm::SmallString<128> buf;
-      llvm::raw_svector_ostream str(buf);
+      wpi::SmallString<128> buf;
+      wpi::raw_svector_ostream str(buf);
       for (int32_t i = 0; i < dataSize; i++) {
         str.write_hex(dataBuffer[i]) << ' ';
       }
@@ -102,8 +102,8 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   CANJNI_LOG(logDEBUG).write_hex(*messageIDPtr);
 
   if (logDEBUG <= canJNILogLevel) {
-    llvm::SmallString<128> buf;
-    llvm::raw_svector_ostream str(buf);
+    wpi::SmallString<128> buf;
+    wpi::raw_svector_ostream str(buf);
 
     for (int32_t i = 0; i < dataSize; i++) {
       // Pad one-digit data with a zero
@@ -121,7 +121,7 @@ Java_edu_wpi_first_wpilibj_can_CANJNI_FRCNetCommCANSessionMuxReceiveMessage(
   CANJNI_LOG(logDEBUG) << "Status: " << status;
 
   if (!CheckCANStatus(env, status, *messageIDPtr)) return nullptr;
-  return MakeJByteArray(env, llvm::StringRef{reinterpret_cast<const char*>(buffer), 
+  return MakeJByteArray(env, wpi::StringRef{reinterpret_cast<const char*>(buffer), 
                         static_cast<size_t>(dataSize)});
 }
 

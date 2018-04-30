@@ -13,13 +13,13 @@
 #include <thread>
 #include <vector>
 
-#include <llvm/SmallVector.h>
-#include <llvm/StringRef.h>
-#include <llvm/raw_ostream.h>
-#include <support/raw_istream.h>
-#include <support/raw_socket_ostream.h>
-#include <tcpsockets/NetworkAcceptor.h>
-#include <tcpsockets/NetworkStream.h>
+#include <wpi/NetworkAcceptor.h>
+#include <wpi/NetworkStream.h>
+#include <wpi/SmallVector.h>
+#include <wpi/StringRef.h>
+#include <wpi/raw_istream.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/raw_socket_ostream.h>
 
 #include "SinkImpl.h"
 
@@ -29,8 +29,8 @@ class SourceImpl;
 
 class CvSinkImpl : public SinkImpl {
  public:
-  explicit CvSinkImpl(llvm::StringRef name);
-  CvSinkImpl(llvm::StringRef name,
+  explicit CvSinkImpl(wpi::StringRef name);
+  CvSinkImpl(wpi::StringRef name,
              std::function<void(uint64_t time)> processFrame);
   ~CvSinkImpl() override;
 

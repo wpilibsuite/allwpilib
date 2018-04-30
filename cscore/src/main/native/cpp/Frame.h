@@ -14,8 +14,8 @@
 #include <utility>
 #include <vector>
 
-#include <llvm/SmallVector.h>
-#include <support/mutex.h>
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 
 #include "Image.h"
 #include "cscore_cpp.h"
@@ -39,14 +39,14 @@ class Frame {
     Time time{0};
     SourceImpl& source;
     std::string error;
-    llvm::SmallVector<Image*, 4> images;
+    wpi::SmallVector<Image*, 4> images;
     std::vector<int> compressionParams;
   };
 
  public:
   Frame() noexcept : m_impl{nullptr} {}
 
-  Frame(SourceImpl& source, llvm::StringRef error, Time time);
+  Frame(SourceImpl& source, wpi::StringRef error, Time time);
 
   Frame(SourceImpl& source, std::unique_ptr<Image> image, Time time);
 
@@ -72,8 +72,8 @@ class Frame {
 
   Time GetTime() const { return m_impl ? m_impl->time : 0; }
 
-  llvm::StringRef GetError() const {
-    if (!m_impl) return llvm::StringRef{};
+  wpi::StringRef GetError() const {
+    if (!m_impl) return wpi::StringRef{};
     return m_impl->error;
   }
 

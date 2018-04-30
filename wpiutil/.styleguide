@@ -9,23 +9,53 @@ cppSrcFileInclude {
 
 generatedFileExclude {
   gmock/
-  llvm/
-  src/main/native/cpp/support/json
-  src/main/native/include/support/json
+  src/main/native/cpp/llvm/
+  src/main/native/include/wpi/AlignOf\.h$
+  src/main/native/include/wpi/ArrayRef\.h$
+  src/main/native/include/wpi/Compiler\.h$
+  src/main/native/include/wpi/ConvertUTF\.h$
+  src/main/native/include/wpi/DenseMap\.h$
+  src/main/native/include/wpi/DenseMapInfo\.h$
+  src/main/native/include/wpi/EpochTracker\.h$
+  src/main/native/include/wpi/FileSystem\.h$
+  src/main/native/include/wpi/Format\.h$
+  src/main/native/include/wpi/Hashing\.h$
+  src/main/native/include/wpi/IntrusiveRefCntPtr\.h$
+  src/main/native/include/wpi/MathExtras\.h$
+  src/main/native/include/wpi/None\.h$
+  src/main/native/include/wpi/Optional\.h$
+  src/main/native/include/wpi/Path\.h $
+  src/main/native/include/wpi/PointerLikeTypeTraits\.h$
+  src/main/native/include/wpi/STLExtras\.h$
+  src/main/native/include/wpi/SmallPtrSet\.h$
+  src/main/native/include/wpi/SmallSet\.h$
+  src/main/native/include/wpi/SmallString\.h$
+  src/main/native/include/wpi/SmallVector\.h$
+  src/main/native/include/wpi/StringExtras\.h$
+  src/main/native/include/wpi/StringMap\.h$
+  src/main/native/include/wpi/StringRef\.h$
+  src/main/native/include/wpi/Twine\.h$
+  src/main/native/include/wpi/WindowsError\.h$
+  src/main/native/include/wpi/iterator_range\.h$
+  src/main/native/include/wpi/raw_os_ostream\.h$
+  src/main/native/include/wpi/raw_ostream\.h$
+  src/main/native/include/wpi/type_traits\.h$
+  src/main/native/cpp/json
+  src/main/native/include/wpi/json
   src/test/native/cpp/json/
 }
 
 licenseUpdateExclude {
-  src/main/native/cpp/support/Base64\.cpp$
-  src/main/native/cpp/support/sha1\.cpp$
-  src/main/native/cpp/tcpsockets/TCPAcceptor\.cpp$
-  src/main/native/cpp/tcpsockets/TCPConnector\.cpp$
-  src/main/native/cpp/tcpsockets/TCPStream\.cpp$
-  src/main/native/include/support/ConcurrentQueue\.h$
-  src/main/native/include/support/sha1\.h$
-  src/main/native/include/tcpsockets/TCPAcceptor\.h$
-  src/main/native/include/tcpsockets/TCPConnector\.h$
-  src/main/native/include/tcpsockets/TCPStream\.h$
+  src/main/native/cpp/Base64\.cpp$
+  src/main/native/cpp/sha1\.cpp$
+  src/main/native/cpp/TCPAcceptor\.cpp$
+  src/main/native/cpp/TCPConnector\.cpp$
+  src/main/native/cpp/TCPStream\.cpp$
+  src/main/native/include/wpi/ConcurrentQueue\.h$
+  src/main/native/include/wpi/sha1\.h$
+  src/main/native/include/wpi/TCPAcceptor\.h$
+  src/main/native/include/wpi/TCPConnector\.h$
+  src/main/native/include/wpi/TCPStream\.h$
 }
 
 includeGuardRoots {

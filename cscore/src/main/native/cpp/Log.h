@@ -8,7 +8,7 @@
 #ifndef CSCORE_LOG_H_
 #define CSCORE_LOG_H_
 
-#include <support/Logger.h>
+#include <wpi/Logger.h>
 
 namespace cs {
 

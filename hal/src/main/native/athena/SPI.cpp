@@ -16,8 +16,8 @@
 #include <atomic>
 #include <cstring>
 
-#include <llvm/raw_ostream.h>
-#include <support/mutex.h>
+#include <wpi/raw_ostream.h>
+#include <wpi/mutex.h>
 
 #include "DigitalInternal.h"
 #include "HAL/DIO.h"
@@ -196,20 +196,20 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       if ((digitalHandles[5] = HAL_InitializeDIOPort(createPortHandleForSPI(14),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
-        llvm::outs() << "Failed to allocate DIO 14\n";
+        wpi::outs() << "Failed to allocate DIO 14\n";
         return;
       }
       if ((digitalHandles[6] = HAL_InitializeDIOPort(createPortHandleForSPI(15),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
-        llvm::outs() << "Failed to allocate DIO 15\n";
+        wpi::outs() << "Failed to allocate DIO 15\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         return;
       }
       if ((digitalHandles[7] = HAL_InitializeDIOPort(createPortHandleForSPI(16),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
-        llvm::outs() << "Failed to allocate DIO 16\n";
+        wpi::outs() << "Failed to allocate DIO 16\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated
         return;
@@ -217,7 +217,7 @@ void HAL_InitializeSPI(HAL_SPIPort port, int32_t* status) {
       if ((digitalHandles[8] = HAL_InitializeDIOPort(createPortHandleForSPI(17),
                                                      false, status)) ==
           HAL_kInvalidHandle) {
-        llvm::outs() << "Failed to allocate DIO 17\n";
+        wpi::outs() << "Failed to allocate DIO 17\n";
         HAL_FreeDIOPort(digitalHandles[5]);  // free the first port allocated
         HAL_FreeDIOPort(digitalHandles[6]);  // free the second port allocated
         HAL_FreeDIOPort(digitalHandles[7]);  // free the third port allocated

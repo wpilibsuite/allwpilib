@@ -151,7 +151,7 @@ void Notifier::RemoveListener(int uid) {
   thr->m_listeners.erase(uid);
 }
 
-void Notifier::NotifySource(llvm::StringRef name, CS_Source source,
+void Notifier::NotifySource(wpi::StringRef name, CS_Source source,
                             CS_EventKind kind) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
@@ -176,9 +176,9 @@ void Notifier::NotifySourceVideoMode(const SourceImpl& source,
 }
 
 void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
-                                    llvm::StringRef propertyName, int property,
+                                    wpi::StringRef propertyName, int property,
                                     CS_PropertyKind propertyKind, int value,
-                                    llvm::StringRef valueStr) {
+                                    wpi::StringRef valueStr) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
 
@@ -191,7 +191,7 @@ void Notifier::NotifySourceProperty(const SourceImpl& source, CS_EventKind kind,
   thr->m_cond.notify_one();
 }
 
-void Notifier::NotifySink(llvm::StringRef name, CS_Sink sink,
+void Notifier::NotifySink(wpi::StringRef name, CS_Sink sink,
                           CS_EventKind kind) {
   auto thr = m_owner.GetThread();
   if (!thr) return;
@@ -205,7 +205,7 @@ void Notifier::NotifySink(const SinkImpl& sink, CS_EventKind kind) {
   NotifySink(sink.GetName(), handleData.first, kind);
 }
 
-void Notifier::NotifySinkSourceChanged(llvm::StringRef name, CS_Sink sink,
+void Notifier::NotifySinkSourceChanged(wpi::StringRef name, CS_Sink sink,
                                        CS_Source source) {
   auto thr = m_owner.GetThread();
   if (!thr) return;

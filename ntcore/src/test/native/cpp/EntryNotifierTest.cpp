@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <support/Logger.h>
+#include <wpi/Logger.h>
 
 #include "EntryNotifier.h"
 #include "TestPrinters.h"

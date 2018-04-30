@@ -74,7 +74,7 @@ bool SafePWM::IsSafetyEnabled() const {
   return m_safetyHelper->IsSafetyEnabled();
 }
 
-void SafePWM::GetDescription(llvm::raw_ostream& desc) const {
+void SafePWM::GetDescription(wpi::raw_ostream& desc) const {
   desc << "PWM " << GetChannel();
 }
 

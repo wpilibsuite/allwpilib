@@ -124,14 +124,14 @@ TEST(JsonReadmeTest, FromToString)
 
     // explicit conversion to string
     std::string s;
-    llvm::raw_string_ostream os(s);
+    wpi::raw_string_ostream os(s);
     j.dump(os);    // {\"happy\":true,\"pi\":3.141}
     EXPECT_EQ(os.str(), "{\"happy\":true,\"pi\":3.141}");
 
     // serialization with pretty printing
     // pass in the amount of spaces to indent
     std::string s2;
-    llvm::raw_string_ostream os2(s2);
+    wpi::raw_string_ostream os2(s2);
     j2.dump(os2, 4);
     EXPECT_EQ(os2.str(), "{\n    \"happy\": true,\n    \"pi\": 3.141\n}");
     // {
@@ -149,7 +149,7 @@ TEST(JsonReadmeTest, Basic2)
     j.push_back(true);
 
     std::string s;
-    llvm::raw_string_ostream os(s);
+    wpi::raw_string_ostream os(s);
 
     // iterate the array
     for (json::iterator it = j.begin(); it != j.end(); ++it)
@@ -198,7 +198,7 @@ TEST(JsonReadmeTest, OtherContainer)
 {
     std::vector<int> c_vector {1, 2, 3, 4};
     json j_vec(c_vector);
-    json j_vec2(llvm::makeArrayRef(c_vector));
+    json j_vec2(wpi::makeArrayRef(c_vector));
     // [1, 2, 3, 4]
 
     std::deque<float> c_deque {1.2f, 2.3f, 3.4f, 5.6f};

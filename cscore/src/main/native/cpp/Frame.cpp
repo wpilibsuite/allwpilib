@@ -16,7 +16,7 @@
 
 using namespace cs;
 
-Frame::Frame(SourceImpl& source, llvm::StringRef error, Time time)
+Frame::Frame(SourceImpl& source, wpi::StringRef error, Time time)
     : m_impl{source.AllocFrameImpl().release()} {
   m_impl->refcount = 1;
   m_impl->error = error;

@@ -20,8 +20,8 @@ using namespace frc;
  * @param fbGains The "feed back" or IIR gains
  */
 LinearDigitalFilter::LinearDigitalFilter(PIDSource& source,
-                                         llvm::ArrayRef<double> ffGains,
-                                         llvm::ArrayRef<double> fbGains)
+                                         wpi::ArrayRef<double> ffGains,
+                                         wpi::ArrayRef<double> fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),
@@ -36,8 +36,8 @@ LinearDigitalFilter::LinearDigitalFilter(PIDSource& source,
  * @param fbGains The "feed back" or IIR gains
  */
 LinearDigitalFilter::LinearDigitalFilter(std::shared_ptr<PIDSource> source,
-                                         llvm::ArrayRef<double> ffGains,
-                                         llvm::ArrayRef<double> fbGains)
+                                         wpi::ArrayRef<double> ffGains,
+                                         wpi::ArrayRef<double> fbGains)
     : Filter(source),
       m_inputs(ffGains.size()),
       m_outputs(fbGains.size()),

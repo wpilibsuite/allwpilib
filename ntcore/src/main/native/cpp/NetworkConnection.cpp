@@ -7,14 +7,14 @@
 
 #include "NetworkConnection.h"
 
-#include <support/raw_socket_istream.h>
-#include <support/timestamp.h>
+#include <wpi/NetworkStream.h>
+#include <wpi/raw_socket_istream.h>
+#include <wpi/timestamp.h>
 
 #include "IConnectionNotifier.h"
 #include "Log.h"
 #include "WireDecoder.h"
 #include "WireEncoder.h"
-#include "tcpsockets/NetworkStream.h"
 
 using namespace nt;
 
@@ -143,7 +143,7 @@ void NetworkConnection::ReadThreadMain() {
                        DEBUG("error reading in handshake: " << decoder.error());
                      return msg;
                    },
-                   [&](llvm::ArrayRef<std::shared_ptr<Message>> msgs) {
+                   [&](wpi::ArrayRef<std::shared_ptr<Message>> msgs) {
                      m_outgoing.emplace(msgs);
                    })) {
     set_state(kDead);

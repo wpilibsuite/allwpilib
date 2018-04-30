@@ -7,10 +7,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "llvm/Twine.h"
-#include "llvm/SmallString.h"
-#include "llvm/raw_ostream.h"
-using namespace llvm;
+#include "wpi/Twine.h"
+#include "wpi/SmallString.h"
+#include "wpi/raw_ostream.h"
+using namespace wpi;
 
 std::string Twine::str() const {
   // If we're storing only a std::string, just return it.

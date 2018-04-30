@@ -13,8 +13,8 @@
 #include <cstdlib>
 #include <cstring>
 
-#include <llvm/MathExtras.h>
-#include <support/leb128.h>
+#include <wpi/MathExtras.h>
+#include <wpi/leb128.h>
 
 using namespace nt;
 
@@ -25,7 +25,7 @@ WireEncoder::WireEncoder(unsigned int proto_rev) {
 
 void WireEncoder::WriteDouble(double val) {
   // The highest performance way to do this, albeit non-portable.
-  uint64_t v = llvm::DoubleToBits(val);
+  uint64_t v = wpi::DoubleToBits(val);
   m_data.append(
       {static_cast<char>((v >> 56) & 0xff), static_cast<char>((v >> 48) & 0xff),
        static_cast<char>((v >> 40) & 0xff), static_cast<char>((v >> 32) & 0xff),
@@ -175,7 +175,7 @@ void WireEncoder::WriteValue(const Value& value) {
   }
 }
 
-size_t WireEncoder::GetStringSize(llvm::StringRef str) const {
+size_t WireEncoder::GetStringSize(wpi::StringRef str) const {
   if (m_proto_rev < 0x0300u) {
     size_t len = str.size();
     if (len > 0xffff) len = 0xffff;  // Limited to 64K length; truncate
@@ -184,7 +184,7 @@ size_t WireEncoder::GetStringSize(llvm::StringRef str) const {
   return wpi::SizeUleb128(str.size()) + str.size();
 }
 
-void WireEncoder::WriteString(llvm::StringRef str) {
+void WireEncoder::WriteString(wpi::StringRef str) {
   // length
   size_t len = str.size();
   if (m_proto_rev < 0x0300u) {

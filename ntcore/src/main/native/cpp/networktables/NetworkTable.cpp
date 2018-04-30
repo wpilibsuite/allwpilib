@@ -9,9 +9,9 @@
 
 #include <algorithm>
 
-#include <llvm/SmallString.h>
-#include <llvm/StringMap.h>
-#include <llvm/raw_ostream.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringMap.h>
+#include <wpi/raw_ostream.h>
 
 #include "networktables/NetworkTableInstance.h"
 #include "ntcore.h"
@@ -38,19 +38,19 @@ StringRef NetworkTable::BasenameKey(StringRef key) {
 
 std::string NetworkTable::NormalizeKey(const Twine& key,
                                        bool withLeadingSlash) {
-  llvm::SmallString<128> buf;
+  wpi::SmallString<128> buf;
   return NormalizeKey(key, buf, withLeadingSlash);
 }
 
 StringRef NetworkTable::NormalizeKey(const Twine& key,
-                                     llvm::SmallVectorImpl<char>& buf,
+                                     wpi::SmallVectorImpl<char>& buf,
                                      bool withLeadingSlash) {
   buf.clear();
   if (withLeadingSlash) buf.push_back(PATH_SEPARATOR_CHAR);
   // for each path element, add it with a slash following
-  llvm::SmallString<128> keyBuf;
+  wpi::SmallString<128> keyBuf;
   StringRef keyStr = key.toStringRef(keyBuf);
-  llvm::SmallVector<StringRef, 16> parts;
+  wpi::SmallVector<StringRef, 16> parts;
   keyStr.split(parts, PATH_SEPARATOR_CHAR, -1, false);
   for (auto i = parts.begin(); i != parts.end(); ++i) {
     buf.append(i->begin(), i->end());
@@ -65,10 +65,10 @@ std::vector<std::string> NetworkTable::GetHierarchy(const Twine& key) {
   std::vector<std::string> hierarchy;
   hierarchy.emplace_back(1, PATH_SEPARATOR_CHAR);
   // for each path element, add it to the end of what we built previously
-  llvm::SmallString<128> keyBuf;
+  wpi::SmallString<128> keyBuf;
   StringRef keyStr = key.toStringRef(keyBuf);
-  llvm::SmallString<128> path;
-  llvm::SmallVector<StringRef, 16> parts;
+  wpi::SmallString<128> path;
+  wpi::SmallVector<StringRef, 16> parts;
   keyStr.split(parts, PATH_SEPARATOR_CHAR, -1, false);
   if (!parts.empty()) {
     for (auto i = parts.begin(); i != parts.end(); ++i) {
@@ -121,7 +121,7 @@ void NetworkTable::SetTeam(int team) {
 
 void NetworkTable::SetIPAddress(StringRef address) {
   auto inst = NetworkTableInstance::GetDefault();
-  llvm::SmallString<32> addr_copy{address};
+  wpi::SmallString<32> addr_copy{address};
   inst.SetServer(addr_copy.c_str(), s_port);
 
   // Stop the DS client if we're explicitly connecting to localhost
@@ -133,7 +133,7 @@ void NetworkTable::SetIPAddress(StringRef address) {
 
 void NetworkTable::SetIPAddress(ArrayRef<std::string> addresses) {
   auto inst = NetworkTableInstance::GetDefault();
-  llvm::SmallVector<StringRef, 8> servers;
+  wpi::SmallVector<StringRef, 8> servers;
   for (const auto& ip_address : addresses) servers.emplace_back(ip_address);
   inst.SetServer(servers, s_port);
 
@@ -201,7 +201,7 @@ NetworkTableInstance NetworkTable::GetInstance() const {
 }
 
 NetworkTableEntry NetworkTable::GetEntry(const Twine& key) const {
-  llvm::SmallString<128> keyBuf;
+  wpi::SmallString<128> keyBuf;
   StringRef keyStr = key.toStringRef(keyBuf);
   std::lock_guard<wpi::mutex> lock(m_mutex);
   NT_Entry& entry = m_entries[keyStr];
@@ -257,7 +257,7 @@ void NetworkTable::AddTableListener(ITableListener* listener,
 void NetworkTable::AddTableListenerEx(ITableListener* listener,
                                       unsigned int flags) {
   std::lock_guard<wpi::mutex> lock(m_mutex);
-  llvm::SmallString<128> path(m_path);
+  wpi::SmallString<128> path(m_path);
   path += PATH_SEPARATOR_CHAR;
   size_t prefix_len = path.size();
   NT_EntryListener id = nt::AddEntryListener(
@@ -304,7 +304,7 @@ void NetworkTable::AddSubTableListener(ITableListener* listener,
 
   // The lambda needs to be copyable, but StringMap is not, so use
   // a shared_ptr to it.
-  auto notified_tables = std::make_shared<llvm::StringMap<char>>();
+  auto notified_tables = std::make_shared<wpi::StringMap<char>>();
 
   unsigned int flags = NT_NOTIFY_NEW | NT_NOTIFY_IMMEDIATE;
   if (localNotify) flags |= NT_NOTIFY_LOCAL;

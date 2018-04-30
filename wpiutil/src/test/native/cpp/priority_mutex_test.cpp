@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <support/priority_mutex.h>  // NOLINT(build/include_order)
+#include <wpi/priority_mutex.h>  // NOLINT(build/include_order)
 
 #include <atomic>
 #include <condition_variable>

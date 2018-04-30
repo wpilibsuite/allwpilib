@@ -7,13 +7,13 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "llvm/StringRef.h"
-#include "llvm/Hashing.h"
-#include "llvm/SmallVector.h"
+#include "wpi/StringRef.h"
+#include "wpi/Hashing.h"
+#include "wpi/SmallVector.h"
 #include <bitset>
 #include <climits>
 
-using namespace llvm;
+using namespace wpi;
 
 // MSVC emits references to this into the translation units which reference it.
 #ifndef _MSC_VER
@@ -120,7 +120,7 @@ std::string StringRef::upper() const {
   return Result;
 }
 
-const char *StringRef::c_str(llvm::SmallVectorImpl<char>& buf) const {
+const char *StringRef::c_str(wpi::SmallVectorImpl<char>& buf) const {
   if (is_null_terminated()) {
     // If null terminated, return data directly
     return data();
@@ -379,7 +379,7 @@ static unsigned GetAutoSenseRadix(StringRef &Str) {
 
 /// GetAsUnsignedInteger - Workhorse method that converts a integer character
 /// sequence of radix up to 36 to an unsigned long long value.
-bool llvm::getAsUnsignedInteger(StringRef Str, unsigned Radix,
+bool wpi::getAsUnsignedInteger(StringRef Str, unsigned Radix,
                                 unsigned long long &Result) {
   // Autosense radix if not specified.
   if (Radix == 0)
@@ -420,7 +420,7 @@ bool llvm::getAsUnsignedInteger(StringRef Str, unsigned Radix,
   return false;
 }
 
-bool llvm::getAsSignedInteger(StringRef Str, unsigned Radix,
+bool wpi::getAsSignedInteger(StringRef Str, unsigned Radix,
                               long long &Result) {
   unsigned long long ULLVal;
 
@@ -447,6 +447,6 @@ bool llvm::getAsSignedInteger(StringRef Str, unsigned Radix,
 }
 
 // Implementation of StringRef hashing.
-hash_code llvm::hash_value(StringRef S) {
+hash_code wpi::hash_value(StringRef S) {
   return hash_combine_range(S.begin(), S.end());
 }

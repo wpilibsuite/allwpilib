@@ -14,11 +14,11 @@
 #include <string>
 #include <vector>
 
-#include <llvm/ArrayRef.h>
-#include <llvm/StringMap.h>
-#include <llvm/StringRef.h>
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/ArrayRef.h>
+#include <wpi/StringMap.h>
+#include <wpi/StringRef.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
 
 #include "Frame.h"
 #include "Image.h"
@@ -31,15 +31,15 @@ class SourceImpl {
   friend class Frame;
 
  public:
-  explicit SourceImpl(llvm::StringRef name);
+  explicit SourceImpl(wpi::StringRef name);
   virtual ~SourceImpl();
   SourceImpl(const SourceImpl& oth) = delete;
   SourceImpl& operator=(const SourceImpl& oth) = delete;
 
-  llvm::StringRef GetName() const { return m_name; }
+  wpi::StringRef GetName() const { return m_name; }
 
-  void SetDescription(llvm::StringRef description);
-  llvm::StringRef GetDescription(llvm::SmallVectorImpl<char>& buf) const;
+  void SetDescription(wpi::StringRef description);
+  wpi::StringRef GetDescription(wpi::SmallVectorImpl<char>& buf) const;
 
   void SetConnected(bool connected);
   bool IsConnected() const { return m_connected; }
@@ -90,23 +90,23 @@ class SourceImpl {
   void Wakeup();
 
   // Property functions
-  int GetPropertyIndex(llvm::StringRef name) const;
-  llvm::ArrayRef<int> EnumerateProperties(llvm::SmallVectorImpl<int>& vec,
-                                          CS_Status* status) const;
+  int GetPropertyIndex(wpi::StringRef name) const;
+  wpi::ArrayRef<int> EnumerateProperties(wpi::SmallVectorImpl<int>& vec,
+                                         CS_Status* status) const;
   CS_PropertyKind GetPropertyKind(int property) const;
-  llvm::StringRef GetPropertyName(int property,
-                                  llvm::SmallVectorImpl<char>& buf,
-                                  CS_Status* status) const;
+  wpi::StringRef GetPropertyName(int property,
+                                 wpi::SmallVectorImpl<char>& buf,
+                                 CS_Status* status) const;
   int GetProperty(int property, CS_Status* status) const;
   virtual void SetProperty(int property, int value, CS_Status* status) = 0;
   int GetPropertyMin(int property, CS_Status* status) const;
   int GetPropertyMax(int property, CS_Status* status) const;
   int GetPropertyStep(int property, CS_Status* status) const;
   int GetPropertyDefault(int property, CS_Status* status) const;
-  llvm::StringRef GetStringProperty(int property,
-                                    llvm::SmallVectorImpl<char>& buf,
-                                    CS_Status* status) const;
-  virtual void SetStringProperty(int property, llvm::StringRef value,
+  wpi::StringRef GetStringProperty(int property,
+                                   wpi::SmallVectorImpl<char>& buf,
+                                   CS_Status* status) const;
+  virtual void SetStringProperty(int property, wpi::StringRef value,
                                  CS_Status* status) = 0;
   std::vector<std::string> GetEnumPropertyChoices(int property,
                                                   CS_Status* status) const;
@@ -139,9 +139,9 @@ class SourceImpl {
 
  protected:
   void PutFrame(VideoMode::PixelFormat pixelFormat, int width, int height,
-                llvm::StringRef data, Frame::Time time);
+                wpi::StringRef data, Frame::Time time);
   void PutFrame(std::unique_ptr<Image> image, Frame::Time time);
-  void PutError(llvm::StringRef msg, Frame::Time time);
+  void PutError(wpi::StringRef msg, Frame::Time time);
 
   // Notification functions for corresponding atomics
   virtual void NumSinksChanged() = 0;
@@ -167,7 +167,7 @@ class SourceImpl {
   // properties that don't exist (as GetPropertyIndex can't fail).
   // Note: called with m_mutex held.
   virtual std::unique_ptr<PropertyImpl> CreateEmptyProperty(
-      llvm::StringRef name) const = 0;
+      wpi::StringRef name) const = 0;
 
   // Cache properties.  Implementations must return false and set status to
   // CS_SOURCE_IS_DISCONNECTED if not possible to cache.
@@ -177,11 +177,11 @@ class SourceImpl {
 
   // Update property value; must be called with m_mutex held.
   void UpdatePropertyValue(int property, bool setString, int value,
-                           llvm::StringRef valueStr);
+                           wpi::StringRef valueStr);
 
   // Cached properties and video modes (protected with m_mutex)
   mutable std::vector<std::unique_ptr<PropertyImpl>> m_propertyData;
-  mutable llvm::StringMap<int> m_properties;
+  mutable wpi::StringMap<int> m_properties;
   mutable std::vector<VideoMode> m_videoModes;
   // Current video mode
   mutable VideoMode m_mode;

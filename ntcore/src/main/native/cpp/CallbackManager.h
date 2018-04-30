@@ -16,11 +16,11 @@
 #include <utility>
 #include <vector>
 
-#include <llvm/raw_ostream.h>
-#include <support/SafeThread.h>
-#include <support/UidVector.h>
-#include <support/condition_variable.h>
-#include <support/mutex.h>
+#include <wpi/SafeThread.h>
+#include <wpi/UidVector.h>
+#include <wpi/condition_variable.h>
+#include <wpi/mutex.h>
+#include <wpi/raw_ostream.h>
 
 namespace nt {
 

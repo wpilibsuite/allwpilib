@@ -31,7 +31,7 @@ using namespace frc;
 PWM::PWM(int channel) {
   if (!SensorBase::CheckPWMChannel(channel)) {
     wpi_setWPIErrorWithContext(ChannelIndexOutOfRange,
-                               "PWM Channel " + llvm::Twine(channel));
+                               "PWM Channel " + wpi::Twine(channel));
     return;
   }
 

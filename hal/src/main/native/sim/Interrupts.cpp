@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <support/condition_variable.h>
+#include <wpi/condition_variable.h>
 
 #include "AnalogInternal.h"
 #include "DigitalInternal.h"

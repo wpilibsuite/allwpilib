@@ -11,7 +11,7 @@
 #include <functional>
 #include <memory>
 
-#include <llvm/StringRef.h>
+#include <wpi/StringRef.h>
 
 namespace nt {
 
@@ -19,7 +19,7 @@ class NetworkTable;
 class NetworkTableEntry;
 class Value;
 
-using llvm::StringRef;
+using wpi::StringRef;
 
 /**
  * A listener that listens to changes in values in a NetworkTable.

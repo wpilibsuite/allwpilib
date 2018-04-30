@@ -11,8 +11,8 @@
 
 #include <HAL/HAL.h>
 #include <HAL/SPI.h>
-#include <llvm/SmallVector.h>
-#include <support/mutex.h>
+#include <wpi/SmallVector.h>
+#include <wpi/mutex.h>
 
 #include "DigitalSource.h"
 #include "Notifier.h"
@@ -257,7 +257,7 @@ int SPI::Write(uint8_t* data, int size) {
 int SPI::Read(bool initiate, uint8_t* dataReceived, int size) {
   int retVal = 0;
   if (initiate) {
-    llvm::SmallVector<uint8_t, 32> dataToSend;
+    wpi::SmallVector<uint8_t, 32> dataToSend;
     dataToSend.resize(size);
     retVal = HAL_TransactionSPI(m_port, dataToSend.data(), dataReceived, size);
   } else {
@@ -311,7 +311,7 @@ void SPI::FreeAuto() {
  * @param dataToSend data to send (maximum 16 bytes)
  * @param zeroSize number of zeros to send after the data
  */
-void SPI::SetAutoTransmitData(llvm::ArrayRef<uint8_t> dataToSend,
+void SPI::SetAutoTransmitData(wpi::ArrayRef<uint8_t> dataToSend,
                               int zeroSize) {
   int32_t status = 0;
   HAL_SetSPIAutoTransmitData(m_port, dataToSend.data(), dataToSend.size(),

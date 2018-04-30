@@ -10,8 +10,8 @@
 #include <memory>
 #include <string>
 
-#include <support/deprecated.h>
-#include <support/mutex.h>
+#include <wpi/deprecated.h>
+#include <wpi/mutex.h>
 
 #include "Base.h"
 #include "Controller.h"

@@ -65,8 +65,8 @@ class VideoProperty {
 
   // String-specific functions
   std::string GetString() const;
-  llvm::StringRef GetString(llvm::SmallVectorImpl<char>& buf) const;
-  void SetString(llvm::StringRef value);
+  wpi::StringRef GetString(wpi::SmallVectorImpl<char>& buf) const;
+  void SetString(wpi::StringRef value);
 
   // Enum-specific functions
   std::vector<std::string> GetChoices() const;
@@ -133,7 +133,7 @@ class VideoSource {
   /// @param name Property name
   /// @return Property contents (of kind Property::kNone if no property with
   ///         the given name exists)
-  VideoProperty GetProperty(llvm::StringRef name);
+  VideoProperty GetProperty(wpi::StringRef name);
 
   /// Enumerate all properties of this source.
   std::vector<VideoProperty> EnumerateProperties() const;
@@ -255,12 +255,12 @@ class UsbCamera : public VideoCamera {
   /// Create a source for a USB camera based on device number.
   /// @param name Source name (arbitrary unique identifier)
   /// @param dev Device number (e.g. 0 for /dev/video0)
-  UsbCamera(llvm::StringRef name, int dev);
+  UsbCamera(wpi::StringRef name, int dev);
 
   /// Create a source for a USB camera based on device path.
   /// @param name Source name (arbitrary unique identifier)
   /// @param path Path to device (e.g. "/dev/video0" on Linux)
-  UsbCamera(llvm::StringRef name, llvm::StringRef path);
+  UsbCamera(wpi::StringRef name, wpi::StringRef path);
 
   /// Enumerate USB cameras on the local system.
   /// @return Vector of USB camera information (one for each camera)
@@ -284,28 +284,28 @@ class HttpCamera : public VideoCamera {
   /// @param name Source name (arbitrary unique identifier)
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
   /// @param kind Camera kind (e.g. kAxis)
-  HttpCamera(llvm::StringRef name, llvm::StringRef url,
+  HttpCamera(wpi::StringRef name, wpi::StringRef url,
              HttpCameraKind kind = kUnknown);
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
   /// @param kind Camera kind (e.g. kAxis)
-  HttpCamera(llvm::StringRef name, const char* url,
+  HttpCamera(wpi::StringRef name, const char* url,
              HttpCameraKind kind = kUnknown);
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param url Camera URL (e.g. "http://10.x.y.11/video/stream.mjpg")
   /// @param kind Camera kind (e.g. kAxis)
-  HttpCamera(llvm::StringRef name, const std::string& url,
+  HttpCamera(wpi::StringRef name, const std::string& url,
              HttpCameraKind kind = kUnknown);
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param urls Array of Camera URLs
   /// @param kind Camera kind (e.g. kAxis)
-  HttpCamera(llvm::StringRef name, llvm::ArrayRef<std::string> urls,
+  HttpCamera(wpi::StringRef name, wpi::ArrayRef<std::string> urls,
              HttpCameraKind kind = kUnknown);
 
   /// Create a source for a MJPEG-over-HTTP (IP) camera.
@@ -313,7 +313,7 @@ class HttpCamera : public VideoCamera {
   /// @param urls Array of Camera URLs
   /// @param kind Camera kind (e.g. kAxis)
   template <typename T>
-  HttpCamera(llvm::StringRef name, std::initializer_list<T> urls,
+  HttpCamera(wpi::StringRef name, std::initializer_list<T> urls,
              HttpCameraKind kind = kUnknown);
 
   /// Get the kind of HTTP camera.
@@ -322,7 +322,7 @@ class HttpCamera : public VideoCamera {
   HttpCameraKind GetHttpCameraKind() const;
 
   /// Change the URLs used to connect to the camera.
-  void SetUrls(llvm::ArrayRef<std::string> urls);
+  void SetUrls(wpi::ArrayRef<std::string> urls);
 
   /// Change the URLs used to connect to the camera.
   template <typename T>
@@ -334,8 +334,8 @@ class HttpCamera : public VideoCamera {
 
 /// A source that represents an Axis IP camera.
 class AxisCamera : public HttpCamera {
-  static std::string HostToUrl(llvm::StringRef host);
-  static std::vector<std::string> HostToUrl(llvm::ArrayRef<std::string> hosts);
+  static std::string HostToUrl(wpi::StringRef host);
+  static std::vector<std::string> HostToUrl(wpi::ArrayRef<std::string> hosts);
   template <typename T>
   static std::vector<std::string> HostToUrl(std::initializer_list<T> hosts);
 
@@ -344,32 +344,32 @@ class AxisCamera : public HttpCamera {
   /// @param name Source name (arbitrary unique identifier)
   /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
   /// @param kind Camera kind (e.g. kAxis)
-  AxisCamera(llvm::StringRef name, llvm::StringRef host);
+  AxisCamera(wpi::StringRef name, wpi::StringRef host);
 
   /// Create a source for an Axis IP camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
   /// @param kind Camera kind (e.g. kAxis)
-  AxisCamera(llvm::StringRef name, const char* host);
+  AxisCamera(wpi::StringRef name, const char* host);
 
   /// Create a source for an Axis IP camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param host Camera host IP or DNS name (e.g. "10.x.y.11")
   /// @param kind Camera kind (e.g. kAxis)
-  AxisCamera(llvm::StringRef name, const std::string& host);
+  AxisCamera(wpi::StringRef name, const std::string& host);
 
   /// Create a source for an Axis IP camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param hosts Array of Camera host IPs/DNS names
   /// @param kind Camera kind (e.g. kAxis)
-  AxisCamera(llvm::StringRef name, llvm::ArrayRef<std::string> hosts);
+  AxisCamera(wpi::StringRef name, wpi::ArrayRef<std::string> hosts);
 
   /// Create a source for an Axis IP camera.
   /// @param name Source name (arbitrary unique identifier)
   /// @param hosts Array of Camera host IPs/DNS names
   /// @param kind Camera kind (e.g. kAxis)
   template <typename T>
-  AxisCamera(llvm::StringRef name, std::initializer_list<T> hosts);
+  AxisCamera(wpi::StringRef name, std::initializer_list<T> hosts);
 };
 
 /// A source for user code to provide OpenCV images as video frames.
@@ -380,7 +380,7 @@ class CvSource : public VideoSource {
   /// Create an OpenCV source.
   /// @param name Source name (arbitrary unique identifier)
   /// @param mode Video mode being generated
-  CvSource(llvm::StringRef name, const VideoMode& mode);
+  CvSource(wpi::StringRef name, const VideoMode& mode);
 
   /// Create an OpenCV source.
   /// @param name Source name (arbitrary unique identifier)
@@ -388,7 +388,7 @@ class CvSource : public VideoSource {
   /// @param width width
   /// @param height height
   /// @param fps fps
-  CvSource(llvm::StringRef name, VideoMode::PixelFormat pixelFormat, int width,
+  CvSource(wpi::StringRef name, VideoMode::PixelFormat pixelFormat, int width,
            int height, int fps);
 
   /// Put an OpenCV image and notify sinks.
@@ -400,7 +400,7 @@ class CvSource : public VideoSource {
 
   /// Signal sinks that an error has occurred.  This should be called instead
   /// of NotifyFrame when an error occurs.
-  void NotifyError(llvm::StringRef msg);
+  void NotifyError(wpi::StringRef msg);
 
   /// Set source connection status.  Defaults to true.
   /// @param connected True for connected, false for disconnected
@@ -408,7 +408,7 @@ class CvSource : public VideoSource {
 
   /// Set source description.
   /// @param description Description
-  void SetDescription(llvm::StringRef description);
+  void SetDescription(wpi::StringRef description);
 
   /// Create a property.
   /// @param name Property name
@@ -419,7 +419,7 @@ class CvSource : public VideoSource {
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateProperty(llvm::StringRef name, VideoProperty::Kind kind,
+  VideoProperty CreateProperty(wpi::StringRef name, VideoProperty::Kind kind,
                                int minimum, int maximum, int step,
                                int defaultValue, int value);
 
@@ -431,7 +431,7 @@ class CvSource : public VideoSource {
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateIntegerProperty(llvm::StringRef name, int minimum,
+  VideoProperty CreateIntegerProperty(wpi::StringRef name, int minimum,
                                       int maximum, int step, int defaultValue,
                                       int value);
 
@@ -440,7 +440,7 @@ class CvSource : public VideoSource {
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateBooleanProperty(llvm::StringRef name, bool defaultValue,
+  VideoProperty CreateBooleanProperty(wpi::StringRef name, bool defaultValue,
                                       bool value);
 
   /// Create a string property.
@@ -448,14 +448,14 @@ class CvSource : public VideoSource {
   /// @param defaultValue Default value
   /// @param value Current value
   /// @return Property
-  VideoProperty CreateStringProperty(llvm::StringRef name,
-                                     llvm::StringRef value);
+  VideoProperty CreateStringProperty(wpi::StringRef name,
+                                     wpi::StringRef value);
 
   /// Configure enum property choices.
   /// @param property Property
   /// @param choices Choices
   void SetEnumPropertyChoices(const VideoProperty& property,
-                              llvm::ArrayRef<std::string> choices);
+                              wpi::ArrayRef<std::string> choices);
 
   /// Configure enum property choices.
   /// @param property Property
@@ -517,7 +517,7 @@ class VideoSink {
   /// @param name Property name
   /// @return Property (kind Property::kNone if no property with
   ///         the given name exists or no source connected)
-  VideoProperty GetSourceProperty(llvm::StringRef name);
+  VideoProperty GetSourceProperty(wpi::StringRef name);
 
   CS_Status GetLastStatus() const { return m_status; }
 
@@ -547,12 +547,12 @@ class MjpegServer : public VideoSink {
   /// @param name Sink name (arbitrary unique identifier)
   /// @param listenAddress TCP listen address (empty string for all addresses)
   /// @param port TCP port number
-  MjpegServer(llvm::StringRef name, llvm::StringRef listenAddress, int port);
+  MjpegServer(wpi::StringRef name, wpi::StringRef listenAddress, int port);
 
   /// Create a MJPEG-over-HTTP server sink.
   /// @param name Sink name (arbitrary unique identifier)
   /// @param port TCP port number
-  MjpegServer(llvm::StringRef name, int port) : MjpegServer(name, "", port) {}
+  MjpegServer(wpi::StringRef name, int port) : MjpegServer(name, "", port) {}
 
   /// Get the listen address of the server.
   std::string GetListenAddress() const;
@@ -570,7 +570,7 @@ class CvSink : public VideoSink {
   /// WaitForFrame() must be called on the created sink to get each new
   /// image.
   /// @param name Source name (arbitrary unique identifier)
-  explicit CvSink(llvm::StringRef name);
+  explicit CvSink(wpi::StringRef name);
 
   /// Create a sink for accepting OpenCV images in a separate thread.
   /// A thread will be created that calls WaitForFrame() and calls the
@@ -580,11 +580,11 @@ class CvSink : public VideoSink {
   ///        time=0 if an error occurred.  processFrame should call GetImage()
   ///        or GetError() as needed, but should not call (except in very
   ///        unusual circumstances) WaitForImage().
-  CvSink(llvm::StringRef name, std::function<void(uint64_t time)> processFrame);
+  CvSink(wpi::StringRef name, std::function<void(uint64_t time)> processFrame);
 
   /// Set sink description.
   /// @param description Description
-  void SetDescription(llvm::StringRef description);
+  void SetDescription(wpi::StringRef description);
 
   /// Wait for the next frame and get the image.
   /// Times out (returning 0) after timeout seconds.

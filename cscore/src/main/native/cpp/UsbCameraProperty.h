@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include <support/mutex.h>
+#include <wpi/mutex.h>
 
 #include "PropertyImpl.h"
 
@@ -24,10 +24,10 @@ namespace cs {
 class UsbCameraProperty : public PropertyImpl {
  public:
   UsbCameraProperty() = default;
-  explicit UsbCameraProperty(llvm::StringRef name_) : PropertyImpl{name_} {}
+  explicit UsbCameraProperty(wpi::StringRef name_) : PropertyImpl{name_} {}
 
   // Normalized property constructor
-  UsbCameraProperty(llvm::StringRef name_, int rawIndex_,
+  UsbCameraProperty(wpi::StringRef name_, int rawIndex_,
                     const UsbCameraProperty& rawProp, int defaultValue_,
                     int value_)
       : PropertyImpl(name_, rawProp.propKind, 1, defaultValue_, value_),
@@ -52,7 +52,7 @@ class UsbCameraProperty : public PropertyImpl {
   bool DeviceGet(std::unique_lock<wpi::mutex>& lock, int fd);
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd) const;
   bool DeviceSet(std::unique_lock<wpi::mutex>& lock, int fd, int newValue,
-                 llvm::StringRef newValueStr) const;
+                 wpi::StringRef newValueStr) const;
 #endif
 
   // If this is a percentage (rather than raw) property

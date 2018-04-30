@@ -12,11 +12,11 @@
 #include <HAL/HAL.h>
 #include <HAL/Power.h>
 #include <HAL/cpp/Log.h>
-#include <llvm/SmallString.h>
-#include <llvm/StringRef.h>
 #include <networktables/NetworkTable.h>
 #include <networktables/NetworkTableEntry.h>
 #include <networktables/NetworkTableInstance.h>
+#include <wpi/SmallString.h>
+#include <wpi/StringRef.h>
 
 #include "AnalogInput.h"
 #include "MotorSafetyHelper.h"
@@ -96,8 +96,8 @@ DriverStation& DriverStation::GetInstance() {
  *
  * The error is also printed to the program console.
  */
-void DriverStation::ReportError(const llvm::Twine& error) {
-  llvm::SmallString<128> temp;
+void DriverStation::ReportError(const wpi::Twine& error) {
+  wpi::SmallString<128> temp;
   HAL_SendError(1, 1, 0, error.toNullTerminatedStringRef(temp).data(), "", "",
                 1);
 }
@@ -107,8 +107,8 @@ void DriverStation::ReportError(const llvm::Twine& error) {
  *
  * The warning is also printed to the program console.
  */
-void DriverStation::ReportWarning(const llvm::Twine& error) {
-  llvm::SmallString<128> temp;
+void DriverStation::ReportWarning(const wpi::Twine& error) {
+  wpi::SmallString<128> temp;
   HAL_SendError(0, 1, 0, error.toNullTerminatedStringRef(temp).data(), "", "",
                 1);
 }
@@ -119,12 +119,12 @@ void DriverStation::ReportWarning(const llvm::Twine& error) {
  * The error is also printed to the program console.
  */
 void DriverStation::ReportError(bool isError, int32_t code,
-                                const llvm::Twine& error,
-                                const llvm::Twine& location,
-                                const llvm::Twine& stack) {
-  llvm::SmallString<128> errorTemp;
-  llvm::SmallString<128> locationTemp;
-  llvm::SmallString<128> stackTemp;
+                                const wpi::Twine& error,
+                                const wpi::Twine& location,
+                                const wpi::Twine& stack) {
+  wpi::SmallString<128> errorTemp;
+  wpi::SmallString<128> locationTemp;
+  wpi::SmallString<128> stackTemp;
   HAL_SendError(isError, code, 0,
                 error.toNullTerminatedStringRef(errorTemp).data(),
                 location.toNullTerminatedStringRef(locationTemp).data(),
@@ -853,7 +853,7 @@ DriverStation::DriverStation() {
  * Reports errors related to unplugged joysticks
  * Throttles the errors so that they don't overwhelm the DS
  */
-void DriverStation::ReportJoystickUnpluggedError(const llvm::Twine& message) {
+void DriverStation::ReportJoystickUnpluggedError(const wpi::Twine& message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportError(message);
@@ -866,7 +866,7 @@ void DriverStation::ReportJoystickUnpluggedError(const llvm::Twine& message) {
  *
  * Throttles the errors so that they don't overwhelm the DS.
  */
-void DriverStation::ReportJoystickUnpluggedWarning(const llvm::Twine& message) {
+void DriverStation::ReportJoystickUnpluggedWarning(const wpi::Twine& message) {
   double currentTime = Timer::GetFPGATimestamp();
   if (currentTime > m_nextMessageTime) {
     ReportWarning(message);
