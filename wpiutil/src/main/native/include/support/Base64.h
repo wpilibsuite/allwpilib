@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_BASE64_H_
-#define WPIUTIL_SUPPORT_BASE64_H_
+#ifndef ALLWPILIB_SUPPORT_BASE64_H_
+#define ALLWPILIB_SUPPORT_BASE64_H_
 
 #include <cstddef>
 #include <string>
@@ -37,4 +37,4 @@ llvm::StringRef Base64Encode(llvm::StringRef plain,
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_BASE64_H_
+#endif  // ALLWPILIB_SUPPORT_BASE64_H_

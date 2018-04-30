@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_NETWORKLISTENER_H_
-#define CSCORE_NETWORKLISTENER_H_
+#ifndef ALLWPILIB_NETWORKLISTENER_H_
+#define ALLWPILIB_NETWORKLISTENER_H_
 
 #include <support/SafeThread.h>
 
@@ -32,4 +32,4 @@ class NetworkListener {
 
 }  // namespace cs
 
-#endif  // CSCORE_NETWORKLISTENER_H_
+#endif  // ALLWPILIB_NETWORKLISTENER_H_

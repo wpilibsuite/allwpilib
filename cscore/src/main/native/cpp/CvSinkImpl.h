@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_CVSINKIMPL_H_
-#define CSCORE_CVSINKIMPL_H_
+#ifndef ALLWPILIB_CVSINKIMPL_H_
+#define ALLWPILIB_CVSINKIMPL_H_
 
 #include <atomic>
 #include <memory>
@@ -49,4 +49,4 @@ class CvSinkImpl : public SinkImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_CVSINKIMPL_H_
+#endif  // ALLWPILIB_CVSINKIMPL_H_

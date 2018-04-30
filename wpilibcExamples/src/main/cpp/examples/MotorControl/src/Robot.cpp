@@ -18,12 +18,12 @@
  * range from -1 to 1 making it easy to work together.
  */
 class Robot : public frc::IterativeRobot {
-public:
-	void TeleopPeriodic() override { m_motor.Set(m_stick.GetY()); }
+ public:
+  void TeleopPeriodic() override { m_motor.Set(m_stick.GetY()); }
 
-private:
-	frc::Joystick m_stick{0};
-	frc::Spark m_motor{0};
+ private:
+  frc::Joystick m_stick{0};
+  frc::Spark m_motor{0};
 };
 
 START_ROBOT_CLASS(Robot)

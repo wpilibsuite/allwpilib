@@ -18,13 +18,13 @@ import edu.wpi.first.wpilibj.examples.pacgoat.Robot;
  * detect that.
  */
 public class CloseClaw extends InstantCommand {
-	public CloseClaw() {
-		requires(Robot.collector);
-	}
+  public CloseClaw() {
+    requires(Robot.collector);
+  }
 
-	// Called just before this Command runs the first time
-	@Override
-	protected void initialize() {
-		Robot.collector.close();
-	}
+  // Called just before this Command runs the first time
+  @Override
+  protected void initialize() {
+    Robot.collector.close();
+  }
 }

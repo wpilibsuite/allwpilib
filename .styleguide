@@ -39,7 +39,6 @@ licenseUpdateExclude {
 
 modifiableFileExclude {
   shared/arm-linux-jni/
-  hal/src/main/native/cpp/jni/
   \.patch$
   \.png$
   \.py$

@@ -21,8 +21,8 @@
    limitations under the License
 */
 
-#ifndef WPIUTIL_TCPSOCKETS_TCPCONNECTOR_H_
-#define WPIUTIL_TCPSOCKETS_TCPCONNECTOR_H_
+#ifndef ALLWPILIB_TCPSOCKETS_TCPCONNECTOR_H_
+#define ALLWPILIB_TCPSOCKETS_TCPCONNECTOR_H_
 
 #include <memory>
 #include <utility>
@@ -46,4 +46,4 @@ class TCPConnector {
 
 }  // namespace wpi
 
-#endif  // WPIUTIL_TCPSOCKETS_TCPCONNECTOR_H_
+#endif  // ALLWPILIB_TCPSOCKETS_TCPCONNECTOR_H_

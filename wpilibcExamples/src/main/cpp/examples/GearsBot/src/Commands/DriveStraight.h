@@ -19,26 +19,26 @@
  * values of the left and right encoders.
  */
 class DriveStraight : public frc::Command {
-public:
-	explicit DriveStraight(double distance);
-	void Initialize() override;
-	bool IsFinished() override;
-	void End() override;
+ public:
+  explicit DriveStraight(double distance);
+  void Initialize() override;
+  bool IsFinished() override;
+  void End() override;
 
-	class DriveStraightPIDSource : public frc::PIDSource {
-	public:
-		virtual ~DriveStraightPIDSource() = default;
-		double PIDGet() override;
-	};
+  class DriveStraightPIDSource : public frc::PIDSource {
+   public:
+    virtual ~DriveStraightPIDSource() = default;
+    double PIDGet() override;
+  };
 
-	class DriveStraightPIDOutput : public frc::PIDOutput {
-	public:
-		virtual ~DriveStraightPIDOutput() = default;
-		void PIDWrite(double d) override;
-	};
+  class DriveStraightPIDOutput : public frc::PIDOutput {
+   public:
+    virtual ~DriveStraightPIDOutput() = default;
+    void PIDWrite(double d) override;
+  };
 
-private:
-	DriveStraightPIDSource m_source;
-	DriveStraightPIDOutput m_output;
-	frc::PIDController m_pid{4, 0, 0, &m_source, &m_output};
+ private:
+  DriveStraightPIDSource m_source;
+  DriveStraightPIDOutput m_output;
+  frc::PIDController m_pid{4, 0, 0, &m_source, &m_output};
 };

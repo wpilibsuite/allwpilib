@@ -28,23 +28,23 @@
  * instead if you're new.
  */
 class Robot : public frc::SampleRobot {
-public:
-	Robot();
+ public:
+  Robot();
 
-	void RobotInit() override;
-	void Autonomous() override;
-	void OperatorControl() override;
-	void Test() override;
+  void RobotInit() override;
+  void Autonomous() override;
+  void OperatorControl() override;
+  void Test() override;
 
-private:
-	// Robot drive system
-	frc::Spark m_leftMotor{0};
-	frc::Spark m_rightMotor{1};
-	frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
+ private:
+  // Robot drive system
+  frc::Spark m_leftMotor{0};
+  frc::Spark m_rightMotor{1};
+  frc::DifferentialDrive m_robotDrive{m_leftMotor, m_rightMotor};
 
-	frc::Joystick m_stick{0};
+  frc::Joystick m_stick{0};
 
-	frc::SendableChooser<std::string> m_chooser;
-	const std::string kAutoNameDefault = "Default";
-	const std::string kAutoNameCustom = "My Auto";
+  frc::SendableChooser<std::string> m_chooser;
+  const std::string kAutoNameDefault = "Default";
+  const std::string kAutoNameCustom = "My Auto";
 };

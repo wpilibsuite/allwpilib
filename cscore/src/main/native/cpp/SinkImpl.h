@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_SINKIMPL_H_
-#define CSCORE_SINKIMPL_H_
+#ifndef ALLWPILIB_SINKIMPL_H_
+#define ALLWPILIB_SINKIMPL_H_
 
 #include <memory>
 #include <string>
@@ -60,4 +60,4 @@ class SinkImpl {
 
 }  // namespace cs
 
-#endif  // CSCORE_SINKIMPL_H_
+#endif  // ALLWPILIB_SINKIMPL_H_

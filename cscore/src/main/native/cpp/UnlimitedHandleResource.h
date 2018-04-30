@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_UNLIMITEDHANDLERESOURCE_H_
-#define CSCORE_UNLIMITEDHANDLERESOURCE_H_
+#ifndef ALLWPILIB_UNLIMITEDHANDLERESOURCE_H_
+#define ALLWPILIB_UNLIMITEDHANDLERESOURCE_H_
 
 #include <memory>
 #include <utility>
@@ -179,4 +179,4 @@ class StaticUnlimitedHandleResource
 
 }  // namespace cs
 
-#endif  // CSCORE_UNLIMITEDHANDLERESOURCE_H_
+#endif  // ALLWPILIB_UNLIMITEDHANDLERESOURCE_H_

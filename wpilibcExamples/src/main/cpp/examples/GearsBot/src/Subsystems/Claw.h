@@ -17,35 +17,35 @@
  * motors don't stall.
  */
 class Claw : public frc::Subsystem {
-public:
-	Claw();
+ public:
+  Claw();
 
-	void InitDefaultCommand() override;
+  void InitDefaultCommand() override;
 
-	/**
-	 * Set the claw motor to move in the open direction.
-	 */
-	void Open();
+  /**
+   * Set the claw motor to move in the open direction.
+   */
+  void Open();
 
-	/**
-	 * Set the claw motor to move in the close direction.
-	 */
-	void Close();
+  /**
+   * Set the claw motor to move in the close direction.
+   */
+  void Close();
 
-	/**
-	 * Stops the claw motor from moving.
-	 */
-	void Stop();
+  /**
+   * Stops the claw motor from moving.
+   */
+  void Stop();
 
-	/**
-	 * Return true when the robot is grabbing an object hard enough
-	 * to trigger the limit switch.
-	 */
-	bool IsGripping();
+  /**
+   * Return true when the robot is grabbing an object hard enough
+   * to trigger the limit switch.
+   */
+  bool IsGripping();
 
-	void Log();
+  void Log();
 
-private:
-	frc::Spark m_motor{7};
-	frc::DigitalInput m_contact{5};
+ private:
+  frc::Spark m_motor{7};
+  frc::DigitalInput m_contact{5};
 };

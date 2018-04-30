@@ -1,12 +1,12 @@
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) FIRST 2017-2018. All Rights Reserved.                        */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef NTCORE_IENTRYNOTIFIER_H_
-#define NTCORE_IENTRYNOTIFIER_H_
+#ifndef ALLWPILIB_IENTRYNOTIFIER_H_
+#define ALLWPILIB_IENTRYNOTIFIER_H_
 
 #include <climits>
 #include <memory>
@@ -42,4 +42,4 @@ class IEntryNotifier {
 
 }  // namespace nt
 
-#endif  // NTCORE_IENTRYNOTIFIER_H_
+#endif  // ALLWPILIB_IENTRYNOTIFIER_H_

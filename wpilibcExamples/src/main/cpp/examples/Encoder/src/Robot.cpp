@@ -26,69 +26,67 @@
  *   autonomous mode.
  */
 class Robot : public frc::IterativeRobot {
-public:
-	Robot() {
-		/* Defines the number of samples to average when determining the
-		 * rate.
-		 * On a quadrature encoder, values range from 1-255; larger
-		 * values
-		 *   result in smoother but potentially less accurate rates than
-		 * lower
-		 *   values.
-		 */
-		m_encoder.SetSamplesToAverage(5);
+ public:
+  Robot() {
+    /* Defines the number of samples to average when determining the
+     * rate.
+     * On a quadrature encoder, values range from 1-255; larger
+     * values
+     *   result in smoother but potentially less accurate rates than
+     * lower
+     *   values.
+     */
+    m_encoder.SetSamplesToAverage(5);
 
-		/* Defines how far the mechanism attached to the encoder moves
-		 * per pulse.
-		 * In this case, we assume that a 360 count encoder is directly
-		 * attached
-		 * to a 3 inch diameter (1.5inch radius) wheel, and that we want
-		 * to
-		 * measure distance in inches.
-		 */
-		m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5);
+    /* Defines how far the mechanism attached to the encoder moves
+     * per pulse.
+     * In this case, we assume that a 360 count encoder is directly
+     * attached
+     * to a 3 inch diameter (1.5inch radius) wheel, and that we want
+     * to
+     * measure distance in inches.
+     */
+    m_encoder.SetDistancePerPulse(1.0 / 360.0 * 2.0 * 3.1415 * 1.5);
 
-		/* Defines the lowest rate at which the encoder will not be
-		 * considered
-		 *   stopped, for the purposes of the GetStopped() method.
-		 * Units are in distance / second, where distance refers to the
-		 * units
-		 *   of distance that you are using, in this case inches.
-		 */
-		m_encoder.SetMinRate(1.0);
-	}
+    /* Defines the lowest rate at which the encoder will not be
+     * considered
+     *   stopped, for the purposes of the GetStopped() method.
+     * Units are in distance / second, where distance refers to the
+     * units
+     *   of distance that you are using, in this case inches.
+     */
+    m_encoder.SetMinRate(1.0);
+  }
 
-	void TeleopPeriodic() override {
-		// Retrieve the net displacement of the Encoder since the last
-		// Reset.
-		frc::SmartDashboard::PutNumber(
-				"Encoder Distance", m_encoder.GetDistance());
+  void TeleopPeriodic() override {
+    // Retrieve the net displacement of the Encoder since the last
+    // Reset.
+    frc::SmartDashboard::PutNumber("Encoder Distance", m_encoder.GetDistance());
 
-		// Retrieve the current rate of the encoder.
-		frc::SmartDashboard::PutNumber(
-				"Encoder Rate", m_encoder.GetRate());
-	}
+    // Retrieve the current rate of the encoder.
+    frc::SmartDashboard::PutNumber("Encoder Rate", m_encoder.GetRate());
+  }
 
-private:
-	/**
-	 * The Encoder object is constructed with 4 parameters, the last two
-	 * being
-	 *   optional.
-	 * The first two parameters (1, 2 in this case) refer to the ports on
-	 * the
-	 *   roboRIO which the encoder uses. Because a quadrature encoder has
-	 *   two signal wires, the signal from two DIO ports on the roboRIO are
-	 * used.
-	 * The third (optional) parameter is a boolean which defaults to false.
-	 *   If you set this parameter to true, the direction of the encoder
-	 * will
-	 *   be reversed, in case it makes more sense mechanically.
-	 * The final (optional) parameter specifies encoding rate (k1X, k2X, or
-	 * k4X)
-	 *   and defaults to k4X. Faster (k4X) encoding gives greater positional
-	 *   precision but more noise in the rate.
-	 */
-	frc::Encoder m_encoder{1, 2, false, Encoder::k4X};
+ private:
+  /**
+   * The Encoder object is constructed with 4 parameters, the last two
+   * being
+   *   optional.
+   * The first two parameters (1, 2 in this case) refer to the ports on
+   * the
+   *   roboRIO which the encoder uses. Because a quadrature encoder has
+   *   two signal wires, the signal from two DIO ports on the roboRIO are
+   * used.
+   * The third (optional) parameter is a boolean which defaults to false.
+   *   If you set this parameter to true, the direction of the encoder
+   * will
+   *   be reversed, in case it makes more sense mechanically.
+   * The final (optional) parameter specifies encoding rate (k1X, k2X, or
+   * k4X)
+   *   and defaults to k4X. Faster (k4X) encoding gives greater positional
+   *   precision but more noise in the rate.
+   */
+  frc::Encoder m_encoder{1, 2, false, Encoder::k4X};
 };
 
 START_ROBOT_CLASS(Robot)

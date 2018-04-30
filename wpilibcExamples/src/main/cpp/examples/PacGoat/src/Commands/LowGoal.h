@@ -14,6 +14,6 @@
  * it.
  */
 class LowGoal : public frc::CommandGroup {
-public:
-	LowGoal();
+ public:
+  LowGoal();
 };

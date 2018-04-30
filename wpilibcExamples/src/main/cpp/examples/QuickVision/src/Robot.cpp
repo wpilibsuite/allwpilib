@@ -17,15 +17,15 @@
  * RobotInit() method in your program.
  */
 class Robot : public frc::IterativeRobot {
-public:
-	void RobotInit() override {
+ public:
+  void RobotInit() override {
 #if defined(__linux__)
-		CameraServer::GetInstance()->StartAutomaticCapture();
+    CameraServer::GetInstance()->StartAutomaticCapture();
 #else
-		llvm::errs() << "Vision only available on Linux.\n";
-		llvm::errs().flush();
+    llvm::errs() << "Vision only available on Linux.\n";
+    llvm::errs().flush();
 #endif
-	}
+  }
 };
 
 START_ROBOT_CLASS(Robot)

@@ -388,7 +388,7 @@ void UsbCameraImpl::CameraThreadMain() {
         DeviceStreamOff();
         DeviceDisconnect();
         notified = true;  // device wasn't deleted, just error'ed
-        continue;  // will reconnect
+        continue;         // will reconnect
       }
 
       if ((buf.flags & V4L2_BUF_FLAG_ERROR) == 0) {
@@ -414,7 +414,7 @@ void UsbCameraImpl::CameraThreadMain() {
         DeviceStreamOff();
         DeviceDisconnect();
         notified = true;  // device wasn't deleted, just error'ed
-        continue;  // will reconnect
+        continue;         // will reconnect
       }
     }
   }

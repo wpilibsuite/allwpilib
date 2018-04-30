@@ -93,9 +93,9 @@ bool JpegNeedsDHT(const char* data, size_t* size, size_t* locSOF) {
   for (;;) {
     if (sdata.size() < 4) return false;  // EOF
     bytes = sdata.bytes_begin();
-    if (bytes[0] != 0xff) return false;  // not a tag
-    if (bytes[1] == 0xda) break;  // SOS
-    if (bytes[1] == 0xc4) return false;  // DHT
+    if (bytes[0] != 0xff) return false;                   // not a tag
+    if (bytes[1] == 0xda) break;                          // SOS
+    if (bytes[1] == 0xc4) return false;                   // DHT
     if (bytes[1] == 0xc0) *locSOF = sdata.data() - data;  // SOF
     // Go to the next block
     sdata = sdata.substr(bytes[2] * 256 + bytes[3] + 2);

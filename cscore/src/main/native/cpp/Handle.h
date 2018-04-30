@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef CSCORE_HANDLE_H_
-#define CSCORE_HANDLE_H_
+#ifndef ALLWPILIB_HANDLE_H_
+#define ALLWPILIB_HANDLE_H_
 
 #include <atomic>
 #include <memory>
@@ -121,4 +121,4 @@ class Sinks : public UnlimitedHandleResource<Handle, SinkData, Handle::kSink> {
 
 }  // namespace cs
 
-#endif  // CSCORE_HANDLE_H_
+#endif  // ALLWPILIB_HANDLE_H_

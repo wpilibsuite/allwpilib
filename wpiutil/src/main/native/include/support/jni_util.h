@@ -5,8 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#ifndef WPIUTIL_SUPPORT_JNI_UTIL_H_
-#define WPIUTIL_SUPPORT_JNI_UTIL_H_
+#ifndef ALLWPILIB_SUPPORT_JNI_UTIL_H_
+#define ALLWPILIB_SUPPORT_JNI_UTIL_H_
 
 #include <jni.h>
 
@@ -46,8 +46,6 @@ std::string GetJavaStackTrace(JNIEnv* env, std::string* func) {
       excludeFuncPrefix == nullptr ? llvm::StringRef() : excludeFuncPrefix);
 }
 
-
-
 // Finds a class and keep it as a global reference.
 // Use with caution, as the destructor does NOT call DeleteGlobalRef due
 // to potential shutdown issues with doing so.
@@ -75,7 +73,7 @@ class JClass {
   jclass m_cls = nullptr;
 };
 
-template<typename T>
+template <typename T>
 class JGlobal {
  public:
   JGlobal() = default;
@@ -636,4 +634,4 @@ class JException : public JClass {
 }  // namespace java
 }  // namespace wpi
 
-#endif  // WPIUTIL_SUPPORT_JNI_UTIL_H_
+#endif  // ALLWPILIB_SUPPORT_JNI_UTIL_H_

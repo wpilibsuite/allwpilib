@@ -19,26 +19,26 @@
  * encoders.
  */
 class SetDistanceToBox : public frc::Command {
-public:
-	explicit SetDistanceToBox(double distance);
-	void Initialize() override;
-	bool IsFinished() override;
-	void End() override;
+ public:
+  explicit SetDistanceToBox(double distance);
+  void Initialize() override;
+  bool IsFinished() override;
+  void End() override;
 
-	class SetDistanceToBoxPIDSource : public frc::PIDSource {
-	public:
-		virtual ~SetDistanceToBoxPIDSource() = default;
-		double PIDGet() override;
-	};
+  class SetDistanceToBoxPIDSource : public frc::PIDSource {
+   public:
+    virtual ~SetDistanceToBoxPIDSource() = default;
+    double PIDGet() override;
+  };
 
-	class SetDistanceToBoxPIDOutput : public frc::PIDOutput {
-	public:
-		virtual ~SetDistanceToBoxPIDOutput() = default;
-		void PIDWrite(double d) override;
-	};
+  class SetDistanceToBoxPIDOutput : public frc::PIDOutput {
+   public:
+    virtual ~SetDistanceToBoxPIDOutput() = default;
+    void PIDWrite(double d) override;
+  };
 
-private:
-	SetDistanceToBoxPIDSource m_source;
-	SetDistanceToBoxPIDOutput m_output;
-	frc::PIDController m_pid{-2, 0, 0, &m_source, &m_output};
+ private:
+  SetDistanceToBoxPIDSource m_source;
+  SetDistanceToBoxPIDOutput m_output;
+  frc::PIDController m_pid{-2, 0, 0, &m_source, &m_output};
 };
