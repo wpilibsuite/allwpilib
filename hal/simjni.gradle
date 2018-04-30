@@ -86,10 +86,9 @@ void SimOnUnload(JavaVM * vm, void* reserved) {
 }
 }
 
-//TODO: Add this back in
-//static void ThrowSimException(JNIEnv* env) {
+static void ThrowSimException(JNIEnv* env) {
 
-//}
+}
 '''
             out.println 'extern "C" {'
             symbolList.each {

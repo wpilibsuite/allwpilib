@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj;
 
 import edu.wpi.first.wpilibj.hal.AnalogJNI;
 import edu.wpi.first.wpilibj.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.wpilibj.sim.AnalogInSim;
 import edu.wpi.first.wpilibj.hal.HAL;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.util.AllocationException;
@@ -349,5 +350,9 @@ public class AnalogInput extends SensorBase implements PIDSource, Sendable {
   public void initSendable(SendableBuilder builder) {
     builder.setSmartDashboardType("Analog Input");
     builder.addDoubleProperty("Value", this::getAverageVoltage, null);
+  }
+
+  public AnalogInSim getSimObject() {
+    return new AnalogInSim(m_channel);
   }
 }
