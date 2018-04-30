@@ -10,7 +10,6 @@
 #include <support/mutex.h>
 
 #include "HAL/ChipObject.h"
-#include "HAL/DIO.h"
 #include "HAL/Types.h"
 
 namespace hal {
@@ -42,10 +41,10 @@ struct DIOSetProxy {
   tDIO::tDO m_unsetOutputStateReg;
   tDIO* m_dio;
 };
-int32_t ComputeDigitalMask(uint8_t channel);
 namespace detail {
 wpi::mutex& UnsafeGetDIOMutex();
 tDIO* UnsafeGetDigialSystem();
+int32_t ComputeDigitalMask(HAL_DigitalHandle handle, int32_t* status);
 }  // namespace detail
 
 /**
@@ -66,7 +65,7 @@ void UnsafeManipulateDIO(HAL_DigitalHandle handle, int32_t* status,
   }
   wpi::mutex& dioMutex = detail::UnsafeGetDIOMutex();
   tDIO* dSys = detail::UnsafeGetDigialSystem();
-  auto mask = ComputeDigitalMask(port->channel);
+  auto mask = detail::ComputeDigitalMask(handle, status);
   if (status != 0) return;
   std::lock_guard<wpi::mutex> lock(dioMutex);
 
