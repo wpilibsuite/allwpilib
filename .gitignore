@@ -1,10 +1,6 @@
 # WPIlib Specific
 
 dependency-reduced-pom.xml
-/wpilibj/src/shared/java/edu/wpi/first/wpilibj/util/WPILibVersion.java
-/wpilibc/shared/src/WPILibVersion.cpp
-/wpilibj/src/main/java/edu/wpi/first/wpilibj/util/WPILibVersion.java
-/wpilibc/src/main/native/cpp/WPILibVersion.cpp
 doxygen.log
 
 # Created by the jenkins test script
