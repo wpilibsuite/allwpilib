@@ -243,11 +243,11 @@ HAL_EncoderHandle HAL_InitializeEncoder(
     HAL_Handle digitalSourceHandleB, HAL_AnalogTriggerType analogTriggerTypeB,
     HAL_Bool reverseDirection, HAL_EncoderEncodingType encodingType,
     int32_t* status) {
-  auto encoder = std::make_shared<Encoder>(
+  auto encoder = std::make_unique<Encoder>(
       digitalSourceHandleA, analogTriggerTypeA, digitalSourceHandleB,
       analogTriggerTypeB, reverseDirection, encodingType, status);
   if (*status != 0) return HAL_kInvalidHandle;  // return in creation error
-  auto handle = encoderHandles->Allocate(encoder);
+  auto handle = encoderHandles->Allocate(std::move(encoder));
   if (handle == HAL_kInvalidHandle) {
     *status = NO_AVAILABLE_RESOURCES;
     return HAL_kInvalidHandle;

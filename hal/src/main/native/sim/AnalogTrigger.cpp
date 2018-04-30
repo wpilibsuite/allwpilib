@@ -204,7 +204,7 @@ HAL_Bool HAL_GetAnalogTriggerInWindow(
     return false;
   }
 
-  double voltage = GetTriggerValue(trigger.get(), status);
+  double voltage = GetTriggerValue(trigger, status);
   if (*status == HAL_HANDLE_ERROR) {
     // Don't error if analog has been destroyed
     *status = 0;
@@ -224,7 +224,7 @@ HAL_Bool HAL_GetAnalogTriggerTriggerState(
     return false;
   }
 
-  double voltage = GetTriggerValue(trigger.get(), status);
+  double voltage = GetTriggerValue(trigger, status);
   if (*status == HAL_HANDLE_ERROR) {
     // Don't error if analog has been destroyed
     *status = 0;
